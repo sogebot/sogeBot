@@ -53,7 +53,7 @@ Notice.prototype.sendNotice = function() {
 }
 
 Notice.prototype.help = function() {
-    var text = 'Notice usage: !notice add <text> | !notice get <id> | !notice remove <id> | !notice list';
+    var text = 'Usage: !notice add <text> | !notice get <id> | !notice remove <id> | !notice list';
     global.client.action(global.configuration.get().twitch.owner, text);
 }
 
