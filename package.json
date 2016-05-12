@@ -1,0 +1,19 @@
+{
+  "name": "sogebot",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "sogeBot",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Michal Orlik",
+  "license": "ISC",
+  "dependencies": {
+    "auto-load": "^2.1.0",
+    "chalk": "^1.1.3",
+    "ini": "^1.3.4",
+    "nedb": "^1.8.0",
+    "tmi.js": "0.0.29"
+  }
+}
