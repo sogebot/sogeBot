@@ -16,11 +16,11 @@ function Notice(configuration) {
     this.msgCountSent   = global.parser.linesParsed;
         
     if (global.configuration.get().systems.notice === true) {
-        global.parser.register('!notice add',  this.addNotice,   constants.OWNER_ONLY);
-        global.parser.register('!notice list', this.listNotices, constants.OWNER_ONLY);
-        global.parser.register('!notice get',  this.getNotice,   constants.OWNER_ONLY);
-        global.parser.register('!notice del',  this.delNotice,   constants.OWNER_ONLY);
-        global.parser.register('!notice',      this.help,        constants.OWNER_ONLY);
+        global.parser.register('!notice add',    this.addNotice,   constants.OWNER_ONLY);
+        global.parser.register('!notice list',   this.listNotices, constants.OWNER_ONLY);
+        global.parser.register('!notice get',    this.getNotice,   constants.OWNER_ONLY);
+        global.parser.register('!notice remove', this.delNotice,   constants.OWNER_ONLY);
+        global.parser.register('!notice',        this.help,        constants.OWNER_ONLY);
         
         // start interval for posting notices
         var self = this;
@@ -53,7 +53,7 @@ Notice.prototype.sendNotice = function() {
 }
 
 Notice.prototype.help = function() {
-    var text = 'Notice usage: !notice add <text> | !notice get <id> | !notice del <id> | !notice list';
+    var text = 'Notice usage: !notice add <text> | !notice get <id> | !notice remove <id> | !notice list';
     global.client.action(global.configuration.get().twitch.owner, text);
 }
 
