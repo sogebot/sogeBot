@@ -15,7 +15,7 @@ Parser.prototype.parse = function(user, message) {
         if (message.startsWith(cmd)) {
             if (this.permissionsCmds[cmd] === constants.VIEWERS || this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user)) {
                 var text = message.replace(cmd,'');
-                this.registeredCmds[cmd](user, text.trim());
+                this.registeredCmds[cmd](user, text.trim(), message);
                 break; // cmd is executed
             }
         }
@@ -25,6 +25,11 @@ Parser.prototype.parse = function(user, message) {
 Parser.prototype.register = function(cmd, fnc, permission) {
     this.registeredCmds[cmd] = fnc;
     this.permissionsCmds[cmd] = permission;
+}
+
+Parser.prototype.unregister = function(cmd) {
+    delete this.registeredCmds[cmd];
+    delete this.permissionsCmds[cmd];
 }
 
 Parser.prototype.isOwner = function(user) {
