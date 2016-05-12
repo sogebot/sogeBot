@@ -37,9 +37,6 @@ client.connect().then(function(data) {
     client.color("Firebrick");
 });
 
-
 client.on("chat", function (channel, user, message, self) {
     parser.parse(user, message);
 });
-
-
