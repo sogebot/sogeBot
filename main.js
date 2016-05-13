@@ -33,7 +33,11 @@ var options = {
 global.client = new irc.client(options);
 
 // Connect the client to the server..
-client.connect().then(function(data) {
+client.connect()
+
+client.on("connected", function (address, port) {
+    global.client.raw("CAP REQ :twitch.tv/commands");
+    global.client.raw("CAP REQ :twitch.tv/membership");
     client.color("Firebrick");
 });
 
