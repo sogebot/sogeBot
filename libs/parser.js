@@ -1,7 +1,10 @@
 'use strict';
 
 var chalk     = require('chalk'),
-    constants = require("./constants");
+    constants = require("./constants"),
+    crypto    = require('crypto');;
+
+var queue = {};
 
 function Parser() {
     this.registeredCmds = {};
@@ -9,19 +12,45 @@ function Parser() {
     this.registeredParsers = {};
     this.permissionsParsers = {};
     this.linesParsed = 0;
+    
+    // check queue and then parseCommands\
+    var self = this;
+    setInterval(function() {
+        for (var id in queue) {
+            if (queue.hasOwnProperty(id) && queue[id].success == queue[id].started) {
+                self.parseCommands(queue[id].user, queue[id].message) 
+                removeFromQueue(id);
+            }
+        }
+    }, 500);
 }
 
 Parser.prototype.parse = function(user, message) {
     this.linesParsed++;
     
-    var isParseable = true;
-    for (var parser in this.registeredParsers) {
-        if (this.permissionsParsers[parser] === constants.VIEWERS || this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user)) {
-            isParseable = this.registeredParsers[parser](user, message);
-        }
-        if (!isParseable) return;
-    }
+    // if we dont have registeredParsers, just parseCommands
+    (this.registeredParsers == {} ? this.parseCommands(user, message) : this.addToQueue(user, message));
+}
+
+Parser.prototype.addToQueue = function(user, message) {
+    var id = crypto.createHash('md5').update(user+message).digest("hex");
     
+    var data = {
+        started: 0,
+        success: 0,
+        user: user,
+        message: message
+    }
+    queue[id] = data;
+    for (var parser in this.registeredParsers) {
+        if (this.permissionsParsers[parser] === constants.VIEWERS || this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user) && typeof queue[id] !== 'undefined') {
+            this.registeredParsers[parser](id, user, message);
+            queue[id].started = parseInt(queue[id].started) + 1;
+        }
+    }
+}
+
+Parser.prototype.parseCommands = function(user, message) {
     for (var cmd in this.registeredCmds) {
         if (message.startsWith(cmd)) {
             if (this.permissionsCmds[cmd] === constants.VIEWERS || this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user)) {
@@ -51,5 +80,20 @@ Parser.prototype.unregister = function(cmd) {
 Parser.prototype.isOwner = function(user) {
     return global.configuration.get().twitch.owner.toLowerCase() === user.username.toLowerCase();
 }
+
+// these needs to be global, will be called from called parsers
+global.updateQueue = function(id, success) {
+    if (success) {
+        queue[id].success = parseInt(queue[id].success) + 1;
+    } else {
+        removeFromQueue(id);
+    }
+}
+
+global.removeFromQueue = function(id) {
+    delete queue[id];
+}
+
+
 
 module.exports = Parser;

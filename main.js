@@ -13,7 +13,7 @@ global.configuration = new Configuration;
 global.parser        = new Parser;
     
 // bot systems
-var systems = require('auto-load')('./libs/systems/');
+global.systems = require('auto-load')('./libs/systems/');
 
 var options = {
     options: {

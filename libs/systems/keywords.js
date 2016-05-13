@@ -57,8 +57,11 @@ Keywords.prototype.addKeyword = function(user, keyword) {
     });
 }
 
-Keywords.prototype.customKeyword = function(user, msg) {
-    if (msg.startsWith('!')) return true; // don't want to parse commands
+Keywords.prototype.customKeyword = function(id, user, msg) {
+    if (msg.startsWith('!')) {
+        global.updateQueue(id, true); // don't want to parse commands
+        return true;
+    }
     
     database.find({ }, function (err, items) {
         for (var item in items) {
@@ -73,8 +76,8 @@ Keywords.prototype.customKeyword = function(user, msg) {
                 }          
             }
         }
+        global.updateQueue(id, true)
     });
-    return true;
 }
 
 Keywords.prototype.listKeywords = function() {

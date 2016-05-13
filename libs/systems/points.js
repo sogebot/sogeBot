@@ -29,6 +29,10 @@ function Points(configuration) {
     console.log('Points system loaded and ' + (global.configuration.get().systems.points === true ? chalk.green('enabled'):chalk.red('disabled')));
 }
 
+Points.prototype.getDatabase = function() {
+    return database;
+}
+
 Points.prototype.addEvents = function(self) {
     global.client.on("join", function (channel, username) {
         if (username != global.configuration.get().twitch.username) {
