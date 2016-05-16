@@ -39,7 +39,7 @@ Notice.prototype.sendNotice = function() {
     
     if (now-this.lastNoticeSent >= timeIntervalInMs && global.parser.linesParsed-this.msgCountSent >= noticeMinChatMsg) {
         database.findOne({ }).sort({ time: 1 }).exec(function (err, item) {
-            if (typeof item !== undefined && item !== null) {
+            if (typeof item !== 'undefined' && item !== null) {
                 database.update({_id: item._id}, {$set: {time: new Date().getTime()}}, {}, function() {
                     global.client.action(global.configuration.get().twitch.owner, item.text);
                 });
@@ -90,7 +90,7 @@ Notice.prototype.getNotice = function(user, id) {
     }  
     
     database.findOne({ _id: id }, function (err, docs) {
-        var output = (typeof docs === undefined || docs === null ? 'Notice#' + id + ' cannot be found.' : docs.text);
+        var output = (typeof docs === 'undefined' || docs === null ? 'Notice#' + id + ' cannot be found.' : docs.text);
         global.client.action(global.configuration.get().twitch.owner, output);
     });
 }

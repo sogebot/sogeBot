@@ -78,7 +78,7 @@ Points.prototype.setPoints = function(user, text) {
     }
     
     database.findOne({ username: user }, function (err, item) {
-        if (typeof item === undefined || item === null) {
+        if (typeof item === 'undefined' || item === null) {
             database.insert({username: user, points: points});
         } else {
             database.update({username: user}, {$set: {points: points}}, {});
@@ -109,14 +109,14 @@ Points.prototype.givePoints = function(user, text) {
     }
     
     database.findOne({ username: user.username }, function (err, item) {
-        if (typeof item === undefined || item === null) {
+        if (typeof item === 'undefined' || item === null) {
             global.client.action(global.configuration.get().twitch.owner, 'You, ' + user.username + ', cannot give points as you have none.');
         } else {
             if (parseInt(item.points) < points) {
                 global.client.action(global.configuration.get().twitch.owner, 'You, ' + user.username + ', don\'t have enough points.');
             }
             database.findOne({ username: user2 }, function (err, item) {
-                if (typeof item === undefined || item === null) {
+                if (typeof item === 'undefined' || item === null) {
                     database.insert({username: user2, points: points});
                 } else {
                     database.update({username: user2}, {$set: {points: parseInt(item.points) + points}}, {});
@@ -140,7 +140,7 @@ Points.prototype.getPointsFromUser = function(user, text) {
         
     database.findOne({ username: user }, function (err, item) {
         // TODO - create a function as this is used a lot
-        var points = (typeof item !== undefined && item !== null ? item.points : 0),
+        var points = (typeof item !== 'undefined' && item !== null ? item.points : 0),
             responsePattern = global.configuration.get().systems.pointsResponse,
             pointsNames = global.configuration.get().systems.pointsName.split('|');
             
@@ -259,7 +259,7 @@ Points.prototype.addPoints = function(user, text) {
     }
     
     database.findOne({ username: user }, function (err, item) {
-        if (typeof item === undefined || item === null) {
+        if (typeof item === 'undefined' || item === null) {
             database.insert({username: user, points: points});
         } else {
             database.update({username: user}, {$set: {points: parseInt(item.points) + points}}, {});
@@ -290,7 +290,7 @@ Points.prototype.removePoints = function(user, text) {
     }
     
     database.findOne({ username: user }, function (err, item) {
-        if (typeof item === undefined || item === null) {
+        if (typeof item === 'undefined' || item === null) {
             database.insert({username: user, points: points});
         } else {
             if (parseInt(item.points) - points < 0) { points = item.points };
@@ -303,7 +303,7 @@ Points.prototype.removePoints = function(user, text) {
 Points.prototype.getPoints = function(user) {
     var self = this;
     database.findOne({ username: user.username }, function (err, item) {
-        var points = (typeof item !== undefined && item !== null ? item.points : 0),
+        var points = (typeof item !== 'undefined' && item !== null ? item.points : 0),
             responsePattern = global.configuration.get().systems.pointsResponse,
             pointsNames = global.configuration.get().systems.pointsName.split('|');
             
@@ -357,7 +357,7 @@ Points.prototype.getPoints = function(user) {
 
 Points.prototype.startCounting = function(username) {
     database.findOne({ username: username }, function (err, item) {
-            if (typeof item !== undefined && item !== null) { // exists, update
+            if (typeof item !== 'undefined' && item !== null) { // exists, update
                 var partedTime = (item.partedTime == 0 ? item.pointsGrantedAt : item.partedTime), // if not correctly parted
                     pointsGrantedAt = new Date().getTime() + (item.pointsGrantedAt - partedTime) ;
                 database.update({_id: item._id}, {$set: {isOnline: true, pointsGrantedAt: pointsGrantedAt}}, {});
