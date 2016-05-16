@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+	<head>
+        <title>YTPlayer for SogeBot!</title>
+        <meta charset="utf-8">
+		<meta name="robots" content="index, follow">
+		<meta name="theme-color" content="#f4f5f6">
+		<meta name="apple-mobile-web-app-status-bar-style" content="#f4f5f6">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- Google Fonts -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+        <!-- CSS Reset -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
+        <!-- Milligram CSS minified -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.1.0/milligram.min.css">
+        <!-- YTPlayer -->
+        <script src="https://www.youtube.com/iframe_api"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+    </head>
+    <body>
+		<main class="wrapper">
+            <div class="container">
+                <div id="YTPlayer"></div>    
+                
+            <h4>Song requests</h4>
+            <table>
+                <thead>
+                    <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Requested By</th>
+                    </tr>
+                </thead>
+                <tbody id="songRequests"></tbody>
+            </table>
+            
+            <h4>Playlist</h4>
+            <table>
+                <thead>
+                    <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    </tr>
+                </thead>
+                <tbody id="Playlist"></tbody>
+            </table>
+            </div>
+        </main>
+        
+        <script>
+            var player, time_update_interval;
+            var socket = io();
+
+            function onYouTubeIframeAPIReady() {
+                player = new YT.Player('YTPlayer', {
+                    width: 600,
+                    height: 400,
+                    videoId: '',
+                    playerVars: {
+                        color: 'white'
+                    },
+                    events: {
+                        onReady: initialize
+                    }
+                });
+            }
+
+            function initialize(){
+                isFinished();
+
+                // Clear any old interval.
+                clearInterval(time_update_interval);
+
+                // Start interval to update elapsed time display and
+                // the elapsed part of the progress bar every second.
+                time_update_interval = setInterval(function () {
+                    isFinished();
+                    socket.emit('getSongRequests');
+                    socket.emit('getPlaylist');
+                }, 2000)
+
+            }
+
+            // This function is called by initialize()
+            function isFinished(){
+                var progress = Math.floor((player.getCurrentTime() / player.getDuration()) * 100);
+                if (progress === 100 || !Number.isInteger(progress)) {
+                    socket.emit('getVideoID');
+                }
+            }
+            
+            socket.on('videoID', function(id) {
+                player.loadVideoById(id);
+                player.playVideo();
+            });
+            
+            socket.on('songRequestsList', function(list) {   
+                $("#songRequests").empty();
+                for (var index in list) {
+                    if (list.hasOwnProperty(index)) {
+                        var title = list[index].title,
+                            requestedBy = list[index].username,
+                            videoID = list[index].videoID;
+                        $("#songRequests").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+requestedBy+'</td></tr>');
+                    }
+                }
+            });
+            
+            socket.on('songPlaylistList', function(list) {   
+                $("#Playlist").empty();
+                for (var index in list) {
+                    if (list.hasOwnProperty(index)) {
+                        var title = list[index].title,
+                            videoID = list[index].videoID;
+                        $("#Playlist").append('<tr><td>'+videoID+'</td><td>'+title+'</td></tr>');
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>
