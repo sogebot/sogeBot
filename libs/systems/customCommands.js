@@ -70,7 +70,7 @@ customCommands.prototype.addCommand = function(user, keyword) {
 
 customCommands.prototype.customCommand = function(user, msg, fullMsg) {
     database.findOne({ keyword: fullMsg.split('!')[1] }, function (err, item) {
-            if (typeof item !== undefined && item !== null) {
+            if (typeof item !== 'undefined' && item !== null) {
                 global.client.action(global.configuration.get().twitch.owner, item.response);
             } else {
                 global.parser.unregister(fullMsg); // unregister if not found in database

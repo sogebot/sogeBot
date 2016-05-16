@@ -94,7 +94,7 @@ Price.prototype.checkPrice = function(id, user, msg) {
                     (msg[position+kwLength] === ' ' || typeof msg[position+kwLength] === 'undefined')) {
                         var pointsDb = global.systems.points.getDatabase();
                         pointsDb.findOne({ username: user.username }, function (err, item) {
-                            var points = (typeof item !== undefined && item !== null ? item.points : 0);
+                            var points = (typeof item !== 'undefined' && item !== null ? item.points : 0);
                             if (points >= price) {
                                 pointsDb.update({username: user.username}, {$set: {points: points-price}}, {});
                                 global.updateQueue(id, true);
