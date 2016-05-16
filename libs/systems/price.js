@@ -81,7 +81,7 @@ Price.prototype.checkPrice = function(id, user, msg) {
         global.updateQueue(id, true); // we want to parse _ONLY_ commands
         return true;
     }
-    
+
     database.find({ }, function (err, items, isParseable) {
         for (var item in items) {
             if (items.hasOwnProperty(item)) {
@@ -106,7 +106,6 @@ Price.prototype.checkPrice = function(id, user, msg) {
                 }    
             }
         }
-        global.updateQueue(id, true);
     });
 }
 
