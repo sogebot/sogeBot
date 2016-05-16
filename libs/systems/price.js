@@ -82,7 +82,8 @@ Price.prototype.checkPrice = function(id, user, msg) {
         return true;
     }
 
-    database.find({ }, function (err, items, isParseable) {
+    database.find({ }, function (err, items) {
+        var itemFound = false;
         for (var item in items) {
             if (items.hasOwnProperty(item)) {
                 var position = msg.toLowerCase().indexOf('!'+items[item].command),
@@ -93,6 +94,7 @@ Price.prototype.checkPrice = function(id, user, msg) {
                 if (position>=0 && typeof msg[position-1] === 'undefined' &&
                     (msg[position+kwLength] === ' ' || typeof msg[position+kwLength] === 'undefined')) {
                         var pointsDb = global.systems.points.getDatabase();
+                        itemFound = true;
                         pointsDb.findOne({ username: user.username }, function (err, item) {
                             var points = (typeof item !== 'undefined' && item !== null ? item.points : 0);
                             if (points >= price) {
@@ -106,6 +108,7 @@ Price.prototype.checkPrice = function(id, user, msg) {
                 }    
             }
         }
+	if (!itemFound) global.updateQueue(id, true);
     });
 }
 
