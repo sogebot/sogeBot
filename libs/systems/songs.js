@@ -26,7 +26,10 @@ function Songs (configuration) {
     global.parser.register('!wrongsong', this.removeSongFromQueue, constants.VIEWERS)
     global.parser.register('!playlist add', this.addSongToPlaylist, constants.OWNER_ONLY)
     global.parser.register('!playlist remove', this.removeSongFromPlaylist, constants.OWNER_ONLY)
+    global.parser.register('!playlist random', this.randomizePlaylist, constants.OWNER_ONLY)
     global.parser.register('!playlist', this.help, constants.OWNER_ONLY)
+
+    this.checkIfRandomizeIsSaved()
 
     var server = http.createServer(this.handleRequest)
     var io = require('socket.io')(server)
@@ -41,6 +44,31 @@ function Songs (configuration) {
   }
 
   console.log('Songs system loaded and ' + (global.configuration.get().systems.songs === true ? chalk.green('enabled') : chalk.red('disabled')))
+}
+
+Songs.prototype.checkIfRandomizeIsSaved = function () {
+  global.cfgDB.findOne({playlistRandomize: {$exists: true}}, function (err, item) {
+    if (err) console.log(err)
+    if (typeof item === 'undefined' || item === null) {
+      global.cfgDB.insert({playlistRandomize: false})
+    }
+  })
+}
+
+Songs.prototype.randomizePlaylist = function (sender, text) {
+  if (text.length < 1) return
+
+  if (text.trim() === 'on') {
+    global.cfgDB.update({playlistRandomize: {$exists: true}}, {$set: {playlistRandomize: true}}, {}, function (err, numUpdated) {
+      if (err) console.log(err)
+      if (numUpdated) global.client.action(global.configuration.get().twitch.owner, 'Playlist will play randomly now.')
+    })
+  } else {
+    global.cfgDB.update({playlistRandomize: {$exists: true}}, {$set: {playlistRandomize: false}}, {}, function (err, numUpdated) {
+      if (err) console.log(err)
+      if (numUpdated) global.client.action(global.configuration.get().twitch.owner, "Playlist won't play randomly now.")
+    })
+  }
 }
 
 Songs.prototype.addSocketListening = function (self, socket) {
@@ -77,11 +105,24 @@ Songs.prototype.sendNextSongID = function (socket) {
       socket.emit('videoID', item.videoID)
       songRequests.remove({ videoID: item.videoID }, {})
     } else { // run from playlist
-      playlist.findOne({}).sort({lastPlayedAt: 1}).exec(function (err, item) {
+      global.cfgDB.findOne({playlistRandomize: {$exists: true}}, function (err, item) {
         if (err) console.log(err)
-        if (typeof item !== 'undefined' && item !== null) { // song is found
-          playlist.update({videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
-          socket.emit('videoID', item.videoID)
+
+        var isRandom = item.playlistRandomize
+        if (isRandom) {
+          playlist.find({}).sort().exec(function (err, items) {
+            if (err) console.log(err)
+            var randomSongIndex = Math.floor((Math.random() * items.length))
+            socket.emit('videoID', items[randomSongIndex].videoID)
+          })
+        } else {
+          playlist.findOne({}).sort({lastPlayedAt: 1}).exec(function (err, item) {
+            if (err) console.log(err)
+            if (typeof item !== 'undefined' && item !== null) { // song is found
+              playlist.update({videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
+              socket.emit('videoID', item.videoID)
+            }
+          })
         }
       })
     }

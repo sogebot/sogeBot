@@ -2,6 +2,13 @@
 
 var ini = require('ini')
 var fs = require('fs')
+var Database = require('nedb')
+
+global.cfgDB = new Database({
+  filename: 'db/config.db',
+  autoload: true
+})
+global.cfgDB.persistence.setAutocompactionInterval(60000)
 
 function Configuration () {
   this.config = null
