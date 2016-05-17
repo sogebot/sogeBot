@@ -4,9 +4,6 @@
   "description": "",
   "private": true,
   "main": "sogeBot",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "Michal Orlik",
   "license": "ISC",
   "dependencies": {
@@ -18,5 +15,5 @@
     "tmi.js": "0.0.29",
     "youtube-info": "^1.1.0"
   },
-  "scripts": { "start" : "node ./main" }
+  "scripts": { "start" : "node ./main", "test": "echo \"Error: no test specified\" && exit 1" }
 }
