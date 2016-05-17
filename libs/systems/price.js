@@ -109,6 +109,7 @@ Price.prototype.checkPrice = function (id, user, msg) {
             }
           })
         }
+        break
       }
     }
     if (!itemFound) global.updateQueue(id, true)
