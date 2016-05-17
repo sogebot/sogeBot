@@ -80,7 +80,7 @@ Notice.prototype.listNotices = function () {
   database.find({}, function (err, docs) {
     if (err) console.log(err)
     var ids = []
-    docs.forEach(function (e, i, ar) { ids.push(e._id); })
+    docs.forEach(function (e, i, ar) { ids.push(e._id) })
     var output = (docs.length === 0 ? 'Notice list is empty.' : 'Notice ID list: ' + ids.join(', ') + '.')
     global.client.action(global.configuration.get().twitch.owner, output)
   })
@@ -105,7 +105,7 @@ Notice.prototype.delNotice = function (user, id) {
     return
   }
 
-  database.remove({ _id: id}, {}, function (err, numRemoved) {
+  database.remove({_id: id}, {}, function (err, numRemoved) {
     if (err) console.log(err)
     var output = (numRemoved === 0 ? 'Notice#' + id + ' cannot be found.' : 'Notice#' + id + ' is succesfully deleted.')
     global.client.action(global.configuration.get().twitch.owner, output)
