@@ -83,7 +83,7 @@ Parser.prototype.isOwner = function (user) {
 
 // these needs to be global, will be called from called parsers
 global.updateQueue = function (id, success) {
-  if (success) {
+  if (success && typeof queue[id] !== 'undefined') {
     queue[id].success = parseInt(queue[id].success, 10) + 1
   } else {
     global.removeFromQueue(id)
