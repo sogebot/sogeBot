@@ -102,7 +102,6 @@ Keywords.prototype.delKeyword = function (user, keyword) {
     if (err) { console.log(err) }
     var output = (numRemoved === 0 ? 'Keyword#' + keyword + ' cannot be found.' : 'Keyword#' + keyword + ' is succesfully deleted.')
     global.client.action(global.configuration.get().twitch.owner, output)
-    if (numRemoved > 0) global.parser.unregister('!' + keyword)
   })
 }
 module.exports = new Keywords()
