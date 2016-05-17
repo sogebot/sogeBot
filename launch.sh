@@ -11,4 +11,4 @@ if [ ! -d "$DIR/node_modules" ]; then
     npm install
 fi
 
-node main.js
+npm start
