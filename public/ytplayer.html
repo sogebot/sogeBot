@@ -52,6 +52,7 @@
         <script>
             var player, time_update_interval;
             var socket = io();
+            var skipSong = false;
 
             function onYouTubeIframeAPIReady() {
                 player = new YT.Player('YTPlayer', {
@@ -86,10 +87,15 @@
             // This function is called by initialize()
             function isFinished(){
                 var progress = Math.floor((player.getCurrentTime() / player.getDuration()) * 100);
-                if (progress === 100 || !Number.isInteger(progress)) {
+                if (progress === 100 || !Number.isInteger(progress) || skipSong) {
                     socket.emit('getVideoID');
+                    skipSong = false;
                 }
             }
+            
+            socket.on('skipSong', function() {
+              skipSong = true;
+            })
             
             socket.on('videoID', function(id) {
                 player.loadVideoById(id);
