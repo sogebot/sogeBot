@@ -24,7 +24,7 @@ function Songs (configuration) {
   if (global.configuration.get().systems.songs === true) {
     this.socketPointer = null
     this.currentSong = {}
-    
+
     global.parser.register(this, '!songrequest', this.addSongToQueue, constants.VIEWERS)
     global.parser.register(this, '!wrongsong', this.removeSongFromQueue, constants.VIEWERS)
     global.parser.register(this, '!currentsong', this.getCurrentSong, constants.VIEWERS)
@@ -70,7 +70,7 @@ Songs.prototype.stealSongToPlaylist = function (self) {
 }
 
 Songs.prototype.skipSong = function (self) {
-  self.sendNextSongID(self.socketPointer)
+  self.socketPointer.emit('skipSong')
 }
 
 Songs.prototype.checkIfRandomizeIsSaved = function () {
