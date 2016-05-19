@@ -14,10 +14,10 @@ database.persistence.setAutocompactionInterval(60000)
 
 function Keywords (configuration) {
   if (global.configuration.get().systems.keywords === true) {
-    global.parser.register('!keyword add', this.addKeyword, constants.OWNER_ONLY)
-    global.parser.register('!keyword list', this.listKeywords, constants.OWNER_ONLY)
-    global.parser.register('!keyword remove', this.delKeyword, constants.OWNER_ONLY)
-    global.parser.register('!keyword', this.help, constants.OWNER_ONLY)
+    global.parser.register(this, '!keyword add', this.addKeyword, constants.OWNER_ONLY)
+    global.parser.register(this, '!keyword list', this.listKeywords, constants.OWNER_ONLY)
+    global.parser.register(this, '!keyword remove', this.delKeyword, constants.OWNER_ONLY)
+    global.parser.register(this, '!keyword', this.help, constants.OWNER_ONLY)
 
     global.parser.registerParser('keywords', this.customKeyword, constants.VIEWERS)
   }
@@ -30,7 +30,7 @@ Keywords.prototype.help = function () {
   global.client.action(global.configuration.get().twitch.owner, text)
 }
 
-Keywords.prototype.addKeyword = function (user, keyword) {
+Keywords.prototype.addKeyword = function (self, user, keyword) {
   if (keyword.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Keyword error: Cannot add empty keyword')
     return
@@ -92,7 +92,7 @@ Keywords.prototype.listKeywords = function () {
   })
 }
 
-Keywords.prototype.delKeyword = function (user, keyword) {
+Keywords.prototype.delKeyword = function (self, user, keyword) {
   if (keyword.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Keyword error: Cannot delete keyword without keyword.')
     return

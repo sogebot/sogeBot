@@ -15,11 +15,11 @@ function Notice (configuration) {
   this.msgCountSent = global.parser.linesParsed
 
   if (global.configuration.get().systems.notice === true) {
-    global.parser.register('!notice add', this.addNotice, constants.OWNER_ONLY)
-    global.parser.register('!notice list', this.listNotices, constants.OWNER_ONLY)
-    global.parser.register('!notice get', this.getNotice, constants.OWNER_ONLY)
-    global.parser.register('!notice remove', this.delNotice, constants.OWNER_ONLY)
-    global.parser.register('!notice', this.help, constants.OWNER_ONLY)
+    global.parser.register(this, '!notice add', this.addNotice, constants.OWNER_ONLY)
+    global.parser.register(this, '!notice list', this.listNotices, constants.OWNER_ONLY)
+    global.parser.register(this, '!notice get', this.getNotice, constants.OWNER_ONLY)
+    global.parser.register(this, '!notice remove', this.delNotice, constants.OWNER_ONLY)
+    global.parser.register(this, '!notice', this.help, constants.OWNER_ONLY)
 
     // start interval for posting notices
     var self = this
@@ -57,7 +57,7 @@ Notice.prototype.help = function () {
   global.client.action(global.configuration.get().twitch.owner, text)
 }
 
-Notice.prototype.addNotice = function (user, text) {
+Notice.prototype.addNotice = function (self, user, text) {
   if (text.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Notice error: Cannot add empty notice.')
     return
@@ -86,7 +86,7 @@ Notice.prototype.listNotices = function () {
   })
 }
 
-Notice.prototype.getNotice = function (user, id) {
+Notice.prototype.getNotice = function (self, user, id) {
   if (id.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Notice error: Cannot get notice without id.')
     return
@@ -99,7 +99,7 @@ Notice.prototype.getNotice = function (user, id) {
   })
 }
 
-Notice.prototype.delNotice = function (user, id) {
+Notice.prototype.delNotice = function (self, user, id) {
   if (id.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Notice error: Cannot delete notice without id.')
     return

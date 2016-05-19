@@ -12,15 +12,15 @@ database.persistence.setAutocompactionInterval(60000)
 
 function CustomCommands (configuration) {
   if (global.configuration.get().systems.customCommands === true) {
-    global.parser.register('!command add', this.addCommand, constants.OWNER_ONLY)
-    global.parser.register('!command list', this.listCommands, constants.OWNER_ONLY)
-    global.parser.register('!command remove', this.delCommand, constants.OWNER_ONLY)
-    global.parser.register('!command', this.help, constants.OWNER_ONLY)
+    global.parser.register(this, '!command add', this.addCommand, constants.OWNER_ONLY)
+    global.parser.register(this, '!command list', this.listCommands, constants.OWNER_ONLY)
+    global.parser.register(this, '!command remove', this.delCommand, constants.OWNER_ONLY)
+    global.parser.register(this, '!command', this.help, constants.OWNER_ONLY)
 
     // start interval for registering commands from DB
     var self = this
     setInterval(function () {
-      self.registerCommands()
+      self.registerCommands(self)
     }, 1000)
   }
 
@@ -32,15 +32,14 @@ CustomCommands.prototype.help = function () {
   global.client.action(global.configuration.get().twitch.owner, text)
 }
 
-CustomCommands.prototype.registerCommands = function () {
-  var self = this
+CustomCommands.prototype.registerCommands = function (self) {
   database.find({}, function (err, docs) {
     if (err) { console.log(err) }
-    docs.forEach(function (e, i, ar) { global.parser.register('!' + e.keyword, self.customCommand, constants.VIEWERS) })
+    docs.forEach(function (e, i, ar) { global.parser.register(self, '!' + e.keyword, self.customCommand, constants.VIEWERS) })
   })
 }
 
-CustomCommands.prototype.addCommand = function (user, keyword) {
+CustomCommands.prototype.addCommand = function (self, user, keyword) {
   if (keyword.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'CustomCommand error: Cannot add empty keyword')
     return
@@ -68,7 +67,7 @@ CustomCommands.prototype.addCommand = function (user, keyword) {
   })
 }
 
-CustomCommands.prototype.customCommand = function (user, msg, fullMsg) {
+CustomCommands.prototype.customCommand = function (self, user, msg, fullMsg) {
   database.findOne({keyword: fullMsg.split('!')[1]}, function (err, item) {
     if (err) { console.log(err) }
     if (typeof item !== 'undefined' && item !== null) {
@@ -89,7 +88,7 @@ CustomCommands.prototype.listCommands = function () {
   })
 }
 
-CustomCommands.prototype.delCommand = function (user, keyword) {
+CustomCommands.prototype.delCommand = function (self, user, keyword) {
   if (keyword.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'CustomCommand error: Cannot delete keyword without keyword.')
     return

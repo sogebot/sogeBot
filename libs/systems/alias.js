@@ -14,10 +14,10 @@ database.persistence.setAutocompactionInterval(60000)
 
 function Alias (configuration) {
   if (global.configuration.get().systems.keywords === true) {
-    global.parser.register('!alias add', this.add, constants.OWNER_ONLY)
-    global.parser.register('!alias list', this.list, constants.OWNER_ONLY)
-    global.parser.register('!alias remove', this.remove, constants.OWNER_ONLY)
-    global.parser.register('!alias', this.help, constants.OWNER_ONLY)
+    global.parser.register(this, '!alias add', this.add, constants.OWNER_ONLY)
+    global.parser.register(this, '!alias list', this.list, constants.OWNER_ONLY)
+    global.parser.register(this, '!alias remove', this.remove, constants.OWNER_ONLY)
+    global.parser.register(this, '!alias', this.help, constants.OWNER_ONLY)
 
     global.parser.registerParser('alias', this.parse, constants.VIEWERS)
   }
@@ -30,7 +30,7 @@ Alias.prototype.help = function () {
   global.client.action(global.configuration.get().twitch.owner, text)
 }
 
-Alias.prototype.add = function (sender, text) {
+Alias.prototype.add = function (self, sender, text) {
   if (text.length < 1 || text.split(' ').length <= 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender + ', alias command is not correct, check !alias')
     return
@@ -62,7 +62,7 @@ Alias.prototype.list = function () {
   })
 }
 
-Alias.prototype.remove = function (sender, text) {
+Alias.prototype.remove = function (self, sender, text) {
   if (text.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender + ', alias command is not correct, check !alias')
     return

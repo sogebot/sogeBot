@@ -11,14 +11,14 @@ database.persistence.setAutocompactionInterval(60000)
 
 function Points (configuration) {
   if (global.configuration.get().systems.points === true) {
-    global.parser.register('!points add', this.addPoints, constants.OWNER_ONLY)
-    global.parser.register('!points remove', this.removePoints, constants.OWNER_ONLY)
-    global.parser.register('!points all', this.allPoints, constants.OWNER_ONLY)
-    global.parser.register('!points set', this.setPoints, constants.OWNER_ONLY)
-    global.parser.register('!points get', this.getPointsFromUser, constants.OWNER_ONLY)
-    global.parser.register('!points give', this.givePoints, constants.VIEWERS)
-    global.parser.register('!makeitrain', this.rainPoints, constants.OWNER_ONLY)
-    global.parser.register('!points', this.getPoints, constants.VIEWERS)
+    global.parser.register(this, '!points add', this.addPoints, constants.OWNER_ONLY)
+    global.parser.register(this, '!points remove', this.removePoints, constants.OWNER_ONLY)
+    global.parser.register(this, '!points all', this.allPoints, constants.OWNER_ONLY)
+    global.parser.register(this, '!points set', this.setPoints, constants.OWNER_ONLY)
+    global.parser.register(this, '!points get', this.getPointsFromUser, constants.OWNER_ONLY)
+    global.parser.register(this, '!points give', this.givePoints, constants.VIEWERS)
+    global.parser.register(this, '!makeitrain', this.rainPoints, constants.OWNER_ONLY)
+    global.parser.register(this, '!points', this.getPoints, constants.VIEWERS)
 
     // add events for join/part
     var self = this
@@ -54,7 +54,7 @@ Points.prototype.addEvents = function (self) {
   })
 }
 
-Points.prototype.setPoints = function (sender, text) {
+Points.prototype.setPoints = function (self, sender, text) {
   if (text.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify user')
     return
@@ -85,7 +85,7 @@ Points.prototype.setPoints = function (sender, text) {
   })
 }
 
-Points.prototype.givePoints = function (user, text) {
+Points.prototype.givePoints = function (self, user, text) {
   if (text.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify user')
     return
@@ -127,7 +127,7 @@ Points.prototype.givePoints = function (user, text) {
   })
 }
 
-Points.prototype.getPointsFromUser = function (sender, text) {
+Points.prototype.getPointsFromUser = function (self, sender, text) {
   if (text.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify user')
     return
@@ -190,7 +190,7 @@ Points.prototype.getPointsFromUser = function (sender, text) {
   })
 }
 
-Points.prototype.allPoints = function (user, text) {
+Points.prototype.allPoints = function (self, user, text) {
   if (text.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify points')
     return
@@ -212,7 +212,7 @@ Points.prototype.allPoints = function (user, text) {
   })
 }
 
-Points.prototype.rainPoints = function (user, text) {
+Points.prototype.rainPoints = function (self, user, text) {
   if (text.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify max points')
     return
@@ -235,7 +235,7 @@ Points.prototype.rainPoints = function (user, text) {
   })
 }
 
-Points.prototype.addPoints = function (sender, text) {
+Points.prototype.addPoints = function (self, sender, text) {
   if (text.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify user')
     return
@@ -266,7 +266,7 @@ Points.prototype.addPoints = function (sender, text) {
   })
 }
 
-Points.prototype.removePoints = function (sender, text) {
+Points.prototype.removePoints = function (self, sender, text) {
   if (text.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify user')
     return
@@ -298,7 +298,7 @@ Points.prototype.removePoints = function (sender, text) {
   })
 }
 
-Points.prototype.getPoints = function (user) {
+Points.prototype.getPoints = function (self, user) {
   database.findOne({ username: user.username }, function (err, item) {
     if (err) console.log(err)
     var points = (typeof item !== 'undefined' && item !== null ? item.points : 0)

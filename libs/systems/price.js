@@ -12,10 +12,10 @@ database.persistence.setAutocompactionInterval(60000)
 
 function Price (configuration) {
   if (global.configuration.get().systems.points === true && global.configuration.get().systems.price === true) {
-    global.parser.register('!price set', this.setPrice, constants.OWNER_ONLY)
-    global.parser.register('!price list', this.listPrices, constants.OWNER_ONLY)
-    global.parser.register('!price unset', this.unsetPrice, constants.OWNER_ONLY)
-    global.parser.register('!price', this.help, constants.OWNER_ONLY)
+    global.parser.register(this, '!price set', this.setPrice, constants.OWNER_ONLY)
+    global.parser.register(this, '!price list', this.listPrices, constants.OWNER_ONLY)
+    global.parser.register(this, '!price unset', this.unsetPrice, constants.OWNER_ONLY)
+    global.parser.register(this, '!price', this.help, constants.OWNER_ONLY)
 
     global.parser.registerParser('price', this.checkPrice, constants.VIEWERS)
   }
@@ -28,7 +28,7 @@ Price.prototype.help = function () {
   global.client.action(global.configuration.get().twitch.owner, text)
 }
 
-Price.prototype.setPrice = function (user, text) {
+Price.prototype.setPrice = function (self, user, text) {
   if (text.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Price error: Cannot set price for empty command')
     return
@@ -59,7 +59,7 @@ Price.prototype.setPrice = function (user, text) {
   })
 }
 
-Price.prototype.unsetPrice = function (user, msg) {
+Price.prototype.unsetPrice = function (self, user, msg) {
   database.remove({command: msg}, {}, function (err, numRemoved) {
     if (err) console.log(err)
     var output = (numRemoved === 0 ? 'Price#' + msg + " wasn't set." : 'Price#' + msg + ' is succesfully unset.')
@@ -67,7 +67,7 @@ Price.prototype.unsetPrice = function (user, msg) {
   })
 }
 
-Price.prototype.listPrices = function (user, msg) {
+Price.prototype.listPrices = function (self, user, msg) {
   database.find({}, function (err, docs) {
     if (err) console.log(err)
     var ids = []
