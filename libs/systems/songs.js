@@ -7,7 +7,6 @@ var http = require('http')
 var fs = require('fs')
 
 var fetchVideoInfo = require('youtube-info')
-var currentSong = ''
 
 var playlist = new Database({
   filename: 'db/playlist.db',
@@ -24,6 +23,7 @@ songRequests.persistence.setAutocompactionInterval(60000)
 function Songs (configuration) {
   if (global.configuration.get().systems.songs === true) {
     this.socketPointer = null
+    this.currentSong = {}
     
     global.parser.register(this, '!songrequest', this.addSongToQueue, constants.VIEWERS)
     global.parser.register(this, '!wrongsong', this.removeSongFromQueue, constants.VIEWERS)
@@ -32,6 +32,7 @@ function Songs (configuration) {
     global.parser.register(this, '!playlist add', this.addSongToPlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist remove', this.removeSongFromPlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist random', this.randomizePlaylist, constants.OWNER_ONLY)
+    global.parser.register(this, '!playlist steal', this.stealSongToPlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist', this.help, constants.OWNER_ONLY)
 
     this.checkIfRandomizeIsSaved()
@@ -52,11 +53,19 @@ function Songs (configuration) {
   console.log('Songs system loaded and ' + (global.configuration.get().systems.songs === true ? chalk.green('enabled') : chalk.red('disabled')))
 }
 
-Songs.prototype.getCurrentSong = function () {
-  if (currentSong.length === 0) {
+Songs.prototype.getCurrentSong = function (self) {
+  try {
+    global.client.action(global.configuration.get().twitch.owner, 'Current song is ' + self.currentSong.title)
+  } catch (err) {
     global.client.action(global.configuration.get().twitch.owner, 'No song is currently playing')
-  } else {
-    global.client.action(global.configuration.get().twitch.owner, 'Current song is ' + currentSong)
+  }
+}
+
+Songs.prototype.stealSongToPlaylist = function (self) {
+  try {
+    self.addSongToPlaylist(self, null, self.currentSong.videoID)
+  } catch (err) {
+    global.client.action(global.configuration.get().twitch.owner, 'No song is currently playing')
   }
 }
 
@@ -116,11 +125,14 @@ Songs.prototype.sendPlaylistList = function (socket) {
 }
 
 Songs.prototype.sendNextSongID = function (socket) {
+  var self = this
   // first, check if there are any requests
   songRequests.findOne({}).sort({addedAt: 1}).exec(function (err, item) {
     if (err) console.log(err)
     if (typeof item !== 'undefined' && item !== null) { // song is found
       socket.emit('videoID', item.videoID)
+      self.currentSong.title = item.title
+      self.currentSong.videoID = item.videoID
       songRequests.remove({ videoID: item.videoID }, {})
     } else { // run from playlist
       global.cfgDB.findOne({playlistRandomize: {$exists: true}}, function (err, item) {
@@ -131,7 +143,8 @@ Songs.prototype.sendNextSongID = function (socket) {
           playlist.find({}).sort().exec(function (err, items) {
             if (err) console.log(err)
             var randomSongIndex = Math.floor((Math.random() * items.length))
-            currentSong = items[randomSongIndex].title
+            self.currentSong.title = items[randomSongIndex].title
+            self.currentSong.videoID = items[randomSongIndex].videoID
             socket.emit('videoID', items[randomSongIndex].videoID)
           })
         } else {
@@ -139,7 +152,8 @@ Songs.prototype.sendNextSongID = function (socket) {
             if (err) console.log(err)
             if (typeof item !== 'undefined' && item !== null) { // song is found
               playlist.update({videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
-              currentSong = item.title
+              self.currentSong.title = item.title
+              self.currentSong.videoID = item.videoID
               socket.emit('videoID', item.videoID)
             }
           })
