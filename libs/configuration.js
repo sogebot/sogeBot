@@ -4,11 +4,12 @@ var ini = require('ini')
 var fs = require('fs')
 var Database = require('nedb')
 
-global.cfgDB = new Database({
-  filename: 'db/config.db',
+global.botDB = new Database({
+  filename: 'sogeBot.db',
   autoload: true
 })
-global.cfgDB.persistence.setAutocompactionInterval(60000)
+global.botDB.persistence.setAutocompactionInterval(60000)
+global.cfgDB = global.botDB // DEPRECATED - delete after fixed
 
 function Configuration () {
   this.config = null
