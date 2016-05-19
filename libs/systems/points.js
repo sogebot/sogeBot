@@ -9,7 +9,7 @@ var database = new Database({
 })
 database.persistence.setAutocompactionInterval(60000)
 
-function Points (configuration) {
+function Points () {
   if (global.configuration.get().systems.points === true) {
     global.parser.register(this, '!points add', this.addPoints, constants.OWNER_ONLY)
     global.parser.register(this, '!points remove', this.removePoints, constants.OWNER_ONLY)

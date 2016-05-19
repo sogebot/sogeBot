@@ -12,7 +12,7 @@ database.persistence.setAutocompactionInterval(60000)
 
 // TODO - add parsing of (sender)
 
-function Keywords (configuration) {
+function Keywords () {
   if (global.configuration.get().systems.keywords === true) {
     global.parser.register(this, '!keyword add', this.addKeyword, constants.OWNER_ONLY)
     global.parser.register(this, '!keyword list', this.listKeywords, constants.OWNER_ONLY)
