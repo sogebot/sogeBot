@@ -9,6 +9,7 @@ function Moderation () {
 
     global.parser.registerParser('moderationLinks', this.containsLink, constants.VIEWERS)
     global.parser.registerParser('moderationSymbols', this.symbols, constants.VIEWERS)
+    global.parser.registerParser('moderationLongMessage', this.longMessage, constants.VIEWERS)
   }
 
   console.log('Moderation system loaded and ' + (global.configuration.get().systems.moderation === true ? chalk.green('enabled') : chalk.red('disabled')))
@@ -21,6 +22,11 @@ Moderation.prototype.permitLink = function (self, sender, text) {
 }
 
 Moderation.prototype.containsLink = function (id, sender, text) {
+  if (global.parser.isOwner(sender)) {
+    global.updateQueue(id, true)
+    return
+  }
+
   var urlRegex = /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/ig
   if (text.search(urlRegex) >= 0 && sender.username !== global.configuration.get().owner) {
     global.botDB.findOne({type: 'permitLink', username: sender.username}, function (err, item) {
@@ -28,7 +34,6 @@ Moderation.prototype.containsLink = function (id, sender, text) {
       try {
         global.botDB.remove({_id: item._id}, {}, function (err, numRemoved) {
           if (err) console.log(err)
-          console.log(numRemoved)
           if (numRemoved === 1) global.updateQueue(id, true)
           else global.updateQueue(id, false)
         })
@@ -44,11 +49,16 @@ Moderation.prototype.containsLink = function (id, sender, text) {
 }
 
 Moderation.prototype.symbols = function (id, sender, text) {
+  if (global.parser.isOwner(sender)) {
+    global.updateQueue(id, true)
+    return
+  }
+
   var timeout = 20
-  var triggerLength = 10
+  var triggerLength = 15
   var msgLength = text.trim().length
   var maxSymbolsConsecutively = 10
-  var maxSymbolsPercent = 20
+  var maxSymbolsPercent = 50
   if (msgLength <= triggerLength) {
     global.updateQueue(id, true)
     return
@@ -76,6 +86,24 @@ Moderation.prototype.symbols = function (id, sender, text) {
     return
   }
 
+  global.updateQueue(id, true)
+}
+
+Moderation.prototype.longMessage = function (id, sender, text) {
+  if (global.parser.isOwner(sender)) {
+    global.updateQueue(id, true)
+    return
+  }
+
+  var timeout = 20
+  var triggerLength = 300
+  var msgLength = text.trim().length
+  if (msgLength >= triggerLength) {
+    global.updateQueue(id, false)
+    global.client.timeout(global.configuration.get().twitch.owner, sender.username, timeout)
+    global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender.username + ', long messages are not allowed')
+    return
+  }
   global.updateQueue(id, true)
 }
 
