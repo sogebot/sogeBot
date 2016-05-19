@@ -7,6 +7,7 @@ var http = require('http')
 var fs = require('fs')
 
 var fetchVideoInfo = require('youtube-info')
+var currentSong = ''
 
 var playlist = new Database({
   filename: 'db/playlist.db',
@@ -24,6 +25,7 @@ function Songs (configuration) {
   if (global.configuration.get().systems.songs === true) {
     global.parser.register('!songrequest', this.addSongToQueue, constants.VIEWERS)
     global.parser.register('!wrongsong', this.removeSongFromQueue, constants.VIEWERS)
+    global.parser.register('!currentsong', this.getCurrentSong, constants.VIEWERS)
     global.parser.register('!playlist add', this.addSongToPlaylist, constants.OWNER_ONLY)
     global.parser.register('!playlist remove', this.removeSongFromPlaylist, constants.OWNER_ONLY)
     global.parser.register('!playlist random', this.randomizePlaylist, constants.OWNER_ONLY)
@@ -44,6 +46,14 @@ function Songs (configuration) {
   }
 
   console.log('Songs system loaded and ' + (global.configuration.get().systems.songs === true ? chalk.green('enabled') : chalk.red('disabled')))
+}
+
+Songs.prototype.getCurrentSong = function () {
+  if (currentSong.length === 0) {
+    global.client.action(global.configuration.get().twitch.owner, 'No song is currently playing')
+  } else {
+    global.client.action(global.configuration.get().twitch.owner, 'Current song is ' + currentSong)
+  }
 }
 
 Songs.prototype.checkIfRandomizeIsSaved = function () {
@@ -113,6 +123,7 @@ Songs.prototype.sendNextSongID = function (socket) {
           playlist.find({}).sort().exec(function (err, items) {
             if (err) console.log(err)
             var randomSongIndex = Math.floor((Math.random() * items.length))
+            currentSong = items[randomSongIndex].title
             socket.emit('videoID', items[randomSongIndex].videoID)
           })
         } else {
@@ -120,6 +131,7 @@ Songs.prototype.sendNextSongID = function (socket) {
             if (err) console.log(err)
             if (typeof item !== 'undefined' && item !== null) { // song is found
               playlist.update({videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
+              currentSong = item.title
               socket.emit('videoID', item.videoID)
             }
           })
