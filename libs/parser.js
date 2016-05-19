@@ -44,9 +44,10 @@ Parser.prototype.addToQueue = function (user, message) {
   }
   queue[id] = data
   for (var parser in this.registeredParsers) {
-    if (this.permissionsParsers[parser] === constants.VIEWERS || this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user) && typeof queue[id] !== 'undefined') {
-      this.registeredParsers[parser](id, user, message)
+    if (typeof queue[id] === 'undefined') break
+    if (this.permissionsParsers[parser] === constants.VIEWERS || this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user)) {
       queue[id].started = parseInt(queue[id].started, 10) + 1
+      this.registeredParsers[parser](id, user, message)
     }
   }
 }
