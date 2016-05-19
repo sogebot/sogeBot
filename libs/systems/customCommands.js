@@ -10,7 +10,7 @@ var database = new Database({
 })
 database.persistence.setAutocompactionInterval(60000)
 
-function CustomCommands (configuration) {
+function CustomCommands () {
   if (global.configuration.get().systems.customCommands === true) {
     global.parser.register(this, '!command add', this.addCommand, constants.OWNER_ONLY)
     global.parser.register(this, '!command list', this.listCommands, constants.OWNER_ONLY)

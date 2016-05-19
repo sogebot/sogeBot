@@ -21,7 +21,7 @@ var songRequests = new Database({
 })
 songRequests.persistence.setAutocompactionInterval(60000)
 
-function Songs (configuration) {
+function Songs () {
   if (global.configuration.get().systems.songs === true) {
     this.socketPointer = null
     this.currentSong = {}

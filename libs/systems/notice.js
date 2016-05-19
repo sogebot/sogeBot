@@ -10,7 +10,7 @@ var database = new Database({
 })
 database.persistence.setAutocompactionInterval(60000)
 
-function Notice (configuration) {
+function Notice () {
   this.lastNoticeSent = new Date().getTime()
   this.msgCountSent = global.parser.linesParsed
 

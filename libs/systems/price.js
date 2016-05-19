@@ -10,7 +10,7 @@ var database = new Database({
 })
 database.persistence.setAutocompactionInterval(60000)
 
-function Price (configuration) {
+function Price () {
   if (global.configuration.get().systems.points === true && global.configuration.get().systems.price === true) {
     global.parser.register(this, '!price set', this.setPrice, constants.OWNER_ONLY)
     global.parser.register(this, '!price list', this.listPrices, constants.OWNER_ONLY)
