@@ -23,13 +23,16 @@ songRequests.persistence.setAutocompactionInterval(60000)
 
 function Songs (configuration) {
   if (global.configuration.get().systems.songs === true) {
-    global.parser.register('!songrequest', this.addSongToQueue, constants.VIEWERS)
-    global.parser.register('!wrongsong', this.removeSongFromQueue, constants.VIEWERS)
-    global.parser.register('!currentsong', this.getCurrentSong, constants.VIEWERS)
-    global.parser.register('!playlist add', this.addSongToPlaylist, constants.OWNER_ONLY)
-    global.parser.register('!playlist remove', this.removeSongFromPlaylist, constants.OWNER_ONLY)
-    global.parser.register('!playlist random', this.randomizePlaylist, constants.OWNER_ONLY)
-    global.parser.register('!playlist', this.help, constants.OWNER_ONLY)
+    this.socketPointer = null
+    
+    global.parser.register(this, '!songrequest', this.addSongToQueue, constants.VIEWERS)
+    global.parser.register(this, '!wrongsong', this.removeSongFromQueue, constants.VIEWERS)
+    global.parser.register(this, '!currentsong', this.getCurrentSong, constants.VIEWERS)
+    global.parser.register(this, '!skipsong', this.skipSong, constants.OWNER_ONLY)
+    global.parser.register(this, '!playlist add', this.addSongToPlaylist, constants.OWNER_ONLY)
+    global.parser.register(this, '!playlist remove', this.removeSongFromPlaylist, constants.OWNER_ONLY)
+    global.parser.register(this, '!playlist random', this.randomizePlaylist, constants.OWNER_ONLY)
+    global.parser.register(this, '!playlist', this.help, constants.OWNER_ONLY)
 
     this.checkIfRandomizeIsSaved()
 
@@ -41,6 +44,7 @@ function Songs (configuration) {
 
     var self = this
     io.on('connection', function (socket) {
+      self.socketPointer = socket
       self.addSocketListening(self, socket)
     })
   }
@@ -56,6 +60,10 @@ Songs.prototype.getCurrentSong = function () {
   }
 }
 
+Songs.prototype.skipSong = function (self) {
+  self.sendNextSongID(self.socketPointer)
+}
+
 Songs.prototype.checkIfRandomizeIsSaved = function () {
   global.cfgDB.findOne({playlistRandomize: {$exists: true}}, function (err, item) {
     if (err) console.log(err)
@@ -65,7 +73,7 @@ Songs.prototype.checkIfRandomizeIsSaved = function () {
   })
 }
 
-Songs.prototype.randomizePlaylist = function (sender, text) {
+Songs.prototype.randomizePlaylist = function (self, sender, text) {
   if (text.length < 1) return
 
   if (text.trim() === 'on') {
@@ -167,7 +175,7 @@ Songs.prototype.help = function () {
     '!playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal')
 }
 
-Songs.prototype.addSongToQueue = function (user, text) {
+Songs.prototype.addSongToQueue = function (self, user, text) {
   if (text.length < 1) return
 
   var videoID = text.trim()
@@ -180,7 +188,7 @@ Songs.prototype.addSongToQueue = function (user, text) {
   })
 }
 
-Songs.prototype.removeSongFromQueue = function (user, text) {
+Songs.prototype.removeSongFromQueue = function (self, user, text) {
   songRequests.findOne({username: user.username}).sort({addedAt: -1}).exec(function (err, item) {
     if (err) console.log(err)
     if (typeof item === 'undefined' || item === null) return
@@ -191,7 +199,7 @@ Songs.prototype.removeSongFromQueue = function (user, text) {
   })
 }
 
-Songs.prototype.addSongToPlaylist = function (user, text) {
+Songs.prototype.addSongToPlaylist = function (self, user, text) {
   if (text.length < 1) return
 
   var videoID = text.trim()
@@ -203,7 +211,7 @@ Songs.prototype.addSongToPlaylist = function (user, text) {
   })
 }
 
-Songs.prototype.removeSongFromPlaylist = function (user, text) {
+Songs.prototype.removeSongFromPlaylist = function (self, user, text) {
   if (text.length < 1) return
 
   var videoID = text.trim()
