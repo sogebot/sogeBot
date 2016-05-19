@@ -5,6 +5,7 @@ var Database = require('nedb')
 var constants = require('../constants')
 var http = require('http')
 var fs = require('fs')
+var auth = require('http-auth')
 
 var fetchVideoInfo = require('youtube-info')
 
@@ -24,6 +25,7 @@ function Songs (configuration) {
   if (global.configuration.get().systems.songs === true) {
     this.socketPointer = null
     this.currentSong = {}
+    this.checkIfRandomizeIsSaved()
 
     global.parser.register(this, '!songrequest', this.addSongToQueue, constants.VIEWERS)
     global.parser.register(this, '!wrongsong', this.removeSongFromQueue, constants.VIEWERS)
@@ -35,10 +37,14 @@ function Songs (configuration) {
     global.parser.register(this, '!playlist steal', this.stealSongToPlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist', this.help, constants.OWNER_ONLY)
 
-    this.checkIfRandomizeIsSaved()
-
-    var server = http.createServer(this.handleRequest)
+    var basic = auth.basic({
+      realm: 'YTPlayer'
+    }, function (username, password, callback) {
+      callback(username === global.configuration.get().ytplayer.username && password === global.configuration.get().ytplayer.password)
+    })
+    var server = http.createServer(basic, this.handleRequest)
     var io = require('socket.io')(server)
+    
     server.listen(global.configuration.get().systems.songsPort, function () {
       console.log('Songs system listening on %s and endpoint /ytplayer', global.configuration.get().systems.songsPort)
     })
