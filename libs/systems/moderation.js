@@ -11,9 +11,8 @@ function Moderation () {
   console.log('Moderation system loaded and ' + (global.configuration.get().systems.moderation === true ? chalk.green('enabled') : chalk.red('disabled')))
 }
 
-
 Moderation.prototype.containsLink = function (id, sender, text) {
-  var urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig
+  var urlRegex = /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/ig
   if (text.search(urlRegex) >= 0 && sender.username !== global.configuration.get().owner) {
     global.client.timeout(global.configuration.get().twitch.owner, sender.username, 5)
     global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender.username + ', no links allowed. Ask for !permit first')
