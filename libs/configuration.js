@@ -9,7 +9,6 @@ global.botDB = new Database({
   autoload: true
 })
 global.botDB.persistence.setAutocompactionInterval(60000)
-global.cfgDB = global.botDB // DEPRECATED - delete after fixed
 
 function Configuration () {
   this.config = null
