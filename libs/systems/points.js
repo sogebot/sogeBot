@@ -1,13 +1,6 @@
 'use strict'
 var chalk = require('chalk')
-var Database = require('nedb')
 var constants = require('../constants')
-
-var database = new Database({
-  filename: 'db/points.db',
-  autoload: true
-})
-database.persistence.setAutocompactionInterval(60000)
 
 function Points () {
   if (global.configuration.get().systems.points === true) {
@@ -31,14 +24,10 @@ function Points () {
     }, 30000)
 
     // disable counting for all users on start
-    database.update({ }, {$set: {isOnline: false, partedTime: new Date().getTime()}}, { multi: true })
+    global.botDB.update({type: 'points'}, {$set: {isOnline: false, partedTime: new Date().getTime()}}, {multi: true})
   }
 
   console.log('Points system loaded and ' + (global.configuration.get().systems.points === true ? chalk.green('enabled') : chalk.red('disabled')))
-}
-
-Points.prototype.getDatabase = function () {
-  return database
 }
 
 Points.prototype.addEvents = function (self) {
@@ -74,12 +63,12 @@ Points.prototype.setPoints = function (self, sender, text) {
     return
   }
 
-  database.findOne({ username: user }, function (err, item) {
+  global.botDB.findOne({type: 'points', username: user}, function (err, item) {
     if (err) console.log(err)
     if (typeof item === 'undefined' || item === null) {
-      database.insert({username: user, points: points})
+      global.botDB.insert({type: 'points', username: user, points: points})
     } else {
-      database.update({username: user}, {$set: {points: points}}, {})
+      global.botDB.update({type: 'points', username: user}, {$set: {points: points}}, {})
     }
     global.client.action(global.configuration.get().twitch.owner, 'I just set ' + points + ' Points to ' + user)
   })
@@ -105,7 +94,7 @@ Points.prototype.givePoints = function (self, user, text) {
     return
   }
 
-  database.findOne({ username: user.username }, function (err, item) {
+  global.botDB.findOne({type: 'points', username: user.username}, function (err, item) {
     if (err) console.log(err)
     if (typeof item === 'undefined' || item === null) {
       global.client.action(global.configuration.get().twitch.owner, 'You, ' + user.username + ', cannot give points as you have none.')
@@ -113,15 +102,15 @@ Points.prototype.givePoints = function (self, user, text) {
       if (parseInt(item.points, 10) < points) {
         global.client.action(global.configuration.get().twitch.owner, 'You, ' + user.username + ", don't have enough points.")
       }
-      database.findOne({ username: user2 }, function (err, item) {
+      global.botDB.findOne({type: 'points', username: user2}, function (err, item) {
         if (err) console.log(err)
         if (typeof item === 'undefined' || item === null) {
-          database.insert({username: user2, points: points})
+          global.botDB.insert({type: 'points', username: user2, points: points})
         } else {
-          database.update({username: user2}, {$set: {points: parseInt(item.points, 10) + points}}, {})
+          global.botDB.update({type: 'points', username: user2}, {$set: {points: parseInt(item.points, 10) + points}}, {})
         }
       })
-      database.update({username: user.username}, {$set: {points: parseInt(item.points, 10) - points}}, {})
+      global.botDB.update({type: 'points', username: user.username}, {$set: {points: parseInt(item.points, 10) - points}}, {})
       global.client.action(global.configuration.get().twitch.owner, user.username + ' just gave ' + points + ' Points to ' + user2)
     }
   })
@@ -135,7 +124,7 @@ Points.prototype.getPointsFromUser = function (self, sender, text) {
 
   var user = text.trim()
 
-  database.findOne({ username: user }, function (err, item) {
+  global.botDB.findOne({type: 'points', username: user}, function (err, item) {
     if (err) console.log(err)
     // TODO - create a function as this is used a lot
     var points = (typeof item !== 'undefined' && item !== null ? item.points : 0)
@@ -203,10 +192,10 @@ Points.prototype.allPoints = function (self, user, text) {
     return
   }
 
-  database.find({ isOnline: true }, function (err, items) {
+  global.botDB.find({type: 'points', isOnline: true}, function (err, items) {
     if (err) console.log(err)
     items.forEach(function (e, i, ar) {
-      database.update({username: e.username}, {$set: {points: parseInt(e.points, 10) + points}}, {})
+      global.botDB.update({type: 'points', username: e.username}, {$set: {points: parseInt(e.points, 10) + points}}, {})
     })
     global.client.action(global.configuration.get().twitch.owner, 'I just added ' + points + ' Points to all users')
   })
@@ -225,11 +214,11 @@ Points.prototype.rainPoints = function (self, user, text) {
     return
   }
 
-  database.find({ isOnline: true }, function (err, items) {
+  global.botDB.find({type: 'points', isOnline: true}, function (err, items) {
     if (err) console.log(err)
     items.forEach(function (e, i, ar) {
       var random = Math.floor(Math.random() * points)
-      database.update({username: e.username}, {$set: {points: parseInt(e.points, 10) + random}}, {})
+      global.botDB.update({type: 'points', username: e.username}, {$set: {points: parseInt(e.points, 10) + random}}, {})
     })
     global.client.action(global.configuration.get().twitch.owner, 'I just added 0-' + points + ' Points to all users')
   })
@@ -255,12 +244,12 @@ Points.prototype.addPoints = function (self, sender, text) {
     return
   }
 
-  database.findOne({ username: user }, function (err, item) {
+  global.botDB.findOne({type: 'points', username: user}, function (err, item) {
     if (err) console.log(err)
     if (typeof item === 'undefined' || item === null) {
-      database.insert({username: user, points: points})
+      global.botDB.insert({type: 'points', username: user, points: points})
     } else {
-      database.update({username: user}, {$set: {points: parseInt(item.points, 10) + points}}, {})
+      global.botDB.update({type: 'points', username: user}, {$set: {points: parseInt(item.points, 10) + points}}, {})
     }
     global.client.action(global.configuration.get().twitch.owner, 'I just added ' + points + ' Points to ' + user)
   })
@@ -286,20 +275,20 @@ Points.prototype.removePoints = function (self, sender, text) {
     return
   }
 
-  database.findOne({ username: user }, function (err, item) {
+  global.botDB.findOne({type: 'points', username: user}, function (err, item) {
     if (err) console.log(err)
     if (typeof item === 'undefined' || item === null) {
-      database.insert({username: user, points: points})
+      global.botDB.insert({type: 'points', username: user, points: points})
     } else {
       if (parseInt(item.points, 10) - points < 0) { points = item.points }
-      database.update({username: user}, {$set: {points: parseInt(item.points, 10) - points}}, {})
+      global.botDB.update({type: 'points', username: user}, {$set: {points: parseInt(item.points, 10) - points}}, {})
     }
     global.client.action(global.configuration.get().twitch.owner, 'I just removed ' + points + ' Points from ' + user)
   })
 }
 
 Points.prototype.getPoints = function (self, user) {
-  database.findOne({ username: user.username }, function (err, item) {
+  global.botDB.findOne({type: 'points', username: user.username}, function (err, item) {
     if (err) console.log(err)
     var points = (typeof item !== 'undefined' && item !== null ? item.points : 0)
     var responsePattern = global.configuration.get().systems.pointsResponse
@@ -354,32 +343,32 @@ Points.prototype.getPoints = function (self, user) {
 }
 
 Points.prototype.startCounting = function (username) {
-  database.findOne({ username: username }, function (err, item) {
+  global.botDB.findOne({type: 'points', username: username}, function (err, item) {
     if (err) console.log(err)
     if (typeof item !== 'undefined' && item !== null) { // exists, update
       var partedTime = (item.partedTime === 0 ? item.pointsGrantedAt : item.partedTime) // if not correctly parted
       var pointsGrantedAt = new Date().getTime() + (item.pointsGrantedAt - partedTime)
-      database.update({_id: item._id}, {$set: {isOnline: true, pointsGrantedAt: pointsGrantedAt}}, {})
+      global.botDB.update({type: 'points', _id: item._id}, {$set: {isOnline: true, pointsGrantedAt: pointsGrantedAt}}, {})
     } else { // not exists, create a new one
-      database.insert({username: username, isOnline: true, pointsGrantedAt: new Date().getTime(), partedTime: 0, points: 0})
+      global.botDB.insert({type: 'points', username: username, isOnline: true, pointsGrantedAt: new Date().getTime(), partedTime: 0, points: 0})
     }
   })
 }
 
 Points.prototype.stopCounting = function (username) {
-  database.update({ username: username }, {$set: {isOnline: false, partedTime: new Date().getTime()}}, {})
+  global.botDB.update({type: 'points', username: username}, {$set: {isOnline: false, partedTime: new Date().getTime()}}, {})
 }
 
 Points.prototype.updatePoints = function () {
   var interval = global.configuration.get().systems.pointsInterval * 60 * 1000
   var ptsPerInterval = global.configuration.get().systems.pointsPerInterval
-  database.find({ isOnline: true }, function (err, items) {
+  global.botDB.find({type: 'points', isOnline: true}, function (err, items) {
     if (err) console.log(err)
     items.forEach(function (e, i, ar) {
       var points = parseInt(e.points, 10) + parseInt(ptsPerInterval, 10)
       var now = new Date().getTime()
       if (now - e.pointsGrantedAt >= interval) {
-        database.update({_id: e._id}, {$set: {pointsGrantedAt: now, points: points}}, {})
+        global.botDB.update({type: 'points', _id: e._id}, {$set: {pointsGrantedAt: now, points: points}}, {})
       }
     })
   })
