@@ -1,16 +1,7 @@
 'use strict'
 
 var chalk = require('chalk')
-var Database = require('nedb')
 var constants = require('../constants')
-
-var database = new Database({
-  filename: 'db/keywords.db',
-  autoload: true
-})
-database.persistence.setAutocompactionInterval(60000)
-
-// TODO - add parsing of (sender)
 
 function Keywords () {
   if (global.configuration.get().systems.keywords === true) {
@@ -64,7 +55,7 @@ Keywords.prototype.customKeyword = function (id, user, msg) {
     return true
   }
 
-  database.find({ }, function (err, items) {
+  global.botDB.find({type: 'keywords'}, function (err, items) {
     if (err) console.log(err)
     for (var item in items) {
       if (items.hasOwnProperty(item)) {
@@ -83,7 +74,7 @@ Keywords.prototype.customKeyword = function (id, user, msg) {
 }
 
 Keywords.prototype.listKeywords = function () {
-  database.find({}, function (err, docs) {
+  global.botDB.find({type: 'keywords'}, function (err, docs) {
     if (err) { console.log(err) }
     var keywords = []
     docs.forEach(function (e, i, ar) { keywords.push('!' + e.keyword) })
@@ -98,7 +89,7 @@ Keywords.prototype.delKeyword = function (self, user, keyword) {
     return
   }
 
-  database.remove({keyword: keyword}, {}, function (err, numRemoved) {
+  global.botDB.remove({type: 'keywords', keyword: keyword}, {}, function (err, numRemoved) {
     if (err) { console.log(err) }
     var output = (numRemoved === 0 ? 'Keyword#' + keyword + ' cannot be found.' : 'Keyword#' + keyword + ' is succesfully deleted.')
     global.client.action(global.configuration.get().twitch.owner, output)
