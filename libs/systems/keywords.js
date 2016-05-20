@@ -36,10 +36,10 @@ Keywords.prototype.addKeyword = function (self, user, keyword) {
   var kw = keyword.split(' ')[0]
   var response = keyword.replace(kw, '').trim()
 
-  database.find({ keyword: kw }, function (err, docs) {
+  global.botDB.find({type: 'keywords', keyword: kw}, function (err, docs) {
     if (err) console.log(err)
     if (docs.length === 0) { // it is safe to insert new keyword?
-      database.insert({keyword: kw, response: response}, function (err, newItem) {
+      global.botDB.insert({type: 'keywords', keyword: kw, response: response}, function (err, newItem) {
         if (err) console.log(err)
         global.client.action(global.configuration.get().twitch.owner, 'Keyword#' + kw + ' succesfully added')
       })
