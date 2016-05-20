@@ -233,11 +233,18 @@ Songs.prototype.addSongToPlaylist = function (self, user, text) {
   if (text.length < 1) return
 
   var videoID = text.trim()
-
-  fetchVideoInfo(videoID, function (err, videoInfo) {
+  playlist.findOne({videoID: videoID}, function (err, item) {
     if (err) console.log(err)
-    playlist.insert({videoID: videoID, title: videoInfo.title, lastPlayedAt: new Date().getTime()})
-    global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to playlist')
+
+    if (typeof item === 'undefined' || item === null) {
+      fetchVideoInfo(videoID, function (err, videoInfo) {
+        if (err) console.log(err)
+        playlist.insert({videoID: videoID, title: videoInfo.title, lastPlayedAt: new Date().getTime()})
+        global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to playlist')
+      })
+    } else {
+      global.client.action(global.configuration.get().twitch.owner, 'Song ' + item.title + ' is already in playlist')
+    }
   })
 }
 
