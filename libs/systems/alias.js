@@ -1,16 +1,7 @@
 'use strict'
 
 var chalk = require('chalk')
-var Database = require('nedb')
 var constants = require('../constants')
-
-var database = new Database({
-  filename: 'db/alias.db',
-  autoload: true
-})
-database.persistence.setAutocompactionInterval(60000)
-
-// TODO - add parsing of (sender)
 
 function Alias () {
   if (global.configuration.get().systems.keywords === true) {
@@ -39,10 +30,10 @@ Alias.prototype.add = function (self, sender, text) {
   var command = text.split(' ')[0]
   var alias = text.replace(command, '').trim()
 
-  database.find({ alias: alias }, function (err, docs) {
+  global.botDB.find({type: 'alias', alias: alias}, function (err, docs) {
     if (err) console.log(err)
     if (docs.length === 0) { // it is safe to insert new keyword?
-      database.insert({alias: alias, command: command}, function (err, newItem) {
+      global.botDB.insert({type: 'alias', alias: alias, command: command}, function (err, newItem) {
         if (err) console.log(err)
         global.client.action(global.configuration.get().twitch.owner, 'Alias#' + alias + ' for ' + command + ' succesfully added')
       })
@@ -53,7 +44,7 @@ Alias.prototype.add = function (self, sender, text) {
 }
 
 Alias.prototype.list = function () {
-  database.find({}, function (err, docs) {
+  global.botDB.find({type: 'alias'}, function (err, docs) {
     if (err) { console.log(err) }
     var list = []
     docs.forEach(function (e, i, ar) { list.push('!' + e.alias) })
@@ -69,7 +60,7 @@ Alias.prototype.remove = function (self, sender, text) {
   }
 
   var alias = text.trim()
-  database.remove({alias: alias}, {}, function (err, numRemoved) {
+  global.botDB.remove({type: 'alias', alias: alias}, {}, function (err, numRemoved) {
     if (err) { console.log(err) }
     var output = (numRemoved === 0 ? 'Alias#' + alias + ' cannot be found.' : 'Alias#' + alias + ' is succesfully deleted.')
     global.client.action(global.configuration.get().twitch.owner, output)
@@ -82,7 +73,7 @@ Alias.prototype.parse = function (id, sender, text) {
     return true
   }
 
-  database.find({ }, function (err, items) {
+  global.botDB.find({type: 'alias'}, function (err, items) {
     if (err) console.log(err)
     var itemFound = false
     for (var index in items) {
