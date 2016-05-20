@@ -63,8 +63,11 @@ Commons.prototype.getCallbacks = function (data) {
 }
 
 Commons.prototype.runCallback = function (cb, data) {
-  if (typeof cb === 'function') cb(data)
-  else global.client.action(global.configuration.get().twitch.owner, cb)
+  (typeof cb === 'function' ? cb(data) : this.sendMessage(cb))
+}
+
+Commons.prototype.sendMessage = function (message) {
+  global.client.action(global.configuration.get().twitch.owner, message)
 }
 
 module.exports = Commons

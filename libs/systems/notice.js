@@ -8,23 +8,23 @@ function Notice () {
   this.msgCountSent = global.parser.linesParsed
 
   if (global.configuration.get().systems.notice === true) {
-    global.parser.register(this, '!notice add', this.addNotice, constants.OWNER_ONLY)
-    global.parser.register(this, '!notice list', this.listNotices, constants.OWNER_ONLY)
-    global.parser.register(this, '!notice get', this.getNotice, constants.OWNER_ONLY)
-    global.parser.register(this, '!notice remove', this.delNotice, constants.OWNER_ONLY)
+    global.parser.register(this, '!notice add', this.add, constants.OWNER_ONLY)
+    global.parser.register(this, '!notice list', this.list, constants.OWNER_ONLY)
+    global.parser.register(this, '!notice get', this.get, constants.OWNER_ONLY)
+    global.parser.register(this, '!notice remove', this.remove, constants.OWNER_ONLY)
     global.parser.register(this, '!notice', this.help, constants.OWNER_ONLY)
 
     // start interval for posting notices
     var self = this
     setInterval(function () {
-      self.sendNotice()
+      self.send()
     }, 60000)
   }
 
   console.log('Notice system loaded and ' + (global.configuration.get().systems.notice === true ? chalk.green('enabled') : chalk.red('disabled')))
 }
 
-Notice.prototype.sendNotice = function () {
+Notice.prototype.send = function () {
   var timeIntervalInMs = global.configuration.get().systems.noticeTimeInterval * 60 * 1000
   var noticeMinChatMsg = global.configuration.get().systems.noticeMinChatMsg
   var now = new Date().getTime()
@@ -50,17 +50,12 @@ Notice.prototype.help = function () {
   global.client.action(global.configuration.get().twitch.owner, text)
 }
 
-Notice.prototype.addNotice = function (self, sender, text) {
-  if (text.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Notice error: Cannot add empty notice.')
-    return
-  }
-
-  var data = {_type: 'notices', _text: text, time: new Date().getTime(), success: 'Notice was succesfully added', error: 'Sorry, ' + sender + ', this notice already exists.'}
-  global.commons.insertIfNotExists(data)
+Notice.prototype.add = function (self, sender, text) {
+  var data = {_type: 'notices', _text: text, time: new Date().getTime(), success: 'Notice was succesfully added', error: 'Sorry, ' + sender.username + ', this notice already exists.'};
+  (data._text.length < 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', notice command is not correct, check !notice') : global.commons.insertIfNotExists(data))
 }
 
-Notice.prototype.listNotices = function () {
+Notice.prototype.list = function () {
   global.botDB.find({type: 'notices'}, function (err, docs) {
     if (err) console.log(err)
     var ids = []
@@ -70,7 +65,7 @@ Notice.prototype.listNotices = function () {
   })
 }
 
-Notice.prototype.getNotice = function (self, user, id) {
+Notice.prototype.get = function (self, user, id) {
   if (id.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Notice error: Cannot get notice without id.')
     return
@@ -83,13 +78,9 @@ Notice.prototype.getNotice = function (self, user, id) {
   })
 }
 
-Notice.prototype.delNotice = function (self, sender, text) {
-  var data = {_type: 'notices', _id: text.trim(), success: 'Notice was succesfully removed.', error: 'Notice cannot be found.'}
-  if (data._id.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender + ', Notice command is not correct, check !notice')
-  } else {
-    global.commons.remove(data)
-  }
+Notice.prototype.remove = function (self, sender, text) {
+  var data = {_type: 'notices', _id: text.trim(), success: 'Notice was succesfully removed.', error: 'Notice cannot be found.'};
+  (data._id.length < 1 ? this.sendMessage('Sorry, ' + sender.username + ', Notice command is not correct, check !notice') : global.commons.remove(data))
 }
 
 module.exports = new Notice()

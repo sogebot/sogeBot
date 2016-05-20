@@ -5,12 +5,12 @@ var constants = require('../constants')
 
 function Keywords () {
   if (global.configuration.get().systems.keywords === true) {
-    global.parser.register(this, '!keyword add', this.addKeyword, constants.OWNER_ONLY)
-    global.parser.register(this, '!keyword list', this.listKeywords, constants.OWNER_ONLY)
-    global.parser.register(this, '!keyword remove', this.delKeyword, constants.OWNER_ONLY)
+    global.parser.register(this, '!keyword add', this.add, constants.OWNER_ONLY)
+    global.parser.register(this, '!keyword list', this.list, constants.OWNER_ONLY)
+    global.parser.register(this, '!keyword remove', this.remove, constants.OWNER_ONLY)
     global.parser.register(this, '!keyword', this.help, constants.OWNER_ONLY)
 
-    global.parser.registerParser('keywords', this.customKeyword, constants.VIEWERS)
+    global.parser.registerParser('keywords', this.run, constants.VIEWERS)
   }
 
   console.log('Keywords system loaded and ' + (global.configuration.get().systems.keywords === true ? chalk.green('enabled') : chalk.red('disabled')))
@@ -21,26 +21,12 @@ Keywords.prototype.help = function () {
   global.client.action(global.configuration.get().twitch.owner, text)
 }
 
-Keywords.prototype.addKeyword = function (self, sender, keyword) {
-  if (keyword.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Keyword error: Cannot add empty keyword')
-    return
-  }
-
-  // check if response after keyword is set
-  if (keyword.split(' ').length <= 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Keyword error: Cannot add keyword without response')
-    return
-  }
-
-  var kw = keyword.split(' ')[0]
-  var response = keyword.replace(kw, '').trim()
-
-  var data = {_type: 'keywords', _keyword: kw, response: response, success: 'Keyword was succesfully added', error: 'Sorry, ' + sender + ', this keyword already exists.'}
-  global.commons.insertIfNotExists(data)
+Keywords.prototype.add = function (self, sender, keyword) {
+  var data = {_type: 'keywords', _keyword: keyword.split(' ')[0], response: keyword.replace(keyword.split(' ')[0], '').trim(), success: 'Keyword was succesfully added', error: 'Sorry, ' + sender.username + ', this keyword already exists.'};
+  (data._keyword.length < 1 || data.response.length <= 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', keyword command is not correct, check !keyword') : global.commons.insertIfNotExists(data))
 }
 
-Keywords.prototype.customKeyword = function (id, user, msg) {
+Keywords.prototype.run = function (id, user, msg) {
   if (msg.startsWith('!')) {
     global.updateQueue(id, true) // don't want to parse commands
     return true
@@ -64,7 +50,7 @@ Keywords.prototype.customKeyword = function (id, user, msg) {
   })
 }
 
-Keywords.prototype.listKeywords = function () {
+Keywords.prototype.list = function () {
   global.botDB.find({type: 'keywords'}, function (err, docs) {
     if (err) { console.log(err) }
     var keywords = []
@@ -74,12 +60,9 @@ Keywords.prototype.listKeywords = function () {
   })
 }
 
-Keywords.prototype.delKeyword = function (self, sender, text) {
-  var data = {_type: 'keywords', _keyword: text.trim(), success: 'Keyword was succesfully removed.', error: 'Keyword cannot be found.'}
-  if (data._keyword.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender + ', keyword command is not correct, check !keyword')
-  } else {
-    global.commons.remove(data)
-  }
+Keywords.prototype.remove = function (self, sender, text) {
+  var data = {_type: 'keywords', _keyword: text.trim(), success: 'Keyword was succesfully removed.', error: 'Keyword cannot be found.'};
+  (data._keyword.length < 1 ? this.sendMessage('Sorry, ' + sender.username + ', keyword command is not correct, check !keyword') : global.commons.remove(data))
 }
+
 module.exports = new Keywords()
