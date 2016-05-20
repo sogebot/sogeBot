@@ -114,6 +114,16 @@ Songs.prototype.addSocketListening = function (self, socket) {
   socket.on('getPlaylist', function () {
     self.sendPlaylistList(socket)
   })
+  socket.on('getRandomize', function () {
+    self.sendRandomizeStatus(socket)
+  })
+}
+
+Songs.prototype.sendRandomizeStatus = function (socket) {
+  global.botDB.findOne({playlistRandomize: {$exists: true}}).exec(function (err, item) {
+    if (err) console.log(err)
+    socket.emit('playlistRandomize', item)
+  })
 }
 
 Songs.prototype.sendSongRequestsList = function (socket) {

@@ -22,8 +22,8 @@
     <body>
 		<main class="wrapper">
             <div class="container">
-                <div id="YTPlayer"></div>    
-                
+                <div id="YTPlayer"></div>
+
             <h4>Song requests</h4>
             <table>
                 <thead>
@@ -35,8 +35,8 @@
                 </thead>
                 <tbody id="songRequests"></tbody>
             </table>
-            
-            <h4>Playlist</h4>
+
+            <h4>Playlist <small class="float-right">random: <span id="randomize">n/a</span></small></h4>
             <table>
                 <thead>
                     <tr>
@@ -48,7 +48,7 @@
             </table>
             </div>
         </main>
-        
+
         <script>
             var player, time_update_interval;
             var socket = io();
@@ -80,6 +80,7 @@
                     isFinished();
                     socket.emit('getSongRequests');
                     socket.emit('getPlaylist');
+                    socket.emit('getRandomize');
                 }, 2000)
 
             }
@@ -92,17 +93,17 @@
                     skipSong = false;
                 }
             }
-            
+
             socket.on('skipSong', function() {
               skipSong = true;
             })
-            
+
             socket.on('videoID', function(id) {
                 player.loadVideoById(id);
                 player.playVideo();
             });
-            
-            socket.on('songRequestsList', function(list) {   
+
+            socket.on('songRequestsList', function(list) {
                 $("#songRequests").empty();
                 for (var index in list) {
                     if (list.hasOwnProperty(index)) {
@@ -113,8 +114,12 @@
                     }
                 }
             });
-            
-            socket.on('songPlaylistList', function(list) {   
+
+            socket.on('playlistRandomize', function(item) {
+              try { $("#randomize").text((item.playlistRandomize == "true" ? 'on' : 'off')); } catch (err) {}
+            })
+
+            socket.on('songPlaylistList', function(list) {
                 $("#Playlist").empty();
                 for (var index in list) {
                     if (list.hasOwnProperty(index)) {
