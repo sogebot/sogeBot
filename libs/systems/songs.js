@@ -32,8 +32,8 @@ function Songs () {
     var server = http.createServer(basic, this.handleRequest)
     var io = require('socket.io')(server)
 
-    server.listen(global.configuration.get().systems.songsPort, function () {
-      console.log('Songs system listening on %s and endpoint /ytplayer', global.configuration.get().systems.songsPort)
+    server.listen(global.configuration.get().ytplayer.port, function () {
+      console.log('Songs system listening on %s and endpoint /ytplayer', global.configuration.get().ytplayer.port)
     })
 
     var self = this
