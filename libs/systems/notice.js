@@ -1,14 +1,7 @@
 'use strict'
 
 var chalk = require('chalk')
-var Database = require('nedb')
 var constants = require('../constants')
-
-var database = new Database({
-  filename: 'db/notice.db',
-  autoload: true
-})
-database.persistence.setAutocompactionInterval(60000)
 
 function Notice () {
   this.lastNoticeSent = new Date().getTime()
@@ -37,10 +30,10 @@ Notice.prototype.sendNotice = function () {
   var now = new Date().getTime()
 
   if (now - this.lastNoticeSent >= timeIntervalInMs && global.parser.linesParsed - this.msgCountSent >= noticeMinChatMsg) {
-    database.findOne({ }).sort({ time: 1 }).exec(function (err, item) {
+    global.botDB.findOne({type: 'notices'}).sort({ time: 1 }).exec(function (err, item) {
       if (err) console.log(err)
       if (typeof item !== 'undefined' && item !== null) {
-        database.update({_id: item._id}, {$set: {time: new Date().getTime()}}, {}, function () {
+        global.botDB.update({type: 'notices', _id: item._id}, {$set: {time: new Date().getTime()}}, {}, function () {
           global.client.action(global.configuration.get().twitch.owner, item.text)
         })
       }
@@ -63,10 +56,10 @@ Notice.prototype.addNotice = function (self, user, text) {
     return
   }
 
-  database.find({ text: text }, function (err, docs) {
+  global.botDB.find({type: 'notices', text: text}, function (err, docs) {
     if (err) console.log(err)
     if (docs.length === 0) { // it is safe to insert new notice?
-      database.insert({text: text, time: new Date().getTime()}, function (err, newItem) {
+      global.botDB.insert({type: 'notices', text: text, time: new Date().getTime()}, function (err, newItem) {
         if (err) console.log(err)
         global.client.action(global.configuration.get().twitch.owner, 'Notice#' + newItem._id + ' succesfully added')
       })
@@ -77,7 +70,7 @@ Notice.prototype.addNotice = function (self, user, text) {
 }
 
 Notice.prototype.listNotices = function () {
-  database.find({}, function (err, docs) {
+  global.botDB.find({type: 'notices'}, function (err, docs) {
     if (err) console.log(err)
     var ids = []
     docs.forEach(function (e, i, ar) { ids.push(e._id) })
@@ -92,7 +85,7 @@ Notice.prototype.getNotice = function (self, user, id) {
     return
   }
 
-  database.findOne({ _id: id }, function (err, docs) {
+  global.botDB.findOne({type: 'notices', _id: id}, function (err, docs) {
     if (err) console.log(err)
     var output = (typeof docs === 'undefined' || docs === null ? 'Notice#' + id + ' cannot be found.' : docs.text)
     global.client.action(global.configuration.get().twitch.owner, output)
@@ -105,7 +98,7 @@ Notice.prototype.delNotice = function (self, user, id) {
     return
   }
 
-  database.remove({_id: id}, {}, function (err, numRemoved) {
+  global.botDB.remove({type: 'notices', _id: id}, {}, function (err, numRemoved) {
     if (err) console.log(err)
     var output = (numRemoved === 0 ? 'Notice#' + id + ' cannot be found.' : 'Notice#' + id + ' is succesfully deleted.')
     global.client.action(global.configuration.get().twitch.owner, output)
