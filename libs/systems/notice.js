@@ -56,7 +56,7 @@ Notice.prototype.addNotice = function (self, sender, text) {
     return
   }
 
-  var data = {_type: 'notices', _text: text, time: new Date().getTime(), successText: 'Notice was succesfully added', errorText: 'Sorry, ' + sender + ', this notice already exists.'}
+  var data = {_type: 'notices', _text: text, time: new Date().getTime(), success: 'Notice was succesfully added', error: 'Sorry, ' + sender + ', this notice already exists.'}
   global.commons.insertIfNotExists(data)
 }
 
