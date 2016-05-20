@@ -4,19 +4,30 @@ function Commons () {
 }
 
 Commons.prototype.insertIfNotExists = function (data) {
-  var messages = this.getMessages(data)
+  var callbacks = this.getCallbacks(data)
   var toFind = this.getObjectToFind(data)
   var toInsert = this.stripUnderscores(data)
+  var self = this
   global.botDB.find(toFind, function (err, docs) {
     if (err) { console.log(err) }
     if (docs.length === 0) { // it is safe to insert new notice?
       global.botDB.insert(toInsert, function (err, newItem) {
         if (err) { console.log(err) }
-        global.client.action(global.configuration.get().twitch.owner, messages.successText)
+        self.runCallback(callbacks.success, data)
       })
     } else {
-      global.client.action(global.configuration.get().twitch.owner, messages.errorText)
+      self.runCallback(callbacks.error, data)
     }
+  })
+}
+
+Commons.prototype.remove = function (data) {
+  var callbacks = this.getCallbacks(data)
+  var toRemove = this.getObjectToFind(data)
+  var self = this
+  global.botDB.remove(toRemove, {}, function (err, numRemoved) {
+    if (err) { console.log(err) }
+    (numRemoved === 0 ? self.runCallback(callbacks.error, data) : self.runCallback(callbacks.success, data))
   })
 }
 
@@ -33,7 +44,7 @@ Commons.prototype.getObjectToFind = function (data) {
 Commons.prototype.stripUnderscores = function (data) {
   var Object = {}
   for (var index in data) {
-    if (data.hasOwnProperty(index) && index.indexOf('Text', index.length - 'Text'.length) === -1) {
+    if (data.hasOwnProperty(index) && !(index === 'success' || index === 'error')) {
       var i = (index.startsWith('_') ? index.slice(1) : index)
       Object[i] = data[index]
     }
@@ -41,14 +52,19 @@ Commons.prototype.stripUnderscores = function (data) {
   return Object
 }
 
-Commons.prototype.getMessages = function (data) {
-  var Messages = {}
+Commons.prototype.getCallbacks = function (data) {
+  var Callbacks = {}
   for (var index in data) {
-    if (data.hasOwnProperty(index) && index.indexOf('Text', index.length - 'Text'.length) !== -1) {
-      Messages[index] = data[index]
+    if (data.hasOwnProperty(index) && (index === 'success' || index === 'error')) {
+      Callbacks[index] = data[index]
     }
   }
-  return Messages
+  return Callbacks
+}
+
+Commons.prototype.runCallback = function (cb, data) {
+  if (typeof cb === 'function') cb(data)
+  else global.client.action(global.configuration.get().twitch.owner, cb)
 }
 
 module.exports = Commons

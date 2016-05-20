@@ -74,16 +74,12 @@ Keywords.prototype.listKeywords = function () {
   })
 }
 
-Keywords.prototype.delKeyword = function (self, user, keyword) {
-  if (keyword.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Keyword error: Cannot delete keyword without keyword.')
-    return
+Keywords.prototype.delKeyword = function (self, sender, text) {
+  var data = {_type: 'keywords', _keyword: text.trim(), success: 'Keyword was succesfully removed.', error: 'Keyword cannot be found.'}
+  if (data._keyword.length < 1) {
+    global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender + ', keyword command is not correct, check !keyword')
+  } else {
+    global.commons.remove(data)
   }
-
-  global.botDB.remove({type: 'keywords', keyword: keyword}, {}, function (err, numRemoved) {
-    if (err) { console.log(err) }
-    var output = (numRemoved === 0 ? 'Keyword#' + keyword + ' cannot be found.' : 'Keyword#' + keyword + ' is succesfully deleted.')
-    global.client.action(global.configuration.get().twitch.owner, output)
-  })
 }
 module.exports = new Keywords()

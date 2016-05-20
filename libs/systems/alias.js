@@ -30,7 +30,7 @@ Alias.prototype.add = function (self, sender, text) {
   var command = text.split(' ')[0]
   var alias = text.replace(command, '').trim()
 
-  var data = {_type: 'alias', _alias: alias, command: command, successText: 'Alias was succesfully added.', errorText: 'Sorry, ' + sender + ', this alias already exists.'}
+  var data = {_type: 'alias', _alias: alias, command: command, success: 'Alias was succesfully added.', error: 'Sorry, ' + sender + ', this alias already exists.'}
   global.commons.insertIfNotExists(data)
 }
 
@@ -45,17 +45,12 @@ Alias.prototype.list = function () {
 }
 
 Alias.prototype.remove = function (self, sender, text) {
-  if (text.length < 1) {
+  var data = {_type: 'alias', _alias: text.trim(), success: 'Alias was succesfully removed.', error: 'Alias cannot be found.'}
+  if (data._alias.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender + ', alias command is not correct, check !alias')
-    return
+  } else {
+    global.commons.remove(data)
   }
-
-  var alias = text.trim()
-  global.botDB.remove({type: 'alias', alias: alias}, {}, function (err, numRemoved) {
-    if (err) { console.log(err) }
-    var output = (numRemoved === 0 ? 'Alias#' + alias + ' cannot be found.' : 'Alias#' + alias + ' is succesfully deleted.')
-    global.client.action(global.configuration.get().twitch.owner, output)
-  })
 }
 
 Alias.prototype.parse = function (id, sender, text) {
