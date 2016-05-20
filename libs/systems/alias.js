@@ -22,8 +22,8 @@ Alias.prototype.help = function () {
 }
 
 Alias.prototype.add = function (self, sender, text) {
-  var data = {_type: 'alias', _alias: text.replace(text.split(' ')[0], '').trim(), command: text.split(' ')[0], success: 'Alias was succesfully added.', error: 'Sorry, ' + sender.username + ', this alias already exists.'};
-  (data._alias.length <= 1 || data.command.length <= 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', alias command is not correct, check !alias') : global.commons.insertIfNotExists(data))
+  var data = {_type: 'alias', _alias: text.replace(text.split(' ')[0], '').trim(), command: text.split(' ')[0], success: 'Alias was succesfully added.', error: 'Sorry, ' + sender.username + ', this alias already exists.'}
+  data._alias.length <= 1 || data.command.length <= 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', alias command is not correct, check !alias') : global.commons.insertIfNotExists(data)
 }
 
 Alias.prototype.list = function () {
@@ -37,8 +37,8 @@ Alias.prototype.list = function () {
 }
 
 Alias.prototype.remove = function (self, sender, text) {
-  var data = {_type: 'alias', _alias: text.trim(), success: 'Alias was succesfully removed.', error: 'Alias cannot be found.'};
-  (data._alias.length < 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', alias command is not correct, check !alias') : global.commons.remove(data))
+  var data = {_type: 'alias', _alias: text.trim(), success: 'Alias was succesfully removed.', error: 'Alias cannot be found.'}
+  data._alias.length < 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', alias command is not correct, check !alias') : global.commons.remove(data)
 }
 
 Alias.prototype.parse = function (id, sender, text) {

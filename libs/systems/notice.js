@@ -51,8 +51,8 @@ Notice.prototype.help = function () {
 }
 
 Notice.prototype.add = function (self, sender, text) {
-  var data = {_type: 'notices', _text: text, time: new Date().getTime(), success: 'Notice was succesfully added', error: 'Sorry, ' + sender.username + ', this notice already exists.'};
-  (data._text.length < 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', notice command is not correct, check !notice') : global.commons.insertIfNotExists(data))
+  var data = {_type: 'notices', _text: text, time: new Date().getTime(), success: 'Notice was succesfully added', error: 'Sorry, ' + sender.username + ', this notice already exists.'}
+  data._text.length < 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', notice command is not correct, check !notice') : global.commons.insertIfNotExists(data)
 }
 
 Notice.prototype.list = function () {
@@ -79,8 +79,8 @@ Notice.prototype.get = function (self, user, id) {
 }
 
 Notice.prototype.remove = function (self, sender, text) {
-  var data = {_type: 'notices', _id: text.trim(), success: 'Notice was succesfully removed.', error: 'Notice cannot be found.'};
-  (data._id.length < 1 ? this.sendMessage('Sorry, ' + sender.username + ', Notice command is not correct, check !notice') : global.commons.remove(data))
+  var data = {_type: 'notices', _id: text.trim(), success: 'Notice was succesfully removed.', error: 'Notice cannot be found.'}
+  data._id.length < 1 ? this.sendMessage('Sorry, ' + sender.username + ', Notice command is not correct, check !notice') : global.commons.remove(data)
 }
 
 module.exports = new Notice()

@@ -22,8 +22,8 @@ Keywords.prototype.help = function () {
 }
 
 Keywords.prototype.add = function (self, sender, keyword) {
-  var data = {_type: 'keywords', _keyword: keyword.split(' ')[0], response: keyword.replace(keyword.split(' ')[0], '').trim(), success: 'Keyword was succesfully added', error: 'Sorry, ' + sender.username + ', this keyword already exists.'};
-  (data._keyword.length < 1 || data.response.length <= 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', keyword command is not correct, check !keyword') : global.commons.insertIfNotExists(data))
+  var data = {_type: 'keywords', _keyword: keyword.split(' ')[0], response: keyword.replace(keyword.split(' ')[0], '').trim(), success: 'Keyword was succesfully added', error: 'Sorry, ' + sender.username + ', this keyword already exists.'}
+  data._keyword.length < 1 || data.response.length <= 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', keyword command is not correct, check !keyword') : global.commons.insertIfNotExists(data)
 }
 
 Keywords.prototype.run = function (id, user, msg) {
@@ -61,8 +61,8 @@ Keywords.prototype.list = function () {
 }
 
 Keywords.prototype.remove = function (self, sender, text) {
-  var data = {_type: 'keywords', _keyword: text.trim(), success: 'Keyword was succesfully removed.', error: 'Keyword cannot be found.'};
-  (data._keyword.length < 1 ? this.sendMessage('Sorry, ' + sender.username + ', keyword command is not correct, check !keyword') : global.commons.remove(data))
+  var data = {_type: 'keywords', _keyword: text.trim(), success: 'Keyword was succesfully removed.', error: 'Keyword cannot be found.'}
+  data._keyword.length < 1 ? this.sendMessage('Sorry, ' + sender.username + ', keyword command is not correct, check !keyword') : global.commons.remove(data)
 }
 
 module.exports = new Keywords()

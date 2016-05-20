@@ -33,8 +33,8 @@ CustomCommands.prototype.register = function (self) {
 }
 
 CustomCommands.prototype.add = function (self, sender, keyword) {
-  var data = {_type: 'customCommands', _keyword: keyword.split(' ')[0], response: keyword.replace(keyword.split(' ')[0], '').trim(), success: 'Custom command was succesfully added', error: 'Sorry, ' + sender.username + ', this custom command already exists.'};
-  (data._keyword.length < 1 || data.response.length <= 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', command is not correct, check !command') : global.commons.insertIfNotExists(data))
+  var data = {_type: 'customCommands', _keyword: keyword.split(' ')[0], response: keyword.replace(keyword.split(' ')[0], '').trim(), success: 'Custom command was succesfully added', error: 'Sorry, ' + sender.username + ', this custom command already exists.'}
+  data._keyword.length < 1 || data.response.length <= 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', command is not correct, check !command') : global.commons.insertIfNotExists(data)
 }
 
 CustomCommands.prototype.run = function (self, user, msg, fullMsg) {
@@ -65,8 +65,8 @@ CustomCommands.prototype.remove = function (self, sender, text) {
       global.client.action(global.configuration.get().twitch.owner, 'Custom command was succesfully removed.')
     },
     error: 'Custom command cannot be found.'
-  };
-  (data._keyword.length < 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', custom command is not correct, check !command') : global.commons.remove(data))
+  }
+  data._keyword.length < 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', custom command is not correct, check !command') : global.commons.remove(data)
 }
 
 module.exports = new CustomCommands()
