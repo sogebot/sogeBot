@@ -1,14 +1,7 @@
 'use strict'
 
 var chalk = require('chalk')
-var Database = require('nedb')
 var constants = require('../constants')
-
-var database = new Database({
-  filename: 'db/price.db',
-  autoload: true
-})
-database.persistence.setAutocompactionInterval(60000)
 
 function Price () {
   if (global.configuration.get().systems.points === true && global.configuration.get().systems.price === true) {
@@ -48,19 +41,19 @@ Price.prototype.setPrice = function (self, user, text) {
     return
   }
 
-  database.find({ command: cmd }, function (err, docs) {
+  global.botDB.find({type: 'price', command: cmd}, function (err, docs) {
     if (err) console.log(err)
     if (docs.length === 0) {
-      database.insert({command: cmd, price: price})
+      global.botDB.insert({type: 'price', command: cmd, price: price})
     } else {
-      database.update({command: cmd}, {$set: {price: price}}, {})
+      global.botDB.update({type: 'price', command: cmd}, {$set: {price: price}}, {})
     }
     global.client.action(global.configuration.get().twitch.owner, 'Price#' + cmd + ' succesfully set to ' + price)
   })
 }
 
 Price.prototype.unsetPrice = function (self, user, msg) {
-  database.remove({command: msg}, {}, function (err, numRemoved) {
+  global.botDB.remove({type: 'price', command: msg}, {}, function (err, numRemoved) {
     if (err) console.log(err)
     var output = (numRemoved === 0 ? 'Price#' + msg + " wasn't set." : 'Price#' + msg + ' is succesfully unset.')
     global.client.action(global.configuration.get().twitch.owner, output)
@@ -68,7 +61,7 @@ Price.prototype.unsetPrice = function (self, user, msg) {
 }
 
 Price.prototype.listPrices = function (self, user, msg) {
-  database.find({}, function (err, docs) {
+  global.botDB.find({type: 'price'}, function (err, docs) {
     if (err) console.log(err)
     var ids = []
     docs.forEach(function (e, i, ar) { ids.push(e.command + ':' + e.price) })
@@ -83,7 +76,7 @@ Price.prototype.checkPrice = function (id, user, msg) {
     return true
   }
 
-  database.find({ }, function (err, items) {
+  global.botDB.find({type: 'price'}, function (err, items) {
     if (err) console.log(err)
     var itemFound = false
     for (var item in items) {
@@ -95,13 +88,12 @@ Price.prototype.checkPrice = function (id, user, msg) {
 
         if (position >= 0 && typeof msg[position - 1] === 'undefined' &&
           (msg[position + kwLength] === ' ' || typeof msg[position + kwLength] === 'undefined')) {
-          var pointsDb = global.systems.points.getDatabase()
           itemFound = true
-          pointsDb.findOne({ username: user.username }, function (err, item) {
+          global.botDB.findOne({type: 'points', username: user.username}, function (err, item) {
             if (err) console.log(err)
             var points = (typeof item !== 'undefined' && item !== null ? item.points : 0)
             if (points >= price) {
-              pointsDb.update({username: user.username}, {$set: {points: points - price}}, {})
+              global.botDB.update({type: 'points', username: user.username}, {$set: {points: points - price}}, {})
               global.updateQueue(id, true)
             } else {
               global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + user.username + ', you need ' + price + ' Points for !' + command)
