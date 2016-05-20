@@ -1,14 +1,7 @@
 'use strict'
 
 var chalk = require('chalk')
-var Database = require('nedb')
 var constants = require('../constants')
-
-var database = new Database({
-  filename: 'db/customCommands.db',
-  autoload: true
-})
-database.persistence.setAutocompactionInterval(60000)
 
 function CustomCommands () {
   if (global.configuration.get().systems.customCommands === true) {
@@ -33,7 +26,7 @@ CustomCommands.prototype.help = function () {
 }
 
 CustomCommands.prototype.registerCommands = function (self) {
-  database.find({}, function (err, docs) {
+  global.botDB.find({type: 'customCommands'}, function (err, docs) {
     if (err) { console.log(err) }
     docs.forEach(function (e, i, ar) { global.parser.register(self, '!' + e.keyword, self.customCommand, constants.VIEWERS) })
   })
@@ -54,10 +47,10 @@ CustomCommands.prototype.addCommand = function (self, user, keyword) {
   var kw = keyword.split(' ')[0]
   var response = keyword.replace(kw, '').trim()
 
-  database.find({ keyword: kw }, function (err, docs) {
+  global.botDB.find({type: 'customCommands', keyword: kw}, function (err, docs) {
     if (err) { console.log(err) }
     if (docs.length === 0) { // it is safe to insert new notice?
-      database.insert({keyword: kw, response: response}, function (err, newItem) {
+      global.botDB.insert({type: 'customCommands', keyword: kw, response: response}, function (err, newItem) {
         if (err) { console.log(err) }
         global.client.action(global.configuration.get().twitch.owner, 'CustomCommand#' + kw + ' succesfully added')
       })
@@ -68,7 +61,7 @@ CustomCommands.prototype.addCommand = function (self, user, keyword) {
 }
 
 CustomCommands.prototype.customCommand = function (self, user, msg, fullMsg) {
-  database.findOne({keyword: fullMsg.split('!')[1]}, function (err, item) {
+  global.botDB.findOne({type: 'customCommands', keyword: fullMsg.split('!')[1]}, function (err, item) {
     if (err) { console.log(err) }
     if (typeof item !== 'undefined' && item !== null) {
       global.client.action(global.configuration.get().twitch.owner, item.response)
@@ -79,7 +72,7 @@ CustomCommands.prototype.customCommand = function (self, user, msg, fullMsg) {
 }
 
 CustomCommands.prototype.listCommands = function () {
-  database.find({}, function (err, docs) {
+  global.botDB.find({type: 'customCommands'}, function (err, docs) {
     if (err) { console.log(err) }
     var keywords = []
     docs.forEach(function (e, i, ar) { keywords.push('!' + e.keyword) })
@@ -94,7 +87,7 @@ CustomCommands.prototype.delCommand = function (self, user, keyword) {
     return
   }
 
-  database.remove({keyword: keyword}, {}, function (err, numRemoved) {
+  global.botDB.remove({type: 'customCommands', keyword: keyword}, {}, function (err, numRemoved) {
     if (err) { console.log(err) }
     var output = (numRemoved === 0 ? 'CustomCommand#' + keyword + ' cannot be found.' : 'CustomCommand#' + keyword + ' is succesfully deleted.')
     global.client.action(global.configuration.get().twitch.owner, output)
