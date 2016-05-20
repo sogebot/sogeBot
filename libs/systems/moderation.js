@@ -10,6 +10,7 @@ function Moderation () {
     global.parser.registerParser('moderationLinks', this.containsLink, constants.VIEWERS)
     global.parser.registerParser('moderationSymbols', this.symbols, constants.VIEWERS)
     global.parser.registerParser('moderationLongMessage', this.longMessage, constants.VIEWERS)
+    global.parser.registerParser('moderationCaps', this.caps, constants.VIEWERS)
   }
 
   console.log('Moderation system loaded and ' + (global.configuration.get().systems.moderation === true ? chalk.green('enabled') : chalk.red('disabled')))
@@ -79,7 +80,7 @@ Moderation.prototype.symbols = function (id, sender, text) {
       symbolsLength = symbolsLength + symbols.length
     }
   }
-  if (symbolsLength / (msgLength / 100) >= maxSymbolsPercent) {
+  if (Math.ceil(symbolsLength / (msgLength / 100)) >= maxSymbolsPercent) {
     global.updateQueue(id, false)
     global.client.timeout(global.configuration.get().twitch.owner, sender.username, timeout)
     global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender.username + ', no excessive symbols usage')
@@ -104,6 +105,33 @@ Moderation.prototype.longMessage = function (id, sender, text) {
     global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender.username + ', long messages are not allowed')
     return
   }
+  global.updateQueue(id, true)
+}
+
+Moderation.prototype.caps = function (id, sender, text) {
+  var timeout = 20
+  var triggerLength = 15
+  var msgLength = text.trim().length
+  var maxCapsPercent = 50
+  var capsLength = 0
+
+  if (global.parser.isOwner(sender) || msgLength <= triggerLength) {
+    global.updateQueue(id, true)
+    return
+  }
+  var out = text.match(/([A-Z]+)/g)
+  for (var item in out) {
+    if (out.hasOwnProperty(item)) {
+      capsLength = capsLength + out[item].length
+    }
+  }
+  if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
+    global.updateQueue(id, false)
+    global.client.timeout(global.configuration.get().twitch.owner, sender.username, timeout)
+    global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender.username + ', no excessive caps usage')
+    return
+  }
+
   global.updateQueue(id, true)
 }
 
