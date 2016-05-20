@@ -29,7 +29,7 @@ Moderation.prototype.containsLink = function (id, sender, text) {
   }
 
   var urlRegex = /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/ig
-  if (text.search(urlRegex) >= 0 && sender.username !== global.configuration.get().owner) {
+  if (text.search(urlRegex) >= 0) {
     global.botDB.findOne({type: 'permitLink', username: sender.username}, function (err, item) {
       if (err) console.log(err)
       try {
@@ -50,24 +50,19 @@ Moderation.prototype.containsLink = function (id, sender, text) {
 }
 
 Moderation.prototype.symbols = function (id, sender, text) {
-  if (global.parser.isOwner(sender)) {
-    global.updateQueue(id, true)
-    return
-  }
-
   var timeout = 20
   var triggerLength = 15
   var msgLength = text.trim().length
   var maxSymbolsConsecutively = 10
   var maxSymbolsPercent = 50
-  if (msgLength <= triggerLength) {
+  var symbolsLength = 0
+
+  if (global.parser.isOwner(sender) || msgLength <= triggerLength) {
     global.updateQueue(id, true)
     return
   }
 
-  var symbolRegex = /([^\s\w]+)/g
-  var symbolsLength = 0
-  var out = text.match(symbolRegex)
+  var out = text.match(/([^\s\w]+)/g)
   for (var item in out) {
     if (out.hasOwnProperty(item)) {
       var symbols = out[item]
@@ -91,21 +86,17 @@ Moderation.prototype.symbols = function (id, sender, text) {
 }
 
 Moderation.prototype.longMessage = function (id, sender, text) {
-  if (global.parser.isOwner(sender)) {
-    global.updateQueue(id, true)
-    return
-  }
-
   var timeout = 20
   var triggerLength = 300
   var msgLength = text.trim().length
-  if (msgLength >= triggerLength) {
+
+  if (global.parser.isOwner(sender) || msgLength < triggerLength) {
+    global.updateQueue(id, true)
+  } else {
     global.updateQueue(id, false)
     global.client.timeout(global.configuration.get().twitch.owner, sender.username, timeout)
     global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender.username + ', long messages are not allowed')
-    return
   }
-  global.updateQueue(id, true)
 }
 
 Moderation.prototype.caps = function (id, sender, text) {
