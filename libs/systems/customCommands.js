@@ -19,6 +19,8 @@ function CustomCommands () {
     }, 1000)
   }
 
+  this.delCommand(self, 'sogehige', 'alpha')
+
   console.log('CustomCommands system loaded and ' + (global.configuration.get().systems.customCommands === true ? chalk.green('enabled') : chalk.red('disabled')))
 }
 
@@ -49,7 +51,7 @@ CustomCommands.prototype.addCommand = function (self, sender, keyword) {
   var kw = keyword.split(' ')[0]
   var response = keyword.replace(kw, '').trim()
 
-  var data = {_type: 'customCommands', _keyword: kw, response: response, successText: 'Custom command was succesfully added', errorText: 'Sorry, ' + sender + ', this custom command already exists.'}
+  var data = {_type: 'customCommands', _keyword: kw, response: response, success: 'Custom command was succesfully added', error: 'Sorry, ' + sender + ', this custom command already exists.'}
   global.commons.insertIfNotExists(data)
 }
 
@@ -74,17 +76,19 @@ CustomCommands.prototype.listCommands = function () {
   })
 }
 
-CustomCommands.prototype.delCommand = function (self, user, keyword) {
-  if (keyword.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'CustomCommand error: Cannot delete keyword without keyword.')
-    return
+CustomCommands.prototype.delCommand = function (self, sender, text) {
+  var data = {_type: 'customCommands', _keyword: text.trim(),
+    success: function (cb) {
+      global.parser.unregister('!' + cb.keyword)
+      global.client.action(global.configuration.get().twitch.owner, 'Custom command was succesfully removed.')
+    },
+    error: 'Custom command cannot be found.'
   }
-
-  global.botDB.remove({type: 'customCommands', keyword: keyword}, {}, function (err, numRemoved) {
-    if (err) { console.log(err) }
-    var output = (numRemoved === 0 ? 'CustomCommand#' + keyword + ' cannot be found.' : 'CustomCommand#' + keyword + ' is succesfully deleted.')
-    global.client.action(global.configuration.get().twitch.owner, output)
-    if (numRemoved > 0) global.parser.unregister('!' + keyword)
-  })
+  if (data._keyword.length < 1) {
+    global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender + ', custom command is not correct, check !command')
+  } else {
+    global.commons.remove(data)
+  }
 }
+
 module.exports = new CustomCommands()

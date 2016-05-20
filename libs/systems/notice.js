@@ -83,17 +83,13 @@ Notice.prototype.getNotice = function (self, user, id) {
   })
 }
 
-Notice.prototype.delNotice = function (self, user, id) {
-  if (id.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Notice error: Cannot delete notice without id.')
-    return
+Notice.prototype.delNotice = function (self, sender, text) {
+  var data = {_type: 'notices', _id: text.trim(), success: 'Notice was succesfully removed.', error: 'Notice cannot be found.'}
+  if (data._id.length < 1) {
+    global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender + ', Notice command is not correct, check !notice')
+  } else {
+    global.commons.remove(data)
   }
-
-  global.botDB.remove({type: 'notices', _id: id}, {}, function (err, numRemoved) {
-    if (err) console.log(err)
-    var output = (numRemoved === 0 ? 'Notice#' + id + ' cannot be found.' : 'Notice#' + id + ' is succesfully deleted.')
-    global.client.action(global.configuration.get().twitch.owner, output)
-  })
 }
 
 module.exports = new Notice()
