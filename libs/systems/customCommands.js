@@ -10,6 +10,8 @@ function CustomCommands () {
     global.parser.register(this, '!command remove', this.delCommand, constants.OWNER_ONLY)
     global.parser.register(this, '!command', this.help, constants.OWNER_ONLY)
 
+    this.addCommand(this, 'sogehige', 'keyword response')
+
     // start interval for registering commands from DB
     var self = this
     setInterval(function () {
@@ -32,7 +34,7 @@ CustomCommands.prototype.registerCommands = function (self) {
   })
 }
 
-CustomCommands.prototype.addCommand = function (self, user, keyword) {
+CustomCommands.prototype.addCommand = function (self, sender, keyword) {
   if (keyword.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'CustomCommand error: Cannot add empty keyword')
     return
@@ -47,17 +49,8 @@ CustomCommands.prototype.addCommand = function (self, user, keyword) {
   var kw = keyword.split(' ')[0]
   var response = keyword.replace(kw, '').trim()
 
-  global.botDB.find({type: 'customCommands', keyword: kw}, function (err, docs) {
-    if (err) { console.log(err) }
-    if (docs.length === 0) { // it is safe to insert new notice?
-      global.botDB.insert({type: 'customCommands', keyword: kw, response: response}, function (err, newItem) {
-        if (err) { console.log(err) }
-        global.client.action(global.configuration.get().twitch.owner, 'CustomCommand#' + kw + ' succesfully added')
-      })
-    } else {
-      global.client.action(global.configuration.get().twitch.owner, 'CustomCommand error: Cannot add duplicate command.')
-    }
-  })
+  var data = {_type: 'customCommands', _keyword: kw, response: response, successText: 'Custom command was succesfully added', errorText: 'Sorry, ' + sender + ', this custom command already exists.'}
+  global.commons.insertIfNotExists(data)
 }
 
 CustomCommands.prototype.customCommand = function (self, user, msg, fullMsg) {

@@ -21,7 +21,7 @@ Keywords.prototype.help = function () {
   global.client.action(global.configuration.get().twitch.owner, text)
 }
 
-Keywords.prototype.addKeyword = function (self, user, keyword) {
+Keywords.prototype.addKeyword = function (self, sender, keyword) {
   if (keyword.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Keyword error: Cannot add empty keyword')
     return
@@ -36,17 +36,8 @@ Keywords.prototype.addKeyword = function (self, user, keyword) {
   var kw = keyword.split(' ')[0]
   var response = keyword.replace(kw, '').trim()
 
-  global.botDB.find({type: 'keywords', keyword: kw}, function (err, docs) {
-    if (err) console.log(err)
-    if (docs.length === 0) { // it is safe to insert new keyword?
-      global.botDB.insert({type: 'keywords', keyword: kw, response: response}, function (err, newItem) {
-        if (err) console.log(err)
-        global.client.action(global.configuration.get().twitch.owner, 'Keyword#' + kw + ' succesfully added')
-      })
-    } else {
-      global.client.action(global.configuration.get().twitch.owner, 'Keyword error: Cannot add duplicate keyword.')
-    }
-  })
+  var data = {_type: 'keywords', _keyword: kw, response: response, successText: 'Keyword was succesfully added', errorText: 'Sorry, ' + sender + ', this keyword already exists.'}
+  global.commons.insertIfNotExists(data)
 }
 
 Keywords.prototype.customKeyword = function (id, user, msg) {

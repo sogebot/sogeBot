@@ -50,23 +50,14 @@ Notice.prototype.help = function () {
   global.client.action(global.configuration.get().twitch.owner, text)
 }
 
-Notice.prototype.addNotice = function (self, user, text) {
+Notice.prototype.addNotice = function (self, sender, text) {
   if (text.length < 1) {
     global.client.action(global.configuration.get().twitch.owner, 'Notice error: Cannot add empty notice.')
     return
   }
 
-  global.botDB.find({type: 'notices', text: text}, function (err, docs) {
-    if (err) console.log(err)
-    if (docs.length === 0) { // it is safe to insert new notice?
-      global.botDB.insert({type: 'notices', text: text, time: new Date().getTime()}, function (err, newItem) {
-        if (err) console.log(err)
-        global.client.action(global.configuration.get().twitch.owner, 'Notice#' + newItem._id + ' succesfully added')
-      })
-    } else {
-      global.client.action(global.configuration.get().twitch.owner, 'Notice error: Cannot add duplicate notice.')
-    }
-  })
+  var data = {_type: 'notices', _text: text, time: new Date().getTime(), successText: 'Notice was succesfully added', errorText: 'Sorry, ' + sender + ', this notice already exists.'}
+  global.commons.insertIfNotExists(data)
 }
 
 Notice.prototype.listNotices = function () {
