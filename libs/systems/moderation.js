@@ -11,6 +11,7 @@ function Moderation () {
     global.parser.registerParser('moderationSymbols', this.symbols, constants.VIEWERS)
     global.parser.registerParser('moderationLongMessage', this.longMessage, constants.VIEWERS)
     global.parser.registerParser('moderationCaps', this.caps, constants.VIEWERS)
+    global.parser.registerParser('moderationSpam', this.spam, constants.VIEWERS)
   }
 
   console.log('Moderation system loaded and ' + (global.configuration.get().systems.moderation === true ? chalk.green('enabled') : chalk.red('disabled')))
@@ -123,6 +124,27 @@ Moderation.prototype.caps = function (id, sender, text) {
     return
   }
 
+  global.updateQueue(id, true)
+}
+
+Moderation.prototype.spam = function (id, sender, text) {
+  var timeout = 300
+  var triggerLength = 15
+  var msgLength = text.trim().length
+  var maxSpamLength = 15
+
+  if (global.parser.isOwner(sender) || msgLength <= triggerLength) {
+    global.updateQueue(id, true)
+    return
+  }
+  var out = text.match(/(.+)(\1+)/g)
+  for (var item in out) {
+    if (out.hasOwnProperty(item) && out[item].length >= maxSpamLength) {
+      global.updateQueue(id, false)
+      global.client.timeout(global.configuration.get().twitch.owner, sender.username, timeout)
+      global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender.username + ', spam is not allowed')
+    }
+  }
   global.updateQueue(id, true)
 }
 
