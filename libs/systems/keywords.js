@@ -36,7 +36,7 @@ Keywords.prototype.addKeyword = function (self, sender, keyword) {
   var kw = keyword.split(' ')[0]
   var response = keyword.replace(kw, '').trim()
 
-  var data = {_type: 'keywords', _keyword: kw, response: response, successText: 'Keyword was succesfully added', errorText: 'Sorry, ' + sender + ', this keyword already exists.'}
+  var data = {_type: 'keywords', _keyword: kw, response: response, success: 'Keyword was succesfully added', error: 'Sorry, ' + sender + ', this keyword already exists.'}
   global.commons.insertIfNotExists(data)
 }
 
