@@ -360,8 +360,9 @@ Points.prototype.stopCounting = function (username) {
 }
 
 Points.prototype.updatePoints = function () {
-  var interval = global.configuration.get().systems.pointsInterval * 60 * 1000
-  var ptsPerInterval = global.configuration.get().systems.pointsPerInterval
+  var interval = (global.twitch.isOnline ? global.configuration.get().systems.pointsInterval * 60 * 1000 : global.configuration.get().systems.pointsIntervalOffline * 60 * 1000)
+  var ptsPerInterval = (global.twitch.isOnline ? global.configuration.get().systems.pointsPerInterval : global.configuration.get().systems.pointsPerIntervalOffline)
+
   global.botDB.find({type: 'points', isOnline: true}, function (err, items) {
     if (err) console.log(err)
     items.forEach(function (e, i, ar) {
