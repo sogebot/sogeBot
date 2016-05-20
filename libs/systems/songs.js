@@ -1,25 +1,12 @@
 'use strict'
 
 var chalk = require('chalk')
-var Database = require('nedb')
 var constants = require('../constants')
 var http = require('http')
 var fs = require('fs')
 var auth = require('http-auth')
 
 var fetchVideoInfo = require('youtube-info')
-
-var playlist = new Database({
-  filename: 'db/playlist.db',
-  autoload: true
-})
-playlist.persistence.setAutocompactionInterval(60000)
-
-var songRequests = new Database({
-  filename: 'db/songRequests.db',
-  autoload: true
-})
-songRequests.persistence.setAutocompactionInterval(60000)
 
 function Songs () {
   if (global.configuration.get().systems.songs === true) {
@@ -80,10 +67,10 @@ Songs.prototype.skipSong = function (self) {
 }
 
 Songs.prototype.checkIfRandomizeIsSaved = function () {
-  global.cfgDB.findOne({playlistRandomize: {$exists: true}}, function (err, item) {
+  global.botDB.findOne({type: 'settings', playlistRandomize: {$exists: true}}, function (err, item) {
     if (err) console.log(err)
     if (typeof item === 'undefined' || item === null) {
-      global.cfgDB.insert({playlistRandomize: false})
+      global.botDB.insert({type: 'settings', playlistRandomize: false})
     }
   })
 }
@@ -92,12 +79,12 @@ Songs.prototype.randomizePlaylist = function (self, sender, text) {
   if (text.length < 1) return
 
   if (text.trim() === 'on') {
-    global.cfgDB.update({playlistRandomize: {$exists: true}}, {$set: {playlistRandomize: true}}, {}, function (err, numUpdated) {
+    global.botDB.update({type: 'settings', playlistRandomize: {$exists: true}}, {$set: {playlistRandomize: true}}, {}, function (err, numUpdated) {
       if (err) console.log(err)
       if (numUpdated) global.client.action(global.configuration.get().twitch.owner, 'Playlist will play randomly now.')
     })
   } else {
-    global.cfgDB.update({playlistRandomize: {$exists: true}}, {$set: {playlistRandomize: false}}, {}, function (err, numUpdated) {
+    global.botDB.update({type: 'settings', playlistRandomize: {$exists: true}}, {$set: {playlistRandomize: false}}, {}, function (err, numUpdated) {
       if (err) console.log(err)
       if (numUpdated) global.client.action(global.configuration.get().twitch.owner, "Playlist won't play randomly now.")
     })
@@ -127,14 +114,14 @@ Songs.prototype.sendRandomizeStatus = function (socket) {
 }
 
 Songs.prototype.sendSongRequestsList = function (socket) {
-  songRequests.find({}).sort({addedAt: 1}).exec(function (err, items) {
+  global.botDB.find({type: 'songRequests'}).sort({addedAt: 1}).exec(function (err, items) {
     if (err) console.log(err)
     socket.emit('songRequestsList', items)
   })
 }
 
 Songs.prototype.sendPlaylistList = function (socket) {
-  playlist.find({}).sort({addedAt: 1}).exec(function (err, items) {
+  global.botDB.find({type: 'playlist'}).sort({addedAt: 1}).exec(function (err, items) {
     if (err) console.log(err)
     socket.emit('songPlaylistList', items)
   })
@@ -143,20 +130,20 @@ Songs.prototype.sendPlaylistList = function (socket) {
 Songs.prototype.sendNextSongID = function (socket) {
   var self = this
   // first, check if there are any requests
-  songRequests.findOne({}).sort({addedAt: 1}).exec(function (err, item) {
+  global.botDB.findOne({type: 'songRequests'}).sort({addedAt: 1}).exec(function (err, item) {
     if (err) console.log(err)
     if (typeof item !== 'undefined' && item !== null) { // song is found
       socket.emit('videoID', item.videoID)
       self.currentSong.title = item.title
       self.currentSong.videoID = item.videoID
-      songRequests.remove({ videoID: item.videoID }, {})
+      global.botDB.remove({type: 'songRequests', videoID: item.videoID}, {})
     } else { // run from playlist
-      global.cfgDB.findOne({playlistRandomize: {$exists: true}}, function (err, item) {
+      global.botDB.findOne({type: 'settings', playlistRandomize: {$exists: true}}, function (err, item) {
         if (err) console.log(err)
 
         var isRandom = item.playlistRandomize
         if (isRandom) {
-          playlist.find({}).sort().exec(function (err, items) {
+          global.botDB.find({type: 'playlist'}).sort().exec(function (err, items) {
             if (err) console.log(err)
             var randomSongIndex = Math.floor((Math.random() * items.length))
             self.currentSong.title = items[randomSongIndex].title
@@ -164,10 +151,10 @@ Songs.prototype.sendNextSongID = function (socket) {
             socket.emit('videoID', items[randomSongIndex].videoID)
           })
         } else {
-          playlist.findOne({}).sort({lastPlayedAt: 1}).exec(function (err, item) {
+          global.botDB.findOne({type: 'playlist'}).sort({lastPlayedAt: 1}).exec(function (err, item) {
             if (err) console.log(err)
             if (typeof item !== 'undefined' && item !== null) { // song is found
-              playlist.update({videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
+              global.botDB.update({type: 'playlist', videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
               self.currentSong.title = item.title
               self.currentSong.videoID = item.videoID
               socket.emit('videoID', item.videoID)
@@ -213,16 +200,16 @@ Songs.prototype.addSongToQueue = function (self, user, text) {
   fetchVideoInfo(videoID, function (err, videoInfo) {
     if (err) console.log(err)
     if (typeof videoInfo.title === 'undefined' || videoInfo.title === null) return
-    songRequests.insert({videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), username: user.username})
+    global.botDB.insert({type: 'songRequests', videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), username: user.username})
     global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to queue requested by ' + user.username)
   })
 }
 
 Songs.prototype.removeSongFromQueue = function (self, user, text) {
-  songRequests.findOne({username: user.username}).sort({addedAt: -1}).exec(function (err, item) {
+  global.botDB.findOne({type: 'songRequests', username: user.username}).sort({addedAt: -1}).exec(function (err, item) {
     if (err) console.log(err)
     if (typeof item === 'undefined' || item === null) return
-    songRequests.remove({ videoID: item.videoID }, {}, function (err, numRemoved) {
+    global.botDB.remove({type: 'songRequests', videoID: item.videoID}, {}, function (err, numRemoved) {
       if (err) console.log(err)
       if (numRemoved > 0) global.client.action(global.configuration.get().twitch.owner, item.title + ' was removed from queue')
     })
@@ -233,13 +220,13 @@ Songs.prototype.addSongToPlaylist = function (self, user, text) {
   if (text.length < 1) return
 
   var videoID = text.trim()
-  playlist.findOne({videoID: videoID}, function (err, item) {
+  global.botDB.findOne({type: 'playlist', videoID: videoID}, function (err, item) {
     if (err) console.log(err)
 
     if (typeof item === 'undefined' || item === null) {
       fetchVideoInfo(videoID, function (err, videoInfo) {
         if (err) console.log(err)
-        playlist.insert({videoID: videoID, title: videoInfo.title, lastPlayedAt: new Date().getTime()})
+        global.botDB.insert({type: 'playlist', videoID: videoID, title: videoInfo.title, lastPlayedAt: new Date().getTime()})
         global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to playlist')
       })
     } else {
@@ -255,7 +242,7 @@ Songs.prototype.removeSongFromPlaylist = function (self, user, text) {
 
   fetchVideoInfo(videoID, function (err, videoInfo) {
     if (err) console.log(err)
-    playlist.remove({ videoID: videoID }, {}, function (err, numRemoved) {
+    global.botDB.remove({type: 'playlist', videoID: videoID}, {}, function (err, numRemoved) {
       if (err) console.log(err)
       if (numRemoved > 0) global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was removed from playlist')
     })
