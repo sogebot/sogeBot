@@ -22,16 +22,8 @@ Alias.prototype.help = function () {
 }
 
 Alias.prototype.add = function (self, sender, text) {
-  if (text.length < 1 || text.split(' ').length <= 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender + ', alias command is not correct, check !alias')
-    return
-  }
-
-  var command = text.split(' ')[0]
-  var alias = text.replace(command, '').trim()
-
-  var data = {_type: 'alias', _alias: alias, command: command, success: 'Alias was succesfully added.', error: 'Sorry, ' + sender + ', this alias already exists.'}
-  global.commons.insertIfNotExists(data)
+  var data = {_type: 'alias', _alias: text.replace(text.split(' ')[0], '').trim(), command: text.split(' ')[0], success: 'Alias was succesfully added.', error: 'Sorry, ' + sender.username + ', this alias already exists.'};
+  (data._alias.length <= 1 || data.command.length <= 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', alias command is not correct, check !alias') : global.commons.insertIfNotExists(data))
 }
 
 Alias.prototype.list = function () {
@@ -45,12 +37,8 @@ Alias.prototype.list = function () {
 }
 
 Alias.prototype.remove = function (self, sender, text) {
-  var data = {_type: 'alias', _alias: text.trim(), success: 'Alias was succesfully removed.', error: 'Alias cannot be found.'}
-  if (data._alias.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender + ', alias command is not correct, check !alias')
-  } else {
-    global.commons.remove(data)
-  }
+  var data = {_type: 'alias', _alias: text.trim(), success: 'Alias was succesfully removed.', error: 'Alias cannot be found.'};
+  (data._alias.length < 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', alias command is not correct, check !alias') : global.commons.remove(data))
 }
 
 Alias.prototype.parse = function (id, sender, text) {

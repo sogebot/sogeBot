@@ -5,21 +5,17 @@ var constants = require('../constants')
 
 function CustomCommands () {
   if (global.configuration.get().systems.customCommands === true) {
-    global.parser.register(this, '!command add', this.addCommand, constants.OWNER_ONLY)
-    global.parser.register(this, '!command list', this.listCommands, constants.OWNER_ONLY)
-    global.parser.register(this, '!command remove', this.delCommand, constants.OWNER_ONLY)
+    global.parser.register(this, '!command add', this.add, constants.OWNER_ONLY)
+    global.parser.register(this, '!command list', this.list, constants.OWNER_ONLY)
+    global.parser.register(this, '!command remove', this.remove, constants.OWNER_ONLY)
     global.parser.register(this, '!command', this.help, constants.OWNER_ONLY)
-
-    this.addCommand(this, 'sogehige', 'keyword response')
 
     // start interval for registering commands from DB
     var self = this
     setInterval(function () {
-      self.registerCommands(self)
+      self.register(self)
     }, 1000)
   }
-
-  this.delCommand(self, 'sogehige', 'alpha')
 
   console.log('CustomCommands system loaded and ' + (global.configuration.get().systems.customCommands === true ? chalk.green('enabled') : chalk.red('disabled')))
 }
@@ -29,33 +25,19 @@ CustomCommands.prototype.help = function () {
   global.client.action(global.configuration.get().twitch.owner, text)
 }
 
-CustomCommands.prototype.registerCommands = function (self) {
+CustomCommands.prototype.register = function (self) {
   global.botDB.find({type: 'customCommands'}, function (err, docs) {
     if (err) { console.log(err) }
-    docs.forEach(function (e, i, ar) { global.parser.register(self, '!' + e.keyword, self.customCommand, constants.VIEWERS) })
+    docs.forEach(function (e, i, ar) { global.parser.register(self, '!' + e.keyword, self.run, constants.VIEWERS) })
   })
 }
 
-CustomCommands.prototype.addCommand = function (self, sender, keyword) {
-  if (keyword.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'CustomCommand error: Cannot add empty keyword')
-    return
-  }
-
-  // check if response after keyword is set
-  if (keyword.split(' ').length <= 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'CustomCommand error: Cannot add keyword without response')
-    return
-  }
-
-  var kw = keyword.split(' ')[0]
-  var response = keyword.replace(kw, '').trim()
-
-  var data = {_type: 'customCommands', _keyword: kw, response: response, success: 'Custom command was succesfully added', error: 'Sorry, ' + sender + ', this custom command already exists.'}
-  global.commons.insertIfNotExists(data)
+CustomCommands.prototype.add = function (self, sender, keyword) {
+  var data = {_type: 'customCommands', _keyword: keyword.split(' ')[0], response: keyword.replace(keyword.split(' ')[0], '').trim(), success: 'Custom command was succesfully added', error: 'Sorry, ' + sender.username + ', this custom command already exists.'};
+  (data._keyword.length < 1 || data.response.length <= 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', command is not correct, check !command') : global.commons.insertIfNotExists(data))
 }
 
-CustomCommands.prototype.customCommand = function (self, user, msg, fullMsg) {
+CustomCommands.prototype.run = function (self, user, msg, fullMsg) {
   global.botDB.findOne({type: 'customCommands', keyword: fullMsg.split('!')[1]}, function (err, item) {
     if (err) { console.log(err) }
     if (typeof item !== 'undefined' && item !== null) {
@@ -66,7 +48,7 @@ CustomCommands.prototype.customCommand = function (self, user, msg, fullMsg) {
   })
 }
 
-CustomCommands.prototype.listCommands = function () {
+CustomCommands.prototype.list = function () {
   global.botDB.find({type: 'customCommands'}, function (err, docs) {
     if (err) { console.log(err) }
     var keywords = []
@@ -76,19 +58,15 @@ CustomCommands.prototype.listCommands = function () {
   })
 }
 
-CustomCommands.prototype.delCommand = function (self, sender, text) {
+CustomCommands.prototype.remove = function (self, sender, text) {
   var data = {_type: 'customCommands', _keyword: text.trim(),
     success: function (cb) {
       global.parser.unregister('!' + cb.keyword)
       global.client.action(global.configuration.get().twitch.owner, 'Custom command was succesfully removed.')
     },
     error: 'Custom command cannot be found.'
-  }
-  if (data._keyword.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender + ', custom command is not correct, check !command')
-  } else {
-    global.commons.remove(data)
-  }
+  };
+  (data._keyword.length < 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', custom command is not correct, check !command') : global.commons.remove(data))
 }
 
 module.exports = new CustomCommands()
