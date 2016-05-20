@@ -7,6 +7,7 @@ var irc = require('tmi.js')
 var Configuration = require('./libs/configuration')
 var Parser = require('./libs/parser')
 var Twitch = require('./libs/twitch')
+var Commons = require('./libs/commons')
 
 global.configuration = new Configuration()
 
@@ -29,6 +30,7 @@ global.client = new irc.client(options)
 
 global.parser = new Parser()
 global.twitch = new Twitch()
+global.commons = new Commons()
 
 // bot systems
 global.systems = require('auto-load')('./libs/systems/')

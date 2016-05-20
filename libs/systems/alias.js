@@ -30,17 +30,8 @@ Alias.prototype.add = function (self, sender, text) {
   var command = text.split(' ')[0]
   var alias = text.replace(command, '').trim()
 
-  global.botDB.find({type: 'alias', alias: alias}, function (err, docs) {
-    if (err) console.log(err)
-    if (docs.length === 0) { // it is safe to insert new keyword?
-      global.botDB.insert({type: 'alias', alias: alias, command: command}, function (err, newItem) {
-        if (err) console.log(err)
-        global.client.action(global.configuration.get().twitch.owner, 'Alias#' + alias + ' for ' + command + ' succesfully added')
-      })
-    } else {
-      global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + sender + ', this alias already exists')
-    }
-  })
+  var data = {_type: 'alias', _alias: alias, command: command, successText: 'Alias was succesfully added.', errorText: 'Sorry, ' + sender + ', this alias already exists.'}
+  global.commons.insertIfNotExists(data)
 }
 
 Alias.prototype.list = function () {
