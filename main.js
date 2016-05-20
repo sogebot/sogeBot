@@ -6,12 +6,9 @@ var irc = require('tmi.js')
 // bot libraries
 var Configuration = require('./libs/configuration')
 var Parser = require('./libs/parser')
+var Twitch = require('./libs/twitch')
 
 global.configuration = new Configuration()
-global.parser = new Parser()
-
-// bot systems
-global.systems = require('auto-load')('./libs/systems/')
 
 var options = {
   options: {
@@ -29,6 +26,12 @@ var options = {
 }
 
 global.client = new irc.client(options)
+
+global.parser = new Parser()
+global.twitch = new Twitch()
+
+// bot systems
+global.systems = require('auto-load')('./libs/systems/')
 
 // Connect the client to the server..
 global.client.connect()
