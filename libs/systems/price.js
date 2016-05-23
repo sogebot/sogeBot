@@ -2,6 +2,7 @@
 
 var chalk = require('chalk')
 var constants = require('../constants')
+var _ = require('underscore')
 
 function Price () {
   if (global.configuration.get().systems.points === true && global.configuration.get().systems.price === true) {
@@ -71,40 +72,12 @@ Price.prototype.listPrices = function (self, user, msg) {
 }
 
 Price.prototype.checkPrice = function (id, user, msg) {
-  if (!msg.startsWith('!')) {
-    global.updateQueue(id, true) // we want to parse _ONLY_ commands
-    return true
-  }
-
-  global.botDB.find({type: 'price'}, function (err, items) {
+  global.botDB.find({$or: [{type: 'price', $where: function () { return msg.search(new RegExp('(?:^\\!)(' + this.command + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'g')) >= 0 }}, {type: 'points', username: user.username}]}, function (err, items) {
     if (err) console.log(err)
-    var itemFound = false
-    for (var item in items) {
-      if (items.hasOwnProperty(item)) {
-        var position = msg.toLowerCase().indexOf('!' + items[item].command)
-        var kwLength = items[item].command.length + 1
-        var price = items[item].price
-        var command = items[item].command
-
-        if (position >= 0 && typeof msg[position - 1] === 'undefined' &&
-          (msg[position + kwLength] === ' ' || typeof msg[position + kwLength] === 'undefined')) {
-          itemFound = true
-          global.botDB.findOne({type: 'points', username: user.username}, function (err, item) {
-            if (err) console.log(err)
-            var points = (typeof item !== 'undefined' && item !== null ? item.points : 0)
-            if (points >= price) {
-              global.botDB.update({type: 'points', username: user.username}, {$set: {points: points - price}}, {})
-              global.updateQueue(id, true)
-            } else {
-              global.client.action(global.configuration.get().twitch.owner, 'Sorry, ' + user.username + ', you need ' + price + ' Points for !' + command)
-              global.updateQueue(id, false)
-            }
-          })
-        }
-        break
-      }
-    }
-    if (!itemFound) global.updateQueue(id, true)
+    var price = !_.isUndefined(items[0]) && items[0].type === 'price' ? parseInt(items[0].price, 10) : 0
+    var points = !_.isUndefined(items[1]) && items[1].type === 'points' ? parseInt(items[1].points, 10) : 0
+    global.updateQueue(id, price === 0 || points >= price)
+    price === 0 || points >= price ? global.botDB.update({type: 'points', username: user.username}, {$set: {points: points - price}}, {}) : global.commons.sendMessage('Sorry, ' + user.username + ', you need ' + price + ' Points for !' + items[0].command)
   })
 }
 
