@@ -21,6 +21,19 @@ Commons.prototype.insertIfNotExists = function (data) {
   })
 }
 
+Commons.prototype.updateOrInsert = function (data) {
+  var callbacks = this.getCallbacks(data)
+  var toFind = this.getObjectToFind(data)
+  var toUpdate = this.getObjectToUpdate(data)
+  var toInsert = this.stripUnderscores(data)
+  var self = this
+  global.botDB.update(toFind, {$set: toUpdate}, {}, function (err, numReplaced) {
+    if (err) console.log(err)
+    if (numReplaced === 0) global.botDB.insert(toInsert)
+    self.runCallback(callbacks.success, data)
+  })
+}
+
 Commons.prototype.remove = function (data) {
   var callbacks = this.getCallbacks(data)
   var toRemove = this.getObjectToFind(data)
@@ -39,6 +52,16 @@ Commons.prototype.getObjectToFind = function (data) {
     }
   }
   return this.stripUnderscores(Object)
+}
+
+Commons.prototype.getObjectToUpdate = function (data) {
+  var Object = {}
+  for (var index in data) {
+    if (data.hasOwnProperty(index) && !index.startsWith('_') && !(index === 'success' || index === 'error')) {
+      Object[index] = data[index]
+    }
+  }
+  return Object
 }
 
 Commons.prototype.stripUnderscores = function (data) {
