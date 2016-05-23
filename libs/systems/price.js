@@ -19,45 +19,18 @@ function Price () {
 
 Price.prototype.help = function () {
   var text = 'Usage: !price set <cmd> <price> | !price unset <cmd> | !price list'
-  global.client.action(global.configuration.get().twitch.owner, text)
+  global.commons.sendMessage(text)
 }
 
-Price.prototype.setPrice = function (self, user, text) {
-  if (text.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Price error: Cannot set price for empty command')
-    return
-  }
-
-  // check if response after keyword is set
-  if (text.split(' ').length <= 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Price error: Cannot set empty price for command')
-    return
-  }
-
-  var cmd = text.split(' ')[0]
-  var price = parseInt(text.replace(cmd, '').trim(), 10)
-
-  if (!Number.isInteger(price)) {
-    global.client.action(global.configuration.get().twitch.owner, 'Price error: Cannot set NaN price.')
-    return
-  }
-
-  global.botDB.find({type: 'price', command: cmd}, function (err, docs) {
-    if (err) console.log(err)
-    if (docs.length === 0) {
-      global.botDB.insert({type: 'price', command: cmd, price: price})
-    } else {
-      global.botDB.update({type: 'price', command: cmd}, {$set: {price: price}}, {})
-    }
-    global.client.action(global.configuration.get().twitch.owner, 'Price#' + cmd + ' succesfully set to ' + price)
-  })
+Price.prototype.setPrice = function (self, sender, text) {
+  var data = {_type: 'price', _command: text.split(' ')[0], price: parseInt(text.replace(text.split(' ')[0], '').trim(), 10), success: 'Price#' + text.split(' ')[0] + ' succesfully set to ' + text.replace(text.split(' ')[0], '').trim()}
+  data._command.length < 1 || !Number.isInteger(data.price) ? global.commons.sendMessage('Sorry, ' + sender.username + ', price command is not correct, check !price') : global.commons.updateOrInsert(data)
 }
 
 Price.prototype.unsetPrice = function (self, user, msg) {
   global.botDB.remove({type: 'price', command: msg}, {}, function (err, numRemoved) {
     if (err) console.log(err)
-    var output = (numRemoved === 0 ? 'Price#' + msg + " wasn't set." : 'Price#' + msg + ' is succesfully unset.')
-    global.client.action(global.configuration.get().twitch.owner, output)
+    global.commons.sendMessage(numRemoved === 0 ? 'Price#' + msg + " wasn't set." : 'Price#' + msg + ' is succesfully unset.')
   })
 }
 
@@ -67,7 +40,7 @@ Price.prototype.listPrices = function (self, user, msg) {
     var ids = []
     docs.forEach(function (e, i, ar) { ids.push(e.command + ':' + e.price) })
     var output = (docs.length === 0 ? 'Price list is empty.' : 'Price list: ' + ids.join(', ') + '.')
-    global.client.action(global.configuration.get().twitch.owner, output)
+    global.commons.sendMessage(output)
   })
 }
 
