@@ -2,6 +2,7 @@
 
 var chalk = require('chalk')
 var constants = require('../constants')
+var _ = require('underscore')
 
 function Keywords () {
   if (global.configuration.get().systems.keywords === true) {
@@ -31,21 +32,9 @@ Keywords.prototype.run = function (id, user, msg) {
     global.updateQueue(id, true) // don't want to parse commands
     return true
   }
-
-  global.botDB.find({type: 'keywords'}, function (err, items) {
+  global.botDB.find({type: 'keywords', $where: function () { return msg.search(new RegExp('(?:^|\\s)(' + this.keyword + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'g')) >= 0 }}, function (err, items) {
     if (err) console.log(err)
-    for (var item in items) {
-      if (items.hasOwnProperty(item)) {
-        var position = msg.toLowerCase().indexOf(items[item].keyword)
-        var kwLength = items[item].keyword.length
-        if (position >= 0) {
-          if ((msg[position - 1] === ' ' || typeof msg[position - 1] === 'undefined') &&
-            (msg[position + kwLength] === ' ' || typeof msg[position + kwLength] === 'undefined')) {
-            global.client.action(global.configuration.get().twitch.owner, items[item].response)
-          }
-        }
-      }
-    }
+    _.each(items, function (item) { global.commons.sendMessage(item.response) })
     global.updateQueue(id, true)
   })
 }
