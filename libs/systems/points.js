@@ -124,7 +124,7 @@ Points.prototype.getPointsFromUser = function (self, sender, text) {
 
   var user = text.trim()
 
-  global.botDB.findOne({type: 'points', username: user}, function (err, item) {
+  global.botDB.findOne({type: 'points', username: user.toLowerCase()}, function (err, item) {
     if (err) console.log(err)
     // TODO - create a function as this is used a lot
     var points = (typeof item !== 'undefined' && item !== null ? item.points : 0)
