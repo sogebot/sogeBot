@@ -2,6 +2,7 @@
 
 var chalk = require('chalk')
 var constants = require('../constants')
+var _ = require('underscore')
 
 function Alias () {
   if (global.configuration.get().systems.keywords === true) {
@@ -42,27 +43,13 @@ Alias.prototype.remove = function (self, sender, text) {
 }
 
 Alias.prototype.parse = function (id, sender, text) {
-  if (!text.startsWith('!')) {
-    global.updateQueue(id, true) // we want to parse _ONLY_ commands
-    return true
-  }
-
-  global.botDB.find({type: 'alias'}, function (err, items) {
+  global.botDB.findOne({type: 'alias', $where: function () { return text.startsWith('!' + this.alias) }}, function (err, item) {
     if (err) console.log(err)
-    var itemFound = false
-    for (var index in items) {
-      if (items.hasOwnProperty(index)) {
-        var item = items[index]
-        if (text.startsWith('!' + item.alias)) { // if alias is found, parse same command and send fail (to not continue parsing)
-          itemFound = true
-          global.updateQueue(id, false)
-          global.parser.parse(sender, text.replace('!' + item.alias, '!' + item.command))
-          global.parser.lineParsed--
-          break
-        }
-      }
+    if (!_.isNull(item)) {
+      global.parser.parse(sender, text.replace('!' + item.alias, '!' + item.command))
+      global.parser.lineParsed--
     }
-    if (!itemFound) global.updateQueue(id, true)
+    global.updateQueue(id, _.isNull(item))
   })
 }
 
