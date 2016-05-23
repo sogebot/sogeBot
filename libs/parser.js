@@ -34,7 +34,7 @@ Parser.prototype.parse = function (user, message) {
 }
 
 Parser.prototype.addToQueue = function (user, message) {
-  var id = crypto.createHash('md5').update(user + message).digest('hex')
+  var id = crypto.createHash('md5').update(Math.random().toString()).digest('hex')
 
   var data = {
     started: 0,
