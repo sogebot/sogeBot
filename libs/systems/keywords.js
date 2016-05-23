@@ -28,11 +28,7 @@ Keywords.prototype.add = function (self, sender, keyword) {
 }
 
 Keywords.prototype.run = function (id, user, msg) {
-  if (msg.startsWith('!')) {
-    global.updateQueue(id, true) // don't want to parse commands
-    return true
-  }
-  global.botDB.find({type: 'keywords', $where: function () { return msg.search(new RegExp('(?:^|\\s)(' + this.keyword + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'g')) >= 0 }}, function (err, items) {
+  global.botDB.find({type: 'keywords', $where: function () { return msg.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + this.keyword + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'g')) >= 0 }}, function (err, items) {
     if (err) console.log(err)
     _.each(items, function (item) { global.commons.sendMessage(item.response) })
     global.updateQueue(id, true)
