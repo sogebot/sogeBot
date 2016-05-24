@@ -1,11 +1,11 @@
 {
-  "name": "sogebot",
+  "name": "SogeBot",
   "version": "1.0.0",
   "description": "",
   "private": true,
-  "main": "sogeBot",
-  "author": "Michal Orlik",
-  "license": "ISC",
+  "main": "SogeBot",
+  "author": "Michal Orlik <sogehige@gmail.com>",
+  "license": "MIT",
   "dependencies": {
     "auto-load": "^2.1.0",
     "chalk": "^1.1.3",
