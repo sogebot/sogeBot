@@ -32,7 +32,7 @@ Minimal CPU usage and small footprint twitch bot based on Node.js intended to be
 
 #### License
 
-See LICENCE file
+See LICENSE file
 
 #### Support [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9ZTX5DS2XB5EN)
 
