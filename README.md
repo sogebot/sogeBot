@@ -34,6 +34,10 @@ Minimal CPU usage and small footprint twitch bot based on Node.js intended to be
 
 See LICENSE file
 
+#### Special thanks
+
+Special thanks goes to team behing tmi.js (you can check it on https://www.tmijs.org/). They did really awesome job.
+
 #### Support [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9ZTX5DS2XB5EN)
 
 If you want to support me, you can click a PayPal link above or you can contribute and we can create something great!
