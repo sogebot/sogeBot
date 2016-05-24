@@ -1,4 +1,7 @@
-# SogeBot [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
+# SogeBot 
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](http://standardjs.com/)
+[![nodejs](https://img.shields.io/badge/node.js-6.2.0-brightgreen.svg?style=flat-square)](https://nodejs.org/en/)
+[![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9ZTX5DS2XB5EN)
 
 Minimal CPU usage and small footprint twitch bot based on Node.js intended to be used on Raspberry PI.
 
@@ -31,6 +34,6 @@ Minimal CPU usage and small footprint twitch bot based on Node.js intended to be
 
 See LICENCE file
 
-#### Support
+#### Support [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9ZTX5DS2XB5EN)
 
-If you want to support me, you can  [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9ZTX5DS2XB5EN) me on PayPal.
+If you want to support me, you can click a PayPal link above or you can contribute and we can create something great!
