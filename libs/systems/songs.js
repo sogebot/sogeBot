@@ -12,6 +12,7 @@ function Songs () {
   if (global.configuration.get().systems.songs === true) {
     this.socketPointer = null
     this.currentSong = {}
+    this.randomIndex = 0
     this.checkIfRandomizeIsSaved()
 
     global.parser.register(this, '!songrequest', this.addSongToQueue, constants.VIEWERS)
@@ -143,12 +144,16 @@ Songs.prototype.sendNextSongID = function (socket) {
 
         var isRandom = item.playlistRandomize
         if (isRandom) {
-          global.botDB.find({type: 'playlist'}).sort().exec(function (err, items) {
+          global.botDB.find({type: 'playlist'}).sort({_id: 1}).exec(function (err, items) {
+            var randomSongIndex = 0
             if (err) console.log(err)
-            var randomSongIndex = Math.floor((Math.random() * items.length))
-            self.currentSong.title = items[randomSongIndex].title
-            self.currentSong.videoID = items[randomSongIndex].videoID
-            socket.emit('videoID', items[randomSongIndex].videoID)
+            while (randomSongIndex === self.randomIndex) {
+              randomSongIndex = Math.floor((Math.random() * items.length))
+            }
+            self.randomIndex = randomSongIndex
+            self.currentSong.title = items[self.randomIndex].title
+            self.currentSong.videoID = items[self.randomIndex].videoID
+            socket.emit('videoID', items[self.randomIndex].videoID)
           })
         } else {
           global.botDB.findOne({type: 'playlist'}).sort({lastPlayedAt: 1}).exec(function (err, item) {
