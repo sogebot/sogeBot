@@ -171,8 +171,7 @@ Songs.prototype.sendNextSongID = function (socket) {
     if (err) console.log(err)
     if (typeof item !== 'undefined' && item !== null) { // song is found
       socket.emit('videoID', item.videoID)
-      self.currentSong.title = item.title
-      self.currentSong.videoID = item.videoID
+      self.currentSong = item
       global.botDB.remove({type: 'songRequests', videoID: item.videoID}, {})
     } else { // run from playlist
       global.botDB.findOne({type: 'settings', playlistRandomize: {$exists: true}}, function (err, item) {
@@ -186,6 +185,7 @@ Songs.prototype.sendNextSongID = function (socket) {
                 self.sendNextSongID(socket) // retry with new seeds
               } else {
                 global.botDB.update({_id: item._id}, {$set: {seed: 1}})
+		self.currentSong = item
                 socket.emit('videoID', item)
               }
             }
@@ -195,6 +195,7 @@ Songs.prototype.sendNextSongID = function (socket) {
             if (err) console.log(err)
             if (typeof item !== 'undefined' && item !== null) { // song is found
               global.botDB.update({type: 'playlist', videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
+	      self.currentSong = item
               socket.emit('videoID', item)
             }
           })
