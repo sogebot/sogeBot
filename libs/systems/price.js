@@ -2,7 +2,7 @@
 
 var chalk = require('chalk')
 var constants = require('../constants')
-var _ = require('underscore')
+var _ = require('lodash')
 
 function Price () {
   if (global.configuration.get().systems.points === true && global.configuration.get().systems.price === true) {

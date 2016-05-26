@@ -2,7 +2,7 @@
 
 var chalk = require('chalk')
 var constants = require('../constants')
-var _ = require('underscore')
+var _ = require('lodash')
 
 function Keywords () {
   if (global.configuration.get().systems.keywords === true) {

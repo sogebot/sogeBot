@@ -5,7 +5,7 @@ var constants = require('../constants')
 var http = require('http')
 var fs = require('fs')
 var auth = require('http-auth')
-var _ = require('underscore')
+var _ = require('lodash')
 var ytdl = require('ytdl-core')
 
 function Songs () {
@@ -73,7 +73,7 @@ Songs.prototype.checkIfRandomizeIsSaved = function () {
     if (err) console.log(err)
     if (typeof item === 'undefined' || item === null) {
       global.botDB.insert({type: 'settings', playlistRandomize: false})
-    } else if (item.playlistRandomize) self.createRandomSeeds()
+    }
   })
 }
 
@@ -267,6 +267,7 @@ Songs.prototype.addSongToPlaylist = function (self, user, text) {
         if (err) console.log(err)
         global.botDB.insert({type: 'playlist', videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime()})
         global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to playlist')
+        self.createRandomSeeds()
       })
     } else {
       global.client.action(global.configuration.get().twitch.owner, 'Song ' + item.title + ' is already in playlist')
