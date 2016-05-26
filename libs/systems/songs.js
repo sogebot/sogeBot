@@ -5,19 +5,21 @@ var constants = require('../constants')
 var http = require('http')
 var fs = require('fs')
 var auth = require('http-auth')
-
-var fetchVideoInfo = require('youtube-info')
+var _ = require('underscore')
+var ytdl = require('ytdl-core')
 
 function Songs () {
   if (global.configuration.get().systems.songs === true) {
     this.socketPointer = null
     this.currentSong = {}
+    this.randomIndex = 0
     this.checkIfRandomizeIsSaved()
 
     global.parser.register(this, '!songrequest', this.addSongToQueue, constants.VIEWERS)
     global.parser.register(this, '!wrongsong', this.removeSongFromQueue, constants.VIEWERS)
     global.parser.register(this, '!currentsong', this.getCurrentSong, constants.VIEWERS)
     global.parser.register(this, '!skipsong', this.skipSong, constants.OWNER_ONLY)
+    global.parser.register(this, '!volume', this.setVolume, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist add', this.addSongToPlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist remove', this.removeSongFromPlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist random', this.randomizePlaylist, constants.OWNER_ONLY)
@@ -104,12 +106,41 @@ Songs.prototype.addSocketListening = function (self, socket) {
   socket.on('getRandomize', function () {
     self.sendRandomizeStatus(socket)
   })
+  socket.on('getMeanLoudness', function () {
+    self.sendMeanLoudness(socket)
+  })
+  socket.on('getVolume', function () {
+    self.sendVolume(socket)
+  })
 }
 
 Songs.prototype.sendRandomizeStatus = function (socket) {
   global.botDB.findOne({playlistRandomize: {$exists: true}}).exec(function (err, item) {
     if (err) console.log(err)
     socket.emit('playlistRandomize', item)
+  })
+}
+
+Songs.prototype.sendVolume = function (socket) {
+  global.botDB.findOne({type: 'settings', volume: {$exists: true}}).exec(function (err, item) {
+    if (err) console.log(err)
+    typeof item !== 'undefined' && item !== null ? socket.emit('volume', item.volume) : socket.emit('volume', 20)
+  })
+}
+
+Songs.prototype.setVolume = function (self, sender, text) {
+  var data = {_type: 'settings', _volume: {$exists: true}, volume: parseInt(text.trim(), 10), success: 'Volume succesfully set to ' + text.trim() + '%'}
+  console.log(Number.isInteger(data.volume))
+  !Number.isInteger(data.volume) ? global.commons.sendMessage('Sorry, ' + sender.username + ', cannot parse volume command, use !volume <integer>') : global.commons.updateOrInsert(data)
+}
+
+Songs.prototype.sendMeanLoudness = function (socket) {
+  var loudness = 0
+  var count = 0
+  global.botDB.find({type: 'playlist'}).exec(function (err, items) {
+    if (err) console.log(err)
+    _.each(items, function (item) { count = count + 1; loudness = loudness + parseFloat(item.loudness) })
+    socket.emit('meanLoudness', loudness / count)
   })
 }
 
@@ -143,21 +174,21 @@ Songs.prototype.sendNextSongID = function (socket) {
 
         var isRandom = item.playlistRandomize
         if (isRandom) {
-          global.botDB.find({type: 'playlist'}).sort().exec(function (err, items) {
+          global.botDB.find({type: 'playlist'}).sort({_id: 1}).exec(function (err, items) {
+            var randomSongIndex = 0
             if (err) console.log(err)
-            var randomSongIndex = Math.floor((Math.random() * items.length))
-            self.currentSong.title = items[randomSongIndex].title
-            self.currentSong.videoID = items[randomSongIndex].videoID
-            socket.emit('videoID', items[randomSongIndex].videoID)
+            while (randomSongIndex === self.randomIndex) {
+              randomSongIndex = Math.floor((Math.random() * items.length))
+            }
+            self.randomIndex = randomSongIndex
+            socket.emit('videoID', items[self.randomIndex])
           })
         } else {
           global.botDB.findOne({type: 'playlist'}).sort({lastPlayedAt: 1}).exec(function (err, item) {
             if (err) console.log(err)
             if (typeof item !== 'undefined' && item !== null) { // song is found
               global.botDB.update({type: 'playlist', videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
-              self.currentSong.title = item.title
-              self.currentSong.videoID = item.videoID
-              socket.emit('videoID', item.videoID)
+              socket.emit('videoID', item)
             }
           })
         }
@@ -197,10 +228,10 @@ Songs.prototype.addSongToQueue = function (self, user, text) {
 
   var videoID = text.trim()
 
-  fetchVideoInfo(videoID, function (err, videoInfo) {
+  ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
     if (err) console.log(err)
     if (typeof videoInfo.title === 'undefined' || videoInfo.title === null) return
-    global.botDB.insert({type: 'songRequests', videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), username: user.username})
+    global.botDB.insert({type: 'songRequests', videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: user.username})
     global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to queue requested by ' + user.username)
   })
 }
@@ -224,9 +255,9 @@ Songs.prototype.addSongToPlaylist = function (self, user, text) {
     if (err) console.log(err)
 
     if (typeof item === 'undefined' || item === null) {
-      fetchVideoInfo(videoID, function (err, videoInfo) {
+      ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
         if (err) console.log(err)
-        global.botDB.insert({type: 'playlist', videoID: videoID, title: videoInfo.title, lastPlayedAt: new Date().getTime()})
+        global.botDB.insert({type: 'playlist', videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime()})
         global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to playlist')
       })
     } else {
@@ -240,7 +271,7 @@ Songs.prototype.removeSongFromPlaylist = function (self, user, text) {
 
   var videoID = text.trim()
 
-  fetchVideoInfo(videoID, function (err, videoInfo) {
+  ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
     if (err) console.log(err)
     global.botDB.remove({type: 'playlist', videoID: videoID}, {}, function (err, numRemoved) {
       if (err) console.log(err)
