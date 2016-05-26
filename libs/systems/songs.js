@@ -12,7 +12,6 @@ function Songs () {
   if (global.configuration.get().systems.songs === true) {
     this.socketPointer = null
     this.currentSong = {}
-    this.randomIndex = 0
     this.checkIfRandomizeIsSaved()
 
     global.parser.register(this, '!songrequest', this.addSongToQueue, constants.VIEWERS)
@@ -69,11 +68,19 @@ Songs.prototype.skipSong = function (self) {
 }
 
 Songs.prototype.checkIfRandomizeIsSaved = function () {
+  var self = this
   global.botDB.findOne({type: 'settings', playlistRandomize: {$exists: true}}, function (err, item) {
     if (err) console.log(err)
     if (typeof item === 'undefined' || item === null) {
       global.botDB.insert({type: 'settings', playlistRandomize: false})
-    }
+    } else if (item.playlistRandomize) self.createRandomSeeds()
+  })
+}
+
+Songs.prototype.createRandomSeeds = function () {
+  global.botDB.find({type: 'playlist'}, function (err, items) {
+    if (err) console.log(err)
+    _.each(items, function (item) { global.botDB.update({_id: item._id}, {$set: {seed: Math.random()}}) })
   })
 }
 
@@ -83,6 +90,7 @@ Songs.prototype.randomizePlaylist = function (self, sender, text) {
   if (text.trim() === 'on') {
     global.botDB.update({type: 'settings', playlistRandomize: {$exists: true}}, {$set: {playlistRandomize: true}}, {}, function (err, numUpdated) {
       if (err) console.log(err)
+      self.createRandomSeeds()
       if (numUpdated) global.client.action(global.configuration.get().twitch.owner, 'Playlist will play randomly now.')
     })
   } else {
@@ -170,17 +178,18 @@ Songs.prototype.sendNextSongID = function (socket) {
     } else { // run from playlist
       global.botDB.findOne({type: 'settings', playlistRandomize: {$exists: true}}, function (err, item) {
         if (err) console.log(err)
-
-        var isRandom = item.playlistRandomize
-        if (isRandom) {
-          global.botDB.find({type: 'playlist'}).sort({_id: 1}).exec(function (err, items) {
-            var randomSongIndex = 0
+        if (item.playlistRandomize) {
+          global.botDB.findOne({type: 'playlist'}).sort({seed: 1}).exec(function (err, item) {
             if (err) console.log(err)
-            while (randomSongIndex === self.randomIndex) {
-              randomSongIndex = Math.floor((Math.random() * items.length))
+            if (typeof item !== 'undefined' && item !== null) { // song is found
+              if (item.seed === 1) {
+                self.createRandomSeeds()
+                self.sendNextSongID(socket) // retry with new seeds
+              } else {
+                global.botDB.update({_id: item._id}, {$set: {seed: 1}})
+                socket.emit('videoID', item)
+              }
             }
-            self.randomIndex = randomSongIndex
-            socket.emit('videoID', items[self.randomIndex])
           })
         } else {
           global.botDB.findOne({type: 'playlist'}).sort({lastPlayedAt: 1}).exec(function (err, item) {
