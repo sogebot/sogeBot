@@ -86,6 +86,7 @@
                     socket.emit('getPlaylist');
                     socket.emit('getRandomize');
                     socket.emit('getMeanLoudness');
+                    socket.emit('getVolume');
                 }, 2000)
 
             }
@@ -104,7 +105,7 @@
             })
 
             socket.on('videoID', function(video) {
-                var correction_constant = volume
+                var correction_constant = 20
                 var vol_percent = (volume/100) * (parseFloat(meanLoudness)/100) * (parseFloat(video.loudness) - parseFloat(meanLoudness) * correction_constant)
                 player.loadVideoById(video.videoID);
                 player.setVolume(Math.round(volume + vol_percent))
@@ -113,6 +114,10 @@
 
             socket.on('meanLoudness', function (loudness) {
               meanLoudness = loudness
+            })
+
+            socket.on('volume', function (vol) {
+              volume = vol
             })
 
             socket.on('songRequestsList', function(list) {

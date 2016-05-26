@@ -19,6 +19,7 @@ function Songs () {
     global.parser.register(this, '!wrongsong', this.removeSongFromQueue, constants.VIEWERS)
     global.parser.register(this, '!currentsong', this.getCurrentSong, constants.VIEWERS)
     global.parser.register(this, '!skipsong', this.skipSong, constants.OWNER_ONLY)
+    global.parser.register(this, '!volume', this.setVolume, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist add', this.addSongToPlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist remove', this.removeSongFromPlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist random', this.randomizePlaylist, constants.OWNER_ONLY)
@@ -108,6 +109,9 @@ Songs.prototype.addSocketListening = function (self, socket) {
   socket.on('getMeanLoudness', function () {
     self.sendMeanLoudness(socket)
   })
+  socket.on('getVolume', function () {
+    self.sendVolume(socket)
+  })
 }
 
 Songs.prototype.sendRandomizeStatus = function (socket) {
@@ -115,6 +119,19 @@ Songs.prototype.sendRandomizeStatus = function (socket) {
     if (err) console.log(err)
     socket.emit('playlistRandomize', item)
   })
+}
+
+Songs.prototype.sendVolume = function (socket) {
+  global.botDB.findOne({type: 'settings', volume: {$exists: true}}).exec(function (err, item) {
+    if (err) console.log(err)
+    typeof item !== 'undefined' && item !== null ? socket.emit('volume', item.volume) : socket.emit('volume', 20)
+  })
+}
+
+Songs.prototype.setVolume = function (self, sender, text) {
+  var data = {_type: 'settings', _volume: {$exists: true}, volume: parseInt(text.trim(), 10), success: 'Volume succesfully set to ' + text.trim() + '%'}
+  console.log(Number.isInteger(data.volume))
+  !Number.isInteger(data.volume) ? global.commons.sendMessage('Sorry, ' + sender.username + ', cannot parse volume command, use !volume <integer>') : global.commons.updateOrInsert(data)
 }
 
 Songs.prototype.sendMeanLoudness = function (socket) {
