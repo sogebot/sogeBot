@@ -134,7 +134,7 @@
             });
 
             socket.on('playlistRandomize', function(item) {
-              try { $("#randomize").text((item.playlistRandomize == "true" ? 'on' : 'off')); } catch (err) {}
+              try { $("#randomize").text((item.playlistRandomize === true ? 'on' : 'off')); } catch (err) {}
             })
 
             socket.on('songPlaylistList', function(list) {
