@@ -15,7 +15,7 @@
     "socket.io": "^1.4.6",
     "tmi.js": "0.0.29",
     "underscore": "^1.8.3",
-    "youtube-info": "^1.1.0"
+    "ytdl-core": "^0.7.15"
   },
   "scripts": {
     "start": "node ./main",
