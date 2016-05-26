@@ -130,7 +130,6 @@ Songs.prototype.sendVolume = function (socket) {
 
 Songs.prototype.setVolume = function (self, sender, text) {
   var data = {_type: 'settings', _volume: {$exists: true}, volume: parseInt(text.trim(), 10), success: 'Volume succesfully set to ' + text.trim() + '%'}
-  console.log(Number.isInteger(data.volume))
   !Number.isInteger(data.volume) ? global.commons.sendMessage('Sorry, ' + sender.username + ', cannot parse volume command, use !volume <integer>') : global.commons.updateOrInsert(data)
 }
 
