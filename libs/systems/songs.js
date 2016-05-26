@@ -68,7 +68,6 @@ Songs.prototype.skipSong = function (self) {
 }
 
 Songs.prototype.checkIfRandomizeIsSaved = function () {
-  var self = this
   global.botDB.findOne({type: 'settings', playlistRandomize: {$exists: true}}, function (err, item) {
     if (err) console.log(err)
     if (typeof item === 'undefined' || item === null) {
