@@ -31,6 +31,7 @@
                     <th>ID</th>
                     <th>Title</th>
                     <th>Requested By</th>
+                    <th>Length</th>
                     </tr>
                 </thead>
                 <tbody id="songRequests"></tbody>
@@ -42,6 +43,7 @@
                     <tr>
                     <th>ID</th>
                     <th>Title</th>
+                    <th>Length</th>
                     </tr>
                 </thead>
                 <tbody id="Playlist"></tbody>
@@ -109,8 +111,9 @@
                     if (list.hasOwnProperty(index)) {
                         var title = list[index].title,
                             requestedBy = list[index].username,
+                            length_seconds = list[index].length_seconds,
                             videoID = list[index].videoID;
-                        $("#songRequests").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+requestedBy+'</td></tr>');
+                        $("#songRequests").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+requestedBy+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td></tr>');
                     }
                 }
             });
@@ -124,8 +127,9 @@
                 for (var index in list) {
                     if (list.hasOwnProperty(index)) {
                         var title = list[index].title,
+                            length_seconds = list[index].length_seconds,
                             videoID = list[index].videoID;
-                        $("#Playlist").append('<tr><td>'+videoID+'</td><td>'+title+'</td></tr>');
+                        $("#Playlist").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td></tr>');
                     }
                 }
             });
