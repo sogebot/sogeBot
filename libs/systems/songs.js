@@ -180,6 +180,7 @@ Songs.prototype.sendNextSongID = function (socket) {
         if (err) console.log(err)
         if (item.playlistRandomize) {
           global.botDB.findOne({type: 'playlist'}).sort({seed: 1}).exec(function (err, item) {
+            if (err) console.log(err)
             if (typeof item !== 'undefined' && item !== null) { // song is found
               if (item.seed === 1) {
                 self.createRandomSeeds()
