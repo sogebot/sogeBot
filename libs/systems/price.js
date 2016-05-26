@@ -49,6 +49,7 @@ Price.prototype.checkPrice = function (id, user, msg) {
     if (err) console.log(err)
     var price = !_.isUndefined(items[0]) && items[0].type === 'price' ? parseInt(items[0].price, 10) : 0
     var points = !_.isUndefined(items[1]) && items[1].type === 'points' ? parseInt(items[1].points, 10) : 0
+    points = !_.isUndefined(items[0]) && items[0].type === 'points' ? parseInt(items[0].points, 10) : points
     global.updateQueue(id, price === 0 || points >= price)
     price === 0 || points >= price ? global.botDB.update({type: 'points', username: user.username}, {$set: {points: points - price}}, {}) : global.commons.sendMessage('Sorry, ' + user.username + ', you need ' + price + ' Points for !' + items[0].command)
   })
