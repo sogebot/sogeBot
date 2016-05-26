@@ -17,6 +17,7 @@ Minimal CPU usage and small footprint twitch bot based on Node.js intended to be
 * notice system
 * price and points system
 * songs system - **songrequest** and **playlist** support for YouTube
+* **auto volume normalization** of videos played through songs system
 * _more to come_
 
 #### Prerequisites
