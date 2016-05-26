@@ -5,6 +5,7 @@ var constants = require('../constants')
 var http = require('http')
 var fs = require('fs')
 var auth = require('http-auth')
+var _ = require('underscore')
 
 var fetchVideoInfo = require('youtube-info')
 
@@ -105,12 +106,25 @@ Songs.prototype.addSocketListening = function (self, socket) {
   socket.on('getRandomize', function () {
     self.sendRandomizeStatus(socket)
   })
+  socket.on('getMeanLoudness', function () {
+    self.sendMeanLoudness(socket)
+  })
 }
 
 Songs.prototype.sendRandomizeStatus = function (socket) {
   global.botDB.findOne({playlistRandomize: {$exists: true}}).exec(function (err, item) {
     if (err) console.log(err)
     socket.emit('playlistRandomize', item)
+  })
+}
+
+Songs.prototype.sendMeanLoudness = function (socket) {
+  var loudness = 0
+  var count = 0
+  global.botDB.find({type: 'playlist'}).exec(function (err, items) {
+    if (err) console.log(err)
+    _.each(items, function (item) { count = count + 1; loudness = loudness + parseFloat(item.loudness) })
+    socket.emit('meanLoudness', loudness / count)
   })
 }
 
@@ -153,7 +167,7 @@ Songs.prototype.sendNextSongID = function (socket) {
             self.randomIndex = randomSongIndex
             self.currentSong.title = items[self.randomIndex].title
             self.currentSong.videoID = items[self.randomIndex].videoID
-            socket.emit('videoID', items[self.randomIndex].videoID)
+            socket.emit('videoID', items[self.randomIndex])
           })
         } else {
           global.botDB.findOne({type: 'playlist'}).sort({lastPlayedAt: 1}).exec(function (err, item) {
@@ -162,7 +176,7 @@ Songs.prototype.sendNextSongID = function (socket) {
               global.botDB.update({type: 'playlist', videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
               self.currentSong.title = item.title
               self.currentSong.videoID = item.videoID
-              socket.emit('videoID', item.videoID)
+              socket.emit('videoID', item)
             }
           })
         }

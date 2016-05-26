@@ -55,6 +55,8 @@
             var player, time_update_interval;
             var socket = io();
             var skipSong = false;
+            var meanLoudness = -16 // default value
+            var volume = 20
 
             function onYouTubeIframeAPIReady() {
                 player = new YT.Player('YTPlayer', {
@@ -83,6 +85,7 @@
                     socket.emit('getSongRequests');
                     socket.emit('getPlaylist');
                     socket.emit('getRandomize');
+                    socket.emit('getMeanLoudness');
                 }, 2000)
 
             }
@@ -100,10 +103,19 @@
               skipSong = true;
             })
 
-            socket.on('videoID', function(id) {
-                player.loadVideoById(id);
+            socket.on('videoID', function(video) {
+                var loudness = video.loudness;
+                var vol_percent = (volume/100) * (meanLoudness/100*loudness)
+                console.log(vol_percent)
+
+                player.loadVideoById(video.videoID);
                 player.playVideo();
             });
+
+            socket.on('meanLoudness', function (loudness) {
+              meanLoudness = loudness
+              console.log(loudness)
+            })
 
             socket.on('songRequestsList', function(list) {
                 $("#songRequests").empty();
@@ -129,6 +141,8 @@
                         var title = list[index].title,
                             length_seconds = list[index].length_seconds,
                             videoID = list[index].videoID;
+                            console.log(length_seconds)
+                            console.log(title)
                         $("#Playlist").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td></tr>');
                     }
                 }
