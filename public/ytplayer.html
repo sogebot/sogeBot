@@ -104,17 +104,15 @@
             })
 
             socket.on('videoID', function(video) {
-                var loudness = video.loudness;
-                var vol_percent = (volume/100) * (meanLoudness/100*loudness)
-                console.log(vol_percent)
-
+                var correction_constant = volume
+                var vol_percent = (volume/100) * (parseFloat(meanLoudness)/100) * (parseFloat(video.loudness) - parseFloat(meanLoudness) * correction_constant)
                 player.loadVideoById(video.videoID);
+                player.setVolume(Math.round(volume + vol_percent))
                 player.playVideo();
             });
 
             socket.on('meanLoudness', function (loudness) {
               meanLoudness = loudness
-              console.log(loudness)
             })
 
             socket.on('songRequestsList', function(list) {
@@ -141,8 +139,6 @@
                         var title = list[index].title,
                             length_seconds = list[index].length_seconds,
                             videoID = list[index].videoID;
-                            console.log(length_seconds)
-                            console.log(title)
                         $("#Playlist").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td></tr>');
                     }
                 }
