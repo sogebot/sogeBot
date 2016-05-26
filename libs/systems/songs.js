@@ -155,7 +155,7 @@ Songs.prototype.sendNextSongID = function (socket) {
       global.botDB.findOne({type: 'settings', playlistRandomize: {$exists: true}}, function (err, item) {
         if (err) console.log(err)
 
-        var isRandom = item.playlistfetchVideoInfoRandomize
+        var isRandom = item.playlistRandomize
         if (isRandom) {
           global.botDB.find({type: 'playlist'}).sort({_id: 1}).exec(function (err, items) {
             var randomSongIndex = 0
