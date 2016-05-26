@@ -6,8 +6,7 @@ var http = require('http')
 var fs = require('fs')
 var auth = require('http-auth')
 var _ = require('underscore')
-
-var fetchVideoInfo = require('youtube-info')
+var ytdl = require('ytdl-core')
 
 function Songs () {
   if (global.configuration.get().systems.songs === true) {
@@ -156,7 +155,7 @@ Songs.prototype.sendNextSongID = function (socket) {
       global.botDB.findOne({type: 'settings', playlistRandomize: {$exists: true}}, function (err, item) {
         if (err) console.log(err)
 
-        var isRandom = item.playlistRandomize
+        var isRandom = item.playlistfetchVideoInfoRandomize
         if (isRandom) {
           global.botDB.find({type: 'playlist'}).sort({_id: 1}).exec(function (err, items) {
             var randomSongIndex = 0
@@ -165,8 +164,6 @@ Songs.prototype.sendNextSongID = function (socket) {
               randomSongIndex = Math.floor((Math.random() * items.length))
             }
             self.randomIndex = randomSongIndex
-            self.currentSong.title = items[self.randomIndex].title
-            self.currentSong.videoID = items[self.randomIndex].videoID
             socket.emit('videoID', items[self.randomIndex])
           })
         } else {
@@ -174,8 +171,6 @@ Songs.prototype.sendNextSongID = function (socket) {
             if (err) console.log(err)
             if (typeof item !== 'undefined' && item !== null) { // song is found
               global.botDB.update({type: 'playlist', videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
-              self.currentSong.title = item.title
-              self.currentSong.videoID = item.videoID
               socket.emit('videoID', item)
             }
           })
@@ -216,10 +211,10 @@ Songs.prototype.addSongToQueue = function (self, user, text) {
 
   var videoID = text.trim()
 
-  fetchVideoInfo(videoID, function (err, videoInfo) {
+  ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
     if (err) console.log(err)
     if (typeof videoInfo.title === 'undefined' || videoInfo.title === null) return
-    global.botDB.insert({type: 'songRequests', videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), username: user.username})
+    global.botDB.insert({type: 'songRequests', videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: user.username})
     global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to queue requested by ' + user.username)
   })
 }
@@ -243,9 +238,9 @@ Songs.prototype.addSongToPlaylist = function (self, user, text) {
     if (err) console.log(err)
 
     if (typeof item === 'undefined' || item === null) {
-      fetchVideoInfo(videoID, function (err, videoInfo) {
+      ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
         if (err) console.log(err)
-        global.botDB.insert({type: 'playlist', videoID: videoID, title: videoInfo.title, lastPlayedAt: new Date().getTime()})
+        global.botDB.insert({type: 'playlist', videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime()})
         global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to playlist')
       })
     } else {
@@ -259,7 +254,7 @@ Songs.prototype.removeSongFromPlaylist = function (self, user, text) {
 
   var videoID = text.trim()
 
-  fetchVideoInfo(videoID, function (err, videoInfo) {
+  ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
     if (err) console.log(err)
     global.botDB.remove({type: 'playlist', videoID: videoID}, {}, function (err, numRemoved) {
       if (err) console.log(err)
