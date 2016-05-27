@@ -105,6 +105,7 @@
             })
 
             socket.on('videoID', function(video) {
+                video.loudness = typeof video.loudness !== 'undefined' ? video.loudness : -15
                 var correction = Math.ceil((volume/100) * 4)
                 var loudnessDiff = parseFloat(parseFloat(meanLoudness) - video.loudness)
                 var newVol = Math.round(volume + correction * loudnessDiff)
