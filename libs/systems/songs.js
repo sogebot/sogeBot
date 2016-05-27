@@ -18,6 +18,8 @@ function Songs () {
     global.parser.register(this, '!wrongsong', this.removeSongFromQueue, constants.VIEWERS)
     global.parser.register(this, '!currentsong', this.getCurrentSong, constants.VIEWERS)
     global.parser.register(this, '!skipsong', this.skipSong, constants.OWNER_ONLY)
+    global.parser.register(this, '!bansong', this.banSong, constants.OWNER_ONLY)
+    global.parser.register(this, '!unbansong', this.unbanSong, constants.OWNER_ONLY)
     global.parser.register(this, '!volume', this.setVolume, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist add', this.addSongToPlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist remove', this.removeSongFromPlaylist, constants.OWNER_ONLY)
@@ -45,6 +47,41 @@ function Songs () {
   }
 
   console.log('Songs system loaded and ' + (global.configuration.get().systems.songs === true ? chalk.green('enabled') : chalk.red('disabled')))
+}
+
+Songs.prototype.banSong = function (self, sender, text) {
+  text.trim().length === 0 ? self.banCurrentSong(self, sender) : self.banSongById(self, sender, text.trim())
+}
+
+Songs.prototype.banCurrentSong = function (self, sender) {
+  global.botDB.update({type: 'banned-song', _id: self.currentSong.videoID}, {$set: {_id: self.currentSong.videoID, title: self.currentSong.title}}, {upsert: true}, function (err, numAffected) {
+    if (err) console.log(err)
+    if (numAffected > 0) {
+      global.commons.sendMessage('Song ' + self.currentSong.title + ' was banned and will never play again!')
+      global.commons.remove({_type: 'playlist', _videoID: self.currentSong.videoID})
+      global.commons.remove({_type: 'songrequest', _videoID: self.currentSong.videoID})
+      self.socketPointer.emit('skipSong')
+    }
+  })
+}
+
+Songs.prototype.banSongById = function (self, sender, text) {
+  ytdl.getInfo('https://www.youtube.com/watch?v=' + text, function (err, videoInfo) {
+    if (err) console.log(err)
+    if (typeof videoInfo.title === 'undefined' || videoInfo.title === null) return
+    global.botDB.update({type: 'banned-song', _id: text}, {$set: {_id: text, title: videoInfo.title}}, {upsert: true}, function (err, numAffected) {
+      if (err) console.log(err)
+      if (numAffected > 0) global.commons.sendMessage('Song ' + videoInfo.title + ' was banned and will never play again!')
+      global.commons.remove({_type: 'playlist', _videoID: text.trim()})
+      global.commons.remove({_type: 'songrequest', _videoID: text.trim()})
+      self.socketPointer.emit('skipSong')
+    })
+  })
+}
+
+Songs.prototype.unbanSong = function (self, sender, text) {
+  var data = {_type: 'banned-song', __id: text.trim(), success: 'Song was succesfully unbanned.', error: 'This song was not banned.'}
+  if (data.__id.length > 1) global.commons.remove(data)
 }
 
 Songs.prototype.getCurrentSong = function (self) {
@@ -145,7 +182,7 @@ Songs.prototype.sendMeanLoudness = function (socket) {
   var count = 0
   global.botDB.find({type: 'playlist'}).exec(function (err, items) {
     if (err) console.log(err)
-    _.each(items, function (item) { (typeof item.loudness == 'undefined') ? loudness = loudness + -15 : loudness = loudness + parseFloat(item.loudness); count = count + 1; })
+    _.each(items, function (item) { (typeof item.loudness === 'undefined') ? loudness = loudness + -15 : loudness = loudness + parseFloat(item.loudness); count = count + 1 })
     socket.emit('meanLoudness', loudness / count)
   })
 }
@@ -185,7 +222,7 @@ Songs.prototype.sendNextSongID = function (socket) {
                 self.sendNextSongID(socket) // retry with new seeds
               } else {
                 global.botDB.update({_id: item._id}, {$set: {seed: 1}})
-		self.currentSong = item
+                self.currentSong = item
                 socket.emit('videoID', item)
               }
             }
@@ -195,7 +232,7 @@ Songs.prototype.sendNextSongID = function (socket) {
             if (err) console.log(err)
             if (typeof item !== 'undefined' && item !== null) { // song is found
               global.botDB.update({type: 'playlist', videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
-	      self.currentSong = item
+              self.currentSong = item
               socket.emit('videoID', item)
             }
           })
@@ -231,16 +268,23 @@ Songs.prototype.help = function () {
     '!playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal')
 }
 
-Songs.prototype.addSongToQueue = function (self, user, text) {
+Songs.prototype.addSongToQueue = function (self, sender, text) {
   if (text.length < 1) return
 
   var videoID = text.trim()
 
-  ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
+  global.botDB.findOne({type: 'song-banned', _id: videoID}, function (err, item) {
     if (err) console.log(err)
-    if (typeof videoInfo.title === 'undefined' || videoInfo.title === null) return
-    global.botDB.insert({type: 'songRequests', videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: user.username})
-    global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to queue requested by ' + user.username)
+    if (_.isNull(item) || _.isUndefined(item)) {
+      global.commons.sendMessage('Sorry, ' + sender.username + ', your requested song is banned.')
+    } else {
+      ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
+        if (err) console.log(err)
+        if (typeof videoInfo.title === 'undefined' || videoInfo.title === null) return
+        global.botDB.insert({type: 'songRequests', videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: sender.username})
+        global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to queue requested by ' + sender.username)
+      })
+    }
   })
 }
 
@@ -255,22 +299,29 @@ Songs.prototype.removeSongFromQueue = function (self, user, text) {
   })
 }
 
-Songs.prototype.addSongToPlaylist = function (self, user, text) {
+Songs.prototype.addSongToPlaylist = function (self, sender, text) {
   if (text.length < 1) return
 
   var videoID = text.trim()
-  global.botDB.findOne({type: 'playlist', videoID: videoID}, function (err, item) {
+  global.botDB.findOne({type: 'song-banned', _id: videoID}, function (err, item) {
     if (err) console.log(err)
-
-    if (typeof item === 'undefined' || item === null) {
-      ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
-        if (err) console.log(err)
-        global.botDB.insert({type: 'playlist', videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime()})
-        global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to playlist')
-        self.createRandomSeeds()
-      })
+    if (_.isNull(item) || _.isUndefined(item)) {
+      global.commons.sendMessage('Sorry, ' + sender.username + ', but this song is banned.')
     } else {
-      global.client.action(global.configuration.get().twitch.owner, 'Song ' + item.title + ' is already in playlist')
+      global.botDB.findOne({type: 'playlist', videoID: videoID}, function (err, item) {
+        if (err) console.log(err)
+
+        if (typeof item === 'undefined' || item === null) {
+          ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
+            if (err) console.log(err)
+            global.botDB.insert({type: 'playlist', videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime()})
+            global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to playlist')
+            self.createRandomSeeds()
+          })
+        } else {
+          global.client.action(global.configuration.get().twitch.owner, 'Song ' + item.title + ' is already in playlist')
+        }
+      })
     }
   })
 }
