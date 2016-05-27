@@ -275,9 +275,8 @@ Songs.prototype.addSongToQueue = function (self, sender, text) {
 
   global.botDB.findOne({type: 'song-banned', _id: videoID}, function (err, item) {
     if (err) console.log(err)
-    if (!_.isNull(item) || !_.isUndefined(item)) {
-      global.commons.sendMessage('Sorry, ' + sender.username + ', your requested song is banned.')
-    } else {
+    if (!_.isNull(item)) global.commons.sendMessage('Sorry, ' + sender.username + ', but this song is banned.')
+    else {
       ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
         if (err) console.log(err)
         if (typeof videoInfo.title === 'undefined' || videoInfo.title === null) return
@@ -305,9 +304,8 @@ Songs.prototype.addSongToPlaylist = function (self, sender, text) {
   var videoID = text.trim()
   global.botDB.findOne({type: 'song-banned', _id: videoID}, function (err, item) {
     if (err) console.log(err)
-    if (!_.isNull(item) || !_.isUndefined(item)) {
-      global.commons.sendMessage('Sorry, ' + sender.username + ', but this song is banned.')
-    } else {
+    if (!_.isNull(item)) global.commons.sendMessage('Sorry, ' + sender.username + ', but this song is banned.')
+    else {
       global.botDB.findOne({type: 'playlist', videoID: videoID}, function (err, item) {
         if (err) console.log(err)
 
