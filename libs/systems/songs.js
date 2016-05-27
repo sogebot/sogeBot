@@ -10,6 +10,7 @@ var ytdl = require('ytdl-core')
 
 function Songs () {
   if (global.configuration.get().systems.songs === true) {
+    this.maxDuration = 10
     this.socketPointer = null
     this.currentSong = {}
     this.checkIfRandomizeIsSaved()
@@ -21,6 +22,7 @@ function Songs () {
     global.parser.register(this, '!bansong', this.banSong, constants.OWNER_ONLY)
     global.parser.register(this, '!unbansong', this.unbanSong, constants.OWNER_ONLY)
     global.parser.register(this, '!volume', this.setVolume, constants.OWNER_ONLY)
+    global.parser.register(this, '!duration', this.setDuration, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist add', this.addSongToPlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist remove', this.removeSongFromPlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist random', this.randomizePlaylist, constants.OWNER_ONLY)
@@ -44,9 +46,25 @@ function Songs () {
       self.socketPointer = socket
       self.addSocketListening(self, socket)
     })
+
+    this.loadDuration(this)
   }
 
   console.log('Songs system loaded and ' + (global.configuration.get().systems.songs === true ? chalk.green('enabled') : chalk.red('disabled')))
+}
+
+Songs.prototype.loadDuration = function (self) {
+  global.botDB.findOne({type: 'settings', duration: {$exists: true}}, function (err, item) {
+    if (err) console.log(err)
+    if (!_.isNull(item)) {
+      self.maxDuration = item.duration
+    }
+  })
+}
+
+Songs.prototype.setDuration = function (self, sender, text) {
+  var data = {_type: 'settings', _duration: {$exists: true}, duration: parseInt(text.trim(), 10), success: 'Maximum song length set to ' + text.trim() + ' minutes.'}
+  !Number.isInteger(data.duration) ? global.commons.sendMessage('Sorry, ' + sender.username + ', cannot parse set command, use !set list for more info') : global.commons.updateOrInsert(data)
 }
 
 Songs.prototype.banSong = function (self, sender, text) {
@@ -280,8 +298,11 @@ Songs.prototype.addSongToQueue = function (self, sender, text) {
       ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
         if (err) console.log(err)
         if (typeof videoInfo.title === 'undefined' || videoInfo.title === null) return
-        global.botDB.insert({type: 'songRequests', videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: sender.username})
-        global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to queue requested by ' + sender.username)
+        else if (videoInfo.length_seconds / 60 > self.maxDuration) global.commons.sendMessage('Sorry, ' + sender.username + ', but this song is too long.')
+        else {
+          global.botDB.insert({type: 'songRequests', videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: sender.username})
+          global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to queue requested by ' + sender.username)
+        }
       })
     }
   })
