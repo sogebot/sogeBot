@@ -225,7 +225,7 @@ Songs.prototype.sendNextSongID = function (socket) {
   global.botDB.findOne({type: 'songRequests'}).sort({addedAt: 1}).exec(function (err, item) {
     if (err) console.log(err)
     if (typeof item !== 'undefined' && item !== null) { // song is found
-      socket.emit('videoID', item.videoID)
+      socket.emit('videoID', item)
       self.currentSong = item
       global.botDB.remove({type: 'songRequests', videoID: item.videoID}, {})
     } else { // run from playlist
