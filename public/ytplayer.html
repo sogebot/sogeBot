@@ -135,8 +135,8 @@
                 }
             });
 
-            socket.on('playlistRandomize', function(item) {
-              try { $("#randomize").text((item.playlistRandomize === true ? 'on' : 'off')); } catch (err) {}
+            socket.on('shuffle', function(isEnabled) {
+              try { $("#randomize").text((isEnabled ? 'on' : 'off')); } catch (err) {}
             })
 
             socket.on('songPlaylistList', function(list) {
