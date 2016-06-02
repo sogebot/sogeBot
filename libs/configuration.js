@@ -45,11 +45,15 @@ Configuration.prototype.setValue = function (self, sender, text) {
   if (filter === 'number' && Number.isInteger(parseInt(value.trim(), 10))) {
     data[cmd] = parseInt(value.trim(), 10)
     global.commons.updateOrInsert(data)
-    self.cfgL.value = data[cmd]
+    self.cfgL[cmd].value = data[cmd]
   } else if (filter === 'bool' && (value === 'true' || value === 'false')) {
     data[cmd] = (value.toLowerCase() === 'true')
     global.commons.updateOrInsert(data)
-    self.cfgL.value = data[cmd]
+    self.cfgL[cmd].value = data[cmd]
+  } else if (filter === 'string' && value.trim().length > 0) {
+    data[cmd] = value.trim()
+    global.commons.updateOrInsert(data)
+    self.cfgL[cmd].value = data[cmd]
   } else global.commons.sendMessage('Sorry, ' + sender.username + ', cannot parse !set command.')
 }
 
