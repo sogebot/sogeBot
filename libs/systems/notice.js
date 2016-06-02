@@ -14,6 +14,9 @@ function Notice () {
     global.parser.register(this, '!notice remove', this.remove, constants.OWNER_ONLY)
     global.parser.register(this, '!notice', this.help, constants.OWNER_ONLY)
 
+    global.configuration.register('noticeInterval', 'Notice minimal interval succesfully set to (value) minutes', 'number', 10)
+    global.configuration.register('noticeMsgReq', 'Notice minimal required message chat count set to (value).', 'number', 10)
+
     // start interval for posting notices
     var self = this
     setInterval(function () {
@@ -25,8 +28,8 @@ function Notice () {
 }
 
 Notice.prototype.send = function () {
-  var timeIntervalInMs = global.configuration.get().systems.noticeTimeInterval * 60 * 1000
-  var noticeMinChatMsg = global.configuration.get().systems.noticeMinChatMsg
+  var timeIntervalInMs = global.configuration.getValue('noticeInterval') * 60 * 1000
+  var noticeMinChatMsg = global.configuration.getValue('noticeMsgReq')
   var now = new Date().getTime()
 
   if (now - this.lastNoticeSent >= timeIntervalInMs && global.parser.linesParsed - this.msgCountSent >= noticeMinChatMsg) {

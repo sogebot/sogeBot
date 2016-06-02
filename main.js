@@ -9,7 +9,10 @@ var Parser = require('./libs/parser')
 var Twitch = require('./libs/twitch')
 var Commons = require('./libs/commons')
 
+global.parser = new Parser()
 global.configuration = new Configuration()
+global.twitch = new Twitch()
+global.commons = new Commons()
 
 var options = {
   options: {
@@ -27,10 +30,6 @@ var options = {
 }
 
 global.client = new irc.client(options)
-
-global.parser = new Parser()
-global.twitch = new Twitch()
-global.commons = new Commons()
 
 // bot systems
 global.systems = require('auto-load')('./libs/systems/')

@@ -10,10 +10,8 @@ var ytdl = require('ytdl-core')
 
 function Songs () {
   if (global.configuration.get().systems.songs === true) {
-    this.maxDuration = 10
     this.socketPointer = null
     this.currentSong = {}
-    this.checkIfRandomizeIsSaved()
 
     global.parser.register(this, '!songrequest', this.addSongToQueue, constants.VIEWERS)
     global.parser.register(this, '!wrongsong', this.removeSongFromQueue, constants.VIEWERS)
@@ -21,13 +19,14 @@ function Songs () {
     global.parser.register(this, '!skipsong', this.skipSong, constants.OWNER_ONLY)
     global.parser.register(this, '!bansong', this.banSong, constants.OWNER_ONLY)
     global.parser.register(this, '!unbansong', this.unbanSong, constants.OWNER_ONLY)
-    global.parser.register(this, '!volume', this.setVolume, constants.OWNER_ONLY)
-    global.parser.register(this, '!duration', this.setDuration, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist add', this.addSongToPlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist remove', this.removeSongFromPlaylist, constants.OWNER_ONLY)
-    global.parser.register(this, '!playlist random', this.randomizePlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist steal', this.stealSongToPlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist', this.help, constants.OWNER_ONLY)
+
+    global.configuration.register('volume', 'Volume succesfully set to (value)%', 'number', 25)
+    global.configuration.register('duration', 'Maximum song length set to (value) minutes.', 'number', 10)
+    global.configuration.register('shuffle', 'Playlist shuffle has been enabled', 'bool', false)
 
     var basic = auth.basic({
       realm: 'YTPlayer'
@@ -46,25 +45,9 @@ function Songs () {
       self.socketPointer = socket
       self.addSocketListening(self, socket)
     })
-
-    this.loadDuration(this)
   }
 
   console.log('Songs system loaded and ' + (global.configuration.get().systems.songs === true ? chalk.green('enabled') : chalk.red('disabled')))
-}
-
-Songs.prototype.loadDuration = function (self) {
-  global.botDB.findOne({type: 'settings', duration: {$exists: true}}, function (err, item) {
-    if (err) console.log(err)
-    if (!_.isNull(item)) {
-      self.maxDuration = item.duration
-    }
-  })
-}
-
-Songs.prototype.setDuration = function (self, sender, text) {
-  var data = {_type: 'settings', _duration: {$exists: true}, duration: parseInt(text.trim(), 10), success: 'Maximum song length set to ' + text.trim() + ' minutes.'}
-  !Number.isInteger(data.duration) ? global.commons.sendMessage('Sorry, ' + sender.username + ', cannot parse set command, use !set list for more info') : global.commons.updateOrInsert(data)
 }
 
 Songs.prototype.banSong = function (self, sender, text) {
@@ -122,37 +105,11 @@ Songs.prototype.skipSong = function (self) {
   self.socketPointer.emit('skipSong')
 }
 
-Songs.prototype.checkIfRandomizeIsSaved = function () {
-  global.botDB.findOne({type: 'settings', playlistRandomize: {$exists: true}}, function (err, item) {
-    if (err) console.log(err)
-    if (typeof item === 'undefined' || item === null) {
-      global.botDB.insert({type: 'settings', playlistRandomize: false})
-    }
-  })
-}
-
 Songs.prototype.createRandomSeeds = function () {
   global.botDB.find({type: 'playlist'}, function (err, items) {
     if (err) console.log(err)
     _.each(items, function (item) { global.botDB.update({_id: item._id}, {$set: {seed: Math.random()}}) })
   })
-}
-
-Songs.prototype.randomizePlaylist = function (self, sender, text) {
-  if (text.length < 1) return
-
-  if (text.trim() === 'on') {
-    global.botDB.update({type: 'settings', playlistRandomize: {$exists: true}}, {$set: {playlistRandomize: true}}, {}, function (err, numUpdated) {
-      if (err) console.log(err)
-      self.createRandomSeeds()
-      if (numUpdated) global.client.action(global.configuration.get().twitch.owner, 'Playlist will play randomly now.')
-    })
-  } else {
-    global.botDB.update({type: 'settings', playlistRandomize: {$exists: true}}, {$set: {playlistRandomize: false}}, {}, function (err, numUpdated) {
-      if (err) console.log(err)
-      if (numUpdated) global.client.action(global.configuration.get().twitch.owner, "Playlist won't play randomly now.")
-    })
-  }
 }
 
 Songs.prototype.addSocketListening = function (self, socket) {
@@ -166,33 +123,14 @@ Songs.prototype.addSocketListening = function (self, socket) {
     self.sendPlaylistList(socket)
   })
   socket.on('getRandomize', function () {
-    self.sendRandomizeStatus(socket)
+    socket.emit('shuffle', global.configuration.getValue('shuffle'))
   })
   socket.on('getMeanLoudness', function () {
     self.sendMeanLoudness(socket)
   })
   socket.on('getVolume', function () {
-    self.sendVolume(socket)
+    socket.emit('volume', global.configuration.getValue('volume'))
   })
-}
-
-Songs.prototype.sendRandomizeStatus = function (socket) {
-  global.botDB.findOne({playlistRandomize: {$exists: true}}).exec(function (err, item) {
-    if (err) console.log(err)
-    socket.emit('playlistRandomize', item)
-  })
-}
-
-Songs.prototype.sendVolume = function (socket) {
-  global.botDB.findOne({type: 'settings', volume: {$exists: true}}).exec(function (err, item) {
-    if (err) console.log(err)
-    typeof item !== 'undefined' && item !== null ? socket.emit('volume', item.volume) : socket.emit('volume', 20)
-  })
-}
-
-Songs.prototype.setVolume = function (self, sender, text) {
-  var data = {_type: 'settings', _volume: {$exists: true}, volume: parseInt(text.trim(), 10), success: 'Volume succesfully set to ' + text.trim() + '%'}
-  !Number.isInteger(data.volume) ? global.commons.sendMessage('Sorry, ' + sender.username + ', cannot parse volume command, use !volume <integer>') : global.commons.updateOrInsert(data)
 }
 
 Songs.prototype.sendMeanLoudness = function (socket) {
@@ -229,33 +167,30 @@ Songs.prototype.sendNextSongID = function (socket) {
       self.currentSong = item
       global.botDB.remove({type: 'songRequests', videoID: item.videoID}, {})
     } else { // run from playlist
-      global.botDB.findOne({type: 'settings', playlistRandomize: {$exists: true}}, function (err, item) {
-        if (err) console.log(err)
-        if (item.playlistRandomize) {
-          global.botDB.findOne({type: 'playlist'}).sort({seed: 1}).exec(function (err, item) {
-            if (err) console.log(err)
-            if (typeof item !== 'undefined' && item !== null) { // song is found
-              if (item.seed === 1) {
-                self.createRandomSeeds()
-                self.sendNextSongID(socket) // retry with new seeds
-              } else {
-                global.botDB.update({_id: item._id}, {$set: {seed: 1}})
-                self.currentSong = item
-                socket.emit('videoID', item)
-              }
-            }
-          })
-        } else {
-          global.botDB.findOne({type: 'playlist'}).sort({lastPlayedAt: 1}).exec(function (err, item) {
-            if (err) console.log(err)
-            if (typeof item !== 'undefined' && item !== null) { // song is found
-              global.botDB.update({type: 'playlist', videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
+      if (global.configuration.getValue('shuffle')) {
+        global.botDB.findOne({type: 'playlist'}).sort({seed: 1}).exec(function (err, item) {
+          if (err) console.log(err)
+          if (typeof item !== 'undefined' && item !== null) { // song is found
+            if (item.seed === 1) {
+              self.createRandomSeeds()
+              self.sendNextSongID(socket) // retry with new seeds
+            } else {
+              global.botDB.update({_id: item._id}, {$set: {seed: 1}})
               self.currentSong = item
               socket.emit('videoID', item)
             }
-          })
-        }
-      })
+          }
+        })
+      } else {
+        global.botDB.findOne({type: 'playlist'}).sort({lastPlayedAt: 1}).exec(function (err, item) {
+          if (err) console.log(err)
+          if (typeof item !== 'undefined' && item !== null) { // song is found
+            global.botDB.update({type: 'playlist', videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
+            self.currentSong = item
+            socket.emit('videoID', item)
+          }
+        })
+      }
     }
   })
 }
@@ -298,7 +233,7 @@ Songs.prototype.addSongToQueue = function (self, sender, text) {
       ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
         if (err) console.log(err)
         if (typeof videoInfo.title === 'undefined' || videoInfo.title === null) return
-        else if (videoInfo.length_seconds / 60 > self.maxDuration) global.commons.sendMessage('Sorry, ' + sender.username + ', but this song is too long.')
+        else if (videoInfo.length_seconds / 60 > global.configuration.getValue('duration')) global.commons.sendMessage('Sorry, ' + sender.username + ', but this song is too long.')
         else {
           global.botDB.insert({type: 'songRequests', videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: sender.username})
           global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to queue requested by ' + sender.username)
