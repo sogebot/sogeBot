@@ -13,6 +13,14 @@ function Points () {
     global.parser.register(this, '!makeitrain', this.rainPoints, constants.OWNER_ONLY)
     global.parser.register(this, '!points', this.getPoints, constants.VIEWERS)
 
+    // default is <singular>|<plural> | in some languages can be set with custom <singular>|<x:multi>|<plural> where x <= 10
+    global.configuration.register('pointsName', 'Points name was set to (value) format', 'string', 'Point|Points')
+    global.configuration.register('pointsResponse', 'Points response was changed to: (value)', 'string', '(sender) has (amount)')
+    global.configuration.register('pointsInterval', 'Points online interval set to (value) minutes', 'number', 10)
+    global.configuration.register('pointsPerInterval', 'Points when online was set to (value) per online interval', 'number', 1)
+    global.configuration.register('pointsIntervalOffline', 'Points offline interval set to (value) minutes', 'number', 30)
+    global.configuration.register('pointsPerIntervalOffline', 'Points when offline was set to (value) per offline interval', 'number', 1)
+
     // add events for join/part
     var self = this
     setTimeout(function () {
@@ -128,8 +136,8 @@ Points.prototype.getPointsFromUser = function (self, sender, text) {
     if (err) console.log(err)
     // TODO - create a function as this is used a lot
     var points = (typeof item !== 'undefined' && item !== null ? item.points : 0)
-    var responsePattern = global.configuration.get().systems.pointsResponse
-    var pointsNames = global.configuration.get().systems.pointsName.split('|')
+    var responsePattern = global.configuration.getValue('pointsResponse')
+    var pointsNames = global.configuration.getValue('pointsName').split('|')
 
     var single, multi, xmulti
     // get single|x:multi|multi from pointsName
@@ -291,8 +299,8 @@ Points.prototype.getPoints = function (self, user) {
   global.botDB.findOne({type: 'points', username: user.username}, function (err, item) {
     if (err) console.log(err)
     var points = (typeof item !== 'undefined' && item !== null ? item.points : 0)
-    var responsePattern = global.configuration.get().systems.pointsResponse
-    var pointsNames = global.configuration.get().systems.pointsName.split('|')
+    var responsePattern = global.configuration.getValue('pointsResponse')
+    var pointsNames = global.configuration.getValue('pointsName').split('|')
 
     var single, multi, xmulti
     // get single|x:multi|multi from pointsName
@@ -360,8 +368,8 @@ Points.prototype.stopCounting = function (username) {
 }
 
 Points.prototype.updatePoints = function () {
-  var interval = (global.twitch.isOnline ? global.configuration.get().systems.pointsInterval * 60 * 1000 : global.configuration.get().systems.pointsIntervalOffline * 60 * 1000)
-  var ptsPerInterval = (global.twitch.isOnline ? global.configuration.get().systems.pointsPerInterval : global.configuration.get().systems.pointsPerIntervalOffline)
+  var interval = (global.twitch.isOnline ? global.configuration.getValue('pointsInterval') * 60 * 1000 : global.configuration.getValue('pointsIntervalOffline') * 60 * 1000)
+  var ptsPerInterval = (global.twitch.isOnline ? global.configuration.getValue('pointsPerInterval') : global.configuration.getValue('pointsPerIntervalOffline'))
 
   global.botDB.find({type: 'points', isOnline: true}, function (err, items) {
     if (err) console.log(err)
