@@ -47,7 +47,7 @@ Keywords.prototype.list = function () {
 
 Keywords.prototype.remove = function (self, sender, text) {
   var data = {_type: 'keywords', _keyword: text.trim(), success: 'Keyword was succesfully removed.', error: 'Keyword cannot be found.'}
-  data._keyword.length < 1 ? this.sendMessage('Sorry, ' + sender.username + ', keyword command is not correct, check !keyword') : global.commons.remove(data)
+  data._keyword.length < 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', keyword command is not correct, check !keyword') : global.commons.remove(data)
 }
 
 module.exports = new Keywords()

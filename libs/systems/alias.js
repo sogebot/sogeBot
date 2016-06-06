@@ -13,21 +13,20 @@ function Alias () {
 
     global.parser.registerParser('alias', this.parse, constants.VIEWERS)
   }
-
-  console.log('Alias system loaded and ' + (global.configuration.get().systems.alias === true ? chalk.green('enabled') : chalk.red('disabled')))
+  console.log('Alias system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.alias === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Alias.prototype.help = function () {
-  var text = 'Usage: !alias add <command> <alias> | !alias remove <alias> | !alias list'
+  var text = global.translate('core.usage') + ': !alias add <command> <alias> | !alias remove <alias> | !alias list'
   global.commons.sendMessage(text)
 }
 
 Alias.prototype.add = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w+) (\w+)$/)
-    global.commons.insertIfNotExists({__id: 'alias_' + parsed[2], _alias: parsed[2], command: parsed[1], success: 'Alias was successfully added', error: 'Sorry, ' + sender.username + ', this alias already exists.'})
+    global.commons.insertIfNotExists({__id: 'alias_' + parsed[2], _alias: parsed[2], command: parsed[1], success: global.translate('alias.success.add'), error: global.translate('alias.failed.add')})
   } catch (e) {
-    global.commons.sendMessage('Sorry, ' + sender.username + ', alias command is not correct, check !alias')
+    global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
   }
 }
 
@@ -36,7 +35,7 @@ Alias.prototype.list = function () {
     if (err) { console.log(err) }
     var list = []
     docs.forEach(function (e, i, ar) { list.push('!' + e.alias) })
-    var output = (docs.length === 0 ? 'Alias list is empty.' : 'Alias list: ' + list.join(', ') + '.')
+    var output = (docs.length === 0 ? global.translate('alias.failed.list') : global.translate('alias.success.list') + ': ' + list.join(', ') + '.')
     global.client.action(global.configuration.get().twitch.owner, output)
   })
 }
@@ -44,9 +43,9 @@ Alias.prototype.list = function () {
 Alias.prototype.remove = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w+)$/)
-    global.commons.remove({__id: 'alias_' + parsed[1], success: 'Alias was succesfully removed', error: 'Alias cannot be found'})
+    global.commons.remove({__id: 'alias_' + parsed[1], success: global.translate('alias.success.remove'), error: global.translate('alias.failed.remove')})
   } catch (e) {
-    global.commons.sendMessage('Sorry, ' + sender.username + ', alias command is not correct, check !alias')
+    global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
   }
 }
 

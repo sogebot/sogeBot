@@ -8,11 +8,18 @@ var Configuration = require('./libs/configuration')
 var Parser = require('./libs/parser')
 var Twitch = require('./libs/twitch')
 var Commons = require('./libs/commons')
+var Translate = require('counterpart');
 
 global.parser = new Parser()
 global.configuration = new Configuration()
 global.twitch = new Twitch()
 global.commons = new Commons()
+global.translate = Translate
+
+global.translate.registerTranslations('en', require('./locales/en.json'))
+global.translate.registerTranslations('cs', require('./locales/cs.json'))
+
+global.translate.setLocale('en')
 
 var options = {
   options: {

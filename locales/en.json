@@ -1,0 +1,21 @@
+{
+  "core": {
+    "loaded": "is loaded and",
+    "enabled": "enabled",
+    "disabled": "disabled",
+    "usage": "Usage"
+  },
+  "alias": {
+    "success": {
+      "add": "Alias was added to database",
+      "remove": "Alias was deleted from database",
+      "list": "List of aliases"
+    },
+    "failed": {
+      "add": "This alias already exists in database",
+      "remove": "This alias cannot be found in database",
+      "list": "List of aliases is empty",
+      "parse": "Sorry, (sender), but this command is not correct, for help type -> !alias"
+    }
+  }
+}
