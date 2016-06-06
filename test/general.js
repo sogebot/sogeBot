@@ -14,10 +14,16 @@ global.client.action = function (owner, text) {
   console.warn('#WARNING: client.action is deprecated ')
 }
 
+global.commons.sendMessage = function (text) {
+  global.output.push(text)
+}
+
 global.botDB = new Database({
   inMemoryOnly: true,
   autoload: true
 })
+
+global.output = []
 
 global.translate = Translate
 global.translate.registerTranslations('en', require('../locales/en.json'))

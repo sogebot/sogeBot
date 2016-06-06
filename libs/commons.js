@@ -11,7 +11,7 @@ Commons.prototype.insertIfNotExists = function (data) {
   var self = this
 
   global.botDB.insert(toInsert, function (err, newItem) {
-    if (err) { self.runCallback(callbacks.error, data) }
+    if (err) self.runCallback(callbacks.error, data)
     else self.runCallback(callbacks.success, data)
   })
 }

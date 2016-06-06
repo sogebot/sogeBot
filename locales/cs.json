@@ -15,7 +15,20 @@
       "add": "Tento alias uz existuje v databazi",
       "remove": "Tento alias v databazi neexistuje",
       "list": "Seznam aliasu je prazdny",
-      "parse": "Promin, (sender), ale tento prikaz neni spravne, pro napovedu napis -> !alias"
+      "parse": "Promin, (sender), ale tento prikaz neni spravne, pro napovedu napis !alias"
+    }
+  },
+  "customcmds": {
+    "success": {
+      "add": "Prikaz byl pridan do databaze",
+      "remove": "Prikaz byl smazany z databaze",
+      "list": "Seznam prikazu"
+    },
+    "failed": {
+      "add": "Tento prikaz uz existuje v databazi",
+      "remove": "Tento prikaz v databazi neexistuje",
+      "list": "Seznam prikazu je prazdny",
+      "parse": "Promin, (sender), ale tento prikaz neni spravne, pro napovedu napis !command"
     }
   }
 }
