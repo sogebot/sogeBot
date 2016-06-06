@@ -1,23 +1,18 @@
 'use strict'
 
+var _ = require('lodash')
+
 function Commons () {
 }
 
 Commons.prototype.insertIfNotExists = function (data) {
   var callbacks = this.getCallbacks(data)
-  var toFind = this.getObjectToFind(data)
   var toInsert = this.stripUnderscores(data)
   var self = this
-  global.botDB.find(toFind, function (err, docs) {
-    if (err) { console.log(err) }
-    if (docs.length === 0) { // it is safe to insert new notice?
-      global.botDB.insert(toInsert, function (err, newItem) {
-        if (err) { console.log(err) }
-        self.runCallback(callbacks.success, data)
-      })
-    } else {
-      self.runCallback(callbacks.error, data)
-    }
+
+  global.botDB.insert(toInsert, function (err, newItem) {
+    if (err) { self.runCallback(callbacks.error, data) }
+    else self.runCallback(callbacks.success, data)
   })
 }
 

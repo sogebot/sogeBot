@@ -5,7 +5,7 @@ var constants = require('../constants')
 var _ = require('lodash')
 
 function Alias () {
-  if (global.configuration.get().systems.keywords === true) {
+  if (global.configuration.get().systems.alias === true) {
     global.parser.register(this, '!alias add', this.add, constants.OWNER_ONLY)
     global.parser.register(this, '!alias list', this.list, constants.OWNER_ONLY)
     global.parser.register(this, '!alias remove', this.remove, constants.OWNER_ONLY)
@@ -19,12 +19,16 @@ function Alias () {
 
 Alias.prototype.help = function () {
   var text = 'Usage: !alias add <command> <alias> | !alias remove <alias> | !alias list'
-  global.client.action(global.configuration.get().twitch.owner, text)
+  global.commons.sendMessage(text)
 }
 
 Alias.prototype.add = function (self, sender, text) {
-  var data = {_type: 'alias', _alias: text.replace(text.split(' ')[0], '').trim(), command: text.split(' ')[0], success: 'Alias was succesfully added.', error: 'Sorry, ' + sender.username + ', this alias already exists.'}
-  data._alias.length <= 1 || data.command.length <= 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', alias command is not correct, check !alias') : global.commons.insertIfNotExists(data)
+  try {
+    var parsed = text.match(/^(\w+) (\w+)$/)
+    global.commons.insertIfNotExists({__id: 'alias_' + parsed[2], _alias: parsed[2], command: parsed[1], success: 'Alias was successfully added', error: 'Sorry, ' + sender.username + ', this alias already exists.'})
+  } catch (e) {
+    global.commons.sendMessage('Sorry, ' + sender.username + ', alias command is not correct, check !alias')
+  }
 }
 
 Alias.prototype.list = function () {
@@ -38,12 +42,16 @@ Alias.prototype.list = function () {
 }
 
 Alias.prototype.remove = function (self, sender, text) {
-  var data = {_type: 'alias', _alias: text.trim(), success: 'Alias was succesfully removed.', error: 'Alias cannot be found.'}
-  data._alias.length < 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', alias command is not correct, check !alias') : global.commons.remove(data)
+  try {
+    var parsed = text.match(/^(\w+)$/)
+    global.commons.remove({__id: 'alias_' + parsed[1], success: 'Alias was succesfully removed', error: 'Alias cannot be found'})
+  } catch (e) {
+    global.commons.sendMessage('Sorry, ' + sender.username + ', alias command is not correct, check !alias')
+  }
 }
 
 Alias.prototype.parse = function (id, sender, text) {
-  global.botDB.findOne({type: 'alias', $where: function () { return text.startsWith('!' + this.alias) }}, function (err, item) {
+  global.botDB.findOne({$where: function () { return text.startsWith('!' + this.alias) }}, function (err, item) {
     if (err) console.log(err)
     if (!_.isNull(item)) {
       global.parser.parse(sender, text.replace('!' + item.alias, '!' + item.command))
