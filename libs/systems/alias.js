@@ -17,8 +17,7 @@ function Alias () {
 }
 
 Alias.prototype.help = function (self, sender) {
-  var text = global.translate('core.usage') + ': !alias add <command> <alias> | !alias remove <alias> | !alias list'
-  global.commons.sendMessage(text, sender)
+  global.commons.sendMessage(global.translate('core.usage') + ': !alias add <command> <alias> | !alias remove <alias> | !alias list', sender)
 }
 
 Alias.prototype.add = function (self, sender, text) {

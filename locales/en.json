@@ -15,7 +15,20 @@
       "add": "This alias already exists in database",
       "remove": "This alias cannot be found in database",
       "list": "List of aliases is empty",
-      "parse": "Sorry, (sender), but this command is not correct, for help type -> !alias"
+      "parse": "Sorry, (sender), but this command is not correct, for help type !alias"
+    }
+  },
+  "customcmds": {
+    "success": {
+      "add": "Command was added to database",
+      "remove": "Command was deleted from database",
+      "list": "List of commands"
+    },
+    "failed": {
+      "add": "This command already exists in database",
+      "remove": "This command cannot be found in database",
+      "list": "List of commands is empty",
+      "parse": "Sorry, (sender), but this command is not correct, for help type !command"
     }
   }
 }
