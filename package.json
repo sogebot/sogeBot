@@ -9,6 +9,7 @@
   "dependencies": {
     "auto-load": "^2.1.0",
     "chalk": "^1.1.3",
+    "counterpart": "^0.17.2",
     "http-auth": "^2.3.6",
     "ini": "^1.3.4",
     "lodash": "^4.13.1",

@@ -1,0 +1,21 @@
+{
+  "core": {
+    "loaded": "je nacten a",
+    "enabled": "zapnut",
+    "disabled": "vypnut",
+    "usage": "Pouziti"
+  },
+  "alias": {
+    "success": {
+      "add": "Alias byl pridan do databaze",
+      "remove": "Alias byl smazany z databaze",
+      "list": "Seznam aliasu"
+    },
+    "failed": {
+      "add": "Tento alias uz existuje v databazi",
+      "remove": "Tento alias v databazi neexistuje",
+      "list": "Seznam aliasu je prazdny",
+      "parse": "Promin, (sender), ale tento prikaz neni spravne, pro napovedu napis -> !alias"
+    }
+  }
+}

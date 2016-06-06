@@ -3,6 +3,7 @@ var Parser = require('../libs/parser')
 var Configuration = require('../libs/configuration')
 var Commons = require('../libs/commons')
 var Database = require('nedb')
+var Translate = require('counterpart')
 
 global.parser = new Parser()
 global.configuration = new Configuration()
@@ -22,6 +23,10 @@ global.botDB = new Database({
   inMemoryOnly: true,
   autoload: true
 })
+
+global.translate = Translate
+global.translate.registerTranslations('en', require('../locales/en.json'))
+global.translate.setLocale('en')
 
 var alias = require('../libs/systems/alias')
 var testData = []
@@ -143,7 +148,7 @@ describe('System - Alias', function () {
       it('should send success msg', function (done) {
         setTimeout(function () {
           global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
-            expect(testData.pop()).to.equal('Alias was successfully added')
+            expect(testData.pop()).to.equal(global.translate('alias.success.add'))
             done()
           })
         }, 10)
@@ -185,7 +190,7 @@ describe('System - Alias', function () {
       it('should send duplicate msg', function (done) {
         setTimeout(function () {
           global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
-            expect(testData.pop()).to.equal('Sorry, sogehige, this alias already exists.')
+            expect(testData.pop()).to.equal(global.translate('alias.failed.add'))
             done()
           })
         }, 10)
@@ -308,7 +313,7 @@ describe('System - Alias', function () {
       })
       it('should send success message', function (done) {
         setTimeout(function () {
-          expect(testData.pop()).to.equal('Alias was succesfully removed')
+          expect(testData.pop()).to.equal(global.translate('alias.success.remove'))
           done()
         }, 100)
       })
@@ -349,7 +354,7 @@ describe('System - Alias', function () {
       })
       it('should send not found message', function (done) {
         setTimeout(function () {
-          expect(testData.pop()).to.equal('Alias cannot be found')
+          expect(testData.pop()).to.equal(global.translate('alias.failed.remove'))
           done()
         }, 100)
       })
