@@ -22,15 +22,13 @@ function Parser () {
         global.removeFromQueue(id)
       }
     }
-  }, 500)
+  }, 100)
 }
 
 Parser.prototype.parse = function (user, message) {
   this.linesParsed++
-
   // if we dont have registeredParsers, just parseCommands
-  (
-  this.registeredParsers === {} ? this.parseCommands(user, message) : this.addToQueue(user, message))
+  this.registeredParsers === {} ? this.parseCommands(user, message) : this.addToQueue(user, message)
 }
 
 Parser.prototype.addToQueue = function (user, message) {
@@ -53,11 +51,13 @@ Parser.prototype.addToQueue = function (user, message) {
 }
 
 Parser.prototype.parseCommands = function (user, message) {
+  message = message.trim()
   for (var cmd in this.registeredCmds) {
     if (message.startsWith(cmd)) {
       if (this.permissionsCmds[cmd] === constants.VIEWERS || this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user)) {
         var text = message.replace(cmd, '')
         this.registeredCmds[cmd](this.selfCmds[cmd], user, text.trim(), message)
+
         break // cmd is executed
       }
     }
