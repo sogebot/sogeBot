@@ -1,36 +1,14 @@
 var expect = require('chai').expect
-var Parser = require('../libs/parser')
-var Configuration = require('../libs/configuration')
-var Commons = require('../libs/commons')
-var Database = require('nedb')
-var Translate = require('counterpart')
 
-global.parser = new Parser()
-global.configuration = new Configuration()
+var testData = []
+var testUser = {username: 'sogehige'}
 
-global.client = {}
-global.commons = new Commons()
+require('./general')
+var alias = require('../libs/systems/alias')
 
-global.client.action = function (owner, text) {
-  console.warn('#WARNING: client.action is deprecated ')
-}
 global.commons.sendMessage = function (text) {
   testData.push(text)
 }
-
-//create db only in memory
-global.botDB = new Database({
-  inMemoryOnly: true,
-  autoload: true
-})
-
-global.translate = Translate
-global.translate.registerTranslations('en', require('../locales/en.json'))
-global.translate.setLocale('en')
-
-var alias = require('../libs/systems/alias')
-var testData = []
-var testUser = {username: 'sogehige'}
 
 describe('System - Alias', function () {
   describe('#help', function () {
@@ -159,7 +137,7 @@ describe('System - Alias', function () {
           setTimeout(function () {
             expect(testData.pop()).to.match(/^Usage:/)
             done()
-          }, 90)
+          }, 100)
         }, 10)
       })
     })
@@ -201,7 +179,7 @@ describe('System - Alias', function () {
           setTimeout(function () {
             expect(testData.pop()).to.match(/^Usage:/)
             done()
-          }, 90)
+          }, 100)
         }, 10)
       })
     })
@@ -391,6 +369,67 @@ describe('System - Alias', function () {
             done()
           })
         }, 10)
+      })
+      it('should send parse error', function () {
+        expect(testData.pop()).to.match(/^Sorry,/)
+      })
+    })
+  })
+  describe('#list', function () {
+    describe('parsing \'!alias list\' when alias is added', function () {
+      beforeEach(function (done) {
+        global.parser.parseCommands(testUser, '!alias add alias test')
+        global.parser.parseCommands(testUser, '!alias add alias test2')
+        setTimeout(function () {
+          global.parser.parseCommands(testUser, '!alias list')
+          done()
+        }, 100)
+      })
+      after(function (done) {
+        testData = []
+        global.botDB.remove({}, {multi: true}, function () {
+          done()
+        })
+      })
+      it('should send list with test and test2', function (done) {
+        setTimeout(function () {
+          expect(testData.pop()).to.equal('List of aliases: !test, !test2')
+          done()
+        }, 100)
+      })
+    })
+    describe('parsing \'!alias list\' when list is empty', function () {
+      beforeEach(function (done) {
+        setTimeout(function () {
+          global.parser.parseCommands(testUser, '!alias list')
+          done()
+        }, 100)
+      })
+      after(function (done) {
+        testData = []
+        global.botDB.remove({}, {multi: true}, function () {
+          done()
+        })
+      })
+      it('should send empty list', function (done) {
+        setTimeout(function () {
+          expect(testData.pop()).to.equal('List of aliases is empty')
+          done()
+        }, 100)
+      })
+    })
+    describe('parsing \'!alias list nonsense\'', function () {
+      beforeEach(function (done) {
+        setTimeout(function () {
+          global.parser.parseCommands(testUser, '!alias list nonsense')
+          done()
+        }, 100)
+      })
+      after(function (done) {
+        testData = []
+        global.botDB.remove({}, {multi: true}, function () {
+          done()
+        })
       })
       it('should send parse error', function () {
         expect(testData.pop()).to.match(/^Sorry,/)

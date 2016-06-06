@@ -16,9 +16,9 @@ function Alias () {
   console.log('Alias system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.alias === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
-Alias.prototype.help = function () {
+Alias.prototype.help = function (self, sender) {
   var text = global.translate('core.usage') + ': !alias add <command> <alias> | !alias remove <alias> | !alias list'
-  global.commons.sendMessage(text)
+  global.commons.sendMessage(text, sender)
 }
 
 Alias.prototype.add = function (self, sender, text) {
@@ -30,14 +30,17 @@ Alias.prototype.add = function (self, sender, text) {
   }
 }
 
-Alias.prototype.list = function () {
-  global.botDB.find({type: 'alias'}, function (err, docs) {
-    if (err) { console.log(err) }
-    var list = []
-    docs.forEach(function (e, i, ar) { list.push('!' + e.alias) })
-    var output = (docs.length === 0 ? global.translate('alias.failed.list') : global.translate('alias.success.list') + ': ' + list.join(', ') + '.')
-    global.client.action(global.configuration.get().twitch.owner, output)
-  })
+Alias.prototype.list = function (self, sender, text) {
+  var parsed = text.match(/^(\w+)$/)
+  if (_.isNull(parsed)) {
+    global.botDB.find({$where: function () { return this._id.startsWith('alias') }}, function (err, docs) {
+      if (err) { console.log(err) }
+      var list = []
+      docs.forEach(function (e, i, ar) { list.push('!' + e.alias) })
+      var output = (docs.length === 0 ? global.translate('alias.failed.list') : global.translate('alias.success.list') + ': ' + list.join(', '))
+      global.commons.sendMessage(output, sender)
+    })
+  } else global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
 }
 
 Alias.prototype.remove = function (self, sender, text) {
