@@ -8,7 +8,7 @@ var Configuration = require('./libs/configuration')
 var Parser = require('./libs/parser')
 var Twitch = require('./libs/twitch')
 var Commons = require('./libs/commons')
-var Translate = require('counterpart');
+var Translate = require('counterpart')
 
 global.parser = new Parser()
 global.configuration = new Configuration()

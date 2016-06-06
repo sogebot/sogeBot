@@ -22,7 +22,7 @@ function Parser () {
         global.removeFromQueue(id)
       }
     }
-  }, 100)
+  }, 10)
 }
 
 Parser.prototype.parse = function (user, message) {
