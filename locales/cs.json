@@ -5,7 +5,8 @@
     "disabled": "vypnut",
     "usage": "Pouziti",
     "online": "Stream je online (time)",
-    "offline": "Stream je prave offline!"
+    "offline": "Stream je prave offline!",
+    "lang-selected": "Bot je nyni prepnuty do cestiny"
   },
   "alias": {
     "success": {
