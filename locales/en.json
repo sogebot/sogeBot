@@ -3,7 +3,9 @@
     "loaded": "is loaded and",
     "enabled": "enabled",
     "disabled": "disabled",
-    "usage": "Usage"
+    "usage": "Usage",
+    "online": "Stream is online for (time)",
+    "offline": "Stream is currently offline!"
   },
   "alias": {
     "success": {
