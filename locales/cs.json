@@ -3,7 +3,9 @@
     "loaded": "je nacten a",
     "enabled": "zapnut",
     "disabled": "vypnut",
-    "usage": "Pouziti"
+    "usage": "Pouziti",
+    "online": "Stream je online (time)",
+    "offline": "Stream je prave offline!"
   },
   "alias": {
     "success": {
