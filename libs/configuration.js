@@ -24,7 +24,6 @@ function Configuration () {
 }
 
 Configuration.prototype.loadFile = function () {
-  console.log('Loading configuration file')
   this.config = ini.parse(fs.readFileSync('./config.ini', 'utf-8'))
 }
 

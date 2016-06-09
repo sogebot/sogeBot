@@ -3,6 +3,7 @@
 var chalk = require('chalk')
 var constants = require('../constants')
 var _ = require('lodash')
+var log = global.log
 
 function CustomCommands () {
   if (global.configuration.get().systems.customCommands === true) {
@@ -17,7 +18,7 @@ function CustomCommands () {
       self.register(self)
     }, 10)
   }
-  console.log('CustomCommands system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.customCommands === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+  log.info('CustomCommands system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.customCommands === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 CustomCommands.prototype.help = function (self, sender) {
@@ -26,7 +27,7 @@ CustomCommands.prototype.help = function (self, sender) {
 
 CustomCommands.prototype.register = function (self) {
   global.botDB.find({$where: function () { return this._id.startsWith('customcmds') }}, function (err, docs) {
-    if (err) { console.log(err) }
+    if (err) { log.error(err) }
     docs.forEach(function (e, i, ar) { global.parser.register(self, '!' + e.command, self.run, constants.VIEWERS) })
   })
 }
@@ -42,7 +43,7 @@ CustomCommands.prototype.add = function (self, sender, text) {
 
 CustomCommands.prototype.run = function (self, sender, msg, fullMsg) {
   global.botDB.findOne({$where: function () { return this._id.startsWith('customcmds') }, command: fullMsg.split('!')[1]}, function (err, item) {
-    if (err) { console.log(err) }
+    if (err) { log.error(err) }
     try { global.commons.sendMessage(item.response, sender) } catch (e) { global.parser.unregister(fullMsg) }
   })
 }
@@ -51,7 +52,7 @@ CustomCommands.prototype.list = function (self, sender, text) {
   var parsed = text.match(/^(\w+)$/)
   if (_.isNull(parsed)) {
     global.botDB.find({$where: function () { return this._id.startsWith('customcmds') }}, function (err, docs) {
-      if (err) { console.log(err) }
+      if (err) { log.error(err) }
       var commands = []
       docs.forEach(function (e, i, ar) { commands.push('!' + e.command) })
       var output = (docs.length === 0 ? global.translate('customcmds.failed.list') : global.translate('customcmds.success.list') + ': ' + commands.join(', '))
