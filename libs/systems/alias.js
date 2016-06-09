@@ -3,6 +3,7 @@
 var chalk = require('chalk')
 var constants = require('../constants')
 var _ = require('lodash')
+var log = global.log
 
 function Alias () {
   if (global.configuration.get().systems.alias === true) {
@@ -13,7 +14,7 @@ function Alias () {
 
     global.parser.registerParser('alias', this.parse, constants.VIEWERS)
   }
-  console.log('Alias system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.alias === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+  log.info('Alias system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.alias === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Alias.prototype.help = function (self, sender) {
@@ -33,7 +34,7 @@ Alias.prototype.list = function (self, sender, text) {
   var parsed = text.match(/^(\w+)$/)
   if (_.isNull(parsed)) {
     global.botDB.find({$where: function () { return this._id.startsWith('alias') }}, function (err, docs) {
-      if (err) { console.log(err) }
+      if (err) { log.error(err) }
       var list = []
       docs.forEach(function (e, i, ar) { list.push('!' + e.alias) })
       var output = (docs.length === 0 ? global.translate('alias.failed.list') : global.translate('alias.success.list') + ': ' + list.join(', '))
@@ -53,7 +54,7 @@ Alias.prototype.remove = function (self, sender, text) {
 
 Alias.prototype.parse = function (id, sender, text) {
   global.botDB.findOne({$where: function () { return text.startsWith('!' + this.alias) }}, function (err, item) {
-    if (err) console.log(err)
+    if (err) log.error(err)
     if (!_.isNull(item)) {
       global.parser.parse(sender, text.replace('!' + item.alias, '!' + item.command))
       global.parser.lineParsed--
