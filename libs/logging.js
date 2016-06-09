@@ -8,11 +8,11 @@ if (!fs.existsSync(logDir)) {
 
 global.log = new (winston.Logger)({
   transports: [
-    new (winston.transports.Console)(),
+    new (winston.transports.Console)({handleExceptions: true}),
     new winston.transports.File({
       level: 'info',
       filename: logDir + '/sogebot.log',
-      handleExceptions: true,
+      handleExceptions: false,
       json: true,
       maxsize: 5242880,
       maxFiles: 5,

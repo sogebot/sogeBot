@@ -5,7 +5,8 @@
     "disabled": "disabled",
     "usage": "Usage",
     "online": "Stream is online for (time)",
-    "offline": "Stream is currently offline!"
+    "offline": "Stream is currently offline!",
+    "lang-selected": "Bot language is currently set to english"
   },
   "alias": {
     "success": {

@@ -21,6 +21,14 @@ function Configuration () {
   global.parser.register(this, '!set', this.setValue, constants.OWNER_ONLY)
 
   this.loadValues()
+
+  this.register('lang', '', 'string', 'en')
+
+  // wait a little bit to get value from db
+  var self = this
+  setTimeout(function () {
+    global.translate.setLocale(self.getValue('lang'))
+  }, 1000)
 }
 
 Configuration.prototype.loadFile = function () {
@@ -36,24 +44,33 @@ Configuration.prototype.register = function (cfgName, success, filter, defaultVa
 }
 
 Configuration.prototype.setValue = function (self, sender, text) {
-  var cmd = text.split(' ')[0]
-  var value = text.replace(text.split(' ')[0], '').trim()
-  var filter = self.cfgL[cmd].filter
-  var data = {_type: 'settings', success: self.cfgL[cmd].success}
-  data['_' + cmd] = {$exists: true}
-  if (filter === 'number' && Number.isInteger(parseInt(value.trim(), 10))) {
-    data[cmd] = parseInt(value.trim(), 10)
-    global.commons.updateOrInsert(data)
-    self.cfgL[cmd].value = data[cmd]
-  } else if (filter === 'bool' && (value === 'true' || value === 'false')) {
-    data[cmd] = (value.toLowerCase() === 'true')
-    global.commons.updateOrInsert(data)
-    self.cfgL[cmd].value = data[cmd]
-  } else if (filter === 'string' && value.trim().length > 0) {
-    data[cmd] = value.trim()
-    global.commons.updateOrInsert(data)
-    self.cfgL[cmd].value = data[cmd]
-  } else global.commons.sendMessage('Sorry, ' + sender.username + ', cannot parse !set command.')
+  try {
+    var cmd = text.split(' ')[0]
+    var value = text.replace(text.split(' ')[0], '').trim()
+    var filter = self.cfgL[cmd].filter
+    var data = {_type: 'settings', success: self.cfgL[cmd].success}
+    data['_' + cmd] = {$exists: true}
+    if (filter === 'number' && Number.isInteger(parseInt(value.trim(), 10))) {
+      data[cmd] = parseInt(value.trim(), 10)
+      global.commons.updateOrInsert(data)
+      self.cfgL[cmd].value = data[cmd]
+    } else if (filter === 'bool' && (value === 'true' || value === 'false')) {
+      data[cmd] = (value.toLowerCase() === 'true')
+      global.commons.updateOrInsert(data)
+      self.cfgL[cmd].value = data[cmd]
+    } else if (filter === 'string' && value.trim().length > 0) {
+      if (cmd === 'lang') {
+        global.translate.setLocale(value)
+        global.commons.sendMessage(global.translate('core.lang-selected'))
+        data.success = function () { return true }
+      }
+      data[cmd] = value.trim()
+      global.commons.updateOrInsert(data)
+      self.cfgL[cmd].value = data[cmd]
+    } else global.commons.sendMessage('Sorry, ' + sender.username + ', cannot parse !set command.')
+  } catch (err) {
+    global.commons.sendMessage('Sorry, ' + sender.username + ', cannot parse !set command.')
+  }
 }
 
 Configuration.prototype.listSets = function (self, sender, text) {
