@@ -31,10 +31,10 @@ Twitch.prototype.isOnline = function () {
 
 Twitch.prototype.uptime = function (self, sender) {
   var now = moment().preciseDiff(self.whenOnline, true)
-  var days = now.days > 0 ? now.days+'d' : ''
-  var hours = now.hours > 0 ? now.hours+'h' : ''
-  var minutes = now.minutes > 0 ? now.minutes+'m' : ''
-  var seconds = now.seconds > 0 ? now.seconds+'s' : ''
+  var days = now.days > 0 ? now.days + 'd' : ''
+  var hours = now.hours > 0 ? now.hours + 'h' : ''
+  var minutes = now.minutes > 0 ? now.minutes + 'm' : ''
+  var seconds = now.seconds > 0 ? now.seconds + 's' : ''
   global.commons.sendMessage(self.isOnline ? global.translate('core.online').replace('(time)', days + hours + minutes + seconds) : global.translate('core.offline'))
 }
 
