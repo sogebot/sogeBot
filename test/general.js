@@ -3,6 +3,7 @@ var Configuration = require('../libs/configuration')
 var Commons = require('../libs/commons')
 var Database = require('nedb')
 var Translate = require('counterpart')
+require('../libs/logging')
 
 global.parser = new Parser()
 global.configuration = new Configuration()
