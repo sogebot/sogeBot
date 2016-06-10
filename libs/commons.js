@@ -1,6 +1,7 @@
 'use strict'
 
 var _ = require('lodash')
+var log = global.log
 
 function Commons () {
 }
@@ -23,7 +24,7 @@ Commons.prototype.updateOrInsert = function (data) {
   var toInsert = this.stripUnderscores(data)
   var self = this
   global.botDB.update(toFind, {$set: toUpdate}, {}, function (err, numReplaced) {
-    if (err) console.log(err)
+    if (err) log.error(err)
     if (numReplaced === 0) global.botDB.insert(toInsert)
     self.runCallback(callbacks.success, data)
   })
@@ -34,8 +35,8 @@ Commons.prototype.remove = function (data) {
   var toRemove = this.getObjectToFind(data)
   var self = this
   global.botDB.remove(toRemove, {}, function (err, numRemoved) {
-    if (err) { console.log(err) }
-    (numRemoved === 0 ? self.runCallback(callbacks.error, data) : self.runCallback(callbacks.success, data))
+    if (err) { log.error(err) }
+    numRemoved === 0 ? self.runCallback(callbacks.error, data) : self.runCallback(callbacks.success, data)
   })
 }
 
