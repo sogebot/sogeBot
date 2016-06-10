@@ -22,7 +22,7 @@ global.commons = new Commons()
 
 var options = {
   options: {
-    debug: true
+    debug: false
   },
   connection: {
     cluster: global.configuration.get().twitch.cluster,
