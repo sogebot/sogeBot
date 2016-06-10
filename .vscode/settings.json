@@ -3,8 +3,7 @@
   "standard.options": {
     "globals": ["$"],
     "ignore": [
-      "node_modules/**",
-      "test/**"
+      "node_modules/**"
     ]
   },
   "trailing-spaces.trimOnSave": true
