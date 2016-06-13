@@ -33,5 +33,18 @@
       "list": "List of commands is empty",
       "parse": "Sorry, (sender), but this command is not correct, for help type !command"
     }
+  },
+  "keywords": {
+    "success": {
+      "add": "Keyword was added to database",
+      "remove": "Keyword was deleted from database",
+      "list": "List of keywords"
+    },
+    "failed": {
+      "add": "This keyword already exists in database",
+      "remove": "This keyword cannot be found in database",
+      "list": "List of keywords is empty",
+      "parse": "Sorry, (sender), but this command is not correct, for help type !keyword"
+    }
   }
 }
