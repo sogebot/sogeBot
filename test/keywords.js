@@ -5,19 +5,19 @@ var expect = require('chai').expect
 var testUser = {username: 'sogehige'}
 
 require('./general')
-var alias = require('../libs/systems/alias')
+var keyword = require('../libs/systems/keywords')
 
-describe('System - Alias', function () {
+describe('System - Keywords', function () {
   describe('#help', function () {
-    describe('parsing \'!alias\'', function () {
+    describe('parsing \'!keyword\'', function () {
       it('parser should return usage text', function () {
-        global.parser.parseCommands(testUser, '!alias')
+        global.parser.parseCommands(testUser, '!keyword')
         expect(global.output.pop()).to.match(/^Usage:/)
       })
     })
-    describe('parsing \'!alias n/a\'', function () {
+    describe('parsing \'!keyword n/a\'', function () {
       it('parser should return usage text', function () {
-        global.parser.parseCommands(testUser, '!alias n/a')
+        global.parser.parseCommands(testUser, '!keyword n/a')
         expect(global.output.pop()).to.match(/^Usage:/)
       })
     })
@@ -29,13 +29,13 @@ describe('System - Alias', function () {
         done()
       })
     })
-    describe('parsing \'!alias add\'', function () {
+    describe('parsing \'!keyword add\'', function () {
       beforeEach(function () {
-        global.parser.parseCommands(testUser, '!alias add')
+        global.parser.parseCommands(testUser, '!keyword add')
       })
       it('should not be in db', function (done) {
         setTimeout(function () {
-          global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
+          global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
             expect(err).to.equal(null)
             expect(count).to.equal(0)
             done()
@@ -46,13 +46,13 @@ describe('System - Alias', function () {
         expect(global.output.pop()).to.match(/^Sorry,/)
       })
     })
-    describe('parsing \'!alias add command\'', function () {
+    describe('parsing \'!keyword add kwd\'', function () {
       beforeEach(function () {
-        global.parser.parseCommands(testUser, '!alias add command')
+        global.parser.parseCommands(testUser, '!keyword add kwd')
       })
       it('should not be in db', function (done) {
         setTimeout(function () {
-          global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
+          global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
             expect(err).to.equal(null)
             expect(count).to.equal(0)
             done()
@@ -63,63 +63,63 @@ describe('System - Alias', function () {
         expect(global.output.pop()).to.match(/^Sorry,/)
       })
     })
-    describe('parsing \'!alias add command alias\'', function () {
+    describe('parsing \'!keyword add kwd response\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!alias add alias test')
-        alias.parse(alias, testUser, '!test')
+        global.parser.parseCommands(testUser, '!keyword add kwd response')
+        keyword.run(keyword, testUser, 'something something kwd something')
         setTimeout(function () { done() }, 10)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
+        global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
           expect(err).to.equal(null)
           expect(count).to.equal(1)
           done()
         })
       })
       it('should send success msg', function () {
-        expect(global.output.shift()).to.include(global.translate('alias.success.add'))
+        expect(global.output.shift()).to.include(global.translate('keywords.success.add'))
       })
-      it('should parse added alias in chat', function () {
-        expect(global.output.shift()).to.match(/^Usage:/)
+      it('should parse added keyword in chat', function () {
+        expect(global.output.shift()).to.match(/^response/)
       })
     })
-    describe('parsing 2x sent \'!alias add command alias\'', function () {
+    describe('parsing 2x sent \'!keyword add kwd response\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!alias add alias test')
-        global.parser.parseCommands(testUser, '!alias add alias test')
-        alias.parse(alias, testUser, '!test')
+        global.parser.parseCommands(testUser, '!keyword add kwd Woohoo')
+        global.parser.parseCommands(testUser, '!keyword add kwd Woohoo')
+        keyword.run(keyword, testUser, 'something something kwd something')
         setTimeout(function () { done() }, 10)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should be once in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
+        global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
           expect(err).to.equal(null)
           expect(count).to.equal(1)
           done()
         })
       })
       it('should send success msg', function () {
-        expect(global.output.shift()).to.include(global.translate('alias.success.add'))
+        expect(global.output.shift()).to.include(global.translate('keywords.success.add'))
       })
       it('should send duplicate msg', function () {
-        expect(global.output.shift()).to.equal(global.translate('alias.failed.add'))
+        expect(global.output.shift()).to.equal(global.translate('keywords.failed.add'))
       })
-      it('should parse added alias in chat', function () {
-        expect(global.output.shift()).to.match(/^Usage:/)
+      it('should parse added keyword in chat', function () {
+        expect(global.output.shift()).to.match(/^Woohoo/)
       })
     })
-    describe('parsing \'!alias add command  alias\'', function () {
+    describe('parsing \'!keyword add kwd  response\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!alias add alias  test')
+        global.parser.parseCommands(testUser, '!keyword add kwd  response')
         setTimeout(function () { done() }, 10)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should not be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
+        global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
           expect(err).to.equal(null)
           expect(count).to.equal(0)
           done()
@@ -129,16 +129,16 @@ describe('System - Alias', function () {
         expect(global.output.pop()).to.match(/^Sorry,/)
       })
     })
-    describe('parsing \'!alias add command alias something\'', function () {
+    describe('parsing \'!keyword add kwd response awesome\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!alias add alias test something')
-        alias.parse(alias, testUser, '!test')
+        global.parser.parseCommands(testUser, '!keyword add kwd response awesome')
+        keyword.run(keyword, testUser, 'something something kwd something')
         setTimeout(function () { done() }, 10)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should not be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
+        global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
           expect(err).to.equal(null)
           expect(count).to.equal(0)
           done()
@@ -150,18 +150,18 @@ describe('System - Alias', function () {
     })
   })
   describe('#remove', function () {
-    describe('parsing \'!alias remove\'', function () {
+    describe('parsing \'!keyword remove\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!alias add alias test')
+        global.parser.parseCommands(testUser, '!keyword add keyword test')
         setTimeout(function () {
-          global.parser.parseCommands(testUser, '!alias remove')
+          global.parser.parseCommands(testUser, '!keyword remove')
           setTimeout(function () { done() }, 10)
         }, 10)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
+        global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
           expect(err).to.equal(null)
           expect(count).to.equal(1)
           done()
@@ -171,25 +171,25 @@ describe('System - Alias', function () {
         expect(global.output.pop()).to.match(/^Sorry,/)
       })
     })
-    describe('parsing \'!alias remove alias\' without created alias', function () {
+    describe('parsing \'!keyword remove keyword\' without created keyword', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!alias remove test')
+        global.parser.parseCommands(testUser, '!keyword remove test')
         setTimeout(function () { done() }, 10)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should send error message', function () {
-        expect(global.output.pop()).to.equal(global.translate('alias.failed.remove'))
+        expect(global.output.pop()).to.equal(global.translate('keywords.failed.remove'))
       })
     })
-    describe('parsing \'!alias remove alias\'', function () {
+    describe('parsing \'!keyword remove keyword\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!alias add alias test')
+        global.parser.parseCommands(testUser, '!keyword add keyword response')
         setTimeout(function () {
-          global.parser.parseCommands(testUser, '!alias remove test')
+          global.parser.parseCommands(testUser, '!keyword remove keyword')
           setTimeout(function () {
-            alias.parse(alias, testUser, '!test')
+            keyword.run(keyword, testUser, 'something something keyword something')
             global.output.shift() // get rid of add success msg
             done()
           }, 10)
@@ -197,28 +197,28 @@ describe('System - Alias', function () {
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should not be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
+        global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
           expect(err).to.equal(null)
           expect(count).to.equal(0)
           done()
         })
       })
       it('should send success message', function () {
-        expect(global.output.shift()).to.equal(global.translate('alias.success.remove'))
+        expect(global.output.shift()).to.equal(global.translate('keywords.success.remove'))
       })
       it('should not parse in chat', function () {
         expect(global.output.shift()).not.to.match(/^Usage:/)
       })
     })
-    describe('parsing 2x sent \'!alias remove alias\'', function () {
+    describe('parsing 2x sent \'!keyword remove keyword\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!alias add alias test')
+        global.parser.parseCommands(testUser, '!keyword add keyword response')
         setTimeout(function () {
-          global.parser.parseCommands(testUser, '!alias remove test')
-          global.parser.parseCommands(testUser, '!alias remove test')
+          global.parser.parseCommands(testUser, '!keyword remove keyword')
+          global.parser.parseCommands(testUser, '!keyword remove keyword')
           setTimeout(function () {
-            alias.parse(alias, testUser, '!test')
+            keyword.run(keyword, testUser, 'something something keyword something')
             global.output.shift() // get rid of add success msg
             done()
           }, 10)
@@ -226,31 +226,31 @@ describe('System - Alias', function () {
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should not be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
+        global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
           expect(err).to.equal(null)
           expect(count).to.equal(0)
           done()
         })
       })
       it('should send not found message', function () {
-        expect(global.output.pop()).to.equal(global.translate('alias.failed.remove'))
+        expect(global.output.pop()).to.equal(global.translate('keywords.failed.remove'))
       })
       it('should not parse in chat', function () {
         expect(global.output.pop()).not.to.match(/^Usage:/)
       })
     })
-    describe('parsing \'!alias remove alias something\'', function () {
+    describe('parsing \'!keyword remove keyword something\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!alias add alias test')
+        global.parser.parseCommands(testUser, '!keyword add keyword response')
         setTimeout(function () {
-          global.parser.parseCommands(testUser, '!alias remove test something')
+          global.parser.parseCommands(testUser, '!keyword remove keyword something')
           setTimeout(function () { done() }, 10)
         }, 10)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
+        global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
           expect(err).to.equal(null)
           expect(count).to.equal(1)
           done()
@@ -262,36 +262,36 @@ describe('System - Alias', function () {
     })
   })
   describe('#list', function () {
-    describe('parsing \'!alias list\' when alias is added', function () {
+    describe('parsing \'!keyword list\' when keyword is added', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!alias add alias test')
-        global.parser.parseCommands(testUser, '!alias add alias test2')
+        global.parser.parseCommands(testUser, '!keyword add keyword test')
+        global.parser.parseCommands(testUser, '!keyword add keyword2 test2')
         setTimeout(function () {
-          global.parser.parseCommands(testUser, '!alias list')
+          global.parser.parseCommands(testUser, '!keyword list')
           setTimeout(function () { done() }, 10)
         }, 10)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
-      it('should send list with test and test2', function () {
-        expect(global.output.pop()).to.equal('List of aliases: !test, !test2')
+      it('should send list with keyword and keyword2', function () {
+        expect(global.output.pop()).to.equal('List of keywords: keyword, keyword2')
       })
     })
-    describe('parsing \'!alias list\' when list is empty', function () {
+    describe('parsing \'!keyword list\' when list is empty', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!alias list')
+        global.parser.parseCommands(testUser, '!keyword list')
         setTimeout(function () { done() }, 10)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should send empty list', function () {
-        expect(global.output.pop()).to.equal('List of aliases is empty')
+        expect(global.output.pop()).to.equal('List of keywords is empty')
       })
     })
-    describe('parsing \'!alias list nonsense\'', function () {
+    describe('parsing \'!keyword list nonsense\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!alias list nonsemse')
+        global.parser.parseCommands(testUser, '!keyword list nonsemse')
         setTimeout(function () { done() }, 10)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })

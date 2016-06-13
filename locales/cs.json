@@ -33,5 +33,18 @@
       "list": "Seznam prikazu je prazdny",
       "parse": "Promin, (sender), ale tento prikaz neni spravne, pro napovedu napis !command"
     }
+  },
+  "keywords": {
+    "success": {
+      "add": "Keyword byl pridan do databaze",
+      "remove": "Keyword byl smazany z databaze",
+      "list": "Seznam keywordu"
+    },
+    "failed": {
+      "add": "Tento keyword uz existuje v databazi",
+      "remove": "Tento keyword v databazi neexistuje",
+      "list": "Seznam keywordu je prazdny",
+      "parse": "Promin, (sender), ale tento prikaz neni spravne, pro napovedu napis !keyword"
+    }
   }
 }
