@@ -57,7 +57,6 @@ Parser.prototype.parseCommands = function (user, message) {
       if (this.permissionsCmds[cmd] === constants.VIEWERS || this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user)) {
         var text = message.replace(cmd, '')
         this.registeredCmds[cmd](this.selfCmds[cmd], user, text.trim(), message)
-
         break // cmd is executed
       }
     }
