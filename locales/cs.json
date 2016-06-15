@@ -46,5 +46,16 @@
       "list": "Seznam keywordu je prazdny",
       "parse": "Promin, (sender), ale tento prikaz neni spravne, pro napovedu napis !keyword"
     }
+  },
+  "moderation": {
+    "links": "Promin, (sender), ale neni povoleno vkladani linku, pozadej o !permit",
+    "permit": "Uzivatel (who) muze nyni postnout link do chatu",
+    "symbols": "Promin, (sender), ale prilisne pouzivani symbolu neni povoleno",
+    "longMessage": "Promin, (sender), ale tva zprava je prilis dlouha",
+    "caps": "Promin, (sender), ale prilisne pouzivani velkych pismen neni povoleno",
+    "spam": "Promin, (sender), ale spamovani neni povoleno",
+    "failed": {
+      "parsePermit": "Promin, (sender), ale tento prikaz neni spravne, pouzij !permit [username]"
+    }
   }
 }
