@@ -11,13 +11,13 @@ describe('System - Custom Commands', function () {
     describe('parsing \'!command\'', function () {
       it('parser should return usage text', function (done) {
         global.parser.parse(testUser, '!command')
-        setTimeout(function () { expect(global.output.pop()).to.match(/^Usage:/); done() }, 10)
+        setTimeout(function () { expect(global.output.pop()).to.match(/^Usage:/); done() }, 20)
       })
     })
     describe('parsing \'!command n/a\'', function () {
       it('parser should return usage text', function (done) {
         global.parser.parse(testUser, '!command n/a')
-        setTimeout(function () { expect(global.output.pop()).to.match(/^Usage:/); done() }, 10)
+        setTimeout(function () { expect(global.output.pop()).to.match(/^Usage:/); done() }, 20)
       })
     })
   })
