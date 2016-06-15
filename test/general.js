@@ -19,13 +19,19 @@ global.commons.sendMessage = function (text) {
   global.output.push(text)
 }
 
+global.commons.timeout = function (user, timeout) {
+  global.timeouts.push(user + ' ' + timeout)
+}
+
 global.botDB = new Database({
   inMemoryOnly: true,
   autoload: true
 })
 
 global.output = []
+global.timeouts = []
 
 global.translate = Translate
 global.translate.registerTranslations('en', require('../locales/en.json'))
 global.translate.setLocale('en')
+global.log.exitOnError = false
