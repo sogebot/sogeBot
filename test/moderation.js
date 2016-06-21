@@ -314,6 +314,7 @@ describe('System - Moderation', function () {
       })
       after(function (done) {
         global.output = []
+        global.timeouts = []
         global.botDB.remove({}, {multi: true}, function () {
           done()
         })
@@ -336,6 +337,7 @@ describe('System - Moderation', function () {
       })
       after(function (done) {
         global.output = []
+        global.timeouts = []
         global.botDB.remove({}, {multi: true}, function () {
           done()
         })
@@ -349,6 +351,49 @@ describe('System - Moderation', function () {
       })
       it('should send success message', function () {
         expect(global.output.pop()).to.equal(global.translate('moderation.permit').replace('(who)', 'soge'))
+      })
+      it('should not timeout user on first link message', function (done) {
+        global.parser.parse(testUser2, 'http://www.google.com')
+        setTimeout(function () {
+          expect(global.timeouts).to.be.empty
+          done()
+        }, 50)
+      })
+      it('should timeout user on second link message', function (done) {
+        global.parser.parse(testUser2, 'http://www.google.com')
+        setTimeout(function () {
+          expect(global.timeouts).to.not.be.empty
+          done()
+        }, 50)
+      })
+      it('should not be in db', function (done) {
+        global.botDB.count({type: 'permitLink'}, function (err, count) {
+          expect(err).to.equal(null)
+          expect(count).to.equal(0)
+          done()
+        })
+      })
+    })
+    describe('parsing \'!permit [username]\' - case sensitive test', function () {
+      before(function (done) {
+        global.parser.parse(testUser, '!permit SOGE')
+        setTimeout(function () { done() }, 50)
+      })
+      after(function (done) {
+        global.output = []
+        global.botDB.remove({}, {multi: true}, function () {
+          done()
+        })
+      })
+      it('should be in db', function (done) {
+        global.botDB.count({type: 'permitLink'}, function (err, count) {
+          expect(err).to.equal(null)
+          expect(count).to.equal(1)
+          done()
+        })
+      })
+      it('should send success message', function () {
+        expect(global.output.pop()).to.equal(global.translate('moderation.permit').replace('(who)', 'SOGE'))
       })
       it('should not timeout user on first link message', function (done) {
         global.parser.parse(testUser2, 'http://www.google.com')

@@ -22,7 +22,7 @@ function Moderation () {
 Moderation.prototype.permitLink = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w+)$/)
-    global.botDB.insert({type: 'permitLink', username: parsed[0]})
+    global.botDB.insert({type: 'permitLink', username: parsed[0].toLowerCase()})
     global.commons.sendMessage(global.translate('moderation.permit').replace('(who)', parsed[0]))
   } catch (e) {
     global.commons.sendMessage(global.translate('moderation.failed.parsePermit'), sender)
@@ -38,10 +38,10 @@ Moderation.prototype.containsLink = function (id, sender, text) {
   var urlRegex = /(https?:\/\/(?:www\.(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,}|[^\s]+\.[^\s]{2,})/ig
   if (text.search(urlRegex) >= 0) {
     global.botDB.findOne({type: 'permitLink', username: sender.username}, function (err, item) {
-      if (err) console.log(err)
+      if (err) log.error(err)
       try {
         global.botDB.remove({_id: item._id}, {}, function (err, numRemoved) {
-          if (err) console.log(err)
+          if (err) log.error(err)
           if (numRemoved === 1) global.updateQueue(id, true)
           else global.updateQueue(id, false)
         })
