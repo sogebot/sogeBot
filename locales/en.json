@@ -48,12 +48,12 @@
     }
   },
   "moderation": {
-    "links": "Sorry, (sender), but you cannot post links in chat, ask for !permit",
+    "links": "No links allowed, ask for !permit",
     "permit": "User (who) can post a link to chat",
-    "symbols": "Sorry, (sender), no excessive symbols usage",
-    "longMessage": "Sorry, (sender), long messages are not allowed",
-    "caps": "Sorry, (sender), no excessive caps usage",
-    "spam": "Sorry, (sender), spamming is not allowed",
+    "symbols": "No excessive symbols usage",
+    "longMessage": "Long messages are not allowed",
+    "caps": "No excessive caps usage",
+    "spam": "Spamming is not allowed",
     "failed": {
       "parsePermit": "Sorry, (sender), but this command is not correct, use !permit [username]"
     }
