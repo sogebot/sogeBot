@@ -19,10 +19,7 @@ describe('System - Moderation', function () {
         global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.links'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.links') + ' 5')
       })
     })
     describe('http://www.google.com', function () {
@@ -32,13 +29,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.links'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.links') + ' 5')
       })
     })
     describe('http://youtu.be/123jAJD123', function () {
@@ -48,13 +41,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.links'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.links') + ' 5')
       })
     })
     describe('https://google.com', function () {
@@ -64,13 +53,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.links'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.links') + ' 5')
       })
     })
     describe('https://www.google.com', function () {
@@ -80,13 +65,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.links'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.links') + ' 5')
       })
     })
     describe('https://youtu.be/123jAJD123', function () {
@@ -96,13 +77,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.links'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.links') + ' 5')
       })
     })
     describe('google.com', function () {
@@ -112,13 +89,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.links'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.links') + ' 5')
       })
     })
     describe('www.google.com', function () {
@@ -128,13 +101,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.links'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.links') + ' 5')
       })
     })
     describe('youtu.be/123jAJD123', function () {
@@ -144,13 +113,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.links'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.links') + ' 5')
       })
     })
   })
@@ -162,13 +127,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.symbols'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.symbols') + ' 20')
       })
     })
     describe('!@#$%^&*( one two (*&^%$#@#', function () {
@@ -178,13 +139,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.symbols'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.symbols') + ' 20')
       })
     })
     describe('!@#$%^&*( one two three four (*&^%$#@ one two three four #$%^&*)', function () {
@@ -194,13 +151,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('not timeout user', function () {
         expect(global.timeouts).to.be.empty
-      })
-      it('not timeout message', function () {
-        expect(global.output.pop()).to.not.be.equal(global.translate('moderation.symbols'))
       })
     })
     describe('!@#$%^&*()(*&^', function () {
@@ -210,13 +163,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('not timeout user', function () {
         expect(global.timeouts).to.be.empty
-      })
-      it('not timeout message', function () {
-        expect(global.output.pop()).not.to.be.equal(global.translate('moderation.symbols'))
       })
     })
   })
@@ -228,13 +177,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.longMessage'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.longMessage') + ' 20')
       })
     })
   })
@@ -246,13 +191,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.caps'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.caps') + ' 20')
       })
     })
     describe('AAAAAAAAAAAAAaaaaaaaaaaaa', function () {
@@ -262,13 +203,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.caps'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.caps') + ' 20')
       })
     })
   })
@@ -280,13 +217,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.spam'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.spam') + ' 300')
       })
     })
     describe('Lorem Ipsum Lorem Ipsum test 1 2 3 4 Lorem Ipsum Lorem Ipsum', function () {
@@ -296,13 +229,9 @@ describe('System - Moderation', function () {
       })
       after(function () {
         global.timeouts = []
-        global.output = []
       })
       it('timeout user', function () {
-        expect(global.timeouts).to.not.be.empty
-      })
-      it('timeout message', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('moderation.spam'))
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.spam') + ' 300')
       })
     })
   })
@@ -362,7 +291,7 @@ describe('System - Moderation', function () {
       it('should timeout user on second link message', function (done) {
         global.parser.parse(testUser2, 'http://www.google.com')
         setTimeout(function () {
-          expect(global.timeouts).to.not.be.empty
+          expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.links') + ' 5')
           done()
         }, 50)
       })
@@ -405,7 +334,7 @@ describe('System - Moderation', function () {
       it('should timeout user on second link message', function (done) {
         global.parser.parse(testUser2, 'http://www.google.com')
         setTimeout(function () {
-          expect(global.timeouts).to.not.be.empty
+          expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.links') + ' 5')
           done()
         }, 50)
       })

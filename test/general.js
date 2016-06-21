@@ -19,8 +19,8 @@ global.commons.sendMessage = function (text) {
   global.output.push(text)
 }
 
-global.commons.timeout = function (user, timeout) {
-  global.timeouts.push(user + ' ' + timeout)
+global.commons.timeout = function (user, reason, timeout) {
+  global.timeouts.push(user + ': ' + reason + ' ' + timeout)
 }
 
 global.botDB = new Database({
