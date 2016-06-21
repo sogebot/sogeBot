@@ -2,7 +2,6 @@
 
 var chalk = require('chalk')
 var constants = require('../constants')
-var _ = require('lodash')
 var log = global.log
 
 function Moderation () {

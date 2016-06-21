@@ -1,4 +1,4 @@
-/* global describe it beforeEach after before */
+/* global describe it after before */
 
 var expect = require('chai').expect
 var testUser = {username: 'sogehige'}
