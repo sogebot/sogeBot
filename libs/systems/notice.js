@@ -2,6 +2,10 @@
 
 var chalk = require('chalk')
 var constants = require('../constants')
+var crypto = require('crypto')
+var _ = require('lodash')
+var log = global.log
+var translate = global.translate
 
 function Notice () {
   this.lastNoticeSent = new Date().getTime()
@@ -14,17 +18,16 @@ function Notice () {
     global.parser.register(this, '!notice remove', this.remove, constants.OWNER_ONLY)
     global.parser.register(this, '!notice', this.help, constants.OWNER_ONLY)
 
-    global.configuration.register('noticeInterval', 'Notice minimal interval succesfully set to (value) minutes', 'number', 10)
-    global.configuration.register('noticeMsgReq', 'Notice minimal required message chat count set to (value).', 'number', 10)
+    global.configuration.register('noticeInterval', translate('notice.settings.noticeInterval'), 'number', 10)
+    global.configuration.register('noticeMsgReq', translate('notice.settings.noticeMsgReq'), 'number', 10)
 
     // start interval for posting notices
     var self = this
     setInterval(function () {
       self.send()
-    }, 60000)
+    }, 10)
   }
-
-  console.log('Notice system loaded and ' + (global.configuration.get().systems.notice === true ? chalk.green('enabled') : chalk.red('disabled')))
+  log.info('Notice system ' + translate('core.loaded') + ' ' + (global.configuration.get().systems.notice === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Notice.prototype.send = function () {
@@ -33,57 +36,69 @@ Notice.prototype.send = function () {
   var now = new Date().getTime()
 
   if (now - this.lastNoticeSent >= timeIntervalInMs && global.parser.linesParsed - this.msgCountSent >= noticeMinChatMsg) {
-    global.botDB.findOne({type: 'notices'}).sort({ time: 1 }).exec(function (err, item) {
-      if (err) console.log(err)
+    var self = this
+    global.botDB.findOne({$where: function () { return this._id.startsWith('notice') }}).sort({ time: 1 }).exec(function (err, item) {
+      if (err) log.error(err)
       if (typeof item !== 'undefined' && item !== null) {
-        global.botDB.update({type: 'notices', _id: item._id}, {$set: {time: new Date().getTime()}}, {}, function () {
-          global.client.action(global.configuration.get().twitch.owner, item.text)
+        global.botDB.update({_id: item._id}, {$set: {time: new Date().getTime()}}, {}, function () {
+          // reset counters
+          self.lastNoticeSent = new Date().getTime()
+          self.msgCountSent = global.parser.linesParsed
+          global.commons.sendMessage(item.text)
         })
       }
     })
-
-    // reset counters
-    this.lastNoticeSent = new Date().getTime()
-    this.msgCountSent = global.parser.linesParsed
   }
 }
 
-Notice.prototype.help = function () {
-  var text = 'Usage: !notice add <text> | !notice get <id> | !notice remove <id> | !notice list'
-  global.client.action(global.configuration.get().twitch.owner, text)
+Notice.prototype.help = function (self, sender) {
+  global.commons.sendMessage(global.translate('core.usage') + ': !notice add <text> | !notice get <id> | !notice remove <id> | !notice list', sender)
 }
 
 Notice.prototype.add = function (self, sender, text) {
-  var data = {_type: 'notices', _text: text, time: new Date().getTime(), success: 'Notice was succesfully added', error: 'Sorry, ' + sender.username + ', this notice already exists.'}
-  data._text.length < 1 ? global.commons.sendMessage('Sorry, ' + sender.username + ', notice command is not correct, check !notice') : global.commons.insertIfNotExists(data)
-}
-
-Notice.prototype.list = function () {
-  global.botDB.find({type: 'notices'}, function (err, docs) {
-    if (err) console.log(err)
-    var ids = []
-    docs.forEach(function (e, i, ar) { ids.push(e._id) })
-    var output = (docs.length === 0 ? 'Notice list is empty.' : 'Notice ID list: ' + ids.join(', ') + '.')
-    global.client.action(global.configuration.get().twitch.owner, output)
-  })
-}
-
-Notice.prototype.get = function (self, user, id) {
-  if (id.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Notice error: Cannot get notice without id.')
-    return
+  try {
+    var parsed = text.match(/^(\w.+)$/)
+    var hash = crypto.createHash('md5').update(parsed[0]).digest('hex')
+    global.commons.insertIfNotExists({__id: 'notice_' + hash, _text: parsed[0], time: new Date().getTime(), success: global.translate('notice.success.add'), error: global.translate('notice.failed.add')})
+  } catch (e) {
+    global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
   }
+}
 
-  global.botDB.findOne({type: 'notices', _id: id}, function (err, docs) {
-    if (err) console.log(err)
-    var output = (typeof docs === 'undefined' || docs === null ? 'Notice#' + id + ' cannot be found.' : docs.text)
-    global.client.action(global.configuration.get().twitch.owner, output)
-  })
+Notice.prototype.list = function (self, sender, text) {
+  if (_.isNull(text.match(/^(\w+)$/))) {
+    global.botDB.find({$where: function () { return this._id.startsWith('notice') }}, function (err, docs) {
+      if (err) { log.error(err) }
+      var list = []
+      docs.forEach(function (e, i, ar) { list.push(e._id.split('_')[1]) })
+      var output = (docs.length === 0 ? global.translate('notice.failed.list') : global.translate('notice.success.list') + ': ' + list.join(', '))
+      global.commons.sendMessage(output, sender)
+    })
+  } else {
+    global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
+  }
+}
+
+Notice.prototype.get = function (self, sender, text) {
+  try {
+    var parsed = text.match(/^(\w+)$/)
+    global.botDB.findOne({_id: 'notice_' + parsed[0]}, function (err, docs) {
+      if (err) log.error(err)
+      var output = (typeof docs === 'undefined' || docs === null ? global.translate('notice.failed.notFound') : 'Notice#' + parsed[0] + ': ' + docs.text)
+      global.commons.sendMessage(output)
+    })
+  } catch (e) {
+    global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
+  }
 }
 
 Notice.prototype.remove = function (self, sender, text) {
-  var data = {_type: 'notices', _id: text.trim(), success: 'Notice was succesfully removed.', error: 'Notice cannot be found.'}
-  data._id.length < 1 ? this.sendMessage('Sorry, ' + sender.username + ', Notice command is not correct, check !notice') : global.commons.remove(data)
+  try {
+    var parsed = text.match(/^(\w+)$/)
+    global.commons.remove({__id: 'notice_' + parsed[1], success: global.translate('notice.success.remove'), error: global.translate('notice.failed.notFound')})
+  } catch (e) {
+    global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
+  }
 }
 
 module.exports = new Notice()
