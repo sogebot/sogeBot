@@ -348,9 +348,9 @@ describe('System - Notice', function () {
       for (var i = 0; i < 20; i++) {
         setTimeout(function () {
           global.parser.parse(testUser, i.toString())
-        }, 10 * i)
+        }, 20 * i)
       }
-      setTimeout(function () { done() }, 210)
+      setTimeout(function () { done() }, 500)
     })
     it('trigger after 5 messages', function () {
       expect(global.output.length).to.be.equal(7) // 3 for success messages, 4*5 = 20 messages
