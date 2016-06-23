@@ -350,7 +350,7 @@ describe('System - Notice', function () {
           global.parser.parse(testUser, i.toString())
         }, 10 * i)
       }
-      setTimeout(function () { done() }, 200)
+      setTimeout(function () { done() }, 210)
     })
     it('trigger after 5 messages', function () {
       expect(global.output.length).to.be.equal(7) // 3 for success messages, 4*5 = 20 messages
