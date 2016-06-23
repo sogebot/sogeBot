@@ -47,6 +47,23 @@
       "parse": "Promin, (sender), ale tento prikaz neni spravne, pro napovedu napis !keyword"
     }
   },
+  "notice": {
+    "success": {
+      "add": "Oznameni bylo pridano do databaze",
+      "remove": "Oznameni bylo smazano z database",
+      "list": "Seznam oznameni"
+    },
+    "failed": {
+      "add": "Toto oznameni jiz existuje v databazi",
+      "notFound": "Toto oznameni v databazi neexistuje",
+      "list": "Seznam oznameni je prazdny",
+      "parse": "Promin, (sender), ale tento prikaz neni spravne, pro napovedu napis !notice"
+    },
+    "settings": {
+      "noticeInterval": "Minimalni interval pro zobrazeni oznameni je nastaven na (value) minut",
+      "noticeMsgReq": "Minimalni pocet zprav pro zobrazeni oznameni je nastaven na (value)"
+    }
+  },
   "moderation": {
     "links": "Nejsou povoleny linky, pozadej o !permit",
     "permit": "Uzivatel (who) muze nyni postnout link do chatu",

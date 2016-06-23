@@ -47,6 +47,23 @@
       "parse": "Sorry, (sender), but this command is not correct, for help type !keyword"
     }
   },
+  "notice": {
+    "success": {
+      "add": "Notice was added to database",
+      "remove": "Notice was deleted from database",
+      "list": "List of notices"
+    },
+    "failed": {
+      "add": "This notice already exists in database",
+      "notFound": "This notice cannot be found in database",
+      "list": "List of notices is empty",
+      "parse": "Sorry, (sender), but this command is not correct, for help type !notice"
+    },
+    "settings": {
+      "noticeInterval": "Notice minimal interval succesfully set to (value) minutes",
+      "noticeMsgReq": "Notice minimal required message chat count set to (value)"
+    }
+  },
   "moderation": {
     "links": "No links allowed, ask for !permit",
     "permit": "User (who) can post a link to chat",
