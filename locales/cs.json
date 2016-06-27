@@ -73,6 +73,13 @@
     "spam": "Spamovani neni povoleno",
     "failed": {
       "parsePermit": "Promin, (sender), ale tento prikaz neni spravne, pouzij !permit [username]"
+    },
+    "settings": {
+      "moderationLinks": "Moderovani linku je nastaveno na (value)",
+      "moderationSymbols": "Moderovani symbolu je nastaveno na (value)",
+      "moderationLongMessage": "Moderovani dlouhych zprav je nastaveno na (value)",
+      "moderationCaps": "Moderovani velkych pismen je nastaveno na (value)",
+      "moderationSpam": "Moderovani spamu je nastaveno na (value)"
     }
   }
 }
