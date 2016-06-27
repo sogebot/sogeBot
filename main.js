@@ -8,6 +8,12 @@ var Configuration = require('./libs/configuration')
 var Parser = require('./libs/parser')
 var Twitch = require('./libs/twitch')
 var Commons = require('./libs/commons')
+var Translate = require('counterpart')
+require('./libs/logging')
+
+global.translate = Translate
+global.translate.registerTranslations('en', require('./locales/en.json'))
+global.translate.registerTranslations('cs', require('./locales/cs.json'))
 
 global.parser = new Parser()
 global.configuration = new Configuration()
@@ -16,7 +22,7 @@ global.commons = new Commons()
 
 var options = {
   options: {
-    debug: true
+    debug: false
   },
   connection: {
     cluster: global.configuration.get().twitch.cluster,
@@ -44,5 +50,6 @@ global.client.on('connected', function (address, port) {
 })
 
 global.client.on('chat', function (channel, user, message, self) {
+  global.log.info(channel + ' ' + user.username + ': ' + message)
   global.parser.parse(user, message)
 })
