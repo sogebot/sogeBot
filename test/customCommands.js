@@ -11,13 +11,13 @@ describe('System - Custom Commands', function () {
     describe('parsing \'!command\'', function () {
       it('parser should return usage text', function (done) {
         global.parser.parse(testUser, '!command')
-        setTimeout(function () { expect(global.output.pop()).to.match(/^Usage:/); done() }, 50)
+        setTimeout(function () { expect(global.output.pop()).to.match(/^Usage:/); done() }, 500)
       })
     })
     describe('parsing \'!command n/a\'', function () {
       it('parser should return usage text', function (done) {
         global.parser.parse(testUser, '!command n/a')
-        setTimeout(function () { expect(global.output.pop()).to.match(/^Usage:/); done() }, 50)
+        setTimeout(function () { expect(global.output.pop()).to.match(/^Usage:/); done() }, 500)
       })
     })
   })
@@ -31,7 +31,7 @@ describe('System - Custom Commands', function () {
     describe('parsing \'!command add\'', function () {
       beforeEach(function (done) {
         global.parser.parse(testUser, '!command add')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       it('should not be in db', function (done) {
         global.botDB.count({$where: function () { return this._id.startsWith('customcmds') }}, function (err, count) {
@@ -47,7 +47,7 @@ describe('System - Custom Commands', function () {
     describe('parsing \'!command add cmd\'', function () {
       beforeEach(function (done) {
         global.parser.parse(testUser, '!command add cmd')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       it('should not be in db', function (done) {
         global.botDB.count({$where: function () { return this._id.startsWith('customcmds') }}, function (err, count) {
@@ -66,8 +66,8 @@ describe('System - Custom Commands', function () {
         global.parser.parse(testUser, '!command add cmd response')
         setTimeout(function () {
           global.parser.parse(testUser, '!cmd')
-          setTimeout(function () { done() }, 50)
-        }, 50)
+          setTimeout(function () { done() }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should be in db', function (done) {
@@ -91,8 +91,8 @@ describe('System - Custom Commands', function () {
         global.parser.parse(testUser, '!command add cmd response')
         setTimeout(function () {
           global.parser.parse(testUser, '!cmd')
-          setTimeout(function () { done() }, 50)
-        }, 50)
+          setTimeout(function () { done() }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should be once in db', function (done) {
@@ -116,7 +116,7 @@ describe('System - Custom Commands', function () {
       before(function (done) {
         global.output = []
         global.parser.parse(testUser, '!command add cmd  response')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should not be in db', function (done) {
@@ -136,8 +136,8 @@ describe('System - Custom Commands', function () {
         global.parser.parse(testUser, '!command add cmd response something')
         setTimeout(function () {
           global.parser.parse(testUser, '!cmd')
-          setTimeout(function () { done() }, 50)
-        }, 50)
+          setTimeout(function () { done() }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should be in db', function (done) {
@@ -159,8 +159,8 @@ describe('System - Custom Commands', function () {
         global.parser.parse(testUser, '!command add cmd test')
         setTimeout(function () {
           global.parser.parse(testUser, '!command remove')
-          setTimeout(function () { done() }, 50)
-        }, 50)
+          setTimeout(function () { done() }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should be in db', function (done) {
@@ -178,7 +178,7 @@ describe('System - Custom Commands', function () {
       before(function (done) {
         global.output = []
         global.parser.parse(testUser, '!command remove cmd')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should send error message', function () {
@@ -195,8 +195,8 @@ describe('System - Custom Commands', function () {
             global.parser.parse(testUser, '!cmd')
             global.output.shift() // get rid of add success msg
             done()
-          }, 50)
-        }, 50)
+          }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should not be in db', function (done) {
@@ -224,8 +224,8 @@ describe('System - Custom Commands', function () {
             global.parser.parse(testUser, '!cmd')
             global.output.shift() // get rid of add success msg
             done()
-          }, 50)
-        }, 50)
+          }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should not be in db', function (done) {
@@ -248,8 +248,8 @@ describe('System - Custom Commands', function () {
         global.parser.parse(testUser, '!command add cmd response')
         setTimeout(function () {
           global.parser.parse(testUser, '!command remove cmd something')
-          setTimeout(function () { done() }, 50)
-        }, 50)
+          setTimeout(function () { done() }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should be in db', function (done) {
@@ -272,8 +272,8 @@ describe('System - Custom Commands', function () {
         global.parser.parse(testUser, '!command add cmd2 test2')
         setTimeout(function () {
           global.parser.parse(testUser, '!command list')
-          setTimeout(function () { done() }, 50)
-        }, 50)
+          setTimeout(function () { done() }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should send list with cmd and cmd2', function () {
@@ -284,7 +284,7 @@ describe('System - Custom Commands', function () {
       before(function (done) {
         global.output = []
         global.parser.parse(testUser, '!command list')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should send empty list', function () {
@@ -295,7 +295,7 @@ describe('System - Custom Commands', function () {
       before(function (done) {
         global.output = []
         global.parser.parse(testUser, '!command list nonsemse')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should send parse error', function () {

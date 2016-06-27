@@ -18,7 +18,7 @@ describe('System - Notice', function () {
       describe('/num/', function () {
         before(function (done) {
           global.parser.parse(testUser, '!set noticeInterval 10')
-          setTimeout(function () { done() }, 100)
+          setTimeout(function () { done() }, 500)
         })
         after(function (done) { cleanup(done) })
         it('success message expected', function () {
@@ -36,7 +36,7 @@ describe('System - Notice', function () {
       describe('/string/', function () {
         before(function (done) {
           global.parser.parse(testUser, '!set noticeInterval test')
-          setTimeout(function () { done() }, 100)
+          setTimeout(function () { done() }, 500)
         })
         after(function (done) { cleanup(done) })
         it('expect parse error', function () {
@@ -53,7 +53,7 @@ describe('System - Notice', function () {
       describe('/empty/', function () {
         before(function (done) {
           global.parser.parse(testUser, '!set noticeInterval')
-          setTimeout(function () { done() }, 100)
+          setTimeout(function () { done() }, 500)
         })
         after(function (done) { cleanup(done) })
         it('expect parse error', function () {
@@ -72,7 +72,7 @@ describe('System - Notice', function () {
       describe('/num/', function () {
         before(function (done) {
           global.parser.parse(testUser, '!set noticeMsgReq 10')
-          setTimeout(function () { done() }, 100)
+          setTimeout(function () { done() }, 500)
         })
         after(function (done) { cleanup(done) })
         it('success message expected', function () {
@@ -90,7 +90,7 @@ describe('System - Notice', function () {
       describe('/string/', function () {
         before(function (done) {
           global.parser.parse(testUser, '!set noticeMsgReq test')
-          setTimeout(function () { done() }, 100)
+          setTimeout(function () { done() }, 500)
         })
         after(function (done) { cleanup(done) })
         it('expect parse error', function () {
@@ -107,7 +107,7 @@ describe('System - Notice', function () {
       describe('/empty/', function () {
         before(function (done) {
           global.parser.parse(testUser, '!set noticeMsgReq')
-          setTimeout(function () { done() }, 100)
+          setTimeout(function () { done() }, 500)
         })
         after(function (done) { cleanup(done) })
         it('expect parse error', function () {
@@ -127,13 +127,13 @@ describe('System - Notice', function () {
     describe('parsing \'!notice\'', function () {
       it('parser should return usage text', function (done) {
         global.parser.parse(testUser, '!notice')
-        setTimeout(function () { expect(global.output.pop()).to.match(/^Usage:/); done() }, 50)
+        setTimeout(function () { expect(global.output.pop()).to.match(/^Usage:/); done() }, 600)
       })
     })
     describe('parsing \'!notice n/a\'', function () {
       it('parser should return usage text', function (done) {
         global.parser.parse(testUser, '!notice n/a')
-        setTimeout(function () { expect(global.output.pop()).to.match(/^Usage:/); done() }, 50)
+        setTimeout(function () { expect(global.output.pop()).to.match(/^Usage:/); done() }, 600)
       })
     })
   })
@@ -142,7 +142,7 @@ describe('System - Notice', function () {
     describe('parsing \'!notice add\'', function () {
       beforeEach(function (done) {
         global.parser.parse(testUser, '!notice add')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       it('should not be in db', function (done) {
         global.botDB.count({$where: function () { return this._id.startsWith('notice') }}, function (err, count) {
@@ -158,7 +158,7 @@ describe('System - Notice', function () {
     describe('parsing \'!notice add test\'', function () {
       beforeEach(function (done) {
         global.parser.parse(testUser, '!notice add test')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       it('should be in db', function (done) {
         global.botDB.count({$where: function () { return this._id.startsWith('notice') }}, function (err, count) {
@@ -174,7 +174,7 @@ describe('System - Notice', function () {
     describe('parsing \'!notice add some longer text  qwerty\'', function () {
       beforeEach(function (done) {
         global.parser.parse(testUser, '!notice add some longer text  qwerty')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       it('should be in db', function (done) {
         global.botDB.count({$where: function () { return this._id.startsWith('notice') }}, function (err, count) {
@@ -191,7 +191,7 @@ describe('System - Notice', function () {
       beforeEach(function (done) {
         global.parser.parse(testUser, '!notice add test')
         global.parser.parse(testUser, '!notice add test')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       it('should be in db', function (done) {
         global.botDB.count({$where: function () { return this._id.startsWith('notice') }}, function (err, count) {
@@ -216,8 +216,8 @@ describe('System - Notice', function () {
         global.parser.parse(testUser, '!notice add test2')
         setTimeout(function () {
           global.parser.parse(testUser, '!notice list')
-          setTimeout(function () { done() }, 50)
-        }, 50)
+          setTimeout(function () { done() }, 500)
+        }, 500)
       })
       after(function (done) { cleanup(done) })
       it('should send list', function () {
@@ -227,7 +227,7 @@ describe('System - Notice', function () {
     describe('parsing \'!notice list\' when list is empty', function () {
       before(function (done) {
         global.parser.parse(testUser, '!notice list')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { cleanup(done) })
       it('should send empty list', function () {
@@ -237,7 +237,7 @@ describe('System - Notice', function () {
     describe('parsing \'!notice list nonsense\'', function () {
       before(function (done) {
         global.parser.parse(testUser, '!notice list nonsemse')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { cleanup(done) })
       it('should send parse error', function () {
@@ -253,9 +253,9 @@ describe('System - Notice', function () {
         setTimeout(function () {
           global.botDB.findOne({$where: function () { return this._id.startsWith('notice') }}, function (err, notice) {
             global.parser.parse(testUser, '!notice get ' + notice._id.split('_')[1])
-            setTimeout(function () { done() }, 50)
+            setTimeout(function () { done() }, 500)
           })
-        }, 50)
+        }, 500)
       })
       after(function (done) { cleanup(done) })
       it('should get notice', function () {
@@ -265,7 +265,7 @@ describe('System - Notice', function () {
     describe('parsing \'!notice get id\' when notice is not added', function () {
       before(function (done) {
         global.parser.parse(testUser, '!notice get ashed123h1jkh3kj')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { cleanup(done) })
       it('should not get notice', function () {
@@ -275,7 +275,7 @@ describe('System - Notice', function () {
     describe('parsing \'!notice get\'', function () {
       before(function (done) {
         global.parser.parse(testUser, '!notice get')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { cleanup(done) })
       it('should send parse error', function () {
@@ -287,7 +287,7 @@ describe('System - Notice', function () {
     describe('parsing \'!notice remove\'', function () {
       before(function (done) {
         global.parser.parse(testUser, '!notice remove')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { cleanup(done) })
       it('should send parse error', function () {
@@ -297,7 +297,7 @@ describe('System - Notice', function () {
     describe('parsing \'!notice remove some thing\'', function () {
       before(function (done) {
         global.parser.parse(testUser, '!notice remove some thing')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { cleanup(done) })
       it('should send parse error', function () {
@@ -307,7 +307,7 @@ describe('System - Notice', function () {
     describe('parsing \'!notice remove id\' without created notice', function () {
       before(function (done) {
         global.parser.parse(testUser, '!notice remove 123815891')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { cleanup(done) })
       it('should send parse error', function () {
@@ -321,9 +321,9 @@ describe('System - Notice', function () {
         setTimeout(function () {
           global.botDB.findOne({$where: function () { return this._id.startsWith('notice') }}, function (err, notice) {
             global.parser.parse(testUser, '!notice remove ' + notice._id.split('_')[1])
-            setTimeout(function () { done() }, 50)
+            setTimeout(function () { done() }, 500)
           })
-        }, 50)
+        }, 500)
       })
       after(function (done) { cleanup(done) })
       it('should not be in db', function (done) {
@@ -340,20 +340,23 @@ describe('System - Notice', function () {
   })
   describe('#trigger', function () {
     before(function (done) {
+      this.timeout(50000);
       global.parser.parse(testUser, '!set noticeMsgReq 5')
       global.parser.parse(testUser, '!set noticeInterval 0')
       global.parser.parse(testUser, '!notice add test')
       // reset parser line count
       global.parser.linesParsed = 0
-      for (var i = 0; i < 20; i++) {
-        setTimeout(function () {
-          global.parser.parse(testUser, i.toString())
-        }, 20 * i)
-      }
-      setTimeout(function () { done() }, 500)
+      setTimeout(function () {
+        for (var i = 0; i < 11; i++) {
+          setTimeout(function () {
+            global.parser.parse(testUser, i.toString())
+          }, 500 * i)
+        }
+        setTimeout(function () { done() }, 10000)
+      }, 600)
     })
     it('trigger after 5 messages', function () {
-      expect(global.output.length).to.be.equal(7) // 3 for success messages, 4*5 = 20 messages
+      expect(global.output.length).to.be.equal(5) // 3 for success messages, 2 for notices
     })
   })
 })

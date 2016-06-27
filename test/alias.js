@@ -40,7 +40,7 @@ describe('System - Alias', function () {
             expect(count).to.equal(0)
             done()
           })
-        }, 50)
+        }, 500)
       })
       it('should send parse error', function () {
         expect(global.output.pop()).to.match(/^Sorry,/)
@@ -57,7 +57,7 @@ describe('System - Alias', function () {
             expect(count).to.equal(0)
             done()
           })
-        }, 50)
+        }, 500)
       })
       it('should send parse error', function () {
         expect(global.output.pop()).to.match(/^Sorry,/)
@@ -68,7 +68,7 @@ describe('System - Alias', function () {
         global.output = []
         global.parser.parseCommands(testUser, '!alias add alias test')
         alias.parse(alias, testUser, '!test')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should be in db', function (done) {
@@ -91,7 +91,7 @@ describe('System - Alias', function () {
         global.parser.parseCommands(testUser, '!alias add alias test')
         global.parser.parseCommands(testUser, '!alias add alias test')
         alias.parse(alias, testUser, '!test')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should be once in db', function (done) {
@@ -115,7 +115,7 @@ describe('System - Alias', function () {
       before(function (done) {
         global.output = []
         global.parser.parseCommands(testUser, '!alias add alias  test')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should not be in db', function (done) {
@@ -134,7 +134,7 @@ describe('System - Alias', function () {
         global.output = []
         global.parser.parseCommands(testUser, '!alias add alias test something')
         alias.parse(alias, testUser, '!test')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should not be in db', function (done) {
@@ -156,8 +156,8 @@ describe('System - Alias', function () {
         global.parser.parseCommands(testUser, '!alias add alias test')
         setTimeout(function () {
           global.parser.parseCommands(testUser, '!alias remove')
-          setTimeout(function () { done() }, 50)
-        }, 50)
+          setTimeout(function () { done() }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should be in db', function (done) {
@@ -175,7 +175,7 @@ describe('System - Alias', function () {
       before(function (done) {
         global.output = []
         global.parser.parseCommands(testUser, '!alias remove test')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should send error message', function () {
@@ -192,8 +192,8 @@ describe('System - Alias', function () {
             alias.parse(alias, testUser, '!test')
             global.output.shift() // get rid of add success msg
             done()
-          }, 50)
-        }, 50)
+          }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should not be in db', function (done) {
@@ -221,8 +221,8 @@ describe('System - Alias', function () {
             alias.parse(alias, testUser, '!test')
             global.output.shift() // get rid of add success msg
             done()
-          }, 50)
-        }, 50)
+          }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should not be in db', function (done) {
@@ -245,8 +245,8 @@ describe('System - Alias', function () {
         global.parser.parseCommands(testUser, '!alias add alias test')
         setTimeout(function () {
           global.parser.parseCommands(testUser, '!alias remove test something')
-          setTimeout(function () { done() }, 50)
-        }, 50)
+          setTimeout(function () { done() }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should be in db', function (done) {
@@ -269,8 +269,8 @@ describe('System - Alias', function () {
         global.parser.parseCommands(testUser, '!alias add alias test2')
         setTimeout(function () {
           global.parser.parseCommands(testUser, '!alias list')
-          setTimeout(function () { done() }, 50)
-        }, 50)
+          setTimeout(function () { done() }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should send list with test and test2', function () {
@@ -281,7 +281,7 @@ describe('System - Alias', function () {
       before(function (done) {
         global.output = []
         global.parser.parseCommands(testUser, '!alias list')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should send empty list', function () {
@@ -292,7 +292,7 @@ describe('System - Alias', function () {
       before(function (done) {
         global.output = []
         global.parser.parseCommands(testUser, '!alias list nonsemse')
-        setTimeout(function () { done() }, 50)
+        setTimeout(function () { done() }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should send parse error', function () {

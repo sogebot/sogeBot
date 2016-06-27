@@ -16,7 +16,7 @@ function CustomCommands () {
     var self = this
     setInterval(function () {
       self.register(self)
-    }, 10)
+    }, 1000)
   }
   log.info('CustomCommands system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.customCommands === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
