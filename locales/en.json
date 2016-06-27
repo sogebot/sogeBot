@@ -1,0 +1,78 @@
+{
+  "core": {
+    "loaded": "is loaded and",
+    "enabled": "enabled",
+    "disabled": "disabled",
+    "usage": "Usage",
+    "online": "Stream is online for (time)",
+    "offline": "Stream is currently offline!",
+    "lang-selected": "Bot language is currently set to english"
+  },
+  "alias": {
+    "success": {
+      "add": "Alias was added to database",
+      "remove": "Alias was deleted from database",
+      "list": "List of aliases"
+    },
+    "failed": {
+      "add": "This alias already exists in database",
+      "remove": "This alias cannot be found in database",
+      "list": "List of aliases is empty",
+      "parse": "Sorry, (sender), but this command is not correct, for help type !alias"
+    }
+  },
+  "customcmds": {
+    "success": {
+      "add": "Command was added to database",
+      "remove": "Command was deleted from database",
+      "list": "List of commands"
+    },
+    "failed": {
+      "add": "This command already exists in database",
+      "remove": "This command cannot be found in database",
+      "list": "List of commands is empty",
+      "parse": "Sorry, (sender), but this command is not correct, for help type !command"
+    }
+  },
+  "keywords": {
+    "success": {
+      "add": "Keyword was added to database",
+      "remove": "Keyword was deleted from database",
+      "list": "List of keywords"
+    },
+    "failed": {
+      "add": "This keyword already exists in database",
+      "remove": "This keyword cannot be found in database",
+      "list": "List of keywords is empty",
+      "parse": "Sorry, (sender), but this command is not correct, for help type !keyword"
+    }
+  },
+  "notice": {
+    "success": {
+      "add": "Notice was added to database",
+      "remove": "Notice was deleted from database",
+      "list": "List of notices"
+    },
+    "failed": {
+      "add": "This notice already exists in database",
+      "notFound": "This notice cannot be found in database",
+      "list": "List of notices is empty",
+      "parse": "Sorry, (sender), but this command is not correct, for help type !notice"
+    },
+    "settings": {
+      "noticeInterval": "Notice minimal interval succesfully set to (value) minutes",
+      "noticeMsgReq": "Notice minimal required message chat count set to (value)"
+    }
+  },
+  "moderation": {
+    "links": "No links allowed, ask for !permit",
+    "permit": "User (who) can post a link to chat",
+    "symbols": "No excessive symbols usage",
+    "longMessage": "Long messages are not allowed",
+    "caps": "No excessive caps usage",
+    "spam": "Spamming is not allowed",
+    "failed": {
+      "parsePermit": "Sorry, (sender), but this command is not correct, use !permit [username]"
+    }
+  }
+}

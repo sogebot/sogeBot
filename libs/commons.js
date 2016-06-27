@@ -1,23 +1,19 @@
 'use strict'
 
+var _ = require('lodash')
+var log = global.log
+
 function Commons () {
 }
 
 Commons.prototype.insertIfNotExists = function (data) {
   var callbacks = this.getCallbacks(data)
-  var toFind = this.getObjectToFind(data)
   var toInsert = this.stripUnderscores(data)
   var self = this
-  global.botDB.find(toFind, function (err, docs) {
-    if (err) { console.log(err) }
-    if (docs.length === 0) { // it is safe to insert new notice?
-      global.botDB.insert(toInsert, function (err, newItem) {
-        if (err) { console.log(err) }
-        self.runCallback(callbacks.success, data)
-      })
-    } else {
-      self.runCallback(callbacks.error, data)
-    }
+
+  global.botDB.insert(toInsert, function (err, newItem) {
+    if (err) self.runCallback(callbacks.error, data)
+    else self.runCallback(callbacks.success, data)
   })
 }
 
@@ -28,7 +24,7 @@ Commons.prototype.updateOrInsert = function (data) {
   var toInsert = this.stripUnderscores(data)
   var self = this
   global.botDB.update(toFind, {$set: toUpdate}, {}, function (err, numReplaced) {
-    if (err) console.log(err)
+    if (err) log.error(err)
     if (numReplaced === 0) global.botDB.insert(toInsert)
     self.runCallback(callbacks.success, data)
   })
@@ -39,8 +35,8 @@ Commons.prototype.remove = function (data) {
   var toRemove = this.getObjectToFind(data)
   var self = this
   global.botDB.remove(toRemove, {}, function (err, numRemoved) {
-    if (err) { console.log(err) }
-    (numRemoved === 0 ? self.runCallback(callbacks.error, data) : self.runCallback(callbacks.success, data))
+    if (err) { log.error(err) }
+    numRemoved === 0 ? self.runCallback(callbacks.error, data) : self.runCallback(callbacks.success, data)
   })
 }
 
@@ -91,8 +87,13 @@ Commons.prototype.runCallback = function (cb, data) {
   typeof cb === 'function' ? cb(data) : this.sendMessage(cb.replace('(value)', value[Object.keys(value)[0]]))
 }
 
-Commons.prototype.sendMessage = function (message) {
+Commons.prototype.sendMessage = function (message, sender) {
+  message = !_.isUndefined(sender) ? message.replace('(sender)', sender.username) : message
   global.client.action(global.configuration.get().twitch.owner, message)
+}
+
+Commons.prototype.timeout = function (username, reason, timeout) {
+  global.client.timeout(global.configuration.get().twitch.owner, username, reason, timeout)
 }
 
 module.exports = Commons
