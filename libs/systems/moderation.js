@@ -3,6 +3,7 @@
 var chalk = require('chalk')
 var constants = require('../constants')
 var log = global.log
+var translate = global.translate
 
 function Moderation () {
   if (global.configuration.get().systems.moderation === true) {
@@ -13,23 +14,29 @@ function Moderation () {
     global.parser.registerParser('moderationLongMessage', this.longMessage, constants.VIEWERS)
     global.parser.registerParser('moderationCaps', this.caps, constants.VIEWERS)
     global.parser.registerParser('moderationSpam', this.spam, constants.VIEWERS)
+
+    global.configuration.register('moderationLinks', translate('moderation.settings.moderationLinks'), 'bool', true)
+    global.configuration.register('moderationSymbols', translate('moderation.settings.moderationSymbols'), 'bool', true)
+    global.configuration.register('moderationLongMessage', translate('moderation.settings.moderationLongMessage'), 'bool', true)
+    global.configuration.register('moderationCaps', translate('moderation.settings.moderationCaps'), 'bool', true)
+    global.configuration.register('moderationSpam', translate('moderation.settings.moderationSpam'), 'bool', true)
   }
 
-  log.info('Moderation system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.moderation === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+  log.info('Moderation system ' + translate('core.loaded') + ' ' + (global.configuration.get().systems.moderation === true ? chalk.green(translate('core.enabled')) : chalk.red(translate('core.disabled'))))
 }
 
 Moderation.prototype.permitLink = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w+)$/)
     global.botDB.insert({type: 'permitLink', username: parsed[0].toLowerCase()})
-    global.commons.sendMessage(global.translate('moderation.permit').replace('(who)', parsed[0]))
+    global.commons.sendMessage(translate('moderation.permit').replace('(who)', parsed[0]))
   } catch (e) {
-    global.commons.sendMessage(global.translate('moderation.failed.parsePermit'), sender)
+    global.commons.sendMessage(translate('moderation.failed.parsePermit'), sender)
   }
 }
 
 Moderation.prototype.containsLink = function (id, sender, text) {
-  if (global.parser.isOwner(sender)) {
+  if (global.parser.isOwner(sender) || !global.configuration.getValue('moderationLinks')) {
     global.updateQueue(id, true)
     return
   }
@@ -46,7 +53,7 @@ Moderation.prototype.containsLink = function (id, sender, text) {
         })
       } catch (err) {
         log.info(sender.username + ' [link] timeout: ' + text)
-        global.commons.timeout(sender.username, global.translate('moderation.links'), 5)
+        global.commons.timeout(sender.username, translate('moderation.links'), 5)
         global.updateQueue(id, false)
       }
     })
@@ -63,7 +70,7 @@ Moderation.prototype.symbols = function (id, sender, text) {
   var maxSymbolsPercent = 50
   var symbolsLength = 0
 
-  if (global.parser.isOwner(sender) || msgLength <= triggerLength) {
+  if (global.parser.isOwner(sender) || msgLength <= triggerLength || !global.configuration.getValue('moderationSymbols')) {
     global.updateQueue(id, true)
     return
   }
@@ -75,7 +82,7 @@ Moderation.prototype.symbols = function (id, sender, text) {
       if (symbols.length >= maxSymbolsConsecutively) {
         global.updateQueue(id, false)
         log.info(sender.username + ' [symbols] timeout: ' + text)
-        global.commons.timeout(sender.username, global.translate('moderation.symbols'), timeout)
+        global.commons.timeout(sender.username, translate('moderation.symbols'), timeout)
         return
       }
       symbolsLength = symbolsLength + symbols.length
@@ -84,7 +91,7 @@ Moderation.prototype.symbols = function (id, sender, text) {
   if (Math.ceil(symbolsLength / (msgLength / 100)) >= maxSymbolsPercent) {
     global.updateQueue(id, false)
     log.info(sender.username + ' [symbols] timeout: ' + text)
-    global.commons.timeout(sender.username, global.translate('moderation.symbols'), timeout)
+    global.commons.timeout(sender.username, translate('moderation.symbols'), timeout)
     return
   }
   global.updateQueue(id, true)
@@ -94,12 +101,12 @@ Moderation.prototype.longMessage = function (id, sender, text) {
   var timeout = 20
   var triggerLength = 300
   var msgLength = text.trim().length
-  if (global.parser.isOwner(sender) || msgLength < triggerLength) {
+  if (global.parser.isOwner(sender) || msgLength < triggerLength || !global.configuration.getValue('moderationLongMessage')) {
     global.updateQueue(id, true)
   } else {
     global.updateQueue(id, false)
     log.info(sender.username + ' [longMessage] timeout: ' + text)
-    global.commons.timeout(sender.username, global.translate('moderation.longMessage'), timeout)
+    global.commons.timeout(sender.username, translate('moderation.longMessage'), timeout)
   }
 }
 
@@ -110,7 +117,7 @@ Moderation.prototype.caps = function (id, sender, text) {
   var maxCapsPercent = 50
   var capsLength = 0
 
-  if (global.parser.isOwner(sender) || msgLength <= triggerLength) {
+  if (global.parser.isOwner(sender) || msgLength <= triggerLength || !global.configuration.getValue('moderationCaps')) {
     global.updateQueue(id, true)
     return
   }
@@ -123,7 +130,7 @@ Moderation.prototype.caps = function (id, sender, text) {
   if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
     global.updateQueue(id, false)
     log.info(sender.username + ' [caps] timeout: ' + text)
-    global.commons.timeout(sender.username, global.translate('moderation.caps'), timeout)
+    global.commons.timeout(sender.username, translate('moderation.caps'), timeout)
     return
   }
   global.updateQueue(id, true)
@@ -135,7 +142,7 @@ Moderation.prototype.spam = function (id, sender, text) {
   var msgLength = text.trim().length
   var maxSpamLength = 15
 
-  if (global.parser.isOwner(sender) || msgLength <= triggerLength) {
+  if (global.parser.isOwner(sender) || msgLength <= triggerLength || !global.configuration.getValue('moderationSpam')) {
     global.updateQueue(id, true)
     return
   }
@@ -144,7 +151,7 @@ Moderation.prototype.spam = function (id, sender, text) {
     if (out.hasOwnProperty(item) && out[item].length >= maxSpamLength) {
       global.updateQueue(id, false)
       log.info(sender.username + ' [spam] timeout: ' + text)
-      global.commons.timeout(sender.username, global.translate('moderation.spam'), timeout)
+      global.commons.timeout(sender.username, translate('moderation.spam'), timeout)
       break
     }
   }

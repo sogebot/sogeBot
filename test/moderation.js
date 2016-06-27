@@ -9,6 +9,25 @@ require('../libs/systems/moderation')
 
 describe('System - Moderation', function () {
   describe('Links', function () {
+    describe('http://google.com - moderation OFF', function () {
+      before(function (done) {
+        global.parser.parse(testUser, '!set moderationLinks false')
+        setTimeout(function () { done() }, 50)
+      })
+      after(function (done) {
+        global.timeouts = []
+        global.output = []
+        global.parser.parse(testUser, '!set moderationLinks true')
+        setTimeout(function () { done() }, 50)
+      })
+      it('will not timeout user', function (done) {
+        global.parser.parse(testUser2, 'http://www.google.com')
+        setTimeout(function () {
+          expect(global.timeouts).to.be.empty
+          done()
+        }, 50)
+      })
+    })
     describe('http://google.com', function () {
       before(function (done) {
         global.parser.parse(testUser2, 'http://google.com')
@@ -120,6 +139,25 @@ describe('System - Moderation', function () {
     })
   })
   describe('Symbols', function () {
+    describe('!@#$%^&*()(*&^%$#@#$%^&*) - moderation OFF', function () {
+      before(function (done) {
+        global.parser.parse(testUser, '!set moderationSymbols false')
+        setTimeout(function () { done() }, 50)
+      })
+      after(function (done) {
+        global.timeouts = []
+        global.output = []
+        global.parser.parse(testUser, '!set moderationSymbols true')
+        setTimeout(function () { done() }, 50)
+      })
+      it('will not timeout user', function (done) {
+        global.parser.parse(testUser2, '!@#$%^&*()(*&^%$#@#$%^&*)')
+        setTimeout(function () {
+          expect(global.timeouts).to.be.empty
+          done()
+        }, 50)
+      })
+    })
     describe('!@#$%^&*()(*&^%$#@#$%^&*)', function () {
       before(function (done) {
         global.parser.parse(testUser2, '!@#$%^&*()(*&^%$#@#$%^&*)')
@@ -170,6 +208,25 @@ describe('System - Moderation', function () {
     })
   })
   describe('Long Message', function () {
+    describe('asdfstVTzgo3KrfNekGTjomK7nBjEX9B3Vw4qctminLjzfqbT8q6Cd23pVSuw0wuWPAJE9vaBDC4PIYkKCleX8yBXBiQMKwJWb8uonmbOzNgpuMpcF6vpF3mRc8bbonrfVHqbT00QpjPJHXOF88XrjgR8v0BQVlsX61lpT8vbqjZRlizoMa2bruKU3GtONgZhtJJQyRJEVo3OTiAgha2kC0PHUa8ZSRNCoTsDWc76BTfa2JntlTgIXmX2aXTDQEyBomkSQAof4APE0sfX9HvEROQqP9SSf09VK1weXNcsmMs - moderation OFF', function () {
+      before(function (done) {
+        global.parser.parse(testUser, '!set moderationLongMessage false')
+        setTimeout(function () { done() }, 50)
+      })
+      after(function (done) {
+        global.timeouts = []
+        global.output = []
+        global.parser.parse(testUser, '!set moderationLongMessage true')
+        setTimeout(function () { done() }, 50)
+      })
+      it('will not timeout user', function (done) {
+        global.parser.parse(testUser2, 'asdfstVTzgo3KrfNekGTjomK7nBjEX9B3Vw4qctminLjzfqbT8q6Cd23pVSuw0wuWPAJE9vaBDC4PIYkKCleX8yBXBiQMKwJWb8uonmbOzNgpuMpcF6vpF3mRc8bbonrfVHqbT00QpjPJHXOF88XrjgR8v0BQVlsX61lpT8vbqjZRlizoMa2bruKU3GtONgZhtJJQyRJEVo3OTiAgha2kC0PHUa8ZSRNCoTsDWc76BTfa2JntlTgIXmX2aXTDQEyBomkSQAof4APE0sfX9HvEROQqP9SSf09VK1weXNcsmMs')
+        setTimeout(function () {
+          expect(global.timeouts).to.be.empty
+          done()
+        }, 50)
+      })
+    })
     describe('asdfstVTzgo3KrfNekGTjomK7nBjEX9B3Vw4qctminLjzfqbT8q6Cd23pVSuw0wuWPAJE9vaBDC4PIYkKCleX8yBXBiQMKwJWb8uonmbOzNgpuMpcF6vpF3mRc8bbonrfVHqbT00QpjPJHXOF88XrjgR8v0BQVlsX61lpT8vbqjZRlizoMa2bruKU3GtONgZhtJJQyRJEVo3OTiAgha2kC0PHUa8ZSRNCoTsDWc76BTfa2JntlTgIXmX2aXTDQEyBomkSQAof4APE0sfX9HvEROQqP9SSf09VK1weXNcsmMs', function () {
       before(function (done) {
         global.parser.parse(testUser2, 'asdfstVTzgo3KrfNekGTjomK7nBjEX9B3Vw4qctminLjzfqbT8q6Cd23pVSuw0wuWPAJE9vaBDC4PIYkKCleX8yBXBiQMKwJWb8uonmbOzNgpuMpcF6vpF3mRc8bbonrfVHqbT00QpjPJHXOF88XrjgR8v0BQVlsX61lpT8vbqjZRlizoMa2bruKU3GtONgZhtJJQyRJEVo3OTiAgha2kC0PHUa8ZSRNCoTsDWc76BTfa2JntlTgIXmX2aXTDQEyBomkSQAof4APE0sfX9HvEROQqP9SSf09VK1weXNcsmMs')
@@ -184,6 +241,26 @@ describe('System - Moderation', function () {
     })
   })
   describe('Caps', function () {
+    describe('AAAAAAAAAAAAAAAAAAAAAA - moderation OFF', function () {
+      before(function (done) {
+        global.parser.parse(testUser, '!set moderationCaps false')
+        global.parser.parse(testUser, '!set moderationSpam false')
+        setTimeout(function () { done() }, 50)
+      })
+      after(function (done) {
+        global.timeouts = []
+        global.output = []
+        global.parser.parse(testUser, '!set moderationCaps true')
+        setTimeout(function () { done() }, 50)
+      })
+      it('will not timeout user', function (done) {
+        global.parser.parse(testUser2, 'AAAAAAAAAAAAAAAAAAAAAA')
+        setTimeout(function () {
+          expect(global.timeouts).to.be.empty
+          done()
+        }, 50)
+      })
+    })
     describe('AAAAAAAAAAAAAAAAAAAAAA', function () {
       before(function (done) {
         global.parser.parse(testUser2, 'AAAAAAAAAAAAAAAAAAAAAA')
@@ -210,6 +287,25 @@ describe('System - Moderation', function () {
     })
   })
   describe('Spam', function () {
+    describe('Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum - moderation OFF', function () {
+      before(function (done) {
+        global.parser.parse(testUser, '!set moderationSpam false')
+        setTimeout(function () { done() }, 50)
+      })
+      after(function (done) {
+        global.timeouts = []
+        global.output = []
+        global.parser.parse(testUser, '!set moderationSpam true')
+        setTimeout(function () { done() }, 50)
+      })
+      it('will not timeout user', function (done) {
+        global.parser.parse(testUser2, 'Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum')
+        setTimeout(function () {
+          expect(global.timeouts).to.be.empty
+          done()
+        }, 50)
+      })
+    })
     describe('Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum', function () {
       before(function (done) {
         global.parser.parse(testUser2, 'Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum')
