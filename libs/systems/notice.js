@@ -25,7 +25,7 @@ function Notice () {
     var self = this
     setInterval(function () {
       self.send()
-    }, 10)
+    }, 1000)
   }
   log.info('Notice system ' + translate('core.loaded') + ' ' + (global.configuration.get().systems.notice === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }

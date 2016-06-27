@@ -20,9 +20,10 @@ function Parser () {
       if (queue.hasOwnProperty(id) && queue[id].success === queue[id].started) {
         self.parseCommands(queue[id].user, queue[id].message)
         global.removeFromQueue(id)
+        break
       }
     }
-  }, 10)
+  }, 200)
 }
 
 Parser.prototype.parse = function (user, message) {
