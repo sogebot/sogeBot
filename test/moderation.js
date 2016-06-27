@@ -28,6 +28,20 @@ describe('System - Moderation', function () {
         }, 50)
       })
     })
+    describe('#42 - proc hrajes tohle auto je dost na nic ....', function () {
+      after(function (done) {
+        global.timeouts = []
+        global.output = []
+        setTimeout(function () { done() }, 50)
+      })
+      it('will not timeout user', function (done) {
+        global.parser.parse(testUser2, 'proc hrajes tohle auto je dost na nic ....')
+        setTimeout(function () {
+          expect(global.timeouts).to.be.empty
+          done()
+        }, 50)
+      })
+    })
     describe('http://google.com', function () {
       before(function (done) {
         global.parser.parse(testUser2, 'http://google.com')
