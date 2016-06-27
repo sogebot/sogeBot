@@ -41,7 +41,7 @@ Moderation.prototype.containsLink = function (id, sender, text) {
     return
   }
 
-  var urlRegex = /(https?:\/\/(?:www\.(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,}|[^\s]+\.[^\s]{2,})/ig
+  var urlRegex = /(^|\s)((https?:\/\/)?[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/ig
   if (text.search(urlRegex) >= 0) {
     global.botDB.findOne({type: 'permitLink', username: sender.username}, function (err, item) {
       if (err) log.error(err)
