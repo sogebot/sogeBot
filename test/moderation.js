@@ -42,6 +42,46 @@ describe('System - Moderation', function () {
         }, 500)
       })
     })
+    describe('#44 - 1.2.3.4', function () {
+      after(function (done) {
+        global.timeouts = []
+        global.output = []
+        setTimeout(function () { done() }, 500)
+      })
+      it('will not timeout user', function (done) {
+        global.parser.parse(testUser2, '1.2.3.4')
+        setTimeout(function () {
+          expect(global.timeouts).to.be.empty
+          done()
+        }, 500)
+      })
+    })
+    describe('http://google.COM', function () {
+      before(function (done) {
+        global.parser.parse(testUser2, 'http://google.COM')
+        setTimeout(function () { done() }, 500)
+      })
+      after(function () {
+        global.timeouts = []
+        global.output = []
+      })
+      it('timeout user', function () {
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.links') + ' 5')
+      })
+    })
+    describe('google.COM', function () {
+      before(function (done) {
+        global.parser.parse(testUser2, 'google.COM')
+        setTimeout(function () { done() }, 500)
+      })
+      after(function () {
+        global.timeouts = []
+        global.output = []
+      })
+      it('timeout user', function () {
+        expect(global.timeouts).to.contain('soge: ' + global.translate('moderation.links') + ' 5')
+      })
+    })
     describe('http://google.com', function () {
       before(function (done) {
         global.parser.parse(testUser2, 'http://google.com')
