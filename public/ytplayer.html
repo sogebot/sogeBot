@@ -58,6 +58,10 @@
             var meanLoudness = -16 // default value
             var volume = 20
 
+            Number.prototype.isInteger = function() {
+              return (this ^ 0) === +this;
+            }
+
             function onYouTubeIframeAPIReady() {
                 player = new YT.Player('YTPlayer', {
                     width: 600,
