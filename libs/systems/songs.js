@@ -222,7 +222,10 @@ Songs.prototype.help = function () {
 }
 
 Songs.prototype.addSongToQueue = function (self, sender, text) {
-  if (text.length < 1) return
+  if (text.length < 1) {
+    global.commons.sendMessage('Usage: !songrequest <video-id>')
+    return
+  }
 
   var videoID = text.trim()
 
