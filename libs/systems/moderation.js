@@ -2,6 +2,7 @@
 
 var chalk = require('chalk')
 var constants = require('../constants')
+var _ = require('lodash')
 var log = global.log
 var translate = global.translate
 
@@ -9,11 +10,11 @@ function Moderation () {
   if (global.configuration.get().systems.moderation === true) {
     global.parser.register(this, '!permit', this.permitLink, constants.OWNER_ONLY)
 
-    global.parser.registerParser('moderationLinks', this.containsLink, constants.VIEWERS)
-    global.parser.registerParser('moderationSymbols', this.symbols, constants.VIEWERS)
-    global.parser.registerParser('moderationLongMessage', this.longMessage, constants.VIEWERS)
-    global.parser.registerParser('moderationCaps', this.caps, constants.VIEWERS)
-    global.parser.registerParser('moderationSpam', this.spam, constants.VIEWERS)
+    global.parser.registerParser(this, 'moderationLinks', this.containsLink, constants.VIEWERS)
+    global.parser.registerParser(this, 'moderationSymbols', this.symbols, constants.VIEWERS)
+    global.parser.registerParser(this, 'moderationLongMessage', this.longMessage, constants.VIEWERS)
+    global.parser.registerParser(this, 'moderationCaps', this.caps, constants.VIEWERS)
+    global.parser.registerParser(this, 'moderationSpam', this.spam, constants.VIEWERS)
 
     global.configuration.register('moderationLinks', translate('moderation.settings.moderationLinks'), 'bool', true)
     global.configuration.register('moderationSymbols', translate('moderation.settings.moderationSymbols'), 'bool', true)
@@ -23,6 +24,13 @@ function Moderation () {
   }
 
   log.info('Moderation system ' + translate('core.loaded') + ' ' + (global.configuration.get().systems.moderation === true ? chalk.green(translate('core.enabled')) : chalk.red(translate('core.disabled'))))
+}
+
+Moderation.prototype.whitelisted = function (text) {
+  // TODO: it's hardcoded now just for youtube
+  var urlRegex = /^!.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)[^#&\?]*.*/
+  var match = text.trim().match(urlRegex)
+  return !_.isNull(match)
 }
 
 Moderation.prototype.permitLink = function (self, sender, text) {
@@ -35,8 +43,8 @@ Moderation.prototype.permitLink = function (self, sender, text) {
   }
 }
 
-Moderation.prototype.containsLink = function (id, sender, text) {
-  if (global.parser.isOwner(sender) || !global.configuration.getValue('moderationLinks')) {
+Moderation.prototype.containsLink = function (self, id, sender, text) {
+  if (global.parser.isOwner(sender) || !global.configuration.getValue('moderationLinks') || self.whitelisted(text)) {
     global.updateQueue(id, true)
     return
   }
@@ -62,7 +70,7 @@ Moderation.prototype.containsLink = function (id, sender, text) {
   }
 }
 
-Moderation.prototype.symbols = function (id, sender, text) {
+Moderation.prototype.symbols = function (self, id, sender, text) {
   var timeout = 20
   var triggerLength = 15
   var msgLength = text.trim().length
@@ -97,7 +105,7 @@ Moderation.prototype.symbols = function (id, sender, text) {
   global.updateQueue(id, true)
 }
 
-Moderation.prototype.longMessage = function (id, sender, text) {
+Moderation.prototype.longMessage = function (self, id, sender, text) {
   var timeout = 20
   var triggerLength = 300
   var msgLength = text.trim().length
@@ -110,7 +118,7 @@ Moderation.prototype.longMessage = function (id, sender, text) {
   }
 }
 
-Moderation.prototype.caps = function (id, sender, text) {
+Moderation.prototype.caps = function (self, id, sender, text) {
   var timeout = 20
   var triggerLength = 15
   var msgLength = text.trim().length
@@ -136,7 +144,7 @@ Moderation.prototype.caps = function (id, sender, text) {
   global.updateQueue(id, true)
 }
 
-Moderation.prototype.spam = function (id, sender, text) {
+Moderation.prototype.spam = function (self, id, sender, text) {
   var timeout = 300
   var triggerLength = 15
   var msgLength = text.trim().length
