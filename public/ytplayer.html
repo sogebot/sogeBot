@@ -56,8 +56,8 @@
             var volume = 20
 
 	    Number.isInteger = Number.isInteger || function(value) {
-                return typeof value === "number" && 
-                isFinite(value) && 
+                return typeof value === "number" &&
+                isFinite(value) &&
                     Math.floor(value) === value;
             };
 
@@ -109,7 +109,7 @@
 
             socket.on('videoID', function(video) {
                 video.loudness = typeof video.loudness !== 'undefined' ? video.loudness : -15
-                var correction = Math.ceil((volume/100) * 4)
+                var correction = Math.ceil((volume/100) * 3)
                 var loudnessDiff = parseFloat(parseFloat(meanLoudness) - video.loudness)
                 var newVol = Math.round(volume + correction * loudnessDiff)
                 player.loadVideoById(video.videoID);
