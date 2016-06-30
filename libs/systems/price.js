@@ -11,7 +11,7 @@ function Price () {
     global.parser.register(this, '!price unset', this.unsetPrice, constants.OWNER_ONLY)
     global.parser.register(this, '!price', this.help, constants.OWNER_ONLY)
 
-    global.parser.registerParser('price', this.checkPrice, constants.VIEWERS)
+    global.parser.registerParser(this, 'price', this.checkPrice, constants.VIEWERS)
   }
 
   console.log('Price system (dependency on Points system) loaded and ' + (global.configuration.get().systems.price === true && global.configuration.get().systems.points === true ? chalk.green('enabled') : chalk.red('disabled')))
