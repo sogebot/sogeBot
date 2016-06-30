@@ -25,7 +25,6 @@ var options = {
     debug: false
   },
   connection: {
-    cluster: global.configuration.get().twitch.cluster,
     reconnect: true
   },
   identity: {
