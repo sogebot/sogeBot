@@ -25,7 +25,6 @@ var options = {
     debug: false
   },
   connection: {
-    cluster: global.configuration.get().twitch.cluster,
     reconnect: true
   },
   identity: {
@@ -44,8 +43,6 @@ global.systems = require('auto-load')('./libs/systems/')
 global.client.connect()
 
 global.client.on('connected', function (address, port) {
-  global.client.raw('CAP REQ :twitch.tv/commands')
-  global.client.raw('CAP REQ :twitch.tv/membership')
   global.client.color('Firebrick')
 })
 

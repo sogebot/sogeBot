@@ -39,13 +39,13 @@ function Points () {
 }
 
 Points.prototype.addEvents = function (self) {
-  global.client.on('join', function (channel, username) {
-    if (username !== global.configuration.get().twitch.username) {
+  global.client.on('join', function (channel, username, fromSelf) {
+    if (!fromSelf) {
       self.startCounting(username)
     }
   })
-  global.client.on('part', function (channel, username) {
-    if (username !== global.configuration.get().twitch.username) {
+  global.client.on('part', function (channel, username, fromSelf) {
+    if (!fromSelf) {
       self.stopCounting(username)
     }
   })
