@@ -14,9 +14,6 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
         <!-- Milligram CSS minified -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.1.0/milligram.min.css">
-        <!-- YTPlayer -->
-        <script src="https://www.youtube.com/iframe_api"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.js"></script>
         <script src="/socket.io/socket.io.js"></script>
     </head>
     <body>
@@ -57,6 +54,12 @@
             var skipSong = false;
             var meanLoudness = -16 // default value
             var volume = 20
+
+	    Number.isInteger = Number.isInteger || function(value) {
+                return typeof value === "number" && 
+                isFinite(value) && 
+                    Math.floor(value) === value;
+            };
 
             function onYouTubeIframeAPIReady() {
                 player = new YT.Player('YTPlayer', {
@@ -151,5 +154,9 @@
                 }
             });
         </script>
+
+	<!-- YTPlayer -->
+        <script src="https://www.youtube.com/iframe_api"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.js"></script>
     </body>
 </html>
