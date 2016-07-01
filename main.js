@@ -48,5 +48,6 @@ global.client.on('connected', function (address, port) {
 
 global.client.on('chat', function (channel, user, message, self) {
   global.log.info(channel + ' ' + user.username + ': ' + message)
+  if (self) return;
   global.parser.parse(user, message)
 })
