@@ -89,7 +89,7 @@ Commons.prototype.runCallback = function (cb, data) {
 
 Commons.prototype.sendMessage = function (message, sender) {
   message = !_.isUndefined(sender) ? message.replace('(sender)', sender.username) : message
-  global.client.action(global.configuration.get().twitch.owner, message)
+  global.client.say(global.configuration.get().twitch.owner, message)
 }
 
 Commons.prototype.timeout = function (username, reason, timeout) {
