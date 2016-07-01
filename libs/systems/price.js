@@ -44,7 +44,7 @@ Price.prototype.listPrices = function (self, user, msg) {
   })
 }
 
-Price.prototype.checkPrice = function (id, user, msg) {
+Price.prototype.checkPrice = function (self, id, user, msg) {
   global.botDB.find({$or: [{type: 'price', $where: function () { return msg.search(new RegExp('(?:^\\!)(' + this.command + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'g')) >= 0 }}, {type: 'points', username: user.username}]}, function (err, items) {
     if (err) console.log(err)
     var price = !_.isUndefined(items[0]) && items[0].type === 'price' ? parseInt(items[0].price, 10) : 0
