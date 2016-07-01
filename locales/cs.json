@@ -64,6 +64,34 @@
       "noticeMsgReq": "Minimalni pocet zprav pro zobrazeni oznameni je nastaven na (value)"
     }
   },
+  "points": {
+    "success": {
+      "set": "(username) ma nyni nastaveno (amount) (pointsName)",
+      "give": "(sender) prave dal svych (amount) (pointsName) uzivateli (username)",
+      "all": "Vsichni online uzivatele prave ziskali (amount) (pointsName)!",
+      "rain": "Jen at prsi! Vsichni online uzivatele prave ziskali az (amount) (pointsName)!",
+      "add": "(username) ziskal (amount) (pointsName)!",
+      "remove": "A jeje, (amount) (pointsName) bylo odebrano uzivateli (username)!"
+    },
+    "failed": {
+      "set": "Promin, (sender), ale tento prikaz neni spravne, pouzij !points set [username] [amount]",
+      "give": "Promin, (sender), ale tento prikaz neni spravne, pouzij !points give [username] [amount]",
+      "giveNotEnough": "Promin, (sender), ale nemas (amount) (pointsName) abys je daroval uzivateli (username)",
+      "get": "Promin, (sender), ale tento prikaz neni spravne, pouzij !points get [username]",
+      "all": "Promin, (sender), ale tento prikaz neni spravne, pouzij !points all [amount]",
+      "rain": "Promin, (sender), ale tento prikaz neni spravne, pouzij !points rain [amount]",
+      "add": "Promin, (sender), ale tento prikaz neni spravne, pouzij !points add [username] [amount]",
+      "remove": "Promin, (sender), ale tento prikaz neni spravne, pouzij !points remove [username] [amount]"
+    },
+    "defaults": {
+      "pointsName": {
+        "single": "bod",
+        "multi": "bodu",
+        "xmulti": "4:body"
+      },
+      "pointsResponse": "(username) ma prave (amount) (pointsName)"
+    }
+  },
   "moderation": {
     "links": "Nejsou povoleny linky, pozadej o !permit",
     "permit": "Uzivatel (who) muze nyni postnout link do chatu",
