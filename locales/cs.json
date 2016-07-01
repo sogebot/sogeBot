@@ -92,6 +92,19 @@
       "pointsResponse": "(username) ma prave (amount) (pointsName)"
     }
   },
+  "price": {
+    "success": {
+      "set": "Cena za !(command) byla nastavena na (amount) (pointsName)",
+      "remove" : "Cena za !(command) byla zrusena",
+      "list": "Seznam cen"
+    },
+    "failed": {
+      "parse": "Promin, (sender), ale tento prikaz neni spravne, pouzij !price",
+      "remove": "Cena za !(command) nebyla v databazi",
+      "list": "Nejsou nastaveny zadne ceny",
+      "notEnough": "Promin, (sender), ale nemas (amount) (pointsName) k pouziti !(command)"
+    }
+  },
   "moderation": {
     "links": "Nejsou povoleny linky, pozadej o !permit",
     "permit": "Uzivatel (who) muze nyni postnout link do chatu",

@@ -92,6 +92,19 @@
       "pointsResponse": "(username) has currently (amount) (pointsName)"
     }
   },
+  "price": {
+    "success": {
+      "set": "Price for !(command) was set to (amount) (pointsName)",
+      "remove" : "Price for !(command) was unset",
+      "list": "List of prices"
+    },
+    "failed": {
+      "parse": "Sorry, (sender), but this command is not correct, for help type !price",
+      "remove": "No price was set for !(command)",
+      "list": "List of prices is empty",
+      "notEnough": "Sorry, (sender), but you don't have (amount) (pointsName) to use !(command)"
+    }
+  },
   "moderation": {
     "links": "No links allowed, ask for !permit",
     "permit": "User (who) can post a link to chat",
