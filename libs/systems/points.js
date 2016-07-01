@@ -1,6 +1,11 @@
 'use strict'
 var chalk = require('chalk')
 var constants = require('../constants')
+var User = require('../user')
+var _ = require('lodash')
+
+var log = global.log
+var translate = global.translate
 
 function Points () {
   if (global.configuration.get().systems.points === true) {
@@ -14,8 +19,8 @@ function Points () {
     global.parser.register(this, '!points', this.getPoints, constants.VIEWERS)
 
     // default is <singular>|<plural> | in some languages can be set with custom <singular>|<x:multi>|<plural> where x <= 10
-    global.configuration.register('pointsName', 'Points name was set to (value) format', 'string', 'Point|Points')
-    global.configuration.register('pointsResponse', 'Points response was changed to: (value)', 'string', '(sender) has (amount)')
+    global.configuration.register('pointsName', 'Points name was set to (value) format', 'string', '')
+    global.configuration.register('pointsResponse', 'Points response was changed to: (value)', 'string', '')
     global.configuration.register('pointsInterval', 'Points online interval set to (value) minutes', 'number', 10)
     global.configuration.register('pointsPerInterval', 'Points when online was set to (value) per online interval', 'number', 1)
     global.configuration.register('pointsIntervalOffline', 'Points offline interval set to (value) minutes', 'number', 30)
@@ -30,12 +35,8 @@ function Points () {
     setInterval(function () {
       self.updatePoints()
     }, 30000)
-
-    // disable counting for all users on start
-    global.botDB.update({type: 'points'}, {$set: {isOnline: false, partedTime: new Date().getTime()}}, {multi: true})
   }
-
-  console.log('Points system loaded and ' + (global.configuration.get().systems.points === true ? chalk.green('enabled') : chalk.red('disabled')))
+  log.info('Points system ' + translate('core.loaded') + ' ' + (global.configuration.get().systems.points === true ? chalk.green(translate('core.enabled')) : chalk.red(translate('core.disabled'))))
 }
 
 Points.prototype.addEvents = function (self) {
@@ -52,332 +53,227 @@ Points.prototype.addEvents = function (self) {
 }
 
 Points.prototype.setPoints = function (self, sender, text) {
-  if (text.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify user')
-    return
+  try {
+    var parsed = text.match(/^([\w]+) ([0-9]+)$/)
+    var user = new User(parsed[1])
+    user.set('points', parseInt(parsed[2], 10))
+    global.commons.sendMessage(translate('points.success.set')
+      .replace('(amount)', parsed[2])
+      .replace('(username)', parsed[1])
+      .replace('(pointsName)', self.getPointsName(parsed[2])), sender)
+  } catch (err) {
+    global.commons.sendMessage(translate('points.failed.set'), sender)
   }
-
-  // check if response after keyword is set
-  if (text.split(' ').length <= 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify points')
-    return
-  }
-
-  var user = text.split(' ')[0]
-  var points = parseInt(text.replace(user, '').trim(), 10)
-
-  if (!Number.isInteger(points)) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: Cannot set NaN points.')
-    return
-  }
-
-  global.botDB.findOne({type: 'points', username: user}, function (err, item) {
-    if (err) console.log(err)
-    if (typeof item === 'undefined' || item === null) {
-      global.botDB.insert({type: 'points', username: user, points: points})
-    } else {
-      global.botDB.update({type: 'points', username: user}, {$set: {points: points}}, {})
-    }
-    global.client.action(global.configuration.get().twitch.owner, 'I just set ' + points + ' Points to ' + user)
-  })
 }
 
-Points.prototype.givePoints = function (self, user, text) {
-  if (text.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify user')
-    return
-  }
+Points.prototype.givePoints = function (self, sender, text) {
+  try {
+    var parsed = text.match(/^([\w]+) ([0-9]+)$/)
+    var givePts = parseInt(parsed[2], 10)
+    var fromUser = new User(sender.username)
+    var toUser = new User(parsed[1])
 
-  // check if response after keyword is set
-  if (text.split(' ').length <= 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify points')
-    return
-  }
-
-  var user2 = text.split(' ')[0]
-  var points = parseInt(text.replace(user2, '').trim(), 10)
-
-  if (!Number.isInteger(points)) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: Cannot set NaN points.')
-    return
-  }
-
-  global.botDB.findOne({type: 'points', username: user.username}, function (err, item) {
-    if (err) console.log(err)
-    if (typeof item === 'undefined' || item === null) {
-      global.client.action(global.configuration.get().twitch.owner, 'You, ' + user.username + ', cannot give points as you have none.')
-    } else {
-      if (parseInt(item.points, 10) < points) {
-        global.client.action(global.configuration.get().twitch.owner, 'You, ' + user.username + ", don't have enough points.")
+    fromUser.isLoaded().then(function () {
+      var availablePts = parseInt(fromUser.get('points'), 10)
+      if (availablePts >= givePts) {
+        fromUser.set('points', availablePts - givePts)
+        toUser.isLoaded().then(function () {
+          var availablePts = parseInt(toUser.get('points'), 10)
+          toUser.set('points', (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts))
+          global.commons.sendMessage(translate('points.success.give')
+            .replace('(amount)', givePts)
+            .replace('(username)', parsed[1])
+            .replace('(pointsName)', self.getPointsName(givePts)), sender)
+        })
+      } else {
+        global.commons.sendMessage(translate('points.failed.giveNotEnough')
+        .replace('(amount)', givePts)
+        .replace('(username)', parsed[1])
+        .replace('(pointsName)', self.getPointsName(givePts)), sender)
       }
-      global.botDB.findOne({type: 'points', username: user2}, function (err, item) {
-        if (err) console.log(err)
-        if (typeof item === 'undefined' || item === null) {
-          global.botDB.insert({type: 'points', username: user2, points: points})
-        } else {
-          global.botDB.update({type: 'points', username: user2}, {$set: {points: parseInt(item.points, 10) + points}}, {})
+    })
+  } catch (err) {
+    global.commons.sendMessage(translate('points.failed.give'), sender)
+  }
+}
+
+Points.prototype.getPointsName = function (points) {
+  var pointsNames = global.configuration.getValue('pointsName').split('|')
+  var single, multi, xmulti
+  // get single|x:multi|multi from pointsName
+  if (global.configuration.getValue('pointsName').length === 0) {
+    xmulti = translate('points.defaults.pointsName.xmulti')
+    single = translate('points.defaults.pointsName.single')
+    multi = translate('points.defaults.pointsName.multi')
+  } else {
+    switch (pointsNames.length) {
+      case 1:
+        xmulti = null
+        single = multi = pointsNames[0]
+        break
+      case 2:
+        single = pointsNames[0]
+        multi = pointsNames[1]
+        xmulti = null
+        break
+      default:
+        var len = pointsNames.length
+        single = pointsNames[0]
+        multi = pointsNames[len - 1]
+        xmulti = {}
+
+        for (var pattern in pointsNames) {
+          if (pointsNames.hasOwnProperty(pattern) && pattern !== 0 && pattern !== len - 1) {
+            var maxPts = pointsNames[pattern].split(':')[0]
+            var name = pointsNames[pattern].split(':')[1]
+            xmulti[maxPts] = name
+          }
         }
-      })
-      global.botDB.update({type: 'points', username: user.username}, {$set: {points: parseInt(item.points, 10) - points}}, {})
-      global.client.action(global.configuration.get().twitch.owner, user.username + ' just gave ' + points + ' Points to ' + user2)
+        break
     }
-  })
+  }
+
+  var pointsName = (points === 1 ? single : multi)
+  if (typeof xmulti === 'object' && points > 1 && points <= 10) {
+    for (var i = points; i <= 10; i++) {
+      if (typeof xmulti[i] === 'string') {
+        pointsName = xmulti[i]
+        break
+      }
+    }
+  }
+  return pointsName
 }
 
 Points.prototype.getPointsFromUser = function (self, sender, text) {
-  if (text.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify user')
-    return
+  try {
+    var parsed = text.match(/^([\w]+)$/)
+    var user = new User(parsed[1])
+    user.isLoaded().then(function () {
+      var pointsResponse = (global.configuration.getValue('pointsResponse').length > 0 ? global.configuration.getValue('pointsResponse') : translate('points.defaults.pointsResponse'))
+      var points = (_.isUndefined(user.get('points')) ? 0 : user.get('points'))
+      global.commons.sendMessage(pointsResponse
+        .replace('(amount)', points)
+        .replace('(username)', parsed[1])
+        .replace('(pointsName)', self.getPointsName(points)), sender)
+    })
+  } catch (err) {
+    global.commons.sendMessage(translate('points.failed.get'), sender)
   }
-
-  var user = text.trim()
-
-  global.botDB.findOne({type: 'points', username: user.toLowerCase()}, function (err, item) {
-    if (err) console.log(err)
-    // TODO - create a function as this is used a lot
-    var points = (typeof item !== 'undefined' && item !== null ? item.points : 0)
-    var responsePattern = global.configuration.getValue('pointsResponse')
-    var pointsNames = global.configuration.getValue('pointsName').split('|')
-
-    var single, multi, xmulti
-    // get single|x:multi|multi from pointsName
-    switch (pointsNames.length) {
-      case 0:
-        xmulti = null
-        single = 'Point'
-        multi = 'Points'
-        break
-      case 1:
-        xmulti = null
-        single = multi = pointsNames[0]
-        break
-      case 2:
-        single = pointsNames[0]
-        multi = pointsNames[1]
-        xmulti = null
-        break
-      default:
-        var len = pointsNames.length
-        single = pointsNames[0]
-        multi = pointsNames[len - 1]
-        xmulti = {}
-
-        for (var pattern in pointsNames) {
-          if (pointsNames.hasOwnProperty(pattern) && pattern !== 0 && pattern !== len - 1) {
-            var maxPts = pointsNames[pattern].split(':')[0]
-            var name = pointsNames[pattern].split(':')[1]
-            xmulti[maxPts] = name
-          }
-        }
-        break
-    }
-
-    var pointsName = (points === 1 ? single : multi)
-    if (typeof xmulti === 'object' && points > 1 && points <= 10) {
-      for (var i = points; i <= 10; i++) {
-        if (typeof xmulti[i] === 'string') {
-          pointsName = xmulti[i]
-          break
-        }
-      }
-    }
-
-    global.client.action(global.configuration.get().twitch.owner,
-      responsePattern.replace('(sender)', user).replace('(amount)', points + ' ' + pointsName))
-  })
 }
 
-Points.prototype.allPoints = function (self, user, text) {
-  if (text.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify points')
-    return
-  }
-
-  var points = parseInt(text.trim(), 10)
-
-  if (!Number.isInteger(points)) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: Cannot add NaN points.')
-    return
-  }
-
-  global.botDB.find({type: 'points', isOnline: true}, function (err, items) {
-    if (err) console.log(err)
-    items.forEach(function (e, i, ar) {
-      global.botDB.update({type: 'points', username: e.username}, {$set: {points: parseInt(e.points, 10) + points}}, {})
+Points.prototype.allPoints = function (self, sender, text) {
+  try {
+    var parsed = text.match(/^([0-9]+)$/)
+    var givePts = parseInt(parsed[1], 10)
+    User.getAllOnline().then(function (users) {
+      _.each(users, function (user) {
+        user = new User(user.username)
+        user.isLoaded().then(function () {
+          var availablePts = parseInt(user.get('points'), 10)
+          user.set('points', (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts))
+        })
+      })
+      global.commons.sendMessage(translate('points.success.all')
+        .replace('(amount)', givePts)
+        .replace('(pointsName)', self.getPointsName(givePts)), sender)
     })
-    global.client.action(global.configuration.get().twitch.owner, 'I just added ' + points + ' Points to all users')
-  })
+  } catch (err) {
+    global.commons.sendMessage(translate('points.failed.all'), sender)
+  }
 }
 
-Points.prototype.rainPoints = function (self, user, text) {
-  if (text.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify max points')
-    return
-  }
-
-  var points = parseInt(text.trim(), 10)
-
-  if (!Number.isInteger(points)) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: Cannot add NaN points.')
-    return
-  }
-
-  global.botDB.find({type: 'points', isOnline: true}, function (err, items) {
-    if (err) console.log(err)
-    items.forEach(function (e, i, ar) {
-      var random = Math.floor(Math.random() * points)
-      global.botDB.update({type: 'points', username: e.username}, {$set: {points: parseInt(e.points, 10) + random}}, {})
+Points.prototype.rainPoints = function (self, sender, text) {
+  try {
+    var parsed = text.match(/^([0-9]+)$/)
+    var givePts = parseInt(parsed[1], 10)
+    User.getAllOnline().then(function (users) {
+      _.each(users, function (user) {
+        var random = Math.floor(Math.random() * givePts)
+        user = new User(user.username)
+        user.isLoaded().then(function () {
+          var availablePts = parseInt(user.get('points'), 10)
+          user.set('points', (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + random : random))
+        })
+      })
+      global.commons.sendMessage(translate('points.success.rain')
+        .replace('(amount)', givePts)
+        .replace('(pointsName)', self.getPointsName(givePts)), sender)
     })
-    global.client.action(global.configuration.get().twitch.owner, 'I just added 0-' + points + ' Points to all users')
-  })
+  } catch (err) {
+    global.commons.sendMessage(translate('points.failed.rain'), sender)
+  }
 }
 
 Points.prototype.addPoints = function (self, sender, text) {
-  if (text.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify user')
-    return
+  try {
+    var parsed = text.match(/^([\w]+) ([0-9]+)$/)
+    var user = new User(parsed[1])
+    var givePts = parseInt(parsed[2], 10)
+    user.isLoaded().then(function (users) {
+      var availablePts = parseInt(user.get('points'), 10)
+      user.set('points', (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts))
+    })
+    global.commons.sendMessage(translate('points.success.add')
+      .replace('(amount)', givePts)
+      .replace('(username)', parsed[1])
+      .replace('(pointsName)', self.getPointsName(givePts)), sender)
+  } catch (err) {
+    global.commons.sendMessage(translate('points.failed.add'), sender)
   }
-
-  // check if response after keyword is set
-  if (text.split(' ').length <= 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify points')
-    return
-  }
-
-  var user = text.split(' ')[0]
-  var points = parseInt(text.replace(user, '').trim(), 10)
-
-  if (!Number.isInteger(points)) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: Cannot add NaN points.')
-    return
-  }
-
-  global.botDB.findOne({type: 'points', username: user}, function (err, item) {
-    if (err) console.log(err)
-    if (typeof item === 'undefined' || item === null) {
-      global.botDB.insert({type: 'points', username: user, points: points})
-    } else {
-      global.botDB.update({type: 'points', username: user}, {$set: {points: parseInt(item.points, 10) + points}}, {})
-    }
-    global.client.action(global.configuration.get().twitch.owner, 'I just added ' + points + ' Points to ' + user)
-  })
 }
 
 Points.prototype.removePoints = function (self, sender, text) {
-  if (text.length < 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify user')
-    return
+  try {
+    var parsed = text.match(/^([\w]+) ([0-9]+)$/)
+    var user = new User(parsed[1])
+    var removePts = parseInt(parsed[2], 10)
+    user.isLoaded().then(function (users) {
+      var availablePts = parseInt(user.get('points'), 10)
+      if (availablePts > removePts) user.set('points', (_.isFinite(availablePts) && !_.isNumber(availablePts) ? availablePts - removePts : 0))
+      else user.set('points', 0)
+    })
+    global.commons.sendMessage(translate('points.success.remove')
+      .replace('(amount)', removePts)
+      .replace('(username)', parsed[1])
+      .replace('(pointsName)', self.getPointsName(removePts)), sender)
+  } catch (err) {
+    global.commons.sendMessage(translate('points.failed.remove'), sender)
   }
-
-  // check if response after keyword is set
-  if (text.split(' ').length <= 1) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: You need to specify points')
-    return
-  }
-
-  var user = text.split(' ')[0]
-  var points = parseInt(text.replace(user, '').trim(), 10)
-
-  if (!Number.isInteger(points)) {
-    global.client.action(global.configuration.get().twitch.owner, 'Points error: Cannot remove NaN points.')
-    return
-  }
-
-  global.botDB.findOne({type: 'points', username: user}, function (err, item) {
-    if (err) console.log(err)
-    if (typeof item === 'undefined' || item === null) {
-      global.botDB.insert({type: 'points', username: user, points: points})
-    } else {
-      if (parseInt(item.points, 10) - points < 0) { points = item.points }
-      global.botDB.update({type: 'points', username: user}, {$set: {points: parseInt(item.points, 10) - points}}, {})
-    }
-    global.client.action(global.configuration.get().twitch.owner, 'I just removed ' + points + ' Points from ' + user)
-  })
 }
 
-Points.prototype.getPoints = function (self, user) {
-  global.botDB.findOne({type: 'points', username: user.username}, function (err, item) {
-    if (err) console.log(err)
-    var points = (typeof item !== 'undefined' && item !== null ? item.points : 0)
-    var responsePattern = global.configuration.getValue('pointsResponse')
-    var pointsNames = global.configuration.getValue('pointsName').split('|')
-
-    var single, multi, xmulti
-    // get single|x:multi|multi from pointsName
-    switch (pointsNames.length) {
-      case 0:
-        xmulti = null
-        single = 'Point'
-        multi = 'Points'
-        break
-      case 1:
-        xmulti = null
-        single = multi = pointsNames[0]
-        break
-      case 2:
-        single = pointsNames[0]
-        multi = pointsNames[1]
-        xmulti = null
-        break
-      default:
-        var len = pointsNames.length
-        single = pointsNames[0]
-        multi = pointsNames[len - 1]
-        xmulti = {}
-
-        for (var pattern in pointsNames) {
-          if (pointsNames.hasOwnProperty(pattern) && pattern !== 0 && pattern !== len - 1) {
-            var maxPts = pointsNames[pattern].split(':')[0]
-            var name = pointsNames[pattern].split(':')[1]
-            xmulti[maxPts] = name
-          }
-        }
-        break
-    }
-
-    var pointsName = (points === 1 ? single : multi)
-    if (typeof xmulti === 'object' && points > 1 && points <= 10) {
-      for (var i = points; i <= 10; i++) {
-        if (typeof xmulti[i] === 'string') {
-          pointsName = xmulti[i]
-          break
-        }
-      }
-    }
-
-    global.client.action(global.configuration.get().twitch.owner,
-      responsePattern.replace('(sender)', user.username).replace('(amount)', points + ' ' + pointsName))
-  })
+Points.prototype.getPoints = function (self, sender) {
+  self.getPointsFromUser(self, sender, sender.username)
 }
 
 Points.prototype.startCounting = function (username) {
-  global.botDB.findOne({type: 'points', username: username}, function (err, item) {
-    if (err) console.log(err)
-    if (typeof item !== 'undefined' && item !== null) { // exists, update
-      var partedTime = (item.partedTime === 0 ? item.pointsGrantedAt : item.partedTime) // if not correctly parted
-      var pointsGrantedAt = new Date().getTime() + (item.pointsGrantedAt - partedTime)
-      global.botDB.update({type: 'points', _id: item._id}, {$set: {isOnline: true, pointsGrantedAt: pointsGrantedAt}}, {})
-    } else { // not exists, create a new one
-      global.botDB.insert({type: 'points', username: username, isOnline: true, pointsGrantedAt: new Date().getTime(), partedTime: 0, points: 0})
-    }
+  var user = new User(username)
+  user.isLoaded().then(function () {
+    var partedTime = (user.get('partedTime') === 0 ? user.get('pointsGrantedAt') : user.get('partedTime')) // if not correctly parted
+    var pointsGrantedAt = new Date().getTime() + (user.get('pointsGrantedAt') - partedTime)
+    user.setOnline()
+    user.set('pointsGrantedAt', (_.isFinite(parseInt(pointsGrantedAt, 10)) && _.isNumber(parseInt(pointsGrantedAt, 10)) ? parseInt(pointsGrantedAt, 10) : new Date().getTime()))
   })
 }
 
 Points.prototype.stopCounting = function (username) {
-  global.botDB.update({type: 'points', username: username}, {$set: {isOnline: false, partedTime: new Date().getTime()}}, {})
+  var user = new User(username)
+  user.setOffline()
 }
 
 Points.prototype.updatePoints = function () {
   var interval = (global.twitch.isOnline ? global.configuration.getValue('pointsInterval') * 60 * 1000 : global.configuration.getValue('pointsIntervalOffline') * 60 * 1000)
   var ptsPerInterval = (global.twitch.isOnline ? global.configuration.getValue('pointsPerInterval') : global.configuration.getValue('pointsPerIntervalOffline'))
 
-  global.botDB.find({type: 'points', isOnline: true}, function (err, items) {
-    if (err) console.log(err)
-    items.forEach(function (e, i, ar) {
-      var points = parseInt(e.points, 10) + parseInt(ptsPerInterval, 10)
-      var now = new Date().getTime()
-      if (now - e.pointsGrantedAt >= interval) {
-        global.botDB.update({type: 'points', _id: e._id}, {$set: {pointsGrantedAt: now, points: points}}, {})
+  User.getAllOnline().then(function (users) {
+    _.each(users, function (user) {
+      if (new Date().getTime() - user.pointsGrantedAt >= interval) {
+        user = new User(user.username)
+        user.isLoaded().then(function () {
+          var availablePts = parseInt(user.get('points'), 10)
+          user.set('points', (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + ptsPerInterval : ptsPerInterval))
+          user.set('pointsGrantedAt', new Date().getTime())
+        })
       }
     })
   })
