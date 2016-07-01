@@ -46,8 +46,9 @@ global.client.on('connected', function (address, port) {
   global.client.color('Firebrick')
 })
 
-global.client.on('chat', function (channel, user, message, self) {
-  global.log.info(channel + ' ' + user.username + ': ' + message)
-  if (self) return;
-  global.parser.parse(user, message)
+global.client.on('chat', function (channel, user, message, fromSelf) {
+  if (!fromSelf) {
+    global.log.info(channel + ' ' + user.username + ': ' + message)
+    global.parser.parse(user, message)
+  }
 })
