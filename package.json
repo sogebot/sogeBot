@@ -17,7 +17,7 @@
     "moment-precise-range-plugin": "^1.2.0",
     "nedb": "^1.8.0",
     "socket.io": "^1.4.6",
-    "tmi.js": "1.0.0",
+    "tmi.js": "^1.1.1",
     "winston": "^2.2.0",
     "ytdl-core": "^0.7.16"
   },
