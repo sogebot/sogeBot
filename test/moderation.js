@@ -56,22 +56,6 @@ describe('System - Moderation', function () {
         }, 500)
       })
     })
-    describe('#47 -  vypadá že máš problémy nad touto počítačovou hrou....doporučuji tvrdý alkohol', function () {
-      after(function (done) {
-        global.timeouts = []
-        global.output = []
-        setTimeout(function () { done() }, 500)
-      })
-      it('will not timeout user', function (done) {
-        global.parser.parse(testUser2, 'vypadá že máš problémy nad touto počítačovou hrou....doporučuji tvrdý alkohol')
-        setTimeout(function () {
-          expect(global.timeouts).to.be.empty
-          done()
-        }, 500)
-      })
-    })
-
-
     describe('http://google.COM', function () {
       before(function (done) {
         global.parser.parse(testUser2, 'http://google.COM')

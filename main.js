@@ -25,7 +25,6 @@ var options = {
     debug: false
   },
   connection: {
-    cluster: global.configuration.get().twitch.cluster,
     reconnect: true
   },
   identity: {
@@ -44,12 +43,12 @@ global.systems = require('auto-load')('./libs/systems/')
 global.client.connect()
 
 global.client.on('connected', function (address, port) {
-  global.client.raw('CAP REQ :twitch.tv/commands')
-  global.client.raw('CAP REQ :twitch.tv/membership')
   global.client.color('Firebrick')
 })
 
-global.client.on('chat', function (channel, user, message, self) {
-  global.log.info(channel + ' ' + user.username + ': ' + message)
-  global.parser.parse(user, message)
+global.client.on('chat', function (channel, user, message, fromSelf) {
+  if (!fromSelf) {
+    global.log.info(channel + ' ' + user.username + ': ' + message)
+    global.parser.parse(user, message)
+  }
 })

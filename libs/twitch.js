@@ -11,8 +11,7 @@ function Twitch () {
   var self = this
   setInterval(function () {
     global.client.api({
-      url: 'https://api.twitch.tv/kraken/streams/' + global.configuration.get().twitch.owner,
-      json: true
+      url: 'https://api.twitch.tv/kraken/streams/' + global.configuration.get().twitch.owner
     }, function (err, res, body) {
       if (err) console.log(err)
       if (body.stream) {

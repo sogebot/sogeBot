@@ -11,6 +11,7 @@ function Parser () {
   this.selfCmds = {}
   this.registeredParsers = {}
   this.permissionsParsers = {}
+  this.selfParsers = {}
   this.linesParsed = 0
 
   // check queue and then parseCommands\
@@ -46,7 +47,7 @@ Parser.prototype.addToQueue = function (user, message) {
     if (typeof queue[id] === 'undefined') break
     if (this.permissionsParsers[parser] === constants.VIEWERS || this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user)) {
       queue[id].started = parseInt(queue[id].started, 10) + 1
-      this.registeredParsers[parser](id, user, message)
+      this.registeredParsers[parser](this.selfParsers[parser], id, user, message)
     }
   }
 }
@@ -70,9 +71,10 @@ Parser.prototype.register = function (self, cmd, fnc, permission) {
   this.selfCmds[cmd] = self
 }
 
-Parser.prototype.registerParser = function (parser, fnc, permission) {
+Parser.prototype.registerParser = function (self, parser, fnc, permission) {
   this.registeredParsers[parser] = fnc
   this.permissionsParsers[parser] = permission
+  this.selfParsers[parser] = self
 }
 
 Parser.prototype.unregister = function (cmd) {

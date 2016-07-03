@@ -222,18 +222,22 @@ Songs.prototype.help = function () {
 }
 
 Songs.prototype.addSongToQueue = function (self, sender, text) {
-  if (text.length < 1) return
-
-  var videoID = text.trim()
-
+  if (text.length < 1) {
+    global.commons.sendMessage('Usage: !songrequest <video-id|video-url>')
+    return
+  }
+  var urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&\?]*).*/
+  var match = text.trim().match(urlRegex)
+  var videoID = (match && match[1].length === 11) ? match[1] : text.trim()
   global.botDB.findOne({type: 'song-banned', _id: videoID}, function (err, item) {
     if (err) console.log(err)
     if (!_.isNull(item)) global.commons.sendMessage('Sorry, ' + sender.username + ', but this song is banned.')
     else {
       ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
         if (err) console.log(err)
-        if (typeof videoInfo.title === 'undefined' || videoInfo.title === null) return
-        else if (videoInfo.length_seconds / 60 > global.configuration.getValue('duration')) global.commons.sendMessage('Sorry, ' + sender.username + ', but this song is too long.')
+        if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
+          global.commons.sendMessage('Sorry, ' + sender.username + ', but this song was not found')
+        } else if (videoInfo.length_seconds / 60 > global.configuration.getValue('duration')) global.commons.sendMessage('Sorry, ' + sender.username + ', but this song is too long.')
         else {
           global.botDB.insert({type: 'songRequests', videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: sender.username})
           global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to queue requested by ' + sender.username)

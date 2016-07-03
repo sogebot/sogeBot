@@ -14,9 +14,6 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
         <!-- Milligram CSS minified -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.1.0/milligram.min.css">
-        <!-- YTPlayer -->
-        <script src="https://www.youtube.com/iframe_api"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.js"></script>
         <script src="/socket.io/socket.io.js"></script>
     </head>
     <body>
@@ -58,9 +55,11 @@
             var meanLoudness = -16 // default value
             var volume = 20
 
-            Number.prototype.isInteger = function() {
-              return (this ^ 0) === +this;
-            }
+	    Number.isInteger = Number.isInteger || function(value) {
+                return typeof value === "number" &&
+                isFinite(value) &&
+                    Math.floor(value) === value;
+            };
 
             function onYouTubeIframeAPIReady() {
                 player = new YT.Player('YTPlayer', {
@@ -110,7 +109,7 @@
 
             socket.on('videoID', function(video) {
                 video.loudness = typeof video.loudness !== 'undefined' ? video.loudness : -15
-                var correction = Math.ceil((volume/100) * 4)
+                var correction = Math.ceil((volume/100) * 3)
                 var loudnessDiff = parseFloat(parseFloat(meanLoudness) - video.loudness)
                 var newVol = Math.round(volume + correction * loudnessDiff)
                 player.loadVideoById(video.videoID);
@@ -155,5 +154,9 @@
                 }
             });
         </script>
+
+	<!-- YTPlayer -->
+        <script src="https://www.youtube.com/iframe_api"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.js"></script>
     </body>
 </html>
