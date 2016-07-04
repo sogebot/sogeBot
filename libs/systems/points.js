@@ -45,11 +45,6 @@ Points.prototype.addEvents = function (self) {
       self.startCounting(username)
     }
   })
-  global.client.on('part', function (channel, username, fromSelf) {
-    if (!fromSelf) {
-      self.stopCounting(username)
-    }
-  })
 }
 
 Points.prototype.setPoints = function (self, sender, text) {
@@ -251,14 +246,8 @@ Points.prototype.startCounting = function (username) {
   user.isLoaded().then(function () {
     var partedTime = (user.get('partedTime') === 0 ? user.get('pointsGrantedAt') : user.get('partedTime')) // if not correctly parted
     var pointsGrantedAt = new Date().getTime() + (user.get('pointsGrantedAt') - partedTime)
-    user.setOnline()
     user.set('pointsGrantedAt', (_.isFinite(parseInt(pointsGrantedAt, 10)) && _.isNumber(parseInt(pointsGrantedAt, 10)) ? parseInt(pointsGrantedAt, 10) : new Date().getTime()))
   })
-}
-
-Points.prototype.stopCounting = function (username) {
-  var user = new User(username)
-  user.setOffline()
 }
 
 Points.prototype.updatePoints = function () {

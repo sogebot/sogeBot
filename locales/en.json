@@ -105,6 +105,16 @@
       "notEnough": "Sorry, (sender), but you don't have (amount) (pointsName) to use !(command)"
     }
   },
+  "lastseen": {
+    "success": {
+      "online": "(username) is currently on channel online!",
+      "never": "(username) was never in this channel!",
+      "offline": "(username) was online at (when) in this channel"
+    },
+    "failed": {
+      "parse": "Sorry, (sender), but this command is not correct, use !lastseen [username]"
+    }
+  },
   "moderation": {
     "links": "No links allowed, ask for !permit",
     "permit": "User (who) can post a link to chat",

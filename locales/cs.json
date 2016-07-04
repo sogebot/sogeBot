@@ -105,6 +105,16 @@
       "notEnough": "Promin, (sender), ale nemas (amount) (pointsName) k pouziti !(command)"
     }
   },
+  "lastseen": {
+    "success": {
+      "online": "(username) je prave na kanale online!",
+      "never": "(username) tady nikdy nebyl!",
+      "offline": "(username) byl online na tomto kanalu (when) "
+    },
+    "failed": {
+      "parse": "Sorry, (sender), but this command is not correct, use !lastseen [username]"
+    }
+  },
   "moderation": {
     "links": "Nejsou povoleny linky, pozadej o !permit",
     "permit": "Uzivatel (who) muze nyni postnout link do chatu",
