@@ -8,9 +8,9 @@ global.botDB.update({$where: function () { return this._id.startsWith('user') }}
 
 function User (username) {
   this.loaded = false
-  this.username = username
+  this.username = username.toLowerCase()
   this.data = {}
-  this.loadFromDB(username)
+  this.loadFromDB(username.toLowerCase())
 }
 
 User.prototype.loadFromDB = function (username) {
