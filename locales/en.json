@@ -115,6 +115,14 @@
       "parse": "Sorry, (sender), but this command is not correct, use !lastseen [username]"
     }
   },
+  "watched": {
+    "success": {
+      "time": "(username) watched this channel for (time) hours"
+    },
+    "failed": {
+      "parse": "Sorry, (sender), but this command is not correct, use !watched or !watched [username]"
+    }
+  },
   "moderation": {
     "links": "No links allowed, ask for !permit",
     "permit": "User (who) can post a link to chat",

@@ -112,7 +112,15 @@
       "offline": "(username) byl online na tomto kanalu (when) "
     },
     "failed": {
-      "parse": "Sorry, (sender), but this command is not correct, use !lastseen [username]"
+      "parse": "Promin, (sender), ale tento prikaz neni spravne, pouzij !lastseen [username]"
+    }
+  },
+  "watched": {
+    "success": {
+      "time": "(username) se dival na tento kanal (time) hodin"
+    },
+    "failed": {
+      "parse": "Promin, (sender), ale tento prikaz neni spravne, pouzij !watched nebo !watched [username]"
     }
   },
   "moderation": {

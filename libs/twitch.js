@@ -21,10 +21,25 @@ function Twitch () {
         self.isOnline = true
       } else self.isOnline = false
     })
+
+    // count watching time when stream is online
+    if (self.isOnline) {
+      User.getAllOnline().then(function (users) {
+        _.each(users, function (user) {
+          var watchTime = 15000
+          if (!_.isUndefined(user.watchTime)) watchTime = watchTime + user.watchTime
+          user = new User(user.username)
+          user.isLoaded().then(function () {
+            user.set('watchTime', watchTime)
+          })
+        })
+      })
+    }
   }, 15000)
 
   global.parser.register(this, '!uptime', this.uptime, constants.VIEWERS)
   global.parser.register(this, '!lastseen', this.lastseen, constants.VIEWERS)
+  global.parser.register(this, '!watched', this.watched, constants.VIEWERS)
 }
 
 Twitch.prototype.isOnline = function () {
@@ -60,6 +75,27 @@ Twitch.prototype.lastseen = function (self, sender, text) {
     })
   } catch (e) {
     global.commons.sendMessage(global.translate('lastseen.failed.parse'), sender)
+  }
+}
+
+Twitch.prototype.watched = function (self, sender, text) {
+  try {
+    var user
+    if (text.trim() < 1) user = new User(sender.username)
+    else {
+      var parsed = text.match(/^(\w+)$/)
+      user = new User(parsed[0])
+    }
+    user.isLoaded().then(function () {
+      var watchTime = user.get('watchTime')
+      watchTime = _.isFinite(parseInt(watchTime, 10)) && _.isNumber(parseInt(watchTime, 10)) ? watchTime : 0
+      var watched = watchTime / 1000 / 60 / 60
+      global.commons.sendMessage(global.translate('watched.success.time')
+        .replace('(time)', watched.toFixed(1))
+        .replace('(username)', user.username), sender)
+    })
+  } catch (e) {
+    global.commons.sendMessage(global.translate('watched.failed.parse'), sender)
   }
 }
 
