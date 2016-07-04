@@ -49,9 +49,9 @@ User.prototype.get = function (attr) {
 }
 
 User.prototype.set = function (attr, value) {
-  var data = {}
-  data[attr] = value
-  global.botDB.update({_id: 'user_' + this.data.username}, {$set: data}, {upsert: true})
+  var toUpdate = {}
+  toUpdate[attr] = value
+  global.botDB.update({_id: 'user_' + this.data.username}, {$set: toUpdate}, {upsert: true})
   this.data[attr] = value
 }
 

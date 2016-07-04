@@ -9,6 +9,7 @@ var Parser = require('./libs/parser')
 var Twitch = require('./libs/twitch')
 var Commons = require('./libs/commons')
 var Translate = require('counterpart')
+var User = require('./libs/user')
 require('./libs/logging')
 
 global.translate = Translate
@@ -50,5 +51,19 @@ global.client.on('chat', function (channel, user, message, fromSelf) {
   if (!fromSelf) {
     global.log.info(channel + ' ' + user.username + ': ' + message)
     global.parser.parse(user, message)
+  }
+})
+
+global.client.on('join', function (channel, username, fromSelf) {
+  if (!fromSelf) {
+    var user = new User(username)
+    user.setOnline()
+  }
+})
+
+global.client.on('part', function (channel, username, fromSelf) {
+  if (!fromSelf) {
+    var user = new User(username)
+    user.setOffline()
   }
 })
