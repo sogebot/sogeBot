@@ -108,8 +108,7 @@
   "lastseen": {
     "success": {
       "online": "(username) je prave na kanale online!",
-      "never": "(username) tady nikdy nebyl!",
-      "offline": "(username) byl online na tomto kanalu (when) "
+      "time": "(username) byl naposled spatren na tomto kanalu (when)"
     },
     "failed": {
       "parse": "Promin, (sender), ale tento prikaz neni spravne, pouzij !lastseen [username]"
