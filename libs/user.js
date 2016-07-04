@@ -35,12 +35,12 @@ User.prototype.isLoaded = function () {
 }
 
 User.prototype.setOnline = function () {
-  global.botDB.update({_id: 'user_' + this.username}, {$set: {isOnline: true}}, {upsert: true})
+  global.botDB.update({_id: 'user_' + this.username}, {$set: {isOnline: true, username: this.username}}, {upsert: true})
   this.data.isOnline = true
 }
 
 User.prototype.setOffline = function () {
-  global.botDB.update({_id: 'user_' + this.username}, {$set: {isOnline: false, partedTime: new Date().getTime()}}, {upsert: true})
+  global.botDB.update({_id: 'user_' + this.username}, {$set: {isOnline: false, partedTime: new Date().getTime(), username: this.username}}, {upsert: true})
   this.data.isOnline = false
 }
 
