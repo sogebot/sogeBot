@@ -18,7 +18,6 @@ User.prototype.loadFromDB = function (username) {
   global.botDB.findOne({_id: 'user_' + username}, function (err, item) {
     if (err) log.error(err)
     if (!_.isNull(item)) self.data = item
-    self.set('username', username)
     self.loaded = true
   })
 }
@@ -50,7 +49,7 @@ User.prototype.get = function (attr) {
 }
 
 User.prototype.set = function (attr, value) {
-  var toUpdate = {}
+  var toUpdate = {username: this.username}
   toUpdate[attr] = value
   global.botDB.update({_id: 'user_' + this.username}, {$set: toUpdate}, {upsert: true})
   this.data[attr] = value
