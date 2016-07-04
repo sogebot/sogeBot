@@ -138,8 +138,11 @@ Songs.prototype.sendMeanLoudness = function (socket) {
   var count = 0
   global.botDB.find({type: 'playlist'}).exec(function (err, items) {
     if (err) console.log(err)
-    _.each(items, function (item) { (typeof item.loudness === 'undefined') ? loudness = loudness + -15 : loudness = loudness + parseFloat(item.loudness); count = count + 1 })
-    socket.emit('meanLoudness', loudness / count)
+    if (items.length < 1) socket.emit('meanLoudness', -15)
+    else {
+      _.each(items, function (item) { (typeof item.loudness === 'undefined') ? loudness = loudness + -15 : loudness = loudness + parseFloat(item.loudness); count = count + 1 })
+      socket.emit('meanLoudness', loudness / count)
+    }
   })
 }
 
