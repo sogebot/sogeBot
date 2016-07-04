@@ -107,9 +107,8 @@
   },
   "lastseen": {
     "success": {
-      "online": "(username) is currently on channel online!",
       "never": "(username) was never in this channel!",
-      "offline": "(username) was online at (when) in this channel"
+      "time": "(username) was last seen at (when) in this channel"
     },
     "failed": {
       "parse": "Sorry, (sender), but this command is not correct, use !lastseen [username]"

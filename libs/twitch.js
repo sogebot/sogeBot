@@ -40,6 +40,8 @@ function Twitch () {
   global.parser.register(this, '!uptime', this.uptime, constants.VIEWERS)
   global.parser.register(this, '!lastseen', this.lastseen, constants.VIEWERS)
   global.parser.register(this, '!watched', this.watched, constants.VIEWERS)
+
+  global.parser.registerParser(this, 'lastseen', this.lastseenUpdate, constants.VIEWERS)
 }
 
 Twitch.prototype.isOnline = function () {
@@ -55,20 +57,26 @@ Twitch.prototype.uptime = function (self, sender) {
   global.commons.sendMessage(self.isOnline ? global.translate('core.online').replace('(time)', days + hours + minutes + seconds) : global.translate('core.offline'))
 }
 
+Twitch.prototype.lastseenUpdate = function (self, id, sender, text) {
+  var user = new User(sender.username)
+  user.isLoaded().then(function () {
+    user.set('lastMessageTime', new Date().getTime())
+    user.setOnline()
+  })
+  global.updateQueue(id, true)
+}
+
 Twitch.prototype.lastseen = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w+)$/)
     var user = new User(parsed[0])
     user.isLoaded().then(function () {
-      var isOnline = user.get('isOnline')
-      var partedTime = user.get('partedTime')
-      if (isOnline) {
-        global.commons.sendMessage(global.translate('lastseen.success.online').replace('(username)', parsed[0]), sender)
-      } else if (_.isNull(partedTime) || _.isUndefined(partedTime)) {
+      var lastMessageTime = user.get('lastMessageTime')
+      if (_.isNull(lastMessageTime) || _.isUndefined(lastMessageTime)) {
         global.commons.sendMessage(global.translate('lastseen.success.never').replace('(username)', parsed[0]), sender)
       } else {
-        var timestamp = moment.unix(partedTime / 1000)
-        global.commons.sendMessage(global.translate('lastseen.success.offline')
+        var timestamp = moment.unix(lastMessageTime / 1000)
+        global.commons.sendMessage(global.translate('lastseen.success.time')
           .replace('(username)', parsed[0])
           .replace('(when)', timestamp.format('DD-MM-YYYY HH:mm:ss')), sender)
       }
