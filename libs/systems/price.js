@@ -77,7 +77,7 @@ Price.prototype.checkPrice = function (self, id, sender, text) {
           var availablePts = parseInt(user.get('points'), 10)
           var removePts = parseInt(item.price, 10)
           var command = item.command
-          if (availablePts < removePts) {
+          if (!isFinite(availablePts) || !isNumber(availablePts) || availablePts < removePts) {
             global.updateQueue(id, false)
             global.commons.sendMessage(translate('price.failed.notEnough')
               .replace('(amount)', removePts)
