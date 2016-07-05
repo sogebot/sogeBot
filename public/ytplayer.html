@@ -3,12 +3,12 @@
 	<head>
         <title>YTPlayer for SogeBot!</title>
         <meta charset="utf-8">
-		<meta name="robots" content="index, follow">
-		<meta name="theme-color" content="#f4f5f6">
-		<meta name="apple-mobile-web-app-status-bar-style" content="#f4f5f6">
-		<meta name="apple-mobile-web-app-capable" content="yes">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<!-- Google Fonts -->
+        <meta name="robots" content="index, follow">
+        <meta name="theme-color" content="#f4f5f6">
+        <meta name="apple-mobile-web-app-status-bar-style" content="#f4f5f6">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+	    	<!-- Google Fonts -->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
         <!-- CSS Reset -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
@@ -18,9 +18,13 @@
     </head>
     <body>
 		<main class="wrapper">
-            <div class="container">
-                <div id="YTPlayer"></div>
-
+        <div class="container" style="margin-top: 20px">
+            <div class="clearfix" style="margin-bottom: 20px">
+                <div id="YTPlayer" class="float-left" style="margin-right:10px"></div>
+                <div>
+                  <h5>Global volume - <strong id="globalVol"></strong></h5>
+                </div>
+            </div>
             <h4>Song requests</h4>
             <table>
                 <thead>
@@ -41,6 +45,7 @@
                     <th>ID</th>
                     <th>Title</th>
                     <th>Length</th>
+                    <th>Volume</th>
                     </tr>
                 </thead>
                 <tbody id="Playlist"></tbody>
@@ -53,7 +58,7 @@
             var socket = io();
             var skipSong = false;
             var meanLoudness = -16 // default value
-            var volume = 20
+            var volume = 0
 
 	    Number.isInteger = Number.isInteger || function(value) {
                 return typeof value === "number" &&
@@ -76,7 +81,11 @@
             }
 
             function initialize(){
-                isFinished();
+                socket.emit('getSongRequests');
+                socket.emit('getPlaylist');
+                socket.emit('getRandomize');
+                socket.emit('getMeanLoudness');
+                socket.emit('getVolume');
 
                 // Clear any old interval.
                 clearInterval(time_update_interval);
@@ -84,12 +93,12 @@
                 // Start interval to update elapsed time display and
                 // the elapsed part of the progress bar every second.
                 time_update_interval = setInterval(function () {
-                    isFinished();
                     socket.emit('getSongRequests');
                     socket.emit('getPlaylist');
                     socket.emit('getRandomize');
                     socket.emit('getMeanLoudness');
                     socket.emit('getVolume');
+                    isFinished();
                 }, 2000)
 
             }
@@ -109,11 +118,8 @@
 
             socket.on('videoID', function(video) {
                 video.loudness = typeof video.loudness !== 'undefined' ? video.loudness : -15
-                var correction = Math.ceil((volume/100) * 3)
-                var loudnessDiff = parseFloat(parseFloat(meanLoudness) - video.loudness)
-                var newVol = Math.round(volume + correction * loudnessDiff)
                 player.loadVideoById(video.videoID);
-                player.setVolume(newVol)
+                player.setVolume(getVolume(video.loudness))
                 player.playVideo();
             });
 
@@ -123,6 +129,7 @@
 
             socket.on('volume', function (vol) {
               volume = vol
+              $("#globalVol").text(vol + '%')
             })
 
             socket.on('songRequestsList', function(list) {
@@ -148,11 +155,18 @@
                     if (list.hasOwnProperty(index)) {
                         var title = list[index].title,
                             length_seconds = list[index].length_seconds,
-                            videoID = list[index].videoID;
-                        $("#Playlist").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td></tr>');
+                            videoID = list[index].videoID,
+                            loudness = typeof list[index].loudness !== 'undefined' ? list[index].loudness : -15
+                        $("#Playlist").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td><td>' + getVolume(loudness) + '%</td></tr>');
                     }
                 }
             });
+
+            var getVolume = function (loudness) {
+                var correction = Math.ceil((volume/100) * 3)
+                var loudnessDiff = parseFloat(parseFloat(meanLoudness) - loudness)
+                return Math.round(volume + correction * loudnessDiff)
+            }
         </script>
 
 	<!-- YTPlayer -->
