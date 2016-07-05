@@ -18,6 +18,7 @@ Minimal CPU usage and small footprint twitch bot based on Node.js intended to be
 * notice system
 * price and points system
 * !uptime, !lastseen, !watched commands
+* !enable, !disable commands
 * language support - currently english and cestina
 * better logging -> know, why user is timed out, bot logs and exceptions
 * songs system - **songrequest** and **playlist** support for YouTube
