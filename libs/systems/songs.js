@@ -61,6 +61,7 @@ Songs.prototype.banCurrentSong = function (self, sender) {
       global.commons.sendMessage('Song ' + self.currentSong.title + ' was banned and will never play again!')
       global.commons.remove({_type: 'playlist', _videoID: self.currentSong.videoID})
       global.commons.remove({_type: 'songrequest', _videoID: self.currentSong.videoID})
+      global.commons.timeout(self.currentSong.username, global.translate('You\'ve got timeout for posting banned song'), 300)
       self.socketPointer.emit('skipSong')
     }
   })
