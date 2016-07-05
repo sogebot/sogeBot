@@ -139,5 +139,14 @@
       "moderationCaps": "Moderovani velkych pismen je nastaveno na (value)",
       "moderationSpam": "Moderovani spamu je nastaveno na (value)"
     }
+  },
+  "settings": {
+    "command": {
+      "disable": "Prikaz !(command) byl vypnut",
+      "disableParse": "Promin, (sender), ale tento prikaz neni spravne, pouzij !disable [command]",
+      "notDisabled": "Prikaz !(command) nebyl vypnut, tudiz ho nelze zapnout",
+      "enable": "Prikaz !(command) byl zapnut",
+      "enableParse": "Promin, (sender), ale tento prikaz neni spravne, pouzij !enable [command]"
+    }
   }
 }
