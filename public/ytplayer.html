@@ -14,7 +14,18 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
         <!-- Milligram CSS minified -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.1.0/milligram.min.css">
+         <!-- Slider CSS minified -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.css">
         <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.js"></script>
+        <style>
+          .noUi-horizontal .noUi-handle { width:10px; height: 10px; }
+          .noUi-horizontal .noUi-handle::before { width:0; }
+          .noUi-horizontal .noUi-handle::after { width:0; }
+          .noUi-origin { margin-left: 12px; top: 2px }
+          .noUi-horizontal { height: 5px }
+          .trim { font-size: 0.8em; text-align: center }
+        </style>
     </head>
     <body>
 		<main class="wrapper">
@@ -46,6 +57,7 @@
                     <th>Title</th>
                     <th>Length</th>
                     <th>Volume</th>
+                    <th>Trim</th>
                     </tr>
                 </thead>
                 <tbody id="Playlist"></tbody>
@@ -56,11 +68,12 @@
         <script>
             var player, time_update_interval;
             var socket = io();
-            var skipSong = false;
             var meanLoudness = -16 // default value
             var volume = 0
+            var playlist = null
+            var loading = false
 
-	    Number.isInteger = Number.isInteger || function(value) {
+	          Number.isInteger = Number.isInteger || function(value) {
                 return typeof value === "number" &&
                 isFinite(value) &&
                     Math.floor(value) === value;
@@ -75,17 +88,19 @@
                         color: 'white'
                     },
                     events: {
-                        onReady: initialize
+                        onReady: initialize,
+                        onStateChange: onPlayerStateChange
                     }
-                });
+                  })
             }
 
             function initialize(){
+                socket.emit('getMeanLoudness');
+                socket.emit('getVolume');
                 socket.emit('getSongRequests');
                 socket.emit('getPlaylist');
                 socket.emit('getRandomize');
-                socket.emit('getMeanLoudness');
-                socket.emit('getVolume');
+                socket.emit('getVideoID');
 
                 // Clear any old interval.
                 clearInterval(time_update_interval);
@@ -94,33 +109,34 @@
                 // the elapsed part of the progress bar every second.
                 time_update_interval = setInterval(function () {
                     socket.emit('getSongRequests');
-                    socket.emit('getPlaylist');
                     socket.emit('getRandomize');
                     socket.emit('getMeanLoudness');
                     socket.emit('getVolume');
-                    isFinished();
                 }, 2000)
 
             }
 
-            // This function is called by initialize()
-            function isFinished(){
-                var progress = Math.floor((player.getCurrentTime() / player.getDuration()) * 100);
-                if (progress === 100 || !Number.isInteger(progress) || skipSong) {
-                    socket.emit('getVideoID');
-                    skipSong = false;
-                }
+            function onPlayerStateChange (event) {
+              if (event.data == YT.PlayerState.ENDED && !loading) {
+                socket.emit('getVideoID');
+              }
             }
 
             socket.on('skipSong', function() {
-              skipSong = true;
+              nextSong = true;
             })
 
             socket.on('videoID', function(video) {
+                loading = true
+                player.stopVideo()
                 video.loudness = typeof video.loudness !== 'undefined' ? video.loudness : -15
-                player.loadVideoById(video.videoID);
+                data = { 'videoId': video.videoID }
+                if (typeof video.startTime !== 'undefined') data.startSeconds = video.startTime
+                if (typeof video.endTime !== 'undefined') data.endSeconds = video.endTime
+                player.loadVideoById(data);
                 player.setVolume(getVolume(video.loudness))
                 player.playVideo();
+                setTimeout(function() { loading = false }, 1000)
             });
 
             socket.on('meanLoudness', function (loudness) {
@@ -157,9 +173,35 @@
                             length_seconds = list[index].length_seconds,
                             videoID = list[index].videoID,
                             loudness = typeof list[index].loudness !== 'undefined' ? list[index].loudness : -15
-                        $("#Playlist").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td><td>' + getVolume(loudness) + '%</td></tr>');
+
+                        var startTime = list[index].startTime
+                        var endTime = list[index].endTime
+                        startTime = (typeof startTime === 'undefined' ? 0 : startTime)
+                        endTime = (typeof endTime === 'undefined' ? list[index].length_seconds : endTime)
+
+                        $("#Playlist").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td><td>' + getVolume(loudness) + '%</td><td><div id="slider_' + videoID + '_' + length_seconds + '"></div><div class="trim" id="trim_' + videoID + '">' + (new Date(startTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + ' - ' + (new Date(endTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + '</div></td></tr>');
+
+                        var slider = document.getElementById('slider_' + videoID + '_' + length_seconds)
+                        noUiSlider.create(slider, {
+                          start: [ parseInt(startTime / (length_seconds / 100), 10), parseInt(endTime / (length_seconds / 100), 10) ],
+                          range: {
+                            'min': [  0 ],
+                            'max': [ 100 ]
+                          }
+                        });
+
+                        slider.noUiSlider.on('update', function( values, handle ) {
+                          var id = this.target.id.split('_')[1]
+                          var percentLength = this.target.id.split('_')[2] / 100
+                          var lowValue = parseInt(values[0] * percentLength, 10)
+                          var highValue = parseInt(values[1] * percentLength, 10)
+                          var text = new Date(lowValue * 1000).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + ' - ' + new Date(highValue * 1000).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
+                          $('#trim_' + id + '').text(text)
+                   	      socket.emit('setTrim', id, lowValue, highValue);
+                        });
                     }
                 }
+                playlist = list
             });
 
             var getVolume = function (loudness) {
@@ -169,8 +211,8 @@
             }
         </script>
 
-	<!-- YTPlayer -->
+      	<!-- YTPlayer -->
         <script src="https://www.youtube.com/iframe_api"></script>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.js"></script>
-    </body>
+      	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.js"></script>
+          </body>
 </html>
