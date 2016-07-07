@@ -23,6 +23,7 @@ Minimal CPU usage and small footprint twitch bot based on Node.js intended to be
 * better logging -> know, why user is timed out, bot logs and exceptions
 * songs system - **songrequest** and **playlist** support for YouTube
 * **auto volume normalization** of videos played through songs system
+* **trimming** music videos in playlist
 * _more to come_
 
 #### Prerequisites
