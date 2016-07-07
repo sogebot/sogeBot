@@ -63,6 +63,7 @@ Songs.prototype.banCurrentSong = function (self, sender) {
       global.commons.remove({_type: 'songrequest', _videoID: self.currentSong.videoID})
       global.commons.timeout(self.currentSong.username, global.translate('You\'ve got timeout for posting banned song'), 300)
       self.socketPointer.emit('skipSong')
+      self.sendPlaylistList(self.socketPointer)
     }
   })
 }
@@ -77,6 +78,7 @@ Songs.prototype.banSongById = function (self, sender, text) {
       global.commons.remove({_type: 'playlist', _videoID: text.trim()})
       global.commons.remove({_type: 'songrequest', _videoID: text.trim()})
       self.socketPointer.emit('skipSong')
+      self.sendPlaylistList(self.socketPointer)
     })
   })
 }
@@ -132,6 +134,9 @@ Songs.prototype.addSocketListening = function (self, socket) {
   socket.on('getVolume', function () {
     socket.emit('volume', global.configuration.getValue('volume'))
   })
+  socket.on('setTrim', function (id, start, end) {
+    self.savePlaylistTrim(id, start, end)
+  })
 }
 
 Songs.prototype.sendMeanLoudness = function (socket) {
@@ -159,6 +164,10 @@ Songs.prototype.sendPlaylistList = function (socket) {
     if (err) console.log(err)
     socket.emit('songPlaylistList', items)
   })
+}
+
+Songs.prototype.savePlaylistTrim = function (id, startTime, endTime) {
+  global.botDB.update({type: 'playlist', videoID: id}, {$set: {startTime: startTime, endTime: endTime}}, {})
 }
 
 Songs.prototype.sendNextSongID = function (socket) {
@@ -297,6 +306,7 @@ Songs.prototype.removeSongFromPlaylist = function (self, user, text) {
     global.botDB.remove({type: 'playlist', videoID: videoID}, {}, function (err, numRemoved) {
       if (err) console.log(err)
       if (numRemoved > 0) global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was removed from playlist')
+      self.sendPlaylistList(self.socketPointer)
     })
   })
 }
