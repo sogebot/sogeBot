@@ -179,9 +179,9 @@
                         startTime = (typeof startTime === 'undefined' ? 0 : startTime)
                         endTime = (typeof endTime === 'undefined' ? list[index].length_seconds : endTime)
 
-                        $("#Playlist").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td><td>' + getVolume(loudness) + '%</td><td><div id="slider_' + videoID + '_' + length_seconds + '"></div><div class="trim" id="trim_' + videoID + '">' + (new Date(startTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + ' - ' + (new Date(endTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + '</div></td></tr>');
+                        $("#Playlist").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td><td>' + getVolume(loudness) + '%</td><td><div id="slider___' + videoID + '___' + length_seconds + '"></div><div class="trim" id="trim___' + videoID + '">' + (new Date(startTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + ' - ' + (new Date(endTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + '</div></td></tr>');
 
-                        var slider = document.getElementById('slider_' + videoID + '_' + length_seconds)
+                        var slider = document.getElementById('slider___' + videoID + '___' + length_seconds)
                         noUiSlider.create(slider, {
                           start: [ parseInt(startTime / (length_seconds / 100), 10), parseInt(endTime / (length_seconds / 100), 10) ],
                           range: {
@@ -191,12 +191,12 @@
                         });
 
                         slider.noUiSlider.on('update', function( values, handle ) {
-                          var id = this.target.id.split('_')[1]
-                          var percentLength = this.target.id.split('_')[2] / 100
+                          var id = this.target.id.split('___')[1]
+                          var percentLength = this.target.id.split('___')[2] / 100
                           var lowValue = parseInt(values[0] * percentLength, 10)
                           var highValue = parseInt(values[1] * percentLength, 10)
                           var text = new Date(lowValue * 1000).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + ' - ' + new Date(highValue * 1000).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
-                          $('#trim_' + id + '').text(text)
+                          $('#trim___' + id + '').text(text)
                    	      socket.emit('setTrim', id, lowValue, highValue);
                         });
                     }
