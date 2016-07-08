@@ -32,7 +32,7 @@ function Configuration () {
   var self = this
   setTimeout(function () {
     global.translate.setLocale(self.getValue('lang'))
-  }, 1000)
+  }, 10000)
 }
 
 Configuration.prototype.loadFile = function () {
