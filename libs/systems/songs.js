@@ -62,7 +62,7 @@ Songs.prototype.banCurrentSong = function (self, sender) {
       global.commons.remove({_type: 'playlist', _videoID: self.currentSong.videoID})
       global.commons.remove({_type: 'songrequest', _videoID: self.currentSong.videoID})
       global.commons.timeout(self.currentSong.username, global.translate('You\'ve got timeout for posting banned song'), 300)
-      self.socketPointer.emit('skipSong')
+      self.sendNextSongID(self.socketPointer)
       self.sendPlaylistList(self.socketPointer)
     }
   })
@@ -77,7 +77,7 @@ Songs.prototype.banSongById = function (self, sender, text) {
       if (numAffected > 0) global.commons.sendMessage('Song ' + videoInfo.title + ' was banned and will never play again!')
       global.commons.remove({_type: 'playlist', _videoID: text.trim()})
       global.commons.remove({_type: 'songrequest', _videoID: text.trim()})
-      self.socketPointer.emit('skipSong')
+      self.sendNextSongID(self.socketPointer)
       self.sendPlaylistList(self.socketPointer)
     })
   })
@@ -105,7 +105,7 @@ Songs.prototype.stealSongToPlaylist = function (self) {
 }
 
 Songs.prototype.skipSong = function (self) {
-  self.socketPointer.emit('skipSong')
+  self.sendNextSongID(self.socketPointer)
 }
 
 Songs.prototype.createRandomSeeds = function () {
