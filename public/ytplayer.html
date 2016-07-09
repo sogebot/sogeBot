@@ -122,10 +122,6 @@
               }
             }
 
-            socket.on('skipSong', function() {
-              socket.emit('getVideoID')
-            })
-
             socket.on('videoID', function(video) {
                 loading = true
                 player.stopVideo()
