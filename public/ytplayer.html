@@ -112,18 +112,29 @@
                     socket.emit('getRandomize');
                     socket.emit('getMeanLoudness');
                     socket.emit('getVolume');
+
+                    if (!loading && player.getDuration() === 0) {
+                      loading = true
+                      socket.emit('getVideoID');
+                    }
                 }, 2000)
 
             }
 
             function onPlayerStateChange (event) {
               if (event.data == YT.PlayerState.ENDED && !loading) {
+                loading = true
                 socket.emit('getVideoID');
               }
             }
 
             socket.on('videoID', function(video) {
-                loading = true
+                if (video === null) {
+                  loading = false
+                  player.stopVideo()
+                  return
+                }
+
                 player.stopVideo()
                 video.loudness = typeof video.loudness !== 'undefined' ? video.loudness : -15
                 data = { 'videoId': video.videoID }
