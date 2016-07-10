@@ -192,6 +192,8 @@ Songs.prototype.sendNextSongID = function (socket) {
               self.currentSong = item
               socket.emit('videoID', item)
             }
+          } else {
+            socket.emit('videoID', null)
           }
         })
       } else {
