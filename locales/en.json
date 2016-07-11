@@ -79,7 +79,7 @@
       "giveNotEnough": "Sorry, (sender), you don't have (amount) (pointsName) to give it to (username)",
       "get": "Sorry, (sender), but this command is not correct, use !points get [username]",
       "all": "Sorry, (sender), but this command is not correct, use !points all [amount]",
-      "rain": "Sorry, (sender), but this command is not correct, use !points rain [amount]",
+      "rain": "Sorry, (sender), but this command is not correct, use !makeitrain [amount]",
       "add": "Sorry, (sender), but this command is not correct, use !points add [username] [amount]",
       "remove": "Sorry, (sender), but this command is not correct, use !points remove [username] [amount]"
     },
