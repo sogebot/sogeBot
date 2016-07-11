@@ -8,6 +8,10 @@ Minimal CPU usage and small footprint twitch bot based on Node.js intended to be
 
 *Notice: SogeBot is still in heavy alpha development*
 
+#### Issues
+If you found an issue with a bot, feel free to create issue at https://github.com/sogehige/SogeBot/issues.
+You can also contact me on my email sogehige@gmail.com or https://twitter.com/sogehige
+
 #### Current features
 
 * custom bot name - you need twitch account for a bot
@@ -36,6 +40,9 @@ Minimal CPU usage and small footprint twitch bot based on Node.js intended to be
 * Update config.ini - set bot username and password (oauth:xxxxxxxxxxxxxxxxxxxx)
 * For **Linux**: run launch.sh
 * For **Windows**: npm install ; node main.js
+
+#### Command list
+https://github.com/sogehige/SogeBot/wiki/Command-list
 
 #### License
 
