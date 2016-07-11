@@ -12,7 +12,7 @@ function Alias () {
     global.parser.register(this, '!alias remove', this.remove, constants.OWNER_ONLY)
     global.parser.register(this, '!alias', this.help, constants.OWNER_ONLY)
 
-    global.parser.registerParser('alias', this.parse, constants.VIEWERS)
+    global.parser.registerParser(this, 'alias', this.parse, constants.VIEWERS)
   }
   log.info('Alias system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.alias === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
@@ -52,15 +52,19 @@ Alias.prototype.remove = function (self, sender, text) {
   }
 }
 
-Alias.prototype.parse = function (id, sender, text) {
-  global.botDB.findOne({$where: function () { return text.startsWith('!' + this.alias) }}, function (err, item) {
-    if (err) log.error(err)
-    if (!_.isNull(item)) {
-      global.parser.parse(sender, text.replace('!' + item.alias, '!' + item.command))
-      global.parser.lineParsed--
-    }
-    global.updateQueue(id, _.isNull(item))
-  })
+Alias.prototype.parse = function (self, id, sender, text) {
+  try {
+    global.botDB.findOne({$where: function () { return text.startsWith('!' + this.alias) }}, function (err, item) {
+      if (err) log.error(err)
+      if (!_.isNull(item)) {
+        global.parser.parse(sender, text.replace('!' + item.alias, '!' + item.command))
+        global.parser.lineParsed--
+      }
+      global.updateQueue(id, _.isNull(item))
+    })
+  } catch (e) {
+    global.updateQueue(id, true)
+  }
 }
 
 module.exports = new Alias()
