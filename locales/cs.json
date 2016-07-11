@@ -79,7 +79,7 @@
       "giveNotEnough": "Promin, (sender), ale nemas (amount) (pointsName) abys je daroval uzivateli (username)",
       "get": "Promin, (sender), ale tento prikaz neni spravne, pouzij !points get [username]",
       "all": "Promin, (sender), ale tento prikaz neni spravne, pouzij !points all [amount]",
-      "rain": "Promin, (sender), ale tento prikaz neni spravne, pouzij !points rain [amount]",
+      "rain": "Promin, (sender), ale tento prikaz neni spravne, pouzij !makeitrain [amount]",
       "add": "Promin, (sender), ale tento prikaz neni spravne, pouzij !points add [username] [amount]",
       "remove": "Promin, (sender), ale tento prikaz neni spravne, pouzij !points remove [username] [amount]"
     },
