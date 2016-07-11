@@ -12,7 +12,7 @@ function Keywords () {
     global.parser.register(this, '!keyword remove', this.remove, constants.OWNER_ONLY)
     global.parser.register(this, '!keyword', this.help, constants.OWNER_ONLY)
 
-    global.parser.registerParser('keywords', this.run, constants.VIEWERS)
+    global.parser.registerParser(this, 'keywords', this.run, constants.VIEWERS)
   }
   log.info('Keywords system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.keywords === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
@@ -30,8 +30,8 @@ Keywords.prototype.add = function (self, sender, text) {
   }
 }
 
-Keywords.prototype.run = function (id, user, msg) {
-  global.botDB.find({$where: function () { return this._id.startsWith('kwd') && msg.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + this.keyword + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'g')) >= 0 }}, function (err, items) {
+Keywords.prototype.run = function (self, id, sender, text) {
+  global.botDB.find({$where: function () { return this._id.startsWith('kwd') && text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + this.keyword + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'g')) >= 0 }}, function (err, items) {
     if (err) log.error(err)
     _.each(items, function (item) { global.commons.sendMessage(item.response) })
     global.updateQueue(id, true)

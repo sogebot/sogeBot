@@ -10,15 +10,21 @@ var keyword = require('../libs/systems/keywords')
 describe('System - Keywords', function () {
   describe('#help', function () {
     describe('parsing \'!keyword\'', function () {
-      it('parser should return usage text', function () {
-        global.parser.parseCommands(testUser, '!keyword')
-        expect(global.output.pop()).to.match(/^Usage:/)
+      it('parser should return usage text', function (done) {
+        global.parser.parse(testUser, '!keyword')
+        setTimeout(function () {
+          expect(global.output.pop()).to.match(/^Usage:/)
+          done()
+        }, 500)
       })
     })
     describe('parsing \'!keyword n/a\'', function () {
-      it('parser should return usage text', function () {
-        global.parser.parseCommands(testUser, '!keyword n/a')
-        expect(global.output.pop()).to.match(/^Usage:/)
+      it('parser should return usage text', function (done) {
+        global.parser.parse(testUser, '!keyword n/a')
+        setTimeout(function () {
+          expect(global.output.pop()).to.match(/^Usage:/)
+          done()
+        }, 500)
       })
     })
   })
@@ -29,35 +35,33 @@ describe('System - Keywords', function () {
         done()
       })
     })
-    describe('parsing \'!keyword add\'', function () {
-      beforeEach(function () {
-        global.parser.parseCommands(testUser, '!keyword add')
+    describe('parsing \'!keyword add\'', function (done) {
+      beforeEach(function (done) {
+        global.parser.parse(testUser, '!keyword add')
+        setTimeout(function () { done() }, 500)
       })
       it('should not be in db', function (done) {
-        setTimeout(function () {
-          global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
-            expect(err).to.equal(null)
-            expect(count).to.equal(0)
-            done()
-          })
-        }, 500)
+        global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
+          expect(err).to.equal(null)
+          expect(count).to.equal(0)
+          done()
+        })
       })
       it('should send parse error', function () {
         expect(global.output.pop()).to.match(/^Sorry,/)
       })
     })
-    describe('parsing \'!keyword add kwd\'', function () {
-      beforeEach(function () {
-        global.parser.parseCommands(testUser, '!keyword add kwd')
+    describe('parsing \'!keyword add kwd\'', function (done) {
+      beforeEach(function (done) {
+        global.parser.parse(testUser, '!keyword add kwd')
+        setTimeout(function () { done() }, 500)
       })
       it('should not be in db', function (done) {
-        setTimeout(function () {
-          global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
-            expect(err).to.equal(null)
-            expect(count).to.equal(0)
-            done()
-          })
-        }, 500)
+        global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
+          expect(err).to.equal(null)
+          expect(count).to.equal(0)
+          done()
+        })
       })
       it('should send parse error', function () {
         expect(global.output.pop()).to.match(/^Sorry,/)
@@ -66,9 +70,11 @@ describe('System - Keywords', function () {
     describe('parsing \'!keyword add kwd response\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!keyword add kwd response')
-        keyword.run(keyword, testUser, 'something something kwd something')
-        setTimeout(function () { done() }, 500)
+        global.parser.parse(testUser, '!keyword add kwd response')
+        setTimeout(function () {
+          global.parser.parse(testUser, 'something something kwd something')
+          setTimeout(function () { done() }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should be in db', function (done) {
@@ -88,10 +94,12 @@ describe('System - Keywords', function () {
     describe('parsing 2x sent \'!keyword add kwd response\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!keyword add kwd Woohoo')
-        global.parser.parseCommands(testUser, '!keyword add kwd Woohoo')
-        keyword.run(keyword, testUser, 'something something kwd something')
-        setTimeout(function () { done() }, 500)
+        global.parser.parse(testUser, '!keyword add kwd Woohoo')
+        global.parser.parse(testUser, '!keyword add kwd Woohoo')
+        setTimeout(function () {
+          global.parser.parse(testUser, 'something something kwd something')
+          setTimeout(function () { done() }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
       it('should be once in db', function (done) {
@@ -114,7 +122,7 @@ describe('System - Keywords', function () {
     describe('parsing \'!keyword add kwd  response\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!keyword add kwd  response')
+        global.parser.parse(testUser, '!keyword add kwd  response')
         setTimeout(function () { done() }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
@@ -132,7 +140,7 @@ describe('System - Keywords', function () {
     describe('parsing \'!keyword add kwd response awesome\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!keyword add kwd response awesome')
+        global.parser.parse(testUser, '!keyword add kwd response awesome')
         keyword.run(keyword, testUser, 'something something kwd something')
         setTimeout(function () { done() }, 500)
       })
@@ -153,9 +161,9 @@ describe('System - Keywords', function () {
     describe('parsing \'!keyword remove\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!keyword add keyword test')
+        global.parser.parse(testUser, '!keyword add keyword test')
         setTimeout(function () {
-          global.parser.parseCommands(testUser, '!keyword remove')
+          global.parser.parse(testUser, '!keyword remove')
           setTimeout(function () { done() }, 500)
         }, 500)
       })
@@ -174,7 +182,7 @@ describe('System - Keywords', function () {
     describe('parsing \'!keyword remove keyword\' without created keyword', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!keyword remove test')
+        global.parser.parse(testUser, '!keyword remove test')
         setTimeout(function () { done() }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
@@ -185,9 +193,9 @@ describe('System - Keywords', function () {
     describe('parsing \'!keyword remove keyword\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!keyword add keyword response')
+        global.parser.parse(testUser, '!keyword add keyword response')
         setTimeout(function () {
-          global.parser.parseCommands(testUser, '!keyword remove keyword')
+          global.parser.parse(testUser, '!keyword remove keyword')
           setTimeout(function () {
             keyword.run(keyword, testUser, 'something something keyword something')
             global.output.shift() // get rid of add success msg
@@ -213,10 +221,10 @@ describe('System - Keywords', function () {
     describe('parsing 2x sent \'!keyword remove keyword\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!keyword add keyword response')
+        global.parser.parse(testUser, '!keyword add keyword response')
         setTimeout(function () {
-          global.parser.parseCommands(testUser, '!keyword remove keyword')
-          global.parser.parseCommands(testUser, '!keyword remove keyword')
+          global.parser.parse(testUser, '!keyword remove keyword')
+          global.parser.parse(testUser, '!keyword remove keyword')
           setTimeout(function () {
             keyword.run(keyword, testUser, 'something something keyword something')
             global.output.shift() // get rid of add success msg
@@ -242,9 +250,9 @@ describe('System - Keywords', function () {
     describe('parsing \'!keyword remove keyword something\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!keyword add keyword response')
+        global.parser.parse(testUser, '!keyword add keyword response')
         setTimeout(function () {
-          global.parser.parseCommands(testUser, '!keyword remove keyword something')
+          global.parser.parse(testUser, '!keyword remove keyword something')
           setTimeout(function () { done() }, 500)
         }, 500)
       })
@@ -265,10 +273,10 @@ describe('System - Keywords', function () {
     describe('parsing \'!keyword list\' when keyword is added', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!keyword add keyword test')
-        global.parser.parseCommands(testUser, '!keyword add keyword2 test2')
+        global.parser.parse(testUser, '!keyword add keyword test')
+        global.parser.parse(testUser, '!keyword add keyword2 test2')
         setTimeout(function () {
-          global.parser.parseCommands(testUser, '!keyword list')
+          global.parser.parse(testUser, '!keyword list')
           setTimeout(function () { done() }, 500)
         }, 500)
       })
@@ -280,7 +288,7 @@ describe('System - Keywords', function () {
     describe('parsing \'!keyword list\' when list is empty', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!keyword list')
+        global.parser.parse(testUser, '!keyword list')
         setTimeout(function () { done() }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
@@ -291,7 +299,7 @@ describe('System - Keywords', function () {
     describe('parsing \'!keyword list nonsense\'', function () {
       before(function (done) {
         global.output = []
-        global.parser.parseCommands(testUser, '!keyword list nonsemse')
+        global.parser.parse(testUser, '!keyword list nonsemse')
         setTimeout(function () { done() }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
