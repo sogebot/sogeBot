@@ -20,6 +20,7 @@ global.parser = new Parser()
 global.configuration = new Configuration()
 global.twitch = new Twitch()
 global.commons = new Commons()
+require('./libs/permissions')
 
 var options = {
   options: {

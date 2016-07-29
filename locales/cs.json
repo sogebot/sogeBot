@@ -122,6 +122,15 @@
       "parse": "Promin, (sender), ale tento prikaz neni spravne, pouzij !watched nebo !watched [username]"
     }
   },
+  "permissions": {
+    "success": {
+      "change": "Prava pro pouziti prikazu byla zmenena"
+    },
+    "failed": {
+      "parse": "Pouziti: !permission viewer|mods|owner [command]",
+      "noCmd": "Promin, (sender), ale tento prikaz neni v botovi evidovan"
+    }
+  },
   "moderation": {
     "links": "Nejsou povoleny linky, pozadej o !permit",
     "permit": "Uzivatel (who) muze nyni postnout link do chatu",
