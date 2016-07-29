@@ -6,6 +6,9 @@ var Database = require('nedb')
 var constants = require('./constants')
 var _ = require('lodash')
 
+var log = global.log
+var translate = global.translate
+
 global.botDB = new Database({
   filename: 'sogeBot.db',
   autoload: true
@@ -101,7 +104,7 @@ Configuration.prototype.loadValues = function () {
 Configuration.prototype.disableCmd = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w+)$/)
-    global.botDB.update({_id: 'disabled_' + parsed[1]}, {$set: {command: parsed[1]}}, {upsert: true}, function(err) {
+    global.botDB.update({_id: 'disabled_' + parsed[1]}, {$set: {command: parsed[1]}}, {upsert: true}, function (err) {
       if (err) log.error(err)
       global.commons.sendMessage(translate('settings.command.disable').replace('(command)', parsed[1]), sender)
     })
@@ -128,13 +131,11 @@ Configuration.prototype.isDisabledCmd = function (self, id, sender, text) {
     var parsed = text.match(/^!(\w+)/)
     global.botDB.findOne({_id: 'disabled_' + parsed[1]}, function (err, item) {
       if (err) log.error(err)
-      if (!_.isNull(item)) { global.updateQueue(id, false) }
-      else { global.updateQueue(id, true) }
+      global.updateQueue(id, _.isNull(item))
     })
   } catch (err) {
     global.updateQueue(id, true) // it's not a command -> not disabled
   }
-
 }
 
 module.exports = Configuration
