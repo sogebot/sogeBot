@@ -58,7 +58,7 @@ Notice.prototype.help = function (self, sender) {
 Notice.prototype.add = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w.+)$/)
-    var hash = crypto.createHash('md5').update(parsed[0]).digest('hex')
+    var hash = crypto.createHash('md5').update(parsed[0]).digest('hex').substring(0, 5)
     global.commons.insertIfNotExists({__id: 'notice_' + hash, _text: parsed[0], time: new Date().getTime(), success: global.translate('notice.success.add'), error: global.translate('notice.failed.add')})
   } catch (e) {
     global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
