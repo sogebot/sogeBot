@@ -122,6 +122,15 @@
       "parse": "Sorry, (sender), but this command is not correct, use !watched or !watched [username]"
     }
   },
+  "permissions": {
+    "success": {
+      "change": "Permission for command was succesfully changed"
+    },
+    "failed": {
+      "parse": "Usage: !permission viewer|mods|owner [command]",
+      "noCmd": "Sorry, (sender), but this command is not registered in a bot"
+    }
+  },
   "moderation": {
     "links": "No links allowed, ask for !permit",
     "permit": "User (who) can post a link to chat",
