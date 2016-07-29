@@ -8,7 +8,7 @@ var translate = global.translate
 
 function Moderation () {
   if (global.configuration.get().systems.moderation === true) {
-    global.parser.register(this, '!permit', this.permitLink, constants.OWNER_ONLY)
+    global.parser.register(this, '!permit', this.permitLink, constants.MODS)
 
     global.parser.registerParser(this, 'moderationLinks', this.containsLink, constants.VIEWERS)
     global.parser.registerParser(this, 'moderationSymbols', this.symbols, constants.VIEWERS)
