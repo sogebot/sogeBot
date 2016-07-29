@@ -43,9 +43,12 @@ Parser.prototype.addToQueue = function (user, message) {
     message: message
   }
   queue[id] = data
+
   for (var parser in this.registeredParsers) {
     if (typeof queue[id] === 'undefined') break
-    if (this.permissionsParsers[parser] === constants.VIEWERS || this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user)) {
+    if (this.permissionsParsers[parser] === constants.VIEWERS ||
+        (this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user)) ||
+        (this.permissionsParsers[parser] === constants.MODS && user.mod)) {
       queue[id].started = parseInt(queue[id].started, 10) + 1
       this.registeredParsers[parser](this.selfParsers[parser], id, user, message)
     }
@@ -56,7 +59,9 @@ Parser.prototype.parseCommands = function (user, message) {
   message = message.trim()
   for (var cmd in this.registeredCmds) {
     if (message.startsWith(cmd)) {
-      if (this.permissionsCmds[cmd] === constants.VIEWERS || this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user)) {
+      if (this.permissionsCmds[cmd] === constants.VIEWERS ||
+        (this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user)) ||
+        (this.permissionsCmds[cmd] === constants.MODS && user.mod || this.isOwner(user))) {
         var text = message.replace(cmd, '')
         this.registeredCmds[cmd](this.selfCmds[cmd], user, text.trim(), message)
         break // cmd is executed
