@@ -14,18 +14,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
         <!-- Milligram CSS minified -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.1.0/milligram.min.css">
-         <!-- Slider CSS minified -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.css">
         <script src="/socket.io/socket.io.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.js"></script>
-        <style>
-          .noUi-horizontal .noUi-handle { width:10px; height: 10px; }
-          .noUi-horizontal .noUi-handle::before { width:0; }
-          .noUi-horizontal .noUi-handle::after { width:0; }
-          .noUi-origin { margin-left: 12px; top: 2px }
-          .noUi-horizontal { height: 5px }
-          .trim { font-size: 0.8em; text-align: center }
-        </style>
     </head>
     <body>
 		<main class="wrapper">
@@ -186,26 +175,13 @@
                         startTime = (typeof startTime === 'undefined' ? 0 : startTime)
                         endTime = (typeof endTime === 'undefined' ? list[index].length_seconds : endTime)
 
-                        $("#Playlist").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td><td>' + getVolume(loudness) + '%</td><td><div id="slider___' + videoID + '___' + length_seconds + '"></div><div class="trim" id="trim___' + videoID + '">' + (new Date(startTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + ' - ' + (new Date(endTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + '</div></td></tr>');
+                        var lowValue = (new Date(startTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
+                        var highValue = (new Date(endTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
 
-                        var slider = document.getElementById('slider___' + videoID + '___' + length_seconds)
-                        noUiSlider.create(slider, {
-                          start: [ parseInt(startTime / (length_seconds / 100), 10), parseInt(endTime / (length_seconds / 100), 10) ],
-                          range: {
-                            'min': [  0 ],
-                            'max': [ 100 ]
-                          }
-                        });
+                        $("#Playlist").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td><td>' + getVolume(loudness) + '%</td><td><div id="slider___' + videoID + '___' + length_seconds + '"></div><div class="trim"><span class="lowValue__' + videoID + '">' + lowValue + '</span><input style="width: 4em; display: none" class="lowValueInput__' + videoID + ' type="text" value="' + lowValue + '"/> - <span class="highValue__' + videoID + '">' + highValue + '</span><input style="width: 4em; display: none" class="highValueInput__' + videoID + ' type="text" value="' + highValue + '"/></div></td></tr>');
 
-                        slider.noUiSlider.on('update', function( values, handle ) {
-                          var id = this.target.id.split('___')[1]
-                          var percentLength = this.target.id.split('___')[2] / 100
-                          var lowValue = parseInt(values[0] * percentLength, 10)
-                          var highValue = parseInt(values[1] * percentLength, 10)
-                          var text = new Date(lowValue * 1000).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + ' - ' + new Date(highValue * 1000).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
-                          $('#trim___' + id + '').text(text)
-                   	      socket.emit('setTrim', id, lowValue, highValue);
-                        });
+                        makeEditable(videoID, $(".lowValue__" + videoID), $(".lowValueInput__" + videoID), endTime)
+                        makeEditable(videoID, $(".highValue__" + videoID), $(".highValueInput__" + videoID), endTime)
                     }
                 }
                 playlist = list
@@ -216,10 +192,46 @@
                 var loudnessDiff = parseFloat(parseFloat(meanLoudness) - loudness)
                 return Math.round(volume + correction * loudnessDiff)
             }
+
+            var makeEditable = function (id, el, input, endTime) {
+              el.css('border-bottom', '1px grey dashed')
+              el.on('click', function() {
+                el.css('display', 'none')
+                input.css('display', 'inline')
+                input.focus()
+              })
+
+              input.on('focusout', function() {
+                var value = input.val()
+                var valueBefore = el.text()
+                input.css('display', 'none')
+                el.css('display', 'inline')
+
+                /* check if value match correct pattern */
+                var pattern = value.match(/^(\d\d):(\d\d):(\d\d)/)
+                if (pattern !== null) {
+                  var currentValue = parseInt(pattern[1], 10) * 3600 + parseInt(pattern[2], 10) * 60 + parseInt(pattern[3], 10)
+                  if (currentValue > endTime) currentValue = endTime
+                  var out = new Date(currentValue * 1000).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
+                  el.text(out)
+                  input.val(out)
+
+                  /* emit update */
+                  var lowValuePtrn = $(".lowValue__" + id).text().match(/^(\d\d):(\d\d):(\d\d)/)
+                  var lowValue = parseInt(lowValuePtrn[1], 10) * 3600 + parseInt(lowValuePtrn[2], 10) * 60 + parseInt(lowValuePtrn[3], 10)
+                  var highValuePtrn = $(".highValue__" + id).text().match(/^(\d\d):(\d\d):(\d\d)/)
+                  var highValue = parseInt(highValuePtrn[1], 10) * 3600 + parseInt(highValuePtrn[2], 10) * 60 + parseInt(highValuePtrn[3], 10)
+                  socket.emit('setTrim', id, lowValue, highValue);
+                } else {
+                  input.val(valueBefore) // reset value
+                }
+              })
+            }
         </script>
 
       	<!-- YTPlayer -->
         <script src="https://www.youtube.com/iframe_api"></script>
-      	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.js"></script>
-          </body>
+      	<script type="text/javascript" src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+      	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jinplace/1.2.1/jinplace.min.js"></script>
+      </body>
 </html>
