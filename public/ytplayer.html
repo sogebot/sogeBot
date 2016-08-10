@@ -152,7 +152,7 @@
                             requestedBy = list[index].username,
                             length_seconds = list[index].length_seconds,
                             videoID = list[index].videoID;
-                        $("#songRequests").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+requestedBy+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td></tr>');
+                        $("#songRequests").append('<tr><td><a href="http://youtu.be/'+videoID+'">'+videoID+'</a></td><td>'+title+'</td><td>'+requestedBy+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td></tr>');
                     }
                 }
             });
@@ -178,7 +178,7 @@
                         var lowValue = (new Date(startTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
                         var highValue = (new Date(endTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
 
-                        $("#Playlist").append('<tr><td>'+videoID+'</td><td>'+title+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td><td>' + getVolume(loudness) + '%</td><td><div id="slider___' + videoID + '___' + length_seconds + '"></div><div class="trim"><span class="lowValue__' + videoID + '">' + lowValue + '</span><input style="width: 4em; display: none" class="lowValueInput__' + videoID + ' type="text" value="' + lowValue + '"/> - <span class="highValue__' + videoID + '">' + highValue + '</span><input style="width: 4em; display: none" class="highValueInput__' + videoID + ' type="text" value="' + highValue + '"/></div></td></tr>');
+                        $("#Playlist").append('<tr><td><a href="http://youtu.be/'+videoID+'">'+videoID+'</a></td><td>'+title+'</td><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td><td>' + getVolume(loudness) + '%</td><td><div id="slider___' + videoID + '___' + length_seconds + '"></div><div class="trim"><span class="lowValue__' + videoID + '">' + lowValue + '</span><input style="width: 4em; display: none" class="lowValueInput__' + videoID + ' type="text" value="' + lowValue + '"/> - <span class="highValue__' + videoID + '">' + highValue + '</span><input style="width: 4em; display: none" class="highValueInput__' + videoID + ' type="text" value="' + highValue + '"/></div></td></tr>');
 
                         makeEditable(videoID, $(".lowValue__" + videoID), $(".lowValueInput__" + videoID), endTime)
                         makeEditable(videoID, $(".highValue__" + videoID), $(".highValueInput__" + videoID), endTime)
