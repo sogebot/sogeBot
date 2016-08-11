@@ -141,12 +141,20 @@
     "failed": {
       "parsePermit": "Promin, (sender), ale tento prikaz neni spravne, pouzij !permit [username]"
     },
+    "warnings": {
+      "links": "Nejsou povoleny linky, (sender), pozadej o !permit [(value) zbyva varovani]",
+      "symbols": "Prilisne pouzivani symbolu neni povoleno, (sender) [(value) zbyva varovani]",
+      "longMessage": "Tva zprava je prilis dlouha, (sender) [(value) zbyva varovani]",
+      "caps": "Prilisne pouzivani velkych pismen neni povoleno, (sender) [(value) zbyva varovani]",
+      "spam": "Spamovani neni povoleno, (sender) [(value) zbyva varovani]"
+    },
     "settings": {
       "moderationLinks": "Moderovani linku je nastaveno na (value)",
       "moderationSymbols": "Moderovani symbolu je nastaveno na (value)",
       "moderationLongMessage": "Moderovani dlouhych zprav je nastaveno na (value)",
       "moderationCaps": "Moderovani velkych pismen je nastaveno na (value)",
-      "moderationSpam": "Moderovani spamu je nastaveno na (value)"
+      "moderationSpam": "Moderovani spamu je nastaveno na (value)",
+      "moderationWarnings": "Uzivatel bude (value)x varovan, nez dostane timeout"
     }
   },
   "settings": {

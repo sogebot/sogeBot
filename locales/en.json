@@ -141,19 +141,29 @@
     "failed": {
       "parsePermit": "Sorry, (sender), but this command is not correct, use !permit [username]"
     },
+    "warnings": {
+      "links": "No links allowed, (sender), ask for !permit [(value) warnings left]",
+      "symbols": "No excessive symbols usage, (sender) [(value) warnings left]",
+      "longMessage": "Long messages are not allowed, (sender) [(value) warnings left]",
+      "caps": "No excessive caps usage, (sender) [(value) warnings left]",
+      "spam": "Spamming is not allowed, (sender) [(value) warnings left]"
+    },
     "settings": {
       "moderationLinks": "Moderation of links is set to (value)",
       "moderationSymbols": "Moderation of symbols is set to (value)",
       "moderationLongMessage": "Moderation of long messages is set to (value)",
       "moderationCaps": "Moderation of caps is set to (value)",
       "moderationSpam": "Moderation of spam is set to (value)",
-      "command": {
-        "disable": "Command !(command) was disabled",
-        "disableParse": "Sorry, (sender), but this command is not correct, use !disable [command]",
-        "notDisabled": "Command !(command) was not disabled before, not needed to enable it",
-        "enable": "Command !(command) was enabled",
-        "enableParse": "Sorry, (sender), but this command is not correct, use !enable [command]"
-      }
+      "moderationWarnings": "User will be warned (value) times before timeout"
+    }
+  },
+  "settings": {
+    "command": {
+      "disable": "Command !(command) was disabled",
+      "disableParse": "Sorry, (sender), but this command is not correct, use !disable [command]",
+      "notDisabled": "Command !(command) was not disabled before, not needed to enable it",
+      "enable": "Command !(command) was enabled",
+      "enableParse": "Sorry, (sender), but this command is not correct, use !enable [command]"
     }
   }
 }
