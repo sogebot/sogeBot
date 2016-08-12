@@ -5,7 +5,6 @@ var constants = require('../constants')
 var crypto = require('crypto')
 var _ = require('lodash')
 var log = global.log
-var translate = global.translate
 
 function Notice () {
   this.lastNoticeSent = new Date().getTime()
@@ -18,8 +17,8 @@ function Notice () {
     global.parser.register(this, '!notice remove', this.remove, constants.OWNER_ONLY)
     global.parser.register(this, '!notice', this.help, constants.OWNER_ONLY)
 
-    global.configuration.register('noticeInterval', translate('notice.settings.noticeInterval'), 'number', 10)
-    global.configuration.register('noticeMsgReq', translate('notice.settings.noticeMsgReq'), 'number', 10)
+    global.configuration.register('noticeInterval', global.translate('notice.settings.noticeInterval'), 'number', 10)
+    global.configuration.register('noticeMsgReq', global.translate('notice.settings.noticeMsgReq'), 'number', 10)
 
     // start interval for posting notices
     var self = this
@@ -27,7 +26,7 @@ function Notice () {
       self.send()
     }, 1000)
   }
-  log.info('Notice system ' + translate('core.loaded') + ' ' + (global.configuration.get().systems.notice === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+  log.info('Notice system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.notice === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Notice.prototype.send = function () {

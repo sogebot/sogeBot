@@ -5,7 +5,6 @@ var constants = require('../constants')
 var User = require('../user')
 var _ = require('lodash')
 var log = global.log
-var translate = global.translate
 
 function Ranks () {
   if (global.configuration.get().systems.ranks === true) {
@@ -21,7 +20,7 @@ function Ranks () {
       self.updateRanks()
     }, 60000)
   }
-  log.info('Ranks system ' + translate('core.loaded') + ' ' + (global.configuration.get().systems.ranks === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+  log.info('Ranks system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.ranks === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Ranks.prototype.help = function (self, sender) {
