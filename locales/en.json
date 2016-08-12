@@ -105,6 +105,20 @@
       "notEnough": "Sorry, (sender), but you don't have (amount) (pointsName) to use !(command)"
     }
   },
+  "rank": {
+    "success": {
+      "add": "New rank was added to bot",
+      "remove" : "Rank was deleted from bot",
+      "list": "List of ranks",
+      "show": "(sender) have (rank) rank"
+    },
+    "failed": {
+      "parse": "Sorry, (sender), but this command is not correct, for help type !rank help",
+      "add": "Rank for this hour already exists",
+      "list": "List of ranks is empty",
+      "notFound": "No rank is associated with this hour"
+    }
+  },
   "lastseen": {
     "success": {
       "never": "(username) was never in this channel!",

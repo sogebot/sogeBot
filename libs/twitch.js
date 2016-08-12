@@ -113,13 +113,17 @@ Twitch.prototype.showMe = function (self, sender, text) {
     var user = new User(sender.username)
     user.isLoaded().then(function () {
       var message = [sender.username]
+      // rank
+      var rank = !_.isUndefined(user.get('rank')) ? user.get('rank') : null
+      global.configuration.get().systems.ranks === true && !_.isNull(rank) ? message.push(rank) : null
+
       // watchTime
       var watchTime = user.get('watchTime')
       watchTime = _.isFinite(parseInt(watchTime, 10)) && _.isNumber(parseInt(watchTime, 10)) ? watchTime : 0
       message.push((watchTime / 1000 / 60 / 60).toFixed(1) + 'h')
 
       // points
-      var points = !_.isUndefined(user.points) ? user.points : 0
+      var points = !_.isUndefined(user.get('points')) ? user.get('points') : 0
       global.configuration.get().systems.points === true ? message.push(points + ' ' + global.systems.points.getPointsName(points)) : null
 
       global.commons.sendMessage(message.join(' | '), sender)

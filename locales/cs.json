@@ -105,6 +105,20 @@
       "notEnough": "Promin, (sender), ale nemas (amount) (pointsName) k pouziti !(command)"
     }
   },
+  "rank": {
+    "success": {
+      "add": "Novy rank byl pridan do bota",
+      "remove" : "Rank byl smazan",
+      "list": "Seznam ranku",
+      "show": "(sender) ma prave (rank) rank"
+    },
+    "failed": {
+      "parse": "Promin, (sender), ale tento prikaz neni spravne, pouzij !rank help",
+      "add": "Rank pro tuto hodinu jiz existuje",
+      "list": "Seznam ranku je prazdny",
+      "notFound": "Nebyl nalezen zadny rank k teto hodine"
+    }
+  },
   "lastseen": {
     "success": {
       "online": "(username) je prave na kanale online!",
