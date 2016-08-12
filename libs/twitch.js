@@ -40,6 +40,7 @@ function Twitch () {
   global.parser.register(this, '!uptime', this.uptime, constants.VIEWERS)
   global.parser.register(this, '!lastseen', this.lastseen, constants.VIEWERS)
   global.parser.register(this, '!watched', this.watched, constants.VIEWERS)
+  global.parser.register(this, '!me', this.showMe, constants.VIEWERS)
 
   global.parser.registerParser(this, 'lastseen', this.lastseenUpdate, constants.VIEWERS)
 }
@@ -104,6 +105,27 @@ Twitch.prototype.watched = function (self, sender, text) {
     })
   } catch (e) {
     global.commons.sendMessage(global.translate('watched.failed.parse'), sender)
+  }
+}
+
+Twitch.prototype.showMe = function (self, sender, text) {
+  try {
+    var user = new User(sender.username)
+    user.isLoaded().then(function () {
+      var message = [sender.username]
+      // watchTime
+      var watchTime = user.get('watchTime')
+      watchTime = _.isFinite(parseInt(watchTime, 10)) && _.isNumber(parseInt(watchTime, 10)) ? watchTime : 0
+      message.push((watchTime / 1000 / 60 / 60).toFixed(1) + 'h')
+
+      // points
+      var points = !_.isUndefined(user.points) ? user.points : 0
+      global.configuration.get().systems.points === true ? message.push(points + ' ' + global.systems.points.getPointsName(points)) : null
+
+      global.commons.sendMessage(message.join(' | '), sender)
+    })
+  } catch (e) {
+    global.log.error(e)
   }
 }
 
