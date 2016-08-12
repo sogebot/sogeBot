@@ -5,7 +5,6 @@ var User = require('../user')
 var _ = require('lodash')
 
 var log = global.log
-var translate = global.translate
 
 function Points () {
   if (global.configuration.get().systems.points === true) {
@@ -36,7 +35,7 @@ function Points () {
       self.updatePoints()
     }, 30000)
   }
-  log.info('Points system ' + translate('core.loaded') + ' ' + (global.configuration.get().systems.points === true ? chalk.green(translate('core.enabled')) : chalk.red(translate('core.disabled'))))
+  log.info('Points system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.points === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Points.prototype.addEvents = function (self) {
@@ -52,12 +51,12 @@ Points.prototype.setPoints = function (self, sender, text) {
     var parsed = text.match(/^([\w]+) ([0-9]+)$/)
     var user = new User(parsed[1])
     user.set('points', parseInt(parsed[2], 10))
-    global.commons.sendMessage(translate('points.success.set')
+    global.commons.sendMessage(global.translate('points.success.set')
       .replace('(amount)', parsed[2])
       .replace('(username)', parsed[1])
       .replace('(pointsName)', self.getPointsName(parsed[2])), sender)
   } catch (err) {
-    global.commons.sendMessage(translate('points.failed.set'), sender)
+    global.commons.sendMessage(global.translate('points.failed.set'), sender)
   }
 }
 
@@ -75,20 +74,20 @@ Points.prototype.givePoints = function (self, sender, text) {
         toUser.isLoaded().then(function () {
           var availablePts = parseInt(toUser.get('points'), 10)
           toUser.set('points', (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts))
-          global.commons.sendMessage(translate('points.success.give')
+          global.commons.sendMessage(global.translate('points.success.give')
             .replace('(amount)', givePts)
             .replace('(username)', parsed[1])
             .replace('(pointsName)', self.getPointsName(givePts)), sender)
         })
       } else {
-        global.commons.sendMessage(translate('points.failed.giveNotEnough')
+        global.commons.sendMessage(global.translate('points.failed.giveNotEnough')
         .replace('(amount)', givePts)
         .replace('(username)', parsed[1])
         .replace('(pointsName)', self.getPointsName(givePts)), sender)
       }
     })
   } catch (err) {
-    global.commons.sendMessage(translate('points.failed.give'), sender)
+    global.commons.sendMessage(global.translate('points.failed.give'), sender)
   }
 }
 
@@ -97,9 +96,9 @@ Points.prototype.getPointsName = function (points) {
   var single, multi, xmulti
   // get single|x:multi|multi from pointsName
   if (global.configuration.getValue('pointsName').length === 0) {
-    xmulti = translate('points.defaults.pointsName.xmulti')
-    single = translate('points.defaults.pointsName.single')
-    multi = translate('points.defaults.pointsName.multi')
+    xmulti = global.translate('points.defaults.pointsName.xmulti')
+    single = global.translate('points.defaults.pointsName.single')
+    multi = global.translate('points.defaults.pointsName.multi')
   } else {
     switch (pointsNames.length) {
       case 1:
@@ -145,7 +144,7 @@ Points.prototype.getPointsFromUser = function (self, sender, text) {
     var parsed = text.match(/^([\w]+)$/)
     var user = new User(parsed[1])
     user.isLoaded().then(function () {
-      var pointsResponse = (global.configuration.getValue('pointsResponse').length > 0 ? global.configuration.getValue('pointsResponse') : translate('points.defaults.pointsResponse'))
+      var pointsResponse = (global.configuration.getValue('pointsResponse').length > 0 ? global.configuration.getValue('pointsResponse') : global.translate('points.defaults.pointsResponse'))
       var points = (_.isUndefined(user.get('points')) ? 0 : user.get('points'))
       global.commons.sendMessage(pointsResponse
         .replace('(amount)', points)
@@ -153,7 +152,7 @@ Points.prototype.getPointsFromUser = function (self, sender, text) {
         .replace('(pointsName)', self.getPointsName(points)), sender)
     })
   } catch (err) {
-    global.commons.sendMessage(translate('points.failed.get'), sender)
+    global.commons.sendMessage(global.translate('points.failed.get'), sender)
   }
 }
 
@@ -169,12 +168,12 @@ Points.prototype.allPoints = function (self, sender, text) {
           user.set('points', (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts))
         })
       })
-      global.commons.sendMessage(translate('points.success.all')
+      global.commons.sendMessage(global.translate('points.success.all')
         .replace('(amount)', givePts)
         .replace('(pointsName)', self.getPointsName(givePts)), sender)
     })
   } catch (err) {
-    global.commons.sendMessage(translate('points.failed.all'), sender)
+    global.commons.sendMessage(global.translate('points.failed.all'), sender)
   }
 }
 
@@ -191,12 +190,12 @@ Points.prototype.rainPoints = function (self, sender, text) {
           user.set('points', (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + random : random))
         })
       })
-      global.commons.sendMessage(translate('points.success.rain')
+      global.commons.sendMessage(global.translate('points.success.rain')
         .replace('(amount)', givePts)
         .replace('(pointsName)', self.getPointsName(givePts)), sender)
     })
   } catch (err) {
-    global.commons.sendMessage(translate('points.failed.rain'), sender)
+    global.commons.sendMessage(global.translate('points.failed.rain'), sender)
   }
 }
 
@@ -209,12 +208,12 @@ Points.prototype.addPoints = function (self, sender, text) {
       var availablePts = parseInt(user.get('points'), 10)
       user.set('points', (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts))
     })
-    global.commons.sendMessage(translate('points.success.add')
+    global.commons.sendMessage(global.translate('points.success.add')
       .replace('(amount)', givePts)
       .replace('(username)', parsed[1])
       .replace('(pointsName)', self.getPointsName(givePts)), sender)
   } catch (err) {
-    global.commons.sendMessage(translate('points.failed.add'), sender)
+    global.commons.sendMessage(global.translate('points.failed.add'), sender)
   }
 }
 
@@ -228,12 +227,12 @@ Points.prototype.removePoints = function (self, sender, text) {
       if (availablePts > removePts) user.set('points', (_.isFinite(availablePts) && !_.isNumber(availablePts) ? availablePts - removePts : 0))
       else user.set('points', 0)
     })
-    global.commons.sendMessage(translate('points.success.remove')
+    global.commons.sendMessage(global.translate('points.success.remove')
       .replace('(amount)', removePts)
       .replace('(username)', parsed[1])
       .replace('(pointsName)', self.getPointsName(removePts)), sender)
   } catch (err) {
-    global.commons.sendMessage(translate('points.failed.remove'), sender)
+    global.commons.sendMessage(global.translate('points.failed.remove'), sender)
   }
 }
 

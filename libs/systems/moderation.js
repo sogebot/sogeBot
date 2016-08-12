@@ -4,7 +4,6 @@ var chalk = require('chalk')
 var constants = require('../constants')
 var _ = require('lodash')
 var log = global.log
-var translate = global.translate
 
 function Moderation () {
   if (global.configuration.get().systems.moderation === true) {
@@ -16,12 +15,12 @@ function Moderation () {
     global.parser.registerParser(this, 'moderationCaps', this.caps, constants.VIEWERS)
     global.parser.registerParser(this, 'moderationSpam', this.spam, constants.VIEWERS)
 
-    global.configuration.register('moderationLinks', translate('moderation.settings.moderationLinks'), 'bool', true)
-    global.configuration.register('moderationSymbols', translate('moderation.settings.moderationSymbols'), 'bool', true)
-    global.configuration.register('moderationLongMessage', translate('moderation.settings.moderationLongMessage'), 'bool', true)
-    global.configuration.register('moderationCaps', translate('moderation.settings.moderationCaps'), 'bool', true)
-    global.configuration.register('moderationSpam', translate('moderation.settings.moderationSpam'), 'bool', true)
-    global.configuration.register('moderationWarnings', translate('moderation.settings.moderationWarnings'), 'number', 0)
+    global.configuration.register('moderationLinks', global.translate('moderation.settings.moderationLinks'), 'bool', true)
+    global.configuration.register('moderationSymbols', global.translate('moderation.settings.moderationSymbols'), 'bool', true)
+    global.configuration.register('moderationLongMessage', global.translate('moderation.settings.moderationLongMessage'), 'bool', true)
+    global.configuration.register('moderationCaps', global.translate('moderation.settings.moderationCaps'), 'bool', true)
+    global.configuration.register('moderationSpam', global.translate('moderation.settings.moderationSpam'), 'bool', true)
+    global.configuration.register('moderationWarnings', global.translate('moderation.settings.moderationWarnings'), 'number', 0)
 
     // purge warnings older than hour
     setInterval(function () {
@@ -43,12 +42,12 @@ function Moderation () {
     }, 600000)
   }
 
-  log.info('Moderation system ' + translate('core.loaded') + ' ' + (global.configuration.get().systems.moderation === true ? chalk.green(translate('core.enabled')) : chalk.red(translate('core.disabled'))))
+  log.info('Moderation system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.moderation === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Moderation.prototype.timeoutUser = function (sender, warning, msg, time) {
   var warningsAllowed = global.configuration.getValue('moderationWarnings')
-  if (warningsAllowed == 0) {
+  if (warningsAllowed === 0) {
     global.commons.timeout(sender.username, msg, time)
     return
   }
@@ -83,9 +82,9 @@ Moderation.prototype.permitLink = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w+)$/)
     global.botDB.insert({type: 'permitLink', username: parsed[0].toLowerCase()})
-    global.commons.sendMessage(translate('moderation.permit').replace('(who)', parsed[0]))
+    global.commons.sendMessage(global.translate('moderation.permit').replace('(who)', parsed[0]))
   } catch (e) {
-    global.commons.sendMessage(translate('moderation.failed.parsePermit'), sender)
+    global.commons.sendMessage(global.translate('moderation.failed.parsePermit'), sender)
   }
 }
 
@@ -107,7 +106,7 @@ Moderation.prototype.containsLink = function (self, id, sender, text) {
         })
       } catch (err) {
         log.info(sender.username + ' [link] timeout: ' + text)
-        self.timeoutUser(sender, translate('moderation.warnings.links'), translate('moderation.links'), 5)
+        self.timeoutUser(sender, global.translate('moderation.warnings.links'), global.translate('moderation.links'), 5)
         global.updateQueue(id, false)
       }
     })
@@ -136,7 +135,7 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
       if (symbols.length >= maxSymbolsConsecutively) {
         global.updateQueue(id, false)
         log.info(sender.username + ' [symbols] timeout: ' + text)
-        self.timeoutUser(sender, translate('moderation.warnings.symbols'), translate('moderation.symbols'), timeout)
+        self.timeoutUser(sender, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout)
         return
       }
       symbolsLength = symbolsLength + symbols.length
@@ -145,7 +144,7 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
   if (Math.ceil(symbolsLength / (msgLength / 100)) >= maxSymbolsPercent) {
     global.updateQueue(id, false)
     log.info(sender.username + ' [symbols] timeout: ' + text)
-    self.timeoutUser(sender, translate('moderation.warnings.symbols'), translate('moderation.symbols'), timeout)
+    self.timeoutUser(sender, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout)
     return
   }
   global.updateQueue(id, true)
@@ -160,7 +159,7 @@ Moderation.prototype.longMessage = function (self, id, sender, text) {
   } else {
     global.updateQueue(id, false)
     log.info(sender.username + ' [longMessage] timeout: ' + text)
-    self.timeoutUser(sender, translate('moderation.warnings.longMessage'), translate('moderation.longMessage'), timeout)
+    self.timeoutUser(sender, global.translate('moderation.warnings.longMessage'), global.translate('moderation.longMessage'), timeout)
   }
 }
 
@@ -184,7 +183,7 @@ Moderation.prototype.caps = function (self, id, sender, text) {
   if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
     global.updateQueue(id, false)
     log.info(sender.username + ' [caps] timeout: ' + text)
-    self.timeoutUser(sender, translate('moderation.warnings.caps'), translate('moderation.caps'), timeout)
+    self.timeoutUser(sender, global.translate('moderation.warnings.caps'), global.translate('moderation.caps'), timeout)
     return
   }
   global.updateQueue(id, true)
@@ -205,7 +204,7 @@ Moderation.prototype.spam = function (self, id, sender, text) {
     if (out.hasOwnProperty(item) && out[item].length >= maxSpamLength) {
       global.updateQueue(id, false)
       log.info(sender.username + ' [spam] timeout: ' + text)
-      self.timeoutUser(sender, translate('moderation.warnings.spam'), translate('moderation.spam'), timeout)
+      self.timeoutUser(sender, global.translate('moderation.warnings.spam'), global.translate('moderation.spam'), timeout)
       break
     }
   }
