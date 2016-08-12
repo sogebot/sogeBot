@@ -7,7 +7,6 @@ var constants = require('./constants')
 var _ = require('lodash')
 
 var log = global.log
-var translate = global.translate
 
 global.botDB = new Database({
   filename: 'sogeBot.db',
@@ -106,10 +105,10 @@ Configuration.prototype.disableCmd = function (self, sender, text) {
     var parsed = text.match(/^(\w+)$/)
     global.botDB.update({_id: 'disabled_' + parsed[1]}, {$set: {command: parsed[1]}}, {upsert: true}, function (err) {
       if (err) log.error(err)
-      global.commons.sendMessage(translate('settings.command.disable').replace('(command)', parsed[1]), sender)
+      global.commons.sendMessage(global.translate('settings.command.disable').replace('(command)', parsed[1]), sender)
     })
   } catch (e) {
-    global.commons.sendMessage(translate('settings.command.disableParse'), sender)
+    global.commons.sendMessage(global.translate('settings.command.disableParse'), sender)
   }
 }
 
@@ -118,11 +117,11 @@ Configuration.prototype.enableCmd = function (self, sender, text) {
     var parsed = text.match(/^(\w+)$/)
     global.botDB.remove({_id: 'disabled_' + parsed[1], command: parsed[1]}, {}, function (err, numRemoved) {
       if (err) log.error(err)
-      var message = (numRemoved === 0 ? translate('settings.command.notDisabled') : translate('settings.command.enable'))
+      var message = (numRemoved === 0 ? global.translate('settings.command.notDisabled') : global.translate('settings.command.enable'))
       global.commons.sendMessage(message.replace('(command)', parsed[1]), sender)
     })
   } catch (e) {
-    global.commons.sendMessage(translate('settings.command.enableParse'), sender)
+    global.commons.sendMessage(global.translate('settings.command.enableParse'), sender)
   }
 }
 
