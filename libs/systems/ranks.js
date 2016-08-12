@@ -78,7 +78,7 @@ Ranks.prototype.updateRanks = function () {
         global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, items) {
           if (err) { log.error(err) }
           _.each(items, function (rank) {
-            if (watchTime > parseInt(rank.hours, 10)) {
+            if (watchTime >= parseInt(rank.hours, 10)) {
               user.set('rank', rank.rank)
             }
           })
