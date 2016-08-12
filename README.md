@@ -21,6 +21,7 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 * keywords system
 * notice system
 * price and points system
+* rank system
 * !uptime, !lastseen, !watched commands
 * !enable, !disable commands
 * language support - currently english and cestina
