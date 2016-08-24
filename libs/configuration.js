@@ -127,7 +127,7 @@ Configuration.prototype.enableCmd = function (self, sender, text) {
 
 Configuration.prototype.isDisabledCmd = function (self, id, sender, text) {
   try {
-    var parsed = text.match(/^!(\w+)/)
+    var parsed = text.match(/^!(\w+)$/)
     global.botDB.findOne({_id: 'disabled_' + parsed[1]}, function (err, item) {
       if (err) log.error(err)
       global.updateQueue(id, _.isNull(item))
