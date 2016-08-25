@@ -23,7 +23,9 @@ function Translate (text) {
 }
 
 function getTranslation (text) {
-  return text.split('.').reduce((o, i) => o[i], translations[global.configuration.getValue('lang')])
+  var translated = text.split('.').reduce((o, i) => o[i], translations[global.configuration.getValue('lang')])
+  _.each(translated.match(/(\{[\w-\.]+\})/g), function (toTranslate) { translated = translated.replace(toTranslate, getTranslation(toTranslate.replace('{', '').replace('}', ''))) })
+  return translated
 }
 
 module.exports = Translate
