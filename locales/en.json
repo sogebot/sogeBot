@@ -6,7 +6,8 @@
     "usage": "Usage",
     "online": "Stream is online for (time)",
     "offline": "Stream is currently offline!",
-    "lang-selected": "Bot language is currently set to english"
+    "lang-selected": "Bot language is currently set to english",
+    "command-parse": "Sorry, (sender), but this command is not correct, use"
   },
   "alias": {
     "success": {
@@ -18,7 +19,7 @@
       "add": "This alias already exists in database",
       "remove": "This alias cannot be found in database",
       "list": "List of aliases is empty",
-      "parse": "Sorry, (sender), but this command is not correct, for help type !alias"
+      "parse": "{core.command-parse} !alias"
     }
   },
   "customcmds": {
@@ -31,7 +32,7 @@
       "add": "This command already exists in database",
       "remove": "This command cannot be found in database",
       "list": "List of commands is empty",
-      "parse": "Sorry, (sender), but this command is not correct, for help type !command"
+      "parse": "{core.command-parse} !command"
     }
   },
   "keywords": {
@@ -44,7 +45,7 @@
       "add": "This keyword already exists in database",
       "remove": "This keyword cannot be found in database",
       "list": "List of keywords is empty",
-      "parse": "Sorry, (sender), but this command is not correct, for help type !keyword"
+      "parse": "{core.command-parse} !keyword"
     }
   },
   "notice": {
@@ -57,7 +58,7 @@
       "add": "This notice already exists in database",
       "notFound": "This notice cannot be found in database",
       "list": "List of notices is empty",
-      "parse": "Sorry, (sender), but this command is not correct, for help type !notice"
+      "parse": "{core.command-parse} !notice"
     },
     "settings": {
       "noticeInterval": "Notice minimal interval succesfully set to (value) minutes",
@@ -74,14 +75,14 @@
       "remove": "Ouch, (amount) (pointsName) was removed from (username)!"
     },
     "failed": {
-      "set": "Sorry, (sender), but this command is not correct, use !points set [username] [amount]",
-      "give": "Sorry, (sender), but this command is not correct, use !points give [username] [amount]",
+      "set": "{core.command-parse} !points set [username] [amount]",
+      "give": "{core.command-parse} !points give [username] [amount]",
       "giveNotEnough": "Sorry, (sender), you don't have (amount) (pointsName) to give it to (username)",
-      "get": "Sorry, (sender), but this command is not correct, use !points get [username]",
-      "all": "Sorry, (sender), but this command is not correct, use !points all [amount]",
-      "rain": "Sorry, (sender), but this command is not correct, use !makeitrain [amount]",
-      "add": "Sorry, (sender), but this command is not correct, use !points add [username] [amount]",
-      "remove": "Sorry, (sender), but this command is not correct, use !points remove [username] [amount]"
+      "get": "{core.command-parse} !points get [username]",
+      "all": "{core.command-parse} !points all [amount]",
+      "rain": "{core.command-parse} !makeitrain [amount]",
+      "add": "{core.command-parse} !points add [username] [amount]",
+      "remove": "{core.command-parse} !points remove [username] [amount]"
     },
     "defaults": {
       "pointsName": {
@@ -99,7 +100,7 @@
       "list": "List of prices"
     },
     "failed": {
-      "parse": "Sorry, (sender), but this command is not correct, for help type !price",
+      "parse": "{core.command-parse} !price",
       "remove": "No price was set for !(command)",
       "list": "List of prices is empty",
       "notEnough": "Sorry, (sender), but you don't have (amount) (pointsName) to use !(command)"
@@ -113,7 +114,7 @@
       "show": "(sender) have (rank) rank"
     },
     "failed": {
-      "parse": "Sorry, (sender), but this command is not correct, for help type !rank help",
+      "parse": "{core.command-parse} !rank help",
       "add": "Rank for this hour already exists",
       "list": "List of ranks is empty",
       "notFound": "No rank is associated with this hour"
@@ -125,7 +126,7 @@
       "time": "(username) was last seen at (when) in this channel"
     },
     "failed": {
-      "parse": "Sorry, (sender), but this command is not correct, use !lastseen [username]"
+      "parse": "{core.command-parse} !lastseen [username]"
     }
   },
   "watched": {
@@ -133,7 +134,7 @@
       "time": "(username) watched this channel for (time) hours"
     },
     "failed": {
-      "parse": "Sorry, (sender), but this command is not correct, use !watched or !watched [username]"
+      "parse": "{core.command-parse} !watched or !watched [username]"
     }
   },
   "permissions": {
@@ -153,7 +154,7 @@
     "caps": "No excessive caps usage",
     "spam": "Spamming is not allowed",
     "failed": {
-      "parsePermit": "Sorry, (sender), but this command is not correct, use !permit [username]"
+      "parsePermit": "{core.command-parse} !permit [username]"
     },
     "warnings": {
       "links": "No links allowed, (sender), ask for !permit [(value) warnings left]",
@@ -174,10 +175,10 @@
   "settings": {
     "command": {
       "disable": "Command !(command) was disabled",
-      "disableParse": "Sorry, (sender), but this command is not correct, use !disable [command]",
+      "disableParse": "{core.command-parse} !disable [command]",
       "notDisabled": "Command !(command) was not disabled before, not needed to enable it",
       "enable": "Command !(command) was enabled",
-      "enableParse": "Sorry, (sender), but this command is not correct, use !enable [command]"
+      "enableParse": "{core.command-parse} !enable [command]"
     }
   }
 }
