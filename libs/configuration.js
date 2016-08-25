@@ -29,12 +29,6 @@ function Configuration () {
   this.loadValues()
 
   this.register('lang', '', 'string', 'en')
-
-  // wait a little bit to get value from db
-  var self = this
-  setTimeout(function () {
-    global.translate.setLocale(self.getValue('lang'))
-  }, 10000)
 }
 
 Configuration.prototype.loadFile = function () {
@@ -66,7 +60,7 @@ Configuration.prototype.setValue = function (self, sender, text) {
       self.cfgL[cmd].value = data[cmd]
     } else if (filter === 'string' && value.trim().length > 0) {
       if (cmd === 'lang') {
-        global.translate.setLocale(value)
+        self.cfgL[cmd].value = value.trim()
         global.commons.sendMessage(global.translate('core.lang-selected'))
         data.success = function () { return true }
       }
