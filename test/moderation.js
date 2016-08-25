@@ -420,7 +420,7 @@ describe('System - Moderation', function () {
         })
       })
       it('should send parse error', function () {
-        expect(global.output.pop()).to.match(/^Sorry,/)
+        expect(global.output.pop()).to.match(/en.moderation.failed.parsePermit/)
       })
     })
     describe('parsing \'!permit [username]\'', function () {

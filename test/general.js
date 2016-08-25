@@ -2,7 +2,9 @@ var Parser = require('../libs/parser')
 var Configuration = require('../libs/configuration')
 var Commons = require('../libs/commons')
 var Database = require('nedb')
-var Translate = require('counterpart')
+
+global.translate = require('../libs/translate')
+
 require('../libs/logging')
 
 global.parser = new Parser()
@@ -31,7 +33,7 @@ global.botDB = new Database({
 global.output = []
 global.timeouts = []
 
-global.translate = Translate
-global.translate.registerTranslations('en', require('../locales/en.json'))
-global.translate.setLocale('en')
 global.log.exitOnError = false
+
+/* users */
+global.ownerUser = {username: 'sogehige'}
