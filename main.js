@@ -8,18 +8,15 @@ var Configuration = require('./libs/configuration')
 var Parser = require('./libs/parser')
 var Twitch = require('./libs/twitch')
 var Commons = require('./libs/commons')
-var Translate = require('counterpart')
 var User = require('./libs/user')
 require('./libs/logging')
-
-global.translate = Translate
-global.translate.registerTranslations('en', require('./locales/en.json'))
-global.translate.registerTranslations('cs', require('./locales/cs.json'))
 
 global.parser = new Parser()
 global.configuration = new Configuration()
 global.twitch = new Twitch()
 global.commons = new Commons()
+global.translate = require('./libs/translate')
+
 require('./libs/permissions')
 
 var options = {
@@ -38,8 +35,10 @@ var options = {
 
 global.client = new irc.client(options)
 
-// bot systems
-global.systems = require('auto-load')('./libs/systems/')
+// load bot systems after translation is loaded
+global.translate().then(function () {
+  global.systems = require('auto-load')('./libs/systems/')
+})
 
 // Connect the client to the server..
 global.client.connect()

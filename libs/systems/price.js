@@ -17,7 +17,7 @@ function Price () {
 
     global.parser.registerParser(this, 'price', this.checkPrice, constants.VIEWERS)
   }
-  log.info('Price system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.price === true && global.configuration.get().systems.points === true ? chalk.green('enabled') : chalk.red('disabled')))
+  log.info('Price system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.price === true && global.configuration.get().systems.points === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Price.prototype.help = function (self, sender) {
