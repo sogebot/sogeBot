@@ -112,7 +112,7 @@ Twitch.prototype.showMe = function (self, sender, text) {
   try {
     var user = new User(sender.username)
     user.isLoaded().then(function () {
-      var message = [sender.username]
+      var message = ['@' + sender.username]
       // rank
       var rank = !_.isUndefined(user.get('rank')) ? user.get('rank') : null
       global.configuration.get().systems.ranks === true && !_.isNull(rank) ? message.push(rank) : null
