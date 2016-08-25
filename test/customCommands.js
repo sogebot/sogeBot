@@ -1,9 +1,9 @@
-/* global describe it beforeEach after afterEach before */
+/* global describe it beforeEach after before */
 
 var expect = require('chai').expect
 
 require('./general')
-var cc = require('../libs/systems/customCommands')
+require('../libs/systems/customCommands')
 
 describe('System - Custom Commands', function () {
   describe('#help', function () {
