@@ -7,7 +7,29 @@
     "online": "Stream is online for (time)",
     "offline": "Stream is currently offline!",
     "lang-selected": "Bot language is currently set to english",
-    "command-parse": "Sorry, (sender), but this command is not correct, use"
+    "command-parse": "Sorry, (sender), but this command is not correct, use",
+    "error": "Sorry, (sender), but something went wrong!"
+  },
+  "bets": {
+      "newBet": "(sender), your current bet is (amount) (pointsName) on (option)!",
+      "running": "(sender), bet is already opened! Use !bet close [(options)]",
+      "notRunning": "No bet is currently opened, ask mods to open it!",
+      "opened": "New bet is opened! Use !bet [(options)] [points] to win! You have only (minutes)min to bet!",
+      "notEnoughOptions": "(sender), new bets needs at least 2 options!",
+      "info": "Bets are opened! Use !bet [(options)] [points] to win! (time)min left to bet!",
+      "parseError": "{core.command-parse} !bet to check usage",
+      "diffBet": "(sender), you already made a bet on (option) and you cannot bet to different option!",
+      "notEnoughPoints": "Sorry, (sender), but you dont have (amount) (pointsName) to bet!",
+      "undefinedBet": "Sorry, (sender), but this bet option doesn't exist, use !bet to check usage",
+      "betPercentGain": "Bet percent gain per option was set to (value)%",
+      "betCloseTimer": "Bets will be automatically closed after (value)min",
+      "refund": "Bets were closed without a winning. All users are refunded!",
+      "notOption": "(sender), this option doesn't exist! Bet is not closed, check !bet",
+      "closed": "Bets was closed and winning option was (option)! Congratulations to winners!",
+      "timeUpBet": "I guess you are too late, (sender), your time for betting is up!",
+      "locked": "Betting time is up! No more bets.",
+      "zeroBet": "Oh boy, (sender), you cannot bet 0 (pointsName)",
+      "lockedInfo": "Bets are opened, but time for betting is up!"
   },
   "alias": {
     "success": {

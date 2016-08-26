@@ -7,7 +7,29 @@
     "online": "Stream je online (time)",
     "offline": "Stream je prave offline!",
     "lang-selected": "Bot je nyni prepnuty do cestiny",
-    "command-parse": "Promin, (sender), ale tento prikaz neni spravne, pouzij"
+    "command-parse": "Promin, (sender), ale tento prikaz neni spravne, pouzij",
+    "error": "Promin, (sender), ale neco se pokazilo!"
+  },
+  "bets": {
+      "newBet": "(sender), nyni mas vsazeno (amount) (pointsName) na (option)!",
+      "running": "(sender), sazky jsou jiz otevreny! Pouzij !bet close [(options)]",
+      "notRunning": "Zadne sazky nejsou otevreny, pozadej moda o otevreni!",
+      "opened": "Sazky otevreny! Pouzij !bet [(options)] [points] a vyhraj! Zbyva pouze (minutes)min pro vsazeni!",
+      "notEnoughOptions": "(sender), nove sazky musi mit alespon dve moznosti!",
+      "info": "Sazky otevreny! Pouzij !bet [(options)] [points] a vyhraj! (time)min zbyva pro vsazeni!",
+      "parseError": "{core.command-parse} !bet a zjisti jak na to",
+      "diffBet": "(sender), uz sis vsdil na (option) a nemuzes vsadit na vice moznosti najednou!",
+      "notEnoughPoints": "Promin, (sender), ale nemas (amount) (pointsName) do sazky!",
+      "undefinedBet": "Promin, (sender), ale tato moznost neexistuje, pouzij !bet a zjisti jak na to",
+      "betPercentGain": "Sazky se vyplaci (value)% za kazdou moznost",
+      "betCloseTimer": "Sazky budou automaticky uzavreny za (value)min",
+      "refund": "Sazky byly uzavreny bez vyhry, vsichni uzivatele byly vyplaceni!",
+      "notOption": "(sender), tato moznost neexistuje! Sazka nebyla uzavrena, pouzij !bet",
+      "closed": "Sazky byly uzavreny a vitezna moznost je (option)! Gratulace vitezum!",
+      "timeUpBet": "Prisel si pozde, (sender), cas na sazeni vyprsel!",
+      "locked": "Vyprsel cas na vsazeni! Dalsi sazky neprijimame",
+      "zeroBet": "Ale ale, (sender), nemuzes vsadit 0 (pointsName)",
+      "lockedInfo": "Sazky jsou otevreny, ale cas na vsazeni jiz vyprsel!"
   },
   "alias": {
     "success": {
