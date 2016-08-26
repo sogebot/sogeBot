@@ -25,6 +25,7 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 * !uptime, !lastseen, !watched commands
 * !enable, !disable commands
 * language support - currently english and cestina
+* currently added **games**: bets
 * better logging -> know, why user is timed out, bot logs and exceptions
 * songs system - **songrequest** and **playlist** support for YouTube
 * **auto volume normalization** of videos played through songs system
