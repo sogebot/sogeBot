@@ -191,7 +191,8 @@
       "moderationLongMessage": "Moderation of long messages is set to (value)",
       "moderationCaps": "Moderation of caps is set to (value)",
       "moderationSpam": "Moderation of spam is set to (value)",
-      "moderationWarnings": "User will be warned (value) times before timeout"
+      "moderationWarnings": "User will be warned (value) times",
+      "moderationWarningsTimeout": "User will be warned with timeout - (value)"
     }
   },
   "settings": {

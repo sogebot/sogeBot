@@ -21,6 +21,7 @@ function Moderation () {
     global.configuration.register('moderationCaps', global.translate('moderation.settings.moderationCaps'), 'bool', true)
     global.configuration.register('moderationSpam', global.translate('moderation.settings.moderationSpam'), 'bool', true)
     global.configuration.register('moderationWarnings', global.translate('moderation.settings.moderationWarnings'), 'number', 0)
+    global.configuration.register('moderationWarningsTimeouts', global.translate('moderation.settings.moderationWarnings'), 'bool', true)
 
     // purge warnings older than hour
     setInterval(function () {
@@ -47,6 +48,7 @@ function Moderation () {
 
 Moderation.prototype.timeoutUser = function (sender, warning, msg, time) {
   var warningsAllowed = global.configuration.getValue('moderationWarnings')
+  var warningsTimeout = global.configuration.getValue('moderationWarningsTimeouts')
   if (warningsAllowed === 0) {
     global.commons.timeout(sender.username, msg, time)
     return
@@ -62,7 +64,11 @@ Moderation.prototype.timeoutUser = function (sender, warning, msg, time) {
       } else {
         times.push(new Date().getTime())
         global.botDB.update({_id: 'warnings_' + sender.username}, {$set: {time: times.join(',')}})
-        global.commons.sendMessage(warning.replace('(value)', parseInt(warningsAllowed, 10) - times.length), sender)
+        if (warningsTimeout) {
+          global.commons.timeout(sender.username, warning.replace('(value)', parseInt(warningsAllowed, 10) - times.length), 1)
+        } else {
+          global.commons.sendMessage(warning.replace('(value)', parseInt(warningsAllowed, 10) - times.length), sender)
+        }
       }
     } else {
       global.botDB.insert({_id: 'warnings_' + sender.username, time: new Date().getTime().toString()})

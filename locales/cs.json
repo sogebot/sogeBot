@@ -191,7 +191,8 @@
       "moderationLongMessage": "Moderovani dlouhych zprav je nastaveno na (value)",
       "moderationCaps": "Moderovani velkych pismen je nastaveno na (value)",
       "moderationSpam": "Moderovani spamu je nastaveno na (value)",
-      "moderationWarnings": "Uzivatel bude (value)x varovan, nez dostane timeout"
+      "moderationWarnings": "Uzivatel bude (value)x varovan, nez dostane timeout",
+      "moderationWarningsTimeout": "Uzivatel bude varovan i s timeoutem - (value)"
     }
   },
   "settings": {
