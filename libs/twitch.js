@@ -41,6 +41,7 @@ function Twitch () {
   global.parser.register(this, '!lastseen', this.lastseen, constants.VIEWERS)
   global.parser.register(this, '!watched', this.watched, constants.VIEWERS)
   global.parser.register(this, '!me', this.showMe, constants.VIEWERS)
+  global.parser.register(this, '!top', this.showTop, constants.VIEWERS)
 
   global.parser.registerParser(this, 'lastseen', this.lastseenUpdate, constants.VIEWERS)
 }
@@ -127,6 +128,35 @@ Twitch.prototype.showMe = function (self, sender, text) {
       global.configuration.get().systems.points === true ? message.push(points + ' ' + global.systems.points.getPointsName(points)) : null
 
       global.commons.sendMessage(message.join(' | '), sender)
+    })
+  } catch (e) {
+    global.log.error(e)
+  }
+}
+
+Twitch.prototype.showTop = function (self, sender, text) {
+  try {
+    var parsed = text.match(/^(watched|points) (\d+)$/)
+    if (parsed[1] === 'watched') parsed[1] = 'watchTime'
+    var orderBy = {}; orderBy[parsed[1]] = -1
+    global.botDB.find({$where: function () {
+      return this._id.startsWith('user') &&
+        this._id !== 'user_' + global.configuration.get().twitch.username &&
+        this._id !== 'user_' + global.configuration.get().twitch.owner }})
+    .limit(parsed[2])
+    .sort(orderBy).exec(function (err, items) {
+      if (err) global.log.error(err)
+
+      global.commons.sendMessage(global.translate(parsed[1] === 'watchTime' ? 'top.listWatched' : 'top.listPoints').replace('(amount)', parsed[2]))
+      var index = 0
+      _.each(items, function (item) {
+        index = index + 1
+        if (parsed[1] === 'watchTime') {
+          global.commons.sendMessage(index + '. ' + '@' + item.username + ' - ' + (!_.isUndefined(item.watchTime) ? item.watchTime : 0 / 1000 / 60 / 60).toFixed(1) + 'h')
+        } else {
+          global.commons.sendMessage(index + '. ' + '@' + item.username + ' - ' + (!_.isUndefined(item.points) ? item.points + ' ' + global.systems.points.getPointsName(item.points) : 0 + ' ' + global.systems.points.getPointsName(0)))
+        }
+      })
     })
   } catch (e) {
     global.log.error(e)
