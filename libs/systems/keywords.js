@@ -24,7 +24,7 @@ Keywords.prototype.help = function (self, sender) {
 Keywords.prototype.add = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w+) (\w+)$/)
-    global.commons.insertIfNotExists({__id: 'kwd_' + parsed[1], _keyword: parsed[1], response: parsed[2], success: global.translate('keywords.success.add'), error: global.translate('keywords.failed.add')})
+    global.commons.insertIfNotExists({__id: 'kwd_' + parsed[1], _keyword: parsed[1], response: parsed[2], success: 'keywords.success.add', error: 'keywords.failed.add'})
   } catch (e) {
     global.commons.sendMessage(global.translate('keywords.failed.parse'), sender)
   }
@@ -56,7 +56,7 @@ Keywords.prototype.list = function (self, sender, text) {
 Keywords.prototype.remove = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w+)$/)
-    global.commons.remove({__id: 'kwd_' + parsed[1], success: global.translate('keywords.success.remove'), error: global.translate('keywords.failed.remove')})
+    global.commons.remove({__id: 'kwd_' + parsed[1], success: 'keywords.success.remove', error: 'keywords.failed.remove'})
   } catch (e) {
     global.commons.sendMessage(global.translate('keywords.failed.parse'), sender)
   }

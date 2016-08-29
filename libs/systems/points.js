@@ -18,12 +18,12 @@ function Points () {
     global.parser.register(this, '!points', this.getPoints, constants.VIEWERS)
 
     // default is <singular>|<plural> | in some languages can be set with custom <singular>|<x:multi>|<plural> where x <= 10
-    global.configuration.register('pointsName', 'Points name was set to (value) format', 'string', '')
-    global.configuration.register('pointsResponse', 'Points response was changed to: (value)', 'string', '')
-    global.configuration.register('pointsInterval', 'Points online interval set to (value) minutes', 'number', 10)
-    global.configuration.register('pointsPerInterval', 'Points when online was set to (value) per online interval', 'number', 1)
-    global.configuration.register('pointsIntervalOffline', 'Points offline interval set to (value) minutes', 'number', 30)
-    global.configuration.register('pointsPerIntervalOffline', 'Points when offline was set to (value) per offline interval', 'number', 1)
+    global.configuration.register('pointsName', 'points.settings.pointsName', 'string', '')
+    global.configuration.register('pointsResponse', 'points.settings.pointsResponse', 'string', '')
+    global.configuration.register('pointsInterval', 'points.settings.pointsInterval', 'number', 10)
+    global.configuration.register('pointsPerInterval', 'points.settings.pointsPerInterval', 'number', 1)
+    global.configuration.register('pointsIntervalOffline', 'points.settings.pointsIntervalOffline', 'number', 30)
+    global.configuration.register('pointsPerIntervalOffline', 'points.settings.pointsPerIntervalOffline', 'number', 1)
 
     // add events for join/part
     var self = this

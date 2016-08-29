@@ -15,13 +15,13 @@ function Moderation () {
     global.parser.registerParser(this, 'moderationCaps', this.caps, constants.VIEWERS)
     global.parser.registerParser(this, 'moderationSpam', this.spam, constants.VIEWERS)
 
-    global.configuration.register('moderationLinks', global.translate('moderation.settings.moderationLinks'), 'bool', true)
-    global.configuration.register('moderationSymbols', global.translate('moderation.settings.moderationSymbols'), 'bool', true)
-    global.configuration.register('moderationLongMessage', global.translate('moderation.settings.moderationLongMessage'), 'bool', true)
-    global.configuration.register('moderationCaps', global.translate('moderation.settings.moderationCaps'), 'bool', true)
-    global.configuration.register('moderationSpam', global.translate('moderation.settings.moderationSpam'), 'bool', true)
-    global.configuration.register('moderationWarnings', global.translate('moderation.settings.moderationWarnings'), 'number', 0)
-    global.configuration.register('moderationWarningsTimeouts', global.translate('moderation.settings.moderationWarnings'), 'bool', true)
+    global.configuration.register('moderationLinks', 'moderation.settings.moderationLinks', 'bool', true)
+    global.configuration.register('moderationSymbols', 'moderation.settings.moderationSymbols', 'bool', true)
+    global.configuration.register('moderationLongMessage', 'moderation.settings.moderationLongMessage', 'bool', true)
+    global.configuration.register('moderationCaps', 'moderation.settings.moderationCaps', 'bool', true)
+    global.configuration.register('moderationSpam', 'moderation.settings.moderationSpam', 'bool', true)
+    global.configuration.register('moderationWarnings', 'moderation.settings.moderationWarnings', 'number', 0)
+    global.configuration.register('moderationWarningsTimeouts', 'moderation.settings.moderationWarnings', 'bool', true)
 
     // purge warnings older than hour
     setInterval(function () {

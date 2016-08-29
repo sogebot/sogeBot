@@ -106,6 +106,14 @@
       "add": "{core.command-parse} !points add [username] [amount]",
       "remove": "{core.command-parse} !points remove [username] [amount]"
     },
+    "settings": {
+      "pointsName": "Pojmenovani bodu nastaveno na (value) format",
+      "pointsResponse": "Odpoved na body nastavena na: (value)",
+      "pointsInterval": "Interval ziskavani bodu online je (value) minut",
+      "pointsPerInterval": "Pocet bodu ziskano za interval online je (amount)",
+      "pointsIntervalOffline": "Interval ziskavani bodu offline je (value) minut",
+      "pointsPerIntervalOffline": "Pocet bodu ziskano za interval offline je (amount)"
+    },
     "defaults": {
       "pointsName": {
         "single": "bod",
@@ -113,6 +121,13 @@
         "xmulti": "4:body"
       },
       "pointsResponse": "(username) ma prave (amount) (pointsName)"
+    }
+  },
+  "songs": {
+    "settings": {
+      "volume": "Hlasitost nastavena na (value)%",
+      "duration": "Maximalni delka pisne nastavena na (value) minut.",
+      "shuffle": "Playlist shuffle - (value)"
     }
   },
   "price": {

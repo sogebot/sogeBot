@@ -30,7 +30,7 @@ Ranks.prototype.help = function (self, sender) {
 Ranks.prototype.add = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\d+) (\w.+)$/)
-    global.commons.insertIfNotExists({__id: 'rank_' + parsed[1], rank: parsed[2], _hours: parseInt(parsed[1], 10), success: global.translate('rank.success.add'), error: global.translate('rank.failed.add')})
+    global.commons.insertIfNotExists({__id: 'rank_' + parsed[1], rank: parsed[2], _hours: parseInt(parsed[1], 10), success: 'rank.success.add', error: 'rank.failed.add'})
   } catch (e) {
     global.commons.sendMessage(global.translate('rank.failed.parse'), sender)
   }
@@ -53,7 +53,7 @@ Ranks.prototype.list = function (self, sender, text) {
 Ranks.prototype.remove = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\d+)$/)
-    global.commons.remove({__id: 'rank_' + parsed[1], success: global.translate('rank.success.remove'), error: global.translate('rank.failed.notFound')})
+    global.commons.remove({__id: 'rank_' + parsed[1], success: 'rank.success.remove', error: 'rank.failed.notFound'})
   } catch (e) {
     global.commons.sendMessage(global.translate('rank.failed.parse'), sender)
   }

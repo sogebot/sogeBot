@@ -106,6 +106,14 @@
       "add": "{core.command-parse} !points add [username] [amount]",
       "remove": "{core.command-parse} !points remove [username] [amount]"
     },
+    "settings": {
+      "pointsName": "Points name was set to (value) format",
+      "pointsResponse": "Points response was changed to: (value)",
+      "pointsInterval": "Points online interval set to (value) minutes",
+      "pointsPerInterval": "Points when online was set to (value) per online interval",
+      "pointsIntervalOffline": "Points offline interval set to (value) minutes",
+      "pointsPerIntervalOffline": "Points when offline was set to (value) per offline interval"
+    },
     "defaults": {
       "pointsName": {
         "single": "point",
@@ -113,6 +121,13 @@
         "xmulti": null
       },
       "pointsResponse": "(username) has currently (amount) (pointsName)"
+    }
+  },
+  "songs": {
+    "settings": {
+      "volume": "Volume succesfully set to (value)%",
+      "duration": "Maximum song length set to (value) minutes.",
+      "shuffle": "Playlist shuffle - (value)"
     }
   },
   "price": {

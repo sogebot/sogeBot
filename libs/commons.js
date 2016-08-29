@@ -85,7 +85,7 @@ Commons.prototype.runCallback = function (cb, data) {
   var value = this.stripUnderscores(data)
   delete value.type
   if (_.isUndefined(cb)) return
-  typeof cb === 'function' ? cb(data) : this.sendMessage(cb.replace('(value)', value[Object.keys(value)[0]]))
+  typeof cb === 'function' ? cb(data) : this.sendMessage(global.translate(cb).replace('(value)', value[Object.keys(value)[0]]))
 }
 
 Commons.prototype.sendMessage = function (message, sender) {

@@ -17,8 +17,8 @@ function Notice () {
     global.parser.register(this, '!notice remove', this.remove, constants.OWNER_ONLY)
     global.parser.register(this, '!notice', this.help, constants.OWNER_ONLY)
 
-    global.configuration.register('noticeInterval', global.translate('notice.settings.noticeInterval'), 'number', 10)
-    global.configuration.register('noticeMsgReq', global.translate('notice.settings.noticeMsgReq'), 'number', 10)
+    global.configuration.register('noticeInterval', 'notice.settings.noticeInterval', 'number', 10)
+    global.configuration.register('noticeMsgReq', 'notice.settings.noticeMsgReq', 'number', 10)
 
     // start interval for posting notices
     var self = this
@@ -58,7 +58,7 @@ Notice.prototype.add = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w.+)$/)
     var hash = crypto.createHash('md5').update(parsed[0]).digest('hex').substring(0, 5)
-    global.commons.insertIfNotExists({__id: 'notice_' + hash, _text: parsed[0], time: new Date().getTime(), success: global.translate('notice.success.add'), error: global.translate('notice.failed.add')})
+    global.commons.insertIfNotExists({__id: 'notice_' + hash, _text: parsed[0], time: new Date().getTime(), success: 'notice.success.add', error: 'notice.failed.add'})
   } catch (e) {
     global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
   }
@@ -94,7 +94,7 @@ Notice.prototype.get = function (self, sender, text) {
 Notice.prototype.remove = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w+)$/)
-    global.commons.remove({__id: 'notice_' + parsed[1], success: global.translate('notice.success.remove'), error: global.translate('notice.failed.notFound')})
+    global.commons.remove({__id: 'notice_' + parsed[1], success: 'notice.success.remove', error: 'notice.failed.notFound'})
   } catch (e) {
     global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
   }
