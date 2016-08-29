@@ -159,6 +159,10 @@
       "parse": "{core.command-parse} !watched nebo !watched [username]"
     }
   },
+  "top": {
+    "listWatched": "Top (amount) podle casu sledovani: ",
+    "listPoints": "Top (amount) podle bodu: "
+  },
   "permissions": {
     "success": {
       "change": "Prava pro pouziti prikazu byla zmenena"

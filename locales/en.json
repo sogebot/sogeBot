@@ -159,6 +159,10 @@
       "parse": "{core.command-parse} !watched or !watched [username]"
     }
   },
+  "top": {
+    "listWatched": "Top (amount) by watch time:",
+    "listPoints": "Top (amount) by points:"
+  },
   "permissions": {
     "success": {
       "change": "Permission for command was succesfully changed"
