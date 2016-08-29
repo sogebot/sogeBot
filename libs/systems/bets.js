@@ -28,8 +28,8 @@ function Bets () {
     global.parser.register(this, '!bet close', this.close, constants.MODS)
     global.parser.register(this, '!bet', this.bet, constants.VIEWERS)
 
-    global.configuration.register('betPercentGain', global.translate('bets.betPercentGain'), 'number', 20)
-    global.configuration.register('betCloseTimer', global.translate('bets.betCloseTimer'), 'number', 2)
+    global.configuration.register('betPercentGain', 'bets.betPercentGain', 'number', 20)
+    global.configuration.register('betCloseTimer', 'bets.betCloseTimer', 'number', 2)
 
     // close any bets
     this.close(this, {username: global.configuration.get().owner}, 'refundall')

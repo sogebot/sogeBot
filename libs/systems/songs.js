@@ -24,9 +24,9 @@ function Songs () {
     global.parser.register(this, '!playlist steal', this.stealSongToPlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist', this.help, constants.OWNER_ONLY)
 
-    global.configuration.register('volume', 'Volume succesfully set to (value)%', 'number', 25)
-    global.configuration.register('duration', 'Maximum song length set to (value) minutes.', 'number', 10)
-    global.configuration.register('shuffle', 'Playlist shuffle has been enabled', 'bool', false)
+    global.configuration.register('volume', 'songs.settings.volume', 'number', 25)
+    global.configuration.register('duration', 'songs.settings.duration', 'number', 10)
+    global.configuration.register('shuffle', 'songs.settings.shuffle', 'bool', false)
 
     var basic = auth.basic({
       realm: 'YTPlayer'

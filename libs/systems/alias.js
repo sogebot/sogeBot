@@ -24,7 +24,7 @@ Alias.prototype.help = function (self, sender) {
 Alias.prototype.add = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w+) (\w+)$/)
-    global.commons.insertIfNotExists({__id: 'alias_' + parsed[2], _alias: parsed[2], command: parsed[1], success: global.translate('alias.success.add'), error: global.translate('alias.failed.add')})
+    global.commons.insertIfNotExists({__id: 'alias_' + parsed[2], _alias: parsed[2], command: parsed[1], success: 'alias.success.add', error: 'alias.failed.add'})
   } catch (e) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
   }
@@ -46,7 +46,7 @@ Alias.prototype.list = function (self, sender, text) {
 Alias.prototype.remove = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w+)$/)
-    global.commons.remove({__id: 'alias_' + parsed[1], success: global.translate('alias.success.remove'), error: global.translate('alias.failed.remove')})
+    global.commons.remove({__id: 'alias_' + parsed[1], success: 'alias.success.remove', error: 'alias.failed.remove'})
   } catch (e) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
   }

@@ -35,7 +35,7 @@ CustomCommands.prototype.register = function (self) {
 CustomCommands.prototype.add = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w+) (\w.+)$/)
-    global.commons.insertIfNotExists({__id: 'customcmds_' + parsed[1], _command: parsed[1], response: parsed[2], success: global.translate('customcmds.success.add'), error: global.translate('customcmds.failed.add')})
+    global.commons.insertIfNotExists({__id: 'customcmds_' + parsed[1], _command: parsed[1], response: parsed[2], success: 'customcmds.success.add', error: 'customcmds.failed.add'})
   } catch (e) {
     global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
   }
@@ -71,7 +71,7 @@ CustomCommands.prototype.remove = function (self, sender, text) {
         global.parser.unregister('!' + cb.command)
         global.commons.sendMessage(global.translate('customcmds.success.remove'), sender)
       },
-      error: global.translate('customcmds.failed.remove')})
+      error: 'customcmds.failed.remove'})
   } catch (e) {
     global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
   }
