@@ -128,7 +128,21 @@
       "volume": "Volume succesfully set to (value)%",
       "duration": "Maximum song length set to (value) minutes.",
       "shuffle": "Playlist shuffle - (value)"
-    }
+    },
+    "bannedSong": "Song (title) was banned and will never play again!",
+    "bannedSongTimeout": "You've got timeout for posting banned song",
+    "unbannedSong": "Song was succesfully unbanned",
+    "notBannedSong": "This song was not banned",
+    "currentSong": "Current song is (title)",
+    "noCurrentSong": "No song is currently playing",
+    "isBanned": "Sorry, (sender), but this song is banned",
+    "notFound": "Sorry, (sender), but this song was not found",
+    "tooLong": "Sorry, (sender), but this song is too long",
+    "addedSong": "(title) was added to queue by (sender)",
+    "addedSongPlaylist": "(title) was added to playlist",
+    "removeSongQueue": "(title) was removed from queue",
+    "alreadyInPlaylist": "Song (title) is already in playlist",
+    "removeSongPlaylist": "(title) was removed from playlist"
   },
   "price": {
     "success": {

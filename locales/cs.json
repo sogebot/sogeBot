@@ -128,7 +128,21 @@
       "volume": "Hlasitost nastavena na (value)%",
       "duration": "Maximalni delka pisne nastavena na (value) minut.",
       "shuffle": "Playlist shuffle - (value)"
-    }
+    },
+    "bannedSong": "Pisen (title) byla zabanovana a nebude uz nikdy hrat!",
+    "bannedSongTimeout": "Dostal si timeout za zabanovanou pisen",
+    "unbannedSong": "Pisen byla uspesne odbanovana",
+    "notBannedSong": "Tato pisen nebyla zabanovana",
+    "currentSong": "Prave hrajici pisen je (title)",
+    "noCurrentSong": "Nic momentalne nehraje",
+    "isBanned": "Promin, (sender), ale tahle pisen je zabanovana",
+    "notFound": "Promin, (sender), ale tahle pisen nebyla nalezena",
+    "tooLong": "Promin, (sender), ale tahle pisen je moc dlouha",
+    "addedSong": "(title) byla pridana do queue uzivatelem (sender)",
+    "addedSongPlaylist": "(title) byla pridana do playlistu",
+    "removeSongQueue": "(title) byla odstranena z queue",
+    "alreadyInPlaylist": "Pisen (title) jiz je v playlistu",
+    "removeSongPlaylist": "(title) byla odstranena z playlistu"
   },
   "price": {
     "success": {

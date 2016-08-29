@@ -58,10 +58,10 @@ Songs.prototype.banCurrentSong = function (self, sender) {
   global.botDB.update({type: 'banned-song', _id: self.currentSong.videoID}, {$set: {_id: self.currentSong.videoID, title: self.currentSong.title}}, {upsert: true}, function (err, numAffected) {
     if (err) console.log(err)
     if (numAffected > 0) {
-      global.commons.sendMessage('Song ' + self.currentSong.title + ' was banned and will never play again!')
+      global.commons.sendMessage(global.translate('songs.bannedSong').replace('(title)', self.currentSong.title))
       global.commons.remove({_type: 'playlist', _videoID: self.currentSong.videoID})
       global.commons.remove({_type: 'songrequest', _videoID: self.currentSong.videoID})
-      global.commons.timeout(self.currentSong.username, global.translate('You\'ve got timeout for posting banned song'), 300)
+      global.commons.timeout(self.currentSong.username, global.translate('songs.bannedSongTimeout'), 300)
       self.sendNextSongID(self.socketPointer)
       self.sendPlaylistList(self.socketPointer)
     }
@@ -74,7 +74,7 @@ Songs.prototype.banSongById = function (self, sender, text) {
     if (typeof videoInfo.title === 'undefined' || videoInfo.title === null) return
     global.botDB.update({type: 'banned-song', _id: text}, {$set: {_id: text, title: videoInfo.title}}, {upsert: true}, function (err, numAffected) {
       if (err) console.log(err)
-      if (numAffected > 0) global.commons.sendMessage('Song ' + videoInfo.title + ' was banned and will never play again!')
+      if (numAffected > 0) global.commons.sendMessage(global.translate('songs.bannedSong').replace('(title)', videoInfo.title))
       global.commons.remove({_type: 'playlist', _videoID: text.trim()})
       global.commons.remove({_type: 'songrequest', _videoID: text.trim()})
       self.sendNextSongID(self.socketPointer)
@@ -84,15 +84,15 @@ Songs.prototype.banSongById = function (self, sender, text) {
 }
 
 Songs.prototype.unbanSong = function (self, sender, text) {
-  var data = {_type: 'banned-song', __id: text.trim(), success: 'Song was succesfully unbanned.', error: 'This song was not banned.'}
+  var data = {_type: 'banned-song', __id: text.trim(), success: 'songs.unbannedSong', error: 'song.notBannedSong'}
   if (data.__id.length > 1) global.commons.remove(data)
 }
 
 Songs.prototype.getCurrentSong = function (self) {
   try {
-    global.client.action(global.configuration.get().twitch.owner, 'Current song is ' + self.currentSong.title)
+    global.commons.sendMessage(global.translate('songs.currentSong').replace('(items)', self.currentSong.title))
   } catch (err) {
-    global.client.action(global.configuration.get().twitch.owner, 'No song is currently playing')
+    global.commons.sendMessage(global.translate('songs.noCurrentSong'))
   }
 }
 
@@ -100,7 +100,7 @@ Songs.prototype.stealSongToPlaylist = function (self) {
   try {
     self.addSongToPlaylist(self, null, self.currentSong.videoID)
   } catch (err) {
-    global.client.action(global.configuration.get().twitch.owner, 'No song is currently playing')
+    global.commons.sendMessage(global.translate('songs.noCurrentSong'))
   }
 }
 
@@ -232,13 +232,12 @@ Songs.prototype.handleRequest = function (request, response) {
 }
 
 Songs.prototype.help = function () {
-  global.client.action(global.configuration.get().twitch.owner,
-    '!playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal')
+  global.commons.sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal')
 }
 
 Songs.prototype.addSongToQueue = function (self, sender, text) {
   if (text.length < 1) {
-    global.commons.sendMessage('Usage: !songrequest <video-id|video-url>')
+    global.commons.sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url>', sender)
     return
   }
   var urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&\?]*).*/
@@ -246,16 +245,16 @@ Songs.prototype.addSongToQueue = function (self, sender, text) {
   var videoID = (match && match[1].length === 11) ? match[1] : text.trim()
   global.botDB.findOne({type: 'song-banned', _id: videoID}, function (err, item) {
     if (err) console.log(err)
-    if (!_.isNull(item)) global.commons.sendMessage('Sorry, ' + sender.username + ', but this song is banned.')
+    if (!_.isNull(item)) global.commons.sendMessage(global.translate('songs.isBanned'), sender)
     else {
       ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
         if (err) console.log(err)
         if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
-          global.commons.sendMessage('Sorry, ' + sender.username + ', but this song was not found')
-        } else if (videoInfo.length_seconds / 60 > global.configuration.getValue('duration')) global.commons.sendMessage('Sorry, ' + sender.username + ', but this song is too long.')
+          global.commons.sendMessage(global.translate('songs.notFound'), sender)
+        } else if (videoInfo.length_seconds / 60 > global.configuration.getValue('duration')) global.commons.sendMessage(global.translate('songs.tooLong'), sender)
         else {
           global.botDB.insert({type: 'songRequests', videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: sender.username})
-          global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to queue requested by ' + sender.username)
+          global.commons.sendMessage(global.translate('songs.addedSong').replace('(title)', videoInfo.title), sender)
         }
       })
     }
@@ -268,7 +267,7 @@ Songs.prototype.removeSongFromQueue = function (self, user, text) {
     if (typeof item === 'undefined' || item === null) return
     global.botDB.remove({type: 'songRequests', videoID: item.videoID}, {}, function (err, numRemoved) {
       if (err) console.log(err)
-      if (numRemoved > 0) global.client.action(global.configuration.get().twitch.owner, item.title + ' was removed from queue')
+      if (numRemoved > 0) global.commons.sendMessage(global.translate('songs.removeSongQueue').replace('(title)', item.title), user)
     })
   })
 }
@@ -279,7 +278,7 @@ Songs.prototype.addSongToPlaylist = function (self, sender, text) {
   var videoID = (match && match[1].length === 11) ? match[1] : text.trim()
   global.botDB.findOne({type: 'song-banned', _id: videoID}, function (err, item) {
     if (err) console.log(err)
-    if (!_.isNull(item)) global.commons.sendMessage('Sorry, ' + sender.username + ', but this song is banned.')
+    if (!_.isNull(item)) global.commons.sendMessage(global.translate('songs.isBanned'), sender)
     else {
       global.botDB.findOne({type: 'playlist', videoID: videoID}, function (err, item) {
         if (err) console.log(err)
@@ -287,11 +286,11 @@ Songs.prototype.addSongToPlaylist = function (self, sender, text) {
           ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
             if (err) console.log(err)
             global.botDB.insert({type: 'playlist', videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime()})
-            global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was added to playlist')
+            global.commons.sendMessage(global.translate('songs.addedSongPlaylist').replace('(title)', videoInfo.title), sender)
             self.createRandomSeeds()
           })
         } else {
-          global.client.action(global.configuration.get().twitch.owner, 'Song ' + item.title + ' is already in playlist')
+          global.commons.sendMessage(global.translate('songs.alreadyInPlaylist').replace('(title)', item.title), sender)
         }
       })
     }
@@ -307,7 +306,7 @@ Songs.prototype.removeSongFromPlaylist = function (self, user, text) {
     if (err) console.log(err)
     global.botDB.remove({type: 'playlist', videoID: videoID}, {}, function (err, numRemoved) {
       if (err) console.log(err)
-      if (numRemoved > 0) global.client.action(global.configuration.get().twitch.owner, videoInfo.title + ' was removed from playlist')
+      if (numRemoved > 0) global.commons.sendMessage(global.translate('songs.removeSongPlaylist').replace('(title)', videoInfo.title), user)
       self.sendPlaylistList(self.socketPointer)
     })
   })
