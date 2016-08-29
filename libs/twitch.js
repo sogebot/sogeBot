@@ -41,7 +41,7 @@ function Twitch () {
   global.parser.register(this, '!lastseen', this.lastseen, constants.VIEWERS)
   global.parser.register(this, '!watched', this.watched, constants.VIEWERS)
   global.parser.register(this, '!me', this.showMe, constants.VIEWERS)
-  global.parser.register(this, '!top', this.showTop, constants.VIEWERS)
+  global.parser.register(this, '!top', this.showTop, constants.OWNER_ONLY)
 
   global.parser.registerParser(this, 'lastseen', this.lastseenUpdate, constants.VIEWERS)
 }
