@@ -67,7 +67,7 @@ Moderation.prototype.timeoutUser = function (sender, warning, msg, time) {
         if (warningsTimeout) {
           global.commons.timeout(sender.username, warning.replace('(value)', parseInt(warningsAllowed, 10) - times.length), 1)
         } else {
-          global.commons.sendMessage(warning.replace('(value)', parseInt(warningsAllowed, 10) - times.length), sender)
+          global.commons.sendMessage('@' + sender.username + ': ' + warning.replace('(value)', parseInt(warningsAllowed, 10) - times.length), sender)
         }
       }
     } else {
