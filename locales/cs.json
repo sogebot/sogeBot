@@ -212,11 +212,11 @@
       "parsePermit": "{core.command-parse} !permit [username]"
     },
     "warnings": {
-      "links": "Nejsou povoleny linky, (sender), pozadej o !permit [(value) zbyva varovani]",
-      "symbols": "Prilisne pouzivani symbolu neni povoleno, (sender) [(value) zbyva varovani]",
-      "longMessage": "Tva zprava je prilis dlouha, (sender) [(value) zbyva varovani]",
-      "caps": "Prilisne pouzivani velkych pismen neni povoleno, (sender) [(value) zbyva varovani]",
-      "spam": "Spamovani neni povoleno, (sender) [(value) zbyva varovani]"
+      "links": "Nejsou povoleny linky, pozadej o !permit [(value) zbyva varovani]",
+      "symbols": "Prilisne pouzivani symbolu neni povoleno [(value) zbyva varovani]",
+      "longMessage": "Tva zprava je prilis dlouha, [(value) zbyva varovani]",
+      "caps": "Prilisne pouzivani velkych pismen neni povoleno [(value) zbyva varovani]",
+      "spam": "Spamovani neni povoleno [(value) zbyva varovani]"
     },
     "settings": {
       "moderationLinks": "Moderovani linku je nastaveno na (value)",
