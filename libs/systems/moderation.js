@@ -21,7 +21,7 @@ function Moderation () {
     global.configuration.register('moderationCaps', 'moderation.settings.moderationCaps', 'bool', true)
     global.configuration.register('moderationSpam', 'moderation.settings.moderationSpam', 'bool', true)
     global.configuration.register('moderationWarnings', 'moderation.settings.moderationWarnings', 'number', 0)
-    global.configuration.register('moderationWarningsTimeouts', 'moderation.settings.moderationWarnings', 'bool', true)
+    global.configuration.register('moderationWarningsTimeouts', 'moderation.settings.moderationWarningsTimeouts', 'bool', true)
 
     // purge warnings older than hour
     setInterval(function () {
@@ -78,10 +78,12 @@ Moderation.prototype.timeoutUser = function (sender, warning, msg, time) {
 }
 
 Moderation.prototype.whitelisted = function (text) {
-  // TODO: it's hardcoded now just for youtube
-  var urlRegex = /^!.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)[^#&\?]*.*/
-  var match = text.trim().match(urlRegex)
-  return !_.isNull(match)
+  // TODO: it's hardcoded now just for youtube and your clips
+  var ytRegex = /^!.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)[^#&\?]*.*/
+  var clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
+  var clipsMatch = text.trim().match(clipsRegex)
+  return !_.isNull(text.trim().match(ytRegex)) ||
+    (!_.isNull(clipsMatch) && clipsMatch[2] === global.configuration.get().twitch.owner)
 }
 
 Moderation.prototype.permitLink = function (self, sender, text) {
@@ -95,6 +97,8 @@ Moderation.prototype.permitLink = function (self, sender, text) {
 }
 
 Moderation.prototype.containsLink = function (self, id, sender, text) {
+  var timeout = 120
+
   if (global.parser.isOwner(sender) || !global.configuration.getValue('moderationLinks') || self.whitelisted(text)) {
     global.updateQueue(id, true)
     return
@@ -112,7 +116,7 @@ Moderation.prototype.containsLink = function (self, id, sender, text) {
         })
       } catch (err) {
         log.info(sender.username + ' [link] timeout: ' + text)
-        self.timeoutUser(sender, global.translate('moderation.warnings.links'), global.translate('moderation.links'), 5)
+        self.timeoutUser(sender, global.translate('moderation.warnings.links'), global.translate('moderation.links'), timeout)
         global.updateQueue(id, false)
       }
     })
@@ -122,7 +126,7 @@ Moderation.prototype.containsLink = function (self, id, sender, text) {
 }
 
 Moderation.prototype.symbols = function (self, id, sender, text) {
-  var timeout = 20
+  var timeout = 120
   var triggerLength = 15
   var msgLength = text.trim().length
   var maxSymbolsConsecutively = 10
@@ -157,7 +161,7 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
 }
 
 Moderation.prototype.longMessage = function (self, id, sender, text) {
-  var timeout = 20
+  var timeout = 120
   var triggerLength = 300
   var msgLength = text.trim().length
   if (global.parser.isOwner(sender) || msgLength < triggerLength || !global.configuration.getValue('moderationLongMessage')) {
@@ -170,7 +174,7 @@ Moderation.prototype.longMessage = function (self, id, sender, text) {
 }
 
 Moderation.prototype.caps = function (self, id, sender, text) {
-  var timeout = 20
+  var timeout = 120
   var triggerLength = 15
   var msgLength = text.trim().length
   var maxCapsPercent = 50

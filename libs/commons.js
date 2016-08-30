@@ -94,7 +94,7 @@ Commons.prototype.sendMessage = function (message, sender) {
 }
 
 Commons.prototype.timeout = function (username, reason, timeout) {
-  global.client.timeout(global.configuration.get().twitch.owner, username, reason, timeout)
+  global.client.timeout(global.configuration.get().twitch.owner, username, timeout, reason)
 }
 
 module.exports = Commons
