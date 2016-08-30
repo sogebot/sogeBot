@@ -212,11 +212,11 @@
       "parsePermit": "{core.command-parse} !permit [username]"
     },
     "warnings": {
-      "links": "No links allowed, (sender), ask for !permit [(value) warnings left]",
-      "symbols": "No excessive symbols usage, (sender) [(value) warnings left]",
-      "longMessage": "Long messages are not allowed, (sender) [(value) warnings left]",
-      "caps": "No excessive caps usage, (sender) [(value) warnings left]",
-      "spam": "Spamming is not allowed, (sender) [(value) warnings left]"
+      "links": "No links allowed, ask for !permit [(value) warnings left]",
+      "symbols": "No excessive symbols usage [(value) warnings left]",
+      "longMessage": "Long messages are not allowed [(value) warnings left]",
+      "caps": "No excessive caps usage [(value) warnings left]",
+      "spam": "Spamming is not allowed [(value) warnings left]"
     },
     "settings": {
       "moderationLinks": "Moderation of links is set to (value)",
