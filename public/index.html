@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>SogeBot - WebPanel</title>
+    <meta charset="utf-8">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#f4f5f6">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#f4f5f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link rel="stylesheet" href="./dist/css/custom.css">
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="top">
+        <h1>SogeBot WebPanel</h1>
+        <ul class="menu">
+          <li>
+            <a href="#"><span class="glyphicon glyphicon-dashboard"></span>Dashboard</a>
+          </li>
+          <li>
+            <a href="#"><span class="glyphicon glyphicon-music"></span>Songs</a>
+          </li>
+          <li>
+            <a href="#"><span class="glyphicon glyphicon-wrench"></span>Systems</a>
+          </li>
+          <li>
+            <a href="#"><span class="glyphicon glyphicon-cog"></span>Settings</a>
+          </li>
+          <li>
+            <a href="#"><span class="glyphicon glyphicon-stats"></span>Stats</a>
+          </li>
+        </ul>
+      </div>
+      <div class="row">
+        <div class="col-sm-12 col-md-12 main">
+          <!-- SNIPPETS -->
+          <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+            <h2><span class="glyphicon glyphicon-user"></span> Current Viewers</h2>
+            <div class="data">1234</div>
+            <div class="stats">&nbsp;</div>
+          </div>
+          <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+            <h2><span class="glyphicon glyphicon-user"></span> Max Concurrent Viewers</h2>
+            <div class="data">2560</div>
+            <div class="stats"><span class="stats-up text-success"><span class="glyphicon glyphicon-triangle-top"></span> 4%</span> From last Session</div>
+          </div>
+          <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+            <h2><span class="glyphicon glyphicon-comment"></span> Total Chat Messages</h2>
+            <div class="data">1234,56k</div>
+            <div class="stats"><span class="stats-down text-danger"><span class="glyphicon glyphicon-triangle-bottom"></span> 4%</span> From last Session</div>
+          </div>
+          <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+            <h2><span class="glyphicon glyphicon-star"></span> Total New Chatters</h2>
+            <div class="data">12</div>
+            <div class="stats"><span class="stats-down text-danger"><span class="glyphicon glyphicon-triangle-bottom"></span> 4%</span> From last Session</div>
+          </div>
+          <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+            <h2><span class="glyphicon glyphicon-time"></span> Streaming Session</h2>
+            <div class="data">1d1:16:28</div>
+            <div class="stats">&nbsp;</div>
+          </div>
+          <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+            <h2><span class="glyphicon glyphicon-thumbs-up"></span> New Followers</h2>
+            <div class="data">1</div>
+            <div class="stats"><span class="stats-up text-success"><span class="glyphicon glyphicon-triangle-top"></span> 4%</span> From last Session</div>
+          </div>
+
+          <div class="clearfix"></div>
+
+          <!-- widgets -->
+          <div class="widgets">
+            <div class="col-xs-12 col-sm-4 col-md-4">
+                <div class="widget">
+                  <div class="title">YouTube Player</div>
+                  <div class="controls">
+                    <span class="glyphicon glyphicon-play text-success"></span>
+                    <span class="glyphicon glyphicon-stop text-danger not-active"></span>
+                  </div>
+                  <iframe width="560" height="315" src="https://www.youtube.com/embed/dVf7bLglido" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-4 col-md-4">
+                <div class="widget">
+                  <div class="title">Song Requests</div>
+                  <div class="controls">
+                    <span class="glyphicon glyphicon-ok text-success not-active"></span>
+                    <span class="glyphicon glyphicon-remove text-danger"></span>
+                  </div>
+                  <table class="table table-condensed">
+                    <tr>
+                      <td>12:45</td>
+                      <td>NAME RAP OR DIE</td>
+                      <td>sogehige</td>
+                    </tr>
+                    <tr>
+                      <td>4:23</td>
+                      <td>Nejaky song</td>
+                      <td>typek_nejaky</td>
+                    </tr>
+                  </table>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-4 col-md-4">
+                <div class="widget">
+                  <div class="title">Twitch Chat</div>
+                  <div class="controls">&nbsp;</div>
+                  <iframe frameborder="0" scrolling="no" src="http://twitch.tv/sogehige/chat?popout=" height="500" width="560"></iframe>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-4 col-md-4">
+                <div class="widget">
+                  <div class="title">Latest Clips</div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <a href="https://github.com/sogehige/SogeBot">GitHub</a> | <a href="https://github.com/sogehige/SogeBot/issues">Issues</a> | <a href="https://github.com/sogehige/SogeBot/blob/master/LICENSE">MIT License</a>
+    </footer>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  </body>
+</html>

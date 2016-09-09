@@ -1,0 +1,230 @@
+body {
+  padding-top: 50px;
+  background-color: #eee
+}
+
+.navbar-fixed-top {
+  border: 0;
+}
+
+.sidebar {
+  display: none;
+}
+@media (min-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 51px;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+    background-color: #f5f5f5;
+    border-right: 1px solid #eee;
+  }
+}
+
+/* Sidebar navigation */
+.nav-sidebar {
+  margin-right: -21px; /* 20px padding + 1px border */
+  margin-bottom: 20px;
+  margin-left: -20px;
+}
+.nav-sidebar > li > a {
+  padding-right: 20px;
+  padding-left: 20px;
+}
+.nav-sidebar > .active > a,
+.nav-sidebar > .active > a:hover,
+.nav-sidebar > .active > a:focus {
+  color: #fff;
+  background-color: #428bca;
+}
+.main {
+  padding: 20px;
+}
+@media (min-width: 768px) {
+  .main {
+    padding-right: 40px;
+    padding-left: 40px;
+  }
+}
+
+/* TOP */
+.top {
+  position: absolute; top: 0; left: 0;
+  width: 100%;
+  height: 65px;
+  border-bottom: 1px solid #ADB2B5;
+  background: white;
+  color: #888;
+}
+
+.top h1 {
+  font-size: 30px;
+  line-height: 30px;
+  padding-left: 20px;
+}
+
+
+@media (max-width: 750px) {
+  .top h1 {
+    display: none;
+  }
+
+  .top .menu {
+    left: 0 !important;
+  }
+}
+
+.top .menu {
+  list-style-type: none;
+  text-align: center;
+  position: absolute;
+  left: 300px;
+  top: 7px;
+}
+
+.top .menu .glyphicon {
+  display:block;
+  font-size: 35px;
+}
+
+.top .menu li {
+  float: left;
+  padding-right: 15px;
+  min-width: 75px;
+}
+
+.top .menu li a:hover {
+  color: black;
+  text-decoration:  none;
+}
+
+
+/* STREAM DASHBOARD INFORMATIONS */
+.stream-info {
+  color: #666;
+  line-height: 30px;
+  font-size: 12px;
+  border-bottom: 1px solid #D9DEE4;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  min-width: 200px;
+}
+
+.stream-info h2 {
+  font-size: 12px;
+}
+
+.stream-info div.data {
+  font-size: 35px;
+  font-weight: bold;
+}
+
+@media (max-width: 1300px) {
+  .stream-info div.data {
+    font-size: 25px;
+  }
+}
+
+@media (min-width: 1300px) and  (max-width: 1580px) {
+  .stream-info div.data {
+    font-size: 30px;
+  }
+}
+
+@media (min-width: 1300px) {
+  .stream-info {
+    border-bottom: 0;
+  }
+}
+
+.stream-info div.stats span.stats-up, .stream-info div.stats span.stats-down {
+  font-style: italic;
+}
+
+.stream-info div.stats span.glyphicon {
+  vertical-align: super;
+  font-size: smaller;
+}
+
+.stream-info div.stats span.stats-down span.glyphicon {
+  vertical-align: sub;
+}
+
+.stream-info:first-child::before {
+  border-left: 0
+}
+
+@media (max-width : 992px) {
+  .stream-info:first-child::before {
+    border-left: 2px solid #ADB2B5;
+  }
+}
+
+.stream-info::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    height: 65px;
+    border-left: 2px solid #ADB2B5;
+    margin-top: 25px;
+}
+
+/* WIDGETS */
+.widgets {
+  padding-top: 20px;
+}
+
+.widget:first-child {
+  margin-left: 0;
+}
+
+.widget {
+  color: #888;
+  background: white;
+  border: 1px solid #ADB2B5;
+  border-radius: 4px;
+  padding: 10px;
+  margin-left: 10px;
+}
+
+.widget .title {
+  font-size: 18px;
+  border-bottom: 1px dotted #ddd;
+  padding: 5px;
+}
+
+.widget .controls {
+  float: right;
+  position: relative;
+  top: -26px;
+}
+
+.widget .controls .not-active {
+  color: #888 !important;
+}
+
+.widget .table tr:first-child > td {
+  border: 0;
+}
+
+.widget .table tr > td {
+  border-top: 1px dotted #eee;
+}
+
+/* FOOTER */
+.footer {
+  position: absolute;
+  bottom: 0; right: 0;
+  background-color: white;
+  border: 1px dotted #ADB2B5;
+  font-size: 10px;
+  padding: 5px;
+  line-height: 10px;
+}
