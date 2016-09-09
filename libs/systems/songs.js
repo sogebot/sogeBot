@@ -2,9 +2,6 @@
 
 var chalk = require('chalk')
 var constants = require('../constants')
-var http = require('http')
-var fs = require('fs')
-var auth = require('http-auth')
 var _ = require('lodash')
 var ytdl = require('ytdl-core')
 
@@ -28,23 +25,12 @@ function Songs () {
     global.configuration.register('duration', 'songs.settings.duration', 'number', 10)
     global.configuration.register('shuffle', 'songs.settings.shuffle', 'bool', false)
 
-    var basic = auth.basic({
-      realm: 'YTPlayer'
-    }, function (username, password, callback) {
-      callback(username === global.configuration.get().ytplayer.username && password === global.configuration.get().ytplayer.password)
-    })
-    var server = http.createServer(basic, this.handleRequest)
-    var io = require('socket.io')(server)
-
-    server.listen(global.configuration.get().ytplayer.port, function () {
-      console.log('Songs system listening on %s and endpoint /ytplayer', global.configuration.get().ytplayer.port)
-    })
-
+    /* TODO: add Panel.getSocket
     var self = this
     io.on('connection', function (socket) {
       self.socketPointer = socket
       self.addSocketListening(self, socket)
-    })
+    })*/
   }
 
   console.log('Songs system loaded and ' + (global.configuration.get().systems.songs === true ? chalk.green('enabled') : chalk.red('disabled')))
@@ -208,27 +194,6 @@ Songs.prototype.sendNextSongID = function (socket) {
       }
     }
   })
-}
-
-Songs.prototype.handleRequest = function (request, response) {
-  if (request.url === '/ytplayer') {
-    fs.readFile('./public/ytplayer.html', 'binary', function (err, file) {
-      if (err) {
-        response.writeHead(500, {'Content-Type': 'text/plain'})
-        response.write(err + '\n')
-        response.end()
-        return
-      }
-
-      response.writeHead(200)
-      response.write(file, 'binary')
-      response.end()
-    })
-  } else {
-    response.writeHead(404, {'Content-Type': 'text/plain'})
-    response.write('404 Not Found\n')
-    response.end()
-  }
 }
 
 Songs.prototype.help = function () {
