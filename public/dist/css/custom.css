@@ -94,13 +94,17 @@ body {
 
 .top .menu li {
   float: left;
-  padding-right: 15px;
   min-width: 75px;
 }
 
 .top .menu li a:hover {
   color: black;
   text-decoration:  none;
+}
+
+.top .menu li a div::first-letter
+{
+    text-transform: uppercase;
 }
 
 

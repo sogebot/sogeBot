@@ -14,9 +14,9 @@ require('./libs/logging')
 
 global.parser = new Parser()
 global.configuration = new Configuration()
-global.twitch = new Twitch()
 global.commons = new Commons()
 global.panel = new Panel()
+global.twitch = new Twitch()
 global.translate = require('./libs/translate')
 
 require('./libs/permissions')

@@ -1,0 +1,97 @@
+<div class="col-xs-12 col-sm-4 col-md-4">
+    <div class="widget">
+      <div class="title">YouTube Player</div>
+      <div class="controls">
+        <span class="glyphicon glyphicon-play text-success"></span>
+        <span class="glyphicon glyphicon-stop text-danger not-active"></span>
+      </div>
+      <div id="YTPlayer" ></div>
+    </div>
+</div>
+
+<script>
+  var player, time_update_interval;
+  var meanLoudness = -16 // default value
+  var volume = 0
+  var loading = false
+
+  function onYouTubeIframeAPIReady() {
+      player = new YT.Player('YTPlayer', {
+          width: 560,
+          height: 400,
+          videoId: '',
+          playerVars: {
+              color: 'white'
+          },
+          events: {
+              onReady: initialize,
+              onStateChange: onPlayerStateChange
+          }
+        })
+  }
+
+  function initialize(){
+      socket.emit('getMeanLoudness');
+      socket.emit('getVolume');
+      socket.emit('getVideoID');
+
+      // Clear any old interval.
+      clearInterval(time_update_interval);
+
+      // Start interval to update elapsed time display and
+      // the elapsed part of the progress bar every second.
+      time_update_interval = setInterval(function () {
+          socket.emit('getMeanLoudness');
+          socket.emit('getVolume');
+
+          if (!loading && player.getDuration() === 0) {
+            loading = true
+            socket.emit('getVideoID');
+          }
+      }, 2000)
+
+  }
+
+  function onPlayerStateChange (event) {
+    if (event.data == YT.PlayerState.ENDED && !loading) {
+      loading = true
+      socket.emit('getVideoID');
+    }
+  }
+
+  var getVolume = function (loudness) {
+      var correction = Math.ceil((volume/100) * 3)
+      var loudnessDiff = parseFloat(parseFloat(meanLoudness) - loudness)
+      return Math.round(volume + correction * loudnessDiff)
+  }
+
+  socket.on('videoID', function(video) {
+      if (video === null) {
+        loading = false
+        player.stopVideo()
+        return
+      }
+
+      player.stopVideo()
+      video.loudness = typeof video.loudness !== 'undefined' ? video.loudness : -15
+      data = { 'videoId': video.videoID }
+      if (typeof video.startTime !== 'undefined') data.startSeconds = video.startTime
+      if (typeof video.endTime !== 'undefined') data.endSeconds = video.endTime
+      player.loadVideoById(data);
+      player.setVolume(getVolume(video.loudness))
+      player.playVideo();
+      setTimeout(function() { loading = false }, 1000)
+  });
+
+  socket.on('meanLoudness', function (loudness) {
+    meanLoudness = loudness
+  })
+
+  socket.on('volume', function (vol) {
+    volume = vol
+    $("#globalVol").text(vol + '%')
+  })
+</script>
+
+<!-- YTPlayer -->
+<script src="https://www.youtube.com/iframe_api"></script>

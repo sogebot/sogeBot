@@ -1,59 +1,68 @@
 'use strict'
 
+var express = require('express')
 var http = require('http')
-var auth = require('http-auth')
-var fs = require('fs')
+var path = require('path')
+var basicAuth = require('basic-auth')
+var _ = require('lodash')
+
+const NOT_AUTHORIZED = '0'
 
 function Panel () {
-  var basic = auth.basic({
-    realm: 'SogeBot - WebPanel'
-  }, function (username, password, callback) {
-    callback(username === global.configuration.get().panel.username && password === global.configuration.get().panel.password)
-  })
-  var server = http.createServer(basic, this.handleRequest)
-  var io = require('socket.io')(server)
+  // setup static server
+  var app = express()
+  var server = http.createServer(app)
+  var port = process.env.PORT || global.configuration.get().panel.port
 
-  server.listen(global.configuration.get().panel.port, function () {
-    global.log.info('WebPanel is listening on %s', global.configuration.get().panel.port)
+  // static routing
+  app.use(this.authUser, express.static(path.join(__dirname, '..', 'public')))
+
+  server.listen(port, function () {
+    global.log.info('WebPanel is listening on %s', port)
+  })
+
+  this.io = require('socket.io')(server)
+  this.menu = [{category: 'main', icon: 'dashboard', name: 'dashboard'}]
+  this.widgets = []
+  this.socketListeners = []
+
+  var self = this
+  this.io.on('connection', function (socket) {
+    self.sendMenu(socket)
+    self.sendWidget(socket)
+
+    _.each(self.socketListeners, function (listener) {
+      socket.on(listener.on, function () {
+        listener.fnc(socket)
+      })
+    })
   })
 }
 
-Panel.prototype.handleRequest = function (request, response) {
-  switch (request.url) {
-    case '/':
-      fs.readFile('./public/index.html', 'binary', function (err, file) {
-        if (err) {
-          response.writeHead(500, {'Content-Type': 'text/plain'})
-          response.write(err + '\n')
-          response.end()
-          return
-        }
-
-        response.writeHead(200)
-        response.write(file, 'binary')
-        response.end()
-      })
-      break
-    case '/dist/css/custom.css':
-      fs.readFile('./public/dist/css/custom.css', 'binary', function (err, file) {
-        if (err) {
-          response.writeHead(500, {'Content-Type': 'text/plain'})
-          response.write(err + '\n')
-          response.end()
-          return
-        }
-
-        response.writeHead(200)
-        response.write(file, 'binary')
-        response.end()
-      })
-      break
-    default:
-      response.writeHead(404, {'Content-Type': 'text/plain'})
-      response.write('404 Not Found\n')
-      response.end()
-      break
+Panel.prototype.authUser = function (req, res, next) {
+  var user = basicAuth(req)
+  try {
+    if (user.name === global.configuration.get().panel.username &&
+        user.pass === global.configuration.get().panel.password) {
+      return next()
+    } else {
+      throw new Error(NOT_AUTHORIZED)
+    }
+  } catch (e) {
+    res.set('WWW-Authenticate', 'Basic realm="Authorize to SogeBot WebPanel"')
+    return res.sendStatus(401)
   }
 }
 
+Panel.prototype.addMenu = function (menu) { this.menu.push(menu) }
+
+Panel.prototype.sendMenu = function (socket) { socket.emit('menu', this.menu) }
+
+Panel.prototype.addWidget = function (widget) { this.widgets.push(widget) }
+
+Panel.prototype.sendWidget = function (socket) { socket.emit('widgets', this.widgets) }
+
+Panel.prototype.socketListening = function (on, fnc) {
+  this.socketListeners.push({on: on, fnc: fnc})
+}
 module.exports = Panel
