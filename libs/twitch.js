@@ -44,6 +44,17 @@ function Twitch () {
   global.parser.register(this, '!top', this.showTop, constants.OWNER_ONLY)
 
   global.parser.registerParser(this, 'lastseen', this.lastseenUpdate, constants.VIEWERS)
+
+  this.webPanel()
+}
+
+Twitch.prototype.webPanel = function () {
+  global.panel.addWidget('chat')
+  global.panel.socketListening('getChatRoom', this.sendChatRoom)
+}
+
+Twitch.prototype.sendChatRoom = function (socket) {
+  socket.emit('chatRoom', global.configuration.get().twitch.owner)
 }
 
 Twitch.prototype.isOnline = function () {

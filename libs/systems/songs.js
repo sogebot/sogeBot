@@ -25,15 +25,36 @@ function Songs () {
     global.configuration.register('duration', 'songs.settings.duration', 'number', 10)
     global.configuration.register('shuffle', 'songs.settings.shuffle', 'bool', false)
 
-    /* TODO: add Panel.getSocket
-    var self = this
-    io.on('connection', function (socket) {
-      self.socketPointer = socket
-      self.addSocketListening(self, socket)
-    })*/
+    this.webPanel()
   }
 
   console.log('Songs system loaded and ' + (global.configuration.get().systems.songs === true ? chalk.green('enabled') : chalk.red('disabled')))
+}
+
+Songs.prototype.webPanel = function () {
+  global.panel.addMenu({category: 'main', icon: 'music', name: 'songs'})
+  global.panel.addWidget('ytplayer')
+  global.panel.addWidget('songrequests')
+
+  global.panel.socketListening('getVideoID', this.sendNextSongID)
+  global.panel.socketListening('getMeanLoudness', this.sendMeanLoudness)
+  global.panel.socketListening('getVolume', this.sendVolume)
+  global.panel.socketListening('getSongRequests', this.sendSongRequestsList)
+  global.panel.socketListening('getPlaylist', this.sendPlaylistList)
+  global.panel.socketListening('getRandomize', this.sendRandomize)
+/*
+  socket.on('setTrim', function (id, start, end) {
+    self.savePlaylistTrim(id, start, end)
+  })
+*/
+}
+
+Songs.prototype.sendVolume = function (socket) {
+  socket.emit('volume', global.configuration.getValue('volume'))
+}
+
+Songs.prototype.sendRandomize = function (socket) {
+  socket.emit('shuffle', global.configuration.getValue('shuffle'))
 }
 
 Songs.prototype.banSong = function (self, sender, text) {
@@ -98,30 +119,6 @@ Songs.prototype.createRandomSeeds = function () {
   global.botDB.find({type: 'playlist'}, function (err, items) {
     if (err) console.log(err)
     _.each(items, function (item) { global.botDB.update({_id: item._id}, {$set: {seed: Math.random()}}) })
-  })
-}
-
-Songs.prototype.addSocketListening = function (self, socket) {
-  socket.on('getVideoID', function () {
-    self.sendNextSongID(socket)
-  })
-  socket.on('getSongRequests', function () {
-    self.sendSongRequestsList(socket)
-  })
-  socket.on('getPlaylist', function () {
-    self.sendPlaylistList(socket)
-  })
-  socket.on('getRandomize', function () {
-    socket.emit('shuffle', global.configuration.getValue('shuffle'))
-  })
-  socket.on('getMeanLoudness', function () {
-    self.sendMeanLoudness(socket)
-  })
-  socket.on('getVolume', function () {
-    socket.emit('volume', global.configuration.getValue('volume'))
-  })
-  socket.on('setTrim', function (id, start, end) {
-    self.savePlaylistTrim(id, start, end)
   })
 }
 

@@ -20,8 +20,8 @@
     <div class="container-fluid">
       <div class="top">
         <h1>SogeBot WebPanel</h1>
-        <ul class="menu">
-          <li>
+        <ul id="menu" class="menu">
+          <!--li>
             <a href="#"><span class="glyphicon glyphicon-dashboard"></span>Dashboard</a>
           </li>
           <li>
@@ -35,7 +35,7 @@
           </li>
           <li>
             <a href="#"><span class="glyphicon glyphicon-stats"></span>Stats</a>
-          </li>
+          </li-->
         </ul>
       </div>
       <div class="row">
@@ -76,49 +76,12 @@
 
           <!-- widgets -->
           <div class="widgets">
-            <div class="col-xs-12 col-sm-4 col-md-4">
-                <div class="widget">
-                  <div class="title">YouTube Player</div>
-                  <div class="controls">
-                    <span class="glyphicon glyphicon-play text-success"></span>
-                    <span class="glyphicon glyphicon-stop text-danger not-active"></span>
-                  </div>
-                  <iframe width="560" height="315" src="https://www.youtube.com/embed/dVf7bLglido" frameborder="0" allowfullscreen></iframe>
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-4 col-md-4">
-                <div class="widget">
-                  <div class="title">Song Requests</div>
-                  <div class="controls">
-                    <span class="glyphicon glyphicon-ok text-success not-active"></span>
-                    <span class="glyphicon glyphicon-remove text-danger"></span>
-                  </div>
-                  <table class="table table-condensed">
-                    <tr>
-                      <td>12:45</td>
-                      <td>NAME RAP OR DIE</td>
-                      <td>sogehige</td>
-                    </tr>
-                    <tr>
-                      <td>4:23</td>
-                      <td>Nejaky song</td>
-                      <td>typek_nejaky</td>
-                    </tr>
-                  </table>
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-4 col-md-4">
-                <div class="widget">
-                  <div class="title">Twitch Chat</div>
-                  <div class="controls">&nbsp;</div>
-                  <iframe frameborder="0" scrolling="no" src="http://twitch.tv/sogehige/chat?popout=" height="500" width="560"></iframe>
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-4 col-md-4">
+            <!--div class="col-xs-12 col-sm-4 col-md-4">
                 <div class="widget">
                   <div class="title">Latest Clips</div>
                 </div>
             </div>
+          -->
           </div>
         </div>
       </div>
@@ -130,7 +93,32 @@
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- LoDash goodnes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.15.0/lodash.min.js"></script>
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <script>
+      var socket = io();
+
+      /* MENU */
+      socket.on('menu', function (menu) {
+        var dMenu = $('#menu')
+        /* at first, clear all menu */
+        dMenu.empty()
+        /* at first fill only main category */
+        _.each(menu, function (obj) {
+          if (obj.category === 'main') dMenu.append('<li><a href="#"><span class="glyphicon glyphicon-' + obj.icon + '"></span><div>' + obj.name + '</div></a></li>')
+        })
+        /* TODO add other categories as pop down menus */
+      })
+
+      /* WIDGETS */
+      socket.on('widgets', function (widgets) {
+        _.each(widgets, function (widget) {
+          $(".widgets").append($('<div>').load('widgets/' + widget + '.html'))
+        })
+      })
+    </script>
   </body>
 </html>

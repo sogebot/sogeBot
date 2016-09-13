@@ -1,0 +1,41 @@
+<div class="col-xs-12 col-sm-4 col-md-4">
+    <div class="widget">
+      <div class="title">Song Requests</div>
+      <div class="controls">
+        <span class="glyphicon glyphicon-ok text-success not-active"></span>
+        <span class="glyphicon glyphicon-remove text-danger"></span>
+      </div>
+      <table id="songRequestsWidget" class="table table-condensed">
+        <tr>
+          <td>12:45</td>
+          <td>NAME RAP OR DIE</td>
+          <td>sogehige</td>
+        </tr>
+        <tr>
+          <td>4:23</td>
+          <td>Nejaky song</td>
+          <td>typek_nejaky</td>
+        </tr>
+      </table>
+    </div>
+</div>
+
+<script>
+  // get song requests
+  setInterval(function () { socket.emit('getSongRequests'); }, 2000)
+  socket.on('songRequestsList', function(list) {
+      $("table#songRequestsWidget").empty();
+      if (_.isEmpty(list)) {
+        $("table#songRequestsWidget").append('<tr><td colspan=3 class="text-info text-center"><strong>No song requests found</strong></td></tr>');
+      }
+      for (var index in list) {
+          if (list.hasOwnProperty(index)) {
+              var title = list[index].title,
+                  requestedBy = list[index].username,
+                  length_seconds = list[index].length_seconds,
+                  videoID = list[index].videoID;
+              $("table#songRequestsWidget").append('<tr><td>'+(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]+'</td><td>'+title+'</td><td>'+requestedBy+'</td></tr>');
+          }
+      }
+  });
+</script>
