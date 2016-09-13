@@ -224,7 +224,7 @@ body {
 
 /* FOOTER */
 .footer {
-  position: absolute;
+  position: fixed;
   bottom: 0; right: 0;
   background-color: white;
   border: 1px dotted #ADB2B5;
