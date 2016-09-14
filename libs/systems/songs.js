@@ -36,12 +36,12 @@ Songs.prototype.webPanel = function () {
   global.panel.addWidget('ytplayer')
   global.panel.addWidget('songrequests')
 
-  global.panel.socketListening('getVideoID', this.sendNextSongID)
-  global.panel.socketListening('getMeanLoudness', this.sendMeanLoudness)
-  global.panel.socketListening('getVolume', this.sendVolume)
-  global.panel.socketListening('getSongRequests', this.sendSongRequestsList)
-  global.panel.socketListening('getPlaylist', this.sendPlaylistList)
-  global.panel.socketListening('getRandomize', this.sendRandomize)
+  global.panel.socketListening(this, 'getVideoID', this.sendNextSongID)
+  global.panel.socketListening(this, 'getMeanLoudness', this.sendMeanLoudness)
+  global.panel.socketListening(this, 'getVolume', this.sendVolume)
+  global.panel.socketListening(this, 'getSongRequests', this.sendSongRequestsList)
+  global.panel.socketListening(this, 'getPlaylist', this.sendPlaylistList)
+  global.panel.socketListening(this, 'getRandomize', this.sendRandomize)
 /*
   socket.on('setTrim', function (id, start, end) {
     self.savePlaylistTrim(id, start, end)
@@ -49,11 +49,11 @@ Songs.prototype.webPanel = function () {
 */
 }
 
-Songs.prototype.sendVolume = function (socket) {
+Songs.prototype.sendVolume = function (self, socket) {
   socket.emit('volume', global.configuration.getValue('volume'))
 }
 
-Songs.prototype.sendRandomize = function (socket) {
+Songs.prototype.sendRandomize = function (self, socket) {
   socket.emit('shuffle', global.configuration.getValue('shuffle'))
 }
 
@@ -69,8 +69,8 @@ Songs.prototype.banCurrentSong = function (self, sender) {
       global.commons.remove({_type: 'playlist', _videoID: self.currentSong.videoID})
       global.commons.remove({_type: 'songrequest', _videoID: self.currentSong.videoID})
       global.commons.timeout(self.currentSong.username, global.translate('songs.bannedSongTimeout'), 300)
-      self.sendNextSongID(self.socketPointer)
-      self.sendPlaylistList(self.socketPointer)
+      self.sendNextSongID(self, self.socketPointer)
+      self.sendPlaylistList(self, self.socketPointer)
     }
   })
 }
@@ -84,8 +84,8 @@ Songs.prototype.banSongById = function (self, sender, text) {
       if (numAffected > 0) global.commons.sendMessage(global.translate('songs.bannedSong').replace('(title)', videoInfo.title))
       global.commons.remove({_type: 'playlist', _videoID: text.trim()})
       global.commons.remove({_type: 'songrequest', _videoID: text.trim()})
-      self.sendNextSongID(self.socketPointer)
-      self.sendPlaylistList(self.socketPointer)
+      self.sendNextSongID(self, self.socketPointer)
+      self.sendPlaylistList(self, self.socketPointer)
     })
   })
 }
@@ -112,7 +112,7 @@ Songs.prototype.stealSongToPlaylist = function (self) {
 }
 
 Songs.prototype.skipSong = function (self) {
-  self.sendNextSongID(self.socketPointer)
+  self.sendNextSongID(self, self.socketPointer)
 }
 
 Songs.prototype.createRandomSeeds = function () {
@@ -122,7 +122,7 @@ Songs.prototype.createRandomSeeds = function () {
   })
 }
 
-Songs.prototype.sendMeanLoudness = function (socket) {
+Songs.prototype.sendMeanLoudness = function (self, socket) {
   var loudness = 0
   var count = 0
   global.botDB.find({type: 'playlist'}).exec(function (err, items) {
@@ -135,14 +135,14 @@ Songs.prototype.sendMeanLoudness = function (socket) {
   })
 }
 
-Songs.prototype.sendSongRequestsList = function (socket) {
+Songs.prototype.sendSongRequestsList = function (self, socket) {
   global.botDB.find({type: 'songRequests'}).sort({addedAt: 1}).exec(function (err, items) {
     if (err) console.log(err)
     socket.emit('songRequestsList', items)
   })
 }
 
-Songs.prototype.sendPlaylistList = function (socket) {
+Songs.prototype.sendPlaylistList = function (self, socket) {
   global.botDB.find({type: 'playlist'}).sort({addedAt: 1}).exec(function (err, items) {
     if (err) console.log(err)
     socket.emit('songPlaylistList', items)
@@ -153,8 +153,7 @@ Songs.prototype.savePlaylistTrim = function (id, startTime, endTime) {
   global.botDB.update({type: 'playlist', videoID: id}, {$set: {startTime: startTime, endTime: endTime}}, {})
 }
 
-Songs.prototype.sendNextSongID = function (socket) {
-  var self = this
+Songs.prototype.sendNextSongID = function (self, socket) {
   // first, check if there are any requests
   global.botDB.findOne({type: 'songRequests'}).sort({addedAt: 1}).exec(function (err, item) {
     if (err) console.log(err)
@@ -169,7 +168,7 @@ Songs.prototype.sendNextSongID = function (socket) {
           if (typeof item !== 'undefined' && item !== null) { // song is found
             if (item.seed === 1) {
               self.createRandomSeeds()
-              self.sendNextSongID(socket) // retry with new seeds
+              self.sendNextSongID(self, socket) // retry with new seeds
             } else {
               global.botDB.update({_id: item._id}, {$set: {seed: 1}})
               self.currentSong = item
@@ -269,7 +268,7 @@ Songs.prototype.removeSongFromPlaylist = function (self, user, text) {
     global.botDB.remove({type: 'playlist', videoID: videoID}, {}, function (err, numRemoved) {
       if (err) console.log(err)
       if (numRemoved > 0) global.commons.sendMessage(global.translate('songs.removeSongPlaylist').replace('(title)', videoInfo.title), user)
-      self.sendPlaylistList(self.socketPointer)
+      self.sendPlaylistList(self, self.socketPointer)
     })
   })
 }
