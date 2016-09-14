@@ -80,7 +80,7 @@
       player.loadVideoById(data);
       player.setVolume(getVolume(video.loudness))
       player.playVideo();
-      setTimeout(function() { loading = false }, 1000)
+      setTimeout(function() { loading = false }, 10000)
   });
 
   socket.on('meanLoudness', function (loudness) {
