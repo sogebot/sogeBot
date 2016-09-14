@@ -30,6 +30,7 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 * songs system - **songrequest** and **playlist** support for YouTube
 * **auto volume normalization** of videos played through songs system
 * **trimming** music videos in playlist
+* **WebPanel**
 * _more to come_
 
 #### Prerequisites
