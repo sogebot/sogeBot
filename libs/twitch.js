@@ -23,7 +23,10 @@ function Twitch () {
   var self = this
   setInterval(function () {
     global.client.api({
-      url: 'https://api.twitch.tv/kraken/streams/' + global.configuration.get().twitch.owner
+      url: 'https://api.twitch.tv/kraken/streams/' + global.configuration.get().twitch.owner,
+      headers: {
+        'Client-ID': '1wjn1i3792t71tl90fmyvd0zl6ri2vg'
+      }
     }, function (err, res, body) {
       if (err) console.log(err)
       if (!_.isNull(body.stream) && !_.isNull(body.stream.created_at)) {
