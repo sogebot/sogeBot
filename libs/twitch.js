@@ -8,7 +8,17 @@ require('moment-precise-range-plugin')
 
 function Twitch () {
   this.isOnline = false
-  this.whenOnline = moment()
+
+  this.currentViewers = 0
+  this.currentFollowers = 0
+  this.maxViewers = 0
+  this.chatMessagesAtStart = global.parser.linesParsed
+  this.followersAtStart = 0
+  this.maxRetries = 20
+  this.curRetries = 0
+  this.newChatters = 0
+
+  this.whenOnline = null
 
   var self = this
   setInterval(function () {
@@ -16,16 +26,35 @@ function Twitch () {
       url: 'https://api.twitch.tv/kraken/streams/' + global.configuration.get().twitch.owner
     }, function (err, res, body) {
       if (err) console.log(err)
-      if (body.stream) {
-        if (!self.isOnline) self.whenOnline = moment()
+      if (!_.isNull(body.stream) && !_.isNull(body.stream.created_at)) {
+        self.curRetries = 0
+        self.saveStream(body.stream)
+        if (!self.isOnline) { // if we are switching from offline - bots restarts? We want refresh to correct data for start as well
+          self.followersAtStart = body.stream.channel.followers
+          self.chatMessagesAtStart = global.parser.linesParsed
+        }
         self.isOnline = true
-      } else self.isOnline = false
+      } else {
+        if (self.curRetries < self.maxRetries) { self.curRetries = self.curRetries + 1; return } // we want to check if stream is _REALLY_ offline
+        // reset everything
+        self.curRetries = 0
+        self.isOnline = false
+        self.whenOnline = null
+        self.currentViewers = 0
+        self.maxViewers = 0
+        self.newChatters = 0
+        self.chatMessagesAtStart = global.parser.linesParsed
+        self.followersAtStart = !_.isNull(body.stream) ? body.stream.channel.followers : 0
+        self.currentFollowers = self.followersAtStart
+      }
     })
 
     // count watching time when stream is online
     if (self.isOnline) {
       User.getAllOnline().then(function (users) {
         _.each(users, function (user) {
+          // add user as a new chatter in a stream
+          if (_.isUndefined(user.watchTime) || user.watchTime === 0) self.newChatters = self.newChatters + 1
           var watchTime = 15000
           if (!_.isUndefined(user.watchTime)) watchTime = watchTime + user.watchTime
           user = new User(user.username)
@@ -48,26 +77,71 @@ function Twitch () {
   this.webPanel()
 }
 
-Twitch.prototype.webPanel = function () {
-  global.panel.addWidget('chat')
-  global.panel.socketListening('getChatRoom', this.sendChatRoom)
+Twitch.prototype.saveStream = function (stream) {
+  this.currentViewers = stream.viewers
+  this.whenOnline = stream.created_at
+  this.currentFollowers = stream.channel.followers
+  this.maxViewers = this.maxViewers < this.currentViewers ? this.currentViewers : this.maxViewers
 }
 
-Twitch.prototype.sendChatRoom = function (socket) {
-  socket.emit('chatRoom', global.configuration.get().twitch.owner)
+Twitch.prototype.webPanel = function () {
+  global.panel.addWidget('chat')
+  global.panel.socketListening(this, 'getChatRoom', this.sendChatRoom)
+  global.panel.socketListening(this, 'getUptime', this.sendUptime)
+  global.panel.socketListening(this, 'getViewers', this.sendViewers)
+  global.panel.socketListening(this, 'getChatMsgs', this.sendChatMsgs)
+  global.panel.socketListening(this, 'getNewFlwrs', this.sendNewFlwrs)
+  global.panel.socketListening(this, 'getNewChtr', this.sendNewChtr)
+}
+
+Twitch.prototype.sendUptime = function (self, socket) {
+  socket.emit('uptime', self.getTime(false))
+}
+
+Twitch.prototype.sendViewers = function (self, socket) {
+  socket.emit('viewers', self.currentViewers, self.maxViewers)
+}
+
+Twitch.prototype.sendChatRoom = function (self, socket) {
+  socket.emit('chatRoom', global.configuration.get().twitch.owner.toLowerCase())
+}
+
+Twitch.prototype.sendChatMsgs = function (self, socket) {
+  var messages = self.isOnline ? global.parser.linesParsed - self.chatMessagesAtStart : 0
+  socket.emit('chatMsgs', messages > 20000 ? (messages / 1000) + 'k' : messages)
+}
+
+Twitch.prototype.sendNewFlwrs = function (self, socket) {
+  socket.emit('newFlwrs', self.currentFollowers - self.followersAtStart)
+}
+
+Twitch.prototype.sendNewChtr = function (self, socket) {
+  socket.emit('newChtr', self.newChatters)
 }
 
 Twitch.prototype.isOnline = function () {
   return this.isOnline
 }
 
+Twitch.prototype.getTime = function (isChat) {
+  var now, days, hours, minutes, seconds
+  now = _.isNull(this.whenOnline) ? {days: 0, hours: 0, minutes: 0, seconds: 0} : moment().preciseDiff(this.whenOnline, true)
+  if (isChat) {
+    days = now.days > 0 ? now.days + 'd' : ''
+    hours = now.hours > 0 ? now.hours + 'h' : ''
+    minutes = now.minutes > 0 ? now.minutes + 'm' : ''
+    seconds = now.seconds > 0 ? now.seconds + 's' : ''
+  } else {
+    days = now.days > 0 ? now.days + 'd' : ''
+    hours = now.hours >= 0 && now.hours < 10 ? '0' + now.hours + ':' : now.hours + ':'
+    minutes = now.minutes >= 0 && now.minutes < 10 ? '0' + now.minutes + ':' : now.minutes + ':'
+    seconds = now.seconds >= 0 && now.seconds < 10 ? '0' + now.seconds : now.seconds
+  }
+  return days + hours + minutes + seconds
+}
+
 Twitch.prototype.uptime = function (self, sender) {
-  var now = moment().preciseDiff(self.whenOnline, true)
-  var days = now.days > 0 ? now.days + 'd' : ''
-  var hours = now.hours > 0 ? now.hours + 'h' : ''
-  var minutes = now.minutes > 0 ? now.minutes + 'm' : ''
-  var seconds = now.seconds > 0 ? now.seconds + 's' : ''
-  global.commons.sendMessage(self.isOnline ? global.translate('core.online').replace('(time)', days + hours + minutes + seconds) : global.translate('core.offline'))
+  global.commons.sendMessage(self.isOnline ? global.translate('core.online').replace('(time)', self.getTime(true)) : global.translate('core.offline'))
 }
 
 Twitch.prototype.lastseenUpdate = function (self, id, sender, text) {
