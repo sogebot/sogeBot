@@ -33,7 +33,7 @@ function Panel () {
 
     _.each(self.socketListeners, function (listener) {
       socket.on(listener.on, function () {
-        listener.fnc(socket)
+        listener.fnc(listener.self, socket)
       })
     })
   })
@@ -62,7 +62,7 @@ Panel.prototype.addWidget = function (widget) { this.widgets.push(widget) }
 
 Panel.prototype.sendWidget = function (socket) { socket.emit('widgets', this.widgets) }
 
-Panel.prototype.socketListening = function (on, fnc) {
-  this.socketListeners.push({on: on, fnc: fnc})
+Panel.prototype.socketListening = function (self, on, fnc) {
+  this.socketListeners.push({self: self, on: on, fnc: fnc})
 }
 module.exports = Panel
