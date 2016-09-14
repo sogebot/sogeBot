@@ -14,7 +14,7 @@ function Twitch () {
   this.maxViewers = 0
   this.chatMessagesAtStart = global.parser.linesParsed
   this.followersAtStart = 0
-  this.maxRetries = 20
+  this.maxRetries = 10
   this.curRetries = 0
   this.newChatters = 0
 
@@ -38,7 +38,7 @@ function Twitch () {
         }
         self.isOnline = true
       } else {
-        if (self.curRetries < self.maxRetries) { self.curRetries = self.curRetries + 1; return } // we want to check if stream is _REALLY_ offline
+        if (self.isOnline && self.curRetries < self.maxRetries) { self.curRetries = self.curRetries + 1; return } // we want to check if stream is _REALLY_ offline
         // reset everything
         self.curRetries = 0
         self.isOnline = false
