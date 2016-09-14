@@ -44,7 +44,7 @@
           socket.emit('getMeanLoudness');
           socket.emit('getVolume');
 
-          if (!loading && player.getDuration() === 0) {
+          if (!loading && player.getPlayerState() === 0 || player.getPlayerState() === 5) {
             loading = true
             socket.emit('getVideoID');
           }
