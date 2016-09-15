@@ -1,4 +1,4 @@
-<div class="col-xs-12 col-sm-4 col-md-4">
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
   <div class="widget" id="twitchVideoWidget">
     <div class="title">Twitch Stream Monitor</div>
     <div class="controls">
@@ -24,7 +24,7 @@
     loadedJS.push('twitch')
     socket.emit('getTwitchVideo');
     socket.on('twitchVideo', function(room) {
-      $("#twitchVideoWidget").append('<iframe src="https://player.twitch.tv/?channel=' + room + '" frameborder="0" scrolling="no" height="400" width="560"></iframe>')
+      $("#twitchVideoWidget").append('<iframe src="https://player.twitch.tv/?channel=' + room + '" frameborder="0" scrolling="no" width="100%"></iframe>')
     })
   }
 </script>

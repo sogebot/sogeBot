@@ -1,4 +1,4 @@
-<div class="col-xs-12 col-sm-4 col-md-4">
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
   <div class="widget" id="chatWidget">
     <div class="title">Twitch Chat</div>
     <div class="controls">
@@ -24,7 +24,7 @@
     loadedJS.push('chat')
     socket.emit('getChatRoom');
     socket.on('chatRoom', function(room) {
-      $("#chatWidget").append('<iframe frameborder="0" scrolling="no" src="http://twitch.tv/' + room + '/chat?popout=" height="500" width="560"></iframe>')
+      $("#chatWidget").append('<iframe frameborder="0" scrolling="no" src="http://twitch.tv/' + room + '/chat?popout=" width="100%"></iframe>')
     })
   }
 </script>

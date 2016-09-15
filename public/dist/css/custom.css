@@ -270,3 +270,11 @@ body {
   padding: 5px;
   line-height: 10px;
 }
+
+/* widgets heights */
+#twitchVideoWidget iframe {
+  height: 315px;
+}
+#chatWidget iframe {
+  height: 600px;
+}
