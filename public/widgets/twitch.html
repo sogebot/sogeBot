@@ -24,7 +24,7 @@
     loadedJS.push('twitch')
     socket.emit('getTwitchVideo');
     socket.on('twitchVideo', function(room) {
-      $("#twitchVideoWidget").append('<iframe src="https://player.twitch.tv/?channel=' + room + '" frameborder="0" scrolling="no" width="100%"></iframe>')
+      $("#twitchVideoWidget").append('<iframe src="https://player.twitch.tv/?autoplay=true&channel=' + room + '" frameborder="0" scrolling="no" width="100%"></iframe>')
     })
   }
 </script>
