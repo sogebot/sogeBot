@@ -1,0 +1,33 @@
+<div class="col-xs-12 col-sm-4 col-md-4">
+  <div class="widget">
+    <div class="title">Select widget to add</div>
+    <div id="widgetList"></div>
+  </div>
+</div>
+
+<script>
+  socket.emit('getWidgetList');
+
+  socket.on('widgetList', function(list) {
+    $("#widgetList").empty()
+    if (list.length === 0) {
+      $("#widgetList").append('<p>There is no widget to add</p>');
+      setTimeout(function() {
+        $("#addWidget").css('display', 'block')
+        $("#widgetList").parent().parent().remove()
+        addingWidget = false
+      }, 2000)
+    } else {
+      _.each(list, function(widget) {
+        $("#widgetList").append('<a class="widgetList" id="' + widget.id + '"><span class="glyphicon glyphicon-' + widget.icon + '"></span> ' + widget.name + '</a>')
+      })
+      $("#widgetList a").on('click', function(ev) {
+        var id = ev.currentTarget.id
+        $("#addWidget").css('display', 'block')
+        $("#widgetList").parent().parent().remove()
+        addingWidget = false
+        socket.emit('addWidget', id)
+      })
+    }
+  })
+</script>

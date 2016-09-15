@@ -1,27 +1,29 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <title>SogeBot - WebPanel</title>
-    <meta charset="utf-8">
-    <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#f4f5f6">
-    <meta name="apple-mobile-web-app-status-bar-style" content="#f4f5f6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-    <link rel="stylesheet" href="./dist/css/custom.css">
-    <script src="/socket.io/socket.io.js"></script>
-  </head>
-  <body>
-    <div class="container-fluid">
-      <div class="top">
-        <h1>SogeBot WebPanel</h1>
-        <ul id="menu" class="menu">
-          <!--li>
+<head>
+  <title>SogeBot - WebPanel</title>
+  <meta charset="utf-8">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#f4f5f6">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#f4f5f6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+  <link rel="stylesheet" href="./dist/css/custom.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="top">
+      <h1>SogeBot WebPanel</h1>
+      <ul id="menu" class="menu">
+        <!--li>
             <a href="#"><span class="glyphicon glyphicon-dashboard"></span>Dashboard</a>
           </li>
           <li>
@@ -36,124 +38,148 @@
           <li>
             <a href="#"><span class="glyphicon glyphicon-stats"></span>Stats</a>
           </li-->
-        </ul>
-      </div>
-      <div class="row">
-        <div class="col-sm-12 col-md-12 main">
-          <!-- SNIPPETS -->
-          <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-            <h2><span class="glyphicon glyphicon-user"></span> Current Viewers</h2>
-            <div class="data" id="currentViewers">0</div>
-            <div class="stats">&nbsp;</div>
-          </div>
-          <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-            <h2><span class="glyphicon glyphicon-user"></span> Max Concurrent Viewers</h2>
-            <div class="data" id="maxViewers">0</div>
-            <div class="stats"><span class="stats-up text-success"><span class="glyphicon glyphicon-triangle-top"></span> 4%</span> From last Session (not working)</div>
-          </div>
-          <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-            <h2><span class="glyphicon glyphicon-comment"></span> Total Chat Messages</h2>
-            <div class="data" id="totalChatMsgs">0</div>
-            <div class="stats"><span class="stats-down text-danger"><span class="glyphicon glyphicon-triangle-bottom"></span> 4%</span> From last Session (not working)</div>
-          </div>
-          <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-            <h2><span class="glyphicon glyphicon-star"></span> Total New Chatters</h2>
-            <div class="data" id="newChtr">0</div>
-            <div class="stats"><span class="stats-down text-danger"><span class="glyphicon glyphicon-triangle-bottom"></span> 4%</span> From last Session (not working)</div>
-          </div>
-          <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-            <h2><span class="glyphicon glyphicon-time"></span> Streaming Session</h2>
-            <div class="data" id="uptime">00:00:00</div>
-            <div class="stats">&nbsp;</div>
-          </div>
-          <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-            <h2><span class="glyphicon glyphicon-thumbs-up"></span> New Followers</h2>
-            <div class="data" id="newFlwrs">0</div>
-            <div class="stats"><span class="stats-up text-success"><span class="glyphicon glyphicon-triangle-top"></span> 4%</span> From last Session (not working)</div>
-          </div>
+      </ul>
+    </div>
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-12 main">
+        <!-- SNIPPETS -->
+        <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+          <h2><span class="glyphicon glyphicon-user"></span> Current Viewers</h2>
+          <div class="data" id="currentViewers">0</div>
+          <div class="stats">&nbsp;</div>
+        </div>
+        <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+          <h2><span class="glyphicon glyphicon-user"></span> Max Concurrent Viewers</h2>
+          <div class="data" id="maxViewers">0</div>
+          <div class="stats"><span class="stats-up text-success"><span class="glyphicon glyphicon-triangle-top"></span> 4%</span> From last Session (not working)</div>
+        </div>
+        <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+          <h2><span class="glyphicon glyphicon-comment"></span> Total Chat Messages</h2>
+          <div class="data" id="totalChatMsgs">0</div>
+          <div class="stats"><span class="stats-down text-danger"><span class="glyphicon glyphicon-triangle-bottom"></span> 4%</span> From last Session (not working)</div>
+        </div>
+        <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+          <h2><span class="glyphicon glyphicon-star"></span> Total New Chatters</h2>
+          <div class="data" id="newChtr">0</div>
+          <div class="stats"><span class="stats-down text-danger"><span class="glyphicon glyphicon-triangle-bottom"></span> 4%</span> From last Session (not working)</div>
+        </div>
+        <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+          <h2><span class="glyphicon glyphicon-time"></span> Streaming Session</h2>
+          <div class="data" id="uptime">00:00:00</div>
+          <div class="stats">&nbsp;</div>
+        </div>
+        <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+          <h2><span class="glyphicon glyphicon-thumbs-up"></span> New Followers</h2>
+          <div class="data" id="newFlwrs">0</div>
+          <div class="stats"><span class="stats-up text-success"><span class="glyphicon glyphicon-triangle-top"></span> 4%</span> From last Session (not working)</div>
+        </div>
 
-          <div class="clearfix"></div>
+        <div class="clearfix"></div>
 
-          <!-- widgets -->
-          <div class="widgets">
-            <!--div class="col-xs-12 col-sm-4 col-md-4">
+        <!-- widgets -->
+        <div class="widgets">
+          <!--div class="col-xs-12 col-sm-4 col-md-4">
                 <div class="widget">
                   <div class="title">Latest Clips</div>
                 </div>
             </div>
           -->
+        </div>
+
+        <div class="col-xs-12 col-sm-4 col-md-4" id="addWidget">
+          <div class="widgetAdd">
+            <span class="glyphicon glyphicon-plus"></span> Add widget
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <footer class="footer">
-      <a href="https://github.com/sogehige/SogeBot">GitHub</a> | <a href="https://github.com/sogehige/SogeBot/issues">Issues</a> | <a href="https://github.com/sogehige/SogeBot/blob/master/LICENSE">MIT License</a>
-    </footer>
+  <footer class="footer">
+    <a href="https://github.com/sogehige/SogeBot">GitHub</a> | <a href="https://github.com/sogehige/SogeBot/issues">Issues</a> | <a href="https://github.com/sogehige/SogeBot/blob/master/LICENSE">MIT License</a>
+  </footer>
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- LoDash goodnes -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.15.0/lodash.min.js"></script>
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <!-- LoDash goodness -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.15.0/lodash.min.js"></script>
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
-    <script>
-      var socket = io();
-      var loadedWidgets = []
+  <script>
+    var socket = io();
+    var loadedWidgets = []
+    var loadedJS = []
+    var addingWidget = false
 
-      /* MENU */
-      socket.on('menu', function (menu) {
-        var dMenu = $('#menu')
+    /* MENU */
+    socket.on('menu', function(menu) {
+      var dMenu = $('#menu')
         /* at first, clear all menu */
-        dMenu.empty()
+      dMenu.empty()
         /* at first fill only main category */
-        _.each(menu, function (obj) {
+      _.each(menu, function(obj) {
           if (obj.category === 'main') dMenu.append('<li><a href="#"><span class="glyphicon glyphicon-' + obj.icon + '"></span><div>' + obj.name + '</div></a></li>')
         })
         /* TODO add other categories as pop down menus */
-      })
+    })
 
-      /* WIDGETS */
-      socket.on('widgets', function (widgets) {
-        _.each(widgets, function (widget) {
-          if (loadedWidgets.indexOf(widget) === -1) {
-            $(".widgets").append($('<div>').load('widgets/' + widget + '.html'))
-            loadedWidgets.push(widget)
-          }
-        })
-      })
+    /* WIDGETS */
+    var deleteWidget = function (id) {
+      $('#' + id).remove();
+      socket.emit('deleteWidget', id)
+      loadedWidgets.splice(loadedWidgets.indexOf(id), 1)
+    }
 
-      /* STATS */
-      setInterval(function () {
-        socket.emit('getUptime');
-        socket.emit('getViewers');
-        socket.emit('getChatMsgs');
-        socket.emit('getNewFlwrs');
-        socket.emit('getNewChtr');
-      }, 1000)
-
-      // TODO - make only one call to get all relevant data?
-      socket.on('uptime', function (uptime) {
-        $("#uptime").text(uptime !== '' ? uptime : '0:00:00')
+    socket.on('widgets', function(widgets) {
+      _.each(widgets, function(widget) {
+        if (loadedWidgets.indexOf(widget) === -1) {
+          $(".widgets").append($('<div id="' + widget + '">').load('widgets/' + widget + '.html'))
+          loadedWidgets.push(widget)
+        }
       })
+    })
 
-      socket.on('viewers', function (current, max) {
-        $("#currentViewers").text(current)
-        $("#maxViewers").text(max)
-      })
+    // addWidget
+    $("#addWidget").on('click', function(ev) {
+      if (!addingWidget) {
+        $(".widgets").append($('<div>').load('widgets/widget_create.html'))
+        $("#addWidget").css('display', 'none')
+        addingWidget = true
+      }
+    })
 
-      socket.on('chatMsgs', function (msgs) {
-        $("#totalChatMsgs").text(msgs)
-      })
+    /* STATS */
+    setInterval(function() {
+      socket.emit('getUptime');
+      socket.emit('getViewers');
+      socket.emit('getChatMsgs');
+      socket.emit('getNewFlwrs');
+      socket.emit('getNewChtr');
+    }, 1000)
 
-      socket.on('newFlwrs', function (followers) {
-        $("#newFlwrs").text(followers)
-      })
+    // TODO - make only one call to get all relevant data?
+    socket.on('uptime', function(uptime) {
+      $("#uptime").text(uptime !== '' ? uptime : '0:00:00')
+    })
 
-      socket.on('newChtr', function (chatters) {
-        $("#newChtr").text(chatters)
-      })
-    </script>
-  </body>
+    socket.on('viewers', function(current, max) {
+      $("#currentViewers").text(current)
+      $("#maxViewers").text(max)
+    })
+
+    socket.on('chatMsgs', function(msgs) {
+      $("#totalChatMsgs").text(msgs)
+    })
+
+    socket.on('newFlwrs', function(followers) {
+      $("#newFlwrs").text(followers)
+    })
+
+    socket.on('newChtr', function(chatters) {
+      $("#newChtr").text(chatters)
+    })
+  </script>
+</body>
+
 </html>

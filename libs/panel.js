@@ -5,6 +5,7 @@ var http = require('http')
 var path = require('path')
 var basicAuth = require('basic-auth')
 var _ = require('lodash')
+var log = global.log
 
 const NOT_AUTHORIZED = '0'
 
@@ -30,6 +31,10 @@ function Panel () {
   this.io.on('connection', function (socket) {
     self.sendMenu(socket)
     self.sendWidget(socket)
+
+    socket.on('getWidgetList', function () { self.sendWidgetList(self, socket) })
+    socket.on('addWidget', function (widget) { self.addWidgetToDb(self, widget, socket) })
+    socket.on('deleteWidget', function (widget) { self.deleteWidgetFromDb(self, widget) })
 
     _.each(self.socketListeners, function (listener) {
       socket.on(listener.on, function () {
@@ -58,9 +63,44 @@ Panel.prototype.addMenu = function (menu) { this.menu.push(menu) }
 
 Panel.prototype.sendMenu = function (socket) { socket.emit('menu', this.menu) }
 
-Panel.prototype.addWidget = function (widget) { this.widgets.push(widget) }
+Panel.prototype.addWidget = function (id, name, icon) { this.widgets.push({id: id, name: name, icon: icon}) }
 
-Panel.prototype.sendWidget = function (socket) { socket.emit('widgets', this.widgets) }
+Panel.prototype.sendWidget = function (socket) {
+  global.botDB.findOne({_id: 'dashboard_widgets'}, function (err, item) {
+    if (err) { log.error(err) }
+    if (_.isNull(item)) return // we doesn't have any widgets to show
+    else {
+      socket.emit('widgets', item.widgets)
+    }
+  })
+}
+
+Panel.prototype.sendWidgetList = function (self, socket) {
+  global.botDB.findOne({_id: 'dashboard_widgets'}, function (err, item) {
+    if (err) { log.error(err) }
+    if (_.isNull(item)) socket.emit('widgetList', self.widgets) // we will return all possible widgets
+    else {
+      var sendWidgets = []
+      _.each(self.widgets, function (widget) {
+        if (item.widgets.indexOf(widget.id) === -1) sendWidgets.push(widget)
+      })
+      socket.emit('widgetList', sendWidgets)
+    }
+  })
+}
+
+Panel.prototype.addWidgetToDb = function (self, widget, socket) {
+  global.botDB.update({ _id: 'dashboard_widgets' }, { $push: { widgets: { $each: [widget] } } }, { upsert: true }, function (err) {
+    if (err) { log.error(err) }
+    self.sendWidget(socket)
+  })
+}
+
+Panel.prototype.deleteWidgetFromDb = function (self, widget) {
+  global.botDB.update({ _id: 'dashboard_widgets' }, { $pull: { widgets: widget } }, { upsert: true }, function (err) {
+    if (err) { log.error(err) }
+  })
+}
 
 Panel.prototype.socketListening = function (self, on, fnc) {
   this.socketListeners.push({self: self, on: on, fnc: fnc})

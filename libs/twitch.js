@@ -88,8 +88,10 @@ Twitch.prototype.saveStream = function (stream) {
 }
 
 Twitch.prototype.webPanel = function () {
-  global.panel.addWidget('chat')
+  global.panel.addWidget('chat', 'Twitch Chat', 'comment')
+  global.panel.addWidget('twitch', 'Twitch Stream Monitor', 'facetime-video')
   global.panel.socketListening(this, 'getChatRoom', this.sendChatRoom)
+  global.panel.socketListening(this, 'getTwitchVideo', this.sendTwitchVideo)
   global.panel.socketListening(this, 'getUptime', this.sendUptime)
   global.panel.socketListening(this, 'getViewers', this.sendViewers)
   global.panel.socketListening(this, 'getChatMsgs', this.sendChatMsgs)
@@ -107,6 +109,10 @@ Twitch.prototype.sendViewers = function (self, socket) {
 
 Twitch.prototype.sendChatRoom = function (self, socket) {
   socket.emit('chatRoom', global.configuration.get().twitch.owner.toLowerCase())
+}
+
+Twitch.prototype.sendTwitchVideo = function (self, socket) {
+  socket.emit('twitchVideo', global.configuration.get().twitch.owner.toLowerCase())
 }
 
 Twitch.prototype.sendChatMsgs = function (self, socket) {
