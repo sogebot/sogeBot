@@ -33,8 +33,8 @@ function Songs () {
 
 Songs.prototype.webPanel = function () {
   global.panel.addMenu({category: 'main', icon: 'music', name: 'songs'})
-  global.panel.addWidget('ytplayer')
-  global.panel.addWidget('songrequests')
+  global.panel.addWidget('ytplayer', 'YouTube player', 'music')
+  global.panel.addWidget('songrequests', 'Song Requests', 'list-alt')
 
   global.panel.socketListening(this, 'getVideoID', this.sendNextSongID)
   global.panel.socketListening(this, 'getMeanLoudness', this.sendMeanLoudness)

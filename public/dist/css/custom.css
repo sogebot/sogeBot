@@ -118,7 +118,6 @@ body {
   overflow: hidden;
   white-space: nowrap;
   position: relative;
-  min-width: 200px;
 }
 
 .stream-info h2 {
@@ -135,6 +134,16 @@ body {
     font-size: 25px;
   }
 }
+
+@media (min-width: 1000px) and  (max-width: 1300px) {
+  .stream-info div.data {
+    font-size: 30px;
+  }
+  .stream-info {
+    min-width: 150px;
+  }
+}
+
 
 @media (min-width: 1300px) and  (max-width: 1580px) {
   .stream-info div.data {
@@ -181,12 +190,27 @@ body {
 }
 
 /* WIDGETS */
+.dropdown-menu {
+  left: -120px;
+}
+
 .widgets {
   padding-top: 20px;
 }
 
 .widget:first-child {
   margin-left: 0;
+}
+
+.widgetAdd {
+  color: #888;
+  border: 3px dashed #ADB2B5;
+  border-radius: 4px;
+  padding: 10px;
+  text-align: center;
+  font-size: 40px;
+  line-height: 100px;
+  cursor: pointer;
 }
 
 .widget {
@@ -196,22 +220,36 @@ body {
   border-radius: 4px;
   padding: 10px;
   margin-left: 10px;
+  margin-bottom: 10px;
 }
 
 .widget .title {
   font-size: 18px;
   border-bottom: 1px dotted #ddd;
   padding: 5px;
+  margin-bottom: 20px;
 }
 
 .widget .controls {
-  float: right;
-  position: relative;
-  top: -26px;
+  position: absolute;
+  right: 30px;
+  top: 10px;
+  font-size: 25px;
+  cursor: pointer;
 }
 
 .widget .controls .not-active {
   color: #888 !important;
+}
+
+.widget .widgetList {
+  font-size: 25px;
+  padding-left: 20px;
+  cursor: pointer;
+  display: inline-block;
+}
+.widget .widgetList:hover {
+  text-decoration: none;
 }
 
 .widget .table tr:first-child > td {
