@@ -94,7 +94,7 @@ Songs.prototype.banSongById = function (self, sender, text) {
 }
 
 Songs.prototype.unbanSong = function (self, sender, text) {
-  var data = {_type: 'banned-song', __id: text.trim(), success: 'songs.unbannedSong', error: 'song.notBannedSong'}
+  var data = {_type: 'banned-song', __id: text.trim(), success: 'songs.unbannedSong', error: 'songs.notBannedSong'}
   if (data.__id.length > 1) global.commons.remove(data)
 }
 
@@ -188,6 +188,8 @@ Songs.prototype.sendNextSongID = function (self, socket) {
             global.botDB.update({type: 'playlist', videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
             self.currentSong = item
             socket.emit('videoID', item)
+          } else {
+            socket.emit('videoID', null)
           }
         })
       }
