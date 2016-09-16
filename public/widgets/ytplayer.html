@@ -11,6 +11,11 @@
     </div>
   </div>
   <div id="YTPlayer"></div>
+  <div class="text-center">
+    <button type="button" class="btn btn-success btn-sm pull-left" onclick="stealToPlaylist()">Steal to Playlist</button>
+    <button type="button" class="btn btn-default btn-sm" onclick="skipSong()">Skip Song</button>
+    <button type="button" class="btn btn-danger btn-sm pull-right" onclick="banSong()">Ban Song</button>
+  </div>
 </div>
 
 <script>
@@ -20,6 +25,18 @@
     var meanLoudness = -16 // default value
     var volume = 0
     var loading = false
+
+    function stealToPlaylist () {
+      socket.emit('stealSong')
+    }
+
+    function skipSong () {
+      socket.emit('skipSong')
+    }
+
+    function banSong () {
+      socket.emit('banSong')
+    }
 
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('YTPlayer', {
