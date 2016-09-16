@@ -1,0 +1,25 @@
+<div class="widget" id="wGAS">
+  <div class="controls">
+    <div class="dropdown">
+      <a id="wGAS" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        <span class="glyphicon glyphicon-option-vertical text-muted"></span>
+      </a>
+      <ul class="dropdown-menu" aria-labelledby="wGAS">
+        <li><a href="#" onclick="deleteWidget('gameandstatus')" style="color: #a94442;">Delete widget</a></li>
+      </ul>
+    </div>
+  </div>
+  <dl>
+    <dt>Status</dt>
+    <dd id="wGASstatus">Not Available</dd>
+    <dt>Game</dt>
+    <dd id="wGASgame">Not Available</dd>
+  </dl>
+</div>
+
+<script>
+  socket.on('stats', function(data) {
+    $("#wGASstatus").text(data.status !== '' ? data.status : 'Not Available')
+    $("#wGASgame").text(data.game !== '' ? data.game : 'Not Available')
+  })
+</script>
