@@ -100,7 +100,7 @@ Songs.prototype.unbanSong = function (self, sender, text) {
 
 Songs.prototype.getCurrentSong = function (self) {
   try {
-    global.commons.sendMessage(global.translate('songs.currentSong').replace('(items)', self.currentSong.title))
+    global.commons.sendMessage(global.translate('songs.currentSong').replace('(title)', self.currentSong.title))
   } catch (err) {
     global.commons.sendMessage(global.translate('songs.noCurrentSong'))
   }
