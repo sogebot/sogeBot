@@ -89,8 +89,10 @@ Commons.prototype.runCallback = function (cb, data) {
 }
 
 Commons.prototype.sendMessage = function (message, sender) {
+  // if sender is null, we can assume, that username is from dashboard -> owner
+  if (_.isNull(sender)) sender = {username: global.configuration.get().twitch.owner}
   if (!_.isUndefined(sender) && sender.username === global.configuration.get().username) return // we don't want to reply on bot commands
-  message = !_.isUndefined(sender) ? message.replace('(sender)', '@' + sender.username) : message
+  message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace('(sender)', '@' + sender.username) : message
   global.client.say(global.configuration.get().twitch.owner, message)
 }
 

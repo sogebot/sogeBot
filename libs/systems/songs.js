@@ -7,7 +7,6 @@ var ytdl = require('ytdl-core')
 
 function Songs () {
   if (global.configuration.get().systems.songs === true) {
-    this.socketPointer = null
     this.currentSong = {}
 
     global.parser.register(this, '!songrequest', this.addSongToQueue, constants.VIEWERS)
@@ -42,6 +41,10 @@ Songs.prototype.webPanel = function () {
   global.panel.socketListening(this, 'getSongRequests', this.sendSongRequestsList)
   global.panel.socketListening(this, 'getPlaylist', this.sendPlaylistList)
   global.panel.socketListening(this, 'getRandomize', this.sendRandomize)
+
+  global.panel.socketListening(this, 'banSong', this.banCurrentSong)
+  global.panel.socketListening(this, 'stealSong', this.stealSongToPlaylist)
+  global.panel.socketListening(this, 'skipSong', this.skipSong)
 /*
   socket.on('setTrim', function (id, start, end) {
     self.savePlaylistTrim(id, start, end)
@@ -69,8 +72,8 @@ Songs.prototype.banCurrentSong = function (self, sender) {
       global.commons.remove({_type: 'playlist', _videoID: self.currentSong.videoID})
       global.commons.remove({_type: 'songrequest', _videoID: self.currentSong.videoID})
       global.commons.timeout(self.currentSong.username, global.translate('songs.bannedSongTimeout'), 300)
-      self.sendNextSongID(self, self.socketPointer)
-      self.sendPlaylistList(self, self.socketPointer)
+      self.sendNextSongID(self, global.panel.socket)
+      self.sendPlaylistList(self, global.panel.socket)
     }
   })
 }
@@ -84,8 +87,8 @@ Songs.prototype.banSongById = function (self, sender, text) {
       if (numAffected > 0) global.commons.sendMessage(global.translate('songs.bannedSong').replace('(title)', videoInfo.title))
       global.commons.remove({_type: 'playlist', _videoID: text.trim()})
       global.commons.remove({_type: 'songrequest', _videoID: text.trim()})
-      self.sendNextSongID(self, self.socketPointer)
-      self.sendPlaylistList(self, self.socketPointer)
+      self.sendNextSongID(self, global.panel.socket)
+      self.sendPlaylistList(self, global.panel.socket)
     })
   })
 }
@@ -111,8 +114,8 @@ Songs.prototype.stealSongToPlaylist = function (self) {
   }
 }
 
-Songs.prototype.skipSong = function (self) {
-  self.sendNextSongID(self, self.socketPointer)
+Songs.prototype.skipSong = function (self, socket) {
+  self.sendNextSongID(self, socket)
 }
 
 Songs.prototype.createRandomSeeds = function () {
@@ -268,7 +271,7 @@ Songs.prototype.removeSongFromPlaylist = function (self, user, text) {
     global.botDB.remove({type: 'playlist', videoID: videoID}, {}, function (err, numRemoved) {
       if (err) console.log(err)
       if (numRemoved > 0) global.commons.sendMessage(global.translate('songs.removeSongPlaylist').replace('(title)', videoInfo.title), user)
-      self.sendPlaylistList(self, self.socketPointer)
+      self.sendPlaylistList(self, global.panel.socket)
     })
   })
 }

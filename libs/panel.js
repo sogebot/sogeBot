@@ -26,11 +26,14 @@ function Panel () {
   this.menu = [{category: 'main', icon: 'dashboard', name: 'dashboard'}]
   this.widgets = []
   this.socketListeners = []
+  this.socket = null
 
   var self = this
   this.io.on('connection', function (socket) {
     self.sendMenu(socket)
     self.sendWidget(socket)
+
+    self.updateSocket(socket)
 
     socket.on('getWidgetList', function () { self.sendWidgetList(self, socket) })
     socket.on('addWidget', function (widget, row) { self.addWidgetToDb(self, widget, row, socket) })
@@ -42,6 +45,10 @@ function Panel () {
       })
     })
   })
+}
+
+Panel.prototype.updateSocket = function (socket) {
+  this.socket = socket
 }
 
 Panel.prototype.authUser = function (req, res, next) {
