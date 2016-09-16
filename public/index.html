@@ -69,8 +69,8 @@
           <div class="stats">&nbsp;</div>
         </div>
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-          <h2><span class="glyphicon glyphicon-thumbs-up"></span> New Followers</h2>
-          <div class="data" id="newFlwrs">0</div>
+          <h2><span class="glyphicon glyphicon-thumbs-up"></span> Followers</h2>
+          <div class="data"><span id="curFollowers">0</span><span id="diffFollowers"></span></div>
           <div class="stats"><span class="stats-up text-success"><span class="glyphicon glyphicon-triangle-top"></span> 4%</span> From last Session (not working)</div>
         </div>
 
@@ -78,12 +78,9 @@
 
         <!-- widgets -->
         <div class="widgets">
-          <!--div class="col-xs-12 col-sm-4 col-md-4">
-                <div class="widget">
-                  <div class="title">Latest Clips</div>
-                </div>
-            </div>
-          -->
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4" id="widgetRow1"></div>
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4" id="widgetRow2"></div>
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4" id="widgetRow3"></div>
         </div>
 
         <div class="col-xs-12 col-sm-12 col-md-12" id="addWidget">
@@ -133,9 +130,10 @@
 
     socket.on('widgets', function(widgets) {
       _.each(widgets, function(widget) {
-        if (loadedWidgets.indexOf(widget) === -1) {
-          $(".widgets").append($('<div id="' + widget + '">').load('widgets/' + widget + '.html'))
-          loadedWidgets.push(widget)
+        widget = widget.split(':')
+        if (loadedWidgets.indexOf(widget[1]) === -1) {
+          $("#widgetRow" + widget[0]).append($('<div id="' + widget[1] + '">').load('widgets/' + widget[1] + '.html'))
+          loadedWidgets.push(widget[1])
         }
       })
     })
@@ -154,7 +152,7 @@
       socket.emit('getUptime');
       socket.emit('getViewers');
       socket.emit('getChatMsgs');
-      socket.emit('getNewFlwrs');
+      socket.emit('getFlwrs');
       socket.emit('getNewChtr');
     }, 1000)
 
@@ -172,8 +170,19 @@
       $("#totalChatMsgs").text(msgs)
     })
 
-    socket.on('newFlwrs', function(followers) {
-      $("#newFlwrs").text(followers)
+    socket.on('Followers', function(current, diff) {
+      var $diffFollowers = $("#diffFollowers")
+      var $curFollowers = $("#curFollowers")
+      if (diff < 0) {
+        $diffFollowers.removeClass('up')
+        $diffFollowers.addClass('down')
+      } else if (diff > 0) {
+        $diffFollowers.removeClass('down')
+        $diffFollowers.addClass('up')
+        diff = '+' + diff
+      } else diff = ''
+      $diffFollowers.text(diff)
+      $curFollowers.text(current)
     })
 
     socket.on('newChtr', function(chatters) {

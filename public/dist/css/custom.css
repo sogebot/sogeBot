@@ -157,6 +157,18 @@ body {
   }
 }
 
+.stream-info #diffFollowers.up {
+  vertical-align: super;
+  font-size: 18px;
+  color: #3c763d;
+}
+
+.stream-info #diffFollowers.down {
+  vertical-align: sub;
+  font-size: 18px;
+  color: #a94442;
+}
+
 .stream-info div.stats span.stats-up, .stream-info div.stats span.stats-down {
   font-style: italic;
 }
@@ -233,22 +245,28 @@ body {
 .widget .controls {
   position: absolute;
   right: 30px;
-  top: 10px;
   font-size: 25px;
   cursor: pointer;
+}
+
+.widget .controls .dropdown {
+  top: -55px;
 }
 
 .widget .controls .not-active {
   color: #888 !important;
+
 }
 
 .widget .widgetList {
-  font-size: 25px;
-  padding-left: 20px;
-  cursor: pointer;
-  display: inline-block;
+  font-size: x-large;
 }
-.widget .widgetList:hover {
+
+.widget .widgetList a {
+  cursor: pointer;
+}
+
+.widget .widgetList a:hover {
   text-decoration: none;
 }
 

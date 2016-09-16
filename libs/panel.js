@@ -33,7 +33,7 @@ function Panel () {
     self.sendWidget(socket)
 
     socket.on('getWidgetList', function () { self.sendWidgetList(self, socket) })
-    socket.on('addWidget', function (widget) { self.addWidgetToDb(self, widget, socket) })
+    socket.on('addWidget', function (widget, row) { self.addWidgetToDb(self, widget, row, socket) })
     socket.on('deleteWidget', function (widget) { self.deleteWidgetFromDb(self, widget) })
 
     _.each(self.socketListeners, function (listener) {
@@ -82,24 +82,24 @@ Panel.prototype.sendWidgetList = function (self, socket) {
     else {
       var sendWidgets = []
       _.each(self.widgets, function (widget) {
-        if (item.widgets.indexOf(widget.id) === -1) sendWidgets.push(widget)
+        if (item.widgets.indexOf('1:' + widget.id) === -1 && item.widgets.indexOf('2:' + widget.id) === -1 && item.widgets.indexOf('3:' + widget.id) === -1) sendWidgets.push(widget)
       })
       socket.emit('widgetList', sendWidgets)
     }
   })
 }
 
-Panel.prototype.addWidgetToDb = function (self, widget, socket) {
-  global.botDB.update({ _id: 'dashboard_widgets' }, { $push: { widgets: { $each: [widget] } } }, { upsert: true }, function (err) {
+Panel.prototype.addWidgetToDb = function (self, widget, row, socket) {
+  global.botDB.update({ _id: 'dashboard_widgets' }, { $push: { widgets: { $each: [row + ':' + widget] } } }, { upsert: true }, function (err) {
     if (err) { log.error(err) }
     self.sendWidget(socket)
   })
 }
 
 Panel.prototype.deleteWidgetFromDb = function (self, widget) {
-  global.botDB.update({ _id: 'dashboard_widgets' }, { $pull: { widgets: widget } }, { upsert: true }, function (err) {
-    if (err) { log.error(err) }
-  })
+  for (var i=1; i < 4; i++) {
+    global.botDB.update({ _id: 'dashboard_widgets' }, { $pull: { widgets: i + ':' + widget } }, { upsert: true }, function (err) { if (err) { log.error(err) } })
+  }
 }
 
 Panel.prototype.socketListening = function (self, on, fnc) {
