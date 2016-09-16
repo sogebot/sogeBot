@@ -47,8 +47,19 @@ function Twitch () {
         self.maxViewers = 0
         self.newChatters = 0
         self.chatMessagesAtStart = global.parser.linesParsed
-        self.followersAtStart = !_.isNull(body.stream) ? body.stream.channel.followers : 0
-        self.currentFollowers = self.followersAtStart
+        self.followersAtStart = self.currentFollowers
+      }
+    })
+
+    global.client.api({
+      url: 'https://api.twitch.tv/kraken/channels/' + global.configuration.get().twitch.owner,
+      headers: {
+        'Client-ID': '1wjn1i3792t71tl90fmyvd0zl6ri2vg'
+      }
+    }, function (err, res, body) {
+      if (err) console.log(err)
+      if (!_.isNull(body)) {
+        self.currentFollowers = body.followers
       }
     })
 
@@ -95,7 +106,7 @@ Twitch.prototype.webPanel = function () {
   global.panel.socketListening(this, 'getUptime', this.sendUptime)
   global.panel.socketListening(this, 'getViewers', this.sendViewers)
   global.panel.socketListening(this, 'getChatMsgs', this.sendChatMsgs)
-  global.panel.socketListening(this, 'getNewFlwrs', this.sendNewFlwrs)
+  global.panel.socketListening(this, 'getFlwrs', this.sendFlwrs)
   global.panel.socketListening(this, 'getNewChtr', this.sendNewChtr)
 }
 
@@ -120,8 +131,8 @@ Twitch.prototype.sendChatMsgs = function (self, socket) {
   socket.emit('chatMsgs', messages > 20000 ? (messages / 1000) + 'k' : messages)
 }
 
-Twitch.prototype.sendNewFlwrs = function (self, socket) {
-  socket.emit('newFlwrs', self.currentFollowers - self.followersAtStart)
+Twitch.prototype.sendFlwrs = function (self, socket) {
+  socket.emit('Followers', self.currentFollowers, self.currentFollowers - self.followersAtStart)
 }
 
 Twitch.prototype.sendNewChtr = function (self, socket) {
