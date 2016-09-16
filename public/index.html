@@ -92,6 +92,12 @@
     </div>
   </div>
 
+  <div class="pages-wrapper">
+    <div class="container-fluid">
+      <div id="pages" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"></div>
+    </div>
+  </div>
+
   <footer class="footer">
     <a href="https://github.com/sogehige/SogeBot">GitHub</a> | <a href="https://github.com/sogehige/SogeBot/issues">Issues</a> | <a href="https://github.com/sogehige/SogeBot/blob/master/LICENSE">MIT License</a>
   </footer>
@@ -106,6 +112,7 @@
   <script>
     var socket = io();
     var loadedWidgets = []
+    var loadedPages = []
     var loadedJS = []
     var addingWidget = false
 
@@ -116,13 +123,66 @@
       dMenu.empty()
         /* at first fill only main category */
       _.each(menu, function(obj) {
-          if (obj.category === 'main') dMenu.append('<li><a href="#"><span class="glyphicon glyphicon-' + obj.icon + '"></span><div>' + obj.name + '</div></a></li>')
-        })
+        if (obj.category === 'main') dMenu.append('<li><a href="#" data-page="' + obj.id + '" id="menu-' + obj.id + '"><span class="glyphicon glyphicon-' + obj.icon + '"></span><div>' + obj.name + '</div></a></li>')
+        if (obj.id !== 'dashboard') {
+          $("#pages").append($('<div id="P' + obj.id + '">').load('pages/' + obj.id + '.html'))
+          loadedPages.push(obj.id)
+        }
         /* TODO add other categories as pop down menus */
+      })
+
+      $("#menu a").on('click', function(ev) {
+        var page = ev.currentTarget.dataset.page
+
+
+        $("#menu-dashboard").css('color', '#337ab7')
+        /* hide everything */
+        _.each(loadedPages, function(page) {
+          $("#menu-" + page).css('color', '#337ab7')
+          $("#P" + page).css('visibility', 'hidden')
+          $("#P" + page).css('z-index', '-99')
+          $(".pages-wrapper").css('z-index', '-99')
+          $("#pages").css('z-index', '-99')
+        })
+        $(".widgets").css('visibility', 'hidden')
+        $("#addWidget").css('visibility', 'hidden')
+          $(".widgets").css('z-index', '-99')
+          $("#addWidget").css('z-index', '-99')
+
+        if (page === 'dashboard') {
+          $(".widgets").css('visibility', 'visible')
+          $("#addWidget").css('visibility', 'visible')
+          $(".widgets").css('z-index', '99')
+          $("#addWidget").css('z-index', '99')
+        }
+        else {
+          $("#P" + page).css('visibility', 'visible')
+          $("#P" + page).css('z-index', '1000')
+          $(".pages-wrapper").css('z-index', '99')
+          $("#pages").css('z-index', '99')
+        }
+
+        /* add shadow for menu */
+        $("#menu-" + page).css('color', 'black')
+      })
     })
 
+    /* PAGES */
+    // update page top on resize
+    $(window).resize(function() {
+      $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
+    })
+    /*
+    function getPos(el) {
+    // yay readability
+    for (var lx=0, ly=0;
+         el != null;
+         lx += el.offsetLeft, ly += el.offsetTop, el = el.offsetParent);
+    return {x: lx,y: ly};
+}*/
+
     /* WIDGETS */
-    var deleteWidget = function (id) {
+    var deleteWidget = function(id) {
       $('#' + id).remove();
       socket.emit('deleteWidget', id)
       loadedWidgets.splice(loadedWidgets.indexOf(id), 1)

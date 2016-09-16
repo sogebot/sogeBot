@@ -1,0 +1,118 @@
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-8">
+  <div class="widget">
+    <div class="title">Playlist</div>
+    <table id="Playlist" class="table table-striped"></table>
+  </div>
+</div>
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+  <div class="widget">
+    <div class="title">Settings</div>
+    <table id="SRRequests" class="table table-striped">
+      <tr>
+        <td><strong>Volume</strong></td>
+        <td><abbr title="click to edit">20%</abbr></td>
+      </tr>
+      <tr>
+        <td><strong>Max duration</strong></td>
+        <td><abbr title="click to edit">10 minutes</abbr></td>
+      </tr>
+      <tr>
+        <td><strong>Shuffle</strong></td>
+        <td><abbr title="click to edit">Enable</abbr></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<script>
+  var playlist = {
+    volume: 0,
+    meanLoudness: -16,
+    getVolume: function(loudness) {
+      var correction = Math.ceil((playlist.volume / 100) * 3)
+      var loudnessDiff = parseFloat(parseFloat(meanLoudness) - loudness)
+      return Math.round(playlist.volume + correction * loudnessDiff)
+    },
+    makeEditable: function(id, el, input, endTime) {
+      el.on('click', function() {
+        el.css('display', 'none')
+        input.css('display', 'inline')
+        input.focus()
+      })
+
+      input.on('focusout', function() {
+        var value = input.val()
+        var valueBefore = el.text()
+        input.css('display', 'none')
+        el.css('display', 'inline')
+
+        /* check if value match correct pattern */
+        var pattern = value.match(/^(\d\d):(\d\d):(\d\d)/)
+        if (pattern !== null) {
+          var currentValue = parseInt(pattern[1], 10) * 3600 + parseInt(pattern[2], 10) * 60 + parseInt(pattern[3], 10)
+          if (currentValue > endTime) currentValue = endTime
+          var out = new Date(currentValue * 1000).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
+          el.text(out)
+          input.val(out)
+
+          /* emit update */
+          var lowValuePtrn = $(".lowValue__" + id).text().match(/^(\d\d):(\d\d):(\d\d)/)
+          var lowValue = parseInt(lowValuePtrn[1], 10) * 3600 + parseInt(lowValuePtrn[2], 10) * 60 + parseInt(lowValuePtrn[3], 10)
+          var highValuePtrn = $(".highValue__" + id).text().match(/^(\d\d):(\d\d):(\d\d)/)
+          var highValue = parseInt(highValuePtrn[1], 10) * 3600 + parseInt(highValuePtrn[2], 10) * 60 + parseInt(highValuePtrn[3], 10)
+          socket.emit('setTrim', id, lowValue, highValue);
+        } else {
+          input.val(valueBefore) // reset value
+        }
+      })
+    },
+    list: {}
+  }
+  socket.emit('getVolume');
+  socket.emit('getMeanLoudness')
+  socket.emit('getPlaylist');
+
+  setInterval(function() {
+    socket.emit('getVolume')
+    socket.emit('getMeanLoudness')
+  }, 60000)
+
+  socket.on('songPlaylistList', function(list) {
+    updatePlaylist(list)
+  });
+
+  socket.on('volume', function(vol) {
+    if (playlist.volume != vol) updatePlaylist(playlist.list)
+    playlist.volume = vol
+  })
+
+  socket.on('meanLoudness', function(loudness) {
+    playlist.meanLoudness = loudness
+  })
+
+  var updatePlaylist = function(list) {
+    playlist.list = list
+    $("#Playlist").empty();
+    for (var index in list) {
+      if (list.hasOwnProperty(index)) {
+        var title = list[index].title,
+          length_seconds = list[index].length_seconds,
+          videoID = list[index].videoID,
+          loudness = typeof list[index].loudness !== 'undefined' ? list[index].loudness : -15
+
+        var startTime = list[index].startTime
+        var endTime = list[index].endTime
+        startTime = (typeof startTime === 'undefined' ? 0 : startTime)
+        endTime = (typeof endTime === 'undefined' ? list[index].length_seconds : endTime)
+
+        var lowValue = (new Date(startTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
+        var highValue = (new Date(endTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
+
+        $("#Playlist").append('<tr><td><a href="http://youtu.be/' + videoID + '">' + videoID + '</a></td><td>' + title + '</td><td>' + (new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + '</td><td>' + playlist.getVolume(loudness) + '%</td><td><div id="slider___' + videoID + '___' + length_seconds + '"></div><div class="trim"><abbr title="click to edit" class="lowValue__' + videoID + '">' + lowValue + '</abbr><input style="width: 6em; display: none" class="form-control input-sm lowValueInput__' + videoID + ' type="text" value="' + lowValue + '"/> - <abbr title="click to edit" class="highValue__' + videoID + '">' + highValue + '</abbr><input style="width: 6em; display: none" class="form-control input-sm highValueInput__' + videoID + ' type="text" value="' + highValue + '"/></div></td></tr>');
+
+        playlist.makeEditable(videoID, $(".lowValue__" + videoID), $(".lowValueInput__" + videoID), endTime)
+        playlist.makeEditable(videoID, $(".highValue__" + videoID), $(".highValueInput__" + videoID), length_seconds)
+      }
+    }
+  }
+</script>
