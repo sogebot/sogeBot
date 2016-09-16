@@ -31,7 +31,7 @@ function Songs () {
 }
 
 Songs.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'main', icon: 'music', name: 'songs'})
+  global.panel.addMenu({category: 'main', icon: 'music', name: 'songs', id: 'songs'})
   global.panel.addWidget('ytplayer', 'YouTube player', 'music')
   global.panel.addWidget('songrequests', 'Song Requests', 'list-alt')
 
@@ -253,6 +253,7 @@ Songs.prototype.addSongToPlaylist = function (self, sender, text) {
             if (err) console.log(err)
             global.botDB.insert({type: 'playlist', videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime()})
             global.commons.sendMessage(global.translate('songs.addedSongPlaylist').replace('(title)', videoInfo.title), sender)
+            self.sendPlaylistList(self, global.panel.socket)
             self.createRandomSeeds()
           })
         } else {

@@ -97,7 +97,11 @@ body {
   min-width: 75px;
 }
 
-.top .menu li a:hover {
+.top .menu li a#menu-dashboard {
+  color: black;
+}
+
+.top .menu li a:hover, .top .menu li a:focus {
   color: black;
   text-decoration:  none;
 }
@@ -303,4 +307,20 @@ body {
 }
 #chatWidget iframe {
   height: 600px;
+}
+
+/* PAGES */
+.pages-wrapper {
+  position: absolute;
+  top: 196px;
+  width: 100%;
+  z-index: -999;
+}
+
+#pages {
+  z-index: -999;
+}
+
+#pages > div {
+  visibility: hidden;
 }

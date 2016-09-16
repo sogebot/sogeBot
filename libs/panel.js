@@ -23,7 +23,7 @@ function Panel () {
   })
 
   this.io = require('socket.io')(server)
-  this.menu = [{category: 'main', icon: 'dashboard', name: 'dashboard'}]
+  this.menu = [{category: 'main', icon: 'dashboard', name: 'dashboard', id: 'dashboard'}]
   this.widgets = []
   this.socketListeners = []
   this.socket = null
