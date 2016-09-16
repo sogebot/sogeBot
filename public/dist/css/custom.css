@@ -249,7 +249,7 @@ body {
   cursor: pointer;
 }
 
-.widget .controls .dropdown {
+.widget .title ~ .controls .dropdown {
   top: -55px;
 }
 
@@ -276,6 +276,14 @@ body {
 
 .widget .table tr > td {
   border-top: 1px dotted #eee;
+}
+
+#wGAS dd {
+  font-size: 25px;
+}
+
+#wGAS dl {
+  margin: 0;
 }
 
 /* FOOTER */

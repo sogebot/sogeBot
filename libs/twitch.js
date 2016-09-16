@@ -17,6 +17,8 @@ function Twitch () {
   this.maxRetries = 10
   this.curRetries = 0
   this.newChatters = 0
+  this.currentStatus = ''
+  this.currentGame = ''
 
   this.whenOnline = null
 
@@ -60,6 +62,8 @@ function Twitch () {
       if (err) console.log(err)
       if (!_.isNull(body)) {
         self.currentFollowers = body.followers
+        self.currentGame = body.game
+        self.currentStatus = body.status
       }
     })
 
@@ -101,21 +105,26 @@ Twitch.prototype.saveStream = function (stream) {
 Twitch.prototype.webPanel = function () {
   global.panel.addWidget('chat', 'Twitch Chat', 'comment')
   global.panel.addWidget('twitch', 'Twitch Stream Monitor', 'facetime-video')
+  global.panel.addWidget('gameandstatus', 'Game & Status', 'info-sign')
   global.panel.socketListening(this, 'getChatRoom', this.sendChatRoom)
   global.panel.socketListening(this, 'getTwitchVideo', this.sendTwitchVideo)
-  global.panel.socketListening(this, 'getUptime', this.sendUptime)
-  global.panel.socketListening(this, 'getViewers', this.sendViewers)
-  global.panel.socketListening(this, 'getChatMsgs', this.sendChatMsgs)
-  global.panel.socketListening(this, 'getFlwrs', this.sendFlwrs)
-  global.panel.socketListening(this, 'getNewChtr', this.sendNewChtr)
+  global.panel.socketListening(this, 'getStats', this.sendStats)
 }
 
-Twitch.prototype.sendUptime = function (self, socket) {
-  socket.emit('uptime', self.getTime(false))
-}
-
-Twitch.prototype.sendViewers = function (self, socket) {
-  socket.emit('viewers', self.currentViewers, self.maxViewers)
+Twitch.prototype.sendStats = function (self, socket) {
+  var messages = self.isOnline ? global.parser.linesParsed - self.chatMessagesAtStart : 0
+  var data = {
+    uptime: self.getTime(false),
+    currentViewers: self.currentViewers,
+    maxViewers: self.maxViewers,
+    chatMessages: messages > 20000 ? (messages / 1000) + 'k' : messages,
+    currentFollowers: self.currentFollowers,
+    diffFollowers: self.currentFollowers - self.followersAtStart,
+    newChatters: self.newChatters,
+    game: self.currentGame,
+    status: self.currentStatus
+  }
+  socket.emit('stats', data)
 }
 
 Twitch.prototype.sendChatRoom = function (self, socket) {
@@ -124,19 +133,6 @@ Twitch.prototype.sendChatRoom = function (self, socket) {
 
 Twitch.prototype.sendTwitchVideo = function (self, socket) {
   socket.emit('twitchVideo', global.configuration.get().twitch.owner.toLowerCase())
-}
-
-Twitch.prototype.sendChatMsgs = function (self, socket) {
-  var messages = self.isOnline ? global.parser.linesParsed - self.chatMessagesAtStart : 0
-  socket.emit('chatMsgs', messages > 20000 ? (messages / 1000) + 'k' : messages)
-}
-
-Twitch.prototype.sendFlwrs = function (self, socket) {
-  socket.emit('Followers', self.currentFollowers, self.currentFollowers - self.followersAtStart)
-}
-
-Twitch.prototype.sendNewChtr = function (self, socket) {
-  socket.emit('newChtr', self.newChatters)
 }
 
 Twitch.prototype.isOnline = function () {

@@ -45,32 +45,32 @@
         <!-- SNIPPETS -->
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-user"></span> Current Viewers</h2>
-          <div class="data" id="currentViewers">0</div>
+          <div class="data" id="currentViewers">-</div>
           <div class="stats">&nbsp;</div>
         </div>
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-user"></span> Max Concurrent Viewers</h2>
-          <div class="data" id="maxViewers">0</div>
+          <div class="data" id="maxViewers">-</div>
           <div class="stats"><span class="stats-up text-success"><span class="glyphicon glyphicon-triangle-top"></span> 4%</span> From last Session (not working)</div>
         </div>
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-comment"></span> Total Chat Messages</h2>
-          <div class="data" id="totalChatMsgs">0</div>
+          <div class="data" id="totalChatMsgs">-</div>
           <div class="stats"><span class="stats-down text-danger"><span class="glyphicon glyphicon-triangle-bottom"></span> 4%</span> From last Session (not working)</div>
         </div>
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-star"></span> Total New Chatters</h2>
-          <div class="data" id="newChtr">0</div>
+          <div class="data" id="newChtr">-</div>
           <div class="stats"><span class="stats-down text-danger"><span class="glyphicon glyphicon-triangle-bottom"></span> 4%</span> From last Session (not working)</div>
         </div>
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-time"></span> Streaming Session</h2>
-          <div class="data" id="uptime">00:00:00</div>
+          <div class="data" id="uptime">--:--:--</div>
           <div class="stats">&nbsp;</div>
         </div>
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-thumbs-up"></span> Followers</h2>
-          <div class="data"><span id="curFollowers">0</span><span id="diffFollowers"></span></div>
+          <div class="data"><span id="curFollowers">-</span><span id="diffFollowers"></span></div>
           <div class="stats"><span class="stats-up text-success"><span class="glyphicon glyphicon-triangle-top"></span> 4%</span> From last Session (not working)</div>
         </div>
 
@@ -149,44 +149,28 @@
 
     /* STATS */
     setInterval(function() {
-      socket.emit('getUptime');
-      socket.emit('getViewers');
-      socket.emit('getChatMsgs');
-      socket.emit('getFlwrs');
-      socket.emit('getNewChtr');
+      socket.emit('getStats');
     }, 1000)
 
-    // TODO - make only one call to get all relevant data?
-    socket.on('uptime', function(uptime) {
-      $("#uptime").text(uptime !== '' ? uptime : '0:00:00')
-    })
-
-    socket.on('viewers', function(current, max) {
-      $("#currentViewers").text(current)
-      $("#maxViewers").text(max)
-    })
-
-    socket.on('chatMsgs', function(msgs) {
-      $("#totalChatMsgs").text(msgs)
-    })
-
-    socket.on('Followers', function(current, diff) {
+    socket.on('stats', function(data) {
       var $diffFollowers = $("#diffFollowers")
       var $curFollowers = $("#curFollowers")
-      if (diff < 0) {
+
+      $("#uptime").text(data.uptime !== '' ? data.uptime : '0:00:00')
+      $("#currentViewers").text(data.currentViewers)
+      $("#maxViewers").text(data.maxViewers)
+      $("#totalChatMsgs").text(data.chatMessages)
+      $("#newChtr").text(data.newChatters)
+      if (data.diffFollowers < 0) {
         $diffFollowers.removeClass('up')
         $diffFollowers.addClass('down')
-      } else if (diff > 0) {
+      } else if (data.diffFollowers > 0) {
         $diffFollowers.removeClass('down')
         $diffFollowers.addClass('up')
-        diff = '+' + diff
-      } else diff = ''
-      $diffFollowers.text(diff)
-      $curFollowers.text(current)
-    })
-
-    socket.on('newChtr', function(chatters) {
-      $("#newChtr").text(chatters)
+        diffFollowers = '+' + diffFollowers
+      } else data.diffFollowers = ''
+      $diffFollowers.text(data.diffFollowers)
+      $curFollowers.text(data.currentFollowers)
     })
   </script>
 </body>
