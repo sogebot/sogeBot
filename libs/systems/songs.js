@@ -42,14 +42,25 @@ Songs.prototype.webPanel = function () {
   global.panel.socketListening(this, 'getPlaylist', this.sendPlaylistList)
   global.panel.socketListening(this, 'getRandomize', this.sendRandomize)
 
+  global.panel.socketListening(this, 'getSongsConfiguration', this.sendConfiguration)
+
+  global.panel.socketListening(this, 'setTrim', this.setTrim)
+
   global.panel.socketListening(this, 'banSong', this.banCurrentSong)
   global.panel.socketListening(this, 'stealSong', this.stealSongToPlaylist)
   global.panel.socketListening(this, 'skipSong', this.skipSong)
-/*
-  socket.on('setTrim', function (id, start, end) {
-    self.savePlaylistTrim(id, start, end)
+}
+
+Songs.prototype.setTrim = function (self, socket, data) {
+  self.savePlaylistTrim(data.id, data.lowValue, data.highValue)
+}
+
+Songs.prototype.sendConfiguration = function (self, socket) {
+  socket.emit('songsConfiguration', {
+    volume: global.configuration.getValue('volume'),
+    shuffle: global.configuration.getValue('shuffle'),
+    duration: global.configuration.getValue('duration')
   })
-*/
 }
 
 Songs.prototype.sendVolume = function (self, socket) {

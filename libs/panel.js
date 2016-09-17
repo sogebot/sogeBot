@@ -38,10 +38,15 @@ function Panel () {
     socket.on('getWidgetList', function () { self.sendWidgetList(self, socket) })
     socket.on('addWidget', function (widget, row) { self.addWidgetToDb(self, widget, row, socket) })
     socket.on('deleteWidget', function (widget) { self.deleteWidgetFromDb(self, widget) })
+    socket.on('saveConfiguration', function (data) {
+      _.each(data, function (index, value) {
+        global.configuration.setValue(global.configuration, { username: global.configuration.get().username }, value + ' ' + index)
+      })
+    })
 
     _.each(self.socketListeners, function (listener) {
-      socket.on(listener.on, function () {
-        listener.fnc(listener.self, socket)
+      socket.on(listener.on, function (data) {
+        listener.fnc(listener.self, socket, data)
       })
     })
   })

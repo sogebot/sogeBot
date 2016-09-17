@@ -10,15 +10,33 @@
     <table id="SRRequests" class="table table-striped">
       <tr>
         <td><strong>Volume</strong></td>
-        <td><abbr title="click to edit">20%</abbr></td>
+        <td>
+          <abbr title="click to edit" data-config-id="volume" onclick="playlist.configEditable(this, '%')" id="configVolume"></abbr>
+          <div class="input-group" style="display:none;" id="input_volume_group">
+            <div class="input-group-addon">%</div>
+            <input style="width: 6em" id="input_volume" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
       </tr>
       <tr>
         <td><strong>Max duration</strong></td>
-        <td><abbr title="click to edit">10 minutes</abbr></td>
+        <td>
+          <abbr title="click to edit" data-config-id="duration" onclick="playlist.configEditable(this, 'min')" id="configDuration"></abbr>
+          <div class="input-group" style="display:none;" id="input_duration_group">
+            <div class="input-group-addon">minutes</div>
+            <input style="width: 6em" id="input_duration" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
       </tr>
       <tr>
         <td><strong>Shuffle</strong></td>
-        <td><abbr title="click to edit">Enable</abbr></td>
+        <td>
+          <abbr title="click to edit" data-config-id="shuffle" onclick="playlist.configEditable(this, '')" id="configShuffle"></abbr>
+          <div class="input-group" style="display:none;" id="input_shuffle_group">
+            <div class="input-group-addon">bool</div>
+            <input style="width: 6em" id="input_shuffle" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
       </tr>
     </table>
   </div>
@@ -32,6 +50,24 @@
       var correction = Math.ceil((playlist.volume / 100) * 3)
       var loudnessDiff = parseFloat(parseFloat(meanLoudness) - loudness)
       return Math.round(playlist.volume + correction * loudnessDiff)
+    },
+    configEditable: function(el, suffix) {
+      var $inputGroup = $('#input_' + el.dataset.configId + '_group')
+      var $input = $('#input_' + el.dataset.configId)
+      $(el).css('display', 'none')
+      $inputGroup.css('display', 'table')
+      $input.focus()
+      $input.val($(el).text().replace(suffix, ''))
+
+      $input.on('focusout', function() {
+        var value = $input.val()
+        var data = {}
+        data[el.dataset.configId] = value
+        $inputGroup.css('display', 'none')
+        $(el).css('display', 'inline')
+        $(el).text(value + suffix)
+        socket.emit('saveConfiguration', data)
+      })
     },
     makeEditable: function(id, el, input, endTime) {
       el.on('click', function() {
@@ -60,7 +96,7 @@
           var lowValue = parseInt(lowValuePtrn[1], 10) * 3600 + parseInt(lowValuePtrn[2], 10) * 60 + parseInt(lowValuePtrn[3], 10)
           var highValuePtrn = $(".highValue__" + id).text().match(/^(\d\d):(\d\d):(\d\d)/)
           var highValue = parseInt(highValuePtrn[1], 10) * 3600 + parseInt(highValuePtrn[2], 10) * 60 + parseInt(highValuePtrn[3], 10)
-          socket.emit('setTrim', id, lowValue, highValue);
+          socket.emit('setTrim', {id:id, lowValue:lowValue, highValue:highValue});
         } else {
           input.val(valueBefore) // reset value
         }
@@ -68,12 +104,13 @@
     },
     list: {}
   }
-  socket.emit('getVolume');
+
   socket.emit('getMeanLoudness')
   socket.emit('getPlaylist');
+  socket.emit('getSongsConfiguration')
 
   setInterval(function() {
-    socket.emit('getVolume')
+    socket.emit('getSongsConfiguration')
     socket.emit('getMeanLoudness')
   }, 60000)
 
@@ -81,9 +118,13 @@
     updatePlaylist(list)
   });
 
-  socket.on('volume', function(vol) {
-    if (playlist.volume != vol) updatePlaylist(playlist.list)
-    playlist.volume = vol
+  socket.on('songsConfiguration', function(data) {
+    if (playlist.volume != data.volume) updatePlaylist(playlist.list)
+    playlist.volume = data.volume
+
+    $("#configVolume").text(data.volume + '%')
+    $("#configDuration").text(data.duration + 'min')
+    $("#configShuffle").text(data.shuffle)
   })
 
   socket.on('meanLoudness', function(loudness) {
