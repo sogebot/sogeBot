@@ -112,7 +112,6 @@
   <script>
     var socket = io();
     var loadedWidgets = []
-    var loadedPages = []
     var loadedJS = []
     var addingWidget = false
 
@@ -124,19 +123,27 @@
         /* at first fill only main category */
       _.each(menu, function(obj) {
         if (obj.category === 'main') dMenu.append('<li><a href="#" data-page="' + obj.id + '" id="menu-' + obj.id + '"><span class="glyphicon glyphicon-' + obj.icon + '"></span><div>' + obj.name + '</div></a></li>')
-        if (obj.id !== 'dashboard') {
-          $("#pages").append($('<div id="P' + obj.id + '">').load('pages/' + obj.id + '.html'))
-          loadedPages.push(obj.id)
-        }
         /* TODO add other categories as pop down menus */
       })
 
       $("#menu a").on('click', function(ev) {
         var page = ev.currentTarget.dataset.page
 
+        $("#pages").empty()
+        if (page !== 'dashboard') {
+          $("#pages").append($('<div id="P' + page + '">').load('pages/' + page + '.html'))
+          $("#menu-dashboard").css('color', '#337ab7')
+          $("#menu-" + page).css('color', 'black')
+          $(".widgets").css('visibility', 'hidden')
+          $("#addWidget").css('visibility', 'hidden')
+        } else {
+          $("#menu-dashboard").css('color', 'black')
+          $("#menu-" + page).css('color', '#337ab7')
+          $(".widgets").css('visibility', 'hidden')
+          $("#addWidget").css('visibility', 'hidden')
+        }
 
-        $("#menu-dashboard").css('color', '#337ab7')
-        /* hide everything */
+        /* hide everything *
         _.each(loadedPages, function(page) {
           $("#menu-" + page).css('color', '#337ab7')
           $("#P" + page).css('visibility', 'hidden')
@@ -160,10 +167,9 @@
           $("#P" + page).css('z-index', '1000')
           $(".pages-wrapper").css('z-index', '99')
           $("#pages").css('z-index', '99')
-        }
+        }*/
 
         /* add shadow for menu */
-        $("#menu-" + page).css('color', 'black')
       })
     })
 

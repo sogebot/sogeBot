@@ -314,13 +314,4 @@ body {
   position: absolute;
   top: 196px;
   width: 100%;
-  z-index: -999;
-}
-
-#pages {
-  z-index: -999;
-}
-
-#pages > div {
-  visibility: hidden;
 }
