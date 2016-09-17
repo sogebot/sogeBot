@@ -122,7 +122,7 @@
       dMenu.empty()
         /* at first fill only main category */
       _.each(menu, function(obj) {
-        if (obj.category === 'main') dMenu.append('<li><a href="#" data-page="' + obj.id + '" id="menu-' + obj.id + '"><span class="glyphicon glyphicon-' + obj.icon + '"></span><div>' + obj.name + '</div></a></li>')
+        if (obj.category === 'main') dMenu.append('<li><a href="#" data-page="' + obj.id + '" class="IMenu" id="menu-' + obj.id + '"><span class="glyphicon glyphicon-' + obj.icon + '"></span><div>' + obj.name + '</div></a></li>')
         /* TODO add other categories as pop down menus */
       })
 
@@ -137,39 +137,11 @@
           $(".widgets").css('visibility', 'hidden')
           $("#addWidget").css('visibility', 'hidden')
         } else {
+          $(".IMenu").css('color', '#337ab7')
           $("#menu-dashboard").css('color', 'black')
-          $("#menu-" + page).css('color', '#337ab7')
-          $(".widgets").css('visibility', 'hidden')
-          $("#addWidget").css('visibility', 'hidden')
-        }
-
-        /* hide everything *
-        _.each(loadedPages, function(page) {
-          $("#menu-" + page).css('color', '#337ab7')
-          $("#P" + page).css('visibility', 'hidden')
-          $("#P" + page).css('z-index', '-99')
-          $(".pages-wrapper").css('z-index', '-99')
-          $("#pages").css('z-index', '-99')
-        })
-        $(".widgets").css('visibility', 'hidden')
-        $("#addWidget").css('visibility', 'hidden')
-          $(".widgets").css('z-index', '-99')
-          $("#addWidget").css('z-index', '-99')
-
-        if (page === 'dashboard') {
           $(".widgets").css('visibility', 'visible')
           $("#addWidget").css('visibility', 'visible')
-          $(".widgets").css('z-index', '99')
-          $("#addWidget").css('z-index', '99')
         }
-        else {
-          $("#P" + page).css('visibility', 'visible')
-          $("#P" + page).css('z-index', '1000')
-          $(".pages-wrapper").css('z-index', '99')
-          $("#pages").css('z-index', '99')
-        }*/
-
-        /* add shadow for menu */
       })
     })
 
@@ -178,14 +150,6 @@
     $(window).resize(function() {
       $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
     })
-    /*
-    function getPos(el) {
-    // yay readability
-    for (var lx=0, ly=0;
-         el != null;
-         lx += el.offsetLeft, ly += el.offsetTop, el = el.offsetParent);
-    return {x: lx,y: ly};
-}*/
 
     /* WIDGETS */
     var deleteWidget = function(id) {
