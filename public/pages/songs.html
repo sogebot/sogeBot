@@ -44,13 +44,6 @@
 
 <script>
   var playlist = {
-    volume: 0,
-    meanLoudness: -16,
-    getVolume: function(loudness) {
-      var correction = Math.ceil((playlist.volume / 100) * 3)
-      var loudnessDiff = parseFloat(parseFloat(meanLoudness) - loudness)
-      return Math.round(playlist.volume + correction * loudnessDiff)
-    },
     configEditable: function(el, suffix) {
       var $inputGroup = $('#input_' + el.dataset.configId + '_group')
       var $input = $('#input_' + el.dataset.configId)
@@ -105,13 +98,11 @@
     list: {}
   }
 
-  socket.emit('getMeanLoudness')
   socket.emit('getPlaylist');
   socket.emit('getSongsConfiguration')
 
   setInterval(function() {
     socket.emit('getSongsConfiguration')
-    socket.emit('getMeanLoudness')
   }, 60000)
 
   socket.on('songPlaylistList', function(list) {
@@ -127,10 +118,6 @@
     $("#configShuffle").text(data.shuffle)
   })
 
-  socket.on('meanLoudness', function(loudness) {
-    playlist.meanLoudness = loudness
-  })
-
   var updatePlaylist = function(list) {
     playlist.list = list
     $("#Playlist").empty();
@@ -139,7 +126,7 @@
         var title = list[index].title,
           length_seconds = list[index].length_seconds,
           videoID = list[index].videoID,
-          loudness = typeof list[index].loudness !== 'undefined' ? list[index].loudness : -15
+          volume = list[index].volume
 
         var startTime = list[index].startTime
         var endTime = list[index].endTime
@@ -149,7 +136,7 @@
         var lowValue = (new Date(startTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
         var highValue = (new Date(endTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
 
-        $("#Playlist").append('<tr><td><a href="http://youtu.be/' + videoID + '">' + videoID + '</a></td><td>' + title + '</td><td>' + (new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + '</td><td>' + playlist.getVolume(loudness) + '%</td><td><div id="slider___' + videoID + '___' + length_seconds + '"></div><div class="trim"><abbr title="click to edit" class="lowValue__' + videoID + '">' + lowValue + '</abbr><input style="width: 6em; display: none" class="form-control input-sm lowValueInput__' + videoID + ' type="text" value="' + lowValue + '"/> - <abbr title="click to edit" class="highValue__' + videoID + '">' + highValue + '</abbr><input style="width: 6em; display: none" class="form-control input-sm highValueInput__' + videoID + ' type="text" value="' + highValue + '"/></div></td></tr>');
+        $("#Playlist").append('<tr><td><a href="http://youtu.be/' + videoID + '">' + videoID + '</a></td><td>' + title + '</td><td>' + (new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + '</td><td>' + volume + '%</td><td><div id="slider___' + videoID + '___' + length_seconds + '"></div><div class="trim"><abbr title="click to edit" class="lowValue__' + videoID + '">' + lowValue + '</abbr><input style="width: 6em; display: none" class="form-control input-sm lowValueInput__' + videoID + ' type="text" value="' + lowValue + '"/> - <abbr title="click to edit" class="highValue__' + videoID + '">' + highValue + '</abbr><input style="width: 6em; display: none" class="form-control input-sm highValueInput__' + videoID + ' type="text" value="' + highValue + '"/></div></td></tr>');
 
         playlist.makeEditable(videoID, $(".lowValue__" + videoID), $(".lowValueInput__" + videoID), endTime)
         playlist.makeEditable(videoID, $(".highValue__" + videoID), $(".highValueInput__" + videoID), length_seconds)
