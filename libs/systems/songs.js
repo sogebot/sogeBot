@@ -60,7 +60,6 @@ Songs.prototype.getMeanLoudness = function (self) {
       _.each(items, function (item) { (typeof item.loudness === 'undefined') ? loudness = loudness + -15 : loudness = loudness + parseFloat(item.loudness); count = count + 1 })
       self.meanLoudness = loudness / count
     }
-    console.log(self.meanLoudness)
   })
 }
 
