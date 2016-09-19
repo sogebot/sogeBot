@@ -22,23 +22,7 @@
   <div class="container-fluid">
     <div class="top">
       <h1>SogeBot WebPanel</h1>
-      <ul id="menu" class="menu">
-        <!--li>
-            <a href="#"><span class="glyphicon glyphicon-dashboard"></span>Dashboard</a>
-          </li>
-          <li>
-            <a href="#"><span class="glyphicon glyphicon-music"></span>Songs</a>
-          </li>
-          <li>
-            <a href="#"><span class="glyphicon glyphicon-wrench"></span>Systems</a>
-          </li>
-          <li>
-            <a href="#"><span class="glyphicon glyphicon-cog"></span>Settings</a>
-          </li>
-          <li>
-            <a href="#"><span class="glyphicon glyphicon-stats"></span>Stats</a>
-          </li-->
-      </ul>
+      <ul id="menu" class="menu"></ul>
     </div>
     <div class="row">
       <div class="col-xs-12 col-sm-12 col-md-12 main">
@@ -130,14 +114,14 @@
         var page = ev.currentTarget.dataset.page
 
         $("#pages").empty()
+        $(".IMenu").css('color', '#337ab7')
+        $("#menu-dashboard").css('color', '#337ab7')
         if (page !== 'dashboard') {
           $("#pages").append($('<div id="P' + page + '">').load('pages/' + page + '.html'))
-          $("#menu-dashboard").css('color', '#337ab7')
           $("#menu-" + page).css('color', 'black')
           $(".widgets").css('visibility', 'hidden')
           $("#addWidget").css('visibility', 'hidden')
         } else {
-          $(".IMenu").css('color', '#337ab7')
           $("#menu-dashboard").css('color', 'black')
           $(".widgets").css('visibility', 'visible')
           $("#addWidget").css('visibility', 'visible')

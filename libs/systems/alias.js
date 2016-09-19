@@ -13,8 +13,22 @@ function Alias () {
     global.parser.register(this, '!alias', this.help, constants.OWNER_ONLY)
 
     global.parser.registerParser(this, 'alias', this.parse, constants.VIEWERS)
+
+    this.webPanel()
   }
   log.info('Alias system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.alias === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+}
+
+Alias.prototype.webPanel = function () {
+  global.panel.addMenu({category: 'main', icon: 'share-alt', name: 'alias', id: 'alias'})
+  global.panel.socketListening(this, 'getAlias', this.sendAliases)
+}
+
+Alias.prototype.sendAliases = function (self, socket) {
+  global.botDB.find({$where: function () { return this._id.startsWith('alias') }}, function (err, docs) {
+    if (err) { log.error(err) }
+    socket.emit('Alias', docs)
+  })
 }
 
 Alias.prototype.help = function (self, sender) {
