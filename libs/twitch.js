@@ -31,7 +31,7 @@ function Twitch () {
       }
     }, function (err, res, body) {
       if (err) console.log(err)
-      if (!_.isNull(body.stream) && !_.isNull(body.stream.created_at)) {
+      if (res.statusCode === 200 && !_.isNull(body.stream)) {
         self.curRetries = 0
         self.saveStream(body.stream)
         if (!self.isOnline) { // if we are switching from offline - bots restarts? We want refresh to correct data for start as well
@@ -60,7 +60,7 @@ function Twitch () {
       }
     }, function (err, res, body) {
       if (err) console.log(err)
-      if (!_.isNull(body)) {
+      if (res.statusCode === 200 && !_.isNull(body)) {
         self.currentFollowers = body.followers
         self.currentGame = body.game
         self.currentStatus = body.status
