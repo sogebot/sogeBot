@@ -186,6 +186,27 @@
       $diffFollowers.text(data.diffFollowers)
       $curFollowers.text(data.currentFollowers)
     })
+
+    var commons = {
+      configEditable: function(el, suffix) {
+        var $inputGroup = $('#input_' + el.dataset.configId + '_group')
+        var $input = $('#input_' + el.dataset.configId)
+        $(el).css('display', 'none')
+        $inputGroup.css('display', 'table')
+        $input.focus()
+        $input.val($(el).text().replace(suffix, ''))
+
+        $input.on('focusout', function() {
+          var value = $input.val()
+          var data = {}
+          data[el.dataset.configId] = value
+          $inputGroup.css('display', 'none')
+          $(el).css('display', 'inline')
+          $(el).text(value + suffix)
+          socket.emit('saveConfiguration', data)
+        })
+      }
+    }
   </script>
 </body>
 
