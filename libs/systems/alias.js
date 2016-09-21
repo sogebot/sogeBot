@@ -22,6 +22,8 @@ function Alias () {
 Alias.prototype.webPanel = function () {
   global.panel.addMenu({category: 'main', icon: 'share-alt', name: 'alias', id: 'alias'})
   global.panel.socketListening(this, 'getAlias', this.sendAliases)
+  global.panel.socketListening(this, 'deleteAlias', this.deleteAlias)
+  global.panel.socketListening(this, 'createAlias', this.createAlias)
 }
 
 Alias.prototype.sendAliases = function (self, socket) {
@@ -29,6 +31,16 @@ Alias.prototype.sendAliases = function (self, socket) {
     if (err) { log.error(err) }
     socket.emit('Alias', docs)
   })
+}
+
+Alias.prototype.deleteAlias = function (self, socket, data) {
+  self.remove(self, null, data)
+  self.sendAliases(self, socket)
+}
+
+Alias.prototype.createAlias = function (self, socket, data) {
+  self.add(self, null, data.command + ' ' + data.value)
+  self.sendAliases(self, socket)
 }
 
 Alias.prototype.help = function (self, sender) {

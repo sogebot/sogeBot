@@ -1,12 +1,13 @@
 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-8">
   <div class="widget">
     <div class="title">Alias</div>
-    <table class="table table-striped table-responsive">
+    <table class="table table-striped table-responsive table-condensed">
       <thead>
         <tr>
           <th>#</th>
           <th>Alias</th>
           <th>Command</th>
+          <th></th>
         </tr>
       </thead>
       <tbody id="Alias" >
@@ -34,15 +35,16 @@
       </div>
       <div class="form-group">
         <div class="col-xs-12 col-sm-12 text-center">
-          <button type="submit" class="btn btn-primary">Create new alias</button>
+          <button type="submit" class="btn btn-primary" onclick="alias.createAlias()">Create new alias</button>
         </div>
       </div>
+    </form>
   </div>
 </div>
 
 <script>
   var alias = {
-    updateAliases: function(list) {
+    updateAliases: function (list) {
       alias.list = list
       $("#Alias").empty()
       _.each(list, function(item, index) {
@@ -50,8 +52,18 @@
           '<td>' + (index + 1) + '</td>' +
           '<td>!' + item.alias + '</td>' +
           '<td>!' + item.command + '</td>' +
+          '<td class="tableMenu"><button type="button" class="btn btn-danger btn-xs" data-alias="' + item.alias + '" onclick="alias.deleteAlias(this)">[x] Delete</button></td>' +
           '</tr>');
       })
+    },
+    deleteAlias: function (el) {
+      socket.emit('deleteAlias', el.dataset.alias)
+    },
+    createAlias: function () {
+      var data = {value: $("#inputAlias").val(), command: $("#inputCommand").val()}
+      socket.emit('createAlias', data)
+      $("#inputAlias").val('')
+      $("#inputCommand").val('')
     },
     list: {}
   }
