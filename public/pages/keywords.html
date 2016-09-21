@@ -1,0 +1,73 @@
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-8">
+  <div class="widget">
+    <div class="title">Keywords</div>
+    <table class="table table-striped table-responsive table-condensed">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Keyword</th>
+          <th>Response</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="Keywords"></tbody>
+    </table>
+  </div>
+</div>
+
+
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+  <div class="widget">
+    <div class="title">Create Keyword</div>
+    <form class="form-horizontal">
+      <div class="form-group">
+        <div class="col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group">
+          <div class="input-group-addon">Keyword</div>
+          <input type="text" class="form-control" id="inputKeyword" placeholder="Keyword">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group">
+          <div class="input-group-addon">Response</div>
+          <input type="text" class="form-control" id="inputResponse" placeholder="Response">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-12 col-sm-12 text-center">
+          <button type="submit" class="btn btn-primary" onclick="keywords.createKeyword()">Create new keyword</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  var keywords = {
+    updateKeywords: function (list) {
+      $("#Keywords").empty()
+      _.each(list, function(item, index) {
+        $("#Keywords").append('<tr>' +
+          '<td>' + (index + 1) + '</td>' +
+          '<td>' + item.keyword + '</td>' +
+          '<td>' + item.response + '</td>' +
+          '<td class="tableMenu"><button type="button" class="btn btn-danger btn-xs" data-keyword="' + item.keyword + '" onclick="keywords.deleteKeyword(this)">[x] Delete</button></td>' +
+          '</tr>');
+      })
+    },
+    deleteKeyword: function (el) {
+      socket.emit('deleteKeyword', el.dataset.keyword)
+    },
+    createKeyword: function () {
+      var data = {keyword: $("#inputKeyword").val(), response: $("#inputResponse").val()}
+      socket.emit('createKeyword', data)
+      $("#inputKeyword").val('')
+      $("#inputResponse").val('')
+    }
+  }
+
+  socket.emit('getKeywords');
+
+  socket.on('Keywords', function(list) {
+    keywords.updateKeywords(list)
+  });
+</script>

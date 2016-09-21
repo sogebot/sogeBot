@@ -13,8 +13,34 @@ function Keywords () {
     global.parser.register(this, '!keyword', this.help, constants.OWNER_ONLY)
 
     global.parser.registerParser(this, 'keywords', this.run, constants.VIEWERS)
+
+    this.webPanel()
   }
   log.info('Keywords system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.keywords === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+}
+
+Keywords.prototype.webPanel = function () {
+  global.panel.addMenu({category: 'main', icon: 'text-color', name: 'keywords', id: 'keywords'})
+  global.panel.socketListening(this, 'getKeywords', this.sendKeywords)
+  global.panel.socketListening(this, 'deleteKeyword', this.deleteKeywords)
+  global.panel.socketListening(this, 'createKeyword', this.createKeywords)
+}
+
+Keywords.prototype.sendKeywords = function (self, socket) {
+  global.botDB.find({$where: function () { return this._id.startsWith('kwd') }}, function (err, items) {
+    if (err) { log.error(err) }
+    socket.emit('Keywords', items)
+  })
+}
+
+Keywords.prototype.deleteKeywords = function (self, socket, data) {
+  self.remove(self, null, data)
+  self.sendKeywords(self, socket)
+}
+
+Keywords.prototype.createKeywords = function (self, socket, data) {
+  self.add(self, null, data.keyword + ' ' + data.response)
+  self.sendKeywords(self, socket)
 }
 
 Keywords.prototype.help = function (self, sender) {
