@@ -16,8 +16,34 @@ function Price () {
     global.parser.register(this, '!price', this.help, constants.OWNER_ONLY)
 
     global.parser.registerParser(this, 'price', this.checkPrice, constants.VIEWERS)
+
+    this.webPanel()
   }
   log.info('Price system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.price === true && global.configuration.get().systems.points === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+}
+
+Price.prototype.webPanel = function () {
+  global.panel.addMenu({category: 'main', icon: 'ruble', name: 'price', id: 'price'})
+  global.panel.socketListening(this, 'getPrices', this.sendPrices)
+  global.panel.socketListening(this, 'deletePrice', this.deletePrice)
+  global.panel.socketListening(this, 'createPrice', this.createPrice)
+}
+
+Price.prototype.sendPrices = function (self, socket) {
+  global.botDB.find({$where: function () { return this._id.startsWith('price') }}, function (err, items) {
+    if (err) { log.error(err) }
+    socket.emit('Prices', items)
+  })
+}
+
+Price.prototype.deletePrice = function (self, socket, data) {
+  self.unset(self, null, data)
+  self.sendPrices(self, socket)
+}
+
+Price.prototype.createPrice = function (self, socket, data) {
+  self.set(self, null, data.command + ' ' + data.price)
+  self.sendPrices(self, socket)
 }
 
 Price.prototype.help = function (self, sender) {

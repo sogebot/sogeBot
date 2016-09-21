@@ -1,0 +1,74 @@
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-8">
+  <div class="widget">
+    <div class="title">Prices</div>
+    <table class="table table-striped table-responsive table-condensed">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Command</th>
+          <th>Price</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="Prices" >
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+  <div class="widget">
+    <div class="title">Create Price</div>
+    <form class="form-horizontal">
+      <div class="form-group">
+        <div class="col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group">
+          <div class="input-group-addon">Command</div>
+          <input type="text" class="form-control" id="inputCommand" placeholder="Command">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group">
+          <div class="input-group-addon">Price</div>
+          <input type="text" class="form-control" id="inputPrice" placeholder="Price">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-12 col-sm-12 text-center">
+          <button type="submit" class="btn btn-primary" onclick="price.create()">Create new price</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  var price = {
+    update: function (list) {
+      $("#Prices").empty()
+      _.each(list, function(item, index) {
+        $("#Prices").append('<tr>' +
+          '<td>' + (index + 1) + '</td>' +
+          '<td>!' + item.command + '</td>' +
+          '<td>' + item.price + '</td>' +
+          '<td class="tableMenu"><button type="button" class="btn btn-danger btn-xs" data-command="' + item.command + '" onclick="price.delete(this)">[x] Delete</button></td>' +
+          '</tr>');
+      })
+    },
+    delete: function (el) {
+      socket.emit('deletePrice', el.dataset.command)
+    },
+    create: function () {
+      var data = {price: $("#inputPrice").val(), command: $("#inputCommand").val()}
+      socket.emit('createPrice', data)
+      $("#inputPrice").val('')
+      $("#inputCommand").val('')
+    }
+  }
+
+  socket.emit('getPrices');
+
+  socket.on('Prices', function(list) {
+    price.update(list)
+  });
+</script>
