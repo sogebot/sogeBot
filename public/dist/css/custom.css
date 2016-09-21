@@ -83,7 +83,7 @@ body {
 
 .top .menu li {
   float: left;
-  min-width: 75px;
+  padding-right: 5px;
 }
 
 .top .menu li a#menu-dashboard {
@@ -113,10 +113,6 @@ body {
 
   .top .menu .glyphicon {
     font-size: 20px;
-  }
-
-  .top .menu li {
-    min-width: 50px;
   }
 
   .top .menu li a {
