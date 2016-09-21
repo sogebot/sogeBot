@@ -17,8 +17,34 @@ function CustomCommands () {
     setInterval(function () {
       self.register(self)
     }, 1000)
+
+    this.webPanel()
   }
   log.info('CustomCommands system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.customCommands === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+}
+
+CustomCommands.prototype.webPanel = function () {
+  global.panel.addMenu({category: 'main', icon: 'console', name: 'commands', id: 'customCommands'})
+  global.panel.socketListening(this, 'getCommands', this.sendCommands)
+  global.panel.socketListening(this, 'deleteCommand', this.deleteCommands)
+  global.panel.socketListening(this, 'createCommand', this.createCommands)
+}
+
+CustomCommands.prototype.sendCommands = function (self, socket) {
+  global.botDB.find({$where: function () { return this._id.startsWith('customcmds') }}, function (err, items) {
+    if (err) { log.error(err) }
+    socket.emit('Commands', items)
+  })
+}
+
+CustomCommands.prototype.deleteCommands = function (self, socket, data) {
+  self.remove(self, null, data)
+  self.sendCommands(self, socket)
+}
+
+CustomCommands.prototype.createCommands = function (self, socket, data) {
+  self.add(self, null, data.command + ' ' + data.response)
+  self.sendCommands(self, socket)
 }
 
 CustomCommands.prototype.help = function (self, sender) {
