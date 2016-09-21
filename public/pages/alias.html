@@ -45,7 +45,6 @@
 <script>
   var alias = {
     updateAliases: function (list) {
-      alias.list = list
       $("#Alias").empty()
       _.each(list, function(item, index) {
         $("#Alias").append('<tr>' +
@@ -64,8 +63,7 @@
       socket.emit('createAlias', data)
       $("#inputAlias").val('')
       $("#inputCommand").val('')
-    },
-    list: {}
+    }
   }
 
   socket.emit('getAlias');
