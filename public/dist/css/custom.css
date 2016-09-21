@@ -222,9 +222,6 @@ body {
   padding-top: 20px;
 }
 
-.widget:first-child {
-  margin-left: 0;
-}
 
 .widgetAdd {
   color: #888;

@@ -25,8 +25,44 @@ function Notice () {
     setInterval(function () {
       self.send()
     }, 1000)
+
+    this.webPanel()
   }
   log.info('Notice system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.notice === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+}
+
+Notice.prototype.webPanel = function () {
+  global.panel.addMenu({category: 'main', icon: 'info-sign', name: 'notice', id: 'notice'})
+
+  global.panel.socketListening(this, 'getNoticeConfiguration', this.sendConfiguration)
+  global.panel.socketListening(this, 'getNotices', this.sendNotices)
+  global.panel.socketListening(this, 'deleteNotice', this.deleteNotice)
+  global.panel.socketListening(this, 'createNotice', this.createNotice)
+}
+
+Notice.prototype.sendNotices = function (self, socket) {
+  global.botDB.find({$where: function () { return this._id.startsWith('notice') }}, function (err, items) {
+    if (err) { log.error(err) }
+    items.forEach(function (e, i, ar) { e.id = e._id.split('_')[1] })
+    socket.emit('Notices', items)
+  })
+}
+
+Notice.prototype.deleteNotice = function (self, socket, data) {
+  self.remove(self, null, data)
+  self.sendNotices(self, socket)
+}
+
+Notice.prototype.createNotice = function (self, socket, data) {
+  self.add(self, null, data.response)
+  self.sendNotices(self, socket)
+}
+
+Notice.prototype.sendConfiguration = function (self, socket) {
+  socket.emit('noticesConfiguration', {
+    interval: global.configuration.getValue('noticeInterval'),
+    msgreq: global.configuration.getValue('noticeMsgReq')
+  })
 }
 
 Notice.prototype.send = function () {
