@@ -315,3 +315,11 @@ body {
   top: 196px;
   width: 100%;
 }
+
+table .tableMenu {
+  text-align: right;
+}
+
+table .tableMenu button { visibility: hidden; }
+
+table tr:hover > .tableMenu button { visibility: visible; }
