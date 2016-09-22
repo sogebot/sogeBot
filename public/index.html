@@ -218,6 +218,7 @@
         $input.focus()
         $input.val($(el).text().replace(suffix, ''))
 
+        $input.off()
         $input.on('focusout', function() {
           var value = $input.val()
           var data = {}
