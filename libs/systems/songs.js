@@ -33,7 +33,7 @@ function Songs () {
 }
 
 Songs.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'main', icon: 'music', name: 'songs', id: 'songs'})
+  global.panel.addMenu({category: 'systems', name: 'Songs', id: 'songs'})
   global.panel.addWidget('ytplayer', 'YouTube player', 'music')
   global.panel.addWidget('songrequests', 'Song Requests', 'list-alt')
 
