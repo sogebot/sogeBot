@@ -109,7 +109,7 @@ Panel.prototype.addWidgetToDb = function (self, widget, row, socket) {
 }
 
 Panel.prototype.deleteWidgetFromDb = function (self, widget) {
-  for (var i=1; i < 4; i++) {
+  for (var i = 1; i < 4; i++) {
     global.botDB.update({ _id: 'dashboard_widgets' }, { $pull: { widgets: i + ':' + widget } }, { upsert: true }, function (err) { if (err) { log.error(err) } })
   }
 }
