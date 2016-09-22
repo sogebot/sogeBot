@@ -43,6 +43,7 @@ function Points () {
 Points.prototype.webPanel = function () {
   global.panel.addMenu({category: 'systems', name: 'Points', id: 'points'})
   global.panel.socketListening(this, 'getPoints', this.listSocket)
+  global.panel.socketListening(this, 'setPoints', this.setSocket)
 
   global.panel.socketListening(this, 'getPointsConfiguration', this.sendConfiguration)
 }
@@ -52,6 +53,10 @@ Points.prototype.listSocket = function (self, socket) {
     if (err) { log.error(err) }
     socket.emit('Points', items)
   })
+}
+
+Points.prototype.setSocket = function (self, socket, data) {
+  self.setPoints(self, {username: global.configuration.get().twitch.owner}, data.username + ' ' + data.value) // we want to show this in chat
 }
 
 Points.prototype.sendConfiguration = function (self, socket) {
