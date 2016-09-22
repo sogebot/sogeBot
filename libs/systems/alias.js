@@ -20,7 +20,7 @@ function Alias () {
 }
 
 Alias.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'main', icon: 'share-alt', name: 'alias', id: 'alias'})
+  global.panel.addMenu({category: 'systems', name: 'Alias', id: 'alias'})
   global.panel.socketListening(this, 'getAlias', this.sendAliases)
   global.panel.socketListening(this, 'deleteAlias', this.deleteAlias)
   global.panel.socketListening(this, 'createAlias', this.createAlias)

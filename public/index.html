@@ -19,11 +19,32 @@
 </head>
 
 <body>
-  <div class="container-fluid">
-    <div class="top">
-      <h1>SogeBot WebPanel</h1>
-      <ul id="menu" class="menu"></ul>
+  <div class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+        <a class="navbar-brand" href="#">SogeBot WebPanel</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav" id="menu">
+          <li id="menuDashboard"><a href="#" data-page="dashboard" class="active">Dashboard</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Systems <span class="caret"></span></a>
+            <ul class="dropdown-menu" id="menu-systems"></ul>
+          </li>
+          <li><a href="#">Stats</a></li>
+        </ul>
+      </div>
     </div>
+  </div>
+  <div class="container-fluid">
     <div class="row">
       <div class="col-xs-12 col-sm-12 col-md-12 main">
         <!-- SNIPPETS -->
@@ -101,31 +122,27 @@
 
     /* MENU */
     socket.on('menu', function(menu) {
-      var dMenu = $('#menu')
-        /* at first, clear all menu */
-      dMenu.empty()
-        /* at first fill only main category */
+      /* at first, clear all menu */
+      $('#menu-*').empty()
       _.each(menu, function(obj) {
-        if (obj.category === 'main') dMenu.append('<li><a href="#" data-page="' + obj.id + '" class="IMenu" id="menu-' + obj.id + '"><span class="glyphicon glyphicon-' + obj.icon + '"></span><div>' + obj.name + '</div></a></li>')
-        /* TODO add other categories as pop down menus */
+        if (obj.category !== 'main') {
+          $('#menu-' + obj.category).append('<li><a href="#" data-page="' + obj.id + '">' + obj.name + '</a></li>')
+        }
       })
 
       $("#menu a").on('click', function(ev) {
         var page = ev.currentTarget.dataset.page
+        var visibility = page !== 'dashboard' ? 'hidden' : 'visible'
+        if (_.isUndefined(page)) return
+
+        $("#menu a").removeClass('active')
+        $(ev.currentTarget).addClass('active')
 
         $("#pages").empty()
-        $(".IMenu").css('color', '#337ab7')
-        $("#menu-dashboard").css('color', '#337ab7')
-        if (page !== 'dashboard') {
-          $("#pages").append($('<div id="P' + page + '">').load('pages/' + page + '.html'))
-          $("#menu-" + page).css('color', 'black')
-          $(".widgets").css('visibility', 'hidden')
-          $("#addWidget").css('visibility', 'hidden')
-        } else {
-          $("#menu-dashboard").css('color', 'black')
-          $(".widgets").css('visibility', 'visible')
-          $("#addWidget").css('visibility', 'visible')
-        }
+        if (page !== 'dashboard') $("#pages").append($('<div id="P' + page + '">').load('pages/' + page + '.html'))
+
+        $(".widgets").css('visibility', visibility)
+        $("#addWidget").css('visibility', visibility)
       })
     })
 
@@ -134,7 +151,7 @@
     $(window).resize(function() {
       $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
     })
-    setInterval(function () {
+    setInterval(function() {
       $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
     })
 
