@@ -220,10 +220,23 @@
     },
     "settings": {
       "moderationLinks": "Moderovani linku je nastaveno na (value)",
+      "moderationLinksTimeout": "Timeout pri pouziti linku je nastaven na (value)s",
       "moderationSymbols": "Moderovani symbolu je nastaveno na (value)",
+      "moderationSymbolsTimeout": "Timeout pri pouziti symbolu je nastaven na (value)s",
+      "moderationSymbolsTriggerLength": "Moderovani symbolu zapnuto od (value) poctu znaku",
+      "moderationSymbolsMaxConsecutively": "Maximum symbolu zapsanych za sebou je nastaveno na (value)",
+      "moderationSymbolsMaxPercent": "Maximum symbolu v cele zprave je nastaveno na (value)%",
       "moderationLongMessage": "Moderovani dlouhych zprav je nastaveno na (value)",
+      "moderationLongMessageTimeout": "Timeout pro dlouhe zpravy je nastaven na  (value)s",
+      "moderationLongMessageTriggerLength": "Moderovani dlouhych zprav zapnuto od (value) poctu znaku",
       "moderationCaps": "Moderovani velkych pismen je nastaveno na (value)",
+      "moderationCapsTimeout": "Timeout pri pouziti celkych pismen je nastaven na (value)s",
+      "moderationCapsTriggerLength": "Moderovani velkych pismen zapnuto od (value) poctu znaku",
+      "moderationCapsMaxPercent": "Maximum velkych pismen v cele zprave je nastaveno na (value)%",
       "moderationSpam": "Moderovani spamu je nastaveno na (value)",
+      "moderationSpamTimeout": "Timeout pri spamovani je nastaven na (value)s",
+      "moderationSpamTriggerLength": "Moderovani spamu zapnuto od (value) poctu znaku",
+      "moderationSpamMaxLength": "Maximalni delka spamu je nastavena na (value)",
       "moderationWarnings": "Uzivatel bude (value)x varovan, nez dostane timeout",
       "moderationWarningsTimeouts": "Uzivatel bude varovan i s timeoutem - (value)"
     }
