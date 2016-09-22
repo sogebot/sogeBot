@@ -48,7 +48,7 @@ Points.prototype.webPanel = function () {
 }
 
 Points.prototype.listSocket = function (self, socket) {
-  global.botDB.find({username: { $nin: [global.configuration.get().twitch.username, global.configuration.get().twitch.owner] }, $where: function () { return this._id.startsWith('user') }}).sort({ points: 0 }).exec(function (err, items) {
+  global.botDB.find({username: { $nin: [global.configuration.get().twitch.username, global.configuration.get().twitch.owner] }, points: { $exists: true }, $where: function () { return this._id.startsWith('user') }}).sort({ points: -1 }).exec(function (err, items) {
     if (err) { log.error(err) }
     socket.emit('Points', items)
   })
