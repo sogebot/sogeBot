@@ -34,8 +34,51 @@ function Points () {
     setInterval(function () {
       self.updatePoints()
     }, 30000)
+
+    this.webPanel()
   }
   log.info('Points system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.points === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+}
+
+Points.prototype.webPanel = function () {
+  global.panel.addMenu({category: 'main', icon: 'usd', name: 'points', id: 'points'})
+  global.panel.socketListening(this, 'getPoints', this.listSocket)
+
+  global.panel.socketListening(this, 'getPointsConfiguration', this.sendConfiguration)
+}
+
+Points.prototype.listSocket = function (self, socket) {
+  global.botDB.find({username: { $nin: [global.configuration.get().twitch.username, global.configuration.get().twitch.owner] }, $where: function () { return this._id.startsWith('user') }}).sort({ points: 0 }).exec(function (err, items) {
+    if (err) { log.error(err) }
+    socket.emit('Points', items)
+  })
+}
+
+Points.prototype.sendConfiguration = function (self, socket) {
+  var pointsNames
+  if (global.configuration.getValue('pointsName').length === 0) {
+    pointsNames = []
+    pointsNames.push(global.translate('points.defaults.pointsName.single'))
+    if (global.translate('points.defaults.pointsName.xmulti').indexOf('missing_translation') === -1) {
+      pointsNames.push(global.translate('points.defaults.pointsName.xmulti'))
+    }
+    pointsNames.push(global.translate('points.defaults.pointsName.multi'))
+    pointsNames = pointsNames.join('|')
+  } else {
+    pointsNames = global.configuration.getValue('pointsName')
+  }
+
+  var pointsResponse = global.configuration.getValue('pointsResponse')
+  pointsResponse = pointsResponse.length === 0 ? global.translate('points.defaults.pointsResponse') : pointsResponse
+
+  socket.emit('pointsConfiguration', {
+    pointsName: pointsNames,
+    pointsResponse: pointsResponse,
+    pointsInterval: global.configuration.getValue('pointsInterval'),
+    pointsPerInterval: global.configuration.getValue('pointsPerInterval'),
+    pointsIntervalOffline: global.configuration.getValue('pointsIntervalOffline'),
+    pointsPerIntervalOffline: global.configuration.getValue('pointsPerIntervalOffline')
+  })
 }
 
 Points.prototype.addEvents = function (self) {
