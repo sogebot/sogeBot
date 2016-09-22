@@ -220,10 +220,23 @@
     },
     "settings": {
       "moderationLinks": "Moderation of links is set to (value)",
+      "moderationLinksTimeout": "Timeout because of links set to (value)s",
       "moderationSymbols": "Moderation of symbols is set to (value)",
+      "moderationSymbolsTimeout": "Timeout because of symbols set to (value)s",
+      "moderationSymbolsTriggerLength": "Trigger message length for symbols set to (value)",
+      "moderationSymbolsMaxConsecutively": "Maximum of consecutively written symbols set to (value)",
+      "moderationSymbolsMaxPercent": "Maximum symbols percentage in message set to (value)%",
       "moderationLongMessage": "Moderation of long messages is set to (value)",
+      "moderationLongMessageTimeout": "Timeout because of long message set to (value)s",
+      "moderationLongMessageTriggerLength": "Trigger message length for long messages set to (value)",
       "moderationCaps": "Moderation of caps is set to (value)",
+      "moderationCapsTimeout": "Timeout because of caps set to (value)s",
+      "moderationCapsTriggerLength": "Trigger message length for caps set to (value)",
+      "moderationCapsMaxPercent": "Maximum caps percentage in message set to (value)%",
       "moderationSpam": "Moderation of spam is set to (value)",
+      "moderationSpamTimeout": "Timeout because of spam set to (value)s",
+      "moderationSpamTriggerLength": "Trigger message length for spam set to (value)",
+      "moderationSpamMaxLength": "Maximum spam length in message set to (value)",
       "moderationWarnings": "User will be warned (value) times",
       "moderationWarningsTimeouts": "User will be warned with timeout - (value)"
     }
