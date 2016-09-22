@@ -32,7 +32,7 @@ function Bets () {
     global.configuration.register('betCloseTimer', 'bets.betCloseTimer', 'number', 2)
 
     // close any bets
-    this.close(this, {username: global.configuration.get().owner}, 'refundall')
+    this.close(this, null, 'refundall')
   }
   log.info('Bets (game) system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.points === true && global.configuration.get().systems.alias === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
