@@ -88,8 +88,27 @@
       _.each(list, function(item, index) {
         $("#Points").append('<tr>' +
           '<td>' + item.username + '</td>' +
-          '<td>' + item.points + '</td>' +
-          '</tr>');
+          '<td>' +
+          '<abbr title="click to edit" data-id="' + item.username + '" onclick="points.makeEditable(this)">' +  item.points + '</abbr>' +
+          '<input id="points_' + item.username + '" style="width: 6em; display: none" class="form-control input-sm" type="text"/>' +
+          '</td>' +
+        '</tr>');
+      })
+    },
+    makeEditable: function(el) {
+      var $input = $('#points_' + el.dataset.id)
+      $(el).css('display', 'none')
+      $input.css('display', 'table')
+      $input.focus()
+      $input.val($(el).text())
+
+      $input.off()
+      $input.on('focusout', function() {
+        var value = $input.val()
+        $input.css('display', 'none')
+        $(el).css('display', 'inline')
+        $(el).text(value)
+        socket.emit('setPoints', {username: el.dataset.id, value: value})
       })
     }
   }
