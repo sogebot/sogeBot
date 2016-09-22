@@ -1,0 +1,72 @@
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-8">
+  <div class="widget">
+    <div class="title">Ranks</div>
+    <table class="table table-striped table-responsive table-condensed">
+      <thead>
+        <tr>
+          <th>Watched Time (hours)</th>
+          <th>Name</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="Ranks" >
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+  <div class="widget">
+    <div class="title">Create Rank</div>
+    <form class="form-horizontal">
+      <div class="form-group">
+        <div class="col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group">
+          <div class="input-group-addon">Watched Time (hours)</div>
+          <input type="text" class="form-control" id="inputWatched" placeholder="e.g. 10">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group">
+          <div class="input-group-addon">Name</div>
+          <input type="text" class="form-control" id="inputName" placeholder="e.g. Novice">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-12 col-sm-12 text-center">
+          <button type="submit" class="btn btn-primary" onclick="ranks.create()">Create new rank</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  var ranks = {
+    update: function (list) {
+      $("#Ranks").empty()
+      _.each(list, function(item, index) {
+        $("#Ranks").append('<tr>' +
+          '<td>' + item.hours + '</td>' +
+          '<td>' + item.rank + '</td>' +
+          '<td class="tableMenu"><button type="button" class="btn btn-danger btn-xs" data-hours="' + item.hours + '" onclick="ranks.delete(this)">[x] Delete</button></td>' +
+          '</tr>');
+      })
+    },
+    delete: function (el) {
+      socket.emit('deleteRank', el.dataset.hours)
+    },
+    create: function () {
+      var data = {hours: $("#inputWatched").val(), rank: $("#inputName").val()}
+      socket.emit('createRank', data)
+      $("#inputWatched").val('')
+      $("#inputName").val('')
+    }
+  }
+
+  socket.emit('getRanks');
+
+  socket.on('Ranks', function(list) {
+    ranks.update(list)
+  });
+</script>

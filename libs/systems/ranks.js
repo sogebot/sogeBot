@@ -19,8 +19,34 @@ function Ranks () {
     setInterval(function () {
       self.updateRanks()
     }, 60000)
+
+    this.webPanel()
   }
   log.info('Ranks system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.ranks === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+}
+
+Ranks.prototype.webPanel = function () {
+  global.panel.addMenu({category: 'main', icon: 'menu-up', name: 'ranks', id: 'ranks'})
+  global.panel.socketListening(this, 'getRanks', this.listSocket)
+  global.panel.socketListening(this, 'deleteRank', this.deleteSocket)
+  global.panel.socketListening(this, 'createRank', this.createSocket)
+}
+
+Ranks.prototype.listSocket = function (self, socket) {
+  global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, items) {
+    if (err) { log.error(err) }
+    socket.emit('Ranks', items)
+  })
+}
+
+Ranks.prototype.deleteSocket = function (self, socket, data) {
+  self.remove(self, null, data)
+  self.listSocket(self, socket)
+}
+
+Ranks.prototype.createSocket = function (self, socket, data) {
+  self.add(self, null, data.hours + ' ' + data.rank)
+  self.listSocket(self, socket)
 }
 
 Ranks.prototype.help = function (self, sender) {
