@@ -193,6 +193,7 @@ a.active {
   right: 30px;
   font-size: 25px;
   cursor: pointer;
+  z-index: 10;
 }
 
 .widget .title ~ .controls .dropdown {
@@ -222,10 +223,6 @@ a.active {
 
 .widget .table tr > td {
   border-top: 1px dotted #eee;
-}
-
-#wGAS dd {
-  font-size: 25px;
 }
 
 #wGAS dl {
