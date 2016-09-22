@@ -16,10 +16,28 @@ function Moderation () {
     global.parser.registerParser(this, 'moderationSpam', this.spam, constants.VIEWERS)
 
     global.configuration.register('moderationLinks', 'moderation.settings.moderationLinks', 'bool', true)
+    global.configuration.register('moderationLinksTimeout', 'moderation.settings.moderationLinksTimeout', 'number', 120)
+
     global.configuration.register('moderationSymbols', 'moderation.settings.moderationSymbols', 'bool', true)
+    global.configuration.register('moderationSymbolsTimeout', 'moderation.settings.moderationSymbolsTimeout', 'number', 120)
+    global.configuration.register('moderationSymbolsTriggerLength', 'moderation.settings.moderationSymbolsTriggerLength', 'number', 15)
+    global.configuration.register('moderationSymbolsMaxConsecutively', 'moderation.settings.moderationSymbolsMaxConsecutively', 'number', 10)
+    global.configuration.register('moderationSymbolsMaxPercent', 'moderation.settings.moderationSymbolsMaxPercent', 'number', 50)
+
     global.configuration.register('moderationLongMessage', 'moderation.settings.moderationLongMessage', 'bool', true)
+    global.configuration.register('moderationLongMessageTimeout', 'moderation.settings.moderationLongMessageTimeout', 'number', 120)
+    global.configuration.register('moderationLongMessageTriggerLength', 'moderation.settings.moderationLongMessageTriggerLength', 'number', 300)
+
     global.configuration.register('moderationCaps', 'moderation.settings.moderationCaps', 'bool', true)
+    global.configuration.register('moderationCapsTimeout', 'moderation.settings.moderationCapsTimeout', 'number', 120)
+    global.configuration.register('moderationCapsTriggerLength', 'moderation.settings.moderationCapsTriggerLength', 'number', 15)
+    global.configuration.register('moderationCapsMaxPercent', 'moderation.settings.moderationCapsMaxPercent', 'number', 50)
+
     global.configuration.register('moderationSpam', 'moderation.settings.moderationSpam', 'bool', true)
+    global.configuration.register('moderationSpamTimeout', 'moderation.settings.moderationSpamTimeout', 'number', 300)
+    global.configuration.register('moderationSpamTriggerLength', 'moderation.settings.moderationSpamTriggerLength', 'number', 15)
+    global.configuration.register('moderationSpamMaxLength', 'moderation.settings.moderationSpamMaxLength', 'number', 15)
+
     global.configuration.register('moderationWarnings', 'moderation.settings.moderationWarnings', 'number', 0)
     global.configuration.register('moderationWarningsTimeouts', 'moderation.settings.moderationWarningsTimeouts', 'bool', true)
 
@@ -41,9 +59,46 @@ function Moderation () {
         })
       })
     }, 600000)
+
+    this.webPanel()
   }
 
   log.info('Moderation system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.moderation === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+}
+
+Moderation.prototype.webPanel = function () {
+  global.panel.addMenu({category: 'main', name: 'Moderation', id: 'moderation'})
+  global.panel.socketListening(this, 'getModerationConfiguration', this.sendConfiguration)
+}
+
+Moderation.prototype.sendConfiguration = function (self, socket) {
+  socket.emit('moderationConfiguration', {
+    moderationLinks: global.configuration.getValue('moderationLinks'),
+    moderationLinksTimeout: global.configuration.getValue('moderationLinksTimeout'),
+
+    moderationSymbols: global.configuration.getValue('moderationSymbols'),
+    moderationSymbolsTimeout: global.configuration.getValue('moderationSymbolsTimeout'),
+    moderationSymbolsTriggerLength: global.configuration.getValue('moderationSymbolsTriggerLength'),
+    moderationSymbolsMaxConsecutively: global.configuration.getValue('moderationSymbolsMaxConsecutively'),
+    moderationSymbolsMaxPercent: global.configuration.getValue('moderationSymbolsMaxPercent'),
+
+    moderationLongMessage: global.configuration.getValue('moderationLongMessage'),
+    moderationLongMessageTimeout: global.configuration.getValue('moderationLongMessageTimeout'),
+    moderationLongMessageTriggerLength: global.configuration.getValue('moderationLongMessageTriggerLength'),
+
+    moderationCaps: global.configuration.getValue('moderationCaps'),
+    moderationCapsTimeout: global.configuration.getValue('moderationCapsTimeout'),
+    moderationCapsTriggerLength: global.configuration.getValue('moderationCapsTriggerLength'),
+    moderationCapsMaxPercent: global.configuration.getValue('moderationCapsMaxPercent'),
+
+    moderationSpam: global.configuration.getValue('moderationSpam'),
+    moderationSpamTimeout: global.configuration.getValue('moderationSpamTimeout'),
+    moderationSpamTriggerLength: global.configuration.getValue('moderationSpamTriggerLength'),
+    moderationSpamMaxLength: global.configuration.getValue('moderationSpamMaxLength'),
+
+    moderationWarnings: global.configuration.getValue('moderationWarnings'),
+    moderationWarningsTimeouts: global.configuration.getValue('moderationWarningsTimeouts')
+  })
 }
 
 Moderation.prototype.timeoutUser = function (sender, warning, msg, time) {
@@ -97,7 +152,7 @@ Moderation.prototype.permitLink = function (self, sender, text) {
 }
 
 Moderation.prototype.containsLink = function (self, id, sender, text) {
-  var timeout = 120
+  var timeout = global.configuration.getValue('moderationLinksTimeout')
 
   if (global.parser.isOwner(sender) || !global.configuration.getValue('moderationLinks') || self.whitelisted(text)) {
     global.updateQueue(id, true)
@@ -126,11 +181,12 @@ Moderation.prototype.containsLink = function (self, id, sender, text) {
 }
 
 Moderation.prototype.symbols = function (self, id, sender, text) {
-  var timeout = 120
-  var triggerLength = 15
+  var timeout = global.configuration.getValue('moderationSymbolsTimeout')
+  var triggerLength = global.configuration.getValue('moderationSymbolsTriggerLength')
+  var maxSymbolsConsecutively = global.configuration.getValue('moderationSymbolsMaxConsecutively')
+  var maxSymbolsPercent = global.configuration.getValue('moderationSymbolsMaxPercent')
+
   var msgLength = text.trim().length
-  var maxSymbolsConsecutively = 10
-  var maxSymbolsPercent = 50
   var symbolsLength = 0
 
   if (global.parser.isOwner(sender) || msgLength <= triggerLength || !global.configuration.getValue('moderationSymbols')) {
@@ -161,8 +217,9 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
 }
 
 Moderation.prototype.longMessage = function (self, id, sender, text) {
-  var timeout = 120
-  var triggerLength = 300
+  var timeout = global.configuration.getValue('moderationLongMessageTimeout')
+  var triggerLength = global.configuration.getValue('moderationLongMessageTriggerLength')
+
   var msgLength = text.trim().length
   if (global.parser.isOwner(sender) || msgLength < triggerLength || !global.configuration.getValue('moderationLongMessage')) {
     global.updateQueue(id, true)
@@ -174,10 +231,11 @@ Moderation.prototype.longMessage = function (self, id, sender, text) {
 }
 
 Moderation.prototype.caps = function (self, id, sender, text) {
-  var timeout = 120
-  var triggerLength = 15
+  var timeout = global.configuration.getValue('moderationCapsTimeout')
+  var triggerLength = global.configuration.getValue('moderationCapsTriggerLength')
+  var maxCapsPercent = global.configuration.getValue('moderationCapsMaxPercent')
+
   var msgLength = text.trim().length
-  var maxCapsPercent = 50
   var capsLength = 0
 
   if (global.parser.isOwner(sender) || msgLength <= triggerLength || !global.configuration.getValue('moderationCaps')) {
@@ -200,10 +258,11 @@ Moderation.prototype.caps = function (self, id, sender, text) {
 }
 
 Moderation.prototype.spam = function (self, id, sender, text) {
-  var timeout = 300
-  var triggerLength = 15
+  var timeout = global.configuration.getValue('moderationSpamTimeout')
+  var triggerLength = global.configuration.getValue('moderationSpamTriggerLength')
+  var maxSpamLength = global.configuration.getValue('moderationSpamMaxLength')
+
   var msgLength = text.trim().length
-  var maxSpamLength = 15
 
   if (global.parser.isOwner(sender) || msgLength <= triggerLength || !global.configuration.getValue('moderationSpam')) {
     global.updateQueue(id, true)

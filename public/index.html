@@ -33,13 +33,12 @@
       </div>
 
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav" id="menu">
+        <ul class="nav navbar-nav" id="menu-main">
           <li id="menuDashboard"><a href="#" data-page="dashboard" class="active">Dashboard</a></li>
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Systems <span class="caret"></span></a>
             <ul class="dropdown-menu" id="menu-systems"></ul>
           </li>
-          <li><a href="#">Stats</a></li>
         </ul>
       </div>
     </div>
@@ -118,19 +117,22 @@
     var socket = io();
     var loadedWidgets = []
     var loadedJS = []
+    var loadedMenu = false
     var addingWidget = false
 
     /* MENU */
     socket.on('menu', function(menu) {
+      if (loadedMenu) return
       /* at first, clear all menu */
       $('#menu-*').empty()
       _.each(menu, function(obj) {
-        if (obj.category !== 'main') {
+        if (obj.id !== 'dashboard') {
           $('#menu-' + obj.category).append('<li><a href="#" data-page="' + obj.id + '">' + obj.name + '</a></li>')
         }
       })
+      loadedMenu = true
 
-      $("#menu a").on('click', function(ev) {
+      $("#menu-main a").on('click', function(ev) {
         var page = ev.currentTarget.dataset.page
         var visibility = page !== 'dashboard' ? 'hidden' : 'visible'
         if (_.isUndefined(page)) return
