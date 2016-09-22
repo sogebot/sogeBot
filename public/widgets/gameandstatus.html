@@ -1,7 +1,7 @@
 <div class="widget" id="wGAS">
   <div class="controls">
     <div class="dropdown">
-      <a id="wGAS" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+      <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
         <span class="glyphicon glyphicon-option-vertical text-muted"></span>
       </a>
       <ul class="dropdown-menu" aria-labelledby="wGAS">
@@ -9,6 +9,7 @@
       </ul>
     </div>
   </div>
+  <img id="wGASimg" width="76.56" height="100" class="pull-left" style="padding-right: 5px;" />
   <dl>
     <dt>Status</dt>
     <dd id="wGASstatus">Not Available</dd>
@@ -21,5 +22,6 @@
   socket.on('stats', function(data) {
     $("#wGASstatus").text(data.status !== '' ? data.status : 'Not Available')
     $("#wGASgame").text(data.game !== '' ? data.game : 'Not Available')
+    $("#wGASimg").attr('src', 'https://static-cdn.jtvnw.net/ttv-boxart/' + data.game + '-272x380.jpg')
   })
 </script>
