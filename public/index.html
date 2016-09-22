@@ -130,8 +130,11 @@
     })
 
     /* PAGES */
-    // update page top on resize
+    // update top offset every second and on page resize
     $(window).resize(function() {
+      $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
+    })
+    setInterval(function () {
       $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
     })
 
