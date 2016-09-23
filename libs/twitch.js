@@ -100,6 +100,18 @@ Twitch.prototype.saveStream = function (stream) {
   this.whenOnline = stream.created_at
   this.currentFollowers = stream.channel.followers
   this.maxViewers = this.maxViewers < this.currentViewers ? this.currentViewers : this.maxViewers
+
+  var messages = global.parser.linesParsed - this.chatMessagesAtStart
+  global.stats.save({
+    timestamp: new Date().getTime(),
+    whenOnline: this.whenOnline,
+    currentViewers: this.currentViewers,
+    chatMessages: messages,
+    currentFollowers: this.currentFollowers,
+    newChatters: this.newChatters,
+    game: this.currentGame,
+    status: this.currentStatus
+  })
 }
 
 Twitch.prototype.webPanel = function () {
