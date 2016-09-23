@@ -59,6 +59,7 @@ Parser.prototype.parseCommands = function (user, message) {
   message = message.trim()
   for (var cmd in this.registeredCmds) {
     if (message.startsWith(cmd)) {
+      if (this.permissionsCmds[cmd] === constants.DISABLE) break
       if (this.permissionsCmds[cmd] === constants.VIEWERS ||
         (this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user)) ||
         (this.permissionsCmds[cmd] === constants.MODS && user.mod || this.isOwner(user))) {

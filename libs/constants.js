@@ -10,3 +10,4 @@ function define (name, value) {
 define('OWNER_ONLY', 0)
 define('VIEWERS', 1)
 define('MODS', 2)
+define('DISABLE', -1)
