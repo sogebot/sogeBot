@@ -271,9 +271,9 @@ Twitch.prototype.showTop = function (self, sender, text) {
       _.each(items, function (item) {
         index = index + 1
         if (parsed[1] === 'watchTime') {
-          global.commons.sendMessage(index + '. ' + '@' + item.username + ' - ' + (!_.isUndefined(item.watchTime) ? item.watchTime / 1000 / 60 / 60 : 0).toFixed(1) + 'h')
+          global.commons.sendMessage(index + '. ' + '@' + item.username + ' - ' + (!_.isUndefined(item.watchTime) ? item.watchTime / 1000 / 60 / 60 : 0).toFixed(1) + 'h', sender)
         } else {
-          global.commons.sendMessage(index + '. ' + '@' + item.username + ' - ' + (!_.isUndefined(item.points) ? item.points + ' ' + global.systems.points.getPointsName(item.points) : 0 + ' ' + global.systems.points.getPointsName(0)))
+          global.commons.sendMessage(index + '. ' + '@' + item.username + ' - ' + (!_.isUndefined(item.points) ? item.points + ' ' + global.systems.points.getPointsName(item.points) : 0 + ' ' + global.systems.points.getPointsName(0)), sender)
         }
       })
     })
