@@ -175,7 +175,7 @@ Twitch.prototype.getTime = function (isChat) {
 }
 
 Twitch.prototype.uptime = function (self, sender) {
-  global.commons.sendMessage(self.isOnline ? global.translate('core.online').replace('(time)', self.getTime(true)) : global.translate('core.offline'))
+  global.commons.sendMessage(self.isOnline ? global.translate('core.online').replace('(time)', self.getTime(true)) : global.translate('core.offline'), sender)
 }
 
 Twitch.prototype.lastseenUpdate = function (self, id, sender, text) {
