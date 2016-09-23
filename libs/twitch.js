@@ -221,7 +221,7 @@ Twitch.prototype.watched = function (self, sender, text) {
       var watched = watchTime / 1000 / 60 / 60
       global.commons.sendMessage(global.translate('watched.success.time')
         .replace('(time)', watched.toFixed(1))
-        .replace('(username)', user.username), sender)
+        .replace('(username)', '@' + user.username), sender)
     })
   } catch (e) {
     global.commons.sendMessage(global.translate('watched.failed.parse'), sender)
