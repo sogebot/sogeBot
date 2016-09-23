@@ -30,7 +30,10 @@ function Twitch () {
         'Client-ID': '1wjn1i3792t71tl90fmyvd0zl6ri2vg'
       }
     }, function (err, res, body) {
-      if (err) console.log(err)
+      if (err) {
+        global.log.error(err)
+        return
+      }
       if (res.statusCode === 200 && !_.isNull(body.stream)) {
         self.curRetries = 0
         self.saveStream(body.stream)
@@ -59,7 +62,10 @@ function Twitch () {
         'Client-ID': '1wjn1i3792t71tl90fmyvd0zl6ri2vg'
       }
     }, function (err, res, body) {
-      if (err) console.log(err)
+      if (err) {
+        global.log.error(err)
+        return
+      }
       if (res.statusCode === 200 && !_.isNull(body)) {
         self.currentFollowers = body.followers
         self.currentGame = body.game
