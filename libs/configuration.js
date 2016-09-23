@@ -22,10 +22,6 @@ function Configuration () {
   global.parser.register(this, '!set list', this.listSets, constants.OWNER_ONLY)
   global.parser.register(this, '!set', this.setValue, constants.OWNER_ONLY)
 
-  global.parser.register(this, '!enable', this.enableCmd, constants.OWNER_ONLY)
-  global.parser.register(this, '!disable', this.disableCmd, constants.OWNER_ONLY)
-  global.parser.registerParser(this, 'disabled', this.isDisabledCmd, constants.VIEWERS)
-
   this.loadValues()
 
   this.register('lang', '', 'string', 'en')
@@ -92,43 +88,6 @@ Configuration.prototype.loadValues = function () {
       if (!_.isUndefined(self.cfgL[Object.keys(item)[0]])) self.cfgL[Object.keys(item)[0]].value = item[Object.keys(item)[0]]
     })
   })
-}
-
-Configuration.prototype.disableCmd = function (self, sender, text) {
-  try {
-    var parsed = text.match(/^(\w+)$/)
-    global.botDB.update({_id: 'disabled_' + parsed[1]}, {$set: {command: parsed[1]}}, {upsert: true}, function (err) {
-      if (err) log.error(err)
-      global.commons.sendMessage(global.translate('settings.command.disable').replace('(command)', parsed[1]), sender)
-    })
-  } catch (e) {
-    global.commons.sendMessage(global.translate('settings.command.disableParse'), sender)
-  }
-}
-
-Configuration.prototype.enableCmd = function (self, sender, text) {
-  try {
-    var parsed = text.match(/^(\w+)$/)
-    global.botDB.remove({_id: 'disabled_' + parsed[1], command: parsed[1]}, {}, function (err, numRemoved) {
-      if (err) log.error(err)
-      var message = (numRemoved === 0 ? global.translate('settings.command.notDisabled') : global.translate('settings.command.enable'))
-      global.commons.sendMessage(message.replace('(command)', parsed[1]), sender)
-    })
-  } catch (e) {
-    global.commons.sendMessage(global.translate('settings.command.enableParse'), sender)
-  }
-}
-
-Configuration.prototype.isDisabledCmd = function (self, id, sender, text) {
-  try {
-    var parsed = text.match(/^!(\w+)$/)
-    global.botDB.findOne({_id: 'disabled_' + parsed[1]}, function (err, item) {
-      if (err) log.error(err)
-      global.updateQueue(id, _.isNull(item))
-    })
-  } catch (err) {
-    global.updateQueue(id, true) // it's not a command -> not disabled
-  }
 }
 
 module.exports = Configuration
