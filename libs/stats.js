@@ -9,11 +9,14 @@ global.botDB.persistence.setAutocompactionInterval(60000)
 
 
 function Stats () {
-
+  this.latestTimestamp = 0
 }
 
 Stats.prototype.save = function (data) {
-  statsDB.update({ _id: data.whenOnline }, { $push: { stats: data } }, { upsert: true }, function () {})
+  if (data.timestamp - this.latestTimestamp >= 300000) {
+    statsDB.update({ _id: data.whenOnline }, { $push: { stats: data } }, { upsert: true }, function () {})
+    this.latestTimestamp = data.timestamp
+  }
 }
 
 Stats.prototype.get = function (id) {
