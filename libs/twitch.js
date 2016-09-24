@@ -14,7 +14,7 @@ function Twitch () {
   this.maxViewers = 0
   this.chatMessagesAtStart = global.parser.linesParsed
   this.followersAtStart = 0
-  this.maxRetries = 10
+  this.maxRetries = 2
   this.curRetries = 0
   this.newChatters = 0
   this.currentStatus = ''
@@ -79,7 +79,7 @@ function Twitch () {
         _.each(users, function (user) {
           // add user as a new chatter in a stream
           if (_.isUndefined(user.watchTime) || user.watchTime === 0) self.newChatters = self.newChatters + 1
-          var watchTime = 15000
+          var watchTime = 60000
           if (!_.isUndefined(user.watchTime)) watchTime = watchTime + user.watchTime
           user = new User(user.username)
           user.isLoaded().then(function () {
@@ -88,7 +88,7 @@ function Twitch () {
         })
       })
     }
-  }, 15000)
+  }, 60000)
 
   global.parser.register(this, '!uptime', this.uptime, constants.VIEWERS)
   global.parser.register(this, '!lastseen', this.lastseen, constants.VIEWERS)
