@@ -23,7 +23,7 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 * price and points system
 * rank system
 * !uptime, !lastseen, !watched, !top commands
-* !enable, !disable commands
+* set custom permissions for each command
 * language support - currently english and cestina
 * currently added **games**: bets
 * better logging -> know, why user is timed out, bot logs and exceptions
