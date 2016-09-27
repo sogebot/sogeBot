@@ -57,17 +57,17 @@
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-user"></span> Max Concurrent Viewers</h2>
           <div class="data" id="maxViewers">-</div>
-          <div class="stats" id="maxViewersChange"></div>
+          <div class="stats" id="maxViewersChange">&nbsp;</div>
         </div>
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-comment"></span> Total Chat Messages</h2>
           <div class="data" id="totalChatMsgs">-</div>
-          <div class="stats" id="totalChatMsgsChange"></div>
+          <div class="stats" id="totalChatMsgsChange">&nbsp;</div>
         </div>
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-star"></span> Total New Chatters</h2>
           <div class="data" id="newChtr">-</div>
-          <div class="stats" id="newChtrChange"></div>
+          <div class="stats" id="newChtrChange">&nbsp;</div>
         </div>
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-time"></span> Streaming Session</h2>
@@ -77,7 +77,7 @@
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-thumbs-up"></span> Followers</h2>
           <div class="data"><span id="curFollowers">-</span><span id="diffFollowers"></span></div>
-          <div class="stats" id="curFollowersChange"></div>
+          <div class="stats" id="curFollowersChange">&nbsp;</div>
         </div>
 
         <div class="clearfix"></div>
@@ -199,7 +199,7 @@
         return Math.round((cur - orig) / orig * 1000) / 10
       }
       var setHtml = function (id, value) {
-        if (value === 0) $("#" + id).html('')
+        if (value === 0) $("#" + id).html('&nbsp;')
         else {
           $("#" + id).html('<span class="stats-' + (value < 0 ? 'down' : 'up') +
             ' text-' + (value < 0 ? 'danger' : 'success') +
