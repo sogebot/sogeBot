@@ -8,17 +8,9 @@
 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-8">
   <div class="widget">
     <div class="title">Stream Stats - 25/12/2016 - 16:25</div>
-    <canvas id="myChart"></canvas>
-  </div>
-
-  <div class="widget">
-    <div class="title">Stream Stats - 25/12/2016 - 18:15 - typ 2</div>
-    <canvas id="myChart2"></canvas>
-  </div>
-
-  <div class="widget">
-    <div class="title">Stream Stats - 25/12/2016 - 18:15 - typ 3</div>
-    <canvas id="myChart3"></canvas>
+    <div id="myChart"></div>
+    <div id="eventsChart"></div>
+    <div id="gameChart" style="padding-left: 40px;"></div>
   </div>
 </div>
 
@@ -26,202 +18,96 @@
 <script>
   $("#calendar").zabuto_calendar({language: "en"});
 
-var ctx = document.getElementById("myChart");
-var myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: ["16:35", "16:40", "16:45", "16:50", "16:55", "17:00"],
-        datasets: [{
-            fill: false,
-            label: 'Followers',
-            data: [12, 13, 13, 15, 20, 30],
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: 'rgba(255,99,132,1)',
-            pointHitRadius: 10
-        },
-        {
-            fill: false,
-            label: 'Max Concurrent Viewers',
-            data: [0, 2, 13, 13, 13, 13],
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            pointHitRadius: 10
-        },
-        {
-            fill: false,
-            label: 'Current Viewers',
-            data: [0, 2, 13, 10, 1, 0],
-            backgroundColor: 'rgba(255, 206, 86, 0.2)',
-            borderColor: 'rgba(255, 206, 86, 1)',
-            pointHitRadius: 10
-        },
-        {
-            fill: false,
-            label: 'Total New Chatters',
-            data: [0, 0, 3, 3, 3, 3],
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            pointHitRadius: 10
-        },
-        {
-            fill: false,
-            label: 'Total Chat Messages',
-            data: [0, 20, 25, 34, 64, 158],
-            backgroundColor: 'rgba(153, 102, 255, 0.2)',
-            borderColor: 'rgba(153, 102, 255, 1)',
-            pointHitRadius: 10
-        }]
-    },
-    options: {
-        tooltips: {
-          mode: 'label'
-        },
-        hover: {
-          mode: 'dataset'
-        },
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero:true
-                }
-            }]
-        }
+  google.charts.load('current', {'packages':['line', 'timeline', 'bar']});
+  google.charts.setOnLoadCallback(drawChart);
+  google.charts.setOnLoadCallback(drawGames);
+  google.charts.setOnLoadCallback(drawEvents);
+
+  function drawEvents() {
+        var data = google.visualization.arrayToDataTable([
+          ['', 'Followers', 'New Chatters'],
+          [new Date(2016, 9, 27, 8, 0, 0, 0), 0, 0],
+        [new Date(2016, 9, 27, 8, 5, 0, 0),  1, 3],
+        [new Date(2016, 9, 27, 8, 10, 0, 0), 0, 0],
+        [new Date(2016, 9, 27, 8, 15, 0, 0), 2, 0],
+        [new Date(2016, 9, 27, 8, 20, 0, 0), 5, 0],
+        [new Date(2016, 9, 27, 8, 25, 0, 0), 10, 0],
+        [new Date(2016, 9, 27, 8, 30, 0, 0), 0, 0],
+        [new Date(2016, 9, 27, 8, 35, 0, 0),  0, 0],
+        [new Date(2016, 9, 27, 8, 40, 0, 0),  0, 0],
+        [new Date(2016, 9, 27, 8, 45, 0, 0),  0, 0],
+        [new Date(2016, 9, 27, 8, 50, 0, 0), 0, 0]
+        ]);
+
+        var options = {
+        width: 830,
+        height: 200
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('eventsChart'));
+
+        chart.draw(data, options);
     }
-});
 
+  function drawChart() {
+      var data = new google.visualization.DataTable();
+      data.addColumn('datetime', '');
+      data.addColumn('number', 'Followers');
+      data.addColumn('number', 'Max Concurrent Viewers');
+      data.addColumn('number', 'Viewers');
+      data.addColumn('number', 'Chatters');
+      data.addColumn('number', 'Chat Messages');
 
+      data.addRows([
+        [new Date(2016, 9, 27, 8, 0, 0, 0),  12, 0, 0, 0, 0],
+        [new Date(2016, 9, 27, 8, 5, 0, 0),  13, 2, 2, 0, 20],
+        [new Date(2016, 9, 27, 8, 10, 0, 0),  13, 13, 13, 3, 25],
+        [new Date(2016, 9, 27, 8, 15, 0, 0),  15, 13, 10, 3, 34],
+        [new Date(2016, 9, 27, 8, 20, 0, 0),  20, 13, 1, 3, 64],
+        [new Date(2016, 9, 27, 8, 25, 0, 0),  30, 13, 0, 3, 150],
+        [new Date(2016, 9, 27, 8, 30, 0, 0),  30, 13, 0, 3, 150],
+        [new Date(2016, 9, 27, 8, 35, 0, 0),  30, 13, 0, 3, 150],
+        [new Date(2016, 9, 27, 8, 40, 0, 0),  30, 13, 0, 3, 150],
+        [new Date(2016, 9, 27, 8, 45, 0, 0),  30, 13, 0, 3, 150],
+        [new Date(2016, 9, 27, 8, 50, 0, 0),  30, 13, 0, 3, 150]
+      ]);
 
-var ctx = document.getElementById("myChart2");
-var myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ["16:35", "16:40", "16:45", "16:50", "16:55", "17:00"],
-        datasets: [{
-            fill: false,
-            label: 'Followers',
-            data: [12, 13, 13, 15, 20, 30],
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: 'rgba(255,99,132,1)',
-            pointHitRadius: 10
-        },
-        {
-            fill: false,
-            label: 'Max Concurrent Viewers',
-            data: [0, 2, 13, 13, 13, 13],
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            pointHitRadius: 10
-        },
-        {
-            fill: false,
-            label: 'Current Viewers',
-            data: [0, 2, 13, 10, 1, 0],
-            backgroundColor: 'rgba(255, 206, 86, 0.2)',
-            borderColor: 'rgba(255, 206, 86, 1)',
-            pointHitRadius: 10
-        },
-        {
-            fill: false,
-            label: 'Total New Chatters',
-            data: [0, 0, 3, 3, 3, 3],
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            pointHitRadius: 10
-        },
-        {
-            fill: false,
-            label: 'Total Chat Messages',
-            data: [0, 20, 25, 34, 64, 158],
-            backgroundColor: 'rgba(153, 102, 255, 0.2)',
-            borderColor: 'rgba(153, 102, 255, 1)',
-            pointHitRadius: 10
-        }]
-    },
-    options: {
-        tooltips: {
-          mode: 'label'
-        },
-        hover: {
-          mode: 'dataset'
-        },
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero:true
-                }
-            }]
-        }
-    }
-});
+      var options = {
+        width: 900,
+        height: 500
+      };
 
-var ctx = document.getElementById("myChart3");
-var myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ["16:35", "16:40", "16:45", "16:50", "16:55", "17:00"],
-        datasets: [{
-            fill: false,
-            label: 'Followers',
-            data: [12, 13, 13, 15, 20, 30],
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: 'rgba(255,99,132,1)',
-            pointHitRadius: 10
-        },{
-            fill: false,
-            type: "line",
-            label: 'Followers',
-            data: [12, 13, 13, 15, 20, 30],
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: 'rgba(255,99,132,1)',
-            pointHitRadius: 10
+      var chart = new google.charts.Line(document.getElementById('myChart'));
+
+      chart.draw(data, options);
+      }
+
+  function drawGames() {
+        var container = document.getElementById('gameChart');
+        var chart = new google.visualization.Timeline(container);
+        var dataTable = new google.visualization.DataTable();
+
+        dataTable.addColumn({ type: 'string', id: 'Status' });
+        dataTable.addColumn({ type: 'string', id: 'Name' });
+        dataTable.addColumn({ type: 'datetime', id: 'Start' });
+        dataTable.addColumn({ type: 'datetime', id: 'End' });
+
+        var options = {
+      timeline: { showRowLabels: false  },
+          width: 635,
+        chart: {
+          title: "aaa"
+,          subtitle: 'Game and Status'
         },
-        {
-            fill: false,
-            label: 'Max Concurrent Viewers',
-            data: [0, 2, 13, 13, 13, 13],
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            pointHitRadius: 10
-        },
-        {
-            fill: false,
-            label: 'Current Viewers',
-            data: [0, 2, 13, 10, 1, 0],
-            backgroundColor: 'rgba(255, 206, 86, 0.2)',
-            borderColor: 'rgba(255, 206, 86, 1)',
-            pointHitRadius: 10
-        },
-        {
-            fill: false,
-            label: 'Total New Chatters',
-            data: [0, 0, 3, 3, 3, 3],
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            pointHitRadius: 10
-        },
-        {
-            fill: false,
-            label: 'Total Chat Messages',
-            data: [0, 20, 25, 34, 64, 158],
-            backgroundColor: 'rgba(153, 102, 255, 0.2)',
-            borderColor: 'rgba(153, 102, 255, 1)',
-            pointHitRadius: 10
-        }]
-    },
-    options: {
-        tooltips: {
-          mode: 'label'
-        },
-        hover: {
-          mode: 'dataset'
-        },
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero:true
-                }
-            }]
-        }
-    }
-});
+          hAxis: {
+            format: ' '
+          },
+    };
+
+        dataTable.addRows([
+          ['Status muj tralala', 'Bioshock 2',    new Date(2016, 9, 27, 8, 0, 0, 0),   new Date(2016, 9, 27, 8, 15, 0, 0) ],
+          ['Statuuuus', 'Rocket League', new Date(2016, 9, 27, 8, 15, 0, 0),  new Date(2016, 9, 27, 8, 50, 0, 0) ]]);
+
+        chart.draw(dataTable, options);
+  }
 </script>
