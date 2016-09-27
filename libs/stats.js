@@ -1,5 +1,6 @@
 'use strict'
 var Database = require('nedb')
+var _ = require('lodash')
 
 var statsDB = new Database({
   filename: 'stats.db',
@@ -10,6 +11,8 @@ global.botDB.persistence.setAutocompactionInterval(60000)
 
 function Stats () {
   this.latestTimestamp = 0
+
+  global.panel.socketListening(this, 'getLatestStats', this.getLatestStats)
 }
 
 Stats.prototype.save = function (data) {
@@ -22,6 +25,23 @@ Stats.prototype.save = function (data) {
 Stats.prototype.get = function (id) {
   statsDB.findOne({ _id: id }).sort({ timestamp: -1 }).exec(function (err, item) {
     if (err) global.log.error(err)
+  })
+}
+
+Stats.prototype.getLatestStats = function (self, socket) {
+  statsDB.findOne({}).sort({ _id: -1 }).skip(1).exec(function (err, item) { // get second stream (first is current stream)
+    if (err) global.log.error(err)
+    var timestamp = 0
+    var data = {}
+    if (!_.isNull(item)) {
+      _.each(item.stats, function (array, index) {
+        if (array.timestamp >= timestamp) {
+          data = array
+          timestamp = array.timestamp
+        }
+      })
+    }
+    socket.emit('latestStats', data)
   })
 }
 

@@ -114,6 +114,7 @@ Twitch.prototype.saveStream = function (stream) {
     currentViewers: this.currentViewers,
     chatMessages: messages,
     currentFollowers: this.currentFollowers,
+    maxViewers: this.maxViewers,
     newChatters: this.newChatters,
     game: this.currentGame,
     status: this.currentStatus

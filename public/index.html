@@ -57,17 +57,17 @@
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-user"></span> Max Concurrent Viewers</h2>
           <div class="data" id="maxViewers">-</div>
-          <div class="stats"><span class="stats-up text-success"><span class="glyphicon glyphicon-triangle-top"></span> 4%</span> From last Session (not working)</div>
+          <div class="stats" id="maxViewersChange"></div>
         </div>
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-comment"></span> Total Chat Messages</h2>
           <div class="data" id="totalChatMsgs">-</div>
-          <div class="stats"><span class="stats-down text-danger"><span class="glyphicon glyphicon-triangle-bottom"></span> 4%</span> From last Session (not working)</div>
+          <div class="stats" id="totalChatMsgsChange"></div>
         </div>
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-star"></span> Total New Chatters</h2>
           <div class="data" id="newChtr">-</div>
-          <div class="stats"><span class="stats-down text-danger"><span class="glyphicon glyphicon-triangle-bottom"></span> 4%</span> From last Session (not working)</div>
+          <div class="stats" id="newChtrChange"></div>
         </div>
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-time"></span> Streaming Session</h2>
@@ -77,7 +77,7 @@
         <div class="stream-info col-xs-6 col-sm-4 col-md-2">
           <h2><span class="glyphicon glyphicon-thumbs-up"></span> Followers</h2>
           <div class="data"><span id="curFollowers">-</span><span id="diffFollowers"></span></div>
-          <div class="stats"><span class="stats-up text-success"><span class="glyphicon glyphicon-triangle-top"></span> 4%</span> From last Session (not working)</div>
+          <div class="stats" id="curFollowersChange"></div>
         </div>
 
         <div class="clearfix"></div>
@@ -187,8 +187,36 @@
 
     /* STATS */
     setInterval(function() {
-      socket.emit('getStats');
+      socket.emit('getStats')
+      socket.emit('getLatestStats')
     }, 1000)
+
+    socket.on('latestStats', function (data) {
+      if ($.isEmptyObject(data)) return
+
+      var getPercentage = function (cur, orig) {
+        if (cur === 0) cur = orig // we don't want to see difference when 0'
+        return Math.round((cur - orig) / orig * 1000) / 10
+      }
+      var setHtml = function (id, value) {
+        if (value === 0) $("#" + id).html('')
+        else {
+          $("#" + id).html('<span class="stats-' + (value < 0 ? 'down' : 'up') +
+            ' text-' + (value < 0 ? 'danger' : 'success') +
+            '"><span class="glyphicon glyphicon-triangle-' + (value < 0 ? 'bottom' : 'up') +
+            '"></span> ' + Math.abs(value) + '%</span> From last Session')
+        }
+      }
+      var maxViewers = getPercentage(parseInt($("#maxViewers").text(), 10), parseInt(data.maxViewers, 10))
+      var totalChatMsgs = getPercentage(parseInt($("#totalChatMsgs").text(), 10), parseInt(data.chatMessages, 10))
+      var newChtr = getPercentage(parseInt($("#newChtr").text(), 10), parseInt(data.newChatters, 10))
+      var curFollowers = getPercentage(parseInt($("#curFollowers").text(), 10), parseInt(data.currentFollowers, 10))
+
+      setHtml('maxViewersChange', maxViewers)
+      setHtml('totalChatMsgsChange', totalChatMsgs)
+      setHtml('newChtrChange', newChtr)
+      setHtml('curFollowersChange', curFollowers)
+    })
 
     socket.on('stats', function(data) {
       var $diffFollowers = $("#diffFollowers")
