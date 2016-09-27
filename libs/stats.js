@@ -12,6 +12,11 @@ global.botDB.persistence.setAutocompactionInterval(60000)
 function Stats () {
   this.latestTimestamp = 0
 
+  this.webPanel()
+}
+
+Stats.prototype.webPanel = function () {
+  global.panel.addMenu({category: 'main', name: 'Stats', id: 'stats'})
   global.panel.socketListening(this, 'getLatestStats', this.getLatestStats)
 }
 
