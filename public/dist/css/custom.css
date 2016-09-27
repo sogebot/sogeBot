@@ -106,14 +106,17 @@ a.active {
   }
 }
 
+.stream-info #diffFollowers {
+  position: absolute;
+  margin-left: 2px;
+}
+
 .stream-info #diffFollowers.up {
-  vertical-align: super;
   font-size: 18px;
   color: #3c763d;
 }
 
 .stream-info #diffFollowers.down {
-  vertical-align: sub;
   font-size: 18px;
   color: #a94442;
 }
