@@ -175,6 +175,7 @@ Songs.prototype.sendNextSongID = function (self, socket) {
     if (typeof item !== 'undefined' && item !== null) { // song is found
       socket.emit('videoID', item)
       self.currentSong = item
+      self.currentSong.volume = self.getVolume(self, self.currentSong)
       global.botDB.remove({type: 'songRequests', videoID: item.videoID}, {})
     } else { // run from playlist
       if (global.configuration.getValue('shuffle')) {
