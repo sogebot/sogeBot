@@ -230,7 +230,15 @@
       var $diffFollowers = $("#diffFollowers")
       var $curFollowers = $("#curFollowers")
 
-      $("#uptime").text(data.uptime !== '' ? data.uptime : '0:00:00')
+      if (data.uptime === '' || data.uptime === '00:00:00') {
+        data.currentViewers = 0
+        data.maxViewers = 0
+        data.chatMessages = 0
+        data.newChatters = 0
+        data.diffFollowers = data.curFollowers
+      }
+
+      $("#uptime").text(data.uptime !== '' ? data.uptime : '00:00:00')
       $("#currentViewers").text(data.currentViewers)
       $("#maxViewers").text(data.maxViewers)
       $("#totalChatMsgs").text(data.chatMessages)
