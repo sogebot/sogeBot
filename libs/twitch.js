@@ -84,7 +84,6 @@ function Twitch () {
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
         self.currentFollowers = body._total
-        console.log(self.currentFollowers)
       }
     })
 
