@@ -14,7 +14,7 @@ function Twitch () {
   this.maxViewers = 0
   this.chatMessagesAtStart = global.parser.linesParsed
   this.followersAtStart = 0
-  this.maxRetries = 2
+  this.maxRetries = 4
   this.curRetries = 0
   this.newChatters = 0
   this.currentStatus = ''
@@ -67,9 +67,24 @@ function Twitch () {
         return
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
-        self.currentFollowers = body.followers
         self.currentGame = body.game
         self.currentStatus = body.status
+      }
+    })
+
+    global.client.api({
+      url: 'https://api.twitch.tv/kraken/channels/' + global.configuration.get().twitch.owner + '/follows?direction=DESC&limit=1',
+      headers: {
+        'Client-ID': '1wjn1i3792t71tl90fmyvd0zl6ri2vg'
+      }
+    }, function (err, res, body) {
+      if (err) {
+        global.log.error(err)
+        return
+      }
+      if (res.statusCode === 200 && !_.isNull(body)) {
+        self.currentFollowers = body._total
+        console.log(self.currentFollowers)
       }
     })
 
@@ -79,7 +94,7 @@ function Twitch () {
         _.each(users, function (user) {
           // add user as a new chatter in a stream
           if (_.isUndefined(user.watchTime) || user.watchTime === 0) self.newChatters = self.newChatters + 1
-          var watchTime = 60000
+          var watchTime = 15000
           if (!_.isUndefined(user.watchTime)) watchTime = watchTime + user.watchTime
           user = new User(user.username)
           user.isLoaded().then(function () {
@@ -88,7 +103,7 @@ function Twitch () {
         })
       })
     }
-  }, 60000)
+  }, 15000)
 
   global.parser.register(this, '!uptime', this.uptime, constants.VIEWERS)
   global.parser.register(this, '!lastseen', this.lastseen, constants.VIEWERS)

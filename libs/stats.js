@@ -21,7 +21,7 @@ Stats.prototype.webPanel = function () {
 }
 
 Stats.prototype.save = function (data) {
-  if (data.timestamp - this.latestTimestamp >= 300000) {
+  if (data.timestamp - this.latestTimestamp >= 150000) {
     statsDB.update({ _id: data.whenOnline }, { $push: { stats: data } }, { upsert: true }, function () {})
     this.latestTimestamp = data.timestamp
   }
