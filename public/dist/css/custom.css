@@ -121,13 +121,20 @@ a.active {
   color: #a94442;
 }
 
-.stream-info div.stats span.stats-up, .stream-info div.stats span.stats-down {
+.stream-info div.stats span.stats-up, .stream-info div.stats span.stats-down, .stream-info div.stats span.stats-mid {
   font-style: italic;
 }
 
 .stream-info div.stats span.glyphicon {
-  vertical-align: super;
   font-size: smaller;
+}
+
+.stream-info div.stats span.stats-up span.glyphicon {
+  vertical-align: super;
+}
+
+.stream-info div.stats span.stats-mid span.glyphicon {
+  vertical-align: initial;
 }
 
 .stream-info div.stats span.stats-down span.glyphicon {
