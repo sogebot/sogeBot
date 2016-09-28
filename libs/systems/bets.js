@@ -50,14 +50,14 @@ Bets.prototype.open = function (self, sender, text) {
         _.each(parsed, function (option) { bOptions[option] = {} })
         global.botDB.update({_id: 'bet'}, {$set: {bets: bOptions, locked: false}}, {upsert: true}, function (err) {
           if (err) log.error(err)
-          global.commons.sendMessage(global.translate('bets.opened')
+          global.commons.sendMessage(global.translate('bets.opened', {username: global.configuration.get().twitch.owner})
             .replace('(options)', parsed.join(' | '))
             .replace('(minutes)', global.configuration.getValue('betCloseTimer')), sender)
         })
         self.timer = setTimeout(function () {
           global.botDB.update({_id: 'bet'}, {$set: {locked: true}}, {}, function (err) {
             if (err) log.error(err)
-            global.commons.sendMessage(global.translate('bets.locked'))
+            global.commons.sendMessage(global.translate('bets.locked'), {username: global.configuration.get().twitch.owner})
           })
         }, parseInt(global.configuration.getValue('betCloseTimer'), 10) * 1000 * 60)
         self.timerEnd = new Date().getTime() + (parseInt(global.configuration.getValue('betCloseTimer'), 10) * 1000 * 60)

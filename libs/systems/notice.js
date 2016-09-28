@@ -79,7 +79,7 @@ Notice.prototype.send = function () {
           // reset counters
           self.lastNoticeSent = new Date().getTime()
           self.msgCountSent = global.parser.linesParsed
-          global.commons.sendMessage(item.text)
+          global.commons.sendMessage(item.text, {username: global.configuration.get().twitch.owner})
         })
       }
     })
@@ -120,7 +120,7 @@ Notice.prototype.get = function (self, sender, text) {
     global.botDB.findOne({_id: 'notice_' + parsed[0]}, function (err, docs) {
       if (err) log.error(err)
       var output = (typeof docs === 'undefined' || docs === null ? global.translate('notice.failed.notFound') : 'Notice#' + parsed[0] + ': ' + docs.text)
-      global.commons.sendMessage(output)
+      global.commons.sendMessage(output, sender)
     })
   } catch (e) {
     global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
