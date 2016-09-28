@@ -14,7 +14,7 @@ function Twitch () {
   this.maxViewers = 0
   this.chatMessagesAtStart = global.parser.linesParsed
   this.followersAtStart = 0
-  this.maxRetries = 4
+  this.maxRetries = 12
   this.curRetries = 0
   this.newChatters = 0
   this.currentStatus = ''
@@ -38,7 +38,6 @@ function Twitch () {
         self.curRetries = 0
         self.saveStream(body.stream)
         if (!self.isOnline) { // if we are switching from offline - bots restarts? We want refresh to correct data for start as well
-          self.followersAtStart = body.stream.channel.followers
           self.chatMessagesAtStart = global.parser.linesParsed
         }
         self.isOnline = true
