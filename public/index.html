@@ -198,7 +198,8 @@
       if ($.isEmptyObject(data)) return
 
       var getPercentage = function (cur, orig) {
-        if (orig === cur && orig === 0) return 0
+        if (orig === cur) return 0
+        if (orig === 0) return cur * 100
         return Math.round((cur - orig) / orig * 1000) / 10
       }
       var setHtml = function (id, value) {
