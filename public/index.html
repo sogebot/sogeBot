@@ -212,7 +212,7 @@
         }
       }
       var uptime = $("#uptime").text()
-      if (uptime !== '00:00:00' || uptime !== '--:--:--') { // TODO: change to &&
+      if (uptime !== '00:00:00' && uptime !== '--:--:--') {
         var maxViewers = getPercentage(parseInt($("#maxViewers").text(), 10), parseInt(data.maxViewers, 10))
         var totalChatMsgs = getPercentage(parseInt($("#totalChatMsgs").text(), 10), parseInt(data.chatMessages, 10))
         var newChtr = getPercentage(parseInt($("#newChtr").text(), 10), parseInt(data.newChatters, 10))
