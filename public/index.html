@@ -198,27 +198,31 @@
       if ($.isEmptyObject(data)) return
 
       var getPercentage = function (cur, orig) {
-        if (cur === 0) cur = orig // we don't want to see difference when 0'
+        if (orig === cur && orig === 0) return 0
         return Math.round((cur - orig) / orig * 1000) / 10
       }
       var setHtml = function (id, value) {
-        if (value === 0) $("#" + id).html('&nbsp;')
-        else {
+        if (value === 0) {
+          $("#" + id).html('<span class="stats-mid"><span class="glyphicon glyphicon-triangle-right"></span> ' + Math.abs(value) + '%</span> From last Session')
+        } else {
           $("#" + id).html('<span class="stats-' + (value < 0 ? 'down' : 'up') +
             ' text-' + (value < 0 ? 'danger' : 'success') +
-            '"><span class="glyphicon glyphicon-triangle-' + (value < 0 ? 'bottom' : 'up') +
+            '"><span class="glyphicon glyphicon-triangle-' + (value < 0 ? 'bottom' : 'top') +
             '"></span> ' + Math.abs(value) + '%</span> From last Session')
         }
       }
-      var maxViewers = getPercentage(parseInt($("#maxViewers").text(), 10), parseInt(data.maxViewers, 10))
-      var totalChatMsgs = getPercentage(parseInt($("#totalChatMsgs").text(), 10), parseInt(data.chatMessages, 10))
-      var newChtr = getPercentage(parseInt($("#newChtr").text(), 10), parseInt(data.newChatters, 10))
-      var curFollowers = getPercentage(parseInt($("#curFollowers").text(), 10), parseInt(data.currentFollowers, 10))
+      var uptime = $("#uptime").text()
+      if (uptime !== '00:00:00' || uptime !== '--:--:--') { // TODO: change to &&
+        var maxViewers = getPercentage(parseInt($("#maxViewers").text(), 10), parseInt(data.maxViewers, 10))
+        var totalChatMsgs = getPercentage(parseInt($("#totalChatMsgs").text(), 10), parseInt(data.chatMessages, 10))
+        var newChtr = getPercentage(parseInt($("#newChtr").text(), 10), parseInt(data.newChatters, 10))
+        var curFollowers = getPercentage(parseInt($("#curFollowers").text(), 10), parseInt(data.currentFollowers, 10))
 
-      setHtml('maxViewersChange', maxViewers)
-      setHtml('totalChatMsgsChange', totalChatMsgs)
-      setHtml('newChtrChange', newChtr)
-      setHtml('curFollowersChange', curFollowers)
+        setHtml('maxViewersChange', maxViewers)
+        setHtml('totalChatMsgsChange', totalChatMsgs)
+        setHtml('newChtrChange', newChtr)
+        setHtml('curFollowersChange', curFollowers)
+      }
     })
 
     socket.on('stats', function(data) {

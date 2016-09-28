@@ -39,6 +39,11 @@ function Twitch () {
         self.saveStream(body.stream)
         if (!self.isOnline) { // if we are switching from offline - bots restarts? We want refresh to correct data for start as well
           self.chatMessagesAtStart = global.parser.linesParsed
+          self.currentViewers = 0
+          self.maxViewers = 0
+          self.newChatters = 0
+          self.chatMessagesAtStart = global.parser.linesParsed
+          self.followersAtStart = self.currentFollowers
         }
         self.isOnline = true
       } else {
@@ -47,11 +52,6 @@ function Twitch () {
         self.curRetries = 0
         self.isOnline = false
         self.whenOnline = null
-        self.currentViewers = 0
-        self.maxViewers = 0
-        self.newChatters = 0
-        self.chatMessagesAtStart = global.parser.linesParsed
-        self.followersAtStart = self.currentFollowers
       }
     })
 
