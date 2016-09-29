@@ -123,7 +123,7 @@
     })
 
       var options = {
-        width: pageWidth - (pageWidth * 0.085)
+        width: pageWidth - (pageWidth * 0.11)
       };
 
       $("#eventsChart").empty()
@@ -155,13 +155,17 @@
 
     var options = {
       width: pageWidth - (pageWidth * 0.034),
-      height: 300
+      height: 300,
+      series: {
+        0: {axis: 'Followers'},
+        1: {axis: 'Chat Messages'}
+      }
     };
 
     $("#statsChart").empty()
     var chart = new google.charts.Line(document.getElementById('statsChart'));
 
-    chart.draw(data, options);
+    chart.draw(data, google.charts.Line.convertOptions(options));
   }
 
   function drawGames(values) {
@@ -202,9 +206,10 @@
       game = array.game
       status = array.status
     })
+    console.log(pageWidth)
     var options = {
       timeline: { showRowLabels: false  },
-      width: (298*pageWidth)/323 - 62702/323,
+      width: (267*pageWidth)/299 - 64280/299,
       hAxis: {
         format: ' '
       }
