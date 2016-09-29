@@ -140,7 +140,7 @@
     data.addColumn('number', 'Followers');
     data.addColumn('number', 'Max Concurrent Viewers');
     data.addColumn('number', 'Viewers');
-    data.addColumn('number', 'Chatters');
+    data.addColumn('number', 'New Chatters');
     data.addColumn('number', 'Chat Messages');
 
     _.each(values, function (array, index) {
@@ -158,8 +158,11 @@
       width: pageWidth - (pageWidth * 0.034),
       height: 300,
       series: {
-        0: {axis: 'Followers'},
-        1: {axis: 'Chat Messages'}
+        0: {axis: 'followers'},
+        1: {axis: 'viewers'},
+        2: {axis: 'viewers'},
+        3: {axis: 'viewers'},
+        4: {axis: 'followers'}
       }
     };
 
@@ -207,7 +210,7 @@
       game = array.game
       status = array.status
     })
-    console.log(pageWidth)
+
     var options = {
       timeline: { showRowLabels: false  },
       width: (267*pageWidth)/299 - 64280/299,
