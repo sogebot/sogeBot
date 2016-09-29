@@ -143,7 +143,9 @@
     data.addColumn('number', 'New Chatters');
     data.addColumn('number', 'Chat Messages');
 
+    var maxViewers = 0
     _.each(values, function (array, index) {
+      if (maxViewers < array.maxViewers) array.currentViewers = array.maxViewers // we need to "fake" currentViewers to have meaningful graph
       data.addRows([[
         new Date(array.timestamp),
         array.currentFollowers,
@@ -152,6 +154,7 @@
         array.newChatters,
         array.chatMessages
       ]])
+      maxViewers = array.maxViewers
     })
 
     var options = {
