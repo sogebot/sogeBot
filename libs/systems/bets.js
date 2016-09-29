@@ -26,13 +26,14 @@ function Bets () {
   if (global.configuration.get().systems.points === true && global.configuration.get().systems.bets === true) {
     global.parser.register(this, '!bet open', this.open, constants.MODS)
     global.parser.register(this, '!bet close', this.close, constants.MODS)
+    global.parser.register(this, '!bet refund', this.refundAll, constants.MODS)
     global.parser.register(this, '!bet', this.bet, constants.VIEWERS)
 
     global.configuration.register('betPercentGain', 'bets.betPercentGain', 'number', 20)
     global.configuration.register('betCloseTimer', 'bets.betCloseTimer', 'number', 2)
 
     // close any bets
-    this.close(this, null, 'refundall')
+    this.refundAll(this, null)
   }
   log.info('Bets (game) system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.points === true && global.configuration.get().systems.alias === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
@@ -131,6 +132,7 @@ Bets.prototype.saveBet = function (self, sender, text) {
         })
         if (diffBet) return
 
+        var percentGain = (Object.keys(item.bets).length * parseInt(global.configuration.getValue('betPercentGain'), 10)) / 100
         var user = new User(sender.username)
         user.isLoaded().then(function () {
           var availablePts = parseInt(user.get('points'), 10)
@@ -149,7 +151,9 @@ Bets.prototype.saveBet = function (self, sender, text) {
                 global.commons.sendMessage(global.translate('bets.newBet')
                   .replace('(option)', betTo)
                   .replace('(amount)', newBet)
-                  .replace('(pointsName)', Points.getPointsName(newBet)), sender)
+                  .replace('(pointsName)', Points.getPointsName(newBet))
+                  .replace('(winAmount)', Math.round((parseInt(newBet, 10) * percentGain) + newBet))
+                  .replace('(winPointsName)', Points.getPointsName(Math.round((parseInt(newBet, 10) * percentGain)))), sender)
               }
             })
           }
@@ -161,34 +165,48 @@ Bets.prototype.saveBet = function (self, sender, text) {
   }
 }
 
-Bets.prototype.refundAll = function (self, item) {
-  _.each(item.bets, function (users) {
-    _.each(users, function (bet, buser) {
-      var user = new User(buser)
-      user.isLoaded().then(function () {
-        var availablePts = parseInt(user.get('points'), 10)
-        var addPts = parseInt(bet, 10)
-        user.set('points', availablePts + addPts)
+Bets.prototype.refundAll = function (self, sender) {
+  global.botDB.findOne({_id: 'bet'}, function (err, item) {
+    if (err) log.error(err)
+    if (_.isNull(item)) {
+      global.commons.sendMessage(global.translate('bets.notRunning'), sender)
+      return
+    } else {
+      _.each(item.bets, function (users) {
+        _.each(users, function (bet, buser) {
+          var user = new User(buser)
+          user.isLoaded().then(function () {
+            var availablePts = parseInt(user.get('points'), 10)
+            var addPts = parseInt(bet, 10)
+            user.set('points', availablePts + addPts)
+          })
+        })
       })
-    })
+      global.commons.sendMessage(global.translate('bets.refund'), sender)
+    }
   })
-  global.commons.sendMessage(global.translate('bets.refund'))
+
+  global.botDB.remove({_id: 'bet'}, {}, function (err) {
+    if (err) log.error(err)
+    // clear possible timeout
+    clearTimeout(self.timer)
+  })
 }
 
 Bets.prototype.close = function (self, sender, text) {
   try {
     var wOption = text.match(/^(\w+)$/)[1]
+    var usersToPay = []
 
     global.botDB.findOne({_id: 'bet'}, function (err, item) {
       if (err) log.error(err)
       if (_.isNull(item)) {
         global.commons.sendMessage(global.translate('bets.notRunning'), sender)
         return
-      }
-      if (wOption === 'refundall') self.refundAll(self, item)
-      else if (!_.isUndefined(item.bets[wOption])) {
+      } else if (!_.isUndefined(item.bets[wOption])) {
         var percentGain = (Object.keys(item.bets).length * parseInt(global.configuration.getValue('betPercentGain'), 10)) / 100
         _.each(item.bets[wOption], function (bet, buser) {
+          usersToPay.push(buser)
           var user = new User(buser)
           user.isLoaded().then(function () {
             var availablePts = parseInt(user.get('points'), 10)
@@ -203,9 +221,9 @@ Bets.prototype.close = function (self, sender, text) {
 
       global.botDB.remove({_id: 'bet'}, {}, function (err) {
         if (err) log.error(err)
-
         global.commons.sendMessage(global.translate('bets.closed')
-          .replace('(option)', wOption), sender)
+          .replace('(option)', wOption)
+          .replace('(amount)', usersToPay.length), sender)
 
         // clear possible timeout
         clearTimeout(self.timer)

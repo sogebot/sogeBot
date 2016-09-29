@@ -11,7 +11,7 @@
     "error": "Sorry, (sender), but something went wrong!"
   },
   "bets": {
-      "newBet": "(sender), your current bet is (amount) (pointsName) on (option)!",
+      "newBet": "(sender), your current bet is (amount) (pointsName) on (option). You can win (winAmount) (winPointsName)!",
       "running": "(sender), bet is already opened! Use !bet close [(options)]",
       "notRunning": "No bet is currently opened, ask mods to open it!",
       "opened": "New bet is opened! Use !bet [(options)] [points] to win! You have only (minutes)min to bet!",
@@ -25,7 +25,7 @@
       "betCloseTimer": "Bets will be automatically closed after (value)min",
       "refund": "Bets were closed without a winning. All users are refunded!",
       "notOption": "(sender), this option doesn't exist! Bet is not closed, check !bet",
-      "closed": "Bets was closed and winning option was (option)! Congratulations to winners!",
+      "closed": "Bets was closed and winning option was (option)! (amount) users won!",
       "timeUpBet": "I guess you are too late, (sender), your time for betting is up!",
       "locked": "Betting time is up! No more bets.",
       "zeroBet": "Oh boy, (sender), you cannot bet 0 (pointsName)",

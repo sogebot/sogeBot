@@ -11,7 +11,7 @@
     "error": "Promin, (sender), ale neco se pokazilo!"
   },
   "bets": {
-      "newBet": "(sender), nyni mas vsazeno (amount) (pointsName) na (option)!",
+      "newBet": "(sender), nyni mas vsazeno (amount) (pointsName) na (option). Muzes vyhrat (winAmount) (winPointsName)!",
       "running": "(sender), sazky jsou jiz otevreny! Pouzij !bet close [(options)]",
       "notRunning": "Zadne sazky nejsou otevreny, pozadej moda o otevreni!",
       "opened": "Sazky otevreny! Pouzij !bet [(options)] [points] a vyhraj! Zbyva pouze (minutes)min pro vsazeni!",
@@ -25,7 +25,7 @@
       "betCloseTimer": "Sazky budou automaticky uzavreny za (value)min",
       "refund": "Sazky byly uzavreny bez vyhry, vsichni uzivatele byly vyplaceni!",
       "notOption": "(sender), tato moznost neexistuje! Sazka nebyla uzavrena, pouzij !bet",
-      "closed": "Sazky byly uzavreny a vitezna moznost je (option)! Gratulace vitezum!",
+      "closed": "Sazky byly uzavreny a vitezna moznost je (option)! Vyplaceno bylo (amount) uzivatelu!",
       "timeUpBet": "Prisel si pozde, (sender), cas na sazeni vyprsel!",
       "locked": "Vyprsel cas na vsazeni! Dalsi sazky neprijimame",
       "zeroBet": "Ale ale, (sender), nemuzes vsadit 0 (pointsName)",
