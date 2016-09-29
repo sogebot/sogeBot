@@ -272,3 +272,16 @@ table .tableMenu {
 table .tableMenu button { visibility: hidden; }
 
 table tr:hover > .tableMenu button { visibility: visible; }
+
+/* STATS */
+[id^=google-visualization-errors-] {
+  display: none;
+}
+
+.streamEvents {
+  padding: 0;
+  margin: 0
+}
+.streamEvents li {
+  list-style-type: none
+}
