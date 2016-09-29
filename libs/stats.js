@@ -8,7 +8,6 @@ var statsDB = new Database({
 })
 global.botDB.persistence.setAutocompactionInterval(60000)
 
-
 function Stats () {
   this.latestTimestamp = 0
 
