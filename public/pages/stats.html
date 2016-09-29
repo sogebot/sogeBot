@@ -3,12 +3,16 @@
     <div class="title">Calendar</div>
     <div id="calendar"></div>
   </div>
+  <div class="widget">
+    <div class="title">Stream Events <small id="calendarDate"></small></div>
+    <div id="streamEvents"><p>Select date from calendar</p></div>
+  </div>
 </div>
 
 <div class="col-xs-12 col-sm-7 col-md-8 col-lg-9">
-  <div class="widget">
-    <div class="title">Stream Stats - 25/12/2016 - 16:25</div>
-    <div id="myChart"></div>
+  <div class="widget" id="graphs">
+    <div class="title">Stream Statistics <small id="streamDate"></small></div>
+    <div id="statsChart">Select stream from calendar and events</div>
     <div id="eventsChart"></div>
     <div id="gameChart" style="padding-left: 40px;"></div>
   </div>
@@ -16,98 +20,197 @@
 
 
 <script>
-  $("#calendar").zabuto_calendar({language: "en"});
-
+  var pageWidth = $('#graphs').css('width').split('px')[0];
+  var chartData = {}
   google.charts.load('current', {'packages':['line', 'timeline', 'bar']});
-  google.charts.setOnLoadCallback(drawChart);
-  google.charts.setOnLoadCallback(drawGames);
-  google.charts.setOnLoadCallback(drawEvents);
 
-  function drawEvents() {
-        var data = google.visualization.arrayToDataTable([
-          ['', 'Followers', 'New Chatters'],
-          [new Date(2016, 9, 27, 8, 0, 0, 0), 0, 0],
-        [new Date(2016, 9, 27, 8, 5, 0, 0),  1, 3],
-        [new Date(2016, 9, 27, 8, 10, 0, 0), 0, 0],
-        [new Date(2016, 9, 27, 8, 15, 0, 0), 2, 0],
-        [new Date(2016, 9, 27, 8, 20, 0, 0), 5, 0],
-        [new Date(2016, 9, 27, 8, 25, 0, 0), 10, 0],
-        [new Date(2016, 9, 27, 8, 30, 0, 0), 0, 0],
-        [new Date(2016, 9, 27, 8, 35, 0, 0),  0, 0],
-        [new Date(2016, 9, 27, 8, 40, 0, 0),  0, 0],
-        [new Date(2016, 9, 27, 8, 45, 0, 0),  0, 0],
-        [new Date(2016, 9, 27, 8, 50, 0, 0), 0, 0]
-        ]);
+  google.charts.setOnLoadCallback(getCalendarData)
 
-        var options = {
-        width: 830,
-        height: 200
-        };
+  function getDateString(d) {
+    return ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
+        d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+  }
 
-        var chart = new google.charts.Bar(document.getElementById('eventsChart'));
+  function getGraphData(id) {
+    $("#streamDate").text(getDateString(new Date(id)))
+    socket.emit('getStatsData', id)
+  }
 
-        chart.draw(data, options);
+  function getCalendarData() {
+    socket.emit('getCalendarData')
+  }
+
+  socket.off('calendarData')
+  socket.on('calendarData', function (data) {
+    // change data values to yyyy-mm-dd
+    var calendar = []
+    _.each(data, function (date) {
+      calendar.push({
+        date: date.split('T')[0],
+        badge: false
+      })
+    })
+
+    $("#calendar").zabuto_calendar({
+      language: "en",
+      today: true,
+      data: calendar,
+      action: function () {
+        socket.emit("getStreamEvents", $("#" + this.id).data("date"))
+        $("#calendarDate").text($("#" + this.id).data("date"))
+      }
+    });
+  })
+
+  socket.off('streamData')
+  socket.on('streamData', function (data) {
+    var $events = $("#streamEvents")
+    var output = ''
+    $events.empty()
+
+
+    output = '<ul class="streamEvents text-center">'
+    _.each(data, function (values) {
+      output = output + '<li><button class="btn btn-link btn-lg" onclick="getGraphData(\'' + values._id + '\')">' + getDateString(new Date(values._id)) + '</button></li>'
+    })
+    output = output + '</ul>'
+
+    if (data.length === 0) {
+      $events.html('<p>There is no events on selected date</p>')
+    } else {
+      $events.html(output)
     }
+  })
 
-  function drawChart() {
-      var data = new google.visualization.DataTable();
-      data.addColumn('datetime', '');
-      data.addColumn('number', 'Followers');
-      data.addColumn('number', 'Max Concurrent Viewers');
-      data.addColumn('number', 'Viewers');
-      data.addColumn('number', 'Chatters');
-      data.addColumn('number', 'Chat Messages');
+  socket.off('statsData')
+  socket.on('statsData', function (data) {
+    chartData = data
+    drawChart(data.stats)
+    drawEvents(data.stats)
+    drawGames(chartData.stats)
+  })
 
-      data.addRows([
-        [new Date(2016, 9, 27, 8, 0, 0, 0),  12, 0, 0, 0, 0],
-        [new Date(2016, 9, 27, 8, 5, 0, 0),  13, 2, 2, 0, 20],
-        [new Date(2016, 9, 27, 8, 10, 0, 0),  13, 13, 13, 3, 25],
-        [new Date(2016, 9, 27, 8, 15, 0, 0),  15, 13, 10, 3, 34],
-        [new Date(2016, 9, 27, 8, 20, 0, 0),  20, 13, 1, 3, 64],
-        [new Date(2016, 9, 27, 8, 25, 0, 0),  30, 13, 0, 3, 150],
-        [new Date(2016, 9, 27, 8, 30, 0, 0),  30, 13, 0, 3, 150],
-        [new Date(2016, 9, 27, 8, 35, 0, 0),  30, 13, 0, 3, 150],
-        [new Date(2016, 9, 27, 8, 40, 0, 0),  30, 13, 0, 3, 150],
-        [new Date(2016, 9, 27, 8, 45, 0, 0),  30, 13, 0, 3, 150],
-        [new Date(2016, 9, 27, 8, 50, 0, 0),  30, 13, 0, 3, 150]
-      ]);
+  $(window).resize(function() {
+    pageWidth = $('#graphs').css('width').split('px')[0]
+    drawChart(chartData.stats)
+    drawEvents(chartData.stats)
+    drawGames(chartData.stats)
+  })
+
+  function drawEvents(values) {
+    if (_.isUndefined(values)) return
+    var data = new google.visualization.DataTable();
+    data.addColumn('datetime', '');
+    data.addColumn('number', 'Followers');
+    data.addColumn('number', 'New Chatters');
+
+    var followers = 0
+    var newChatters = 0
+    var init = false
+    _.each(values, function (array, index) {
+      if (!init) {
+        followers = array.currentFollowers
+        newChatters = array.newChatters
+        init = true
+      }
+      data.addRows([[
+        new Date(array.timestamp),
+        array.currentFollowers - followers,
+        array.newChatters - newChatters,
+      ]])
+      followers = array.currentFollowers
+      newChatters = array.newChatters
+    })
 
       var options = {
-        width: 900,
-        height: 500
+        width: pageWidth - (pageWidth * 0.10)
       };
 
-      var chart = new google.charts.Line(document.getElementById('myChart'));
+      $("#eventsChart").empty()
+      var chart = new google.charts.Bar(document.getElementById('eventsChart'));
 
       chart.draw(data, options);
-      }
+    }
 
-  function drawGames() {
-        var container = document.getElementById('gameChart');
-        var chart = new google.visualization.Timeline(container);
-        var dataTable = new google.visualization.DataTable();
+  function drawChart(values) {
+    if (_.isUndefined(values)) return
+    var data = new google.visualization.DataTable();
+    data.addColumn('datetime', '');
+    data.addColumn('number', 'Followers');
+    data.addColumn('number', 'Max Concurrent Viewers');
+    data.addColumn('number', 'Viewers');
+    data.addColumn('number', 'Chatters');
+    data.addColumn('number', 'Chat Messages');
 
-        dataTable.addColumn({ type: 'string', id: 'Status' });
-        dataTable.addColumn({ type: 'string', id: 'Name' });
-        dataTable.addColumn({ type: 'datetime', id: 'Start' });
-        dataTable.addColumn({ type: 'datetime', id: 'End' });
+    _.each(values, function (array, index) {
+      data.addRows([[
+        new Date(array.timestamp),
+        array.currentFollowers,
+        array.maxViewers,
+        array.currentViewers,
+        array.newChatters,
+        array.chatMessages
+      ]])
+    })
 
-        var options = {
-      timeline: { showRowLabels: false  },
-          width: 635,
-        chart: {
-          title: "aaa"
-,          subtitle: 'Game and Status'
-        },
-          hAxis: {
-            format: ' '
-          },
+    var options = {
+      width: pageWidth - (pageWidth * 0.034),
+      height: 300
     };
 
-        dataTable.addRows([
-          ['Status muj tralala', 'Bioshock 2',    new Date(2016, 9, 27, 8, 0, 0, 0),   new Date(2016, 9, 27, 8, 15, 0, 0) ],
-          ['Statuuuus', 'Rocket League', new Date(2016, 9, 27, 8, 15, 0, 0),  new Date(2016, 9, 27, 8, 50, 0, 0) ]]);
+    $("#statsChart").empty()
+    var chart = new google.charts.Line(document.getElementById('statsChart'));
 
-        chart.draw(dataTable, options);
+    chart.draw(data, options);
+  }
+
+  function drawGames(values) {
+    if (_.isUndefined(values)) return
+    var container = document.getElementById('gameChart');
+    var chart = new google.visualization.Timeline(container);
+    var dataTable = new google.visualization.DataTable();
+
+    dataTable.addColumn({ type: 'string', id: 'Status' });
+    dataTable.addColumn({ type: 'string', id: 'Name' });
+    dataTable.addColumn({ type: 'datetime', id: 'Start' });
+    dataTable.addColumn({ type: 'datetime', id: 'End' });
+
+    var game = ''
+    var status = ''
+    var init = false
+    var startTimestamp = 0
+    var endTimestamp = 0
+    var aLength = values.length
+    _.each(values, function (array, index) {
+      if (!init) {
+        game = array.game
+        status = array.status
+        startTimestamp = array.timestamp
+        init = true
+      }
+
+      if (game != array.game || status != array.status || index === aLength - 1) {
+        endTimestamp = array.timestamp
+        dataTable.addRows([[
+          status,
+          game,
+          new Date(startTimestamp),
+          new Date(endTimestamp)
+        ]])
+        startTimestamp = array.timestamp
+      }
+      game = array.game
+      status = array.status
+    })
+
+    var options = {
+      timeline: { showRowLabels: false  },
+      width: pageWidth - (pageWidth * 0.32),
+      hAxis: {
+        format: ' '
+      }
+    };
+    $("#gameChart").empty()
+    chart.draw(dataTable, options);
   }
 </script>
