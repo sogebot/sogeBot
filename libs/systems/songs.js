@@ -267,10 +267,9 @@ Songs.prototype.addSongToPlaylist = function (self, sender, text) {
         if (typeof item === 'undefined' || item === null) {
           ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
             if (err) console.log(err)
-            global.botDB.insert({type: 'playlist', videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime()})
+            global.botDB.insert({type: 'playlist', videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1})
             global.commons.sendMessage(global.translate('songs.addedSongPlaylist').replace('(title)', videoInfo.title), sender)
             self.sendPlaylistList(self, global.panel.socket)
-            self.createRandomSeeds()
             self.getMeanLoudness(self)
           })
         } else {
