@@ -1,4 +1,4 @@
-<div class="widget" id="twitchVideoWidget">
+<div class="widget">
   <div class="title">Twitch Stream Monitor</div>
   <div class="controls">
     <div class="dropdown">
@@ -10,15 +10,19 @@
       </ul>
     </div>
   </div>
-
+  <div id="twitchVideoWidget"></div>
 </div>
 
 <script>
-  if (loadedJS.indexOf('twitch') === -1) {
-    loadedJS.push('twitch')
-    socket.emit('getTwitchVideo');
-    socket.on('twitchVideo', function(room) {
-      $("#twitchVideoWidget").append('<iframe src="https://player.twitch.tv/?autoplay=true&channel=' + room + '" frameborder="0" scrolling="no" width="100%"></iframe>')
+  $.getScript("http://player.twitch.tv/js/embed/v1.js", function() {
+    socket.emit('getTwitchVideo')
+  });
+
+  socket.off('twitchVideo')
+  socket.on('twitchVideo', function(room) {
+    var player = new Twitch.Player("twitchVideoWidget", {width: "100%", channel: room})
+    player.addEventListener(Twitch.Player.ONLINE, function () {
+      player.play()
     })
-  }
+  })
 </script>
