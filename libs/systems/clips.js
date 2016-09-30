@@ -62,6 +62,7 @@ Clips.prototype.save = function (self, id, sender, text) {
       }
     })
   }
+  global.updateQueue(id, true)
 }
 
 module.exports = new Clips()
