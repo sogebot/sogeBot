@@ -96,8 +96,8 @@ Songs.prototype.banCurrentSong = function (self, sender) {
       global.commons.remove({_type: 'songrequest', _videoID: self.currentSong.videoID})
       global.commons.timeout(self.currentSong.username, global.translate('songs.bannedSongTimeout'), 300)
       self.getMeanLoudness(self)
-      self.sendNextSongID(self, global.panel.socket)
-      self.sendPlaylistList(self, global.panel.socket)
+      self.sendNextSongID(self, global.panel.io)
+      self.sendPlaylistList(self, global.panel.io)
     }
   })
 }
@@ -112,8 +112,8 @@ Songs.prototype.banSongById = function (self, sender, text) {
       global.commons.remove({_type: 'playlist', _videoID: text.trim()})
       global.commons.remove({_type: 'songrequest', _videoID: text.trim()})
       self.getMeanLoudness(self)
-      self.sendNextSongID(self, global.panel.socket)
-      self.sendPlaylistList(self, global.panel.socket)
+      self.sendNextSongID(self, global.panel.io)
+      self.sendPlaylistList(self, global.panel.io)
     })
   })
 }
@@ -270,7 +270,7 @@ Songs.prototype.addSongToPlaylist = function (self, sender, text) {
             if (err) log.error(err)
             global.botDB.insert({type: 'playlist', videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1})
             global.commons.sendMessage(global.translate('songs.addedSongPlaylist').replace('(title)', videoInfo.title), sender)
-            self.sendPlaylistList(self, global.panel.socket)
+            self.sendPlaylistList(self, global.panel.io)
             self.getMeanLoudness(self)
           })
         } else {
@@ -292,7 +292,7 @@ Songs.prototype.removeSongFromPlaylist = function (self, sender, text) {
       if (err) log.error(err)
       if (numRemoved > 0) global.commons.sendMessage(global.translate('songs.removeSongPlaylist').replace('(title)', videoInfo.title), sender)
       self.getMeanLoudness(self)
-      self.sendPlaylistList(self, global.panel.socket)
+      self.sendPlaylistList(self, global.panel.io)
     })
   })
 }
