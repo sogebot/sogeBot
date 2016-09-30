@@ -1,0 +1,35 @@
+<div class="widget">
+  <div class="title">Latest Clips</div>
+  <div class="controls">
+    <div class="dropdown">
+      <a id="SRMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        <span class="glyphicon glyphicon-option-vertical text-muted"></span>
+      </a>
+      <ul class="dropdown-menu" aria-labelledby="SRMenu">
+        <li><a href="#" onclick="deleteWidget('clips')" style="color: #a94442;">Delete widget</a></li>
+      </ul>
+    </div>
+  </div>
+    <table class="table table-striped table-responsive table-condensed">
+      <tbody id="ClipsWidget"></tbody>
+    </table>
+</div>
+
+<script>
+  if (!_.isUndefined(IClips)) window.clearInterval(IClips)
+  var IClips = setInterval(function() { socket.emit('getLatestClips') }, 2000)
+
+  socket.off('LatestClips')
+  socket.on('LatestClips', function (items) {
+    $("#ClipsWidget").empty()
+    _.each(items, function(item, index) {
+      $("#ClipsWidget").append('<tr>' +
+        '<td><a href="' + item.clip_uri + '">' + item.slug + '</a><br>' +
+        item.game + '<br>' +
+        item.title + '</td>' +
+        '<td><strong>' + item.curator + '</strong><br>' +
+        '<small>' + commons.getDateString(new Date(item.timestamp)) + '</small></td>' +
+        '</tr>');
+    })
+  })
+</script>
