@@ -51,7 +51,7 @@
   <div class="stream-info-container col-xs-12 col-sm-12 col-md-12">
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
       <h2>Viewers</h2>
-      <span class="data" id="currentViewers">-</span>
+      <span class="data" id="curViewers">-</span>
       <span class="stats">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
@@ -65,6 +65,11 @@
       <span class="stats" id="totalChatMsgsChange">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+      <h2>Views</h2>
+      <span class="data" id="curViews">-</span>
+      <span class="stats" id="curViewsChange">&nbsp;</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
       <h2>New Chatters</h2>
       <span class="data" id="newChtr">-</span>
       <span class="stats" id="newChtrChange">&nbsp;</span>
@@ -75,15 +80,28 @@
       <span class="stats">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+      <h2>Hosts</h2>
+      <span class="data" id="hosts">Not working</span>
+      <span class="stats">&nbsp;</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
       <h2>Followers</h2>
-      <span class="data"><span id="curFollowers">-</span><span id="diffFollowers"></span></span>
+      <span class="data"><span id="curFollowers">-</span></span>
       <span class="stats" id="curFollowersChange">&nbsp;</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+      <h2>Game</h2>
+      <span class="data" id="game">Not Available</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+      <h2>Title</h2>
+      <span class="data" id="title">Not Available</span>
     </div>
   </div>
 
   <div class="container-fluid">
     <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-12 main">
+      <div class="col-xs-12 col-sm-12 col-md-12">
         <!-- widgets -->
         <div class="widgets">
           <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4" id="widgetRow1"></div>
@@ -219,16 +237,17 @@
         var totalChatMsgs = getPercentage(parseInt($("#totalChatMsgs").text(), 10), parseInt(data.chatMessages, 10))
         var newChtr = getPercentage(parseInt($("#newChtr").text(), 10), parseInt(data.newChatters, 10))
         var curFollowers = getPercentage(parseInt($("#curFollowers").text(), 10), parseInt(data.currentFollowers, 10))
+        var curViews = getPercentage(parseInt($("#curViews").text(), 10), parseInt(data.currentViews, 10))
 
         setHtml('maxViewersChange', maxViewers)
         setHtml('totalChatMsgsChange', totalChatMsgs)
         setHtml('newChtrChange', newChtr)
         setHtml('curFollowersChange', curFollowers)
+        setHtml('curViewsChange', curViews)
       }
     })
 
     socket.on('stats', function(data) {
-      var $diffFollowers = $("#diffFollowers")
       var $curFollowers = $("#curFollowers")
 
       if (data.uptime === '' || data.uptime === '00:00:00') {
@@ -236,24 +255,19 @@
         data.maxViewers = 0
         data.chatMessages = 0
         data.newChatters = 0
-        data.diffFollowers = data.curFollowers
       }
 
       $("#uptime").text(data.uptime !== '' ? data.uptime : '00:00:00')
-      $("#currentViewers").text(data.currentViewers)
+      $("#curViewers").text(data.currentViewers)
+      $("#curViews").text(data.currentViews)
       $("#maxViewers").text(data.maxViewers)
       $("#totalChatMsgs").text(data.chatMessages)
       $("#newChtr").text(data.newChatters)
-      if (data.diffFollowers < 0) {
-        $diffFollowers.removeClass('up')
-        $diffFollowers.addClass('down')
-      } else if (data.diffFollowers > 0) {
-        $diffFollowers.removeClass('down')
-        $diffFollowers.addClass('up')
-        diffFollowers = '+' + diffFollowers
-      } else data.diffFollowers = ''
-      $diffFollowers.text(data.diffFollowers)
-      $curFollowers.text(data.currentFollowers)
+      $("#curFollowers").text(data.currentFollowers)
+      $("#title").text(data.status)
+      $('#title').prop('title', data.status)
+      $("#game").text(data.game)
+      $('#game').prop('title', data.game)
     })
 
     var commons = {
