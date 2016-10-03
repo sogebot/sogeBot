@@ -11,9 +11,9 @@ function Twitch () {
 
   this.currentViewers = 0
   this.currentFollowers = 0
+  this.currentViews = 0
   this.maxViewers = 0
   this.chatMessagesAtStart = global.parser.linesParsed
-  this.followersAtStart = 0
   this.maxRetries = 12
   this.curRetries = 0
   this.newChatters = 0
@@ -42,7 +42,6 @@ function Twitch () {
           self.maxViewers = 0
           self.newChatters = 0
           self.chatMessagesAtStart = global.parser.linesParsed
-          self.followersAtStart = self.currentFollowers
         }
         self.saveStream(body.stream)
         self.isOnline = true
@@ -68,6 +67,7 @@ function Twitch () {
       if (res.statusCode === 200 && !_.isNull(body)) {
         self.currentGame = body.game
         self.currentStatus = body.status
+        self.currentViews = body.views
       }
     })
 
@@ -126,6 +126,7 @@ Twitch.prototype.saveStream = function (stream) {
     currentViewers: this.currentViewers,
     chatMessages: messages,
     currentFollowers: this.currentFollowers,
+    currentViews: this.currentViews,
     maxViewers: this.maxViewers,
     newChatters: this.newChatters,
     game: this.currentGame,
@@ -136,7 +137,6 @@ Twitch.prototype.saveStream = function (stream) {
 Twitch.prototype.webPanel = function () {
   global.panel.addWidget('chat', 'Twitch Chat', 'comment')
   global.panel.addWidget('twitch', 'Twitch Stream Monitor', 'facetime-video')
-  global.panel.addWidget('gameandstatus', 'Game & Status', 'info-sign')
   global.panel.socketListening(this, 'getChatRoom', this.sendChatRoom)
   global.panel.socketListening(this, 'getTwitchVideo', this.sendTwitchVideo)
   global.panel.socketListening(this, 'getStats', this.sendStats)
@@ -150,7 +150,7 @@ Twitch.prototype.sendStats = function (self, socket) {
     maxViewers: self.maxViewers,
     chatMessages: messages > 20000 ? (messages / 1000) + 'k' : messages,
     currentFollowers: self.currentFollowers,
-    diffFollowers: self.currentFollowers - self.followersAtStart,
+    currentViews: self.currentViews,
     newChatters: self.newChatters,
     game: self.currentGame,
     status: self.currentStatus

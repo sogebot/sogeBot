@@ -45,12 +45,6 @@ body {
   color: #fff;
   background-color: #428bca;
 }
-@media (min-width: 768px) {
-  .main {
-    padding-right: 40px;
-    padding-left: 40px;
-  }
-}
 
 /* TOP */
 a.active {
@@ -138,7 +132,13 @@ a.active {
   .stream-info:first-child::before {
     border-left: 0;
   }
-  .stream-info:nth-child(4)::before {
+  .stream-info:nth-child(3n+1)::before {
+    border-left: 0;
+  }
+}
+
+@media (min-width : 992px){
+  .stream-info:nth-child(7)::before {
     border-left: 0;
   }
 }
@@ -179,7 +179,6 @@ a.active {
   border: 1px solid #ADB2B5;
   border-radius: 4px;
   padding: 10px;
-  margin-left: 10px;
   margin-bottom: 10px;
 }
 
