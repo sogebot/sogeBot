@@ -54,7 +54,7 @@ a.active {
 /* STREAM DASHBOARD INFORMATIONS */
 .stream-info-container {
   line-height: 50px;
-  font-size: 16px;
+  font-size: 10px;
   background: white;
   border-bottom: 1px solid #ADB2B5;
   border-top: 1px solid #ADB2B5;
@@ -70,7 +70,6 @@ a.active {
 }
 
 .stream-info h2 {
-  font-size: 10px;
   position: absolute;
   top: -5px;
   font-weight: bold;
