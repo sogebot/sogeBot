@@ -117,7 +117,6 @@ function Twitch () {
 Twitch.prototype.saveStream = function (stream) {
   this.currentViewers = stream.viewers
   this.whenOnline = stream.created_at
-  this.currentFollowers = stream.channel.followers
   this.maxViewers = this.maxViewers < this.currentViewers ? this.currentViewers : this.maxViewers
 
   var messages = global.parser.linesParsed - this.chatMessagesAtStart
