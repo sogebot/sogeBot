@@ -228,12 +228,12 @@
       }
       var setHtml = function (id, value) {
         if (value === 0) {
-          $("#" + id).html('<span class="stats-mid"><span class="glyphicon glyphicon-triangle-right"></span> ' + Math.abs(value) + '%</span> last session')
+          $("#" + id).html('<span class="stats-mid"><span class="glyphicon glyphicon-triangle-right"></span> ' + Math.abs(value) + '%</span>')
         } else {
           $("#" + id).html('<span class="stats-' + (value < 0 ? 'down' : 'up') +
             ' text-' + (value < 0 ? 'danger' : 'success') +
             '"><span class="glyphicon glyphicon-triangle-' + (value < 0 ? 'bottom' : 'top') +
-            '"></span> ' + Math.abs(value) + '%</span> last session')
+            '"></span> ' + Math.abs(value) + '%</span>')
         }
       }
       var uptime = $("#uptime").text()
