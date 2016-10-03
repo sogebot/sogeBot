@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
   <script src="https://use.fontawesome.com/92ba895b59.js"></script>
   <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -46,43 +46,44 @@
       </div>
     </div>
   </div>
+
+  <!-- SNIPPETS -->
+  <div class="stream-info-container col-xs-12 col-sm-12 col-md-12">
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+      <h2>Viewers</h2>
+      <span class="data" id="currentViewers">-</span>
+      <span class="stats">&nbsp;</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+      <h2>Max Viewers</h2>
+      <span class="data" id="maxViewers">-</span>
+      <span class="stats" id="maxViewersChange">&nbsp;</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+      <h2>Chat Messages</h2>
+      <span class="data" id="totalChatMsgs">-</span>
+      <span class="stats" id="totalChatMsgsChange">&nbsp;</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+      <h2>New Chatters</h2>
+      <span class="data" id="newChtr">-</span>
+      <span class="stats" id="newChtrChange">&nbsp;</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+      <h2>Streaming Session</h2>
+      <span class="data" id="uptime">--:--:--</span>
+      <span class="stats">&nbsp;</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+      <h2>Followers</h2>
+      <span class="data"><span id="curFollowers">-</span><span id="diffFollowers"></span></span>
+      <span class="stats" id="curFollowersChange">&nbsp;</span>
+    </div>
+  </div>
+
   <div class="container-fluid">
     <div class="row">
       <div class="col-xs-12 col-sm-12 col-md-12 main">
-        <!-- SNIPPETS -->
-        <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-          <h2><span class="glyphicon glyphicon-user"></span> Current Viewers</h2>
-          <div class="data" id="currentViewers">-</div>
-          <div class="stats">&nbsp;</div>
-        </div>
-        <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-          <h2><span class="glyphicon glyphicon-user"></span> Max Concurrent Viewers</h2>
-          <div class="data" id="maxViewers">-</div>
-          <div class="stats" id="maxViewersChange">&nbsp;</div>
-        </div>
-        <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-          <h2><span class="glyphicon glyphicon-comment"></span> Total Chat Messages</h2>
-          <div class="data" id="totalChatMsgs">-</div>
-          <div class="stats" id="totalChatMsgsChange">&nbsp;</div>
-        </div>
-        <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-          <h2><span class="glyphicon glyphicon-star"></span> Total New Chatters</h2>
-          <div class="data" id="newChtr">-</div>
-          <div class="stats" id="newChtrChange">&nbsp;</div>
-        </div>
-        <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-          <h2><span class="glyphicon glyphicon-time"></span> Streaming Session</h2>
-          <div class="data" id="uptime">--:--:--</div>
-          <div class="stats">&nbsp;</div>
-        </div>
-        <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-          <h2><span class="glyphicon glyphicon-thumbs-up"></span> Followers</h2>
-          <div class="data"><span id="curFollowers">-</span><span id="diffFollowers"></span></div>
-          <div class="stats" id="curFollowersChange">&nbsp;</div>
-        </div>
-
-        <div class="clearfix"></div>
-
         <!-- widgets -->
         <div class="widgets">
           <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4" id="widgetRow1"></div>
@@ -204,12 +205,12 @@
       }
       var setHtml = function (id, value) {
         if (value === 0) {
-          $("#" + id).html('<span class="stats-mid"><span class="glyphicon glyphicon-triangle-right"></span> ' + Math.abs(value) + '%</span> From last Session')
+          $("#" + id).html('<span class="stats-mid"><span class="glyphicon glyphicon-triangle-right"></span> ' + Math.abs(value) + '%</span> last session')
         } else {
           $("#" + id).html('<span class="stats-' + (value < 0 ? 'down' : 'up') +
             ' text-' + (value < 0 ? 'danger' : 'success') +
             '"><span class="glyphicon glyphicon-triangle-' + (value < 0 ? 'bottom' : 'top') +
-            '"></span> ' + Math.abs(value) + '%</span> From last Session')
+            '"></span> ' + Math.abs(value) + '%</span> last session')
         }
       }
       var uptime = $("#uptime").text()
