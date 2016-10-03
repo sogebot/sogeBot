@@ -6,6 +6,7 @@ var crypto = require('crypto')
 var queue = {}
 
 function Parser () {
+  this.registeredHelpers = []
   this.registeredCmds = {}
   this.permissionsCmds = {}
   this.selfCmds = {}
@@ -81,6 +82,10 @@ Parser.prototype.registerParser = function (self, parser, fnc, permission) {
   this.registeredParsers[parser] = fnc
   this.permissionsParsers[parser] = permission
   this.selfParsers[parser] = self
+}
+
+Parser.prototype.registerHelper = function (cmd) {
+  this.registeredHelpers.push(cmd)
 }
 
 Parser.prototype.unregister = function (cmd) {

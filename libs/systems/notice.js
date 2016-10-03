@@ -17,6 +17,8 @@ function Notice () {
     global.parser.register(this, '!notice remove', this.remove, constants.OWNER_ONLY)
     global.parser.register(this, '!notice', this.help, constants.OWNER_ONLY)
 
+    global.parser.registerHelper('!notice')
+
     global.configuration.register('noticeInterval', 'notice.settings.noticeInterval', 'number', 10)
     global.configuration.register('noticeMsgReq', 'notice.settings.noticeMsgReq', 'number', 10)
 

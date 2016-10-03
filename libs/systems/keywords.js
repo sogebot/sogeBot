@@ -12,6 +12,8 @@ function Keywords () {
     global.parser.register(this, '!keyword remove', this.remove, constants.OWNER_ONLY)
     global.parser.register(this, '!keyword', this.help, constants.OWNER_ONLY)
 
+    global.parser.registerHelper('!keyword')
+
     global.parser.registerParser(this, 'keywords', this.run, constants.VIEWERS)
 
     this.webPanel()

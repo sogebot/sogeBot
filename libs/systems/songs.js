@@ -22,6 +22,8 @@ function Songs () {
     global.parser.register(this, '!playlist steal', this.stealSongToPlaylist, constants.OWNER_ONLY)
     global.parser.register(this, '!playlist', this.help, constants.OWNER_ONLY)
 
+    global.parser.registerHelper('!songrequest')
+
     global.configuration.register('volume', 'songs.settings.volume', 'number', 25)
     global.configuration.register('duration', 'songs.settings.duration', 'number', 10)
     global.configuration.register('shuffle', 'songs.settings.shuffle', 'bool', false)

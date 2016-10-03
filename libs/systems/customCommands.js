@@ -12,6 +12,8 @@ function CustomCommands () {
     global.parser.register(this, '!command remove', this.remove, constants.OWNER_ONLY)
     global.parser.register(this, '!command', this.help, constants.OWNER_ONLY)
 
+    global.parser.registerHelper('!command')
+
     // start interval for registering commands from DB
     var self = this
     setInterval(function () {
