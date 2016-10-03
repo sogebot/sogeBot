@@ -174,9 +174,9 @@ Songs.prototype.sendNextSongID = function (self, socket) {
   global.botDB.findOne({type: 'songRequests'}).sort({addedAt: 1}).exec(function (err, item) {
     if (err) log.error(err)
     if (typeof item !== 'undefined' && item !== null) { // song is found
-      socket.emit('videoID', item)
       self.currentSong = item
       self.currentSong.volume = self.getVolume(self, self.currentSong)
+      socket.emit('videoID', self.currentSong)
       global.botDB.remove({type: 'songRequests', videoID: item.videoID}, {})
     } else { // run from playlist
       if (global.configuration.getValue('shuffle')) {
@@ -190,7 +190,7 @@ Songs.prototype.sendNextSongID = function (self, socket) {
               global.botDB.update({_id: item._id}, {$set: {seed: 1}})
               self.currentSong = item
               self.currentSong.volume = self.getVolume(self, self.currentSong)
-              socket.emit('videoID', item)
+              socket.emit('videoID', self.currentSong)
             }
           } else {
             socket.emit('videoID', null)
@@ -202,7 +202,8 @@ Songs.prototype.sendNextSongID = function (self, socket) {
           if (typeof item !== 'undefined' && item !== null) { // song is found
             global.botDB.update({type: 'playlist', videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
             self.currentSong = item
-            socket.emit('videoID', item)
+            self.currentSong.volume = self.getVolume(self, self.currentSong)
+            socket.emit('videoID', self.currentSong)
           } else {
             socket.emit('videoID', null)
           }
