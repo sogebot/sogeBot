@@ -79,6 +79,7 @@ a.active {
 .stream-info span.data {
   color: #999;
   margin-left: 5px;
+  font-size: 10px;
 }
 
 .stream-info #diffFollowers {
