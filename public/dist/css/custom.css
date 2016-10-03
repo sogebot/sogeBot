@@ -66,12 +66,15 @@ a.active {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  padding-top: 5px;
+  padding-top: 15px;
 }
 
 .stream-info h2 {
-  font-size: 16px;
-  display: inline;
+  font-size: 10px;
+  position: absolute;
+  top: -5px;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 
 .stream-info span.data {
