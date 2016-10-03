@@ -1,6 +1,9 @@
+
+
 body {
   padding-top: 50px;
-  background-color: #eee
+  background-color: #eee;
+  font-family: 'Roboto', sans-serif;
 }
 
 .navbar-fixed-top {
@@ -55,52 +58,31 @@ a.active {
 }
 
 /* STREAM DASHBOARD INFORMATIONS */
+.stream-info-container {
+  line-height: 50px;
+  font-size: 16px;
+  background: white;
+  border-bottom: 1px solid #ADB2B5;
+  border-top: 1px solid #ADB2B5;
+  border-radius: 4px;
+  width: 100%;
+}
+
 .stream-info {
-  color: #666;
-  line-height: 30px;
-  font-size: 12px;
-  border-bottom: 1px solid #D9DEE4;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  position: relative;
+  padding-top: 5px;
 }
 
 .stream-info h2 {
-  font-size: 12px;
+  font-size: 16px;
+  display: inline;
 }
 
-.stream-info div.data {
-  font-size: 35px;
-  font-weight: bold;
-}
-
-@media (max-width: 1300px) {
-  .stream-info div.data {
-    font-size: 25px;
-  }
-}
-
-@media (min-width: 1000px) and  (max-width: 1300px) {
-  .stream-info div.data {
-    font-size: 30px;
-  }
-  .stream-info {
-    min-width: 150px;
-  }
-}
-
-
-@media (min-width: 1300px) and  (max-width: 1580px) {
-  .stream-info div.data {
-    font-size: 30px;
-  }
-}
-
-@media (min-width: 1300px) {
-  .stream-info {
-    border-bottom: 0;
-  }
+.stream-info span.data {
+  color: #999;
+  margin-left: 5px;
 }
 
 .stream-info #diffFollowers {
@@ -118,23 +100,23 @@ a.active {
   color: #a94442;
 }
 
-.stream-info div.stats span.stats-up, .stream-info div.stats span.stats-down, .stream-info div.stats span.stats-mid {
+.stream-info span.stats span.stats-up, .stream-info span.stats span.stats-down, .stream-info span.stats span.stats-mid {
   font-style: italic;
 }
 
-.stream-info div.stats span.glyphicon {
+.stream-info span.stats span.glyphicon {
   font-size: smaller;
 }
 
-.stream-info div.stats span.stats-up span.glyphicon {
+.stream-info span.stats span.stats-up span.glyphicon {
   vertical-align: super;
 }
 
-.stream-info div.stats span.stats-mid span.glyphicon {
+.stream-info span.stats span.stats-mid span.glyphicon {
   vertical-align: initial;
 }
 
-.stream-info div.stats span.stats-down span.glyphicon {
+.stream-info span.stats span.stats-down span.glyphicon {
   vertical-align: sub;
 }
 
@@ -144,7 +126,10 @@ a.active {
 
 @media (max-width : 992px) {
   .stream-info:first-child::before {
-    border-left: 2px solid #ADB2B5;
+    border-left: 0;
+  }
+  .stream-info:nth-child(4)::before {
+    border-left: 0;
   }
 }
 
@@ -152,9 +137,9 @@ a.active {
     content: "";
     position: absolute;
     left: 0;
-    height: 65px;
-    border-left: 2px solid #ADB2B5;
-    margin-top: 25px;
+    top: 10px;
+    height: 40px;
+    border-left: 1px solid #ddd;
 }
 
 /* WIDGETS */
