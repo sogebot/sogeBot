@@ -54,7 +54,6 @@ a.active {
 /* STREAM DASHBOARD INFORMATIONS */
 .stream-info-container {
   line-height: 50px;
-  font-size: 10px;
   background: white;
   border-bottom: 1px solid #ADB2B5;
   border-top: 1px solid #ADB2B5;
@@ -72,6 +71,7 @@ a.active {
 .stream-info h2 {
   position: absolute;
   top: -5px;
+  font-size: 10px;
   font-weight: bold;
   text-transform: uppercase;
 }
@@ -79,7 +79,7 @@ a.active {
 .stream-info span.data {
   color: #999;
   margin-left: 5px;
-  font-size: 10px;
+  font-size: small;
 }
 
 .stream-info #diffFollowers {
