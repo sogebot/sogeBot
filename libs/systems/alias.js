@@ -12,6 +12,8 @@ function Alias () {
     global.parser.register(this, '!alias remove', this.remove, constants.OWNER_ONLY)
     global.parser.register(this, '!alias', this.help, constants.OWNER_ONLY)
 
+    global.parser.registerHelper('!alias')
+
     global.parser.registerParser(this, 'alias', this.parse, constants.VIEWERS)
 
     this.webPanel()

@@ -15,6 +15,8 @@ function Price () {
     global.parser.register(this, '!price unset', this.unset, constants.OWNER_ONLY)
     global.parser.register(this, '!price', this.help, constants.OWNER_ONLY)
 
+    global.parser.registerHelper('!price')
+
     global.parser.registerParser(this, 'price', this.checkPrice, constants.VIEWERS)
 
     this.webPanel()
@@ -92,6 +94,10 @@ Price.prototype.list = function (self, sender, text) {
 }
 
 Price.prototype.checkPrice = function (self, id, sender, text) {
+  if (global.parser.registeredHelpers.includes(text.trim())) {
+    global.updateQueue(id, true)
+    return
+  }
   try {
     var parsed = text.match(/^!(\w+)/)
     global.botDB.findOne({_id: 'price_' + parsed[1]}, function (err, item) {

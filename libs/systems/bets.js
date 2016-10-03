@@ -29,6 +29,8 @@ function Bets () {
     global.parser.register(this, '!bet refund', this.refundAll, constants.MODS)
     global.parser.register(this, '!bet', this.bet, constants.VIEWERS)
 
+    global.parser.registerHelper('!bet')
+
     global.configuration.register('betPercentGain', 'bets.betPercentGain', 'number', 20)
     global.configuration.register('betCloseTimer', 'bets.betCloseTimer', 'number', 2)
 
