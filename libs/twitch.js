@@ -12,6 +12,8 @@ function Twitch () {
   this.currentViewers = 0
   this.currentFollowers = 0
   this.currentViews = 0
+  this.currentHosts = 0
+  this.currentHostsViewers = 0
   this.maxViewers = 0
   this.chatMessagesAtStart = global.parser.linesParsed
   this.maxRetries = 12
@@ -41,6 +43,8 @@ function Twitch () {
           self.currentViewers = 0
           self.maxViewers = 0
           self.newChatters = 0
+          self.currentHosts = 0
+          self.currentHostsViewers = 0
           self.chatMessagesAtStart = global.parser.linesParsed
         }
         self.saveStream(body.stream)
@@ -130,7 +134,9 @@ Twitch.prototype.saveStream = function (stream) {
     maxViewers: this.maxViewers,
     newChatters: this.newChatters,
     game: this.currentGame,
-    status: this.currentStatus
+    status: this.currentStatus,
+    currentHosts: this.currentHosts,
+    currentHostsViewers: this.currentHostsViewers
   })
 }
 
@@ -153,7 +159,9 @@ Twitch.prototype.sendStats = function (self, socket) {
     currentViews: self.currentViews,
     newChatters: self.newChatters,
     game: self.currentGame,
-    status: self.currentStatus
+    status: self.currentStatus,
+    currentHosts: self.currentHosts,
+    currentHostsViewers: this.currentHostsViewers
   }
   socket.emit('stats', data)
 }

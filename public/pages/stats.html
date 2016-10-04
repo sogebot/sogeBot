@@ -103,23 +103,28 @@
     data.addColumn('datetime', '');
     data.addColumn('number', 'Followers');
     data.addColumn('number', 'New Chatters');
+    data.addColumn('number', 'Hosts');
 
     var followers = 0
     var newChatters = 0
+    var hosts = 0
     var init = false
     _.each(values, function (array, index) {
       if (!init) {
         followers = array.currentFollowers
+        hosts = array.currentHosts
         newChatters = array.newChatters
         init = true
       }
       data.addRows([[
         new Date(array.timestamp),
         array.currentFollowers - followers,
-        array.newChatters - newChatters,
+        array.newChatters - hosts,
+        array.currentHosts - newChatters,
       ]])
       followers = array.currentFollowers
       newChatters = array.newChatters
+      hosts = array.currentHosts
     })
 
       var options = {

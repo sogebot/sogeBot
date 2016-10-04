@@ -70,3 +70,9 @@ global.client.on('part', function (channel, username, fromSelf) {
     user.setOffline()
   }
 })
+
+global.client.on('hosted', function (channel, username, viewers) {
+  global.twitch.currentHosts = global.twitch.currentHosts + 1
+  global.twitch.currentHostsViewers = global.twitch.currentHostsViewers + viewers
+})
+
