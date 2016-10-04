@@ -54,14 +54,14 @@
       <span class="data" id="game">Not Available</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>Viewers</h2>
-      <span class="data" id="curViewers">-</span>
+      <h2>Uptime</h2>
+      <span class="data" id="uptime">--:--:--</span>
       <span class="stats">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>New Chatters</h2>
-      <span class="data" id="newChtr">-</span>
-      <span class="stats" id="newChtrChange">&nbsp;</span>
+      <h2>Viewers</h2>
+      <span class="data" id="curViewers">-</span>
+      <span class="stats">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
       <h2>Max Viewers</h2>
@@ -69,38 +69,38 @@
       <span class="stats" id="maxViewersChange">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+      <h2>New Chatters</h2>
+      <span class="data" id="newChtr">-</span>
+      <span class="stats" id="newChtrChange">&nbsp;</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
       <h2>Chat Messages</h2>
       <span class="data" id="totalChatMsgs">-</span>
       <span class="stats" id="totalChatMsgsChange">&nbsp;</span>
-    </div>
-    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>Views</h2>
-      <span class="data" id="curViews">-</span>
-      <span class="stats" id="curViewsChange">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-4">
       <h2>Title</h2>
       <span class="data" id="title">Not Available</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>Uptime</h2>
-      <span class="data" id="uptime">--:--:--</span>
-      <span class="stats">&nbsp;</span>
+      <h2>Views</h2>
+      <span class="data" id="curViews">-</span>
+      <span class="stats" id="curViewsChange">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
       <h2>Hosts</h2>
-      <span class="data" id="hosts">Not working</span>
-      <span class="stats">&nbsp;</span>
+      <span class="data" id="curHosts">-</span>
+      <span class="stats" id="curHostsChange">&nbsp;</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+      <h2>Potentional Viewers from Hosts</h2>
+      <span class="data" id="curHostsViewers">-</span>
+      <span class="stats" id="">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
       <h2>Followers</h2>
       <span class="data"><span id="curFollowers">-</span></span>
       <span class="stats" id="curFollowersChange">&nbsp;</span>
-    </div>
-    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>Most Active User</h2>
-      <span class="data" id="activeChatter">Not working</span>
-      <span class="stats">&nbsp;</span>
     </div>
   </div>
 
@@ -243,12 +243,14 @@
         var newChtr = getPercentage(parseInt($("#newChtr").text(), 10), parseInt(data.newChatters, 10))
         var curFollowers = getPercentage(parseInt($("#curFollowers").text(), 10), parseInt(data.currentFollowers, 10))
         var curViews = getPercentage(parseInt($("#curViews").text(), 10), parseInt(data.currentViews, 10))
+        var curHosts = getPercentage(parseInt($("#curHosts").text(), 10), parseInt(data.currentHosts, 10))
 
         setHtml('maxViewersChange', maxViewers)
         setHtml('totalChatMsgsChange', totalChatMsgs)
         setHtml('newChtrChange', newChtr)
         setHtml('curFollowersChange', curFollowers)
         setHtml('curViewsChange', curViews)
+        setHtml('curHostsChange', curHosts)
       }
     })
 
@@ -260,11 +262,15 @@
         data.maxViewers = 0
         data.chatMessages = 0
         data.newChatters = 0
+        data.currentHosts = 0
+        data.currentHostsViewers = 0
       }
 
       $("#uptime").text(data.uptime !== '' ? data.uptime : '00:00:00')
       $("#curViewers").text(data.currentViewers)
       $("#curViews").text(data.currentViews)
+      $("#curHosts").text(data.currentHosts)
+      $("#curHostsViewers").text(data.currentHostsViewers)
       $("#maxViewers").text(data.maxViewers)
       $("#totalChatMsgs").text(data.chatMessages)
       $("#newChtr").text(data.newChatters)
