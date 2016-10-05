@@ -279,3 +279,9 @@ table tr:hover > .tableMenu button { visibility: visible; }
 .streamEvents li {
   list-style-type: none
 }
+
+table a {
+  font-family: 'Cousine', monospace;
+  font-size: 10px;
+  color:#999;
+}
