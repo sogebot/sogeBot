@@ -148,6 +148,7 @@
     data.addColumn('number', 'New Chatters');
     data.addColumn('number', 'Chat Messages');
     data.addColumn('number', 'Views');
+    data.addColumn('number', 'Hosts');
 
     var maxViewers = 0
     _.each(values, function (array, index) {
@@ -159,7 +160,8 @@
         array.currentViewers,
         array.newChatters,
         array.chatMessages,
-        array.currentViews
+        array.currentViews,
+        array.currentHosts
       ]])
       maxViewers = array.maxViewers
     })
@@ -173,7 +175,8 @@
         2: {axis: 'viewers'},
         3: {axis: 'viewers'},
         4: {axis: 'followers'},
-        5: {axis: 'views'}
+        5: {axis: 'views'},
+        6: {axis: 'followers'}
       }
     };
 
