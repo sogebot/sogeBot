@@ -119,8 +119,8 @@
       data.addRows([[
         new Date(array.timestamp),
         array.currentFollowers - followers,
-        array.newChatters - hosts,
-        array.currentHosts - newChatters,
+        array.newChatters - newChatters,
+        array.currentHosts - hosts,
       ]])
       followers = array.currentFollowers
       newChatters = array.newChatters
@@ -173,7 +173,7 @@
         2: {axis: 'viewers'},
         3: {axis: 'viewers'},
         4: {axis: 'followers'},
-        5: {axis: 'followers'}
+        5: {axis: 'views'}
       }
     };
 
