@@ -93,11 +93,6 @@
       <span class="stats" id="curHostsChange">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>Potentional Viewers from Hosts</h2>
-      <span class="data" id="curHostsViewers">-</span>
-      <span class="stats" id="">&nbsp;</span>
-    </div>
-    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
       <h2>Followers</h2>
       <span class="data"><span id="curFollowers">-</span></span>
       <span class="stats" id="curFollowersChange">&nbsp;</span>
@@ -263,14 +258,12 @@
         data.chatMessages = 0
         data.newChatters = 0
         data.currentHosts = 0
-        data.currentHostsViewers = 0
       }
 
       $("#uptime").text(data.uptime !== '' ? data.uptime : '00:00:00')
       $("#curViewers").text(data.currentViewers)
       $("#curViews").text(data.currentViews)
       $("#curHosts").text(data.currentHosts)
-      $("#curHostsViewers").text(data.currentHostsViewers)
       $("#maxViewers").text(data.maxViewers)
       $("#totalChatMsgs").text(data.chatMessages)
       $("#newChtr").text(data.newChatters)
