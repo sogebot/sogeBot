@@ -9,11 +9,11 @@ require('moment-precise-range-plugin')
 function Twitch () {
   this.isOnline = false
 
+  this.channelId = null
   this.currentViewers = 0
   this.currentFollowers = 0
   this.currentViews = 0
   this.currentHosts = 0
-  this.currentHostsViewers = 0
   this.maxViewers = 0
   this.chatMessagesAtStart = global.parser.linesParsed
   this.maxRetries = 12
@@ -43,8 +43,6 @@ function Twitch () {
           self.currentViewers = 0
           self.maxViewers = 0
           self.newChatters = 0
-          self.currentHosts = 0
-          self.currentHostsViewers = 0
           self.chatMessagesAtStart = global.parser.linesParsed
         }
         self.saveStream(body.stream)
@@ -72,8 +70,23 @@ function Twitch () {
         self.currentGame = body.game
         self.currentStatus = body.status
         self.currentViews = body.views
+        self.channelId = body._id
       }
     })
+
+    if (!_.isNull(self.channelId)) {
+      global.client.api({
+        url: 'http://tmi.twitch.tv/hosts?include_logins=1&target=' + self.channelId
+      }, function (err, res, body) {
+        if (err) {
+          global.log.error(err)
+          return
+        }
+        if (res.statusCode === 200 && !_.isNull(body)) {
+          self.currentHosts = body.hosts.length
+        }
+      })
+    }
 
     global.client.api({
       url: 'https://api.twitch.tv/kraken/channels/' + global.configuration.get().twitch.owner + '/follows?direction=DESC&limit=1',
@@ -135,8 +148,7 @@ Twitch.prototype.saveStream = function (stream) {
     newChatters: this.newChatters,
     game: this.currentGame,
     status: this.currentStatus,
-    currentHosts: this.currentHosts,
-    currentHostsViewers: this.currentHostsViewers
+    currentHosts: this.currentHosts
   })
 }
 
@@ -160,8 +172,7 @@ Twitch.prototype.sendStats = function (self, socket) {
     newChatters: self.newChatters,
     game: self.currentGame,
     status: self.currentStatus,
-    currentHosts: self.currentHosts,
-    currentHostsViewers: this.currentHostsViewers
+    currentHosts: self.currentHosts
   }
   socket.emit('stats', data)
 }
