@@ -20,6 +20,7 @@
 
   socket.off('twitchVideo')
   socket.on('twitchVideo', function(room) {
+    $("#twitchVideoWidget").empty()
     var player = new Twitch.Player("twitchVideoWidget", {width: "100%", channel: room})
     player.addEventListener(Twitch.Player.ONLINE, function () {
       player.play()
