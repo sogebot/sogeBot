@@ -23,7 +23,8 @@ global.stats = new Stats()
 global.translate = require('./libs/translate')
 
 global.status = {'TMI': constants.DISCONNECTED,
-                 'API': constants.DISCONNECTED}
+                 'API': constants.DISCONNECTED,
+                 'MOD': false}
 
 require('./libs/permissions')
 
@@ -87,3 +88,8 @@ global.client.on('part', function (channel, username, fromSelf) {
     user.setOffline()
   }
 })
+
+// Bot is checking if it is a mod
+setInterval(function () {
+  global.status.MOD = global.client.isMod('#' + global.configuration.get().twitch.owner, global.configuration.get().twitch.username)
+}, 60000)
