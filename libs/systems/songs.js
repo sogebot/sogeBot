@@ -126,11 +126,7 @@ Songs.prototype.unbanSong = function (self, sender, text) {
 }
 
 Songs.prototype.getCurrentSong = function (self) {
-  try {
-    global.commons.sendMessage(global.translate('songs.currentSong').replace('(title)', self.currentSong.title), {username: global.configuration.get().twitch.owner})
-  } catch (err) {
-    global.commons.sendMessage(global.translate('songs.noCurrentSong'), {username: global.configuration.get().twitch.owner})
-  }
+  global.commons.sendMessage(global.translate(_.isUndefined(self.currentSong.title) ? 'songs.noCurrentSong' : 'songs.currentSong').replace('(title)', self.currentSong.title), {username: global.configuration.get().twitch.owner})
 }
 
 Songs.prototype.stealSongToPlaylist = function (self) {
