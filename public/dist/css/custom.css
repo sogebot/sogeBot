@@ -209,7 +209,7 @@ a.active {
 
 }
 
-.widget .widgetList {
+.widget .widgetList a {
   font-size: x-large;
 }
 
