@@ -127,7 +127,11 @@ Moderation.prototype.timeoutUser = function (sender, warning, msg, time) {
       }
     } else {
       global.botDB.insert({_id: 'warnings_' + sender.username, time: new Date().getTime().toString()})
-      global.commons.sendMessage(warning.replace('(value)', parseInt(warningsAllowed, 10) - 1), sender)
+      if (warningsTimeout) {
+        global.commons.timeout(sender.username, warning.replace('(value)', parseInt(warningsAllowed, 10) - 1), 1)
+      } else {
+        global.commons.sendMessage('@' + sender.username + ': ' + warning.replace('(value)', parseInt(warningsAllowed, 10) - 1), sender)
+      }
     }
   })
 }
