@@ -11,6 +11,7 @@ var Commons = require('./libs/commons')
 var User = require('./libs/user')
 var Panel = require('./libs/panel')
 var Stats = require('./libs/stats')
+var constants = require('./libs/constants')
 require('./libs/logging')
 
 global.parser = new Parser()
@@ -20,6 +21,9 @@ global.panel = new Panel()
 global.twitch = new Twitch()
 global.stats = new Stats()
 global.translate = require('./libs/translate')
+
+global.status = {'TMI': constants.DISCONNECTED,
+                 'API': constants.DISCONNECTED}
 
 require('./libs/permissions')
 
@@ -49,6 +53,19 @@ global.client.connect()
 
 global.client.on('connected', function (address, port) {
   global.client.color('Firebrick')
+  global.status.TMI = constants.CONNECTED
+})
+
+global.client.on('connecting', function (address, port) {
+  global.status.TMI = constants.CONNECTING
+})
+
+global.client.on('reconnect', function (address, port) {
+  global.status.TMI = constants.RECONNECTING
+})
+
+global.client.on('disconnected', function (address, port) {
+  global.status.TMI = constants.DISCONNECTED
 })
 
 global.client.on('chat', function (channel, user, message, fromSelf) {

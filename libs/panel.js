@@ -35,6 +35,7 @@ function Panel () {
     socket.on('getWidgetList', function () { self.sendWidgetList(self, socket) })
     socket.on('addWidget', function (widget, row) { self.addWidgetToDb(self, widget, row, socket) })
     socket.on('deleteWidget', function (widget) { self.deleteWidgetFromDb(self, widget) })
+    socket.on('getConnectionStatus', function () { socket.emit('connectionStatus', global.status) })
     socket.on('saveConfiguration', function (data) {
       _.each(data, function (index, value) {
         global.configuration.setValue(global.configuration, { username: global.configuration.get().username }, value + ' ' + index)
