@@ -69,7 +69,7 @@ global.client.on('disconnected', function (address, port) {
   global.status.TMI = constants.DISCONNECTED
 })
 
-global.client.on('chat', function (channel, user, message, fromSelf) {
+global.client.on('message', function (channel, user, message, fromSelf) {
   if (!fromSelf) {
     global.parser.parse(user, message)
   }
