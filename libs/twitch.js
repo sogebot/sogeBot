@@ -29,7 +29,7 @@ function Twitch () {
     global.client.api({
       url: 'https://api.twitch.tv/kraken/streams/' + global.configuration.get().twitch.owner,
       headers: {
-        'Client-ID': '1wjn1i3792t71tl90fmyvd0zl6ri2vg'
+        'Client-ID': global.configuration.get().twitch.clientId
       }
     }, function (err, res, body) {
       if (err) {
@@ -57,9 +57,42 @@ function Twitch () {
     })
 
     global.client.api({
+      url: 'https://api.twitch.tv/kraken/channels/' + global.configuration.get().twitch.owner + '/follows?direction=DESC&limit=1',
+      headers: {
+        'Client-ID': global.configuration.get().twitch.clientId
+      }
+    }, function (err, res, body) {
+      if (err) {
+        global.log.error(err)
+        return
+      }
+      if (res.statusCode === 200 && !_.isNull(body)) {
+        self.currentFollowers = body._total
+      }
+    })
+
+    // count watching time when stream is online
+    if (self.isOnline) {
+      User.getAllOnline().then(function (users) {
+        _.each(users, function (user) {
+          // add user as a new chatter in a stream
+          if (_.isUndefined(user.watchTime) || user.watchTime === 0) self.newChatters = self.newChatters + 1
+          var watchTime = 15000
+          if (!_.isUndefined(user.watchTime)) watchTime = watchTime + user.watchTime
+          user = new User(user.username)
+          user.isLoaded().then(function () {
+            user.set('watchTime', watchTime)
+          })
+        })
+      })
+    }
+  }, 15000)
+
+  setInterval(function () {
+    global.client.api({
       url: 'https://api.twitch.tv/kraken/channels/' + global.configuration.get().twitch.owner,
       headers: {
-        'Client-ID': '1wjn1i3792t71tl90fmyvd0zl6ri2vg'
+        'Client-ID': global.configuration.get().twitch.clientId
       }
     }, function (err, res, body) {
       if (err) {
@@ -89,36 +122,18 @@ function Twitch () {
     }
 
     global.client.api({
-      url: 'https://api.twitch.tv/kraken/channels/' + global.configuration.get().twitch.owner + '/follows?direction=DESC&limit=1',
+      url: 'https://api.twitch.tv/kraken',
       headers: {
-        'Client-ID': '1wjn1i3792t71tl90fmyvd0zl6ri2vg'
+        'Client-ID': global.configuration.get().twitch.clientId
       }
     }, function (err, res, body) {
       if (err) {
-        global.log.error(err)
+        global.status.API = constants.DISCONNECTED
         return
       }
-      if (res.statusCode === 200 && !_.isNull(body)) {
-        self.currentFollowers = body._total
-      }
+      global.status.API = res.statusCode === 200 ? constants.CONNECTED : constants.DISCONNECTED
     })
-
-    // count watching time when stream is online
-    if (self.isOnline) {
-      User.getAllOnline().then(function (users) {
-        _.each(users, function (user) {
-          // add user as a new chatter in a stream
-          if (_.isUndefined(user.watchTime) || user.watchTime === 0) self.newChatters = self.newChatters + 1
-          var watchTime = 15000
-          if (!_.isUndefined(user.watchTime)) watchTime = watchTime + user.watchTime
-          user = new User(user.username)
-          user.isLoaded().then(function () {
-            user.set('watchTime', watchTime)
-          })
-        })
-      })
-    }
-  }, 15000)
+  }, 60000)
 
   global.parser.register(this, '!uptime', this.uptime, constants.VIEWERS)
   global.parser.register(this, '!lastseen', this.lastseen, constants.VIEWERS)

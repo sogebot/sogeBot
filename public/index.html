@@ -97,6 +97,14 @@
       <span class="data"><span id="curFollowers">-</span></span>
       <span class="stats" id="curFollowersChange">&nbsp;</span>
     </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+      <h2>Status</h2>
+      <span class="data" style="font-weight: bold">
+        <span class="text-warning" id="APIStatus" title="API checking">API</span>
+        <span class="text-warning" id="TMIStatus" title="TMI checking">TMI</span>
+        <span class="text-warning" id="SOCStatus" title="SOC checking">SOC</span>
+      </span>
+    </div>
   </div>
 
   <div class="container-fluid">
@@ -143,6 +151,39 @@
     var loadedJS = []
     var loadedMenu = false
     var addingWidget = false
+
+    var setStatus = function (id, status) {
+      $("#" + id + "Status").removeClass()
+
+      if (id === 'SOC' && status === 0) {
+        $("[id$='Status']").removeClass()
+        $("[id$='Status']").addClass('text-muted')
+      }
+
+      switch (status) {
+        case 0:
+          $("#" + id + "Status").attr('title', id + ' disconnected')
+          $("#" + id + "Status").addClass('text-danger')
+          break;
+        case 1:
+          $("#" + id + "Status").attr('title', id + ' connecting')
+          $("#" + id + "Status").addClass('text-warning')
+          break;
+        case 2:
+          $("#" + id + "Status").attr('title', id + ' reconnecting')
+          $("#" + id + "Status").addClass('text-warning')
+        case 3:
+          $("#" + id + "Status").attr('title', id + ' connected')
+          $("#" + id + "Status").addClass('text-success')
+          break;
+      }
+    }
+    setInterval(function () { socket.emit('getConnectionStatus'); setStatus('SOC', socket.connected ? 3 : 0) }, 1000)
+    socket.on('connectionStatus', function (data) {
+      _.each(data, function (status, conn) {
+        setStatus(conn, status)
+      })
+    })
 
     /* MENU */
     socket.on('menu', function(menu) {
