@@ -53,7 +53,7 @@ global.translate().then(function () {
 global.client.connect()
 
 global.client.on('connected', function (address, port) {
-  global.client.color('Firebrick')
+  global.client.color(global.configuration.get().twitch.color)
   global.status.TMI = constants.CONNECTED
 })
 
