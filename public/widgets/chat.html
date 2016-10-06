@@ -18,7 +18,7 @@
     loadedJS.push('chat')
     socket.emit('getChatRoom');
     socket.on('chatRoom', function(room) {
-      $("#chatWidget").append('<iframe frameborder="0" scrolling="no" src="http://twitch.tv/' + room + '/chat?popout=" width="100%"></iframe>')
+      $("#chatWidget").html('<iframe frameborder="0" scrolling="no" src="http://twitch.tv/' + room + '/chat?popout=" width="100%"></iframe>')
     })
   }
 </script>
