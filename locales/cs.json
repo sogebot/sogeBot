@@ -212,11 +212,12 @@
       "parsePermit": "{core.command-parse} !permit [username]"
     },
     "warnings": {
-      "links": "Nejsou povoleny linky, pozadej o !permit [(value) zbyva varovani]",
-      "symbols": "Prilisne pouzivani symbolu neni povoleno [(value) zbyva varovani]",
-      "longMessage": "Tva zprava je prilis dlouha, [(value) zbyva varovani]",
-      "caps": "Prilisne pouzivani velkych pismen neni povoleno [(value) zbyva varovani]",
-      "spam": "Spamovani neni povoleno [(value) zbyva varovani]"
+      "links": "Nejsou povoleny linky, pozadej o !permit [zbyva (value) varovani]",
+      "symbols": "Prilisne pouzivani symbolu neni povoleno [zbyva (value) varovani]",
+      "longMessage": "Tva zprava je prilis dlouha, [zbyva (value) varovani]",
+      "caps": "Prilisne pouzivani velkych pismen neni povoleno [zbyva (value) varovani]",
+      "spam": "Spamovani neni povoleno [zbyva (value) varovani]",
+      "color": "Barvy a /me nejsou povoleny [zbyva (value) varovani]"
     },
     "settings": {
       "moderationLinks": "Moderovani linku je nastaveno na (value)",
@@ -233,6 +234,8 @@
       "moderationCapsTimeout": "Timeout pri pouziti celkych pismen je nastaven na (value)s",
       "moderationCapsTriggerLength": "Moderovani velkych pismen zapnuto od (value) poctu znaku",
       "moderationCapsMaxPercent": "Maximum velkych pismen v cele zprave je nastaveno na (value)%",
+      "moderationColor": "Moderovani barev (/me) je nastaveno na (value)",
+      "moderationColorTimeout": "Timeout pri pouziti barev (/me) je nastaven na (value)s",
       "moderationSpam": "Moderovani spamu je nastaveno na (value)",
       "moderationSpamTimeout": "Timeout pri spamovani je nastaven na (value)s",
       "moderationSpamTriggerLength": "Moderovani spamu zapnuto od (value) poctu znaku",

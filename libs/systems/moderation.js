@@ -14,6 +14,7 @@ function Moderation () {
     global.parser.registerParser(this, 'moderationLongMessage', this.longMessage, constants.VIEWERS)
     global.parser.registerParser(this, 'moderationCaps', this.caps, constants.VIEWERS)
     global.parser.registerParser(this, 'moderationSpam', this.spam, constants.VIEWERS)
+    global.parser.registerParser(this, 'moderationColor', this.color, constants.VIEWERS)
 
     global.configuration.register('moderationLinks', 'moderation.settings.moderationLinks', 'bool', true)
     global.configuration.register('moderationLinksTimeout', 'moderation.settings.moderationLinksTimeout', 'number', 120)
@@ -37,6 +38,9 @@ function Moderation () {
     global.configuration.register('moderationSpamTimeout', 'moderation.settings.moderationSpamTimeout', 'number', 300)
     global.configuration.register('moderationSpamTriggerLength', 'moderation.settings.moderationSpamTriggerLength', 'number', 15)
     global.configuration.register('moderationSpamMaxLength', 'moderation.settings.moderationSpamMaxLength', 'number', 15)
+
+    global.configuration.register('moderationColor', 'moderation.settings.moderationColor', 'bool', true)
+    global.configuration.register('moderationColorTimeout', 'moderation.settings.moderationColorTimeout', 'number', 120)
 
     global.configuration.register('moderationWarnings', 'moderation.settings.moderationWarnings', 'number', 0)
     global.configuration.register('moderationWarningsTimeouts', 'moderation.settings.moderationWarningsTimeouts', 'bool', true)
@@ -282,6 +286,22 @@ Moderation.prototype.spam = function (self, id, sender, text) {
     }
   }
   global.updateQueue(id, true)
+}
+
+
+Moderation.prototype.color = function (self, id, sender, text) {
+  var timeout = global.configuration.getValue('moderationColorTimeout')
+
+  if (!global.configuration.getValue('moderationColor')) {
+    global.updateQueue(id, true)
+    return
+  }
+
+  if (sender['message-type'] === 'action') {
+    global.updateQueue(id, false)
+    log.info(sender.username + ' [color] timeout: ' + text)
+    self.timeoutUser(sender, global.translate('moderation.warnings.color'), global.translate('moderation.color'), timeout)
+  } else global.updateQueue(id, true)
 }
 
 module.exports = new Moderation()

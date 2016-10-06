@@ -209,7 +209,35 @@
     </table>
   </div>
 </div>
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+  <div class="widget">
+    <div class="title">Colors</div>
+    <table class="table table-striped">
+      <tr>
+        <td><strong>Enabled</strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="moderationColor" onclick="commons.configEditable(this, '')" id="moderationColor"></abbr>
+          <div class="input-group" style="display:none;" id="input_moderationColor_group">
+            <input style="width: 6em" id="input_moderationColor" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Timeout duration</strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="moderationColorTimeout" onclick="commons.configEditable(this, 's')" id="moderationColorTimeout"></abbr>
+          <div class="input-group" style="display:none;" id="input_moderationColorTimeout_group">
+            <div class="input-group-addon">seconds</div>
+            <input style="width: 6em" id="input_moderationColorTimeout" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+</div>
 
+<div class="row">
 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
   <div class="widget">
     <div class="title">Warnings before timeout</div>
@@ -267,6 +295,9 @@
     $("#moderationSpamTimeout").text(data.moderationSpamTimeout + 's')
     $("#moderationSpamTriggerLength").text(data.moderationSpamTriggerLength)
     $("#moderationSpamMaxLength").text(data.moderationSpamMaxLength)
+
+    $("#moderationColor").text(data.moderationLinks)
+    $("#moderationColorTimeout").text(data.moderationLinksTimeout + 's')
 
     $("#moderationWarnings").text(data.moderationWarnings)
     $("#moderationWarningsTimeouts").text(data.moderationWarningsTimeouts)
