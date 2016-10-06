@@ -216,7 +216,8 @@
       "symbols": "No excessive symbols usage [(value) warnings left]",
       "longMessage": "Long messages are not allowed [(value) warnings left]",
       "caps": "No excessive caps usage [(value) warnings left]",
-      "spam": "Spamming is not allowed [(value) warnings left]"
+      "spam": "Spamming is not allowed [(value) warnings left]",
+      "color": "Colors and /me is not allowed [(value) warnings left]"
     },
     "settings": {
       "moderationLinks": "Moderation of links is set to (value)",
@@ -235,6 +236,8 @@
       "moderationCapsMaxPercent": "Maximum caps percentage in message set to (value)%",
       "moderationSpam": "Moderation of spam is set to (value)",
       "moderationSpamTimeout": "Timeout because of spam set to (value)s",
+      "moderationColor": "Moderation of colors (/me) is set to (value)",
+      "moderationColorTimeout": "Timeout because of colors (/me) usage set to (value)s",
       "moderationSpamTriggerLength": "Trigger message length for spam set to (value)",
       "moderationSpamMaxLength": "Maximum spam length in message set to (value)",
       "moderationWarnings": "User will be warned (value) times",
