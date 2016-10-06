@@ -100,6 +100,9 @@ Moderation.prototype.sendConfiguration = function (self, socket) {
     moderationSpamTriggerLength: global.configuration.getValue('moderationSpamTriggerLength'),
     moderationSpamMaxLength: global.configuration.getValue('moderationSpamMaxLength'),
 
+    moderationColor: global.configuration.getValue('moderationColor'),
+    moderationColorTimeouts: global.configuration.getValue('moderationColorTimeouts'),
+
     moderationWarnings: global.configuration.getValue('moderationWarnings'),
     moderationWarningsTimeouts: global.configuration.getValue('moderationWarningsTimeouts')
   })
@@ -287,7 +290,6 @@ Moderation.prototype.spam = function (self, id, sender, text) {
   }
   global.updateQueue(id, true)
 }
-
 
 Moderation.prototype.color = function (self, id, sender, text) {
   var timeout = global.configuration.getValue('moderationColorTimeout')
