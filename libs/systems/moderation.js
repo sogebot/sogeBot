@@ -101,7 +101,7 @@ Moderation.prototype.sendConfiguration = function (self, socket) {
     moderationSpamMaxLength: global.configuration.getValue('moderationSpamMaxLength'),
 
     moderationColor: global.configuration.getValue('moderationColor'),
-    moderationColorTimeouts: global.configuration.getValue('moderationColorTimeouts'),
+    moderationColorTimeout: global.configuration.getValue('moderationColorTimeout'),
 
     moderationWarnings: global.configuration.getValue('moderationWarnings'),
     moderationWarningsTimeouts: global.configuration.getValue('moderationWarningsTimeouts')
