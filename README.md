@@ -15,7 +15,7 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 #### Current features
 
 * custom bot name - you need twitch account for a bot
-* basic channel auto moderation
+* basic channel auto moderation - links, symbols, long messages, capitals, spam, colors, emotes
 * alias system
 * basic custom command support
 * keywords system
