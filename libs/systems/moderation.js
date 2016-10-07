@@ -64,7 +64,11 @@ function Moderation () {
               updatedTime.push(time)
             }
           }
-          global.botDB.update({_id: item._id}, {$set: {time: updatedTime.join(',')}})
+          if (updatedTime.length > 0) {
+            global.botDB.update({_id: item._id}, {$set: {time: updatedTime.join(',')}})
+          } else {
+            global.botDB.remove({_id: item._id})
+          }
         })
       })
     }, 600000)
