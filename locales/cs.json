@@ -202,22 +202,25 @@
     }
   },
   "moderation": {
-    "links": "Nejsou povoleny linky, pozadej o !permit",
+    "warning": "[zbyva (value) varovani]",
     "permit": "Uzivatel (who) muze nyni postnout link do chatu",
+    "links": "Nejsou povoleny linky, pozadej o !permit",
     "symbols": "Prilisne pouzivani symbolu neni povoleno",
     "longMessage": "Tva zprava je prilis dlouha",
     "caps": "Prilisne pouzivani velkych pismen neni povoleno",
     "spam": "Spamovani neni povoleno",
+    "emotes": "Zadne spamovani smajlikama!",
     "failed": {
       "parsePermit": "{core.command-parse} !permit [username]"
     },
     "warnings": {
-      "links": "Nejsou povoleny linky, pozadej o !permit [zbyva (value) varovani]",
-      "symbols": "Prilisne pouzivani symbolu neni povoleno [zbyva (value) varovani]",
-      "longMessage": "Tva zprava je prilis dlouha, [zbyva (value) varovani]",
-      "caps": "Prilisne pouzivani velkych pismen neni povoleno [zbyva (value) varovani]",
-      "spam": "Spamovani neni povoleno [zbyva (value) varovani]",
-      "color": "Barvy a /me nejsou povoleny [zbyva (value) varovani]"
+      "links": "{moderation.links} {moderation.warning}",
+      "symbols": "{moderation.symbols} {moderation.warning}",
+      "longMessage": "{moderation.longMessage} {moderation.warning}",
+      "caps": "{moderation.caps} {moderation.warning}",
+      "spam": "{moderation.spam} {moderation.warning}",
+      "color": "{moderation.color} {moderation.warning}",
+      "emotes": "{moderation.emotes} {moderation.warning}"
     },
     "settings": {
       "moderationLinks": "Moderovani linku je nastaveno na (value)",
@@ -240,17 +243,11 @@
       "moderationSpamTimeout": "Timeout pri spamovani je nastaven na (value)s",
       "moderationSpamTriggerLength": "Moderovani spamu zapnuto od (value) poctu znaku",
       "moderationSpamMaxLength": "Maximalni delka spamu je nastavena na (value)",
+      "moderationEmotes": "Moderovani smajliku je nastaveno na (value)",
+      "moderationEmotesTimeout": "Timeout pri spamovani smnajliku je nastaven na (value)s",
+      "moderationEmotesMaxCount": "Maximalni pocet smajliky ku ve jedne zprave je nastaveno na (value)",
       "moderationWarnings": "Uzivatel bude (value)x varovan, nez dostane timeout",
       "moderationWarningsTimeouts": "Uzivatel bude varovan i s timeoutem - (value)"
-    }
-  },
-  "settings": {
-    "command": {
-      "disable": "Prikaz !(command) byl vypnut",
-      "disableParse": "{core.command-parse} !disable [command]",
-      "notDisabled": "Prikaz !(command) nebyl vypnut, tudiz ho nelze zapnout",
-      "enable": "Prikaz !(command) byl zapnut",
-      "enableParse": "{core.command-parse} !enable [command]"
     }
   }
 }

@@ -15,6 +15,7 @@ function Moderation () {
     global.parser.registerParser(this, 'moderationCaps', this.caps, constants.VIEWERS)
     global.parser.registerParser(this, 'moderationSpam', this.spam, constants.VIEWERS)
     global.parser.registerParser(this, 'moderationColor', this.color, constants.VIEWERS)
+    global.parser.registerParser(this, 'moderationEmotes', this.emotes, constants.VIEWERS)
 
     global.configuration.register('moderationLinks', 'moderation.settings.moderationLinks', 'bool', true)
     global.configuration.register('moderationLinksTimeout', 'moderation.settings.moderationLinksTimeout', 'number', 120)
@@ -41,6 +42,10 @@ function Moderation () {
 
     global.configuration.register('moderationColor', 'moderation.settings.moderationColor', 'bool', true)
     global.configuration.register('moderationColorTimeout', 'moderation.settings.moderationColorTimeout', 'number', 120)
+
+    global.configuration.register('moderationEmotes', 'moderation.settings.moderationEmotes', 'bool', true)
+    global.configuration.register('moderationEmotesTimeout', 'moderation.settingsmoderationEmotesTimeout', 'number', 120)
+    global.configuration.register('moderationEmotesMaxCount', 'moderation.settings.moderationEmotesMaxCount', 'number', 15)
 
     global.configuration.register('moderationWarnings', 'moderation.settings.moderationWarnings', 'number', 0)
     global.configuration.register('moderationWarningsTimeouts', 'moderation.settings.moderationWarningsTimeouts', 'bool', true)
@@ -102,6 +107,10 @@ Moderation.prototype.sendConfiguration = function (self, socket) {
 
     moderationColor: global.configuration.getValue('moderationColor'),
     moderationColorTimeout: global.configuration.getValue('moderationColorTimeout'),
+
+    moderationEmotes: global.configuration.getValue('moderationEmotes'),
+    moderationEmotesTimeout: global.configuration.getValue('moderationEmotesTimeout'),
+    moderationEmotesMaxCount: global.configuration.getValue('moderationEmotesMaxCount'),
 
     moderationWarnings: global.configuration.getValue('moderationWarnings'),
     moderationWarningsTimeouts: global.configuration.getValue('moderationWarningsTimeouts')
@@ -294,7 +303,7 @@ Moderation.prototype.spam = function (self, id, sender, text) {
 Moderation.prototype.color = function (self, id, sender, text) {
   var timeout = global.configuration.getValue('moderationColorTimeout')
 
-  if (!global.configuration.getValue('moderationColor')) {
+  if (global.parser.isOwner(sender) || !global.configuration.getValue('moderationColor')) {
     global.updateQueue(id, true)
     return
   }
@@ -303,6 +312,27 @@ Moderation.prototype.color = function (self, id, sender, text) {
     global.updateQueue(id, false)
     log.info(sender.username + ' [color] timeout: ' + text)
     self.timeoutUser(sender, global.translate('moderation.warnings.color'), global.translate('moderation.color'), timeout)
+  } else global.updateQueue(id, true)
+}
+
+Moderation.prototype.emotes = function (self, id, sender, text) {
+  var timeout = global.configuration.getValue('moderationSpamTimeout')
+  var maxCount = global.configuration.getValue('moderationEmotesMaxCount')
+  var count = 0
+
+  if (global.parser.isOwner(sender) || !global.configuration.getValue('moderationEmotes')) {
+    global.updateQueue(id, true)
+    return
+  }
+
+  _.each(sender['emotes'], function (value, index) {
+    count = count + value.length
+  })
+
+  if (count > maxCount) {
+    global.updateQueue(id, false)
+    log.info(sender.username + ' [emotes] timeout: ' + text)
+    self.timeoutUser(sender, global.translate('moderation.warnings.emotes'), global.translate('moderation.emotes'), timeout)
   } else global.updateQueue(id, true)
 }
 

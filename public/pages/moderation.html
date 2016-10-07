@@ -240,6 +240,41 @@
 <div class="row">
 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
   <div class="widget">
+    <div class="title">Emotes</div>
+    <table class="table table-striped">
+      <tr>
+        <td><strong>Enabled</strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="moderationEmotes" onclick="commons.configEditable(this, '')" id="moderationEmotes"></abbr>
+          <div class="input-group" style="display:none;" id="input_moderationEmotes_group">
+            <input style="width: 6em" id="input_moderationEmotes" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Timeout duration</strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="moderationEmotesTimeout" onclick="commons.configEditable(this, 's')" id="moderationEmotesTimeout"></abbr>
+          <div class="input-group" style="display:none;" id="input_moderationEmotesTimeout_group">
+            <div class="input-group-addon">seconds</div>
+            <input style="width: 6em" id="input_moderationEmotesTimeout" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Max emotes in message</strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="moderationEmotesMaxCount" onclick="commons.configEditable(this, '')" id="moderationEmotesMaxCount"></abbr>
+          <div class="input-group" style="display:none;" id="input_moderationEmotesMaxCount_group">
+            <input style="width: 6em" id="input_moderationEmotesMaxCount" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+  <div class="widget">
     <div class="title">Warnings before timeout</div>
     <table class="table table-striped">
       <tr>
@@ -298,6 +333,10 @@
 
     $("#moderationColor").text(data.moderationColor)
     $("#moderationColorTimeout").text(data.moderationColorTimeout + 's')
+
+    $("#moderationEmotes").text(data.moderationEmotes)
+    $("#moderationEmotesTimeout").text(data.moderationEmotesTimeout + 's')
+    $("#moderationEmotesMaxCount").text(data.moderationEmotesMaxCount)
 
     $("#moderationWarnings").text(data.moderationWarnings)
     $("#moderationWarningsTimeouts").text(data.moderationWarningsTimeouts)
