@@ -16,10 +16,13 @@ function Stats () {
 
 Stats.prototype.webPanel = function () {
   global.panel.addMenu({category: 'main', name: 'Stats', id: 'stats'})
+  global.panel.addMenu({category: 'main', name: 'Viewers', id: 'viewers'})
   global.panel.socketListening(this, 'getLatestStats', this.getLatestStats)
   global.panel.socketListening(this, 'getStatsData', this.getStatsData)
   global.panel.socketListening(this, 'getCalendarData', this.getCalendarData)
   global.panel.socketListening(this, 'getStreamEvents', this.getStreamEvents)
+  global.panel.socketListening(this, 'getViewers', this.getViewers)
+  global.panel.socketListening(this, 'deleteViewer', this.deleteViewer)
 }
 
 Stats.prototype.save = function (data) {
@@ -27,6 +30,18 @@ Stats.prototype.save = function (data) {
     statsDB.update({ _id: data.whenOnline }, { $push: { stats: data } }, { upsert: true }, function () {})
     this.latestTimestamp = data.timestamp
   }
+}
+
+Stats.prototype.getViewers = function (self, socket) {
+  global.botDB.find({$where: function () { return this._id.startsWith('user') }}, function (err, items) {
+    if (err) { global.log.error(err) }
+    socket.emit('Viewers', items)
+  })
+}
+
+Stats.prototype.deleteViewer = function (self, socket, data) {
+  global.botDB.remove({ _id: 'user_' + data })
+  self.getViewers(self, socket)
 }
 
 Stats.prototype.getStreamEvents = function (self, socket, data) {
