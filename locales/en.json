@@ -202,22 +202,26 @@
     }
   },
   "moderation": {
-    "links": "No links allowed, ask for !permit",
+    "warning": "[(value) warnings left]",
     "permit": "User (who) can post a link to chat",
+    "links": "No links allowed, ask for !permit",
     "symbols": "No excessive symbols usage",
     "longMessage": "Long messages are not allowed",
     "caps": "No excessive caps usage",
     "spam": "Spamming is not allowed",
+    "color": "Colors and /me is not allowed",
+    "emotes": "No emotes spamming!",
     "failed": {
       "parsePermit": "{core.command-parse} !permit [username]"
     },
     "warnings": {
-      "links": "No links allowed, ask for !permit [(value) warnings left]",
-      "symbols": "No excessive symbols usage [(value) warnings left]",
-      "longMessage": "Long messages are not allowed [(value) warnings left]",
-      "caps": "No excessive caps usage [(value) warnings left]",
-      "spam": "Spamming is not allowed [(value) warnings left]",
-      "color": "Colors and /me is not allowed [(value) warnings left]"
+      "links": "{moderation.links} {moderation.warning}",
+      "symbols": "{moderation.symbols} {moderation.warning}",
+      "longMessage": "{moderation.longMessage} {moderation.warning}",
+      "caps": "{moderation.caps} {moderation.warning}",
+      "spam": "{moderation.spam} {moderation.warning}",
+      "color": "{moderation.color} {moderation.warning}",
+      "emotes": "{moderation.emotes} {moderation.warning}"
     },
     "settings": {
       "moderationLinks": "Moderation of links is set to (value)",
@@ -236,21 +240,15 @@
       "moderationCapsMaxPercent": "Maximum caps percentage in message set to (value)%",
       "moderationSpam": "Moderation of spam is set to (value)",
       "moderationSpamTimeout": "Timeout because of spam set to (value)s",
-      "moderationColor": "Moderation of colors (/me) is set to (value)",
-      "moderationColorTimeout": "Timeout because of colors (/me) usage set to (value)s",
       "moderationSpamTriggerLength": "Trigger message length for spam set to (value)",
       "moderationSpamMaxLength": "Maximum spam length in message set to (value)",
+      "moderationColor": "Moderation of colors (/me) is set to (value)",
+      "moderationColorTimeout": "Timeout because of colors (/me) usage set to (value)s",
+      "moderationEmotes": "Moderation of emotes is set to (value)",
+      "moderationEmotesTimeout": "Timeout because of emotes spamming set to (value)s",
+      "moderationEmotesMaxCount": "Maximum count of emotes in one messages set to (value)",
       "moderationWarnings": "User will be warned (value) times",
       "moderationWarningsTimeouts": "User will be warned with timeout - (value)"
-    }
-  },
-  "settings": {
-    "command": {
-      "disable": "Command !(command) was disabled",
-      "disableParse": "{core.command-parse} !disable [command]",
-      "notDisabled": "Command !(command) was not disabled before, not needed to enable it",
-      "enable": "Command !(command) was enabled",
-      "enableParse": "{core.command-parse} !enable [command]"
     }
   }
 }
