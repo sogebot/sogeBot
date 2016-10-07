@@ -64,4 +64,38 @@ User.getAllOnline = function () {
   })
 }
 
+User.deleteFollowers = function () {
+  return new Promise(function (resolve, reject) {
+    global.botDB.update({ $where: function () { return this._id.startsWith('user') } }, { $set: { isFollower: false } }, function (err, numUpdated) {
+      if (err) reject(err)
+      resolve(numUpdated)
+    })
+  })
+}
+
+User.updateFollowers = function () {
+  var makeRequest = function (cursor) {
+    global.client.api({
+      url: 'https://api.twitch.tv/kraken/channels/' + global.configuration.get().twitch.owner + '/follows?limit=100' + (!_.isUndefined(cursor) ? '&cursor=' + cursor : ''),
+      headers: {
+        'Client-ID': global.configuration.get().twitch.clientId
+      }
+    }, function (err, res, body) {
+      if (err) {
+        global.log.error(err)
+        return
+      }
+      if (res.statusCode === 200 && !_.isNull(body) && body.follows.length > 0) {
+        _.each(body.follows, function (follower) {
+          var user = new User(follower.user.name)
+          user.set('isFollower', true)
+        })
+        makeRequest(body._cursor)
+      }
+    })
+  }
+
+  User.deleteFollowers().then(makeRequest())
+}
+
 module.exports = User
