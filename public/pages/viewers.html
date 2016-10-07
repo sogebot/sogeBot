@@ -1,0 +1,62 @@
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+  <div class="widget">
+    <div class="title">Viewers</div>
+    <table class="table table-striped table-responsive table-condensed">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Follower</th>
+          <th>Currently on Stream</th>
+          <th>Last Seen</th>
+          <th>Watched Time</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="Users">
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  var viewers = {
+    update: function (list) {
+      $("#Users").empty()
+      _.each(list, function(item, index) {
+        $("#Users").append('<tr>' +
+          '<td>' + item.username + '</td>' +
+          '<td>' + viewers.styleBool(item.isFollower) + '</td>' +
+          '<td>' + viewers.styleBool(item.isOnline) + '</td>' +
+          '<td>' + viewers.getDateString(item.lastMessageTime) + '</td>' +
+          '<td>' + viewers.styleWatched(item.watchTime) + '</td>' +
+          '<td class="tableMenu"><button type="button" class="btn btn-danger btn-xs" data-username="' + item.username + '" onclick="viewers.delete(this)">[x] Delete</button></td>' +
+          '</tr>');
+      })
+    },
+    styleBool: function (bool) {
+      return '<strong style="font-size: x-large" class="text-' + (bool ? 'success' : 'danger') + '">' + (bool ? 'YES' : 'NO') + '</strong>'
+    },
+    getDateString: function (timestamp) {
+      if (_.isUndefined(timestamp)) return 'never seen in chat'
+      else {
+        d = new Date(timestamp)
+        return ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
+        d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+      }
+    },
+    styleWatched: function (timestamp) {
+      if (_.isUndefined(timestamp)) timestamp = 0
+      return (timestamp / 1000 / 60 / 60).toFixed(1) + 'h'
+    },
+    delete: function (el) {
+      socket.emit('deleteViewer', el.dataset.username)
+    }
+  }
+
+  socket.emit('getViewers')
+
+  socket.off('Viewers')
+  socket.on('Viewers', function(list) {
+    viewers.update(list)
+  });
+</script>
