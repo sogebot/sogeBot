@@ -1,14 +1,14 @@
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
   <div class="widget">
     <div class="title">Viewers</div>
-    <table class="table table-striped table-responsive table-condensed">
+    <table id="UsersTableSortable" class="table table-striped table-responsive table-condensed sortable-theme-bootstrap" data-sortable>
       <thead>
         <tr>
           <th>Username</th>
           <th>Follower</th>
           <th>Currently on Stream</th>
-          <th>Last Seen</th>
-          <th>Watched Time</th>
+          <th data-sortable-type="numeric">Last Seen</th>
+          <th data-sortable-type="numeric">Watched Time</th>
           <th></th>
         </tr>
       </thead>
@@ -27,8 +27,8 @@
           '<td>' + item.username + '</td>' +
           '<td>' + viewers.styleBool(item.isFollower) + '</td>' +
           '<td>' + viewers.styleBool(item.isOnline) + '</td>' +
-          '<td>' + viewers.getDateString(item.lastMessageTime) + '</td>' +
-          '<td>' + viewers.styleWatched(item.watchTime) + '</td>' +
+          '<td data-value=' + (_.isUndefined(item.lastMessageTime) ? 0 : item.lastMessageTime) + '>' + viewers.getDateString(item.lastMessageTime) + '</td>' +
+          '<td data-value=' + (_.isUndefined(item.watchTime) ? 0 : item.watchTime) + '>' + viewers.styleWatched(item.watchTime) + '</td>' +
           '<td class="tableMenu"><button type="button" class="btn btn-danger btn-xs" data-username="' + item.username + '" onclick="viewers.delete(this)">[x] Delete</button></td>' +
           '</tr>');
       })
@@ -59,4 +59,6 @@
   socket.on('Viewers', function(list) {
     viewers.update(list)
   });
+
+  Sortable.initTable(document.querySelector('#UsersTableSortable'))
 </script>
