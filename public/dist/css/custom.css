@@ -201,7 +201,8 @@ a.active {
 }
 
 .widget .title ~ .controls .dropdown {
-  top: -55px;
+  margin-top: -55px;
+  float:left;
 }
 
 .widget .controls .not-active {
@@ -250,6 +251,15 @@ a.active {
 }
 #chatWidget iframe {
   height: 600px;
+}
+
+.progress {
+  height: 5px !important;
+  z-index: 9999;
+}
+
+#YTPlayer {
+  display: none;
 }
 
 /* PAGES */
