@@ -2,6 +2,7 @@
   <div class="title">YouTube Player</div>
   <div class="controls">
     <div class="dropdown">
+      <a id="YTControl" ><span class="glyphicon glyphicon-play text-success"></span></a>
       <a id="YTMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
         <span class="glyphicon glyphicon-option-vertical text-muted"></span>
       </a>
@@ -11,6 +12,10 @@
     </div>
   </div>
   <div id="YTPlayer"></div>
+  <div id="video-title"></div>
+  <div class="progress">
+    <div class="progress-bar progress-bar-danger" id="youtube-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+  </div>
   <div class="text-center">
     <button type="button" class="btn btn-success btn-sm pull-left" onclick="stealToPlaylist()">Steal to Playlist</button>
     <button type="button" class="btn btn-default btn-sm" onclick="skipSong()">Skip Song</button>
@@ -23,6 +28,7 @@
     loadedJS.push('ytplayer')
     var player, time_update_interval;
     var loading = false
+    var progressUpdate = null
 
     function stealToPlaylist () {
       socket.emit('stealSong')
@@ -38,14 +44,9 @@
 
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('YTPlayer', {
-        width: '100%',
-        height: 315,
+        width: 0,
+        height: 0,
         videoId: '',
-        playerVars: {
-          controls: 2,
-          fs: 0,
-          color: 'white'
-        },
         events: {
           onReady: initialize,
           onStateChange: onPlayerStateChange
@@ -89,6 +90,8 @@
       data = {
         'videoId': video.videoID
       }
+
+      $("#video-title").html(video.title)
       if (typeof video.startTime !== 'undefined') data.startSeconds = video.startTime
       if (typeof video.endTime !== 'undefined') data.endSeconds = video.endTime
       player.loadVideoById(data);
@@ -98,10 +101,36 @@
       setTimeout(function() {
         loading = false
       }, 10000)
+
+      progressUpdate = setInterval(function() {
+        var duration = player.getDuration()
+        var played = player.getCurrentTime()
+
+        var percentage = played / (duration / 100)
+
+        if (!_.isFinite(percentage)) percentage = 0
+        else percentage = Math.floor(percentage)
+        $("#youtube-progress").css('width', percentage + '%')
+      }, 1000)
     });
   } else {
     $('#YTPlayer').text('Refresh your browser to use YouTube Player')
   }
+
+  $("#YTControl").on('click', function() {
+    $("#YTControl span").removeClass()
+    if (player.getPlayerState() === YT.PlayerState.PAUSED) {
+      player.playVideo()
+      $("#YTControl span").addClass('glyphicon glyphicon-play text-success')
+    } else {
+      player.pauseVideo()
+      $("#YTControl span").addClass('glyphicon glyphicon-pause text-danger')
+    }
+  })
+
+  $(".progress").on('click', function(e) {
+    player.seekTo(player.getDuration() / 100 * (Math.floor(e.offsetX * 100 / this.offsetWidth)))
+  })
 </script>
 
 <!-- YTPlayer -->
