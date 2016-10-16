@@ -91,7 +91,7 @@
       if (typeof video.endTime !== 'undefined') data.endSeconds = video.endTime
       player.loadVideoById(data);
       player.setVolume(video.volume)
-      player.setPlaybackQuality('large') // set playback to 480p
+      player.setPlaybackQuality('small') // set playback to lowest possible
       player.playVideo();
       setTimeout(function() {
         loading = false
