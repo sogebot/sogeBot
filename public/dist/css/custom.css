@@ -157,7 +157,8 @@ a.active {
 
 /* WIDGETS */
 .widgets .dropdown-menu {
-  left: -120px;
+  left: -88px;
+  top: 50px;
 }
 
 .widgets {
@@ -189,7 +190,6 @@ a.active {
   font-size: 18px;
   border-bottom: 1px dotted #ddd;
   padding: 5px;
-  margin-bottom: 20px;
 }
 
 .widget .controls {
@@ -198,6 +198,11 @@ a.active {
   font-size: 25px;
   cursor: pointer;
   z-index: 10;
+  line-height: 70px;
+}
+
+.widget div:nth-of-type(3) {
+  margin-top: 10px;
 }
 
 .widget .title ~ .controls .dropdown {

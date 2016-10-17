@@ -2,6 +2,7 @@
   <div class="title">Latest Clips</div>
   <div class="controls">
     <div class="dropdown">
+      <a data-id="clips-widget" onclick="commons.minimize(this)"><span class="glyphicon glyphicon-resize-small text-muted"></span></a>
       <a id="SRMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
         <span class="glyphicon glyphicon-option-vertical text-muted"></span>
       </a>
@@ -10,9 +11,11 @@
       </ul>
     </div>
   </div>
-    <table class="table table-striped table-responsive table-condensed">
-      <tbody id="ClipsWidget"></tbody>
-    </table>
+    <div id="clips-widget">
+      <table class="table table-striped table-responsive table-condensed">
+        <tbody id="ClipsWidget"></tbody>
+      </table>
+    </div>
 </div>
 
 <script>

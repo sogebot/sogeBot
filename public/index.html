@@ -329,6 +329,17 @@
         return ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
             d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
       },
+      minimize: function (el) {
+        var toMinimize = el.dataset.id
+        $(el).children().removeClass()
+        if ($("#" + toMinimize).css('display') === 'none') {
+          $(el).children().addClass('glyphicon glyphicon-resize-small text-muted')
+          $("#" + toMinimize).css('display', 'block')
+        } else {
+          $(el).children().addClass('glyphicon glyphicon-resize-full text-muted')
+          $("#" + toMinimize).css('display', 'none')
+        }
+      },
       configEditable: function(el, suffix) {
         var $inputGroup = $('#input_' + el.dataset.configId + '_group')
         var $input = $('#input_' + el.dataset.configId)

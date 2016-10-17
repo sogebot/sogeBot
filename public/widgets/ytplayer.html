@@ -2,24 +2,27 @@
   <div class="title">YouTube Player</div>
   <div class="controls">
     <div class="dropdown">
+      <a data-id="ytplayer-widget" onclick="commons.minimize(this)"><span class="glyphicon glyphicon-resize-small text-muted"></span></a>
       <a id="YTControl" ><span class="glyphicon glyphicon-pause text-danger"></span></a>
       <a id="YTMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
         <span class="glyphicon glyphicon-option-vertical text-muted"></span>
       </a>
-      <ul style="left: -88px;" class="dropdown-menu" aria-labelledby="YTMenu">
+      <ul style="left: -57px;" class="dropdown-menu" aria-labelledby="YTMenu">
         <li><a href="#" onclick="deleteWidget('ytplayer')" style="color: #a94442;">Delete widget</a></li>
       </ul>
     </div>
   </div>
-  <div id="YTPlayer"></div>
-  <div id="video-title"></div>
-  <div class="progress">
-    <div class="progress-bar progress-bar-danger" id="youtube-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
-  </div>
-  <div class="text-center">
-    <button type="button" class="btn btn-success btn-sm pull-left" onclick="stealToPlaylist()">Steal to Playlist</button>
-    <button type="button" class="btn btn-default btn-sm" onclick="skipSong()">Skip Song</button>
-    <button type="button" class="btn btn-danger btn-sm pull-right" onclick="banSong()">Ban Song</button>
+  <div id="ytplayer-widget">
+    <div id="YTPlayer"></div>
+    <div id="video-title"></div>
+    <div class="progress">
+      <div class="progress-bar progress-bar-danger" id="youtube-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+    </div>
+    <div class="text-center">
+      <button type="button" class="btn btn-success btn-sm pull-left" onclick="stealToPlaylist()">Steal to Playlist</button>
+      <button type="button" class="btn btn-default btn-sm" onclick="skipSong()">Skip Song</button>
+      <button type="button" class="btn btn-danger btn-sm pull-right" onclick="banSong()">Ban Song</button>
+    </div>
   </div>
 </div>
 
