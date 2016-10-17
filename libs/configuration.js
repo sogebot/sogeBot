@@ -6,8 +6,6 @@ var Database = require('nedb')
 var constants = require('./constants')
 var _ = require('lodash')
 
-var log = global.log
-
 global.botDB = new Database({
   filename: 'sogeBot.db',
   autoload: true
