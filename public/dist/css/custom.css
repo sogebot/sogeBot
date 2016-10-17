@@ -268,6 +268,15 @@ a.active {
   font-weight: bold;
 }
 
+#soundboard-widget {
+  text-align:center;
+}
+
+#soundboard-widget button {
+  margin: 5px;
+  font-weight: bold;
+}
+
 /* PAGES */
 .pages-wrapper {
   position: absolute;
