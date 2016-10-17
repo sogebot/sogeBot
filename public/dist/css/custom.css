@@ -245,7 +245,7 @@ a.active {
   line-height: 10px;
 }
 
-/* widgets heights */
+/* WIDGETS */
 #twitchVideoWidget iframe {
   height: 315px;
 }
@@ -260,6 +260,12 @@ a.active {
 
 #YTPlayer {
   display: none;
+}
+
+#video-title {
+  padding-bottom: 10px;
+  font-size: small;
+  font-weight: bold;
 }
 
 /* PAGES */
