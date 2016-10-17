@@ -49,6 +49,9 @@ global.translate().then(function () {
   global.systems = require('auto-load')('./libs/systems/')
 })
 
+// load widgets
+require('auto-load')('./libs/widgets/')
+
 // Connect the client to the server..
 global.client.connect()
 

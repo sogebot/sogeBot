@@ -1,0 +1,33 @@
+<div class="widget">
+  <div class="title">SoundBoard</div>
+  <div class="controls">
+    <div class="dropdown">
+      <a id="ChatMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        <span class="glyphicon glyphicon-option-vertical text-muted"></span>
+      </a>
+      <ul class="dropdown-menu" aria-labelledby="ChatMenu">
+        <li><a href="#" onclick="deleteWidget('soundboard')" style="color: #a94442;">Delete widget</a></li>
+      </ul>
+    </div>
+  </div>
+  <div id="soundboard-widget"></div>
+</div>
+
+<script>
+  var soundboard = {
+    play: function (el) {
+      var sound = el.dataset.sound
+      new Audio('dist/soundboard/' + sound + '.mp3').play()
+    }
+  }
+
+  socket.emit('getSoundBoardSounds')
+
+  socket.off('soundBoardSounds')
+  socket.on('soundBoardSounds', function (sounds) {
+    $("#soundboard-widget").empty()
+    _.each(sounds, function (sound) {
+      $("#soundboard-widget").append('<button onclick="soundboard.play(this)" data-sound="' + sound + '" type="button" class="btn btn-default">' + sound + '</button>')
+    })
+  })
+</script>

@@ -32,6 +32,7 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 * **auto volume normalization** of videos played through songs system
 * **trimming** music videos in playlist
 * **WebPanel**
+* soundboard widget - place your mp3s to /public/dist/soundboard/ to customize
 * _more to come_
 
 #### Prerequisites
