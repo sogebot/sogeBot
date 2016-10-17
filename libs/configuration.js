@@ -57,21 +57,21 @@ Configuration.prototype.setValue = function (self, sender, text) {
     } else if (filter === 'string' && value.trim().length > 0) {
       if (cmd === 'lang') {
         self.cfgL[cmd].value = value.trim()
-        global.commons.sendMessage(global.translate('core.lang-selected'))
+        global.commons.sendMessage(global.translate('core.lang-selected'), sender)
         data.success = function () { return true }
       }
       data[cmd] = value.trim()
       global.commons.updateOrInsert(data)
       self.cfgL[cmd].value = data[cmd]
-    } else global.commons.sendMessage('Sorry, ' + sender.username + ', cannot parse !set command.')
+    } else global.commons.sendMessage('Sorry, (sender), cannot parse !set command.', sender)
   } catch (err) {
-    global.commons.sendMessage('Sorry, ' + sender.username + ', cannot parse !set command.')
+    global.commons.sendMessage('Sorry, (sender), cannot parse !set command.', sender)
   }
 }
 
 Configuration.prototype.listSets = function (self, sender, text) {
   var setL = Object.keys(self.cfgL).map(function (item) { return item }).join(', ')
-  global.commons.sendMessage(setL.length === 0 ? 'Sorry, ' + sender.username + ', you cannot configure anything' : 'List of possible settings: ' + setL)
+  global.commons.sendMessage(setL.length === 0 ? 'Sorry, (sender), you cannot configure anything' : 'List of possible settings: ' + setL, sender)
 }
 
 Configuration.prototype.getValue = function (cfgName) {
