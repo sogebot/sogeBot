@@ -44,6 +44,4 @@ BetsWidget.prototype.removeBetTemplate = function (self, socket, options) {
   global.botDB.update({ _id: 'bets_template' }, { $pull: { options: options } }, {})
 }
 
-
-
 module.exports = new BetsWidget()
