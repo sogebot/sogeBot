@@ -2,7 +2,7 @@
   <div class="title">YouTube Player</div>
   <div class="controls">
     <div class="dropdown">
-      <a id="YTControl" ><span class="glyphicon glyphicon-play text-success"></span></a>
+      <a id="YTControl" ><span class="glyphicon glyphicon-pause text-danger"></span></a>
       <a id="YTMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
         <span class="glyphicon glyphicon-option-vertical text-muted"></span>
       </a>
@@ -121,10 +121,10 @@
     $("#YTControl span").removeClass()
     if (player.getPlayerState() === YT.PlayerState.PAUSED) {
       player.playVideo()
-      $("#YTControl span").addClass('glyphicon glyphicon-play text-success')
+      $("#YTControl span").addClass('glyphicon glyphicon-pause text-danger')
     } else {
       player.pauseVideo()
-      $("#YTControl span").addClass('glyphicon glyphicon-pause text-danger')
+      $("#YTControl span").addClass('glyphicon glyphicon-play text-success')
     }
   })
 
