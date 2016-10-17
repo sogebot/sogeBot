@@ -71,7 +71,10 @@
 
     output = '<ul class="streamEvents text-center">'
     _.each(data, function (values) {
-      output = output + '<li><button class="btn btn-link btn-lg" onclick="getGraphData(\'' + values._id + '\')">' + getDateString(new Date(values._id)) + '</button></li>'
+      output = output + '<li><div style="margin-top: 10px;" class="btn-group" role="group">' +
+          '<button class="btn btn-default" onclick="getGraphData(\'' + values._id + '\')">' + getDateString(new Date(values._id)) + '</button>' +
+          '<button type="button" class="btn btn-danger" onclick="removeStats(this)" data-id="' + values._id + '"><span class="glyphicon glyphicon-trash"></span></button>' +
+        '</div></li>'
     })
     output = output + '</ul>'
 
@@ -234,5 +237,10 @@
     };
     $("#gameChart").empty()
     chart.draw(dataTable, options);
+  }
+
+  function removeStats(el) {
+    socket.emit('removeStatsData', el.dataset.id)
+    $(el).parent().css('display', 'none')
   }
 </script>
