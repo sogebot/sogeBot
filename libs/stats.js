@@ -19,6 +19,7 @@ Stats.prototype.webPanel = function () {
   global.panel.addMenu({category: 'main', name: 'Viewers', id: 'viewers'})
   global.panel.socketListening(this, 'getLatestStats', this.getLatestStats)
   global.panel.socketListening(this, 'getStatsData', this.getStatsData)
+  global.panel.socketListening(this, 'removeStatsData', this.removeStatsData)
   global.panel.socketListening(this, 'getCalendarData', this.getCalendarData)
   global.panel.socketListening(this, 'getStreamEvents', this.getStreamEvents)
   global.panel.socketListening(this, 'getViewers', this.getViewers)
@@ -56,6 +57,10 @@ Stats.prototype.getStatsData = function (self, socket, data) {
     if (err) global.log.error(err)
     socket.emit('statsData', item)
   })
+}
+
+Stats.prototype.removeStatsData = function (self, socket, data) {
+  statsDB.remove({ _id: data })
 }
 
 Stats.prototype.getCalendarData = function (self, socket, data) {
