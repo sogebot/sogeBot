@@ -2,6 +2,7 @@
   <div class="title">Song Requests</div>
   <div class="controls">
     <div class="dropdown">
+      <a data-id="songrequest-widget" onclick="commons.minimize(this)"><span class="glyphicon glyphicon-resize-small text-muted"></span></a>
       <a id="SRMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
         <span class="glyphicon glyphicon-option-vertical text-muted"></span>
       </a>
@@ -10,7 +11,9 @@
       </ul>
     </div>
   </div>
-  <table id="songRequestsWidget" class="table table-condensed"></table>
+  <div id="songrequest-widget">
+    <table id="songRequestsWidget" class="table table-condensed"></table>
+  </div>
 </div>
 
 <script>
