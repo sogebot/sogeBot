@@ -64,6 +64,7 @@ Bets.prototype.open = function (self, sender, text) {
           })
         }, parseInt(global.configuration.getValue('betCloseTimer'), 10) * 1000 * 60)
         self.timerEnd = new Date().getTime() + (parseInt(global.configuration.getValue('betCloseTimer'), 10) * 1000 * 60)
+        self.saveBetTemplate(self, bOptions)
       }
     })
   } catch (e) {
@@ -75,6 +76,22 @@ Bets.prototype.open = function (self, sender, text) {
         global.commons.sendMessage(global.translate('core.error'), sender)
     }
   }
+}
+
+Bets.prototype.saveBetTemplate = function (self, bOptions) {
+  var aOptions = []
+  _.each(bOptions, function (v, i) { aOptions.push(i) })
+  global.botDB.update({ _id: 'bets_template' }, { $addToSet: { options: aOptions } }, { upsert: true })
+  global.botDB.findOne({ _id: 'bets_template' }, function (err, item) {
+    if (err) log.error(err)
+    if (!_.isNull(item)) {
+      var rmCount = item.options.length - 5
+      while (rmCount > 0) {
+        global.botDB.update({ _id: 'bets_template' }, { $pop: { options: -1 } }, {})
+        rmCount = rmCount - 1
+      }
+    }
+  })
 }
 
 Bets.prototype.info = function (self, sender) {
