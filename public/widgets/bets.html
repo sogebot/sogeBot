@@ -1,0 +1,90 @@
+<div class="widget">
+  <div class="title">Bets</div>
+  <div class="controls">
+    <div class="dropdown">
+      <a id="BetsMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        <span class="glyphicon glyphicon-option-vertical text-muted"></span>
+      </a>
+      <ul class="dropdown-menu" aria-labelledby="BetsMenu">
+        <li><a href="#" onclick="deleteWidget('bets')" style="color: #a94442;">Delete widget</a></li>
+      </ul>
+    </div>
+  </div>
+  <div id="bets-widget">
+    <div id="bets-running" class="text-center"></div>
+    <table class="table table-condensed" style="margin-top: 20px" id="bets-templates"></table>
+  </div>
+</div>
+
+<script>
+  var bets = {
+    timerEnd: 0,
+    updateTimer: function () {
+      // update timer
+      var timeLeft = bets.timerEnd - new Date().getTime()
+      if (timeLeft < 0) {
+        $("#betEndTimer").text('0:00')
+      } else {
+        var date = new Date(timeLeft)
+        var minutes = "0" + date.getMinutes();
+        var seconds = "0" + date.getSeconds();
+        $("#betEndTimer").text(minutes.substr(-2) + ':' + seconds.substr(-2))
+      }
+    },
+    close: function (el) {
+      socket.emit('closeBet', el.dataset.option)
+    },
+    reuse: function (el) {
+      socket.emit('reuseBet', el.dataset.options.split(' | '))
+    },
+    remove: function (el) {
+      socket.emit('removeBetTemplate', el.dataset.options.split(' | '))
+    }
+  }
+
+  socket.emit('getBetsTemplates');
+  socket.emit('getRunningBet');
+
+  socket.off('betsTemplates')
+  socket.on('betsTemplates', function (list) {
+    $("#bets-templates").empty()
+    _.each(list, function (options) {
+      $("#bets-templates").append(
+        '<tr>' +
+          '<td style="line-height: 30px"><strong>' + options.join(' | ') + '</strong></td>' +
+          '<td class="text-right"><div class="btn-group" role="group">' +
+            '<button type="button" class="btn btn-default" onclick="bets.reuse(this)" data-options="' + options.join(' | ') + '">re-use bet</button>' +
+            '<button type="button" class="btn btn-danger" onclick="bets.remove(this)" data-options="' + options.join(' | ') + '"><span class="glyphicon glyphicon-trash"></span></button></div></td>' +
+        '</tr>'
+        )
+    })
+  })
+
+  socket.off('runningBet')
+  socket.on('runningBet', function (bet) {
+    var $el = $("#bets-running")
+    if (_.isNull(bet)) {
+      $el.empty()
+      $el.html('<div class="text-info text-center"><strong>No bet is currently running!</strong></div>')
+    } else {
+      if (bet.timerEnd != bets.timerEnd) {
+        $el.empty()
+        bets.timerEnd = bet.timerEnd
+        $el.append('<div class="text-center">')
+        var btns = []
+        btns.push('<div class="btn-group" role="group">')
+        _.each(bet.bets, function (value, index) {
+          btns.push('<button onclick="bets.close(this)" data-option="' + index + '" type="button" class="btn btn-default">' + index + '</button>')
+        })
+        btns.push('<button onclick="bets.close(this)" data-option="refund" type="button" class="btn btn-danger">refund</button>')
+        btns.push('</div>')
+        $el.append(btns.join(''))
+        $el.append('<span id="betEndTimer" style="font-size: 30px; font-weight: bold; position: relative; top: 7px; left: 10px;">--:--</span>')
+        $el.append('</div>')
+      }
+    }
+  })
+
+  setInterval(function () { socket.emit('getBetsTemplates'); socket.emit('getRunningBet') }, 2000)
+  setInterval(function () { bets.updateTimer() }, 1000)
+</script>

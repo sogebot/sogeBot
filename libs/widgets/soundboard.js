@@ -1,7 +1,6 @@
 'use strict'
 
 var _ = require('lodash')
-var log = global.log
 var glob = require('glob')
 
 function SoundboardWidget () {
