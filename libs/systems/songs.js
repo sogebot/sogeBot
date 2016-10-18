@@ -267,6 +267,10 @@ Songs.prototype.addSongToPlaylist = function (self, sender, text) {
         if (typeof item === 'undefined' || item === null) {
           ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
             if (err) log.error(err)
+            if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
+              global.commons.sendMessage(global.translate('songs.notFound'), sender)
+              return
+            }
             global.botDB.insert({type: 'playlist', videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1})
             global.commons.sendMessage(global.translate('songs.addedSongPlaylist').replace('(title)', videoInfo.title), sender)
             self.sendPlaylistList(self, global.panel.io)
@@ -287,6 +291,10 @@ Songs.prototype.removeSongFromPlaylist = function (self, sender, text) {
 
   ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
     if (err) log.error(err)
+    if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
+      global.commons.sendMessage(global.translate('songs.notFound'), sender)
+      return
+    }
     global.botDB.remove({type: 'playlist', videoID: videoID}, {}, function (err, numRemoved) {
       if (err) log.error(err)
       if (numRemoved > 0) global.commons.sendMessage(global.translate('songs.removeSongPlaylist').replace('(title)', videoInfo.title), sender)
