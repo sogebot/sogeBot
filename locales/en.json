@@ -29,7 +29,8 @@
       "timeUpBet": "I guess you are too late, (sender), your time for betting is up!",
       "locked": "Betting time is up! No more bets.",
       "zeroBet": "Oh boy, (sender), you cannot bet 0 (pointsName)",
-      "lockedInfo": "Bets are opened, but time for betting is up!"
+      "lockedInfo": "Bets are opened, but time for betting is up!",
+      "removed": "Betting time is up! No bets were sent -> automatically closing"
   },
   "alias": {
     "success": {

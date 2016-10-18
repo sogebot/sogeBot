@@ -60,7 +60,26 @@ Bets.prototype.open = function (self, sender, text) {
         self.timer = setTimeout(function () {
           global.botDB.update({_id: 'bet'}, {$set: {locked: true}}, {}, function (err) {
             if (err) log.error(err)
-            global.commons.sendMessage(global.translate('bets.locked'), {username: global.configuration.get().twitch.owner})
+            // check if someone did bet, else just remove a bet
+            global.botDB.findOne({_id: 'bet'}, function (err, item) {
+              if (err) log.error(err)
+              var isBet = false
+              _.each(item.bets, function (value, index) {
+                _.each(value, function () {
+                  isBet = true
+                })
+              })
+              if (isBet) global.commons.sendMessage(global.translate('bets.locked'), {username: global.configuration.get().twitch.owner})
+              else {
+                global.botDB.remove({_id: 'bet'}, {}, function (err) {
+                  if (err) log.error(err)
+                  global.commons.sendMessage(global.translate('bets.removed'), sender)
+
+                  // clear possible timeout
+                  clearTimeout(self.timer)
+                })
+              }
+            })
           })
         }, parseInt(global.configuration.getValue('betCloseTimer'), 10) * 1000 * 60)
         self.timerEnd = new Date().getTime() + (parseInt(global.configuration.getValue('betCloseTimer'), 10) * 1000 * 60)
