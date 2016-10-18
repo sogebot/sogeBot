@@ -29,7 +29,8 @@
       "timeUpBet": "Prisel si pozde, (sender), cas na sazeni vyprsel!",
       "locked": "Vyprsel cas na vsazeni! Dalsi sazky neprijimame",
       "zeroBet": "Ale ale, (sender), nemuzes vsadit 0 (pointsName)",
-      "lockedInfo": "Sazky jsou otevreny, ale cas na vsazeni jiz vyprsel!"
+      "lockedInfo": "Sazky jsou otevreny, ale cas na vsazeni jiz vyprsel!",
+      "removed": "Vyprsel cas na vsazeni! Nikdo si nevsadil -> automaticky uzaviram"
   },
   "alias": {
     "success": {
