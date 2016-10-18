@@ -358,6 +358,14 @@
           $(el).text(value + suffix)
           socket.emit('saveConfiguration', data)
         })
+      },
+      confirm: function (el) {
+        $(el).parent().children(".btn-confirm").css('display', 'inline-block')
+        $(el).parent().children(".btn-remove").css('display', 'none')
+      },
+      unconfirm: function (el) {
+        $(el).parent().children(".btn-confirm").css('display', 'none')
+        $(el).parent().children(".btn-remove").css('display', 'inline-block')
       }
     }
   </script>

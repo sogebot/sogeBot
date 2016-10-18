@@ -40,6 +40,7 @@
     },
     remove: function (el) {
       socket.emit('removeBetTemplate', el.dataset.options.split(' | '))
+      socket.emit('getBetsTemplates');
     }
   }
 
@@ -53,9 +54,13 @@
       $("#bets-templates").append(
         '<tr>' +
           '<td style="line-height: 30px"><strong>' + options.join(' | ') + '</strong></td>' +
-          '<td class="text-right"><div class="btn-group" role="group">' +
-            '<button type="button" class="btn btn-default" onclick="bets.reuse(this)" data-options="' + options.join(' | ') + '">re-use bet</button>' +
-            '<button type="button" class="btn btn-danger" onclick="bets.remove(this)" data-options="' + options.join(' | ') + '"><span class="glyphicon glyphicon-trash"></span></button></div></td>' +
+          '<td class="text-right">' +
+            '<div class="btn-group" role="group">' +
+              '<button type="button" class="btn btn-default" onclick="bets.reuse(this)" data-options="' + options.join(' | ') + '">re-use bet</button>' +
+              '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
+              '<button type="button" style="display: none" class="btn btn-success btn-confirm" onclick="bets.remove(this)" data-options="' + options.join(' | ') + '"><span class="glyphicon glyphicon-ok"></span></button>' +
+              '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="glyphicon glyphicon-remove"></span></button>' +
+            '</div></td>' +
         '</tr>'
         )
     })
