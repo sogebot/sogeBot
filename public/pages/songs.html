@@ -43,11 +43,7 @@
       <tr>
         <td><strong>Shuffle</strong></td>
         <td>
-          <abbr title="click to edit" data-config-id="shuffle" onclick="commons.configEditable(this, '')" id="configShuffle"></abbr>
-          <div class="input-group" style="display:none;" id="input_shuffle_group">
-            <div class="input-group-addon">bool</div>
-            <input style="width: 6em" id="input_shuffle" class="form-control input-sm" type="text"/>
-          </div>
+          <input id="shuffleToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
         </td>
       </tr>
     </table>
@@ -105,7 +101,13 @@
 
     $("#configVolume").text(data.volume + '%')
     $("#configDuration").text(data.duration + 'min')
-    $("#configShuffle").text(data.shuffle)
+
+    $('#shuffleToggle').bootstrapToggle(data.shuffle ? 'on' : 'off')
+    $('#shuffleToggle').off('change')
+    $('#shuffleToggle').change(function() {
+      if ($('#shuffleToggle').data('init')) socket.emit('saveConfiguration', {'shuffle': $(this).prop('checked')})
+    })
+    $('#shuffleToggle').data('init', true)
   })
 
   var updatePlaylist = function(list) {
@@ -133,4 +135,6 @@
       }
     }
   }
+
+  $('#shuffleToggle').bootstrapToggle()
 </script>
