@@ -24,7 +24,8 @@
       // update timer
       var timeLeft = bets.timerEnd - new Date().getTime()
       if (timeLeft < 0) {
-        $("#betEndTimer").text('0:00')
+        $("#betEndTimer").html('<small style="font-size: 50%; position: relative; top: -5px;" class="text-muted">CLOSED</small>')
+        clearInterval(bets.interval)
       } else {
         var date = new Date(timeLeft)
         var minutes = "0" + date.getMinutes();
@@ -32,65 +33,68 @@
         $("#betEndTimer").text(minutes.substr(-2) + ':' + seconds.substr(-2))
       }
     },
+    updateTemplates: function (list) {
+      $("#bets-templates").empty()
+      _.each(list, function (options) {
+        $("#bets-templates").append(
+          '<tr>' +
+            '<td style="line-height: 30px"><strong>' + options.join(' | ') + '</strong></td>' +
+            '<td class="text-right">' +
+              '<div class="btn-group" role="group">' +
+                '<button type="button" class="btn btn-default" onclick="bets.reuse(this)" data-options="' + options.join(' | ') + '">re-use bet</button>' +
+                '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
+                '<button type="button" style="display: none" class="btn btn-success btn-confirm" onclick="bets.remove(this)" data-options="' + options.join(' | ') + '"><span class="glyphicon glyphicon-ok"></span></button>' +
+                '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="glyphicon glyphicon-remove"></span></button>' +
+              '</div></td>' +
+          '</tr>'
+          )
+      })
+    },
+    updateBet: function (bet) {
+      var $el = $("#bets-running")
+      if (_.isNull(bet)) {
+        $el.empty()
+        $el.html('<div class="text-info text-center"><strong>No bet is currently running!</strong></div>')
+      } else {
+        if (bet.timerEnd != bets.timerEnd) {
+          $el.empty()
+          bets.timerEnd = bet.timerEnd
+          $el.append('<div class="text-center">')
+          var btns = []
+          btns.push('<div class="btn-group" role="group">')
+          _.each(bet.bets, function (value, index) {
+            btns.push('<button onclick="bets.close(this)" data-option="' + index + '" type="button" class="btn btn-default">' + index + '</button>')
+          })
+          btns.push('<button onclick="bets.close(this)" data-option="refund" type="button" class="btn btn-danger">refund</button>')
+          btns.push('</div>')
+          $el.append(btns.join(''))
+          $el.append('<span id="betEndTimer" style="font-size: 30px; font-weight: bold; position: relative; top: 7px; left: 10px;">--:--</span>')
+          $el.append('</div>')
+
+          bets.updateTimer()
+          bets.interval = setInterval(function () { bets.updateTimer() }, 1000)
+        }
+      }
+    },
     close: function (el) {
       socket.emit('closeBet', el.dataset.option)
+      clearInterval(bets.interval)
     },
     reuse: function (el) {
       socket.emit('reuseBet', el.dataset.options.split(' | '))
     },
     remove: function (el) {
       socket.emit('removeBetTemplate', el.dataset.options.split(' | '))
-      socket.emit('getBetsTemplates');
-    }
+    },
+    interval: null
   }
 
   socket.emit('getBetsTemplates');
   socket.emit('getRunningBet');
 
   socket.off('betsTemplates')
-  socket.on('betsTemplates', function (list) {
-    $("#bets-templates").empty()
-    _.each(list, function (options) {
-      $("#bets-templates").append(
-        '<tr>' +
-          '<td style="line-height: 30px"><strong>' + options.join(' | ') + '</strong></td>' +
-          '<td class="text-right">' +
-            '<div class="btn-group" role="group">' +
-              '<button type="button" class="btn btn-default" onclick="bets.reuse(this)" data-options="' + options.join(' | ') + '">re-use bet</button>' +
-              '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
-              '<button type="button" style="display: none" class="btn btn-success btn-confirm" onclick="bets.remove(this)" data-options="' + options.join(' | ') + '"><span class="glyphicon glyphicon-ok"></span></button>' +
-              '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="glyphicon glyphicon-remove"></span></button>' +
-            '</div></td>' +
-        '</tr>'
-        )
-    })
-  })
+  socket.on('betsTemplates', function (list) { bets.updateTemplates(list) })
 
   socket.off('runningBet')
-  socket.on('runningBet', function (bet) {
-    var $el = $("#bets-running")
-    if (_.isNull(bet)) {
-      $el.empty()
-      $el.html('<div class="text-info text-center"><strong>No bet is currently running!</strong></div>')
-    } else {
-      if (bet.timerEnd != bets.timerEnd) {
-        $el.empty()
-        bets.timerEnd = bet.timerEnd
-        $el.append('<div class="text-center">')
-        var btns = []
-        btns.push('<div class="btn-group" role="group">')
-        _.each(bet.bets, function (value, index) {
-          btns.push('<button onclick="bets.close(this)" data-option="' + index + '" type="button" class="btn btn-default">' + index + '</button>')
-        })
-        btns.push('<button onclick="bets.close(this)" data-option="refund" type="button" class="btn btn-danger">refund</button>')
-        btns.push('</div>')
-        $el.append(btns.join(''))
-        $el.append('<span id="betEndTimer" style="font-size: 30px; font-weight: bold; position: relative; top: 7px; left: 10px;">--:--</span>')
-        $el.append('</div>')
-      }
-    }
-  })
-
-  setInterval(function () { socket.emit('getBetsTemplates'); socket.emit('getRunningBet') }, 2000)
-  setInterval(function () { bets.updateTimer() }, 1000)
+  socket.on('runningBet', function (bet) { bets.updateBet(bet) })
 </script>
