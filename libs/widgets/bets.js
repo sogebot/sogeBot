@@ -4,12 +4,23 @@ var _ = require('lodash')
 var log = global.log
 
 function BetsWidget () {
+  this.timerEnd = 0
+
   global.panel.addWidget('bets', 'Bets', 'knight')
   global.panel.socketListening(this, 'getBetsTemplates', this.getBetsTemplates)
   global.panel.socketListening(this, 'getRunningBet', this.getRunningBet)
   global.panel.socketListening(this, 'closeBet', this.closeBet)
   global.panel.socketListening(this, 'reuseBet', this.reuseBet)
   global.panel.socketListening(this, 'removeBetTemplate', this.removeBetTemplate)
+
+  var self = this
+  setInterval(function () {
+    if (global.systems.bets.timerEnd !== self.timerEnd) {
+      self.getRunningBet(self, global.panel.io)
+      self.getBetsTemplates(self, global.panel.io)
+      self.timerEnd = global.systems.bets.timerEnd
+    }
+  }, 1000)
 }
 
 BetsWidget.prototype.getBetsTemplates = function (self, socket) {
@@ -42,6 +53,7 @@ BetsWidget.prototype.reuseBet = function (self, socket, options) {
 
 BetsWidget.prototype.removeBetTemplate = function (self, socket, options) {
   global.botDB.update({ _id: 'bets_template' }, { $pull: { options: options } }, {})
+  self.getBetsTemplates(self, socket)
 }
 
 module.exports = new BetsWidget()

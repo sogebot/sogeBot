@@ -77,6 +77,7 @@ Bets.prototype.open = function (self, sender, text) {
 
                   // clear possible timeout
                   clearTimeout(self.timer)
+                  self.timerEnd = 0
                 })
               }
             })
@@ -220,6 +221,7 @@ Bets.prototype.refundAll = function (self, sender) {
           })
         })
       })
+
       global.commons.sendMessage(global.translate('bets.refund'), sender)
     }
   })
@@ -228,6 +230,7 @@ Bets.prototype.refundAll = function (self, sender) {
     if (err) log.error(err)
     // clear possible timeout
     clearTimeout(self.timer)
+    self.timerEnd = 0
   })
 }
 
@@ -265,6 +268,7 @@ Bets.prototype.close = function (self, sender, text) {
 
         // clear possible timeout
         clearTimeout(self.timer)
+        self.timerEnd = 0
       })
     })
   } catch (e) {
