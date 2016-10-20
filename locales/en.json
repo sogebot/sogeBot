@@ -128,7 +128,10 @@
     "settings": {
       "volume": "Volume succesfully set to (value)%",
       "duration": "Maximum song length set to (value) minutes.",
-      "shuffle": "Playlist shuffle - (value)"
+      "shuffle": {
+        "true": "Songs will play randomly",
+        "false": "Songs will play by time added in playlist"
+      }
     },
     "bannedSong": "Song (title) was banned and will never play again!",
     "bannedSongTimeout": "You've got timeout for posting banned song",
@@ -225,31 +228,62 @@
       "emotes": "{moderation.emotes} {moderation.warning}"
     },
     "settings": {
-      "moderationLinks": "Moderation of links is set to (value)",
+      "moderationLinks": {
+        "text": "Moderation of links is",
+        "true": "{moderation.settings.moderationLinks.text} {core.enabled}",
+        "false": "{moderation.settings.moderationLinks.text} {core.disabled}"
+      },
       "moderationLinksTimeout": "Timeout because of links set to (value)s",
-      "moderationSymbols": "Moderation of symbols is set to (value)",
+      "moderationSymbols": {
+        "text": "Moderation of symbols is",
+        "true": "{moderation.settings.moderationSymbols.text} {core.enabled}",
+        "false": "{moderation.settings.moderationSymbols.text} {core.disabled}"
+      },
       "moderationSymbolsTimeout": "Timeout because of symbols set to (value)s",
       "moderationSymbolsTriggerLength": "Trigger message length for symbols set to (value)",
       "moderationSymbolsMaxConsecutively": "Maximum of consecutively written symbols set to (value)",
       "moderationSymbolsMaxPercent": "Maximum symbols percentage in message set to (value)%",
-      "moderationLongMessage": "Moderation of long messages is set to (value)",
+      "moderationLongMessage": {
+        "text": "Moderation of long messages is",
+        "true": "{moderation.settings.moderationLongMessage.text} {core.enabled}",
+        "false": "{moderation.settings.moderationLongMessage.text} {core.disabled}"
+      },
       "moderationLongMessageTimeout": "Timeout because of long message set to (value)s",
       "moderationLongMessageTriggerLength": "Trigger message length for long messages set to (value)",
-      "moderationCaps": "Moderation of caps is set to (value)",
+      "moderationCaps": {
+        "text": "Moderation of caps is",
+        "true": "{moderation.settings.moderationCaps.text} {core.enabled}",
+        "false": "{moderation.settings.moderationCaps.text} {core.disabled}"
+      },
       "moderationCapsTimeout": "Timeout because of caps set to (value)s",
       "moderationCapsTriggerLength": "Trigger message length for caps set to (value)",
       "moderationCapsMaxPercent": "Maximum caps percentage in message set to (value)%",
-      "moderationSpam": "Moderation of spam is set to (value)",
+      "moderationSpam": {
+        "text": "Moderation of spam is",
+        "true": "{moderation.settings.moderationSpam.text} {core.enabled}",
+        "false": "{moderation.settings.moderationSpam.text} {core.disabled}"
+      },
       "moderationSpamTimeout": "Timeout because of spam set to (value)s",
       "moderationSpamTriggerLength": "Trigger message length for spam set to (value)",
       "moderationSpamMaxLength": "Maximum spam length in message set to (value)",
-      "moderationColor": "Moderation of colors (/me) is set to (value)",
+      "moderationColor": {
+        "text": "Moderation of colors (/me) is",
+        "true": "{moderation.settings.moderationColor.text} {core.enabled}",
+        "false": "{moderation.settings.moderationColor.text} {core.disabled}"
+      },
       "moderationColorTimeout": "Timeout because of colors (/me) usage set to (value)s",
-      "moderationEmotes": "Moderation of emotes is set to (value)",
+      "moderationEmotes": {
+        "text": "Moderation of emotes is",
+        "true": "{moderation.settings.moderationEmotes.text} {core.enabled}",
+        "false": "{moderation.settings.moderationEmotes.text} {core.disabled}"
+      },
       "moderationEmotesTimeout": "Timeout because of emotes spamming set to (value)s",
       "moderationEmotesMaxCount": "Maximum count of emotes in one messages set to (value)",
       "moderationWarnings": "User will be warned (value) times",
-      "moderationWarningsTimeouts": "User will be warned with timeout - (value)"
+      "moderationWarningsTimeouts": {
+        "true": "Warnings are set to be 1s timeout",
+        "false": "Warnings are set to chat message only"
+      }
     }
   }
 }

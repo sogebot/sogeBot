@@ -1,8 +1,8 @@
 {
   "core": {
     "loaded": "je nacten a",
-    "enabled": "zapnut",
-    "disabled": "vypnut",
+    "enabled": "zapnuto",
+    "disabled": "vypnuto",
     "usage": "Pouziti",
     "online": "Stream je online (time)",
     "offline": "Stream je prave offline!",
@@ -18,7 +18,7 @@
       "notEnoughOptions": "(sender), nove sazky musi mit alespon dve moznosti!",
       "info": "Sazky otevreny! Pouzij !bet [(options)] [points] a vyhraj! (time)min zbyva pro vsazeni!",
       "parseError": "{core.command-parse} !bet a zjisti jak na to",
-      "diffBet": "(sender), uz sis vsdil na (option) a nemuzes vsadit na vice moznosti najednou!",
+      "diffBet": "(sender), uz sis vsadil na (option) a nemuzes vsadit na vice moznosti najednou!",
       "notEnoughPoints": "Promin, (sender), ale nemas (amount) (pointsName) do sazky!",
       "undefinedBet": "Promin, (sender), ale tato moznost neexistuje, pouzij !bet a zjisti jak na to",
       "betPercentGain": "Sazky se vyplaci (value)% za kazdou moznost",
@@ -128,7 +128,10 @@
     "settings": {
       "volume": "Hlasitost nastavena na (value)%",
       "duration": "Maximalni delka pisne nastavena na (value) minut.",
-      "shuffle": "Playlist shuffle - (value)"
+      "shuffle": {
+        "true": "Pisnicky budou hrat nahodne",
+        "false": "Pisnicky budou hrat podle casu pridani"
+      }
     },
     "bannedSong": "Pisen (title) byla zabanovana a nebude uz nikdy hrat!",
     "bannedSongTimeout": "Dostal si timeout za zabanovanou pisen",
@@ -224,31 +227,62 @@
       "emotes": "{moderation.emotes} {moderation.warning}"
     },
     "settings": {
-      "moderationLinks": "Moderovani linku je nastaveno na (value)",
+      "moderationLinks": {
+        "text": "Moderovani linku je",
+        "true": "{moderation.settings.moderationLinks.text} {core.enabled}",
+        "false": "{moderation.settings.moderationLinks.text} {core.disabled}"
+      },
       "moderationLinksTimeout": "Timeout pri pouziti linku je nastaven na (value)s",
-      "moderationSymbols": "Moderovani symbolu je nastaveno na (value)",
+      "moderationSymbols": {
+        "text": "Moderovani symbolu je",
+        "true": "{moderation.settings.moderationSymbols.text} {core.enabled}",
+        "false": "{moderation.settings.moderationSymbols.text} {core.disabled}"
+      },
       "moderationSymbolsTimeout": "Timeout pri pouziti symbolu je nastaven na (value)s",
       "moderationSymbolsTriggerLength": "Moderovani symbolu zapnuto od (value) poctu znaku",
       "moderationSymbolsMaxConsecutively": "Maximum symbolu zapsanych za sebou je nastaveno na (value)",
       "moderationSymbolsMaxPercent": "Maximum symbolu v cele zprave je nastaveno na (value)%",
-      "moderationLongMessage": "Moderovani dlouhych zprav je nastaveno na (value)",
+      "moderationLongMessage": {
+        "text": "Moderovani dlouhych zprav je",
+        "true": "{moderation.settings.moderationLongMessage.text} {core.enabled}",
+        "false": "{moderation.settings.moderationLongMessage.text} {core.disabled}"
+      },
       "moderationLongMessageTimeout": "Timeout pro dlouhe zpravy je nastaven na  (value)s",
       "moderationLongMessageTriggerLength": "Moderovani dlouhych zprav zapnuto od (value) poctu znaku",
-      "moderationCaps": "Moderovani velkych pismen je nastaveno na (value)",
+      "moderationCaps": {
+        "text": "Moderovani velkych pismen je",
+        "true": "{moderation.settings.moderationCaps.text} {core.enabled}",
+        "false": "{moderation.settings.moderationCaps.text} {core.disabled}"
+      },
       "moderationCapsTimeout": "Timeout pri pouziti celkych pismen je nastaven na (value)s",
       "moderationCapsTriggerLength": "Moderovani velkych pismen zapnuto od (value) poctu znaku",
       "moderationCapsMaxPercent": "Maximum velkych pismen v cele zprave je nastaveno na (value)%",
-      "moderationColor": "Moderovani barev (/me) je nastaveno na (value)",
+      "moderationColor": {
+        "text": "Moderovani pouziti barev (/me) je",
+        "true": "{moderation.settings.moderationColor.text} {core.enabled}",
+        "false": "{moderation.settings.moderationColor.text} {core.disabled}"
+      },
       "moderationColorTimeout": "Timeout pri pouziti barev (/me) je nastaven na (value)s",
-      "moderationSpam": "Moderovani spamu je nastaveno na (value)",
+      "moderationSpam": {
+        "text": "Moderovani spamu je",
+        "true": "{moderation.settings.moderationSpam.text} {core.enabled}",
+        "false": "{moderation.settings.moderationSpam.text} {core.disabled}"
+      },
       "moderationSpamTimeout": "Timeout pri spamovani je nastaven na (value)s",
       "moderationSpamTriggerLength": "Moderovani spamu zapnuto od (value) poctu znaku",
       "moderationSpamMaxLength": "Maximalni delka spamu je nastavena na (value)",
-      "moderationEmotes": "Moderovani smajliku je nastaveno na (value)",
-      "moderationEmotesTimeout": "Timeout pri spamovani smnajliku je nastaven na (value)s",
+      "moderationEmotes": {
+        "text": "Moderovani smajliku je",
+        "true": "{moderation.settings.moderationEmotes.text} {core.enabled}",
+        "false": "{moderation.settings.moderationEmotes.text} {core.disabled}"
+      },
+      "moderationEmotesTimeout": "Timeout pri spamovani smajliku je nastaven na (value)s",
       "moderationEmotesMaxCount": "Maximalni pocet smajliky ku ve jedne zprave je nastaveno na (value)",
       "moderationWarnings": "Uzivatel bude (value)x varovan, nez dostane timeout",
-      "moderationWarningsTimeouts": "Uzivatel bude varovan i s timeoutem - (value)"
+      "moderationWarningsTimeouts": {
+        "true": "Varovanim pro uzivatele bude 1s timeout",
+        "false": "Varovanim pro uzivatele bude pouze zprava v chatu"
+      }
     }
   }
 }
