@@ -50,7 +50,7 @@ Clips.prototype.save = function (self, id, sender, text) {
     var data = {
       _id: 'clips_' + clipsMatch[3],
       slug: clipsMatch[3],
-      clip_uri: clipsMatch.input,
+      clip_uri: clipsMatch[0],
       timestamp: new Date().getTime()
     }
     request(data.clip_uri, function (error, response, body) {
