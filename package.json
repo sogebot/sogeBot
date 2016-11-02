@@ -6,6 +6,9 @@
   "main": "SogeBot",
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
+  "engines" : {
+    "node" : ">=6.0"
+  },
   "dependencies": {
     "auto-load": "^2.1.0",
     "basic-auth": "^1.0.4",
