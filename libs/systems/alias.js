@@ -82,7 +82,7 @@ Alias.prototype.remove = function (self, sender, text) {
 
 Alias.prototype.parse = function (self, id, sender, text) {
   try {
-    global.botDB.findOne({$where: function () { return text.startsWith('!' + this.alias) }}, function (err, item) {
+    global.botDB.findOne({$where: function () { return this._id.startsWith('alias_') && text.startsWith('!' + this.alias) && text.trim().length === this.alias.length + 1 }}, function (err, item) {
       if (err) log.error(err)
       if (!_.isNull(item)) {
         global.parser.parse(sender, text.replace('!' + item.alias, '!' + item.command))
