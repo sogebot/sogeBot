@@ -24,10 +24,19 @@
     "open": {
       "error": "(sender) Raffle was not opened! Use: !raffle open [raffle-keyword] [timer(optional)] [followers(optional)]",
       "running": "(sender) Raffle is already running! Current raffle keyword is !(keyword)",
+      "locked": "(sender) Raffle is currently closed! Pick a winner with !raffle pick",
       "ok": "New raffle {raffle.commons.opened}",
       "okWithoutTime": "New raffle {raffle.commons.openedWithoutTime}",
       "notice": "Raffle {raffle.commons.opened}",
       "noticeWithoutTime": "Raffle {raffle.commons.openedWithoutTime}"
+    },
+    "close": {
+      "ok": "Current raffle was closed! You cannot participate anymore!",
+      "notRunning": "(sender) No raffle is currently running!"
+    },
+    "pick": {
+      "winner": "Congratulations @(winner), you just won a raffle!",
+      "noParticipants": "There were no participants in this raffle! No winner selected."
     }
   },
   "bets": {
