@@ -83,6 +83,8 @@
     }
 
     socket.on('videoID', function(video) {
+      if(player.getPlayerState() === YT.PlayerState.PAUSED) return // do nothing if player is PAUSED
+
       if (video === null) {
         loading = false
         player.stopVideo()
