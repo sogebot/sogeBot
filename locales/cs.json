@@ -10,6 +10,35 @@
     "command-parse": "Promin, (sender), ale tento prikaz neni spravne, pouzij",
     "error": "Promin, (sender), ale neco se pokazilo!"
   },
+  "raffle": {
+    "commons": {
+      "opened": "je otevrena! Pouzij !(keyword) aby ses zucastnil! zbyva (time)min!",
+      "openedWithoutTime": "je otevrena! Pouzij !(keyword) aby ses zucastnil!"
+    },
+    "info": {
+      "opened": "(sender) Raffle {raffle.commons.opened}",
+      "openedWithoutTime": "(sender) Raffle {raffle.commons.openedWithoutTime}",
+      "closed": "(sender) Raffle je uzavrena, ale vitez jeste nebyl vybran!",
+      "notRunning": "(sender) Zadne raffle neni momentalne otevreno!"
+    },
+    "open": {
+      "error": "(sender) Raffle neni otevreno! Pouzij: !raffle open [raffle-keyword] [timer(optional)] [followers(optional)]",
+      "running": "(sender) Raffle nyni jiz bezi! Keyword pro raffle je !(keyword)",
+      "locked": "(sender) Raffle je nyni uzavreno! Vyber viteze pomoci !raffle pick",
+      "ok": "Nova raffle {raffle.commons.opened}",
+      "okWithoutTime": "Nova raffle {raffle.commons.openedWithoutTime}",
+      "notice": "Raffle {raffle.commons.opened}",
+      "noticeWithoutTime": "Raffle {raffle.commons.openedWithoutTime}"
+    },
+    "close": {
+      "ok": "Raffle byla uzavrena! Uz se nemuzes zucastnit!",
+      "notRunning": "(sender) Zadna raffle momentalne neni otevrena!"
+    },
+    "pick": {
+      "winner": "Gratulace @(winner), prave si vyhral raffle!",
+      "noParticipants": "Nikdo se nezucastnil raffle! Zadny vitez nebyl vybran."
+    }
+  },
   "bets": {
       "newBet": "(sender), nyni mas vsazeno (amount) (pointsName) na (option). Muzes vyhrat (winAmount) (winPointsName)!",
       "running": "(sender), sazky jsou jiz otevreny! Pouzij !bet close [(options)]",

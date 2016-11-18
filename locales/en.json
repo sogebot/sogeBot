@@ -10,6 +10,35 @@
     "command-parse": "Sorry, (sender), but this command is not correct, use",
     "error": "Sorry, (sender), but something went wrong!"
   },
+  "raffle": {
+    "commons": {
+      "opened": "is opened! Use !(keyword) to join raffle! (time)min left to join!",
+      "openedWithoutTime": "is opened! Use !(keyword) to join raffle!"
+    },
+    "info": {
+      "opened": "(sender) Raffle {raffle.commons.opened}",
+      "openedWithoutTime": "(sender) Raffle {raffle.commons.openedWithoutTime}",
+      "closed": "(sender) Raffle is closed, but winner is not picked yet!",
+      "notRunning": "(sender) No raffle is currently opened!"
+    },
+    "open": {
+      "error": "(sender) Raffle was not opened! Use: !raffle open [raffle-keyword] [timer(optional)] [followers(optional)]",
+      "running": "(sender) Raffle is already running! Current raffle keyword is !(keyword)",
+      "locked": "(sender) Raffle is currently closed! Pick a winner with !raffle pick",
+      "ok": "New raffle {raffle.commons.opened}",
+      "okWithoutTime": "New raffle {raffle.commons.openedWithoutTime}",
+      "notice": "Raffle {raffle.commons.opened}",
+      "noticeWithoutTime": "Raffle {raffle.commons.openedWithoutTime}"
+    },
+    "close": {
+      "ok": "Current raffle was closed! You cannot participate anymore!",
+      "notRunning": "(sender) No raffle is currently running!"
+    },
+    "pick": {
+      "winner": "Congratulations @(winner), you just won a raffle!",
+      "noParticipants": "There were no participants in this raffle! No winner selected."
+    }
+  },
   "bets": {
       "newBet": "(sender), your current bet is (amount) (pointsName) on (option). You can win (winAmount) (winPointsName)!",
       "running": "(sender), bet is already opened! Use !bet close [(options)]",
