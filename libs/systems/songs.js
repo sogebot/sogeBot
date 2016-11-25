@@ -43,6 +43,7 @@ Songs.prototype.webPanel = function () {
   global.panel.socketListening(this, 'getVideoID', this.sendNextSongID)
   global.panel.socketListening(this, 'getSongRequests', this.sendSongRequestsList)
   global.panel.socketListening(this, 'getPlaylist', this.sendPlaylistList)
+  global.panel.socketListening(this, 'getCurrentSong', this.sendCurrentSong)
 
   global.panel.socketListening(this, 'getSongsConfiguration', this.sendConfiguration)
 
@@ -165,6 +166,10 @@ Songs.prototype.sendPlaylistList = function (self, socket) {
 
 Songs.prototype.savePlaylistTrim = function (id, startTime, endTime) {
   global.botDB.update({type: 'playlist', videoID: id}, {$set: {startTime: startTime, endTime: endTime}}, {})
+}
+
+Songs.prototype.sendCurrentSong = function (self, socket) {
+  socket.emit('currentSong', self.currentSong)
 }
 
 Songs.prototype.sendNextSongID = function (self, socket) {
