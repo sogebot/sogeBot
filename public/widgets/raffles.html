@@ -1,0 +1,104 @@
+<div class="widget">
+    <ul class="nav nav-pills" role="tablist">
+      <li role="presentation" class="active">
+        <a href="#raffles-participants" aria-controls="home" role="tab" data-toggle="tab" title="Participants" style="border-top-left-radius: 4px" >
+          <span id="raffles-participants-count">1000</span>
+          <i class="fa fa-users" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li role="presentation">
+        <a href="#raffles-giveaway" aria-controls="home" role="tab" data-toggle="tab" title="Giveaway">
+          <i class="fa fa-gift" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li role="presentation">
+        <a href="#raffles-winner" aria-controls="home" role="tab" data-toggle="tab" title="Last winner">
+          <i class="fa fa-trophy" aria-hidden="true"></i>
+          <span id="raffles-winner-name">bukan12</span>
+        </a>
+      </li>
+      <li role="presentation">
+        <a href="#raffles-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+          <i class="fa fa-cog" aria-hidden="true"></i>
+        </a>
+      </li>
+    </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="raffles-participants">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search..." style="border-radius: 0">
+        <span class="input-group-btn">
+          <button class="btn btn-muted" type="button" title="Cancel search"><i class="fa fa-close" aria-hidden="true"></i></button>
+        </span>
+      </div>
+      <ul class="list-unstyled" id="raffles-participants-list">
+        <li><i class="fa fa-dot-circle-o" aria-hidden="true"></i> bukan12</li>
+        <li><i class="fa fa-check-circle-o" aria-hidden="true"  style="color: green"></i> sogehige</li>
+        <li><i class="fa fa-check-circle-o" aria-hidden="true"  style="color: green"></i> sogebot</li>
+        <li><i class="fa fa-check-circle-o" aria-hidden="true"  style="color: green"></i> ZephyCZ</li>
+        <li><i class="fa fa-check-circle-o" aria-hidden="true"  style="color: green"></i> flexboycz1</li>
+        <li><i class="fa fa-check-circle-o" aria-hidden="true"  style="color: green"></i> Flip017cz</li>
+        <li><i class="fa fa-check-circle-o" aria-hidden="true"  style="color: green"></i> macju123</li>
+        <li><i class="fa fa-check-circle-o" aria-hidden="true"  style="color: green"></i> Muffinko</li>
+        <li><i class="fa fa-check-circle-o" aria-hidden="true"  style="color: green"></i> rellikcze</li>
+        <li><i class="fa fa-check-circle-o" aria-hidden="true"  style="color: green"></i> Thebrysa</li>
+        <li><i class="fa fa-eye-slash" aria-hidden="true"  style="color: red"></i> 987 hidden</li>
+      </ul>
+    </div> <!-- /PARTICIPANTS -->
+
+    <div role="tabpanel" class="tab-pane" id="raffles-giveaway">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Enter keyword..." style="border-radius: 0">
+        <span class="input-group-btn">
+          <button class="btn btn-warning" type="button" title="Clear participants"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+          <button class="btn btn-danger" type="button" style="border-radius: 0" title="Remove keyword"><i class="fa fa-close" aria-hidden="true"></i></button>
+        </span>
+      </div>
+
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default btn-label" disabled="disabled">Eligible to enter: </button>
+        <button type="button" class="btn btn-success" style="border-radius:0">Mods</button>
+        <button type="button" class="btn btn-danger" style="border-radius:0">Followers only</button>
+      </div>
+    </div> <!-- /GIVEAWAY -->
+    <div role="tabpanel" class="tab-pane" id="raffles-winner">
+        <div style="text-align: center"><strong style="font-size: 30px"><i class="fa fa-twitch" aria-hidden="true"></i> bukan12</strong></div>
+
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-default btn-label" disabled="disabled">Info: </button>
+          <button type="button" class="btn btn-link" disabled="disabled"><span style="color: green"><i class="fa fa-check" aria-hidden="true"></i> Following</span></button>
+          <button type="button" class="btn btn-link"><a href="https://twitch.tv/bukan12/profile"><i class="fa fa-envelope" aria-hidden="true"></i> Send Message</a></button>
+          <button type="button" class="btn btn-link"><span style="color: gray"><i class="fa fa-refresh" aria-hidden="true"></i> Roll again</span></button>
+        </div>
+
+        <div class="table-responsive" style="margin-top: 0; padding-left: 10px; padding-right: 10px;">
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <td style="vertical-align: bottom; font-size: 18px;"><i class="fa fa-comments-o" aria-hidden="true"></i> Messages - 5</td>
+                <td style="font-size: 25px; color: green; text-align: right;"><strong>0:45</strong></td>
+              </tr>
+            </thead>
+            <tbody style="font-size:10px;">
+              <tr>
+                <td>přenechavam matymu :D </td>
+                <td style="text-align: right">0:08</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+    </div> <!-- /WINNER -->
+    <div role="tabpanel" class="tab-pane" id="raffles-settings">
+      <div class="input-group">
+        <span class="input-group-addon" style="border-radius:0">Announce every</span>
+        <input type="text" class="form-control">
+        <span class="input-group-addon" style="border-radius:0">minutes</span>
+      </div>
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('raffles')" style="margin-top: 20px;">Remove widget</button>
+    </div> <!-- /SETTINGS -->
+
+    <div class="clearfix"></div>
+  </div>
+</div>

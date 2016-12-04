@@ -156,6 +156,39 @@ a.active {
 }
 
 /* WIDGETS */
+.nav-pills > li > a {
+  border-radius: 0px;
+}
+.nav-pills > li > a > i {
+  font-size: 1.2em;
+}
+
+.nav-pills > li + li {
+  margin-left: 0;
+}
+
+#raffles-participants-list li:hover {
+  background-color: #eee;
+}
+
+#raffles-participants-list li {
+  padding: 5px;
+  font-size: 10px;
+  float: left;
+  cursor: pointer;
+}
+
+.btn-label {
+  background-color: white !important;
+  border: 0px !important;
+  font-weight: bold;
+}
+
+.btn-label:hover {
+  cursor: auto;
+}
+
+
 .widgets .dropdown-menu {
   left: -88px;
   top: 50px;
@@ -182,7 +215,6 @@ a.active {
   background: white;
   border: 1px solid #ADB2B5;
   border-radius: 4px;
-  padding: 10px;
   margin-bottom: 10px;
 }
 

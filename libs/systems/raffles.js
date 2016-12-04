@@ -9,7 +9,7 @@ var log = global.log
 
 /*
  * !raffle                                           - gets an info about raffle
- * !raffle open [raffle-keyword] [timer] [followers] - open a new raffle with selected keyword, auto close after timer (in minutes, default: 0 - disabled), for followers? (optional)
+ * !raffle open [raffle-keyword] [followers]         - open a new raffle with selected keyword, for followers? (optional)
  * !raffle close                                     - close a raffle manually
  * !raffle pick                                      - pick or repick a winner of raffle
  * ![raffle-keyword]                                 - join a raffle
@@ -84,9 +84,8 @@ Raffles.prototype.info = function (self, sender) {
     if (!_.isNull(item)) {
       if (!_.isNull(item.winner)) global.commons.sendMessage(global.translate('raffle.info.notRunning'), sender)
       else if (!item.locked) {
-        global.commons.sendMessage(global.translate(item.timer !== 0 ? 'raffle.info.opened' : 'raffle.info.openedWithoutTime')
-          .replace('(keyword)', item.keyword)
-          .replace('(time)', parseFloat((item.timer - new Date().getTime()) / 1000 / 60).toFixed(1)), sender)
+        global.commons.sendMessage(global.translate('raffle.info.opened')
+          .replace('(keyword)', item.keyword), sender)
       } else {
         global.commons.sendMessage(global.translate('raffle.info.closed'), sender)
       }
@@ -98,52 +97,29 @@ Raffles.prototype.info = function (self, sender) {
 
 Raffles.prototype.open = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\w+) ?(\d+)? ?(followers)?/)
-    var groups = { keyword: 1, timer: 2, followers: 3 }
+    var parsed = text.match(/^(\w+) ?(followers)?/)
+    var groups = { keyword: 1, followers: 2 }
     var raffle = {
       keyword: parsed[groups.keyword],
-      timer: parsed[groups.timer] ? new Date().getTime() + parsed[groups.timer] * 60 * 1000 : 0,
       followers: parsed[groups.followers] != null,
-      participants: [],
-      locked: false,
       winner: null
     }
 
-    global.botDB.findOne({_id: 'raffle'}, function (err, item) {
+    global.botDB.update({_id: 'raffle'}, {$set: raffle}, {upsert: true}, function (err) {
       if (err) return log.error(err)
-      if (!_.isNull(item)) {
-        if (item.locked) {
-          global.commons.sendMessage(global.translate('raffle.open.locked'), sender)
-        } else {
-          global.commons.sendMessage(global.translate('raffle.open.running')
-            .replace('(keyword)', item.keyword), sender)
-        }
-        return
+      global.commons.sendMessage(global.translate('raffle.open.ok')
+        .replace('(keyword)', raffle.keyword), sender)
+
+      // register raffle keyword
+      self.registerRaffleKeyword(self)
+
+      // add timer if raffleAnnounceInterval is set
+      if (global.configuration.getValue('raffleAnnounceInterval')) {
+        self.timer = setInterval(function () {
+          global.commons.sendMessage(global.translate('raffle.open.notice')
+              .replace('(keyword)', raffle.keyword), sender)
+        }, global.configuration.getValue('raffleAnnounceInterval') * 60 * 1000)
       }
-
-      global.botDB.update({_id: 'raffle'}, {$set: raffle}, {upsert: true}, function (err) {
-        if (err) return log.error(err)
-        global.commons.sendMessage(global.translate(raffle.timer !== 0 ? 'raffle.open.ok' : 'raffle.open.okWithoutTime')
-          .replace('(keyword)', raffle.keyword)
-          .replace('(time)', parseFloat((parseInt(raffle.timer, 10) - new Date().getTime()) / 1000 / 60).toFixed(1)), sender)
-
-        // register raffle keyword
-        self.registerRaffleKeyword(self)
-
-        // add timer if raffleAnnounceInterval is set
-        if (global.configuration.getValue('raffleAnnounceInterval')) {
-          self.timer = setInterval(function () {
-            if ((parseInt(raffle.timer, 10) - new Date().getTime()) / 1000 / 60 < 0) {
-              self.close(self, sender)
-              clearInterval(self.timer)
-            } else {
-              global.commons.sendMessage(global.translate(raffle.timer !== 0 ? 'raffle.open.notice' : 'raffle.open.noticeWithoutTime')
-                .replace('(keyword)', raffle.keyword)
-                .replace('(time)', parseFloat((parseInt(raffle.timer, 10) - new Date().getTime()) / 1000 / 60).toFixed(1)), sender)
-            }
-          }, global.configuration.getValue('raffleAnnounceInterval') * 60 * 1000)
-        }
-      })
     })
   } catch (err) {
     global.commons.sendMessage(global.translate('raffle.open.error'))

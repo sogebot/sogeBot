@@ -12,23 +12,17 @@
   },
   "raffle": {
     "commons": {
-      "opened": "is opened! Use !(keyword) to join raffle! (time)min left to join!",
-      "openedWithoutTime": "is opened! Use !(keyword) to join raffle!"
+      "opened": "is opened! Use !(keyword) to join raffle!"
     },
     "info": {
       "opened": "(sender) Raffle {raffle.commons.opened}",
-      "openedWithoutTime": "(sender) Raffle {raffle.commons.openedWithoutTime}",
       "closed": "(sender) Raffle is closed, but winner is not picked yet!",
       "notRunning": "(sender) No raffle is currently opened!"
     },
     "open": {
-      "error": "(sender) Raffle was not opened! Use: !raffle open [raffle-keyword] [timer(optional)] [followers(optional)]",
-      "running": "(sender) Raffle is already running! Current raffle keyword is !(keyword)",
-      "locked": "(sender) Raffle is currently closed! Pick a winner with !raffle pick",
+      "error": "(sender) Raffle was not opened! Use: !raffle open [raffle-keyword] [followers(optional)]",
       "ok": "New raffle {raffle.commons.opened}",
-      "okWithoutTime": "New raffle {raffle.commons.openedWithoutTime}",
-      "notice": "Raffle {raffle.commons.opened}",
-      "noticeWithoutTime": "Raffle {raffle.commons.openedWithoutTime}"
+      "notice": "Raffle {raffle.commons.opened}"
     },
     "close": {
       "ok": "Current raffle was closed! You cannot participate anymore!",
