@@ -47,22 +47,25 @@ Raffles.prototype.registerRaffleKeyword = function (self) {
 Raffles.prototype.pick = function (self, sender) {
   global.botDB.find({ $where: function () { return this._id.startsWith('raffle_participant_') && this.eligible } }, function (err, items) {
     if (err) return log.error(err)
-    var raffle = {winner: null, locked: true}
+    var winner = { username: null }
     if (items.length !== 0) {
-      var winner = _.sample(items)
-      raffle.winner = winner.username
+      winner = _.sample(items)
       global.botDB.update({ _id: winner._id }, { $set: { eligible: false } }) // don't want to pick same winner 2 times
     }
-    global.botDB.update({_id: 'raffle'}, {$set: raffle}, {}, function (err) {
-      if (err) return log.error(err)
-      if (_.isNull(raffle.winner)) {
-        global.commons.sendMessage(global.translate('raffle.pick.noParticipants'), sender)
-      } else {
+
+    if (_.isNull(winner.username)) {
+      global.commons.sendMessage(global.translate('raffle.pick.noParticipants'), sender)
+    } else {
+      var user = new User(winner.username)
+      user.isLoaded().then(function () {
+        global.botDB.update({_id: 'raffle'}, {$set: { winner: user, locked: true, timestamp: new Date().getTime() }})
         global.commons.sendMessage(global.translate('raffle.pick.winner')
-          .replace('(winner)', raffle.winner), sender)
-      }
-    })
-    global.parser.unregister('!' + self.keyword)
+          .replace('(winner)', winner.username), sender)
+        global.parser.unregister('!' + self.keyword)
+        global.widgets.raffles.sendWinner(global.widgets.raffles, user)
+        clearInterval(self.timer)
+      })
+    }
   })
 }
 
@@ -127,6 +130,7 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
 
       // add timer if raffleAnnounceInterval is set
       if (global.configuration.getValue('raffleAnnounceInterval')) {
+        clearInterval(self.timer)
         self.timer = setInterval(function () {
           global.commons.sendMessage(global.translate('raffle.open.notice')
               .replace('(keyword)', raffle.keyword), sender)

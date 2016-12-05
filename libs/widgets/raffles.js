@@ -3,9 +3,12 @@
 var _ = require('lodash')
 var log = global.log
 var User = require('../user')
+var constants = require('../constants')
+var crypto = require('crypto')
 
 function RafflesWidget () {
   this.participants = 0
+  this.winner = null
 
   global.panel.addWidget('raffles', 'Raffles', 'knight')
 
@@ -19,10 +22,24 @@ function RafflesWidget () {
   global.panel.socketListening(this, 'removeRaffle', this.removeRaffle)
   global.panel.socketListening(this, 'rafflesRollWinner', this.rafflesRollWinner)
 
+  global.parser.registerParser(this, 'rafflesMessages', this.rafflesMessages, constants.VIEWERS)
+
   var self = this
   setInterval(function () {
-    self.sendRafflesParticipants(self, self.socket)
+    self.sendRafflesParticipants(self)
+    self.sendRafflesMessages(self)
   }, 1000)
+}
+
+RafflesWidget.prototype.rafflesMessages = function (self, id, sender, text) {
+  if (!_.isNull(self.winner) && self.winner.username === sender.username) {
+    var msgId = crypto.createHash('md5').update(Math.random().toString()).digest('hex').substring(0, 5)
+    var message = { _id: 'raffle_messages_' + msgId,
+                    timestamp: sender['sent-ts'],
+                    text: text }
+    global.botDB.update({_id: message._id}, {$set: message}, {upsert: true})
+  }
+  global.updateQueue(id, true)
 }
 
 RafflesWidget.prototype.forceSendRaffleParticipants = function (self, socket) {
@@ -31,13 +48,13 @@ RafflesWidget.prototype.forceSendRaffleParticipants = function (self, socket) {
 
 RafflesWidget.prototype.rafflesRollWinner = function (self, socket) {
   global.systems.raffles.pick(global.systems.raffles, {username: null})
-  global.botDB.findOne({ _id: 'raffle' }, function (err, item) {
-    if (err) { log.error(err); return err }
-    var user = new User(item.winner)
-    user.isLoaded().then(function () {
-      socket.emit('raffleWinner', user)
-    })
-  })
+}
+
+RafflesWidget.prototype.sendWinner = function (self, user) {
+  self.winner = user
+  global.panel.io.emit('raffleWinner', user)
+  global.botDB.remove({ $where: function () { return this._id.startsWith('raffle_messages_') } }, { multi: true })
+
 }
 
 RafflesWidget.prototype.removeRaffle = function (self, socket) {
@@ -51,7 +68,13 @@ RafflesWidget.prototype.clearRaffleParticipants = function (self, socket) {
   global.botDB.remove({ $where: function () { return this._id.startsWith('raffle_participant_') } }, { multi: true })
   self.forceSendRaffleParticipants(self)
   socket.emit('rafflesParticipants', {})
+}
 
+RafflesWidget.prototype.sendRafflesMessages = function (self) {
+  global.botDB.find({ $where: function () { return this._id.startsWith('raffle_messages_') } }).sort({ timestamp: 1 }).exec(function (err, items) {
+    if (err) log.error(err)
+    global.panel.io.emit('rafflesMessages', items)
+  })
 }
 
 RafflesWidget.prototype.sendRafflesParticipants = function (self) {
