@@ -1,4 +1,6 @@
-
+* {
+  border-radius: 0 !important;
+}
 
 body {
   padding-top: 50px;

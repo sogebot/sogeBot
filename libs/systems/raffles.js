@@ -19,6 +19,7 @@ var log = global.log
 function Raffles () {
   if (global.configuration.get().systems.raffles === true) {
     this.timer = null
+    this.keyword = null
 
     global.parser.register(this, '!raffle pick', this.pick, constants.OWNER_ONLY)
     global.parser.register(this, '!raffle close', this.close, constants.OWNER_ONLY)
@@ -33,47 +34,53 @@ function Raffles () {
 }
 
 Raffles.prototype.registerRaffleKeyword = function (self) {
+  if (!_.isNull(self.keyword)) global.parser.unregister('!' + self.keyword)
   global.botDB.findOne({_id: 'raffle'}, function (err, item) {
     if (err) return log.error(err)
     if (!_.isNull(item)) {
       global.parser.register(this, '!' + item.keyword, self.participate, constants.VIEWERS)
+      self.keyword = item.keyword
     }
   })
 }
 
 Raffles.prototype.pick = function (self, sender) {
-  global.botDB.findOne({_id: 'raffle'}, function (err, item) {
+  global.botDB.find({ $where: function () { return this._id.startsWith('raffle_participant_') && this.eligible } }, function (err, items) {
     if (err) return log.error(err)
-    if (!_.isNull(item)) {
-      var winner
-      do { // we want different winner
-        winner = _.sample(item.participants)
-      } while (winner === item.winner && item.participants.length > 1)
-
-      global.botDB.update({_id: 'raffle'}, {$set: {winner: winner, locked: true}}, {}, function (err) {
-        if (err) return log.error(err)
-        if (_.isUndefined(winner)) {
-          global.commons.sendMessage(global.translate('raffle.pick.noParticipants'), sender)
-        } else {
-          global.commons.sendMessage(global.translate('raffle.pick.winner')
-            .replace('(winner)', winner), sender)
-        }
-        global.parser.unregister('!' + item.keyword)
-      })
+    var raffle = {winner: null, locked: true}
+    if (items.length !== 0) {
+      var winner = _.sample(items)
+      raffle.winner = winner.username
+      global.botDB.update({ _id: winner._id }, { $set: { eligible: false } }) // don't want to pick same winner 2 times
     }
+    global.botDB.update({_id: 'raffle'}, {$set: raffle}, {}, function (err) {
+      if (err) return log.error(err)
+      if (_.isNull(raffle.winner)) {
+        global.commons.sendMessage(global.translate('raffle.pick.noParticipants'), sender)
+      } else {
+        global.commons.sendMessage(global.translate('raffle.pick.winner')
+          .replace('(winner)', raffle.winner), sender)
+      }
+    })
+    global.parser.unregister('!' + self.keyword)
   })
 }
 
 Raffles.prototype.participate = function (self, sender) {
   global.botDB.findOne({_id: 'raffle'}, function (err, item) {
     if (err) return log.error(err)
-    if (!_.isNull(item)) {
+    if (!_.isNull(item) && !item.locked) {
+      var participant = { _id: 'raffle_participant_' + sender.username,
+                          eligible: true,
+                          forced: false,
+                          username: sender.username }
       if (item.followers) {
         var user = new User(sender.username)
         user.isLoaded().then(function () {
-          if (user.get('isFollower')) { global.botDB.update({ _id: 'raffle' }, { $addToSet: { participants: sender.username } }, { upsert: true }) }
+          participant.eligible = user.get('isFollower')
+          global.botDB.insert(participant)
         })
-      } else global.botDB.update({ _id: 'raffle' }, { $addToSet: { participants: sender.username } }, { upsert: true })
+      } else { global.botDB.insert(participant) }
     }
   })
 }
@@ -95,20 +102,25 @@ Raffles.prototype.info = function (self, sender) {
   })
 }
 
-Raffles.prototype.open = function (self, sender, text) {
+Raffles.prototype.open = function (self, sender, text, dashboard = false) {
   try {
     var parsed = text.match(/^(\w+) ?(followers)?/)
     var groups = { keyword: 1, followers: 2 }
     var raffle = {
       keyword: parsed[groups.keyword],
       followers: parsed[groups.followers] != null,
-      winner: null
+      winner: null,
+      locked: false
     }
 
     global.botDB.update({_id: 'raffle'}, {$set: raffle}, {upsert: true}, function (err) {
       if (err) return log.error(err)
-      global.commons.sendMessage(global.translate('raffle.open.ok')
-        .replace('(keyword)', raffle.keyword), sender)
+      if (!dashboard) {
+        global.commons.sendMessage(global.translate('raffle.open.ok').replace('(keyword)', raffle.keyword), sender)
+
+      // remove any participants - don't delete in dashboard
+        global.botDB.remove({ $where: function () { return this._id.startsWith('raffle_participant_') } }, { multi: true })
+      }
 
       // register raffle keyword
       self.registerRaffleKeyword(self)
