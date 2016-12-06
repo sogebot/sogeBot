@@ -279,7 +279,6 @@
   socket.emit('getRafflesConfiguration')
   socket.off('rafflesConfiguration')
   socket.on('rafflesConfiguration', function(data) {
-    console.log(data)
     $("#raffleAnnounce").val(data.raffleAnnounceInterval)
   })
 

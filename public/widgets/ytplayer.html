@@ -3,7 +3,7 @@
   <div class="controls">
     <div class="dropdown">
       <a data-id="ytplayer-widget" onclick="commons.minimize(this)"><span class="glyphicon glyphicon-resize-small text-muted"></span></a>
-      <a id="YTControl" ><span class="glyphicon glyphicon-pause text-danger"></span></a>
+      <a id="YTControl" ><span class="glyphicon glyphicon-play text-success"></span></a>
       <a id="YTMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
         <span class="glyphicon glyphicon-option-vertical text-muted"></span>
       </a>
@@ -32,6 +32,7 @@
     var player, time_update_interval;
     var loading = false
     var progressUpdate = null
+    var afterStart = true
 
     function stealToPlaylist () {
       socket.emit('stealSong')
@@ -58,8 +59,6 @@
     }
 
     function initialize() {
-      socket.emit('getVideoID');
-
       // Clear any old interval.
       clearInterval(time_update_interval);
 
@@ -68,6 +67,7 @@
       time_update_interval = setInterval(function() {
 
         if (!loading && player.getPlayerState() === 0 || player.getPlayerState() === 5) {
+          if (afterStart) return
           loading = true
           socket.emit('getVideoID');
         }
@@ -124,7 +124,9 @@
 
   $("#YTControl").on('click', function() {
     $("#YTControl span").removeClass()
-    if (player.getPlayerState() === YT.PlayerState.PAUSED) {
+    if (player.getPlayerState() === YT.PlayerState.PAUSED || afterStart) {
+      if (afterStart) socket.emit('getVideoID')
+      afterStart = false
       player.playVideo()
       $("#YTControl span").addClass('glyphicon glyphicon-pause text-danger')
     } else {
