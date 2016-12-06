@@ -190,12 +190,6 @@ a.active {
   cursor: auto;
 }
 
-
-.widgets .dropdown-menu {
-  left: -88px;
-  top: 50px;
-}
-
 .widgets {
   padding-top: 20px;
 }
@@ -261,6 +255,11 @@ a.active {
   text-decoration: none;
 }
 
+.widget .table {
+  margin-bottom: 0;
+  font-size: 10px;
+}
+
 .widget .table tr:first-child > td {
   border: 0;
 }
@@ -281,7 +280,6 @@ a.active {
 }
 
 .progress {
-  height: 5px !important;
   z-index: 9999;
 }
 

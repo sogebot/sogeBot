@@ -1,28 +1,60 @@
 <div class="widget">
-  <div class="title">YouTube Player</div>
-  <div class="controls">
-    <div class="dropdown">
-      <a data-id="ytplayer-widget" onclick="commons.minimize(this)"><span class="glyphicon glyphicon-resize-small text-muted"></span></a>
-      <a id="YTControl" ><span class="glyphicon glyphicon-play text-success"></span></a>
-      <a id="YTMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        <span class="glyphicon glyphicon-option-vertical text-muted"></span>
-      </a>
-      <ul style="left: -57px;" class="dropdown-menu" aria-labelledby="YTMenu">
-        <li><a href="#" onclick="deleteWidget('ytplayer')" style="color: #a94442;">Delete widget</a></li>
-      </ul>
-    </div>
-  </div>
-  <div id="ytplayer-widget">
-    <div id="YTPlayer"></div>
-    <div id="video-title"></div>
-    <div class="progress">
-      <div class="progress-bar progress-bar-danger" id="youtube-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
-    </div>
-    <div class="text-center">
-      <button type="button" class="btn btn-success btn-sm pull-left" onclick="stealToPlaylist()">Steal to Playlist</button>
-      <button type="button" class="btn btn-default btn-sm" onclick="skipSong()">Skip Song</button>
-      <button type="button" class="btn btn-danger btn-sm pull-right" onclick="banSong()">Ban Song</button>
-    </div>
+    <ul class="nav nav-pills" role="tablist">
+      <li role="presentation">
+        <a href="#yt-song-requests" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
+          <span id="yt-song-requests-count">0</span>
+          <i class="fa fa-user" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li role="presentation" class="active" style="height:40px;">
+        <a href="#yt-player" aria-controls="home" role="tab" data-toggle="tab" title="" style="max-width: 210px;display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">
+          <i class="fa fa-music" aria-hidden="true"></i>
+          <span id="yt-player-currentsong"></span>
+        </a>
+      </li>
+      <li role="presentation">
+        <a href="#yt-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+          <i class="fa fa-cog" aria-hidden="true"></i>
+        </a>
+      </li>
+    </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="yt-player">
+      <div id="YTPlayer"></div>
+      <div class="row">
+        <div class="btn-group col-xs-5" role="group" aria-label="..." style="width: auto; padding-right: 0" >
+          <button type="button" class="btn btn-default" id="YTControl"><i class="fa fa-play text-success" aria-hidden="true"></i></button>
+          <button type="button" class="btn btn-default" onclick="skipSong()"><i class="fa fa-forward" aria-hidden="true"></i></button>
+
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-sliders" aria-hidden="true"></i>
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li class="dropdown-header">Playlist</li>
+              <li><a href="#" onclick="stealToPlaylist()">Steal to playlist</a></li>
+              <li class="dropdown-header">Others</li>
+              <li><a href="#" onclick="banSong()">Ban Song</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="progress col-xs-7" style="height:34px; padding-left:0px; padding-right: 0" >
+          <div class="progress-bar progress-bar-danger" id="youtube-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+        </div>
+      </div>
+    </div> <!-- /YT-PLAYER -->
+
+    <div role="tabpanel" class="tab-pane" id="yt-song-requests">
+      <table id="songRequestsWidget" class="table table-condensed"></table>
+    </div> <!-- /YT-SONG-REQUESTS -->
+    <div role="tabpanel" class="tab-pane" id="yt-settings">
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('ytplayer')" style="margin-top: 20px;">Remove widget</button>
+    </div> <!-- /SETTINGS -->
+
+    <div class="clearfix"></div>
   </div>
 </div>
 
@@ -96,7 +128,8 @@
         'videoId': video.videoID
       }
 
-      $("#video-title").html(video.title)
+      $("#yt-player-currentsong").html(video.title)
+      $("#yt-player-currentsong").parent().attr('title', video.title)
       if (typeof video.startTime !== 'undefined') data.startSeconds = video.startTime
       if (typeof video.endTime !== 'undefined') data.endSeconds = video.endTime
       player.loadVideoById(data);
@@ -123,22 +156,42 @@
   }
 
   $("#YTControl").on('click', function() {
-    $("#YTControl span").removeClass()
+    $("#YTControl i").removeClass()
     if (player.getPlayerState() === YT.PlayerState.PAUSED || afterStart) {
       if (afterStart) socket.emit('getVideoID')
       afterStart = false
       player.playVideo()
-      $("#YTControl span").addClass('glyphicon glyphicon-pause text-danger')
+      $("#YTControl i").addClass('glyphicon glyphicon-pause text-danger')
     } else {
       player.pauseVideo()
-      $("#YTControl span").addClass('glyphicon glyphicon-play text-success')
+      $("#YTControl i").addClass('glyphicon glyphicon-play text-success')
     }
   })
 
   $(".progress").on('click', function(e) {
     player.seekTo(player.getDuration() / 100 * (Math.floor(e.offsetX * 100 / this.offsetWidth)))
   })
-</script>
 
+  setInterval(function() {
+    socket.emit('getSongRequests');
+  }, 2000)
+  socket.on('songRequestsList', function(list) {
+    $("#yt-song-requests-count").text(list.length)
+
+    $("table#songRequestsWidget").empty();
+    if (_.isEmpty(list)) {
+      $("table#songRequestsWidget").append('<tr><td colspan=3 class="text-info text-center"><strong>No song requests found</strong></td></tr>');
+    }
+    for (var index in list) {
+      if (list.hasOwnProperty(index)) {
+        var title = list[index].title,
+          requestedBy = list[index].username,
+          length_seconds = list[index].length_seconds,
+          videoID = list[index].videoID;
+        $("table#songRequestsWidget").append('<tr><td>' + (new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + '</td><td>' + title + '</td><td>' + requestedBy + '</td></tr>');
+      }
+    }
+  });
+</script>
 <!-- YTPlayer -->
 <script src="https://www.youtube.com/iframe_api"></script>

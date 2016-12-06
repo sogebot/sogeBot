@@ -38,7 +38,6 @@ function Songs () {
 Songs.prototype.webPanel = function () {
   global.panel.addMenu({category: 'systems', name: 'Songs', id: 'songs'})
   global.panel.addWidget('ytplayer', 'YouTube player', 'music')
-  global.panel.addWidget('songrequests', 'Song Requests', 'list-alt')
 
   global.panel.socketListening(this, 'getVideoID', this.sendNextSongID)
   global.panel.socketListening(this, 'getSongRequests', this.sendSongRequestsList)
