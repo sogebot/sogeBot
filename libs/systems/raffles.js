@@ -29,8 +29,16 @@ function Raffles () {
     global.configuration.register('raffleAnnounceInterval', 'raffle.announceInterval', 'number', 10)
 
     this.registerRaffleKeyword(this)
+
+    global.panel.socketListening(this, 'getRafflesConfiguration', this.sendConfiguration)
   }
   log.info('Raffles system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.raffles === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+}
+
+Raffles.prototype.sendConfiguration = function (self, socket) {
+  socket.emit('rafflesConfiguration', {
+    raffleAnnounceInterval: global.configuration.getValue('raffleAnnounceInterval')
+  })
 }
 
 Raffles.prototype.registerRaffleKeyword = function (self) {

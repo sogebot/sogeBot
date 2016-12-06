@@ -79,7 +79,7 @@
     <div role="tabpanel" class="tab-pane" id="raffles-settings">
       <div class="input-group">
         <span class="input-group-addon">Announce every</span>
-        <input type="text" class="form-control">
+        <input type="text" class="form-control" id="raffleAnnounce">
         <span class="input-group-addon">minutes</span>
       </div>
       <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('raffles')" style="margin-top: 20px;">Remove widget</button>
@@ -128,7 +128,6 @@
     },
     updateWinnerTab: function () {
       $('a[href="#raffles-winner"]').css('display', 'block')
-      $('a[href="#raffles-winner"]').tab('show') // TODO: delete
 
       var following = $('#raffleWinnerFollowing')
       following.children('span').css('color', this.winner.isFollowing ? 'green' : 'red')
@@ -167,6 +166,9 @@
     clearParticipants: function () {
       socket.emit('clearRaffleParticipants')
       $('#raffles-participants-count').text(0)
+
+      $("#raffleWidgetRoll").removeClass()
+      $("#raffleWidgetRoll").addClass('btn btn-disabled btn-block')
     },
     createRaffle: function (el) {
       this.keyword = $(el).val()
@@ -230,6 +232,7 @@
     updateParticipants: function (list) {
       var max_show = 100
       var $el = $('#raffles-participants-list')
+      this.participants = _.isUndefined(list.length) ? 0 : list.length
 
       $el.empty()
       _.each(list, function (item) {
@@ -244,11 +247,9 @@
       if (!this.isSearching) $('#raffles-participants-count').text(list.length)
 
       $("#raffleWidgetRoll").removeClass()
-      if (list.length === 0) {
+      if (this.participants === 0) {
         $("#raffleWidgetRoll").addClass('btn btn-disabled btn-block')
       } else $("#raffleWidgetRoll").addClass('btn btn-success btn-block')
-
-      this.participants = list.length
     }
   }
 
@@ -265,5 +266,22 @@
 
   socket.off('rafflesMessages')
   socket.on('rafflesMessages', function (messages) { raffles.updateMessages(messages) })
+
+  var $input = $('#raffleAnnounce')
+  $input.off()
+  $input.on('focusout', function() {
+    var value = $input.val()
+    var data = {}
+    data['raffleAnnounceInterval'] = value
+    socket.emit('saveConfiguration', data)
+  })
+
+  socket.emit('getRafflesConfiguration')
+  socket.off('rafflesConfiguration')
+  socket.on('rafflesConfiguration', function(data) {
+    console.log(data)
+    $("#raffleAnnounce").val(data.raffleAnnounceInterval)
+  })
+
 
 </script>

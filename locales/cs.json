@@ -11,6 +11,7 @@
     "error": "Promin, (sender), ale neco se pokazilo!"
   },
   "raffle": {
+    "announceInterval": "Otevrene raffle budou oznamovany kazdych (value) minut",
     "commons": {
       "opened": "je otevrena! Pouzij !(keyword) aby ses zucastnil!"
     },

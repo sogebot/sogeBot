@@ -11,6 +11,7 @@
     "error": "Sorry, (sender), but something went wrong!"
   },
   "raffle": {
+    "announceInterval": "Opened raffles will be announced every (value) minute",
     "commons": {
       "opened": "is opened! Use !(keyword) to join raffle!"
     },
