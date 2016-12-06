@@ -50,7 +50,7 @@ global.translate().then(function () {
 })
 
 // load widgets
-require('auto-load')('./libs/widgets/')
+global.widgets = require('auto-load')('./libs/widgets/')
 
 // Connect the client to the server..
 global.client.connect()
