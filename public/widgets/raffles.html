@@ -26,7 +26,7 @@
 
   <!-- Tab panes -->
   <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="raffles-participants">
+    <div role="tabpanel" class="tab-pane" id="raffles-participants">
       <div class="input-group">
         <input type="text" class="form-control" placeholder="Search..." id="rafflesWidgetSearch" onkeyup="raffles.search(this)">
         <span class="input-group-btn">
@@ -36,7 +36,7 @@
       <ul class="list-unstyled" id="raffles-participants-list"></ul>
     </div> <!-- /PARTICIPANTS -->
 
-    <div role="tabpanel" class="tab-pane" id="raffles-giveaway">
+    <div role="tabpanel" class="tab-pane active" id="raffles-giveaway">
       <div class="input-group">
         <span class="input-group-addon">!</span>
         <input type="text" class="form-control" placeholder="Enter keyword..." id="rafflesWidgetKeyword" onkeyup="raffles.createRaffle(this)">
