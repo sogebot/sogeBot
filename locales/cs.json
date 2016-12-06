@@ -11,13 +11,12 @@
     "error": "Promin, (sender), ale neco se pokazilo!"
   },
   "raffle": {
+    "announceInterval": "Otevrene raffle budou oznamovany kazdych (value) minut",
     "commons": {
-      "opened": "je otevrena! Pouzij !(keyword) aby ses zucastnil! zbyva (time)min!",
-      "openedWithoutTime": "je otevrena! Pouzij !(keyword) aby ses zucastnil!"
+      "opened": "je otevrena! Pouzij !(keyword) aby ses zucastnil!"
     },
     "info": {
       "opened": "(sender) Raffle {raffle.commons.opened}",
-      "openedWithoutTime": "(sender) Raffle {raffle.commons.openedWithoutTime}",
       "closed": "(sender) Raffle je uzavrena, ale vitez jeste nebyl vybran!",
       "notRunning": "(sender) Zadne raffle neni momentalne otevreno!"
     },
@@ -26,9 +25,7 @@
       "running": "(sender) Raffle nyni jiz bezi! Keyword pro raffle je !(keyword)",
       "locked": "(sender) Raffle je nyni uzavreno! Vyber viteze pomoci !raffle pick",
       "ok": "Nova raffle {raffle.commons.opened}",
-      "okWithoutTime": "Nova raffle {raffle.commons.openedWithoutTime}",
-      "notice": "Raffle {raffle.commons.opened}",
-      "noticeWithoutTime": "Raffle {raffle.commons.openedWithoutTime}"
+      "notice": "Raffle {raffle.commons.opened}"
     },
     "close": {
       "ok": "Raffle byla uzavrena! Uz se nemuzes zucastnit!",

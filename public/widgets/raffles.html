@@ -1,0 +1,287 @@
+<div class="widget">
+    <ul class="nav nav-pills" role="tablist">
+      <li role="presentation" class="active">
+        <a href="#raffles-participants" aria-controls="home" role="tab" data-toggle="tab" title="Participants">
+          <span id="raffles-participants-count">0</span>
+          <i class="fa fa-users" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li role="presentation">
+        <a href="#raffles-giveaway" aria-controls="home" role="tab" data-toggle="tab" title="Giveaway">
+          <i class="fa fa-gift" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li role="presentation">
+        <a href="#raffles-winner" aria-controls="home" role="tab" data-toggle="tab" title="Last winner" style="display:none">
+          <i class="fa fa-trophy" aria-hidden="true"></i>
+          <span class="raffles-winner-name"></span>
+        </a>
+      </li>
+      <li role="presentation">
+        <a href="#raffles-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+          <i class="fa fa-cog" aria-hidden="true"></i>
+        </a>
+      </li>
+    </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="raffles-participants">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search..." id="rafflesWidgetSearch" onkeyup="raffles.search(this)">
+        <span class="input-group-btn">
+          <button class="btn btn-muted" type="button" title="Cancel search" onclick="raffles.cleanSearch()"><i class="fa fa-close" aria-hidden="true"></i></button>
+        </span>
+      </div>
+      <ul class="list-unstyled" id="raffles-participants-list"></ul>
+    </div> <!-- /PARTICIPANTS -->
+
+    <div role="tabpanel" class="tab-pane" id="raffles-giveaway">
+      <div class="input-group">
+        <span class="input-group-addon">!</span>
+        <input type="text" class="form-control" placeholder="Enter keyword..." id="rafflesWidgetKeyword" onkeyup="raffles.createRaffle(this)">
+        <span class="input-group-btn">
+          <button class="btn btn-warning" type="button" title="Clear participants" onclick="raffles.clearParticipants()"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+          <button class="btn btn-danger" type="button" title="Remove raffle" onclick="raffles.removeRaffle()"><i class="fa fa-close" aria-hidden="true"></i></button>
+        </span>
+      </div>
+
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default btn-label" disabled="disabled">Eligible to enter: </button>
+        <button type="button" class="btn btn-disabled" id="followerCheckbox" onclick="raffles.switchFollowersOnly()">Followers only</button>
+      </div>
+      <button type="button" class="btn btn-disabled btn-block" style="margin-top: 20px;" id="raffleWidgetRoll" onclick="raffles.rollWinner()">Roll a winner</button>
+    </div> <!-- /GIVEAWAY -->
+    <div role="tabpanel" class="tab-pane" id="raffles-winner">
+        <div style="text-align: center"><strong style="font-size: 30px"><i class="fa fa-twitch" aria-hidden="true"></i> <span class="raffles-winner-name"></span></strong></div>
+
+        <div class="text-center">
+          <div class="btn-group" role="group ">
+            <button type="button" class="btn btn-link" disabled="disabled" id="raffleWinnerFollowing"><span><i aria-hidden="true"></i> Following</span></button>
+            <button type="button" class="btn btn-link"><a href="" id="raffleWinnerMessage"><i class="fa fa-envelope" aria-hidden="true"></i> Send Message</a></button>
+            <button type="button" class="btn btn-link" onclick="raffles.rollWinner()"><span style="color: gray"><i class="fa fa-refresh" aria-hidden="true"></i> Roll again</span></button>
+          </div>
+        </div>
+
+        <div class="table-responsive" style="margin-top: 0; padding-left: 10px; padding-right: 10px;">
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <td style="vertical-align: bottom; font-size: 18px;"><i class="fa fa-comments-o" aria-hidden="true"></i> Messages</td>
+                <td style="font-size: 25px; text-align: right;"><strong id="raffleMessageOffset">0:00</strong></td>
+              </tr>
+            </thead>
+            <tbody style="font-size:10px;" id="raffleMessages">
+            </tbody>
+          </table>
+        </div>
+    </div> <!-- /WINNER -->
+    <div role="tabpanel" class="tab-pane" id="raffles-settings">
+      <div class="input-group">
+        <span class="input-group-addon">Announce every</span>
+        <input type="text" class="form-control" id="raffleAnnounce">
+        <span class="input-group-addon">minutes</span>
+      </div>
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('raffles')" style="margin-top: 20px;">Remove widget</button>
+    </div> <!-- /SETTINGS -->
+
+    <div class="clearfix"></div>
+  </div>
+</div>
+
+<script>
+  var raffles = {
+    isSearching: false,
+    followersOnly: false,
+    keyword: '',
+    winner: null,
+    timestamp: new Date().getTime(),
+    participants: 0,
+    updateMessages: function (messages) {
+      var $el = $("#raffleMessages")
+      var $offset = $("#raffleMessageOffset")
+
+      var timestamp
+      if (!_.isUndefined(messages[0])) {
+        timestamp = messages[0].timestamp
+        $offset.css('color', 'green')
+      }
+      else {
+        timestamp = new Date().getTime()
+        $offset.css('color', 'red')
+      }
+
+      var difference = timestamp - this.timestamp
+      difference -= Math.floor(difference/1000/60/60/24)*1000*60*60*24
+      difference -= Math.floor(difference/1000/60/60)*1000*60*60
+
+      var minutesDifference = Math.floor(difference/1000/60);
+      difference -= minutesDifference*1000*60
+
+      var secondsDifference = Math.floor(difference/1000);
+      $offset.text(minutesDifference + ':' + (secondsDifference <= 10 ? '0' + secondsDifference : secondsDifference))
+
+      $el.empty()
+      _.each(messages.slice(Math.max(messages.length - 5, 0)), function (message) {
+        $el.append('<tr><td>' + message.text + '</td><td style="text-align: right">' + moment.unix(message.timestamp/1000).format("HH:mm:ss") + '</td></tr>')
+      })
+    },
+    updateWinnerTab: function () {
+      $('a[href="#raffles-winner"]').css('display', 'block')
+
+      var following = $('#raffleWinnerFollowing')
+      following.children('span').css('color', this.winner.isFollowing ? 'green' : 'red')
+      following.children('span').children('i').removeClass().addClass('fa ' + (this.winner.isFollowing ? 'fa-check' : 'fa-close'))
+
+      var message = $('#raffleWinnerMessage')
+      message.attr('href', 'https://www.twitch.tv/message/compose?to=' + this.winner.username)
+
+      $(".raffles-winner-name").text(this.winner.username)
+    },
+    updateWinner: function (winner) {
+      this.winner = winner
+      this.winner.isFollowing = !_.isNull(this.winner.isFollowing) && this.winner.isFollowing
+
+      if (!_.isNull(this.winner)) {
+        this.updateWinnerTab()
+        $('a[href="#raffles-winner"]').tab('show')
+        socket.emit('getRafflesParticipants')
+        socket.emit('getRaffle')
+      }
+    },
+    rollWinner: function () {
+      if (this.keyword === '' || this.participants === 0) return
+      socket.emit('rafflesRollWinner')
+      this.winner = null
+    },
+    removeRaffle: function () {
+      socket.emit('removeRaffle')
+      $('#raffles-participants-count').text(0)
+      $("#rafflesWidgetKeyword").val("")
+      this.keyword = ''
+
+      $("#raffleWidgetRoll").removeClass()
+      $("#raffleWidgetRoll").addClass('btn btn-disabled btn-block')
+    },
+    clearParticipants: function () {
+      socket.emit('clearRaffleParticipants')
+      $('#raffles-participants-count').text(0)
+
+      $("#raffleWidgetRoll").removeClass()
+      $("#raffleWidgetRoll").addClass('btn btn-disabled btn-block')
+    },
+    createRaffle: function (el) {
+      this.keyword = $(el).val()
+      if (this.keyword.trim().length === 0) this.removeRaffle()
+      socket.emit('createRaffle', {keyword: this.keyword, followers: this.followersOnly})
+
+      $("#raffleWidgetRoll").removeClass()
+      if (this.participants === 0) {
+        $("#raffleWidgetRoll").addClass('btn btn-disabled btn-block')
+      } else $("#raffleWidgetRoll").addClass('btn btn-success btn-block')
+    },
+    switchFollowersOnly: function () {
+      this.followersOnly = !this.followersOnly
+      $("#followerCheckbox").removeClass()
+      if (this.followersOnly) $("#followerCheckbox").addClass('btn btn-success')
+      else $("#followerCheckbox").addClass('btn btn-danger')
+      socket.emit('setRafflesFollowersOnly', this.followersOnly)
+    },
+    updateRaffle: function (raffle) {
+      this.followersOnly = !_.isNull(raffle) && raffle.followers
+      this.keyword = !_.isNull(raffle) && raffle.keyword ? raffle.keyword : ''
+      this.winner = !_.isNull(raffle) && raffle.winner ? raffle.winner : null
+      this.timestamp = !_.isNull(raffle) && raffle.timestamp ? raffle.timestamp : null
+
+      $("#rafflesWidgetKeyword").val(this.keyword)
+
+      $("#followerCheckbox").removeClass()
+      if (this.followersOnly) $("#followerCheckbox").addClass('btn btn-success')
+      else $("#followerCheckbox").addClass('btn btn-danger')
+
+      if (!_.isNull(this.winner)) {
+        this.updateWinnerTab()
+      } else {
+        $(".raffles-winner-name").text('')
+      }
+    },
+    cleanSearch: function () {
+      $("#rafflesWidgetSearch").val("")
+      this.isSearching = false
+      socket.emit('getRafflesParticipants')
+    },
+    search: function (el) {
+      if (el.value.trim().length === 0) {
+        socket.emit('getRafflesParticipants')
+        this.isSearching = false
+      } else {
+        socket.emit('searchRafflesParticipants', el.value)
+        this.isSearching = true
+      }
+    },
+    switchEligibility: function (el) {
+      $(el).children('i').removeClass()
+      if (el.dataset.eligible == 'true') { $(el).children('i').addClass('fa fa-dot-circle-o') }
+      else { $(el).children('i').addClass('fa fa-check-circle-o text-success') }
+
+      if (el.dataset.eligible == 'true') el.dataset.eligible = false
+      else el.dataset.eligible = true
+
+      socket.emit('switchEligibility', {username: el.dataset.username, eligible: el.dataset.eligible});
+    },
+    updateParticipants: function (list) {
+      var max_show = 100
+      var $el = $('#raffles-participants-list')
+      this.participants = _.isUndefined(list.length) ? 0 : list.length
+
+      $el.empty()
+      _.each(list, function (item) {
+        max_show = max_show - 1
+        if (max_show < 0) return
+        $el.append('<li data-username="' + item.username + '" data-eligible="' + item.eligible + '" onclick="raffles.switchEligibility(this)"><i class="fa ' + (item.eligible ? 'fa-check-circle-o text-success' : 'fa-dot-circle-o') + '" aria-hidden="true"></i> ' + item.username + '</li>')
+      })
+
+      if (max_show < 0) {
+        $el.append('<li><i class="fa fa-eye-slash" aria-hidden="true"  style="color: red"></i> ' + Math.abs(max_show) + ' hidden</li>')
+      }
+      if (!this.isSearching) $('#raffles-participants-count').text(list.length)
+
+      $("#raffleWidgetRoll").removeClass()
+      if (this.participants === 0) {
+        $("#raffleWidgetRoll").addClass('btn btn-disabled btn-block')
+      } else $("#raffleWidgetRoll").addClass('btn btn-success btn-block')
+    }
+  }
+
+  socket.off('rafflesParticipants')
+  socket.emit('getRafflesParticipants')
+  socket.on('rafflesParticipants', function (list) { raffles.updateParticipants(list) })
+
+  socket.off('getRaffle')
+  socket.emit('getRaffle')
+  socket.on('raffle', function (raffle) { raffles.updateRaffle(raffle) })
+
+  socket.off('raffleWinner')
+  socket.on('raffleWinner', function (winner) { raffles.updateWinner(winner) })
+
+  socket.off('rafflesMessages')
+  socket.on('rafflesMessages', function (messages) { raffles.updateMessages(messages) })
+
+  var $input = $('#raffleAnnounce')
+  $input.off()
+  $input.on('focusout', function() {
+    var value = $input.val()
+    var data = {}
+    data['raffleAnnounceInterval'] = value
+    socket.emit('saveConfiguration', data)
+  })
+
+  socket.emit('getRafflesConfiguration')
+  socket.off('rafflesConfiguration')
+  socket.on('rafflesConfiguration', function(data) {
+    console.log(data)
+    $("#raffleAnnounce").val(data.raffleAnnounceInterval)
+  })
+
+
+</script>
