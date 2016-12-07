@@ -23,6 +23,7 @@ function RafflesWidget () {
   global.panel.socketListening(this, 'createRaffle', this.createRaffle)
   global.panel.socketListening(this, 'removeRaffle', this.removeRaffle)
   global.panel.socketListening(this, 'rafflesRollWinner', this.rafflesRollWinner)
+  global.panel.socketListening(this, 'getRafflesConfiguration', this.sendConfiguration)
 
   global.parser.registerParser(this, 'rafflesMessages', this.rafflesMessages, constants.VIEWERS)
 
@@ -31,6 +32,12 @@ function RafflesWidget () {
     self.sendRafflesParticipants(self)
     self.sendRafflesMessages(self)
   }, 1000)
+}
+
+RafflesWidget.prototype.sendConfiguration = function (self, socket) {
+  socket.emit('rafflesConfiguration', {
+    raffleAnnounceInterval: global.configuration.getValue('raffleAnnounceInterval')
+  })
 }
 
 RafflesWidget.prototype.rafflesMessages = function (self, id, sender, text) {

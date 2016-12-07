@@ -5,7 +5,7 @@
 body {
   padding-top: 50px;
   background-color: #eee;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .navbar-fixed-top {
@@ -229,10 +229,6 @@ a.active {
   line-height: 70px;
 }
 
-.widget div:nth-of-type(3) {
-  margin-top: 10px;
-}
-
 .widget .title ~ .controls .dropdown {
   margin-top: -55px;
   float:left;
@@ -301,6 +297,16 @@ a.active {
   margin: 5px;
   font-weight: bold;
 }
+
+.input-group-addon:last-child, .input-group-addon:first-child {
+  border-right: 0; border-left: 0
+}
+
+.input-group .form-control:first-child {
+  border-left: 0; border-right: 0;
+}
+
+
 
 
 /* FOOTER */

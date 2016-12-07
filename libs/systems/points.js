@@ -176,7 +176,7 @@ Points.prototype.getPointsName = function (points) {
   }
 
   var pointsName = (points === 1 ? single : multi)
-  if (!_.isNull(xmulti) && points > 1 && points <= 10) {
+  if (!_.isNull(xmulti) && typeof xmulti === 'string' && points > 1 && points <= 10) {
     for (var i = points; i <= 10; i++) {
       if (typeof xmulti[i] === 'string') {
         pointsName = xmulti[i]
