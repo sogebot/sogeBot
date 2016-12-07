@@ -130,7 +130,7 @@ RafflesWidget.prototype.setRafflesFollowersOnly = function (self, socket, follow
         } else {
           var user = new User(item.username)
           user.isLoaded().then(function () {
-            item.eligible = user.get('isFollower')
+            item.eligible = !_.isUndefined(user.get('isFollower')) && user.get('isFollower')
             global.botDB.update({ _id: item._id }, item)
             self.forceSendRaffleParticipants(self)
           })
