@@ -169,9 +169,7 @@ Twitch.prototype.saveStream = function (stream) {
 }
 
 Twitch.prototype.webPanel = function () {
-  global.panel.addWidget('chat', 'Twitch Chat', 'comment')
   global.panel.addWidget('twitch', 'Twitch Stream Monitor', 'facetime-video')
-  global.panel.socketListening(this, 'getChatRoom', this.sendChatRoom)
   global.panel.socketListening(this, 'getTwitchVideo', this.sendTwitchVideo)
   global.panel.socketListening(this, 'getStats', this.sendStats)
 }
@@ -191,10 +189,6 @@ Twitch.prototype.sendStats = function (self, socket) {
     currentHosts: self.currentHosts
   }
   socket.emit('stats', data)
-}
-
-Twitch.prototype.sendChatRoom = function (self, socket) {
-  socket.emit('chatRoom', global.configuration.get().twitch.owner.toLowerCase())
 }
 
 Twitch.prototype.sendTwitchVideo = function (self, socket) {

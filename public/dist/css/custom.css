@@ -306,8 +306,31 @@ a.active {
   border-left: 0; border-right: 0;
 }
 
+ .chat-block {
+   padding-left: 10px; padding-right: 10px;
+ }
 
+#chat-room {
+  padding-bottom:10px;
+  max-height:400px;
+  overflow-y: auto;
+}
 
+.chat-username {
+  text-transform: uppercase;
+  padding-left: 10px;
+  font-weight: bold;
+}
+
+.chat-message {
+  display:inline-block;
+  width: 100%;
+  padding-left: 10px;
+}
+
+.chat-time {
+  font-size: 10px;
+}
 
 /* FOOTER */
 .footer {

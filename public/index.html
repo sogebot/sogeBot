@@ -61,7 +61,7 @@
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
       <h2>Viewers</h2>
-      <span class="data" id="curViewers">-</span>
+      <span class="data curViewers">-</span>
       <span class="stats">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
@@ -314,7 +314,7 @@
       }
 
       $("#uptime").text(data.uptime !== '' ? data.uptime : '00:00:00')
-      $("#curViewers").text(data.currentViewers)
+      $(".curViewers").text(data.currentViewers)
       $("#curViews").text(data.currentViews)
       $("#curHosts").text(data.currentHosts)
       $("#maxViewers").text(data.maxViewers)
