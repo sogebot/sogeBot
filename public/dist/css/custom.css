@@ -271,9 +271,6 @@ a.active {
 #twitchVideoWidget iframe {
   height: 315px;
 }
-#chatWidget iframe {
-  height: 600px;
-}
 
 .progress {
   z-index: 9999;
@@ -310,26 +307,11 @@ a.active {
    padding-left: 10px; padding-right: 10px;
  }
 
-#chat-room {
-  padding-bottom:10px;
-  max-height:400px;
-  overflow-y: auto;
+#chat-room iframe {
+  height: 600px;
 }
-
-.chat-username {
-  text-transform: uppercase;
-  padding-left: 10px;
-  font-weight: bold;
-}
-
-.chat-message {
-  display:inline-block;
-  width: 100%;
-  padding-left: 10px;
-}
-
-.chat-time {
-  font-size: 10px;
+#chat-room iframe > .chat-header {
+  display: none !important;
 }
 
 /* FOOTER */

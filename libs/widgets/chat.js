@@ -13,8 +13,4 @@ ChatWidget.prototype.sendChatRoom = function (self, socket) {
   socket.emit('chatRoom', global.configuration.get().twitch.owner.toLowerCase())
 }
 
-ChatWidget.prototype.sendMessage = function (self, id, sender, text) {
-  global.panel.io.emit('chatMessage', {username: sender.username, message: text})
-}
-
 module.exports = new ChatWidget()
