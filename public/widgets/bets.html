@@ -27,6 +27,16 @@
     </div> <!-- /BETS -->
 
     <div role="tabpanel" class="tab-pane" id="bets-settings">
+      <div class="input-group">
+        <span class="input-group-addon">Close bet after</span>
+        <input type="text" class="form-control" id="bets-close-after">
+        <span class="input-group-addon">minutes</span>
+      </div>
+      <div class="input-group">
+        <span class="input-group-addon">Gain every option</span>
+        <input type="text" class="form-control" id="bets-percent-gain">
+        <span class="input-group-addon">%</span>
+      </div>
       <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('bets')" style="margin-top: 20px;">Remove widget</button>
     </div> <!-- /SETTINGS -->
 
@@ -53,17 +63,21 @@
     updateTemplates: function (list) {
       $("#bets-templates").empty()
       _.each(list, function (options) {
+        var option_labels = ''
+        _.each(options, function (option) {
+          option_labels = option_labels + '<button type="button" class="btn btn-default btn-label" disabled="disabled">' + option + '</button>'
+        })
+
         $("#bets-templates").append(
-          '<tr>' +
-            '<td style="line-height: 30px"><strong>' + options.join(' | ') + '</strong></td>' +
-            '<td class="text-right">' +
-              '<div class="btn-group" role="group">' +
+          '<div class="btn-group" role="group" style="width: 100%">' +
+            '<div class="btn-group" role="group"> ' + option_labels + ' </div>' +
+              '<div class="btn-group" role="group" style="float: right">' +
                 '<button type="button" class="btn btn-default" onclick="bets.reuse(this)" data-options="' + options.join(' | ') + '">re-use bet</button>' +
-                '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
+                '<button type="button" onclick="commons.confirm(this)" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
                 '<button type="button" style="display: none" class="btn btn-success btn-confirm" onclick="bets.remove(this)" data-options="' + options.join(' | ') + '"><span class="glyphicon glyphicon-ok"></span></button>' +
                 '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="glyphicon glyphicon-remove"></span></button>' +
-              '</div></td>' +
-          '</tr>'
+              '</div>' +
+          '</div>'
           )
       })
     },
@@ -75,14 +89,16 @@
         $('a[href="#bets-templates"]').tab('show')
       } else {
         $el.empty()
+        $('a[href="#bets-running"]').css('display', 'block')
+        $('a[href="#bets-running"]').tab('show')
         bets.timerEnd = bet.timerEnd
         $el.append('<div class="text-center">')
         var btns = []
-        btns.push('<div class="btn-group" role="group">')
+        btns.push('<div class="btn-group btn-group-justified" role="group">')
         _.each(bet.bets, function (value, index) {
-          btns.push('<button onclick="bets.close(this)" data-option="' + index + '" type="button" class="btn btn-default">' + index + '</button>')
+          btns.push('<div class="btn-group" role="group"><button onclick="bets.close(this)" data-option="' + index + '" type="button" class="btn btn-default">' + index + '</button></div>')
         })
-        btns.push('<button onclick="bets.close(this)" data-option="refund" type="button" class="btn btn-danger">refund</button>')
+        btns.push('<div class="btn-group" role="group"><button onclick="bets.close(this)" data-option="refund" type="button" class="btn btn-danger">refund</button></div>')
         btns.push('</div>')
         $el.append(btns.join(''))
         $el.append('</div>')
@@ -117,4 +133,30 @@
 
   socket.off('runningBet')
   socket.on('runningBet', function (bet) { bets.updateBet(bet) })
+
+  socket.emit('getBetsConfiguration')
+  socket.off('betsConfiguration')
+  socket.on('betsConfiguration', function(data) {
+    $("#bets-close-after").val(data.betCloseTimer)
+    $("#bets-percent-gain").val(data.betPercentGain)
+  })
+
+  var $betCloseTimerInput = $('#bets-close-after')
+  $betCloseTimerInput.off()
+  $betCloseTimerInput.on('focusout', function() {
+    var value = $betCloseTimerInput.val()
+    var data = {}
+    data['betCloseTimer'] = value
+    socket.emit('saveConfiguration', data)
+  })
+
+  var $betPercentGainInput = $('#bets-percent-gain')
+  $betPercentGainInput.off()
+  $betPercentGainInput.on('focusout', function() {
+    var value = $betPercentGainInput.val()
+    var data = {}
+    data['betPercentGain'] = value
+    socket.emit('saveConfiguration', data)
+  })
+
 </script>
