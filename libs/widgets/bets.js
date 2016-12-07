@@ -12,6 +12,7 @@ function BetsWidget () {
   global.panel.socketListening(this, 'closeBet', this.closeBet)
   global.panel.socketListening(this, 'reuseBet', this.reuseBet)
   global.panel.socketListening(this, 'removeBetTemplate', this.removeBetTemplate)
+  global.panel.socketListening(this, 'getBetsConfiguration', this.sendConfiguration)
 
   var self = this
   setInterval(function () {
@@ -21,6 +22,13 @@ function BetsWidget () {
       self.timerEnd = global.systems.bets.timerEnd
     }
   }, 1000)
+}
+
+BetsWidget.prototype.sendConfiguration = function (self, socket) {
+  socket.emit('betsConfiguration', {
+    betCloseTimer: global.configuration.getValue('betCloseTimer'),
+    betPercentGain: global.configuration.getValue('betPercentGain')
+  })
 }
 
 BetsWidget.prototype.getBetsTemplates = function (self, socket) {

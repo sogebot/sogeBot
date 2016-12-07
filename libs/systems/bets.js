@@ -191,7 +191,7 @@ Bets.prototype.saveBet = function (self, sender, text) {
                   .replace('(option)', betTo)
                   .replace('(amount)', newBet)
                   .replace('(pointsName)', Points.getPointsName(newBet))
-                  .replace('(winAmount)', Math.round((parseInt(newBet, 10) * percentGain) + newBet))
+                  .replace('(winAmount)', Math.round((parseInt(newBet, 10) * percentGain)))
                   .replace('(winPointsName)', Points.getPointsName(Math.round((parseInt(newBet, 10) * percentGain)))), sender)
               }
             })

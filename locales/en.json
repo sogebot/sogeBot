@@ -143,7 +143,7 @@
       "pointsName": {
         "single": "point",
         "multi": "points",
-        "xmulti": null
+        "xmulti": ""
       },
       "pointsResponse": "(username) has currently (amount) (pointsName)"
     }
