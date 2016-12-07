@@ -1,11 +1,7 @@
 'use strict'
 
-var _ = require('lodash')
-var constants = require('../constants')
-
 function ChatWidget () {
   global.panel.addWidget('chat', 'Twitch Chat', 'comment')
-  global.parser.registerParser(this, 'messages', this.sendMessage, constants.VIEWERS)
   global.panel.socketListening(this, 'getChatRoom', this.sendChatRoom)
 }
 
