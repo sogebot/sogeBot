@@ -271,9 +271,6 @@ a.active {
 #twitchVideoWidget iframe {
   height: 315px;
 }
-#chatWidget iframe {
-  height: 600px;
-}
 
 .progress {
   z-index: 9999;
@@ -306,8 +303,16 @@ a.active {
   border-left: 0; border-right: 0;
 }
 
+ .chat-block {
+   padding-left: 10px; padding-right: 10px;
+ }
 
-
+#chat-room iframe {
+  height: 600px;
+}
+#chat-room iframe > .chat-header {
+  display: none !important;
+}
 
 /* FOOTER */
 .footer {

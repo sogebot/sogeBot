@@ -63,7 +63,6 @@ RafflesWidget.prototype.sendWinner = function (self, user) {
   self.winner = user
   global.panel.io.emit('raffleWinner', user)
   global.botDB.remove({ $where: function () { return this._id.startsWith('raffle_messages_') } }, { multi: true })
-
 }
 
 RafflesWidget.prototype.removeRaffle = function (self, socket) {

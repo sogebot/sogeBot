@@ -1,25 +1,30 @@
 <div class="widget">
-  <div class="title">Twitch Chat</div>
-  <div class="controls">
-    <div class="dropdown">
-      <a data-id="chatWidget" onclick="commons.minimize(this)"><span class="glyphicon glyphicon-resize-small text-muted"></span></a>
-      <a id="ChatMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        <span class="glyphicon glyphicon-option-vertical text-muted"></span>
-      </a>
-      <ul class="dropdown-menu" aria-labelledby="ChatMenu">
-        <li><a href="#" onclick="deleteWidget('chat')" style="color: #a94442;">Delete widget</a></li>
-      </ul>
-    </div>
-  </div>
-  <div id="chatWidget"></div>
+    <ul class="nav nav-pills" role="tablist">
+      <li role="presentation" class="active">
+        <a href="#chat-room" aria-controls="home" role="tab" data-toggle="tab" title="Betting templates">
+          <i class="fa fa-commenting-o" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li role="presentation">
+        <a href="#chat-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+          <i class="fa fa-cog" aria-hidden="true"></i>
+        </a>
+      </li>
+    </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="chat-room">
+    </div> <!-- /CHAT-ROOM -->
+
+    <div role="tabpanel" class="tab-pane" id="chat-settings">
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('chat')" style="margin-top: 20px;">Remove widget</button>
+    </div> <!-- /SETTINGS -->
 </div>
 
 <script>
-  if (loadedJS.indexOf('chat') === -1) {
-    loadedJS.push('chat')
     socket.emit('getChatRoom');
     socket.on('chatRoom', function(room) {
-      $("#chatWidget").html('<iframe frameborder="0" scrolling="no" src="http://twitch.tv/' + room + '/chat?popout=" width="100%"></iframe>')
+      $("#chat-room").html('<iframe frameborder="0" scrolling="no" src="http://twitch.tv/' + room + '/chat?popout=" width="100%"></iframe>')
     })
-  }
 </script>
