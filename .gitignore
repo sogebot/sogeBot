@@ -1,3 +1,7 @@
 node_modules
 db/*
 logs/*
+
+public/dist/*
+!public/dist/css
+!public/dist/js
