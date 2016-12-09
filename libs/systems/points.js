@@ -303,6 +303,7 @@ Points.prototype.updatePoints = function () {
 
   User.getAllOnline().then(function (users) {
     _.each(users, function (user) {
+      user.pointsGrantedAt = _.isUndefined(user.pointsGrantedAt) ? 0 : user.pointsGrantedAt
       if (new Date().getTime() - user.pointsGrantedAt >= interval) {
         user = new User(user.username)
         user.isLoaded().then(function () {
