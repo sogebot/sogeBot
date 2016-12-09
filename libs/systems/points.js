@@ -291,9 +291,10 @@ Points.prototype.getPoints = function (self, sender) {
 Points.prototype.startCounting = function (username) {
   var user = new User(username)
   user.isLoaded().then(function () {
-    var partedTime = (user.get('partedTime') === 0 ? user.get('pointsGrantedAt') : user.get('partedTime')) // if not correctly parted
-    var pointsGrantedAt = new Date().getTime() + (user.get('pointsGrantedAt') - partedTime)
-    user.set('pointsGrantedAt', (_.isFinite(parseInt(pointsGrantedAt, 10)) && _.isNumber(parseInt(pointsGrantedAt, 10)) ? parseInt(pointsGrantedAt, 10) : new Date().getTime()))
+    var pointsGrantedAt = (_.isUndefined(user.get('pointsGrantedAt')) ? new Date().getTime() : user.get('pointsGrantedAt'))
+    var partedTime = (_.isUndefined(user.get('partedTime')) ? pointsGrantedAt : user.get('partedTime')) // if not correctly parted
+    pointsGrantedAt = new Date().getTime() + (pointsGrantedAt - partedTime)
+    user.set('pointsGrantedAt', parseInt(pointsGrantedAt, 10))
   })
 }
 
