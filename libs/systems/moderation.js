@@ -169,7 +169,7 @@ Moderation.prototype.permitLink = function (self, sender, text) {
   try {
     var parsed = text.match(/^(\w+)$/)
     global.botDB.insert({type: 'permitLink', username: parsed[0].toLowerCase()})
-    global.commons.sendMessage(global.translate('moderation.permit').replace('(who)', parsed[0]))
+    global.commons.sendMessage(global.translate('moderation.permit').replace('(who)', parsed[0]), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('moderation.failed.parsePermit'), sender)
   }
