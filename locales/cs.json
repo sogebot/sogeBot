@@ -137,9 +137,9 @@
       "pointsName": "Pojmenovani bodu nastaveno na (value) format",
       "pointsResponse": "Odpoved na body nastavena na: (value)",
       "pointsInterval": "Interval ziskavani bodu online je (value) minut",
-      "pointsPerInterval": "Pocet bodu ziskano za interval online je (amount)",
+      "pointsPerInterval": "Pocet bodu ziskano za interval online je (value)",
       "pointsIntervalOffline": "Interval ziskavani bodu offline je (value) minut",
-      "pointsPerIntervalOffline": "Pocet bodu ziskano za interval offline je (amount)"
+      "pointsPerIntervalOffline": "Pocet bodu ziskano za interval offline je (value)"
     },
     "defaults": {
       "pointsName": {
