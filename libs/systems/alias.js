@@ -1,12 +1,11 @@
 'use strict'
 
-var chalk = require('chalk')
 var constants = require('../constants')
 var _ = require('lodash')
 var log = global.log
 
 function Alias () {
-  if (global.configuration.get().systems.alias === true) {
+  if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!alias add', this.add, constants.OWNER_ONLY)
     global.parser.register(this, '!alias list', this.list, constants.OWNER_ONLY)
     global.parser.register(this, '!alias remove', this.remove, constants.OWNER_ONLY)
@@ -18,7 +17,6 @@ function Alias () {
 
     this.webPanel()
   }
-  log.info('Alias system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.alias === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Alias.prototype.webPanel = function () {

@@ -1,5 +1,4 @@
 'use strict'
-var chalk = require('chalk')
 var constants = require('../constants')
 var User = require('../user')
 var _ = require('lodash')
@@ -7,7 +6,7 @@ var _ = require('lodash')
 var log = global.log
 
 function Points () {
-  if (global.configuration.get().systems.points === true) {
+  if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!points add', this.addPoints, constants.OWNER_ONLY)
     global.parser.register(this, '!points remove', this.removePoints, constants.OWNER_ONLY)
     global.parser.register(this, '!points all', this.allPoints, constants.OWNER_ONLY)
@@ -37,7 +36,6 @@ function Points () {
 
     this.webPanel()
   }
-  log.info('Points system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.points === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Points.prototype.webPanel = function () {

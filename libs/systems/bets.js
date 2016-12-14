@@ -1,6 +1,5 @@
 'use strict'
 
-var chalk = require('chalk')
 var constants = require('../constants')
 var User = require('../user')
 var Points = require('./points')
@@ -23,7 +22,7 @@ function Bets () {
   this.timer = null
   this.timerEnd = 0
 
-  if (global.configuration.get().systems.points === true && global.configuration.get().systems.bets === true) {
+  if (global.commons.isSystemEnabled('points') && global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!bet open', this.open, constants.MODS)
     global.parser.register(this, '!bet close', this.close, constants.MODS)
     global.parser.register(this, '!bet refund', this.refundAll, constants.MODS)
@@ -37,7 +36,6 @@ function Bets () {
     // close any bets
     this.refundAll(this, null)
   }
-  log.info('Bets (game) system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.points === true && global.configuration.get().systems.alias === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Bets.prototype.open = function (self, sender, text) {

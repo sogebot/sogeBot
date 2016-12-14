@@ -1,6 +1,5 @@
 'use strict'
 
-var chalk = require('chalk')
 var constants = require('../constants')
 var User = require('../user')
 var Points = require('./points')
@@ -9,7 +8,7 @@ var _ = require('lodash')
 var log = global.log
 
 function Price () {
-  if (global.configuration.get().systems.points === true && global.configuration.get().systems.price === true) {
+  if (global.commons.isSystemEnabled('points') && global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!price set', this.set, constants.OWNER_ONLY)
     global.parser.register(this, '!price list', this.list, constants.OWNER_ONLY)
     global.parser.register(this, '!price unset', this.unset, constants.OWNER_ONLY)
@@ -21,7 +20,6 @@ function Price () {
 
     this.webPanel()
   }
-  log.info('Price system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.price === true && global.configuration.get().systems.points === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Price.prototype.webPanel = function () {

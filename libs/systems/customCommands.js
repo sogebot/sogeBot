@@ -1,12 +1,11 @@
 'use strict'
 
-var chalk = require('chalk')
 var constants = require('../constants')
 var _ = require('lodash')
 var log = global.log
 
 function CustomCommands () {
-  if (global.configuration.get().systems.customCommands === true) {
+  if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!command add', this.add, constants.OWNER_ONLY)
     global.parser.register(this, '!command list', this.list, constants.OWNER_ONLY)
     global.parser.register(this, '!command remove', this.remove, constants.OWNER_ONLY)
@@ -22,7 +21,6 @@ function CustomCommands () {
 
     this.webPanel()
   }
-  log.info('CustomCommands system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.customCommands === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 CustomCommands.prototype.webPanel = function () {

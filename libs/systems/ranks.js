@@ -1,13 +1,12 @@
 'use strict'
 
-var chalk = require('chalk')
 var constants = require('../constants')
 var User = require('../user')
 var _ = require('lodash')
 var log = global.log
 
 function Ranks () {
-  if (global.configuration.get().systems.ranks === true) {
+  if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!rank add', this.add, constants.OWNER_ONLY)
     global.parser.register(this, '!rank list', this.list, constants.OWNER_ONLY)
     global.parser.register(this, '!rank remove', this.remove, constants.OWNER_ONLY)
@@ -22,7 +21,6 @@ function Ranks () {
 
     this.webPanel()
   }
-  log.info('Ranks system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.ranks === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Ranks.prototype.webPanel = function () {

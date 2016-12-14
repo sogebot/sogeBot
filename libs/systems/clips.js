@@ -1,20 +1,15 @@
 'use strict'
 
-var chalk = require('chalk')
 var constants = require('../constants')
-
 var request = require('request')
 var _ = require('lodash')
 
-var log = global.log
-
 function Clips () {
-  if (global.configuration.get().systems.clips === true) {
+  if (global.commons.isSystemEnabled(this)) {
     global.parser.registerParser(this, 'clips', this.save, constants.VIEWERS)
 
     this.webPanel()
   }
-  log.info('Clips system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.clips === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Clips.prototype.webPanel = function () {

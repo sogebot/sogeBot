@@ -2,7 +2,6 @@
 
 var User = require('../user')
 
-var chalk = require('chalk')
 var constants = require('../constants')
 var _ = require('lodash')
 var log = global.log
@@ -17,7 +16,7 @@ var log = global.log
  */
 
 function Raffles () {
-  if (global.configuration.get().systems.raffles === true) {
+  if (global.commons.isSystemEnabled(this)) {
     this.timer = null
     this.keyword = null
 
@@ -30,7 +29,6 @@ function Raffles () {
 
     this.registerRaffleKeyword(this)
   }
-  log.info('Raffles system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.raffles === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Raffles.prototype.registerRaffleKeyword = function (self) {

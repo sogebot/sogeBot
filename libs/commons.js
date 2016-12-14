@@ -1,9 +1,16 @@
 'use strict'
 
 var _ = require('lodash')
-var log = global.log
+var chalk = require('chalk')
 
 function Commons () {
+}
+
+Commons.prototype.isSystemEnabled = function (fn) {
+  var name = (typeof fn === 'object') ? fn.constructor.name : fn
+  var enabled = global.configuration.get().systems[name.toLowerCase()]
+  if (typeof fn === 'object') global.log.info(name + ' system ' + global.translate('core.loaded') + ' ' + (enabled ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+  return enabled
 }
 
 Commons.prototype.insertIfNotExists = function (data) {
