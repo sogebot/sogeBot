@@ -1,8 +1,10 @@
 'use strict'
 
-var constants = require('../constants')
+// 3rdparty libraries
 var _ = require('lodash')
 var ytdl = require('ytdl-core')
+// bot libraries
+var constants = require('../constants')
 var log = global.log
 
 function Songs () {
