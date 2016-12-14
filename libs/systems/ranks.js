@@ -1,8 +1,10 @@
 'use strict'
 
+// 3rdparty libraries
+var _ = require('lodash')
+// bot libraries
 var constants = require('../constants')
 var User = require('../user')
-var _ = require('lodash')
 var log = global.log
 
 function Ranks () {

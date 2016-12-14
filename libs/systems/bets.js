@@ -1,9 +1,11 @@
 'use strict'
 
+// 3rdparty libraries
+var _ = require('lodash')
+// bot libraries
 var constants = require('../constants')
 var User = require('../user')
 var Points = require('./points')
-var _ = require('lodash')
 var log = global.log
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0'

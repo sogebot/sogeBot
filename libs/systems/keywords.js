@@ -1,7 +1,9 @@
 'use strict'
 
-var constants = require('../constants')
+// 3rdparty libraries
 var _ = require('lodash')
+// bot libraries
+var constants = require('../constants')
 var log = global.log
 
 function Keywords () {

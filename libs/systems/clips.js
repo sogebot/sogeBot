@@ -1,8 +1,10 @@
 'use strict'
 
-var constants = require('../constants')
+// 3rdparty libraries
 var request = require('request')
 var _ = require('lodash')
+// bot libraries
+var constants = require('../constants')
 
 function Clips () {
   if (global.commons.isSystemEnabled(this)) {

@@ -1,9 +1,10 @@
 'use strict'
 
-var User = require('../user')
-
-var constants = require('../constants')
+// 3rdparty libraries
 var _ = require('lodash')
+// bot libraries
+var User = require('../user')
+var constants = require('../constants')
 var log = global.log
 
 /*
