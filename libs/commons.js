@@ -2,6 +2,7 @@
 
 var _ = require('lodash')
 var chalk = require('chalk')
+var log = global.log
 
 function Commons () {
 }
