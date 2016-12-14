@@ -1,12 +1,11 @@
 'use strict'
 
-var chalk = require('chalk')
 var constants = require('../constants')
 var _ = require('lodash')
 var log = global.log
 
 function Moderation () {
-  if (global.configuration.get().systems.moderation === true) {
+  if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!permit', this.permitLink, constants.MODS)
 
     global.parser.registerParser(this, 'moderationLinks', this.containsLink, constants.VIEWERS)
@@ -75,8 +74,6 @@ function Moderation () {
 
     this.webPanel()
   }
-
-  log.info('Moderation system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.moderation === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Moderation.prototype.webPanel = function () {

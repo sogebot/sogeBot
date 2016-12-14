@@ -1,13 +1,12 @@
 'use strict'
 
-var chalk = require('chalk')
 var constants = require('../constants')
 var _ = require('lodash')
 var ytdl = require('ytdl-core')
 var log = global.log
 
 function Songs () {
-  if (global.configuration.get().systems.songs === true) {
+  if (global.commons.isSystemEnabled(this)) {
     this.currentSong = {}
     this.meanLoudness = -15
 
@@ -31,8 +30,6 @@ function Songs () {
     this.getMeanLoudness(this)
     this.webPanel()
   }
-
-  log.info('Songs system loaded and ' + (global.configuration.get().systems.songs === true ? chalk.green('enabled') : chalk.red('disabled')))
 }
 
 Songs.prototype.webPanel = function () {

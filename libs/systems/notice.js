@@ -1,6 +1,5 @@
 'use strict'
 
-var chalk = require('chalk')
 var constants = require('../constants')
 var crypto = require('crypto')
 var _ = require('lodash')
@@ -10,7 +9,7 @@ function Notice () {
   this.lastNoticeSent = new Date().getTime()
   this.msgCountSent = global.parser.linesParsed
 
-  if (global.configuration.get().systems.notice === true) {
+  if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!notice add', this.add, constants.OWNER_ONLY)
     global.parser.register(this, '!notice list', this.list, constants.OWNER_ONLY)
     global.parser.register(this, '!notice get', this.get, constants.OWNER_ONLY)
@@ -30,7 +29,6 @@ function Notice () {
 
     this.webPanel()
   }
-  log.info('Notice system ' + global.translate('core.loaded') + ' ' + (global.configuration.get().systems.notice === true ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
 }
 
 Notice.prototype.webPanel = function () {
