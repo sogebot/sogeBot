@@ -27,6 +27,9 @@ function Queue () {
     global.parser.register(this, '!queue open', this.open, constants.OWNER_ONLY)
     global.parser.register(this, '!queue', this.info, constants.VIEWERS)
 
+    global.watcher.watch(this, 'locked', this._save)
+    global.watcher.watch(this, 'users', this._save)
+
     this._update(this)
   }
 }
@@ -41,30 +44,26 @@ Queue.prototype._update = function (self) {
   })
 }
 
-Queue.prototype._save = function () {
+Queue.prototype._save = function (self) {
   var queue = {
-    locked: this.locked,
-    users: this.users
+    locked: self.locked,
+    users: self.users
   }
   global.botDB.update({ _id: 'queue' }, { $set: queue }, { upsert: true })
 }
 
 Queue.prototype.setLocked = function (locked) {
   this.locked = locked
-  this._save()
 }
 
 Queue.prototype.addUser = function (username) {
   if (this.users.indexOf(username) === -1) {
     this.users.push(username)
-    this._save()
   }
 }
 
 Queue.prototype.getUser = function () {
-  var user = this.users.shift()
-  this._save()
-  return user
+  return this.users.shift()
 }
 
 Queue.prototype.info = function (self, sender) {
