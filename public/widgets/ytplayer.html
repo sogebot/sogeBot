@@ -139,18 +139,29 @@
       setTimeout(function() {
         loading = false
       }, 10000)
-
-      progressUpdate = setInterval(function() {
-        var duration = player.getDuration()
-        var played = player.getCurrentTime()
-
-        var percentage = played / (duration / 100)
-
-        if (!_.isFinite(percentage)) percentage = 0
-        else percentage = Math.floor(percentage)
-        $("#youtube-progress").css('width', percentage + '%')
-      }, 1000)
     });
+
+    var retries = 0
+    unstartedCheck = setInterval(function() {
+      if(player.getPlayerState() === -1 && retries < 5) {
+        player.playVideo();
+        retries++
+      } else if (player.getPlayerState() === -1 && retries === 5) {
+        retries = 0
+        skipSong()
+      }
+    }, 1000)
+
+    progressUpdate = setInterval(function() {
+      var duration = player.getDuration()
+      var played = player.getCurrentTime()
+
+      var percentage = played / (duration / 100)
+
+      if (!_.isFinite(percentage)) percentage = 0
+      else percentage = Math.floor(percentage)
+      $("#youtube-progress").css('width', percentage + '%')
+    }, 1000)
   } else {
     $('#YTPlayer').text('Refresh your browser to use YouTube Player')
   }
