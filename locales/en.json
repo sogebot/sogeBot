@@ -312,12 +312,12 @@
   },
   "queue": {
     "info": {
-      "closed": "(username), {queue.close}",
-      "opened": "(username), {queue.open}"
+      "closed": "(sender), {queue.close}",
+      "opened": "(sender), {queue.open}"
     },
     "join": {
-      "closed": "Sorry (username), queue is currently closed",
-      "opened": "(username) were added into queue"
+      "closed": "Sorry (sender), queue is currently closed",
+      "opened": "(sender) were added into queue"
     },
     "open": "Queue is currently OPENED! Join to queue with !queue join",
     "close": "Queue is currently closed!",
