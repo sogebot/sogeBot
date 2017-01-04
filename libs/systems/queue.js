@@ -2,7 +2,6 @@
 
 // 3rdparty libraries
 var _ = require('lodash')
-var util = require('util')
 // bot libraries
 var constants = require('../constants')
 var log = global.log
@@ -99,12 +98,26 @@ Queue.prototype.pick = function (self, sender, text) {
   var amount = (input === '' ? 1 : parseInt(input, 10))
   var picked = []
 
-  do {
-    amount -= 1
+  while (amount > 0 && self.users.length > 0) {
     picked.push('@' + self.getUser())
-  } while (amount > 0)
+    amount--
+  }
 
-  global.commons.sendMessage(global.translate('queue.picked')
+  var msg
+  console.log(picked)
+  console.log(picked.length)
+  switch (picked.length) {
+    case 0:
+      msg = global.translate('queue.picked.none')
+      break
+    case 1:
+      msg = global.translate('queue.picked.single')
+      break
+    default:
+      msg = global.translate('queue.picked.multi')
+  }
+
+  global.commons.sendMessage(msg
     .replace('(users)', picked.join(', ')), sender)
 }
 
