@@ -214,6 +214,19 @@ a.active {
   margin-bottom: 10px;
 }
 
+.widget h6 {
+  font-size: 10px;
+  position:absolute;
+  right: 8%;
+  margin-top: 0;
+  line-height: 0;
+  font-weight: bold;
+  text-shadow: 0 0 2px #000, 0 0 4px #888, 0 0 8px #888;
+  color:white;
+  font-family: 'Catamaran', sans-serif !important;
+
+}
+
 .widget .title {
   font-size: 18px;
   border-bottom: 1px dotted #ddd;
