@@ -1,0 +1,45 @@
+<div class="widget">
+  <h6>QUEUE</h6>
+    <ul class="nav nav-pills" role="tablist">
+      <li role="presentation" class="active">
+        <a href="#queue-pick" aria-controls="home" role="tab" data-toggle="tab" title="Queue">
+          <i class="fa fa-unlock-alt" aria-hidden="true"></i>
+          <i class="fa fa-lock-alt" aria-hidden="true"></i>
+          <span id="queue-participants-count">0</span>
+        </a>
+      </li>
+      <li role="presentation">
+        <a href="#queue-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+          <i class="fa fa-cog" aria-hidden="true"></i>
+        </a>
+      </li>
+    </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="queue-pick">
+      <div class="input-group" style="width: 100.1%">
+        <span class="input-group-btn">
+          <button class="btn btn-success" type="button" title="Open queue" onclick="queue.toggleOpen()">Open queue</button>
+        </span>
+        <span class="input-group-addon">No. users</span>
+        <input type="number" class="form-control" placeholder="How many users should be picked?" id="" value="1" style="text-align:right">
+
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button" title="Pick from queue" onclick="queue.pick()"><i class="fa fa-user-secret" aria-hidden="true"></i></button>
+          <button class="btn btn-warning" type="button" title="Clear queue" onclick="queue.clear()"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+        </span>
+      </div>
+    </div> <!-- /QUEUE -->
+
+    <div role="tabpanel" class="tab-pane" id="queue-settings">
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('queue')" style="margin-top: 20px;">Remove widget</button>
+    </div> <!-- /SETTINGS -->
+
+    <div class="clearfix"></div>
+  </div>
+</div>
+
+<script>
+
+</script>
