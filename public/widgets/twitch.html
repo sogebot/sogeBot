@@ -1,17 +1,27 @@
 <div class="widget">
-  <div class="title">Twitch Stream Monitor</div>
-  <div class="controls">
-    <div class="dropdown">
-      <a data-id="twitchVideoWidget" onclick="commons.minimize(this)"><span class="glyphicon glyphicon-resize-small text-muted"></span></a>
-      <a id="TVMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        <span class="glyphicon glyphicon-option-vertical text-muted"></span>
+  <h6>TWITCH STREAM MONITOR</h6>
+  <ul class="nav nav-pills" role="tablist">
+    <li role="presentation" class="active">
+      <a href="#twitch-main" aria-controls="home" role="tab" data-toggle="tab" title="Twitch Stream Monitor">
+        <i class="fa fa-television" aria-hidden="true"></i>
       </a>
-      <ul class="dropdown-menu" aria-labelledby="TVMenu">
-        <li><a href="#" onclick="deleteWidget('twitch')" style="color: #a94442;">Delete widget</a></li>
-      </ul>
-    </div>
-  </div>
-  <div id="twitchVideoWidget"></div>
+    </li>
+    <li role="presentation">
+      <a href="#twitch-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+        <i class="fa fa-cog" aria-hidden="true"></i>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="twitch-main">
+      <div id="twitchVideoWidget"></div>
+    </div> <!-- /MAIN -->
+
+    <div role="tabpanel" class="tab-pane" id="twitch-settings">
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('twitch')" style="margin-top: 20px;">Remove widget</button>
+    </div> <!-- /SETTINGS -->
 </div>
 
 <script>
