@@ -1,22 +1,50 @@
 <div class="widget">
-  <div class="title">SoundBoard</div>
-  <div class="controls">
-    <div class="dropdown">
-      <a data-id="soundboard-widget" onclick="commons.minimize(this)"><span class="glyphicon glyphicon-resize-small text-muted"></span></a>
-      <a id="ChatMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        <span class="glyphicon glyphicon-option-vertical text-muted"></span>
+  <h6>SOUNDBOARD</h6>
+  <ul class="nav nav-pills" role="tablist">
+    <li role="presentation" class="active">
+      <a href="#soundboard-main" aria-controls="home" role="tab" data-toggle="tab" title="Betting templates">
+        <i class="fa fa-music" aria-hidden="true"></i>
       </a>
-      <ul class="dropdown-menu" aria-labelledby="ChatMenu">
-        <li><a href="#" onclick="deleteWidget('soundboard')" style="color: #a94442;">Delete widget</a></li>
-      </ul>
-    </div>
-  </div>
-  <div id="soundboard-widget"></div>
+    </li>
+    <li role="presentation">
+      <a href="#soundboard-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+        <i class="fa fa-cog" aria-hidden="true"></i>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="soundboard-main">
+      <div class="queue-list-group list-group" id="soundboard-list">
+      </div>
+      <div class="clearfix"></div>
+    </div> <!-- /MAIN -->
+
+    <div role="tabpanel" class="tab-pane" id="soundboard-settings">
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('soundboard')" style="margin-top: 20px;">Remove widget</button>
+    </div> <!-- /SETTINGS -->
 </div>
 
 <script>
   var soundboard = {
-    play: function (el) {
+    resize: function () {
+      _.each($(".soundboard-list-group-item span"), function (el) {
+          $(el).css('font-size', '18px')
+          soundboard.resizeEl(el, 18)
+        })
+    },
+    resizeEl: function (el, size) {
+      if ($(el).height() >= ((2*size)/5 + (98/5))) {
+        $(el).css('font-size', (size-1) + 'px')
+        $(el).css('top', Math.round((3*size)/7 - 57/7) + 'px')
+        if ($(el).height() >= ((2*size)/5 + (98/5))) {
+          soundboard.resizeEl(el, size-1)
+        }
+      }
+    },
+    play: function (ev, el) {
+      ev.preventDefault()
       var sound = el.dataset.sound
       new Audio('dist/soundboard/' + sound + '.mp3').play()
     }
@@ -26,9 +54,14 @@
 
   socket.off('soundBoardSounds')
   socket.on('soundBoardSounds', function (sounds) {
-    $("#soundboard-widget").empty()
+    $("#soundboard-list").empty()
     _.each(sounds, function (sound) {
-      $("#soundboard-widget").append('<button onclick="soundboard.play(this)" data-sound="' + sound + '" type="button" class="btn btn-default">' + sound + '</button>')
+      $("#soundboard-list").append('<a class="soundboard-list-group-item list-group-item" onclick="soundboard.play(event, this)" data-sound="' + sound + '" type="button"><span>' + sound + '</span></a>');
     })
+    soundboard.resize()
+  })
+
+  $(window).resize(function() {
+    soundboard.resize()
   })
 </script>

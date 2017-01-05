@@ -392,3 +392,27 @@ span.queue-list-group-item {
     width: 50%;
   }
 }
+
+/* SOUNDBOARD-WIDGET */
+
+a.soundboard-list-group-item {
+  width: 100%;
+  float: left;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  cursor: pointer;
+  height: 45px;
+}
+
+a.soundboard-list-group-item span {
+  overflow: hidden;
+  position: relative;
+}
+
+@media (min-width: 400px) {
+  a.soundboard-list-group-item {
+    width: 33.3%;
+  }
+}
