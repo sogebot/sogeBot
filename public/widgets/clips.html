@@ -1,21 +1,31 @@
 <div class="widget">
-  <div class="title">Latest Clips</div>
-  <div class="controls">
-    <div class="dropdown">
-      <a data-id="clips-widget" onclick="commons.minimize(this)"><span class="glyphicon glyphicon-resize-small text-muted"></span></a>
-      <a id="SRMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        <span class="glyphicon glyphicon-option-vertical text-muted"></span>
+  <h6>LATEST CLIPS</h6>
+  <ul class="nav nav-pills" role="tablist">
+    <li role="presentation" class="active">
+      <a href="#clips-main" aria-controls="home" role="tab" data-toggle="tab" title="Latest Clips">
+        <i class="fa fa-film" aria-hidden="true"></i>
       </a>
-      <ul class="dropdown-menu" aria-labelledby="SRMenu">
-        <li><a href="#" onclick="deleteWidget('clips')" style="color: #a94442;">Delete widget</a></li>
-      </ul>
-    </div>
-  </div>
-    <div id="clips-widget">
-      <table class="table table-striped table-responsive table-condensed">
-        <tbody id="ClipsWidget"></tbody>
-      </table>
-    </div>
+    </li>
+    <li role="presentation">
+      <a href="#clips-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+        <i class="fa fa-cog" aria-hidden="true"></i>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="clips-main">
+      <div id="clips-widget">
+        <table class="table table-striped table-responsive table-condensed">
+          <tbody id="ClipsWidget"></tbody>
+        </table>
+      </div>
+    </div> <!-- /MAIN -->
+
+    <div role="tabpanel" class="tab-pane" id="clips-settings">
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('clips')" style="margin-top: 20px;">Remove widget</button>
+    </div> <!-- /SETTINGS -->
 </div>
 
 <script>
