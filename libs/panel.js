@@ -44,6 +44,10 @@ function Panel () {
 
     _.each(self.socketListeners, function (listener) {
       socket.on(listener.on, function (data) {
+        if (typeof listener.fnc !== 'function') {
+          throw new Error('Function for this listener is undefined' +
+            ' widget=' + listener.self.constructor.name + ' on=' + listener.on)
+        }
         listener.fnc(listener.self, self.io, data)
       })
     })

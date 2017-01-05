@@ -309,5 +309,23 @@
         "false": "Warnings are set to chat message only"
       }
     }
+  },
+  "queue": {
+    "info": {
+      "closed": "(sender), {queue.close}",
+      "opened": "(sender), {queue.open}"
+    },
+    "join": {
+      "closed": "Sorry (sender), queue is currently closed",
+      "opened": "(sender) were added into queue"
+    },
+    "open": "Queue is currently OPENED! Join to queue with !queue join",
+    "close": "Queue is currently closed!",
+    "clear": "Queue were completely cleared",
+    "picked": {
+      "single": "This user was picked from queue: (users)",
+      "multi": "These users were picked from queue: (users)",
+      "none": "No users were found in queue"
+    }
   }
 }

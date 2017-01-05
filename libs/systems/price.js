@@ -93,7 +93,7 @@ Price.prototype.list = function (self, sender, text) {
 }
 
 Price.prototype.checkPrice = function (self, id, sender, text) {
-  if (global.parser.registeredHelpers.includes(text.trim())) {
+  if (global.parser.registeredHelpers.includes(text.trim()) || global.parser.isOwner(sender)) {
     global.updateQueue(id, true)
     return
   }

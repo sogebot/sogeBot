@@ -310,5 +310,23 @@
         "false": "Varovanim pro uzivatele bude pouze zprava v chatu"
       }
     }
+  },
+  "queue": {
+    "info": {
+      "closed": "(sender), {queue.close}",
+      "opened": "(sender), {queue.open}"
+    },
+    "join": {
+      "closed": "Promin (sender), ale queue je uzavrena",
+      "opened": "(sender) byl pridan do queue!"
+    },
+    "open": "Queue je prave OTEVRENA! Pro pridani do queue zadej !queue join",
+    "close": "Queue je prave zavrena!",
+    "clear": "Queue byla uplne vymazana",
+    "picked": {
+      "single": "Tento uzivatel byl vybran z queue: (users)",
+      "multi": "Tito uzivatele byli vybrani z queue: (users)",
+      "none": "Zadny uzivatel nebyl nalezen v queue"
+    }
   }
 }
