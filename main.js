@@ -11,6 +11,7 @@ var Commons = require('./libs/commons')
 var User = require('./libs/user')
 var Panel = require('./libs/panel')
 var Stats = require('./libs/stats')
+var Watcher = require('./libs/watcher')
 var constants = require('./libs/constants')
 require('./libs/logging')
 
@@ -20,6 +21,7 @@ global.commons = new Commons()
 global.panel = new Panel()
 global.twitch = new Twitch()
 global.stats = new Stats()
+global.watcher = new Watcher()
 global.translate = require('./libs/translate')
 
 global.status = {'TMI': constants.DISCONNECTED,
