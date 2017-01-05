@@ -371,3 +371,24 @@ table a {
   font-size: 10px;
   color:#999;
 }
+
+/* QUEUE-WIDGET */
+.queue-list-group {
+  margin-bottom: 0
+}
+
+span.queue-list-group-item {
+  width: 100%;
+  float: left;
+  font-size: 18px;
+  border: 0;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+@media (min-width: 400px) {
+  span.queue-list-group-item {
+    width: 50%;
+  }
+}

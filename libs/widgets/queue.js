@@ -1,51 +1,43 @@
 'use strict'
 
-var _ = require('lodash')
-var log = global.log
-
 function QueueWidget () {
+  this.timestamp = 0
 
+  if (global.configuration.get().systems.queue !== true) return
   global.panel.addWidget('queue', 'Queue', 'heart-empty')
+  global.panel.socketListening(this, 'queue.get', this.sendQueue)
+  global.panel.socketListening(this, 'queue.setLocked', this.setLocked)
+  global.panel.socketListening(this, 'queue.clear', this.clear)
+  global.panel.socketListening(this, 'queue.pick', this.pick)
+
+  global.watcher.watch(this, 'timestamp', this._send)
+
+  var self = this
+  setInterval(function () { self.timestamp = global.systems.queue.timestamp }, 1000)
 }
-/*
-BetsWidget.prototype.sendConfiguration = function (self, socket) {
-  socket.emit('betsConfiguration', {
-    betCloseTimer: global.configuration.getValue('betCloseTimer'),
-    betPercentGain: global.configuration.getValue('betPercentGain')
+
+QueueWidget.prototype._send = function (self) {
+  self.sendQueue(self, global.panel.io)
+}
+
+QueueWidget.prototype.sendQueue = function (self, socket) {
+  socket.emit('queue', {
+    locked: global.systems.queue.locked,
+    picked: global.systems.queue.picked,
+    users: global.systems.queue.users
   })
 }
 
-BetsWidget.prototype.getBetsTemplates = function (self, socket) {
-  global.botDB.findOne({ _id: 'bets_template' }, function (err, item) {
-    if (err) log.error(err)
-    if (!_.isNull(item)) {
-      socket.emit('betsTemplates', item.options)
-    }
-  })
+QueueWidget.prototype.setLocked = function (self, socket, locked) {
+  global.parser.parse({username: global.configuration.get().twitch.owner}, '!queue ' + (locked ? 'close' : 'open'))
 }
 
-BetsWidget.prototype.getRunningBet = function (self, socket) {
-  global.botDB.findOne({_id: 'bet'}, function (err, item) {
-    if (err) log.error(err)
-    if (_.isNull(item)) socket.emit('runningBet', null)
-    else {
-      item.timerEnd = global.systems.bets.timerEnd
-      socket.emit('runningBet', item)
-    }
-  })
+QueueWidget.prototype.clear = function (self, socket) {
+  global.parser.parse({username: global.configuration.get().twitch.owner}, '!queue clear')
 }
 
-BetsWidget.prototype.closeBet = function (self, socket, option) {
-  global.parser.parse({username: global.configuration.get().twitch.owner}, '!bet ' + (option === 'refund' ? option : 'close ' + option))
+QueueWidget.prototype.pick = function (self, socket, count) {
+  global.parser.parse({username: global.configuration.get().twitch.owner}, '!queue pick ' + count)
 }
 
-BetsWidget.prototype.reuseBet = function (self, socket, options) {
-  global.parser.parse({username: global.configuration.get().twitch.owner}, '!bet open ' + options.join(' '))
-}
-
-BetsWidget.prototype.removeBetTemplate = function (self, socket, options) {
-  global.botDB.update({ _id: 'bets_template' }, { $pull: { options: options } }, {})
-  self.getBetsTemplates(self, socket)
-}
-*/
 module.exports = new QueueWidget()

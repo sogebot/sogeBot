@@ -2,10 +2,14 @@
   <h6>QUEUE</h6>
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="active">
-        <a href="#queue-pick" aria-controls="home" role="tab" data-toggle="tab" title="Queue">
-          <i class="fa fa-unlock-alt" aria-hidden="true"></i>
-          <i class="fa fa-lock-alt" aria-hidden="true"></i>
+        <a href="#queue-main" aria-controls="home" role="tab" data-toggle="tab" title="Queue">
+          <i id="queue-toggle-icon" class="fa fa-lock" aria-hidden="true"></i>
           <span id="queue-participants-count">0</span>
+        </a>
+      </li>
+      <li role="presentation">
+        <a href="#queue-pick" aria-controls="home" role="tab" data-toggle="tab" title="Picked Users" style="display:none">
+          <i class="fa fa-user" aria-hidden="true"></i>
         </a>
       </li>
       <li role="presentation">
@@ -17,20 +21,25 @@
 
   <!-- Tab panes -->
   <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="queue-pick">
+    <div role="tabpanel" class="tab-pane active" id="queue-main">
       <div class="input-group" style="width: 100.1%">
         <span class="input-group-btn">
-          <button class="btn btn-success" type="button" title="Open queue" onclick="queue.toggleOpen()">Open queue</button>
+          <button class="btn btn-success" type="button" title="Open queue" onclick="queue.toggleLocked()" id="queue-toggle-btn">Open queue</button>
         </span>
         <span class="input-group-addon">No. users</span>
-        <input type="number" class="form-control" placeholder="How many users should be picked?" id="" value="1" style="text-align:right">
+        <input type="number" class="form-control" placeholder="How many users should be picked?" min="1" value="1" style="text-align:right" id="queue-pick-count">
 
         <span class="input-group-btn">
           <button class="btn btn-default" type="button" title="Pick from queue" onclick="queue.pick()"><i class="fa fa-user-secret" aria-hidden="true"></i></button>
           <button class="btn btn-warning" type="button" title="Clear queue" onclick="queue.clear()"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
         </span>
       </div>
-    </div> <!-- /QUEUE -->
+    </div> <!-- /MAIN -->
+
+    <div role="tabpanel" class="tab-pane" id="queue-pick">
+      <div class="queue-list-group list-group" id="queue-pick-list">
+      </div>
+    </div> <!-- /PICK -->
 
     <div role="tabpanel" class="tab-pane" id="queue-settings">
       <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('queue')" style="margin-top: 20px;">Remove widget</button>
@@ -41,5 +50,90 @@
 </div>
 
 <script>
+  var queue = {
+    locked: null,
+    picked: null,
+    users: null,
 
+    html: {
+      switchToPick: false,
+      el: {
+        toggle: $("#queue-toggle-btn"),
+        toggleIcon: $("#queue-toggle-icon"),
+        participantsCount: $("#queue-participants-count"),
+        pickList: $("#queue-pick-list"),
+        pickCount: $("#queue-pick-count")
+      },
+      locked: function () {
+        this.el.toggle.removeClass()
+        this.el.toggle.addClass('btn ' + (!queue.locked ? 'btn-danger' : 'btn-success'))
+        this.el.toggle.text((!queue.locked ? 'Close queue' : 'Open queue'))
+
+        this.el.toggleIcon.removeClass()
+        this.el.toggleIcon.addClass('fa ' + (queue.locked ? 'fa-lock' : 'fa-unlock'))
+      },
+      picked: function () {
+        var count = queue.picked.length
+        $('a[href="#queue-pick"]').css('display', (count > 0 ? 'block' : 'none'))
+
+        if (count > 0 && this.switchToPick) {
+          $('a[href="#queue-pick"]').tab('show')
+          this.switchToPick = false
+        }
+
+        this.el.pickList.empty()
+        var self = this
+        _.each(queue.picked, function (value) {
+          self.el.pickList.append('<span class="queue-list-group-item list-group-item">' + value.replace('@', '') + '</span>')
+        })
+      },
+      users: function () {
+        this.el.participantsCount.text(queue.users.length)
+      }
+    },
+
+    setLocked: function (locked) {
+      this.locked = locked
+      this.html.locked()
+    },
+    setPicked: function (picked) {
+      this.picked = picked
+      this.html.picked()
+    },
+    setUsers: function (users) {
+      this.users = users
+      this.html.users()
+    },
+
+    toggleLocked: function (el) {
+      socket.emit('queue.setLocked', !this.locked)
+      this.html.locked()
+    },
+
+    pick: function () {
+      var count = queue.html.el.pickCount.val() > 0 ? queue.html.el.pickCount.val() : 1
+      socket.emit('queue.pick', count)
+      this.picked = []
+      this.html.switchToPick = true
+    },
+    clear: function () {
+      this.picked = []
+      this.users = []
+
+      this.html.picked()
+      this.html.locked()
+
+      socket.emit('queue.clear')
+    },
+    update: function () { socket.emit('queue.get') }
+  }
+
+  socket.off('queue')
+  socket.on('queue', function(data) {
+    if (queue.locked !== data.locked) queue.setLocked(data.locked)
+    queue.setPicked(data.picked)
+    queue.setUsers(data.users)
+  })
+
+  queue.update()
 </script>

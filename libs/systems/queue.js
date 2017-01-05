@@ -15,8 +15,10 @@ var log = global.log
  * !queue clear         - clear a queue
  */
 function Queue () {
+  this.timestamp = 0
   this.locked = true
   this.users = []
+  this.picked = []
 
   if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!queue pick', this.pick, constants.OWNER_ONLY)
@@ -25,6 +27,8 @@ function Queue () {
     global.parser.register(this, '!queue close', this.close, constants.OWNER_ONLY)
     global.parser.register(this, '!queue open', this.open, constants.OWNER_ONLY)
     global.parser.register(this, '!queue', this.info, constants.VIEWERS)
+
+    global.parser.registerHelper('!queue')
 
     global.watcher.watch(this, 'locked', this._save)
     global.watcher.watch(this, 'users', this._save)
@@ -40,15 +44,19 @@ Queue.prototype._update = function (self) {
 
     self.locked = item.locked
     self.users = item.users
+    self.picked = item.picked
+    self.timestamp = new Date().getTime()
   })
 }
 
 Queue.prototype._save = function (self) {
   var queue = {
     locked: self.locked,
-    users: self.users
+    users: self.users,
+    picked: self.picked
   }
   global.botDB.update({ _id: 'queue' }, { $set: queue }, { upsert: true })
+  self.timestamp = new Date().getTime()
 }
 
 Queue.prototype.setLocked = function (locked) {
@@ -90,23 +98,22 @@ Queue.prototype.join = function (self, sender) {
 
 Queue.prototype.clear = function (self, sender) {
   self.users = []
+  self.picked = []
   global.commons.sendMessage(global.translate('queue.clear'), sender)
 }
 
 Queue.prototype.pick = function (self, sender, text) {
   var input = text.match(/^(\d+)?/)[0]
   var amount = (input === '' ? 1 : parseInt(input, 10))
-  var picked = []
+  self.picked = []
 
   while (amount > 0 && self.users.length > 0) {
-    picked.push('@' + self.getUser())
+    self.picked.push('@' + self.getUser())
     amount--
   }
 
   var msg
-  console.log(picked)
-  console.log(picked.length)
-  switch (picked.length) {
+  switch (self.picked.length) {
     case 0:
       msg = global.translate('queue.picked.none')
       break
@@ -118,7 +125,7 @@ Queue.prototype.pick = function (self, sender, text) {
   }
 
   global.commons.sendMessage(msg
-    .replace('(users)', picked.join(', ')), sender)
+    .replace('(users)', self.picked.join(', ')), sender)
 }
 
 module.exports = new Queue()

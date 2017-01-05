@@ -10,7 +10,7 @@ function Watcher () {
 
   // check for changes
   var self = this
-  setInterval(function () { self.checkChanges(self) }, 1000)
+  setInterval(function () { self.checkChanges(self) }, 100)
 }
 
 Watcher.prototype.watch = function (aObj, aVar, aFn) {
@@ -18,20 +18,20 @@ Watcher.prototype.watch = function (aObj, aVar, aFn) {
 
   this.objects[name] = aObj
   this.variables[name] = _.isUndefined(this.variables[name]) ? {} : this.variables[name]
-  this.variables[name][aVar] = aObj[aVar]
+  this.variables[name][aVar] = typeof aObj[aVar] === 'object' ? _.clone(aObj[aVar]) : aObj[aVar]
   this.functions[name + '.' + aVar] = aFn
 }
 
 Watcher.prototype.checkChanges = function (self) {
   _.each(self.variables, function (variables, obj) {
     _.each(variables, function (value, name) {
-      if ((typeof value === 'boolean' || typeof value === 'string') && value !== self.objects[obj][name]) {
+      if ((typeof value === 'boolean' || typeof value === 'string' || typeof value === 'number') && value !== self.objects[obj][name]) {
         self.functions[obj + '.' + name](self.objects[obj])
-      } else if (typeof value === 'object' && !self.arraysEqual(value, self.objects[obj][name])) {
-        console.log('array changed')
+        self.variables[obj][name] = self.objects[obj][name]
+      } else if (typeof value === 'object' && (value.length !== self.objects[obj][name].length || !self.arraysEqual(value, self.objects[obj][name]))) {
+        self.functions[obj + '.' + name](self.objects[obj])
+        self.variables[obj][name] = _.clone(self.objects[obj][name])
       }
-
-      self.variables[obj][name] = self.objects[obj][name]
     })
   })
 }

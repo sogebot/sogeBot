@@ -4,6 +4,7 @@ var _ = require('lodash')
 var log = global.log
 
 function BetsWidget () {
+  if (global.configuration.get().systems.bets !== true) return
   this.timerEnd = 0
 
   global.panel.addWidget('bets', 'Bets', 'knight')
