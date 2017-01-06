@@ -141,6 +141,8 @@ function Twitch () {
   global.parser.register(this, '!watched', this.watched, constants.VIEWERS)
   global.parser.register(this, '!me', this.showMe, constants.VIEWERS)
   global.parser.register(this, '!top', this.showTop, constants.OWNER_ONLY)
+  global.parser.register(this, '!title', this.setTitle, constants.OWNER_ONLY)
+  global.parser.register(this, '!game', this.setGame, constants.OWNER_ONLY)
 
   global.parser.registerParser(this, 'lastseen', this.lastseenUpdate, constants.VIEWERS)
 
@@ -322,6 +324,72 @@ Twitch.prototype.showTop = function (self, sender, text) {
   } catch (e) {
     global.log.error(e)
   }
+}
+
+Twitch.prototype.setTitle = function (self, sender, text) {
+  if (text.trim().length === 0) {
+    global.commons.sendMessage(global.translate('title.current')
+      .replace('(title)', self.currentStatus), sender)
+    return
+  }
+
+  global.client.api({
+    url: 'https://api.twitch.tv/kraken/channels/' + global.configuration.get().twitch.owner,
+    json: true,
+    qs: {
+      _method: 'put',
+      channel: {
+        status: text
+      }
+    },
+    headers: {
+      Accept: "application/vnd.twitchtv.v3+json",
+      Authorization: 'OAuth ' + global.configuration.get().twitch.password.split(':')[1],
+      'Client-ID': global.configuration.get().twitch.clientId
+    }
+  }, function (err, res, body) {
+    if (err) { return console.log(err) }
+    if (body.status === text.trim()) {
+      global.commons.sendMessage(global.translate('title.change.success')
+        .replace('(status)', body.status), sender)
+    } else {
+      global.commons.sendMessage(global.translate('title.change.failed')
+        .replace('(status)', body.status), sender)
+    }
+  })
+}
+
+Twitch.prototype.setGame = function (self, sender, text) {
+  if (text.trim().length === 0) {
+    global.commons.sendMessage(global.translate('game.current')
+      .replace('(game)', self.currentGame), sender)
+    return
+  }
+
+  global.client.api({
+    url: 'https://api.twitch.tv/kraken/channels/' + global.configuration.get().twitch.owner,
+    json: true,
+    qs: {
+      _method: 'put',
+      channel: {
+        game: text
+      }
+    },
+    headers: {
+      Accept: "application/vnd.twitchtv.v3+json",
+      Authorization: 'OAuth ' + global.configuration.get().twitch.password.split(':')[1],
+      'Client-ID': global.configuration.get().twitch.clientId
+    }
+  }, function (err, res, body) {
+    if (err) { return console.log(err) }
+    if (body.game === text.trim()) {
+      global.commons.sendMessage(global.translate('game.change.success')
+        .replace('(game)', body.game), sender)
+    } else {
+      global.commons.sendMessage(global.translate('game.change.failed')
+        .replace('(game)', body.game), sender)
+    }
+  })
 }
 
 module.exports = Twitch
