@@ -68,6 +68,15 @@ a.active {
   overflow: hidden;
   white-space: nowrap;
   padding-top: 15px;
+  cursor: pointer;
+}
+
+.stream-info > h2 > small {
+  display: none;
+}
+
+.stream-info:hover > h2 > small {
+  display: inline;
 }
 
 .stream-info h2 {
@@ -394,7 +403,6 @@ span.queue-list-group-item {
 }
 
 /* SOUNDBOARD-WIDGET */
-
 a.soundboard-list-group-item {
   width: 100%;
   float: left;
@@ -415,4 +423,31 @@ a.soundboard-list-group-item span {
   a.soundboard-list-group-item {
     width: 33.3%;
   }
+}
+
+/* MODAL GAME AND TITLE */
+.dlg-game-and-title {
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+.dlg-select-game > div > img {
+  width: 100%;
+}
+.dlg-select-game > div > i {
+  font-size: 30px;
+  line-height: 125px;
+}
+
+.dlg-select-game > div {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.dlg-select-game > div.col-md-1 {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.dlg-select-game > div.col-md-2.focus > img {
+  border-bottom:5px solid greenyellow
 }

@@ -49,10 +49,71 @@
     </div>
   </div>
 
+
+  <!-- CHANGE TITLE/GAME DLG -->
+  <div class="modal fade" id="game_and_title_dlg" tabindex="-1" role="dialog" aria-labelledby="game_and_title_dlg">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Change Game</h4>
+        </div>
+        <div class="modal-body dlg-game-and-title">
+          <div class="row dlg-select-game">
+            <div class="col-md-1 text-center"><i class="fa fa-chevron-circle-left" aria-hidden="true"></i></div>
+            <div class="col-md-2 focus"><img src="https://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-100x140.jpg"></div>
+            <div class="col-md-2"><img src="https://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-100x140.jpg"></div>
+            <div class="col-md-2"><img src="https://static-cdn.jtvnw.net/ttv-boxart/Dota%202-100x140.jpg"></div>
+            <div class="col-md-2"><img src="https://static-cdn.jtvnw.net/ttv-boxart/Overwatch-100x140.jpg"></div>
+            <div class="col-md-2"><img src="https://static-cdn.jtvnw.net/ttv-boxart/World%20of%20Warcraft-100x140.jpg"></div>
+            <div class="col-md-1 text-center"><i class="fa fa-chevron-circle-right" aria-hidden="true"></i></div>
+          </div>
+          <div style="font-weight: bold; position: absolute; line-height: 40px; left: 46.5%; text-align: center; font-family: 'Catamaran';">- OR -</div>
+          <hr>
+          <div class="form-group">
+            <input type="input" class="form-control" id="change-game" placeholder="Create and use a new game">
+          </div>
+
+        </div>
+        <div class="modal-header" style="padding-top: 0">
+          <h4 class="modal-title">Change Title <small>for Dota 2</small></h4>
+        </div>
+        <div class="modal-body dlg-game-and-title" >
+          <div class="radio">
+            <label>
+              <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+              Overwatch zadarmo! :D #hezkycesky
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+              Soge je zpet! #hezkycesky #rocketleague
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3" disabled>
+              Soge pari kantra! #hezkycesky
+            </label>
+          </div>
+          <div style="font-weight: bold; position: absolute; left: 46.5%; text-align: center; font-family: 'Catamaran';">- OR -</div>
+          <hr>
+          <div class="form-group">
+            <input type="input" class="form-control" id="change-title" placeholder="Create and use a new title">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- SNIPPETS -->
   <div class="stream-info-container col-xs-12 col-sm-12 col-md-12">
-    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>Game</h2>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2" onclick="$('#game_and_title_dlg').modal()">
+      <h2>Game <small>click to change</small></h2>
       <span class="data" id="game">Not Available</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
@@ -80,8 +141,8 @@
       <span class="data" id="totalChatMsgs">-</span>
       <span class="stats" id="totalChatMsgsChange">&nbsp;</span>
     </div>
-    <div class="stream-info col-xs-6 col-sm-4 col-md-4">
-      <h2>Title</h2>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-4" onclick="$('#game_and_title_dlg').modal()">
+      <h2>Title <small>click to change</small></h2>
       <span class="data" id="title">Not Available</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
