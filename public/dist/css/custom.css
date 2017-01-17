@@ -430,24 +430,40 @@ a.soundboard-list-group-item span {
   padding-bottom: 0;
   margin-bottom: 0;
 }
-.dlg-select-game > div > img {
+.carousel-games-inner > div > div > img {
   width: 100%;
 }
-.dlg-select-game > div > i {
+.carousel-games-inner > div > div > i {
   font-size: 30px;
   line-height: 125px;
 }
 
-.dlg-select-game > div {
+.carousel-games-inner > div > div {
   padding-left: 5px;
   padding-right: 5px;
 }
 
-.dlg-select-game > div.col-md-1 {
+.carousel-games-inner > div > div.col-md-1 {
   padding-left: 0px;
   padding-right: 0px;
 }
 
-.dlg-select-game > div.col-md-2.focus > img {
+.carousel-games-inner > div > div.col-md-2.focus > img {
   border-bottom:5px solid greenyellow
+}
+
+.carousel-games-inner > div > div.col-md-2 > img {
+  border-bottom:5px solid white
+}
+
+.carousel-games-control {
+  background-image: none !important;
+  background: white;
+  color: black;
+  width: 5%;
+}
+
+.carousel-games-inner .item {
+  padding-left: 10%;
+  padding-right: 10%;
 }

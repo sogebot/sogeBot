@@ -58,21 +58,39 @@
           <h4 class="modal-title">Change Game</h4>
         </div>
         <div class="modal-body dlg-game-and-title">
-          <div class="row dlg-select-game">
-            <div class="col-md-1 text-center"><i class="fa fa-chevron-circle-left" aria-hidden="true"></i></div>
-            <div class="col-md-2 focus"><img src="https://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-100x140.jpg"></div>
-            <div class="col-md-2"><img src="https://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-100x140.jpg"></div>
-            <div class="col-md-2"><img src="https://static-cdn.jtvnw.net/ttv-boxart/Dota%202-100x140.jpg"></div>
-            <div class="col-md-2"><img src="https://static-cdn.jtvnw.net/ttv-boxart/Overwatch-100x140.jpg"></div>
-            <div class="col-md-2"><img src="https://static-cdn.jtvnw.net/ttv-boxart/World%20of%20Warcraft-100x140.jpg"></div>
-            <div class="col-md-1 text-center"><i class="fa fa-chevron-circle-right" aria-hidden="true"></i></div>
+          <div id="carousel-games" class="carousel slide" data-interval="false" data-keyboard="false">
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner carousel-games-inner" role="listbox">
+              <div class="item active">
+                <div class="col-md-2 focus"><img src="https://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-100x140.jpg"></div>
+                <div class="col-md-2"><img src="https://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-100x140.jpg"></div>
+                <div class="col-md-2"><img src="https://static-cdn.jtvnw.net/ttv-boxart/Dota%202-100x140.jpg"></div>
+                <div class="col-md-2"><img src="https://static-cdn.jtvnw.net/ttv-boxart/Overwatch-100x140.jpg"></div>
+                <div class="col-md-2"><img src="https://static-cdn.jtvnw.net/ttv-boxart/World%20of%20Warcraft-100x140.jpg"></div>
+                <div class="col-md-2"><img src="https://static-cdn.jtvnw.net/ttv-boxart/Star%20Citizen-100x140.jpg"></div>
+              </div>
+              <div class="item">
+                <div class="col-md-2"><img src="https://static-cdn.jtvnw.net/ttv-boxart/Star%20Citizen-100x140.jpg"></div>
+              </div>
+            </div>
+
+            <!-- Controls -->
+            <a class="left carousel-control carousel-games-control" href="#carousel-games" role="button" data-slide="prev">
+              <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control carousel-games-control" href="#carousel-games" role="button" data-slide="next">
+              <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+              <span class="sr-only">Next</span>
+            </a>
           </div>
           <div style="font-weight: bold; position: absolute; line-height: 40px; left: 46.5%; text-align: center; font-family: 'Catamaran';">- OR -</div>
           <hr>
-          <div class="form-group">
-            <input type="input" class="form-control" id="change-game" placeholder="Create and use a new game">
+          <div class="form-group has-success has-feedback">
+            <input type="text" class="form-control" id="change-game" aria-describedby="inputSuccess2Status" placeholder="Create and use a new game">
+            <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+            <span id="inputSuccess2Status" class="sr-only">(success)</span>
           </div>
-
         </div>
         <div class="modal-header" style="padding-top: 0">
           <h4 class="modal-title">Change Title <small>for Dota 2</small></h4>
@@ -92,14 +110,17 @@
           </div>
           <div class="radio">
             <label>
-              <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3" disabled>
+              <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
               Soge pari kantra! #hezkycesky
             </label>
           </div>
           <div style="font-weight: bold; position: absolute; left: 46.5%; text-align: center; font-family: 'Catamaran';">- OR -</div>
           <hr>
-          <div class="form-group">
-            <input type="input" class="form-control" id="change-title" placeholder="Create and use a new title">
+          <div class="input-group" style="padding-bottom: 20px">
+            <span class="input-group-addon" style="border:0; background-color: inherit">
+              <input type="radio" name="optionsRadios" id="optionsRadios4" value="option4">
+            </span>
+            <input type="text" class="form-control" id="change-title" placeholder="Create and use a new title">
           </div>
         </div>
         <div class="modal-footer">
