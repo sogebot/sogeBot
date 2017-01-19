@@ -35,6 +35,7 @@ function Panel () {
     /* twitch game and title change */
     socket.on('getGameFromTwitch', function (game) { global.twitch.sendGameFromTwitch(self, socket, game) })
     socket.on('getUserTwitchGames', function () { global.twitch.sendUserTwitchGamesAndTitles(self, socket) })
+    socket.on('updateGameAndTitle', function (data) { global.twitch.updateGameAndTitle(self, socket, data) })
 
     socket.on('getWidgetList', function () { self.sendWidgetList(self, socket) })
     socket.on('addWidget', function (widget, row) { self.addWidgetToDb(self, widget, row, socket) })

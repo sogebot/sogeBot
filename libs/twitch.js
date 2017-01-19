@@ -402,7 +402,7 @@ Twitch.prototype.sendGameFromTwitch = function (self, socket, game) {
     }
   }, function (err, res, body) {
     if (err) { return console.log(err) }
-    socket.emit('sendGameFromTwitch', !_.isUndefined(body.games[0]) && game.toLowerCase() === body.games[0].name.toLowerCase())
+    socket.emit('sendGameFromTwitch', !_.isUndefined(body.games[0]) && game.toLowerCase() === body.games[0].name.toLowerCase() ? body.games[0].name : false)
   })
 }
 
@@ -417,6 +417,14 @@ Twitch.prototype.sendUserTwitchGamesAndTitles = function (self, socket) {
     'Elite: Dangerous': [],
     'H1Z1: King of the Kill': []
   })
+}
+
+Twitch.prototype.updateGameAndTitle = function (self, socket, data) {
+  global.twitch.setTitle(global.twitch, null, data.title) // we need to use globals, as self is webpanel
+  global.twitch.setGame(global.twitch, null, data.game)
+  global.twitch.currentGame = data.game
+  global.twitch.currentStatus = data.title
+  global.twitch.sendStats(global.twitch, global.panel.io) // force dashboard update
 }
 
 module.exports = Twitch

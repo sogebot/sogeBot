@@ -94,8 +94,9 @@
           </div>
         </div>
         <div class="modal-footer">
+          <button type="button" class="btn btn-danger disabled" style="display: none" id="title-error">Custom title is checked, but is empty!</button>
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-primary" onclick="changeGT.save()">Save changes</button>
         </div>
       </div>
     </div>
@@ -103,7 +104,7 @@
 
   <!-- SNIPPETS -->
   <div class="stream-info-container col-xs-12 col-sm-12 col-md-12">
-    <div class="stream-info col-xs-6 col-sm-4 col-md-2" onclick="$('#game_and_title_dlg').modal(); socket.emit('getUserTwitchGames')">
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2" onclick="changeGT.showDlg()">
       <h2>Game <small>click to change</small></h2>
       <span class="data" id="game">Not Available</span>
     </div>
@@ -132,7 +133,7 @@
       <span class="data" id="totalChatMsgs">-</span>
       <span class="stats" id="totalChatMsgsChange">&nbsp;</span>
     </div>
-    <div class="stream-info col-xs-6 col-sm-4 col-md-4" onclick="$('#game_and_title_dlg').modal(); socket.emit('getUserTwitchGames')">
+    <div class="stream-info col-xs-6 col-sm-4 col-md-4" onclick="changeGT.showDlg()">
       <h2>Title <small>click to change</small></h2>
       <span class="data" id="title">Not Available</span>
     </div>
@@ -426,6 +427,7 @@
 
     var changeGT = {
       selectedGame: '',
+      selectedTitle: '',
 
       icon: $("#change-game-icon"),
       ticon: $("#change-title-icon"),
@@ -458,11 +460,12 @@
       gameInputStatus: function (status) {
         this.icon.removeClass()
         this.group.removeClass()
-        if (status) {
+        if (status !== false) {
           this.icon.addClass('fa fa-check form-control-feedback')
           this.group.addClass('form-group has-feedback has-success')
-          this.setSelectedGame(this.lastSearch)
-          this.update(this.cachedData, this.lastSearch)
+          console.log(status)
+          this.setSelectedGame(status)
+          this.update(this.cachedData, status)
         } else {
           this.icon.addClass('fa fa-exclamation form-control-feedback')
           this.group.addClass('form-group has-feedback has-error')
@@ -480,6 +483,8 @@
         if ($(el).val().trim().length > 0) {
           this.ticon.addClass('fa fa-check form-control-feedback')
           this.tgroup.addClass('input-group has-feedback has-success')
+          // also trigger onchange event to update title
+          $('input[type=radio][name=titleSelector][id=inputRadio]').trigger('change')
         } else {
           this.ticon.addClass('fa fa-exclamation form-control-feedback')
           this.tgroup.addClass('input-group has-feedback has-error')
@@ -510,8 +515,8 @@
         $('.carousel-games-inner').empty()
         var divItem = $('<div class="item active">')
 
-        if (curGame !== 'Not Available') {
-          var div = $('<div class="col-md-2 focus">')
+        if (curGame !== 'Not Available' && curGame !== '') {
+          var div = $('<div class="col-md-2 focus" style="cursor: pointer">')
           var img = $('<img>')
           img.attr('src', 'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(curGame) + '-100x140.jpg')
           img.attr('onclick', 'changeGT.gameSelect(this)')
@@ -522,7 +527,7 @@
           this.setSelectedGame(curGame)
         }
 
-        var count = (curGame !== 'Not Available') ? 1 : 0
+        var count = (curGame !== 'Not Available' && curGame !== '') ? 1 : 0
         _.each(data, function(aTitles, aGame) {
           if (aGame === curGame) return // current game is already in carousel
 
@@ -531,7 +536,7 @@
             divItem = $('<div class="item">')
             count = 0
           }
-          var div = $('<div class="col-md-2">')
+          var div = $('<div class="col-md-2" style="cursor: pointer">')
           var img = $('<img>')
           img.attr('src', 'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(aGame) + '-100x140.jpg')
           img.attr('onclick', 'changeGT.gameSelect(this)')
@@ -552,7 +557,7 @@
         $('#titles-list').empty()
         var curTitle = $('#title').text()
 
-        if (curTitle !== 'Not Available') {
+        if (curTitle !== 'Not Available' && curTitle !== '') {
           var div = $('<div class="radio">')
           var label = $('<label>')
           label.html(curTitle + ' <small style="font-size: 65%; color:#777">CURRENT</small>')
@@ -567,6 +572,7 @@
           div.append(label)
 
           $('#titles-list').append(div)
+          this.selectedTitle = curTitle
         }
 
         _.each(this.cachedData[this.selectedGame], function(aTitle) {
@@ -585,7 +591,41 @@
           $('#titles-list').append(div)
         })
 
+        // add onchange event
+        var self = this
+        $('input[type=radio][name=titleSelector]').off('change')
+        $('input[type=radio][name=titleSelector]').on('change', function() {
+          var title = $(this).val()
+          if (title === 'input') { // we want to use custom input
+            title = $("#change-title").val()
+          }
+          self.selectedTitle = title
+        });
+      },
+      showDlg: function () {
+        $("#title-error").css('display', 'none')
 
+        this.ticon.removeClass()
+        this.tgroup.removeClass()
+        this.icon.removeClass()
+        this.group.removeClass()
+        this.ticon.addClass('form-control-feedback')
+        this.tgroup.addClass('input-group has-feedback')
+        this.icon.addClass('fa fa-search form-control-feedback')
+        this.group.addClass('form-group has-feedback')
+        $("#change-game-input").val('')
+        $("#change-title").val('')
+        $('#game_and_title_dlg').modal();
+        socket.emit('getUserTwitchGames')
+      },
+      save: function() {
+        // pokud this.tgroup  has-error v classe + je radio checked, vyhod chybu
+        if (this.tgroup.hasClass('has-error') &&  $('#inputRadio').prop('checked')) {
+          $("#title-error").css('display', 'inline-block')
+        } else {
+          socket.emit('updateGameAndTitle', {game: this.selectedGame, title: this.selectedTitle})
+          $('#game_and_title_dlg').modal('hide')
+        }
       }
     }
 
