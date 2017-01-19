@@ -462,6 +462,7 @@
           this.icon.addClass('fa fa-check form-control-feedback')
           this.group.addClass('form-group has-feedback has-success')
           this.setSelectedGame(this.lastSearch)
+          this.update(this.cachedData, this.lastSearch)
         } else {
           this.icon.addClass('fa fa-exclamation form-control-feedback')
           this.group.addClass('form-group has-feedback has-error')
@@ -502,9 +503,9 @@
         this.updateRadios(this.cachedData[game])
       },
 
-      update: function(data) {
+      update: function(data, curGame=null) {
         this.cachedData = data
-        var curGame = $('#game').text()
+        curGame = _.isNull(curGame) ? $('#game').text() : curGame
 
         $('.carousel-games-inner').empty()
         var divItem = $('<div class="item active">')
