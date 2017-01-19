@@ -32,6 +32,10 @@ function Panel () {
     self.sendMenu(socket)
     self.sendWidget(socket)
 
+    /* twitch game and title change */
+    socket.on('getGameFromTwitch', function (game) { global.twitch.sendGameFromTwitch(self, socket, game) })
+    socket.on('getUserTwitchGames', function () { global.twitch.sendUserTwitchGamesAndTitles(self, socket) })
+
     socket.on('getWidgetList', function () { self.sendWidgetList(self, socket) })
     socket.on('addWidget', function (widget, row) { self.addWidgetToDb(self, widget, row, socket) })
     socket.on('deleteWidget', function (widget) { self.deleteWidgetFromDb(self, widget) })
@@ -53,6 +57,7 @@ function Panel () {
     })
   })
 }
+
 Panel.prototype.authUser = function (req, res, next) {
   var user = basicAuth(req)
   try {

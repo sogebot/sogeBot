@@ -467,3 +467,7 @@ a.soundboard-list-group-item span {
   padding-left: 10%;
   padding-right: 10%;
 }
+
+.form-control-feedback {
+  z-index: 20 !important;
+}

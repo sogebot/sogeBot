@@ -376,7 +376,7 @@ Twitch.prototype.setGame = function (self, sender, text) {
       }
     },
     headers: {
-      Accept: "application/vnd.twitchtv.v3+json",
+      Accept: 'application/vnd.twitchtv.v3+json',
       Authorization: 'OAuth ' + global.configuration.get().twitch.password.split(':')[1],
       'Client-ID': global.configuration.get().twitch.clientId
     }
@@ -389,6 +389,33 @@ Twitch.prototype.setGame = function (self, sender, text) {
       global.commons.sendMessage(global.translate('game.change.failed')
         .replace('(game)', body.game), sender)
     }
+  })
+}
+
+Twitch.prototype.sendGameFromTwitch = function (self, socket, game) {
+  global.client.api({
+    url: 'https://api.twitch.tv/kraken/search/games?q=' + encodeURIComponent(game) + '&type=suggest',
+    json: true,
+    headers: {
+      Accept: 'application/vnd.twitchtv.v3+json',
+      'Client-ID': global.configuration.get().twitch.clientId
+    }
+  }, function (err, res, body) {
+    if (err) { return console.log(err) }
+    socket.emit('sendGameFromTwitch', !_.isUndefined(body.games[0]) && game.toLowerCase() === body.games[0].name.toLowerCase())
+  })
+}
+
+Twitch.prototype.sendUserTwitchGamesAndTitles = function (self, socket) {
+  // TODO: send actual games
+  socket.emit('sendUserTwitchGamesAndTitles', {
+    'Star Citizen': ['Lorem Ipsum Dolor', 'Pecka jsem pirat', 'A tak dale'],
+    'Dota 2': ['Natrhneme prdelky', 'Lorem Ipsum Dotic'],
+    'Overwatch': [],
+    'Smite': [],
+    'Counter-Strike: Global Offensive': [],
+    'Elite: Dangerous': [],
+    'H1Z1: King of the Kill': []
   })
 }
 
