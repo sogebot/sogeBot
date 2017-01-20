@@ -634,6 +634,7 @@
     })
 
     socket.on('sendUserTwitchGamesAndTitles', function(data) {
+      delete data._id
       changeGT.update(data)
     })
   </script>

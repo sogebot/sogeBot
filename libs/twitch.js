@@ -24,6 +24,10 @@ function Twitch () {
 
   this.whenOnline = null
 
+  this.cGamesTitles = {} // cached Games and Titles
+  global.watcher.watch(this, 'cGamesTitles', this._save)
+  this._load(this)
+
   var self = this
   setInterval(function () {
     global.client.api({
@@ -147,6 +151,19 @@ function Twitch () {
   global.parser.registerParser(this, 'lastseen', this.lastseenUpdate, constants.VIEWERS)
 
   this.webPanel()
+}
+
+Twitch.prototype._load = function (self) {
+  global.botDB.findOne({ _id: 'cachedGamesTitles' }, function (err, item) {
+    if (err) return log.error(err)
+    if (_.isNull(item)) return
+    self.cGamesTitles = item
+  })
+}
+
+Twitch.prototype._save = function (self) {
+  global.botDB.update({ _id: 'cachedGamesTitles' }, { $set: self.cGamesTitles }, { upsert: true })
+  self.timestamp = new Date().getTime()
 }
 
 Twitch.prototype.saveStream = function (stream) {
@@ -407,16 +424,7 @@ Twitch.prototype.sendGameFromTwitch = function (self, socket, game) {
 }
 
 Twitch.prototype.sendUserTwitchGamesAndTitles = function (self, socket) {
-  // TODO: send actual games
-  socket.emit('sendUserTwitchGamesAndTitles', {
-    'Star Citizen': ['Lorem Ipsum Dolor', 'Pecka jsem pirat', 'A tak dale'],
-    'Dota 2': ['Natrhneme prdelky', 'Lorem Ipsum Dotic'],
-    'Overwatch': [],
-    'Smite': [],
-    'Counter-Strike: Global Offensive': [],
-    'Elite: Dangerous': [],
-    'H1Z1: King of the Kill': []
-  })
+  socket.emit('sendUserTwitchGamesAndTitles', global.twitch.cGamesTitles) // we need to use globals, as self is webpanel
 }
 
 Twitch.prototype.updateGameAndTitle = function (self, socket, data) {
@@ -424,6 +432,14 @@ Twitch.prototype.updateGameAndTitle = function (self, socket, data) {
   global.twitch.setGame(global.twitch, null, data.game)
   global.twitch.currentGame = data.game
   global.twitch.currentStatus = data.title
+
+  if (_.isUndefined(global.twitch.cGamesTitles[data.game])) { //create key if doesnt exists
+    global.twitch.cGamesTitles[data.game] = []
+  }
+
+  if(global.twitch.cGamesTitles[data.game].indexOf(data.title) == -1) { // if unique
+    global.twitch.cGamesTitles[data.game].push(data.title) // also, we need to add game and title to cached property
+  }
   global.twitch.sendStats(global.twitch, global.panel.io) // force dashboard update
 }
 
