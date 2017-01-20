@@ -24,6 +24,10 @@ function Twitch () {
 
   this.whenOnline = null
 
+  this.cGamesTitles = {} // cached Games and Titles
+  global.watcher.watch(this, 'cGamesTitles', this._save)
+  this._load(this)
+
   var self = this
   setInterval(function () {
     global.client.api({
@@ -141,10 +145,25 @@ function Twitch () {
   global.parser.register(this, '!watched', this.watched, constants.VIEWERS)
   global.parser.register(this, '!me', this.showMe, constants.VIEWERS)
   global.parser.register(this, '!top', this.showTop, constants.OWNER_ONLY)
+  global.parser.register(this, '!title', this.setTitle, constants.OWNER_ONLY)
+  global.parser.register(this, '!game', this.setGame, constants.OWNER_ONLY)
 
   global.parser.registerParser(this, 'lastseen', this.lastseenUpdate, constants.VIEWERS)
 
   this.webPanel()
+}
+
+Twitch.prototype._load = function (self) {
+  global.botDB.findOne({ _id: 'cachedGamesTitles' }, function (err, item) {
+    if (err) return log.error(err)
+    if (_.isNull(item)) return
+    self.cGamesTitles = item
+  })
+}
+
+Twitch.prototype._save = function (self) {
+  global.botDB.update({ _id: 'cachedGamesTitles' }, { $set: self.cGamesTitles }, { upsert: true })
+  self.timestamp = new Date().getTime()
 }
 
 Twitch.prototype.saveStream = function (stream) {
@@ -322,6 +341,106 @@ Twitch.prototype.showTop = function (self, sender, text) {
   } catch (e) {
     global.log.error(e)
   }
+}
+
+Twitch.prototype.setTitle = function (self, sender, text) {
+  if (text.trim().length === 0) {
+    global.commons.sendMessage(global.translate('title.current')
+      .replace('(title)', self.currentStatus), sender)
+    return
+  }
+
+  global.client.api({
+    url: 'https://api.twitch.tv/kraken/channels/' + global.configuration.get().twitch.owner,
+    json: true,
+    qs: {
+      _method: 'put',
+      channel: {
+        status: text
+      }
+    },
+    headers: {
+      Accept: "application/vnd.twitchtv.v3+json",
+      Authorization: 'OAuth ' + global.configuration.get().twitch.password.split(':')[1],
+      'Client-ID': global.configuration.get().twitch.clientId
+    }
+  }, function (err, res, body) {
+    if (err) { return console.log(err) }
+    if (body.status === text.trim()) {
+      global.commons.sendMessage(global.translate('title.change.success')
+        .replace('(status)', body.status), sender)
+    } else {
+      global.commons.sendMessage(global.translate('title.change.failed')
+        .replace('(status)', body.status), sender)
+    }
+  })
+}
+
+Twitch.prototype.setGame = function (self, sender, text) {
+  if (text.trim().length === 0) {
+    global.commons.sendMessage(global.translate('game.current')
+      .replace('(game)', self.currentGame), sender)
+    return
+  }
+
+  global.client.api({
+    url: 'https://api.twitch.tv/kraken/channels/' + global.configuration.get().twitch.owner,
+    json: true,
+    qs: {
+      _method: 'put',
+      channel: {
+        game: text
+      }
+    },
+    headers: {
+      Accept: 'application/vnd.twitchtv.v3+json',
+      Authorization: 'OAuth ' + global.configuration.get().twitch.password.split(':')[1],
+      'Client-ID': global.configuration.get().twitch.clientId
+    }
+  }, function (err, res, body) {
+    if (err) { return console.log(err) }
+    if (body.game === text.trim()) {
+      global.commons.sendMessage(global.translate('game.change.success')
+        .replace('(game)', body.game), sender)
+    } else {
+      global.commons.sendMessage(global.translate('game.change.failed')
+        .replace('(game)', body.game), sender)
+    }
+  })
+}
+
+Twitch.prototype.sendGameFromTwitch = function (self, socket, game) {
+  global.client.api({
+    url: 'https://api.twitch.tv/kraken/search/games?q=' + encodeURIComponent(game) + '&type=suggest',
+    json: true,
+    headers: {
+      Accept: 'application/vnd.twitchtv.v3+json',
+      'Client-ID': global.configuration.get().twitch.clientId
+    }
+  }, function (err, res, body) {
+    if (err) { return console.log(err) }
+    socket.emit('sendGameFromTwitch', !_.isUndefined(body.games[0]) && game.toLowerCase() === body.games[0].name.toLowerCase() ? body.games[0].name : false)
+  })
+}
+
+Twitch.prototype.sendUserTwitchGamesAndTitles = function (self, socket) {
+  socket.emit('sendUserTwitchGamesAndTitles', global.twitch.cGamesTitles) // we need to use globals, as self is webpanel
+}
+
+Twitch.prototype.updateGameAndTitle = function (self, socket, data) {
+  global.twitch.setTitle(global.twitch, null, data.title) // we need to use globals, as self is webpanel
+  global.twitch.setGame(global.twitch, null, data.game)
+  global.twitch.currentGame = data.game
+  global.twitch.currentStatus = data.title
+
+  if (_.isUndefined(global.twitch.cGamesTitles[data.game])) { //create key if doesnt exists
+    global.twitch.cGamesTitles[data.game] = []
+  }
+
+  if(global.twitch.cGamesTitles[data.game].indexOf(data.title) == -1) { // if unique
+    global.twitch.cGamesTitles[data.game].push(data.title) // also, we need to add game and title to cached property
+  }
+  global.twitch.sendStats(global.twitch, global.panel.io) // force dashboard update
 }
 
 module.exports = Twitch
