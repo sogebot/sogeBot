@@ -328,5 +328,19 @@
       "multi": "Tito uzivatele byli vybrani z queue: (users)",
       "none": "Zadny uzivatel nebyl nalezen v queue"
     }
+  },
+  "title": {
+    "current": "(sender), titulek streamu je '(title)'.",
+    "change": {
+      "success": "(sender), titulek byl nastaven na: (status)",
+      "failed": "(sender), neco se pokazilo. Titulek je stale nastaveny na: (status)"
+    }
+  },
+  "game": {
+    "current": "(sender), prave se hraje (game).",
+    "change": {
+      "success": "(sender), hra byl nastavena na: (game)",
+      "failed": "(sender), neco se pokazilo. Hra je stale nastavena na: (game)"
+    }
   }
 }

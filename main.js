@@ -15,13 +15,13 @@ var Watcher = require('./libs/watcher')
 var constants = require('./libs/constants')
 require('./libs/logging')
 
+global.watcher = new Watcher()
 global.parser = new Parser()
 global.configuration = new Configuration()
 global.commons = new Commons()
 global.panel = new Panel()
 global.twitch = new Twitch()
 global.stats = new Stats()
-global.watcher = new Watcher()
 global.translate = require('./libs/translate')
 
 global.status = {'TMI': constants.DISCONNECTED,
