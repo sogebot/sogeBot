@@ -23,7 +23,7 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 * price and points system
 * rank system
 * **clips** system to save clips posted in chat
-* !uptime, !lastseen, !watched, !top commands
+* !uptime, !lastseen, !watched, !top, !game, !title commands
 * set custom permissions for each command
 * language support - currently english and cestina
 * currently added **games**: bets
@@ -33,6 +33,7 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 * **trimming** music videos in playlist
 * **WebPanel**
 * soundboard widget - place your mp3s to /public/dist/soundboard/ to customize
+* change game and title from dashboard (your games and titles are saved to further use)
 * _more to come_
 
 #### Prerequisites
