@@ -9,7 +9,6 @@ require('moment-precise-range-plugin')
 function Twitch () {
   this.isOnline = false
 
-  this.channelId = null
   this.currentViewers = 0
   this.currentFollowers = 0
   this.currentViews = 0
@@ -31,8 +30,9 @@ function Twitch () {
   var self = this
   setInterval(function () {
     global.client.api({
-      url: 'https://api.twitch.tv/kraken/streams/' + global.configuration.get().twitch.owner,
+      url: 'https://api.twitch.tv/kraken/streams/' + global.channelId,
       headers: {
+        Accept: 'application/vnd.twitchtv.v5+json',
         'Client-ID': global.configuration.get().twitch.clientId
       }
     }, function (err, res, body) {
@@ -61,8 +61,9 @@ function Twitch () {
     })
 
     global.client.api({
-      url: 'https://api.twitch.tv/kraken/channels/' + global.configuration.get().twitch.owner + '/follows?direction=DESC&limit=1',
+      url: 'https://api.twitch.tv/kraken/channels/' + global.channelId + '/follows?direction=DESC&limit=1',
       headers: {
+        Accept: 'application/vnd.twitchtv.v5+json',
         'Client-ID': global.configuration.get().twitch.clientId
       }
     }, function (err, res, body) {
@@ -95,8 +96,9 @@ function Twitch () {
 
   setInterval(function () {
     global.client.api({
-      url: 'https://api.twitch.tv/kraken/channels/' + global.configuration.get().twitch.owner + '?timestamp=' + new Date().getTime(),
+      url: 'https://api.twitch.tv/kraken/channels/' + global.channelId + '?timestamp=' + new Date().getTime(),
       headers: {
+        Accept: 'application/vnd.twitchtv.v5+json',
         'Client-ID': global.configuration.get().twitch.clientId
       }
     }, function (err, res, body) {
@@ -108,13 +110,12 @@ function Twitch () {
         self.currentGame = body.game
         self.currentStatus = body.status
         self.currentViews = body.views
-        self.channelId = body._id
       }
     })
 
-    if (!_.isNull(self.channelId)) {
+    if (!_.isNull(global.channelId)) {
       global.client.api({
-        url: 'http://tmi.twitch.tv/hosts?include_logins=1&target=' + self.channelId
+        url: 'http://tmi.twitch.tv/hosts?include_logins=1&target=' + global.channelId
       }, function (err, res, body) {
         if (err) {
           global.log.error(err)
@@ -155,7 +156,7 @@ function Twitch () {
 
 Twitch.prototype._load = function (self) {
   global.botDB.findOne({ _id: 'cachedGamesTitles' }, function (err, item) {
-    if (err) return log.error(err)
+    if (err) return global.log.error(err)
     if (_.isNull(item)) return
     self.cGamesTitles = item
   })
@@ -345,7 +346,7 @@ Twitch.prototype.showTop = function (self, sender, text) {
 
 Twitch.prototype.setTitleAndGame = function (self, sender, title = null, game = null) {
   global.client.api({
-    url: 'https://api.twitch.tv/kraken/channels/' + global.configuration.get().twitch.owner,
+    url: 'https://api.twitch.tv/kraken/channels/' + global.channelId,
     json: true,
     qs: {
       _method: 'put',
@@ -355,7 +356,7 @@ Twitch.prototype.setTitleAndGame = function (self, sender, title = null, game = 
       }
     },
     headers: {
-      Accept: "application/vnd.twitchtv.v3+json",
+      Accept: 'application/vnd.twitchtv.v5+json',
       Authorization: 'OAuth ' + global.configuration.get().twitch.password.split(':')[1],
       'Client-ID': global.configuration.get().twitch.clientId
     }
@@ -366,7 +367,7 @@ Twitch.prototype.setTitleAndGame = function (self, sender, title = null, game = 
       if (body.game === game.trim()) {
         global.commons.sendMessage(global.translate('game.change.success')
           .replace('(game)', body.game), sender)
-          self.currentGame = body.game
+        self.currentGame = body.game
       } else {
         global.commons.sendMessage(global.translate('game.change.failed')
           .replace('(game)', body.game), sender)
@@ -377,7 +378,7 @@ Twitch.prototype.setTitleAndGame = function (self, sender, title = null, game = 
       if (body.status === title.trim()) {
         global.commons.sendMessage(global.translate('title.change.success')
           .replace('(status)', body.status), sender)
-          self.currentStatus = body.status
+        self.currentStatus = body.status
       } else {
         global.commons.sendMessage(global.translate('title.change.failed')
           .replace('(status)', body.status), sender)
@@ -392,7 +393,7 @@ Twitch.prototype.setTitle = function (self, sender, text) {
       .replace('(title)', self.currentStatus), sender)
     return
   }
-  self.setTitleAndGame(self, sender, title=text)
+  self.setTitleAndGame(self, sender, text, null)
 }
 
 Twitch.prototype.setGame = function (self, sender, text) {
@@ -401,19 +402,19 @@ Twitch.prototype.setGame = function (self, sender, text) {
       .replace('(game)', self.currentGame), sender)
     return
   }
-  self.setTitleAndGame(self, sender, game=text)
+  self.setTitleAndGame(self, sender, null, text)
 }
 
 Twitch.prototype.sendGameFromTwitch = function (self, socket, game) {
   global.client.api({
-    url: 'https://api.twitch.tv/kraken/search/games?q=' + encodeURIComponent(game) + '&type=suggest',
+    url: 'https://api.twitch.tv/kraken/search/games?query=' + encodeURIComponent(game) + '&type=suggest',
     json: true,
     headers: {
-      Accept: 'application/vnd.twitchtv.v3+json',
+      Accept: 'application/vnd.twitchtv.v5+json',
       'Client-ID': global.configuration.get().twitch.clientId
     }
   }, function (err, res, body) {
-    if (err) { return console.log(err) }
+    if (err) { return global.log.error(err) }
     socket.emit('sendGameFromTwitch', !_.isUndefined(body.games[0]) && game.toLowerCase() === body.games[0].name.toLowerCase() ? body.games[0].name : false)
   })
 }
@@ -425,11 +426,11 @@ Twitch.prototype.sendUserTwitchGamesAndTitles = function (self, socket) {
 Twitch.prototype.updateGameAndTitle = function (self, socket, data) {
   global.twitch.setTitleAndGame(global.twitch, null, data.title, data.game) // we need to use globals, as self is webpanel
 
-  if (_.isUndefined(global.twitch.cGamesTitles[data.game])) { //create key if doesnt exists
+  if (_.isUndefined(global.twitch.cGamesTitles[data.game])) { // create key if doesnt exists
     global.twitch.cGamesTitles[data.game] = []
   }
 
-  if(global.twitch.cGamesTitles[data.game].indexOf(data.title) == -1) { // if unique
+  if (global.twitch.cGamesTitles[data.game].indexOf(data.title) === -1) { // if unique
     global.twitch.cGamesTitles[data.game].push(data.title) // also, we need to add game and title to cached property
   }
   global.twitch.sendStats(global.twitch, global.panel.io) // force dashboard update

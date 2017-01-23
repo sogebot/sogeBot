@@ -28,6 +28,27 @@ User.prototype.isLoaded = function () {
     global.botDB.findOne({_id: 'user_' + self.username}, function (err, item) {
       if (err) reject(err)
       if (!_.isNull(item)) self.data = item
+
+      if (_.isUndefined(item.id)) {
+        global.client.api({
+          url: 'https://api.twitch.tv/kraken/users?login=' + self.username,
+          headers: {
+            Accept: 'application/vnd.twitchtv.v5+json',
+            'Client-ID': global.configuration.get().twitch.clientId
+          }
+        }, function (err, res, body) {
+          if (err) {
+            global.log.error(err)
+            return
+          }
+          self.set('id', body.users[0]._id)
+          self.loaded = true
+          resolve(self.loaded)
+        })
+      } else {
+        self.loaded = true
+        resolve(self.loaded)
+      }
       self.loaded = true
       resolve(self.loaded)
     })
@@ -76,8 +97,9 @@ User.deleteFollowers = function () {
 User.updateFollowers = function () {
   var makeRequest = function (cursor) {
     global.client.api({
-      url: 'https://api.twitch.tv/kraken/channels/' + global.configuration.get().twitch.owner + '/follows?limit=100' + (!_.isUndefined(cursor) ? '&cursor=' + cursor : ''),
+      url: 'https://api.twitch.tv/kraken/channels/' + global.channelId + '/follows?limit=100' + (!_.isUndefined(cursor) ? '&cursor=' + cursor : ''),
       headers: {
+        Accept: 'application/vnd.twitchtv.v5+json',
         'Client-ID': global.configuration.get().twitch.clientId
       }
     }, function (err, res, body) {
