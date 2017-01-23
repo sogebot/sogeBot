@@ -22,11 +22,11 @@
     "jquery": "^3.1.1",
     "lodash": "^4.17.4",
     "moment": "^2.17.1",
-    "moment-precise-range-plugin": "^1.2.0",
+    "moment-precise-range-plugin": "^1.2.1",
     "nedb": "^1.8.0",
     "socket.io": "^1.7.2",
     "tmi.js": "^1.1.2",
-    "winston": "^2.3.0",
+    "winston": "^2.3.1",
     "ytdl-core": "^0.7.21"
   },
   "scripts": {
