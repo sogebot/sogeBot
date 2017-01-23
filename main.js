@@ -44,6 +44,8 @@ var options = {
   channels: ['#' + global.configuration.get().twitch.owner]
 }
 
+global.channelId = null
+
 global.client = new irc.client(options)
 
 // load bot systems after translation is loaded
@@ -98,3 +100,18 @@ global.client.on('part', function (channel, username, fromSelf) {
 setInterval(function () {
   global.status.MOD = global.client.isMod('#' + global.configuration.get().twitch.owner, global.configuration.get().twitch.username)
 }, 60000)
+
+// get and save channel_id
+global.client.api({
+  url: 'https://api.twitch.tv/kraken/users?login=' + global.configuration.get().twitch.owner,
+  headers: {
+    Accept: 'application/vnd.twitchtv.v5+json',
+    'Client-ID': global.configuration.get().twitch.clientId
+  }
+}, function (err, res, body) {
+  if (err) {
+    global.log.error(err)
+    return
+  }
+  global.channelId = body.users[0]._id
+})
