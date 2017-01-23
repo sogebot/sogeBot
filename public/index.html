@@ -202,6 +202,7 @@
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script src="./dist/js/sortable.min.js"></script>
   <script type="text/javascript" src="./dist/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
+  <script type="text/javascript" src="./dist/bootstrap-menu/js/BootstrapMenu.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
 
   <script>
@@ -463,7 +464,6 @@
         if (status !== false) {
           this.icon.addClass('fa fa-check form-control-feedback')
           this.group.addClass('form-group has-feedback has-success')
-          console.log(status)
           this.setSelectedGame(status)
           this.update(this.cachedData, status)
         } else {
@@ -522,6 +522,8 @@
           img.attr('onclick', 'changeGT.gameSelect(this)')
           img.attr('title', curGame)
           img.attr('data-game', curGame)
+          img.attr('data-deletable', false)
+          img.attr('class', 'titles-list-image')
           div.append(img)
           divItem.append(div)
           this.setSelectedGame(curGame)
@@ -542,6 +544,7 @@
           img.attr('onclick', 'changeGT.gameSelect(this)')
           img.attr('title', aGame)
           img.attr('data-game', aGame)
+          img.attr('class', 'titles-list-image')
 
           div.append(img)
           divItem.append(div)
@@ -552,13 +555,31 @@
         $('.carousel-games-inner').append(divItem)
         // refresh carousel
         $('#carousel-games').carousel()
+        // refresh dropdown
+        var menu = new BootstrapMenu(".titles-list-image", {
+        fetchElementData: function($el) {
+          return $el.data();
+        },
+          actions: [{
+            name: 'Delete',
+            iconClass: 'fa-trash-o',
+            onClick: function(game) {
+              socket.emit('deleteUserTwitchGame', game.game)
+            },
+            isEnabled: function(game) {
+              return game.deletable;
+            }
+          }]
+        })
       },
       updateRadios: function (aTitles) {
+        var self = this
         $('#titles-list').empty()
         var curTitle = $('#title').text()
 
         if (curTitle !== 'Not Available' && curTitle !== '') {
-          var div = $('<div class="radio">')
+          var div = $('<div class="radio titles-list-radio">')
+          div.attr('data-deletable', false)
           var label = $('<label>')
           label.html(curTitle + ' <small style="font-size: 65%; color:#777">CURRENT</small>')
 
@@ -576,7 +597,10 @@
         }
 
         _.each(this.cachedData[this.selectedGame], function(aTitle) {
-          var div = $('<div class="radio">')
+          var div = $('<div class="radio titles-list-radio">')
+          div.attr('data-title', aTitle)
+          div.attr('data-game', self.selectedGame)
+
           var label = $('<label>')
           label.text(aTitle)
 
@@ -589,6 +613,23 @@
           div.append(label)
 
           $('#titles-list').append(div)
+        })
+
+        // refresh dropdown
+        var menu = new BootstrapMenu(".titles-list-radio", {
+        fetchElementData: function($el) {
+          return $el.data();
+        },
+          actions: [{
+            name: 'Delete',
+            iconClass: 'fa-trash-o',
+            onClick: function(data) {
+              socket.emit('deleteUserTwitchTitle', data)
+            },
+            isEnabled: function(data) {
+              return data.deletable;
+            }
+          }]
         })
 
         // add onchange event

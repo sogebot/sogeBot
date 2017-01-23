@@ -24,6 +24,9 @@ var dist = {
   'bootstrap-toggle': {
     'js': 'js/bootstrap-toggle.min.js',
     'css': 'css/bootstrap-toggle.min.css'
+  },
+  'bootstrap-menu': {
+    'js': 'dist/BootstrapMenu.min.js'
   }
 }
 

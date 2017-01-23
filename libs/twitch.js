@@ -419,21 +419,33 @@ Twitch.prototype.sendGameFromTwitch = function (self, socket, game) {
   })
 }
 
+Twitch.prototype.deleteUserTwitchGame = function (self, socket, game) {
+  delete self.cGamesTitles[game]
+  self.sendUserTwitchGamesAndTitles(self, socket)
+}
+
+Twitch.prototype.deleteUserTwitchTitle = function (self, socket, data) {
+  _.remove(self.cGamesTitles[data.game], function (aTitle) {
+    return aTitle === data.title
+  })
+  self.sendUserTwitchGamesAndTitles(self, socket)
+}
+
 Twitch.prototype.sendUserTwitchGamesAndTitles = function (self, socket) {
-  socket.emit('sendUserTwitchGamesAndTitles', global.twitch.cGamesTitles) // we need to use globals, as self is webpanel
+  socket.emit('sendUserTwitchGamesAndTitles', self.cGamesTitles)
 }
 
 Twitch.prototype.updateGameAndTitle = function (self, socket, data) {
-  global.twitch.setTitleAndGame(global.twitch, null, data.title, data.game) // we need to use globals, as self is webpanel
+  self.setTitleAndGame(self, null, data.title, data.game)
 
-  if (_.isUndefined(global.twitch.cGamesTitles[data.game])) { // create key if doesnt exists
-    global.twitch.cGamesTitles[data.game] = []
+  if (_.isUndefined(self.cGamesTitles[data.game])) { // create key if doesnt exists
+    self.cGamesTitles[data.game] = []
   }
 
-  if (global.twitch.cGamesTitles[data.game].indexOf(data.title) === -1) { // if unique
-    global.twitch.cGamesTitles[data.game].push(data.title) // also, we need to add game and title to cached property
+  if (self.cGamesTitles[data.game].indexOf(data.title) === -1) { // if unique
+    self.cGamesTitles[data.game].push(data.title) // also, we need to add game and title to cached property
   }
-  global.twitch.sendStats(global.twitch, global.panel.io) // force dashboard update
+  self.sendStats(self, global.panel.io) // force dashboard update
 }
 
 module.exports = Twitch
