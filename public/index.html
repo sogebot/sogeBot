@@ -163,6 +163,8 @@
     </div>
   </div>
 
+  <button class="btn btn-info btn-xs" id="percentage-btn" data-show-percentage="true" style="position: absolute; right: 50px" onclick="switchPercentageShow()">%</button>
+
   <div class="container-fluid">
     <div class="row">
       <div class="col-xs-12 col-sm-12 col-md-12">
@@ -211,6 +213,17 @@
     var loadedJS = []
     var loadedMenu = false
     var addingWidget = false
+
+    var switchPercentageShow = function() {
+      var btn = $('#percentage-btn')
+      btn.removeClass()
+      if (btn.data('showPercentage')) {
+        btn.addClass('btn btn-default btn-xs')
+      } else {
+        btn.addClass('btn btn-info btn-xs')
+      }
+      btn.data('showPercentage', !btn.data('showPercentage'))
+    }
 
     var setStatus = function (id, status) {
       $("#" + id + "Status").removeClass()
@@ -324,18 +337,20 @@
       if ($.isEmptyObject(data)) return
 
       var getPercentage = function (cur, orig) {
+        var btn = $('#percentage-btn')
         if (orig === cur) return 0
         if (orig === 0) return cur * 100
-        return Math.round((cur - orig) / orig * 1000) / 10
+        if (btn.data('showPercentage')) return Math.round((cur - orig) / orig * 1000) / 10
+        return cur - orig
       }
       var setHtml = function (id, value) {
         if (value === 0) {
-          $("#" + id).html('<span class="stats-mid"><span class="glyphicon glyphicon-triangle-right"></span> ' + Math.abs(value) + '%</span>')
+          $("#" + id).html('<span class="stats-mid"><span class="glyphicon glyphicon-triangle-right"></span> ' + Math.abs(value) + (btn.data('showPercentage') ? '%' : '') + '</span>')
         } else {
           $("#" + id).html('<span class="stats-' + (value < 0 ? 'down' : 'up') +
             ' text-' + (value < 0 ? 'danger' : 'success') +
             '"><span class="glyphicon glyphicon-triangle-' + (value < 0 ? 'bottom' : 'top') +
-            '"></span> ' + Math.abs(value) + '%</span>')
+            '"></span> ' + Math.abs(value)  + (btn.data('showPercentage') ? '%' : '') + '</span>')
         }
       }
       var uptime = $("#uptime").text()
