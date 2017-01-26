@@ -67,7 +67,6 @@ a.active {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  padding-top: 15px;
   cursor: pointer;
 }
 
@@ -81,7 +80,7 @@ a.active {
 
 .stream-info h2 {
   position: absolute;
-  top: -5px;
+  top: -10px;
   font-size: 10px;
   font-weight: bold;
   text-transform: uppercase;
@@ -91,6 +90,8 @@ a.active {
   color: #999;
   margin-left: 5px;
   font-size: small;
+  position: relative;
+  top: 5px;
 }
 
 .stream-info #diffFollowers {
@@ -106,6 +107,12 @@ a.active {
 .stream-info #diffFollowers.down {
   font-size: 18px;
   color: #a94442;
+}
+
+.stream-info span.stats {
+  position: relative;
+  top: 5px;
+  font-size: small;
 }
 
 .stream-info span.stats span.stats-up, .stream-info span.stats span.stats-down, .stream-info span.stats span.stats-mid {
@@ -161,8 +168,8 @@ a.active {
     content: "";
     position: absolute;
     left: 0;
-    top: 10px;
-    height: 40px;
+    top: 8px;
+    height: 30px;
     border-left: 1px solid #ddd;
 }
 
