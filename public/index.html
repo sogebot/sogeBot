@@ -344,6 +344,7 @@
         return cur - orig
       }
       var setHtml = function (id, value) {
+        var btn = $('#percentage-btn')
         if (value === 0) {
           $("#" + id).html('<span class="stats-mid"><span class="glyphicon glyphicon-triangle-right"></span> ' + Math.abs(value) + (btn.data('showPercentage') ? '%' : '') + '</span>')
         } else {
