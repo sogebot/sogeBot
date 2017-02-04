@@ -27,7 +27,7 @@
     "socket.io": "^1.7.2",
     "tmi.js": "^1.1.2",
     "winston": "^2.3.1",
-    "ytdl-core": "^0.7.21"
+    "ytdl-core": "^0.8.1"
   },
   "scripts": {
     "copy:dist": "node tools/copy-dist-files.js",
