@@ -23,7 +23,24 @@ function Cooldown () {
     global.watcher.watch(this, 'viewers', this._save)
 
     this._update(this)
+
+    this.webPanel()
   }
+}
+
+Cooldown.prototype.webPanel = function () {
+  global.panel.addMenu({category: 'systems', name: 'Commands Cooldowns', id: 'cooldown'})
+  global.panel.socketListening(this, 'cooldown.get', this.sSend)
+  global.panel.socketListening(this, 'cooldown.set', this.sSet)
+}
+
+Cooldown.prototype.sSend = function (self, socket) {
+  socket.emit('cooldown.data', self.list)
+}
+
+Cooldown.prototype.sSet = function (self, socket, data) {
+  self.set(self, null, data.command + ' ' + data.seconds)
+  self.sSend(self, socket)
 }
 
 Cooldown.prototype._save = function (self) {

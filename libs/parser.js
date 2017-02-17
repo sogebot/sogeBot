@@ -95,7 +95,11 @@ Parser.prototype.unregister = function (cmd) {
 }
 
 Parser.prototype.isOwner = function (user) {
-  return global.configuration.get().twitch.owner.toLowerCase() === user.username.toLowerCase()
+  try {
+    return global.configuration.get().twitch.owner.toLowerCase() === user.username.toLowerCase()
+  } catch (e) {
+    return true // we can expect, if user is null -> bot or admin
+  }
 }
 
 // these needs to be global, will be called from called parsers

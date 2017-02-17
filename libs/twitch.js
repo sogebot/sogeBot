@@ -241,6 +241,11 @@ Twitch.prototype.uptime = function (self, sender) {
 }
 
 Twitch.prototype.lastseenUpdate = function (self, id, sender, text) {
+  if (_.isNull(sender)) {
+    global.updateQueue(id, true)
+    return
+  }
+
   var user = new User(sender.username)
   user.isLoaded().then(function () {
     user.set('lastMessageTime', new Date().getTime())
