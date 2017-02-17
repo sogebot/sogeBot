@@ -31,16 +31,16 @@ Watcher.prototype.checkChanges = function (self) {
       } else if (_.isArray(value) && (value.length !== self.objects[obj][name].length || !self.arraysEqual(value, self.objects[obj][name]))) { // simple array
         self.functions[obj + '.' + name](self.objects[obj])
         self.variables[obj][name] = _.clone(self.objects[obj][name])
-      } else if (_.isPlainObject(value) ) { // dictionary
+      } else if (_.isPlainObject(value)) { // dictionary
         // check keys at first
-        if (Object.keys(value).length != Object.keys(self.objects[obj][name]).length) {
-            self.functions[obj + '.' + name](self.objects[obj])
-            self.variables[obj][name] = _.clone(self.objects[obj][name])
-            return
+        if (Object.keys(value).length !== Object.keys(self.objects[obj][name]).length) {
+          self.functions[obj + '.' + name](self.objects[obj])
+          self.variables[obj][name] = _.clone(self.objects[obj][name])
+          return
         }
         _.each(value, function (aArray, aKey) {
           if (!value.hasOwnProperty(aKey)) return
-          if (_.isUndefined(self.objects[obj][name][aKey]) || !self.arraysEqual(aArray, self.objects[obj][name][aKey]) || Object.keys(value).length != Object.keys(self.objects[obj][name]).length) { // if key doesn't exists or arrays doesn't match -> isChanged: true
+          if (_.isUndefined(self.objects[obj][name][aKey]) || !self.arraysEqual(aArray, self.objects[obj][name][aKey]) || Object.keys(value).length !== Object.keys(self.objects[obj][name]).length) { // if key doesn't exists or arrays doesn't match -> isChanged: true
             self.functions[obj + '.' + name](self.objects[obj])
             self.variables[obj][name] = _.clone(self.objects[obj][name])
           }
