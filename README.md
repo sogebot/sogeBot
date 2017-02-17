@@ -12,37 +12,48 @@ Minimal CPU usage and small footprint twitch bot based on Node.js intended to be
 If you found an issue with a bot, feel free to create issue at https://github.com/sogehige/SogeBot/issues.
 You can also contact me on my email sogehige@gmail.com or https://twitter.com/sogehige
 
-#### Current features
+| System           | Description                                                                                                        |
+|------------------|--------------------------------------------------------------------------------------------------------------------|
+| Alias            | Don't like default commands? Make an alias!                                                                        |
+| Keywords         | Bot will respond on certain keywords                                                                               |
+| Points / Loyalty | Points system for your users                                                                                       |
+| Price            | Make viewers to spend points on e.g. !songrequest                                                                  |
+| Ranks            | Create ranks for your viewers                                                                                      |
+| Clips            | Clips posted in chat by your viewers will be saved and you can check them in webpanel                              |
+| Custom commands  | Create (simplified) custom commands                                                                                |
+| Notice           | Post a notice every x minutes                                                                                      |
+| Queue            | Do you lost track of viewers who wants to play with you? Use !queue and be fair!                                   |
+| Raffles          | Create raffles for you giveaways!                                                                                  |
+| Songs            | **Songrequest** and **playlist** support for YouTube with **trimming** of videos and **auto volume normalization** |
+
+| Game | Description                                    |
+|------|------------------------------------------------|
+| Bets |                                                |
+
+#### Languages
+
+* Cestina
+* English
+
+#### Other features
 
 * custom bot name - you need twitch account for a bot
 * basic channel auto moderation - links, symbols, long messages, capitals, spam, colors, emotes
-* alias system
-* basic custom command support
-* keywords system
-* notice system
-* price and points system
-* rank system
 * **clips** system to save clips posted in chat
 * !uptime, !lastseen, !watched, !top, !game, !title commands
 * set custom permissions for each command
-* language support - currently english and cestina
-* currently added **games**: bets
 * better logging -> know, why user is timed out, bot logs and exceptions
-* songs system - **songrequest** and **playlist** support for YouTube
-* **auto volume normalization** of videos played through songs system
-* **trimming** music videos in playlist
 * **WebPanel**
 * soundboard widget - place your mp3s to /public/dist/soundboard/ to customize
 * change game and title from dashboard (your games and titles are saved to further use)
-* _more to come_
 
 #### Prerequisites
 
-* Node.js 6.x
+* Node.js 7.x
 
 #### Instalation
 
-* As there is no release yet, you need to clone repository https://github.com/sogehige/SogeBot.git
+* Latest release can be found at https://github.com/sogehige/SogeBot/releases
 * Update config.ini - set bot username and password (oauth:xxxxxxxxxxxxxxxxxxxx)
 * For **Linux**: run launch.sh
 * For **Windows**: npm install ; node main.js
