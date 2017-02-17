@@ -341,5 +341,15 @@
       "success": "(sender), game was set to: (game)",
       "failed": "(sender), something went wrong. Current game is still set to: (game)"
     }
+  },
+  "cooldown": {
+    "failed": {
+      "parse": "{core.command-parse} !cooldown [command] [seconds]",
+      "cooldown": "(sender), you cannot user !(command), remaining (seconds)s"
+    },
+    "success": {
+      "set": "Cooldown for !(command) was set to (seconds)s",
+      "unset": "Cooldown for !(command) was unset"
+    }
   }
 }

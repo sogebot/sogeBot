@@ -342,5 +342,15 @@
       "success": "(sender), hra byl nastavena na: (game)",
       "failed": "(sender), neco se pokazilo. Hra je stale nastavena na: (game)"
     }
+  },
+  "cooldown": {
+    "failed": {
+      "parse": "{core.command-parse} !cooldown [command] [seconds]",
+      "cooldown": "(sender), jeste nemuzes pouzit !(command), zbyva jeste (seconds)s"
+    },
+    "success": {
+      "set": "Cooldown pro !(command) byl nastaven na (seconds)s",
+      "unset": "Cooldown pro !(command) byl odebran"
+    }
   }
 }
