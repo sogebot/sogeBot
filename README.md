@@ -25,6 +25,7 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 | Queue            | Do you lost track of viewers who wants to play with you? Use !queue and be fair!                                   |
 | Raffles          | Create raffles for you giveaways!                                                                                  |
 | Songs            | **Songrequest** and **playlist** support for YouTube with **trimming** of videos and **auto volume normalization** |
+| Cooldowns        | Stop spamming of commands with cooldowns!                                                                          |
 
 | Game | Description                                    |
 |------|------------------------------------------------|
