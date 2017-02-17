@@ -16,7 +16,16 @@ function Panel () {
   var port = process.env.PORT || global.configuration.get().panel.port
 
   // static routing
-  app.use(this.authUser, express.static(path.join(__dirname, '..', 'public')))
+  app.get('/playlist', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'playlist', 'index.html'))
+  })
+  app.get('/', this.authUser, function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'))
+  })
+  app.get('/:type/:page', this.authUser, function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.page))
+  })
+  app.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')))
 
   server.listen(port, function () {
     global.log.info('WebPanel is listening on %s', port)

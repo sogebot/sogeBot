@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>SogeBot - Playlist</title>
+    <meta charset="utf-8">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#f4f5f6">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#f4f5f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">  <link href="https://fonts.googleapis.com/css?family=Catamaran:900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Catamaran:900" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="/dist/bootstrap/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="/dist/css/sortable-theme-bootstrap.css">
+    <link rel="stylesheet" href="/dist/bootstrap-toggle/css/bootstrap-toggle.min.css" />
+    <link rel="stylesheet" href="/dist/css/custom.css">
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body style="padding-top: 10px;">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <div class="title">Song Requests <small id="yt-song-requests-count">0</small></div>
+        <table class="table table-striped table-responsive">
+          <thead>
+            <tr>
+              <th>Youtube ID</th>
+              <th>Title</th>
+              <th>Length</th>
+              <th>Requested by</th>
+            </tr>
+          </thead>
+          <tbody id="songRequestsWidget" >
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <div class="title">Playlist <small id="yt-playlist-count">0</small></div>
+        <table class="table table-striped table-responsive">
+          <thead>
+            <tr>
+              <th>Youtube ID</th>
+              <th>Title</th>
+              <th>Length</th>
+            </tr>
+          </thead>
+          <tbody id="Playlist" >
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="/dist/jquery/js/jquery.min.js"></script>
+    <!-- LoDash goodness -->
+    <script src="/dist/lodash/js/lodash.min.js"></script>
+
+    <script>
+      var playlist = {
+        list: {}
+      }
+
+      var socket = io();
+
+      setInterval(function() {
+        socket.emit('getSongRequests');
+      }, 2000)
+      socket.emit('getPlaylist');
+
+      socket.on('songPlaylistList', function(list) {
+        updatePlaylist(list)
+      });
+
+      socket.on('songRequestsList', function(list) {
+        $("#yt-song-requests-count").text(list.length)
+
+        $("#songRequestsWidget").empty();
+        if (_.isEmpty(list)) {
+          $("#songRequestsWidget").append('<tr><td colspan=4 class="text-info text-center"><strong>No song requests found</strong></td></tr>');
+        }
+        for (var index in list) {
+          if (list.hasOwnProperty(index)) {
+            var title = list[index].title,
+              requestedBy = list[index].username,
+              length_seconds = list[index].length_seconds,
+              videoID = list[index].videoID;
+            $("#songRequestsWidget").append('<tr><td><a href="http://youtu.be/' + videoID + '">' + videoID + '</a></td><td>' + title + '</td><td>' + (new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + '</td><td>' + requestedBy + '</td></tr>');
+          }
+        }
+      });
+
+      var updatePlaylist = function(list) {
+        playlist.list = list
+        $("#yt-playlist-count").text(list.length)
+        $("#Playlist").empty();
+        for (var index in list) {
+          if (list.hasOwnProperty(index)) {
+            var title = list[index].title,
+              length_seconds = list[index].length_seconds,
+              videoID = list[index].videoID
+
+            $("#Playlist").append('<tr><td><a href="http://youtu.be/' + videoID + '">' + videoID + '</a></td><td>' + title + '</td><td>' + (new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + '</td></tr>');
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
