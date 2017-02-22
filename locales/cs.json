@@ -152,6 +152,16 @@
   },
   "songs": {
     "settings": {
+      "songrequest": {
+        "text": "Prehravani song requestu je ",
+        "true": "{songs.settings.songrequest.text} {core.enabled}",
+        "false": "{songs.settings.songrequest.text} {core.disabled}"
+      },
+      "playlist": {
+        "text": "Prehravani playlistu je ",
+        "true": "{songs.settings.playlist.text} {core.enabled}",
+        "false": "{songs.settings.playlist.text} {core.disabled}"
+      },
       "volume": "Hlasitost nastavena na (value)%",
       "duration": "Maximalni delka pisne nastavena na (value) minut.",
       "shuffle": {
