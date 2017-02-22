@@ -25,9 +25,11 @@ function Songs () {
 
     global.parser.registerHelper('!songrequest')
 
-    global.configuration.register('volume', 'songs.settings.volume', 'number', 25)
-    global.configuration.register('duration', 'songs.settings.duration', 'number', 10)
-    global.configuration.register('shuffle', 'songs.settings.shuffle', 'bool', false)
+    global.configuration.register('songs_volume', 'songs.settings.volume', 'number', 25)
+    global.configuration.register('songs_duration', 'songs.settings.duration', 'number', 10)
+    global.configuration.register('songs_shuffle', 'songs.settings.shuffle', 'bool', false)
+    global.configuration.register('songs_songrequest', 'songs.settings.songrequest', 'bool', true)
+    global.configuration.register('songs_playlist', 'songs.settings.playlist', 'bool', true)
 
     this.getMeanLoudness(this)
     this.webPanel()
@@ -66,9 +68,9 @@ Songs.prototype.getMeanLoudness = function (self) {
 
 Songs.prototype.getVolume = function (self, item) {
   item.loudness = typeof item.loudness !== 'undefined' ? item.loudness : -15
-  var correction = Math.ceil((global.configuration.getValue('volume') / 100) * 3)
+  var correction = Math.ceil((global.configuration.getValue('songs_volume') / 100) * 3)
   var loudnessDiff = parseFloat(parseFloat(self.meanLoudness) - item.loudness)
-  return Math.round(global.configuration.getValue('volume') + correction * loudnessDiff)
+  return Math.round(global.configuration.getValue('songs_volume') + correction * loudnessDiff)
 }
 
 Songs.prototype.setTrim = function (self, socket, data) {
@@ -77,9 +79,11 @@ Songs.prototype.setTrim = function (self, socket, data) {
 
 Songs.prototype.sendConfiguration = function (self, socket) {
   socket.emit('songsConfiguration', {
-    volume: global.configuration.getValue('volume'),
-    shuffle: global.configuration.getValue('shuffle'),
-    duration: global.configuration.getValue('duration')
+    volume: global.configuration.getValue('songs_volume'),
+    shuffle: global.configuration.getValue('songs_shuffle'),
+    duration: global.configuration.getValue('songs_duration'),
+    songrequest: global.configuration.getValue('songs_songrequest'),
+    playlist: global.configuration.getValue('songs_playlist')
   })
 }
 
@@ -169,13 +173,17 @@ Songs.prototype.sendNextSongID = function (self, socket) {
   // first, check if there are any requests
   global.botDB.findOne({type: 'songRequests'}).sort({addedAt: 1}).exec(function (err, item) {
     if (err) log.error(err)
-    if (typeof item !== 'undefined' && item !== null) { // song is found
+    if (typeof item !== 'undefined' && item !== null && global.configuration.getValue('songs_songrequest')) { // song is found
       self.currentSong = item
       self.currentSong.volume = self.getVolume(self, self.currentSong)
       socket.emit('videoID', self.currentSong)
       global.botDB.remove({type: 'songRequests', videoID: item.videoID}, {})
     } else { // run from playlist
-      if (global.configuration.getValue('shuffle')) {
+      if (!global.configuration.getValue('songs_playlist')) {
+        socket.emit('videoID', null)
+        return
+      }
+      if (global.configuration.getValue('songs_shuffle')) {
         global.botDB.findOne({type: 'playlist'}).sort({seed: 1}).exec(function (err, item) {
           if (err) log.error(err)
           if (typeof item !== 'undefined' && item !== null) { // song is found
@@ -214,8 +222,12 @@ Songs.prototype.help = function () {
 }
 
 Songs.prototype.addSongToQueue = function (self, sender, text) {
-  if (text.length < 1) {
-    global.commons.sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url>', sender)
+  if (text.length < 1 || !global.configuration.getValue('songs_songrequest')) {
+    if (global.configuration.getValue('songs_songrequest')) {
+      global.commons.sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url>', sender)
+    } else {
+      global.commons.sendMessage('(sender), ' + global.translate('songs.settings.songrequest.false'), sender)
+    }
     return
   }
   var urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&\?]*).*/
@@ -229,7 +241,7 @@ Songs.prototype.addSongToQueue = function (self, sender, text) {
         if (err) log.error(err)
         if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
           global.commons.sendMessage(global.translate('songs.notFound'), sender)
-        } else if (videoInfo.length_seconds / 60 > global.configuration.getValue('duration')) global.commons.sendMessage(global.translate('songs.tooLong'), sender)
+        } else if (videoInfo.length_seconds / 60 > global.configuration.getValue('songs_duration')) global.commons.sendMessage(global.translate('songs.tooLong'), sender)
         else {
           global.botDB.insert({type: 'songRequests', videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: sender.username})
           global.commons.sendMessage(global.translate('songs.addedSong').replace('(title)', videoInfo.title), sender)

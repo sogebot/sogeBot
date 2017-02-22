@@ -150,6 +150,16 @@
   },
   "songs": {
     "settings": {
+      "songrequest": {
+        "text": "Song requests are ",
+        "true": "{songs.settings.songrequest.text} {core.enabled}",
+        "false": "{songs.settings.songrequest.text} {core.disabled}"
+      },
+      "playlist": {
+        "text": "Playlist is ",
+        "true": "{songs.settings.playlist.text} {core.enabled}",
+        "false": "{songs.settings.playlist.text} {core.disabled}"
+      },
       "volume": "Volume succesfully set to (value)%",
       "duration": "Maximum song length set to (value) minutes.",
       "shuffle": {
