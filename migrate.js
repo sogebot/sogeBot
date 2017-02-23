@@ -1,15 +1,5 @@
 'use strict'
 
-var _ = require('lodash')
-/*
-var Database = require('nedb')
-var botDB = Database({
-  filename: 'sogeBot.db',
-  autoload: true
-})
-botDB.persistence.setAutocompactionInterval(60000)
-*/
-
 var Database = require('nedb-promise')
 var DB = new Database({
   filename: 'sogeBot.db',
