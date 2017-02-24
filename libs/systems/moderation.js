@@ -79,7 +79,7 @@ function Moderation () {
 }
 
 Moderation.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'main', name: 'Moderation', id: 'moderation'})
+  global.panel.addMenu({category: 'settings', name: 'Moderation', id: 'moderation'})
   global.panel.socketListening(this, 'getModerationConfiguration', this.sendConfiguration)
 }
 
