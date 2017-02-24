@@ -115,7 +115,7 @@ User.updateFollowers = function () {
           var user = new User(follower.user.name)
           user.set('isFollower', true)
         })
-        makeRequest(body._cursor)
+        setTimeout(function () { makeRequest(body._cursor) }, 1000)
       }
     })
   }
