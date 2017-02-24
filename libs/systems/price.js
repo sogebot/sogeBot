@@ -24,7 +24,7 @@ function Price () {
 }
 
 Price.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'systems', name: 'Price', id: 'price'})
+  global.panel.addMenu({category: 'manage', name: 'Price', id: 'price'})
   global.panel.socketListening(this, 'getPrices', this.sendPrices)
   global.panel.socketListening(this, 'deletePrice', this.deletePrice)
   global.panel.socketListening(this, 'createPrice', this.createPrice)

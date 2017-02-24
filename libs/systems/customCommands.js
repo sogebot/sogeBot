@@ -26,7 +26,7 @@ function CustomCommands () {
 }
 
 CustomCommands.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'systems', name: 'Custom Commands', id: 'customCommands'})
+  global.panel.addMenu({category: 'manage', name: 'Custom Commands', id: 'customCommands'})
   global.panel.socketListening(this, 'getCommands', this.sendCommands)
   global.panel.socketListening(this, 'deleteCommand', this.deleteCommands)
   global.panel.socketListening(this, 'createCommand', this.createCommands)
