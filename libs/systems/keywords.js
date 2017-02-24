@@ -52,6 +52,7 @@ Keywords.prototype.help = function (self, sender) {
 Keywords.prototype.add = function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) (.*)$/)
+    if (parsed[2].trim().length === 0) throw Boolean(true)
     global.commons.insertIfNotExists({__id: 'kwd_' + parsed[1], _keyword: parsed[1], response: parsed[2].trim(), success: 'keywords.success.add', error: 'keywords.failed.add'})
   } catch (e) {
     global.commons.sendMessage(global.translate('keywords.failed.parse'), sender)
