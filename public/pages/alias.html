@@ -35,7 +35,7 @@
       </div>
       <div class="form-group">
         <div class="col-xs-12 col-sm-12 text-center">
-          <button type="submit" class="btn btn-primary" onclick="alias.createAlias()">Create new alias</button>
+          <button type="submit" class="btn btn-primary" onclick="alias.createAlias(event)">Create new alias</button>
         </div>
       </div>
     </form>
@@ -58,7 +58,8 @@
     deleteAlias: function (el) {
       socket.emit('deleteAlias', el.dataset.alias)
     },
-    createAlias: function () {
+    createAlias: function (event) {
+      event.preventDefault()
       var data = {value: $("#inputAlias").val(), command: $("#inputCommand").val()}
       socket.emit('createAlias', data)
       $("#inputAlias").val('')

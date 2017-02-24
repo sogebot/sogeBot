@@ -33,7 +33,7 @@
       </div>
       <div class="form-group">
         <div class="col-xs-12 col-sm-12 text-center">
-          <button type="submit" class="btn btn-primary" onclick="cooldown.create()">Create new cooldown</button>
+          <button type="submit" class="btn btn-primary" onclick="cooldown.create(event)">Create new cooldown</button>
         </div>
       </div>
     </form>
@@ -55,7 +55,8 @@
     delete: function (el) {
       socket.emit('cooldown.set', {command: el.dataset.command, seconds: 0})
     },
-    create: function () {
+    create: function (event) {
+      event.preventDefault()
       socket.emit('cooldown.set', {command: $("#inputCommand").val(), seconds: $("#inputCooldown").val()})
       $("#inputCooldown").val('')
       $("#inputCommand").val('')
