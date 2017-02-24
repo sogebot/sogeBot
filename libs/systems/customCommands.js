@@ -62,7 +62,7 @@ CustomCommands.prototype.register = function (self) {
 
 CustomCommands.prototype.add = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\w+) (\w.+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w].+)$/)
     global.commons.insertIfNotExists({__id: 'customcmds_' + parsed[1], _command: parsed[1], response: parsed[2], success: 'customcmds.success.add', error: 'customcmds.failed.add'})
   } catch (e) {
     global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
@@ -77,7 +77,7 @@ CustomCommands.prototype.run = function (self, sender, msg, fullMsg) {
 }
 
 CustomCommands.prototype.list = function (self, sender, text) {
-  var parsed = text.match(/^(\w+)$/)
+  var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
   if (_.isNull(parsed)) {
     global.botDB.find({$where: function () { return this._id.startsWith('customcmds') }}, function (err, docs) {
       if (err) { log.error(err) }
@@ -93,7 +93,7 @@ CustomCommands.prototype.list = function (self, sender, text) {
 
 CustomCommands.prototype.remove = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\w+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     global.commons.remove({__id: 'customcmds_' + parsed[1],
       success: function (cb) {
         global.parser.unregister('!' + cb.command)

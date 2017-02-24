@@ -256,7 +256,7 @@ Twitch.prototype.lastseenUpdate = function (self, id, sender, text) {
 
 Twitch.prototype.lastseen = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\w+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     var user = new User(parsed[0])
     user.isLoaded().then(function () {
       var lastMessageTime = user.get('lastMessageTime')
@@ -279,7 +279,7 @@ Twitch.prototype.watched = function (self, sender, text) {
     var user
     if (text.trim() < 1) user = new User(sender.username)
     else {
-      var parsed = text.match(/^(\w+)$/)
+      var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
       user = new User(parsed[0])
     }
     user.isLoaded().then(function () {

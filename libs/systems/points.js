@@ -96,7 +96,7 @@ Points.prototype.addEvents = function (self) {
 
 Points.prototype.setPoints = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\w]+) ([0-9]+)$/)
+    var parsed = text.match(/^([[\u0500-\u052F\u0400-\u04FF\w]]+) ([0-9]+)$/)
     var user = new User(parsed[1])
     user.set('points', parseInt(parsed[2], 10))
     global.commons.sendMessage(global.translate('points.success.set')
@@ -110,7 +110,7 @@ Points.prototype.setPoints = function (self, sender, text) {
 
 Points.prototype.givePoints = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\w]+) ([0-9]+)$/)
+    var parsed = text.match(/^([[\u0500-\u052F\u0400-\u04FF\w]]+) ([0-9]+)$/)
     var givePts = parseInt(parsed[2], 10)
     var fromUser = new User(sender.username)
     var toUser = new User(parsed[1])
@@ -189,7 +189,7 @@ Points.prototype.getPointsName = function (points) {
 
 Points.prototype.getPointsFromUser = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\w]+)$/)
+    var parsed = text.match(/^([[\u0500-\u052F\u0400-\u04FF\w]]+)$/)
     var user = new User(parsed[1])
     user.isLoaded().then(function () {
       var pointsResponse = (global.configuration.getValue('pointsResponse').length > 0 ? global.configuration.getValue('pointsResponse') : global.translate('points.defaults.pointsResponse'))
@@ -249,7 +249,7 @@ Points.prototype.rainPoints = function (self, sender, text) {
 
 Points.prototype.addPoints = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\w]+) ([0-9]+)$/)
+    var parsed = text.match(/^([[\u0500-\u052F\u0400-\u04FF\w]]+) ([0-9]+)$/)
     var user = new User(parsed[1])
     var givePts = parseInt(parsed[2], 10)
     user.isLoaded().then(function (users) {
@@ -267,7 +267,7 @@ Points.prototype.addPoints = function (self, sender, text) {
 
 Points.prototype.removePoints = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\w]+) ([0-9]+)$/)
+    var parsed = text.match(/^([[\u0500-\u052F\u0400-\u04FF\w]]+) ([0-9]+)$/)
     var user = new User(parsed[1])
     var removePts = parseInt(parsed[2], 10)
     user.isLoaded().then(function (users) {

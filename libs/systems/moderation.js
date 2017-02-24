@@ -166,7 +166,7 @@ Moderation.prototype.whitelisted = function (text) {
 
 Moderation.prototype.permitLink = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\w+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     global.botDB.insert({type: 'permitLink', username: parsed[0].toLowerCase()})
     global.commons.sendMessage(global.translate('moderation.permit').replace('(who)', parsed[0]), sender)
   } catch (e) {
@@ -217,7 +217,7 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
     return
   }
 
-  var out = text.match(/([^\s\w]+)/g)
+  var out = text.match(/([^\s\u0500-\u052F\u0400-\u04FF\w]+)/g)
   for (var item in out) {
     if (out.hasOwnProperty(item)) {
       var symbols = out[item]

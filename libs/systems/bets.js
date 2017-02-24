@@ -42,7 +42,7 @@ function Bets () {
 
 Bets.prototype.open = function (self, sender, text) {
   try {
-    var parsed = text.match(/(\w+)/g)
+    var parsed = text.match(/([\u0500-\u052F\u0400-\u04FF\w]+)/g)
     if (parsed.length < 2) { throw new Error(ERROR_NOT_ENOUGH_OPTIONS) }
     global.botDB.findOne({_id: 'bet'}, function (err, item) {
       if (err) log.error(err)
@@ -133,7 +133,7 @@ Bets.prototype.info = function (self, sender) {
 
 Bets.prototype.saveBet = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\w+) (\d+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) (\d+)$/)
     if (parsed.length < 2) { throw new Error() }
 
     var betTo = parsed[1]
@@ -236,7 +236,7 @@ Bets.prototype.refundAll = function (self, sender) {
 
 Bets.prototype.close = function (self, sender, text) {
   try {
-    var wOption = text.match(/^(\w+)$/)[1]
+    var wOption = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
     var usersToPay = []
 
     global.botDB.findOne({_id: 'bet'}, function (err, item) {
