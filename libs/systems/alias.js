@@ -52,7 +52,7 @@ Alias.prototype.help = function (self, sender) {
 
 Alias.prototype.add = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\w+) (\w+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     global.commons.insertIfNotExists({__id: 'alias_' + parsed[2], _alias: parsed[2], command: parsed[1], success: 'alias.success.add', error: 'alias.failed.add'})
   } catch (e) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
@@ -60,7 +60,7 @@ Alias.prototype.add = function (self, sender, text) {
 }
 
 Alias.prototype.list = function (self, sender, text) {
-  var parsed = text.match(/^(\w+)$/)
+  var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
   if (_.isNull(parsed)) {
     global.botDB.find({$where: function () { return this._id.startsWith('alias') }}, function (err, docs) {
       if (err) { log.error(err) }
@@ -74,7 +74,7 @@ Alias.prototype.list = function (self, sender, text) {
 
 Alias.prototype.remove = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\w+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     global.commons.remove({__id: 'alias_' + parsed[1], success: 'alias.success.remove', error: 'alias.failed.remove'})
   } catch (e) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)

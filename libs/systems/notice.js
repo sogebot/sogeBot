@@ -94,7 +94,7 @@ Notice.prototype.help = function (self, sender) {
 
 Notice.prototype.add = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\w.+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w].+)$/)
     var hash = crypto.createHash('md5').update(parsed[0]).digest('hex').substring(0, 5)
     global.commons.insertIfNotExists({__id: 'notice_' + hash, _text: parsed[0], time: new Date().getTime(), success: 'notice.success.add', error: 'notice.failed.add'})
   } catch (e) {
@@ -103,7 +103,7 @@ Notice.prototype.add = function (self, sender, text) {
 }
 
 Notice.prototype.list = function (self, sender, text) {
-  if (_.isNull(text.match(/^(\w+)$/))) {
+  if (_.isNull(text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/))) {
     global.botDB.find({$where: function () { return this._id.startsWith('notice') }}, function (err, docs) {
       if (err) { log.error(err) }
       var list = []
@@ -118,7 +118,7 @@ Notice.prototype.list = function (self, sender, text) {
 
 Notice.prototype.get = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\w+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     global.botDB.findOne({_id: 'notice_' + parsed[0]}, function (err, docs) {
       if (err) log.error(err)
       var output = (typeof docs === 'undefined' || docs === null ? global.translate('notice.failed.notFound') : 'Notice#' + parsed[0] + ': ' + docs.text)
@@ -131,7 +131,7 @@ Notice.prototype.get = function (self, sender, text) {
 
 Notice.prototype.remove = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\w+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     global.commons.remove({__id: 'notice_' + parsed[1], success: 'notice.success.remove', error: 'notice.failed.notFound'})
   } catch (e) {
     global.commons.sendMessage(global.translate('notice.failed.parse'), sender)

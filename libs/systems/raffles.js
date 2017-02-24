@@ -106,7 +106,7 @@ Raffles.prototype.info = function (self, sender) {
 
 Raffles.prototype.open = function (self, sender, text, dashboard = false) {
   try {
-    var parsed = text.match(/^(\w+) ?(followers)?/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ?(followers)?/)
     var groups = { keyword: 1, followers: 2 }
     var raffle = {
       keyword: parsed[groups.keyword],
