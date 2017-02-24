@@ -34,7 +34,7 @@
       </div>
       <div class="form-group">
         <div class="col-xs-12 col-sm-12 text-center">
-          <button type="submit" class="btn btn-primary" onclick="ranks.create()">Create new rank</button>
+          <button type="submit" class="btn btn-primary" onclick="ranks.create(event)">Create new rank</button>
         </div>
       </div>
     </form>
@@ -56,7 +56,7 @@
     delete: function (el) {
       socket.emit('deleteRank', el.dataset.hours)
     },
-    create: function () {
+    create: function (event) {
       var data = {hours: $("#inputWatched").val(), rank: $("#inputName").val()}
       socket.emit('createRank', data)
       $("#inputWatched").val('')

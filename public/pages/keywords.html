@@ -34,7 +34,7 @@
       </div>
       <div class="form-group">
         <div class="col-xs-12 col-sm-12 text-center">
-          <button type="submit" class="btn btn-primary" onclick="keywords.createKeyword()">Create new keyword</button>
+          <button type="submit" class="btn btn-primary" onclick="keywords.createKeyword(event)">Create new keyword</button>
         </div>
       </div>
     </form>
@@ -57,7 +57,8 @@
     deleteKeyword: function (el) {
       socket.emit('deleteKeyword', el.dataset.keyword)
     },
-    createKeyword: function () {
+    createKeyword: function (event) {
+      event.preventDefault()
       var data = {keyword: $("#inputKeyword").val(), response: $("#inputResponse").val()}
       socket.emit('createKeyword', data)
       $("#inputKeyword").val('')

@@ -35,7 +35,7 @@
       </div>
       <div class="form-group">
         <div class="col-xs-12 col-sm-12 text-center">
-          <button type="submit" class="btn btn-primary" onclick="price.create()">Create new price</button>
+          <button type="submit" class="btn btn-primary" onclick="price.create(event)">Create new price</button>
         </div>
       </div>
     </form>
@@ -58,7 +58,8 @@
     delete: function (el) {
       socket.emit('deletePrice', el.dataset.command)
     },
-    create: function () {
+    create: function (event) {
+      event.preventDefault()
       var data = {price: $("#inputPrice").val(), command: $("#inputCommand").val()}
       socket.emit('createPrice', data)
       $("#inputPrice").val('')
