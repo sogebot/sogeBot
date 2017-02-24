@@ -120,37 +120,48 @@ describe('System - Keywords', function () {
       before(function (done) {
         global.output = []
         global.parser.parse(global.ownerUser, '!keyword add kwd  response')
-        setTimeout(function () { done() }, 500)
+        setTimeout(function () {
+          global.parser.parse(global.ownerUser, 'something something kwd something')
+          setTimeout(function () { done() }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
-      it('should not be in db', function (done) {
+      it('should be in db', function (done) {
         global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
           expect(err).to.equal(null)
-          expect(count).to.equal(0)
+          expect(count).to.equal(1)
           done()
         })
       })
-      it('should send parse error', function () {
-        expect(global.output.pop()).to.match(/en.keywords.failed.parse/)
+      it('should send success msg', function () {
+        expect(global.output.shift()).to.include(global.translate('keywords.success.add'))
+      })
+      it('should parse added keyword in chat', function () {
+        expect(global.output.shift()).to.match(/^response/)
       })
     })
     describe('parsing \'!keyword add kwd response awesome\'', function () {
       before(function (done) {
         global.output = []
         global.parser.parse(global.ownerUser, '!keyword add kwd response awesome')
-        keyword.run(keyword, global.ownerUser, 'something something kwd something')
-        setTimeout(function () { done() }, 500)
+        setTimeout(function () {
+          global.parser.parse(global.ownerUser, 'something something kwd something')
+          setTimeout(function () { done() }, 500)
+        }, 500)
       })
       after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
-      it('should not be in db', function (done) {
+      it('should be in db', function (done) {
         global.botDB.count({$where: function () { return this._id.startsWith('kwd') }}, function (err, count) {
           expect(err).to.equal(null)
-          expect(count).to.equal(0)
+          expect(count).to.equal(1)
           done()
         })
       })
-      it('should send parse error', function () {
-        expect(global.output.pop()).to.match(/en.keywords.failed.parse/)
+      it('should send success msg', function () {
+        expect(global.output.shift()).to.include(global.translate('keywords.success.add'))
+      })
+      it('should parse added keyword in chat', function () {
+        expect(global.output.shift()).to.match(/^response/)
       })
     })
   })
