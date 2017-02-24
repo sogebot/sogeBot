@@ -55,7 +55,7 @@ Ranks.prototype.help = function (self, sender) {
 
 Ranks.prototype.add = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\d+) (\w.+)$/)
+    var parsed = text.match(/^(\d+) ([\u0500-\u052F\u0400-\u04FF\w].+)$/)
     global.commons.insertIfNotExists({__id: 'rank_' + parsed[1], rank: parsed[2], _hours: parseInt(parsed[1], 10), success: 'rank.success.add', error: 'rank.failed.add'})
   } catch (e) {
     global.commons.sendMessage(global.translate('rank.failed.parse'), sender)
@@ -63,7 +63,7 @@ Ranks.prototype.add = function (self, sender, text) {
 }
 
 Ranks.prototype.list = function (self, sender, text) {
-  if (_.isNull(text.match(/^(\w+)$/))) {
+  if (_.isNull(text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/))) {
     global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, docs) {
       if (err) { log.error(err) }
       var list = []

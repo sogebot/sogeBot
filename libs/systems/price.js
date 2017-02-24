@@ -53,7 +53,7 @@ Price.prototype.help = function (self, sender) {
 
 Price.prototype.set = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\w+) ([0-9]+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
     global.botDB.update({_id: 'price_' + parsed[1]}, {$set: {command: parsed[1], price: parsed[2]}}, {upsert: true})
     global.commons.sendMessage(global.translate('price.success.set')
       .replace('(command)', parsed[1])
@@ -66,7 +66,7 @@ Price.prototype.set = function (self, sender, text) {
 
 Price.prototype.unset = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\w+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     global.botDB.remove({_id: 'price_' + parsed[1], command: parsed[1]}, {}, function (err, numRemoved) {
       if (err) log.error(err)
       var message = (numRemoved === 0 ? global.translate('price.failed.remove') : global.translate('price.success.remove'))
@@ -78,7 +78,7 @@ Price.prototype.unset = function (self, sender, text) {
 }
 
 Price.prototype.list = function (self, sender, text) {
-  var parsed = text.match(/^(\w+)$/)
+  var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
   if (_.isNull(parsed)) {
     global.botDB.find({$where: function () { return this._id.startsWith('price') }}, function (err, docs) {
       if (err) { log.error(err) }
@@ -98,7 +98,7 @@ Price.prototype.checkPrice = function (self, id, sender, text) {
     return
   }
   try {
-    var parsed = text.match(/^!(\w+)/)
+    var parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)/)
     global.botDB.findOne({_id: 'price_' + parsed[1]}, function (err, item) {
       if (err) log.error(err)
       if (!_.isNull(item)) {
