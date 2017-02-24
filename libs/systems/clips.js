@@ -41,7 +41,7 @@ Clips.prototype.deleteSocket = function (self, socket, data) {
 }
 
 Clips.prototype.save = function (self, id, sender, text) {
-  var clipsRegex = /.*(clips.twitch.tv\/)(\w+)\/(\w+)/
+  var clipsRegex = /.*(clips.twitch.tv\/)([\u0500-\u052F\u0400-\u04FF\w]+)\/([\u0500-\u052F\u0400-\u04FF\w]+)/
   var clipsMatch = text.trim().match(clipsRegex)
   if (!_.isNull(clipsMatch) && clipsMatch[2] === global.configuration.get().twitch.owner) {
     var data = {

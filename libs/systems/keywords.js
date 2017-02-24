@@ -51,7 +51,7 @@ Keywords.prototype.help = function (self, sender) {
 
 Keywords.prototype.add = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\w+) (\w+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     global.commons.insertIfNotExists({__id: 'kwd_' + parsed[1], _keyword: parsed[1], response: parsed[2], success: 'keywords.success.add', error: 'keywords.failed.add'})
   } catch (e) {
     global.commons.sendMessage(global.translate('keywords.failed.parse'), sender)
@@ -67,7 +67,7 @@ Keywords.prototype.run = function (self, id, sender, text) {
 }
 
 Keywords.prototype.list = function (self, sender, text) {
-  var parsed = text.match(/^(\w+)$/)
+  var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
   if (_.isNull(parsed)) {
     global.botDB.find({$where: function () { return this._id.startsWith('kwd') }}, function (err, docs) {
       if (err) { log.error(err) }
@@ -83,7 +83,7 @@ Keywords.prototype.list = function (self, sender, text) {
 
 Keywords.prototype.remove = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(\w+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     global.commons.remove({__id: 'kwd_' + parsed[1], success: 'keywords.success.remove', error: 'keywords.failed.remove'})
   } catch (e) {
     global.commons.sendMessage(global.translate('keywords.failed.parse'), sender)
