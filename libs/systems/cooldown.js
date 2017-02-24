@@ -69,6 +69,7 @@ Cooldown.prototype.set = function (self, sender, text) {
     data = {'command': match[1], 'seconds': match[2]}
   } catch (e) {
     global.commons.sendMessage(global.translate('cooldown.failed.parse'), sender)
+    return
   }
 
   delete self.list[data.command]
