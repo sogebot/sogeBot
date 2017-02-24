@@ -60,7 +60,7 @@ Keywords.prototype.add = function (self, sender, text) {
 }
 
 Keywords.prototype.run = function (self, id, sender, text) {
-  global.botDB.find({$where: function () { return this._id.startsWith('kwd') && text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + this.keyword + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0 }}, function (err, items) {
+  global.botDB.find({$where: function () { return this._id.startsWith('kwd') && text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(this.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0 }}, function (err, items) {
     if (err) log.error(err)
     _.each(items, function (item) { global.commons.sendMessage(item.response, sender) })
     global.updateQueue(id, true)
