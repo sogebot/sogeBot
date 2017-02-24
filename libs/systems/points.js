@@ -41,7 +41,7 @@ function Points () {
 }
 
 Points.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'settings', name: 'Points', id: 'points'})
+  global.panel.addMenu({category: 'settings', name: 'Systems', id: 'systems'})
 
   global.panel.socketListening(this, 'setPoints', this.setSocket)
   global.panel.socketListening(this, 'getPointsConfiguration', this.sendConfiguration)

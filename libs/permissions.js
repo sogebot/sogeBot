@@ -23,7 +23,7 @@ function Permissions () {
 }
 
 Permissions.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'main', name: 'Permissions', id: 'permissions'})
+  global.panel.addMenu({category: 'settings', name: 'Permissions', id: 'permissions'})
   global.panel.socketListening(this, 'getPermissions', this.sendSocket)
   global.panel.socketListening(this, 'changePermission', this.changeSocket)
 }

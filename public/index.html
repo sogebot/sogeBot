@@ -41,10 +41,6 @@
         <ul class="nav navbar-nav" id="menu-main">
           <li id="menuDashboard"><a href="#" data-page="dashboard" class="active">Dashboard</a></li>
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Systems <span class="caret"></span></a>
-            <ul class="dropdown-menu" id="menu-systems"></ul>
-          </li>
-          <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Manage <span class="caret"></span></a>
             <ul class="dropdown-menu" id="menu-manage"></ul>
           </li>
@@ -283,10 +279,13 @@
       if (loadedMenu) return
       /* at first, clear all menu */
       $('#menu-*').empty()
+      var systems = false // we want only systems settings once
       _.each(menu, function(obj) {
         if (obj.id !== 'dashboard') {
+          if ((obj.id === 'systems') && systems) return
           $('#menu-' + obj.category).append('<li><a href="#" data-page="' + obj.id + '">' + obj.name + '</a></li>')
         }
+        if (obj.id === 'systems') systems = true
       })
       loadedMenu = true
 
