@@ -1,4 +1,4 @@
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-8">
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
   <div class="widget">
     <div class="title">Playlist <small><a href="/playlist/">public link</a></div>
     <table class="table table-striped table-responsive">
@@ -13,51 +13,6 @@
       </thead>
       <tbody id="Playlist" >
       </tbody>
-    </table>
-  </div>
-</div>
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-  <div class="widget">
-    <div class="title">Settings</div>
-    <table id="SRRequests" class="table table-striped">
-      <tr>
-        <td><strong>Volume</strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="songs_volume" onclick="commons.configEditable(this, '%')" id="configVolume"></abbr>
-          <div class="input-group" style="display:none;" id="input_volume_group">
-            <div class="input-group-addon">%</div>
-            <input style="width: 6em" id="input_volume" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong>Max duration</strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="songs_duration" onclick="commons.configEditable(this, 'min')" id="configDuration"></abbr>
-          <div class="input-group" style="display:none;" id="input_duration_group">
-            <div class="input-group-addon">minutes</div>
-            <input style="width: 6em" id="input_duration" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong>Shuffle</strong></td>
-        <td>
-          <input id="shuffleToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-        </td>
-      </tr>
-      <tr>
-        <td><strong>Song Requests</strong></td>
-        <td>
-          <input id="songrequestToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-        </td>
-      </tr>
-      <tr>
-        <td><strong>Playlist</strong></td>
-        <td>
-          <input id="playlistToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-        </td>
-      </tr>
     </table>
   </div>
 </div>
@@ -101,40 +56,10 @@
   }
 
   socket.emit('getPlaylist');
-  socket.emit('getSongsConfiguration')
 
   socket.on('songPlaylistList', function(list) {
     updatePlaylist(list)
   });
-
-  socket.on('songsConfiguration', function(data) {
-    if (playlist.volume != data.volume) updatePlaylist(playlist.list)
-    playlist.volume = data.volume
-
-    $("#configVolume").text(data.volume + '%')
-    $("#configDuration").text(data.duration + 'min')
-
-    $('#shuffleToggle').bootstrapToggle(data.shuffle ? 'on' : 'off')
-    $('#shuffleToggle').off('change')
-    $('#shuffleToggle').change(function() {
-      if ($('#shuffleToggle').data('init')) socket.emit('saveConfiguration', {'songs_shuffle': $(this).prop('checked')})
-    })
-    $('#shuffleToggle').data('init', true)
-
-    $('#songrequestToggle').bootstrapToggle(data.songrequest ? 'on' : 'off')
-    $('#songrequestToggle').off('change')
-    $('#songrequestToggle').change(function() {
-      if ($('#songrequestToggle').data('init')) socket.emit('saveConfiguration', {'songs_songrequest': $(this).prop('checked')})
-    })
-    $('#songrequestToggle').data('init', true)
-
-    $('#playlistToggle').bootstrapToggle(data.playlist ? 'on' : 'off')
-    $('#playlistToggle').off('change')
-    $('#playlistToggle').change(function() {
-      if ($('#playlistToggle').data('init')) socket.emit('saveConfiguration', {'songs_playlist': $(this).prop('checked')})
-    })
-    $('#playlistToggle').data('init', true)
-  })
 
   var updatePlaylist = function(list) {
     playlist.list = list

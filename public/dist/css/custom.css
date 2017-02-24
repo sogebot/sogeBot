@@ -291,6 +291,11 @@ a.active {
 
 .widget .table tr > td {
   border-top: 1px dotted #eee;
+  font-size: 12px
+}
+
+#settings .widget .table tr > td {
+  width: 30%
 }
 
 #wGAS dl {

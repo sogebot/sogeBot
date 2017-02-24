@@ -22,7 +22,7 @@ function Keywords () {
 }
 
 Keywords.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'systems', name: 'Keywords', id: 'keywords'})
+  global.panel.addMenu({category: 'manage', name: 'Keywords', id: 'keywords'})
   global.panel.socketListening(this, 'getKeywords', this.sendKeywords)
   global.panel.socketListening(this, 'deleteKeyword', this.deleteKeywords)
   global.panel.socketListening(this, 'createKeyword', this.createKeywords)
