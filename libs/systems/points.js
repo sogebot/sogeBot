@@ -41,18 +41,10 @@ function Points () {
 }
 
 Points.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'systems', name: 'Points', id: 'points'})
-  global.panel.socketListening(this, 'getPoints', this.listSocket)
+  global.panel.addMenu({category: 'settings', name: 'Points', id: 'points'})
+
   global.panel.socketListening(this, 'setPoints', this.setSocket)
-
   global.panel.socketListening(this, 'getPointsConfiguration', this.sendConfiguration)
-}
-
-Points.prototype.listSocket = function (self, socket) {
-  global.botDB.find({username: { $nin: [global.configuration.get().twitch.username, global.configuration.get().twitch.owner] }, points: { $exists: true }, $where: function () { return this._id.startsWith('user') }}).sort({ points: -1 }).exec(function (err, items) {
-    if (err) { log.error(err) }
-    socket.emit('Points', items)
-  })
 }
 
 Points.prototype.setSocket = function (self, socket, data) {
@@ -96,7 +88,7 @@ Points.prototype.addEvents = function (self) {
 
 Points.prototype.setPoints = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([[\u0500-\u052F\u0400-\u04FF\w]]+) ([0-9]+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
     var user = new User(parsed[1])
     user.set('points', parseInt(parsed[2], 10))
     global.commons.sendMessage(global.translate('points.success.set')
