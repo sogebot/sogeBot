@@ -1,22 +1,6 @@
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-8">
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
   <div class="widget">
-    <div class="title">Points</div>
-    <table class="table table-striped table-responsive table-condensed">
-      <thead>
-        <tr>
-          <th>User</th>
-          <th>Points</th>
-        </tr>
-      </thead>
-      <tbody id="Points" >
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-  <div class="widget">
-    <div class="title">Settings</div>
+    <div class="title">Points settings</div>
     <table class="table table-striped">
       <tr>
         <td><strong>Points Name</strong></td>
@@ -82,38 +66,6 @@
   </div>
 </div>
 <script>
-  var points = {
-    update: function (list) {
-      $("#Points").empty()
-      _.each(list, function(item, index) {
-        $("#Points").append('<tr>' +
-          '<td>' + item.username + '</td>' +
-          '<td>' +
-          '<abbr title="click to edit" data-id="' + item.username + '" onclick="points.makeEditable(this)">' +  item.points + '</abbr>' +
-          '<input id="points_' + item.username + '" style="width: 6em; display: none" class="form-control input-sm" type="text"/>' +
-          '</td>' +
-        '</tr>');
-      })
-    },
-    makeEditable: function(el) {
-      var $input = $('#points_' + el.dataset.id)
-      $(el).css('display', 'none')
-      $input.css('display', 'table')
-      $input.focus()
-      $input.val($(el).text())
-
-      $input.off()
-      $input.on('focusout', function() {
-        var value = $input.val()
-        $input.css('display', 'none')
-        $(el).css('display', 'inline')
-        $(el).text(value)
-        socket.emit('setPoints', {username: el.dataset.id, value: value})
-      })
-    }
-  }
-
-  socket.emit('getPoints');
   socket.emit('getPointsConfiguration')
 
   socket.on('Points', function(list) {

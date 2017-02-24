@@ -58,6 +58,9 @@ function Panel () {
       })
     })
 
+    // send enabled systems
+    socket.on('getSystems', function () { socket.emit('systems', global.configuration.get().systems) })
+
     _.each(self.socketListeners, function (listener) {
       socket.on(listener.on, function (data) {
         if (typeof listener.fnc !== 'function') {

@@ -9,7 +9,8 @@
           <th>Currently on Stream</th>
           <th data-sortable-type="numeric">Last Seen</th>
           <th data-sortable-type="numeric">Watched Time</th>
-          <th></th>
+          <th data-sortable-type="numeric" id="viewers-points">Points</th>
+          <th data-sortable="false"></th>
         </tr>
       </thead>
       <tbody id="Users">
@@ -19,18 +20,29 @@
 </div>
 
 <script>
+  if(!systems.points) {
+    $("#viewers-points").remove()
+  }
+
   var viewers = {
     update: function (list) {
       $("#Users").empty()
       _.each(list, function(item, index) {
+        item.points = _.isUndefined(item.points) ? 0 : item.points
         $("#Users").append('<tr>' +
           '<td>' + item.username + '</td>' +
           '<td>' + viewers.styleBool(item.isFollower) + '</td>' +
           '<td>' + viewers.styleBool(item.isOnline) + '</td>' +
           '<td data-value=' + (_.isUndefined(item.lastMessageTime) ? 0 : item.lastMessageTime) + '>' + viewers.getDateString(item.lastMessageTime) + '</td>' +
           '<td data-value=' + (_.isUndefined(item.watchTime) ? 0 : item.watchTime) + '>' + viewers.styleWatched(item.watchTime) + '</td>' +
+          '<td id="viewers-points-data" data-value=' + item.points + '>' +
+            '<abbr title="click to edit" data-id="' + item.username + '" onclick="viewers.pointsEditable(this)">' +  item.points + '</abbr>' +
+            '<input id="points_' + item.username + '" style="width: 6em; display: none" class="form-control input-sm" type="text"/></td>' +
           '<td class="tableMenu"><button type="button" class="btn btn-danger btn-xs" data-username="' + item.username + '" onclick="viewers.delete(this)">[x] Delete</button></td>' +
           '</tr>');
+        if(!systems.points) {
+          $("#viewers-points-data").remove()
+        }
       })
     },
     styleBool: function (bool) {
@@ -50,6 +62,22 @@
     },
     delete: function (el) {
       socket.emit('deleteViewer', el.dataset.username)
+    },
+    pointsEditable: function(el) {
+      var $input = $('#points_' + el.dataset.id)
+      $(el).css('display', 'none')
+      $input.css('display', 'table')
+      $input.focus()
+      $input.val($(el).text())
+
+      $input.off()
+      $input.on('focusout', function() {
+        var value = $input.val()
+        $input.css('display', 'none')
+        $(el).css('display', 'inline')
+        $(el).text(value)
+        socket.emit('setPoints', {username: el.dataset.id, value: value})
+      })
     }
   }
 
