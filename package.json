@@ -33,7 +33,7 @@
   "scripts": {
     "copy:dist": "node tools/copy-dist-files.js",
     "migrate": "node --harmony-async-await ./migrate",
-    "start": "npm run copy:dist && node ./main",
+    "start": "npm run copy:dist && node --harmony-async-await ./main",
     "test": "mocha"
   },
   "devDependencies": {
