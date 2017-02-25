@@ -3,6 +3,7 @@
 var ini = require('ini')
 var fs = require('fs')
 var Database = require('nedb')
+var dbPromise = require('nedb-promise')
 var constants = require('./constants')
 var _ = require('lodash')
 
@@ -11,6 +12,7 @@ global.botDB = new Database({
   autoload: true
 })
 global.botDB.persistence.setAutocompactionInterval(60000)
+global.asyncBotDB = dbPromise.fromInstance(global.botDB)
 
 function Configuration () {
   this.config = null

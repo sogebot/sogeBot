@@ -2,6 +2,7 @@
 
 var constants = require('./constants')
 var crypto = require('crypto')
+var _ = require('lodash')
 
 var queue = {}
 
@@ -100,6 +101,78 @@ Parser.prototype.isOwner = function (user) {
   } catch (e) {
     return true // we can expect, if user is null -> bot or admin
   }
+}
+
+Parser.prototype.parseMessage = async function (message) {
+  let random = {
+    '(random.online.viewer)': async function () {
+      let onlineViewers = await global.asyncBotDB.find({
+        $where: function () {
+          return this._id.startsWith('user_') && this.isOnline && this.username.toLowerCase() !== global.configuration.get().twitch.username
+        }
+      })
+      if (onlineViewers.length === 0) return 'unknown'
+      return onlineViewers[_.random(0, onlineViewers.length-1)].username
+    },
+    '(random.online.follower)': async function () {
+      let onlineFollower = await global.asyncBotDB.find({
+        $where: function () {
+          return this._id.startsWith('user_') && this.isOnline && (!_.isUndefined(this.isFollower) && this.isFollower) && this.username.toLowerCase() !== global.configuration.get().twitch.username
+        }
+      })
+      if (onlineFollower.length === 0) return 'unknown'
+      return onlineFollower[_.random(0, onlineFollower.length-1)].username
+    },
+    '(random.viewer)': async function () {
+      let viewer = await global.asyncBotDB.find({
+        $where: function () {
+          return this._id.startsWith('user_') && this.username.toLowerCase() !== global.configuration.get().twitch.username
+        }
+      })
+      if (viewer.length === 0) return 'unknown'
+      return viewer[_.random(0, viewer.length-1)].username
+    },
+    '(random.follower)': async function () {
+      let follower = await global.asyncBotDB.find({
+        $where: function () {
+          return this._id.startsWith('user_') && (!_.isUndefined(this.isFollower) && this.isFollower) && this.username.toLowerCase() !== global.configuration.get().twitch.username
+        }
+      })
+      if (follower.length === 0) return 'unknown'
+      return follower[_.random(0, follower.length-1)].username
+    },
+    '(random.number-#-to-#)':  async function (filter) {
+      let numbers = filter.replace('(random.number-', '')
+        .replace(')', '')
+        .split('-to-')
+      return _.random(numbers[0],  numbers[1])
+    },
+    '(random.true-or-false)': async function () {
+      return Math.random() < 0.5 ? true : false
+    }
+  }
+
+  return await this.parseMessageEach(random, message)
+}
+
+Parser.prototype.parseMessageEach = async function (filters, msg) {
+  for (var key in filters) {
+    if (!filters.hasOwnProperty(key)) continue;
+
+    let fnc = filters[key]
+    let regexp = _.escapeRegExp(key)
+
+    // we want to handle # as \d - number in regexp
+    regexp = regexp.replace(/#/g, '(\\d+)')
+    let rMessage = msg.match((new RegExp('(' + regexp + ')', 'g')))
+    if (!_.isNull(rMessage)) {
+      for (var bkey in rMessage) {
+        let newString = await fnc(rMessage[bkey])
+        msg = msg.replace(rMessage[bkey], newString)
+      }
+    }
+  }
+  return msg
 }
 
 // these needs to be global, will be called from called parsers
