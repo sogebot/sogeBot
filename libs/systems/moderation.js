@@ -80,44 +80,6 @@ function Moderation () {
 
 Moderation.prototype.webPanel = function () {
   global.panel.addMenu({category: 'settings', name: 'Moderation', id: 'moderation'})
-  global.panel.socketListening(this, 'getModerationConfiguration', this.sendConfiguration)
-}
-
-Moderation.prototype.sendConfiguration = function (self, socket) {
-  socket.emit('moderationConfiguration', {
-    moderationLinks: global.configuration.getValue('moderationLinks'),
-    moderationLinksTimeout: global.configuration.getValue('moderationLinksTimeout'),
-
-    moderationSymbols: global.configuration.getValue('moderationSymbols'),
-    moderationSymbolsTimeout: global.configuration.getValue('moderationSymbolsTimeout'),
-    moderationSymbolsTriggerLength: global.configuration.getValue('moderationSymbolsTriggerLength'),
-    moderationSymbolsMaxConsecutively: global.configuration.getValue('moderationSymbolsMaxConsecutively'),
-    moderationSymbolsMaxPercent: global.configuration.getValue('moderationSymbolsMaxPercent'),
-
-    moderationLongMessage: global.configuration.getValue('moderationLongMessage'),
-    moderationLongMessageTimeout: global.configuration.getValue('moderationLongMessageTimeout'),
-    moderationLongMessageTriggerLength: global.configuration.getValue('moderationLongMessageTriggerLength'),
-
-    moderationCaps: global.configuration.getValue('moderationCaps'),
-    moderationCapsTimeout: global.configuration.getValue('moderationCapsTimeout'),
-    moderationCapsTriggerLength: global.configuration.getValue('moderationCapsTriggerLength'),
-    moderationCapsMaxPercent: global.configuration.getValue('moderationCapsMaxPercent'),
-
-    moderationSpam: global.configuration.getValue('moderationSpam'),
-    moderationSpamTimeout: global.configuration.getValue('moderationSpamTimeout'),
-    moderationSpamTriggerLength: global.configuration.getValue('moderationSpamTriggerLength'),
-    moderationSpamMaxLength: global.configuration.getValue('moderationSpamMaxLength'),
-
-    moderationColor: global.configuration.getValue('moderationColor'),
-    moderationColorTimeout: global.configuration.getValue('moderationColorTimeout'),
-
-    moderationEmotes: global.configuration.getValue('moderationEmotes'),
-    moderationEmotesTimeout: global.configuration.getValue('moderationEmotesTimeout'),
-    moderationEmotesMaxCount: global.configuration.getValue('moderationEmotesMaxCount'),
-
-    moderationWarnings: global.configuration.getValue('moderationWarnings'),
-    moderationWarningsTimeouts: global.configuration.getValue('moderationWarningsTimeouts')
-  })
 }
 
 Moderation.prototype.timeoutUser = function (sender, warning, msg, time) {
