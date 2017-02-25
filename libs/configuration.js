@@ -69,8 +69,12 @@ Configuration.prototype.setValue = function (self, sender, text) {
   }
 }
 
+Configuration.prototype.sets = function (self) {
+  return Object.keys(self.cfgL).map(function (item) { return item })
+}
+
 Configuration.prototype.listSets = function (self, sender, text) {
-  var setL = Object.keys(self.cfgL).map(function (item) { return item }).join(', ')
+  var setL = self.sets(self).join(', ')
   global.commons.sendMessage(setL.length === 0 ? 'Sorry, (sender), you cannot configure anything' : 'List of possible settings: ' + setL, sender)
 }
 

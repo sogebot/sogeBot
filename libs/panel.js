@@ -57,6 +57,13 @@ function Panel () {
         global.configuration.setValue(global.configuration, { username: global.configuration.get().username }, value + ' ' + index)
       })
     })
+    socket.on('getConfiguration', function () {
+      var data = {}
+      _.each(global.configuration.sets(global.configuration), function (key) {
+        data[key] = global.configuration.getValue(key)
+      })
+      socket.emit('configuration', data)
+    })
 
     // send enabled systems
     socket.on('getSystems', function () { socket.emit('systems', global.configuration.get().systems) })
