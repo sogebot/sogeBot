@@ -6,7 +6,7 @@ var statsDB = new Database({
   filename: 'stats.db',
   autoload: true
 })
-global.botDB.persistence.setAutocompactionInterval(60000)
+statsDB.persistence.setAutocompactionInterval(60000)
 
 function Stats () {
   this.latestTimestamp = 0
