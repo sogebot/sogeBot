@@ -230,10 +230,10 @@
       /* MUTE BUTTON */
       var btn = $('#mute-btn')
       btn.data('muted', !data.mute)
-      switchMute()
+      switchMute(false)
     })
 
-    var switchMute = function () {
+    var switchMute = function (update = true) {
       var btn = $('#mute-btn')
       btn.removeClass()
       if (btn.data('muted')) {
@@ -242,7 +242,7 @@
         btn.addClass('btn btn-success btn-xs')
       }
       btn.data('muted', !btn.data('muted'))
-      socket.emit('saveConfiguration', {'mute': btn.data('muted')})
+      if (update) socket.emit('saveConfiguration', {'mute': btn.data('muted')})
     }
 
     var switchPercentageShow = function() {
