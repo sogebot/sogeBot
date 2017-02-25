@@ -145,7 +145,11 @@ Parser.prototype.parseMessage = async function (message) {
       let numbers = filter.replace('(random.number-', '')
         .replace(')', '')
         .split('-to-')
-      return _.random(numbers[0],  numbers[1])
+      try {
+        return _.random(numbers[0],  numbers[1])
+      } catch (e) {
+        return 0
+      }
     },
     '(random.true-or-false)': async function () {
       return Math.random() < 0.5 ? true : false
