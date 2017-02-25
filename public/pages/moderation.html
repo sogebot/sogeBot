@@ -256,7 +256,7 @@
 </div>
 
 <script>
-  socket.emit('getModerationConfiguration')
+  socket.emit('getConfiguration')
 
   var createToggle = function (id, value, options) {
     options = options || {on: 'On', off: 'Off'}
@@ -271,8 +271,8 @@
     $('#' + id + 'Toggle').data('init', true)
   }
 
-  socket.off('moderationConfiguration')
-  socket.on('moderationConfiguration', function(data) {
+  socket.off('configuration')
+  socket.on('configuration', function(data) {
     createToggle('moderationLinks', data.moderationLinks)
     $("#moderationLinksTimeout").text(data.moderationLinksTimeout + 's')
 
