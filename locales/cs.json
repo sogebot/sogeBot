@@ -8,7 +8,10 @@
     "offline": "Stream je prave offline!",
     "lang-selected": "Bot je nyni prepnuty do cestiny",
     "command-parse": "Promin, (sender), ale tento prikaz neni spravne, pouzij",
-    "error": "Promin, (sender), ale neco se pokazilo!"
+    "error": "Promin, (sender), ale neco se pokazilo!",
+    "mute": {
+      "false": "Mute vypnut. Bot bude posilat zpravy."
+    }
   },
   "raffle": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych (value) minut",

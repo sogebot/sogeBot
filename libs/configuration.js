@@ -23,6 +23,7 @@ function Configuration () {
   this.loadValues()
 
   this.register('lang', '', 'string', 'en')
+  this.register('mute', 'core.mute', 'bool', false)
 }
 
 Configuration.prototype.loadFile = function () {
