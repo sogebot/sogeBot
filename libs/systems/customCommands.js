@@ -63,7 +63,6 @@ CustomCommands.prototype.register = function (self) {
 CustomCommands.prototype.add = function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
-    console.log(parsed)
     global.commons.insertIfNotExists({__id: 'customcmds_' + parsed[1], _command: parsed[1], response: parsed[2], success: 'customcmds.success.add', error: 'customcmds.failed.add'})
   } catch (e) {
     global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
