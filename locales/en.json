@@ -8,7 +8,10 @@
     "offline": "Stream is currently offline!",
     "lang-selected": "Bot language is currently set to english",
     "command-parse": "Sorry, (sender), but this command is not correct, use",
-    "error": "Sorry, (sender), but something went wrong!"
+    "error": "Sorry, (sender), but something went wrong!",
+    "mute": {
+      "false": "Mute disabled. Bot will send messages."
+    }
   },
   "raffle": {
     "announceInterval": "Opened raffles will be announced every (value) minute",
