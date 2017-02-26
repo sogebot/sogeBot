@@ -358,7 +358,7 @@
   "cooldown": {
     "failed": {
       "parse": "{core.command-parse} !cooldown [command] [seconds]",
-      "cooldown": "(sender), you cannot user !(command), remaining (seconds)s"
+      "cooldown": "(sender), you cannot use !(command), remaining (seconds)s"
     },
     "success": {
       "set": "Cooldown for !(command) was set to (seconds)s",
