@@ -83,10 +83,13 @@ Alias.prototype.remove = function (self, sender, text) {
 
 Alias.prototype.parse = function (self, id, sender, text) {
   try {
-    global.botDB.findOne({$where: function () { return this._id.startsWith('alias_') && text.startsWith('!' + this.alias) && text.trim().length === this.alias.length + 1 }}, function (err, item) {
+    var parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
+    var cmd = parsed[1]
+    global.botDB.findOne({$where: function () { return this._id.startsWith('alias_') && cmd === this.alias }}, function (err, item) {
       if (err) log.error(err)
       if (!_.isNull(item)) {
         global.parser.parse(sender, text.replace('!' + item.alias, '!' + item.command))
+        console.log(text.replace('!' + item.alias, '!' + item.command))
         global.parser.lineParsed--
       }
       global.updateQueue(id, _.isNull(item))
