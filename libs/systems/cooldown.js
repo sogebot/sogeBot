@@ -95,6 +95,8 @@ Cooldown.prototype.check = function (self, id, sender, text) {
   try {
     match = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)/)
     data = {'command': match[1], 'miliseconds': self.list[match[1]]}
+
+    if (_.isUndefined(data.miliseconds)) throw Error()
   } catch (e) {
     global.updateQueue(id, true)
     return
