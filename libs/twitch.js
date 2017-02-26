@@ -420,7 +420,11 @@ Twitch.prototype.sendGameFromTwitch = function (self, socket, game) {
     }
   }, function (err, res, body) {
     if (err) { return global.log.error(err) }
-    socket.emit('sendGameFromTwitch', !_.isUndefined(body.games[0]) && game.toLowerCase() === body.games[0].name.toLowerCase() ? body.games[0].name : false)
+    if (_.isNull(body.games)) {
+      socket.emit('sendGameFromTwitch', false)
+    } else {
+      socket.emit('sendGameFromTwitch', !_.isUndefined(body.games[0]) && game.toLowerCase() === body.games[0].name.toLowerCase() ? body.games[0].name : false)
+    }
   })
 }
 
