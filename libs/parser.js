@@ -16,7 +16,7 @@ function Parser () {
   this.selfParsers = {}
   this.linesParsed = 0
 
-  // check queue and then parseCommands\
+  // check queue and then parseCommands
   var self = this
   setInterval(function () {
     for (var id in queue) {
@@ -46,7 +46,7 @@ Parser.prototype.addToQueue = function (user, message) {
   }
   queue[id] = data
 
-  for (var parser in this.registeredParsers) {
+  for (var parser in _(this.registeredParsers).toPairs().sortBy(0).fromPairs().value()) {
     if (typeof queue[id] === 'undefined') break
     if (this.permissionsParsers[parser] === constants.VIEWERS ||
         (this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user)) ||
