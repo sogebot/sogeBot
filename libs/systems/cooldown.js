@@ -65,7 +65,7 @@ Cooldown.prototype.set = function (self, sender, text) {
   var data, match
 
   try {
-    match = text.match(/^(\w+) (\d+)/)
+    match = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) (\d+)/)
     data = {'command': match[1], 'seconds': match[2]}
   } catch (e) {
     global.commons.sendMessage(global.translate('cooldown.failed.parse'), sender)
