@@ -1,5 +1,6 @@
 'use strict'
 
+var _ = require('lodash')
 var Database = require('nedb-promise')
 var DB = new Database({
   filename: 'sogeBot.db',
