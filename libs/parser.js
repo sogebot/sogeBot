@@ -176,7 +176,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
     '(var.#)': async function (filter) {
       let variable = filter.replace('(var.', '').replace(')', '')
       if (attr.set.length === 0) return global.parser.customVariables[variable]
-      global.parser.customVariables[variable] = attr.set
+      if (this.isOwner(attr.sender) || attr.sender.mod) global.parser.customVariables[variable] = attr.set
       return ''
     }
   }

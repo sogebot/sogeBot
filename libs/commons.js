@@ -97,6 +97,7 @@ Commons.prototype.runCallback = function (cb, data) {
 }
 
 Commons.prototype.sendMessage = async function (message, sender, attr={}) {
+  attr.sender = sender
   message = await global.parser.parseMessage(message, attr)
   if (message === '') return // if message is empty, don't send anything
 
