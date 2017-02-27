@@ -89,7 +89,6 @@ Alias.prototype.parse = function (self, id, sender, text) {
       if (err) log.error(err)
       if (!_.isNull(item)) {
         global.parser.parse(sender, text.replace('!' + item.alias, '!' + item.command))
-        console.log(text.replace('!' + item.alias, '!' + item.command))
         global.parser.lineParsed--
       }
       global.updateQueue(id, _.isNull(item))
