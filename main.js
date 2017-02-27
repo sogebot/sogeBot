@@ -41,7 +41,7 @@ var options = {
     username: global.configuration.get().twitch.username,
     password: global.configuration.get().twitch.password
   },
-  channels: ['#' + global.configuration.get().twitch.owner]
+  channels: ['#' + global.configuration.get().twitch.channel]
 }
 
 global.channelId = null
@@ -98,12 +98,12 @@ global.client.on('part', function (channel, username, fromSelf) {
 
 // Bot is checking if it is a mod
 setInterval(function () {
-  global.status.MOD = global.client.isMod('#' + global.configuration.get().twitch.owner, global.configuration.get().twitch.username)
+  global.status.MOD = global.client.isMod('#' + global.configuration.get().twitch.channel, global.configuration.get().twitch.username)
 }, 60000)
 
 // get and save channel_id
 global.client.api({
-  url: 'https://api.twitch.tv/kraken/users?login=' + global.configuration.get().twitch.owner,
+  url: 'https://api.twitch.tv/kraken/users?login=' + global.configuration.get().twitch.channel,
   headers: {
     Accept: 'application/vnd.twitchtv.v5+json',
     'Client-ID': global.configuration.get().twitch.clientId

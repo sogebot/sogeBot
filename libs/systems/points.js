@@ -48,7 +48,7 @@ Points.prototype.webPanel = function () {
 }
 
 Points.prototype.setSocket = function (self, socket, data) {
-  self.setPoints(self, {username: global.configuration.get().twitch.owner}, data.username + ' ' + data.value) // we want to show this in chat
+  self.setPoints(self, {username: global.configuration.get().twitch.channel}, data.username + ' ' + data.value) // we want to show this in chat
 }
 
 Points.prototype.sendConfiguration = function (self, socket) {

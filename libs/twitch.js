@@ -212,7 +212,7 @@ Twitch.prototype.sendStats = function (self, socket) {
 }
 
 Twitch.prototype.sendTwitchVideo = function (self, socket) {
-  socket.emit('twitchVideo', global.configuration.get().twitch.owner.toLowerCase())
+  socket.emit('twitchVideo', global.configuration.get().twitch.channel.toLowerCase())
 }
 
 Twitch.prototype.isOnline = function () {
@@ -328,7 +328,7 @@ Twitch.prototype.showTop = function (self, sender, text) {
     global.botDB.find({$where: function () {
       return this._id.startsWith('user') &&
         this._id !== 'user_' + global.configuration.get().twitch.username &&
-        this._id !== 'user_' + global.configuration.get().twitch.owner }})
+        this._id !== 'user_' + global.configuration.get().twitch.channel }})
     .limit(parsed[2])
     .sort(orderBy).exec(function (err, items) {
       if (err) global.log.error(err)

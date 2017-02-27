@@ -129,14 +129,14 @@ Songs.prototype.unbanSong = function (self, sender, text) {
 }
 
 Songs.prototype.getCurrentSong = function (self) {
-  global.commons.sendMessage(global.translate(_.isUndefined(self.currentSong.title) ? 'songs.noCurrentSong' : 'songs.currentSong').replace('(title)', self.currentSong.title), {username: global.configuration.get().twitch.owner})
+  global.commons.sendMessage(global.translate(_.isUndefined(self.currentSong.title) ? 'songs.noCurrentSong' : 'songs.currentSong').replace('(title)', self.currentSong.title), {username: global.configuration.get().twitch.channel})
 }
 
 Songs.prototype.stealSongToPlaylist = function (self) {
   try {
     self.addSongToPlaylist(self, null, self.currentSong.videoID)
   } catch (err) {
-    global.commons.sendMessage(global.translate('songs.noCurrentSong'), {username: global.configuration.get().twitch.owner})
+    global.commons.sendMessage(global.translate('songs.noCurrentSong'), {username: global.configuration.get().twitch.channel})
   }
 }
 
@@ -219,7 +219,7 @@ Songs.prototype.sendNextSongID = function (self, socket) {
 }
 
 Songs.prototype.help = function () {
-  global.commons.sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', {username: global.configuration.get().twitch.owner})
+  global.commons.sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', {username: global.configuration.get().twitch.channel})
 }
 
 Songs.prototype.addSongToQueue = function (self, sender, text) {
