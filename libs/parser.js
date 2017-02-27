@@ -172,6 +172,12 @@ Parser.prototype.parseMessage = async function (message, attr) {
       let variable = filter.replace('(set.', '').replace(')', '')
       global.parser.customVariables[variable] = attr.set
       return ''
+    },
+    '(var.#)': async function (filter) {
+      let variable = filter.replace('(var.', '').replace(')', '')
+      if (attr.set.length === 0) return global.parser.customVariables[variable]
+      global.parser.customVariables[variable] = attr.set
+      return ''
     }
   }
 
@@ -193,6 +199,7 @@ Parser.prototype.parseMessageEach = async function (filters, msg) {
     if (!_.isNull(rMessage)) {
       for (var bkey in rMessage) {
         let newString = await fnc(rMessage[bkey])
+        if (newString.length === 0) msg = ''
         msg = msg.replace(rMessage[bkey], newString)
       }
     }
