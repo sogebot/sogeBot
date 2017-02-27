@@ -34,7 +34,7 @@ Stats.prototype.save = function (data) {
 }
 
 Stats.prototype.getViewers = function (self, socket) {
-  global.botDB.find({$where: function () { return this._id.startsWith('user') && this.username !== global.configuration.get().twitch.username && this.username !== global.configuration.get().twitch.owner }}, function (err, items) {
+  global.botDB.find({$where: function () { return this._id.startsWith('user') && this.username !== global.configuration.get().twitch.username && this.username !== global.configuration.get().twitch.channel }}, function (err, items) {
     if (err) { global.log.error(err) }
     socket.emit('Viewers', items)
   })

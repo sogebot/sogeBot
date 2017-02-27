@@ -53,7 +53,7 @@ Bets.prototype.open = function (self, sender, text) {
         _.each(parsed, function (option) { bOptions[option] = {} })
         global.botDB.update({_id: 'bet'}, {$set: {bets: bOptions, locked: false}}, {upsert: true}, function (err) {
           if (err) log.error(err)
-          global.commons.sendMessage(global.translate('bets.opened', {username: global.configuration.get().twitch.owner})
+          global.commons.sendMessage(global.translate('bets.opened', {username: global.configuration.get().twitch.channel})
             .replace('(options)', parsed.join(' | '))
             .replace('(minutes)', global.configuration.getValue('betCloseTimer')), sender)
         })
@@ -69,7 +69,7 @@ Bets.prototype.open = function (self, sender, text) {
                   isBet = true
                 })
               })
-              if (isBet) global.commons.sendMessage(global.translate('bets.locked'), {username: global.configuration.get().twitch.owner})
+              if (isBet) global.commons.sendMessage(global.translate('bets.locked'), {username: global.configuration.get().twitch.channel})
               else {
                 global.botDB.remove({_id: 'bet'}, {}, function (err) {
                   if (err) log.error(err)

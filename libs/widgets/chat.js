@@ -6,7 +6,7 @@ function ChatWidget () {
 }
 
 ChatWidget.prototype.sendChatRoom = function (self, socket) {
-  socket.emit('chatRoom', global.configuration.get().twitch.owner.toLowerCase())
+  socket.emit('chatRoom', global.configuration.get().twitch.channel.toLowerCase())
 }
 
 module.exports = new ChatWidget()

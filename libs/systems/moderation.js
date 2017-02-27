@@ -123,7 +123,7 @@ Moderation.prototype.whitelisted = function (text) {
   var clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
   var clipsMatch = text.trim().match(clipsRegex)
   return !_.isNull(text.trim().match(ytRegex)) ||
-    (!_.isNull(clipsMatch) && clipsMatch[2] === global.configuration.get().twitch.owner)
+    (!_.isNull(clipsMatch) && clipsMatch[2] === global.configuration.get().twitch.channel)
 }
 
 Moderation.prototype.permitLink = function (self, sender, text) {

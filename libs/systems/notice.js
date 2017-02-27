@@ -82,7 +82,7 @@ Notice.prototype.send = function () {
           // reset counters
           self.lastNoticeSent = new Date().getTime()
           self.msgCountSent = global.parser.linesParsed
-          global.commons.sendMessage(item.text, {username: global.configuration.get().twitch.owner})
+          global.commons.sendMessage(item.text, {username: global.configuration.get().twitch.channel})
         })
       }
     })

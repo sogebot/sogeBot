@@ -53,11 +53,11 @@ BetsWidget.prototype.getRunningBet = function (self, socket) {
 }
 
 BetsWidget.prototype.closeBet = function (self, socket, option) {
-  global.parser.parse({username: global.configuration.get().twitch.owner}, '!bet ' + (option === 'refund' ? option : 'close ' + option))
+  global.parser.parse({username: global.configuration.get().twitch.channel}, '!bet ' + (option === 'refund' ? option : 'close ' + option))
 }
 
 BetsWidget.prototype.reuseBet = function (self, socket, options) {
-  global.parser.parse({username: global.configuration.get().twitch.owner}, '!bet open ' + options.join(' '))
+  global.parser.parse({username: global.configuration.get().twitch.channel}, '!bet open ' + options.join(' '))
 }
 
 BetsWidget.prototype.removeBetTemplate = function (self, socket, options) {

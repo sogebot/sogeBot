@@ -93,7 +93,7 @@ Commons.prototype.runCallback = function (cb, data) {
   var value = this.stripUnderscores(data)
   delete value.type
   if (_.isUndefined(cb)) return
-  typeof cb === 'function' ? cb(data) : this.sendMessage(global.translate(cb).replace('(value)', value[Object.keys(value)[0]]), {username: global.configuration.get().twitch.owner})
+  typeof cb === 'function' ? cb(data) : this.sendMessage(global.translate(cb).replace('(value)', value[Object.keys(value)[0]]), {username: global.configuration.get().twitch.channel})
 }
 
 Commons.prototype.sendMessage = async function (message, sender, attr={}) {
@@ -108,12 +108,12 @@ Commons.prototype.sendMessage = async function (message, sender, attr={}) {
   if (_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === global.configuration.get().twitch.username)) return // we don't want to reply on bot commands
   message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace('(sender)', '@' + sender.username) : message
   if (!global.configuration.getValue('mute')) {
-    sender['message-type'] === 'whisper' ? global.client.whisper(sender.username, message) : global.client.say(global.configuration.get().twitch.owner, message)
+    sender['message-type'] === 'whisper' ? global.client.whisper(sender.username, message) : global.client.say(global.configuration.get().twitch.channel, message)
   }
 }
 
 Commons.prototype.timeout = function (username, reason, timeout) {
-  global.client.timeout(global.configuration.get().twitch.owner, username, timeout, reason)
+  global.client.timeout(global.configuration.get().twitch.channel, username, timeout, reason)
 }
 
 module.exports = Commons

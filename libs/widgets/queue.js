@@ -29,15 +29,15 @@ QueueWidget.prototype.sendQueue = function (self, socket) {
 }
 
 QueueWidget.prototype.setLocked = function (self, socket, locked) {
-  global.parser.parse({username: global.configuration.get().twitch.owner}, '!queue ' + (locked ? 'close' : 'open'))
+  global.parser.parse({username: global.configuration.get().twitch.channel}, '!queue ' + (locked ? 'close' : 'open'))
 }
 
 QueueWidget.prototype.clear = function (self, socket) {
-  global.parser.parse({username: global.configuration.get().twitch.owner}, '!queue clear')
+  global.parser.parse({username: global.configuration.get().twitch.channel}, '!queue clear')
 }
 
 QueueWidget.prototype.pick = function (self, socket, count) {
-  global.parser.parse({username: global.configuration.get().twitch.owner}, '!queue pick ' + count)
+  global.parser.parse({username: global.configuration.get().twitch.channel}, '!queue pick ' + count)
 }
 
 module.exports = new QueueWidget()
