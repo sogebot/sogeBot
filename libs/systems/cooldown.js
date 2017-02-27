@@ -125,7 +125,6 @@ Cooldown.prototype.check = function (self, id, sender, text) {
       .replace('(seconds)', Math.ceil((data.miliseconds - now + timestamp) / 1000)), sender)
     global.updateQueue(id, false)
   }
-
 }
 
 module.exports = new Cooldown()
