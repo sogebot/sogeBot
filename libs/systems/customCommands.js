@@ -70,9 +70,14 @@ CustomCommands.prototype.add = function (self, sender, text) {
 }
 
 CustomCommands.prototype.run = function (self, sender, msg, fullMsg) {
-  global.botDB.findOne({$where: function () { return this._id.startsWith('customcmds') }, command: fullMsg.split('!')[1]}, function (err, item) {
+  var parsed = fullMsg.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
+  global.botDB.findOne({$where: function () { return this._id.startsWith('customcmds') }, command: parsed[1]}, function (err, item) {
     if (err) { log.error(err) }
-    try { global.commons.sendMessage(item.response, sender) } catch (e) { global.parser.unregister(fullMsg) }
+    try {
+      global.commons.sendMessage(item.response, sender, {'set': msg})
+    } catch (e) {
+      global.parser.unregister(fullMsg)
+    }
   })
 }
 

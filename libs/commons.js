@@ -96,8 +96,10 @@ Commons.prototype.runCallback = function (cb, data) {
   typeof cb === 'function' ? cb(data) : this.sendMessage(global.translate(cb).replace('(value)', value[Object.keys(value)[0]]), {username: global.configuration.get().twitch.owner})
 }
 
-Commons.prototype.sendMessage = async function (message, sender) {
-  message = await global.parser.parseMessage(message)
+Commons.prototype.sendMessage = async function (message, sender, attr={}) {
+  message = await global.parser.parseMessage(message, attr)
+  if (message === '') return // if message is empty, don't send anything
+
   if (global.configuration.get().bot.debug) {
     console.log('TO: ' + (_.isNull(sender) ? 'null' : sender.username) + ': ' + message)
     return

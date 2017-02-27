@@ -16,6 +16,11 @@ function Parser () {
   this.selfParsers = {}
   this.linesParsed = 0
 
+  this.customVariables = {}
+  global.watcher.watch(this, 'customVariables', this._save)
+
+  this._update(this)
+
   // check queue and then parseCommands
   var self = this
   setInterval(function () {
@@ -103,7 +108,7 @@ Parser.prototype.isOwner = function (user) {
   }
 }
 
-Parser.prototype.parseMessage = async function (message) {
+Parser.prototype.parseMessage = async function (message, attr) {
   let random = {
     '(random.online.viewer)': async function () {
       let onlineViewers = await global.asyncBotDB.find({
@@ -155,8 +160,21 @@ Parser.prototype.parseMessage = async function (message) {
       return Math.random() < 0.5 ? true : false
     }
   }
+  let custom = {
+    '(get.#)': async function (filter) {
+      let variable = filter.replace('(get.', '').replace(')', '')
+      return global.parser.customVariables[variable]
+    },
+    '(set.#)': async function (filter) {
+      let variable = filter.replace('(set.', '').replace(')', '')
+      global.parser.customVariables[variable] = attr.set
+      return ''
+    }
+  }
 
-  return await this.parseMessageEach(random, message)
+  let msg = await this.parseMessageEach(random, message)
+  msg = await this.parseMessageEach(custom, msg)
+  return msg
 }
 
 Parser.prototype.parseMessageEach = async function (filters, msg) {
@@ -166,8 +184,8 @@ Parser.prototype.parseMessageEach = async function (filters, msg) {
     let fnc = filters[key]
     let regexp = _.escapeRegExp(key)
 
-    // we want to handle # as \d - number in regexp
-    regexp = regexp.replace(/#/g, '(\\d+)')
+    // we want to handle # as \w - number in regexp
+    regexp = regexp.replace(/#/g, '(\\w+)')
     let rMessage = msg.match((new RegExp('(' + regexp + ')', 'g')))
     if (!_.isNull(rMessage)) {
       for (var bkey in rMessage) {
@@ -178,6 +196,23 @@ Parser.prototype.parseMessageEach = async function (filters, msg) {
   }
   return msg
 }
+
+Parser.prototype._update = function (self) {
+  global.botDB.findOne({ _id: 'customVariables' }, function (err, item) {
+    if (err) return log.error(err)
+    if (_.isNull(item)) return
+
+    self.customVariables = item.variables
+  })
+}
+
+Parser.prototype._save = function (self) {
+  var data = {
+    variables: self.customVariables
+  }
+  global.botDB.update({ _id: 'customVariables' }, { $set: data }, { upsert: true })
+}
+
 
 // these needs to be global, will be called from called parsers
 global.updateQueue = function (id, success) {
