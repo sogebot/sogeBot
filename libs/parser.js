@@ -31,7 +31,7 @@ function Parser () {
         break
       }
     }
-  }, 200)
+  }, 10)
 }
 
 Parser.prototype.parse = function (user, message) {
