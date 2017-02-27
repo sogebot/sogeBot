@@ -2,12 +2,14 @@ var Parser = require('../libs/parser')
 var Configuration = require('../libs/configuration')
 var Commons = require('../libs/commons')
 var Panel = require('../libs/panel')
+var Watcher = require('../libs/watcher')
 var Database = require('nedb')
 
 global.translate = require('../libs/translate')
 
 require('../libs/logging')
 
+global.watcher = new Watcher()
 global.parser = new Parser()
 global.configuration = new Configuration()
 global.panel = new Panel()
