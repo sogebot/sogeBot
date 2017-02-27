@@ -362,7 +362,7 @@
       "cooldown": "(sender), jeste nemuzes pouzit !(command), zbyva jeste (seconds)s"
     },
     "success": {
-      "set": "Cooldown pro !(command) byl nastaven na (seconds)s",
+      "set": "(type) cooldown pro !(command) byl nastaven na (seconds)s",
       "unset": "Cooldown pro !(command) byl odebran"
     }
   }

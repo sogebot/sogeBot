@@ -108,6 +108,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr={}) {
   if (_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === global.configuration.get().twitch.username)) return // we don't want to reply on bot commands
   message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace('(sender)', '@' + sender.username) : message
   if (!global.configuration.getValue('mute')) {
+    message = message.charAt(0).toUpperCase() + message.slice(1);
     sender['message-type'] === 'whisper' ? global.client.whisper(sender.username, message) : global.client.say(global.configuration.get().twitch.channel, message)
   }
 }

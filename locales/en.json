@@ -361,7 +361,7 @@
       "cooldown": "(sender), you cannot use !(command), remaining (seconds)s"
     },
     "success": {
-      "set": "Cooldown for !(command) was set to (seconds)s",
+      "set": "(type) cooldown for !(command) was set to (seconds)s",
       "unset": "Cooldown for !(command) was unset"
     }
   }
