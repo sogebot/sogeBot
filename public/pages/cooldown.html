@@ -6,6 +6,7 @@
         <tr>
           <th>Command</th>
           <th>Cooldown (seconds)</th>
+          <th>Type</th>
           <th></th>
         </tr>
       </thead>
@@ -31,6 +32,20 @@
           <input type="text" class="form-control" id="inputCooldown" placeholder="e.g. 10">
         </div>
       </div>
+
+      <div class="form-group" id="cooldownType">
+        <div class="col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group  text-center">
+          <div class="btn-group" data-toggle="buttons">
+            <label class="btn btn-default active">
+              <input type="radio" name="cooldownType" value="global" autocomplete="off" checked> Global
+            </label>
+            <label class="btn btn-default">
+              <input type="radio" name="cooldownType" value="user" autocomplete="off"> User
+            </label>
+          </div>
+        </div>
+      </div>
+
       <div class="form-group">
         <div class="col-xs-12 col-sm-12 text-center">
           <button type="submit" class="btn btn-primary" onclick="cooldown.create(event)">Create new cooldown</button>
@@ -47,7 +62,8 @@
       _.each(list, function(item, index) {
         $("#Cooldowns").append('<tr>' +
           '<td>!' + index + '</td>' +
-          '<td>' + item / 1000 + '</td>' +
+          '<td>' + item.miliseconds / 1000 + '</td>' +
+          '<td>' + item.type + '</td>' +
           '<td class="tableMenu"><button type="button" class="btn btn-danger btn-xs" data-command="' + index + '" onclick="cooldown.delete(this)">[x] Delete</button></td>' +
           '</tr>');
       })
@@ -57,7 +73,7 @@
     },
     create: function (event) {
       event.preventDefault()
-      socket.emit('cooldown.set', {command: $("#inputCommand").val(), seconds: $("#inputCooldown").val()})
+      socket.emit('cooldown.set', {command: $("#inputCommand").val(), type: $('#cooldownType input:radio:checked').val(), seconds: $("#inputCooldown").val()})
       $("#inputCooldown").val('')
       $("#inputCommand").val('')
     }
