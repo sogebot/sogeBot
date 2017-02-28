@@ -25,7 +25,7 @@ function Translate (text) {
 function getTranslation (text) {
   try {
     var translated = text.split('.').reduce((o, i) => o[i], translations[global.configuration.getValue('lang')])
-    _.each(translated.match(/(\{[\w-\.]+\})/g), function (toTranslate) { translated = translated.replace(toTranslate, getTranslation(toTranslate.replace('{', '').replace('}', ''))) })
+    _.each(translated.match(/(\{[\w-.]+\})/g), function (toTranslate) { translated = translated.replace(toTranslate, getTranslation(toTranslate.replace('{', '').replace('}', ''))) })
     return translated
   } catch (err) {
     return '{missing_translation: ' + global.configuration.getValue('lang') + '.' + text + '}'

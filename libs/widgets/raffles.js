@@ -44,8 +44,8 @@ RafflesWidget.prototype.rafflesMessages = function (self, id, sender, text) {
   if (!_.isNull(self.winner) && self.winner.username === sender.username) {
     var msgId = crypto.createHash('md5').update(Math.random().toString()).digest('hex').substring(0, 5)
     var message = { _id: 'raffle_messages_' + msgId,
-                    timestamp: sender['sent-ts'],
-                    text: text }
+      timestamp: sender['sent-ts'],
+      text: text }
     global.botDB.update({_id: message._id}, {$set: message}, {upsert: true})
   }
   global.updateQueue(id, true)

@@ -328,7 +328,8 @@ Twitch.prototype.showTop = function (self, sender, text) {
     global.botDB.find({$where: function () {
       return this._id.startsWith('user') &&
         this._id !== 'user_' + global.configuration.get().twitch.username &&
-        this._id !== 'user_' + global.configuration.get().twitch.channel }})
+        this._id !== 'user_' + global.configuration.get().twitch.channel
+    }})
     .limit(parsed[2])
     .sort(orderBy).exec(function (err, items) {
       if (err) global.log.error(err)

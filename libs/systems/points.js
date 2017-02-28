@@ -5,7 +5,6 @@ var _ = require('lodash')
 // bot libraries
 var constants = require('../constants')
 var User = require('../user')
-var log = global.log
 
 function Points () {
   if (global.commons.isSystemEnabled(this)) {

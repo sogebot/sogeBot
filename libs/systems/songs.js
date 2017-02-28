@@ -231,7 +231,7 @@ Songs.prototype.addSongToQueue = function (self, sender, text) {
     }
     return
   }
-  var urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&\?]*).*/
+  var urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/
   var match = text.trim().match(urlRegex)
   var videoID = (match && match[1].length === 11) ? match[1] : text.trim()
   global.botDB.findOne({type: 'song-banned', _id: videoID}, function (err, item) {
@@ -266,7 +266,7 @@ Songs.prototype.removeSongFromQueue = function (self, sender, text) {
 }
 
 Songs.prototype.addSongToPlaylist = function (self, sender, text) {
-  var urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&\?]*).*/
+  var urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/
   var match = text.trim().match(urlRegex)
   var videoID = (match && match[1].length === 11) ? match[1] : text.trim()
   global.botDB.findOne({type: 'song-banned', _id: videoID}, function (err, item) {
