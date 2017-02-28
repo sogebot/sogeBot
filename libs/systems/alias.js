@@ -7,6 +7,13 @@ var _ = require('lodash')
 var constants = require('../constants')
 var log = global.log
 
+/*
+ * !alias                       - gets an info about bet
+ * !alias add [command] [alias] - bet [amount] of points on [option]
+ * !alias remove [alias]        - open a new bet with selected options
+ * !alias list                  - close a bet and select option as winner
+ */
+
 function Alias () {
   this.alias = []
   if (global.commons.isSystemEnabled(this)) {
@@ -74,15 +81,9 @@ Alias.prototype.add = function (self, sender, text) {
       alias: parsed[2],
       command: parsed[1]
     }
-    // check if alias is already created
-    var unique = true
-    _.each(self.alias, function (alias) {
-      if (!unique) return
-      if (alias.alias === data.alias) unique = false
-    })
-
-    if (unique) self.alias.push(data)
-    global.commons.sendMessage(global.translate(unique ? 'alias.success.add' : 'alias.failed.add'), sender)
+    let alias = _.find(self.alias, function (oAlias) { return oAlias.alias === data.alias })
+    if (_.isUndefined(alias)) self.alias.push(data)
+    global.commons.sendMessage(global.translate(_.isUndefined(alias) ? 'alias.success.add' : 'alias.failed.add'), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
   }
@@ -97,16 +98,11 @@ Alias.prototype.list = function (self, sender, text) {
 
 Alias.prototype.remove = function (self, sender, text) {
   try {
-    let alias = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
-
-    var removed = false
-    self.alias.forEach(function (element, key) {
-      if (element.alias === alias) {
-        removed = true
-        self.alias.splice(key, 1)
-      }
-    }, this)
-    global.commons.sendMessage(global.translate(removed ? 'alias.success.remove' : 'alias.failed.remove'), sender)
+    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+    let alias = _.find(self.alias, function (oAlias) { return oAlias.alias !== parsed })
+    alias = _.isUndefined(alias) ? [] : alias
+    global.commons.sendMessage(global.translate(self.alias.length !== alias.length ? 'alias.success.remove' : 'alias.failed.remove'), sender)
+    self.alias = alias
   } catch (e) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
   }
@@ -117,15 +113,11 @@ Alias.prototype.parse = function (self, id, sender, text) {
     var parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
     var cmd = parsed[1]
 
-    var found = false
-    _.each(self.alias, function (alias) {
-      if (found) return
-      if (alias.alias === cmd) {
-        found = true
-        global.parser.parse(sender, text.replace('!' + cmd, '!' + alias.command))
-        global.parser.lineParsed--
-      }
-    })
+    let alias = _.find(self.alias, function (oAlias) { return oAlias.alias === cmd })
+    if (!_.isUndefined(alias)) {
+      global.parser.parse(sender, text.replace('!' + cmd, '!' + alias.command))
+      global.parser.lineParsed--
+    }
     global.updateQueue(id, true)
   } catch (e) {
     global.updateQueue(id, true)
