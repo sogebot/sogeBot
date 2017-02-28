@@ -34,11 +34,11 @@
     "copy:dist": "node tools/copy-dist-files.js",
     "migrate": "node --harmony-async-await ./migrate",
     "start": "npm run copy:dist && node --harmony-async-await ./main",
-    "test": "mocha"
+    "test": "standard libs/* && standard libs/systems/* && standard libs/widgets/* && mocha"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^3.2.0",
-    "standard": "^8.6.0"
+    "standard": "*"
   }
 }

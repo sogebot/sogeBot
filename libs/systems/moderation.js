@@ -119,7 +119,7 @@ Moderation.prototype.timeoutUser = function (sender, warning, msg, time) {
 
 Moderation.prototype.whitelisted = function (text) {
   // TODO: it's hardcoded now just for youtube and your clips
-  var ytRegex = /^!.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)[^#&\?]*.*/
+  var ytRegex = /^!.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)[^#&?]*.*/
   var clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
   var clipsMatch = text.trim().match(clipsRegex)
   return !_.isNull(text.trim().match(ytRegex)) ||

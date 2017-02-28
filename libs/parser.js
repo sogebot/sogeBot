@@ -102,8 +102,8 @@ Parser.prototype.unregister = function (cmd) {
 
 Parser.prototype.isOwner = function (user) {
   try {
-    let owners = _.map(_.filter(global.configuration.get().twitch.owners.split(','), _.isString), function(owner) {
-      return _.trim(owner.toLowerCase());
+    let owners = _.map(_.filter(global.configuration.get().twitch.owners.split(','), _.isString), function (owner) {
+      return _.trim(owner.toLowerCase())
     })
     return _.includes(owners, user.username.toLowerCase())
   } catch (e) {
@@ -120,7 +120,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
         }
       })
       if (onlineViewers.length === 0) return 'unknown'
-      return onlineViewers[_.random(0, onlineViewers.length-1)].username
+      return onlineViewers[_.random(0, onlineViewers.length - 1)].username
     },
     '(random.online.follower)': async function () {
       let onlineFollower = await global.asyncBotDB.find({
@@ -129,7 +129,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
         }
       })
       if (onlineFollower.length === 0) return 'unknown'
-      return onlineFollower[_.random(0, onlineFollower.length-1)].username
+      return onlineFollower[_.random(0, onlineFollower.length - 1)].username
     },
     '(random.viewer)': async function () {
       let viewer = await global.asyncBotDB.find({
@@ -138,7 +138,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
         }
       })
       if (viewer.length === 0) return 'unknown'
-      return viewer[_.random(0, viewer.length-1)].username
+      return viewer[_.random(0, viewer.length - 1)].username
     },
     '(random.follower)': async function () {
       let follower = await global.asyncBotDB.find({
@@ -147,20 +147,20 @@ Parser.prototype.parseMessage = async function (message, attr) {
         }
       })
       if (follower.length === 0) return 'unknown'
-      return follower[_.random(0, follower.length-1)].username
+      return follower[_.random(0, follower.length - 1)].username
     },
-    '(random.number-#-to-#)':  async function (filter) {
+    '(random.number-#-to-#)': async function (filter) {
       let numbers = filter.replace('(random.number-', '')
         .replace(')', '')
         .split('-to-')
       try {
-        return _.random(numbers[0],  numbers[1])
+        return _.random(numbers[0], numbers[1])
       } catch (e) {
         return 0
       }
     },
     '(random.true-or-false)': async function () {
-      return Math.random() < 0.5 ? true : false
+      return Math.random() < 0.5
     }
   }
   let custom = {
@@ -188,7 +188,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
 
 Parser.prototype.parseMessageEach = async function (filters, msg) {
   for (var key in filters) {
-    if (!filters.hasOwnProperty(key)) continue;
+    if (!filters.hasOwnProperty(key)) continue
 
     let fnc = filters[key]
     let regexp = _.escapeRegExp(key)
@@ -209,7 +209,7 @@ Parser.prototype.parseMessageEach = async function (filters, msg) {
 
 Parser.prototype._update = function (self) {
   global.botDB.findOne({ _id: 'customVariables' }, function (err, item) {
-    if (err) return log.error(err)
+    if (err) return global.log.error(err)
     if (_.isNull(item)) return
 
     self.customVariables = item.variables
@@ -222,7 +222,6 @@ Parser.prototype._save = function (self) {
   }
   global.botDB.update({ _id: 'customVariables' }, { $set: data }, { upsert: true })
 }
-
 
 // these needs to be global, will be called from called parsers
 global.updateQueue = function (id, success) {

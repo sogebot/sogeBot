@@ -73,9 +73,9 @@ Raffles.prototype.participate = function (self, sender) {
     if (err) return log.error(err)
     if (!_.isNull(item) && !item.locked) {
       var participant = { _id: 'raffle_participant_' + sender.username,
-                          eligible: true,
-                          forced: false,
-                          username: sender.username }
+        eligible: true,
+        forced: false,
+        username: sender.username }
       if (item.followers) {
         var user = new User(sender.username)
         user.isLoaded().then(function () {
