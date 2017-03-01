@@ -47,10 +47,10 @@
 
 <script>
   var bets = {
-    timerEnd: 0,
+    end: 0,
     updateTimer: function () {
       // update timer
-      var timeLeft = bets.timerEnd - new Date().getTime()
+      var timeLeft = bets.end - new Date().getTime()
       if (timeLeft < 0) {
         $("#betEndTimer").html('CLOSED')
         clearInterval(bets.interval)
@@ -63,7 +63,8 @@
     },
     updateTemplates: function (list) {
       $("#bets-templates").empty()
-      _.each(list, function (options) {
+      _.each(list, function (template) {
+        var options = template.values
         var option_labels = ''
         _.each(options, function (option) {
           option_labels = option_labels + '<button type="button" class="btn btn-default btn-label" disabled="disabled">' + option + '</button>'
@@ -75,7 +76,7 @@
               '<div class="btn-group" role="group" style="float: right">' +
                 '<button type="button" class="btn btn-default" onclick="bets.reuse(this)" data-options="' + options.join(' | ') + '">re-use bet</button>' +
                 '<button type="button" onclick="commons.confirm(this)" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
-                '<button type="button" style="display: none" class="btn btn-success btn-confirm" onclick="bets.remove(this)" data-options="' + options.join(' | ') + '"><span class="glyphicon glyphicon-ok"></span></button>' +
+                '<button type="button" style="display: none" class="btn btn-success btn-confirm" onclick="bets.remove(this)" data-id="' + template._id + '"><span class="glyphicon glyphicon-ok"></span></button>' +
                 '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="glyphicon glyphicon-remove"></span></button>' +
               '</div>' +
           '</div>'
@@ -92,7 +93,7 @@
         $el.empty()
         $('a[href="#bets-running"]').css('display', 'block')
         $('a[href="#bets-running"]').tab('show')
-        bets.timerEnd = bet.timerEnd
+        bets.end = bet.end
         $el.append('<div class="text-center">')
         var btns = []
         btns.push('<div class="btn-group btn-group-justified" role="group">')
@@ -121,7 +122,7 @@
       $('a[href="#bets-running"]').tab('show')
     },
     remove: function (el) {
-      socket.emit('removeBetTemplate', el.dataset.options.split(' | '))
+      socket.emit('removeBetTemplate', el.dataset.id)
     },
     interval: null
   }

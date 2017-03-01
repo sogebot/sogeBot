@@ -1,11 +1,8 @@
 'use strict'
 
-var _ = require('lodash')
-var log = global.log
-
 function BetsWidget () {
   if (global.configuration.get().systems.bets !== true) return
-  this.timerEnd = 0
+  this.cachedTime = 0
 
   global.panel.addWidget('bets', 'Bets', 'knight')
   global.panel.socketListening(this, 'getBetsTemplates', this.getBetsTemplates)
@@ -17,10 +14,10 @@ function BetsWidget () {
 
   var self = this
   setInterval(function () {
-    if (global.systems.bets.timerEnd !== self.timerEnd) {
+    if (global.systems.bets.modifiedTime !== self.cachedTime) {
       self.getRunningBet(self, global.panel.io)
       self.getBetsTemplates(self, global.panel.io)
-      self.timerEnd = global.systems.bets.timerEnd
+      self.cachedTime = global.systems.bets.modifiedTime
     }
   }, 1000)
 }
@@ -33,23 +30,11 @@ BetsWidget.prototype.sendConfiguration = function (self, socket) {
 }
 
 BetsWidget.prototype.getBetsTemplates = function (self, socket) {
-  global.botDB.findOne({ _id: 'bets_template' }, function (err, item) {
-    if (err) log.error(err)
-    if (!_.isNull(item)) {
-      socket.emit('betsTemplates', item.options)
-    }
-  })
+  socket.emit('betsTemplates', global.systems.bets.templates)
 }
 
 BetsWidget.prototype.getRunningBet = function (self, socket) {
-  global.botDB.findOne({_id: 'bet'}, function (err, item) {
-    if (err) log.error(err)
-    if (_.isNull(item)) socket.emit('runningBet', null)
-    else {
-      item.timerEnd = global.systems.bets.timerEnd
-      socket.emit('runningBet', item)
-    }
-  })
+  socket.emit('runningBet', global.systems.bets.bet)
 }
 
 BetsWidget.prototype.closeBet = function (self, socket, option) {
@@ -60,8 +45,8 @@ BetsWidget.prototype.reuseBet = function (self, socket, options) {
   global.parser.parse({username: global.configuration.get().twitch.channel}, '!bet open ' + options.join(' '))
 }
 
-BetsWidget.prototype.removeBetTemplate = function (self, socket, options) {
-  global.botDB.update({ _id: 'bets_template' }, { $pull: { options: options } }, {})
+BetsWidget.prototype.removeBetTemplate = function (self, socket, id) {
+  delete global.systems.bets.templates[id]
   self.getBetsTemplates(self, socket)
 }
 

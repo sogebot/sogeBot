@@ -2,6 +2,8 @@
 
 // 3rdparty libraries
 var _ = require('lodash')
+var crypto = require('crypto')
+
 // bot libraries
 var constants = require('../constants')
 var User = require('../user')
@@ -9,6 +11,13 @@ var Points = require('./points')
 var log = global.log
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0'
+const ERROR_ALREADY_OPENED = '1'
+const ERROR_ZERO_BET = '2'
+const ERROR_NOT_RUNNING = '3'
+const ERROR_UNDEFINED_BET = '4'
+const ERROR_IS_LOCKED = '5'
+const ERROR_DIFF_BET = '6'
+const ERROR_NOT_OPTION = '7'
 
 /**
  * !bet                                 - gets an info about bet
@@ -21,76 +30,159 @@ const ERROR_NOT_ENOUGH_OPTIONS = '0'
  */
 
 function Bets () {
+  this.modifiedTime = new Date().getTime()
+
   this.timer = null
-  this.timerEnd = 0
+  this.bet = null
+  this.templates = {}
 
   if (global.commons.isSystemEnabled('points') && global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!bet open', this.open, constants.MODS)
     global.parser.register(this, '!bet close', this.close, constants.MODS)
     global.parser.register(this, '!bet refund', this.refundAll, constants.MODS)
-    global.parser.register(this, '!bet', this.bet, constants.VIEWERS)
+    global.parser.register(this, '!bet', this.save, constants.VIEWERS)
 
     global.parser.registerHelper('!bet')
 
     global.configuration.register('betPercentGain', 'bets.betPercentGain', 'number', 20)
     global.configuration.register('betCloseTimer', 'bets.betCloseTimer', 'number', 2)
 
-    // close any bets
-    this.refundAll(this, null)
+    global.watcher.watch(this, 'templates', this._save)
+    this._update(this)
   }
+}
+
+Bets.prototype._update = function (self) {
+  global.botDB.findOne({ _id: 'bets_template' }, function (err, item) {
+    if (err) return log.error(err)
+    if (_.isNull(item)) return
+
+    delete item._id
+    self.templates = item
+  })
+}
+
+Bets.prototype._save = function (self) {
+  if (_.size(self.templates) > 0) global.botDB.update({ _id: 'bets_template' }, { $set: self.templates }, { upsert: true })
+  else global.botDB.remove({ _id: 'bets_template' })
 }
 
 Bets.prototype.open = function (self, sender, text) {
   try {
-    var parsed = text.match(/([\u0500-\u052F\u0400-\u04FF\w]+)/g)
+    var parsed = text.match(/([\u0500-\u052F\u0400-\u04FF\S]+)/g)
     if (parsed.length < 2) { throw new Error(ERROR_NOT_ENOUGH_OPTIONS) }
-    global.botDB.findOne({_id: 'bet'}, function (err, item) {
-      if (err) log.error(err)
-      if (!_.isNull(item)) { // cannot open new bet if old one wasn't closed
-        global.commons.sendMessage(global.translate('bets.running').replace('(options)', parsed.join(' | ')), sender)
-      } else { // open new bet
-        var bOptions = {}
-        _.each(parsed, function (option) { bOptions[option] = {} })
-        global.botDB.update({_id: 'bet'}, {$set: {bets: bOptions, locked: false}}, {upsert: true}, function (err) {
-          if (err) log.error(err)
-          global.commons.sendMessage(global.translate('bets.opened', {username: global.configuration.get().twitch.channel})
-            .replace('(options)', parsed.join(' | '))
-            .replace('(minutes)', global.configuration.getValue('betCloseTimer')), sender)
-        })
-        self.timer = setTimeout(function () {
-          global.botDB.update({_id: 'bet'}, {$set: {locked: true}}, {}, function (err) {
-            if (err) log.error(err)
-            // check if someone did bet, else just remove a bet
-            global.botDB.findOne({_id: 'bet'}, function (err, item) {
-              if (err) log.error(err)
-              var isBet = false
-              _.each(item.bets, function (value, index) {
-                _.each(value, function () {
-                  isBet = true
-                })
-              })
-              if (isBet) global.commons.sendMessage(global.translate('bets.locked'), {username: global.configuration.get().twitch.channel})
-              else {
-                global.botDB.remove({_id: 'bet'}, {}, function (err) {
-                  if (err) log.error(err)
-                  global.commons.sendMessage(global.translate('bets.removed'), sender)
+    if (!_.isNull(self.bet)) { throw new Error(ERROR_ALREADY_OPENED) }
 
-                  // clear possible timeout
-                  clearTimeout(self.timer)
-                  self.timerEnd = 0
-                })
-              }
-            })
-          })
-        }, parseInt(global.configuration.getValue('betCloseTimer'), 10) * 1000 * 60)
-        self.timerEnd = new Date().getTime() + (parseInt(global.configuration.getValue('betCloseTimer'), 10) * 1000 * 60)
-        self.saveBetTemplate(self, bOptions)
+    self.bet = {locked: false, bets: {}}
+    _.each(parsed, function (option) { self.bet.bets[option] = {} })
+    global.commons.sendMessage(global.translate('bets.opened', {username: global.configuration.get().twitch.channel})
+      .replace('(options)', Object.keys(self.bet.bets).join(' | '))
+      .replace('(minutes)', global.configuration.getValue('betCloseTimer')), sender)
+
+    self.bet.end = new Date().getTime() + (parseInt(global.configuration.getValue('betCloseTimer'), 10) * 1000 * 60)
+    self.saveTemplate(self, Object.keys(self.bet.bets))
+
+    self.timer = setTimeout(function () {
+      self.bet.locked = true
+      self.bet.count = 0
+      _.each(self.bet.bets, function (bet) { self.bet.count += _.size(bet) })
+      if (self.bet.count > 0) global.commons.sendMessage(global.translate('bets.locked'), {username: global.configuration.get().twitch.channel})
+      else {
+        global.commons.sendMessage(global.translate('bets.removed'), sender)
+        self.bet = null
+      }
+    }, parseInt(global.configuration.getValue('betCloseTimer'), 10) * 1000 * 60)
+  } catch (e) {
+    switch (e.message) {
+      case ERROR_ALREADY_OPENED:
+        global.commons.sendMessage(global.translate('bets.running').replace('(options)', Object.keys(self.bet.bets).join(' | ')), sender)
+        break
+      case ERROR_NOT_ENOUGH_OPTIONS:
+        global.commons.sendMessage(global.translate('bets.notEnoughOptions'), sender)
+        break
+      default:
+        global.commons.sendMessage(global.translate('core.error'), sender)
+    }
+  } finally {
+    self.modifiedTime = new Date().getTime()
+  }
+}
+
+Bets.prototype.saveTemplate = function (self, bOptions) {
+  let id = crypto.createHash('md5').update(bOptions.toString()).digest('hex').substring(0, 5)
+  if (_.isUndefined(self.templates[id])) {
+    self.templates[id] = {_id: id, values: bOptions, added: new Date().getTime()}
+  } else {
+    self.templates[id].added = new Date().getTime()
+  }
+  if (_.size(self.templates) > 1) {
+    let template = _.find(self.templates, function (o) { return o.added === _.map(self.templates, 'added').sort()[0] })
+    delete self.templates[template._id]
+  }
+}
+
+Bets.prototype.info = function (self, sender) {
+  if (_.isNull(self.bet)) global.commons.sendMessage(global.translate('bets.notRunning'), sender)
+  else {
+    global.commons.sendMessage(global.translate(self.bet.locked ? 'bets.lockedInfo' : 'bets.info')
+      .replace('(options)', Object.keys(self.bet.bets).join(' | '))
+      .replace('(time)', parseFloat((self.bet.end - new Date().getTime()) / 1000 / 60).toFixed(1)), sender)
+  }
+}
+
+Bets.prototype.saveBet = function (self, sender, text) {
+  try {
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) (\d+)$/)
+    if (parsed.length < 2) { throw new Error(ERROR_NOT_ENOUGH_OPTIONS) }
+
+    let bet = { option: parsed[1], amount: parsed[2] }
+
+    if (parseInt(bet.amount, 10) === 0) throw Error(ERROR_ZERO_BET)
+    if (_.isNull(self.bet)) throw Error(ERROR_NOT_RUNNING)
+    if (_.isUndefined(self.bet.bets[bet.option])) throw Error(ERROR_UNDEFINED_BET)
+    if (self.bet.locked) throw Error(ERROR_IS_LOCKED)
+    if (!_.isUndefined(_.find(self.bet.bets, function (o, i) { return _.includes(Object.keys(o), sender.username) && i !== bet.option }))) throw Error(ERROR_DIFF_BET)
+
+    var percentGain = (Object.keys(self.bet.bets).length * parseInt(global.configuration.getValue('betPercentGain'), 10)) / 100
+    var user = new User(sender.username)
+    user.isLoaded().then(function () {
+      var availablePts = parseInt(user.get('points'), 10)
+      var removePts = parseInt(bet.amount, 10)
+      if (!_.isFinite(availablePts) || !_.isNumber(availablePts) || availablePts < removePts) {
+        global.commons.sendMessage(global.translate('bets.notEnoughPoints')
+          .replace('(amount)', removePts)
+          .replace('(pointsName)', Points.getPointsName(removePts)), sender)
+      } else {
+        var newBet = _.isUndefined(self.bet.bets[bet.option][sender.username]) ? removePts : parseInt(self.bet.bets[bet.option][sender.username], 10) + removePts
+        self.bet.bets[bet.option][sender.username] = newBet
+        user.set('points', availablePts - removePts)
+
+        global.commons.sendMessage(global.translate('bets.newBet')
+          .replace('(option)', bet.option)
+          .replace('(amount)', newBet)
+          .replace('(pointsName)', Points.getPointsName(newBet))
+          .replace('(winAmount)', Math.round((parseInt(newBet, 10) * percentGain)))
+          .replace('(winPointsName)', Points.getPointsName(Math.round((parseInt(newBet, 10) * percentGain)))), sender)
       }
     })
   } catch (e) {
     switch (e.message) {
-      case ERROR_NOT_ENOUGH_OPTIONS:
-        global.commons.sendMessage(global.translate('bets.notEnoughOptions'), sender)
+      case ERROR_ZERO_BET:
+        global.commons.sendMessage(global.translate('bets.zeroBet')
+          .replace('(pointsName)', Points.getPointsName(0)), sender)
+        break
+      case ERROR_NOT_RUNNING:
+        global.commons.sendMessage(global.translate('bets.notRunning'), sender)
+        break
+      case ERROR_UNDEFINED_BET:
+        global.commons.sendMessage(global.translate('bets.undefinedBet'), sender)
+        break
+      case ERROR_IS_LOCKED:
+        global.commons.sendMessage(global.translate('bets.timeUpBet'), sender)
+        break
+      case ERROR_DIFF_BET:
+        let result = _.pickBy(self.bet.bets, function (v, k) { return _.includes(Object.keys(v), sender.username) })
+        global.commons.sendMessage(global.translate('bets.diffBet').replace('(option)', Object.keys(result)[0]), sender)
         break
       default:
         global.commons.sendMessage(global.translate('core.error'), sender)
@@ -98,140 +190,33 @@ Bets.prototype.open = function (self, sender, text) {
   }
 }
 
-Bets.prototype.saveBetTemplate = function (self, bOptions) {
-  var aOptions = []
-  _.each(bOptions, function (v, i) { aOptions.push(i) })
-  global.botDB.update({ _id: 'bets_template' }, { $addToSet: { options: aOptions } }, { upsert: true })
-  global.botDB.findOne({ _id: 'bets_template' }, function (err, item) {
-    if (err) log.error(err)
-    if (!_.isNull(item)) {
-      var rmCount = item.options.length - 5
-      while (rmCount > 0) {
-        global.botDB.update({ _id: 'bets_template' }, { $pop: { options: -1 } }, {})
-        rmCount = rmCount - 1
-      }
-    }
-  })
-}
-
-Bets.prototype.info = function (self, sender) {
-  global.botDB.findOne({_id: 'bet'}, function (err, item) {
-    if (err) log.error(err)
-    if (!_.isNull(item)) {
-      if (!item.locked) {
-        global.commons.sendMessage(global.translate('bets.info')
-          .replace('(options)', Object.keys(item.bets).join(' | '))
-          .replace('(time)', parseFloat((self.timerEnd - new Date().getTime()) / 1000 / 60).toFixed(1)), sender)
-      } else {
-        global.commons.sendMessage(global.translate('bets.lockedInfo'), sender)
-      }
-    } else {
-      global.commons.sendMessage(global.translate('bets.notRunning'), sender)
-    }
-  })
-}
-
-Bets.prototype.saveBet = function (self, sender, text) {
+Bets.prototype.refundAll = function (self, sender) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) (\d+)$/)
-    if (parsed.length < 2) { throw new Error() }
-
-    var betTo = parsed[1]
-    var amount = parsed[2]
-
-    if (parseInt(amount, 10) === 0) {
-      global.commons.sendMessage(global.translate('bets.zeroBet')
-        .replace('(pointsName)', Points.getPointsName(0)), sender)
-      return
-    }
-
-    global.botDB.findOne({_id: 'bet'}, function (err, item) {
-      if (err) log.error(err)
-      if (_.isNull(item)) {
-        global.commons.sendMessage(global.translate('bets.notRunning'), sender)
-      } else {
-        if (_.isUndefined(item.bets[betTo])) {
-          global.commons.sendMessage(global.translate('bets.undefinedBet'), sender)
-          return
-        }
-
-        // check if time expired
-        if (item.locked) {
-          global.commons.sendMessage(global.translate('bets.timeUpBet'), sender)
-          return
-        }
-
-        // check if already bet
-        var diffBet = false
-        _.each(item.bets, function (val, key) {
-          if (!_.isUndefined(val[sender.username]) && betTo !== key) {
-            diffBet = true
-            global.commons.sendMessage(global.translate('bets.diffBet').replace('(option)', key), sender)
-          }
-        })
-        if (diffBet) return
-
-        var percentGain = (Object.keys(item.bets).length * parseInt(global.configuration.getValue('betPercentGain'), 10)) / 100
-        var user = new User(sender.username)
+    if (_.isNull(self.bet)) throw Error(ERROR_NOT_RUNNING)
+    _.each(self.bet.bets, function (users) {
+      _.each(users, function (bet, buser) {
+        var user = new User(buser)
         user.isLoaded().then(function () {
           var availablePts = parseInt(user.get('points'), 10)
-          var removePts = parseInt(amount, 10)
-          if (!_.isFinite(availablePts) || !_.isNumber(availablePts) || availablePts < removePts) {
-            global.commons.sendMessage(global.translate('bets.notEnoughPoints')
-              .replace('(amount)', removePts)
-              .replace('(pointsName)', Points.getPointsName(removePts)), sender)
-          } else {
-            var newBet = _.isUndefined(item.bets[betTo][sender.username]) ? removePts : parseInt(item.bets[betTo][sender.username], 10) + removePts
-            item.bets[betTo][sender.username] = newBet
-            user.set('points', availablePts - removePts)
-            global.botDB.update({_id: 'bet'}, {$set: {bets: item.bets}}, {}, function (err, numReplaced) {
-              if (err) log.error(err)
-              else {
-                global.commons.sendMessage(global.translate('bets.newBet')
-                  .replace('(option)', betTo)
-                  .replace('(amount)', newBet)
-                  .replace('(pointsName)', Points.getPointsName(newBet))
-                  .replace('(winAmount)', Math.round((parseInt(newBet, 10) * percentGain)))
-                  .replace('(winPointsName)', Points.getPointsName(Math.round((parseInt(newBet, 10) * percentGain)))), sender)
-              }
-            })
-          }
-        })
-      }
-    })
-  } catch (e) {
-    global.commons.sendMessage(global.translate('core.error'), sender)
-  }
-}
-
-Bets.prototype.refundAll = function (self, sender) {
-  global.botDB.findOne({_id: 'bet'}, function (err, item) {
-    if (err) log.error(err)
-    if (_.isNull(item)) {
-      global.commons.sendMessage(global.translate('bets.notRunning'), sender)
-      return
-    } else {
-      _.each(item.bets, function (users) {
-        _.each(users, function (bet, buser) {
-          var user = new User(buser)
-          user.isLoaded().then(function () {
-            var availablePts = parseInt(user.get('points'), 10)
-            var addPts = parseInt(bet, 10)
-            user.set('points', availablePts + addPts)
-          })
+          var addPts = parseInt(bet, 10)
+          user.set('points', availablePts + addPts)
         })
       })
-
-      global.commons.sendMessage(global.translate('bets.refund'), sender)
+    })
+    global.commons.sendMessage(global.translate('bets.refund'), sender)
+  } catch (e) {
+    switch (e.message) {
+      case ERROR_NOT_RUNNING:
+        global.commons.sendMessage(global.translate('bets.notRunning'), sender)
+        break
+      default:
+        global.commons.sendMessage(global.translate('core.error'), sender)
     }
-  })
-
-  global.botDB.remove({_id: 'bet'}, {}, function (err) {
-    if (err) log.error(err)
-    // clear possible timeout
+  } finally {
+    self.bet = null
     clearTimeout(self.timer)
-    self.timerEnd = 0
-  })
+    self.modifiedTime = new Date().getTime()
+  }
 }
 
 Bets.prototype.close = function (self, sender, text) {
@@ -239,44 +224,42 @@ Bets.prototype.close = function (self, sender, text) {
     var wOption = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
     var usersToPay = []
 
-    global.botDB.findOne({_id: 'bet'}, function (err, item) {
-      if (err) log.error(err)
-      if (_.isNull(item)) {
-        global.commons.sendMessage(global.translate('bets.notRunning'), sender)
-        return
-      } else if (!_.isUndefined(item.bets[wOption])) {
-        var percentGain = (Object.keys(item.bets).length * parseInt(global.configuration.getValue('betPercentGain'), 10)) / 100
-        _.each(item.bets[wOption], function (bet, buser) {
-          usersToPay.push(buser)
-          var user = new User(buser)
-          user.isLoaded().then(function () {
-            var availablePts = parseInt(user.get('points'), 10)
-            var addPts = parseInt(bet, 10) + Math.round((parseInt(bet, 10) * percentGain))
-            user.set('points', availablePts + addPts)
-          })
-        })
-      } else {
-        global.commons.sendMessage(global.translate('bets.notOption'), sender)
-        return
-      }
+    if (_.isNull(self.bet)) throw Error(ERROR_NOT_RUNNING)
+    if (_.isUndefined(self.bet.bets[wOption])) throw Error(ERROR_NOT_OPTION)
 
-      global.botDB.remove({_id: 'bet'}, {}, function (err) {
-        if (err) log.error(err)
-        global.commons.sendMessage(global.translate('bets.closed')
-          .replace('(option)', wOption)
-          .replace('(amount)', usersToPay.length), sender)
-
-        // clear possible timeout
-        clearTimeout(self.timer)
-        self.timerEnd = 0
+    var percentGain = (Object.keys(self.bet.bets).length * parseInt(global.configuration.getValue('betPercentGain'), 10)) / 100
+    _.each(self.bet.bets[wOption], function (bet, buser) {
+      usersToPay.push(buser)
+      var user = new User(buser)
+      user.isLoaded().then(function () {
+        var availablePts = parseInt(user.get('points'), 10)
+        var addPts = parseInt(bet, 10) + Math.round((parseInt(bet, 10) * percentGain))
+        user.set('points', availablePts + addPts)
       })
     })
+
+    global.commons.sendMessage(global.translate('bets.closed')
+      .replace('(option)', wOption)
+      .replace('(amount)', usersToPay.length), sender)
   } catch (e) {
-    global.commons.sendMessage(global.translate('core.error'), sender)
+    switch (e.message) {
+      case ERROR_NOT_RUNNING:
+        global.commons.sendMessage(global.translate('bets.notRunning'), sender)
+        break
+      case ERROR_NOT_OPTION:
+        global.commons.sendMessage(global.translate('bets.notOption'), sender)
+        break
+      default:
+        global.commons.sendMessage(global.translate('core.error'), sender)
+    }
+  } finally {
+    self.bet = null
+    clearTimeout(self.timer)
+    self.modifiedTime = new Date().getTime()
   }
 }
 
-Bets.prototype.bet = function (self, sender, text) {
+Bets.prototype.save = function (self, sender, text) {
   if (text.length === 0) self.info(self, sender)
   else self.saveBet(self, sender, text)
 }
