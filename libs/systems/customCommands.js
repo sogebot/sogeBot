@@ -6,7 +6,12 @@ var _ = require('lodash')
 var constants = require('../constants')
 var log = global.log
 
+const ERROR_ALREADY_EXISTS = '0'
+const ERROR_DOESNT_EXISTS = '1'
+
 function CustomCommands () {
+  this.commands = {}
+
   if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!command add', this.add, constants.OWNER_ONLY)
     global.parser.register(this, '!command list', this.list, constants.OWNER_ONLY)
@@ -15,14 +20,24 @@ function CustomCommands () {
 
     global.parser.registerHelper('!command')
 
-    // start interval for registering commands from DB
-    var self = this
-    setInterval(function () {
-      self.register(self)
-    }, 1000)
+    global.watcher.watch(this, 'commands', this._save)
+    global.watcher.watch(this, 'commands', this.register)
+    this._update(this)
 
     this.webPanel()
   }
+}
+
+CustomCommands.prototype._update = function (self) {
+  global.botDB.findOne({ _id: 'commands' }, function (err, item) {
+    if (err) return log.error(err)
+    if (_.isNull(item)) return
+    self.commands = item.commands
+  })
+}
+
+CustomCommands.prototype._save = function (self) {
+  global.botDB.update({ _id: 'commands' }, { $set: { commands: self.commands } }, { upsert: true })
 }
 
 CustomCommands.prototype.webPanel = function () {
@@ -33,14 +48,11 @@ CustomCommands.prototype.webPanel = function () {
 }
 
 CustomCommands.prototype.sendCommands = function (self, socket) {
-  global.botDB.find({$where: function () { return this._id.startsWith('customcmds') }}, function (err, items) {
-    if (err) { log.error(err) }
-    socket.emit('Commands', items)
-  })
+  socket.emit('Commands', self.commands)
 }
 
 CustomCommands.prototype.deleteCommands = function (self, socket, data) {
-  self.remove(self, null, data)
+  self.remove(data)
   self.sendCommands(self, socket)
 }
 
@@ -54,59 +66,59 @@ CustomCommands.prototype.help = function (self, sender) {
 }
 
 CustomCommands.prototype.register = function (self) {
-  global.botDB.find({$where: function () { return this._id.startsWith('customcmds') }}, function (err, docs) {
-    if (err) { log.error(err) }
-    docs.forEach(function (e, i, ar) { global.parser.register(self, '!' + e.command, self.run, constants.VIEWERS) })
-  })
+  _.each(self.commands, function (o) { global.parser.register(self, '!' + o.command, self.run, constants.VIEWERS) })
 }
 
 CustomCommands.prototype.add = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
-    global.commons.insertIfNotExists({__id: 'customcmds_' + parsed[1], _command: parsed[1], response: parsed[2], success: 'customcmds.success.add', error: 'customcmds.failed.add'})
+    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
+    let command = { command: parsed[1], response: parsed[2] }
+    if (!_.isUndefined(_.find(self.commands, function (o) { return o.command === command.command }))) throw Error(ERROR_ALREADY_EXISTS)
+    self.commands.push(command)
   } catch (e) {
-    global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
+    console.log(e)
+    switch (e.message) {
+      case ERROR_ALREADY_EXISTS:
+        global.commons.sendMessage(global.translate('customcmds.failed.add'), sender)
+        break
+      default:
+        global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
+    }
   }
 }
 
 CustomCommands.prototype.run = function (self, sender, msg, fullMsg) {
-  var parsed = fullMsg.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
-  global.botDB.findOne({$where: function () { return this._id.startsWith('customcmds') }, command: parsed[1]}, function (err, item) {
-    if (err) { log.error(err) }
-    try {
-      global.commons.sendMessage(item.response, sender, {'set': msg})
-    } catch (e) {
-      global.parser.unregister(fullMsg)
-    }
-  })
+  let parsed = fullMsg.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
+  let command = _.find(self.commands, function (o) { return o.command === parsed[1] })
+  try {
+    global.commons.sendMessage(command.response, sender, {'set': msg})
+  } catch (e) {
+    global.parser.unregister(fullMsg)
+  }
 }
 
 CustomCommands.prototype.list = function (self, sender, text) {
-  var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-  if (_.isNull(parsed)) {
-    global.botDB.find({$where: function () { return this._id.startsWith('customcmds') }}, function (err, docs) {
-      if (err) { log.error(err) }
-      var commands = []
-      docs.forEach(function (e, i, ar) { commands.push('!' + e.command) })
-      var output = (docs.length === 0 ? global.translate('customcmds.failed.list') : global.translate('customcmds.success.list') + ': ' + commands.join(', '))
-      global.commons.sendMessage(output, sender)
-    })
-  } else {
-    global.commons.sendMessage(global.translate('customcmds.failed.parse', sender))
-  }
+  var commands = []
+  _.each(self.commands, function (element) { commands.push('!' + element.command) })
+  var output = (commands.length === 0 ? global.translate('customcmds.failed.list') : global.translate('customcmds.success.list') + ': ' + commands.join(', '))
+  global.commons.sendMessage(output, sender)
 }
 
 CustomCommands.prototype.remove = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    global.commons.remove({__id: 'customcmds_' + parsed[1],
-      success: function (cb) {
-        global.parser.unregister('!' + cb.command)
-        global.commons.sendMessage(global.translate('customcmds.success.remove'), sender)
-      },
-      error: 'customcmds.failed.remove'})
+    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+    if (_.isUndefined(_.find(self.commands, function (o) { return o.command === parsed[1] }))) throw Error(ERROR_DOESNT_EXISTS)
+    self.commands = _.filter(self.commands, function (o) { return o.command !== parsed[1] })
+    global.parser.unregister('!' + parsed[1])
+    global.commons.sendMessage(global.translate('customcmds.success.remove'), sender)
   } catch (e) {
-    global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
+    switch (e.message) {
+      case ERROR_DOESNT_EXISTS:
+        global.commons.sendMessage(global.translate('customcmds.failed.remove'), sender)
+        break
+      default:
+        global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
+    }
   }
 }
 
