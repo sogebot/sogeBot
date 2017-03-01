@@ -86,9 +86,13 @@ async function customCmdsDbUpdate() {
 
   let commandsUpdate = { commands: []}
   _.each(commands, function (command) {
-    DB.remove({_id: command._id})
     commandsUpdate.commands.push({command: command.command, response: command.response})
   })
+  await DB.remove({
+    $where: function () {
+      return this._id.startsWith('customcmds_')
+    }
+  }, { multi: true })
   await DB.update({ _id: 'commands' }, { $set: commandsUpdate }, { upsert: true })
 }
 
