@@ -31,15 +31,18 @@
     "ytdl-core": "^0.9.2"
   },
   "scripts": {
-    "copy:dist": "node tools/copy-dist-files.js",
+    "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
+    "standard": "standard libs/* && standard libs/systems/* && standard libs/widgets/*",
+    "test": "npm run standard && mocha",
     "migrate": "node --harmony-async-await ./migrate",
     "start": "npm run copy:dist && node --harmony-async-await ./main",
-    "standard": "standard libs/* && standard libs/systems/* && standard libs/widgets/*",
-    "test": "npm run standard && mocha"
+    "copy:dist": "node tools/copy-dist-files.js"
   },
+  "pre-commit": [ "precommit-msg", "standard" ],
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^3.2.0",
+    "pre-commit": "^1.2.2",
     "standard": "*"
   }
 }
