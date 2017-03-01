@@ -104,10 +104,7 @@ Panel.prototype.addWidget = function (id, name, icon) { this.widgets.push({id: i
 Panel.prototype.sendWidget = function (socket) {
   global.botDB.findOne({_id: 'dashboard_widgets'}, function (err, item) {
     if (err) { log.error(err) }
-    if (_.isNull(item)) return // we doesn't have any widgets to show
-    else {
-      socket.emit('widgets', item.widgets)
-    }
+    if (!_.isNull(item)) socket.emit('widgets', item.widgets)
   })
 }
 
