@@ -22,6 +22,8 @@ var migration = {
     process: async function () {
       console.log('-> Alias table update')
       await aliasDbUpdate()
+      console.log('-> Removing bet templates')
+      await removeFromDB('bets_template')
     }
   }
 }
@@ -70,4 +72,8 @@ async function aliasDbUpdate() {
     aliasUpdate.alias.push({alias: alias.alias, command: alias.command})
   })
   await DB.update({ _id: 'alias' }, { $set: aliasUpdate }, { upsert: true })
+}
+
+async function removeFromDB(id) {
+  await DB.remove({ _id: id })
 }
