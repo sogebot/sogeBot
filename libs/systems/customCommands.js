@@ -10,7 +10,7 @@ const ERROR_ALREADY_EXISTS = '0'
 const ERROR_DOESNT_EXISTS = '1'
 
 function CustomCommands () {
-  this.commands = {}
+  this.commands = []
 
   if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!command add', this.add, constants.OWNER_ONLY)
@@ -21,7 +21,6 @@ function CustomCommands () {
     global.parser.registerHelper('!command')
 
     global.watcher.watch(this, 'commands', this._save)
-    global.watcher.watch(this, 'commands', this.register)
     this._update(this)
 
     this.webPanel()
@@ -37,7 +36,9 @@ CustomCommands.prototype._update = function (self) {
 }
 
 CustomCommands.prototype._save = function (self) {
-  global.botDB.update({ _id: 'commands' }, { $set: { commands: self.commands } }, { upsert: true })
+  let commands = { commands: self.commands }
+  global.botDB.update({ _id: 'commands' }, { $set: commands }, { upsert: true })
+  self.register(self)
 }
 
 CustomCommands.prototype.webPanel = function () {
@@ -52,7 +53,7 @@ CustomCommands.prototype.sendCommands = function (self, socket) {
 }
 
 CustomCommands.prototype.deleteCommands = function (self, socket, data) {
-  self.remove(data)
+  self.remove(self, null, data)
   self.sendCommands(self, socket)
 }
 
