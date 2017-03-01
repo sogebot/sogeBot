@@ -71,7 +71,7 @@ Songs.prototype.getVolume = function (self, item) {
   item.loudness = typeof item.loudness !== 'undefined' ? item.loudness : -15
   var correction = Math.ceil((global.configuration.getValue('songs_volume') / 100) * 3)
   var loudnessDiff = parseFloat(parseFloat(self.meanLoudness) - item.loudness)
-  return Math.round(global.configuration.getValue('songs_volume') + correction * loudnessDiff)
+  return Math.round(global.configuration.getValue('songs_volume') + (correction * loudnessDiff))
 }
 
 Songs.prototype.setTrim = function (self, socket, data) {
