@@ -302,7 +302,7 @@ Twitch.prototype.showMe = function (self, sender, text) {
       var message = ['@' + sender.username]
       // rank
       var rank = !_.isUndefined(user.get('rank')) ? user.get('rank') : null
-      global.configuration.get().systems.ranks === true && !_.isNull(rank) ? message.push(rank) : null
+      if (global.configuration.get().systems.ranks === true && !_.isNull(rank)) message.push(rank)
 
       // watchTime
       var watchTime = user.get('watchTime')
@@ -311,7 +311,7 @@ Twitch.prototype.showMe = function (self, sender, text) {
 
       // points
       var points = !_.isUndefined(user.get('points')) ? user.get('points') : 0
-      global.configuration.get().systems.points === true ? message.push(points + ' ' + global.systems.points.getPointsName(points)) : null
+      if (global.configuration.get().systems.points === true) message.push(points + ' ' + global.systems.points.getPointsName(points))
 
       global.commons.sendMessage(message.join(' | '), sender)
     })
