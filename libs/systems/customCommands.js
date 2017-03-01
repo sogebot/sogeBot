@@ -76,7 +76,6 @@ CustomCommands.prototype.add = function (self, sender, text) {
     if (!_.isUndefined(_.find(self.commands, function (o) { return o.command === command.command }))) throw Error(ERROR_ALREADY_EXISTS)
     self.commands.push(command)
   } catch (e) {
-    console.log(e)
     switch (e.message) {
       case ERROR_ALREADY_EXISTS:
         global.commons.sendMessage(global.translate('customcmds.failed.add'), sender)
