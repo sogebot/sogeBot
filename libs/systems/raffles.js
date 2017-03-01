@@ -159,4 +159,3 @@ Raffles.prototype.close = function (self, sender, text) {
 }
 
 module.exports = new Raffles()
-
