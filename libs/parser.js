@@ -69,7 +69,7 @@ Parser.prototype.parseCommands = function (user, message) {
       if (this.permissionsCmds[cmd] === constants.DISABLE) break
       if (this.permissionsCmds[cmd] === constants.VIEWERS ||
         (this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user)) ||
-        (this.permissionsCmds[cmd] === constants.MODS && user.mod || this.isOwner(user))) {
+        (this.permissionsCmds[cmd] === constants.MODS && (user.mod || this.isOwner(user)))) {
         var text = message.replace(cmd, '')
         if (typeof this.registeredCmds[cmd] === 'function') this.registeredCmds[cmd](this.selfCmds[cmd], user, text.trim(), message)
         else global.log.error(cmd + ' have wrong null function registered!')
