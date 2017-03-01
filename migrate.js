@@ -24,6 +24,8 @@ var migration = {
       await aliasDbUpdate()
       console.log('-> Removing bet templates')
       await removeFromDB('bets_template')
+      console.log('-> Custom Commands update')
+      await customCmdsDbUpdate()
     }
   }
 }
@@ -72,6 +74,22 @@ async function aliasDbUpdate() {
     aliasUpdate.alias.push({alias: alias.alias, command: alias.command})
   })
   await DB.update({ _id: 'alias' }, { $set: aliasUpdate }, { upsert: true })
+}
+
+async function customCmdsDbUpdate() {
+  let commands = await DB.find({
+    $where: function () {
+      return this._id.startsWith('customcmds_')
+    }
+  })
+  if (commands.length === 0) return
+
+  let commandsUpdate = { commands: []}
+  _.each(commands, function (command) {
+    DB.remove({_id: command._id})
+    commandsUpdate.commands.push({command: command.command, response: command.response})
+  })
+  await DB.update({ _id: 'commands' }, { $set: commandsUpdate }, { upsert: true })
 }
 
 async function removeFromDB(id) {
