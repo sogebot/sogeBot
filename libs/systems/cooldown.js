@@ -2,6 +2,7 @@
 
 // 3rdparty libraries
 var _ = require('lodash')
+
 // bot libraries
 var constants = require('../constants')
 var log = global.log

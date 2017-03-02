@@ -8,10 +8,10 @@ var constants = require('../constants')
 var log = global.log
 
 /*
- * !alias                       - gets an info about bet
- * !alias add [command] [alias] - bet [amount] of points on [option]
- * !alias remove [alias]        - open a new bet with selected options
- * !alias list                  - close a bet and select option as winner
+ * !alias                   - gets an info about alias usage
+ * !alias add [cmd] [alias] - add alias for specified command
+ * !alias remove [alias]    - remove specified alias
+ * !alias list              - get alias list
  */
 
 function Alias () {
