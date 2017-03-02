@@ -28,6 +28,8 @@ var migration = {
       await customCmdsDbUpdate_1_3()
       console.log('-> Keywords update')
       await keywordsDbUpdate_1_3()
+      console.log('-> Users update')
+      await usersDbUpdate_1_3()
     }
   }
 }
@@ -120,6 +122,31 @@ async function keywordsDbUpdate_1_3() {
     }
   }, { multi: true })
   await DB.update({ _id: 'keywords' }, { $set: kwdsUpdate }, { upsert: true })
+}
+
+async function removeFromDB(id) {
+  await DB.remove({ _id: id })
+}
+
+async function usersDbUpdate_1_3() {
+  let users = await DB.find({
+    $where: function () {
+      return this._id.startsWith('user_')
+    }
+  })
+  if (users.length === 0) return
+
+  let usersUpdate = { users: [] }
+  _.each(users, function (user) {
+    delete user._id
+    usersUpdate.users.push(user)
+  })
+  await DB.remove({
+    $where: function () {
+      return this._id.startsWith('user_')
+    }
+  }, { multi: true })
+  await DB.update({ _id: 'users' }, { $set: usersUpdate }, { upsert: true })
 }
 
 async function removeFromDB(id) {
