@@ -55,20 +55,20 @@
       })
     },
     deleteKeyword: function (el) {
-      socket.emit('deleteKeyword', el.dataset.keyword)
+      socket.emit('keywords.delete', el.dataset.keyword)
     },
     createKeyword: function (event) {
       event.preventDefault()
       var data = {keyword: $("#inputKeyword").val(), response: $("#inputResponse").val()}
-      socket.emit('createKeyword', data)
+      socket.emit('keywords.create', data)
       $("#inputKeyword").val('')
       $("#inputResponse").val('')
     }
   }
 
-  socket.emit('getKeywords');
+  socket.emit('keywords.get');
 
-  socket.on('Keywords', function(list) {
+  socket.on('keywords.update', function(list) {
     keywords.updateKeywords(list)
   });
 </script>
