@@ -7,6 +7,8 @@ var testUser2 = {username: 'soge'}
 require('./general')
 require('../libs/systems/moderation')
 
+global.parser.parse(testUser, '!set moderationWarnings 0')
+
 describe('System - Moderation', function () {
   describe('Links', function () {
     describe('http://google.com - moderation OFF', function () {
