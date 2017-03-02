@@ -40,7 +40,7 @@ Parser.prototype.parse = function (user, message) {
   this.registeredParsers === {} ? this.parseCommands(user, message) : this.addToQueue(user, message)
 }
 
-Parser.prototype.addToQueue = function (user, message) {
+Parser.prototype.addToQueue = async function (user, message) {
   var id = crypto.createHash('md5').update(Math.random().toString()).digest('hex')
 
   var data = {
@@ -62,7 +62,7 @@ Parser.prototype.addToQueue = function (user, message) {
   }
 }
 
-Parser.prototype.parseCommands = function (user, message) {
+Parser.prototype.parseCommands = async function (user, message) {
   message = message.trim()
   for (var cmd in this.registeredCmds) {
     if (message.startsWith(cmd)) {
