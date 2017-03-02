@@ -4,9 +4,7 @@
 [![nodejs](https://img.shields.io/badge/node.js-7.6.0-brightgreen.svg?style=flat-square)](https://nodejs.org/en/)
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9ZTX5DS2XB5EN)
 
-Minimal CPU usage and small footprint twitch bot based on Node.js intended to be used on Raspberry PI.
-
-*Notice: SogeBot is still in heavy alpha development*
+Free Twitch Bot built on Node.js
 
 #### Issues
 If you found an issue with a bot, feel free to create issue at https://github.com/sogehige/SogeBot/issues.
