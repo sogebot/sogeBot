@@ -19,7 +19,7 @@ const ERROR_IS_LOCKED = '5'
 const ERROR_DIFF_BET = '6'
 const ERROR_NOT_OPTION = '7'
 
-/**
+/*
  * !bet                                 - gets an info about bet
  * !bet [option] [amount]               - bet [amount] of points on [option]
  * !bet open [option option option ...] - open a new bet with selected options

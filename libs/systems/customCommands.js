@@ -2,12 +2,20 @@
 
 // 3rdparty libraries
 var _ = require('lodash')
+
 // bot libraries
 var constants = require('../constants')
 var log = global.log
 
 const ERROR_ALREADY_EXISTS = '0'
 const ERROR_DOESNT_EXISTS = '1'
+
+/*
+ * !command                      - gets an info about command usage
+ * !command add [cmd] [response] - add command with specified response
+ * !command remove [cmd]         - remove specified command
+ * !command list                 - get commands list
+ */
 
 function CustomCommands () {
   this.commands = []
