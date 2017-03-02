@@ -136,10 +136,31 @@ async function usersDbUpdate_1_3() {
   })
   if (users.length === 0) return
 
-  let usersUpdate = { users: [] }
+  let usersUpdate = { users: {} }
   _.each(users, function (user) {
     delete user._id
-    usersUpdate.users.push(user)
+
+    let time = {
+      message: (_.isUndefined(user.lastMessageTime)) ? 0 : user.lastMessageTime,
+      watched: (_.isUndefined(user.watchTime)) ? 0 : user.watchTime,
+      parted: (_.isUndefined(user.partedTime)) ? 0 : user.partedTime,
+      points: (_.isUndefined(user.pointsGrantedAt)) ? 0 : user.pointsGrantedAt
+    }
+    delete user.lastMessageTime
+    delete user.watchTime
+    delete user.partedTime
+    delete user.pointsGrantedAt
+    user.time = time
+
+    let is = {
+      online: false,
+      follower: (_.isUndefined(user.isFollower)) ? false : user.isFollower
+    }
+    delete user.isOnline
+    delete user.isFollower
+    user.is = is
+
+    usersUpdate.users[user.username] = user
   })
   await DB.remove({
     $where: function () {
