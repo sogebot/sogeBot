@@ -6,7 +6,19 @@ var _ = require('lodash')
 var constants = require('../constants')
 var log = global.log
 
+const ERROR_ALREADY_EXISTS = '0'
+const ERROR_DOESNT_EXISTS = '1'
+
+/*
+ * !keyword                      - gets an info about keyword usage
+ * !keyword add [kwd] [response] - add keyword with specified response
+ * !keyword remove [kwd]         - remove specified keyword
+ * !keyword list                 - get keywords list
+ */
+
 function Keywords () {
+  this.keywords = []
+
   if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!keyword add', this.add, constants.OWNER_ONLY)
     global.parser.register(this, '!keyword list', this.list, constants.OWNER_ONLY)
@@ -15,24 +27,37 @@ function Keywords () {
 
     global.parser.registerHelper('!keyword')
 
+    global.watcher.watch(this, 'keywords', this._save)
+    this._update(this)
+
     global.parser.registerParser(this, 'keywords', this.run, constants.VIEWERS)
 
     this.webPanel()
   }
 }
 
+Keywords.prototype._update = function (self) {
+  global.botDB.findOne({ _id: 'keywords' }, function (err, item) {
+    if (err) return log.error(err)
+    if (_.isNull(item)) return
+    self.keywords = item.keywords
+  })
+}
+
+Keywords.prototype._save = function (self) {
+  let keywords = { keywords: self.keywords }
+  global.botDB.update({ _id: 'keywords' }, { $set: keywords }, { upsert: true })
+}
+
 Keywords.prototype.webPanel = function () {
   global.panel.addMenu({category: 'manage', name: 'Keywords', id: 'keywords'})
-  global.panel.socketListening(this, 'getKeywords', this.sendKeywords)
-  global.panel.socketListening(this, 'deleteKeyword', this.deleteKeywords)
-  global.panel.socketListening(this, 'createKeyword', this.createKeywords)
+  global.panel.socketListening(this, 'keywords.get', this.sendKeywords)
+  global.panel.socketListening(this, 'keywords.delete', this.deleteKeywords)
+  global.panel.socketListening(this, 'keywords.create', this.createKeywords)
 }
 
 Keywords.prototype.sendKeywords = function (self, socket) {
-  global.botDB.find({$where: function () { return this._id.startsWith('kwd') }}, function (err, items) {
-    if (err) { log.error(err) }
-    socket.emit('Keywords', items)
-  })
+  socket.emit('keywords.update', self.keywords)
 }
 
 Keywords.prototype.deleteKeywords = function (self, socket, data) {
@@ -51,43 +76,51 @@ Keywords.prototype.help = function (self, sender) {
 
 Keywords.prototype.add = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S]+) (.*)$/)
-    if (parsed[2].trim().length === 0) throw Boolean(true)
-    global.commons.insertIfNotExists({__id: 'kwd_' + parsed[1], _keyword: parsed[1], response: parsed[2].trim(), success: 'keywords.success.add', error: 'keywords.failed.add'})
+    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S]+) (.*)$/)
+    let keyword = { keyword: parsed[1], response: parsed[2] }
+    if (!_.isUndefined(_.find(self.keywords, function (o) { return o.keyword === keyword.keyword }))) throw Error(ERROR_ALREADY_EXISTS)
+    self.keywords.push(keyword)
+    global.commons.sendMessage(global.translate('keywords.success.add'), sender)
   } catch (e) {
-    global.commons.sendMessage(global.translate('keywords.failed.parse'), sender)
+    switch (e.message) {
+      case ERROR_ALREADY_EXISTS:
+        global.commons.sendMessage(global.translate('keywords.failed.add'), sender)
+        break
+      default:
+        global.commons.sendMessage(global.translate('keywords.failed.parse'), sender)
+    }
   }
 }
 
 Keywords.prototype.run = function (self, id, sender, text) {
-  global.botDB.find({$where: function () { return this._id.startsWith('kwd') && text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(this.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0 }}, function (err, items) {
-    if (err) log.error(err)
-    _.each(items, function (item) { global.commons.sendMessage(item.response, sender) })
-    global.updateQueue(id, true)
+  let keywords = _.filter(self.keywords, function (o) {
+    return text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
   })
+  _.each(keywords, function (o) { global.commons.sendMessage(o.response, sender) })
+  global.updateQueue(id, true)
 }
 
 Keywords.prototype.list = function (self, sender, text) {
-  var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-  if (_.isNull(parsed)) {
-    global.botDB.find({$where: function () { return this._id.startsWith('kwd') }}, function (err, docs) {
-      if (err) { log.error(err) }
-      var keywords = []
-      docs.forEach(function (e, i, ar) { keywords.push(e.keyword) })
-      var output = (docs.length === 0 ? global.translate('keywords.failed.list') : global.translate('keywords.success.list') + ': ' + keywords.join(', '))
-      global.commons.sendMessage(output, sender)
-    })
-  } else {
-    global.commons.sendMessage(global.translate('keywords.failed.parse', sender))
-  }
+  let keywords = []
+  _.each(self.keywords, function (element) { keywords.push(element.keyword) })
+  let output = (keywords.length === 0 ? global.translate('keywords.failed.list') : global.translate('keywords.success.list') + ': ' + keywords.join(', '))
+  global.commons.sendMessage(output, sender)
 }
 
 Keywords.prototype.remove = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    global.commons.remove({__id: 'kwd_' + parsed[1], success: 'keywords.success.remove', error: 'keywords.failed.remove'})
+    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S]+)$/)
+    if (_.isUndefined(_.find(self.keywords, function (o) { return o.keyword === parsed[1] }))) throw Error(ERROR_DOESNT_EXISTS)
+    self.keywords = _.filter(self.keywords, function (o) { return o.keyword !== parsed[1] })
+    global.commons.sendMessage(global.translate('keywords.success.remove'), sender)
   } catch (e) {
-    global.commons.sendMessage(global.translate('keywords.failed.parse'), sender)
+    switch (e.message) {
+      case ERROR_DOESNT_EXISTS:
+        global.commons.sendMessage(global.translate('keywords.failed.remove'), sender)
+        break
+      default:
+        global.commons.sendMessage(global.translate('keywords.failed.parse'), sender)
+    }
   }
 }
 

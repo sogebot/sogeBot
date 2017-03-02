@@ -20,12 +20,14 @@ var migration = {
   '1.3': {
     description: '1.1 to 1.3',
     process: async function () {
-      console.log('-> Alias table update')
-      await aliasDbUpdate()
       console.log('-> Removing bet templates')
       await removeFromDB('bets_template')
+      console.log('-> Alias table update')
+      await aliasDbUpdate_1_3()
       console.log('-> Custom Commands update')
-      await customCmdsDbUpdate()
+      await customCmdsDbUpdate_1_3()
+      console.log('-> Keywords update')
+      await keywordsDbUpdate_1_3()
     }
   }
 }
@@ -60,7 +62,7 @@ async function settingsRename(aOrig, aRenamed) {
   }
 }
 
-async function aliasDbUpdate() {
+async function aliasDbUpdate_1_3() {
   let aliases = await DB.find({
     $where: function () {
       return this._id.startsWith('alias_')
@@ -76,7 +78,7 @@ async function aliasDbUpdate() {
   await DB.update({ _id: 'alias' }, { $set: aliasUpdate }, { upsert: true })
 }
 
-async function customCmdsDbUpdate() {
+async function customCmdsDbUpdate_1_3() {
   let commands = await DB.find({
     $where: function () {
       return this._id.startsWith('customcmds_')
@@ -94,6 +96,30 @@ async function customCmdsDbUpdate() {
     }
   }, { multi: true })
   await DB.update({ _id: 'commands' }, { $set: commandsUpdate }, { upsert: true })
+}
+
+async function removeFromDB(id) {
+  await DB.remove({ _id: id })
+}
+
+async function keywordsDbUpdate_1_3() {
+  let kwds = await DB.find({
+    $where: function () {
+      return this._id.startsWith('kwd_')
+    }
+  })
+  if (kwds.length === 0) return
+
+  let kwdsUpdate = { keywords: [] }
+  _.each(kwds, function (kwd) {
+    kwdsUpdate.keywords.push({keyword: kwd.keyword, response: kwd.response})
+  })
+  await DB.remove({
+    $where: function () {
+      return this._id.startsWith('kwd_')
+    }
+  }, { multi: true })
+  await DB.update({ _id: 'keywords' }, { $set: kwdsUpdate }, { upsert: true })
 }
 
 async function removeFromDB(id) {
