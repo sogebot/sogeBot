@@ -7,6 +7,8 @@ var testUser2 = {username: 'soge'}
 require('./general')
 require('../libs/systems/moderation')
 
+global.parser.parse(testUser, '!set moderationWarnings 0')
+
 describe('System - Moderation', function () {
   describe('Links', function () {
     describe('http://google.com - moderation OFF', function () {
@@ -412,13 +414,6 @@ describe('System - Moderation', function () {
           done()
         })
       })
-      it('should not be in db', function (done) {
-        global.botDB.count({type: 'permitLink'}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(0)
-          done()
-        })
-      })
       it('should send parse error', function () {
         expect(global.output.pop()).to.match(/en.moderation.failed.parsePermit/)
       })
@@ -435,13 +430,6 @@ describe('System - Moderation', function () {
           done()
         })
       })
-      it('should be in db', function (done) {
-        global.botDB.count({type: 'permitLink'}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(1)
-          done()
-        })
-      })
       it('should send success message', function () {
         expect(global.output.pop()).to.equal('{missing_translation: en.moderation.permit}')
       })
@@ -458,13 +446,6 @@ describe('System - Moderation', function () {
           expect(global.timeouts).to.contain('soge: {missing_translation: en.moderation.links} 120')
           done()
         }, 500)
-      })
-      it('should not be in db', function (done) {
-        global.botDB.count({type: 'permitLink'}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(0)
-          done()
-        })
       })
     })
     describe('parsing \'!permit [username]\' - case sensitive test', function () {
@@ -478,13 +459,6 @@ describe('System - Moderation', function () {
           done()
         })
       })
-      it('should be in db', function (done) {
-        global.botDB.count({type: 'permitLink'}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(1)
-          done()
-        })
-      })
       it('should send success message', function () {
         expect(global.output.pop()).to.equal('{missing_translation: en.moderation.permit}')
       })
@@ -501,13 +475,6 @@ describe('System - Moderation', function () {
           expect(global.timeouts).to.contain('soge: {missing_translation: en.moderation.links} 120')
           done()
         }, 500)
-      })
-      it('should not be in db', function (done) {
-        global.botDB.count({type: 'permitLink'}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(0)
-          done()
-        })
       })
     })
   })

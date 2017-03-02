@@ -7,6 +7,9 @@ var constants = require('../constants')
 var log = global.log
 
 function Moderation () {
+  this.warnings = {}
+  this.permits = []
+
   if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!permit', this.permitLink, constants.MODS)
 
@@ -48,31 +51,20 @@ function Moderation () {
     global.configuration.register('moderationEmotesTimeout', 'moderation.settingsmoderationEmotesTimeout', 'number', 120)
     global.configuration.register('moderationEmotesMaxCount', 'moderation.settings.moderationEmotesMaxCount', 'number', 15)
 
-    global.configuration.register('moderationWarnings', 'moderation.settings.moderationWarnings', 'number', 0)
+    global.configuration.register('moderationWarnings', 'moderation.settings.moderationWarnings', 'number', 3)
     global.configuration.register('moderationWarningsTimeouts', 'moderation.settings.moderationWarningsTimeouts', 'bool', true)
 
+    var self = this
     // purge warnings older than hour
     setInterval(function () {
-      global.botDB.find({$where: function () { return this._id.startsWith('warnings') }}, function (err, items) {
-        if (err) log.error(err)
-        _.each(items, function (item) {
-          var updatedTime = []
-          var times = (item.time.length > 0) ? item.time.split(',') : []
-          var currentTime = new Date().getTime()
-          for (var time in times) {
-            time = parseInt(times[time], 10)
-            if (currentTime - time < 3600000) {
-              updatedTime.push(time)
-            }
-          }
-          if (updatedTime.length > 0) {
-            global.botDB.update({_id: item._id}, {$set: {time: updatedTime.join(',')}})
-          } else {
-            global.botDB.remove({_id: item._id})
-          }
+      _.each(self.warnings, function (times, user) {
+        let now = new Date().getTime()
+        self.warnings[user] = _.filter(times, function (time) {
+          return (now - parseInt(time, 10) < 3600000)
         })
+        if (_.size(self.warnings[user]) === 0) delete self.warnings[user]
       })
-    }, 600000)
+    }, 60000)
 
     this.webPanel()
   }
@@ -82,7 +74,7 @@ Moderation.prototype.webPanel = function () {
   global.panel.addMenu({category: 'settings', name: 'Moderation', id: 'moderation'})
 }
 
-Moderation.prototype.timeoutUser = function (sender, warning, msg, time) {
+Moderation.prototype.timeoutUser = function (self, sender, warning, msg, time) {
   var warningsAllowed = global.configuration.getValue('moderationWarnings')
   var warningsTimeout = global.configuration.getValue('moderationWarningsTimeouts')
   if (warningsAllowed === 0) {
@@ -90,31 +82,22 @@ Moderation.prototype.timeoutUser = function (sender, warning, msg, time) {
     return
   }
 
-  global.botDB.findOne({_id: 'warnings_' + sender.username}, {}, function (err, item) {
-    if (err) log.error(err)
-    if (!_.isNull(item)) {
-      var times = item.time.split(',')
-      if (times.length >= warningsAllowed) {
-        global.commons.timeout(sender.username, msg, time)
-        global.botDB.remove({_id: 'warnings_' + sender.username})
-      } else {
-        times.push(new Date().getTime())
-        global.botDB.update({_id: 'warnings_' + sender.username}, {$set: {time: times.join(',')}})
-        if (warningsTimeout) {
-          global.commons.timeout(sender.username, warning.replace('(value)', parseInt(warningsAllowed, 10) - times.length), 1)
-        } else {
-          global.commons.sendMessage('@' + sender.username + ': ' + warning.replace('(value)', parseInt(warningsAllowed, 10) - times.length), sender)
-        }
-      }
-    } else {
-      global.botDB.insert({_id: 'warnings_' + sender.username, time: new Date().getTime().toString()})
-      if (warningsTimeout) {
-        global.commons.timeout(sender.username, warning.replace('(value)', parseInt(warningsAllowed, 10) - 1), 1)
-      } else {
-        global.commons.sendMessage('@' + sender.username + ': ' + warning.replace('(value)', parseInt(warningsAllowed, 10) - 1), sender)
-      }
-    }
-  })
+  let warnings = _.isUndefined(self.warnings[sender.username]) ? [] : self.warnings[sender.username]
+
+  if (warnings.length >= warningsAllowed) {
+    global.commons.timeout(sender.username, msg, time)
+    delete self.warnings[sender.username]
+    return
+  }
+
+  warnings.push(new Date().getTime())
+  if (warningsTimeout) {
+    global.commons.timeout(sender.username, warning.replace('(value)', parseInt(warningsAllowed, 10) - warnings.length), 1)
+  } else {
+    global.commons.sendMessage('@' + sender.username + ': ' + warning.replace('(value)', parseInt(warningsAllowed, 10) - warnings.length), sender)
+  }
+
+  self.warnings[sender.username] = warnings
 }
 
 Moderation.prototype.whitelisted = function (text) {
@@ -129,7 +112,7 @@ Moderation.prototype.whitelisted = function (text) {
 Moderation.prototype.permitLink = function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    global.botDB.insert({type: 'permitLink', username: parsed[0].toLowerCase()})
+    self.permits.push(parsed[0].toLowerCase())
     global.commons.sendMessage(global.translate('moderation.permit').replace('(who)', parsed[0]), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('moderation.failed.parsePermit'), sender)
@@ -146,20 +129,14 @@ Moderation.prototype.containsLink = function (self, id, sender, text) {
 
   var urlRegex = /[a-zA-Z0-9]+([a-zA-Z0-9-]+)?\.(aero|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|sl|sm|sn|so|sr|st|su|sv|sy|sz|tc|td|tf|tg|th|tj|tk|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|um|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zr|zw)\b/ig
   if (text.search(urlRegex) >= 0) {
-    global.botDB.findOne({type: 'permitLink', username: sender.username}, function (err, item) {
-      if (err) log.error(err)
-      try {
-        global.botDB.remove({_id: item._id}, {}, function (err, numRemoved) {
-          if (err) log.error(err)
-          if (numRemoved === 1) global.updateQueue(id, true)
-          else global.updateQueue(id, false)
-        })
-      } catch (err) {
-        log.info(sender.username + ' [link] timeout: ' + text)
-        self.timeoutUser(sender, global.translate('moderation.warnings.links'), global.translate('moderation.links'), timeout)
-        global.updateQueue(id, false)
-      }
-    })
+    if (_.includes(self.permits, sender.username.toLowerCase())) {
+      _.pull(self.permits, sender.username.toLowerCase())
+      global.updateQueue(id, true)
+    } else {
+      log.info(sender.username + ' [link] timeout: ' + text)
+      self.timeoutUser(self, sender, global.translate('moderation.warnings.links'), global.translate('moderation.links'), timeout)
+      global.updateQueue(id, false)
+    }
   } else {
     global.updateQueue(id, true)
   }
@@ -186,7 +163,7 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
       if (symbols.length >= maxSymbolsConsecutively) {
         global.updateQueue(id, false)
         log.info(sender.username + ' [symbols] timeout: ' + text)
-        self.timeoutUser(sender, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout)
+        self.timeoutUser(self, sender, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout)
         return
       }
       symbolsLength = symbolsLength + symbols.length
@@ -195,7 +172,7 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
   if (Math.ceil(symbolsLength / (msgLength / 100)) >= maxSymbolsPercent) {
     global.updateQueue(id, false)
     log.info(sender.username + ' [symbols] timeout: ' + text)
-    self.timeoutUser(sender, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout)
+    self.timeoutUser(self, sender, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout)
     return
   }
   global.updateQueue(id, true)
@@ -211,7 +188,7 @@ Moderation.prototype.longMessage = function (self, id, sender, text) {
   } else {
     global.updateQueue(id, false)
     log.info(sender.username + ' [longMessage] timeout: ' + text)
-    self.timeoutUser(sender, global.translate('moderation.warnings.longMessage'), global.translate('moderation.longMessage'), timeout)
+    self.timeoutUser(self, sender, global.translate('moderation.warnings.longMessage'), global.translate('moderation.longMessage'), timeout)
   }
 }
 
@@ -236,7 +213,7 @@ Moderation.prototype.caps = function (self, id, sender, text) {
   if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
     global.updateQueue(id, false)
     log.info(sender.username + ' [caps] timeout: ' + text)
-    self.timeoutUser(sender, global.translate('moderation.warnings.caps'), global.translate('moderation.caps'), timeout)
+    self.timeoutUser(self, sender, global.translate('moderation.warnings.caps'), global.translate('moderation.caps'), timeout)
     return
   }
   global.updateQueue(id, true)
@@ -258,7 +235,7 @@ Moderation.prototype.spam = function (self, id, sender, text) {
     if (out.hasOwnProperty(item) && out[item].length >= maxSpamLength) {
       global.updateQueue(id, false)
       log.info(sender.username + ' [spam] timeout: ' + text)
-      self.timeoutUser(sender, global.translate('moderation.warnings.spam'), global.translate('moderation.spam'), timeout)
+      self.timeoutUser(self, sender, global.translate('moderation.warnings.spam'), global.translate('moderation.spam'), timeout)
       break
     }
   }
@@ -276,7 +253,7 @@ Moderation.prototype.color = function (self, id, sender, text) {
   if (sender['message-type'] === 'action') {
     global.updateQueue(id, false)
     log.info(sender.username + ' [color] timeout: ' + text)
-    self.timeoutUser(sender, global.translate('moderation.warnings.color'), global.translate('moderation.color'), timeout)
+    self.timeoutUser(self, sender, global.translate('moderation.warnings.color'), global.translate('moderation.color'), timeout)
   } else global.updateQueue(id, true)
 }
 
@@ -297,7 +274,7 @@ Moderation.prototype.emotes = function (self, id, sender, text) {
   if (count > maxCount) {
     global.updateQueue(id, false)
     log.info(sender.username + ' [emotes] timeout: ' + text)
-    self.timeoutUser(sender, global.translate('moderation.warnings.emotes'), global.translate('moderation.emotes'), timeout)
+    self.timeoutUser(self, sender, global.translate('moderation.warnings.emotes'), global.translate('moderation.emotes'), timeout)
   } else global.updateQueue(id, true)
 }
 
