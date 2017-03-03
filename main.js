@@ -2,6 +2,7 @@
 
 // 3rd party libraries
 var irc = require('tmi.js')
+var _ = require('lodash')
 
 // bot libraries
 var Configuration = require('./libs/configuration')
@@ -77,9 +78,13 @@ global.client.on('disconnected', function (address, port) {
   global.status.TMI = constants.DISCONNECTED
 })
 
-global.client.on('message', function (channel, user, message, fromSelf) {
+global.client.on('message', function (channel, sender, message, fromSelf) {
   if (!fromSelf) {
-    global.parser.parse(user, message)
+    global.parser.parse(sender, message)
+
+    const user = global.users.get(sender.username)
+    let msgs = _.isUndefined(user.stats.messages) ? 1 : user.stats.messages + 1
+    global.users.set(user.username, { stats: { messages: msgs } }, true)
   }
 })
 

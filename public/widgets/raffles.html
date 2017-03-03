@@ -131,8 +131,8 @@
       $('a[href="#raffles-winner"]').css('display', 'block')
 
       var following = $('#raffleWinnerFollowing')
-      following.children('span').css('color', this.winner.isFollowing ? 'green' : 'red')
-      following.children('span').children('i').removeClass().addClass('fa ' + (this.winner.isFollowing ? 'fa-check' : 'fa-close'))
+      following.children('span').css('color', this.winner.is.follower ? 'green' : 'red')
+      following.children('span').children('i').removeClass().addClass('fa ' + (this.winner.is.follower ? 'fa-check' : 'fa-close'))
 
       var message = $('#raffleWinnerMessage')
       message.attr('href', 'https://www.twitch.tv/message/compose?to=' + this.winner.username)
@@ -141,7 +141,7 @@
     },
     updateWinner: function (winner) {
       this.winner = winner
-      this.winner.isFollowing = !_.isNull(this.winner.isFollowing) && this.winner.isFollowing
+      this.winner.is.follower = !_.isNull(this.winner.is.follower) && this.winner.is.follower
 
       if (!_.isNull(this.winner)) {
         this.updateWinnerTab()

@@ -239,7 +239,7 @@ Twitch.prototype.lastseenUpdate = function (self, id, sender, text) {
     return
   }
   global.users.set(sender.username, { time: { message: new Date().getTime() } })
-  if (!global.users.get(sender.username).is.online) global.users.set(sender.username, { is: { online: true } })
+  if (_.isUndefined(global.users.get(sender.username).is) || !global.users.get(sender.username).is.online) global.users.set(sender.username, { is: { online: true } })
   global.updateQueue(id, true)
 }
 
@@ -287,6 +287,10 @@ Twitch.prototype.showMe = function (self, sender, text) {
     // points
     var points = !_.isUndefined(user.points) ? user.points : 0
     if (global.configuration.get().systems.points === true) message.push(points + ' ' + global.systems.points.getPointsName(points))
+
+    // message count
+    var messages = !_.isUndefined(user.stats.messages) ? user.stats.messages : 0
+    message.push(messages + ' messages')
 
     global.commons.sendMessage(message.join(' | '), sender)
   } catch (e) {

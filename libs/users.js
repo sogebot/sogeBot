@@ -57,35 +57,48 @@ Users.prototype.get = function (username) {
       global.users.set(username, 'id', body.users[0]._id)
     })
   }
+
+  // return all default attributes
+  if (_.isUndefined(user.username)) user.username = username
+  if (_.isUndefined(user.time)) user.time = {}
+  if (_.isUndefined(user.is)) user.is = {}
+  if (_.isUndefined(user.stats)) user.stats = {}
   return user
 }
 
 Users.prototype.getAll = function (object) {
-  return _.filter(this.users, object)
+  if (_.isObject(object)) return _.filter(this.users, object)
+  return this.users
 }
 
 Users.prototype.set = function (username, object, silent = true) {
   if (username === global.configuration.get().twitch.username) return // it shouldn't happen, but there can be more than one instance of a bot
   let user = _.isUndefined(this.users[username]) ? {} : this.users[username]
   this.users[username] = _.merge(user, object)
+
+  // also we need to be sure that all default attrs exists
+  if (_.isUndefined(this.users[username].username)) this.users[username].username = username
+  if (_.isUndefined(this.users[username].time)) this.users[username].time = {}
+  if (_.isUndefined(this.users[username].is)) this.users[username].is = {}
+  if (_.isUndefined(this.users[username].stats)) this.users[username].stats = {}
+
   if (silent) this.changes += 1
 }
 
-Users.prototype.updateFollowers = function () {
-  console.log('updating followers')
-}
-/*
-
-User.deleteFollowers = function () {
-  return new Promise(function (resolve, reject) {
-    global.botDB.update({ $where: function () { return this._id.startsWith('user') } }, { $set: { isFollower: false } }, function (err, numUpdated) {
-      if (err) reject(err)
-      resolve(numUpdated)
-    })
+Users.prototype.setAll = function (object) {
+  var self = this
+  _.each(this.users, function (user) {
+    self.set(user.username, object, true)
   })
 }
 
-User.updateFollowers = function () {
+Users.prototype.delete = function (username) {
+  delete this.users[username]
+}
+
+Users.prototype.updateFollowers = function () {
+  this.setAll({ is: { follower: false } })
+
   var makeRequest = function (cursor) {
     global.client.api({
       url: 'https://api.twitch.tv/kraken/channels/' + global.channelId + '/follows?limit=100' + (!_.isUndefined(cursor) ? '&cursor=' + cursor : ''),
@@ -100,15 +113,14 @@ User.updateFollowers = function () {
       }
       if (res.statusCode === 200 && !_.isNull(body) && body.follows.length > 0) {
         _.each(body.follows, function (follower) {
-          var user = new User(follower.user.name)
-          user.set('isFollower', true)
+          global.users.set(follower.user.name, { is: { follower: true } }, true)
         })
-        setTimeout(function () { makeRequest(body._cursor) }, 1000)
+        makeRequest(body._cursor)
       }
     })
   }
 
-  User.deleteFollowers().then(makeRequest())
+  makeRequest()
 }
-*/
+
 module.exports = Users

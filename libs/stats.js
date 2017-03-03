@@ -34,15 +34,11 @@ Stats.prototype.save = function (data) {
 }
 
 Stats.prototype.getViewers = function (self, socket) {
-  global.botDB.find({$where: function () { return this._id.startsWith('user') && this.username !== global.configuration.get().twitch.username && this.username !== global.configuration.get().twitch.channel }}, function (err, items) {
-    if (err) { global.log.error(err) }
-    socket.emit('Viewers', items)
-  })
+  socket.emit('Viewers', global.users.getAll())
 }
 
-Stats.prototype.deleteViewer = function (self, socket, data) {
-  global.botDB.remove({ _id: 'user_' + data })
-  self.getViewers(self, socket)
+Stats.prototype.deleteViewer = function (self, socket, username) {
+  global.users.delete(username)
 }
 
 Stats.prototype.getStreamEvents = function (self, socket, data) {

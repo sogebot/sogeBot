@@ -2,7 +2,6 @@
 
 var _ = require('lodash')
 var log = global.log
-var User = require('../user')
 var constants = require('../constants')
 var crypto = require('crypto')
 
@@ -128,12 +127,10 @@ RafflesWidget.prototype.setRafflesFollowersOnly = function (self, socket, follow
           global.botDB.update({ _id: item._id }, item)
           self.forceSendRaffleParticipants(self)
         } else {
-          var user = new User(item.username)
-          user.isLoaded().then(function () {
-            item.eligible = !_.isUndefined(user.get('isFollower')) && user.get('isFollower')
-            global.botDB.update({ _id: item._id }, item)
-            self.forceSendRaffleParticipants(self)
-          })
+          const user = global.users.get(item.username)
+          item.eligible = _.isUndefined(user.is.follower) ? false : user.is.follower
+          global.botDB.update({ _id: item._id }, item)
+          self.forceSendRaffleParticipants(self)
         }
       }
     })

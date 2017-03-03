@@ -3,7 +3,6 @@
 // 3rdparty libraries
 var _ = require('lodash')
 // bot libraries
-var User = require('../user')
 var constants = require('../constants')
 var log = global.log
 
@@ -55,15 +54,13 @@ Raffles.prototype.pick = function (self, sender) {
     if (_.isNull(winner.username)) {
       global.commons.sendMessage(global.translate('raffle.pick.noParticipants'), sender)
     } else {
-      var user = new User(winner.username)
-      user.isLoaded().then(function () {
-        global.botDB.update({_id: 'raffle'}, {$set: { winner: user, locked: true, timestamp: new Date().getTime() }})
-        global.commons.sendMessage(global.translate('raffle.pick.winner')
-          .replace('(winner)', winner.username), sender)
-        global.parser.unregister('!' + self.keyword)
-        global.widgets.raffles.sendWinner(global.widgets.raffles, user)
-        clearInterval(self.timer)
-      })
+      const user = global.users.get(winner.username)
+      global.botDB.update({_id: 'raffle'}, {$set: { winner: user, locked: true, timestamp: new Date().getTime() }})
+      global.commons.sendMessage(global.translate('raffle.pick.winner')
+        .replace('(winner)', winner.username), sender)
+      global.parser.unregister('!' + self.keyword)
+      global.widgets.raffles.sendWinner(global.widgets.raffles, user)
+      clearInterval(self.timer)
     }
   })
 }
@@ -77,11 +74,9 @@ Raffles.prototype.participate = function (self, sender) {
         forced: false,
         username: sender.username }
       if (item.followers) {
-        var user = new User(sender.username)
-        user.isLoaded().then(function () {
-          participant.eligible = user.get('isFollower')
-          global.botDB.insert(participant)
-        })
+        const user = global.users.get(sender.username)
+        participant.eligible = _.isUndefined(user.is.follower) ? false : user.is.follower
+        global.botDB.insert(participant)
       } else { global.botDB.insert(participant) }
     }
   })
