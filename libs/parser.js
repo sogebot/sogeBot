@@ -119,38 +119,32 @@ Parser.prototype.isOwner = function (user) {
 Parser.prototype.parseMessage = async function (message, attr) {
   let random = {
     '(random.online.viewer)': async function () {
-      let onlineViewers = await global.asyncBotDB.find({
-        $where: function () {
-          return this._id.startsWith('user_') && this.isOnline && this.username.toLowerCase() !== global.configuration.get().twitch.username
-        }
-      })
+      let onlineViewers = global.users.getAll({ is: { online: true } })
       if (onlineViewers.length === 0) return 'unknown'
       return onlineViewers[_.random(0, onlineViewers.length - 1)].username
     },
     '(random.online.follower)': async function () {
-      let onlineFollower = await global.asyncBotDB.find({
-        $where: function () {
-          return this._id.startsWith('user_') && this.isOnline && (!_.isUndefined(this.isFollower) && this.isFollower) && this.username.toLowerCase() !== global.configuration.get().twitch.username
-        }
-      })
+      let onlineFollower = global.users.getAll({ is: { online: true, follower: true } })
       if (onlineFollower.length === 0) return 'unknown'
       return onlineFollower[_.random(0, onlineFollower.length - 1)].username
     },
+    '(random.online.subscriber)': async function () {
+      let onlineSubscriber = global.users.getAll({ is: { online: true, subscriber: true } })
+      if (onlineSubscriber.length === 0) return 'unknown'
+      return onlineSubscriber[_.random(0, onlineSubscriber.length - 1)].username
+    },
     '(random.viewer)': async function () {
-      let viewer = await global.asyncBotDB.find({
-        $where: function () {
-          return this._id.startsWith('user_') && this.username.toLowerCase() !== global.configuration.get().twitch.username
-        }
-      })
+      let viewer = global.users.getAll()
       if (viewer.length === 0) return 'unknown'
       return viewer[_.random(0, viewer.length - 1)].username
     },
     '(random.follower)': async function () {
-      let follower = await global.asyncBotDB.find({
-        $where: function () {
-          return this._id.startsWith('user_') && (!_.isUndefined(this.isFollower) && this.isFollower) && this.username.toLowerCase() !== global.configuration.get().twitch.username
-        }
-      })
+      let follower = global.users.getAll({ is: { follower: true } })
+      if (follower.length === 0) return 'unknown'
+      return follower[_.random(0, follower.length - 1)].username
+    },
+    '(random.subscriber)': async function () {
+      let follower = global.users.getAll({ is: { subscriber: true } })
       if (follower.length === 0) return 'unknown'
       return follower[_.random(0, follower.length - 1)].username
     },
