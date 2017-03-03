@@ -13,7 +13,7 @@ function Users () {
 
   var self = this
   setInterval(function () {
-    self.changes += 2000 // force every 15min to save changes
+    self.changes += 500 // force every 15min to save changes
   }, 15 * 60 * 1000)
 }
 
@@ -33,7 +33,7 @@ Users.prototype._update = function (self) {
 }
 
 Users.prototype._save = function (self) {
-  if (self.changes >= 2000) {
+  if (self.changes >= 500) {
     self.changes = 0
     var users = { users: self.users }
     global.botDB.update({ _id: 'users' }, { $set: users }, { upsert: true })
@@ -71,7 +71,7 @@ Users.prototype.getAll = function (object) {
   return this.users
 }
 
-Users.prototype.set = function (username, object, silent = true) {
+Users.prototype.set = function (username, object, silent = false) {
   if (username === global.configuration.get().twitch.username) return // it shouldn't happen, but there can be more than one instance of a bot
   let user = _.isUndefined(this.users[username]) ? {} : this.users[username]
   this.users[username] = _.merge(user, object)
@@ -82,7 +82,7 @@ Users.prototype.set = function (username, object, silent = true) {
   if (_.isUndefined(this.users[username].is)) this.users[username].is = {}
   if (_.isUndefined(this.users[username].stats)) this.users[username].stats = {}
 
-  if (silent) this.changes += 1
+  if (!silent) this.changes += 1
 }
 
 Users.prototype.setAll = function (object) {
