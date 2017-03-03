@@ -5,11 +5,11 @@
       <thead>
         <tr>
           <th>Username</th>
-          <th>Follower</th>
-          <th>Currently on Stream</th>
           <th data-sortable-type="numeric">Last Seen</th>
           <th data-sortable-type="numeric">Watched Time</th>
           <th data-sortable-type="numeric" id="viewers-points">Points</th>
+          <th data-sortable-type="numeric" id="viewers-messages">Messages</th>
+          <th data-sortable="false"></th>
           <th data-sortable="false"></th>
         </tr>
       </thead>
@@ -31,13 +31,14 @@
         item.points = _.isUndefined(item.points) ? 0 : item.points
         $("#Users").append('<tr>' +
           '<td>' + item.username + '</td>' +
-          '<td>' + viewers.styleBool(item.isFollower) + '</td>' +
-          '<td>' + viewers.styleBool(item.isOnline) + '</td>' +
-          '<td data-value=' + (_.isUndefined(item.lastMessageTime) ? 0 : item.lastMessageTime) + '>' + viewers.getDateString(item.lastMessageTime) + '</td>' +
-          '<td data-value=' + (_.isUndefined(item.watchTime) ? 0 : item.watchTime) + '>' + viewers.styleWatched(item.watchTime) + '</td>' +
+          '<td data-value=' + (_.isUndefined(item.time.message) ? 0 : item.time.message) + '>' + viewers.getDateString(item.time.message) + '</td>' +
+          '<td data-value=' + (_.isUndefined(item.time.watched) ? 0 : item.time.watched) + '>' + viewers.styleWatched(item.time.watched) + '</td>' +
           '<td id="viewers-points-data" data-value=' + item.points + '>' +
             '<abbr title="click to edit" data-id="' + item.username + '" onclick="viewers.pointsEditable(this)">' +  item.points + '</abbr>' +
             '<input id="points_' + item.username + '" style="width: 6em; display: none" class="form-control input-sm" type="text"/></td>' +
+          '<td data-value=' + (_.isUndefined(item.stats.messages) ? 0 : item.stats.messages) + '>' + (_.isUndefined(item.stats.messages) ? 0 : item.stats.messages) + '</td>' +
+          '<td style="font-weight: bold"><span class="' + (item.is.follower ? "text-success" : "text-danger") + '"> FOLLOWER </span>' +
+          '<span class="' + (item.is.online ? "text-success" : "text-danger") + '"> ONLINE </span></td>' +
           '<td class="tableMenu"><button type="button" class="btn btn-danger btn-xs" data-username="' + item.username + '" onclick="viewers.delete(this)">[x] Delete</button></td>' +
           '</tr>');
         if(!systems.points) {
@@ -45,11 +46,8 @@
         }
       })
     },
-    styleBool: function (bool) {
-      return '<strong style="font-size: x-large" class="text-' + (bool ? 'success' : 'danger') + '">' + (bool ? 'YES' : 'NO') + '</strong>'
-    },
     getDateString: function (timestamp) {
-      if (_.isUndefined(timestamp)) return 'never seen in chat'
+      if (_.isUndefined(timestamp) || timestamp === 0) return 'never seen in chat'
       else {
         d = new Date(timestamp)
         return ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +

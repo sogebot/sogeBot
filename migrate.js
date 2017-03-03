@@ -28,6 +28,8 @@ var migration = {
       await customCmdsDbUpdate_1_3()
       console.log('-> Keywords update')
       await keywordsDbUpdate_1_3()
+      console.log('-> Users update')
+      await usersDbUpdate_1_3()
     }
   }
 }
@@ -120,6 +122,52 @@ async function keywordsDbUpdate_1_3() {
     }
   }, { multi: true })
   await DB.update({ _id: 'keywords' }, { $set: kwdsUpdate }, { upsert: true })
+}
+
+async function removeFromDB(id) {
+  await DB.remove({ _id: id })
+}
+
+async function usersDbUpdate_1_3() {
+  let users = await DB.find({
+    $where: function () {
+      return this._id.startsWith('user_')
+    }
+  })
+  if (users.length === 0) return
+
+  let usersUpdate = { users: {} }
+  _.each(users, function (user) {
+    delete user._id
+
+    let time = {
+      message: (_.isUndefined(user.lastMessageTime)) ? 0 : user.lastMessageTime,
+      watched: (_.isUndefined(user.watchTime)) ? 0 : user.watchTime,
+      parted: (_.isUndefined(user.partedTime)) ? 0 : user.partedTime,
+      points: (_.isUndefined(user.pointsGrantedAt)) ? 0 : user.pointsGrantedAt
+    }
+    delete user.lastMessageTime
+    delete user.watchTime
+    delete user.partedTime
+    delete user.pointsGrantedAt
+    user.time = time
+
+    let is = {
+      online: false,
+      follower: (_.isUndefined(user.isFollower)) ? false : user.isFollower
+    }
+    delete user.isOnline
+    delete user.isFollower
+    user.is = is
+
+    usersUpdate.users[user.username] = user
+  })
+  await DB.remove({
+    $where: function () {
+      return this._id.startsWith('user_')
+    }
+  }, { multi: true })
+  await DB.update({ _id: 'users' }, { $set: usersUpdate }, { upsert: true })
 }
 
 async function removeFromDB(id) {

@@ -4,7 +4,6 @@
 var _ = require('lodash')
 // bot libraries
 var constants = require('../constants')
-var User = require('../user')
 
 function Points () {
   if (global.commons.isSystemEnabled(this)) {
@@ -88,8 +87,7 @@ Points.prototype.addEvents = function (self) {
 Points.prototype.setPoints = function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
-    var user = new User(parsed[1])
-    user.set('points', parseInt(parsed[2], 10))
+    global.users.set(parsed[1], { points: parseInt(parsed[2], 10) })
     global.commons.sendMessage(global.translate('points.success.set')
       .replace('(amount)', parsed[2])
       .replace('(username)', parsed[1])
@@ -103,28 +101,25 @@ Points.prototype.givePoints = function (self, sender, text) {
   try {
     var parsed = text.match(/^([[\u0500-\u052F\u0400-\u04FF\w]]+) ([0-9]+)$/)
     var givePts = parseInt(parsed[2], 10)
-    var fromUser = new User(sender.username)
-    var toUser = new User(parsed[1])
 
-    fromUser.isLoaded().then(function () {
-      var availablePts = parseInt(fromUser.get('points'), 10)
-      if (availablePts >= givePts) {
-        fromUser.set('points', availablePts - givePts)
-        toUser.isLoaded().then(function () {
-          var availablePts = parseInt(toUser.get('points'), 10)
-          toUser.set('points', (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts))
-          global.commons.sendMessage(global.translate('points.success.give')
-            .replace('(amount)', givePts)
-            .replace('(username)', parsed[1])
-            .replace('(pointsName)', self.getPointsName(givePts)), sender)
-        })
-      } else {
-        global.commons.sendMessage(global.translate('points.failed.giveNotEnough')
+    const user = global.users.get(sender.username)
+    const user2 = global.users.get(parsed[1])
+    if (parseInt(user.points, 10) >= givePts) {
+      let availablePts = user.points
+      global.users.set(sender.username, { points: availablePts - givePts })
+      global.users.set(parsed[2], { points:
+        (_.isFinite(parseInt(user2.points, 10)) && _.isNumber(parseInt(user2.points, 10))
+        ? parseInt(user2.points, 10) + givePts : givePts) })
+      global.commons.sendMessage(global.translate('points.success.give')
         .replace('(amount)', givePts)
         .replace('(username)', parsed[1])
         .replace('(pointsName)', self.getPointsName(givePts)), sender)
-      }
-    })
+    } else {
+      global.commons.sendMessage(global.translate('points.failed.giveNotEnough')
+      .replace('(amount)', givePts)
+      .replace('(username)', parsed[1])
+      .replace('(pointsName)', self.getPointsName(givePts)), sender)
+    }
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.give'), sender)
   }
@@ -181,15 +176,13 @@ Points.prototype.getPointsName = function (points) {
 Points.prototype.getPointsFromUser = function (self, sender, text) {
   try {
     var parsed = text.match(/^([[\u0500-\u052F\u0400-\u04FF\w]]+)$/)
-    var user = new User(parsed[1])
-    user.isLoaded().then(function () {
-      var pointsResponse = (global.configuration.getValue('pointsResponse').length > 0 ? global.configuration.getValue('pointsResponse') : global.translate('points.defaults.pointsResponse'))
-      var points = (_.isUndefined(user.get('points')) ? 0 : user.get('points'))
-      global.commons.sendMessage(pointsResponse
-        .replace('(amount)', points)
-        .replace('(username)', parsed[1])
-        .replace('(pointsName)', self.getPointsName(points)), sender)
-    })
+    const user = global.users.get(parsed[1])
+    var pointsResponse = (global.configuration.getValue('pointsResponse').length > 0 ? global.configuration.getValue('pointsResponse') : global.translate('points.defaults.pointsResponse'))
+    var points = (_.isUndefined(user.points) ? 0 : user.points)
+    global.commons.sendMessage(pointsResponse
+      .replace('(amount)', points)
+      .replace('(username)', parsed[1])
+      .replace('(pointsName)', self.getPointsName(points)), sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.get'), sender)
   }
@@ -199,18 +192,13 @@ Points.prototype.allPoints = function (self, sender, text) {
   try {
     var parsed = text.match(/^([0-9]+)$/)
     var givePts = parseInt(parsed[1], 10)
-    User.getAllOnline().then(function (users) {
-      _.each(users, function (user) {
-        user = new User(user.username)
-        user.isLoaded().then(function () {
-          var availablePts = parseInt(user.get('points'), 10)
-          user.set('points', (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts))
-        })
-      })
-      global.commons.sendMessage(global.translate('points.success.all')
-        .replace('(amount)', givePts)
-        .replace('(pointsName)', self.getPointsName(givePts)), sender)
+    _.each(global.users.getAll({ is: { online: true } }), function (user) {
+      var availablePts = parseInt(user.points, 10)
+      global.users.set(user.username, { points: (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts) })
     })
+    global.commons.sendMessage(global.translate('points.success.all')
+      .replace('(amount)', givePts)
+      .replace('(pointsName)', self.getPointsName(givePts)), sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.all'), sender)
   }
@@ -220,19 +208,14 @@ Points.prototype.rainPoints = function (self, sender, text) {
   try {
     var parsed = text.match(/^([0-9]+)$/)
     var givePts = parseInt(parsed[1], 10)
-    User.getAllOnline().then(function (users) {
-      _.each(users, function (user) {
-        var random = Math.floor(Math.random() * givePts)
-        user = new User(user.username)
-        user.isLoaded().then(function () {
-          var availablePts = parseInt(user.get('points'), 10)
-          user.set('points', (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + random : random))
-        })
-      })
-      global.commons.sendMessage(global.translate('points.success.rain')
-        .replace('(amount)', givePts)
-        .replace('(pointsName)', self.getPointsName(givePts)), sender)
+    _.each(global.users.getAll({ is: { online: true } }), function (user) {
+      var availablePts = parseInt(user.points, 10)
+      var random = Math.floor(Math.random() * givePts)
+      global.users.set(user.username, { points: (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + random : random) })
     })
+    global.commons.sendMessage(global.translate('points.success.rain')
+      .replace('(amount)', givePts)
+      .replace('(pointsName)', self.getPointsName(givePts)), sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.rain'), sender)
   }
@@ -241,12 +224,10 @@ Points.prototype.rainPoints = function (self, sender, text) {
 Points.prototype.addPoints = function (self, sender, text) {
   try {
     var parsed = text.match(/^([[\u0500-\u052F\u0400-\u04FF\w]]+) ([0-9]+)$/)
-    var user = new User(parsed[1])
+    const user = global.users.get(parsed[1])
     var givePts = parseInt(parsed[2], 10)
-    user.isLoaded().then(function (users) {
-      var availablePts = parseInt(user.get('points'), 10)
-      user.set('points', (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts))
-    })
+    var availablePts = parseInt(user.points, 10)
+    global.users.set(parsed[1], { points: (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts) })
     global.commons.sendMessage(global.translate('points.success.add')
       .replace('(amount)', givePts)
       .replace('(username)', parsed[1])
@@ -259,13 +240,11 @@ Points.prototype.addPoints = function (self, sender, text) {
 Points.prototype.removePoints = function (self, sender, text) {
   try {
     var parsed = text.match(/^([[\u0500-\u052F\u0400-\u04FF\w]]+) ([0-9]+)$/)
-    var user = new User(parsed[1])
+    const user = global.users.get(parsed[1])
     var removePts = parseInt(parsed[2], 10)
-    user.isLoaded().then(function (users) {
-      var availablePts = parseInt(user.get('points'), 10)
-      if (availablePts > removePts) user.set('points', (_.isFinite(availablePts) && !_.isNumber(availablePts) ? availablePts - removePts : 0))
-      else user.set('points', 0)
-    })
+    var availablePts = parseInt(user.points, 10)
+    if (availablePts > removePts) global.users.set(user.username, { points: (_.isFinite(availablePts) && !_.isNumber(availablePts) ? availablePts - removePts : 0) })
+    else global.users.set(user.username, { points: 0 })
     global.commons.sendMessage(global.translate('points.success.remove')
       .replace('(amount)', removePts)
       .replace('(username)', parsed[1])
@@ -280,28 +259,20 @@ Points.prototype.getPoints = function (self, sender) {
 }
 
 Points.prototype.startCounting = function (username) {
-  var user = new User(username)
-  user.isLoaded().then(function () {
-    user.set('pointsGrantedAt', parseInt(new Date().getTime(), 10))
-  })
+  global.users.set(username, { time: { points: parseInt(new Date().getTime(), 10) } })
 }
 
 Points.prototype.updatePoints = function () {
   var interval = (global.twitch.isOnline ? global.configuration.getValue('pointsInterval') * 60 * 1000 : global.configuration.getValue('pointsIntervalOffline') * 60 * 1000)
   var ptsPerInterval = (global.twitch.isOnline ? global.configuration.getValue('pointsPerInterval') : global.configuration.getValue('pointsPerIntervalOffline'))
 
-  User.getAllOnline().then(function (users) {
-    _.each(users, function (user) {
-      user.pointsGrantedAt = _.isUndefined(user.pointsGrantedAt) ? 0 : user.pointsGrantedAt
-      if (new Date().getTime() - user.pointsGrantedAt >= interval) {
-        user = new User(user.username)
-        user.isLoaded().then(function () {
-          var availablePts = parseInt(user.get('points'), 10)
-          user.set('points', (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + ptsPerInterval : ptsPerInterval))
-          user.set('pointsGrantedAt', new Date().getTime())
-        })
-      }
-    })
+  _.each(global.users.getAll({ is: { online: true } }), function (user) {
+    user.time.points = _.isUndefined(user.time.points) ? 0 : user.time.points
+    if (new Date().getTime() - user.time.points >= interval) {
+      let availablePts = parseInt(user.points, 10)
+      global.users.set(user.username, { points: (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + ptsPerInterval : ptsPerInterval) })
+      global.users.set(user.username, { time: { points: new Date().getTime() } })
+    }
   })
 }
 

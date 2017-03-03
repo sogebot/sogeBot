@@ -6,7 +6,6 @@ var crypto = require('crypto')
 
 // bot libraries
 var constants = require('../constants')
-var User = require('../user')
 var Points = require('./points')
 var log = global.log
 
@@ -144,27 +143,26 @@ Bets.prototype.saveBet = function (self, sender, text) {
     if (!_.isUndefined(_.find(self.bet.bets, function (o, i) { return _.includes(Object.keys(o), sender.username) && i !== bet.option }))) throw Error(ERROR_DIFF_BET)
 
     var percentGain = (Object.keys(self.bet.bets).length * parseInt(global.configuration.getValue('betPercentGain'), 10)) / 100
-    var user = new User(sender.username)
-    user.isLoaded().then(function () {
-      var availablePts = parseInt(user.get('points'), 10)
-      var removePts = parseInt(bet.amount, 10)
-      if (!_.isFinite(availablePts) || !_.isNumber(availablePts) || availablePts < removePts) {
-        global.commons.sendMessage(global.translate('bets.notEnoughPoints')
-          .replace('(amount)', removePts)
-          .replace('(pointsName)', Points.getPointsName(removePts)), sender)
-      } else {
-        var newBet = _.isUndefined(self.bet.bets[bet.option][sender.username]) ? removePts : parseInt(self.bet.bets[bet.option][sender.username], 10) + removePts
-        self.bet.bets[bet.option][sender.username] = newBet
-        user.set('points', availablePts - removePts)
 
-        global.commons.sendMessage(global.translate('bets.newBet')
-          .replace('(option)', bet.option)
-          .replace('(amount)', newBet)
-          .replace('(pointsName)', Points.getPointsName(newBet))
-          .replace('(winAmount)', Math.round((parseInt(newBet, 10) * percentGain)))
-          .replace('(winPointsName)', Points.getPointsName(Math.round((parseInt(newBet, 10) * percentGain)))), sender)
-      }
-    })
+    const user = global.users.get(sender.username)
+    var availablePts = parseInt(user.points, 10)
+    var removePts = parseInt(bet.amount, 10)
+    if (!_.isFinite(availablePts) || !_.isNumber(availablePts) || availablePts < removePts) {
+      global.commons.sendMessage(global.translate('bets.notEnoughPoints')
+        .replace('(amount)', removePts)
+        .replace('(pointsName)', Points.getPointsName(removePts)), sender)
+    } else {
+      var newBet = _.isUndefined(self.bet.bets[bet.option][sender.username]) ? removePts : parseInt(self.bet.bets[bet.option][sender.username], 10) + removePts
+      self.bet.bets[bet.option][sender.username] = newBet
+      global.users.set(sender.username, { points: availablePts - removePts })
+
+      global.commons.sendMessage(global.translate('bets.newBet')
+        .replace('(option)', bet.option)
+        .replace('(amount)', newBet)
+        .replace('(pointsName)', Points.getPointsName(newBet))
+        .replace('(winAmount)', Math.round((parseInt(newBet, 10) * percentGain)))
+        .replace('(winPointsName)', Points.getPointsName(Math.round((parseInt(newBet, 10) * percentGain)))), sender)
+    }
   } catch (e) {
     switch (e.message) {
       case ERROR_ZERO_BET:
@@ -195,12 +193,10 @@ Bets.prototype.refundAll = function (self, sender) {
     if (_.isNull(self.bet)) throw Error(ERROR_NOT_RUNNING)
     _.each(self.bet.bets, function (users) {
       _.each(users, function (bet, buser) {
-        var user = new User(buser)
-        user.isLoaded().then(function () {
-          var availablePts = parseInt(user.get('points'), 10)
-          var addPts = parseInt(bet, 10)
-          user.set('points', availablePts + addPts)
-        })
+        const user = global.users.get(buser)
+        var availablePts = parseInt(user.points, 10)
+        var addPts = parseInt(bet, 10)
+        global.users.set(buser, { points: availablePts + addPts })
       })
     })
     global.commons.sendMessage(global.translate('bets.refund'), sender)
@@ -230,12 +226,10 @@ Bets.prototype.close = function (self, sender, text) {
     var percentGain = (Object.keys(self.bet.bets).length * parseInt(global.configuration.getValue('betPercentGain'), 10)) / 100
     _.each(self.bet.bets[wOption], function (bet, buser) {
       usersToPay.push(buser)
-      var user = new User(buser)
-      user.isLoaded().then(function () {
-        var availablePts = parseInt(user.get('points'), 10)
-        var addPts = parseInt(bet, 10) + Math.round((parseInt(bet, 10) * percentGain))
-        user.set('points', availablePts + addPts)
-      })
+      const user = global.users.get(buser)
+      var availablePts = parseInt(user.points, 10)
+      var addPts = parseInt(bet, 10) + Math.round((parseInt(bet, 10) * percentGain))
+      global.users.set(buser, { points: availablePts + addPts })
     })
 
     global.commons.sendMessage(global.translate('bets.closed')

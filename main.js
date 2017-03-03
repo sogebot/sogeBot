@@ -2,13 +2,14 @@
 
 // 3rd party libraries
 var irc = require('tmi.js')
+var _ = require('lodash')
 
 // bot libraries
 var Configuration = require('./libs/configuration')
 var Parser = require('./libs/parser')
 var Twitch = require('./libs/twitch')
 var Commons = require('./libs/commons')
-var User = require('./libs/user')
+var Users = require('./libs/users')
 var Panel = require('./libs/panel')
 var Stats = require('./libs/stats')
 var Watcher = require('./libs/watcher')
@@ -16,6 +17,7 @@ var constants = require('./libs/constants')
 require('./libs/logging')
 
 global.watcher = new Watcher()
+global.users = new Users()
 global.parser = new Parser()
 global.configuration = new Configuration()
 global.commons = new Commons()
@@ -76,24 +78,22 @@ global.client.on('disconnected', function (address, port) {
   global.status.TMI = constants.DISCONNECTED
 })
 
-global.client.on('message', function (channel, user, message, fromSelf) {
+global.client.on('message', function (channel, sender, message, fromSelf) {
   if (!fromSelf) {
-    global.parser.parse(user, message)
+    global.parser.parse(sender, message)
+
+    const user = global.users.get(sender.username)
+    let msgs = _.isUndefined(user.stats.messages) ? 1 : user.stats.messages + 1
+    global.users.set(user.username, { stats: { messages: msgs } }, true)
   }
 })
 
 global.client.on('join', function (channel, username, fromSelf) {
-  if (!fromSelf) {
-    var user = new User(username)
-    user.setOnline()
-  }
+  if (!fromSelf) { global.users.set(username, { is: { online: false }}) }
 })
 
 global.client.on('part', function (channel, username, fromSelf) {
-  if (!fromSelf) {
-    var user = new User(username)
-    user.setOffline()
-  }
+  if (!fromSelf) { global.users.set(username, { is: { online: false }}) }
 })
 
 // Bot is checking if it is a mod
