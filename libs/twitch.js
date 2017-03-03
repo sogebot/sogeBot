@@ -1,7 +1,6 @@
 'use strict'
 
 var constants = require('./constants')
-var User = require('./user')
 var moment = require('moment')
 var _ = require('lodash')
 require('moment-precise-range-plugin')
@@ -72,24 +71,21 @@ function Twitch () {
         return
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
-        if (self.currentFollowers !== body._total) User.updateFollowers()
+        if (self.currentFollowers !== body._total) global.users.updateFollowers()
         self.currentFollowers = body._total
       }
     })
 
     // count watching time when stream is online
     if (self.isOnline) {
-      User.getAllOnline().then(function (users) {
-        _.each(users, function (user) {
-          // add user as a new chatter in a stream
-          if (_.isUndefined(user.watchTime) || user.watchTime === 0) self.newChatters = self.newChatters + 1
-          var watchTime = 15000
-          if (!_.isUndefined(user.watchTime)) watchTime = watchTime + user.watchTime
-          user = new User(user.username)
-          user.isLoaded().then(function () {
-            user.set('watchTime', watchTime)
-          })
-        })
+      const users = global.users.getAll({ is: { online: true }})
+      _.each(users, function (user) {
+        var watchTime = 15000
+
+        // add user as a new chatter in a stream
+        if (_.isUndefined(user.time.watched) || user.time.watched === 0) self.newChatters = self.newChatters + 1
+        const time = (!_.isUndefined(user.time.watched)) ? 15000 + user.time.watched : 15000
+        global.users.set(user.username, { time: { watched: time }})
       })
     }
   }, 15000)
@@ -145,7 +141,6 @@ function Twitch () {
   global.parser.register(this, '!lastseen', this.lastseen, constants.VIEWERS)
   global.parser.register(this, '!watched', this.watched, constants.VIEWERS)
   global.parser.register(this, '!me', this.showMe, constants.VIEWERS)
-  global.parser.register(this, '!top', this.showTop, constants.OWNER_ONLY)
   global.parser.register(this, '!title', this.setTitle, constants.OWNER_ONLY)
   global.parser.register(this, '!game', this.setGame, constants.OWNER_ONLY)
 
@@ -245,30 +240,22 @@ Twitch.prototype.lastseenUpdate = function (self, id, sender, text) {
     global.updateQueue(id, true)
     return
   }
-
-  var user = new User(sender.username)
-  user.isLoaded().then(function () {
-    user.set('lastMessageTime', new Date().getTime())
-    user.setOnline()
-  })
+  global.users.set(sender.username, { time: { message: new Date().getTime() }})
+  if (!global.users.get(sender.username).is.online) global.users.set(sender.username, { is: { online: true }})
   global.updateQueue(id, true)
 }
 
 Twitch.prototype.lastseen = function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    var user = new User(parsed[0])
-    user.isLoaded().then(function () {
-      var lastMessageTime = user.get('lastMessageTime')
-      if (_.isNull(lastMessageTime) || _.isUndefined(lastMessageTime)) {
-        global.commons.sendMessage(global.translate('lastseen.success.never').replace('(username)', parsed[0]), sender)
-      } else {
-        var timestamp = moment.unix(lastMessageTime / 1000)
-        global.commons.sendMessage(global.translate('lastseen.success.time')
-          .replace('(username)', parsed[0])
-          .replace('(when)', timestamp.format('DD-MM-YYYY HH:mm:ss')), sender)
-      }
-    })
+    const user = global.users.get(parsed[0])
+    if (_.isNull(user.time.message) || _.isUndefined(user.time.message)) {
+      global.commons.sendMessage(global.translate('lastseen.success.never').replace('(username)', parsed[0]), sender)
+    } else {
+      global.commons.sendMessage(global.translate('lastseen.success.time')
+        .replace('(username)', parsed[0])
+        .replace('(when)', moment.unix(user.time.message / 1000).format('DD-MM-YYYY HH:mm:ss')), sender)
+    }
   } catch (e) {
     global.commons.sendMessage(global.translate('lastseen.failed.parse'), sender)
   }
@@ -276,20 +263,12 @@ Twitch.prototype.lastseen = function (self, sender, text) {
 
 Twitch.prototype.watched = function (self, sender, text) {
   try {
-    var user
-    if (text.trim() < 1) user = new User(sender.username)
-    else {
-      var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-      user = new User(parsed[0])
-    }
-    user.isLoaded().then(function () {
-      var watchTime = user.get('watchTime')
-      watchTime = _.isFinite(parseInt(watchTime, 10)) && _.isNumber(parseInt(watchTime, 10)) ? watchTime : 0
-      var watched = watchTime / 1000 / 60 / 60
-      global.commons.sendMessage(global.translate('watched.success.time')
-        .replace('(time)', watched.toFixed(1))
-        .replace('(username)', '@' + user.username), sender)
-    })
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+    const user = global.users.get(text.trim() < 1 ? sender.username : parsed[0])
+    var watched = parseInt(user.time.watched) / 1000 / 60 / 60
+    global.commons.sendMessage(global.translate('watched.success.time')
+      .replace('(time)', watched.toFixed(1))
+      .replace('(username)', '@' + user.username), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('watched.failed.parse'), sender)
   }
@@ -297,54 +276,21 @@ Twitch.prototype.watched = function (self, sender, text) {
 
 Twitch.prototype.showMe = function (self, sender, text) {
   try {
-    var user = new User(sender.username)
-    user.isLoaded().then(function () {
-      var message = ['@' + sender.username]
-      // rank
-      var rank = !_.isUndefined(user.get('rank')) ? user.get('rank') : null
-      if (global.configuration.get().systems.ranks === true && !_.isNull(rank)) message.push(rank)
+    const user = global.users.get(sender.username)
+    var message = ['@' + sender.username]
+    // rank
+    var rank = !_.isUndefined(user.rank) ? user.rank : null
+    if (global.configuration.get().systems.ranks === true && !_.isNull(rank)) message.push(rank)
 
-      // watchTime
-      var watchTime = user.get('watchTime')
-      watchTime = _.isFinite(parseInt(watchTime, 10)) && _.isNumber(parseInt(watchTime, 10)) ? watchTime : 0
-      message.push((watchTime / 1000 / 60 / 60).toFixed(1) + 'h')
+    // watchTime
+    var watchTime = _.isFinite(parseInt(user.time.watched, 10)) && _.isNumber(parseInt(user.time.watched, 10)) ? user.time.watched : 0
+    message.push((user.time.watched / 1000 / 60 / 60).toFixed(1) + 'h')
 
-      // points
-      var points = !_.isUndefined(user.get('points')) ? user.get('points') : 0
-      if (global.configuration.get().systems.points === true) message.push(points + ' ' + global.systems.points.getPointsName(points))
+    // points
+    var points = !_.isUndefined(user.points) ? user.points : 0
+    if (global.configuration.get().systems.points === true) message.push(points + ' ' + global.systems.points.getPointsName(points))
 
-      global.commons.sendMessage(message.join(' | '), sender)
-    })
-  } catch (e) {
-    global.log.error(e)
-  }
-}
-
-Twitch.prototype.showTop = function (self, sender, text) {
-  try {
-    var parsed = text.match(/^(watched|points) (\d+)$/)
-    if (parsed[1] === 'watched') parsed[1] = 'watchTime'
-    var orderBy = {}; orderBy[parsed[1]] = -1
-    global.botDB.find({$where: function () {
-      return this._id.startsWith('user') &&
-        this._id !== 'user_' + global.configuration.get().twitch.username &&
-        this._id !== 'user_' + global.configuration.get().twitch.channel
-    }})
-    .limit(parsed[2])
-    .sort(orderBy).exec(function (err, items) {
-      if (err) global.log.error(err)
-
-      global.commons.sendMessage(global.translate(parsed[1] === 'watchTime' ? 'top.listWatched' : 'top.listPoints').replace('(amount)', parsed[2]))
-      var index = 0
-      _.each(items, function (item) {
-        index = index + 1
-        if (parsed[1] === 'watchTime') {
-          global.commons.sendMessage(index + '. ' + '@' + item.username + ' - ' + (!_.isUndefined(item.watchTime) ? item.watchTime / 1000 / 60 / 60 : 0).toFixed(1) + 'h', sender)
-        } else {
-          global.commons.sendMessage(index + '. ' + '@' + item.username + ' - ' + (!_.isUndefined(item.points) ? item.points + ' ' + global.systems.points.getPointsName(item.points) : 0 + ' ' + global.systems.points.getPointsName(0)), sender)
-        }
-      })
-    })
+    global.commons.sendMessage(message.join(' | '), sender)
   } catch (e) {
     global.log.error(e)
   }
