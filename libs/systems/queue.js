@@ -1,10 +1,7 @@
 'use strict'
 
-// 3rdparty libraries
-var _ = require('lodash')
 // bot libraries
 var constants = require('../constants')
-var log = global.log
 
 /*
  * !queue               - gets an info whether queue is opened or closed
