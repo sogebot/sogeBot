@@ -13,7 +13,7 @@ function Users () {
 
   var self = this
   setInterval(function () {
-    self.changes += 500 // force every 15min to save changes
+    self.changes += 2000 // force every 15min to save changes
   }, 15 * 60 * 1000)
 }
 
@@ -33,7 +33,7 @@ Users.prototype._update = function (self) {
 }
 
 Users.prototype._save = function (self) {
-  if (self.changes >= 500) {
+  if (self.changes >= 2000) {
     self.changes = 0
     var users = { users: self.users }
     global.botDB.update({ _id: 'users' }, { $set: users }, { upsert: true })
