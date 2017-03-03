@@ -78,14 +78,12 @@ function Twitch () {
 
     // count watching time when stream is online
     if (self.isOnline) {
-      const users = global.users.getAll({ is: { online: true }})
+      const users = global.users.getAll({ is: { online: true } })
       _.each(users, function (user) {
-        var watchTime = 15000
-
         // add user as a new chatter in a stream
         if (_.isUndefined(user.time.watched) || user.time.watched === 0) self.newChatters = self.newChatters + 1
         const time = (!_.isUndefined(user.time.watched)) ? 15000 + user.time.watched : 15000
-        global.users.set(user.username, { time: { watched: time }})
+        global.users.set(user.username, { time: { watched: time } })
       })
     }
   }, 15000)
@@ -240,8 +238,8 @@ Twitch.prototype.lastseenUpdate = function (self, id, sender, text) {
     global.updateQueue(id, true)
     return
   }
-  global.users.set(sender.username, { time: { message: new Date().getTime() }})
-  if (!global.users.get(sender.username).is.online) global.users.set(sender.username, { is: { online: true }})
+  global.users.set(sender.username, { time: { message: new Date().getTime() } })
+  if (!global.users.get(sender.username).is.online) global.users.set(sender.username, { is: { online: true } })
   global.updateQueue(id, true)
 }
 
@@ -284,7 +282,7 @@ Twitch.prototype.showMe = function (self, sender, text) {
 
     // watchTime
     var watchTime = _.isFinite(parseInt(user.time.watched, 10)) && _.isNumber(parseInt(user.time.watched, 10)) ? user.time.watched : 0
-    message.push((user.time.watched / 1000 / 60 / 60).toFixed(1) + 'h')
+    message.push((watchTime / 1000 / 60 / 60).toFixed(1) + 'h')
 
     // points
     var points = !_.isUndefined(user.points) ? user.points : 0

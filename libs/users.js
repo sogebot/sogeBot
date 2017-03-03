@@ -15,7 +15,6 @@ function Users () {
   setInterval(function () {
     self.changes += 500 // force every 15min to save changes
   }, 15 * 60 * 1000)
-
 }
 
 Users.prototype._update = function (self) {
@@ -27,7 +26,7 @@ Users.prototype._update = function (self) {
     self.users = item.users
 
     // set all users offline
-    _.each(global.users.getAll({is: { online : true }}), function (user) {
+    _.each(global.users.getAll({is: { online: true }}), function (user) {
       global.users.set(user.username, {is: { online: false }}, true)
     })
   })
@@ -44,19 +43,19 @@ Users.prototype._save = function (self) {
 Users.prototype.get = function (username) {
   let user = _.isUndefined(this.users[username]) ? {} : this.users[username]
   if (_.isUndefined(user.id)) {
-      global.client.api({
-        url: 'https://api.twitch.tv/kraken/users?login=' + self.username,
-        headers: {
-          Accept: 'application/vnd.twitchtv.v5+json',
-          'Client-ID': global.configuration.get().twitch.clientId
-        }
-      }, function (err, res, body) {
-        if (err) {
-          global.log.error(err)
-          return
-        }
-        global.users.set(username, 'id', body.users[0]._id)
-      })
+    global.client.api({
+      url: 'https://api.twitch.tv/kraken/users?login=' + username,
+      headers: {
+        Accept: 'application/vnd.twitchtv.v5+json',
+        'Client-ID': global.configuration.get().twitch.clientId
+      }
+    }, function (err, res, body) {
+      if (err) {
+        global.log.error(err)
+        return
+      }
+      global.users.set(username, 'id', body.users[0]._id)
+    })
   }
   return user
 }
@@ -76,7 +75,6 @@ Users.prototype.updateFollowers = function () {
   console.log('updating followers')
 }
 /*
-
 
 User.deleteFollowers = function () {
   return new Promise(function (resolve, reject) {
