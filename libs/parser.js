@@ -53,14 +53,17 @@ Parser.prototype.addToQueue = async function (user, message) {
 }
 
 Parser.prototype.processQueue = async function (id) {
-  while (!_.isUndefined(queue[id]) && new Date().getTime() - queue[id].user['tmi-sent-ts'] < 1000) {
+  while (!_.isUndefined(queue[id])) {
+    if (new Date().getTime() - queue[id].user['tmi-sent-ts'] < 1000) {
+      global.removeFromQueue(id)
+      break
+    }
+
     if (queue.hasOwnProperty(id) && queue[id].success === queue[id].started) {
       this.parseCommands(queue[id].user, queue[id].message)
       global.removeFromQueue(id)
     }
   }
-  // cleanup if something went wrong
-  global.removeFromQueue(id)
 }
 
 Parser.prototype.parseCommands = async function (user, message) {
