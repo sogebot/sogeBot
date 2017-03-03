@@ -25,7 +25,6 @@ describe('System - Moderation', function () {
       it('will not timeout user', function (done) {
         global.parser.parse(testUser2, 'http://www.google.com')
         setTimeout(function () {
-          console.log(global.timeouts)
           expect(global.timeouts).to.be.empty
           done()
         }, 500)
