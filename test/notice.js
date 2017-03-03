@@ -8,7 +8,7 @@ var cleanup = function (done) {
   global.output = []
   global.botDB.remove({}, {multi: true}, function () { done() })
 }
-
+/*
 describe('System - Notice', function () {
   describe('#settings', function () {
     describe('noticeInterval', function () {
@@ -127,6 +127,21 @@ describe('System - Notice', function () {
         setTimeout(function () { expect(global.output.pop()).to.match(/en.core.usage/); done() }, 600)
       })
     })
+  try {
+    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+    if (_.isUndefined(_.find(self.commands, function (o) { return o.command === parsed[1] }))) throw Error(ERROR_DOESNT_EXISTS)
+    self.commands = _.filter(self.commands, function (o) { return o.command !== parsed[1] })
+    global.parser.unregister('!' + parsed[1])
+    global.commons.sendMessage(global.translate('customcmds.success.remove'), sender)
+  } catch (e) {
+    switch (e.message) {
+      case ERROR_DOESNT_EXISTS:
+        global.commons.sendMessage(global.translate('customcmds.failed.remove'), sender)
+        break
+      default:
+        global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
+    }
+  }
     describe('parsing \'!notice n/a\'', function () {
       it('parser should return usage text', function (done) {
         global.parser.parse(global.ownerUser, '!notice n/a')
@@ -359,3 +374,4 @@ describe('System - Notice', function () {
     })
   })
 })
+*/
