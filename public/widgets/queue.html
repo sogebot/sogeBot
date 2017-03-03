@@ -37,9 +37,7 @@
     </div> <!-- /MAIN -->
 
     <div role="tabpanel" class="tab-pane" id="queue-pick">
-      <div class="queue-list-group list-group" id="queue-pick-list">
-      </div>
-      <div class="clearfix"></div>
+      <div id="queue-pick-list"></div>
     </div> <!-- /PICK -->
 
     <div role="tabpanel" class="tab-pane" id="queue-settings">
@@ -84,8 +82,22 @@
 
         this.el.pickList.empty()
         var self = this
-        _.each(queue.picked, function (value) {
-          self.el.pickList.append('<span class="queue-list-group-item list-group-item">' + value.replace('@', '') + '</span>')
+        _.each(queue.picked, function (value, key) {
+          if (key === queue.picked.length - 1) {
+            self.el.pickList.append(
+              '<div style="text-align: center"><strong style="font-size: 30px"><i class="fa fa-twitch" aria-hidden="true"></i> <span class="raffles-winner-name"> ' + value.username + ' </span></strong></div>'
+              + '<div class="text-center"><div class="btn-group" role="group">'
+              + '<button type="button" class="btn btn-link" disabled="disabled"><span style="color: ' + (value.is.follower ? 'green' : 'red') + '"><i class="fa ' + (value.is.follower ? 'fa-check' : 'fa-close') + '"></i> Following</span></button>'
+              + '<button type="button" class="btn btn-link" onclick="queue.pick()"><span style="color: gray"><i class="fa fa-refresh" aria-hidden="true"></i> Roll again</span></button>'
+              + '</div></div>'
+            )
+          } else {
+            self.el.pickList.append(
+              '<div style="text-align: center"><strong style="font-size: 30px"><i class="fa fa-twitch" aria-hidden="true"></i> <span class="raffles-winner-name"> ' + value.username + ' </span></strong></div>'
+              + '<div class="text-center"><div class="btn-group" role="group">'
+              + '<button type="button" class="btn btn-link" disabled="disabled"><span style="color: ' + (value.is.follower ? 'green' : 'red') + '"><i class="fa ' + (value.is.follower ? 'fa-check' : 'fa-close') + '"></i> Following</span></button>'
+              + '</div></div>')
+          }
         })
       },
       users: function () {
