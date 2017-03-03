@@ -7,7 +7,12 @@ var _ = require('lodash')
 var constants = require('../constants')
 var log = global.log
 
+const ERROR_ALREADY_EXISTS = '0'
+const ERROR_DOESNT_EXISTS = '1'
+
 function Notice () {
+  this.notices = []
+
   this.lastNoticeSent = new Date().getTime()
   this.msgCountSent = global.parser.linesParsed
 
@@ -23,14 +28,33 @@ function Notice () {
     global.configuration.register('noticeInterval', 'notice.settings.noticeInterval', 'number', 10)
     global.configuration.register('noticeMsgReq', 'notice.settings.noticeMsgReq', 'number', 10)
 
+    global.watcher.watch(this, 'notices', this._save)
+    this._update(this)
+
+    this.webPanel()
+
     // start interval for posting notices
     var self = this
     setInterval(function () {
       self.send()
     }, 1000)
-
-    this.webPanel()
   }
+}
+
+Notice.prototype._update = function (self) {
+  global.botDB.findOne({ _id: 'notices' }, function (err, item) {
+    if (err) return log.error(err)
+    if (_.isNull(item)) return
+
+    self.notices = item.notices
+  })
+}
+
+Notice.prototype._save = function (self) {
+  var notices = {
+    notices: self.notices
+  }
+  global.botDB.update({ _id: 'notices' }, { $set: notices }, { upsert: true })
 }
 
 Notice.prototype.webPanel = function () {
@@ -44,11 +68,7 @@ Notice.prototype.webPanel = function () {
 }
 
 Notice.prototype.sendNotices = function (self, socket) {
-  global.botDB.find({$where: function () { return this._id.startsWith('notice') }}, function (err, items) {
-    if (err) { log.error(err) }
-    items.forEach(function (e, i, ar) { e.id = e._id.split('_')[1] })
-    socket.emit('Notices', items)
-  })
+  socket.emit('Notices', self.notices)
 }
 
 Notice.prototype.deleteNotice = function (self, socket, data) {
@@ -74,18 +94,19 @@ Notice.prototype.send = function () {
   var now = new Date().getTime()
 
   if (now - this.lastNoticeSent >= timeIntervalInMs && global.parser.linesParsed - this.msgCountSent >= noticeMinChatMsg) {
-    var self = this
-    global.botDB.findOne({$where: function () { return this._id.startsWith('notice') }}).sort({ time: 1 }).exec(function (err, item) {
-      if (err) log.error(err)
-      if (typeof item !== 'undefined' && item !== null) {
-        global.botDB.update({_id: item._id}, {$set: {time: new Date().getTime()}}, {}, function () {
-          // reset counters
-          self.lastNoticeSent = new Date().getTime()
-          self.msgCountSent = global.parser.linesParsed
-          global.commons.sendMessage(item.text, {username: global.configuration.get().twitch.channel})
-        })
-      }
+    let notice = _.orderBy(this.notices, 'time', 'asc')[0]
+    if (_.isUndefined(notice)) return
+
+    this.lastNoticeSent = new Date().getTime()
+    this.msgCountSent = global.parser.linesParsed
+    global.commons.sendMessage(notice.text, {username: global.configuration.get().twitch.channel})
+
+    // update notice
+    notice.time = this.lastNoticeSent
+    this.notices = _.filter(this.notices, function (o) {
+      return o.id !== notice.id
     })
+    this.notices.push(notice)
   }
 }
 
@@ -95,47 +116,60 @@ Notice.prototype.help = function (self, sender) {
 
 Notice.prototype.add = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
-    var hash = crypto.createHash('md5').update(parsed[0]).digest('hex').substring(0, 5)
-    global.commons.insertIfNotExists({__id: 'notice_' + hash, _text: parsed[0], time: new Date().getTime(), success: 'notice.success.add', error: 'notice.failed.add'})
+    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
+    let notice = { text: parsed[0], time: new Date().getTime(), id: crypto.createHash('md5').update(parsed[0]).digest('hex').substring(0, 5) }
+    if (!_.isUndefined(_.find(self.notices, function (o) { return o.id === notice.id }))) throw Error(ERROR_ALREADY_EXISTS)
+    self.notices.push(notice)
+    global.commons.sendMessage(global.translate('notice.success.add'), sender)
   } catch (e) {
-    global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
+    switch (e.message) {
+      case ERROR_ALREADY_EXISTS:
+        global.commons.sendMessage(global.translate('notice.failed.add'), sender)
+        break
+      default:
+        global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
+    }
   }
 }
 
 Notice.prototype.list = function (self, sender, text) {
-  if (_.isNull(text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/))) {
-    global.botDB.find({$where: function () { return this._id.startsWith('notice') }}, function (err, docs) {
-      if (err) { log.error(err) }
-      var list = []
-      docs.forEach(function (e, i, ar) { list.push(e._id.split('_')[1]) })
-      var output = (docs.length === 0 ? global.translate('notice.failed.list') : global.translate('notice.success.list') + ': ' + list.join(', '))
-      global.commons.sendMessage(output, sender)
-    })
-  } else {
-    global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
-  }
+  var notices = []
+  _.each(self.notices, function (element) { notices.push(element.id) })
+  var output = (notices.length === 0 ? global.translate('notice.failed.list') : global.translate('notice.success.list') + ': ' + notices.join(', '))
+  global.commons.sendMessage(output, sender)
 }
 
 Notice.prototype.get = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    global.botDB.findOne({_id: 'notice_' + parsed[0]}, function (err, docs) {
-      if (err) log.error(err)
-      var output = (typeof docs === 'undefined' || docs === null ? global.translate('notice.failed.notFound') : 'Notice#' + parsed[0] + ': ' + docs.text)
-      global.commons.sendMessage(output, sender)
-    })
+    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
+    const notice = _.find(self.notices, function (o) { return o.id === parsed[0] })
+    if (_.isUndefined(notice)) throw Error(ERROR_DOESNT_EXISTS)
+    global.commons.sendMessage('Notice#' + notice.id + ': ' + notice.text, sender)
   } catch (e) {
-    global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
+    switch (e.message) {
+      case ERROR_DOESNT_EXISTS:
+        global.commons.sendMessage(global.translate('notice.failed.notFound'), sender)
+        break
+      default:
+        global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
+    }
   }
 }
 
 Notice.prototype.remove = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    global.commons.remove({__id: 'notice_' + parsed[1], success: 'notice.success.remove', error: 'notice.failed.notFound'})
+    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+    if (_.isUndefined(_.find(self.notices, function (o) { return o.id === parsed[1] }))) throw Error(ERROR_DOESNT_EXISTS)
+    self.notices = _.filter(self.notices, function (o) { return o.id !== parsed[1] })
+    global.commons.sendMessage(global.translate('notice.success.remove'), sender)
   } catch (e) {
-    global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
+    switch (e.message) {
+      case ERROR_DOESNT_EXISTS:
+        global.commons.sendMessage(global.translate('notice.failed.notFound'), sender)
+        break
+      default:
+        global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
+    }
   }
 }
 
