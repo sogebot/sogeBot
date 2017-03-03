@@ -54,7 +54,7 @@ Users.prototype.get = function (username) {
         global.log.error(err)
         return
       }
-      global.users.set(username, 'id', body.users[0]._id)
+      global.users.set(username, {id: body.users[0]._id})
     })
   }
 

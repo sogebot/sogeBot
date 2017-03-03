@@ -30,32 +30,11 @@ function Queue () {
 
     global.parser.registerHelper('!queue')
 
-    global.watcher.watch(this, 'locked', this._save)
-    global.watcher.watch(this, 'users', this._save)
-
-    this._update(this)
+    global.watcher.watch(this, 'locked', this._timestamp)
+    global.watcher.watch(this, 'users', this._timestamp)
   }
 }
-
-Queue.prototype._update = function (self) {
-  global.botDB.findOne({ _id: 'queue' }, function (err, item) {
-    if (err) return log.error(err)
-    if (_.isNull(item)) return
-
-    self.locked = item.locked
-    self.users = item.users
-    self.picked = item.picked
-    self.timestamp = new Date().getTime()
-  })
-}
-
-Queue.prototype._save = function (self) {
-  var queue = {
-    locked: self.locked,
-    users: self.users,
-    picked: self.picked
-  }
-  global.botDB.update({ _id: 'queue' }, { $set: queue }, { upsert: true })
+Queue.prototype._timestamp = function (self) {
   self.timestamp = new Date().getTime()
 }
 
