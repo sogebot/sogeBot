@@ -1,5 +1,7 @@
 'use strict'
 
+var _ = require('lodash')
+
 function QueueWidget () {
   this.timestamp = 0
 
@@ -21,9 +23,13 @@ QueueWidget.prototype._send = function (self) {
 }
 
 QueueWidget.prototype.sendQueue = function (self, socket) {
+  let picked = []
+  _.each(global.systems.queue.picked, function (username) {
+    picked.push(global.users.get(username.split('@')[1]))
+  })
   socket.emit('queue', {
     locked: global.systems.queue.locked,
-    picked: global.systems.queue.picked,
+    picked: picked,
     users: global.systems.queue.users
   })
 }
