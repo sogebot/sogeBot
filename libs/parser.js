@@ -20,18 +20,6 @@ function Parser () {
   global.watcher.watch(this, 'customVariables', this._save)
 
   this._update(this)
-
-  // check queue and then parseCommands
-  var self = this
-  setInterval(function () {
-    for (var id in queue) {
-      if (queue.hasOwnProperty(id) && queue[id].success === queue[id].started) {
-        self.parseCommands(queue[id].user, queue[id].message)
-        global.removeFromQueue(id)
-        break
-      }
-    }
-  }, 10)
 }
 
 Parser.prototype.parse = function (user, message) {
@@ -40,7 +28,7 @@ Parser.prototype.parse = function (user, message) {
   this.registeredParsers === {} ? this.parseCommands(user, message) : this.addToQueue(user, message)
 }
 
-Parser.prototype.addToQueue = function (user, message) {
+Parser.prototype.addToQueue = async function (user, message) {
   var id = crypto.createHash('md5').update(Math.random().toString()).digest('hex')
 
   var data = {
@@ -60,9 +48,25 @@ Parser.prototype.addToQueue = function (user, message) {
       this.registeredParsers[parser](this.selfParsers[parser], id, user, message)
     }
   }
+
+  this.processQueue(id)
 }
 
-Parser.prototype.parseCommands = function (user, message) {
+Parser.prototype.processQueue = async function (id) {
+  while (!_.isUndefined(queue[id])) {
+    if (new Date().getTime() - queue[id].user['tmi-sent-ts'] < 1000) {
+      global.removeFromQueue(id)
+      break
+    }
+
+    if (queue.hasOwnProperty(id) && queue[id].success === queue[id].started) {
+      this.parseCommands(queue[id].user, queue[id].message)
+      global.removeFromQueue(id)
+    }
+  }
+}
+
+Parser.prototype.parseCommands = async function (user, message) {
   message = message.trim()
   for (var cmd in this.registeredCmds) {
     if (message.startsWith(cmd)) {
