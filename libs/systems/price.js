@@ -7,6 +7,8 @@ var constants = require('../constants')
 var log = global.log
 
 function Price () {
+  this.prices = []
+
   if (global.commons.isSystemEnabled('points') && global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!price set', this.set, constants.OWNER_ONLY)
     global.parser.register(this, '!price list', this.list, constants.OWNER_ONLY)
@@ -17,8 +19,27 @@ function Price () {
 
     global.parser.registerParser(this, 'price', this.checkPrice, constants.VIEWERS)
 
+    global.watcher.watch(this, 'prices', this._save)
+    this._update(this)
+
     this.webPanel()
   }
+}
+
+Price.prototype._update = function (self) {
+  global.botDB.findOne({ _id: 'prices' }, function (err, item) {
+    if (err) return log.error(err)
+    if (_.isNull(item)) return
+
+    self.prices = item.prices
+  })
+}
+
+Price.prototype._save = function (self) {
+  var prices = {
+    prices: self.prices
+  }
+  global.botDB.update({ _id: 'prices' }, { $set: prices }, { upsert: true })
 }
 
 Price.prototype.webPanel = function () {
@@ -29,10 +50,7 @@ Price.prototype.webPanel = function () {
 }
 
 Price.prototype.sendPrices = function (self, socket) {
-  global.botDB.find({$where: function () { return this._id.startsWith('price') }}, function (err, items) {
-    if (err) { log.error(err) }
-    socket.emit('Prices', items)
-  })
+  socket.emit('Prices', self.prices)
 }
 
 Price.prototype.deletePrice = function (self, socket, data) {
@@ -52,7 +70,8 @@ Price.prototype.help = function (self, sender) {
 Price.prototype.set = function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
-    global.botDB.update({_id: 'price_' + parsed[1]}, {$set: {command: parsed[1], price: parsed[2]}}, {upsert: true})
+    self.prices = _.filter(self.prices, function (o) { return o.command !== parsed[1] })
+    self.prices.push({command: parsed[1], price: parsed[2]})
     global.commons.sendMessage(global.translate('price.success.set')
       .replace('(command)', parsed[1])
       .replace('(amount)', parsed[2])
@@ -65,29 +84,18 @@ Price.prototype.set = function (self, sender, text) {
 Price.prototype.unset = function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    global.botDB.remove({_id: 'price_' + parsed[1], command: parsed[1]}, {}, function (err, numRemoved) {
-      if (err) log.error(err)
-      var message = (numRemoved === 0 ? global.translate('price.failed.remove') : global.translate('price.success.remove'))
-      global.commons.sendMessage(message.replace('(command)', parsed[1]), sender)
-    })
+    self.prices = _.filter(self.prices, function (o) { return o.command !== parsed[1] })
+    global.commons.sendMessage(global.translate('price.success.remove').replace('(command)', parsed[1]), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('price.failed.parse'), sender)
   }
 }
 
 Price.prototype.list = function (self, sender, text) {
-  var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-  if (_.isNull(parsed)) {
-    global.botDB.find({$where: function () { return this._id.startsWith('price') }}, function (err, docs) {
-      if (err) { log.error(err) }
-      var commands = []
-      docs.forEach(function (e, i, ar) { commands.push(e.command) })
-      var output = (docs.length === 0 ? global.translate('price.failed.list') : global.translate('price.success.list') + ': ' + commands.join(', '))
-      global.commons.sendMessage(output, sender)
-    })
-  } else {
-    global.commons.sendMessage(global.translate('price.failed.parse', sender))
-  }
+  var prices = []
+  _.each(self.prices, function (element) { prices.push('!' + element.command) })
+  var output = (prices.length === 0 ? global.translate('price.failed.list') : global.translate('price.success.list') + ': ' + prices.join(', '))
+  global.commons.sendMessage(output, sender)
 }
 
 Price.prototype.checkPrice = function (self, id, sender, text) {
@@ -97,27 +105,25 @@ Price.prototype.checkPrice = function (self, id, sender, text) {
   }
   try {
     var parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)/)
-    global.botDB.findOne({_id: 'price_' + parsed[1]}, function (err, item) {
-      if (err) log.error(err)
-      if (!_.isNull(item)) {
-        const user = global.users.get(sender.username)
-        var availablePts = parseInt(user.points, 10)
-        var removePts = parseInt(item.price, 10)
-        var command = item.command
-        if (!_.isFinite(availablePts) || !_.isNumber(availablePts) || availablePts < removePts) {
-          global.updateQueue(id, false)
-          global.commons.sendMessage(global.translate('price.failed.notEnough')
-            .replace('(amount)', removePts)
-            .replace('(command)', command)
-            .replace('(pointsName)', global.systems.points.getPointsName(removePts)), sender)
-        } else {
-          global.users.set(sender.username, { points: availablePts - removePts })
-          global.updateQueue(id, true)
-        }
-      } else {
-        global.updateQueue(id, true)
-      }
-    })
+
+    var price = _.find(self.prices, function (o) { return o.command === parsed[1] })
+    if (_.isUndefined(price)) { // no price set
+      global.updateQueue(id, true)
+      return
+    }
+    const user = global.users.get(sender.username)
+    var availablePts = parseInt(user.points, 10)
+    var removePts = parseInt(price.price, 10)
+    if (!_.isFinite(availablePts) || !_.isNumber(availablePts) || availablePts < removePts) {
+      global.updateQueue(id, false)
+      global.commons.sendMessage(global.translate('price.failed.notEnough')
+        .replace('(amount)', removePts)
+        .replace('(command)', price.command)
+        .replace('(pointsName)', global.systems.points.getPointsName(removePts)), sender)
+    } else {
+      global.users.set(sender.username, { points: availablePts - removePts })
+      global.updateQueue(id, true)
+    }
   } catch (err) {
     global.updateQueue(id, true) // it's not a command -> no price
   }
