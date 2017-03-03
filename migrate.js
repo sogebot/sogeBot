@@ -32,6 +32,8 @@ var migration = {
       await usersDbUpdate_1_3()
       console.log('-> Prices update')
       await pricesDbUpdate_1_3()
+      console.log('-> Notices update')
+      await noticesDbUpdate_1_3()
     }
   }
 }
@@ -140,6 +142,26 @@ async function keywordsDbUpdate_1_3() {
     }
   }, { multi: true })
   await DB.update({ _id: 'keywords' }, { $set: kwdsUpdate }, { upsert: true })
+}
+
+async function noticesDbUpdate_1_3() {
+  let list = await DB.find({
+    $where: function () {
+      return this._id.startsWith('notice_')
+    }
+  })
+  if (list.length === 0) return
+
+  let listUpdate = { notices: [] }
+  _.each(list, function (o) {
+    listUpdate.notices.push({text: o.text, time: o.time, id: o._id.split('_')[1]})
+  })
+  await DB.remove({
+    $where: function () {
+      return this._id.startsWith('notice_')
+    }
+  }, { multi: true })
+  await DB.update({ _id: 'notices' }, { $set: listUpdate }, { upsert: true })
 }
 
 async function removeFromDB(id) {
