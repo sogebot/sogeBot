@@ -4,8 +4,6 @@
 var _ = require('lodash')
 // bot libraries
 var constants = require('../constants')
-var User = require('../user')
-var Points = require('./points')
 var log = global.log
 
 function Price () {
@@ -58,7 +56,7 @@ Price.prototype.set = function (self, sender, text) {
     global.commons.sendMessage(global.translate('price.success.set')
       .replace('(command)', parsed[1])
       .replace('(amount)', parsed[2])
-      .replace('(pointsName)', Points.getPointsName(parsed[2])), sender)
+      .replace('(pointsName)', global.systems.points.getPointsName(parsed[2])), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('price.failed.parse'), sender)
   }
@@ -102,22 +100,20 @@ Price.prototype.checkPrice = function (self, id, sender, text) {
     global.botDB.findOne({_id: 'price_' + parsed[1]}, function (err, item) {
       if (err) log.error(err)
       if (!_.isNull(item)) {
-        var user = new User(sender.username)
-        user.isLoaded().then(function () {
-          var availablePts = parseInt(user.get('points'), 10)
-          var removePts = parseInt(item.price, 10)
-          var command = item.command
-          if (!_.isFinite(availablePts) || !_.isNumber(availablePts) || availablePts < removePts) {
-            global.updateQueue(id, false)
-            global.commons.sendMessage(global.translate('price.failed.notEnough')
-              .replace('(amount)', removePts)
-              .replace('(command)', command)
-              .replace('(pointsName)', Points.getPointsName(removePts)), sender)
-          } else {
-            user.set('points', availablePts - removePts)
-            global.updateQueue(id, true)
-          }
-        })
+        const user = global.users.get(sender.username)
+        var availablePts = parseInt(user.points, 10)
+        var removePts = parseInt(item.price, 10)
+        var command = item.command
+        if (!_.isFinite(availablePts) || !_.isNumber(availablePts) || availablePts < removePts) {
+          global.updateQueue(id, false)
+          global.commons.sendMessage(global.translate('price.failed.notEnough')
+            .replace('(amount)', removePts)
+            .replace('(command)', command)
+            .replace('(pointsName)', global.systems.points.getPointsName(removePts)), sender)
+        } else {
+          global.users.set(sender.username, { points: availablePts - removePts })
+          global.updateQueue(id, true)
+        }
       } else {
         global.updateQueue(id, true)
       }

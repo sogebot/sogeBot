@@ -4,7 +4,6 @@
 var _ = require('lodash')
 // bot libraries
 var constants = require('../constants')
-var User = require('../user')
 var log = global.log
 
 function Ranks () {
@@ -86,28 +85,20 @@ Ranks.prototype.remove = function (self, sender, text) {
 }
 
 Ranks.prototype.show = function (self, sender) {
-  var user = new User(sender.username)
-  user.isLoaded().then(function () {
-    global.commons.sendMessage(global.translate('rank.success.show').replace('(rank)', user.get('rank')), sender)
-  })
+  global.commons.sendMessage(global.translate('rank.success.show').replace('(rank)', global.users.get(sender.username).rank), sender)
 }
 
 Ranks.prototype.updateRanks = function () {
-  User.getAllOnline().then(function (users) {
-    _.each(users, function (user) {
-      user = new User(user.username)
-      user.isLoaded().then(function () {
-        var watchTime = user.get('watchTime')
-        watchTime = _.isFinite(parseInt(watchTime, 10)) && _.isNumber(parseInt(watchTime, 10)) ? (watchTime / 1000 / 60 / 60).toFixed(0) : 0
+  _.each(global.users.getAll({ is: { online: true } }), function (user) {
+    var watchTime = user.time.watched
+    watchTime = _.isFinite(parseInt(watchTime, 10)) && _.isNumber(parseInt(watchTime, 10)) ? (watchTime / 1000 / 60 / 60).toFixed(0) : 0
 
-        global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, items) {
-          if (err) { log.error(err) }
-          _.each(items, function (rank) {
-            if (watchTime >= parseInt(rank.hours, 10)) {
-              user.set('rank', rank.rank)
-            }
-          })
-        })
+    global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, items) {
+      if (err) { log.error(err) }
+      _.each(items, function (rank) {
+        if (watchTime >= parseInt(rank.hours, 10)) {
+          global.users.set(user.username, {rank: rank.rank})
+        }
       })
     })
   })
