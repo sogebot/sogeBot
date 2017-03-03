@@ -240,6 +240,7 @@ Twitch.prototype.lastseenUpdate = function (self, id, sender, text) {
   }
   global.users.set(sender.username, { time: { message: new Date().getTime() } })
   if (_.isUndefined(global.users.get(sender.username).is) || !global.users.get(sender.username).is.online) global.users.set(sender.username, { is: { online: true } })
+  global.users.set(sender.username, { is: { subscriber: sender.subscriber } }) // save subscriber status
   global.updateQueue(id, true)
 }
 
