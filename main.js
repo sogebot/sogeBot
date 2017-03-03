@@ -79,7 +79,7 @@ global.client.on('disconnected', function (address, port) {
 })
 
 global.client.on('message', function (channel, sender, message, fromSelf) {
-  if (!fromSelf) {
+  if (!fromSelf && global.configuration.get().twitch.username !== sender.username) {
     global.parser.parse(sender, message)
 
     const user = global.users.get(sender.username)
@@ -89,11 +89,11 @@ global.client.on('message', function (channel, sender, message, fromSelf) {
 })
 
 global.client.on('join', function (channel, username, fromSelf) {
-  if (!fromSelf) { global.users.set(username, { is: { online: false }}) }
+  if (!fromSelf) { global.users.set(username, { is: { online: false } }) }
 })
 
 global.client.on('part', function (channel, username, fromSelf) {
-  if (!fromSelf) { global.users.set(username, { is: { online: false }}) }
+  if (!fromSelf) { global.users.set(username, { is: { online: false } }) }
 })
 
 // Bot is checking if it is a mod

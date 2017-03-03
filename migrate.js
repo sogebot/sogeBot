@@ -30,6 +30,8 @@ var migration = {
       await keywordsDbUpdate_1_3()
       console.log('-> Users update')
       await usersDbUpdate_1_3()
+      console.log('-> Prices update')
+      await pricesDbUpdate_1_3()
     }
   }
 }
@@ -78,6 +80,22 @@ async function aliasDbUpdate_1_3() {
     aliasUpdate.alias.push({alias: alias.alias, command: alias.command})
   })
   await DB.update({ _id: 'alias' }, { $set: aliasUpdate }, { upsert: true })
+}
+
+async function pricesDbUpdate_1_3() {
+  let prices = await DB.find({
+    $where: function () {
+      return this._id.startsWith('price_')
+    }
+  })
+  if (prices.length === 0) return
+
+  let pricesUpdate = { prices: []}
+  _.each(prices, function (price) {
+    DB.remove({_id: price._id})
+    pricesUpdate.prices.push({price: price.price, command: price.command})
+  })
+  await DB.update({ _id: 'prices' }, { $set: pricesUpdate }, { upsert: true })
 }
 
 async function customCmdsDbUpdate_1_3() {
