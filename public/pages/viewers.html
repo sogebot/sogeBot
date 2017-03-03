@@ -37,7 +37,9 @@
             '<abbr title="click to edit" data-id="' + item.username + '" onclick="viewers.pointsEditable(this)">' +  item.points + '</abbr>' +
             '<input id="points_' + item.username + '" style="width: 6em; display: none" class="form-control input-sm" type="text"/></td>' +
           '<td data-value=' + (_.isUndefined(item.stats.messages) ? 0 : item.stats.messages) + '>' + (_.isUndefined(item.stats.messages) ? 0 : item.stats.messages) + '</td>' +
-          '<td style="font-weight: bold"><span class="' + (item.is.follower ? "text-success" : "text-danger") + '"> FOLLOWER </span>' +
+          '<td style="font-weight: bold">' +
+          '<span class="' + (item.is.subscriber ? "text-success" : "text-danger") + '"> SUBSCRIBER </span>' +
+          '<span class="' + (item.is.follower ? "text-success" : "text-danger") + '"> FOLLOWER </span>' +
           '<span class="' + (item.is.online ? "text-success" : "text-danger") + '"> ONLINE </span></td>' +
           '<td class="tableMenu"><button type="button" class="btn btn-danger btn-xs" data-username="' + item.username + '" onclick="viewers.delete(this)">[x] Delete</button></td>' +
           '</tr>');
