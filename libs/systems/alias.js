@@ -119,9 +119,6 @@ Alias.prototype.toggle = function (self, sender, text) {
     alias.enabled = !alias.enabled
     global.commons.sendMessage(global.translate(alias.enabled ? 'alias.success.enabled' : 'alias.success.disabled')
       .replace('(alias)', alias.alias), sender)
-
-    self.alias = _.filter(self.alias, function (o) { return o.alias !== parsed })
-    self.alias.push(alias)
   } catch (e) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
   }
