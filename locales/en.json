@@ -66,13 +66,16 @@
     "success": {
       "add": "Alias was added to database",
       "remove": "Alias was deleted from database",
-      "list": "List of aliases"
+      "list": "List of aliases",
+      "enabled": "Alias !(alias) was enabled",
+      "disabled": "Alias !(alias) was disabled"
     },
     "failed": {
       "add": "This alias already exists in database",
       "remove": "This alias cannot be found in database",
       "list": "List of aliases is empty",
-      "parse": "{core.command-parse} !alias"
+      "parse": "{core.command-parse} !alias",
+      "toggle": "Alias !(alias) was not found"
     }
   },
   "customcmds": {

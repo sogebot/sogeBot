@@ -68,13 +68,16 @@
     "success": {
       "add": "Alias byl pridan do databaze",
       "remove": "Alias byl smazany z databaze",
-      "list": "Seznam aliasu"
+      "list": "Seznam aliasu",
+      "enabled": "Alias !(alias) byl zapnut",
+      "disabled": "Alias !(alias) byl vypnut"
     },
     "failed": {
       "add": "Tento alias uz existuje v databazi",
       "remove": "Tento alias v databazi neexistuje",
       "list": "Seznam aliasu je prazdny",
-      "parse": "{core.command-parse} !alias"
+      "parse": "{core.command-parse} !alias",
+      "toggle": "Alias !(alias) neni v databazi!"
     }
   },
   "customcmds": {

@@ -11,6 +11,7 @@ var log = global.log
  * !alias                   - gets an info about alias usage
  * !alias add [cmd] [alias] - add alias for specified command
  * !alias remove [alias]    - remove specified alias
+ * !alias toggle [alias]    - enable/disable specified alias
  * !alias list              - get alias list
  */
 
@@ -20,6 +21,7 @@ function Alias () {
     global.parser.register(this, '!alias add', this.add, constants.OWNER_ONLY)
     global.parser.register(this, '!alias list', this.list, constants.OWNER_ONLY)
     global.parser.register(this, '!alias remove', this.remove, constants.OWNER_ONLY)
+    global.parser.register(this, '!alias toggle', this.toggle, constants.OWNER_ONLY)
     global.parser.register(this, '!alias', this.help, constants.OWNER_ONLY)
 
     global.parser.registerHelper('!alias')
@@ -51,17 +53,23 @@ Alias.prototype._save = function (self) {
 
 Alias.prototype.webPanel = function () {
   global.panel.addMenu({category: 'manage', name: 'Alias', id: 'alias'})
-  global.panel.socketListening(this, 'getAlias', this.sendAliases)
-  global.panel.socketListening(this, 'deleteAlias', this.deleteAlias)
-  global.panel.socketListening(this, 'createAlias', this.createAlias)
+  global.panel.socketListening(this, 'alias.get', this.sendAliases)
+  global.panel.socketListening(this, 'alias.delete', this.deleteAlias)
+  global.panel.socketListening(this, 'alias.create', this.createAlias)
+  global.panel.socketListening(this, 'alias.toggle', this.toggleAlias)
 }
 
 Alias.prototype.sendAliases = function (self, socket) {
-  socket.emit('Alias', self.alias)
+  socket.emit('alias', self.alias)
 }
 
 Alias.prototype.deleteAlias = function (self, socket, data) {
   self.remove(self, null, data)
+  self.sendAliases(self, socket)
+}
+
+Alias.prototype.toggleAlias = function (self, socket, data) {
+  self.toggle(self, null, data)
   self.sendAliases(self, socket)
 }
 
@@ -71,7 +79,7 @@ Alias.prototype.createAlias = function (self, socket, data) {
 }
 
 Alias.prototype.help = function (self, sender) {
-  global.commons.sendMessage(global.translate('core.usage') + ': !alias add <command> <alias> | !alias remove <alias> | !alias list', sender)
+  global.commons.sendMessage(global.translate('core.usage') + ': !alias add <command> <alias> | !alias remove <alias> | !alias list | !alias toggle <alias>', sender)
 }
 
 Alias.prototype.add = function (self, sender, text) {
@@ -79,7 +87,8 @@ Alias.prototype.add = function (self, sender, text) {
     let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     let data = {
       alias: parsed[2],
-      command: parsed[1]
+      command: parsed[1],
+      enabled: true
     }
     let alias = _.find(self.alias, function (oAlias) { return oAlias.alias === data.alias })
     if (_.isUndefined(alias)) self.alias.push(data)
@@ -94,6 +103,28 @@ Alias.prototype.list = function (self, sender, text) {
   _.each(self.alias, function (element) { aliases.push('!' + element.alias) })
   var output = (aliases.length === 0 ? global.translate('alias.failed.list') : global.translate('alias.success.list') + ': ' + aliases.join(', '))
   global.commons.sendMessage(output, sender)
+}
+
+Alias.prototype.toggle = function (self, sender, text) {
+  try {
+    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+    let alias = _.find(self.alias, function (o) { return o.alias === parsed })
+
+    if (_.isUndefined(alias)) {
+      global.commons.sendMessage(global.translate('alias.failed.toggle')
+        .replace('(alias)', parsed), sender)
+      return
+    }
+
+    alias.enabled = !alias.enabled
+    global.commons.sendMessage(global.translate(alias.enabled ? 'alias.success.enabled' : 'alias.success.disabled')
+      .replace('(alias)', alias.alias), sender)
+
+    self.alias = _.filter(self.alias, function (o) { return o.alias !== parsed })
+    self.alias.push(alias)
+  } catch (e) {
+    global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
+  }
 }
 
 Alias.prototype.remove = function (self, sender, text) {
@@ -114,7 +145,7 @@ Alias.prototype.parse = function (self, id, sender, text) {
     var cmd = parsed[1]
 
     let alias = _.find(self.alias, function (oAlias) { return oAlias.alias === cmd })
-    if (!_.isUndefined(alias)) {
+    if (!_.isUndefined(alias) && alias.enabled) {
       global.parser.parse(sender, text.replace('!' + cmd, '!' + alias.command))
       global.parser.lineParsed--
     }
