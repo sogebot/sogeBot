@@ -98,13 +98,17 @@
     "success": {
       "add": "Keyword was added to database",
       "remove": "Keyword was deleted from database",
-      "list": "List of keywords"
+      "list": "List of keywords",
+      "enabled": "Keyword (keyword) was enabled",
+      "disabled": "Keyword (keyword) was disabled"
     },
     "failed": {
       "add": "This keyword already exists in database",
       "remove": "This keyword cannot be found in database",
       "list": "List of keywords is empty",
-      "parse": "{core.command-parse} !keyword"
+      "parse": "{core.command-parse} !keyword",
+      "toggle": "Keyword (keyword) was not found"
+    }
     }
   },
   "notice": {

@@ -100,13 +100,16 @@
     "success": {
       "add": "Keyword byl pridan do databaze",
       "remove": "Keyword byl smazany z databaze",
-      "list": "Seznam keywordu"
+      "list": "Seznam keywordu",
+      "enabled": "Keyword (keyword) byl zapnut",
+      "disabled": "Keyword (keyword) byl vypnut"
     },
     "failed": {
       "add": "Tento keyword uz existuje v databazi",
       "remove": "Tento keyword v databazi neexistuje",
       "list": "Seznam keywordu je prazdny",
-      "parse": "{core.command-parse} !keyword"
+      "parse": "{core.command-parse} !keyword",
+      "toggle": "Keyword (keyword) neni v databazi!"
     }
   },
   "notice": {
