@@ -8,7 +8,7 @@
           <abbr title="click to edit" data-config-id="pointsName" onclick="commons.configEditable(this, '')" id="configPointsName"></abbr>
           <div class="input-group" style="display:none;" id="input_pointsName_group">
             <div class="input-group-addon">single|multi</div>
-            <input style="width: 6em" id="input_pointsName" class="form-control input-sm" type="text"/>
+            <input id="input_pointsName" class="form-control input-sm" type="text"/>
           </div>
         </td>
       </tr>
@@ -16,9 +16,9 @@
         <td><strong>Points Response</strong></td>
         <td>
           <abbr title="click to edit" data-config-id="pointsResponse" onclick="commons.configEditable(this, '')" id="configPointsResponse"></abbr>
-          <div class="input-group" style="display:none;" id="input_pointsResponsen_group">
+          <div class="input-group" style="display:none;" id="input_pointsResponse_group">
             <div class="input-group-addon">string</div>
-            <input style="width: 6em" id="input_pointsResponse" class="form-control input-sm" type="text"/>
+            <input id="input_pointsResponse" class="form-control input-sm" type="text"/>
           </div>
         </td>
       </tr>
@@ -28,7 +28,7 @@
           <abbr title="click to edit" data-config-id="pointsInterval" onclick="commons.configEditable(this, 'min')" id="configPointsInterval"></abbr>
           <div class="input-group" style="display:none;" id="input_pointsInterval_group">
             <div class="input-group-addon">min</div>
-            <input style="width: 6em" id="input_pointsInterval" class="form-control input-sm" type="text"/>
+            <input id="input_pointsInterval" class="form-control input-sm" type="text"/>
           </div>
         </td>
       </tr>
@@ -38,7 +38,7 @@
           <abbr title="click to edit" data-config-id="pointsPerInterval" onclick="commons.configEditable(this, '')" id="configPointsPerInterval"></abbr>
           <div class="input-group" style="display:none;" id="input_pointsPerInterval_group">
             <div class="input-group-addon">points</div>
-            <input style="width: 6em" id="input_pointsPerInterval" class="form-control input-sm" type="text"/>
+            <input id="input_pointsPerInterval" class="form-control input-sm" type="text"/>
           </div>
         </td>
       </tr>
@@ -48,7 +48,7 @@
           <abbr title="click to edit" data-config-id="pointsIntervalOffline" onclick="commons.configEditable(this, 'min')" id="configPointsIntervalOffline"></abbr>
           <div class="input-group" style="display:none;" id="input_pointsIntervalOffline_group">
             <div class="input-group-addon">min</div>
-            <input style="width: 6em" id="input_pointsIntervalOffline" class="form-control input-sm" type="text"/>
+            <input id="input_pointsIntervalOffline" class="form-control input-sm" type="text"/>
           </div>
         </td>
       </tr>
@@ -58,7 +58,7 @@
           <abbr title="click to edit" data-config-id="pointsPerIntervalOffline" onclick="commons.configEditable(this, '')" id="configPointsPerIntervalOffline"></abbr>
           <div class="input-group" style="display:none;" id="input_pointsPerIntervalOffline_group">
             <div class="input-group-addon">points</div>
-            <input style="width: 6em" id="input_pointsPerIntervalOffline" class="form-control input-sm" type="text"/>
+            <input id="input_pointsPerIntervalOffline" class="form-control input-sm" type="text"/>
           </div>
         </td>
       </tr>
@@ -74,7 +74,7 @@
           <abbr title="click to edit" data-config-id="noticeInterval" onclick="commons.configEditable(this, 'min')" id="configNoticeInterval"></abbr>
           <div class="input-group" style="display:none;" id="input_noticeInterval_group">
             <div class="input-group-addon">minutes</div>
-            <input style="width: 6em" id="input_noticeInterval" class="form-control input-sm" type="text"/>
+            <input id="input_noticeInterval" class="form-control input-sm" type="text"/>
           </div>
         </td>
       </tr>
@@ -83,7 +83,8 @@
         <td>
           <abbr title="click to edit" data-config-id="noticeMsgReq" onclick="commons.configEditable(this, '')" id="configNoticeMsgReq"></abbr>
           <div class="input-group" style="display:none;" id="input_noticeMsgReq_group">
-            <input style="width: 6em" id="input_noticeMsgReq" class="form-control input-sm" type="text"/>
+            <div class="input-group-addon">number</div>
+            <input id="input_noticeMsgReq" class="form-control input-sm" type="text"/>
           </div>
         </td>
       </tr>
@@ -99,7 +100,7 @@
           <abbr title="click to edit" data-config-id="songs_volume" onclick="commons.configEditable(this, '%')" id="configVolume"></abbr>
           <div class="input-group" style="display:none;" id="input_songs_volume_group">
             <div class="input-group-addon">%</div>
-            <input style="width: 6em" id="input_songs_volume" class="form-control input-sm" type="text"/>
+            <input id="input_songs_volume" class="form-control input-sm" type="text"/>
           </div>
         </td>
       </tr>
@@ -109,7 +110,7 @@
           <abbr title="click to edit" data-config-id="songs_duration" onclick="commons.configEditable(this, 'min')" id="configDuration"></abbr>
           <div class="input-group" style="display:none;" id="input_songs_duration_group">
             <div class="input-group-addon">minutes</div>
-            <input style="width: 6em" id="input_songs_duration" class="form-control input-sm" type="text"/>
+            <input id="input_songs_duration" class="form-control input-sm" type="text"/>
           </div>
         </td>
       </tr>
@@ -133,6 +134,23 @@
       </tr>
     </table>
   </div>
+
+  <div class="widget" id="uptime">
+    <div class="title">Uptime settings</div>
+    <table class="table table-striped">
+      <tr>
+        <td><strong>Format</strong><br>
+        <small><strong>Available:</strong> (days), (hours), (minutes), (seconds)</small></td>
+        <td>
+          <abbr title="click to edit" data-config-id="uptimeFormat" onclick="commons.configEditable(this, '')" id="configUptimeFormat"></abbr>
+          <div class="input-group" style="display:none;" id="input_uptimeFormat_group">
+            <div class="input-group-addon">string</div>
+            <input id="input_uptimeFormat" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
 </div>
 <script>
   if (!systems.points) $("#points").css('display', 'none')
@@ -142,6 +160,12 @@
   socket.emit('getPointsConfiguration')
   socket.emit('getNoticeConfiguration')
   socket.emit('getSongsConfiguration')
+  socket.emit('getConfiguration')
+
+  socket.off('configuration')
+  socket.on('configuration', function (data) {
+    $("#configUptimeFormat").text(data.uptimeFormat)
+  })
 
   socket.off('pointsConfiguration')
   socket.on('pointsConfiguration', function(data) {

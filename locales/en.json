@@ -11,6 +11,9 @@
     "error": "Sorry, (sender), but something went wrong!",
     "mute": {
       "false": "Mute disabled. Bot will send messages."
+    },
+    "settings": {
+      "uptime-format": "Uptime format set to (value)"
     }
   },
   "raffle": {
