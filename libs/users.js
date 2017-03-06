@@ -41,6 +41,7 @@ Users.prototype._save = function (self) {
 }
 
 Users.prototype.get = function (username) {
+  var self = this
   let user = _.isUndefined(this.users[username]) ? {} : this.users[username]
   if (_.isUndefined(user.id)) {
     global.client.api({
@@ -54,7 +55,18 @@ Users.prototype.get = function (username) {
         global.log.error(err)
         return
       }
-      global.users.set(username, {id: body.users[0]._id})
+
+      const oldUser = _.find(self.users, function (o) { return o.id === body.users[0]._id })
+      // if user changed his username -> move all saved data to new username
+      if (_.isUndefined(oldUser)) {
+        global.users.set(username, {id: body.users[0]._id})
+      } else {
+        self.users[username].time = self.users[oldUser.username].time
+        self.users[username].is = self.users[oldUser.username].is
+        self.users[username].stats = self.users[oldUser.username].stats
+        self.users[username].points = !_.isUndefined(self.users[oldUser.username].points) ? self.users[oldUser.username].points : 0
+        delete self.users[oldUser.username]
+      }
     })
   }
 
