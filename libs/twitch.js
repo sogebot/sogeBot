@@ -144,6 +144,8 @@ function Twitch () {
 
   global.parser.registerParser(this, 'lastseen', this.lastseenUpdate, constants.VIEWERS)
 
+  global.configuration.register('uptimeFormat', 'core.settings.uptime-format', 'string', '(days)(hours)(minutes)(seconds)')
+
   this.webPanel()
 }
 
@@ -220,17 +222,27 @@ Twitch.prototype.getTime = function (isChat) {
     hours = now.hours > 0 ? now.hours + 'h' : ''
     minutes = now.minutes > 0 ? now.minutes + 'm' : ''
     seconds = now.seconds > 0 ? now.seconds + 's' : ''
+    return { days: days,
+      hours: hours,
+      minutes: minutes,
+      seconds: seconds }
   } else {
     days = now.days > 0 ? now.days + 'd' : ''
     hours = now.hours >= 0 && now.hours < 10 ? '0' + now.hours + ':' : now.hours + ':'
     minutes = now.minutes >= 0 && now.minutes < 10 ? '0' + now.minutes + ':' : now.minutes + ':'
     seconds = now.seconds >= 0 && now.seconds < 10 ? '0' + now.seconds : now.seconds
+    return days + hours + minutes + seconds
   }
-  return days + hours + minutes + seconds
 }
 
 Twitch.prototype.uptime = function (self, sender) {
-  global.commons.sendMessage(self.isOnline ? global.translate('core.online').replace('(time)', self.getTime(true)) : global.translate('core.offline'), sender)
+  const time = self.getTime(true)
+  global.commons.sendMessage(self.isOnline ? global.translate('core.online')
+    .replace('(time)', global.configuration.getValue('uptimeFormat')
+    .replace('(days)', time.days)
+    .replace('(hours)', time.hours)
+    .replace('(minutes)', time.minutes)
+    .replace('(seconds)', time.seconds)) : global.translate('core.offline'), sender)
 }
 
 Twitch.prototype.lastseenUpdate = function (self, id, sender, text) {
