@@ -82,13 +82,16 @@
     "success": {
       "add": "Command was added to database",
       "remove": "Command was deleted from database",
-      "list": "List of commands"
+      "list": "List of commands",
+      "enabled": "Command !(command) was enabled",
+      "disabled": "Command !(command) was disabled"
     },
     "failed": {
       "add": "This command already exists in database",
       "remove": "This command cannot be found in database",
       "list": "List of commands is empty",
-      "parse": "{core.command-parse} !command"
+      "parse": "{core.command-parse} !command",
+      "toggle": "Command !(command) was not found"
     }
   },
   "keywords": {

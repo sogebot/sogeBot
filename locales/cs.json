@@ -84,13 +84,16 @@
     "success": {
       "add": "Prikaz byl pridan do databaze",
       "remove": "Prikaz byl smazany z databaze",
-      "list": "Seznam prikazu"
+      "list": "Seznam prikazu",
+      "enabled": "Prikaz !(command) byl zapnut",
+      "disabled": "Prikaz !(command) byl vypnut"
     },
     "failed": {
       "add": "Tento prikaz uz existuje v databazi",
       "remove": "Tento prikaz v databazi neexistuje",
       "list": "Seznam prikazu je prazdny",
-      "parse": "{core.command-parse} !command"
+      "parse": "{core.command-parse} !command",
+      "toggle": "Prikaz !(command) neni v databazi!"
     }
   },
   "keywords": {
