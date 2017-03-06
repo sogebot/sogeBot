@@ -11,6 +11,9 @@
     "error": "Promin, (sender), ale neco se pokazilo!",
     "mute": {
       "false": "Mute vypnut. Bot bude posilat zpravy."
+    },
+    "settings": {
+      "uptime-format": "Format pro uptime nastaven na (value)"
     }
   },
   "raffle": {
