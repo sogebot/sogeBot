@@ -109,7 +109,6 @@
       "parse": "{core.command-parse} !keyword",
       "toggle": "Keyword (keyword) was not found"
     }
-    }
   },
   "notice": {
     "success": {
