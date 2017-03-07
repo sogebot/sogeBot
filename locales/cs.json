@@ -68,52 +68,64 @@
     "success": {
       "add": "Alias byl pridan do databaze",
       "remove": "Alias byl smazany z databaze",
-      "list": "Seznam aliasu"
+      "list": "Seznam aliasu",
+      "enabled": "Alias !(alias) byl zapnut",
+      "disabled": "Alias !(alias) byl vypnut"
     },
     "failed": {
       "add": "Tento alias uz existuje v databazi",
       "remove": "Tento alias v databazi neexistuje",
       "list": "Seznam aliasu je prazdny",
-      "parse": "{core.command-parse} !alias"
+      "parse": "{core.command-parse} !alias",
+      "toggle": "Alias !(alias) neni v databazi!"
     }
   },
   "customcmds": {
     "success": {
       "add": "Prikaz byl pridan do databaze",
       "remove": "Prikaz byl smazany z databaze",
-      "list": "Seznam prikazu"
+      "list": "Seznam prikazu",
+      "enabled": "Prikaz !(command) byl zapnut",
+      "disabled": "Prikaz !(command) byl vypnut"
     },
     "failed": {
       "add": "Tento prikaz uz existuje v databazi",
       "remove": "Tento prikaz v databazi neexistuje",
       "list": "Seznam prikazu je prazdny",
-      "parse": "{core.command-parse} !command"
+      "parse": "{core.command-parse} !command",
+      "toggle": "Prikaz !(command) neni v databazi!"
     }
   },
   "keywords": {
     "success": {
       "add": "Keyword byl pridan do databaze",
       "remove": "Keyword byl smazany z databaze",
-      "list": "Seznam keywordu"
+      "list": "Seznam keywordu",
+      "enabled": "Keyword (keyword) byl zapnut",
+      "disabled": "Keyword (keyword) byl vypnut"
     },
     "failed": {
       "add": "Tento keyword uz existuje v databazi",
       "remove": "Tento keyword v databazi neexistuje",
       "list": "Seznam keywordu je prazdny",
-      "parse": "{core.command-parse} !keyword"
+      "parse": "{core.command-parse} !keyword",
+      "toggle": "Keyword (keyword) neni v databazi!"
     }
   },
   "notice": {
     "success": {
       "add": "Oznameni bylo pridano do databaze",
       "remove": "Oznameni bylo smazano z database",
-      "list": "Seznam oznameni"
+      "list": "Seznam oznameni",
+      "enabled": "Oznameni (notice) bylo zapnuto",
+      "disabled": "Oznameni (notice) bylo vypnuto"
     },
     "failed": {
       "add": "Toto oznameni jiz existuje v databazi",
       "notFound": "Toto oznameni v databazi neexistuje",
       "list": "Seznam oznameni je prazdny",
-      "parse": "{core.command-parse} !notice"
+      "parse": "{core.command-parse} !notice",
+      "toggle": "Oznameni (notice) neni v databazi!"
     },
     "settings": {
       "noticeInterval": "Minimalni interval pro zobrazeni oznameni je nastaven na (value) minut",
@@ -194,13 +206,16 @@
     "success": {
       "set": "Cena za !(command) byla nastavena na (amount) (pointsName)",
       "remove" : "Cena za !(command) byla zrusena",
-      "list": "Seznam cen"
+      "list": "Seznam cen",
+      "enabled": "Cena za !(command) byla zapnuta",
+      "disabled": "Cena za !(command) byla vypnuta"
     },
     "failed": {
       "parse": "{core.command-parse} !price",
       "remove": "Cena za !(command) nebyla v databazi",
       "list": "Nejsou nastaveny zadne ceny",
-      "notEnough": "Promin, (sender), ale nemas (amount) (pointsName) k pouziti !(command)"
+      "notEnough": "Promin, (sender), ale nemas (amount) (pointsName) k pouziti !(command)",
+      "toggle": "Cena za !(command) nebyla nalezena"
     }
   },
   "rank": {

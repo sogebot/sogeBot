@@ -47,29 +47,35 @@
     update: function (list) {
       $("#Prices").empty()
       _.each(list, function(item, index) {
-        $("#Prices").append('<tr>' +
+        $("#Prices").append((item.enabled ? '<tr>' : '<tr style="text-decoration: line-through">') +
           '<td>' + (index + 1) + '</td>' +
           '<td>!' + item.command + '</td>' +
           '<td>' + item.price + '</td>' +
-          '<td class="tableMenu"><button type="button" class="btn btn-danger btn-xs" data-command="' + item.command + '" onclick="price.delete(this)">[x] Delete</button></td>' +
+          '<td class="tableMenu">' +
+          '<button type="button" class="btn btn-' + (!item.enabled ? 'success' : 'danger') + ' btn-xs" data-command="' + item.command + '" onclick="price.toggle(this)">' + (!item.enabled ? 'Enable' : 'Disable') + '</button>' +
+          '<button type="button" class="btn btn-danger btn-xs" data-command="' + item.command + '" onclick="price.delete(this)">[x] Delete</button>' +
+          '</td>' +
           '</tr>');
       })
     },
     delete: function (el) {
-      socket.emit('deletePrice', el.dataset.command)
+      socket.emit('price.delete', el.dataset.command)
+    },
+    toggle: function (el) {
+      socket.emit('price.toggle', el.dataset.command)
     },
     create: function (event) {
       event.preventDefault()
       var data = {price: $("#inputPrice").val(), command: $("#inputCommand").val()}
-      socket.emit('createPrice', data)
+      socket.emit('price.create', data)
       $("#inputPrice").val('')
       $("#inputCommand").val('')
     }
   }
 
-  socket.emit('getPrices');
+  socket.emit('price.get');
 
-  socket.on('Prices', function(list) {
+  socket.on('price', function(list) {
     price.update(list)
   });
 </script>

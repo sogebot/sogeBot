@@ -26,7 +26,7 @@
       </div>
       <div class="form-group">
         <div class="col-xs-12 col-sm-12 text-center">
-          <button type="submit" class="btn btn-primary" onclick="notice.createNotice(event)">Create new notice</button>
+          <button type="submit" class="btn btn-primary" onclick="notice.create(event)">Create new notice</button>
         </div>
       </div>
     </form>
@@ -35,30 +35,37 @@
 
 <script>
   var notice = {
-    updateNotices: function (list) {
+    update: function (list) {
       $("#Notices").empty()
       _.each(list, function(item, index) {
-        $("#Notices").append('<tr>' +
+        $("#Notices").append((item.enabled ? '<tr>' : '<tr style="text-decoration: line-through">') +
           '<td>' + item.id + '</td>' +
           '<td>' + item.text + '</td>' +
-          '<td class="tableMenu"><button type="button" class="btn btn-danger btn-xs" data-id="' + item.id + '" onclick="notice.deleteNotice(this)">[x] Delete</button></td>' +
+          '<td class="tableMenu">' +
+          '<button type="button" class="btn btn-' + (!item.enabled ? 'success' : 'danger') + ' btn-xs" data-id="' + item.id + '" onclick="notice.toggle(this)">' + (!item.enabled ? 'Enable' : 'Disable') + '</button>' +
+          '<button type="button" class="btn btn-danger btn-xs" data-id="' + item.id + '" onclick="notice.delete(this)">[x] Delete</button>' +
+          '</td>' +
           '</tr>');
       })
     },
-    deleteNotice: function (el) {
-      socket.emit('deleteNotice', el.dataset.id)
+    delete: function (el) {
+      socket.emit('notice.delete', el.dataset.id)
     },
-    createNotice: function (event) {
+    toggle: function (el) {
+      socket.emit('notice.toggle', el.dataset.id)
+    },
+    create: function (event) {
       event.preventDefault()
       var data = {response: $("#inputResponse").val()}
-      socket.emit('createNotice', data)
+      socket.emit('notice.create', data)
       $("#inputResponse").val('')
     }
   }
 
-  socket.emit('getNotices');
+  socket.emit('notice.get');
 
-  socket.on('Notices', function(list) {
-    notice.updateNotices(list)
+  socket.off('notice')
+  socket.on('notice', function(list) {
+    notice.update(list)
   });
 </script>

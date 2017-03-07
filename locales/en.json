@@ -66,52 +66,64 @@
     "success": {
       "add": "Alias was added to database",
       "remove": "Alias was deleted from database",
-      "list": "List of aliases"
+      "list": "List of aliases",
+      "enabled": "Alias !(alias) was enabled",
+      "disabled": "Alias !(alias) was disabled"
     },
     "failed": {
       "add": "This alias already exists in database",
       "remove": "This alias cannot be found in database",
       "list": "List of aliases is empty",
-      "parse": "{core.command-parse} !alias"
+      "parse": "{core.command-parse} !alias",
+      "toggle": "Alias !(alias) was not found"
     }
   },
   "customcmds": {
     "success": {
       "add": "Command was added to database",
       "remove": "Command was deleted from database",
-      "list": "List of commands"
+      "list": "List of commands",
+      "enabled": "Command !(command) was enabled",
+      "disabled": "Command !(command) was disabled"
     },
     "failed": {
       "add": "This command already exists in database",
       "remove": "This command cannot be found in database",
       "list": "List of commands is empty",
-      "parse": "{core.command-parse} !command"
+      "parse": "{core.command-parse} !command",
+      "toggle": "Command !(command) was not found"
     }
   },
   "keywords": {
     "success": {
       "add": "Keyword was added to database",
       "remove": "Keyword was deleted from database",
-      "list": "List of keywords"
+      "list": "List of keywords",
+      "enabled": "Keyword (keyword) was enabled",
+      "disabled": "Keyword (keyword) was disabled"
     },
     "failed": {
       "add": "This keyword already exists in database",
       "remove": "This keyword cannot be found in database",
       "list": "List of keywords is empty",
-      "parse": "{core.command-parse} !keyword"
+      "parse": "{core.command-parse} !keyword",
+      "toggle": "Keyword (keyword) was not found"
     }
   },
   "notice": {
     "success": {
       "add": "Notice was added to database",
       "remove": "Notice was deleted from database",
-      "list": "List of notices"
+      "list": "List of notices",
+      "enabled": "Notice (notice) was enabled",
+      "disabled": "Notice (notice) was disabled"
     },
     "failed": {
       "add": "This notice already exists in database",
       "notFound": "This notice cannot be found in database",
       "list": "List of notices is empty",
-      "parse": "{core.command-parse} !notice"
+      "parse": "{core.command-parse} !notice",
+      "toggle": "Notice (notice) was not found"
     },
     "settings": {
       "noticeInterval": "Notice minimal interval succesfully set to (value) minutes",
@@ -192,13 +204,16 @@
     "success": {
       "set": "Price for !(command) was set to (amount) (pointsName)",
       "remove" : "Price for !(command) was unset",
-      "list": "List of prices"
+      "list": "List of prices",
+      "enabled": "Price for !(command) was enabled",
+      "disabled": "Price for !(command) was disabled"
     },
     "failed": {
       "parse": "{core.command-parse} !price",
       "remove": "No price was set for !(command)",
       "list": "List of prices is empty",
-      "notEnough": "Sorry, (sender), but you don't have (amount) (pointsName) to use !(command)"
+      "notEnough": "Sorry, (sender), but you don't have (amount) (pointsName) to use !(command)",
+      "toggle": "Price for !(command) was not found"
     }
   },
   "rank": {

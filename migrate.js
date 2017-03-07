@@ -79,7 +79,7 @@ async function aliasDbUpdate_1_3() {
   let aliasUpdate = { alias: []}
   _.each(aliases, function (alias) {
     DB.remove({_id: alias._id})
-    aliasUpdate.alias.push({alias: alias.alias, command: alias.command})
+    aliasUpdate.alias.push({alias: alias.alias, command: alias.command, enabled: true})
   })
   await DB.update({ _id: 'alias' }, { $set: aliasUpdate }, { upsert: true })
 }
@@ -95,7 +95,7 @@ async function pricesDbUpdate_1_3() {
   let pricesUpdate = { prices: []}
   _.each(prices, function (price) {
     DB.remove({_id: price._id})
-    pricesUpdate.prices.push({price: price.price, command: price.command})
+    pricesUpdate.prices.push({price: price.price, command: price.command, enabled: true})
   })
   await DB.update({ _id: 'prices' }, { $set: pricesUpdate }, { upsert: true })
 }
@@ -110,7 +110,7 @@ async function customCmdsDbUpdate_1_3() {
 
   let commandsUpdate = { commands: []}
   _.each(commands, function (command) {
-    commandsUpdate.commands.push({command: command.command, response: command.response})
+    commandsUpdate.commands.push({command: command.command, response: command.response, enabled: true})
   })
   await DB.remove({
     $where: function () {
@@ -134,7 +134,7 @@ async function keywordsDbUpdate_1_3() {
 
   let kwdsUpdate = { keywords: [] }
   _.each(kwds, function (kwd) {
-    kwdsUpdate.keywords.push({keyword: kwd.keyword, response: kwd.response})
+    kwdsUpdate.keywords.push({keyword: kwd.keyword, response: kwd.response, enabled: true})
   })
   await DB.remove({
     $where: function () {
@@ -154,7 +154,7 @@ async function noticesDbUpdate_1_3() {
 
   let listUpdate = { notices: [] }
   _.each(list, function (o) {
-    listUpdate.notices.push({text: o.text, time: o.time, id: o._id.split('_')[1]})
+    listUpdate.notices.push({text: o.text, time: o.time, id: o._id.split('_')[1], enabled: true})
   })
   await DB.remove({
     $where: function () {

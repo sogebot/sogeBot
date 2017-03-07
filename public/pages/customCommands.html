@@ -46,29 +46,35 @@
     updateCommands: function (list) {
       $("#Commands").empty()
       _.each(list, function(item, index) {
-        $("#Commands").append('<tr>' +
+        $("#Commands").append((item.enabled ? '<tr>' : '<tr style="text-decoration: line-through">') +
           '<td>' + (index + 1) + '</td>' +
           '<td>!' + item.command + '</td>' +
           '<td>' + item.response + '</td>' +
-          '<td class="tableMenu"><button type="button" class="btn btn-danger btn-xs" data-command="' + item.command + '" onclick="cc.deleteCommand(this)">[x] Delete</button></td>' +
+          '<td class="tableMenu">' +
+          '<button type="button" class="btn btn-' + (!item.enabled ? 'success' : 'danger') + ' btn-xs" data-command="' + item.command + '" onclick="cc.toggleCommand(this)">' + (!item.enabled ? 'Enable' : 'Disable') + '</button>' +
+          '<button type="button" class="btn btn-danger btn-xs" data-command="' + item.command + '" onclick="cc.deleteCommand(this)">[x] Delete</button>' +
+          '</td>' +
           '</tr>');
       })
     },
     deleteCommand: function (el) {
-      socket.emit('deleteCommand', el.dataset.command)
+      socket.emit('commands.delete', el.dataset.command)
+    },
+    toggleCommand: function (el) {
+      socket.emit('commands.toggle', el.dataset.command)
     },
     createCommand: function (event) {
       event.preventDefault()
       var data = {command: $("#inputCommand").val(), response: $("#inputResponse").val()}
-      socket.emit('createCommand', data)
+      socket.emit('commands.create', data)
       $("#inputCommand").val('')
       $("#inputResponse").val('')
     }
   }
 
-  socket.emit('getCommands');
+  socket.emit('commands.get');
 
-  socket.on('Commands', function(list) {
+  socket.on('commands', function(list) {
     cc.updateCommands(list)
   });
 </script>

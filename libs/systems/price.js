@@ -6,6 +6,14 @@ var _ = require('lodash')
 var constants = require('../constants')
 var log = global.log
 
+/*
+ * !price                     - gets an info about price usage
+ * !price set [cmd] [price]   - add notice with specified response
+ * !price unset [cmd] [price] - add notice with specified response
+ * !price list                - get list of notices
+ * !price toggle [cmd]        - remove notice by id
+ */
+
 function Price () {
   this.prices = []
 
@@ -13,6 +21,7 @@ function Price () {
     global.parser.register(this, '!price set', this.set, constants.OWNER_ONLY)
     global.parser.register(this, '!price list', this.list, constants.OWNER_ONLY)
     global.parser.register(this, '!price unset', this.unset, constants.OWNER_ONLY)
+    global.parser.register(this, '!price toggle', this.toggle, constants.OWNER_ONLY)
     global.parser.register(this, '!price', this.help, constants.OWNER_ONLY)
 
     global.parser.registerHelper('!price')
@@ -44,17 +53,23 @@ Price.prototype._save = function (self) {
 
 Price.prototype.webPanel = function () {
   global.panel.addMenu({category: 'manage', name: 'Price', id: 'price'})
-  global.panel.socketListening(this, 'getPrices', this.sendPrices)
-  global.panel.socketListening(this, 'deletePrice', this.deletePrice)
-  global.panel.socketListening(this, 'createPrice', this.createPrice)
+  global.panel.socketListening(this, 'price.get', this.sendPrices)
+  global.panel.socketListening(this, 'price.delete', this.deletePrice)
+  global.panel.socketListening(this, 'price.create', this.createPrice)
+  global.panel.socketListening(this, 'price.toggle', this.togglePrice)
 }
 
 Price.prototype.sendPrices = function (self, socket) {
-  socket.emit('Prices', self.prices)
+  socket.emit('price', self.prices)
 }
 
 Price.prototype.deletePrice = function (self, socket, data) {
   self.unset(self, null, data)
+  self.sendPrices(self, socket)
+}
+
+Price.prototype.togglePrice = function (self, socket, data) {
+  self.toggle(self, null, data)
   self.sendPrices(self, socket)
 }
 
@@ -64,14 +79,14 @@ Price.prototype.createPrice = function (self, socket, data) {
 }
 
 Price.prototype.help = function (self, sender) {
-  global.commons.sendMessage(global.translate('core.usage') + ': !price set <cmd> <price> | !price unset <cmd> | !price list', sender)
+  global.commons.sendMessage(global.translate('core.usage') + ': !price set <cmd> <price> | !price unset <cmd> | !price list | !price toggle <cmd>', sender)
 }
 
 Price.prototype.set = function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
     self.prices = _.filter(self.prices, function (o) { return o.command !== parsed[1] })
-    self.prices.push({command: parsed[1], price: parsed[2]})
+    self.prices.push({command: parsed[1], price: parsed[2], enabled: true})
     global.commons.sendMessage(global.translate('price.success.set')
       .replace('(command)', parsed[1])
       .replace('(amount)', parsed[2])
@@ -91,6 +106,22 @@ Price.prototype.unset = function (self, sender, text) {
   }
 }
 
+Price.prototype.toggle = function (self, sender, text) {
+  try {
+    const id = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+    let price = _.find(self.prices, function (o) { return o.command === id })
+    if (_.isUndefined(price)) {
+      global.commons.sendMessage(global.translate('price.failed.toggle')
+        .replace('(command)', id), sender)
+    }
+    price.enabled = !price.enabled
+    global.commons.sendMessage(global.translate(price.enabled ? 'price.success.enabled' : 'price.success.disabled')
+      .replace('(command)', price.command), sender)
+  } catch (e) {
+    global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
+  }
+}
+
 Price.prototype.list = function (self, sender, text) {
   var prices = []
   _.each(self.prices, function (element) { prices.push('!' + element.command) })
@@ -106,7 +137,7 @@ Price.prototype.checkPrice = function (self, id, sender, text) {
   try {
     var parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)/)
 
-    var price = _.find(self.prices, function (o) { return o.command === parsed[1] })
+    var price = _.find(self.prices, function (o) { return o.command === parsed[1] && o.enabled })
     if (_.isUndefined(price)) { // no price set
       global.updateQueue(id, true)
       return

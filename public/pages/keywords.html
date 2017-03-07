@@ -46,16 +46,22 @@
     updateKeywords: function (list) {
       $("#Keywords").empty()
       _.each(list, function(item, index) {
-        $("#Keywords").append('<tr>' +
+        $("#Keywords").append((item.enabled ? '<tr>' : '<tr style="text-decoration: line-through">') +
           '<td>' + (index + 1) + '</td>' +
           '<td>' + item.keyword + '</td>' +
           '<td>' + item.response + '</td>' +
-          '<td class="tableMenu"><button type="button" class="btn btn-danger btn-xs" data-keyword="' + item.keyword + '" onclick="keywords.deleteKeyword(this)">[x] Delete</button></td>' +
+          '<td class="tableMenu">' +
+          '<button type="button" class="btn btn-' + (!item.enabled ? 'success' : 'danger') + ' btn-xs" data-keyword="' + item.keyword + '" onclick="keywords.toggleKeyword(this)">' + (!item.enabled ? 'Enable' : 'Disable') + '</button>' +
+          '<button type="button" class="btn btn-danger btn-xs" data-keyword="' + item.keyword + '" onclick="keywords.deleteKeyword(this)">[x] Delete</button>' +
+          '</td>' +
           '</tr>');
       })
     },
     deleteKeyword: function (el) {
       socket.emit('keywords.delete', el.dataset.keyword)
+    },
+    toggleKeyword: function (el) {
+      socket.emit('keywords.toggle', el.dataset.keyword)
     },
     createKeyword: function (event) {
       event.preventDefault()
