@@ -268,15 +268,35 @@ a.active {
 
 }
 
-.widget .widgetList a {
-  font-size: x-large;
+#widgets > div {
+  padding: 10px;
+  font-family: 'Catamaran', sans-serif !important;
+  font-size: 12px;
+  text-shadow: 0 0 2px #000, 0 0 4px #888, 0 0 8px #888
 }
 
-.widget .widgetList a {
-  cursor: pointer;
+#widgets div span {
+  color: white;
+  padding-top: 5px;
+  display: block;
+  text-align: center;
 }
 
-.widget .widgetList a:hover {
+#widgets div > span.glyphicon, #widgets .widgets-exit {
+  font-size: 80px;
+}
+
+#widgets a {
+  font-size: 30px;
+  display:inline-block
+}
+
+#widgets a:hover {
+  text-decoration: none;
+}
+
+#widgets a:hover span {
+  color: #337ab7 !important;
   text-decoration: none;
 }
 

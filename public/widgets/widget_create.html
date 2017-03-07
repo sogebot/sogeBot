@@ -1,36 +1,38 @@
-<div class="col-xs-12 col-sm-12 col-md-12">
-  <div class="widget">
-    <div class="title">Select widget to add</div>
-    <table id="widgetList" class="table .table-striped"></table>
-  </div>
+<div id="widgets" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 </div>
 
 <script>
   socket.emit('getWidgetList');
 
   socket.on('widgetList', function(list) {
-    $("#widgetList").empty()
+    $("#widgets").empty()
     if (list.length === 0) {
-      $("#widgetList").append('<p>There is no widget to add</p>');
+      $("#widgets").append('<p>There is no widget to add</p>');
       setTimeout(function() {
         $("#addWidget").css('display', 'block')
-        $("#widgetList").parent().parent().remove()
+        $("#widgets").remove()
         addingWidget = false
       }, 2000)
     } else {
+        $("#widgets").append('<div style="font-weight: bold; position: absolute; width: 100%; text-align: center; top: -4px; font-size: 20px; text-align: center; font-family: \'Catamaran\'; color: white">- WIDGETS TO ADD -</div><hr style="border-top: 1px solid #ccc">')
       _.each(list, function(widget) {
-        $("#widgetList").append('<tr>' +
-                                  '<td><span class="glyphicon glyphicon-' + widget.icon + '"></span> ' + widget.name + '</td>' +
-                                  '<td class="widgetList"><a data-id="' + widget.id + '" data-align="1"><span class="glyphicon glyphicon-object-align-left"></span></a></td>' +
-                                  '<td class="widgetList"><a data-id="' + widget.id + '" data-align="2"><span class="glyphicon glyphicon-object-align-vertical"></span></a></td>' +
-                                  '<td class="widgetList"><a data-id="' + widget.id + '" data-align="3"><span class="glyphicon glyphicon-object-align-right"></span></a></td>' +
-                                '</tr>')
+        $("#widgets").append('<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">' +
+                              '<span class="glyphicon glyphicon-' + widget.icon + '"></span>' +
+                              '<span>' + widget.name.toUpperCase() + '</span>' +
+                              '<div class="col-md-offset-1 col-lg-offset-1 col-md-3 col-lg-3"><a data-id="' + widget.id + '" data-align="1"><span class="glyphicon glyphicon-object-align-left"></span></a></div>' +
+                              '<div class="col-md-4 col-lg-4 text-center"><a data-id="' + widget.id + '" data-align="2"><span class="glyphicon glyphicon-object-align-vertical"></span></a></div>' +
+                              '<div class="col-md-3 col-lg-3 text-right"><a data-id="' + widget.id + '" data-align="3"><span class="glyphicon glyphicon-object-align-right"></span></a></div>' +
+                              '</div>')
       })
-      $("#widgetList a").on('click', function(ev) {
+      $("#widgets").append('<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">' +
+                              '<a data-id="exit"><span class="widgets-exit glyphicon glyphicon-remove"></span>' +
+                              '<span style="font-size: 12px;">CLOSE</span></a>' +
+                              '</div>')
+      $("#widgets a").on('click', function(ev) {
         $("#addWidget").css('display', 'block')
-        $("#widgetList").parent().parent().remove()
+        $("#widgets").remove()
         addingWidget = false
-        socket.emit('addWidget', ev.currentTarget.dataset.id, ev.currentTarget.dataset.align)
+        if (ev.currentTarget.dataset.id !== 'exit') socket.emit('addWidget', ev.currentTarget.dataset.id, ev.currentTarget.dataset.align)
       })
     }
   })
