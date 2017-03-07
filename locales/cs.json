@@ -116,13 +116,16 @@
     "success": {
       "add": "Oznameni bylo pridano do databaze",
       "remove": "Oznameni bylo smazano z database",
-      "list": "Seznam oznameni"
+      "list": "Seznam oznameni",
+      "enabled": "Oznameni (notice) bylo zapnuto",
+      "disabled": "Oznameni (notice) bylo vypnuto"
     },
     "failed": {
       "add": "Toto oznameni jiz existuje v databazi",
       "notFound": "Toto oznameni v databazi neexistuje",
       "list": "Seznam oznameni je prazdny",
-      "parse": "{core.command-parse} !notice"
+      "parse": "{core.command-parse} !notice",
+      "toggle": "Oznameni (notice) neni v databazi!"
     },
     "settings": {
       "noticeInterval": "Minimalni interval pro zobrazeni oznameni je nastaven na (value) minut",

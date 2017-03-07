@@ -114,13 +114,16 @@
     "success": {
       "add": "Notice was added to database",
       "remove": "Notice was deleted from database",
-      "list": "List of notices"
+      "list": "List of notices",
+      "enabled": "Notice (notice) was enabled",
+      "disabled": "Notice (notice) was disabled"
     },
     "failed": {
       "add": "This notice already exists in database",
       "notFound": "This notice cannot be found in database",
       "list": "List of notices is empty",
-      "parse": "{core.command-parse} !notice"
+      "parse": "{core.command-parse} !notice",
+      "toggle": "Notice (notice) was not found"
     },
     "settings": {
       "noticeInterval": "Notice minimal interval succesfully set to (value) minutes",
