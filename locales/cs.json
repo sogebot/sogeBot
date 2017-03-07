@@ -206,13 +206,16 @@
     "success": {
       "set": "Cena za !(command) byla nastavena na (amount) (pointsName)",
       "remove" : "Cena za !(command) byla zrusena",
-      "list": "Seznam cen"
+      "list": "Seznam cen",
+      "enabled": "Cena za !(command) byla zapnuta",
+      "disabled": "Cena za !(command) byla vypnuta"
     },
     "failed": {
       "parse": "{core.command-parse} !price",
       "remove": "Cena za !(command) nebyla v databazi",
       "list": "Nejsou nastaveny zadne ceny",
-      "notEnough": "Promin, (sender), ale nemas (amount) (pointsName) k pouziti !(command)"
+      "notEnough": "Promin, (sender), ale nemas (amount) (pointsName) k pouziti !(command)",
+      "toggle": "Cena za !(command) nebyla nalezena"
     }
   },
   "rank": {
