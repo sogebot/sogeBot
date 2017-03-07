@@ -132,12 +132,12 @@ CustomCommands.prototype.toggle = function (self, sender, text) {
     }
 
     command.enabled = !command.enabled
-    global.commons.sendMessage(global.translate(command.enabled ? 'command.success.enabled' : 'command.success.disabled')
+    global.commons.sendMessage(global.translate(command.enabled ? 'customcmds.success.enabled' : 'command.success.disabled')
       .replace('(command)', command.command), sender)
 
     if (command.enabled) { self.register(self) }
   } catch (e) {
-    global.commons.sendMessage(global.translate('command.failed.parse'), sender)
+    global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
   }
 }
 
