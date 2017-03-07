@@ -28,9 +28,9 @@ Watcher.prototype.checkChanges = function (self) {
       if ((typeof value === 'boolean' || typeof value === 'string' || typeof value === 'number') && value !== self.objects[obj][name]) {
         self.functions[obj + '.' + name](self.objects[obj])
         self.variables[obj][name] = self.objects[obj][name]
-      } else if (_.isArray(value) && (value.length !== self.objects[obj][name].length || !self.arraysEqual(value, self.objects[obj][name]))) { // simple array
+      } else if (_.isArray(value) && (JSON.stringify(value) !== JSON.stringify(self.objects[obj][name]))) {
         self.functions[obj + '.' + name](self.objects[obj])
-        self.variables[obj][name] = _.clone(self.objects[obj][name])
+        self.variables[obj][name] = _.cloneDeep(self.objects[obj][name])
       } else if (_.isPlainObject(value)) { // dictionary
         // check keys at first
         if (Object.keys(value).length !== Object.keys(self.objects[obj][name]).length) {
