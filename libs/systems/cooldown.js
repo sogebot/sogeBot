@@ -121,6 +121,7 @@ Cooldown.prototype.check = function (self, id, sender, text) {
     }
     global.updateQueue(id, true)
   } else {
+    sender['message-type'] = 'whisper' // we want to whisp cooldown message
     global.commons.sendMessage(global.translate('cooldown.failed.cooldown')
       .replace('(command)', data.command)
       .replace('(seconds)', Math.ceil((data.miliseconds - now + timestamp) / 1000)), sender)
