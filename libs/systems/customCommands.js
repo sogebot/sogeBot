@@ -106,7 +106,7 @@ CustomCommands.prototype.add = function (self, sender, text) {
 
 CustomCommands.prototype.run = function (self, sender, msg, fullMsg) {
   let parsed = fullMsg.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
-  let command = _.find(self.commands, function (o) { return o.command === parsed[1] })
+  let command = _.find(self.commands, function (o) { return o.command === parsed[1] && o.enabled })
   try {
     global.commons.sendMessage(command.response, sender, {'set': msg})
   } catch (e) {
@@ -124,7 +124,7 @@ CustomCommands.prototype.list = function (self, sender, text) {
 CustomCommands.prototype.toggle = function (self, sender, text) {
   try {
     let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
-    let command = _.find(self.commands, function (o) { return o.command === parsed && o.enabled })
+    let command = _.find(self.commands, function (o) { return o.command === parsed })
     if (_.isUndefined(command)) {
       global.commons.sendMessage(global.translate('command.failed.toggle')
         .replace('(command)', parsed), sender)
