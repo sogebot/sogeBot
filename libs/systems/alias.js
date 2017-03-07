@@ -7,6 +7,8 @@ var _ = require('lodash')
 var constants = require('../constants')
 var log = global.log
 
+const ERROR_DOESNT_EXISTS = '1'
+
 /*
  * !alias                   - gets an info about alias usage
  * !alias add [cmd] [alias] - add alias for specified command
@@ -127,12 +129,17 @@ Alias.prototype.toggle = function (self, sender, text) {
 Alias.prototype.remove = function (self, sender, text) {
   try {
     let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
-    let alias = _.find(self.alias, function (oAlias) { return oAlias.alias !== parsed })
-    alias = _.isUndefined(alias) ? [] : alias
-    global.commons.sendMessage(global.translate(self.alias.length !== alias.length ? 'alias.success.remove' : 'alias.failed.remove'), sender)
-    self.alias = alias
+    if (_.isUndefined(_.find(self.alias, function (o) { return o.alias === parsed }))) throw Error(ERROR_DOESNT_EXISTS)
+    self.alias = _.filter(self.alias, function (o) { return o.alias !== parsed })
+    global.commons.sendMessage(global.translate('alias.success.remove'), sender)
   } catch (e) {
-    global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
+    switch (e.message) {
+      case ERROR_DOESNT_EXISTS:
+        global.commons.sendMessage(global.translate('alias.failed.remove'), sender)
+        break
+      default:
+        global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
+    }
   }
 }
 
