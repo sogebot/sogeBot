@@ -85,7 +85,7 @@ Keywords.prototype.help = function (self, sender) {
 Keywords.prototype.add = function (self, sender, text) {
   try {
     let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S]+) (.*)$/)
-    let keyword = { keyword: parsed[1], response: parsed[2] }
+    let keyword = { keyword: parsed[1], response: parsed[2], enabled: true }
     if (!_.isUndefined(_.find(self.keywords, function (o) { return o.keyword === keyword.keyword }))) throw Error(ERROR_ALREADY_EXISTS)
     self.keywords.push(keyword)
     global.commons.sendMessage(global.translate('keywords.success.add'), sender)
