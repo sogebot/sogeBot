@@ -58,10 +58,10 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 
 * Node.js 7.x
 
-#### Instalation
+#### Installation
 
 * Latest release can be found at https://github.com/sogehige/SogeBot/releases
-* Update config.ini - set bot username and password (oauth:xxxxxxxxxxxxxxxxxxxx)
+* Update config.ini - set bot username and password (oauth:xxxxxxxxxxxxxxxxxxxx), owners and channel
 * **IF UPGRADING BOT AND USING OLD SogeBot.db**: npm install ; npm run migrate
 * For **Linux**: run launch.sh
 * For **Windows**: npm install ; node main.js
