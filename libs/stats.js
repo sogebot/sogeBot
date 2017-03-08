@@ -39,6 +39,7 @@ Stats.prototype.getViewers = function (self, socket) {
 
 Stats.prototype.deleteViewer = function (self, socket, username) {
   global.users.delete(username)
+  self.getViewers(self, socket)
 }
 
 Stats.prototype.getStreamEvents = function (self, socket, data) {

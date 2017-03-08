@@ -386,8 +386,9 @@ a.active {
   width: 100%;
 }
 
-table .tableMenu {
-  text-align: right;
+.tableMenu {
+  text-align: right !important;
+  width: 18%;
 }
 
 table .tableMenu button { visibility: hidden; }
@@ -405,6 +406,10 @@ table tr:hover > .tableMenu button { visibility: visible; }
 }
 .streamEvents li {
   list-style-type: none
+}
+
+table td {
+  vertical-align: middle !important;
 }
 
 table a {
