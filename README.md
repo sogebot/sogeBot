@@ -6,6 +6,14 @@
 
 Free Twitch Bot built on Node.js
 
+#### Screenshots
+<img src="https://github.com/sogehige/SogeBot/blob/master/screenshots/1.png?raw=true" width="200">
+<img src="https://github.com/sogehige/SogeBot/blob/master/screenshots/2.png?raw=true" width="200">
+<img src="https://github.com/sogehige/SogeBot/blob/master/screenshots/3.png?raw=true" width="200">
+<img src="https://github.com/sogehige/SogeBot/blob/master/screenshots/4.png?raw=true" width="200">
+<img src="https://github.com/sogehige/SogeBot/blob/master/screenshots/5.png?raw=true" width="200">
+<img src="https://github.com/sogehige/SogeBot/blob/master/screenshots/6.png?raw=true" width="200">
+
 #### Issues
 If you found an issue with a bot, feel free to create issue at https://github.com/sogehige/SogeBot/issues.
 You can also contact me on my email sogehige@gmail.com or https://twitter.com/sogehige
