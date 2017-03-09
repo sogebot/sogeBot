@@ -270,6 +270,7 @@
     "longMessage": "Tva zprava je prilis dlouha",
     "caps": "Prilisne pouzivani velkych pismen neni povoleno",
     "spam": "Spamovani neni povoleno",
+    "color": "Pouzivani /me neni povoleno",
     "emotes": "Zadne spamovani smajlikama!",
     "failed": {
       "parsePermit": "{core.command-parse} !permit [username]"
