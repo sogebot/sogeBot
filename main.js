@@ -116,3 +116,9 @@ global.client.api({
   }
   global.channelId = body.users[0]._id
 })
+
+if (global.configuration.get().bot.debug) {
+  process.on('unhandledRejection', function (reason, p) {
+    console.log('Possibly Unhandled Rejection at: Promise ', p, ' reason: ', reason)
+  })
+}
