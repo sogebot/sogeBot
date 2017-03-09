@@ -52,6 +52,7 @@ function Moderation () {
     global.configuration.register('moderationEmotesMaxCount', 'moderation.settings.moderationEmotesMaxCount', 'number', 15)
 
     global.configuration.register('moderationWarnings', 'moderation.settings.moderationWarnings', 'number', 3)
+    global.configuration.register('moderationAnnounceTimeouts', 'moderation.settings.moderationAnnounceTimeouts', 'bool', true)
     global.configuration.register('moderationWarningsTimeouts', 'moderation.settings.moderationWarningsTimeouts', 'bool', true)
 
     var self = this

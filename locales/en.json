@@ -283,6 +283,10 @@
       "emotes": "{moderation.emotes} {moderation.warning}"
     },
     "settings": {
+      "moderationAnnounceTimeouts": {
+        "true": "Bot will send timeout messages to chat",
+        "false": "Bot won't send timeout messages to chat"
+      },
       "moderationLinks": {
         "text": "Moderation of links is",
         "true": "{moderation.settings.moderationLinks.text} {core.enabled}",
