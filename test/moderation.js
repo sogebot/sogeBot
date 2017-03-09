@@ -8,6 +8,7 @@ require('./general')
 require('../libs/systems/moderation')
 
 global.parser.parse(testUser, '!set moderationWarnings 0')
+global.parser.parse(testUser, '!set moderationAnnounceTimeouts false')
 
 describe('System - Moderation', function () {
   describe('Links', function () {

@@ -16,6 +16,7 @@ global.panel = new Panel()
 
 global.client = {}
 global.commons = new Commons()
+global.status = {}
 
 global.client.action = function (owner, text) {
   console.warn('#WARNING: client.action is deprecated ')
