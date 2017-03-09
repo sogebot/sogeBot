@@ -267,9 +267,9 @@
 
       if (id === 'RES') {
           $("#" + id + "Status").attr('title', 'Average bot response ' + status + 'ms')
-          if (status > 600) {
+          if (status >= 600) {
             $("#" + id + "Status").addClass('text-warning')
-          } else if (status > 250) {
+          } else if (status < 600 && status >= 250) {
             $("#" + id + "Status").addClass('text-danger')
           } else {
             $("#" + id + "Status").addClass('text-success')
