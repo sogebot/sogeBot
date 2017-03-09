@@ -116,7 +116,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
 
 Commons.prototype.timeout = function (username, reason, timeout) {
   if (global.configuration.getValue('moderationAnnounceTimeouts')) {
-    global.commons.sendMessage(reason, { username: username })
+    global.commons.sendMessage('(sender), ' + reason[0].toLowerCase() + reason.substring(1), { username: username })
   }
   global.client.timeout(global.configuration.get().twitch.channel, username, timeout, reason)
 }
