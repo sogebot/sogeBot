@@ -241,8 +241,10 @@ global.updateQueue = function (id, success) {
   if (success && typeof queue[id] !== 'undefined') {
     queue[id].success = parseInt(queue[id].success, 10) + 1
   } else {
-    const index = _.findIndex(global.parser.timer, function (o) { return o.id === queue[id].user.id })
-    if (!_.isUndefined(global.parser.timer[index])) global.parser.timer[index].sent = new Date().getTime()
+    if (!_.isUndefined(queue[id])) {
+      const index = _.findIndex(global.parser.timer, function (o) { return o.id === queue[id].user.id })
+      if (!_.isUndefined(global.parser.timer[index])) global.parser.timer[index].sent = new Date().getTime()
+    }
     global.removeFromQueue(id)
   }
 }
