@@ -233,7 +233,7 @@
 </div>
 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
   <div class="widget">
-    <div class="title">Warnings before timeout</div>
+    <div class="title">Timeout settings</div>
     <table class="table table-striped">
       <tr>
         <td><strong>Warnings before user timeout</strong></td>
@@ -248,6 +248,12 @@
         <td><strong>Warning should be timeout</strong></td>
         <td>
           <input id="moderationWarningsTimeoutsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Announce timeouts in chat</strong></td>
+        <td>
+          <input id="moderationAnnounceTimeoutsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
         </td>
       </tr>
     </table>
@@ -305,5 +311,8 @@
 
     $("#moderationWarnings").text(data.moderationWarnings)
     createToggle('moderationWarningsTimeouts', data.moderationWarningsTimeouts, {on: 'timeout', off: 'warning'})
+
+    $("#moderationAnnounceTimeouts").text(data.moderationAnnounceTimeouts)
+    createToggle('moderationAnnounceTimeouts', data.moderationAnnounceTimeouts, {on: 'announce', off: 'muted'})
   })
 </script>

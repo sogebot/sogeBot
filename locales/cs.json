@@ -284,6 +284,10 @@
       "emotes": "{moderation.emotes} {moderation.warning}"
     },
     "settings": {
+      "moderationAnnounceTimeouts": {
+        "true": "Bot bude posilat timeout zpravy do chatu",
+        "false": "Bot nebude posilat timeout zpravy do chatu"
+      },
       "moderationLinks": {
         "text": "Moderovani linku je",
         "true": "{moderation.settings.moderationLinks.text} {core.enabled}",
