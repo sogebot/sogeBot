@@ -55,7 +55,7 @@ Parser.prototype.addToQueue = async function (user, message) {
 
 Parser.prototype.processQueue = async function (id) {
   while (!_.isUndefined(queue[id])) {
-    if (new Date().getTime() - queue[id].user['tmi-sent-ts'] > 1000) {
+    if (new Date().getTime() - queue[id].user['tmi-sent-ts'] > 2000) {
       global.removeFromQueue(id)
       break
     }
