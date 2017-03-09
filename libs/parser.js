@@ -15,6 +15,7 @@ function Parser () {
   this.permissionsParsers = {}
   this.selfParsers = {}
   this.linesParsed = 0
+  this.timer = []
 
   this.customVariables = {}
   global.watcher.watch(this, 'customVariables', this._save)
@@ -61,6 +62,18 @@ Parser.prototype.processQueue = async function (id) {
 
     if (queue.hasOwnProperty(id) && queue[id].success === queue[id].started) {
       this.parseCommands(queue[id].user, queue[id].message)
+
+      global.parser.timer[_.findIndex(global.parser.timer, function (o) { return o.id === queue[id].user.id })].sent = new Date().getTime()
+      if (global.parser.timer.length > 100) {
+        global.parser.timer.shift()
+      }
+      let avgTime = 0
+      let length = global.parser.timer.length
+      for (var index = 0; index < length; index++) {
+        if (_.isUndefined(global.parser.timer[index].sent)) global.parser.timer[index].sent = new Date().getTime() + (1000 * 5) // if sent is not defined yet, expect 5s to response to show some fails
+        avgTime += global.parser.timer[index].sent - global.parser.timer[index].received
+      }
+      global.status['RES'] = (avgTime / length).toFixed(0)
       global.removeFromQueue(id)
     }
   }

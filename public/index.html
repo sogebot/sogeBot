@@ -163,6 +163,7 @@
         <span class="text-warning" id="TMIStatus" title="TMI checking">TMI</span>
         <span class="text-warning" id="SOCStatus" title="SOC checking">SOC</span>
         <span class="text-warning" id="MODStatus" title="MOD checking">MOD</span>
+        <span class="text-warning" id="RESStatus" title="RES checking">0ms</span>
       </span>
     </div>
   </div>
@@ -262,6 +263,18 @@
       if (id === 'SOC' && status === 0) {
         $("[id$='Status']").removeClass()
         $("[id$='Status']").addClass('text-muted')
+      }
+
+      if (id === 'RES') {
+          $("#" + id + "Status").attr('title', 'Average bot response ' + status + 'ms')
+          if (status > 600) {
+            $("#" + id + "Status").addClass('text-warning')
+          } else if (status > 250) {
+            $("#" + id + "Status").addClass('text-danger')
+          } else {
+            $("#" + id + "Status").addClass('text-success')
+          }
+          $("#" + id + "Status").text(status + 'ms')
       }
 
       if (id === 'MOD') {
