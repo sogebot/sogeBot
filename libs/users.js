@@ -80,7 +80,7 @@ Users.prototype.get = function (username) {
 
 Users.prototype.getAll = function (object) {
   if (_.isObject(object)) return _.filter(this.users, object)
-  return this.users
+  return _.filter(this.users, function () { return true })
 }
 
 Users.prototype.set = function (username, object, silent = false) {
