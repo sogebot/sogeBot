@@ -29,6 +29,7 @@ global.log = new (winston.Logger)({
       formatter: function (options) {
         // Return string will be passed to logger.
         let level = options.level
+        if (level === 'error') level = '!!! ERROR !!!'
         if (level === 'chatIn') level = '<<<'
         if (level === 'chatOut') level = '>>>'
         if (level === 'whisperIn') level = '<w<'
@@ -49,6 +50,7 @@ global.log = new (winston.Logger)({
       formatter: function (options) {
         // Return string will be passed to logger.
         let level = options.level
+        if (level === 'error') level = '!!! ERROR !!!'
         if (level === 'chatIn') level = '<<<'
         if (level === 'chatOut') level = '>>>'
         if (level === 'whisperIn') level = '<w<'
