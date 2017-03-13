@@ -135,32 +135,32 @@ Parser.prototype.isOwner = function (user) {
 Parser.prototype.parseMessage = async function (message, attr) {
   let random = {
     '(random.online.viewer)': async function () {
-      let onlineViewers = global.users.getAll({ is: { online: true } })
+      let onlineViewers = _.filter(global.users.getAll({ is: { online: true } }), function (o) { return o.username !== attr.sender.username })
       if (onlineViewers.length === 0) return 'unknown'
       return onlineViewers[_.random(0, onlineViewers.length - 1)].username
     },
     '(random.online.follower)': async function () {
-      let onlineFollower = global.users.getAll({ is: { online: true, follower: true } })
+      let onlineFollower = _.filter(global.users.getAll({ is: { online: true, follower: true } }), function (o) { return o.username !== attr.sender.username })
       if (onlineFollower.length === 0) return 'unknown'
       return onlineFollower[_.random(0, onlineFollower.length - 1)].username
     },
     '(random.online.subscriber)': async function () {
-      let onlineSubscriber = global.users.getAll({ is: { online: true, subscriber: true } })
+      let onlineSubscriber = _.filter(global.users.getAll({ is: { online: true, subscriber: true } }), function (o) { return o.username !== attr.sender.username })
       if (onlineSubscriber.length === 0) return 'unknown'
       return onlineSubscriber[_.random(0, onlineSubscriber.length - 1)].username
     },
     '(random.viewer)': async function () {
-      let viewer = global.users.getAll()
+      let viewer = _.filter(global.users.getAll(), function (o) { return o.username !== attr.sender.username })
       if (viewer.length === 0) return 'unknown'
       return viewer[_.random(0, viewer.length - 1)].username
     },
     '(random.follower)': async function () {
-      let follower = global.users.getAll({ is: { follower: true } })
+      let follower = _.filter(global.users.getAll({ is: { follower: true } }), function (o) { return o.username !== attr.sender.username })
       if (follower.length === 0) return 'unknown'
       return follower[_.random(0, follower.length - 1)].username
     },
     '(random.subscriber)': async function () {
-      let follower = global.users.getAll({ is: { subscriber: true } })
+      let follower = _.filter(global.users.getAll({ is: { subscriber: true } }), function (o) { return o.username !== attr.sender.username })
       if (follower.length === 0) return 'unknown'
       return follower[_.random(0, follower.length - 1)].username
     },
@@ -214,7 +214,7 @@ Parser.prototype.parseMessageEach = async function (filters, msg) {
     if (!_.isNull(rMessage)) {
       for (var bkey in rMessage) {
         let newString = await fnc(rMessage[bkey])
-        if (newString.length === 0) msg = ''
+        if (_.isUndefined(newString) || newString.length === 0) msg = ''
         msg = msg.replace(rMessage[bkey], newString)
       }
     }
