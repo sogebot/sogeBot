@@ -14,7 +14,10 @@ global.log = new (winston.Logger)({
     chatOut: 2,
     whisperIn: 3,
     whisperOut: 4,
-    info: 5
+    join: 5,
+    part: 6,
+    warning: 7,
+    info: 8
 
   },
   transports: [
@@ -30,7 +33,10 @@ global.log = new (winston.Logger)({
         if (level === 'chatOut') level = '>>>'
         if (level === 'whisperIn') level = '<w<'
         if (level === 'whisperOut') level = '>w>'
-        if (level === 'info') level = ''
+        if (level === 'info') level = '|'
+        if (level === 'warning') level = '|!'
+        if (level === 'join') level = 'JOIN:'
+        if (level === 'part') level = 'PART:'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
         return options.timestamp() + (level ? ' ' + level + ' ' : ' ') + (options.message ? options.message : '') + (username ? ' [' + username + ']' : '')
       }
@@ -47,7 +53,10 @@ global.log = new (winston.Logger)({
         if (level === 'chatOut') level = '>>>'
         if (level === 'whisperIn') level = '<w<'
         if (level === 'whisperOut') level = '>w>'
-        if (level === 'info') level = ''
+        if (level === 'info') level = '|'
+        if (level === 'warning') level = '|!'
+        if (level === 'join') level = 'JOIN:'
+        if (level === 'part') level = 'PART:'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
         return options.timestamp() + (level ? ' ' + level + ' ' : ' ') + (options.message ? options.message : '') + (username ? ' [' + username + ']' : '')
       },
