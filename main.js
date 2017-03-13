@@ -62,19 +62,23 @@ global.widgets = require('auto-load')('./libs/widgets/')
 global.client.connect()
 
 global.client.on('connected', function (address, port) {
+  global.log.info('Bot is connected to TMI server')
   global.client.color(global.configuration.get().twitch.color)
   global.status.TMI = constants.CONNECTED
 })
 
 global.client.on('connecting', function (address, port) {
+  global.log.info('Bot is connecting to TMI server')
   global.status.TMI = constants.CONNECTING
 })
 
 global.client.on('reconnect', function (address, port) {
+  global.log.info('Bot is trying to reconnect to TMI server')
   global.status.TMI = constants.RECONNECTING
 })
 
 global.client.on('disconnected', function (address, port) {
+  global.log.warning('Bot is disconnected from TMI server')
   global.status.TMI = constants.DISCONNECTED
 })
 
@@ -95,11 +99,17 @@ global.client.on('message', function (channel, sender, message, fromSelf) {
 })
 
 global.client.on('join', function (channel, username, fromSelf) {
-  if (!fromSelf) { global.users.set(username, { is: { online: false } }) }
+  if (!fromSelf) {
+    global.users.set(username, { is: { online: false } })
+    global.log.join(username)
+  }
 })
 
 global.client.on('part', function (channel, username, fromSelf) {
-  if (!fromSelf) { global.users.set(username, { is: { online: false } }) }
+  if (!fromSelf) {
+    global.users.set(username, { is: { online: false } })
+    global.log.part(username)
+  }
 })
 
 // Bot is checking if it is a mod
@@ -123,6 +133,11 @@ global.client.api({
 })
 
 if (global.configuration.get().bot.debug) {
+  global.log.warning('+------------------------------------+')
+  global.log.warning('| DEBUG MODE IS ENABLED              |')
+  global.log.warning('| PLEASE DISABLE IT IN CONFIG.INI    |')
+  global.log.warning('| UNLESS YOU KNOW WHAT YOU ARE DOING |')
+  global.log.warning('+------------------------------------+')
   process.on('unhandledRejection', function (reason, p) {
     console.log('Possibly Unhandled Rejection at: Promise ', p, ' reason: ', reason)
   })
