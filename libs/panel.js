@@ -77,6 +77,9 @@ function Panel () {
         listener.fnc(listener.self, self.io, data)
       })
     })
+
+    // send webpanel translations
+    socket.emit('lang', global.translate({root: 'webpanel'}))
   })
 }
 

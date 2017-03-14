@@ -1,14 +1,14 @@
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
   <div class="widget">
-    <div class="title">Viewers</div>
+    <div class="title" data-lang="viewers"></div>
     <table id="UsersTableSortable" class="table table-striped table-responsive table-condensed sortable-theme-bootstrap" data-sortable>
       <thead>
         <tr>
-          <th>Username</th>
-          <th data-sortable-type="numeric">Last Seen</th>
-          <th data-sortable-type="numeric">Watched Time</th>
-          <th data-sortable-type="numeric" id="viewers-points">Points</th>
-          <th data-sortable-type="numeric" id="viewers-messages">Messages</th>
+          <th data-lang="username"></th>
+          <th data-sortable-type="numeric" data-lang="last-seen"></th>
+          <th data-sortable-type="numeric" data-lang="watched-time"></th>
+          <th data-sortable-type="numeric" id="viewers-points" data-lang="points"></th>
+          <th data-sortable-type="numeric" id="viewers-messages" data-lang="messages"></th>
           <th data-sortable="false"></th>
           <th data-sortable="false"></th>
         </tr>
@@ -53,7 +53,7 @@
       })
     },
     getDateString: function (timestamp) {
-      if (_.isUndefined(timestamp) || timestamp === 0) return 'never seen in chat'
+      if (_.isUndefined(timestamp) || timestamp === 0) return translations['never-seen-in-chat']
       else {
         d = new Date(timestamp)
         return ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +

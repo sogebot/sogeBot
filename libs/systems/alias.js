@@ -54,7 +54,7 @@ Alias.prototype._save = function (self) {
 }
 
 Alias.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'manage', name: 'Alias', id: 'alias'})
+  global.panel.addMenu({category: 'manage', name: 'aliases', id: 'alias'})
   global.panel.socketListening(this, 'alias.get', this.sendAliases)
   global.panel.socketListening(this, 'alias.delete', this.deleteAlias)
   global.panel.socketListening(this, 'alias.create', this.createAlias)

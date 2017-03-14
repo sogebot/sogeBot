@@ -72,7 +72,7 @@ function Moderation () {
 }
 
 Moderation.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'settings', name: 'Moderation', id: 'moderation'})
+  global.panel.addMenu({category: 'settings', name: 'moderation', id: 'moderation'})
 }
 
 Moderation.prototype.timeoutUser = function (self, sender, warning, msg, time) {

@@ -49,14 +49,10 @@ var options = {
 global.channelId = null
 
 global.client = new irc.client(options)
-
-// load bot systems after translation is loaded
 global.translate().then(function () {
   global.systems = require('auto-load')('./libs/systems/')
+  global.widgets = require('auto-load')('./libs/widgets/')
 })
-
-// load widgets
-global.widgets = require('auto-load')('./libs/widgets/')
 
 // Connect the client to the server..
 global.client.connect()

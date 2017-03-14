@@ -30,7 +30,7 @@ function Cooldown () {
 }
 
 Cooldown.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'manage', name: 'Commands Cooldowns', id: 'cooldown'})
+  global.panel.addMenu({category: 'manage', name: 'commands-cooldowns', id: 'cooldown'})
   global.panel.socketListening(this, 'cooldown.get', this.sSend)
   global.panel.socketListening(this, 'cooldown.set', this.sSet)
 }

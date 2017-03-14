@@ -1,5 +1,5 @@
 <div class="widget">
-    <h6>BETS</h6>
+    <h6 data-lang="widget-title-bets"></h6>
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="active">
         <a href="#bets-templates" aria-controls="home" role="tab" data-toggle="tab" title="Betting templates">
@@ -29,16 +29,16 @@
 
     <div role="tabpanel" class="tab-pane" id="bets-settings">
       <div class="input-group">
-        <span class="input-group-addon">Close bet after</span>
+        <span class="input-group-addon" data-lang="close-bet-after"></span>
         <input type="text" class="form-control" id="bets-close-after">
-        <span class="input-group-addon">minutes</span>
+        <span class="input-group-addon" data-lang="minutes"></span>
       </div>
       <div class="input-group">
-        <span class="input-group-addon">Gain every option</span>
+        <span class="input-group-addon" data-lang="gain-every-option"></span>
         <input type="text" class="form-control" id="bets-percent-gain">
         <span class="input-group-addon">%</span>
       </div>
-      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('bets')" style="margin-top: 20px;">Remove widget</button>
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('bets')" style="margin-top: 20px;" data-lang="remove-widget"></button>
     </div> <!-- /SETTINGS -->
 
     <div class="clearfix"></div>
@@ -74,13 +74,14 @@
           '<div class="btn-group" role="group" style="width: 100%">' +
             '<div class="btn-group" role="group"> ' + option_labels + ' </div>' +
               '<div class="btn-group" role="group" style="float: right">' +
-                '<button type="button" class="btn btn-default" onclick="bets.reuse(this)" data-options="' + options.join(' | ') + '">re-use bet</button>' +
+                '<button type="button" class="btn btn-default" onclick="bets.reuse(this)" data-options="' + options.join(' | ') + '" data-lang="reuse-bet"></button>' +
                 '<button type="button" onclick="commons.confirm(this)" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
                 '<button type="button" style="display: none" class="btn btn-success btn-confirm" onclick="bets.remove(this)" data-id="' + template._id + '"><span class="glyphicon glyphicon-ok"></span></button>' +
                 '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="glyphicon glyphicon-remove"></span></button>' +
               '</div>' +
           '</div>'
           )
+        commons.translate()
       })
     },
     updateBet: function (bet) {
@@ -100,13 +101,14 @@
         _.each(bet.bets, function (value, index) {
           btns.push('<div class="btn-group" role="group"><button onclick="bets.close(this)" data-option="' + index + '" type="button" class="btn btn-default">' + index + '</button></div>')
         })
-        btns.push('<div class="btn-group" role="group"><button onclick="bets.close(this)" data-option="refund" type="button" class="btn btn-danger">refund</button></div>')
+        btns.push('<div class="btn-group" role="group"><button onclick="bets.close(this)" data-option="refund" type="button" class="btn btn-danger" data-lang="refund"></button></div>')
         btns.push('</div>')
         $el.append(btns.join(''))
         $el.append('</div>')
 
         bets.updateTimer()
         bets.interval = setInterval(function () { bets.updateTimer() }, 1000)
+        commons.translate()
       }
     },
     close: function (el) {
@@ -160,5 +162,4 @@
     data['betPercentGain'] = value
     socket.emit('saveConfiguration', data)
   })
-
 </script>

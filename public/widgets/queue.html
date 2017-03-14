@@ -1,5 +1,5 @@
 <div class="widget">
-  <h6>QUEUE</h6>
+  <h6 data-lang="widget-title-queue"></h6>
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="active">
         <a href="#queue-main" aria-controls="home" role="tab" data-toggle="tab" title="Queue">
@@ -24,9 +24,9 @@
     <div role="tabpanel" class="tab-pane active" id="queue-main">
       <div class="input-group" style="width: 100.1%">
         <span class="input-group-btn">
-          <button class="btn btn-success" type="button" title="Open queue" onclick="queue.toggleLocked()" id="queue-toggle-btn">Open queue</button>
+          <button class="btn btn-success" type="button" title="Open queue" onclick="queue.toggleLocked()" id="queue-toggle-btn"></button>
         </span>
-        <span class="input-group-addon">No. users</span>
+        <span class="input-group-addon" data-lang="number-of-users"></span>
         <input type="number" class="form-control" placeholder="How many users should be picked?" min="1" value="1" style="text-align:right" id="queue-pick-count">
 
         <span class="input-group-btn">
@@ -41,7 +41,7 @@
     </div> <!-- /PICK -->
 
     <div role="tabpanel" class="tab-pane" id="queue-settings">
-      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('queue')" style="margin-top: 20px;">Remove widget</button>
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('queue')" style="margin-top: 20px;" data-lang="remove-widget"></button>
     </div> <!-- /SETTINGS -->
 
     <div class="clearfix"></div>
@@ -66,8 +66,9 @@
       locked: function () {
         this.el.toggle.removeClass()
         this.el.toggle.addClass('btn ' + (!queue.locked ? 'btn-danger' : 'btn-success'))
-        this.el.toggle.text((!queue.locked ? 'Close queue' : 'Open queue'))
+        this.el.toggle.text((!queue.locked ? translations['close-queue'] : translations['open-queue']))
 
+        console.log(this.el.toggle.data())
         this.el.toggleIcon.removeClass()
         this.el.toggleIcon.addClass('fa ' + (queue.locked ? 'fa-lock' : 'fa-unlock'))
       },
@@ -87,18 +88,19 @@
             self.el.pickList.append(
               '<div style="text-align: center"><strong style="font-size: 30px"><i class="fa fa-twitch" aria-hidden="true"></i> <span class="raffles-winner-name"> ' + value.username + ' </span></strong></div>'
               + '<div class="text-center"><div class="btn-group" role="group">'
-              + '<button type="button" class="btn btn-link" disabled="disabled"><span style="color: ' + (value.is.follower ? 'green' : 'red') + '"><i class="fa ' + (value.is.follower ? 'fa-check' : 'fa-close') + '"></i> Following</span></button>'
-              + '<button type="button" class="btn btn-link" onclick="queue.pick()"><span style="color: gray"><i class="fa fa-refresh" aria-hidden="true"></i> Roll again</span></button>'
+              + '<button type="button" class="btn btn-link" disabled="disabled"><span style="color: ' + (value.is.follower ? 'green' : 'red') + '"><i class="fa ' + (value.is.follower ? 'fa-check' : 'fa-close') + '"></i> <span data-lang="follower"></span></span></button>'
+              + '<button type="button" class="btn btn-link" onclick="queue.pick()"><span style="color: gray"><i class="fa fa-refresh" aria-hidden="true"></i> <span data-lang="roll-again"></span></span></button>'
               + '</div></div>'
             )
           } else {
             self.el.pickList.append(
               '<div style="text-align: center"><strong style="font-size: 30px"><i class="fa fa-twitch" aria-hidden="true"></i> <span class="raffles-winner-name"> ' + value.username + ' </span></strong></div>'
               + '<div class="text-center"><div class="btn-group" role="group">'
-              + '<button type="button" class="btn btn-link" disabled="disabled"><span style="color: ' + (value.is.follower ? 'green' : 'red') + '"><i class="fa ' + (value.is.follower ? 'fa-check' : 'fa-close') + '"></i> Following</span></button>'
+              + '<button type="button" class="btn btn-link" disabled="disabled"><span style="color: ' + (value.is.follower ? 'green' : 'red') + '"><i class="fa ' + (value.is.follower ? 'fa-check' : 'fa-close') + '"></i> <span data-lang="follower"></span></span></button>'
               + '</div></div>')
           }
         })
+        commons.translate()
       },
       users: function () {
         this.el.participantsCount.text(queue.users.length)

@@ -68,8 +68,8 @@ Notice.prototype._save = function (self) {
 }
 
 Notice.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'settings', name: 'Systems', id: 'systems'})
-  global.panel.addMenu({category: 'manage', name: 'Notices', id: 'notice'})
+  global.panel.addMenu({category: 'settings', name: 'systems', id: 'systems'})
+  global.panel.addMenu({category: 'manage', name: 'notices', id: 'notice'})
 
   global.panel.socketListening(this, 'getNoticeConfiguration', this.sendConfiguration)
   global.panel.socketListening(this, 'notice.get', this.sendNotices)

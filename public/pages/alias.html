@@ -1,12 +1,12 @@
 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-8">
   <div class="widget">
-    <div class="title">Alias</div>
+    <div class="title" data-lang="aliases"></div>
     <table class="table table-striped table-responsive table-condensed">
       <thead>
         <tr>
           <th>#</th>
-          <th>Alias</th>
-          <th>Command</th>
+          <th data-lang="alias"></th>
+          <th data-lang="command"></th>
           <th></th>
         </tr>
       </thead>
@@ -19,23 +19,23 @@
 
 <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
   <div class="widget">
-    <div class="title">Create Alias</div>
+    <div class="title" data-lang="create-alias"></div>
     <form class="form-horizontal">
       <div class="form-group">
         <div class="col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group">
-          <div class="input-group-addon">Alias</div>
+          <div class="input-group-addon" data-lang="alias"></div>
           <input type="text" class="form-control" id="inputAlias" placeholder="e.g. requestsong">
         </div>
       </div>
       <div class="form-group">
         <div class="col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group">
-          <div class="input-group-addon">Command</div>
+          <div class="input-group-addon" data-lang="command"></div>
           <input type="text" class="form-control" id="inputCommand" placeholder="e.g. songrequest">
         </div>
       </div>
       <div class="form-group">
         <div class="col-xs-12 col-sm-12 text-center">
-          <button type="submit" class="btn btn-primary" onclick="alias.createAlias(event)">Create new alias</button>
+          <button type="submit" class="btn btn-primary" onclick="alias.createAlias(event)" data-lang="confirm"></button>
         </div>
       </div>
     </form>
@@ -52,7 +52,7 @@
           '<td>!' + item.alias + '</td>' +
           '<td>!' + item.command + '</td>' +
           '<td class="tableMenu">' +
-          '<button type="button" class="btn btn-' + (!item.enabled ? 'success' : 'danger') + '" data-alias="' + item.alias + '" onclick="alias.toggleAlias(this)">' + (!item.enabled ? 'Enable' : 'Disable') + '</button>' +
+          '<button type="button" class="btn btn-' + (!item.enabled ? 'success' : 'danger') + '" data-alias="' + item.alias + '" onclick="alias.toggleAlias(this)">' + (!item.enabled ? translations['enable'] : translations['disable']) + '</button>' +
           '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
           '<button type="button" style="display: none" class="btn btn-success btn-confirm" onclick="alias.deleteAlias(this)" data-alias="' + item.alias + '"><span class="glyphicon glyphicon-ok"></span></button>' +
           '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="glyphicon glyphicon-remove"></span></button>' +
