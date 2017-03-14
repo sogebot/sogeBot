@@ -76,6 +76,7 @@ Notice.prototype.webPanel = function () {
   global.panel.socketListening(this, 'notice.delete', this.deleteNotice)
   global.panel.socketListening(this, 'notice.toggle', this.toggleNotice)
   global.panel.socketListening(this, 'notice.create', this.createNotice)
+  global.panel.socketListening(this, 'notice.edit', this.editNotice)
 }
 
 Notice.prototype.sendNotices = function (self, socket) {
@@ -94,6 +95,12 @@ Notice.prototype.toggleNotice = function (self, socket, data) {
 
 Notice.prototype.createNotice = function (self, socket, data) {
   self.add(self, null, data.response)
+  self.sendNotices(self, socket)
+}
+
+Notice.prototype.editNotice = function (self, socket, data) {
+  if (data.value.length === 0) self.remove(self, null, data.id)
+  else _.find(self.notices, function (o) { return o.id === data.id }).text = data.value
   self.sendNotices(self, socket)
 }
 

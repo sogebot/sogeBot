@@ -445,6 +445,28 @@
     })
 
     var commons = {
+      editable: function (string, id, fnc) {
+        id = id || ''
+        var output = '<abbr title="click to edit" data-id="' + id + '" onclick="commons.editableSwap(\'' + id + '\')">' + string + '</abbr>'
+        output += '<input style="display: none" data-fnc="' + fnc + '" class="form-control input-sm" data-id="' + id + '" type="text" value="' + string + '"/>'
+        return output
+      },
+      editableSwap: function (id) {
+        if ($('abbr[data-id="' + id + '"]').css('display') == 'inline') $('abbr[data-id="' + id + '"]').css('display', 'none')
+        else $('abbr[data-id="' + id + '"]').css('display', 'inline')
+        if ($('input[data-id="' + id + '"]').css('display') == 'inline-block') $('input[data-id="' + id + '"]').css('display', 'none')
+        else {
+          $('input[data-id="' + id + '"]').css('display', 'inline-block')
+            .focus()
+            .off('focusout')
+            .on('focusout', function (ev) {
+              commons.editableSwap(id)
+              $('abbr[data-id="' + id + '"]').text($(ev.target).val())
+              var fnc = ev.target.dataset.fnc.split('.')
+              window[fnc[0]][fnc[1]](id, $(ev.target).val())
+            })
+        }
+      },
       getDateString: function (d) {
         return ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
             d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);

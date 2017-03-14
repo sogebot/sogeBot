@@ -40,7 +40,7 @@
       _.each(list, function(item, index) {
         $("#Notices").append((item.enabled ? '<tr>' : '<tr style="text-decoration: line-through">') +
           '<td>' + item.id + '</td>' +
-          '<td>' + item.text + '</td>' +
+          '<td>' + commons.editable(item.text, item.id, 'notice.edit') + '</td>' +
           '<td class="tableMenu">' +
           '<button type="button" class="btn btn-' + (!item.enabled ? 'success' : 'danger') + '" data-id="' + item.id + '" onclick="notice.toggle(this)">' + (!item.enabled ? 'Enable' : 'Disable') + '</button>' +
           '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
@@ -52,6 +52,9 @@
     },
     delete: function (el) {
       socket.emit('notice.delete', el.dataset.id)
+    },
+    edit: function (id, value) {
+      socket.emit('notice.edit', {id: id, value: value})
     },
     toggle: function (el) {
       socket.emit('notice.toggle', el.dataset.id)
@@ -70,4 +73,6 @@
   socket.on('notice', function(list) {
     notice.update(list)
   });
+
+  window.notice = notice
 </script>
