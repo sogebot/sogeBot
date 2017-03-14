@@ -11,7 +11,7 @@ function RafflesWidget () {
   this.participants = 0
   this.winner = null
 
-  global.panel.addWidget('raffles', 'Raffles', 'knight')
+  global.panel.addWidget('raffles', 'widget-title-raffles', 'knight')
 
   global.panel.socketListening(this, 'getRafflesParticipants', this.forceSendRaffleParticipants)
   global.panel.socketListening(this, 'switchEligibility', this.setEligibility)

@@ -25,7 +25,7 @@ function Ranks () {
 }
 
 Ranks.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'manage', name: 'Ranks', id: 'ranks'})
+  global.panel.addMenu({category: 'manage', name: 'ranks', id: 'ranks'})
   global.panel.socketListening(this, 'getRanks', this.listSocket)
   global.panel.socketListening(this, 'deleteRank', this.deleteSocket)
   global.panel.socketListening(this, 'createRank', this.createSocket)

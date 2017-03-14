@@ -1,5 +1,5 @@
 <div class="widget">
-    <h6>RAFFLES</h6>
+  <h6 data-lang="widget-title-raffles"></h6>
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation">
         <a href="#raffles-participants" aria-controls="home" role="tab" data-toggle="tab" title="Participants">
@@ -48,19 +48,19 @@
       </div>
 
       <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default btn-label" disabled="disabled">Eligible to enter: </button>
-        <button type="button" class="btn btn-disabled" id="followerCheckbox" onclick="raffles.switchFollowersOnly()">Followers only</button>
+        <button type="button" class="btn btn-default btn-label" disabled="disabled" data-lang="eligible-to-enter"></button>
+        <button type="button" class="btn btn-disabled" id="followerCheckbox" onclick="raffles.switchFollowersOnly()" data-lang="followers-only"></button>
       </div>
-      <button type="button" class="btn btn-disabled btn-block" style="margin-top: 20px;" id="raffleWidgetRoll" onclick="raffles.rollWinner()">Roll a winner</button>
+      <button type="button" class="btn btn-disabled btn-block" style="margin-top: 20px;" id="raffleWidgetRoll" onclick="raffles.rollWinner()" data-lang="roll-a-winner"></button>
     </div> <!-- /GIVEAWAY -->
     <div role="tabpanel" class="tab-pane" id="raffles-winner">
         <div style="text-align: center"><strong style="font-size: 30px"><i class="fa fa-twitch" aria-hidden="true"></i> <span class="raffles-winner-name"></span></strong></div>
 
         <div class="text-center">
           <div class="btn-group" role="group ">
-            <button type="button" class="btn btn-link" disabled="disabled" id="raffleWinnerFollowing"><span><i aria-hidden="true"></i> Following</span></button>
-            <button type="button" class="btn btn-link"><a href="" id="raffleWinnerMessage"><i class="fa fa-envelope" aria-hidden="true"></i> Send Message</a></button>
-            <button type="button" class="btn btn-link" onclick="raffles.rollWinner()"><span style="color: gray"><i class="fa fa-refresh" aria-hidden="true"></i> Roll again</span></button>
+            <button type="button" class="btn btn-link" disabled="disabled" id="raffleWinnerFollowing"><span><i aria-hidden="true"></i> <span data-lang="follower"></span></span></button>
+            <button type="button" class="btn btn-link"><a href="" id="raffleWinnerMessage"><i class="fa fa-envelope" aria-hidden="true"></i> <span data-lang="send-message"></span></a></button>
+            <button type="button" class="btn btn-link" onclick="raffles.rollWinner()"><span style="color: gray"><i class="fa fa-refresh" aria-hidden="true"></i> <i data-lang="roll-again"></i></span></button>
           </div>
         </div>
 
@@ -68,7 +68,7 @@
           <table class="table table-condensed">
             <thead>
               <tr>
-                <td style="vertical-align: bottom; font-size: 18px;"><i class="fa fa-comments-o" aria-hidden="true"></i> Messages</td>
+                <td style="vertical-align: bottom; font-size: 18px;"><i class="fa fa-comments-o" aria-hidden="true"></i> <i data-lang="messages"></i></td>
                 <td style="font-size: 25px; text-align: right;"><strong id="raffleMessageOffset">0:00</strong></td>
               </tr>
             </thead>
@@ -79,11 +79,11 @@
     </div> <!-- /WINNER -->
     <div role="tabpanel" class="tab-pane" id="raffles-settings">
       <div class="input-group">
-        <span class="input-group-addon">Announce every</span>
+        <span class="input-group-addon" data-lang="announce-every"></span>
         <input type="text" class="form-control" id="raffleAnnounce">
-        <span class="input-group-addon">minutes</span>
+        <span class="input-group-addon" data-lang="minutes"></span>
       </div>
-      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('raffles')" style="margin-top: 20px;">Remove widget</button>
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('raffles')" style="margin-top: 20px;" data-lang="remove-widget"></button>
     </div> <!-- /SETTINGS -->
 
     <div class="clearfix"></div>
@@ -280,8 +280,8 @@
   socket.emit('getRafflesConfiguration')
   socket.off('rafflesConfiguration')
   socket.on('rafflesConfiguration', function(data) {
+    $("#rafflesWidgetSearch").attr('placeholder', translations['search'] + '...')
+    $("#rafflesWidgetKeyword").attr('placeholder', translations['enter-keyword'] + '...')
     $("#raffleAnnounce").val(data.raffleAnnounceInterval)
   })
-
-
 </script>

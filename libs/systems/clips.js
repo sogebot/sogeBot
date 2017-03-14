@@ -16,8 +16,8 @@ function Clips () {
 }
 
 Clips.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'manage', name: 'Clips', id: 'clips'})
-  global.panel.addWidget('clips', 'Latest Clips', 'scissors')
+  global.panel.addMenu({category: 'manage', name: 'clips', id: 'clips'})
+  global.panel.addWidget('clips', 'widget-title-clips', 'scissors')
 
   global.panel.socketListening(this, 'getClips', this.sendSocket)
   global.panel.socketListening(this, 'getLatestClips', this.sendLatestSocket)

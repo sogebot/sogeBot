@@ -39,13 +39,13 @@
 
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav" id="menu-main">
-          <li id="menuDashboard"><a href="#" data-page="dashboard" class="active">Dashboard</a></li>
+          <li id="menuDashboard"><a href="#" data-page="dashboard" class="active" data-lang="dashboard"></a></li>
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Manage <span class="caret"></span></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span data-lang="manage"></span> <span class="caret"></span></a>
             <ul class="dropdown-menu" id="menu-manage"></ul>
           </li>
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Settings <span class="caret"></span></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span data-lang="settings"></span> <span class="caret"></span></a>
             <ul class="dropdown-menu" id="menu-settings"></ul>
           </li>
         </ul>
@@ -58,7 +58,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">Change Game</h4>
+          <h4 class="modal-title" data-lang="change-game"></h4>
         </div>
         <div class="modal-body dlg-game-and-title">
           <div id="carousel-games" class="carousel slide" data-interval="false" data-keyboard="false">
@@ -68,14 +68,14 @@
             <!-- Controls -->
             <a class="left carousel-control carousel-games-control" href="#carousel-games" role="button" data-slide="prev">
               <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-              <span class="sr-only">Previous</span>
+              <span class="sr-only" data-lang="previous"></span>
             </a>
             <a class="right carousel-control carousel-games-control" href="#carousel-games" role="button" data-slide="next">
               <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-              <span class="sr-only">Next</span>
+              <span class="sr-only" data-lang="next"></span>
             </a>
           </div>
-          <div style="font-weight: bold; position: absolute; line-height: 40px; left: 46.5%; text-align: center; font-family: 'Catamaran';">- OR -</div>
+          <div style="font-weight: bold; position: absolute; line-height: 40px; left: 46.5%; text-align: center; font-family: 'Catamaran';" data-lang="or"></div>
           <hr>
           <div class="form-group has-feedback" id="change-game-group">
             <input type="text" class="form-control" id="change-game-input" placeholder="Create and use a new game" onkeyup="changeGT.gameInput(this)">
@@ -83,11 +83,11 @@
           </div>
         </div>
         <div class="modal-header" style="padding-top: 0">
-          <h4 class="modal-title">Change Title <small id="titleForGame"></small></h4>
+          <h4 class="modal-title"><i data-lang="change-title"></i> <small id="titleForGame"></small></h4>
         </div>
         <div class="modal-body dlg-game-and-title">
           <div id="titles-list"></div>
-          <div style="font-weight: bold; position: absolute; left: 46.5%; text-align: center; font-family: 'Catamaran';">- OR -</div>
+          <div style="font-weight: bold; position: absolute; left: 46.5%; text-align: center; font-family: 'Catamaran';" data-lang="or"></div>
           <hr>
           <div class="input-group has-feedback" id="change-title-group" style="padding-bottom: 20px">
             <span class="input-group-addon" style="border:0; background-color: inherit">
@@ -98,9 +98,9 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger disabled" style="display: none" id="title-error">Custom title is checked, but is empty!</button>
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="changeGT.save()">Save changes</button>
+          <button type="button" class="btn btn-danger disabled" style="display: none" id="title-error"><i data-lang="custom-title-empty-error"></i></button>
+          <button type="button" class="btn btn-default" data-dismiss="modal"><i data-lang="close"></i></button>
+          <button type="button" class="btn btn-primary" onclick="changeGT.save()"><i data-lang="save-changes"></i></button>
         </div>
       </div>
     </div>
@@ -109,55 +109,55 @@
   <!-- SNIPPETS -->
   <div class="stream-info-container col-xs-12 col-sm-12 col-md-12">
     <div class="stream-info col-xs-6 col-sm-4 col-md-2" onclick="changeGT.showDlg()">
-      <h2>Game <small>click to change</small></h2>
-      <span class="data" id="game">Not Available</span>
+      <h2><i data-lang="game"></i> <small data-lang="click-to-change"></small></h2>
+      <span class="data" id="game" data-lang="not-available"></span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>Uptime</h2>
+      <h2 data-lang="uptime"></h2>
       <span class="data" id="uptime">--:--:--</span>
       <span class="stats">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>Viewers</h2>
+      <h2 data-lang="viewers"></h2>
       <span class="data curViewers">-</span>
       <span class="stats">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>Max Viewers</h2>
+      <h2 data-lang="max-viewers"></h2>
       <span class="data" id="maxViewers">-</span>
       <span class="stats" id="maxViewersChange">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>New Chatters</h2>
+      <h2 data-lang="new-chatters"></h2>
       <span class="data" id="newChtr">-</span>
       <span class="stats" id="newChtrChange">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>Chat Messages</h2>
+      <h2 data-lang="chat-messages"></h2>
       <span class="data" id="totalChatMsgs">-</span>
       <span class="stats" id="totalChatMsgsChange">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-4" onclick="changeGT.showDlg()">
-      <h2>Title <small>click to change</small></h2>
-      <span class="data" id="title">Not Available</span>
+      <h2><i data-lang="title"></i> <small data-lang="click-to-change"></small></h2>
+      <span class="data" id="title" data-lang="not-available"></span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>Views</h2>
+      <h2 data-lang="views"></h2>
       <span class="data" id="curViews">-</span>
       <span class="stats" id="curViewsChange">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>Hosts</h2>
+      <h2 data-lang="hosts"></h2>
       <span class="data" id="curHosts">-</span>
       <span class="stats" id="curHostsChange">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>Followers</h2>
+      <h2 data-lang="followers"></h2>
       <span class="data"><span id="curFollowers">-</span></span>
       <span class="stats" id="curFollowersChange">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2>Status</h2>
+      <h2 data-lang="status"></h2>
       <span class="data" style="font-weight: bold">
         <span class="text-warning" id="APIStatus" title="API checking">API</span>
         <span class="text-warning" id="TMIStatus" title="TMI checking">TMI</span>
@@ -169,7 +169,7 @@
   </div>
 
   <button class="btn btn-info btn-xs" id="percentage-btn" data-show-percentage="true" style="position: absolute; right: 50px" onclick="switchPercentageShow()">%</button>
-  <button class="btn btn-default btn-xs text-muted" id="mute-btn" data-muted="false" style="position: absolute; right: 70px" onclick="switchMute()">mute</button>
+  <button class="btn btn-default btn-xs text-muted" id="mute-btn" data-muted="false" style="position: absolute; right: 70px" onclick="switchMute()" data-lang="mute"></button>
 
   <div class="container-fluid">
     <div class="row">
@@ -183,7 +183,7 @@
 
         <div class="col-xs-12 col-sm-12 col-md-12" id="addWidget">
           <div class="widgetAdd">
-            <span class="glyphicon glyphicon-plus"></span> Add widget
+            <span class="glyphicon glyphicon-plus"></span> <span data-lang="add-widget">
           </div>
         </div>
       </div>
@@ -220,6 +220,8 @@
     var loadedMenu = false
     var addingWidget = false
     var systems
+
+    var translations = {}
 
     socket.emit('getSystems')
     socket.on('systems', function(data) {
@@ -317,7 +319,7 @@
       _.each(menu, function(obj) {
         if (obj.id !== 'dashboard') {
           if ((obj.id === 'systems') && systems) return
-          $('#menu-' + obj.category).append('<li><a href="#" data-page="' + obj.id + '">' + obj.name + '</a></li>')
+          $('#menu-' + obj.category).append('<li><a href="#" data-page="' + obj.id + '" data-lang="' + obj.name + '"></a></li>')
         }
         if (obj.id === 'systems') systems = true
       })
@@ -332,7 +334,9 @@
         $(ev.currentTarget).addClass('active')
 
         $("#pages").empty()
-        if (page !== 'dashboard') $("#pages").append($('<div id="P' + page + '">').load('pages/' + page + '.html'))
+        if (page !== 'dashboard') $("#pages").append($('<div id="P' + page + '">').load('pages/' + page + '.html', function () {
+          commons.translate()
+        }))
 
         $(".widgets").css('visibility', visibility)
         $("#addWidget").css('visibility', visibility)
@@ -359,7 +363,9 @@
       _.each(widgets, function(widget) {
         widget = widget.split(':')
         if (loadedWidgets.indexOf(widget[1]) === -1) {
-          $("#widgetRow" + widget[0]).append($('<div id="' + widget[1] + '">').load('widgets/' + widget[1] + '.html'))
+          $("#widgetRow" + widget[0]).append($('<div id="' + widget[1] + '">').load('widgets/' + widget[1] + '.html', function () {
+            commons.translate()
+          }))
           loadedWidgets.push(widget[1])
         }
       })
@@ -445,6 +451,11 @@
     })
 
     var commons = {
+      translate: function () {
+        _.each(translations, function (value, key) {
+            $('[data-lang="' + key + '"]').text(value)
+          })
+      },
       editable: function (string, id, fnc) {
         id = id || ''
         var output = '<abbr title="click to edit" data-id="' + id + '" onclick="commons.editableSwap(\'' + id + '\')">' + string + '</abbr>'
@@ -587,7 +598,7 @@
       },
       setSelectedGame: function(game) {
         this.selectedGame = game
-        $("#titleForGame").text('for ' + game)
+        $("#titleForGame").text(translations['for'] + ' ' + game)
 
         // also, we want to update radios
         this.updateRadios(this.cachedData[game])
@@ -600,7 +611,7 @@
         $('.carousel-games-inner').empty()
         var divItem = $('<div class="item active">')
 
-        if (curGame !== 'Not Available' && curGame !== '') {
+        if (curGame !== translations['not-available'] && curGame !== '') {
           var div = $('<div class="col-md-2 focus" style="cursor: pointer">')
           var img = $('<img>')
           img.attr('src', 'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(curGame) + '-100x140.jpg')
@@ -614,7 +625,7 @@
           this.setSelectedGame(curGame)
         }
 
-        var count = (curGame !== 'Not Available' && curGame !== '') ? 1 : 0
+        var count = (curGame !== translations['not-available'] && curGame !== '') ? 1 : 0
         _.each(data, function(aTitles, aGame) {
           if (aGame === curGame) return // current game is already in carousel
 
@@ -662,7 +673,7 @@
         $('#titles-list').empty()
         var curTitle = $('#title').text()
 
-        if (curTitle !== 'Not Available' && curTitle !== '') {
+        if (curTitle !== translations['not-available'] && curTitle !== '') {
           var div = $('<div class="radio titles-list-radio">')
           div.attr('data-deletable', false)
           var label = $('<label>')
@@ -762,6 +773,13 @@
     socket.on('sendUserTwitchGamesAndTitles', function(data) {
       delete data._id
       changeGT.update(data)
+    })
+
+    socket.on('lang', function (data) {
+      translations = data
+      _.each(data, function (value, key) {
+        $('[data-lang="' + key + '"]').text(value)
+      })
     })
   </script>
 </body>
