@@ -1,7 +1,7 @@
 'use strict'
 
 function ChatWidget () {
-  global.panel.addWidget('chat', 'Twitch Chat', 'comment')
+  global.panel.addWidget('chat', 'widget-title-chat', 'comment')
   global.panel.socketListening(this, 'getChatRoom', this.sendChatRoom)
 }
 

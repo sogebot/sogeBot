@@ -88,6 +88,7 @@ Configuration.prototype.loadValues = function () {
   var self = this
   global.botDB.find({type: 'settings'}, function (err, items) {
     if (err) console.log(err)
+    self._loaded = true
     items.map(function (item) {
       delete item.type
       delete item._id

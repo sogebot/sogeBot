@@ -1,18 +1,18 @@
 <div class="col-xs-12 col-sm-5 col-md-4 col-lg-3">
   <div class="widget">
-    <div class="title">Calendar</div>
+    <div class="title" data-lang="calendar"></div>
     <div id="calendar"></div>
   </div>
   <div class="widget">
-    <div class="title">Stream Events <small id="calendarDate"></small></div>
-    <div id="streamEvents"><p>Select date from calendar</p></div>
+    <div class="title"><span data-lang="stream-events"></span> <small id="calendarDate"></small></div>
+    <div id="streamEvents"><p data-lang="select-date-from-calendar"></p></div>
   </div>
 </div>
 
 <div class="col-xs-12 col-sm-7 col-md-8 col-lg-9">
   <div class="widget" id="graphs">
-    <div class="title">Stream Statistics <small id="streamDate"></small></div>
-    <div id="statsChart">Select stream from calendar and events</div>
+    <div class="title"><span data-lang="stats"></span> <small id="streamDate"></small></div>
+    <div id="statsChart" data-lang="select-stream-from-calendar-and-events"></div>
     <div id="eventsChart"></div>
     <div id="gameChart" style="padding-left: 40px;"></div>
   </div>
@@ -81,7 +81,7 @@
     output = output + '</ul>'
 
     if (data.length === 0) {
-      $events.html('<p>There is no events on selected date</p>')
+      $events.html('<p>' + translations['there-is-no-events-on-selected-date'] + '</p>')
     } else {
       $events.html(output)
     }
@@ -106,9 +106,9 @@
     if (_.isUndefined(values)) return
     var data = new google.visualization.DataTable();
     data.addColumn('datetime', '');
-    data.addColumn('number', 'Followers');
-    data.addColumn('number', 'New Chatters');
-    data.addColumn('number', 'Hosts');
+    data.addColumn('number', translations['followers']);
+    data.addColumn('number', translations['new-chatters']);
+    data.addColumn('number', translations['hosts']);
 
     var followers = 0
     var newChatters = 0
@@ -147,13 +147,13 @@
     if (_.isUndefined(values)) return
     var data = new google.visualization.DataTable();
     data.addColumn('datetime', '');
-    data.addColumn('number', 'Followers');
-    data.addColumn('number', 'Max Concurrent Viewers');
-    data.addColumn('number', 'Viewers');
-    data.addColumn('number', 'New Chatters');
-    data.addColumn('number', 'Chat Messages');
-    data.addColumn('number', 'Views');
-    data.addColumn('number', 'Hosts');
+    data.addColumn('number', translations['followers']);
+    data.addColumn('number', translations['max-viewers']);
+    data.addColumn('number', translations['viewers']);
+    data.addColumn('number', translations['new-chatters']);
+    data.addColumn('number', translations['chat-messages']);
+    data.addColumn('number', translations['views']);
+    data.addColumn('number', translations['hosts']);
 
     var maxViewers = 0
     _.each(values, function (array, index) {
@@ -197,10 +197,10 @@
     var chart = new google.visualization.Timeline(container);
     var dataTable = new google.visualization.DataTable();
 
-    dataTable.addColumn({ type: 'string', id: 'Status' });
-    dataTable.addColumn({ type: 'string', id: 'Name' });
-    dataTable.addColumn({ type: 'datetime', id: 'Start' });
-    dataTable.addColumn({ type: 'datetime', id: 'End' });
+    dataTable.addColumn({ type: 'string', id: translations['status'] });
+    dataTable.addColumn({ type: 'string', id: translations['name'] });
+    dataTable.addColumn({ type: 'datetime', id: translations['start-time'] });
+    dataTable.addColumn({ type: 'datetime', id: translations['end-time'] });
 
     var game = ''
     var status = ''

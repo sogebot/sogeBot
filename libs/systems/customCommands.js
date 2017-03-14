@@ -52,7 +52,7 @@ CustomCommands.prototype._save = function (self) {
 }
 
 CustomCommands.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'manage', name: 'Custom Commands', id: 'customCommands'})
+  global.panel.addMenu({category: 'manage', name: 'custom-commands', id: 'customCommands'})
   global.panel.socketListening(this, 'commands.get', this.sendCommands)
   global.panel.socketListening(this, 'commands.delete', this.deleteCommands)
   global.panel.socketListening(this, 'commands.create', this.createCommands)

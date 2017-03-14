@@ -2,6 +2,10 @@
   border-radius: 0 !important;
 }
 
+[data-lang] {
+  font-style: normal;
+}
+
 body {
   padding-top: 50px;
   background-color: #eee;

@@ -6,7 +6,7 @@ function QueueWidget () {
   this.timestamp = 0
 
   if (global.configuration.get().systems.queue !== true) return
-  global.panel.addWidget('queue', 'Queue', 'heart-empty')
+  global.panel.addWidget('queue', 'widget-title-queue', 'heart-empty')
   global.panel.socketListening(this, 'queue.get', this.sendQueue)
   global.panel.socketListening(this, 'queue.setLocked', this.setLocked)
   global.panel.socketListening(this, 'queue.clear', this.clear)

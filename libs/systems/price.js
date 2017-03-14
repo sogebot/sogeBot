@@ -52,7 +52,7 @@ Price.prototype._save = function (self) {
 }
 
 Price.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'manage', name: 'Price', id: 'price'})
+  global.panel.addMenu({category: 'manage', name: 'price', id: 'price'})
   global.panel.socketListening(this, 'price.get', this.sendPrices)
   global.panel.socketListening(this, 'price.delete', this.deletePrice)
   global.panel.socketListening(this, 'price.create', this.createPrice)
