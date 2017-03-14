@@ -49,7 +49,7 @@
         $("#Commands").append((item.enabled ? '<tr>' : '<tr style="text-decoration: line-through">') +
           '<td>' + (index + 1) + '</td>' +
           '<td>!' + item.command + '</td>' +
-          '<td>' + item.response + '</td>' +
+          '<td>' + commons.editable(item.response, item.command, 'cc.editCommand') + '</td>' +
           '<td class="tableMenu">' +
           '<button type="button" class="btn btn-' + (!item.enabled ? 'success' : 'danger') + '" data-command="' + item.command + '" onclick="cc.toggleCommand(this)">' + (!item.enabled ? 'Enable' : 'Disable') + '</button>' +
           '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
@@ -58,6 +58,9 @@
           '</td>' +
           '</tr>');
       })
+    },
+    editCommand: function (id, value) {
+      socket.emit('commands.edit', {id: id, value: value})
     },
     deleteCommand: function (el) {
       socket.emit('commands.delete', el.dataset.command)
@@ -79,4 +82,6 @@
   socket.on('commands', function(list) {
     cc.updateCommands(list)
   });
+
+  window.cc = cc
 </script>

@@ -57,6 +57,7 @@ Keywords.prototype.webPanel = function () {
   global.panel.socketListening(this, 'keywords.delete', this.deleteKeywords)
   global.panel.socketListening(this, 'keywords.create', this.createKeywords)
   global.panel.socketListening(this, 'keywords.toggle', this.toggleKeywords)
+  global.panel.socketListening(this, 'keywords.edit', this.editKeywords)
 }
 
 Keywords.prototype.sendKeywords = function (self, socket) {
@@ -75,6 +76,12 @@ Keywords.prototype.toggleKeywords = function (self, socket, data) {
 
 Keywords.prototype.createKeywords = function (self, socket, data) {
   self.add(self, null, data.keyword + ' ' + data.response)
+  self.sendKeywords(self, socket)
+}
+
+Keywords.prototype.editKeywords = function (self, socket, data) {
+  if (data.value.length === 0) self.remove(self, null, data.id)
+  else _.find(self.keywords, function (o) { return o.keyword === data.id }).response = data.value
   self.sendKeywords(self, socket)
 }
 
