@@ -150,7 +150,7 @@
     "max-spam-length": "Maximální délka spamu",
     "max-emotes-in-message": "Maximální počet smajlíků",
     "timeout-duration": "Trvání timeoutu",
-    "timeout settings": "Nastavení timeoutů",
+    "timeout-settings": "Nastavení timeoutů",
     "warnings-before-user-timeout": "Varování před timeoutem diváka",
     "warning-should-be-timeout": "Varování je 1s timeout (promaže chat)",
     "announce-timeouts-in-chat": "Oznámit timeouty v chatu",
