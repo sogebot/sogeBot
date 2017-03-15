@@ -150,7 +150,7 @@
     "max-spam-length": "Max spam length",
     "max-emotes-in-message": "Max emotes in message",
     "timeout-duration": "Timeout duration",
-    "timeout settings": "Timeout settings",
+    "timeout-settings": "Timeout settings",
     "warnings-before-user-timeout": "Warnings before user timeout",
     "warning-should-be-timeout": "Warning is 1s timeout (deletes chat)",
     "announce-timeouts-in-chat": "Announce timeouts in chat",
