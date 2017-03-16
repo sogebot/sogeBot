@@ -415,7 +415,8 @@
     "failed": {
       "parse": "Pouziti: !permission viewer|mods|owner [command]",
       "noCmd": "Promin, (sender), ale tento prikaz neni v botovi evidovan"
-    }
+    },
+    "without-permission": "Nemas dostatecne opravneni pro '(command)'"
   },
   "moderation": {
     "warning": "[zbyva (value) varovani]",

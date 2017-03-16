@@ -413,7 +413,8 @@
     "failed": {
       "parse": "Usage: !permission viewer|mods|owner [command]",
       "noCmd": "Sorry, (sender), but this command is not registered in a bot"
-    }
+    },
+    "without-permission": "You don't have enough permissions for '(command)'"
   },
   "moderation": {
     "warning": "[(value) warnings left]",
