@@ -7,6 +7,7 @@ function Users () {
   this.changes = 0
   this.users = {}
   this.cachedLatestFollowers = []
+  this.rate_limit_follower_check = []
 
   this._update(this)
 
@@ -16,6 +17,13 @@ function Users () {
   setInterval(function () {
     self.changes += 500 // force every 15min to save changes
   }, 15 * 60 * 1000)
+
+  setInterval(function () {
+    if (self.rate_limit_follower_check.length > 0) {
+      self.rate_limit_follower_check = _.uniq(self.rate_limit_follower_check)
+      self.isFollowerUpdate(self.rate_limit_follower_check.shift())
+    }
+  }, 1000) // run follower ONE request every second
 }
 
 Users.prototype._update = function (self) {
@@ -73,7 +81,7 @@ Users.prototype.get = function (username) {
         self.users[username].points = !_.isUndefined(self.users[oldUser.username].points) ? self.users[oldUser.username].points : 0
         delete self.users[oldUser.username]
       }
-      self.isFollowerUpdate(username)
+      self.isFollower(username)
       self.users[username].time.followCheck = new Date().getTime()
     })
   }
@@ -116,10 +124,15 @@ Users.prototype.delete = function (username) {
   delete this.users[username]
 }
 
-Users.prototype.isFollowerUpdate = function (username) {
+Users.prototype.isFollower = function (username) {
   if (new Date().getTime() - global.users.get(username).time.followCheck < 1000 * 60 * 15) { // check can be performed _only_ every 15 minutes
     return
   }
+
+  global.users.rate_limit_follower_check.push(username)
+}
+
+Users.prototype.isFollowerUpdate = function (username) {
   global.client.api({
     url: 'https://api.twitch.tv/kraken/users/' + global.users.get(username).id + '/follows/channels/' + global.channelId,
     headers: {
@@ -176,7 +189,7 @@ Users.prototype.updateFollowers = function () {
 
     _.each(_.difference(self.cachedLatestFollowers, _.map(body.follows, 'user.name')), function (user) {
       // if user is in cachedLatestFollowers -> recheck user
-      if (_.includes(user, self.cachedLatestFollowers)) self.isFollowerUpdate(user)
+      if (_.includes(user, self.cachedLatestFollowers)) self.isFollower(user)
       // if user is in body.follows -> new follower
       if (_.includes(user, _.map(body.follows, 'user.name'))) {
         global.log.follow(user)

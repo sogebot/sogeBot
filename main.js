@@ -85,7 +85,7 @@ global.client.on('message', function (channel, sender, message, fromSelf) {
       global.log.chatIn(message, {username: sender.username})
 
       if (!_.isUndefined(global.users.get(sender.username).id)) {
-        global.users.isFollowerUpdate(sender.username)
+        global.users.isFollower(sender.username)
       }
     } else {
       global.log.whisperIn(message, {username: sender.username})
@@ -101,7 +101,7 @@ global.client.on('message', function (channel, sender, message, fromSelf) {
 global.client.on('join', function (channel, username, fromSelf) {
   if (!fromSelf) {
     if (!_.isUndefined(global.users.get(username).id)) {
-      global.users.isFollowerUpdate(username)
+      global.users.isFollower(username)
     }
     global.users.set(username, { is: { online: true } })
   }
