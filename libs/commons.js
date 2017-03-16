@@ -102,7 +102,9 @@ Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
   if (message === '') return // if message is empty, don't send anything
 
   if (global.configuration.get().bot.debug) {
-    console.log('TO: ' + (_.isNull(sender) ? 'null' : sender.username) + ': ' + message)
+    if (_.isUndefined(sender) || _.isNull(sender)) sender = { username: null }
+    message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace('(sender)', '@' + sender.username) : message
+    sender['message-type'] === 'whisper' ? global.log.whisperOut(message, {username: sender.username}) : global.log.chatOut(message, {username: sender.username})
     return
   }
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot

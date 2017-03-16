@@ -94,6 +94,10 @@ Parser.prototype.parseCommands = async function (user, message) {
         if (typeof this.registeredCmds[cmd] === 'function') this.registeredCmds[cmd](this.selfCmds[cmd], user, text.trim(), message)
         else global.log.error(cmd + ' have wrong null function registered!')
         break // cmd is executed
+      } else {
+        // user doesn't have permissions for command
+        user['message-type'] = 'whisper'
+        global.commons.sendMessage(global.translate('permissions.without-permission').replace('(command)', message), user)
       }
     }
   }
