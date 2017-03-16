@@ -96,7 +96,7 @@ global.client.on('message', function (channel, sender, message, fromSelf) {
 
 global.client.on('join', function (channel, username, fromSelf) {
   if (!fromSelf) {
-    global.users.set(username, { is: { online: false } })
+    global.users.set(username, { is: { online: true } })
     global.log.join(username)
   }
 })
