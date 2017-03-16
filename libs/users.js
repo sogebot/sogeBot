@@ -6,6 +6,7 @@ var log = global.log
 function Users () {
   this.changes = 0
   this.users = {}
+  this.cachedLatestFollowers = []
 
   this._update(this)
 
@@ -56,7 +57,12 @@ Users.prototype.get = function (username) {
         return
       }
 
-      const oldUser = _.find(self.users, function (o) { return o.id === body.users[0]._id })
+      if (_.isUndefined(body.users[0])) {
+        body.custom = {error: 'Cannot find username ID in twitch'}
+        global.log.error(JSON.stringify(body))
+        return
+      }
+      const oldUser = _.find(self.users, function (o) { return o.id === body.users[0]._id && o.username !== username })
       // if user changed his username -> move all saved data to new username
       if (_.isUndefined(oldUser)) {
         global.users.set(username, {id: body.users[0]._id})
@@ -67,6 +73,8 @@ Users.prototype.get = function (username) {
         self.users[username].points = !_.isUndefined(self.users[oldUser.username].points) ? self.users[oldUser.username].points : 0
         delete self.users[oldUser.username]
       }
+      self.isFollowerUpdate(username)
+      self.users[username].time.followCheck = new Date().getTime()
     })
   }
 
@@ -108,31 +116,80 @@ Users.prototype.delete = function (username) {
   delete this.users[username]
 }
 
-Users.prototype.updateFollowers = function () {
-  this.setAll({ is: { follower: false } })
+Users.prototype.isFollowerUpdate = function (username) {
+  if (new Date().getTime() - global.users.get(username).time.followCheck < 1000 * 60 * 15) { // check can be performed _only_ every 15 minutes
+    return
+  }
+  global.client.api({
+    url: 'https://api.twitch.tv/kraken/users/' + global.users.get(username).id + '/follows/channels/' + global.channelId,
+    headers: {
+      Accept: 'application/vnd.twitchtv.v5+json',
+      'Client-ID': global.configuration.get().twitch.clientId
+    }
+  }, function (err, res, body) {
+    if (err) {
+      global.log.error(err)
+      return
+    }
+    if (res.statusCode === 400) {
+      body.username = username
+      body.user_id = global.users.get(username).id
+      body.channel_id = global.channelId
+      body.url = 'https://api.twitch.tv/kraken/users/' + global.users.get(username).id + '/follows/channels/' + global.channelId
+      global.log.error(JSON.stringify(body))
+      return
+    }
+    if (res.statusCode === 404) {
+      if (global.users.get(username).is.follower) {
+        global.log.unfollow(username)
+      }
+      global.users.set(username, { is: { follower: false, time: { followCheck: new Date().getTime() } } }, global.users.get(username).is.follower)
+    } else {
+      if (!global.users.get(username).is.follower) {
+        global.log.follow(username)
+      }
+      global.users.set(username, { is: { follower: true, time: { followCheck: new Date().getTime() } } }, !global.users.get(username).is.follower)
+    }
+  })
+}
 
-  var makeRequest = function (cursor) {
-    global.client.api({
-      url: 'https://api.twitch.tv/kraken/channels/' + global.channelId + '/follows?limit=100' + (!_.isUndefined(cursor) ? '&cursor=' + cursor : ''),
-      headers: {
-        Accept: 'application/vnd.twitchtv.v5+json',
-        'Client-ID': global.configuration.get().twitch.clientId
-      }
-    }, function (err, res, body) {
-      if (err) {
-        global.log.error(err)
-        return
-      }
-      if (res.statusCode === 200 && !_.isNull(body) && body.follows.length > 0) {
-        _.each(body.follows, function (follower) {
-          global.users.set(follower.user.name, { is: { follower: true } }, true)
-        })
-        makeRequest(body._cursor)
+Users.prototype.updateFollowers = function () {
+  const self = global.users
+  global.client.api({
+    url: 'https://api.twitch.tv/kraken/channels/' + global.channelId + '/follows?limit=100',
+    headers: {
+      Accept: 'application/vnd.twitchtv.v5+json',
+      'Client-ID': global.configuration.get().twitch.clientId
+    }
+  }, function (err, res, body) {
+    if (err) {
+      global.log.error(err)
+      return
+    }
+
+    if (self.cachedLatestFollowers.length === 0) {
+      _.each(_.map(body.follows, 'user.name'), function (follower) {
+        self.cachedLatestFollowers.push(follower)
+      })
+      return
+    }
+
+    _.each(_.difference(self.cachedLatestFollowers, _.map(body.follows, 'user.name')), function (user) {
+      // if user is in cachedLatestFollowers -> recheck user
+      if (_.includes(user, self.cachedLatestFollowers)) self.isFollowerUpdate(user)
+      // if user is in body.follows -> new follower
+      if (_.includes(user, _.map(body.follows, 'user.name'))) {
+        global.log.follow(user)
+        global.users.set(user, { is: { follower: true }, time: { followCheck: new Date().getTime() } })
       }
     })
-  }
 
-  makeRequest()
+    // flush cache
+    self.cachedLatestFollowers = []
+    _.each(_.map(body.follows, 'user.name'), function (follower) {
+      self.cachedLatestFollowers.push(follower)
+    })
+  })
 }
 
 module.exports = Users
