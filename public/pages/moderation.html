@@ -265,9 +265,9 @@
   socket.emit('getConfiguration')
 
   var createToggle = function (id, value, options) {
-    options = options || {on: 'On', off: 'Off'}
+    options = options || {on: translations['on'], off: translations['off']}
     $('#' + id + 'Toggle').bootstrapToggle(options)
-    $('#' + id + 'Toggle').bootstrapToggle(value ? 'on' : 'off')
+    $('#' + id + 'Toggle').bootstrapToggle(value ? translations['on'] : translations['off'])
     $('#' + id + 'Toggle').off('change')
     $('#' + id + 'Toggle').change(function() {
       var data = {}
@@ -310,9 +310,9 @@
     $("#moderationEmotesMaxCount").text(data.moderationEmotesMaxCount)
 
     $("#moderationWarnings").text(data.moderationWarnings)
-    createToggle('moderationWarningsTimeouts', data.moderationWarningsTimeouts, {on: 'timeout', off: 'warning'})
+    createToggle('moderationWarningsTimeouts', data.moderationWarningsTimeouts, {on: translations['timeout'], off: translations['warning']})
 
     $("#moderationAnnounceTimeouts").text(data.moderationAnnounceTimeouts)
-    createToggle('moderationAnnounceTimeouts', data.moderationAnnounceTimeouts, {on: 'announce', off: 'muted'})
+    createToggle('moderationAnnounceTimeouts', data.moderationAnnounceTimeouts, {on: translations['announce'], off: translations['muted']})
   })
 </script>
