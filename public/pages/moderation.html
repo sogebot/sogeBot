@@ -267,7 +267,7 @@
   var createToggle = function (id, value, options) {
     options = options || {on: translations['on'], off: translations['off']}
     $('#' + id + 'Toggle').bootstrapToggle(options)
-    $('#' + id + 'Toggle').bootstrapToggle(value ? translations['on'] : translations['off'])
+    $('#' + id + 'Toggle').bootstrapToggle(value ? 'on' : 'off')
     $('#' + id + 'Toggle').off('change')
     $('#' + id + 'Toggle').change(function() {
       var data = {}
