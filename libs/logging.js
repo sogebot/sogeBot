@@ -70,6 +70,6 @@ global.log = new (winston.Logger)({
       colorize: false })
   ],
   exceptionHandlers: [
-    new winston.transports.File({ filename: logDir + '/exceptions.log' })
+    new winston.transports.File({ filename: logDir + '/exceptions.log', json: false })
   ]
 })
