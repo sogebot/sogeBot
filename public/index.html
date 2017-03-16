@@ -780,6 +780,9 @@
       _.each(data, function (value, key) {
         $('[data-lang="' + key + '"]').text(value)
       })
+      $('#change-game-input').attr('placeholder', translations['create-and-use-a-new-game'])
+      $('#change-title').attr('placeholder', translations['create-and-use-a-new-title'])
+
     })
   </script>
 </body>
