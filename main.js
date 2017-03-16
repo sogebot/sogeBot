@@ -81,8 +81,12 @@ global.client.on('disconnected', function (address, port) {
 global.client.on('message', function (channel, sender, message, fromSelf) {
   if (!fromSelf && global.configuration.get().twitch.username !== sender.username) {
     if (sender['message-type'] !== 'whisper') {
-      global.parser.timer.push({ 'id': sender.id, 'received': sender['tmi-sent-ts'] })
+      global.parser.timer.push({ 'id': sender.id, 'received': new Date().getTime() })
       global.log.chatIn(message, {username: sender.username})
+
+      if (!_.isUndefined(global.users.get(sender.username).id)) {
+        global.users.isFollowerUpdate(sender.username)
+      }
     } else {
       global.log.whisperIn(message, {username: sender.username})
     }
@@ -96,15 +100,16 @@ global.client.on('message', function (channel, sender, message, fromSelf) {
 
 global.client.on('join', function (channel, username, fromSelf) {
   if (!fromSelf) {
+    if (!_.isUndefined(global.users.get(username).id)) {
+      global.users.isFollowerUpdate(username)
+    }
     global.users.set(username, { is: { online: true } })
-    global.log.join(username)
   }
 })
 
 global.client.on('part', function (channel, username, fromSelf) {
   if (!fromSelf) {
     global.users.set(username, { is: { online: false } })
-    global.log.part(username)
   }
 })
 
