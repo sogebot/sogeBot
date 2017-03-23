@@ -37,7 +37,7 @@ function Price () {
 
 Price.prototype._update = function (self) {
   global.botDB.findOne({ _id: 'prices' }, function (err, item) {
-    if (err) return log.error(err)
+    if (err) return log.error(err, { fnc: 'Price.prototype._update' })
     if (_.isNull(item)) return
 
     self.prices = item.prices

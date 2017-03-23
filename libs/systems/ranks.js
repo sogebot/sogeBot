@@ -33,7 +33,7 @@ Ranks.prototype.webPanel = function () {
 
 Ranks.prototype.listSocket = function (self, socket) {
   global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, items) {
-    if (err) { log.error(err) }
+    if (err) { log.error(err, { fnc: 'Ranks.prototype.listSocket' }) }
     socket.emit('Ranks', items)
   })
 }
@@ -64,7 +64,7 @@ Ranks.prototype.add = function (self, sender, text) {
 Ranks.prototype.list = function (self, sender, text) {
   if (_.isNull(text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/))) {
     global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, docs) {
-      if (err) { log.error(err) }
+      if (err) { log.error(err, { fnc: 'Ranks.prototype.list' }) }
       var list = []
       docs.forEach(function (e, i, ar) { list.push(e.hours + ' ' + e.rank) })
       var output = (docs.length === 0 ? global.translate('rank.failed.list') : global.translate('rank.success.list') + ': ' + list.join(', '))
@@ -94,7 +94,7 @@ Ranks.prototype.updateRanks = function () {
     watchTime = _.isFinite(parseInt(watchTime, 10)) && _.isNumber(parseInt(watchTime, 10)) ? (watchTime / 1000 / 60 / 60).toFixed(0) : 0
 
     global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, items) {
-      if (err) { log.error(err) }
+      if (err) { log.error(err, { fnc: 'Ranks.prototype.updateRanks' }) }
       _.each(items, function (rank) {
         if (watchTime >= parseInt(rank.hours, 10)) {
           global.users.set(user.username, {rank: rank.rank})

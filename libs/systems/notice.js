@@ -53,7 +53,7 @@ function Notice () {
 
 Notice.prototype._update = function (self) {
   global.botDB.findOne({ _id: 'notices' }, function (err, item) {
-    if (err) return log.error(err)
+    if (err) return log.error(err, { fnc: 'Notice.prototype._update' })
     if (_.isNull(item)) return
 
     self.notices = item.notices

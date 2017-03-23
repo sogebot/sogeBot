@@ -55,7 +55,7 @@ Cooldown.prototype._save = function (self) {
 
 Cooldown.prototype._update = function (self) {
   global.botDB.findOne({ _id: self._id }, function (err, item) {
-    if (err) return log.error(err)
+    if (err) return log.error(err, { fnc: 'Cooldown.prototype._update' })
     if (_.isNull(item)) return
 
     self.list = item.list

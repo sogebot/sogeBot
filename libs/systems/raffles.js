@@ -34,7 +34,7 @@ function Raffles () {
 Raffles.prototype.registerRaffleKeyword = function (self) {
   if (!_.isNull(self.keyword)) global.parser.unregister('!' + self.keyword)
   global.botDB.findOne({_id: 'raffle'}, function (err, item) {
-    if (err) return log.error(err)
+    if (err) return log.error(err, { fnc: 'Raffles.prototype.registerRaffleKeyword' })
     if (!_.isNull(item)) {
       global.parser.register(this, '!' + item.keyword, self.participate, constants.VIEWERS)
       self.keyword = item.keyword
@@ -44,7 +44,7 @@ Raffles.prototype.registerRaffleKeyword = function (self) {
 
 Raffles.prototype.pick = function (self, sender) {
   global.botDB.find({ $where: function () { return this._id.startsWith('raffle_participant_') && this.eligible } }, function (err, items) {
-    if (err) return log.error(err)
+    if (err) return log.error(err, { fnc: 'Raffles.prototype.pick' })
     var winner = { username: null }
     if (items.length !== 0) {
       winner = _.sample(items)
@@ -67,7 +67,7 @@ Raffles.prototype.pick = function (self, sender) {
 
 Raffles.prototype.participate = function (self, sender) {
   global.botDB.findOne({_id: 'raffle'}, function (err, item) {
-    if (err) return log.error(err)
+    if (err) return log.error(err, { fnc: 'Raffles.prototype.participate' })
     if (!_.isNull(item) && !item.locked) {
       var participant = { _id: 'raffle_participant_' + sender.username,
         eligible: true,
@@ -84,7 +84,7 @@ Raffles.prototype.participate = function (self, sender) {
 
 Raffles.prototype.info = function (self, sender) {
   global.botDB.findOne({_id: 'raffle'}, function (err, item) {
-    if (err) return log.error(err)
+    if (err) return log.error(err, { fnc: 'Raffles.prototype.info' })
     if (!_.isNull(item)) {
       if (!_.isNull(item.winner)) global.commons.sendMessage(global.translate('raffle.info.notRunning'), sender)
       else if (!item.locked) {
@@ -111,7 +111,7 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
     }
 
     global.botDB.update({_id: 'raffle'}, {$set: raffle}, {upsert: true}, function (err) {
-      if (err) return log.error(err)
+      if (err) return log.error(err, { fnc: 'Raffles.prototype.open' })
       if (!dashboard) {
         global.commons.sendMessage(global.translate('raffle.open.ok').replace('(keyword)', raffle.keyword), sender)
 
@@ -138,10 +138,10 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
 
 Raffles.prototype.close = function (self, sender, text) {
   global.botDB.findOne({_id: 'raffle'}, function (err, item) {
-    if (err) return log.error(err)
+    if (err) return log.error(err, { fnc: 'Raffles.prototype.close' })
     if (!_.isNull(item)) {
       global.botDB.update({_id: 'raffle'}, {$set: {locked: true}}, {}, function (err) {
-        if (err) return log.error(err)
+        if (err) return log.error(err, { fnc: 'Raffles.prototype.close' })
         global.commons.sendMessage(global.translate('raffle.close.ok'), sender)
 
         clearInterval(self.timer)

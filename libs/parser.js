@@ -92,7 +92,7 @@ Parser.prototype.parseCommands = async function (user, message) {
         (this.permissionsCmds[cmd] === constants.MODS && (user.mod || this.isOwner(user)))) {
         var text = message.replace(cmd, '')
         if (typeof this.registeredCmds[cmd] === 'function') this.registeredCmds[cmd](this.selfCmds[cmd], user, text.trim(), message)
-        else global.log.error(cmd + ' have wrong null function registered!')
+        else global.log.error(cmd + ' have wrong null function registered!', { fnc: 'Parser.prototype.parseCommands' })
         break // cmd is executed
       } else {
         // user doesn't have permissions for command
@@ -235,7 +235,7 @@ Parser.prototype.parseMessageEach = async function (filters, msg) {
 
 Parser.prototype._update = function (self) {
   global.botDB.findOne({ _id: 'customVariables' }, function (err, item) {
-    if (err) return global.log.error(err)
+    if (err) return global.log.error(err, { fnc: 'Parser.prototype._update' })
     if (_.isNull(item)) return
 
     self.customVariables = item.variables

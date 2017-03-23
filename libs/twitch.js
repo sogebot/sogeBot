@@ -36,7 +36,7 @@ function Twitch () {
       }
     }, function (err, res, body) {
       if (err) {
-        global.log.error(err)
+        global.log.error(err, { fnc: 'Twitch#1' })
         return
       }
       if (res.statusCode === 200 && !_.isNull(body.stream)) {
@@ -67,7 +67,7 @@ function Twitch () {
       }
     }, function (err, res, body) {
       if (err) {
-        global.log.error(err)
+        global.log.error(err, { fnc: 'Twitch#2' })
         return
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
@@ -97,7 +97,7 @@ function Twitch () {
       }
     }, function (err, res, body) {
       if (err) {
-        global.log.error(err)
+        global.log.error(err, { fnc: 'Twitch#3' })
         return
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
@@ -112,7 +112,7 @@ function Twitch () {
         url: 'http://tmi.twitch.tv/hosts?include_logins=1&target=' + global.channelId
       }, function (err, res, body) {
         if (err) {
-          global.log.error(err)
+          global.log.error(err, { fnc: 'Twitch#4' })
           return
         }
         if (res.statusCode === 200 && !_.isNull(body)) {
@@ -151,7 +151,7 @@ function Twitch () {
 
 Twitch.prototype._load = function (self) {
   global.botDB.findOne({ _id: 'cachedGamesTitles' }, function (err, item) {
-    if (err) return global.log.error(err)
+    if (err) return global.log.error(err, { fnc: 'Twitch.prototype._load' })
     if (_.isNull(item)) return
     self.cGamesTitles = item
   })
@@ -307,7 +307,7 @@ Twitch.prototype.showMe = function (self, sender, text) {
 
     global.commons.sendMessage(message.join(' | '), sender)
   } catch (e) {
-    global.log.error(e)
+    global.log.error(e, { fnc: 'Twitch.prototype.showMe' })
   }
 }
 
@@ -328,7 +328,7 @@ Twitch.prototype.setTitleAndGame = function (self, sender, title = null, game = 
       'Client-ID': global.configuration.get().twitch.clientId
     }
   }, function (err, res, body) {
-    if (err) { return global.log.error(err) }
+    if (err) { return global.log.error(err, { fnc: 'Twitch.prototype.setTitleAndGame' }) }
 
     if (!_.isNull(game)) {
       if (body.game === game.trim()) {
@@ -381,7 +381,7 @@ Twitch.prototype.sendGameFromTwitch = function (self, socket, game) {
       'Client-ID': global.configuration.get().twitch.clientId
     }
   }, function (err, res, body) {
-    if (err) { return global.log.error(err) }
+    if (err) { return global.log.error(err, { fnc: 'Twitch.prototype.sendGameFromTwitch' }) }
     if (_.isNull(body.games)) {
       socket.emit('sendGameFromTwitch', false)
     } else {

@@ -39,7 +39,7 @@ function CustomCommands () {
 
 CustomCommands.prototype._update = function (self) {
   global.botDB.findOne({ _id: 'commands' }, function (err, item) {
-    if (err) return log.error(err)
+    if (err) return log.error(err, { fnc: 'CustomCommands.prototype._update' })
     if (_.isNull(item)) return
     self.commands = item.commands
   })

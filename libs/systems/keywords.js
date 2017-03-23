@@ -40,7 +40,7 @@ function Keywords () {
 
 Keywords.prototype._update = function (self) {
   global.botDB.findOne({ _id: 'keywords' }, function (err, item) {
-    if (err) return log.error(err)
+    if (err) return log.error(err, { fnc: 'Keywords.prototype._update' })
     if (_.isNull(item)) return
     self.keywords = item.keywords
   })

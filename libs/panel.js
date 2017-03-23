@@ -106,14 +106,14 @@ Panel.prototype.addWidget = function (id, name, icon) { this.widgets.push({id: i
 
 Panel.prototype.sendWidget = function (socket) {
   global.botDB.findOne({_id: 'dashboard_widgets'}, function (err, item) {
-    if (err) { log.error(err) }
+    if (err) { log.error(err, { fnc: 'Panel.prototype.sendWidget' }) }
     if (!_.isNull(item)) socket.emit('widgets', item.widgets)
   })
 }
 
 Panel.prototype.sendWidgetList = function (self, socket) {
   global.botDB.findOne({_id: 'dashboard_widgets'}, function (err, item) {
-    if (err) { log.error(err) }
+    if (err) { log.error(err, { fnc: 'Panel.prototype.sendWidgetList' }) }
     if (_.isNull(item)) socket.emit('widgetList', self.widgets) // we will return all possible widgets
     else {
       var sendWidgets = []
@@ -127,14 +127,14 @@ Panel.prototype.sendWidgetList = function (self, socket) {
 
 Panel.prototype.addWidgetToDb = function (self, widget, row, socket) {
   global.botDB.update({ _id: 'dashboard_widgets' }, { $push: { widgets: { $each: [row + ':' + widget] } } }, { upsert: true }, function (err) {
-    if (err) { log.error(err) }
+    if (err) { log.error(err, { fnc: 'Panel.prototype.addWidgetToDb' }) }
     self.sendWidget(socket)
   })
 }
 
 Panel.prototype.deleteWidgetFromDb = function (self, widget) {
   for (var i = 1; i < 4; i++) {
-    global.botDB.update({ _id: 'dashboard_widgets' }, { $pull: { widgets: i + ':' + widget } }, { upsert: true }, function (err) { if (err) { log.error(err) } })
+    global.botDB.update({ _id: 'dashboard_widgets' }, { $pull: { widgets: i + ':' + widget } }, { upsert: true }, function (err) { if (err) { log.error(err, { fnc: 'Panel.prototype.deleteWidgetFromDb' }) } })
   }
 }
 

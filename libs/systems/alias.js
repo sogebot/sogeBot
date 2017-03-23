@@ -39,7 +39,7 @@ function Alias () {
 
 Alias.prototype._update = function (self) {
   global.botDB.findOne({ _id: 'alias' }, function (err, item) {
-    if (err) return log.error(err)
+    if (err) return log.error(err, { fnc: 'Alias.prototype._update' })
     if (_.isNull(item)) return
 
     self.alias = item.alias

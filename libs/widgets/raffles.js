@@ -79,14 +79,14 @@ RafflesWidget.prototype.clearRaffleParticipants = function (self, socket) {
 
 RafflesWidget.prototype.sendRafflesMessages = function (self) {
   global.botDB.find({ $where: function () { return this._id.startsWith('raffle_messages_') } }).sort({ timestamp: 1 }).exec(function (err, items) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'RafflesWidget.prototype.sendRafflesMessages' })
     global.panel.io.emit('rafflesMessages', items)
   })
 }
 
 RafflesWidget.prototype.sendRafflesParticipants = function (self) {
   global.botDB.find({ $where: function () { return this._id.startsWith('raffle_participant_') } }, function (err, items) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'RafflesWidget.prototype.sendRafflesParticipants' })
     if (items.length !== self.participants) global.panel.io.emit('rafflesParticipants', items)
     self.participants = items.length
   })
@@ -98,14 +98,14 @@ RafflesWidget.prototype.createRaffle = function (self, socket, data) {
 
 RafflesWidget.prototype.searchRafflesParticipants = function (self, socket, data) {
   global.botDB.find({ $where: function () { return this._id.startsWith('raffle_participant_' + data.trim()) } }, function (err, items) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'RafflesWidget.prototype.searchRafflesParticipants' })
     if (items.length !== self.participants) global.panel.io.emit('rafflesParticipants', items)
   })
 }
 
 RafflesWidget.prototype.getRaffle = function (self, socket) {
   global.botDB.findOne({ _id: 'raffle' }, function (err, item) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'RafflesWidget.prototype.getRaffle' })
     socket.emit('raffle', item)
   })
 }
@@ -119,7 +119,7 @@ RafflesWidget.prototype.setRafflesFollowersOnly = function (self, socket, follow
 
   // update elegibility
   global.botDB.find({ $where: function () { return this._id.startsWith('raffle_participant_') } }, function (err, items) {
-    if (err) { log.error(err); return err }
+    if (err) { log.error(err, { fnc: 'RafflesWidget.prototype.setRafflesFollowersOnly' }); return err }
     _.each(items, function (item) {
       if (item.forced === false) { // update non-forced only
         if (!followersOnly && item.eligible === false) { // update only if neccessary

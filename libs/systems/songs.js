@@ -58,7 +58,7 @@ Songs.prototype.getMeanLoudness = function (self) {
   var loudness = 0
   var count = 0
   global.botDB.find({type: 'playlist'}).exec(function (err, items) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'Songs.prototype.getMeanLoudness' })
     if (items.length < 1) self.meanLoudness = -15
     else {
       _.each(items, function (item) { (typeof item.loudness === 'undefined') ? loudness = loudness + -15 : loudness = loudness + parseFloat(item.loudness); count = count + 1 })
@@ -94,7 +94,7 @@ Songs.prototype.banSong = function (self, sender, text) {
 
 Songs.prototype.banCurrentSong = function (self, sender) {
   global.botDB.update({type: 'banned-song', _id: self.currentSong.videoID}, {$set: {_id: self.currentSong.videoID, title: self.currentSong.title}}, {upsert: true}, function (err, numAffected) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'Songs.prototype.banCurrentSong' })
     if (numAffected > 0) {
       global.commons.sendMessage(global.translate('songs.bannedSong').replace('(title)', self.currentSong.title), sender)
       global.commons.remove({_type: 'playlist', _videoID: self.currentSong.videoID})
@@ -109,10 +109,10 @@ Songs.prototype.banCurrentSong = function (self, sender) {
 
 Songs.prototype.banSongById = function (self, sender, text) {
   ytdl.getInfo('https://www.youtube.com/watch?v=' + text, function (err, videoInfo) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'Songs.prototype.banSongById#1' })
     if (typeof videoInfo.title === 'undefined' || videoInfo.title === null) return
     global.botDB.update({type: 'banned-song', _id: text}, {$set: {_id: text, title: videoInfo.title}}, {upsert: true}, function (err, numAffected) {
-      if (err) log.error(err)
+      if (err) log.error(err, { fnc: 'Songs.prototype.banSongById#2' })
       if (numAffected > 0) global.commons.sendMessage(global.translate('songs.bannedSong').replace('(title)', videoInfo.title), sender)
       global.commons.remove({_type: 'playlist', _videoID: text.trim()})
       global.commons.remove({_type: 'songrequest', _videoID: text.trim()})
@@ -146,21 +146,21 @@ Songs.prototype.skipSong = function (self, socket) {
 
 Songs.prototype.createRandomSeeds = function () {
   global.botDB.find({type: 'playlist'}, function (err, items) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'Songs.prototype.createRandomSeeds' })
     _.each(items, function (item) { global.botDB.update({_id: item._id}, {$set: {seed: Math.random()}}) })
   })
 }
 
 Songs.prototype.sendSongRequestsList = function (self, socket) {
   global.botDB.find({type: 'songRequests'}).sort({addedAt: 1}).exec(function (err, items) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'Songs.prototype.sendSongRequestsList' })
     socket.emit('songRequestsList', items)
   })
 }
 
 Songs.prototype.sendPlaylistList = function (self, socket) {
   global.botDB.find({type: 'playlist'}).sort({addedAt: 1}).exec(function (err, items) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'Songs.prototype.sendPlaylistList' })
     _.each(items, function (item) { item.volume = self.getVolume(self, item) })
     socket.emit('songPlaylistList', items)
   })
@@ -173,7 +173,7 @@ Songs.prototype.savePlaylistTrim = function (id, startTime, endTime) {
 Songs.prototype.sendNextSongID = function (self, socket) {
   // first, check if there are any requests
   global.botDB.findOne({type: 'songRequests'}).sort({addedAt: 1}).exec(function (err, item) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'Songs.prototype.sendNextSongID#1' })
     if (typeof item !== 'undefined' && item !== null && global.configuration.getValue('songs_songrequest')) { // song is found
       self.currentSong = item
       self.currentSong.volume = self.getVolume(self, self.currentSong)
@@ -186,7 +186,7 @@ Songs.prototype.sendNextSongID = function (self, socket) {
       }
       if (global.configuration.getValue('songs_shuffle')) {
         global.botDB.findOne({type: 'playlist'}).sort({seed: 1}).exec(function (err, item) {
-          if (err) log.error(err)
+          if (err) log.error(err, { fnc: 'Songs.prototype.sendNextSongID#2' })
           if (typeof item !== 'undefined' && item !== null) { // song is found
             if (item.seed === 1) {
               self.createRandomSeeds()
@@ -203,7 +203,7 @@ Songs.prototype.sendNextSongID = function (self, socket) {
         })
       } else {
         global.botDB.findOne({type: 'playlist'}).sort({lastPlayedAt: 1}).exec(function (err, item) {
-          if (err) log.error(err)
+          if (err) log.error(err, { fnc: 'Songs.prototype.sendNextSongID#3' })
           if (typeof item !== 'undefined' && item !== null) { // song is found
             global.botDB.update({type: 'playlist', videoID: item.videoID}, {$set: {lastPlayedAt: new Date().getTime()}}, {})
             self.currentSong = item
@@ -235,11 +235,11 @@ Songs.prototype.addSongToQueue = function (self, sender, text) {
   var match = text.trim().match(urlRegex)
   var videoID = (match && match[1].length === 11) ? match[1] : text.trim()
   global.botDB.findOne({type: 'song-banned', _id: videoID}, function (err, item) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' })
     if (!_.isNull(item)) global.commons.sendMessage(global.translate('songs.isBanned'), sender)
     else {
       ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
-        if (err) log.error(err)
+        if (err) log.error(err, { fnc: 'Songs.prototype.addSongToQueue#2' })
         if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
           global.commons.sendMessage(global.translate('songs.notFound'), sender)
         } else if (videoInfo.length_seconds / 60 > global.configuration.getValue('songs_duration')) global.commons.sendMessage(global.translate('songs.tooLong'), sender)
@@ -255,10 +255,10 @@ Songs.prototype.addSongToQueue = function (self, sender, text) {
 
 Songs.prototype.removeSongFromQueue = function (self, sender, text) {
   global.botDB.findOne({type: 'songRequests', username: sender.username}).sort({addedAt: -1}).exec(function (err, item) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'Songs.prototype.removeSongFromQueue#1' })
     if (typeof item === 'undefined' || item === null) return
     global.botDB.remove({type: 'songRequests', videoID: item.videoID}, {}, function (err, numRemoved) {
-      if (err) log.error(err)
+      if (err) log.error(err, { fnc: 'Songs.prototype.removeSongFromQueue#2' })
       if (numRemoved > 0) global.commons.sendMessage(global.translate('songs.removeSongQueue').replace('(title)', item.title), sender)
       self.getMeanLoudness(self)
     })
@@ -270,14 +270,14 @@ Songs.prototype.addSongToPlaylist = function (self, sender, text) {
   var match = text.trim().match(urlRegex)
   var videoID = (match && match[1].length === 11) ? match[1] : text.trim()
   global.botDB.findOne({type: 'song-banned', _id: videoID}, function (err, item) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'Songs.prototype.addSongToPlaylist#1' })
     if (!_.isNull(item)) global.commons.sendMessage(global.translate('songs.isBanned'), sender)
     else {
       global.botDB.findOne({type: 'playlist', videoID: videoID}, function (err, item) {
-        if (err) log.error(err)
+        if (err) log.error(err, { fnc: 'Songs.prototype.addSongToPlaylist#2' })
         if (typeof item === 'undefined' || item === null) {
           ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
-            if (err) log.error(err)
+            if (err) log.error(err, { fnc: 'Songs.prototype.addSongToPlaylist#3' })
             if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
               global.commons.sendMessage(global.translate('songs.notFound'), sender)
               return
@@ -301,13 +301,13 @@ Songs.prototype.removeSongFromPlaylist = function (self, sender, text) {
   var videoID = text.trim()
 
   ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'Songs.prototype.removeSongFromPlaylist#1' })
     if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
       global.commons.sendMessage(global.translate('songs.notFound'), sender)
       return
     }
     global.botDB.remove({type: 'playlist', videoID: videoID}, {}, function (err, numRemoved) {
-      if (err) log.error(err)
+      if (err) log.error(err, { fnc: 'Songs.prototype.removeSongFromPlaylist#2' })
       if (numRemoved > 0) global.commons.sendMessage(global.translate('songs.removeSongPlaylist').replace('(title)', videoInfo.title), sender)
       self.getMeanLoudness(self)
       self.sendPlaylistList(self, global.panel.io)

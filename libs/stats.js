@@ -44,14 +44,14 @@ Stats.prototype.deleteViewer = function (self, socket, username) {
 
 Stats.prototype.getStreamEvents = function (self, socket, data) {
   statsDB.find({$where: function () { return this._id.startsWith(data) }}, function (err, items) {
-    if (err) { global.log.error(err) }
+    if (err) { global.log.error(err, { fnc: 'Stats.prototype.getStreamEvents' }) }
     socket.emit('streamData', items)
   })
 }
 
 Stats.prototype.getStatsData = function (self, socket, data) {
   statsDB.findOne({ _id: data }).sort({ timestamp: -1 }).exec(function (err, item) {
-    if (err) global.log.error(err)
+    if (err) global.log.error(err, { fnc: 'Stats.prototype.getStatsData' })
     socket.emit('statsData', item)
   })
 }
@@ -62,7 +62,7 @@ Stats.prototype.removeStatsData = function (self, socket, data) {
 
 Stats.prototype.getCalendarData = function (self, socket, data) {
   statsDB.find({}).exec(function (err, items) {
-    if (err) global.log.error(err)
+    if (err) global.log.error(err, { fnc: 'Stats.prototype.getCalendarData' })
     var ids = []
     _.each(items, function (item) {
       ids.push(item._id)
@@ -73,7 +73,7 @@ Stats.prototype.getCalendarData = function (self, socket, data) {
 
 Stats.prototype.getLatestStats = function (self, socket) {
   statsDB.findOne({}).sort({ _id: -1 }).skip(1).exec(function (err, item) { // get second stream (first is current stream)
-    if (err) global.log.error(err)
+    if (err) global.log.error(err, { fnc: 'Stats.prototype.getLatestStats' })
     var timestamp = 0
     var data = {}
     if (!_.isNull(item)) {

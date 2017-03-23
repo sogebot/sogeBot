@@ -12,7 +12,7 @@ function Permissions () {
 
   setInterval(function () {
     global.botDB.find({$where: function () { return this._id.startsWith('permission') }}, function (err, items) {
-      if (err) { log.error(err) }
+      if (err) { log.error(err, { fnc: 'Permissions' }) }
       _.each(items, function (item) {
         global.parser.permissionsCmds['!' + item.command] = item.permission
       })
@@ -60,7 +60,7 @@ Permissions.prototype.overridePermission = function (self, sender, text) {
     if (!_.isUndefined(global.parser.permissionsCmds['!' + command])) {
       global.parser.permissionsCmds['!' + command] = permission
       global.botDB.update({_id: 'permission_' + hash}, {$set: {command: command, permission: permission}}, {upsert: true}, function (err) {
-        if (err) log.error(err)
+        if (err) log.error(err, { fnc: 'Permissions.prototype.overridePermission' })
         global.commons.sendMessage(translate('permissions.success.change').replace('(command)', parsed[1]), sender)
       })
     } else {

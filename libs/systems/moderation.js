@@ -79,7 +79,7 @@ function Moderation () {
 
 Moderation.prototype._update = function (self) {
   global.botDB.findOne({ _id: 'moderation_lists' }, function (err, item) {
-    if (err) return log.error(err)
+    if (err) return log.error(err, { fnc: 'Moderation.prototype._update' })
     if (_.isNull(item)) return
 
     self.lists.blacklist = item.blacklist
