@@ -7,8 +7,6 @@ var constants = require('../constants')
 var log = global.log
 
 function Moderation () {
-  this.emit = Object.prototype
-
   this.lists = { blacklist: [], whitelist: [] }
   this.warnings = {}
   this.permits = []
