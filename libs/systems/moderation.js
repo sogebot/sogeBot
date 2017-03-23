@@ -132,13 +132,16 @@ Moderation.prototype.timeoutUser = function (self, sender, warning, msg, time) {
   self.warnings[sender.username] = warnings
 }
 
-Moderation.prototype.whitelisted = function (text) {
-  // TODO: it's hardcoded now just for youtube and your clips
-  var ytRegex = /^!.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)[^#&?]*.*/
-  var clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
-  var clipsMatch = text.trim().match(clipsRegex)
-  return !_.isNull(text.trim().match(ytRegex)) ||
-    (!_.isNull(clipsMatch) && clipsMatch[2] === global.configuration.get().twitch.channel)
+Moderation.prototype.whitelist = function (text) {
+  // Clips regex is hardcoded
+  let clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
+  text = text.replace(clipsRegex, '')
+
+  _.each(this.lists.whitelist, function (value) {
+    text = text.replace(value, '')
+  })
+
+  return text
 }
 
 Moderation.prototype.permitLink = function (self, sender, text) {
@@ -153,8 +156,9 @@ Moderation.prototype.permitLink = function (self, sender, text) {
 
 Moderation.prototype.containsLink = function (self, id, sender, text) {
   var timeout = global.configuration.getValue('moderationLinksTimeout')
+  text = self.whitelist(text)
 
-  if (global.parser.isOwner(sender) || !global.configuration.getValue('moderationLinks') || self.whitelisted(text)) {
+  if (global.parser.isOwner(sender) || !global.configuration.getValue('moderationLinks')) {
     global.updateQueue(id, true)
     return
   }
@@ -175,6 +179,8 @@ Moderation.prototype.containsLink = function (self, id, sender, text) {
 }
 
 Moderation.prototype.symbols = function (self, id, sender, text) {
+  text = self.whitelist(text)
+
   var timeout = global.configuration.getValue('moderationSymbolsTimeout')
   var triggerLength = global.configuration.getValue('moderationSymbolsTriggerLength')
   var maxSymbolsConsecutively = global.configuration.getValue('moderationSymbolsMaxConsecutively')
@@ -211,6 +217,8 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
 }
 
 Moderation.prototype.longMessage = function (self, id, sender, text) {
+  text = self.whitelist(text)
+
   var timeout = global.configuration.getValue('moderationLongMessageTimeout')
   var triggerLength = global.configuration.getValue('moderationLongMessageTriggerLength')
 
@@ -225,6 +233,8 @@ Moderation.prototype.longMessage = function (self, id, sender, text) {
 }
 
 Moderation.prototype.caps = function (self, id, sender, text) {
+  text = self.whitelist(text)
+
   var timeout = global.configuration.getValue('moderationCapsTimeout')
   var triggerLength = global.configuration.getValue('moderationCapsTriggerLength')
   var maxCapsPercent = global.configuration.getValue('moderationCapsMaxPercent')
@@ -252,6 +262,8 @@ Moderation.prototype.caps = function (self, id, sender, text) {
 }
 
 Moderation.prototype.spam = function (self, id, sender, text) {
+  text = self.whitelist(text)
+
   var timeout = global.configuration.getValue('moderationSpamTimeout')
   var triggerLength = global.configuration.getValue('moderationSpamTriggerLength')
   var maxSpamLength = global.configuration.getValue('moderationSpamMaxLength')
@@ -290,6 +302,8 @@ Moderation.prototype.color = function (self, id, sender, text) {
 }
 
 Moderation.prototype.emotes = function (self, id, sender, text) {
+  text = self.whitelist(text)
+
   var timeout = global.configuration.getValue('moderationSpamTimeout')
   var maxCount = global.configuration.getValue('moderationEmotesMaxCount')
   var count = 0

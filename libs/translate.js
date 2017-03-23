@@ -8,7 +8,8 @@ var _ = require('lodash')
 var translations = {}
 
 function Translate (text) {
-  if (typeof text === 'object') return translations[global.configuration.getValue('lang')][text.root]
+  if (_.isUndefined(translations[global.configuration.getValue('lang')]) && !_.isUndefined(text)) return '{missing_translation: ' + global.configuration.getValue('lang') + '.' + text + '}'
+  else if (typeof text === 'object') return translations[global.configuration.getValue('lang')][text.root]
   else if (typeof text !== 'undefined') return getTranslation(text)
   else {
     return new Promise(function (resolve, reject) {
