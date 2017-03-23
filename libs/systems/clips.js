@@ -42,12 +42,12 @@ Clips.prototype.deleteSocket = function (self, socket, data) {
 }
 
 Clips.prototype.save = function (self, id, sender, text) {
-  var clipsRegex = /.*(clips.twitch.tv\/)([\u0500-\u052F\u0400-\u04FF\w]+)\/([\u0500-\u052F\u0400-\u04FF\w]+)/
+  var clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
   var clipsMatch = text.trim().match(clipsRegex)
-  if (!_.isNull(clipsMatch) && clipsMatch[2] === global.configuration.get().twitch.channel) {
+  if (!_.isNull(clipsMatch)) {
     var data = {
-      _id: 'clips_' + clipsMatch[3],
-      slug: clipsMatch[3],
+      _id: 'clips_' + clipsMatch[2],
+      slug: clipsMatch[2],
       clip_uri: clipsMatch[0],
       timestamp: new Date().getTime()
     }
@@ -56,7 +56,9 @@ Clips.prototype.save = function (self, id, sender, text) {
         data.game = /game: "(.+)"/g.exec(body)[1]
         data.title = /channel_title: "(.+)"/g.exec(body)[1]
         data.curator = /curator_display_name: "(.+)"/g.exec(body)[1]
-        global.botDB.insert(data, function () {})
+
+        let broadcaster = /broadcaster_login: "(.+)"/g.exec(body)[1]
+        if (global.parser.isOwner(broadcaster)) global.botDB.insert(data, function () {})
       }
     })
   }

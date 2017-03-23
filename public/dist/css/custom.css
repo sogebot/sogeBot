@@ -253,6 +253,15 @@ a.active {
   padding: 5px;
 }
 
+.widget .title small {
+  font-size: 50%;
+}
+
+.widget textarea {
+  font-size: 80%;
+  font-family: monospace;
+}
+
 .widget .controls {
   position: absolute;
   right: 30px;

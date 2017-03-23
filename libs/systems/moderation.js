@@ -7,6 +7,7 @@ var constants = require('../constants')
 var log = global.log
 
 function Moderation () {
+  this.lists = { blacklist: [], whitelist: [] }
   this.warnings = {}
   this.permits = []
 
@@ -20,6 +21,7 @@ function Moderation () {
     global.parser.registerParser(this, 'moderationSpam', this.spam, constants.VIEWERS)
     global.parser.registerParser(this, 'moderationColor', this.color, constants.VIEWERS)
     global.parser.registerParser(this, 'moderationEmotes', this.emotes, constants.VIEWERS)
+    global.parser.registerParser(this, 'moderationBlacklist', this.blacklist, constants.VIEWERS)
 
     global.configuration.register('moderationLinks', 'moderation.settings.moderationLinks', 'bool', true)
     global.configuration.register('moderationLinksTimeout', 'moderation.settings.moderationLinksTimeout', 'number', 120)
@@ -48,8 +50,10 @@ function Moderation () {
     global.configuration.register('moderationColorTimeout', 'moderation.settings.moderationColorTimeout', 'number', 120)
 
     global.configuration.register('moderationEmotes', 'moderation.settings.moderationEmotes', 'bool', true)
-    global.configuration.register('moderationEmotesTimeout', 'moderation.settingsmoderationEmotesTimeout', 'number', 120)
+    global.configuration.register('moderationEmotesTimeout', 'moderation.settings.moderationEmotesTimeout', 'number', 120)
     global.configuration.register('moderationEmotesMaxCount', 'moderation.settings.moderationEmotesMaxCount', 'number', 15)
+
+    global.configuration.register('moderationBlacklistTimeout', 'moderation.settings.moderationBlacklistTimeout', 'number', 120)
 
     global.configuration.register('moderationWarnings', 'moderation.settings.moderationWarnings', 'number', 3)
     global.configuration.register('moderationAnnounceTimeouts', 'moderation.settings.moderationAnnounceTimeouts', 'bool', true)
@@ -67,12 +71,37 @@ function Moderation () {
       })
     }, 60000)
 
+    global.watcher.watch(this, 'lists', this._save)
+    this._update(this)
     this.webPanel()
   }
 }
 
+Moderation.prototype._update = function (self) {
+  global.botDB.findOne({ _id: 'moderation_lists' }, function (err, item) {
+    if (err) return log.error(err)
+    if (_.isNull(item)) return
+
+    self.lists.blacklist = item.blacklist
+    self.lists.whitelist = item.whitelist
+  })
+}
+
+Moderation.prototype._save = function (self) {
+  global.botDB.update({ _id: 'moderation_lists' }, { $set: self.lists }, { upsert: true })
+}
+
 Moderation.prototype.webPanel = function () {
   global.panel.addMenu({category: 'settings', name: 'moderation', id: 'moderation'})
+  global.panel.socketListening(this, 'moderation.lists.get', this.emitLists)
+  global.panel.socketListening(this, 'moderation.lists.set', this.setLists)
+}
+
+Moderation.prototype.emitLists = function (self, socket) {
+  socket.emit('moderation.lists', self.lists)
+}
+Moderation.prototype.setLists = function (self, socket, data) {
+  self.lists = data
 }
 
 Moderation.prototype.timeoutUser = function (self, sender, warning, msg, time) {
@@ -101,13 +130,16 @@ Moderation.prototype.timeoutUser = function (self, sender, warning, msg, time) {
   self.warnings[sender.username] = warnings
 }
 
-Moderation.prototype.whitelisted = function (text) {
-  // TODO: it's hardcoded now just for youtube and your clips
-  var ytRegex = /^!.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)[^#&?]*.*/
-  var clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
-  var clipsMatch = text.trim().match(clipsRegex)
-  return !_.isNull(text.trim().match(ytRegex)) ||
-    (!_.isNull(clipsMatch) && clipsMatch[2] === global.configuration.get().twitch.channel)
+Moderation.prototype.whitelist = function (text) {
+  // Clips regex is hardcoded
+  let clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
+  text = text.replace(clipsRegex, '')
+
+  _.each(this.lists.whitelist, function (value) {
+    text = text.replace(value, '')
+  })
+
+  return text
 }
 
 Moderation.prototype.permitLink = function (self, sender, text) {
@@ -122,8 +154,9 @@ Moderation.prototype.permitLink = function (self, sender, text) {
 
 Moderation.prototype.containsLink = function (self, id, sender, text) {
   var timeout = global.configuration.getValue('moderationLinksTimeout')
+  text = self.whitelist(text)
 
-  if (global.parser.isOwner(sender) || !global.configuration.getValue('moderationLinks') || self.whitelisted(text)) {
+  if (global.parser.isOwner(sender) || !global.configuration.getValue('moderationLinks')) {
     global.updateQueue(id, true)
     return
   }
@@ -134,7 +167,7 @@ Moderation.prototype.containsLink = function (self, id, sender, text) {
       _.pull(self.permits, sender.username.toLowerCase())
       global.updateQueue(id, true)
     } else {
-      log.info(sender.username + ' [link] timeout: ' + text)
+      log.info(sender.username + ' [link] ' + timeout + 's timeout: ' + text)
       self.timeoutUser(self, sender, global.translate('moderation.warnings.links'), global.translate('moderation.links'), timeout)
       global.updateQueue(id, false)
     }
@@ -144,6 +177,8 @@ Moderation.prototype.containsLink = function (self, id, sender, text) {
 }
 
 Moderation.prototype.symbols = function (self, id, sender, text) {
+  text = self.whitelist(text)
+
   var timeout = global.configuration.getValue('moderationSymbolsTimeout')
   var triggerLength = global.configuration.getValue('moderationSymbolsTriggerLength')
   var maxSymbolsConsecutively = global.configuration.getValue('moderationSymbolsMaxConsecutively')
@@ -163,7 +198,7 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
       var symbols = out[item]
       if (symbols.length >= maxSymbolsConsecutively) {
         global.updateQueue(id, false)
-        log.info(sender.username + ' [symbols] timeout: ' + text)
+        log.info(sender.username + ' [symbols] ' + timeout + 's timeout: ' + text)
         self.timeoutUser(self, sender, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout)
         return
       }
@@ -172,7 +207,7 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
   }
   if (Math.ceil(symbolsLength / (msgLength / 100)) >= maxSymbolsPercent) {
     global.updateQueue(id, false)
-    log.info(sender.username + ' [symbols] timeout: ' + text)
+    log.info(sender.username + ' [symbols] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout)
     return
   }
@@ -180,6 +215,8 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
 }
 
 Moderation.prototype.longMessage = function (self, id, sender, text) {
+  text = self.whitelist(text)
+
   var timeout = global.configuration.getValue('moderationLongMessageTimeout')
   var triggerLength = global.configuration.getValue('moderationLongMessageTriggerLength')
 
@@ -188,12 +225,14 @@ Moderation.prototype.longMessage = function (self, id, sender, text) {
     global.updateQueue(id, true)
   } else {
     global.updateQueue(id, false)
-    log.info(sender.username + ' [longMessage] timeout: ' + text)
+    log.info(sender.username + ' [longMessage] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender, global.translate('moderation.warnings.longMessage'), global.translate('moderation.longMessage'), timeout)
   }
 }
 
 Moderation.prototype.caps = function (self, id, sender, text) {
+  text = self.whitelist(text)
+
   var timeout = global.configuration.getValue('moderationCapsTimeout')
   var triggerLength = global.configuration.getValue('moderationCapsTriggerLength')
   var maxCapsPercent = global.configuration.getValue('moderationCapsMaxPercent')
@@ -213,7 +252,7 @@ Moderation.prototype.caps = function (self, id, sender, text) {
   }
   if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
     global.updateQueue(id, false)
-    log.info(sender.username + ' [caps] timeout: ' + text)
+    log.info(sender.username + ' [caps] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender, global.translate('moderation.warnings.caps'), global.translate('moderation.caps'), timeout)
     return
   }
@@ -221,6 +260,8 @@ Moderation.prototype.caps = function (self, id, sender, text) {
 }
 
 Moderation.prototype.spam = function (self, id, sender, text) {
+  text = self.whitelist(text)
+
   var timeout = global.configuration.getValue('moderationSpamTimeout')
   var triggerLength = global.configuration.getValue('moderationSpamTriggerLength')
   var maxSpamLength = global.configuration.getValue('moderationSpamMaxLength')
@@ -235,7 +276,7 @@ Moderation.prototype.spam = function (self, id, sender, text) {
   for (var item in out) {
     if (out.hasOwnProperty(item) && out[item].length >= maxSpamLength) {
       global.updateQueue(id, false)
-      log.info(sender.username + ' [spam] timeout: ' + text)
+      log.info(sender.username + ' [spam] ' + timeout + 's timeout: ' + text)
       self.timeoutUser(self, sender, global.translate('moderation.warnings.spam'), global.translate('moderation.spam'), timeout)
       break
     }
@@ -253,12 +294,14 @@ Moderation.prototype.color = function (self, id, sender, text) {
 
   if (sender['message-type'] === 'action') {
     global.updateQueue(id, false)
-    log.info(sender.username + ' [color] timeout: ' + text)
+    log.info(sender.username + ' [color] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender, global.translate('moderation.warnings.color'), global.translate('moderation.color'), timeout)
   } else global.updateQueue(id, true)
 }
 
 Moderation.prototype.emotes = function (self, id, sender, text) {
+  text = self.whitelist(text)
+
   var timeout = global.configuration.getValue('moderationSpamTimeout')
   var maxCount = global.configuration.getValue('moderationEmotesMaxCount')
   var count = 0
@@ -274,9 +317,23 @@ Moderation.prototype.emotes = function (self, id, sender, text) {
 
   if (count > maxCount) {
     global.updateQueue(id, false)
-    log.info(sender.username + ' [emotes] timeout: ' + text)
+    log.info(sender.username + ' [emotes] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender, global.translate('moderation.warnings.emotes'), global.translate('moderation.emotes'), timeout)
   } else global.updateQueue(id, true)
+}
+
+Moderation.prototype.blacklist = function (self, id, sender, text) {
+  var timeout = global.configuration.getValue('moderationBlacklistTimeout')
+  _.each(self.lists.blacklist, function (value) {
+    value = value.trim()
+    if (text.indexOf(value) !== -1) {
+      log.info(sender.username + ' [blacklist] ' + timeout + 's timeout: ' + text)
+      self.timeoutUser(self, sender, global.translate('moderation.warnings.blacklist'), global.translate('moderation.blacklist'), timeout)
+      global.updateQueue(id, false)
+      return true
+    }
+  })
+  global.updateQueue(id, true)
 }
 
 module.exports = new Moderation()
