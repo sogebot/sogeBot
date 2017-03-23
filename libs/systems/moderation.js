@@ -167,7 +167,7 @@ Moderation.prototype.containsLink = function (self, id, sender, text) {
       _.pull(self.permits, sender.username.toLowerCase())
       global.updateQueue(id, true)
     } else {
-      log.info(sender.username + ' [link]' + timeout + 's timeout: ' + text)
+      log.info(sender.username + ' [link] ' + timeout + 's timeout: ' + text)
       self.timeoutUser(self, sender, global.translate('moderation.warnings.links'), global.translate('moderation.links'), timeout)
       global.updateQueue(id, false)
     }
@@ -198,7 +198,7 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
       var symbols = out[item]
       if (symbols.length >= maxSymbolsConsecutively) {
         global.updateQueue(id, false)
-        log.info(sender.username + ' [symbols]' + timeout + 's timeout: ' + text)
+        log.info(sender.username + ' [symbols] ' + timeout + 's timeout: ' + text)
         self.timeoutUser(self, sender, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout)
         return
       }
@@ -207,7 +207,7 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
   }
   if (Math.ceil(symbolsLength / (msgLength / 100)) >= maxSymbolsPercent) {
     global.updateQueue(id, false)
-    log.info(sender.username + ' [symbols]' + timeout + 's timeout: ' + text)
+    log.info(sender.username + ' [symbols] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout)
     return
   }
@@ -225,7 +225,7 @@ Moderation.prototype.longMessage = function (self, id, sender, text) {
     global.updateQueue(id, true)
   } else {
     global.updateQueue(id, false)
-    log.info(sender.username + ' [longMessage]' + timeout + 's timeout: ' + text)
+    log.info(sender.username + ' [longMessage] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender, global.translate('moderation.warnings.longMessage'), global.translate('moderation.longMessage'), timeout)
   }
 }
@@ -252,7 +252,7 @@ Moderation.prototype.caps = function (self, id, sender, text) {
   }
   if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
     global.updateQueue(id, false)
-    log.info(sender.username + ' [caps]' + timeout + 's timeout: ' + text)
+    log.info(sender.username + ' [caps] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender, global.translate('moderation.warnings.caps'), global.translate('moderation.caps'), timeout)
     return
   }
@@ -276,7 +276,7 @@ Moderation.prototype.spam = function (self, id, sender, text) {
   for (var item in out) {
     if (out.hasOwnProperty(item) && out[item].length >= maxSpamLength) {
       global.updateQueue(id, false)
-      log.info(sender.username + ' [spam]' + timeout + 's timeout: ' + text)
+      log.info(sender.username + ' [spam] ' + timeout + 's timeout: ' + text)
       self.timeoutUser(self, sender, global.translate('moderation.warnings.spam'), global.translate('moderation.spam'), timeout)
       break
     }
@@ -294,7 +294,7 @@ Moderation.prototype.color = function (self, id, sender, text) {
 
   if (sender['message-type'] === 'action') {
     global.updateQueue(id, false)
-    log.info(sender.username + ' [color]' + timeout + 's timeout: ' + text)
+    log.info(sender.username + ' [color] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender, global.translate('moderation.warnings.color'), global.translate('moderation.color'), timeout)
   } else global.updateQueue(id, true)
 }
