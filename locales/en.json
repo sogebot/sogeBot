@@ -429,6 +429,7 @@
     "spam": "Spamming is not allowed",
     "color": "Colors and /me is not allowed",
     "emotes": "No emotes spamming!",
+    "blacklist": "No blacklisted words!",
     "failed": {
       "parsePermit": "{core.command-parse} !permit [username]"
     },
@@ -439,7 +440,8 @@
       "caps": "{moderation.caps} {moderation.warning}",
       "spam": "{moderation.spam} {moderation.warning}",
       "color": "{moderation.color} {moderation.warning}",
-      "emotes": "{moderation.emotes} {moderation.warning}"
+      "emotes": "{moderation.emotes} {moderation.warning}",
+      "blacklist": "{moderation.blacklist} {moderation.warning}"
     },
     "settings": {
       "moderationAnnounceTimeouts": {
@@ -497,6 +499,7 @@
       },
       "moderationEmotesTimeout": "Timeout because of emotes spamming set to (value)s",
       "moderationEmotesMaxCount": "Maximum count of emotes in one messages set to (value)",
+      "moderationBlacklistTimeout": "Timeout because of blacklisted word set to (value)s",
       "moderationWarnings": "User will be warned (value) times",
       "moderationWarningsTimeouts": {
         "true": "Warnings are set to be 1s timeout",

@@ -259,13 +259,26 @@
     </table>
   </div>
 </div>
-<div class="col-xs-12 col-sm-12 col-md-3 col-lg-2">
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
   <div class="widget">
     <div class="title"><span data-lang="timeout-blacklist"></span> <small data-lang="one-record-per-line"></small></div>
     <textarea class="form-control" rows="10" id="blacklist"></textarea>
+
+    <table class="table table-striped">
+      <tr>
+        <td><strong data-lang="timeout-duration"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="moderationBlacklistTimeout" onclick="commons.configEditable(this, 's')" id="moderationBlacklistTimeout"></abbr>
+          <div class="input-group" style="display:none;" id="input_moderationBlacklistTimeout_group">
+            <div class="input-group-addon" data-lang="seconds"></div>
+            <input style="width: 6em" id="input_moderationBlacklistTimeout" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+    </table>
   </div>
 </div>
-<div class="col-xs-12 col-sm-12 col-md-3 col-lg-2">
+<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
   <div class="widget">
     <div class="title"><span data-lang="timeout-whitelist"></span> <small data-lang="one-record-per-line"></small></div>
     <textarea class="form-control" rows="10" id="whitelist"></textarea>
@@ -321,6 +334,8 @@
     createToggle('moderationEmotes', data.moderationEmotes)
     $("#moderationEmotesTimeout").text(data.moderationEmotesTimeout + 's')
     $("#moderationEmotesMaxCount").text(data.moderationEmotesMaxCount)
+
+    $("#moderationBlacklistTimeout").text(data.moderationBlacklistTimeout + 's')
 
     $("#moderationWarnings").text(data.moderationWarnings)
     createToggle('moderationWarningsTimeouts', data.moderationWarningsTimeouts, {on: translations['timeout'], off: translations['warning']})
