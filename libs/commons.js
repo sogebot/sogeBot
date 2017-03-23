@@ -32,7 +32,7 @@ Commons.prototype.updateOrInsert = function (data) {
   var toInsert = this.stripUnderscores(data)
   var self = this
   global.botDB.update(toFind, {$set: toUpdate}, {}, function (err, numReplaced) {
-    if (err) log.error(err)
+    if (err) log.error(err, { fnc: 'Commons.prototype.updateOrInsert' })
     if (numReplaced === 0) global.botDB.insert(toInsert)
     self.runCallback(callbacks.success, data)
   })
@@ -43,7 +43,7 @@ Commons.prototype.remove = function (data) {
   var toRemove = this.getObjectToFind(data)
   var self = this
   global.botDB.remove(toRemove, {}, function (err, numRemoved) {
-    if (err) { log.error(err) }
+    if (err) { log.error(err, { fnc: 'Commons.prototype.remove' }) }
     numRemoved === 0 ? self.runCallback(callbacks.error, data) : self.runCallback(callbacks.success, data)
   })
 }

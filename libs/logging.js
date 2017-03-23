@@ -39,7 +39,8 @@ global.log = new (winston.Logger)({
         if (level === 'follow') level = '+follow'
         if (level === 'unfollow') level = '-follow'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
-        return options.timestamp() + (level ? ' ' + level + ' ' : ' ') + (options.message ? options.message : '') + (username ? ' [' + username + ']' : '')
+        let fnc = !_.isUndefined(options.meta.fnc) ? options.meta.fnc : ''
+        return options.timestamp() + (level ? ' ' + level + ' ' : ' ') + (options.message ? options.message : '') + (username ? ' [' + username + ']' : '') + (fnc ? ' [function: ' + fnc + ']' : '')
       }
     }),
     new winston.transports.File({

@@ -53,7 +53,7 @@ function Bets () {
 
 Bets.prototype._update = function (self) {
   global.botDB.findOne({ _id: 'bets_template' }, function (err, item) {
-    if (err) return log.error(err)
+    if (err) return log.error(err, { fnc: 'Bets.prototype._update' })
     if (_.isNull(item)) return
 
     delete item._id

@@ -28,7 +28,7 @@ function Users () {
 
 Users.prototype._update = function (self) {
   global.botDB.findOne({ _id: 'users' }, function (err, item) {
-    if (err) return log.error(err)
+    if (err) return log.error(err, { fnc: 'Users.prototype._update' })
     if (_.isNull(item)) return
 
     delete item._id
@@ -61,13 +61,13 @@ Users.prototype.get = function (username) {
       }
     }, function (err, res, body) {
       if (err) {
-        global.log.error(err)
+        global.log.error(err, { fnc: 'Users.prototype.get#1' })
         return
       }
 
       if (_.isUndefined(body.users[0])) {
         body.custom = {error: 'Cannot find username ID in twitch'}
-        global.log.error(JSON.stringify(body))
+        global.log.error(JSON.stringify(body), { fnc: 'Users.prototype.get#2' })
         return
       }
       const oldUser = _.find(self.users, function (o) { return o.id === body.users[0]._id && o.username !== username })
@@ -141,7 +141,7 @@ Users.prototype.isFollowerUpdate = function (username) {
     }
   }, function (err, res, body) {
     if (err) {
-      global.log.error(err)
+      global.log.error(err, { fnc: 'Users.prototype.isFollowerUpdate#1' })
       return
     }
     if (res.statusCode === 400) {
@@ -149,7 +149,7 @@ Users.prototype.isFollowerUpdate = function (username) {
       body.user_id = global.users.get(username).id
       body.channel_id = global.channelId
       body.url = 'https://api.twitch.tv/kraken/users/' + global.users.get(username).id + '/follows/channels/' + global.channelId
-      global.log.error(JSON.stringify(body))
+      global.log.error(JSON.stringify(body), { fnc: 'Users.prototype.isFollowerUpdate#2' })
       return
     }
     if (res.statusCode === 404) {
@@ -176,7 +176,7 @@ Users.prototype.updateFollowers = function () {
     }
   }, function (err, res, body) {
     if (err) {
-      global.log.error(err)
+      global.log.error(err, { fnc: 'Users.prototype.updateFollowers' })
       return
     }
 
