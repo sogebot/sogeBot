@@ -275,6 +275,7 @@
 
 <script>
   socket.emit('getConfiguration')
+  socket.emit('moderation.lists.get')
 
   var createToggle = function (id, value, options) {
     options = options || {on: translations['on'], off: translations['off']}
@@ -326,5 +327,15 @@
 
     $("#moderationAnnounceTimeouts").text(data.moderationAnnounceTimeouts)
     createToggle('moderationAnnounceTimeouts', data.moderationAnnounceTimeouts, {on: translations['announce'], off: translations['muted']})
+  })
+
+  socket.off('moderation.lists')
+  socket.on('moderation.lists', function(lists) {
+    $('#blacklist').val(lists.blacklist.join('\n'))
+    $('#whitelist').val(lists.whitelist.join('\n'))
+  })
+
+  $('#blacklist, #whitelist').off().on('focusout', function (ev) {
+    socket.emit('moderation.lists.set', { blacklist: $('#blacklist').val().split('\n'), whitelist: $('#whitelist').val().split('\n') })
   })
 </script>

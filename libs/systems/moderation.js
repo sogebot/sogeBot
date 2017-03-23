@@ -7,6 +7,9 @@ var constants = require('../constants')
 var log = global.log
 
 function Moderation () {
+  this.emit = Object.prototype
+
+  this.lists = { blacklist: [], whitelist: [] }
   this.warnings = {}
   this.permits = []
 
@@ -67,12 +70,37 @@ function Moderation () {
       })
     }, 60000)
 
+    global.watcher.watch(this, 'lists', this._save)
+    this._update(this)
     this.webPanel()
   }
 }
 
+Moderation.prototype._update = function (self) {
+  global.botDB.findOne({ _id: 'moderation_lists' }, function (err, item) {
+    if (err) return log.error(err)
+    if (_.isNull(item)) return
+
+    self.lists.blacklist = item.blacklist
+    self.lists.whitelist = item.whitelist
+  })
+}
+
+Moderation.prototype._save = function (self) {
+  global.botDB.update({ _id: 'moderation_lists' }, { $set: self.lists }, { upsert: true })
+}
+
 Moderation.prototype.webPanel = function () {
   global.panel.addMenu({category: 'settings', name: 'moderation', id: 'moderation'})
+  global.panel.socketListening(this, 'moderation.lists.get', this.emitLists)
+  global.panel.socketListening(this, 'moderation.lists.set', this.setLists)
+}
+
+Moderation.prototype.emitLists = function (self, socket) {
+  socket.emit('moderation.lists', self.lists)
+}
+Moderation.prototype.setLists = function (self, socket, data) {
+  self.lists = data
 }
 
 Moderation.prototype.timeoutUser = function (self, sender, warning, msg, time) {
