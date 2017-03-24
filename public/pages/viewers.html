@@ -2,6 +2,7 @@
   <div class="widget">
     <h2 class="title" data-lang="viewers"></h2>
     <ul class="paging"></ul>
+    <input type="text" class="form-control form-search" placeholder="Search by username" id="viewersSearch" onkeyup="viewers.updateSearch()">
     <table class="table table-striped table-responsive table-condensed">
       <thead>
         <tr>
@@ -30,6 +31,7 @@
   var viewers = {
     sortBy: 'username',
     sortType: 'asc',
+    toSearch: '',
     list: {},
     update: function (list) {
       $("#Users").empty()
@@ -106,8 +108,19 @@
       page = i
       viewers.update(viewers.paging(viewers.list))
     },
-    paging: function(list) {
-      list = _.sortBy(list, [function(o) {
+    search: function (list) {
+      return _.filter(list, function (o) {
+        if (viewers.search.length === 0) return true
+        return o.username.toLowerCase().indexOf(viewers.toSearch.toLowerCase())>=0;
+      })
+    },
+    updateSearch: function () {
+      viewers.toSearch = $('#viewersSearch').val()
+      viewers.page = 1
+      viewers.update(viewers.paging())
+    },
+    paging: function() {
+      var list = _.sortBy(viewers.search(viewers.list), [function(o) {
         var split = viewers.sortBy.split('.')
         var sort
         if (split.length == 2) {
@@ -127,7 +140,7 @@
       paging.empty()
       _.each(list, function (v, i) {
         if (list.length < 10) {
-          paging.append('<li onclick="viewers.page(' + (i+1) + ')" "class="btn ' + (page === i+1 ? 'btn-primary' : 'btn-default') + '">' + (i+1) + '</li>')
+          paging.append('<li onclick="viewers.page(' + (i+1) + ')" class="btn ' + (page === i+1 ? 'btn-primary' : 'btn-default') + '">' + (i+1) + '</li>')
         } else {
           if ((i >= page - 3 && i < page + 2) || (i > list.length - 4) || i%10 === Math.floor(list.length/10) || i<3) {
             paging.append('<li onclick="viewers.page(' + (i+1) + ')" class="btn ' + (page === i+1 ? 'btn-primary' : 'btn-default') + '">' + (i+1) + '</li>')
@@ -140,6 +153,9 @@
           }
         }
       })
+      if (list.length === 0) {
+        paging.append('<li onclick="viewers.page(1)" class="btn btn-primary">1</li>')
+      }
       return list[page-1];
     }
   }
@@ -148,7 +164,9 @@
 
   socket.off('Viewers')
   socket.on('Viewers', function(list) {
-    viewers.update(viewers.paging(list))
     viewers.list = list
+    viewers.update(viewers.paging())
   });
+
+  $('#viewersSearch').attr('placeholder', translations['search-by-username'])
 </script>

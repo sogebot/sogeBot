@@ -163,6 +163,7 @@
     "warning": "warning",
     "announce": "announce",
     "muted": "muted",
+    "search-by-username": "Search by username",
     "create-and-use-a-new-game": "Create and use a new game",
     "create-and-use-a-new-title": "Create and use a new title",
     "widget-title-bets": "BETS",

@@ -573,3 +573,9 @@ a.soundboard-list-group-item span {
 .form-control-feedback {
   z-index: 20 !important;
 }
+
+.form-search {
+  float: right;
+  width: auto;
+  margin: 10px;
+}
