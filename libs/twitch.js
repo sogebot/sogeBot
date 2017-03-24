@@ -36,7 +36,7 @@ function Twitch () {
       }
     }, function (err, res, body) {
       if (err) {
-        global.log.error(err, { fnc: 'Twitch#1' })
+        if (err.code !== 'ETIMEDOUT' && err.code !== 'ECONNRESET') global.log.error(err, { fnc: 'Twitch#1' })
         return
       }
       if (res.statusCode === 200 && !_.isNull(body.stream)) {
@@ -67,7 +67,7 @@ function Twitch () {
       }
     }, function (err, res, body) {
       if (err) {
-        global.log.error(err, { fnc: 'Twitch#2' })
+        if (err.code !== 'ETIMEDOUT' && err.code !== 'ECONNRESET') global.log.error(err, { fnc: 'Twitch#2' })
         return
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
@@ -97,7 +97,7 @@ function Twitch () {
       }
     }, function (err, res, body) {
       if (err) {
-        global.log.error(err, { fnc: 'Twitch#3' })
+        if (err.code !== 'ETIMEDOUT' && err.code !== 'ECONNRESET') global.log.error(err, { fnc: 'Twitch#3' })
         return
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
@@ -112,7 +112,7 @@ function Twitch () {
         url: 'http://tmi.twitch.tv/hosts?include_logins=1&target=' + global.channelId
       }, function (err, res, body) {
         if (err) {
-          global.log.error(err, { fnc: 'Twitch#4' })
+          if (err.code !== 'ETIMEDOUT' && err.code !== 'ECONNRESET') global.log.error(err, { fnc: 'Twitch#4' })
           return
         }
         if (res.statusCode === 200 && !_.isNull(body)) {
