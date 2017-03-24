@@ -385,7 +385,7 @@ Twitch.prototype.sendGameFromTwitch = function (self, socket, game) {
     if (_.isNull(body.games)) {
       socket.emit('sendGameFromTwitch', false)
     } else {
-      socket.emit('sendGameFromTwitch', !_.isUndefined(body.games[0]) && game.toLowerCase() === body.games[0].name.toLowerCase() ? body.games[0].name : false)
+      socket.emit('sendGameFromTwitch', _.map(body.games, 'name'))
     }
   })
 }
