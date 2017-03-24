@@ -393,9 +393,22 @@ a.active {
 }
 
 /* PAGES */
+h2.title {
+  display: inline;
+  font-size: 30px !important;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: 0 !important;
+  position: relative;
+  top: 10px;
+  left: 10px;
+}
+
 .paging {
   padding: 10px;
   text-align: right;
+  display: inline-block;
+  float: right;
 }
 
 .pages-wrapper {
