@@ -476,6 +476,32 @@ a.soundboard-list-group-item span {
 }
 
 /* MODAL GAME AND TITLE */
+#change-game-search-list {
+  list-style-type: none;
+  padding: 0;
+  border: 1px dotted #ccc;
+  border-top: 0;
+  position: absolute;
+  background-color: white;
+  width: 100%;
+  z-index: 9000;
+  display: none;
+  height: auto;
+  max-height: 200px;
+  overflow: auto;
+}
+
+#change-game-search-list li {
+  padding: 10px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  cursor: pointer;
+}
+
+#change-game-search-list li:hover {
+  color: #337ab7
+}
+
 .dlg-game-and-title {
   padding-bottom: 0;
   margin-bottom: 0;
