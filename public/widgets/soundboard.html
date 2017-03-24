@@ -45,8 +45,15 @@
     },
     play: function (ev, el) {
       ev.preventDefault()
-      var sound = el.dataset.sound
-      new Audio('dist/soundboard/' + sound + '.mp3').play()
+      var audio = new Audio('dist/soundboard/' + el.dataset.sound + '.mp3')
+      audio.addEventListener('loadedmetadata', function() {
+        $(el).children('div').animate({
+          width: '100%'
+        }, audio.duration * 1000, 'linear', function () {
+          $(el).children('div').css('width', 0)
+        })
+        audio.play()
+      })
     }
   }
 
@@ -56,7 +63,7 @@
   socket.on('soundBoardSounds', function (sounds) {
     $("#soundboard-list").empty()
     _.each(sounds, function (sound) {
-      $("#soundboard-list").append('<a class="soundboard-list-group-item list-group-item" onclick="soundboard.play(event, this)" data-sound="' + sound + '" type="button"><span>' + sound + '</span></a>');
+      $("#soundboard-list").append('<a class="soundboard-list-group-item list-group-item"  style="padding: 10px 0 0 0" onclick="soundboard.play(event, this)" data-sound="' + sound + '" type="button"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0"></div><span>' + sound + '</span></a>');
     })
     soundboard.resize()
   })
