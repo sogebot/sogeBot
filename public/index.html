@@ -572,8 +572,8 @@
           if (games[0] === $('#change-game-input').val()) {
             this.icon.addClass('fa fa-check form-control-feedback')
             this.group.addClass('form-group has-feedback has-success')
-            this.setSelectedGame(games)
-            this.update(this.cachedData, games)
+            this.setSelectedGame(games[0])
+            this.update(this.cachedData, games[0])
           } else {
             this.icon.addClass('fa fa-exclamation form-control-feedback')
             this.group.addClass('form-group has-feedback has-error')
