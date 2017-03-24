@@ -1,16 +1,17 @@
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
   <div class="widget">
     <div class="title" data-lang="viewers"></div>
-    <table id="UsersTableSortable" class="table table-striped table-responsive table-condensed sortable-theme-bootstrap" data-sortable>
+    <ul class="paging"></ul>
+    <table class="table table-striped table-responsive table-condensed">
       <thead>
         <tr>
-          <th data-lang="username"></th>
-          <th data-sortable-type="numeric" data-lang="last-seen"></th>
-          <th data-sortable-type="numeric" data-lang="watched-time"></th>
-          <th data-sortable-type="numeric" id="viewers-points" data-lang="points"></th>
-          <th data-sortable-type="numeric" id="viewers-messages" data-lang="messages"></th>
-          <th data-sortable="false"></th>
-          <th data-sortable="false"></th>
+          <th class="sortable" onclick="viewers.sort(this)" data-sort="username"><span data-lang="username"></span> <i class="fa fa-sort-asc" aria-hidden="true"></i></th>
+          <th class="sortable" onclick="viewers.sort(this)" data-sort="time.message"><span data-lang="last-seen"></span> <i class="fa" aria-hidden="true"></i></th>
+          <th class="sortable" onclick="viewers.sort(this)" data-sort="time.watched"><span data-lang="watched-time"></span> <i class="fa" aria-hidden="true"></i></th>
+          <th class="sortable" onclick="viewers.sort(this)" data-sort="points"><span data-lang="points"></span> <i class="fa" aria-hidden="true"></i></th>
+          <th class="sortable" onclick="viewers.sort(this)" data-sort="stats.messages"><span data-lang="messages"></span> <i class="fa" aria-hidden="true"></i></th>
+          <th></th>
+          <th></th>
         </tr>
       </thead>
       <tbody id="Users">
@@ -20,11 +21,16 @@
 </div>
 
 <script>
+  var page = 1
+
   if(!systems.points) {
     $("#viewers-points").remove()
   }
 
   var viewers = {
+    sortBy: 'username',
+    sortType: 'asc',
+    list: {},
     update: function (list) {
       $("#Users").empty()
       _.each(list, function(item, index) {
@@ -82,6 +88,59 @@
         $(el).text(value)
         socket.emit('setPoints', {username: el.dataset.id, value: value})
       })
+    },
+    sort: function (el) {
+      $('table tr th i').removeClass()
+
+      if (viewers.sortBy === el.dataset.sort) {
+        viewers.sortType = viewers.sortType === 'asc' ? 'desc' : 'asc'
+      } else {
+        viewers.sortType = 'desc'
+        if (el.dataset.sort === 'username') viewers.sortType = 'asc'
+      }
+      viewers.sortBy = el.dataset.sort
+      $(el).children('i').addClass('fa fa-sort-' + viewers.sortType)
+      viewers.update(viewers.paging(viewers.list))
+    },
+    page: function (i) {
+      page = i
+      viewers.update(viewers.paging(viewers.list))
+    },
+    paging: function(list) {
+      list = _.sortBy(list, [function(o) {
+        var split = viewers.sortBy.split('.')
+        var sort
+        if (split.length == 2) {
+          sort = (!_.isUndefined(o[split[0]]) && !_.isUndefined(o[split[0]][split[1]])) ? o[split[0]][split[1]] : 0
+        } else {
+          sort = !_.isUndefined(o[viewers.sortBy]) ? o[viewers.sortBy] : 0
+        }
+        if (viewers.sortBy !== 'username') {
+          return parseInt(sort, 10)
+        }
+        return sort
+      }])
+      if (viewers.sortType === 'desc') list = list.reverse()
+      list = _.chunk(list, 50)
+      var paging = $('.paging')
+      var empty = false
+      paging.empty()
+      _.each(list, function (v, i) {
+        if (list.length < 10) {
+          paging.append('<li onclick="viewers.page(' + (i+1) + ')" "class="btn ' + (page === i+1 ? 'btn-primary' : 'btn-default') + '">' + (i+1) + '</li>')
+        } else {
+          if ((i >= page - 3 && i < page + 2) || (i > list.length - 4) || i%10 === Math.floor(list.length/10) || i<3) {
+            paging.append('<li onclick="viewers.page(' + (i+1) + ')" class="btn ' + (page === i+1 ? 'btn-primary' : 'btn-default') + '">' + (i+1) + '</li>')
+            if (!(i+1 > page - 2 && i+1 < page + 2) || !(i+1 > list.length - 4)) {
+              empty = true
+            }
+          } else if (empty) {
+            paging.append('<li class="btn btn-link disabled"></li>')
+            empty = false
+          }
+        }
+      })
+      return list[page-1];
     }
   }
 
@@ -89,8 +148,7 @@
 
   socket.off('Viewers')
   socket.on('Viewers', function(list) {
-    viewers.update(list)
+    viewers.update(viewers.paging(list))
+    viewers.list = list
   });
-
-  Sortable.initTable(document.querySelector('#UsersTableSortable'))
 </script>

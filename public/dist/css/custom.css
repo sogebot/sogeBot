@@ -393,6 +393,11 @@ a.active {
 }
 
 /* PAGES */
+.paging {
+  padding: 10px;
+  text-align: right;
+}
+
 .pages-wrapper {
   position: absolute;
   top: 196px;
@@ -402,6 +407,14 @@ a.active {
 .tableMenu {
   text-align: right !important;
   width: 18%;
+}
+
+table th {
+  font-size: 14px;
+}
+
+table th.sortable {
+  cursor: pointer;
 }
 
 table .tableMenu button { visibility: hidden; }
