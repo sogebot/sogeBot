@@ -10,7 +10,8 @@
     "command-parse": "Sorry, (sender), but this command is not correct, use",
     "error": "Sorry, (sender), but something went wrong!",
     "api": {
-      "error": "(sender), API is not responding correctly!"
+      "error": "(sender), API is not responding correctly!",
+      "not-available": "not available"
     },
     "mute": {
       "false": "Mute disabled. Bot will send messages."
