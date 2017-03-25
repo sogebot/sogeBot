@@ -9,6 +9,9 @@
     "lang-selected": "Bot je nyni prepnuty do cestiny",
     "command-parse": "Promin, (sender), ale tento prikaz neni spravne, pouzij",
     "error": "Promin, (sender), ale neco se pokazilo!",
+    "api": {
+      "error": "(sender), neco se pokazilo v API!"
+    },
     "mute": {
       "false": "Mute vypnut. Bot bude posilat zpravy."
     },

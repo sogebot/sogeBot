@@ -9,6 +9,9 @@
     "lang-selected": "Bot language is currently set to english",
     "command-parse": "Sorry, (sender), but this command is not correct, use",
     "error": "Sorry, (sender), but something went wrong!",
+    "api": {
+      "error": "(sender), API is not responding correctly!"
+    },
     "mute": {
       "false": "Mute disabled. Bot will send messages."
     },
