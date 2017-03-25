@@ -10,6 +10,7 @@
     "node": ">=7.0"
   },
   "dependencies": {
+    "async-request": "^1.2.0",
     "auto-load": "^2.1.0",
     "basic-auth": "^1.1.0",
     "bootstrap": "^3.3.7",

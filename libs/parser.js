@@ -3,6 +3,7 @@
 var constants = require('./constants')
 var crypto = require('crypto')
 var _ = require('lodash')
+var request = require('async-request')
 
 var queue = {}
 
@@ -209,6 +210,28 @@ Parser.prototype.parseMessage = async function (message, attr) {
   let msg = await this.parseMessageEach(random, message)
   msg = await this.parseMessageEach(custom, msg)
   msg = await this.parseMessageEach(param, msg)
+  msg = await this.parseMessageApi(msg)
+  return msg
+}
+
+Parser.prototype.parseMessageApi = async function (msg) {
+  let rMessage = msg.match(/\(api\|(http\S+)\)/i)
+  if (!_.isNil(rMessage) && !_.isNil(rMessage[1])) {
+    msg = msg.replace(rMessage[0], '').trim() // remove api command from message
+    let url = rMessage[1]
+    let response = await request(url)
+    if (response.statusCode !== 200) {
+      return global.translate('core.api.error')
+    }
+
+    // search for api datas in msg
+    let rData = msg.match(/\(api\.\S+\)/gi)
+    let data = JSON.parse(response.body)
+    _.each(rData, function (tag) {
+      let id = tag.replace('(api.', '').replace(')', '')
+      msg = msg.replace(tag, data[id])
+    })
+  }
   return msg
 }
 
