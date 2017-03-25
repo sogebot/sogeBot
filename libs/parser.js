@@ -229,7 +229,7 @@ Parser.prototype.parseMessageApi = async function (msg) {
     let data = JSON.parse(response.body)
     _.each(rData, function (tag) {
       let id = tag.replace('(api.', '').replace(')', '')
-      msg = msg.replace(tag, data[id])
+      msg = msg.replace(tag, !_.isNil(data[id]) ? data[id] : global.translate('core.api.not-available'))
     })
   }
   return msg
