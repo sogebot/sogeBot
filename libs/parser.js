@@ -231,8 +231,17 @@ Parser.prototype.parseMessageApi = async function (msg) {
     } else {
       let data = JSON.parse(response.body)
       _.each(rData, function (tag) {
-        let id = tag.replace('(api.', '').replace(')', '')
-        msg = msg.replace(tag, !_.isNil(data[id]) ? data[id] : global.translate('core.api.not-available'))
+        let path = data
+        let ids = tag.replace('(api.', '').replace(')', '').split('.')
+        _.each(ids, function (id) {
+          let isArray = id.match(/(\S+)\[(\d+)\]/i)
+          if (isArray) {
+            path = path[isArray[1]][isArray[2]]
+          } else {
+            path = path[id]
+          }
+        })
+        msg = msg.replace(tag, !_.isNil(path) ? path : global.translate('core.api.not-available'))
       })
     }
   }
