@@ -131,8 +131,20 @@ Moderation.prototype.timeoutUser = function (self, sender, warning, msg, time) {
 }
 
 Moderation.prototype.whitelist = function (text) {
-  // Clips regex is hardcoded
-  let clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
+  let ytRegex, clipsRegex
+
+  // check if songrequest -or- alias of songrequest contain youtube link -> change it to ID
+  if (global.commons.isSystemEnabled('songs')) {
+    let alias = _.find(global.systems.alias.alias, function (oAlias) { return oAlias.command === 'songrequest' })
+    if (!_.isUndefined(alias) && alias.enabled && global.commons.isSystemEnabled('alias')) {
+      ytRegex = new RegExp('^(!songrequest|!' + alias.alias + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*')
+    } else {
+      ytRegex = /^(!songrequest) \S+(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/
+    }
+    text = text.replace(ytRegex, '$1 $2')
+  }
+
+  clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
   text = text.replace(clipsRegex, '')
 
   _.each(this.lists.whitelist, function (value) {
