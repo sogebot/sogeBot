@@ -179,7 +179,7 @@ Points.prototype.getPointsFromUser = function (self, sender, text) {
     const username = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
 
     // find if user exists
-    if (_.isNil(_.find(global.users.users, function (o) { return o.username == username }))) {
+    if (_.isNil(_.find(global.users.users, function (o) { return o.username === username }))) {
       user = { username: username, points: 0 }
     } else {
       user = global.users.get(username)
