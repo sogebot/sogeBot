@@ -413,8 +413,8 @@
     }
   },
   "top": {
-    "listWatched": "Top (amount) podle casu sledovani: ",
-    "listPoints": "Top (amount) podle bodu: "
+    "listWatched": "Top (amount) (cas sledovani): ",
+    "listPoints": "Top (amount) (body): "
   },
   "permissions": {
     "success": {

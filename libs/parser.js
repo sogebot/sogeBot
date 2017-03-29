@@ -128,6 +128,7 @@ Parser.prototype.unregister = function (cmd) {
 
 Parser.prototype.isOwner = function (user) {
   try {
+    if (_.isString(user)) user = { username: user }
     let owners = _.map(_.filter(global.configuration.get().twitch.owners.split(','), _.isString), function (owner) {
       return _.trim(owner.toLowerCase())
     })
