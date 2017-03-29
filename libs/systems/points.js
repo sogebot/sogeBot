@@ -175,13 +175,21 @@ Points.prototype.getPointsName = function (points) {
 
 Points.prototype.getPointsFromUser = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([[\u0500-\u052F\u0400-\u04FF\w]]+)$/)
-    const user = global.users.get(parsed[1])
+    let user
+    const username = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+
+    // find if user exists
+    if (_.isNil(_.find(global.users.users, function (o) { o.username == username }))) {
+      user = { username: username, points: 0 }
+    } else {
+      user = global.users.get(username)
+    }
+
     var pointsResponse = (global.configuration.getValue('pointsResponse').length > 0 ? global.configuration.getValue('pointsResponse') : global.translate('points.defaults.pointsResponse'))
     var points = (_.isUndefined(user.points) ? 0 : user.points)
     global.commons.sendMessage(pointsResponse
       .replace('(amount)', points)
-      .replace('(username)', parsed[1])
+      .replace('(username)', username)
       .replace('(pointsName)', self.getPointsName(points)), sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.get'), sender)
