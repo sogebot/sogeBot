@@ -338,11 +338,11 @@ Moderation.prototype.blacklist = function (self, id, sender, text) {
   var timeout = global.configuration.getValue('moderationBlacklistTimeout')
   _.each(self.lists.blacklist, function (value) {
     value = value.trim()
-    if (text.indexOf(value) !== -1) {
+    if (text.indexOf(value) !== -1 && value.length > 0) {
       log.info(sender.username + ' [blacklist] ' + timeout + 's timeout: ' + text)
       self.timeoutUser(self, sender, global.translate('moderation.warnings.blacklist'), global.translate('moderation.blacklist'), timeout)
       global.updateQueue(id, false)
-      return true
+      return false
     }
   })
   global.updateQueue(id, true)
