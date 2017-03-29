@@ -16,7 +16,10 @@ global.panel = new Panel()
 
 global.client = {}
 global.commons = new Commons()
+
 global.status = {}
+global.systems = {}
+global.systems.alias = require('../libs/systems/alias')
 
 global.client.action = function (owner, text) {
   console.warn('#WARNING: client.action is deprecated ')
