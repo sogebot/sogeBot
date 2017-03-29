@@ -411,8 +411,8 @@
     }
   },
   "top": {
-    "listWatched": "Top (amount) by watch time:",
-    "listPoints": "Top (amount) by points:"
+    "listWatched": "Top (amount) (watch time):",
+    "listPoints": "Top (amount) (points):"
   },
   "permissions": {
     "success": {

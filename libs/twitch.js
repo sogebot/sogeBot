@@ -139,6 +139,7 @@ function Twitch () {
   global.parser.register(this, '!lastseen', this.lastseen, constants.VIEWERS)
   global.parser.register(this, '!watched', this.watched, constants.VIEWERS)
   global.parser.register(this, '!me', this.showMe, constants.VIEWERS)
+  global.parser.register(this, '!top', this.showTop, constants.OWNER_ONLY)
   global.parser.register(this, '!title', this.setTitle, constants.OWNER_ONLY)
   global.parser.register(this, '!game', this.setGame, constants.OWNER_ONLY)
 
@@ -308,6 +309,36 @@ Twitch.prototype.showMe = function (self, sender, text) {
     global.commons.sendMessage(message.join(' | '), sender)
   } catch (e) {
     global.log.error(e, { fnc: 'Twitch.prototype.showMe' })
+  }
+}
+
+Twitch.prototype.showTop = function (self, sender, text) {
+  try {
+    let sorted, message
+    let type = text.trim().match(/^(time|points)$/)
+
+    if (_.isNil(type)) type = 'time'
+    else type = type[1]
+
+    if (type === 'points' && global.commons.isSystemEnabled('points')) {
+      sorted = _.orderBy(_.filter(global.users.users, function (o) { return !_.isNil(o.points) && !global.parser.isOwner(o.username) && o.username !== global.configuration.get().twitch.username }), 'points', 'desc')
+    } else {
+      sorted = _.orderBy(_.filter(global.users.users, function (o) { return !_.isNil(o.time.watched) && !global.parser.isOwner(o.username) && o.username !== global.configuration.get().twitch.username }), 'time.watched', 'desc')
+    }
+
+    sorted = _.chunk(_.map(sorted, 'username'), 10)[0]
+
+    message = global.translate(type === 'points' ? 'top.listPoints' : 'top.listWatched').replace('(amount)', 10)
+    _.each(sorted, function (username, index) {
+      message += (index + 1) + '. @' + username + ' - '
+      if (type === 'time') message += (global.users.get(username).time.watched / 1000 / 60 / 60).toFixed(1) + 'h'
+      else message += global.users.get(username).points + ' ' + global.systems.points.getPointsName(global.users.get(username).points)
+      if (index + 1 < 10) message += ', '
+    })
+    global.commons.sendMessage(message, sender)
+  } catch (e) {
+    console.log(e)
+    global.log.error(e)
   }
 }
 
