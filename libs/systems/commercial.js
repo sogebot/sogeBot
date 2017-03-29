@@ -23,7 +23,6 @@ function Commercial () {
 Commercial.prototype.run = function (self, sender, text) {
   try {
     let parsed = text.match(/^([\d]+)? ?([\u0500-\u052F\u0400-\u04FF\S\s]+)?$/)
-    console.log(parsed)
     let commercial = {
       duration: !_.isNil(parsed[1]) ? parseInt(parsed[1], 10) : null,
       message: !_.isNil(parsed[2]) ? parsed[2] : null
