@@ -99,7 +99,7 @@ Points.prototype.setPoints = function (self, sender, text) {
 
 Points.prototype.givePoints = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([[\u0500-\u052F\u0400-\u04FF\w]]+) ([0-9]+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
     var givePts = parseInt(parsed[2], 10)
 
     const user = global.users.get(sender.username)
@@ -232,7 +232,7 @@ Points.prototype.rainPoints = function (self, sender, text) {
 
 Points.prototype.addPoints = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([[\u0500-\u052F\u0400-\u04FF\w]]+) ([0-9]+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
     const user = global.users.get(parsed[1])
     var givePts = parseInt(parsed[2], 10)
     var availablePts = parseInt(user.points, 10)
@@ -248,7 +248,7 @@ Points.prototype.addPoints = function (self, sender, text) {
 
 Points.prototype.removePoints = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([[\u0500-\u052F\u0400-\u04FF\w]]+) ([0-9]+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
     const user = global.users.get(parsed[1])
     var removePts = parseInt(parsed[2], 10)
     var availablePts = parseInt(user.points, 10)
