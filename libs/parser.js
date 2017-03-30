@@ -88,11 +88,12 @@ Parser.prototype.parseCommands = async function (user, message) {
   for (var cmd in this.registeredCmds) {
     if (message.startsWith(cmd)) {
       if (this.permissionsCmds[cmd] === constants.DISABLE) break
-      if (this.permissionsCmds[cmd] === constants.VIEWERS ||
+      if (_.isNil(user) || // if user is null -> we are running command through a bot
+        (this.permissionsCmds[cmd] === constants.VIEWERS) ||
         (this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user)) ||
         (this.permissionsCmds[cmd] === constants.MODS && (user.mod || this.isOwner(user)))) {
         var text = message.replace(cmd, '')
-        if (typeof this.registeredCmds[cmd] === 'function') this.registeredCmds[cmd](this.selfCmds[cmd], user, text.trim(), message)
+        if (typeof this.registeredCmds[cmd] === 'function') this.registeredCmds[cmd](this.selfCmds[cmd], _.isNil(user) ? { username: global.configuration.get().twitch.username } : user, text.trim(), message)
         else global.log.error(cmd + ' have wrong null function registered!', { fnc: 'Parser.prototype.parseCommands' })
         break // cmd is executed
       } else {
@@ -215,8 +216,30 @@ Parser.prototype.parseMessage = async function (message, attr) {
       return global.twitch.currentStatus
     }
   }
+  let command = {
+    '(command.#)': async function (filter) {
+      let cmd = filter.replace('(command.', '!')
+      .replace(')', '')
+      .replace('.', ' ')
+      .replace('sender', attr.sender.username)
+      global.parser.parseCommands(null, cmd)
+      return ''
+    }
+  }
+  let price = {
+    '(price)': async function (filter) {
+      let price = 0
+      if (global.commons.isSystemEnabled('price') && global.commons.isSystemEnabled('points')) {
+        price = _.find(global.systems.price.prices, function (o) { return o.command === attr.cmd.command })
+        price = !_.isNil(price) ? price.price : 0
+      }
+      return [price, global.systems.points.getPointsName(price)].join(' ')
+    }
+  }
 
   let msg = await this.parseMessageEach(random, message)
+  msg = await this.parseMessageCommand(command, msg)
+  msg = await this.parseMessageEach(price, msg)
   msg = await this.parseMessageEach(custom, msg)
   msg = await this.parseMessageEach(param, msg)
   msg = await this.parseMessageEach(gameAndStatus, msg)
@@ -258,6 +281,26 @@ Parser.prototype.parseMessageApi = async function (msg) {
   return msg
 }
 
+Parser.prototype.parseMessageCommand = async function (filters, msg) {
+  for (var key in filters) {
+    if (!filters.hasOwnProperty(key)) continue
+
+    let fnc = filters[key]
+    let regexp = _.escapeRegExp(key)
+
+    // we want to handle # as \w - number in regexp
+    regexp = regexp.replace(/#/g, '(\\S+)')
+    let rMessage = msg.match((new RegExp('(' + regexp + ')', 'g')))
+    if (!_.isNull(rMessage)) {
+      for (var bkey in rMessage) {
+        await fnc(rMessage[bkey])
+        msg = msg.replace(rMessage[bkey], '').trim()
+      }
+    }
+  }
+  return msg
+}
+
 Parser.prototype.parseMessageEach = async function (filters, msg) {
   for (var key in filters) {
     if (!filters.hasOwnProperty(key)) continue
@@ -266,13 +309,13 @@ Parser.prototype.parseMessageEach = async function (filters, msg) {
     let regexp = _.escapeRegExp(key)
 
     // we want to handle # as \w - number in regexp
-    regexp = regexp.replace(/#/g, '(\\w+)')
+    regexp = regexp.replace(/#/g, '(\\S+)')
     let rMessage = msg.match((new RegExp('(' + regexp + ')', 'g')))
     if (!_.isNull(rMessage)) {
       for (var bkey in rMessage) {
         let newString = await fnc(rMessage[bkey])
         if (_.isUndefined(newString) || newString.length === 0) msg = ''
-        msg = msg.replace(rMessage[bkey], newString)
+        msg = msg.replace(rMessage[bkey], newString).trim()
       }
     }
   }
