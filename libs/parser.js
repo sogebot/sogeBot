@@ -236,9 +236,18 @@ Parser.prototype.parseMessage = async function (message, attr) {
       return [price, global.systems.points.getPointsName(price)].join(' ')
     }
   }
+  let online = {
+    '(onlineonly)': async function (filter) {
+      return global.twitch.isOnline
+    },
+    '(offlineonly)': async function (filter) {
+      return !global.twitch.isOnline
+    }
+  }
 
-  let msg = await this.parseMessageEach(random, message)
+  let msg = await this.parseMessageOnline(online, message)
   msg = await this.parseMessageCommand(command, msg)
+  msg = await this.parseMessageEach(random, msg)
   msg = await this.parseMessageEach(price, msg)
   msg = await this.parseMessageEach(custom, msg)
   msg = await this.parseMessageEach(param, msg)
@@ -248,6 +257,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
 }
 
 Parser.prototype.parseMessageApi = async function (msg) {
+  if (msg.length === 0) return msg
   let rMessage = msg.match(/\(api\|(http\S+)\)/i)
   if (!_.isNil(rMessage) && !_.isNil(rMessage[1])) {
     msg = msg.replace(rMessage[0], '').trim() // remove api command from message
@@ -282,6 +292,7 @@ Parser.prototype.parseMessageApi = async function (msg) {
 }
 
 Parser.prototype.parseMessageCommand = async function (filters, msg) {
+  if (msg.length === 0) return msg
   for (var key in filters) {
     if (!filters.hasOwnProperty(key)) continue
 
@@ -301,7 +312,31 @@ Parser.prototype.parseMessageCommand = async function (filters, msg) {
   return msg
 }
 
+Parser.prototype.parseMessageOnline = async function (filters, msg) {
+  if (msg.length === 0) return msg
+  for (var key in filters) {
+    if (!filters.hasOwnProperty(key)) continue
+
+    let fnc = filters[key]
+    let regexp = _.escapeRegExp(key)
+
+    // we want to handle # as \w - number in regexp
+    regexp = regexp.replace(/#/g, '(\\S+)')
+    let rMessage = msg.match((new RegExp('(' + regexp + ')', 'g')))
+    if (!_.isNull(rMessage)) {
+      for (var bkey in rMessage) {
+        if (!await fnc(rMessage[bkey])) msg = ''
+        else {
+          msg = msg.replace(rMessage[bkey], '').trim()
+        }
+      }
+    }
+  }
+  return msg
+}
+
 Parser.prototype.parseMessageEach = async function (filters, msg) {
+  if (msg.length === 0) return msg
   for (var key in filters) {
     if (!filters.hasOwnProperty(key)) continue
 
