@@ -104,6 +104,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
   if (global.configuration.get().bot.debug) {
     if (_.isUndefined(sender) || _.isNull(sender)) sender = { username: null }
     message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace('(sender)', '@' + sender.username) : message
+    if ((_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === global.configuration.get().twitch.username))) message = '! ' + message
     sender['message-type'] === 'whisper' ? global.log.whisperOut(message, {username: sender.username}) : global.log.chatOut(message, {username: sender.username})
     return
   }
