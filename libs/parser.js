@@ -207,10 +207,19 @@ Parser.prototype.parseMessage = async function (message, attr) {
       return ''
     }
   }
+  let gameAndStatus = {
+    '(game)': async function (filter) {
+      return global.twitch.currentGame
+    },
+    '(status)': async function (filter) {
+      return global.twitch.currentStatus
+    }
+  }
 
   let msg = await this.parseMessageEach(random, message)
   msg = await this.parseMessageEach(custom, msg)
   msg = await this.parseMessageEach(param, msg)
+  msg = await this.parseMessageEach(gameAndStatus, msg)
   msg = await this.parseMessageApi(msg)
   return msg
 }
