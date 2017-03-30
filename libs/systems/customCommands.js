@@ -115,7 +115,7 @@ CustomCommands.prototype.run = function (self, sender, msg, fullMsg) {
   let parsed = fullMsg.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
   let command = _.find(self.commands, function (o) { return o.command === parsed[1] && o.enabled })
   try {
-    global.commons.sendMessage(command.response, sender, {'param': msg})
+    global.commons.sendMessage(command.response, sender, {'param': msg, 'cmd': command})
   } catch (e) {
     global.parser.unregister(fullMsg)
   }
