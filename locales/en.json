@@ -9,6 +9,7 @@
     "lang-selected": "Bot language is currently set to english",
     "command-parse": "Sorry, (sender), but this command is not correct, use",
     "error": "Sorry, (sender), but something went wrong!",
+    "no-response": "",
     "api": {
       "error": "(sender), API is not responding correctly!",
       "not-available": "not available"
@@ -170,6 +171,9 @@
     "search-by-username": "Search by username",
     "create-and-use-a-new-game": "Create and use a new game",
     "create-and-use-a-new-title": "Create and use a new title",
+    "followers-show-number": "Show",
+    "followers-show": "followers",
+    "followers-size": "Font size",
     "widget-title-bets": "BETS",
     "widget-title-chat": "CHAT",
     "widget-title-clips": "LATEST CLIPS",
@@ -177,7 +181,8 @@
     "widget-title-raffles": "RAFFLES",
     "widget-title-soundboard": "SOUNDBOARD",
     "widget-title-monitor": "TWITCH STREAM MONITOR",
-    "widget-title-ytplayer": "MUSIC PLAYER"
+    "widget-title-ytplayer": "MUSIC PLAYER",
+    "widget-title-latest-followers": "LATEST FOLLOWERS"
   },
   "raffle": {
     "announceInterval": "Opened raffles will be announced every (value) minute",

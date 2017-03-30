@@ -1,0 +1,77 @@
+<div class="widget">
+  <h6 data-lang="widget-title-latest-followers"></h6>
+  <ul class="nav nav-pills" role="tablist">
+    <li role="presentation" class="active">
+      <a href="#followers-main" aria-controls="home" role="tab" data-toggle="tab" title="Latest Followers">
+        <i class="fa fa-user" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li role="presentation">
+      <a href="#followers-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+        <i class="fa fa-cog" aria-hidden="true"></i>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="followers-main">
+      <div id="followers-widget"></div>
+    </div> <!-- /MAIN -->
+
+    <div role="tabpanel" class="tab-pane" id="followers-settings">
+      <div class="input-group">
+        <span class="input-group-addon" data-lang="followers-show-number"></span>
+        <input type="text" class="form-control" id="followersShow">
+        <span class="input-group-addon" data-lang="followers-show"></span>
+      </div>
+        <div class="input-group">
+          <span class="input-group-addon" data-lang="followers-size"></span>
+          <input type="text" class="form-control" id="followersSize">
+        </div>
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('followers')" style="margin-top: 20px;"  data-lang="remove-widget"></button>
+    </div> <!-- /SETTINGS -->
+</div>
+
+<script>
+  if (!_.isUndefined(IFollowers)) window.clearInterval(IFollowers)
+  var IFollowers = setInterval(function() { socket.emit('followers.latest.get') }, 2000)
+
+  socket.emit('followers.configuration.get')
+  socket.off('followers.configuration')
+  socket.on('followers.configuration', function(data) {
+    $("#followersShow").val(data.followersWidgetShow)
+    $("#followersSize").val(data.followersWidgetFontSize)
+  })
+
+  socket.off('followers.latest')
+  socket.on('followers.latest', function (items) {
+    $("#followers-widget").empty()
+    var toShow = $("#followersShow").val()
+    var output = ''
+    _.each(items, function(item, index) {
+      if (index < toShow) {
+        output += '<p class="text-center text-uppercase" style="font-size: ' + $('#followersSize').val() + 'px">' + item + '</p>'
+      } else return false
+    })
+    $("#followers-widget").html(output)
+  })
+
+  var $followersShow = $('#followersShow')
+  $followersShow.off()
+  $followersShow.on('focusout', function() {
+    var value = $followersShow.val()
+    var data = {}
+    data['followersWidgetShow'] = value
+    socket.emit('saveConfiguration', data)
+  })
+
+  var $followersSize = $('#followersSize')
+  $followersSize.off()
+  $followersSize.on('focusout', function() {
+    var value = $followersSize.val()
+    var data = {}
+    data['followersWidgetFontSize'] = value
+    socket.emit('saveConfiguration', data)
+  })
+</script>
