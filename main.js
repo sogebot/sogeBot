@@ -13,6 +13,7 @@ var Users = require('./libs/users')
 var Panel = require('./libs/panel')
 var Stats = require('./libs/stats')
 var Watcher = require('./libs/watcher')
+var ChainOps = require('./libs/chainops')
 var constants = require('./libs/constants')
 
 require('./libs/logging')
@@ -25,6 +26,7 @@ global.commons = new Commons()
 global.panel = new Panel()
 global.twitch = new Twitch()
 global.stats = new Stats()
+global.chainops = new ChainOps()
 global.translate = require('./libs/translate')
 
 global.status = {
@@ -109,12 +111,14 @@ global.client.on('join', function (channel, username, fromSelf) {
       global.users.isFollower(username)
     }
     global.users.set(username, { is: { online: true } })
+    global.chainops.fire('user-joined-channel', { username: username })
   }
 })
 
 global.client.on('part', function (channel, username, fromSelf) {
   if (!fromSelf) {
     global.users.set(username, { is: { online: false } })
+    global.chainops.fire('user-parted-channel', { username: username })
   }
 })
 

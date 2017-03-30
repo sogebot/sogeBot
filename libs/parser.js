@@ -129,6 +129,10 @@ Parser.prototype.unregister = function (cmd) {
   delete this.selfCmds[cmd]
 }
 
+Parser.prototype.getOwner = function () {
+  return global.configuration.get().twitch.owners.split(',')[0].trim()
+}
+
 Parser.prototype.isOwner = function (user) {
   try {
     if (_.isString(user)) user = { username: user }
