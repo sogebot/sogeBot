@@ -126,7 +126,7 @@ Points.prototype.givePoints = function (self, sender, text) {
 }
 
 Points.prototype.getPointsName = function (points) {
-  var pointsNames = global.configuration.getValue('pointsName').split('|')
+  var pointsNames = global.configuration.getValue('pointsName').split('|').map(Function.prototype.call, String.prototype.trim)
   var single, multi, xmulti
   // get single|x:multi|multi from pointsName
   if (global.configuration.getValue('pointsName').length === 0) {
@@ -151,6 +151,7 @@ Points.prototype.getPointsName = function (points) {
         xmulti = {}
 
         for (var pattern in pointsNames) {
+          pattern = parseInt(pattern, 10)
           if (pointsNames.hasOwnProperty(pattern) && pattern !== 0 && pattern !== len - 1) {
             var maxPts = pointsNames[pattern].split(':')[0]
             var name = pointsNames[pattern].split(':')[1]
@@ -162,7 +163,7 @@ Points.prototype.getPointsName = function (points) {
   }
 
   var pointsName = (points === 1 ? single : multi)
-  if (!_.isNull(xmulti) && typeof xmulti === 'string' && points > 1 && points <= 10) {
+  if (!_.isNull(xmulti) && _.isObject(xmulti) && points > 1 && points <= 10) {
     for (var i = points; i <= 10; i++) {
       if (typeof xmulti[i] === 'string') {
         pointsName = xmulti[i]
