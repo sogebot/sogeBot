@@ -9,6 +9,7 @@
     "lang-selected": "Bot je nyni prepnuty do cestiny",
     "command-parse": "Promin, (sender), ale tento prikaz neni spravne, pouzij",
     "error": "Promin, (sender), ale neco se pokazilo!",
+    "no-response": "",
     "api": {
       "error": "(sender), neco se pokazilo v API!",
       "not-available": "nedostupne"
@@ -170,6 +171,9 @@
     "search-by-username": "Vyhledat podle uživ. jm.",
     "create-and-use-a-new-game": "Vytvoř a použij novou hru",
     "create-and-use-a-new-title": "Vytvoř a použij nový název",
+    "followers-show-number": "Zobrazit",
+    "followers-show": "followerů",
+    "followers-size": "Velikost fontu",
     "widget-title-bets": "SÁZKY",
     "widget-title-chat": "CHAT",
     "widget-title-clips": "POSLEDNÍ KLIPY",
@@ -177,7 +181,8 @@
     "widget-title-raffles": "TOMBOLA",
     "widget-title-soundboard": "SOUNDBOARD",
     "widget-title-monitor": "TWITCH STREAM MONITOR",
-    "widget-title-ytplayer": "PŘEHRÁVAČ HUDBY"
+    "widget-title-ytplayer": "PŘEHRÁVAČ HUDBY",
+    "widget-title-latest-followers": "NEJNOVĚJŠÍ FOLLOWEŘI"
   },
   "raffle": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych (value) minut",
