@@ -560,5 +560,14 @@
       "set": "(type) cooldown pro !(command) byl nastaven na (seconds)s",
       "unset": "Cooldown pro !(command) byl odebran"
     }
+  },
+  "gambling": {
+    "gamble": {
+      "zeroBet": "(sender), nemuzes hrat o 0 (pointsName)",
+      "notEnoughOptions": "(sender), musis hrat o nejake body",
+      "notEnoughPoints": "(sender), nemas dostatek (pointsName) abys o ne hral",
+      "win": "(sender), VYHRALS! Aktualne mas (points) (pointsName)",
+      "lose": "(sender), PROHRALS! Aktualne mas (points) (pointsName)"
+    }
   }
 }
