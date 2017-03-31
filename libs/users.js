@@ -51,6 +51,16 @@ Users.prototype._save = function (self) {
 
 Users.prototype.get = function (username) {
   var self = this
+
+  if (username === global.configuration.get().twitch.username) {
+    return {
+      username: username,
+      time: {},
+      is: {},
+      stats: {}
+    }
+  }
+
   let user = _.isUndefined(this.users[username]) ? {} : this.users[username]
   if (_.isUndefined(user.id)) {
     global.client.api({
