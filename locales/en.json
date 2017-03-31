@@ -236,14 +236,17 @@
       "remove": "Alias was deleted from database",
       "list": "List of aliases",
       "enabled": "Alias !(alias) was enabled",
-      "disabled": "Alias !(alias) was disabled"
+      "disabled": "Alias !(alias) was disabled",
+      "visible": "Alias !(alias) will be visible in list",
+      "invisible": "Alias !(alias) will not be visible in list"
     },
     "failed": {
       "add": "This alias already exists in database",
       "remove": "This alias cannot be found in database",
       "list": "List of aliases is empty",
       "parse": "{core.command-parse} !alias",
-      "toggle": "Alias !(alias) was not found"
+      "toggle": "Alias !(alias) was not found",
+      "visible": "(alias.failed.remove)"
     }
   },
   "customcmds": {
@@ -252,14 +255,17 @@
       "remove": "Command was deleted from database",
       "list": "List of commands",
       "enabled": "Command !(command) was enabled",
-      "disabled": "Command !(command) was disabled"
+      "disabled": "Command !(command) was disabled",
+      "visible": "Command !(command) will be visible in list",
+      "invisible": "Command !(command) will not be visible in list"
     },
     "failed": {
       "add": "This command already exists in database",
       "remove": "This command cannot be found in database",
       "list": "List of commands is empty",
       "parse": "{core.command-parse} !command",
-      "toggle": "Command !(command) was not found"
+      "toggle": "Command !(command) was not found",
+      "visible": "(customcmds.failed.remove)"
     }
   },
   "keywords": {

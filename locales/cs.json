@@ -238,14 +238,17 @@
       "remove": "Alias byl smazany z databaze",
       "list": "Seznam aliasu",
       "enabled": "Alias !(alias) byl zapnut",
-      "disabled": "Alias !(alias) byl vypnut"
+      "disabled": "Alias !(alias) byl vypnut",
+      "visible": "Alias !(alias) bude zobrazen v listu",
+      "invisible": "Alias !(alias) nebude zobrazen v listu"
     },
     "failed": {
       "add": "Tento alias uz existuje v databazi",
       "remove": "Tento alias v databazi neexistuje",
       "list": "Seznam aliasu je prazdny",
       "parse": "{core.command-parse} !alias",
-      "toggle": "Alias !(alias) neni v databazi!"
+      "toggle": "Alias !(alias) neni v databazi!",
+      "visible": "(alias.failed.remove)"
     }
   },
   "customcmds": {
@@ -254,14 +257,17 @@
       "remove": "Prikaz byl smazany z databaze",
       "list": "Seznam prikazu",
       "enabled": "Prikaz !(command) byl zapnut",
-      "disabled": "Prikaz !(command) byl vypnut"
+      "disabled": "Prikaz !(command) byl vypnut",
+      "visible": "Prikaz !(command) bude zobrazen v listu",
+      "invisible": "Prikaz !(command) nebude zobrazen v listu"
     },
     "failed": {
       "add": "Tento prikaz uz existuje v databazi",
       "remove": "Tento prikaz v databazi neexistuje",
       "list": "Seznam prikazu je prazdny",
       "parse": "{core.command-parse} !command",
-      "toggle": "Prikaz !(command) neni v databazi!"
+      "toggle": "Prikaz !(command) neni v databazi!",
+      "visible": "(customcmds.failed.remove)"
     }
   },
   "keywords": {

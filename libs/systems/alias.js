@@ -10,11 +10,12 @@ var log = global.log
 const ERROR_DOESNT_EXISTS = '1'
 
 /*
- * !alias                   - gets an info about alias usage
- * !alias add ![cmd] ![alias] - add alias for specified command
- * !alias remove ![alias]    - remove specified alias
- * !alias toggle ![alias]    - enable/disable specified alias
- * !alias list              - get alias list
+ * !alias                            - gets an info about alias usage
+ * !alias add ![cmd] ![alias]        - add alias for specified command
+ * !alias remove ![alias]            - remove specified alias
+ * !alias toggle ![alias]            - enable/disable specified alias
+ * !alias toggle-visibility ![alias] - enable/disable specified alias
+ * !alias list                       - get alias list
  */
 
 function Alias () {
@@ -23,6 +24,7 @@ function Alias () {
     global.parser.register(this, '!alias add', this.add, constants.OWNER_ONLY)
     global.parser.register(this, '!alias list', this.list, constants.OWNER_ONLY)
     global.parser.register(this, '!alias remove', this.remove, constants.OWNER_ONLY)
+    global.parser.register(this, '!alias toggle-visibility', this.visible, constants.OWNER_ONLY)
     global.parser.register(this, '!alias toggle', this.toggle, constants.OWNER_ONLY)
     global.parser.register(this, '!alias', this.help, constants.OWNER_ONLY)
 
@@ -59,6 +61,7 @@ Alias.prototype.webPanel = function () {
   global.panel.socketListening(this, 'alias.delete', this.deleteAlias)
   global.panel.socketListening(this, 'alias.create', this.createAlias)
   global.panel.socketListening(this, 'alias.toggle', this.toggleAlias)
+  global.panel.socketListening(this, 'alias.toggle.visibility', this.toggleVisibilityAlias)
 }
 
 Alias.prototype.sendAliases = function (self, socket) {
@@ -75,13 +78,18 @@ Alias.prototype.toggleAlias = function (self, socket, data) {
   self.sendAliases(self, socket)
 }
 
+Alias.prototype.toggleVisibilityAlias = function (self, socket, data) {
+  self.visible(self, null, '!' + data)
+  self.sendAliases(self, socket)
+}
+
 Alias.prototype.createAlias = function (self, socket, data) {
   self.add(self, null, '!' + data.command + ' !' + data.value)
   self.sendAliases(self, socket)
 }
 
 Alias.prototype.help = function (self, sender) {
-  global.commons.sendMessage(global.translate('core.usage') + ': !alias add !<command> !<alias> | !alias remove !<alias> | !alias list | !alias toggle !<alias>', sender)
+  global.commons.sendMessage(global.translate('core.usage') + ': !alias add !<command> !<alias> | !alias remove !<alias> | !alias list | !alias toggle !<alias> | !alias toggle-visibility !<alias>', sender)
 }
 
 Alias.prototype.add = function (self, sender, text) {
@@ -102,7 +110,7 @@ Alias.prototype.add = function (self, sender, text) {
 
 Alias.prototype.list = function (self, sender, text) {
   var aliases = []
-  _.each(self.alias, function (element) { aliases.push('!' + element.alias) })
+  _.each(self.alias, function (element) { if (element.visible) aliases.push('!' + element.alias) })
   var output = (aliases.length === 0 ? global.translate('alias.failed.list') : global.translate('alias.success.list') + ': ' + aliases.join(', '))
   global.commons.sendMessage(output, sender)
 }
@@ -120,6 +128,25 @@ Alias.prototype.toggle = function (self, sender, text) {
 
     alias.enabled = !alias.enabled
     global.commons.sendMessage(global.translate(alias.enabled ? 'alias.success.enabled' : 'alias.success.disabled')
+      .replace('(alias)', alias.alias), sender)
+  } catch (e) {
+    global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
+  }
+}
+
+Alias.prototype.visible = function (self, sender, text) {
+  try {
+    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)[1]
+    let alias = _.find(self.alias, function (o) { return o.alias === parsed })
+
+    if (_.isUndefined(alias)) {
+      global.commons.sendMessage(global.translate('alias.failed.visible')
+        .replace('(alias)', parsed), sender)
+      return
+    }
+
+    alias.visible = !alias.visible
+    global.commons.sendMessage(global.translate(alias.visible ? 'alias.success.visible' : 'alias.success.invisible')
       .replace('(alias)', alias.alias), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
