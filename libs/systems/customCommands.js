@@ -68,12 +68,12 @@ CustomCommands.prototype.sendCommands = function (self, socket) {
 }
 
 CustomCommands.prototype.deleteCommands = function (self, socket, data) {
-  self.remove(self, null, data)
+  self.remove(self, null, '!' + data)
   self.sendCommands(self, socket)
 }
 
 CustomCommands.prototype.toggleCommands = function (self, socket, data) {
-  self.toggle(self, null, data)
+  self.toggle(self, null, '!' + data)
   self.sendCommands(self, socket)
 }
 
@@ -83,7 +83,7 @@ CustomCommands.prototype.toggleVisibilityCommands = function (self, socket, data
 }
 
 CustomCommands.prototype.createCommands = function (self, socket, data) {
-  self.add(self, null, data.command + ' ' + data.response)
+  self.add(self, null, '!' + data.command + ' ' + data.response)
   self.sendCommands(self, socket)
 }
 
