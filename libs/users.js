@@ -170,7 +170,7 @@ Users.prototype.isFollowerUpdate = function (username) {
     } else {
       if (!global.users.get(username).is.follower) {
         global.log.follow(username)
-        self.cachedLatestFollowers.push(username)
+        self.cachedLatestFollowers.unshift(username)
       }
       global.users.set(username, { is: { follower: true, time: { followCheck: new Date().getTime() } } }, !global.users.get(username).is.follower)
     }
