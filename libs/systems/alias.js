@@ -11,9 +11,9 @@ const ERROR_DOESNT_EXISTS = '1'
 
 /*
  * !alias                   - gets an info about alias usage
- * !alias add [cmd] [alias] - add alias for specified command
- * !alias remove [alias]    - remove specified alias
- * !alias toggle [alias]    - enable/disable specified alias
+ * !alias add ![cmd] ![alias] - add alias for specified command
+ * !alias remove ![alias]    - remove specified alias
+ * !alias toggle ![alias]    - enable/disable specified alias
  * !alias list              - get alias list
  */
 
@@ -66,27 +66,27 @@ Alias.prototype.sendAliases = function (self, socket) {
 }
 
 Alias.prototype.deleteAlias = function (self, socket, data) {
-  self.remove(self, null, data)
+  self.remove(self, null, '!' + data)
   self.sendAliases(self, socket)
 }
 
 Alias.prototype.toggleAlias = function (self, socket, data) {
-  self.toggle(self, null, data)
+  self.toggle(self, null, '!' + data)
   self.sendAliases(self, socket)
 }
 
 Alias.prototype.createAlias = function (self, socket, data) {
-  self.add(self, null, data.command + ' ' + data.value)
+  self.add(self, null, '!' + data.command + ' !' + data.value)
   self.sendAliases(self, socket)
 }
 
 Alias.prototype.help = function (self, sender) {
-  global.commons.sendMessage(global.translate('core.usage') + ': !alias add <command> <alias> | !alias remove <alias> | !alias list | !alias toggle <alias>', sender)
+  global.commons.sendMessage(global.translate('core.usage') + ': !alias add !<command> !<alias> | !alias remove !<alias> | !alias list | !alias toggle !<alias>', sender)
 }
 
 Alias.prototype.add = function (self, sender, text) {
   try {
-    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+) !([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
     let data = {
       alias: parsed[2],
       command: parsed[1],
@@ -109,7 +109,7 @@ Alias.prototype.list = function (self, sender, text) {
 
 Alias.prototype.toggle = function (self, sender, text) {
   try {
-    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)[1]
     let alias = _.find(self.alias, function (o) { return o.alias === parsed })
 
     if (_.isUndefined(alias)) {
@@ -128,7 +128,7 @@ Alias.prototype.toggle = function (self, sender, text) {
 
 Alias.prototype.remove = function (self, sender, text) {
   try {
-    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)[1]
     if (_.isUndefined(_.find(self.alias, function (o) { return o.alias === parsed }))) throw Error(ERROR_DOESNT_EXISTS)
     self.alias = _.filter(self.alias, function (o) { return o.alias !== parsed })
     global.commons.sendMessage(global.translate('alias.success.remove'), sender)
@@ -148,7 +148,7 @@ Alias.prototype.parse = function (self, id, sender, text) {
     var parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
     var cmd = parsed[1]
 
-    let alias = _.find(self.alias, function (oAlias) { return oAlias.alias === cmd })
+    let alias = _.find(self.alias, function (oAlias) { return oAlias.alias === cmd || '!' + oAlias.alias === parsed[0] })
     if (!_.isUndefined(alias) && alias.enabled) {
       global.parser.parse(sender, text.replace('!' + cmd, '!' + alias.command))
       global.parser.lineParsed--
