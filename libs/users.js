@@ -164,11 +164,13 @@ Users.prototype.isFollowerUpdate = function (username) {
     if (res.statusCode === 404) {
       if (global.users.get(username).is.follower) {
         global.log.unfollow(username)
+
       }
       global.users.set(username, { is: { follower: false, time: { followCheck: new Date().getTime() } } }, global.users.get(username).is.follower)
     } else {
       if (!global.users.get(username).is.follower) {
         global.log.follow(username)
+        self.cachedLatestFollowers.push(username)
       }
       global.users.set(username, { is: { follower: true, time: { followCheck: new Date().getTime() } } }, !global.users.get(username).is.follower)
     }
