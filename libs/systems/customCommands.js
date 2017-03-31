@@ -11,11 +11,12 @@ const ERROR_ALREADY_EXISTS = '0'
 const ERROR_DOESNT_EXISTS = '1'
 
 /*
- * !command                      - gets an info about command usage
- * !command add [cmd] [response] - add command with specified response
- * !command remove [cmd]         - remove specified command
- * !command toggle [cmd]         - enable/disable specified command
- * !command list                 - get commands list
+ * !command                          - gets an info about command usage
+ * !command add ![cmd] [response]    - add command with specified response
+ * !command remove ![cmd]            - remove specified command
+ * !command toggle ![cmd]            - enable/disable specified command
+ * !command toggle-visibility ![cmd] - enable/disable specified command
+ * !command list                     - get commands list
  */
 
 function CustomCommands () {
@@ -25,6 +26,7 @@ function CustomCommands () {
     global.parser.register(this, '!command add', this.add, constants.OWNER_ONLY)
     global.parser.register(this, '!command list', this.list, constants.OWNER_ONLY)
     global.parser.register(this, '!command remove', this.remove, constants.OWNER_ONLY)
+    global.parser.register(this, '!command toggle-visibility', this.visible, constants.OWNER_ONLY)
     global.parser.register(this, '!command toggle', this.toggle, constants.OWNER_ONLY)
     global.parser.register(this, '!command', this.help, constants.OWNER_ONLY)
 
@@ -57,6 +59,7 @@ CustomCommands.prototype.webPanel = function () {
   global.panel.socketListening(this, 'commands.delete', this.deleteCommands)
   global.panel.socketListening(this, 'commands.create', this.createCommands)
   global.panel.socketListening(this, 'commands.toggle', this.toggleCommands)
+  global.panel.socketListening(this, 'commands.toggle.visibility', this.toggleVisibilityCommands)
   global.panel.socketListening(this, 'commands.edit', this.editCommands)
 }
 
@@ -71,6 +74,11 @@ CustomCommands.prototype.deleteCommands = function (self, socket, data) {
 
 CustomCommands.prototype.toggleCommands = function (self, socket, data) {
   self.toggle(self, null, data)
+  self.sendCommands(self, socket)
+}
+
+CustomCommands.prototype.toggleVisibilityCommands = function (self, socket, data) {
+  self.visible(self, null, '!' + data)
   self.sendCommands(self, socket)
 }
 
@@ -95,7 +103,7 @@ CustomCommands.prototype.register = function (self) {
 
 CustomCommands.prototype.add = function (self, sender, text) {
   try {
-    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
+    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
     let command = { command: parsed[1], response: parsed[2], enabled: true }
     if (!_.isUndefined(_.find(self.commands, function (o) { return o.command === command.command }))) throw Error(ERROR_ALREADY_EXISTS)
     self.commands.push(command)
@@ -123,14 +131,14 @@ CustomCommands.prototype.run = function (self, sender, msg, fullMsg) {
 
 CustomCommands.prototype.list = function (self, sender, text) {
   var commands = []
-  _.each(self.commands, function (element) { commands.push('!' + element.command) })
+  _.each(self.commands, function (element) { if (element.visible) commands.push('!' + element.command) })
   var output = (commands.length === 0 ? global.translate('customcmds.failed.list') : global.translate('customcmds.success.list') + ': ' + commands.join(', '))
   global.commons.sendMessage(output, sender)
 }
 
 CustomCommands.prototype.toggle = function (self, sender, text) {
   try {
-    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
     let command = _.find(self.commands, function (o) { return o.command === parsed })
     if (_.isUndefined(command)) {
       global.commons.sendMessage(global.translate('command.failed.toggle')
@@ -148,9 +156,27 @@ CustomCommands.prototype.toggle = function (self, sender, text) {
   }
 }
 
+CustomCommands.prototype.visible = function (self, sender, text) {
+  try {
+    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+    let command = _.find(self.commands, function (o) { return o.command === parsed })
+    if (_.isUndefined(command)) {
+      global.commons.sendMessage(global.translate('command.failed.visible')
+        .replace('(command)', parsed), sender)
+      return
+    }
+
+    command.visible = !command.visible
+    global.commons.sendMessage(global.translate(command.visible ? 'customcmds.success.visible' : 'customcmds.success.invisible')
+      .replace('(command)', command.command), sender)
+  } catch (e) {
+    global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
+  }
+}
+
 CustomCommands.prototype.remove = function (self, sender, text) {
   try {
-    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     if (_.isUndefined(_.find(self.commands, function (o) { return o.command === parsed[1] }))) throw Error(ERROR_DOESNT_EXISTS)
     self.commands = _.filter(self.commands, function (o) { return o.command !== parsed[1] })
     global.parser.unregister('!' + parsed[1])
