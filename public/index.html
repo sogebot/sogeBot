@@ -803,7 +803,11 @@
       })
       $('#change-game-input').attr('placeholder', translations['create-and-use-a-new-game'])
       $('#change-title').attr('placeholder', translations['create-and-use-a-new-title'])
+    })
 
+    socket.off('play-sound')
+    socket.on('play-sound', function (sound) {
+      var audio = new Audio(sound).play()
     })
   </script>
 </body>

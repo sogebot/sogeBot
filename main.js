@@ -90,6 +90,7 @@ global.client.on('message', function (channel, sender, message, fromSelf) {
     if (sender['message-type'] !== 'whisper') {
       global.parser.timer.push({ 'id': sender.id, 'received': new Date().getTime() })
       global.log.chatIn(message, {username: sender.username})
+      global.chainops.fire('command-send-x-times', { message: message })
 
       if (!_.isUndefined(global.users.get(sender.username).id)) {
         global.users.isFollower(sender.username)
@@ -120,6 +121,24 @@ global.client.on('part', function (channel, username, fromSelf) {
     global.users.set(username, { is: { online: false } })
     global.chainops.fire('user-parted-channel', { username: username })
   }
+})
+
+global.client.on('cheer', function (channel, userstate, message) {
+  global.chainops.fire('cheer', { username: userstate['display-name'].toLowerCase(), bits: userstate.bits, message: message })
+})
+
+global.client.on('clearchat', function (channel) {
+  global.chainops.fire('clearchat')
+})
+
+global.client.on('subscription', function (channel, username, method) {
+  global.users.set(username, { is: { subscriber: true } })
+  global.chainops.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
+})
+
+global.client.on('resub', function (channel, username, months, message) {
+  global.users.set(username, { is: { subscriber: true } })
+  global.chainops.fire('resub', { username: username, months: months, message: message })
 })
 
 // Bot is checking if it is a mod

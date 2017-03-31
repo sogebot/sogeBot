@@ -54,10 +54,12 @@ function Twitch () {
           self.maxViewers = 0
           self.newChatters = 0
           self.chatMessagesAtStart = global.parser.linesParsed
+          global.chainops.fire('stream-started')
         }
         self.saveStream(body.stream)
         self.isOnline = true
         self.when.offline = null
+        global.chainops.fire('number-of-viewers-is-at-least-x')
       } else {
         if (self.isOnline && self.curRetries < self.maxRetries) { self.curRetries = self.curRetries + 1; return } // we want to check if stream is _REALLY_ offline
         // reset everything
@@ -65,6 +67,9 @@ function Twitch () {
         self.isOnline = false
         if (_.isNil(self.when.offline)) self.when.offline = new Date().getTime()
         self.when.online = null
+        global.chainops.fire('stream-stopped')
+        global.chainops.fire('stream-is-running-x-minutes', { reset: true })
+        global.chainops.fire('number-of-viewers-is-at-least-x', { reset: true })
       }
     })
 
@@ -86,6 +91,7 @@ function Twitch () {
         _.each(body.follows, function (follower) {
           if (!global.users.get(follower.user.name).is.follower) {
             global.log.follow(follower.user.name)
+            global.chainops.fire('follow', { username: follower.user.name })
           }
           global.users.set(follower.user.name, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(follower.created_at).format('X') * 1000 } })
           self.cached.followers.push(follower.user.name)
