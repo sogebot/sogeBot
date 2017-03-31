@@ -1,6 +1,6 @@
 {
   "name": "sogebot",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "Free Twitch Bot built on Node.js",
   "private": true,
   "main": "SogeBot",
