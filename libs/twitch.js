@@ -261,7 +261,7 @@ Twitch.prototype.lastseen = function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     const user = global.users.get(parsed[0])
-    if (_.isNull(user.time.message) || _.isUndefined(user.time.message)) {
+    if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.message)) {
       global.commons.sendMessage(global.translate('lastseen.success.never').replace('(username)', parsed[0]), sender)
     } else {
       global.commons.sendMessage(global.translate('lastseen.success.time')
@@ -275,9 +275,10 @@ Twitch.prototype.lastseen = function (self, sender, text) {
 
 Twitch.prototype.watched = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+    let watched, parsed
+    parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     const user = global.users.get(text.trim() < 1 ? sender.username : parsed[0])
-    var watched = parseInt(user.time.watched) / 1000 / 60 / 60
+    watched = parseInt(!_.isNil(user) && !_.isNil(user.time) && !_.isNil(user.time.watched) ? user.time.watched : 0) / 1000 / 60 / 60
     global.commons.sendMessage(global.translate('watched.success.time')
       .replace('(time)', watched.toFixed(1))
       .replace('(username)', '@' + user.username), sender)
