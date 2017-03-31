@@ -67,7 +67,7 @@ Users.prototype.get = function (username) {
 
       if (_.isUndefined(body.users[0])) {
         body.custom = {error: 'Cannot find username ID in twitch'}
-        global.log.error(JSON.stringify(body), { fnc: 'Users.prototype.get#2' })
+        global.log.warning(JSON.stringify(body), { fnc: 'Users.prototype.get#2' })
         return
       }
       const oldUser = _.find(self.users, function (o) { return o.id === body.users[0]._id && o.username !== username })
