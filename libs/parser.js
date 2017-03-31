@@ -246,20 +246,18 @@ Parser.prototype.parseMessage = async function (message, attr) {
   }
   let list = {
     '(list.#)': async function (filter) {
-      let alias
+      let list
       let system = filter.replace('(list.', '')
       .replace(')', '')
-      switch(system) {
+      switch (system) {
         case 'alias':
-          list = _.map(_.filter(global.systems[system].alias, function (o) { return o.visible }), function(n) { return '!' + n.alias }).join(', ')
+          list = _.map(_.filter(global.systems[system].alias, function (o) { return o.visible }), function (n) { return '!' + n.alias }).join(', ')
           return list
-          break
         case 'command':
-          list = _.map(_.filter(global.systems['customcommands'].commands, function (o) { return o.visible }), function(n) { return '!' + n.command }).join(', ')
+          list = _.map(_.filter(global.systems['customcommands'].commands, function (o) { return o.visible }), function (n) { return '!' + n.command }).join(', ')
           return list
-          break
         default:
-        return ''
+          return ''
       }
     }
   }
