@@ -244,6 +244,25 @@ Parser.prototype.parseMessage = async function (message, attr) {
       return !global.twitch.isOnline
     }
   }
+  let list = {
+    '(list.#)': async function (filter) {
+      let alias
+      let system = filter.replace('(list.', '')
+      .replace(')', '')
+      switch(system) {
+        case 'alias':
+          list = _.map(_.filter(global.systems[system].alias, function (o) { return o.visible }), function(n) { return '!' + n.alias }).join(', ')
+          return list
+          break
+        case 'command':
+          list = _.map(_.filter(global.systems['customcommands'].commands, function (o) { return o.visible }), function(n) { return '!' + n.command }).join(', ')
+          return list
+          break
+        default:
+        return ''
+      }
+    }
+  }
 
   let msg = await this.parseMessageOnline(online, message)
   msg = await this.parseMessageCommand(command, msg)
@@ -252,6 +271,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
   msg = await this.parseMessageEach(custom, msg)
   msg = await this.parseMessageEach(param, msg)
   msg = await this.parseMessageEach(gameAndStatus, msg)
+  msg = await this.parseMessageEach(list, msg)
   msg = await this.parseMessageApi(msg)
   return msg
 }
