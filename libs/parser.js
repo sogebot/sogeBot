@@ -404,6 +404,49 @@ global.updateQueue = function (id, success) {
   }
 }
 
+Parser.prototype.getLocalizedName = function (number, translation) {
+  let single, multi, xmulti, name
+  let names = global.translate(translation).split('|').map(Function.prototype.call, String.prototype.trim)
+  number = parseInt(number, 10)
+
+  switch (names.length) {
+    case 1:
+      xmulti = null
+      single = multi = names[0]
+      break
+    case 2:
+      single = names[0]
+      multi = names[1]
+      xmulti = null
+      break
+    default:
+      var len = names.length
+      single = names[0]
+      multi = names[len - 1]
+      xmulti = {}
+
+      for (var pattern in names) {
+        pattern = parseInt(pattern, 10)
+        if (names.hasOwnProperty(pattern) && pattern !== 0 && pattern !== len - 1) {
+          var maxPts = names[pattern].split(':')[0]
+          xmulti[maxPts] = names[pattern].split(':')[1]
+        }
+      }
+      break
+  }
+
+  name = (number === 1 ? single : multi)
+  if (!_.isNull(xmulti) && _.isObject(xmulti) && number > 1 && number <= 10) {
+    for (var i = number; i <= 10; i++) {
+      if (typeof xmulti[i] === 'string') {
+        name = xmulti[i]
+        break
+      }
+    }
+  }
+  return name
+}
+
 global.removeFromQueue = function (id) {
   delete queue[id]
 }

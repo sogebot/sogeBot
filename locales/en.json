@@ -19,7 +19,11 @@
     },
     "settings": {
       "uptime-format": "Uptime format set to (value)"
-    }
+    },
+    "years": "year|years",
+    "months": "month|months",
+    "days": "day|days",
+    "hours": "hour|hours"
   },
   "webpanel": {
     "global": "Global",
@@ -402,6 +406,12 @@
       "add": "Rank for this hour already exists",
       "list": "List of ranks is empty",
       "notFound": "No rank is associated with this hour"
+    }
+  },
+  "followage": {
+    "success": {
+      "never": "@(username) is not a channel follower",
+      "time": "@(username) is following channel (diff)"
     }
   },
   "lastseen": {
