@@ -2,6 +2,7 @@
 
 var _ = require('lodash')
 var log = global.log
+var moment = require('moment')
 
 function Users () {
   this.changes = 0
@@ -74,8 +75,7 @@ Users.prototype.get = function (username) {
         global.log.error(err, { fnc: 'Users.prototype.get#1' })
         return
       }
-
-      if (_.isUndefined(body.users[0])) {
+      if (_.isNil(body.users) || _.isNil(body.users[0])) {
         global.log.warning('User ' + username + ' doesn\'t exists in Twitch')
         return
       }
@@ -90,8 +90,6 @@ Users.prototype.get = function (username) {
         self.users[username].points = !_.isUndefined(self.users[oldUser.username].points) ? self.users[oldUser.username].points : 0
         delete self.users[oldUser.username]
       }
-      self.isFollower(username)
-      self.users[username].time.followCheck = new Date().getTime()
     })
   }
 
@@ -142,6 +140,7 @@ Users.prototype.isFollower = function (username) {
 }
 
 Users.prototype.isFollowerUpdate = function (username) {
+  const self = global.users
   global.client.api({
     url: 'https://api.twitch.tv/kraken/users/' + global.users.get(username).id + '/follows/channels/' + global.channelId,
     headers: {
@@ -164,15 +163,14 @@ Users.prototype.isFollowerUpdate = function (username) {
     if (res.statusCode === 404) {
       if (global.users.get(username).is.follower) {
         global.log.unfollow(username)
-
       }
-      global.users.set(username, { is: { follower: false, time: { followCheck: new Date().getTime() } } }, global.users.get(username).is.follower)
+      global.users.set(username, { is: { follower: false }, time: { followCheck: new Date().getTime(), follow: 0 } }, global.users.get(username).is.follower)
     } else {
       if (!global.users.get(username).is.follower) {
         global.log.follow(username)
         self.cachedLatestFollowers.unshift(username)
       }
-      global.users.set(username, { is: { follower: true, time: { followCheck: new Date().getTime() } } }, !global.users.get(username).is.follower)
+      global.users.set(username, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(body.created_at).format('X') * 1000 } }, !global.users.get(username).is.follower)
     }
   })
 }
@@ -192,8 +190,9 @@ Users.prototype.updateFollowers = function () {
     }
 
     if (self.cachedLatestFollowers.length === 0) {
-      _.each(_.map(body.follows, 'user.name'), function (follower) {
-        self.cachedLatestFollowers.push(follower)
+      _.each(body.follows, function (follower) {
+        global.users.set(follower.user.name, { is: { follower: true, time: { followCheck: new Date().getTime(), follow: moment(follower.created_at).format('X') * 1000 } } })
+        self.cachedLatestFollowers.push(follower.user.name)
       })
       return
     }

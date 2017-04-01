@@ -19,7 +19,11 @@
     },
     "settings": {
       "uptime-format": "Format pro uptime nastaven na (value)"
-    }
+    },
+    "years": "rok|4:roky|roku",
+    "months": "mesic|4:mesice|mesicu",
+    "days": "den|4:dny|dnu",
+    "hours": "hodina|4:hodiny|hodin"
   },
   "webpanel": {
     "global": "Globální",
@@ -404,6 +408,12 @@
       "add": "Rank pro tuto hodinu jiz existuje",
       "list": "Seznam ranku je prazdny",
       "notFound": "Nebyl nalezen zadny rank k teto hodine"
+    }
+  },
+  "followage": {
+    "success": {
+      "never": "@(username) neni followerem kanalu",
+      "time": "@(username) sleduje tento kanal jiz (diff)"
     }
   },
   "lastseen": {
