@@ -3,9 +3,9 @@ var fs = require('fs')
 var _ = require('lodash')
 var logDir = './logs'
 
-if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir)
-}
+if (!fs.existsSync(logDir)) fs.mkdirSync(logDir)
+// remove exceptions.log on startup to have clear results
+if (fs.existsSync(logDir + '/exceptions.log')) fs.unlinkSync(logDir + '/exceptions.log')
 
 global.log = new (winston.Logger)({
   levels: {
@@ -71,6 +71,18 @@ global.log = new (winston.Logger)({
       colorize: false })
   ],
   exceptionHandlers: [
-    new winston.transports.File({ filename: logDir + '/exceptions.log', json: false })
+    new winston.transports.File({
+      exitOnError: true,
+      filename: logDir + '/exceptions.log',
+      json: false,
+      formatter: function (options) {
+        global.log.error('+------------------------------------------------------------------------------+')
+        global.log.error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')
+        global.log.error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
+        global.log.error('| AND ADD logs/exceptions.log file to your report                              |')
+        global.log.error('+------------------------------------------------------------------------------+')
+        return JSON.stringify(options.meta)
+      }
+    })
   ]
 })
