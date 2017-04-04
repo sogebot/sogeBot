@@ -267,7 +267,7 @@ Twitch.prototype.followage = function (self, sender, text) {
   global.users.isFollower(username)
 
   const user = global.users.get(username)
-  if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.follow)) {
+  if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.follow) || _.isNil(user.is.follower) || !user.is.follower) {
     global.commons.sendMessage(global.translate('followage.success.never').replace('(username)', username), sender)
   } else {
     let diff = moment.preciseDiff(user.time.follow, moment(), true)
