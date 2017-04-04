@@ -198,14 +198,14 @@ Users.prototype.updateFollowers = function () {
       return
     }
 
-    _.each(_.difference(self.cachedLatestFollowers, _.map(body.follows, 'user.name')), function (user) {
+    _.each(_.map(body.follows, 'user.name'), function (user) {
       // if user is in cachedLatestFollowers -> recheck user
       if (_.includes(user, self.cachedLatestFollowers)) self.isFollower(user)
       // if user is in body.follows -> new follower
-      if (_.includes(user, _.map(body.follows, 'user.name'))) {
+      else {
         global.log.follow(user)
         self.cachedLatestFollowers.unshift(user)
-        global.users.set(user, { is: { follower: true }, time: { followCheck: new Date().getTime() } })
+        global.users.set(user, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
       }
     })
   })
