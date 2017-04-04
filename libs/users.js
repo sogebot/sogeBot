@@ -84,6 +84,7 @@ Users.prototype.get = function (username) {
       if (_.isUndefined(oldUser)) {
         global.users.set(username, {id: body.users[0]._id})
       } else {
+        self.users[username] = {}
         self.users[username].time = self.users[oldUser.username].time
         self.users[username].is = self.users[oldUser.username].is
         self.users[username].stats = self.users[oldUser.username].stats
