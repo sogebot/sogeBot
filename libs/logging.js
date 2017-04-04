@@ -4,8 +4,6 @@ var _ = require('lodash')
 var logDir = './logs'
 
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir)
-// remove exceptions.log on startup to have clear results
-if (fs.existsSync(logDir + '/exceptions.log')) fs.unlinkSync(logDir + '/exceptions.log')
 
 global.log = new (winston.Logger)({
   levels: {
