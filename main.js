@@ -16,14 +16,6 @@ var Watcher = require('./libs/watcher')
 var constants = require('./libs/constants')
 
 require('./libs/logging')
-process.on('uncaughtException', function () {
-  global.log.error('+------------------------------------------------------------------------------+')
-  global.log.error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')
-  global.log.error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
-  global.log.error('| AND ADD logs/exceptions.log file to your report                              |')
-  global.log.error('+------------------------------------------------------------------------------+')
-  process.exit(1) // exit with failure
-})
 
 global.watcher = new Watcher()
 global.users = new Users()
