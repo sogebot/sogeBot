@@ -20,6 +20,10 @@ function Twitch () {
   this.currentStatus = ''
   this.currentGame = ''
 
+  this.cached = {
+    followers: []
+  }
+
   this.whenOnline = null
 
   this.cGamesTitles = {} // cached Games and Titles
@@ -60,7 +64,7 @@ function Twitch () {
     })
 
     global.client.api({
-      url: 'https://api.twitch.tv/kraken/channels/' + global.channelId + '/follows?direction=DESC&limit=1',
+      url: 'https://api.twitch.tv/kraken/channels/' + global.channelId + '/follows?limit=100',
       headers: {
         Accept: 'application/vnd.twitchtv.v5+json',
         'Client-ID': global.configuration.get().twitch.clientId
@@ -71,8 +75,16 @@ function Twitch () {
         return
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
-        if (self.currentFollowers !== body._total) global.users.updateFollowers()
         self.currentFollowers = body._total
+
+        self.cached.followers = []
+        _.each(body.follows, function (follower) {
+          if (!global.users.get(follower.user.name).is.follower) {
+            global.log.follow(follower.user.name)
+          }
+          global.users.set(follower.user.name, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(follower.created_at).format('X') * 1000 } })
+          self.cached.followers.push(follower.user.name)
+        })
       }
     })
 
