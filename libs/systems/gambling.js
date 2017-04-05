@@ -12,12 +12,19 @@ const ERROR_NOT_ENOUGH_POINTS = '2'
 
 /*
  * !gamble [amount] - gamble [amount] points with 50/50 chance
+ * !seppuku         - timeout yourself
  */
 
 function Gambling () {
   if (global.commons.isSystemEnabled(this) ** global.commons.isSystemEnabled('points')) {
     global.parser.register(this, '!gamble', this.gamble, constants.VIEWERS)
+    global.parser.register(this, '!seppuku', this.seppuku, constants.VIEWERS)
   }
+}
+
+Gambling.prototype.seppuku = function (self, sender) {
+  global.commons.sendMessage(global.translate('gambling.seppuku'), sender)
+  global.client.timeout(global.configuration.get().twitch.channel, sender.username, 10, global.translate('gambling.seppuku'))
 }
 
 Gambling.prototype.gamble = function (self, sender, text) {

@@ -578,6 +578,7 @@
     }
   },
   "gambling": {
+    "seppuku": "(sender) spachal seppuku.",
     "gamble": {
       "zeroBet": "(sender), nemuzes hrat o 0 (pointsName)",
       "notEnoughOptions": "(sender), musis hrat o nejake body",
