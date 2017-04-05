@@ -19,12 +19,23 @@ function Gambling () {
   if (global.commons.isSystemEnabled(this) ** global.commons.isSystemEnabled('points')) {
     global.parser.register(this, '!gamble', this.gamble, constants.VIEWERS)
     global.parser.register(this, '!seppuku', this.seppuku, constants.VIEWERS)
+    global.parser.register(this, '!roulette', this.roulette, constants.VIEWERS)
   }
+}
+
+Gambling.prototype.roulette = function (self, sender) {
+  let isAlive = _.random(0, 1, false)
+  let message = [
+    global.translate('gambling.roulette.trigger'),
+    isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead')
+  ]
+  if (!isAlive) global.client.timeout(global.configuration.get().twitch.channel, sender.username, 10)
+  global.commons.sendMessage(message.join(' '), sender)
 }
 
 Gambling.prototype.seppuku = function (self, sender) {
   global.commons.sendMessage(global.translate('gambling.seppuku'), sender)
-  global.client.timeout(global.configuration.get().twitch.channel, sender.username, 10, global.translate('gambling.seppuku'))
+  global.client.timeout(global.configuration.get().twitch.channel, sender.username, 10)
 }
 
 Gambling.prototype.gamble = function (self, sender, text) {
