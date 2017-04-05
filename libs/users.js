@@ -7,7 +7,6 @@ var moment = require('moment')
 function Users () {
   this.changes = 0
   this.users = {}
-  this.cachedLatestFollowers = []
   this.rate_limit_follower_check = []
 
   this._update(this)
@@ -141,7 +140,6 @@ Users.prototype.isFollower = function (username) {
 }
 
 Users.prototype.isFollowerUpdate = function (username) {
-  const self = global.users
   global.client.api({
     url: 'https://api.twitch.tv/kraken/users/' + global.users.get(username).id + '/follows/channels/' + global.channelId,
     headers: {
@@ -169,45 +167,9 @@ Users.prototype.isFollowerUpdate = function (username) {
     } else {
       if (!global.users.get(username).is.follower) {
         global.log.follow(username)
-        self.cachedLatestFollowers.unshift(username)
       }
       global.users.set(username, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(body.created_at).format('X') * 1000 } }, !global.users.get(username).is.follower)
     }
-  })
-}
-
-Users.prototype.updateFollowers = function () {
-  const self = global.users
-  global.client.api({
-    url: 'https://api.twitch.tv/kraken/channels/' + global.channelId + '/follows?limit=100',
-    headers: {
-      Accept: 'application/vnd.twitchtv.v5+json',
-      'Client-ID': global.configuration.get().twitch.clientId
-    }
-  }, function (err, res, body) {
-    if (err) {
-      global.log.error(err, { fnc: 'Users.prototype.updateFollowers' })
-      return
-    }
-
-    if (self.cachedLatestFollowers.length === 0) {
-      _.each(body.follows, function (follower) {
-        global.users.set(follower.user.name, { is: { follower: true, time: { followCheck: new Date().getTime(), follow: moment(follower.created_at).format('X') * 1000 } } })
-        self.cachedLatestFollowers.push(follower.user.name)
-      })
-      return
-    }
-
-    _.each(_.map(body.follows, 'user.name'), function (user) {
-      // if user is in cachedLatestFollowers -> recheck user
-      if (_.includes(user, self.cachedLatestFollowers)) self.isFollower(user)
-      // if user is in body.follows -> new follower
-      else {
-        global.log.follow(user)
-        self.cachedLatestFollowers.unshift(user)
-        global.users.set(user, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
-      }
-    })
   })
 }
 
