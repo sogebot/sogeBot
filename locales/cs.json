@@ -578,6 +578,11 @@
     }
   },
   "gambling": {
+    "roulette": {
+      "trigger": "(sender) stiskl spoust",
+      "alive": "a nic se nestalo",
+      "dead": "a kulka rozmaznula jeho mozek po zdi"
+    },
     "seppuku": "(sender) spachal seppuku.",
     "gamble": {
       "zeroBet": "(sender), nemuzes hrat o 0 (pointsName)",

@@ -576,6 +576,11 @@
     }
   },
   "gambling": {
+    "roulette": {
+      "trigger": "(sender) pulled a trigger",
+      "alive": "and nothing happened",
+      "dead": "and bullet splashed his brain on the wall"
+    },
     "seppuku": "(sender) has committed seppuku.",
     "gamble": {
       "zeroBet": "(sender), you cannot gamble 0 (pointsName)",
