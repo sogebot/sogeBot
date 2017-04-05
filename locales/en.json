@@ -576,6 +576,7 @@
     }
   },
   "gambling": {
+    "seppuku": "(sender) has committed seppuku.",
     "gamble": {
       "zeroBet": "(sender), you cannot gamble 0 (pointsName)",
       "notEnoughOptions": "(sender), you need to specify points to gamble",
