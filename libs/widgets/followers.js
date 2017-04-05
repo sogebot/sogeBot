@@ -17,7 +17,7 @@ FollowersWidget.prototype.sendConfiguration = function (self, socket) {
 }
 
 FollowersWidget.prototype.emitLatestFollowers = function (self, socket) {
-  socket.emit('followers.latest', global.users.cachedLatestFollowers)
+  socket.emit('followers.latest', global.twitch.cached.followers)
 }
 
 module.exports = new FollowersWidget()
