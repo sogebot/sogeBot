@@ -284,6 +284,7 @@ a.active {
 #widgets > div {
   padding: 10px;
   font-family: 'Catamaran', sans-serif !important;
+  font-weight: bold;
   font-size: 12px;
   text-shadow: 0 0 2px #000, 0 0 4px #888, 0 0 8px #888
 }
@@ -394,14 +395,18 @@ a.active {
 
 /* PAGES */
 h2.title {
-  display: inline;
+  display: inline-block;
   font-size: 30px !important;
   font-weight: bold;
   text-transform: uppercase;
   border: 0 !important;
   position: relative;
-  top: 10px;
+  top: -10px;
   left: 10px;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  font-family: 'Yantramanav', sans-serif;
+  font-weight: 100;
 }
 
 .paging {
@@ -578,4 +583,39 @@ a.soundboard-list-group-item span {
   float: right;
   width: auto;
   margin: 10px;
+}
+
+.form-chainops {
+  padding: 10px;
+  font-weight: lighter;
+  font-family: 'Yantramanav', sans-serif;
+  padding-top: 20px;
+}
+
+.form-chainops label {
+  position: absolute;
+  top: 60px;
+  font-size: 20px;
+  color:white;
+  font-variant: small-caps;
+  text-transform: lowercase;
+  text-shadow: 0 0 2px #000, 0 0 4px #888, 0 0 8px #888;
+}
+
+.form-chainops small {
+  display: block;
+}
+
+.form-chainops small div {
+  display: none;
+}
+
+.form-chainops * {
+  border: 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.form-chainops .form-group {
+    vertical-align: top;
 }

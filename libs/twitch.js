@@ -60,6 +60,7 @@ function Twitch () {
         self.isOnline = true
         self.when.offline = null
         global.chainops.fire('number-of-viewers-is-at-least-x')
+        global.chainops.fire('stream-is-running-x-minutes')
       } else {
         if (self.isOnline && self.curRetries < self.maxRetries) { self.curRetries = self.curRetries + 1; return } // we want to check if stream is _REALLY_ offline
         // reset everything
@@ -90,7 +91,6 @@ function Twitch () {
         self.cached.followers = []
         _.each(body.follows, function (follower) {
           if (!global.users.get(follower.user.name).is.follower) {
-            global.log.follow(follower.user.name)
             global.chainops.fire('follow', { username: follower.user.name })
           }
           global.users.set(follower.user.name, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(follower.created_at).format('X') * 1000 } })

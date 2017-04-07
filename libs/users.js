@@ -205,7 +205,6 @@ Users.prototype.isFollowerUpdate = function (username) {
       global.users.set(username, { is: { follower: false }, time: { followCheck: new Date().getTime(), follow: 0 } }, global.users.get(username).is.follower)
     } else {
       if (!global.users.get(username).is.follower) {
-        global.log.follow(username)
         global.chainops.fire('follow', { username: username })
       }
       global.users.set(username, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(body.created_at).format('X') * 1000 } }, !global.users.get(username).is.follower)

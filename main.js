@@ -123,6 +123,27 @@ global.client.on('part', function (channel, username, fromSelf) {
   }
 })
 
+global.client.on('action', function (channel, userstate, message, self) {
+  if (self) return
+  global.chainops.fire('action', { username: userstate['display-name'].toLowerCase() })
+})
+
+global.client.on('ban', function (channel, username, reason) {
+  global.chainops.fire('ban', { username: username.toLowerCase(), reason: reason })
+})
+
+global.client.on('timeout', function (channel, username, reason, duration) {
+  global.chainops.fire('timeout', { username: username.toLowerCase(), reason: reason, duration: duration })
+})
+
+global.client.on('hosting', function (channel, target, viewers) {
+  global.chainops.fire('hosting', { target: target, viewers: viewers })
+})
+
+global.client.on('mod', function (channel, username) {
+  global.chainops.fire('mod', { username: username })
+})
+
 global.client.on('cheer', function (channel, userstate, message) {
   global.chainops.fire('cheer', { username: userstate['display-name'].toLowerCase(), bits: userstate.bits, message: message })
 })

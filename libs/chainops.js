@@ -16,11 +16,19 @@ function ChainOps () {
     'stream-stopped': [],
     'stream-is-running-x-minutes': [], // needs definition = { definition: true, minutes: 100, tTriggered: false }
     'cheer': [], // (username), (bits), (message)
-    'clearchat': []
+    'clearchat': [],
+    'action': [], // (username)
+    'ban': [], // (username), (reason)
+    'hosting': [], // (target), (viewers)
+    'mod': [], // (username)
+    'timeout': [] // (username), (reason), (duration)
   }
   this.operations = {
     'send-chat-message': function (attr) {
       if (_.isNil(attr.send)) return
+      _.each(attr, function (val, name) {
+        attr.send = attr.send.replace('(' + name + ')', val)
+      })
       global.commons.sendMessage(attr.send, { username: attr.username })
     },
     'send-whisper': function (attr) {
@@ -29,7 +37,7 @@ function ChainOps () {
     },
     'run-command': function (attr) {
       if (_.isNil(attr.quiet)) attr.quiet = false
-      global.parser.parseCommands((attr.quiet) ? null : { username: attr.username }, attr.command)
+      global.parser.parseCommands((attr.quiet) ? null : { username: attr.username }, attr.command.replace('(username)', attr.username))
     },
     'play-sound': function (attr) {
       // attr.sound can be filename or url
@@ -37,24 +45,85 @@ function ChainOps () {
         attr.sound = 'dist/soundboard/' + attr.sound + '.mp3'
       }
       global.panel.io.emit('play-sound', attr.sound)
+    },
+    'log': function (attr) {
+      let message = attr.message.replace('(username)', attr.username)
+      _.each(message.match(/\((\w+)\)/gi), function (match) {
+        let value = !_.isNil(attr[match.replace('(', '').replace(')', '')]) ? attr[match.replace('(', '').replace(')', '')] : 'none'
+        message = message.replace(match, value)
+      })
+      global.log[attr.level](message)
     }
   }
 
-  // this._update(this) TODO: uncomment
+  this._update(this)
+  this._webpanel(this)
+}
 
-  this.events['number-of-viewers-is-at-least-x'].push([
-    { definition: true, viewers: 100, tTriggered: false, tTimestamp: 40000 },
-    { name: 'send-chat-message', send: 'Tady mi nikdo bordel delat nebude!' },
-    { name: 'send-whisper', send: 'Lorem ipsum 2' },
-    { name: 'run-command', command: '!bet' },
-    { name: 'run-command', command: '!songrequest', quiet: true },
-    { name: 'play-sound', sound: 'http://localhost:20000/dist/soundboard/Woop.mp3' }
+ChainOps.prototype.loadSystemEvents = function (self) {
+  self.events['timeout'].push([
+    { system: true, name: 'log', message: '(username), reason: (reason), duration: (duration)', level: 'timeout' }
   ])
-  this._save(this)
+  self.events['follow'].push([
+    { system: true, name: 'log', message: '(username)', level: 'follow' }
+  ])
+  self.events['unfollow'].push([
+    { system: true, name: 'log', message: '(username)', level: 'unfollow' }
+  ])
+  self.events['ban'].push([
+    { system: true, name: 'log', message: '(username), reason: (reason)', level: 'ban' }
+  ])
+}
+
+ChainOps.prototype._webpanel = function (self) {
+  global.panel.addMenu({category: 'manage', name: 'chainops', id: 'chainops'})
+
+  global.panel.socketListening(this, 'chainops.get', this._send)
+  global.panel.socketListening(this, 'chainops.new', this._new)
+}
+
+ChainOps.prototype._send = function (self, socket) {
+  socket.emit('chainops', { events: Object.keys(self.events), operations: Object.keys(self.operations) })
+}
+
+ChainOps.prototype._new = function (self, socket, data) {
+  let event = []
+  let operation = {}
+
+  if (data.definition.command || data.definition.count || data.definition.timestamp) {
+    let definition = { definition: true }
+    if (data.event === 'command-send-x-times') {
+      definition.command = data.definition.command
+      definition.tCount = data.definition.count
+      definition.tTimestamp = data.definition.timestamp
+      definition.tTriggered = new Date().getTime()
+    }
+
+    if (data.event === 'number-of-viewers-is-at-least-x') {
+      definition.viewers = data.definition.count
+      definition.tTriggered = data.definition.timestamp === 0 ? false : new Date().getTime()
+      definition.tTimestamp = data.definition.timestamp
+    }
+
+    if (data.event === 'stream-is-running-x-minutes') {
+      definition.tTriggered = false
+      definition.minutes = data.count
+    }
+    event.push(definition)
+  }
+
+  _.each(data.operation, function (v, i) {
+    if (v.length === 0) return
+    operation[i] = v
+  })
+  event.push(operation)
+  self.events[data.event].push(event)
+  self._save(self)
 }
 
 ChainOps.prototype._update = function (self) {
   global.botDB.findOne({ _id: 'chainops' }, function (err, item) {
+    self.loadSystemEvents(self)
     if (err) return global.log.error(err, { fnc: 'ChainOps.prototype._update' })
     if (_.isNull(item)) return false
     _.each(item.events, function (event, name) {
@@ -64,8 +133,18 @@ ChainOps.prototype._update = function (self) {
 }
 
 ChainOps.prototype._save = function (self) {
+  let save = {}
+
+  _.each(self.events, function (o, n) {
+    _.each(o, function (v) {
+      _.each(v, function (v2) {
+        if (!v2.system) save[n] = self.events[n]
+      })
+    })
+  })
+
   var events = {
-    events: self.events
+    events: save
   }
   global.botDB.update({ _id: 'chainops' }, { $set: events }, { upsert: true })
 }
@@ -91,31 +170,39 @@ ChainOps.prototype.fire = function (event, attr) {
             }
             break
           case 'stream-is-running-x-minutes':
-            if (!_.isNul(attr.reset) && attr.reset) {
-              attr.tTriggered = false
+            if (!_.isNil(attr.reset) && attr.reset) {
+              operation.tTriggered = false
               return false
             }
-            if (!attr.tTriggered && new Date().getTime() - global.twitch.whenOnline > attr.minutes * 60 * 1000) {
-              attr.tTriggered = true
+            if (!operation.tTriggered && new Date().getTime() - global.twitch.whenOnline > operation.minutes * 60 * 1000) {
+              operation.tTriggered = true
               return true
             }
             break
           case 'number-of-viewers-is-at-least-x':
-            //  viewers: 100, tTriggered: false, tTimestamp: 40000 } (if tTimestamp === 0 run once)
+            if (!_.isNil(attr.reset) && attr.reset) {
+              operation.tTriggered = false
+              return false
+            }
+
+            if (_.isFinite(operation.tTimestamp) && parseInt(operation.tTimestamp, 10) > 0) {
+              if (global.twitch.currentViewers <= operation.viewers && new Date().getTime() - operation.tTriggered >= operation.tTimestamp) {
+                attr.tTriggered = new Date().getTime()
+                return true
+              }
+            } else if (!operation.tTriggered) { // run only once if tTimestamp === 0
+              attr.tTriggered = true
+              return true
+            }
             break
           default:
             return false
         }
         return false
       } else if (_.isFunction(self.operations[operation.name])) {
-        if (!_.isNil(operation.send)) {
-          _.each(attr, function (val, name) {
-            operation.send = operation.send.replace('(' + name + ')', val)
-          })
-        }
         self.operations[operation.name](_.merge(operation, attr))
       } else {
-        global.log.error('Operation doesn\'t exist', operation.name)
+        global.log.warning('Operation doesn\'t exist', operation.name)
       }
     })
   })
