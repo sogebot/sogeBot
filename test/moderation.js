@@ -99,6 +99,19 @@ describe('System - Moderation', function () {
         expect(global.timeouts).to.contain('soge: {missing_translation: en.moderation.links} 120')
       })
     })
+    describe('google . com', function () {
+      before(function (done) {
+        global.parser.parse(testUser2, 'google . com')
+        setTimeout(function () { done() }, 500)
+      })
+      after(function () {
+        global.timeouts = []
+        global.output = []
+      })
+      it('timeout user', function () {
+        expect(global.timeouts).to.contain('soge: {missing_translation: en.moderation.links} 120')
+      })
+    })
     describe('http://google.com', function () {
       before(function (done) {
         global.parser.parse(testUser2, 'http://google.com')
@@ -112,9 +125,34 @@ describe('System - Moderation', function () {
         expect(global.timeouts).to.contain('soge: {missing_translation: en.moderation.links} 120')
       })
     })
+    describe('http://google . com', function () {
+      before(function (done) {
+        global.parser.parse(testUser2, 'http://google . com')
+        setTimeout(function () { done() }, 500)
+      })
+      after(function () {
+        global.timeouts = []
+        global.output = []
+      })
+      it('timeout user', function () {
+        expect(global.timeouts).to.contain('soge: {missing_translation: en.moderation.links} 120')
+      })
+    })
     describe('http://www.google.com', function () {
       before(function (done) {
         global.parser.parse(testUser2, 'http://www.google.com')
+        setTimeout(function () { done() }, 500)
+      })
+      after(function () {
+        global.timeouts = []
+      })
+      it('timeout user', function () {
+        expect(global.timeouts).to.contain('soge: {missing_translation: en.moderation.links} 120')
+      })
+    })
+    describe('http://www . google.com', function () {
+      before(function (done) {
+        global.parser.parse(testUser2, 'http://www . google.com')
         setTimeout(function () { done() }, 500)
       })
       after(function () {
