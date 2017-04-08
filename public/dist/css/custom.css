@@ -396,7 +396,7 @@ a.active {
 /* PAGES */
 h2.title {
   display: inline-block;
-  font-size: 30px !important;
+  font-size: 26px !important;
   font-weight: bold;
   text-transform: uppercase;
   border: 0 !important;
@@ -405,7 +405,7 @@ h2.title {
   left: 10px;
   padding-bottom: 0;
   margin-bottom: 0;
-  font-family: 'Yantramanav', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-weight: 100;
 }
 
@@ -588,7 +588,7 @@ a.soundboard-list-group-item span {
 .form-chainops {
   padding: 10px;
   font-weight: lighter;
-  font-family: 'Yantramanav', sans-serif;
+  font-family: 'Poppins', sans-serif;
   padding-top: 20px;
 }
 
