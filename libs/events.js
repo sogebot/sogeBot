@@ -2,7 +2,7 @@
 
 var _ = require('lodash')
 
-function ChainOps () {
+function Events () {
   this.events = {
     'user-joined-channel': [], // (username)
     'user-parted-channel': [], // (username)
@@ -60,7 +60,7 @@ function ChainOps () {
   this._webpanel(this)
 }
 
-ChainOps.prototype.loadSystemEvents = function (self) {
+Events.prototype.loadSystemEvents = function (self) {
   self.events['timeout'].push([
     { system: true, name: 'log', message: '(username), reason: (reason), duration: (duration)', level: 'timeout' }
   ])
@@ -75,18 +75,18 @@ ChainOps.prototype.loadSystemEvents = function (self) {
   ])
 }
 
-ChainOps.prototype._webpanel = function (self) {
-  global.panel.addMenu({category: 'manage', name: 'chainops', id: 'chainops'})
+Events.prototype._webpanel = function (self) {
+  global.panel.addMenu({category: 'manage', name: 'event-listeners', id: 'events'})
 
-  global.panel.socketListening(this, 'chainops.get', this._send)
-  global.panel.socketListening(this, 'chainops.new', this._new)
+  global.panel.socketListening(this, 'events.get', this._send)
+  global.panel.socketListening(this, 'events.new', this._new)
 }
 
-ChainOps.prototype._send = function (self, socket) {
-  socket.emit('chainops', { events: Object.keys(self.events), operations: Object.keys(self.operations) })
+Events.prototype._send = function (self, socket) {
+  socket.emit('events', { events: Object.keys(self.events), operations: Object.keys(self.operations) })
 }
 
-ChainOps.prototype._new = function (self, socket, data) {
+Events.prototype._new = function (self, socket, data) {
   let event = []
   let operation = {}
 
@@ -121,10 +121,10 @@ ChainOps.prototype._new = function (self, socket, data) {
   self._save(self)
 }
 
-ChainOps.prototype._update = function (self) {
-  global.botDB.findOne({ _id: 'chainops' }, function (err, item) {
+Events.prototype._update = function (self) {
+  global.botDB.findOne({ _id: 'Events' }, function (err, item) {
     self.loadSystemEvents(self)
-    if (err) return global.log.error(err, { fnc: 'ChainOps.prototype._update' })
+    if (err) return global.log.error(err, { fnc: 'Events.prototype._update' })
     if (_.isNull(item)) return false
     _.each(item.events, function (event, name) {
       self.events[name] = event
@@ -132,7 +132,7 @@ ChainOps.prototype._update = function (self) {
   })
 }
 
-ChainOps.prototype._save = function (self) {
+Events.prototype._save = function (self) {
   let save = {}
 
   _.each(self.events, function (o, n) {
@@ -146,10 +146,10 @@ ChainOps.prototype._save = function (self) {
   var events = {
     events: save
   }
-  global.botDB.update({ _id: 'chainops' }, { $set: events }, { upsert: true })
+  global.botDB.update({ _id: 'Events' }, { $set: events }, { upsert: true })
 }
 
-ChainOps.prototype.fire = function (event, attr) {
+Events.prototype.fire = function (event, attr) {
   if (_.isNil(this.events[event])) return true
 
   let operationsBulk = this.events[event]
@@ -208,4 +208,4 @@ ChainOps.prototype.fire = function (event, attr) {
   })
 }
 
-module.exports = ChainOps
+module.exports = Events

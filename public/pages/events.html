@@ -1,6 +1,6 @@
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
   <div class="widget">
-    <h2 class="title" data-lang="chainops"></h2>
+    <h2 class="title" data-lang="event-listeners"></h2>
 
     <form class="form-inline form-chainops">
       <div class="form-group">
@@ -63,7 +63,7 @@
 </div>
 
 <script>
-socket.emit('chainops.get');
+socket.emit('events.get');
 
 $('#events-list').on('change', function(ev) {
   $('#commandGroup').css('display', 'none')
@@ -174,11 +174,11 @@ var newEvent = function () {
       timestamp: $('#timestamp').val().length > 0 ? $('#timestamp').val() : null
     },
   }
-  socket.emit('chainops.new', data)
+  socket.emit('events.new', data)
 }
 
-socket.off('chainops')
-socket.on('chainops', function(data) {
+socket.off('events')
+socket.on('events', function(data) {
   $('#events-list').empty()
   $('#operations-list').empty()
 

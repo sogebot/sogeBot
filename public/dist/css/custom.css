@@ -9,7 +9,7 @@
 body {
   padding-top: 50px;
   background-color: #eee;
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Catamaran', sans-serif;
 }
 
 .navbar-fixed-top {
@@ -588,7 +588,7 @@ a.soundboard-list-group-item span {
 .form-chainops {
   padding: 10px;
   font-weight: lighter;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Catamaran', sans-serif;
   padding-top: 20px;
 }
 
