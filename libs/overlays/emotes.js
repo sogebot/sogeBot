@@ -15,9 +15,10 @@ function Emotes () {
 
   global.parser.registerParser(this, 'emotes', this.containsEmotes, constants.VIEWERS)
 
-  global.configuration.register('OEmotesSize', 'overlay.emotes.settings.OEmotesSize', 'number', 2)
+  global.configuration.register('OEmotesSize', 'overlay.emotes.settings.OEmotesSize', 'number', 0)
   global.configuration.register('OEmotesMax', 'overlay.emotes.settings.OEmotesMax', 'number', 5)
   global.configuration.register('OEmotesAnimation', 'overlay.emotes.settings.OEmotesAnimation', 'string', 'fadeup')
+  global.configuration.register('OEmotesAnimationTime', 'overlay.emotes.settings.OEmotesAnimationTime', 'number', 4000)
   global.configuration.register('OEmotesFollowerExplosion', 'overlay.emotes.settings.OEmotesFollowerExplosion', 'bool', false)
   global.configuration.register('OEmotesFollowerExplosionList', 'overlay.emotes.settings.OEmotesFollowerExplosionList', 'string', '<3')
   global.configuration.register('OEmotesSubscribeExplosion', 'overlay.emotes.settings.OEmotesSubscribeExplosion', 'bool', false)

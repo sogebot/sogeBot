@@ -34,6 +34,16 @@
         </td>
       </tr>
       <tr>
+        <td><strong data-lang="overlay-emotes-animation-time"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="OEmotesAnimationTime" onclick="commons.configEditable(this, 'ms')" id="configOEmotesAnimationTime"></abbr>
+          <div class="input-group" style="display:none;" id="input_OEmotesAnimationTime_group">
+            <input id="input_OEmotesAnimationTime" class="form-control input-sm" type="text"/>
+            <div class="input-group-addon">ms</div>
+          </div>
+        </td>
+      </tr>
+      <tr>
         <td><strong data-lang="overlay-emotes-follower-explosion"></strong></td>
         <td>
           <input id="OEmotesFollowerExplosionToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
@@ -92,6 +102,7 @@
   socket.on('configuration', function (data) {
     $("#configOEmotesSize").text(data.OEmotesSize)
     $("#configOEmotesMax").text(data.OEmotesMax)
+    $("#configOEmotesAnimationTime").text(data.OEmotesAnimationTime + 'ms')
 
     $("#configOEmotesFollowerExplosionList").text(data.OEmotesFollowerExplosionList)
     $("#configOEmotesSubscribeExplosionList").text(data.OEmotesSubscribeExplosionList)

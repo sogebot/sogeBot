@@ -42,11 +42,13 @@
       socket.on('configuration', function (data) {
         emote.size = data.OEmotesSize > 5 ? emote.size = 5 : emote.size = data.OEmotesSize
         emote.animation = data.OEmotesAnimation
+        emote.animationTime = data.OEmotesAnimationTime
       })
 
       var emote = {
         size: 2,
         max: 5,
+        animationTime: 2000,
         animation: 'fadeup',
 
         show: function (emote_number) {
@@ -68,7 +70,7 @@
                   top: top-100
                 }, 1000,
                 function () {
-                  //$(this).remove()
+                  $(this).remove()
                 })
               }, _.random(2000))
               break
