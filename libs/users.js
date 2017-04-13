@@ -118,8 +118,8 @@ Users.prototype.addRegular = function (self, sender, text) {
     return false
   }
 
-  if(!_.isNil(_.find(self.users, function(o) { console.log(o.username); return o.username === username }))) {
-    self.set(username, { is: { regular: true }})
+  if (!_.isNil(_.find(self.users, function (o) { return o.username === username }))) {
+    self.set(username, { is: { regular: true } })
     global.commons.sendMessage(global.translate('regulars.add.success').replace('(username)', username), sender)
   } else {
     global.commons.sendMessage(global.translate('regulars.add.undefined').replace('(username)', username), sender)
@@ -135,8 +135,8 @@ Users.prototype.rmRegular = function (self, sender, text) {
     return false
   }
 
-  if(!_.isNil(_.find(self.users, function(o) { return o.username === username }))) {
-    self.set(username, { is: { regular: false }})
+  if (!_.isNil(_.find(self.users, function (o) { return o.username === username }))) {
+    self.set(username, { is: { regular: false } })
     global.commons.sendMessage(global.translate('regulars.rm.success').replace('(username)', username), sender)
   } else {
     global.commons.sendMessage(global.translate('regulars.rm.undefined').replace('(username)', username), sender)
