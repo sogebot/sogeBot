@@ -3,6 +3,7 @@
 var _ = require('lodash')
 var log = global.log
 var moment = require('moment')
+var constants = require('./constants')
 
 function Users () {
   this.changes = 0
@@ -10,6 +11,9 @@ function Users () {
   this.rate_limit_follower_check = []
 
   this._update(this)
+
+  global.parser.register(this, '!regular add', this.addRegular, constants.OWNER_ONLY)
+  global.parser.register(this, '!regular remove', this.rmRegular, constants.OWNER_ONLY)
 
   global.watcher.watch(this, 'changes', this._save)
 
@@ -104,6 +108,40 @@ Users.prototype.get = function (username) {
 Users.prototype.getAll = function (object) {
   if (_.isObject(object)) return _.filter(this.users, object)
   return _.filter(this.users, function () { return true })
+}
+
+Users.prototype.addRegular = function (self, sender, text) {
+  const username = text.trim()
+
+  if (username.length === 0) {
+    global.commons.sendMessage(global.translate('regulars.add.empty'), sender)
+    return false
+  }
+
+  if (!_.isNil(_.find(self.users, function (o) { return o.username === username }))) {
+    self.set(username, { is: { regular: true } })
+    global.commons.sendMessage(global.translate('regulars.add.success').replace('(username)', username), sender)
+  } else {
+    global.commons.sendMessage(global.translate('regulars.add.undefined').replace('(username)', username), sender)
+    return false
+  }
+}
+
+Users.prototype.rmRegular = function (self, sender, text) {
+  const username = text.trim()
+
+  if (username.length === 0) {
+    global.commons.sendMessage(global.translate('regulars.rm.empty'), sender)
+    return false
+  }
+
+  if (!_.isNil(_.find(self.users, function (o) { return o.username === username }))) {
+    self.set(username, { is: { regular: false } })
+    global.commons.sendMessage(global.translate('regulars.rm.success').replace('(username)', username), sender)
+  } else {
+    global.commons.sendMessage(global.translate('regulars.rm.undefined').replace('(username)', username), sender)
+    return false
+  }
 }
 
 Users.prototype.set = function (username, object, silent = false) {

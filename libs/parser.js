@@ -44,8 +44,9 @@ Parser.prototype.addToQueue = async function (user, message) {
   for (var parser in _(this.registeredParsers).toPairs().sortBy(0).fromPairs().value()) {
     if (typeof queue[id] === 'undefined') break
     if (this.permissionsParsers[parser] === constants.VIEWERS ||
-        (this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user)) ||
-        (this.permissionsParsers[parser] === constants.MODS && user.mod)) {
+        (this.permissionsParsers[parser] === constants.REGULAR && (global.users.get(user.username).is.regular || user.mod || this.isOwner(user))) ||
+        (this.permissionsParsers[parser] === constants.MODS && (user.mod || this.isOwner(user))) ||
+        (this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user))) {
       queue[id].started = parseInt(queue[id].started, 10) + 1
       this.registeredParsers[parser](this.selfParsers[parser], id, user, message)
     }
@@ -90,8 +91,9 @@ Parser.prototype.parseCommands = async function (user, message) {
       if (this.permissionsCmds[cmd] === constants.DISABLE) break
       if (_.isNil(user) || // if user is null -> we are running command through a bot
         (this.permissionsCmds[cmd] === constants.VIEWERS) ||
-        (this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user)) ||
-        (this.permissionsCmds[cmd] === constants.MODS && (user.mod || this.isOwner(user)))) {
+        (this.permissionsCmds[cmd] === constants.REGULAR && (global.users.get(user.username).is.regular || user.mod || this.isOwner(user))) ||
+        (this.permissionsCmds[cmd] === constants.MODS && (user.mod || this.isOwner(user))) ||
+        (this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user))) {
         var text = message.replace(cmd, '')
         if (typeof this.registeredCmds[cmd] === 'function') this.registeredCmds[cmd](this.selfCmds[cmd], _.isNil(user) ? { username: global.configuration.get().twitch.username } : user, text.trim(), message)
         else global.log.error(cmd + ' have wrong null function registered!', { fnc: 'Parser.prototype.parseCommands' })
