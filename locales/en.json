@@ -31,6 +31,7 @@
         "OEmotesSize": "Emoticon size is set to (value)",
         "OEmotesMax": "Max count of same emoticon to show is (value)",
         "OEmotesAnimation": "Emoticon show animation is (value)",
+        "OEmotesAnimationTime": "Emoticon animation duration is (value)ms",
         "OEmotesFollowerExplosion": {
           "explosion": "Follower emoticon explosion is",
           "true": "{overlay.emotes.settings.OEmotesFollowerExplosion.explosion} enabled",
@@ -56,6 +57,7 @@
     "overlay-emotes-size": "Emoticon size",
     "overlay-emotes-max": "Max same emoticons to show",
     "overlay-emotes-animation": "Emoticon animation",
+    "overlay-emotes-animation-time": "Animation Duration",
     "fade-out-top": "fade up",
     "fade-out-zoom": "fade zoom",
     "overlay-emotes-follower-explosion": "Follower explosion",
