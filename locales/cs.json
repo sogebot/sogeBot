@@ -25,7 +25,45 @@
     "days": "den|4:dny|dnu",
     "hours": "hodina|4:hodiny|hodin"
   },
+  "overlay": {
+    "emotes": {
+      "settings": {
+        "OEmotesSize": "Velikost emotikonu je nastavena na (value)",
+        "OEmotesMax": "Maximalni pocet zobrazeni stejnych emotikonu na zpravu je (value)",
+        "OEmotesAnimation": "Animace zobrazeni emotikonu je (value)",
+        "OEmotesFollowerExplosion": {
+          "explosion": "Exploze emotikonu behem followu je",
+          "true": "{overlay.emotes.settings.OEmotesFollowerExplosion.explosion} zapnuta",
+          "false": "{overlay.emotes.settings.OEmotesFollowerExplosion.explosion} vypnuta"
+        },
+        "OEmotesSubscribeExplosion": {
+          "explosion": "Exploze emotikonu behem subscribe je",
+          "true": "{overlay.emotes.settings.OEmotesSubscribeExplosion.explosion} zapnuta",
+          "false": "{overlay.emotes.settings.OEmotesSubscribeExplosion.explosion} vypnuta"
+        },
+        "OEmotesResubExplosion": {
+          "explosion": "Exploze emotikonu behem resubu je",
+          "true": "{overlay.emotes.settings.OEmotesResubExplosion.explosion} zapnuta",
+          "false": "{overlay.emotes.settings.OEmotesResubExplosion.explosion} vypnuta"
+        },
+        "OEmotesFollowerExplosionList": "Emotikony behem exploze followu: (value)",
+        "OEmotesSubscribeExplosionList": "Emotikony behem exploze subscribe: (value)",
+        "OEmotesResubExplosionList": "Emotikony behem exploze resub: (value)"
+      }
+    }
+  },
   "webpanel": {
+    "overlay-emotes-size": "Velikost emotikonu",
+    "overlay-emotes-max": "Max stejných emotikonů na zprávu",
+    "overlay-emotes-animation": "Animace emotikonu",
+    "fade-out-top": "slábnout směrem nahoru",
+    "fade-out-zoom": "slábnout přiblížením",
+    "overlay-emotes-follower-explosion": "Follower exploze",
+    "overlay-emotes-subscribe-explosion": "Subscribe exploze",
+    "overlay-emotes-resub-explosion": "Resub exploze",
+    "overlay-emotes-follower-list": "Emotikony pro follower explozi",
+    "overlay-emotes-subscribe-list": "Emotikony pro subscribe explozi",
+    "overlay-emotes-resub-list": "Emotikony pro resub explozi",
     "global": "Globální",
     "user": "Divák",
     "dashboard": "Dashboard",
@@ -36,6 +74,7 @@
     "stats": "Statistiky",
     "viewers": "Diváci",
     "systems": "Moduly",
+    "overlays": "Overlaye",
     "aliases": "Aliasy",
     "alias": "Alias",
     "command": "Příkaz",
