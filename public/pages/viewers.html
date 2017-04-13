@@ -9,7 +9,7 @@
           <th class="sortable" onclick="viewers.sort(this)" data-sort="username"><span data-lang="username"></span> <i class="fa fa-sort-asc" aria-hidden="true"></i></th>
           <th class="sortable" onclick="viewers.sort(this)" data-sort="time.message"><span data-lang="last-seen"></span> <i class="fa" aria-hidden="true"></i></th>
           <th class="sortable" onclick="viewers.sort(this)" data-sort="time.watched"><span data-lang="watched-time"></span> <i class="fa" aria-hidden="true"></i></th>
-          <th class="sortable" onclick="viewers.sort(this)" data-sort="points"><span data-lang="points"></span> <i class="fa" aria-hidden="true"></i></th>
+          <th id="viewers-points" class="sortable" onclick="viewers.sort(this)" data-sort="points"><span data-lang="points"></span> <i class="fa" aria-hidden="true"></i></th>
           <th class="sortable" onclick="viewers.sort(this)" data-sort="stats.messages"><span data-lang="messages"></span> <i class="fa" aria-hidden="true"></i></th>
           <th></th>
           <th></th>
@@ -57,6 +57,7 @@
           '</tr>');
         if(!systems.points) {
           $("#viewers-points-data").remove()
+          $("#viewers-points").remove()
         }
       })
     },
