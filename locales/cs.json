@@ -66,6 +66,7 @@
     "overlay-emotes-follower-list": "Emotikony pro follower explozi",
     "overlay-emotes-subscribe-list": "Emotikony pro subscribe explozi",
     "overlay-emotes-resub-list": "Emotikony pro resub explozi",
+    "moderation-subscribers-toggle": "Postihovat i subscribery",
     "global": "Globální",
     "user": "Divák",
     "dashboard": "Dashboard",
@@ -522,11 +523,21 @@
         "true": "{moderation.settings.moderationLinks.text} {core.enabled}",
         "false": "{moderation.settings.moderationLinks.text} {core.disabled}"
       },
+      "moderationLinksSubs": {
+        "text": "Moderovani linku pro subscribery je",
+        "true": "{moderation.settings.moderationLinkSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationLinkSubs.text} {core.disabled}"
+      },
       "moderationLinksTimeout": "Timeout pri pouziti linku je nastaven na (value)s",
       "moderationSymbols": {
         "text": "Moderovani symbolu je",
         "true": "{moderation.settings.moderationSymbols.text} {core.enabled}",
         "false": "{moderation.settings.moderationSymbols.text} {core.disabled}"
+      },
+      "moderationSymbolsSubs": {
+        "text": "Moderovani symbolu pro subscribery je",
+        "true": "{moderation.settings.moderationSymbolsSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationSymbolsSubs.text} {core.disabled}"
       },
       "moderationSymbolsTimeout": "Timeout pri pouziti symbolu je nastaven na (value)s",
       "moderationSymbolsTriggerLength": "Moderovani symbolu zapnuto od (value) poctu znaku",
@@ -537,12 +548,22 @@
         "true": "{moderation.settings.moderationLongMessage.text} {core.enabled}",
         "false": "{moderation.settings.moderationLongMessage.text} {core.disabled}"
       },
+      "moderationLongMessageSubs": {
+        "text": "Moderovani dlouhych zprav pro subscribery je",
+        "true": "{moderation.settings.moderationLongMessageSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationLongMessageSubs.text} {core.disabled}"
+      },
       "moderationLongMessageTimeout": "Timeout pro dlouhe zpravy je nastaven na  (value)s",
       "moderationLongMessageTriggerLength": "Moderovani dlouhych zprav zapnuto od (value) poctu znaku",
       "moderationCaps": {
         "text": "Moderovani velkych pismen je",
         "true": "{moderation.settings.moderationCaps.text} {core.enabled}",
         "false": "{moderation.settings.moderationCaps.text} {core.disabled}"
+      },
+      "moderationCapsSubs": {
+        "text": "Moderovani velkych pismen pro subscribery je",
+        "true": "{moderation.settings.moderationCapsSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationCapsSubs.text} {core.disabled}"
       },
       "moderationCapsTimeout": "Timeout pri pouziti celkych pismen je nastaven na (value)s",
       "moderationCapsTriggerLength": "Moderovani velkych pismen zapnuto od (value) poctu znaku",
@@ -552,11 +573,21 @@
         "true": "{moderation.settings.moderationColor.text} {core.enabled}",
         "false": "{moderation.settings.moderationColor.text} {core.disabled}"
       },
+      "moderationColorSubs": {
+        "text": "Moderovani pouziti barev (/me) pro subscribery je",
+        "true": "{moderation.settings.moderationColorSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationColorSubs.text} {core.disabled}"
+      },
       "moderationColorTimeout": "Timeout pri pouziti barev (/me) je nastaven na (value)s",
       "moderationSpam": {
         "text": "Moderovani spamu je",
         "true": "{moderation.settings.moderationSpam.text} {core.enabled}",
         "false": "{moderation.settings.moderationSpam.text} {core.disabled}"
+      },
+      "moderationSpamSubs": {
+        "text": "Moderovani spamu pro subscribery je",
+        "true": "{moderation.settings.moderationSpamSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationSpamSubs.text} {core.disabled}"
       },
       "moderationSpamTimeout": "Timeout pri spamovani je nastaven na (value)s",
       "moderationSpamTriggerLength": "Moderovani spamu zapnuto od (value) poctu znaku",
@@ -565,6 +596,11 @@
         "text": "Moderovani smajliku je",
         "true": "{moderation.settings.moderationEmotes.text} {core.enabled}",
         "false": "{moderation.settings.moderationEmotes.text} {core.disabled}"
+      },
+      "moderationEmotesSubs": {
+        "text": "Moderovani smajliku pro subscribery je",
+        "true": "{moderation.settings.moderationEmotesSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationEmotesSubs.text} {core.disabled}"
       },
       "moderationEmotesTimeout": "Timeout pri spamovani smajliku je nastaven na (value)s",
       "moderationEmotesMaxCount": "Maximalni pocet smajliky ku ve jedne zprave je nastaveno na (value)",
