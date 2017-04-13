@@ -19,6 +19,9 @@ function Panel () {
   app.get('/playlist', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'playlist', 'index.html'))
   })
+  app.get('/overlays/:overlay', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'overlays', req.params.overlay + '.html'))
+  })
   app.get('/', this.authUser, function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'))
   })
