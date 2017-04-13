@@ -53,6 +53,8 @@ Emotes.prototype._test = async function (self, socket, data) {
 }
 
 Emotes.prototype.containsEmotes = async function (self, id, sender, text) {
+  global.updateQueue(id, true)
+
   let OEmotesMax = global.configuration.getValue('OEmotesMax')
   let OEmotesSize = global.configuration.getValue('OEmotesSize')
 
@@ -76,15 +78,6 @@ Emotes.prototype.containsEmotes = async function (self, id, sender, text) {
       }
     }
   })
-
-  /*
-  _.each(sender.emotes, function (index, emote) {
-    _.each(index, function (v, i) {
-      if (i === OEmotesMax) return false
-      global.panel.io.emit('emote', emote)
-    })
-  })*/
-  global.updateQueue(id, true)
 }
 
 Emotes.prototype.parseEmotes = async function (self, emotes) {
