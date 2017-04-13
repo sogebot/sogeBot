@@ -22,10 +22,11 @@
         $("#Permissions").append('<tr>' +
           '<td>' + command + '</td>' +
           '<td>' +
-            '<button onclick="permissions.change(this)" data-command="' + command + '" data-permission="owner" type="button" class="btn ' + (permission === 0 ? 'btn-success' : 'btn-link') + '" title="Owner"><i class="fa fa-microphone"></i></button>' +
-            '<button onclick="permissions.change(this)" data-command="' + command + '" data-permission="mods" type="button" class="btn ' + (permission === 2 ? 'btn-info' : 'btn-link') + '" title="Moderator"><i class="fa fa-gavel "></i></button>' +
-            '<button onclick="permissions.change(this)" data-command="' + command + '" data-permission="viewer" type="button" class="btn ' + (permission === 1 ? 'btn-warning' : 'btn-link') + '" title="Viewer"><i class="fa fa-eye"></i></button>' +
-            '<button onclick="permissions.change(this)" data-command="' + command + '" data-permission="disable" type="button" class="btn ' + (permission === -1 ? 'btn-danger' : 'btn-link') + '" title="Disable"><i class="fa fa-power-off"></i></button>' +
+            '<button onclick="permissions.change(this)" data-command="' + command + '" data-permission="owner" type="button" class="btn ' + (permission === 0 ? 'btn-success' : 'btn-link') + '" title="Owner">OWNER</button>' +
+            '<button onclick="permissions.change(this)" data-command="' + command + '" data-permission="mods" type="button" class="btn ' + (permission === 2 ? 'btn-primary' : 'btn-link') + '" title="Moderator">MOD</button>' +
+            '<button onclick="permissions.change(this)" data-command="' + command + '" data-permission="regular" type="button" class="btn ' + (permission === 3 ? 'btn-info' : 'btn-link') + '" title="Regulars">REGULAR</button>' +
+            '<button onclick="permissions.change(this)" data-command="' + command + '" data-permission="viewer" type="button" class="btn ' + (permission === 1 ? 'btn-warning' : 'btn-link') + '" title="Viewer">VIEWER</i></button>' +
+            '<button onclick="permissions.change(this)" data-command="' + command + '" data-permission="disable" type="button" class="btn ' + (permission === -1 ? 'btn-danger' : 'btn-link') + '" title="Disable">DISABLE</button>' +
             '</td>' +
           '</tr>');
       })

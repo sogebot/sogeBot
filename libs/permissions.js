@@ -39,7 +39,7 @@ Permissions.prototype.changeSocket = function (self, socket, data) {
 
 Permissions.prototype.overridePermission = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(viewer|mods|owner|disable) ([\u0500-\u052F\u0400-\u04FF\w].+)$/)
+    var parsed = text.match(/^(viewer|mods|owner|regular|disable) ([\u0500-\u052F\u0400-\u04FF\w].+)$/)
     var hash = crypto.createHash('md5').update(parsed[2]).digest('hex')
     var command = parsed[2]
     var permission
@@ -52,6 +52,9 @@ Permissions.prototype.overridePermission = function (self, sender, text) {
         break
       case 'disable':
         permission = constants.DISABLE
+        break
+      case 'regular':
+        permission = constants.REGULAR
         break
       default:
         permission = constants.OWNER_ONLY

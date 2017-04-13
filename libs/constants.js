@@ -11,6 +11,7 @@ function define (name, value) {
 define('OWNER_ONLY', 0)
 define('VIEWERS', 1)
 define('MODS', 2)
+define('REGULAR', 3)
 define('DISABLE', -1)
 
 // Connection status
