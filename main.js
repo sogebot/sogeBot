@@ -50,9 +50,11 @@ var options = {
 global.channelId = null
 
 global.client = new irc.client(options)
+
 global.translate().then(function () {
   global.systems = require('auto-load')('./libs/systems/')
   global.widgets = require('auto-load')('./libs/widgets/')
+  global.overlays = require('auto-load')('./libs/overlays/')
 })
 
 // Connect the client to the server..

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Emotes</title>
+    <meta charset="utf-8">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#f4f5f6">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#f4f5f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <style>
+      body, html {
+        height: 99%;
+      }
+      #emotes {
+        margin: auto;
+        width: 97%;
+        height: 100%;
+      }
+      #emotes img {
+        opacity: 1;
+        position: absolute;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="emotes"></div>
+
+    <script src="/dist/jquery/js/jquery.min.js"></script>
+    <script src="/dist/lodash/js/lodash.min.js"></script>
+
+    <script>
+      var socket = io()
+
+      var emote = {
+        show: function (emote_number) {
+          var left = _.random($('body').width() - 200) + 100
+          var top = _.random($('body').height() - 200) + 100
+
+          var emotes = $('#emotes')
+          var img = $('<img></img>')
+            .attr('src', 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote_number + '/1.0')
+            .css('top', top)
+            .css('left', left)
+
+
+          setTimeout(function() {
+            emotes.append(img)
+            img.animate({
+                opacity: 0,
+                top: top-100
+              }, 1000,
+              function () {
+                $(this).remove()
+            })
+          }, _.random(2000))
+        }
+      }
+
+      emote.show('69')
+
+      socket.on('emote', function (emote_number) {
+        emote.show(emote_number)
+      })
+    </script>
+  </body>
+</html>
