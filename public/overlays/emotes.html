@@ -51,13 +51,13 @@
         animationTime: 2000,
         animation: 'fadeup',
 
-        show: function (emote_number) {
+        show: function (emote_url) {
           var left = _.random($('body').width() - 200) + 100
           var top = _.random($('body').height() - 200) + 100
 
           var emotes = $('#emotes')
           var img = $('<img></img>')
-            .attr('src', 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote_number + '/' + (emote.size+1) + '.0')
+            .attr('src', emote_url)
             .css('top', top)
             .css('left', left)
 
@@ -114,8 +114,8 @@
       socket.on('emote.explode', function (emotes) {
         emote.explode(emotes)
       })
-      socket.on('emote', function (emote_number) {
-        emote.show(emote_number)
+      socket.on('emote', function (emote_url) {
+        emote.show(emote_url)
       })
     </script>
   </body>
