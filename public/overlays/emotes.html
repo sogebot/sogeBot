@@ -68,7 +68,7 @@
                 img.velocity({
                   opacity: 0,
                   top: top-100
-                }, 1000,
+                }, emote.animationTime,
                 function () {
                   $(this).remove()
                 })
@@ -81,7 +81,7 @@
                   opacity: 0,
                   scaleX: 0,
                   scaleY: 0
-                },2000,
+                }, emote.animationTime,
                 function () {
                   $(this).remove()
                 })
@@ -102,7 +102,7 @@
                   opacity: 0,
                   top: _.random(0, $('#emotes').height() - 100),
                   left: _.random(0, $('#emotes').width() - 100)
-                }, 2000,
+                }, emote.animationTime,
                 function () {
                   $(this).remove()
                 })
