@@ -18,41 +18,41 @@ Free Twitch Bot built on Node.js
 If you found an issue with a bot, feel free to create issue at https://github.com/sogehige/SogeBot/issues.
 You can also contact me on my email sogehige@gmail.com or https://twitter.com/sogehige
 
-| System           | Description                                                                                                        |
-|------------------|--------------------------------------------------------------------------------------------------------------------|
-| Alias            | Don't like default commands? Make an alias!                                                                        |
-| Keywords         | Bot will respond on certain keywords                                                                               |
-| Points / Loyalty | Points system for your users                                                                                       |
-| Price            | Make viewers to spend points on e.g. !songrequest                                                                  |
-| Ranks            | Create ranks for your viewers                                                                                      |
-| Clips            | Clips posted in chat by your viewers will be saved and you can check them in webpanel                              |
-| Custom commands  | Create (simplified) custom commands                                                                                |
-| Notice           | Post a notice every x minutes                                                                                      |
-| Queue            | Do you lost track of viewers who wants to play with you? Use !queue and be fair!                                   |
-| Raffles          | Create raffles for you giveaways!                                                                                  |
-| Songs            | **Songrequest** and **playlist** support for YouTube with **trimming** of videos and **auto volume normalization** |
-| Cooldowns        | Stop spamming of commands with cooldowns!                                                                          |
+| System             | Description                                                                                                                              |
+|--------------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| Alias              | Don't like default commands? Make an alias!                                                                                              |
+| Keywords           | Bot will respond on certain keywords                                                                                                     |
+| Points / Loyalty   | Points system for your users                                                                                                             |
+| Price              | Make viewers to spend points on e.g. !songrequest                                                                                        |
+| Ranks              | Create ranks for your viewers                                                                                                            |
+| Clips              | Clips posted in chat by your viewers will be saved and you can check them in webpanel                                                    |
+| Custom commands    | Create custom commands, call custom APIs, set custom variables                                                                           |
+| Notice             | Post a notice every x minutes                                                                                                            |
+| Queue              | Do you lost track of viewers who wants to play with you? Use !queue and be fair!                                                         |
+| Raffles            | Create raffles for you giveaways!                                                                                                        |
+| Songs              | **Songrequest** and **playlist** support for YouTube with **trimming** of videos and **auto volume normalization**                       |
+| Cooldowns          | Stop spamming of commands with cooldowns!                                                                                                |
+| Permissions        | Set your custom permissions for your commands! (owner, mods, regular, viewer)                                                            |
+| Moderation         | Automoderate links, colors, symbols, blacklist and more!                                                                                 |
+| Twitch             | Be able to change your game and title from webpanel and much more! !uptime, !lastseen, etc.                                              |
+| Webpanel and Stats | Bot is tracking your twitch **stats** and bot **webpanel** is user friendly and full of features!                                        |
+|                    | Many widgets for your dashboard: customizable soundboard (/public/dist/soundboard/), follower list, twitch monitor, bets, songs and more |
+|                    | Be able to set your !title and !game from dashboard and **save** them for further use!                                                   |
+| Overlay            | Use various overlays in your OBS or XSplit                                                                                               |
 
-| Game | Description                                    |
-|------|------------------------------------------------|
-| Bets |                                                |
+| Game     | Description                                    |
+|----------|------------------------------------------------|
+| Bets     |                                                |
+| Gambling | !seppuku, !roulette commands                   |
+
+| Overlay | Description                              |
+|---------|------------------------------------------|
+| Emotes  | Show chat message emotes in your stream! |
 
 #### Languages
 
 * Cestina
 * English
-
-#### Other features
-
-* custom bot name - you need twitch account for a bot
-* basic channel auto moderation - links, symbols, long messages, capitals, spam, colors, emotes
-* **clips** system to save clips posted in chat
-* !uptime, !lastseen, !watched, !top, !game, !title commands
-* set custom permissions for each command
-* better logging -> know, why user is timed out, bot logs and exceptions
-* **WebPanel**
-* soundboard widget - place your mp3s to /public/dist/soundboard/ to customize
-* change game and title from dashboard (your games and titles are saved to further use)
 
 #### Prerequisites
 
@@ -62,9 +62,11 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 
 * Latest release can be found at https://github.com/sogehige/SogeBot/releases
 * Update config.ini - set bot username and password (oauth:xxxxxxxxxxxxxxxxxxxx), owners and channel
-* **IF UPGRADING BOT AND USING OLD SogeBot.db**: npm install ; npm run migrate
-* For **Linux**: run launch.sh
-* For **Windows**: npm install ; node main.js
+* `cd to/your/bot/folder`
+* **IF UPGRADING BOT AND USING OLD SogeBot.db**: `rm -rf node_modules ; npm install`
+* Check https://github.com/sogehige/SogeBot/releases for info, if you should do `npm migrate`
+* For **Linux**: `npm install ; npm start`
+* For **Windows**: `npm install ; npm start`
 
 #### Command list
 https://github.com/sogehige/SogeBot/wiki/Command-list
