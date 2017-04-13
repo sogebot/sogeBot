@@ -59,6 +59,8 @@
       <div class="clearfix"></div>
     </form>
     <hr>
+
+    <div id="events-current"></div>
   </div>
 </div>
 
@@ -180,12 +182,62 @@ var newEvent = function () {
 socket.off('events')
 socket.on('events', function(data) {
   $('#events-list').empty()
+  $('#events-current').empty()
   $('#operations-list').empty()
 
-  _.each(data.events, function (o) {
+  _.each(data.events, function (o, k) {
     $('#events-list').append(
-      $('<option></option').attr('value', o).text(translations[o])
-    )
+      $('<option></option').attr('value', k).text(translations[k]))
+
+    if (o.length) {
+      let div_part
+      let div_op = $('<div class="operation"></div>')
+      let div_main = $('<div id="' + k + '"></div>')
+
+      div_part = $('<div style="min-width:14%"></div>')
+        .append($('<label></label>').text(translations['event']))
+        .append($('<div></div>').text(translations[k]))
+      div_main.append(div_part)
+
+      _.each(o, function (obj) {
+        let div_part2 = $('<div></div>')
+        _.each(obj, function (operation) {
+          div_part = $('<div style="min-width:14%" ></div>')
+            .append($('<label></label>').text(translations['operation']))
+            .append($('<div></div>').text(translations[operation.name]))
+          div_part2.append(div_part)
+
+          switch (operation.name) {
+            case 'send-chat-message':
+            case 'send-whisper':
+              div_part = $('<div></div>')
+                .append($('<label></label>').text(translations['message']))
+                .append($('<div></div>').text(operation.send))
+              break;
+          }
+          div_part2.append(div_part)
+        })
+        div_op.append(div_part2)
+      })
+
+      div_main.append(div_op)
+      $('#events-current').append(div_main)
+
+      // refresh right-click menu
+      var menu = new BootstrapMenu(".operation", {
+        fetchElementData: function($el) {
+          return $el.data();
+        },
+        actions: [{
+          name: 'Delete',
+          classNames: ['action-danger'],
+          iconClass: 'fa-trash-o',
+          onClick: function(data) {
+            console.log(data)
+          }
+        }]
+      })
+    }
   })
   _.each(data.operations, function (o) {
     if (o === 'log') return true

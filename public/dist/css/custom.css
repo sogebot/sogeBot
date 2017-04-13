@@ -619,3 +619,45 @@ a.soundboard-list-group-item span {
 .form-chainops .form-group {
     vertical-align: top;
 }
+
+#events-current label {
+    font-size: 20px;
+    color:white;
+    font-variant: small-caps;
+    text-transform: lowercase;
+    text-shadow: 0 0 2px #000, 0 0 4px #888, 0 0 8px #888;
+    padding-left: 10px;
+}
+
+#events-current div {
+  padding-bottom: 10px;
+  vertical-align: top;
+
+}
+#events-current div > div {
+  display: inline-block;
+  clear: both;
+}
+
+#events-current div > div > div {
+  display: block;
+  padding-left: 20px;
+  padding-bottom: 0;
+}
+
+#events-current div > div > div > div {
+  display: inline-block;
+}
+
+#events-current div > div > div > div > div {
+  display: block;
+}
+
+#events-current .operation {
+  width: 86%;
+  display: inline-block;
+}
+
+.action-danger > a {
+  color: #a94442 !important;
+}

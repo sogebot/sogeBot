@@ -83,7 +83,19 @@ Events.prototype._webpanel = function (self) {
 }
 
 Events.prototype._send = function (self, socket) {
-  socket.emit('events', { events: Object.keys(self.events), operations: Object.keys(self.operations) })
+  let events = {}
+  _.each(self.events, function (o, n) {
+    if (o.length === 0) {
+      events[n] = self.events[n]
+      return true
+    }
+    _.each(o, function (v) {
+      _.each(v, function (v2) {
+        if (!v2.system) events[n] = self.events[n]
+      })
+    })
+  })
+  socket.emit('events', { events: events, operations: Object.keys(self.operations) })
 }
 
 Events.prototype._new = function (self, socket, data) {
@@ -119,6 +131,7 @@ Events.prototype._new = function (self, socket, data) {
   event.push(operation)
   self.events[data.event].push(event)
   self._save(self)
+  self._send(self, socket)
 }
 
 Events.prototype._update = function (self) {
