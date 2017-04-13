@@ -484,7 +484,7 @@
       "change": "Prava pro pouziti prikazu byla zmenena"
     },
     "failed": {
-      "parse": "Pouziti: !permission viewer|mods|owner [command]",
+      "parse": "Pouziti: !permission viewer|mods|owner|regular|disable [command]",
       "noCmd": "Promin, (sender), ale tento prikaz neni v botovi evidovan"
     },
     "without-permission": "Nemas dostatecne opravneni pro '(command)'"
@@ -667,6 +667,18 @@
       "notEnoughPoints": "(sender), nemas dostatek (pointsName) abys o ne hral",
       "win": "(sender), VYHRALS! Aktualne mas (points) (pointsName)",
       "lose": "(sender), PROHRALS! Aktualne mas (points) (pointsName)"
+    }
+  },
+  "regulars": {
+    "add": {
+      "success": "@(username) je od ted pravidelnym navstevnikem kanalu",
+      "undefined": "@(username) neexistuje v databazi bota",
+      "empty": "Pouziti: !regular add <username>"
+    },
+    "rm": {
+      "success": "@(username) uz neni pravidelnym navstevnikem kanalu",
+      "undefined": "@(username) neexistuje v databazi bota",
+      "empty": "Pouziti: !regular remove <username>"
     }
   }
 }
