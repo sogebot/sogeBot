@@ -206,7 +206,7 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
   var msgLength = text.trim().length
   var symbolsLength = 0
 
-  if (global.parser.isOwner(sender) || sender.mod || msgLength <= triggerLength || !global.configuration.getValue('moderationSymbols') || (sender.subscriber && !global.configuration.getValue('moderationSymbolsSubs')) {
+  if (global.parser.isOwner(sender) || sender.mod || msgLength <= triggerLength || !global.configuration.getValue('moderationSymbols') || (sender.subscriber && !global.configuration.getValue('moderationSymbolsSubs'))) {
     global.updateQueue(id, true)
     return
   }
