@@ -1,0 +1,136 @@
+<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4" id="settings">
+  <div class="widget" id="emotes">
+    <div class="title">
+      <span data-lang="emotes"></span>
+      <small><a href="/overlays/emotes">XSplit / OBS link</a></small>
+    </div>
+    <table class="table table-striped">
+      <tr>
+        <td><strong data-lang="overlay-emotes-size"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="OEmotesSize" onclick="commons.configEditable(this, '')" id="configOEmotesSize"></abbr>
+          <div class="input-group" style="display:none;" id="input_OEmotesSize_group">
+            <div class="input-group-addon">0-2</div>
+            <input id="input_OEmotesSize" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="overlay-emotes-max"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="OEmotesMax" onclick="commons.configEditable(this, '')" id="configOEmotesMax"></abbr>
+          <div class="input-group" style="display:none;" id="input_OEmotesMax_group">
+            <input id="input_OEmotesMax" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="overlay-emotes-animation"></strong></td>
+        <td>
+          <select id="overlay-emotes-animation-select" class="form-control" onchange="saveEmotesAnimation()">
+            <option value="fadeup" data-lang="fade-out-top"></option>
+            <option value="fadezoom" data-lang="fade-out-zoom"></option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="overlay-emotes-follower-explosion"></strong></td>
+        <td>
+          <input id="OEmotesFollowerExplosionToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
+          <button class="btn btn-success btn-xs pull-right" onclick="explodeTest('follower')">Test me!</button>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="overlay-emotes-follower-list"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="OEmotesFollowerExplosionList" onclick="commons.configEditable(this, '')" id="configOEmotesFollowerExplosionList"></abbr>
+          <div class="input-group" style="display:none;" id="input_OEmotesFollowerExplosionList_group">
+            <input id="input_OEmotesFollowerExplosionList" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="overlay-emotes-subscribe-explosion"></strong></td>
+        <td>
+          <input id="OEmotesSubscribeExplosionToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
+          <button class="btn btn-success btn-xs pull-right" onclick="explodeTest('subscribe')">Test me!</button>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="overlay-emotes-subscribe-list"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="OEmotesSubscribeExplosionList" onclick="commons.configEditable(this, '')" id="configOEmotesSubscribeExplosionList"></abbr>
+          <div class="input-group" style="display:none;" id="input_OEmotesSubscribeExplosionList_group">
+            <input id="input_OEmotesSubscribeExplosionList" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="overlay-emotes-resub-explosion"></strong></td>
+        <td>
+          <input id="OEmotesResubExplosionToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
+          <button class="btn btn-success btn-xs pull-right" onclick="explodeTest('resub')">Test me!</button>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="overlay-emotes-resub-list"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="OEmotesResubExplosionList" onclick="commons.configEditable(this, '')" id="configOEmotesResubExplosionList"></abbr>
+          <div class="input-group" style="display:none;" id="input_OEmotesResubExplosionList_group">
+            <input id="input_OEmotesResubExplosionList" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<script>
+  socket.off('configuration')
+
+  socket.emit('getConfiguration')
+  socket.on('configuration', function (data) {
+    $("#configOEmotesSize").text(data.OEmotesSize)
+    $("#configOEmotesMax").text(data.OEmotesMax)
+
+    $("#configOEmotesFollowerExplosionList").text(data.OEmotesFollowerExplosionList)
+    $("#configOEmotesSubscribeExplosionList").text(data.OEmotesSubscribeExplosionList)
+    $("#configOEmotesResubExplosionList").text(data.OEmotesResubExplosionList)
+
+    $('#overlay-emotes-animation-select option[value=' + data.OEmotesAnimation + ']').prop('selected', true)
+
+    $('#OEmotesFollowerExplosionToggle').bootstrapToggle(data.OEmotesFollowerExplosion ? 'on' : 'off')
+    $('#OEmotesFollowerExplosionToggle').off('change')
+    $('#OEmotesFollowerExplosionToggle').change(function() {
+      if ($('#OEmotesFollowerExplosionToggle').data('init')) socket.emit('saveConfiguration', {'OEmotesFollowerExplosion': $(this).prop('checked')})
+    })
+    $('#OEmotesFollowerExplosionToggle').data('init', true)
+
+    $('#OEmotesSubscribeExplosionToggle').bootstrapToggle(data.OEmotesSubscribeExplosion ? 'on' : 'off')
+    $('#OEmotesSubscribeExplosionToggle').off('change')
+    $('#OEmotesSubscribeExplosionToggle').change(function() {
+      if ($('#OEmotesSubscribeExplosionToggle').data('init')) socket.emit('saveConfiguration', {'OEmotesSubscribeExplosion': $(this).prop('checked')})
+    })
+    $('#OEmotesSubscribeExplosionToggle').data('init', true)
+
+    $('#OEmotesResubExplosionToggle').bootstrapToggle(data.OEmotesResubExplosion ? 'on' : 'off')
+    $('#OEmotesResubExplosionToggle').off('change')
+    $('#OEmotesResubExplosionToggle').change(function() {
+      if ($('#OEmotesResubExplosionToggle').data('init')) socket.emit('saveConfiguration', {'OEmotesResubExplosion': $(this).prop('checked')})
+    })
+    $('#OEmotesResubExplosionToggle').data('init', true)
+  })
+
+  function saveEmotesAnimation () {
+    socket.emit('saveConfiguration', {'OEmotesAnimation': $('#overlay-emotes-animation-select').val()})
+  }
+
+  function explodeTest (type) {
+    let emotes
+    if (type === 'follower') emotes = $("#configOEmotesFollowerExplosionList").text().split(' ')
+    if (type === 'subscribe') emotes = $("#configOEmotesSubscribeExplosionList").text().split(' ')
+    if (type === 'resub') emotes = $("#configOEmotesResubExplosionList").text().split(' ')
+    socket.emit('emote.test', emotes)
+  }
+
+</script>
