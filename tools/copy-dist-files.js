@@ -27,6 +27,12 @@ var dist = {
   },
   'bootstrap-menu': {
     'js': 'dist/BootstrapMenu.min.js'
+  },
+  'velocity-animate': {
+    'js': [
+      'velocity.min.js',
+      'velocity.ui.min.js'
+    ]
   }
 }
 
