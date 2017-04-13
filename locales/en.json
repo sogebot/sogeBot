@@ -66,6 +66,7 @@
     "overlay-emotes-follower-list": "Emoticons for follower explosion",
     "overlay-emotes-subscribe-list": "Emoticons for subscribe explosion",
     "overlay-emotes-resub-list": "Emoticons for resub explosion",
+    "moderation-subscribers-toggle": "Timeout subscribers",
     "global": "Global",
     "user": "User",
     "dashboard": "Dashboard",
@@ -520,11 +521,21 @@
         "true": "{moderation.settings.moderationLinks.text} {core.enabled}",
         "false": "{moderation.settings.moderationLinks.text} {core.disabled}"
       },
+      "moderationLinksSubs": {
+        "text": "Moderation of links for subscribers is",
+        "true": "{moderation.settings.moderationLinksSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationLinksSubs.text} {core.disabled}"
+      },
       "moderationLinksTimeout": "Timeout because of links set to (value)s",
       "moderationSymbols": {
         "text": "Moderation of symbols is",
         "true": "{moderation.settings.moderationSymbols.text} {core.enabled}",
         "false": "{moderation.settings.moderationSymbols.text} {core.disabled}"
+      },
+      "moderationSymbolsSubs": {
+        "text": "Moderation of symbols for subscribers is",
+        "true": "{moderation.settings.moderationSymbolsSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationSymbolsSubs.text} {core.disabled}"
       },
       "moderationSymbolsTimeout": "Timeout because of symbols set to (value)s",
       "moderationSymbolsTriggerLength": "Trigger message length for symbols set to (value)",
@@ -535,12 +546,22 @@
         "true": "{moderation.settings.moderationLongMessage.text} {core.enabled}",
         "false": "{moderation.settings.moderationLongMessage.text} {core.disabled}"
       },
+      "moderationLongMessageSubs": {
+        "text": "Moderation of long messages for subscribers is",
+        "true": "{moderation.settings.moderationLongMessageSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationLongMessageSubs.text} {core.disabled}"
+      },
       "moderationLongMessageTimeout": "Timeout because of long message set to (value)s",
       "moderationLongMessageTriggerLength": "Trigger message length for long messages set to (value)",
       "moderationCaps": {
         "text": "Moderation of caps is",
         "true": "{moderation.settings.moderationCaps.text} {core.enabled}",
         "false": "{moderation.settings.moderationCaps.text} {core.disabled}"
+      },
+      "moderationCapsSubs": {
+        "text": "Moderation of caps for subscribers is",
+        "true": "{moderation.settings.moderationCapsSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationCapsSubs.text} {core.disabled}"
       },
       "moderationCapsTimeout": "Timeout because of caps set to (value)s",
       "moderationCapsTriggerLength": "Trigger message length for caps set to (value)",
@@ -550,6 +571,11 @@
         "true": "{moderation.settings.moderationSpam.text} {core.enabled}",
         "false": "{moderation.settings.moderationSpam.text} {core.disabled}"
       },
+      "moderationSpamSubs": {
+        "text": "Moderation of spam for subscribers is",
+        "true": "{moderation.settings.moderationSpamSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationSpamSubs.text} {core.disabled}"
+      },
       "moderationSpamTimeout": "Timeout because of spam set to (value)s",
       "moderationSpamTriggerLength": "Trigger message length for spam set to (value)",
       "moderationSpamMaxLength": "Maximum spam length in message set to (value)",
@@ -558,11 +584,21 @@
         "true": "{moderation.settings.moderationColor.text} {core.enabled}",
         "false": "{moderation.settings.moderationColor.text} {core.disabled}"
       },
+      "moderationColorSubs": {
+        "text": "Moderation of colors (/me) for subscribers is",
+        "true": "{moderation.settings.moderationColorSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationColorSubs.text} {core.disabled}"
+      },
       "moderationColorTimeout": "Timeout because of colors (/me) usage set to (value)s",
       "moderationEmotes": {
         "text": "Moderation of emotes is",
         "true": "{moderation.settings.moderationEmotes.text} {core.enabled}",
         "false": "{moderation.settings.moderationEmotes.text} {core.disabled}"
+      },
+      "moderationEmotesSubs": {
+        "text": "Moderation of emotes for subscribers is",
+        "true": "{moderation.settings.moderationEmotesSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationEmotesSubs.text} {core.disabled}"
       },
       "moderationEmotesTimeout": "Timeout because of emotes spamming set to (value)s",
       "moderationEmotesMaxCount": "Maximum count of emotes in one messages set to (value)",

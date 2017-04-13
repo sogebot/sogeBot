@@ -16,6 +16,12 @@
           </div>
         </td>
       </tr>
+      <tr>
+        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
+        <td>
+          <input id="moderationLinksSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
+        </td>
+      </tr>
     </table>
   </div>
 </div>
@@ -35,6 +41,12 @@
             <div class="input-group-addon" data-lang="seconds"></div>
             <input style="width: 6em" id="input_moderationSymbolsTimeout" class="form-control input-sm" type="text"/>
           </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
+        <td>
+          <input id="moderationSymbolsSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
         </td>
       </tr>
       <tr>
@@ -87,6 +99,12 @@
         </td>
       </tr>
       <tr>
+        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
+        <td>
+          <input id="moderationLongMessageSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
+        </td>
+      </tr>
+      <tr>
         <td><strong data-lang="trigger-length-of-message"></strong></td>
         <td>
           <abbr title="click to edit" data-config-id="moderationLongMessageTriggerLength" onclick="commons.configEditable(this, '')" id="moderationLongMessageTriggerLength"></abbr>
@@ -116,6 +134,12 @@
             <div class="input-group-addon" data-lang="seconds"></div>
             <input style="width: 6em" id="input_moderationCapsTimeout" class="form-control input-sm" type="text"/>
           </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
+        <td>
+          <input id="moderationCapsSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
         </td>
       </tr>
       <tr>
@@ -159,6 +183,12 @@
         </td>
       </tr>
       <tr>
+        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
+        <td>
+          <input id="moderationSpamSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
+        </td>
+      </tr>
+      <tr>
         <td><strong data-lang="trigger-length-of-message"></strong></td>
         <td>
           <abbr title="click to edit" data-config-id="moderationSpamTriggerLength" onclick="commons.configEditable(this, '')" id="moderationSpamTriggerLength"></abbr>
@@ -196,6 +226,12 @@
           </div>
         </td>
       </tr>
+      <tr>
+        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
+        <td>
+          <input id="moderationColorSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
+        </td>
+      </tr>
     </table>
   </div>
 </div>
@@ -217,6 +253,12 @@
             <div class="input-group-addon" data-lang="seconds"></div>
             <input style="width: 6em" id="input_moderationEmotesTimeout" class="form-control input-sm" type="text"/>
           </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
+        <td>
+          <input id="moderationEmotesSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
         </td>
       </tr>
       <tr>
@@ -306,32 +348,39 @@
   socket.off('configuration')
   socket.on('configuration', function(data) {
     createToggle('moderationLinks', data.moderationLinks)
+    createToggle('moderationLinksSubs', data.moderationLinksSubs)
     $("#moderationLinksTimeout").text(data.moderationLinksTimeout + 's')
 
     createToggle('moderationSymbols', data.moderationSymbols)
+    createToggle('moderationSymbolsSubs', data.moderationSymbolsSubs)
     $("#moderationSymbolsTimeout").text(data.moderationSymbolsTimeout + 's')
     $("#moderationSymbolsTriggerLength").text(data.moderationSymbolsTriggerLength)
     $("#moderationSymbolsMaxConsecutively").text(data.moderationSymbolsMaxConsecutively)
     $("#moderationSymbolsMaxPercent").text(data.moderationSymbolsMaxPercent + '%')
 
     createToggle('moderationLongMessage', data.moderationLongMessage)
+    createToggle('moderationLongMessageSubs', data.moderationLongMessageSubs)
     $("#moderationLongMessageTimeout").text(data.moderationLongMessageTimeout + 's')
     $("#moderationLongMessageTriggerLength").text(data.moderationLongMessageTriggerLength)
 
     createToggle('moderationCaps', data.moderationCaps)
+    createToggle('moderationCapsSubs', data.moderationCapsSubs)
     $("#moderationCapsTimeout").text(data.moderationCapsTimeout + 's')
     $("#moderationCapsTriggerLength").text(data.moderationCapsTriggerLength)
     $("#moderationCapsMaxPercent").text(data.moderationCapsMaxPercent + '%')
 
     createToggle('moderationSpam', data.moderationSpam)
+    createToggle('moderationSpamSubs', data.moderationSpamSubs)
     $("#moderationSpamTimeout").text(data.moderationSpamTimeout + 's')
     $("#moderationSpamTriggerLength").text(data.moderationSpamTriggerLength)
     $("#moderationSpamMaxLength").text(data.moderationSpamMaxLength)
 
     createToggle('moderationColor', data.moderationColor)
+    createToggle('moderationColorSubs', data.moderationColorSubs)
     $("#moderationColorTimeout").text(data.moderationColorTimeout + 's')
 
     createToggle('moderationEmotes', data.moderationEmotes)
+    createToggle('moderationEmotesSubs', data.moderationEmotesSubs)
     $("#moderationEmotesTimeout").text(data.moderationEmotesTimeout + 's')
     $("#moderationEmotesMaxCount").text(data.moderationEmotesMaxCount)
 
