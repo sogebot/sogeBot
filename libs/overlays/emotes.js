@@ -11,6 +11,23 @@ const constants = require('../constants')
 // implement explosions on events
 
 function Emotes () {
+  this.simpleEmotes = {
+    ':)': 'https://static-cdn.jtvnw.net/emoticons/v1/1/',
+    ':(': 'https://static-cdn.jtvnw.net/emoticons/v1/2/',
+    ':o': 'https://static-cdn.jtvnw.net/emoticons/v1/8/',
+    ':z': 'https://static-cdn.jtvnw.net/emoticons/v1/5/',
+    'B)': 'https://static-cdn.jtvnw.net/emoticons/v1/7/',
+    ':\\': 'https://static-cdn.jtvnw.net/emoticons/v1/10/',
+    ';)': 'https://static-cdn.jtvnw.net/emoticons/v1/11/',
+    ';p': 'https://static-cdn.jtvnw.net/emoticons/v1/13/',
+    ':p': 'https://static-cdn.jtvnw.net/emoticons/v1/12/',
+    'R)': 'https://static-cdn.jtvnw.net/emoticons/v1/14/',
+    'o_O': 'https://static-cdn.jtvnw.net/emoticons/v1/6/',
+    ':D': 'https://static-cdn.jtvnw.net/emoticons/v1/3/',
+    '>(': 'https://static-cdn.jtvnw.net/emoticons/v1/4/',
+    '<3': 'https://static-cdn.jtvnw.net/emoticons/v1/9/'
+  }
+
   emoticons.loadBTTVChannel(global.configuration.get().twitch.channel)
 
   global.parser.registerParser(this, 'emotes', this.containsEmotes, constants.VIEWERS)
@@ -35,15 +52,38 @@ Emotes.prototype._test = async function (self, socket, data) {
   socket.emit('emote.explode', emotes)
 }
 
-Emotes.prototype.containsEmotes = function (self, id, sender, text) {
+Emotes.prototype.containsEmotes = async function (self, id, sender, text) {
   let OEmotesMax = global.configuration.getValue('OEmotesMax')
+  let OEmotesSize = global.configuration.getValue('OEmotesSize')
 
+  let parsed = await emoticons.parseAll(text, 'text', 2, '', '', '[{name}$]')
+  _.each(self.simpleEmotes, function (link, emote) {
+    parsed = parsed.replace(emote, '[' + emote + '$]')
+  })
+
+  _.each(parsed.match(/\[(\S*)\$\]/g), function (emote) {
+    emote = emote.replace('[', '').replace('$]', '')
+
+    if (_.includes(Object.keys(self.simpleEmotes), emote)) {
+      global.panel.io.emit('emote', self.simpleEmotes[emote] + (OEmotesSize + 1) + '.0')
+    } else {
+      try {
+        emoticons.emote(emote).then(function (obj) {
+          global.panel.io.emit('emote', obj.toLink(OEmotesSize))
+        })
+      } catch (e) {
+        return true
+      }
+    }
+  })
+
+  /*
   _.each(sender.emotes, function (index, emote) {
     _.each(index, function (v, i) {
       if (i === OEmotesMax) return false
       global.panel.io.emit('emote', emote)
     })
-  })
+  })*/
   global.updateQueue(id, true)
 }
 
@@ -52,11 +92,15 @@ Emotes.prototype.parseEmotes = async function (self, emotes) {
   let emotesArray = []
 
   for (var i = 0; i < emotes.length; i++) {
-    try {
-      let parsed = await emoticons.emote(emotes[i])
-      emotesArray.push(parsed.toLink(OEmotesSize))
-    } catch (e) {
-      continue
+    if (_.includes(Object.keys(self.simpleEmotes), emotes[i])) {
+      emotesArray.push(self.simpleEmotes[emotes[i]] + (OEmotesSize + 1) + '.0')
+    } else {
+      try {
+        let parsed = await emoticons.emote(emotes[i])
+        emotesArray.push(parsed.toLink(OEmotesSize))
+      } catch (e) {
+        continue
+      }
     }
   }
   return emotesArray
