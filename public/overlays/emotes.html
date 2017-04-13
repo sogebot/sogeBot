@@ -47,7 +47,7 @@
       var emote = {
         size: 2,
         max: 5,
-        animation: 'waterfall',
+        animation: 'fadeup',
 
         show: function (emote_number) {
           var left = _.random($('body').width() - 200) + 100
@@ -68,21 +68,18 @@
                   top: top-100
                 }, 1000,
                 function () {
-                  $(this).remove()
+                  //$(this).remove()
                 })
               }, _.random(2000))
               break
-            case 'zoomfade':
+            case 'fadezoom':
               setTimeout(function() {
                 emotes.append(img)
                 img.velocity({
-                  opacity: 0
-                }, {
-                  duration: 2000,
-                  step: function(now,fx) {
-                    $(this).css('transform','scale('+ (1-now)+')');
-                  }
-                },
+                  opacity: 0,
+                  scaleX: 0,
+                  scaleY: 0
+                },2000,
                 function () {
                   $(this).remove()
                 })
