@@ -85,7 +85,7 @@ Parser.prototype.processQueue = async function (id) {
 }
 
 Parser.prototype.parseCommands = async function (user, message) {
-  message = message.trim()
+  message = message.trim().toLowerCase()
   for (var cmd in this.registeredCmds) {
     if (message.startsWith(cmd)) {
       if (this.permissionsCmds[cmd] === constants.DISABLE) break
