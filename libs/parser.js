@@ -85,9 +85,9 @@ Parser.prototype.processQueue = async function (id) {
 }
 
 Parser.prototype.parseCommands = async function (user, message) {
-  message = message.trim().toLowerCase()
+  message = message.trim()
   for (var cmd in this.registeredCmds) {
-    if (message.startsWith(cmd)) {
+    if (message.toLowerCase().startsWith(cmd.toLowerCase())) {
       if (this.permissionsCmds[cmd] === constants.DISABLE) break
       if (_.isNil(user) || // if user is null -> we are running command through a bot
         (this.permissionsCmds[cmd] === constants.VIEWERS) ||
