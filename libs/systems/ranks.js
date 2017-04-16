@@ -66,8 +66,13 @@ Ranks.prototype.list = function (self, sender, text) {
     global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, docs) {
       if (err) { log.error(err, { fnc: 'Ranks.prototype.list' }) }
       var list = []
-      docs.forEach(function (e, i, ar) { list.push(e.hours + ' ' + e.rank) })
-      var output = (docs.length === 0 ? global.translate('rank.failed.list') : global.translate('rank.success.list') + ': ' + list.join(', '))
+      var output
+      if (!_.isNil(docs)) {
+        output = global.translate('rank.success.list') + ':'
+      } else {
+        docs.forEach(function (e, i, ar) { list.push(e.hours + ' ' + e.rank) })
+        output = (docs.length === 0 ? global.translate('rank.failed.list') : global.translate('rank.success.list') + ': ' + list.join(', '))
+      }
       global.commons.sendMessage(output, sender)
     })
   } else {
