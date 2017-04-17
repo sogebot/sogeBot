@@ -142,7 +142,8 @@ if (global.configuration.get().bot.debug) {
   global.log.warning('| PLEASE DISABLE IT IN CONFIG.INI    |')
   global.log.warning('| UNLESS YOU KNOW WHAT YOU ARE DOING |')
   global.log.warning('+------------------------------------+')
-  process.on('unhandledRejection', function (reason, p) {
-    console.log('Possibly Unhandled Rejection at: Promise ', p, ' reason: ', reason)
-  })
 }
+
+  process.on('unhandledRejection', function (reason, p) {
+    global.log.error('Possibly Unhandled Rejection', {promise: p, reason: reason})
+  })
