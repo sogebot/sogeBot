@@ -74,7 +74,7 @@ Parser.prototype.processQueue = async function (id) {
         let avgTime = 0
         let length = global.parser.timer.length
         for (var i = 0; i < length; i++) {
-          if (_.isUndefined(global.parser.timer[i].sent)) global.parser.timer[i].sent = new Date().getTime() + (1000 * 5) // if sent is not defined yet, expect 5s to response to show some fails
+          if (_.isUndefined(global.parser.timer[i].sent)) continue
           avgTime += global.parser.timer[i].sent - global.parser.timer[i].received
         }
         global.status['RES'] = (avgTime / length).toFixed(0)
