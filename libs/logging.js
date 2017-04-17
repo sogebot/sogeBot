@@ -59,7 +59,11 @@ global.log = new (winston.Logger)({
         if (level === 'join') level = 'JOIN:'
         if (level === 'part') level = 'PART:'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
-        return options.timestamp() + (level ? ' ' + level + ' ' : ' ') + (options.message ? options.message : '') + (username ? ' [' + username + ']' : '')
+        if (level === '!!! ERROR !!!') console.error(options.timestamp() + ' !!! ' + JSON.stringify(options.meta))
+        return options.timestamp() +
+          (level ? ' ' + level + ' ' : ' ') +
+          (options.message ? options.message : '') +
+          (username ? ' [' + username + ']' : '')
       },
       filename: logDir + '/sogebot.log',
       handleExceptions: false,
