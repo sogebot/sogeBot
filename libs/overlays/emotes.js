@@ -58,26 +58,23 @@ Emotes.prototype.containsEmotes = async function (self, id, sender, text) {
   let OEmotesMax = global.configuration.getValue('OEmotesMax')
   let OEmotesSize = global.configuration.getValue('OEmotesSize')
 
-  let parsed = await emoticons.parseAll(text, 'text', 2, '', '', '[{name}$]')
-  _.each(self.simpleEmotes, function (link, emote) {
-    parsed = parsed.replace(emote, '[' + emote + '$]')
+  _.each(sender.emotes, function (v, emote) {
+    let limit = 0
+    _.each(v, function () {
+      if (limit === OEmotesMax) return false
+      global.panel.io.emit('emote', 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote + '/' + (OEmotesSize + 1) + '.0')
+      limit++
+    })
   })
 
-  _.each(parsed.match(/\[(\S*)\$\]/g), function (emote) {
-    emote = emote.replace('[', '').replace('$]', '')
-
-    if (_.includes(Object.keys(self.simpleEmotes), emote)) {
-      global.panel.io.emit('emote', self.simpleEmotes[emote] + (OEmotesSize + 1) + '.0')
-    } else {
-      try {
-        emoticons.emote(emote).then(function (obj) {
-          global.panel.io.emit('emote', obj.toLink(OEmotesSize))
-        })
-      } catch (e) {
-        return true
-      }
+  // parse BTTV emoticons
+  for (let emote of emoticons.cache().bttvEmotes.keys()) {
+    for (let i in _.range((text.match(new RegExp(emote, 'g')) || []).length)) {
+      if (i === OEmotesMax) break
+      let parsed = await emoticons.emote(emote)
+      global.panel.io.emit('emote', parsed.toLink(OEmotesSize))
     }
-  })
+  }
 }
 
 Emotes.prototype.parseEmotes = async function (self, emotes) {
