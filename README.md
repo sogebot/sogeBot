@@ -48,6 +48,7 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 | Overlay | Description                              |
 |---------|------------------------------------------|
 | Emotes  | Show chat message emotes in your stream! |
+| Stats   | Show viewers, follower, uptime           |
 
 #### Languages
 
