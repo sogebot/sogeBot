@@ -17,8 +17,10 @@ var log = global.log
 
 function Raffles () {
   if (global.commons.isSystemEnabled(this)) {
-    this.timer = null
+    this.lastAnnounce = 0
     this.keyword = null
+    this.product = null
+    this.followers = false
 
     global.parser.register(this, '!raffle pick', this.pick, constants.OWNER_ONLY)
     global.parser.register(this, '!raffle close', this.close, constants.OWNER_ONLY)
@@ -26,6 +28,33 @@ function Raffles () {
     global.parser.register(this, '!raffle', this.info, constants.VIEWERS)
     global.parser.registerHelper('!raffle')
     global.configuration.register('raffleAnnounceInterval', 'raffle.announceInterval', 'number', 10)
+    global.configuration.register('raffleAnnounceCustomMessage', 'raffle.announceCustomMessage', 'string', '')
+
+    var self = this
+    setInterval(function () {
+      if (new Date().getTime() < self.lastAnnounce + (global.configuration.getValue('raffleAnnounceInterval') * 60 * 1000) || _.isNil(self.keyword)) return
+      self.lastAnnounce = new Date().getTime()
+      let message
+      if (global.configuration.getValue('raffleAnnounceCustomMessage')) {
+        message = global.configuration.getValue('raffleAnnounceCustomMessage')
+          .replace('(keyword)', self.keyword)
+          .replace('(product)', self.product)
+      } else {
+        if (self.followers && self.product) {
+          message = global.translate('raffle.open.notice.both')
+            .replace('(keyword)', self.keyword)
+            .replace('(product)', self.product)
+        } else if (self.followers && !self.product) {
+          message = global.translate('raffle.open.notice.followers')
+            .replace('(keyword)', self.keyword)
+        } else if (!self.followers && self.product) {
+          message = global.translate('raffle.open.notice.product')
+            .replace('(keyword)', self.keyword)
+            .replace('(product)', self.product)
+        }
+      }
+      global.commons.sendMessage(message, null)
+    }, 10000)
 
     this.registerRaffleKeyword(this)
   }
@@ -38,6 +67,8 @@ Raffles.prototype.registerRaffleKeyword = function (self) {
     if (!_.isNull(item)) {
       global.parser.register(this, '!' + item.keyword, self.participate, constants.VIEWERS)
       self.keyword = item.keyword
+      self.product = item.product
+      self.followers = item.followers
     }
   })
 }
@@ -161,15 +192,7 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
 
       // register raffle keyword
       self.registerRaffleKeyword(self)
-
-      // add timer if raffleAnnounceInterval is set
-      if (global.configuration.getValue('raffleAnnounceInterval')) {
-        clearInterval(self.timer)
-        self.timer = setInterval(function () {
-          global.commons.sendMessage(global.translate('raffle.open.notice')
-              .replace('(keyword)', raffle.keyword), sender)
-        }, global.configuration.getValue('raffleAnnounceInterval') * 60 * 1000)
-      }
+      self.lastAnnounce = new Date().getTime()
     })
   } catch (err) {
     global.commons.sendMessage(global.translate('raffle.open.error'))
@@ -183,10 +206,10 @@ Raffles.prototype.close = function (self, sender, text) {
       global.botDB.update({_id: 'raffle'}, {$set: {locked: true}}, {}, function (err) {
         if (err) return log.error(err, { fnc: 'Raffles.prototype.close' })
         global.commons.sendMessage(global.translate('raffle.close.ok'), sender)
-
-        clearInterval(self.timer)
-        global.parser.unregister('!' + item.keyword)
       })
+
+      clearInterval(self.timer)
+      global.parser.unregister('!' + item.keyword)
     } else {
       global.commons.sendMessage(global.translate('raffle.close.notRunning'), sender)
     }
