@@ -70,6 +70,12 @@ Configuration.prototype.setValue = function (self, sender, text) {
       global.commons.updateOrInsert(data)
       self.cfgL[cmd].value = data[cmd]
     } else global.commons.sendMessage('Sorry, (sender), cannot parse !set command.', sender)
+
+    let emit = {}
+    _.each(self.sets(self), function (key) {
+      emit[key] = self.getValue(key)
+    })
+    global.panel.io.emit('configuration', emit)
   } catch (err) {
     global.commons.sendMessage('Sorry, (sender), cannot parse !set command.', sender)
   }
