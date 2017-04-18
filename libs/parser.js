@@ -177,7 +177,18 @@ Parser.prototype.parseMessage = async function (message, attr) {
       let numbers = filter.replace('(random.number-', '')
         .replace(')', '')
         .split('-to-')
+
       try {
+        let lastParamUsed = 0
+        for (let index in numbers) {
+          if (!_.isFinite(parseInt(numbers[index], 10))) {
+            let param = attr.param.split(' ')
+            if (_.isNil(param[lastParamUsed])) return 0
+
+            numbers[index] = param[lastParamUsed]
+            lastParamUsed++
+          }
+        }
         return _.random(numbers[0], numbers[1])
       } catch (e) {
         return 0
