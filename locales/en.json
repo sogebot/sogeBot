@@ -233,6 +233,10 @@
   },
   "raffle": {
     "announceInterval": "Opened raffles will be announced every (value) minute",
+    "participation": {
+      "success": "You just entered in current raffle! Good luck!",
+      "failed": "Sorry, you are not eligible to enter the raffle! If you want to know conditions to enter, whisper me !raffle"
+    },
     "info": {
       "opened": {
         "product": "(sender), raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate.",
