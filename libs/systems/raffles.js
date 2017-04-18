@@ -88,8 +88,20 @@ Raffles.prototype.info = function (self, sender) {
     if (!_.isNull(item)) {
       if (!_.isNull(item.winner)) global.commons.sendMessage(global.translate('raffle.info.notRunning'), sender)
       else if (!item.locked) {
-        global.commons.sendMessage(global.translate('raffle.info.opened')
-          .replace('(keyword)', item.keyword), sender)
+        let message = global.translate('raffle.info.opened.none').replace('(keyword)', item.keyword)
+        if (item.followers && item.product) {
+          message = global.translate('raffle.info.opened.both')
+            .replace('(keyword)', item.keyword)
+            .replace('(product)', item.product)
+        } else if (item.followers && !item.product) {
+          message = global.translate('raffle.info.opened.followers')
+            .replace('(keyword)', item.keyword)
+        } else if (!item.followers && item.product) {
+          message = global.translate('raffle.info.opened.product')
+            .replace('(keyword)', item.keyword)
+            .replace('(product)', item.product)
+        }
+        global.commons.sendMessage(message, sender)
       } else {
         global.commons.sendMessage(global.translate('raffle.info.closed'), sender)
       }
