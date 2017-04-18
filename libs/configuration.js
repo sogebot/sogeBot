@@ -17,6 +17,7 @@ global.asyncBotDB = dbPromise.fromInstance(global.botDB)
 function Configuration () {
   this.config = null
   this.cfgL = {}
+  this.default = {}
   this.loadFile()
 
   global.parser.register(this, '!set list', this.listSets, constants.OWNER_ONLY)
@@ -38,12 +39,15 @@ Configuration.prototype.get = function () {
 
 Configuration.prototype.register = function (cfgName, success, filter, defaultValue) {
   this.cfgL[cfgName] = {success: success, value: defaultValue, filter: filter}
+  this.default[cfgName] = {value: defaultValue}
 }
 
 Configuration.prototype.setValue = function (self, sender, text) {
   try {
     var cmd = text.split(' ')[0]
     var value = text.replace(text.split(' ')[0], '').trim()
+    if (value.length === 0) value = self.default[cmd]
+
     var filter = self.cfgL[cmd].filter
     var data = {_type: 'settings', success: self.cfgL[cmd].success}
     data['_' + cmd] = {$exists: true}
@@ -56,7 +60,7 @@ Configuration.prototype.setValue = function (self, sender, text) {
       data.success = data.success + '.' + value
       global.commons.updateOrInsert(data)
       self.cfgL[cmd].value = data[cmd]
-    } else if (filter === 'string' && value.trim().length > 0) {
+    } else if (filter === 'string') {
       if (cmd === 'lang') {
         self.cfgL[cmd].value = value.trim()
         global.commons.sendMessage(global.translate('core.lang-selected'), sender)
