@@ -57,7 +57,7 @@
 
       <div class="btn-group" role="group">
         <button type="button" class="btn btn-default btn-label" disabled="disabled" data-lang="eligible-to-enter"></button>
-        <button type="button" class="btn btn-disabled" id="followerCheckbox" onclick="raffles.switchFollowersOnly()" data-lang="followers-only"></button>
+        <button type="button" class="btn btn-primary" id="followerCheckbox" onclick="raffles.switchFollowersOnly()" data-lang="followers-only"></button>
       </div>
       <button type="button" class="btn btn-disabled btn-block" style="margin-top: 20px;" id="raffleWidgetRoll" onclick="raffles.rollWinner()" data-lang="roll-a-winner"></button>
     </div> <!-- /GIVEAWAY -->
@@ -194,9 +194,11 @@
     },
     switchFollowersOnly: function () {
       this.followersOnly = !this.followersOnly
-      $("#followerCheckbox").removeClass()
-      if (this.followersOnly) $("#followerCheckbox").addClass('btn btn-success')
-      else $("#followerCheckbox").addClass('btn btn-danger')
+      if (this.followersOnly) {
+        $("#followerCheckbox").html(translations['followers-only'])
+      } else {
+        $("#followerCheckbox").html(translations['everyone'])
+      }
       socket.emit('setRafflesFollowersOnly', this.followersOnly)
     },
     updateRaffle: function (raffle) {
@@ -207,9 +209,8 @@
 
       $("#rafflesWidgetKeyword").val(this.keyword)
 
-      $("#followerCheckbox").removeClass()
-      if (this.followersOnly) $("#followerCheckbox").addClass('btn btn-success')
-      else $("#followerCheckbox").addClass('btn btn-danger')
+      if (this.followersOnly) $("#followerCheckbox").html(translations['followers-only'])
+      else $("#followerCheckbox").html(translations['everyone'])
 
       if (!_.isNull(this.winner)) {
         this.updateWinnerTab()
