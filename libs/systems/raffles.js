@@ -76,8 +76,15 @@ Raffles.prototype.participate = function (self, sender) {
       if (item.followers) {
         const user = global.users.get(sender.username)
         participant.eligible = _.isUndefined(user.is.follower) ? false : user.is.follower
+      }
+
+      sender['message-type'] = 'whisper'
+      if (participant.eligible) {
+        global.commons.sendMessage(global.translate('raffle.participation.success'), sender)
         global.botDB.insert(participant)
-      } else { global.botDB.insert(participant) }
+      } else {
+        global.commons.sendMessage(global.translate('raffle.participation.failed'), sender)
+      }
     }
   })
 }
