@@ -28,7 +28,7 @@
     "nedb-promise": "^2.0.1",
     "request": "^2.81.0",
     "socket.io": "^1.7.3",
-    "tmi.js": "^1.1.2",
+    "tmi.js": "^1.2.0",
     "twitch-emoticons": "^1.5.0",
     "velocity-animate": "^1.5.0",
     "winston": "^2.3.1",
@@ -36,7 +36,7 @@
   },
   "scripts": {
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
-    "standard": "standard libs/* && standard libs/systems/* && standard libs/widgets/*",
+    "standard": "standard main.js && standard libs/* && standard libs/systems/* && standard libs/widgets/*",
     "test": "npm run standard && mocha",
     "migrate": "node --harmony-async-await ./migrate",
     "start": "npm run copy:dist && node --harmony-async-await ./main || true",

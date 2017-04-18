@@ -27,9 +27,11 @@ global.twitch = new Twitch()
 global.stats = new Stats()
 global.translate = require('./libs/translate')
 
-global.status = {'TMI': constants.DISCONNECTED,
-                 'API': constants.DISCONNECTED,
-                 'MOD': false}
+global.status = {
+  'TMI': constants.DISCONNECTED,
+  'API': constants.DISCONNECTED,
+  'MOD': false
+}
 
 require('./libs/permissions')
 
@@ -49,7 +51,7 @@ var options = {
 
 global.channelId = null
 
-global.client = new irc.client(options)
+global.client = new irc.Client(options)
 
 global.translate().then(function () {
   global.systems = require('auto-load')('./libs/systems/')
@@ -144,6 +146,6 @@ if (global.configuration.get().bot.debug) {
   global.log.warning('+------------------------------------+')
 }
 
-  process.on('unhandledRejection', function (reason, p) {
-    global.log.error('Possibly Unhandled Rejection', {promise: p, reason: reason})
-  })
+process.on('unhandledRejection', function (reason, p) {
+  global.log.error('Possibly Unhandled Rejection', {promise: p, reason: reason})
+})
