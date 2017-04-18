@@ -206,6 +206,7 @@
       this.keyword = !_.isNull(raffle) && raffle.keyword ? raffle.keyword : ''
       this.winner = !_.isNull(raffle) && raffle.winner ? raffle.winner : null
       this.timestamp = !_.isNull(raffle) && raffle.timestamp ? raffle.timestamp : null
+      $("#rafflesWidgetProduct").val(!_.isNull(raffle) && raffle.product ? raffle.product : '')
 
       $("#rafflesWidgetKeyword").val(this.keyword)
 
