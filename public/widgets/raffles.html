@@ -56,9 +56,21 @@
       </div>
 
       <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default btn-label" disabled="disabled" data-lang="eligible-to-enter"></button>
-        <button type="button" class="btn btn-primary" id="followerCheckbox" onclick="raffles.switchFollowersOnly()" data-lang="followers-only"></button>
+        <button type="button" style="min-width:30%" class="btn btn-default btn-label" disabled="disabled" data-lang="eligible-to-enter"></button>
+        <div style="position:absolute; left: 200px">
+          <button type="button" class="btn btn-primary" id="followerCheckbox" onclick="raffles.switchFollowersOnly()" data-lang="followers-only"></button>
+        </div>
       </div>
+
+      <div class="input-group" role="group" style="padding-top: 5px;">
+        <button type="button" style="min-width:30%" class="btn btn-default btn-label" disabled="disabled" data-lang="minimal-watched-time"></button>
+
+        <span style="position:absolute; left: 200px; display: inline-block; width: 100%">
+          <input type="text" class="form-control" id="rafflesWatchedTime" style="display: inline-block; width: 30%; border-left: 1px solid #ccc; float:none; position: relative;">
+          <span class="input-group-addon" data-lang="hours" style="display: inline-block; width: auto; height: auto; line-height: 20px; position: relative; left: -4px; top: -1px; border-right: 1px solid rgb(204, 204, 204)"></span>
+        </span>
+      </div>
+
       <button type="button" class="btn btn-disabled btn-block" style="margin-top: 20px;" id="raffleWidgetRoll" onclick="raffles.rollWinner()" data-lang="roll-a-winner"></button>
     </div> <!-- /GIVEAWAY -->
     <div role="tabpanel" class="tab-pane" id="raffles-winner">
@@ -189,7 +201,7 @@
     createRaffle: function (el) {
       this.keyword = $(el).val()
       if (this.keyword.trim().length === 0) this.removeRaffle()
-      socket.emit('createRaffle', {keyword: this.keyword, followers: this.followersOnly, product: $("#rafflesWidgetProduct").val()})
+      socket.emit('createRaffle', {keyword: this.keyword, followers: this.followersOnly, product: $("#rafflesWidgetProduct").val(), minWatchedTime: $("#rafflesWatchedTime").val()})
 
       $("#raffleWidgetRoll").removeClass()
       if (this.participants === 0) {
@@ -211,6 +223,8 @@
       this.winner = !_.isNull(raffle) && raffle.winner ? raffle.winner : null
       this.timestamp = !_.isNull(raffle) && raffle.timestamp ? raffle.timestamp : null
       $("#rafflesWidgetProduct").val(!_.isNull(raffle) && raffle.product ? raffle.product : '')
+      $("#rafflesWatchedTime").val(!_.isNull(raffle) && raffle.watchedTime ? raffle.watchedTime : 0)
+
 
       $("#rafflesWidgetKeyword").val(this.keyword)
 

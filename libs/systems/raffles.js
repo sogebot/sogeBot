@@ -7,12 +7,12 @@ var constants = require('../constants')
 var log = global.log
 
 /*
- * !raffle                                             - gets an info about raffle
- * !raffle open [raffle-keyword] [product] [followers] - open a new raffle with selected keyword for specified product (optional), for followers? (optional)
- * !raffle close                                       - close a raffle manually
- * !raffle pick                                        - pick or repick a winner of raffle
- * ![raffle-keyword]                                   - join a raffle
- * !set raffleAnnounceInterval [minutes]               - reannounce raffle interval each x minutes
+ * !raffle                                                      - gets an info about raffle
+ * !raffle open [raffle-keyword] [product] [time=#] [followers] - open a new raffle with selected keyword for specified product (optional), time=# (optional) - minimal watched time in minutes, for followers? (optional)
+ * !raffle close                                                - close a raffle manually
+ * !raffle pick                                                 - pick or repick a winner of raffle
+ * ![raffle-keyword]                                            - join a raffle
+ * !set raffleAnnounceInterval [minutes]                        - reannounce raffle interval each x minutes
  */
 
 function Raffles () {
@@ -20,6 +20,7 @@ function Raffles () {
     this.lastAnnounce = 0
     this.keyword = null
     this.product = null
+    this.minWatchedTime = 0
     this.followers = false
 
     global.parser.register(this, '!raffle pick', this.pick, constants.OWNER_ONLY)
@@ -53,7 +54,11 @@ function Raffles () {
             .replace('(product)', self.product)
         }
       }
-      global.commons.sendMessage(message, null)
+
+      if (self.minWatchedTime > 0) {
+        message += ' ' + global.translate('raffle.minWatchedTime').replace('(time)', self.minWatchedTime)
+      }
+      global.commons.sendMessage(message + '.', null)
     }, 10000)
 
     this.registerRaffleKeyword(this)
@@ -69,6 +74,7 @@ Raffles.prototype.registerRaffleKeyword = function (self) {
       self.keyword = item.keyword
       self.product = item.product
       self.followers = item.followers
+      self.minWatchedTime = item.minWatchedTime
     }
   })
 }
@@ -104,9 +110,14 @@ Raffles.prototype.participate = function (self, sender) {
         eligible: true,
         forced: false,
         username: sender.username }
+
+      const user = global.users.get(sender.username)
       if (item.followers) {
-        const user = global.users.get(sender.username)
         participant.eligible = _.isUndefined(user.is.follower) ? false : user.is.follower
+      }
+
+      if (participant.eligible && item.minWatchedTime > 0) {
+        participant.eligible = !_.isUndefined(user.time.watched) && (user.time.watched - 3600000) > 0
       }
 
       sender['message-type'] = 'whisper'
@@ -139,7 +150,11 @@ Raffles.prototype.info = function (self, sender) {
             .replace('(keyword)', item.keyword)
             .replace('(product)', item.product)
         }
-        global.commons.sendMessage(message, sender)
+
+        if (item.minWatchedTime > 0) {
+          message += ' ' + global.translate('raffle.minWatchedTime').replace('(time)', item.minWatchedTime)
+        }
+        global.commons.sendMessage(message + '.', sender)
       } else {
         global.commons.sendMessage(global.translate('raffle.info.closed'), sender)
       }
@@ -157,12 +172,22 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
       followers = true
     }
 
+    // check if time is set
+    let minWatchedTime = 0
+    let split = text.split(' ')
+    if (split[split.length - 1].startsWith('time=')) {
+      minWatchedTime = split[split.length - 1].replace('time=', '')
+      split.pop()
+      text = split.join(' ')
+    }
+
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)?/)
     var groups = { keyword: 1, product: 2 }
     var raffle = {
       keyword: parsed[groups.keyword],
       followers: followers,
       product: !_.isNil(parsed[groups.product]) ? parsed[groups.product] : '',
+      minWatchedTime: minWatchedTime,
       winner: null,
       locked: false
     }
@@ -183,7 +208,11 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
           .replace('(keyword)', raffle.keyword)
           .replace('(product)', raffle.product)
       }
-      global.commons.sendMessage(message, sender)
+
+      if (raffle.minWatchedTime > 0) {
+        message += ' ' + global.translate('raffle.minWatchedTime').replace('(time)', raffle.minWatchedTime)
+      }
+      global.commons.sendMessage(message + '.', sender)
 
       if (!dashboard) {
         // remove any participants - don't delete in dashboard

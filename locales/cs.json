@@ -222,6 +222,7 @@
     "followers-show": "followerů",
     "followers-size": "Velikost fontu",
     "custom-message": "Vlastní zpráva",
+    "minimal-watched-time": "Minimální čas sledování:",
     "widget-title-bets": "SÁZKY",
     "widget-title-chat": "CHAT",
     "widget-title-clips": "POSLEDNÍ KLIPY",
@@ -235,35 +236,36 @@
   "raffle": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych (value) minut",
     "announceCustomMessage": "Vlastni oznameni pro raffle nastaveno na `(value)`",
+    "minWatchedTime": "a take je potreba minimalne (time)h sledovat tento stream",
     "participation": {
       "success": "Ucastnis se prave probihajiciho raffle! Hodne stesti!",
       "failed": "Promin, ale nesplnujes podminky pro vstup do raffle! Pokud te zajimaji podminky, zaseptej mi !raffle"
     },
     "info": {
       "opened": {
-        "product": "(sender), raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem.",
-        "followers": "(sender), raffle je spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum.",
-        "both": "(sender), raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum.",
-        "none": "(sender), raffle je spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem."
+        "product": "(sender), raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
+        "followers": "(sender), raffle je spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
+        "both": "(sender), raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
+        "none": "(sender), raffle je spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem"
       },
       "closed": "(sender) Raffle je uzavrena, ale vitez jeste nebyl vybran!",
       "notRunning": "(sender) Zadne raffle neni momentalne otevreno!"
     },
     "open": {
-      "error": "(sender) Raffle neni otevreno! Pouzij: !raffle open [raffle-keyword] [timer(optional)] [followers(optional)]",
+      "error": "(sender) Raffle neni otevreno! Pouzij: !raffle open [raffle-keyword] [product(optional)] [time=#(optional)] [followers(optional)]",
       "running": "(sender) Raffle nyni jiz bezi! Keyword pro raffle je !(keyword)",
       "locked": "(sender) Raffle je nyni uzavreno! Vyber viteze pomoci !raffle pick",
       "ok": {
-        "product": "Nova raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem.",
-        "followers": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum.",
-        "both": "Nova raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum.",
-        "none": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem."
+        "product": "Nova raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
+        "followers": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
+        "both": "Nova raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
+        "none": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem"
       },
       "notice": {
-        "product": "Raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem.",
-        "followers": "Raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum.",
-        "both": "Raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum.",
-        "none": "Raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem."
+        "product": "Raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
+        "followers": "Raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
+        "both": "Raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
+        "none": "Raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem"
       }
     },
     "close": {
