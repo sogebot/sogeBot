@@ -7,12 +7,12 @@ var constants = require('../constants')
 var log = global.log
 
 /*
- * !raffle                                           - gets an info about raffle
- * !raffle open [raffle-keyword] [followers]         - open a new raffle with selected keyword, for followers? (optional)
- * !raffle close                                     - close a raffle manually
- * !raffle pick                                      - pick or repick a winner of raffle
- * ![raffle-keyword]                                 - join a raffle
- * !set raffleAnnounceInterval [minutes]             - reannounce raffle interval each x minutes
+ * !raffle                                             - gets an info about raffle
+ * !raffle open [raffle-keyword] [product] [followers] - open a new raffle with selected keyword for specified product (optional), for followers? (optional)
+ * !raffle close                                       - close a raffle manually
+ * !raffle pick                                        - pick or repick a winner of raffle
+ * ![raffle-keyword]                                   - join a raffle
+ * !set raffleAnnounceInterval [minutes]               - reannounce raffle interval each x minutes
  */
 
 function Raffles () {
@@ -101,21 +101,42 @@ Raffles.prototype.info = function (self, sender) {
 
 Raffles.prototype.open = function (self, sender, text, dashboard = false) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ?(followers)?/)
-    var groups = { keyword: 1, followers: 2 }
+    let followers = false
+    if (text.indexOf('followers') >= 0) {
+      text = text.replace('followers', '').trim()
+      followers = true
+    }
+
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)?/)
+    var groups = { keyword: 1, product: 2 }
     var raffle = {
       keyword: parsed[groups.keyword],
-      followers: parsed[groups.followers] != null,
+      followers: followers,
+      product: !_.isNil(parsed[groups.product]) ? parsed[groups.product] : '',
       winner: null,
       locked: false
     }
 
     global.botDB.update({_id: 'raffle'}, {$set: raffle}, {upsert: true}, function (err) {
       if (err) return log.error(err, { fnc: 'Raffles.prototype.open' })
-      if (!dashboard) {
-        global.commons.sendMessage(global.translate('raffle.open.ok').replace('(keyword)', raffle.keyword), sender)
 
-      // remove any participants - don't delete in dashboard
+      let message = global.translate('raffle.open.ok.none').replace('(keyword)', raffle.keyword)
+      if (raffle.followers && raffle.product) {
+        message = global.translate('raffle.open.ok.both')
+          .replace('(keyword)', raffle.keyword)
+          .replace('(product)', raffle.product)
+      } else if (raffle.followers && !raffle.product) {
+        message = global.translate('raffle.open.ok.followers')
+          .replace('(keyword)', raffle.keyword)
+      } else if (!raffle.followers && raffle.product) {
+        message = global.translate('raffle.open.ok.product')
+          .replace('(keyword)', raffle.keyword)
+          .replace('(product)', raffle.product)
+      }
+      global.commons.sendMessage(message, sender)
+
+      if (!dashboard) {
+        // remove any participants - don't delete in dashboard
         global.botDB.remove({ $where: function () { return this._id.startsWith('raffle_participant_') } }, { multi: true })
       }
 

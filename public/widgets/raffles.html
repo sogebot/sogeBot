@@ -39,6 +39,14 @@
 
     <div role="tabpanel" class="tab-pane active" id="raffles-giveaway">
       <div class="input-group">
+        <span class="input-group-addon">Product <small>(optional)</small></span>
+        <input type="text" class="form-control" placeholder="Enter product..." id="rafflesWidgetProduct">
+        <span class="input-group-btn">
+          <button class="btn btn-warning" type="button" title="Clear product" onclick="raffles.clearProduct()"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+        </span>
+      </div>
+
+      <div class="input-group">
         <span class="input-group-addon">!</span>
         <input type="text" class="form-control" placeholder="Enter keyword..." id="rafflesWidgetKeyword" onkeyup="raffles.createRaffle(this)">
         <span class="input-group-btn">
@@ -171,10 +179,13 @@
       $("#raffleWidgetRoll").removeClass()
       $("#raffleWidgetRoll").addClass('btn btn-disabled btn-block')
     },
+    clearProduct: function () {
+      $("#rafflesWidgetProduct").val('')
+    },
     createRaffle: function (el) {
       this.keyword = $(el).val()
       if (this.keyword.trim().length === 0) this.removeRaffle()
-      socket.emit('createRaffle', {keyword: this.keyword, followers: this.followersOnly})
+      socket.emit('createRaffle', {keyword: this.keyword, followers: this.followersOnly, product: $("#rafflesWidgetProduct").val()})
 
       $("#raffleWidgetRoll").removeClass()
       if (this.participants === 0) {
