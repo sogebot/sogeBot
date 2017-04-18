@@ -91,6 +91,10 @@
         <input type="text" class="form-control" id="raffleAnnounce">
         <span class="input-group-addon" data-lang="minutes"></span>
       </div>
+        <div class="input-group">
+          <span class="input-group-addon" data-lang="custom-message"></span>
+          <input type="text" class="form-control" id="raffleAnnounceCustomMessage" placeholder="Default: empty; usable filters: (product), (keyword)">
+        </div>
       <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('raffles')" style="margin-top: 20px;" data-lang="remove-widget"></button>
     </div> <!-- /SETTINGS -->
 
@@ -290,11 +294,21 @@
     socket.emit('saveConfiguration', data)
   })
 
+  var $input2 = $('#raffleAnnounceCustomMessage')
+  $input2.off()
+  $input2.on('focusout', function() {
+    var value = $input2.val()
+    var data = {}
+    data['raffleAnnounceCustomMessage'] = value
+    socket.emit('saveConfiguration', data)
+  })
+
   socket.emit('getRafflesConfiguration')
   socket.off('rafflesConfiguration')
   socket.on('rafflesConfiguration', function(data) {
     $("#rafflesWidgetSearch").attr('placeholder', translations['search'] + '...')
     $("#rafflesWidgetKeyword").attr('placeholder', translations['enter-keyword'] + '...')
     $("#raffleAnnounce").val(data.raffleAnnounceInterval)
+    $("#raffleAnnounceCustomMessage").val(data.raffleAnnounceCustomMessage)
   })
 </script>

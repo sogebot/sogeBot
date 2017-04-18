@@ -35,7 +35,8 @@ function RafflesWidget () {
 
 RafflesWidget.prototype.sendConfiguration = function (self, socket) {
   socket.emit('rafflesConfiguration', {
-    raffleAnnounceInterval: global.configuration.getValue('raffleAnnounceInterval')
+    raffleAnnounceInterval: global.configuration.getValue('raffleAnnounceInterval'),
+    raffleAnnounceCustomMessage: global.configuration.getValue('raffleAnnounceCustomMessage')
   })
 }
 

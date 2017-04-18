@@ -221,6 +221,7 @@
     "followers-show-number": "Show",
     "followers-show": "followers",
     "followers-size": "Font size",
+    "custom-message": "Custom message",
     "widget-title-bets": "BETS",
     "widget-title-chat": "CHAT",
     "widget-title-clips": "LATEST CLIPS",
@@ -233,6 +234,7 @@
   },
   "raffle": {
     "announceInterval": "Opened raffles will be announced every (value) minute",
+    "announceCustomMessage": "Raffle custom announce message set to `(value)`",
     "participation": {
       "success": "You just entered in current raffle! Good luck!",
       "failed": "Sorry, you are not eligible to enter the raffle! If you want to know conditions to enter, whisper me !raffle"
@@ -255,7 +257,12 @@
         "both": "New raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate.",
         "none": "New raffle is opened. To enter type !(keyword). Everyone can participate."
       },
-      "notice": "Raffle {raffle.commons.opened}"
+      "notice": {
+        "product": "Raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate.",
+        "followers": "Raffle is opened. To enter type !(keyword). Only followers can participate.",
+        "both": "Raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate.",
+        "none": "Raffle is opened. To enter type !(keyword). Everyone can participate."
+      }
     },
     "close": {
       "ok": "Current raffle was closed! You cannot participate anymore!",
