@@ -48,10 +48,10 @@
 
       <div class="input-group">
         <span class="input-group-addon">!</span>
-        <input type="text" class="form-control" placeholder="Enter keyword..." id="rafflesWidgetKeyword" onkeyup="raffles.createRaffle(this)">
+        <input type="text" class="form-control" placeholder="Enter keyword..." id="rafflesWidgetKeyword">
         <span class="input-group-btn">
           <button class="btn btn-warning" type="button" title="Clear participants" onclick="raffles.clearParticipants()"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
-          <button class="btn btn-danger" type="button" title="Remove raffle" onclick="raffles.removeRaffle()"><i class="fa fa-close" aria-hidden="true"></i></button>
+          <button class="btn btn-danger" id="toggleButton" type="button" title="" onclick="raffles.toggleRaffle()"><i class="fa fa-close" aria-hidden="true"></i></button>
         </span>
       </div>
 
@@ -179,11 +179,23 @@
       socket.emit('rafflesRollWinner')
       this.winner = null
     },
+    toggleRaffle: function () {
+      let classes = $("#toggleButton i").attr('class')
+      if (classes.indexOf('fa-plus') >= 0) {
+        raffles.createRaffle()
+      } else {
+        raffles.removeRaffle()
+      }
+    },
     removeRaffle: function () {
       socket.emit('removeRaffle')
       $('#raffles-participants-count').text(0)
       $("#rafflesWidgetKeyword").val("")
       this.keyword = ''
+
+      $('#toggleButton').removeClass().addClass('btn btn-success')
+      $('#toggleButton').attr('title', 'Create new raffle')
+      $('#toggleButton i').removeClass().addClass('fa fa-plus')
 
       $("#raffleWidgetRoll").removeClass()
       $("#raffleWidgetRoll").addClass('btn btn-disabled btn-block')
@@ -198,10 +210,16 @@
     clearProduct: function () {
       $("#rafflesWidgetProduct").val('')
     },
-    createRaffle: function (el) {
-      this.keyword = $(el).val()
-      if (this.keyword.trim().length === 0) this.removeRaffle()
-      socket.emit('createRaffle', {keyword: this.keyword, followers: this.followersOnly, product: $("#rafflesWidgetProduct").val(), minWatchedTime: $("#rafflesWatchedTime").val()})
+    createRaffle: function () {
+      if ($("#rafflesWidgetKeyword").val().length === 0) {
+        $("#rafflesWidgetKeyword").parent().addClass('has-error')
+      } else {
+        $("#rafflesWidgetKeyword").parent().removeClass().addClass('input-group')
+        $('#toggleButton').removeClass().addClass('btn btn-danger')
+        $('#toggleButton').attr('title', 'Remove raffle')
+        $('#toggleButton i').removeClass().addClass('fa fa-close')
+        socket.emit('createRaffle', { keyword: $("#rafflesWidgetKeyword").val(), followers: this.followersOnly, product: $("#rafflesWidgetProduct").val(), minWatchedTime: $("#rafflesWatchedTime").val()})
+      }
 
       $("#raffleWidgetRoll").removeClass()
       if (this.participants === 0) {
@@ -218,13 +236,24 @@
       socket.emit('setRafflesFollowersOnly', this.followersOnly)
     },
     updateRaffle: function (raffle) {
+      $('#toggleButton').removeClass()
+      $('#toggleButton i').removeClass()
+      if (_.isNull(raffle)) {
+        $('#toggleButton').addClass('btn btn-success')
+        $('#toggleButton').attr('title', 'Create new raffle')
+        $('#toggleButton i').addClass('fa fa-plus')
+      } else {
+        $('#toggleButton').addClass('btn btn-danger')
+        $('#toggleButton').attr('title', 'Remove raffle')
+        $('#toggleButton i').addClass('fa fa-close')
+      }
+
       this.followersOnly = !_.isNull(raffle) && raffle.followers
       this.keyword = !_.isNull(raffle) && raffle.keyword ? raffle.keyword : ''
       this.winner = !_.isNull(raffle) && raffle.winner ? raffle.winner : null
       this.timestamp = !_.isNull(raffle) && raffle.timestamp ? raffle.timestamp : null
       $("#rafflesWidgetProduct").val(!_.isNull(raffle) && raffle.product ? raffle.product : '')
       $("#rafflesWatchedTime").val(!_.isNull(raffle) && raffle.watchedTime ? raffle.watchedTime : 0)
-
 
       $("#rafflesWidgetKeyword").val(this.keyword)
 
