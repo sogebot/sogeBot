@@ -232,9 +232,6 @@
   },
   "raffle": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych (value) minut",
-    "commons": {
-      "opened": "je otevrena! Pouzij !(keyword) aby ses zucastnil!"
-    },
     "info": {
       "opened": "(sender) Raffle {raffle.commons.opened}",
       "closed": "(sender) Raffle je uzavrena, ale vitez jeste nebyl vybran!",
@@ -244,7 +241,12 @@
       "error": "(sender) Raffle neni otevreno! Pouzij: !raffle open [raffle-keyword] [timer(optional)] [followers(optional)]",
       "running": "(sender) Raffle nyni jiz bezi! Keyword pro raffle je !(keyword)",
       "locked": "(sender) Raffle je nyni uzavreno! Vyber viteze pomoci !raffle pick",
-      "ok": "Nova raffle {raffle.commons.opened}",
+      "ok": {
+        "product": "Nova raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem.",
+        "followers": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum.",
+        "both": "Nova raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum.",
+        "none": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem."
+      },
       "notice": "Raffle {raffle.commons.opened}"
     },
     "close": {

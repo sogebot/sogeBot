@@ -232,9 +232,6 @@
   },
   "raffle": {
     "announceInterval": "Opened raffles will be announced every (value) minute",
-    "commons": {
-      "opened": "is opened! Use !(keyword) to join raffle!"
-    },
     "info": {
       "opened": "(sender) Raffle {raffle.commons.opened}",
       "closed": "(sender) Raffle is closed, but winner is not picked yet!",
@@ -242,7 +239,12 @@
     },
     "open": {
       "error": "(sender) Raffle was not opened! Use: !raffle open [raffle-keyword] [followers(optional)]",
-      "ok": "New raffle {raffle.commons.opened}",
+      "ok": {
+        "product": "New raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate.",
+        "followers": "New raffle is opened. To enter type !(keyword). Only followers can participate.",
+        "both": "New raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate.",
+        "none": "New raffle is opened. To enter type !(keyword). Everyone can participate."
+      },
       "notice": "Raffle {raffle.commons.opened}"
     },
     "close": {
