@@ -222,6 +222,7 @@
     "followers-show": "followers",
     "followers-size": "Font size",
     "custom-message": "Custom message",
+    "minimal-watched-time": "Minimal watched time:",
     "widget-title-bets": "BETS",
     "widget-title-chat": "CHAT",
     "widget-title-clips": "LATEST CLIPS",
@@ -235,33 +236,34 @@
   "raffle": {
     "announceInterval": "Opened raffles will be announced every (value) minute",
     "announceCustomMessage": "Raffle custom announce message set to `(value)`",
+    "minWatchedTime": "and you need to have at least (time) watched hours to parcitipate",
     "participation": {
       "success": "You just entered in current raffle! Good luck!",
       "failed": "Sorry, you are not eligible to enter the raffle! If you want to know conditions to enter, whisper me !raffle"
     },
     "info": {
       "opened": {
-        "product": "(sender), raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate.",
-        "followers": "(sender), raffle is opened. To enter type !(keyword). Only followers can participate.",
-        "both": "(sender), raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate.",
-        "none": "(sender), raffle is opened. To enter type !(keyword). Everyone can participate."
+        "product": "(sender), raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate",
+        "followers": "(sender), raffle is opened. To enter type !(keyword). Only followers can participate",
+        "both": "(sender), raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate",
+        "none": "(sender), raffle is opened. To enter type !(keyword). Everyone can participate"
       },
       "closed": "(sender) Raffle is closed, but winner is not picked yet!",
       "notRunning": "(sender) No raffle is currently opened!"
     },
     "open": {
-      "error": "(sender) Raffle was not opened! Use: !raffle open [raffle-keyword] [followers(optional)]",
+      "error": "(sender) Raffle was not opened! Use: !raffle open [raffle-keyword] [product(optional)] [time=#(optional)] [followers(optional)]",
       "ok": {
-        "product": "New raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate.",
-        "followers": "New raffle is opened. To enter type !(keyword). Only followers can participate.",
-        "both": "New raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate.",
-        "none": "New raffle is opened. To enter type !(keyword). Everyone can participate."
+        "product": "New raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate",
+        "followers": "New raffle is opened. To enter type !(keyword). Only followers can participate",
+        "both": "New raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate",
+        "none": "New raffle is opened. To enter type !(keyword). Everyone can participate"
       },
       "notice": {
-        "product": "Raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate.",
-        "followers": "Raffle is opened. To enter type !(keyword). Only followers can participate.",
-        "both": "Raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate.",
-        "none": "Raffle is opened. To enter type !(keyword). Everyone can participate."
+        "product": "Raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate",
+        "followers": "Raffle is opened. To enter type !(keyword). Only followers can participate",
+        "both": "Raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate",
+        "none": "Raffle is opened. To enter type !(keyword). Everyone can participate"
       }
     },
     "close": {
