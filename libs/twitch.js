@@ -235,7 +235,7 @@ Twitch.prototype.isOnline = function () {
 
 Twitch.prototype.getTime = function (time, isChat) {
   var now, days, hours, minutes, seconds
-  now = _.isNull(time) ? {days: 0, hours: 0, minutes: 0, seconds: 0} : moment().preciseDiff(time, true)
+  now = _.isNull(time) || !time ? {days: 0, hours: 0, minutes: 0, seconds: 0} : moment().preciseDiff(time, true)
   if (isChat) {
     days = now.days > 0 ? now.days + 'd' : ''
     hours = now.hours > 0 ? now.hours + 'h' : ''
