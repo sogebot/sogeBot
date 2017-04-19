@@ -5,7 +5,7 @@
     "disabled": "vypnuto",
     "usage": "Pouziti",
     "online": "Stream je online (time)",
-    "offline": "Stream je prave offline!",
+    "offline": "Stream je offline (time)",
     "lang-selected": "Bot je nyni prepnuty do cestiny",
     "command-parse": "Promin, (sender), ale tento prikaz neni spravne, pouzij",
     "error": "Promin, (sender), ale neco se pokazilo!",

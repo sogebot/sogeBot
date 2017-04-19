@@ -24,7 +24,10 @@ function Twitch () {
     followers: []
   }
 
-  this.whenOnline = null
+  this.when = {
+    online: null,
+    offline: null
+  }
 
   this.cGamesTitles = {} // cached Games and Titles
   global.watcher.watch(this, 'cGamesTitles', this._save)
@@ -54,12 +57,14 @@ function Twitch () {
         }
         self.saveStream(body.stream)
         self.isOnline = true
+        self.when.offline = null
       } else {
         if (self.isOnline && self.curRetries < self.maxRetries) { self.curRetries = self.curRetries + 1; return } // we want to check if stream is _REALLY_ offline
         // reset everything
         self.curRetries = 0
         self.isOnline = false
-        self.whenOnline = null
+        if (_.isNil(self.when.offline)) self.when.offline = new Date().getTime()
+        self.when.online = null
       }
     })
 
@@ -178,13 +183,13 @@ Twitch.prototype._save = function (self) {
 
 Twitch.prototype.saveStream = function (stream) {
   this.currentViewers = stream.viewers
-  this.whenOnline = stream.created_at
+  this.when.online = stream.created_at
   this.maxViewers = this.maxViewers < this.currentViewers ? this.currentViewers : this.maxViewers
 
   var messages = global.parser.linesParsed - this.chatMessagesAtStart
   global.stats.save({
     timestamp: new Date().getTime(),
-    whenOnline: this.whenOnline,
+    whenOnline: this.when.online,
     currentViewers: this.currentViewers,
     chatMessages: messages,
     currentFollowers: this.currentFollowers,
@@ -206,7 +211,7 @@ Twitch.prototype.webPanel = function () {
 Twitch.prototype.sendStats = function (self, socket) {
   var messages = self.isOnline ? global.parser.linesParsed - self.chatMessagesAtStart : 0
   var data = {
-    uptime: self.getTime(false),
+    uptime: self.getTime(self.when.online, false),
     currentViewers: self.currentViewers,
     maxViewers: self.maxViewers,
     chatMessages: messages > 20000 ? (messages / 1000) + 'k' : messages,
@@ -228,9 +233,9 @@ Twitch.prototype.isOnline = function () {
   return this.isOnline
 }
 
-Twitch.prototype.getTime = function (isChat) {
+Twitch.prototype.getTime = function (time, isChat) {
   var now, days, hours, minutes, seconds
-  now = _.isNull(this.whenOnline) ? {days: 0, hours: 0, minutes: 0, seconds: 0} : moment().preciseDiff(this.whenOnline, true)
+  now = _.isNull(time) ? {days: 0, hours: 0, minutes: 0, seconds: 0} : moment().preciseDiff(time, true)
   if (isChat) {
     days = now.days > 0 ? now.days + 'd' : ''
     hours = now.hours > 0 ? now.hours + 'h' : ''
@@ -250,13 +255,13 @@ Twitch.prototype.getTime = function (isChat) {
 }
 
 Twitch.prototype.uptime = function (self, sender) {
-  const time = self.getTime(true)
-  global.commons.sendMessage(self.isOnline ? global.translate('core.online')
+  const time = self.getTime(self.isOnline ? self.when.online : self.when.offline, true)
+  global.commons.sendMessage(global.translate(self.isOnline ? 'core.online' : 'core.offline')
     .replace('(time)', global.configuration.getValue('uptimeFormat')
     .replace('(days)', time.days)
     .replace('(hours)', time.hours)
     .replace('(minutes)', time.minutes)
-    .replace('(seconds)', time.seconds)) : global.translate('core.offline'), sender)
+    .replace('(seconds)', time.seconds)), sender)
 }
 
 Twitch.prototype.lastseenUpdate = function (self, id, sender, text) {
