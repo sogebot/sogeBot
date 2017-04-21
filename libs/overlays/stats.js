@@ -1,15 +1,5 @@
 'use strict'
 
-// 3rdparty libraries
-const _ = require('lodash')
-const emoticons = require('twitch-emoticons')
-
-// bot libraries
-const constants = require('../constants')
-
-// TODO:
-// implement explosions on events
-
 function Stats () {
   global.panel.socketListening(this, 'overlay.stats.get', this._get)
 }

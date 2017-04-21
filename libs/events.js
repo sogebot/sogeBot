@@ -46,6 +46,10 @@ function Events () {
       }
       global.panel.io.emit('play-sound', attr.sound)
     },
+    'emote-explosion': function (attr) {
+      // attr.emotes is string with emotes to show
+      global.overlays.emotes.explode(global.overlays.emotes, global.panel.io, attr.emotes.split(' '))
+    },
     'log': function (attr) {
       let message = attr.message.replace('(username)', attr.username)
       _.each(message.match(/\((\w+)\)/gi), function (match) {
@@ -80,6 +84,57 @@ Events.prototype._webpanel = function (self) {
 
   global.panel.socketListening(this, 'events.get', this._send)
   global.panel.socketListening(this, 'events.new', this._new)
+  global.panel.socketListening(this, 'events.delete', this._delete)
+}
+
+Events.prototype._delete = function (self, socket, data) {
+  if (data.definition) {
+    _.each(self.events[data.event], function (event, index) {
+      let keys = Object.keys(event[0])
+      for (let i = 0; i < keys.length; i++) {
+        if (event[0][keys[i]] !== data.definition[keys[i]] && keys[i] !== 'tTriggered' && keys[i] !== 'tSent') return true
+      }
+
+      let events = []
+      _.each(self.events[data.event], function (event, index2) {
+        if (index !== index2) {
+          events.push(event)
+          return true
+        }
+
+        let filtered = _.filter(event, function (o) {
+          if (o.definition) return true
+
+          let keys = Object.keys(o)
+          let isSame = true
+          for (let i = 0; i < keys.length; i++) {
+            // exclude message and reset as they are created in source
+            if (o[keys[i]] !== data[keys[i]] && !_.isUndefined(data[keys[i]])) isSame = false
+          }
+          return !isSame
+        })
+        // we don't want to store only definition
+        if (filtered.length > 1) events.push(filtered)
+      })
+      self.events[data.event] = events
+    })
+  } else {
+    let events = []
+    _.each(self.events[data.event], function (event) {
+      let filtered = _.filter(event, function (o) {
+        let keys = Object.keys(o)
+        let isSame = true
+        for (let i = 0; i < keys.length; i++) {
+          if (o[keys[i]] !== data[keys[i]] && !_.isUndefined(data[keys[i]])) isSame = false
+        }
+        return !isSame
+      })
+      if (filtered.length > 0) events.push(filtered)
+    })
+    self.events[data.event] = events
+  }
+  self._save(self)
+  self._send(self, socket)
 }
 
 Events.prototype._send = function (self, socket) {
@@ -101,19 +156,21 @@ Events.prototype._send = function (self, socket) {
 Events.prototype._new = function (self, socket, data) {
   let event = []
   let operation = {}
+  let isAdd = -1
 
-  if (data.definition.command || data.definition.count || data.definition.timestamp) {
+  if (!_.isNil(data.definition)) {
     let definition = { definition: true }
     if (data.event === 'command-send-x-times') {
       definition.command = data.definition.command
       definition.tCount = data.definition.count
       definition.tTimestamp = data.definition.timestamp
-      definition.tTriggered = new Date().getTime()
+      definition.tSent = 0
+      definition.tTriggered = new Date().getTime() - (data.definition.timestamp * 1000)
     }
 
     if (data.event === 'number-of-viewers-is-at-least-x') {
       definition.viewers = data.definition.count
-      definition.tTriggered = data.definition.timestamp === 0 ? false : new Date().getTime()
+      definition.tTriggered = data.definition.timestamp === 0 ? false : new Date().getTime() - (data.definition.timestamp * 1000)
       definition.tTimestamp = data.definition.timestamp
     }
 
@@ -121,15 +178,26 @@ Events.prototype._new = function (self, socket, data) {
       definition.tTriggered = false
       definition.minutes = data.count
     }
-    event.push(definition)
-  }
 
+    _.each(self.events[data.event], function (aEvent, index) {
+      let keys = Object.keys(aEvent[0])
+      // re-do definition
+      for (let i = 0; i < keys.length; i++) {
+        if (aEvent[0][keys[i]] !== definition[keys[i]] && keys[i] !== 'tTriggered' && keys[i] !== 'tSent') return true
+      }
+      isAdd = index
+      event = self.events[data.event][index]
+    })
+    if (isAdd === -1) event.push(definition)
+  }
   _.each(data.operation, function (v, i) {
     if (v.length === 0) return
     operation[i] = v
   })
   event.push(operation)
-  self.events[data.event].push(event)
+
+  if (isAdd > -1) self.events[data.event][isAdd] = event
+  else self.events[data.event].push(event)
   self._save(self)
   self._send(self, socket)
 }
@@ -175,7 +243,7 @@ Events.prototype.fire = function (event, attr) {
           case 'command-send-x-times':
             if (attr.message.startsWith(operation.command)) {
               operation.tSent += 1
-              if (operation.tSent >= operation.tCount && new Date().getTime() - operation.tTriggered >= operation.tTimestamp) {
+              if (operation.tSent >= operation.tCount && new Date().getTime() - operation.tTriggered >= operation.tTimestamp * 1000) {
                 operation.tSent = 0
                 operation.tTriggered = new Date().getTime()
                 return true
@@ -199,7 +267,7 @@ Events.prototype.fire = function (event, attr) {
             }
 
             if (_.isFinite(operation.tTimestamp) && parseInt(operation.tTimestamp, 10) > 0) {
-              if (global.twitch.currentViewers <= operation.viewers && new Date().getTime() - operation.tTriggered >= operation.tTimestamp) {
+              if (global.twitch.currentViewers <= operation.viewers && new Date().getTime() - operation.tTriggered >= operation.tTimestamp * 1000) {
                 attr.tTriggered = new Date().getTime()
                 return true
               }

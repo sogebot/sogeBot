@@ -256,7 +256,9 @@
     "count": "počet",
     "timestamp": "timestamp",
     "message": "zpráva",
-    "sound": "zvuk"
+    "sound": "zvuk",
+    "emote-explosion": "exploze smajlíků",
+    "emotes": "smajlíci"
   },
   "raffle": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych (value) minut",

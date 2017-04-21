@@ -253,6 +253,10 @@ a.active {
   padding: 5px;
 }
 
+.widget .title:first-letter {
+    text-transform: uppercase;
+}
+
 .widget .title small {
   font-size: 50%;
 }
@@ -589,12 +593,21 @@ a.soundboard-list-group-item span {
   padding: 10px;
   font-weight: lighter;
   font-family: 'Catamaran', sans-serif;
-  padding-top: 20px;
+}
+
+.form-chainops .form-group {
+  padding-top: 5px;
+}
+
+.form-chainops br + .form-group {
+  padding-left: 20px;
+}
+
+.form-chainops .form-group:first-child {
+  padding-top: 0;
 }
 
 .form-chainops label {
-  position: absolute;
-  top: 60px;
   font-size: 20px;
   color:white;
   font-variant: small-caps;
@@ -642,6 +655,7 @@ a.soundboard-list-group-item span {
 #events-current div > div > div {
   display: block;
   padding-left: 20px;
+  padding-top: 5px;
   padding-bottom: 0;
 }
 
@@ -654,8 +668,17 @@ a.soundboard-list-group-item span {
 }
 
 #events-current .operation {
-  width: 86%;
+  width: 100%;
   display: inline-block;
+
+}
+
+.operation + .operation {
+  border-top: 1px dotted rgb(200,200,200)
+}
+
+#events-current > div:nth-child(2n) {
+  background-color: rgb(250, 250, 250);
 }
 
 .action-danger > a {

@@ -256,7 +256,9 @@
     "count": "count",
     "timestamp": "timestamp",
     "message": "message",
-    "sound": "sound"
+    "sound": "sound",
+    "emote-explosion": "emote explosion",
+    "emotes": "emotes"
   },
   "raffle": {
     "announceInterval": "Opened raffles will be announced every (value) minute",

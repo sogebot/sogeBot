@@ -35,6 +35,8 @@
         <input id="timestamp" class="form-control" placeholder="activate every x seconds">
       </div>
 
+      <br>
+
       <div class="form-group" id="operationsGroup">
         <label for="Operations" data-lang="operation"></label>
         <select id="operations-list" class="form-control"></select>
@@ -53,6 +55,11 @@
       <div class="form-group" id="soundGroup" style="display: none">
         <label for="sound" data-lang="sound"></label>
         <input id="sound" class="form-control" placeholder="link or soundboard name">
+      </div>
+
+      <div class="form-group" id="emotesGroup" style="display: none">
+        <label for="emotes" data-lang="emotes"></label>
+        <input id="emotes" class="form-control" placeholder="Kappa :) purpleHeart">
       </div>
 
       <button type="button" class="btn btn-success pull-right" data-lang="create-a-new-event-listener" onclick="newEvent()"></button>
@@ -122,18 +129,18 @@ $('#events-list').on('change', function(ev) {
       $('#viewersInfo').css('display', 'block')
       break
     case 'command-send-x-times':
-      $('#commandGroup').css('display', 'inline')
-      $('#countGroup').css('display', 'inline')
+      $('#commandGroup').css('display', 'inline-block')
+      $('#countGroup').css('display', 'inline-block')
       $('#count').attr('placeholder', 'commands to activate')
       $('#timestampGroup').css('display', 'inline')
       break
     case 'number-of-viewers-is-at-least-x':
-      $('#countGroup').css('display', 'inline')
+      $('#countGroup').css('display', 'inline-block')
       $('#count').attr('placeholder', 'viewers to activate')
-      $('#timestampGroup').css('display', 'inline')
+      $('#timestampGroup').css('display', 'inline-block')
       break
     case 'stream-is-running-x-minutes':
-      $('#countGroup').css('display', 'inline')
+      $('#countGroup').css('display', 'inline-block')
       $('#count').attr('placeholder', 'minutes to activate')
       break
   }
@@ -143,10 +150,12 @@ $('#operations-list').on('change', function(ev) {
   $('#messageGroup').css('display', 'none')
   $('#command2Group').css('display', 'none')
   $('#soundGroup').css('display', 'none')
+  $('#emotesGroup').css('display', 'none')
 
   $('#message').val('')
   $('#sound').val('')
-  $('#command').val('')
+  $('#command2').val('')
+  $('#emotes').val('')
 
   switch (ev.currentTarget.value) {
     case 'send-chat-message':
@@ -158,6 +167,9 @@ $('#operations-list').on('change', function(ev) {
       break
     case 'play-sound':
       $('#soundGroup').css('display', 'inline')
+      break
+    case 'emote-explosion':
+      $('#emotesGroup').css('display', 'inline')
   }
 })
 
@@ -168,15 +180,36 @@ var newEvent = function () {
       name: $('#operations-list').val(),
       send: $('#message').val(),
       sound: $('#sound').val(),
-      command: $('#command').val()
+      command: $('#command2').val(),
+      emotes: $('#emotes').val()
     },
     definition: {
-      command: $('#command2').val().length > 0 ? $('#command').val() : null,
+      command: $('#command').val().length > 0 ? $('#command').val() : null,
       count: $('#count').val().length > 0 ? $('#count').val() : null,
       timestamp: $('#timestamp').val().length > 0 ? $('#timestamp').val() : null
     },
   }
+  switch($('#events-list').val()) {
+    case 'user-joined-channel':
+    case 'user-parted-channel':
+    case 'follow':
+    case 'unfollow':
+    case 'subscription':
+    case 'resub':
+    case 'stream-started':
+    case 'stream-stopped':
+    case 'cheer':
+    case 'clearchat':
+    case 'action':
+    case 'ban':
+    case 'hosting':
+    case 'mod':
+    case 'timeout':
+      delete data.definition
+  }
   socket.emit('events.new', data)
+
+  // TODO: reset form?
 }
 
 socket.off('events')
@@ -188,10 +221,8 @@ socket.on('events', function(data) {
   _.each(data.events, function (o, k) {
     $('#events-list').append(
       $('<option></option').attr('value', k).text(translations[k]))
-
     if (o.length) {
       let div_part
-      let div_op = $('<div class="operation"></div>')
       let div_main = $('<div id="' + k + '"></div>')
 
       div_part = $('<div style="min-width:14%"></div>')
@@ -199,28 +230,90 @@ socket.on('events', function(data) {
         .append($('<div></div>').text(translations[k]))
       div_main.append(div_part)
 
+      let firstDefinition = true
       _.each(o, function (obj) {
-        let div_part2 = $('<div></div>')
+        let definition = null
         _.each(obj, function (operation) {
-          div_part = $('<div style="min-width:14%" ></div>')
-            .append($('<label></label>').text(translations['operation']))
-            .append($('<div></div>').text(translations[operation.name]))
-          div_part2.append(div_part)
+          let div_op = $('<div class="operation" data-event="' + k + '"></div>')
+          // is definition
+          let div_def
+          if (operation.definition) {
+            definition = operation
+            if (!firstDefinition) {
+              div_def = $('<div class="definition" style="position:relative; left: 200px;"></div>')
+            } else {
+              div_def = $('<div class="definition" style="position:absolute; left: 220px;"></div>')
+            }
+            firstDefinition = false
 
-          switch (operation.name) {
-            case 'send-chat-message':
-            case 'send-whisper':
-              div_part = $('<div></div>')
-                .append($('<label></label>').text(translations['message']))
-                .append($('<div></div>').text(operation.send))
-              break;
+            if (operation.command) {
+              div_part = $('<div style="min-width:100px;display:inline-block" ></div>')
+                .append($('<label></label>').text(translations['command']))
+                .append($('<div style="display:block;"></div>').text(operation.command))
+              div_def.append(div_part)
+            }
+              if (operation.tCount) {
+                div_part = $('<div style="min-width:100px;display:inline-block" ></div>')
+                  .append($('<label></label>').text(translations['count']))
+                  .append($('<div style="display:block;"></div>').text(operation.tCount))
+                div_def.append(div_part)
+              }
+            if (operation.viewers) {
+              div_part = $('<div style="min-width:100px;display:inline-block" ></div>')
+                .append($('<label></label>').text(translations['count']))
+                .append($('<div style="display:block;"></div>').text(operation.viewers))
+              div_def.append(div_part)
+            }
+            if (operation.tTimestamp) {
+              div_part = $('<div style="min-width:100px;display:inline-block" ></div>')
+                .append($('<label></label>').text(translations['timestamp']))
+                .append($('<div style="display:block"></div>').text(operation.tTimestamp))
+              div_def.append(div_part)
+            }
+            div_main.append(div_def)
+          } else {
+            div_op.data('name', operation.name)
+            div_part = $('<div></div>')
+              .append($('<label></label>').text(translations['operation']))
+              .append($('<div></div>').text(translations[operation.name]))
+            div_op.append(div_part)
+
+            switch (operation.name) {
+              case 'send-chat-message':
+              case 'send-whisper':
+                div_op.data('send', operation.send)
+                div_part = $('<div></div>')
+                  .append($('<label></label>').text(translations['message']))
+                  .append($('<div></div>').text(operation.send))
+                break
+              case 'run-command':
+                div_op.data('command', operation.command)
+                div_part = $('<div></div>')
+                  .append($('<label></label>').text(translations['command']))
+                  .append($('<div></div>').text(operation.command))
+                break
+              case 'play-sound':
+                div_op.data('sound', operation.sound)
+                div_part = $('<div></div>')
+                  .append($('<label></label>').text(translations['sound']))
+                  .append($('<div></div>').text(operation.sound))
+                break
+              case 'emote-explosion':
+                div_op.data('emotes', operation.emotes)
+                div_part = $('<div></div>')
+                  .append($('<label></label>').text(translations['emotes']))
+                  .append($('<div></div>').text(operation.emotes))
+                break
+            }
+
+            if (!_.isNil(definition) && _.size(definition) > 1) {
+                div_op.data('definition', definition)
+            }
+            div_op.append(div_part)
+            div_main.append(div_op)
           }
-          div_part2.append(div_part)
         })
-        div_op.append(div_part2)
       })
-
-      div_main.append(div_op)
       $('#events-current').append(div_main)
 
       // refresh right-click menu
@@ -229,11 +322,11 @@ socket.on('events', function(data) {
           return $el.data();
         },
         actions: [{
-          name: 'Delete',
+          name: 'Delete Operation',
           classNames: ['action-danger'],
           iconClass: 'fa-trash-o',
           onClick: function(data) {
-            console.log(data)
+            socket.emit('events.delete', data)
           }
         }]
       })
