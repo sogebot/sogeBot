@@ -258,7 +258,10 @@
     "message": "message",
     "sound": "sound",
     "emote-explosion": "emote explosion",
-    "emotes": "emotes"
+    "emotes": "emotes",
+    "quiet": "quiet",
+    "true": "true",
+    "false": "false"
   },
   "raffle": {
     "announceInterval": "Opened raffles will be announced every (value) minute",

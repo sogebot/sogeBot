@@ -52,6 +52,11 @@
         <input id="command2" class="form-control" placeholder="!command to run">
       </div>
 
+      <div class="form-group" id="quietGroup" style="display: none">
+        <label for="quiet" data-lang="quiet"></label>
+        <button class="btn btn-danger" id="quietToggle" data-lang="false"></button>
+      </div>
+
       <div class="form-group" id="soundGroup" style="display: none">
         <label for="sound" data-lang="sound"></label>
         <input id="sound" class="form-control" placeholder="link or soundboard name">
@@ -73,6 +78,20 @@
 
 <script>
 socket.emit('events.get');
+
+$("#quietToggle").on('click', function (ev) {
+  ev.preventDefault()
+  $el = $(ev.currentTarget)
+  if ($el.text() === translations['false']) {
+    $el.text(translations['true'])
+    $el.removeClass()
+    $el.addClass('btn btn-success')
+  } else {
+    $el.text(translations['false'])
+    $el.removeClass()
+    $el.addClass('btn btn-danger')
+  }
+})
 
 $('#events-list').on('change', function(ev) {
   $('#commandGroup').css('display', 'none')
@@ -151,6 +170,7 @@ $('#operations-list').on('change', function(ev) {
   $('#command2Group').css('display', 'none')
   $('#soundGroup').css('display', 'none')
   $('#emotesGroup').css('display', 'none')
+  $('#quietGroup').css('display', 'none')
 
   $('#message').val('')
   $('#sound').val('')
@@ -160,16 +180,17 @@ $('#operations-list').on('change', function(ev) {
   switch (ev.currentTarget.value) {
     case 'send-chat-message':
     case 'send-whisper':
-      $('#messageGroup').css('display', 'inline')
+      $('#messageGroup').css('display', 'inline-block')
       break
     case 'run-command':
-      $('#command2Group').css('display', 'inline')
+      $('#command2Group').css('display', 'inline-block')
+      $('#quietGroup').css('display', 'inline-block')
       break
     case 'play-sound':
-      $('#soundGroup').css('display', 'inline')
+      $('#soundGroup').css('display', 'inline-block')
       break
     case 'emote-explosion':
-      $('#emotesGroup').css('display', 'inline')
+      $('#emotesGroup').css('display', 'inline-block')
   }
 })
 
@@ -181,7 +202,8 @@ var newEvent = function () {
       send: $('#message').val(),
       sound: $('#sound').val(),
       command: $('#command2').val(),
-      emotes: $('#emotes').val()
+      emotes: $('#emotes').val(),
+      quiet: $('#quietToggle').text() === translations['true'] ? true : false
     },
     definition: {
       command: $('#command').val().length > 0 ? $('#command').val() : null,
@@ -289,8 +311,9 @@ socket.on('events', function(data) {
               case 'run-command':
                 div_op.data('command', operation.command)
                 div_part = $('<div></div>')
-                  .append($('<label></label>').text(translations['command']))
+                  .append($('<label></label>').text((operation.quiet ? translations['quiet'] + ' ' : '') + translations['command']))
                   .append($('<div></div>').text(operation.command))
+                console.log(operation.quiet)
                 break
               case 'play-sound':
                 div_op.data('sound', operation.sound)

@@ -258,7 +258,10 @@
     "message": "zpráva",
     "sound": "zvuk",
     "emote-explosion": "exploze smajlíků",
-    "emotes": "smajlíci"
+    "emotes": "smajlíci",
+    "quiet": "tichý",
+    "true": "ano",
+    "false": "ne"
   },
   "raffle": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych (value) minut",
