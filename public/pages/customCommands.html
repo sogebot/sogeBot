@@ -46,7 +46,7 @@
     updateCommands: function (list) {
       $("#Commands").empty()
       _.each(list, function(item, index) {
-        $("#Commands").append('<tr style="' + (!item.enabled ? "text-decoration: line-through": "") + '" class="' + (item.visible ? 'text-danger' : '') + '">' +
+        $("#Commands").append('<tr style="' + (!item.enabled ? "text-decoration: line-through": "") + '" class="' + (item.visible ? '' : 'text-danger') + '">' +
           '<td>' + (index + 1) + '</td>' +
           '<td>!' + item.command + '</td>' +
           '<td>' + commons.editable(item.response, item.command, 'cc.editCommand') + '</td>' +
