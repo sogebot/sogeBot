@@ -66,11 +66,13 @@ function Twitch () {
         // reset everything
         self.curRetries = 0
         self.isOnline = false
-        if (_.isNil(self.when.offline)) self.when.offline = new Date().getTime()
+        if (_.isNil(self.when.offline)) {
+          self.when.offline = new Date().getTime()
+          global.events.fire('stream-stopped')
+          global.events.fire('stream-is-running-x-minutes', { reset: true })
+          global.events.fire('number-of-viewers-is-at-least-x', { reset: true })
+        }
         self.when.online = null
-        global.events.fire('stream-stopped')
-        global.events.fire('stream-is-running-x-minutes', { reset: true })
-        global.events.fire('number-of-viewers-is-at-least-x', { reset: true })
       }
     })
 
