@@ -151,7 +151,7 @@ $('#events-list').on('change', function(ev) {
       $('#commandGroup').css('display', 'inline-block')
       $('#countGroup').css('display', 'inline-block')
       $('#count').attr('placeholder', 'commands to activate')
-      $('#timestampGroup').css('display', 'inline')
+      $('#timestampGroup').css('display', 'inline-block')
       break
     case 'number-of-viewers-is-at-least-x':
       $('#countGroup').css('display', 'inline-block')
@@ -195,6 +195,64 @@ $('#operations-list').on('change', function(ev) {
 })
 
 var newEvent = function () {
+  let validated = true
+  if ($('#commandGroup').css('display') !== 'none') {
+    if ($('#command').val().length === 0) {
+      $('#commandGroup').addClass('has-error')
+      validated = false
+    } else {
+      $('#commandGroup').removeClass('has-error')
+    }
+    if (validated && !$('#command').val().startsWith('!')) $('#command').val('!' + $('#command').val()) // add ! if it doesn't start with one
+  }
+
+  if ($('#countGroup').css('display') !== 'none' && ($('#count').val().length === 0 || !_.isFinite(parseInt($('#count').val(), 10)))) {
+    $('#countGroup').addClass('has-error')
+    validated = false
+  } else {
+    $('#countGroup').removeClass('has-error')
+  }
+
+  if ($('#timestampGroup').css('display') !== 'none' && ($('#timestamp').val().length === 0 || !_.isFinite(parseInt($('#timestamp').val(), 10)))) {
+    $('#timestampGroup').addClass('has-error')
+    validated = false
+  } else {
+    $('#timestampGroup').removeClass('has-error')
+  }
+
+  if ($('#messageGroup').css('display') !== 'none' && $('#message').val().length === 0) {
+    $('#messageGroup').addClass('has-error')
+    validated = false
+  } else {
+    $('#messageGroup').removeClass('has-error')
+  }
+
+  if ($('#command2Group').css('display') !== 'none') {
+    if ($('#command2').val().length === 0) {
+      $('#command2Group').addClass('has-error')
+      validated = false
+    } else {
+      $('#command2Group').removeClass('has-error')
+    }
+    if (validated && !$('#command2').val().startsWith('!')) $('#command2').val('!' + $('#command2').val()) // add ! if it doesn't start with one
+  }
+
+  if ($('#soundGroup').css('display') !== 'none' && $('#sound').val().length === 0) {
+    $('#soundGroup').addClass('has-error')
+    validated = false
+  } else {
+    $('#soundGroup').removeClass('has-error')
+  }
+
+  if ($('#emotesGroup').css('display') !== 'none' && $('#emotes').val().length === 0) {
+    $('#emotesGroup').addClass('has-error')
+    validated = false
+  } else {
+    $('#emotesGroup').removeClass('has-error')
+  }
+
+  if (!validated) { return 0 }
+
   var data = {
     event: $('#events-list').val(),
     operation: {
@@ -211,6 +269,7 @@ var newEvent = function () {
       timestamp: $('#timestamp').val().length > 0 ? $('#timestamp').val() : null
     },
   }
+
   switch($('#events-list').val()) {
     case 'user-joined-channel':
     case 'user-parted-channel':
@@ -230,8 +289,6 @@ var newEvent = function () {
       delete data.definition
   }
   socket.emit('events.new', data)
-
-  // TODO: reset form?
 }
 
 socket.off('events')
@@ -313,7 +370,6 @@ socket.on('events', function(data) {
                 div_part = $('<div></div>')
                   .append($('<label></label>').text((operation.quiet ? translations['quiet'] + ' ' : '') + translations['command']))
                   .append($('<div></div>').text(operation.command))
-                console.log(operation.quiet)
                 break
               case 'play-sound':
                 div_op.data('sound', operation.sound)

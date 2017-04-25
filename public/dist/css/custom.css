@@ -595,6 +595,16 @@ a.soundboard-list-group-item span {
   font-family: 'Open Sans', sans-serif;
 }
 
+.form-chainops .has-error label {
+  border: 0;
+  text-shadow: 0 0 2px #a94442, 0 0 4px #a94442, 0 0 8px #a94442;
+}
+
+.form-chainops .has-error * {
+  border-bottom: 1px dotted #a94442;
+}
+
+
 .form-chainops .form-group {
   padding-top: 5px;
 }
