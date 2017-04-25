@@ -104,7 +104,7 @@ CustomCommands.prototype.register = function (self) {
 CustomCommands.prototype.add = function (self, sender, text) {
   try {
     let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
-    let command = { command: parsed[1], response: parsed[2], enabled: true }
+    let command = { command: parsed[1], response: parsed[2], enabled: true, visible: true }
     if (!_.isUndefined(_.find(self.commands, function (o) { return o.command === command.command }))) throw Error(ERROR_ALREADY_EXISTS)
     self.commands.push(command)
     global.commons.sendMessage(global.translate('customcmds.success.add'), sender)
