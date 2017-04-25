@@ -141,7 +141,9 @@ global.client.on('hosting', function (channel, target, viewers) {
 })
 
 global.client.on('mod', function (channel, username) {
-  global.events.fire('mod', { username: username })
+  const user = global.users.get(username)
+  if (!user.is.mod) global.events.fire('mod', { username: username })
+  global.users.set(username, { is: { mod: true } }, true)
 })
 
 global.client.on('cheer', function (channel, userstate, message) {
