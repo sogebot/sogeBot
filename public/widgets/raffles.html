@@ -218,6 +218,7 @@
         $('#toggleButton').removeClass().addClass('btn btn-danger')
         $('#toggleButton').attr('title', 'Remove raffle')
         $('#toggleButton i').removeClass().addClass('fa fa-close')
+        this.keyword = $("#rafflesWidgetKeyword").val()
         socket.emit('createRaffle', { keyword: $("#rafflesWidgetKeyword").val(), followers: this.followersOnly, product: $("#rafflesWidgetProduct").val(), minWatchedTime: $("#rafflesWatchedTime").val()})
       }
 
