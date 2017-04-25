@@ -98,7 +98,8 @@ Alias.prototype.add = function (self, sender, text) {
     let data = {
       alias: parsed[2],
       command: parsed[1],
-      enabled: true
+      enabled: true,
+      visible: true
     }
     let alias = _.find(self.alias, function (oAlias) { return oAlias.alias === data.alias })
     if (_.isUndefined(alias)) self.alias.push(data)
@@ -110,6 +111,7 @@ Alias.prototype.add = function (self, sender, text) {
 
 Alias.prototype.list = function (self, sender, text) {
   var aliases = []
+  console.log(aliases)
   _.each(self.alias, function (element) { if (element.visible) aliases.push('!' + element.alias) })
   var output = (aliases.length === 0 ? global.translate('alias.failed.list') : global.translate('alias.success.list') + ': ' + aliases.join(', '))
   global.commons.sendMessage(output, sender)
