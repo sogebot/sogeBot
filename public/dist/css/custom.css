@@ -9,7 +9,7 @@
 body {
   padding-top: 50px;
   background-color: #eee;
-  font-family: 'Catamaran', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .navbar-fixed-top {
@@ -243,7 +243,7 @@ a.active {
   font-weight: bold;
   text-shadow: 0 0 2px #000, 0 0 4px #888, 0 0 8px #888;
   color:white;
-  font-family: 'Catamaran', sans-serif !important;
+  font-family: 'Open Sans', sans-serif !important;
 
 }
 
@@ -287,7 +287,7 @@ a.active {
 
 #widgets > div {
   padding: 10px;
-  font-family: 'Catamaran', sans-serif !important;
+  font-family: 'Open Sans', sans-serif !important;
   font-weight: bold;
   font-size: 12px;
   text-shadow: 0 0 2px #000, 0 0 4px #888, 0 0 8px #888
@@ -592,7 +592,7 @@ a.soundboard-list-group-item span {
 .form-chainops {
   padding: 10px;
   font-weight: lighter;
-  font-family: 'Catamaran', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .form-chainops .form-group {
