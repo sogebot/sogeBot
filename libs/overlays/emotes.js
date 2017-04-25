@@ -7,9 +7,6 @@ const emoticons = require('twitch-emoticons')
 // bot libraries
 const constants = require('../constants')
 
-// TODO:
-// implement explosions on events
-
 function Emotes () {
   this.simpleEmotes = {
     ':)': 'https://static-cdn.jtvnw.net/emoticons/v1/1/',
@@ -36,18 +33,22 @@ function Emotes () {
   global.configuration.register('OEmotesMax', 'overlay.emotes.settings.OEmotesMax', 'number', 5)
   global.configuration.register('OEmotesAnimation', 'overlay.emotes.settings.OEmotesAnimation', 'string', 'fadeup')
   global.configuration.register('OEmotesAnimationTime', 'overlay.emotes.settings.OEmotesAnimationTime', 'number', 4000)
-  global.configuration.register('OEmotesFollowerExplosion', 'overlay.emotes.settings.OEmotesFollowerExplosion', 'bool', false)
-  global.configuration.register('OEmotesFollowerExplosionList', 'overlay.emotes.settings.OEmotesFollowerExplosionList', 'string', '<3')
-  global.configuration.register('OEmotesSubscribeExplosion', 'overlay.emotes.settings.OEmotesSubscribeExplosion', 'bool', false)
-  global.configuration.register('OEmotesSubscribeExplosionList', 'overlay.emotes.settings.OEmotesSubscribeExplosionList', 'string', ':)')
-  global.configuration.register('OEmotesResubExplosion', 'overlay.emotes.settings.OEmotesResubExplosion', 'bool', false)
-  global.configuration.register('OEmotesResubExplosionList', 'overlay.emotes.settings.OEmotesResubExplosionList', 'string', ':)')
 
   global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
+  global.panel.socketListening(this, 'emote.testExplosion', this._testExplosion)
   global.panel.socketListening(this, 'emote.test', this._test)
 }
 
-Emotes.prototype._test = async function (self, socket, data) {
+Emotes.prototype._testExplosion = async function (self, socket) {
+  self.explode(self, socket, ['Kappa', 'GivePLZ', 'PogChamp'])
+}
+
+Emotes.prototype._test = async function (self, socket) {
+  let OEmotesSize = global.configuration.getValue('OEmotesSize')
+  socket.emit('emote', 'https://static-cdn.jtvnw.net/emoticons/v1/9/' + (OEmotesSize + 1) + '.0')
+}
+
+Emotes.prototype.explode = async function (self, socket, data) {
   const emotes = await self.parseEmotes(self, data)
   socket.emit('emote.explode', emotes)
 }

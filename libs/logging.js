@@ -14,8 +14,10 @@ global.log = new (winston.Logger)({
     whisperOut: 4,
     follow: 6,
     unfollow: 7,
-    warning: 8,
-    info: 9
+    timeout: 8,
+    ban: 9,
+    warning: 10,
+    info: 11
 
   },
   transports: [
@@ -34,6 +36,8 @@ global.log = new (winston.Logger)({
         if (level === 'whisperOut') level = '>w>'
         if (level === 'info') level = '|'
         if (level === 'warning') level = '|!'
+        if (level === 'timeout') level = '+timeout'
+        if (level === 'ban') level = '+ban'
         if (level === 'follow') level = '+follow'
         if (level === 'unfollow') level = '-follow'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''

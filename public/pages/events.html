@@ -1,0 +1,424 @@
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+  <div class="widget">
+    <h2 class="title" data-lang="event-listeners"></h2>
+
+    <form class="form-inline form-chainops">
+      <div class="form-group">
+        <label for="Events" data-lang="event"></label>
+        <select id="events-list" class="form-control"></select>
+
+        <small>
+          <div id="usernameInfo"><strong>(username)</strong> user triggered event</div>
+          <div id="methodInfo"><strong>(method)</strong> method used to subscribe</div>
+          <div id="monthsInfo"><strong>(months)</strong> months of subscription</div>
+          <div id="messageInfo"><strong>(message)</strong> user message</div>
+          <div id="bitsInfo"><strong>(bits)</strong> bits user sent</div>
+          <div id="reasonInfo"><strong>(reason)</strong> reason for ban/timeout</div>
+          <div id="durationInfo"><strong>(duration)</strong> duration of timeout</div>
+          <div id="targetInfo"><strong>(target)</strong> target of your hosting</div>
+          <div id="viewersInfo"><strong>(viewers)</strong> viewers of your hosting</div>
+        </small>
+      </div>
+
+      <div class="form-group" id="commandGroup" style="display: none">
+        <label for="command" data-lang="command"></label>
+        <input id="command" class="form-control" placeholder="Set your !command">
+      </div>
+
+      <div class="form-group" id="countGroup" style="display: none">
+        <label for="count" data-lang="count"></label>
+        <input id="count" class="form-control" placeholder="commands to activate">
+      </div>
+
+      <div class="form-group" id="timestampGroup" style="display: none">
+        <label for="timestamp" data-lang="timestamp"></label>
+        <input id="timestamp" class="form-control" placeholder="activate every x seconds">
+      </div>
+
+      <br>
+
+      <div class="form-group" id="operationsGroup">
+        <label for="Operations" data-lang="operation"></label>
+        <select id="operations-list" class="form-control"></select>
+      </div>
+
+      <div class="form-group" id="messageGroup">
+        <label for="message" data-lang="message"></label>
+        <input id="message" class="form-control" placeholder="message to send">
+      </div>
+
+      <div class="form-group" id="command2Group" style="display: none">
+        <label for="command2" data-lang="command"></label>
+        <input id="command2" class="form-control" placeholder="!command to run">
+      </div>
+
+      <div class="form-group" id="quietGroup" style="display: none">
+        <label for="quiet" data-lang="quiet"></label>
+        <button class="btn btn-danger" id="quietToggle" data-lang="false"></button>
+      </div>
+
+      <div class="form-group" id="soundGroup" style="display: none">
+        <label for="sound" data-lang="sound"></label>
+        <input id="sound" class="form-control" placeholder="link or soundboard name">
+      </div>
+
+      <div class="form-group" id="emotesGroup" style="display: none">
+        <label for="emotes" data-lang="emotes"></label>
+        <input id="emotes" class="form-control" placeholder="Kappa :) purpleHeart">
+      </div>
+
+      <button type="button" class="btn btn-success pull-right" data-lang="create-a-new-event-listener" onclick="newEvent()"></button>
+      <div class="clearfix"></div>
+    </form>
+    <hr>
+
+    <div id="events-current"></div>
+  </div>
+</div>
+
+<script>
+socket.emit('events.get');
+
+$("#quietToggle").on('click', function (ev) {
+  ev.preventDefault()
+  $el = $(ev.currentTarget)
+  if ($el.text() === translations['false']) {
+    $el.text(translations['true'])
+    $el.removeClass()
+    $el.addClass('btn btn-success')
+  } else {
+    $el.text(translations['false'])
+    $el.removeClass()
+    $el.addClass('btn btn-danger')
+  }
+})
+
+$('#events-list').on('change', function(ev) {
+  $('#commandGroup').css('display', 'none')
+  $('#countGroup').css('display', 'none')
+  $('#timestampGroup').css('display', 'none')
+  $('#usernameInfo').css('display', 'none')
+  $('#methodInfo').css('display', 'none')
+  $('#monthsInfo').css('display', 'none')
+  $('#messageInfo').css('display', 'none')
+  $('#bitsInfo').css('display', 'none')
+  $('#reasonInfo').css('display', 'none')
+  $('#durationInfo').css('display', 'none')
+  $('#targetInfo').css('display', 'none')
+  $('#viewersInfo').css('display', 'none')
+
+  $('#command2').val('')
+  $('#count').val('')
+  $('#timestamp').val('')
+
+  switch (ev.currentTarget.value) {
+    case 'user-joined-channel':
+    case 'user-parted-channel':
+    case 'follow':
+    case 'unfollow':
+    case 'action':
+    case 'mod':
+      $('#usernameInfo').css('display', 'block')
+      break
+    case 'subscription':
+      $('#usernameInfo').css('display', 'block')
+      $('#methodInfo').css('display', 'block')
+      break
+    case 'resub':
+      $('#usernameInfo').css('display', 'block')
+      $('#monthsInfo').css('display', 'block')
+      $('#messageInfo').css('display', 'block')
+      break
+    case 'cheer':
+      $('#usernameInfo').css('display', 'block')
+      $('#bitsInfo').css('display', 'block')
+      $('#messageInfo').css('display', 'block')
+      break
+    case 'ban':
+      $('#usernameInfo').css('display', 'block')
+      $('#reasonInfo').css('display', 'block')
+      break
+    case 'timeout':
+      $('#usernameInfo').css('display', 'block')
+      $('#reasonInfo').css('display', 'block')
+      $('#durationInfo').css('display', 'block')
+      break
+    case 'hosting':
+      $('#targetInfo').css('display', 'block')
+      $('#viewersInfo').css('display', 'block')
+      break
+    case 'command-send-x-times':
+      $('#commandGroup').css('display', 'inline-block')
+      $('#countGroup').css('display', 'inline-block')
+      $('#count').attr('placeholder', 'commands to activate')
+      $('#timestampGroup').css('display', 'inline-block')
+      break
+    case 'number-of-viewers-is-at-least-x':
+      $('#countGroup').css('display', 'inline-block')
+      $('#count').attr('placeholder', 'viewers to activate')
+      $('#timestampGroup').css('display', 'inline-block')
+      break
+    case 'stream-is-running-x-minutes':
+      $('#countGroup').css('display', 'inline-block')
+      $('#count').attr('placeholder', 'minutes to activate')
+      break
+  }
+})
+
+$('#operations-list').on('change', function(ev) {
+  $('#messageGroup').css('display', 'none')
+  $('#command2Group').css('display', 'none')
+  $('#soundGroup').css('display', 'none')
+  $('#emotesGroup').css('display', 'none')
+  $('#quietGroup').css('display', 'none')
+
+  $('#message').val('')
+  $('#sound').val('')
+  $('#command2').val('')
+  $('#emotes').val('')
+
+  switch (ev.currentTarget.value) {
+    case 'send-chat-message':
+    case 'send-whisper':
+      $('#messageGroup').css('display', 'inline-block')
+      break
+    case 'run-command':
+      $('#command2Group').css('display', 'inline-block')
+      $('#quietGroup').css('display', 'inline-block')
+      break
+    case 'play-sound':
+      $('#soundGroup').css('display', 'inline-block')
+      break
+    case 'emote-explosion':
+      $('#emotesGroup').css('display', 'inline-block')
+  }
+})
+
+var newEvent = function () {
+  let validated = true
+  if ($('#commandGroup').css('display') !== 'none') {
+    if ($('#command').val().length === 0) {
+      $('#commandGroup').addClass('has-error')
+      validated = false
+    } else {
+      $('#commandGroup').removeClass('has-error')
+    }
+    if (validated && !$('#command').val().startsWith('!')) $('#command').val('!' + $('#command').val()) // add ! if it doesn't start with one
+  }
+
+  if ($('#countGroup').css('display') !== 'none' && ($('#count').val().length === 0 || !_.isFinite(parseInt($('#count').val(), 10)))) {
+    $('#countGroup').addClass('has-error')
+    validated = false
+  } else {
+    $('#countGroup').removeClass('has-error')
+  }
+
+  if ($('#timestampGroup').css('display') !== 'none' && ($('#timestamp').val().length === 0 || !_.isFinite(parseInt($('#timestamp').val(), 10)))) {
+    $('#timestampGroup').addClass('has-error')
+    validated = false
+  } else {
+    $('#timestampGroup').removeClass('has-error')
+  }
+
+  if ($('#messageGroup').css('display') !== 'none' && $('#message').val().length === 0) {
+    $('#messageGroup').addClass('has-error')
+    validated = false
+  } else {
+    $('#messageGroup').removeClass('has-error')
+  }
+
+  if ($('#command2Group').css('display') !== 'none') {
+    if ($('#command2').val().length === 0) {
+      $('#command2Group').addClass('has-error')
+      validated = false
+    } else {
+      $('#command2Group').removeClass('has-error')
+    }
+    if (validated && !$('#command2').val().startsWith('!')) $('#command2').val('!' + $('#command2').val()) // add ! if it doesn't start with one
+  }
+
+  if ($('#soundGroup').css('display') !== 'none' && $('#sound').val().length === 0) {
+    $('#soundGroup').addClass('has-error')
+    validated = false
+  } else {
+    $('#soundGroup').removeClass('has-error')
+  }
+
+  if ($('#emotesGroup').css('display') !== 'none' && $('#emotes').val().length === 0) {
+    $('#emotesGroup').addClass('has-error')
+    validated = false
+  } else {
+    $('#emotesGroup').removeClass('has-error')
+  }
+
+  if (!validated) { return 0 }
+
+  var data = {
+    event: $('#events-list').val(),
+    operation: {
+      name: $('#operations-list').val(),
+      send: $('#message').val(),
+      sound: $('#sound').val(),
+      command: $('#command2').val(),
+      emotes: $('#emotes').val(),
+      quiet: $('#quietToggle').text() === translations['true'] ? true : false
+    },
+    definition: {
+      command: $('#command').val().length > 0 ? $('#command').val() : null,
+      count: $('#count').val().length > 0 ? $('#count').val() : null,
+      timestamp: $('#timestamp').val().length > 0 ? $('#timestamp').val() : null
+    },
+  }
+
+  switch($('#events-list').val()) {
+    case 'user-joined-channel':
+    case 'user-parted-channel':
+    case 'follow':
+    case 'unfollow':
+    case 'subscription':
+    case 'resub':
+    case 'stream-started':
+    case 'stream-stopped':
+    case 'cheer':
+    case 'clearchat':
+    case 'action':
+    case 'ban':
+    case 'hosting':
+    case 'mod':
+    case 'timeout':
+      delete data.definition
+  }
+  socket.emit('events.new', data)
+}
+
+socket.off('events')
+socket.on('events', function(data) {
+  $('#events-list').empty()
+  $('#events-current').empty()
+  $('#operations-list').empty()
+
+  _.each(data.events, function (o, k) {
+    $('#events-list').append(
+      $('<option></option').attr('value', k).text(translations[k]))
+    if (o.length) {
+      let div_part
+      let div_main = $('<div id="' + k + '"></div>')
+
+      div_part = $('<div style="min-width:14%"></div>')
+        .append($('<label></label>').text(translations['event']))
+        .append($('<div></div>').text(translations[k]))
+      div_main.append(div_part)
+
+      let firstDefinition = true
+      _.each(o, function (obj) {
+        let definition = null
+        _.each(obj, function (operation) {
+          let div_op = $('<div class="operation" data-event="' + k + '"></div>')
+          // is definition
+          let div_def
+          if (operation.definition) {
+            definition = operation
+            if (!firstDefinition) {
+              div_def = $('<div class="definition" style="position:relative; left: 200px;"></div>')
+            } else {
+              div_def = $('<div class="definition" style="position:absolute; left: 220px;"></div>')
+            }
+            firstDefinition = false
+
+            if (operation.command) {
+              div_part = $('<div style="min-width:100px;display:inline-block" ></div>')
+                .append($('<label></label>').text(translations['command']))
+                .append($('<div style="display:block;"></div>').text(operation.command))
+              div_def.append(div_part)
+            }
+              if (operation.tCount) {
+                div_part = $('<div style="min-width:100px;display:inline-block" ></div>')
+                  .append($('<label></label>').text(translations['count']))
+                  .append($('<div style="display:block;"></div>').text(operation.tCount))
+                div_def.append(div_part)
+              }
+            if (operation.viewers) {
+              div_part = $('<div style="min-width:100px;display:inline-block" ></div>')
+                .append($('<label></label>').text(translations['count']))
+                .append($('<div style="display:block;"></div>').text(operation.viewers))
+              div_def.append(div_part)
+            }
+            if (operation.tTimestamp) {
+              div_part = $('<div style="min-width:100px;display:inline-block" ></div>')
+                .append($('<label></label>').text(translations['timestamp']))
+                .append($('<div style="display:block"></div>').text(operation.tTimestamp))
+              div_def.append(div_part)
+            }
+            div_main.append(div_def)
+          } else {
+            div_op.data('name', operation.name)
+            div_part = $('<div></div>')
+              .append($('<label></label>').text(translations['operation']))
+              .append($('<div></div>').text(translations[operation.name]))
+            div_op.append(div_part)
+
+            switch (operation.name) {
+              case 'send-chat-message':
+              case 'send-whisper':
+                div_op.data('send', operation.send)
+                div_part = $('<div></div>')
+                  .append($('<label></label>').text(translations['message']))
+                  .append($('<div></div>').text(operation.send))
+                break
+              case 'run-command':
+                div_op.data('command', operation.command)
+                div_part = $('<div></div>')
+                  .append($('<label></label>').text((operation.quiet ? translations['quiet'] + ' ' : '') + translations['command']))
+                  .append($('<div></div>').text(operation.command))
+                break
+              case 'play-sound':
+                div_op.data('sound', operation.sound)
+                div_part = $('<div></div>')
+                  .append($('<label></label>').text(translations['sound']))
+                  .append($('<div></div>').text(operation.sound))
+                break
+              case 'emote-explosion':
+                div_op.data('emotes', operation.emotes)
+                div_part = $('<div></div>')
+                  .append($('<label></label>').text(translations['emotes']))
+                  .append($('<div></div>').text(operation.emotes))
+                break
+            }
+
+            if (!_.isNil(definition) && _.size(definition) > 1) {
+                div_op.data('definition', definition)
+            }
+            div_op.append(div_part)
+            div_main.append(div_op)
+          }
+        })
+      })
+      $('#events-current').append(div_main)
+
+      // refresh right-click menu
+      var menu = new BootstrapMenu(".operation", {
+        fetchElementData: function($el) {
+          return $el.data();
+        },
+        actions: [{
+          name: 'Delete Operation',
+          classNames: ['action-danger'],
+          iconClass: 'fa-trash-o',
+          onClick: function(data) {
+            socket.emit('events.delete', data)
+          }
+        }]
+      })
+    }
+  })
+  _.each(data.operations, function (o) {
+    if (o === 'log') return true
+    $('#operations-list').append(
+      $('<option></option').attr('value', o).text(translations[o])
+    )
+  })
+})
+
+$('#usernameInfo').css('display', 'block')
+
+</script>

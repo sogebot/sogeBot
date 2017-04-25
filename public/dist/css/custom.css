@@ -243,7 +243,7 @@ a.active {
   font-weight: bold;
   text-shadow: 0 0 2px #000, 0 0 4px #888, 0 0 8px #888;
   color:white;
-  font-family: 'Catamaran', sans-serif !important;
+  font-family: 'Open Sans', sans-serif !important;
 
 }
 
@@ -251,6 +251,10 @@ a.active {
   font-size: 18px;
   border-bottom: 1px dotted #ddd;
   padding: 5px;
+}
+
+.widget .title:first-letter {
+    text-transform: uppercase;
 }
 
 .widget .title small {
@@ -283,7 +287,8 @@ a.active {
 
 #widgets > div {
   padding: 10px;
-  font-family: 'Catamaran', sans-serif !important;
+  font-family: 'Open Sans', sans-serif !important;
+  font-weight: bold;
   font-size: 12px;
   text-shadow: 0 0 2px #000, 0 0 4px #888, 0 0 8px #888
 }
@@ -394,14 +399,18 @@ a.active {
 
 /* PAGES */
 h2.title {
-  display: inline;
-  font-size: 30px !important;
+  display: inline-block;
+  font-size: 26px !important;
   font-weight: bold;
   text-transform: uppercase;
   border: 0 !important;
   position: relative;
-  top: 10px;
+  top: -10px;
   left: 10px;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 100;
 }
 
 .paging {
@@ -578,4 +587,110 @@ a.soundboard-list-group-item span {
   float: right;
   width: auto;
   margin: 10px;
+}
+
+.form-chainops {
+  padding: 10px;
+  font-weight: lighter;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.form-chainops .has-error label {
+  border: 0;
+  text-shadow: 0 0 2px #a94442, 0 0 4px #a94442, 0 0 8px #a94442;
+}
+
+.form-chainops .has-error * {
+  border-bottom: 1px dotted #a94442;
+}
+
+
+.form-chainops .form-group {
+  padding-top: 5px;
+}
+
+.form-chainops br + .form-group {
+  padding-left: 20px;
+}
+
+.form-chainops .form-group:first-child {
+  padding-top: 0;
+}
+
+.form-chainops label {
+  font-size: 20px;
+  color:white;
+  font-variant: small-caps;
+  text-transform: lowercase;
+  text-shadow: 0 0 2px #000, 0 0 4px #888, 0 0 8px #888;
+}
+
+.form-chainops small {
+  display: block;
+}
+
+.form-chainops small div {
+  display: none;
+}
+
+.form-chainops * {
+  border: 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.form-chainops .form-group {
+    vertical-align: top;
+}
+
+#events-current label {
+    font-size: 20px;
+    color:white;
+    font-variant: small-caps;
+    text-transform: lowercase;
+    text-shadow: 0 0 2px #000, 0 0 4px #888, 0 0 8px #888;
+    padding-left: 10px;
+}
+
+#events-current div {
+  padding-bottom: 10px;
+  vertical-align: top;
+
+}
+#events-current div > div {
+  display: inline-block;
+  clear: both;
+}
+
+#events-current div > div > div {
+  display: block;
+  padding-left: 20px;
+  padding-top: 5px;
+  padding-bottom: 0;
+}
+
+#events-current div > div > div > div {
+  display: inline-block;
+}
+
+#events-current div > div > div > div > div {
+  display: block;
+}
+
+#events-current .operation {
+  width: 100%;
+  display: inline-block;
+
+}
+
+.operation + .operation {
+  border-top: 1px dotted rgb(200,200,200)
+}
+
+#events-current > div:nth-child(2n) {
+  background-color: rgb(250, 250, 250);
+}
+
+.action-danger > a {
+  color: #a94442 !important;
 }
