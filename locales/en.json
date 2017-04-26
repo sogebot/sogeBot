@@ -17,6 +17,7 @@
     "mute": {
       "false": "Mute disabled. Bot will send messages."
     },
+    "theme": "",
     "settings": {
       "uptime-format": "Uptime format set to (value)"
     },
@@ -261,7 +262,9 @@
     "emotes": "emotes",
     "quiet": "quiet",
     "true": "true",
-    "false": "false"
+    "false": "false",
+    "light": "light theme",
+    "dark": "dark theme"
   },
   "raffle": {
     "announceInterval": "Opened raffles will be announced every (value) minute",

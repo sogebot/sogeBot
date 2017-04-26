@@ -39,6 +39,8 @@ function Panel () {
   this.widgets = []
   this.socketListeners = []
 
+  global.configuration.register('theme', 'core.theme', 'string', 'light')
+
   var self = this
   this.io.on('connection', function (socket) {
     self.sendMenu(socket)
