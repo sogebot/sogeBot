@@ -111,18 +111,21 @@ Notice.prototype.sendConfiguration = function (self, socket) {
   })
 }
 
-Notice.prototype.send = function () {
+Notice.prototype.send = async function (last, i) {
+  i = i || 0
+
   var timeIntervalInMs = global.configuration.getValue('noticeInterval') * 60 * 1000
   var noticeMinChatMsg = global.configuration.getValue('noticeMsgReq')
   var now = new Date().getTime()
 
-  if (now - this.lastNoticeSent >= timeIntervalInMs && global.parser.linesParsed - this.msgCountSent >= noticeMinChatMsg) {
+  if ((now - this.lastNoticeSent >= timeIntervalInMs && global.parser.linesParsed - this.msgCountSent >= noticeMinChatMsg) || (!_.isNil(last) && i < 2)) {
     let notice = _.orderBy(_.filter(this.notices, function (o) { return o.enabled }), 'time', 'asc')[0]
     if (_.isUndefined(notice)) return
 
     this.lastNoticeSent = new Date().getTime()
     this.msgCountSent = global.parser.linesParsed
-    global.commons.sendMessage(notice.text, {username: global.configuration.get().twitch.channel})
+
+    let sent = await global.commons.sendMessage(notice.text, {username: global.configuration.get().twitch.channel})
 
     // update notice
     notice.time = this.lastNoticeSent
@@ -130,6 +133,7 @@ Notice.prototype.send = function () {
       return o.id !== notice.id
     })
     this.notices.push(notice)
+    if (!sent) this.send(notice, i++) // send another one if notice was not sent
   }
 }
 
