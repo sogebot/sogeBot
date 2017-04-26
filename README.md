@@ -73,6 +73,9 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 #### Command list
 https://github.com/sogehige/SogeBot/wiki/Command-list
 
+#### FAQ
+https://github.com/sogehige/SogeBot/wiki/FAQ
+
 #### License
 
 See LICENSE file
