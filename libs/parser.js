@@ -239,7 +239,9 @@ Parser.prototype.parseMessage = async function (message, attr) {
       .replace(')', '')
       .replace('.', ' ')
       .replace('sender', attr.sender.username)
-      global.parser.parseCommands(null, cmd)
+
+      if (message.replace(filter, '').length === 0) global.parser.parseCommands(attr.sender, cmd)
+      else global.parser.parseCommands(null, cmd)
       return ''
     }
   }
