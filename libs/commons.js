@@ -99,23 +99,23 @@ Commons.prototype.runCallback = function (cb, data) {
 Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
   attr.sender = sender
   message = await global.parser.parseMessage(message, attr)
-  if (message === '') return // if message is empty, don't send anything
+  if (message === '') return false // if message is empty, don't send anything
 
   if (global.configuration.get().bot.debug) {
     if (_.isUndefined(sender) || _.isNull(sender)) sender = { username: null }
     message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace('(sender)', '@' + sender.username) : message
     if ((_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === global.configuration.get().twitch.username))) message = '! ' + message
     sender['message-type'] === 'whisper' ? global.log.whisperOut(message, {username: sender.username}) : global.log.chatOut(message, {username: sender.username})
-    return
   }
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
-  if (_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === global.configuration.get().twitch.username)) return // we don't want to reply on bot commands
+  if (_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === global.configuration.get().twitch.username)) return false // we don't want to reply on bot commands
   message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace('(sender)', '@' + sender.username) : message
   if (!global.configuration.getValue('mute')) {
     message = message.charAt(0).toUpperCase() + message.slice(1)
     sender['message-type'] === 'whisper' ? global.log.whisperOut(message, {username: sender.username}) : global.log.chatOut(message, {username: sender.username})
     sender['message-type'] === 'whisper' ? global.client.whisper(sender.username, message) : global.client.say(global.configuration.get().twitch.channel, message)
   }
+  return true
 }
 
 Commons.prototype.timeout = function (username, reason, timeout) {
