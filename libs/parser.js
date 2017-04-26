@@ -278,9 +278,15 @@ Parser.prototype.parseMessage = async function (message, attr) {
       .replace(')', '')
       switch (system) {
         case 'alias':
+          list = _.map(_.filter(global.systems[system].alias, function (o) { return o.visible }), function (n) { return n.alias }).join(', ')
+          return list
+        case '!alias':
           list = _.map(_.filter(global.systems[system].alias, function (o) { return o.visible }), function (n) { return '!' + n.alias }).join(', ')
           return list
         case 'command':
+          list = _.map(_.filter(global.systems['customcommands'].commands, function (o) { return o.visible }), function (n) { return n.command }).join(', ')
+          return list
+        case '!command':
           list = _.map(_.filter(global.systems['customcommands'].commands, function (o) { return o.visible }), function (n) { return '!' + n.command }).join(', ')
           return list
         default:
