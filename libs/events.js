@@ -147,6 +147,7 @@ Events.prototype._send = function (self, socket) {
     _.each(o, function (v) {
       _.each(v, function (v2) {
         if (!v2.system) events[n] = self.events[n]
+        else events[n] = []
       })
     })
   })
