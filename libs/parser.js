@@ -225,12 +225,20 @@ Parser.prototype.parseMessage = async function (message, attr) {
       return ''
     }
   }
-  let gameAndStatus = {
+  let info = {
     '(game)': async function (filter) {
       return global.twitch.currentGame
     },
     '(status)': async function (filter) {
       return global.twitch.currentStatus
+    },
+    '(uptime)': async function (filter) {
+      const time = global.twitch.getTime(global.twitch.isOnline ? global.twitch.when.online : global.twitch.when.offline, true)
+      return global.configuration.getValue('uptimeFormat')
+        .replace('(days)', time.days)
+        .replace('(hours)', time.hours)
+        .replace('(minutes)', time.minutes)
+        .replace('(seconds)', time.seconds)
     }
   }
   let command = {
@@ -287,7 +295,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
   msg = await this.parseMessageEach(price, msg)
   msg = await this.parseMessageEach(custom, msg)
   msg = await this.parseMessageEach(param, msg)
-  msg = await this.parseMessageEach(gameAndStatus, msg)
+  msg = await this.parseMessageEach(info, msg)
   msg = await this.parseMessageEach(list, msg)
   msg = await this.parseMessageApi(msg)
   return msg
