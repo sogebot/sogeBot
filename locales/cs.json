@@ -17,6 +17,7 @@
     "mute": {
       "false": "Mute vypnut. Bot bude posilat zpravy."
     },
+    "theme": "",
     "settings": {
       "uptime-format": "Format pro uptime nastaven na (value)"
     },
@@ -261,7 +262,9 @@
     "emotes": "smajlíci",
     "quiet": "tichý",
     "true": "ano",
-    "false": "ne"
+    "false": "ne",
+    "light": "světlý theme",
+    "dark": "tmavý theme"
   },
   "raffle": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych (value) minut",
