@@ -15,6 +15,7 @@
       "not-available": "not available"
     },
     "mute": {
+      "true": "Mute enabled. Bot will not send messages.",
       "false": "Mute disabled. Bot will send messages."
     },
     "theme": "",

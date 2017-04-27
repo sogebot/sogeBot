@@ -58,6 +58,7 @@ Configuration.prototype.setValue = function (self, sender, text) {
     } else if (filter === 'bool' && (value === 'true' || value === 'false')) {
       data[cmd] = (value.toLowerCase() === 'true')
       data.success = data.success + '.' + value
+      if (cmd === 'mute') data.force = true
       global.commons.updateOrInsert(data)
       self.cfgL[cmd].value = data[cmd]
     } else if (filter === 'string') {

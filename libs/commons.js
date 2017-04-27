@@ -93,7 +93,7 @@ Commons.prototype.runCallback = function (cb, data) {
   var value = this.stripUnderscores(data)
   delete value.type
   if (_.isUndefined(cb)) return
-  typeof cb === 'function' ? cb(data) : this.sendMessage(global.translate(cb).replace('(value)', value[Object.keys(value)[0]]), {username: global.configuration.get().twitch.channel})
+  typeof cb === 'function' ? cb(data) : this.sendMessage(global.translate(cb).replace('(value)', value[Object.keys(value)[0]]), {username: global.configuration.get().twitch.channel}, data)
 }
 
 Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
@@ -110,7 +110,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
   if (_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === global.configuration.get().twitch.username)) return false // we don't want to reply on bot commands
   message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace('(sender)', '@' + sender.username) : message
-  if (!global.configuration.getValue('mute')) {
+  if (!global.configuration.getValue('mute') || attr.force) {
     message = message.charAt(0).toUpperCase() + message.slice(1)
     sender['message-type'] === 'whisper' ? global.log.whisperOut(message, {username: sender.username}) : global.log.chatOut(message, {username: sender.username})
     sender['message-type'] === 'whisper' ? global.client.whisper(sender.username, message) : global.client.say(global.configuration.get().twitch.channel, message)
