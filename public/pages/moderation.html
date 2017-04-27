@@ -22,6 +22,12 @@
           <input id="moderationLinksSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
         </td>
       </tr>
+      <tr>
+        <td><strong data-lang="moderation-spaces-toggle"></strong></td>
+        <td>
+          <input id="moderationLinksWithSpacesToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
+        </td>
+      </tr>
     </table>
   </div>
 </div>
@@ -337,7 +343,7 @@
     $('#' + id + 'Toggle').bootstrapToggle(options)
     $('#' + id + 'Toggle').bootstrapToggle(value ? 'on' : 'off')
     $('#' + id + 'Toggle').off('change')
-    $('#' + id + 'Toggle').change(function() {
+    $('#' + id + 'Toggle').on('change', function() {
       var data = {}
       data[id] = $(this).prop('checked')
       if ($('#' + id + 'Toggle').data('init')) socket.emit('saveConfiguration', data)
@@ -345,10 +351,10 @@
     $('#' + id + 'Toggle').data('init', true)
   }
 
-  socket.off('configuration')
-  socket.on('configuration', function(data) {
+  socket.once('configuration', function(data) {
     createToggle('moderationLinks', data.moderationLinks)
     createToggle('moderationLinksSubs', data.moderationLinksSubs)
+    createToggle('moderationLinksWithSpaces', data.moderationLinksWithSpaces)
     $("#moderationLinksTimeout").text(data.moderationLinksTimeout + 's')
 
     createToggle('moderationSymbols', data.moderationSymbols)
