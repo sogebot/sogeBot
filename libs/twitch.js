@@ -35,17 +35,27 @@ function Twitch () {
 
   var self = this
   setInterval(function () {
-    global.client.api({
+    let options = {
       url: 'https://api.twitch.tv/kraken/streams/' + global.channelId,
       headers: {
         Accept: 'application/vnd.twitchtv.v5+json',
         'Client-ID': global.configuration.get().twitch.clientId
       }
-    }, function (err, res, body) {
+    }
+
+    if (global.configuration.get('debug')) {
+      global.log.debug('Get current stream data from twitch', options)
+    }
+    global.client.api(options, function (err, res, body) {
       if (err) {
         if (err.code !== 'ETIMEDOUT' && err.code !== 'ECONNRESET') global.log.error(err, { fnc: 'Twitch#1' })
         return
       }
+
+      if (global.configuration.get('debug')) {
+        global.log.debug('Response: Get current stream data from twitch', body)
+      }
+
       if (res.statusCode === 200 && !_.isNull(body.stream)) {
         self.curRetries = 0
         if (!self.isOnline) { // if we are switching from offline - bots restarts? We want refresh to correct data for start as well
@@ -76,16 +86,23 @@ function Twitch () {
       }
     })
 
-    global.client.api({
+    options = {
       url: 'https://api.twitch.tv/kraken/channels/' + global.channelId + '/follows?limit=100',
       headers: {
         Accept: 'application/vnd.twitchtv.v5+json',
         'Client-ID': global.configuration.get().twitch.clientId
       }
-    }, function (err, res, body) {
+    }
+    if (global.configuration.get('debug')) {
+      global.log.debug('Get last 100 followers from twitch', options)
+    }
+    global.client.api(options, function (err, res, body) {
       if (err) {
         if (err.code !== 'ETIMEDOUT' && err.code !== 'ECONNRESET') global.log.error(err, { fnc: 'Twitch#2' })
         return
+      }
+      if (global.configuration.get('debug')) {
+        global.log.debug('Response: Get last 100 followers from twitch', body)
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
         self.currentFollowers = body._total
@@ -114,16 +131,23 @@ function Twitch () {
   }, 15000)
 
   setInterval(function () {
-    global.client.api({
+    let options = {
       url: 'https://api.twitch.tv/kraken/channels/' + global.channelId + '?timestamp=' + new Date().getTime(),
       headers: {
         Accept: 'application/vnd.twitchtv.v5+json',
         'Client-ID': global.configuration.get().twitch.clientId
       }
-    }, function (err, res, body) {
+    }
+    if (global.configuration.get('debug')) {
+      global.log.debug('Get current channel data from twitch', options)
+    }
+    global.client.api(options, function (err, res, body) {
       if (err) {
         if (err.code !== 'ETIMEDOUT' && err.code !== 'ECONNRESET') global.log.error(err, { fnc: 'Twitch#3' })
         return
+      }
+      if (global.configuration.get('debug')) {
+        global.log.debug('Response: Get current channel data from twitch', body)
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
         self.currentGame = body.game
@@ -133,12 +157,19 @@ function Twitch () {
     })
 
     if (!_.isNull(global.channelId)) {
-      global.client.api({
+      options = {
         url: 'http://tmi.twitch.tv/hosts?include_logins=1&target=' + global.channelId
-      }, function (err, res, body) {
+      }
+      if (global.configuration.get('debug')) {
+        global.log.debug('Get current hosts', options)
+      }
+      global.client.api(options, function (err, res, body) {
         if (err) {
           if (err.code !== 'ETIMEDOUT' && err.code !== 'ECONNRESET') global.log.error(err, { fnc: 'Twitch#4' })
           return
+        }
+        if (global.configuration.get('debug')) {
+          global.log.debug('Response: Get current hosts', body)
         }
         if (res.statusCode === 200 && !_.isNull(body)) {
           self.currentHosts = body.hosts.length
@@ -146,15 +177,22 @@ function Twitch () {
       })
     }
 
-    global.client.api({
+    options = {
       url: 'https://api.twitch.tv/kraken',
       headers: {
         'Client-ID': global.configuration.get().twitch.clientId
       }
-    }, function (err, res, body) {
+    }
+    if (global.configuration.get('debug')) {
+      global.log.debug('Get API connection status', options)
+    }
+    global.client.api(options, function (err, res, body) {
       if (err) {
         global.status.API = constants.DISCONNECTED
         return
+      }
+      if (global.configuration.get('debug')) {
+        global.log.debug('Response: Get API connection status', body)
       }
       global.status.API = res.statusCode === 200 ? constants.CONNECTED : constants.DISCONNECTED
     })
@@ -394,23 +432,7 @@ Twitch.prototype.showTop = function (self, sender, text) {
 }
 
 Twitch.prototype.setTitleAndGame = function (self, sender, title = null, game = null) {
-  if (global.configuration.get('debug')) {
-    global.log.debug('Updating game and title ', {
-      url: 'https://api.twitch.tv/kraken/channels/' + global.channelId,
-      payload: {
-        channel: {
-          game: !_.isNull(game) ? game : self.currentGame,
-          status: !_.isNull(title) ? title : self.currentStatus
-        }
-      },
-      headers: {
-        Accept: 'application/vnd.twitchtv.v5+json',
-        Authorization: 'OAuth ' + global.configuration.get().twitch.password.split(':')[1],
-        'Client-ID': global.configuration.get().twitch.clientId
-      }
-    })
-  }
-  global.client.api({
+  const options = {
     url: 'https://api.twitch.tv/kraken/channels/' + global.channelId,
     json: true,
     qs: {
@@ -425,11 +447,15 @@ Twitch.prototype.setTitleAndGame = function (self, sender, title = null, game = 
       Authorization: 'OAuth ' + global.configuration.get().twitch.password.split(':')[1],
       'Client-ID': global.configuration.get().twitch.clientId
     }
-  }, function (err, res, body) {
+  }
+  if (global.configuration.get('debug')) {
+    global.log.debug('Updating game and title ', options)
+  }
+  global.client.api(options, function (err, res, body) {
     if (err) { return global.log.error(err, { fnc: 'Twitch.prototype.setTitleAndGame' }) }
 
     if (global.configuration.get('debug')) {
-      global.log.debug('Response updating game and title ', body)
+      global.log.debug('Response: Updating game and title ', body)
     }
 
     if (!_.isNull(game)) {
@@ -475,15 +501,26 @@ Twitch.prototype.setGame = function (self, sender, text) {
 }
 
 Twitch.prototype.sendGameFromTwitch = function (self, socket, game) {
-  global.client.api({
+  const options = {
     url: 'https://api.twitch.tv/kraken/search/games?query=' + encodeURIComponent(game) + '&type=suggest',
     json: true,
     headers: {
       Accept: 'application/vnd.twitchtv.v5+json',
       'Client-ID': global.configuration.get().twitch.clientId
     }
-  }, function (err, res, body) {
+  }
+
+  if (global.configuration.get('debug')) {
+    global.log.debug('Search game on twitch ', options)
+  }
+
+  global.client.api(options, function (err, res, body) {
     if (err) { return global.log.error(err, { fnc: 'Twitch.prototype.sendGameFromTwitch' }) }
+
+    if (global.configuration.get('debug')) {
+      global.log.debug('Response: Search game on twitch ', body)
+    }
+
     if (_.isNull(body.games)) {
       socket.emit('sendGameFromTwitch', false)
     } else {
