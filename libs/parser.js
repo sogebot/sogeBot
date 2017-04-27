@@ -279,16 +279,16 @@ Parser.prototype.parseMessage = async function (message, attr) {
       switch (system) {
         case 'alias':
           list = _.map(_.filter(global.systems[system].alias, function (o) { return o.visible }), function (n) { return n.alias }).join(', ')
-          return list
+          return list.length > 0 ? list : ' '
         case '!alias':
           list = _.map(_.filter(global.systems[system].alias, function (o) { return o.visible }), function (n) { return '!' + n.alias }).join(', ')
-          return list
+          return list.length > 0 ? list : ' '
         case 'command':
           list = _.map(_.filter(global.systems['customcommands'].commands, function (o) { return o.visible }), function (n) { return n.command }).join(', ')
-          return list
+          return list.length > 0 ? list : ' '
         case '!command':
           list = _.map(_.filter(global.systems['customcommands'].commands, function (o) { return o.visible }), function (n) { return '!' + n.command }).join(', ')
-          return list
+          return list.length > 0 ? list : ' '
         default:
           return ''
       }
