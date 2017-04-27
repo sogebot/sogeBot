@@ -17,8 +17,8 @@ global.log = new (winston.Logger)({
     timeout: 8,
     ban: 9,
     warning: 10,
-    info: 11
-
+    debug: 11,
+    info: 12
   },
   transports: [
     new (winston.transports.Console)({
@@ -30,6 +30,7 @@ global.log = new (winston.Logger)({
         // Return string will be passed to logger.
         let level = options.level
         if (level === 'error') level = '!!! ERROR !!!'
+        if (level === 'debug') level = 'DEBUG:'
         if (level === 'chatIn') level = '<<<'
         if (level === 'chatOut') level = '>>>'
         if (level === 'whisperIn') level = '<w<'
@@ -42,7 +43,7 @@ global.log = new (winston.Logger)({
         if (level === 'unfollow') level = '-follow'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
         let fnc = !_.isUndefined(options.meta.fnc) ? options.meta.fnc : ''
-        return options.timestamp() + (level ? ' ' + level + ' ' : ' ') + (options.message ? options.message : '') + (username ? ' [' + username + ']' : '') + (fnc ? ' [function: ' + fnc + ']' : '')
+        return options.timestamp() + (level ? ' ' + level + ' ' : ' ') + (options.message ? options.message : '') + (username ? ' [' + username + ']' : '') + (fnc ? ' [function: ' + fnc + ']' : '') + (_.size(options.meta) > 0 ? '\n' + options.timestamp() + ' DEBUG: ' + JSON.stringify(options.meta) : '')
       }
     }),
     new winston.transports.File({
