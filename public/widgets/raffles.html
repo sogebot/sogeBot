@@ -50,7 +50,6 @@
         <span class="input-group-addon">!</span>
         <input type="text" class="form-control" placeholder="Enter keyword..." id="rafflesWidgetKeyword">
         <span class="input-group-btn">
-          <button class="btn btn-warning" type="button" title="Clear participants" onclick="raffles.clearParticipants()"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
           <button class="btn btn-danger" id="toggleButton" type="button" title="" onclick="raffles.toggleRaffle()"><i class="fa fa-close" aria-hidden="true"></i></button>
         </span>
       </div>
@@ -196,13 +195,6 @@
       $('#toggleButton').removeClass().addClass('btn btn-success')
       $('#toggleButton').attr('title', 'Create new raffle')
       $('#toggleButton i').removeClass().addClass('fa fa-plus')
-
-      $("#raffleWidgetRoll").removeClass()
-      $("#raffleWidgetRoll").addClass('btn btn-disabled btn-block')
-    },
-    clearParticipants: function () {
-      socket.emit('clearRaffleParticipants')
-      $('#raffles-participants-count').text(0)
 
       $("#raffleWidgetRoll").removeClass()
       $("#raffleWidgetRoll").addClass('btn btn-disabled btn-block')
