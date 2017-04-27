@@ -394,6 +394,22 @@ Twitch.prototype.showTop = function (self, sender, text) {
 }
 
 Twitch.prototype.setTitleAndGame = function (self, sender, title = null, game = null) {
+  if (global.configuration.get('debug')) {
+    global.log.debug('Updating game and title ', {
+      url: 'https://api.twitch.tv/kraken/channels/' + global.channelId,
+      payload: {
+        channel: {
+          game: !_.isNull(game) ? game : self.currentGame,
+          status: !_.isNull(title) ? title : self.currentStatus
+        }
+      },
+      headers: {
+        Accept: 'application/vnd.twitchtv.v5+json',
+        Authorization: 'OAuth ' + global.configuration.get().twitch.password.split(':')[1],
+        'Client-ID': global.configuration.get().twitch.clientId
+      }
+    })
+  }
   global.client.api({
     url: 'https://api.twitch.tv/kraken/channels/' + global.channelId,
     json: true,
@@ -411,6 +427,10 @@ Twitch.prototype.setTitleAndGame = function (self, sender, title = null, game = 
     }
   }, function (err, res, body) {
     if (err) { return global.log.error(err, { fnc: 'Twitch.prototype.setTitleAndGame' }) }
+
+    if (global.configuration.get('debug')) {
+      global.log.debug('Response updating game and title ', body)
+    }
 
     if (!_.isNull(game)) {
       if (body.game === game.trim()) {
