@@ -224,13 +224,13 @@
 
     var translations = {}
 
+    console.debug('EMIT [getSystems]')
     socket.emit('getSystems')
     socket.on('systems', function(data) {
       systems = data
     })
 
-
-
+    console.debug('EMIT [getConfiguration]')
     socket.emit('getConfiguration')
     socket.on('configuration', function (data) {
       /* THEME */
@@ -251,10 +251,12 @@
       if (btn.text() === translations['dark']) {
         btn.text(translations['light'])
         $('head').append('<link rel="stylesheet" href="./dist/css/dark.css">')
+        console.debug('EMIT [saveConfiguration]', {'theme': 'dark'})
         socket.emit('saveConfiguration', {'theme': 'dark'})
       } else {
         btn.text(translations['dark'])
         $("LINK[href='./dist/css/dark.css']").remove();
+        console.debug('EMIT [saveConfiguration]', {'theme': 'light'})
         socket.emit('saveConfiguration', {'theme': 'light'})
       }
     }
@@ -268,7 +270,10 @@
         btn.addClass('btn btn-success btn-xs')
       }
       btn.data('muted', !btn.data('muted'))
-      if (update) socket.emit('saveConfiguration', {'mute': btn.data('muted')})
+      if (update) {
+        console.debug('EMIT [saveConfiguration]', {'mute': btn.data('muted')})
+        socket.emit('saveConfiguration', {'mute': btn.data('muted')})
+      }
     }
 
     var switchPercentageShow = function() {
@@ -326,7 +331,7 @@
           break;
       }
     }
-    setInterval(function () { socket.emit('getConnectionStatus'); setStatus('SOC', socket.connected ? 3 : 0) }, 1000)
+    setInterval(function () { console.debug('EMIT [getConnectionStatus]'); socket.emit('getConnectionStatus'); setStatus('SOC', socket.connected ? 3 : 0) }, 1000)
     socket.on('connectionStatus', function (data) {
       _.each(data, function (status, conn) {
         setStatus(conn, status)
@@ -378,6 +383,7 @@
     /* WIDGETS */
     var deleteWidget = function(id) {
       $('#' + id).remove();
+      console.debug('EMIT [deleteWidget]', 0)
       socket.emit('deleteWidget', id)
       loadedWidgets.splice(loadedWidgets.indexOf(id), 1)
     }
@@ -405,6 +411,8 @@
 
     /* STATS */
     setInterval(function() {
+      console.debug('EMIT [getStats]')
+      console.debug('EMIT [getLatestStats]')
       socket.emit('getStats')
       socket.emit('getLatestStats')
     }, 1000)
@@ -532,6 +540,7 @@
           $inputGroup.css('display', 'none')
           $(el).css('display', 'inline')
           $(el).text(value + suffix)
+          console.debug('EMIT [saveConfiguration]', data)
           socket.emit('saveConfiguration', data)
         })
       },
@@ -579,6 +588,7 @@
           self.group.addClass('form-group has-feedback')
           self.lastSearch = $(el).val().trim()
           if($(el).val().trim() !== '')  {
+            console.debug('EMIT [getGameFromTwitch]', $(el).val())
             socket.emit('getGameFromTwitch', $(el).val())
             self.icon.addClass('fa fa-spinner fa-spin form-control-feedback')
           } else {
@@ -703,6 +713,7 @@
             name: 'Delete',
             iconClass: 'fa-trash-o',
             onClick: function(game) {
+              console.debug('EMIT [deleteUserTwitchGame]', game.game)
               socket.emit('deleteUserTwitchGame', game.game)
             },
             isEnabled: function(game) {
@@ -721,16 +732,6 @@
           div.attr('data-deletable', false)
           var label = $('<label>')
           label.html(curTitle + ' <small style="font-size: 65%; color:#777">CURRENT</small>')
-
-          var input = $('<input>')
-          input.attr('type', 'radio')
-          input.attr('name', 'titleSelector')
-          input.attr('value', curTitle)
-          input.attr('checked', 'checked')
-
-          label.prepend(input)
-          div.append(label)
-
           $('#titles-list').append(div)
           this.selectedTitle = curTitle
         }
@@ -763,6 +764,7 @@
             name: 'Delete',
             iconClass: 'fa-trash-o',
             onClick: function(data) {
+              console.debug('EMIT [deleteUserTwitchGame]', data)
               socket.emit('deleteUserTwitchTitle', data)
             },
             isEnabled: function(data) {
@@ -796,6 +798,7 @@
         $("#change-game-input").val('')
         $("#change-title").val('')
         $('#game_and_title_dlg').modal();
+        console.debug('EMIT [getUserTwitchGames]')
         socket.emit('getUserTwitchGames')
       },
       save: function() {
@@ -803,6 +806,7 @@
         if (this.tgroup.hasClass('has-error') &&  $('#inputRadio').prop('checked')) {
           $("#title-error").css('display', 'inline-block')
         } else {
+          console.debug('EMIT [updateGameAndTitle]', {game: this.selectedGame, title: this.selectedTitle})
           socket.emit('updateGameAndTitle', {game: this.selectedGame, title: this.selectedTitle})
           $('#game_and_title_dlg').modal('hide')
         }
