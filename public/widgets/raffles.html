@@ -181,9 +181,16 @@
     toggleRaffle: function () {
       let classes = $("#toggleButton i").attr('class')
       if (classes.indexOf('fa-plus') >= 0) {
-        raffles.createRaffle()
+        if(raffles.createRaffle()) {
+          // disable configuration buttons and inputs
+          $("#followerCheckbox").removeClass().addClass('btn btn-disabled')
+          $("#rafflesWatchedTime").prop("disabled", true);
+        }
       } else {
         raffles.removeRaffle()
+        // enable configuration buttons and inputs
+        $("#followerCheckbox").removeClass().addClass('btn btn-primary')
+        $("#rafflesWatchedTime").prop("disabled", false);
       }
     },
     removeRaffle: function () {
@@ -205,6 +212,7 @@
     createRaffle: function () {
       if ($("#rafflesWidgetKeyword").val().length === 0) {
         $("#rafflesWidgetKeyword").parent().addClass('has-error')
+        return false
       } else {
         $("#rafflesWidgetKeyword").parent().removeClass().addClass('input-group')
         $('#toggleButton').removeClass().addClass('btn btn-danger')
@@ -212,6 +220,7 @@
         $('#toggleButton i').removeClass().addClass('fa fa-close')
         this.keyword = $("#rafflesWidgetKeyword").val()
         socket.emit('createRaffle', { keyword: $("#rafflesWidgetKeyword").val(), followers: this.followersOnly, product: $("#rafflesWidgetProduct").val(), minWatchedTime: $("#rafflesWatchedTime").val()})
+        return true
       }
 
       $("#raffleWidgetRoll").removeClass()
@@ -220,6 +229,7 @@
       } else $("#raffleWidgetRoll").addClass('btn btn-success btn-block')
     },
     switchFollowersOnly: function () {
+      if ($("#followerCheckbox").hasClass('btn-disabled')) return false
       this.followersOnly = !this.followersOnly
       if (this.followersOnly) {
         $("#followerCheckbox").html(translations['followers-only'])
@@ -239,6 +249,10 @@
         $('#toggleButton').addClass('btn btn-danger')
         $('#toggleButton').attr('title', 'Remove raffle')
         $('#toggleButton i').addClass('fa fa-close')
+
+        // disable configuration buttons and inputs
+        $("#followerCheckbox").removeClass().addClass('btn btn-disabled')
+        $("#rafflesWatchedTime").prop("disabled", true);
       }
 
       this.followersOnly = !_.isNull(raffle) && raffle.followers
