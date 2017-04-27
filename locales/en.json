@@ -18,6 +18,9 @@
       "false": "Mute disabled. Bot will send messages."
     },
     "theme": "",
+    "percentage": {
+      "true": "", "false": ""
+    },
     "settings": {
       "uptime-format": "Uptime format set to (value)"
     },
