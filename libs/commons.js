@@ -106,6 +106,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
     message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace('(sender)', '@' + sender.username) : message
     if ((_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === global.configuration.get().twitch.username))) message = '! ' + message
     sender['message-type'] === 'whisper' ? global.log.whisperOut(message, {username: sender.username}) : global.log.chatOut(message, {username: sender.username})
+    return true
   }
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
   if (_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === global.configuration.get().twitch.username)) return false // we don't want to reply on bot commands
