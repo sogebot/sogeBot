@@ -72,6 +72,7 @@
     "overlay-emotes-subscribe-list": "Emoticons for subscribe explosion",
     "overlay-emotes-resub-list": "Emoticons for resub explosion",
     "moderation-subscribers-toggle": "Timeout subscribers",
+    "moderation-spaces-toggle": "Timeout links with spaces",
     "global": "Global",
     "user": "User",
     "dashboard": "Dashboard",
@@ -578,6 +579,11 @@
         "text": "Moderation of links is",
         "true": "{moderation.settings.moderationLinks.text} {core.enabled}",
         "false": "{moderation.settings.moderationLinks.text} {core.disabled}"
+      },
+      "moderationLinksWithSpaces": {
+        "text": "Moderation of links with spaces is",
+        "true": "{moderation.settings.moderationLinksWithSpaces.text} {core.enabled}",
+        "false": "{moderation.settings.moderationLinksWithSpaces.text} {core.disabled}"
       },
       "moderationLinksSubs": {
         "text": "Moderation of links for subscribers is",

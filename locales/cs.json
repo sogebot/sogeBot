@@ -72,6 +72,7 @@
     "overlay-emotes-subscribe-list": "Emotikony pro subscribe explozi",
     "overlay-emotes-resub-list": "Emotikony pro resub explozi",
     "moderation-subscribers-toggle": "Postihovat i subscribery",
+    "moderation-spaces-toggle": "Zahrnout linky s mezerou",
     "global": "Globální",
     "user": "Divák",
     "dashboard": "Dashboard",
@@ -581,10 +582,15 @@
         "true": "{moderation.settings.moderationLinks.text} {core.enabled}",
         "false": "{moderation.settings.moderationLinks.text} {core.disabled}"
       },
+      "moderationLinksWithSpaces": {
+        "text": "Moderovani linku s mezerama je",
+        "true": "{moderation.settings.moderationLinksWithSpaces.text} {core.enabled}",
+        "false": "{moderation.settings.moderationLinksWithSpaces.text} {core.disabled}"
+      },
       "moderationLinksSubs": {
         "text": "Moderovani linku pro subscribery je",
-        "true": "{moderation.settings.moderationLinkSubs.text} {core.enabled}",
-        "false": "{moderation.settings.moderationLinkSubs.text} {core.disabled}"
+        "true": "{moderation.settings.moderationLinksSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationLinksSubs.text} {core.disabled}"
       },
       "moderationLinksTimeout": "Timeout pri pouziti linku je nastaven na (value)s",
       "moderationSymbols": {
