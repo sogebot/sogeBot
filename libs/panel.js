@@ -40,6 +40,7 @@ function Panel () {
   this.socketListeners = []
 
   global.configuration.register('theme', 'core.theme', 'string', 'light')
+  global.configuration.register('percentage', 'core.percentage', 'bool', true)
 
   var self = this
   this.io.on('connection', function (socket) {

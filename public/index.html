@@ -244,6 +244,11 @@
       var btn = $('#mute-btn')
       btn.data('muted', !data.mute)
       switchMute(false)
+
+      /* PERCENTAGE BUTTON */
+      var btn = $('#percentage-btn')
+      btn.data('showPercentage', !data.percentage)
+      switchPercentageShow(false)
     })
 
     var switchTheme = function () {
@@ -276,7 +281,7 @@
       }
     }
 
-    var switchPercentageShow = function() {
+    var switchPercentageShow = function(update = true) {
       var btn = $('#percentage-btn')
       btn.removeClass()
       if (btn.data('showPercentage')) {
@@ -285,6 +290,10 @@
         btn.addClass('btn btn-info btn-xs')
       }
       btn.data('showPercentage', !btn.data('showPercentage'))
+      if (update) {
+        console.debug('EMIT [saveConfiguration]', {'percentage': btn.data('showPercentage')})
+        socket.emit('saveConfiguration', {'percentage': btn.data('showPercentage')})
+      }
     }
 
     var setStatus = function (id, status) {

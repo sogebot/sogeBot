@@ -18,6 +18,9 @@
       "false": "Mute vypnut. Bot bude posilat zpravy."
     },
     "theme": "",
+    "percentage": {
+      "true": "", "false": ""
+    },
     "settings": {
       "uptime-format": "Format pro uptime nastaven na (value)"
     },
