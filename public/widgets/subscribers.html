@@ -1,0 +1,77 @@
+<div class="widget">
+  <h6 data-lang="widget-title-latest-subscribers"></h6>
+  <ul class="nav nav-pills" role="tablist">
+    <li role="presentation" class="active">
+      <a href="#subscribers-main" aria-controls="home" role="tab" data-toggle="tab" title="Latest Subscribers">
+        <i class="fa fa-user" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li role="presentation">
+      <a href="#subscribers-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+        <i class="fa fa-cog" aria-hidden="true"></i>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="subscribers-main">
+      <div id="subscribers-widget"></div>
+    </div> <!-- /MAIN -->
+
+    <div role="tabpanel" class="tab-pane" id="subscribers-settings">
+      <div class="input-group">
+        <span class="input-group-addon" data-lang="followers-show-number"></span>
+        <input type="text" class="form-control" id="subscribersShow">
+        <span class="input-group-addon" data-lang="subscribers-show"></span>
+      </div>
+        <div class="input-group">
+          <span class="input-group-addon" data-lang="followers-size"></span>
+          <input type="text" class="form-control" id="subscribersSize">
+        </div>
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('subscribers')" style="margin-top: 20px;"  data-lang="remove-widget"></button>
+    </div> <!-- /SETTINGS -->
+</div>
+
+<script>
+  if (!_.isUndefined(Isubscribers)) window.clearInterval(Isubscribers)
+  var Isubscribers = setInterval(function() { socket.emit('subscribers.latest.get') }, 2000)
+
+  socket.emit('subscribers.configuration.get')
+  socket.off('subscribers.configuration')
+  socket.on('subscribers.configuration', function(data) {
+    $("#subscribersShow").val(data.subscribersWidgetShow)
+    $("#subscribersSize").val(data.subscribersWidgetFontSize)
+  })
+
+  socket.off('subscribers.latest')
+  socket.on('subscribers.latest', function (items) {
+    $("#subscribers-widget").empty()
+    var toShow = $("#subscribersShow").val()
+    var output = ''
+    _.each(items, function(item, index) {
+      if (index < toShow) {
+        output += '<p class="text-center text-uppercase" style="font-size: ' + $('#subscribersSize').val() + 'px">' + item + '</p>'
+      } else return false
+    })
+    $("#subscribers-widget").html(output)
+  })
+
+  var $subscribersShow = $('#subscribersShow')
+  $subscribersShow.off()
+  $subscribersShow.on('focusout', function() {
+    var value = $subscribersShow.val()
+    var data = {}
+    data['subscribersWidgetShow'] = value
+    socket.emit('saveConfiguration', data)
+  })
+
+  var $subscribersSize = $('#subscribersSize')
+  $subscribersSize.off()
+  $subscribersSize.on('focusout', function() {
+    var value = $subscribersSize.val()
+    var data = {}
+    data['subscribersWidgetFontSize'] = value
+    socket.emit('saveConfiguration', data)
+  })
+</script>
