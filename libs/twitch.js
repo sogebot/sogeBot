@@ -432,7 +432,10 @@ Twitch.prototype.showTop = function (self, sender, text) {
   }
 }
 
-Twitch.prototype.setTitleAndGame = function (self, sender, title = null, game = null) {
+Twitch.prototype.setTitleAndGame = function (self, sender, title, game) {
+  title = title || null
+  game = game || null
+
   const options = {
     url: 'https://api.twitch.tv/kraken/channels/' + global.channelId,
     json: true,

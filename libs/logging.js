@@ -43,7 +43,7 @@ global.log = new (winston.Logger)({
         if (level === 'unfollow') level = '-follow'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
         let fnc = !_.isUndefined(options.meta.fnc) ? options.meta.fnc : ''
-        return options.timestamp() + (level ? ' ' + level + ' ' : ' ') + (options.message ? options.message : '') + (username ? ' [' + username + ']' : '') + (fnc ? ' [function: ' + fnc + ']' : '') + (_.size(options.meta) > 0 ? '\n' + options.timestamp() + ' DEBUG: ' + JSON.stringify(options.meta) : '')
+        return options.timestamp() + (level ? ' ' + level + ' ' : ' ') + (options.message ? options.message : '') + (username ? ' [' + username + ']' : '') + (fnc ? ' [function: ' + fnc + ']' : '') + (_.size(options.meta) > 0 && level === 'DEBUG:' ? '\n' + options.timestamp() + ' DEBUG: ' + JSON.stringify(options.meta) : '')
       }
     }),
     new winston.transports.File({
