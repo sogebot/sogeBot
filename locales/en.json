@@ -36,25 +36,7 @@
         "OEmotesSize": "Emoticon size is set to (value)",
         "OEmotesMax": "Max count of same emoticon to show is (value)",
         "OEmotesAnimation": "Emoticon show animation is (value)",
-        "OEmotesAnimationTime": "Emoticon animation duration is (value)ms",
-        "OEmotesFollowerExplosion": {
-          "explosion": "Follower emoticon explosion is",
-          "true": "{overlay.emotes.settings.OEmotesFollowerExplosion.explosion} enabled",
-          "false": "{overlay.emotes.settings.OEmotesFollowerExplosion.explosion} disabled"
-        },
-        "OEmotesSubscribeExplosion": {
-          "explosion": "Subscribe emoticon explosion is",
-          "true": "{overlay.emotes.settings.OEmotesSubscribeExplosion.explosion} enabled",
-          "false": "{overlay.emotes.settings.OEmotesSubscribeExplosion.explosion} disabled"
-        },
-        "OEmotesResubExplosion": {
-          "explosion": "Resub emoticon explosion is",
-          "true": "{overlay.emotes.settings.OEmotesResubExplosion.explosion} enabled",
-          "false": "{overlay.emotes.settings.OEmotesResubExplosion.explosion} disabled"
-        },
-        "OEmotesFollowerExplosionList": "Emoticons for follower explosion: (value)",
-        "OEmotesSubscribeExplosionList": "Emoticons for subscribe explosion: (value)",
-        "OEmotesResubExplosionList": "Emoticons for resub explosion: (value)"
+        "OEmotesAnimationTime": "Emoticon animation duration is (value)ms"
       }
     }
   },
@@ -63,18 +45,14 @@
     "overlay-emotes-max": "Max same emoticons to show",
     "overlay-emotes-animation": "Emoticon animation",
     "overlay-emotes-animation-time": "Animation Duration",
+    "overlay-carousel-upload": "Upload image",
     "fade-out-top": "fade up",
     "fade-out-zoom": "fade zoom",
-    "overlay-emotes-follower-explosion": "Follower explosion",
-    "overlay-emotes-subscribe-explosion": "Subscribe explosion",
-    "overlay-emotes-resub-explosion": "Resub explosion",
-    "overlay-emotes-follower-list": "Emoticons for follower explosion",
-    "overlay-emotes-subscribe-list": "Emoticons for subscribe explosion",
-    "overlay-emotes-resub-list": "Emoticons for resub explosion",
     "moderation-subscribers-toggle": "Timeout subscribers",
     "moderation-spaces-toggle": "Timeout links with spaces",
     "global": "Global",
     "user": "User",
+    "carousel": "Image Carousel",
     "dashboard": "Dashboard",
     "manage": "Manage",
     "settings": "Settings",
@@ -213,7 +191,7 @@
     "announce-timeouts-in-chat": "Announce timeouts in chat",
     "on": "on",
     "off": "off",
-    "timeout": "timeout",
+    "will-timeout": "timeout",
     "warning": "warning",
     "announce": "announce",
     "muted": "muted",

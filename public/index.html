@@ -353,12 +353,15 @@
       /* at first, clear all menu */
       $('#menu-*').empty()
       var systems = false // we want only systems settings once
+      var overlays = false // we want only overlays settings once
       _.each(menu, function(obj) {
         if (obj.id !== 'dashboard') {
           if ((obj.id === 'systems') && systems) return
+          if ((obj.id === 'overlays') && overlays) return
           $('#menu-' + obj.category).append('<li><a href="#" data-page="' + obj.id + '" data-lang="' + obj.name + '"></a></li>')
         }
         if (obj.id === 'systems') systems = true
+        if (obj.id === 'overlays') overlays = true
       })
       loadedMenu = true
 

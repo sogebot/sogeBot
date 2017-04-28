@@ -53,8 +53,20 @@
     <div class="title">
       <span data-lang="stats"></span>
       <small><a href="/overlays/stats">XSplit / OBS link</a> (300x55)</small>
-      <a href="https://github.com/sogehige/SogeBot/wiki/Overlay-Themes#stats" class="pull-right initialism">more themes</span>
+      <a href="https://github.com/sogehige/SogeBot/wiki/Overlay-Themes#stats" class="pull-right initialism">more themes</span></a>
     </div>
+  </div>
+
+  <div class="widget" id="carousel">
+    <div class="title">
+      <span data-lang="carousel"></span>
+    </div>
+    <table class="table table-striped">
+      <tr>
+        <td><strong data-lang="overlay-carousel-upload"></strong></td>
+        <td><input type="file" id="file-input-carousel" accept="image/*" /></td>
+      </tr>
+    </table>
   </div>
 </div>
 
@@ -68,6 +80,14 @@
     $("#configOEmotesAnimationTime").text(data.OEmotesAnimationTime + 'ms')
 
     $('#overlay-emotes-animation-select option[value=' + data.OEmotesAnimation + ']').prop('selected', true)
+  })
+
+  $('#file-input-carousel').on('change', function (ev) {
+    var reader = new FileReader()
+    reader.onload = function(event) {
+      socket.emit('overlay.image.upload', event.target.result)
+    }
+    reader.readAsDataURL(event.target.files[0])
   })
 
   function saveEmotesAnimation () {
