@@ -46,10 +46,11 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 | Bets     |                                                |
 | Gambling | !seppuku, !roulette commands                   |
 
-| Overlay | Description                              |
-|---------|------------------------------------------|
-| Emotes  | Show chat message emotes in your stream! |
-| Stats   | Show viewers, follower, uptime           |
+| Overlay       | Description                              |
+|---------------|------------------------------------------|
+| Emotes        | Show chat message emotes in your stream! |
+| Stats         | Show viewers, follower, uptime           |
+| ImageCarousel | Simple image fadeIn/fadeOut carousel     |
 
 #### Languages
 
