@@ -36,25 +36,7 @@
         "OEmotesSize": "Velikost emotikonu je nastavena na (value)",
         "OEmotesMax": "Maximalni pocet zobrazeni stejnych emotikonu na zpravu je (value)",
         "OEmotesAnimation": "Animace zobrazeni emotikonu je (value)",
-        "OEmotesAnimationTime": "Doba trvani animace nastavena na (value)ms",
-        "OEmotesFollowerExplosion": {
-          "explosion": "Exploze emotikonu behem followu je",
-          "true": "{overlay.emotes.settings.OEmotesFollowerExplosion.explosion} zapnuta",
-          "false": "{overlay.emotes.settings.OEmotesFollowerExplosion.explosion} vypnuta"
-        },
-        "OEmotesSubscribeExplosion": {
-          "explosion": "Exploze emotikonu behem subscribe je",
-          "true": "{overlay.emotes.settings.OEmotesSubscribeExplosion.explosion} zapnuta",
-          "false": "{overlay.emotes.settings.OEmotesSubscribeExplosion.explosion} vypnuta"
-        },
-        "OEmotesResubExplosion": {
-          "explosion": "Exploze emotikonu behem resubu je",
-          "true": "{overlay.emotes.settings.OEmotesResubExplosion.explosion} zapnuta",
-          "false": "{overlay.emotes.settings.OEmotesResubExplosion.explosion} vypnuta"
-        },
-        "OEmotesFollowerExplosionList": "Emotikony behem exploze followu: (value)",
-        "OEmotesSubscribeExplosionList": "Emotikony behem exploze subscribe: (value)",
-        "OEmotesResubExplosionList": "Emotikony behem exploze resub: (value)"
+        "OEmotesAnimationTime": "Doba trvani animace nastavena na (value)ms"
       }
     }
   },
@@ -63,19 +45,15 @@
     "overlay-emotes-max": "Max stejných emotikonů na zprávu",
     "overlay-emotes-animation": "Animace emotikonu",
     "overlay-emotes-animation-time": "Trvání animace",
+    "overlay-carousel-upload": "Nahrát obrázek",
     "fade-out-top": "slábnout směrem nahoru",
     "fade-out-zoom": "slábnout přiblížením",
-    "overlay-emotes-follower-explosion": "Follower exploze",
-    "overlay-emotes-subscribe-explosion": "Subscribe exploze",
-    "overlay-emotes-resub-explosion": "Resub exploze",
-    "overlay-emotes-follower-list": "Emotikony pro follower explozi",
-    "overlay-emotes-subscribe-list": "Emotikony pro subscribe explozi",
-    "overlay-emotes-resub-list": "Emotikony pro resub explozi",
     "moderation-subscribers-toggle": "Postihovat i subscribery",
     "moderation-spaces-toggle": "Zahrnout linky s mezerou",
     "global": "Globální",
     "user": "Divák",
     "dashboard": "Dashboard",
+    "carousel": "Obrázky",
     "manage": "Správa",
     "settings": "Nastavení",
     "permissions": "Oprávnění",
@@ -213,7 +191,7 @@
     "announce-timeouts-in-chat": "Oznámit timeouty v chatu",
     "on": "zapnuto",
     "off": "vypnuto",
-    "timeout": "timeout",
+    "will-timeout": "timeout",
     "warning": "varování",
     "announce": "oznámit",
     "muted": "neoznámit",

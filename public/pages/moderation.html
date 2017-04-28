@@ -393,7 +393,7 @@
     $("#moderationBlacklistTimeout").text(data.moderationBlacklistTimeout + 's')
 
     $("#moderationWarnings").text(data.moderationWarnings)
-    createToggle('moderationWarningsTimeouts', data.moderationWarningsTimeouts, {on: translations['timeout'], off: translations['warning']})
+    createToggle('moderationWarningsTimeouts', data.moderationWarningsTimeouts, {on: translations['will-timeout'], off: translations['warning']})
 
     $("#moderationAnnounceTimeouts").text(data.moderationAnnounceTimeouts)
     createToggle('moderationAnnounceTimeouts', data.moderationAnnounceTimeouts, {on: translations['announce'], off: translations['muted']})
