@@ -432,9 +432,8 @@ Twitch.prototype.showTop = function (self, sender, text) {
   }
 }
 
-Twitch.prototype.setTitleAndGame = function (self, sender, title, game) {
-  title = title || null
-  game = game || null
+Twitch.prototype.setTitleAndGame = function (self, sender, args) {
+  args = _.defaults(args, { title: null }, { game: null })
 
   const options = {
     url: 'https://api.twitch.tv/kraken/channels/' + global.channelId,
@@ -442,8 +441,8 @@ Twitch.prototype.setTitleAndGame = function (self, sender, title, game) {
     qs: {
       _method: 'put',
       channel: {
-        game: !_.isNull(game) ? game : self.currentGame,
-        status: !_.isNull(title) ? title : self.currentStatus
+        game: !_.isNull(args.game) ? args.game : self.currentGame,
+        status: !_.isNull(args.title) ? args.title : self.currentStatus
       }
     },
     headers: {
@@ -462,8 +461,8 @@ Twitch.prototype.setTitleAndGame = function (self, sender, title, game) {
       global.log.debug('Response: Updating game and title ', body)
     }
 
-    if (!_.isNull(game)) {
-      if (body.game === game.trim()) {
+    if (!_.isNull(args.game)) {
+      if (body.game === args.game.trim()) {
         global.commons.sendMessage(global.translate('game.change.success')
           .replace('(game)', body.game), sender)
         self.currentGame = body.game
@@ -473,8 +472,8 @@ Twitch.prototype.setTitleAndGame = function (self, sender, title, game) {
       }
     }
 
-    if (!_.isNull(title)) {
-      if (body.status === title.trim()) {
+    if (!_.isNull(args.title)) {
+      if (body.status === args.title.trim()) {
         global.commons.sendMessage(global.translate('title.change.success')
           .replace('(status)', body.status), sender)
         self.currentStatus = body.status
@@ -492,7 +491,7 @@ Twitch.prototype.setTitle = function (self, sender, text) {
       .replace('(title)', self.currentStatus), sender)
     return
   }
-  self.setTitleAndGame(self, sender, text, null)
+  self.setTitleAndGame(self, sender, { title: text })
 }
 
 Twitch.prototype.setGame = function (self, sender, text) {
@@ -501,7 +500,7 @@ Twitch.prototype.setGame = function (self, sender, text) {
       .replace('(game)', self.currentGame), sender)
     return
   }
-  self.setTitleAndGame(self, sender, null, text)
+  self.setTitleAndGame(self, sender, { game: text })
 }
 
 Twitch.prototype.sendGameFromTwitch = function (self, socket, game) {
@@ -550,7 +549,7 @@ Twitch.prototype.sendUserTwitchGamesAndTitles = function (self, socket) {
 }
 
 Twitch.prototype.updateGameAndTitle = function (self, socket, data) {
-  self.setTitleAndGame(self, null, data.title, data.game)
+  self.setTitleAndGame(self, null, data)
 
   if (_.isUndefined(self.cGamesTitles[data.game])) { // create key if doesnt exists
     self.cGamesTitles[data.game] = []
