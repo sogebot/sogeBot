@@ -60,6 +60,7 @@
   <div class="widget" id="carousel">
     <div class="title">
       <span data-lang="carousel"></span>
+      <small><a href="/overlays/carousel">XSplit / OBS link</a></small>
     </div>
     <table class="table table-striped">
       <tr>
@@ -67,6 +68,7 @@
         <td><input type="file" id="file-input-carousel" accept="image/*" /></td>
       </tr>
     </table>
+    <div id="carousel-image-list"></div>
   </div>
 </div>
 
@@ -82,6 +84,17 @@
     $('#overlay-emotes-animation-select option[value=' + data.OEmotesAnimation + ']').prop('selected', true)
   })
 
+  socket.emit('overlay.images.get')
+  socket.on('overlay.image.list', function (data) {
+    $('#carousel-image-list').empty()
+    _.each(data, function (image) {
+      $('#carousel-image-list').append('<span>' +
+          '<img src="/dist/carousel/' + image + '" style="max-width: 100px; max-height: 100px">' +
+          '<button data-image="' + image + '" class="btn btn-danger" style="position: absolute; margin-left: -30px;" onclick="deleteCarouselImage(this)">X</button>' +
+        '</span>')
+    })
+  })
+
   $('#file-input-carousel').on('change', function (ev) {
     var reader = new FileReader()
     reader.onload = function(event) {
@@ -89,6 +102,10 @@
     }
     reader.readAsDataURL(event.target.files[0])
   })
+
+  function deleteCarouselImage (el) {
+    socket.emit('overlay.image.delete', $(el).data('image'))
+  }
 
   function saveEmotesAnimation () {
     socket.emit('saveConfiguration', {'OEmotesAnimation': $('#overlay-emotes-animation-select').val()})
