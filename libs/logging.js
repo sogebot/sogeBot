@@ -55,6 +55,7 @@ global.log = new (winston.Logger)({
         // Return string will be passed to logger.
         let level = options.level
         if (level === 'error') level = '!!! ERROR !!!'
+        if (level === 'debug') level = 'DEBUG:'
         if (level === 'chatIn') level = '<<<'
         if (level === 'chatOut') level = '>>>'
         if (level === 'whisperIn') level = '<w<'
@@ -68,7 +69,8 @@ global.log = new (winston.Logger)({
         return options.timestamp() +
           (level ? ' ' + level + ' ' : ' ') +
           (options.message ? options.message : '') +
-          (username ? ' [' + username + ']' : '')
+          (username ? ' [' + username + ']' : '') +
+          (_.size(options.meta) > 0 && level === 'DEBUG:' ? '\n' + options.timestamp() + ' DEBUG: ' + JSON.stringify(options.meta) : '')
       },
       filename: logDir + '/sogebot.log',
       handleExceptions: false,
