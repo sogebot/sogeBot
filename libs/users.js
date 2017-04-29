@@ -107,7 +107,7 @@ Users.prototype.get = function (username) {
 
 Users.prototype.getAll = function (object) {
   if (_.isObject(object)) return _.filter(this.users, object)
-  return _.filter(this.users, function () { return true })
+  return this.users
 }
 
 Users.prototype.addRegular = function (self, sender, text) {
