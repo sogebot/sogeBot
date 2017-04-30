@@ -39,6 +39,7 @@
     "standard": "standard main.js && standard libs/* && standard libs/systems/* && standard libs/widgets/*",
     "test": "npm run standard && mocha",
     "migrate": "node --harmony-async-await ./migrate",
+    "cleanup": "node --harmony-async-await ./tools/cleanup",
     "start": "npm run copy:dist && node --harmony-async-await ./main || true",
     "copy:dist": "node tools/copy-dist-files.js"
   },
