@@ -34,7 +34,7 @@ Stats.prototype.save = function (data) {
 }
 
 Stats.prototype.getViewers = function (self, socket) {
-  socket.emit('Viewers', global.users.getAll())
+  socket.emit('Viewers', Buffer.from(JSON.stringify(global.users.getAll())).toString('base64'))
 }
 
 Stats.prototype.deleteViewer = function (self, socket, username) {

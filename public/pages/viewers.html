@@ -166,7 +166,7 @@
 
   socket.off('Viewers')
   socket.on('Viewers', function(list) {
-    viewers.list = list
+    viewers.list = JSON.parse(atob(list))
     viewers.update(viewers.paging())
   });
 
