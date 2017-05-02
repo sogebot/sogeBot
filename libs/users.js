@@ -88,10 +88,10 @@ Users.prototype.get = function (username) {
         global.users.set(username, {id: body.users[0]._id})
       } else {
         self.users[username] = {}
-        self.users[username].time = !_.isNil(self.users[oldUser.username].time) ? self.users[oldUser.username].time : {}
-        self.users[username].is = !_.isNil(self.users[oldUser.username].is) ? self.users[oldUser.username].is : {}
-        self.users[username].stats = !_.isNil(self.users[oldUser.username].stats) ? self.users[oldUser.username].stats : {}
-        self.users[username].points = !_.isNil(self.users[oldUser.username].points) ? self.users[oldUser.username].points : 0
+        self.users[username].time = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].time) ? self.users[oldUser.username].time : {}
+        self.users[username].is = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].is) ? self.users[oldUser.username].is : {}
+        self.users[username].stats = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].stats) ? self.users[oldUser.username].stats : {}
+        self.users[username].points = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].points) ? self.users[oldUser.username].points : 0
         delete self.users[oldUser.username]
       }
     })
