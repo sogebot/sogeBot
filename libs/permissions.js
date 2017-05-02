@@ -4,15 +4,12 @@ var constants = require('./constants')
 var crypto = require('crypto')
 var _ = require('lodash')
 
-var log = global.log
-var translate = global.translate
-
 function Permissions () {
   global.parser.register(this, '!permission', this.overridePermission, constants.OWNER_ONLY)
 
   setInterval(function () {
     global.botDB.find({$where: function () { return this._id.startsWith('permission') }}, function (err, items) {
-      if (err) { log.error(err, { fnc: 'Permissions' }) }
+      if (err) { global.log.error(err, { fnc: 'Permissions' }) }
       _.each(items, function (item) {
         global.parser.permissionsCmds['!' + item.command] = item.permission
       })
@@ -35,6 +32,10 @@ Permissions.prototype.sendSocket = function (self, socket) {
 Permissions.prototype.changeSocket = function (self, socket, data) {
   self.overridePermission(self, null, data.permission + ' ' + data.command)
   self.sendSocket(self, socket)
+}
+
+Permissions.prototype.removePermission = function (self, command) {
+  global.botDB.remove({_id: 'permission_' + crypto.createHash('md5').update(command.replace('!', '')).digest('hex')})
 }
 
 Permissions.prototype.overridePermission = function (self, sender, text) {
@@ -63,8 +64,8 @@ Permissions.prototype.overridePermission = function (self, sender, text) {
     if (!_.isUndefined(global.parser.permissionsCmds['!' + command])) {
       global.parser.permissionsCmds['!' + command] = permission
       global.botDB.update({_id: 'permission_' + hash}, {$set: {command: command, permission: permission}}, {upsert: true}, function (err) {
-        if (err) log.error(err, { fnc: 'Permissions.prototype.overridePermission' })
-        global.commons.sendMessage(translate('permissions.success.change').replace('(command)', parsed[1]), sender)
+        if (err) global.log.error(err, { fnc: 'Permissions.prototype.overridePermission' })
+        global.commons.sendMessage(global.translate('permissions.success.change').replace('(command)', parsed[1]), sender)
       })
     } else {
       global.commons.sendMessage(global.translate('permissions.failed.noCmd'), sender)
@@ -74,4 +75,4 @@ Permissions.prototype.overridePermission = function (self, sender, text) {
   }
 }
 
-module.exports = new Permissions()
+module.exports = Permissions
