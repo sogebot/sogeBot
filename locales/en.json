@@ -278,10 +278,10 @@
         "none": "New raffle is opened. To enter type !(keyword). Everyone can participate"
       },
       "notice": {
-        "product": "Raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate",
-        "followers": "Raffle is opened. To enter type !(keyword). Only followers can participate",
-        "both": "Raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate",
-        "none": "Raffle is opened. To enter type !(keyword). Everyone can participate"
+        "product": "Raffle is currently running for `(product)`. To enter type !(keyword). Everyone can participate",
+        "followers": "Raffle is currently running. To enter type !(keyword). Only followers can participate",
+        "both": "Raffle is currently running for `(product)`. To enter type !(keyword). Only followers can participate",
+        "none": "Raffle is currently running. To enter type !(keyword). Everyone can participate"
       }
     },
     "close": {

@@ -280,10 +280,10 @@
         "none": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem"
       },
       "notice": {
-        "product": "Raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
-        "followers": "Raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
-        "both": "Raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
-        "none": "Raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem"
+        "product": "Raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
+        "followers": "Raffle prave bezi. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
+        "both": "Raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
+        "none": "Raffle prave bezi. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem"
       }
     },
     "close": {
