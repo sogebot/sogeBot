@@ -26,14 +26,19 @@ function Events () {
   this.operations = {
     'send-chat-message': function (attr) {
       if (_.isNil(attr.send)) return
+      let message = attr.send
       _.each(attr, function (val, name) {
-        attr.send = attr.send.replace('(' + name + ')', val)
+        message = message.replace('(' + name + ')', val)
       })
-      global.commons.sendMessage(attr.send, { username: attr.username })
+      global.commons.sendMessage(message, { username: attr.username })
     },
     'send-whisper': function (attr) {
       if (_.isNil(attr.username) || _.isNil(attr.send)) return
-      global.commons.sendMessage(attr.send, { username: attr.username, 'message-type': 'whisper' })
+      let message = attr.send
+      _.each(attr, function (val, name) {
+        message = message.replace('(' + name + ')', val)
+      })
+      global.commons.sendMessage(message, { username: attr.username, 'message-type': 'whisper' })
     },
     'run-command': function (attr) {
       if (_.isNil(attr.quiet)) attr.quiet = false
