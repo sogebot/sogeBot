@@ -124,6 +124,7 @@ Parser.prototype.registerHelper = function (cmd) {
 }
 
 Parser.prototype.unregister = function (cmd) {
+  global.permissions.removePermission(global.permissions.removePermission, cmd)
   delete this.registeredCmds[cmd]
   delete this.permissionsCmds[cmd]
   delete this.selfCmds[cmd]
