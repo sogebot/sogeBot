@@ -36,7 +36,7 @@ function Raffles () {
       if (new Date().getTime() < self.lastAnnounce + (global.configuration.getValue('raffleAnnounceInterval') * 60 * 1000) || _.isNil(self.keyword)) return
       self.lastAnnounce = new Date().getTime()
       let message
-      if (global.configuration.getValue('raffleAnnounceCustomMessage')) {
+      if (global.configuration.getValue('raffleAnnounceCustomMessage').length > 0) {
         message = global.configuration.getValue('raffleAnnounceCustomMessage')
           .replace('(keyword)', self.keyword)
           .replace('(product)', self.product)
@@ -58,7 +58,7 @@ function Raffles () {
       if (self.minWatchedTime > 0) {
         message += ' ' + global.translate('raffle.minWatchedTime').replace('(time)', self.minWatchedTime)
       }
-      global.commons.sendMessage(message + '.', null)
+      global.commons.sendMessage(message + '.', { username: null }, { force: true })
     }, 10000)
 
     this.registerRaffleKeyword(this)
