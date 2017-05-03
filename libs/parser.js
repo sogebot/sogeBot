@@ -18,16 +18,25 @@ function Parser () {
   this.linesParsed = 0
   this.timer = []
 
+  this.messages = []
+
   this.customVariables = {}
   global.watcher.watch(this, 'customVariables', this._save)
+
+  var self = this
+  setInterval(function () {
+    if (self.messages.length > 0) {
+      let message = self.messages.shift()
+      self.linesParsed++
+      self.registeredParsers === {} ? self.parseCommands(message.user, message.message) : self.addToQueue(message.user, message.message)
+    }
+  }, 10)
 
   this._update(this)
 }
 
 Parser.prototype.parse = function (user, message) {
-  this.linesParsed++
-  // if we dont have registeredParsers, just parseCommands
-  this.registeredParsers === {} ? this.parseCommands(user, message) : this.addToQueue(user, message)
+  this.messages.push({user: user, message: message})
 }
 
 Parser.prototype.addToQueue = async function (user, message) {
