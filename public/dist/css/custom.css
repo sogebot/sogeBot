@@ -349,7 +349,8 @@ a.active {
 }
 
 #YTPlayer {
-  display: none;
+  display: block;
+  position: absolute;
 }
 
 #video-title {
