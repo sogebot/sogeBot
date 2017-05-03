@@ -82,7 +82,7 @@ Users.prototype.get = function (username) {
         global.log.warning('User ' + username + ' doesn\'t exists in Twitch')
         return
       }
-      const oldUser = _.find(self.users, function (o) { return !_.isNil(o.id) && o.id === body.users[0]._id && o.username !== username })
+      const oldUser = _.find(self.users, function (o) { return !_.isNil(o) && o.id === body.users[0]._id && o.username !== username })
       // if user changed his username -> move all saved data to new username
       if (_.isUndefined(oldUser)) {
         global.users.set(username, {id: body.users[0]._id})
