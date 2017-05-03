@@ -185,7 +185,11 @@ global.client.api({
     global.log.error(err)
     return
   }
-  global.channelId = body.users[0]._id
+
+  if (_.isNil(body.users[0])) {
+    global.log.error('Channel ' + global.configuration.get().twitch.channel + ' not found!')
+    process.exit()
+  } else global.channelId = body.users[0]._id
 })
 
 if (global.configuration.get().bot.debug) {
