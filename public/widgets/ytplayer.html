@@ -62,10 +62,15 @@
 <script>
   if (loadedJS.indexOf('ytplayer') === -1) {
     loadedJS.push('ytplayer')
+
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
     var player, time_update_interval;
     var loading = false
     var progressUpdate = null
-    var afterStart = true
 
     function stealToPlaylist () {
       socket.emit('stealSong')
@@ -81,8 +86,8 @@
 
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('YTPlayer', {
-        width: 0,
-        height: 0,
+        width: 1,
+        height: 1,
         videoId: '',
         events: {
           onReady: initialize,
@@ -92,20 +97,13 @@
     }
 
     function initialize() {
-      // Clear any old interval.
       clearInterval(time_update_interval);
-
-      // Start interval to update elapsed time display and
-      // the elapsed part of the progress bar every second.
       time_update_interval = setInterval(function() {
-
-        if (!loading && player.getPlayerState() === 0 || player.getPlayerState() === 5) {
-          if (afterStart) return
+        if (!loading && (player.getPlayerState() === 0 || player.getPlayerState() === 5) && $("#YTControl i").hasClass('text-danger')) {
           loading = true
           socket.emit('getVideoID');
         }
       }, 2000)
-
     }
 
     function onPlayerStateChange(event) {
@@ -134,8 +132,8 @@
       if (typeof video.startTime !== 'undefined') data.startSeconds = video.startTime
       if (typeof video.endTime !== 'undefined') data.endSeconds = video.endTime
       player.loadVideoById(data);
-      player.setVolume(video.volume)
-      player.setPlaybackQuality('small') // set playback to lowest possible
+      //player.setVolume(video.volume)
+      //player.setPlaybackQuality('small') // set playback to lowest possible
       player.playVideo();
       setTimeout(function() {
         loading = false
@@ -168,15 +166,13 @@
   }
 
   $("#YTControl").on('click', function() {
-    $("#YTControl i").removeClass()
-    if (player.getPlayerState() === YT.PlayerState.PAUSED || afterStart) {
-      if (afterStart) socket.emit('getVideoID')
-      afterStart = false
+    if ($("#YTControl i").hasClass('text-success')) {
+      if (player.getPlayerState() === YT.PlayerState.CUED) socket.emit('getVideoID')
       player.playVideo()
-      $("#YTControl i").addClass('glyphicon glyphicon-pause text-danger')
+      $("#YTControl i").removeClass().addClass('glyphicon glyphicon-pause text-danger')
     } else {
       player.pauseVideo()
-      $("#YTControl i").addClass('glyphicon glyphicon-play text-success')
+      $("#YTControl i").removeClass().addClass('glyphicon glyphicon-play text-success')
     }
   })
 
@@ -205,5 +201,3 @@
     }
   });
 </script>
-<!-- YTPlayer -->
-<script src="https://www.youtube.com/iframe_api"></script>
