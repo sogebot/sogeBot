@@ -50,6 +50,7 @@ Users.prototype._save = function (self) {
     self.changes = 0
     var users = { users: self.users }
     global.botDB.update({ _id: 'users' }, { $set: users }, { upsert: true })
+    global.botDB.persistence.compactDatafile()
   }
 }
 
