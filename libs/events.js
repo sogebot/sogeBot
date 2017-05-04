@@ -237,6 +237,7 @@ Events.prototype._save = function (self) {
 }
 
 Events.prototype.fire = function (event, attr) {
+  attr = attr || {}
   if (_.isNil(this.events[event])) return true
 
   let operationsBulk = this.events[event]
