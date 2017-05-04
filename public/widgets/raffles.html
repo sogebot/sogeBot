@@ -147,7 +147,7 @@
         difference -= minutesDifference*1000*60
 
         var secondsDifference = Math.floor(difference/1000);
-        $offset.text(minutesDifference + ':' + (secondsDifference <= 10 ? '0' + secondsDifference : secondsDifference))
+        $offset.text(minutesDifference + ':' + (secondsDifference < 10 ? '0' + secondsDifference : secondsDifference))
       }
 
       $el.empty()
