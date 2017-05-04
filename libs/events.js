@@ -274,9 +274,9 @@ Events.prototype.fire = function (event, attr) {
               return false
             }
 
-            if (_.isFinite(operation.tTimestamp) && parseInt(operation.tTimestamp, 10) > 0) {
-              if (global.twitch.currentViewers <= operation.viewers && new Date().getTime() - operation.tTriggered >= operation.tTimestamp * 1000) {
-                attr.tTriggered = new Date().getTime()
+            if (parseInt(operation.tTimestamp, 10) > 0) {
+              if (global.twitch.currentViewers >= parseInt(operation.viewers, 10) && new Date().getTime() - operation.tTriggered >= operation.tTimestamp * 1000) {
+                operation.tTriggered = new Date().getTime()
                 return true
               }
             } else if (!operation.tTriggered) { // run only once if tTimestamp === 0
