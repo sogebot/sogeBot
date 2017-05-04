@@ -326,25 +326,25 @@ socket.on('events', function(data) {
             firstDefinition = false
 
             if (operation.command) {
-              div_part = $('<div style="min-width:100px;display:inline-block" ></div>')
+              div_part = $('<div style="min-width:100px;display:inline-block;padding-top:0;" ></div>')
                 .append($('<label></label>').text(translations['command']))
                 .append($('<div style="display:block;"></div>').text(operation.command))
               div_def.append(div_part)
             }
               if (operation.tCount) {
-                div_part = $('<div style="min-width:100px;display:inline-block" ></div>')
+                div_part = $('<div style="min-width:100px;display:inline-block;padding-top:0;" ></div>')
                   .append($('<label></label>').text(translations['count']))
                   .append($('<div style="display:block;"></div>').text(operation.tCount))
                 div_def.append(div_part)
               }
             if (operation.viewers) {
-              div_part = $('<div style="min-width:100px;display:inline-block" ></div>')
+              div_part = $('<div style="min-width:100px;display:inline-block;padding-top:0;" ></div>')
                 .append($('<label></label>').text(translations['count']))
                 .append($('<div style="display:block;"></div>').text(operation.viewers))
               div_def.append(div_part)
             }
             if (operation.tTimestamp) {
-              div_part = $('<div style="min-width:100px;display:inline-block" ></div>')
+              div_part = $('<div style="min-width:100px;display:inline-block;padding-top:0;" ></div>')
                 .append($('<label></label>').text(translations['timestamp']))
                 .append($('<div style="display:block"></div>').text(operation.tTimestamp))
               div_def.append(div_part)

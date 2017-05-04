@@ -1,5 +1,6 @@
 'use strict'
 
+var moment = require('moment')
 var _ = require('lodash')
 
 function Events () {
@@ -14,7 +15,7 @@ function Events () {
     'number-of-viewers-is-at-least-x': [], // needs definition => { definition: true, viewers: 100, tTriggered: false, tTimestamp: 40000 } (if tTimestamp === 0 run once)
     'stream-started': [],
     'stream-stopped': [],
-    'stream-is-running-x-minutes': [], // needs definition = { definition: true, minutes: 100, tTriggered: false }
+    'stream-is-running-x-minutes': [], // needs definition = { definition: true, tCount: 100, tTriggered: false }
     'cheer': [], // (username), (bits), (message)
     'clearchat': [],
     'action': [], // (username)
@@ -182,7 +183,7 @@ Events.prototype._new = function (self, socket, data) {
 
     if (data.event === 'stream-is-running-x-minutes') {
       definition.tTriggered = false
-      definition.minutes = data.count
+      definition.tCount = data.definition.count
     }
 
     _.each(self.events[data.event], function (aEvent, index) {
@@ -262,7 +263,7 @@ Events.prototype.fire = function (event, attr) {
               operation.tTriggered = false
               return false
             }
-            if (!operation.tTriggered && new Date().getTime() - global.twitch.whenOnline > operation.minutes * 60 * 1000) {
+            if (!operation.tTriggered && new Date().getTime() - (moment(global.twitch.when.online).format('X') * 1000) > operation.tCount * 60 * 1000) {
               operation.tTriggered = true
               return true
             }
