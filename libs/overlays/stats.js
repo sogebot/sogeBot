@@ -7,7 +7,7 @@ function Stats () {
 
 Stats.prototype._get = function (self, socket) {
   const stats = {
-    uptime: global.twitch.getTime(global.twitch.isOnline ? global.twitch.when.online : global.twitch.when.offline, false),
+    uptime: global.twitch.getTime(global.twitch.isOnline ? global.twitch.when.online : 0, false),
     viewers: global.twitch.currentViewers,
     followers: global.twitch.currentFollowers
   }
