@@ -31,7 +31,7 @@ function Panel () {
   app.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')))
 
   server.listen(port, function () {
-    global.log.info('WebPanel is listening on %s', port)
+    global.log.info('WebPanel is available at http://localhost:%s', port)
   })
 
   this.io = require('socket.io')(server)
