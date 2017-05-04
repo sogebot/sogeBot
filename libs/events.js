@@ -151,10 +151,12 @@ Events.prototype._send = function (self, socket) {
       return true
     }
     _.each(o, function (v) {
+      events[n] = []
+      let eventBatch = []
       _.each(v, function (v2) {
-        if (!v2.system) events[n] = self.events[n]
-        else events[n] = []
+        if (!v2.system) eventBatch.push(v2)
       })
+      if (eventBatch.length !== 0) events[n].push(eventBatch)
     })
   })
   socket.emit('events', { events: events, operations: Object.keys(self.operations) })
