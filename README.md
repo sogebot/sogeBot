@@ -60,6 +60,7 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 #### Prerequisites
 
 * Node.js 7.x
+* Minimum of 512MB RAM
 
 #### Installation
 
