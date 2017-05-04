@@ -94,7 +94,10 @@ RafflesWidget.prototype.sendRafflesParticipants = function (self) {
 }
 
 RafflesWidget.prototype.createRaffle = function (self, socket, data) {
-  global.systems.raffles.open(global.systems.raffles, {username: null}, data.keyword.trim() + (data.product ? ' ' + data.product.trim() : '') + (data.minWatchedTime ? ' time=' + data.minWatchedTime.trim() : '') + (data.followers ? ' followers' : ''), true)
+  let eligibility = ''
+  if (data.eligibility === 0) eligibility = 'followers'
+  if (data.eligibility === 1) eligibility = 'subscribers'
+  global.systems.raffles.open(global.systems.raffles, {username: null}, data.keyword.trim() + (data.product ? ' ' + data.product.trim() : '') + (data.minWatchedTime ? ' time=' + data.minWatchedTime.trim() : '') + ' ' + eligibility, true)
 }
 
 RafflesWidget.prototype.searchRafflesParticipants = function (self, socket, data) {

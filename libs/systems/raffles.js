@@ -21,7 +21,7 @@ function Raffles () {
     this.keyword = null
     this.product = null
     this.minWatchedTime = 0
-    this.followers = false
+    this.eligibility = 0
 
     global.parser.register(this, '!raffle pick', this.pick, constants.OWNER_ONLY)
     global.parser.register(this, '!raffle close', this.close, constants.OWNER_ONLY)
@@ -41,14 +41,21 @@ function Raffles () {
           .replace('(keyword)', self.keyword)
           .replace('(product)', self.product)
       } else {
-        if (self.followers && self.product) {
-          message = global.translate('raffle.open.notice.both')
+        if (self.eligibility === 0 && self.product) {
+          message = global.translate('raffle.open.notice.followersAndProduct')
             .replace('(keyword)', self.keyword)
             .replace('(product)', self.product)
-        } else if (self.followers && !self.product) {
+        } else if (self.eligibility === 0 && !self.product) {
           message = global.translate('raffle.open.notice.followers')
             .replace('(keyword)', self.keyword)
-        } else if (!self.followers && self.product) {
+        } else if (self.eligibility === 1 && self.product) {
+          message = global.translate('raffle.open.notice.subscribersAndProduct')
+            .replace('(keyword)', self.keyword)
+            .replace('(product)', self.product)
+        } else if (self.eligibility === 1 && !self.product) {
+          message = global.translate('raffle.open.notice.subscribers')
+            .replace('(keyword)', self.keyword)
+        } else if (self.eligibility !== 0 && !self.eligibility !== 1 && self.product) {
           message = global.translate('raffle.open.notice.product')
             .replace('(keyword)', self.keyword)
             .replace('(product)', self.product)
@@ -73,7 +80,7 @@ Raffles.prototype.registerRaffleKeyword = function (self) {
       global.parser.register(this, '!' + item.keyword, self.participate, constants.VIEWERS)
       self.keyword = item.keyword
       self.product = item.product
-      self.followers = item.followers
+      self.eligibility = item.eligibility
       self.minWatchedTime = item.minWatchedTime
     }
   })
@@ -112,8 +119,11 @@ Raffles.prototype.participate = function (self, sender) {
         username: sender.username }
 
       const user = global.users.get(sender.username)
-      if (item.followers) {
+      if (item.eligibility === 0) {
         participant.eligible = _.isUndefined(user.is.follower) ? false : user.is.follower
+      }
+      if (item.eligibility === 1) {
+        participant.eligible = _.isUndefined(user.is.subscriber) ? false : user.is.subscriber
       }
 
       if (participant.eligible && item.minWatchedTime > 0) {
@@ -138,14 +148,21 @@ Raffles.prototype.info = function (self, sender) {
       if (!_.isNull(item.winner)) global.commons.sendMessage(global.translate('raffle.info.notRunning'), sender)
       else if (!item.locked) {
         let message = global.translate('raffle.info.opened.none').replace('(keyword)', item.keyword)
-        if (item.followers && item.product) {
-          message = global.translate('raffle.info.opened.both')
+        if (item.eligibility === 0 && item.product) {
+          message = global.translate('raffle.info.opened.followersAndProduct')
             .replace('(keyword)', item.keyword)
             .replace('(product)', item.product)
-        } else if (item.followers && !item.product) {
+        } else if (item.eligibility === 0 && !item.product) {
           message = global.translate('raffle.info.opened.followers')
             .replace('(keyword)', item.keyword)
-        } else if (!item.followers && item.product) {
+        } else if (item.eligibility === 1 && item.product) {
+          message = global.translate('raffle.info.opened.subscribersAndProduct')
+            .replace('(keyword)', item.keyword)
+            .replace('(product)', item.product)
+        } else if (item.eligibility === 1 && !item.product) {
+          message = global.translate('raffle.info.opened.subscribers')
+            .replace('(keyword)', item.keyword)
+        } else if (item.eligibility !== 0 && item.eligibility !== 1 && item.product) {
           message = global.translate('raffle.info.opened.product')
             .replace('(keyword)', item.keyword)
             .replace('(product)', item.product)
@@ -166,15 +183,19 @@ Raffles.prototype.info = function (self, sender) {
 
 Raffles.prototype.open = function (self, sender, text, dashboard = false) {
   try {
-    let followers = false
+    let eligibility = 2
     if (text.indexOf('followers') >= 0) {
       text = text.replace('followers', '').trim()
-      followers = true
+      eligibility = 0
+    }
+    if (text.indexOf('subscribers') >= 0) {
+      text = text.replace('subscribers', '').trim()
+      eligibility = 1
     }
 
     // check if time is set
     let minWatchedTime = 0
-    let split = text.split(' ')
+    let split = text.trim().split(' ')
     if (split[split.length - 1].startsWith('time=')) {
       minWatchedTime = split[split.length - 1].replace('time=', '')
       split.pop()
@@ -185,7 +206,7 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
     var groups = { keyword: 1, product: 2 }
     var raffle = {
       keyword: parsed[groups.keyword],
-      followers: followers,
+      eligibility: eligibility,
       product: !_.isNil(parsed[groups.product]) ? parsed[groups.product] : '',
       minWatchedTime: minWatchedTime,
       winner: null,
@@ -196,14 +217,21 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
       if (err) return log.error(err, { fnc: 'Raffles.prototype.open' })
 
       let message = global.translate('raffle.open.ok.none').replace('(keyword)', raffle.keyword)
-      if (raffle.followers && raffle.product) {
-        message = global.translate('raffle.open.ok.both')
+      if (raffle.eligibility === 0 && raffle.product) {
+        message = global.translate('raffle.open.ok.followersAndProduct')
           .replace('(keyword)', raffle.keyword)
           .replace('(product)', raffle.product)
-      } else if (raffle.followers && !raffle.product) {
+      } else if (raffle.eligibility === 0 && !raffle.product) {
         message = global.translate('raffle.open.ok.followers')
           .replace('(keyword)', raffle.keyword)
-      } else if (!raffle.followers && raffle.product) {
+      } else if (raffle.eligibility === 1 && raffle.product) {
+        message = global.translate('raffle.open.ok.subscribersAndProduct')
+          .replace('(keyword)', raffle.keyword)
+          .replace('(product)', raffle.product)
+      } else if (raffle.eligibility === 1 && !raffle.product) {
+        message = global.translate('raffle.open.ok.subscribers')
+          .replace('(keyword)', raffle.keyword)
+      } else if (raffle.eligibility !== 0 && !raffle.eligibility !== 1 && raffle.product) {
         message = global.translate('raffle.open.ok.product')
           .replace('(keyword)', raffle.keyword)
           .replace('(product)', raffle.product)

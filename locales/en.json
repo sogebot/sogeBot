@@ -120,6 +120,7 @@
     "hours": "hours",
     "eligible-to-enter": "Eligible to enter:",
     "followers-only": "Followers only",
+    "subscribers-only": "Subscribers only",
     "everyone": "Everyone",
     "roll-a-winner": "Roll a winner",
     "send-message": "Send Message",
@@ -266,7 +267,9 @@
       "opened": {
         "product": "(sender), raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate",
         "followers": "(sender), raffle is opened. To enter type !(keyword). Only followers can participate",
-        "both": "(sender), raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate",
+        "subscribers": "(sender), raffle is opened. To enter type !(keyword). Only subscribers can participate",
+        "followersAndProduct": "(sender), raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate",
+        "subscribersAndProduct": "(sender), raffle is opened o `(product)`. To enter type !(keyword). Only subscribers can participate",
         "none": "(sender), raffle is opened. To enter type !(keyword). Everyone can participate"
       },
       "closed": "(sender) Raffle is closed, but winner is not picked yet!",
@@ -277,13 +280,17 @@
       "ok": {
         "product": "New raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate",
         "followers": "New raffle is opened. To enter type !(keyword). Only followers can participate",
-        "both": "New raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate",
+        "subscribers": "New raffle is opened. To enter type !(keyword). Only subscribers can participate",
+        "followersAndProduct": "New raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate",
+        "subscribersAndProduct": "New raffle is opened o `(product)`. To enter type !(keyword). Only subscribers can participate",
         "none": "New raffle is opened. To enter type !(keyword). Everyone can participate"
       },
       "notice": {
         "product": "Raffle is currently running for `(product)`. To enter type !(keyword). Everyone can participate",
         "followers": "Raffle is currently running. To enter type !(keyword). Only followers can participate",
-        "both": "Raffle is currently running for `(product)`. To enter type !(keyword). Only followers can participate",
+        "subscribers": "Raffle is currently running. To enter type !(keyword). Only subscribers can participate",
+        "followersAndProduct": "Raffle is currently running o `(product)`. To enter type !(keyword). Only followers can participate",
+        "subscribersAndProduct": "Raffle is currently running o `(product)`. To enter type !(keyword). Only subscribers can participate",
         "none": "Raffle is currently running. To enter type !(keyword). Everyone can participate"
       }
     },
