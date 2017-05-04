@@ -57,7 +57,7 @@
       <div class="btn-group" role="group">
         <button type="button" style="min-width:30%" class="btn btn-default btn-label" disabled="disabled" data-lang="eligible-to-enter"></button>
         <div style="position:absolute; left: 200px">
-          <button type="button" class="btn btn-primary" id="followerCheckbox" onclick="raffles.switchFollowersOnly()" data-lang="followers-only"></button>
+          <button type="button" class="btn btn-primary" id="followerCheckbox" onclick="raffles.toggleEligibility(true)" data-lang="followers-only"></button>
         </div>
       </div>
 
@@ -116,7 +116,7 @@
 <script>
   var raffles = {
     isSearching: false,
-    followersOnly: false,
+    eligibility: 0,
     keyword: '',
     winner: null,
     timestamp: null,
@@ -227,7 +227,7 @@
         $('#toggleButton').attr('title', 'Remove raffle')
         $('#toggleButton i').removeClass().addClass('fa fa-close')
         this.keyword = $("#rafflesWidgetKeyword").val()
-        socket.emit('createRaffle', { keyword: $("#rafflesWidgetKeyword").val(), followers: this.followersOnly, product: $("#rafflesWidgetProduct").val(), minWatchedTime: $("#rafflesWatchedTime").val()})
+        socket.emit('createRaffle', { keyword: $("#rafflesWidgetKeyword").val(), eligibility: this.eligibility, product: $("#rafflesWidgetProduct").val(), minWatchedTime: $("#rafflesWatchedTime").val()})
         return true
       }
 
@@ -236,15 +236,22 @@
         $("#raffleWidgetRoll").addClass('btn btn-disabled btn-block')
       } else $("#raffleWidgetRoll").addClass('btn btn-success btn-block')
     },
-    switchFollowersOnly: function () {
+    toggleEligibility: function (toggle) {
       if ($("#followerCheckbox").hasClass('btn-disabled')) return false
-      this.followersOnly = !this.followersOnly
-      if (this.followersOnly) {
-        $("#followerCheckbox").html(translations['followers-only'])
-      } else {
-        $("#followerCheckbox").html(translations['everyone'])
+      if (toggle) this.eligibility = this.eligibility + 1
+      if (this.eligibility > 2) this.eligibility = 0
+      switch (this.eligibility) {
+        case 0:
+          $("#followerCheckbox").html(translations['followers-only'])
+          break
+        case 1:
+          $("#followerCheckbox").html(translations['subscribers-only'])
+          break
+        case 2:
+          $("#followerCheckbox").html(translations['everyone'])
+          break
       }
-      socket.emit('setRafflesFollowersOnly', this.followersOnly)
+      socket.emit('setRafflesEligibility', this.eligibility)
     },
     updateRaffle: function (raffle) {
       $('#toggleButton').removeClass()
@@ -263,7 +270,7 @@
         $("#rafflesWatchedTime").prop("disabled", true);
       }
 
-      this.followersOnly = !_.isNull(raffle) && raffle.followers
+      this.eligibilty = !_.isNull(raffle) && raffle.eligibility ? raffle.eligibility : 0
       this.keyword = !_.isNull(raffle) && raffle.keyword ? raffle.keyword : ''
       this.winner = !_.isNull(raffle) && raffle.winner ? raffle.winner : null
       this.timestamp = !_.isNull(raffle) && raffle.timestamp ? raffle.timestamp : null
@@ -272,8 +279,7 @@
 
       $("#rafflesWidgetKeyword").val(this.keyword)
 
-      if (this.followersOnly) $("#followerCheckbox").html(translations['followers-only'])
-      else $("#followerCheckbox").html(translations['everyone'])
+      this.toggleEligibility(false)
 
       if (!_.isNull(this.winner)) {
         this.updateWinnerTab()
