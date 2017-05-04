@@ -294,7 +294,10 @@
       "notRunning": "(sender) Zadna raffle momentalne neni otevrena!"
     },
     "pick": {
-      "winner": "Gratulace @(winner), prave si vyhral raffle!",
+      "winner": {
+        "withProduct": "Gratulace @(winner), prave si vyhral raffle!",
+        "withoutProduct": "Gratulace @(winner), prave si vyhral raffle o `(product)`!"
+      },
       "noParticipants": "Nikdo se nezucastnil raffle! Zadny vitez nebyl vybran."
     }
   },

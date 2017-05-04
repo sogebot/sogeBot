@@ -292,7 +292,10 @@
       "notRunning": "(sender) No raffle is currently running!"
     },
     "pick": {
-      "winner": "Congratulations @(winner), you just won a raffle!",
+      "winner": {
+        "withProduct": "Congratulations @(winner), you just won a raffle!",
+        "withoutProduct": "Congratulations @(winner), you just won a raffle for `(product)`!"
+      },
       "noParticipants": "There were no participants in this raffle! No winner selected."
     }
   },

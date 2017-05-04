@@ -93,7 +93,7 @@ Raffles.prototype.pick = function (self, sender) {
     } else {
       const user = global.users.get(winner.username)
       global.botDB.update({_id: 'raffle'}, {$set: { winner: user, locked: true, timestamp: new Date().getTime() }})
-      global.commons.sendMessage(global.translate('raffle.pick.winner')
+      global.commons.sendMessage(!_.isNil(self.product) ? global.translate('raffle.pick.winner.withProduct') : global.translate('raffle.pick.winner.withoutProduct')
         .replace('(winner)', winner.username), sender)
       global.parser.unregister('!' + self.keyword)
       global.widgets.raffles.sendWinner(global.widgets.raffles, user)
