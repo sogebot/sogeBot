@@ -39,7 +39,7 @@
 
     <div role="tabpanel" class="tab-pane active" id="raffles-giveaway">
       <div class="input-group">
-        <span class="input-group-addon">Product <small>(optional)</small></span>
+        <span class="input-group-addon"><span data-lang="product"></span> <small>(<span data-lang="optional"></span>)</small></span>
         <input type="text" class="form-control" placeholder="Enter product..." id="rafflesWidgetProduct">
         <span class="input-group-btn">
           <button class="btn btn-warning" type="button" title="Clear product" onclick="raffles.clearProduct()"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
@@ -364,8 +364,9 @@
   socket.emit('getRafflesConfiguration')
   socket.off('rafflesConfiguration')
   socket.on('rafflesConfiguration', function(data) {
-    $("#rafflesWidgetSearch").attr('placeholder', translations['search'] + '...')
-    $("#rafflesWidgetKeyword").attr('placeholder', translations['enter-keyword'] + '...')
+    $("#rafflesWidgetSearch").attr('placeholder', translations['placeholder-search'] + '...')
+    $("#rafflesWidgetKeyword").attr('placeholder', translations['placeholder-enter-keyword'] + '...')
+    $("#rafflesWidgetProduct").attr('placeholder', translations['placeholder-enter-product'] + '...')
     $("#raffleAnnounce").val(data.raffleAnnounceInterval)
     $("#raffleAnnounceCustomMessage").val(data.raffleAnnounceCustomMessage)
   })

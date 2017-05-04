@@ -41,6 +41,11 @@
     }
   },
   "webpanel": {
+    "product": "Produkt",
+    "optional": "nepovinný",
+    "placeholder-search": "Hledat",
+    "placeholder-enter-product": "Vložte produkt",
+    "placeholder-enter-keyword": "Vložte klíčové slovo",
     "overlay-emotes-size": "Velikost emotikonu",
     "overlay-emotes-max": "Max stejných emotikonů na zprávu",
     "overlay-emotes-animation": "Animace emotikonu",
@@ -120,8 +125,6 @@
     "send-message": "Poslat zprávu",
     "messages": "Zprávy",
     "announce-every": "Oznámit každých",
-    "enter-keyword": "Klíčové slovo",
-    "search": "Hledat",
     "create": "Vytvořit",
     "cooldown": "Cooldown",
     "confirm": "Potvrdit",

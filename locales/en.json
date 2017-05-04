@@ -41,6 +41,11 @@
     }
   },
   "webpanel": {
+    "product": "Product",
+    "optional": "optional",
+    "placeholder-search": "Search",
+    "placeholder-enter-product": "Enter product",
+    "placeholder-enter-keyword": "Enter keyword",
     "overlay-emotes-size": "Emoticon size",
     "overlay-emotes-max": "Max same emoticons to show",
     "overlay-emotes-animation": "Emoticon animation",
@@ -120,8 +125,6 @@
     "send-message": "Send Message",
     "messages": "Messages",
     "announce-every": "Announce every",
-    "enter-keyword": "Enter keyword",
-    "search": "Search",
     "create": "Create",
     "cooldown": "Cooldown",
     "confirm": "Confirm",
