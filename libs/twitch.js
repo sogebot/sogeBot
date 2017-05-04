@@ -33,6 +33,7 @@ function Twitch () {
   this.cGamesTitles = {} // cached Games and Titles
   global.watcher.watch(this, 'cGamesTitles', this._save)
   global.watcher.watch(this, 'when', this._save)
+  global.watcher.watch(this, 'cached', this._save)
   this._load(this)
 
   var self = this
@@ -227,11 +228,17 @@ Twitch.prototype._load = function (self) {
     if (_.isNull(item)) return
     self.when = item
   })
+  global.botDB.findOne({ _id: 'cached' }, function (err, item) {
+    if (err) return global.log.error(err, { fnc: 'Twitch.prototype._load#3' })
+    if (_.isNull(item)) return
+    self.cached = item
+  })
 }
 
 Twitch.prototype._save = function (self) {
   global.botDB.update({ _id: 'cachedGamesTitles' }, { $set: self.cGamesTitles }, { upsert: true })
   global.botDB.update({ _id: 'when' }, { $set: self.when }, { upsert: true })
+  global.botDB.update({ _id: 'cached' }, { $set: self.cached }, { upsert: true })
   self.timestamp = new Date().getTime()
 }
 
