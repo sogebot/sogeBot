@@ -164,7 +164,7 @@ global.client.on('subscription', function (channel, username, method) {
 global.client.on('resub', function (channel, username, months, message) {
   global.users.set(username, { is: { subscriber: true } })
   global.events.fire('resub', { username: username, months: months, message: message })
-  global.twitch.cached.subscribers.unshift(username + ', ' + months + ' ' + global.parser.getLocalizedName(months, 'months'))
+  global.twitch.cached.subscribers.unshift(username + ', ' + months + ' ' + global.parser.getLocalizedName(months, 'core.months'))
   global.twitch.cached.subscribers = _.chunk(global.twitch.cached.subscribers, 100)[0]
 })
 
