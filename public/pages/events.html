@@ -289,6 +289,12 @@ var newEvent = function () {
       delete data.definition
   }
   socket.emit('events.new', data)
+  $('#messageGroup').css('display', 'inline-block')
+  $('#message').val('')
+  $('#soundGroup').css('display', 'none')
+  $('#emotesGroup').css('display', 'none')
+  $('#command2Group').css('display', 'none')
+  $('#quietGroup').css('display', 'none')
 }
 
 socket.off('events')
