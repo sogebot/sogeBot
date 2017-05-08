@@ -346,6 +346,11 @@ Moderation.prototype.emotes = function (self, id, sender, text) {
 }
 
 Moderation.prototype.blacklist = function (self, id, sender, text) {
+  if (global.parser.isOwner(sender) || sender.mod) {
+    global.updateQueue(id, true)
+    return
+  }
+
   var timeout = global.configuration.getValue('moderationBlacklistTimeout')
   _.each(self.lists.blacklist, function (value) {
     value = value.trim()
