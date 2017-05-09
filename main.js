@@ -108,7 +108,8 @@ global.client.on('message', function (channel, sender, message, fromSelf) {
 
 global.client.on('join', function (channel, username, fromSelf) {
   if (!fromSelf) {
-    if (!_.isUndefined(global.users.get(username).id)) {
+    let user = global.users.get(username)
+    if (!_.isNil(user) && !_.isNil(user.id)) {
       global.users.isFollower(username)
     }
     global.users.set(username, { is: { online: true } })
