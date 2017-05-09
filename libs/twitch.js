@@ -113,9 +113,9 @@ function Twitch () {
         self.cached.followers = []
         _.each(body.follows, function (follower) {
           if (!global.users.get(follower.user.name).is.follower) {
-            global.events.fire('follow', { username: follower.user.name })
+            if (new Date().getTime() - moment(follower.created_at).format('X') * 1000 < 60000 * 60) global.events.fire('follow', { username: follower.user.name })
           }
-          global.users.set(follower.user.name, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(follower.created_at).format('X') * 1000 } })
+          global.users.set(follower.user.name, { id: follower.user._id, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(follower.created_at).format('X') * 1000 } })
           self.cached.followers.push(follower.user.name)
         })
       }
