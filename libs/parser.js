@@ -26,9 +26,13 @@ function Parser () {
   var self = this
   setInterval(function () {
     if (self.messages.length > 0) {
-      let message = self.messages.shift()
-      self.linesParsed++
-      self.registeredParsers === {} ? self.parseCommands(message.user, message.message) : self.addToQueue(message.user, message.message)
+      let messages = self.messages
+      self.messages = []
+
+      _.each(messages, function (message) {
+        self.linesParsed++
+        self.registeredParsers === {} ? self.parseCommands(message.user, message.message) : self.addToQueue(message.user, message.message)
+      })
     }
   }, 10)
 
@@ -66,11 +70,6 @@ Parser.prototype.addToQueue = async function (user, message) {
 
 Parser.prototype.processQueue = async function (id) {
   while (!_.isUndefined(queue[id])) {
-    if (new Date().getTime() - queue[id].user['tmi-sent-ts'] > 2000) {
-      global.removeFromQueue(id)
-      break
-    }
-
     if (queue.hasOwnProperty(id) && queue[id].success === queue[id].started) {
       this.parseCommands(queue[id].user, queue[id].message)
 
