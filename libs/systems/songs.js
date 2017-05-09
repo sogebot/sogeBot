@@ -3,6 +3,7 @@
 // 3rdparty libraries
 var _ = require('lodash')
 var ytdl = require('ytdl-core')
+const ytsearch = require('youtube-search')
 // bot libraries
 var constants = require('../constants')
 var log = global.log
@@ -225,15 +226,26 @@ Songs.prototype.help = function () {
 Songs.prototype.addSongToQueue = function (self, sender, text) {
   if (text.length < 1 || !global.configuration.getValue('songs_songrequest')) {
     if (global.configuration.getValue('songs_songrequest')) {
-      global.commons.sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url>', sender)
+      global.commons.sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', sender)
     } else {
       global.commons.sendMessage('(sender), ' + global.translate('songs.settings.songrequest.false'), sender)
     }
     return
   }
+
   var urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/
+  const idRegex = /^[a-zA-Z0-9-_]{11}$/
   var match = text.trim().match(urlRegex)
   var videoID = (match && match[1].length === 11) ? match[1] : text.trim()
+
+  if (_.isNil(text.trim().match(idRegex))) { // not id or url
+    ytsearch(text.trim(), { maxResults: 1, key: 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0' }, function (err, results) {
+      if (err) return console.log(err)
+      self.addSongToQueue(self, sender, results[0].id)
+    })
+    return
+  }
+
   global.botDB.findOne({type: 'song-banned', _id: videoID}, function (err, item) {
     if (err) log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' })
     if (!_.isNull(item)) global.commons.sendMessage(global.translate('songs.isBanned'), sender)
