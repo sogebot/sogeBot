@@ -27,12 +27,12 @@
     "nedb": "^1.8.0",
     "nedb-promise": "^2.0.1",
     "request": "^2.81.0",
-    "socket.io": "^1.7.3",
+    "socket.io": "^2.0.1",
     "tmi.js": "^1.2.0",
     "twitch-emoticons": "^1.5.0",
     "velocity-animate": "^1.5.0",
     "winston": "^2.3.1",
-    "ytdl-core": "^0.13.2"
+    "ytdl-core": "^0.14.0"
   },
   "scripts": {
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
