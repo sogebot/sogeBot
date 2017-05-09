@@ -87,6 +87,7 @@ global.client.on('disconnected', function (address, port) {
 
 global.client.on('message', function (channel, sender, message, fromSelf) {
   if (!fromSelf && global.configuration.get().twitch.username !== sender.username) {
+    global.users.set(sender.username, { id: sender['user-id'] })
     if (sender['message-type'] !== 'whisper') {
       global.parser.timer.push({ 'id': sender.id, 'received': new Date().getTime() })
       global.log.chatIn(message, {username: sender.username})
