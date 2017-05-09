@@ -22,9 +22,28 @@ async function clean_users () {
   console.log('Cleaned ' + (size - _.size(users.users) + ' users'))
 }
 
+async function clean_users_without_id () {
+  let users = await DB.findOne({ _id: 'users' })
+  let size = _.size(users.users)
+
+  users = _.filter(users.users, function (o) {
+    return !_.isNil(o.id)
+  })
+  users = {
+    _id: 'users',
+    users: users
+  }
+  await DB.update({ _id: 'users' }, { $set: users }, { upsert: true })
+  console.log('Cleaned ' + (size - _.size(users.users) + ' users'))
+}
+
 async function main () {
   console.log('Cleaning up users without watched time')
   await clean_users()
+  console.log('- DONE')
+
+  console.log('Cleaning up users without id')
+  await clean_users_without_id()
   console.log('- DONE')
 }
 

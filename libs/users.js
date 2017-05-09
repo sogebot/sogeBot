@@ -67,35 +67,18 @@ Users.prototype.get = function (username) {
   }
 
   let user = _.isUndefined(this.users[username]) ? {} : this.users[username]
-  if (_.isUndefined(user.id)) {
-    global.client.api({
-      url: 'https://api.twitch.tv/kraken/users?login=' + username,
-      headers: {
-        Accept: 'application/vnd.twitchtv.v5+json',
-        'Client-ID': global.configuration.get().twitch.clientId
-      }
-    }, function (err, res, body) {
-      if (err) {
-        global.log.error(err, { fnc: 'Users.prototype.get#1' })
-        return
-      }
-      if (_.isNil(body.users) || _.isNil(body.users[0])) {
-        global.log.warning('User ' + username + ' doesn\'t exists in Twitch')
-        return
-      }
-      const oldUser = _.find(self.users, function (o) { return !_.isNil(o) && o.id === body.users[0]._id && o.username !== username })
-      // if user changed his username -> move all saved data to new username
-      if (_.isUndefined(oldUser)) {
-        global.users.set(username, {id: body.users[0]._id})
-      } else {
-        self.users[username] = {}
-        self.users[username].time = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].time) ? self.users[oldUser.username].time : {}
-        self.users[username].is = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].is) ? self.users[oldUser.username].is : {}
-        self.users[username].stats = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].stats) ? self.users[oldUser.username].stats : {}
-        self.users[username].points = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].points) ? self.users[oldUser.username].points : 0
-        delete self.users[oldUser.username]
-      }
-    })
+
+  if (!_.isNil(user.id)) {
+    let oldUser = _.filter(this.users, function (o) { return o.id === global.users.users[username].id && o.username !== username })
+    if (oldUser.length > 0) {
+      oldUser = oldUser[0]
+      self.users[username] = {}
+      self.users[username].time = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].time) ? self.users[oldUser.username].time : {}
+      self.users[username].is = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].is) ? self.users[oldUser.username].is : {}
+      self.users[username].stats = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].stats) ? self.users[oldUser.username].stats : {}
+      self.users[username].points = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].points) ? self.users[oldUser.username].points : 0
+      delete self.users[oldUser.username]
+    }
   }
 
   // return all default attributes
