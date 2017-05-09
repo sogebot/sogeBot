@@ -224,9 +224,12 @@ Parser.prototype.parseMessage = async function (message, attr) {
     },
     '(var.#)': async function (filter) {
       let variable = filter.replace('(var.', '').replace(')', '')
-      if (!_.isUndefined(attr.param) && attr.param.length === 0) return global.parser.customVariables[variable]
-      if (global.parser.isOwner(attr.sender) || attr.sender.mod) global.parser.customVariables[variable] = attr.param
-      return ''
+      if ((global.parser.isOwner(attr.sender) || attr.sender.mod) &&
+        (!_.isUndefined(attr.param) && attr.param.length !== 0)) {
+        global.parser.customVariables[variable] = attr.param
+        return ''
+      }
+      return _.isNil(global.parser.customVariables[variable]) ? '' : global.parser.customVariables[variable]
     }
   }
   let param = {
