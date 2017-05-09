@@ -162,6 +162,8 @@ Users.prototype.isFollower = function (username) {
 }
 
 Users.prototype.isFollowerUpdate = function (username) {
+  if (_.isNil(global.users.get(username).id)) return // skip check if ID doesn't exist
+
   global.client.api({
     url: 'https://api.twitch.tv/kraken/users/' + global.users.get(username).id + '/follows/channels/' + global.channelId,
     headers: {
