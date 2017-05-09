@@ -69,7 +69,7 @@ Users.prototype.get = function (username) {
   let user = _.isUndefined(this.users[username]) ? {} : this.users[username]
 
   if (!_.isNil(user.id)) {
-    let oldUser = _.filter(this.users, function (o) { return o.id === global.users.users[username].id && o.username !== username })
+    let oldUser = _.filter(this.users, function (o) { return !_.isNil(o.id) && o.id === user.id && o.username !== username })
     if (oldUser.length > 0) {
       oldUser = oldUser[0]
       self.users[username] = {}
