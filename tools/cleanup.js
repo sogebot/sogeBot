@@ -14,11 +14,18 @@ async function clean_users () {
   users = _.filter(users.users, function (o) {
     return !_.isNil(o.time) && !_.isNil(o.time.watched) && o.time.watched > 0
   })
+
+  let newUsers = {}
+  for (var i = 0, len = users.length; i < len; i++) {
+    let username = users[i].username
+    newUsers[username] = users[i]
+  }
   users = {
     _id: 'users',
-    users: users
+    users: newUsers
   }
-  await DB.update({ _id: 'users' }, { $set: users }, { upsert: true })
+  await DB.remove({ _id: 'users' })
+  await DB.insert(users)
   console.log('Cleaned ' + (size - _.size(users.users) + ' users'))
 }
 
@@ -29,11 +36,19 @@ async function clean_users_without_id () {
   users = _.filter(users.users, function (o) {
     return !_.isNil(o.id)
   })
+
+  let newUsers = {}
+  for (var i = 0, len = users.length; i < len; i++) {
+    let username = users[i].username
+    newUsers[username] = users[i]
+  }
+
   users = {
     _id: 'users',
-    users: users
+    users: newUsers
   }
-  await DB.update({ _id: 'users' }, { $set: users }, { upsert: true })
+  await DB.remove({ _id: 'users' })
+  await DB.insert(users)
   console.log('Cleaned ' + (size - _.size(users.users) + ' users'))
 }
 
