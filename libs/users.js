@@ -17,6 +17,8 @@ function Users () {
 
   global.watcher.watch(this, 'changes', this._save)
 
+  global.panel.socketListening(this, 'viewers.toggle', this.toggleIs)
+
   var self = this
   setInterval(function () {
     self.changes += 500 // force every 15min to save changes
@@ -92,6 +94,12 @@ Users.prototype.get = function (username) {
 Users.prototype.getAll = function (object) {
   if (_.isObject(object)) return _.filter(this.users, object)
   return this.users
+}
+
+Users.prototype.toggleIs = function (self, socket, data) {
+  let object = { is: {} }
+  object.is[data.type] = data.is
+  self.set(data.username, object)
 }
 
 Users.prototype.addRegular = function (self, sender, text) {

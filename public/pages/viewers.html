@@ -33,6 +33,17 @@
     sortType: 'asc',
     toSearch: '',
     list: {},
+    toggle: function (type, username) {
+      var id = '#' + type + '-' + username
+      var bool = false
+      if ($(id).hasClass('text-success')) {
+        $(id).removeClass().addClass('text-danger')
+      } else {
+        $(id).removeClass().addClass('text-success')
+        bool = true
+      }
+      socket.emit('viewers.toggle', { type: type, username: username, is: bool })
+    },
     update: function (list) {
       $("#Users").empty()
       _.each(list, function(item, index) {
@@ -45,10 +56,10 @@
             '<abbr title="click to edit" data-id="' + item.username + '" onclick="viewers.pointsEditable(this)">' +  item.points + '</abbr>' +
             '<input id="points_' + item.username + '" style="width: 6em; display: none" class="form-control input-sm" type="text"/></td>' +
           '<td data-value=' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.messages) ? 0 : item.stats.messages) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.messages) ? 0 : item.stats.messages) + '</td>' +
-          '<td style="font-weight: bold">' +
-          '<span class="' + (item.is.subscriber ? "text-success" : "text-danger") + '"> SUBSCRIBER </span>' +
-          '<span class="' + (item.is.follower ? "text-success" : "text-danger") + '"> FOLLOWER </span>' +
-          '<span class="' + (item.is.regular ? "text-success" : "text-danger") + '"> REGULAR </span>' +
+          '<td style="font-weight: bold; cursor: pointer; user-select: none;">' +
+          '<span id="subscriber-' + item.username + '" class="' + (item.is.subscriber ? "text-success" : "text-danger") + '" onclick="viewers.toggle(\'subscriber\', \'' + item.username + '\')"> SUBSCRIBER </span>' +
+          '<span id="follower-' + item.username + '" class="' + (item.is.follower ? "text-success" : "text-danger") + '" onclick="viewers.toggle(\'follower\', \'' + item.username + '\')"> FOLLOWER </span>' +
+          '<span id="regular-' + item.username + '" class="' + (item.is.regular ? "text-success" : "text-danger") + '" onclick="viewers.toggle(\'regular\', \'' + item.username + '\')"> REGULAR </span>' +
           '<span class="' + (item.is.online ? "text-success" : "text-danger") + '"> ONLINE </span></td>' +
           '<td class="tableMenu">' +
           '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
