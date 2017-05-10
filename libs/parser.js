@@ -94,6 +94,7 @@ Parser.prototype.processQueue = async function (id) {
 
 Parser.prototype.parseCommands = async function (user, message) {
   message = message.trim()
+  if (!message.startsWith('!')) return // do nothing, this is not a command
   for (var cmd in this.registeredCmds) {
     if (message.search(new RegExp(cmd + '\\b', 'i')) > -1) {
       if (this.permissionsCmds[cmd] === constants.DISABLE) break
