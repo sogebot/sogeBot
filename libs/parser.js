@@ -115,6 +115,10 @@ Parser.prototype.parseCommands = async function (user, message) {
   }
 }
 
+Parser.prototype.isRegistered = function (cmd) {
+  return !_.isNil(this.registeredCmds[cmd])
+}
+
 Parser.prototype.register = function (self, cmd, fnc, permission) {
   this.registeredCmds[cmd] = fnc
   this.permissionsCmds[cmd] = permission
