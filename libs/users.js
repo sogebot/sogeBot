@@ -68,17 +68,7 @@ Users.prototype.get = function (username) {
     }
   }
 
-  let user = _.find(this.users, function (o) { return o.username === username })
-  user = _.isUndefined(user) ? {} : user
-
-  if (!_.isNil(user.id)) {
-    let oldUser = _.filter(this.users, function (o) { return !_.isNil(o.id) && o.id === user.id && o.username !== username })
-    if (oldUser.length > 0) {
-      self.users[username] = oldUser[0]
-      delete self.users[oldUser[0].username]
-    }
-  }
-
+  let user = _.isUndefined(this.users[username]) ? {} : this.users[username]
   // return all default attributes
   if (_.isUndefined(user.username)) user.username = username
   if (_.isUndefined(user.time)) user.time = {}
@@ -135,8 +125,7 @@ Users.prototype.rmRegular = function (self, sender, text) {
 Users.prototype.set = function (username, object, silent = false) {
   if (username === global.configuration.get().twitch.username) return // it shouldn't happen, but there can be more than one instance of a bot
 
-  let user = _.find(this.users, function (o) { return o.username === username })
-  user = _.isUndefined(user) ? {} : user
+  let user = _.isUndefined(this.users[username]) ? {} : this.users[username]
   this.users[username] = _.merge(user, object)
 
   // also we need to be sure that all default attrs exists
