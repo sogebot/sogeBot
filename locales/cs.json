@@ -29,7 +29,8 @@
     "months": "mesic|4:mesice|mesicu",
     "days": "den|4:dny|dnu",
     "hours": "hodina|4:hodiny|hodin",
-    "minutes": "minuta|4:minuty|minut"
+    "minutes": "minuta|4:minuty|minut",
+    "messages": "zprava|4:zpravy|zprav"
   },
   "overlay": {
     "emotes": {

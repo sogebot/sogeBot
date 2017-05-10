@@ -408,7 +408,7 @@ Twitch.prototype.showMe = function (self, sender, text) {
 
     // message count
     var messages = !_.isUndefined(user.stats.messages) ? user.stats.messages : 0
-    message.push(messages + ' messages')
+    message.push(messages + ' ' + global.parser.getLocalizedName(messages, 'core.messages'))
 
     global.commons.sendMessage(message.join(' | '), sender)
   } catch (e) {
