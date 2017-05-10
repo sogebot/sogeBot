@@ -134,7 +134,9 @@ Users.prototype.rmRegular = function (self, sender, text) {
 
 Users.prototype.set = function (username, object, silent = false) {
   if (username === global.configuration.get().twitch.username) return // it shouldn't happen, but there can be more than one instance of a bot
-  let user = _.isUndefined(this.users[username]) ? {} : this.users[username]
+
+  let user = _.find(this.users, function (o) { return o.username === username })
+  user = _.isUndefined(user) ? {} : user
   this.users[username] = _.merge(user, object)
 
   // also we need to be sure that all default attrs exists
