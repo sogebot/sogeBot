@@ -101,9 +101,11 @@ global.client.on('message', function (channel, sender, message, fromSelf) {
     }
     global.parser.parse(sender, message)
 
-    const user = global.users.get(sender.username)
-    let msgs = _.isUndefined(user.stats.messages) ? 1 : user.stats.messages + 1
-    global.users.set(user.username, { stats: { messages: msgs } }, true)
+    if (!message.startsWith('!')) {
+      const user = global.users.get(sender.username)
+      let msgs = _.isUndefined(user.stats.messages) ? 1 : parseInt(user.stats.messages, 10) + 1
+      global.users.set(user.username, { stats: { messages: msgs } }, true)
+    }
   }
 })
 
