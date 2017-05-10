@@ -29,7 +29,8 @@
     "months": "month|months",
     "days": "day|days",
     "hours": "hour|hours",
-    "minutes": "minute|minutes"
+    "minutes": "minute|minutes",
+    "messages": "message|messages"
   },
   "overlay": {
     "emotes": {
