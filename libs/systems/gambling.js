@@ -35,7 +35,7 @@ function Gambling () {
     setInterval(function () {
       if (_.isNil(self.current.duel._timestamp)) return true
 
-      if (new Date().getTime() - self.current.duel._timestamp > 15000) { // 1000 * 60 * 5) {
+      if (new Date().getTime() - self.current.duel._timestamp > 1000 * 60 * 5) {
         let winner = _.random(0, parseInt(self.current.duel._total, 10) - 1, false)
         const total = self.current.duel._total
 
