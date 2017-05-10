@@ -132,8 +132,8 @@
       if (typeof video.startTime !== 'undefined') data.startSeconds = video.startTime
       if (typeof video.endTime !== 'undefined') data.endSeconds = video.endTime
       player.loadVideoById(data);
-      //player.setVolume(video.volume)
-      //player.setPlaybackQuality('small') // set playback to lowest possible
+      player.setVolume(video.volume)
+      player.setPlaybackQuality('small') // set playback to lowest possible
       player.playVideo();
       setTimeout(function() {
         loading = false
