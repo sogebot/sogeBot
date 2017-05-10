@@ -45,6 +45,7 @@ You can also contact me on my email sogehige@gmail.com or https://twitter.com/so
 |----------|------------------------------------------------|
 | Bets     |                                                |
 | Gambling | !seppuku, !roulette commands                   |
+| Duel     | !duel - bet your points, only one can win      |
 
 | Overlay       | Description                              |
 |---------------|------------------------------------------|
