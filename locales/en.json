@@ -41,6 +41,8 @@
     }
   },
   "webpanel": {
+    "send-message-as-a-bot": "Send message as a bot",
+    "chat-as-bot": "Chat (as bot)",
     "product": "Product",
     "optional": "optional",
     "placeholder-search": "Search",

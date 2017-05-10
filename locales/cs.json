@@ -41,6 +41,8 @@
     }
   },
   "webpanel": {
+    "send-message-as-a-bot": "Poslat zprávu jako bot",
+    "chat-as-bot": "Chat (jako bot)",
     "product": "Produkt",
     "optional": "nepovinný",
     "placeholder-search": "Hledat",
