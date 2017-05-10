@@ -68,18 +68,14 @@ Users.prototype.get = function (username) {
     }
   }
 
-  let user = _.isUndefined(this.users[username]) ? {} : this.users[username]
+  let user = _.find(this.users, function (o) { return o.username === username })
+  user = _.isUndefined(user) ? {} : user
 
   if (!_.isNil(user.id)) {
     let oldUser = _.filter(this.users, function (o) { return !_.isNil(o.id) && o.id === user.id && o.username !== username })
     if (oldUser.length > 0) {
-      oldUser = oldUser[0]
-      self.users[username] = {}
-      self.users[username].time = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].time) ? self.users[oldUser.username].time : {}
-      self.users[username].is = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].is) ? self.users[oldUser.username].is : {}
-      self.users[username].stats = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].stats) ? self.users[oldUser.username].stats : {}
-      self.users[username].points = !_.isNil(self.users[oldUser.username]) && !_.isNil(self.users[oldUser.username].points) ? self.users[oldUser.username].points : 0
-      delete self.users[oldUser.username]
+      self.users[username] = oldUser[0]
+      delete self.users[oldUser[0].username]
     }
   }
 
