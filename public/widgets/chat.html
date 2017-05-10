@@ -15,7 +15,18 @@
 
   <!-- Tab panes -->
   <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="chat-room">
+    <div role="tabpanel" class="tab-pane active">
+      <div id="chat-room"></div>
+      <form class="form-horizontal">
+        <div class="form-group" style="margin-bottom: 0">
+          <div class="col-sm-8" style="padding-right: 0">
+            <input type="text" id="chatInput" class="form-control"/>
+          </div>
+          <div class="col-sm-4" style="padding-left: 0">
+            <button id="chatInputSubmit" class="form-control btn btn-primary" data-lang="chat-as-bot"></button>
+          </div>
+        </div>
+      </form>
     </div> <!-- /CHAT-ROOM -->
 
     <div role="tabpanel" class="tab-pane" id="chat-settings">
@@ -27,5 +38,15 @@
     socket.emit('getChatRoom');
     socket.on('chatRoom', function(room) {
       $("#chat-room").html('<iframe frameborder="0" scrolling="no" src="http://twitch.tv/' + room + '/chat?popout=" width="100%"></iframe>')
+    })
+
+    $('#chatInput').attr('placeholder', translations['send-message-as-a-bot'])
+
+    $('#chatInputSubmit').on('click', function (ev) {
+        ev.preventDefault()
+        var message = $('#chatInput').val()
+        $('#chatInput').val('')
+
+        if (message.length > 0) socket.emit('chat.message.send', message)
     })
 </script>
