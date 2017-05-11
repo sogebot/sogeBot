@@ -94,7 +94,7 @@ Alias.prototype.help = function (self, sender) {
 
 Alias.prototype.add = function (self, sender, text) {
   try {
-    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+) !([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
+    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w\S ]+) !([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
     let data = {
       alias: parsed[2],
       command: parsed[1],
