@@ -235,6 +235,7 @@
     "stream-started": "stream started",
     "stream-stopped": "stream stopped",
     "stream-is-running-x-minutes": "stream is running x minutes",
+    "every-x-seconds": "every x seconds",
     "cheer": "received cheer",
     "clearchat": "chat was cleared",
     "action": "user sent /me",

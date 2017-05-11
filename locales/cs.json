@@ -235,6 +235,7 @@
     "stream-started": "stream začal",
     "stream-stopped": "stream skončil",
     "stream-is-running-x-minutes": "stream trvá x minut",
+    "every-x-seconds": "každých x sekund",
     "cheer": "cheer byl získán",
     "clearchat": "chat byl vymazán",
     "action": "uživatel poslal /me",
