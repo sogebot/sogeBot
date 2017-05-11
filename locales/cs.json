@@ -212,6 +212,7 @@
     "subscribers-show": "subscriberů",
     "followers-size": "Velikost fontu",
     "custom-message": "Vlastní zpráva",
+    "title-template": "Šablona nadpisu",
     "minimal-watched-time": "Minimální čas sledování:",
     "widget-title-bets": "SÁZKY",
     "widget-title-chat": "CHAT",
@@ -264,6 +265,7 @@
   "raffle": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych (value) minut",
     "announceCustomMessage": "Vlastni oznameni pro raffle nastaveno na `(value)`",
+    "announceTitleTemplate": "Sablona pro nadpis nastavena na `(value)`",
     "minWatchedTime": "a take je potreba minimalne (time)h sledovat tento stream",
     "participation": {
       "success": "Ucastnis se prave probihajiciho raffle! Hodne stesti!",

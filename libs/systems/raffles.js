@@ -22,6 +22,7 @@ function Raffles () {
     this.product = null
     this.minWatchedTime = 0
     this.eligibility = 0
+    this.status = null
 
     global.parser.register(this, '!raffle pick', this.pick, constants.OWNER_ONLY)
     global.parser.register(this, '!raffle close', this.close, constants.OWNER_ONLY)
@@ -30,6 +31,7 @@ function Raffles () {
     global.parser.registerHelper('!raffle')
     global.configuration.register('raffleAnnounceInterval', 'raffle.announceInterval', 'number', 10)
     global.configuration.register('raffleAnnounceCustomMessage', 'raffle.announceCustomMessage', 'string', '')
+    global.configuration.register('raffleTitleTemplate', 'raffle.announceTitleTemplate', 'string', '')
 
     var self = this
     setInterval(function () {
@@ -100,7 +102,7 @@ Raffles.prototype.pick = function (self, sender) {
     } else {
       const user = global.users.get(winner.username)
       global.botDB.update({_id: 'raffle'}, {$set: { winner: user, locked: true, timestamp: new Date().getTime() }})
-      global.commons.sendMessage(!_.isNil(self.product) ? global.translate('raffle.pick.winner.withProduct') : global.translate('raffle.pick.winner.withoutProduct')
+      global.commons.sendMessage(global.translate(!_.isNil(self.product) ? 'raffle.pick.winner.withProduct' : 'raffle.pick.winner.withoutProduct')
         .replace('(winner)', winner.username), sender)
       global.parser.unregister('!' + self.keyword)
       global.widgets.raffles.sendWinner(global.widgets.raffles, user)
@@ -250,6 +252,8 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
       // register raffle keyword
       self.registerRaffleKeyword(self)
       self.lastAnnounce = new Date().getTime()
+      self.status = global.twitch.currentStatus
+      global.twitch.setTitle(global.twitch, null, self.status + ' ' + global.configuration.getValue('raffleTitleTemplate').replace('(product)', !raffle.product ? ' ' : raffle.product).replace('(keyword)', raffle.keyword))
     })
   } catch (err) {
     global.commons.sendMessage(global.translate('raffle.open.error'))
@@ -257,6 +261,11 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
 }
 
 Raffles.prototype.close = function (self, sender, text) {
+  if (!_.isNil(self.status)) {
+    global.twitch.setTitle(global.twitch, null, self.status)
+    self.status = null
+  }
+
   global.botDB.findOne({_id: 'raffle'}, function (err, item) {
     if (err) return log.error(err, { fnc: 'Raffles.prototype.close' })
     if (!_.isNull(item)) {
