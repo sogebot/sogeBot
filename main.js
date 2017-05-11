@@ -129,7 +129,7 @@ global.client.on('part', function (channel, username, fromSelf) {
 
 global.client.on('action', function (channel, userstate, message, self) {
   if (self) return
-  global.events.fire('action', { username: userstate['display-name'].toLowerCase() })
+  global.events.fire('action', { username: userstate.username.toLowerCase() })
 })
 
 global.client.on('ban', function (channel, username, reason) {
@@ -151,7 +151,7 @@ global.client.on('mod', function (channel, username) {
 })
 
 global.client.on('cheer', function (channel, userstate, message) {
-  global.events.fire('cheer', { username: userstate['display-name'].toLowerCase(), bits: userstate.bits, message: message })
+  global.events.fire('cheer', { username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
 })
 
 global.client.on('clearchat', function (channel) {
