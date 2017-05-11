@@ -46,7 +46,7 @@ Configuration.prototype.setValue = function (self, sender, text) {
   try {
     var cmd = text.split(' ')[0]
     var value = text.replace(text.split(' ')[0], '').trim()
-    if (value.length === 0) value = self.default[cmd]
+    if (value.length === 0) value = self.default[cmd].value
 
     var filter = self.cfgL[cmd].filter
     var data = {_type: 'settings', success: self.cfgL[cmd].success}
