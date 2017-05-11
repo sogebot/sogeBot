@@ -751,5 +751,11 @@
       "undefined": "@(username) neexistuje v databazi bota",
       "empty": "Pouziti: !regular remove <username>"
     }
+  },
+  "merge": {
+    "noUsername": "(sender), musis zadat uzivatelske jmeno!",
+    "success": "(sender), (username) ma nyni data (merged-username)",
+    "noID": "(sender), pro toto uzivatelske jmeno neexistuje ID, proto nelze zmenit",
+    "noUsernameToMerge": "(sender), nebylo nalezeno jine uzivatelske jmeno"
   }
 }
