@@ -118,7 +118,7 @@ Parser.prototype.parseCommands = async function (user, message) {
 }
 
 Parser.prototype.isRegistered = function (cmd) {
-  return !_.isNil(this.registeredCmds[cmd])
+  return !_.isNil(this.registeredCmds[cmd]) || (global.commons.isSystemEnabled('alias') && global.systems.alias.isAlias(global.systems.alias, cmd))
 }
 
 Parser.prototype.register = function (self, cmd, fnc, permission) {

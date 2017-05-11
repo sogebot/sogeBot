@@ -188,4 +188,8 @@ Alias.prototype.parse = function (self, id, sender, text) {
   }
 }
 
+Alias.prototype.isAlias = function (self, cmd) {
+  return !_.isUndefined(_.find(self.alias, function (oAlias) { return '!' + oAlias.alias.toLowerCase() === cmd.toLowerCase() }))
+}
+
 module.exports = new Alias()

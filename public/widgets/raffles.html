@@ -222,7 +222,7 @@
       $("#rafflesWidgetProduct").val('')
     },
     createRaffle: function () {
-      if ($("#rafflesWidgetKeyword").val().length === 0) {
+      if ($("#rafflesWidgetKeyword").val().length === 0 || $("#rafflesWidgetKeyword").parent().hasClass('has-error')) {
         $("#rafflesWidgetKeyword").parent().addClass('has-error')
         return false
       } else {
@@ -379,6 +379,21 @@
     data['raffleTitleTemplate'] = value
     socket.emit('saveConfiguration', data)
   })
+
+  var $inputRafflesWidgetKeyword = $('#rafflesWidgetKeyword')
+  $inputRafflesWidgetKeyword.off()
+  $inputRafflesWidgetKeyword.on('keyup', function (ev) {
+    socket.emit('parser.isRegistered', { emit: 'raffles.check', command: '!' + $(ev.target).val().trim() })
+  })
+
+  socket.on('raffles.check', function (data) {
+    if (data.isRegistered) {
+      $("#rafflesWidgetKeyword").parent().removeClass().addClass('input-group').addClass('has-error')
+    } else {
+      $("#rafflesWidgetKeyword").parent().removeClass().addClass('input-group').addClass('has-success')
+    }
+  })
+
 
   socket.emit('getRafflesConfiguration')
   socket.off('rafflesConfiguration')
