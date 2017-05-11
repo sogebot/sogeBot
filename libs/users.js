@@ -88,7 +88,7 @@ Users.prototype.merge = function (self, sender, text) {
 Users.prototype.get = function (username) {
   var self = this
 
-  if (username === global.configuration.get().twitch.username || _.isNil(self.users)) {
+  if (username === global.configuration.get().twitch.username || _.isNil(self.users) || _.isNil(username)) {
     return {
       username: username,
       time: {},
@@ -152,7 +152,7 @@ Users.prototype.rmRegular = function (self, sender, text) {
 }
 
 Users.prototype.set = function (username, object, silent = false) {
-  if (username === global.configuration.get().twitch.username) return // it shouldn't happen, but there can be more than one instance of a bot
+  if (username === global.configuration.get().twitch.username || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
 
   let user = _.isUndefined(this.users[username]) ? {} : this.users[username]
   this.users[username] = _.merge(user, object)
