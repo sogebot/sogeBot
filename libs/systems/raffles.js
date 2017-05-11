@@ -252,8 +252,10 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
       // register raffle keyword
       self.registerRaffleKeyword(self)
       self.lastAnnounce = new Date().getTime()
-      self.status = global.twitch.currentStatus
-      global.twitch.setTitle(global.twitch, null, self.status + ' ' + global.configuration.getValue('raffleTitleTemplate').replace('(product)', !raffle.product ? ' ' : raffle.product).replace('(keyword)', raffle.keyword))
+      if (global.configuration.getValue('raffleTitleTemplate').trim().length > 0) {
+        self.status = global.twitch.currentStatus
+        global.twitch.setTitle(global.twitch, null, self.status + ' ' + global.configuration.getValue('raffleTitleTemplate').replace('(product)', !raffle.product ? ' ' : raffle.product).replace('(keyword)', raffle.keyword))
+      }
     })
   } catch (err) {
     global.commons.sendMessage(global.translate('raffle.open.error'))
