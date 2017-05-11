@@ -214,7 +214,7 @@ Users.prototype.isFollowerUpdate = function (username) {
       }
       global.users.set(username, { is: { follower: false }, time: { followCheck: new Date().getTime(), follow: 0 } }, global.users.get(username).is.follower)
     } else {
-      if (!global.users.get(username).is.follower) {
+      if (!global.users.get(username).is.follower && new Date().getTime() - moment(body.created_at).format('X') * 1000 < 60000 * 60) {
         global.events.fire('follow', { username: username })
       }
       global.users.set(username, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(body.created_at).format('X') * 1000 } }, !global.users.get(username).is.follower)
