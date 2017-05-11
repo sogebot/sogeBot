@@ -74,6 +74,10 @@ function Panel () {
     // send enabled systems
     socket.on('getSystems', function () { socket.emit('systems', global.configuration.get().systems) })
 
+    socket.on('parser.isRegistered', function (data) {
+      socket.emit(data.emit, { isRegistered: global.parser.isRegistered(data.command) })
+    })
+
     _.each(self.socketListeners, function (listener) {
       socket.on(listener.on, function (data) {
         if (typeof listener.fnc !== 'function') {
