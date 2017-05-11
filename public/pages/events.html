@@ -162,6 +162,10 @@ $('#events-list').on('change', function(ev) {
       $('#countGroup').css('display', 'inline-block')
       $('#count').attr('placeholder', 'minutes to activate')
       break
+    case 'every-x-seconds':
+      $('#countGroup').css('display', 'inline-block')
+      $('#count').attr('placeholder', 'seconds to activate')
+      break
   }
 })
 
@@ -295,6 +299,7 @@ var newEvent = function () {
   $('#emotesGroup').css('display', 'none')
   $('#command2Group').css('display', 'none')
   $('#quietGroup').css('display', 'none')
+  $('#countGroup').css('display', 'none')
 }
 
 socket.off('events')

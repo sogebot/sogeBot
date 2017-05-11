@@ -22,7 +22,8 @@ function Events () {
     'ban': [], // (username), (reason)
     'hosting': [], // (target), (viewers)
     'mod': [], // (username)
-    'timeout': [] // (username), (reason), (duration)
+    'timeout': [], // (username), (reason), (duration)
+    'every-x-seconds': [] // needs definition = { definition: true, tTrigerred: new Date(), tCount: 60 }
   }
   this.operations = {
     'send-chat-message': function (attr) {
@@ -188,6 +189,11 @@ Events.prototype._new = function (self, socket, data) {
       definition.tCount = data.definition.count
     }
 
+    if (data.event === 'every-x-seconds') {
+      definition.tCount = parseInt(data.definition.count, 10)
+      definition.tTriggered = new Date().getTime()
+    }
+
     _.each(self.events[data.event], function (aEvent, index) {
       let keys = Object.keys(aEvent[0])
       // re-do definition
@@ -283,6 +289,16 @@ Events.prototype.fire = function (event, attr) {
               }
             } else if (!operation.tTriggered) { // run only once if tTimestamp === 0
               attr.tTriggered = true
+              return true
+            }
+            break
+          case 'every-x-seconds':
+            if (!_.isNil(attr.reset) && attr.reset) {
+              operation.tTriggered = new Date().getTime()
+              return false
+            }
+            if (new Date().getTime() - operation.tTriggered >= operation.tCount * 1000) {
+              operation.tTriggered = new Date().getTime()
               return true
             }
             break

@@ -68,12 +68,14 @@ function Twitch () {
           self.newChatters = 0
           self.chatMessagesAtStart = global.parser.linesParsed
           global.events.fire('stream-started')
+          global.events.fire('every-x-seconds', { reset: true })
         }
         self.saveStream(body.stream)
         self.isOnline = true
         self.when.offline = null
         global.events.fire('number-of-viewers-is-at-least-x')
         global.events.fire('stream-is-running-x-minutes')
+        global.events.fire('every-x-seconds')
       } else {
         if (self.isOnline && self.curRetries < self.maxRetries) { self.curRetries = self.curRetries + 1; return } // we want to check if stream is _REALLY_ offline
         // reset everything
