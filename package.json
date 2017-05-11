@@ -42,6 +42,7 @@
     "migrate": "node --harmony-async-await ./migrate",
     "cleanup": "node --harmony-async-await ./tools/cleanup",
     "start": "npm run copy:dist && node --harmony-async-await ./main || true",
+    "debug": "npm run copy:dist && node --harmony-async-await --inspect ./main || true",
     "copy:dist": "node tools/copy-dist-files.js"
   },
   "pre-commit": [
