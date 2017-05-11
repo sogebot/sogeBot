@@ -14,6 +14,7 @@ function Users () {
 
   global.parser.register(this, '!regular add', this.addRegular, constants.OWNER_ONLY)
   global.parser.register(this, '!regular remove', this.rmRegular, constants.OWNER_ONLY)
+  global.parser.register(this, '!merge', this.merge, constants.MODS)
 
   global.watcher.watch(this, 'changes', this._save)
 
@@ -53,6 +54,34 @@ Users.prototype._save = function (self) {
     var users = { users: self.users }
     global.botDB.update({ _id: 'users' }, { $set: users }, { upsert: true })
     global.botDB.persistence.compactDatafile()
+  }
+}
+
+Users.prototype.merge = function (self, sender, text) {
+  let username = text.trim()
+  if (username.length === 0) {
+    global.commons.sendMessage(global.translate('merge.noUsername'), sender)
+    return
+  }
+
+  let user = self.get(username)
+  if (!_.isNil(user.id)) {
+    let oldUser = _.filter(self.users, function (o) { return o.id === user.id && o.username !== username })
+    if (oldUser.length > 0) {
+      console.log(oldUser)
+      self.users[username] = _.clone(oldUser[0])
+      self.users[username].username = username
+      global.commons.sendMessage(global.translate('merge.success')
+        .replace('(username)', username)
+        .replace('(merged-username)', oldUser[0].username), sender)
+      delete self.users[oldUser[0].username]
+    } else {
+      global.commons.sendMessage(global.translate('merge.noUsernameToMerge')
+        .replace('(username)', username), sender)
+    }
+  } else {
+    global.commons.sendMessage(global.translate('merge.noID')
+      .replace('(username)', username), sender)
   }
 }
 

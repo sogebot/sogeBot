@@ -749,5 +749,11 @@
       "undefined": "@(username) doesn't exist in bot database",
       "empty": "Correct usage: !regular remove <username>"
     }
+  },
+  "merge": {
+    "noUsername": "(sender), you need to specify username to merge",
+    "success": "(sender), (username) have now data of (merged-username)",
+    "noID": "(sender), specified username doesn't have ID and cannot be merged",
+    "noUsernameToMerge": "(sender), no other username was found to merge"
   }
 }
