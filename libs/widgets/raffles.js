@@ -36,7 +36,8 @@ function RafflesWidget () {
 RafflesWidget.prototype.sendConfiguration = function (self, socket) {
   socket.emit('rafflesConfiguration', {
     raffleAnnounceInterval: global.configuration.getValue('raffleAnnounceInterval'),
-    raffleAnnounceCustomMessage: global.configuration.getValue('raffleAnnounceCustomMessage')
+    raffleAnnounceCustomMessage: global.configuration.getValue('raffleAnnounceCustomMessage'),
+    raffleTitleTemplate: global.configuration.getValue('raffleTitleTemplate')
   })
 }
 
@@ -70,6 +71,11 @@ RafflesWidget.prototype.removeRaffle = function (self, socket) {
   self.clearRaffleParticipants(self, socket)
   global.parser.unregister('!' + global.systems.raffles.keyword)
   global.systems.raffles.keyword = null
+
+  if (!_.isNil(global.systems.raffles.status)) {
+    global.twitch.setTitle(global.twitch, null, global.systems.raffles.status)
+    global.systems.raffles.status = null
+  }
 }
 
 RafflesWidget.prototype.clearRaffleParticipants = function (self, socket) {

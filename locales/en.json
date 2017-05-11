@@ -78,6 +78,7 @@
     "clips": "Clips",
     "commands-cooldowns": "Commands cooldowns",
     "custom-commands": "Custom commands",
+    "title-template": "Title template",
     "keywords": "Keywords",
     "keyword": "Keyword",
     "moderation": "Moderation",
@@ -264,6 +265,7 @@
   "raffle": {
     "announceInterval": "Opened raffles will be announced every (value) minute",
     "announceCustomMessage": "Raffle custom announce message set to `(value)`",
+    "announceTitleTemplate": "Template title set to `(value)`",
     "minWatchedTime": "and you need to have at least (time) watched hours to parcitipate",
     "participation": {
       "success": "You just entered in current raffle! Good luck!",
