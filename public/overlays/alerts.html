@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Alerts</title>
+    <meta charset="utf-8">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#f4f5f6">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#f4f5f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <style>
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+      }
+      #images {
+        display: table;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+      }
+      #images div img {
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="images"></div>
+
+    <script src="/dist/jquery/js/jquery.min.js"></script>
+    <script src="/dist/lodash/js/lodash.min.js"></script>
+    <script src="/dist/velocity-animate/js/velocity.min.js"></script>
+
+    <script>
+      var socket = io()
+
+      socket.on('overlay.show', function (data) {
+        _.each(data, function (d) {
+          if (d.type === 'image') showImage(d)
+          if (d.type === 'audio') playAudio(d)
+        })
+      })
+
+      function playAudio (audio) {
+        var sound = new Audio(audio.url)
+        audio.delay = _.isNil(audio.delay) ? 0 : parseInt(audio.delay, 10)
+        sound.volume = _.isNil(audio.volume) ? 1 : parseInt(audio.volume, 10) / 100
+
+        if (audio.delay === 0) sound.play()
+        else {
+          setTimeout(function () { sound.play() }, audio.delay)
+        }
+      }
+
+      function showImage (image) {
+        $('#images').empty()
+
+        let style = ''
+        switch (image.position) {
+          case 'top-left':
+            break
+          case 'top-center':
+            style = 'display: table-cell; text-align: center'
+            break
+          case 'top-right':
+            style = 'display: table-cell; text-align: right'
+            break
+          case 'left':
+            style = 'display: table-cell; vertical-align: middle'
+            break
+          case 'right':
+            style = 'display: table-cell; vertical-align: middle; text-align: right'
+            break
+          case 'bottom-left':
+            style = 'display: table-cell; vertical-align: bottom'
+            break
+          case 'bottom-center':
+            style = 'display: table-cell; vertical-align: bottom; text-align: center'
+            break
+          case 'bottom-right':
+            style = 'display: table-cell; vertical-align: bottom; text-align: right'
+            break
+          default:
+            style = 'display: table-cell; vertical-align: middle; text-align: center'
+            break
+        }
+
+        $('#images').append('<div style="' + style + '"><img src="' + image.url + '?x=' + Math.random() + '"></img></div>')
+
+        image.delay = _.isNil(image.delay) ? 0 : parseInt(image.delay, 10) // delay of animation
+        image.time = _.isNil(image.time) ? 1000 : parseInt(image.time, 10) // how long to show
+        image.duration = _.isNil(image.duration) ? 1000 : parseInt(image.duration) // how long to animate
+        $('#images div img')
+          .velocity("fadeIn", { delay: image.delay, duration: image.duration })
+          .velocity("fadeOut", { delay: (image.delay + image.time), duration: image.duration });
+      }
+    </script>
+  </body>
+</html>
