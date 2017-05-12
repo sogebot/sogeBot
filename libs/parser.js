@@ -44,7 +44,7 @@ Parser.prototype.parse = function (user, message, skip) {
   this.messages.push({user: user, message: message, skip: skip})
 }
 
-Parser.prototype.addToQueue = async function (user, message) {
+Parser.prototype.addToQueue = async function (user, message, skip) {
   var id = crypto.createHash('md5').update(Math.random().toString()).digest('hex')
 
   var data = {
