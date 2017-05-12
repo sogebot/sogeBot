@@ -56,12 +56,12 @@ Users.prototype._save = function (self) {
     global.botDB.remove({ _id: 'users' }, function (err) {
       if (err) {
         global.log.error(err, 'Users._save#1')
-        return
+        return true
       }
       global.botDB.insert(users, function (err) {
         if (err) {
           global.log.error(err, 'Users._save#2')
-          return
+          return true
         }
       })
     })
