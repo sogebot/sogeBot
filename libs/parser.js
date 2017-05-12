@@ -31,7 +31,7 @@ function Parser () {
 
       _.each(messages, function (message) {
         self.linesParsed++
-        self.registeredParsers === {} ? self.parseCommands(message.user, message.message) : self.addToQueue(message.user, message.message, message.skip)
+        self.registeredParsers === {} ? self.parseCommands(message.user, message.message, message.skip) : self.addToQueue(message.user, message.message, message.skip)
       })
     }
   }, 10)
@@ -51,13 +51,14 @@ Parser.prototype.addToQueue = async function (user, message, skip) {
     started: 0,
     success: 0,
     user: user,
-    message: message
+    message: message,
+    skip: skip
   }
   queue[id] = data
 
   for (var parser in _(this.registeredParsers).toPairs().sortBy(0).fromPairs().value()) {
     if (typeof queue[id] === 'undefined') break
-    if (skip || this.permissionsParsers[parser] === constants.VIEWERS ||
+    if (this.permissionsParsers[parser] === constants.VIEWERS ||
         (this.permissionsParsers[parser] === constants.REGULAR && (global.users.get(user.username).is.regular || user.mod || this.isOwner(user))) ||
         (this.permissionsParsers[parser] === constants.MODS && (user.mod || this.isOwner(user))) ||
         (this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user))) {
@@ -72,7 +73,7 @@ Parser.prototype.addToQueue = async function (user, message, skip) {
 Parser.prototype.processQueue = async function (id) {
   while (!_.isUndefined(queue[id])) {
     if (queue.hasOwnProperty(id) && queue[id].success === queue[id].started) {
-      this.parseCommands(queue[id].user, queue[id].message)
+      this.parseCommands(queue[id].user, queue[id].message, queue[id].skip)
 
       if (!_.isUndefined(queue[id].user.id)) {
         const index = _.findIndex(global.parser.timer, function (o) { return o.id === queue[id].user.id })
@@ -93,7 +94,7 @@ Parser.prototype.processQueue = async function (id) {
   }
 }
 
-Parser.prototype.parseCommands = async function (user, message) {
+Parser.prototype.parseCommands = async function (user, message, skip) {
   message = message.trim()
   if (!message.startsWith('!')) return // do nothing, this is not a command
   for (var cmd in this.registeredCmds) {
@@ -101,7 +102,7 @@ Parser.prototype.parseCommands = async function (user, message) {
     if (message.trim().toLowerCase().startsWith(cmd) && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
       if (this.permissionsCmds[cmd] === constants.DISABLE) break
       if (_.isNil(user) || // if user is null -> we are running command through a bot
-        (this.permissionsCmds[cmd] === constants.VIEWERS) ||
+        skip || (this.permissionsCmds[cmd] === constants.VIEWERS) ||
         (this.permissionsCmds[cmd] === constants.REGULAR && (global.users.get(user.username).is.regular || user.mod || this.isOwner(user))) ||
         (this.permissionsCmds[cmd] === constants.MODS && (user.mod || this.isOwner(user))) ||
         (this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user))) {

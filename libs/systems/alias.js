@@ -181,6 +181,8 @@ Alias.prototype.parse = function (self, id, sender, text) {
     if (!_.isUndefined(alias) && alias.enabled) {
       global.parser.parse(sender, text.replace('!' + cmd, '!' + alias.command), true)
       global.parser.lineParsed--
+      global.updateQueue(id, false) // alias found -> remove from parsing
+      return
     }
     global.updateQueue(id, true)
   } catch (e) {
