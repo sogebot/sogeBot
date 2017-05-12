@@ -172,11 +172,11 @@ Moderation.prototype.permitLink = function (self, sender, text) {
   }
 }
 
-Moderation.prototype.containsLink = function (self, id, sender, text) {
+Moderation.prototype.containsLink = function (self, id, sender, text, skip) {
   var timeout = global.configuration.getValue('moderationLinksTimeout')
   text = self.whitelist(text)
 
-  if (global.parser.isOwner(sender) || sender.mod || !global.configuration.getValue('moderationLinks') || (sender.subscriber && !global.configuration.getValue('moderationLinksSubs'))) {
+  if (skip || global.parser.isOwner(sender) || sender.mod || !global.configuration.getValue('moderationLinks') || (sender.subscriber && !global.configuration.getValue('moderationLinksSubs'))) {
     global.updateQueue(id, true)
     return
   }
@@ -199,7 +199,7 @@ Moderation.prototype.containsLink = function (self, id, sender, text) {
   }
 }
 
-Moderation.prototype.symbols = function (self, id, sender, text) {
+Moderation.prototype.symbols = function (self, id, sender, text, skip) {
   text = self.whitelist(text)
 
   var timeout = global.configuration.getValue('moderationSymbolsTimeout')
@@ -210,7 +210,7 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
   var msgLength = text.trim().length
   var symbolsLength = 0
 
-  if (global.parser.isOwner(sender) || sender.mod || msgLength <= triggerLength || !global.configuration.getValue('moderationSymbols') || (sender.subscriber && !global.configuration.getValue('moderationSymbolsSubs'))) {
+  if (skip || global.parser.isOwner(sender) || sender.mod || msgLength <= triggerLength || !global.configuration.getValue('moderationSymbols') || (sender.subscriber && !global.configuration.getValue('moderationSymbolsSubs'))) {
     global.updateQueue(id, true)
     return
   }
@@ -237,14 +237,14 @@ Moderation.prototype.symbols = function (self, id, sender, text) {
   global.updateQueue(id, true)
 }
 
-Moderation.prototype.longMessage = function (self, id, sender, text) {
+Moderation.prototype.longMessage = function (self, id, sender, text, skip) {
   text = self.whitelist(text)
 
   var timeout = global.configuration.getValue('moderationLongMessageTimeout')
   var triggerLength = global.configuration.getValue('moderationLongMessageTriggerLength')
 
   var msgLength = text.trim().length
-  if (global.parser.isOwner(sender) || sender.mod || msgLength < triggerLength || !global.configuration.getValue('moderationLongMessage') || (sender.subscriber && !global.configuration.getValue('moderationLongMessageSubs'))) {
+  if (skip || global.parser.isOwner(sender) || sender.mod || msgLength < triggerLength || !global.configuration.getValue('moderationLongMessage') || (sender.subscriber && !global.configuration.getValue('moderationLongMessageSubs'))) {
     global.updateQueue(id, true)
   } else {
     global.updateQueue(id, false)
@@ -253,7 +253,7 @@ Moderation.prototype.longMessage = function (self, id, sender, text) {
   }
 }
 
-Moderation.prototype.caps = function (self, id, sender, text) {
+Moderation.prototype.caps = function (self, id, sender, text, skip) {
   text = self.whitelist(text)
 
   var timeout = global.configuration.getValue('moderationCapsTimeout')
@@ -263,7 +263,7 @@ Moderation.prototype.caps = function (self, id, sender, text) {
   var msgLength = text.trim().length
   var capsLength = 0
 
-  if (global.parser.isOwner(sender) || sender.mod || msgLength <= triggerLength || !global.configuration.getValue('moderationCaps') || (sender.subscriber && !global.configuration.getValue('moderationCapsSubs'))) {
+  if (skip || global.parser.isOwner(sender) || sender.mod || msgLength <= triggerLength || !global.configuration.getValue('moderationCaps') || (sender.subscriber && !global.configuration.getValue('moderationCapsSubs'))) {
     global.updateQueue(id, true)
     return
   }
@@ -282,7 +282,7 @@ Moderation.prototype.caps = function (self, id, sender, text) {
   global.updateQueue(id, true)
 }
 
-Moderation.prototype.spam = function (self, id, sender, text) {
+Moderation.prototype.spam = function (self, id, sender, text, skip) {
   text = self.whitelist(text)
 
   var timeout = global.configuration.getValue('moderationSpamTimeout')
@@ -291,7 +291,7 @@ Moderation.prototype.spam = function (self, id, sender, text) {
 
   var msgLength = text.trim().length
 
-  if (global.parser.isOwner(sender) || sender.mod || msgLength <= triggerLength || !global.configuration.getValue('moderationSpam') || (sender.subscriber && !global.configuration.getValue('moderationSpamSubs'))) {
+  if (skip || global.parser.isOwner(sender) || sender.mod || msgLength <= triggerLength || !global.configuration.getValue('moderationSpam') || (sender.subscriber && !global.configuration.getValue('moderationSpamSubs'))) {
     global.updateQueue(id, true)
     return
   }
@@ -307,10 +307,10 @@ Moderation.prototype.spam = function (self, id, sender, text) {
   global.updateQueue(id, true)
 }
 
-Moderation.prototype.color = function (self, id, sender, text) {
+Moderation.prototype.color = function (self, id, sender, text, skip) {
   var timeout = global.configuration.getValue('moderationColorTimeout')
 
-  if (global.parser.isOwner(sender) || sender.mod || !global.configuration.getValue('moderationColor') || (sender.subscriber && !global.configuration.getValue('moderationColorSubs'))) {
+  if (skip || global.parser.isOwner(sender) || sender.mod || !global.configuration.getValue('moderationColor') || (sender.subscriber && !global.configuration.getValue('moderationColorSubs'))) {
     global.updateQueue(id, true)
     return
   }
@@ -322,14 +322,14 @@ Moderation.prototype.color = function (self, id, sender, text) {
   } else global.updateQueue(id, true)
 }
 
-Moderation.prototype.emotes = function (self, id, sender, text) {
+Moderation.prototype.emotes = function (self, id, sender, text, skip) {
   text = self.whitelist(text)
 
   var timeout = global.configuration.getValue('moderationSpamTimeout')
   var maxCount = global.configuration.getValue('moderationEmotesMaxCount')
   var count = 0
 
-  if (global.parser.isOwner(sender) || sender.mod || !global.configuration.getValue('moderationEmotes') || (sender.subscriber && !global.configuration.getValue('moderationEmotesSubs'))) {
+  if (skip || global.parser.isOwner(sender) || sender.mod || !global.configuration.getValue('moderationEmotes') || (sender.subscriber && !global.configuration.getValue('moderationEmotesSubs'))) {
     global.updateQueue(id, true)
     return
   }
@@ -345,8 +345,8 @@ Moderation.prototype.emotes = function (self, id, sender, text) {
   } else global.updateQueue(id, true)
 }
 
-Moderation.prototype.blacklist = function (self, id, sender, text) {
-  if (global.parser.isOwner(sender) || sender.mod) {
+Moderation.prototype.blacklist = function (self, id, sender, text, skip) {
+  if (skip || global.parser.isOwner(sender) || sender.mod) {
     global.updateQueue(id, true)
     return
   }
