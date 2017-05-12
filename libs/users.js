@@ -23,7 +23,7 @@ function Users () {
   var self = this
   setInterval(function () {
     self.changes += 500 // force every 15min to save changes
-  }, 15 * 60 * 1000)
+  }, 15 * 60 * 10000)
 
   setInterval(function () {
     if (self.rate_limit_follower_check.length > 0) {
@@ -51,8 +51,20 @@ Users.prototype._update = function (self) {
 Users.prototype._save = function (self) {
   if (self.changes >= 500) {
     self.changes = 0
-    var users = { users: self.users }
-    global.botDB.update({ _id: 'users' }, { $set: users }, { upsert: true })
+    var users = { _id: 'users', users: self.users }
+
+    global.botDB.remove({ _id: 'users' }, function (err) {
+      if (err) {
+        global.log.error(err, 'Users._save#1')
+        return
+      }
+      global.botDB.insert(users, function (err) {
+        if (err) {
+          global.log.error(err, 'Users._save#2')
+          return
+        }
+      })
+    })
     global.botDB.persistence.compactDatafile()
   }
 }
@@ -68,7 +80,6 @@ Users.prototype.merge = function (self, sender, text) {
   if (!_.isNil(user.id)) {
     let oldUser = _.filter(self.users, function (o) { return o.id === user.id && o.username !== username })
     if (oldUser.length > 0) {
-      console.log(oldUser)
       self.users[username] = _.clone(oldUser[0])
       self.users[username].username = username
       global.commons.sendMessage(global.translate('merge.success')
@@ -88,6 +99,7 @@ Users.prototype.merge = function (self, sender, text) {
 Users.prototype.get = function (username) {
   var self = this
 
+  if (_.isNil(username)) global.log.error('username is NULL!\n' + new Error().stack)
   if (username === global.configuration.get().twitch.username || _.isNil(self.users) || _.isNil(username)) {
     return {
       username: username,
@@ -152,9 +164,10 @@ Users.prototype.rmRegular = function (self, sender, text) {
 }
 
 Users.prototype.set = function (username, object, silent = false) {
+  if (_.isNil(username)) global.log.error('username is NULL!\n' + new Error().stack)
   if (username === global.configuration.get().twitch.username || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
 
-  let user = _.isUndefined(this.users[username]) ? {} : this.users[username]
+  let user = this.get(username)
   this.users[username] = _.merge(user, object)
 
   // also we need to be sure that all default attrs exists
