@@ -172,14 +172,14 @@ Alias.prototype.remove = function (self, sender, text) {
   }
 }
 
-Alias.prototype.parse = function (self, id, sender, text) {
+Alias.prototype.parse = function (self, id, sender, text, skip) {
   try {
     var parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
     var cmd = parsed[1]
 
     let alias = _.find(self.alias, function (oAlias) { return oAlias.alias.toLowerCase() === cmd.toLowerCase() || '!' + oAlias.alias.toLowerCase() === parsed[0].toLowerCase() })
     if (!_.isUndefined(alias) && alias.enabled) {
-      global.parser.parse(sender, text.replace('!' + cmd, '!' + alias.command))
+      global.parser.parse(sender, text.replace('!' + cmd, '!' + alias.command), skip)
       global.parser.lineParsed--
     }
     global.updateQueue(id, true)
