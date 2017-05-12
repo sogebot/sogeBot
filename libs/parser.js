@@ -57,7 +57,7 @@ Parser.prototype.addToQueue = async function (user, message, skip) {
 
   for (var parser in _(this.registeredParsers).toPairs().sortBy(0).fromPairs().value()) {
     if (typeof queue[id] === 'undefined') break
-    if (this.permissionsParsers[parser] === constants.VIEWERS ||
+    if (skip || this.permissionsParsers[parser] === constants.VIEWERS ||
         (this.permissionsParsers[parser] === constants.REGULAR && (global.users.get(user.username).is.regular || user.mod || this.isOwner(user))) ||
         (this.permissionsParsers[parser] === constants.MODS && (user.mod || this.isOwner(user))) ||
         (this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user))) {
