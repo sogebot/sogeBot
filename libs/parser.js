@@ -41,7 +41,7 @@ function Parser () {
 
 Parser.prototype.parse = function (user, message, skip) {
   skip = skip || false
-  this.messages.push({user: user, message: message})
+  this.messages.push({user: user, message: message, skip: skip})
 }
 
 Parser.prototype.addToQueue = async function (user, message) {
