@@ -260,14 +260,12 @@ Parser.prototype.parseMessage = async function (message, attr) {
     }
   }
   let command = {
-    '(command.#)': async function (filter) {
-      let cmd = filter.replace('(command.', '!')
+    '(!#)': async function (filter) {
+      let cmd = filter.replace('(', '')
       .replace(')', '')
       .replace('.', ' ')
       .replace('sender', attr.sender.username)
-
-      if (message.replace(filter, '').length === 0) global.parser.parseCommands(attr.sender, cmd)
-      else global.parser.parseCommands(null, cmd)
+      global.parser.parse({ username: attr.sender.username }, cmd)
       return ''
     }
   }
