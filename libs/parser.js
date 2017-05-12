@@ -31,7 +31,7 @@ function Parser () {
 
       _.each(messages, function (message) {
         self.linesParsed++
-        self.registeredParsers === {} ? self.parseCommands(message.user, message.message) : self.addToQueue(message.user, message.message)
+        self.registeredParsers === {} ? self.parseCommands(message.user, message.message) : self.addToQueue(message.user, message.message, message.skip)
       })
     }
   }, 10)
@@ -39,7 +39,8 @@ function Parser () {
   this._update(this)
 }
 
-Parser.prototype.parse = function (user, message) {
+Parser.prototype.parse = function (user, message, skip) {
+  skip = skip || false
   this.messages.push({user: user, message: message})
 }
 
@@ -61,7 +62,7 @@ Parser.prototype.addToQueue = async function (user, message) {
         (this.permissionsParsers[parser] === constants.MODS && (user.mod || this.isOwner(user))) ||
         (this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user))) {
       queue[id].started = parseInt(queue[id].started, 10) + 1
-      this.registeredParsers[parser](this.selfParsers[parser], id, user, message)
+      this.registeredParsers[parser](this.selfParsers[parser], id, user, message, skip)
     }
   }
 
@@ -265,7 +266,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
       .replace(')', '')
       .replace('.', ' ')
       .replace('sender', attr.sender.username)
-      global.parser.parse({ username: attr.sender.username }, cmd)
+      global.parser.parse({ username: attr.sender.username }, cmd, true)
       return ''
     }
   }
