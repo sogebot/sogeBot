@@ -56,12 +56,12 @@ Users.prototype._save = function (self) {
     global.botDB.remove({ _id: 'users' }, function (err) {
       if (err) {
         global.log.error(err, 'Users._save#1')
-        return true
+        return err
       }
       global.botDB.insert(users, function (err) {
         if (err) {
           global.log.error(err, 'Users._save#2')
-          return true
+          return err
         }
       })
     })
@@ -109,7 +109,7 @@ Users.prototype.get = function (username) {
     }
   }
 
-  let user = _.isUndefined(this.users[username]) ? {} : this.users[username]
+  let user = _.isUndefined(this.users[username]) ? {} : _.cloneDeep(this.users[username])
   // return all default attributes
   if (_.isUndefined(user.username)) user.username = username
   if (_.isUndefined(user.time)) user.time = {}
@@ -168,7 +168,8 @@ Users.prototype.set = function (username, object, silent = false) {
   if (username === global.configuration.get().twitch.username || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
 
   let user = this.get(username)
-  this.users[username] = _.merge(user, object)
+  _.merge(user, object)
+  this.users[username] = user
 
   // also we need to be sure that all default attrs exists
   if (_.isUndefined(this.users[username].username)) this.users[username].username = username
