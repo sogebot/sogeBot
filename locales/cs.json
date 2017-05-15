@@ -482,7 +482,10 @@
     "bannedSongTimeout": "Dostal si timeout za zabanovanou pisen",
     "unbannedSong": "Pisen byla uspesne odbanovana",
     "notBannedSong": "Tato pisen nebyla zabanovana",
-    "currentSong": "Prave hrajici pisen je (title)",
+    "currentSong": {
+      "songrequest": "Prave hrajici pisen je (title) pridana uzivatelem (username)",
+      "playlist": "Prave hrajici pisen je (title) z playlistu"
+    },
     "noCurrentSong": "Nic momentalne nehraje",
     "isBanned": "Promin, (sender), ale tahle pisen je zabanovana",
     "notFound": "Promin, (sender), ale tahle pisen nebyla nalezena",

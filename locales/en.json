@@ -480,7 +480,10 @@
     "bannedSongTimeout": "You've got timeout for posting banned song",
     "unbannedSong": "Song was succesfully unbanned",
     "notBannedSong": "This song was not banned",
-    "currentSong": "Current song is (title)",
+    "currentSong": {
+      "songrequest": "Current song is (title) requested by (username)",
+      "playlist": "Current song is (title) from playlist"
+    },
     "noCurrentSong": "No song is currently playing",
     "isBanned": "Sorry, (sender), but this song is banned",
     "notFound": "Sorry, (sender), but this song was not found",
