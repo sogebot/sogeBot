@@ -94,7 +94,21 @@ Commons.prototype.runCallback = function (cb, data) {
   var value = this.stripUnderscores(data)
   delete value.type
   if (_.isUndefined(cb)) return
-  typeof cb === 'function' ? cb(data) : this.sendMessage(global.translate(cb).replace('(value)', value[Object.keys(value)[0]]), {username: global.configuration.get().twitch.channel}, data)
+  if (data._type === 'settings') {
+    typeof cb === 'function' ? cb(data) : this.sendToOwners(global.translate(cb).replace('(value)', value[Object.keys(value)[0]]))
+  } else {
+    typeof cb === 'function' ? cb(data) : this.sendMessage(global.translate(cb).replace('(value)', value[Object.keys(value)[0]]), {username: global.configuration.get().twitch.channel}, data)
+  }
+}
+
+Commons.prototype.sendToOwners = function (text) {
+  for (let owner of global.parser.getOwners()) {
+    owner = {
+      username: owner,
+      'message-type': 'whisper'
+    }
+    global.commons.sendMessage(text, owner)
+  }
 }
 
 Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
