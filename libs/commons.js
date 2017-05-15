@@ -115,9 +115,9 @@ Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
   attr.sender = sender
   message = await global.parser.parseMessage(message, attr)
   if (message === '') return false // if message is empty, don't send anything
-  let username = (global.configuration.getValue('atUsername') ? '@' : '') + sender.username
   if (global.configuration.get().bot.debug) {
     if (_.isUndefined(sender) || _.isNull(sender)) sender = { username: null }
+    let username = (global.configuration.getValue('atUsername') ? '@' : '') + sender.username
     message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace('(sender)', username) : message
     if ((_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === global.configuration.get().twitch.username))) message = '! ' + message
     sender['message-type'] === 'whisper' ? global.log.whisperOut(message, {username: sender.username}) : global.log.chatOut(message, {username: sender.username})
@@ -125,7 +125,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
   }
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
   if (_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === global.configuration.get().twitch.username && !attr.force)) return false // we don't want to reply on bot commands
-  message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace('(sender)', username) : message
+  message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace('(sender)', (global.configuration.getValue('atUsername') ? '@' : '') + sender.username) : message
   if (!global.configuration.getValue('mute') || attr.force) {
     message = message.charAt(0).toUpperCase() + message.slice(1)
     sender['message-type'] === 'whisper' ? global.log.whisperOut(message, {username: sender.username}) : global.log.chatOut(message, {username: sender.username})
