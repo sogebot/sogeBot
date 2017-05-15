@@ -8,7 +8,7 @@ var constants = require('../constants')
 var log = global.log
 
 /*
- * !cooldown [command] [seconds] - set cooldown for command - 0 for disable
+ * !cooldown [command] [seconds] [true/false] - set cooldown for command - 0 for disable, true/false set quiet mode
  */
 
 function Cooldown () {
@@ -41,7 +41,7 @@ Cooldown.prototype.sSend = function (self, socket) {
 
 Cooldown.prototype.sSet = function (self, socket, data) {
   data.type = _.isUndefined(data.type) ? 'global' : data.type
-  self.set(self, null, data.command + ' ' + data.type + ' ' + data.seconds)
+  self.set(self, null, [data.command, data.type, data.seconds, data.quiet].join(' '))
   self.sSend(self, socket)
 }
 
@@ -67,8 +67,8 @@ Cooldown.prototype.set = function (self, sender, text) {
   var data, match
 
   try {
-    match = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) (global|user) (\d+)/)
-    data = {'command': match[1], 'seconds': match[3], 'type': match[2]}
+    match = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) (global|user) (\d+) ?(\w+)?/)
+    data = {'command': match[1], 'seconds': match[3], 'type': match[2], 'quiet': match[4] !== 'false'}
   } catch (e) {
     global.commons.sendMessage(global.translate('cooldown.failed.parse'), sender)
     return
@@ -76,7 +76,7 @@ Cooldown.prototype.set = function (self, sender, text) {
 
   delete self.list[data.command]
   if (parseInt(data.seconds, 10) !== 0) {
-    self.list[data.command] = { 'miliseconds': data.seconds * 1000, 'type': data.type, 'timestamp': 0 }
+    self.list[data.command] = { 'miliseconds': data.seconds * 1000, 'type': data.type, 'timestamp': 0, 'quiet': data.quiet }
     global.commons.sendMessage(global.translate('cooldown.success.set')
       .replace('(command)', data.command)
       .replace('(type)', data.type)
@@ -97,7 +97,7 @@ Cooldown.prototype.check = function (self, id, sender, text) {
 
   try {
     match = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)/)
-    data = {'command': match[1], 'miliseconds': self.list[match[1]].miliseconds, 'type': self.list[match[1]].type, 'timestamp': self.list[match[1]].timestamp}
+    data = {'command': match[1], 'miliseconds': self.list[match[1]].miliseconds, 'type': self.list[match[1]].type, 'timestamp': self.list[match[1]].timestamp, 'quiet': self.list[match[1]].quiet}
     if (_.isUndefined(data.miliseconds)) throw Error()
   } catch (e) {
     global.updateQueue(id, true)
@@ -121,10 +121,12 @@ Cooldown.prototype.check = function (self, id, sender, text) {
     }
     global.updateQueue(id, true)
   } else {
-    sender['message-type'] = 'whisper' // we want to whisp cooldown message
-    global.commons.sendMessage(global.translate('cooldown.failed.cooldown')
-      .replace('(command)', data.command)
-      .replace('(seconds)', Math.ceil((data.miliseconds - now + timestamp) / 1000)), sender)
+    if (!data.quiet) {
+      sender['message-type'] = 'whisper' // we want to whisp cooldown message
+      global.commons.sendMessage(global.translate('cooldown.failed.cooldown')
+        .replace('(command)', data.command)
+        .replace('(seconds)', Math.ceil((data.miliseconds - now + timestamp) / 1000)), sender)
+    }
     global.updateQueue(id, false)
   }
 }

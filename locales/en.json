@@ -49,6 +49,9 @@
     }
   },
   "webpanel": {
+    "cooldown-quiet-header": "Show cooldown message",
+    "cooldown-quiet-toggle-no": "Notify",
+    "cooldown-quiet-toggle-yes": "Won't notify",
     "at-username": "Usernames",
     "show-with-at": "Show with @",
     "send-message-as-a-bot": "Send message as a bot",
