@@ -50,10 +50,11 @@ function Gambling () {
         })
 
         winner = winnerArray[winner]
+        let username = (global.configuration.getValue('atUsername') ? '@' : '') + winner
         global.commons.sendMessage(global.translate((_.size(self.current.duel) === 1) ? 'gambling.duel.noContestant' : 'gambling.duel.winner')
           .replace('(pointsName)', global.systems.points.getPointsName(total))
           .replace('(points)', total)
-          .replace('(winner)', '@' + winner), { username: winner }, { force: true })
+          .replace('(winner)', username), { username: winner }, { force: true })
 
         // give user his points
         const user = global.users.get(winner)
