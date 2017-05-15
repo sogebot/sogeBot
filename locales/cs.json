@@ -49,6 +49,9 @@
     }
   },
   "webpanel": {
+    "cooldown-quiet-header": "Zobrazí cooldown zprávu",
+    "cooldown-quiet-toggle-no": "Upozornit",
+    "cooldown-quiet-toggle-yes": "Neupozornit",
     "at-username": "Uživatelské jména",
     "show-with-at": "Zobrazit s @",
     "send-message-as-a-bot": "Poslat zprávu jako bot",
