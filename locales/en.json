@@ -30,7 +30,13 @@
     "days": "day|days",
     "hours": "hour|hours",
     "minutes": "minute|minutes",
-    "messages": "message|messages"
+    "messages": "message|messages",
+    "settings": {
+      "atUsername": {
+        "true": "Usernames will be shown with @ like @foo",
+        "false": "Usernames will be shown without @ like foo"
+      }
+    }
   },
   "overlay": {
     "emotes": {
@@ -43,6 +49,8 @@
     }
   },
   "webpanel": {
+    "at-username": "Usernames",
+    "show-with-at": "Show with @",
     "send-message-as-a-bot": "Send message as a bot",
     "chat-as-bot": "Chat (as bot)",
     "product": "Product",
@@ -534,8 +542,8 @@
     }
   },
   "top": {
-    "listWatched": "Top (amount) (watch time):",
-    "listPoints": "Top (amount) (points):"
+    "listWatched": "Top (amount) (watch time): ",
+    "listPoints": "Top (amount) (points): "
   },
   "permissions": {
     "success": {

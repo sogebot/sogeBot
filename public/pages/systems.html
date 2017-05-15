@@ -151,6 +151,18 @@
       </tr>
     </table>
   </div>
+
+  <div class="widget" id="atUsername">
+    <div class="title" data-lang="at-username"></div>
+    <table class="table table-striped">
+      <tr>
+        <td><strong data-lang="show-with-at"></strong></td>
+        <td>
+          <input id="atUsernameToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
+        </td>
+      </tr>
+    </table>
+  </div>
 </div>
 <script>
   if (!systems.points) $("#points").css('display', 'none')
@@ -162,9 +174,15 @@
   socket.emit('getSongsConfiguration')
   socket.emit('getConfiguration')
 
-  socket.off('configuration')
-  socket.on('configuration', function (data) {
+  socket.once('configuration', function (data) {
     $("#configUptimeFormat").text(data.uptimeFormat)
+
+    $('#atUsernameToggle').bootstrapToggle(data.atUsername ? 'on' : 'off')
+    $('#atUsernameToggle').off('change')
+    $('#atUsernameToggle').change(function() {
+      if ($('#atUsernameToggle').data('init')) socket.emit('saveConfiguration', {'atUsername': $(this).prop('checked')})
+    })
+    $('#atUsernameToggle').data('init', true)
   })
 
   socket.off('pointsConfiguration')

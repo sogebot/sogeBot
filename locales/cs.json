@@ -30,7 +30,13 @@
     "days": "den|4:dny|dnu",
     "hours": "hodina|4:hodiny|hodin",
     "minutes": "minuta|4:minuty|minut",
-    "messages": "zprava|4:zpravy|zprav"
+    "messages": "zprava|4:zpravy|zprav",
+    "settings": {
+      "atUsername": {
+        "true": "Uzivatelske jmena budou zobrazena s @ takto @foo",
+        "false": "Uzivatelske jmena budou zobrazena bez @ takto foo"
+      }
+    }
   },
   "overlay": {
     "emotes": {
@@ -43,6 +49,8 @@
     }
   },
   "webpanel": {
+    "at-username": "Uživatelské jména",
+    "show-with-at": "Zobrazit s @",
     "send-message-as-a-bot": "Poslat zprávu jako bot",
     "chat-as-bot": "Chat (jako bot)",
     "product": "Produkt",

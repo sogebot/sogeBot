@@ -84,7 +84,8 @@ Queue.prototype.pick = function (self, sender, text) {
   self.picked = []
 
   while (amount > 0 && self.users.length > 0) {
-    self.picked.push('@' + self.getUser())
+    let username = (global.configuration.getValue('atUsername') ? '@' : '') + self.getUser()
+    self.picked.push(username)
     amount--
   }
 

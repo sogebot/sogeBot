@@ -384,9 +384,11 @@ Twitch.prototype.watched = function (self, sender, text) {
     parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     const user = global.users.get(text.trim() < 1 ? sender.username : parsed[0])
     watched = parseInt(!_.isNil(user) && !_.isNil(user.time) && !_.isNil(user.time.watched) ? user.time.watched : 0) / 1000 / 60 / 60
+
+    let username = (global.configuration.getValue('atUsername') ? '@' : '') + user.username
     global.commons.sendMessage(global.translate('watched.success.time')
       .replace('(time)', watched.toFixed(1))
-      .replace('(username)', '@' + user.username), sender)
+      .replace('(username)', username), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('watched.failed.parse'), sender)
   }
@@ -395,7 +397,7 @@ Twitch.prototype.watched = function (self, sender, text) {
 Twitch.prototype.showMe = function (self, sender, text) {
   try {
     const user = global.users.get(sender.username)
-    var message = ['@' + sender.username]
+    var message = ['(sender)']
     // rank
     var rank = !_.isUndefined(user.rank) ? user.rank : null
     if (global.configuration.get().systems.ranks === true && !_.isNull(rank)) message.push(rank)
@@ -436,7 +438,7 @@ Twitch.prototype.showTop = function (self, sender, text) {
 
     message = global.translate(type === 'points' ? 'top.listPoints' : 'top.listWatched').replace('(amount)', 10)
     _.each(sorted, function (username, index) {
-      message += (index + 1) + '. @' + username + ' - '
+      message += (index + 1) + '. ' + (global.configuration.getValue('atUsername') ? '@' : '') + username + ' - '
       if (type === 'time') message += (global.users.get(username).time.watched / 1000 / 60 / 60).toFixed(1) + 'h'
       else message += global.users.get(username).points + ' ' + global.systems.points.getPointsName(global.users.get(username).points)
       if (index + 1 < 10) message += ', '
