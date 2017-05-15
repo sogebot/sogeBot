@@ -238,6 +238,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
       if ((global.parser.isOwner(attr.sender) || attr.sender.mod) &&
         (!_.isUndefined(attr.param) && attr.param.length !== 0)) {
         global.parser.customVariables[variable] = attr.param
+        global.commons.sendMessage('(sender) ' + attr.param, attr.sender)
         return ''
       }
       return _.isNil(global.parser.customVariables[variable]) ? '' : global.parser.customVariables[variable]
