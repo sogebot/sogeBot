@@ -64,7 +64,7 @@ Configuration.prototype.setValue = function (self, sender, text) {
     } else if (filter === 'string') {
       if (cmd === 'lang') {
         self.cfgL[cmd].value = value.trim()
-        global.commons.sendMessage(global.translate('core.lang-selected'), sender)
+        global.commons.sendToOwners(global.translate('core.lang-selected'))
         global.panel.io.emit('lang', global.translate({root: 'webpanel'}))
         data.success = function () { return true }
       }

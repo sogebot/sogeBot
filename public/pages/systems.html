@@ -177,8 +177,8 @@
   socket.once('configuration', function (data) {
     $("#configUptimeFormat").text(data.uptimeFormat)
 
-    $('#atUsernameToggle').bootstrapToggle(data.atUsername ? 'on' : 'off')
     $('#atUsernameToggle').off('change')
+    $('#atUsernameToggle').bootstrapToggle(data.atUsername ? 'on' : 'off')
     $('#atUsernameToggle').change(function() {
       if ($('#atUsernameToggle').data('init')) socket.emit('saveConfiguration', {'atUsername': $(this).prop('checked')})
     })

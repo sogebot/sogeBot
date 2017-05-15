@@ -150,6 +150,10 @@ Parser.prototype.getOwner = function () {
   return global.configuration.get().twitch.owners.split(',')[0].trim()
 }
 
+Parser.prototype.getOwners = function () {
+  return global.configuration.get().twitch.owners.split(',')
+}
+
 Parser.prototype.isOwner = function (user) {
   try {
     if (_.isString(user)) user = { username: user }
