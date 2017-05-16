@@ -2,7 +2,7 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const emoticons = require('twitch-emoticons')
+const { EmoteFetcher, EmoteParser } = require('twitch-emoticons')
 
 // bot libraries
 const constants = require('../constants')
@@ -25,7 +25,11 @@ function Emotes () {
     '<3': 'https://static-cdn.jtvnw.net/emoticons/v1/9/'
   }
 
-  emoticons.loadBTTVChannel(global.configuration.get().twitch.channel)
+  this.fetcher = new EmoteFetcher()
+  this.fetcher.fetchTwitchEmotes()
+  this.fetcher.fetchBTTVEmotes()
+  this.fetcher.fetchBTTVEmotes(global.configuration.get().twitch.channel)
+  this.fetcher.fetchTwitchEmotes(global.configuration.get().twitch.channel)
 
   global.parser.registerParser(this, 'emotes', this.containsEmotes, constants.VIEWERS)
 
@@ -69,11 +73,10 @@ Emotes.prototype.containsEmotes = async function (self, id, sender, text) {
   })
 
   // parse BTTV emoticons
-  for (let emote of emoticons.cache().bttvEmotes.keys()) {
-    for (let i in _.range((text.match(new RegExp(emote, 'g')) || []).length)) {
+  for (let emote of await self.fetcher._getRawBTTVEmotes(global.configuration.get().twitch.channel)) {
+    for (let i in _.range((text.match(new RegExp(emote.code, 'g')) || []).length)) {
       if (i === OEmotesMax) break
-      let parsed = await emoticons.emote(emote)
-      global.panel.io.emit('emote', parsed.toLink(OEmotesSize))
+      global.panel.io.emit('emote', self.fetcher.emotes.get(emote.code).toLink(OEmotesSize))
     }
   }
 }
@@ -87,9 +90,9 @@ Emotes.prototype.parseEmotes = async function (self, emotes) {
       emotesArray.push(self.simpleEmotes[emotes[i]] + (OEmotesSize + 1) + '.0')
     } else {
       try {
-        let parsed = await emoticons.emote(emotes[i])
-        emotesArray.push(parsed.toLink(OEmotesSize))
+        emotesArray.push(self.fetcher.emotes.get(emotes[i]).toLink(OEmotesSize))
       } catch (e) {
+        console.log(e)
         continue
       }
     }
