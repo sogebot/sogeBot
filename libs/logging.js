@@ -68,7 +68,6 @@ global.log = new (winston.Logger)({
         if (level === 'join') level = 'JOIN:'
         if (level === 'part') level = 'PART:'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
-        if (level === '!!! ERROR !!!') console.error(options.timestamp() + ' !!! ' + JSON.stringify(options.meta))
         return options.timestamp() +
           (level ? ' ' + level + ' ' : ' ') +
           (options.message ? options.message : '') +

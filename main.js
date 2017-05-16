@@ -205,5 +205,6 @@ if (global.configuration.get().bot.debug) {
 }
 
 process.on('unhandledRejection', function (reason, p) {
-  global.log.error('Possibly Unhandled Rejection', {promise: p, reason: reason})
+  global.log.error('Possibly Unhandled Rejection')
+  global.log.error(p)
 })
