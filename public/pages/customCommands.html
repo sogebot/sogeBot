@@ -87,5 +87,22 @@
     cc.updateCommands(list)
   });
 
+
+
+  var $inputCommand = $('#inputCommand')
+  $inputCommand.off()
+  $inputCommand.on('keyup', function (ev) {
+    socket.emit('parser.isRegistered', { emit: 'alias.check', command: '!' + $(ev.target).val().trim() })
+  })
+
+  socket.on('alias.check', function (data) {
+    if (data.isRegistered) {
+      $("#inputCommand").parent().removeClass().addClass('col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group').addClass('has-error')
+    } else {
+      $("#inputCommand").parent().removeClass().addClass('col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group').addClass('has-success')
+    }
+    if ($('#inputCommand').val().length === 0) $("#inputCommand").parent().removeClass().addClass('col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group')
+  })
+
   window.cc = cc
 </script>

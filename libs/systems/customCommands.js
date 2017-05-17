@@ -94,7 +94,7 @@ CustomCommands.prototype.editCommands = function (self, socket, data) {
 }
 
 CustomCommands.prototype.help = function (self, sender) {
-  global.commons.sendMessage(global.translate('core.usage') + ': !command add <command> <response> | !command remove <command> | !command list', sender)
+  global.commons.sendMessage(global.translate('core.usage') + ': !command add <!command> <response> | !command remove <!command> | !command list', sender)
 }
 
 CustomCommands.prototype.register = function (self) {
@@ -106,6 +106,12 @@ CustomCommands.prototype.add = function (self, sender, text) {
     let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
     let command = { command: parsed[1], response: parsed[2], enabled: true, visible: true }
     if (!_.isUndefined(_.find(self.commands, function (o) { return o.command === command.command }))) throw Error(ERROR_ALREADY_EXISTS)
+
+    if (global.parser.isRegistered(command.command)) {
+      global.commons.sendMessage(global.translate('core.isRegistered').replace('(keyword)', '!' + command.command), sender)
+      return
+    }
+
     self.commands.push(command)
     global.commons.sendMessage(global.translate('customcmds.success.add'), sender)
   } catch (e) {
