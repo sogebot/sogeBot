@@ -84,4 +84,19 @@
   socket.on('alias', function(list) {
     alias.updateAliases(list)
   });
+
+  var $inputAlias = $('#inputAlias')
+  $inputAlias.off()
+  $inputAlias.on('keyup', function (ev) {
+    socket.emit('parser.isRegistered', { emit: 'alias.check', command: '!' + $(ev.target).val().trim() })
+  })
+
+  socket.on('alias.check', function (data) {
+    if (data.isRegistered) {
+      $("#inputAlias").parent().removeClass().addClass('col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group').addClass('has-error')
+    } else {
+      $("#inputAlias").parent().removeClass().addClass('col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group').addClass('has-success')
+    }
+    if ($('#inputAlias').val().length === 0) $("#inputAlias").parent().removeClass().addClass('col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group')
+  })
 </script>
