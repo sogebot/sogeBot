@@ -89,7 +89,7 @@ Alias.prototype.createAlias = function (self, socket, data) {
 }
 
 Alias.prototype.help = function (self, sender) {
-  global.commons.sendMessage(global.translate('core.usage') + ': !alias add !<command> !<alias> | !alias remove !<alias> | !alias list | !alias toggle !<alias> | !alias toggle-visibility !<alias>', sender)
+  global.commons.sendMessage(global.translate('core.usage') + ': !alias add <!command> <!alias> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', sender)
 }
 
 Alias.prototype.add = function (self, sender, text) {
@@ -101,6 +101,12 @@ Alias.prototype.add = function (self, sender, text) {
       enabled: true,
       visible: true
     }
+
+    if (global.parser.isRegistered(data.alias)) {
+      global.commons.sendMessage(global.translate('core.isRegistered').replace('(keyword)', '!' + data.alias), sender)
+      return
+    }
+
     let alias = _.find(self.alias, function (oAlias) { return oAlias.alias === data.alias })
     if (_.isUndefined(alias)) self.alias.push(data)
     global.commons.sendMessage(global.translate(_.isUndefined(alias) ? 'alias.success.add' : 'alias.failed.add'), sender)
