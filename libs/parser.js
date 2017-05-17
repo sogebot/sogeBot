@@ -120,6 +120,7 @@ Parser.prototype.parseCommands = async function (user, message, skip) {
 }
 
 Parser.prototype.isRegistered = function (cmd) {
+  if (!cmd.startsWith('!')) cmd = '!' + cmd
   return !_.isNil(this.registeredCmds[cmd]) || (global.commons.isSystemEnabled('alias') && global.systems.alias.isAlias(global.systems.alias, cmd))
 }
 

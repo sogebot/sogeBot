@@ -23,7 +23,10 @@
       "true": "", "false": ""
     },
     "settings": {
-      "uptime-format": "Uptime format set to (value)"
+      "uptime-format": "Uptime format set to (value)",
+      "atUsername": {
+        "true": "Usernames will be shown with @ like @foo",
+        "false": "Usernames will be shown without @ like foo"
     },
     "years": "year|years",
     "months": "month|months",
@@ -31,11 +34,7 @@
     "hours": "hour|hours",
     "minutes": "minute|minutes",
     "messages": "message|messages",
-    "settings": {
-      "atUsername": {
-        "true": "Usernames will be shown with @ like @foo",
-        "false": "Usernames will be shown without @ like foo"
-      }
+    "isRegistered": "(sender), you cannot use (keyword), because is already in use for another action!"
     }
   },
   "overlay": {

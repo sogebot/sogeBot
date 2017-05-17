@@ -23,7 +23,11 @@
       "true": "", "false": ""
     },
     "settings": {
-      "uptime-format": "Format pro uptime nastaven na (value)"
+      "uptime-format": "Format pro uptime nastaven na (value)",
+      "atUsername": {
+        "true": "Uzivatelske jmena budou zobrazena s @ takto @foo",
+        "false": "Uzivatelske jmena budou zobrazena bez @ takto foo"
+      }
     },
     "years": "rok|4:roky|roku",
     "months": "mesic|4:mesice|mesicu",
@@ -31,12 +35,7 @@
     "hours": "hodina|4:hodiny|hodin",
     "minutes": "minuta|4:minuty|minut",
     "messages": "zprava|4:zpravy|zprav",
-    "settings": {
-      "atUsername": {
-        "true": "Uzivatelske jmena budou zobrazena s @ takto @foo",
-        "false": "Uzivatelske jmena budou zobrazena bez @ takto foo"
-      }
-    }
+    "isRegistered": "(sender), nelze pouzit (keyword), protoze je uz prirazena k jine akci!"
   },
   "overlay": {
     "emotes": {
