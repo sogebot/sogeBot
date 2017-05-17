@@ -215,6 +215,12 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
       locked: false
     }
 
+    // check if keyword is free
+    if (global.parser.isRegistered(raffle.keyword)) {
+      global.commons.sendMessage(global.translate('core.isRegistered').replace('(keyword)', '!' + raffle.keyword), sender)
+      return
+    }
+
     global.botDB.update({_id: 'raffle'}, {$set: raffle}, {upsert: true}, function (err) {
       if (err) return log.error(err, { fnc: 'Raffles.prototype.open' })
 
