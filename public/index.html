@@ -48,6 +48,9 @@
             <ul class="dropdown-menu" id="menu-settings"></ul>
           </li>
         </ul>
+        <a class="text-danger" id="new-version-notice" style="display: none; font-weight: bold; padding-left: 30px; padding-top: 15px; padding-bottom: 15px;" href="https://github.com/sogehige/SogeBot/releases">
+          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> New version available
+        </a>
       </div>
     </div>
   </div>
@@ -223,6 +226,15 @@
     var systems
 
     var translations = {}
+
+    console.debug('EMIT [getVersion]')
+    socket.emit('getVersion')
+    socket.once('version', function(version) {
+      $.get('https://api.github.com/repos/sogehige/sogebot/releases/latest', function (response) {
+        if (response.name !== version) $('#new-version-notice').css('display', 'inline-block')
+      })
+    })
+
 
     console.debug('EMIT [getSystems]')
     socket.emit('getSystems')
