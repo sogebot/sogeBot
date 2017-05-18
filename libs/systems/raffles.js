@@ -57,10 +57,13 @@ function Raffles () {
         } else if (self.eligibility === 1 && !self.product) {
           message = global.translate('raffle.open.notice.subscribers')
             .replace('(keyword)', self.keyword)
-        } else if (self.eligibility !== 0 && !self.eligibility !== 1 && self.product) {
-          message = global.translate('raffle.open.notice.product')
+        } else if (self.eligibility === 2 && self.product) {
+          message = global.translate('raffle.open.notice.everyoneAndproduct')
             .replace('(keyword)', self.keyword)
             .replace('(product)', self.product)
+        } else {
+          message = global.translate('raffle.open.notice.everyone')
+            .replace('(keyword)', self.keyword)
         }
       }
 
@@ -164,10 +167,13 @@ Raffles.prototype.info = function (self, sender) {
         } else if (item.eligibility === 1 && !item.product) {
           message = global.translate('raffle.info.opened.subscribers')
             .replace('(keyword)', item.keyword)
-        } else if (item.eligibility !== 0 && item.eligibility !== 1 && item.product) {
-          message = global.translate('raffle.info.opened.product')
+        } else if (item.eligibility === 2 && item.product) {
+          message = global.translate('raffle.info.opened.everyoneAndProduct')
             .replace('(keyword)', item.keyword)
             .replace('(product)', item.product)
+        } else {
+          message = global.translate('raffle.info.opened.everyone')
+            .replace('(keyword)', item.keyword)
         }
 
         if (item.minWatchedTime > 0) {
@@ -239,10 +245,13 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
       } else if (raffle.eligibility === 1 && !raffle.product) {
         message = global.translate('raffle.open.ok.subscribers')
           .replace('(keyword)', raffle.keyword)
-      } else if (raffle.eligibility !== 0 && !raffle.eligibility !== 1 && raffle.product) {
-        message = global.translate('raffle.open.ok.product')
+      } else if (raffle.eligibility === 2 && raffle.product) {
+        message = global.translate('raffle.open.ok.everyoneAndProduct')
           .replace('(keyword)', raffle.keyword)
           .replace('(product)', raffle.product)
+      } else {
+        message = global.translate('raffle.open.ok.everyone')
+          .replace('(keyword)', raffle.keyword)
       }
 
       if (raffle.minWatchedTime > 0) {

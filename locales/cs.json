@@ -283,7 +283,8 @@
     },
     "info": {
       "opened": {
-        "product": "(sender), raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
+        "everyone": "(sender), raffle je spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
+        "everyoneAndProduct": "(sender), raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
         "followers": "(sender), raffle je spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
         "followersAndProduct": "(sender), raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
         "subscribers": "(sender), raffle je spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze subscriberum",
@@ -298,7 +299,8 @@
       "running": "(sender) Raffle nyni jiz bezi! Keyword pro raffle je !(keyword)",
       "locked": "(sender) Raffle je nyni uzavreno! Vyber viteze pomoci !raffle pick",
       "ok": {
-        "product": "Nova raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
+        "everyone": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
+        "everyoneAndProduct": "Nova raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
         "followers": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
         "followersAndProduct": "Nova raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
         "subscribers": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze subscriberum",
@@ -306,7 +308,8 @@
         "none": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem"
       },
       "notice": {
-        "product": "Raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
+        "everyone": "Raffle prave bezi. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
+        "everyoneAndProduct": "Raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
         "followers": "Raffle prave bezi. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
         "followersAndProduct": "Raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
         "subscribers": "Raffle prave bezi. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze subscriberum",
