@@ -73,6 +73,7 @@ function Panel () {
 
     // send enabled systems
     socket.on('getSystems', function () { socket.emit('systems', global.configuration.get().systems) })
+    socket.on('getVersion', function () { socket.emit('version', process.env.npm_package_version) })
 
     socket.on('parser.isRegistered', function (data) {
       socket.emit(data.emit, { isRegistered: global.parser.isRegistered(data.command) })
