@@ -50,7 +50,7 @@
         $("#Alias").append('<tr style="' + (!item.enabled ? "text-decoration: line-through": "") + '" class="' + (item.visible ? '' : 'text-danger') + '">' +
           '<td>' + (index + 1) + '</td>' +
           '<td>!' + item.alias + '</td>' +
-          '<td>!' + item.command + '</td>' +
+          '<td>' + commons.editable('!' + item.command, item.alias, 'alias.edit') + '</td>' +
           '<td class="tableMenu">' +
           '<button type="button" class="btn btn-' + (!item.visible ? 'success fa fa-eye' : 'danger fa fa-eye-slash') + '" data-alias="' + item.alias + '" onclick="alias.toggleVisibilityAlias(this)"></button>' +
           '<button type="button" class="btn btn-' + (!item.enabled ? 'success' : 'danger') + '" data-alias="' + item.alias + '" onclick="alias.toggleAlias(this)">' + (!item.enabled ? translations['enable'] : translations['disable']) + '</button>' +
@@ -60,6 +60,9 @@
           '</td>' +
           '</tr>');
       })
+    },
+    edit: function (id, value) {
+      socket.emit('alias.edit', {id: id, value: value})
     },
     deleteAlias: function (el) {
       socket.emit('alias.delete', el.dataset.alias)

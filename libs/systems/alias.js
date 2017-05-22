@@ -63,6 +63,7 @@ Alias.prototype.webPanel = function () {
   global.panel.socketListening(this, 'alias.create', this.createAlias)
   global.panel.socketListening(this, 'alias.toggle', this.toggleAlias)
   global.panel.socketListening(this, 'alias.toggle.visibility', this.toggleVisibilityAlias)
+  global.panel.socketListening(this, 'alias.edit', this.editAlias)
 }
 
 Alias.prototype.sendAliases = function (self, socket) {
@@ -86,6 +87,15 @@ Alias.prototype.toggleVisibilityAlias = function (self, socket, data) {
 
 Alias.prototype.createAlias = function (self, socket, data) {
   self.add(self, null, '!' + data.command + ' !' + data.value)
+  self.sendAliases(self, socket)
+}
+
+Alias.prototype.editAlias = function (self, socket, data) {
+  if (data.value.length === 0) self.remove(self, null, '!' + data.id)
+  else {
+    if (data.value.startsWith('!')) data.value = data.value.replace('!', '')
+    _.find(self.alias, function (o) { return o.alias === data.id }).command = data.value
+  }
   self.sendAliases(self, socket)
 }
 
@@ -177,6 +187,7 @@ Alias.prototype.remove = function (self, sender, text) {
     if (_.isUndefined(_.find(self.alias, function (o) { return o.alias === parsed }))) throw Error(ERROR_DOESNT_EXISTS)
     self.alias = _.filter(self.alias, function (o) { return o.alias !== parsed })
     global.commons.sendMessage(global.translate('alias.success.remove'), sender)
+    global.parser.unregister(text)
   } catch (e) {
     switch (e.message) {
       case ERROR_DOESNT_EXISTS:
