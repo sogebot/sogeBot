@@ -30,8 +30,6 @@ function Alias () {
 
     global.parser.registerHelper('!alias')
 
-    global.parser.registerParser(this, 'alias', this.parse, constants.VIEWERS)
-
     global.watcher.watch(this, 'alias', this._save)
     this._update(this)
 
@@ -49,10 +47,13 @@ Alias.prototype._update = function (self) {
 }
 
 Alias.prototype._save = function (self) {
-  var alias = {
-    alias: self.alias
-  }
+  var alias = { alias: self.alias }
   global.botDB.update({ _id: 'alias' }, { $set: alias }, { upsert: true })
+  self._register(self)
+}
+
+Alias.prototype._register = function (self) {
+  _.each(self.alias, function (o) { global.parser.register(self, '!' + o.alias, self.run, constants.VIEWERS) })
 }
 
 Alias.prototype.webPanel = function () {
@@ -115,9 +116,18 @@ Alias.prototype.add = function (self, sender, text) {
   }
 }
 
+Alias.prototype.run = function (self, sender, msg, fullMsg) {
+  let parsed = fullMsg.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
+  let alias = _.find(self.alias, function (o) { return o.alias.toLowerCase() === parsed[1].toLowerCase() && o.enabled })
+  try {
+    global.parser.parse(sender, fullMsg.replace(alias.alias, alias.command))
+  } catch (e) {
+    global.parser.unregister(fullMsg)
+  }
+}
+
 Alias.prototype.list = function (self, sender, text) {
   var aliases = []
-  console.log(aliases)
   _.each(self.alias, function (element) { if (element.visible) aliases.push('!' + element.alias) })
   var output = (aliases.length === 0 ? global.translate('alias.failed.list') : global.translate('alias.success.list') + ': ' + aliases.join(', '))
   global.commons.sendMessage(output, sender)
@@ -176,28 +186,6 @@ Alias.prototype.remove = function (self, sender, text) {
         global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
     }
   }
-}
-
-Alias.prototype.parse = function (self, id, sender, text) {
-  try {
-    var parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
-    var cmd = parsed[1]
-
-    let alias = _.find(self.alias, function (oAlias) { return oAlias.alias.toLowerCase() === cmd.toLowerCase() || '!' + oAlias.alias.toLowerCase() === parsed[0].toLowerCase() })
-    if (!_.isUndefined(alias) && alias.enabled) {
-      global.parser.parse(sender, text.replace('!' + cmd, '!' + alias.command), true)
-      global.parser.lineParsed--
-      global.updateQueue(id, false) // alias found -> remove from parsing
-      return
-    }
-    global.updateQueue(id, true)
-  } catch (e) {
-    global.updateQueue(id, true)
-  }
-}
-
-Alias.prototype.isAlias = function (self, cmd) {
-  return !_.isUndefined(_.find(self.alias, function (oAlias) { return '!' + oAlias.alias.toLowerCase() === cmd.toLowerCase() }))
 }
 
 module.exports = new Alias()
