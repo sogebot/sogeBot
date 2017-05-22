@@ -519,13 +519,18 @@
       "add": "Novy rank byl pridan do bota",
       "remove" : "Rank byl smazan",
       "list": "Seznam ranku",
+      "set": "(username) ma nastaveny rank na (rank)",
+      "unset": "Vlastni rank byl vymazan pro (username)",
       "show": "(sender) ma prave (rank) rank"
     },
     "failed": {
       "parse": "{core.command-parse} !rank help",
       "add": "Rank pro tuto hodinu jiz existuje",
       "list": "Seznam ranku je prazdny",
-      "notFound": "Nebyl nalezen zadny rank k teto hodine"
+      "set": "{core.command-parse} !rank set <username> <rank>",
+      "unset": "{core.command-parse} !rank unset <username>",
+      "notFound": "Nebyl nalezen zadny rank k teto hodine",
+      "show": "(sender) nema zatim zadny rank."
     }
   },
   "followage": {
