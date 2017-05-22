@@ -6,9 +6,20 @@ var _ = require('lodash')
 var constants = require('../constants')
 var log = global.log
 
+/*
+ * !rank                       - show user rank
+ * !rank add <hours> <rank>    - add <rank> for selected <hours>
+ * !rank remove <hours>        - remove rank for selected <hours>
+ * !rank list                  - show rank list
+ * !rank set <username> <rank> - set custom <rank> for <username>
+ * !rank unset <username>      - unset custom rank for <username>
+ */
+
 function Ranks () {
   if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!rank add', this.add, constants.OWNER_ONLY)
+    global.parser.register(this, '!rank set', this.set, constants.OWNER_ONLY)
+    global.parser.register(this, '!rank unset', this.unset, constants.OWNER_ONLY)
     global.parser.register(this, '!rank list', this.list, constants.OWNER_ONLY)
     global.parser.register(this, '!rank remove', this.remove, constants.OWNER_ONLY)
     global.parser.register(this, '!rank help', this.help, constants.OWNER_ONLY)
@@ -49,7 +60,7 @@ Ranks.prototype.createSocket = function (self, socket, data) {
 }
 
 Ranks.prototype.help = function (self, sender) {
-  global.commons.sendMessage(global.translate('core.usage') + ': !rank add <hours> <rank> | !rank remove <hour> | !rank list', sender)
+  global.commons.sendMessage(global.translate('core.usage') + ': !rank add <hours> <rank> | !rank remove <hour> | !rank list | !rank set <username> <rank> | !rank unset <username>', sender)
 }
 
 Ranks.prototype.add = function (self, sender, text) {
@@ -86,8 +97,34 @@ Ranks.prototype.remove = function (self, sender, text) {
   }
 }
 
+Ranks.prototype.set = function (self, sender, text) {
+  try {
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+    global.users.set(parsed[1], { custom: { rank: parsed[2].trim() } })
+    global.commons.sendMessage(global.translate('rank.success.set')
+      .replace('(rank)', parsed[2])
+      .replace('(username)', parsed[1]), sender)
+  } catch (err) {
+    global.commons.sendMessage(global.translate('rank.failed.set'), sender)
+  }
+}
+
+Ranks.prototype.unset = function (self, sender, text) {
+  try {
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+    global.users.set(parsed[1], { custom: { rank: null } })
+    global.commons.sendMessage(global.translate('rank.success.unset')
+      .replace('(username)', parsed[1]), sender)
+  } catch (err) {
+    global.commons.sendMessage(global.translate('rank.failed.unset'), sender)
+  }
+}
+
 Ranks.prototype.show = function (self, sender) {
-  global.commons.sendMessage(global.translate('rank.success.show').replace('(rank)', global.users.get(sender.username).rank), sender)
+  let user = global.users.get(sender.username)
+  let rank = !_.isNil(user.rank) ? user.rank : null
+  rank = !_.isNil(user.custom.rank) ? user.custom.rank : rank
+  global.commons.sendMessage(global.translate(!_.isNil(rank) ? 'rank.success.show' : 'rank.failed.show').replace('(rank)', rank), sender)
 }
 
 Ranks.prototype.updateRanks = function () {

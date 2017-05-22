@@ -400,6 +400,7 @@ Twitch.prototype.showMe = function (self, sender, text) {
     var message = ['(sender)']
     // rank
     var rank = !_.isUndefined(user.rank) ? user.rank : null
+    rank = !_.isNil(user.custom.rank) ? user.custom.rank : null
     if (global.configuration.get().systems.ranks === true && !_.isNull(rank)) message.push(rank)
 
     // watchTime
