@@ -95,13 +95,14 @@
         }
 
         $('#images').append('<div style="' + style + '"><img src="' + image.url + '?x=' + Math.random() + '"></img></div>')
-
-        image.delay = _.isNil(image.delay) ? 0 : parseInt(image.delay, 10) // delay of animation
-        image.time = _.isNil(image.time) ? 1000 : parseInt(image.time, 10) // how long to show
-        image.duration = _.isNil(image.duration) ? 1000 : parseInt(image.duration) // how long to animate
-        $('#images div img')
-          .velocity("fadeIn", { delay: image.delay, duration: image.duration })
-          .velocity("fadeOut", { delay: (image.delay + image.time), duration: image.duration });
+        $('#images div img').on('load', function () {
+          image.delay = _.isNil(image.delay) ? 0 : parseInt(image.delay, 10) // delay of animation
+          image.time = _.isNil(image.time) ? 1000 : parseInt(image.time, 10) // how long to show
+          image.duration = _.isNil(image.duration) ? 1000 : parseInt(image.duration) // how long to animate
+          $('#images div img')
+            .velocity("fadeIn", { delay: image.delay, duration: image.duration })
+            .velocity("fadeOut", { delay: (image.delay + image.time), duration: image.duration });
+        })
       }
     </script>
   </body>
