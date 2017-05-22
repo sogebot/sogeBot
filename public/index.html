@@ -23,6 +23,21 @@
 </head>
 
 <body>
+  <!-- changelog modal dialog -->
+  <div class="modal" id ="new_version_dlg" tabindex="-1" role="dialog" aria-labelledby="new_version_dlg">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header"><h4 class="modal-title">Changelog <small id="sogebot-version"></small></h4></div>
+        <div class="modal-body"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal"><i data-lang="close"></i></button>
+          <a class="btn btn-primary" href="https://github.com/sogehige/sogeBot/releases">Go to release download</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <div class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
@@ -48,7 +63,7 @@
             <ul class="dropdown-menu" id="menu-settings"></ul>
           </li>
         </ul>
-        <a class="text-danger" id="new-version-notice" style="display: none; font-weight: bold; padding-left: 30px; padding-top: 15px; padding-bottom: 15px;" href="https://github.com/sogehige/SogeBot/releases">
+        <a class="text-danger" id="new-version-notice" style="display: none; font-weight: bold; padding-left: 30px; padding-top: 15px; padding-bottom: 15px; cursor: pointer;"  data-toggle="modal" data-target="#new_version_dlg">
           <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> New version available
         </a>
       </div>
@@ -56,7 +71,7 @@
   </div>
 
   <!-- CHANGE TITLE/GAME DLG -->
-  <div class="modal fade" id="game_and_title_dlg" tabindex="-1" role="dialog" aria-labelledby="game_and_title_dlg">
+  <div class="modal" id="game_and_title_dlg" tabindex="-1" role="dialog" aria-labelledby="game_and_title_dlg">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -216,6 +231,7 @@
   <script type="text/javascript" src="./dist/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
   <script type="text/javascript" src="./dist/bootstrap-menu/js/BootstrapMenu.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.1/markdown-it.js"></script>
 
   <script>
     var socket = io();
@@ -231,6 +247,26 @@
     socket.emit('getVersion')
     socket.once('version', function(version) {
       $.get('https://api.github.com/repos/sogehige/sogebot/releases/latest', function (response) {
+        var md = new markdownit()
+        var commits = new RegExp('[0-9a-f]{5,40}', 'gm')
+        let commits_match = response.body.match(commits)
+        if (!_.isNil(commits_match)) {
+          for (let commit of commits_match) {
+            commit_short = commit.substring(0, 6)
+            response.body = response.body.replace(commit, '[' + commit_short + '](https://github.com/sogehige/sogeBot/commit/' + commit_short + ')')
+          }
+        }
+
+        var issues = new RegExp('#[0-9]{1,4}', 'gm')
+        let issues_match = response.body.match(issues)
+        if (!_.isNil(issues_match)) {
+          for (let issue of issues_match) {
+            response.body = response.body.replace(issue, '[' + issue + '](https://github.com/sogehige/sogeBot/issues/' + issue.replace('#', '') + ')')
+          }
+        }
+
+        $('#new_version_dlg .modal-body').html(md.render(response.body.replace('**Changelog**', '').trim()))
+        $('#new_version_dlg .modal-header small').text(response.name)
         if (response.name !== version) $('#new-version-notice').css('display', 'inline-block')
       })
     })
