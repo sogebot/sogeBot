@@ -1,9 +1,9 @@
 # SogeBot
-[![Build Status](https://img.shields.io/travis/sogehige/SogeBot.svg?style=flat-square)](https://travis-ci.org/sogehige/SogeBot)
+[![Build Status](https://img.shields.io/travis/sogehige/sogeBot.svg?style=flat-square)](https://travis-ci.org/sogehige/SogeBot)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](http://standardjs.com/)
 [![nodejs](https://img.shields.io/badge/node.js-7.6.0-brightgreen.svg?style=flat-square)](https://nodejs.org/en/)
-[![GitHub release](https://img.shields.io/github/release/sogehige/sogebot.svg?style=flat-square)](https://github.com/sogehige/SogeBot/releases)
-[![Downloads](https://img.shields.io/github/downloads/sogehige/sogebot/total.svg?style=flat-square)](https://github.com/sogehige/SogeBot/releases)
+[![GitHub release](https://img.shields.io/github/release/sogehige/sogebot.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
+[![Downloads](https://img.shields.io/github/downloads/sogehige/sogebot/total.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9ZTX5DS2XB5EN)
 
 Free Twitch Bot built on Node.js
