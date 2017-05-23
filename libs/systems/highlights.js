@@ -107,7 +107,7 @@ Highlights.prototype.list = function (self, sender) {
   const latestStreamId = sortedHighlights.length > 0 ? sortedHighlights[0].id : null
 
   if (_.isNull(latestStreamId)) {
-    global.commons.sendMessage(global.translate('highlights.empty'))
+    global.commons.sendMessage(global.translate('highlights.list.empty'), sender)
     return
   }
   let highlights = _.filter(self.highlights, function (o) { return o.id === latestStreamId })
@@ -118,7 +118,6 @@ Highlights.prototype.list = function (self, sender) {
       highlight.timestamp.minutes + 'm' +
       highlight.timestamp.seconds + 's')
   }
-
   global.commons.sendMessage(global.translate(list.length > 0 ? 'highlights.list.items' : 'highlights.list.empty')
     .replace('(items)', list.join(', ')), sender)
 }
