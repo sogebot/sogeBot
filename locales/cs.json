@@ -782,5 +782,16 @@
     "success": "(sender), (username) ma nyni data (merged-username)",
     "noID": "(sender), pro toto uzivatelske jmeno neexistuje ID, proto nelze zmenit",
     "noUsernameToMerge": "(sender), nebylo nalezeno jine uzivatelske jmeno"
+  },
+  "highlights": {
+    "saved": {
+      "description": "(sender), highlight byl ulozen pro (hours)h(minutes)m(seconds)s jako `(description)`",
+      "no-description": "(sender), highlight byl ulozen pro (hours)h(minutes)m(seconds)s"
+    },
+    "list": {
+      "items": "(sender), seznam ulozenych highlightu pro posledni stream: (items)",
+      "empty": "(sender), zande highlighty nebyly ulozeny"
+    },
+    "offline": "(sender), nelze ulozit highlight, stream je offline"
   }
 }

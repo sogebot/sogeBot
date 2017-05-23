@@ -780,5 +780,16 @@
     "success": "(sender), (username) have now data of (merged-username)",
     "noID": "(sender), specified username doesn't have ID and cannot be merged",
     "noUsernameToMerge": "(sender), no other username was found to merge"
+  },
+  "highlights": {
+    "saved": {
+      "description": "(sender), highlight was saved for (hours)h(minutes)m(seconds)s as `(description)`",
+      "no-description": "(sender), highlight was saved for (hours)h(minutes)m(seconds)s"
+    },
+    "list": {
+      "items": "(sender), list of saved highlights for latest stream: (items)",
+      "empty": "(sender), no highlights were saved"
+    },
+    "offline": "(sender), cannot save highlight, stream is offline"
   }
 }
