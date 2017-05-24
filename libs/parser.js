@@ -312,6 +312,18 @@ Parser.prototype.parseMessage = async function (message, attr) {
         case '!command':
           list = _.map(_.filter(global.systems['customcommands'].commands, function (o) { return o.visible && o.enabled }), function (n) { return '!' + n.command }).join(', ')
           return list.length > 0 ? list : ' '
+        case 'cooldown':
+          list = _.map(global.systems['cooldown'].list, function (o, k) {
+            const time = o.miliseconds
+            return k + ': ' + (parseInt(time, 10) / 1000) + 's'
+          }).join(', ')
+          return list.length > 0 ? list : ' '
+        case '!cooldown':
+          list = _.map(global.systems['cooldown'].list, function (o, k) {
+            const time = o.miliseconds
+            return '!' + k + ': ' + (parseInt(time, 10) / 1000) + 's'
+          }).join(', ')
+          return list.length > 0 ? list : ' '
         default:
           return ''
       }
