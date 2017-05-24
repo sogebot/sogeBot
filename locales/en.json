@@ -541,13 +541,13 @@
   },
   "followage": {
     "success": {
-      "never": "@(username) is not a channel follower",
-      "time": "@(username) is following channel (diff)"
+      "never": "(sender), @(username) is not a channel follower",
+      "time": "(sender), @(username) is following channel (diff)"
     }
   },
   "age": {
-    "failed": "I don't have data for @(username) account age",
-    "success": "Account age for @(username) is (diff)"
+    "failed": "(sender), I don't have data for @(username) account age",
+    "success": "(sender), Account age for @(username) is (diff)"
   },
   "lastseen": {
     "success": {
