@@ -545,6 +545,10 @@
       "time": "@(username) sleduje tento kanal jiz (diff)"
     }
   },
+  "age": {
+    "failed": "Nemam zatim data o stari uctu @(username)",
+    "success": "Stari uctu @(username) je (diff)"
+  },
   "lastseen": {
     "success": {
       "online": "(username) je prave na kanale online!",

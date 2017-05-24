@@ -545,6 +545,10 @@
       "time": "@(username) is following channel (diff)"
     }
   },
+  "age": {
+    "failed": "I don't have data for @(username) account age",
+    "success": "Account age for @(username) is (diff)"
+  },
   "lastseen": {
     "success": {
       "never": "(username) was never in this channel!",
