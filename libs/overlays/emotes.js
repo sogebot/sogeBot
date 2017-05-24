@@ -73,11 +73,16 @@ Emotes.prototype.containsEmotes = async function (self, id, sender, text) {
   })
 
   // parse BTTV emoticons
-  for (let emote of await self.fetcher._getRawBTTVEmotes(global.configuration.get().twitch.channel)) {
-    for (let i in _.range((text.match(new RegExp(emote.code, 'g')) || []).length)) {
-      if (i === OEmotesMax) break
-      global.panel.io.emit('emote', self.fetcher.emotes.get(emote.code).toLink(OEmotesSize))
+  try {
+    for (let emote of await self.fetcher._getRawBTTVEmotes(global.configuration.get().twitch.channel)) {
+      for (let i in _.range((text.match(new RegExp(emote.code, 'g')) || []).length)) {
+        if (i === OEmotesMax) break
+        global.panel.io.emit('emote', self.fetcher.emotes.get(emote.code).toLink(OEmotesSize))
+      }
     }
+  } catch (e) {
+    // we don't want to output error when BTTV emotes doesn't exist
+    return
   }
 }
 
