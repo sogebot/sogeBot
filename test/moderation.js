@@ -1,7 +1,7 @@
 /* global describe it after before */
 
 var expect = require('chai').expect
-var testUser = {username: 'sogehige'}
+var testUser = ownerUser
 var testUser2 = {username: 'soge'}
 
 require('./general')

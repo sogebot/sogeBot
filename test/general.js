@@ -44,4 +44,4 @@ global.timeouts = []
 global.log.exitOnError = false
 
 /* users */
-global.ownerUser = {username: 'sogehige'}
+global.ownerUser = {username: 'soge__'}
