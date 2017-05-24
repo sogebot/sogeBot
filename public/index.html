@@ -483,7 +483,10 @@
       var getPercentage = function (cur, orig) {
         var btn = $('#percentage-btn')
         if (orig === cur) return 0
-        if (orig === 0) return cur * 100
+        if (orig === 0) {
+          if (!btn.data('showPercentage')) return cur
+          else return cur * 100
+        }
         if (btn.data('showPercentage')) return Math.round((cur - orig) / orig * 1000) / 10
         return cur - orig
       }
