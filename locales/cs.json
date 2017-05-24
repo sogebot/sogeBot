@@ -541,13 +541,13 @@
   },
   "followage": {
     "success": {
-      "never": "@(username) neni followerem kanalu",
-      "time": "@(username) sleduje tento kanal jiz (diff)"
+      "never": "(sender), @(username) neni followerem kanalu",
+      "time": "(sender), @(username) sleduje tento kanal jiz (diff)"
     }
   },
   "age": {
-    "failed": "Nemam zatim data o stari uctu @(username)",
-    "success": "Stari uctu @(username) je (diff)"
+    "failed": "(sender), Nemam zatim data o stari uctu @(username)",
+    "success": "(sender), Stari uctu @(username) je (diff)"
   },
   "lastseen": {
     "success": {
