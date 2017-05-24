@@ -48,6 +48,8 @@
     }
   },
   "webpanel": {
+    "video_id": "ID Videa",
+    "highlights": "Highlighty",
     "cooldown-quiet-header": "Zobrazí cooldown zprávu",
     "cooldown-quiet-toggle-no": "Upozornit",
     "cooldown-quiet-toggle-yes": "Neupozornit",
@@ -273,7 +275,8 @@
     "dark": "tmavý theme",
     "gambling": "Gambling",
     "seppukuTimeout": "Timeout pro !sepukku",
-    "rouletteTimeout": "Timeout pro !roulette"
+    "rouletteTimeout": "Timeout pro !roulette",
+    "click-to-highlight": "highlight"
   },
   "raffle": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych (value) minut",
@@ -789,5 +792,16 @@
     "success": "(sender), (username) ma nyni data (merged-username)",
     "noID": "(sender), pro toto uzivatelske jmeno neexistuje ID, proto nelze zmenit",
     "noUsernameToMerge": "(sender), nebylo nalezeno jine uzivatelske jmeno"
+  },
+  "highlights": {
+    "saved": {
+      "description": "(sender), highlight byl ulozen pro (hours)h(minutes)m(seconds)s jako `(description)`",
+      "no-description": "(sender), highlight byl ulozen pro (hours)h(minutes)m(seconds)s"
+    },
+    "list": {
+      "items": "(sender), seznam ulozenych highlightu pro posledni stream: (items)",
+      "empty": "(sender), zande highlighty nebyly ulozeny"
+    },
+    "offline": "(sender), nelze ulozit highlight, stream je offline"
   }
 }

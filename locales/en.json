@@ -48,6 +48,8 @@
     }
   },
   "webpanel": {
+    "video_id": "Video ID",
+    "highlights": "Highlights",
     "cooldown-quiet-header": "Show cooldown message",
     "cooldown-quiet-toggle-no": "Notify",
     "cooldown-quiet-toggle-yes": "Won't notify",
@@ -273,7 +275,8 @@
     "dark": "dark theme",
     "gambling": "Gambling",
     "seppukuTimeout": "Timeout for !sepukku",
-    "rouletteTimeout": "Timeout for !roulette"
+    "rouletteTimeout": "Timeout for !roulette",
+    "click-to-highlight": "highlight"
   },
   "raffle": {
     "announceInterval": "Opened raffles will be announced every (value) minute",
@@ -789,5 +792,16 @@
     "success": "(sender), (username) have now data of (merged-username)",
     "noID": "(sender), specified username doesn't have ID and cannot be merged",
     "noUsernameToMerge": "(sender), no other username was found to merge"
+  },
+  "highlights": {
+    "saved": {
+      "description": "(sender), highlight was saved for (hours)h(minutes)m(seconds)s as `(description)`",
+      "no-description": "(sender), highlight was saved for (hours)h(minutes)m(seconds)s"
+    },
+    "list": {
+      "items": "(sender), list of saved highlights for latest stream: (items)",
+      "empty": "(sender), no highlights were saved"
+    },
+    "offline": "(sender), cannot save highlight, stream is offline"
   }
 }

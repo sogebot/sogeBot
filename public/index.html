@@ -130,8 +130,8 @@
       <h2><i data-lang="game"></i> <small data-lang="click-to-change"></small></h2>
       <span class="data" id="game" data-lang="not-available"></span>
     </div>
-    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2 data-lang="uptime"></h2>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2" onclick="saveHighlight()">
+      <h2><i data-lang="uptime"></i> <small data-lang="click-to-highlight"></small></h2>
       <span class="data" id="uptime">--:--:--</span>
       <span class="stats">&nbsp;</span>
     </div>
@@ -271,7 +271,6 @@
       })
     })
 
-
     console.debug('EMIT [getSystems]')
     socket.emit('getSystems')
     socket.on('systems', function(data) {
@@ -299,6 +298,11 @@
       switchPercentageShow(false)
     })
 
+    var saveHighlight = function () {
+      console.debug('EMIT [highlight.save]')
+      socket.emit('highlight.save')
+
+    }
     var switchTheme = function () {
       var btn = $('#theme-btn')
       if (btn.text() === translations['dark']) {
