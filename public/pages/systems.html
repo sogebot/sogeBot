@@ -189,9 +189,9 @@
   socket.on('pointsConfiguration', function(data) {
     $("#configPointsName").text(data.pointsName)
     $("#configPointsResponse").text(data.pointsResponse)
-    $("#configPointsInterval").text(data.pointsInterval)
+    $("#configPointsInterval").text(data.pointsInterval + 'min')
     $("#configPointsPerInterval").text(data.pointsPerInterval)
-    $("#configPointsIntervalOffline").text(data.pointsIntervalOffline)
+    $("#configPointsIntervalOffline").text(data.pointsIntervalOffline + 'min')
     $("#configPointsPerIntervalOffline").text(data.pointsPerIntervalOffline)
   })
 
