@@ -76,11 +76,11 @@
       })
     },
     getDateString: function (timestamp) {
-      if (_.isUndefined(timestamp) || timestamp === 0) return '--------------------------'
+      if (_.isUndefined(timestamp) || timestamp === 0) return '<hr>'
       return moment(timestamp).format('HH:mm:ss, YYYY-MM-DD')
     },
     styleFollowTime: function (timestamp) {
-      if (_.isUndefined(timestamp) || timestamp === 0) return '--------------------------'
+      if (_.isUndefined(timestamp) || timestamp === 0) return '<hr>'
       return moment(timestamp).format('HH:mm:ss, YYYY-MM-DD')
     },
     styleWatched: function (timestamp) {
