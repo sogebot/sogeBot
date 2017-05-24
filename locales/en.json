@@ -547,7 +547,7 @@
   },
   "age": {
     "failed": "(sender), I don't have data for @(username) account age",
-    "success": "(sender), Account age for @(username) is (diff)"
+    "success": "(sender), account age for @(username) is (diff)"
   },
   "lastseen": {
     "success": {

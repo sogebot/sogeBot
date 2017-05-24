@@ -546,8 +546,8 @@
     }
   },
   "age": {
-    "failed": "(sender), Nemam zatim data o stari uctu @(username)",
-    "success": "(sender), Stari uctu @(username) je (diff)"
+    "failed": "(sender), nemam zatim data o stari uctu @(username)",
+    "success": "(sender), stari uctu @(username) je (diff)"
   },
   "lastseen": {
     "success": {
