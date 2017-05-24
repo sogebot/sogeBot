@@ -80,7 +80,7 @@
       return moment(timestamp).format('HH:mm:ss, YYYY-MM-DD')
     },
     styleFollowTime: function (timestamp) {
-      if (_.isUndefined(timestamp)) return '--------------------------'
+      if (_.isUndefined(timestamp) || timestamp === 0) return '--------------------------'
       return moment(timestamp).format('HH:mm:ss, YYYY-MM-DD')
     },
     styleWatched: function (timestamp) {
