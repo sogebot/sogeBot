@@ -7,10 +7,11 @@
       <thead>
         <tr>
           <th class="sortable" onclick="viewers.sort(this)" data-sort="username"><span data-lang="username"></span> <i class="fa fa-sort-asc" aria-hidden="true"></i></th>
-          <th class="sortable" onclick="viewers.sort(this)" data-sort="time.message"><span data-lang="last-seen"></span> <i class="fa" aria-hidden="true"></i></th>
-          <th class="sortable" onclick="viewers.sort(this)" data-sort="time.watched"><span data-lang="watched-time"></span> <i class="fa" aria-hidden="true"></i></th>
-          <th id="viewers-points" class="sortable" onclick="viewers.sort(this)" data-sort="points"><span data-lang="points"></span> <i class="fa" aria-hidden="true"></i></th>
-          <th class="sortable" onclick="viewers.sort(this)" data-sort="stats.messages"><span data-lang="messages"></span> <i class="fa" aria-hidden="true"></i></th>
+          <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="time.message"><span data-lang="last-seen"></span> <i class="fa" aria-hidden="true"></i></th>
+          <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="time.watched"><span data-lang="watched-time"></span> <i class="fa" aria-hidden="true"></i></th>
+          <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="time.follow"><span data-lang="followed-since"></span> <i class="fa" aria-hidden="true"></i></th>
+          <th id="viewers-points" class="sortable text-center" onclick="viewers.sort(this)" data-sort="points"><span data-lang="points"></span> <i class="fa" aria-hidden="true"></i></th>
+          <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="stats.messages"><span data-lang="messages"></span> <i class="fa" aria-hidden="true"></i></th>
           <th></th>
           <th></th>
         </tr>
@@ -50,12 +51,13 @@
         item.points = _.isUndefined(item.points) ? 0 : item.points
         $("#Users").append('<tr>' +
           '<td>' + item.username + '</td>' +
-          '<td data-value=' + (_.isUndefined(item.time.message) ? 0 : item.time.message) + '>' + viewers.getDateString(item.time.message) + '</td>' +
-          '<td data-value=' + (_.isUndefined(item.time.watched) ? 0 : item.time.watched) + '>' + viewers.styleWatched(item.time.watched) + '</td>' +
-          '<td id="viewers-points-data" data-value=' + item.points + '>' +
+          '<td class="text-center" data-value=' + (_.isUndefined(item.time.message) ? 0 : item.time.message) + '>' + viewers.getDateString(item.time.message) + '</td>' +
+          '<td class="text-center" data-value=' + (_.isUndefined(item.time.watched) ? 0 : item.time.watched) + '>' + viewers.styleWatched(item.time.watched) + '</td>' +
+          '<td class="text-center"  data-value=' + (_.isUndefined(item.time.follow) ? 0 : item.time.follow) + '>' + viewers.styleFollowTime(item.time.follow) + '</td>' +
+          '<td class="text-center" id="viewers-points-data" data-value=' + item.points + '>' +
             '<abbr title="click to edit" data-id="' + item.username + '" onclick="viewers.pointsEditable(this)">' +  item.points + '</abbr>' +
             '<input id="points_' + item.username + '" style="width: 6em; display: none" class="form-control input-sm" type="text"/></td>' +
-          '<td data-value=' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.messages) ? 0 : item.stats.messages) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.messages) ? 0 : item.stats.messages) + '</td>' +
+          '<td class="text-center" data-value=' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.messages) ? 0 : item.stats.messages) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.messages) ? 0 : item.stats.messages) + '</td>' +
           '<td style="font-weight: bold; cursor: pointer; user-select: none;">' +
           '<span id="subscriber-' + item.username + '" class="' + (item.is.subscriber ? "text-success" : "text-danger") + '" onclick="viewers.toggle(\'subscriber\', \'' + item.username + '\')"> SUBSCRIBER </span>' +
           '<span id="follower-' + item.username + '" class="' + (item.is.follower ? "text-success" : "text-danger") + '" onclick="viewers.toggle(\'follower\', \'' + item.username + '\')"> FOLLOWER </span>' +
@@ -74,12 +76,12 @@
       })
     },
     getDateString: function (timestamp) {
-      if (_.isUndefined(timestamp) || timestamp === 0) return translations['never-seen-in-chat']
-      else {
-        d = new Date(timestamp)
-        return ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
-        d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
-      }
+      if (_.isUndefined(timestamp) || timestamp === 0) return '--------------------------'
+      return moment(timestamp).format('HH:mm:ss, YYYY-MM-DD')
+    },
+    styleFollowTime: function (timestamp) {
+      if (_.isUndefined(timestamp)) return '--------------------------'
+      return moment(timestamp).format('HH:mm:ss, YYYY-MM-DD')
     },
     styleWatched: function (timestamp) {
       if (_.isUndefined(timestamp)) timestamp = 0
