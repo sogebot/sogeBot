@@ -163,11 +163,38 @@
       </tr>
     </table>
   </div>
+
+  <div class="widget" id="gambling">
+    <div class="title" data-lang="gambling"></div>
+    <table class="table table-striped">
+      <tr>
+        <td><strong data-lang="seppukuTimeout"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="seppukuTimeout" onclick="commons.configEditable(this, 's')" id="configSeppukuTimeout"></abbr>
+          <div class="input-group" style="display:none;" id="input_seppukuTimeout_group">
+            <div class="input-group-addon" data-lang="seconds"></div>
+            <input id="input_seppukuTimeout" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="rouletteTimeout"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="rouletteTimeout" onclick="commons.configEditable(this, 's')" id="configRouletteTimeout"></abbr>
+          <div class="input-group" style="display:none;" id="input_rouletteTimeout_group">
+            <div class="input-group-addon" data-lang="seconds"></div>
+            <input id="input_rouletteTimeout" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+        </tr>
+    </table>
+  </div>
 </div>
 <script>
   if (!systems.points) $("#points").css('display', 'none')
   if (!systems.notice) $("#notice").css('display', 'none')
   if (!systems.songs) $("#songs").css('display', 'none')
+  if (!systems.gambling) $("#gambling").css('display', 'none')
 
   socket.emit('getPointsConfiguration')
   socket.emit('getNoticeConfiguration')
@@ -176,6 +203,9 @@
 
   socket.once('configuration', function (data) {
     $("#configUptimeFormat").text(data.uptimeFormat)
+
+    $("#configSeppukuTimeout").text(data.seppukuTimeout + 's')
+    $("#configRouletteTimeout").text(data.rouletteTimeout + 's')
 
     $('#atUsernameToggle').off('change')
     $('#atUsernameToggle').bootstrapToggle(data.atUsername ? 'on' : 'off')

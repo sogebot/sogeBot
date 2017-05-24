@@ -31,6 +31,9 @@ function Gambling () {
     global.parser.register(this, '!roulette', this.roulette, constants.VIEWERS)
     global.parser.register(this, '!duel', this.duel, constants.VIEWERS)
 
+    global.configuration.register('seppukuTimeout', 'gambling.seppuku.timeout', 'number', 10)
+    global.configuration.register('rouletteTimeout', 'gambling.roulette.timeout', 'number', 10)
+
     const self = this
     setInterval(function () {
       if (_.isNil(self.current.duel._timestamp)) return true
@@ -132,13 +135,13 @@ Gambling.prototype.roulette = function (self, sender) {
     global.translate('gambling.roulette.trigger'),
     isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead')
   ]
-  if (!isAlive) global.client.timeout(global.configuration.get().twitch.channel, sender.username, 10)
+  if (!isAlive) global.client.timeout(global.configuration.get().twitch.channel, sender.username, global.configuration.getValue('rouletteTimeout'))
   global.commons.sendMessage(message.join(' '), sender)
 }
 
 Gambling.prototype.seppuku = function (self, sender) {
-  global.commons.sendMessage(global.translate('gambling.seppuku'), sender)
-  global.client.timeout(global.configuration.get().twitch.channel, sender.username, 10)
+  global.commons.sendMessage(global.translate('gambling.seppuku.text'), sender)
+  global.client.timeout(global.configuration.get().twitch.channel, sender.username, global.configuration.getValue('seppukuTimeout'))
 }
 
 Gambling.prototype.gamble = function (self, sender, text) {

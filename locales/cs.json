@@ -270,7 +270,10 @@
     "true": "ano",
     "false": "ne",
     "light": "světlý theme",
-    "dark": "tmavý theme"
+    "dark": "tmavý theme",
+    "gambling": "Gambling",
+    "seppukuTimeout": "Timeout pro !sepukku",
+    "rouletteTimeout": "Timeout pro !roulette"
   },
   "raffle": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych (value) minut",
@@ -754,9 +757,13 @@
     "roulette": {
       "trigger": "(sender) stiskl spoust",
       "alive": "a nic se nestalo",
-      "dead": "a kulka rozmaznula jeho mozek po zdi"
+      "dead": "a kulka rozmaznula jeho mozek po zdi",
+      "timeout": "Roulette timeout nastaven na (value)s"
     },
-    "seppuku": "(sender) spachal seppuku.",
+    "seppuku": {
+      "text": "(sender) spachal seppuku.",
+      "timeout": "Seppuku timeout nastaven na (value)s"
+    },
     "gamble": {
       "zeroBet": "(sender), nemuzes hrat o 0 (pointsName)",
       "notEnoughOptions": "(sender), musis hrat o nejake body",
