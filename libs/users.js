@@ -117,7 +117,24 @@ Users.prototype.get = function (username) {
   if (_.isUndefined(user.is)) user.is = {}
   if (_.isUndefined(user.stats)) user.stats = {}
   if (_.isUndefined(user.custom)) user.custom = {}
+
+  if (_.isNil(user.time.created_at) && !_.isNil(user.id)) self.fetchAccountAge(self, username, user.id)
   return user
+}
+
+Users.prototype.fetchAccountAge = function (self, username, id) {
+  global.client.api({
+    url: 'https://api.twitch.tv/kraken/users/' + id,
+    headers: {
+      Accept: 'application/vnd.twitchtv.v5+json',
+      'Client-ID': global.configuration.get().twitch.clientId
+    }
+  }, function (err, res, body) {
+    if (err) { return }
+    if (res.statusCode === 200) {
+      self.set(username, { time: { created_at: moment(body.created_at).format('X') * 1000 } })
+    }
+  })
 }
 
 Users.prototype.getAll = function (object) {

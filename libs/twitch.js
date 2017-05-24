@@ -207,6 +207,7 @@ function Twitch () {
   global.parser.register(this, '!lastseen', this.lastseen, constants.VIEWERS)
   global.parser.register(this, '!watched', this.watched, constants.VIEWERS)
   global.parser.register(this, '!followage', this.followage, constants.VIEWERS)
+  global.parser.register(this, '!age', this.age, constants.VIEWERS)
   global.parser.register(this, '!me', this.showMe, constants.VIEWERS)
   global.parser.register(this, '!top', this.showTop, constants.OWNER_ONLY)
   global.parser.register(this, '!title', this.setTitle, constants.OWNER_ONLY)
@@ -357,6 +358,28 @@ Twitch.prototype.followage = function (self, sender, text) {
     if (diff.days) output.push(diff.days + ' ' + global.parser.getLocalizedName(diff.days, 'core.days'))
     if (diff.hours) output.push(diff.hours + ' ' + global.parser.getLocalizedName(diff.hours, 'core.hours'))
     global.commons.sendMessage(global.translate('followage.success.time')
+      .replace('(username)', username)
+      .replace('(diff)', output.join(', ')), sender)
+  }
+}
+
+Twitch.prototype.age = function (self, sender, text) {
+  let username
+  let parsed = text.match(/^(\S?)+$/g)
+  if (parsed[0].length > 0) username = parsed[0]
+  else username = sender.username
+
+  const user = global.users.get(username)
+  if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.created_at)) {
+    global.commons.sendMessage(global.translate('age.failed').replace('(username)', username), sender)
+  } else {
+    let diff = moment.preciseDiff(user.time.created_at, moment(), true)
+    let output = []
+    if (diff.years) output.push(diff.years + ' ' + global.parser.getLocalizedName(diff.years, 'core.years'))
+    if (diff.months) output.push(diff.months + ' ' + global.parser.getLocalizedName(diff.months, 'core.months'))
+    if (diff.days) output.push(diff.days + ' ' + global.parser.getLocalizedName(diff.days, 'core.days'))
+    if (diff.hours) output.push(diff.hours + ' ' + global.parser.getLocalizedName(diff.hours, 'core.hours'))
+    global.commons.sendMessage(global.translate('age.success')
       .replace('(username)', username)
       .replace('(diff)', output.join(', ')), sender)
   }
