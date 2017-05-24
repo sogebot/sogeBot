@@ -270,7 +270,10 @@
     "true": "true",
     "false": "false",
     "light": "light theme",
-    "dark": "dark theme"
+    "dark": "dark theme",
+    "gambling": "Gambling",
+    "seppukuTimeout": "Timeout for !sepukku",
+    "rouletteTimeout": "Timeout for !roulette"
   },
   "raffle": {
     "announceInterval": "Opened raffles will be announced every (value) minute",
@@ -754,9 +757,13 @@
     "roulette": {
       "trigger": "(sender) pulled a trigger",
       "alive": "and nothing happened",
-      "dead": "and bullet splashed his brain on the wall"
+      "dead": "and bullet splashed his brain on the wall",
+      "timeout": "Roulette timeout set to (value)s"
     },
-    "seppuku": "(sender) has committed seppuku.",
+    "seppuku": {
+      "text": "(sender) has committed seppuku.",
+      "timeout": "Seppuku timeout set to (value)s"
+    },
     "gamble": {
       "zeroBet": "(sender), you cannot gamble 0 (pointsName)",
       "notEnoughOptions": "(sender), you need to specify points to gamble",
