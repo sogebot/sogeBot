@@ -27,6 +27,7 @@
       "atUsername": {
         "true": "Usernames will be shown with @ like @foo",
         "false": "Usernames will be shown without @ like foo"
+      }
     },
     "years": "year|years",
     "months": "month|months",
@@ -35,7 +36,6 @@
     "minutes": "minute|minutes",
     "messages": "message|messages",
     "isRegistered": "(sender), you cannot use (keyword), because is already in use for another action!"
-    }
   },
   "overlay": {
     "emotes": {
@@ -70,16 +70,16 @@
     "moderation-subscribers-toggle": "Timeout subscribers",
     "moderation-spaces-toggle": "Timeout links with spaces",
     "global": "Global",
-    "alerts": "Alerts",
     "user": "User",
-    "carousel": "Image Carousel",
+    "alerts": "Alerts",
     "dashboard": "Dashboard",
+    "carousel": "Image Carousel",
     "manage": "Manage",
     "settings": "Settings",
-    "stats": "Stats",
-    "viewers": "Viewers",
     "permissions": "Permissions",
     "permission": "Permission",
+    "stats": "Stats",
+    "viewers": "Viewers",
     "systems": "Systems",
     "overlays": "Overlays",
     "aliases": "Aliases",
@@ -296,6 +296,8 @@
     },
     "open": {
       "error": "(sender) Raffle was not opened! Use: !raffle open [raffle-keyword] [product(optional)] [time=#(optional)] [followers(optional)]",
+      "running": "(sender) Raffle is already running! Keyword for raffle is !(keyword)",
+      "locked": "(sender) Raffle is closed! Choose winner with !raffle pick",
       "ok": {
         "everyone": "New raffle is opened. To enter type !(keyword). Everyone can participate",
         "everyoneAndProduct": "New raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate",
