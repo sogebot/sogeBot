@@ -26,7 +26,9 @@ function Highlights () {
     global.parser.register(this, '!highlight list', this.list, constants.OWNER_ONLY)
     global.parser.register(this, '!highlight', this.highlight, constants.OWNER_ONLY)
 
+    global.panel.addMenu({category: 'manage', name: 'highlights', id: 'highlights'})
     global.panel.socketListening(this, 'highlight.save', this.saveHighlight)
+    global.panel.socketListening(this, 'highlight.get', this.sendHighlight)
 
     global.watcher.watch(this, 'highlights', this._save)
     this._update(this)
@@ -61,6 +63,9 @@ Highlights.prototype.highlight = function (self, sender, description) {
     highlight.stream = global.twitch.when.online
     highlight.timestamp = timestamp
     highlight.description = description
+    highlight.title = global.twitch.currentStatus
+    highlight.game = global.twitch.currentGame
+    highlight.created_at = moment().format('X')
 
     if (self.cached.created_at === global.twitch.when.online && !_.isNil(self.cached.id) && !_.isNil(self.cached.created_at)) {
       highlight.video_id = self.cached.id
@@ -96,6 +101,9 @@ Highlights.prototype.highlight = function (self, sender, description) {
 
 Highlights.prototype.saveHighlight = function (self, socket) {
   self.highlight(self, null, '')
+}
+Highlights.prototype.sendHighlight = function (self, socket) {
+  socket.emit('highlight.list', _.orderBy(self.highlights, 'created_at', 'desc'))
 }
 
 Highlights.prototype.add = function (self, highlight, timestamp, sender) {

@@ -48,6 +48,8 @@
     }
   },
   "webpanel": {
+    "video_id": "Video ID",
+    "highlights": "Highlights",
     "cooldown-quiet-header": "Show cooldown message",
     "cooldown-quiet-toggle-no": "Notify",
     "cooldown-quiet-toggle-yes": "Won't notify",

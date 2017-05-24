@@ -695,3 +695,7 @@ a.soundboard-list-group-item span {
 .action-danger > a {
   color: #a94442 !important;
 }
+
+th:first-letter {
+  text-transform: uppercase;
+}
