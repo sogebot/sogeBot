@@ -105,7 +105,8 @@ Users.prototype.get = function (username) {
       username: username,
       time: {},
       is: {},
-      stats: {}
+      stats: {},
+      custom: {}
     }
   }
 
@@ -115,6 +116,7 @@ Users.prototype.get = function (username) {
   if (_.isUndefined(user.time)) user.time = {}
   if (_.isUndefined(user.is)) user.is = {}
   if (_.isUndefined(user.stats)) user.stats = {}
+  if (_.isUndefined(user.custom)) user.custom = {}
   return user
 }
 
