@@ -26,6 +26,8 @@ function Highlights () {
     global.parser.register(this, '!highlight list', this.list, constants.OWNER_ONLY)
     global.parser.register(this, '!highlight', this.highlight, constants.OWNER_ONLY)
 
+    global.panel.socketListening(this, 'highlight.save', this.saveHighlight)
+
     global.watcher.watch(this, 'highlights', this._save)
     this._update(this)
   }
@@ -90,6 +92,10 @@ Highlights.prototype.highlight = function (self, sender, description) {
         break
     }
   }
+}
+
+Highlights.prototype.saveHighlight = function (self, socket) {
+  self.highlight(self, null, '')
 }
 
 Highlights.prototype.add = function (self, highlight, timestamp, sender) {

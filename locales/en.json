@@ -270,7 +270,11 @@
     "true": "true",
     "false": "false",
     "light": "light theme",
-    "dark": "dark theme"
+    "dark": "dark theme",
+    "gambling": "Gambling",
+    "seppukuTimeout": "Timeout for !sepukku",
+    "rouletteTimeout": "Timeout for !roulette",
+    "click-to-highlight": "highlight"
   },
   "raffle": {
     "announceInterval": "Opened raffles will be announced every (value) minute",
