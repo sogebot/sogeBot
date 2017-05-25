@@ -256,6 +256,8 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
       }
     }
     text = text.replace('type=' + (type === 0 ? 'keyword' : 'tickets'), '')
+    // ignore type settings if points are not enabled
+    if (!global.commons.isSystemEnabled('points')) type = 0
 
     let minTickets = 0
     for (let part of text.trim().split(' ')) {
