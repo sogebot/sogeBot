@@ -370,7 +370,7 @@ Twitch.prototype.followage = function (self, sender, text) {
 Twitch.prototype.age = function (self, sender, text) {
   let username
   let parsed = text.match(/^(\S?)+$/g)
-  if (parsed[0].length > 0) username = parsed[0]
+  if (parsed[0].length > 0) username = parsed[0].toLowerCase()
   else username = sender.username
 
   const user = global.users.get(username)
