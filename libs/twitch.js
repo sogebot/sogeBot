@@ -511,7 +511,7 @@ Twitch.prototype.setTitleAndGame = function (self, sender, args) {
         self.currentGame = body.game
       } else {
         global.commons.sendMessage(global.translate('game.change.failed')
-          .replace('(game)', body.game), sender)
+          .replace('(game)', self.currentGame), sender)
       }
     }
 
@@ -522,7 +522,7 @@ Twitch.prototype.setTitleAndGame = function (self, sender, args) {
         self.currentStatus = body.status
       } else {
         global.commons.sendMessage(global.translate('title.change.failed')
-          .replace('(status)', body.status), sender)
+          .replace('(status)', self.currentStatus), sender)
       }
     }
   })
