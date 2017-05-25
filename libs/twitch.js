@@ -2,6 +2,7 @@
 
 var constants = require('./constants')
 var moment = require('moment')
+var request = require('request-promise')
 var _ = require('lodash')
 require('moment-precise-range-plugin')
 
@@ -474,29 +475,61 @@ Twitch.prototype.showTop = function (self, sender, text) {
   }
 }
 
-Twitch.prototype.setTitleAndGame = function (self, sender, args) {
+Twitch.prototype.setTitleAndGame = async function (self, sender, args) {
   args = _.defaults(args, { title: null }, { game: null })
 
   const options = {
     url: 'https://api.twitch.tv/kraken/channels/' + global.channelId,
     json: true,
-    qs: {
-      _method: 'put',
+    method: 'PUT',
+    body: {
       channel: {
         game: !_.isNull(args.game) ? args.game : self.currentGame,
         status: !_.isNull(args.title) ? args.title : self.currentStatus
       }
     },
     headers: {
-      'Content-Type': 'application/json',
       Accept: 'application/vnd.twitchtv.v5+json',
-      Authorization: 'OAuth ' + global.configuration.get().twitch.password.split(':')[1],
-      'Client-ID': global.configuration.get().twitch.clientId
+      Authorization: 'OAuth ' + global.configuration.get().twitch.password.split(':')[1]
     }
   }
   if (global.configuration.get().bot.debug) {
     global.log.debug('Updating game and title ', options)
   }
+
+  try {
+    const response = await request(options)
+    if (global.configuration.get().bot.debug) {
+      global.log.debug('Response: Updating game and title ', response)
+    }
+
+    if (!_.isNull(args.game)) {
+      if (response.game === args.game.trim()) {
+        global.commons.sendMessage(global.translate('game.change.success')
+          .replace('(game)', response.game), sender)
+        self.currentGame = response.game
+      } else {
+        global.commons.sendMessage(global.translate('game.change.failed')
+          .replace('(game)', self.currentGame), sender)
+      }
+    }
+
+    if (!_.isNull(args.title)) {
+      if (response.status === args.title.trim()) {
+        global.commons.sendMessage(global.translate('title.change.success')
+          .replace('(status)', response.status), sender)
+        self.currentStatus = response.status
+      } else {
+        global.commons.sendMessage(global.translate('title.change.failed')
+          .replace('(status)', self.currentStatus), sender)
+      }
+    }
+  } catch (e) {
+    if (global.configuration.get().bot.debug) {
+      global.log.debug('Response: Updating game and title ', e.message)
+    }
+  }
+  /*
   global.client.api(options, function (err, res, body) {
     if (err) { return global.log.error(err, { fnc: 'Twitch.prototype.setTitleAndGame' }) }
 
@@ -526,6 +559,7 @@ Twitch.prototype.setTitleAndGame = function (self, sender, args) {
       }
     }
   })
+  */
 }
 
 Twitch.prototype.setTitle = function (self, sender, text) {
