@@ -61,6 +61,24 @@
         </div>
       </div>
 
+      <div class="clearfix"></div>
+      <div class="btn-group" role="group" style="padding-top: 5px;">
+        <button type="button" style="min-width:30%" class="btn btn-default btn-label" disabled="disabled" data-lang="raffle-type"></button>
+        <div style="position:absolute; left: 200px">
+          <button type="button" class="btn btn-primary" id="raffleType" onclick="raffles.toggleType(true)" data-lang="raffle-type-keywords"></button>
+        </div>
+      </div>
+
+      <div class="input-group" role="group" style="padding-top: 5px;">
+        <button type="button" style="min-width:30%;" class="btn btn-default btn-label" disabled="disabled" data-lang="raffle-tickets-range"></button>
+
+        <span style="position:absolute; left: 200px; display: inline-block; width: 250px">
+          <input type="text" class="form-control" id="rafflesMinTickets" style="display: inline-block; width: 80px; border-left: 1px solid #ccc; float:none; position: relative;">
+          <span class="input-group-addon" style="display: inline-block; width: auto; height: auto; line-height: 20px; position: relative; left: -4px; top: -1px; border-right: 1px solid rgb(204, 204, 204)">-</span>
+          <input type="text" class="form-control" id="rafflesMaxTickets" style="position:relative; left: -10px; display: inline-block; width: 80px; border-left: 1px solid #ccc; float:none; position: relative;">
+        </span>
+      </div>
+
       <div class="input-group" role="group" style="padding-top: 5px;">
         <button type="button" style="min-width:30%" class="btn btn-default btn-label" disabled="disabled" data-lang="minimal-watched-time"></button>
 
@@ -118,6 +136,13 @@
 </div>
 
 <script>
+  socket.on('systems', function(data) {
+    if (!data.points) {
+      $("#raffleType").parent().parent().css('display', 'none')
+      $("#rafflesMinTickets").parent().parent().css('display', 'none')
+    }
+  })
+
   var raffles = {
     isSearching: false,
     eligibility: 0,
@@ -125,6 +150,7 @@
     winner: null,
     timestamp: null,
     participants: 0,
+    type: 0,
     updateMessages: function (messages) {
       var $el = $("#raffleMessages")
       var $offset = $("#raffleMessageOffset")
@@ -196,13 +222,21 @@
         if(raffles.createRaffle()) {
           // disable configuration buttons and inputs
           $("#followerCheckbox").removeClass().addClass('btn btn-disabled')
+          $("#raffleType").removeClass().addClass('btn btn-disabled')
           $("#rafflesWatchedTime").prop("disabled", true);
+          $("#rafflesMinTickets").prop("disabled", false)
+          $("#rafflesMaxTickets").prop("disabled", false)
         }
       } else {
         raffles.removeRaffle()
         // enable configuration buttons and inputs
         $("#followerCheckbox").removeClass().addClass('btn btn-primary')
+        $("#raffleType").removeClass().addClass('btn btn-primary')
         $("#rafflesWatchedTime").prop("disabled", false);
+        if (this.type === 1) {
+          $("#rafflesMinTickets").prop("disabled", false)
+          $("#rafflesMaxTickets").prop("disabled", false)
+        }
       }
     },
     removeRaffle: function () {
@@ -231,7 +265,7 @@
         $('#toggleButton').attr('title', 'Remove raffle')
         $('#toggleButton i').removeClass().addClass('fa fa-close')
         this.keyword = $("#rafflesWidgetKeyword").val()
-        socket.emit('createRaffle', { keyword: $("#rafflesWidgetKeyword").val(), eligibility: this.eligibility, product: $("#rafflesWidgetProduct").val(), minWatchedTime: $("#rafflesWatchedTime").val()})
+        socket.emit('createRaffle', { keyword: $("#rafflesWidgetKeyword").val(), minTickets: $('#rafflesMinTickets').val(), maxTickets: $('#rafflesMaxTickets').val(), type: this.type, eligibility: this.eligibility, product: $("#rafflesWidgetProduct").val(), minWatchedTime: $("#rafflesWatchedTime").val()})
         return true
       }
 
@@ -239,6 +273,20 @@
       if (this.participants === 0) {
         $("#raffleWidgetRoll").addClass('btn btn-disabled btn-block')
       } else $("#raffleWidgetRoll").addClass('btn btn-success btn-block')
+    },
+    toggleType: function (toggle) {
+      if ($("#raffleType").hasClass('btn-disabled')) return false
+      if (toggle) this.type = this.type + 1
+      if (this.type > 1) this.type = 0
+      if (this.type === 1) {
+        $("#raffleType").text(translations['raffle-type-tickets'])
+        $("#rafflesMinTickets").prop("disabled", false)
+        $("#rafflesMaxTickets").prop("disabled", false)
+      } else {
+        $("#raffleType").text(translations['raffle-type-keywords'])
+        $("#rafflesMinTickets").prop("disabled", true)
+        $("#rafflesMaxTickets").prop("disabled", true)
+      }
     },
     toggleEligibility: function (toggle) {
       if ($("#followerCheckbox").hasClass('btn-disabled')) return false
@@ -255,7 +303,6 @@
           $("#followerCheckbox").html(translations['everyone'])
           break
       }
-      socket.emit('setRafflesEligibility', this.eligibility)
     },
     updateRaffle: function (raffle) {
       $('#toggleButton').removeClass()
@@ -271,19 +318,25 @@
 
         // disable configuration buttons and inputs
         $("#followerCheckbox").removeClass().addClass('btn btn-disabled')
-        $("#rafflesWatchedTime").prop("disabled", true);
+        $("#raffleType").removeClass().addClass('btn btn-disabled')
+        $("#rafflesWatchedTime").prop("disabled", true)
+        $("#rafflesMinTickets").prop("disabled", true)
+        $("#rafflesMaxTickets").prop("disabled", true)
       }
 
       this.eligibilty = !_.isNull(raffle) && raffle.eligibility ? raffle.eligibility : 0
       this.keyword = !_.isNull(raffle) && raffle.keyword ? raffle.keyword : ''
       this.winner = !_.isNull(raffle) && raffle.winner ? raffle.winner : null
       this.timestamp = !_.isNull(raffle) && raffle.timestamp ? raffle.timestamp : null
+      this.type = !_.isNull(raffle) && raffle.type ? raffle.type : 0
       $("#rafflesWidgetProduct").val(!_.isNull(raffle) && raffle.product ? raffle.product : '')
       $("#rafflesWatchedTime").val(!_.isNull(raffle) && raffle.watchedTime ? raffle.watchedTime : 0)
-
+      $("#rafflesMinTickets").val(!_.isNull(raffle) && raffle.minTickets ? raffle.minTickets : 0)
+      $("#rafflesMaxTickets").val(!_.isNull(raffle) && raffle.maxTickets ? raffle.maxTickets : 1000)
       $("#rafflesWidgetKeyword").val(this.keyword)
 
       this.toggleEligibility(false)
+      this.toggleType(false)
 
       if (!_.isNull(this.winner)) {
         this.updateWinnerTab()
@@ -394,6 +447,28 @@
     }
   })
 
+  $('#rafflesMinTickets').off()
+  $('#rafflesMinTickets').on('keyup', function (ev) {
+    if (validateTickets($('#rafflesMinTickets'), false)) {
+      validateTickets($('#rafflesMaxTickets'), true)
+    }
+  })
+  $('#rafflesMaxTickets').off()
+  $('#rafflesMaxTickets').on('keyup', function (ev) {
+    if (validateTickets($('#rafflesMaxTickets'), true)) {
+      validateTickets($('#rafflesMinTickets'), false)
+    }
+  })
+
+  function validateTickets (el, isMax) {
+    if (!_.isFinite(parseInt(el.val().trim(), 10)) || parseInt(el.val().trim(), 10) < 0) {
+      el.parent().removeClass().addClass('input-group').addClass('has-error')
+    } else el.parent().removeClass().addClass('input-group')
+
+    if (isMax && el.val() < $('#rafflesMinTickets').val()) {
+      el.parent().removeClass().addClass('input-group').addClass('has-error')
+    }
+  }
 
   socket.emit('getRafflesConfiguration')
   socket.off('rafflesConfiguration')

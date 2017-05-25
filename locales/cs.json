@@ -49,6 +49,10 @@
   },
   "webpanel": {
     "description": "Popisek",
+    "raffle-type": "Typ raffle",
+    "raffle-type-keywords": "Pouze keyword",
+    "raffle-type-tickets": "S tickety",
+    "raffle-tickets-range": "Rozsah ticketu",
     "video_id": "ID Videa",
     "highlights": "Highlighty",
     "cooldown-quiet-header": "Zobrazí cooldown zprávu",
@@ -296,7 +300,12 @@
         "followersAndProduct": "(sender), raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
         "subscribers": "(sender), raffle je spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze subscriberum",
         "subscribersAndProduct": "(sender), raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze subscriberum",
-        "none": "(sender), raffle je spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem"
+        "everyoneTickets": "(sender), ticket raffle je spustena. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je otevreny vsem",
+        "everyoneAndProductTickets": "(sender), ticket raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je otevreny vsem",
+        "followersTickets": "(sender), ticket raffle je spustena. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze followerum",
+        "followersAndProductTickets": "(sender), ticket raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze followerum",
+        "subscribersTickets": "(sender), ticket raffle je spustena. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze subscriberum",
+        "subscribersAndProductTickets": "(sender), ticket raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze subscriberum"
       },
       "closed": "(sender) Raffle je uzavrena, ale vitez jeste nebyl vybran!",
       "notRunning": "(sender) Zadne raffle neni momentalne otevreno!"
@@ -312,7 +321,12 @@
         "followersAndProduct": "Nova raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
         "subscribers": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze subscriberum",
         "subscribersAndProduct": "Nova raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze subscriberum",
-        "none": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem"
+        "everyoneTickets": "Nova ticket raffle byla spustena. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je otevreny vsem",
+        "everyoneAndProductTickets": "Nova ticket raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je otevreny vsem",
+        "followersTickets": "Nova ticket raffle byla spustena. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze followerum",
+        "followersAndProductTickets": "Nova ticket affle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze followerum",
+        "subscribersTickets": "Nova ticket raffle byla spustena. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze subscriberum",
+        "subscribersAndProductTickets": "Nova ticket raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze subscriberum"
       },
       "notice": {
         "everyone": "Raffle prave bezi. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
@@ -321,7 +335,12 @@
         "followersAndProduct": "Raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
         "subscribers": "Raffle prave bezi. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze subscriberum",
         "subscribersAndProduct": "Raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze subscriberum",
-        "none": "Raffle prave bezi. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem"
+        "everyoneTickets": "Ticket raffle prave bezi. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je otevreny vsem",
+        "everyoneAndProductTickets": "Ticket raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je otevreny vsem",
+        "followersTickets": "Ticket raffle prave bezi. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze followerum",
+        "followersAndProductTickets": "Ticket raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze followerum",
+        "subscribersTickets": "Ticket raffle prave bezi. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze subscriberum",
+        "subscribersAndProductTickets": "Ticket raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze subscriberum"
       }
     },
     "close": {

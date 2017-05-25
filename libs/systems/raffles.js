@@ -21,7 +21,10 @@ function Raffles () {
     this.keyword = null
     this.product = null
     this.minWatchedTime = 0
+    this.minTickets = 0
+    this.maxTickets = 1000
     this.eligibility = 0
+    this.type = 0
     this.status = null
     this.locked = false
 
@@ -43,28 +46,42 @@ function Raffles () {
         message = global.configuration.getValue('raffleAnnounceCustomMessage')
           .replace('(keyword)', self.keyword)
           .replace('(product)', self.product)
+          .replace('(min)', self.minTickets)
+          .replace('(max)', self.maxTickets)
       } else {
         if (self.eligibility === 0 && self.product) {
-          message = global.translate('raffle.open.notice.followersAndProduct')
+          message = global.translate(self.type === 0 ? 'raffle.open.notice.followersAndProduct' : 'raffle.open.notice.followersAndProductTickets')
             .replace('(keyword)', self.keyword)
             .replace('(product)', self.product)
+            .replace('(min)', self.minTickets)
+            .replace('(max)', self.maxTickets)
         } else if (self.eligibility === 0 && !self.product) {
-          message = global.translate('raffle.open.notice.followers')
+          message = global.translate(self.type === 0 ? 'raffle.open.notice.followers' : 'raffle.open.notice.followersTickets')
             .replace('(keyword)', self.keyword)
+            .replace('(min)', self.minTickets)
+            .replace('(max)', self.maxTickets)
         } else if (self.eligibility === 1 && self.product) {
-          message = global.translate('raffle.open.notice.subscribersAndProduct')
+          message = global.translate(self.type === 0 ? 'raffle.open.notice.subscribersAndProduct' : 'raffle.open.notice.subscribersAndProductTickets')
             .replace('(keyword)', self.keyword)
             .replace('(product)', self.product)
+            .replace('(min)', self.minTickets)
+            .replace('(max)', self.maxTickets)
         } else if (self.eligibility === 1 && !self.product) {
-          message = global.translate('raffle.open.notice.subscribers')
+          message = global.translate(self.type === 0 ? 'raffle.open.notice.subscribers' : 'raffle.open.notice.subscribersTickets')
             .replace('(keyword)', self.keyword)
+            .replace('(min)', self.minTickets)
+            .replace('(max)', self.maxTickets)
         } else if (self.eligibility === 2 && self.product) {
-          message = global.translate('raffle.open.notice.everyoneAndproduct')
+          message = global.translate(self.type === 0 ? 'raffle.open.notice.everyoneAndproduct' : 'raffle.open.notice.everyoneAndproductTickets')
             .replace('(keyword)', self.keyword)
             .replace('(product)', self.product)
+            .replace('(min)', self.minTickets)
+            .replace('(max)', self.maxTickets)
         } else {
-          message = global.translate('raffle.open.notice.everyone')
+          message = global.translate(self.type === 0 ? 'raffle.open.notice.everyone' : 'raffle.open.notice.everyoneTickets')
             .replace('(keyword)', self.keyword)
+            .replace('(min)', self.minTickets)
+            .replace('(max)', self.maxTickets)
         }
       }
 
@@ -87,6 +104,9 @@ Raffles.prototype.registerRaffleKeyword = function (self) {
       self.keyword = item.keyword
       self.product = item.product
       self.eligibility = item.eligibility
+      self.type = item.type
+      self.minTickets = item.minTickets
+      self.maxTickets = item.maxTickets
       self.minWatchedTime = item.minWatchedTime
       self.locked = item.locked
     }
@@ -156,28 +176,40 @@ Raffles.prototype.info = function (self, sender) {
     if (!_.isNull(item)) {
       if (!_.isNull(item.winner)) global.commons.sendMessage(global.translate('raffle.info.notRunning'), sender)
       else if (!item.locked) {
-        let message = global.translate('raffle.info.opened.none').replace('(keyword)', item.keyword)
+        let message
         if (item.eligibility === 0 && item.product) {
-          message = global.translate('raffle.info.opened.followersAndProduct')
+          message = global.translate(item.type === 0 ? 'raffle.info.opened.followersAndProduct' : 'raffle.info.opened.followersAndProductTickets')
             .replace('(keyword)', item.keyword)
             .replace('(product)', item.product)
+            .replace('(min)', item.minTickets)
+            .replace('(max)', item.maxTickets)
         } else if (item.eligibility === 0 && !item.product) {
-          message = global.translate('raffle.info.opened.followers')
+          message = global.translate(item.type === 0 ? 'raffle.info.opened.followers' : 'raffle.info.opened.followersTickets')
             .replace('(keyword)', item.keyword)
+            .replace('(min)', item.minTickets)
+            .replace('(max)', item.maxTickets)
         } else if (item.eligibility === 1 && item.product) {
-          message = global.translate('raffle.info.opened.subscribersAndProduct')
+          message = global.translate(item.type === 0 ? 'raffle.info.opened.subscribersAndProduct' : 'raffle.info.opened.subscribersAndProductTickets')
             .replace('(keyword)', item.keyword)
             .replace('(product)', item.product)
+            .replace('(min)', item.minTickets)
+            .replace('(max)', item.maxTickets)
         } else if (item.eligibility === 1 && !item.product) {
-          message = global.translate('raffle.info.opened.subscribers')
+          message = global.translate(item.type === 0 ? 'raffle.info.opened.subscribers' : 'raffle.info.opened.subscribersTickets')
             .replace('(keyword)', item.keyword)
+            .replace('(min)', item.minTickets)
+            .replace('(max)', item.maxTickets)
         } else if (item.eligibility === 2 && item.product) {
-          message = global.translate('raffle.info.opened.everyoneAndProduct')
+          message = global.translate(item.type === 0 ? 'raffle.info.opened.everyoneAndProduct' : 'raffle.info.opened.everyoneAndProductTickets')
             .replace('(keyword)', item.keyword)
             .replace('(product)', item.product)
+            .replace('(min)', item.minTickets)
+            .replace('(max)', item.maxTickets)
         } else {
-          message = global.translate('raffle.info.opened.everyone')
+          message = global.translate(item.type === 0 ? 'raffle.info.opened.everyone' : 'raffle.info.opened.everyoneTickets')
             .replace('(keyword)', item.keyword)
+            .replace('(min)', item.minTickets)
+            .replace('(max)', item.maxTickets)
         }
 
         if (item.minWatchedTime > 0) {
@@ -196,6 +228,7 @@ Raffles.prototype.info = function (self, sender) {
 Raffles.prototype.open = function (self, sender, text, dashboard = false) {
   try {
     let eligibility = 2
+
     if (text.indexOf('followers') >= 0) {
       text = text.replace('followers', '').trim()
       eligibility = 0
@@ -207,20 +240,51 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
 
     // check if time is set
     let minWatchedTime = 0
-    let split = text.trim().split(' ')
-    if (split[split.length - 1].startsWith('time=')) {
-      minWatchedTime = split[split.length - 1].replace('time=', '')
-      split.pop()
-      text = split.join(' ')
+    for (let part of text.trim().split(' ')) {
+      if (part.startsWith('time=')) {
+        minWatchedTime = part.replace('time=', '')
+        break
+      }
     }
+    text = text.replace('time=' + minWatchedTime, '')
 
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)?/)
+    let type = 0
+    for (let part of text.trim().split(' ')) {
+      if (part.startsWith('type=')) {
+        type = part.replace('type=', '') === 'keyword' ? 0 : 1
+        break
+      }
+    }
+    text = text.replace('type=' + (type === 0 ? 'keyword' : 'tickets'), '')
+
+    let minTickets = 0
+    for (let part of text.trim().split(' ')) {
+      if (part.startsWith('min=')) {
+        minTickets = part.replace('min=', '')
+        break
+      }
+    }
+    text = text.replace('min=' + minTickets, '')
+
+    let maxTickets = 1000
+    for (let part of text.trim().split(' ')) {
+      if (part.startsWith('max=')) {
+        maxTickets = part.replace('max=', '')
+        break
+      }
+    }
+    text = text.replace('max=' + maxTickets, '')
+
+    var parsed = text.trim().match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)?/)
     var groups = { keyword: 1, product: 2 }
     var raffle = {
       keyword: parsed[groups.keyword],
       eligibility: eligibility,
       product: !_.isNil(parsed[groups.product]) ? parsed[groups.product] : '',
       minWatchedTime: minWatchedTime,
+      type: type,
+      minTickets: minTickets,
+      maxTickets: maxTickets,
       winner: null,
       locked: false
     }
@@ -234,28 +298,40 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
     global.botDB.update({_id: 'raffle'}, {$set: raffle}, {upsert: true}, function (err) {
       if (err) return log.error(err, { fnc: 'Raffles.prototype.open' })
 
-      let message = global.translate('raffle.open.ok.none').replace('(keyword)', raffle.keyword)
+      let message
       if (raffle.eligibility === 0 && raffle.product) {
-        message = global.translate('raffle.open.ok.followersAndProduct')
+        message = global.translate(raffle.type === 0 ? 'raffle.open.ok.followersAndProduct' : 'raffle.open.ok.followersAndProductTickets')
           .replace('(keyword)', raffle.keyword)
           .replace('(product)', raffle.product)
+          .replace('(min)', raffle.minTickets)
+          .replace('(max)', raffle.maxTickets)
       } else if (raffle.eligibility === 0 && !raffle.product) {
-        message = global.translate('raffle.open.ok.followers')
+        message = global.translate(raffle.type === 0 ? 'raffle.open.ok.followers' : 'raffle.open.ok.followersTickets')
           .replace('(keyword)', raffle.keyword)
+          .replace('(min)', raffle.minTickets)
+          .replace('(max)', raffle.maxTickets)
       } else if (raffle.eligibility === 1 && raffle.product) {
-        message = global.translate('raffle.open.ok.subscribersAndProduct')
+        message = global.translate(raffle.type === 0 ? 'raffle.open.ok.subscribersAndProduct' : 'raffle.open.ok.subscribersAndProductTickets')
           .replace('(keyword)', raffle.keyword)
           .replace('(product)', raffle.product)
+          .replace('(min)', raffle.minTickets)
+          .replace('(max)', raffle.maxTickets)
       } else if (raffle.eligibility === 1 && !raffle.product) {
-        message = global.translate('raffle.open.ok.subscribers')
+        message = global.translate(raffle.type === 0 ? 'raffle.open.ok.subscribers' : 'raffle.open.ok.subscribersTickets')
           .replace('(keyword)', raffle.keyword)
+          .replace('(min)', raffle.minTickets)
+          .replace('(max)', raffle.maxTickets)
       } else if (raffle.eligibility === 2 && raffle.product) {
-        message = global.translate('raffle.open.ok.everyoneAndProduct')
+        message = global.translate(raffle.type === 0 ? 'raffle.open.ok.everyoneAndProduct' : 'raffle.open.ok.everyoneAndProductTickets')
           .replace('(keyword)', raffle.keyword)
           .replace('(product)', raffle.product)
+          .replace('(min)', raffle.minTickets)
+          .replace('(max)', raffle.maxTickets)
       } else {
-        message = global.translate('raffle.open.ok.everyone')
+        message = global.translate(raffle.type === 0 ? 'raffle.open.ok.everyone' : 'raffle.open.ok.everyoneTickets')
           .replace('(keyword)', raffle.keyword)
+          .replace('(min)', raffle.minTickets)
+          .replace('(max)', raffle.maxTickets)
       }
 
       if (raffle.minWatchedTime > 0) {
