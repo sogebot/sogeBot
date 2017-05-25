@@ -329,8 +329,8 @@
     },
     "pick": {
       "winner": {
-        "withProduct": "Gratulace @(winner), prave si vyhral raffle!",
-        "withoutProduct": "Gratulace @(winner), prave si vyhral raffle o `(product)`!"
+        "withoutProduct": "Gratulace @(winner), prave si vyhral raffle!",
+        "withProduct": "Gratulace @(winner), prave si vyhral raffle o `(product)`!"
       },
       "noParticipants": "Nikdo se nezucastnil raffle! Zadny vitez nebyl vybran."
     }
