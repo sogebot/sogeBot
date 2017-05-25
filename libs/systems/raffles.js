@@ -107,7 +107,7 @@ Raffles.prototype.pick = function (self, sender) {
       global.botDB.update({_id: 'raffle'}, {$set: { winner: user, locked: true, timestamp: new Date().getTime() }})
       global.commons.sendMessage(global.translate(!_.isNil(self.product) ? 'raffle.pick.winner.withProduct' : 'raffle.pick.winner.withoutProduct')
         .replace('(winner)', winner.username)
-        .replace('(product)', winner.username), sender)
+        .replace('(product)', self.product), sender)
       global.parser.unregister('!' + self.keyword)
       global.widgets.raffles.sendWinner(global.widgets.raffles, user)
       clearInterval(self.timer)
