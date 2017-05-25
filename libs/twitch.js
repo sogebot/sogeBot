@@ -488,6 +488,7 @@ Twitch.prototype.setTitleAndGame = function (self, sender, args) {
       }
     },
     headers: {
+      'Content-Type': 'application/json'
       Accept: 'application/vnd.twitchtv.v5+json',
       Authorization: 'OAuth ' + global.configuration.get().twitch.password.split(':')[1],
       'Client-ID': global.configuration.get().twitch.clientId
