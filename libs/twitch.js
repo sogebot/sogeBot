@@ -240,7 +240,10 @@ Twitch.prototype._load = function (self) {
 }
 
 Twitch.prototype._save = function (self) {
-  global.botDB.update({ _id: 'cachedGamesTitles' }, { $set: self.cGamesTitles }, { upsert: true })
+  var cachedGamesTitles = self.cGamesTitles
+  cachedGamesTitles._id = 'cachedGamesTitles'
+  global.botDB.remove({ _id: cachedGamesTitles._id })
+  global.botDB.insert(cachedGamesTitles)
   global.botDB.update({ _id: 'when' }, { $set: self.when }, { upsert: true })
   global.botDB.update({ _id: 'cached' }, { $set: self.cached }, { upsert: true })
   self.timestamp = new Date().getTime()
