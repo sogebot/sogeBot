@@ -86,6 +86,8 @@ Alias.prototype.toggleVisibilityAlias = function (self, socket, data) {
 }
 
 Alias.prototype.createAlias = function (self, socket, data) {
+  if (data.command.startsWith('!')) data.command = data.command.replace('!', '')
+  if (data.value.startsWith('!')) data.value = data.value.replace('!', '')
   self.add(self, null, '!' + data.command + ' !' + data.value)
   self.sendAliases(self, socket)
 }
