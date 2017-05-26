@@ -23,6 +23,7 @@ function Raffles () {
     this.minWatchedTime = 0
     this.eligibility = 0
     this.status = null
+    this.locked = false
 
     global.parser.register(this, '!raffle pick', this.pick, constants.OWNER_ONLY)
     global.parser.register(this, '!raffle close', this.close, constants.OWNER_ONLY)
@@ -35,7 +36,7 @@ function Raffles () {
 
     var self = this
     setInterval(function () {
-      if (new Date().getTime() < self.lastAnnounce + (global.configuration.getValue('raffleAnnounceInterval') * 60 * 1000) || _.isNil(self.keyword)) return
+      if (new Date().getTime() < self.lastAnnounce + (global.configuration.getValue('raffleAnnounceInterval') * 60 * 1000) || _.isNil(self.keyword) || self.locked) return
       self.lastAnnounce = new Date().getTime()
       let message
       if (global.configuration.getValue('raffleAnnounceCustomMessage').length > 0) {
@@ -87,6 +88,7 @@ Raffles.prototype.registerRaffleKeyword = function (self) {
       self.product = item.product
       self.eligibility = item.eligibility
       self.minWatchedTime = item.minWatchedTime
+      self.locked = item.locked
     }
   })
 }
@@ -105,6 +107,7 @@ Raffles.prototype.pick = function (self, sender) {
     } else {
       const user = global.users.get(winner.username)
       global.botDB.update({_id: 'raffle'}, {$set: { winner: user, locked: true, timestamp: new Date().getTime() }})
+      self.locked = true
       global.commons.sendMessage(global.translate(!_.isNil(self.product) ? 'raffle.pick.winner.withProduct' : 'raffle.pick.winner.withoutProduct')
         .replace('(winner)', winner.username)
         .replace('(product)', self.product), sender)
