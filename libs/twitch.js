@@ -383,7 +383,7 @@ Twitch.prototype.age = function (self, sender, text) {
     if (diff.months) output.push(diff.months + ' ' + global.parser.getLocalizedName(diff.months, 'core.months'))
     if (diff.days) output.push(diff.days + ' ' + global.parser.getLocalizedName(diff.days, 'core.days'))
     if (diff.hours) output.push(diff.hours + ' ' + global.parser.getLocalizedName(diff.hours, 'core.hours'))
-    global.commons.sendMessage(global.translate('age.success')
+    global.commons.sendMessage(global.translate(sender.username.toLowerCase() !== username.toLowerCase() ? 'age.success.withUsername' : 'age.success.withoutUsername')
       .replace('(username)', username)
       .replace('(diff)', output.join(', ')), sender)
   }
