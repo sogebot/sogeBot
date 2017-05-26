@@ -547,7 +547,10 @@
   },
   "age": {
     "failed": "(sender), nemam zatim data o stari uctu @(username)",
-    "success": "(sender), stari uctu @(username) je (diff)"
+    "success": {
+      "withUsername": "(sender), stari uctu @(username) je (diff)",
+      "withoutUsername": "(sender), stari tveho uctu je (diff)"
+    }
   },
   "lastseen": {
     "success": {
