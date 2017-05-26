@@ -266,8 +266,8 @@
         }
 
         $('#new_version_dlg .modal-body').html(md.render(response.body.replace('**Changelog**', '').trim()))
-        $('#new_version_dlg .modal-header small').text(response.name)
-        if (response.name !== version) $('#new-version-notice').css('display', 'inline-block')
+        $('#new_version_dlg .modal-header small').text(response.tag_name)
+        if (response.tag_name !== version) $('#new-version-notice').css('display', 'inline-block')
       })
     })
 
