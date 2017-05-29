@@ -48,6 +48,7 @@
     }
   },
   "webpanel": {
+    "description": "Popisek",
     "video_id": "ID Videa",
     "highlights": "Highlighty",
     "cooldown-quiet-header": "Zobrazí cooldown zprávu",
