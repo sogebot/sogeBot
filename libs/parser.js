@@ -354,7 +354,7 @@ Parser.prototype.parseMessageApi = async function (msg) {
     }
 
     // search for api datas in msg
-    let rData = msg.match(/\(api\.(?!_response)(\S*)\)/gi)
+    let rData = msg.match(/\(api\.(?!_response)(\S*?)\)/gi)
     if (_.isNil(rData)) {
       msg = msg.replace('(api._response)', response.body.replace(/^"(.*)"/, '$1'))
     } else {
