@@ -699,3 +699,28 @@ a.soundboard-list-group-item span {
 th:first-letter {
   text-transform: uppercase;
 }
+
+/* VOLUME SLIDER */
+.slider-handle.custom {
+	background: transparent none;
+}
+
+.slider-handle.custom::before {
+  content: ''
+}
+
+.slider-handle {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.slider.slider-vertical {
+  height: 100%;
+}
+
+.slider-track {
+  width: 100% !important;
+  left: 0 !important;
+  background-image: none;
+  background-color: #337ab7;
+}

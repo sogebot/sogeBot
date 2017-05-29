@@ -63,7 +63,8 @@ function Panel () {
     socket.on('getConnectionStatus', function () { socket.emit('connectionStatus', global.status) })
     socket.on('saveConfiguration', function (data) {
       _.each(data, function (index, value) {
-        global.configuration.setValue(global.configuration, { username: global.configuration.get().username }, value + ' ' + index)
+        if (value.startsWith('_')) return true
+        global.configuration.setValue(global.configuration, { username: global.configuration.get().username }, value + ' ' + index, data._quiet)
       })
     })
     socket.on('getConfiguration', function () {

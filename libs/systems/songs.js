@@ -53,6 +53,8 @@ Songs.prototype.webPanel = function () {
   global.panel.socketListening(this, 'banSong', this.banCurrentSong)
   global.panel.socketListening(this, 'stealSong', this.stealSongToPlaylist)
   global.panel.socketListening(this, 'skipSong', this.skipSong)
+
+  global.panel.socketListening(this, 'getVolume', this.getCurrentVolume)
 }
 
 Songs.prototype.getMeanLoudness = function (self) {
@@ -73,6 +75,10 @@ Songs.prototype.getVolume = function (self, item) {
   var correction = Math.ceil((global.configuration.getValue('songs_volume') / 100) * 3)
   var loudnessDiff = parseFloat(parseFloat(self.meanLoudness) - item.loudness)
   return Math.round(global.configuration.getValue('songs_volume') + (correction * loudnessDiff))
+}
+
+Songs.prototype.getCurrentVolume = function (self, socket) {
+  socket.emit('newVolume', self.getVolume(self, self.currentSong))
 }
 
 Songs.prototype.setTrim = function (self, socket, data) {
