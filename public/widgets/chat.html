@@ -37,7 +37,10 @@
 <script>
     socket.emit('getChatRoom');
     socket.on('chatRoom', function(room) {
-      $("#chat-room").html('<iframe frameborder="0" scrolling="no" src="http://twitch.tv/' + room + '/chat?popout=" width="100%"></iframe>')
+      if (loadedJS.indexOf('chat') === -1) {
+        loadedJS.push('chat')
+        $("#chat-room").html('<iframe frameborder="0" scrolling="no" src="http://twitch.tv/' + room + '/chat?popout=" width="100%"></iframe>')
+      }
     })
 
     $('#chatInput').attr('placeholder', translations['send-message-as-a-bot'])
