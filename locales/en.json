@@ -48,6 +48,7 @@
     }
   },
   "webpanel": {
+    "description": "Description",
     "video_id": "Video ID",
     "highlights": "Highlights",
     "cooldown-quiet-header": "Show cooldown message",
