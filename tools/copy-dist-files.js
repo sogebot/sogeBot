@@ -28,6 +28,10 @@ var dist = {
   'bootstrap-menu': {
     'js': 'dist/BootstrapMenu.min.js'
   },
+  'bootstrap-slider': {
+    'js': 'dist/bootstrap-slider.min.js',
+    'css': 'dist/css/bootstrap-slider.min.css'
+  },
   'velocity-animate': {
     'js': [
       'velocity.min.js',

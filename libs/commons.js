@@ -95,7 +95,11 @@ Commons.prototype.runCallback = function (cb, data) {
   delete value.type
   if (_.isUndefined(cb)) return
   if (data._type === 'settings') {
-    typeof cb === 'function' ? cb(data) : this.sendToOwners(global.translate(cb).replace('(value)', value[Object.keys(value)[0]]))
+    if (typeof cb === 'function') cb(data)
+    else if (!value.quiet) {
+      delete value.quiet
+      this.sendToOwners(global.translate(cb).replace('(value)', value[Object.keys(value)[0]]))
+    }
   } else {
     typeof cb === 'function' ? cb(data) : this.sendMessage(global.translate(cb).replace('(value)', value[Object.keys(value)[0]]), {username: global.configuration.get().twitch.channel}, data)
   }

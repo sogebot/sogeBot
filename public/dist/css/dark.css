@@ -25,3 +25,28 @@ body {
 .table-striped>tbody>tr:nth-of-type(odd), #events-current > div:nth-child(2n) {
     background-color: #222;
 }
+
+/* VOLUME SLIDER */
+.slider-handle.custom {
+	background: transparent none;
+}
+
+.slider-handle.custom::before {
+  content: ''
+}
+
+.slider-handle {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.slider.slider-vertical {
+  height: 100%;
+}
+
+.slider-track {
+  width: 100% !important;
+  left: 0 !important;
+  background-image: none;
+  background-color: #337ab7;
+}

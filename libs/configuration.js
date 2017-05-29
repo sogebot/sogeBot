@@ -42,14 +42,15 @@ Configuration.prototype.register = function (cfgName, success, filter, defaultVa
   this.default[cfgName] = {value: defaultValue}
 }
 
-Configuration.prototype.setValue = function (self, sender, text) {
+Configuration.prototype.setValue = function (self, sender, text, quiet) {
   try {
+    if (_.isNil(quiet)) { quiet = false }
     var cmd = text.split(' ')[0]
     var value = text.replace(text.split(' ')[0], '').trim()
     if (value.length === 0) value = self.default[cmd].value
 
     var filter = self.cfgL[cmd].filter
-    var data = {_type: 'settings', success: self.cfgL[cmd].success}
+    var data = {_type: 'settings', success: self.cfgL[cmd].success, _quiet: quiet}
     data['_' + cmd] = {$exists: true}
     if (filter === 'number' && Number.isInteger(parseInt(value.trim(), 10))) {
       data[cmd] = parseInt(value.trim(), 10)

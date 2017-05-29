@@ -40,6 +40,9 @@
               <li class="dropdown-header">Others</li>
               <li><a href="#" onclick="banSong()">Ban Song</a></li>
             </ul>
+            <div style="height:34px; display: inline-block">
+              <input id="volumeSlider" data-slider-handle="custom" data-slider-orientation="vertical" data-slider-id='volumeSlider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="50"/>
+            </div>
           </div>
           <div class="progress" style="height:34px; padding-left:0px; padding-right: 0" >
             <div class="progress-bar progress-bar-danger" id="youtube-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
@@ -62,6 +65,28 @@
 <script>
   if (loadedJS.indexOf('ytplayer') === -1) {
     loadedJS.push('ytplayer')
+
+    $("#volumeSlider").on("change", function(slideEvt) {
+      socket.emit('saveConfiguration', {'songs_volume': slideEvt.value.newValue, '_quiet': true})
+      setTimeout(function () {
+          socket.emit('getVolume')
+      })
+    })
+
+    socket.on('newVolume', function (vol) {
+      player.setVolume(vol)
+    })
+
+    socket.emit('getConfiguration')
+    socket.once('configuration', function (data) {
+      $('#volumeSlider').slider({
+  	    reversed : true,
+        value: data.songs_volume,
+        formatter: function(value) {
+        	return value + '%';
+        }
+      })
+    })
 
     var tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
