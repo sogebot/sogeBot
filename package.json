@@ -42,10 +42,10 @@
     "standard": "standard main.js && standard libs/* && standard libs/systems/* && standard libs/widgets/*",
     "build-zip": "echo Removing sogeBot-$npm_package_version.zip; rm sogeBot-$npm_package_version.zip; echo Creating new sogeBot-$npm_package_version.zip; zip -qr sogeBot-$npm_package_version.zip config.ini libs/ locales/ main.js public/ launch.sh LICENSE migrate.js package.json README.md tools/",
     "test": "npm run standard && mocha",
-    "migrate": "node --harmony-async-await ./migrate",
-    "cleanup": "node --harmony-async-await ./tools/cleanup",
-    "start": "npm run copy:dist && node --harmony-async-await ./main || true",
-    "debug": "npm run copy:dist && node --harmony-async-await --inspect ./main || true",
+    "migrate": "node ./migrate",
+    "cleanup": "node ./tools/cleanup",
+    "start": "npm run copy:dist && node ./main || true",
+    "debug": "npm run copy:dist && node --inspect ./main || true",
     "copy:dist": "node tools/copy-dist-files.js"
   },
   "pre-commit": [
