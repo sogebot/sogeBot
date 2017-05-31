@@ -24,7 +24,7 @@
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
-    "moment-precise-range-plugin": "^1.2.1",
+    "moment-precise-range-plugin": "^1.2.3",
     "nedb": "^1.8.0",
     "nedb-promise": "^2.0.1",
     "request": "^2.81.0",
@@ -35,7 +35,7 @@
     "velocity-animate": "^1.5.0",
     "winston": "^2.3.1",
     "youtube-search": "^1.0.9",
-    "ytdl-core": "^0.14.1"
+    "ytdl-core": "^0.14.2"
   },
   "scripts": {
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
@@ -53,8 +53,8 @@
     "standard"
   ],
   "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^3.4.1",
+    "chai": "^4.0.0",
+    "mocha": "^3.4.2",
     "pre-commit": "^1.2.2",
     "standard": "*"
   }
