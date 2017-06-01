@@ -35,7 +35,8 @@
     "velocity-animate": "^1.5.0",
     "winston": "^2.3.1",
     "youtube-search": "^1.0.9",
-    "ytdl-core": "^0.14.2"
+    "ytdl-core": "^0.14.2",
+    "snyk": "^1.32.0"
   },
   "scripts": {
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
@@ -46,7 +47,9 @@
     "cleanup": "node ./tools/cleanup",
     "start": "npm run copy:dist && node ./main || true",
     "debug": "npm run copy:dist && node --inspect ./main || true",
-    "copy:dist": "node tools/copy-dist-files.js"
+    "copy:dist": "node tools/copy-dist-files.js",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "pre-commit": [
     "precommit-msg",
@@ -57,5 +60,6 @@
     "mocha": "^3.4.2",
     "pre-commit": "^1.2.2",
     "standard": "*"
-  }
+  },
+  "snyk": true
 }
