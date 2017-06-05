@@ -297,15 +297,15 @@
         "everyone": "(sender), raffle is opened. To enter type !(keyword). Everyone can participate",
         "everyoneAndProduct": "(sender), raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate",
         "followers": "(sender), raffle is opened. To enter type !(keyword). Only followers can participate",
-        "followersAndProduct": "(sender), raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate",
+        "followersAndProduct": "(sender), raffle is opened for `(product)`. To enter type !(keyword). Only followers can participate",
         "subscribers": "(sender), raffle is opened. To enter type !(keyword). Only subscribers can participate",
-        "subscribersAndProduct": "(sender), raffle is opened o `(product)`. To enter type !(keyword). Only subscribers can participate",
+        "subscribersAndProduct": "(sender), raffle is opened for `(product)`. To enter type !(keyword). Only subscribers can participate",
         "everyoneTickets": "(sender), ticket raffle is opened. To enter type !(keyword) <(min)-(max)>. Everyone can participate",
         "everyoneAndProductTickets": "(sender), ticket raffle is opened for `(product)`. To enter type !(keyword) <(min)-(max)>. Everyone can participate",
         "followersTickets": "(sender), ticket raffle is opened. To enter type !(keyword) <(min)-(max)>. Only followers can participate",
-        "followersAndProductTickets": "(sender), ticket raffle is opened o `(product)`. To enter type !(keyword) <(min)-(max)>. Only followers can participate",
+        "followersAndProductTickets": "(sender), ticket raffle is opened for `(product)`. To enter type !(keyword) <(min)-(max)>. Only followers can participate",
         "subscribersTickets": "(sender), ticket raffle is opened. To enter type !(keyword) <(min)-(max)>. Only subscribers can participate",
-        "subscribersAndProductTickets": "(sender), ticket raffle is opened o `(product)`. To enter type !(keyword) <(min)-(max)>. Only subscribers can participate"
+        "subscribersAndProductTickets": "(sender), ticket raffle is opened for `(product)`. To enter type !(keyword) <(min)-(max)>. Only subscribers can participate"
       },
       "closed": "(sender) Raffle is closed, but winner is not picked yet!",
       "notRunning": "(sender) No raffle is currently opened!"
@@ -318,29 +318,29 @@
         "everyone": "New raffle is opened. To enter type !(keyword). Everyone can participate",
         "everyoneAndProduct": "New raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate",
         "followers": "New raffle is opened. To enter type !(keyword). Only followers can participate",
-        "followersAndProduct": "New raffle is opened o `(product)`. To enter type !(keyword). Only followers can participate",
+        "followersAndProduct": "New raffle is opened for `(product)`. To enter type !(keyword). Only followers can participate",
         "subscribers": "New raffle is opened. To enter type !(keyword). Only subscribers can participate",
-        "subscribersAndProduct": "New raffle is opened o `(product)`. To enter type !(keyword). Only subscribers can participate",
+        "subscribersAndProduct": "New raffle is opened for `(product)`. To enter type !(keyword). Only subscribers can participate",
         "everyoneTickets": "New raffle is opened. To enter type !(keyword) <(min)-(max)>. Everyone can participate",
         "everyoneAndProductTickets": "New ticket raffle is opened for `(product)`. To enter type !(keyword) <(min)-(max)>. Everyone can participate",
         "followersTickets": "New ticket raffle is opened. To enter type !(keyword) <(min)-(max)>. Only followers can participate",
-        "followersAndProductTickets": "New ticket raffle is opened o `(product)`. To enter type !(keyword) <(min)-(max)>. Only followers can participate",
+        "followersAndProductTickets": "New ticket raffle is opened for `(product)`. To enter type !(keyword) <(min)-(max)>. Only followers can participate",
         "subscribersTickets": "New ticket raffle is opened. To enter type !(keyword) <(min)-(max)>. Only subscribers can participate",
-        "subscribersAndProductTickets": "New ticket raffle is opened o `(product)`. To enter type !(keyword) <(min)-(max)>. Only subscribers can participate"
+        "subscribersAndProductTickets": "New ticket raffle is opened for `(product)`. To enter type !(keyword) <(min)-(max)>. Only subscribers can participate"
       },
       "notice": {
         "everyone": "Raffle is currently running. To enter type !(keyword). Everyone can participate",
         "everyoneAndProduct": "Raffle is currently running for `(product)`. To enter type !(keyword). Everyone can participate",
         "followers": "Raffle is currently running. To enter type !(keyword). Only followers can participate",
-        "followersAndProduct": "Raffle is currently running o `(product)`. To enter type !(keyword). Only followers can participate",
+        "followersAndProduct": "Raffle is currently running for `(product)`. To enter type !(keyword). Only followers can participate",
         "subscribers": "Raffle is currently running. To enter type !(keyword). Only subscribers can participate",
-        "subscribersAndProduct": "Raffle is currently running o `(product)`. To enter type !(keyword). Only subscribers can participate",
+        "subscribersAndProduct": "Raffle is currently running for `(product)`. To enter type !(keyword). Only subscribers can participate",
         "everyoneTickets": "Ticket raffle is currently running. To enter type !(keyword) <(min)-(max)>. Everyone can participate",
         "everyoneAndProductTickets": "Ticket raffle is currently running for `(product)`. To enter type !(keyword) <(min)-(max)>. Everyone can participate",
         "followersTickets": "Ticket raffle is currently running. To enter type !(keyword) <(min)-(max)>. Only followers can participate",
-        "followersAndProductTickets": "Ticket raffle is currently running o `(product)`. To enter type !(keyword) <(min)-(max)>. Only followers can participate",
+        "followersAndProductTickets": "Ticket raffle is currently running for `(product)`. To enter type !(keyword) <(min)-(max)>. Only followers can participate",
         "subscribersTickets": "Ticket raffle is currently running. To enter type !(keyword) <(min)-(max)>. Only subscribers can participate",
-        "subscribersAndProductTickets": "Ticket raffle is currently running o `(product)`. To enter type !(keyword) <(min)-(max)>. Only subscribers can participate"
+        "subscribersAndProductTickets": "Ticket raffle is currently running for `(product)`. To enter type !(keyword) <(min)-(max)>. Only subscribers can participate"
       }
     },
     "close": {
