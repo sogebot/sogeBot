@@ -260,6 +260,7 @@
     "action": "uživatel poslal /me",
     "ban": "uživatel byl zabanován",
     "hosting": "tvůj channel začal hostovat",
+    "hosted": "tvůj channel je hostován",
     "mod": "uživatel se stal novým modem",
     "timeout": "uživatel dostal timeout",
     "create-a-new-event-listener": "Vytvoř nový event listener",

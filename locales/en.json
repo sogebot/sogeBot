@@ -260,6 +260,7 @@
     "action": "user sent /me",
     "ban": "user was banned",
     "hosting": "your channel started hosting",
+    "hosted": "your channel is hosted",
     "mod": "user is a new mod",
     "timeout": "user was timeouted",
     "create-a-new-event-listener": "Create a new event listener",

@@ -13,6 +13,7 @@ global.log = new (winston.Logger)({
     chatOut: 2,
     whisperIn: 3,
     whisperOut: 4,
+    host: 5,
     follow: 6,
     unfollow: 7,
     timeout: 8,
@@ -42,6 +43,7 @@ global.log = new (winston.Logger)({
         if (level === 'timeout') level = '+timeout'
         if (level === 'ban') level = '+ban'
         if (level === 'follow') level = '+follow'
+        if (level === 'host') level = '+host'
         if (level === 'unfollow') level = '-follow'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
         let fnc = !_.isUndefined(options.meta.fnc) ? options.meta.fnc : ''
@@ -65,8 +67,11 @@ global.log = new (winston.Logger)({
         if (level === 'whisperOut') level = '>w>'
         if (level === 'info') level = '|'
         if (level === 'warning') level = '|!'
-        if (level === 'join') level = 'JOIN:'
-        if (level === 'part') level = 'PART:'
+        if (level === 'timeout') level = '+timeout'
+        if (level === 'ban') level = '+ban'
+        if (level === 'follow') level = '+follow'
+        if (level === 'host') level = '+host'
+        if (level === 'unfollow') level = '-follow'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
         return options.timestamp() +
           (level ? ' ' + level + ' ' : ' ') +

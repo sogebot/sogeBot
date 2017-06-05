@@ -23,7 +23,8 @@ function Twitch () {
 
   this.cached = {
     followers: [],
-    subscribers: []
+    subscribers: [],
+    hosts: []
   }
 
   this.when = {
@@ -179,6 +180,19 @@ function Twitch () {
         }
         if (res.statusCode === 200 && !_.isNull(body)) {
           self.currentHosts = body.hosts.length
+          if (self.currentHosts > 0) {
+            _.each(body.hosts, function (host) {
+              if (!_.includes(self.cached.hosts, host.host_login)) {
+                global.events.fire('hosted', { username: host.host_login })
+              }
+            })
+
+            // re-cache hosts
+            self.cached.hosts = []
+            _.each(body.hosts, function (host) { self.cached.hosts.push(host.host_login) })
+          } else {
+            self.cached.hosts = []
+          }
         }
       })
     }
