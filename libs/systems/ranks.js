@@ -99,7 +99,7 @@ Ranks.prototype.remove = function (self, sender, text) {
 
 Ranks.prototype.set = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
     global.users.set(parsed[1], { custom: { rank: parsed[2].trim() } })
     global.commons.sendMessage(global.translate('rank.success.set')
       .replace('(rank)', parsed[2])
