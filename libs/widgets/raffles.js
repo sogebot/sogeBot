@@ -79,7 +79,7 @@ RafflesWidget.prototype.removeRaffle = function (self, socket) {
 }
 
 RafflesWidget.prototype.clearRaffleParticipants = function (self, socket) {
-  global.botDB.remove({ $where: function () { return this._id.startsWith('raffle_participant_') } }, { multi: true })
+  global.systems.raffles.participants = {}
   self.forceSendRaffleParticipants(self)
   socket.emit('rafflesParticipants', {})
 }
@@ -92,11 +92,8 @@ RafflesWidget.prototype.sendRafflesMessages = function (self) {
 }
 
 RafflesWidget.prototype.sendRafflesParticipants = function (self) {
-  global.botDB.find({ $where: function () { return this._id.startsWith('raffle_participant_') } }, function (err, items) {
-    if (err) log.error(err, { fnc: 'RafflesWidget.prototype.sendRafflesParticipants' })
-    if (items.length !== self.participants) global.panel.io.emit('rafflesParticipants', items)
-    self.participants = items.length
-  })
+  if (_.size(global.systems.raffles.participants) !== self.participants) global.panel.io.emit('rafflesParticipants', global.systems.raffles.participants)
+  self.participants = _.size(global.systems.raffles.participants)
 }
 
 RafflesWidget.prototype.createRaffle = function (self, socket, data) {

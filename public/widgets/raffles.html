@@ -371,7 +371,7 @@
     updateParticipants: function (list) {
       var max_show = 100
       var $el = $('#raffles-participants-list')
-      this.participants = _.isUndefined(list.length) ? 0 : list.length
+      this.participants = _.size(list)
 
       $el.empty()
       _.each(list, function (item) {
@@ -383,7 +383,7 @@
       if (max_show < 0) {
         $el.append('<li><i class="fa fa-eye-slash" aria-hidden="true"  style="color: red"></i> ' + Math.abs(max_show) + ' hidden</li>')
       }
-      if (!this.isSearching) $('#raffles-participants-count').text(list.length)
+      if (!this.isSearching) $('#raffles-participants-count').text(this.participants)
 
       $("#raffleWidgetRoll").removeClass()
       if (this.participants === 0) {
