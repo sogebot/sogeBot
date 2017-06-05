@@ -65,6 +65,9 @@ function Events () {
         message = message.replace(match, value)
       })
       global.log[attr.level](message)
+    },
+    '_function': function (attr) {
+      attr.fnc(attr)
     }
   }
 
@@ -77,7 +80,14 @@ Events.prototype.loadSystemEvents = function (self) {
     { system: true, name: 'log', message: '(username), reason: (reason), duration: (duration)', level: 'timeout' }
   ])
   self.events['follow'].push([
-    { system: true, name: 'log', message: '(username)', level: 'follow' }
+    { system: true, name: 'log', message: '(username)', level: 'follow' },
+    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'follow'}
+  ])
+  self.events['resub'].push([
+    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'resub'}
+  ])
+  self.events['subscription'].push([
+    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'sub'}
   ])
   self.events['unfollow'].push([
     { system: true, name: 'log', message: '(username)', level: 'unfollow' }
@@ -86,7 +96,8 @@ Events.prototype.loadSystemEvents = function (self) {
     { system: true, name: 'log', message: '(username), reason: (reason)', level: 'ban' }
   ])
   self.events['hosted'].push([
-    { system: true, name: 'log', message: '(username)', level: 'host' }
+    { system: true, name: 'log', message: '(username)', level: 'host' },
+    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'host'}
   ])
 }
 
@@ -164,7 +175,7 @@ Events.prototype._send = function (self, socket) {
     })
     if (eventBatch.length !== 0) events[n].push(eventBatch)
   })
-  socket.emit('events', { events: events, operations: Object.keys(self.operations) })
+  socket.emit('events', { events: events, operations: _.filter(Object.keys(self.operations), function (o) { return !o.startsWith('_') }) })
 }
 
 Events.prototype._new = function (self, socket, data) {
