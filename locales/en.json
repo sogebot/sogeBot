@@ -349,8 +349,8 @@
     },
     "pick": {
       "winner": {
-        "withoutProduct": "Congratulations @(winner), you just won a raffle!",
-        "withProduct": "Congratulations @(winner), you just won a raffle for `(product)`!"
+        "withoutProduct": "Congratulations @(winner), you just won a raffle! Win probability was (probability)%",
+        "withProduct": "Congratulations @(winner), you just won a raffle for `(product)`! Win probability was (probability)%"
       },
       "noParticipants": "There were no participants in this raffle! No winner selected."
     }

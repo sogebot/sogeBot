@@ -127,28 +127,39 @@ Raffles.prototype.registerRaffleKeyword = function (self) {
 }
 
 Raffles.prototype.pick = function (self, sender) {
-  global.botDB.find({ $where: function () { return this._id.startsWith('raffle_participant_') && this.eligible } }, function (err, items) {
-    if (err) return log.error(err, { fnc: 'Raffles.prototype.pick' })
-    var winner = { username: null }
-    if (items.length !== 0) {
-      winner = _.sample(items)
-      global.botDB.update({ _id: winner._id }, { $set: { eligible: false } }) // don't want to pick same winner 2 times
-    }
+  if (_.size(self.participants) === 0) {
+    global.commons.sendMessage(global.translate('raffle.pick.noParticipants'), sender)
+    return true
+  }
 
-    if (_.isNull(winner.username)) {
-      global.commons.sendMessage(global.translate('raffle.pick.noParticipants'), sender)
-    } else {
-      const user = global.users.get(winner.username)
-      global.botDB.update({_id: 'raffle'}, {$set: { winner: user, locked: true, timestamp: new Date().getTime() }})
-      self.locked = true
-      global.commons.sendMessage(global.translate(!_.isNil(self.product) ? 'raffle.pick.winner.withProduct' : 'raffle.pick.winner.withoutProduct')
-        .replace('(winner)', winner.username)
-        .replace('(product)', self.product), sender)
-      global.parser.unregister('!' + self.keyword)
-      global.widgets.raffles.sendWinner(global.widgets.raffles, user)
-      clearInterval(self.timer)
+  let winnerArray = []
+  let _total = 0
+  _.each(self.participants, function (dict, username) {
+    if (!dict.eligible) return true
+    _total = _total + parseInt(dict.tickets)
+    for (let i = 0; i < dict.tickets; i++) {
+      winnerArray.push(username)
     }
   })
+
+  const winner = winnerArray[_.random(0, parseInt(_total, 10) - 1, false)]
+  if (_.isNil(winner)) {
+    global.commons.sendMessage(global.translate('raffle.pick.noParticipants'), sender)
+    return true
+  }
+  self.participants[winner].eligible = false
+
+  let probability = parseInt(self.participants[winner].tickets, 10) / (parseInt(_total, 10) / 100)
+
+  global.botDB.update({_id: 'raffle'}, {$set: { winner: global.users.get(winner), locked: true, timestamp: new Date().getTime() }})
+  self.locked = true
+  global.commons.sendMessage(global.translate(!_.isNil(self.product) && self.product.trim().length > 0 ? 'raffle.pick.winner.withProduct' : 'raffle.pick.winner.withoutProduct')
+    .replace('(winner)', winner)
+    .replace('(product)', self.product)
+    .replace('(probability)', probability), sender)
+  global.parser.unregister('!' + self.keyword)
+  global.widgets.raffles.sendWinner(global.widgets.raffles, global.users.get(winner))
+  clearInterval(self.timer)
 }
 
 Raffles.prototype.participate = function (self, sender, text) {
