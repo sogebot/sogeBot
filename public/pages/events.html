@@ -147,6 +147,9 @@ $('#events-list').on('change', function(ev) {
       $('#targetInfo').css('display', 'block')
       $('#viewersInfo').css('display', 'block')
       break
+    case 'hosted':
+      $('#usernameInfo').css('display', 'block')
+      break
     case 'command-send-x-times':
       $('#commandGroup').css('display', 'inline-block')
       $('#countGroup').css('display', 'inline-block')
@@ -288,6 +291,7 @@ var newEvent = function () {
     case 'action':
     case 'ban':
     case 'hosting':
+    case 'hosted':
     case 'mod':
     case 'timeout':
       delete data.definition

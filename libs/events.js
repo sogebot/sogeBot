@@ -21,6 +21,7 @@ function Events () {
     'action': [], // (username)
     'ban': [], // (username), (reason)
     'hosting': [], // (target), (viewers)
+    'hosted': [], // (username)
     'mod': [], // (username)
     'timeout': [], // (username), (reason), (duration)
     'every-x-seconds': [] // needs definition = { definition: true, tTrigerred: new Date(), tCount: 60 }
@@ -83,6 +84,9 @@ Events.prototype.loadSystemEvents = function (self) {
   ])
   self.events['ban'].push([
     { system: true, name: 'log', message: '(username), reason: (reason)', level: 'ban' }
+  ])
+  self.events['hosted'].push([
+    { system: true, name: 'log', message: '(username)', level: 'host' }
   ])
 }
 
