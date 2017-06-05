@@ -79,7 +79,7 @@ RafflesWidget.prototype.removeRaffle = function (self, socket) {
 }
 
 RafflesWidget.prototype.clearRaffleParticipants = function (self, socket) {
-  global.botDB.remove({ $where: function () { return this._id.startsWith('raffle_participant_') } }, { multi: true })
+  global.systems.raffles.participants = {}
   self.forceSendRaffleParticipants(self)
   socket.emit('rafflesParticipants', {})
 }
@@ -92,25 +92,31 @@ RafflesWidget.prototype.sendRafflesMessages = function (self) {
 }
 
 RafflesWidget.prototype.sendRafflesParticipants = function (self) {
-  global.botDB.find({ $where: function () { return this._id.startsWith('raffle_participant_') } }, function (err, items) {
-    if (err) log.error(err, { fnc: 'RafflesWidget.prototype.sendRafflesParticipants' })
-    if (items.length !== self.participants) global.panel.io.emit('rafflesParticipants', items)
-    self.participants = items.length
-  })
+  if (_.size(global.systems.raffles.participants) !== self.participants) global.panel.io.emit('rafflesParticipants', global.systems.raffles.participants)
+  self.participants = _.size(global.systems.raffles.participants)
 }
 
 RafflesWidget.prototype.createRaffle = function (self, socket, data) {
   let eligibility = ''
+  let type = 'keyword'
   if (data.eligibility === 0) eligibility = 'followers'
   if (data.eligibility === 1) eligibility = 'subscribers'
-  global.systems.raffles.open(global.systems.raffles, {username: null}, data.keyword.trim() + (data.product ? ' ' + data.product.trim() : '') + (data.minWatchedTime ? ' time=' + data.minWatchedTime.trim() : '') + ' ' + eligibility, true)
+  if (data.type === 1) type = 'tickets'
+  global.systems.raffles.open(global.systems.raffles, {username: null},
+    data.keyword.trim() + (data.product ? ' ' + data.product.trim() : '') +
+    (data.minWatchedTime ? ' time=' + data.minWatchedTime.trim() : '') +
+    (data.type ? ' type=' + type : '') +
+    (data.minTickets ? ' min=' + data.minTickets : '') +
+    (data.maxTickets ? ' max=' + data.maxTickets : '') +
+    ' ' + eligibility, true)
 }
 
 RafflesWidget.prototype.searchRafflesParticipants = function (self, socket, data) {
-  global.botDB.find({ $where: function () { return this._id.startsWith('raffle_participant_' + data.trim()) } }, function (err, items) {
-    if (err) log.error(err, { fnc: 'RafflesWidget.prototype.searchRafflesParticipants' })
-    if (items.length !== self.participants) global.panel.io.emit('rafflesParticipants', items)
-  })
+  global.panel.io.emit('rafflesParticipants',
+    _.filter(_.clone(global.systems.raffles.participants), function (o) {
+      return o.username.startsWith(data.trim())
+    })
+  )
 }
 
 RafflesWidget.prototype.getRaffle = function (self, socket) {
@@ -121,7 +127,7 @@ RafflesWidget.prototype.getRaffle = function (self, socket) {
 }
 
 RafflesWidget.prototype.setEligibility = function (self, socket, data) {
-  global.botDB.update({ _id: 'raffle_participant_' + data.username }, { $set: { forced: true, eligible: (data.eligible.toLowerCase() === 'true') } })
+  global.systems.raffles.participants[data.username].eligible = true
 }
 
 RafflesWidget.prototype.setRafflesFollowersOnly = function (self, socket, followersOnly) {
