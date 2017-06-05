@@ -28,6 +28,9 @@
 
 <script>
   var soundboard = {
+    audio: null,
+    el: null,
+
     resize: function () {
       _.each($(".soundboard-list-group-item span"), function (el) {
           $(el).css('font-size', '18px')
@@ -45,14 +48,17 @@
     },
     play: function (ev, el) {
       ev.preventDefault()
-      var audio = new Audio('dist/soundboard/' + el.dataset.sound + '.mp3')
-      audio.addEventListener('loadedmetadata', function() {
+      if (!_.isNil(soundboard.audio)) soundboard.audio.pause()
+      if (!_.isNil(soundboard.el)) soundboard.el.stop(true, true)
+      soundboard.audio = new Audio('dist/soundboard/' + el.dataset.sound + '.mp3')
+      soundboard.audio.addEventListener('loadedmetadata', function() {
+        soundboard.el = $(el).children('div')
         $(el).children('div').animate({
           width: '100%'
-        }, audio.duration * 1000, 'linear', function () {
+        }, soundboard.audio.duration * 1000, 'linear', function () {
           $(el).children('div').css('width', 0)
         })
-        audio.play()
+        soundboard.audio.play()
       })
     }
   }
