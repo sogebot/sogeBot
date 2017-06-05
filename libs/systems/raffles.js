@@ -14,12 +14,16 @@ const TYPE_NORMAL = 0
 const TYPE_TICKETS = 1
 
 /*
- * !raffle                                                      - gets an info about raffle
- * !raffle open [raffle-keyword] [product] [time=#] [followers] - open a new raffle with selected keyword for specified product (optional), time=# (optional) - minimal watched time in minutes, for followers? (optional)
- * !raffle close                                                - close a raffle manually
- * !raffle pick                                                 - pick or repick a winner of raffle
- * ![raffle-keyword]                                            - join a raffle
- * !set raffleAnnounceInterval [minutes]                        - reannounce raffle interval each x minutes
+ * !raffle                               - gets an info about raffle
+ * !raffle open [raffle-keyword] [product] [min=#] [max=#] [time=#] [type=keyword|tickets] [followers]
+ *                                       - open a new raffle with selected keyword for specified product (optional),
+ *                                       - min=# - minimal of tickets to join, max=# - max of tickets to join
+ *                                       - time=# (optional) - minimal watched time in minutes, for followers? (optional)
+ *                                       - type=keyword or type=tickets
+ * !raffle close                         - close a raffle manually
+ * !raffle pick                          - pick or repick a winner of raffle
+ * ![raffle-keyword]                     - join a raffle
+ * !set raffleAnnounceInterval [minutes] - reannounce raffle interval each x minutes
  */
 
 function Raffles () {
@@ -35,6 +39,8 @@ function Raffles () {
     this.status = null
     this.locked = false
 
+    this.participants = {}
+
     global.parser.register(this, '!raffle pick', this.pick, constants.OWNER_ONLY)
     global.parser.register(this, '!raffle close', this.close, constants.OWNER_ONLY)
     global.parser.register(this, '!raffle open', this.open, constants.OWNER_ONLY)
@@ -43,6 +49,9 @@ function Raffles () {
     global.configuration.register('raffleAnnounceInterval', 'raffle.announceInterval', 'number', 10)
     global.configuration.register('raffleAnnounceCustomMessage', 'raffle.announceCustomMessage', 'string', '')
     global.configuration.register('raffleTitleTemplate', 'raffle.announceTitleTemplate', 'string', '')
+
+    global.watcher.watch(this, 'participants', this._save)
+    this._update(this)
 
     var self = this
     setInterval(function () {
@@ -83,12 +92,28 @@ function Raffles () {
   }
 }
 
+Raffles.prototype._save = function (self) {
+  var participants = {
+    participants: self.participants
+  }
+  global.botDB.update({ _id: 'raffle_participants' }, { $set: participants })
+}
+
+Raffles.prototype._update = function (self) {
+  global.botDB.findOne({ _id: 'raffle_participants' }, function (err, item) {
+    if (err) return log.error(err, { fnc: 'Raffle.prototype._update' })
+    if (_.isNull(item)) return
+
+    self.participants = item.participants
+  })
+}
+
 Raffles.prototype.registerRaffleKeyword = function (self) {
   if (!_.isNull(self.keyword)) global.parser.unregister('!' + self.keyword)
   global.botDB.findOne({_id: 'raffle'}, function (err, item) {
     if (err) return log.error(err, { fnc: 'Raffles.prototype.registerRaffleKeyword' })
     if (!_.isNull(item)) {
-      global.parser.register(this, '!' + item.keyword, self.participate, constants.VIEWERS)
+      global.parser.register(self, '!' + item.keyword, self.participate, constants.VIEWERS)
       self.keyword = item.keyword
       self.product = item.product
       self.eligibility = item.eligibility
@@ -126,19 +151,35 @@ Raffles.prototype.pick = function (self, sender) {
   })
 }
 
-Raffles.prototype.participate = function (self, sender) {
+Raffles.prototype.participate = function (self, sender, text) {
+  sender['message-type'] = 'whisper'
+  let tickets = parseInt(text.trim(), 10)
+
+  if ((!_.isFinite(tickets) || tickets <= 0 || tickets > self.maxTickets || tickets < self.minTickets) && self.type === TYPE_TICKETS) {
+    global.commons.sendMessage(global.translate('raffle.participation.failed'), sender)
+    return true
+  }
+
+  let curTickets = !_.isNil(self.participants[sender.username]) ? parseInt(self.participants[sender.username].tickets, 10) : 0
+  let newTickets = curTickets + tickets
+
+  if (newTickets > self.maxTickets) { newTickets = self.maxTickets }
+  tickets = newTickets - curTickets
+
   global.botDB.findOne({_id: 'raffle'}, function (err, item) {
     if (err) return log.error(err, { fnc: 'Raffles.prototype.participate' })
     if (!_.isNull(item) && !item.locked) {
-      var participant = { _id: 'raffle_participant_' + sender.username,
+      var participant = {
         eligible: true,
-        forced: false,
-        username: sender.username }
+        tickets: self.type === TYPE_NORMAL ? 1 : newTickets,
+        username: sender.username
+      }
 
       const user = global.users.get(sender.username)
       if (item.eligibility === ELIGIBILITY_FOLLOWERS) {
         participant.eligible = _.isUndefined(user.is.follower) ? false : user.is.follower
       }
+
       if (item.eligibility === ELIGIBILITY_SUBSCRIBERS) {
         participant.eligible = _.isUndefined(user.is.subscriber) ? false : user.is.subscriber
       }
@@ -147,10 +188,15 @@ Raffles.prototype.participate = function (self, sender) {
         participant.eligible = !_.isUndefined(user.time.watched) && (user.time.watched - 3600000) > 0
       }
 
-      sender['message-type'] = 'whisper'
+      if (item.type === TYPE_TICKETS) {
+        participant.eligible = user.points >= tickets
+      }
+
       if (participant.eligible) {
+        if (item.type === TYPE_TICKETS) global.users.set(sender.username, { points: parseInt(user.points, 10) - parseInt(tickets, 10) })
         global.commons.sendMessage(global.translate('raffle.participation.success'), sender)
-        global.botDB.insert(participant)
+        delete self.participants[sender.username]
+        self.participants[sender.username] = participant
       } else {
         global.commons.sendMessage(global.translate('raffle.participation.failed'), sender)
       }
@@ -289,10 +335,8 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
       }
       global.commons.sendMessage(message + '.', sender)
 
-      if (!dashboard) {
-        // remove any participants - don't delete in dashboard
-        global.botDB.remove({ $where: function () { return this._id.startsWith('raffle_participant_') } }, { multi: true })
-      }
+      self.participants = {}
+      self._save(self)
 
       // register raffle keyword
       self.registerRaffleKeyword(self)
@@ -323,6 +367,7 @@ Raffles.prototype.close = function (self, sender, text) {
 
       clearInterval(self.timer)
       global.parser.unregister('!' + item.keyword)
+      self._save(self)
     } else {
       global.commons.sendMessage(global.translate('raffle.close.notRunning'), sender)
     }
