@@ -331,7 +331,7 @@
       this.type = !_.isNull(raffle) && raffle.type ? raffle.type : 0
       $("#rafflesWidgetProduct").val(!_.isNull(raffle) && raffle.product ? raffle.product : '')
       $("#rafflesWatchedTime").val(!_.isNull(raffle) && raffle.watchedTime ? raffle.watchedTime : 0)
-      $("#rafflesMinTickets").val(!_.isNull(raffle) && raffle.minTickets ? raffle.minTickets : 0)
+      $("#rafflesMinTickets").val(!_.isNull(raffle) && raffle.minTickets ? raffle.minTickets : 1)
       $("#rafflesMaxTickets").val(!_.isNull(raffle) && raffle.maxTickets ? raffle.maxTickets : 1000)
       $("#rafflesWidgetKeyword").val(this.keyword)
 
@@ -461,7 +461,7 @@
   })
 
   function validateTickets (el, isMax) {
-    if (!_.isFinite(parseInt(el.val().trim(), 10)) || parseInt(el.val().trim(), 10) < 0) {
+    if (!_.isFinite(parseInt(el.val().trim(), 10)) || parseInt(el.val().trim(), 10) <= 0) {
       el.parent().removeClass().addClass('input-group').addClass('has-error')
     } else el.parent().removeClass().addClass('input-group')
 

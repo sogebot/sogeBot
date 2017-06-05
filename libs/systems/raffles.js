@@ -28,7 +28,7 @@ function Raffles () {
     this.keyword = null
     this.product = null
     this.minWatchedTime = 0
-    this.minTickets = 0
+    this.minTickets = 1
     this.maxTickets = 1000
     this.eligibility = 0
     this.type = 0
