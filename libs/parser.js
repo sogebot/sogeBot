@@ -98,7 +98,7 @@ Parser.prototype.parseCommands = async function (user, message, skip) {
   message = message.trim()
   if (!message.startsWith('!')) return // do nothing, this is not a command
   for (var cmd in this.registeredCmds) {
-    let onlyParams = message.replace(cmd, '')
+    let onlyParams = message.trim().toLowerCase().replace(cmd, '')
     if (message.trim().toLowerCase().startsWith(cmd) && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
       if (this.permissionsCmds[cmd] === constants.DISABLE) break
       if (_.isNil(user) || // if user is null -> we are running command through a bot
