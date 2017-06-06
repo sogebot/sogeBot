@@ -81,13 +81,13 @@ Events.prototype.loadSystemEvents = function (self) {
   ])
   self.events['follow'].push([
     { system: true, name: 'log', message: '(username)', level: 'follow' },
-    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'follow'}
+    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'follow' }
   ])
   self.events['resub'].push([
-    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'resub'}
+    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'resub' }
   ])
   self.events['subscription'].push([
-    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'sub'}
+    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'sub' }
   ])
   self.events['unfollow'].push([
     { system: true, name: 'log', message: '(username)', level: 'unfollow' }
@@ -97,7 +97,7 @@ Events.prototype.loadSystemEvents = function (self) {
   ])
   self.events['hosted'].push([
     { system: true, name: 'log', message: '(username)', level: 'host' },
-    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'host'}
+    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'host' }
   ])
 }
 
@@ -234,12 +234,15 @@ Events.prototype._new = function (self, socket, data) {
 
 Events.prototype._update = function (self) {
   global.botDB.findOne({ _id: 'Events' }, function (err, item) {
-    self.loadSystemEvents(self)
     if (err) return global.log.error(err, { fnc: 'Events.prototype._update' })
-    if (_.isNull(item)) return false
+    if (_.isNull(item)) {
+      self.loadSystemEvents(self)
+      return false
+    }
     _.each(item.events, function (event, name) {
       self.events[name] = event
     })
+    self.loadSystemEvents(self)
   })
 }
 

@@ -97,7 +97,6 @@ Emotes.prototype.parseEmotes = async function (self, emotes) {
       try {
         emotesArray.push(self.fetcher.emotes.get(emotes[i]).toLink(OEmotesSize))
       } catch (e) {
-        console.log(e)
         continue
       }
     }

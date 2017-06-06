@@ -24,23 +24,22 @@
       }
 
       ul {
-          list-style-type: none;
-          text-transform: uppercase;
-          font-size: 1.6em;
-          margin: 0;
-          padding: 0;
-          text-align: right;
+        list-style-type: none;
+        text-transform: uppercase;
+        font-size: 1.6em;
+        margin: 0;
+        padding: 0;
+        text-align: right;
       }
 
       ul li {
         width: 99%;
         margin: 5px;
         margin-left: 0;
-        text-shadow: 0 0 1px #000, 0 0 2px #888
+        text-shadow: 0 0 1px white, 0 0 2px white;
       }
 
       ul li span {
-        vertical-align: bottom;
         font-size: 0.6em;
       }
 
@@ -66,28 +65,7 @@
     </style>
   </head>
   <body>
-    <ul>
-      <li>
-        <strong>fikuss_czlivetv</strong>
-        <span>Host</span>
-      </li>
-        <li>
-          <strong>OkeyeIVJarvan</strong>
-          <span>Follower</span>
-        </li>
-          <li>
-            <strong>sogehige</strong>
-            <span>subscriber</span>
-          </li>
-            <li>
-              <strong>sogehige</strong>
-              <span>Follower</span>
-            </li>
-              <li>
-                <strong>sogehige</strong>
-                <span>Follower</span>
-              </li>
-    </ul>
+    <ul id="eventlist"></ul>
 
     <script src="/dist/jquery/js/jquery.min.js"></script>
     <script src="/dist/lodash/js/lodash.min.js"></script>
@@ -96,12 +74,21 @@
       var socket = io()
 
       setInterval(function () {
-        socket.emit('overlay.stats.get')
+        socket.emit('overlay.eventlist.get')
       }, 1000)
-      socket.on('overlay.stats', function (data) {
-       $("#viewers").text(data.viewers)
-       $("#uptime").text(data.uptime)
-       $("#followers").text(data.followers)
+      socket.on('overlay.eventlist', function (data) {
+        $('#eventlist').empty()
+        data = _.orderBy(data, 'timestamp', 'desc');
+        for (let i = 0; i<5; i++) {
+          if (_.isNil(data[i])) break
+
+          if (data[i].event === 'resub') data[i].event = data[i].months + 'x resub'
+
+          $('#eventlist').append('<li>' +
+            '<strong>' + data[i].username + '</strong> ' +
+            '<span>' + data[i].event + '</span>' +
+          '</li>')
+        }
       })
     </script>
   </body>

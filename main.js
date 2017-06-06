@@ -208,7 +208,3 @@ process.on('unhandledRejection', function (reason, p) {
   global.log.error('Possibly Unhandled Rejection')
   global.log.error(p)
 })
-
-setTimeout(function() {
-  global.events.fire('hosted', { username: 'test' })
-}, 5000)
