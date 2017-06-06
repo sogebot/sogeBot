@@ -26,7 +26,7 @@ EventList.prototype._update = function (self) {
 
 EventList.prototype._save = function (self) {
   let events = { events: self.events }
-  global.botDB.update({ _id: 'eventlist' }, { $set: self.events }, { upsert: true })
+  global.botDB.update({ _id: 'eventlist' }, { $set: events }, { upsert: true })
 }
 
 EventList.prototype._get = function (self, socket) {

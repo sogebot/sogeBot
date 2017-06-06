@@ -23,10 +23,11 @@ function Configuration () {
   global.parser.register(this, '!set list', this.listSets, constants.OWNER_ONLY)
   global.parser.register(this, '!set', this.setValue, constants.OWNER_ONLY)
 
-  this.loadValues()
-
   this.register('lang', '', 'string', 'en')
   this.register('mute', 'core.mute', 'bool', false)
+
+  const self = this
+  setTimeout(function () { global.log.info('Bot is loading configuration data'); self.loadValues() }, 2000)
 }
 
 Configuration.prototype.loadFile = function () {
