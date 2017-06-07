@@ -42,7 +42,9 @@ EventList.prototype.add = function (data) {
   })
 
   // only save when event is not in list for 24h
-  if (_.isNil(event) && (self.events[0].event === data.event && self.events[0].username === data.username && data.event !== 'cheer')) {
+  if (_.isNil(event) || data.type === 'cheer') {
+    if (_.size(self.events) > 0 && self.events[0].event === data.type && self.events[0].username === data.username && data.type !== 'cheer') return
+
     self.events.push({
       event: data.type,
       timestamp: _.now(),
