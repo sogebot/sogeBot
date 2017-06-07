@@ -42,12 +42,13 @@ EventList.prototype.add = function (data) {
   })
 
   // only save when event is not in list for 24h
-  if (_.isNil(event) && !(self.events[0].event === data.event && self.events[0].username === data.username)) {
+  if (_.isNil(event) && !(self.events[0].event === data.event && self.events[0].username === data.username && data.event !== 'cheer')) {
     self.events.push({
       event: data.type,
       timestamp: _.now(),
       username: data.username,
       months: _.isNil(data.months) ? 0 : data.months
+      bits: _.isNil(data.bits) ? 0 : data.bits
     })
   }
   // store only 20 last events

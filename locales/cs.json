@@ -52,6 +52,7 @@
     "overlays-eventlist-host": "host",
     "overlays-eventlist-sub": "sub",
     "overlays-eventlist-follow": "follow",
+    "overlays-eventlist-cheer": "bits",
     "description": "Popisek",
     "raffle-type": "Typ raffle",
     "raffle-type-keywords": "Pouze keyword",

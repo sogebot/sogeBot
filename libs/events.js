@@ -99,6 +99,9 @@ Events.prototype.loadSystemEvents = function (self) {
     { system: true, name: 'log', message: '(username)', level: 'host' },
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'host' }
   ])
+  self.events['cheer'].push([
+    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'cheer' }
+  ])
 }
 
 Events.prototype._webpanel = function (self) {
