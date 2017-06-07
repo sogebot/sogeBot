@@ -25,20 +25,18 @@
 </div>
 
 <script>
-    $.getScript("http://player.twitch.tv/js/embed/v1.js", function() {
-      socket.emit('getTwitchVideo')
-    })
+  $.getScript("http://player.twitch.tv/js/embed/v1.js", function() {
+    socket.emit('getTwitchVideo')
+  })
 
-    socket.off('twitchVideo')
-    socket.on('twitchVideo', function(room) {
-      if (loadedJS.indexOf('twitch') === -1) {
-        loadedJS.push('twitch')
-        $("#twitchVideoWidget").empty()
-        var player = new Twitch.Player("twitchVideoWidget", {width: "100%", channel: room})
-        player.addEventListener(Twitch.Player.ONLINE, function () {
-          player.play()
-        })
-      }
-    })
-  }
+  socket.once('twitchVideo', function(room) {
+    if (loadedJS.indexOf('twitch') === -1) {
+      loadedJS.push('twitch')
+      $("#twitchVideoWidget").empty()
+      var player = new Twitch.Player("twitchVideoWidget", {width: "100%", channel: room})
+      player.addEventListener(Twitch.Player.ONLINE, function () {
+        player.play()
+      })
+    }
+  })
 </script>
