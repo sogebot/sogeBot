@@ -31,7 +31,7 @@ Commons.prototype.updateOrInsert = function (data) {
   var toFind = this.getObjectToFind(data)
   var toInsert = this.stripUnderscores(data)
   var self = this
-  global.botDB.remove(toFind)
+  global.botDB.remove(toFind, { multi: true })
   global.botDB.insert(toInsert)
   self.runCallback(callbacks.success, data)
 }
