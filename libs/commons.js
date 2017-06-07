@@ -59,7 +59,7 @@ Commons.prototype.getObjectToFind = function (data) {
 Commons.prototype.stripUnderscores = function (data) {
   var Object = {}
   for (var index in data) {
-    if (data.hasOwnProperty(index) && !(index === 'success' || index === 'error')) {
+    if (data.hasOwnProperty(index) && !(index === 'success' || index === 'error' || index === '_quiet')) {
       var i = (index.startsWith('_') ? index.slice(1) : index)
       Object[i] = data[index]
     }
