@@ -48,6 +48,10 @@
     }
   },
   "webpanel": {
+    "overlays-eventlist-resub": "resub",
+    "overlays-eventlist-host": "host",
+    "overlays-eventlist-sub": "sub",
+    "overlays-eventlist-follow": "follow",
     "description": "Description",
     "raffle-type": "Raffle type",
     "raffle-type-keywords": "Only keyword",

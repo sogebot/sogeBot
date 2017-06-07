@@ -73,7 +73,11 @@
     <script>
       var socket = io()
 
-      socket.emit('overlay.eventlist.get')
+      var translations = {}
+      socket.on('lang', function (data) {
+        translations = data
+        socket.emit('overlay.eventlist.get')
+      })
 
       socket.on('overlay.eventlist', function (data) {
         $('#eventlist').empty()
@@ -81,7 +85,8 @@
         for (let i = 0; i<5; i++) {
           if (_.isNil(data[i])) break
 
-          if (data[i].event === 'resub') data[i].event = data[i].months + 'x resub'
+          if (data[i].event === 'resub') data[i].event = data[i].months + 'x ' + translations['overlays-eventlist-resub']
+          else data[i].event = translations['overlays-eventlist-' + data[i].event]
 
           $('#eventlist').append('<li>' +
             '<strong>' + data[i].username + '</strong> ' +
