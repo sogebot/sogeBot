@@ -41,7 +41,8 @@ EventList.prototype.add = function (data) {
     return o.event === data.type && o.username === data.username && _.now() - o.timestamp < 1000 * 60 * 60 * 24
   })
 
-  if (_.isNil(event)) { // only save when event is not in list for 24h
+  // only save when event is not in list for 24h
+  if (_.isNil(event) && !(self.events[0].event === data.event && self.events[0].username === data.username)) {
     self.events.push({
       event: data.type,
       timestamp: _.now(),
