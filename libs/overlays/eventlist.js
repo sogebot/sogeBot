@@ -27,10 +27,11 @@ EventList.prototype._update = function (self) {
 EventList.prototype._save = function (self) {
   let events = { events: self.events }
   global.botDB.update({ _id: 'eventlist' }, { $set: events }, { upsert: true })
+  self._get(self)
 }
 
-EventList.prototype._get = function (self, socket) {
-  socket.emit('overlay.eventlist', self.events)
+EventList.prototype._get = function (self) {
+  global.panel.io.emit('overlay.eventlist', self.events)
 }
 
 EventList.prototype.add = function (data) {
