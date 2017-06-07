@@ -38,16 +38,16 @@ EventList.prototype.add = function (data) {
   const self = global.overlays.eventlist
 
   const event = _.find(self.events, function (o) {
-    return o.event === data.type && o.username === data.username && _.now() - o.timestamp < 1000 * 60 * 60 * 24
+    return o.event === data.type && o.username === data.username && _.now() - o.timestamp < 1000 * 60 * 60 * 24 && data.event !== 'cheer'
   })
 
   // only save when event is not in list for 24h
-  if (_.isNil(event) && !(self.events[0].event === data.event && self.events[0].username === data.username && data.event !== 'cheer')) {
+  if (_.isNil(event) && (self.events[0].event === data.event && self.events[0].username === data.username && data.event !== 'cheer')) {
     self.events.push({
       event: data.type,
       timestamp: _.now(),
       username: data.username,
-      months: _.isNil(data.months) ? 0 : data.months
+      months: _.isNil(data.months) ? 0 : data.months,
       bits: _.isNil(data.bits) ? 0 : data.bits
     })
   }
