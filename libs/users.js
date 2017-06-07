@@ -98,6 +98,7 @@ Users.prototype.merge = function (self, sender, text) {
 
 Users.prototype.get = function (username) {
   var self = this
+  username = username.toLowerCase()
 
   if (_.isNil(username)) global.log.error('username is NULL!\n' + new Error().stack)
   if (username === global.configuration.get().twitch.username || _.isNil(self.users) || _.isNil(username)) {
