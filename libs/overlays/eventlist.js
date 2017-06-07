@@ -36,13 +36,18 @@ EventList.prototype._get = function (self, socket) {
 EventList.prototype.add = function (data) {
   const self = global.overlays.eventlist
 
-  self.events.push({
-    event: data.type,
-    timestamp: _.now(),
-    username: data.username,
-    months: _.isNil(data.months) ? 0 : data.months
+  const event = _.find(self.events, function (o) {
+    return o.event === data.type && o.username === data.username && _.now() - o.timestamp < 1000 * 60 * 60 * 24
   })
 
+  if (_.isNil(event)) { // only save when event is not in list for 24h
+    self.events.push({
+      event: data.type,
+      timestamp: _.now(),
+      username: data.username,
+      months: _.isNil(data.months) ? 0 : data.months
+    })
+  }
   // store only 20 last events
   self.events = _.chunk(_.orderBy(self.events, 'timestamp', 'desc'), 20)[0]
 }
