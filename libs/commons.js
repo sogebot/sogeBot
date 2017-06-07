@@ -83,8 +83,7 @@ Commons.prototype.runCallback = function (cb, data) {
   if (_.isUndefined(cb)) return
   if (data._type === 'settings') {
     if (typeof cb === 'function') cb(data)
-    else if (!value.quiet) {
-      delete value.quiet
+    else if (!data._quiet) {
       this.sendToOwners(global.translate(cb).replace('(value)', value[Object.keys(value)[0]]))
     }
   } else {
