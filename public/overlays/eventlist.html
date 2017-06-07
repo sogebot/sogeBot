@@ -86,6 +86,7 @@
           if (_.isNil(data[i])) break
 
           if (data[i].event === 'resub') data[i].event = data[i].months + 'x ' + translations['overlays-eventlist-resub']
+          else if (data[i].event === 'cheer') data[i].event = data[i].bits + ' ' + translations['overlays-eventlist-cheer']
           else data[i].event = translations['overlays-eventlist-' + data[i].event]
 
           $('#eventlist').append('<li>' +
