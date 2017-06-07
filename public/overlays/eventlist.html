@@ -73,9 +73,8 @@
     <script>
       var socket = io()
 
-      setInterval(function () {
-        socket.emit('overlay.eventlist.get')
-      }, 1000)
+      socket.emit('overlay.eventlist.get')
+
       socket.on('overlay.eventlist', function (data) {
         $('#eventlist').empty()
         data = _.orderBy(data, 'timestamp', 'desc');
