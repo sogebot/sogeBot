@@ -360,7 +360,7 @@ Twitch.prototype.lastseenUpdate = function (self, id, sender, text) {
 Twitch.prototype.followage = function (self, sender, text) {
   let username
   let parsed = text.match(/^(\S?)+$/g)
-  if (parsed[0].length > 0) username = parsed[0]
+  if (parsed[0].length > 0) username = parsed[0].toLowerCase()
   else username = sender.username
 
   global.users.isFollower(username)
