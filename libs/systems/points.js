@@ -124,17 +124,17 @@ Points.prototype.givePoints = function (self, sender, text) {
     if (parseInt(user.points, 10) >= givePts) {
       let availablePts = user.points
       global.users.set(sender.username, { points: availablePts - givePts })
-      global.users.set(parsed[2], { points:
+      global.users.set(user2.username, { points:
         (_.isFinite(parseInt(user2.points, 10)) && _.isNumber(parseInt(user2.points, 10))
         ? parseInt(user2.points, 10) + givePts : givePts) })
       global.commons.sendMessage(global.translate('points.success.give')
         .replace('(amount)', givePts)
-        .replace('(username)', parsed[1])
+        .replace('(username)', user2.username)
         .replace('(pointsName)', self.getPointsName(givePts)), sender)
     } else {
       global.commons.sendMessage(global.translate('points.failed.giveNotEnough')
       .replace('(amount)', givePts)
-      .replace('(username)', parsed[1])
+      .replace('(username)', user2.username)
       .replace('(pointsName)', self.getPointsName(givePts)), sender)
     }
   } catch (err) {
