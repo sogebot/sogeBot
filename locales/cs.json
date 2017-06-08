@@ -192,6 +192,7 @@
     "points-per-interval": "Bodů za interval",
     "points-interval-offline": "Interval bodů (offline)",
     "points-per-interval-offline": "Bodů za interval (offline)",
+    "points-per-message": "Bodů za zprávu",
     "interval": "Interval",
     "number": "číslo",
     "minimal-messages-required": "Minimální počet zpráv",
@@ -482,6 +483,7 @@
       "pointsResponse": "Odpoved na body nastavena na: (value)",
       "pointsInterval": "Interval ziskavani bodu online je (value) minut",
       "pointsPerInterval": "Pocet bodu ziskano za interval online je (value)",
+      "pointsPerMessage": "Pocet bodu ziskanych za zpravu je (value)",
       "pointsIntervalOffline": "Interval ziskavani bodu offline je (value) minut",
       "pointsPerIntervalOffline": "Pocet bodu ziskano za interval offline je (value)"
     },
