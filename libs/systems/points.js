@@ -133,8 +133,8 @@ Points.prototype.givePoints = function (self, sender, text) {
     const user2 = global.users.get(parsed[1])
     if (parseInt(user.points, 10) >= givePts) {
       let availablePts = user.points
-      
-      if (user.username !== user2.username) { 
+
+      if (user.username !== user2.username) {
         global.users.set(sender.username, { points: availablePts - givePts })
         global.users.set(user2.username, { points:
           (_.isFinite(parseInt(user2.points, 10)) && _.isNumber(parseInt(user2.points, 10))
