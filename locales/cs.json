@@ -48,6 +48,15 @@
     }
   },
   "webpanel": {
+    "events-user-triggered-event": "uživatel, který spustil event",
+    "events-method-used-to-subscribe": "metoda použita pro subscribe",
+    "events-months-of-subscription": "počet měsíců",
+    "events-user-message": "zpráva uživatele",
+    "events-bits-user-sent": "počet poslaných bitů",
+    "events-reason-for-ban-timeout": "důvod pro ban/timeout",
+    "events-duration-of-timeout": "doba trvání timeoutu",
+    "events-target-of-your-hosting": "koho hostuješ",
+    "events-viewers-of-your-hosting": "diváků při tvém hostingu",
     "overlays-eventlist-resub": "resub",
     "overlays-eventlist-host": "host",
     "overlays-eventlist-sub": "sub",
