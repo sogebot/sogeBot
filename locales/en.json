@@ -193,6 +193,7 @@
     "points-per-interval": "Points per Interval",
     "points-interval-offline": "Points Interval (offline)",
     "points-per-interval-offline": "Points per Interval (offline)",
+    "points-per-message": "Points per Message",
     "interval": "Interval",
     "number": "number",
     "minimal-messages-required": "Minimal Messages Required",
@@ -482,6 +483,7 @@
       "pointsResponse": "Points response was changed to: (value)",
       "pointsInterval": "Points online interval set to (value) minutes",
       "pointsPerInterval": "Points when online was set to (value) per online interval",
+      "pointsPerMessage": "Points per message was set to (value)",
       "pointsIntervalOffline": "Points offline interval set to (value) minutes",
       "pointsPerIntervalOffline": "Points when offline was set to (value) per offline interval"
     },

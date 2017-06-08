@@ -23,6 +23,9 @@ function Points () {
     global.configuration.register('pointsPerInterval', 'points.settings.pointsPerInterval', 'number', 1)
     global.configuration.register('pointsIntervalOffline', 'points.settings.pointsIntervalOffline', 'number', 30)
     global.configuration.register('pointsPerIntervalOffline', 'points.settings.pointsPerIntervalOffline', 'number', 1)
+    global.configuration.register('pointsPerMessage', 'points.settings.pointsPerMessage', 'number', 0)
+
+    global.parser.registerParser(this, '9-points', this.messagePoints, constants.VIEWERS)
 
     // add events for join/part
     var self = this
@@ -72,7 +75,8 @@ Points.prototype.sendConfiguration = function (self, socket) {
     pointsInterval: global.configuration.getValue('pointsInterval'),
     pointsPerInterval: global.configuration.getValue('pointsPerInterval'),
     pointsIntervalOffline: global.configuration.getValue('pointsIntervalOffline'),
-    pointsPerIntervalOffline: global.configuration.getValue('pointsPerIntervalOffline')
+    pointsPerIntervalOffline: global.configuration.getValue('pointsPerIntervalOffline'),
+    pointsPerMessage: global.configuration.getValue('pointsPerMessage')
   })
 }
 
@@ -82,6 +86,19 @@ Points.prototype.addEvents = function (self) {
       self.startCounting(username)
     }
   })
+}
+
+Points.prototype.messagePoints = function (self, id, sender, text, skip) {
+  if (skip || text.startsWith('!')) {
+    global.updateQueue(id, true)
+    return
+  }
+
+  var givePts = parseInt(global.configuration.getValue('pointsPerMessage'), 10)
+  var availablePts = parseInt(global.users.get(sender.username).points, 10)
+  global.users.set(sender.username, { points: (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts) })
+
+  global.updateQueue(id, true)
 }
 
 Points.prototype.setPoints = function (self, sender, text) {
