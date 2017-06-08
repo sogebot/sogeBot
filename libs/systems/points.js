@@ -23,7 +23,8 @@ function Points () {
     global.configuration.register('pointsPerInterval', 'points.settings.pointsPerInterval', 'number', 1)
     global.configuration.register('pointsIntervalOffline', 'points.settings.pointsIntervalOffline', 'number', 30)
     global.configuration.register('pointsPerIntervalOffline', 'points.settings.pointsPerIntervalOffline', 'number', 1)
-    global.configuration.register('pointsPerMessage', 'points.settings.pointsPerMessage', 'number', 0)
+    global.configuration.register('pointsMessageInterval', 'points.settings.pointsMessageInterval', 'number', 5)
+    global.configuration.register('pointsPerMessageInterval', 'points.settings.pointsPerMessageInterval', 'number', 1)
 
     global.parser.registerParser(this, '9-points', this.messagePoints, constants.VIEWERS)
 
@@ -76,7 +77,8 @@ Points.prototype.sendConfiguration = function (self, socket) {
     pointsPerInterval: global.configuration.getValue('pointsPerInterval'),
     pointsIntervalOffline: global.configuration.getValue('pointsIntervalOffline'),
     pointsPerIntervalOffline: global.configuration.getValue('pointsPerIntervalOffline'),
-    pointsPerMessage: global.configuration.getValue('pointsPerMessage')
+    pointsMessageInterval: global.configuration.getValue('pointsMessageInterval'),
+    pointsPerMessageInterval: global.configuration.getValue('pointsPerMessageInterval')
   })
 }
 
@@ -94,10 +96,18 @@ Points.prototype.messagePoints = function (self, id, sender, text, skip) {
     return
   }
 
-  var givePts = parseInt(global.configuration.getValue('pointsPerMessage'), 10)
-  var availablePts = parseInt(global.users.get(sender.username).points, 10)
-  global.users.set(sender.username, { points: (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts) })
+  const points = parseInt(global.configuration.getValue('pointsPerMessageInterval'), 10)
+  const interval = parseInt(global.configuration.getValue('pointsMessageInterval'), 10)
+  const user = global.users.get(sender.username)
 
+  let lastMessageCount = _.isNil(user.custom.lastMessagePoints) ? 0 : user.custom.lastMessagePoints
+
+  if (lastMessageCount + interval <= user.stats.messages) {
+    global.users.set(sender.username, {
+      points: (_.isFinite(user.points) && _.isNumber(user.points) ? user.points + points : points),
+      custom: { lastMessagePoints: user.stats.messages }
+    })
+  }
   global.updateQueue(id, true)
 }
 

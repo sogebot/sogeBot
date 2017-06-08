@@ -63,12 +63,22 @@
         </td>
       </tr>
       <tr>
+        <td><strong data-lang="points-per-message-interval"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="pointsMessageInterval" onclick="commons.configEditable(this, '')" id="configPointsMessageInterval"></abbr>
+          <div class="input-group" style="display:none;" id="input_pointsMessageInterval_group">
+            <div class="input-group-addon" data-lang="points"></div>
+            <input id="input_pointsMessageInterval" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
         <td><strong data-lang="points-per-message"></strong></td>
         <td>
-          <abbr title="click to edit" data-config-id="pointsPerMessage" onclick="commons.configEditable(this, '')" id="configPointsPerMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_pointsPerMessage_group">
+          <abbr title="click to edit" data-config-id="pointsPerMessageInterval" onclick="commons.configEditable(this, '')" id="configPointsPerMessageInterval"></abbr>
+          <div class="input-group" style="display:none;" id="input_pointsPerMessageInterval_group">
             <div class="input-group-addon" data-lang="points"></div>
-            <input id="input_pointsPerMessage" class="form-control input-sm" type="text"/>
+            <input id="input_pointsPerMessageInterval" class="form-control input-sm" type="text"/>
           </div>
         </td>
       </tr>
@@ -233,7 +243,8 @@
     $("#configPointsPerInterval").text(data.pointsPerInterval)
     $("#configPointsIntervalOffline").text(data.pointsIntervalOffline + 'min')
     $("#configPointsPerIntervalOffline").text(data.pointsPerIntervalOffline)
-    $("#configPointsPerMessage").text(data.pointsPerMessage)
+    $("#configPointsMessageInterval").text(data.pointsMessageInterval)
+    $("#configPointsPerMessageInterval").text(data.pointsPerMessageInterval)
   })
 
   socket.off('noticesConfiguration')
