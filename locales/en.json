@@ -48,6 +48,15 @@
     }
   },
   "webpanel": {
+    "events-user-triggered-event": "user triggered event",
+    "events-method-used-to-subscribe": "method used to subscribe",
+    "events-months-of-subscription": "months of subscription",
+    "events-user-message": "user message",
+    "events-bits-user-sent": "bits user sent",
+    "events-reason-for-ban-timeout": "reason for ban/timeout",
+    "events-duration-of-timeout": "duration of timeout",
+    "events-target-of-your-hosting": "target of your hosting",
+    "events-viewers-of-your-hosting": "viewers of your hosting",
     "overlays-eventlist-resub": "resub",
     "overlays-eventlist-host": "host",
     "overlays-eventlist-sub": "sub",
