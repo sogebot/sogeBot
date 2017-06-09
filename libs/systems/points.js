@@ -47,10 +47,15 @@ Points.prototype.webPanel = function () {
 
   global.panel.socketListening(this, 'setPoints', this.setSocket)
   global.panel.socketListening(this, 'getPointsConfiguration', this.sendConfiguration)
+  global.panel.socketListening(this, 'resetPoints', this.resetPoints)
 }
 
 Points.prototype.setSocket = function (self, socket, data) {
   self.setPoints(self, {username: global.configuration.get().twitch.channel}, data.username + ' ' + data.value) // we want to show this in chat
+}
+
+Points.prototype.resetPoints = function (self, socket, data) {
+  global.users.setAll({points: 0})
 }
 
 Points.prototype.sendConfiguration = function (self, socket) {
