@@ -83,7 +83,7 @@ Gambling.prototype.duel = function (self, sender, text) {
     if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
 
     const user = global.users.get(sender.username)
-    if (_.isNil(user.points) || user.points <= points) throw Error(ERROR_NOT_ENOUGH_POINTS)
+    if (_.isNil(user.points) || user.points < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
     global.users.set(sender.username, { points: parseInt(user.points, 10) - parseInt(points, 10) })
 
     // check if user is already in duel and add points
@@ -154,7 +154,7 @@ Gambling.prototype.gamble = function (self, sender, text) {
     if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
 
     const user = global.users.get(sender.username)
-    if (_.isNil(user.points) || user.points <= points) throw Error(ERROR_NOT_ENOUGH_POINTS)
+    if (_.isNil(user.points) || user.points < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
 
     global.users.set(sender.username, { points: parseInt(user.points, 10) - parseInt(points, 10) })
     if (_.random(0, 1)) {
