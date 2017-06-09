@@ -48,6 +48,8 @@
     }
   },
   "webpanel": {
+    "viewers-reset-attributes": "Vymazat data",
+    "viewers-points-of-all-users": "Body všech uživatelů",
     "events-user-triggered-event": "uživatel, který spustil event",
     "events-method-used-to-subscribe": "metoda použita pro subscribe",
     "events-months-of-subscription": "počet měsíců",

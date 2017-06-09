@@ -48,6 +48,8 @@
     }
   },
   "webpanel": {
+    "viewers-reset-attributes": "Reset attributes",
+    "viewers-points-of-all-users": "Points of all users",
     "events-user-triggered-event": "user triggered event",
     "events-method-used-to-subscribe": "method used to subscribe",
     "events-months-of-subscription": "months of subscription",

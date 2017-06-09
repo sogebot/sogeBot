@@ -2,6 +2,13 @@
   <div class="widget">
     <h2 class="title" data-lang="viewers"></h2>
     <ul class="paging"></ul>
+    <div class="dropdown pull-right" style="margin-top:10px;">
+      <button class="btn btn-danger dropdown-toggle" type="button" data-toggle="dropdown"><span data-lang="viewers-reset-attributes"></span>
+      <span class="caret"></span></button>
+      <ul class="dropdown-menu" style="font-variant: small-caps">
+        <li><a href="#" id="reset-points-of-all-users" data-lang="viewers-points-of-all-users"></a></li>
+      </ul>
+    </div>
     <input type="text" class="form-control form-search" placeholder="Search by username" id="viewersSearch" onkeyup="viewers.updateSearch()">
     <table class="table table-striped table-responsive table-condensed">
       <thead>
@@ -28,6 +35,13 @@
   if(!systems.points) {
     $("#viewers-points").remove()
   }
+
+  $("#reset-points-of-all-users").off('click')
+  $("#reset-points-of-all-users").on('click', function (ev) {
+    ev.preventDefault()
+    socket.emit('resetPoints')
+    setTimeout(function () { socket.emit('getViewers') }, 1000)
+  })
 
   var viewers = {
     sortBy: 'username',
