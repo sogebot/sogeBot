@@ -76,6 +76,17 @@ function Events () {
 }
 
 Events.prototype.loadSystemEvents = function (self) {
+  // remove all system events
+  _.each(self.events, function (o, n) {
+    _.each(o, function (v, i) {
+      _.each(v, function (v2, i2) {
+        if (v2.system) {
+          _.pull(self.events[n], v)
+        }
+      })
+    })
+  })
+
   self.events['timeout'].push([
     { system: true, name: 'log', message: '(username), reason: (reason), duration: (duration)', level: 'timeout' }
   ])
