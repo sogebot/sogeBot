@@ -210,7 +210,7 @@ Moderation.prototype.symbols = function (self, id, sender, text, skip) {
   var msgLength = text.trim().length
   var symbolsLength = 0
 
-  if (skip || global.parser.isOwner(sender) || sender.mod || msgLength <= triggerLength || !global.configuration.getValue('moderationSymbols') || (sender.subscriber && !global.configuration.getValue('moderationSymbolsSubs'))) {
+  if (skip || global.parser.isOwner(sender) || sender.mod || msgLength < triggerLength || !global.configuration.getValue('moderationSymbols') || (sender.subscriber && !global.configuration.getValue('moderationSymbolsSubs'))) {
     global.updateQueue(id, true)
     return
   }
@@ -263,7 +263,7 @@ Moderation.prototype.caps = function (self, id, sender, text, skip) {
   var msgLength = text.trim().length
   var capsLength = 0
 
-  if (skip || global.parser.isOwner(sender) || sender.mod || msgLength <= triggerLength || !global.configuration.getValue('moderationCaps') || (sender.subscriber && !global.configuration.getValue('moderationCapsSubs'))) {
+  if (skip || global.parser.isOwner(sender) || sender.mod || msgLength < triggerLength || !global.configuration.getValue('moderationCaps') || (sender.subscriber && !global.configuration.getValue('moderationCapsSubs'))) {
     global.updateQueue(id, true)
     return
   }
@@ -291,7 +291,7 @@ Moderation.prototype.spam = function (self, id, sender, text, skip) {
 
   var msgLength = text.trim().length
 
-  if (skip || global.parser.isOwner(sender) || sender.mod || msgLength <= triggerLength || !global.configuration.getValue('moderationSpam') || (sender.subscriber && !global.configuration.getValue('moderationSpamSubs'))) {
+  if (skip || global.parser.isOwner(sender) || sender.mod || msgLength < triggerLength || !global.configuration.getValue('moderationSpam') || (sender.subscriber && !global.configuration.getValue('moderationSpamSubs'))) {
     global.updateQueue(id, true)
     return
   }
