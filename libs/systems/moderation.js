@@ -268,7 +268,8 @@ Moderation.prototype.caps = function (self, id, sender, text, skip) {
     return
   }
 
-  const withoutSymbols = text.replace(/[^\w\s]/gi, '')
+  const regexp = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-./:;<=>?@[\]^_`{|}~]/gi
+  const withoutSymbols = text.replace(regexp, '')
   for (let i = 0; i < withoutSymbols.length; i++) {
     if (!_.isFinite(parseInt(withoutSymbols.charAt(i), 10)) && withoutSymbols.charAt(i).toUpperCase() === withoutSymbols.charAt(i)) capsLength += 1
   }
