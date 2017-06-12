@@ -26,6 +26,8 @@ function Events () {
     'timeout': [], // (username), (reason), (duration)
     'every-x-seconds': [] // needs definition = { definition: true, tTrigerred: new Date(), tCount: 60 }
   }
+  this.eventsTemplate = _.cloneDeep(this.events)
+
   this.operations = {
     'send-chat-message': function (attr) {
       if (_.isNil(attr.send)) return
@@ -75,17 +77,21 @@ function Events () {
   this._webpanel(this)
 }
 
-Events.prototype.loadSystemEvents = function (self) {
-  // remove all system events
-  _.each(self.events, function (o, n) {
-    _.each(o, function (v, i) {
-      _.each(v, function (v2, i2) {
-        if (v2.system) {
-          _.pull(self.events[n], v)
-        }
+Events.prototype.removeSystemEvents = function (self) {
+  let nonSystemEvents = _.cloneDeep(self.eventsTemplate)
+  _.each(self.events, function (events, n) {
+    _.each(events, function (event, index) {
+      let filtered = _.filter(event, function (o, i) {
+        return !o.system
       })
+      if (filtered.length > 0) nonSystemEvents[n].push(event)
     })
   })
+  return nonSystemEvents
+}
+
+Events.prototype.loadSystemEvents = function (self) {
+  self.events = self.removeSystemEvents(self)
 
   self.events['timeout'].push([
     { system: true, name: 'log', message: '(username), reason: (reason), duration: (duration)', level: 'timeout' }
@@ -261,20 +267,12 @@ Events.prototype._update = function (self) {
 }
 
 Events.prototype._save = function (self) {
-  let save = {}
-
-  _.each(self.events, function (o, n) {
-    _.each(o, function (v) {
-      _.each(v, function (v2) {
-        if (!v2.system) save[n] = self.events[n]
-      })
-    })
-  })
-
   var events = {
-    events: save
+    _id: 'Events',
+    events: self.removeSystemEvents(self)
   }
-  global.botDB.update({ _id: 'Events' }, { $set: events }, { upsert: true })
+  global.botDB.remove({ _id: 'Events' })
+  global.botDB.insert(events)
 }
 
 Events.prototype.fire = function (event, attr) {
