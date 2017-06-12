@@ -3,6 +3,7 @@
 // 3rd party libraries
 var irc = require('tmi.js')
 var _ = require('lodash')
+var ON_DEATH = require('death')
 
 // bot libraries
 var Configuration = require('./libs/configuration')
@@ -207,4 +208,13 @@ if (global.configuration.get().bot.debug) {
 process.on('unhandledRejection', function (reason, p) {
   global.log.error('Possibly Unhandled Rejection')
   global.log.error(p)
+})
+
+ON_DEATH(function (signal, err) {
+  global.log.error('Caught TERM signal - saving users...')
+  global.users.changes += 500
+  global.users._save(global.users)
+  setTimeout(function () {
+    process.exit()
+  }, 5000)
 })
