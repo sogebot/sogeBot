@@ -382,6 +382,18 @@ describe('System - Moderation', function () {
         expect(global.timeouts).to.contain('soge: {missing_translation: en.moderation.caps} 120')
       })
     })
+    describe('ЙЦУЦЙУЙЦУЙЦУЙЦУЙЦУЙЦ', function () {
+      before(function (done) {
+        global.parser.parse(testUser2, 'ЙЦУЦЙУЙЦУЙЦУЙЦУЙЦУЙЦ')
+        setTimeout(function () { done() }, 500)
+      })
+      after(function () {
+        global.timeouts = []
+      })
+      it('timeout user', function () {
+        expect(global.timeouts).to.contain('soge: {missing_translation: en.moderation.caps} 120')
+      })
+    })
     describe('123123123213123123123123213123', function () {
       before(function (done) {
         global.parser.parse(testUser2, '123123123213123123123123213123')
