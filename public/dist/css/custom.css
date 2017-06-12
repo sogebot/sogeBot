@@ -507,7 +507,7 @@ a.soundboard-list-group-item span {
 
 @media (min-width: 400px) {
   a.soundboard-list-group-item {
-    width: 33.3%;
+    width: 25%;
   }
 }
 
