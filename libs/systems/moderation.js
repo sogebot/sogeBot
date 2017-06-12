@@ -267,12 +267,12 @@ Moderation.prototype.caps = function (self, id, sender, text, skip) {
     global.updateQueue(id, true)
     return
   }
-  var out = text.match(/([A-Z]+)/g)
-  for (var item in out) {
-    if (out.hasOwnProperty(item)) {
-      capsLength = capsLength + out[item].length
-    }
+
+  const withoutSymbols = text.replace(/[^\w\s]/gi, '')
+  for (let i = 0; i < withoutSymbols.length; i++) {
+    if (!_.isFinite(parseInt(withoutSymbols.charAt(i), 10)) && withoutSymbols.charAt(i).toUpperCase() === withoutSymbols.charAt(i)) capsLength += 1
   }
+
   if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
     global.updateQueue(id, false)
     log.info(sender.username + ' [caps] ' + timeout + 's timeout: ' + text)
