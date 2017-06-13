@@ -296,7 +296,7 @@ Twitch.prototype.sendStats = function (self, socket) {
     uptime: self.getTime(self.when.online, false),
     currentViewers: self.currentViewers,
     maxViewers: self.maxViewers,
-    chatMessages: messages > 20000 ? (messages / 1000) + 'k' : messages,
+    chatMessages: messages,
     currentFollowers: self.currentFollowers,
     currentViews: self.currentViews,
     newChatters: self.newChatters,

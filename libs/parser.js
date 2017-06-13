@@ -26,7 +26,7 @@ function Parser () {
   var self = this
   setInterval(function () {
     if (self.messages.length > 0) {
-      let messages = self.messages
+      let messages = _.cloneDeep(self.messages)
       self.messages = []
 
       _.each(messages, function (message) {
