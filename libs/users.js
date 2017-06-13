@@ -53,18 +53,7 @@ Users.prototype._save = function (self) {
     self.changes = 0
     var users = { _id: 'users', users: self.users }
 
-    global.botDB.remove({ _id: 'users' }, function (err) {
-      if (err) {
-        global.log.error(err, 'Users._save#1')
-        return err
-      }
-      global.botDB.insert(users, function (err) {
-        if (err) {
-          global.log.error(err, 'Users._save#2')
-          return err
-        }
-      })
-    })
+    global.botDB.update({ _id: 'users' }, users)
     global.botDB.persistence.compactDatafile()
   }
 }
