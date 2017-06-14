@@ -86,7 +86,7 @@
       socket.emit('cooldown.edit', {id: id, seconds: value})
     },
     toggle: function (el) {
-      socket.emit('cooldown.toggle', el.dataset.index)
+      socket.emit('cooldown.toggle', el.dataset.cooldown)
     },
     delete: function (el) {
       socket.emit('cooldown.set', {command: el.dataset.command, seconds: 0})
