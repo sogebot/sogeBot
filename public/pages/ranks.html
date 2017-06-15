@@ -34,7 +34,7 @@
       </div>
       <div class="form-group">
         <div class="col-xs-12 col-sm-12 text-center">
-          <button type="submit" class="btn btn-primary" onclick="ranks.create(event)" data-lang="confirm"></button>
+          <button class="btn btn-primary" onclick="ranks.create(event)" data-lang="confirm"></button>
         </div>
       </div>
     </form>
@@ -43,12 +43,15 @@
 
 <script>
   var ranks = {
+    edit: function (id, value) {
+      socket.emit('ranks.edit', {id: id, value: value})
+    },
     update: function (list) {
       $("#Ranks").empty()
       _.each(list, function(item, index) {
         $("#Ranks").append('<tr>' +
           '<td>' + item.hours + '</td>' +
-          '<td>' + item.rank + '</td>' +
+          '<td>' + commons.editable(item.rank, item.hours, 'ranks.edit') + '</td>' +
           '<td class="tableMenu">' +
           '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
           '<button type="button" style="display: none" class="btn btn-success btn-confirm" onclick="ranks.delete(this)" data-hours="' + item.hours + '"><span class="glyphicon glyphicon-ok"></span></button>' +

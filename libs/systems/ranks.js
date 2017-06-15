@@ -40,6 +40,7 @@ Ranks.prototype.webPanel = function () {
   global.panel.socketListening(this, 'getRanks', this.listSocket)
   global.panel.socketListening(this, 'deleteRank', this.deleteSocket)
   global.panel.socketListening(this, 'createRank', this.createSocket)
+  global.panel.socketListening(this, 'ranks.edit', this.editSocket)
 }
 
 Ranks.prototype.listSocket = function (self, socket) {
@@ -47,6 +48,12 @@ Ranks.prototype.listSocket = function (self, socket) {
     if (err) { log.error(err, { fnc: 'Ranks.prototype.listSocket' }) }
     socket.emit('Ranks', items)
   })
+}
+
+Ranks.prototype.editSocket = function (self, socket, data) {
+  if (data.value.length === 0) self.remove(self, null, data.id)
+  else global.botDB.update({ _id: 'rank_' + data.id }, { rank: data.value })
+  self.listSocket(self, socket)
 }
 
 Ranks.prototype.deleteSocket = function (self, socket, data) {
