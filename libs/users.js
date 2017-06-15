@@ -179,6 +179,7 @@ Users.prototype.set = function (username, object, silent = false) {
   if (_.isNil(username)) global.log.error('username is NULL!\n' + new Error().stack)
   if (username === global.configuration.get().twitch.username || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
 
+  username = username.toLowerCase()
   let user = this.get(username)
   _.merge(user, object)
   this.users[username] = user
