@@ -614,7 +614,8 @@
   },
   "top": {
     "listWatched": "Top (amount) (watch time): ",
-    "listPoints": "Top (amount) (points): "
+    "listPoints": "Top (amount) (points): ",
+    "listMessages": "Top (amount) (messages): "
   },
   "permissions": {
     "success": {
