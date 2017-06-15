@@ -97,16 +97,16 @@ global.client.on('message', function (channel, sender, message, fromSelf) {
       if (!_.isUndefined(global.users.get(sender.username).id)) {
         global.users.isFollower(sender.username)
       }
+
+      if (!message.startsWith('!')) {
+        const user = global.users.get(sender.username)
+        let msgs = _.isUndefined(user.stats.messages) ? 1 : parseInt(user.stats.messages, 10) + 1
+        global.users.set(user.username, { stats: { messages: msgs } }, true)
+      }
     } else {
       global.log.whisperIn(message, {username: sender.username})
     }
     global.parser.parse(sender, message)
-
-    if (!message.startsWith('!')) {
-      const user = global.users.get(sender.username)
-      let msgs = _.isUndefined(user.stats.messages) ? 1 : parseInt(user.stats.messages, 10) + 1
-      global.users.set(user.username, { stats: { messages: msgs } }, true)
-    }
   }
 })
 
