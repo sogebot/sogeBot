@@ -256,6 +256,15 @@ Moderation.prototype.longMessage = function (self, id, sender, text, skip) {
 Moderation.prototype.caps = function (self, id, sender, text, skip) {
   text = self.whitelist(text)
 
+  var emotesCharList = [] // remove emotes from caps checking
+  _.each(sender['emotes'], function (emote) {
+    _.each(emote, function (list) {
+      _.each(_.range(parseInt(list.split('-')[0], 10), parseInt(list.split('-')[1], 10) + 1), function (val) {
+        emotesCharList.push(val)
+      })
+    })
+  })
+
   var timeout = global.configuration.getValue('moderationCapsTimeout')
   var triggerLength = global.configuration.getValue('moderationCapsTriggerLength')
   var maxCapsPercent = global.configuration.getValue('moderationCapsMaxPercent')
@@ -269,9 +278,13 @@ Moderation.prototype.caps = function (self, id, sender, text, skip) {
   }
 
   const regexp = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-./:;<=>?@[\]^_`{|}~]/gi
-  const withoutSymbols = text.replace(regexp, '')
-  for (let i = 0; i < withoutSymbols.length; i++) {
-    if (!_.isFinite(parseInt(withoutSymbols.charAt(i), 10)) && withoutSymbols.charAt(i).toUpperCase() === withoutSymbols.charAt(i)) capsLength += 1
+  for (let i = 0; i < text.length; i++) {
+    // if is emote or symbol - continue
+    if (_.includes(emotesCharList, i) || !_.isNull(text.charAt(i).match(regexp))) {
+      msgLength = parseInt(msgLength, 10) - 1
+      continue
+    }
+    if (!_.isFinite(parseInt(text.charAt(i), 10)) && text.charAt(i).toUpperCase() === text.charAt(i)) capsLength += 1
   }
 
   if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
