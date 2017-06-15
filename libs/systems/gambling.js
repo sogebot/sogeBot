@@ -74,6 +74,7 @@ function Gambling () {
 }
 
 Gambling.prototype.duel = function (self, sender, text) {
+  sender['message-type'] = 'chat' // force responses to chat
   let points = 0
   try {
     let parsed = text.trim().match(/^([\d]+)$/)
@@ -130,6 +131,7 @@ Gambling.prototype.duel = function (self, sender, text) {
 }
 
 Gambling.prototype.roulette = function (self, sender) {
+  sender['message-type'] = 'chat' // force responses to chat
   let isAlive = _.random(0, 1, false)
   let message = [
     global.translate('gambling.roulette.trigger'),
@@ -145,6 +147,7 @@ Gambling.prototype.seppuku = function (self, sender) {
 }
 
 Gambling.prototype.gamble = function (self, sender, text) {
+  sender['message-type'] = 'chat' // force responses to chat
   let points = 0
   try {
     let parsed = text.trim().match(/^([\d]+)$/)
