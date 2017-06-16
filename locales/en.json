@@ -789,12 +789,15 @@
   },
   "cooldown": {
     "failed": {
-      "parse": "{core.command-parse} !cooldown [command] [global|user] [seconds]",
-      "cooldown": "(sender), you cannot use !(command), remaining (seconds)s"
+      "parse": "{core.command-parse} !cooldown [command] [global|user] [seconds] [true/false]",
+      "cooldown": "(sender), you cannot use !(command), remaining (seconds)s",
+      "toggle": "Cooldown for !(command) was not found!"
     },
     "success": {
       "set": "(type) cooldown for !(command) was set to (seconds)s",
-      "unset": "Cooldown for !(command) was unset"
+      "unset": "Cooldown for !(command) was unset",
+      "enabled": "Cooldown for !(command) was enabled",
+      "disabled": "Cooldown for !(command) was disabled"
     }
   },
   "gambling": {
