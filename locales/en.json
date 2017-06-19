@@ -48,6 +48,10 @@
     }
   },
   "webpanel": {
+    "stats-panel": {
+      "show": "show",
+      "hide": "hide"
+    },
     "viewers-reset-attributes": "Reset attributes",
     "viewers-points-of-all-users": "Points of all users",
     "events-user-triggered-event": "user triggered event",

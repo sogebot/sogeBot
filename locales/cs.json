@@ -48,6 +48,10 @@
     }
   },
   "webpanel": {
+    "stats": {
+      "show": "ukázat",
+      "hide": "skrýt"
+    },
     "viewers-reset-attributes": "Vymazat data",
     "viewers-points-of-all-users": "Body všech uživatelů",
     "events-user-triggered-event": "uživatel, který spustil event",

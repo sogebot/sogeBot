@@ -40,7 +40,7 @@
 
 
   <div class="navbar navbar-default navbar-fixed-top">
-    <div class="container-fluid">
+    <div class="container-fluid menu-container">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -187,9 +187,12 @@
     </div>
   </div>
 
-  <button class="btn btn-info btn-xs" id="percentage-btn" data-show-percentage="true" style="position: absolute; right: 50px" onclick="switchPercentageShow()">%</button>
-  <button class="btn btn-default btn-xs text-muted" id="mute-btn" data-muted="false" style="position: absolute; right: 70px" onclick="switchMute()" data-lang="mute"></button>
-  <button class="btn btn-default btn-xs text-muted" id="theme-btn" style="position: absolute; top: 0px; z-index: 9999; right: 50px" onclick="switchTheme()" data-lang="dark"></button>
+  <div class="btn-group pull-right" role="group" style="position: relative; top: -1px;">
+    <button class="btn btn-info btn-xs" id="percentage-btn" data-show-percentage="true" onclick="switchPercentageShow()">%</button>
+    <button class="btn btn-default btn-xs text-muted" id="mute-btn" data-muted="false" onclick="switchMute()" data-lang="mute"></button>
+    <button class="btn btn-default btn-xs text-muted" id="theme-btn" onclick="switchTheme()" data-lang="dark"></button>
+    <button style="border-right:0;" class="btn btn-default btn-xs text-muted" id="stats-btn" onclick="switchStats()"><i class="fa fa-angle-up" aria-hidden="true"></i> <span>hide</span> <i class="fa fa-angle-up" aria-hidden="true"></i></button>
+  </div>
 
   <div class="container-fluid">
     <div class="row">
@@ -317,6 +320,21 @@
         $("LINK[href='./dist/css/dark.css']").remove();
         console.debug('EMIT [saveConfiguration]', {'theme': 'light'})
         socket.emit('saveConfiguration', {'theme': 'light'})
+      }
+    }
+
+    var switchStats = function () {
+      var btn = $('#stats-btn')
+      var container = $('.stream-info-container')
+
+      if (btn.children('span').text() === translations['stats-panel'].hide) {
+        container.css('display', 'none')
+        btn.children('span').text(translations['stats-panel'].show)
+        btn.children('i').removeClass().addClass('fa fa-angle-down')
+      } else {
+        container.css('display', 'block')
+        btn.children('span').text(translations['stats-panel'].hide)
+        btn.children('i').removeClass().addClass('fa fa-angle-up')
       }
     }
 

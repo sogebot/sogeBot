@@ -62,7 +62,6 @@ a.active {
   line-height: 50px;
   background: white;
   border-bottom: 1px solid #ADB2B5;
-  border-top: 1px solid #ADB2B5;
   border-radius: 4px;
   width: 100%;
 }
@@ -211,7 +210,7 @@ a.active {
 }
 
 .widgets {
-  padding-top: 20px;
+  padding-top: 3px;
 }
 
 
@@ -723,4 +722,8 @@ th:first-letter {
   left: 0 !important;
   background-image: none;
   background-color: #337ab7;
+}
+
+.menu-container {
+  border-bottom: 1px solid #ADB2B5;
 }
