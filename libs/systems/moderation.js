@@ -284,7 +284,7 @@ Moderation.prototype.caps = function (self, id, sender, text, skip) {
       msgLength = parseInt(msgLength, 10) - 1
       continue
     }
-    if (!_.isFinite(parseInt(text.charAt(i), 10)) && text.charAt(i).toUpperCase() === text.charAt(i)) capsLength += 1
+    if (!_.isFinite(parseInt(text.charAt(i), 10)) && text.charAt(i).toUpperCase() === text.charAt(i) && text.charAt(i) !== ' ') capsLength += 1
   }
 
   if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
