@@ -48,7 +48,7 @@
     }
   },
   "webpanel": {
-    "stats": {
+    "stats-panel": {
       "show": "ukázat",
       "hide": "skrýt"
     },
