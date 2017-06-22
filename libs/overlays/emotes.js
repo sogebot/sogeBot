@@ -2,7 +2,7 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const { EmoteFetcher, EmoteParser } = require('twitch-emoticons')
+const { EmoteFetcher } = require('twitch-emoticons')
 
 // bot libraries
 const constants = require('../constants')
@@ -28,7 +28,7 @@ function Emotes () {
   this.fetcher = new EmoteFetcher()
   this.fetcher.fetchTwitchEmotes()
   this.fetcher.fetchBTTVEmotes()
-  this.fetcher.fetchBTTVEmotes(global.configuration.get().twitch.channel).catch(function(reason) {})
+  this.fetcher.fetchBTTVEmotes(global.configuration.get().twitch.channel).catch(function (reason) {})
   this.fetcher.fetchTwitchEmotes(global.configuration.get().twitch.channel)
 
   global.parser.registerParser(this, 'emotes', this.containsEmotes, constants.VIEWERS)
@@ -82,7 +82,7 @@ Emotes.prototype.containsEmotes = async function (self, id, sender, text) {
     }
   } catch (e) {
     // we don't want to output error when BTTV emotes doesn't exist
-    return
+    return true
   }
 }
 

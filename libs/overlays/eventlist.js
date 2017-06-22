@@ -3,9 +3,6 @@
 // 3rdparty libraries
 var _ = require('lodash')
 
-// bot libraries
-var constants = require('../constants')
-
 function EventList () {
   this.events = []
 
@@ -18,7 +15,7 @@ function EventList () {
 
 EventList.prototype._update = function (self) {
   global.botDB.findOne({ _id: 'eventlist' }, function (err, item) {
-    if (err) return log.error(err, { fnc: 'EventList.prototype._update' })
+    if (err) return global.log.error(err, { fnc: 'EventList.prototype._update' })
     if (_.isNull(item)) return
     self.events = item.events
   })
