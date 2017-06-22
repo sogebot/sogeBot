@@ -35,7 +35,7 @@
     "twitch-emoticons": "^2.1.0",
     "velocity-animate": "^1.5.0",
     "winston": "^2.3.1",
-    "youtube-search": "^1.0.9",
+    "youtube-search": "^1.0.10",
     "ytdl-core": "^0.14.4"
   },
   "scripts": {
