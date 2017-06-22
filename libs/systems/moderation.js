@@ -146,11 +146,10 @@ Moderation.prototype.whitelist = function (text) {
     let alias = _.find(global.systems.alias.alias, function (oAlias) { return oAlias.command === 'songrequest' })
     if (!_.isUndefined(alias) && alias.enabled && global.commons.isSystemEnabled('alias')) {
       ytRegex = new RegExp('^(!songrequest|!' + alias.alias + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi')
-      console.log(ytRegex)
     } else {
       ytRegex = /^(!songrequest) \S+(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/gi
     }
-    text = text.replace(ytRegex, '$1 $2')
+    text = text.replace(ytRegex, '')
   }
 
   clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
