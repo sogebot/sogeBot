@@ -244,25 +244,25 @@ Songs.prototype.addSongToQueue = function (self, sender, text) {
     return
   }
 
-  var urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/
+  const urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/
   const idRegex = /^[a-zA-Z0-9-_]{11}$/
   var match = text.trim().match(urlRegex)
   var videoID = (match && match[1].length === 11) ? match[1] : text.trim()
 
   if (_.isNil(text.trim().match(idRegex))) { // not id or url
     ytsearch(text.trim(), { maxResults: 1, key: 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0' }, function (err, results) {
-      if (err) return console.log(err)
+      if (err) return log.error(err, { fnc: 'Songs.prototype.addSongToQueue#3' })
       self.addSongToQueue(self, sender, results[0].id)
     })
     return
   }
 
   global.botDB.findOne({type: 'song-banned', _id: videoID}, function (err, item) {
-    if (err) log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' })
+    if (err) return log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' })
     if (!_.isNull(item)) global.commons.sendMessage(global.translate('songs.isBanned'), sender)
     else {
       ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
-        if (err) log.error(err, { fnc: 'Songs.prototype.addSongToQueue#2' })
+        if (err) return log.error(err, { fnc: 'Songs.prototype.addSongToQueue#2' })
         if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
           global.commons.sendMessage(global.translate('songs.notFound'), sender)
         } else if (videoInfo.length_seconds / 60 > global.configuration.getValue('songs_duration')) global.commons.sendMessage(global.translate('songs.tooLong'), sender)
