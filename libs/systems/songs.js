@@ -249,7 +249,7 @@ Songs.prototype.addSongToQueue = function (self, sender, text) {
   var match = text.trim().match(urlRegex)
   var videoID = (match && match[1].length === 11) ? match[1] : text.trim()
 
-  if (_.isNil(text.trim().match(idRegex))) { // not id or url
+  if (_.isNil(videoID.match(idRegex))) { // not id or url
     ytsearch(text.trim(), { maxResults: 1, key: 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0' }, function (err, results) {
       if (err) return log.error(err, { fnc: 'Songs.prototype.addSongToQueue#3' })
       self.addSongToQueue(self, sender, results[0].id)
