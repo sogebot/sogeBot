@@ -132,7 +132,7 @@ Alias.prototype.run = function (self, sender, msg, fullMsg) {
   let parsed = fullMsg.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
   let alias = _.find(self.alias, function (o) { return o.alias.toLowerCase() === parsed[1].toLowerCase() && o.enabled })
   try {
-    global.parser.parse(sender, fullMsg.replace(alias.alias, alias.command), true)
+    global.parser.parse(sender, fullMsg.replace(parsed[1], alias.command), true)
   } catch (e) {
     global.parser.unregister(fullMsg)
   }
