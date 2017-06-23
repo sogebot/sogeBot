@@ -1,0 +1,101 @@
+<div class="widget">
+  <h6 data-lang="widget-title-cmdboard"></h6>
+  <ul class="nav nav-pills" role="tablist">
+    <li role="presentation" class="active">
+      <a href="#cmdboard-main" aria-controls="home" role="tab" data-toggle="tab" title="CommandBoard">
+        <i class="fa fa-terminal" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li role="presentation">
+      <a href="#cmdboard-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+        <i class="fa fa-cog" aria-hidden="true"></i>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="cmdboard-main">
+      <div class="queue-list-group list-group" id="cmdboard-list">
+      </div>
+      <div class="clearfix"></div>
+    </div> <!-- /MAIN -->
+
+    <div role="tabpanel" class="tab-pane" id="cmdboard-settings">
+      <div class="input-group">
+        <span class="input-group-addon" data-lang="name"></span>
+        <input type="text" class="form-control" id="cmdboard-name">
+      </div>
+      <div class="input-group">
+        <span class="input-group-addon" data-lang="command"></span>
+        <input type="text" class="form-control" id="cmdboard-command">
+      </div>
+
+      <button type="button" class="btn btn-success btn-block" onclick="cmdboard.add()" data-lang="confirm"></button>
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('cmdboard')" style="margin-top: 20px;" data-lang="remove-widget"></button>
+    </div> <!-- /SETTINGS -->
+</div>
+
+<script>
+  var cmdboard = {
+    el: null,
+
+    add: function () {
+      var name = $('#cmdboard-name').val(); $('#cmdboard-name').val('')
+      var command = $('#cmdboard-command').val(); $('#cmdboard-command').val('')
+
+      $('a[href="#cmdboard-main"]').tab('show')
+      socket.emit('cmdboard.widget.add', { name: name, command: command })
+    },
+    emit: function (ev, el) {
+      ev.preventDefault()
+      socket.emit('cmdboard.widget.run', el.dataset.name)
+    },
+    resize: function () {
+      _.each($(".soundboard-list-group-item span"), function (el) {
+          $(el).css('font-size', '18px')
+          cmdboard.resizeEl(el, 18)
+        })
+    },
+    resizeEl: function (el, size) {
+      if ($(el).height() >= ((2*size)/5 + (98/5))) {
+        $(el).css('font-size', (size-1) + 'px')
+        $(el).css('top', Math.round((3*size)/7 - 57/7) + 'px')
+        if ($(el).height() >= ((2*size)/5 + (98/5))) {
+          cmdboard.resizeEl(el, size-1)
+        }
+      }
+    }
+  }
+
+  socket.emit('cmdboard.widget.fetch')
+
+  socket.off('cmdboard.widget.data')
+  socket.on('cmdboard.widget.data', function (data) {
+    $("#cmdboard-list").empty()
+    _.each(data, function (cmd, name) {
+      $("#cmdboard-list").append('<a class="soundboard-list-group-item list-group-item cmdboard-item"  style="padding: 10px 0 0 0" data-name="' + name + '" onclick="cmdboard.emit(event, this)" type="button"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0"></div><span>' + name + '</span></a>');
+    })
+    cmdboard.resize()
+  })
+
+  $(window).resize(function() {
+    cmdboard.resize()
+  })
+
+
+  // deletion right-click menu
+  var menu = new BootstrapMenu(".cmdboard-item", {
+    fetchElementData: function($el) {
+      return $el.data();
+    },
+    actions: [{
+      name: 'Delete',
+      classNames: ['action-danger'],
+      iconClass: 'fa-trash-o',
+      onClick: function(data) {
+        socket.emit('cmdboard.widget.remove', data)
+      }
+    }]
+  })
+</script>
