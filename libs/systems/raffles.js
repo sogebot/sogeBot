@@ -156,7 +156,7 @@ Raffles.prototype.pick = function (self, sender) {
   global.commons.sendMessage(global.translate(!_.isNil(self.product) && self.product.trim().length > 0 ? 'raffle.pick.winner.withProduct' : 'raffle.pick.winner.withoutProduct')
     .replace('(winner)', winner)
     .replace('(product)', self.product)
-    .replace('(probability)', probability), sender)
+    .replace('(probability)', _.round(probability, 2)), sender)
   global.parser.unregister('!' + self.keyword)
   global.widgets.raffles.sendWinner(global.widgets.raffles, global.users.get(winner))
   clearInterval(self.timer)
