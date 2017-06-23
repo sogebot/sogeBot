@@ -52,17 +52,22 @@ function Gambling () {
           }
         })
 
-        winner = winnerArray[winner]
-        let username = (global.configuration.getValue('atUsername') ? '@' : '') + winner
+        const username = winnerArray[winner]
+        const tickets = parseInt(self.current.duel[username], 10)
+        const probability = tickets / (parseInt(total, 10) / 100)
+
         global.commons.sendMessage(global.translate((_.size(self.current.duel) === 1) ? 'gambling.duel.noContestant' : 'gambling.duel.winner')
           .replace('(pointsName)', global.systems.points.getPointsName(total))
           .replace('(points)', total)
-          .replace('(winner)', username), { username: winner }, { force: true })
+          .replace('(probability)', _.round(probability, 2))
+          .replace('(tickets)', tickets)
+          .replace('(ticketsName)', global.systems.points.getPointsName(tickets))
+          .replace('(winner)', (global.configuration.getValue('atUsername') ? '@' : '') + username), { username: username }, { force: true })
 
         // give user his points
-        const user = global.users.get(winner)
+        const user = global.users.get(username)
         user.points = parseInt(_.isNil(user.points) ? 0 : user.points, 10) + parseInt(total, 10)
-        global.users.set(winner, { points: user.points })
+        global.users.set(username, { points: user.points })
 
         // reset duel
         self.current.duel = {}

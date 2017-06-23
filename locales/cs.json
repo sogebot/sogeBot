@@ -813,7 +813,7 @@
       "notEnoughOptions": "(sender), k duelu musis neco vsadit",
       "notEnoughPoints": "(sender), nemas dostatek (pointsName) pro duel!",
       "noContestant": "Pouze (sender) se odvazil zucastnit duelu! Jeho sazka (points) (pointsName) mu byla vracena.",
-      "winner": "Gratulace (winner)! Je poslednim prezivsim a ziskal (points) (pointsName)!"
+      "winner": "Gratulace (winner)! Je poslednim prezivsim a ziskal (points) (pointsName) ((probability)% se sazkou (tickets) (ticketsName))!!"
     },
     "roulette": {
       "trigger": "(sender) stiskl spoust",

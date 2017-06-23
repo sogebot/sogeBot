@@ -813,7 +813,7 @@
       "notEnoughOptions": "(sender), you need to specify points to dueling",
       "notEnoughPoints": "(sender), you don't have enough (pointsName) to duel!",
       "noContestant": "Only (sender) have courage to join duel! Your bet of (points) (pointsName) are returned to you.",
-      "winner": "Congratulations to (winner)! He is last man standing and he won (points) (pointsName)!"
+      "winner": "Congratulations to (winner)! He is last man standing and he won (points) (pointsName) ((probability)% with bet of (tickets) (ticketsName))!"
     },
     "roulette": {
       "trigger": "(sender) pulled a trigger",
