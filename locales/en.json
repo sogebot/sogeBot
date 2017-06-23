@@ -35,6 +35,7 @@
     "hours": "hour|hours",
     "minutes": "minute|minutes",
     "messages": "message|messages",
+    "links": "link|links",
     "isRegistered": "(sender), you cannot use (keyword), because is already in use for another action!"
   },
   "overlay": {
@@ -632,7 +633,7 @@
   },
   "moderation": {
     "warning": "[(value) warnings left]",
-    "permit": "User (who) can post a link to chat",
+    "permit": "User (who) can post a (count) (link) to chat",
     "links": "No links allowed, ask for !permit",
     "symbols": "No excessive symbols usage",
     "longMessage": "Long messages are not allowed",

@@ -164,9 +164,18 @@ Moderation.prototype.whitelist = function (text) {
 
 Moderation.prototype.permitLink = function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    self.permits.push(parsed[0].toLowerCase())
-    global.commons.sendMessage(global.translate('moderation.permit').replace('(who)', parsed[0]), sender)
+    var parsed = text.match(/^@?([\u0500-\u052F\u0400-\u04FF\w]+) ?(\d+)?$/)
+    let count = 1
+    if (!_.isNil(parsed[2])) count = parseInt(parsed[2], 10)
+
+    _.range(count).forEach(function () {
+      self.permits.push(parsed[1].toLowerCase())
+    })
+
+    global.commons.sendMessage(global.translate('moderation.permit')
+      .replace('(who)', (global.configuration.getValue('atUsername') ? '@' : '') + parsed[1])
+      .replace('(link)', global.parser.getLocalizedName(count, 'core.links'))
+      .replace('(count)', count), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('moderation.failed.parsePermit'), sender)
   }

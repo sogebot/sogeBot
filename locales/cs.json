@@ -35,6 +35,7 @@
     "hours": "hodina|4:hodiny|hodin",
     "minutes": "minuta|4:minuty|minut",
     "messages": "zprava|4:zpravy|zprav",
+    "links": "odkaz|4:odkazy|odkazu",
     "isRegistered": "(sender), nelze pouzit (keyword), protoze je uz prirazena k jine akci!"
   },
   "overlay": {
@@ -632,7 +633,7 @@
   },
   "moderation": {
     "warning": "[zbyva (value) varovani]",
-    "permit": "Uzivatel (who) muze nyni postnout link do chatu",
+    "permit": "Uzivatel (who) muze nyni postnout (count) (link) do chatu",
     "links": "Nejsou povoleny linky, pozadej o !permit",
     "symbols": "Prilisne pouzivani symbolu neni povoleno",
     "longMessage": "Tva zprava je prilis dlouha",
