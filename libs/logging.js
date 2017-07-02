@@ -79,7 +79,7 @@ global.log = new (winston.Logger)({
           (username ? ' [' + username + ']' : '') +
           (_.size(options.meta) > 0 && level === 'DEBUG:' ? '\n' + options.timestamp() + ' DEBUG: ' + JSON.stringify(options.meta) : '')
       },
-      filename: logDir + '/sogebot-' + moment().format('YYYY-MM-DDTHH:mm:ss') + '.log',
+      filename: logDir + '/sogebot-' + moment().format('YYYY-MM-DDTHH_mm_ss') + '.log',
       handleExceptions: false,
       json: false,
       maxsize: 5242880,
@@ -89,7 +89,7 @@ global.log = new (winston.Logger)({
   exceptionHandlers: [
     new winston.transports.File({
       exitOnError: true,
-      filename: logDir + '/exceptions-' + moment().format('YYYY-MM-DDTHH:mm:ss') + '.log',
+      filename: logDir + '/exceptions-' + moment().format('YYYY-MM-DDTHH_mm_ss') + '.log',
       json: false,
       formatter: function (options) {
         global.log.error('+------------------------------------------------------------------------------+')
