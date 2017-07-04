@@ -43,7 +43,7 @@
             <label class="btn btn-default">
               <input type="radio" name="cooldownType" value="user" autocomplete="off"> <span data-lang="user"></span>
             </label>
-            <button class="btn btn-primary" type="button" id="quietToggle" value="quiet" autocomplete="off" data-lang="cooldown-quiet-toggle-no" onclick="cooldown.toggle()"></button>
+            <button class="btn btn-primary" type="button" id="quietToggle" value="quiet" autocomplete="off" data-lang="cooldown-quiet-toggle-no" onclick="cooldown.toggleBtn()"></button>
           </div>
         </div>
       </div>
@@ -59,7 +59,7 @@
 
 <script>
   var cooldown = {
-    toggle: function () {
+    toggleBtn: function () {
       var $toggle = $("#quietToggle")
       if ($toggle.text() === translations['cooldown-quiet-toggle-no']) {
         $toggle.text(translations['cooldown-quiet-toggle-yes'])
