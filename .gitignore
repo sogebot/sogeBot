@@ -1,9 +1,10 @@
 node_modules
-db/*
 logs/*
-package-lock.json
-npm-shrinkwrap.json
+package-lock.json*
+npm-shrinkwrap.json*
+*.zip
 config.ini
+*.db
 
 public/dist/*
 !public/dist/css
