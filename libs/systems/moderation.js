@@ -24,7 +24,7 @@ function Moderation () {
     global.parser.registerParser(this, 'moderationBlacklist', this.blacklist, constants.VIEWERS)
 
     global.configuration.register('moderationLinks', 'moderation.settings.moderationLinks', 'bool', true)
-    global.configuration.register('moderationLinksWithSpaces', 'moderation.settings.moderationLinksWithSpaces', 'bool', true)
+    global.configuration.register('moderationLinksWithSpaces', 'moderation.settings.moderationLinksWithSpaces', 'bool', false)
     global.configuration.register('moderationLinksSubs', 'moderation.settings.moderationLinksSubs', 'bool', true)
     global.configuration.register('moderationLinksTimeout', 'moderation.settings.moderationLinksTimeout', 'number', 120)
 
