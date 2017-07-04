@@ -3,6 +3,7 @@ db/*
 logs/*
 package-lock.json
 npm-shrinkwrap.json
+config.ini
 
 public/dist/*
 !public/dist/css
