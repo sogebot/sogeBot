@@ -54,6 +54,7 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 | Emotes        | Show chat message emotes in your stream! |
 | Stats         | Show viewers, follower, uptime           |
 | ImageCarousel | Simple image fadeIn/fadeOut carousel     |
+| Alerts        | Show images and play audio in overlay    |
 
 #### Languages
 
