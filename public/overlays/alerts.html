@@ -96,6 +96,14 @@
             break
         }
 
+        if (!_.isNil(image['x-offset'])) {
+          style += ';left:' + image['x-offset'] + 'px'
+        }
+
+        if (!_.isNil(image['y-offset'])) {
+          style += ';top:' + image['y-offset'] + 'px'
+        }
+
         $('#images').append('<div style="' + style + '"><img src="' + image.url + '?x=' + Math.random() + '"></img></div>')
         $('#images div img').on('load', function () {
           image.delay = _.isNil(image.delay) ? 0 : parseInt(image.delay, 10) // delay of animation
