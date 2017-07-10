@@ -550,37 +550,6 @@ Twitch.prototype.setTitleAndGame = async function (self, sender, args) {
       global.log.debug('Response: Updating game and title ', e.message)
     }
   }
-  /*
-  global.client.api(options, function (err, res, body) {
-    if (err) { return global.log.error(err, { fnc: 'Twitch.prototype.setTitleAndGame' }) }
-
-    if (global.configuration.get().bot.debug) {
-      global.log.debug('Response: Updating game and title ', body)
-    }
-
-    if (!_.isNull(args.game)) {
-      if (body.game === args.game.trim()) {
-        global.commons.sendMessage(global.translate('game.change.success')
-          .replace('(game)', body.game), sender)
-        self.currentGame = body.game
-      } else {
-        global.commons.sendMessage(global.translate('game.change.failed')
-          .replace('(game)', self.currentGame), sender)
-      }
-    }
-
-    if (!_.isNull(args.title)) {
-      if (body.status === args.title.trim()) {
-        global.commons.sendMessage(global.translate('title.change.success')
-          .replace('(status)', body.status), sender)
-        self.currentStatus = body.status
-      } else {
-        global.commons.sendMessage(global.translate('title.change.failed')
-          .replace('(status)', self.currentStatus), sender)
-      }
-    }
-  })
-  */
 }
 
 Twitch.prototype.setTitle = function (self, sender, text) {
