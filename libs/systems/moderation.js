@@ -62,6 +62,7 @@ function Moderation () {
     global.configuration.register('moderationEmotesMaxCount', 'moderation.settings.moderationEmotesMaxCount', 'number', 15)
 
     global.configuration.register('moderationBlacklistTimeout', 'moderation.settings.moderationBlacklistTimeout', 'number', 120)
+    global.configuration.register('moderationBlacklistSubs', 'moderation.settings.moderationBlacklistSubs', 'bool', true)
 
     global.configuration.register('moderationWarnings', 'moderation.settings.moderationWarnings', 'number', 3)
     global.configuration.register('moderationAnnounceTimeouts', 'moderation.settings.moderationAnnounceTimeouts', 'bool', true)
@@ -369,7 +370,7 @@ Moderation.prototype.emotes = function (self, id, sender, text, skip) {
 }
 
 Moderation.prototype.blacklist = function (self, id, sender, text, skip) {
-  if (skip || global.parser.isOwner(sender) || sender.mod) {
+  if (skip || global.parser.isOwner(sender) || sender.mod || (sender.subscriber && !global.configuration.getValue('moderationBlacklistSubs'))) {
     global.updateQueue(id, true)
     return
   }

@@ -753,6 +753,11 @@
       "moderationEmotesTimeout": "Timeout because of emotes spamming set to (value)s",
       "moderationEmotesMaxCount": "Maximum count of emotes in one messages set to (value)",
       "moderationBlacklistTimeout": "Timeout because of blacklisted word set to (value)s",
+      "moderationBlacklistSubs": {
+        "text": "Moderation of blacklist for subscribers is",
+        "true": "{moderation.settings.moderationBlacklistSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationBlacklistSubs.text} {core.disabled}"
+      },
       "moderationWarnings": "User will be warned (value) times",
       "moderationWarningsTimeouts": {
         "true": "Warnings are set to be 1s timeout",

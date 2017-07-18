@@ -314,6 +314,12 @@
 
     <table class="table table-striped">
       <tr>
+        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
+        <td>
+          <input id="moderationBlacklistSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
+        </td>
+      </tr>
+      <tr>
         <td><strong data-lang="timeout-duration"></strong></td>
         <td>
           <abbr title="click to edit" data-config-id="moderationBlacklistTimeout" onclick="commons.configEditable(this, 's')" id="moderationBlacklistTimeout"></abbr>
@@ -390,6 +396,7 @@
     $("#moderationEmotesTimeout").text(data.moderationEmotesTimeout + 's')
     $("#moderationEmotesMaxCount").text(data.moderationEmotesMaxCount)
 
+    createToggle('moderationBlacklistSubs', data.moderationBlacklistSubs)
     $("#moderationBlacklistTimeout").text(data.moderationBlacklistTimeout + 's')
 
     $("#moderationWarnings").text(data.moderationWarnings)

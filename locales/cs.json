@@ -753,6 +753,11 @@
       "moderationEmotesTimeout": "Timeout pri spamovani smajliku je nastaven na (value)s",
       "moderationEmotesMaxCount": "Maximalni pocet smajliky ku ve jedne zprave je nastaveno na (value)",
       "moderationBlacklistTimeout": "Timeout pri pouzivani zakazanych slov je nastaven na (value)s",
+      "moderationBlacklistSubs": {
+        "text": "Moderovani blacklistu pro subscribery je",
+        "true": "{moderation.settings.moderationBlacklistSubs.text} {core.enabled}",
+        "false": "{moderation.settings.moderationBlacklistSubs.text} {core.disabled}"
+      },
       "moderationWarnings": "Uzivatel bude (value)x varovan, nez dostane timeout",
       "moderationWarningsTimeouts": {
         "true": "Varovanim pro uzivatele bude 1s timeout",
