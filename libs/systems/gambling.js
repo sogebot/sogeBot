@@ -18,7 +18,7 @@ const ERROR_NOT_ENOUGH_POINTS = '2'
  */
 
 function Gambling () {
-  if (global.commons.isSystemEnabled(this) && global.commons.isSystemEnabled('points')) {
+  if (global.commons.isSystemEnabled(this)) {
     this.current = {
       duel: {
         '_total': 0,
@@ -26,10 +26,13 @@ function Gambling () {
       }
     }
 
-    global.parser.register(this, '!gamble', this.gamble, constants.VIEWERS)
+    if (global.commons.isSystemEnabled('points')) {
+      global.parser.register(this, '!gamble', this.gamble, constants.VIEWERS)
+      global.parser.register(this, '!duel', this.duel, constants.VIEWERS)
+    }
+
     global.parser.register(this, '!seppuku', this.seppuku, constants.VIEWERS)
     global.parser.register(this, '!roulette', this.roulette, constants.VIEWERS)
-    global.parser.register(this, '!duel', this.duel, constants.VIEWERS)
 
     global.configuration.register('seppukuTimeout', 'gambling.seppuku.timeout', 'number', 10)
     global.configuration.register('rouletteTimeout', 'gambling.roulette.timeout', 'number', 10)
