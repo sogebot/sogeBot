@@ -307,10 +307,10 @@ Parser.prototype.parseMessage = async function (message, attr) {
           list = _.map(_.filter(global.systems['alias'].alias, function (o) { return o.visible && o.enabled }), function (n) { return '!' + n.alias }).join(', ')
           return list.length > 0 ? list : ' '
         case 'command':
-          list = _.map(_.filter(global.systems['customcommands'].commands, function (o) { return o.visible && o.enabled }), function (n) { return n.command }).join(', ')
+          list = _.map(_.filter(global.systems['customCommands'].commands, function (o) { return o.visible && o.enabled }), function (n) { return n.command }).join(', ')
           return list.length > 0 ? list : ' '
         case '!command':
-          list = _.map(_.filter(global.systems['customcommands'].commands, function (o) { return o.visible && o.enabled }), function (n) { return '!' + n.command }).join(', ')
+          list = _.map(_.filter(global.systems['customCommands'].commands, function (o) { return o.visible && o.enabled }), function (n) { return '!' + n.command }).join(', ')
           return list.length > 0 ? list : ' '
         case 'cooldown':
           list = _.map(global.systems['cooldown'].list, function (o, k) {
