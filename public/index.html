@@ -817,8 +817,19 @@
         if (curTitle !== translations['not-available'] && curTitle !== '') {
           var div = $('<div class="radio titles-list-radio">')
           div.attr('data-deletable', false)
+
           var label = $('<label>')
           label.html(curTitle + ' <small style="font-size: 65%; color:#777">CURRENT</small>')
+
+          var input = $('<input>')
+          input.attr('type', 'radio')
+          input.attr('name', 'titleSelector')
+          input.attr('value', curTitle)
+          input.attr('checked', 'checked')
+
+          label.prepend(input)
+          div.append(label)
+
           $('#titles-list').append(div)
           this.selectedTitle = curTitle
         }
