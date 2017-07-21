@@ -1,0 +1,58 @@
+<div class="widget">
+  <h6 data-lang="widget-title-commercial"></h6>
+  <ul class="nav nav-pills" role="tablist">
+    <li role="presentation" class="active">
+      <a href="#commercial-main" aria-controls="home" role="tab" data-toggle="tab" title="Commercials">
+        <i class="fa fa-usd" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li role="presentation">
+      <a href="#commercial-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+        <i class="fa fa-cog" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li role="presentation">
+      <span id="commercial-status" class="text-success" style="display: none; position: relative; top: 9px; font-variant: small-caps;"><i class="fa fa-play" aria-hidden="true"></i> commercial running <span id="commercial-countdown">0</span>s
+    </li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="commercial-main">
+      <div class="text-center">
+        <div class="btn-group">
+          <button type="button" class="btn btn-default" data-seconds="30" onclick="commercial.run(this)">30s</button>
+          <button type="button" class="btn btn-default" data-seconds="60" onclick="commercial.run(this)">60s</button>
+          <button type="button" class="btn btn-default" data-seconds="90" onclick="commercial.run(this)">90s</button>
+          <button type="button" class="btn btn-default" data-seconds="120" onclick="commercial.run(this)">120s</button>
+          <button type="button" class="btn btn-default" data-seconds="150" onclick="commercial.run(this)">150s</button>
+          <button type="button" class="btn btn-default" data-seconds="180" onclick="commercial.run(this)">180s</button>
+        </div>
+      </div>
+    </div> <!-- /MAIN -->
+
+    <div role="tabpanel" class="tab-pane" id="commercial-settings">
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('commercial')" style="margin-top: 20px;" data-lang="remove-widget"></button>
+    </div> <!-- /SETTINGS -->
+</div>
+
+<script>
+const commercial = {
+  countdown: 0,
+  run: function(el) {
+    socket.emit('commercial.run', { seconds: $(el).data('seconds') })
+    this.countdown = $(el).data('seconds')
+  }
+}
+
+setInterval(function() {
+  if (commercial.countdown === 0) {
+    $('#commercial-status').css('display', 'none')
+    return
+  }
+
+  commercial.countdown--
+  $('#commercial-status').css('display', 'inline')
+  $('#commercial-countdown').text(commercial.countdown)
+}, 1000)
+</script>
