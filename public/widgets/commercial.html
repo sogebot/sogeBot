@@ -11,9 +11,6 @@
         <i class="fa fa-cog" aria-hidden="true"></i>
       </a>
     </li>
-    <li role="presentation">
-      <span id="commercial-status" class="text-success" style="display: none; position: relative; top: 9px; font-variant: small-caps;"><i class="fa fa-play" aria-hidden="true"></i> commercial running <span id="commercial-countdown">0</span>s
-    </li>
   </ul>
 
   <!-- Tab panes -->
@@ -21,12 +18,12 @@
     <div role="tabpanel" class="tab-pane active" id="commercial-main">
       <div class="text-center">
         <div class="btn-group">
-          <button type="button" class="btn btn-default" data-seconds="30" onclick="commercial.run(this)">30s</button>
-          <button type="button" class="btn btn-default" data-seconds="60" onclick="commercial.run(this)">60s</button>
-          <button type="button" class="btn btn-default" data-seconds="90" onclick="commercial.run(this)">90s</button>
-          <button type="button" class="btn btn-default" data-seconds="120" onclick="commercial.run(this)">120s</button>
-          <button type="button" class="btn btn-default" data-seconds="150" onclick="commercial.run(this)">150s</button>
-          <button type="button" class="btn btn-default" data-seconds="180" onclick="commercial.run(this)">180s</button>
+          <button type="button" class="btn btn-default" data-seconds="30" onclick="commercial.run(this)"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>30s</button>
+          <button type="button" class="btn btn-default" data-seconds="60" onclick="commercial.run(this)"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>60s</button>
+          <button type="button" class="btn btn-default" data-seconds="90" onclick="commercial.run(this)"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>90s</button>
+          <button type="button" class="btn btn-default" data-seconds="120" onclick="commercial.run(this)"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>120s</button>
+          <button type="button" class="btn btn-default" data-seconds="150" onclick="commercial.run(this)"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>150s</button>
+          <button type="button" class="btn btn-default" data-seconds="180" onclick="commercial.run(this)"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>180s</button>
         </div>
       </div>
     </div> <!-- /MAIN -->
@@ -40,6 +37,12 @@
 const commercial = {
   countdown: 0,
   run: function(el) {
+    $(el).children('div').animate({
+      width: '100%'
+    }, $(el).data('seconds') * 1000, 'linear', function () {
+      $(el).children('div').css('width', 0)
+    })
+
     socket.emit('commercial.run', { seconds: $(el).data('seconds') })
     this.countdown = $(el).data('seconds')
   }
