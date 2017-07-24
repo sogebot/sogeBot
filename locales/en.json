@@ -826,10 +826,14 @@
       "trigger": "(sender) pulled a trigger",
       "alive": "and nothing happened",
       "dead": "and bullet splashed his brain on the wall",
+      "mod": "and he completely missed!",
+      "broadcaster": "and he is using blanks!",
       "timeout": "Roulette timeout set to (value)s"
     },
     "seppuku": {
       "text": "(sender) has committed seppuku.",
+      "mod": "(sender) tried to commit seppuku, but broke a sword.",
+      "broadcaster": "(sender) tried to commit seppuku, but lost a sword.",
       "timeout": "Seppuku timeout set to (value)s"
     },
     "gamble": {

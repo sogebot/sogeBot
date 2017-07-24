@@ -826,10 +826,14 @@
       "trigger": "(sender) stiskl spoust",
       "alive": "a nic se nestalo",
       "dead": "a kulka rozmaznula jeho mozek po zdi",
+      "mod": "a vubec se netrefil!",
+      "broadcaster": "a pouzil slepe!",
       "timeout": "Roulette timeout nastaven na (value)s"
     },
     "seppuku": {
       "text": "(sender) spachal seppuku.",
+      "mod": "(sender) se pokusil o seppuku, ale zlomil mec.",
+      "broadcaster": "(sender) se pokusil o seppuku, ale ztratil mec.",
       "timeout": "Seppuku timeout nastaven na (value)s"
     },
     "gamble": {

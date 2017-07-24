@@ -145,11 +145,32 @@ Gambling.prototype.roulette = function (self, sender) {
     global.translate('gambling.roulette.trigger'),
     isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead')
   ]
+
+  if (global.parser.isOwner(sender)) {
+    global.commons.sendMessage(global.translate('gambling.roulette.trigger') + ' ' + global.translate('gambling.roulette.broadcaster'), sender)
+    return
+  }
+
+  if (sender.mod) {
+    global.commons.sendMessage(global.translate('gambling.roulette.trigger') + ' ' + global.translate('gambling.roulette.mod'), sender)
+    return
+  }
+
   if (!isAlive) global.client.timeout(global.configuration.get().twitch.channel, sender.username, global.configuration.getValue('rouletteTimeout'))
   global.commons.sendMessage(message.join(' '), sender)
 }
 
 Gambling.prototype.seppuku = function (self, sender) {
+  if (global.parser.isOwner(sender)) {
+    global.commons.sendMessage(global.translate('gambling.seppuku.broadcaster'), sender)
+    return
+  }
+
+  if (sender.mod) {
+    global.commons.sendMessage(global.translate('gambling.seppuku.mod'), sender)
+    return
+  }
+
   global.commons.sendMessage(global.translate('gambling.seppuku.text'), sender)
   global.client.timeout(global.configuration.get().twitch.channel, sender.username, global.configuration.getValue('seppukuTimeout'))
 }
