@@ -15,6 +15,7 @@
           <div id="bitsInfo"><strong>(bits)</strong> <span data-lang="events-user-message"></span></div>
           <div id="reasonInfo"><strong>(reason)</strong> <span data-lang="events-reason-for-ban-timeout"></span></div>
           <div id="durationInfo"><strong>(duration)</strong> <span data-lang="events-duration-of-timeout"></span></div>
+          <div id="durationCommercialInfo"><strong>(duration)</strong> <span data-lang="events-duration-of-commercial"></span></div>
           <div id="targetInfo"><strong>(target)</strong> <span data-lang="events-target-of-your-hosting"></span></div>
           <div id="viewersInfo"><strong>(viewers)</strong> <span data-lang="events-viewers-of-your-hosting"></span></div>
         </small>
@@ -67,6 +68,18 @@
         <input id="emotes" class="form-control" placeholder="Kappa :) purpleHeart">
       </div>
 
+      <div class="form-group" id="commercialGroup" style="display: none">
+        <label for="duration" data-lang="duration"></label>
+        <select class="form-control" id="commercial-list">
+          <option value="30">30s</option>
+          <option value="60">60s</option>
+          <option value="90">90s</option>
+          <option value="120">120s</option>
+          <option value="150">150s</option>
+          <option value="180">180s</option>
+        </select>
+      </div>
+
       <button type="button" class="btn btn-success pull-right" data-lang="create-a-new-event-listener" onclick="newEvent()"></button>
       <div class="clearfix"></div>
     </form>
@@ -104,6 +117,7 @@ $('#events-list').on('change', function(ev) {
   $('#bitsInfo').css('display', 'none')
   $('#reasonInfo').css('display', 'none')
   $('#durationInfo').css('display', 'none')
+  $('#durationCommercialInfo').css('display', 'none')
   $('#targetInfo').css('display', 'none')
   $('#viewersInfo').css('display', 'none')
 
@@ -123,6 +137,9 @@ $('#events-list').on('change', function(ev) {
     case 'subscription':
       $('#usernameInfo').css('display', 'block')
       $('#methodInfo').css('display', 'block')
+      break
+    case 'commercial':
+      $('#durationCommercialInfo').css('display', 'block')
       break
     case 'resub':
       $('#usernameInfo').css('display', 'block')
@@ -178,6 +195,7 @@ $('#operations-list').on('change', function(ev) {
   $('#soundGroup').css('display', 'none')
   $('#emotesGroup').css('display', 'none')
   $('#quietGroup').css('display', 'none')
+  $('#commercialGroup').css('display', 'none')
 
   $('#message').val('')
   $('#sound').val('')
@@ -198,6 +216,10 @@ $('#operations-list').on('change', function(ev) {
       break
     case 'emote-explosion':
       $('#emotesGroup').css('display', 'inline-block')
+      break
+    case 'start-commercial':
+      $('#commercialGroup').css('display', 'inline-block')
+      break
   }
 })
 
@@ -264,6 +286,7 @@ var newEvent = function () {
     event: $('#events-list').val(),
     operation: {
       name: $('#operations-list').val(),
+      duration: $('#commercial-list').val(),
       send: $('#message').val(),
       sound: $('#sound').val(),
       command: $('#command2').val(),
@@ -294,6 +317,7 @@ var newEvent = function () {
     case 'hosted':
     case 'mod':
     case 'timeout':
+    case 'commercial':
       delete data.definition
   }
   socket.emit('events.new', data)
@@ -304,6 +328,7 @@ var newEvent = function () {
   $('#command2Group').css('display', 'none')
   $('#quietGroup').css('display', 'none')
   $('#countGroup').css('display', 'none')
+  $('#commercialGroup').css('display', 'none')
 }
 
 socket.off('events')
@@ -397,6 +422,12 @@ socket.on('events', function(data) {
                 div_part = $('<div></div>')
                   .append($('<label></label>').text(translations['emotes']))
                   .append($('<div></div>').text(operation.emotes))
+                break
+              case 'start-commercial':
+                div_op.data('duration', operation.duration)
+                div_part = $('<div></div>')
+                  .append($('<label></label>').text(translations['duration']))
+                  .append($('<div></div>').text(operation.duration + 's'))
                 break
             }
 

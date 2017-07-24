@@ -53,6 +53,7 @@
       "show": "ukázat",
       "hide": "skrýt"
     },
+    "duration": "Trvání",
     "viewers-reset-attributes": "Vymazat data",
     "viewers-points-of-all-users": "Body všech uživatelů",
     "events-user-triggered-event": "uživatel, který spustil event",
@@ -62,6 +63,7 @@
     "events-bits-user-sent": "počet poslaných bitů",
     "events-reason-for-ban-timeout": "důvod pro ban/timeout",
     "events-duration-of-timeout": "doba trvání timeoutu",
+    "events-duration-of-commercial": "doba trvání reklamy",
     "events-target-of-your-hosting": "koho hostuješ",
     "events-viewers-of-your-hosting": "diváků při tvém hostingu",
     "overlays-eventlist-resub": "resub",
@@ -308,7 +310,9 @@
     "gambling": "Gambling",
     "seppukuTimeout": "Timeout pro !sepukku",
     "rouletteTimeout": "Timeout pro !roulette",
-    "click-to-highlight": "highlight"
+    "click-to-highlight": "highlight",
+    "commercial": "reklama zahájena",
+    "start-commercial": "spustit reklamu"
   },
   "raffle": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych (value) minut",

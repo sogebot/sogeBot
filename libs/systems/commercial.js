@@ -34,6 +34,7 @@ Commercial.prototype.run = function (self, sender, text) {
 
     // check if duration is correct (30, 60, 90, 120, 150, 180)
     if (_.includes([30, 60, 90, 120, 150, 180], commercial.duration)) {
+      global.events.fire('commercial', { duration: commercial.duration })
       global.client.commercial(global.configuration.get().twitch.channel, commercial.duration)
       if (!_.isNil(commercial.message)) global.commons.sendMessage(commercial.message, sender)
     } else {

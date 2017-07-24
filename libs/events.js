@@ -23,6 +23,7 @@ function Events () {
     'hosting': [], // (target), (viewers)
     'hosted': [], // (username)
     'mod': [], // (username)
+    'commercial': [], // (duration)
     'timeout': [], // (username), (reason), (duration)
     'every-x-seconds': [] // needs definition = { definition: true, tTrigerred: new Date(), tCount: 60 }
   }
@@ -59,6 +60,10 @@ function Events () {
     'emote-explosion': function (attr) {
       // attr.emotes is string with emotes to show
       global.overlays.emotes.explode(global.overlays.emotes, global.panel.io, attr.emotes.split(' '))
+    },
+    'start-commercial': function (attr) {
+      // attr.duration - duration of commercial
+      global.client.commercial(global.configuration.get().twitch.channel, attr.duration)
     },
     'log': function (attr) {
       let message = attr.message.replace('(username)', attr.username)

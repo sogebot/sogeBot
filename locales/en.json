@@ -53,6 +53,7 @@
       "show": "show",
       "hide": "hide"
     },
+    "duration": "Duration",
     "viewers-reset-attributes": "Reset attributes",
     "viewers-points-of-all-users": "Points of all users",
     "events-user-triggered-event": "user triggered event",
@@ -62,6 +63,7 @@
     "events-bits-user-sent": "bits user sent",
     "events-reason-for-ban-timeout": "reason for ban/timeout",
     "events-duration-of-timeout": "duration of timeout",
+    "events-duration-of-commercial": "duration of commercial",
     "events-target-of-your-hosting": "target of your hosting",
     "events-viewers-of-your-hosting": "viewers of your hosting",
     "overlays-eventlist-resub": "resub",
@@ -308,7 +310,9 @@
     "gambling": "Gambling",
     "seppukuTimeout": "Timeout for !sepukku",
     "rouletteTimeout": "Timeout for !roulette",
-    "click-to-highlight": "highlight"
+    "click-to-highlight": "highlight",
+    "commercial": "commercial started",
+    "start-commercial": "run a commercial"
   },
   "raffle": {
     "announceInterval": "Opened raffles will be announced every (value) minute",
