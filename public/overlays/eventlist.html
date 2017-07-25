@@ -81,9 +81,19 @@
 
       socket.on('overlay.eventlist', function (data) {
         $('#eventlist').empty()
-        data = _.orderBy(data, 'timestamp', 'desc');
-        for (let i = 0; i<5; i++) {
+
+        var order = $.urlParam('order') || 'desc'
+        var ignore = $.urlParam('ignore') || ''; ignore = ignore.split(',')
+        var count = $.urlParam('count') || 5
+
+        data = _.orderBy(data, 'timestamp', order);
+        for (let i = 0; i<count; i++) {
           if (_.isNil(data[i])) break
+
+          if (!_.includes(ignore, data[i].event)) {
+            if (i > 0) i--
+            continue
+          }
 
           if (data[i].event === 'resub') data[i].event = data[i].months + 'x ' + translations['overlays-eventlist-resub']
           else if (data[i].event === 'cheer') data[i].event = data[i].bits + ' ' + translations['overlays-eventlist-cheer']
@@ -95,6 +105,16 @@
           '</li>')
         }
       })
+
+      $.urlParam = function(name){
+        var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+        if (results==null){
+          return null;
+        }
+        else{
+          return decodeURI(results[1]) || 0;
+        }
+    }
     </script>
   </body>
 </html>
