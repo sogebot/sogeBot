@@ -819,7 +819,7 @@
           div.attr('data-deletable', false)
 
           var label = $('<label>')
-          label.html(curTitle + ' <small style="font-size: 65%; color:#777">CURRENT</small>')
+          label.html('<span>' + curTitle + '</span> <small style="font-size: 65%; color:#777">CURRENT</small>')
 
           var input = $('<input>')
           input.attr('type', 'radio')
@@ -827,6 +827,14 @@
           input.attr('value', curTitle)
           input.attr('checked', 'checked')
 
+          var edit = $('<input>')
+          edit.attr('type', 'text')
+          edit.attr('value', curTitle)
+          edit.css('display', 'none')
+          edit.css('border', 0)
+          edit.css('border-bottom', '1px dotted #ccc')
+
+          label.prepend(edit)
           label.prepend(input)
           div.append(label)
 
@@ -840,13 +848,21 @@
           div.attr('data-game', self.selectedGame)
 
           var label = $('<label>')
-          label.text(aTitle)
+          label.html('<span>' + aTitle + '</span>')
 
           var input = $('<input>')
           input.attr('type', 'radio')
           input.attr('name', 'titleSelector')
           input.attr('value', aTitle)
 
+          var edit = $('<input>')
+          edit.attr('type', 'text')
+          edit.attr('value', aTitle)
+          edit.css('display', 'none')
+          edit.css('border', 0)
+          edit.css('border-bottom', '1px dotted #ccc')
+
+          label.prepend(edit)
           label.prepend(input)
           div.append(label)
 
@@ -855,14 +871,42 @@
 
         // refresh dropdown
         var menu = new BootstrapMenu(".titles-list-radio", {
-        fetchElementData: function($el) {
-          return $el.data();
-        },
+          fetchElementData: function($el) {
+            var data = $el.data()
+            data.el = $el
+            return data;
+          },
           actions: [{
+            name: 'Edit',
+            iconClass: 'fa-pencil-square-o',
+            onClick: function(data) {
+              data.el.find(':text').css('display', 'inline-block')
+              data.el.find(':text').css('padding-left', '5px')
+              data.el.find(':text').css('padding-right', '5px')
+              data.el.find(':text').attr('size', data.title.length)
+              data.el.find(':text').focus()
+              data.el.find('span').css('display', 'none')
+
+              data.el.find(':text').focusout(function (el) {
+                data.el.find('span').css('display', 'inline-block')
+                data.el.find(':text').css('display', 'none')
+                console.debug('EMIT [editUserTwitchTitle]', data.el.find('span').text() + ' => ' + data.el.find(':text').val())
+                socket.emit('editUserTwitchTitle', {
+                  game: data.game,
+                  title: data.el.find('span').text(),
+                  new: data.el.find(':text').val()
+                })
+                data.el.find('span').text(data.el.find(':text').val())
+              })
+            },
+            isEnabled: function(data) {
+              return data.deletable;
+            }
+          }, {
             name: 'Delete',
             iconClass: 'fa-trash-o',
             onClick: function(data) {
-              console.debug('EMIT [deleteUserTwitchGame]', data)
+              console.debug('EMIT [deleteUserTwitchTitle]', data)
               socket.emit('deleteUserTwitchTitle', data)
             },
             isEnabled: function(data) {

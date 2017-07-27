@@ -611,6 +611,24 @@ Twitch.prototype.deleteUserTwitchTitle = function (self, socket, data) {
   self.sendUserTwitchGamesAndTitles(self, socket)
 }
 
+Twitch.prototype.editUserTwitchTitle = function (self, socket, data) {
+  if (data.new.length === 0) {
+    self.deleteUserTwitchTitle(self, socket, data)
+    return
+  }
+
+  if (_.isUndefined(self.cGamesTitles[data.game])) { // create key if doesnt exists
+    self.cGamesTitles[data.game] = []
+  }
+
+  if (self.cGamesTitles[data.game].indexOf(data.title) === -1) { // if unique
+    self.cGamesTitles[data.game].push(data.new) // also, we need to add game and title to cached property
+  } else {
+    self.cGamesTitles[data.game][self.cGamesTitles[data.game].indexOf(data.title)] = data.new
+  }
+  self._save(self) // force save
+}
+
 Twitch.prototype.sendUserTwitchGamesAndTitles = function (self, socket) {
   socket.emit('sendUserTwitchGamesAndTitles', self.cGamesTitles)
 }
