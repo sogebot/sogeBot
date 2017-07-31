@@ -259,6 +259,8 @@
     "subscribers-show": "subscribers",
     "followers-size": "Font size",
     "custom-message": "Custom message",
+    "custom-ban-message": "Custom ban message",
+    "custom-ban-message-warning": "Custom warning message",
     "minimal-watched-time": "Minimal watched time:",
     "widget-title-bets": "BETS",
     "widget-title-chat": "CHAT",
@@ -640,7 +642,7 @@
     "without-permission": "You don't have enough permissions for '(command)'"
   },
   "moderation": {
-    "warning": "[(value) warnings left]",
+    "warning": "[$count warnings left]",
     "permit": "User (who) can post a (count) (link) to chat",
     "links": "No links allowed, ask for !permit",
     "symbols": "No excessive symbols usage",
@@ -664,6 +666,22 @@
       "blacklist": "{moderation.blacklist} {moderation.warning}"
     },
     "settings": {
+      "moderationLinksCustomMessage": "Moderation Links custom message set to '(value)'",
+      "moderationLinksWarningCustomMessage": "Moderation Links custom warning message set to '(value)'",
+      "moderationSymbolsCustomMessage": "Moderation Symbols custom message set to '(value)'",
+      "moderationSymbolsWarningCustomMessage": "Moderation Symbols custom warning message set to '(value)'",
+      "moderationLongMessageCustomMessage": "Moderation Long Message custom message set to '(value)'",
+      "moderationLongMessageWarningCustomMessage": "Moderation Long Message custom warning message set to '(value)'",
+      "moderationCapsCustomMessage": "Moderation Caps custom message set to '(value)'",
+      "moderationCapsWarningCustomMessage": "Moderation Caps custom warning message set to '(value)'",
+      "moderationSpamCustomMessage": "Moderation Spam custom message set to '(value)'",
+      "moderationSpamWarningCustomMessage": "Moderation Spam custom warning message set to '(value)'",
+      "moderationColorCustomMessage": "Moderation Color custom message set to '(value)'",
+      "moderationColorWarningCustomMessage": "Moderation Color custom warning message set to '(value)'",
+      "moderationEmotesCustomMessage": "Moderation Emotes custom message set to '(value)'",
+      "moderationEmotesWarningCustomMessage": "Moderation Emotes custom warning message set to '(value)'",
+      "moderationBlacklistCustomMessage": "Moderation Blacklist custom message set to '(value)'",
+      "moderationBlacklistWarningCustomMessage": "Moderation Blacklist custom warning message set to '(value)'",
       "moderationAnnounceTimeouts": {
         "true": "Bot will send timeout messages to chat",
         "false": "Bot won't send timeout messages to chat"

@@ -258,6 +258,8 @@
     "subscribers-show": "subscriberů",
     "followers-size": "Velikost fontu",
     "custom-message": "Vlastní zpráva",
+    "custom-ban-message": "Vlastní ban zpráva",
+    "custom-ban-message-warning": "Vlastní varování",
     "title-template": "Šablona nadpisu",
     "minimal-watched-time": "Minimální čas sledování:",
     "widget-title-bets": "SÁZKY",
@@ -640,7 +642,7 @@
     "without-permission": "Nemas dostatecne opravneni pro '(command)'"
   },
   "moderation": {
-    "warning": "[zbyva (value) varovani]",
+    "warning": "[zbyva $count varovani]",
     "permit": "Uzivatel (who) muze nyni postnout (count) (link) do chatu",
     "links": "Nejsou povoleny linky, pozadej o !permit",
     "symbols": "Prilisne pouzivani symbolu neni povoleno",
@@ -664,6 +666,22 @@
       "blacklist": "{moderation.blacklist} {moderation.warning}"
     },
     "settings": {
+      "moderationLinksCustomMessage": "Vlastni zprava pro moderovani linku je nastavena na '(value)'",
+      "moderationLinksWarningCustomMessage": "Vlastni varovna zprava pro moderovani linku je nastavena na '(value)'",
+      "moderationSymbolsCustomMessage": "Vlastni zprava pro moderovani symbolu je nastavena na '(value)'",
+      "moderationSymbolsWarningCustomMessage": "Vlastni varovna zprava pro moderovani symbolu je nastavena na '(value)'",
+      "moderationLongMessageCustomMessage": "Vlastni zprava pro moderovani dlouhych zprav je nastavena na '(value)'",
+      "moderationLongMessageWarningCustomMessage": "Vlastni varovna zprava pro moderovani dlouhych zprav je nastavena na '(value)'",
+      "moderationCapsCustomMessage": "Vlastni zprava pro moderovani velkych pismen je nastavena na '(value)'",
+      "moderationCapsWarningCustomMessage": "Vlastni varovna zprava pro moderovani velkych pismen je nastavena na '(value)'",
+      "moderationSpamCustomMessage": "Vlastni zprava pro moderovani spamu je nastavena na '(value)'",
+      "moderationSpamWarningCustomMessage": "Vlastni varovna zprava pro moderovani spamu je nastavena na '(value)'",
+      "moderationColorCustomMessage": "Vlastni zprava pro moderovani /me je nastavena na '(value)'",
+      "moderationColorWarningCustomMessage": "Vlastni varovna zprava pro moderovani /me je nastavena na '(value)'",
+      "moderationEmotesCustomMessage": "Vlastni zprava pro moderovani smajliku je nastavena na '(value)'",
+      "moderationEmotesWarningCustomMessage": "Vlastni varovna zprava pro moderovani smajliku je nastavena na '(value)'",
+      "moderationBlacklistCustomMessage": "Vlastni zprava pro moderovani blacklistu je nastavena na '(value)'",
+      "moderationBlacklistWarningCustomMessage": "Vlastni varovna zprava pro moderovani blacklistu je nastavena na '(value)'",
       "moderationAnnounceTimeouts": {
         "true": "Bot bude posilat timeout zpravy do chatu",
         "false": "Bot nebude posilat timeout zpravy do chatu"

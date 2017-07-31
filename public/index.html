@@ -617,7 +617,7 @@
         $(el).css('display', 'none')
         $inputGroup.css('display', 'table')
         $input.focus()
-        $input.val($(el).text().replace(suffix, ''))
+        $input.val($(el).text().replace(suffix, '').replace('< empty >', ''))
 
         $input.off()
         $input.on('focusout', function() {
@@ -626,7 +626,11 @@
           data[el.dataset.configId] = value
           $inputGroup.css('display', 'none')
           $(el).css('display', 'inline')
-          $(el).text(value + suffix)
+
+          if (value.length === 0) $(el).text('< empty >')
+          else $(el).text(value + suffix)
+
+          if (value.trim() === '< empty >') return // doesn't save if is as default
           console.debug('EMIT [saveConfiguration]', data)
           socket.emit('saveConfiguration', data)
         })
