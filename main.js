@@ -16,9 +16,8 @@ var Stats = require('./libs/stats')
 var Watcher = require('./libs/watcher')
 var Events = require('./libs/events')
 var Permissions = require('./libs/permissions')
+var Logger = require('./libs/logging')
 var constants = require('./libs/constants')
-
-require('./libs/logging')
 
 global.watcher = new Watcher()
 global.parser = new Parser()
@@ -30,6 +29,7 @@ global.twitch = new Twitch()
 global.stats = new Stats()
 global.events = new Events()
 global.permissions = new Permissions()
+global.logger = new Logger()
 global.translate = require('./libs/translate')
 
 global.status = {

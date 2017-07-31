@@ -1,8 +1,12 @@
+'use strict'
+
 var winston = require('winston')
 var fs = require('fs')
 var _ = require('lodash')
 var logDir = './logs'
 var moment = require('moment')
+
+const datetime = moment().format('YYYY-MM-DDTHH_mm_ss')
 
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir)
 
@@ -79,7 +83,7 @@ global.log = new (winston.Logger)({
           (username ? ' [' + username + ']' : '') +
           (_.size(options.meta) > 0 && level === 'DEBUG:' ? '\n' + options.timestamp() + ' DEBUG: ' + JSON.stringify(options.meta) : '')
       },
-      filename: logDir + '/sogebot-' + moment().format('YYYY-MM-DDTHH_mm_ss') + '.log',
+      filename: logDir + '/sogebot-' + datetime + '.log',
       handleExceptions: false,
       json: false,
       maxsize: 5242880,
@@ -102,3 +106,17 @@ global.log = new (winston.Logger)({
     })
   ]
 })
+
+function Logger () {
+  global.panel.addMenu({category: 'main', name: 'logger', id: 'logger'})
+
+  this.file = logDir + '/sogebot-' + datetime + '.log'
+
+  global.panel.socketListening(this, 'log.get', this.send)
+}
+
+Logger.prototype.send = async function (self, socket) {
+  socket.emit('log', await fs.readFileSync(self.file, 'utf-8'))
+}
+
+module.exports = Logger

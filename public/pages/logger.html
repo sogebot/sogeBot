@@ -1,0 +1,14 @@
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+  <div class="widget">
+    <h2 class="title" data-lang="logger"></h2>
+    <textarea class="form-control" rows="3" id="logger-data" style="height: 800px"></textarea>
+  </div>
+</div>
+
+<script>
+  socket.emit('log.get');
+
+  socket.on('log', function (log) {
+    $("#logger-data").val(log)
+  })
+</script>
