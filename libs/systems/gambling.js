@@ -146,7 +146,7 @@ Gambling.prototype.roulette = function (self, sender) {
     isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead')
   ]
 
-  if (global.parser.isOwner(sender)) {
+  if (global.parser.isBroadcaster(sender)) {
     global.commons.sendMessage(global.translate('gambling.roulette.trigger') + ' ' + global.translate('gambling.roulette.broadcaster'), sender)
     return
   }
@@ -161,7 +161,7 @@ Gambling.prototype.roulette = function (self, sender) {
 }
 
 Gambling.prototype.seppuku = function (self, sender) {
-  if (global.parser.isOwner(sender)) {
+  if (global.parser.isBroadcaster(sender)) {
     global.commons.sendMessage(global.translate('gambling.seppuku.broadcaster'), sender)
     return
   }
