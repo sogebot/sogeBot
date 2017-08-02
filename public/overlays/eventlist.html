@@ -91,7 +91,7 @@
           if (_.isNil(data[i])) break
 
           if (!_.includes(ignore, data[i].event)) {
-            if (i > 0) i--
+            count++
             continue
           }
 
