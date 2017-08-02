@@ -90,7 +90,7 @@
         for (let i = 0; i<count; i++) {
           if (_.isNil(data[i])) break
 
-          if (!_.includes(ignore, data[i].event)) {
+          if (_.includes(ignore, data[i].event)) {
             count++
             continue
           }
