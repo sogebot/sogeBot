@@ -9,6 +9,7 @@
   socket.emit('log.get');
 
   socket.on('log', function (log) {
+    log = log.replace(/\[32m/g, '').replace(/\[39m/g, '', '')
     $("#logger-data").val(log)
   })
 </script>
