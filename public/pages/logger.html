@@ -1,15 +1,55 @@
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
   <div class="widget">
     <h2 class="title" data-lang="logger"></h2>
+    <div class="btn-group" data-toggle="buttons" style="float: right; padding-top: 10px; padding-right: 10px;">
+      <label class="btn btn-success" onclick="filter.toggle('messages')">
+        <input type="checkbox" autocomplete="off"> Messages
+      </label>
+      <label class="btn btn-success" onclick="filter.toggle('follow')">
+        <input type="checkbox" autocomplete="off"> Follows
+      </label>
+      <label class="btn btn-success" onclick="filter.toggle('responses')">
+        <input type="checkbox" autocomplete="off"> Bot responses
+      </label>
+      <label class="btn btn-success" onclick="filter.toggle('Whispers')">
+        <input type="checkbox" autocomplete="off"> Whispers
+      </label>
+    </div>
     <textarea class="form-control" rows="3" id="logger-data" style="height: 800px"></textarea>
   </div>
 </div>
 
 <script>
-  socket.emit('log.get');
+  socket.emit('log.get', null)
+
+  var filter = {
+    data: {
+      enabled: false,
+      messages: false,
+      follow: false,
+      responses: false,
+      whispers: false
+    },
+    toggle: function (id) {
+      filter.data[id] = !filter.data[id]
+      filter.data.enabled = false
+      _.each(filter.data, function (value, key) {
+        if (key === 'enabled') return true
+        if (value) {
+          filter.data.enabled = true
+          return false
+        }
+      })
+      socket.emit('log.get', filter.data)
+    }
+  }
+
+  $('input:checkbox').off()
+  $(':checkbox').on('click', function (ev) {
+    console.log('aaaa')
+  })
 
   socket.on('log', function (log) {
-    log = log.replace(/\[32m/g, '').replace(/\[39m/g, '', '')
     $("#logger-data").val(log)
   })
 </script>
