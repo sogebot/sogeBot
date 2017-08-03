@@ -5,6 +5,7 @@ var fs = require('fs')
 var _ = require('lodash')
 var logDir = './logs'
 var moment = require('moment')
+const glob = require('glob')
 
 const datetime = moment().format('YYYY-MM-DDTHH_mm_ss')
 
@@ -110,13 +111,51 @@ global.log = new (winston.Logger)({
 function Logger () {
   global.panel.addMenu({category: 'main', name: 'logger', id: 'logger'})
 
-  this.file = logDir + '/sogebot-' + datetime + '.log'
+  this.files = []
 
   global.panel.socketListening(this, 'log.get', this.send)
 }
 
-Logger.prototype.send = async function (self, socket) {
-  socket.emit('log', await fs.readFileSync(self.file, 'utf-8'))
+Logger.prototype.send = async function (self, socket, filters) {
+  var content = ''
+
+  if (!_.isNull(filters)) {
+    self.filter = filters
+  } else {
+    self.filter = {
+      enabled: false,
+      follow: false,
+      messages: false,
+      responses: false,
+      whispers: false
+    }
+  }
+
+  self.files = glob.sync(logDir + '/sogebot-*.log')
+  for (var i = 0; i < self.files.length; i++) {
+    content += await fs.readFileSync(self.files[i], 'utf-8')
+  }
+
+  content = self.doFilter(self, content)
+  socket.emit('log', content)
+}
+
+Logger.prototype.doFilter = function (self, content) {
+  // remove colors
+  var sContent = content.replace(/.\[32m/g, '').replace(/.\[39m/g, '', '').replace(/.*DEBUG:.*/g, '').split('\n')
+  content = []
+
+  for (var i = 0; i < sContent.length; i++) {
+    var line = sContent[i]
+    if (!self.filter.enabled || ((self.filter.follow && (line.search(' +follow ') > 0 || line.search(' -follow ') > 0)) ||
+       (self.filter.messages && line.search(' <<< ') > 0) ||
+       (self.filter.responses && line.search(' >>> ') > 0) ||
+       (self.filter.whispers && (line.search(' >w> ') > 0 || line.search(' <w< ') > 0)))) {
+      content.push(line)
+    }
+  }
+
+  return content.join('\n')
 }
 
 module.exports = Logger
