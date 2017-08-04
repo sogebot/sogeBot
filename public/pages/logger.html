@@ -2,6 +2,13 @@
   <div class="widget">
     <h2 class="title" data-lang="logger"></h2>
     <div class="btn-group" style="float: right; padding-top: 10px; padding-right: 10px;">
+      <button class="btn btn-default btn-label">ORDER:</button>
+      <select class="form-control" style="display: inline-block; width: auto;" onchange="filter.toggle(this, 'order')">
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+      </select>
+    </div>
+    <div class="btn-group" style="float: right; padding-top: 10px; padding-right: 10px;">
       <button class="btn btn-default btn-label">RANGE:</button>
       <select class="form-control" style="display: inline-block; width: auto;" onchange="filter.toggle(this, 'range')">
         <option value="24">24 hours</option>
@@ -15,18 +22,20 @@
       <button class="btn btn-default btn-label">FILTERS:</button>
       <button class="btn btn-danger" onclick="filter.toggle(this, 'messages')">Messages</button>
       <button class="btn btn-danger" onclick="filter.toggle(this, 'follow')">Follows</button>
+      <button class="btn btn-danger" onclick="filter.toggle(this, 'sub')">Subs & Resubs</button>
+      <button class="btn btn-danger" onclick="filter.toggle(this, 'cheer')">Cheers</button>
       <button class="btn btn-danger" onclick="filter.toggle(this, 'responses')">Bot responses</button>
       <button class="btn btn-danger" onclick="filter.toggle(this, 'whispers')">Whispers</button>
       <button class="btn btn-danger" onclick="filter.toggle(this, 'host')">Hosts</button>
       <button class="btn btn-danger" onclick="filter.toggle(this, 'ban')">Bans</button>
       <button class="btn btn-danger" onclick="filter.toggle(this, 'timeout')">Timeouts</button>
     </div>
-    <textarea class="form-control" rows="3" id="logger-data" style="height: 800px"></textarea>
+    <textarea readonly class="form-control" rows="3" id="logger-data" style="height: 800px; color: lawngreen; background-color: #000; font-size: 100%"></textarea>
   </div>
 </div>
 
 <script>
-  socket.emit('log.get', { range: 24 })
+  socket.emit('log.get', { range: 24, order: 'asc' })
 
   var filter = {
     data: {
@@ -38,18 +47,21 @@
       host: false,
       ban: false,
       timeout: false,
-      range: 24
+      sub: false,
+      cheer: false,
+      range: 24,
+      order: 'asc'
     },
     toggle: function (el, id) {
-      if (id === 'range') {
-        filter.data.range = $(el).val()
+      if (id === 'range' || id === 'order') {
+        filter.data[id] = $(el).val()
       } else {
         filter.data[id] = !filter.data[id]
         $(el).removeClass().addClass('btn ' + (filter.data[id] ? 'btn-success' : 'btn-danger'))
       }
       filter.data.enabled = false
       _.each(filter.data, function (value, key) {
-        if (key === 'enabled' || key === 'range') return true
+        if (key === 'enabled' || key === 'range' || key === 'order') return true
         if (value) {
           filter.data.enabled = true
           return false

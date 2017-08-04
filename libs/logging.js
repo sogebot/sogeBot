@@ -21,7 +21,10 @@ global.log = new (winston.Logger)({
     host: 5,
     follow: 6,
     unfollow: 7,
-    timeout: 8,
+    cheer: 7,
+    sub: 7,
+    resub: 7,
+    timeout: 7,
     ban: 9,
     warning: 10,
     debug: 11,
@@ -50,6 +53,9 @@ global.log = new (winston.Logger)({
         if (level === 'follow') level = '+follow'
         if (level === 'host') level = '+host'
         if (level === 'unfollow') level = '-follow'
+        if (level === 'cheer') level = '+cheer'
+        if (level === 'sub') level = '+sub'
+        if (level === 'resub') level = '+resub'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
         let fnc = !_.isUndefined(options.meta.fnc) ? options.meta.fnc : ''
         return moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + (level ? ' ' + level + ' ' : ' ') + (options.message ? options.message : '') + (username ? ' [' + username + ']' : '') + (fnc ? ' [function: ' + fnc + ']' : '') + (_.size(options.meta) > 0 && level === 'DEBUG:' ? '\n' + options.timestamp() + ' DEBUG: ' + JSON.stringify(options.meta) : '')
@@ -77,6 +83,9 @@ global.log = new (winston.Logger)({
         if (level === 'follow') level = '+follow'
         if (level === 'host') level = '+host'
         if (level === 'unfollow') level = '-follow'
+        if (level === 'cheer') level = '+cheer'
+        if (level === 'sub') level = '+sub'
+        if (level === 'resub') level = '+resub'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
         return moment().format('YYYY-MM-DDTHH:mm:ss.SSS') +
           (level ? ' ' + level + ' ' : ' ') +
@@ -119,22 +128,7 @@ function Logger () {
 Logger.prototype.send = async function (self, socket, filters) {
   var content = ''
 
-  if (!_.isNull(filters)) {
-    self.filter = filters
-  } else {
-    self.filter = {
-      enabled: false,
-      follow: false,
-      messages: false,
-      responses: false,
-      whispers: false,
-      host: false,
-      ban: false,
-      timeout: false,
-      range: 24
-    }
-  }
-
+  self.filter = filters
   self.files = glob.sync(logDir + '/sogebot-*.log')
   for (var i = 0; i < self.files.length; i++) {
     content += await fs.readFileSync(self.files[i], 'utf-8')
@@ -145,8 +139,12 @@ Logger.prototype.send = async function (self, socket, filters) {
 }
 
 Logger.prototype.doFilter = function (self, content) {
-  // remove colors
-  var sContent = content.replace(/.\[32m/g, '').replace(/.\[39m/g, '', '').replace(/.*DEBUG:.*/g, '').split('\n')
+  // remove startup, debug and errors
+  var sContent = content.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z? \| .*/g, '')
+    .replace(/.\[39m/g, '', '')
+    .replace(/.*DEBUG:.*/g, '')
+    .replace(/.*!!! ERROR !!!.*/g, '')
+    .split('\n')
   content = []
 
   for (var i = 0; i < sContent.length; i++) {
@@ -172,12 +170,14 @@ Logger.prototype.doFilter = function (self, content) {
        (self.filter.timeout && line.match(/\s[+-]timeout\s/g)) ||
        (self.filter.messages && line.match(/\s<{3}\s/g)) ||
        (self.filter.responses && line.match(/\s>{3}\s/g)) ||
+       (self.filter.sub && line.match(/\s[+-](sub|resub)\s/g)) ||
+       (self.filter.cheer && line.match(/\s[+-]cheer\s/g)) ||
        (self.filter.whispers && line.match(/\s[<>]w[<>]\s/g))) {
       content.push(line)
     }
   }
 
-  return content.join('\n')
+  return self.filter.order === 'desc' ? _.reverse(content).join('\n') : content.join('\n')
 }
 
 module.exports = Logger
