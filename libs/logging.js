@@ -78,11 +78,11 @@ global.log = new (winston.Logger)({
         if (level === 'host') level = '+host'
         if (level === 'unfollow') level = '-follow'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
-        return options.timestamp() +
+        return moment().format('YYYY-MM-DDTHH:mm:ss.SSS') +
           (level ? ' ' + level + ' ' : ' ') +
           (options.message ? options.message : '') +
           (username ? ' [' + username + ']' : '') +
-          (_.size(options.meta) > 0 && level === 'DEBUG:' ? '\n' + options.timestamp() + ' DEBUG: ' + JSON.stringify(options.meta) : '')
+          (_.size(options.meta) > 0 && level === 'DEBUG:' ? '\n' + moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + ' DEBUG: ' + JSON.stringify(options.meta) : '')
       },
       filename: logDir + '/sogebot-' + datetime + '.log',
       handleExceptions: false,
@@ -127,7 +127,11 @@ Logger.prototype.send = async function (self, socket, filters) {
       follow: false,
       messages: false,
       responses: false,
-      whispers: false
+      whispers: false,
+      host: false,
+      ban: false,
+      timeout: false,
+      range: 24
     }
   }
 
@@ -147,10 +151,28 @@ Logger.prototype.doFilter = function (self, content) {
 
   for (var i = 0; i < sContent.length; i++) {
     var line = sContent[i]
-    if (!self.filter.enabled || ((self.filter.follow && (line.search(' +follow ') > 0 || line.search(' -follow ') > 0)) ||
-       (self.filter.messages && line.search(' <<< ') > 0) ||
-       (self.filter.responses && line.search(' >>> ') > 0) ||
-       (self.filter.whispers && (line.search(' >w> ') > 0 || line.search(' <w< ') > 0)))) {
+
+    var time = line.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})/g)
+    var curTime = moment().format('X')
+
+    if (_.isNull(time)) continue
+    time = moment(time[0].replace(/[-:]/g, '')).format('X')
+
+    var range = self.filter.range * 60 * 60
+    if (curTime - time > range && parseInt(self.filter.range, 10) !== 0) continue
+
+    if (!self.filter.enabled) {
+      content.push(line)
+      continue
+    }
+
+    if ((self.filter.follow && line.match(/\s[+-]follow\s/g)) ||
+       (self.filter.host && line.match(/\s[+-]host\s/g)) ||
+       (self.filter.ban && line.match(/\s[+-]ban\s/g)) ||
+       (self.filter.timeout && line.match(/\s[+-]timeout\s/g)) ||
+       (self.filter.messages && line.match(/\s<{3}\s/g)) ||
+       (self.filter.responses && line.match(/\s>{3}\s/g)) ||
+       (self.filter.whispers && line.match(/\s[<>]w[<>]\s/g))) {
       content.push(line)
     }
   }

@@ -1,26 +1,32 @@
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
   <div class="widget">
     <h2 class="title" data-lang="logger"></h2>
-    <div class="btn-group" data-toggle="buttons" style="float: right; padding-top: 10px; padding-right: 10px;">
-      <label class="btn btn-success" onclick="filter.toggle('messages')">
-        <input type="checkbox" autocomplete="off"> Messages
-      </label>
-      <label class="btn btn-success" onclick="filter.toggle('follow')">
-        <input type="checkbox" autocomplete="off"> Follows
-      </label>
-      <label class="btn btn-success" onclick="filter.toggle('responses')">
-        <input type="checkbox" autocomplete="off"> Bot responses
-      </label>
-      <label class="btn btn-success" onclick="filter.toggle('Whispers')">
-        <input type="checkbox" autocomplete="off"> Whispers
-      </label>
+    <div class="btn-group" style="float: right; padding-top: 10px; padding-right: 10px;">
+      <button class="btn btn-default btn-label">RANGE:</button>
+      <select class="form-control" style="display: inline-block; width: auto;" onchange="filter.toggle(this, 'range')">
+        <option value="24">24 hours</option>
+        <option value="168">7 days</option>
+        <option value="672">1 month</option>
+        <option value="8064">1 year</option>
+        <option value="0">All time</option>
+      </select>
+    </div>
+    <div class="btn-group" style="float: right; padding-top: 10px; padding-right: 10px;">
+      <button class="btn btn-default btn-label">FILTERS:</button>
+      <button class="btn btn-danger" onclick="filter.toggle(this, 'messages')">Messages</button>
+      <button class="btn btn-danger" onclick="filter.toggle(this, 'follow')">Follows</button>
+      <button class="btn btn-danger" onclick="filter.toggle(this, 'responses')">Bot responses</button>
+      <button class="btn btn-danger" onclick="filter.toggle(this, 'whispers')">Whispers</button>
+      <button class="btn btn-danger" onclick="filter.toggle(this, 'host')">Hosts</button>
+      <button class="btn btn-danger" onclick="filter.toggle(this, 'ban')">Bans</button>
+      <button class="btn btn-danger" onclick="filter.toggle(this, 'timeout')">Timeouts</button>
     </div>
     <textarea class="form-control" rows="3" id="logger-data" style="height: 800px"></textarea>
   </div>
 </div>
 
 <script>
-  socket.emit('log.get', null)
+  socket.emit('log.get', { range: 24 })
 
   var filter = {
     data: {
@@ -28,13 +34,22 @@
       messages: false,
       follow: false,
       responses: false,
-      whispers: false
+      whispers: false,
+      host: false,
+      ban: false,
+      timeout: false,
+      range: 24
     },
-    toggle: function (id) {
-      filter.data[id] = !filter.data[id]
+    toggle: function (el, id) {
+      if (id === 'range') {
+        filter.data.range = $(el).val()
+      } else {
+        filter.data[id] = !filter.data[id]
+        $(el).removeClass().addClass('btn ' + (filter.data[id] ? 'btn-success' : 'btn-danger'))
+      }
       filter.data.enabled = false
       _.each(filter.data, function (value, key) {
-        if (key === 'enabled') return true
+        if (key === 'enabled' || key === 'range') return true
         if (value) {
           filter.data.enabled = true
           return false
@@ -43,11 +58,6 @@
       socket.emit('log.get', filter.data)
     }
   }
-
-  $('input:checkbox').off()
-  $(':checkbox').on('click', function (ev) {
-    console.log('aaaa')
-  })
 
   socket.on('log', function (log) {
     $("#logger-data").val(log)
