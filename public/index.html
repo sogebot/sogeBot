@@ -570,9 +570,10 @@
 
     var commons = {
       translate: function () {
-        _.each(translations, function (value, key) {
-            $('[data-lang="' + key + '"]').text(value)
-          })
+        _.each($('[data-lang]'), function (el) {
+          var key = ($(el).data('lang'))
+          $(el).text(_.at(translations, key)[0])
+        })
       },
       editable: function (string, id, fnc) {
         id = id || ''

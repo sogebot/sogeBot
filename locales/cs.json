@@ -49,6 +49,35 @@
     }
   },
   "webpanel": {
+    "page-logger": {
+      "buttons": {
+        "messages": "Zprávy",
+        "follows": "Followy",
+        "subs": "Odběratelé",
+        "cheers": "Cheery",
+        "responses": "Odpovědi bota",
+        "whispers": "Šeptání",
+        "hosts": "Hostování",
+        "bans": "Bany",
+        "timeouts": "Timeouty"
+      },
+      "range": {
+        "day": "den",
+        "week": "týden",
+        "month": "měsíc",
+        "year": "rok",
+        "all": "bez omezení"
+      },
+      "order": {
+        "asc": "Vzestupně",
+        "desc": "Sestupně"
+      },
+      "labels": {
+        "order": "SEŘADIT",
+        "range": "ROZSAH",
+        "filters": "FILTRY"
+      }
+    },
     "stats-panel": {
       "show": "ukázat",
       "hide": "skrýt"
@@ -130,6 +159,7 @@
     "price": "Cena příkazů",
     "ranks": "Hodnosti",
     "event-listeners": "Události",
+    "logger": "Záznamy",
     "songs": "Písničky",
     "previous": "Předchozí",
     "next": "Další",

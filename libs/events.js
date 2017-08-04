@@ -106,10 +106,12 @@ Events.prototype.loadSystemEvents = function (self) {
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'follow' }
   ])
   self.events['resub'].push([
-    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'resub' }
+    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'resub' },
+    { system: true, name: 'log', message: '(username), months: (months), message: (message)', level: 'resub' }
   ])
   self.events['subscription'].push([
-    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'sub' }
+    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'sub' },
+    { system: true, name: 'log', message: '(username), method: (method)', level: 'sub' }
   ])
   self.events['unfollow'].push([
     { system: true, name: 'log', message: '(username)', level: 'unfollow' }
@@ -122,7 +124,8 @@ Events.prototype.loadSystemEvents = function (self) {
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'host' }
   ])
   self.events['cheer'].push([
-    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'cheer' }
+    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'cheer' },
+    { system: true, name: 'log', message: '(username), bits: (bits), message: (message)', level: 'cheer' }
   ])
 }
 

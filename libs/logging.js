@@ -1,8 +1,13 @@
+'use strict'
+
 var winston = require('winston')
 var fs = require('fs')
 var _ = require('lodash')
 var logDir = './logs'
 var moment = require('moment')
+const glob = require('glob')
+
+const datetime = moment().format('YYYY-MM-DDTHH_mm_ss')
 
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir)
 
@@ -16,7 +21,10 @@ global.log = new (winston.Logger)({
     host: 5,
     follow: 6,
     unfollow: 7,
-    timeout: 8,
+    cheer: 7,
+    sub: 7,
+    resub: 7,
+    timeout: 7,
     ban: 9,
     warning: 10,
     debug: 11,
@@ -45,6 +53,9 @@ global.log = new (winston.Logger)({
         if (level === 'follow') level = '+follow'
         if (level === 'host') level = '+host'
         if (level === 'unfollow') level = '-follow'
+        if (level === 'cheer') level = '+cheer'
+        if (level === 'sub') level = '+sub'
+        if (level === 'resub') level = '+resub'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
         let fnc = !_.isUndefined(options.meta.fnc) ? options.meta.fnc : ''
         return moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + (level ? ' ' + level + ' ' : ' ') + (options.message ? options.message : '') + (username ? ' [' + username + ']' : '') + (fnc ? ' [function: ' + fnc + ']' : '') + (_.size(options.meta) > 0 && level === 'DEBUG:' ? '\n' + options.timestamp() + ' DEBUG: ' + JSON.stringify(options.meta) : '')
@@ -72,14 +83,17 @@ global.log = new (winston.Logger)({
         if (level === 'follow') level = '+follow'
         if (level === 'host') level = '+host'
         if (level === 'unfollow') level = '-follow'
+        if (level === 'cheer') level = '+cheer'
+        if (level === 'sub') level = '+sub'
+        if (level === 'resub') level = '+resub'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
-        return options.timestamp() +
+        return moment().format('YYYY-MM-DDTHH:mm:ss.SSS') +
           (level ? ' ' + level + ' ' : ' ') +
           (options.message ? options.message : '') +
           (username ? ' [' + username + ']' : '') +
-          (_.size(options.meta) > 0 && level === 'DEBUG:' ? '\n' + options.timestamp() + ' DEBUG: ' + JSON.stringify(options.meta) : '')
+          (_.size(options.meta) > 0 && level === 'DEBUG:' ? '\n' + moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + ' DEBUG: ' + JSON.stringify(options.meta) : '')
       },
-      filename: logDir + '/sogebot-' + moment().format('YYYY-MM-DDTHH_mm_ss') + '.log',
+      filename: logDir + '/sogebot-' + datetime + '.log',
       handleExceptions: false,
       json: false,
       maxsize: 5242880,
@@ -102,3 +116,68 @@ global.log = new (winston.Logger)({
     })
   ]
 })
+
+function Logger () {
+  global.panel.addMenu({category: 'main', name: 'logger', id: 'logger'})
+
+  this.files = []
+
+  global.panel.socketListening(this, 'log.get', this.send)
+}
+
+Logger.prototype.send = async function (self, socket, filters) {
+  var content = ''
+
+  self.filter = filters
+  self.files = glob.sync(logDir + '/sogebot-*.log')
+  for (var i = 0; i < self.files.length; i++) {
+    content += await fs.readFileSync(self.files[i], 'utf-8')
+  }
+
+  content = self.doFilter(self, content)
+  socket.emit('log', content)
+}
+
+Logger.prototype.doFilter = function (self, content) {
+  // remove startup, debug and errors
+  var sContent = content.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z? \| .*/g, '')
+    .replace(/.\[39m/g, '', '')
+    .replace(/.*DEBUG:.*/g, '')
+    .replace(/.*!!! ERROR !!!.*/g, '')
+    .split('\n')
+  content = []
+
+  for (var i = 0; i < sContent.length; i++) {
+    var line = sContent[i]
+
+    var time = line.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})/g)
+    var curTime = moment().format('X')
+
+    if (_.isNull(time)) continue
+    time = moment(time[0].replace(/[-:]/g, '')).format('X')
+
+    var range = self.filter.range * 60 * 60
+    if (curTime - time > range && parseInt(self.filter.range, 10) !== 0) continue
+
+    if (!self.filter.enabled) {
+      content.push(line)
+      continue
+    }
+
+    if ((self.filter.follow && line.match(/\s[+-]follow\s/g)) ||
+       (self.filter.host && line.match(/\s[+-]host\s/g)) ||
+       (self.filter.ban && line.match(/\s[+-]ban\s/g)) ||
+       (self.filter.timeout && line.match(/\s[+-]timeout\s/g)) ||
+       (self.filter.messages && line.match(/\s<{3}\s/g)) ||
+       (self.filter.responses && line.match(/\s>{3}\s/g)) ||
+       (self.filter.sub && line.match(/\s[+-](sub|resub)\s/g)) ||
+       (self.filter.cheer && line.match(/\s[+-]cheer\s/g)) ||
+       (self.filter.whispers && line.match(/\s[<>]w[<>]\s/g))) {
+      content.push(line)
+    }
+  }
+
+  return self.filter.order === 'desc' ? _.reverse(content).join('\n') : content.join('\n')
+}
+
+module.exports = Logger

@@ -49,6 +49,35 @@
     }
   },
   "webpanel": {
+    "page-logger": {
+      "buttons": {
+        "messages": "Messages",
+        "follows": "Follows",
+        "subs": "Subs & Resubs",
+        "cheers": "Cheers",
+        "responses": "Bot responses",
+        "whispers": "Whispers",
+        "hosts": "Hosts",
+        "bans": "Bans",
+        "timeouts": "Timeouts"
+      },
+      "range": {
+        "day": "a day",
+        "week": "a week",
+        "month": "a month",
+        "year": "an year",
+        "all": "All time"
+      },
+      "order": {
+        "asc": "Ascending",
+        "desc": "Descending"
+      },
+      "labels": {
+        "order": "ORDER",
+        "range": "RANGE",
+        "filters": "FILTERS"
+      }
+    },
     "stats-panel": {
       "show": "show",
       "hide": "hide"
@@ -131,6 +160,7 @@
     "price": "Price",
     "ranks": "Ranks",
     "event-listeners": "Event listeners",
+    "logger": "Logs",
     "songs": "Songs",
     "previous": "Previous",
     "next": "Next",
