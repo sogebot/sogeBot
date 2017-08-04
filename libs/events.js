@@ -48,7 +48,7 @@ function Events () {
     },
     'run-command': function (attr) {
       if (_.isNil(attr.quiet)) attr.quiet = false
-      global.parser.parseCommands((attr.quiet) ? null : { username: attr.username }, attr.command.replace('(username)', attr.username))
+      global.parser.parseCommands((attr.quiet) ? null : { username: global.parser.getOwner() }, attr.command.replace('(username)', attr.username))
     },
     'play-sound': function (attr) {
       // attr.sound can be filename or url
