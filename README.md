@@ -67,14 +67,7 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 * Minimum of 512MB RAM
 
 #### Installation
-
-* Latest release can be found at https://github.com/sogehige/SogeBot/releases
-* Update config.ini - set bot username and password (oauth:xxxxxxxxxxxxxxxxxxxx), owners and channel
-* `cd to/your/bot/folder`
-* **IF UPGRADING BOT AND USING OLD SogeBot.db**: `rm -rf node_modules ; npm install`
-* Check https://github.com/sogehige/SogeBot/releases for info, if you should do `npm migrate`
-* For **Linux**: `npm install ; npm start`
-* For **Windows**: `npm install ; npm start`
+https://github.com/sogehige/SogeBot/wiki/Install-and-Upgrade
 
 #### Command list
 https://github.com/sogehige/SogeBot/wiki/Command-list
