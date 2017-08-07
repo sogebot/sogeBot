@@ -727,3 +727,29 @@ th:first-letter {
 .menu-container {
   border-bottom: 1px solid #ADB2B5;
 }
+
+#gallery-list {
+  padding-left: 0;
+  list-style: none;
+}
+
+#gallery-list li {
+  width: 12%;
+  max-width: 12%;
+  font-size: 12px;
+  float: left;
+  margin: 0.25%;
+  text-align: center;
+}
+
+#gallery-list li img {
+  display: inline-block;
+  width: 100%;
+}
+
+#gallery-list li i {
+  display: inline-block;
+  width: 100%;
+  font-size: 5vw;
+  margin-top: 15%;
+}
