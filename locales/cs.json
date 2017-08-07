@@ -150,7 +150,7 @@
     "alias": "Alias",
     "command": "Příkaz",
     "clips": "Klipy",
-    "commands-cooldowns": "Cooldowny příkazů",
+    "cooldowns": "Cooldowny",
     "custom-commands": "Vlastní příkazy",
     "keywords": "Klíčová slova",
     "keyword": "Klíčové slovo",
@@ -856,26 +856,26 @@
   "cooldown": {
     "toggle": {
       "moderator": {
-        "enabled": "Cooldown pro !(command) je nastaven i pro moderatory",
-        "disabled": "Cooldown pro !(command) ignoruje moderatory",
+        "enabled": "Cooldown pro (command) je nastaven i pro moderatory",
+        "disabled": "Cooldown pro (command) ignoruje moderatory",
         "failed": "Promin, (sender), ale tento cooldown neexistuje"
       },
       "owner": {
-        "enabled": "Cooldown pro !(command) je nastaven i pro vlastnika",
-        "disabled": "Cooldown pro !(command) ignoruje vlastnika",
+        "enabled": "Cooldown pro (command) je nastaven i pro vlastnika",
+        "disabled": "Cooldown pro (command) ignoruje vlastnika",
         "failed": "Promin, (sender), ale tento cooldown neexistuje"
       }
     },
     "failed": {
-      "parse": "{core.command-parse} !cooldown [command] [global|user] [seconds] [true/false]",
-      "cooldown": "(sender), jeste nemuzes pouzit !(command), zbyva jeste (seconds)s",
-      "toggle": "Cooldown pro !(command) neni v databazi!"
+      "parse": "{core.command-parse} !cooldown [keyword|!command] [global|user] [seconds] [true/false]",
+      "cooldown": "(sender), jeste nemuzes pouzit (command), zbyva jeste (seconds)s",
+      "toggle": "Cooldown pro (command) neni v databazi!"
     },
     "success": {
-      "set": "(type) cooldown pro !(command) byl nastaven na (seconds)s",
-      "unset": "Cooldown pro !(command) byl odebran",
-      "enabled": "Cooldown pro !(command) byl zapnut",
-      "disabled": "Cooldown pro !(command) byl vypnut"
+      "set": "(type) cooldown pro (command) byl nastaven na (seconds)s",
+      "unset": "Cooldown pro (command) byl odebran",
+      "enabled": "Cooldown pro (command) byl zapnut",
+      "disabled": "Cooldown pro (command) byl vypnut"
     }
   },
   "gambling": {

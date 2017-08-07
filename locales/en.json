@@ -150,7 +150,7 @@
     "alias": "Alias",
     "command": "Command",
     "clips": "Clips",
-    "commands-cooldowns": "Commands cooldowns",
+    "cooldowns": "Cooldowns",
     "custom-commands": "Custom commands",
     "title-template": "Title template",
     "keywords": "Keywords",
@@ -856,26 +856,26 @@
   "cooldown": {
     "toggle": {
       "moderator": {
-        "enabled": "Cooldown for !(command) was enabled for moderators",
-        "disabled": "Cooldown for !(command) was disabled for moderators",
+        "enabled": "Cooldown for (command) was enabled for moderators",
+        "disabled": "Cooldown for (command) was disabled for moderators",
         "failed": "Sorry, (sender), this cooldown doesn't exist"
       },
       "owner": {
-        "enabled": "Cooldown for !(command) was enabled for owners",
-        "disabled": "Cooldown for !(command) was disabled for owners",
+        "enabled": "Cooldown for (command) was enabled for owners",
+        "disabled": "Cooldown for (command) was disabled for owners",
         "failed": "Sorry, (sender), this cooldown doesn't exist"
       }
     },
     "failed": {
-      "parse": "{core.command-parse} !cooldown [command] [global|user] [seconds] [true/false]",
-      "cooldown": "(sender), you cannot use !(command), remaining (seconds)s",
-      "toggle": "Cooldown for !(command) was not found!"
+      "parse": "{core.command-parse} !cooldown [keyword|!command] [global|user] [seconds] [true/false]",
+      "cooldown": "(sender), you cannot use (command), remaining (seconds)s",
+      "toggle": "Cooldown for (command) was not found!"
     },
     "success": {
-      "set": "(type) cooldown for !(command) was set to (seconds)s",
-      "unset": "Cooldown for !(command) was unset",
-      "enabled": "Cooldown for !(command) was enabled",
-      "disabled": "Cooldown for !(command) was disabled"
+      "set": "(type) cooldown for (command) was set to (seconds)s",
+      "unset": "Cooldown for (command) was unset",
+      "enabled": "Cooldown for (command) was enabled",
+      "disabled": "Cooldown for (command) was disabled"
     }
   },
   "gambling": {

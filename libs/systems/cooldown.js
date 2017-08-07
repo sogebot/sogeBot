@@ -8,10 +8,10 @@ var constants = require('../constants')
 var log = global.log
 
 /*
- * !cooldown [command] [seconds] [true/false] - set cooldown for command - 0 for disable, true/false set quiet mode
- * !cooldown toggle moderators [command]      - enable/disable specified command cooldown for moderators
- * !cooldown toggle owners [command]          - enable/disable specified command cooldown for owners
- * !cooldown toggle enabled [command]         - enable/disable specified command cooldown
+ * !cooldown [keyword|!command] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
+ * !cooldown toggle moderators [keyword|!command]      - enable/disable specified keyword or !command cooldown for moderators
+ * !cooldown toggle owners [keyword|!command]          - enable/disable specified keyword or !command cooldown for owners
+ * !cooldown toggle enabled [keyword|!command]         - enable/disable specified keyword or !command cooldown
  */
 
 function Cooldown () {
@@ -36,7 +36,7 @@ function Cooldown () {
 }
 
 Cooldown.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'manage', name: 'commands-cooldowns', id: 'cooldown'})
+  global.panel.addMenu({category: 'manage', name: 'cooldowns', id: 'cooldown'})
   global.panel.socketListening(this, 'cooldown.get', this.sSend)
   global.panel.socketListening(this, 'cooldown.set', this.sSet)
   global.panel.socketListening(this, 'cooldown.edit', this.sEdit)
@@ -98,7 +98,7 @@ Cooldown.prototype.set = function (self, sender, text) {
   var data, match
 
   try {
-    match = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) (global|user) (\d+) ?(\w+)?/)
+    match = text.match(/^([!\u0500-\u052F\u0400-\u04FF\w]+) (global|user) (\d+) ?(\w+)?/)
     data = {'command': match[1], 'seconds': match[3], 'type': match[2], 'quiet': match[4] !== 'false', 'enabled': true}
   } catch (e) {
     global.commons.sendMessage(global.translate('cooldown.failed.parse'), sender)
@@ -119,52 +119,70 @@ Cooldown.prototype.set = function (self, sender, text) {
 }
 
 Cooldown.prototype.check = function (self, id, sender, text) {
-  var data, match, viewer, timestamp, now
+  var data, cmdMatch, viewer, timestamp, now
 
-  try {
-    match = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)/)
-    data = {'command': match[1], 'miliseconds': self.list[match[1]].miliseconds, 'type': self.list[match[1]].type, 'timestamp': self.list[match[1]].timestamp, 'quiet': self.list[match[1]].quiet, 'enabled': self.list[match[1]].enabled, 'moderator': self.list[match[1]].moderator, 'owner': self.list[match[1]].owner}
-    if (_.isUndefined(data.miliseconds) || !data.enabled) throw Error()
-  } catch (e) {
-    global.updateQueue(id, true)
-    return
-  }
-
-  if ((global.parser.isOwner(sender) && !data.owner) || (sender.mod && !data.moderator)) {
-    global.updateQueue(id, true)
-    return
-  }
-
-  viewer = _.isUndefined(self.viewers[sender.username]) ? {} : self.viewers[sender.username]
-  if (data.type === 'global') {
-    timestamp = data.timestamp
-  } else {
-    timestamp = _.isUndefined(viewer[data.command]) ? 0 : viewer[data.command]
-  }
-  now = new Date().getTime()
-
-  if (now - timestamp >= data.miliseconds) {
-    if (data.type === 'global') {
-      self.list[match[1]].timestamp = now
+  cmdMatch = text.match(/^(![\u0500-\u052F\u0400-\u04FF\w]+)/)
+  if (!_.isNil(cmdMatch)) { // command
+    if (_.isNil(self.list[cmdMatch[1]])) { // command is not on cooldown -> recheck with text only
+      self.check(self, id, sender, text.replace(cmdMatch[1], ''))
+      return // do nothing
     } else {
-      viewer[data.command] = now
-      self.viewers[sender.username] = viewer
+      data = [{'command': cmdMatch[1], 'miliseconds': self.list[cmdMatch[1]].miliseconds, 'type': self.list[cmdMatch[1]].type, 'timestamp': self.list[cmdMatch[1]].timestamp, 'quiet': self.list[cmdMatch[1]].quiet, 'enabled': self.list[cmdMatch[1]].enabled, 'moderator': self.list[cmdMatch[1]].moderator, 'owner': self.list[cmdMatch[1]].owner}]
     }
-    global.updateQueue(id, true)
-  } else {
-    if (!data.quiet) {
-      sender['message-type'] = 'whisper' // we want to whisp cooldown message
-      global.commons.sendMessage(global.translate('cooldown.failed.cooldown')
-        .replace('(command)', data.command)
-        .replace('(seconds)', Math.ceil((data.miliseconds - now + timestamp) / 1000)), sender)
-    }
-    global.updateQueue(id, false)
+  } else { // text
+    let keywords = _.filter(global.systems.keywords.keywords, function (o) {
+      return text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
+    })
+    data = []
+    _.each(keywords, function (o) { if (o.enabled) data.push({'command': o.keyword, 'miliseconds': self.list[o.keyword].miliseconds, 'type': self.list[o.keyword].type, 'timestamp': self.list[o.keyword].timestamp, 'quiet': self.list[o.keyword].quiet, 'enabled': self.list[o.keyword].enabled, 'moderator': self.list[o.keyword].moderator, 'owner': self.list[o.keyword].owner}) })
   }
+
+  if (!_.some(data, { enabled: true })) { // parse ok if all cooldowns are disabled
+    global.updateQueue(id, true)
+    return
+  }
+
+  let result = false
+  _.each(data, function (cooldown) {
+    if ((global.parser.isOwner(sender) && !cooldown.owner) || (sender.mod && !cooldown.moderator)) {
+      result = true
+      return true
+    }
+
+    viewer = _.isUndefined(self.viewers[sender.username]) ? {} : self.viewers[sender.username]
+    if (cooldown.type === 'global') {
+      timestamp = cooldown.timestamp
+    } else {
+      timestamp = _.isUndefined(viewer[cooldown.command]) ? 0 : viewer[cooldown.command]
+    }
+    now = new Date().getTime()
+
+    if (now - timestamp >= cooldown.miliseconds) {
+      if (cooldown.type === 'global') {
+        self.list[cooldown.command].timestamp = now
+      } else {
+        viewer[cooldown.command] = now
+        self.viewers[sender.username] = viewer
+      }
+      result = true
+      return true
+    } else {
+      if (!cooldown.quiet) {
+        sender['message-type'] = 'whisper' // we want to whisp cooldown message
+        global.commons.sendMessage(global.translate('cooldown.failed.cooldown')
+          .replace('(command)', cooldown.command)
+          .replace('(seconds)', Math.ceil((cooldown.miliseconds - now + timestamp) / 1000)), sender)
+      }
+      result = false
+      return false // disable _.each and updateQueue with false
+    }
+  })
+  global.updateQueue(id, result)
 }
 
 Cooldown.prototype.toggle = function (self, sender, text) {
   try {
-    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S]+)$/)[1]
+    let parsed = text.match(/^([!\u0500-\u052F\u0400-\u04FF\w\S]+)$/)[1]
     let cooldown = _.find(self.list, function (o, k) { return k === parsed })
     if (_.isUndefined(cooldown)) {
       global.commons.sendMessage(global.translate('cooldown.failed.toggle')
@@ -182,7 +200,7 @@ Cooldown.prototype.toggle = function (self, sender, text) {
 
 Cooldown.prototype.toggleModerators = function (self, sender, text) {
   try {
-    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S]+)$/)[1]
+    let parsed = text.match(/^([!\u0500-\u052F\u0400-\u04FF\w\S]+)$/)[1]
     let cooldown = _.find(self.list, function (o, k) { return k === parsed })
     if (_.isUndefined(cooldown)) {
       global.commons.sendMessage(global.translate('cooldown.toggle.moderator.failed')
@@ -200,7 +218,7 @@ Cooldown.prototype.toggleModerators = function (self, sender, text) {
 
 Cooldown.prototype.toggleOwners = function (self, sender, text) {
   try {
-    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S]+)$/)[1]
+    let parsed = text.match(/^([!\u0500-\u052F\u0400-\u04FF\w\S]+)$/)[1]
     let cooldown = _.find(self.list, function (o, k) { return k === parsed })
     if (_.isUndefined(cooldown)) {
       global.commons.sendMessage(global.translate('cooldown.toggle.owner.failed')
