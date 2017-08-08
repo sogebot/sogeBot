@@ -25,7 +25,7 @@
 </div>
 
 <script>
-  $.getScript("http://player.twitch.tv/js/embed/v1.js", function() {
+  $.getScript(window.location.protocol + "//player.twitch.tv/js/embed/v1.js", function() {
     socket.emit('getTwitchVideo')
   })
 
