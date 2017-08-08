@@ -26,6 +26,8 @@ function Cooldown () {
     global.parser.register(this, '!cooldown', this.set, constants.OWNER_ONLY)
     global.parser.registerParser(this, '0-cooldown', this.check, constants.VIEWERS)
 
+    global.configuration.register('disableCooldownWhispers', 'whisper.settings.disableCooldownWhispers', 'bool', false)
+
     global.watcher.watch(this, 'list', this._save)
     global.watcher.watch(this, 'viewers', this._save)
 
@@ -167,7 +169,7 @@ Cooldown.prototype.check = function (self, id, sender, text) {
       result = true
       return true
     } else {
-      if (!cooldown.quiet) {
+      if (!cooldown.quiet && !global.configuration.getValue('disableCooldownWhispers')) {
         sender['message-type'] = 'whisper' // we want to whisp cooldown message
         global.commons.sendMessage(global.translate('cooldown.failed.cooldown')
           .replace('(command)', cooldown.command)

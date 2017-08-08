@@ -26,6 +26,9 @@ function Configuration () {
   this.register('lang', '', 'string', 'en')
   this.register('mute', 'core.mute', 'bool', false)
 
+  this.register('disableWhisperListener', 'whisper.settings.disableWhisperListener', 'bool', true)
+  this.register('disableSettingsWhispers', 'whisper.settings.disableSettingsWhispers', 'bool', false)
+
   const self = this
   setTimeout(function () { global.log.info('Bot is loading configuration data'); self.loadValues() }, 2000)
 }

@@ -7,6 +7,8 @@ var _ = require('lodash')
 function Permissions () {
   global.parser.register(this, '!permission', this.overridePermission, constants.OWNER_ONLY)
 
+  global.configuration.register('disablePermissionWhispers', 'whisper.settings.disablePermissionWhispers', 'bool', true)
+
   setInterval(function () {
     global.botDB.find({$where: function () { return this._id.startsWith('permission') }}, function (err, items) {
       if (err) { global.log.error(err, { fnc: 'Permissions' }) }

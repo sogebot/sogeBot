@@ -103,10 +103,12 @@ global.client.on('message', function (channel, sender, message, fromSelf) {
         let msgs = _.isUndefined(user.stats.messages) ? 1 : parseInt(user.stats.messages, 10) + 1
         global.users.set(user.username, { stats: { messages: msgs } }, true)
       }
+
+      global.parser.parse(sender, message)
     } else {
       global.log.whisperIn(message, {username: sender.username})
+      if (!global.configuration.getValue('disableWhisperListener')) global.parser.parse(sender, message)
     }
-    global.parser.parse(sender, message)
   }
 })
 

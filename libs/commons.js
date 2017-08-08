@@ -92,6 +92,7 @@ Commons.prototype.runCallback = function (cb, data) {
 }
 
 Commons.prototype.sendToOwners = function (text) {
+  if (global.configuration.getValue('disableSettingsWhispers')) return
   for (let owner of global.parser.getOwners()) {
     owner = {
       username: owner,

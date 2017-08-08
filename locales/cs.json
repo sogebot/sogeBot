@@ -49,6 +49,20 @@
     }
   },
   "webpanel": {
+    "page-settings": {
+      "systems": {
+        "whispers": {
+          "title": "Šeptání",
+          "toggle": {
+            "listener": "Poslouchat příkazy šeptem",
+            "settings": "Šeptat změny nastavení",
+            "raffle": "Šeptat při zapojení do raffle",
+            "permissions": "Šeptat, když má uživatel nedostatečná oprávnění",
+            "cooldowns": "Šeptat při cooldownu (pokud nastaven jako oznámit)"
+          }
+        }
+      }
+    },
     "page-logger": {
       "buttons": {
         "messages": "Zprávy",
@@ -939,5 +953,29 @@
       "empty": "(sender), zande highlighty nebyly ulozeny"
     },
     "offline": "(sender), nelze ulozit highlight, stream je offline"
+  },
+  "whisper" : {
+    "settings": {
+      "disableWhisperListener": {
+        "true": "Bot nebude naslouchat prikazum pres whisper",
+        "false": "Bot bude naslouchat prikazum pres whisper"
+      },
+      "disableSettingsWhispers": {
+        "true": "Bot nebude posilat oznameni o zmene nastaveni",
+        "false": "Bot bude posilat oznameni o zmene nastaveni pres whisper"
+      },
+      "disableRaffleWhispers": {
+        "true": "Bot nebude posilat oznameni o vstupu do raffle",
+        "false": "Bot bude posilat oznameni o vstupu do raffle pres whisper"
+      },
+      "disablePermissionWhispers": {
+        "true": "Bot nebude posilat chyby opravneni",
+        "false": "Bot bude posilat chyby opravneni pres whisper"
+      },
+      "disableCooldownWhispers": {
+        "true": "Bot nebude posilat oznameni o cooldownu",
+        "false": "Bot bude posilat oznameni o cooldownu pres whisper"
+      }
+    }
   }
 }

@@ -209,12 +209,50 @@
         </tr>
     </table>
   </div>
+
+  <div class="widget" id="whispers">
+    <div class="title" data-lang="page-settings.systems.whispers.title"></div>
+    <table class="table table-striped">
+      <tr>
+        <td><strong data-lang="page-settings.systems.whispers.toggle.listener"></strong></td>
+        <td>
+          <input id="disableWhisperListener" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-size="mini" data-onstyle="success" data-offstyle="danger">
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="page-settings.systems.whispers.toggle.settings"></strong></td>
+        <td>
+          <input id="disableSettingsWhispers" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-size="mini" data-onstyle="success" data-offstyle="danger">
+        </td>
+      </tr>
+      <tr id="raffles-whisper">
+        <td><strong data-lang="page-settings.systems.whispers.toggle.raffle"></strong></td>
+        <td>
+          <input id="disableRaffleWhispers" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-size="mini" data-onstyle="success" data-offstyle="danger">
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="page-settings.systems.whispers.toggle.permissions"></strong></td>
+        <td>
+          <input id="disablePermissionWhispers" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-size="mini" data-onstyle="success" data-offstyle="danger">
+        </td>
+      </tr>
+      <tr id="cooldowns-whisper">
+        <td><strong data-lang="page-settings.systems.whispers.toggle.cooldowns"></strong></td>
+        <td>
+          <input id="disableCooldownWhispers" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-size="mini" data-onstyle="success" data-offstyle="danger">
+        </td>
+      </tr>
+    </table>
+  </div>
 </div>
 <script>
   if (!systems.points) $("#points").css('display', 'none')
   if (!systems.notice) $("#notice").css('display', 'none')
   if (!systems.songs) $("#songs").css('display', 'none')
   if (!systems.gambling) $("#gambling").css('display', 'none')
+  if (!systems.raffles) $("#raffles-whisper").css('display', 'none')
+  if (!systems.cooldown) $("#cooldowns-whisper").css('display', 'none')
 
   socket.emit('getPointsConfiguration')
   socket.emit('getNoticeConfiguration')
@@ -233,6 +271,46 @@
       if ($('#atUsernameToggle').data('init')) socket.emit('saveConfiguration', {'atUsername': $(this).prop('checked')})
     })
     $('#atUsernameToggle').data('init', true)
+
+    /* whispers */
+    $('#disableWhisperListener').off('change')
+    $('#disableWhisperListener').bootstrapToggle(!data.disableWhisperListener ? 'on' : 'off')
+    $('#disableWhisperListener').change(function() {
+      if ($('#disableWhisperListener').data('init')) socket.emit('saveConfiguration', {'disableWhisperListener': !$(this).prop('checked')})
+    })
+    $('#disableWhisperListener').data('init', true)
+
+    $('#disableSettingsWhispers').off('change')
+    $('#disableSettingsWhispers').bootstrapToggle(!data.disableSettingsWhispers ? 'on' : 'off')
+    $('#disableSettingsWhispers').change(function() {
+      if ($('#disableSettingsWhispers').data('init')) socket.emit('saveConfiguration', {'disableSettingsWhispers': !$(this).prop('checked')})
+    })
+    $('#disableSettingsWhispers').data('init', true)
+
+    if (systems.raffles) {
+      $('#disableRaffleWhispers').off('change')
+      $('#disableRaffleWhispers').bootstrapToggle(!data.disableRaffleWhispers ? 'on' : 'off')
+      $('#disableRaffleWhispers').change(function() {
+        if ($('#disableRaffleWhispers').data('init')) socket.emit('saveConfiguration', {'disableRaffleWhispers': !$(this).prop('checked')})
+      })
+      $('#disableRaffleWhispers').data('init', true)
+    }
+
+    $('#disablePermissionWhispers').off('change')
+    $('#disablePermissionWhispers').bootstrapToggle(!data.disablePermissionWhispers ? 'on' : 'off')
+    $('#disablePermissionWhispers').change(function() {
+      if ($('#disablePermissionWhispers').data('init')) socket.emit('saveConfiguration', {'disablePermissionWhispers': !$(this).prop('checked')})
+    })
+    $('#disablePermissionWhispers').data('init', true)
+
+    if (systems.cooldown) {
+      $('#disableCooldownWhispers').off('change')
+      $('#disableCooldownWhispers').bootstrapToggle(!data.disableCooldownWhispers ? 'on' : 'off')
+      $('#disableCooldownWhispers').change(function() {
+        if ($('#disableCooldownWhispers').data('init')) socket.emit('saveConfiguration', {'disableCooldownWhispers': !$(this).prop('checked')})
+      })
+      $('#disableCooldownWhispers').data('init', true)
+    }
   })
 
   socket.off('pointsConfiguration')

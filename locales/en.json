@@ -49,6 +49,20 @@
     }
   },
   "webpanel": {
+    "page-settings": {
+      "systems": {
+        "whispers": {
+          "title": "Whispers",
+          "toggle": {
+            "listener": "Listen commands on whisper",
+            "settings": "Whispers on settings change",
+            "raffle": "Whispers on raffle join",
+            "permissions": "Whispers on insufficient permissions",
+            "cooldowns": "Whispers on cooldown (if set as notify)"
+          }
+        }
+      }
+    },
     "page-logger": {
       "buttons": {
         "messages": "Messages",
@@ -939,5 +953,29 @@
       "empty": "(sender), no highlights were saved"
     },
     "offline": "(sender), cannot save highlight, stream is offline"
+  },
+  "whisper" : {
+    "settings": {
+      "disableWhisperListener": {
+        "true": "Bot won't listen to commands on whisper",
+        "false": "Bot will listen to commands on whisper"
+      },
+      "disableSettingsWhispers": {
+        "true": "Bot won't send settings notifications",
+        "false": "Bot will send settings notifications through whispers"
+      },
+      "disableRaffleWhispers": {
+        "true": "Bot won't send raffle notifications",
+        "false": "Bot will send raffle notifications through whispers"
+      },
+      "disablePermissionWhispers": {
+        "true": "Bot won't send permissions insufficient errors",
+        "false": "Bot will send permissions insufficient errors through whispers"
+      },
+      "disableCooldownWhispers": {
+        "true": "Bot won't send cooldown notifications",
+        "false": "Bot will send cooldown notifications through whispers"
+      }
+    }
   }
 }

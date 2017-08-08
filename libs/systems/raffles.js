@@ -49,6 +49,7 @@ function Raffles () {
     global.configuration.register('raffleAnnounceInterval', 'raffle.announceInterval', 'number', 10)
     global.configuration.register('raffleAnnounceCustomMessage', 'raffle.announceCustomMessage', 'string', '')
     global.configuration.register('raffleTitleTemplate', 'raffle.announceTitleTemplate', 'string', '')
+    global.configuration.register('disableRaffleWhispers', 'whisper.settings.disableRaffleWhispers', 'bool', false)
 
     global.watcher.watch(this, 'participants', this._save)
     this._update(this)
@@ -167,7 +168,7 @@ Raffles.prototype.participate = function (self, sender, text) {
   let tickets = parseInt(text.trim(), 10)
 
   if ((!_.isFinite(tickets) || tickets <= 0 || tickets > self.maxTickets || tickets < self.minTickets) && self.type === TYPE_TICKETS) {
-    global.commons.sendMessage(global.translate('raffle.participation.failed'), sender)
+    if (!global.configuration.getValue('disableRaffleWhispers')) global.commons.sendMessage(global.translate('raffle.participation.failed'), sender)
     return true
   }
 
@@ -205,11 +206,11 @@ Raffles.prototype.participate = function (self, sender, text) {
 
       if (participant.eligible) {
         if (item.type === TYPE_TICKETS) global.users.set(sender.username, { points: parseInt(user.points, 10) - parseInt(tickets, 10) })
-        global.commons.sendMessage(global.translate('raffle.participation.success'), sender)
+        if (!global.configuration.getValue('disableRaffleWhispers')) global.commons.sendMessage(global.translate('raffle.participation.success'), sender)
         delete self.participants[sender.username]
         self.participants[sender.username] = participant
       } else {
-        global.commons.sendMessage(global.translate('raffle.participation.failed'), sender)
+        if (!global.configuration.getValue('disableRaffleWhispers')) global.commons.sendMessage(global.translate('raffle.participation.failed'), sender)
       }
     }
   })
