@@ -28,6 +28,7 @@
     "moment-precise-range-plugin": "^1.2.4",
     "nedb": "^1.8.0",
     "nedb-promise": "^2.0.1",
+    "node-hue-api": "^2.4.2",
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
     "socket.io": "^2.0.3",
