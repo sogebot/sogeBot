@@ -977,5 +977,8 @@
         "false": "Bot bude posilat oznameni o cooldownu pres whisper"
       }
     }
+  },
+  "phillipsHue": {
+    "list": "(sender), Seznam pripojenych Phillips Hue zarovek: "
   }
 }

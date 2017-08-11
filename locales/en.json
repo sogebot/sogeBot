@@ -977,5 +977,8 @@
         "false": "Bot will send cooldown notifications through whispers"
       }
     }
+  },
+  "phillipsHue": {
+    "list": "(sender), List of Phillips Hue connected lights: "
   }
 }

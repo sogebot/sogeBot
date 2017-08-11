@@ -75,7 +75,7 @@ PhillipsHue.prototype.getLights = function (self, sender, text) {
       _.each(lights.lights, function (light) {
         output.push('id: ' + light.id + ', name: \'' + light.name + '\'')
       })
-      global.commons.sendMessage('(sender), List of Phillips Hue connected lights: ' + output.join(' | '), sender)
+      global.commons.sendMessage(global.translate('phillipsHue.list') + output.join(' | '), sender)
     })
     .fail(function (err) { global.log.error(err, 'PhillipsHue.prototype.getLights#1') })
 }
