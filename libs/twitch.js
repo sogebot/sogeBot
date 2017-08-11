@@ -375,6 +375,8 @@ Twitch.prototype.followage = function (self, sender, text) {
     if (diff.months) output.push(diff.months + ' ' + global.parser.getLocalizedName(diff.months, 'core.months'))
     if (diff.days) output.push(diff.days + ' ' + global.parser.getLocalizedName(diff.days, 'core.days'))
     if (diff.hours) output.push(diff.hours + ' ' + global.parser.getLocalizedName(diff.hours, 'core.hours'))
+    if (diff.minutes) output.push(diff.minutes + ' ' + global.parser.getLocalizedName(diff.minutes, 'core.minutes'))
+    if (output.length === 0) output.push(0 + ' ' + global.parser.getLocalizedName(0, 'core.minutes'))
     global.commons.sendMessage(global.translate('followage.success.time')
       .replace('(username)', username)
       .replace('(diff)', output.join(', ')), sender)
