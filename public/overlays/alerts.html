@@ -31,7 +31,7 @@
       #images div img {
         opacity: 0;
       }
-      ul#text {
+      div.text {
         list-style-type: none;
         margin: 0; padding: 0;
         display: table;
@@ -39,19 +39,13 @@
         height: 100%;
         width: 100%;
       }
+      ul {
+        list-style-type: none;
+      }
     </style>
   </head>
   <body>
     <div id="images"></div>
-    <!--ul id="text"></ul-->
-    <ul id="text">
-      <li style="display: table-cell;/* position: absolute; */vertical-align: middle;text-align: right;">
-        <span class="follow" style="/* display: none; *//* opacity: 0; */">New Follower !!!</span>
-      </li>
-      <li style="display: table-cell; vertical-align: middle; text-align: right;left:50px">
-        <span class="follow" style="/* display: none; *//* opacity: 0; */">$sender</span></li>
-      </li>
-    </ul>
 
     <script src="/dist/jquery/js/jquery.min.js"></script>
     <script src="/dist/lodash/js/lodash.min.js"></script>
@@ -76,19 +70,20 @@
         let style = ''
         switch (text.position) {
           case 'top-left':
+            style = 'position: relative'
             break
           case 'top-center':
           case 'top':
-            style = 'display: table-cell; text-align: center'
+            style = 'display: table-cell; text-align: center; position: relative'
             break
           case 'top-right':
-            style = 'display: table-cell; text-align: right'
+            style = 'display: table-cell; text-align: right; position: relative'
             break
           case 'left':
-            style = 'display: table-cell; vertical-align: middle'
+            style = 'display: table-cell; vertical-align: middle; position: relative'
             break
           case 'right':
-            style = 'display: table-cell; vertical-align: middle; text-align: right'
+            style = 'display: table-cell; vertical-align: middle; text-align: right; position: relative'
             break
           case 'bottom-left':
             style = 'display: table-cell; vertical-align: bottom; position: relative; top:10px'
@@ -101,7 +96,7 @@
             style = 'display: table-cell; vertical-align: bottom; position: relative; top:10px; text-align: right'
             break
           default:
-            style = 'display: table-cell; vertical-align: middle; text-align: center'
+            style = 'display: table-cell; vertical-align: middle; text-align: center; position: relative'
             break
         }
 
@@ -113,17 +108,18 @@
           style += ';top:' + text['y-offset'] + 'px'
         }
 
-        var id = new Date().getTime()
-        var $li = $('<li>')
+        var $ul = $('<ul>')
           .attr('style', style)
-          .data('id', id)
-        var $span = $('<span>')
+        var $li = $('<li>')
           .addClass(text.class)
+          .attr('style', 'opacity:0')
           .text(text.text.replace(/\'/g, ''))
           .velocity("fadeIn", { delay: text.delay, duration: text.duration })
-          .velocity("fadeOut", { delay: (text.delay + text.time), duration: text.duration })
-        $li.append($span)
-        $('ul#text').append($li)
+          .velocity("fadeOut", { delay: text.time, duration: text.duration, complete: function(e) {
+            $(e[0]).parent().parent().remove()
+           }})
+        $ul.append($li)
+        $('body').append($('<div class="text">').append($ul))
       }
 
       function playAudio (audio) {
@@ -187,7 +183,7 @@
           image.duration = _.isNil(image.duration) ? 1000 : parseInt(image.duration) // how long to animate
           $('#images div img')
             .velocity("fadeIn", { delay: image.delay, duration: image.duration })
-            .velocity("fadeOut", { delay: (image.delay + image.time), duration: image.duration });
+            .velocity("fadeOut", { delay: image.time, duration: image.duration });
         })
       }
     </script>
