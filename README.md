@@ -43,6 +43,7 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 |                    | Be able to set your !title and !game from dashboard and **save** them for further use!                                                   |
 | Overlay            | Use various overlays in your OBS or XSplit                                                                                               |
 | PhillipsHue        | Blink your lights on follower or any other event                                                                                         |
+| Events             | On numerous events run commands, send messages, do whatever!                                                                             |
 
 | Game     | Description                                    |
 |----------|------------------------------------------------|
