@@ -54,15 +54,40 @@
     <script>
       var socket = io()
 
+      var alertsQueue = {}
+
+      setInterval(function () {
+        var alert = _.find(alertsQueue, function(o) { return o.running })
+        if (!_.isNil(alert)) {
+          if (alert.finished === _.size(alert.alerts)) {
+            delete alertsQueue[alert.id]
+          }
+        }
+
+        if (_.size(alertsQueue) > 0 && !_.some(alertsQueue, { 'running': true })) {
+          var alert = _.find(alertsQueue, function(o) { return !o.running })
+          alert.running = true
+          _.each(alert.alerts, function (d) {
+            if (d.type === 'image') showImage(alert.id, d)
+            if (d.type === 'audio') playAudio(alert.id, d)
+            if (d.type === 'text') showText(alert.id, d)
+          })
+        }
+      }, 1000)
+
       socket.on('overlay.show', function (data) {
-        _.each(data, function (d) {
-          if (d.type === 'image') showImage(d)
-          if (d.type === 'audio') playAudio(d)
-          if (d.type === 'text') showText(d)
-        })
+        const id = new Date().getTime()
+        var alert = {
+          id: id,
+          alerts: data,
+          running: false,
+          finished: 0
+        }
+
+        alertsQueue[id] = alert
       })
 
-      function showText (text) {
+      function showText (id, text) {
         text.delay = _.isNil(text.delay) ? 0 : parseInt(text.delay, 10)
         text.time = _.isNil(text.time) ? 1000 : parseInt(text.time, 10) // how long to show
         text.duration = _.isNil(text.duration) ? 1000 : parseInt(text.duration) // how long to animate
@@ -117,23 +142,29 @@
           .velocity("fadeIn", { delay: text.delay, duration: text.duration })
           .velocity("fadeOut", { delay: text.time, duration: text.duration, complete: function(e) {
             $(e[0]).parent().parent().remove()
+            alertsQueue[id].finished++
            }})
         $ul.append($li)
         $('body').append($('<div class="text">').append($ul))
       }
 
-      function playAudio (audio) {
+      function playAudio (id, audio) {
         var sound = new Audio(audio.url)
         audio.delay = _.isNil(audio.delay) ? 0 : parseInt(audio.delay, 10)
         sound.volume = _.isNil(audio.volume) ? 1 : parseInt(audio.volume, 10) / 100
 
-        if (audio.delay === 0) sound.play()
-        else {
-          setTimeout(function () { sound.play() }, audio.delay)
+        if (audio.delay === 0) {
+          sound.play()
+          alertsQueue[id].finished++
+        } else {
+          setTimeout(function () {
+            sound.play()
+            alertsQueue[id].finished++
+          }, audio.delay)
         }
       }
 
-      function showImage (image) {
+      function showImage (id, image) {
         $('#images').empty()
 
         let style = ''
@@ -183,7 +214,9 @@
           image.duration = _.isNil(image.duration) ? 1000 : parseInt(image.duration) // how long to animate
           $('#images div img')
             .velocity("fadeIn", { delay: image.delay, duration: image.duration })
-            .velocity("fadeOut", { delay: image.time, duration: image.duration });
+            .velocity("fadeOut", { delay: image.time, duration: image.duration, complete: function(e) {
+              alertsQueue[id].finished++
+           }})
         })
       }
     </script>
