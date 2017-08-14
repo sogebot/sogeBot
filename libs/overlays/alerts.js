@@ -16,9 +16,14 @@ Alerts.prototype.overlay = function (self, sender, text) {
   let objectString = text.trim().split(' | ')
   _.each(objectString, function (o) {
     let object = {}
-    let settings = o.split(' ')
+    let settings = o.match(/(\S+)=([\w-://.]+|'[\S ]+')/g)
     _.each(settings, function (s) {
       let data = { key: s.split('=')[0], value: s.split('=')[1] }
+
+      if (data.key === 'text') {
+        data.value = data.value.replace('$sender', sender.username)
+      }
+
       object[data.key] = data.value
     })
     send.push(object)
