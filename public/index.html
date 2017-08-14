@@ -912,6 +912,7 @@
             name: 'Delete',
             iconClass: 'fa-trash-o',
             onClick: function(data) {
+              delete data.el
               console.debug('EMIT [deleteUserTwitchTitle]', data)
               socket.emit('deleteUserTwitchTitle', data)
             },
