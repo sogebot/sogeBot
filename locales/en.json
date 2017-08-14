@@ -196,6 +196,8 @@
     "views": "Views",
     "hosts": "Hosts",
     "followers": "Followers",
+    "subscribers": "Subscribers",
+    "bits": "Bits",
     "status": "Status",
     "mute": "mute",
     "add-widget": "Add widget",
