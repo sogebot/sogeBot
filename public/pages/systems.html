@@ -206,7 +206,17 @@
             <input id="input_rouletteTimeout" class="form-control input-sm" type="text"/>
           </div>
         </td>
-        </tr>
+      </tr>
+      <tr>
+        <td><strong data-lang="fightmeTimeout"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="fightmeTimeout" onclick="commons.configEditable(this, 's')" id="configFightmeTimeout"></abbr>
+          <div class="input-group" style="display:none;" id="input_fightmeTimeout_group">
+            <div class="input-group-addon" data-lang="seconds"></div>
+            <input id="input_fightmeTimeout" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
     </table>
   </div>
 
@@ -264,6 +274,7 @@
 
     $("#configSeppukuTimeout").text(data.seppukuTimeout + 's')
     $("#configRouletteTimeout").text(data.rouletteTimeout + 's')
+    $("#configFightmeTimeout").text(data.fightmeTimeout + 's')
 
     $('#atUsernameToggle').off('change')
     $('#atUsernameToggle').bootstrapToggle(data.atUsername ? 'on' : 'off')
