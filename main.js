@@ -155,6 +155,7 @@ global.client.on('mod', function (channel, username) {
 
 global.client.on('cheer', function (channel, userstate, message) {
   global.events.fire('cheer', { username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
+  if (global.twitch.isOnline) global.twitch.current.bits = global.twitch.current.bits + parseInt(userstate.bits, 10)
 })
 
 global.client.on('clearchat', function (channel) {

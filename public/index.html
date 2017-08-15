@@ -131,51 +131,61 @@
       <h2><i data-lang="game"></i> <small data-lang="click-to-change"></small></h2>
       <span class="data" id="game" data-lang="not-available"></span>
     </div>
-    <div class="stream-info col-xs-6 col-sm-4 col-md-2" onclick="saveHighlight()">
+    <div class="stream-info col-xs-6 col-sm-4 col-md-1" onclick="saveHighlight()">
       <h2><i data-lang="uptime"></i> <small data-lang="click-to-highlight"></small></h2>
       <span class="data" id="uptime">--:--:--</span>
       <span class="stats">&nbsp;</span>
     </div>
-    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+    <div class="stream-info col-xs-6 col-sm-4 col-md-1">
       <h2 data-lang="viewers"></h2>
       <span class="data curViewers">-</span>
       <span class="stats">&nbsp;</span>
     </div>
-    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+    <div class="stream-info col-xs-6 col-sm-4 col-md-1">
       <h2 data-lang="max-viewers"></h2>
       <span class="data" id="maxViewers">-</span>
       <span class="stats" id="maxViewersChange">&nbsp;</span>
     </div>
-    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+    <div class="stream-info col-xs-6 col-sm-4 col-md-1">
       <h2 data-lang="new-chatters"></h2>
       <span class="data" id="newChtr">-</span>
       <span class="stats" id="newChtrChange">&nbsp;</span>
     </div>
-    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+    <div class="stream-info col-xs-6 col-sm-4 col-md-1">
       <h2 data-lang="chat-messages"></h2>
       <span class="data" id="totalChatMsgs">-</span>
       <span class="stats" id="totalChatMsgsChange">&nbsp;</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-1">
+      <h2 data-lang="views"></h2>
+      <span class="data" id="curViews">-</span>
+      <span class="stats" id="curViewsChange">&nbsp;</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-1">
+      <h2 data-lang="hosts"></h2>
+      <span class="data" id="curHosts">-</span>
+      <span class="stats" id="curHostsChange">&nbsp;</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-1">
+      <h2 data-lang="followers"></h2>
+      <span class="data"><span id="curFollowers">-</span></span>
+      <span class="stats" id="curFollowersChange">&nbsp;</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-1">
+      <h2 data-lang="subscribers"></h2>
+      <span class="data"><span id="curSubscribers">-</span></span>
+      <span class="stats" id="curSubscribersChange">&nbsp;</span>
+    </div>
+    <div class="stream-info col-xs-6 col-sm-4 col-md-1">
+      <h2 data-lang="bits"></h2>
+      <span class="data" id="curBits">-</span>
+      <span class="stats" id="curBitsChange">&nbsp;</span>
     </div>
     <div class="stream-info col-xs-6 col-sm-4 col-md-4" onclick="changeGT.showDlg()">
       <h2><i data-lang="title"></i> <small data-lang="click-to-change"></small></h2>
       <span class="data" id="title" data-lang="not-available"></span>
     </div>
-    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2 data-lang="views"></h2>
-      <span class="data" id="curViews">-</span>
-      <span class="stats" id="curViewsChange">&nbsp;</span>
-    </div>
-    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2 data-lang="hosts"></h2>
-      <span class="data" id="curHosts">-</span>
-      <span class="stats" id="curHostsChange">&nbsp;</span>
-    </div>
-    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
-      <h2 data-lang="followers"></h2>
-      <span class="data"><span id="curFollowers">-</span></span>
-      <span class="stats" id="curFollowersChange">&nbsp;</span>
-    </div>
-    <div class="stream-info col-xs-6 col-sm-4 col-md-2">
+    <div class="stream-info col-xs-6 col-sm-4 col-md-2 col-md-offset-6">
       <h2 data-lang="status"></h2>
       <span class="data" style="font-weight: bold">
         <span class="text-warning" id="APIStatus" title="API checking">API</span>
@@ -532,6 +542,8 @@
         var totalChatMsgs = getPercentage(parseInt($("#totalChatMsgs").text(), 10), parseInt(data.chatMessages, 10))
         var newChtr = getPercentage(parseInt($("#newChtr").text(), 10), parseInt(data.newChatters, 10))
         var curFollowers = getPercentage(parseInt($("#curFollowers").text(), 10), parseInt(data.currentFollowers, 10))
+        var curSubscribers = getPercentage(parseInt($("#curSubscribers").text(), 10), parseInt(data.currentSubscribers, 10))
+        var curBits = getPercentage(parseInt($("#curBits").text(), 10), parseInt(data.currentBits, 10))
         var curViews = getPercentage(parseInt($("#curViews").text(), 10), parseInt(data.currentViews, 10))
         var curHosts = getPercentage(parseInt($("#curHosts").text(), 10), parseInt(data.currentHosts, 10))
 
@@ -539,6 +551,8 @@
         setHtml('totalChatMsgsChange', totalChatMsgs)
         setHtml('newChtrChange', newChtr)
         setHtml('curFollowersChange', curFollowers)
+        setHtml('curSubscribersChange', curSubscribers)
+        setHtml('curBitsChange', curBits)
         setHtml('curViewsChange', curViews)
         setHtml('curHostsChange', curHosts)
       }
@@ -559,6 +573,8 @@
       $(".curViewers").text(data.currentViewers)
       $("#curViews").text(data.currentViews)
       $("#curHosts").text(data.currentHosts)
+      $("#curSubscribers").text(data.currentSubscribers)
+      $("#curBits").text(data.currentBits)
       $("#maxViewers").text(data.maxViewers)
       $("#totalChatMsgs").text(data.chatMessages)
       $("#newChtr").text(data.newChatters)

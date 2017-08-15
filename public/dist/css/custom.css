@@ -162,7 +162,7 @@ a.active {
 }
 
 @media (min-width : 992px){
-  .stream-info:nth-child(7)::before {
+  .stream-info:nth-child(12)::before {
     border-left: 0;
   }
 }

@@ -9,17 +9,22 @@ require('moment-precise-range-plugin')
 function Twitch () {
   this.isOnline = false
 
-  this.currentViewers = 0
-  this.currentFollowers = 0
-  this.currentViews = 0
-  this.currentHosts = 0
   this.maxViewers = 0
   this.chatMessagesAtStart = global.parser.linesParsed
   this.maxRetries = 12
   this.curRetries = 0
   this.newChatters = 0
-  this.currentStatus = ''
-  this.currentGame = ''
+
+  this.current = {
+    viewers: 0,
+    views: 0,
+    followers: 0,
+    hosts: 0,
+    subscribers: 0,
+    bits: 0,
+    status: '',
+    game: ''
+  }
 
   this.cached = {
     followers: [],
@@ -65,7 +70,8 @@ function Twitch () {
         self.curRetries = 0
         if (!self.isOnline) { // if we are switching from offline - bots restarts? We want refresh to correct data for start as well
           self.chatMessagesAtStart = global.parser.linesParsed
-          self.currentViewers = 0
+          self.current.viewers = 0
+          self.current.bits = 0
           self.maxViewers = 0
           self.newChatters = 0
           self.chatMessagesAtStart = global.parser.linesParsed
@@ -112,7 +118,7 @@ function Twitch () {
         global.log.debug('Response: Get last 100 followers from twitch', body)
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
-        self.currentFollowers = body._total
+        self.current.followers = body._total
 
         self.cached.followers = []
         _.each(body.follows, function (follower) {
@@ -157,9 +163,9 @@ function Twitch () {
         global.log.debug('Response: Get current channel data from twitch', body)
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
-        self.currentGame = body.game
-        self.currentStatus = body.status
-        self.currentViews = body.views
+        self.current.game = body.game
+        self.current.status = body.status
+        self.current.views = body.views
       }
     })
 
@@ -179,8 +185,8 @@ function Twitch () {
           global.log.debug('Response: Get current hosts', body)
         }
         if (res.statusCode === 200 && !_.isNull(body)) {
-          self.currentHosts = body.hosts.length
-          if (self.currentHosts > 0) {
+          self.current.hosts = body.hosts.length
+          if (self.current.hosts > 0) {
             _.each(body.hosts, function (host) {
               if (!_.includes(self.cached.hosts, host.host_login)) {
                 global.events.fire('hosted', { username: host.host_login })
@@ -264,23 +270,25 @@ Twitch.prototype._save = function (self) {
 }
 
 Twitch.prototype.saveStream = function (stream) {
-  this.currentViewers = stream.viewers
+  this.current.viewers = stream.viewers
   if (_.isNil(this.when.online)) this.when.online = stream.created_at
-  this.maxViewers = this.maxViewers < this.currentViewers ? this.currentViewers : this.maxViewers
+  this.maxViewers = this.maxViewers < this.current.viewers ? this.current.viewers : this.maxViewers
 
   var messages = global.parser.linesParsed - this.chatMessagesAtStart
   global.stats.save({
     timestamp: new Date().getTime(),
     whenOnline: this.when.online,
-    currentViewers: this.currentViewers,
+    currentViewers: this.current.viewers,
+    currentSubscribers: this.current.subscribers,
+    currentBits: this.current.bits,
     chatMessages: messages,
-    currentFollowers: this.currentFollowers,
-    currentViews: this.currentViews,
+    currentFollowers: this.current.followers,
+    currentViews: this.current.views,
     maxViewers: this.maxViewers,
     newChatters: this.newChatters,
-    game: this.currentGame,
-    status: this.currentStatus,
-    currentHosts: this.currentHosts
+    game: this.current.game,
+    status: this.current.status,
+    currentHosts: this.current.hosts
   })
 }
 
@@ -294,15 +302,17 @@ Twitch.prototype.sendStats = function (self, socket) {
   var messages = self.isOnline ? global.parser.linesParsed - self.chatMessagesAtStart : 0
   var data = {
     uptime: self.getTime(self.when.online, false),
-    currentViewers: self.currentViewers,
-    maxViewers: self.maxViewers,
+    currentViewers: self.current.viewers,
+    currentSubscribers: self.current.subscribers,
+    currentBits: self.current.bits,
     chatMessages: messages,
-    currentFollowers: self.currentFollowers,
-    currentViews: self.currentViews,
+    currentFollowers: self.current.followers,
+    currentViews: self.current.views,
+    maxViewers: self.maxViewers,
     newChatters: self.newChatters,
-    game: self.currentGame,
-    status: self.currentStatus,
-    currentHosts: self.currentHosts
+    game: self.current.game,
+    status: self.current.status,
+    currentHosts: self.current.hosts
   }
   socket.emit('stats', data)
 }
@@ -507,8 +517,8 @@ Twitch.prototype.setTitleAndGame = async function (self, sender, args) {
     method: 'PUT',
     body: {
       channel: {
-        game: !_.isNull(args.game) ? args.game : self.currentGame,
-        status: !_.isNull(args.title) ? args.title : self.currentStatus
+        game: !_.isNull(args.game) ? args.game : self.current.game,
+        status: !_.isNull(args.title) ? args.title : self.current.status
       }
     },
     headers: {
@@ -530,10 +540,10 @@ Twitch.prototype.setTitleAndGame = async function (self, sender, args) {
       if (response.game === args.game.trim()) {
         global.commons.sendMessage(global.translate('game.change.success')
           .replace('(game)', response.game), sender)
-        self.currentGame = response.game
+        self.current.game = response.game
       } else {
         global.commons.sendMessage(global.translate('game.change.failed')
-          .replace('(game)', self.currentGame), sender)
+          .replace('(game)', self.current.game), sender)
       }
     }
 
@@ -541,10 +551,10 @@ Twitch.prototype.setTitleAndGame = async function (self, sender, args) {
       if (response.status === args.title.trim()) {
         global.commons.sendMessage(global.translate('title.change.success')
           .replace('(status)', response.status), sender)
-        self.currentStatus = response.status
+        self.current.status = response.status
       } else {
         global.commons.sendMessage(global.translate('title.change.failed')
-          .replace('(status)', self.currentStatus), sender)
+          .replace('(status)', self.current.status), sender)
       }
     }
   } catch (e) {
@@ -557,7 +567,7 @@ Twitch.prototype.setTitleAndGame = async function (self, sender, args) {
 Twitch.prototype.setTitle = function (self, sender, text) {
   if (text.trim().length === 0) {
     global.commons.sendMessage(global.translate('title.current')
-      .replace('(title)', self.currentStatus), sender)
+      .replace('(title)', self.current.status), sender)
     return
   }
   self.setTitleAndGame(self, sender, { title: text })
@@ -566,7 +576,7 @@ Twitch.prototype.setTitle = function (self, sender, text) {
 Twitch.prototype.setGame = function (self, sender, text) {
   if (text.trim().length === 0) {
     global.commons.sendMessage(global.translate('game.current')
-      .replace('(game)', self.currentGame), sender)
+      .replace('(game)', self.current.game), sender)
     return
   }
   self.setTitleAndGame(self, sender, { game: text })
