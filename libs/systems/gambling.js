@@ -20,6 +20,7 @@ const ERROR_NOT_ENOUGH_POINTS = '2'
 function Gambling () {
   if (global.commons.isSystemEnabled(this)) {
     this.current = {
+      fightme: {},
       duel: {
         '_total': 0,
         '_timestamp': null
@@ -33,9 +34,11 @@ function Gambling () {
 
     global.parser.register(this, '!seppuku', this.seppuku, constants.VIEWERS)
     global.parser.register(this, '!roulette', this.roulette, constants.VIEWERS)
+    global.parser.register(this, '!fightme', this.fightme, constants.VIEWERS)
 
     global.configuration.register('seppukuTimeout', 'gambling.seppuku.timeout', 'number', 10)
     global.configuration.register('rouletteTimeout', 'gambling.roulette.timeout', 'number', 10)
+    global.configuration.register('fightmeTimeout', 'gambling.figthme.timeout', 'number', 10)
 
     const self = this
     setInterval(function () {
@@ -173,6 +176,34 @@ Gambling.prototype.seppuku = function (self, sender) {
 
   global.commons.sendMessage(global.translate('gambling.seppuku.text'), sender)
   global.client.timeout(global.configuration.get().twitch.channel, sender.username, global.configuration.getValue('seppukuTimeout'))
+}
+
+Gambling.prototype.fightme = function (self, sender, text) {
+  sender['message-type'] = 'chat' // force responses to chat
+  var username
+
+  try {
+    username = text.trim().match(/^@?([\S]+)$/)[1]
+  } catch (e) {
+    global.commons.sendMessage(global.translate('gambling.fightme.notEnoughOptions'), sender) // TODO
+    return
+  }
+
+  // check if you are challenged by user
+  if (_.includes(self.current.fightme[username], sender.username)) {
+    let winner = _.random(0, 1, false)
+    global.client.timeout(global.configuration.get().twitch.channel, winner ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
+    global.commons.sendMessage(global.translate('gambling.fightme.winner')
+      .replace('$username', winner ? username : sender.username), sender)
+    self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
+  } else {
+    if (_.isNil(self.current.fightme[sender.username])) self.current.fightme[sender.username] = []
+
+    self.current.fightme[sender.username].push(username)
+    self.current.fightme[sender.username] = _.uniq(self.current.fightme[sender.username])
+    global.commons.sendMessage(global.translate('gambling.fightme.challenge')
+      .replace('$username', username), sender)
+  }
 }
 
 Gambling.prototype.gamble = function (self, sender, text) {

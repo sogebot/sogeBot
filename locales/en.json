@@ -359,6 +359,7 @@
     "gambling": "Gambling",
     "seppukuTimeout": "Timeout for !sepukku",
     "rouletteTimeout": "Timeout for !roulette",
+    "fightmeTimeout": "Timeout for !fightme",
     "click-to-highlight": "highlight",
     "commercial": "commercial started",
     "start-commercial": "run a commercial"
@@ -916,6 +917,12 @@
       "mod": "(sender) tried to commit seppuku, but broke a sword.",
       "broadcaster": "(sender) tried to commit seppuku, but lost a sword.",
       "timeout": "Seppuku timeout set to (value)s"
+    },
+    "fightme": {
+      "timeout": "FightMe! timeout set to (value)s",
+      "challenge": "(ง'̀-'́)ง (sender) wants to fight you $username! If you accept, send !fightme (sender)",
+      "winner": "٩(^ᴗ^)۶ $username is proud winner! Who's next?",
+      "notEnoughOptions": "(sender), you need to select user to fight."
     },
     "gamble": {
       "zeroBet": "(sender), you cannot gamble 0 (pointsName)",

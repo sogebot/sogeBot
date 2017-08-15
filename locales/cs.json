@@ -359,6 +359,7 @@
     "gambling": "Gambling",
     "seppukuTimeout": "Timeout pro !sepukku",
     "rouletteTimeout": "Timeout pro !roulette",
+    "fightmeTimeout": "Timeout pro !fightme",
     "click-to-highlight": "highlight",
     "commercial": "reklama zahájena",
     "start-commercial": "spustit reklamu"
@@ -916,6 +917,12 @@
       "mod": "(sender) se pokusil o seppuku, ale zlomil mec.",
       "broadcaster": "(sender) se pokusil o seppuku, ale ztratil mec.",
       "timeout": "Seppuku timeout nastaven na (value)s"
+    },
+    "fightme": {
+      "timeout": "FightMe! timeout nastaven na (value)s",
+      "challenge": "(ง'̀-'́)ง (sender) se chce s tebou porvat $username! Pokud souhlasis, posli !fightme (sender)",
+      "winner": "٩(^ᴗ^)۶ $username je hrdym vitezem! Kdo je dalsim na rade?",
+      "notEnoughOptions": "(sender), musis vybrat uzivatele k souboji."
     },
     "gamble": {
       "zeroBet": "(sender), nemuzes hrat o 0 (pointsName)",
