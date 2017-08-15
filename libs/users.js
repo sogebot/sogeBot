@@ -26,6 +26,9 @@ function Users () {
   }, 15 * 60 * 10000)
 
   setInterval(function () {
+    // count subscribers
+    global.twitch.current.subscribers = _.size(global.users.getAll({ is: { subscriber: true } }))
+
     if (self.rate_limit_follower_check.length > 0) {
       self.rate_limit_follower_check = _.uniq(self.rate_limit_follower_check)
       self.isFollowerUpdate(self.rate_limit_follower_check.shift())

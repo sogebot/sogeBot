@@ -542,6 +542,8 @@
         var totalChatMsgs = getPercentage(parseInt($("#totalChatMsgs").text(), 10), parseInt(data.chatMessages, 10))
         var newChtr = getPercentage(parseInt($("#newChtr").text(), 10), parseInt(data.newChatters, 10))
         var curFollowers = getPercentage(parseInt($("#curFollowers").text(), 10), parseInt(data.currentFollowers, 10))
+        var curSubscribers = getPercentage(parseInt($("#curSubscribers").text(), 10), parseInt(data.currentSubscribers, 10))
+        var curBits = getPercentage(parseInt($("#curBits").text(), 10), parseInt(data.currentBits, 10))
         var curViews = getPercentage(parseInt($("#curViews").text(), 10), parseInt(data.currentViews, 10))
         var curHosts = getPercentage(parseInt($("#curHosts").text(), 10), parseInt(data.currentHosts, 10))
 
@@ -549,6 +551,8 @@
         setHtml('totalChatMsgsChange', totalChatMsgs)
         setHtml('newChtrChange', newChtr)
         setHtml('curFollowersChange', curFollowers)
+        setHtml('curSubscribersChange', curSubscribers)
+        setHtml('curBitsChange', curBits)
         setHtml('curViewsChange', curViews)
         setHtml('curHostsChange', curHosts)
       }
@@ -569,6 +573,8 @@
       $(".curViewers").text(data.currentViewers)
       $("#curViews").text(data.currentViews)
       $("#curHosts").text(data.currentHosts)
+      $("#curSubscribers").text(data.currentSubscribers)
+      $("#curBits").text(data.currentBits)
       $("#maxViewers").text(data.maxViewers)
       $("#totalChatMsgs").text(data.chatMessages)
       $("#newChtr").text(data.newChatters)

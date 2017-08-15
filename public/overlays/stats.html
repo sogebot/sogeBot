@@ -57,6 +57,18 @@
         <span id="followers">0</span>
         <span class="text"></span>
       </span>
+
+      <span class="item subscribers">
+        <i class="fa fa-star" aria-hidden="true"></i>
+        <span id="subscribers">0</span>
+        <span class="text"></span>
+      </span>
+
+      <span class="item bits">
+        <i class="fa fa-diamond" aria-hidden="true"></i>
+        <span id="bits">0</span>
+        <span class="text"></span>
+      </span>
     </span>
 
     <script src="/dist/jquery/js/jquery.min.js"></script>
@@ -72,6 +84,8 @@
        $("#viewers").text(data.viewers)
        $("#uptime").text(data.uptime)
        $("#followers").text(data.followers)
+       $("#subscribers").text(data.subscribers)
+       $("#bits").text(data.bits)
       })
     </script>
   </body>
