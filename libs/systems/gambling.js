@@ -183,7 +183,8 @@ Gambling.prototype.fightme = function (self, sender, text) {
   var username
 
   try {
-    username = text.trim().match(/^@?([\S]+)$/)[1]
+    username = text.trim().match(/^@?([\S]+)$/)[1].toLowerCase()
+    sender.username = sender.username.toLowerCase()
   } catch (e) {
     global.commons.sendMessage(global.translate('gambling.fightme.notEnoughOptions'), sender) // TODO
     return
