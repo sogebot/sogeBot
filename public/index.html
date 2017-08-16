@@ -517,6 +517,7 @@
 
       var getPercentage = function (cur, orig) {
         var btn = $('#percentage-btn')
+        if (_.isNil(orig)) orig = 0
         if (orig === cur) return 0
         if (orig === 0) {
           if (!btn.data('showPercentage')) return cur
