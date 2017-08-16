@@ -63,8 +63,8 @@ Highlights.prototype.highlight = function (self, sender, description) {
     highlight.stream = global.twitch.when.online
     highlight.timestamp = timestamp
     highlight.description = description
-    highlight.title = global.twitch.currentStatus
-    highlight.game = global.twitch.currentGame
+    highlight.title = global.twitch.current.status
+    highlight.game = global.twitch.current.game
     highlight.created_at = moment().format('X')
 
     if (self.cached.created_at === global.twitch.when.online && !_.isNil(self.cached.id) && !_.isNil(self.cached.created_at)) {
