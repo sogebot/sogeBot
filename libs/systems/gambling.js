@@ -27,6 +27,11 @@ function Gambling () {
       }
     }
 
+    this.cooldown = {
+      'duel': new Date().getTime(),
+      'fightme': new Date().getTime()
+    }
+
     if (global.commons.isSystemEnabled('points')) {
       global.parser.register(this, '!gamble', this.gamble, constants.VIEWERS)
       global.parser.register(this, '!duel', this.duel, constants.VIEWERS)
@@ -39,6 +44,8 @@ function Gambling () {
     global.configuration.register('seppukuTimeout', 'gambling.seppuku.timeout', 'number', 10)
     global.configuration.register('rouletteTimeout', 'gambling.roulette.timeout', 'number', 10)
     global.configuration.register('fightmeTimeout', 'gambling.figthme.timeout', 'number', 10)
+    global.configuration.register('duelCooldown', 'gambling.cooldown.duel', 'number', 0)
+    global.configuration.register('fightmeCooldown', 'gambling.cooldown.fightme', 'number', 0)
 
     const self = this
     setInterval(function () {
@@ -108,7 +115,19 @@ Gambling.prototype.duel = function (self, sender, text) {
         return false
       }
     })
-    if (newDuelist) self.current.duel[sender.username.toLowerCase()] = parseInt(points, 10)
+    if (newDuelist) {
+      // check if under gambling cooldown
+      const cooldown = global.configuration.getValue('duelCooldown')
+      if (new Date().getTime() - self.cooldown.duel > cooldown * 1000) {
+        self.cooldown.duel = new Date().getTime()
+        self.current.duel[sender.username.toLowerCase()] = parseInt(points, 10)
+      } else {
+        global.commons.sendMessage(global.translate('gambling.fightme.cooldown')
+          .replace('(cooldown)', Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.duel)) / 1000 / 60))
+          .replace('(minutesName)', global.parser.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.duel)) / 1000 / 60), 'core.minutes')), sender)
+        return true
+      }
+    }
 
     // if new duel, we want to save timestamp
     if (_.isNil(self.current.duel._timestamp)) {
@@ -143,6 +162,7 @@ Gambling.prototype.duel = function (self, sender, text) {
 
 Gambling.prototype.roulette = function (self, sender) {
   sender['message-type'] = 'chat' // force responses to chat
+
   let isAlive = _.random(0, 1, false)
   let message = [
     global.translate('gambling.roulette.trigger'),
@@ -198,6 +218,16 @@ Gambling.prototype.fightme = function (self, sender, text) {
       .replace('$username', winner ? username : sender.username), sender)
     self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
   } else {
+    // check if under gambling cooldown
+    const cooldown = global.configuration.getValue('fightmeCooldown')
+    if (new Date().getTime() - self.cooldown.fightme < cooldown * 1000) {
+      global.commons.sendMessage(global.translate('gambling.fightme.cooldown')
+        .replace('(cooldown)', Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.fightme)) / 1000 / 60))
+        .replace('(minutesName)', global.parser.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.fightme)) / 1000 / 60), 'core.minutes')), sender)
+      return
+    }
+    self.cooldown.fightme = new Date().getTime()
+
     if (_.isNil(self.current.fightme[sender.username])) self.current.fightme[sender.username] = []
 
     self.current.fightme[sender.username].push(username)

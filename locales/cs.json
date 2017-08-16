@@ -362,6 +362,8 @@
     "seppukuTimeout": "Timeout pro !sepukku",
     "rouletteTimeout": "Timeout pro !roulette",
     "fightmeTimeout": "Timeout pro !fightme",
+    "duelCooldown": "Cooldown pro !duel",
+    "fightmeCooldown": "Cooldown pro !fightme",
     "click-to-highlight": "highlight",
     "commercial": "reklama zahájena",
     "start-commercial": "spustit reklamu"
@@ -896,7 +898,12 @@
     }
   },
   "gambling": {
+    "cooldown": {
+      "duel": "Cooldown pro !duel je nastaven na (value)s",
+      "fightme": "Cooldown pro !fightme je nastaven na (value)s"
+    },
     "duel": {
+      "cooldown": "(sender), nemuzes pouzit !duel jeste (cooldown) (minutesName).",
       "joined": "(sender), hodne stesti behem duelu. Vsadil sis na sebe (points) (pointsName)!",
       "added": "(sender) si mysli, ze je lepsi nez ostatni a zvysuje sazku na (points) (pointsName)!",
       "new": "(sender) je vas novy vyzyvatel pro duel! Zucastni se take pomoci !duel [points], zbyva ti (minutes) (minutesName) pro ucast.",
@@ -921,6 +928,7 @@
       "timeout": "Seppuku timeout nastaven na (value)s"
     },
     "fightme": {
+      "cooldown": "(sender), nemuzes pouzit !fightme jeste (cooldown) (minutesName).",
       "timeout": "FightMe! timeout nastaven na (value)s",
       "challenge": "(ง'̀-'́)ง (sender) se chce s tebou porvat $username! Pokud souhlasis, posli !fightme (sender)",
       "winner": "٩(^ᴗ^)۶ $username je hrdym vitezem! Kdo je dalsim na rade?",

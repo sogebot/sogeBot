@@ -362,6 +362,8 @@
     "seppukuTimeout": "Timeout for !sepukku",
     "rouletteTimeout": "Timeout for !roulette",
     "fightmeTimeout": "Timeout for !fightme",
+    "duelCooldown": "Cooldown for !duel",
+    "fightmeCooldown": "Cooldown for !fightme",
     "click-to-highlight": "highlight",
     "commercial": "commercial started",
     "start-commercial": "run a commercial"
@@ -896,7 +898,12 @@
     }
   },
   "gambling": {
+    "cooldown": {
+      "duel": "Cooldown for !duel is set to (value)s",
+      "fightme": "Cooldown for !fightme is set to (value)s"
+    },
     "duel": {
+      "cooldown": "(sender), you cannot use !duel for (cooldown) (minutesName).",
       "joined": "(sender), good luck with your dueling skills. You bet on yourself (points) (pointsName)!",
       "added": "(sender) really thinks he is better than others raising his bet to (points) (pointsName)!",
       "new": "(sender) is your new duel challenger! To participate use !duel [points], you have (minutes) (minutesName) left to join.",
@@ -921,6 +928,7 @@
       "timeout": "Seppuku timeout set to (value)s"
     },
     "fightme": {
+      "cooldown": "(sender), you cannot use !fightme for (cooldown) (minutesName).",
       "timeout": "FightMe! timeout set to (value)s",
       "challenge": "(ง'̀-'́)ง (sender) wants to fight you $username! If you accept, send !fightme (sender)",
       "winner": "٩(^ᴗ^)۶ $username is proud winner! Who's next?",

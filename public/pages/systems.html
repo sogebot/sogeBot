@@ -217,6 +217,26 @@
           </div>
         </td>
       </tr>
+      <tr>
+        <td><strong data-lang="duelCooldown"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="duelCooldown" onclick="commons.configEditable(this, 's')" id="configDuelCooldown"></abbr>
+          <div class="input-group" style="display:none;" id="input_duelCooldown_group">
+            <div class="input-group-addon" data-lang="seconds"></div>
+            <input id="input_duelCooldown" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="fightmeCooldown"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="fightmeCooldown" onclick="commons.configEditable(this, 's')" id="configFightmeCooldown"></abbr>
+          <div class="input-group" style="display:none;" id="input_fightmeCooldown_group">
+            <div class="input-group-addon" data-lang="seconds"></div>
+            <input id="input_fightmeCooldown" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
     </table>
   </div>
 
@@ -275,6 +295,9 @@
     $("#configSeppukuTimeout").text(data.seppukuTimeout + 's')
     $("#configRouletteTimeout").text(data.rouletteTimeout + 's')
     $("#configFightmeTimeout").text(data.fightmeTimeout + 's')
+
+    $("#configDuelCooldown").text(data.duelCooldown + 's')
+    $("#configFightmeCooldown").text(data.fightmeCooldown + 's')
 
     $('#atUsernameToggle').off('change')
     $('#atUsernameToggle').bootstrapToggle(data.atUsername ? 'on' : 'off')
