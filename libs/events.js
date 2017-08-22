@@ -30,25 +30,31 @@ function Events () {
   this.eventsTemplate = _.cloneDeep(this.events)
 
   this.operations = {
-    'send-chat-message': function (attr) {
+    'send-chat-message': async function (attr) {
       if (_.isNil(attr.send)) return
       let message = attr.send
       _.each(attr, function (val, name) {
         message = message.replace('$' + name, val)
       })
+      message = await global.parser.parseMessage(attr.message)
       global.commons.sendMessage(message, { username: attr.username })
     },
-    'send-whisper': function (attr) {
+    'send-whisper': async function (attr) {
       if (_.isNil(attr.username) || _.isNil(attr.send)) return
       let message = attr.send
       _.each(attr, function (val, name) {
         message = message.replace('$' + name, val)
       })
+      message = await global.parser.parseMessage(attr.message)
       global.commons.sendMessage(message, { username: attr.username, 'message-type': 'whisper' })
     },
-    'run-command': function (attr) {
+    'run-command': async function (attr) {
       if (_.isNil(attr.quiet)) attr.quiet = false
-      global.parser.parseCommands((attr.quiet) ? null : { username: global.parser.getOwner() }, attr.command.replace('$username', attr.username))
+      _.each(attr, function (val, name) {
+        attr.command = attr.command.replace('$' + name, val)
+      })
+      attr.command = await global.parser.parseMessage(attr.command)
+      global.parser.parseCommands((attr.quiet) ? null : { username: global.parser.getOwner() }, attr.command)
     },
     'play-sound': function (attr) {
       // attr.sound can be filename or url

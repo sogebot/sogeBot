@@ -24,6 +24,7 @@
     "ini": "^1.3.4",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
+    "mathjs": "^3.16.2",
     "moment": "^2.18.1",
     "moment-precise-range-plugin": "^1.2.4",
     "nedb": "^1.8.0",

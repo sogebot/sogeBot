@@ -4,6 +4,7 @@ var constants = require('./constants')
 var crypto = require('crypto')
 var _ = require('lodash')
 var request = require('async-request')
+var mathjs = require('mathjs')
 
 var queue = {}
 
@@ -95,6 +96,7 @@ Parser.prototype.processQueue = async function (id) {
 }
 
 Parser.prototype.parseCommands = async function (user, message, skip) {
+  console.log(message)
   message = message.trim()
   if (!message.startsWith('!')) return // do nothing, this is not a command
   for (var cmd in this.registeredCmds) {
@@ -334,6 +336,12 @@ Parser.prototype.parseMessage = async function (message, attr) {
       }
     }
   }
+  let math = {
+    '(math.#)': async function (filter) {
+      let toEvaluate = filter.replace('(math.', '').replace(')', '')
+      return mathjs.eval(toEvaluate)
+    }
+  }
 
   let msg = await this.parseMessageOnline(online, message)
   msg = await this.parseMessageCommand(command, msg)
@@ -343,6 +351,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
   msg = await this.parseMessageEach(param, msg)
   msg = await this.parseMessageEach(info, msg)
   msg = await this.parseMessageEach(list, msg)
+  msg = await this.parseMessageEach(math, msg)
   msg = await this.parseMessageApi(msg)
   return msg
 }
