@@ -49,6 +49,7 @@ Gallery.prototype._upload = function (self, socket, data) {
   if (type === 'image/gif') ext = 'gif'
   if (type === 'audio/mp3') ext = 'mp3'
   if (type === 'audio/ogg') ext = 'png'
+  if (type === 'video/mp4') ext = 'mp4'
 
   if (_.isNil(type)) { socket.emit('overlay.gallery.upload.failed'); return false }
 

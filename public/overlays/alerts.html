@@ -11,7 +11,10 @@
 
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+    <link href="http://vjs.zencdn.net/6.2.5/video-js.css" rel="stylesheet">
 
+    <!-- If you'd like to support IE8 -->
+    <script src="http://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
 
     <style>
@@ -22,12 +25,18 @@
         margin: 0;
         padding: 0;
       }
-      #images {
+      #images, #video-pos {
         display: table;
         position: absolute;
         height: 100%;
         width: 100%;
       }
+      #video-rel-pos { display: table-cell; position: relative; height: 100%; width: 100%; }
+      #video-rel-pos > div { display: inline-block !important; }
+      #video {
+        display: inline-block; opacity: 0
+      }
+      #video_html5_api { width: 100% }
       #images div img {
         opacity: 0;
       }
@@ -46,10 +55,16 @@
   </head>
   <body>
     <div id="images"></div>
+    <div id="video-pos">
+      <div id="video-rel-pos">
+        <video id="video"></video>
+      </div>
+    </div>
 
     <script src="/dist/jquery/js/jquery.min.js"></script>
     <script src="/dist/lodash/js/lodash.min.js"></script>
     <script src="/dist/velocity-animate/js/velocity.min.js"></script>
+    <script src="http://vjs.zencdn.net/6.2.5/video.js"></script>
 
     <script>
       var socket = io()
@@ -65,12 +80,13 @@
         }
 
         if (_.size(alertsQueue) > 0 && !_.some(alertsQueue, { 'running': true })) {
-          var alert = _.find(alertsQueue, function(o) { return !o.running })
-          alert.running = true
-          _.each(alert.alerts, function (d) {
-            if (d.type === 'image') showImage(alert.id, d)
-            if (d.type === 'audio') playAudio(alert.id, d)
-            if (d.type === 'text') showText(alert.id, d)
+          var alert_not_running = _.find(alertsQueue, function(o) { return !o.running })
+          alert_not_running.running = true
+          _.each(alert_not_running.alerts, function (d) {
+            if (d.type === 'image') showImage(alert_not_running.id, d)
+            if (d.type === 'audio') playAudio(alert_not_running.id, d)
+            if (d.type === 'text') showText(alert_not_running.id, d)
+            if (d.type === 'video') showVideo(alert_not_running.id, d)
           })
         }
       }, 1000)
@@ -217,6 +233,82 @@
             .velocity("fadeOut", { delay: image.time, duration: image.duration, complete: function(e) {
               alertsQueue[id].finished++
            }})
+        })
+      }
+
+      function showVideo(id, video) {
+        video.volume = _.isNil(video.volume) ? 1 : parseInt(video.volume, 10) / 100
+        video.delay = _.isNil(video.delay) ? 0 : parseInt(video.delay, 10)
+
+        let style = ''
+        switch (video.position) {
+          case 'top-left':
+            break
+          case 'top-center':
+          case 'top':
+            style = 'display: table-cell; text-align: center'
+            break
+          case 'top-right':
+            style = 'display: table-cell; text-align: right'
+            break
+          case 'left':
+            style = 'display: table-cell; vertical-align: middle'
+            break
+          case 'right':
+            style = 'display: table-cell; vertical-align: middle; text-align: right'
+            break
+          case 'bottom-left':
+            style = 'display: table-cell; vertical-align: bottom; position: relative; top:10px'
+            break
+          case 'bottom-center':
+          case 'bottom':
+            style = 'display: table-cell; vertical-align: bottom; position: relative; top:10px; text-align: center'
+            break
+          case 'bottom-right':
+            style = 'display: table-cell; vertical-align: bottom; position: relative; top:10px; text-align: right'
+            break
+          default:
+            style = 'display: table-cell; vertical-align: middle; text-align: center'
+            break
+        }
+
+        if (!_.isNil(video['x-offset'])) {
+          style += ';left:' + video['x-offset'] + 'px'
+        }
+
+        if (!_.isNil(video['y-offset'])) {
+          style += ';top:' + video['y-offset'] + 'px'
+        }
+
+        var vjs = videojs('video', {
+          controls: false,
+          autoplay: false,
+          preload: 'auto'
+        })
+
+        if (!_.isNil(video.size)) vjs.width(video.size)
+
+        vjs.src(video.url)
+        vjs.ready(function() {
+          vjs.volume(video.volume)
+
+          $('#video-rel-pos').attr('style', style)
+
+          if (video.delay === 0) {
+            vjs.play()
+            $('#video').velocity("fadeIn", { duration: video.duration })
+          } else {
+            setTimeout(function () {
+              vjs.play()
+              $('#video').velocity("fadeIn", { duration: video.duration })
+            }, video.delay)
+          }
+        })
+
+        vjs.on('ended', function() {
+          $('#video').velocity("fadeOut", { duration: video.duration, complete: function(e) {
+            alertsQueue[id].finished++
+          }})
         })
       }
     </script>
