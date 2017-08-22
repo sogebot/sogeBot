@@ -67,7 +67,7 @@ Permissions.prototype.overridePermission = function (self, sender, text) {
       global.parser.permissionsCmds['!' + command] = permission
       global.botDB.update({_id: 'permission_' + hash}, {$set: {command: command, permission: permission}}, {upsert: true}, function (err) {
         if (err) global.log.error(err, { fnc: 'Permissions.prototype.overridePermission' })
-        global.commons.sendMessage(global.translate('permissions.success.change').replace('(command)', parsed[1]), sender)
+        global.commons.sendMessage(global.translate('permissions.success.change').replace('$command', parsed[1]), sender)
       })
     } else {
       global.commons.sendMessage(global.translate('permissions.failed.noCmd'), sender)

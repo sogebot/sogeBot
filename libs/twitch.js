@@ -349,11 +349,11 @@ Twitch.prototype.getTime = function (time, isChat) {
 Twitch.prototype.uptime = function (self, sender) {
   const time = self.getTime(self.isOnline ? self.when.online : self.when.offline, true)
   global.commons.sendMessage(global.translate(self.isOnline ? 'core.online' : 'core.offline')
-    .replace('(time)', global.configuration.getValue('uptimeFormat')
-    .replace('(days)', time.days)
-    .replace('(hours)', time.hours)
-    .replace('(minutes)', time.minutes)
-    .replace('(seconds)', time.seconds)), sender)
+    .replace('$time', global.configuration.getValue('uptimeFormat')
+    .replace('$days', time.days)
+    .replace('$hours', time.hours)
+    .replace('$minutes', time.minutes)
+    .replace('$seconds', time.seconds)), sender)
 }
 
 Twitch.prototype.lastseenUpdate = function (self, id, sender, text) {
@@ -377,7 +377,7 @@ Twitch.prototype.followage = function (self, sender, text) {
 
   const user = global.users.get(username)
   if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.follow) || _.isNil(user.is.follower) || !user.is.follower) {
-    global.commons.sendMessage(global.translate('followage.success.never').replace('(username)', username), sender)
+    global.commons.sendMessage(global.translate('followage.success.never').replace('$username', username), sender)
   } else {
     let diff = moment.preciseDiff(user.time.follow, moment(), true)
     let output = []
@@ -388,8 +388,8 @@ Twitch.prototype.followage = function (self, sender, text) {
     if (diff.minutes) output.push(diff.minutes + ' ' + global.parser.getLocalizedName(diff.minutes, 'core.minutes'))
     if (output.length === 0) output.push(0 + ' ' + global.parser.getLocalizedName(0, 'core.minutes'))
     global.commons.sendMessage(global.translate('followage.success.time')
-      .replace('(username)', username)
-      .replace('(diff)', output.join(', ')), sender)
+      .replace('$username', username)
+      .replace('$diff', output.join(', ')), sender)
   }
 }
 
@@ -401,7 +401,7 @@ Twitch.prototype.age = function (self, sender, text) {
 
   const user = global.users.get(username)
   if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.created_at)) {
-    global.commons.sendMessage(global.translate('age.failed').replace('(username)', username), sender)
+    global.commons.sendMessage(global.translate('age.failed').replace('$username', username), sender)
   } else {
     let diff = moment.preciseDiff(user.time.created_at, moment(), true)
     let output = []
@@ -410,8 +410,8 @@ Twitch.prototype.age = function (self, sender, text) {
     if (diff.days) output.push(diff.days + ' ' + global.parser.getLocalizedName(diff.days, 'core.days'))
     if (diff.hours) output.push(diff.hours + ' ' + global.parser.getLocalizedName(diff.hours, 'core.hours'))
     global.commons.sendMessage(global.translate(sender.username.toLowerCase() !== username.toLowerCase() ? 'age.success.withUsername' : 'age.success.withoutUsername')
-      .replace('(username)', username)
-      .replace('(diff)', output.join(', ')), sender)
+      .replace('$username', username)
+      .replace('$diff', output.join(', ')), sender)
   }
 }
 
@@ -420,11 +420,11 @@ Twitch.prototype.lastseen = function (self, sender, text) {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     const user = global.users.get(parsed[0])
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.message)) {
-      global.commons.sendMessage(global.translate('lastseen.success.never').replace('(username)', parsed[0]), sender)
+      global.commons.sendMessage(global.translate('lastseen.success.never').replace('$username', parsed[0]), sender)
     } else {
       global.commons.sendMessage(global.translate('lastseen.success.time')
-        .replace('(username)', parsed[0])
-        .replace('(when)', moment.unix(user.time.message / 1000).format('DD-MM-YYYY HH:mm:ss')), sender)
+        .replace('$username', parsed[0])
+        .replace('$when', moment.unix(user.time.message / 1000).format('DD-MM-YYYY HH:mm:ss')), sender)
     }
   } catch (e) {
     global.commons.sendMessage(global.translate('lastseen.failed.parse'), sender)
@@ -440,8 +440,8 @@ Twitch.prototype.watched = function (self, sender, text) {
 
     let username = (global.configuration.getValue('atUsername') ? '@' : '') + user.username
     global.commons.sendMessage(global.translate('watched.success.time')
-      .replace('(time)', watched.toFixed(1))
-      .replace('(username)', username), sender)
+      .replace('$time', watched.toFixed(1))
+      .replace('$username', username), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('watched.failed.parse'), sender)
   }
@@ -483,13 +483,13 @@ Twitch.prototype.showTop = function (self, sender, text) {
     else type = type[1]
 
     if (type === 'points' && global.commons.isSystemEnabled('points')) {
-      message = global.translate('top.listPoints').replace('(amount)', 10)
+      message = global.translate('top.listPoints').replace('$amount', 10)
       sorted = _.orderBy(_.filter(global.users.users, function (o) { return !_.isNil(o.points) && !global.parser.isOwner(o.username) && o.username !== global.configuration.get().twitch.username }), 'points', 'desc')
     } else if (type === 'time') {
-      message = global.translate('top.listWatched').replace('(amount)', 10)
+      message = global.translate('top.listWatched').replace('$amount', 10)
       sorted = _.orderBy(_.filter(global.users.users, function (o) { return !_.isNil(o.time.watched) && !global.parser.isOwner(o.username) && o.username !== global.configuration.get().twitch.username }), 'time.watched', 'desc')
     } else {
-      message = global.translate('top.listMessages').replace('(amount)', 10)
+      message = global.translate('top.listMessages').replace('$amount', 10)
       sorted = _.orderBy(_.filter(global.users.users, function (o) { return !_.isNil(o.stats.messages) && !global.parser.isOwner(o.username) && o.username !== global.configuration.get().twitch.username }), 'stats.messages', 'desc')
     }
 
@@ -539,22 +539,22 @@ Twitch.prototype.setTitleAndGame = async function (self, sender, args) {
     if (!_.isNull(args.game)) {
       if (response.game === args.game.trim()) {
         global.commons.sendMessage(global.translate('game.change.success')
-          .replace('(game)', response.game), sender)
+          .replace('$game', response.game), sender)
         self.current.game = response.game
       } else {
         global.commons.sendMessage(global.translate('game.change.failed')
-          .replace('(game)', self.current.game), sender)
+          .replace('$game', self.current.game), sender)
       }
     }
 
     if (!_.isNull(args.title)) {
       if (response.status === args.title.trim()) {
         global.commons.sendMessage(global.translate('title.change.success')
-          .replace('(status)', response.status), sender)
+          .replace('$status', response.status), sender)
         self.current.status = response.status
       } else {
         global.commons.sendMessage(global.translate('title.change.failed')
-          .replace('(status)', self.current.status), sender)
+          .replace('$status', self.current.status), sender)
       }
     }
   } catch (e) {
@@ -567,7 +567,7 @@ Twitch.prototype.setTitleAndGame = async function (self, sender, args) {
 Twitch.prototype.setTitle = function (self, sender, text) {
   if (text.trim().length === 0) {
     global.commons.sendMessage(global.translate('title.current')
-      .replace('(title)', self.current.status), sender)
+      .replace('$title', self.current.status), sender)
     return
   }
   self.setTitleAndGame(self, sender, { title: text })
@@ -576,7 +576,7 @@ Twitch.prototype.setTitle = function (self, sender, text) {
 Twitch.prototype.setGame = function (self, sender, text) {
   if (text.trim().length === 0) {
     global.commons.sendMessage(global.translate('game.current')
-      .replace('(game)', self.current.game), sender)
+      .replace('$game', self.current.game), sender)
     return
   }
   self.setTitleAndGame(self, sender, { game: text })

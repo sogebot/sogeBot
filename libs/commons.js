@@ -84,10 +84,10 @@ Commons.prototype.runCallback = function (cb, data) {
   if (data._type === 'settings') {
     if (typeof cb === 'function') cb(data)
     else if (!data._quiet) {
-      this.sendToOwners(global.translate(cb).replace('(value)', value[Object.keys(value)[0]]))
+      this.sendToOwners(global.translate(cb).replace('$value', value[Object.keys(value)[0]]))
     }
   } else {
-    typeof cb === 'function' ? cb(data) : this.sendMessage(global.translate(cb).replace('(value)', value[Object.keys(value)[0]]), {username: global.configuration.get().twitch.channel}, data)
+    typeof cb === 'function' ? cb(data) : this.sendMessage(global.translate(cb).replace('$value', value[Object.keys(value)[0]]), {username: global.configuration.get().twitch.channel}, data)
   }
 }
 

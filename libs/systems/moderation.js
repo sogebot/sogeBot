@@ -190,9 +190,9 @@ Moderation.prototype.permitLink = function (self, sender, text) {
     })
 
     global.commons.sendMessage(global.translate('moderation.permit')
-      .replace('(who)', (global.configuration.getValue('atUsername') ? '@' : '') + parsed[1])
-      .replace('(link)', global.parser.getLocalizedName(count, 'core.links'))
-      .replace('(count)', count), sender)
+      .replace('$who', (global.configuration.getValue('atUsername') ? '@' : '') + parsed[1])
+      .replace('$link', global.parser.getLocalizedName(count, 'core.links'))
+      .replace('$count', count), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('moderation.failed.parsePermit'), sender)
   }

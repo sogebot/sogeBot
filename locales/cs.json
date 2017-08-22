@@ -4,14 +4,14 @@
     "enabled": "zapnuto",
     "disabled": "vypnuto",
     "usage": "Pouziti",
-    "online": "Stream je online (time)",
-    "offline": "Stream je offline (time)",
+    "online": "Stream je online $time",
+    "offline": "Stream je offline $time",
     "lang-selected": "Bot je nyni prepnuty do cestiny",
-    "command-parse": "Promin, (sender), ale tento prikaz neni spravne, pouzij",
-    "error": "Promin, (sender), ale neco se pokazilo!",
+    "command-parse": "Promin, $sender, ale tento prikaz neni spravne, pouzij",
+    "error": "Promin, $sender, ale neco se pokazilo!",
     "no-response": "",
     "api": {
-      "error": "(sender), neco se pokazilo v API!",
+      "error": "$sender, neco se pokazilo v API!",
       "not-available": "nedostupne"
     },
     "mute": {
@@ -23,7 +23,7 @@
       "true": "", "false": ""
     },
     "settings": {
-      "uptime-format": "Format pro uptime nastaven na (value)",
+      "uptime-format": "Format pro uptime nastaven na $value",
       "atUsername": {
         "true": "Uzivatelske jmena budou zobrazena s @ takto @foo",
         "false": "Uzivatelske jmena budou zobrazena bez @ takto foo"
@@ -36,15 +36,15 @@
     "minutes": "minuta|4:minuty|minut",
     "messages": "zprava|4:zpravy|zprav",
     "links": "odkaz|4:odkazy|odkazu",
-    "isRegistered": "(sender), nelze pouzit (keyword), protoze je uz prirazena k jine akci!"
+    "isRegistered": "$sender, nelze pouzit $keyword, protoze je uz prirazena k jine akci!"
   },
   "overlay": {
     "emotes": {
       "settings": {
-        "OEmotesSize": "Velikost emotikonu je nastavena na (value)",
-        "OEmotesMax": "Maximalni pocet zobrazeni stejnych emotikonu na zpravu je (value)",
-        "OEmotesAnimation": "Animace zobrazeni emotikonu je (value)",
-        "OEmotesAnimationTime": "Doba trvani animace nastavena na (value)ms"
+        "OEmotesSize": "Velikost emotikonu je nastavena na $value",
+        "OEmotesMax": "Maximalni pocet zobrazeni stejnych emotikonu na zpravu je $value",
+        "OEmotesAnimation": "Animace zobrazeni emotikonu je $value",
+        "OEmotesAnimationTime": "Doba trvani animace nastavena na $valuems"
       }
     }
   },
@@ -370,96 +370,96 @@
     "start-commercial": "spustit reklamu"
   },
   "raffle": {
-    "announceInterval": "Otevrene raffle budou oznamovany kazdych (value) minut",
-    "announceCustomMessage": "Vlastni oznameni pro raffle nastaveno na `(value)`",
-    "announceTitleTemplate": "Sablona pro nadpis nastavena na `(value)`",
-    "minWatchedTime": "a take je potreba minimalne (time)h sledovat tento stream",
+    "announceInterval": "Otevrene raffle budou oznamovany kazdych $value minut",
+    "announceCustomMessage": "Vlastni oznameni pro raffle nastaveno na `$value`",
+    "announceTitleTemplate": "Sablona pro nadpis nastavena na `$value`",
+    "minWatchedTime": "a take je potreba minimalne $timeh sledovat tento stream",
     "participation": {
       "success": "Ucastnis se prave probihajiciho raffle! Hodne stesti!",
       "failed": "Promin, ale nesplnujes podminky pro vstup do raffle! Pokud te zajimaji podminky, zaseptej mi !raffle"
     },
     "info": {
       "opened": {
-        "everyone": "(sender), raffle je spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
-        "everyoneAndProduct": "(sender), raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
-        "followers": "(sender), raffle je spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
-        "followersAndProduct": "(sender), raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
-        "subscribers": "(sender), raffle je spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze subscriberum",
-        "subscribersAndProduct": "(sender), raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze subscriberum",
-        "everyoneTickets": "(sender), ticket raffle je spustena. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je otevreny vsem",
-        "everyoneAndProductTickets": "(sender), ticket raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je otevreny vsem",
-        "followersTickets": "(sender), ticket raffle je spustena. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze followerum",
-        "followersAndProductTickets": "(sender), ticket raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze followerum",
-        "subscribersTickets": "(sender), ticket raffle je spustena. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze subscriberum",
-        "subscribersAndProductTickets": "(sender), ticket raffle je spustena o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze subscriberum"
+        "everyone": "$sender, raffle je spustena. Pro vstup do raffle napis !$keyword. Vstup je otevreny vsem",
+        "everyoneAndProduct": "$sender, raffle je spustena o `$product`. Pro vstup do raffle napis !$keyword. Vstup je otevreny vsem",
+        "followers": "$sender, raffle je spustena. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze followerum",
+        "followersAndProduct": "$sender, raffle je spustena o `$product`. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze followerum",
+        "subscribers": "$sender, raffle je spustena. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze subscriberum",
+        "subscribersAndProduct": "$sender, raffle je spustena o `$product`. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze subscriberum",
+        "everyoneTickets": "$sender, ticket raffle je spustena. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je otevreny vsem",
+        "everyoneAndProductTickets": "$sender, ticket raffle je spustena o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je otevreny vsem",
+        "followersTickets": "$sender, ticket raffle je spustena. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze followerum",
+        "followersAndProductTickets": "$sender, ticket raffle je spustena o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze followerum",
+        "subscribersTickets": "$sender, ticket raffle je spustena. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze subscriberum",
+        "subscribersAndProductTickets": "$sender, ticket raffle je spustena o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze subscriberum"
       },
-      "closed": "(sender) Raffle je uzavrena, ale vitez jeste nebyl vybran!",
-      "notRunning": "(sender) Zadne raffle neni momentalne otevreno!"
+      "closed": "$sender Raffle je uzavrena, ale vitez jeste nebyl vybran!",
+      "notRunning": "$sender Zadne raffle neni momentalne otevreno!"
     },
     "open": {
-      "error": "(sender) Raffle neni otevreno! Pouzij: !raffle open [raffle-keyword] [product(optional)] [time=#(optional)] [followers(optional)]",
-      "running": "(sender) Raffle nyni jiz bezi! Keyword pro raffle je !(keyword)",
-      "locked": "(sender) Raffle je nyni uzavreno! Vyber viteze pomoci !raffle pick",
+      "error": "$sender Raffle neni otevreno! Pouzij: !raffle open [raffle-keyword] [product(optional)] [time=#(optional)] [followers(optional)]",
+      "running": "$sender Raffle nyni jiz bezi! Keyword pro raffle je !$keyword",
+      "locked": "$sender Raffle je nyni uzavreno! Vyber viteze pomoci !raffle pick",
       "ok": {
-        "everyone": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
-        "everyoneAndProduct": "Nova raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
-        "followers": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
-        "followersAndProduct": "Nova raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
-        "subscribers": "Nova raffle byla spustena. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze subscriberum",
-        "subscribersAndProduct": "Nova raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze subscriberum",
-        "everyoneTickets": "Nova ticket raffle byla spustena. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je otevreny vsem",
-        "everyoneAndProductTickets": "Nova ticket raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je otevreny vsem",
-        "followersTickets": "Nova ticket raffle byla spustena. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze followerum",
-        "followersAndProductTickets": "Nova ticket affle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze followerum",
-        "subscribersTickets": "Nova ticket raffle byla spustena. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze subscriberum",
-        "subscribersAndProductTickets": "Nova ticket raffle byla spustena o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze subscriberum"
+        "everyone": "Nova raffle byla spustena. Pro vstup do raffle napis !$keyword. Vstup je otevreny vsem",
+        "everyoneAndProduct": "Nova raffle byla spustena o `$product`. Pro vstup do raffle napis !$keyword. Vstup je otevreny vsem",
+        "followers": "Nova raffle byla spustena. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze followerum",
+        "followersAndProduct": "Nova raffle byla spustena o `$product`. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze followerum",
+        "subscribers": "Nova raffle byla spustena. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze subscriberum",
+        "subscribersAndProduct": "Nova raffle byla spustena o `$product`. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze subscriberum",
+        "everyoneTickets": "Nova ticket raffle byla spustena. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je otevreny vsem",
+        "everyoneAndProductTickets": "Nova ticket raffle byla spustena o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je otevreny vsem",
+        "followersTickets": "Nova ticket raffle byla spustena. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze followerum",
+        "followersAndProductTickets": "Nova ticket affle byla spustena o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze followerum",
+        "subscribersTickets": "Nova ticket raffle byla spustena. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze subscriberum",
+        "subscribersAndProductTickets": "Nova ticket raffle byla spustena o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze subscriberum"
       },
       "notice": {
-        "everyone": "Raffle prave bezi. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
-        "everyoneAndProduct": "Raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je otevreny vsem",
-        "followers": "Raffle prave bezi. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
-        "followersAndProduct": "Raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze followerum",
-        "subscribers": "Raffle prave bezi. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze subscriberum",
-        "subscribersAndProduct": "Raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword). Vstup je mozny pouze subscriberum",
-        "everyoneTickets": "Ticket raffle prave bezi. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je otevreny vsem",
-        "everyoneAndProductTickets": "Ticket raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je otevreny vsem",
-        "followersTickets": "Ticket raffle prave bezi. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze followerum",
-        "followersAndProductTickets": "Ticket raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze followerum",
-        "subscribersTickets": "Ticket raffle prave bezi. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze subscriberum",
-        "subscribersAndProductTickets": "Ticket raffle prave bezi o `(product)`. Pro vstup do raffle napis !(keyword) <(min)-(max)>. Vstup je mozny pouze subscriberum"
+        "everyone": "Raffle prave bezi. Pro vstup do raffle napis !$keyword. Vstup je otevreny vsem",
+        "everyoneAndProduct": "Raffle prave bezi o `$product`. Pro vstup do raffle napis !$keyword. Vstup je otevreny vsem",
+        "followers": "Raffle prave bezi. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze followerum",
+        "followersAndProduct": "Raffle prave bezi o `$product`. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze followerum",
+        "subscribers": "Raffle prave bezi. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze subscriberum",
+        "subscribersAndProduct": "Raffle prave bezi o `$product`. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze subscriberum",
+        "everyoneTickets": "Ticket raffle prave bezi. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je otevreny vsem",
+        "everyoneAndProductTickets": "Ticket raffle prave bezi o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je otevreny vsem",
+        "followersTickets": "Ticket raffle prave bezi. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze followerum",
+        "followersAndProductTickets": "Ticket raffle prave bezi o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze followerum",
+        "subscribersTickets": "Ticket raffle prave bezi. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze subscriberum",
+        "subscribersAndProductTickets": "Ticket raffle prave bezi o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze subscriberum"
       }
     },
     "close": {
       "ok": "Raffle byla uzavrena! Uz se nemuzes zucastnit!",
-      "notRunning": "(sender) Zadna raffle momentalne neni otevrena!"
+      "notRunning": "$sender Zadna raffle momentalne neni otevrena!"
     },
     "pick": {
       "winner": {
-        "withoutProduct": "Gratulace @(winner), prave si vyhral raffle (pravdepodobnost vyhry byla (probability)%)!",
-        "withProduct": "Gratulace @(winner), prave si vyhral raffle o `(product)` (pravdepodobnost vyhry byla (probability)%)!"
+        "withoutProduct": "Gratulace @$winner, prave si vyhral raffle (pravdepodobnost vyhry byla $probability%)!",
+        "withProduct": "Gratulace @$winner, prave si vyhral raffle o `$product` (pravdepodobnost vyhry byla $probability%)!"
       },
       "noParticipants": "Nikdo se nezucastnil raffle! Zadny vitez nebyl vybran."
     }
   },
   "bets": {
-      "newBet": "(sender), nyni mas vsazeno (amount) (pointsName) na (option). Muzes vyhrat (winAmount) (winPointsName)!",
-      "running": "(sender), sazky jsou jiz otevreny! Pouzij !bet close [(options)]",
+      "newBet": "$sender, nyni mas vsazeno $amount $pointsName na $option. Muzes vyhrat $winAmount $winPointsName!",
+      "running": "$sender, sazky jsou jiz otevreny! Pouzij !bet close [$options]",
       "notRunning": "Zadne sazky nejsou otevreny, pozadej moda o otevreni!",
-      "opened": "Sazky otevreny! Pouzij !bet [(options)] [points] a vyhraj! Zbyva pouze (minutes)min pro vsazeni!",
-      "notEnoughOptions": "(sender), nove sazky musi mit alespon dve moznosti!",
-      "info": "Sazky otevreny! Pouzij !bet [(options)] [points] a vyhraj! (time)min zbyva pro vsazeni!",
+      "opened": "Sazky otevreny! Pouzij !bet [$options] [points] a vyhraj! Zbyva pouze $minutesmin pro vsazeni!",
+      "notEnoughOptions": "$sender, nove sazky musi mit alespon dve moznosti!",
+      "info": "Sazky otevreny! Pouzij !bet [$options] [points] a vyhraj! $timemin zbyva pro vsazeni!",
       "parseError": "{core.command-parse} !bet a zjisti jak na to",
-      "diffBet": "(sender), uz sis vsadil na (option) a nemuzes vsadit na vice moznosti najednou!",
-      "notEnoughPoints": "Promin, (sender), ale nemas (amount) (pointsName) do sazky!",
-      "undefinedBet": "Promin, (sender), ale tato moznost neexistuje, pouzij !bet a zjisti jak na to",
-      "betPercentGain": "Sazky se vyplaci (value)% za kazdou moznost",
-      "betCloseTimer": "Sazky budou automaticky uzavreny za (value)min",
+      "diffBet": "$sender, uz sis vsadil na $option a nemuzes vsadit na vice moznosti najednou!",
+      "notEnoughPoints": "Promin, $sender, ale nemas $amount $pointsName do sazky!",
+      "undefinedBet": "Promin, $sender, ale tato moznost neexistuje, pouzij !bet a zjisti jak na to",
+      "betPercentGain": "Sazky se vyplaci $value% za kazdou moznost",
+      "betCloseTimer": "Sazky budou automaticky uzavreny za $valuemin",
       "refund": "Sazky byly uzavreny bez vyhry, vsichni uzivatele byly vyplaceni!",
-      "notOption": "(sender), tato moznost neexistuje! Sazka nebyla uzavrena, pouzij !bet",
-      "closed": "Sazky byly uzavreny a vitezna moznost je (option)! Vyplaceno bylo (amount) uzivatelu!",
-      "timeUpBet": "Prisel si pozde, (sender), cas na sazeni vyprsel!",
+      "notOption": "$sender, tato moznost neexistuje! Sazka nebyla uzavrena, pouzij !bet",
+      "closed": "Sazky byly uzavreny a vitezna moznost je $option! Vyplaceno bylo $amount uzivatelu!",
+      "timeUpBet": "Prisel si pozde, $sender, cas na sazeni vyprsel!",
       "locked": "Vyprsel cas na vsazeni! Dalsi sazky neprijimame",
-      "zeroBet": "Ale ale, (sender), nemuzes vsadit 0 (pointsName)",
+      "zeroBet": "Ale ale, $sender, nemuzes vsadit 0 $pointsName",
       "lockedInfo": "Sazky jsou otevreny, ale cas na vsazeni jiz vyprsel!",
       "removed": "Vyprsel cas na vsazeni! Nikdo si nevsadil -> automaticky uzaviram"
   },
@@ -468,18 +468,18 @@
       "add": "Alias byl pridan do databaze",
       "remove": "Alias byl smazany z databaze",
       "list": "Seznam aliasu",
-      "enabled": "Alias !(alias) byl zapnut",
-      "disabled": "Alias !(alias) byl vypnut",
-      "visible": "Alias !(alias) bude zobrazen v listu",
-      "invisible": "Alias !(alias) nebude zobrazen v listu"
+      "enabled": "Alias !$alias byl zapnut",
+      "disabled": "Alias !$alias byl vypnut",
+      "visible": "Alias !$alias bude zobrazen v listu",
+      "invisible": "Alias !$alias nebude zobrazen v listu"
     },
     "failed": {
       "add": "Tento alias uz existuje v databazi",
       "remove": "Tento alias v databazi neexistuje",
       "list": "Seznam aliasu je prazdny",
       "parse": "{core.command-parse} !alias",
-      "toggle": "Alias !(alias) neni v databazi!",
-      "visible": "(alias.failed.remove)"
+      "toggle": "Alias !$alias neni v databazi!",
+      "visible": "{alias.failed.remove}"
     }
   },
   "customcmds": {
@@ -487,18 +487,18 @@
       "add": "Prikaz byl pridan do databaze",
       "remove": "Prikaz byl smazany z databaze",
       "list": "Seznam prikazu",
-      "enabled": "Prikaz !(command) byl zapnut",
-      "disabled": "Prikaz !(command) byl vypnut",
-      "visible": "Prikaz !(command) bude zobrazen v listu",
-      "invisible": "Prikaz !(command) nebude zobrazen v listu"
+      "enabled": "Prikaz !$command byl zapnut",
+      "disabled": "Prikaz !$command byl vypnut",
+      "visible": "Prikaz !$command bude zobrazen v listu",
+      "invisible": "Prikaz !$command nebude zobrazen v listu"
     },
     "failed": {
       "add": "Tento prikaz uz existuje v databazi",
       "remove": "Tento prikaz v databazi neexistuje",
       "list": "Seznam prikazu je prazdny",
       "parse": "{core.command-parse} !command",
-      "toggle": "Prikaz !(command) neni v databazi!",
-      "visible": "(customcmds.failed.remove)"
+      "toggle": "Prikaz !$command neni v databazi!",
+      "visible": "{customcmds.failed.remove}"
     }
   },
   "keywords": {
@@ -506,15 +506,15 @@
       "add": "Keyword byl pridan do databaze",
       "remove": "Keyword byl smazany z databaze",
       "list": "Seznam keywordu",
-      "enabled": "Keyword (keyword) byl zapnut",
-      "disabled": "Keyword (keyword) byl vypnut"
+      "enabled": "Keyword $keyword byl zapnut",
+      "disabled": "Keyword $keyword byl vypnut"
     },
     "failed": {
       "add": "Tento keyword uz existuje v databazi",
       "remove": "Tento keyword v databazi neexistuje",
       "list": "Seznam keywordu je prazdny",
       "parse": "{core.command-parse} !keyword",
-      "toggle": "Keyword (keyword) neni v databazi!"
+      "toggle": "Keyword $keyword neni v databazi!"
     }
   },
   "notice": {
@@ -522,34 +522,34 @@
       "add": "Oznameni bylo pridano do databaze",
       "remove": "Oznameni bylo smazano z database",
       "list": "Seznam oznameni",
-      "enabled": "Oznameni (notice) bylo zapnuto",
-      "disabled": "Oznameni (notice) bylo vypnuto"
+      "enabled": "Oznameni $notice bylo zapnuto",
+      "disabled": "Oznameni $notice bylo vypnuto"
     },
     "failed": {
       "add": "Toto oznameni jiz existuje v databazi",
       "notFound": "Toto oznameni v databazi neexistuje",
       "list": "Seznam oznameni je prazdny",
       "parse": "{core.command-parse} !notice",
-      "toggle": "Oznameni (notice) neni v databazi!"
+      "toggle": "Oznameni $notice neni v databazi!"
     },
     "settings": {
-      "noticeInterval": "Minimalni interval pro zobrazeni oznameni je nastaven na (value) minut",
-      "noticeMsgReq": "Minimalni pocet zprav pro zobrazeni oznameni je nastaven na (value)"
+      "noticeInterval": "Minimalni interval pro zobrazeni oznameni je nastaven na $value minut",
+      "noticeMsgReq": "Minimalni pocet zprav pro zobrazeni oznameni je nastaven na $value"
     }
   },
   "points": {
     "success": {
-      "set": "(username) ma nyni nastaveno (amount) (pointsName)",
-      "give": "(sender) prave dal svych (amount) (pointsName) uzivateli (username)",
-      "all": "Vsichni online uzivatele prave ziskali (amount) (pointsName)!",
-      "rain": "Jen at prsi! Vsichni online uzivatele prave ziskali az (amount) (pointsName)!",
-      "add": "(username) ziskal (amount) (pointsName)!",
-      "remove": "A jeje, (amount) (pointsName) bylo odebrano uzivateli (username)!"
+      "set": "$username ma nyni nastaveno $amount $pointsName",
+      "give": "$sender prave dal svych $amount $pointsName uzivateli $username",
+      "all": "Vsichni online uzivatele prave ziskali $amount $pointsName!",
+      "rain": "Jen at prsi! Vsichni online uzivatele prave ziskali az $amount $pointsName!",
+      "add": "$username ziskal $amount $pointsName!",
+      "remove": "A jeje, $amount $pointsName bylo odebrano uzivateli $username!"
     },
     "failed": {
       "set": "{core.command-parse} !points set [username] [amount]",
       "give": "{core.command-parse} !points give [username] [amount]",
-      "giveNotEnough": "Promin, (sender), ale nemas (amount) (pointsName) abys je daroval uzivateli (username)",
+      "giveNotEnough": "Promin, $sender, ale nemas $amount $pointsName abys je daroval uzivateli $username",
       "get": "{core.command-parse} !points get [username]",
       "all": "{core.command-parse} !points all [amount]",
       "rain": "{core.command-parse} !makeitrain [amount]",
@@ -557,14 +557,14 @@
       "remove": "{core.command-parse} !points remove [username] [amount]"
     },
     "settings": {
-      "pointsName": "Pojmenovani bodu nastaveno na (value) format",
-      "pointsResponse": "Odpoved na body nastavena na: (value)",
-      "pointsInterval": "Interval ziskavani bodu online je (value) minut",
-      "pointsPerInterval": "Pocet bodu ziskano za interval online je (value)",
-      "pointsMessageInterval": "Interval zprav pro ziskani bodu je (value)",
-      "pointsPerMessageInterval": "Pocet bodu ziskanych za interval zprav je (value)",
-      "pointsIntervalOffline": "Interval ziskavani bodu offline je (value) minut",
-      "pointsPerIntervalOffline": "Pocet bodu ziskano za interval offline je (value)"
+      "pointsName": "Pojmenovani bodu nastaveno na $value format",
+      "pointsResponse": "Odpoved na body nastavena na: $value",
+      "pointsInterval": "Interval ziskavani bodu online je $value minut",
+      "pointsPerInterval": "Pocet bodu ziskano za interval online je $value",
+      "pointsMessageInterval": "Interval zprav pro ziskani bodu je $value",
+      "pointsPerMessageInterval": "Pocet bodu ziskanych za interval zprav je $value",
+      "pointsIntervalOffline": "Interval ziskavani bodu offline je $value minut",
+      "pointsPerIntervalOffline": "Pocet bodu ziskano za interval offline je $value"
     },
     "defaults": {
       "pointsName": {
@@ -572,7 +572,7 @@
         "multi": "bodu",
         "xmulti": "4:body"
       },
-      "pointsResponse": "(username) ma prave (amount) (pointsName)"
+      "pointsResponse": "$username ma prave $amount $pointsName"
     }
   },
   "songs": {
@@ -587,45 +587,45 @@
         "true": "{songs.settings.playlist.text} {core.enabled}",
         "false": "{songs.settings.playlist.text} {core.disabled}"
       },
-      "volume": "Hlasitost nastavena na (value)%",
-      "duration": "Maximalni delka pisne nastavena na (value) minut.",
+      "volume": "Hlasitost nastavena na $value%",
+      "duration": "Maximalni delka pisne nastavena na $value minut.",
       "shuffle": {
         "true": "Pisnicky budou hrat nahodne",
         "false": "Pisnicky budou hrat podle casu pridani"
       }
     },
-    "bannedSong": "Pisen (title) byla zabanovana a nebude uz nikdy hrat!",
+    "bannedSong": "Pisen $title byla zabanovana a nebude uz nikdy hrat!",
     "bannedSongTimeout": "Dostal si timeout za zabanovanou pisen",
     "unbannedSong": "Pisen byla uspesne odbanovana",
     "notBannedSong": "Tato pisen nebyla zabanovana",
     "currentSong": {
-      "songrequest": "Prave hrajici pisen je (title) pridana uzivatelem (username)",
-      "playlist": "Prave hrajici pisen je (title) z playlistu"
+      "songrequest": "Prave hrajici pisen je $title pridana uzivatelem $username",
+      "playlist": "Prave hrajici pisen je $title z playlistu"
     },
     "noCurrentSong": "Nic momentalne nehraje",
-    "isBanned": "Promin, (sender), ale tahle pisen je zabanovana",
-    "notFound": "Promin, (sender), ale tahle pisen nebyla nalezena",
-    "tooLong": "Promin, (sender), ale tahle pisen je moc dlouha",
-    "addedSong": "(title) byla pridana do queue uzivatelem (sender)",
-    "addedSongPlaylist": "(title) byla pridana do playlistu",
-    "removeSongQueue": "(title) byla odstranena z queue",
-    "alreadyInPlaylist": "Pisen (title) jiz je v playlistu",
-    "removeSongPlaylist": "(title) byla odstranena z playlistu"
+    "isBanned": "Promin, $sender, ale tahle pisen je zabanovana",
+    "notFound": "Promin, $sender, ale tahle pisen nebyla nalezena",
+    "tooLong": "Promin, $sender, ale tahle pisen je moc dlouha",
+    "addedSong": "$title byla pridana do queue uzivatelem $sender",
+    "addedSongPlaylist": "$title byla pridana do playlistu",
+    "removeSongQueue": "$title byla odstranena z queue",
+    "alreadyInPlaylist": "Pisen $title jiz je v playlistu",
+    "removeSongPlaylist": "$title byla odstranena z playlistu"
   },
   "price": {
     "success": {
-      "set": "Cena za !(command) byla nastavena na (amount) (pointsName)",
-      "remove" : "Cena za !(command) byla zrusena",
+      "set": "Cena za !$command byla nastavena na $amount $pointsName",
+      "remove" : "Cena za !$command byla zrusena",
       "list": "Seznam cen",
-      "enabled": "Cena za !(command) byla zapnuta",
-      "disabled": "Cena za !(command) byla vypnuta"
+      "enabled": "Cena za !$command byla zapnuta",
+      "disabled": "Cena za !$command byla vypnuta"
     },
     "failed": {
       "parse": "{core.command-parse} !price",
-      "remove": "Cena za !(command) nebyla v databazi",
+      "remove": "Cena za !$command nebyla v databazi",
       "list": "Nejsou nastaveny zadne ceny",
-      "notEnough": "Promin, (sender), ale nemas (amount) (pointsName) k pouziti !(command)",
-      "toggle": "Cena za !(command) nebyla nalezena"
+      "notEnough": "Promin, $sender, ale nemas $amount $pointsName k pouziti !$command",
+      "toggle": "Cena za !$command nebyla nalezena"
     }
   },
   "rank": {
@@ -633,9 +633,9 @@
       "add": "Novy rank byl pridan do bota",
       "remove" : "Rank byl smazan",
       "list": "Seznam ranku",
-      "set": "(username) ma nastaveny rank na (rank)",
-      "unset": "Vlastni rank byl vymazan pro (username)",
-      "show": "(sender) ma prave (rank) rank"
+      "set": "$username ma nastaveny rank na $rank",
+      "unset": "Vlastni rank byl vymazan pro $username",
+      "show": "$sender ma prave $rank rank"
     },
     "failed": {
       "parse": "{core.command-parse} !rank help",
@@ -644,26 +644,26 @@
       "set": "{core.command-parse} !rank set <username> <rank>",
       "unset": "{core.command-parse} !rank unset <username>",
       "notFound": "Nebyl nalezen zadny rank k teto hodine",
-      "show": "(sender) nema zatim zadny rank."
+      "show": "$sender nema zatim zadny rank."
     }
   },
   "followage": {
     "success": {
-      "never": "(sender), @(username) neni followerem kanalu",
-      "time": "(sender), @(username) sleduje tento kanal jiz (diff)"
+      "never": "$sender, @$username neni followerem kanalu",
+      "time": "$sender, @$username sleduje tento kanal jiz $diff"
     }
   },
   "age": {
-    "failed": "(sender), nemam zatim data o stari uctu @(username)",
+    "failed": "$sender, nemam zatim data o stari uctu @$username",
     "success": {
-      "withUsername": "(sender), stari uctu @(username) je (diff)",
-      "withoutUsername": "(sender), stari tveho uctu je (diff)"
+      "withUsername": "$sender, stari uctu @$username je $diff",
+      "withoutUsername": "$sender, stari tveho uctu je $diff"
     }
   },
   "lastseen": {
     "success": {
-      "online": "(username) je prave na kanale online!",
-      "time": "(username) byl naposled spatren na tomto kanalu (when)"
+      "online": "$username je prave na kanale online!",
+      "time": "$username byl naposled spatren na tomto kanalu $when"
     },
     "failed": {
       "parse": "{core.command-parse} !lastseen [username]"
@@ -671,16 +671,16 @@
   },
   "watched": {
     "success": {
-      "time": "(username) se dival na tento kanal (time) hodin"
+      "time": "$username se dival na tento kanal $time hodin"
     },
     "failed": {
       "parse": "{core.command-parse} !watched nebo !watched [username]"
     }
   },
   "top": {
-    "listWatched": "Top (amount) (cas sledovani): ",
-    "listPoints": "Top (amount) (body): ",
-    "listMessages": "Top (amount) (zpravy): "
+    "listWatched": "Top $amount (cas sledovani): ",
+    "listPoints": "Top $amount (body): ",
+    "listMessages": "Top $amount (zpravy): "
   },
   "permissions": {
     "success": {
@@ -688,13 +688,13 @@
     },
     "failed": {
       "parse": "Pouziti: !permission viewer|mods|owner|regular|disable [command]",
-      "noCmd": "Promin, (sender), ale tento prikaz neni v botovi evidovan"
+      "noCmd": "Promin, $sender, ale tento prikaz neni v botovi evidovan"
     },
-    "without-permission": "Nemas dostatecne opravneni pro '(command)'"
+    "without-permission": "Nemas dostatecne opravneni pro '$command'"
   },
   "moderation": {
     "warning": "[zbyva $count varovani]",
-    "permit": "Uzivatel (who) muze nyni postnout (count) (link) do chatu",
+    "permit": "Uzivatel $who muze nyni postnout $count $link do chatu",
     "links": "Nejsou povoleny linky, pozadej o !permit",
     "symbols": "Prilisne pouzivani symbolu neni povoleno",
     "longMessage": "Tva zprava je prilis dlouha",
@@ -717,22 +717,22 @@
       "blacklist": "{moderation.blacklist} {moderation.warning}"
     },
     "settings": {
-      "moderationLinksCustomMessage": "Vlastni zprava pro moderovani linku je nastavena na '(value)'",
-      "moderationLinksWarningCustomMessage": "Vlastni varovna zprava pro moderovani linku je nastavena na '(value)'",
-      "moderationSymbolsCustomMessage": "Vlastni zprava pro moderovani symbolu je nastavena na '(value)'",
-      "moderationSymbolsWarningCustomMessage": "Vlastni varovna zprava pro moderovani symbolu je nastavena na '(value)'",
-      "moderationLongMessageCustomMessage": "Vlastni zprava pro moderovani dlouhych zprav je nastavena na '(value)'",
-      "moderationLongMessageWarningCustomMessage": "Vlastni varovna zprava pro moderovani dlouhych zprav je nastavena na '(value)'",
-      "moderationCapsCustomMessage": "Vlastni zprava pro moderovani velkych pismen je nastavena na '(value)'",
-      "moderationCapsWarningCustomMessage": "Vlastni varovna zprava pro moderovani velkych pismen je nastavena na '(value)'",
-      "moderationSpamCustomMessage": "Vlastni zprava pro moderovani spamu je nastavena na '(value)'",
-      "moderationSpamWarningCustomMessage": "Vlastni varovna zprava pro moderovani spamu je nastavena na '(value)'",
-      "moderationColorCustomMessage": "Vlastni zprava pro moderovani /me je nastavena na '(value)'",
-      "moderationColorWarningCustomMessage": "Vlastni varovna zprava pro moderovani /me je nastavena na '(value)'",
-      "moderationEmotesCustomMessage": "Vlastni zprava pro moderovani smajliku je nastavena na '(value)'",
-      "moderationEmotesWarningCustomMessage": "Vlastni varovna zprava pro moderovani smajliku je nastavena na '(value)'",
-      "moderationBlacklistCustomMessage": "Vlastni zprava pro moderovani blacklistu je nastavena na '(value)'",
-      "moderationBlacklistWarningCustomMessage": "Vlastni varovna zprava pro moderovani blacklistu je nastavena na '(value)'",
+      "moderationLinksCustomMessage": "Vlastni zprava pro moderovani linku je nastavena na '$value'",
+      "moderationLinksWarningCustomMessage": "Vlastni varovna zprava pro moderovani linku je nastavena na '$value'",
+      "moderationSymbolsCustomMessage": "Vlastni zprava pro moderovani symbolu je nastavena na '$value'",
+      "moderationSymbolsWarningCustomMessage": "Vlastni varovna zprava pro moderovani symbolu je nastavena na '$value'",
+      "moderationLongMessageCustomMessage": "Vlastni zprava pro moderovani dlouhych zprav je nastavena na '$value'",
+      "moderationLongMessageWarningCustomMessage": "Vlastni varovna zprava pro moderovani dlouhych zprav je nastavena na '$value'",
+      "moderationCapsCustomMessage": "Vlastni zprava pro moderovani velkych pismen je nastavena na '$value'",
+      "moderationCapsWarningCustomMessage": "Vlastni varovna zprava pro moderovani velkych pismen je nastavena na '$value'",
+      "moderationSpamCustomMessage": "Vlastni zprava pro moderovani spamu je nastavena na '$value'",
+      "moderationSpamWarningCustomMessage": "Vlastni varovna zprava pro moderovani spamu je nastavena na '$value'",
+      "moderationColorCustomMessage": "Vlastni zprava pro moderovani /me je nastavena na '$value'",
+      "moderationColorWarningCustomMessage": "Vlastni varovna zprava pro moderovani /me je nastavena na '$value'",
+      "moderationEmotesCustomMessage": "Vlastni zprava pro moderovani smajliku je nastavena na '$value'",
+      "moderationEmotesWarningCustomMessage": "Vlastni varovna zprava pro moderovani smajliku je nastavena na '$value'",
+      "moderationBlacklistCustomMessage": "Vlastni zprava pro moderovani blacklistu je nastavena na '$value'",
+      "moderationBlacklistWarningCustomMessage": "Vlastni varovna zprava pro moderovani blacklistu je nastavena na '$value'",
       "moderationAnnounceTimeouts": {
         "true": "Bot bude posilat timeout zpravy do chatu",
         "false": "Bot nebude posilat timeout zpravy do chatu"
@@ -752,7 +752,7 @@
         "true": "{moderation.settings.moderationLinksSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationLinksSubs.text} {core.disabled}"
       },
-      "moderationLinksTimeout": "Timeout pri pouziti linku je nastaven na (value)s",
+      "moderationLinksTimeout": "Timeout pri pouziti linku je nastaven na $values",
       "moderationSymbols": {
         "text": "Moderovani symbolu je",
         "true": "{moderation.settings.moderationSymbols.text} {core.enabled}",
@@ -763,10 +763,10 @@
         "true": "{moderation.settings.moderationSymbolsSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationSymbolsSubs.text} {core.disabled}"
       },
-      "moderationSymbolsTimeout": "Timeout pri pouziti symbolu je nastaven na (value)s",
-      "moderationSymbolsTriggerLength": "Moderovani symbolu zapnuto od (value) poctu znaku",
-      "moderationSymbolsMaxConsecutively": "Maximum symbolu zapsanych za sebou je nastaveno na (value)",
-      "moderationSymbolsMaxPercent": "Maximum symbolu v cele zprave je nastaveno na (value)%",
+      "moderationSymbolsTimeout": "Timeout pri pouziti symbolu je nastaven na $values",
+      "moderationSymbolsTriggerLength": "Moderovani symbolu zapnuto od $value poctu znaku",
+      "moderationSymbolsMaxConsecutively": "Maximum symbolu zapsanych za sebou je nastaveno na $value",
+      "moderationSymbolsMaxPercent": "Maximum symbolu v cele zprave je nastaveno na $value%",
       "moderationLongMessage": {
         "text": "Moderovani dlouhych zprav je",
         "true": "{moderation.settings.moderationLongMessage.text} {core.enabled}",
@@ -777,8 +777,8 @@
         "true": "{moderation.settings.moderationLongMessageSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationLongMessageSubs.text} {core.disabled}"
       },
-      "moderationLongMessageTimeout": "Timeout pro dlouhe zpravy je nastaven na  (value)s",
-      "moderationLongMessageTriggerLength": "Moderovani dlouhych zprav zapnuto od (value) poctu znaku",
+      "moderationLongMessageTimeout": "Timeout pro dlouhe zpravy je nastaven na  $values",
+      "moderationLongMessageTriggerLength": "Moderovani dlouhych zprav zapnuto od $value poctu znaku",
       "moderationCaps": {
         "text": "Moderovani velkych pismen je",
         "true": "{moderation.settings.moderationCaps.text} {core.enabled}",
@@ -789,9 +789,9 @@
         "true": "{moderation.settings.moderationCapsSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationCapsSubs.text} {core.disabled}"
       },
-      "moderationCapsTimeout": "Timeout pri pouziti celkych pismen je nastaven na (value)s",
-      "moderationCapsTriggerLength": "Moderovani velkych pismen zapnuto od (value) poctu znaku",
-      "moderationCapsMaxPercent": "Maximum velkych pismen v cele zprave je nastaveno na (value)%",
+      "moderationCapsTimeout": "Timeout pri pouziti celkych pismen je nastaven na $values",
+      "moderationCapsTriggerLength": "Moderovani velkych pismen zapnuto od $value poctu znaku",
+      "moderationCapsMaxPercent": "Maximum velkych pismen v cele zprave je nastaveno na $value%",
       "moderationColor": {
         "text": "Moderovani pouziti barev (/me) je",
         "true": "{moderation.settings.moderationColor.text} {core.enabled}",
@@ -802,7 +802,7 @@
         "true": "{moderation.settings.moderationColorSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationColorSubs.text} {core.disabled}"
       },
-      "moderationColorTimeout": "Timeout pri pouziti barev (/me) je nastaven na (value)s",
+      "moderationColorTimeout": "Timeout pri pouziti barev (/me) je nastaven na $values",
       "moderationSpam": {
         "text": "Moderovani spamu je",
         "true": "{moderation.settings.moderationSpam.text} {core.enabled}",
@@ -813,9 +813,9 @@
         "true": "{moderation.settings.moderationSpamSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationSpamSubs.text} {core.disabled}"
       },
-      "moderationSpamTimeout": "Timeout pri spamovani je nastaven na (value)s",
-      "moderationSpamTriggerLength": "Moderovani spamu zapnuto od (value) poctu znaku",
-      "moderationSpamMaxLength": "Maximalni delka spamu je nastavena na (value)",
+      "moderationSpamTimeout": "Timeout pri spamovani je nastaven na $values",
+      "moderationSpamTriggerLength": "Moderovani spamu zapnuto od $value poctu znaku",
+      "moderationSpamMaxLength": "Maximalni delka spamu je nastavena na $value",
       "moderationEmotes": {
         "text": "Moderovani smajliku je",
         "true": "{moderation.settings.moderationEmotes.text} {core.enabled}",
@@ -826,15 +826,15 @@
         "true": "{moderation.settings.moderationEmotesSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationEmotesSubs.text} {core.disabled}"
       },
-      "moderationEmotesTimeout": "Timeout pri spamovani smajliku je nastaven na (value)s",
-      "moderationEmotesMaxCount": "Maximalni pocet smajliky ku ve jedne zprave je nastaveno na (value)",
-      "moderationBlacklistTimeout": "Timeout pri pouzivani zakazanych slov je nastaven na (value)s",
+      "moderationEmotesTimeout": "Timeout pri spamovani smajliku je nastaven na $values",
+      "moderationEmotesMaxCount": "Maximalni pocet smajliky ku ve jedne zprave je nastaveno na $value",
+      "moderationBlacklistTimeout": "Timeout pri pouzivani zakazanych slov je nastaven na $values",
       "moderationBlacklistSubs": {
         "text": "Moderovani blacklistu pro subscribery je",
         "true": "{moderation.settings.moderationBlacklistSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationBlacklistSubs.text} {core.disabled}"
       },
-      "moderationWarnings": "Uzivatel bude (value)x varovan, nez dostane timeout",
+      "moderationWarnings": "Uzivatel bude $valuex varovan, nez dostane timeout",
       "moderationWarningsTimeouts": {
         "true": "Varovanim pro uzivatele bude 1s timeout",
         "false": "Varovanim pro uzivatele bude pouze zprava v chatu"
@@ -843,141 +843,141 @@
   },
   "queue": {
     "info": {
-      "closed": "(sender), {queue.close}",
-      "opened": "(sender), {queue.open}"
+      "closed": "$sender, {queue.close}",
+      "opened": "$sender, {queue.open}"
     },
     "join": {
-      "closed": "Promin (sender), ale queue je uzavrena",
-      "opened": "(sender) byl pridan do queue!"
+      "closed": "Promin $sender, ale queue je uzavrena",
+      "opened": "$sender byl pridan do queue!"
     },
     "open": "Queue je prave OTEVRENA! Pro pridani do queue zadej !queue join",
     "close": "Queue je prave zavrena!",
     "clear": "Queue byla uplne vymazana",
     "picked": {
-      "single": "Tento uzivatel byl vybran z queue: (users)",
-      "multi": "Tito uzivatele byli vybrani z queue: (users)",
+      "single": "Tento uzivatel byl vybran z queue: $users",
+      "multi": "Tito uzivatele byli vybrani z queue: $users",
       "none": "Zadny uzivatel nebyl nalezen v queue"
     }
   },
   "title": {
-    "current": "(sender), titulek streamu je '(title)'.",
+    "current": "$sender, titulek streamu je '$title'.",
     "change": {
-      "success": "(sender), titulek byl nastaven na: (status)",
-      "failed": "(sender), neco se pokazilo. Titulek je stale nastaveny na: (status)"
+      "success": "$sender, titulek byl nastaven na: $status",
+      "failed": "$sender, neco se pokazilo. Titulek je stale nastaveny na: $status"
     }
   },
   "game": {
-    "current": "(sender), prave se hraje (game).",
+    "current": "$sender, prave se hraje $game.",
     "change": {
-      "success": "(sender), hra byl nastavena na: (game)",
-      "failed": "(sender), neco se pokazilo. Hra je stale nastavena na: (game)"
+      "success": "$sender, hra byl nastavena na: $game",
+      "failed": "$sender, neco se pokazilo. Hra je stale nastavena na: $game"
     }
   },
   "cooldown": {
     "toggle": {
       "moderator": {
-        "enabled": "Cooldown pro (command) je nastaven i pro moderatory",
-        "disabled": "Cooldown pro (command) ignoruje moderatory",
-        "failed": "Promin, (sender), ale tento cooldown neexistuje"
+        "enabled": "Cooldown pro $command je nastaven i pro moderatory",
+        "disabled": "Cooldown pro $command ignoruje moderatory",
+        "failed": "Promin, $sender, ale tento cooldown neexistuje"
       },
       "owner": {
-        "enabled": "Cooldown pro (command) je nastaven i pro vlastnika",
-        "disabled": "Cooldown pro (command) ignoruje vlastnika",
-        "failed": "Promin, (sender), ale tento cooldown neexistuje"
+        "enabled": "Cooldown pro $command je nastaven i pro vlastnika",
+        "disabled": "Cooldown pro $command ignoruje vlastnika",
+        "failed": "Promin, $sender, ale tento cooldown neexistuje"
       }
     },
     "failed": {
       "parse": "{core.command-parse} !cooldown [keyword|!command] [global|user] [seconds] [true/false]",
-      "cooldown": "(sender), jeste nemuzes pouzit (command), zbyva jeste (seconds)s",
-      "toggle": "Cooldown pro (command) neni v databazi!"
+      "cooldown": "$sender, jeste nemuzes pouzit $command, zbyva jeste $secondss",
+      "toggle": "Cooldown pro $command neni v databazi!"
     },
     "success": {
-      "set": "(type) cooldown pro (command) byl nastaven na (seconds)s",
-      "unset": "Cooldown pro (command) byl odebran",
-      "enabled": "Cooldown pro (command) byl zapnut",
-      "disabled": "Cooldown pro (command) byl vypnut"
+      "set": "$type cooldown pro $command byl nastaven na $secondss",
+      "unset": "Cooldown pro $command byl odebran",
+      "enabled": "Cooldown pro $command byl zapnut",
+      "disabled": "Cooldown pro $command byl vypnut"
     }
   },
   "gambling": {
     "cooldown": {
-      "duel": "Cooldown pro !duel je nastaven na (value)s",
-      "fightme": "Cooldown pro !fightme je nastaven na (value)s",
+      "duel": "Cooldown pro !duel je nastaven na $values",
+      "fightme": "Cooldown pro !fightme je nastaven na $values",
       "bypass": {
         "true": "Herni cooldowny budou ignorovany pro mody/castera",
         "false": "Herni cooldowny nebudou ignorovany mody/castera"
       }
     },
     "duel": {
-      "cooldown": "(sender), nemuzes pouzit !duel jeste (cooldown) (minutesName).",
-      "joined": "(sender), hodne stesti behem duelu. Vsadil sis na sebe (points) (pointsName)!",
-      "added": "(sender) si mysli, ze je lepsi nez ostatni a zvysuje sazku na (points) (pointsName)!",
-      "new": "(sender) je vas novy vyzyvatel pro duel! Zucastni se take pomoci !duel [points], zbyva ti (minutes) (minutesName) pro ucast.",
-      "zeroBet": "(sender), nemuzes na sebe vsadit 0 (pointsName)",
-      "notEnoughOptions": "(sender), k duelu musis neco vsadit",
-      "notEnoughPoints": "(sender), nemas dostatek (pointsName) pro duel!",
-      "noContestant": "Pouze (sender) se odvazil zucastnit duelu! Jeho sazka (points) (pointsName) mu byla vracena.",
-      "winner": "Gratulace (winner)! Je poslednim prezivsim a ziskal (points) (pointsName) ((probability)% se sazkou (tickets) (ticketsName))!!"
+      "cooldown": "$sender, nemuzes pouzit !duel jeste $cooldown $minutesName.",
+      "joined": "$sender, hodne stesti behem duelu. Vsadil sis na sebe $points $pointsName!",
+      "added": "$sender si mysli, ze je lepsi nez ostatni a zvysuje sazku na $points $pointsName!",
+      "new": "$sender je vas novy vyzyvatel pro duel! Zucastni se take pomoci !duel [points], zbyva ti $minutes $minutesName pro ucast.",
+      "zeroBet": "$sender, nemuzes na sebe vsadit 0 $pointsName",
+      "notEnoughOptions": "$sender, k duelu musis neco vsadit",
+      "notEnoughPoints": "$sender, nemas dostatek $pointsName pro duel!",
+      "noContestant": "Pouze $sender se odvazil zucastnit duelu! Jeho sazka $points $pointsName mu byla vracena.",
+      "winner": "Gratulace $winner! Je poslednim prezivsim a ziskal $points $pointsName ($probability% se sazkou $tickets $ticketsName)!!"
     },
     "roulette": {
-      "trigger": "(sender) stiskl spoust",
+      "trigger": "$sender stiskl spoust",
       "alive": "a nic se nestalo",
       "dead": "a kulka rozmaznula jeho mozek po zdi",
       "mod": "a vubec se netrefil!",
       "broadcaster": "a pouzil slepe!",
-      "timeout": "Roulette timeout nastaven na (value)s"
+      "timeout": "Roulette timeout nastaven na $values"
     },
     "seppuku": {
-      "text": "(sender) spachal seppuku.",
-      "mod": "(sender) se pokusil o seppuku, ale zlomil mec.",
-      "broadcaster": "(sender) se pokusil o seppuku, ale ztratil mec.",
-      "timeout": "Seppuku timeout nastaven na (value)s"
+      "text": "$sender spachal seppuku.",
+      "mod": "$sender se pokusil o seppuku, ale zlomil mec.",
+      "broadcaster": "$sender se pokusil o seppuku, ale ztratil mec.",
+      "timeout": "Seppuku timeout nastaven na $values"
     },
     "fightme": {
-      "cooldown": "(sender), nemuzes pouzit !fightme jeste (cooldown) (minutesName).",
-      "timeout": "FightMe! timeout nastaven na (value)s",
-      "challenge": "(ง'̀-'́)ง (sender) se chce s tebou porvat $username! Pokud souhlasis, posli !fightme (sender)",
+      "cooldown": "$sender, nemuzes pouzit !fightme jeste $cooldown $minutesName.",
+      "timeout": "FightMe! timeout nastaven na $values",
+      "challenge": "(ง'̀-'́)ง $sender se chce s tebou porvat $username! Pokud souhlasis, posli !fightme $sender",
       "winner": "٩(^ᴗ^)۶ $username je hrdym vitezem! Kdo je dalsim na rade?",
-      "notEnoughOptions": "(sender), musis vybrat uzivatele k souboji.",
+      "notEnoughOptions": "$sender, musis vybrat uzivatele k souboji.",
       "broadcaster": "ψ(｀∇´)ψ $winner je zde bohem. Tento souboj byl rozhodnut jeste nez vubec zacal.",
-      "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) (sender), tento souboj bude trvat tisicileti, nez se rozhodne!",
+      "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) $sender, tento souboj bude trvat tisicileti, nez se rozhodne!",
       "oneModerator": "¯\\_(ツ)_/¯ $winner je pod ochranou. Sorry."
     },
     "gamble": {
-      "zeroBet": "(sender), nemuzes hrat o 0 (pointsName)",
-      "notEnoughOptions": "(sender), musis hrat o nejake body",
-      "notEnoughPoints": "(sender), nemas dostatek (pointsName) abys o ne hral",
-      "win": "(sender), VYHRALS! Aktualne mas (points) (pointsName)",
-      "lose": "(sender), PROHRALS! Aktualne mas (points) (pointsName)"
+      "zeroBet": "$sender, nemuzes hrat o 0 $pointsName",
+      "notEnoughOptions": "$sender, musis hrat o nejake body",
+      "notEnoughPoints": "$sender, nemas dostatek $pointsName abys o ne hral",
+      "win": "$sender, VYHRALS! Aktualne mas $points $pointsName",
+      "lose": "$sender, PROHRALS! Aktualne mas $points $pointsName"
     }
   },
   "regulars": {
     "add": {
-      "success": "@(username) je od ted pravidelnym navstevnikem kanalu",
-      "undefined": "@(username) neexistuje v databazi bota",
+      "success": "@$username je od ted pravidelnym navstevnikem kanalu",
+      "undefined": "@$username neexistuje v databazi bota",
       "empty": "Pouziti: !regular add <username>"
     },
     "rm": {
-      "success": "@(username) uz neni pravidelnym navstevnikem kanalu",
-      "undefined": "@(username) neexistuje v databazi bota",
+      "success": "@$username uz neni pravidelnym navstevnikem kanalu",
+      "undefined": "@$username neexistuje v databazi bota",
       "empty": "Pouziti: !regular remove <username>"
     }
   },
   "merge": {
-    "noUsername": "(sender), musis zadat uzivatelske jmeno!",
-    "success": "(sender), (username) ma nyni data (merged-username)",
-    "noID": "(sender), pro toto uzivatelske jmeno neexistuje ID, proto nelze zmenit",
-    "noUsernameToMerge": "(sender), nebylo nalezeno jine uzivatelske jmeno"
+    "noUsername": "$sender, musis zadat uzivatelske jmeno!",
+    "success": "$sender, $username ma nyni data $merged-username",
+    "noID": "$sender, pro toto uzivatelske jmeno neexistuje ID, proto nelze zmenit",
+    "noUsernameToMerge": "$sender, nebylo nalezeno jine uzivatelske jmeno"
   },
   "highlights": {
     "saved": {
-      "description": "(sender), highlight byl ulozen pro (hours)h(minutes)m(seconds)s jako `(description)`",
-      "no-description": "(sender), highlight byl ulozen pro (hours)h(minutes)m(seconds)s"
+      "description": "$sender, highlight byl ulozen pro $hoursh$minutesm$secondss jako `$description`",
+      "no-description": "$sender, highlight byl ulozen pro $hoursh$minutesm$secondss"
     },
     "list": {
-      "items": "(sender), seznam ulozenych highlightu pro posledni stream: (items)",
-      "empty": "(sender), zande highlighty nebyly ulozeny"
+      "items": "$sender, seznam ulozenych highlightu pro posledni stream: $items",
+      "empty": "$sender, zande highlighty nebyly ulozeny"
     },
-    "offline": "(sender), nelze ulozit highlight, stream je offline"
+    "offline": "$sender, nelze ulozit highlight, stream je offline"
   },
   "whisper" : {
     "settings": {
@@ -1004,6 +1004,6 @@
     }
   },
   "phillipsHue": {
-    "list": "(sender), Seznam pripojenych Phillips Hue zarovek: "
+    "list": "$sender, Seznam pripojenych Phillips Hue zarovek: "
   }
 }
