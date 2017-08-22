@@ -237,6 +237,12 @@
           </div>
         </td>
       </tr>
+      <tr>
+        <td><strong data-lang="gamblingCooldownBypass"></strong></td>
+        <td>
+          <input id="gamblingCooldownBypassToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
+        </td>
+      </tr>
     </table>
   </div>
 
@@ -298,6 +304,13 @@
 
     $("#configDuelCooldown").text(data.duelCooldown + 's')
     $("#configFightmeCooldown").text(data.fightmeCooldown + 's')
+
+    $('#gamblingCooldownBypassToggle').off('change')
+    $('#gamblingCooldownBypassToggle').bootstrapToggle(data.gamblingCooldownBypass ? 'on' : 'off')
+    $('#gamblingCooldownBypassToggle').change(function() {
+      if ($('#gamblingCooldownBypassToggle').data('init')) socket.emit('saveConfiguration', {'gamblingCooldownBypass': $(this).prop('checked')})
+    })
+    $('#gamblingCooldownBypassToggle').data('init', true)
 
     $('#atUsernameToggle').off('change')
     $('#atUsernameToggle').bootstrapToggle(data.atUsername ? 'on' : 'off')

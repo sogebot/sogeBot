@@ -364,6 +364,7 @@
     "fightmeTimeout": "Timeout pro !fightme",
     "duelCooldown": "Cooldown pro !duel",
     "fightmeCooldown": "Cooldown pro !fightme",
+    "gamblingCooldownBypass": "Ignorovat herní cooldowny pro mody/castera",
     "click-to-highlight": "highlight",
     "commercial": "reklama zahájena",
     "start-commercial": "spustit reklamu"
@@ -900,7 +901,11 @@
   "gambling": {
     "cooldown": {
       "duel": "Cooldown pro !duel je nastaven na (value)s",
-      "fightme": "Cooldown pro !fightme je nastaven na (value)s"
+      "fightme": "Cooldown pro !fightme je nastaven na (value)s",
+      "bypass": {
+        "true": "Herni cooldowny budou ignorovany pro mody/castera",
+        "false": "Herni cooldowny nebudou ignorovany mody/castera"
+      }
     },
     "duel": {
       "cooldown": "(sender), nemuzes pouzit !duel jeste (cooldown) (minutesName).",

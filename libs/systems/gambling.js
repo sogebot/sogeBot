@@ -44,6 +44,8 @@ function Gambling () {
     global.configuration.register('seppukuTimeout', 'gambling.seppuku.timeout', 'number', 10)
     global.configuration.register('rouletteTimeout', 'gambling.roulette.timeout', 'number', 10)
     global.configuration.register('fightmeTimeout', 'gambling.fightme.timeout', 'number', 10)
+
+    global.configuration.register('gamblingCooldownBypass', 'gambling.cooldown.bypass', 'bool', false)
     global.configuration.register('duelCooldown', 'gambling.cooldown.duel', 'number', 0)
     global.configuration.register('fightmeCooldown', 'gambling.cooldown.fightme', 'number', 0)
 
@@ -118,8 +120,10 @@ Gambling.prototype.duel = function (self, sender, text) {
     if (newDuelist) {
       // check if under gambling cooldown
       const cooldown = global.configuration.getValue('duelCooldown')
-      if (new Date().getTime() - self.cooldown.duel > cooldown * 1000) {
-        self.cooldown.duel = new Date().getTime()
+      if (new Date().getTime() - self.cooldown.duel > cooldown * 1000 ||
+        (global.configuration.getValue('gamblingCooldownBypass') && (sender.mod || global.parser.isBroadcaster(sender)))) {
+        // save new cooldown if not bypassed
+        if (!(global.configuration.getValue('gamblingCooldownBypass') && (sender.mod || global.parser.isBroadcaster(sender)))) self.cooldown.duel = new Date().getTime()
         self.current.duel[sender.username.toLowerCase()] = parseInt(points, 10)
       } else {
         global.commons.sendMessage(global.translate('gambling.fightme.cooldown')
@@ -219,6 +223,7 @@ Gambling.prototype.fightme = function (self, sender, text) {
       global.commons.sendMessage(global.translate('gambling.fightme.broadcaster')
         .replace('$winner', global.parser.isBroadcaster(sender) ? sender.username : username), sender)
       if ((self.current.fightme[sender.username].mod || sender.mod) === false) global.client.timeout(global.configuration.get().twitch.channel, global.parser.isBroadcaster(sender) ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
+      self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
       return
     }
 
@@ -226,6 +231,7 @@ Gambling.prototype.fightme = function (self, sender, text) {
     if (self.current.fightme[sender.username].mod && sender.mod) {
       global.commons.sendMessage(global.translate('gambling.fightme.bothModerators')
         .replace('$challenger', username), sender)
+      self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
       return
     }
 
@@ -234,6 +240,7 @@ Gambling.prototype.fightme = function (self, sender, text) {
       global.commons.sendMessage(global.translate('gambling.fightme.oneModerator')
         .replace('$winner', sender.mod ? sender.username : username), sender)
       global.client.timeout(global.configuration.get().twitch.channel, sender.mod ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
+      self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
       return
     }
 
@@ -244,13 +251,16 @@ Gambling.prototype.fightme = function (self, sender, text) {
   } else {
     // check if under gambling cooldown
     const cooldown = global.configuration.getValue('fightmeCooldown')
-    if (new Date().getTime() - self.cooldown.fightme < cooldown * 1000) {
+    if (new Date().getTime() - self.cooldown.fightme < cooldown * 1000 &&
+      !(global.configuration.getValue('gamblingCooldownBypass') && (sender.mod || global.parser.isBroadcaster(sender)))) {
       global.commons.sendMessage(global.translate('gambling.fightme.cooldown')
         .replace('(cooldown)', Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.fightme)) / 1000 / 60))
         .replace('(minutesName)', global.parser.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.fightme)) / 1000 / 60), 'core.minutes')), sender)
       return
     }
-    self.cooldown.fightme = new Date().getTime()
+
+    // save new timestamp if not bypassed
+    if (!(global.configuration.getValue('gamblingCooldownBypass') && (sender.mod || global.parser.isBroadcaster(sender)))) self.cooldown.fightme = new Date().getTime()
 
     if (_.isNil(self.current.fightme[sender.username])) self.current.fightme[sender.username] = []
 
