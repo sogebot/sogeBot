@@ -37,6 +37,10 @@ var dist = {
       'velocity.min.js',
       'velocity.ui.min.js'
     ]
+  },
+  'video.js': {
+    'js': 'dist/video.js',
+    'css': 'dist/video-js.css'
   }
 }
 

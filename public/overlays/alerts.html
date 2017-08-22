@@ -11,7 +11,7 @@
 
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
-    <link href="http://vjs.zencdn.net/6.2.5/video-js.css" rel="stylesheet">
+    <link href="/dist/video.js/css/video-js.css" rel="stylesheet">
 
     <!-- If you'd like to support IE8 -->
     <script src="http://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.js"></script>
@@ -64,7 +64,7 @@
     <script src="/dist/jquery/js/jquery.min.js"></script>
     <script src="/dist/lodash/js/lodash.min.js"></script>
     <script src="/dist/velocity-animate/js/velocity.min.js"></script>
-    <script src="http://vjs.zencdn.net/6.2.5/video.js"></script>
+    <script src="/dist/video.js/js/video.js"></script>
 
     <script>
       var socket = io()
@@ -237,6 +237,11 @@
       }
 
       function showVideo(id, video) {
+        if (!_.endsWith(video.url, '.mp4')) {
+          console.error('ERROR: Only mp4 files can be played')
+          alertsQueue[id].finished++;
+          return
+        }
         video.volume = _.isNil(video.volume) ? 1 : parseInt(video.volume, 10) / 100
         video.delay = _.isNil(video.delay) ? 0 : parseInt(video.delay, 10)
 
