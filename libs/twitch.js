@@ -236,7 +236,7 @@ function Twitch () {
 
   global.parser.registerParser(this, 'lastseen', this.lastseenUpdate, constants.VIEWERS)
 
-  global.configuration.register('uptimeFormat', 'core.settings.uptime-format', 'string', '(days)(hours)(minutes)(seconds)')
+  global.configuration.register('uptimeFormat', 'core.settings.uptime-format', 'string', '$days$hours$minutes$seconds')
 
   this.webPanel()
 }
