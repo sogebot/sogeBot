@@ -932,7 +932,10 @@
       "timeout": "FightMe! timeout nastaven na (value)s",
       "challenge": "(ง'̀-'́)ง (sender) se chce s tebou porvat $username! Pokud souhlasis, posli !fightme (sender)",
       "winner": "٩(^ᴗ^)۶ $username je hrdym vitezem! Kdo je dalsim na rade?",
-      "notEnoughOptions": "(sender), musis vybrat uzivatele k souboji."
+      "notEnoughOptions": "(sender), musis vybrat uzivatele k souboji.",
+      "broadcaster": "ψ(｀∇´)ψ $winner je zde bohem. Tento souboj byl rozhodnut jeste nez vubec zacal.",
+      "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) (sender), tento souboj bude trvat tisicileti, nez se rozhodne!",
+      "oneModerator": "¯\\_(ツ)_/¯ $winner je pod ochranou. Sorry."
     },
     "gamble": {
       "zeroBet": "(sender), nemuzes hrat o 0 (pointsName)",

@@ -43,7 +43,7 @@ function Gambling () {
 
     global.configuration.register('seppukuTimeout', 'gambling.seppuku.timeout', 'number', 10)
     global.configuration.register('rouletteTimeout', 'gambling.roulette.timeout', 'number', 10)
-    global.configuration.register('fightmeTimeout', 'gambling.figthme.timeout', 'number', 10)
+    global.configuration.register('fightmeTimeout', 'gambling.fightme.timeout', 'number', 10)
     global.configuration.register('duelCooldown', 'gambling.cooldown.duel', 'number', 0)
     global.configuration.register('fightmeCooldown', 'gambling.cooldown.fightme', 'number', 0)
 
@@ -213,9 +213,33 @@ Gambling.prototype.fightme = function (self, sender, text) {
   // check if you are challenged by user
   if (_.includes(self.current.fightme[username], sender.username)) {
     let winner = _.random(0, 1, false)
+
+    // vs broadcaster
+    if (global.parser.isBroadcaster(sender) || global.parser.isBroadcaster(username)) {
+      global.commons.sendMessage(global.translate('gambling.fightme.broadcaster')
+        .replace('$winner', global.parser.isBroadcaster(sender) ? sender.username : username), sender)
+      if ((self.current.fightme[sender.username].mod || sender.mod) === false) global.client.timeout(global.configuration.get().twitch.channel, global.parser.isBroadcaster(sender) ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
+      return
+    }
+
+    // mod vs mod
+    if (self.current.fightme[sender.username].mod && sender.mod) {
+      global.commons.sendMessage(global.translate('gambling.fightme.bothModerators')
+        .replace('$challenger', username), sender)
+      return
+    }
+
+    // vs mod
+    if (self.current.fightme[sender.username].mod || sender.mod) {
+      global.commons.sendMessage(global.translate('gambling.fightme.oneModerator')
+        .replace('$winner', sender.mod ? sender.username : username), sender)
+      global.client.timeout(global.configuration.get().twitch.channel, sender.mod ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
+      return
+    }
+
     global.client.timeout(global.configuration.get().twitch.channel, winner ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
     global.commons.sendMessage(global.translate('gambling.fightme.winner')
-      .replace('$username', winner ? username : sender.username), sender)
+      .replace('$winner', winner ? username : sender.username), sender)
     self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
   } else {
     // check if under gambling cooldown

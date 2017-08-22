@@ -931,8 +931,11 @@
       "cooldown": "(sender), you cannot use !fightme for (cooldown) (minutesName).",
       "timeout": "FightMe! timeout set to (value)s",
       "challenge": "(ง'̀-'́)ง (sender) wants to fight you $username! If you accept, send !fightme (sender)",
-      "winner": "٩(^ᴗ^)۶ $username is proud winner! Who's next?",
-      "notEnoughOptions": "(sender), you need to select user to fight."
+      "winner": "٩(^ᴗ^)۶ $winner is proud winner! Who's next?",
+      "notEnoughOptions": "(sender), you need to select user to fight.",
+      "broadcaster": "ψ(｀∇´)ψ $winner is a god among you. This fight  was decided even before it started.",
+      "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) (sender), this fight will take milleniums to decide!",
+      "oneModerator": "¯\\_(ツ)_/¯ $winner is under divine protection. Sorry."
     },
     "gamble": {
       "zeroBet": "(sender), you cannot gamble 0 (pointsName)",
