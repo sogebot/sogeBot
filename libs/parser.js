@@ -96,7 +96,6 @@ Parser.prototype.processQueue = async function (id) {
 }
 
 Parser.prototype.parseCommands = async function (user, message, skip) {
-  console.log(message)
   message = message.trim()
   if (!message.startsWith('!')) return // do nothing, this is not a command
   for (var cmd in this.registeredCmds) {
@@ -108,7 +107,7 @@ Parser.prototype.parseCommands = async function (user, message, skip) {
         (this.permissionsCmds[cmd] === constants.REGULAR && (global.users.get(user.username).is.regular || user.mod || this.isOwner(user))) ||
         (this.permissionsCmds[cmd] === constants.MODS && (user.mod || this.isOwner(user))) ||
         (this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user))) {
-        var text = message.trim().replace(/^(![\S\u0500-\u052F\u0400-\u04FF]+)/, '').trim()
+        var text = message.trim().replace(new RegExp('^(' + cmd + ')', 'i'), '').trim()
         if (typeof this.registeredCmds[cmd] === 'function') this.registeredCmds[cmd](this.selfCmds[cmd], _.isNil(user) ? { username: global.configuration.get().twitch.username } : user, text.trim(), message)
         else global.log.error(cmd + ' have wrong null function registered!', { fnc: 'Parser.prototype.parseCommands' })
         break // cmd is executed
