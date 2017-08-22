@@ -116,7 +116,7 @@ Alias.prototype.add = function (self, sender, text) {
     }
 
     if (global.parser.isRegistered(data.alias)) {
-      global.commons.sendMessage(global.translate('core.isRegistered').replace('(keyword)', '!' + data.alias), sender)
+      global.commons.sendMessage(global.translate('core.isRegistered').replace('$keyword', '!' + data.alias), sender)
       return
     }
 
@@ -152,13 +152,13 @@ Alias.prototype.toggle = function (self, sender, text) {
 
     if (_.isUndefined(alias)) {
       global.commons.sendMessage(global.translate('alias.failed.toggle')
-        .replace('(alias)', parsed), sender)
+        .replace('$alias', parsed), sender)
       return
     }
 
     alias.enabled = !alias.enabled
     global.commons.sendMessage(global.translate(alias.enabled ? 'alias.success.enabled' : 'alias.success.disabled')
-      .replace('(alias)', alias.alias), sender)
+      .replace('$alias', alias.alias), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
   }
@@ -171,13 +171,13 @@ Alias.prototype.visible = function (self, sender, text) {
 
     if (_.isUndefined(alias)) {
       global.commons.sendMessage(global.translate('alias.failed.visible')
-        .replace('(alias)', parsed), sender)
+        .replace('$alias', parsed), sender)
       return
     }
 
     alias.visible = !alias.visible
     global.commons.sendMessage(global.translate(alias.visible ? 'alias.success.visible' : 'alias.success.invisible')
-      .replace('(alias)', alias.alias), sender)
+      .replace('$alias', alias.alias), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
   }

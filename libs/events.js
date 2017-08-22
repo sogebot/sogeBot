@@ -34,7 +34,7 @@ function Events () {
       if (_.isNil(attr.send)) return
       let message = attr.send
       _.each(attr, function (val, name) {
-        message = message.replace('(' + name + ')', val)
+        message = message.replace('$' + name, val)
       })
       global.commons.sendMessage(message, { username: attr.username })
     },
@@ -42,13 +42,13 @@ function Events () {
       if (_.isNil(attr.username) || _.isNil(attr.send)) return
       let message = attr.send
       _.each(attr, function (val, name) {
-        message = message.replace('(' + name + ')', val)
+        message = message.replace('$' + name, val)
       })
       global.commons.sendMessage(message, { username: attr.username, 'message-type': 'whisper' })
     },
     'run-command': function (attr) {
       if (_.isNil(attr.quiet)) attr.quiet = false
-      global.parser.parseCommands((attr.quiet) ? null : { username: global.parser.getOwner() }, attr.command.replace('(username)', attr.username))
+      global.parser.parseCommands((attr.quiet) ? null : { username: global.parser.getOwner() }, attr.command.replace('$username', attr.username))
     },
     'play-sound': function (attr) {
       // attr.sound can be filename or url
@@ -66,9 +66,9 @@ function Events () {
       global.client.commercial(global.configuration.get().twitch.channel, attr.duration)
     },
     'log': function (attr) {
-      let message = attr.message.replace('(username)', attr.username)
+      let message = attr.message.replace('$username', attr.username)
       _.each(message.match(/\((\w+)\)/gi), function (match) {
-        let value = !_.isNil(attr[match.replace('(', '').replace(')', '')]) ? attr[match.replace('(', '').replace(')', '')] : 'none'
+        let value = !_.isNil(attr[match.replace('$', '')]) ? attr[match.replace('$', '')] : 'none'
         message = message.replace(match, value)
       })
       global.log[attr.level](message)

@@ -4,14 +4,14 @@
     "enabled": "enabled",
     "disabled": "disabled",
     "usage": "Usage",
-    "online": "Stream is online for (time)",
-    "offline": "Stream is currently offline for (time)",
+    "online": "Stream is online for $time",
+    "offline": "Stream is currently offline for $time",
     "lang-selected": "Bot language is currently set to english",
-    "command-parse": "Sorry, (sender), but this command is not correct, use",
-    "error": "Sorry, (sender), but something went wrong!",
+    "command-parse": "Sorry, $sender, but this command is not correct, use",
+    "error": "Sorry, $sender, but something went wrong!",
     "no-response": "",
     "api": {
-      "error": "(sender), API is not responding correctly!",
+      "error": "$sender, API is not responding correctly!",
       "not-available": "not available"
     },
     "mute": {
@@ -23,7 +23,7 @@
       "true": "", "false": ""
     },
     "settings": {
-      "uptime-format": "Uptime format set to (value)",
+      "uptime-format": "Uptime format set to $value",
       "atUsername": {
         "true": "Usernames will be shown with @ like @foo",
         "false": "Usernames will be shown without @ like foo"
@@ -36,15 +36,15 @@
     "minutes": "minute|minutes",
     "messages": "message|messages",
     "links": "link|links",
-    "isRegistered": "(sender), you cannot use (keyword), because is already in use for another action!"
+    "isRegistered": "$sender, you cannot use $keyword, because is already in use for another action!"
   },
   "overlay": {
     "emotes": {
       "settings": {
-        "OEmotesSize": "Emoticon size is set to (value)",
-        "OEmotesMax": "Max count of same emoticon to show is (value)",
-        "OEmotesAnimation": "Emoticon show animation is (value)",
-        "OEmotesAnimationTime": "Emoticon animation duration is (value)ms"
+        "OEmotesSize": "Emoticon size is set to $value",
+        "OEmotesMax": "Max count of same emoticon to show is $value",
+        "OEmotesAnimation": "Emoticon show animation is $value",
+        "OEmotesAnimationTime": "Emoticon animation duration is $valuems"
       }
     }
   },
@@ -370,96 +370,96 @@
     "start-commercial": "run a commercial"
   },
   "raffle": {
-    "announceInterval": "Opened raffles will be announced every (value) minute",
-    "announceCustomMessage": "Raffle custom announce message set to `(value)`",
-    "announceTitleTemplate": "Template title set to `(value)`",
-    "minWatchedTime": "and you need to have at least (time) watched hours to parcitipate",
+    "announceInterval": "Opened raffles will be announced every $value minute",
+    "announceCustomMessage": "Raffle custom announce message set to `$value`",
+    "announceTitleTemplate": "Template title set to `$value`",
+    "minWatchedTime": "and you need to have at least $time watched hours to parcitipate",
     "participation": {
       "success": "You just entered in current raffle! Good luck!",
       "failed": "Sorry, you are not eligible to enter the raffle! If you want to know conditions to enter, whisper me !raffle"
     },
     "info": {
       "opened": {
-        "everyone": "(sender), raffle is opened. To enter type !(keyword). Everyone can participate",
-        "everyoneAndProduct": "(sender), raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate",
-        "followers": "(sender), raffle is opened. To enter type !(keyword). Only followers can participate",
-        "followersAndProduct": "(sender), raffle is opened for `(product)`. To enter type !(keyword). Only followers can participate",
-        "subscribers": "(sender), raffle is opened. To enter type !(keyword). Only subscribers can participate",
-        "subscribersAndProduct": "(sender), raffle is opened for `(product)`. To enter type !(keyword). Only subscribers can participate",
-        "everyoneTickets": "(sender), ticket raffle is opened. To enter type !(keyword) <(min)-(max)>. Everyone can participate",
-        "everyoneAndProductTickets": "(sender), ticket raffle is opened for `(product)`. To enter type !(keyword) <(min)-(max)>. Everyone can participate",
-        "followersTickets": "(sender), ticket raffle is opened. To enter type !(keyword) <(min)-(max)>. Only followers can participate",
-        "followersAndProductTickets": "(sender), ticket raffle is opened for `(product)`. To enter type !(keyword) <(min)-(max)>. Only followers can participate",
-        "subscribersTickets": "(sender), ticket raffle is opened. To enter type !(keyword) <(min)-(max)>. Only subscribers can participate",
-        "subscribersAndProductTickets": "(sender), ticket raffle is opened for `(product)`. To enter type !(keyword) <(min)-(max)>. Only subscribers can participate"
+        "everyone": "$sender, raffle is opened. To enter type !$keyword. Everyone can participate",
+        "everyoneAndProduct": "$sender, raffle is opened for `$product`. To enter type !$keyword. Everyone can participate",
+        "followers": "$sender, raffle is opened. To enter type !$keyword. Only followers can participate",
+        "followersAndProduct": "$sender, raffle is opened for `$product`. To enter type !$keyword. Only followers can participate",
+        "subscribers": "$sender, raffle is opened. To enter type !$keyword. Only subscribers can participate",
+        "subscribersAndProduct": "$sender, raffle is opened for `$product`. To enter type !$keyword. Only subscribers can participate",
+        "everyoneTickets": "$sender, ticket raffle is opened. To enter type !$keyword <$min-$max>. Everyone can participate",
+        "everyoneAndProductTickets": "$sender, ticket raffle is opened for `$product`. To enter type !$keyword <$min-$max>. Everyone can participate",
+        "followersTickets": "$sender, ticket raffle is opened. To enter type !$keyword <$min-$max>. Only followers can participate",
+        "followersAndProductTickets": "$sender, ticket raffle is opened for `$product`. To enter type !$keyword <$min-$max>. Only followers can participate",
+        "subscribersTickets": "$sender, ticket raffle is opened. To enter type !$keyword <$min-$max>. Only subscribers can participate",
+        "subscribersAndProductTickets": "$sender, ticket raffle is opened for `$product`. To enter type !$keyword <$min-$max>. Only subscribers can participate"
       },
-      "closed": "(sender) Raffle is closed, but winner is not picked yet!",
-      "notRunning": "(sender) No raffle is currently opened!"
+      "closed": "$sender Raffle is closed, but winner is not picked yet!",
+      "notRunning": "$sender No raffle is currently opened!"
     },
     "open": {
-      "error": "(sender) Raffle was not opened! Use: !raffle open [raffle-keyword] [product(optional)] [time=#(optional)] [followers(optional)]",
-      "running": "(sender) Raffle is already running! Keyword for raffle is !(keyword)",
-      "locked": "(sender) Raffle is closed! Choose winner with !raffle pick",
+      "error": "$sender Raffle was not opened! Use: !raffle open [raffle-keyword] [product(optional)] [time=#(optional)] [followers(optional)]",
+      "running": "$sender Raffle is already running! Keyword for raffle is !$keyword",
+      "locked": "$sender Raffle is closed! Choose winner with !raffle pick",
       "ok": {
-        "everyone": "New raffle is opened. To enter type !(keyword). Everyone can participate",
-        "everyoneAndProduct": "New raffle is opened for `(product)`. To enter type !(keyword). Everyone can participate",
-        "followers": "New raffle is opened. To enter type !(keyword). Only followers can participate",
-        "followersAndProduct": "New raffle is opened for `(product)`. To enter type !(keyword). Only followers can participate",
-        "subscribers": "New raffle is opened. To enter type !(keyword). Only subscribers can participate",
-        "subscribersAndProduct": "New raffle is opened for `(product)`. To enter type !(keyword). Only subscribers can participate",
-        "everyoneTickets": "New raffle is opened. To enter type !(keyword) <(min)-(max)>. Everyone can participate",
-        "everyoneAndProductTickets": "New ticket raffle is opened for `(product)`. To enter type !(keyword) <(min)-(max)>. Everyone can participate",
-        "followersTickets": "New ticket raffle is opened. To enter type !(keyword) <(min)-(max)>. Only followers can participate",
-        "followersAndProductTickets": "New ticket raffle is opened for `(product)`. To enter type !(keyword) <(min)-(max)>. Only followers can participate",
-        "subscribersTickets": "New ticket raffle is opened. To enter type !(keyword) <(min)-(max)>. Only subscribers can participate",
-        "subscribersAndProductTickets": "New ticket raffle is opened for `(product)`. To enter type !(keyword) <(min)-(max)>. Only subscribers can participate"
+        "everyone": "New raffle is opened. To enter type !$keyword. Everyone can participate",
+        "everyoneAndProduct": "New raffle is opened for `$product`. To enter type !$keyword. Everyone can participate",
+        "followers": "New raffle is opened. To enter type !$keyword. Only followers can participate",
+        "followersAndProduct": "New raffle is opened for `$product`. To enter type !$keyword. Only followers can participate",
+        "subscribers": "New raffle is opened. To enter type !$keyword. Only subscribers can participate",
+        "subscribersAndProduct": "New raffle is opened for `$product`. To enter type !$keyword. Only subscribers can participate",
+        "everyoneTickets": "New raffle is opened. To enter type !$keyword <$min-$max>. Everyone can participate",
+        "everyoneAndProductTickets": "New ticket raffle is opened for `$product`. To enter type !$keyword <$min-$max>. Everyone can participate",
+        "followersTickets": "New ticket raffle is opened. To enter type !$keyword <$min-$max>. Only followers can participate",
+        "followersAndProductTickets": "New ticket raffle is opened for `$product`. To enter type !$keyword <$min-$max>. Only followers can participate",
+        "subscribersTickets": "New ticket raffle is opened. To enter type !$keyword <$min-$max>. Only subscribers can participate",
+        "subscribersAndProductTickets": "New ticket raffle is opened for `$product`. To enter type !$keyword <$min-$max>. Only subscribers can participate"
       },
       "notice": {
-        "everyone": "Raffle is currently running. To enter type !(keyword). Everyone can participate",
-        "everyoneAndProduct": "Raffle is currently running for `(product)`. To enter type !(keyword). Everyone can participate",
-        "followers": "Raffle is currently running. To enter type !(keyword). Only followers can participate",
-        "followersAndProduct": "Raffle is currently running for `(product)`. To enter type !(keyword). Only followers can participate",
-        "subscribers": "Raffle is currently running. To enter type !(keyword). Only subscribers can participate",
-        "subscribersAndProduct": "Raffle is currently running for `(product)`. To enter type !(keyword). Only subscribers can participate",
-        "everyoneTickets": "Ticket raffle is currently running. To enter type !(keyword) <(min)-(max)>. Everyone can participate",
-        "everyoneAndProductTickets": "Ticket raffle is currently running for `(product)`. To enter type !(keyword) <(min)-(max)>. Everyone can participate",
-        "followersTickets": "Ticket raffle is currently running. To enter type !(keyword) <(min)-(max)>. Only followers can participate",
-        "followersAndProductTickets": "Ticket raffle is currently running for `(product)`. To enter type !(keyword) <(min)-(max)>. Only followers can participate",
-        "subscribersTickets": "Ticket raffle is currently running. To enter type !(keyword) <(min)-(max)>. Only subscribers can participate",
-        "subscribersAndProductTickets": "Ticket raffle is currently running for `(product)`. To enter type !(keyword) <(min)-(max)>. Only subscribers can participate"
+        "everyone": "Raffle is currently running. To enter type !$keyword. Everyone can participate",
+        "everyoneAndProduct": "Raffle is currently running for `$product`. To enter type !$keyword. Everyone can participate",
+        "followers": "Raffle is currently running. To enter type !$keyword. Only followers can participate",
+        "followersAndProduct": "Raffle is currently running for `$product`. To enter type !$keyword. Only followers can participate",
+        "subscribers": "Raffle is currently running. To enter type !$keyword. Only subscribers can participate",
+        "subscribersAndProduct": "Raffle is currently running for `$product`. To enter type !$keyword. Only subscribers can participate",
+        "everyoneTickets": "Ticket raffle is currently running. To enter type !$keyword <$min-$max>. Everyone can participate",
+        "everyoneAndProductTickets": "Ticket raffle is currently running for `$product`. To enter type !$keyword <$min-$max>. Everyone can participate",
+        "followersTickets": "Ticket raffle is currently running. To enter type !$keyword <$min-$max>. Only followers can participate",
+        "followersAndProductTickets": "Ticket raffle is currently running for `$product`. To enter type !$keyword <$min-$max>. Only followers can participate",
+        "subscribersTickets": "Ticket raffle is currently running. To enter type !$keyword <$min-$max>. Only subscribers can participate",
+        "subscribersAndProductTickets": "Ticket raffle is currently running for `$product`. To enter type !$keyword <$min-$max>. Only subscribers can participate"
       }
     },
     "close": {
       "ok": "Current raffle was closed! You cannot participate anymore!",
-      "notRunning": "(sender) No raffle is currently running!"
+      "notRunning": "$sender No raffle is currently running!"
     },
     "pick": {
       "winner": {
-        "withoutProduct": "Congratulations @(winner), you just won a raffle! Win probability was (probability)%",
-        "withProduct": "Congratulations @(winner), you just won a raffle for `(product)`! Win probability was (probability)%"
+        "withoutProduct": "Congratulations @$winner, you just won a raffle! Win probability was $probability%",
+        "withProduct": "Congratulations @$winner, you just won a raffle for `$product`! Win probability was $probability%"
       },
       "noParticipants": "There were no participants in this raffle! No winner selected."
     }
   },
   "bets": {
-      "newBet": "(sender), your current bet is (amount) (pointsName) on (option). You can win (winAmount) (winPointsName)!",
-      "running": "(sender), bet is already opened! Use !bet close [(options)]",
+      "newBet": "$sender, your current bet is $amount $pointsName on $option. You can win $winAmount $winPointsName!",
+      "running": "$sender, bet is already opened! Use !bet close [$options]",
       "notRunning": "No bet is currently opened, ask mods to open it!",
-      "opened": "New bet is opened! Use !bet [(options)] [points] to win! You have only (minutes)min to bet!",
-      "notEnoughOptions": "(sender), new bets needs at least 2 options!",
-      "info": "Bets are opened! Use !bet [(options)] [points] to win! (time)min left to bet!",
+      "opened": "New bet is opened! Use !bet [$options] [points] to win! You have only $minutesmin to bet!",
+      "notEnoughOptions": "$sender, new bets needs at least 2 options!",
+      "info": "Bets are opened! Use !bet [$options] [points] to win! $timemin left to bet!",
       "parseError": "{core.command-parse} !bet to check usage",
-      "diffBet": "(sender), you already made a bet on (option) and you cannot bet to different option!",
-      "notEnoughPoints": "Sorry, (sender), but you dont have (amount) (pointsName) to bet!",
-      "undefinedBet": "Sorry, (sender), but this bet option doesn't exist, use !bet to check usage",
-      "betPercentGain": "Bet percent gain per option was set to (value)%",
-      "betCloseTimer": "Bets will be automatically closed after (value)min",
+      "diffBet": "$sender, you already made a bet on $option and you cannot bet to different option!",
+      "notEnoughPoints": "Sorry, $sender, but you dont have $amount $pointsName to bet!",
+      "undefinedBet": "Sorry, $sender, but this bet option doesn't exist, use !bet to check usage",
+      "betPercentGain": "Bet percent gain per option was set to $value%",
+      "betCloseTimer": "Bets will be automatically closed after $valuemin",
       "refund": "Bets were closed without a winning. All users are refunded!",
-      "notOption": "(sender), this option doesn't exist! Bet is not closed, check !bet",
-      "closed": "Bets was closed and winning option was (option)! (amount) users won!",
-      "timeUpBet": "I guess you are too late, (sender), your time for betting is up!",
+      "notOption": "$sender, this option doesn't exist! Bet is not closed, check !bet",
+      "closed": "Bets was closed and winning option was $option! $amount users won!",
+      "timeUpBet": "I guess you are too late, $sender, your time for betting is up!",
       "locked": "Betting time is up! No more bets.",
-      "zeroBet": "Oh boy, (sender), you cannot bet 0 (pointsName)",
+      "zeroBet": "Oh boy, $sender, you cannot bet 0 $pointsName",
       "lockedInfo": "Bets are opened, but time for betting is up!",
       "removed": "Betting time is up! No bets were sent -> automatically closing"
   },
@@ -468,18 +468,18 @@
       "add": "Alias was added to database",
       "remove": "Alias was deleted from database",
       "list": "List of aliases",
-      "enabled": "Alias !(alias) was enabled",
-      "disabled": "Alias !(alias) was disabled",
-      "visible": "Alias !(alias) will be visible in list",
-      "invisible": "Alias !(alias) will not be visible in list"
+      "enabled": "Alias !$alias was enabled",
+      "disabled": "Alias !$alias was disabled",
+      "visible": "Alias !$alias will be visible in list",
+      "invisible": "Alias !$alias will not be visible in list"
     },
     "failed": {
       "add": "This alias already exists in database",
       "remove": "This alias cannot be found in database",
       "list": "List of aliases is empty",
       "parse": "{core.command-parse} !alias",
-      "toggle": "Alias !(alias) was not found",
-      "visible": "(alias.failed.remove)"
+      "toggle": "Alias !$alias was not found",
+      "visible": "{alias.failed.remove}"
     }
   },
   "customcmds": {
@@ -487,18 +487,18 @@
       "add": "Command was added to database",
       "remove": "Command was deleted from database",
       "list": "List of commands",
-      "enabled": "Command !(command) was enabled",
-      "disabled": "Command !(command) was disabled",
-      "visible": "Command !(command) will be visible in list",
-      "invisible": "Command !(command) will not be visible in list"
+      "enabled": "Command !$command was enabled",
+      "disabled": "Command !$command was disabled",
+      "visible": "Command !$command will be visible in list",
+      "invisible": "Command !$command will not be visible in list"
     },
     "failed": {
       "add": "This command already exists in database",
       "remove": "This command cannot be found in database",
       "list": "List of commands is empty",
       "parse": "{core.command-parse} !command",
-      "toggle": "Command !(command) was not found",
-      "visible": "(customcmds.failed.remove)"
+      "toggle": "Command !$command was not found",
+      "visible": "{customcmds.failed.remove}"
     }
   },
   "keywords": {
@@ -506,15 +506,15 @@
       "add": "Keyword was added to database",
       "remove": "Keyword was deleted from database",
       "list": "List of keywords",
-      "enabled": "Keyword (keyword) was enabled",
-      "disabled": "Keyword (keyword) was disabled"
+      "enabled": "Keyword $keyword was enabled",
+      "disabled": "Keyword $keyword was disabled"
     },
     "failed": {
       "add": "This keyword already exists in database",
       "remove": "This keyword cannot be found in database",
       "list": "List of keywords is empty",
       "parse": "{core.command-parse} !keyword",
-      "toggle": "Keyword (keyword) was not found"
+      "toggle": "Keyword $keyword was not found"
     }
   },
   "notice": {
@@ -522,34 +522,34 @@
       "add": "Notice was added to database",
       "remove": "Notice was deleted from database",
       "list": "List of notices",
-      "enabled": "Notice (notice) was enabled",
-      "disabled": "Notice (notice) was disabled"
+      "enabled": "Notice $notice was enabled",
+      "disabled": "Notice $notice was disabled"
     },
     "failed": {
       "add": "This notice already exists in database",
       "notFound": "This notice cannot be found in database",
       "list": "List of notices is empty",
       "parse": "{core.command-parse} !notice",
-      "toggle": "Notice (notice) was not found"
+      "toggle": "Notice $notice was not found"
     },
     "settings": {
-      "noticeInterval": "Notice minimal interval succesfully set to (value) minutes",
-      "noticeMsgReq": "Notice minimal required message chat count set to (value)"
+      "noticeInterval": "Notice minimal interval succesfully set to $value minutes",
+      "noticeMsgReq": "Notice minimal required message chat count set to $value"
     }
   },
   "points": {
     "success": {
-      "set": "(username) was set to (amount) (pointsName)",
-      "give": "(sender) just gave his (amount) (pointsName) to (username)",
-      "all": "All online users just received (amount) (pointsName)!",
-      "rain": "Make it rain! All online users just received up to (amount) (pointsName)!",
-      "add": "(username) just received (amount) (pointsName)!",
-      "remove": "Ouch, (amount) (pointsName) was removed from (username)!"
+      "set": "$username was set to $amount $pointsName",
+      "give": "$sender just gave his $amount $pointsName to $username",
+      "all": "All online users just received $amount $pointsName!",
+      "rain": "Make it rain! All online users just received up to $amount $pointsName!",
+      "add": "$username just received $amount $pointsName!",
+      "remove": "Ouch, $amount $pointsName was removed from $username!"
     },
     "failed": {
       "set": "{core.command-parse} !points set [username] [amount]",
       "give": "{core.command-parse} !points give [username] [amount]",
-      "giveNotEnough": "Sorry, (sender), you don't have (amount) (pointsName) to give it to (username)",
+      "giveNotEnough": "Sorry, $sender, you don't have $amount $pointsName to give it to $username",
       "get": "{core.command-parse} !points get [username]",
       "all": "{core.command-parse} !points all [amount]",
       "rain": "{core.command-parse} !makeitrain [amount]",
@@ -557,14 +557,14 @@
       "remove": "{core.command-parse} !points remove [username] [amount]"
     },
     "settings": {
-      "pointsName": "Points name was set to (value) format",
-      "pointsResponse": "Points response was changed to: (value)",
-      "pointsInterval": "Points online interval set to (value) minutes",
-      "pointsPerInterval": "Points when online was set to (value) per online interval",
-      "pointsMessageInterval": "Points interval message set to (value)",
-      "pointsPerMessageInterval": "Points per message interval set to (value)",
-      "pointsIntervalOffline": "Points offline interval set to (value) minutes",
-      "pointsPerIntervalOffline": "Points when offline was set to (value) per offline interval"
+      "pointsName": "Points name was set to $value format",
+      "pointsResponse": "Points response was changed to: $value",
+      "pointsInterval": "Points online interval set to $value minutes",
+      "pointsPerInterval": "Points when online was set to $value per online interval",
+      "pointsMessageInterval": "Points interval message set to $value",
+      "pointsPerMessageInterval": "Points per message interval set to $value",
+      "pointsIntervalOffline": "Points offline interval set to $value minutes",
+      "pointsPerIntervalOffline": "Points when offline was set to $value per offline interval"
     },
     "defaults": {
       "pointsName": {
@@ -572,7 +572,7 @@
         "multi": "points",
         "xmulti": ""
       },
-      "pointsResponse": "(username) has currently (amount) (pointsName)"
+      "pointsResponse": "$username has currently $amount $pointsName"
     }
   },
   "songs": {
@@ -587,45 +587,45 @@
         "true": "{songs.settings.playlist.text} {core.enabled}",
         "false": "{songs.settings.playlist.text} {core.disabled}"
       },
-      "volume": "Volume succesfully set to (value)%",
-      "duration": "Maximum song length set to (value) minutes.",
+      "volume": "Volume succesfully set to $value%",
+      "duration": "Maximum song length set to $value minutes.",
       "shuffle": {
         "true": "Songs will play randomly",
         "false": "Songs will play by time added in playlist"
       }
     },
-    "bannedSong": "Song (title) was banned and will never play again!",
+    "bannedSong": "Song $title was banned and will never play again!",
     "bannedSongTimeout": "You've got timeout for posting banned song",
     "unbannedSong": "Song was succesfully unbanned",
     "notBannedSong": "This song was not banned",
     "currentSong": {
-      "songrequest": "Current song is (title) requested by (username)",
-      "playlist": "Current song is (title) from playlist"
+      "songrequest": "Current song is $title requested by $username",
+      "playlist": "Current song is $title from playlist"
     },
     "noCurrentSong": "No song is currently playing",
-    "isBanned": "Sorry, (sender), but this song is banned",
-    "notFound": "Sorry, (sender), but this song was not found",
-    "tooLong": "Sorry, (sender), but this song is too long",
-    "addedSong": "(title) was added to queue by (sender)",
-    "addedSongPlaylist": "(title) was added to playlist",
-    "removeSongQueue": "(title) was removed from queue",
-    "alreadyInPlaylist": "Song (title) is already in playlist",
-    "removeSongPlaylist": "(title) was removed from playlist"
+    "isBanned": "Sorry, $sender, but this song is banned",
+    "notFound": "Sorry, $sender, but this song was not found",
+    "tooLong": "Sorry, $sender, but this song is too long",
+    "addedSong": "$title was added to queue by $sender",
+    "addedSongPlaylist": "$title was added to playlist",
+    "removeSongQueue": "$title was removed from queue",
+    "alreadyInPlaylist": "Song $title is already in playlist",
+    "removeSongPlaylist": "$title was removed from playlist"
   },
   "price": {
     "success": {
-      "set": "Price for !(command) was set to (amount) (pointsName)",
-      "remove" : "Price for !(command) was unset",
+      "set": "Price for !$command was set to $amount $pointsName",
+      "remove" : "Price for !$command was unset",
       "list": "List of prices",
-      "enabled": "Price for !(command) was enabled",
-      "disabled": "Price for !(command) was disabled"
+      "enabled": "Price for !$command was enabled",
+      "disabled": "Price for !$command was disabled"
     },
     "failed": {
       "parse": "{core.command-parse} !price",
-      "remove": "No price was set for !(command)",
+      "remove": "No price was set for !$command",
       "list": "List of prices is empty",
-      "notEnough": "Sorry, (sender), but you don't have (amount) (pointsName) to use !(command)",
-      "toggle": "Price for !(command) was not found"
+      "notEnough": "Sorry, $sender, but you don't have $amount $pointsName to use !$command",
+      "toggle": "Price for !$command was not found"
     }
   },
   "rank": {
@@ -633,9 +633,9 @@
       "add": "New rank was added to bot",
       "remove" : "Rank was deleted from bot",
       "list": "List of ranks",
-      "set": "(username) have rank set to (rank)",
-      "unset": "Custom rank was unset for (username)",
-      "show": "(sender) have (rank) rank"
+      "set": "$username have rank set to $rank",
+      "unset": "Custom rank was unset for $username",
+      "show": "$sender have $rank rank"
     },
     "failed": {
       "parse": "{core.command-parse} !rank help",
@@ -644,26 +644,26 @@
       "set": "{core.command-parse} !rank set <username> <rank>",
       "unset": "{core.command-parse} !rank unset <username>",
       "notFound": "No rank is associated with this hour",
-      "show": "(sender) doesn't have a rank yet."
+      "show": "$sender doesn't have a rank yet."
     }
   },
   "followage": {
     "success": {
-      "never": "(sender), @(username) is not a channel follower",
-      "time": "(sender), @(username) is following channel (diff)"
+      "never": "$sender, @$username is not a channel follower",
+      "time": "$sender, @$username is following channel $diff"
     }
   },
   "age": {
-    "failed": "(sender), I don't have data for @(username) account age",
+    "failed": "$sender, I don't have data for @$username account age",
     "success": {
-      "withUsername": "(sender), account age for @(username) is (diff)",
-      "withoutUsername": "(sender), your account age is (diff)"
+      "withUsername": "$sender, account age for @$username is $diff",
+      "withoutUsername": "$sender, your account age is $diff"
     }
   },
   "lastseen": {
     "success": {
-      "never": "(username) was never in this channel!",
-      "time": "(username) was last seen at (when) in this channel"
+      "never": "$username was never in this channel!",
+      "time": "$username was last seen at $when in this channel"
     },
     "failed": {
       "parse": "{core.command-parse} !lastseen [username]"
@@ -671,16 +671,16 @@
   },
   "watched": {
     "success": {
-      "time": "(username) watched this channel for (time) hours"
+      "time": "$username watched this channel for $time hours"
     },
     "failed": {
       "parse": "{core.command-parse} !watched or !watched [username]"
     }
   },
   "top": {
-    "listWatched": "Top (amount) (watch time): ",
-    "listPoints": "Top (amount) (points): ",
-    "listMessages": "Top (amount) (messages): "
+    "listWatched": "Top $amount (watch time): ",
+    "listPoints": "Top $amount (points): ",
+    "listMessages": "Top $amount (messages): "
   },
   "permissions": {
     "success": {
@@ -688,13 +688,13 @@
     },
     "failed": {
       "parse": "Usage: !permission viewer|mods|owner|regular|disable [command]",
-      "noCmd": "Sorry, (sender), but this command is not registered in a bot"
+      "noCmd": "Sorry, $sender, but this command is not registered in a bot"
     },
-    "without-permission": "You don't have enough permissions for '(command)'"
+    "without-permission": "You don't have enough permissions for '$command'"
   },
   "moderation": {
     "warning": "[$count warnings left]",
-    "permit": "User (who) can post a (count) (link) to chat",
+    "permit": "User $who can post a $count $link to chat",
     "links": "No links allowed, ask for !permit",
     "symbols": "No excessive symbols usage",
     "longMessage": "Long messages are not allowed",
@@ -717,22 +717,22 @@
       "blacklist": "{moderation.blacklist} {moderation.warning}"
     },
     "settings": {
-      "moderationLinksCustomMessage": "Moderation Links custom message set to '(value)'",
-      "moderationLinksWarningCustomMessage": "Moderation Links custom warning message set to '(value)'",
-      "moderationSymbolsCustomMessage": "Moderation Symbols custom message set to '(value)'",
-      "moderationSymbolsWarningCustomMessage": "Moderation Symbols custom warning message set to '(value)'",
-      "moderationLongMessageCustomMessage": "Moderation Long Message custom message set to '(value)'",
-      "moderationLongMessageWarningCustomMessage": "Moderation Long Message custom warning message set to '(value)'",
-      "moderationCapsCustomMessage": "Moderation Caps custom message set to '(value)'",
-      "moderationCapsWarningCustomMessage": "Moderation Caps custom warning message set to '(value)'",
-      "moderationSpamCustomMessage": "Moderation Spam custom message set to '(value)'",
-      "moderationSpamWarningCustomMessage": "Moderation Spam custom warning message set to '(value)'",
-      "moderationColorCustomMessage": "Moderation Color custom message set to '(value)'",
-      "moderationColorWarningCustomMessage": "Moderation Color custom warning message set to '(value)'",
-      "moderationEmotesCustomMessage": "Moderation Emotes custom message set to '(value)'",
-      "moderationEmotesWarningCustomMessage": "Moderation Emotes custom warning message set to '(value)'",
-      "moderationBlacklistCustomMessage": "Moderation Blacklist custom message set to '(value)'",
-      "moderationBlacklistWarningCustomMessage": "Moderation Blacklist custom warning message set to '(value)'",
+      "moderationLinksCustomMessage": "Moderation Links custom message set to '$value'",
+      "moderationLinksWarningCustomMessage": "Moderation Links custom warning message set to '$value'",
+      "moderationSymbolsCustomMessage": "Moderation Symbols custom message set to '$value'",
+      "moderationSymbolsWarningCustomMessage": "Moderation Symbols custom warning message set to '$value'",
+      "moderationLongMessageCustomMessage": "Moderation Long Message custom message set to '$value'",
+      "moderationLongMessageWarningCustomMessage": "Moderation Long Message custom warning message set to '$value'",
+      "moderationCapsCustomMessage": "Moderation Caps custom message set to '$value'",
+      "moderationCapsWarningCustomMessage": "Moderation Caps custom warning message set to '$value'",
+      "moderationSpamCustomMessage": "Moderation Spam custom message set to '$value'",
+      "moderationSpamWarningCustomMessage": "Moderation Spam custom warning message set to '$value'",
+      "moderationColorCustomMessage": "Moderation Color custom message set to '$value'",
+      "moderationColorWarningCustomMessage": "Moderation Color custom warning message set to '$value'",
+      "moderationEmotesCustomMessage": "Moderation Emotes custom message set to '$value'",
+      "moderationEmotesWarningCustomMessage": "Moderation Emotes custom warning message set to '$value'",
+      "moderationBlacklistCustomMessage": "Moderation Blacklist custom message set to '$value'",
+      "moderationBlacklistWarningCustomMessage": "Moderation Blacklist custom warning message set to '$value'",
       "moderationAnnounceTimeouts": {
         "true": "Bot will send timeout messages to chat",
         "false": "Bot won't send timeout messages to chat"
@@ -752,7 +752,7 @@
         "true": "{moderation.settings.moderationLinksSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationLinksSubs.text} {core.disabled}"
       },
-      "moderationLinksTimeout": "Timeout because of links set to (value)s",
+      "moderationLinksTimeout": "Timeout because of links set to $values",
       "moderationSymbols": {
         "text": "Moderation of symbols is",
         "true": "{moderation.settings.moderationSymbols.text} {core.enabled}",
@@ -763,10 +763,10 @@
         "true": "{moderation.settings.moderationSymbolsSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationSymbolsSubs.text} {core.disabled}"
       },
-      "moderationSymbolsTimeout": "Timeout because of symbols set to (value)s",
-      "moderationSymbolsTriggerLength": "Trigger message length for symbols set to (value)",
-      "moderationSymbolsMaxConsecutively": "Maximum of consecutively written symbols set to (value)",
-      "moderationSymbolsMaxPercent": "Maximum symbols percentage in message set to (value)%",
+      "moderationSymbolsTimeout": "Timeout because of symbols set to $values",
+      "moderationSymbolsTriggerLength": "Trigger message length for symbols set to $value",
+      "moderationSymbolsMaxConsecutively": "Maximum of consecutively written symbols set to $value",
+      "moderationSymbolsMaxPercent": "Maximum symbols percentage in message set to $value%",
       "moderationLongMessage": {
         "text": "Moderation of long messages is",
         "true": "{moderation.settings.moderationLongMessage.text} {core.enabled}",
@@ -777,8 +777,8 @@
         "true": "{moderation.settings.moderationLongMessageSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationLongMessageSubs.text} {core.disabled}"
       },
-      "moderationLongMessageTimeout": "Timeout because of long message set to (value)s",
-      "moderationLongMessageTriggerLength": "Trigger message length for long messages set to (value)",
+      "moderationLongMessageTimeout": "Timeout because of long message set to $values",
+      "moderationLongMessageTriggerLength": "Trigger message length for long messages set to $value",
       "moderationCaps": {
         "text": "Moderation of caps is",
         "true": "{moderation.settings.moderationCaps.text} {core.enabled}",
@@ -789,9 +789,9 @@
         "true": "{moderation.settings.moderationCapsSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationCapsSubs.text} {core.disabled}"
       },
-      "moderationCapsTimeout": "Timeout because of caps set to (value)s",
-      "moderationCapsTriggerLength": "Trigger message length for caps set to (value)",
-      "moderationCapsMaxPercent": "Maximum caps percentage in message set to (value)%",
+      "moderationCapsTimeout": "Timeout because of caps set to $values",
+      "moderationCapsTriggerLength": "Trigger message length for caps set to $value",
+      "moderationCapsMaxPercent": "Maximum caps percentage in message set to $value%",
       "moderationSpam": {
         "text": "Moderation of spam is",
         "true": "{moderation.settings.moderationSpam.text} {core.enabled}",
@@ -802,9 +802,9 @@
         "true": "{moderation.settings.moderationSpamSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationSpamSubs.text} {core.disabled}"
       },
-      "moderationSpamTimeout": "Timeout because of spam set to (value)s",
-      "moderationSpamTriggerLength": "Trigger message length for spam set to (value)",
-      "moderationSpamMaxLength": "Maximum spam length in message set to (value)",
+      "moderationSpamTimeout": "Timeout because of spam set to $values",
+      "moderationSpamTriggerLength": "Trigger message length for spam set to $value",
+      "moderationSpamMaxLength": "Maximum spam length in message set to $value",
       "moderationColor": {
         "text": "Moderation of colors (/me) is",
         "true": "{moderation.settings.moderationColor.text} {core.enabled}",
@@ -815,7 +815,7 @@
         "true": "{moderation.settings.moderationColorSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationColorSubs.text} {core.disabled}"
       },
-      "moderationColorTimeout": "Timeout because of colors (/me) usage set to (value)s",
+      "moderationColorTimeout": "Timeout because of colors (/me) usage set to $values",
       "moderationEmotes": {
         "text": "Moderation of emotes is",
         "true": "{moderation.settings.moderationEmotes.text} {core.enabled}",
@@ -826,15 +826,15 @@
         "true": "{moderation.settings.moderationEmotesSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationEmotesSubs.text} {core.disabled}"
       },
-      "moderationEmotesTimeout": "Timeout because of emotes spamming set to (value)s",
-      "moderationEmotesMaxCount": "Maximum count of emotes in one messages set to (value)",
-      "moderationBlacklistTimeout": "Timeout because of blacklisted word set to (value)s",
+      "moderationEmotesTimeout": "Timeout because of emotes spamming set to $values",
+      "moderationEmotesMaxCount": "Maximum count of emotes in one messages set to $value",
+      "moderationBlacklistTimeout": "Timeout because of blacklisted word set to $values",
       "moderationBlacklistSubs": {
         "text": "Moderation of blacklist for subscribers is",
         "true": "{moderation.settings.moderationBlacklistSubs.text} {core.enabled}",
         "false": "{moderation.settings.moderationBlacklistSubs.text} {core.disabled}"
       },
-      "moderationWarnings": "User will be warned (value) times",
+      "moderationWarnings": "User will be warned $value times",
       "moderationWarningsTimeouts": {
         "true": "Warnings are set to be 1s timeout",
         "false": "Warnings are set to chat message only"
@@ -843,141 +843,141 @@
   },
   "queue": {
     "info": {
-      "closed": "(sender), {queue.close}",
-      "opened": "(sender), {queue.open}"
+      "closed": "$sender, {queue.close}",
+      "opened": "$sender, {queue.open}"
     },
     "join": {
-      "closed": "Sorry (sender), queue is currently closed",
-      "opened": "(sender) were added into queue"
+      "closed": "Sorry $sender, queue is currently closed",
+      "opened": "$sender were added into queue"
     },
     "open": "Queue is currently OPENED! Join to queue with !queue join",
     "close": "Queue is currently closed!",
     "clear": "Queue were completely cleared",
     "picked": {
-      "single": "This user was picked from queue: (users)",
-      "multi": "These users were picked from queue: (users)",
+      "single": "This user was picked from queue: $users",
+      "multi": "These users were picked from queue: $users",
       "none": "No users were found in queue"
     }
   },
   "title": {
-    "current": "(sender), title of stream is '(title)'.",
+    "current": "$sender, title of stream is '$title'.",
     "change": {
-      "success": "(sender), title was set to: (status)",
-      "failed": "(sender), something went wrong. Current title is still set to: (status)"
+      "success": "$sender, title was set to: $status",
+      "failed": "$sender, something went wrong. Current title is still set to: $status"
     }
   },
   "game": {
-    "current": "(sender), streamer is currently playing (game).",
+    "current": "$sender, streamer is currently playing $game.",
     "change": {
-      "success": "(sender), game was set to: (game)",
-      "failed": "(sender), something went wrong. Current game is still set to: (game)"
+      "success": "$sender, game was set to: $game",
+      "failed": "$sender, something went wrong. Current game is still set to: $game"
     }
   },
   "cooldown": {
     "toggle": {
       "moderator": {
-        "enabled": "Cooldown for (command) was enabled for moderators",
-        "disabled": "Cooldown for (command) was disabled for moderators",
-        "failed": "Sorry, (sender), this cooldown doesn't exist"
+        "enabled": "Cooldown for $command was enabled for moderators",
+        "disabled": "Cooldown for $command was disabled for moderators",
+        "failed": "Sorry, $sender, this cooldown doesn't exist"
       },
       "owner": {
-        "enabled": "Cooldown for (command) was enabled for owners",
-        "disabled": "Cooldown for (command) was disabled for owners",
-        "failed": "Sorry, (sender), this cooldown doesn't exist"
+        "enabled": "Cooldown for $command was enabled for owners",
+        "disabled": "Cooldown for $command was disabled for owners",
+        "failed": "Sorry, $sender, this cooldown doesn't exist"
       }
     },
     "failed": {
       "parse": "{core.command-parse} !cooldown [keyword|!command] [global|user] [seconds] [true/false]",
-      "cooldown": "(sender), you cannot use (command), remaining (seconds)s",
-      "toggle": "Cooldown for (command) was not found!"
+      "cooldown": "$sender, you cannot use $command, remaining $secondss",
+      "toggle": "Cooldown for $command was not found!"
     },
     "success": {
-      "set": "(type) cooldown for (command) was set to (seconds)s",
-      "unset": "Cooldown for (command) was unset",
-      "enabled": "Cooldown for (command) was enabled",
-      "disabled": "Cooldown for (command) was disabled"
+      "set": "$type cooldown for $command was set to $secondss",
+      "unset": "Cooldown for $command was unset",
+      "enabled": "Cooldown for $command was enabled",
+      "disabled": "Cooldown for $command was disabled"
     }
   },
   "gambling": {
     "cooldown": {
-      "duel": "Cooldown for !duel is set to (value)s",
-      "fightme": "Cooldown for !fightme is set to (value)s",
+      "duel": "Cooldown for !duel is set to $values",
+      "fightme": "Cooldown for !fightme is set to $values",
       "bypass": {
         "true": "Gamble cooldowns will be ignored for mods/caster",
         "false": "Gamble cooldowns won't be ignored for mods/caster"
       }
     },
     "duel": {
-      "cooldown": "(sender), you cannot use !duel for (cooldown) (minutesName).",
-      "joined": "(sender), good luck with your dueling skills. You bet on yourself (points) (pointsName)!",
-      "added": "(sender) really thinks he is better than others raising his bet to (points) (pointsName)!",
-      "new": "(sender) is your new duel challenger! To participate use !duel [points], you have (minutes) (minutesName) left to join.",
-      "zeroBet": "(sender), you cannot duel 0 (pointsName)",
-      "notEnoughOptions": "(sender), you need to specify points to dueling",
-      "notEnoughPoints": "(sender), you don't have enough (pointsName) to duel!",
-      "noContestant": "Only (sender) have courage to join duel! Your bet of (points) (pointsName) are returned to you.",
-      "winner": "Congratulations to (winner)! He is last man standing and he won (points) (pointsName) ((probability)% with bet of (tickets) (ticketsName))!"
+      "cooldown": "$sender, you cannot use !duel for $cooldown $minutesName.",
+      "joined": "$sender, good luck with your dueling skills. You bet on yourself $points $pointsName!",
+      "added": "$sender really thinks he is better than others raising his bet to $points $pointsName!",
+      "new": "$sender is your new duel challenger! To participate use !duel [points], you have $minutes $minutesName left to join.",
+      "zeroBet": "$sender, you cannot duel 0 $pointsName",
+      "notEnoughOptions": "$sender, you need to specify points to dueling",
+      "notEnoughPoints": "$sender, you don't have enough $pointsName to duel!",
+      "noContestant": "Only $sender have courage to join duel! Your bet of $points $pointsName are returned to you.",
+      "winner": "Congratulations to $winner! He is last man standing and he won $points $pointsName ($probability% with bet of $tickets $ticketsName)!"
     },
     "roulette": {
-      "trigger": "(sender) pulled a trigger",
+      "trigger": "$sender pulled a trigger",
       "alive": "and nothing happened",
       "dead": "and bullet splashed his brain on the wall",
       "mod": "and he completely missed!",
       "broadcaster": "and he is using blanks!",
-      "timeout": "Roulette timeout set to (value)s"
+      "timeout": "Roulette timeout set to $values"
     },
     "seppuku": {
-      "text": "(sender) has committed seppuku.",
-      "mod": "(sender) tried to commit seppuku, but broke a sword.",
-      "broadcaster": "(sender) tried to commit seppuku, but lost a sword.",
-      "timeout": "Seppuku timeout set to (value)s"
+      "text": "$sender has committed seppuku.",
+      "mod": "$sender tried to commit seppuku, but broke a sword.",
+      "broadcaster": "$sender tried to commit seppuku, but lost a sword.",
+      "timeout": "Seppuku timeout set to $values"
     },
     "fightme": {
-      "cooldown": "(sender), you cannot use !fightme for (cooldown) (minutesName).",
-      "timeout": "FightMe! timeout set to (value)s",
-      "challenge": "(ง'̀-'́)ง (sender) wants to fight you $username! If you accept, send !fightme (sender)",
+      "cooldown": "$sender, you cannot use !fightme for $cooldown $minutesName.",
+      "timeout": "FightMe! timeout set to $values",
+      "challenge": "(ง'̀-'́)ง $sender wants to fight you $username! If you accept, send !fightme $sender",
       "winner": "٩(^ᴗ^)۶ $winner is proud winner! Who's next?",
-      "notEnoughOptions": "(sender), you need to select user to fight.",
+      "notEnoughOptions": "$sender, you need to select user to fight.",
       "broadcaster": "ψ(｀∇´)ψ $winner is a god among you. This fight  was decided even before it started.",
-      "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) (sender), this fight will take milleniums to decide!",
+      "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) $sender, this fight will take milleniums to decide!",
       "oneModerator": "¯\\_(ツ)_/¯ $winner is under divine protection. Sorry."
     },
     "gamble": {
-      "zeroBet": "(sender), you cannot gamble 0 (pointsName)",
-      "notEnoughOptions": "(sender), you need to specify points to gamble",
-      "notEnoughPoints": "(sender), you don't have enough (pointsName) to gamble",
-      "win": "(sender), you WON! You now have (points) (pointsName)",
-      "lose": "(sender), you LOST! You now have (points) (pointsName)"
+      "zeroBet": "$sender, you cannot gamble 0 $pointsName",
+      "notEnoughOptions": "$sender, you need to specify points to gamble",
+      "notEnoughPoints": "$sender, you don't have enough $pointsName to gamble",
+      "win": "$sender, you WON! You now have $points $pointsName",
+      "lose": "$sender, you LOST! You now have $points $pointsName"
     }
   },
   "regulars": {
     "add": {
-      "success": "@(username) was set as channel regular",
-      "undefined": "@(username) doesn't exist in bot database",
+      "success": "@$username was set as channel regular",
+      "undefined": "@$username doesn't exist in bot database",
       "empty": "Correct usage: !regular add <username>"
     },
     "rm": {
-      "success": "@(username) is not channel regular anymore",
-      "undefined": "@(username) doesn't exist in bot database",
+      "success": "@$username is not channel regular anymore",
+      "undefined": "@$username doesn't exist in bot database",
       "empty": "Correct usage: !regular remove <username>"
     }
   },
   "merge": {
-    "noUsername": "(sender), you need to specify username to merge",
-    "success": "(sender), (username) have now data of (merged-username)",
-    "noID": "(sender), specified username doesn't have ID and cannot be merged",
-    "noUsernameToMerge": "(sender), no other username was found to merge"
+    "noUsername": "$sender, you need to specify username to merge",
+    "success": "$sender, $username have now data of $merged-username",
+    "noID": "$sender, specified username doesn't have ID and cannot be merged",
+    "noUsernameToMerge": "$sender, no other username was found to merge"
   },
   "highlights": {
     "saved": {
-      "description": "(sender), highlight was saved for (hours)h(minutes)m(seconds)s as `(description)`",
-      "no-description": "(sender), highlight was saved for (hours)h(minutes)m(seconds)s"
+      "description": "$sender, highlight was saved for $hoursh$minutesm$secondss as `$description`",
+      "no-description": "$sender, highlight was saved for $hoursh$minutesm$secondss"
     },
     "list": {
-      "items": "(sender), list of saved highlights for latest stream: (items)",
-      "empty": "(sender), no highlights were saved"
+      "items": "$sender, list of saved highlights for latest stream: $items",
+      "empty": "$sender, no highlights were saved"
     },
-    "offline": "(sender), cannot save highlight, stream is offline"
+    "offline": "$sender, cannot save highlight, stream is offline"
   },
   "whisper" : {
     "settings": {
@@ -1004,6 +1004,6 @@
     }
   },
   "phillipsHue": {
-    "list": "(sender), List of Phillips Hue connected lights: "
+    "list": "$sender, List of Phillips Hue connected lights: "
   }
 }

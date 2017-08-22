@@ -128,13 +128,13 @@ Keywords.prototype.toggle = function (self, sender, text) {
     let keyword = _.find(self.keywords, function (o) { return o.keyword === parsed })
     if (_.isUndefined(keyword)) {
       global.commons.sendMessage(global.translate('keywords.failed.toggle')
-        .replace('(keyword)', parsed), sender)
+        .replace('$keyword', parsed), sender)
       return
     }
 
     keyword.enabled = !keyword.enabled
     global.commons.sendMessage(global.translate(keyword.enabled ? 'keywords.success.enabled' : 'keywords.success.disabled')
-      .replace('(keyword)', keyword.keyword), sender)
+      .replace('$keyword', keyword.keyword), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('keywords.failed.parse'), sender)
   }

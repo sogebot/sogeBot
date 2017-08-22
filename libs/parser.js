@@ -113,7 +113,7 @@ Parser.prototype.parseCommands = async function (user, message, skip) {
       } else {
         // user doesn't have permissions for command
         user['message-type'] = 'whisper'
-        global.commons.sendMessage(global.translate('permissions.without-permission').replace('(command)', message), user)
+        global.commons.sendMessage(global.translate('permissions.without-permission').replace('$command', message), user)
       }
     }
   }
@@ -266,10 +266,10 @@ Parser.prototype.parseMessage = async function (message, attr) {
     '(uptime)': async function (filter) {
       const time = global.twitch.getTime(global.twitch.isOnline ? global.twitch.when.online : global.twitch.when.offline, true)
       return global.configuration.getValue('uptimeFormat')
-        .replace('(days)', time.days)
-        .replace('(hours)', time.hours)
-        .replace('(minutes)', time.minutes)
-        .replace('(seconds)', time.seconds)
+        .replace('$days', time.days)
+        .replace('$hours', time.hours)
+        .replace('$minutes', time.minutes)
+        .replace('$seconds', time.seconds)
     }
   }
   let command = {

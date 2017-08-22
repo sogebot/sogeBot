@@ -121,9 +121,9 @@ Points.prototype.setPoints = function (self, sender, text) {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
     global.users.set(parsed[1], { points: parseInt(parsed[2], 10) })
     global.commons.sendMessage(global.translate('points.success.set')
-      .replace('(amount)', parsed[2])
-      .replace('(username)', parsed[1])
-      .replace('(pointsName)', self.getPointsName(parsed[2])), sender)
+      .replace('$amount', parsed[2])
+      .replace('$username', parsed[1])
+      .replace('$pointsName', self.getPointsName(parsed[2])), sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.set'), sender)
   }
@@ -144,14 +144,14 @@ Points.prototype.givePoints = function (self, sender, text) {
           ? parseInt(user2.points, 10) + givePts : givePts) })
       }
       global.commons.sendMessage(global.translate('points.success.give')
-        .replace('(amount)', givePts)
-        .replace('(username)', user2.username)
-        .replace('(pointsName)', self.getPointsName(givePts)), sender)
+        .replace('$amount', givePts)
+        .replace('$username', user2.username)
+        .replace('$pointsName', self.getPointsName(givePts)), sender)
     } else {
       global.commons.sendMessage(global.translate('points.failed.giveNotEnough')
-      .replace('(amount)', givePts)
-      .replace('(username)', user2.username)
-      .replace('(pointsName)', self.getPointsName(givePts)), sender)
+      .replace('$amount', givePts)
+      .replace('$username', user2.username)
+      .replace('$pointsName', self.getPointsName(givePts)), sender)
     }
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.give'), sender)
@@ -222,9 +222,9 @@ Points.prototype.getPointsFromUser = function (self, sender, text) {
     var pointsResponse = (global.configuration.getValue('pointsResponse').length > 0 ? global.configuration.getValue('pointsResponse') : global.translate('points.defaults.pointsResponse'))
     var points = (_.isUndefined(user.points) ? 0 : user.points)
     global.commons.sendMessage(pointsResponse
-      .replace('(amount)', points)
-      .replace('(username)', username)
-      .replace('(pointsName)', self.getPointsName(points)), sender)
+      .replace('$amount', points)
+      .replace('$username', username)
+      .replace('$pointsName', self.getPointsName(points)), sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.get'), sender)
   }
@@ -239,8 +239,8 @@ Points.prototype.allPoints = function (self, sender, text) {
       global.users.set(user.username, { points: (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts) })
     })
     global.commons.sendMessage(global.translate('points.success.all')
-      .replace('(amount)', givePts)
-      .replace('(pointsName)', self.getPointsName(givePts)), sender)
+      .replace('$amount', givePts)
+      .replace('$pointsName', self.getPointsName(givePts)), sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.all'), sender)
   }
@@ -256,8 +256,8 @@ Points.prototype.rainPoints = function (self, sender, text) {
       global.users.set(user.username, { points: (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + random : random) })
     })
     global.commons.sendMessage(global.translate('points.success.rain')
-      .replace('(amount)', givePts)
-      .replace('(pointsName)', self.getPointsName(givePts)), sender)
+      .replace('$amount', givePts)
+      .replace('$pointsName', self.getPointsName(givePts)), sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.rain'), sender)
   }
@@ -271,9 +271,9 @@ Points.prototype.addPoints = function (self, sender, text) {
     var availablePts = parseInt(user.points, 10)
     global.users.set(parsed[1], { points: (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts) })
     global.commons.sendMessage(global.translate('points.success.add')
-      .replace('(amount)', givePts)
-      .replace('(username)', parsed[1])
-      .replace('(pointsName)', self.getPointsName(givePts)), sender)
+      .replace('$amount', givePts)
+      .replace('$username', parsed[1])
+      .replace('$pointsName', self.getPointsName(givePts)), sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.add'), sender)
   }
@@ -288,9 +288,9 @@ Points.prototype.removePoints = function (self, sender, text) {
     if (availablePts > removePts) global.users.set(user.username, { points: (_.isFinite(availablePts) && !_.isNumber(availablePts) ? availablePts - removePts : 0) })
     else global.users.set(user.username, { points: 0 })
     global.commons.sendMessage(global.translate('points.success.remove')
-      .replace('(amount)', removePts)
-      .replace('(username)', parsed[1])
-      .replace('(pointsName)', self.getPointsName(removePts)), sender)
+      .replace('$amount', removePts)
+      .replace('$username', parsed[1])
+      .replace('$pointsName', self.getPointsName(removePts)), sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.remove'), sender)
   }

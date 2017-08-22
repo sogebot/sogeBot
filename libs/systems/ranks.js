@@ -109,8 +109,8 @@ Ranks.prototype.set = function (self, sender, text) {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
     global.users.set(parsed[1], { custom: { rank: parsed[2].trim() } })
     global.commons.sendMessage(global.translate('rank.success.set')
-      .replace('(rank)', parsed[2])
-      .replace('(username)', parsed[1]), sender)
+      .replace('$rank', parsed[2])
+      .replace('$username', parsed[1]), sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('rank.failed.set'), sender)
   }
@@ -121,7 +121,7 @@ Ranks.prototype.unset = function (self, sender, text) {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     global.users.set(parsed[1], { custom: { rank: null } })
     global.commons.sendMessage(global.translate('rank.success.unset')
-      .replace('(username)', parsed[1]), sender)
+      .replace('$username', parsed[1]), sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('rank.failed.unset'), sender)
   }
@@ -131,7 +131,7 @@ Ranks.prototype.show = function (self, sender) {
   let user = global.users.get(sender.username)
   let rank = !_.isNil(user.rank) ? user.rank : null
   rank = !_.isNil(user.custom.rank) ? user.custom.rank : rank
-  global.commons.sendMessage(global.translate(!_.isNil(rank) ? 'rank.success.show' : 'rank.failed.show').replace('(rank)', rank), sender)
+  global.commons.sendMessage(global.translate(!_.isNil(rank) ? 'rank.success.show' : 'rank.failed.show').replace('$rank', rank), sender)
 }
 
 Ranks.prototype.updateRanks = function () {
