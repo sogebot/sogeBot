@@ -450,7 +450,7 @@ Twitch.prototype.watched = function (self, sender, text) {
 Twitch.prototype.showMe = function (self, sender, text) {
   try {
     const user = global.users.get(sender.username)
-    var message = ['(sender)']
+    var message = ['$sender']
     // rank
     var rank = !_.isUndefined(user.rank) ? user.rank : null
     rank = !_.isNil(user.custom.rank) ? user.custom.rank : rank
