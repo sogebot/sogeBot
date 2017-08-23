@@ -44,14 +44,29 @@ Gallery.prototype._upload = function (self, socket, data) {
   var buffer = Buffer.from(matches[2], 'base64')
   var ext
 
-  if (type === 'image/jpeg') ext = 'jpg'
-  if (type === 'image/png') ext = 'png'
-  if (type === 'image/gif') ext = 'gif'
-  if (type === 'audio/mp3') ext = 'mp3'
-  if (type === 'audio/ogg') ext = 'png'
-  if (type === 'video/mp4') ext = 'mp4'
-
-  if (_.isNil(type)) { socket.emit('overlay.gallery.upload.failed'); return false }
+  switch (type) {
+    case 'image/jpeg':
+      ext = 'jpg'
+      break
+    case 'image/png':
+      ext = 'png'
+      break
+    case 'image/gif':
+      ext = 'gif'
+      break
+    case 'audio/mp3':
+      ext = 'mp3'
+      break
+    case 'audio/ogg':
+      ext = 'ogg'
+      break
+    case 'video/mp4':
+      ext = 'mp4'
+      break
+    default:
+      socket.emit('overlay.gallery.upload.failed')
+      return false
+  }
 
   fs.writeFile(galleryDir + crypto.randomBytes(5).toString('hex') + '.' + ext, buffer, function (err) {
     if (err) {
