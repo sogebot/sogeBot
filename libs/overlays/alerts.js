@@ -10,11 +10,28 @@ function Alerts () {
   global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
   global.parser.register(this, '!alert', this.overlay, constants.OWNER_ONLY)
 
+  global.configuration.register('replayPosition', 'core.no-response', 'string', 'right')
+  global.configuration.register('replayOffsetX', 'core.no-response', 'number', '-50')
+  global.configuration.register('replayOffsetY', 'core.no-response', 'number', '-300')
+  global.configuration.register('replaySize', 'core.no-response', 'number', '600')
+  global.configuration.register('replayVolume', 'core.no-response', 'number', '0')
+  global.configuration.register('replayLabel', 'core.no-response-bool', 'bool', true)
+
   global.panel.socketListening(this, 'replay-video', this.replay)
 }
 
 Alerts.prototype.replay = function (self, socket, data) {
-  self.overlay(self, null, 'type=video url=' + data + ' position=right x-offset=-50 y-offset=-300 size=600 volume=0')
+  const replay = [
+    'type=video',
+    'url=' + data,
+    'position=' + global.configuration.getValue('replayPosition'),
+    'x-offset=' + global.configuration.getValue('replayOffsetX'),
+    'y-offset=' + global.configuration.getValue('replayOffsetY'),
+    'size=' + global.configuration.getValue('replaySize'),
+    'volume=' + global.configuration.getValue('replayVolume'),
+    'label=' + global.configuration.getValue('replayLabel')
+  ]
+  self.overlay(self, null, replay.join(' '))
 }
 
 Alerts.prototype.overlay = function (self, sender, text) {

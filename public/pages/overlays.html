@@ -63,7 +63,71 @@
     <div class="title">
       <span data-lang="alerts"></span>
       <small><a href="/overlays/alerts">XSplit / OBS link</a> (1280x720)</small>
+
+      <button class="btn btn-success btn-xs pull-right" onclick="replayTest()">Test replay</button>
     </div>
+
+    <table class="table table-striped">
+      <tr style="font-size:14px">
+        <td colspan=2><span data-lang="page-settings.overlays.replay.title"></span> <a href="https://github.com/sogehige/sogeBot/wiki/OBS-replays-through-alert-systems">How to setup</a></td>
+      </tr>
+      <tr>
+        <td><strong data-lang="page-settings.overlays.replay.position"></strong></td>
+        <td>
+          <select id="overlay-replay-position-select" class="form-control" onchange="saveReplayPos()">
+            <option value="left" data-lang="page-settings.overlays.replay.posleft"></option>
+            <option value="right" data-lang="page-settings.overlays.replay.posright"></option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="page-settings.overlays.replay.offsetX"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="replayOffsetX" onclick="commons.configEditable(this, '')" id="configReplayOffsetX"></abbr>
+          <div class="input-group" style="display:none;" id="input_replayOffsetX_group">
+            <div class="input-group-addon">px</div>
+            <input id="input_replayOffsetX" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="page-settings.overlays.replay.offsetY"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="replayOffsetY" onclick="commons.configEditable(this, '')" id="configReplayOffsetY"></abbr>
+          <div class="input-group" style="display:none;" id="input_replayOffsetY_group">
+            <div class="input-group-addon">px</div>
+            <input id="input_replayOffsetY" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="page-settings.overlays.replay.size"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="replaySize" onclick="commons.configEditable(this, '')" id="configReplaySize"></abbr>
+          <div class="input-group" style="display:none;" id="input_replaySize_group">
+            <div class="input-group-addon">px</div>
+            <input id="input_replaySize" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="page-settings.overlays.replay.volume"></strong></td>
+        <td>
+          <abbr title="click to edit" data-config-id="replayVolume" onclick="commons.configEditable(this, '')" id="configReplayVolume"></abbr>
+          <div class="input-group" style="display:none;" id="input_replayVolume_group">
+            <div class="input-group-addon">0-100</div>
+            <input id="input_replayVolume" class="form-control input-sm" type="text"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong data-lang="page-settings.overlays.replay.label"></strong></td>
+        <td>
+            <input id="replayLabelToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
+
+        </td>
+      </tr>
+    </table>
   </div>
 
   <div class="widget" id="eventlist">
@@ -93,12 +157,31 @@
   socket.off('configuration')
 
   socket.emit('getConfiguration')
-  socket.on('configuration', function (data) {
+  socket.once('configuration', function (data) {
     $("#configOEmotesSize").text(data.OEmotesSize)
     $("#configOEmotesMax").text(data.OEmotesMax)
     $("#configOEmotesAnimationTime").text(data.OEmotesAnimationTime + 'ms')
 
     $('#overlay-emotes-animation-select option[value=' + data.OEmotesAnimation + ']').prop('selected', true)
+
+    // replay settings
+    $("#configReplayOffsetX").text(data.replayOffsetX)
+    $("#configReplayOffsetY").text(data.replayOffsetY)
+    $("#configReplaySize").text(data.replaySize)
+    $("#configReplayVolume").text(data.replayVolume)
+
+    var options = {on: translations['on'], off: translations['off']}
+    $('#replayLabelToggle').bootstrapToggle(options)
+    $('#replayLabelToggle').bootstrapToggle(data.replayLabel ? 'on' : 'off')
+    $('#replayLabelToggle').off('change')
+    $('#replayLabelToggle').on('change', function() {
+      var data = {}
+      data['replayLabel'] = $(this).prop('checked')
+      if ($('#replayLabelToggle').data('init')) socket.emit('saveConfiguration', data)
+    })
+    $('#replayLabelToggle').data('init', true)
+
+    $('#overlay-replay-position-select option[value=' + data.replayPosition + ']').prop('selected', true)
   })
 
   socket.emit('overlay.images.get')
@@ -131,6 +214,14 @@
   function emotesTest (type) {
     if (type === 'explosion') socket.emit('emote.testExplosion')
     if (type === 'emote') socket.emit('emote.test')
+  }
+
+  function replayTest() {
+    socket.emit('replay-video', '/dist/video/instant_replay.mp4')
+  }
+
+  function saveReplayPos () {
+    socket.emit('saveConfiguration', {'replayPosition': $('#overlay-replay-position-select').val()})
   }
 
 </script>

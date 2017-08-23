@@ -295,6 +295,13 @@
 
         vjs.src(video.url)
         vjs.ready(function() {
+          $('#replay-label').remove()
+          if (video.label === 'true') {
+            var label = $('<div id="replay-label" style="opacity:0; text-shadow: 0px 0px 2px black; position: relative; top:30px; left:-20px; font-family: \'Roboto Condensed\', sans; color: red; font-weight: bold; text-transform: uppercase; float:right"><i class="fa fa-circle" style="position:relative; top: -3px; aria-hidden="true"></i> <span style="font-size:20px">REPLAY</span></div>')
+            label.velocity("fadeIn", { loop: true, duration: 1000 });
+            $('#video').prepend(label)
+          }
+
           vjs.volume(video.volume)
 
           $('#video-rel-pos').attr('style', style)

@@ -10,6 +10,10 @@
     "command-parse": "Sorry, $sender, but this command is not correct, use",
     "error": "Sorry, $sender, but something went wrong!",
     "no-response": "",
+    "no-response-bool": {
+      "true": "",
+      "false": ""
+    },
     "api": {
       "error": "$sender, API is not responding correctly!",
       "not-available": "not available"
@@ -60,6 +64,19 @@
             "permissions": "Whispers on insufficient permissions",
             "cooldowns": "Whispers on cooldown (if set as notify)"
           }
+        }
+      },
+      "overlays": {
+        "replay": {
+          "title": "Replay settings",
+          "position": "Position",
+          "posleft": "Left",
+          "posright": "Right",
+          "offsetX": "Horizontal offset",
+          "offsetY": "Vertical offset",
+          "size": "Video size",
+          "volume": "Volume",
+          "label": "Show 'replay' label"
         }
       }
     },

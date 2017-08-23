@@ -10,6 +10,10 @@
     "command-parse": "Promin, $sender, ale tento prikaz neni spravne, pouzij",
     "error": "Promin, $sender, ale neco se pokazilo!",
     "no-response": "",
+    "no-response-bool": {
+      "true": "",
+      "false": ""
+    },
     "api": {
       "error": "$sender, neco se pokazilo v API!",
       "not-available": "nedostupne"
@@ -60,6 +64,19 @@
             "permissions": "Šeptat, když má uživatel nedostatečná oprávnění",
             "cooldowns": "Šeptat při cooldownu (pokud nastaven jako oznámit)"
           }
+        }
+      },
+      "overlays": {
+        "replay": {
+          "title": "Nastavení replaye",
+          "position": "Pozice",
+          "posleft": "Vlevo",
+          "posright": "Vpravo",
+          "offsetX": "Horizontální posun",
+          "offsetY": "Vertikální posun",
+          "size": "Velikost videa",
+          "volume": "Hlasitost",
+          "label": "Ukazát 'replay' popisek"
         }
       }
     },
