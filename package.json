@@ -39,7 +39,7 @@
     "video.js": "^6.2.5",
     "winston": "^2.3.1",
     "youtube-search": "^1.0.10",
-    "ytdl-core": "^0.15.0"
+    "ytdl-core": "^0.16.1"
   },
   "scripts": {
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
