@@ -88,9 +88,9 @@ Price.prototype.set = function (self, sender, text) {
     self.prices = _.filter(self.prices, function (o) { return o.command !== parsed[1] })
     self.prices.push({command: parsed[1], price: parsed[2], enabled: true})
     global.commons.sendMessage(global.translate('price.success.set')
-      .replace('$command', parsed[1])
-      .replace('$amount', parsed[2])
-      .replace('$pointsName', global.systems.points.getPointsName(parsed[2])), sender)
+      .replace(/\$command/g, parsed[1])
+      .replace(/\$amount/g, parsed[2])
+      .replace(/\$pointsName/g, global.systems.points.getPointsName(parsed[2])), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('price.failed.parse'), sender)
   }
@@ -100,7 +100,7 @@ Price.prototype.unset = function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     self.prices = _.filter(self.prices, function (o) { return o.command !== parsed[1] })
-    global.commons.sendMessage(global.translate('price.success.remove').replace('$command', parsed[1]), sender)
+    global.commons.sendMessage(global.translate('price.success.remove').replace(/\$command/g, parsed[1]), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('price.failed.parse'), sender)
   }
@@ -112,11 +112,11 @@ Price.prototype.toggle = function (self, sender, text) {
     let price = _.find(self.prices, function (o) { return o.command === id })
     if (_.isUndefined(price)) {
       global.commons.sendMessage(global.translate('price.failed.toggle')
-        .replace('$command', id), sender)
+        .replace(/\$command/g, id), sender)
     }
     price.enabled = !price.enabled
     global.commons.sendMessage(global.translate(price.enabled ? 'price.success.enabled' : 'price.success.disabled')
-      .replace('$command', price.command), sender)
+      .replace(/\$command/g, price.command), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
   }
@@ -148,9 +148,9 @@ Price.prototype.checkPrice = function (self, id, sender, text) {
     if (!_.isFinite(availablePts) || !_.isNumber(availablePts) || availablePts < removePts) {
       global.updateQueue(id, false)
       global.commons.sendMessage(global.translate('price.failed.notEnough')
-        .replace('$amount', removePts)
-        .replace('$command', price.command)
-        .replace('$pointsName', global.systems.points.getPointsName(removePts)), sender)
+        .replace(/\$amount/g, removePts)
+        .replace(/\$command/g, price.command)
+        .replace(/\$pointsName/g, global.systems.points.getPointsName(removePts)), sender)
     } else {
       global.users.set(sender.username, { points: availablePts - removePts })
       global.updateQueue(id, true)

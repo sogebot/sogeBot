@@ -44,7 +44,7 @@ Alerts.prototype.overlay = function (self, sender, text) {
       let data = { key: s.split('=')[0], value: s.split('=')[1] }
 
       if (data.key === 'text') {
-        data.value = data.value.replace('$sender', sender.username)
+        data.value = data.value.replace(/\$sender/g, sender.username)
       }
 
       object[data.key] = data.value

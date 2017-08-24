@@ -108,7 +108,7 @@ CustomCommands.prototype.add = function (self, sender, text) {
     if (!_.isUndefined(_.find(self.commands, function (o) { return o.command === command.command }))) throw Error(ERROR_ALREADY_EXISTS)
 
     if (global.parser.isRegistered(command.command)) {
-      global.commons.sendMessage(global.translate('core.isRegistered').replace('$keyword', '!' + command.command), sender)
+      global.commons.sendMessage(global.translate('core.isRegistered').replace(/\$keyword/g, '!' + command.command), sender)
       return
     }
 
@@ -148,13 +148,13 @@ CustomCommands.prototype.toggle = function (self, sender, text) {
     let command = _.find(self.commands, function (o) { return o.command === parsed })
     if (_.isUndefined(command)) {
       global.commons.sendMessage(global.translate('command.failed.toggle')
-        .replace('$command', parsed), sender)
+        .replace(/\$command/g, parsed), sender)
       return
     }
 
     command.enabled = !command.enabled
     global.commons.sendMessage(global.translate(command.enabled ? 'customcmds.success.enabled' : 'customcmds.success.disabled')
-      .replace('$command', command.command), sender)
+      .replace(/\$command/g, command.command), sender)
 
     if (command.enabled) { self.register(self) }
   } catch (e) {
@@ -168,13 +168,13 @@ CustomCommands.prototype.visible = function (self, sender, text) {
     let command = _.find(self.commands, function (o) { return o.command === parsed })
     if (_.isUndefined(command)) {
       global.commons.sendMessage(global.translate('command.failed.visible')
-        .replace('$command', parsed), sender)
+        .replace(/\$command/g, parsed), sender)
       return
     }
 
     command.visible = !command.visible
     global.commons.sendMessage(global.translate(command.visible ? 'customcmds.success.visible' : 'customcmds.success.invisible')
-      .replace('$command', command.command), sender)
+      .replace(/\$command/g, command.command), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
   }

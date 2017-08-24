@@ -75,8 +75,8 @@ Bets.prototype.open = function (self, sender, text) {
     self.bet = {locked: false, bets: {}}
     _.each(parsed, function (option) { self.bet.bets[option] = {} })
     global.commons.sendMessage(global.translate('bets.opened', {username: global.configuration.get().twitch.channel})
-      .replace('$options', Object.keys(self.bet.bets).join(' | '))
-      .replace('$minutes', global.configuration.getValue('betCloseTimer')), sender)
+      .replace(/\$options/g, Object.keys(self.bet.bets).join(' | '))
+      .replace(/\$minutes/g, global.configuration.getValue('betCloseTimer')), sender)
 
     self.bet.end = new Date().getTime() + (parseInt(global.configuration.getValue('betCloseTimer'), 10) * 1000 * 60)
     self.saveTemplate(self, Object.keys(self.bet.bets))
@@ -94,7 +94,7 @@ Bets.prototype.open = function (self, sender, text) {
   } catch (e) {
     switch (e.message) {
       case ERROR_ALREADY_OPENED:
-        global.commons.sendMessage(global.translate('bets.running').replace('$options', Object.keys(self.bet.bets).join(' | ')), sender)
+        global.commons.sendMessage(global.translate('bets.running').replace(/\$options/g, Object.keys(self.bet.bets).join(' | ')), sender)
         break
       case ERROR_NOT_ENOUGH_OPTIONS:
         global.commons.sendMessage(global.translate('bets.notEnoughOptions'), sender)
@@ -124,8 +124,8 @@ Bets.prototype.info = function (self, sender) {
   if (_.isNull(self.bet)) global.commons.sendMessage(global.translate('bets.notRunning'), sender)
   else {
     global.commons.sendMessage(global.translate(self.bet.locked ? 'bets.lockedInfo' : 'bets.info')
-      .replace('$options', Object.keys(self.bet.bets).join(' | '))
-      .replace('$time', parseFloat((self.bet.end - new Date().getTime()) / 1000 / 60).toFixed(1)), sender)
+      .replace(/\$options/g, Object.keys(self.bet.bets).join(' | '))
+      .replace(/\$time/g, parseFloat((self.bet.end - new Date().getTime()) / 1000 / 60).toFixed(1)), sender)
   }
 }
 
@@ -149,25 +149,25 @@ Bets.prototype.saveBet = function (self, sender, text) {
     var removePts = parseInt(bet.amount, 10)
     if (!_.isFinite(availablePts) || !_.isNumber(availablePts) || availablePts < removePts) {
       global.commons.sendMessage(global.translate('bets.notEnoughPoints')
-        .replace('$amount', removePts)
-        .replace('$pointsName', Points.getPointsName(removePts)), sender)
+        .replace(/\$amount/g, removePts)
+        .replace(/\$pointsName/g, Points.getPointsName(removePts)), sender)
     } else {
       var newBet = _.isUndefined(self.bet.bets[bet.option][sender.username]) ? removePts : parseInt(self.bet.bets[bet.option][sender.username], 10) + removePts
       self.bet.bets[bet.option][sender.username] = newBet
       global.users.set(sender.username, { points: availablePts - removePts })
 
       global.commons.sendMessage(global.translate('bets.newBet')
-        .replace('$option', bet.option)
-        .replace('$amount', newBet)
-        .replace('$pointsName', Points.getPointsName(newBet))
-        .replace('$winAmount', Math.round((parseInt(newBet, 10) * percentGain)))
-        .replace('$winPointsName', Points.getPointsName(Math.round((parseInt(newBet, 10) * percentGain)))), sender)
+        .replace(/\$option/g, bet.option)
+        .replace(/\$amount/g, newBet)
+        .replace(/\$pointsName/g, Points.getPointsName(newBet))
+        .replace(/\$winAmount/g, Math.round((parseInt(newBet, 10) * percentGain)))
+        .replace(/\$winPointsName/g, Points.getPointsName(Math.round((parseInt(newBet, 10) * percentGain)))), sender)
     }
   } catch (e) {
     switch (e.message) {
       case ERROR_ZERO_BET:
         global.commons.sendMessage(global.translate('bets.zeroBet')
-          .replace('$pointsName', Points.getPointsName(0)), sender)
+          .replace(/\$pointsName/g, Points.getPointsName(0)), sender)
         break
       case ERROR_NOT_RUNNING:
         global.commons.sendMessage(global.translate('bets.notRunning'), sender)
@@ -180,7 +180,7 @@ Bets.prototype.saveBet = function (self, sender, text) {
         break
       case ERROR_DIFF_BET:
         let result = _.pickBy(self.bet.bets, function (v, k) { return _.includes(Object.keys(v), sender.username) })
-        global.commons.sendMessage(global.translate('bets.diffBet').replace('$option', Object.keys(result)[0]), sender)
+        global.commons.sendMessage(global.translate('bets.diffBet').replace(/\$option/g, Object.keys(result)[0]), sender)
         break
       default:
         global.commons.sendMessage(global.translate('core.error'), sender)
@@ -233,8 +233,8 @@ Bets.prototype.close = function (self, sender, text) {
     })
 
     global.commons.sendMessage(global.translate('bets.closed')
-      .replace('$option', wOption)
-      .replace('$amount', usersToPay.length), sender)
+      .replace(/\$option/g, wOption)
+      .replace(/\$amount/g, usersToPay.length), sender)
   } catch (e) {
     switch (e.message) {
       case ERROR_NOT_RUNNING:

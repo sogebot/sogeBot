@@ -147,9 +147,9 @@ Moderation.prototype.timeoutUser = function (self, sender, warning, msg, time) {
 
   warnings.push(new Date().getTime())
   if (warningsTimeout) {
-    global.commons.timeout(sender.username, warning.replace('$count', parseInt(warningsAllowed, 10) - warnings.length), 1)
+    global.commons.timeout(sender.username, warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length), 1)
   } else {
-    global.commons.sendMessage('(sender): ' + warning.replace('$count', parseInt(warningsAllowed, 10) - warnings.length), sender)
+    global.commons.sendMessage('(sender): ' + warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length), sender)
   }
 
   self.warnings[sender.username] = warnings
@@ -190,9 +190,9 @@ Moderation.prototype.permitLink = function (self, sender, text) {
     })
 
     global.commons.sendMessage(global.translate('moderation.permit')
-      .replace('$who', (global.configuration.getValue('atUsername') ? '@' : '') + parsed[1])
-      .replace('$link', global.parser.getLocalizedName(count, 'core.links'))
-      .replace('$count', count), sender)
+      .replace(/\$who/g, (global.configuration.getValue('atUsername') ? '@' : '') + parsed[1])
+      .replace(/\$link/g, global.parser.getLocalizedName(count, 'core.links'))
+      .replace(/\$count/g, count), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('moderation.failed.parsePermit'), sender)
   }

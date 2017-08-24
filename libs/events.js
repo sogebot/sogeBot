@@ -72,7 +72,7 @@ function Events () {
       global.client.commercial(global.configuration.get().twitch.channel, attr.duration)
     },
     'log': function (attr) {
-      let message = attr.message.replace('$username', attr.username)
+      let message = attr.message.replace(/\$username/g, attr.username)
       _.each(message.match(/\((\w+)\)/gi), function (match) {
         let value = !_.isNil(attr[match.replace('$', '')]) ? attr[match.replace('$', '')] : 'none'
         message = message.replace(match, value)

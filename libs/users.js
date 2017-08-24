@@ -78,16 +78,16 @@ Users.prototype.merge = function (self, sender, text) {
       self.users[username] = _.clone(oldUser[0])
       self.users[username].username = username
       global.commons.sendMessage(global.translate('merge.success')
-        .replace('$username', username)
+        .replace(/\$username/g, username)
         .replace('$merged-username', oldUser[0].username), sender)
       delete self.users[oldUser[0].username]
     } else {
       global.commons.sendMessage(global.translate('merge.noUsernameToMerge')
-        .replace('$username', username), sender)
+        .replace(/\$username/g, username), sender)
     }
   } else {
     global.commons.sendMessage(global.translate('merge.noID')
-      .replace('$username', username), sender)
+      .replace(/\$username/g, username), sender)
   }
 }
 
@@ -154,9 +154,9 @@ Users.prototype.addRegular = function (self, sender, text) {
 
   if (!_.isNil(_.find(self.users, function (o) { return o.username === username }))) {
     self.set(username, { is: { regular: true } })
-    global.commons.sendMessage(global.translate('regulars.add.success').replace('$username', username), sender)
+    global.commons.sendMessage(global.translate('regulars.add.success').replace(/\$username/g, username), sender)
   } else {
-    global.commons.sendMessage(global.translate('regulars.add.undefined').replace('$username', username), sender)
+    global.commons.sendMessage(global.translate('regulars.add.undefined').replace(/\$username/g, username), sender)
     return false
   }
 }
@@ -171,9 +171,9 @@ Users.prototype.rmRegular = function (self, sender, text) {
 
   if (!_.isNil(_.find(self.users, function (o) { return o.username === username }))) {
     self.set(username, { is: { regular: false } })
-    global.commons.sendMessage(global.translate('regulars.rm.success').replace('$username', username), sender)
+    global.commons.sendMessage(global.translate('regulars.rm.success').replace(/\$username/g, username), sender)
   } else {
-    global.commons.sendMessage(global.translate('regulars.rm.undefined').replace('$username', username), sender)
+    global.commons.sendMessage(global.translate('regulars.rm.undefined').replace(/\$username/g, username), sender)
     return false
   }
 }

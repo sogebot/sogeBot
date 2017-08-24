@@ -189,13 +189,13 @@ Notice.prototype.toggle = function (self, sender, text) {
     let notice = _.find(self.notices, function (o) { return o.id === id })
     if (_.isUndefined(notice)) {
       global.commons.sendMessage(global.translate('notice.failed.toggle')
-        .replace('$notice', id), sender)
+        .replace(/\$notice/g, id), sender)
       return
     }
 
     notice.enabled = !notice.enabled
     global.commons.sendMessage(global.translate(notice.enabled ? 'notice.success.enabled' : 'notice.success.disabled')
-      .replace('$notice', notice.id), sender)
+      .replace(/\$notice/g, notice.id), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
   }

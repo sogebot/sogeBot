@@ -111,12 +111,12 @@ Cooldown.prototype.set = function (self, sender, text) {
   if (parseInt(data.seconds, 10) !== 0) {
     self.list[data.command] = { 'miliseconds': data.seconds * 1000, 'type': data.type, 'timestamp': 0, 'quiet': data.quiet, 'enabled': data.enabled }
     global.commons.sendMessage(global.translate('cooldown.success.set')
-      .replace('$command', data.command)
-      .replace('$type', data.type)
-      .replace('$seconds', data.seconds), sender)
+      .replace(/\$command/g, data.command)
+      .replace(/\$type/g, data.type)
+      .replace(/\$seconds/g, data.seconds), sender)
   } else {
     global.commons.sendMessage(global.translate('cooldown.success.unset')
-      .replace('$command', data.command), sender)
+      .replace(/\$command/g, data.command), sender)
   }
 }
 
@@ -172,8 +172,8 @@ Cooldown.prototype.check = function (self, id, sender, text) {
       if (!cooldown.quiet && !global.configuration.getValue('disableCooldownWhispers')) {
         sender['message-type'] = 'whisper' // we want to whisp cooldown message
         global.commons.sendMessage(global.translate('cooldown.failed.cooldown')
-          .replace('$command', cooldown.command)
-          .replace('$seconds', Math.ceil((cooldown.miliseconds - now + timestamp) / 1000)), sender)
+          .replace(/\$command/g, cooldown.command)
+          .replace(/\$seconds/g, Math.ceil((cooldown.miliseconds - now + timestamp) / 1000)), sender)
       }
       result = false
       return false // disable _.each and updateQueue with false
@@ -188,13 +188,13 @@ Cooldown.prototype.toggle = function (self, sender, text) {
     let cooldown = _.find(self.list, function (o, k) { return k === parsed })
     if (_.isUndefined(cooldown)) {
       global.commons.sendMessage(global.translate('cooldown.failed.toggle')
-        .replace('$command', parsed), sender)
+        .replace(/\$command/g, parsed), sender)
       return
     }
 
     cooldown.enabled = !cooldown.enabled
     global.commons.sendMessage(global.translate(cooldown.enabled ? 'cooldown.success.enabled' : 'cooldown.success.disabled')
-      .replace('$command', parsed), sender)
+      .replace(/\$command/g, parsed), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('cooldown.failed.parse'), sender)
   }
@@ -206,13 +206,13 @@ Cooldown.prototype.toggleModerators = function (self, sender, text) {
     let cooldown = _.find(self.list, function (o, k) { return k === parsed })
     if (_.isUndefined(cooldown)) {
       global.commons.sendMessage(global.translate('cooldown.toggle.moderator.failed')
-        .replace('$command', parsed), sender)
+        .replace(/\$command/g, parsed), sender)
       return
     }
 
     cooldown.moderator = !cooldown.moderator
     global.commons.sendMessage(global.translate(cooldown.moderator ? 'cooldown.toggle.moderator.enabled' : 'cooldown.toggle.moderator.disabled')
-      .replace('$command', parsed), sender)
+      .replace(/\$command/g, parsed), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('cooldown.failed.parse'), sender)
   }
@@ -224,13 +224,13 @@ Cooldown.prototype.toggleOwners = function (self, sender, text) {
     let cooldown = _.find(self.list, function (o, k) { return k === parsed })
     if (_.isUndefined(cooldown)) {
       global.commons.sendMessage(global.translate('cooldown.toggle.owner.failed')
-        .replace('$command', parsed), sender)
+        .replace(/\$command/g, parsed), sender)
       return
     }
 
     cooldown.owner = !cooldown.owner
     global.commons.sendMessage(global.translate(cooldown.owner ? 'cooldown.toggle.owner.enabled' : 'cooldown.toggle.owner.disabled')
-      .replace('$command', parsed), sender)
+      .replace(/\$command/g, parsed), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('cooldown.failed.parse'), sender)
   }

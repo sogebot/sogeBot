@@ -102,7 +102,7 @@ Queue.prototype.pick = function (self, sender, text) {
   }
 
   global.commons.sendMessage(msg
-    .replace('$users', self.picked.join(', ')), sender)
+    .replace(/\$users/g, self.picked.join(', ')), sender)
 }
 
 module.exports = new Queue()

@@ -72,12 +72,12 @@ function Gambling () {
         const probability = tickets / (parseInt(total, 10) / 100)
 
         global.commons.sendMessage(global.translate((_.size(self.current.duel) === 1) ? 'gambling.duel.noContestant' : 'gambling.duel.winner')
-          .replace('$pointsName', global.systems.points.getPointsName(total))
-          .replace('$points', total)
-          .replace('$probability', _.round(probability, 2))
-          .replace('$tickets', tickets)
-          .replace('$ticketsName', global.systems.points.getPointsName(tickets))
-          .replace('$winner', (global.configuration.getValue('atUsername') ? '@' : '') + username), { username: username }, { force: true })
+          .replace(/\$pointsName/g, global.systems.points.getPointsName(total))
+          .replace(/\$points/g, total)
+          .replace(/\$probability/g, _.round(probability, 2))
+          .replace(/\$tickets/g, tickets)
+          .replace(/\$ticketsName/g, global.systems.points.getPointsName(tickets))
+          .replace(/\$winner/g, (global.configuration.getValue('atUsername') ? '@' : '') + username), { username: username }, { force: true })
 
         // give user his points
         const user = global.users.get(username)
@@ -127,8 +127,8 @@ Gambling.prototype.duel = function (self, sender, text) {
         self.current.duel[sender.username.toLowerCase()] = parseInt(points, 10)
       } else {
         global.commons.sendMessage(global.translate('gambling.fightme.cooldown')
-          .replace('$cooldown', Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.duel)) / 1000 / 60))
-          .replace('$minutesName', global.parser.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.duel)) / 1000 / 60), 'core.minutes')), sender)
+          .replace(/\$cooldown/g, Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.duel)) / 1000 / 60))
+          .replace(/\$minutesName/g, global.parser.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.duel)) / 1000 / 60), 'core.minutes')), sender)
         return true
       }
     }
@@ -137,16 +137,16 @@ Gambling.prototype.duel = function (self, sender, text) {
     if (_.isNil(self.current.duel._timestamp)) {
       self.current.duel._timestamp = new Date().getTime()
       global.commons.sendMessage(global.translate('gambling.duel.new')
-        .replace('$minutes', 5)
-        .replace('$minutesName', global.parser.getLocalizedName(5, 'core.minutes')), sender)
+        .replace(/\$minutes/g, 5)
+        .replace(/\$minutesName/g, global.parser.getLocalizedName(5, 'core.minutes')), sender)
     }
 
     // save points to _total
     self.current.duel._total = parseInt(self.current.duel._total, 10) + parseInt(points, 10)
 
     global.commons.sendMessage(global.translate(newDuelist ? 'gambling.duel.joined' : 'gambling.duel.added')
-      .replace('$pointsName', global.systems.points.getPointsName(self.current.duel[sender.username.toLowerCase()]))
-      .replace('$points', self.current.duel[sender.username.toLowerCase()]), sender)
+      .replace(/\$pointsName/g, global.systems.points.getPointsName(self.current.duel[sender.username.toLowerCase()]))
+      .replace(/\$points/g, self.current.duel[sender.username.toLowerCase()]), sender)
   } catch (e) {
     switch (e.message) {
       case ERROR_NOT_ENOUGH_OPTIONS:
@@ -154,11 +154,11 @@ Gambling.prototype.duel = function (self, sender, text) {
         break
       case ERROR_ZERO_BET:
         global.commons.sendMessage(global.translate('gambling.duel.zeroBet')
-        .replace('$pointsName', global.systems.points.getPointsName(0)), sender)
+        .replace(/\$pointsName/g, global.systems.points.getPointsName(0)), sender)
         break
       case ERROR_NOT_ENOUGH_POINTS:
         global.commons.sendMessage(global.translate('gambling.duel.notEnoughPoints')
-        .replace('$pointsName', global.systems.points.getPointsName(points).toLowerCase()), sender)
+        .replace(/\$pointsName/g, global.systems.points.getPointsName(points).toLowerCase()), sender)
         break
     }
   }
@@ -221,7 +221,7 @@ Gambling.prototype.fightme = function (self, sender, text) {
     // vs broadcaster
     if (global.parser.isBroadcaster(sender) || global.parser.isBroadcaster(username)) {
       global.commons.sendMessage(global.translate('gambling.fightme.broadcaster')
-        .replace('$winner', global.parser.isBroadcaster(sender) ? sender.username : username), sender)
+        .replace(/\$winner/g, global.parser.isBroadcaster(sender) ? sender.username : username), sender)
       if ((self.current.fightme[sender.username].mod || sender.mod) === false) global.client.timeout(global.configuration.get().twitch.channel, global.parser.isBroadcaster(sender) ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
       self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
       return
@@ -230,7 +230,7 @@ Gambling.prototype.fightme = function (self, sender, text) {
     // mod vs mod
     if (self.current.fightme[sender.username].mod && sender.mod) {
       global.commons.sendMessage(global.translate('gambling.fightme.bothModerators')
-        .replace('$challenger', username), sender)
+        .replace(/\$challenger/g, username), sender)
       self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
       return
     }
@@ -238,7 +238,7 @@ Gambling.prototype.fightme = function (self, sender, text) {
     // vs mod
     if (self.current.fightme[sender.username].mod || sender.mod) {
       global.commons.sendMessage(global.translate('gambling.fightme.oneModerator')
-        .replace('$winner', sender.mod ? sender.username : username), sender)
+        .replace(/\$winner/g, sender.mod ? sender.username : username), sender)
       global.client.timeout(global.configuration.get().twitch.channel, sender.mod ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
       self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
       return
@@ -246,7 +246,7 @@ Gambling.prototype.fightme = function (self, sender, text) {
 
     global.client.timeout(global.configuration.get().twitch.channel, winner ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
     global.commons.sendMessage(global.translate('gambling.fightme.winner')
-      .replace('$winner', winner ? username : sender.username), sender)
+      .replace(/\$winner/g, winner ? username : sender.username), sender)
     self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
   } else {
     // check if under gambling cooldown
@@ -254,8 +254,8 @@ Gambling.prototype.fightme = function (self, sender, text) {
     if (new Date().getTime() - self.cooldown.fightme < cooldown * 1000 &&
       !(global.configuration.getValue('gamblingCooldownBypass') && (sender.mod || global.parser.isBroadcaster(sender)))) {
       global.commons.sendMessage(global.translate('gambling.fightme.cooldown')
-        .replace('$cooldown', Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.fightme)) / 1000 / 60))
-        .replace('$minutesName', global.parser.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.fightme)) / 1000 / 60), 'core.minutes')), sender)
+        .replace(/\$cooldown/g, Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.fightme)) / 1000 / 60))
+        .replace(/\$minutesName/g, global.parser.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.fightme)) / 1000 / 60), 'core.minutes')), sender)
       return
     }
 
@@ -267,7 +267,7 @@ Gambling.prototype.fightme = function (self, sender, text) {
     self.current.fightme[sender.username].push(username)
     self.current.fightme[sender.username] = _.uniq(self.current.fightme[sender.username])
     global.commons.sendMessage(global.translate('gambling.fightme.challenge')
-      .replace('$username', username), sender)
+      .replace(/\$username/g, username), sender)
   }
 }
 
@@ -288,25 +288,25 @@ Gambling.prototype.gamble = function (self, sender, text) {
     if (_.random(0, 1)) {
       global.users.set(sender.username, { points: parseInt(user.points, 10) + (parseInt(points, 10) * 2) })
       global.commons.sendMessage(global.translate('gambling.gamble.win')
-        .replace('$points', global.users.get(sender.username).points)
-        .replace('$pointsName', global.systems.points.getPointsName(global.users.get(sender.username).points)), sender)
+        .replace(/\$points/g, global.users.get(sender.username).points)
+        .replace(/\$pointsName/g, global.systems.points.getPointsName(global.users.get(sender.username).points)), sender)
     } else {
       global.commons.sendMessage(global.translate('gambling.gamble.lose')
-        .replace('$points', global.users.get(sender.username).points)
-        .replace('$pointsName', global.systems.points.getPointsName(global.users.get(sender.username).points)), sender)
+        .replace(/\$points/g, global.users.get(sender.username).points)
+        .replace(/\$pointsName/g, global.systems.points.getPointsName(global.users.get(sender.username).points)), sender)
     }
   } catch (e) {
     switch (e.message) {
       case ERROR_ZERO_BET:
         global.commons.sendMessage(global.translate('gambling.gamble.zeroBet')
-        .replace('$pointsName', global.systems.points.getPointsName(0)), sender)
+        .replace(/\$pointsName/g, global.systems.points.getPointsName(0)), sender)
         break
       case ERROR_NOT_ENOUGH_OPTIONS:
         global.commons.sendMessage(global.translate('gambling.gamble.notEnoughOptions'), sender)
         break
       case ERROR_NOT_ENOUGH_POINTS:
         global.commons.sendMessage(global.translate('gambling.gamble.notEnoughPoints')
-        .replace('$pointsName', global.systems.points.getPointsName(points).toLowerCase()), sender)
+        .replace(/\$pointsName/g, global.systems.points.getPointsName(points).toLowerCase()), sender)
         break
       default:
         global.commons.sendMessage(global.translate('core.error'), sender)

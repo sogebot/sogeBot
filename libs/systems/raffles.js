@@ -62,10 +62,10 @@ function Raffles () {
       let message
       if (global.configuration.getValue('raffleAnnounceCustomMessage').length > 0) {
         message = global.configuration.getValue('raffleAnnounceCustomMessage')
-          .replace('$keyword', self.keyword)
-          .replace('$product', self.product)
-          .replace('$min', self.minTickets)
-          .replace('$max', self.maxTickets)
+          .replace(/\$keyword/g, self.keyword)
+          .replace(/\$product/g, self.product)
+          .replace(/\$min/g, self.minTickets)
+          .replace(/\$max/g, self.maxTickets)
       } else {
         let path = 'raffle.open.notice'
 
@@ -77,14 +77,14 @@ function Raffles () {
         if (self.type === TYPE_TICKETS) path += 'Tickets'
 
         message = global.translate(path)
-          .replace('$keyword', self.keyword)
-          .replace('$product', self.product)
-          .replace('$min', self.minTickets)
-          .replace('$max', self.maxTickets)
+          .replace(/\$keyword/g, self.keyword)
+          .replace(/\$product/g, self.product)
+          .replace(/\$min/g, self.minTickets)
+          .replace(/\$max/g, self.maxTickets)
       }
 
       if (self.minWatchedTime > 0) {
-        message += ' ' + global.translate('raffle.minWatchedTime').replace('$time', self.minWatchedTime)
+        message += ' ' + global.translate('raffle.minWatchedTime').replace(/\$time/g, self.minWatchedTime)
       }
       global.commons.sendMessage(message + '.', { username: null }, { force: true })
     }, 10000)
@@ -155,9 +155,9 @@ Raffles.prototype.pick = function (self, sender) {
   global.botDB.update({_id: 'raffle'}, {$set: { winner: global.users.get(winner), locked: true, timestamp: new Date().getTime() }})
   self.locked = true
   global.commons.sendMessage(global.translate(!_.isNil(self.product) && self.product.trim().length > 0 ? 'raffle.pick.winner.withProduct' : 'raffle.pick.winner.withoutProduct')
-    .replace('$winner', winner)
-    .replace('$product', self.product)
-    .replace('$probability', _.round(probability, 2)), sender)
+    .replace(/\$winner/g, winner)
+    .replace(/\$product/g, self.product)
+    .replace(/\$probability/g, _.round(probability, 2)), sender)
   global.parser.unregister('!' + self.keyword)
   global.widgets.raffles.sendWinner(global.widgets.raffles, global.users.get(winner))
   clearInterval(self.timer)
@@ -233,13 +233,13 @@ Raffles.prototype.info = function (self, sender) {
         if (item.type === TYPE_TICKETS) path += 'Tickets'
 
         message = global.translate(path)
-          .replace('$keyword', item.keyword)
-          .replace('$product', item.product)
-          .replace('$min', item.minTickets)
-          .replace('$max', item.maxTickets)
+          .replace(/\$keyword/g, item.keyword)
+          .replace(/\$product/g, item.product)
+          .replace(/\$min/g, item.minTickets)
+          .replace(/\$max/g, item.maxTickets)
 
         if (item.minWatchedTime > 0) {
-          message += ' ' + global.translate('raffle.minWatchedTime').replace('$time', item.minWatchedTime)
+          message += ' ' + global.translate('raffle.minWatchedTime').replace(/\$time/g, item.minWatchedTime)
         }
         global.commons.sendMessage(message + '.', sender)
       } else {
@@ -319,7 +319,7 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
 
     // check if keyword is free
     if (global.parser.isRegistered(raffle.keyword)) {
-      global.commons.sendMessage(global.translate('core.isRegistered').replace('$keyword', '!' + raffle.keyword), sender)
+      global.commons.sendMessage(global.translate('core.isRegistered').replace(/\$keyword/g, '!' + raffle.keyword), sender)
       return
     }
 
@@ -337,13 +337,13 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
       if (raffle.type === TYPE_TICKETS) path += 'Tickets'
 
       message = global.translate(path)
-        .replace('$keyword', raffle.keyword)
-        .replace('$product', raffle.product)
-        .replace('$min', raffle.minTickets)
-        .replace('$max', raffle.maxTickets)
+        .replace(/\$keyword/g, raffle.keyword)
+        .replace(/\$product/g, raffle.product)
+        .replace(/\$min/g, raffle.minTickets)
+        .replace(/\$max/g, raffle.maxTickets)
 
       if (raffle.minWatchedTime > 0) {
-        message += ' ' + global.translate('raffle.minWatchedTime').replace('$time', raffle.minWatchedTime)
+        message += ' ' + global.translate('raffle.minWatchedTime').replace(/\$time/g, raffle.minWatchedTime)
       }
       global.commons.sendMessage(message + '.', sender)
 
@@ -355,7 +355,7 @@ Raffles.prototype.open = function (self, sender, text, dashboard = false) {
       self.lastAnnounce = new Date().getTime()
       if (global.configuration.getValue('raffleTitleTemplate').trim().length > 0) {
         self.status = global.twitch.currentStatus
-        global.twitch.setTitle(global.twitch, null, self.status + ' ' + global.configuration.getValue('raffleTitleTemplate').replace('$product', !raffle.product ? ' ' : raffle.product).replace('$keyword', raffle.keyword))
+        global.twitch.setTitle(global.twitch, null, self.status + ' ' + global.configuration.getValue('raffleTitleTemplate').replace(/\$product/g, !raffle.product ? ' ' : raffle.product).replace(/\$keyword/g, raffle.keyword))
       }
     })
   } catch (err) {

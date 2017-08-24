@@ -108,10 +108,10 @@ Highlights.prototype.sendHighlight = function (self, socket) {
 
 Highlights.prototype.add = function (self, highlight, timestamp, sender) {
   global.commons.sendMessage(global.translate(_.isNil(highlight.description) ? 'highlights.saved.no-description' : 'highlights.saved.description')
-    .replace('$description', highlight.description)
-    .replace('$hours', (timestamp.hours < 10) ? '0' + timestamp.hours : timestamp.hours)
-    .replace('$minutes', (timestamp.minutes < 10) ? '0' + timestamp.minutes : timestamp.minutes)
-    .replace('$seconds', (timestamp.seconds < 10) ? '0' + timestamp.seconds : timestamp.seconds), sender)
+    .replace(/\$description/g, highlight.description)
+    .replace(/\$hours/g, (timestamp.hours < 10) ? '0' + timestamp.hours : timestamp.hours)
+    .replace(/\$minutes/g, (timestamp.minutes < 10) ? '0' + timestamp.minutes : timestamp.minutes)
+    .replace(/\$seconds/g, (timestamp.seconds < 10) ? '0' + timestamp.seconds : timestamp.seconds), sender)
 
   self.highlights.push(highlight)
 }
@@ -133,6 +133,6 @@ Highlights.prototype.list = function (self, sender) {
       highlight.timestamp.seconds + 's')
   }
   global.commons.sendMessage(global.translate(list.length > 0 ? 'highlights.list.items' : 'highlights.list.empty')
-    .replace('$items', list.join(', ')), sender)
+    .replace(/\$items/g, list.join(', ')), sender)
 }
 module.exports = new Highlights()
