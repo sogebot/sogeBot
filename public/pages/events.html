@@ -204,6 +204,7 @@ $('#operations-list').on('change', function(ev) {
 
   switch (ev.currentTarget.value) {
     case 'send-chat-message':
+    case 'send-twitter-message':
     case 'send-whisper':
       $('#messageGroup').css('display', 'inline-block')
       break
@@ -399,6 +400,7 @@ socket.on('events', function(data) {
 
             switch (operation.name) {
               case 'send-chat-message':
+              case 'send-twitter-message':
               case 'send-whisper':
                 div_op.data('send', operation.send)
                 div_part = $('<div></div>')

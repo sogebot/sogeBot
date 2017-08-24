@@ -58,6 +58,7 @@ global.client = new irc.Client(options)
 
 global.translate().then(function () {
   global.systems = require('auto-load')('./libs/systems/')
+  global.integrations = require('auto-load')('./libs/integrations/')
   global.widgets = require('auto-load')('./libs/widgets/')
   global.overlays = require('auto-load')('./libs/overlays/')
 })

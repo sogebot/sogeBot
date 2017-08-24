@@ -15,6 +15,13 @@ Commons.prototype.isSystemEnabled = function (fn) {
   return enabled
 }
 
+Commons.prototype.isIntegrationEnabled = function (fn) {
+  var name = (typeof fn === 'object') ? fn.constructor.name : fn
+  var enabled = global.configuration.get().integrations[name.toLowerCase()]
+  if (typeof fn === 'object') global.log.info(name + ' integration ' + global.translate('core.loaded') + ' ' + (enabled ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
+  return enabled
+}
+
 Commons.prototype.insertIfNotExists = function (data) {
   var callbacks = this.getCallbacks(data)
   var toInsert = this.stripUnderscores(data)

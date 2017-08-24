@@ -477,14 +477,6 @@
         $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
       })
 
-      /* WIDGETS */
-      var deleteWidget = function(id) {
-        $('#' + id).remove();
-        console.debug('EMIT [deleteWidget]', 0)
-        socket.emit('deleteWidget', id)
-        loadedWidgets.splice(loadedWidgets.indexOf(id), 1)
-      }
-
       socket.on('widgets', function(widgets) {
         _.each(widgets, function(widget) {
           widget = widget.split(':')
@@ -588,7 +580,33 @@
         $('#game').prop('title', data.game)
       })
 
-      var commons = {
+      socket.on('sendGameFromTwitch', function(status) {
+        changeGT.gameInputStatus(status)
+      })
+
+      socket.on('sendUserTwitchGamesAndTitles', function(data) {
+        delete data._id
+        changeGT.update(data)
+      })
+
+      socket.on('lang', function (data) {
+        translations = data
+        _.each(data, function (value, key) {
+          $('[data-lang="' + key + '"]').text(value)
+        })
+        $('#change-game-input').attr('placeholder', translations['create-and-use-a-new-game'])
+        $('#change-title').attr('placeholder', translations['create-and-use-a-new-title'])
+      })
+
+      socket.off('play-sound')
+      socket.on('play-sound', function (sound) {
+        var audio = new Audio(sound).play()
+      })
+    })
+
+
+
+    var commons = {
         translate: function () {
           _.each($('[data-lang]'), function (el) {
             var key = ($(el).data('lang'))
@@ -981,29 +999,13 @@
         }
       }
 
-      socket.on('sendGameFromTwitch', function(status) {
-        changeGT.gameInputStatus(status)
-      })
-
-      socket.on('sendUserTwitchGamesAndTitles', function(data) {
-        delete data._id
-        changeGT.update(data)
-      })
-
-      socket.on('lang', function (data) {
-        translations = data
-        _.each(data, function (value, key) {
-          $('[data-lang="' + key + '"]').text(value)
-        })
-        $('#change-game-input').attr('placeholder', translations['create-and-use-a-new-game'])
-        $('#change-title').attr('placeholder', translations['create-and-use-a-new-title'])
-      })
-
-      socket.off('play-sound')
-      socket.on('play-sound', function (sound) {
-        var audio = new Audio(sound).play()
-      })
-    })
+      /* WIDGETS */
+      var deleteWidget = function(id) {
+        $('#' + id).remove();
+        console.debug('EMIT [deleteWidget]', 0)
+        socket.emit('deleteWidget', id)
+        loadedWidgets.splice(loadedWidgets.indexOf(id), 1)
+      }
   </script>
 </body>
 
