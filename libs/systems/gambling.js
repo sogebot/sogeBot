@@ -146,7 +146,7 @@ Gambling.prototype.duel = function (self, sender, text) {
 
     global.commons.sendMessage(global.translate(newDuelist ? 'gambling.duel.joined' : 'gambling.duel.added')
       .replace('$pointsName', global.systems.points.getPointsName(self.current.duel[sender.username.toLowerCase()]))
-      .replace('points', self.current.duel[sender.username.toLowerCase()]), sender)
+      .replace('$points', self.current.duel[sender.username.toLowerCase()]), sender)
   } catch (e) {
     switch (e.message) {
       case ERROR_NOT_ENOUGH_OPTIONS:
