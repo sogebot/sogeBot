@@ -17,8 +17,21 @@ function Panel () {
 
   // static routing
   app.get('/auth/token.js', function (req, res) {
-    res.set('Content-Type', 'application/javascript')
-    res.send('const token="' + global.configuration.get().panel.token.trim() + '"')
+    const origin = req.headers.referer ? req.headers.referer.substring(0, req.headers.referer.length - 1) : undefined
+    const domain = global.configuration.get().panel.domain.trim()
+    if (_.isNil(origin)) {
+      // file CANNOT be accessed directly
+      res.status(401).send('401 Access Denied - This is not a file you are looking for.')
+      return
+    }
+
+    if (origin.match(new RegExp('https?://' + domain))) {
+      res.set('Content-Type', 'application/javascript')
+      res.send('const token="' + global.configuration.get().panel.token.trim() + '"')
+    } else {
+      // file CANNOT be accessed from different domain
+      res.status(403).send('403 Forbidden - You are looking at wrong castle.')
+    }
   })
   app.get('/playlist', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'playlist', 'index.html'))
