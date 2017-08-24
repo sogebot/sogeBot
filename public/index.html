@@ -247,6 +247,7 @@
   <script type="text/javascript" src="./dist/bootstrap-menu/js/BootstrapMenu.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.1/markdown-it.js"></script>
+  <script type="text/javascript" src="/auth/token.js"></script>
   <script src="/dist/velocity-animate/js/velocity.min.js"></script>
 
   <script>
@@ -258,748 +259,750 @@
     var systems
 
     var translations = {}
-
-    console.debug('EMIT [getVersion]')
-    socket.emit('getVersion')
-    socket.once('version', function(version) {
-      $.get('https://api.github.com/repos/sogehige/sogebot/releases/latest', function (response) {
-        var md = new markdownit()
-        var commits = new RegExp('[0-9a-f]{5,40}', 'gm')
-        let commits_match = response.body.match(commits)
-        if (!_.isNil(commits_match)) {
-          for (let commit of commits_match) {
-            commit_short = commit.substring(0, 6)
-            response.body = response.body.replace(commit, '[' + commit_short + '](https://github.com/sogehige/sogeBot/commit/' + commit_short + ')')
+    socket.emit('authenticate', token)
+    socket.on('authenticated', function () {
+      console.debug('EMIT [getVersion]')
+      socket.emit('getVersion')
+      socket.once('version', function(version) {
+        $.get('https://api.github.com/repos/sogehige/sogebot/releases/latest', function (response) {
+          var md = new markdownit()
+          var commits = new RegExp('[0-9a-f]{5,40}', 'gm')
+          let commits_match = response.body.match(commits)
+          if (!_.isNil(commits_match)) {
+            for (let commit of commits_match) {
+              commit_short = commit.substring(0, 6)
+              response.body = response.body.replace(commit, '[' + commit_short + '](https://github.com/sogehige/sogeBot/commit/' + commit_short + ')')
+            }
           }
-        }
 
-        var issues = new RegExp('#[0-9]{1,4}', 'gm')
-        let issues_match = response.body.match(issues)
-        if (!_.isNil(issues_match)) {
-          for (let issue of issues_match) {
-            response.body = response.body.replace(issue, '[' + issue + '](https://github.com/sogehige/sogeBot/issues/' + issue.replace('#', '') + ')')
+          var issues = new RegExp('#[0-9]{1,4}', 'gm')
+          let issues_match = response.body.match(issues)
+          if (!_.isNil(issues_match)) {
+            for (let issue of issues_match) {
+              response.body = response.body.replace(issue, '[' + issue + '](https://github.com/sogehige/sogeBot/issues/' + issue.replace('#', '') + ')')
+            }
           }
-        }
 
-        $('#new_version_dlg .modal-body').html(md.render(response.body.replace('**Changelog**', '').trim()))
-        $('#new_version_dlg .modal-header small').text(response.tag_name)
-        if (response.tag_name !== version) $('#new-version-notice').css('display', 'inline-block')
+          $('#new_version_dlg .modal-body').html(md.render(response.body.replace('**Changelog**', '').trim()))
+          $('#new_version_dlg .modal-header small').text(response.tag_name)
+          if (response.tag_name !== version) $('#new-version-notice').css('display', 'inline-block')
+        })
       })
-    })
 
-    console.debug('EMIT [getSystems]')
-    socket.emit('getSystems')
-    socket.on('systems', function(data) {
-      systems = data
-    })
+      console.debug('EMIT [getSystems]')
+      socket.emit('getSystems')
+      socket.on('systems', function(data) {
+        systems = data
+      })
 
-    console.debug('EMIT [getConfiguration]')
-    socket.emit('getConfiguration')
-    socket.on('configuration', function (data) {
-      /* THEME */
-      if (data.theme === 'dark') {
-          $('head').append('<link rel="stylesheet" href="./dist/css/dark.css">')
-          var btn = $('#theme-btn')
+      console.debug('EMIT [getConfiguration]')
+      socket.emit('getConfiguration')
+      socket.on('configuration', function (data) {
+        /* THEME */
+        if (data.theme === 'dark') {
+            $('head').append('<link rel="stylesheet" href="./dist/css/dark.css">')
+            var btn = $('#theme-btn')
+            btn.text(translations['light'])
+        }
+
+        /* MUTE BUTTON */
+        var btn = $('#mute-btn')
+        btn.data('muted', !data.mute)
+        switchMute(false)
+
+        /* PERCENTAGE BUTTON */
+        var btn = $('#percentage-btn')
+        btn.data('showPercentage', !data.percentage)
+        switchPercentageShow(false)
+      })
+
+      var saveHighlight = function () {
+        console.debug('EMIT [highlight.save]')
+        socket.emit('highlight.save')
+
+      }
+      var switchTheme = function () {
+        var btn = $('#theme-btn')
+        if (btn.text() === translations['dark']) {
           btn.text(translations['light'])
-      }
-
-      /* MUTE BUTTON */
-      var btn = $('#mute-btn')
-      btn.data('muted', !data.mute)
-      switchMute(false)
-
-      /* PERCENTAGE BUTTON */
-      var btn = $('#percentage-btn')
-      btn.data('showPercentage', !data.percentage)
-      switchPercentageShow(false)
-    })
-
-    var saveHighlight = function () {
-      console.debug('EMIT [highlight.save]')
-      socket.emit('highlight.save')
-
-    }
-    var switchTheme = function () {
-      var btn = $('#theme-btn')
-      if (btn.text() === translations['dark']) {
-        btn.text(translations['light'])
-        $('head').append('<link rel="stylesheet" href="./dist/css/dark.css">')
-        console.debug('EMIT [saveConfiguration]', {'theme': 'dark'})
-        socket.emit('saveConfiguration', {'theme': 'dark'})
-      } else {
-        btn.text(translations['dark'])
-        $("LINK[href='./dist/css/dark.css']").remove();
-        console.debug('EMIT [saveConfiguration]', {'theme': 'light'})
-        socket.emit('saveConfiguration', {'theme': 'light'})
-      }
-    }
-
-    var switchStats = function () {
-      var btn = $('#stats-btn')
-      var container = $('.stream-info-container')
-
-      if (btn.children('span').text() === translations['stats-panel'].hide) {
-        container.css('display', 'none')
-        btn.children('span').text(translations['stats-panel'].show)
-        btn.children('i').removeClass().addClass('fa fa-angle-down')
-      } else {
-        container.css('display', 'block')
-        btn.children('span').text(translations['stats-panel'].hide)
-        btn.children('i').removeClass().addClass('fa fa-angle-up')
-      }
-    }
-
-    var switchMute = function (update = true) {
-      var btn = $('#mute-btn')
-      btn.removeClass()
-      if (btn.data('muted')) {
-        btn.addClass('btn btn-default btn-xs')
-      } else {
-        btn.addClass('btn btn-success btn-xs')
-      }
-      btn.data('muted', !btn.data('muted'))
-      if (update) {
-        console.debug('EMIT [saveConfiguration]', {'mute': btn.data('muted')})
-        socket.emit('saveConfiguration', {'mute': btn.data('muted')})
-      }
-    }
-
-    var switchPercentageShow = function(update = true) {
-      var btn = $('#percentage-btn')
-      btn.removeClass()
-      if (btn.data('showPercentage')) {
-        btn.addClass('btn btn-default btn-xs')
-      } else {
-        btn.addClass('btn btn-info btn-xs')
-      }
-      btn.data('showPercentage', !btn.data('showPercentage'))
-      if (update) {
-        console.debug('EMIT [saveConfiguration]', {'percentage': btn.data('showPercentage')})
-        socket.emit('saveConfiguration', {'percentage': btn.data('showPercentage')})
-      }
-    }
-
-    var setStatus = function (id, status) {
-      $("#" + id + "Status").removeClass()
-
-      if (id === 'SOC' && status === 0) {
-        $("[id$='Status']").removeClass()
-        $("[id$='Status']").addClass('text-muted')
-      }
-
-      if (id === 'RES') {
-          $("#" + id + "Status").attr('title', 'Average bot response ' + status + 'ms')
-          if (status >= 1000) {
-            $("#" + id + "Status").addClass('text-danger')
-          } else if (status < 1000 && status >= 400) {
-            $("#" + id + "Status").addClass('text-warning')
-          } else {
-            $("#" + id + "Status").addClass('text-success')
-          }
-          $("#" + id + "Status").text(status + 'ms')
-      }
-
-      if (id === 'MOD') {
-        $("#" + id + "Status").attr('title', 'Bot is' + (status ? ' ' : ' not ') + 'a MOD')
-        $("#" + id + "Status").addClass('text-' + (status ? 'success' : 'danger'))
-        return
-      }
-
-      switch (status) {
-        case 0:
-          $("#" + id + "Status").attr('title', id + ' disconnected')
-          $("#" + id + "Status").addClass('text-danger')
-          break;
-        case 1:
-          $("#" + id + "Status").attr('title', id + ' connecting')
-          $("#" + id + "Status").addClass('text-warning')
-          break;
-        case 2:
-          $("#" + id + "Status").attr('title', id + ' reconnecting')
-          $("#" + id + "Status").addClass('text-warning')
-        case 3:
-          $("#" + id + "Status").attr('title', id + ' connected')
-          $("#" + id + "Status").addClass('text-success')
-          break;
-      }
-    }
-    setInterval(function () { console.debug('EMIT [getConnectionStatus]'); socket.emit('getConnectionStatus'); setStatus('SOC', socket.connected ? 3 : 0) }, 1000)
-    socket.on('connectionStatus', function (data) {
-      _.each(data, function (status, conn) {
-        setStatus(conn, status)
-      })
-    })
-
-    /* MENU */
-    socket.on('menu', function(menu) {
-      if (loadedMenu) return
-      /* at first, clear all menu */
-      $('#menu-*').empty()
-      var systems = false // we want only systems settings once
-      var overlays = false // we want only overlays settings once
-      _.each(menu, function(obj) {
-        if (obj.id !== 'dashboard') {
-          if ((obj.id === 'systems') && systems) return
-          if ((obj.id === 'overlays') && overlays) return
-          $('#menu-' + obj.category).append('<li><a href="#" data-page="' + obj.id + '" data-lang="' + obj.name + '"></a></li>')
+          $('head').append('<link rel="stylesheet" href="./dist/css/dark.css">')
+          console.debug('EMIT [saveConfiguration]', {'theme': 'dark'})
+          socket.emit('saveConfiguration', {'theme': 'dark'})
+        } else {
+          btn.text(translations['dark'])
+          $("LINK[href='./dist/css/dark.css']").remove();
+          console.debug('EMIT [saveConfiguration]', {'theme': 'light'})
+          socket.emit('saveConfiguration', {'theme': 'light'})
         }
-        if (obj.id === 'systems') systems = true
-        if (obj.id === 'overlays') overlays = true
+      }
+
+      var switchStats = function () {
+        var btn = $('#stats-btn')
+        var container = $('.stream-info-container')
+
+        if (btn.children('span').text() === translations['stats-panel'].hide) {
+          container.css('display', 'none')
+          btn.children('span').text(translations['stats-panel'].show)
+          btn.children('i').removeClass().addClass('fa fa-angle-down')
+        } else {
+          container.css('display', 'block')
+          btn.children('span').text(translations['stats-panel'].hide)
+          btn.children('i').removeClass().addClass('fa fa-angle-up')
+        }
+      }
+
+      var switchMute = function (update = true) {
+        var btn = $('#mute-btn')
+        btn.removeClass()
+        if (btn.data('muted')) {
+          btn.addClass('btn btn-default btn-xs')
+        } else {
+          btn.addClass('btn btn-success btn-xs')
+        }
+        btn.data('muted', !btn.data('muted'))
+        if (update) {
+          console.debug('EMIT [saveConfiguration]', {'mute': btn.data('muted')})
+          socket.emit('saveConfiguration', {'mute': btn.data('muted')})
+        }
+      }
+
+      var switchPercentageShow = function(update = true) {
+        var btn = $('#percentage-btn')
+        btn.removeClass()
+        if (btn.data('showPercentage')) {
+          btn.addClass('btn btn-default btn-xs')
+        } else {
+          btn.addClass('btn btn-info btn-xs')
+        }
+        btn.data('showPercentage', !btn.data('showPercentage'))
+        if (update) {
+          console.debug('EMIT [saveConfiguration]', {'percentage': btn.data('showPercentage')})
+          socket.emit('saveConfiguration', {'percentage': btn.data('showPercentage')})
+        }
+      }
+
+      var setStatus = function (id, status) {
+        $("#" + id + "Status").removeClass()
+
+        if (id === 'SOC' && status === 0) {
+          $("[id$='Status']").removeClass()
+          $("[id$='Status']").addClass('text-muted')
+        }
+
+        if (id === 'RES') {
+            $("#" + id + "Status").attr('title', 'Average bot response ' + status + 'ms')
+            if (status >= 1000) {
+              $("#" + id + "Status").addClass('text-danger')
+            } else if (status < 1000 && status >= 400) {
+              $("#" + id + "Status").addClass('text-warning')
+            } else {
+              $("#" + id + "Status").addClass('text-success')
+            }
+            $("#" + id + "Status").text(status + 'ms')
+        }
+
+        if (id === 'MOD') {
+          $("#" + id + "Status").attr('title', 'Bot is' + (status ? ' ' : ' not ') + 'a MOD')
+          $("#" + id + "Status").addClass('text-' + (status ? 'success' : 'danger'))
+          return
+        }
+
+        switch (status) {
+          case 0:
+            $("#" + id + "Status").attr('title', id + ' disconnected')
+            $("#" + id + "Status").addClass('text-danger')
+            break;
+          case 1:
+            $("#" + id + "Status").attr('title', id + ' connecting')
+            $("#" + id + "Status").addClass('text-warning')
+            break;
+          case 2:
+            $("#" + id + "Status").attr('title', id + ' reconnecting')
+            $("#" + id + "Status").addClass('text-warning')
+          case 3:
+            $("#" + id + "Status").attr('title', id + ' connected')
+            $("#" + id + "Status").addClass('text-success')
+            break;
+        }
+      }
+      setInterval(function () { console.debug('EMIT [getConnectionStatus]'); socket.emit('getConnectionStatus'); setStatus('SOC', socket.connected ? 3 : 0) }, 1000)
+      socket.on('connectionStatus', function (data) {
+        _.each(data, function (status, conn) {
+          setStatus(conn, status)
+        })
       })
-      loadedMenu = true
 
-      $("#menu-main a").on('click', function(ev) {
-        var page = ev.currentTarget.dataset.page
-        var visibility = page !== 'dashboard' ? 'hidden' : 'visible'
-        if (_.isUndefined(page)) return
+      /* MENU */
+      socket.on('menu', function(menu) {
+        if (loadedMenu) return
+        /* at first, clear all menu */
+        $('#menu-*').empty()
+        var systems = false // we want only systems settings once
+        var overlays = false // we want only overlays settings once
+        _.each(menu, function(obj) {
+          if (obj.id !== 'dashboard') {
+            if ((obj.id === 'systems') && systems) return
+            if ((obj.id === 'overlays') && overlays) return
+            $('#menu-' + obj.category).append('<li><a href="#" data-page="' + obj.id + '" data-lang="' + obj.name + '"></a></li>')
+          }
+          if (obj.id === 'systems') systems = true
+          if (obj.id === 'overlays') overlays = true
+        })
+        loadedMenu = true
 
-        $("#menu-main a").removeClass('active')
-        $(ev.currentTarget).addClass('active')
+        $("#menu-main a").on('click', function(ev) {
+          var page = ev.currentTarget.dataset.page
+          var visibility = page !== 'dashboard' ? 'hidden' : 'visible'
+          if (_.isUndefined(page)) return
 
-        $("#pages").empty()
-        if (page !== 'dashboard') $("#pages").append($('<div id="P' + page + '">').load('pages/' + page + '.html', function () {
-          commons.translate()
-        }))
+          $("#menu-main a").removeClass('active')
+          $(ev.currentTarget).addClass('active')
 
-        $(".widgets").css('visibility', visibility)
-        $("#addWidget").css('visibility', visibility)
-      })
-    })
-
-    /* PAGES */
-    // update top offset every second and on page resize
-    $(window).resize(function() {
-      $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
-    })
-    setInterval(function() {
-      $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
-    })
-
-    /* WIDGETS */
-    var deleteWidget = function(id) {
-      $('#' + id).remove();
-      console.debug('EMIT [deleteWidget]', 0)
-      socket.emit('deleteWidget', id)
-      loadedWidgets.splice(loadedWidgets.indexOf(id), 1)
-    }
-
-    socket.on('widgets', function(widgets) {
-      _.each(widgets, function(widget) {
-        widget = widget.split(':')
-        if (loadedWidgets.indexOf(widget[1]) === -1) {
-          $("#widgetRow" + widget[0]).append($('<div id="' + widget[1] + '">').load('widgets/' + widget[1] + '.html', function () {
+          $("#pages").empty()
+          if (page !== 'dashboard') $("#pages").append($('<div id="P' + page + '">').load('pages/' + page + '.html', function () {
             commons.translate()
           }))
-          loadedWidgets.push(widget[1])
+
+          $(".widgets").css('visibility', visibility)
+          $("#addWidget").css('visibility', visibility)
+        })
+      })
+
+      /* PAGES */
+      // update top offset every second and on page resize
+      $(window).resize(function() {
+        $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
+      })
+      setInterval(function() {
+        $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
+      })
+
+      /* WIDGETS */
+      var deleteWidget = function(id) {
+        $('#' + id).remove();
+        console.debug('EMIT [deleteWidget]', 0)
+        socket.emit('deleteWidget', id)
+        loadedWidgets.splice(loadedWidgets.indexOf(id), 1)
+      }
+
+      socket.on('widgets', function(widgets) {
+        _.each(widgets, function(widget) {
+          widget = widget.split(':')
+          if (loadedWidgets.indexOf(widget[1]) === -1) {
+            $("#widgetRow" + widget[0]).append($('<div id="' + widget[1] + '">').load('widgets/' + widget[1] + '.html', function () {
+              commons.translate()
+            }))
+            loadedWidgets.push(widget[1])
+          }
+        })
+      })
+
+      // addWidget
+      $("#addWidget").on('click', function(ev) {
+        if (!addingWidget) {
+          $(".widgets").append($('<div>').load('widgets/widget_create.html'))
+          $("#addWidget").css('display', 'none')
+          addingWidget = true
         }
       })
-    })
 
-    // addWidget
-    $("#addWidget").on('click', function(ev) {
-      if (!addingWidget) {
-        $(".widgets").append($('<div>').load('widgets/widget_create.html'))
-        $("#addWidget").css('display', 'none')
-        addingWidget = true
-      }
-    })
+      /* STATS */
+      setInterval(function() {
+        console.debug('EMIT [getStats]')
+        console.debug('EMIT [getLatestStats]')
+        socket.emit('getStats')
+        socket.emit('getLatestStats')
+      }, 1000)
 
-    /* STATS */
-    setInterval(function() {
-      console.debug('EMIT [getStats]')
-      console.debug('EMIT [getLatestStats]')
-      socket.emit('getStats')
-      socket.emit('getLatestStats')
-    }, 1000)
+      socket.on('latestStats', function (data) {
+        if ($.isEmptyObject(data)) return
 
-    socket.on('latestStats', function (data) {
-      if ($.isEmptyObject(data)) return
-
-      var getPercentage = function (cur, orig) {
-        var btn = $('#percentage-btn')
-        if (_.isNil(orig)) orig = 0
-        if (orig === cur) return 0
-        if (orig === 0) {
-          if (!btn.data('showPercentage')) return cur
-          else return cur * 100
-        }
-        if (btn.data('showPercentage')) return Math.round((cur - orig) / orig * 1000) / 10
-        return cur - orig
-      }
-      var setHtml = function (id, value) {
-        var btn = $('#percentage-btn')
-        if (value === 0) {
-          $("#" + id).html('<span class="stats-mid"><span class="glyphicon glyphicon-triangle-right"></span> ' + Math.abs(value) + (btn.data('showPercentage') ? '%' : '') + '</span>')
-        } else {
-          $("#" + id).html('<span class="stats-' + (value < 0 ? 'down' : 'up') +
-            ' text-' + (value < 0 ? 'danger' : 'success') +
-            '"><span class="glyphicon glyphicon-triangle-' + (value < 0 ? 'bottom' : 'top') +
-            '"></span> ' + Math.abs(value)  + (btn.data('showPercentage') ? '%' : '') + '</span>')
-        }
-      }
-      var uptime = $("#uptime").text()
-      if (uptime !== '00:00:00' && uptime !== '--:--:--') {
-        var maxViewers = getPercentage(parseInt($("#maxViewers").text(), 10), parseInt(data.maxViewers, 10))
-        var totalChatMsgs = getPercentage(parseInt($("#totalChatMsgs").text(), 10), parseInt(data.chatMessages, 10))
-        var newChtr = getPercentage(parseInt($("#newChtr").text(), 10), parseInt(data.newChatters, 10))
-        var curFollowers = getPercentage(parseInt($("#curFollowers").text(), 10), parseInt(data.currentFollowers, 10))
-        var curSubscribers = getPercentage(parseInt($("#curSubscribers").text(), 10), parseInt(data.currentSubscribers, 10))
-        var curBits = getPercentage(parseInt($("#curBits").text(), 10), parseInt(data.currentBits, 10))
-        var curViews = getPercentage(parseInt($("#curViews").text(), 10), parseInt(data.currentViews, 10))
-        var curHosts = getPercentage(parseInt($("#curHosts").text(), 10), parseInt(data.currentHosts, 10))
-
-        setHtml('maxViewersChange', maxViewers)
-        setHtml('totalChatMsgsChange', totalChatMsgs)
-        setHtml('newChtrChange', newChtr)
-        setHtml('curFollowersChange', curFollowers)
-        setHtml('curSubscribersChange', curSubscribers)
-        setHtml('curBitsChange', curBits)
-        setHtml('curViewsChange', curViews)
-        setHtml('curHostsChange', curHosts)
-      }
-    })
-
-    socket.on('stats', function(data) {
-      var $curFollowers = $("#curFollowers")
-
-      if (data.uptime === '' || data.uptime === '00:00:00') {
-        data.currentViewers = 0
-        data.maxViewers = 0
-        data.chatMessages = 0
-        data.newChatters = 0
-        data.currentHosts = 0
-      }
-
-      $("#uptime").text(data.uptime !== '' ? data.uptime : '00:00:00')
-      $(".curViewers").text(data.currentViewers)
-      $("#curViews").text(data.currentViews)
-      $("#curHosts").text(data.currentHosts)
-      $("#curSubscribers").text(data.currentSubscribers)
-      $("#curBits").text(data.currentBits)
-      $("#maxViewers").text(data.maxViewers)
-      $("#totalChatMsgs").text(data.chatMessages)
-      $("#newChtr").text(data.newChatters)
-      $("#curFollowers").text(data.currentFollowers)
-      $("#title").text(data.status)
-      $('#title').prop('title', data.status)
-      $("#game").text(data.game)
-      $('#game').prop('title', data.game)
-    })
-
-    var commons = {
-      translate: function () {
-        _.each($('[data-lang]'), function (el) {
-          var key = ($(el).data('lang'))
-          $(el).text(_.at(translations, key)[0])
-        })
-      },
-      editable: function (string, id, fnc) {
-        id = id || ''
-        var output = '<abbr title="click to edit" data-id="' + id + '" onclick="commons.editableSwap(\'' + id + '\')">' + string + '</abbr>'
-        output += '<input style="display: none" data-fnc="' + fnc + '" class="form-control input-sm" data-id="' + id + '" type="text" value="' + string + '"/>'
-        return output
-      },
-      editableSwap: function (id) {
-        if ($('abbr[data-id="' + id + '"]').css('display') == 'inline') $('abbr[data-id="' + id + '"]').css('display', 'none')
-        else $('abbr[data-id="' + id + '"]').css('display', 'inline')
-        if ($('input[data-id="' + id + '"]').css('display') == 'inline-block') $('input[data-id="' + id + '"]').css('display', 'none')
-        else {
-          $('input[data-id="' + id + '"]').css('display', 'inline-block')
-            .focus()
-            .off('focusout')
-            .on('focusout', function (ev) {
-              commons.editableSwap(id)
-              $('abbr[data-id="' + id + '"]').text($(ev.target).val())
-              var fnc = ev.target.dataset.fnc.split('.')
-              window[fnc[0]][fnc[1]](id, $(ev.target).val())
-            })
-        }
-      },
-      getDateString: function (d) {
-        return ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
-            d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
-      },
-      minimize: function (el) {
-        var toMinimize = el.dataset.id
-        $(el).children().removeClass()
-        if ($("#" + toMinimize).css('display') === 'none') {
-          $(el).children().addClass('glyphicon glyphicon-resize-small text-muted')
-          $("#" + toMinimize).css('display', 'block')
-        } else {
-          $(el).children().addClass('glyphicon glyphicon-resize-full text-muted')
-          $("#" + toMinimize).css('display', 'none')
-        }
-      },
-      configEditable: function(el, suffix) {
-        var $inputGroup = $('#input_' + el.dataset.configId + '_group')
-        var $input = $('#input_' + el.dataset.configId)
-        $(el).css('display', 'none')
-        $inputGroup.css('display', 'table')
-        $input.focus()
-        $input.val($(el).text().replace(suffix, '').replace('< empty >', ''))
-
-        $input.off()
-        $input.on('focusout', function() {
-          var value = $input.val()
-          var data = {}
-          data[el.dataset.configId] = value
-          $inputGroup.css('display', 'none')
-          $(el).css('display', 'inline')
-
-          if (value.length === 0) $(el).text('< empty >')
-          else $(el).text(value + suffix)
-
-          if (value.trim() === '< empty >') return // doesn't save if is as default
-          console.debug('EMIT [saveConfiguration]', data)
-          socket.emit('saveConfiguration', data)
-        })
-      },
-      confirm: function (el) {
-        $(el).parent().children(".btn-confirm").css('display', 'inline-block')
-        $(el).parent().children(".btn-remove").css('display', 'none')
-      },
-      unconfirm: function (el) {
-        $(el).parent().children(".btn-confirm").css('display', 'none')
-        $(el).parent().children(".btn-remove").css('display', 'inline-block')
-      }
-    }
-
-    var changeGT = {
-      selectedGame: '',
-      selectedTitle: '',
-
-      icon: $("#change-game-icon"),
-      ticon: $("#change-title-icon"),
-      group: $("#change-game-group"),
-      tgroup: $("#change-title-group"),
-
-      timeout: null,
-      lastSearch: '',
-
-      cachedData: null,
-
-      setGameInput: function (el) {
-        $('#change-game-search-list').css('display', 'none')
-        $('#change-game-input').val(el.dataset.game)
-        $('#change-game-input').keyup()
-        this.group.removeClass()
-        this.icon.removeClass()
-        this.group.addClass('form-group has-feedback')
-        this.icon.addClass('fa fa-spinner fa-spin form-control-feedback')
-      },
-      gameInput: function (el) {
-        if ($(el).val().trim() === this.lastSearch) return
-
-        clearTimeout(this.timeout)
-        var self = this
-        this.timeout = setTimeout(function () {
-          self.icon.removeClass()
-          self.group.removeClass()
-          self.group.addClass('form-group has-feedback')
-          self.lastSearch = $(el).val().trim()
-          if($(el).val().trim() !== '')  {
-            console.debug('EMIT [getGameFromTwitch]', $(el).val())
-            socket.emit('getGameFromTwitch', $(el).val())
-            self.icon.addClass('fa fa-spinner fa-spin form-control-feedback')
-          } else {
-            self.icon.addClass('fa fa-search form-control-feedback')
+        var getPercentage = function (cur, orig) {
+          var btn = $('#percentage-btn')
+          if (_.isNil(orig)) orig = 0
+          if (orig === cur) return 0
+          if (orig === 0) {
+            if (!btn.data('showPercentage')) return cur
+            else return cur * 100
           }
-        }, 1000)
-      },
-      gameInputStatus: function (games) {
-        $('#change-game-search-list').css('display', 'none')
-        this.icon.removeClass()
-        this.group.removeClass()
-        if (games !== false) {
-          if (games[0] === $('#change-game-input').val()) {
-            this.icon.addClass('fa fa-check form-control-feedback')
-            this.group.addClass('form-group has-feedback has-success')
-            this.setSelectedGame(games[0])
-            this.update(this.cachedData, games[0])
+          if (btn.data('showPercentage')) return Math.round((cur - orig) / orig * 1000) / 10
+          return cur - orig
+        }
+        var setHtml = function (id, value) {
+          var btn = $('#percentage-btn')
+          if (value === 0) {
+            $("#" + id).html('<span class="stats-mid"><span class="glyphicon glyphicon-triangle-right"></span> ' + Math.abs(value) + (btn.data('showPercentage') ? '%' : '') + '</span>')
+          } else {
+            $("#" + id).html('<span class="stats-' + (value < 0 ? 'down' : 'up') +
+              ' text-' + (value < 0 ? 'danger' : 'success') +
+              '"><span class="glyphicon glyphicon-triangle-' + (value < 0 ? 'bottom' : 'top') +
+              '"></span> ' + Math.abs(value)  + (btn.data('showPercentage') ? '%' : '') + '</span>')
+          }
+        }
+        var uptime = $("#uptime").text()
+        if (uptime !== '00:00:00' && uptime !== '--:--:--') {
+          var maxViewers = getPercentage(parseInt($("#maxViewers").text(), 10), parseInt(data.maxViewers, 10))
+          var totalChatMsgs = getPercentage(parseInt($("#totalChatMsgs").text(), 10), parseInt(data.chatMessages, 10))
+          var newChtr = getPercentage(parseInt($("#newChtr").text(), 10), parseInt(data.newChatters, 10))
+          var curFollowers = getPercentage(parseInt($("#curFollowers").text(), 10), parseInt(data.currentFollowers, 10))
+          var curSubscribers = getPercentage(parseInt($("#curSubscribers").text(), 10), parseInt(data.currentSubscribers, 10))
+          var curBits = getPercentage(parseInt($("#curBits").text(), 10), parseInt(data.currentBits, 10))
+          var curViews = getPercentage(parseInt($("#curViews").text(), 10), parseInt(data.currentViews, 10))
+          var curHosts = getPercentage(parseInt($("#curHosts").text(), 10), parseInt(data.currentHosts, 10))
+
+          setHtml('maxViewersChange', maxViewers)
+          setHtml('totalChatMsgsChange', totalChatMsgs)
+          setHtml('newChtrChange', newChtr)
+          setHtml('curFollowersChange', curFollowers)
+          setHtml('curSubscribersChange', curSubscribers)
+          setHtml('curBitsChange', curBits)
+          setHtml('curViewsChange', curViews)
+          setHtml('curHostsChange', curHosts)
+        }
+      })
+
+      socket.on('stats', function(data) {
+        var $curFollowers = $("#curFollowers")
+
+        if (data.uptime === '' || data.uptime === '00:00:00') {
+          data.currentViewers = 0
+          data.maxViewers = 0
+          data.chatMessages = 0
+          data.newChatters = 0
+          data.currentHosts = 0
+        }
+
+        $("#uptime").text(data.uptime !== '' ? data.uptime : '00:00:00')
+        $(".curViewers").text(data.currentViewers)
+        $("#curViews").text(data.currentViews)
+        $("#curHosts").text(data.currentHosts)
+        $("#curSubscribers").text(data.currentSubscribers)
+        $("#curBits").text(data.currentBits)
+        $("#maxViewers").text(data.maxViewers)
+        $("#totalChatMsgs").text(data.chatMessages)
+        $("#newChtr").text(data.newChatters)
+        $("#curFollowers").text(data.currentFollowers)
+        $("#title").text(data.status)
+        $('#title').prop('title', data.status)
+        $("#game").text(data.game)
+        $('#game').prop('title', data.game)
+      })
+
+      var commons = {
+        translate: function () {
+          _.each($('[data-lang]'), function (el) {
+            var key = ($(el).data('lang'))
+            $(el).text(_.at(translations, key)[0])
+          })
+        },
+        editable: function (string, id, fnc) {
+          id = id || ''
+          var output = '<abbr title="click to edit" data-id="' + id + '" onclick="commons.editableSwap(\'' + id + '\')">' + string + '</abbr>'
+          output += '<input style="display: none" data-fnc="' + fnc + '" class="form-control input-sm" data-id="' + id + '" type="text" value="' + string + '"/>'
+          return output
+        },
+        editableSwap: function (id) {
+          if ($('abbr[data-id="' + id + '"]').css('display') == 'inline') $('abbr[data-id="' + id + '"]').css('display', 'none')
+          else $('abbr[data-id="' + id + '"]').css('display', 'inline')
+          if ($('input[data-id="' + id + '"]').css('display') == 'inline-block') $('input[data-id="' + id + '"]').css('display', 'none')
+          else {
+            $('input[data-id="' + id + '"]').css('display', 'inline-block')
+              .focus()
+              .off('focusout')
+              .on('focusout', function (ev) {
+                commons.editableSwap(id)
+                $('abbr[data-id="' + id + '"]').text($(ev.target).val())
+                var fnc = ev.target.dataset.fnc.split('.')
+                window[fnc[0]][fnc[1]](id, $(ev.target).val())
+              })
+          }
+        },
+        getDateString: function (d) {
+          return ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
+              d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+        },
+        minimize: function (el) {
+          var toMinimize = el.dataset.id
+          $(el).children().removeClass()
+          if ($("#" + toMinimize).css('display') === 'none') {
+            $(el).children().addClass('glyphicon glyphicon-resize-small text-muted')
+            $("#" + toMinimize).css('display', 'block')
+          } else {
+            $(el).children().addClass('glyphicon glyphicon-resize-full text-muted')
+            $("#" + toMinimize).css('display', 'none')
+          }
+        },
+        configEditable: function(el, suffix) {
+          var $inputGroup = $('#input_' + el.dataset.configId + '_group')
+          var $input = $('#input_' + el.dataset.configId)
+          $(el).css('display', 'none')
+          $inputGroup.css('display', 'table')
+          $input.focus()
+          $input.val($(el).text().replace(suffix, '').replace('< empty >', ''))
+
+          $input.off()
+          $input.on('focusout', function() {
+            var value = $input.val()
+            var data = {}
+            data[el.dataset.configId] = value
+            $inputGroup.css('display', 'none')
+            $(el).css('display', 'inline')
+
+            if (value.length === 0) $(el).text('< empty >')
+            else $(el).text(value + suffix)
+
+            if (value.trim() === '< empty >') return // doesn't save if is as default
+            console.debug('EMIT [saveConfiguration]', data)
+            socket.emit('saveConfiguration', data)
+          })
+        },
+        confirm: function (el) {
+          $(el).parent().children(".btn-confirm").css('display', 'inline-block')
+          $(el).parent().children(".btn-remove").css('display', 'none')
+        },
+        unconfirm: function (el) {
+          $(el).parent().children(".btn-confirm").css('display', 'none')
+          $(el).parent().children(".btn-remove").css('display', 'inline-block')
+        }
+      }
+
+      var changeGT = {
+        selectedGame: '',
+        selectedTitle: '',
+
+        icon: $("#change-game-icon"),
+        ticon: $("#change-title-icon"),
+        group: $("#change-game-group"),
+        tgroup: $("#change-title-group"),
+
+        timeout: null,
+        lastSearch: '',
+
+        cachedData: null,
+
+        setGameInput: function (el) {
+          $('#change-game-search-list').css('display', 'none')
+          $('#change-game-input').val(el.dataset.game)
+          $('#change-game-input').keyup()
+          this.group.removeClass()
+          this.icon.removeClass()
+          this.group.addClass('form-group has-feedback')
+          this.icon.addClass('fa fa-spinner fa-spin form-control-feedback')
+        },
+        gameInput: function (el) {
+          if ($(el).val().trim() === this.lastSearch) return
+
+          clearTimeout(this.timeout)
+          var self = this
+          this.timeout = setTimeout(function () {
+            self.icon.removeClass()
+            self.group.removeClass()
+            self.group.addClass('form-group has-feedback')
+            self.lastSearch = $(el).val().trim()
+            if($(el).val().trim() !== '')  {
+              console.debug('EMIT [getGameFromTwitch]', $(el).val())
+              socket.emit('getGameFromTwitch', $(el).val())
+              self.icon.addClass('fa fa-spinner fa-spin form-control-feedback')
+            } else {
+              self.icon.addClass('fa fa-search form-control-feedback')
+            }
+          }, 1000)
+        },
+        gameInputStatus: function (games) {
+          $('#change-game-search-list').css('display', 'none')
+          this.icon.removeClass()
+          this.group.removeClass()
+          if (games !== false) {
+            if (games[0] === $('#change-game-input').val()) {
+              this.icon.addClass('fa fa-check form-control-feedback')
+              this.group.addClass('form-group has-feedback has-success')
+              this.setSelectedGame(games[0])
+              this.update(this.cachedData, games[0])
+            } else {
+              this.icon.addClass('fa fa-exclamation form-control-feedback')
+              this.group.addClass('form-group has-feedback has-error')
+                $('#change-game-search-list').empty()
+              _.each(games, function (game) {
+                $('#change-game-search-list').append('<li onclick="changeGT.setGameInput(this)" data-game="' + game + '">' + game.replace(new RegExp('(' + $('#change-game-input').val() + ')', 'gi'), "<strong>$1</strong>") + '</li>')
+                $('#change-game-search-list').css('display', 'block')
+              })
+            }
           } else {
             this.icon.addClass('fa fa-exclamation form-control-feedback')
             this.group.addClass('form-group has-feedback has-error')
-              $('#change-game-search-list').empty()
-            _.each(games, function (game) {
-              $('#change-game-search-list').append('<li onclick="changeGT.setGameInput(this)" data-game="' + game + '">' + game.replace(new RegExp('(' + $('#change-game-input').val() + ')', 'gi'), "<strong>$1</strong>") + '</li>')
-              $('#change-game-search-list').css('display', 'block')
-            })
           }
-        } else {
-          this.icon.addClass('fa fa-exclamation form-control-feedback')
-          this.group.addClass('form-group has-feedback has-error')
-        }
-      },
-      checkEmptyTitle: function(el) {
-        this.ticon.removeClass()
-        this.tgroup.removeClass()
+        },
+        checkEmptyTitle: function(el) {
+          this.ticon.removeClass()
+          this.tgroup.removeClass()
 
-        // only if title input radio is selected
-        if (!$('#inputRadio').prop('checked')) {
+          // only if title input radio is selected
+          if (!$('#inputRadio').prop('checked')) {
+            this.ticon.addClass('form-control-feedback')
+            this.tgroup.addClass('input-group has-feedback')
+          }
+          if ($(el).val().trim().length > 0) {
+            this.ticon.addClass('fa fa-check form-control-feedback')
+            this.tgroup.addClass('input-group has-feedback has-success')
+            // also trigger onchange event to update title
+            $('input[type=radio][name=titleSelector][id=inputRadio]').trigger('change')
+          } else {
+            this.ticon.addClass('fa fa-exclamation form-control-feedback')
+            this.tgroup.addClass('input-group has-feedback has-error')
+          }
+        },
+
+        gameSelect: function (el) {
+          // unfocus every img
+          _.each($('.carousel-games-inner').children('div').children('div'), function (unfocus) {
+            $(unfocus).removeClass()
+            $(unfocus).addClass('col-md-2')
+          })
+          $(el).parent().addClass('focus')
+          this.setSelectedGame(el.dataset.game)
+        },
+        setSelectedGame: function(game) {
+          this.selectedGame = game
+          $("#titleForGame").text(translations['for'] + ' ' + game)
+
+          // also, we want to update radios
+          this.updateRadios(this.cachedData[game])
+        },
+
+        update: function(data, curGame=null) {
+          this.cachedData = data
+          curGame = _.isNull(curGame) ? $('#game').text() : curGame
+
+          $('.carousel-games-inner').empty()
+          var divItem = $('<div class="item active">')
+
+          if (curGame !== translations['not-available'] && curGame !== '') {
+            var div = $('<div class="col-md-2 focus" style="cursor: pointer">')
+            var img = $('<img>')
+            img.attr('src', 'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(curGame) + '-100x140.jpg')
+            img.attr('onclick', 'changeGT.gameSelect(this)')
+            img.attr('title', curGame)
+            img.attr('data-game', curGame)
+            img.attr('data-deletable', false)
+            img.attr('class', 'titles-list-image')
+            div.append(img)
+            divItem.append(div)
+            this.setSelectedGame(curGame)
+          }
+
+          var count = (curGame !== translations['not-available'] && curGame !== '') ? 1 : 0
+          _.each(data, function(aTitles, aGame) {
+            if (aGame === curGame) return // current game is already in carousel
+
+            if (count === 6) { // if 6 elements exists, flush data
+              $('.carousel-games-inner').append(divItem)
+              divItem = $('<div class="item">')
+              count = 0
+            }
+            var div = $('<div class="col-md-2" style="cursor: pointer">')
+            var img = $('<img>')
+            img.attr('src', 'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(aGame) + '-100x140.jpg')
+            img.attr('onclick', 'changeGT.gameSelect(this)')
+            img.attr('title', aGame)
+            img.attr('data-game', aGame)
+            img.attr('class', 'titles-list-image')
+
+            div.append(img)
+            divItem.append(div)
+
+            count += 1
+          })
+          // flush remaining data
+          $('.carousel-games-inner').append(divItem)
+          // refresh carousel
+          $('#carousel-games').carousel()
+          // refresh dropdown
+          var menu = new BootstrapMenu(".titles-list-image", {
+            fetchElementData: function($el) {
+              return $el.data();
+            },
+            actions: [{
+              name: 'Delete',
+              iconClass: 'fa-trash-o',
+              onClick: function(game) {
+                console.debug('EMIT [deleteUserTwitchGame]', game.game)
+                socket.emit('deleteUserTwitchGame', game.game)
+              },
+              isEnabled: function(game) {
+                return game.deletable;
+              }
+            }]
+          })
+        },
+        updateRadios: function (aTitles) {
+          var self = this
+          $('#titles-list').empty()
+          var curTitle = $('#title').text()
+
+          if (curTitle !== translations['not-available'] && curTitle !== '') {
+            var div = $('<div class="radio titles-list-radio">')
+            div.attr('data-deletable', false)
+
+            var label = $('<label>')
+            label.html('<span>' + curTitle + '</span> <small style="font-size: 65%; color:#777">CURRENT</small>')
+
+            var input = $('<input>')
+            input.attr('type', 'radio')
+            input.attr('name', 'titleSelector')
+            input.attr('value', curTitle)
+            input.attr('checked', 'checked')
+
+            var edit = $('<input>')
+            edit.attr('type', 'text')
+            edit.attr('value', curTitle)
+            edit.css('display', 'none')
+            edit.css('border', 0)
+            edit.css('border-bottom', '1px dotted #ccc')
+
+            label.prepend(edit)
+            label.prepend(input)
+            div.append(label)
+
+            $('#titles-list').append(div)
+            this.selectedTitle = curTitle
+          }
+
+          _.each(this.cachedData[this.selectedGame], function(aTitle) {
+            var div = $('<div class="radio titles-list-radio">')
+            div.attr('data-title', aTitle)
+            div.attr('data-game', self.selectedGame)
+
+            var label = $('<label>')
+            label.html('<span>' + aTitle + '</span>')
+
+            var input = $('<input>')
+            input.attr('type', 'radio')
+            input.attr('name', 'titleSelector')
+            input.attr('value', aTitle)
+
+            var edit = $('<input>')
+            edit.attr('type', 'text')
+            edit.attr('value', aTitle)
+            edit.css('display', 'none')
+            edit.css('border', 0)
+            edit.css('border-bottom', '1px dotted #ccc')
+
+            label.prepend(edit)
+            label.prepend(input)
+            div.append(label)
+
+            $('#titles-list').append(div)
+          })
+
+          // refresh dropdown
+          var menu = new BootstrapMenu(".titles-list-radio", {
+            fetchElementData: function($el) {
+              var data = $el.data()
+              data.el = $el
+              return data;
+            },
+            actions: [{
+              name: 'Edit',
+              iconClass: 'fa-pencil-square-o',
+              onClick: function(data) {
+                data.el.find(':text').css('display', 'inline-block')
+                data.el.find(':text').css('padding-left', '5px')
+                data.el.find(':text').css('padding-right', '5px')
+                data.el.find(':text').attr('size', data.title.length)
+                data.el.find(':text').focus()
+                data.el.find('span').css('display', 'none')
+
+                data.el.find(':text').focusout(function (el) {
+                  data.el.find('span').css('display', 'inline-block')
+                  data.el.find(':text').css('display', 'none')
+                  console.debug('EMIT [editUserTwitchTitle]', data.el.find('span').text() + ' => ' + data.el.find(':text').val())
+                  socket.emit('editUserTwitchTitle', {
+                    game: data.game,
+                    title: data.el.find('span').text(),
+                    new: data.el.find(':text').val()
+                  })
+                  data.el.find('span').text(data.el.find(':text').val())
+                })
+              },
+              isEnabled: function(data) {
+                return data.deletable;
+              }
+            }, {
+              name: 'Delete',
+              iconClass: 'fa-trash-o',
+              onClick: function(data) {
+                delete data.el
+                console.debug('EMIT [deleteUserTwitchTitle]', data)
+                socket.emit('deleteUserTwitchTitle', data)
+              },
+              isEnabled: function(data) {
+                return data.deletable;
+              }
+            }]
+          })
+
+          // add onchange event
+          var self = this
+          $('input[type=radio][name=titleSelector]').off('change')
+          $('input[type=radio][name=titleSelector]').on('change', function() {
+            var title = $(this).val()
+            if (title === 'input') { // we want to use custom input
+              title = $("#change-title").val()
+            }
+            self.selectedTitle = title
+          });
+        },
+        showDlg: function () {
+          $("#title-error").css('display', 'none')
+
+          this.ticon.removeClass()
+          this.tgroup.removeClass()
+          this.icon.removeClass()
+          this.group.removeClass()
           this.ticon.addClass('form-control-feedback')
           this.tgroup.addClass('input-group has-feedback')
-        }
-        if ($(el).val().trim().length > 0) {
-          this.ticon.addClass('fa fa-check form-control-feedback')
-          this.tgroup.addClass('input-group has-feedback has-success')
-          // also trigger onchange event to update title
-          $('input[type=radio][name=titleSelector][id=inputRadio]').trigger('change')
-        } else {
-          this.ticon.addClass('fa fa-exclamation form-control-feedback')
-          this.tgroup.addClass('input-group has-feedback has-error')
-        }
-      },
-
-      gameSelect: function (el) {
-        // unfocus every img
-        _.each($('.carousel-games-inner').children('div').children('div'), function (unfocus) {
-          $(unfocus).removeClass()
-          $(unfocus).addClass('col-md-2')
-        })
-        $(el).parent().addClass('focus')
-        this.setSelectedGame(el.dataset.game)
-      },
-      setSelectedGame: function(game) {
-        this.selectedGame = game
-        $("#titleForGame").text(translations['for'] + ' ' + game)
-
-        // also, we want to update radios
-        this.updateRadios(this.cachedData[game])
-      },
-
-      update: function(data, curGame=null) {
-        this.cachedData = data
-        curGame = _.isNull(curGame) ? $('#game').text() : curGame
-
-        $('.carousel-games-inner').empty()
-        var divItem = $('<div class="item active">')
-
-        if (curGame !== translations['not-available'] && curGame !== '') {
-          var div = $('<div class="col-md-2 focus" style="cursor: pointer">')
-          var img = $('<img>')
-          img.attr('src', 'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(curGame) + '-100x140.jpg')
-          img.attr('onclick', 'changeGT.gameSelect(this)')
-          img.attr('title', curGame)
-          img.attr('data-game', curGame)
-          img.attr('data-deletable', false)
-          img.attr('class', 'titles-list-image')
-          div.append(img)
-          divItem.append(div)
-          this.setSelectedGame(curGame)
-        }
-
-        var count = (curGame !== translations['not-available'] && curGame !== '') ? 1 : 0
-        _.each(data, function(aTitles, aGame) {
-          if (aGame === curGame) return // current game is already in carousel
-
-          if (count === 6) { // if 6 elements exists, flush data
-            $('.carousel-games-inner').append(divItem)
-            divItem = $('<div class="item">')
-            count = 0
+          this.icon.addClass('fa fa-search form-control-feedback')
+          this.group.addClass('form-group has-feedback')
+          $("#change-game-input").val('')
+          $("#change-title").val('')
+          $('#game_and_title_dlg').modal();
+          console.debug('EMIT [getUserTwitchGames]')
+          socket.emit('getUserTwitchGames')
+        },
+        save: function() {
+          // pokud this.tgroup  has-error v classe + je radio checked, vyhod chybu
+          if (this.tgroup.hasClass('has-error') &&  $('#inputRadio').prop('checked')) {
+            $("#title-error").css('display', 'inline-block')
+          } else {
+            console.debug('EMIT [updateGameAndTitle]', {game: this.selectedGame, title: this.selectedTitle})
+            socket.emit('updateGameAndTitle', {game: this.selectedGame, title: this.selectedTitle})
+            $('#game_and_title_dlg').modal('hide')
           }
-          var div = $('<div class="col-md-2" style="cursor: pointer">')
-          var img = $('<img>')
-          img.attr('src', 'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(aGame) + '-100x140.jpg')
-          img.attr('onclick', 'changeGT.gameSelect(this)')
-          img.attr('title', aGame)
-          img.attr('data-game', aGame)
-          img.attr('class', 'titles-list-image')
-
-          div.append(img)
-          divItem.append(div)
-
-          count += 1
-        })
-        // flush remaining data
-        $('.carousel-games-inner').append(divItem)
-        // refresh carousel
-        $('#carousel-games').carousel()
-        // refresh dropdown
-        var menu = new BootstrapMenu(".titles-list-image", {
-          fetchElementData: function($el) {
-            return $el.data();
-          },
-          actions: [{
-            name: 'Delete',
-            iconClass: 'fa-trash-o',
-            onClick: function(game) {
-              console.debug('EMIT [deleteUserTwitchGame]', game.game)
-              socket.emit('deleteUserTwitchGame', game.game)
-            },
-            isEnabled: function(game) {
-              return game.deletable;
-            }
-          }]
-        })
-      },
-      updateRadios: function (aTitles) {
-        var self = this
-        $('#titles-list').empty()
-        var curTitle = $('#title').text()
-
-        if (curTitle !== translations['not-available'] && curTitle !== '') {
-          var div = $('<div class="radio titles-list-radio">')
-          div.attr('data-deletable', false)
-
-          var label = $('<label>')
-          label.html('<span>' + curTitle + '</span> <small style="font-size: 65%; color:#777">CURRENT</small>')
-
-          var input = $('<input>')
-          input.attr('type', 'radio')
-          input.attr('name', 'titleSelector')
-          input.attr('value', curTitle)
-          input.attr('checked', 'checked')
-
-          var edit = $('<input>')
-          edit.attr('type', 'text')
-          edit.attr('value', curTitle)
-          edit.css('display', 'none')
-          edit.css('border', 0)
-          edit.css('border-bottom', '1px dotted #ccc')
-
-          label.prepend(edit)
-          label.prepend(input)
-          div.append(label)
-
-          $('#titles-list').append(div)
-          this.selectedTitle = curTitle
-        }
-
-        _.each(this.cachedData[this.selectedGame], function(aTitle) {
-          var div = $('<div class="radio titles-list-radio">')
-          div.attr('data-title', aTitle)
-          div.attr('data-game', self.selectedGame)
-
-          var label = $('<label>')
-          label.html('<span>' + aTitle + '</span>')
-
-          var input = $('<input>')
-          input.attr('type', 'radio')
-          input.attr('name', 'titleSelector')
-          input.attr('value', aTitle)
-
-          var edit = $('<input>')
-          edit.attr('type', 'text')
-          edit.attr('value', aTitle)
-          edit.css('display', 'none')
-          edit.css('border', 0)
-          edit.css('border-bottom', '1px dotted #ccc')
-
-          label.prepend(edit)
-          label.prepend(input)
-          div.append(label)
-
-          $('#titles-list').append(div)
-        })
-
-        // refresh dropdown
-        var menu = new BootstrapMenu(".titles-list-radio", {
-          fetchElementData: function($el) {
-            var data = $el.data()
-            data.el = $el
-            return data;
-          },
-          actions: [{
-            name: 'Edit',
-            iconClass: 'fa-pencil-square-o',
-            onClick: function(data) {
-              data.el.find(':text').css('display', 'inline-block')
-              data.el.find(':text').css('padding-left', '5px')
-              data.el.find(':text').css('padding-right', '5px')
-              data.el.find(':text').attr('size', data.title.length)
-              data.el.find(':text').focus()
-              data.el.find('span').css('display', 'none')
-
-              data.el.find(':text').focusout(function (el) {
-                data.el.find('span').css('display', 'inline-block')
-                data.el.find(':text').css('display', 'none')
-                console.debug('EMIT [editUserTwitchTitle]', data.el.find('span').text() + ' => ' + data.el.find(':text').val())
-                socket.emit('editUserTwitchTitle', {
-                  game: data.game,
-                  title: data.el.find('span').text(),
-                  new: data.el.find(':text').val()
-                })
-                data.el.find('span').text(data.el.find(':text').val())
-              })
-            },
-            isEnabled: function(data) {
-              return data.deletable;
-            }
-          }, {
-            name: 'Delete',
-            iconClass: 'fa-trash-o',
-            onClick: function(data) {
-              delete data.el
-              console.debug('EMIT [deleteUserTwitchTitle]', data)
-              socket.emit('deleteUserTwitchTitle', data)
-            },
-            isEnabled: function(data) {
-              return data.deletable;
-            }
-          }]
-        })
-
-        // add onchange event
-        var self = this
-        $('input[type=radio][name=titleSelector]').off('change')
-        $('input[type=radio][name=titleSelector]').on('change', function() {
-          var title = $(this).val()
-          if (title === 'input') { // we want to use custom input
-            title = $("#change-title").val()
-          }
-          self.selectedTitle = title
-        });
-      },
-      showDlg: function () {
-        $("#title-error").css('display', 'none')
-
-        this.ticon.removeClass()
-        this.tgroup.removeClass()
-        this.icon.removeClass()
-        this.group.removeClass()
-        this.ticon.addClass('form-control-feedback')
-        this.tgroup.addClass('input-group has-feedback')
-        this.icon.addClass('fa fa-search form-control-feedback')
-        this.group.addClass('form-group has-feedback')
-        $("#change-game-input").val('')
-        $("#change-title").val('')
-        $('#game_and_title_dlg').modal();
-        console.debug('EMIT [getUserTwitchGames]')
-        socket.emit('getUserTwitchGames')
-      },
-      save: function() {
-        // pokud this.tgroup  has-error v classe + je radio checked, vyhod chybu
-        if (this.tgroup.hasClass('has-error') &&  $('#inputRadio').prop('checked')) {
-          $("#title-error").css('display', 'inline-block')
-        } else {
-          console.debug('EMIT [updateGameAndTitle]', {game: this.selectedGame, title: this.selectedTitle})
-          socket.emit('updateGameAndTitle', {game: this.selectedGame, title: this.selectedTitle})
-          $('#game_and_title_dlg').modal('hide')
         }
       }
-    }
 
-    socket.on('sendGameFromTwitch', function(status) {
-      changeGT.gameInputStatus(status)
-    })
-
-    socket.on('sendUserTwitchGamesAndTitles', function(data) {
-      delete data._id
-      changeGT.update(data)
-    })
-
-    socket.on('lang', function (data) {
-      translations = data
-      _.each(data, function (value, key) {
-        $('[data-lang="' + key + '"]').text(value)
+      socket.on('sendGameFromTwitch', function(status) {
+        changeGT.gameInputStatus(status)
       })
-      $('#change-game-input').attr('placeholder', translations['create-and-use-a-new-game'])
-      $('#change-title').attr('placeholder', translations['create-and-use-a-new-title'])
-    })
 
-    socket.off('play-sound')
-    socket.on('play-sound', function (sound) {
-      var audio = new Audio(sound).play()
+      socket.on('sendUserTwitchGamesAndTitles', function(data) {
+        delete data._id
+        changeGT.update(data)
+      })
+
+      socket.on('lang', function (data) {
+        translations = data
+        _.each(data, function (value, key) {
+          $('[data-lang="' + key + '"]').text(value)
+        })
+        $('#change-game-input').attr('placeholder', translations['create-and-use-a-new-game'])
+        $('#change-title').attr('placeholder', translations['create-and-use-a-new-title'])
+      })
+
+      socket.off('play-sound')
+      socket.on('play-sound', function (sound) {
+        var audio = new Audio(sound).play()
+      })
     })
   </script>
 </body>

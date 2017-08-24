@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
 
     <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/auth/token.js"></script>
 
     <style>
       html, body {
@@ -76,16 +77,18 @@
 
     <script>
       var socket = io()
-
-      setInterval(function () {
-        socket.emit('overlay.stats.get')
-      }, 1000)
-      socket.on('overlay.stats', function (data) {
-       $("#viewers").text(data.viewers)
-       $("#uptime").text(data.uptime)
-       $("#followers").text(data.followers)
-       $("#subscribers").text(data.subscribers)
-       $("#bits").text(data.bits)
+      socket.emit('authenticate', token)
+      socket.on('authenticated', function () {
+        setInterval(function () {
+          socket.emit('overlay.stats.get')
+        }, 1000)
+        socket.on('overlay.stats', function (data) {
+        $("#viewers").text(data.viewers)
+        $("#uptime").text(data.uptime)
+        $("#followers").text(data.followers)
+        $("#subscribers").text(data.subscribers)
+        $("#bits").text(data.bits)
+        })
       })
     </script>
   </body>

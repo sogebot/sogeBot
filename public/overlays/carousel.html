@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
 
     <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/auth/token.js"></script>
 
     <style>
       html, body {
@@ -34,34 +35,38 @@
 
     <script>
       var socket = io()
-      var currentImage = -1
 
-      socket.emit('overlay.images.get')
-      socket.on('overlay.image.list', function (data) {
-        $('#images').empty()
-        _.each(data, function (image, index) {
-          currentImage = -1
-          $('#images').append('<div style="position: absolute; left: 50%;"><img data-index="' + index + '" style="position: relative; left: -50%;" src="/dist/carousel/' + image + '"></img></div>')
+      socket.emit('authenticate', token)
+      socket.on('authenticated', function () {
+        var currentImage = -1
+
+        socket.emit('overlay.images.get')
+        socket.on('overlay.image.list', function (data) {
+          $('#images').empty()
+          _.each(data, function (image, index) {
+            currentImage = -1
+            $('#images').append('<div style="position: absolute; left: 50%;"><img data-index="' + index + '" style="position: relative; left: -50%;" src="/dist/carousel/' + image + '"></img></div>')
+          })
         })
-      })
 
-      function swapImages() {
-        var imgToFade = $('img[data-index="' + currentImage + '"]')
-        imgToFade.velocity({
-          opacity: 0
-        }, 2000)
-
-        setTimeout(function () {
-          currentImage++
-          if ($('img').length <= currentImage) currentImage = 0
-          var imgToShow = $('img[data-index="' + currentImage + '"]')
-          imgToShow.velocity({
-            opacity: 1
+        function swapImages() {
+          var imgToFade = $('img[data-index="' + currentImage + '"]')
+          imgToFade.velocity({
+            opacity: 0
           }, 2000)
-        }, 5000)
-      }
-      swapImages()
-      setInterval(swapImages, 30000)
+
+          setTimeout(function () {
+            currentImage++
+            if ($('img').length <= currentImage) currentImage = 0
+            var imgToShow = $('img[data-index="' + currentImage + '"]')
+            imgToShow.velocity({
+              opacity: 1
+            }, 2000)
+          }, 5000)
+        }
+        swapImages()
+        setInterval(swapImages, 30000)
+      })
     </script>
   </body>
 </html>
