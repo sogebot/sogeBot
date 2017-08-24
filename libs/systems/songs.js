@@ -239,7 +239,7 @@ Songs.prototype.addSongToQueue = function (self, sender, text) {
     if (global.configuration.getValue('songs_songrequest')) {
       global.commons.sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', sender)
     } else {
-      global.commons.sendMessage('(sender), ' + global.translate('songs.settings.songrequest.false'), sender)
+      global.commons.sendMessage('$sender, ' + global.translate('songs.settings.songrequest.false'), sender)
     }
     return
   }

@@ -38,7 +38,7 @@ Commercial.prototype.run = function (self, sender, text) {
       global.client.commercial(global.configuration.get().twitch.channel, commercial.duration)
       if (!_.isNil(commercial.message)) global.commons.sendMessage(commercial.message, sender)
     } else {
-      global.commons.sendMessage('(sender), available commercial duration are: 30, 60, 90, 120, 150 and 180', sender)
+      global.commons.sendMessage('$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', sender)
     }
   } catch (e) {
     global.log.error(e, 'Commercial.prototype.run')

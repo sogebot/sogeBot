@@ -76,7 +76,7 @@ Configuration.prototype.setValue = function (self, sender, text, quiet) {
       data[cmd] = value.trim()
       global.commons.updateOrInsert(data)
       self.cfgL[cmd].value = data[cmd]
-    } else global.commons.sendMessage('Sorry, (sender), cannot parse !set command.', sender)
+    } else global.commons.sendMessage('Sorry, $sender, cannot parse !set command.', sender)
 
     let emit = {}
     _.each(self.sets(self), function (key) {
@@ -84,7 +84,7 @@ Configuration.prototype.setValue = function (self, sender, text, quiet) {
     })
     global.panel.io.emit('configuration', emit)
   } catch (err) {
-    global.commons.sendMessage('Sorry, (sender), cannot parse !set command.', sender)
+    global.commons.sendMessage('Sorry, $sender, cannot parse !set command.', sender)
   }
 }
 
@@ -94,7 +94,7 @@ Configuration.prototype.sets = function (self) {
 
 Configuration.prototype.listSets = function (self, sender, text) {
   var setL = self.sets(self).join(', ')
-  global.commons.sendMessage(setL.length === 0 ? 'Sorry, (sender), you cannot configure anything' : 'List of possible settings: ' + setL, sender)
+  global.commons.sendMessage(setL.length === 0 ? 'Sorry, $sender, you cannot configure anything' : 'List of possible settings: ' + setL, sender)
 }
 
 Configuration.prototype.getValue = function (cfgName) {

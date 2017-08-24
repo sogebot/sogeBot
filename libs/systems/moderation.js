@@ -149,7 +149,7 @@ Moderation.prototype.timeoutUser = function (self, sender, warning, msg, time) {
   if (warningsTimeout) {
     global.commons.timeout(sender.username, warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length), 1)
   } else {
-    global.commons.sendMessage('(sender): ' + warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length), sender)
+    global.commons.sendMessage('$sender: ' + warning.replace('$count', parseInt(warningsAllowed, 10) - warnings.length), sender)
   }
 
   self.warnings[sender.username] = warnings
