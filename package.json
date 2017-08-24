@@ -35,6 +35,7 @@
     "socket.io": "^2.0.3",
     "tmi.js": "^1.2.1",
     "twitch-emoticons": "^2.1.0",
+    "twitter": "^1.7.1",
     "velocity-animate": "^1.5.0",
     "video.js": "^6.2.5",
     "winston": "^2.3.1",

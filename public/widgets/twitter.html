@@ -1,0 +1,45 @@
+<div class="widget">
+  <h6 data-lang="widget-title-twitter"></h6>
+  <ul class="nav nav-pills" role="tablist">
+    <li role="presentation" class="active">
+      <a href="#twitter-main" aria-controls="home" role="tab" data-toggle="tab" title="Send a twitch status">
+        <i class="fa fa-twitter" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li role="presentation">
+      <a href="#twitter-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+        <i class="fa fa-cog" aria-hidden="true"></i>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="twitter-main">
+      <form class="form-horizontal">
+        <div class="form-group" style="margin-bottom: 0">
+          <div class="col-sm-8" style="padding-right: 0">
+            <input type="text" id="twitterInput" class="form-control"/>
+          </div>
+          <div class="col-sm-4" style="padding-left: 0">
+            <button id="twitterInputSubmit" class="form-control btn btn-primary" data-lang="twitter-send-message"></button>
+          </div>
+        </div>
+      </form>
+    </div> <!-- /MAIN -->
+
+    <div role="tabpanel" class="tab-pane" id="twitter-settings">
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('twitter')" style="margin-top: 20px;" data-lang="remove-widget"></button>
+    </div> <!-- /SETTINGS -->
+</div>
+
+<script>
+
+  $('#twitterInputSubmit').on('click', function (ev) {
+      ev.preventDefault()
+      var message = $('#twitterInput').val()
+      $('#twitterInput').val('')
+
+      if (message.length > 0) socket.emit('twitter.send', message)
+  })
+</script>
