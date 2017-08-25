@@ -8,10 +8,10 @@ var constants = require('../constants')
 var log = global.log
 
 /*
- * !cooldown [keyword|!command] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
- * !cooldown toggle moderators [keyword|!command]      - enable/disable specified keyword or !command cooldown for moderators
- * !cooldown toggle owners [keyword|!command]          - enable/disable specified keyword or !command cooldown for owners
- * !cooldown toggle enabled [keyword|!command]         - enable/disable specified keyword or !command cooldown
+ * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
+ * !cooldown toggle moderators [keyword|!command]                    - enable/disable specified keyword or !command cooldown for moderators
+ * !cooldown toggle owners [keyword|!command]                        - enable/disable specified keyword or !command cooldown for owners
+ * !cooldown toggle enabled [keyword|!command]                       - enable/disable specified keyword or !command cooldown
  */
 
 function Cooldown () {
