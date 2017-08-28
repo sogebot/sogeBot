@@ -316,115 +316,6 @@
         switchPercentageShow(false)
       })
 
-      var saveHighlight = function () {
-        console.debug('EMIT [highlight.save]')
-        socket.emit('highlight.save')
-
-      }
-      var switchTheme = function () {
-        var btn = $('#theme-btn')
-        if (btn.text() === translations['dark']) {
-          btn.text(translations['light'])
-          $('head').append('<link rel="stylesheet" href="./dist/css/dark.css">')
-          console.debug('EMIT [saveConfiguration]', {'theme': 'dark'})
-          socket.emit('saveConfiguration', {'theme': 'dark'})
-        } else {
-          btn.text(translations['dark'])
-          $("LINK[href='./dist/css/dark.css']").remove();
-          console.debug('EMIT [saveConfiguration]', {'theme': 'light'})
-          socket.emit('saveConfiguration', {'theme': 'light'})
-        }
-      }
-
-      var switchStats = function () {
-        var btn = $('#stats-btn')
-        var container = $('.stream-info-container')
-
-        if (btn.children('span').text() === translations['stats-panel'].hide) {
-          container.css('display', 'none')
-          btn.children('span').text(translations['stats-panel'].show)
-          btn.children('i').removeClass().addClass('fa fa-angle-down')
-        } else {
-          container.css('display', 'block')
-          btn.children('span').text(translations['stats-panel'].hide)
-          btn.children('i').removeClass().addClass('fa fa-angle-up')
-        }
-      }
-
-      var switchMute = function (update = true) {
-        var btn = $('#mute-btn')
-        btn.removeClass()
-        if (btn.data('muted')) {
-          btn.addClass('btn btn-default btn-xs')
-        } else {
-          btn.addClass('btn btn-success btn-xs')
-        }
-        btn.data('muted', !btn.data('muted'))
-        if (update) {
-          console.debug('EMIT [saveConfiguration]', {'mute': btn.data('muted')})
-          socket.emit('saveConfiguration', {'mute': btn.data('muted')})
-        }
-      }
-
-      var switchPercentageShow = function(update = true) {
-        var btn = $('#percentage-btn')
-        btn.removeClass()
-        if (btn.data('showPercentage')) {
-          btn.addClass('btn btn-default btn-xs')
-        } else {
-          btn.addClass('btn btn-info btn-xs')
-        }
-        btn.data('showPercentage', !btn.data('showPercentage'))
-        if (update) {
-          console.debug('EMIT [saveConfiguration]', {'percentage': btn.data('showPercentage')})
-          socket.emit('saveConfiguration', {'percentage': btn.data('showPercentage')})
-        }
-      }
-
-      var setStatus = function (id, status) {
-        $("#" + id + "Status").removeClass()
-
-        if (id === 'SOC' && status === 0) {
-          $("[id$='Status']").removeClass()
-          $("[id$='Status']").addClass('text-muted')
-        }
-
-        if (id === 'RES') {
-            $("#" + id + "Status").attr('title', 'Average bot response ' + status + 'ms')
-            if (status >= 1000) {
-              $("#" + id + "Status").addClass('text-danger')
-            } else if (status < 1000 && status >= 400) {
-              $("#" + id + "Status").addClass('text-warning')
-            } else {
-              $("#" + id + "Status").addClass('text-success')
-            }
-            $("#" + id + "Status").text(status + 'ms')
-        }
-
-        if (id === 'MOD') {
-          $("#" + id + "Status").attr('title', 'Bot is' + (status ? ' ' : ' not ') + 'a MOD')
-          $("#" + id + "Status").addClass('text-' + (status ? 'success' : 'danger'))
-          return
-        }
-
-        switch (status) {
-          case 0:
-            $("#" + id + "Status").attr('title', id + ' disconnected')
-            $("#" + id + "Status").addClass('text-danger')
-            break;
-          case 1:
-            $("#" + id + "Status").attr('title', id + ' connecting')
-            $("#" + id + "Status").addClass('text-warning')
-            break;
-          case 2:
-            $("#" + id + "Status").attr('title', id + ' reconnecting')
-            $("#" + id + "Status").addClass('text-warning')
-          case 3:
-            $("#" + id + "Status").attr('title', id + ' connected')
-            $("#" + id + "Status").addClass('text-success')
-            break;
-        }
-      }
       setInterval(function () { console.debug('EMIT [getConnectionStatus]'); socket.emit('getConnectionStatus'); setStatus('SOC', socket.connected ? 3 : 0) }, 1000)
       socket.on('connectionStatus', function (data) {
         _.each(data, function (status, conn) {
@@ -466,15 +357,6 @@
           $(".widgets").css('visibility', visibility)
           $("#addWidget").css('visibility', visibility)
         })
-      })
-
-      /* PAGES */
-      // update top offset every second and on page resize
-      $(window).resize(function() {
-        $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
-      })
-      setInterval(function() {
-        $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
       })
 
       socket.on('widgets', function(widgets) {
@@ -603,8 +485,6 @@
         var audio = new Audio(sound).play()
       })
     })
-
-
 
     var commons = {
         translate: function () {
@@ -1006,6 +886,125 @@
         socket.emit('deleteWidget', id)
         loadedWidgets.splice(loadedWidgets.indexOf(id), 1)
       }
+
+
+      var saveHighlight = function () {
+        console.debug('EMIT [highlight.save]')
+        socket.emit('highlight.save')
+
+      }
+      var switchTheme = function () {
+        var btn = $('#theme-btn')
+        if (btn.text() === translations['dark']) {
+          btn.text(translations['light'])
+          $('head').append('<link rel="stylesheet" href="./dist/css/dark.css">')
+          console.debug('EMIT [saveConfiguration]', {'theme': 'dark'})
+          socket.emit('saveConfiguration', {'theme': 'dark'})
+        } else {
+          btn.text(translations['dark'])
+          $("LINK[href='./dist/css/dark.css']").remove();
+          console.debug('EMIT [saveConfiguration]', {'theme': 'light'})
+          socket.emit('saveConfiguration', {'theme': 'light'})
+        }
+      }
+
+      var switchStats = function () {
+        var btn = $('#stats-btn')
+        var container = $('.stream-info-container')
+
+        if (btn.children('span').text() === translations['stats-panel'].hide) {
+          container.css('display', 'none')
+          btn.children('span').text(translations['stats-panel'].show)
+          btn.children('i').removeClass().addClass('fa fa-angle-down')
+        } else {
+          container.css('display', 'block')
+          btn.children('span').text(translations['stats-panel'].hide)
+          btn.children('i').removeClass().addClass('fa fa-angle-up')
+        }
+      }
+
+      var switchMute = function (update = true) {
+        var btn = $('#mute-btn')
+        btn.removeClass()
+        if (btn.data('muted')) {
+          btn.addClass('btn btn-default btn-xs')
+        } else {
+          btn.addClass('btn btn-success btn-xs')
+        }
+        btn.data('muted', !btn.data('muted'))
+        if (update) {
+          console.debug('EMIT [saveConfiguration]', {'mute': btn.data('muted')})
+          socket.emit('saveConfiguration', {'mute': btn.data('muted')})
+        }
+      }
+
+      var switchPercentageShow = function(update = true) {
+        var btn = $('#percentage-btn')
+        btn.removeClass()
+        if (btn.data('showPercentage')) {
+          btn.addClass('btn btn-default btn-xs')
+        } else {
+          btn.addClass('btn btn-info btn-xs')
+        }
+        btn.data('showPercentage', !btn.data('showPercentage'))
+        if (update) {
+          console.debug('EMIT [saveConfiguration]', {'percentage': btn.data('showPercentage')})
+          socket.emit('saveConfiguration', {'percentage': btn.data('showPercentage')})
+        }
+      }
+
+      var setStatus = function (id, status) {
+        $("#" + id + "Status").removeClass()
+
+        if (id === 'SOC' && status === 0) {
+          $("[id$='Status']").removeClass()
+          $("[id$='Status']").addClass('text-muted')
+        }
+
+        if (id === 'RES') {
+            $("#" + id + "Status").attr('title', 'Average bot response ' + status + 'ms')
+            if (status >= 1000) {
+              $("#" + id + "Status").addClass('text-danger')
+            } else if (status < 1000 && status >= 400) {
+              $("#" + id + "Status").addClass('text-warning')
+            } else {
+              $("#" + id + "Status").addClass('text-success')
+            }
+            $("#" + id + "Status").text(status + 'ms')
+        }
+
+        if (id === 'MOD') {
+          $("#" + id + "Status").attr('title', 'Bot is' + (status ? ' ' : ' not ') + 'a MOD')
+          $("#" + id + "Status").addClass('text-' + (status ? 'success' : 'danger'))
+          return
+        }
+
+        switch (status) {
+          case 0:
+            $("#" + id + "Status").attr('title', id + ' disconnected')
+            $("#" + id + "Status").addClass('text-danger')
+            break;
+          case 1:
+            $("#" + id + "Status").attr('title', id + ' connecting')
+            $("#" + id + "Status").addClass('text-warning')
+            break;
+          case 2:
+            $("#" + id + "Status").attr('title', id + ' reconnecting')
+            $("#" + id + "Status").addClass('text-warning')
+          case 3:
+            $("#" + id + "Status").attr('title', id + ' connected')
+            $("#" + id + "Status").addClass('text-success')
+            break;
+        }
+      }
+
+      // update top offset every second and on page resize
+      $(window).resize(function() {
+        $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
+      })
+      setInterval(function() {
+        $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
+      })
   </script>
 </body>
 
