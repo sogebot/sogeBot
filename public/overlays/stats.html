@@ -76,19 +76,16 @@
     <script src="/dist/lodash/js/lodash.min.js"></script>
 
     <script>
-      var socket = io()
-      socket.emit('authenticate', token)
-      socket.on('authenticated', function () {
-        setInterval(function () {
-          socket.emit('overlay.stats.get')
-        }, 1000)
-        socket.on('overlay.stats', function (data) {
-        $("#viewers").text(data.viewers)
-        $("#uptime").text(data.uptime)
-        $("#followers").text(data.followers)
-        $("#subscribers").text(data.subscribers)
-        $("#bits").text(data.bits)
-        })
+      var socket = io({query: "token="+token})
+      setInterval(function () {
+        socket.emit('overlay.stats.get')
+      }, 1000)
+      socket.on('overlay.stats', function (data) {
+      $("#viewers").text(data.viewers)
+      $("#uptime").text(data.uptime)
+      $("#followers").text(data.followers)
+      $("#subscribers").text(data.subscribers)
+      $("#bits").text(data.bits)
       })
     </script>
   </body>

@@ -72,7 +72,7 @@
     <script src="/dist/lodash/js/lodash.min.js"></script>
 
     <script>
-      var socket = io()
+      var socket = io({query: "token="+token});
 
       var translations = {}
       socket.on('lang', function (data) {

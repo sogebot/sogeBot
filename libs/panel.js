@@ -62,64 +62,65 @@ function Panel () {
   global.configuration.register('theme', 'core.theme', 'string', 'light')
   global.configuration.register('percentage', 'core.percentage', 'bool', true)
 
+  this.io.use(function (socket, next) {
+    if (global.configuration.get().panel.token.trim() === socket.request._query['token']) next()
+    return false
+  })
+
   var self = this
   this.io.on('connection', function (socket) {
     // check auth
-    const token = global.configuration.get().panel.token.trim()
-    socket.on('authenticate', function (aToken) {
-      if (aToken !== token) return
-      socket.emit('authenticated')
+    socket.emit('authenticated')
 
-      self.sendMenu(socket)
-      self.sendWidget(socket)
+    self.sendMenu(socket)
+    self.sendWidget(socket)
 
-      // twitch game and title change
-      socket.on('getGameFromTwitch', function (game) { global.twitch.sendGameFromTwitch(global.twitch, socket, game) })
-      socket.on('getUserTwitchGames', function () { global.twitch.sendUserTwitchGamesAndTitles(global.twitch, socket) })
-      socket.on('deleteUserTwitchGame', function (game) { global.twitch.deleteUserTwitchGame(global.twitch, socket, game) })
-      socket.on('deleteUserTwitchTitle', function (data) { global.twitch.deleteUserTwitchTitle(global.twitch, socket, data) })
-      socket.on('editUserTwitchTitle', function (data) { global.twitch.editUserTwitchTitle(global.twitch, socket, data) })
-      socket.on('updateGameAndTitle', function (data) { global.twitch.updateGameAndTitle(global.twitch, socket, data) })
+    // twitch game and title change
+    socket.on('getGameFromTwitch', function (game) { global.twitch.sendGameFromTwitch(global.twitch, socket, game) })
+    socket.on('getUserTwitchGames', function () { global.twitch.sendUserTwitchGamesAndTitles(global.twitch, socket) })
+    socket.on('deleteUserTwitchGame', function (game) { global.twitch.deleteUserTwitchGame(global.twitch, socket, game) })
+    socket.on('deleteUserTwitchTitle', function (data) { global.twitch.deleteUserTwitchTitle(global.twitch, socket, data) })
+    socket.on('editUserTwitchTitle', function (data) { global.twitch.editUserTwitchTitle(global.twitch, socket, data) })
+    socket.on('updateGameAndTitle', function (data) { global.twitch.updateGameAndTitle(global.twitch, socket, data) })
 
-      socket.on('getWidgetList', function () { self.sendWidgetList(self, socket) })
-      socket.on('addWidget', function (widget, row) { self.addWidgetToDb(self, widget, row, socket) })
-      socket.on('deleteWidget', function (widget) { self.deleteWidgetFromDb(self, widget) })
-      socket.on('getConnectionStatus', function () { socket.emit('connectionStatus', global.status) })
-      socket.on('saveConfiguration', function (data) {
-        _.each(data, function (index, value) {
-          if (value.startsWith('_')) return true
-          global.configuration.setValue(global.configuration, { username: global.configuration.get().username }, value + ' ' + index, data._quiet)
-        })
+    socket.on('getWidgetList', function () { self.sendWidgetList(self, socket) })
+    socket.on('addWidget', function (widget, row) { self.addWidgetToDb(self, widget, row, socket) })
+    socket.on('deleteWidget', function (widget) { self.deleteWidgetFromDb(self, widget) })
+    socket.on('getConnectionStatus', function () { socket.emit('connectionStatus', global.status) })
+    socket.on('saveConfiguration', function (data) {
+      _.each(data, function (index, value) {
+        if (value.startsWith('_')) return true
+        global.configuration.setValue(global.configuration, { username: global.configuration.get().username }, value + ' ' + index, data._quiet)
       })
-      socket.on('getConfiguration', function () {
-        var data = {}
-        _.each(global.configuration.sets(global.configuration), function (key) {
-          data[key] = global.configuration.getValue(key)
-        })
-        socket.emit('configuration', data)
-      })
-
-      // send enabled systems
-      socket.on('getSystems', function () { socket.emit('systems', global.configuration.get().systems) })
-      socket.on('getVersion', function () { socket.emit('version', process.env.npm_package_version) })
-
-      socket.on('parser.isRegistered', function (data) {
-        socket.emit(data.emit, { isRegistered: global.parser.isRegistered(data.command) })
-      })
-
-      _.each(self.socketListeners, function (listener) {
-        socket.on(listener.on, function (data) {
-          if (typeof listener.fnc !== 'function') {
-            throw new Error('Function for this listener is undefined' +
-              ' widget=' + listener.self.constructor.name + ' on=' + listener.on)
-          }
-          listener.fnc(listener.self, self.io, data)
-        })
-      })
-
-      // send webpanel translations
-      socket.emit('lang', global.translate({root: 'webpanel'}))
     })
+    socket.on('getConfiguration', function () {
+      var data = {}
+      _.each(global.configuration.sets(global.configuration), function (key) {
+        data[key] = global.configuration.getValue(key)
+      })
+      socket.emit('configuration', data)
+    })
+
+    // send enabled systems
+    socket.on('getSystems', function () { socket.emit('systems', global.configuration.get().systems) })
+    socket.on('getVersion', function () { socket.emit('version', process.env.npm_package_version) })
+
+    socket.on('parser.isRegistered', function (data) {
+      socket.emit(data.emit, { isRegistered: global.parser.isRegistered(data.command) })
+    })
+
+    _.each(self.socketListeners, function (listener) {
+      socket.on(listener.on, function (data) {
+        if (typeof listener.fnc !== 'function') {
+          throw new Error('Function for this listener is undefined' +
+            ' widget=' + listener.self.constructor.name + ' on=' + listener.on)
+        }
+        listener.fnc(listener.self, self.io, data)
+      })
+    })
+
+    // send webpanel translations
+    socket.emit('lang', global.translate({root: 'webpanel'}))
   })
 }
 

@@ -35,91 +35,88 @@
     <script src="/dist/lodash/js/lodash.min.js"></script>
 
     <script>
-      var socket = io()
+      var socket = io({query: "token="+token})
 
-      socket.emit('authenticate', token)
-      socket.on('authenticated', function () {
-        socket.off('configuration')
+      socket.off('configuration')
 
-        socket.emit('getConfiguration')
-        socket.on('configuration', function (data) {
-          emote.size = data.OEmotesSize > 5 ? emote.size = 5 : emote.size = data.OEmotesSize
-          emote.animation = data.OEmotesAnimation
-          emote.animationTime = data.OEmotesAnimationTime
-        })
+      socket.emit('getConfiguration')
+      socket.on('configuration', function (data) {
+        emote.size = data.OEmotesSize > 5 ? emote.size = 5 : emote.size = data.OEmotesSize
+        emote.animation = data.OEmotesAnimation
+        emote.animationTime = data.OEmotesAnimationTime
+      })
 
-        var emote = {
-          size: 2,
-          max: 5,
-          animationTime: 2000,
-          animation: 'fadeup',
+      var emote = {
+        size: 2,
+        max: 5,
+        animationTime: 2000,
+        animation: 'fadeup',
 
-          show: function (emote_url) {
-            var left = _.random($('body').width() - 200) + 100
-            var top = _.random($('body').height() - 200) + 100
+        show: function (emote_url) {
+          var left = _.random($('body').width() - 200) + 100
+          var top = _.random($('body').height() - 200) + 100
 
+          var emotes = $('#emotes')
+          var img = $('<img></img>')
+            .attr('src', emote_url)
+            .css('top', top)
+            .css('left', left)
+
+          switch (emote.animation) {
+            case 'fadeup':
+              setTimeout(function() {
+                emotes.append(img)
+                img.velocity({
+                  opacity: 0,
+                  top: top-100
+                }, emote.animationTime,
+                function () {
+                  $(this).remove()
+                })
+              }, _.random(2000))
+              break
+            case 'fadezoom':
+              setTimeout(function() {
+                emotes.append(img)
+                img.velocity({
+                  opacity: 0,
+                  scaleX: 0,
+                  scaleY: 0
+                }, emote.animationTime,
+                function () {
+                  $(this).remove()
+                })
+              }, _.random(2000))
+              break
+            }
+          },
+          explode: function (emotes_array) {
             var emotes = $('#emotes')
-            var img = $('<img></img>')
-              .attr('src', emote_url)
-              .css('top', top)
-              .css('left', left)
-
-            switch (emote.animation) {
-              case 'fadeup':
-                setTimeout(function() {
-                  emotes.append(img)
-                  img.velocity({
-                    opacity: 0,
-                    top: top-100
-                  }, emote.animationTime,
-                  function () {
-                    $(this).remove()
-                  })
-                }, _.random(2000))
-                break
-              case 'fadezoom':
-                setTimeout(function() {
-                  emotes.append(img)
-                  img.velocity({
-                    opacity: 0,
-                    scaleX: 0,
-                    scaleY: 0
-                  }, emote.animationTime,
-                  function () {
-                    $(this).remove()
-                  })
-                }, _.random(2000))
-                break
-              }
-            },
-            explode: function (emotes_array) {
-              var emotes = $('#emotes')
-              for (var i = 0; i < 50; i++) {
-                setTimeout(function() {
-                  var img = $('<img></img>')
-                    .attr('src', _.sample(emotes_array))
-                    .css('top', _.random(-300, 300) + $('#emotes').height() / 2)
-                    .css('left', _.random(-300, 300) + $('#emotes').width() / 2)
-                  emotes.append(img)
-                  img.velocity({
-                    opacity: 0,
-                    top: _.random(0, $('#emotes').height() - 100),
-                    left: _.random(0, $('#emotes').width() - 100)
-                  }, emote.animationTime,
-                  function () {
-                    $(this).remove()
-                  })
-                }, _.random(3000))
-              }
+            for (var i = 0; i < 50; i++) {
+              setTimeout(function() {
+                var img = $('<img></img>')
+                  .attr('src', _.sample(emotes_array))
+                  .css('top', _.random(-300, 300) + $('#emotes').height() / 2)
+                  .css('left', _.random(-300, 300) + $('#emotes').width() / 2)
+                emotes.append(img)
+                img.velocity({
+                  opacity: 0,
+                  top: _.random(0, $('#emotes').height() - 100),
+                  left: _.random(0, $('#emotes').width() - 100)
+                }, emote.animationTime,
+                function () {
+                  $(this).remove()
+                })
+              }, _.random(3000))
             }
           }
+        }
 
-        socket.on('emote.explode', function (emotes) {
-          emote.explode(emotes)
-        })
-        socket.on('emote', function (emote_url) {
-          emote.show(emote_url)
-        })
+      socket.on('emote.explode', function (emotes) {
+        emote.explode(emotes)
+      })
+      socket.on('emote', function (emote_url) {
+        emote.show(emote_url)
       })
     </script>
   </body>
