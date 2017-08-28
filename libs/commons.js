@@ -124,6 +124,17 @@ Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
   if (_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === global.configuration.get().twitch.username && !attr.force)) return false // we don't want to reply on bot commands
   message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + sender.username) : message
+
+  // global variables
+  message = message.replace(/\$game/g, global.twitch.current.game)
+    .replace(/\$title/g, global.twitch.current.status)
+    .replace(/\$viewers/g, global.twitch.current.viewers)
+    .replace(/\$views/g, global.twitch.current.views)
+    .replace(/\$followers/g, global.twitch.current.followers)
+    .replace(/\$hosts/g, global.twitch.current.hosts)
+    .replace(/\$subscribers/g, global.twitch.current.subscribers)
+    .replace(/\$bits/g, global.twitch.current.bits)
+
   if (!global.configuration.getValue('mute') || attr.force) {
     sender['message-type'] === 'whisper' ? global.log.whisperOut(message, {username: sender.username}) : global.log.chatOut(message, {username: sender.username})
     sender['message-type'] === 'whisper' ? global.client.whisper(sender.username, message) : global.client.say(global.configuration.get().twitch.channel, message)
