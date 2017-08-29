@@ -76,7 +76,15 @@
           "offsetY": "Vertical offset",
           "size": "Video size",
           "volume": "Volume",
-          "label": "Show 'replay' label"
+          "label": "Show 'replay' label",
+          "filter": {
+            "title": "Replay filter",
+            "none": "- none -",
+            "grayscale": "grayscale",
+            "sepia": "sepia",
+            "tint": "tint",
+            "washed": "washed out colors"
+          }
         }
       }
     },

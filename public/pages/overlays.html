@@ -81,6 +81,18 @@
         </td>
       </tr>
       <tr>
+        <td><strong data-lang="page-settings.overlays.replay.filter.title"></strong></td>
+        <td>
+          <select id="overlay-replay-filter-select" class="form-control" onchange="saveReplayFil()">
+            <option value="none" data-lang="page-settings.overlays.replay.filter.none"></option>
+            <option value="grayscale" data-lang="page-settings.overlays.replay.filter.grayscale"></option>
+            <option value="sepia" data-lang="page-settings.overlays.replay.filter.sepia"></option>
+            <option value="tint" data-lang="page-settings.overlays.replay.filter.tint"></option>
+            <option value="washed" data-lang="page-settings.overlays.replay.filter.washed"></option>
+          </select>
+        </td>
+      </tr>
+      <tr>
         <td><strong data-lang="page-settings.overlays.replay.offsetX"></strong></td>
         <td>
           <abbr title="click to edit" data-config-id="replayOffsetX" onclick="commons.configEditable(this, '')" id="configReplayOffsetX"></abbr>
@@ -182,6 +194,7 @@
     $('#replayLabelToggle').data('init', true)
 
     $('#overlay-replay-position-select option[value=' + data.replayPosition + ']').prop('selected', true)
+    $('#overlay-replay-filter-select option[value=' + data.replayFilter + ']').prop('selected', true)
   })
 
   socket.emit('overlay.images.get')
@@ -222,6 +235,10 @@
 
   function saveReplayPos () {
     socket.emit('saveConfiguration', {'replayPosition': $('#overlay-replay-position-select').val()})
+  }
+
+  function saveReplayFil () {
+    socket.emit('saveConfiguration', {'replayFilter': $('#overlay-replay-filter-select').val()})
   }
 
 </script>

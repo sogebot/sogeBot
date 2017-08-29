@@ -35,7 +35,7 @@
       #video-rel-pos { display: table-cell; position: relative; height: 100%; width: 100%; }
       #video-rel-pos > div { display: inline-block !important; }
       #video {
-        display: inline-block; opacity: 0
+        display: inline-block !important; opacity: 0;
       }
       #video_html5_api { width: 100% }
       #images div img {
@@ -52,20 +52,44 @@
       ul {
         list-style-type: none;
       }
+
+      /* filters */
+      .grayscale {
+        -webkit-filter: grayscale(1);
+        filter: grayscale(1);
+      }
+      .sepia {
+        -webkit-filter: sepia(1);
+        filter: sepia(1);
+      }
+      .tint {
+        -webkit-filter: sepia(1) hue-rotate(200deg);
+        filter: sepia(1) hue-rotate(200deg);
+      }
+      .washed {
+        -webkit-filter: contrast(1.4) saturate(1.8) sepia(.6);
+        filter: contrast(1.4) saturate(1.8) sepia(.6);
+      }
+
+
     </style>
   </head>
   <body>
     <div id="images"></div>
     <div id="video-pos">
       <div id="video-rel-pos">
-        <video id="video"></video>
+        <video id="video">
+          <source src="" type="video/mp4" />
+        </video>
+        <div id="replay-label" style="vertical-align: top; opacity:0; text-shadow: 0px 0px 2px black; position: absolute; font-family: 'Roboto Condensed', sans; color: red; font-weight: bold; text-transform: uppercase; margin-top: 5px; margin-left: -90px; width: 100%; text-align: left;"><i class="fa fa-circle" style="position:relative; top: -3px;" aria-hidden="true"></i>
+          <span style="font-size:20px">REPLAY</span>
+        </div>
       </div>
     </div>
 
     <script src="/dist/jquery/js/jquery.min.js"></script>
     <script src="/dist/lodash/js/lodash.min.js"></script>
     <script src="/dist/velocity-animate/js/velocity.min.js"></script>
-    <script src="/dist/video.js/js/video.js"></script>
 
     <script>
       var socket = io({query: "token="+token});
@@ -245,6 +269,7 @@
         }
         video.volume = _.isNil(video.volume) ? 1 : parseInt(video.volume, 10) / 100
         video.delay = _.isNil(video.delay) ? 0 : parseInt(video.delay, 10)
+        video.class = _.isNil(video.class) ? 'video' : video.class
 
         let style = ''
         switch (video.position) {
@@ -286,43 +311,54 @@
           style += ';top:' + video['y-offset'] + 'px'
         }
 
-        var vjs = videojs('video', {
-          controls: false,
-          autoplay: false,
-          preload: 'auto'
-        })
+        $('video source').attr('src', video.url)
+        $('video')[0].load()
 
-        if (!_.isNil(video.size)) vjs.width(video.size)
+        function checkLoad() {
+          if ($('video')[0].readyState === 4) {
+            $('video').prop("volume", video.volume)
+            $('video').attr("width", video.size)
 
-        vjs.src(video.url)
-        vjs.ready(function() {
-          $('#replay-label').remove()
-          if (video.label === 'true') {
-            var label = $('<div id="replay-label" style="opacity:0; text-shadow: 0px 0px 2px black; position: relative; top:30px; left:-20px; font-family: \'Roboto Condensed\', sans; color: red; font-weight: bold; text-transform: uppercase; float:right"><i class="fa fa-circle" style="position:relative; top: -3px; aria-hidden="true"></i> <span style="font-size:20px">REPLAY</span></div>')
-            label.velocity("fadeIn", { loop: true, duration: 1000 });
-            $('#video').prepend(label)
-          }
+            if (!_.isNil(video.filter)) {
+              $('video').addClass(video.filter)
+            }
 
-          vjs.volume(video.volume)
+            $('video').addClass(video.class)
 
-          $('#video-rel-pos').attr('style', style)
+            if (video.label === 'true') {
+              $('#replay-label').velocity("fadeIn", { loop: true, duration: 1000 });
+            } else {
+              $('#replay-label').css('opacity', 0)
+            }
 
-          if (video.delay === 0) {
-            vjs.play()
-            $('#video').velocity("fadeIn", { duration: video.duration })
-          } else {
-            setTimeout(function () {
-              vjs.play()
+            $('#video-rel-pos').attr('style', style)
+
+            if (video.delay === 0) {
+              $('video').trigger('play')
               $('#video').velocity("fadeIn", { duration: video.duration })
-            }, video.delay)
+            } else {
+              setTimeout(function () {
+                $('video').trigger('play')
+                $('#video').velocity("fadeIn", { duration: video.duration })
+              }, video.delay)
+            }
+            $("#video").bind("ended", function() {
+              $("#replay-label").velocity("stop");
+              $('#replay-label').velocity("fadeOut", { duration: video.duration });
+              $('#video').velocity("fadeOut", { duration: video.duration, complete: function(e) {
+                alertsQueue[id].finished++
+                $('video').removeClass(video.class)
+                if (!_.isNil(video.filter)) {
+                  $('video').removeClass(video.filter)
+                }
+              }})
+            });
+          } else {
+              setTimeout(checkLoad, 100);
           }
-        })
+        }
 
-        vjs.on('ended', function() {
-          $('#video').velocity("fadeOut", { duration: video.duration, complete: function(e) {
-            alertsQueue[id].finished++
-          }})
-        })
+        checkLoad()
       }
 
     </script>

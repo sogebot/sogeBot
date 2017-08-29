@@ -76,7 +76,15 @@
           "offsetY": "Vertikální posun",
           "size": "Velikost videa",
           "volume": "Hlasitost",
-          "label": "Ukazát 'replay' popisek"
+          "label": "Ukazát 'replay' popisek",
+          "filter": {
+            "title": "Filter replaye",
+            "none": "- žádný -",
+            "grayscale": "grayscale",
+            "sepia": "sepia",
+            "tint": "tint",
+            "washed": "vybledlé barvy"
+          }
         }
       }
     },

@@ -15,6 +15,7 @@ function Alerts () {
   global.configuration.register('replayOffsetY', 'core.no-response', 'number', '-300')
   global.configuration.register('replaySize', 'core.no-response', 'number', '600')
   global.configuration.register('replayVolume', 'core.no-response', 'number', '0')
+  global.configuration.register('replayFilter', 'core.no-response', 'string', 'none')
   global.configuration.register('replayLabel', 'core.no-response-bool', 'bool', true)
 
   global.panel.socketListening(this, 'replay-video', this.replay)
@@ -29,7 +30,9 @@ Alerts.prototype.replay = function (self, socket, data) {
     'y-offset=' + global.configuration.getValue('replayOffsetY'),
     'size=' + global.configuration.getValue('replaySize'),
     'volume=' + global.configuration.getValue('replayVolume'),
-    'label=' + global.configuration.getValue('replayLabel')
+    'label=' + global.configuration.getValue('replayLabel'),
+    'filter=' + global.configuration.getValue('replayFilter'),
+    'class=replay'
   ]
   self.overlay(self, null, replay.join(' '))
 }
