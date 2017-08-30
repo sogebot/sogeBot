@@ -161,6 +161,12 @@ Parser.prototype.isBroadcaster = function (user) {
   return global.configuration.get().twitch.channel.toLowerCase().trim() === user.username.toLowerCase().trim()
 }
 
+Parser.prototype.isMod = function (user) {
+  if (_.isString(user)) user = global.users.get(user)
+  else user = global.users.get(user.username)
+  return user.is.mod
+}
+
 Parser.prototype.isOwner = function (user) {
   try {
     if (_.isString(user)) user = { username: user }
