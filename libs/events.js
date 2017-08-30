@@ -5,26 +5,26 @@ var _ = require('lodash')
 
 function Events () {
   this.events = {
-    'user-joined-channel': [], // (username)
-    'user-parted-channel': [], // (username)
-    'follow': [], // (username)
-    'unfollow': [], // (username)
-    'subscription': [], // (username), (method)
-    'resub': [], // (username), (months), (message)
+    'user-joined-channel': [], // $username
+    'user-parted-channel': [], // $username
+    'follow': [], // $username
+    'unfollow': [], // $username
+    'subscription': [], // $username, (method)
+    'resub': [], // $username, $months, $message
     'command-send-x-times': [], // needs definition => { definition: true, command: '!smile', tCount: 10, tSent: 0, tTimestamp: 40000, tTriggered: new Date() }
     'number-of-viewers-is-at-least-x': [], // needs definition => { definition: true, viewers: 100, tTriggered: false, tTimestamp: 40000 } (if tTimestamp === 0 run once)
     'stream-started': [],
     'stream-stopped': [],
     'stream-is-running-x-minutes': [], // needs definition = { definition: true, tCount: 100, tTriggered: false }
-    'cheer': [], // (username), (bits), (message)
+    'cheer': [], // $username, $bits, $message
     'clearchat': [],
-    'action': [], // (username)
-    'ban': [], // (username), (reason)
-    'hosting': [], // (target), (viewers)
-    'hosted': [], // (username)
-    'mod': [], // (username)
-    'commercial': [], // (duration)
-    'timeout': [], // (username), (reason), (duration)
+    'action': [], // $username
+    'ban': [], // $username, $reason
+    'hosting': [], // $target, $viewers
+    'hosted': [], // $username
+    'mod': [], // $username
+    'commercial': [], // $duration
+    'timeout': [], // $username, $reason, $duration
     'every-x-seconds': [] // needs definition = { definition: true, tTrigerred: new Date(), tCount: 60 }
   }
   this.eventsTemplate = _.cloneDeep(this.events)
@@ -73,7 +73,7 @@ function Events () {
     },
     'log': function (attr) {
       let message = attr.message.replace(/\$username/g, attr.username)
-      _.each(message.match(/\((\w+)\)/gi), function (match) {
+      _.each(message.match(/\$(\w+)/gi), function (match) {
         let value = !_.isNil(attr[match.replace('$', '')]) ? attr[match.replace('$', '')] : 'none'
         message = message.replace(match, value)
       })
@@ -105,33 +105,33 @@ Events.prototype.loadSystemEvents = function (self) {
   self.events = self.removeSystemEvents(self)
 
   self.events['timeout'].push([
-    { system: true, name: 'log', message: '(username), reason: (reason), duration: (duration)', level: 'timeout' }
+    { system: true, name: 'log', message: 'username: $username, reason: $reason, duration: $duration', level: 'timeout' }
   ])
   self.events['follow'].push([
-    { system: true, name: 'log', message: '(username)', level: 'follow' },
+    { system: true, name: 'log', message: '$username', level: 'follow' },
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'follow' }
   ])
   self.events['resub'].push([
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'resub' },
-    { system: true, name: 'log', message: '(username), months: (months), message: (message)', level: 'resub' }
+    { system: true, name: 'log', message: '$username, months: $months, message: $message', level: 'resub' }
   ])
   self.events['subscription'].push([
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'sub' },
-    { system: true, name: 'log', message: '(username), method: (method)', level: 'sub' }
+    { system: true, name: 'log', message: '$username, method: (method)', level: 'sub' }
   ])
   self.events['unfollow'].push([
-    { system: true, name: 'log', message: '(username)', level: 'unfollow' }
+    { system: true, name: 'log', message: '$username', level: 'unfollow' }
   ])
   self.events['ban'].push([
-    { system: true, name: 'log', message: '(username), reason: (reason)', level: 'ban' }
+    { system: true, name: 'log', message: '$username, reason: $reason', level: 'ban' }
   ])
   self.events['hosted'].push([
-    { system: true, name: 'log', message: '(username)', level: 'host' },
+    { system: true, name: 'log', message: '$username', level: 'host' },
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'host' }
   ])
   self.events['cheer'].push([
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'cheer' },
-    { system: true, name: 'log', message: '(username), bits: (bits), message: (message)', level: 'cheer' }
+    { system: true, name: 'log', message: '$username, bits: $bits, message: $message', level: 'cheer' }
   ])
 }
 
