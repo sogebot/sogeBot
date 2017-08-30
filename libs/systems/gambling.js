@@ -121,9 +121,9 @@ Gambling.prototype.duel = function (self, sender, text) {
       // check if under gambling cooldown
       const cooldown = global.configuration.getValue('duelCooldown')
       if (new Date().getTime() - self.cooldown.duel > cooldown * 1000 ||
-        (global.configuration.getValue('gamblingCooldownBypass') && (sender.mod || global.parser.isBroadcaster(sender)))) {
+        (global.configuration.getValue('gamblingCooldownBypass') && (global.parser.isMod(sender) || global.parser.isBroadcaster(sender)))) {
         // save new cooldown if not bypassed
-        if (!(global.configuration.getValue('gamblingCooldownBypass') && (sender.mod || global.parser.isBroadcaster(sender)))) self.cooldown.duel = new Date().getTime()
+        if (!(global.configuration.getValue('gamblingCooldownBypass') && (global.parser.isMod(sender) || global.parser.isBroadcaster(sender)))) self.cooldown.duel = new Date().getTime()
         self.current.duel[sender.username.toLowerCase()] = parseInt(points, 10)
       } else {
         global.commons.sendMessage(global.translate('gambling.fightme.cooldown')
@@ -178,7 +178,7 @@ Gambling.prototype.roulette = function (self, sender) {
     return
   }
 
-  if (sender.mod) {
+  if (global.parser.isMod(sender)) {
     global.commons.sendMessage(global.translate('gambling.roulette.trigger') + ' ' + global.translate('gambling.roulette.mod'), sender)
     return
   }
@@ -193,7 +193,7 @@ Gambling.prototype.seppuku = function (self, sender) {
     return
   }
 
-  if (sender.mod) {
+  if (global.parser.isMod(sender)) {
     global.commons.sendMessage(global.translate('gambling.seppuku.mod'), sender)
     return
   }
@@ -222,13 +222,14 @@ Gambling.prototype.fightme = function (self, sender, text) {
     if (global.parser.isBroadcaster(sender) || global.parser.isBroadcaster(username)) {
       global.commons.sendMessage(global.translate('gambling.fightme.broadcaster')
         .replace(/\$winner/g, global.parser.isBroadcaster(sender) ? sender.username : username), sender)
-      if ((self.current.fightme[sender.username].mod || sender.mod) === false) global.client.timeout(global.configuration.get().twitch.channel, global.parser.isBroadcaster(sender) ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
+      var isMod = global.parser.isBroadcaster(sender) ? global.parser.isMod(username) : global.parser.isMod(sender)
+      if (!isMod) global.client.timeout(global.configuration.get().twitch.channel, global.parser.isBroadcaster(sender) ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
       self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
       return
     }
 
     // mod vs mod
-    if (self.current.fightme[sender.username].mod && sender.mod) {
+    if (global.parser.isMod(username) && global.parser.isMod(sender)) {
       global.commons.sendMessage(global.translate('gambling.fightme.bothModerators')
         .replace(/\$challenger/g, username), sender)
       self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
@@ -236,10 +237,10 @@ Gambling.prototype.fightme = function (self, sender, text) {
     }
 
     // vs mod
-    if (self.current.fightme[sender.username].mod || sender.mod) {
+    if (global.parser.isMod(username) || global.parser.isMod(sender)) {
       global.commons.sendMessage(global.translate('gambling.fightme.oneModerator')
-        .replace(/\$winner/g, sender.mod ? sender.username : username), sender)
-      global.client.timeout(global.configuration.get().twitch.channel, sender.mod ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
+        .replace(/\$winner/g, global.parser.isMod(sender) ? sender.username : username), sender)
+      global.client.timeout(global.configuration.get().twitch.channel, global.parser.isMod(sender) ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
       self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
       return
     }
@@ -252,7 +253,7 @@ Gambling.prototype.fightme = function (self, sender, text) {
     // check if under gambling cooldown
     const cooldown = global.configuration.getValue('fightmeCooldown')
     if (new Date().getTime() - self.cooldown.fightme < cooldown * 1000 &&
-      !(global.configuration.getValue('gamblingCooldownBypass') && (sender.mod || global.parser.isBroadcaster(sender)))) {
+      !(global.configuration.getValue('gamblingCooldownBypass') && (global.parser.isMod(sender) || global.parser.isBroadcaster(sender)))) {
       global.commons.sendMessage(global.translate('gambling.fightme.cooldown')
         .replace(/\$cooldown/g, Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.fightme)) / 1000 / 60))
         .replace(/\$minutesName/g, global.parser.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.fightme)) / 1000 / 60), 'core.minutes')), sender)
@@ -260,7 +261,7 @@ Gambling.prototype.fightme = function (self, sender, text) {
     }
 
     // save new timestamp if not bypassed
-    if (!(global.configuration.getValue('gamblingCooldownBypass') && (sender.mod || global.parser.isBroadcaster(sender)))) self.cooldown.fightme = new Date().getTime()
+    if (!(global.configuration.getValue('gamblingCooldownBypass') && (global.parser.isMod(sender) || global.parser.isBroadcaster(sender)))) self.cooldown.fightme = new Date().getTime()
 
     if (_.isNil(self.current.fightme[sender.username])) self.current.fightme[sender.username] = []
 

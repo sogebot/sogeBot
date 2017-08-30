@@ -966,7 +966,7 @@
       "challenge": "(ง'̀-'́)ง $sender wants to fight you $username! If you accept, send !fightme $sender",
       "winner": "٩(^ᴗ^)۶ $winner is proud winner! Who's next?",
       "notEnoughOptions": "$sender, you need to select user to fight.",
-      "broadcaster": "ψ(｀∇´)ψ $winner is a god among you. This fight  was decided even before it started.",
+      "broadcaster": "ψ(｀∇´)ψ $winner is a god among you. This fight was decided even before it started.",
       "bothModerators": "$challenger (*-`ω´- )人(*-`ω´- ) $sender, this fight will take milleniums to decide!",
       "oneModerator": "¯\\_(ツ)_/¯ $winner is under divine protection. Sorry."
     },
