@@ -52,7 +52,7 @@ Ranks.prototype.listSocket = function (self, socket) {
 
 Ranks.prototype.editSocket = function (self, socket, data) {
   if (data.value.length === 0) self.remove(self, null, data.id)
-  else global.botDB.update({ _id: 'rank_' + data.id }, { rank: data.value })
+  else global.botDB.update({ _id: 'rank_' + data.id }, { rank: data.value, hours: data.id })
   self.listSocket(self, socket)
 }
 

@@ -64,6 +64,7 @@
       socket.emit('deleteRank', el.dataset.hours)
     },
     create: function (event) {
+      event.preventDefault()
       var data = {hours: $("#inputWatched").val(), rank: $("#inputName").val()}
       socket.emit('createRank', data)
       $("#inputWatched").val('')
