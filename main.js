@@ -99,11 +99,14 @@ global.client.on('message', function (channel, sender, message, fromSelf) {
         global.users.isFollower(sender.username)
       }
 
+      const user = global.users.get(sender.username)
       if (!message.startsWith('!')) {
-        const user = global.users.get(sender.username)
         let msgs = _.isUndefined(user.stats.messages) ? 1 : parseInt(user.stats.messages, 10) + 1
         global.users.set(user.username, { stats: { messages: msgs } }, true)
       }
+
+      // set is.mod
+      global.users.set(user.username, { is: { mod: user.mod } })
 
       global.parser.parse(sender, message)
     } else {
