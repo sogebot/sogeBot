@@ -10,14 +10,14 @@ function Commons () {
 
 Commons.prototype.isSystemEnabled = function (fn) {
   var name = (typeof fn === 'object') ? fn.constructor.name : fn
-  var enabled = global.configuration.get().systems[name.toLowerCase()]
+  var enabled = !_.isNil(global.configuration.get().systems) && !_.isNil(global.configuration.get().systems[name.toLowerCase()]) ? global.configuration.get().systems[name.toLowerCase()] : false
   if (typeof fn === 'object') global.log.info(name + ' system ' + global.translate('core.loaded') + ' ' + (enabled ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
   return enabled
 }
 
 Commons.prototype.isIntegrationEnabled = function (fn) {
   var name = (typeof fn === 'object') ? fn.constructor.name : fn
-  var enabled = global.configuration.get().integrations[name.toLowerCase()]
+  var enabled = !_.isNil(global.configuration.get().integrations) && !_.isNil(global.configuration.get().integrations[name.toLowerCase()]) ? global.configuration.get().integrations[name.toLowerCase()] : false
   if (typeof fn === 'object') global.log.info(name + ' integration ' + global.translate('core.loaded') + ' ' + (enabled ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
   return enabled
 }
