@@ -111,7 +111,7 @@ global.client.on('message', function (channel, sender, message, fromSelf) {
       global.parser.parse(sender, message)
     } else {
       global.log.whisperIn(message, {username: sender.username})
-      if (!global.configuration.getValue('disableWhisperListener')) global.parser.parse(sender, message)
+      if (!global.configuration.getValue('disableWhisperListener') || global.parser.isOwner(sender)) global.parser.parse(sender, message)
     }
   }
 })
