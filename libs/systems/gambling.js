@@ -75,8 +75,8 @@ function Gambling () {
           .replace(/\$pointsName/g, global.systems.points.getPointsName(total))
           .replace(/\$points/g, total)
           .replace(/\$probability/g, _.round(probability, 2))
-          .replace(/\$tickets/g, tickets)
           .replace(/\$ticketsName/g, global.systems.points.getPointsName(tickets))
+          .replace(/\$tickets/g, tickets)
           .replace(/\$winner/g, (global.configuration.getValue('atUsername') ? '@' : '') + username), { username: username }, { force: true })
 
         // give user his points
