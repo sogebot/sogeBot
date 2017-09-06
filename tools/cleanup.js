@@ -64,6 +64,7 @@ async function clean_users_duplicates () {
 
   let newUsers = {}
   for (var i = 0, len = uniqueUsernames.length; i < len; i++) {
+    if (_.isNil(users.users[uniqueUsernames[i]])) continue
     newUsers[users.users[uniqueUsernames[i]].username] = users.users[uniqueUsernames[i]]
   }
   users = {
