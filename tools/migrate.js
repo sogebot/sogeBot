@@ -49,6 +49,10 @@ var migration = {
       await keywordsUpdate_5_8_0()
       console.log('-> Price update')
       await priceUpdate_5_8_0()
+      console.log('-> Playlist update')
+      await playlistUpdate_5_8_0()
+      console.log('-> Banned songs update')
+      await bannedsongsUpdate_5_8_0()
     }
   }
 }
@@ -278,4 +282,35 @@ async function priceUpdate_5_8_0() {
     await DB.update({ _table: 'prices', item }, item, { upsert: true })
   })
   await DB.remove({ _id: 'prices' })
+}
+
+async function playlistUpdate_5_8_0() {
+  let items = await DB.find({ type: 'playlist' })
+  if (items.length === 0) return
+
+  _.each(items, async function (item) {
+    delete item.type
+    delete item._id
+
+    item._table = 'playlist'
+    await DB.update({ _table: 'playlist', item }, item, { upsert: true })
+  })
+  await DB.remove({ type: 'playlist' }, { multi: true })
+}
+
+
+async function bannedsongsUpdate_5_8_0() {
+  let items = await DB.find({ type: 'banned-song' })
+  if (items.length === 0) return
+
+  _.each(items, async function (item) {
+    item.videoId = item._id
+    item._table = 'bannedsong'
+
+    delete item.type
+    delete item._id
+
+    await DB.update({ _table: 'bannedsong', item }, item, { upsert: true })
+  })
+  await DB.remove({ type: 'bannedsong' }, { multi: true })
 }
