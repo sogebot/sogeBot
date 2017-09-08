@@ -15,12 +15,12 @@ function Panel () {
   // setup static server
   var app = express()
   var server = http.createServer(app)
-  var port = process.env.PORT || global.configuration.get().panel.port
+  var port = process.env.PORT || config.panel.port
 
   // static routing
   app.get('/auth/token.js', function (req, res) {
     const origin = req.headers.referer ? req.headers.referer.substring(0, req.headers.referer.length - 1) : undefined
-    const domain = global.configuration.get().panel.domain.trim()
+    const domain = config.panel.domain.trim()
     if (_.isNil(origin)) {
       // file CANNOT be accessed directly
       res.status(401).send('401 Access Denied - This is not a file you are looking for.')
@@ -29,7 +29,7 @@ function Panel () {
 
     if (origin.match(new RegExp('https?://' + domain))) {
       res.set('Content-Type', 'application/javascript')
-      res.send('const token="' + global.configuration.get().panel.token.trim() + '"')
+      res.send('const token="' + config.panel.token.trim() + '"')
     } else {
       // file CANNOT be accessed from different domain
       res.status(403).send('403 Forbidden - You are looking at wrong castle.')
@@ -65,7 +65,7 @@ function Panel () {
   global.configuration.register('percentage', 'core.percentage', 'bool', true)
 
   this.io.use(function (socket, next) {
-    if (global.configuration.get().panel.token.trim() === socket.request._query['token']) next()
+    if (config.panel.token.trim() === socket.request._query['token']) next()
     return false
   })
 
@@ -129,8 +129,8 @@ function Panel () {
 Panel.prototype.authUser = function (req, res, next) {
   var user = basicAuth(req)
   try {
-    if (user.name === global.configuration.get().panel.username &&
-        user.pass === global.configuration.get().panel.password) {
+    if (user.name === config.panel.username &&
+        user.pass === config.panel.password) {
       return next()
     } else {
       throw new Error(NOT_AUTHORIZED)
