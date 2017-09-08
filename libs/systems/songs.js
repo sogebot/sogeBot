@@ -57,17 +57,16 @@ Songs.prototype.webPanel = function () {
   global.panel.socketListening(this, 'getVolume', this.getCurrentVolume)
 }
 
-Songs.prototype.getMeanLoudness = function (self) {
+Songs.prototype.getMeanLoudness = async function (self) {
   var loudness = 0
   var count = 0
-  global.botDB.find({type: 'playlist'}).exec(function (err, items) {
-    if (err) log.error(err, { fnc: 'Songs.prototype.getMeanLoudness' })
-    if (items.length < 1) self.meanLoudness = -15
-    else {
-      _.each(items, function (item) { (typeof item.loudness === 'undefined') ? loudness = loudness + -15 : loudness = loudness + parseFloat(item.loudness); count = count + 1 })
-      self.meanLoudness = loudness / count
-    }
-  })
+
+  let playlist = await global.db.engine.find('playlist')
+  if (playlist.length < 1) self.meanLoudness = -15
+  else {
+    _.each(playlist, function (item) { (typeof item.loudness === 'undefined') ? loudness = loudness + -15 : loudness = loudness + parseFloat(item.loudness); count = count + 1 })
+    self.meanLoudness = loudness / count
+  }
 }
 
 Songs.prototype.getVolume = function (self, item) {
@@ -99,13 +98,34 @@ Songs.prototype.banSong = function (self, sender, text) {
   text.trim().length === 0 ? self.banCurrentSong(self, sender) : self.banSongById(self, sender, text.trim())
 }
 
-Songs.prototype.banCurrentSong = function (self, sender) {
-  global.botDB.update({type: 'banned-song', _id: self.currentSong.videoID}, {$set: {_id: self.currentSong.videoID, title: self.currentSong.title}}, {upsert: true}, function (err, numAffected) {
-    if (err) log.error(err, { fnc: 'Songs.prototype.banCurrentSong' })
-    if (numAffected > 0) {
+Songs.prototype.banCurrentSong = async function (self, sender) {
+  let update = await global.db.engine.update('bannedsong', { videoId: self.currentSong.videoID }, { videoId: self.currentSong.videoID, title: self.currentSong.title })
+  if (update > 0) {
+    global.commons.sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, self.currentSong.title), sender)
+
+    global.db.engine.remove('playlist', { videoId: self.currentSong.videoID })
+    global.db.engine.remove('songrequest', { videoId: self.currentSong.videoID })
+
+    global.commons.timeout(self.currentSong.username, global.translate('songs.bannedSongTimeout'), 300)
+    self.getMeanLoudness(self)
+    self.sendNextSongID(self, global.panel.io)
+    self.sendPlaylistList(self, global.panel.io)
+  }
+}
+
+Songs.prototype.banSongById = async function (self, sender, text) {
+  text = text.trim()
+  ytdl.getInfo('https://www.youtube.com/watch?v=' + text, async function (err, videoInfo) {
+    if (err) log.error(err, { fnc: 'Songs.prototype.banSongById#1' })
+    if (typeof videoInfo.title === 'undefined' || videoInfo.title === null) return
+
+    let updated = await global.db.engine.update('bannedsong', { videoId: text }, { videoId: text, title: videoInfo.title })
+    if (updated > 0) {
       global.commons.sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, self.currentSong.title), sender)
-      global.commons.remove({_type: 'playlist', _videoID: self.currentSong.videoID})
-      global.commons.remove({_type: 'songrequest', _videoID: self.currentSong.videoID})
+
+      global.db.engine.remove('playlist', { videoId: text })
+      global.db.engine.remove('songrequest', { videoId: text })
+
       global.commons.timeout(self.currentSong.username, global.translate('songs.bannedSongTimeout'), 300)
       self.getMeanLoudness(self)
       self.sendNextSongID(self, global.panel.io)
@@ -114,25 +134,10 @@ Songs.prototype.banCurrentSong = function (self, sender) {
   })
 }
 
-Songs.prototype.banSongById = function (self, sender, text) {
-  ytdl.getInfo('https://www.youtube.com/watch?v=' + text, function (err, videoInfo) {
-    if (err) log.error(err, { fnc: 'Songs.prototype.banSongById#1' })
-    if (typeof videoInfo.title === 'undefined' || videoInfo.title === null) return
-    global.botDB.update({type: 'banned-song', _id: text}, {$set: {_id: text, title: videoInfo.title}}, {upsert: true}, function (err, numAffected) {
-      if (err) log.error(err, { fnc: 'Songs.prototype.banSongById#2' })
-      if (numAffected > 0) global.commons.sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, videoInfo.title), sender)
-      global.commons.remove({_type: 'playlist', _videoID: text.trim()})
-      global.commons.remove({_type: 'songrequest', _videoID: text.trim()})
-      self.getMeanLoudness(self)
-      self.sendNextSongID(self, global.panel.io)
-      self.sendPlaylistList(self, global.panel.io)
-    })
-  })
-}
-
-Songs.prototype.unbanSong = function (self, sender, text) {
-  var data = {_type: 'banned-song', __id: text.trim(), success: 'songs.unbannedSong', error: 'songs.notBannedSong'}
-  if (data.__id.length > 1) global.commons.remove(data)
+Songs.prototype.unbanSong = async function (self, sender, text) {
+  let removed = await global.db.engine.remove('bannedsong', { videoId: text.trim() })
+  if (removed > 0) global.commons.sendMessage(global.translate('songs.unbannedSong'), sender)
+  else global.commons.sendMessage(global.translate('songs.notBannedSong'), sender)
 }
 
 Songs.prototype.getCurrentSong = function (self) {
@@ -144,6 +149,7 @@ Songs.prototype.getCurrentSong = function (self) {
   global.commons.sendMessage(global.translate(translation).replace(/\$title/g, self.currentSong.title).replace(/\$username/g, (global.configuration.getValue('atUsername') ? '@' : '') + self.currentSong.username), {username: global.configuration.get().twitch.channel})
 }
 
+/* TODO: CONTINUE */
 Songs.prototype.stealSongToPlaylist = function (self) {
   try {
     self.addSongToPlaylist(self, null, self.currentSong.videoID)
