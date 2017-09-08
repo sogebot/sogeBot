@@ -53,6 +53,8 @@ var migration = {
       await playlistUpdate_5_8_0()
       console.log('-> Banned songs update')
       await bannedsongsUpdate_5_8_0()
+      console.log('-> Alias update')
+      await aliasUpdate_5_8_0()
     }
   }
 }
@@ -298,7 +300,6 @@ async function playlistUpdate_5_8_0() {
   await DB.remove({ type: 'playlist' }, { multi: true })
 }
 
-
 async function bannedsongsUpdate_5_8_0() {
   let items = await DB.find({ type: 'banned-song' })
   if (items.length === 0) return
@@ -313,4 +314,16 @@ async function bannedsongsUpdate_5_8_0() {
     await DB.update({ _table: 'bannedsong', item }, item, { upsert: true })
   })
   await DB.remove({ type: 'bannedsong' }, { multi: true })
+}
+
+async function aliasUpdate_5_8_0() {
+  let items = await DB.findOne({ _id: 'alias' })
+  if (items.alias.length === 0) return
+
+  _.each(items.alias, async function (item) {
+    delete item.id
+    item._table = 'alias'
+    await DB.update({ _table: 'alias', item }, item, { upsert: true })
+  })
+  await DB.remove({ _id: 'alias' })
 }

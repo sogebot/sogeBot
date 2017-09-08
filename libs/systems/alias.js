@@ -5,7 +5,6 @@ var _ = require('lodash')
 
 // bot libraries
 var constants = require('../constants')
-var log = global.log
 
 const ERROR_DOESNT_EXISTS = '1'
 
@@ -19,7 +18,6 @@ const ERROR_DOESNT_EXISTS = '1'
  */
 
 function Alias () {
-  this.alias = []
   if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!alias add', this.add, constants.OWNER_ONLY)
     global.parser.register(this, '!alias list', this.list, constants.OWNER_ONLY)
@@ -30,30 +28,13 @@ function Alias () {
 
     global.parser.registerHelper('!alias')
 
-    global.watcher.watch(this, 'alias', this._save)
-    this._update(this)
-
     this.webPanel()
   }
 }
 
-Alias.prototype._update = function (self) {
-  global.botDB.findOne({ _id: 'alias' }, function (err, item) {
-    if (err) return log.error(err, { fnc: 'Alias.prototype._update' })
-    if (_.isNull(item)) return
-
-    self.alias = item.alias
-  })
-}
-
-Alias.prototype._save = function (self) {
-  var alias = { alias: self.alias }
-  global.botDB.update({ _id: 'alias' }, { $set: alias }, { upsert: true })
-  self._register(self)
-}
-
-Alias.prototype._register = function (self) {
-  _.each(self.alias, function (o) { global.parser.register(self, '!' + o.alias, self.run, constants.VIEWERS) })
+Alias.prototype.register = async function (self) {
+  let alias = await global.db.engine.find('alias')
+  _.each(alias, function (o) { global.parser.register(self, '!' + o.alias, self.run, constants.VIEWERS) })
 }
 
 Alias.prototype.webPanel = function () {
@@ -66,8 +47,8 @@ Alias.prototype.webPanel = function () {
   global.panel.socketListening(this, 'alias.edit', this.editAlias)
 }
 
-Alias.prototype.sendAliases = function (self, socket) {
-  socket.emit('alias', self.alias)
+Alias.prototype.sendAliases = async function (self, socket) {
+  socket.emit('alias', await global.db.engine.find('alias'))
 }
 
 Alias.prototype.deleteAlias = function (self, socket, data) {
@@ -92,11 +73,11 @@ Alias.prototype.createAlias = function (self, socket, data) {
   self.sendAliases(self, socket)
 }
 
-Alias.prototype.editAlias = function (self, socket, data) {
+Alias.prototype.editAlias = async function (self, socket, data) {
   if (data.value.length === 0) self.remove(self, null, '!' + data.id)
   else {
     if (data.value.startsWith('!')) data.value = data.value.replace('!', '')
-    _.find(self.alias, function (o) { return o.alias === data.id }).command = data.value
+    await global.db.engine.update('alias', { alias: data.id }, { command: data.value })
   }
   self.sendAliases(self, socket)
 }
@@ -108,29 +89,29 @@ Alias.prototype.help = function (self, sender) {
 Alias.prototype.add = function (self, sender, text) {
   try {
     let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w\S ]+) !([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
-    let data = {
+    let alias = {
       alias: parsed[2],
       command: parsed[1],
       enabled: true,
       visible: true
     }
 
-    if (global.parser.isRegistered(data.alias)) {
-      global.commons.sendMessage(global.translate('core.isRegistered').replace(/\$keyword/g, '!' + data.alias), sender)
+    if (global.parser.isRegistered(alias.alias)) {
+      global.commons.sendMessage(global.translate('core.isRegistered').replace(/\$keyword/g, '!' + alias.alias), sender)
       return
     }
 
-    let alias = _.find(self.alias, function (oAlias) { return oAlias.alias === data.alias })
-    if (_.isUndefined(alias)) self.alias.push(data)
-    global.commons.sendMessage(global.translate(_.isUndefined(alias) ? 'alias.success.add' : 'alias.failed.add'), sender)
+    global.db.engine.update('alias', { alias: alias.alias }, alias)
+    self.register(self)
+    global.commons.sendMessage(alias.success.add, sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
   }
 }
 
-Alias.prototype.run = function (self, sender, msg, fullMsg) {
+Alias.prototype.run = async function (self, sender, msg, fullMsg) {
   let parsed = fullMsg.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
-  let alias = _.find(self.alias, function (o) { return o.alias.toLowerCase() === parsed[1].toLowerCase() && o.enabled })
+  let alias = await global.db.engine.findOne('alias', { alias: parsed[1].toLowerCase(), enabled: true })
   try {
     global.parser.parse(sender, fullMsg.replace(parsed[1], alias.command), true)
   } catch (e) {
@@ -138,25 +119,25 @@ Alias.prototype.run = function (self, sender, msg, fullMsg) {
   }
 }
 
-Alias.prototype.list = function (self, sender, text) {
-  var aliases = []
-  _.each(self.alias, function (element) { if (element.visible) aliases.push('!' + element.alias) })
-  var output = (aliases.length === 0 ? global.translate('alias.failed.list') : global.translate('alias.success.list') + ': ' + aliases.join(', '))
+Alias.prototype.list = async function (self, sender, text) {
+  let alias = await global.db.engine.find('alias', { visible: true })
+  var output = (alias.length === 0 ? global.translate('alias.failed.list') : global.translate('alias.success.list') + ': !' + _.map(alias, 'alias').join(', !'))
   global.commons.sendMessage(output, sender)
 }
 
-Alias.prototype.toggle = function (self, sender, text) {
+Alias.prototype.toggle = async function (self, sender, text) {
   try {
-    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)[1]
-    let alias = _.find(self.alias, function (o) { return o.alias === parsed })
-
-    if (_.isUndefined(alias)) {
+    const id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)[1]
+    const alias = await global.db.engine.findOne('alias', { alias: id })
+    if (_.isEmpty(alias)) {
       global.commons.sendMessage(global.translate('alias.failed.toggle')
-        .replace(/\$alias/g, parsed), sender)
+        .replace(/\$alias/g, id), sender)
       return
     }
 
-    alias.enabled = !alias.enabled
+    await global.db.engine.update('alias', { alias: id }, { enabled: !alias.enabled })
+    self.register(self)
+
     global.commons.sendMessage(global.translate(alias.enabled ? 'alias.success.enabled' : 'alias.success.disabled')
       .replace(/\$alias/g, alias.alias), sender)
   } catch (e) {
@@ -164,18 +145,18 @@ Alias.prototype.toggle = function (self, sender, text) {
   }
 }
 
-Alias.prototype.visible = function (self, sender, text) {
+Alias.prototype.visible = async function (self, sender, text) {
   try {
-    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)[1]
-    let alias = _.find(self.alias, function (o) { return o.alias === parsed })
-
-    if (_.isUndefined(alias)) {
+    const id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)[1]
+    const alias = await global.db.engine.findOne('alias', { alias: id })
+    if (_.isEmpty(alias)) {
       global.commons.sendMessage(global.translate('alias.failed.visible')
-        .replace(/\$alias/g, parsed), sender)
+        .replace(/\$alias/g, id), sender)
       return
     }
 
-    alias.visible = !alias.visible
+    await global.db.engine.update('alias', { alias: id }, { visible: !alias.visible })
+
     global.commons.sendMessage(global.translate(alias.visible ? 'alias.success.visible' : 'alias.success.invisible')
       .replace(/\$alias/g, alias.alias), sender)
   } catch (e) {
@@ -183,13 +164,13 @@ Alias.prototype.visible = function (self, sender, text) {
   }
 }
 
-Alias.prototype.remove = function (self, sender, text) {
+Alias.prototype.remove = async function (self, sender, text) {
   try {
-    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)[1]
-    if (_.isUndefined(_.find(self.alias, function (o) { return o.alias === parsed }))) throw Error(ERROR_DOESNT_EXISTS)
-    self.alias = _.filter(self.alias, function (o) { return o.alias !== parsed })
-    global.commons.sendMessage(global.translate('alias.success.remove'), sender)
+    const id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)[1]
+    let removed = await global.db.engine.remove('alias', { alias: id })
+    if (!removed) throw Error(ERROR_DOESNT_EXISTS)
     global.parser.unregister(text)
+    global.commons.sendMessage(global.translate('alias.success.remove'), sender)
   } catch (e) {
     switch (e.message) {
       case ERROR_DOESNT_EXISTS:

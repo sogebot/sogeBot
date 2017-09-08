@@ -121,7 +121,7 @@ CustomCommands.prototype.run = async function (self, sender, msg, fullMsg) {
 
 CustomCommands.prototype.list = async function (self, sender, text) {
   let commands = await global.db.engine.find('commands', { visible: true })
-  var output = (commands.length === 0 ? global.translate('customcmds.failed.list') : global.translate('customcmds.success.list') + ': ' + commands.join(', '))
+  var output = (commands.length === 0 ? global.translate('customcmds.failed.list') : global.translate('customcmds.success.list') + ': !' + commands.join(', !'))
   global.commons.sendMessage(output, sender)
 }
 
@@ -136,11 +136,10 @@ CustomCommands.prototype.toggle = async function (self, sender, text) {
     }
 
     await global.db.engine.update('commands', { command: id }, { enabled: !command.enabled })
+    self.register(self)
 
     global.commons.sendMessage(global.translate(command.enabled ? 'customcmds.success.enabled' : 'customcmds.success.disabled')
       .replace(/\$command/g, command.command), sender)
-
-    if (command.enabled) { self.register(self) }
   } catch (e) {
     global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
   }

@@ -1,7 +1,5 @@
 'use strict'
 
-var ini = require('ini')
-var fs = require('fs')
 var Database = require('nedb')
 var dbPromise = require('nedb-promise')
 var constants = require('./constants')
@@ -18,7 +16,6 @@ function Configuration () {
   this.config = null
   this.cfgL = {}
   this.default = {}
-  this.loadFile()
 
   global.parser.register(this, '!set list', this.listSets, constants.OWNER_ONLY)
   global.parser.register(this, '!set', this.setValue, constants.OWNER_ONLY)
@@ -31,10 +28,6 @@ function Configuration () {
 
   const self = this
   setTimeout(function () { global.log.info('Bot is loading configuration data'); self.loadValues() }, 2000)
-}
-
-Configuration.prototype.loadFile = function () {
-  this.config = ini.parse(fs.readFileSync('./config.ini', 'utf-8'))
 }
 
 Configuration.prototype.get = function () {
