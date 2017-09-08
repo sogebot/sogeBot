@@ -47,6 +47,8 @@ var migration = {
       await commandsUpdate_5_8_0()
       console.log('-> Keywords update')
       await keywordsUpdate_5_8_0()
+      console.log('-> Price update')
+      await priceUpdate_5_8_0()
     }
   }
 }
@@ -265,4 +267,15 @@ async function keywordsUpdate_5_8_0() {
     await DB.update({ _table: 'keywords', item }, item, { upsert: true })
   })
   await DB.remove({ _id: 'keywords' })
+}
+
+async function priceUpdate_5_8_0() {
+  let items = await DB.findOne({ _id: 'prices' })
+  if (items.prices.length === 0) return
+
+  _.each(items.prices, async function (item) {
+    item._table = 'prices'
+    await DB.update({ _table: 'prices', item }, item, { upsert: true })
+  })
+  await DB.remove({ _id: 'prices' })
 }
