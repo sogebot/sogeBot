@@ -6,7 +6,7 @@ var constants = require('../constants')
 var crypto = require('crypto')
 
 function RafflesWidget () {
-  if (global.configuration.get().systems.raffles !== true) return
+  if (!global.commons.isSystemEnabled('raffles')) return
 
   this.participants = 0
   this.winner = null

@@ -1,7 +1,7 @@
 'use strict'
 
 function BetsWidget () {
-  if (global.configuration.get().systems.bets !== true) return
+  if (!global.commons.isSystemEnabled('bets')) return
   this.cachedTime = 0
 
   global.panel.addWidget('bets', 'widget-title-bets', 'knight')

@@ -1,13 +1,10 @@
 'use strict'
 
 // 3rdparty libraries
-var crypto = require('crypto')
 var _ = require('lodash')
 // bot libraries
 var constants = require('../constants')
-var log = global.log
 
-const ERROR_ALREADY_EXISTS = '0'
 const ERROR_DOESNT_EXISTS = '1'
 
 /*
@@ -20,8 +17,6 @@ const ERROR_DOESNT_EXISTS = '1'
  */
 
 function Notice () {
-  this.notices = []
-
   this.lastNoticeSent = new Date().getTime()
   this.msgCountSent = global.parser.linesParsed
 
@@ -38,9 +33,6 @@ function Notice () {
     global.configuration.register('noticeInterval', 'notice.settings.noticeInterval', 'number', 10)
     global.configuration.register('noticeMsgReq', 'notice.settings.noticeMsgReq', 'number', 10)
 
-    global.watcher.watch(this, 'notices', this._save)
-    this._update(this)
-
     this.webPanel()
 
     // start interval for posting notices
@@ -49,22 +41,6 @@ function Notice () {
       self.send()
     }, 1000)
   }
-}
-
-Notice.prototype._update = function (self) {
-  global.botDB.findOne({ _id: 'notices' }, function (err, item) {
-    if (err) return log.error(err, { fnc: 'Notice.prototype._update' })
-    if (_.isNull(item)) return
-
-    self.notices = item.notices
-  })
-}
-
-Notice.prototype._save = function (self) {
-  var notices = {
-    notices: self.notices
-  }
-  global.botDB.update({ _id: 'notices' }, { $set: notices }, { upsert: true })
 }
 
 Notice.prototype.webPanel = function () {
@@ -79,8 +55,8 @@ Notice.prototype.webPanel = function () {
   global.panel.socketListening(this, 'notice.edit', this.editNotice)
 }
 
-Notice.prototype.sendNotices = function (self, socket) {
-  socket.emit('notice', self.notices)
+Notice.prototype.sendNotices = async function (self, socket) {
+  socket.emit('notice', await global.db.engine.find('notices'))
 }
 
 Notice.prototype.deleteNotice = function (self, socket, data) {
@@ -88,8 +64,8 @@ Notice.prototype.deleteNotice = function (self, socket, data) {
   self.sendNotices(self, socket)
 }
 
-Notice.prototype.toggleNotice = function (self, socket, data) {
-  self.toggle(self, null, data)
+Notice.prototype.toggleNotice = async function (self, socket, data) {
+  await self.toggle(self, null, data)
   self.sendNotices(self, socket)
 }
 
@@ -98,9 +74,9 @@ Notice.prototype.createNotice = function (self, socket, data) {
   self.sendNotices(self, socket)
 }
 
-Notice.prototype.editNotice = function (self, socket, data) {
+Notice.prototype.editNotice = async function (self, socket, data) {
   if (data.value.length === 0) self.remove(self, null, data.id)
-  else _.find(self.notices, function (o) { return o.id === data.id }).text = data.value
+  else await global.db.engine.update('notices', { _id: data.id }, { text: data.value })
   self.sendNotices(self, socket)
 }
 
@@ -117,7 +93,8 @@ Notice.prototype.send = async function () {
   var now = new Date().getTime()
 
   if ((now - this.lastNoticeSent >= timeIntervalInMs && global.parser.linesParsed - this.msgCountSent >= noticeMinChatMsg)) {
-    let notice = _.orderBy(_.filter(this.notices, function (o) {
+    let notices = await global.db.engine.find('notices')
+    let notice = _.orderBy(_.filter(notices, function (o) {
       const filter = _.isNil(global.twitch.when.online) ? '(onlineonly)' : '(offlineonly)'
       return o.enabled && !o.text.trim().startsWith(filter)
     }), 'time', 'asc')[0]
@@ -129,11 +106,7 @@ Notice.prototype.send = async function () {
     global.commons.sendMessage(notice.text, {username: global.configuration.get().twitch.channel})
 
     // update notice
-    notice.time = this.lastNoticeSent
-    this.notices = _.filter(this.notices, function (o) {
-      return o.id !== notice.id
-    })
-    this.notices.push(notice)
+    global.db.engine.update('notices', { _id: notice._id }, { time: this.lastNoticeSent })
   }
 }
 
@@ -144,34 +117,27 @@ Notice.prototype.help = function (self, sender) {
 Notice.prototype.add = function (self, sender, text) {
   try {
     let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
-    let notice = { text: parsed[0], time: new Date().getTime(), id: crypto.createHash('md5').update(parsed[0]).digest('hex').substring(0, 5), enabled: true }
-    if (!_.isUndefined(_.find(self.notices, function (o) { return o.id === notice.id }))) throw Error(ERROR_ALREADY_EXISTS)
-    self.notices.push(notice)
+    let notice = { text: parsed[0], time: new Date().getTime(), enabled: true }
+
+    global.db.engine.update('notices', { text: notice.text }, notice)
     global.commons.sendMessage(global.translate('notice.success.add'), sender)
   } catch (e) {
-    switch (e.message) {
-      case ERROR_ALREADY_EXISTS:
-        global.commons.sendMessage(global.translate('notice.failed.add'), sender)
-        break
-      default:
-        global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
-    }
+    global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
   }
 }
 
-Notice.prototype.list = function (self, sender, text) {
-  var notices = []
-  _.each(self.notices, function (element) { notices.push(element.id) })
-  var output = (notices.length === 0 ? global.translate('notice.failed.list') : global.translate('notice.success.list') + ': ' + notices.join(', '))
+Notice.prototype.list = async function (self, sender, text) {
+  let notices = await global.db.engine.find('notices')
+  var output = (notices.length === 0 ? global.translate('notice.failed.list') : global.translate('notice.success.list') + ': ' + _.map(notices, '_id').join(', '))
   global.commons.sendMessage(output, sender)
 }
 
-Notice.prototype.get = function (self, sender, text) {
+Notice.prototype.get = async function (self, sender, text) {
   try {
     const id = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
-    const notice = _.find(self.notices, function (o) { return o.id === id })
+    const notice = await global.db.engine.findOne('notices', { _id: id })
     if (_.isUndefined(notice)) throw Error(ERROR_DOESNT_EXISTS)
-    global.commons.sendMessage('Notice#' + notice.id + ': ' + notice.text, sender)
+    global.commons.sendMessage('Notice#' + notice._id + ': ' + notice.text, sender)
   } catch (e) {
     switch (e.message) {
       case ERROR_DOESNT_EXISTS:
@@ -183,29 +149,29 @@ Notice.prototype.get = function (self, sender, text) {
   }
 }
 
-Notice.prototype.toggle = function (self, sender, text) {
+Notice.prototype.toggle = async function (self, sender, text) {
   try {
     const id = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
-    let notice = _.find(self.notices, function (o) { return o.id === id })
-    if (_.isUndefined(notice)) {
+    const notice = await global.db.engine.findOne('notices', { _id: id })
+    if (_.isEmpty(notice)) {
       global.commons.sendMessage(global.translate('notice.failed.toggle')
         .replace(/\$notice/g, id), sender)
       return
     }
 
-    notice.enabled = !notice.enabled
+    await global.db.engine.update('notices', { _id: notice._id }, { enabled: !notice.enabled })
     global.commons.sendMessage(global.translate(notice.enabled ? 'notice.success.enabled' : 'notice.success.disabled')
-      .replace(/\$notice/g, notice.id), sender)
+      .replace(/\$notice/g, notice._id), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
   }
 }
 
-Notice.prototype.remove = function (self, sender, text) {
+Notice.prototype.remove = async function (self, sender, text) {
   try {
-    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    if (_.isUndefined(_.find(self.notices, function (o) { return o.id === parsed[1] }))) throw Error(ERROR_DOESNT_EXISTS)
-    self.notices = _.filter(self.notices, function (o) { return o.id !== parsed[1] })
+    let id = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+    let removed = await global.db.engine.remove('notices', { _id: id })
+    if (!removed) throw Error(ERROR_DOESNT_EXISTS)
     global.commons.sendMessage(global.translate('notice.success.remove'), sender)
   } catch (e) {
     switch (e.message) {

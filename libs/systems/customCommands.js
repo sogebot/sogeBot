@@ -5,7 +5,6 @@ var _ = require('lodash')
 
 // bot libraries
 var constants = require('../constants')
-var log = global.log
 
 const ERROR_ALREADY_EXISTS = '0'
 const ERROR_DOESNT_EXISTS = '1'
@@ -20,8 +19,6 @@ const ERROR_DOESNT_EXISTS = '1'
  */
 
 function CustomCommands () {
-  this.commands = []
-
   if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!command add', this.add, constants.OWNER_ONLY)
     global.parser.register(this, '!command list', this.list, constants.OWNER_ONLY)
@@ -32,25 +29,9 @@ function CustomCommands () {
 
     global.parser.registerHelper('!command')
 
-    global.watcher.watch(this, 'commands', this._save)
-    this._update(this)
-
+    this.register(this)
     this.webPanel()
   }
-}
-
-CustomCommands.prototype._update = function (self) {
-  global.botDB.findOne({ _id: 'commands' }, function (err, item) {
-    if (err) return log.error(err, { fnc: 'CustomCommands.prototype._update' })
-    if (_.isNull(item)) return
-    self.commands = item.commands
-  })
-}
-
-CustomCommands.prototype._save = function (self) {
-  let commands = { commands: self.commands }
-  global.botDB.update({ _id: 'commands' }, { $set: commands }, { upsert: true })
-  self.register(self)
 }
 
 CustomCommands.prototype.webPanel = function () {
@@ -63,8 +44,8 @@ CustomCommands.prototype.webPanel = function () {
   global.panel.socketListening(this, 'commands.edit', this.editCommands)
 }
 
-CustomCommands.prototype.sendCommands = function (self, socket) {
-  socket.emit('commands', self.commands)
+CustomCommands.prototype.sendCommands = async function (self, socket) {
+  socket.emit('commands', await global.db.engine.find('commands'))
 }
 
 CustomCommands.prototype.deleteCommands = function (self, socket, data) {
@@ -72,13 +53,13 @@ CustomCommands.prototype.deleteCommands = function (self, socket, data) {
   self.sendCommands(self, socket)
 }
 
-CustomCommands.prototype.toggleCommands = function (self, socket, data) {
-  self.toggle(self, null, '!' + data)
+CustomCommands.prototype.toggleCommands = async function (self, socket, data) {
+  await self.toggle(self, null, '!' + data)
   self.sendCommands(self, socket)
 }
 
-CustomCommands.prototype.toggleVisibilityCommands = function (self, socket, data) {
-  self.visible(self, null, '!' + data)
+CustomCommands.prototype.toggleVisibilityCommands = async function (self, socket, data) {
+  await self.visible(self, null, '!' + data)
   self.sendCommands(self, socket)
 }
 
@@ -87,9 +68,9 @@ CustomCommands.prototype.createCommands = function (self, socket, data) {
   self.sendCommands(self, socket)
 }
 
-CustomCommands.prototype.editCommands = function (self, socket, data) {
+CustomCommands.prototype.editCommands = async function (self, socket, data) {
   if (data.value.length === 0) self.remove(self, null, data.id)
-  else _.find(self.commands, function (o) { return o.command === data.id }).response = data.value
+  else await global.db.engine.update('commands', { command: data.id }, { response: data.value })
   self.sendCommands(self, socket)
 }
 
@@ -97,22 +78,25 @@ CustomCommands.prototype.help = function (self, sender) {
   global.commons.sendMessage(global.translate('core.usage') + ': !command add <!command> <response> | !command remove <!command> | !command list', sender)
 }
 
-CustomCommands.prototype.register = function (self) {
-  _.each(self.commands, function (o) { global.parser.register(self, '!' + o.command, self.run, constants.VIEWERS) })
+CustomCommands.prototype.register = async function (self) {
+  let commands = await global.db.engine.find('commands')
+  _.each(commands, function (o) { global.parser.register(self, '!' + o.command, self.run, constants.VIEWERS) })
 }
 
-CustomCommands.prototype.add = function (self, sender, text) {
+CustomCommands.prototype.add = async function (self, sender, text) {
   try {
     let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
     let command = { command: parsed[1], response: parsed[2], enabled: true, visible: true }
-    if (!_.isUndefined(_.find(self.commands, function (o) { return o.command === command.command }))) throw Error(ERROR_ALREADY_EXISTS)
+
+    if (!_.isEmpty(await global.db.engine.findOne('commands', { command: parsed[1] }))) throw Error(ERROR_ALREADY_EXISTS)
 
     if (global.parser.isRegistered(command.command)) {
       global.commons.sendMessage(global.translate('core.isRegistered').replace(/\$keyword/g, '!' + command.command), sender)
       return
     }
 
-    self.commands.push(command)
+    global.db.engine.update('commands', { command: parsed[1] }, command)
+    self.register(self)
     global.commons.sendMessage(global.translate('customcmds.success.add'), sender)
   } catch (e) {
     switch (e.message) {
@@ -125,9 +109,9 @@ CustomCommands.prototype.add = function (self, sender, text) {
   }
 }
 
-CustomCommands.prototype.run = function (self, sender, msg, fullMsg) {
+CustomCommands.prototype.run = async function (self, sender, msg, fullMsg) {
   let parsed = fullMsg.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
-  let command = _.find(self.commands, function (o) { return o.command.toLowerCase() === parsed[1].toLowerCase() && o.enabled })
+  let command = await global.db.engine.findOne('commands', { command: parsed[1].toLowerCase(), enabled: true })
   try {
     global.commons.sendMessage(command.response, sender, {'param': msg, 'cmd': command})
   } catch (e) {
@@ -135,24 +119,24 @@ CustomCommands.prototype.run = function (self, sender, msg, fullMsg) {
   }
 }
 
-CustomCommands.prototype.list = function (self, sender, text) {
-  var commands = []
-  _.each(self.commands, function (element) { if (element.visible) commands.push('!' + element.command) })
+CustomCommands.prototype.list = async function (self, sender, text) {
+  let commands = await global.db.engine.find('commands', { visible: true })
   var output = (commands.length === 0 ? global.translate('customcmds.failed.list') : global.translate('customcmds.success.list') + ': ' + commands.join(', '))
   global.commons.sendMessage(output, sender)
 }
 
-CustomCommands.prototype.toggle = function (self, sender, text) {
+CustomCommands.prototype.toggle = async function (self, sender, text) {
   try {
-    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
-    let command = _.find(self.commands, function (o) { return o.command === parsed })
-    if (_.isUndefined(command)) {
-      global.commons.sendMessage(global.translate('command.failed.toggle')
-        .replace(/\$command/g, parsed), sender)
+    const id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+    const command = await global.db.engine.findOne('commands', { command: id })
+    if (_.isEmpty(command)) {
+      global.commons.sendMessage(global.translate('customcmds.failed.toggle')
+        .replace(/\$command/g, id), sender)
       return
     }
 
-    command.enabled = !command.enabled
+    await global.db.engine.update('commands', { command: id }, { enabled: !command.enabled })
+
     global.commons.sendMessage(global.translate(command.enabled ? 'customcmds.success.enabled' : 'customcmds.success.disabled')
       .replace(/\$command/g, command.command), sender)
 
@@ -162,17 +146,17 @@ CustomCommands.prototype.toggle = function (self, sender, text) {
   }
 }
 
-CustomCommands.prototype.visible = function (self, sender, text) {
+CustomCommands.prototype.visible = async function (self, sender, text) {
   try {
-    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
-    let command = _.find(self.commands, function (o) { return o.command === parsed })
+    const id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+    const command = await global.db.engine.findOne('commands', { command: id })
     if (_.isUndefined(command)) {
-      global.commons.sendMessage(global.translate('command.failed.visible')
-        .replace(/\$command/g, parsed), sender)
+      global.commons.sendMessage(global.translate('customcmds.failed.visible')
+        .replace(/\$command/g, id), sender)
       return
     }
 
-    command.visible = !command.visible
+    await global.db.engine.update('commands', { command: id }, { visible: !command.visible })
     global.commons.sendMessage(global.translate(command.visible ? 'customcmds.success.visible' : 'customcmds.success.invisible')
       .replace(/\$command/g, command.command), sender)
   } catch (e) {
@@ -180,12 +164,12 @@ CustomCommands.prototype.visible = function (self, sender, text) {
   }
 }
 
-CustomCommands.prototype.remove = function (self, sender, text) {
+CustomCommands.prototype.remove = async function (self, sender, text) {
   try {
-    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    if (_.isUndefined(_.find(self.commands, function (o) { return o.command === parsed[1] }))) throw Error(ERROR_DOESNT_EXISTS)
-    self.commands = _.filter(self.commands, function (o) { return o.command !== parsed[1] })
-    global.parser.unregister('!' + parsed[1])
+    let id = text.match(/^!?([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+    let removed = await global.db.engine.remove('commands', { command: id })
+    if (!removed) throw Error(ERROR_DOESNT_EXISTS)
+    global.parser.unregister('!' + id)
     global.commons.sendMessage(global.translate('customcmds.success.remove'), sender)
   } catch (e) {
     switch (e.message) {

@@ -4,7 +4,6 @@
 var _ = require('lodash')
 // bot libraries
 var constants = require('../constants')
-var log = global.log
 
 const ERROR_ALREADY_EXISTS = '0'
 const ERROR_DOESNT_EXISTS = '1'
@@ -18,8 +17,6 @@ const ERROR_DOESNT_EXISTS = '1'
  */
 
 function Keywords () {
-  this.keywords = []
-
   if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!keyword add', this.add, constants.OWNER_ONLY)
     global.parser.register(this, '!keyword list', this.list, constants.OWNER_ONLY)
@@ -29,26 +26,10 @@ function Keywords () {
 
     global.parser.registerHelper('!keyword')
 
-    global.watcher.watch(this, 'keywords', this._save)
-    this._update(this)
-
     global.parser.registerParser(this, 'keywords', this.run, constants.VIEWERS)
 
     this.webPanel()
   }
-}
-
-Keywords.prototype._update = function (self) {
-  global.botDB.findOne({ _id: 'keywords' }, function (err, item) {
-    if (err) return log.error(err, { fnc: 'Keywords.prototype._update' })
-    if (_.isNull(item)) return
-    self.keywords = item.keywords
-  })
-}
-
-Keywords.prototype._save = function (self) {
-  let keywords = { keywords: self.keywords }
-  global.botDB.update({ _id: 'keywords' }, { $set: keywords }, { upsert: true })
 }
 
 Keywords.prototype.webPanel = function () {
@@ -60,8 +41,8 @@ Keywords.prototype.webPanel = function () {
   global.panel.socketListening(this, 'keywords.edit', this.editKeywords)
 }
 
-Keywords.prototype.sendKeywords = function (self, socket) {
-  socket.emit('keywords.update', self.keywords)
+Keywords.prototype.sendKeywords = async function (self, socket) {
+  socket.emit('keywords.update', await global.db.engine.find('keywords'))
 }
 
 Keywords.prototype.deleteKeywords = function (self, socket, data) {
@@ -69,8 +50,8 @@ Keywords.prototype.deleteKeywords = function (self, socket, data) {
   self.sendKeywords(self, socket)
 }
 
-Keywords.prototype.toggleKeywords = function (self, socket, data) {
-  self.toggle(self, null, data)
+Keywords.prototype.toggleKeywords = async function (self, socket, data) {
+  await self.toggle(self, null, data)
   self.sendKeywords(self, socket)
 }
 
@@ -79,9 +60,9 @@ Keywords.prototype.createKeywords = function (self, socket, data) {
   self.sendKeywords(self, socket)
 }
 
-Keywords.prototype.editKeywords = function (self, socket, data) {
+Keywords.prototype.editKeywords = async function (self, socket, data) {
   if (data.value.length === 0) self.remove(self, null, data.id)
-  else _.find(self.keywords, function (o) { return o.keyword === data.id }).response = data.value
+  else await global.db.engine.update('keywords', { keyword: data.id }, { response: data.value })
   self.sendKeywords(self, socket)
 }
 
@@ -89,12 +70,14 @@ Keywords.prototype.help = function (self, sender) {
   global.commons.sendMessage(global.translate('core.usage') + ': !keyword add <keyword> <response> | !keyword remove <keyword> | !keyword list', sender)
 }
 
-Keywords.prototype.add = function (self, sender, text) {
+Keywords.prototype.add = async function (self, sender, text) {
   try {
     let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S]+) (.*)$/)
     let keyword = { keyword: parsed[1], response: parsed[2], enabled: true }
-    if (!_.isUndefined(_.find(self.keywords, function (o) { return o.keyword === keyword.keyword }))) throw Error(ERROR_ALREADY_EXISTS)
-    self.keywords.push(keyword)
+
+    if (!_.isEmpty(await global.db.engine.findOne('keywords', { keyword: parsed[1] }))) throw Error(ERROR_ALREADY_EXISTS)
+
+    global.db.engine.update('keywords', { keyword: parsed[1] }, keyword)
     global.commons.sendMessage(global.translate('keywords.success.add'), sender)
   } catch (e) {
     switch (e.message) {
@@ -107,32 +90,33 @@ Keywords.prototype.add = function (self, sender, text) {
   }
 }
 
-Keywords.prototype.run = function (self, id, sender, text) {
-  let keywords = _.filter(self.keywords, function (o) {
+Keywords.prototype.run = async function (self, id, sender, text) {
+  let keywords = await global.db.engine.find('keywords')
+  keywords = _.filter(keywords, function (o) {
     return text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
   })
   _.each(keywords, function (o) { if (o.enabled) global.commons.sendMessage(o.response, sender) })
   global.updateQueue(id, true)
 }
 
-Keywords.prototype.list = function (self, sender, text) {
-  let keywords = []
-  _.each(self.keywords, function (element) { keywords.push(element.keyword) })
-  let output = (keywords.length === 0 ? global.translate('keywords.failed.list') : global.translate('keywords.success.list') + ': ' + keywords.join(', '))
+Keywords.prototype.list = async function (self, sender, text) {
+  let keywords = await global.db.engine.find('keywords')
+  var output = (keywords.length === 0 ? global.translate('keywords.failed.list') : global.translate('keywords.success.list') + ': ' + _.map(keywords, 'keyword').join(', '))
   global.commons.sendMessage(output, sender)
 }
 
-Keywords.prototype.toggle = function (self, sender, text) {
+Keywords.prototype.toggle = async function (self, sender, text) {
   try {
-    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S]+)$/)[1]
-    let keyword = _.find(self.keywords, function (o) { return o.keyword === parsed })
-    if (_.isUndefined(keyword)) {
+    const id = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+    const keyword = await global.db.engine.findOne('keywords', { keyword: id })
+    if (_.isEmpty(keyword)) {
       global.commons.sendMessage(global.translate('keywords.failed.toggle')
-        .replace(/\$keyword/g, parsed), sender)
+        .replace(/\$keyword/g, id), sender)
       return
     }
 
-    keyword.enabled = !keyword.enabled
+    await global.db.engine.update('keywords', { keyword: id }, { enabled: !keyword.enabled })
+
     global.commons.sendMessage(global.translate(keyword.enabled ? 'keywords.success.enabled' : 'keywords.success.disabled')
       .replace(/\$keyword/g, keyword.keyword), sender)
   } catch (e) {
@@ -140,11 +124,11 @@ Keywords.prototype.toggle = function (self, sender, text) {
   }
 }
 
-Keywords.prototype.remove = function (self, sender, text) {
+Keywords.prototype.remove = async function (self, sender, text) {
   try {
-    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S]+)$/)
-    if (_.isUndefined(_.find(self.keywords, function (o) { return o.keyword === parsed[1] }))) throw Error(ERROR_DOESNT_EXISTS)
-    self.keywords = _.filter(self.keywords, function (o) { return o.keyword !== parsed[1] })
+    let id = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+    let removed = await global.db.engine.remove('keywords', { keyword: id })
+    if (!removed) throw Error(ERROR_DOESNT_EXISTS)
     global.commons.sendMessage(global.translate('keywords.success.remove'), sender)
   } catch (e) {
     switch (e.message) {

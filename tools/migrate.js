@@ -3,7 +3,7 @@
 var _ = require('lodash')
 var Database = require('nedb-promise')
 var DB = new Database({
-  filename: 'sogeBot.db',
+  filename: 'test.db',
   autoload: true
 })
 
@@ -35,12 +35,26 @@ var migration = {
       console.log('-> Notices update')
       await noticesDbUpdate_1_3()
     }
+  },
+  '5.8.0': {
+    description: '5.7.x to 5.8.x',
+    process: async function () {
+      console.log('-> Users update')
+      await usersDbUpdate_5_8_0()
+      console.log('-> Notices update')
+      await noticesUpdate_5_8_0()
+      console.log('-> Custom Commands update')
+      await commandsUpdate_5_8_0()
+      console.log('-> Keywords update')
+      await keywordsUpdate_5_8_0()
+    }
   }
 }
 
 async function main () {
   await migrate('1.1')
   await migrate('1.3')
+  await migrate('5.8.0')
   console.log('=> EVERY PROCESS IS DONE')
   process.exit()
 }
@@ -164,10 +178,6 @@ async function noticesDbUpdate_1_3() {
   await DB.update({ _id: 'notices' }, { $set: listUpdate }, { upsert: true })
 }
 
-async function removeFromDB(id) {
-  await DB.remove({ _id: id })
-}
-
 async function usersDbUpdate_1_3() {
   let users = await DB.find({
     $where: function () {
@@ -210,6 +220,49 @@ async function usersDbUpdate_1_3() {
   await DB.update({ _id: 'users' }, { $set: usersUpdate }, { upsert: true })
 }
 
-async function removeFromDB(id) {
-  await DB.remove({ _id: id })
+async function usersDbUpdate_5_8_0() {
+  let users = await DB.findOne({ _id: 'users' })
+  if (users.users.length === 0) return
+
+  _.each(users.users, async function (user) {
+    user._table = 'users'
+    await DB.update({ _table: 'users', username: user.username }, user, { upsert: true })
+  })
+  await DB.remove({ _id: 'users' })
+}
+
+async function noticesUpdate_5_8_0() {
+  let notices = await DB.findOne({ _id: 'notices' })
+  if (notices.notices.length === 0) return
+
+  _.each(notices.notices, async function (notice) {
+    delete notice.id
+    notice._table = 'notices'
+    await DB.update({ _table: 'notices', text: notice.text }, notice, { upsert: true })
+  })
+  await DB.remove({ _id: 'notices' })
+}
+
+async function commandsUpdate_5_8_0() {
+  let items = await DB.findOne({ _id: 'commands' })
+  if (items.commands.length === 0) return
+
+  _.each(items.commands, async function (item) {
+    delete item.id
+    item._table = 'commands'
+    await DB.update({ _table: 'commands', item }, item, { upsert: true })
+  })
+  await DB.remove({ _id: 'commands' })
+}
+
+async function keywordsUpdate_5_8_0() {
+  let items = await DB.findOne({ _id: 'keywords' })
+  if (items.keywords.length === 0) return
+
+  _.each(items.keywords, async function (item) {
+    delete item.id
+    item._table = 'keywords'
+    await DB.update({ _table: 'keywords', item }, item, { upsert: true })
+  })
+  await DB.remove({ _id: 'keywords' })
 }

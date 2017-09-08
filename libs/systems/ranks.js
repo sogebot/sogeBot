@@ -1,10 +1,10 @@
 'use strict'
 
 // 3rdparty libraries
-var _ = require('lodash')
+const _ = require('lodash')
+
 // bot libraries
-var constants = require('../constants')
-var log = global.log
+const constants = require('../constants')
 
 /*
  * !rank                       - show user rank
@@ -31,7 +31,8 @@ function Ranks () {
       self.updateRanks()
     }, 60000)
 
-    this.webPanel()
+    // Disable webpanel for now
+    // this.webPanel()
   }
 }
 
@@ -45,7 +46,7 @@ Ranks.prototype.webPanel = function () {
 
 Ranks.prototype.listSocket = function (self, socket) {
   global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, items) {
-    if (err) { log.error(err, { fnc: 'Ranks.prototype.listSocket' }) }
+    if (err) { global.log.error(err, { fnc: 'Ranks.prototype.listSocket' }) }
     socket.emit('Ranks', items)
   })
 }
@@ -70,38 +71,46 @@ Ranks.prototype.help = function (self, sender) {
   global.commons.sendMessage(global.translate('core.usage') + ': !rank add <hours> <rank> | !rank remove <hour> | !rank list | !rank set <username> <rank> | !rank unset <username>', sender)
 }
 
-Ranks.prototype.add = function (self, sender, text) {
-  try {
-    var parsed = text.match(/^(\d+) ([\u0500-\u052F\u0400-\u04FF\w].+)$/)
-    global.commons.insertIfNotExists({__id: 'rank_' + parsed[1], rank: parsed[2], _hours: parseInt(parsed[1], 10), success: 'rank.success.add', error: 'rank.failed.add'})
-  } catch (e) {
-    global.commons.sendMessage(global.translate('rank.failed.parse'), sender)
+Ranks.prototype.add = async function (self, sender, text) {
+  const parsed = text.match(/^(\d+) ([\u0500-\u052F\u0400-\u04FF\w].+)$/)
+  if (_.isNil(parsed)) return global.commons.sendMessage(global.translate('rank.failed.parse'), sender)
+
+  const values = {
+    hours: parseInt(parsed[1], 10),
+    value: parsed[2]
   }
+
+  var ranks = await global.db.engine.find('ranks', { hours: values.hours })
+  if (ranks.length === 0) { global.db.engine.insert('ranks', values) }
+
+  global.commons.sendMessage(
+    global.translate(ranks.length === 0
+      ? 'rank.success.add' : 'rank.failed.add'
+    ), sender)
 }
 
-Ranks.prototype.list = function (self, sender, text) {
-  if (_.isNull(text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/))) {
-    global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, docs) {
-      if (err) { log.error(err, { fnc: 'Ranks.prototype.list' }) }
-      var list = []
-      if (!_.isNil(docs)) {
-        docs.forEach(function (e, i, ar) { list.push(e.hours + 'h - ' + e.rank) })
-      }
-      var output = (list.length === 0 ? global.translate('rank.failed.list') : global.translate('rank.success.list') + ': ' + list.join(', '))
-      global.commons.sendMessage(output, sender)
-    })
-  } else {
-    global.commons.sendMessage(global.translate('rank.failed.parse'), sender)
-  }
+Ranks.prototype.list = async function (self, sender) {
+  var list = await global.db.engine.find('ranks')
+  global.commons.sendMessage(
+    (list.length === 0
+      ? global.translate('rank.failed.list')
+      : global.translate('rank.success.list') + ': ' + _.map(list, 'value').join(', '))
+    , sender)
 }
 
-Ranks.prototype.remove = function (self, sender, text) {
-  try {
-    var parsed = text.match(/^(\d+)$/)
-    global.commons.remove({__id: 'rank_' + parsed[1], success: 'rank.success.remove', error: 'rank.failed.notFound'})
-  } catch (e) {
-    global.commons.sendMessage(global.translate('rank.failed.parse'), sender)
+Ranks.prototype.remove = async function (self, sender, text) {
+  const parsed = text.match(/^(\d+)$/)
+  if (_.isNil(parsed)) return global.commons.sendMessage(global.translate('rank.failed.parse'), sender)
+
+  const values = {
+    hours: parseInt(parsed[1], 10)
   }
+
+  const removed = await global.db.engine.remove('ranks', values)
+  global.commons.sendMessage(
+    global.translate(removed > 0
+      ? 'rank.success.remove' : 'rank.failed.remove'
+    ), sender)
 }
 
 Ranks.prototype.set = function (self, sender, text) {
@@ -136,17 +145,21 @@ Ranks.prototype.show = function (self, sender) {
 
 Ranks.prototype.updateRanks = function () {
   _.each(global.users.getAll({ is: { online: true } }), function (user) {
+    /*
     var watchTime = user.time.watched
     watchTime = _.isFinite(parseInt(watchTime, 10)) && _.isNumber(parseInt(watchTime, 10)) ? (watchTime / 1000 / 60 / 60).toFixed(0) : 0
 
-    global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, items) {
-      if (err) { log.error(err, { fnc: 'Ranks.prototype.updateRanks' }) }
+    global.log.warning('updateRanks are not implemented!')
+    /*
+      global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, items) {
+      if (err) { global.log.error(err, { fnc: 'Ranks.prototype.updateRanks' }) }
       _.each(items, function (rank) {
         if (watchTime >= parseInt(rank.hours, 10)) {
           global.users.set(user.username, {rank: rank.rank})
         }
       })
     })
+    */
   })
 }
 

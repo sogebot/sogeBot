@@ -1,5 +1,7 @@
 'use strict'
 
+const config = require('../../config.json')
+
 function ChatWidget () {
   global.panel.addWidget('chat', 'widget-title-chat', 'comment')
   global.panel.socketListening(this, 'getChatRoom', this.sendChatRoom)
@@ -7,11 +9,11 @@ function ChatWidget () {
 }
 
 ChatWidget.prototype.sendChatRoom = function (self, socket) {
-  socket.emit('chatRoom', global.configuration.get().twitch.channel.toLowerCase())
+  socket.emit('chatRoom', config.settings.broadcaster_username.toLowerCase())
 }
 
 ChatWidget.prototype.chatMessageSend = function (self, socket, message) {
-  global.commons.sendMessage(message, { username: global.configuration.get().twitch.username }, { force: true })
+  global.commons.sendMessage(message, { username: config.settings.bot_username }, { force: true })
 }
 
 module.exports = new ChatWidget()

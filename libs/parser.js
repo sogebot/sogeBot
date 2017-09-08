@@ -59,12 +59,15 @@ Parser.prototype.addToQueue = async function (user, message, skip) {
 
   for (var parser in _(this.registeredParsers).toPairs().sortBy(0).fromPairs().value()) {
     if (typeof queue[id] === 'undefined') break
+
+    let isRegular = await this.isRegular(user)
+    let isMod = await this.isMod(user)
     if (this.permissionsParsers[parser] === constants.VIEWERS ||
-        (this.permissionsParsers[parser] === constants.REGULAR && (global.users.get(user.username).is.regular || user.mod || this.isOwner(user))) ||
-        (this.permissionsParsers[parser] === constants.MODS && (user.mod || this.isOwner(user))) ||
+        (this.permissionsParsers[parser] === constants.REGULAR && (isRegular || isMod || this.isOwner(user))) ||
+        (this.permissionsParsers[parser] === constants.MODS && (isMod || this.isOwner(user))) ||
         (this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user))) {
       queue[id].started = parseInt(queue[id].started, 10) + 1
-      this.registeredParsers[parser](this.selfParsers[parser], id, user, message, skip)
+      await this.registeredParsers[parser](this.selfParsers[parser], id, user, message, skip)
     }
   }
 
@@ -102,10 +105,12 @@ Parser.prototype.parseCommands = async function (user, message, skip) {
     let onlyParams = message.trim().toLowerCase().replace(cmd, '')
     if (message.trim().toLowerCase().startsWith(cmd) && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
       if (this.permissionsCmds[cmd] === constants.DISABLE) break
+      let isRegular = await this.isRegular(user)
+      let isMod = await this.isMod(user)
       if (_.isNil(user) || // if user is null -> we are running command through a bot
         skip || (this.permissionsCmds[cmd] === constants.VIEWERS) ||
-        (this.permissionsCmds[cmd] === constants.REGULAR && (global.users.get(user.username).is.regular || user.mod || this.isOwner(user))) ||
-        (this.permissionsCmds[cmd] === constants.MODS && (user.mod || this.isOwner(user))) ||
+        (this.permissionsCmds[cmd] === constants.REGULAR && (isRegular || isMod || this.isOwner(user))) ||
+        (this.permissionsCmds[cmd] === constants.MODS && (isMod || this.isOwner(user))) ||
         (this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user))) {
         var text = message.trim().replace(new RegExp('^(' + cmd + ')', 'i'), '').trim()
         if (typeof this.registeredCmds[cmd] === 'function') this.registeredCmds[cmd](this.selfCmds[cmd], _.isNil(user) ? { username: global.configuration.get().twitch.username } : user, text.trim(), message)
@@ -161,10 +166,22 @@ Parser.prototype.isBroadcaster = function (user) {
   return global.configuration.get().twitch.channel.toLowerCase().trim() === user.username.toLowerCase().trim()
 }
 
-Parser.prototype.isMod = function (user) {
-  if (_.isString(user)) user = global.users.get(user)
-  else user = global.users.get(user.username)
-  return user.is.mod
+Parser.prototype.isMod = async function (user) {
+  if (!_.isNil(user)) return false
+
+  if (_.isString(user)) user = await global.users.get(user)
+  else user = await global.users.get(user.username)
+
+  return (!_.isNil(user.is.mod) ? user.is.mod : false)
+}
+
+Parser.prototype.isRegular = async function (user) {
+  if (!_.isNil(user)) return false
+
+  if (_.isString(user)) user = await global.users.get(user)
+  else user = await global.users.get(user.username)
+
+  return (!_.isNil(user.is.regular) ? user.is.regular : false)
 }
 
 Parser.prototype.isOwner = function (user) {

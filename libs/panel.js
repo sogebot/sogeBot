@@ -7,6 +7,8 @@ var basicAuth = require('basic-auth')
 var _ = require('lodash')
 var log = global.log
 
+const config = require('../config.json')
+
 const NOT_AUTHORIZED = '0'
 
 function Panel () {
@@ -102,7 +104,7 @@ function Panel () {
     })
 
     // send enabled systems
-    socket.on('getSystems', function () { socket.emit('systems', global.configuration.get().systems) })
+    socket.on('getSystems', function () { socket.emit('systems', config.systems) })
     socket.on('getVersion', function () { socket.emit('version', process.env.npm_package_version) })
 
     socket.on('parser.isRegistered', function (data) {
