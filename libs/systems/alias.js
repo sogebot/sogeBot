@@ -28,6 +28,8 @@ function Alias () {
 
     global.parser.registerHelper('!alias')
 
+    this.register(this)
+
     this.webPanel()
   }
 }

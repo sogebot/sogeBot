@@ -5,8 +5,8 @@ var _ = require('lodash')
 var ytdl = require('ytdl-core')
 const ytsearch = require('youtube-search')
 // bot libraries
+const config = require('../../config.json')
 var constants = require('../constants')
-var log = global.log
 
 function Songs () {
   if (global.commons.isSystemEnabled(this)) {
@@ -116,7 +116,7 @@ Songs.prototype.banCurrentSong = async function (self, sender) {
 Songs.prototype.banSongById = async function (self, sender, text) {
   text = text.trim()
   ytdl.getInfo('https://www.youtube.com/watch?v=' + text, async function (err, videoInfo) {
-    if (err) log.error(err, { fnc: 'Songs.prototype.banSongById#1' })
+    if (err) global.log.error(err, { fnc: 'Songs.prototype.banSongById#1' })
     if (typeof videoInfo.title === 'undefined' || videoInfo.title === null) return
 
     let updated = await global.db.engine.update('bannedsong', { videoID: text }, { videoID: text, title: videoInfo.title })
@@ -146,14 +146,14 @@ Songs.prototype.getCurrentSong = function (self) {
     if (self.currentSong.type === 'playlist') translation = 'songs.currentSong.playlist'
     else translation = 'songs.currentSong.songrequest'
   }
-  global.commons.sendMessage(global.translate(translation).replace(/\$title/g, self.currentSong.title).replace(/\$username/g, (global.configuration.getValue('atUsername') ? '@' : '') + self.currentSong.username), {username: global.configuration.get().twitch.channel})
+  global.commons.sendMessage(global.translate(translation).replace(/\$title/g, self.currentSong.title).replace(/\$username/g, (global.configuration.getValue('atUsername') ? '@' : '') + self.currentSong.username), {username: config.settings.broadcaster_username})
 }
 
 Songs.prototype.stealSongToPlaylist = function (self) {
   try {
     self.addSongToPlaylist(self, null, self.currentSong.videoID)
   } catch (err) {
-    global.commons.sendMessage(global.translate('songs.noCurrentSong'), {username: global.configuration.get().twitch.channel})
+    global.commons.sendMessage(global.translate('songs.noCurrentSong'), {username: config.settings.broadcaster_username})
   }
 }
 
@@ -221,7 +221,7 @@ Songs.prototype.sendNextSongID = async function (self, socket) {
 }
 
 Songs.prototype.help = function () {
-  global.commons.sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', {username: global.configuration.get().twitch.channel})
+  global.commons.sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', {username: config.settings.broadcaster_username})
 }
 
 Songs.prototype.addSongToQueue = async function (self, sender, text) {
@@ -241,7 +241,7 @@ Songs.prototype.addSongToQueue = async function (self, sender, text) {
 
   if (_.isNil(videoID.match(idRegex))) { // not id or url
     ytsearch(text.trim(), { maxResults: 1, key: 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0' }, function (err, results) {
-      if (err) return log.error(err, { fnc: 'Songs.prototype.addSongToQueue#3' })
+      if (err) return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#3' })
       self.addSongToQueue(self, sender, results[0].id)
     })
     return
@@ -255,7 +255,7 @@ Songs.prototype.addSongToQueue = async function (self, sender, text) {
   }
 
   ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
-    if (err) return log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' })
+    if (err) return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' })
     if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
       global.commons.sendMessage(global.translate('songs.notFound'), sender)
     } else if (videoInfo.length_seconds / 60 > global.configuration.getValue('songs_duration')) global.commons.sendMessage(global.translate('songs.tooLong'), sender)
@@ -294,7 +294,7 @@ Songs.prototype.addSongToPlaylist = async function (self, sender, text) {
   }
 
   ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
-    if (err) log.error(err, { fnc: 'Songs.prototype.addSongToPlaylist#1' })
+    if (err) global.log.error(err, { fnc: 'Songs.prototype.addSongToPlaylist#1' })
     if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
       global.commons.sendMessage(global.translate('songs.notFound'), sender)
       return
@@ -311,7 +311,7 @@ Songs.prototype.removeSongFromPlaylist = function (self, sender, text) {
   var videoID = text.trim()
 
   ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async function (err, videoInfo) {
-    if (err) log.error(err, { fnc: 'Songs.prototype.removeSongFromPlaylist#1' })
+    if (err) global.log.error(err, { fnc: 'Songs.prototype.removeSongFromPlaylist#1' })
     if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
       global.commons.sendMessage(global.translate('songs.notFound'), sender)
       return
