@@ -55,7 +55,7 @@ function Twitch () {
       }
     }
 
-    if (global.configuration.get().bot.debug) {
+    if (config.debug.all) {
       global.log.debug('Get current stream data from twitch', options)
     }
     global.client.api(options, function (err, res, body) {
@@ -64,7 +64,7 @@ function Twitch () {
         return
       }
 
-      if (global.configuration.get().bot.debug) {
+      if (config.debug.all) {
         global.log.debug('Response: Get current stream data from twitch', body)
       }
 
@@ -109,7 +109,7 @@ function Twitch () {
       }
     }
 
-    if (global.configuration.get().bot.debug) {
+    if (config.debug.all) {
       global.log.debug('Get last 100 followers from twitch', options)
     }
     global.client.api(options, function (err, res, body) {
@@ -117,7 +117,7 @@ function Twitch () {
         if (err.code !== 'ETIMEDOUT' && err.code !== 'ECONNRESET') global.log.error(err, { fnc: 'Twitch#2' })
         return
       }
-      if (global.configuration.get().bot.debug) {
+      if (config.debug.all) {
         global.log.debug('Response: Get last 100 followers from twitch', body)
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
@@ -155,7 +155,7 @@ function Twitch () {
         'Client-ID': config.settings.client_id
       }
     }
-    if (global.configuration.get().bot.debug) {
+    if (config.debug.all) {
       global.log.debug('Get current channel data from twitch', options)
     }
     global.client.api(options, function (err, res, body) {
@@ -163,7 +163,7 @@ function Twitch () {
         if (err.code !== 'ETIMEDOUT' && err.code !== 'ECONNRESET') global.log.error(err, { fnc: 'Twitch#3' })
         return
       }
-      if (global.configuration.get().bot.debug) {
+      if (config.debug.all) {
         global.log.debug('Response: Get current channel data from twitch', body)
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
@@ -177,7 +177,7 @@ function Twitch () {
       options = {
         url: 'http://tmi.twitch.tv/hosts?include_logins=1&target=' + global.channelId
       }
-      if (global.configuration.get().bot.debug) {
+      if (config.debug.all) {
         global.log.debug('Get current hosts', options)
       }
       global.client.api(options, function (err, res, body) {
@@ -185,7 +185,7 @@ function Twitch () {
           if (err.code !== 'ETIMEDOUT' && err.code !== 'ECONNRESET') global.log.error(err, { fnc: 'Twitch#4' })
           return
         }
-        if (global.configuration.get().bot.debug) {
+        if (config.debug.all) {
           global.log.debug('Response: Get current hosts', body)
         }
         if (res.statusCode === 200 && !_.isNull(body)) {
@@ -213,7 +213,7 @@ function Twitch () {
         'Client-ID': config.settings.client_id
       }
     }
-    if (global.configuration.get().bot.debug) {
+    if (config.debug.all) {
       global.log.debug('Get API connection status', options)
     }
     global.client.api(options, function (err, res, body) {
@@ -221,7 +221,7 @@ function Twitch () {
         global.status.API = constants.DISCONNECTED
         return
       }
-      if (global.configuration.get().bot.debug) {
+      if (config.debug.all) {
         global.log.debug('Response: Get API connection status', body)
       }
       global.status.API = res.statusCode === 200 ? constants.CONNECTED : constants.DISCONNECTED
@@ -523,13 +523,13 @@ Twitch.prototype.setTitleAndGame = async function (self, sender, args) {
       Authorization: 'OAuth ' + config.settings.bot_oauth.split(':')[1]
     }
   }
-  if (global.configuration.get().bot.debug) {
+  if (config.debug.all) {
     global.log.debug('Updating game and title ', options)
   }
 
   try {
     const response = await request(options)
-    if (global.configuration.get().bot.debug) {
+    if (config.debug.all) {
       global.log.debug('Response: Updating game and title ', response)
     }
 
@@ -555,7 +555,7 @@ Twitch.prototype.setTitleAndGame = async function (self, sender, args) {
       }
     }
   } catch (e) {
-    if (global.configuration.get().bot.debug) {
+    if (config.debug.all) {
       global.log.debug('Response: Updating game and title ', e.message)
     }
   }
@@ -589,14 +589,14 @@ Twitch.prototype.sendGameFromTwitch = function (self, socket, game) {
     }
   }
 
-  if (global.configuration.get().bot.debug) {
+  if (config.debug.all) {
     global.log.debug('Search game on twitch ', options)
   }
 
   global.client.api(options, function (err, res, body) {
     if (err) { return global.log.error(err, { fnc: 'Twitch.prototype.sendGameFromTwitch' }) }
 
-    if (global.configuration.get().bot.debug) {
+    if (config.debug.all) {
       global.log.debug('Response: Search game on twitch ', body)
     }
 
