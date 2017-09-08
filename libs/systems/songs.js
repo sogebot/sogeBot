@@ -149,7 +149,6 @@ Songs.prototype.getCurrentSong = function (self) {
   global.commons.sendMessage(global.translate(translation).replace(/\$title/g, self.currentSong.title).replace(/\$username/g, (global.configuration.getValue('atUsername') ? '@' : '') + self.currentSong.username), {username: config.settings.broadcaster_username})
 }
 
-/* TODO: CONTINUE */
 Songs.prototype.stealSongToPlaylist = function (self) {
   try {
     self.addSongToPlaylist(self, null, self.currentSong.videoID)
