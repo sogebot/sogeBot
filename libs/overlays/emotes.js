@@ -27,17 +27,10 @@ function Emotes () {
   }
 
   this.fetcher = new EmoteFetcher()
-<<<<<<< HEAD
   this.fetcher.fetchTwitchEmotes().catch(function (reason) {})
   this.fetcher.fetchBTTVEmotes().catch(function (reason) {})
   this.fetcher.fetchBTTVEmotes(global.configuration.get().twitch.channel).catch(function (reason) {})
   this.fetcher.fetchTwitchEmotes(global.configuration.get().twitch.channel).catch(function (reason) {})
-=======
-  this.fetcher.fetchTwitchEmotes()
-  this.fetcher.fetchBTTVEmotes()
-  this.fetcher.fetchBTTVEmotes(config.settings.broadcaster_username).catch(function (reason) {})
-  this.fetcher.fetchTwitchEmotes(config.settings.broadcaster_username)
->>>>>>> init commit
 
   global.parser.registerParser(this, 'emotes', this.containsEmotes, constants.VIEWERS)
 
