@@ -3,6 +3,7 @@
 // 3rdparty libraries
 var _ = require('lodash')
 // bot libraries
+const config = require('../../config.json')
 var constants = require('../constants')
 
 function Points () {
@@ -51,7 +52,7 @@ Points.prototype.webPanel = function () {
 }
 
 Points.prototype.setSocket = function (self, socket, data) {
-  self.setPoints(self, {username: global.configuration.get().twitch.channel}, data.username + ' ' + data.value) // we want to show this in chat
+  self.setPoints(self, {username: config.settings.bot_username}, data.username + ' ' + data.value) // we want to show this in chat
 }
 
 Points.prototype.resetPoints = function (self, socket, data) {
@@ -95,7 +96,7 @@ Points.prototype.addEvents = function (self) {
   })
 }
 
-Points.prototype.messagePoints = function (self, id, sender, text, skip) {
+Points.prototype.messagePoints = async function (self, id, sender, text, skip) {
   if (skip || text.startsWith('!')) {
     global.updateQueue(id, true)
     return
@@ -103,13 +104,13 @@ Points.prototype.messagePoints = function (self, id, sender, text, skip) {
 
   const points = parseInt(global.configuration.getValue('pointsPerMessageInterval'), 10)
   const interval = parseInt(global.configuration.getValue('pointsMessageInterval'), 10)
-  const user = global.users.get(sender.username)
+  const user = await global.users.get(sender.username)
 
   let lastMessageCount = _.isNil(user.custom.lastMessagePoints) ? 0 : user.custom.lastMessagePoints
 
   if (lastMessageCount + interval <= user.stats.messages) {
+    global.db.engine.increment('users', { username: user.username }, { points: parseInt(points, 10) })
     global.users.set(sender.username, {
-      points: (_.isFinite(user.points) && _.isNumber(user.points) ? user.points + points : points),
       custom: { lastMessagePoints: user.stats.messages }
     })
   }
@@ -129,19 +130,17 @@ Points.prototype.setPoints = function (self, sender, text) {
   }
 }
 
-Points.prototype.givePoints = function (self, sender, text) {
+Points.prototype.givePoints = async function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
     var givePts = parseInt(parsed[2], 10)
 
-    const user = global.users.get(sender.username)
-    const user2 = global.users.get(parsed[1])
+    const user = await global.users.get(sender.username)
+    const user2 = await global.users.get(parsed[1])
     if (parseInt(user.points, 10) >= givePts) {
       if (user.username !== user2.username) {
-        global.users.set(sender.username, { points: parseInt(user.points, 10) - givePts })
-        global.users.set(user2.username, { points:
-          (_.isFinite(parseInt(user2.points, 10)) && _.isNumber(parseInt(user2.points, 10))
-          ? parseInt(user2.points, 10) + givePts : givePts) })
+        global.db.engine.increment('users', { username: user.username }, { points: (parseInt(givePts, 10) * -1) })
+        global.db.engine.increment('users', { username: user2.username }, { points: parseInt(givePts, 10) })
       }
       global.commons.sendMessage(global.translate('points.success.give')
         .replace(/\$amount/g, givePts)
@@ -207,17 +206,10 @@ Points.prototype.getPointsName = function (points) {
   return pointsName
 }
 
-Points.prototype.getPointsFromUser = function (self, sender, text) {
+Points.prototype.getPointsFromUser = async function (self, sender, text) {
   try {
-    let user
+    let user = await global.users.get(sender.username)
     const username = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
-
-    // find if user exists
-    if (_.isNil(_.find(global.users.users, function (o) { return o.username === username }))) {
-      user = { username: username, points: 0 }
-    } else {
-      user = global.users.get(username)
-    }
 
     var pointsResponse = (global.configuration.getValue('pointsResponse').length > 0 ? global.configuration.getValue('pointsResponse') : global.translate('points.defaults.pointsResponse'))
     var points = (_.isUndefined(user.points) ? 0 : user.points)
@@ -230,13 +222,14 @@ Points.prototype.getPointsFromUser = function (self, sender, text) {
   }
 }
 
-Points.prototype.allPoints = function (self, sender, text) {
+Points.prototype.allPoints = async function (self, sender, text) {
   try {
     var parsed = text.match(/^([0-9]+)$/)
     var givePts = parseInt(parsed[1], 10)
-    _.each(global.users.getAll({ is: { online: true } }), function (user) {
-      var availablePts = parseInt(user.points, 10)
-      global.users.set(user.username, { points: (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts) })
+
+    let users = await global.users.getAll({ is: { online: true } })
+    _.each(users, function (user) {
+      global.db.engine.increment('users', { username: user.username }, { points: parseInt(givePts, 10) })
     })
     global.commons.sendMessage(global.translate('points.success.all')
       .replace(/\$amount/g, givePts)
@@ -246,15 +239,16 @@ Points.prototype.allPoints = function (self, sender, text) {
   }
 }
 
-Points.prototype.rainPoints = function (self, sender, text) {
+Points.prototype.rainPoints = async function (self, sender, text) {
   try {
     var parsed = text.match(/^([0-9]+)$/)
     var givePts = parseInt(parsed[1], 10)
-    _.each(global.users.getAll({ is: { online: true } }), function (user) {
-      var availablePts = parseInt(user.points, 10)
-      var random = Math.floor(Math.random() * givePts)
-      global.users.set(user.username, { points: (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + random : random) })
+
+    let users = await global.users.getAll({ is: { online: true } })
+    _.each(users, function (user) {
+      global.db.engine.increment('users', { username: user.username }, { points: parseInt(Math.floor(Math.random() * givePts), 10) })
     })
+
     global.commons.sendMessage(global.translate('points.success.rain')
       .replace(/\$amount/g, givePts)
       .replace(/\$pointsName/g, self.getPointsName(givePts)), sender)
@@ -266,10 +260,9 @@ Points.prototype.rainPoints = function (self, sender, text) {
 Points.prototype.addPoints = function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
-    const user = global.users.get(parsed[1])
-    var givePts = parseInt(parsed[2], 10)
-    var availablePts = parseInt(user.points, 10)
-    global.users.set(parsed[1], { points: (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + givePts : givePts) })
+    let givePts = parseInt(parsed[2], 10)
+    global.db.engine.increment('users', { username: parsed[1] }, { points: givePts })
+
     global.commons.sendMessage(global.translate('points.success.add')
       .replace(/\$amount/g, givePts)
       .replace(/\$username/g, parsed[1])
@@ -282,11 +275,10 @@ Points.prototype.addPoints = function (self, sender, text) {
 Points.prototype.removePoints = function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
-    const user = global.users.get(parsed[1])
-    var removePts = parseInt(parsed[2], 10)
-    var availablePts = parseInt(user.points, 10)
-    if (availablePts > removePts) global.users.set(user.username, { points: (_.isFinite(availablePts) && !_.isNumber(availablePts) ? availablePts - removePts : 0) })
-    else global.users.set(user.username, { points: 0 })
+    let removePts = parseInt(parsed[2], 10)
+
+    global.db.engine.increment('users', { username: parsed[1] }, { points: (removePts * -1) })
+
     global.commons.sendMessage(global.translate('points.success.remove')
       .replace(/\$amount/g, removePts)
       .replace(/\$username/g, parsed[1])
@@ -304,16 +296,19 @@ Points.prototype.startCounting = function (username) {
   global.users.set(username, { time: { points: parseInt(new Date().getTime(), 10) } })
 }
 
-Points.prototype.updatePoints = function () {
+Points.prototype.updatePoints = async function () {
   var interval = (global.twitch.isOnline ? global.configuration.getValue('pointsInterval') * 60 * 1000 : global.configuration.getValue('pointsIntervalOffline') * 60 * 1000)
   var ptsPerInterval = (global.twitch.isOnline ? global.configuration.getValue('pointsPerInterval') : global.configuration.getValue('pointsPerIntervalOffline'))
 
-  _.each(global.users.getAll({ is: { online: true } }), function (user) {
+  let users = await global.users.getAll({ is: { online: true } })
+  _.each(users, function (user) {
     user.time.points = _.isUndefined(user.time.points) ? 0 : user.time.points
     if (new Date().getTime() - user.time.points >= interval) {
-      let availablePts = parseInt(user.points, 10)
-      global.users.set(user.username, { points: (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + ptsPerInterval : ptsPerInterval) })
-      global.users.set(user.username, { time: { points: new Date().getTime() } })
+      let availablePts = (parseInt(user.points, 10) > 0) ? parseInt(user.points, 10) : 0 // reset to 0 if points are below zero
+      global.users.set(user.username, {
+        points: (_.isFinite(availablePts) && _.isNumber(availablePts) ? availablePts + ptsPerInterval : ptsPerInterval),
+        time: { points: new Date().getTime() }
+      })
     }
   })
 }

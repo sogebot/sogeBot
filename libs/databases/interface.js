@@ -66,17 +66,6 @@ class Interface {
   async increment (table, where, object) {
     throw Error('function increment() is not implemented in ' + this.constructor.name)
   }
-
-  /**
-   * Asynchronous decrement update of object in db
-   * @param {string} table table of object to update
-   * @param {string} where object to search update
-   * @param {object} object object data to update
-   * @returns {object} no. of results updated
-   */
-  async decrement (table, where, object) {
-    throw Error('function decrement() is not implemented in ' + this.constructor.name)
-  }
 }
 
 module.exports = Interface
