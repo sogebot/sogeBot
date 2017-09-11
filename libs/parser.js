@@ -8,6 +8,8 @@ const snekfetch = require('snekfetch')
 
 const config = require('../config.json')
 
+const config = require('../config.json')
+
 var queue = {}
 
 function Parser () {

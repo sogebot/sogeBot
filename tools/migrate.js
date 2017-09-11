@@ -55,6 +55,16 @@ var migration = {
       await bannedsongsUpdate_5_8_0()
       console.log('-> Alias update')
       await aliasUpdate_5_8_0()
+      console.log('-> Configuration update')
+      await configurationUpdate_5_8_0()
+      console.log('-> CustomVars update')
+      await customVariablesUpdate_5_8_0()
+      console.log('-> Events update')
+      await eventsUpdate_5_8_0()
+      console.log('-> Permissions update')
+      await permissionsUpdate_5_8_0()
+      console.log('-> Widgets update')
+      await widgetsUpdate_5_8_0()
     }
   }
 }
@@ -326,4 +336,91 @@ async function aliasUpdate_5_8_0() {
     await DB.update({ _table: 'alias', item }, item, { upsert: true })
   })
   await DB.remove({ _id: 'alias' })
+}
+
+async function configurationUpdate_5_8_0() {
+  let items = await DB.find({ type: 'settings' })
+  if (items.length === 0) return
+
+  _.each(items, async function (item) {
+    delete item.type
+    delete item._id
+    delete item.quiet
+
+    item = {
+      key: Object.keys(item)[0],
+      value: item[Object.keys(item)[0]]
+    }
+
+    item._table = 'settings'
+    await DB.update({ _table: 'settings', item }, item, { upsert: true })
+  })
+  await DB.remove({ type: 'settings' }, { multi: true })
+}
+
+async function customVariablesUpdate_5_8_0() {
+  let items = await DB.findOne({ _id: 'customVariables' })
+  if (items.variables.length === 0) return
+
+  _.each(items.variables, async function (value, key) {
+    let item = {
+      _table: 'customvars',
+      key: key,
+      value: value
+    }
+    await DB.update({ _table: 'customvars', item }, item, { upsert: true })
+  })
+  await DB.remove({ _id: 'customVariables' })
+}
+
+async function eventsUpdate_5_8_0() {
+  let items = await DB.findOne({ _id: 'Events' })
+  if (items.events.length === 0) return
+
+  _.each(items.events, async function (events, key) {
+    let item = {
+      _table: 'events',
+      key: key,
+      value: []
+    }
+    _.each(events, function (event) {
+      item.value.push(event[0])
+    })
+
+    await DB.update({ _table: 'events', item }, item, { upsert: true })
+  })
+  await DB.remove({ _id: 'Events' })
+}
+
+async function permissionsUpdate_5_8_0() {
+  let items = await DB.find({$where: function () { return this._id.startsWith('permission') }})
+  if (items.length === 0) return
+
+  _.each(items, async function (item, key) {
+    delete item._id
+
+    item = {
+      _table: 'permissions',
+      key: item.command,
+      permission: item.permission
+    }
+
+    await DB.update({ _table: 'permissions', item }, item, { upsert: true })
+  })
+  await DB.remove({ $where: function () { return this._id.startsWith('permission') }})
+}
+
+async function widgetsUpdate_5_8_0() {
+  let items = await DB.findOne({ _id: 'dashboard_widgets' })
+  if (items.widgets.length === 0) return
+
+  _.each(items.widgets, async function (widget) {
+    let item = {
+      _table: 'widgets',
+      widget: widget.split(':')[1],
+      column: widget.split(':')[0]
+    }
+    await DB.update({ _table: 'widgets', item }, item, { upsert: true })
+  })
+  await DB.remove({ _id: 'dashboard_widgets' })
 }
