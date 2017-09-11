@@ -5,7 +5,6 @@ var http = require('http')
 var path = require('path')
 var basicAuth = require('basic-auth')
 var _ = require('lodash')
-var log = global.log
 
 const config = require('../config.json')
 
