@@ -33,24 +33,26 @@ function Events () {
     'send-chat-message': async function (attr) {
       if (_.isNil(attr.send)) return
 
-      let username = attr.username; delete attr.username
+      let username = attr.username
       let message = attr.send
       _.each(attr, function (val, name) {
         message = message.replace('$' + name, val)
       })
       message = await global.parser.parseMessage(message)
       global.commons.sendMessage(message, { username: username })
+      delete attr.username
     },
     'send-whisper': async function (attr) {
       if (_.isNil(attr.username) || _.isNil(attr.send)) return
 
-      let username = attr.username; delete attr.username
+      let username = attr.username
       let message = attr.send
       _.each(attr, function (val, name) {
         message = message.replace('$' + name, val)
       })
       message = await global.parser.parseMessage(message)
       global.commons.sendMessage(message, { username: username, 'message-type': 'whisper' })
+      delete attr.username
     },
     'run-command': async function (attr) {
       let command = attr.command
