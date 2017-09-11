@@ -9,14 +9,12 @@ function Permissions () {
 
   global.configuration.register('disablePermissionWhispers', 'whisper.settings.disablePermissionWhispers', 'bool', true)
 
-  setInterval(function () {
-    global.botDB.find({$where: function () { return this._id.startsWith('permission') }}, function (err, items) {
-      if (err) { global.log.error(err, { fnc: 'Permissions' }) }
-      _.each(items, function (item) {
-        global.parser.permissionsCmds['!' + item.command] = item.permission
-      })
+  setInterval(async function () {
+    let permissions = await global.db.engine.find('permissions')
+    _.each(permissions, function (permission) {
+      global.parser.permissionsCmds['!' + permission.key] = permission.permission
     })
-  }, 500)
+  }, 1000)
 
   this.webPanel()
 }
@@ -65,10 +63,8 @@ Permissions.prototype.overridePermission = function (self, sender, text) {
 
     if (!_.isUndefined(global.parser.permissionsCmds['!' + command])) {
       global.parser.permissionsCmds['!' + command] = permission
-      global.botDB.update({_id: 'permission_' + hash}, {$set: {command: command, permission: permission}}, {upsert: true}, function (err) {
-        if (err) global.log.error(err, { fnc: 'Permissions.prototype.overridePermission' })
-        global.commons.sendMessage(global.translate('permissions.success.change').replace(/\$command/g, parsed[1]), sender)
-      })
+      global.db.engine.update('permissions', { key: command }, { key: command, permission: permission })
+      global.commons.sendMessage(global.translate('permissions.success.change').replace(/\$command/g, parsed[1]), sender)
     } else {
       global.commons.sendMessage(global.translate('permissions.failed.noCmd'), sender)
     }

@@ -6,6 +6,8 @@ var _ = require('lodash')
 var mathjs = require('mathjs')
 const snekfetch = require('snekfetch')
 
+const config = require('../config.json')
+
 var queue = {}
 
 function Parser () {
@@ -21,9 +23,6 @@ function Parser () {
 
   this.messages = []
 
-  this.customVariables = {}
-  global.watcher.watch(this, 'customVariables', this._save)
-
   var self = this
   setInterval(function () {
     if (self.messages.length > 0) {
@@ -36,8 +35,6 @@ function Parser () {
       })
     }
   }, 10)
-
-  this._update(this)
 }
 
 Parser.prototype.parse = function (user, message, skip) {
@@ -113,7 +110,7 @@ Parser.prototype.parseCommands = async function (user, message, skip) {
         (this.permissionsCmds[cmd] === constants.MODS && (isMod || this.isOwner(user))) ||
         (this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user))) {
         var text = message.trim().replace(new RegExp('^(' + cmd + ')', 'i'), '').trim()
-        if (typeof this.registeredCmds[cmd] === 'function') this.registeredCmds[cmd](this.selfCmds[cmd], _.isNil(user) ? { username: global.configuration.get().twitch.username } : user, text.trim(), message)
+        if (typeof this.registeredCmds[cmd] === 'function') this.registeredCmds[cmd](this.selfCmds[cmd], _.isNil(user) ? { username: config.settings.bot_username } : user, text.trim(), message)
         else global.log.error(cmd + ' have wrong null function registered!', { fnc: 'Parser.prototype.parseCommands' })
         break // cmd is executed
       } else {
@@ -154,16 +151,16 @@ Parser.prototype.unregister = function (cmd) {
 }
 
 Parser.prototype.getOwner = function () {
-  return global.configuration.get().twitch.owners.split(',')[0].trim()
+  return config.settings.bot_owners.split(',')[0].trim()
 }
 
 Parser.prototype.getOwners = function () {
-  return global.configuration.get().twitch.owners.split(',')
+  return config.settings.bot_owners.split(',')
 }
 
 Parser.prototype.isBroadcaster = function (user) {
   if (_.isString(user)) user = { username: user }
-  return global.configuration.get().twitch.channel.toLowerCase().trim() === user.username.toLowerCase().trim()
+  return config.settings.broadcaster_username.toLowerCase().trim() === user.username.toLowerCase().trim()
 }
 
 Parser.prototype.isMod = async function (user) {
@@ -187,7 +184,7 @@ Parser.prototype.isRegular = async function (user) {
 Parser.prototype.isOwner = function (user) {
   try {
     if (_.isString(user)) user = { username: user }
-    let owners = _.map(_.filter(global.configuration.get().twitch.owners.split(','), _.isString), function (owner) {
+    let owners = _.map(_.filter(config.settings.bot_owners.split(','), _.isString), function (owner) {
       return _.trim(owner.toLowerCase())
     })
     return _.includes(owners, user.username.toLowerCase())
@@ -256,22 +253,24 @@ Parser.prototype.parseMessage = async function (message, attr) {
   let custom = {
     '(get.#)': async function (filter) {
       let variable = filter.replace('(get.', '').replace(')', '')
-      return global.parser.customVariables[variable]
+      let cvar = await global.engine.db.findOne('customvars', { key: variable })
+      return cvar.value
     },
     '(set.#)': async function (filter) {
       let variable = filter.replace('(set.', '').replace(')', '')
-      global.parser.customVariables[variable] = attr.param
+      await global.engine.db.update('customvars', { key: variable }, { key: variable, value: attr.param })
       return ''
     },
     '(var.#)': async function (filter) {
       let variable = filter.replace('(var.', '').replace(')', '')
       if ((global.parser.isOwner(attr.sender) || attr.sender.mod) &&
         (!_.isUndefined(attr.param) && attr.param.length !== 0)) {
-        global.parser.customVariables[variable] = attr.param
+        await global.engine.db.update('customvars', { key: variable }, { key: variable, value: attr.param })
         global.commons.sendMessage('$sender ' + attr.param, attr.sender)
         return ''
       }
-      return _.isNil(global.parser.customVariables[variable]) ? '' : global.parser.customVariables[variable]
+      let cvar = await global.engine.db.findOne('customvars', { key: variable })
+      return _.isEmpty(cvar.value) ? '' : cvar.value
     }
   }
   let param = {
@@ -477,22 +476,6 @@ Parser.prototype.parseMessageEach = async function (filters, msg) {
     }
   }
   return msg
-}
-
-Parser.prototype._update = function (self) {
-  global.botDB.findOne({ _id: 'customVariables' }, function (err, item) {
-    if (err) return global.log.error(err, { fnc: 'Parser.prototype._update' })
-    if (_.isNull(item)) return
-
-    self.customVariables = item.variables
-  })
-}
-
-Parser.prototype._save = function (self) {
-  var data = {
-    variables: self.customVariables
-  }
-  global.botDB.update({ _id: 'customVariables' }, { $set: data }, { upsert: true })
 }
 
 // these needs to be global, will be called from called parsers

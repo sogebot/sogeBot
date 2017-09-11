@@ -1,16 +1,7 @@
 'use strict'
 
-var Database = require('nedb')
-var dbPromise = require('nedb-promise')
 var constants = require('./constants')
 var _ = require('lodash')
-
-global.botDB = new Database({
-  filename: 'sogeBot.db',
-  autoload: true
-})
-global.botDB.persistence.setAutocompactionInterval(60000)
-global.asyncBotDB = dbPromise.fromInstance(global.botDB)
 
 function Configuration () {
   this.config = null
@@ -39,36 +30,36 @@ Configuration.prototype.register = function (cfgName, success, filter, defaultVa
   this.default[cfgName] = {value: defaultValue}
 }
 
-Configuration.prototype.setValue = function (self, sender, text, quiet) {
+Configuration.prototype.setValue = async function (self, sender, text) {
   try {
-    if (_.isNil(quiet)) { quiet = false }
     var cmd = text.split(' ')[0]
     var value = text.replace(text.split(' ')[0], '').trim()
+    var filter = self.cfgL[cmd].filter
+
     if (value.length === 0) value = self.default[cmd].value
 
-    var filter = self.cfgL[cmd].filter
-    var data = {_type: 'settings', success: self.cfgL[cmd].success, _quiet: quiet}
-    data['_' + cmd] = {$exists: true}
     if (filter === 'number' && Number.isInteger(parseInt(value.trim(), 10))) {
-      data[cmd] = parseInt(value.trim(), 10)
-      global.commons.updateOrInsert(data)
-      self.cfgL[cmd].value = data[cmd]
+      value = parseInt(value.trim(), 10)
+
+      let updated = await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
+      if (updated > 0) global.commons.sendToOwners(global.translate(self.cfgL[cmd].success).replace(/\$value/g, value))
+
+      self.cfgL[cmd].value = value
     } else if (filter === 'bool' && (value === 'true' || value === 'false')) {
-      data[cmd] = (value.toLowerCase() === 'true')
-      data.success = data.success + '.' + value
-      if (cmd === 'mute') data.force = true
-      global.commons.updateOrInsert(data)
-      self.cfgL[cmd].value = data[cmd]
+      value = (value.toLowerCase() === 'true')
+
+      let updated = await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
+      if (updated > 0) global.commons.sendToOwners(global.translate(self.cfgL[cmd].success + '.' + value).replace(/\$value/g, value))
+
+      self.cfgL[cmd].value = value
     } else if (filter === 'string') {
+      self.cfgL[cmd].value = value.trim()
       if (cmd === 'lang') {
-        self.cfgL[cmd].value = value.trim()
         global.commons.sendToOwners(global.translate('core.lang-selected'))
         global.panel.io.emit('lang', global.translate({root: 'webpanel'}))
-        data.success = function () { return true }
       }
-      data[cmd] = value.trim()
-      global.commons.updateOrInsert(data)
-      self.cfgL[cmd].value = data[cmd]
+      let updated = await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
+      if (updated > 0 && cmd !== 'lang') global.commons.sendToOwners(global.translate(self.cfgL[cmd].success).replace(/\$value/g, value))
     } else global.commons.sendMessage('Sorry, $sender, cannot parse !set command.', sender)
 
     let emit = {}
@@ -77,6 +68,7 @@ Configuration.prototype.setValue = function (self, sender, text, quiet) {
     })
     global.panel.io.emit('configuration', emit)
   } catch (err) {
+    console.log(err)
     global.commons.sendMessage('Sorry, $sender, cannot parse !set command.', sender)
   }
 }
@@ -94,17 +86,13 @@ Configuration.prototype.getValue = function (cfgName) {
   return this.cfgL[cfgName].value
 }
 
-Configuration.prototype.loadValues = function () {
+Configuration.prototype.loadValues = async function () {
   var self = this
-  global.botDB.find({type: 'settings'}, function (err, items) {
-    if (err) console.log(err)
-    self._loaded = true
-    items.map(function (item) {
-      delete item.type
-      delete item._id
-      if (!_.isUndefined(self.cfgL[Object.keys(item)[0]])) self.cfgL[Object.keys(item)[0]].value = item[Object.keys(item)[0]]
-    })
+  let config = await global.db.engine.find('settings')
+  _.each(config, function (obj) {
+    if (!_.isUndefined(self.cfgL[obj.key])) self.cfgL[obj.key].value = obj.value
   })
+  global.log.info('Bot loaded configuration data')
 }
 
 module.exports = Configuration
