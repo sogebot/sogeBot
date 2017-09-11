@@ -32,29 +32,35 @@ function Events () {
   this.operations = {
     'send-chat-message': async function (attr) {
       if (_.isNil(attr.send)) return
+
+      let username = attr.username; delete attr.username
       let message = attr.send
       _.each(attr, function (val, name) {
         message = message.replace('$' + name, val)
       })
-      message = await global.parser.parseMessage(attr.message)
-      global.commons.sendMessage(message, { username: attr.username })
+      message = await global.parser.parseMessage(message)
+      global.commons.sendMessage(message, { username: username })
     },
     'send-whisper': async function (attr) {
       if (_.isNil(attr.username) || _.isNil(attr.send)) return
+
+      let username = attr.username; delete attr.username
       let message = attr.send
       _.each(attr, function (val, name) {
         message = message.replace('$' + name, val)
       })
-      message = await global.parser.parseMessage(attr.message)
-      global.commons.sendMessage(message, { username: attr.username, 'message-type': 'whisper' })
+      message = await global.parser.parseMessage(message)
+      global.commons.sendMessage(message, { username: username, 'message-type': 'whisper' })
     },
     'run-command': async function (attr) {
+      let command = attr.command
+
       if (_.isNil(attr.quiet)) attr.quiet = false
       _.each(attr, function (val, name) {
-        attr.command = attr.command.replace('$' + name, val)
+        command = attr.command.replace('$' + name, val)
       })
-      attr.command = await global.parser.parseMessage(attr.command)
-      global.parser.parseCommands((attr.quiet) ? null : { username: global.parser.getOwner() }, attr.command)
+      attr.command = await global.parser.parseMessage(command)
+      global.parser.parseCommands((attr.quiet) ? null : { username: global.parser.getOwner() }, command)
     },
     'play-sound': function (attr) {
       // attr.sound can be filename or url
