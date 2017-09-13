@@ -6,6 +6,9 @@ const _ = require('lodash')
 // bot libraries
 const constants = require('../constants')
 
+// debug
+const debug = require('debug')('systems:ranks')
+
 /*
  * !rank                       - show user rank
  * !rank add <hours> <rank>    - add <rank> for selected <hours>
@@ -25,14 +28,11 @@ function Ranks () {
     global.parser.register(this, '!rank help', this.help, constants.OWNER_ONLY)
     global.parser.register(this, '!rank', this.show, constants.VIEWERS)
 
-    // count Points - every 30s check points
-    var self = this
-    setInterval(function () {
-      self.updateRanks()
+    // count Points
+    setInterval(() => {
+      this.updateRanks()
     }, 60000)
-
-    // Disable webpanel for now
-    // this.webPanel()
+    this.webPanel()
   }
 }
 
@@ -44,16 +44,15 @@ Ranks.prototype.webPanel = function () {
   global.panel.socketListening(this, 'ranks.edit', this.editSocket)
 }
 
-Ranks.prototype.listSocket = function (self, socket) {
-  global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, items) {
-    if (err) { global.log.error(err, { fnc: 'Ranks.prototype.listSocket' }) }
-    socket.emit('Ranks', items)
-  })
+Ranks.prototype.listSocket = async function (self, socket) {
+  let ranks = await global.db.engine.find('ranks')
+  socket.emit('Ranks', _.orderBy(ranks, 'hours', 'asc'))
 }
 
 Ranks.prototype.editSocket = function (self, socket, data) {
   if (data.value.length === 0) self.remove(self, null, data.id)
-  else global.botDB.update({ _id: 'rank_' + data.id }, { rank: data.value, hours: data.id })
+  console.log(data)
+  global.db.engine.update('ranks', { hours: parseInt(data.id, 10) }, { value: data.value })
   self.listSocket(self, socket)
 }
 
@@ -94,7 +93,7 @@ Ranks.prototype.list = async function (self, sender) {
   global.commons.sendMessage(
     (list.length === 0
       ? global.translate('rank.failed.list')
-      : global.translate('rank.success.list') + ': ' + _.map(list, 'value').join(', '))
+      : global.translate('rank.success.list') + ': ' + _.map(_.orderBy(list, 'hours', 'asc'), 'value').join(', '))
     , sender)
 }
 
@@ -143,24 +142,30 @@ Ranks.prototype.show = function (self, sender) {
   global.commons.sendMessage(global.translate(!_.isNil(rank) ? 'rank.success.show' : 'rank.failed.show').replace(/\$rank/g, rank), sender)
 }
 
-Ranks.prototype.updateRanks = function () {
-  _.each(global.users.getAll({ is: { online: true } }), function (user) {
-    /*
+Ranks.prototype.updateRanks = async function () {
+  debug('updateRanks() users and ranks started')
+
+  let users = await global.users.getAll({ is: { online: true } })
+  let ranks = await global.db.engine.find('ranks')
+
+  debug('updateRanks() %i online users and %i ranks loaded', users.length, ranks.length)
+
+  _.each(users, function (user) {
     var watchTime = user.time.watched
     watchTime = _.isFinite(parseInt(watchTime, 10)) && _.isNumber(parseInt(watchTime, 10)) ? (watchTime / 1000 / 60 / 60).toFixed(0) : 0
 
-    global.log.warning('updateRanks are not implemented!')
-    /*
-      global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, items) {
-      if (err) { global.log.error(err, { fnc: 'Ranks.prototype.updateRanks' }) }
-      _.each(items, function (rank) {
-        if (watchTime >= parseInt(rank.hours, 10)) {
-          global.users.set(user.username, {rank: rank.rank})
-        }
-      })
+    let rankToUpdate
+    _.each(_.orderBy(ranks, 'hours', 'asc'), function (rank) {
+      if (watchTime >= parseInt(rank.hours, 10)) {
+        rankToUpdate = rank.value
+      } else {
+        global.users.set(user.username, {rank: rankToUpdate})
+        return false
+      }
     })
-    */
   })
+
+  debug('updateRanks : finished')
 }
 
 module.exports = new Ranks()

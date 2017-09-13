@@ -18,6 +18,7 @@
     "bootstrap-slider": "^9.9.0",
     "bootstrap-toggle": "^2.2.2",
     "chalk": "^2.1.0",
+    "debug": "^3.0.1",
     "express": "^4.15.4",
     "flat": "^4.0.0",
     "glob": "^7.1.2",

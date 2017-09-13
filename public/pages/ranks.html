@@ -49,9 +49,10 @@
     update: function (list) {
       $("#Ranks").empty()
       _.each(list, function(item, index) {
+        item.hours = item.hours.toString()
         $("#Ranks").append('<tr>' +
           '<td>' + item.hours + '</td>' +
-          '<td>' + commons.editable(item.rank, item.hours, 'ranks.edit') + '</td>' +
+          '<td>' + commons.editable(item.value, item.hours, 'ranks.edit') + '</td>' +
           '<td class="tableMenu">' +
           '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
           '<button type="button" style="display: none" class="btn btn-success btn-confirm" onclick="ranks.delete(this)" data-hours="' + item.hours + '"><span class="glyphicon glyphicon-ok"></span></button>' +
@@ -65,7 +66,7 @@
     },
     create: function (event) {
       event.preventDefault()
-      var data = {hours: $("#inputWatched").val(), rank: $("#inputName").val()}
+      var data = {hours: $("#inputWatched").val(), value: $("#inputName").val()}
       socket.emit('createRank', data)
       $("#inputWatched").val('')
       $("#inputName").val('')

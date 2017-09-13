@@ -67,6 +67,8 @@ var migration = {
       await widgetsUpdate_5_8_0()
       console.log('-> Moderation update')
       await moderationUpdate_5_8_0()
+      console.log('-> Ranks update')
+      await ranksUpdate_5_8_0()
     }
   }
 }
@@ -444,4 +446,19 @@ async function widgetsUpdate_5_8_0() {
     await DB.update({ _table: 'widgets', item }, item, { upsert: true })
   })
   await DB.remove({ _id: 'dashboard_widgets' })
+}
+
+async function ranksUpdate_5_8_0() {
+  let items = await DB.find({$where: function () { return this._id.startsWith('rank') }})
+  if (items.length === 0) return
+
+  _.each(items, async function (rank) {
+    let item = {
+      _table: 'ranks',
+      hours: parseInt(rank.hours, 10),
+      value: rank.rank
+    }
+    await DB.update({ _table: 'ranks', item }, item, { upsert: true })
+  })
+  await DB.remove({$where: function () { return this._id.startsWith('rank') }})
 }

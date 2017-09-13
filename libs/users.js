@@ -102,7 +102,7 @@ Users.prototype.fetchAccountAge = function (self, username, id) {
 }
 
 Users.prototype.getAll = async function (object) {
-  let users = await global.db.engine.find('users')
+  let users = await global.db.engine.find('users', object)
   return users
 }
 
