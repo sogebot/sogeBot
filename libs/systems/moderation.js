@@ -96,24 +96,20 @@ function Moderation () {
       })
     }, 60000)
 
-    global.watcher.watch(this, 'lists', this._save)
     this._update(this)
     this.webPanel()
   }
 }
 
-Moderation.prototype._update = function (self) {
-  global.botDB.findOne({ _id: 'moderation_lists' }, function (err, item) {
-    if (err) return log.error(err, { fnc: 'Moderation.prototype._update' })
-    if (_.isNull(item)) return
+Moderation.prototype._update = async function (self) {
+  let blacklist = global.db.engine.findOne('settings', { key: 'blacklist' })
+  let whitelist = global.db.engine.findOne('settings', { key: 'whitelist' })
 
-    self.lists.blacklist = item.blacklist
-    self.lists.whitelist = item.whitelist
-  })
-}
+  await blacklist
+  await whitelist
 
-Moderation.prototype._save = function (self) {
-  global.botDB.update({ _id: 'moderation_lists' }, { $set: self.lists }, { upsert: true })
+  self.lists.blacklist = blacklist.value
+  self.lists.whitelist = whitelist.value
 }
 
 Moderation.prototype.webPanel = function () {
@@ -126,7 +122,11 @@ Moderation.prototype.emitLists = function (self, socket) {
   socket.emit('moderation.lists', self.lists)
 }
 Moderation.prototype.setLists = function (self, socket, data) {
-  self.lists = data
+  self.lists.blacklist = data.blacklist.filter(entry => entry.trim() !== '')
+  self.lists.whitelist = data.whitelist.filter(entry => entry.trim() !== '')
+
+  global.db.engine.update('settings', { key: 'blacklist' }, { value: self.lists.blacklist })
+  global.db.engine.update('settings', { key: 'whitelist' }, { value: self.lists.whitelist })
 }
 
 Moderation.prototype.timeoutUser = function (self, sender, warning, msg, time) {
