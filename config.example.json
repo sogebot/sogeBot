@@ -19,8 +19,7 @@
   },
   "database": {
     "__README__": "TBD",
-    "type": "nedb",
-    "debug": true
+    "type": "nedb"
   },
   "systems": {
     "notice": true,
