@@ -3,7 +3,7 @@
 var _ = require('lodash')
 var Database = require('nedb-promise')
 var DB = new Database({
-  filename: 'test.db',
+  filename: 'sogeBot.db',
   autoload: true
 })
 
@@ -65,6 +65,8 @@ var migration = {
       await permissionsUpdate_5_8_0()
       console.log('-> Widgets update')
       await widgetsUpdate_5_8_0()
+      console.log('-> Moderation update')
+      await moderationUpdate_5_8_0()
     }
   }
 }
@@ -408,6 +410,25 @@ async function permissionsUpdate_5_8_0() {
     await DB.update({ _table: 'permissions', item }, item, { upsert: true })
   })
   await DB.remove({ $where: function () { return this._id.startsWith('permission') }})
+}
+
+async function moderationUpdate_5_8_0() {
+  let items = await DB.findOne({ _id: 'moderation_lists' })
+
+  let item = {
+    _table: 'settings',
+    key: 'blacklist',
+    value: items.blacklist
+  }
+  await DB.update({ _table: 'settings', item }, item, { upsert: true })
+
+  item = {
+    _table: 'settings',
+    key: 'whitelist',
+    value: items.whitelist
+  }
+  await DB.update({ _table: 'settings', item }, item, { upsert: true })
+  await DB.remove({ _id: 'moderation_lists' })
 }
 
 async function widgetsUpdate_5_8_0() {

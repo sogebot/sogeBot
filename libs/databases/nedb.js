@@ -8,7 +8,7 @@ class INeDB extends Interface {
   constructor () {
     super('nedb')
 
-    this.engine = new Datastore({ filename: 'test.db', autoload: true })
+    this.engine = new Datastore({ filename: 'sogeBot.db', autoload: true })
     this.engine.persistence.setAutocompactionInterval(60000)
   }
 
