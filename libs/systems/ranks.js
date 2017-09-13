@@ -67,10 +67,12 @@ Ranks.prototype.createSocket = function (self, socket, data) {
 }
 
 Ranks.prototype.help = function (self, sender) {
+  if (debug.enabled) debug('help(self,%s)', JSON.stringify(sender))
   global.commons.sendMessage(global.translate('core.usage') + ': !rank add <hours> <rank> | !rank remove <hour> | !rank list | !rank set <username> <rank> | !rank unset <username>', sender)
 }
 
 Ranks.prototype.add = async function (self, sender, text) {
+  if (debug.enabled) debug('add(self, %s, %s)', JSON.stringify(sender), text)
   const parsed = text.match(/^(\d+) ([\u0500-\u052F\u0400-\u04FF\w].+)$/)
   if (_.isNil(parsed)) return global.commons.sendMessage(global.translate('rank.failed.parse'), sender)
 
@@ -89,15 +91,17 @@ Ranks.prototype.add = async function (self, sender, text) {
 }
 
 Ranks.prototype.list = async function (self, sender) {
+  if (debug.enabled) debug('list(self, %s)', JSON.stringify(sender))
   var list = await global.db.engine.find('ranks')
   global.commons.sendMessage(
     (list.length === 0
       ? global.translate('rank.failed.list')
-      : global.translate('rank.success.list') + ': ' + _.map(_.orderBy(list, 'hours', 'asc'), 'value').join(', '))
+      : global.translate('rank.success.list') + ': ' + _.map(_.orderBy(list, 'hours', 'asc'), function (l) { return l.hours + 'h - ' + l.value }).join(', '))
     , sender)
 }
 
 Ranks.prototype.remove = async function (self, sender, text) {
+  if (debug.enabled) debug('remove(self, %s, %s)', JSON.stringify(sender), text)
   const parsed = text.match(/^(\d+)$/)
   if (_.isNil(parsed)) return global.commons.sendMessage(global.translate('rank.failed.parse'), sender)
 
@@ -113,6 +117,7 @@ Ranks.prototype.remove = async function (self, sender, text) {
 }
 
 Ranks.prototype.set = function (self, sender, text) {
+  if (debug.enabled) debug('set(self, %s, %s)', JSON.stringify(sender), text)
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
     global.users.set(parsed[1], { custom: { rank: parsed[2].trim() } })
@@ -125,6 +130,7 @@ Ranks.prototype.set = function (self, sender, text) {
 }
 
 Ranks.prototype.unset = function (self, sender, text) {
+  if (debug.enabled) debug('unset(self, %s, %s)', JSON.stringify(sender), text)
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     global.users.set(parsed[1], { custom: { rank: null } })
@@ -136,6 +142,7 @@ Ranks.prototype.unset = function (self, sender, text) {
 }
 
 Ranks.prototype.show = function (self, sender) {
+  if (debug.enabled) debug('show(self, %s)', JSON.stringify(sender))
   let user = global.users.get(sender.username)
   let rank = !_.isNil(user.rank) ? user.rank : null
   rank = !_.isNil(user.custom.rank) ? user.custom.rank : rank
@@ -143,12 +150,12 @@ Ranks.prototype.show = function (self, sender) {
 }
 
 Ranks.prototype.updateRanks = async function () {
-  debug('updateRanks() users and ranks started')
+  if (debug.enabled) debug('updateRanks() users and ranks started')
 
   let users = await global.users.getAll({ is: { online: true } })
   let ranks = await global.db.engine.find('ranks')
 
-  debug('updateRanks() %i online users and %i ranks loaded', users.length, ranks.length)
+  if (debug.enabled) debug('updateRanks() %i online users and %i ranks loaded', users.length, ranks.length)
 
   _.each(users, function (user) {
     var watchTime = user.time.watched
@@ -165,7 +172,7 @@ Ranks.prototype.updateRanks = async function () {
     })
   })
 
-  debug('updateRanks : finished')
+  if (debug.enabled) debug('updateRanks() finished')
 }
 
 module.exports = new Ranks()

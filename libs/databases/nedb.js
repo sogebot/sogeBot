@@ -14,7 +14,7 @@ class INeDB extends Interface {
     this.engine = new Datastore({ filename: 'sogeBot.db', autoload: true })
     this.engine.persistence.setAutocompactionInterval(60000)
 
-    debug('NeDB initialized')
+    if (debug.enabled) debug('NeDB initialized')
   }
 
   async find (table, where) {
@@ -28,7 +28,7 @@ class INeDB extends Interface {
     return new Promise(function (resolve, reject) {
       self.engine.find(query, function (err, items) {
         if (err) reject(err)
-        debug('find() query:%s', JSON.stringify(query))
+        if (debug.enabled) debug('find() query:%s', JSON.stringify(query))
         resolve(items)
       })
     })
@@ -44,7 +44,7 @@ class INeDB extends Interface {
     return new Promise(function (resolve, reject) {
       self.engine.findOne(query, function (err, item) {
         if (err) reject(err)
-        debug('findOne() query:%s', JSON.stringify(query))
+        if (debug.enabled) debug('findOne() query:%s', JSON.stringify(query))
         resolve(_.isNil(item) ? {} : item)
       })
     })
@@ -62,7 +62,7 @@ class INeDB extends Interface {
     return new Promise(function (resolve, reject) {
       self.engine.insert(query, function (err, item) {
         if (err) reject(err)
-        debug('insert() query:%s', JSON.stringify(query))
+        if (debug.enabled) debug('insert() query:%s', JSON.stringify(query))
         resolve(item)
       })
     })
@@ -80,7 +80,7 @@ class INeDB extends Interface {
     return new Promise(function (resolve, reject) {
       self.engine.remove(query, { multi: true }, function (err, numRemoved) {
         if (err) reject(err)
-        debug('remove() query:%s', JSON.stringify(query))
+        if (debug.enabled) debug('remove() query:%s', JSON.stringify(query))
         resolve(numRemoved)
       })
     })
@@ -98,7 +98,7 @@ class INeDB extends Interface {
     return new Promise(function (resolve, reject) {
       self.engine.update(query, { $set: flatten(object) }, { upsert: true, multi: (_.isEmpty(where)) }, function (err, numReplaced) {
         if (err) reject(err)
-        debug('update() query:%s, update:%s', JSON.stringify(query), JSON.stringify(object))
+        if (debug.enabled) debug('update() query:%s, update:%s', JSON.stringify(query), JSON.stringify(object))
         resolve(numReplaced)
       })
     })
@@ -116,7 +116,7 @@ class INeDB extends Interface {
     return new Promise(function (resolve, reject) {
       self.engine.update(query, { $inc: flatten(object) }, { upsert: true, multi: (_.isEmpty(where)) }, function (err, numReplaced) {
         if (err) reject(err)
-        debug('increment() query:%s, update:%s', JSON.stringify(query), JSON.stringify(object))
+        if (debug.enabled) debug('increment() query:%s, update:%s', JSON.stringify(query), JSON.stringify(object))
         resolve(numReplaced)
       })
     })
