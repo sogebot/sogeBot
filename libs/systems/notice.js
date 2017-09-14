@@ -103,7 +103,7 @@ Notice.prototype.send = async function () {
     this.lastNoticeSent = new Date().getTime()
     this.msgCountSent = global.parser.linesParsed
 
-    global.commons.sendMessage(notice.text, {username: global.configuration.get().twitch.channel})
+    global.commons.sendMessage(notice.text, {username: global.parser.getOwner()})
 
     // update notice
     global.db.engine.update('notices', { _id: notice._id }, { time: this.lastNoticeSent })
