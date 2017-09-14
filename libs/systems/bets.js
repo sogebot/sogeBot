@@ -2,12 +2,10 @@
 
 // 3rdparty libraries
 var _ = require('lodash')
-var crypto = require('crypto')
 
 // bot libraries
 var constants = require('../constants')
 var Points = require('./points')
-var log = global.log
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0'
 const ERROR_ALREADY_OPENED = '1'
@@ -33,7 +31,6 @@ function Bets () {
 
   this.timer = null
   this.bet = null
-  this.templates = {}
 
   if (global.commons.isSystemEnabled('points') && global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!bet open', this.open, constants.MODS)
@@ -45,25 +42,7 @@ function Bets () {
 
     global.configuration.register('betPercentGain', 'bets.betPercentGain', 'number', 20)
     global.configuration.register('betCloseTimer', 'bets.betCloseTimer', 'number', 2)
-
-    global.watcher.watch(this, 'templates', this._save)
-    this._update(this)
   }
-}
-
-Bets.prototype._update = function (self) {
-  global.botDB.findOne({ _id: 'bets_template' }, function (err, item) {
-    if (err) return log.error(err, { fnc: 'Bets.prototype._update' })
-    if (_.isNull(item)) return
-
-    delete item._id
-    self.templates = item
-  })
-}
-
-Bets.prototype._save = function (self) {
-  if (_.size(self.templates) > 0) global.botDB.update({ _id: 'bets_template' }, { $set: self.templates }, { upsert: true })
-  else global.botDB.remove({ _id: 'bets_template' })
 }
 
 Bets.prototype.open = function (self, sender, text) {
@@ -79,7 +58,7 @@ Bets.prototype.open = function (self, sender, text) {
       .replace(/\$minutes/g, global.configuration.getValue('betCloseTimer')), sender)
 
     self.bet.end = new Date().getTime() + (parseInt(global.configuration.getValue('betCloseTimer'), 10) * 1000 * 60)
-    self.saveTemplate(self, Object.keys(self.bet.bets))
+    // TODO: self.saveTemplate(self, Object.keys(self.bet.bets))
 
     self.timer = setTimeout(function () {
       self.bet.locked = true
@@ -104,19 +83,6 @@ Bets.prototype.open = function (self, sender, text) {
     }
   } finally {
     self.modifiedTime = new Date().getTime()
-  }
-}
-
-Bets.prototype.saveTemplate = function (self, bOptions) {
-  let id = crypto.createHash('md5').update(bOptions.toString()).digest('hex').substring(0, 5)
-  if (_.isUndefined(self.templates[id])) {
-    self.templates[id] = {_id: id, values: bOptions, added: new Date().getTime()}
-  } else {
-    self.templates[id].added = new Date().getTime()
-  }
-  if (_.size(self.templates) > 1) {
-    let template = _.find(self.templates, function (o) { return o.added === _.map(self.templates, 'added').sort()[0] })
-    delete self.templates[template._id]
   }
 }
 
