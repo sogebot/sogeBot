@@ -1,10 +1,4 @@
-const config = require('../../config.json')
-
 class Interface {
-  constructor (engine) {
-    if (config.database.debug) global.log.debug('Initializing database engine ' + engine)
-  }
-
   /**
    * Asynchronous find several results on db
    * @param {string} table table to search
