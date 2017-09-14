@@ -96,7 +96,7 @@ class INeDB extends Interface {
 
     var self = this
     return new Promise(function (resolve, reject) {
-      self.engine.update(query, { $set: flatten(object) }, { upsert: true, multi: (_.isEmpty(where)) }, function (err, numReplaced) {
+      self.engine.update(query, { $set: flatten(object) }, { upsert: (_.isNil(query._id)), multi: (_.isEmpty(where)) }, function (err, numReplaced) {
         if (err) reject(err)
         if (debug.enabled) debug('update() query:%s, update:%s', JSON.stringify(query), JSON.stringify(object))
         resolve(numReplaced)

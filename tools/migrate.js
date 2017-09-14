@@ -69,8 +69,8 @@ var migration = {
       await moderationUpdate_5_8_0()
       console.log('-> Ranks update')
       await ranksUpdate_5_8_0()
-      console.log('-> Bets template remove')
-      await betsTmplRemove_5_8_0()
+      console.log('-> Others remove')
+      await othersRemove_5_8_0()
     }
   }
 }
@@ -465,6 +465,8 @@ async function ranksUpdate_5_8_0() {
   await DB.remove({$where: function () { return this._id.startsWith('rank') }})
 }
 
-async function betsTmplRemove_5_8_0() {
+async function othersRemove_5_8_0() {
   await DB.remove({ _id: 'bets_template' })
+  await DB.remove({ _id: 'raffles' })
+  await DB.remove({ _id: 'raffle' })
 }

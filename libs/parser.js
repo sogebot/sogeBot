@@ -130,6 +130,7 @@ Parser.prototype.isRegistered = function (cmd) {
 }
 
 Parser.prototype.register = function (self, cmd, fnc, permission) {
+  if (!cmd.startsWith('!')) cmd = '!' + cmd
   this.registeredCmds[cmd] = fnc
   this.permissionsCmds[cmd] = permission
   this.selfCmds[cmd] = self
@@ -146,6 +147,7 @@ Parser.prototype.registerHelper = function (cmd) {
 }
 
 Parser.prototype.unregister = function (cmd) {
+  if (!cmd.startsWith('!')) cmd = '!' + cmd
   global.permissions.removePermission(global.permissions.removePermission, cmd)
   delete this.registeredCmds[cmd]
   delete this.permissionsCmds[cmd]
