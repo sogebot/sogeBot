@@ -1,5 +1,6 @@
 const _ = require('lodash')
 const flatten = require('flat')
+const fs = require('fs')
 
 const Interface = require('./interface')
 const Datastore = require('nedb')
@@ -11,24 +12,30 @@ class INeDB extends Interface {
   constructor () {
     super('nedb')
 
-    this.engine = new Datastore({ filename: 'sogeBot.db', autoload: true })
-    this.engine.persistence.setAutocompactionInterval(60000)
+    if (!fs.existsSync('./db')) fs.mkdirSync('./db')
+    if (!fs.existsSync('./db/nedb')) fs.mkdirSync('./db/nedb')
+
+    this.table = {}
 
     if (debug.enabled) debug('NeDB initialized')
   }
 
+  on (table) {
+    if (_.isNil(this.table[table])) {
+      this.table[table] = new Datastore({ filename: './db/nedb/' + table + '.db', autoload: true })
+      this.table[table].persistence.setAutocompactionInterval(60000)
+    }
+    return this.table[table]
+  }
+
   async find (table, where) {
     where = where || {}
-    let query = {
-      _table: table
-    }
-    _.merge(query, flatten(where))
 
     var self = this
     return new Promise(function (resolve, reject) {
-      self.engine.find(query, function (err, items) {
+      self.on(table).find(flatten(where), function (err, items) {
         if (err) reject(err)
-        if (debug.enabled) debug('find() query:%s', JSON.stringify(query))
+        if (debug.enabled) debug('find() \n\ttable: %s \n\twhere: %j \n\titems: %j', table, where, items)
         resolve(items)
       })
     })
@@ -36,15 +43,12 @@ class INeDB extends Interface {
 
   async findOne (table, where) {
     where = where || {}
-    let query = {
-      _table: table
-    }
-    _.merge(query, flatten(where))
+
     var self = this
     return new Promise(function (resolve, reject) {
-      self.engine.findOne(query, function (err, item) {
+      self.on(table).findOne(flatten(where), function (err, item) {
         if (err) reject(err)
-        if (debug.enabled) debug('findOne() query:%s', JSON.stringify(query))
+        if (debug.enabled) debug('findOne() \n\ttable: %s \n\twhere: %j \n\titem: %j', table, where, _.isNil(item) ? {} : item)
         resolve(_.isNil(item) ? {} : item)
       })
     })
@@ -53,16 +57,11 @@ class INeDB extends Interface {
   async insert (table, object) {
     if (_.isEmpty(object)) throw Error('Object cannot be empty')
 
-    let query = {
-      _table: table
-    }
-    _.merge(query, object)
-
     var self = this
     return new Promise(function (resolve, reject) {
-      self.engine.insert(query, function (err, item) {
+      self.on(table).insert(object, function (err, item) {
         if (err) reject(err)
-        if (debug.enabled) debug('insert() query:%s', JSON.stringify(query))
+        if (debug.enabled) debug('insert() \n\ttable: %s \n\tobject: %j', table, object)
         resolve(item)
       })
     })
@@ -71,16 +70,11 @@ class INeDB extends Interface {
   async remove (table, where) {
     if (_.isEmpty(where)) throw Error('Object to delete cannot be empty')
 
-    let query = {
-      _table: table
-    }
-    _.merge(query, where)
-
     var self = this
     return new Promise(function (resolve, reject) {
-      self.engine.remove(query, { multi: true }, function (err, numRemoved) {
+      self.on(table).remove(flatten(where), { multi: true }, function (err, numRemoved) {
         if (err) reject(err)
-        if (debug.enabled) debug('remove() query:%s', JSON.stringify(query))
+        if (debug.enabled) debug('remove() \n\ttable: %s \n\twhere: %j \n\tremoved: %j', table, where, numRemoved)
         resolve(numRemoved)
       })
     })
@@ -89,16 +83,11 @@ class INeDB extends Interface {
   async update (table, where, object) {
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
 
-    let query = {
-      _table: table
-    }
-    _.merge(query, flatten(where))
-
     var self = this
     return new Promise(function (resolve, reject) {
-      self.engine.update(query, { $set: flatten(object) }, { upsert: (_.isNil(query._id)), multi: (_.isEmpty(where)) }, function (err, numReplaced) {
+      self.on(table).update(flatten(where), { $set: flatten(object) }, { upsert: (_.isNil(where._id) && !_.isEmpty(where)), multi: (_.isEmpty(where)) }, function (err, numReplaced) {
         if (err) reject(err)
-        if (debug.enabled) debug('update() query:%s, update:%s', JSON.stringify(query), JSON.stringify(object))
+        if (debug.enabled) debug('update() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
         resolve(numReplaced)
       })
     })
@@ -107,16 +96,11 @@ class INeDB extends Interface {
   async increment (table, where, object) {
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
 
-    let query = {
-      _table: table
-    }
-    _.merge(query, where)
-
     var self = this
     return new Promise(function (resolve, reject) {
-      self.engine.update(query, { $inc: flatten(object) }, { upsert: true, multi: (_.isEmpty(where)) }, function (err, numReplaced) {
+      self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: (_.isEmpty(where)) }, function (err, numReplaced) {
         if (err) reject(err)
-        if (debug.enabled) debug('increment() query:%s, update:%s', JSON.stringify(query), JSON.stringify(object))
+        if (debug.enabled) debug('increment() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
         resolve(numReplaced)
       })
     })

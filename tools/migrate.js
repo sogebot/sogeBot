@@ -1,472 +1,356 @@
-'use strict'
+const _ = require('lodash')
+const figlet = require('figlet')
 
-var _ = require('lodash')
-var Database = require('nedb-promise')
-var DB = new Database({
-  filename: 'sogeBot.db',
-  autoload: true
-})
+// db
+const OldDatabase = require('nedb-promise')
+const Database = require('../libs/databases/database')
+global.db = new Database();
 
-var migration = {
-  '1.1': {
-    description: '1.0 to 1.1',
-    process: async function () {
-      console.log('-> Renaming settings')
-      await settingsRename('volume', 'songs_volume')
-      await settingsRename('duration', 'songs_duration')
-      await settingsRename('shuffle', 'songs_shuffle')
-    }
-  },
-  '1.3': {
-    description: '1.1 to 1.3',
-    process: async function () {
-      console.log('-> Removing bet templates')
-      await removeFromDB('bets_template')
-      console.log('-> Alias table update')
-      await aliasDbUpdate_1_3()
-      console.log('-> Custom Commands update')
-      await customCmdsDbUpdate_1_3()
-      console.log('-> Keywords update')
-      await keywordsDbUpdate_1_3()
-      console.log('-> Users update')
-      await usersDbUpdate_1_3()
-      console.log('-> Prices update')
-      await pricesDbUpdate_1_3()
-      console.log('-> Notices update')
-      await noticesDbUpdate_1_3()
-    }
-  },
-  '5.8.0': {
-    description: '5.7.x to 5.8.x',
-    process: async function () {
-      console.log('-> Users update')
-      await usersDbUpdate_5_8_0()
-      console.log('-> Notices update')
-      await noticesUpdate_5_8_0()
-      console.log('-> Custom Commands update')
-      await commandsUpdate_5_8_0()
-      console.log('-> Keywords update')
-      await keywordsUpdate_5_8_0()
-      console.log('-> Price update')
-      await priceUpdate_5_8_0()
-      console.log('-> Playlist update')
-      await playlistUpdate_5_8_0()
-      console.log('-> Banned songs update')
-      await bannedsongsUpdate_5_8_0()
-      console.log('-> Alias update')
-      await aliasUpdate_5_8_0()
-      console.log('-> Configuration update')
-      await configurationUpdate_5_8_0()
-      console.log('-> CustomVars update')
-      await customVariablesUpdate_5_8_0()
-      console.log('-> Events update')
-      await eventsUpdate_5_8_0()
-      console.log('-> Permissions update')
-      await permissionsUpdate_5_8_0()
-      console.log('-> Widgets update')
-      await widgetsUpdate_5_8_0()
-      console.log('-> Moderation update')
-      await moderationUpdate_5_8_0()
-      console.log('-> Ranks update')
-      await ranksUpdate_5_8_0()
-      console.log('-> Others remove')
-      await othersRemove_5_8_0()
-    }
+(async () => {
+  let info = await global.db.engine.find('info')
+  console.log(figlet.textSync('MIGRATE', {
+    font: 'ANSI Shadow',
+    horizontalLayout: 'default',
+    verticalLayout: 'default'
+  }))
+
+  let dbVersion = _.isEmpty(info) || _.isNil(_.find(info, (o) => !_.isNil(o.version)).version)
+    ? '0.0.0'
+    : _.find(info, (o) => !_.isNil(o.version)).version
+
+  console.info(('-').repeat(56))
+  console.info('Current bot version: %s', process.env.npm_package_version)
+  console.info('DB version: %s', dbVersion)
+  console.info(('-').repeat(56))
+
+  if (process.env.npm_package_version === dbVersion) {
+    console.info('Nothing to do, exiting ...')
+    process.exit()
   }
-}
 
-async function main () {
-  await migrate('1.1')
-  await migrate('1.3')
-  await migrate('5.8.0')
-  console.log('=> EVERY PROCESS IS DONE')
+  await updates(dbVersion, process.env.npm_package_version)
+
+  console.info(('-').repeat(56))
+  console.info('All process DONE! Database is upgraded to %s', process.env.npm_package_version)
+  if (dbVersion !== '0.0.0') await global.db.engine.update('info', { version: dbVersion }, { version: process.env.npm_package_version })
+  else await global.db.engine.insert('info', { version: process.env.npm_package_version })
   process.exit()
-}
+})()
 
-async function migrate (aVersion) {
-  console.log('Migration from %s', migration[aVersion].description)
-  await migration[aVersion].process()
-  console.log('=> DONE')
-}
+let updates = async (from, to) => {
+  console.info('Performing update from %s to %s', from, to)
+  console.info(('-').repeat(56))
 
-main();
+  let migrate = []
 
-async function settingsRename(aOrig, aRenamed) {
-  let setting = await DB.findOne({
-    $where: function () {
-      return this.type === 'settings' && Object.keys(this).indexOf(aOrig) >= 0;
+  for (let table of _.values(migration)) {
+    for (let i of table) {
+      if (parseInt(i.version.replace(/\./g, ''), 10) > parseInt(from.replace(/\./g, ''), 10) &&
+          parseInt(i.version.replace(/\./g, ''), 10) <= parseInt(to.replace(/\./g, ''), 10)) {
+        migrate.push(i)
+      }
     }
-  })
-  if (!_.isNull(setting)) {
-    setting[aRenamed] = setting[aOrig]
-    await DB.remove({ _id: setting._id})
-    delete setting[aOrig]
-    delete setting._id
-    await DB.insert(setting)
   }
+  for (let i of _.orderBy(migrate, 'version', 'asc')) { await i.do() }
 }
 
-async function aliasDbUpdate_1_3() {
-  let aliases = await DB.find({
-    $where: function () {
-      return this._id.startsWith('alias_')
+// TODO: change versions to 5.8.0
+
+let migration = {
+  users: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration users to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let users = await db.findOne({ _id: 'users' })
+      if (_.isNil(users) || _.size(users.users) === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
+
+      console.info('Migrating %i users', _.size(users.users))
+      for (let user of _.values(users.users)) {
+        await global.db.engine.update('users', user, user)
+      }
     }
-  })
-  if (aliases.length === 0) return
+  }],
+  notices: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration notices to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.findOne({ _id: 'notices' })
+      if (_.isNil(items) || _.size(items.notices) === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
 
-  let aliasUpdate = { alias: []}
-  _.each(aliases, function (alias) {
-    DB.remove({_id: alias._id})
-    aliasUpdate.alias.push({alias: alias.alias, command: alias.command, enabled: true})
-  })
-  await DB.update({ _id: 'alias' }, { $set: aliasUpdate }, { upsert: true })
-}
-
-async function pricesDbUpdate_1_3() {
-  let prices = await DB.find({
-    $where: function () {
-      return this._id.startsWith('price_')
+      console.info('Migrating %i notices', _.size(items.notices))
+      for (let item of _.values(items.notices)) {
+        delete item.id
+        await global.db.engine.update('notices', item, item)
+      }
     }
-  })
-  if (prices.length === 0) return
+  }],
+  commands: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration notices to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.findOne({ _id: 'commands' })
+      if (_.isNil(items) || _.size(items.commands) === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
 
-  let pricesUpdate = { prices: []}
-  _.each(prices, function (price) {
-    DB.remove({_id: price._id})
-    pricesUpdate.prices.push({price: price.price, command: price.command, enabled: true})
-  })
-  await DB.update({ _id: 'prices' }, { $set: pricesUpdate }, { upsert: true })
-}
-
-async function customCmdsDbUpdate_1_3() {
-  let commands = await DB.find({
-    $where: function () {
-      return this._id.startsWith('customcmds_')
+      console.info('Migrating %i commands', _.size(items.commands))
+      for (let item of _.values(items.commands)) {
+        await global.db.engine.update('commands', item, item)
+      }
     }
-  })
-  if (commands.length === 0) return
+  }],
+  keywords: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration keywords to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.findOne({ _id: 'keywords' })
+      if (_.isNil(items) || _.size(items.keywords) === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
 
-  let commandsUpdate = { commands: []}
-  _.each(commands, function (command) {
-    commandsUpdate.commands.push({command: command.command, response: command.response, enabled: true})
-  })
-  await DB.remove({
-    $where: function () {
-      return this._id.startsWith('customcmds_')
+      console.info('Migrating %i keywords', _.size(items.keywords))
+      for (let item of _.values(items.keywords)) {
+        await global.db.engine.update('keywords', item, item)
+      }
     }
-  }, { multi: true })
-  await DB.update({ _id: 'commands' }, { $set: commandsUpdate }, { upsert: true })
-}
+  }],
+  prices: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration prices to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.findOne({ _id: 'prices' })
+      if (_.isNil(items) || _.size(items.prices) === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
 
-async function removeFromDB(id) {
-  await DB.remove({ _id: id })
-}
-
-async function keywordsDbUpdate_1_3() {
-  let kwds = await DB.find({
-    $where: function () {
-      return this._id.startsWith('kwd_')
+      console.info('Migrating %i prices', _.size(items.prices))
+      for (let item of _.values(items.prices)) {
+        await global.db.engine.update('prices', item, item)
+      }
     }
-  })
-  if (kwds.length === 0) return
+  }],
+  playlist: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration playlist to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.find({ type: 'playlist' })
+      if (_.isNil(items) || items.length === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
 
-  let kwdsUpdate = { keywords: [] }
-  _.each(kwds, function (kwd) {
-    kwdsUpdate.keywords.push({keyword: kwd.keyword, response: kwd.response, enabled: true})
-  })
-  await DB.remove({
-    $where: function () {
-      return this._id.startsWith('kwd_')
+      console.info('Migrating %i playlist', items.length)
+      for (let item of items) {
+        delete item.type
+        await global.db.engine.insert('playlist', item)
+      }
     }
-  }, { multi: true })
-  await DB.update({ _id: 'keywords' }, { $set: kwdsUpdate }, { upsert: true })
-}
+  }],
+  bannedsongs: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration banned songs to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.find({ type: 'banned-song' })
+      if (_.isNil(items) || items.length === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
 
-async function noticesDbUpdate_1_3() {
-  let list = await DB.find({
-    $where: function () {
-      return this._id.startsWith('notice_')
+      console.info('Migrating %i banned songs', items.length)
+      for (let item of items) {
+        item.videoId = item._id
+
+        delete item.type
+        delete item._id
+        await global.db.engine.insert('bannedsong', item)
+      }
     }
-  })
-  if (list.length === 0) return
+  }],
+  alias: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration aliases to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.findOne({ _id: 'alias' })
+      if (_.isNil(items) || _.size(items.alias) === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
 
-  let listUpdate = { notices: [] }
-  _.each(list, function (o) {
-    listUpdate.notices.push({text: o.text, time: o.time, id: o._id.split('_')[1], enabled: true})
-  })
-  await DB.remove({
-    $where: function () {
-      return this._id.startsWith('notice_')
+      console.info('Migrating %i aliases', _.size(items.alias))
+      for (let item of _.values(items.alias)) {
+        await global.db.engine.update('alias', item, item)
+      }
     }
-  }, { multi: true })
-  await DB.update({ _id: 'notices' }, { $set: listUpdate }, { upsert: true })
-}
+  }],
+  settings: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration settings to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.find({ type: 'settings' })
+      if (_.isNil(items) || items.length === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
 
-async function usersDbUpdate_1_3() {
-  let users = await DB.find({
-    $where: function () {
-      return this._id.startsWith('user_')
+      console.info('Migrating %i settings', items.length)
+      for (let item of items) {
+        delete item.type
+        delete item._id
+        delete item.quiet
+
+        item = {
+          key: Object.keys(item)[0],
+          value: item[Object.keys(item)[0]]
+        }
+        await global.db.engine.insert('settings', item)
+      }
     }
-  })
-  if (users.length === 0) return
+  }],
+  customVariables: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration custom variables to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.findOne({ _id: 'customVariables' })
+      if (_.isNil(items) || _.size(items.variables) === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
 
-  let usersUpdate = { users: {} }
-  _.each(users, function (user) {
-    delete user._id
-
-    let time = {
-      message: (_.isUndefined(user.lastMessageTime)) ? 0 : user.lastMessageTime,
-      watched: (_.isUndefined(user.watchTime)) ? 0 : user.watchTime,
-      parted: (_.isUndefined(user.partedTime)) ? 0 : user.partedTime,
-      points: (_.isUndefined(user.pointsGrantedAt)) ? 0 : user.pointsGrantedAt
+      console.info('Migrating %i custom variables', _.size(items.variables))
+      for (let k of Object.keys(items.variables)) {
+        await global.db.engine.insert('customvars', { key: k, value: items.variables[k] })
+      }
     }
-    delete user.lastMessageTime
-    delete user.watchTime
-    delete user.partedTime
-    delete user.pointsGrantedAt
-    user.time = time
+  }],
+  events: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration events to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.findOne({ _id: 'Events' })
+      if (_.isNil(items) || _.size(items.events) === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
 
-    let is = {
-      online: false,
-      follower: (_.isUndefined(user.isFollower)) ? false : user.isFollower
+      console.info('Migrating %i events', _.size(items.events))
+      for (let k of Object.keys(items.events)) {
+        let item = {
+          key: k,
+          value: []
+        }
+
+        _.each(items.events[k], function (event) {
+          item.value.push(event[0])
+        })
+        await global.db.engine.insert('events', item)
+      }
     }
-    delete user.isOnline
-    delete user.isFollower
-    user.is = is
+  }],
+  permissions: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration permissions to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.find({$where: function () { return this._id.startsWith('permission') }})
+      if (_.isNil(items) || items.length === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
 
-    usersUpdate.users[user.username] = user
-  })
-  await DB.remove({
-    $where: function () {
-      return this._id.startsWith('user_')
+      console.info('Migrating %i permissions', items.length)
+      for (let item of items) {
+        await global.db.engine.insert('permissions', { key: item.command, permission: item.permission })
+      }
     }
-  }, { multi: true })
-  await DB.update({ _id: 'users' }, { $set: usersUpdate }, { upsert: true })
-}
+  }],
+  moderation: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration moderation to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.findOne({ _id: 'moderation_lists' })
+      if (_.isNil(items)) {
+        console.info('Nothing to do ...')
+        return
+      }
 
-async function usersDbUpdate_5_8_0() {
-  let users = await DB.findOne({ _id: 'users' })
-  if (users.users.length === 0) return
+      console.info('Migrating blacklist')
+      await global.db.engine.insert('settings', { key: 'blacklist', value: items.blacklist })
 
-  _.each(users.users, async function (user) {
-    user._table = 'users'
-    await DB.update({ _table: 'users', username: user.username }, user, { upsert: true })
-  })
-  await DB.remove({ _id: 'users' })
-}
-
-async function noticesUpdate_5_8_0() {
-  let notices = await DB.findOne({ _id: 'notices' })
-  if (notices.notices.length === 0) return
-
-  _.each(notices.notices, async function (notice) {
-    delete notice.id
-    notice._table = 'notices'
-    await DB.update({ _table: 'notices', text: notice.text }, notice, { upsert: true })
-  })
-  await DB.remove({ _id: 'notices' })
-}
-
-async function commandsUpdate_5_8_0() {
-  let items = await DB.findOne({ _id: 'commands' })
-  if (items.commands.length === 0) return
-
-  _.each(items.commands, async function (item) {
-    delete item.id
-    item._table = 'commands'
-    await DB.update({ _table: 'commands', item }, item, { upsert: true })
-  })
-  await DB.remove({ _id: 'commands' })
-}
-
-async function keywordsUpdate_5_8_0() {
-  let items = await DB.findOne({ _id: 'keywords' })
-  if (items.keywords.length === 0) return
-
-  _.each(items.keywords, async function (item) {
-    delete item.id
-    item._table = 'keywords'
-    await DB.update({ _table: 'keywords', item }, item, { upsert: true })
-  })
-  await DB.remove({ _id: 'keywords' })
-}
-
-async function priceUpdate_5_8_0() {
-  let items = await DB.findOne({ _id: 'prices' })
-  if (items.prices.length === 0) return
-
-  _.each(items.prices, async function (item) {
-    item._table = 'prices'
-    await DB.update({ _table: 'prices', item }, item, { upsert: true })
-  })
-  await DB.remove({ _id: 'prices' })
-}
-
-async function playlistUpdate_5_8_0() {
-  let items = await DB.find({ type: 'playlist' })
-  if (items.length === 0) return
-
-  _.each(items, async function (item) {
-    delete item.type
-    delete item._id
-
-    item._table = 'playlist'
-    await DB.update({ _table: 'playlist', item }, item, { upsert: true })
-  })
-  await DB.remove({ type: 'playlist' }, { multi: true })
-}
-
-async function bannedsongsUpdate_5_8_0() {
-  let items = await DB.find({ type: 'banned-song' })
-  if (items.length === 0) return
-
-  _.each(items, async function (item) {
-    item.videoId = item._id
-    item._table = 'bannedsong'
-
-    delete item.type
-    delete item._id
-
-    await DB.update({ _table: 'bannedsong', item }, item, { upsert: true })
-  })
-  await DB.remove({ type: 'bannedsong' }, { multi: true })
-}
-
-async function aliasUpdate_5_8_0() {
-  let items = await DB.findOne({ _id: 'alias' })
-  if (items.alias.length === 0) return
-
-  _.each(items.alias, async function (item) {
-    delete item.id
-    item._table = 'alias'
-    await DB.update({ _table: 'alias', item }, item, { upsert: true })
-  })
-  await DB.remove({ _id: 'alias' })
-}
-
-async function configurationUpdate_5_8_0() {
-  let items = await DB.find({ type: 'settings' })
-  if (items.length === 0) return
-
-  _.each(items, async function (item) {
-    delete item.type
-    delete item._id
-    delete item.quiet
-
-    item = {
-      key: Object.keys(item)[0],
-      value: item[Object.keys(item)[0]]
+      console.info('Migrating whitelist')
+      await global.db.engine.insert('settings', { key: 'whitelist', value: items.whitelist })
     }
+  }],
+  widgets: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration widgets to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.findOne({ _id: 'dashboard_widgets' })
+      if (_.isNil(items) || items.widgets.length === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
 
-    item._table = 'settings'
-    await DB.update({ _table: 'settings', item }, item, { upsert: true })
-  })
-  await DB.remove({ type: 'settings' }, { multi: true })
-}
-
-async function customVariablesUpdate_5_8_0() {
-  let items = await DB.findOne({ _id: 'customVariables' })
-  if (items.variables.length === 0) return
-
-  _.each(items.variables, async function (value, key) {
-    let item = {
-      _table: 'customvars',
-      key: key,
-      value: value
+      console.info('Migrating %s widgets', items.widgets.length)
+      for (let item of items.widgets) {
+        await global.db.engine.insert('widgets', { widget: item.split(':')[1], column: item.split(':')[0] })
+      }
     }
-    await DB.update({ _table: 'customvars', item }, item, { upsert: true })
-  })
-  await DB.remove({ _id: 'customVariables' })
-}
+  }],
+  ranks: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration widgets to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.find({$where: function () { return this._id.startsWith('rank') }})
+      if (_.isNil(items) || items.length === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
 
-async function eventsUpdate_5_8_0() {
-  let items = await DB.findOne({ _id: 'Events' })
-  if (items.events.length === 0) return
-
-  _.each(items.events, async function (events, key) {
-    let item = {
-      _table: 'events',
-      key: key,
-      value: []
+      console.info('Migrating %s ranks', items.length)
+      for (let item of items) {
+        await global.db.engine.insert('ranks', { hours: parseInt(item.hours, 10), value: item.rank })
+      }
     }
-    _.each(events, function (event) {
-      item.value.push(event[0])
-    })
+  }],
+  cooldowns: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration widgets to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.findOne({ _id: 'cooldowns' })
+      if (_.isNil(items) || _.size(items.list) === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
 
-    await DB.update({ _table: 'events', item }, item, { upsert: true })
-  })
-  await DB.remove({ _id: 'Events' })
-}
-
-async function permissionsUpdate_5_8_0() {
-  let items = await DB.find({$where: function () { return this._id.startsWith('permission') }})
-  if (items.length === 0) return
-
-  _.each(items, async function (item, key) {
-    delete item._id
-
-    item = {
-      _table: 'permissions',
-      key: item.command,
-      permission: item.permission
+      console.info('Migrating %s cooldowns', _.size(items.list))
+      for (let k of Object.keys(items.list)) {
+        items.list[k].key = k
+        await global.db.engine.insert('cooldowns', items.list[k])
+      }
     }
-
-    await DB.update({ _table: 'permissions', item }, item, { upsert: true })
-  })
-  await DB.remove({ $where: function () { return this._id.startsWith('permission') }})
-}
-
-async function moderationUpdate_5_8_0() {
-  let items = await DB.findOne({ _id: 'moderation_lists' })
-
-  let item = {
-    _table: 'settings',
-    key: 'blacklist',
-    value: items.blacklist
-  }
-  await DB.update({ _table: 'settings', item }, item, { upsert: true })
-
-  item = {
-    _table: 'settings',
-    key: 'whitelist',
-    value: items.whitelist
-  }
-  await DB.update({ _table: 'settings', item }, item, { upsert: true })
-  await DB.remove({ _id: 'moderation_lists' })
-}
-
-async function widgetsUpdate_5_8_0() {
-  let items = await DB.findOne({ _id: 'dashboard_widgets' })
-  if (items.widgets.length === 0) return
-
-  _.each(items.widgets, async function (widget) {
-    let item = {
-      _table: 'widgets',
-      widget: widget.split(':')[1],
-      column: widget.split(':')[0]
-    }
-    await DB.update({ _table: 'widgets', item }, item, { upsert: true })
-  })
-  await DB.remove({ _id: 'dashboard_widgets' })
-}
-
-async function ranksUpdate_5_8_0() {
-  let items = await DB.find({$where: function () { return this._id.startsWith('rank') }})
-  if (items.length === 0) return
-
-  _.each(items, async function (rank) {
-    let item = {
-      _table: 'ranks',
-      hours: parseInt(rank.hours, 10),
-      value: rank.rank
-    }
-    await DB.update({ _table: 'ranks', item }, item, { upsert: true })
-  })
-  await DB.remove({$where: function () { return this._id.startsWith('rank') }})
-}
-
-async function othersRemove_5_8_0() {
-  await DB.remove({ _id: 'bets_template' })
-  await DB.remove({ _id: 'raffles' })
-  await DB.remove({ _id: 'raffle' })
+  }]
 }
