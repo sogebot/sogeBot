@@ -32,7 +32,6 @@
     "moderation": true,
     "ranks": true,
     "bets": true,
-    "clips": true,
     "raffles": true,
     "queue": true,
     "cooldown": true,
