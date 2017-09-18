@@ -8,25 +8,25 @@ global.db = new Database();
 
 (async () => {
   let info = await global.db.engine.find('info')
+
+  let dbVersion = _.isEmpty(info) || _.isNil(_.find(info, (o) => !_.isNil(o.version)).version)
+    ? '0.0.0'
+    : _.find(info, (o) => !_.isNil(o.version)).version
+
+  if (process.env.npm_package_version === dbVersion) {
+    process.exit()
+  }
+
   console.log(figlet.textSync('MIGRATE', {
     font: 'ANSI Shadow',
     horizontalLayout: 'default',
     verticalLayout: 'default'
   }))
 
-  let dbVersion = _.isEmpty(info) || _.isNil(_.find(info, (o) => !_.isNil(o.version)).version)
-    ? '0.0.0'
-    : _.find(info, (o) => !_.isNil(o.version)).version
-
   console.info(('-').repeat(56))
   console.info('Current bot version: %s', process.env.npm_package_version)
   console.info('DB version: %s', dbVersion)
   console.info(('-').repeat(56))
-
-  if (process.env.npm_package_version === dbVersion) {
-    console.info('Nothing to do, exiting ...')
-    process.exit()
-  }
 
   await updates(dbVersion, process.env.npm_package_version)
 

@@ -3,6 +3,7 @@
 // 3rd party libraries
 var irc = require('tmi.js')
 var _ = require('lodash')
+const figlet = require('figlet')
 
 // config
 const config = require('./config.json')
@@ -14,6 +15,9 @@ global.logger = new Logger()
 // db
 const Database = require('./libs/databases/database')
 global.db = new Database()
+
+// debug
+const debug = require('debug')('tmijs')
 
 // bot libraries
 var Configuration = require('./libs/configuration')
@@ -27,6 +31,12 @@ var Watcher = require('./libs/watcher')
 var Events = require('./libs/events')
 var Permissions = require('./libs/permissions')
 var constants = require('./libs/constants')
+
+console.log(figlet.textSync('sogeBot ' + process.env.npm_package_version, {
+  font: 'ANSI Shadow',
+  horizontalLayout: 'default',
+  verticalLayout: 'default'
+}))
 
 global.watcher = new Watcher()
 global.parser = new Parser()
@@ -75,27 +85,32 @@ global.translate().then(function () {
 global.client.connect()
 
 global.client.on('connected', function (address, port) {
+  if (debug.enabled) debug('Bot is connected to TMI server - %s:%s', address, port)
   global.log.info('Bot is connected to TMI server')
   global.client.color(config.settings.bot_color)
   global.status.TMI = constants.CONNECTED
 })
 
 global.client.on('connecting', function (address, port) {
+  if (debug.enabled) debug('Bot is connecting to TMI server - %s:%s', address, port)
   global.log.info('Bot is connecting to TMI server')
   global.status.TMI = constants.CONNECTING
 })
 
 global.client.on('reconnect', function (address, port) {
+  if (debug.enabled) debug('Bot is reconnecting to TMI server - %s:%s', address, port)
   global.log.info('Bot is trying to reconnect to TMI server')
   global.status.TMI = constants.RECONNECTING
 })
 
 global.client.on('disconnected', function (address, port) {
+  if (debug.enabled) debug('Bot is disconnected to TMI server - %s:%s', address, port)
   global.log.warning('Bot is disconnected from TMI server')
   global.status.TMI = constants.DISCONNECTED
 })
 
 global.client.on('message', async function (channel, sender, message, fromSelf) {
+  if (debug.enabled) debug('Message received: %s\n\tuserstate: %s', message, JSON.stringify(sender))
   if (!fromSelf && config.settings.bot_username !== sender.username) {
     global.users.set(sender.username, { id: sender['user-id'] })
     if (sender['message-type'] !== 'whisper') {
@@ -120,6 +135,7 @@ global.client.on('message', async function (channel, sender, message, fromSelf) 
 })
 
 global.client.on('join', async function (channel, username, fromSelf) {
+  if (debug.enabled) debug('User joined: %s', username)
   if (!fromSelf) {
     let user = await global.users.get(username)
     if (!_.isNil(user) && !_.isNil(user.id)) {
@@ -131,6 +147,7 @@ global.client.on('join', async function (channel, username, fromSelf) {
 })
 
 global.client.on('part', async function (channel, username, fromSelf) {
+  if (debug.enabled) debug('User parted: %s', username)
   if (!fromSelf) {
     global.users.set(username, { is: { online: false } })
     global.events.fire('user-parted-channel', { username: username })
@@ -138,29 +155,35 @@ global.client.on('part', async function (channel, username, fromSelf) {
 })
 
 global.client.on('action', function (channel, userstate, message, self) {
+  if (debug.enabled) debug('User action: %s\n\tuserstate', message, JSON.stringify(userstate))
   if (self) return
   global.events.fire('action', { username: userstate.username.toLowerCase() })
 })
 
 global.client.on('ban', function (channel, username, reason) {
+  if (debug.enabled) debug('User ban: %s with reason %s', username, reason)
   global.events.fire('ban', { username: username.toLowerCase(), reason: reason })
 })
 
 global.client.on('timeout', function (channel, username, reason, duration) {
+  if (debug.enabled) debug('User timeout: %s with reason %s for %ss', username, reason, duration)
   global.events.fire('timeout', { username: username.toLowerCase(), reason: reason, duration: duration })
 })
 
 global.client.on('hosting', function (channel, target, viewers) {
+  if (debug.enabled) debug('Hosting: %s with %s viewers', target, viewers)
   global.events.fire('hosting', { target: target, viewers: viewers })
 })
 
 global.client.on('mod', async function (channel, username) {
+  if (debug.enabled) debug('User mod: %s', username)
   const user = await global.users.get(username)
   if (!user.is.mod) global.events.fire('mod', { username: username })
   global.users.set(username, { is: { mod: true } })
 })
 
 global.client.on('cheer', function (channel, userstate, message) {
+  if (debug.enabled) debug('Cheer: %s\n\tuserstate: %s', message, JSON.stringify(userstate))
   global.events.fire('cheer', { username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
   if (global.twitch.isOnline) global.twitch.current.bits = global.twitch.current.bits + parseInt(userstate.bits, 10)
 })
@@ -170,6 +193,7 @@ global.client.on('clearchat', function (channel) {
 })
 
 global.client.on('subscription', async function (channel, username, method) {
+  if (debug.enabled) debug('Subscription: %s from %s', username, method)
   global.users.set(username, { is: { subscriber: true } })
   global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
   global.twitch.cached.subscribers.unshift(username)
@@ -177,6 +201,7 @@ global.client.on('subscription', async function (channel, username, method) {
 })
 
 global.client.on('resub', async function (channel, username, months, message) {
+  if (debug.enabled) debug('Resub: %s (%s months) - %s', username, months, message)
   global.users.set(username, { is: { subscriber: true } })
   global.events.fire('resub', { username: username, months: months, message: message })
   global.twitch.cached.subscribers.unshift(username + ', ' + months + ' ' + global.parser.getLocalizedName(months, 'core.months'))
@@ -222,10 +247,3 @@ process.on('unhandledRejection', function (reason, p) {
   global.log.error('Possibly Unhandled Rejection')
   global.log.error(p)
 })
-
-/*
-setTimeout(async function () {
-  global.parser.parse({username: 'soge__'}, 'asdasdsa')
-  global.parser.parse({username: 'soge__'}, '!me')
-}, 2000)
-*/

@@ -5,7 +5,6 @@ var _ = require('lodash')
 
 // bot libraries
 var constants = require('../constants')
-var log = global.log
 
 /*
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
@@ -120,7 +119,7 @@ Cooldown.prototype.check = async function (self, id, sender, text) {
     })
     data = []
     _.each(keywords, (keyword) => {
-      let cooldown = _.find(cooldowns, (o) => o.key = keyword.keyword)
+      let cooldown = _.find(cooldowns, (o) => o.key === keyword.keyword)
       if (keyword.enabled && !_.isEmpty(cooldown)) {
         data.push({
           key: keyword.keyword,
