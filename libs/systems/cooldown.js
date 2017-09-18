@@ -15,10 +15,6 @@ var log = global.log
  */
 
 function Cooldown () {
-  this._id = 'cooldowns'
-  this.list = {}
-  this.viewers = {}
-
   if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!cooldown toggle moderators', this.toggleModerators, constants.OWNER_ONLY)
     global.parser.register(this, '!cooldown toggle owners', this.toggleOwners, constants.OWNER_ONLY)
@@ -27,11 +23,6 @@ function Cooldown () {
     global.parser.registerParser(this, '0-cooldown', this.check, constants.VIEWERS)
 
     global.configuration.register('disableCooldownWhispers', 'whisper.settings.disableCooldownWhispers', 'bool', false)
-
-    global.watcher.watch(this, 'list', this._save)
-    global.watcher.watch(this, 'viewers', this._save)
-
-    this._update(this)
 
     this.webPanel()
   }
@@ -47,14 +38,14 @@ Cooldown.prototype.webPanel = function () {
   global.panel.socketListening(this, 'cooldown.toggle.owners', this.sToggleOwners)
 }
 
-Cooldown.prototype.sEdit = function (self, socket, data) {
+Cooldown.prototype.sEdit = async function (self, socket, data) {
   if (data.seconds.length === 0 || parseInt(data.seconds, 10) === 0) self.sSet(self, socket, {command: data.id, seconds: 0})
-  else _.find(self.list, function (o, k) { return k === data.id }).miliseconds = parseInt(data.seconds, 10) * 1000
+  else await global.db.engine.update('cooldowns', { key: data.id }, { key: data.value })
   self.sSend(self, socket)
 }
 
-Cooldown.prototype.sSend = function (self, socket) {
-  socket.emit('cooldown.data', self.list)
+Cooldown.prototype.sSend = async function (self, socket) {
+  socket.emit('cooldown.data', await global.db.engine.find('cooldowns'))
 }
 
 Cooldown.prototype.sSet = function (self, socket, data) {
@@ -78,24 +69,6 @@ Cooldown.prototype.sToggleOwners = function (self, socket, data) {
   self.sSend(self, socket)
 }
 
-Cooldown.prototype._save = function (self) {
-  var cooldown = {
-    list: self.list,
-    viewers: self.viewers
-  }
-  global.botDB.update({ _id: self._id }, { $set: cooldown }, { upsert: true })
-}
-
-Cooldown.prototype._update = function (self) {
-  global.botDB.findOne({ _id: self._id }, function (err, item) {
-    if (err) return log.error(err, { fnc: 'Cooldown.prototype._update' })
-    if (_.isNull(item)) return
-
-    self.list = item.list
-    self.viewers = item.viewers
-  })
-}
-
 Cooldown.prototype.set = function (self, sender, text) {
   var data, match
 
@@ -107,9 +80,8 @@ Cooldown.prototype.set = function (self, sender, text) {
     return
   }
 
-  delete self.list[data.command]
   if (parseInt(data.seconds, 10) !== 0) {
-    self.list[data.command] = { 'miliseconds': data.seconds * 1000, 'type': data.type, 'timestamp': 0, 'quiet': data.quiet, 'enabled': data.enabled }
+    global.db.engine.update('cooldowns', { key: data.command }, { miliseconds: data.seconds * 1000, type: data.type, timestamp: 0, quiet: data.quiet, enabled: data.enabled })
     global.commons.sendMessage(global.translate('cooldown.success.set')
       .replace(/\$command/g, data.command)
       .replace(/\$type/g, data.type)
@@ -120,23 +92,48 @@ Cooldown.prototype.set = function (self, sender, text) {
   }
 }
 
-Cooldown.prototype.check = function (self, id, sender, text) {
+Cooldown.prototype.check = async function (self, id, sender, text) {
   var data, cmdMatch, viewer, timestamp, now
 
   cmdMatch = text.match(/^(![\u0500-\u052F\u0400-\u04FF\w]+)/)
   if (!_.isNil(cmdMatch)) { // command
-    if (_.isNil(self.list[cmdMatch[1]])) { // command is not on cooldown -> recheck with text only
+    let cooldown = await global.db.engine.findOne('cooldowns', { key: cmdMatch[1] })
+    if (_.isEmpty(cooldown)) { // command is not on cooldown -> recheck with text only
       self.check(self, id, sender, text.replace(cmdMatch[1], ''))
       return // do nothing
-    } else {
-      data = [{'command': cmdMatch[1], 'miliseconds': self.list[cmdMatch[1]].miliseconds, 'type': self.list[cmdMatch[1]].type, 'timestamp': self.list[cmdMatch[1]].timestamp, 'quiet': self.list[cmdMatch[1]].quiet, 'enabled': self.list[cmdMatch[1]].enabled, 'moderator': self.list[cmdMatch[1]].moderator, 'owner': self.list[cmdMatch[1]].owner}]
     }
+    data = [{
+      key: cooldown.key,
+      miliseconds: cooldown.miliseconds,
+      type: cooldown.type,
+      timestamp: cooldown.timestamp,
+      quiet: cooldown.quiet,
+      enabled: cooldown.enabled,
+      moderator: cooldown.moderator,
+      owner: self.list[cmdMatch[1]].owner
+    }]
   } else { // text
-    let keywords = _.filter(global.systems.keywords.keywords, function (o) {
+    let keywords = await global.db.engine.find('keywords')
+    let cooldowns = await global.db.engine.find('cooldowns')
+    keywords = _.filter(keywords, function (o) {
       return text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
     })
     data = []
-    _.each(keywords, function (o) { if (o.enabled) data.push({'command': o.keyword, 'miliseconds': self.list[o.keyword].miliseconds, 'type': self.list[o.keyword].type, 'timestamp': self.list[o.keyword].timestamp, 'quiet': self.list[o.keyword].quiet, 'enabled': self.list[o.keyword].enabled, 'moderator': self.list[o.keyword].moderator, 'owner': self.list[o.keyword].owner}) })
+    _.each(keywords, (keyword) => {
+      let cooldown = _.find(cooldowns, (o) => o.key = keyword.keyword)
+      if (keyword.enabled && !_.isEmpty(cooldown)) {
+        data.push({
+          key: keyword.keyword,
+          miliseconds: cooldown.miliseconds,
+          type: cooldown.type,
+          timestamp: cooldown.timestamp,
+          quiet: cooldown.quiet,
+          enabled: cooldown.enabled,
+          moderator: cooldown.moderator,
+          owner: cooldown.owner
+        })
+      }
+    })
   }
 
   if (!_.some(data, { enabled: true })) { // parse ok if all cooldowns are disabled
@@ -151,6 +148,7 @@ Cooldown.prototype.check = function (self, id, sender, text) {
       return true
     }
 
+    // TODO VIEWERS!
     viewer = _.isUndefined(self.viewers[sender.username]) ? {} : self.viewers[sender.username]
     if (cooldown.type === 'global') {
       timestamp = cooldown.timestamp
