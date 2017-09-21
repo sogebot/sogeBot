@@ -9,6 +9,7 @@ const snekfetch = require('snekfetch')
 const config = require('../config.json')
 
 const config = require('../config.json')
+const debug = require('debug')('parser')
 
 var queue = {}
 
@@ -186,12 +187,14 @@ Parser.prototype.isRegular = async function (user) {
 }
 
 Parser.prototype.isOwner = function (user) {
+  debug('isOwner(%j)', user)
   try {
     if (_.isString(user)) user = { username: user }
     let owners = _.map(_.filter(config.settings.bot_owners.split(','), _.isString), function (owner) {
       return _.trim(owner.toLowerCase())
     })
-    return _.includes(owners, user.username.toLowerCase())
+    debug('owners: %j', owners)
+    return _.includes(owners, user.username.toLowerCase()).trim()
   } catch (e) {
     return true // we can expect, if user is null -> bot or admin
   }

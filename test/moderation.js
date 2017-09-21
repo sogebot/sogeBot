@@ -1,5 +1,6 @@
 /* global describe it after before */
 
+/*
 var expect = require('chai').expect
 var testUser = ownerUser
 var testUser2 = {username: 'soge'}
@@ -543,3 +544,4 @@ describe('System - Moderation', function () {
     })
   })
 })
+*/
