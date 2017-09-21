@@ -1,14 +1,19 @@
 /* global describe it before beforeEach after */
 
 const fs = require('fs')
-var assert = require('chai').assert
+const assert = require('chai').assert
 const until = require('test-until')
+const _ = require('lodash')
 require('mocha-sinon')
 
 // setup config
 const config = require('../config.json')
 config.settings.bot_owners = 'soge__'
 config.settings.broadcaster_username = 'soge__'
+_.each(config.systems, (system, key) => {
+  config.systems[key] = false
+})
+config.systems.notice = true
 fs.writeFileSync('../config.json', JSON.stringify(config))
 
 // users
