@@ -3,7 +3,7 @@
   "version": "5.7.3",
   "description": "Free Twitch Bot built on Node.js",
   "private": true,
-  "main": "SogeBot",
+  "main": "main.js",
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
   "engines": {
@@ -47,7 +47,7 @@
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
     "standard": "standard main.js && standard libs/* && standard libs/systems/* && standard libs/overlays/* && standard libs/widgets/*",
     "build-zip": "npm run cleanup:dist; rm -rf node_modules; rm npm-shrinkwrap.json; npm install; npm shrinkwrap; echo Removing sogeBot-$npm_package_version.zip; rm sogeBot-$npm_package_version.zip; echo Creating new sogeBot-$npm_package_version.zip; zip -qr sogeBot-$npm_package_version.zip npm-shrinkwrap.json config.example.json libs/ locales/ main.js public/ launch.sh LICENSE migrate.js package.json README.md tools/ bin/ bat/",
-    "test": "npm run standard && mocha",
+    "test": "npm run standard && cp config.json config.backup.json && cp config.example.json config.json && mocha && cp config.backup.json config.json",
     "start": "node ./tools/migrate && npm run copy:dist && node ./main || true",
     "debug": "npm run copy:dist && node --inspect ./main || true",
     "cleanup:dist": "rm -rf ./public/dist/bootstrap* ./public/dist/carousel/* ./public/dist/gallery/* ./public/dist/jquery ./public/dist/lodash ./public/dist/velocity-animate",
@@ -62,6 +62,8 @@
     "locate-path": "^2.0.0",
     "mocha": "^3.5.3",
     "pre-commit": "^1.2.2",
-    "standard": "^10.0.3"
+    "sinon": "^3.3.0",
+    "standard": "^10.0.3",
+    "test-until": "^1.1.1"
   }
 }
