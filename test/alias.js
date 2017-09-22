@@ -127,7 +127,6 @@ describe('System - Alias', () => {
       it('text: /correct alias/', async () => {
         global.systems.alias.add(global.systems.alias, owner, '!uptime !time')
         await until(() => global.commons.sendMessage.calledOnce, 5000)
-        console.log(global.commons.sendMessage.firstCall.args[0])
         await global.systems.alias.visible(global.systems.alias, owner, '!time')
         await global.systems.alias.visible(global.systems.alias, owner, '!time')
         await until(() => global.commons.sendMessage.calledThrice, 5000)
