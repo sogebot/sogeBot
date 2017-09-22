@@ -39,7 +39,7 @@ function Notice () {
     var self = this
     setInterval(function () {
       self.send()
-    }, 1000)
+    }, 100)
   }
 }
 
@@ -103,6 +103,7 @@ Notice.prototype.send = async function () {
     this.lastNoticeSent = new Date().getTime()
     this.msgCountSent = global.parser.linesParsed
 
+    console.log('sent')
     global.commons.sendMessage(notice.text, {username: global.parser.getOwner()})
 
     // update notice
@@ -114,12 +115,12 @@ Notice.prototype.help = function (self, sender) {
   global.commons.sendMessage(global.translate('core.usage') + ': !notice add <text> | !notice get <id> | !notice remove <id> | !notice list | !notice toggle <id>', sender)
 }
 
-Notice.prototype.add = function (self, sender, text) {
+Notice.prototype.add = async function (self, sender, text) {
   try {
     let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
     let notice = { text: parsed[0], time: new Date().getTime(), enabled: true }
 
-    global.db.engine.update('notices', { text: notice.text }, notice)
+    await global.db.engine.update('notices', { text: notice.text }, notice)
     global.commons.sendMessage(global.translate('notice.success.add'), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
