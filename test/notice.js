@@ -23,8 +23,12 @@ const owner = { username: 'soge__' }
 require('../main.js')
 
 describe('System - Notice', () => {
-  beforeEach(function () {
+  beforeEach(async function () {
     this.sinon.stub(global.commons, 'sendMessage')
+    let items = await global.db.engine.find('notices')
+    _.each(items, async (item) => {
+      await global.db.engine.remove('notices', { _id: item._id })
+    })
   })
   describe('#settings', () => {
     describe('noticeInterval', () => {
@@ -172,6 +176,100 @@ describe('System - Notice', () => {
         assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('notice.success.add'))
         assert.notEmpty(item)
         assert.equal(item.text, 'Lorem Ipsum')
+      })
+    })
+    describe('list()', () => {
+      it('list: /empty/', async () => {
+        global.systems.notice.list(global.systems.notice, owner)
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('notice.failed.list'))
+      })
+      it('list: /not empty/', async () => {
+        global.systems.notice.add(global.systems.notice, owner, 'test 1')
+        global.systems.notice.add(global.systems.notice, owner, 'test 2')
+        global.systems.notice.list(global.systems.notice, owner)
+        await until(() => global.commons.sendMessage.calledThrice, 5000)
+        assert.isTrue(global.commons.sendMessage.thirdCall.args[0].startsWith(
+          global.translate('notice.success.list')))
+      })
+    })
+    describe('get()', () => {
+      it('text: /empty/', async () => {
+        global.systems.notice.get(global.systems.notice, owner, '')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('notice.failed.parse'))
+      })
+      it('text: /incorrect id/', async () => {
+        global.systems.notice.get(global.systems.notice, owner, 'asdasd')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('notice.failed.notFound'))
+      })
+      it('text: /correct id/', async () => {
+        global.systems.notice.add(global.systems.notice, owner, 'Lorem Ipsum')
+        let item = await global.db.engine.findOne('notices', { text: 'Lorem Ipsum' })
+        assert.isNotEmpty(item)
+
+        global.systems.notice.get(global.systems.notice, owner, item._id)
+        await until(() => global.commons.sendMessage.calledTwice, 5000)
+        assert.equal(global.commons.sendMessage.secondCall.args[0],
+          'Notice#' + item._id + ': ' + item.text)
+      })
+    })
+    describe('toggle()', () => {
+      it('text: /empty/', async () => {
+        global.systems.notice.toggle(global.systems.notice, owner, '')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('notice.failed.parse'))
+      })
+      it('text: /incorrect id/', async () => {
+        global.systems.notice.toggle(global.systems.notice, owner, 'asdasd')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('notice.failed.toggle')
+            .replace(/\$notice/g, 'asdasd'))
+      })
+      it('text: /correct id/', async () => {
+        global.systems.notice.add(global.systems.notice, owner, 'Lorem Ipsum')
+        let item = await global.db.engine.findOne('notices', { text: 'Lorem Ipsum' })
+        assert.isNotEmpty(item)
+
+        await global.systems.notice.toggle(global.systems.notice, owner, item._id)
+        await global.systems.notice.toggle(global.systems.notice, owner, item._id)
+        await until(() => global.commons.sendMessage.calledThrice, 5000)
+        assert.equal(global.commons.sendMessage.secondCall.args[0],
+          global.translate('notice.success.disabled')
+            .replace(/\$notice/g, item._id))
+        assert.equal(global.commons.sendMessage.thirdCall.args[0],
+          global.translate('notice.success.enabled')
+            .replace(/\$notice/g, item._id))
+      })
+    })
+    describe('remove()', () => {
+      it('text: /empty/', async () => {
+        global.systems.notice.remove(global.systems.notice, owner, '')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('notice.failed.parse'))
+      })
+      it('text: /incorrect id/', async () => {
+        global.systems.notice.remove(global.systems.notice, owner, 'asdasd')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('notice.failed.notFound'))
+      })
+      it('text: /correct id/', async () => {
+        global.systems.notice.add(global.systems.notice, owner, 'Lorem Ipsum')
+        let item = await global.db.engine.findOne('notices', { text: 'Lorem Ipsum' })
+        assert.isNotEmpty(item)
+
+        await global.systems.notice.remove(global.systems.notice, owner, item._id)
+        await until(() => global.commons.sendMessage.calledTwice, 5000)
+        assert.equal(global.commons.sendMessage.secondCall.args[0],
+          global.translate('notice.success.remove'))
       })
     })
   })

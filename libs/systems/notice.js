@@ -126,7 +126,7 @@ Notice.prototype.add = function (self, sender, text) {
   }
 }
 
-Notice.prototype.list = async function (self, sender, text) {
+Notice.prototype.list = async function (self, sender) {
   let notices = await global.db.engine.find('notices')
   var output = (notices.length === 0 ? global.translate('notice.failed.list') : global.translate('notice.success.list') + ': ' + _.map(notices, '_id').join(', '))
   global.commons.sendMessage(output, sender)
@@ -136,7 +136,7 @@ Notice.prototype.get = async function (self, sender, text) {
   try {
     const id = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
     const notice = await global.db.engine.findOne('notices', { _id: id })
-    if (_.isUndefined(notice)) throw Error(ERROR_DOESNT_EXISTS)
+    if (_.isEmpty(notice)) throw Error(ERROR_DOESNT_EXISTS)
     global.commons.sendMessage('Notice#' + notice._id + ': ' + notice.text, sender)
   } catch (e) {
     switch (e.message) {
@@ -160,7 +160,7 @@ Notice.prototype.toggle = async function (self, sender, text) {
     }
 
     await global.db.engine.update('notices', { _id: notice._id }, { enabled: !notice.enabled })
-    global.commons.sendMessage(global.translate(notice.enabled ? 'notice.success.enabled' : 'notice.success.disabled')
+    global.commons.sendMessage(global.translate(!notice.enabled ? 'notice.success.enabled' : 'notice.success.disabled')
       .replace(/\$notice/g, notice._id), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
