@@ -84,7 +84,7 @@ describe('System - Notice', () => {
           let message = global.commons.sendMessage.getCall(0).args[0]
           assert.equal(message, global.translate('notice.settings.noticeInterval').replace('$value', 10))
         })
-        it('should not be set in db', async function () {
+        it('should be set in db as default', async function () {
           let item = await global.db.engine.findOne('settings', { key: 'noticeInterval' })
           assert.equal(item.value, 10)
         })
