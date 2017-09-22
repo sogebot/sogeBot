@@ -103,7 +103,6 @@ Notice.prototype.send = async function () {
     this.lastNoticeSent = new Date().getTime()
     this.msgCountSent = global.parser.linesParsed
 
-    console.log('sent')
     global.commons.sendMessage(notice.text, {username: global.parser.getOwner()})
 
     // update notice

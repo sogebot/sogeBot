@@ -2,6 +2,7 @@
 
 var constants = require('./constants')
 var _ = require('lodash')
+const debug = require('debug')('configuration')
 
 function Configuration () {
   this.config = null
@@ -37,6 +38,9 @@ Configuration.prototype.setValue = async function (self, sender, text) {
     var filter = self.cfgL[cmd].filter
 
     if (value.length === 0) value = self.default[cmd].value
+    debug('key: %s', cmd)
+    debug('filter: %s', filter)
+    debug('value to set: %s', value)
 
     if (_.isString(value)) value = value.trim()
     if (filter === 'number' && Number.isInteger(parseInt(value, 10))) {
@@ -46,14 +50,14 @@ Configuration.prototype.setValue = async function (self, sender, text) {
       if (updated > 0) global.commons.sendToOwners(global.translate(self.cfgL[cmd].success).replace(/\$value/g, value))
 
       self.cfgL[cmd].value = value
-    } else if (filter === 'bool' && (value === 'true' || value === 'false')) {
-      value = (value.toLowerCase() === 'true')
+    } else if (filter === 'bool' && (value === 'true' || value === 'false' || _.isBoolean(value))) {
+      value = !_.isBoolean(value) ? (value.toLowerCase() === 'true') : value
 
       let updated = await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
       if (updated > 0) global.commons.sendToOwners(global.translate(self.cfgL[cmd].success + '.' + value).replace(/\$value/g, value))
 
       self.cfgL[cmd].value = value
-    } else if (filter === 'string') {
+    } else if (filter === 'string' && !(value === 'true' || value === 'false' || _.isBoolean(value)) && !Number.isInteger(parseInt(value, 10))) {
       self.cfgL[cmd].value = value
       if (cmd === 'lang') {
         global.commons.sendToOwners(global.translate('core.lang-selected'))
