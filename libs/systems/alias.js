@@ -105,7 +105,7 @@ Alias.prototype.add = function (self, sender, text) {
 
     global.db.engine.update('alias', { alias: alias.alias }, alias)
     self.register(self)
-    global.commons.sendMessage(alias.success.add, sender)
+    global.commons.sendMessage(global.translate('alias.success.add'), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
   }
@@ -140,7 +140,7 @@ Alias.prototype.toggle = async function (self, sender, text) {
     await global.db.engine.update('alias', { alias: id }, { enabled: !alias.enabled })
     self.register(self)
 
-    global.commons.sendMessage(global.translate(alias.enabled ? 'alias.success.enabled' : 'alias.success.disabled')
+    global.commons.sendMessage(global.translate(!alias.enabled ? 'alias.success.enabled' : 'alias.success.disabled')
       .replace(/\$alias/g, alias.alias), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
@@ -159,7 +159,7 @@ Alias.prototype.visible = async function (self, sender, text) {
 
     await global.db.engine.update('alias', { alias: id }, { visible: !alias.visible })
 
-    global.commons.sendMessage(global.translate(alias.visible ? 'alias.success.visible' : 'alias.success.invisible')
+    global.commons.sendMessage(global.translate(!alias.visible ? 'alias.success.visible' : 'alias.success.invisible')
       .replace(/\$alias/g, alias.alias), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)

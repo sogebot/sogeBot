@@ -27,6 +27,10 @@ describe('System - Notice', () => {
     _.each(items, async (item) => {
       await global.db.engine.remove('notices', { _id: item._id })
     })
+    items = await global.db.engine.find('settings')
+    _.each(items, async (item) => {
+      await global.db.engine.remove('settings', { _id: item._id })
+    })
   })
   describe('#fnc', () => {
     describe('add()', () => {

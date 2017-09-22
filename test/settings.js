@@ -1,4 +1,4 @@
-/* global describe it before beforeEach afterEach */
+/* global describe it before beforeEach after */
 
 const fs = require('fs')
 const assert = require('chai').assert
@@ -26,6 +26,12 @@ describe('Settings tests', () => {
   })
   beforeEach(async function () {
     this.sinon.stub(global.commons, 'sendMessage')
+  })
+  after(async function () {
+    let items = await global.db.engine.find('settings')
+    _.each(items, async (item) => {
+      await global.db.engine.remove('settings', { _id: item._id })
+    })
   })
   describe('testBool', () => {
     describe('/bool/', function () {
