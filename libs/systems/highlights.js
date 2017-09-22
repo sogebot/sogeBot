@@ -6,7 +6,6 @@ var moment = require('moment')
 require('moment-precise-range-plugin')
 // bot libraries
 var constants = require('../constants')
-var log = global.log
 
 const ERROR_STREAM_NOT_ONLINE = '1'
 
@@ -16,7 +15,6 @@ const ERROR_STREAM_NOT_ONLINE = '1'
  */
 
 function Highlights () {
-  this.highlights = []
   this.cached = {
     id: null,
     created_at: null
@@ -34,21 +32,6 @@ function Highlights () {
     this._update(this)
   }
 }
-
-Highlights.prototype._update = function (self) {
-  global.botDB.findOne({ _id: 'highlights' }, function (err, item) {
-    if (err) return log.error(err, { fnc: 'Highlights.prototype._update' })
-    if (_.isNull(item)) return
-
-    self.highlights = item.highlights
-  })
-}
-
-Highlights.prototype._save = function (self) {
-  var highlights = { highlights: self.highlights }
-  global.botDB.update({ _id: 'highlights' }, { $set: highlights }, { upsert: true })
-}
-
 Highlights.prototype.highlight = function (self, sender, description) {
   description = description.trim().length > 0 ? description : null
 
@@ -102,8 +85,9 @@ Highlights.prototype.highlight = function (self, sender, description) {
 Highlights.prototype.saveHighlight = function (self, socket) {
   self.highlight(self, null, '')
 }
-Highlights.prototype.sendHighlight = function (self, socket) {
-  socket.emit('highlight.list', _.orderBy(self.highlights, 'created_at', 'desc'))
+Highlights.prototype.sendHighlight = async function (self, socket) {
+  let highlights = await global.db.engine.find('highlights')
+  socket.emit('highlight.list', _.orderBy(highlights, 'created_at', 'desc'))
 }
 
 Highlights.prototype.add = function (self, highlight, timestamp, sender) {
@@ -113,18 +97,19 @@ Highlights.prototype.add = function (self, highlight, timestamp, sender) {
     .replace(/\$minutes/g, (timestamp.minutes < 10) ? '0' + timestamp.minutes : timestamp.minutes)
     .replace(/\$seconds/g, (timestamp.seconds < 10) ? '0' + timestamp.seconds : timestamp.seconds), sender)
 
-  self.highlights.push(highlight)
+  global.db.engine.insert('highlights', highlight)
 }
 
-Highlights.prototype.list = function (self, sender) {
-  const sortedHighlights = _.orderBy(self.highlights, 'id', 'desc')
+Highlights.prototype.list = async function (self, sender) {
+  let highlights = await global.db.engine.find('highlights')
+  const sortedHighlights = _.orderBy(highlights, 'id', 'desc')
   const latestStreamId = sortedHighlights.length > 0 ? sortedHighlights[0].id : null
 
   if (_.isNull(latestStreamId)) {
     global.commons.sendMessage(global.translate('highlights.list.empty'), sender)
     return
   }
-  let highlights = _.filter(self.highlights, function (o) { return o.id === latestStreamId })
+  highlights = _.filter(highlights, function (o) { return o.id === latestStreamId })
   let list = []
 
   for (let highlight of highlights) {

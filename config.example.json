@@ -6,7 +6,7 @@
     "bot_oauth": "bot_oauth_here",
     "bot_color": "OrangeRed",
     "bot_owners": "bot_owners_here_separated_by_comma",
-    "broadcaster_username": "boradcaster_username_here",
+    "broadcaster_username": "broadcaster_username_here",
     "client_id": "1wjn1i3792t71tl90fmyvd0zl6ri2vg"
   },
   "panel": {
@@ -37,8 +37,7 @@
     "cooldown": true,
     "gambling": true,
     "highlights": true,
-    "commercial": true,
-    "phillipshue": true
+    "commercial": true
   },
   "integrations": {
     "twitter": {
@@ -48,6 +47,13 @@
       "consumerSecret": "secret_key_here",
       "accessToken": "access_token_here",
       "secretToken": "secretToken"
+    },
+    "phillipshue": {
+      "enabled": false,
+      "host": "YourPhillipsHueHost",
+      "port": "YourPhillipsHuePort",
+      "user": "YourPhillipsHueUserName",
+      "timeout": "30000"
     }
   },
   "debug": {

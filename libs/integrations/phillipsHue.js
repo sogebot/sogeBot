@@ -6,24 +6,25 @@ const HueApi = require('node-hue-api').HueApi
 const lightState = require('node-hue-api').lightState
 
 // bot libraries
+const config = require('../../config.json')
 const constants = require('../constants')
 
 /*
- * NOTE: For this system to be working, you need bot running on same network, as your lights
+ * NOTE: For this integration to be working, you need bot running on same network, as your lights
  *
  * !hue rgb=<0-255>,<0-255>,<0-255> light=<0-x;default:1> loop=<0-x;default:3> time=<100-x;default:500> - start hue alert
  * !hue list                                                                                            - get lights list
  */
 
 function PhillipsHue () {
-  if (global.commons.isSystemEnabled(this)) {
+  if (global.commons.isIntegrationEnabled(this)) {
     global.parser.register(this, '!hue list', this.getLights, constants.OWNER_ONLY)
     global.parser.register(this, '!hue', this.hue, constants.OWNER_ONLY)
 
-    var host = global.configuration.get()['phillips-hue'].host
-    var user = global.configuration.get()['phillips-hue'].user
-    var timeout = global.configuration.get()['phillips-hue'].timeout
-    var port = global.configuration.get()['phillips-hue'].port
+    var host = config.integrations.phillipshue.host
+    var user = config.integrations.phillipshue.user
+    var timeout = config.integrations.phillipshue.timeout
+    var port = config.integrations.phillipshue.port
 
     this.api = new HueApi(host, user, timeout, port)
 

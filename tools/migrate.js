@@ -321,7 +321,7 @@ let migration = {
   ranks: [{
     version: '5.7.2',
     do: async () => {
-      console.info('Migration widgets to %s', '5.7.2')
+      console.info('Migration ranks to %s', '5.7.2')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.find({$where: function () { return this._id.startsWith('rank') }})
       if (_.isNil(items) || items.length === 0) {
@@ -338,7 +338,7 @@ let migration = {
   cooldowns: [{
     version: '5.7.2',
     do: async () => {
-      console.info('Migration widgets to %s', '5.7.2')
+      console.info('Migration cooldowns to %s', '5.7.2')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.findOne({ _id: 'cooldowns' })
       if (_.isNil(items) || _.size(items.list) === 0) {
@@ -350,6 +350,23 @@ let migration = {
       for (let k of Object.keys(items.list)) {
         items.list[k].key = k
         await global.db.engine.insert('cooldowns', items.list[k])
+      }
+    }
+  }],
+  highlights: [{
+    version: '5.7.2',
+    do: async () => {
+      console.info('Migration highlights to %s', '5.7.2')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.findOne({ _id: 'highlights' })
+      if (_.isNil(items) || _.size(items.highlights) === 0) {
+        console.info('Nothing to do ...')
+        return
+      }
+
+      console.info('Migrating %s highlights', _.size(items.highlights))
+      for (let k of Object.keys(items.highlights)) {
+        await global.db.engine.insert('highlights', items.highlights[k])
       }
     }
   }]
