@@ -14,17 +14,23 @@ function EventList () {
 }
 
 EventList.prototype._update = function (self) {
+  global.log.warning('EventList update not implemented!')
+  /*
   global.botDB.findOne({ _id: 'eventlist' }, function (err, item) {
     if (err) return global.log.error(err, { fnc: 'EventList.prototype._update' })
     if (_.isNull(item)) return
     self.events = item.events
   })
+  */
 }
 
 EventList.prototype._save = function (self) {
+  global.log.warning('EventList save not implemented!')
+  /*
   let events = { events: self.events }
   global.botDB.update({ _id: 'eventlist' }, { $set: events }, { upsert: true })
   self._get(self)
+  */
 }
 
 EventList.prototype._get = function (self) {

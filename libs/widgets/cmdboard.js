@@ -1,6 +1,6 @@
 'use strict'
 
-var _ = require('lodash')
+// var _ = require('lodash')
 
 function CmdboardWidget () {
   this.commands = {}
@@ -16,15 +16,21 @@ function CmdboardWidget () {
 }
 
 CmdboardWidget.prototype._update = function (self) {
+  global.log.warning('CMDBoard update not implemented!')
+  /*
   global.botDB.findOne({ _id: 'cmdboard.widget' }, function (err, item) {
     if (err) return global.log.error(err, { fnc: 'CmdboardWidget.prototype._update' })
     if (!_.isNull(item)) self.commands = item.commands
   })
+  */
 }
 
 CmdboardWidget.prototype._save = function (self) {
+  global.log.warning('CMDBoard save not implemented!')
+  /*
   var commands = { commands: self.commands }
   global.botDB.update({ _id: 'cmdboard.widget' }, { $set: commands }, { upsert: true })
+  */
 }
 
 CmdboardWidget.prototype.fetchCommands = function (self, socket) {

@@ -38,8 +38,9 @@ Configuration.prototype.setValue = async function (self, sender, text) {
 
     if (value.length === 0) value = self.default[cmd].value
 
-    if (filter === 'number' && Number.isInteger(parseInt(value.trim(), 10))) {
-      value = parseInt(value.trim(), 10)
+    if (_.isString(value)) value = value.trim()
+    if (filter === 'number' && Number.isInteger(parseInt(value, 10))) {
+      value = parseInt(value, 10)
 
       let updated = await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
       if (updated > 0) global.commons.sendToOwners(global.translate(self.cfgL[cmd].success).replace(/\$value/g, value))
@@ -53,7 +54,7 @@ Configuration.prototype.setValue = async function (self, sender, text) {
 
       self.cfgL[cmd].value = value
     } else if (filter === 'string') {
-      self.cfgL[cmd].value = value.trim()
+      self.cfgL[cmd].value = value
       if (cmd === 'lang') {
         global.commons.sendToOwners(global.translate('core.lang-selected'))
         global.panel.io.emit('lang', global.translate({root: 'webpanel'}))
