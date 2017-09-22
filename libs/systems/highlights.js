@@ -27,9 +27,6 @@ function Highlights () {
     global.panel.addMenu({category: 'manage', name: 'highlights', id: 'highlights'})
     global.panel.socketListening(this, 'highlight.save', this.saveHighlight)
     global.panel.socketListening(this, 'highlight.get', this.sendHighlight)
-
-    global.watcher.watch(this, 'highlights', this._save)
-    this._update(this)
   }
 }
 Highlights.prototype.highlight = function (self, sender, description) {
