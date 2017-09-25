@@ -1,4 +1,4 @@
-/* global describe it before beforeEach afterEach */
+/* global describe it beforeEach afterEach */
 
 const fs = require('fs')
 const assert = require('chai').assert
@@ -153,6 +153,7 @@ describe('System - Alias', () => {
       })
       it('text: /correct id/', async () => {
         global.systems.alias.add(global.systems.alias, owner, '!uptime !timetime')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
         let item = await global.db.engine.findOne('alias', { alias: 'timetime' })
         assert.isNotEmpty(item)
 

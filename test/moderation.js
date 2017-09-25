@@ -1,4 +1,6 @@
-/* global describe it after before */
+/*
+TBD global describe it after before
+*/
 
 /*
 var expect = require('chai').expect

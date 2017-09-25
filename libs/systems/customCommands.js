@@ -138,7 +138,7 @@ CustomCommands.prototype.toggle = async function (self, sender, text) {
     await global.db.engine.update('commands', { command: id }, { enabled: !command.enabled })
     self.register(self)
 
-    global.commons.sendMessage(global.translate(command.enabled ? 'customcmds.success.enabled' : 'customcmds.success.disabled')
+    global.commons.sendMessage(global.translate(!command.enabled ? 'customcmds.success.enabled' : 'customcmds.success.disabled')
       .replace(/\$command/g, command.command), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
@@ -149,15 +149,15 @@ CustomCommands.prototype.visible = async function (self, sender, text) {
   try {
     const id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
     const command = await global.db.engine.findOne('commands', { command: id })
-    if (_.isUndefined(command)) {
+    if (_.isEmpty(command)) {
       global.commons.sendMessage(global.translate('customcmds.failed.visible')
         .replace(/\$command/g, id), sender)
       return
     }
 
     await global.db.engine.update('commands', { command: id }, { visible: !command.visible })
-    global.commons.sendMessage(global.translate(command.visible ? 'customcmds.success.visible' : 'customcmds.success.invisible')
-      .replace(/\$command/g, command.command), sender)
+    global.commons.sendMessage(global.translate(!command.visible ? 'customcmds.success.visible' : 'customcmds.success.invisible')
+      .replace(/\$command/g, id), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
   }
