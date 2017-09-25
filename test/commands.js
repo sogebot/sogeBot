@@ -4,7 +4,6 @@ const assert = require('chai').assert
 const until = require('test-until')
 const _ = require('lodash')
 const crypto = require('crypto')
-require('mocha-sinon')
 require('./general.js')
 
 // users

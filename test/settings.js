@@ -3,7 +3,6 @@
 const assert = require('chai').assert
 const until = require('test-until')
 const _ = require('lodash')
-require('mocha-sinon')
 require('./general.js')
 
 // users
