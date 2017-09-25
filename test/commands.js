@@ -102,7 +102,6 @@ describe('System - Custom Commands', () => {
         let id = crypto.randomBytes(4).toString('hex')
         global.systems.customCommands.add(global.systems.customCommands, owner, `!${id} Lorem Ipsum`)
         await until(() => global.commons.sendMessage.calledOnce, 5000)
-        console.log(global.commons.sendMessage.firstCall.args[0])
         await global.systems.customCommands.toggle(global.systems.customCommands, owner, `!${id}`)
         await global.systems.customCommands.toggle(global.systems.customCommands, owner, `!${id}`)
         await until(() => global.commons.sendMessage.calledThrice, 5000)
