@@ -31,8 +31,9 @@
     "nedb": "^1.8.0",
     "nedb-promise": "^2.0.1",
     "node-hue-api": "^2.4.2",
-    "request": "^2.83.0",
-    "request-promise": "^4.2.2",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.1",
+    "snekfetch": "3.2.0",
     "socket.io": "^2.0.3",
     "tmi.js": "^1.2.1",
     "twitch-emoticons": "^2.1.0",
@@ -40,8 +41,7 @@
     "velocity-animate": "^1.5.0",
     "winston": "^2.3.1",
     "youtube-search": "^1.0.10",
-    "ytdl-core": "^0.17.1",
-    "snekfetch": "^3.4.1"
+    "ytdl-core": "^0.17.0"
   },
   "scripts": {
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
