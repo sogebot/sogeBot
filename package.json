@@ -47,7 +47,7 @@
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
     "standard": "standard main.js && standard test/* && standard libs/* && standard libs/systems/* && standard libs/overlays/* && standard libs/widgets/*",
     "build-zip": "npm run cleanup:dist; rm -rf node_modules; rm npm-shrinkwrap.json; npm install; npm shrinkwrap; echo Removing sogeBot-$npm_package_version.zip; rm sogeBot-$npm_package_version.zip; echo Creating new sogeBot-$npm_package_version.zip; zip -qr sogeBot-$npm_package_version.zip npm-shrinkwrap.json config.example.json libs/ locales/ main.js public/ launch.sh LICENSE migrate.js package.json README.md tools/ bin/ bat/",
-    "test": "npm run standard && npm run test:config && mocha --timeout 4000 && npm run test:revert",
+    "test": "npm run standard && npm run test:config && mocha --timeout 4000 --retries 3 && npm run test:revert",
     "test:config": "cp config.json config.backup.json > /dev/null; cp config.example.json config.json",
     "test:revert": "cp config.backup.json config.json > /dev/null | true",
     "start": "node ./tools/migrate && npm run copy:dist && node ./main || true",
