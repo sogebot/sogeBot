@@ -1,17 +1,11 @@
 /* global describe it beforeEach afterEach */
 
-const fs = require('fs')
 const assert = require('chai').assert
 const until = require('test-until')
 const _ = require('lodash')
 const crypto = require('crypto')
 require('mocha-sinon')
-
-// setup config
-const config = require('../config.json')
-config.settings.bot_owners = 'soge__'
-config.settings.broadcaster_username = 'soge__'
-fs.writeFileSync('../config.json', JSON.stringify(config))
+require('./general.js')
 
 // users
 const owner = { username: 'soge__' }
@@ -21,7 +15,7 @@ require('../main.js')
 
 describe('System - Custom Commands', () => {
   beforeEach(async function () {
-    this.sinon.stub(global.commons, 'sendMessage')
+    global.commons.sendMessage.reset()
   })
   afterEach(async function () {
     let items = await global.db.engine.find('commands')

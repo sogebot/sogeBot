@@ -194,8 +194,9 @@ Parser.prototype.isOwner = function (user) {
       return _.trim(owner.toLowerCase())
     })
     debug('owners: %j', owners)
-    return _.includes(owners, user.username.toLowerCase()).trim()
+    return _.includes(owners, user.username.toLowerCase().trim())
   } catch (e) {
+    debug(e)
     return true // we can expect, if user is null -> bot or admin
   }
 }

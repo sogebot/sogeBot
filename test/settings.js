@@ -1,16 +1,10 @@
 /* global describe it before beforeEach after */
 
-const fs = require('fs')
 const assert = require('chai').assert
 const until = require('test-until')
 const _ = require('lodash')
 require('mocha-sinon')
-
-// setup config
-const config = require('../config.json')
-config.settings.bot_owners = 'soge__'
-config.settings.broadcaster_username = 'soge__'
-fs.writeFileSync('../config.json', JSON.stringify(config))
+require('./general.js')
 
 // users
 const owner = { username: 'soge__' }
@@ -25,7 +19,7 @@ describe('Settings tests', () => {
     global.configuration.register('testString', 'settings.testString', 'string', 'test')
   })
   beforeEach(async function () {
-    this.sinon.stub(global.commons, 'sendMessage')
+    global.commons.sendMessage.reset()
   })
   after(async function () {
     let items = await global.db.engine.find('settings')
