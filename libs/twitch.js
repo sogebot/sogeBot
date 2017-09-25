@@ -141,7 +141,7 @@ function Twitch () {
         _.each(users, function (user) {
           // add user as a new chatter in a stream
           if (_.isUndefined(user.time.watched) || user.time.watched === 0) self.newChatters = self.newChatters + 1
-          global.db.engine.increment('users', { username: user.username }, 15000)
+          global.db.engine.increment('users', { username: user.username }, { time: { watched: 15000 } })
         })
       })
     }
