@@ -1,4 +1,7 @@
 #!/bin/bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $DIR/..
+
 rm -rf node_modules &
 echo -n 'Purging old dependencies'
 while kill -0 $! 2> /dev/null; do
