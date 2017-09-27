@@ -26,11 +26,21 @@
         margin: 0;
         padding: 0;
       }
-      #images, #video-pos {
+      #images, #video-pos, #alerts {
         display: table;
         position: absolute;
         height: 100%;
         width: 100%;
+      }
+      #alerts > div {
+        float:right;
+        clear:both;
+        border: 2px solid red;
+        padding: 5px;
+        margin: 5px;
+        color: rgba(100, 0, 0, 0.7);
+        background-color: rgba(255, 0, 0, 0.5);
+        font-size: 24px;
       }
       #video-rel-pos { display: table-cell; position: relative; height: 100%; width: 100%; }
       #video-rel-pos > div { display: inline-block !important; }
@@ -70,11 +80,10 @@
         -webkit-filter: contrast(1.4) saturate(1.8) sepia(.6);
         filter: contrast(1.4) saturate(1.8) sepia(.6);
       }
-
-
     </style>
   </head>
   <body>
+    <div id="alerts"></div>
     <div id="images"></div>
     <div id="video-pos">
       <div id="video-rel-pos">
@@ -190,6 +199,12 @@
       }
 
       function playAudio (id, audio) {
+        if (_.isNil(audio.url)) {
+          alertsQueue[id].finished++;
+          $div = $('<div class="alert alert-danger"><strong>Oh Crap!</strong> Your <strong>audio URL</strong> is not valid!</div>').velocity("fadeOut", { delay: 100, duration: 2000 })
+          $('#alerts').append($div)
+          return
+        }
         var sound = new Audio(audio.url)
         audio.delay = _.isNil(audio.delay) ? 0 : parseInt(audio.delay, 10)
         sound.volume = _.isNil(audio.volume) ? 1 : parseInt(audio.volume, 10) / 100
@@ -206,6 +221,18 @@
       }
 
       function showImage (id, image) {
+        if (_.isNil(image.url)) {
+          alertsQueue[id].finished++;
+          $div = $('<div class="alert alert-danger"><strong>Oh Crap!</strong> Your <strong>image URL</strong> is not valid!</div>').velocity("fadeOut", { delay: 100, duration: 2000 })
+          $('#alerts').append($div)
+          return
+        }
+        if (_.isNil(image.url)) {
+          alertsQueue[id].finished++;
+
+          return
+        }
+
         $('#images').empty()
 
         let style = ''
