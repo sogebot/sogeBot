@@ -15,9 +15,11 @@ var constants = require('../constants')
 
 function Cooldown () {
   if (global.commons.isSystemEnabled(this)) {
+    this.viewers = {}
+
     global.parser.register(this, '!cooldown toggle moderators', this.toggleModerators, constants.OWNER_ONLY)
     global.parser.register(this, '!cooldown toggle owners', this.toggleOwners, constants.OWNER_ONLY)
-    global.parser.register(this, '!cooldown toggle enabled', this.toggle, constants.OWNER_ONLY)
+    global.parser.register(this, '!cooldown toggle enabled', this.toggleEnabled, constants.OWNER_ONLY)
     global.parser.register(this, '!cooldown', this.set, constants.OWNER_ONLY)
     global.parser.registerParser(this, '0-cooldown', this.check, constants.VIEWERS)
 
@@ -38,7 +40,7 @@ Cooldown.prototype.webPanel = function () {
 }
 
 Cooldown.prototype.sEdit = async function (self, socket, data) {
-  if (data.seconds.length === 0 || parseInt(data.seconds, 10) === 0) self.sSet(self, socket, {command: data.id, seconds: 0})
+  if (data.seconds.length === 0 || parseInt(data.seconds, 10) === 0) self.sSet(self, socket, {key: data.id, seconds: 0})
   else await global.db.engine.update('cooldowns', { key: data.id }, { key: data.value })
   self.sSend(self, socket)
 }
@@ -54,7 +56,7 @@ Cooldown.prototype.sSet = function (self, socket, data) {
 }
 
 Cooldown.prototype.sToggle = function (self, socket, data) {
-  self.toggle(self, null, data)
+  self.toggleEnabled(self, null, data)
   self.sSend(self, socket)
 }
 
@@ -80,12 +82,13 @@ Cooldown.prototype.set = function (self, sender, text) {
   }
 
   if (parseInt(data.seconds, 10) !== 0) {
-    global.db.engine.update('cooldowns', { key: data.command }, { miliseconds: data.seconds * 1000, type: data.type, timestamp: 0, quiet: data.quiet, enabled: data.enabled })
+    global.db.engine.update('cooldowns', { key: data.command, type: data.type }, { miliseconds: data.seconds * 1000, type: data.type, timestamp: 0, quiet: data.quiet, enabled: data.enabled, owner: false, moderator: false })
     global.commons.sendMessage(global.translate('cooldown.success.set')
       .replace(/\$command/g, data.command)
       .replace(/\$type/g, data.type)
       .replace(/\$seconds/g, data.seconds), sender)
   } else {
+    global.db.engine.remove('cooldowns', { key: data.command, type: data.type })
     global.commons.sendMessage(global.translate('cooldown.success.unset')
       .replace(/\$command/g, data.command), sender)
   }
@@ -109,7 +112,7 @@ Cooldown.prototype.check = async function (self, id, sender, text) {
       quiet: cooldown.quiet,
       enabled: cooldown.enabled,
       moderator: cooldown.moderator,
-      owner: self.list[cmdMatch[1]].owner
+      owner: cooldown.owner
     }]
   } else { // text
     let keywords = await global.db.engine.find('keywords')
@@ -134,33 +137,32 @@ Cooldown.prototype.check = async function (self, id, sender, text) {
       }
     })
   }
-
   if (!_.some(data, { enabled: true })) { // parse ok if all cooldowns are disabled
     global.updateQueue(id, true)
     return
   }
 
   let result = false
+  let isMod = await global.parser.isMod(sender)
   _.each(data, function (cooldown) {
-    if ((global.parser.isOwner(sender) && !cooldown.owner) || (sender.mod && !cooldown.moderator)) {
+    if ((global.parser.isOwner(sender) && !cooldown.owner) || (isMod && !cooldown.moderator)) {
       result = true
       return true
     }
 
-    // TODO VIEWERS!
     viewer = _.isUndefined(self.viewers[sender.username]) ? {} : self.viewers[sender.username]
     if (cooldown.type === 'global') {
       timestamp = cooldown.timestamp
     } else {
-      timestamp = _.isUndefined(viewer[cooldown.command]) ? 0 : viewer[cooldown.command]
+      timestamp = _.isUndefined(viewer[cooldown.key]) ? 0 : viewer[cooldown.key]
     }
     now = new Date().getTime()
 
     if (now - timestamp >= cooldown.miliseconds) {
       if (cooldown.type === 'global') {
-        self.list[cooldown.command].timestamp = now
+        global.db.engine.update('cooldowns', { key: cooldown.key, type: 'global' }, { timestamp: now, key: cooldown.key, type: 'global' })
       } else {
-        viewer[cooldown.command] = now
+        viewer[cooldown.key] = now
         self.viewers[sender.username] = viewer
       }
       result = true
@@ -169,7 +171,7 @@ Cooldown.prototype.check = async function (self, id, sender, text) {
       if (!cooldown.quiet && !global.configuration.getValue('disableCooldownWhispers')) {
         sender['message-type'] = 'whisper' // we want to whisp cooldown message
         global.commons.sendMessage(global.translate('cooldown.failed.cooldown')
-          .replace(/\$command/g, cooldown.command)
+          .replace(/\$command/g, cooldown.key)
           .replace(/\$seconds/g, Math.ceil((cooldown.miliseconds - now + timestamp) / 1000)), sender)
       }
       result = false
@@ -179,58 +181,34 @@ Cooldown.prototype.check = async function (self, id, sender, text) {
   global.updateQueue(id, result)
 }
 
-Cooldown.prototype.toggle = function (self, sender, text) {
-  try {
-    let parsed = text.match(/^([!\u0500-\u052F\u0400-\u04FF\w\S]+)$/)[1]
-    let cooldown = _.find(self.list, function (o, k) { return k === parsed })
-    if (_.isUndefined(cooldown)) {
-      global.commons.sendMessage(global.translate('cooldown.failed.toggle')
-        .replace(/\$command/g, parsed), sender)
-      return
-    }
+Cooldown.prototype.toggle = async function (self, sender, text, type) {
+  const toggle = text.match(/^([!\u0500-\u052F\u0400-\u04FF\w]+) (global|user)$/)
 
-    cooldown.enabled = !cooldown.enabled
-    global.commons.sendMessage(global.translate(cooldown.enabled ? 'cooldown.success.enabled' : 'cooldown.success.disabled')
-      .replace(/\$command/g, parsed), sender)
-  } catch (e) {
+  if (_.isNil(toggle)) {
     global.commons.sendMessage(global.translate('cooldown.failed.parse'), sender)
+    return false
   }
+
+  const cooldown = await global.db.engine.findOne('cooldowns', { key: toggle[1], type: toggle[2] })
+  if (_.isEmpty(cooldown)) {
+    global.commons.sendMessage(global.translate('cooldown.failed.toggle')
+     .replace(/\$command/g, toggle[1]), sender)
+    return false
+  }
+
+  cooldown[type] = !cooldown[type]
+
+  await global.db.engine.update('cooldowns', { key: toggle[1], type: toggle[2] }, cooldown)
+
+  let translation = 'cooldown.success'
+  if (type !== 'enabled') translation = `cooldown.toggle.${type}`
+
+  global.commons.sendMessage(global.translate(cooldown[type] ? `${translation}.enabled` : `${translation}.disabled`)
+    .replace(/\$command/g, cooldown.key), sender)
 }
 
-Cooldown.prototype.toggleModerators = function (self, sender, text) {
-  try {
-    let parsed = text.match(/^([!\u0500-\u052F\u0400-\u04FF\w\S]+)$/)[1]
-    let cooldown = _.find(self.list, function (o, k) { return k === parsed })
-    if (_.isUndefined(cooldown)) {
-      global.commons.sendMessage(global.translate('cooldown.toggle.moderator.failed')
-        .replace(/\$command/g, parsed), sender)
-      return
-    }
-
-    cooldown.moderator = !cooldown.moderator
-    global.commons.sendMessage(global.translate(cooldown.moderator ? 'cooldown.toggle.moderator.enabled' : 'cooldown.toggle.moderator.disabled')
-      .replace(/\$command/g, parsed), sender)
-  } catch (e) {
-    global.commons.sendMessage(global.translate('cooldown.failed.parse'), sender)
-  }
-}
-
-Cooldown.prototype.toggleOwners = function (self, sender, text) {
-  try {
-    let parsed = text.match(/^([!\u0500-\u052F\u0400-\u04FF\w\S]+)$/)[1]
-    let cooldown = _.find(self.list, function (o, k) { return k === parsed })
-    if (_.isUndefined(cooldown)) {
-      global.commons.sendMessage(global.translate('cooldown.toggle.owner.failed')
-        .replace(/\$command/g, parsed), sender)
-      return
-    }
-
-    cooldown.owner = !cooldown.owner
-    global.commons.sendMessage(global.translate(cooldown.owner ? 'cooldown.toggle.owner.enabled' : 'cooldown.toggle.owner.disabled')
-      .replace(/\$command/g, parsed), sender)
-  } catch (e) {
-    global.commons.sendMessage(global.translate('cooldown.failed.parse'), sender)
-  }
-}
+Cooldown.prototype.toggleEnabled = async (self, sender, text) => self.toggle(self, sender, text, 'enabled')
+Cooldown.prototype.toggleModerators = async (self, sender, text) => self.toggle(self, sender, text, 'moderator')
+Cooldown.prototype.toggleOwners = async (self, sender, text) => self.toggle(self, sender, text, 'owner')
 
 module.exports = new Cooldown()
