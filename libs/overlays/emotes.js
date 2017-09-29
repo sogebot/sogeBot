@@ -26,10 +26,10 @@ function Emotes () {
   }
 
   this.fetcher = new EmoteFetcher()
-  this.fetcher.fetchTwitchEmotes()
-  this.fetcher.fetchBTTVEmotes()
+  this.fetcher.fetchTwitchEmotes().catch(function (reason) {})
+  this.fetcher.fetchBTTVEmotes().catch(function (reason) {})
   this.fetcher.fetchBTTVEmotes(global.configuration.get().twitch.channel).catch(function (reason) {})
-  this.fetcher.fetchTwitchEmotes(global.configuration.get().twitch.channel)
+  this.fetcher.fetchTwitchEmotes(global.configuration.get().twitch.channel).catch(function (reason) {})
 
   global.parser.registerParser(this, 'emotes', this.containsEmotes, constants.VIEWERS)
 
