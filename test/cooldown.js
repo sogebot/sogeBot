@@ -143,6 +143,7 @@ describe('System - Cooldowns', () => {
     describe('toggles', () => {
       describe('toggle()', () => {
         it('correct toggle', async () => {
+          global.updateQueue.restore()
           var spy = sinon.spy(global, 'updateQueue')
           global.commons.sendMessage.reset()
 
@@ -167,7 +168,6 @@ describe('System - Cooldowns', () => {
           for (let args of spy.args) {
             assert.isTrue(args[1])
           }
-          global.updateQueue.restore()
         })
         it('incorrect toggle', async () => {
           global.commons.sendMessage.reset()
@@ -184,6 +184,7 @@ describe('System - Cooldowns', () => {
         it('correct toggle', async () => {
           // flush viewers cooldowns
           global.systems.cooldown.viewers = {}
+          global.updateQueue.restore()
 
           var spy = sinon.spy(global, 'updateQueue')
           global.commons.sendMessage.reset()
@@ -211,7 +212,6 @@ describe('System - Cooldowns', () => {
             if (!args[1]) isFalse = true
           }
           assert.isTrue(isFalse)
-          global.updateQueue.restore()
         })
         it('incorrect toggle', async () => {
           global.commons.sendMessage.reset()
@@ -228,6 +228,7 @@ describe('System - Cooldowns', () => {
         it('correct toggle', async () => {
           // flush viewers cooldowns
           global.systems.cooldown.viewers = {}
+          global.updateQueue.restore()
 
           var spy = sinon.spy(global, 'updateQueue')
           global.commons.sendMessage.reset()
@@ -255,7 +256,6 @@ describe('System - Cooldowns', () => {
             if (!args[1]) isFalse = true
           }
           assert.isTrue(isFalse)
-          global.updateQueue.restore()
         })
         it('incorrect toggle', async () => {
           global.commons.sendMessage.reset()
