@@ -3,8 +3,8 @@
 var constants = require('./constants')
 var crypto = require('crypto')
 var _ = require('lodash')
-var request = require('async-request')
 var mathjs = require('mathjs')
+const snekfetch = require('snekfetch')
 
 var queue = {}
 
@@ -367,17 +367,17 @@ Parser.prototype.parseMessageApi = async function (msg) {
   if (!_.isNil(rMessage) && !_.isNil(rMessage[1])) {
     msg = msg.replace(rMessage[0], '').trim() // remove api command from message
     let url = rMessage[1]
-    let response = await request(url)
-    if (response.statusCode !== 200) {
+    let response = await snekfetch.get(url)
+    if (response.status !== 200) {
       return global.translate('core.api.error')
     }
 
     // search for api datas in msg
     let rData = msg.match(/\(api\.(?!_response)(\S*?)\)/gi)
     if (_.isNil(rData)) {
-      msg = msg.replace('(api._response)', response.body.replace(/^"(.*)"/, '$1'))
+      msg = msg.replace('(api._response)', response.body.toString().replace(/^"(.*)"/, '$1'))
     } else {
-      let data = JSON.parse(response.body)
+      let data = JSON.parse(response.body.toString())
       _.each(rData, function (tag) {
         let path = data
         let ids = tag.replace('(api.', '').replace(')', '').split('.')

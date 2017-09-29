@@ -39,7 +39,8 @@
     "velocity-animate": "^1.5.0",
     "winston": "^2.3.1",
     "youtube-search": "^1.0.10",
-    "ytdl-core": "^0.17.1"
+    "ytdl-core": "^0.17.1",
+    "snekfetch": "^3.4.1"
   },
   "scripts": {
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
