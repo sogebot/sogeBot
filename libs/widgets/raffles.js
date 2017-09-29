@@ -117,11 +117,8 @@ RafflesWidget.prototype.searchRafflesParticipants = function (self, socket, data
   )
 }
 
-RafflesWidget.prototype.getRaffle = function (self, socket) {
-  global.botDB.findOne({ _id: 'raffle' }, function (err, item) {
-    if (err) log.error(err, { fnc: 'RafflesWidget.prototype.getRaffle' })
-    socket.emit('raffle', item)
-  })
+RafflesWidget.prototype.getRaffle = async function (self, socket) {
+  socket.emit('raffle', await global.db.engine.findOne('raffle'))
 }
 
 RafflesWidget.prototype.setEligibility = function (self, socket, data) {

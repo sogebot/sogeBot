@@ -58,9 +58,9 @@ let updates = async (from, to) => {
 
 let migration = {
   users: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration users to %s', '5.7.2')
+      console.info('Migration users to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let users = await db.findOne({ _id: 'users' })
       if (_.isNil(users) || _.size(users.users) === 0) {
@@ -75,9 +75,9 @@ let migration = {
     }
   }],
   notices: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration notices to %s', '5.7.2')
+      console.info('Migration notices to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.findOne({ _id: 'notices' })
       if (_.isNil(items) || _.size(items.notices) === 0) {
@@ -93,9 +93,9 @@ let migration = {
     }
   }],
   commands: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration notices to %s', '5.7.2')
+      console.info('Migration notices to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.findOne({ _id: 'commands' })
       if (_.isNil(items) || _.size(items.commands) === 0) {
@@ -110,9 +110,9 @@ let migration = {
     }
   }],
   keywords: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration keywords to %s', '5.7.2')
+      console.info('Migration keywords to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.findOne({ _id: 'keywords' })
       if (_.isNil(items) || _.size(items.keywords) === 0) {
@@ -127,9 +127,9 @@ let migration = {
     }
   }],
   prices: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration prices to %s', '5.7.2')
+      console.info('Migration prices to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.findOne({ _id: 'prices' })
       if (_.isNil(items) || _.size(items.prices) === 0) {
@@ -144,9 +144,9 @@ let migration = {
     }
   }],
   playlist: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration playlist to %s', '5.7.2')
+      console.info('Migration playlist to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.find({ type: 'playlist' })
       if (_.isNil(items) || items.length === 0) {
@@ -162,9 +162,9 @@ let migration = {
     }
   }],
   bannedsongs: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration banned songs to %s', '5.7.2')
+      console.info('Migration banned songs to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.find({ type: 'banned-song' })
       if (_.isNil(items) || items.length === 0) {
@@ -183,9 +183,9 @@ let migration = {
     }
   }],
   alias: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration aliases to %s', '5.7.2')
+      console.info('Migration aliases to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.findOne({ _id: 'alias' })
       if (_.isNil(items) || _.size(items.alias) === 0) {
@@ -200,9 +200,9 @@ let migration = {
     }
   }],
   settings: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration settings to %s', '5.7.2')
+      console.info('Migration settings to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.find({ type: 'settings' })
       if (_.isNil(items) || items.length === 0) {
@@ -225,9 +225,9 @@ let migration = {
     }
   }],
   customVariables: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration custom variables to %s', '5.7.2')
+      console.info('Migration custom variables to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.findOne({ _id: 'customVariables' })
       if (_.isNil(items) || _.size(items.variables) === 0) {
@@ -242,9 +242,9 @@ let migration = {
     }
   }],
   events: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration events to %s', '5.7.2')
+      console.info('Migration events to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.findOne({ _id: 'Events' })
       if (_.isNil(items) || _.size(items.events) === 0) {
@@ -267,9 +267,9 @@ let migration = {
     }
   }],
   permissions: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration permissions to %s', '5.7.2')
+      console.info('Migration permissions to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.find({$where: function () { return this._id.startsWith('permission') }})
       if (_.isNil(items) || items.length === 0) {
@@ -284,9 +284,9 @@ let migration = {
     }
   }],
   moderation: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration moderation to %s', '5.7.2')
+      console.info('Migration moderation to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.findOne({ _id: 'moderation_lists' })
       if (_.isNil(items)) {
@@ -302,26 +302,36 @@ let migration = {
     }
   }],
   widgets: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration widgets to %s', '5.7.2')
+      console.info('Migration widgets to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.findOne({ _id: 'dashboard_widgets' })
       if (_.isNil(items) || items.widgets.length === 0) {
         console.info('Nothing to do ...')
-        return
+      } else {
+        console.info('Migrating %s widgets', items.widgets.length)
+        for (let item of items.widgets) {
+          await global.db.engine.insert('widgets', { widget: item.split(':')[1], column: item.split(':')[0] })
+        }
       }
 
-      console.info('Migrating %s widgets', items.widgets.length)
-      for (let item of items.widgets) {
-        await global.db.engine.insert('widgets', { widget: item.split(':')[1], column: item.split(':')[0] })
+      console.info('Migration cmdboard widget to %s', '5.8.0')
+      items = await db.findOne({ _id: 'cmdboard.widget' })
+      if (_.isNil(items) || _.size(items.commands) === 0) {
+        console.info('Nothing to do ...')
+      } else {
+        console.info('Migrating %s cmdboard widget', _.size(items.commands))
+        for (let text of _.keys(items.commands)) {
+          await global.db.engine.insert('widgetsCmdBoard', { text: text, command: items.commands[text] })
+        }
       }
     }
   }],
   ranks: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration ranks to %s', '5.7.2')
+      console.info('Migration ranks to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.find({$where: function () { return this._id.startsWith('rank') }})
       if (_.isNil(items) || items.length === 0) {
@@ -336,9 +346,9 @@ let migration = {
     }
   }],
   cooldowns: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration cooldowns to %s', '5.7.2')
+      console.info('Migration cooldowns to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.findOne({ _id: 'cooldowns' })
       if (_.isNil(items) || _.size(items.list) === 0) {
@@ -354,9 +364,9 @@ let migration = {
     }
   }],
   highlights: [{
-    version: '5.7.2',
+    version: '5.8.0',
     do: async () => {
-      console.info('Migration highlights to %s', '5.7.2')
+      console.info('Migration highlights to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.findOne({ _id: 'highlights' })
       if (_.isNil(items) || _.size(items.highlights) === 0) {
