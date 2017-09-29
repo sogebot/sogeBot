@@ -88,7 +88,7 @@ function Events () {
       global.log[attr.level](message)
     },
     '_function': function (attr) {
-      attr.fnc(attr)
+      attr.fnc(_.clone(attr))
     }
   }
 
