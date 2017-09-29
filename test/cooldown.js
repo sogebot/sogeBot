@@ -70,7 +70,7 @@ describe('System - Cooldowns', () => {
     })
     describe('check()', () => {
       it('user', async () => {
-        global.updateQueue.restore()
+        if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
 
         global.systems.cooldown.set(global.systems.cooldown, owner, '!me user 60 true')
         await until(() => global.commons.sendMessage.calledOnce, 5000)
@@ -104,7 +104,7 @@ describe('System - Cooldowns', () => {
         }
       })
       it('global', async () => {
-        global.updateQueue.restore()
+        if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
 
         global.systems.cooldown.set(global.systems.cooldown, owner, '!me global 60 true')
         await until(() => global.commons.sendMessage.calledOnce, 5000)
@@ -139,13 +139,13 @@ describe('System - Cooldowns', () => {
         }
         assert.isTrue(isFalse)
 
-        global.updateQueue.restore()
+        if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
       })
     })
     describe('toggles', () => {
       describe('toggle()', () => {
         it('correct toggle', async () => {
-          global.updateQueue.restore()
+          if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
           var spy = sinon.spy(global, 'updateQueue')
           global.commons.sendMessage.reset()
 
@@ -186,7 +186,7 @@ describe('System - Cooldowns', () => {
         it('correct toggle', async () => {
           // flush viewers cooldowns
           global.systems.cooldown.viewers = {}
-          global.updateQueue.restore()
+          if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
 
           var spy = sinon.spy(global, 'updateQueue')
           global.commons.sendMessage.reset()
@@ -230,7 +230,7 @@ describe('System - Cooldowns', () => {
         it('correct toggle', async () => {
           // flush viewers cooldowns
           global.systems.cooldown.viewers = {}
-          global.updateQueue.restore()
+          if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
 
           var spy = sinon.spy(global, 'updateQueue')
           global.commons.sendMessage.reset()
