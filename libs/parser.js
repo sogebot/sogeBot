@@ -7,8 +7,6 @@ var mathjs = require('mathjs')
 const snekfetch = require('snekfetch')
 
 const config = require('../config.json')
-
-const config = require('../config.json')
 const debug = require('debug')('parser')
 
 var queue = {}
