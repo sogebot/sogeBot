@@ -93,6 +93,8 @@ Notice.prototype.send = async function () {
   var now = new Date().getTime()
 
   if ((now - this.lastNoticeSent >= timeIntervalInMs && global.parser.linesParsed - this.msgCountSent >= noticeMinChatMsg)) {
+    this.msgCountSent = global.parser.linesParsed
+
     let notices = await global.db.engine.find('notices')
     let notice = _.orderBy(_.filter(notices, function (o) {
       const filter = _.isNil(global.twitch.when.online) ? '(onlineonly)' : '(offlineonly)'
@@ -101,7 +103,6 @@ Notice.prototype.send = async function () {
     if (_.isUndefined(notice)) return
 
     this.lastNoticeSent = new Date().getTime()
-    this.msgCountSent = global.parser.linesParsed
 
     global.commons.sendMessage(notice.text, {username: global.parser.getOwner()})
 
