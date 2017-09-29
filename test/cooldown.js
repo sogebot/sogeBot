@@ -70,6 +70,8 @@ describe('System - Cooldowns', () => {
     })
     describe('check()', () => {
       it('user', async () => {
+        global.updateQueue.restore()
+
         global.systems.cooldown.set(global.systems.cooldown, owner, '!me user 60 true')
         await until(() => global.commons.sendMessage.calledOnce, 5000)
         let item = await global.db.engine.findOne('cooldowns', { key: '!me' })
@@ -100,10 +102,10 @@ describe('System - Cooldowns', () => {
         for (let args of spy.args) {
           assert.isTrue(args[1])
         }
-
-        global.updateQueue.restore()
       })
       it('global', async () => {
+        global.updateQueue.restore()
+
         global.systems.cooldown.set(global.systems.cooldown, owner, '!me global 60 true')
         await until(() => global.commons.sendMessage.calledOnce, 5000)
         let item = await global.db.engine.findOne('cooldowns', { key: '!me' })
