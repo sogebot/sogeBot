@@ -18,8 +18,8 @@
     "bootstrap-slider": "^9.9.0",
     "bootstrap-toggle": "^2.2.2",
     "chalk": "^2.1.0",
-    "debug": "^3.0.1",
-    "express": "^4.15.4",
+    "debug": "^3.1.0",
+    "express": "^4.16.1",
     "figlet": "^1.2.0",
     "flat": "^4.0.0",
     "glob": "^7.1.2",
@@ -31,9 +31,9 @@
     "nedb": "^1.8.0",
     "nedb-promise": "^2.0.1",
     "node-hue-api": "^2.4.2",
-    "request": "^2.81.0",
-    "request-promise": "^4.2.1",
-    "snekfetch": "3.2.0",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
+    "snekfetch": "3.4.1",
     "socket.io": "^2.0.3",
     "tmi.js": "^1.2.1",
     "twitch-emoticons": "^2.1.0",
@@ -41,7 +41,7 @@
     "velocity-animate": "^1.5.0",
     "winston": "^2.3.1",
     "youtube-search": "^1.0.10",
-    "ytdl-core": "^0.17.0"
+    "ytdl-core": "^0.17.1"
   },
   "scripts": {
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
@@ -64,7 +64,7 @@
     "locate-path": "^2.0.0",
     "mocha": "^3.5.3",
     "pre-commit": "^1.2.2",
-    "sinon": "^3.3.0",
+    "sinon": "^4.0.0",
     "standard": "^10.0.3",
     "test-until": "^1.1.1"
   }
