@@ -62,7 +62,7 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "locate-path": "^2.0.0",
-    "mocha": "3.5.2",
+    "mocha": "3.5.3",
     "pre-commit": "^1.2.2",
     "sinon": "^4.0.0",
     "standard": "^10.0.3",
