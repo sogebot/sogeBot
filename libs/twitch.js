@@ -253,14 +253,17 @@ Twitch.prototype._load = async function (self) {
   self.cached = !_.isNil(cache.cached) ? cache.cached : {}
 }
 
-Twitch.prototype._save = function (self) {
-  let cache = {
+Twitch.prototype._save = async function (self) {
+  let caches = await global.db.engine.find('cache')
+  _.each(caches, function (cache) {
+    global.db.engine.remove('cache', { _id: cache._id })
+  })
+
+  global.db.engine.insert('cache', {
     cachedGamesTitles: self.cGamesTitles,
     when: self.when,
     cached: self.cached
-  }
-
-  global.db.engine.update('cache', {}, cache)
+  })
   self.timestamp = new Date().getTime()
 }
 
