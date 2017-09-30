@@ -93,6 +93,7 @@ Notice.prototype.send = async function () {
   var now = new Date().getTime()
 
   if ((now - this.lastNoticeSent >= timeIntervalInMs && global.parser.linesParsed - this.msgCountSent >= noticeMinChatMsg)) {
+    this.lastNoticeSent = new Date().getTime()
     this.msgCountSent = global.parser.linesParsed
 
     let notices = await global.db.engine.find('notices')
@@ -101,8 +102,6 @@ Notice.prototype.send = async function () {
       return o.enabled && !o.text.trim().startsWith(filter)
     }), 'time', 'asc')[0]
     if (_.isUndefined(notice)) return
-
-    this.lastNoticeSent = new Date().getTime()
 
     global.commons.sendMessage(notice.text, {username: global.parser.getOwner()})
 
