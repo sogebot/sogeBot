@@ -141,11 +141,11 @@ function Twitch () {
         _.each(users, function (user) {
           // add user as a new chatter in a stream
           if (_.isUndefined(user.time.watched) || user.time.watched === 0) self.newChatters = self.newChatters + 1
-          global.db.engine.increment('users', { username: user.username }, { time: { watched: 15000 } })
+          global.db.engine.increment('users', { username: user.username }, { time: { watched: 60000 } })
         })
       })
     }
-  }, 15000)
+  }, 60000)
 
   setInterval(function () {
     let options = {
@@ -462,6 +462,7 @@ Twitch.prototype.showMe = async function (self, sender, text) {
 
     // message count
     var messages = !_.isUndefined(user.stats.messages) ? user.stats.messages : 0
+    if (!_.isNil(global.users.increment[user.username])) messages = messages + global.users.increment[user.username]
     message.push(messages + ' ' + global.parser.getLocalizedName(messages, 'core.messages'))
 
     global.commons.sendMessage(message.join(' | '), sender)

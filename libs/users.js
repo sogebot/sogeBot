@@ -8,6 +8,7 @@ const config = require('../config.json')
 
 function Users () {
   this.rate_limit_follower_check = []
+  this.increment = {}
 
   global.parser.register(this, '!regular add', this.addRegular, constants.OWNER_ONLY)
   global.parser.register(this, '!regular remove', this.rmRegular, constants.OWNER_ONLY)
@@ -28,6 +29,15 @@ function Users () {
       this.isFollowerUpdate(this.rate_limit_follower_check.shift())
     }
   }, 1000) // run follower ONE request every second
+
+  setInterval(async () => {
+    let increment = this.increment
+    this.increment = {}
+
+    _.each(increment, (inc, username) => {
+      global.db.engine.increment('users', { username: username }, { stats: { messages: inc } })
+    })
+  }, 60000)
 }
 
 Users.prototype.merge = async function (self, sender, text) {
@@ -169,7 +179,7 @@ Users.prototype.delete = function (username) {
 
 Users.prototype.isFollower = async function (username) {
   let user = await global.users.get(username)
-  if (new Date().getTime() - user.time.followCheck < 1000 * 60 * 15) { // check can be performed _only_ every 15 minutes
+  if (new Date().getTime() - user.time.followCheck < 1000 * 60 * 30) { // check can be performed _only_ every 30 minutes
     return
   }
 
@@ -210,6 +220,11 @@ Users.prototype.isFollowerUpdate = async function (username) {
       global.users.set(username, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(body.created_at).format('X') * 1000 } }, !user.is.follower)
     }
   })
+}
+
+Users.prototype.messagesInc = function (username) {
+  if (_.isNil(global.users.increment[username])) global.users.increment[username] = 1
+  else global.users.increment[username] = global.users.increment[username] + 1
 }
 
 module.exports = Users

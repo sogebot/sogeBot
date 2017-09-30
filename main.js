@@ -125,7 +125,7 @@ global.client.on('message', async function (channel, sender, message, fromSelf) 
         const user = await global.users.get(sender.username)
 
         if (!_.isNil(user.id)) global.users.isFollower(user.username)
-        if (!message.startsWith('!')) global.db.engine.increment('users', { username: user.username }, { stats: { messages: 1 } })
+        if (!message.startsWith('!')) global.users.messagesInc(user.username)
 
         // set is.mod
         global.users.set(user.username, { is: { mod: user.mod } })
