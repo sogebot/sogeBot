@@ -1,7 +1,6 @@
 'use strict'
 
 var constants = require('./constants')
-var crypto = require('crypto')
 var _ = require('lodash')
 
 function Permissions () {
@@ -9,14 +8,12 @@ function Permissions () {
 
   global.configuration.register('disablePermissionWhispers', 'whisper.settings.disablePermissionWhispers', 'bool', true)
 
-  setInterval(function () {
-    global.botDB.find({$where: function () { return this._id.startsWith('permission') }}, function (err, items) {
-      if (err) { global.log.error(err, { fnc: 'Permissions' }) }
-      _.each(items, function (item) {
-        global.parser.permissionsCmds['!' + item.command] = item.permission
-      })
+  setInterval(async function () {
+    let permissions = await global.db.engine.find('permissions')
+    _.each(permissions, function (permission) {
+      global.parser.permissionsCmds['!' + permission.key] = permission.permission
     })
-  }, 500)
+  }, 1000)
 
   this.webPanel()
 }
@@ -37,13 +34,12 @@ Permissions.prototype.changeSocket = function (self, socket, data) {
 }
 
 Permissions.prototype.removePermission = function (self, command) {
-  global.botDB.remove({_id: 'permission_' + crypto.createHash('md5').update(command.replace('!', '')).digest('hex')})
+  global.db.engine.remove('permissions', { key: command })
 }
 
 Permissions.prototype.overridePermission = function (self, sender, text) {
   try {
     var parsed = text.match(/^(viewer|mods|owner|regular|disable) ([\u0500-\u052F\u0400-\u04FF\w].+)$/)
-    var hash = crypto.createHash('md5').update(parsed[2]).digest('hex')
     var command = parsed[2]
     var permission
     switch (parsed[1]) {
@@ -65,10 +61,8 @@ Permissions.prototype.overridePermission = function (self, sender, text) {
 
     if (!_.isUndefined(global.parser.permissionsCmds['!' + command])) {
       global.parser.permissionsCmds['!' + command] = permission
-      global.botDB.update({_id: 'permission_' + hash}, {$set: {command: command, permission: permission}}, {upsert: true}, function (err) {
-        if (err) global.log.error(err, { fnc: 'Permissions.prototype.overridePermission' })
-        global.commons.sendMessage(global.translate('permissions.success.change').replace(/\$command/g, parsed[1]), sender)
-      })
+      global.db.engine.update('permissions', { key: command }, { key: command, permission: permission })
+      global.commons.sendMessage(global.translate('permissions.success.change').replace(/\$command/g, parsed[1]), sender)
     } else {
       global.commons.sendMessage(global.translate('permissions.failed.noCmd'), sender)
     }

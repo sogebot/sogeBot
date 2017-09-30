@@ -5,7 +5,8 @@ var http = require('http')
 var path = require('path')
 var basicAuth = require('basic-auth')
 var _ = require('lodash')
-var log = global.log
+
+const config = require('../config.json')
 
 const NOT_AUTHORIZED = '0'
 
@@ -13,12 +14,12 @@ function Panel () {
   // setup static server
   var app = express()
   var server = http.createServer(app)
-  var port = process.env.PORT || global.configuration.get().panel.port
+  var port = process.env.PORT || config.panel.port
 
   // static routing
   app.get('/auth/token.js', function (req, res) {
     const origin = req.headers.referer ? req.headers.referer.substring(0, req.headers.referer.length - 1) : undefined
-    const domain = global.configuration.get().panel.domain.trim()
+    const domain = config.panel.domain.trim()
     if (_.isNil(origin)) {
       // file CANNOT be accessed directly
       res.status(401).send('401 Access Denied - This is not a file you are looking for.')
@@ -27,7 +28,7 @@ function Panel () {
 
     if (origin.match(new RegExp('https?://' + domain))) {
       res.set('Content-Type', 'application/javascript')
-      res.send('const token="' + global.configuration.get().panel.token.trim() + '"')
+      res.send('const token="' + config.panel.token.trim() + '"')
     } else {
       // file CANNOT be accessed from different domain
       res.status(403).send('403 Forbidden - You are looking at wrong castle.')
@@ -63,7 +64,7 @@ function Panel () {
   global.configuration.register('percentage', 'core.percentage', 'bool', true)
 
   this.io.use(function (socket, next) {
-    if (global.configuration.get().panel.token.trim() === socket.request._query['token']) next()
+    if (config.panel.token.trim() === socket.request._query['token']) next()
     return false
   })
 
@@ -90,7 +91,7 @@ function Panel () {
     socket.on('saveConfiguration', function (data) {
       _.each(data, function (index, value) {
         if (value.startsWith('_')) return true
-        global.configuration.setValue(global.configuration, { username: global.configuration.get().username }, value + ' ' + index, data._quiet)
+        global.configuration.setValue(global.configuration, { username: global.parser.getOwner() }, value + ' ' + index, data._quiet)
       })
     })
     socket.on('getConfiguration', function () {
@@ -102,7 +103,7 @@ function Panel () {
     })
 
     // send enabled systems
-    socket.on('getSystems', function () { socket.emit('systems', global.configuration.get().systems) })
+    socket.on('getSystems', function () { socket.emit('systems', config.systems) })
     socket.on('getVersion', function () { socket.emit('version', process.env.npm_package_version) })
 
     socket.on('parser.isRegistered', function (data) {
@@ -127,8 +128,8 @@ function Panel () {
 Panel.prototype.authUser = function (req, res, next) {
   var user = basicAuth(req)
   try {
-    if (user.name === global.configuration.get().panel.username &&
-        user.pass === global.configuration.get().panel.password) {
+    if (user.name === config.panel.username &&
+        user.pass === config.panel.password) {
       return next()
     } else {
       throw new Error(NOT_AUTHORIZED)
@@ -145,38 +146,31 @@ Panel.prototype.sendMenu = function (socket) { socket.emit('menu', this.menu) }
 
 Panel.prototype.addWidget = function (id, name, icon) { this.widgets.push({id: id, name: name, icon: icon}) }
 
-Panel.prototype.sendWidget = function (socket) {
-  global.botDB.findOne({_id: 'dashboard_widgets'}, function (err, item) {
-    if (err) { log.error(err, { fnc: 'Panel.prototype.sendWidget' }) }
-    if (!_.isNull(item)) socket.emit('widgets', item.widgets)
-  })
+Panel.prototype.sendWidget = async function (socket) {
+  socket.emit('widgets', await global.db.engine.find('widgets'))
 }
 
-Panel.prototype.sendWidgetList = function (self, socket) {
-  global.botDB.findOne({_id: 'dashboard_widgets'}, function (err, item) {
-    if (err) { log.error(err, { fnc: 'Panel.prototype.sendWidgetList' }) }
-    if (_.isNull(item)) socket.emit('widgetList', self.widgets) // we will return all possible widgets
-    else {
-      var sendWidgets = []
-      _.each(self.widgets, function (widget) {
-        if (item.widgets.indexOf('1:' + widget.id) === -1 && item.widgets.indexOf('2:' + widget.id) === -1 && item.widgets.indexOf('3:' + widget.id) === -1) sendWidgets.push(widget)
-      })
-      socket.emit('widgetList', sendWidgets)
-    }
-  })
+Panel.prototype.sendWidgetList = async function (self, socket) {
+  let widgets = await global.db.engine.find('widgets')
+  if (_.isEmpty(widgets)) socket.emit('widgetList', self.widgets)
+  else {
+    var sendWidgets = []
+    _.each(self.widgets, function (widget) {
+      if (!_.includes(_.map(widgets, 'widget'), widget.id)) {
+        sendWidgets.push(widget)
+      }
+    })
+    socket.emit('widgetList', sendWidgets)
+  }
 }
 
-Panel.prototype.addWidgetToDb = function (self, widget, row, socket) {
-  global.botDB.update({ _id: 'dashboard_widgets' }, { $push: { widgets: { $each: [row + ':' + widget] } } }, { upsert: true }, function (err) {
-    if (err) { log.error(err, { fnc: 'Panel.prototype.addWidgetToDb' }) }
-    self.sendWidget(socket)
-  })
+Panel.prototype.addWidgetToDb = async function (self, widget, row, socket) {
+  await global.db.engine.update('widgets', { widget: widget }, { widget: widget, column: row })
+  self.sendWidget(socket)
 }
 
 Panel.prototype.deleteWidgetFromDb = function (self, widget) {
-  for (var i = 1; i < 4; i++) {
-    global.botDB.update({ _id: 'dashboard_widgets' }, { $pull: { widgets: i + ':' + widget } }, { upsert: true }, function (err) { if (err) { log.error(err, { fnc: 'Panel.prototype.deleteWidgetFromDb' }) } })
-  }
+  global.db.engine.remove('widgets', { widget: widget })
 }
 
 Panel.prototype.socketListening = function (self, on, fnc) {

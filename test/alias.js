@@ -1,311 +1,157 @@
-/* global describe it after before */
+/* global describe it beforeEach afterEach */
 
-require('./general')
-var expect = require('chai').expect
-var alias = require('../libs/systems/alias')
-/*
-describe('System - Alias', function () {
-  describe('#help', function () {
-    describe('parsing \'!alias\'', function () {
-      it('parser should return usage text', function (done) {
-        global.parser.parse(global.ownerUser, '!alias')
-        setTimeout(function () {
-          expect(global.output.pop()).to.match(/en.core.usage/)
-          done()
-        }, 500)
-      })
+const assert = require('chai').assert
+const until = require('test-until')
+const _ = require('lodash')
+require('./general.js')
+
+// users
+const owner = { username: 'soge__' }
+
+describe('System - Alias', () => {
+  beforeEach(async function () {
+    global.commons.sendMessage.reset()
+  })
+  afterEach(async function () {
+    let items = await global.db.engine.find('alias')
+    _.each(items, async (item) => {
+      await global.db.engine.remove('alias', { _id: item._id })
     })
-    describe('parsing \'!alias n/a\'', function () {
-      it('parser should return usage text', function (done) {
-        global.parser.parse(global.ownerUser, '!alias n/a')
-        setTimeout(function () {
-          expect(global.output.pop()).to.match(/en.core.usage/)
-          done()
-        }, 500)
-      })
+    items = await global.db.engine.find('settings')
+    _.each(items, async (item) => {
+      await global.db.engine.remove('settings', { _id: item._id })
     })
   })
-  describe('#add', function () {
-    after(function (done) {
-      global.output = []
-      global.botDB.remove({}, {multi: true}, function () {
-        done()
+  describe('#fnc', () => {
+    describe('add()', () => {
+      it('text: /empty/', async () => {
+        global.systems.alias.add(global.systems.alias, owner, '')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        let item = await global.db.engine.findOne('alias', { text: '' })
+
+        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('alias.failed.parse'))
+        assert.empty(item)
+      })
+      it('text: !mee !me', async () => {
+        global.systems.alias.add(global.systems.alias, owner, '!mee !me')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        let item = await global.db.engine.findOne('alias', { alias: 'mee' })
+
+        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('core.isRegistered').replace(/\$keyword/g, '!me'))
+        assert.empty(item)
+      })
+      it('text: !uptime !mee', async () => {
+        global.systems.alias.add(global.systems.alias, owner, '!uptime !mee')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        let item = await global.db.engine.findOne('alias', { alias: 'mee' })
+
+        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('alias.success.add'))
+        assert.notEmpty(item)
+        assert.equal(item.alias, 'mee')
+        assert.equal(item.command, 'uptime')
+
+        global.commons.sendMessage.reset()
+        global.parser.parse(owner, '!mee')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.isTrue(global.commons.sendMessage.getCall(0).args[0].startsWith('Stream is'))
       })
     })
-    describe('parsing \'!alias add\'', function (done) {
-      before(function (done) {
-        global.parser.parse(global.ownerUser, '!alias add')
-        setTimeout(function () { done() }, 500)
+    describe('list()', () => {
+      it('list: /empty/', async () => {
+        global.systems.alias.list(global.systems.alias, owner)
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('alias.failed.list'))
       })
-      after(function () { global.timeouts = []; global.output = [] })
-      it('should not be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(0)
-          done()
-        })
-      })
-      it('should send parse error', function () {
-        expect(global.output.pop()).to.match(/en.alias.failed.parse/)
-      })
-    })
-    describe('parsing \'!alias add command\'', function () {
-      before(function (done) {
-        global.parser.parse(global.ownerUser, '!alias add command')
-        setTimeout(function () { done() }, 500)
-      })
-      after(function () { global.timeouts = []; global.output = [] })
-      it('should not be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(0)
-          done()
-        })
-      })
-      it('should send parse error', function () {
-        expect(global.output.pop()).to.match(/en.alias.failed.parse/)
+      it('list: /not empty/', async () => {
+        global.systems.alias.add(global.systems.alias, owner, '!mee !test')
+        global.systems.alias.add(global.systems.alias, owner, '!meee !test')
+        global.systems.alias.list(global.systems.alias, owner)
+        await until(() => global.commons.sendMessage.calledThrice, 5000)
+        assert.isTrue(global.commons.sendMessage.thirdCall.args[0].startsWith(
+          global.translate('alias.success.list')))
       })
     })
-    describe('parsing \'!alias add command alias\'', function () {
-      before(function (done) {
-        global.output = []
-        global.parser.parse(global.ownerUser, '!alias add alias test')
-        setTimeout(function () {
-          global.parser.parse(global.ownerUser, '!test')
-          setTimeout(function () { done() }, 500)
-        }, 500)
+    describe('toggle()', () => {
+      it('text: /empty/', async () => {
+        global.systems.alias.toggle(global.systems.alias, owner, '')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('alias.failed.parse'))
       })
-      after(function (done) { global.timeouts = []; global.output = []; global.botDB.remove({}, {multi: true}, function () { done() }) })
-      it('should be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(1)
-          done()
-        })
+      it('alias: /incorrect alias/', async () => {
+        global.systems.alias.toggle(global.systems.alias, owner, '!asdasd')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('alias.failed.toggle')
+            .replace(/\$alias/g, 'asdasd'))
       })
-      it('should send success msg', function () {
-        expect(global.output.shift()).to.include(global.translate('alias.success.add'))
-      })
-      it('should parse added alias in chat', function () {
-        expect(global.output.shift()).to.match(/en.core.usage/)
-      })
-    })
-    describe('parsing 2x sent \'!alias add command alias\'', function () {
-      before(function (done) {
-        global.output = []
-        global.parser.parse(global.ownerUser, '!alias add alias test')
-        global.parser.parse(global.ownerUser, '!alias add alias test')
-        setTimeout(function () {
-          global.parser.parse(global.ownerUser, '!test')
-          setTimeout(function () { done() }, 500)
-        }, 500)
-      })
-      after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
-      it('should be once in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(1)
-          done()
-        })
-      })
-      it('should send success msg', function () {
-        expect(global.output.shift()).to.include(global.translate('alias.success.add'))
-      })
-      it('should send duplicate msg', function () {
-        expect(global.output.shift()).to.equal(global.translate('alias.failed.add'))
-      })
-      it('should parse added alias in chat', function () {
-        expect(global.output.shift()).to.match(/en.core.usage/)
+      it('text: /correct alias/', async () => {
+        global.systems.alias.add(global.systems.alias, owner, '!uptime !meee')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await global.systems.alias.toggle(global.systems.alias, owner, '!meee')
+        await global.systems.alias.toggle(global.systems.alias, owner, '!meee')
+        await until(() => global.commons.sendMessage.calledThrice, 5000)
+        assert.equal(global.commons.sendMessage.secondCall.args[0],
+          global.translate('alias.success.disabled')
+            .replace(/\$alias/g, 'meee'))
+        assert.equal(global.commons.sendMessage.thirdCall.args[0],
+          global.translate('alias.success.enabled')
+            .replace(/\$alias/g, 'meee'))
       })
     })
-    describe('parsing \'!alias add command  alias\'', function () {
-      before(function (done) {
-        global.output = []
-        global.parser.parse(global.ownerUser, '!alias add alias  test')
-        setTimeout(function () { done() }, 500)
+    describe('visible()', () => {
+      it('text: /empty/', async () => {
+        global.systems.alias.visible(global.systems.alias, owner, '')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('alias.failed.parse'))
       })
-      after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
-      it('should not be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(0)
-          done()
-        })
+      it('alias: /incorrect alias/', async () => {
+        global.systems.alias.visible(global.systems.alias, owner, '!asdasd')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('alias.failed.visible')
+            .replace(/\$alias/g, 'asdasd'))
       })
-      it('should send parse error', function () {
-        expect(global.output.pop()).to.match(/en.alias.failed.parse/)
-      })
-    })
-    describe('parsing \'!alias add command alias something\'', function () {
-      before(function (done) {
-        global.output = []
-        global.parser.parse(global.ownerUser, '!alias add alias test something')
-        alias.parse(alias, global.ownerUser, '!test')
-        setTimeout(function () { done() }, 500)
-      })
-      after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
-      it('should not be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(0)
-          done()
-        })
-      })
-      it('should send parse error', function () {
-        expect(global.output.pop()).to.match(/en.alias.failed.parse/)
+      it('text: /correct alias/', async () => {
+        global.systems.alias.add(global.systems.alias, owner, '!uptime !time')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await global.systems.alias.visible(global.systems.alias, owner, '!time')
+        await global.systems.alias.visible(global.systems.alias, owner, '!time')
+        await until(() => global.commons.sendMessage.calledThrice, 5000)
+        assert.equal(global.commons.sendMessage.secondCall.args[0],
+          global.translate('alias.success.invisible')
+            .replace(/\$alias/g, 'time'))
+        assert.equal(global.commons.sendMessage.thirdCall.args[0],
+          global.translate('alias.success.visible')
+            .replace(/\$alias/g, 'time'))
       })
     })
-  })
-  describe('#remove', function () {
-    describe('parsing \'!alias remove\'', function () {
-      before(function (done) {
-        global.output = []
-        global.parser.parse(global.ownerUser, '!alias add alias test')
-        setTimeout(function () {
-          global.parser.parse(global.ownerUser, '!alias remove')
-          setTimeout(function () { done() }, 500)
-        }, 500)
+    describe('remove()', () => {
+      it('text: /empty/', async () => {
+        global.systems.alias.remove(global.systems.alias, owner, '')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('alias.failed.parse'))
       })
-      after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
-      it('should be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(1)
-          done()
-        })
+      it('text: /incorrect id/', async () => {
+        global.systems.alias.remove(global.systems.alias, owner, '!asdasd')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('alias.failed.remove'))
       })
-      it('should send parse error', function () {
-        expect(global.output.pop()).to.match(/en.alias.failed.parse/)
-      })
-    })
-    describe('parsing \'!alias remove alias\' without created alias', function () {
-      before(function (done) {
-        global.output = []
-        global.parser.parse(global.ownerUser, '!alias remove test')
-        setTimeout(function () { done() }, 500)
-      })
-      after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
-      it('should send error message', function () {
-        expect(global.output.pop()).to.equal(global.translate('alias.failed.remove'))
-      })
-    })
-    describe('parsing \'!alias remove alias\'', function () {
-      before(function (done) {
-        global.output = []
-        global.parser.parse(global.ownerUser, '!alias add alias test')
-        setTimeout(function () {
-          global.parser.parse(global.ownerUser, '!alias remove test')
-          setTimeout(function () {
-            alias.parse(alias, global.ownerUser, '!test')
-            global.output.shift() // get rid of add success msg
-            done()
-          }, 500)
-        }, 500)
-      })
-      after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
-      it('should not be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(0)
-          done()
-        })
-      })
-      it('should send success message', function () {
-        expect(global.output.shift()).to.equal(global.translate('alias.success.remove'))
-      })
-      it('should not parse in chat', function () {
-        expect(global.output.shift()).not.to.match(/en.core.usage/)
-      })
-    })
-    describe('parsing 2x sent \'!alias remove alias\'', function () {
-      before(function (done) {
-        global.output = []
-        global.parser.parse(global.ownerUser, '!alias add alias test')
-        setTimeout(function () {
-          global.parser.parse(global.ownerUser, '!alias remove test')
-          global.parser.parse(global.ownerUser, '!alias remove test')
-          setTimeout(function () {
-            alias.parse(alias, global.ownerUser, '!test')
-            global.output.shift() // get rid of add success msg
-            done()
-          }, 500)
-        }, 500)
-      })
-      after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
-      it('should not be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(0)
-          done()
-        })
-      })
-      it('should send not found message', function () {
-        expect(global.output.pop()).to.equal(global.translate('alias.failed.remove'))
-      })
-      it('should not parse in chat', function () {
-        expect(global.output.pop()).not.to.match(/en.core.usage/)
-      })
-    })
-    describe('parsing \'!alias remove alias something\'', function () {
-      before(function (done) {
-        global.output = []
-        global.parser.parse(global.ownerUser, '!alias add alias test')
-        setTimeout(function () {
-          global.parser.parse(global.ownerUser, '!alias remove test something')
-          setTimeout(function () { done() }, 500)
-        }, 500)
-      })
-      after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
-      it('should be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('alias') }}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(1)
-          done()
-        })
-      })
-      it('should send parse error', function () {
-        expect(global.output.pop()).to.match(/en.alias.failed.parse/)
-      })
-    })
-  })
-  describe('#list', function () {
-    describe('parsing \'!alias list\' when alias is added', function () {
-      before(function (done) {
-        global.output = []
-        global.parser.parse(global.ownerUser, '!alias add alias test')
-        global.parser.parse(global.ownerUser, '!alias add alias test2')
-        setTimeout(function () {
-          global.parser.parse(global.ownerUser, '!alias list')
-          setTimeout(function () { done() }, 500)
-        }, 500)
-      })
-      after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
-      it('should send list with test and test2', function () {
-        expect(global.output.pop()).to.match(/en.alias.success.list.* !test, !test2/)
-      })
-    })
-    describe('parsing \'!alias list\' when list is empty', function () {
-      before(function (done) {
-        global.output = []
-        global.parser.parse(global.ownerUser, '!alias list')
-        setTimeout(function () { done() }, 500)
-      })
-      after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
-      it('should send empty list', function () {
-        expect(global.output.pop()).to.match(/en.alias.failed.list/)
-      })
-    })
-    describe('parsing \'!alias list nonsense\'', function () {
-      before(function (done) {
-        global.output = []
-        global.parser.parse(global.ownerUser, '!alias list nonsemse')
-        setTimeout(function () { done() }, 500)
-      })
-      after(function (done) { global.botDB.remove({}, {multi: true}, function () { done() }) })
-      it('should send parse error', function () {
-        expect(global.output.pop()).to.match(/en.alias.failed.parse/)
+      it('text: /correct id/', async () => {
+        global.systems.alias.add(global.systems.alias, owner, '!uptime !timetime')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        let item = await global.db.engine.findOne('alias', { alias: 'timetime' })
+        assert.isNotEmpty(item)
+
+        await global.systems.alias.remove(global.systems.alias, owner, '!timetime')
+        await until(() => global.commons.sendMessage.calledTwice, 5000)
+        assert.equal(global.commons.sendMessage.secondCall.args[0],
+          global.translate('alias.success.remove'))
       })
     })
   })
 })
-*/

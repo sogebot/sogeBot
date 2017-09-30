@@ -6,6 +6,9 @@ var _ = require('lodash')
 var mathjs = require('mathjs')
 const snekfetch = require('snekfetch')
 
+const config = require('../config.json')
+const debug = require('debug')('parser')
+
 var queue = {}
 
 function Parser () {
@@ -21,9 +24,6 @@ function Parser () {
 
   this.messages = []
 
-  this.customVariables = {}
-  global.watcher.watch(this, 'customVariables', this._save)
-
   var self = this
   setInterval(function () {
     if (self.messages.length > 0) {
@@ -36,8 +36,6 @@ function Parser () {
       })
     }
   }, 10)
-
-  this._update(this)
 }
 
 Parser.prototype.parse = function (user, message, skip) {
@@ -59,12 +57,15 @@ Parser.prototype.addToQueue = async function (user, message, skip) {
 
   for (var parser in _(this.registeredParsers).toPairs().sortBy(0).fromPairs().value()) {
     if (typeof queue[id] === 'undefined') break
+
+    let isRegular = await this.isRegular(user)
+    let isMod = await this.isMod(user)
     if (this.permissionsParsers[parser] === constants.VIEWERS ||
-        (this.permissionsParsers[parser] === constants.REGULAR && (global.users.get(user.username).is.regular || user.mod || this.isOwner(user))) ||
-        (this.permissionsParsers[parser] === constants.MODS && (user.mod || this.isOwner(user))) ||
+        (this.permissionsParsers[parser] === constants.REGULAR && (isRegular || isMod || this.isOwner(user))) ||
+        (this.permissionsParsers[parser] === constants.MODS && (isMod || this.isOwner(user))) ||
         (this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user))) {
       queue[id].started = parseInt(queue[id].started, 10) + 1
-      this.registeredParsers[parser](this.selfParsers[parser], id, user, message, skip)
+      await this.registeredParsers[parser](this.selfParsers[parser], id, user, message, skip)
     }
   }
 
@@ -102,13 +103,15 @@ Parser.prototype.parseCommands = async function (user, message, skip) {
     let onlyParams = message.trim().toLowerCase().replace(cmd, '')
     if (message.trim().toLowerCase().startsWith(cmd) && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
       if (this.permissionsCmds[cmd] === constants.DISABLE) break
+      let isRegular = await this.isRegular(user)
+      let isMod = await this.isMod(user)
       if (_.isNil(user) || // if user is null -> we are running command through a bot
         skip || (this.permissionsCmds[cmd] === constants.VIEWERS) ||
-        (this.permissionsCmds[cmd] === constants.REGULAR && (global.users.get(user.username).is.regular || user.mod || this.isOwner(user))) ||
-        (this.permissionsCmds[cmd] === constants.MODS && (user.mod || this.isOwner(user))) ||
+        (this.permissionsCmds[cmd] === constants.REGULAR && (isRegular || isMod || this.isOwner(user))) ||
+        (this.permissionsCmds[cmd] === constants.MODS && (isMod || this.isOwner(user))) ||
         (this.permissionsCmds[cmd] === constants.OWNER_ONLY && this.isOwner(user))) {
         var text = message.trim().replace(new RegExp('^(' + cmd + ')', 'i'), '').trim()
-        if (typeof this.registeredCmds[cmd] === 'function') this.registeredCmds[cmd](this.selfCmds[cmd], _.isNil(user) ? { username: global.configuration.get().twitch.username } : user, text.trim(), message)
+        if (typeof this.registeredCmds[cmd] === 'function') this.registeredCmds[cmd](this.selfCmds[cmd], _.isNil(user) ? { username: config.settings.bot_username } : user, text.trim(), message)
         else global.log.error(cmd + ' have wrong null function registered!', { fnc: 'Parser.prototype.parseCommands' })
         break // cmd is executed
       } else {
@@ -126,6 +129,7 @@ Parser.prototype.isRegistered = function (cmd) {
 }
 
 Parser.prototype.register = function (self, cmd, fnc, permission) {
+  if (!cmd.startsWith('!')) cmd = '!' + cmd
   this.registeredCmds[cmd] = fnc
   this.permissionsCmds[cmd] = permission
   this.selfCmds[cmd] = self
@@ -142,6 +146,7 @@ Parser.prototype.registerHelper = function (cmd) {
 }
 
 Parser.prototype.unregister = function (cmd) {
+  if (!cmd.startsWith('!')) cmd = '!' + cmd
   global.permissions.removePermission(global.permissions.removePermission, cmd)
   delete this.registeredCmds[cmd]
   delete this.permissionsCmds[cmd]
@@ -149,32 +154,47 @@ Parser.prototype.unregister = function (cmd) {
 }
 
 Parser.prototype.getOwner = function () {
-  return global.configuration.get().twitch.owners.split(',')[0].trim()
+  return config.settings.bot_owners.split(',')[0].trim()
 }
 
 Parser.prototype.getOwners = function () {
-  return global.configuration.get().twitch.owners.split(',')
+  return config.settings.bot_owners.split(',')
 }
 
 Parser.prototype.isBroadcaster = function (user) {
   if (_.isString(user)) user = { username: user }
-  return global.configuration.get().twitch.channel.toLowerCase().trim() === user.username.toLowerCase().trim()
+  return config.settings.broadcaster_username.toLowerCase().trim() === user.username.toLowerCase().trim()
 }
 
-Parser.prototype.isMod = function (user) {
-  if (_.isString(user)) user = global.users.get(user)
-  else user = global.users.get(user.username)
-  return user.is.mod
+Parser.prototype.isMod = async function (user) {
+  if (!_.isNil(user)) return false
+
+  if (_.isString(user)) user = await global.users.get(user)
+  else user = await global.users.get(user.username)
+
+  return (!_.isNil(user.is.mod) ? user.is.mod : false)
+}
+
+Parser.prototype.isRegular = async function (user) {
+  if (!_.isNil(user)) return false
+
+  if (_.isString(user)) user = await global.users.get(user)
+  else user = await global.users.get(user.username)
+
+  return (!_.isNil(user.is.regular) ? user.is.regular : false)
 }
 
 Parser.prototype.isOwner = function (user) {
+  debug('isOwner(%j)', user)
   try {
     if (_.isString(user)) user = { username: user }
-    let owners = _.map(_.filter(global.configuration.get().twitch.owners.split(','), _.isString), function (owner) {
+    let owners = _.map(_.filter(config.settings.bot_owners.split(','), _.isString), function (owner) {
       return _.trim(owner.toLowerCase())
     })
-    return _.includes(owners, user.username.toLowerCase())
+    debug('owners: %j', owners)
+    return _.includes(owners, user.username.toLowerCase().trim())
   } catch (e) {
+    debug(e)
     return true // we can expect, if user is null -> bot or admin
   }
 }
@@ -182,34 +202,40 @@ Parser.prototype.isOwner = function (user) {
 Parser.prototype.parseMessage = async function (message, attr) {
   let random = {
     '(random.online.viewer)': async function () {
-      let onlineViewers = _.filter(global.users.getAll({ is: { online: true } }), function (o) { return o.username !== attr.sender.username })
+      let onlineViewers = await global.users.getAll({ is: { online: true } })
+      onlineViewers = _.filter(onlineViewers, function (o) { return o.username !== attr.sender.username })
       if (onlineViewers.length === 0) return 'unknown'
       return onlineViewers[_.random(0, onlineViewers.length - 1)].username
     },
     '(random.online.follower)': async function () {
-      let onlineFollower = _.filter(global.users.getAll({ is: { online: true, follower: true } }), function (o) { return o.username !== attr.sender.username })
+      let onlineFollower = await global.users.getAll({ is: { online: true, follower: true } })
+      onlineFollower = _.filter(onlineFollower, function (o) { return o.username !== attr.sender.username })
       if (onlineFollower.length === 0) return 'unknown'
       return onlineFollower[_.random(0, onlineFollower.length - 1)].username
     },
     '(random.online.subscriber)': async function () {
-      let onlineSubscriber = _.filter(global.users.getAll({ is: { online: true, subscriber: true } }), function (o) { return o.username !== attr.sender.username })
+      let onlineSubscriber = await global.users.getAll({ is: { online: true, subscriber: true } })
+      onlineSubscriber = _.filter(onlineSubscriber, function (o) { return o.username !== attr.sender.username })
       if (onlineSubscriber.length === 0) return 'unknown'
       return onlineSubscriber[_.random(0, onlineSubscriber.length - 1)].username
     },
     '(random.viewer)': async function () {
-      let viewer = _.filter(global.users.getAll(), function (o) { return o.username !== attr.sender.username })
+      let viewer = await global.users.getAll()
+      viewer = _.filter(viewer, function (o) { return o.username !== attr.sender.username })
       if (viewer.length === 0) return 'unknown'
       return viewer[_.random(0, viewer.length - 1)].username
     },
     '(random.follower)': async function () {
-      let follower = _.filter(global.users.getAll({ is: { follower: true } }), function (o) { return o.username !== attr.sender.username })
+      let follower = await global.users.getAll({ is: { follower: true } })
+      follower = _.filter(follower, function (o) { return o.username !== attr.sender.username })
       if (follower.length === 0) return 'unknown'
       return follower[_.random(0, follower.length - 1)].username
     },
     '(random.subscriber)': async function () {
-      let follower = _.filter(global.users.getAll({ is: { subscriber: true } }), function (o) { return o.username !== attr.sender.username })
-      if (follower.length === 0) return 'unknown'
-      return follower[_.random(0, follower.length - 1)].username
+      let subscriber = await global.users.getAll({ is: { subscriber: true } })
+      subscriber = _.filter(subscriber, function (o) { return o.username !== attr.sender.username })
+      if (subscriber.length === 0) return 'unknown'
+      return subscriber[_.random(0, subscriber.length - 1)].username
     },
     '(random.number-#-to-#)': async function (filter) {
       let numbers = filter.replace('(random.number-', '')
@@ -239,22 +265,24 @@ Parser.prototype.parseMessage = async function (message, attr) {
   let custom = {
     '(get.#)': async function (filter) {
       let variable = filter.replace('(get.', '').replace(')', '')
-      return global.parser.customVariables[variable]
+      let cvar = await global.engine.db.findOne('customvars', { key: variable })
+      return cvar.value
     },
     '(set.#)': async function (filter) {
       let variable = filter.replace('(set.', '').replace(')', '')
-      global.parser.customVariables[variable] = attr.param
+      await global.engine.db.update('customvars', { key: variable }, { key: variable, value: attr.param })
       return ''
     },
     '(var.#)': async function (filter) {
       let variable = filter.replace('(var.', '').replace(')', '')
       if ((global.parser.isOwner(attr.sender) || attr.sender.mod) &&
         (!_.isUndefined(attr.param) && attr.param.length !== 0)) {
-        global.parser.customVariables[variable] = attr.param
+        await global.engine.db.update('customvars', { key: variable }, { key: variable, value: attr.param })
         global.commons.sendMessage('$sender ' + attr.param, attr.sender)
         return ''
       }
-      return _.isNil(global.parser.customVariables[variable]) ? '' : global.parser.customVariables[variable]
+      let cvar = await global.engine.db.findOne('customvars', { key: variable })
+      return _.isEmpty(cvar.value) ? '' : cvar.value
     }
   }
   let param = {
@@ -460,22 +488,6 @@ Parser.prototype.parseMessageEach = async function (filters, msg) {
     }
   }
   return msg
-}
-
-Parser.prototype._update = function (self) {
-  global.botDB.findOne({ _id: 'customVariables' }, function (err, item) {
-    if (err) return global.log.error(err, { fnc: 'Parser.prototype._update' })
-    if (_.isNull(item)) return
-
-    self.customVariables = item.variables
-  })
-}
-
-Parser.prototype._save = function (self) {
-  var data = {
-    variables: self.customVariables
-  }
-  global.botDB.update({ _id: 'customVariables' }, { $set: data }, { upsert: true })
 }
 
 // these needs to be global, will be called from called parsers

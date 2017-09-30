@@ -3,10 +3,9 @@
 var _ = require('lodash')
 var log = global.log
 var constants = require('../constants')
-var crypto = require('crypto')
 
 function RafflesWidget () {
-  if (global.configuration.get().systems.raffles !== true) return
+  if (!global.commons.isSystemEnabled('raffles')) return
 
   this.participants = 0
   this.winner = null
@@ -41,13 +40,14 @@ RafflesWidget.prototype.sendConfiguration = function (self, socket) {
   })
 }
 
-RafflesWidget.prototype.rafflesMessages = function (self, id, sender, text) {
+RafflesWidget.prototype.rafflesMessages = async function (self, id, sender, text) {
   if (!_.isNull(self.winner) && self.winner.username === sender.username) {
-    var msgId = crypto.createHash('md5').update(Math.random().toString()).digest('hex').substring(0, 5)
-    var message = { _id: 'raffle_messages_' + msgId,
+    let winner = await global.db.engine.findOne('raffle_participants', { username: self.winner.username })
+    winner.messages.push({
       timestamp: sender['sent-ts'],
-      text: text }
-    global.botDB.update({_id: message._id}, {$set: message}, {upsert: true})
+      text: text
+    })
+    await global.db.engine.update('raffle_participants', { username: self.winner.username }, winner)
   }
   global.updateQueue(id, true)
 }
@@ -63,7 +63,6 @@ RafflesWidget.prototype.rafflesRollWinner = function (self, socket) {
 RafflesWidget.prototype.sendWinner = function (self, user) {
   self.winner = user
   global.panel.io.emit('raffleWinner', user)
-  global.botDB.remove({ $where: function () { return this._id.startsWith('raffle_messages_') } }, { multi: true })
 }
 
 RafflesWidget.prototype.removeRaffle = function (self, socket) {
@@ -84,11 +83,10 @@ RafflesWidget.prototype.clearRaffleParticipants = function (self, socket) {
   socket.emit('rafflesParticipants', {})
 }
 
-RafflesWidget.prototype.sendRafflesMessages = function (self) {
-  global.botDB.find({ $where: function () { return this._id.startsWith('raffle_messages_') } }).sort({ timestamp: 1 }).exec(function (err, items) {
-    if (err) log.error(err, { fnc: 'RafflesWidget.prototype.sendRafflesMessages' })
-    global.panel.io.emit('rafflesMessages', items)
-  })
+RafflesWidget.prototype.sendRafflesMessages = async function (self) {
+  if (_.isNil(self.winner)) return
+  let winner = await global.db.engine.findOne('raffle_participants', { username: self.winner.username })
+  global.panel.io.emit('rafflesMessages', winner.messages)
 }
 
 RafflesWidget.prototype.sendRafflesParticipants = function (self) {
@@ -119,11 +117,8 @@ RafflesWidget.prototype.searchRafflesParticipants = function (self, socket, data
   )
 }
 
-RafflesWidget.prototype.getRaffle = function (self, socket) {
-  global.botDB.findOne({ _id: 'raffle' }, function (err, item) {
-    if (err) log.error(err, { fnc: 'RafflesWidget.prototype.getRaffle' })
-    socket.emit('raffle', item)
-  })
+RafflesWidget.prototype.getRaffle = async function (self, socket) {
+  socket.emit('raffle', await global.db.engine.findOne('raffle'))
 }
 
 RafflesWidget.prototype.setEligibility = function (self, socket, data) {

@@ -4,7 +4,6 @@
 var _ = require('lodash')
 // bot libraries
 var constants = require('../constants')
-var log = global.log
 
 /*
  * !price                     - gets an info about price usage
@@ -15,8 +14,6 @@ var log = global.log
  */
 
 function Price () {
-  this.prices = []
-
   if (global.commons.isSystemEnabled('points') && global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!price set', this.set, constants.OWNER_ONLY)
     global.parser.register(this, '!price list', this.list, constants.OWNER_ONLY)
@@ -25,30 +22,10 @@ function Price () {
     global.parser.register(this, '!price', this.help, constants.OWNER_ONLY)
 
     global.parser.registerHelper('!price')
-
     global.parser.registerParser(this, 'price', this.checkPrice, constants.VIEWERS)
-
-    global.watcher.watch(this, 'prices', this._save)
-    this._update(this)
 
     this.webPanel()
   }
-}
-
-Price.prototype._update = function (self) {
-  global.botDB.findOne({ _id: 'prices' }, function (err, item) {
-    if (err) return log.error(err, { fnc: 'Price.prototype._update' })
-    if (_.isNull(item)) return
-
-    self.prices = item.prices
-  })
-}
-
-Price.prototype._save = function (self) {
-  var prices = {
-    prices: self.prices
-  }
-  global.botDB.update({ _id: 'prices' }, { $set: prices }, { upsert: true })
 }
 
 Price.prototype.webPanel = function () {
@@ -59,8 +36,8 @@ Price.prototype.webPanel = function () {
   global.panel.socketListening(this, 'price.toggle', this.togglePrice)
 }
 
-Price.prototype.sendPrices = function (self, socket) {
-  socket.emit('price', self.prices)
+Price.prototype.sendPrices = async function (self, socket) {
+  socket.emit('price', await global.db.engine.find('prices'))
 }
 
 Price.prototype.deletePrice = function (self, socket, data) {
@@ -68,13 +45,13 @@ Price.prototype.deletePrice = function (self, socket, data) {
   self.sendPrices(self, socket)
 }
 
-Price.prototype.togglePrice = function (self, socket, data) {
-  self.toggle(self, null, data)
+Price.prototype.togglePrice = async function (self, socket, data) {
+  await self.toggle(self, null, data)
   self.sendPrices(self, socket)
 }
 
-Price.prototype.createPrice = function (self, socket, data) {
-  self.set(self, null, data.command + ' ' + data.price)
+Price.prototype.createPrice = async function (self, socket, data) {
+  await self.set(self, null, data.command + ' ' + data.price)
   self.sendPrices(self, socket)
 }
 
@@ -82,11 +59,12 @@ Price.prototype.help = function (self, sender) {
   global.commons.sendMessage(global.translate('core.usage') + ': !price set <cmd> <price> | !price unset <cmd> | !price list | !price toggle <cmd>', sender)
 }
 
-Price.prototype.set = function (self, sender, text) {
+Price.prototype.set = async function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
-    self.prices = _.filter(self.prices, function (o) { return o.command !== parsed[1] })
-    self.prices.push({command: parsed[1], price: parsed[2], enabled: true})
+    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
+    let price = {command: parsed[1], price: parsed[2], enabled: true}
+
+    global.db.engine.update('prices', { command: price.command }, price)
     global.commons.sendMessage(global.translate('price.success.set')
       .replace(/\$command/g, parsed[1])
       .replace(/\$amount/g, parsed[2])
@@ -99,22 +77,26 @@ Price.prototype.set = function (self, sender, text) {
 Price.prototype.unset = function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    self.prices = _.filter(self.prices, function (o) { return o.command !== parsed[1] })
-    global.commons.sendMessage(global.translate('price.success.remove').replace(/\$command/g, parsed[1]), sender)
+    global.db.engine.remove('prices', { command: parsed[1] })
+    global.commons.sendMessage(global.translate('price.success.remove')
+      .replace(/\$command/g, parsed[1]), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('price.failed.parse'), sender)
   }
 }
 
-Price.prototype.toggle = function (self, sender, text) {
+Price.prototype.toggle = async function (self, sender, text) {
   try {
     const id = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
-    let price = _.find(self.prices, function (o) { return o.command === id })
-    if (_.isUndefined(price)) {
+    const price = await global.db.engine.findOne('prices', { command: id })
+    if (_.isEmpty(price)) {
       global.commons.sendMessage(global.translate('price.failed.toggle')
         .replace(/\$command/g, id), sender)
+      return
     }
-    price.enabled = !price.enabled
+
+    await global.db.engine.update('prices', { command: id }, { enabled: !price.enabled })
+
     global.commons.sendMessage(global.translate(price.enabled ? 'price.success.enabled' : 'price.success.disabled')
       .replace(/\$command/g, price.command), sender)
   } catch (e) {
@@ -122,14 +104,13 @@ Price.prototype.toggle = function (self, sender, text) {
   }
 }
 
-Price.prototype.list = function (self, sender, text) {
-  var prices = []
-  _.each(self.prices, function (element) { prices.push('!' + element.command) })
-  var output = (prices.length === 0 ? global.translate('price.failed.list') : global.translate('price.success.list') + ': ' + prices.join(', '))
+Price.prototype.list = async function (self, sender, text) {
+  let prices = await global.db.engine.find('prices')
+  var output = (prices.length === 0 ? global.translate('price.failed.list') : global.translate('price.success.list') + ': ' + _.map(prices, 'command').join(', '))
   global.commons.sendMessage(output, sender)
 }
 
-Price.prototype.checkPrice = function (self, id, sender, text) {
+Price.prototype.checkPrice = async function (self, id, sender, text) {
   if (global.parser.registeredHelpers.includes(text.trim()) || global.parser.isOwner(sender)) {
     global.updateQueue(id, true)
     return
@@ -137,12 +118,14 @@ Price.prototype.checkPrice = function (self, id, sender, text) {
   try {
     var parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)/)
 
-    var price = _.find(self.prices, function (o) { return o.command === parsed[1] && o.enabled })
-    if (_.isUndefined(price)) { // no price set
+    const user = await global.users.get(sender.username)
+    const price = await global.db.engine.findOne('prices', { command: parsed[1], enabled: true })
+
+    if (_.isEmpty(price)) { // no price set
       global.updateQueue(id, true)
       return
     }
-    const user = global.users.get(sender.username)
+
     var availablePts = parseInt(user.points, 10)
     var removePts = parseInt(price.price, 10)
     if (!_.isFinite(availablePts) || !_.isNumber(availablePts) || availablePts < removePts) {
@@ -152,7 +135,7 @@ Price.prototype.checkPrice = function (self, id, sender, text) {
         .replace(/\$command/g, price.command)
         .replace(/\$pointsName/g, global.systems.points.getPointsName(removePts)), sender)
     } else {
-      global.users.set(sender.username, { points: availablePts - removePts })
+      global.db.engine.increment('users', { username: sender.username }, { points: (removePts * -1) })
       global.updateQueue(id, true)
     }
   } catch (err) {

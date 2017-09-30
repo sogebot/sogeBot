@@ -1,377 +1,178 @@
-/* global describe it beforeEach after afterEach before */
+/* global describe it before beforeEach afterEach */
 
-require('./general')
-var expect = require('chai').expect
-require('../libs/systems/notice')
+const assert = require('chai').assert
+const until = require('test-until')
+const _ = require('lodash')
+require('./general.js')
 
-var cleanup = function (done) {
-  global.output = []
-  global.botDB.remove({}, {multi: true}, function () { done() })
-}
-/*
-describe('System - Notice', function () {
-  describe('#settings', function () {
-    describe('noticeInterval', function () {
-      describe('/num/', function () {
-        before(function (done) {
-          global.parser.parse(global.ownerUser, '!set noticeInterval 10')
-          setTimeout(function () { done() }, 500)
-        })
-        after(function (done) { cleanup(done) })
-        it('success message expected', function () {
-          expect(global.output.pop()).to.be.equal(global.translate('notice.settings.noticeInterval').replace('(value)', 10))
-        })
-        it('should be set in db', function (done) {
-          global.botDB.find({type: 'settings', noticeInterval: 10}, function (err, items) {
-            expect(err).to.be.null
-            expect(items).to.not.be.empty
-            expect(items[0].noticeInterval).to.be.equal(10)
-            done()
-          })
-        })
+// users
+const owner = { username: 'soge__' }
+
+describe('System - Notice', () => {
+  beforeEach(async function () {
+    global.commons.sendMessage.reset()
+  })
+  afterEach(async function () {
+    let items = await global.db.engine.find('notices')
+    _.each(items, async (item) => {
+      await global.db.engine.remove('notices', { _id: item._id })
+    })
+    items = await global.db.engine.find('settings')
+    _.each(items, async (item) => {
+      await global.db.engine.remove('settings', { _id: item._id })
+    })
+  })
+  describe('#fnc', () => {
+    describe('add()', () => {
+      it('text: /empty/', async () => {
+        global.systems.notice.add(global.systems.notice, owner, '')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        let item = await global.db.engine.findOne('notices', { text: '' })
+
+        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('notice.failed.parse'))
+        assert.empty(item)
       })
-      describe('/string/', function () {
-        before(function (done) {
-          global.parser.parse(global.ownerUser, '!set noticeInterval test')
-          setTimeout(function () { done() }, 500)
-        })
-        after(function (done) { cleanup(done) })
-        it('expect parse error', function () {
-          expect(global.output.pop()).to.match(/^Sorry,/)
-        })
-        it('should not be set in db', function (done) {
-          global.botDB.find({type: 'settings', noticeInterval: 10}, function (err, items) {
-            expect(err).to.be.null
-            expect(items).to.be.empty
-            done()
-          })
-        })
-      })
-      describe('/empty/', function () {
-        before(function (done) {
-          global.parser.parse(global.ownerUser, '!set noticeInterval')
-          setTimeout(function () { done() }, 500)
-        })
-        after(function (done) { cleanup(done) })
-        it('expect parse error', function () {
-          expect(global.output.pop()).to.match(/^Sorry,/)
-        })
-        it('should not be set in db', function (done) {
-          global.botDB.find({type: 'settings', noticeInterval: 10}, function (err, items) {
-            expect(err).to.be.null
-            expect(items).to.be.empty
-            done()
-          })
-        })
+      it('text: Lorem Ipsum', async () => {
+        global.systems.notice.add(global.systems.notice, owner, 'Lorem Ipsum')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        let item = await global.db.engine.findOne('notices', { text: 'Lorem Ipsum' })
+
+        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('notice.success.add'))
+        assert.notEmpty(item)
+        assert.equal(item.text, 'Lorem Ipsum')
       })
     })
-    describe('noticeMsgReq', function () {
-      describe('/num/', function () {
-        before(function (done) {
-          global.parser.parse(global.ownerUser, '!set noticeMsgReq 10')
-          setTimeout(function () { done() }, 500)
-        })
-        after(function (done) { cleanup(done) })
-        it('success message expected', function () {
-          expect(global.output.pop()).to.be.equal(global.translate('notice.settings.noticeMsgReq').replace('(value)', 10))
-        })
-        it('should be set in db', function (done) {
-          global.botDB.find({type: 'settings', noticeMsgReq: 10}, function (err, items) {
-            expect(err).to.be.null
-            expect(items).to.not.be.empty
-            expect(items[0].noticeMsgReq).to.be.equal(10)
-            done()
-          })
-        })
+    describe('list()', () => {
+      it('list: /empty/', async () => {
+        global.systems.notice.list(global.systems.notice, owner)
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('notice.failed.list'))
       })
-      describe('/string/', function () {
-        before(function (done) {
-          global.parser.parse(global.ownerUser, '!set noticeMsgReq test')
-          setTimeout(function () { done() }, 500)
-        })
-        after(function (done) { cleanup(done) })
-        it('expect parse error', function () {
-          expect(global.output.pop()).to.match(/^Sorry,/)
-        })
-        it('should not be set in db', function (done) {
-          global.botDB.find({type: 'settings', noticeMsgReq: 10}, function (err, items) {
-            expect(err).to.be.null
-            expect(items).to.be.empty
-            done()
-          })
-        })
+      it('list: /not empty/', async () => {
+        global.systems.notice.add(global.systems.notice, owner, 'test 1')
+        global.systems.notice.add(global.systems.notice, owner, 'test 2')
+        global.systems.notice.list(global.systems.notice, owner)
+        await until(() => global.commons.sendMessage.calledThrice, 5000)
+        assert.isTrue(global.commons.sendMessage.thirdCall.args[0].startsWith(
+          global.translate('notice.success.list')))
       })
-      describe('/empty/', function () {
-        before(function (done) {
-          global.parser.parse(global.ownerUser, '!set noticeMsgReq')
-          setTimeout(function () { done() }, 500)
-        })
-        after(function (done) { cleanup(done) })
-        it('expect parse error', function () {
-          expect(global.output.pop()).to.match(/^Sorry,/)
-        })
-        it('should not be set in db', function (done) {
-          global.botDB.find({type: 'settings', noticeMsgReq: 10}, function (err, items) {
-            expect(err).to.be.null
-            expect(items).to.be.empty
-            done()
-          })
-        })
+    })
+    describe('get()', () => {
+      it('text: /empty/', async () => {
+        global.systems.notice.get(global.systems.notice, owner, '')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('notice.failed.parse'))
+      })
+      it('text: /incorrect id/', async () => {
+        global.systems.notice.get(global.systems.notice, owner, 'asdasd')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('notice.failed.notFound'))
+      })
+      it('text: /correct id/', async () => {
+        global.systems.notice.add(global.systems.notice, owner, 'Lorem Ipsum')
+        let item = await global.db.engine.findOne('notices', { text: 'Lorem Ipsum' })
+        assert.isNotEmpty(item)
+
+        global.systems.notice.get(global.systems.notice, owner, item._id)
+        await until(() => global.commons.sendMessage.calledTwice, 5000)
+        assert.equal(global.commons.sendMessage.secondCall.args[0],
+          'Notice#' + item._id + ': ' + item.text)
+      })
+    })
+    describe('toggle()', () => {
+      it('text: /empty/', async () => {
+        global.systems.notice.toggle(global.systems.notice, owner, '')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('notice.failed.parse'))
+      })
+      it('text: /incorrect id/', async () => {
+        global.systems.notice.toggle(global.systems.notice, owner, 'asdasd')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('notice.failed.toggle')
+            .replace(/\$notice/g, 'asdasd'))
+      })
+      it('text: /correct id/', async () => {
+        global.systems.notice.add(global.systems.notice, owner, 'Lorem Ipsum')
+        let item = await global.db.engine.findOne('notices', { text: 'Lorem Ipsum' })
+        assert.isNotEmpty(item)
+
+        await global.systems.notice.toggle(global.systems.notice, owner, item._id)
+        await global.systems.notice.toggle(global.systems.notice, owner, item._id)
+        await until(() => global.commons.sendMessage.calledThrice, 5000)
+        assert.equal(global.commons.sendMessage.secondCall.args[0],
+          global.translate('notice.success.disabled')
+            .replace(/\$notice/g, item._id))
+        assert.equal(global.commons.sendMessage.thirdCall.args[0],
+          global.translate('notice.success.enabled')
+            .replace(/\$notice/g, item._id))
+      })
+    })
+    describe('remove()', () => {
+      it('text: /empty/', async () => {
+        global.systems.notice.remove(global.systems.notice, owner, '')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('notice.failed.parse'))
+      })
+      it('text: /incorrect id/', async () => {
+        global.systems.notice.remove(global.systems.notice, owner, 'asdasd')
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+          global.translate('notice.failed.notFound'))
+      })
+      it('text: /correct id/', async () => {
+        global.systems.notice.add(global.systems.notice, owner, 'Lorem Ipsum')
+        let item = await global.db.engine.findOne('notices', { text: 'Lorem Ipsum' })
+        assert.isNotEmpty(item)
+
+        await global.systems.notice.remove(global.systems.notice, owner, item._id)
+        await until(() => global.commons.sendMessage.calledTwice, 5000)
+        assert.equal(global.commons.sendMessage.secondCall.args[0],
+          global.translate('notice.success.remove'))
       })
     })
   })
-  describe('#help', function () {
-    describe('parsing \'!notice\'', function () {
-      it('parser should return usage text', function (done) {
-        global.parser.parse(global.ownerUser, '!notice')
-        setTimeout(function () { expect(global.output.pop()).to.match(/en.core.usage/); done() }, 600)
+  describe('#send', () => {
+    describe('0min, 5msgs', () => {
+      before(async function () {
+        global.commons.sendMessage.reset()
+        global.parser.parse(owner, '!set noticeInterval 0')
+        global.parser.parse(owner, '!set noticeMsgReq 5')
+        await global.systems.notice.add(global.systems.notice, owner, 'Lorem Ipsum')
+        await until(() => global.commons.sendMessage.callCount === 3, 5000)
       })
-    })
-  try {
-    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    if (_.isUndefined(_.find(self.commands, function (o) { return o.command === parsed[1] }))) throw Error(ERROR_DOESNT_EXISTS)
-    self.commands = _.filter(self.commands, function (o) { return o.command !== parsed[1] })
-    global.parser.unregister('!' + parsed[1])
-    global.commons.sendMessage(global.translate('customcmds.success.remove'), sender)
-  } catch (e) {
-    switch (e.message) {
-      case ERROR_DOESNT_EXISTS:
-        global.commons.sendMessage(global.translate('customcmds.failed.remove'), sender)
-        break
-      default:
-        global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
-    }
-  }
-    describe('parsing \'!notice n/a\'', function () {
-      it('parser should return usage text', function (done) {
-        global.parser.parse(global.ownerUser, '!notice n/a')
-        setTimeout(function () { expect(global.output.pop()).to.match(/en.core.usage/); done() }, 600)
-      })
-    })
-  })
-  describe('#add', function () {
-    afterEach(function (done) { cleanup(done) })
-    describe('parsing \'!notice add\'', function () {
-      beforeEach(function (done) {
-        global.parser.parse(global.ownerUser, '!notice add')
-        setTimeout(function () { done() }, 500)
-      })
-      it('should not be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('notice') }}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(0)
-          done()
-        })
-      })
-      it('should send parse error', function () {
-        expect(global.output.pop()).to.match(/en.notice.failed.parse/)
-      })
-    })
-    describe('parsing \'!notice add test\'', function () {
-      beforeEach(function (done) {
-        global.parser.parse(global.ownerUser, '!notice add test')
-        setTimeout(function () { done() }, 500)
-      })
-      it('should be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('notice') }}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(1)
-          done()
-        })
-      })
-      it('expect success message', function () {
-        expect(global.output.pop()).to.equal(global.translate('notice.success.add'))
-      })
-    })
-    describe('parsing \'!notice add some longer text  qwerty\'', function () {
-      beforeEach(function (done) {
-        global.parser.parse(global.ownerUser, '!notice add some longer text  qwerty')
-        setTimeout(function () { done() }, 500)
-      })
-      it('should be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('notice') }}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(1)
-          done()
-        })
-      })
-      it('expect success message', function () {
-        expect(global.output.pop()).to.equal(global.translate('notice.success.add'))
-      })
-    })
-    describe('parsing 2x \'!notice add test\'', function () {
-      beforeEach(function (done) {
-        global.parser.parse(global.ownerUser, '!notice add test')
-        global.parser.parse(global.ownerUser, '!notice add test')
-        setTimeout(function () { done() }, 500)
-      })
-      it('should be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('notice') }}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(1)
-          done()
-        })
-      })
-      it('expect success message', function () {
-        expect(global.output).to.include(global.translate('notice.success.add'))
-      })
-      it('expect duplicate fail message', function () {
-        expect(global.output).to.include(global.translate('notice.failed.add'))
-      })
-    })
-  })
-  describe('#list', function () {
-    describe('parsing \'!notice list\' when notice is added', function () {
-      before(function (done) {
-        global.output = []
-        global.parser.parse(global.ownerUser, '!notice add test')
-        global.parser.parse(global.ownerUser, '!notice add test2')
-        setTimeout(function () {
-          global.parser.parse(global.ownerUser, '!notice list')
-          setTimeout(function () { done() }, 500)
-        }, 500)
-      })
-      after(function (done) { cleanup(done) })
-      it('should send list', function () {
-        expect(global.output.pop()).to.match(/en.notice.success.list/)
-      })
-    })
-    describe('parsing \'!notice list\' when list is empty', function () {
-      before(function (done) {
-        global.parser.parse(global.ownerUser, '!notice list')
-        setTimeout(function () { done() }, 500)
-      })
-      after(function (done) { cleanup(done) })
-      it('should send empty list', function () {
-        expect(global.output.pop()).to.match(/en.notice.failed.list/)
-      })
-    })
-    describe('parsing \'!notice list nonsense\'', function () {
-      before(function (done) {
-        global.parser.parse(global.ownerUser, '!notice list nonsemse')
-        setTimeout(function () { done() }, 500)
-      })
-      after(function (done) { cleanup(done) })
-      it('should send parse error', function () {
-        expect(global.output.pop()).to.match(/en.notice.failed.parse/)
-      })
-    })
-  })
-  describe('#get', function () {
-    describe('parsing \'!notice get id\' when notice is added', function () {
-      before(function (done) {
-        global.output = []
-        global.parser.parse(global.ownerUser, '!notice add test')
-        setTimeout(function () {
-          global.botDB.findOne({$where: function () { return this._id.startsWith('notice') }}, function (err, notice) {
-            if (err) console.log(err)
-            global.parser.parse(global.ownerUser, '!notice get ' + notice._id.split('_')[1])
-            setTimeout(function () { done() }, 500)
-          })
-        }, 500)
-      })
-      after(function (done) { cleanup(done) })
-      it('should get notice', function () {
-        expect(global.output.pop()).to.match(/^Notice#/)
-      })
-    })
-    describe('parsing \'!notice get id\' when notice is not added', function () {
-      before(function (done) {
-        global.parser.parse(global.ownerUser, '!notice get ashed123h1jkh3kj')
-        setTimeout(function () { done() }, 500)
-      })
-      after(function (done) { cleanup(done) })
-      it('should not get notice', function () {
-        expect(global.output.pop()).to.be.equal(global.translate('notice.failed.notFound'))
-      })
-    })
-    describe('parsing \'!notice get\'', function () {
-      before(function (done) {
-        global.parser.parse(global.ownerUser, '!notice get')
-        setTimeout(function () { done() }, 500)
-      })
-      after(function (done) { cleanup(done) })
-      it('should send parse error', function () {
-        expect(global.output.pop()).to.match(/en.notice.failed.parse/)
-      })
-    })
-  })
-  describe('#remove', function () {
-    describe('parsing \'!notice remove\'', function () {
-      before(function (done) {
-        global.parser.parse(global.ownerUser, '!notice remove')
-        setTimeout(function () { done() }, 500)
-      })
-      after(function (done) { cleanup(done) })
-      it('should send parse error', function () {
-        expect(global.output.pop()).to.match(/en.notice.failed.parse/)
-      })
-    })
-    describe('parsing \'!notice remove some thing\'', function () {
-      before(function (done) {
-        global.parser.parse(global.ownerUser, '!notice remove some thing')
-        setTimeout(function () { done() }, 500)
-      })
-      after(function (done) { cleanup(done) })
-      it('should send parse error', function () {
-        expect(global.output.pop()).to.match(/en.notice.failed.parse/)
-      })
-    })
-    describe('parsing \'!notice remove id\' without created notice', function () {
-      before(function (done) {
-        global.parser.parse(global.ownerUser, '!notice remove 123815891')
-        setTimeout(function () { done() }, 500)
-      })
-      after(function (done) { cleanup(done) })
-      it('should send parse error', function () {
-        expect(global.output.pop()).to.equal(global.translate('notice.failed.notFound'))
-      })
-    })
-    describe('parsing \'!notice remove id\' with created notice', function () {
-      before(function (done) {
-        global.output = []
-        global.parser.parse(global.ownerUser, '!notice add test')
-        setTimeout(function () {
-          global.botDB.findOne({$where: function () { return this._id.startsWith('notice') }}, function (err, notice) {
-            if (err) console.log(err)
-            global.parser.parse(global.ownerUser, '!notice remove ' + notice._id.split('_')[1])
-            setTimeout(function () { done() }, 500)
-          })
-        }, 500)
-      })
-      after(function (done) { cleanup(done) })
-      it('should not be in db', function (done) {
-        global.botDB.count({$where: function () { return this._id.startsWith('notice') }}, function (err, count) {
-          expect(err).to.equal(null)
-          expect(count).to.equal(0)
-          done()
-        })
-      })
-      it('should send success msg', function () {
-        expect(global.output.pop()).to.equal(global.translate('notice.success.remove'))
-      })
-    })
-  })
-  describe('#trigger', function () {
-    before(function (done) {
-      this.timeout(50000)
-      global.parser.parse(global.ownerUser, '!set noticeMsgReq 5')
-      global.parser.parse(global.ownerUser, '!set noticeInterval 0')
-      global.parser.parse(global.ownerUser, '!notice add test')
-      // reset parser line count
-      global.parser.linesParsed = 0
-      setTimeout(function () {
-        for (var i = 0; i < 11; i++) {
-          setTimeout(function () {
-            global.parser.parse(global.ownerUser, i.toString())
-          }, 500 * i)
+      it('sent twice after 10 messages', async () => {
+        for (var i in _.range(5)) {
+          global.parser.parse(owner, i)
         }
-        setTimeout(function () { done() }, 10000)
-      }, 600)
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        for (var j in _.range(5)) {
+          global.parser.parse(owner, j)
+        }
+        await until(() => global.commons.sendMessage.calledTwice, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0], 'Lorem Ipsum')
+        assert.equal(global.commons.sendMessage.getCall(1).args[0], 'Lorem Ipsum')
+      })
     })
-    it('trigger after 5 messages', function () {
-      expect(global.output.length).to.be.equal(5) // 3 for success messages, 2 for notices
+    describe('1s, 0msgs', () => {
+      before(async function () {
+        global.commons.sendMessage.reset()
+        await global.db.engine.update('settings', { key: 'noticeInterval' }, { value: 0.015 })
+        global.parser.parse(owner, '!set noticeMsgReq 0')
+        await global.systems.notice.add(global.systems.notice, owner, 'Lorem Ipsum')
+        await until(() => global.commons.sendMessage.callCount === 2, 5000)
+      })
+      it('sent thrice after 3s', async () => {
+        await until(() => global.commons.sendMessage.calledThrice, 5000)
+        assert.equal(global.commons.sendMessage.getCall(0).args[0], 'Lorem Ipsum')
+        assert.equal(global.commons.sendMessage.getCall(1).args[0], 'Lorem Ipsum')
+        assert.equal(global.commons.sendMessage.getCall(2).args[0], 'Lorem Ipsum')
+      })
     })
   })
 })
-*/

@@ -3,13 +3,15 @@
 // 3rdparty libraries
 const Client = require('twitter')
 
+const config = require('../../config.json')
+
 function Twitter () {
   if (global.commons.isIntegrationEnabled(this)) {
     this.client = new Client({
-      consumer_key: global.configuration.get().twitter.consumerKey,
-      consumer_secret: global.configuration.get().twitter.consumerSecret,
-      access_token_key: global.configuration.get().twitter.accessToken,
-      access_token_secret: global.configuration.get().twitter.secretToken
+      consumer_key: config.integrations.twitter.consumerKey,
+      consumer_secret: config.integrations.twitter.consumerSecret,
+      access_token_key: config.integrations.twitter.accessToken,
+      access_token_secret: config.integrations.twitter.secretToken
     })
 
     this.addEvent(this)

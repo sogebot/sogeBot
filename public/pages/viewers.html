@@ -63,6 +63,7 @@
       $("#Users").empty()
       _.each(list, function(item, index) {
         item.points = _.isUndefined(item.points) ? 0 : item.points
+        item.time = _.isNil(item.time) ? {} : item.time
         $("#Users").append('<tr>' +
           '<td>' + item.username + '</td>' +
           '<td class="text-center" data-value=' + (_.isUndefined(item.time.message) ? 0 : item.time.message) + '>' + viewers.getDateString(item.time.message) + '</td>' +

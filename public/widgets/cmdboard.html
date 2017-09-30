@@ -73,8 +73,8 @@
   socket.off('cmdboard.widget.data')
   socket.on('cmdboard.widget.data', function (data) {
     $("#cmdboard-list").empty()
-    _.each(data, function (cmd, name) {
-      $("#cmdboard-list").append('<a class="soundboard-list-group-item list-group-item cmdboard-item"  style="padding: 10px 0 0 0" data-name="' + name + '" onclick="cmdboard.emit(event, this)" type="button"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0"></div><span>' + name + '</span></a>');
+    _.each(data, function (name) {
+      $("#cmdboard-list").append('<a class="soundboard-list-group-item list-group-item cmdboard-item"  style="padding: 10px 0 0 0" data-name="' + name.text + '" onclick="cmdboard.emit(event, this)" type="button"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0"></div><span>' + name.text + '</span></a>');
     })
     cmdboard.resize()
   })

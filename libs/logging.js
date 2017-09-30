@@ -118,11 +118,12 @@ global.log = new (winston.Logger)({
 })
 
 function Logger () {
-  global.panel.addMenu({category: 'main', name: 'logger', id: 'logger'})
-
   this.files = []
 
-  global.panel.socketListening(this, 'log.get', this.send)
+  setTimeout(function () {
+    global.panel.addMenu({category: 'main', name: 'logger', id: 'logger'})
+    global.panel.socketListening(this, 'log.get', this.send)
+  }, 1000)
 }
 
 Logger.prototype.send = async function (self, socket, filters) {

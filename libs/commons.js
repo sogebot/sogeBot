@@ -2,7 +2,10 @@
 
 var _ = require('lodash')
 var chalk = require('chalk')
-var log = global.log
+
+const config = require('../config.json')
+
+const debug = require('debug')('commons')
 
 function Commons () {
   global.configuration.register('atUsername', 'core.settings.atUsername', 'bool', true)
@@ -10,92 +13,16 @@ function Commons () {
 
 Commons.prototype.isSystemEnabled = function (fn) {
   var name = (typeof fn === 'object') ? fn.constructor.name : fn
-  var enabled = !_.isNil(global.configuration.get().systems) && !_.isNil(global.configuration.get().systems[name.toLowerCase()]) ? global.configuration.get().systems[name.toLowerCase()] : false
+  var enabled = !_.isNil(config.systems) && !_.isNil(config.systems[name.toLowerCase()]) ? (_.isBoolean(config.systems[name.toLowerCase()] ? config.systems[name.toLowerCase()] : config.systems[name.toLowerCase()].enabled)) : false
   if (typeof fn === 'object') global.log.info(name + ' system ' + global.translate('core.loaded') + ' ' + (enabled ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
   return enabled
 }
 
 Commons.prototype.isIntegrationEnabled = function (fn) {
   var name = (typeof fn === 'object') ? fn.constructor.name : fn
-  var enabled = !_.isNil(global.configuration.get().integrations) && !_.isNil(global.configuration.get().integrations[name.toLowerCase()]) ? global.configuration.get().integrations[name.toLowerCase()] : false
+  var enabled = !_.isNil(config.integrations) && !_.isNil(config.integrations[name.toLowerCase()]) ? (_.isBoolean(config.integrations[name.toLowerCase()] ? config.integrations[name.toLowerCase()] : config.integrations[name.toLowerCase()].enabled)) : false
   if (typeof fn === 'object') global.log.info(name + ' integration ' + global.translate('core.loaded') + ' ' + (enabled ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
   return enabled
-}
-
-Commons.prototype.insertIfNotExists = function (data) {
-  var callbacks = this.getCallbacks(data)
-  var toInsert = this.stripUnderscores(data)
-  var self = this
-
-  global.botDB.insert(toInsert, function (err, newItem) {
-    if (err) self.runCallback(callbacks.error, data)
-    else self.runCallback(callbacks.success, data)
-  })
-}
-
-Commons.prototype.updateOrInsert = function (data) {
-  var callbacks = this.getCallbacks(data)
-  var toFind = this.getObjectToFind(data)
-  var toInsert = this.stripUnderscores(data)
-  var self = this
-  global.botDB.remove(toFind, { multi: true })
-  global.botDB.insert(toInsert)
-  self.runCallback(callbacks.success, data)
-}
-
-Commons.prototype.remove = function (data) {
-  var callbacks = this.getCallbacks(data)
-  var toRemove = this.getObjectToFind(data)
-  var self = this
-  global.botDB.remove(toRemove, {}, function (err, numRemoved) {
-    if (err) { log.error(err, { fnc: 'Commons.prototype.remove' }) }
-    numRemoved === 0 ? self.runCallback(callbacks.error, data) : self.runCallback(callbacks.success, data)
-  })
-}
-
-Commons.prototype.getObjectToFind = function (data) {
-  var Object = {}
-  for (var index in data) {
-    if (data.hasOwnProperty(index) && index.startsWith('_') && index !== '_quiet') {
-      Object[index] = data[index]
-    }
-  }
-  return this.stripUnderscores(Object)
-}
-
-Commons.prototype.stripUnderscores = function (data) {
-  var Object = {}
-  for (var index in data) {
-    if (data.hasOwnProperty(index) && !(index === 'success' || index === 'error' || index === '_quiet')) {
-      var i = (index.startsWith('_') ? index.slice(1) : index)
-      Object[i] = data[index]
-    }
-  }
-  return Object
-}
-
-Commons.prototype.getCallbacks = function (data) {
-  var Callbacks = {}
-  for (var index in data) {
-    if (data.hasOwnProperty(index) && (index === 'success' || index === 'error')) {
-      Callbacks[index] = data[index]
-    }
-  }
-  return Callbacks
-}
-
-Commons.prototype.runCallback = function (cb, data) {
-  var value = this.stripUnderscores(data)
-  delete value.type
-  if (_.isUndefined(cb)) return
-  if (data._type === 'settings') {
-    if (typeof cb === 'function') cb(data)
-    else if (!data._quiet) {
-      this.sendToOwners(global.translate(cb).replace(/\$value/g, value[Object.keys(value)[0]]))
-    }
-  } else {
-    typeof cb === 'function' ? cb(data) : this.sendMessage(global.translate(cb).replace(/\$value/g, value[Object.keys(value)[0]]), {username: global.configuration.get().twitch.channel}, data)
-  }
 }
 
 Commons.prototype.sendToOwners = function (text) {
@@ -110,19 +37,20 @@ Commons.prototype.sendToOwners = function (text) {
 }
 
 Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
+  debug('sendMessage(%s, %j, %j)', message, sender, attr)
   attr.sender = sender
   message = await global.parser.parseMessage(message, attr)
   if (message === '') return false // if message is empty, don't send anything
-  if (global.configuration.get().bot.debug || global.configuration.get().bot.console) {
+  if (config.debug.all || config.debug.console) {
     if (_.isUndefined(sender) || _.isNull(sender)) sender = { username: null }
     let username = (global.configuration.getValue('atUsername') ? '@' : '') + sender.username
     message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace(/\$sender/g, username) : message
-    if ((_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === global.configuration.get().twitch.username))) message = '! ' + message
+    if ((_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === config.settings.bot_username))) message = '! ' + message
     sender['message-type'] === 'whisper' ? global.log.whisperOut(message, {username: sender.username}) : global.log.chatOut(message, {username: sender.username})
     return true
   }
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
-  if (_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === global.configuration.get().twitch.username && !attr.force)) return false // we don't want to reply on bot commands
+  if (_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === config.settings.bot_username && !attr.force)) return false // we don't want to reply on bot commands
   message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + sender.username) : message
 
   // global variables
@@ -137,7 +65,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
 
   if (!global.configuration.getValue('mute') || attr.force) {
     sender['message-type'] === 'whisper' ? global.log.whisperOut(message, {username: sender.username}) : global.log.chatOut(message, {username: sender.username})
-    sender['message-type'] === 'whisper' ? global.client.whisper(sender.username, message) : global.client.say(global.configuration.get().twitch.channel, message)
+    sender['message-type'] === 'whisper' ? global.client.whisper(sender.username, message) : global.client.say(config.settings.broadcaster_username, message)
   }
   return true
 }
@@ -145,9 +73,9 @@ Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
 Commons.prototype.timeout = function (username, reason, timeout) {
   if (global.configuration.getValue('moderationAnnounceTimeouts')) {
     global.commons.sendMessage('$sender, ' + reason[0].toLowerCase() + reason.substring(1), { username: username })
-    global.client.timeout(global.configuration.get().twitch.channel, username, timeout)
+    global.client.timeout(config.settings.broadcaster_username, username, timeout)
   } else {
-    global.client.timeout(global.configuration.get().twitch.channel, username, timeout, reason)
+    global.client.timeout(config.settings.broadcaster_username, username, timeout, reason)
   }
 }
 

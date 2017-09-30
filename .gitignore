@@ -3,7 +3,7 @@ logs/*
 package-lock.json*
 npm-shrinkwrap.json*
 *.zip
-config.ini
+config.json
 *.db
 
 public/dist/*

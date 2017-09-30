@@ -6,6 +6,8 @@ var request = require('request-promise')
 var _ = require('lodash')
 require('moment-precise-range-plugin')
 
+const config = require('../config.json')
+
 function Twitch () {
   this.isOnline = false
 
@@ -49,11 +51,11 @@ function Twitch () {
       url: 'https://api.twitch.tv/kraken/streams/' + global.channelId,
       headers: {
         Accept: 'application/vnd.twitchtv.v5+json',
-        'Client-ID': global.configuration.get().twitch.clientId
+        'Client-ID': config.settings.client_id
       }
     }
 
-    if (global.configuration.get().bot.debug) {
+    if (config.debug.all) {
       global.log.debug('Get current stream data from twitch', options)
     }
     global.client.api(options, function (err, res, body) {
@@ -62,7 +64,7 @@ function Twitch () {
         return
       }
 
-      if (global.configuration.get().bot.debug) {
+      if (config.debug.all) {
         global.log.debug('Response: Get current stream data from twitch', body)
       }
 
@@ -103,10 +105,11 @@ function Twitch () {
       url: 'https://api.twitch.tv/kraken/channels/' + global.channelId + '/follows?limit=100',
       headers: {
         Accept: 'application/vnd.twitchtv.v5+json',
-        'Client-ID': global.configuration.get().twitch.clientId
+        'Client-ID': config.settings.client_id
       }
     }
-    if (global.configuration.get().bot.debug) {
+
+    if (config.debug.all) {
       global.log.debug('Get last 100 followers from twitch', options)
     }
     global.client.api(options, function (err, res, body) {
@@ -114,15 +117,16 @@ function Twitch () {
         if (err.code !== 'ETIMEDOUT' && err.code !== 'ECONNRESET') global.log.error(err, { fnc: 'Twitch#2' })
         return
       }
-      if (global.configuration.get().bot.debug) {
+      if (config.debug.all) {
         global.log.debug('Response: Get last 100 followers from twitch', body)
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
         self.current.followers = body._total
 
         self.cached.followers = []
-        _.each(body.follows, function (follower) {
-          if (!global.users.get(follower.user.name).is.follower) {
+        _.each(body.follows, async function (follower) {
+          let user = await global.users.get(follower.user.name)
+          if (!user.is.follower) {
             if (new Date().getTime() - moment(follower.created_at).format('X') * 1000 < 60000 * 60) global.events.fire('follow', { username: follower.user.name })
           }
           global.users.set(follower.user.name, { id: follower.user._id, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(follower.created_at).format('X') * 1000 } })
@@ -133,12 +137,12 @@ function Twitch () {
 
     // count watching time when stream is online
     if (self.isOnline) {
-      const users = global.users.getAll({ is: { online: true } })
-      _.each(users, function (user) {
-        // add user as a new chatter in a stream
-        if (_.isUndefined(user.time.watched) || user.time.watched === 0) self.newChatters = self.newChatters + 1
-        const time = (!_.isUndefined(user.time.watched)) ? 15000 + user.time.watched : 15000
-        global.users.set(user.username, { time: { watched: time } })
+      global.users.getAll({ is: { online: true } }).then(function (users) {
+        _.each(users, function (user) {
+          // add user as a new chatter in a stream
+          if (_.isUndefined(user.time.watched) || user.time.watched === 0) self.newChatters = self.newChatters + 1
+          global.db.engine.increment('users', { username: user.username }, { time: { watched: 15000 } })
+        })
       })
     }
   }, 15000)
@@ -148,10 +152,10 @@ function Twitch () {
       url: 'https://api.twitch.tv/kraken/channels/' + global.channelId + '?timestamp=' + new Date().getTime(),
       headers: {
         Accept: 'application/vnd.twitchtv.v5+json',
-        'Client-ID': global.configuration.get().twitch.clientId
+        'Client-ID': config.settings.client_id
       }
     }
-    if (global.configuration.get().bot.debug) {
+    if (config.debug.all) {
       global.log.debug('Get current channel data from twitch', options)
     }
     global.client.api(options, function (err, res, body) {
@@ -159,7 +163,7 @@ function Twitch () {
         if (err.code !== 'ETIMEDOUT' && err.code !== 'ECONNRESET') global.log.error(err, { fnc: 'Twitch#3' })
         return
       }
-      if (global.configuration.get().bot.debug) {
+      if (config.debug.all) {
         global.log.debug('Response: Get current channel data from twitch', body)
       }
       if (res.statusCode === 200 && !_.isNull(body)) {
@@ -173,7 +177,7 @@ function Twitch () {
       options = {
         url: 'http://tmi.twitch.tv/hosts?include_logins=1&target=' + global.channelId
       }
-      if (global.configuration.get().bot.debug) {
+      if (config.debug.all) {
         global.log.debug('Get current hosts', options)
       }
       global.client.api(options, function (err, res, body) {
@@ -181,7 +185,7 @@ function Twitch () {
           if (err.code !== 'ETIMEDOUT' && err.code !== 'ECONNRESET') global.log.error(err, { fnc: 'Twitch#4' })
           return
         }
-        if (global.configuration.get().bot.debug) {
+        if (config.debug.all) {
           global.log.debug('Response: Get current hosts', body)
         }
         if (res.statusCode === 200 && !_.isNull(body)) {
@@ -206,10 +210,10 @@ function Twitch () {
     options = {
       url: 'https://api.twitch.tv/kraken',
       headers: {
-        'Client-ID': global.configuration.get().twitch.clientId
+        'Client-ID': config.settings.client_id
       }
     }
-    if (global.configuration.get().bot.debug) {
+    if (config.debug.all) {
       global.log.debug('Get API connection status', options)
     }
     global.client.api(options, function (err, res, body) {
@@ -217,7 +221,7 @@ function Twitch () {
         global.status.API = constants.DISCONNECTED
         return
       }
-      if (global.configuration.get().bot.debug) {
+      if (config.debug.all) {
         global.log.debug('Response: Get API connection status', body)
       }
       global.status.API = res.statusCode === 200 ? constants.CONNECTED : constants.DISCONNECTED
@@ -241,31 +245,22 @@ function Twitch () {
   this.webPanel()
 }
 
-Twitch.prototype._load = function (self) {
-  global.botDB.findOne({ _id: 'cachedGamesTitles' }, function (err, item) {
-    if (err) return global.log.error(err, { fnc: 'Twitch.prototype._load' })
-    if (_.isNull(item)) return
-    self.cGamesTitles = item
-  })
-  global.botDB.findOne({ _id: 'when' }, function (err, item) {
-    if (err) return global.log.error(err, { fnc: 'Twitch.prototype._load#2' })
-    if (_.isNull(item)) return
-    self.when = item
-  })
-  global.botDB.findOne({ _id: 'cached' }, function (err, item) {
-    if (err) return global.log.error(err, { fnc: 'Twitch.prototype._load#3' })
-    if (_.isNull(item)) return
-    self.cached = item
-  })
+Twitch.prototype._load = async function (self) {
+  let cache = await global.db.engine.findOne('cache')
+
+  self.cGamesTitles = !_.isNil(cache.cachedGamesTitles) ? cache.cachedGamesTitles : {}
+  self.when = !_.isNil(cache.when) ? cache.when : {}
+  self.cached = !_.isNil(cache.cached) ? cache.cached : {}
 }
 
 Twitch.prototype._save = function (self) {
-  var cachedGamesTitles = self.cGamesTitles
-  cachedGamesTitles._id = 'cachedGamesTitles'
-  global.botDB.remove({ _id: cachedGamesTitles._id })
-  global.botDB.insert(cachedGamesTitles)
-  global.botDB.update({ _id: 'when' }, { $set: self.when }, { upsert: true })
-  global.botDB.update({ _id: 'cached' }, { $set: self.cached }, { upsert: true })
+  let cache = {
+    cachedGamesTitles: self.cGamesTitles,
+    when: self.when,
+    cached: self.cached
+  }
+
+  global.db.engine.update('cache', {}, cache)
   self.timestamp = new Date().getTime()
 }
 
@@ -318,7 +313,7 @@ Twitch.prototype.sendStats = function (self, socket) {
 }
 
 Twitch.prototype.sendTwitchVideo = function (self, socket) {
-  socket.emit('twitchVideo', global.configuration.get().twitch.channel.toLowerCase())
+  socket.emit('twitchVideo', config.settings.broadcaster_username.toLowerCase())
 }
 
 Twitch.prototype.isOnline = function () {
@@ -356,18 +351,19 @@ Twitch.prototype.uptime = function (self, sender) {
     .replace(/\$seconds/g, time.seconds)), sender)
 }
 
-Twitch.prototype.lastseenUpdate = function (self, id, sender, text) {
+Twitch.prototype.lastseenUpdate = async function (self, id, sender, text) {
   if (_.isNull(sender)) {
     global.updateQueue(id, true)
     return
   }
-  global.users.set(sender.username, { time: { message: new Date().getTime() } }, true)
-  if (_.isUndefined(global.users.get(sender.username).is) || !global.users.get(sender.username).is.online) global.users.set(sender.username, { is: { online: true } }, true)
-  global.users.set(sender.username, { is: { subscriber: sender.subscriber } }, true) // save subscriber status
+  global.users.set(sender.username, {
+    time: { message: new Date().getTime() },
+    is: { online: true, subscriber: !_.isNil(sender.subscriber) ? sender.subscriber : false }
+  }, true)
   global.updateQueue(id, true)
 }
 
-Twitch.prototype.followage = function (self, sender, text) {
+Twitch.prototype.followage = async function (self, sender, text) {
   let username
   let parsed = text.match(/^(\S?)+$/g)
   if (parsed[0].length > 0) username = parsed[0].toLowerCase()
@@ -375,7 +371,7 @@ Twitch.prototype.followage = function (self, sender, text) {
 
   global.users.isFollower(username)
 
-  const user = global.users.get(username)
+  const user = await global.users.get(username)
   if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.follow) || _.isNil(user.is.follower) || !user.is.follower) {
     global.commons.sendMessage(global.translate('followage.success.never').replace(/\$username/g, username), sender)
   } else {
@@ -393,13 +389,13 @@ Twitch.prototype.followage = function (self, sender, text) {
   }
 }
 
-Twitch.prototype.age = function (self, sender, text) {
+Twitch.prototype.age = async function (self, sender, text) {
   let username
   let parsed = text.match(/^(\S?)+$/g)
   if (parsed[0].length > 0) username = parsed[0].toLowerCase()
   else username = sender.username
 
-  const user = global.users.get(username)
+  const user = await global.users.get(username)
   if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.created_at)) {
     global.commons.sendMessage(global.translate('age.failed').replace(/\$username/g, username), sender)
   } else {
@@ -415,10 +411,10 @@ Twitch.prototype.age = function (self, sender, text) {
   }
 }
 
-Twitch.prototype.lastseen = function (self, sender, text) {
+Twitch.prototype.lastseen = async function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    const user = global.users.get(parsed[0])
+    const user = await global.users.get(parsed[0])
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.message)) {
       global.commons.sendMessage(global.translate('lastseen.success.never').replace(/\$username/g, parsed[0]), sender)
     } else {
@@ -431,11 +427,11 @@ Twitch.prototype.lastseen = function (self, sender, text) {
   }
 }
 
-Twitch.prototype.watched = function (self, sender, text) {
+Twitch.prototype.watched = async function (self, sender, text) {
   try {
     let watched, parsed
     parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    const user = global.users.get(text.trim() < 1 ? sender.username : parsed[0])
+    const user = await global.users.get(text.trim() < 1 ? sender.username : parsed[0])
     watched = parseInt(!_.isNil(user) && !_.isNil(user.time) && !_.isNil(user.time.watched) ? user.time.watched : 0) / 1000 / 60 / 60
 
     let username = (global.configuration.getValue('atUsername') ? '@' : '') + user.username
@@ -447,14 +443,14 @@ Twitch.prototype.watched = function (self, sender, text) {
   }
 }
 
-Twitch.prototype.showMe = function (self, sender, text) {
+Twitch.prototype.showMe = async function (self, sender, text) {
   try {
-    const user = global.users.get(sender.username)
+    const user = await global.users.get(sender.username)
     var message = ['$sender']
     // rank
     var rank = !_.isUndefined(user.rank) ? user.rank : null
     rank = !_.isNil(user.custom.rank) ? user.custom.rank : rank
-    if (global.configuration.get().systems.ranks === true && !_.isNull(rank)) message.push(rank)
+    if (global.commons.isSystemEnabled('ranks') && !_.isNull(rank)) message.push(rank)
 
     // watchTime
     var watchTime = _.isFinite(parseInt(user.time.watched, 10)) && _.isNumber(parseInt(user.time.watched, 10)) ? user.time.watched : 0
@@ -462,7 +458,7 @@ Twitch.prototype.showMe = function (self, sender, text) {
 
     // points
     var points = !_.isUndefined(user.points) ? user.points : 0
-    if (global.configuration.get().systems.points === true) message.push(points + ' ' + global.systems.points.getPointsName(points))
+    if (global.commons.isSystemEnabled('points')) message.push(points + ' ' + global.systems.points.getPointsName(points))
 
     // message count
     var messages = !_.isUndefined(user.stats.messages) ? user.stats.messages : 0
@@ -474,7 +470,7 @@ Twitch.prototype.showMe = function (self, sender, text) {
   }
 }
 
-Twitch.prototype.showTop = function (self, sender, text) {
+Twitch.prototype.showTop = async function (self, sender, text) {
   try {
     let sorted, message
     let type = text.trim().match(/^(time|points|messages)$/)
@@ -482,28 +478,29 @@ Twitch.prototype.showTop = function (self, sender, text) {
     if (_.isNil(type)) type = 'time'
     else type = type[1]
 
+    let users = await global.users.getAll()
     if (type === 'points' && global.commons.isSystemEnabled('points')) {
       message = global.translate('top.listPoints').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(global.users.users, function (o) { return !_.isNil(o.points) && !global.parser.isOwner(o.username) && o.username !== global.configuration.get().twitch.username }), 'points', 'desc')
+      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.points) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'points', 'desc')
     } else if (type === 'time') {
       message = global.translate('top.listWatched').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(global.users.users, function (o) { return !_.isNil(o.time.watched) && !global.parser.isOwner(o.username) && o.username !== global.configuration.get().twitch.username }), 'time.watched', 'desc')
+      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.time.watched) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'time.watched', 'desc')
     } else {
       message = global.translate('top.listMessages').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(global.users.users, function (o) { return !_.isNil(o.stats.messages) && !global.parser.isOwner(o.username) && o.username !== global.configuration.get().twitch.username }), 'stats.messages', 'desc')
+      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.stats.messages) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'stats.messages', 'desc')
     }
 
     sorted = _.chunk(_.map(sorted, 'username'), 10)[0]
-    _.each(sorted, function (username, index) {
+    _.each(sorted, async function (username, index) {
+      let user = await global.users.get(username)
       message += (index + 1) + '. ' + (global.configuration.getValue('atUsername') ? '@' : '') + username + ' - '
-      if (type === 'time') message += (global.users.get(username).time.watched / 1000 / 60 / 60).toFixed(1) + 'h'
-      else if (type === 'points') message += global.users.get(username).points + ' ' + global.systems.points.getPointsName(global.users.get(username).points)
-      else message += global.users.get(username).stats.messages
+      if (type === 'time') message += (user.time.watched / 1000 / 60 / 60).toFixed(1) + 'h'
+      else if (type === 'points') message += user.points + ' ' + global.systems.points.getPointsName(user.points)
+      else message += user.stats.messages
       if (index + 1 < 10 && !_.isNil(sorted[index + 1])) message += ', '
     })
     global.commons.sendMessage(message, sender)
   } catch (e) {
-    console.log(e)
     global.log.error(e)
   }
 }
@@ -523,16 +520,16 @@ Twitch.prototype.setTitleAndGame = async function (self, sender, args) {
     },
     headers: {
       Accept: 'application/vnd.twitchtv.v5+json',
-      Authorization: 'OAuth ' + global.configuration.get().twitch.password.split(':')[1]
+      Authorization: 'OAuth ' + config.settings.bot_oauth.split(':')[1]
     }
   }
-  if (global.configuration.get().bot.debug) {
+  if (config.debug.all) {
     global.log.debug('Updating game and title ', options)
   }
 
   try {
     const response = await request(options)
-    if (global.configuration.get().bot.debug) {
+    if (config.debug.all) {
       global.log.debug('Response: Updating game and title ', response)
     }
 
@@ -558,7 +555,7 @@ Twitch.prototype.setTitleAndGame = async function (self, sender, args) {
       }
     }
   } catch (e) {
-    if (global.configuration.get().bot.debug) {
+    if (config.debug.all) {
       global.log.debug('Response: Updating game and title ', e.message)
     }
   }
@@ -588,18 +585,18 @@ Twitch.prototype.sendGameFromTwitch = function (self, socket, game) {
     json: true,
     headers: {
       Accept: 'application/vnd.twitchtv.v5+json',
-      'Client-ID': global.configuration.get().twitch.clientId
+      'Client-ID': config.settings.client_id
     }
   }
 
-  if (global.configuration.get().bot.debug) {
+  if (config.debug.all) {
     global.log.debug('Search game on twitch ', options)
   }
 
   global.client.api(options, function (err, res, body) {
     if (err) { return global.log.error(err, { fnc: 'Twitch.prototype.sendGameFromTwitch' }) }
 
-    if (global.configuration.get().bot.debug) {
+    if (config.debug.all) {
       global.log.debug('Response: Search game on twitch ', body)
     }
 

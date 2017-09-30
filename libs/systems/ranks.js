@@ -1,10 +1,13 @@
 'use strict'
 
 // 3rdparty libraries
-var _ = require('lodash')
+const _ = require('lodash')
+
 // bot libraries
-var constants = require('../constants')
-var log = global.log
+const constants = require('../constants')
+
+// debug
+const debug = require('debug')('systems:ranks')
 
 /*
  * !rank                       - show user rank
@@ -25,12 +28,10 @@ function Ranks () {
     global.parser.register(this, '!rank help', this.help, constants.OWNER_ONLY)
     global.parser.register(this, '!rank', this.show, constants.VIEWERS)
 
-    // count Points - every 30s check points
-    var self = this
-    setInterval(function () {
-      self.updateRanks()
+    // count Points
+    setInterval(() => {
+      this.updateRanks()
     }, 60000)
-
     this.webPanel()
   }
 }
@@ -43,16 +44,15 @@ Ranks.prototype.webPanel = function () {
   global.panel.socketListening(this, 'ranks.edit', this.editSocket)
 }
 
-Ranks.prototype.listSocket = function (self, socket) {
-  global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, items) {
-    if (err) { log.error(err, { fnc: 'Ranks.prototype.listSocket' }) }
-    socket.emit('Ranks', items)
-  })
+Ranks.prototype.listSocket = async function (self, socket) {
+  let ranks = await global.db.engine.find('ranks')
+  socket.emit('Ranks', _.orderBy(ranks, 'hours', 'asc'))
 }
 
 Ranks.prototype.editSocket = function (self, socket, data) {
   if (data.value.length === 0) self.remove(self, null, data.id)
-  else global.botDB.update({ _id: 'rank_' + data.id }, { rank: data.value, hours: data.id })
+  console.log(data)
+  global.db.engine.update('ranks', { hours: parseInt(data.id, 10) }, { value: data.value })
   self.listSocket(self, socket)
 }
 
@@ -67,44 +67,57 @@ Ranks.prototype.createSocket = function (self, socket, data) {
 }
 
 Ranks.prototype.help = function (self, sender) {
+  if (debug.enabled) debug('help(self,%s)', JSON.stringify(sender))
   global.commons.sendMessage(global.translate('core.usage') + ': !rank add <hours> <rank> | !rank remove <hour> | !rank list | !rank set <username> <rank> | !rank unset <username>', sender)
 }
 
-Ranks.prototype.add = function (self, sender, text) {
-  try {
-    var parsed = text.match(/^(\d+) ([\u0500-\u052F\u0400-\u04FF\w].+)$/)
-    global.commons.insertIfNotExists({__id: 'rank_' + parsed[1], rank: parsed[2], _hours: parseInt(parsed[1], 10), success: 'rank.success.add', error: 'rank.failed.add'})
-  } catch (e) {
-    global.commons.sendMessage(global.translate('rank.failed.parse'), sender)
+Ranks.prototype.add = async function (self, sender, text) {
+  if (debug.enabled) debug('add(self, %s, %s)', JSON.stringify(sender), text)
+  const parsed = text.match(/^(\d+) ([\u0500-\u052F\u0400-\u04FF\w].+)$/)
+  if (_.isNil(parsed)) return global.commons.sendMessage(global.translate('rank.failed.parse'), sender)
+
+  const values = {
+    hours: parseInt(parsed[1], 10),
+    value: parsed[2]
   }
+
+  var ranks = await global.db.engine.find('ranks', { hours: values.hours })
+  if (ranks.length === 0) { global.db.engine.insert('ranks', values) }
+
+  global.commons.sendMessage(
+    global.translate(ranks.length === 0
+      ? 'rank.success.add' : 'rank.failed.add'
+    ), sender)
 }
 
-Ranks.prototype.list = function (self, sender, text) {
-  if (_.isNull(text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/))) {
-    global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, docs) {
-      if (err) { log.error(err, { fnc: 'Ranks.prototype.list' }) }
-      var list = []
-      if (!_.isNil(docs)) {
-        docs.forEach(function (e, i, ar) { list.push(e.hours + 'h - ' + e.rank) })
-      }
-      var output = (list.length === 0 ? global.translate('rank.failed.list') : global.translate('rank.success.list') + ': ' + list.join(', '))
-      global.commons.sendMessage(output, sender)
-    })
-  } else {
-    global.commons.sendMessage(global.translate('rank.failed.parse'), sender)
-  }
+Ranks.prototype.list = async function (self, sender) {
+  if (debug.enabled) debug('list(self, %s)', JSON.stringify(sender))
+  var list = await global.db.engine.find('ranks')
+  global.commons.sendMessage(
+    (list.length === 0
+      ? global.translate('rank.failed.list')
+      : global.translate('rank.success.list') + ': ' + _.map(_.orderBy(list, 'hours', 'asc'), function (l) { return l.hours + 'h - ' + l.value }).join(', '))
+    , sender)
 }
 
-Ranks.prototype.remove = function (self, sender, text) {
-  try {
-    var parsed = text.match(/^(\d+)$/)
-    global.commons.remove({__id: 'rank_' + parsed[1], success: 'rank.success.remove', error: 'rank.failed.notFound'})
-  } catch (e) {
-    global.commons.sendMessage(global.translate('rank.failed.parse'), sender)
+Ranks.prototype.remove = async function (self, sender, text) {
+  if (debug.enabled) debug('remove(self, %s, %s)', JSON.stringify(sender), text)
+  const parsed = text.match(/^(\d+)$/)
+  if (_.isNil(parsed)) return global.commons.sendMessage(global.translate('rank.failed.parse'), sender)
+
+  const values = {
+    hours: parseInt(parsed[1], 10)
   }
+
+  const removed = await global.db.engine.remove('ranks', values)
+  global.commons.sendMessage(
+    global.translate(removed > 0
+      ? 'rank.success.remove' : 'rank.failed.remove'
+    ), sender)
 }
 
 Ranks.prototype.set = function (self, sender, text) {
+  if (debug.enabled) debug('set(self, %s, %s)', JSON.stringify(sender), text)
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
     global.users.set(parsed[1], { custom: { rank: parsed[2].trim() } })
@@ -117,6 +130,7 @@ Ranks.prototype.set = function (self, sender, text) {
 }
 
 Ranks.prototype.unset = function (self, sender, text) {
+  if (debug.enabled) debug('unset(self, %s, %s)', JSON.stringify(sender), text)
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     global.users.set(parsed[1], { custom: { rank: null } })
@@ -128,26 +142,37 @@ Ranks.prototype.unset = function (self, sender, text) {
 }
 
 Ranks.prototype.show = function (self, sender) {
+  if (debug.enabled) debug('show(self, %s)', JSON.stringify(sender))
   let user = global.users.get(sender.username)
   let rank = !_.isNil(user.rank) ? user.rank : null
   rank = !_.isNil(user.custom.rank) ? user.custom.rank : rank
   global.commons.sendMessage(global.translate(!_.isNil(rank) ? 'rank.success.show' : 'rank.failed.show').replace(/\$rank/g, rank), sender)
 }
 
-Ranks.prototype.updateRanks = function () {
-  _.each(global.users.getAll({ is: { online: true } }), function (user) {
+Ranks.prototype.updateRanks = async function () {
+  if (debug.enabled) debug('updateRanks() users and ranks started')
+
+  let users = await global.users.getAll({ is: { online: true } })
+  let ranks = await global.db.engine.find('ranks')
+
+  if (debug.enabled) debug('updateRanks() %i online users and %i ranks loaded', users.length, ranks.length)
+
+  _.each(users, function (user) {
     var watchTime = user.time.watched
     watchTime = _.isFinite(parseInt(watchTime, 10)) && _.isNumber(parseInt(watchTime, 10)) ? (watchTime / 1000 / 60 / 60).toFixed(0) : 0
 
-    global.botDB.find({$where: function () { return this._id.startsWith('rank') }}).sort({ hours: 1 }).exec(function (err, items) {
-      if (err) { log.error(err, { fnc: 'Ranks.prototype.updateRanks' }) }
-      _.each(items, function (rank) {
-        if (watchTime >= parseInt(rank.hours, 10)) {
-          global.users.set(user.username, {rank: rank.rank})
-        }
-      })
+    let rankToUpdate
+    _.each(_.orderBy(ranks, 'hours', 'asc'), function (rank) {
+      if (watchTime >= parseInt(rank.hours, 10)) {
+        rankToUpdate = rank.value
+      } else {
+        global.users.set(user.username, {rank: rankToUpdate})
+        return false
+      }
     })
   })
+
+  if (debug.enabled) debug('updateRanks() finished')
 }
 
 module.exports = new Ranks()

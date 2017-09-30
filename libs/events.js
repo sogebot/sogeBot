@@ -88,7 +88,7 @@ function Events () {
       global.log[attr.level](message)
     },
     '_function': function (attr) {
-      attr.fnc(attr)
+      attr.fnc(_.clone(attr))
     }
   }
 
@@ -274,27 +274,19 @@ Events.prototype._new = function (self, socket, data) {
   self._send(self, socket)
 }
 
-Events.prototype._update = function (self) {
-  global.botDB.findOne({ _id: 'Events' }, function (err, item) {
-    if (err) return global.log.error(err, { fnc: 'Events.prototype._update' })
-    if (_.isNull(item)) {
-      self.loadSystemEvents(self)
-      return false
-    }
-    _.each(item.events, function (event, name) {
-      self.events[name] = event
-    })
-    self.loadSystemEvents(self)
+Events.prototype._update = async function (self) {
+  let events = await global.db.engine.find('events')
+  _.each(events, function (event) {
+    self.events[event.key] = [event.value]
   })
+  self.loadSystemEvents(self)
 }
 
 Events.prototype._save = function (self) {
-  var events = {
-    _id: 'Events',
-    events: self.removeSystemEvents(self)
-  }
-  global.botDB.remove({ _id: 'Events' })
-  global.botDB.insert(events)
+  let events = self.removeSystemEvents(self)
+  _.each(events, function (event, key) {
+    global.db.engine.update('events', { key: key }, { key: key, value: event[0] })
+  })
 }
 
 Events.prototype.fire = function (event, attr) {

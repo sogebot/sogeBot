@@ -360,12 +360,11 @@
 
       socket.on('widgets', function(widgets) {
         _.each(widgets, function(widget) {
-          widget = widget.split(':')
-          if (loadedWidgets.indexOf(widget[1]) === -1) {
-            $("#widgetRow" + widget[0]).append($('<div id="' + widget[1] + '">').load('widgets/' + widget[1] + '.html', function () {
+          if (loadedWidgets.indexOf(widget.widget) === -1) {
+            $("#widgetRow" + widget.column).append($('<div id="' + widget.widget + '">').load('widgets/' + widget.widget + '.html', function () {
               commons.translate()
             }))
-            loadedWidgets.push(widget[1])
+            loadedWidgets.push(widget.widget)
           }
         })
       })

@@ -5,7 +5,7 @@ var _ = require('lodash')
 function QueueWidget () {
   this.timestamp = 0
 
-  if (global.configuration.get().systems.queue !== true) return
+  if (!global.commons.isSystemEnabled('queue')) return
   global.panel.addWidget('queue', 'widget-title-queue', 'heart-empty')
   global.panel.socketListening(this, 'queue.get', this.sendQueue)
   global.panel.socketListening(this, 'queue.setLocked', this.setLocked)
