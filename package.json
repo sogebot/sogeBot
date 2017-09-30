@@ -28,6 +28,7 @@
     "mathjs": "^3.16.3",
     "moment": "^2.18.1",
     "moment-precise-range-plugin": "^1.2.4",
+    "mongodb": "^2.2.31",
     "nedb": "^1.8.0",
     "nedb-promise": "^2.0.1",
     "node-hue-api": "^2.4.2",
@@ -51,6 +52,7 @@
     "test:config": "cp config.json config.backup.json > /dev/null; cp config.example.json config.json",
     "test:revert": "cp config.backup.json config.json > /dev/null | true",
     "start": "node ./tools/migrate && npm run copy:dist && node ./main || true",
+    "start-no-migration": "npm run copy:dist && node ./main || true",
     "debug": "npm run copy:dist && node --inspect ./main || true",
     "cleanup:dist": "rm -rf ./public/dist/bootstrap* ./public/dist/carousel/* ./public/dist/gallery/* ./public/dist/jquery ./public/dist/lodash ./public/dist/velocity-animate",
     "copy:dist": "node tools/copy-dist-files.js"
