@@ -29,6 +29,7 @@ class IMongoDB extends Interface {
 
     let db = await this.connection()
     let collection = await db.collection(table)
+    collection.createIndex('_id')
     let items = await collection.find(where)
     return items.toArray()
   }
@@ -38,6 +39,7 @@ class IMongoDB extends Interface {
 
     let db = await this.connection()
     let collection = await db.collection(table)
+    collection.createIndex('_id')
     let item = await collection.findOne(where)
     return item || {}
   }
@@ -47,6 +49,7 @@ class IMongoDB extends Interface {
 
     let db = await this.connection()
     let collection = await db.collection(table)
+    collection.createIndex('_id')
     let item = await collection.insert(object)
     return _.size(item)
   }
@@ -56,6 +59,7 @@ class IMongoDB extends Interface {
 
     let db = await this.connection()
     let collection = await db.collection(table)
+    collection.createIndex('_id')
 
     let result = await collection.update(
       where,
@@ -72,6 +76,7 @@ class IMongoDB extends Interface {
 
     let db = await this.connection()
     let collection = await db.collection(table)
+    collection.createIndex('_id')
     let result = await collection.remove(where)
     return result.nRemoved
   }
@@ -83,6 +88,7 @@ class IMongoDB extends Interface {
 
     let db = await this.connection()
     let collection = await db.collection(table)
+    collection.createIndex('_id')
 
     let result
     if (_.size(where) === 0) {
