@@ -116,15 +116,17 @@ global.client.on('message', async function (channel, sender, message, fromSelf) 
     if (sender['message-type'] !== 'whisper') {
       global.parser.timer.push({ 'id': sender.id, 'received': new Date().getTime() })
       global.log.chatIn(message, {username: sender.username})
-      global.events.fire('command-send-x-times', { message: message })
+      global.events.fire('command-send-x-times', { message: message });
 
-      const user = await global.users.get(sender.username)
+      (async () => {
+        const user = await global.users.get(sender.username)
 
-      if (!_.isNil(user.id)) global.users.isFollower(user.username)
-      if (!message.startsWith('!')) global.db.engine.increment('users', { username: user.username }, { stats: { messages: 1 } })
+        if (!_.isNil(user.id)) global.users.isFollower(user.username)
+        if (!message.startsWith('!')) global.db.engine.increment('users', { username: user.username }, { stats: { messages: 1 } })
 
-      // set is.mod
-      global.users.set(user.username, { is: { mod: user.mod } })
+        // set is.mod
+        global.users.set(user.username, { is: { mod: user.mod } })
+      })()
 
       global.parser.parse(sender, message)
     } else {
