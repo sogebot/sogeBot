@@ -201,6 +201,8 @@ global.client.on('subscription', async function (channel, username, method) {
   if (debug.enabled) debug('Subscription: %s from %s', username, method)
   global.users.set(username, { is: { subscriber: true } })
   global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
+
+  if (!_.isArray(global.twitch.cached.subscribers)) global.twitch.cached.subscribers = []
   global.twitch.cached.subscribers.unshift(username)
   global.twitch.cached.subscribers = _.chunk(global.twitch.cached.subscribers, 100)[0]
 })
@@ -209,6 +211,8 @@ global.client.on('resub', async function (channel, username, months, message) {
   if (debug.enabled) debug('Resub: %s (%s months) - %s', username, months, message)
   global.users.set(username, { is: { subscriber: true } })
   global.events.fire('resub', { username: username, months: months, message: message })
+
+  if (!_.isArray(global.twitch.cached.subscribers)) global.twitch.cached.subscribers = []
   global.twitch.cached.subscribers.unshift(username + ', ' + months + ' ' + global.parser.getLocalizedName(months, 'core.months'))
   global.twitch.cached.subscribers = _.chunk(global.twitch.cached.subscribers, 100)[0]
 })
