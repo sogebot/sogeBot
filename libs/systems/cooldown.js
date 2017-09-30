@@ -6,6 +6,8 @@ var _ = require('lodash')
 // bot libraries
 var constants = require('../constants')
 
+const debug = require('debug')('systems:cooldown')
+
 /*
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
  * !cooldown toggle moderators [keyword|!command]                    - enable/disable specified keyword or !command cooldown for moderators
@@ -95,6 +97,7 @@ Cooldown.prototype.set = function (self, sender, text) {
 }
 
 Cooldown.prototype.check = async function (self, id, sender, text) {
+  debug('check start')
   var data, cmdMatch, viewer, timestamp, now
 
   cmdMatch = text.match(/^(![\u0500-\u052F\u0400-\u04FF\w]+)/)
@@ -115,8 +118,12 @@ Cooldown.prototype.check = async function (self, id, sender, text) {
       owner: cooldown.owner
     }]
   } else { // text
-    let keywords = await global.db.engine.find('keywords')
-    let cooldowns = await global.db.engine.find('cooldowns')
+    let keywords = global.db.engine.find('keywords')
+    let cooldowns = global.db.engine.find('cooldowns')
+
+    await keywords
+    await cooldowns
+
     keywords = _.filter(keywords, function (o) {
       return text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
     })
@@ -138,6 +145,7 @@ Cooldown.prototype.check = async function (self, id, sender, text) {
     })
   }
   if (!_.some(data, { enabled: true })) { // parse ok if all cooldowns are disabled
+    debug('cooldowns disabled')
     global.updateQueue(id, true)
     return
   }
@@ -178,6 +186,7 @@ Cooldown.prototype.check = async function (self, id, sender, text) {
       return false // disable _.each and updateQueue with false
     }
   })
+  debug('cooldowns result %s', result)
   global.updateQueue(id, result)
 }
 
