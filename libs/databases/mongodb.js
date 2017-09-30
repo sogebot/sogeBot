@@ -29,7 +29,7 @@ class IMongoDB extends Interface {
 
     let db = await this.connection()
     let collection = await db.collection(table)
-    collection.createIndex('_id')
+    if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
     let items = await collection.find(where)
     return items.toArray()
   }
@@ -39,7 +39,7 @@ class IMongoDB extends Interface {
 
     let db = await this.connection()
     let collection = await db.collection(table)
-    collection.createIndex('_id')
+    if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
     let item = await collection.findOne(where)
     return item || {}
   }
@@ -49,7 +49,7 @@ class IMongoDB extends Interface {
 
     let db = await this.connection()
     let collection = await db.collection(table)
-    collection.createIndex('_id')
+    if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
     let item = await collection.insert(object)
     return _.size(item)
   }
@@ -59,7 +59,7 @@ class IMongoDB extends Interface {
 
     let db = await this.connection()
     let collection = await db.collection(table)
-    collection.createIndex('_id')
+    if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
 
     let result = await collection.update(
       where,
@@ -76,7 +76,7 @@ class IMongoDB extends Interface {
 
     let db = await this.connection()
     let collection = await db.collection(table)
-    collection.createIndex('_id')
+    if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
     let result = await collection.remove(where)
     return result.nRemoved
   }
@@ -88,7 +88,7 @@ class IMongoDB extends Interface {
 
     let db = await this.connection()
     let collection = await db.collection(table)
-    collection.createIndex('_id')
+    if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
 
     let result
     if (_.size(where) === 0) {
