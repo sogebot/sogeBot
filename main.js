@@ -50,6 +50,9 @@ global.events = new Events()
 global.permissions = new Permissions()
 global.translate = require('./libs/translate')
 
+// panel
+global.logger._panel()
+
 global.status = {
   'TMI': constants.DISCONNECTED,
   'API': constants.DISCONNECTED,

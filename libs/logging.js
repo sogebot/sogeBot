@@ -119,11 +119,11 @@ global.log = new (winston.Logger)({
 
 function Logger () {
   this.files = []
+}
 
-  setTimeout(function () {
-    global.panel.addMenu({category: 'main', name: 'logger', id: 'logger'})
-    global.panel.socketListening(this, 'log.get', this.send)
-  }, 1000)
+Logger.prototype._panel = () => {
+  global.panel.addMenu({category: 'main', name: 'logger', id: 'logger'})
+  global.panel.socketListening(global.logger, 'log.get', global.logger.send)
 }
 
 Logger.prototype.send = async function (self, socket, filters) {
