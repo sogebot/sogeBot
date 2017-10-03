@@ -88,7 +88,7 @@ Alias.prototype.help = function (self, sender) {
   global.commons.sendMessage(global.translate('core.usage') + ': !alias add <!command> <!alias> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', sender)
 }
 
-Alias.prototype.add = function (self, sender, text) {
+Alias.prototype.add = async function (self, sender, text) {
   try {
     let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w\S ]+) !([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
     let alias = {
@@ -103,7 +103,7 @@ Alias.prototype.add = function (self, sender, text) {
       return
     }
 
-    global.db.engine.update('alias', { alias: alias.alias }, alias)
+    await global.db.engine.update('alias', { alias: alias.alias }, alias)
     self.register(self)
     global.commons.sendMessage(global.translate('alias.success.add'), sender)
   } catch (e) {

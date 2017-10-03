@@ -2,6 +2,7 @@
 
 // 3rdparty libraries
 var _ = require('lodash')
+const crypto = require('crypto')
 // bot libraries
 var constants = require('../constants')
 
@@ -76,7 +77,7 @@ Notice.prototype.createNotice = function (self, socket, data) {
 
 Notice.prototype.editNotice = async function (self, socket, data) {
   if (data.value.length === 0) self.remove(self, null, data.id)
-  else await global.db.engine.update('notices', { _id: data.id }, { text: data.value })
+  else await global.db.engine.update('notices', { key: data.id }, { text: data.value })
   self.sendNotices(self, socket)
 }
 
@@ -106,7 +107,7 @@ Notice.prototype.send = async function () {
     global.commons.sendMessage(notice.text, {username: global.parser.getOwner()})
 
     // update notice
-    global.db.engine.update('notices', { _id: notice._id }, { time: this.lastNoticeSent })
+    global.db.engine.update('notices', { key: notice.key }, { time: this.lastNoticeSent })
   }
 }
 
@@ -119,7 +120,8 @@ Notice.prototype.add = async function (self, sender, text) {
     let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
     let notice = { text: parsed[0], time: new Date().getTime(), enabled: true }
 
-    await global.db.engine.update('notices', { text: notice.text }, notice)
+    let key = crypto.randomBytes(4).toString('hex')
+    await global.db.engine.update('notices', { text: notice.text, key: key }, notice)
     global.commons.sendMessage(global.translate('notice.success.add'), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
@@ -128,16 +130,17 @@ Notice.prototype.add = async function (self, sender, text) {
 
 Notice.prototype.list = async function (self, sender) {
   let notices = await global.db.engine.find('notices')
-  var output = (notices.length === 0 ? global.translate('notice.failed.list') : global.translate('notice.success.list') + ': ' + _.map(notices, '_id').join(', '))
+  var output = (notices.length === 0 ? global.translate('notice.failed.list') : global.translate('notice.success.list') + ': ' + _.map(notices, 'key').join(', '))
   global.commons.sendMessage(output, sender)
 }
 
 Notice.prototype.get = async function (self, sender, text) {
   try {
+    text = _.isString(text) ? text : text.toString()
     const id = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
-    const notice = await global.db.engine.findOne('notices', { _id: id })
+    const notice = await global.db.engine.findOne('notices', { key: id })
     if (_.isEmpty(notice)) throw Error(ERROR_DOESNT_EXISTS)
-    global.commons.sendMessage('Notice#' + notice._id + ': ' + notice.text, sender)
+    global.commons.sendMessage('Notice#' + notice.key + ': ' + notice.text, sender)
   } catch (e) {
     switch (e.message) {
       case ERROR_DOESNT_EXISTS:
@@ -151,17 +154,18 @@ Notice.prototype.get = async function (self, sender, text) {
 
 Notice.prototype.toggle = async function (self, sender, text) {
   try {
+    text = _.isString(text) ? text : text.toString()
     const id = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
-    const notice = await global.db.engine.findOne('notices', { _id: id })
+    const notice = await global.db.engine.findOne('notices', { key: id })
     if (_.isEmpty(notice)) {
       global.commons.sendMessage(global.translate('notice.failed.toggle')
         .replace(/\$notice/g, id), sender)
       return
     }
 
-    await global.db.engine.update('notices', { _id: notice._id }, { enabled: !notice.enabled })
+    await global.db.engine.update('notices', { key: notice.key }, { enabled: !notice.enabled })
     global.commons.sendMessage(global.translate(!notice.enabled ? 'notice.success.enabled' : 'notice.success.disabled')
-      .replace(/\$notice/g, notice._id), sender)
+      .replace(/\$notice/g, notice.key), sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('notice.failed.parse'), sender)
   }
@@ -169,8 +173,9 @@ Notice.prototype.toggle = async function (self, sender, text) {
 
 Notice.prototype.remove = async function (self, sender, text) {
   try {
+    text = _.isString(text) ? text : text.toString()
     let id = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
-    let removed = await global.db.engine.remove('notices', { _id: id })
+    let removed = await global.db.engine.remove('notices', { key: id })
     if (!removed) throw Error(ERROR_DOESNT_EXISTS)
     global.commons.sendMessage(global.translate('notice.success.remove'), sender)
   } catch (e) {

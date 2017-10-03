@@ -15,13 +15,13 @@ const testUser2 = { username: 'test2' }
 require('../main.js')
 
 describe('System - Cooldowns', () => {
-  beforeEach(async function () {
+  beforeEach(function () {
     global.commons.sendMessage.reset()
   })
   afterEach(async function () {
     let items = await global.db.engine.find('cooldowns')
     _.each(items, async (item) => {
-      await global.db.engine.remove('cooldowns', { _id: item._id })
+      await global.db.engine.remove('cooldowns', { key: item.key })
     })
   })
   describe('#fnc', () => {

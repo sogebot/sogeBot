@@ -72,6 +72,7 @@ class IMongoDB extends Interface {
     this.on(table) // init table
 
     if (_.isEmpty(object)) throw Error('Object cannot be empty')
+    delete object._id
 
     let db = await this.connection(table)
     let collection = await db.collection(table)
@@ -86,6 +87,7 @@ class IMongoDB extends Interface {
     this.on(table) // init table
 
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
+    delete object._id
 
     // invalidate cache on update
     var keys = this.cache[table].keys()
@@ -106,7 +108,10 @@ class IMongoDB extends Interface {
         multi: _.isEmpty(where)
       }
     )
-    return result.nMatched
+    if (table === 'alias') {
+      console.log(result)
+    }
+    return result.result.n
   }
 
   async remove (table, where) {
@@ -126,13 +131,14 @@ class IMongoDB extends Interface {
     let collection = await db.collection(table)
     if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
     let result = await collection.remove(where)
-    return result.nRemoved
+    return result.result.n
   }
 
   async update (table, where, object) {
     this.on(table) // init table
 
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
+    delete object._id
 
     // invalidate cache on update
     var keys = this.cache[table].keys()
@@ -159,7 +165,7 @@ class IMongoDB extends Interface {
         }
       )
     }
-    return result.nMatched
+    return _.isNil(result.result.upserted) ? result.result.nModified : _.size(result.result.upserted)
   }
 }
 

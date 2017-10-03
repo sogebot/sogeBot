@@ -9,9 +9,16 @@ const owner = { username: 'soge__' }
 const testUser = { username: 'test' }
 
 describe('System - Moderation', function () {
-  before(() => {
+  before(async () => {
     // enable links with spaces to be moderated
+    global.commons.sendMessage.reset()
     global.parser.parse(owner, '!set moderationLinksWithSpaces true')
+    await until(() => {
+      if (global.commons.sendMessage.called) {
+        return global.commons.sendMessage.calledWith(
+          global.translate('moderation.settings.moderationLinksWithSpaces.true'))
+      } else return false
+    }, 5000)
   })
   beforeEach(() => {
     global.commons.timeout.reset()

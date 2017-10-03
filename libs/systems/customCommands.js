@@ -95,7 +95,7 @@ CustomCommands.prototype.add = async function (self, sender, text) {
       return
     }
 
-    global.db.engine.update('commands', { command: parsed[1] }, command)
+    await global.db.engine.update('commands', { command: parsed[1] }, command)
     self.register(self)
     global.commons.sendMessage(global.translate('customcmds.success.add'), sender)
   } catch (e) {
@@ -121,7 +121,7 @@ CustomCommands.prototype.run = async function (self, sender, msg, fullMsg) {
 
 CustomCommands.prototype.list = async function (self, sender, text) {
   let commands = await global.db.engine.find('commands', { visible: true })
-  var output = (commands.length === 0 ? global.translate('customcmds.failed.list') : global.translate('customcmds.success.list') + ': !' + commands.join(', !'))
+  var output = (commands.length === 0 ? global.translate('customcmds.failed.list') : global.translate('customcmds.success.list') + ': !' + _.map(commands, 'command').join(', !'))
   global.commons.sendMessage(output, sender)
 }
 

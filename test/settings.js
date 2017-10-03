@@ -17,7 +17,7 @@ describe('Settings tests', () => {
     global.configuration.register('testNumber', 'settings.testNumber', 'number', 1)
     global.configuration.register('testString', 'settings.testString', 'string', 'test')
   })
-  beforeEach(async function () {
+  beforeEach(function () {
     global.commons.sendMessage.reset()
   })
   after(async function () {

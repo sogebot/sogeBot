@@ -13,7 +13,7 @@ const owner = { username: 'soge__' }
 require('../main.js')
 
 describe('System - Custom Commands', () => {
-  beforeEach(async function () {
+  beforeEach(function () {
     global.commons.sendMessage.reset()
   })
   afterEach(async function () {
@@ -71,9 +71,12 @@ describe('System - Custom Commands', () => {
       it('list: /not empty/', async () => {
         global.systems.customCommands.add(global.systems.customCommands, owner, '!' + crypto.randomBytes(4).toString('hex') + ' Lorem Ipsun')
         global.systems.customCommands.add(global.systems.customCommands, owner, '!' + crypto.randomBytes(4).toString('hex') + ' Lorem Ipsum')
+        await until(() => global.commons.sendMessage.calledTwice, 5000)
+
+        global.commons.sendMessage.reset()
         global.systems.customCommands.list(global.systems.customCommands, owner)
-        await until(() => global.commons.sendMessage.calledThrice, 5000)
-        assert.isTrue(global.commons.sendMessage.thirdCall.args[0].startsWith(
+        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        assert.isTrue(global.commons.sendMessage.firstCall.args[0].startsWith(
           global.translate('customcmds.success.list')))
       })
     })

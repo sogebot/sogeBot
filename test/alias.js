@@ -9,7 +9,7 @@ require('./general.js')
 const owner = { username: 'soge__' }
 
 describe('System - Alias', () => {
-  beforeEach(async function () {
+  beforeEach(function () {
     global.commons.sendMessage.reset()
   })
   afterEach(async function () {
@@ -43,9 +43,9 @@ describe('System - Alias', () => {
       it('text: !uptime !mee', async () => {
         global.systems.alias.add(global.systems.alias, owner, '!uptime !mee')
         await until(() => global.commons.sendMessage.calledOnce, 5000)
-        let item = await global.db.engine.findOne('alias', { alias: 'mee' })
-
         assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('alias.success.add'))
+
+        let item = await global.db.engine.findOne('alias', { alias: 'mee' })
         assert.notEmpty(item)
         assert.equal(item.alias, 'mee')
         assert.equal(item.command, 'uptime')

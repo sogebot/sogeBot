@@ -72,7 +72,7 @@ Cooldown.prototype.sToggleOwners = function (self, socket, data) {
   self.sSend(self, socket)
 }
 
-Cooldown.prototype.set = function (self, sender, text) {
+Cooldown.prototype.set = async function (self, sender, text) {
   var data, match
 
   try {
@@ -84,13 +84,13 @@ Cooldown.prototype.set = function (self, sender, text) {
   }
 
   if (parseInt(data.seconds, 10) !== 0) {
-    global.db.engine.update('cooldowns', { key: data.command, type: data.type }, { miliseconds: data.seconds * 1000, type: data.type, timestamp: 0, quiet: data.quiet, enabled: data.enabled, owner: false, moderator: false })
+    await global.db.engine.update('cooldowns', { key: data.command, type: data.type }, { miliseconds: data.seconds * 1000, type: data.type, timestamp: 0, quiet: data.quiet, enabled: data.enabled, owner: false, moderator: false })
     global.commons.sendMessage(global.translate('cooldown.success.set')
       .replace(/\$command/g, data.command)
       .replace(/\$type/g, data.type)
       .replace(/\$seconds/g, data.seconds), sender)
   } else {
-    global.db.engine.remove('cooldowns', { key: data.command, type: data.type })
+    await global.db.engine.remove('cooldowns', { key: data.command, type: data.type })
     global.commons.sendMessage(global.translate('cooldown.success.unset')
       .replace(/\$command/g, data.command), sender)
   }

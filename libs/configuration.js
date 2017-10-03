@@ -46,15 +46,15 @@ Configuration.prototype.setValue = async function (self, sender, text) {
     if (filter === 'number' && Number.isInteger(parseInt(value, 10))) {
       value = parseInt(value, 10)
 
-      let updated = await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
-      if (updated > 0) global.commons.sendToOwners(global.translate(self.cfgL[cmd].success).replace(/\$value/g, value))
+      await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
+      global.commons.sendToOwners(global.translate(self.cfgL[cmd].success).replace(/\$value/g, value))
 
       self.cfgL[cmd].value = value
     } else if (filter === 'bool' && (value === 'true' || value === 'false' || _.isBoolean(value))) {
       value = !_.isBoolean(value) ? (value.toLowerCase() === 'true') : value
 
-      let updated = await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
-      if (updated > 0) global.commons.sendToOwners(global.translate(self.cfgL[cmd].success + '.' + value).replace(/\$value/g, value))
+      await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
+      global.commons.sendToOwners(global.translate(self.cfgL[cmd].success + '.' + value).replace(/\$value/g, value))
 
       self.cfgL[cmd].value = value
     } else if (filter === 'string' && !(value === 'true' || value === 'false' || _.isBoolean(value)) && !Number.isInteger(parseInt(value, 10))) {
@@ -63,8 +63,8 @@ Configuration.prototype.setValue = async function (self, sender, text) {
         global.commons.sendToOwners(global.translate('core.lang-selected'))
         global.panel.io.emit('lang', global.translate({root: 'webpanel'}))
       }
-      let updated = await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
-      if (updated > 0 && cmd !== 'lang') global.commons.sendToOwners(global.translate(self.cfgL[cmd].success).replace(/\$value/g, value))
+      await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
+      if (cmd !== 'lang') global.commons.sendToOwners(global.translate(self.cfgL[cmd].success).replace(/\$value/g, value))
     } else global.commons.sendMessage('Sorry, $sender, cannot parse !set command.', sender)
 
     let emit = {}

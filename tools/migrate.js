@@ -87,6 +87,7 @@ let migration = {
 
       console.info('Migrating %i notices', _.size(items.notices))
       for (let item of _.values(items.notices)) {
+        item.key = item.id
         delete item.id
         await global.db.engine.update('notices', item, item)
       }
