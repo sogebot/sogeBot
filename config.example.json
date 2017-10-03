@@ -19,7 +19,10 @@
   },
   "database": {
     "__README__": "TBD",
-    "type": "nedb"
+    "type": "nedb",
+    "mongodb": {
+      "url": "mongodb://localhost:27017/changeit"
+    }
   },
   "systems": {
     "notice": true,
