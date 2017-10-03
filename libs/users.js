@@ -20,15 +20,17 @@ function Users () {
   this.setAll({ is: { online: false } })
 
   setInterval(async () => {
-    // count subscribers
-    let users = await global.users.getAll({ is: { subscriber: true } })
-    global.twitch.current.subscribers = _.size(users)
-
     if (this.rate_limit_follower_check.length > 0) {
       this.rate_limit_follower_check = _.uniq(this.rate_limit_follower_check)
       this.isFollowerUpdate(this.rate_limit_follower_check.shift())
     }
   }, 1000) // run follower ONE request every second
+
+  setInterval(async () => {
+    // count subscribers
+    let users = await global.users.getAll({ is: { subscriber: true } })
+    global.twitch.current.subscribers = _.size(users)
+  }, 10000)
 
   setInterval(async () => {
     let increment = this.increment
