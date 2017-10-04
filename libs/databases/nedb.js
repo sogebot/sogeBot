@@ -60,7 +60,7 @@ class INeDB extends Interface {
     // get from cache
     var keys = this.cache[table].keys()
     for (let key of keys) {
-      if (_.filter(this.cache[table].get(key), where)) {
+      if (!_.isEmpty((_.filter(this.cache[table].get(key), where)))) {
         return this.cache[table].get(key)
       }
     }
@@ -70,7 +70,6 @@ class INeDB extends Interface {
       self.on(table).findOne(flatten(where), function (err, item) {
         if (err) reject(err)
         if (debug.enabled) debug('findOne() \n\ttable: %s \n\twhere: %j \n\titem: %j', table, where, _.isNil(item) ? {} : item)
-
         if (!_.isNil(item)) self.cache[table].put(item._id, item)
         resolve(_.isNil(item) ? {} : item)
       })
@@ -102,7 +101,7 @@ class INeDB extends Interface {
     // remove from cache
     var keys = this.cache[table].keys()
     for (let key of keys) {
-      if (_.filter(this.cache[table].get(key), where)) {
+      if (!_.isEmpty((_.filter(this.cache[table].get(key), where)))) {
         this.cache[table].del(key)
       }
     }
@@ -125,7 +124,7 @@ class INeDB extends Interface {
     // invalidate cache on update
     var keys = this.cache[table].keys()
     for (let key of keys) {
-      if (_.filter(this.cache[table].get(key), where)) {
+      if (!_.isEmpty((_.filter(this.cache[table].get(key), where)))) {
         this.cache[table].del(key)
       }
     }
@@ -148,7 +147,7 @@ class INeDB extends Interface {
     // invalidate cache on update
     var keys = this.cache[table].keys()
     for (let key of keys) {
-      if (_.filter(this.cache[table].get(key), where)) {
+      if (!_.isEmpty((_.filter(this.cache[table].get(key), where)))) {
         this.cache[table].del(key)
       }
     }

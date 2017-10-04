@@ -55,7 +55,7 @@ class IMongoDB extends Interface {
     // get from cache
     var keys = this.cache[table].keys()
     for (let key of keys) {
-      if (_.filter(this.cache[table].get(key), where)) {
+      if (!_.isEmpty((_.filter(this.cache[table].get(key), where)))) {
         return this.cache[table].get(key)
       }
     }
@@ -92,7 +92,7 @@ class IMongoDB extends Interface {
     // invalidate cache on update
     var keys = this.cache[table].keys()
     for (let key of keys) {
-      if (_.filter(this.cache[table].get(key), where)) {
+      if (!_.isEmpty((_.filter(this.cache[table].get(key), where)))) {
         this.cache[table].del(key)
       }
     }
@@ -122,7 +122,7 @@ class IMongoDB extends Interface {
     // remove cache
     var keys = this.cache[table].keys()
     for (let key of keys) {
-      if (_.filter(this.cache[table].get(key), where)) {
+      if (!_.isEmpty((_.filter(this.cache[table].get(key), where)))) {
         this.cache[table].del(key)
       }
     }
@@ -143,7 +143,7 @@ class IMongoDB extends Interface {
     // invalidate cache on update
     var keys = this.cache[table].keys()
     for (let key of keys) {
-      if (_.filter(this.cache[table].get(key), where)) {
+      if (!_.isEmpty((_.filter(this.cache[table].get(key), where)))) {
         this.cache[table].del(key)
       }
     }
