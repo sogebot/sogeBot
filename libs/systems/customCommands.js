@@ -6,9 +6,6 @@ var _ = require('lodash')
 // bot libraries
 var constants = require('../constants')
 
-const ERROR_ALREADY_EXISTS = '0'
-const ERROR_DOESNT_EXISTS = '1'
-
 /*
  * !command                          - gets an info about command usage
  * !command add ![cmd] [response]    - add command with specified response
@@ -84,39 +81,36 @@ CustomCommands.prototype.register = async function (self) {
 }
 
 CustomCommands.prototype.add = async function (self, sender, text) {
-  try {
-    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
-    let command = { command: parsed[1], response: parsed[2], enabled: true, visible: true }
+  let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
 
-    if (!_.isEmpty(await global.db.engine.findOne('commands', { command: parsed[1] }))) throw Error(ERROR_ALREADY_EXISTS)
-
-    if (global.parser.isRegistered(command.command)) {
-      global.commons.sendMessage(global.translate('core.isRegistered').replace(/\$keyword/g, '!' + command.command), sender)
-      return
-    }
-
-    await global.db.engine.update('commands', { command: parsed[1] }, command)
-    self.register(self)
-    global.commons.sendMessage(global.translate('customcmds.success.add'), sender)
-  } catch (e) {
-    switch (e.message) {
-      case ERROR_ALREADY_EXISTS:
-        global.commons.sendMessage(global.translate('customcmds.failed.add'), sender)
-        break
-      default:
-        global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
-    }
+  if (_.isNil(parsed)) {
+    global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
+    return false
   }
+
+  let command = { command: parsed[1], response: parsed[2], enabled: true, visible: true }
+
+  let exists = await global.db.engine.findOne('commands', { command: parsed[1] })
+  if (!_.isEmpty(exists)) {
+    global.commons.sendMessage(global.translate('customcmds.failed.add'), sender)
+    return false
+  }
+
+  if (global.parser.isRegistered(command.command)) {
+    global.commons.sendMessage(global.translate('core.isRegistered').replace(/\$keyword/g, '!' + command.command), sender)
+    return false
+  }
+
+  await global.db.engine.insert('commands', command)
+  await self.register(self)
+  global.commons.sendMessage(global.translate('customcmds.success.add'), sender)
 }
 
 CustomCommands.prototype.run = async function (self, sender, msg, fullMsg) {
   let parsed = fullMsg.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
   let command = await global.db.engine.findOne('commands', { command: parsed[1].toLowerCase(), enabled: true })
-  try {
-    global.commons.sendMessage(command.response, sender, {'param': msg, 'cmd': command})
-  } catch (e) {
-    global.parser.unregister(fullMsg)
-  }
+  if (!_.isEmpty(command)) global.commons.sendMessage(command.response, sender, {'param': msg, 'cmd': command})
+  else global.parser.unregister(fullMsg)
 }
 
 CustomCommands.prototype.list = async function (self, sender, text) {
@@ -126,59 +120,62 @@ CustomCommands.prototype.list = async function (self, sender, text) {
 }
 
 CustomCommands.prototype.toggle = async function (self, sender, text) {
-  try {
-    const id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
-    const command = await global.db.engine.findOne('commands', { command: id })
-    if (_.isEmpty(command)) {
-      global.commons.sendMessage(global.translate('customcmds.failed.toggle')
-        .replace(/\$command/g, id), sender)
-      return
-    }
-
-    await global.db.engine.update('commands', { command: id }, { enabled: !command.enabled })
-    self.register(self)
-
-    global.commons.sendMessage(global.translate(!command.enabled ? 'customcmds.success.enabled' : 'customcmds.success.disabled')
-      .replace(/\$command/g, command.command), sender)
-  } catch (e) {
+  let id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+  if (_.isNil(id)) {
     global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
+    return false
   }
+  id = id[1]
+
+  const command = await global.db.engine.findOne('commands', { command: id })
+  if (_.isEmpty(command)) {
+    global.commons.sendMessage(global.translate('customcmds.failed.toggle')
+      .replace(/\$command/g, id), sender)
+    return false
+  }
+
+  await global.db.engine.update('commands', { command: id }, { enabled: !command.enabled })
+  await self.register(self)
+
+  global.commons.sendMessage(global.translate(!command.enabled ? 'customcmds.success.enabled' : 'customcmds.success.disabled')
+    .replace(/\$command/g, command.command), sender)
 }
 
 CustomCommands.prototype.visible = async function (self, sender, text) {
-  try {
-    const id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
-    const command = await global.db.engine.findOne('commands', { command: id })
-    if (_.isEmpty(command)) {
-      global.commons.sendMessage(global.translate('customcmds.failed.visible')
-        .replace(/\$command/g, id), sender)
-      return
-    }
-
-    await global.db.engine.update('commands', { command: id }, { visible: !command.visible })
-    global.commons.sendMessage(global.translate(!command.visible ? 'customcmds.success.visible' : 'customcmds.success.invisible')
-      .replace(/\$command/g, id), sender)
-  } catch (e) {
+  let id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+  if (_.isNil(id)) {
     global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
+    return false
   }
+  id = id[1]
+
+  const command = await global.db.engine.findOne('commands', { command: id })
+  if (_.isEmpty(command)) {
+    global.commons.sendMessage(global.translate('customcmds.failed.visible')
+      .replace(/\$command/g, id), sender)
+    return
+  }
+
+  await global.db.engine.update('commands', { command: id }, { visible: !command.visible })
+  global.commons.sendMessage(global.translate(!command.visible ? 'customcmds.success.visible' : 'customcmds.success.invisible')
+    .replace(/\$command/g, id), sender)
 }
 
 CustomCommands.prototype.remove = async function (self, sender, text) {
-  try {
-    let id = text.match(/^!?([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
-    let removed = await global.db.engine.remove('commands', { command: id })
-    if (!removed) throw Error(ERROR_DOESNT_EXISTS)
-    global.parser.unregister('!' + id)
-    global.commons.sendMessage(global.translate('customcmds.success.remove'), sender)
-  } catch (e) {
-    switch (e.message) {
-      case ERROR_DOESNT_EXISTS:
-        global.commons.sendMessage(global.translate('customcmds.failed.remove'), sender)
-        break
-      default:
-        global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
-    }
+  let id = text.match(/^!?([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+  if (_.isNil(id)) {
+    global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
+    return false
   }
+  id = id[1]
+
+  let removed = await global.db.engine.remove('commands', { command: id })
+  if (!removed) {
+    global.commons.sendMessage(global.translate('customcmds.failed.remove'), sender)
+    return false
+  }
+  global.parser.unregister('!' + id)
+  global.commons.sendMessage(global.translate('customcmds.success.remove'), sender)
 }
 
 module.exports = new CustomCommands()
