@@ -89,7 +89,7 @@ Notice.prototype.sendConfiguration = function (self, socket) {
 }
 
 Notice.prototype.send = async function () {
-  var timeIntervalInMs = global.configuration.getValue('noticeInterval') * 60 * 1000
+  var timeIntervalInMs = global.configuration.getValue('noticeInterval') * 1000
   var noticeMinChatMsg = global.configuration.getValue('noticeMsgReq')
   var now = new Date().getTime()
 
@@ -130,7 +130,7 @@ Notice.prototype.add = async function (self, sender, text) {
 
 Notice.prototype.list = async function (self, sender) {
   let notices = await global.db.engine.find('notices')
-  var output = (notices.length === 0 ? global.translate('notice.failed.list') : global.translate('notice.success.list') + ': ' + _.map(notices, 'key').join(', '))
+  var output = (notices.length === 0 ? global.translate('notice.failed.list') : global.translate('notice.success.list') + ': ' + _.map(_.orderBy(notices, 'key'), 'key').join(', '))
   global.commons.sendMessage(output, sender)
 }
 
