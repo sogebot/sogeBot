@@ -20,7 +20,7 @@ class IMongoDB extends Interface {
 
   async connection (table) {
     if (_.isNil(this._connection[table])) {
-      this._connection[table] = await client.connect(config.database.mongodb.url)
+      this._connection[table] = await client.connect(config.database.mongodb.url, { poolSize: 100 })
       debug(this._connection[table])
     }
     return this._connection[table]
