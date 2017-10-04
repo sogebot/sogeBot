@@ -6,8 +6,6 @@ var _ = require('lodash')
 // bot libraries
 var constants = require('../constants')
 
-const ERROR_DOESNT_EXISTS = '1'
-
 /*
  * !alias                            - gets an info about alias usage
  * !alias add ![cmd] ![alias]        - add alias for specified command
@@ -35,8 +33,10 @@ function Alias () {
 }
 
 Alias.prototype.register = async function (self) {
-  let alias = await global.db.engine.find('alias')
-  _.each(alias, function (o) { global.parser.register(self, '!' + o.alias, self.run, constants.VIEWERS) })
+  let aliases = await global.db.engine.find('alias')
+  for (let alias of aliases) {
+    global.parser.register(self, '!' + alias.alias, self.run, constants.VIEWERS)
+  }
 }
 
 Alias.prototype.webPanel = function () {
@@ -89,99 +89,104 @@ Alias.prototype.help = function (self, sender) {
 }
 
 Alias.prototype.add = async function (self, sender, text) {
-  try {
-    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w\S ]+) !([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
-    let alias = {
-      alias: parsed[2],
-      command: parsed[1],
-      enabled: true,
-      visible: true
-    }
+  let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w\S ]+) !([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
 
-    if (global.parser.isRegistered(alias.alias)) {
-      global.commons.sendMessage(global.translate('core.isRegistered').replace(/\$keyword/g, '!' + alias.alias), sender)
-      return
-    }
-
-    await global.db.engine.update('alias', { alias: alias.alias }, alias)
-    self.register(self)
-    global.commons.sendMessage(global.translate('alias.success.add'), sender)
-  } catch (e) {
+  if (_.isNil(parsed)) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
+    return false
   }
+
+  let alias = {
+    alias: parsed[2],
+    command: parsed[1],
+    enabled: true,
+    visible: true
+  }
+
+  if (global.parser.isRegistered(alias.alias)) {
+    global.commons.sendMessage(global.translate('core.isRegistered').replace(/\$keyword/g, '!' + alias.alias), sender)
+    return false
+  }
+
+  await global.db.engine.insert('alias', alias)
+  await self.register(self)
+  global.commons.sendMessage(global.translate('alias.success.add'), sender)
 }
 
 Alias.prototype.run = async function (self, sender, msg, fullMsg) {
   let parsed = fullMsg.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
   let alias = await global.db.engine.findOne('alias', { alias: parsed[1].toLowerCase(), enabled: true })
-  try {
-    global.parser.parse(sender, fullMsg.replace(parsed[1], alias.command), true)
-  } catch (e) {
-    global.parser.unregister(fullMsg)
-  }
+
+  if (!_.isEmpty(alias)) global.parser.parse(sender, fullMsg.replace(parsed[1], alias.command), true)
+  else global.parser.unregister(fullMsg)
 }
 
 Alias.prototype.list = async function (self, sender, text) {
   let alias = await global.db.engine.find('alias', { visible: true })
-  var output = (alias.length === 0 ? global.translate('alias.failed.list') : global.translate('alias.success.list') + ': !' + _.map(alias, 'alias').join(', !'))
+  var output = (alias.length === 0 ? global.translate('alias.failed.list') : global.translate('alias.success.list') + ': !' + (_.map(alias, 'alias')).join(', !'))
   global.commons.sendMessage(output, sender)
 }
 
 Alias.prototype.toggle = async function (self, sender, text) {
-  try {
-    const id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)[1]
-    const alias = await global.db.engine.findOne('alias', { alias: id })
-    if (_.isEmpty(alias)) {
-      global.commons.sendMessage(global.translate('alias.failed.toggle')
-        .replace(/\$alias/g, id), sender)
-      return
-    }
+  let id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
 
-    await global.db.engine.update('alias', { alias: id }, { enabled: !alias.enabled })
-    self.register(self)
-
-    global.commons.sendMessage(global.translate(!alias.enabled ? 'alias.success.enabled' : 'alias.success.disabled')
-      .replace(/\$alias/g, alias.alias), sender)
-  } catch (e) {
+  if (_.isNil(id)) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
+    return false
   }
+  id = id[1]
+  const alias = await global.db.engine.findOne('alias', { alias: id })
+  if (_.isEmpty(alias)) {
+    global.commons.sendMessage(global.translate('alias.failed.toggle')
+      .replace(/\$alias/g, id), sender)
+    return
+  }
+
+  await global.db.engine.update('alias', { alias: id }, { enabled: !alias.enabled })
+  self.register(self)
+
+  global.commons.sendMessage(global.translate(!alias.enabled ? 'alias.success.enabled' : 'alias.success.disabled')
+    .replace(/\$alias/g, alias.alias), sender)
 }
 
 Alias.prototype.visible = async function (self, sender, text) {
-  try {
-    const id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)[1]
-    const alias = await global.db.engine.findOne('alias', { alias: id })
-    if (_.isEmpty(alias)) {
-      global.commons.sendMessage(global.translate('alias.failed.visible')
-        .replace(/\$alias/g, id), sender)
-      return
-    }
+  let id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
 
-    await global.db.engine.update('alias', { alias: id }, { visible: !alias.visible })
-
-    global.commons.sendMessage(global.translate(!alias.visible ? 'alias.success.visible' : 'alias.success.invisible')
-      .replace(/\$alias/g, alias.alias), sender)
-  } catch (e) {
+  if (_.isNil(id)) {
     global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
+    return false
   }
+  id = id[1]
+
+  const alias = await global.db.engine.findOne('alias', { alias: id })
+  if (_.isEmpty(alias)) {
+    global.commons.sendMessage(global.translate('alias.failed.visible')
+      .replace(/\$alias/g, id), sender)
+    return
+  }
+
+  await global.db.engine.update('alias', { alias: id }, { visible: !alias.visible })
+
+  global.commons.sendMessage(global.translate(!alias.visible ? 'alias.success.visible' : 'alias.success.invisible')
+      .replace(/\$alias/g, alias.alias), sender)
 }
 
 Alias.prototype.remove = async function (self, sender, text) {
-  try {
-    const id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)[1]
-    let removed = await global.db.engine.remove('alias', { alias: id })
-    if (!removed) throw Error(ERROR_DOESNT_EXISTS)
-    global.parser.unregister(text)
-    global.commons.sendMessage(global.translate('alias.success.remove'), sender)
-  } catch (e) {
-    switch (e.message) {
-      case ERROR_DOESNT_EXISTS:
-        global.commons.sendMessage(global.translate('alias.failed.remove'), sender)
-        break
-      default:
-        global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
-    }
+  let id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
+
+  if (_.isNil(id)) {
+    global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
+    return false
   }
+  id = id[1]
+
+  let removed = await global.db.engine.remove('alias', { alias: id })
+  if (!removed) {
+    global.commons.sendMessage(global.translate('alias.failed.remove'), sender)
+    return false
+  }
+  global.parser.unregister(text)
+  global.commons.sendMessage(global.translate('alias.success.remove'), sender)
 }
 
 module.exports = new Alias()
