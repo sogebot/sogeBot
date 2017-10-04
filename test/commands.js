@@ -2,8 +2,8 @@
 
 const assert = require('chai').assert
 const until = require('test-until')
-const _ = require('lodash')
 const crypto = require('crypto')
+const sinon = require('sinon')
 require('./general.js')
 
 // users
@@ -13,155 +13,146 @@ const owner = { username: 'soge__' }
 require('../main.js')
 
 describe('System - Custom Commands', () => {
-  beforeEach(function () {
+  beforeEach(() => {
     global.commons.sendMessage.reset()
   })
   afterEach(async function () {
     let items = await global.db.engine.find('commands')
-    _.each(items, async (item) => {
+    for (let item of items) {
       await global.db.engine.remove('commands', { _id: item._id })
-    })
+      global.parser.unregister(item.command)
+    }
     items = await global.db.engine.find('settings')
-    _.each(items, async (item) => {
+    for (let item of items) {
       await global.db.engine.remove('settings', { _id: item._id })
-    })
+    }
   })
   describe('#fnc', () => {
     describe('add()', () => {
       it('text: /empty/', async () => {
         global.systems.customCommands.add(global.systems.customCommands, owner, '')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        let item = await global.db.engine.findOne('commands', { text: '' })
+        await until(() => global.commons.sendMessage.calledWith(global.translate('customcmds.failed.parse'), sinon.match(owner)), 5000)
 
-        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('customcmds.failed.parse'))
+        let item = await global.db.engine.findOne('commands', { text: '' })
         assert.empty(item)
       })
       it('text: !me Lorem Ipsum', async () => {
         global.systems.customCommands.add(global.systems.customCommands, owner, '!me Lorem Ipsum')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        let item = await global.db.engine.findOne('commands', { command: 'me' })
+        await until(() => global.commons.sendMessage.calledWith(global.translate('core.isRegistered').replace(/\$keyword/g, '!me'), sinon.match(owner)), 5000)
 
-        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('core.isRegistered').replace(/\$keyword/g, '!me'))
+        let item = await global.db.engine.findOne('commands', { command: 'me' })
         assert.empty(item)
       })
       it('text: !randomid Lorem Ipsum', async () => {
         let id = crypto.randomBytes(4).toString('hex')
         global.systems.customCommands.add(global.systems.customCommands, owner, `!${id} Lorem Ipsum`)
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        let item = await global.db.engine.findOne('commands', { command: id })
+        await until(() => global.commons.sendMessage.calledWith(global.translate('customcmds.success.add'), sinon.match(owner)), 5000)
 
-        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('customcmds.success.add'))
+        let item = await global.db.engine.findOne('commands', { command: id })
         assert.notEmpty(item)
         assert.equal(item.response, 'Lorem Ipsum')
         assert.equal(item.command, id)
 
-        global.commons.sendMessage.reset()
         global.parser.parse(owner, `!${id}`)
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        assert.equal(global.commons.sendMessage.getCall(0).args[0], 'Lorem Ipsum')
+        await until(() => global.commons.sendMessage.withArgs('Lorem Ipsum'), 5000)
       })
     })
     describe('list()', () => {
       it('list: /empty/', async () => {
         global.systems.customCommands.list(global.systems.customCommands, owner)
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        assert.equal(global.commons.sendMessage.getCall(0).args[0],
-          global.translate('customcmds.failed.list'))
+        await until(() => global.commons.sendMessage.calledWith(global.translate('customcmds.failed.list'), sinon.match(owner)), 5000)
       })
       it('list: /not empty/', async () => {
-        global.systems.customCommands.add(global.systems.customCommands, owner, '!' + crypto.randomBytes(4).toString('hex') + ' Lorem Ipsun')
-        global.systems.customCommands.add(global.systems.customCommands, owner, '!' + crypto.randomBytes(4).toString('hex') + ' Lorem Ipsum')
-        await until(() => global.commons.sendMessage.calledTwice, 5000)
-
+        let id1 = crypto.randomBytes(4).toString('hex')
+        global.systems.customCommands.add(global.systems.customCommands, owner, '!' + id1 + ' Lorem Ipsun')
+        await until(() => global.commons.sendMessage.calledWith(global.translate('customcmds.success.add'), sinon.match(owner)), 5000)
         global.commons.sendMessage.reset()
+
+        let id2 = crypto.randomBytes(4).toString('hex')
+        global.systems.customCommands.add(global.systems.customCommands, owner, '!' + id2 + ' Lorem Ipsum')
+        await until(() => global.commons.sendMessage.calledWith(global.translate('customcmds.success.add'), sinon.match(owner)), 5000)
+
         global.systems.customCommands.list(global.systems.customCommands, owner)
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        assert.isTrue(global.commons.sendMessage.firstCall.args[0].startsWith(
-          global.translate('customcmds.success.list')))
+        await until(() =>
+          global.commons.sendMessage.calledWith(
+            global.translate('customcmds.success.list') + `: !${id1}, !${id2}`, sinon.match(owner)) ||
+          global.commons.sendMessage.calledWith(
+            global.translate('customcmds.success.list') + `: !${id2}, !${id1}`, sinon.match(owner)), 5000)
       })
     })
     describe('toggle()', () => {
       it('text: /empty/', async () => {
         global.systems.customCommands.toggle(global.systems.customCommands, owner, '')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        assert.equal(global.commons.sendMessage.getCall(0).args[0],
-          global.translate('customcmds.failed.parse'))
+        await until(() => global.commons.sendMessage.calledWith(global.translate('customcmds.failed.parse'), sinon.match(owner)), 5000)
       })
       it('commands: /incorrect commands/', async () => {
         global.systems.customCommands.toggle(global.systems.customCommands, owner, '!asdasd')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+        await until(() => global.commons.sendMessage.calledWith(
           global.translate('customcmds.failed.toggle')
-            .replace(/\$command/g, 'asdasd'))
+            .replace(/\$command/g, 'asdasd'), sinon.match(owner)), 5000)
       })
       it('text: /correct commands/', async () => {
         let id = crypto.randomBytes(4).toString('hex')
         global.systems.customCommands.add(global.systems.customCommands, owner, `!${id} Lorem Ipsum`)
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledWith(global.translate('customcmds.success.add'), sinon.match(owner)), 5000)
+
         await global.systems.customCommands.toggle(global.systems.customCommands, owner, `!${id}`)
-        await global.systems.customCommands.toggle(global.systems.customCommands, owner, `!${id}`)
-        await until(() => global.commons.sendMessage.calledThrice, 5000)
-        assert.equal(global.commons.sendMessage.secondCall.args[0],
+        await until(() => global.commons.sendMessage.calledWith(
           global.translate('customcmds.success.disabled')
-            .replace(/\$command/g, id))
-        assert.equal(global.commons.sendMessage.thirdCall.args[0],
+          .replace(/\$command/g, id), sinon.match(owner)), 5000)
+
+        await global.systems.customCommands.toggle(global.systems.customCommands, owner, `!${id}`)
+        await until(() => global.commons.sendMessage.calledWith(
           global.translate('customcmds.success.enabled')
-            .replace(/\$command/g, id))
+            .replace(/\$command/g, id), sinon.match(owner)), 5000)
       })
     })
     describe('visible()', () => {
       it('text: /empty/', async () => {
         global.systems.customCommands.visible(global.systems.customCommands, owner, '')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        assert.equal(global.commons.sendMessage.getCall(0).args[0],
-          global.translate('customcmds.failed.parse'))
+        await until(() => global.commons.sendMessage.calledWith(global.translate('customcmds.failed.parse'), sinon.match(owner)), 5000)
       })
       it('commands: /incorrect commands/', async () => {
         global.systems.customCommands.visible(global.systems.customCommands, owner, '!asdasd')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        assert.equal(global.commons.sendMessage.getCall(0).args[0],
+        await until(() => global.commons.sendMessage.calledWith(
           global.translate('customcmds.failed.visible')
-            .replace(/\$command/g, 'asdasd'))
+            .replace(/\$command/g, 'asdasd'), sinon.match(owner)), 5000)
       })
       it('text: /correct commands/', async () => {
         let id = crypto.randomBytes(4).toString('hex')
         global.systems.customCommands.add(global.systems.customCommands, owner, `!${id} Lorem Ipsum`)
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledWith(global.translate('customcmds.success.add'), sinon.match(owner)), 5000)
+
         await global.systems.customCommands.visible(global.systems.customCommands, owner, `!${id}`)
-        await global.systems.customCommands.visible(global.systems.customCommands, owner, `!${id}`)
-        await until(() => global.commons.sendMessage.calledThrice, 5000)
-        assert.equal(global.commons.sendMessage.secondCall.args[0],
+        await until(() => global.commons.sendMessage.calledWith(
           global.translate('customcmds.success.invisible')
-            .replace(/\$command/g, id))
-        assert.equal(global.commons.sendMessage.thirdCall.args[0],
+            .replace(/\$command/g, id), sinon.match(owner)), 5000)
+
+        await global.systems.customCommands.visible(global.systems.customCommands, owner, `!${id}`)
+        await until(() => global.commons.sendMessage.calledWith(
           global.translate('customcmds.success.visible')
-            .replace(/\$command/g, id))
+            .replace(/\$command/g, id), sinon.match(owner)), 5000)
       })
     })
     describe('remove()', () => {
       it('text: /empty/', async () => {
         global.systems.customCommands.remove(global.systems.customCommands, owner, '')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        assert.equal(global.commons.sendMessage.getCall(0).args[0],
-          global.translate('customcmds.failed.parse'))
+        await until(() => global.commons.sendMessage.calledWith(global.translate('customcmds.failed.parse'), sinon.match(owner)), 5000)
       })
       it('text: /incorrect id/', async () => {
         global.systems.customCommands.remove(global.systems.customCommands, owner, '!asdasd')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        assert.equal(global.commons.sendMessage.getCall(0).args[0],
-          global.translate('customcmds.failed.remove'))
+        await until(() => global.commons.sendMessage.calledWith(global.translate('customcmds.failed.remove'), sinon.match(owner)), 5000)
       })
       it('text: /correct id/', async () => {
         let id = crypto.randomBytes(4).toString('hex')
         global.systems.customCommands.add(global.systems.customCommands, owner, `!${id} Lorem Ipsum`)
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledWith(global.translate('customcmds.success.add'), sinon.match(owner)), 5000)
+
         let item = await global.db.engine.findOne('commands', { command: id })
         assert.isNotEmpty(item)
 
         await global.systems.customCommands.remove(global.systems.customCommands, owner, `!${id}`)
-        await until(() => global.commons.sendMessage.calledTwice, 5000)
-        assert.equal(global.commons.sendMessage.secondCall.args[0],
-          global.translate('customcmds.success.remove'))
+        await until(() => global.commons.sendMessage.calledWith(global.translate('customcmds.success.remove'), sinon.match(owner)), 5000)
         assert.isFalse(global.parser.isRegistered(id))
       })
     })

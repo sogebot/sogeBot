@@ -20,51 +20,51 @@ describe('System - Cooldowns', () => {
   })
   afterEach(async function () {
     let items = await global.db.engine.find('cooldowns')
-    _.each(items, async (item) => {
+    for (let item of items) {
       await global.db.engine.remove('cooldowns', { key: item.key })
-    })
+    }
   })
   describe('#fnc', () => {
     describe('set()', () => {
       it('text: /empty/', async () => {
         global.systems.cooldown.set(global.systems.cooldown, owner, '')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        let item = await global.db.engine.findOne('cooldowns', { key: '' })
+        await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.failed.parse'), sinon.match(owner)), 5000)
 
-        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('cooldown.failed.parse'))
+        let item = await global.db.engine.findOne('cooldowns', { key: '' })
         assert.empty(item)
       })
       it('global', async () => {
         global.systems.cooldown.set(global.systems.cooldown, owner, '!me global 60 true')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        let item = await global.db.engine.findOne('cooldowns', { key: '!me' })
+        await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
+          .replace(/\$command/g, '!me')
+          .replace(/\$type/g, 'global')
+          .replace(/\$seconds/g, '60'), sinon.match(owner)), 5000)
 
-        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('cooldown.success.set')
-        .replace(/\$command/g, '!me')
-        .replace(/\$type/g, 'global')
-        .replace(/\$seconds/g, '60'))
+        let item = await global.db.engine.findOne('cooldowns', { key: '!me' })
         assert.notEmpty(item)
       })
       it('user', async () => {
         global.systems.cooldown.set(global.systems.cooldown, owner, '!me user 60 true')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        let item = await global.db.engine.findOne('cooldowns', { key: '!me' })
+        await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
+          .replace(/\$command/g, '!me')
+          .replace(/\$type/g, 'user')
+          .replace(/\$seconds/g, '60'), sinon.match(owner)), 5000)
 
-        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('cooldown.success.set')
-        .replace(/\$command/g, '!me')
-        .replace(/\$type/g, 'user')
-        .replace(/\$seconds/g, '60'))
+        let item = await global.db.engine.findOne('cooldowns', { key: '!me' })
         assert.notEmpty(item)
       })
       it('unset', async () => {
         global.systems.cooldown.set(global.systems.cooldown, owner, '!me user 60 true')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-        global.systems.cooldown.set(global.systems.cooldown, owner, '!me user 0')
-        await until(() => global.commons.sendMessage.calledTwice, 5000)
-        let item = await global.db.engine.findOne('cooldowns', { key: '!me' })
+        await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
+          .replace(/\$command/g, '!me')
+          .replace(/\$type/g, 'user')
+          .replace(/\$seconds/g, '60'), sinon.match(owner)), 5000)
 
-        assert.equal(global.commons.sendMessage.getCall(1).args[0], global.translate('cooldown.success.unset')
-        .replace(/\$command/g, '!me'))
+        global.systems.cooldown.set(global.systems.cooldown, owner, '!me user 0')
+        await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.unset')
+          .replace(/\$command/g, '!me'), sinon.match(owner)), 5000)
+
+        let item = await global.db.engine.findOne('cooldowns', { key: '!me' })
         assert.empty(item)
       })
     })
@@ -73,7 +73,11 @@ describe('System - Cooldowns', () => {
         if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
 
         global.systems.cooldown.set(global.systems.cooldown, owner, '!me user 60 true')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
+          .replace(/\$command/g, '!me')
+          .replace(/\$type/g, 'user')
+          .replace(/\$seconds/g, '60'), sinon.match(owner)), 5000)
+
         let item = await global.db.engine.findOne('cooldowns', { key: '!me' })
         assert.notEmpty(item)
 
@@ -107,14 +111,17 @@ describe('System - Cooldowns', () => {
         if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
 
         global.systems.cooldown.set(global.systems.cooldown, owner, '!me global 60 true')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
+          .replace(/\$command/g, '!me')
+          .replace(/\$type/g, 'global')
+          .replace(/\$seconds/g, '60'), sinon.match(owner)), 5000)
+
         let item = await global.db.engine.findOne('cooldowns', { key: '!me' })
         assert.notEmpty(item)
 
         var spy = sinon.spy(global, 'updateQueue')
         global.parser.parse(testUser, '!me')
         await until(() => spy.called, 5000)
-
         for (let args of spy.args) {
           assert.isTrue(args[1])
         }
@@ -150,11 +157,14 @@ describe('System - Cooldowns', () => {
           global.commons.sendMessage.reset()
 
           global.systems.cooldown.set(global.systems.cooldown, owner, '!me user 60 true')
-          await until(() => global.commons.sendMessage.calledOnce, 5000)
+          await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
+            .replace(/\$command/g, '!me')
+            .replace(/\$type/g, 'user')
+            .replace(/\$seconds/g, '60'), sinon.match(owner)), 5000)
 
           global.systems.cooldown.toggleEnabled(global.systems.cooldown, owner, '!me user')
-          await until(() => global.commons.sendMessage.calledTwice, 5000)
-          assert.equal(global.commons.sendMessage.getCall(1).args[0], global.translate('cooldown.success.disabled').replace(/\$command/g, '!me'))
+          await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.disabled')
+            .replace(/\$command/g, '!me'), sinon.match(owner)), 5000)
 
           global.parser.parse(testUser, '!me')
           await until(() => spy.called, 5000)
@@ -175,11 +185,13 @@ describe('System - Cooldowns', () => {
           global.commons.sendMessage.reset()
 
           global.systems.cooldown.set(global.systems.cooldown, owner, '!me user 60 true')
-          await until(() => global.commons.sendMessage.calledOnce, 5000)
+          await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
+            .replace(/\$command/g, '!me')
+            .replace(/\$type/g, 'user')
+            .replace(/\$seconds/g, '60'), sinon.match(owner)), 5000)
 
           global.systems.cooldown.toggleEnabled(global.systems.cooldown, owner, '!me')
-          await until(() => global.commons.sendMessage.calledTwice, 5000)
-          assert.equal(global.commons.sendMessage.getCall(1).args[0], global.translate('cooldown.failed.parse'))
+          await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.failed.parse'), sinon.match(owner)), 5000)
         })
       })
       describe('toggleModerators()', () => {
@@ -192,11 +204,14 @@ describe('System - Cooldowns', () => {
           global.commons.sendMessage.reset()
 
           global.systems.cooldown.set(global.systems.cooldown, owner, '!me user 60 true')
-          await until(() => global.commons.sendMessage.calledOnce, 5000)
+          await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
+            .replace(/\$command/g, '!me')
+            .replace(/\$type/g, 'user')
+            .replace(/\$seconds/g, '60'), sinon.match(owner)), 5000)
 
           global.systems.cooldown.toggleModerators(global.systems.cooldown, owner, '!me user')
-          await until(() => global.commons.sendMessage.calledTwice, 5000)
-          assert.equal(global.commons.sendMessage.getCall(1).args[0], global.translate('cooldown.toggle.moderator.enabled').replace(/\$command/g, '!me'))
+          await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.toggle.moderator.enabled')
+            .replace(/\$command/g, '!me'), sinon.match(owner)), 5000)
 
           global.parser.parse(testUser, '!me')
           await until(() => spy.called, 5000)
@@ -219,11 +234,13 @@ describe('System - Cooldowns', () => {
           global.commons.sendMessage.reset()
 
           global.systems.cooldown.set(global.systems.cooldown, owner, '!me user 60 true')
-          await until(() => global.commons.sendMessage.calledOnce, 5000)
+          await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
+            .replace(/\$command/g, '!me')
+            .replace(/\$type/g, 'user')
+            .replace(/\$seconds/g, '60'), sinon.match(owner)), 5000)
 
           global.systems.cooldown.toggleModerators(global.systems.cooldown, owner, '!me')
-          await until(() => global.commons.sendMessage.calledTwice, 5000)
-          assert.equal(global.commons.sendMessage.getCall(1).args[0], global.translate('cooldown.failed.parse'))
+          await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.failed.parse'), sinon.match(owner)), 5000)
         })
       })
       describe('toggleOwners()', () => {
@@ -236,11 +253,14 @@ describe('System - Cooldowns', () => {
           global.commons.sendMessage.reset()
 
           global.systems.cooldown.set(global.systems.cooldown, owner, '!me user 60 true')
-          await until(() => global.commons.sendMessage.calledOnce, 5000)
+          await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
+            .replace(/\$command/g, '!me')
+            .replace(/\$type/g, 'user')
+            .replace(/\$seconds/g, '60'), sinon.match(owner)), 5000)
 
           global.systems.cooldown.toggleOwners(global.systems.cooldown, owner, '!me user')
-          await until(() => global.commons.sendMessage.calledTwice, 5000)
-          assert.equal(global.commons.sendMessage.getCall(1).args[0], global.translate('cooldown.toggle.owner.enabled').replace(/\$command/g, '!me'))
+          await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.toggle.owner.enabled')
+            .replace(/\$command/g, '!me'), sinon.match(owner)), 5000)
 
           global.parser.parse(owner, '!me')
           await until(() => spy.called, 5000)
@@ -263,11 +283,13 @@ describe('System - Cooldowns', () => {
           global.commons.sendMessage.reset()
 
           global.systems.cooldown.set(global.systems.cooldown, owner, '!me user 60 true')
-          await until(() => global.commons.sendMessage.calledOnce, 5000)
+          await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
+            .replace(/\$command/g, '!me')
+            .replace(/\$type/g, 'user')
+            .replace(/\$seconds/g, '60'), sinon.match(owner)), 5000)
 
           global.systems.cooldown.toggleOwners(global.systems.cooldown, owner, '!me')
-          await until(() => global.commons.sendMessage.calledTwice, 5000)
-          assert.equal(global.commons.sendMessage.getCall(1).args[0], global.translate('cooldown.failed.parse'))
+          await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.failed.parse'), sinon.match(owner)), 5000)
         })
       })
     })
