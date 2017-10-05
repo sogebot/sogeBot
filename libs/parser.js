@@ -265,23 +265,23 @@ Parser.prototype.parseMessage = async function (message, attr) {
   let custom = {
     '(get.#)': async function (filter) {
       let variable = filter.replace('(get.', '').replace(')', '')
-      let cvar = await global.engine.db.findOne('customvars', { key: variable })
+      let cvar = await global.db.engine.findOne('customvars', { key: variable })
       return cvar.value
     },
     '(set.#)': async function (filter) {
       let variable = filter.replace('(set.', '').replace(')', '')
-      await global.engine.db.update('customvars', { key: variable }, { key: variable, value: attr.param })
+      await global.db.engine.update('customvars', { key: variable }, { key: variable, value: attr.param })
       return ''
     },
     '(var.#)': async function (filter) {
       let variable = filter.replace('(var.', '').replace(')', '')
       if ((global.parser.isOwner(attr.sender) || attr.sender.mod) &&
         (!_.isUndefined(attr.param) && attr.param.length !== 0)) {
-        await global.engine.db.update('customvars', { key: variable }, { key: variable, value: attr.param })
+        await global.db.engine.update('customvars', { key: variable }, { key: variable, value: attr.param })
         global.commons.sendMessage('$sender ' + attr.param, attr.sender)
         return ''
       }
-      let cvar = await global.engine.db.findOne('customvars', { key: variable })
+      let cvar = await global.db.engine.findOne('customvars', { key: variable })
       return _.isEmpty(cvar.value) ? '' : cvar.value
     }
   }
