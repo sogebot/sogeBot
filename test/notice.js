@@ -153,25 +153,5 @@ describe('System - Notice', () => {
         await until(() => global.commons.sendMessage.calledWith('Lorem Ipsum', sinon.match(owner)), 5000)
       })
     })
-    describe('1s, 0msgs', () => {
-      before(async function () {
-        global.commons.sendMessage.reset()
-        global.parser.parse(owner, '!set noticeInterval 1')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('notice.settings.noticeInterval').replace(/\$value/g, 1), sinon.match(owner)), 5000)
-
-        global.parser.parse(owner, '!set noticeMsgReq 0')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('notice.settings.noticeMsgReq').replace(/\$value/g, 0), sinon.match(owner)), 5000)
-
-        await global.systems.notice.add(global.systems.notice, owner, 'Lorem Ipsum')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('notice.success.add'), sinon.match(owner)), 5000)
-      })
-      it('sent thrice after 3s', async () => {
-        global.commons.sendMessage.reset()
-        await until(() => global.commons.sendMessage.calledThrice, 5000)
-        assert.equal(global.commons.sendMessage.getCall(0).args[0], 'Lorem Ipsum')
-        assert.equal(global.commons.sendMessage.getCall(1).args[0], 'Lorem Ipsum')
-        assert.equal(global.commons.sendMessage.getCall(2).args[0], 'Lorem Ipsum')
-      })
-    })
   })
 })

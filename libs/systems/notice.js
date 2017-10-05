@@ -89,7 +89,7 @@ Notice.prototype.sendConfiguration = function (self, socket) {
 }
 
 Notice.prototype.send = async function () {
-  var timeIntervalInMs = global.configuration.getValue('noticeInterval') * 1000
+  var timeIntervalInMs = global.configuration.getValue('noticeInterval') * 1000 * 60 // interval is in minutes
   var noticeMinChatMsg = global.configuration.getValue('noticeMsgReq')
   var now = new Date().getTime()
 
