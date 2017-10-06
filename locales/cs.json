@@ -657,13 +657,14 @@
     }
   },
   "rank": {
+    "next-rank": "Dalsi rank - ",
     "success": {
       "add": "Novy rank byl pridan do bota",
       "remove" : "Rank byl smazan",
       "list": "Seznam ranku",
       "set": "$username ma nastaveny rank na $rank",
       "unset": "Vlastni rank byl vymazan pro $username",
-      "show": "$sender ma prave $rank rank"
+      "show": "$sender ma prave $rank rank. $nextrank"
     },
     "failed": {
       "parse": "{core.command-parse} !rank help",

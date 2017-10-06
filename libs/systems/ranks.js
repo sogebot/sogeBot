@@ -51,7 +51,6 @@ Ranks.prototype.listSocket = async function (self, socket) {
 
 Ranks.prototype.editSocket = function (self, socket, data) {
   if (data.value.length === 0) self.remove(self, null, data.id)
-  console.log(data)
   global.db.engine.update('ranks', { hours: parseInt(data.id, 10) }, { value: data.value })
   self.listSocket(self, socket)
 }
@@ -62,7 +61,7 @@ Ranks.prototype.deleteSocket = function (self, socket, data) {
 }
 
 Ranks.prototype.createSocket = function (self, socket, data) {
-  self.add(self, null, data.hours + ' ' + data.rank)
+  self.add(self, null, data.hours + ' ' + data.value)
   self.listSocket(self, socket)
 }
 
@@ -141,12 +140,32 @@ Ranks.prototype.unset = function (self, sender, text) {
   }
 }
 
-Ranks.prototype.show = function (self, sender) {
+Ranks.prototype.show = async function (self, sender) {
   if (debug.enabled) debug('show(self, %s)', JSON.stringify(sender))
-  let user = global.users.get(sender.username)
-  let rank = !_.isNil(user.rank) ? user.rank : null
+  let user = await global.users.get(sender.username)
+  let rank = !_.isUndefined(user.rank) ? user.rank : null
   rank = !_.isNil(user.custom.rank) ? user.custom.rank : rank
-  global.commons.sendMessage(global.translate(!_.isNil(rank) ? 'rank.success.show' : 'rank.failed.show').replace(/\$rank/g, rank), sender)
+
+  let watched = !_.isNil(user.time) && !_.isNil(user.time.watched) ? user.time.watched : 0
+  let ranks = await global.db.engine.find('ranks')
+  let nextRank = null
+  for (let _rank of _.orderBy(ranks, 'hours', 'desc')) {
+    if (_rank.hours > watched / 1000 / 60 / 60) {
+      nextRank = _rank
+    } else {
+      break
+    }
+  }
+
+  if (!_.isNil(nextRank)) {
+    let toWatch = (nextRank.hours - (watched / 1000 / 60 / 60))
+    let percentage = (toWatch / nextRank.hours) * 100
+    nextRank = global.translate('rank.next-rank') + `${nextRank.value} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)}h)`
+  } else nextRank = ''
+
+  global.commons.sendMessage(
+    global.translate(!_.isNil(rank) ? 'rank.success.show' : 'rank.failed.show')
+      .replace(/\$rank/g, rank).replace(/\$nextrank/g, nextRank), sender)
 }
 
 Ranks.prototype.updateRanks = async function () {

@@ -657,13 +657,14 @@
     }
   },
   "rank": {
+    "next-rank": "Next rank - ",
     "success": {
       "add": "New rank was added to bot",
       "remove" : "Rank was deleted from bot",
       "list": "List of ranks",
       "set": "$username have rank set to $rank",
       "unset": "Custom rank was unset for $username",
-      "show": "$sender have $rank rank"
+      "show": "$sender have $rank rank. $nextrank"
     },
     "failed": {
       "parse": "{core.command-parse} !rank help",
