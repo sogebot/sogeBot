@@ -380,5 +380,24 @@ let migration = {
         await global.db.engine.insert('highlights', items.highlights[k])
       }
     }
+  }],
+  cache: [{
+    version: '5.8.0',
+    do: async () => {
+      console.info('Migration cache to %s', '5.8.0')
+      const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
+      let items = await db.findOne({ _id: 'cached' })
+      let games = await db.findOne({ _id: 'cachedGamesTitles' })
+      if (_.isNil(items) && _.isNil(games)) {
+        console.info('Nothing to do ...')
+        return
+      }
+
+      console.info('Migrating %s cache', _.size(items))
+      delete items._id
+      delete games._id
+      items.cachedGamesTitles = games
+      await global.db.engine.insert('cache', items)
+    }
   }]
 }
