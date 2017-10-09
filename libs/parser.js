@@ -35,7 +35,29 @@ function Parser () {
         self.registeredParsers === {} ? self.parseCommands(message.user, message.message, message.skip) : self.addToQueue(message.user, message.message, message.skip)
       })
     }
-  }, 10)
+
+    _.each(queue, function (val, id) {
+      if (queue.hasOwnProperty(id) && queue[id].success === queue[id].started && queue[id].started > 0) {
+        self.parseCommands(queue[id].user, queue[id].message, queue[id].skip)
+
+        if (!_.isUndefined(queue[id].user.id)) {
+          const index = _.findIndex(global.parser.timer, function (o) { return o.id === queue[id].user.id })
+          if (!_.isUndefined(global.parser.timer[index])) global.parser.timer[index].sent = new Date().getTime()
+          if (global.parser.timer.length > 100) {
+            global.parser.timer.shift()
+          }
+          let avgTime = 0
+          let length = global.parser.timer.length
+          for (var i = 0; i < length; i++) {
+            if (_.isUndefined(global.parser.timer[i].sent)) continue
+            avgTime += global.parser.timer[i].sent - global.parser.timer[i].received
+          }
+          global.status['RES'] = (avgTime / length).toFixed(0)
+        }
+        global.removeFromQueue(id)
+      }
+    })
+  }, 100)
 }
 
 Parser.prototype.parse = function (user, message, skip) {
@@ -64,34 +86,10 @@ Parser.prototype.addToQueue = async function (user, message, skip) {
         (this.permissionsParsers[parser] === constants.REGULAR && (isRegular || isMod || this.isOwner(user))) ||
         (this.permissionsParsers[parser] === constants.MODS && (isMod || this.isOwner(user))) ||
         (this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user))) {
-      queue[id].started = parseInt(queue[id].started, 10) + 1
-      await this.registeredParsers[parser](this.selfParsers[parser], id, user, message, skip)
-    }
-  }
-
-  this.processQueue(id)
-}
-
-Parser.prototype.processQueue = async function (id) {
-  while (!_.isUndefined(queue[id])) {
-    if (queue.hasOwnProperty(id) && queue[id].success === queue[id].started) {
-      this.parseCommands(queue[id].user, queue[id].message, queue[id].skip)
-
-      if (!_.isUndefined(queue[id].user.id)) {
-        const index = _.findIndex(global.parser.timer, function (o) { return o.id === queue[id].user.id })
-        if (!_.isUndefined(global.parser.timer[index])) global.parser.timer[index].sent = new Date().getTime()
-        if (global.parser.timer.length > 100) {
-          global.parser.timer.shift()
-        }
-        let avgTime = 0
-        let length = global.parser.timer.length
-        for (var i = 0; i < length; i++) {
-          if (_.isUndefined(global.parser.timer[i].sent)) continue
-          avgTime += global.parser.timer[i].sent - global.parser.timer[i].received
-        }
-        global.status['RES'] = (avgTime / length).toFixed(0)
+      if (!_.isNil(queue[id])) {
+        queue[id].started = parseInt(queue[id].started, 10) + 1
+        this.registeredParsers[parser](this.selfParsers[parser], id, user, message, skip)
       }
-      global.removeFromQueue(id)
     }
   }
 }
