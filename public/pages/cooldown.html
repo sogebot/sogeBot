@@ -71,8 +71,8 @@
       $("#Cooldowns").empty()
       _.each(list, function(item, index) {
         $("#Cooldowns").append((item.enabled ? '<tr>' : '<tr style="text-decoration: line-through">') +
-          '<td>' + index + '</td>' +
-          '<td>' + commons.editable(item.miliseconds / 1000, index, 'cooldown.edit') + '</td>' +
+          '<td>' + item.key + '</td>' +
+          '<td>' + commons.editable(item.miliseconds / 1000, item.key, 'cooldown.edit') + '</td>' +
           '<td>' + translations[item.type] + '</td>' +
           '<td>' + translations[item.quiet ? 'cooldown-quiet-toggle-yes' : 'cooldown-quiet-toggle-no'] + '</td>' +
           '<td class="text-center"><i class="fa ' + (item.moderator ? 'text-success fa-check' : 'text-danger fa-times') + '" aria-hidden="true"></i></td>' +
@@ -84,14 +84,14 @@
             '</button>' +
             '<ul class="dropdown-menu">' +
               '<li class="dropdown-header">Controls</li>' +
-              '<li><a href="#" data-cooldown="' + index + '" onclick="cooldown.toggle(this)">' + (!item.enabled ? translations['enable'] : translations['disable']) + '</a></li>' +
+              '<li><a href="#" data-cooldown="' + item.key + '" onclick="cooldown.toggle(this)">' + (!item.enabled ? translations['enable'] : translations['disable']) + '</a></li>' +
               '<li class="dropdown-header">Toggle</li>' +
-              '<li><a href="#" data-cooldown="' + index + '" onclick="cooldown.toggleModerators(this)">Moderators</a></li>' +
-              '<li><a href="#" data-cooldown="' + index + '" onclick="cooldown.toggleOwners(this)">Owners</a></li>' +
+              '<li><a href="#" data-cooldown="' + item.key + '" onclick="cooldown.toggleModerators(this)">Moderators</a></li>' +
+              '<li><a href="#" data-cooldown="' + item.key + '" onclick="cooldown.toggleOwners(this)">Owners</a></li>' +
             '</ul>' +
           '</div>' +
           '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
-          '<button type="button" style="display: none" class="btn btn-success btn-confirm" onclick="cooldown.delete(this)" data-command="' + index + '"><span class="glyphicon glyphicon-ok"></span></button>' +
+          '<button type="button" style="display: none" class="btn btn-success btn-confirm" onclick="cooldown.delete(this)" data-command="' + item.key + '"><span class="glyphicon glyphicon-ok"></span></button>' +
           '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="glyphicon glyphicon-remove"></span></button>' +
           '</td>' +
           '</tr>');
