@@ -136,7 +136,7 @@ Raffles.prototype.pick = async function (self, sender) {
   if (debug.enabled) debug('winner participant: %j', participant)
   let probability = parseInt(participant.tickets, 10) / (parseInt(_total, 10) / 100)
 
-  global.db.engine.update('raffle', { _id: raffle._id }, { winner: global.users.get(winner), timestamp: new Date().getTime() })
+  global.db.engine.update('raffles', { _id: raffle._id }, { winner: global.users.get(winner), timestamp: new Date().getTime() })
   global.commons.sendMessage(global.translate(!_.isNil(raffle.product) && raffle.product.trim().length > 0 ? 'raffle.pick.winner.withProduct' : 'raffle.pick.winner.withoutProduct')
     .replace(/\$winner/g, winner)
     .replace(/\$product/g, raffle.product)
