@@ -83,29 +83,44 @@ describe('System - Cooldowns', () => {
 
         var spy = sinon.spy(global, 'updateQueue')
         global.parser.parse(testUser, '!me')
-        await until(() => spy.called, 5000)
-
-        for (let args of spy.args) {
-          assert.isTrue(args[1])
-        }
+        await until(() => {
+          if (spy.called) {
+            let isTrue = true
+            for (let args of spy.args) {
+              if (!args[1]) isTrue = false
+            }
+            return isTrue
+          }
+          return false
+        }, 5000)
         spy.reset()
 
+        spy.reset()
         global.parser.parse(testUser, '!me')
-        await until(() => spy.called, 5000)
-
-        let isFalse = false
-        for (let args of spy.args) {
-          if (!args[1]) isFalse = true
-        }
-        assert.isTrue(isFalse)
+        await until(() => {
+          if (spy.called) {
+            let isFalse = false
+            for (let args of spy.args) {
+              if (!args[1]) isFalse = true
+            }
+            return isFalse
+          }
+          return false
+        }, 5000)
         spy.reset()
 
         global.parser.parse(testUser2, '!me')
-        await until(() => spy.called, 5000)
-
-        for (let args of spy.args) {
-          assert.isTrue(args[1])
-        }
+        await until(() => {
+          if (spy.called) {
+            let isTrue = true
+            for (let args of spy.args) {
+              if (!args[1]) isTrue = false
+            }
+            return isTrue
+          }
+          return false
+        }, 5000)
+        spy.reset()
       })
       it('global', async () => {
         if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
@@ -121,31 +136,43 @@ describe('System - Cooldowns', () => {
 
         var spy = sinon.spy(global, 'updateQueue')
         global.parser.parse(testUser, '!me')
-        await until(() => spy.called, 5000)
-        for (let args of spy.args) {
-          assert.isTrue(args[1])
-        }
+        await until(() => {
+          if (spy.called) {
+            let isTrue = true
+            for (let args of spy.args) {
+              if (!args[1]) isTrue = false
+            }
+            return isTrue
+          }
+          return false
+        }, 5000)
         spy.reset()
 
         global.parser.parse(testUser, '!me')
-        await until(() => spy.called, 5000)
-
-        let isFalse = false
-        for (let args of spy.args) {
-          if (!args[1]) isFalse = true
-        }
-        assert.isTrue(isFalse)
+        await until(() => {
+          if (spy.called) {
+            let isFalse = false
+            for (let args of spy.args) {
+              if (!args[1]) isFalse = true
+            }
+            return isFalse
+          }
+          return false
+        }, 5000)
         spy.reset()
 
         global.parser.parse(testUser2, '!me')
-        await until(() => spy.called, 5000)
-
-        isFalse = false
-        for (let args of spy.args) {
-          if (!args[1]) isFalse = true
-        }
-        assert.isTrue(isFalse)
-
+        await until(() => {
+          if (spy.called) {
+            let isFalse = false
+            for (let args of spy.args) {
+              if (!args[1]) isFalse = true
+            }
+            return isFalse
+          }
+          return false
+        }, 5000)
+        spy.reset()
         if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
       })
     })
