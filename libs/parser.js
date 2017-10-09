@@ -337,31 +337,31 @@ Parser.prototype.parseMessage = async function (message, attr) {
   }
   let list = {
     '(list.#)': async function (filter) {
-      let list
       let system = filter.replace('(list.', '').replace(')', '')
+
+      const alias = await global.db.engine.find('alias', { visible: true })
+      const commands = await global.db.engine.find('commands', { visible: true })
+      const cooldowns = await global.db.engine.find('cooldowns')
+
       switch (system) {
         case 'alias':
-          list = _.map(_.filter(global.systems['alias'].alias, function (o) { return o.visible && o.enabled }), function (n) { return n.alias }).join(', ')
-          return list.length > 0 ? list : ' '
+          return _.size(alias) === 0 ? ' ' : (_.map(alias, 'alias')).join(', ')
         case '!alias':
-          list = _.map(_.filter(global.systems['alias'].alias, function (o) { return o.visible && o.enabled }), function (n) { return '!' + n.alias }).join(', ')
-          return list.length > 0 ? list : ' '
+          return _.size(alias) === 0 ? ' ' : '!' + (_.map(alias, 'alias')).join(', !')
         case 'command':
-          list = _.map(_.filter(global.systems['customCommands'].commands, function (o) { return o.visible && o.enabled }), function (n) { return n.command }).join(', ')
-          return list.length > 0 ? list : ' '
+          return _.size(commands) === 0 ? ' ' : (_.map(commands, 'command')).join(', ')
         case '!command':
-          list = _.map(_.filter(global.systems['customCommands'].commands, function (o) { return o.visible && o.enabled }), function (n) { return '!' + n.command }).join(', ')
-          return list.length > 0 ? list : ' '
+          return _.size(commands) === 0 ? ' ' : '!' + (_.map(commands, 'command')).join(', !')
         case 'cooldown':
-          list = _.map(global.systems['cooldown'].list, function (o, k) {
+          list = _.map(cooldowns, function (o, k) {
             const time = o.miliseconds
-            return k + ': ' + (parseInt(time, 10) / 1000) + 's'
+            return o.key + ': ' + (parseInt(time, 10) / 1000) + 's'
           }).join(', ')
           return list.length > 0 ? list : ' '
         case '!cooldown':
-          list = _.map(global.systems['cooldown'].list, function (o, k) {
+          list = _.map(cooldowns, function (o, k) {
             const time = o.miliseconds
-            return '!' + k + ': ' + (parseInt(time, 10) / 1000) + 's'
+            return '!' + o.key + ': ' + (parseInt(time, 10) / 1000) + 's'
           }).join(', ')
           return list.length > 0 ? list : ' '
         default:
