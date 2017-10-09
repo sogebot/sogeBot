@@ -50,7 +50,7 @@ function Gambling () {
     global.configuration.register('fightmeCooldown', 'gambling.cooldown.fightme', 'number', 0)
 
     const self = this
-    setInterval(function () {
+    setInterval(async function () {
       if (_.isNil(self.current.duel._timestamp)) return true
 
       if (new Date().getTime() - self.current.duel._timestamp > 1000 * 60 * 5) {
@@ -80,7 +80,7 @@ function Gambling () {
           .replace(/\$winner/g, (global.configuration.getValue('atUsername') ? '@' : '') + username), { username: username }, { force: true })
 
         // give user his points
-        const user = global.users.get(username)
+        const user = await global.users.get(username)
         user.points = parseInt(_.isNil(user.points) ? 0 : user.points, 10) + parseInt(total, 10)
         global.users.set(username, { points: user.points })
 
@@ -93,7 +93,7 @@ function Gambling () {
   }
 }
 
-Gambling.prototype.duel = function (self, sender, text) {
+Gambling.prototype.duel = async function (self, sender, text) {
   sender['message-type'] = 'chat' // force responses to chat
   let points = 0
   try {
@@ -103,7 +103,7 @@ Gambling.prototype.duel = function (self, sender, text) {
     points = parsed[1]
     if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
 
-    const user = global.users.get(sender.username)
+    const user = await global.users.get(sender.username)
     if (_.isNil(user.points) || user.points < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
     global.users.set(sender.username, { points: parseInt(user.points, 10) - parseInt(points, 10) })
 
@@ -272,7 +272,7 @@ Gambling.prototype.fightme = function (self, sender, text) {
   }
 }
 
-Gambling.prototype.gamble = function (self, sender, text) {
+Gambling.prototype.gamble = async function (self, sender, text) {
   sender['message-type'] = 'chat' // force responses to chat
   let points = 0
   try {
@@ -282,19 +282,19 @@ Gambling.prototype.gamble = function (self, sender, text) {
     points = parsed[1]
     if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
 
-    const user = global.users.get(sender.username)
+    const user = await global.users.get(sender.username)
     if (_.isNil(user.points) || user.points < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
 
     global.users.set(sender.username, { points: parseInt(user.points, 10) - parseInt(points, 10) })
     if (_.random(0, 1)) {
       global.users.set(sender.username, { points: parseInt(user.points, 10) + (parseInt(points, 10) * 2) })
       global.commons.sendMessage(global.translate('gambling.gamble.win')
-        .replace(/\$points/g, global.users.get(sender.username).points)
-        .replace(/\$pointsName/g, global.systems.points.getPointsName(global.users.get(sender.username).points)), sender)
+        .replace(/\$points/g, user.points)
+        .replace(/\$pointsName/g, global.systems.points.getPointsName(user.points)), sender)
     } else {
       global.commons.sendMessage(global.translate('gambling.gamble.lose')
-        .replace(/\$points/g, global.users.get(sender.username).points)
-        .replace(/\$pointsName/g, global.systems.points.getPointsName(global.users.get(sender.username).points)), sender)
+        .replace(/\$points/g, user.points)
+        .replace(/\$pointsName/g, global.systems.points.getPointsName(user.points)), sender)
     }
   } catch (e) {
     switch (e.message) {
