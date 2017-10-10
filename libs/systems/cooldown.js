@@ -43,7 +43,7 @@ Cooldown.prototype.webPanel = function () {
 
 Cooldown.prototype.sEdit = async function (self, socket, data) {
   if (data.seconds.length === 0 || parseInt(data.seconds, 10) === 0) self.sSet(self, socket, {key: data.id, seconds: 0})
-  else await global.db.engine.update('cooldowns', { key: data.id }, { key: data.value })
+  else await global.db.engine.update('cooldowns', { key: data.id }, { miliseconds: data.seconds * 1000 })
   self.sSend(self, socket)
 }
 
