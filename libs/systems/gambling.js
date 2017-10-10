@@ -5,6 +5,7 @@ var _ = require('lodash')
 
 // bot libraries
 var constants = require('../constants')
+const config = require('../../config.json')
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0'
 const ERROR_ZERO_BET = '1'
@@ -185,7 +186,7 @@ Gambling.prototype.roulette = async function (self, sender) {
     return
   }
 
-  if (!isAlive) global.client.timeout(global.configuration.get().twitch.channel, sender.username, global.configuration.getValue('rouletteTimeout'))
+  if (!isAlive) global.client.timeout(config.settings.broadcaster_username, sender.username, global.configuration.getValue('rouletteTimeout'))
   global.commons.sendMessage(message.join(' '), sender)
 }
 
@@ -202,7 +203,7 @@ Gambling.prototype.seppuku = async function (self, sender) {
   }
 
   global.commons.sendMessage(global.translate('gambling.seppuku.text'), sender)
-  global.client.timeout(global.configuration.get().twitch.channel, sender.username, global.configuration.getValue('seppukuTimeout'))
+  global.client.timeout(config.settings.broadcaster_username, sender.username, global.configuration.getValue('seppukuTimeout'))
 }
 
 Gambling.prototype.fightme = async function (self, sender, text) {
@@ -230,7 +231,7 @@ Gambling.prototype.fightme = async function (self, sender, text) {
       global.commons.sendMessage(global.translate('gambling.fightme.broadcaster')
         .replace(/\$winner/g, global.parser.isBroadcaster(sender) ? sender.username : username), sender)
       isMod = global.parser.isBroadcaster(sender) ? isMod.user : isMod.sender
-      if (!isMod) global.client.timeout(global.configuration.get().twitch.channel, global.parser.isBroadcaster(sender) ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
+      if (!isMod) global.client.timeout(config.settings.broadcaster_username, global.parser.isBroadcaster(sender) ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
       self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
       return
     }
@@ -247,12 +248,12 @@ Gambling.prototype.fightme = async function (self, sender, text) {
     if (isMod.user || isMod.sender) {
       global.commons.sendMessage(global.translate('gambling.fightme.oneModerator')
         .replace(/\$winner/g, isMod.sender ? sender.username : username), sender)
-      global.client.timeout(global.configuration.get().twitch.channel, isMod.sender ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
+      global.client.timeout(config.settings.broadcaster_username, isMod.sender ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
       self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
       return
     }
 
-    global.client.timeout(global.configuration.get().twitch.channel, winner ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
+    global.client.timeout(config.settings.broadcaster_username, winner ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
     global.commons.sendMessage(global.translate('gambling.fightme.winner')
       .replace(/\$winner/g, winner ? username : sender.username), sender)
     self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
