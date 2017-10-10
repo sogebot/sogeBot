@@ -337,9 +337,9 @@ Parser.prototype.parseMessage = async function (message, attr) {
     '(list.#)': async function (filter) {
       let system = filter.replace('(list.', '').replace(')', '')
 
-      const alias = await global.db.engine.find('alias', { visible: true })
-      const commands = await global.db.engine.find('commands', { visible: true })
-      const cooldowns = await global.db.engine.find('cooldowns')
+      const alias = await global.db.engine.find('alias', { visible: true, enabled: true })
+      const commands = await global.db.engine.find('commands', { visible: true, enabled: true })
+      const cooldowns = await global.db.engine.find('cooldowns', { enabled: true })
 
       switch (system) {
         case 'alias':
