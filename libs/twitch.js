@@ -475,39 +475,35 @@ Twitch.prototype.showMe = async function (self, sender, text) {
 }
 
 Twitch.prototype.showTop = async function (self, sender, text) {
-  try {
-    let sorted, message
-    let type = text.trim().match(/^(time|points|messages)$/)
-    let i = 0
+  let sorted, message
+  let type = text.trim().match(/^(time|points|messages)$/)
+  let i = 0
 
-    if (_.isNil(type)) type = 'time'
-    else type = type[1]
+  if (_.isNil(type)) type = 'time'
+  else type = type[1]
 
-    let users = await global.users.getAll()
-    if (type === 'points' && global.commons.isSystemEnabled('points')) {
-      message = global.translate('top.listPoints').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.points) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'points', 'desc')
-    } else if (type === 'time') {
-      message = global.translate('top.listWatched').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.time.watched) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'time.watched', 'desc')
-    } else {
-      message = global.translate('top.listMessages').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.stats.messages) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'stats.messages', 'desc')
-    }
-
-    sorted = _.chunk(sorted, 10)[0]
-    for (let user of sorted) {
-      message += (i + 1) + '. ' + (global.configuration.getValue('atUsername') ? '@' : '') + user.username + ' - '
-      if (type === 'time') message += (user.time.watched / 1000 / 60 / 60).toFixed(1) + 'h'
-      else if (type === 'points') message += user.points + ' ' + global.systems.points.getPointsName(user.points)
-      else message += user.stats.messages
-      if (i + 1 < 10 && !_.isNil(sorted[i + 1])) message += ', '
-      i++
-    }
-    global.commons.sendMessage(message, sender)
-  } catch (e) {
-    global.log.error(e)
+  let users = await global.users.getAll()
+  if (type === 'points' && global.commons.isSystemEnabled('points')) {
+    message = global.translate('top.listPoints').replace(/\$amount/g, 10)
+    sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.points) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'points', 'desc')
+  } else if (type === 'time') {
+    message = global.translate('top.listWatched').replace(/\$amount/g, 10)
+    sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.time) && !_.isNil(o.time.watched) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'time.watched', 'desc')
+  } else {
+    message = global.translate('top.listMessages').replace(/\$amount/g, 10)
+    sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.stats) && !_.isNil(o.stats.messages) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'stats.messages', 'desc')
   }
+
+  sorted = _.chunk(sorted, 10)[0]
+  for (let user of sorted) {
+    message += (i + 1) + '. ' + (global.configuration.getValue('atUsername') ? '@' : '') + user.username + ' - '
+    if (type === 'time') message += (user.time.watched / 1000 / 60 / 60).toFixed(1) + 'h'
+    else if (type === 'points') message += user.points + ' ' + global.systems.points.getPointsName(user.points)
+    else message += user.stats.messages
+    if (i + 1 < 10 && !_.isNil(sorted[i + 1])) message += ', '
+    i++
+  }
+  global.commons.sendMessage(message, sender)
 }
 
 Twitch.prototype.setTitleAndGame = async function (self, sender, args) {
