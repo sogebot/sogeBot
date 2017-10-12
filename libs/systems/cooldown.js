@@ -118,8 +118,7 @@ Cooldown.prototype.check = async function (self, id, sender, text) {
       owner: cooldown.owner
     }]
   } else { // text
-    let keywords = await global.db.engine.find('keywords')
-    let cooldowns = await global.db.engine.find('cooldowns')
+    let [keywords, cooldowns] = await Promise.all([global.db.engine.find('keywords'), global.db.engine.find('cooldowns')])
 
     keywords = _.filter(keywords, function (o) {
       return text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
