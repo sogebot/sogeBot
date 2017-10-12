@@ -379,8 +379,10 @@ Parser.prototype.parseMessage = async function (message, attr) {
   let evaluate = {
     '(eval#)': async function (filter) {
       let toEvaluate = filter.replace('(eval ', '').slice(0, -1)
+      let param = (!_.isUndefined(attr.param) && attr.param.length !== 0) ? `var param="${attr.param}";` : ''
+      let sender = `var sender="${attr.sender}";`
       return (safeEval(
-        `(function evaluation () { ${toEvaluate} })()`
+        `(function evaluation () { ${param} ${sender} ${toEvaluate} })()`
       ))
     }
   }
