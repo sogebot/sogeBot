@@ -64,8 +64,14 @@ Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
     .replace(/\$bits/g, global.twitch.current.bits)
 
   if (!global.configuration.getValue('mute') || attr.force) {
-    sender['message-type'] === 'whisper' ? global.log.whisperOut(message, {username: sender.username}) : global.log.chatOut(message, {username: sender.username})
-    sender['message-type'] === 'whisper' ? global.client.whisper(sender.username, message) : global.client.say(config.settings.broadcaster_username, message)
+    if (sender['message-type'] === 'whisper') {
+      global.log.whisperOut(message, {username: sender.username})
+      global.client.whisper(sender.username, message)
+    } else {
+      global.log.chatOut(message, {username: sender.username})
+      if (!_.isNil(config.settings['bot_use_/me']) && config.settings['bot_use_/me']) global.client.action(config.settings.broadcaster_username, message)
+      else global.client.say(config.settings.broadcaster_username, message)
+    }
   }
   return true
 }
