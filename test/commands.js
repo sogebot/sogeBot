@@ -1,4 +1,4 @@
-/* global describe it beforeEach afterEach */
+/* global describe it beforeEach */
 
 const assert = require('chai').assert
 const until = require('test-until')
@@ -13,19 +13,18 @@ const owner = { username: 'soge__' }
 require('../main.js')
 
 describe('System - Custom Commands', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     global.commons.sendMessage.reset()
-  })
-  afterEach(async function () {
+
     let items = await global.db.engine.find('commands')
     for (let item of items) {
-      await global.db.engine.remove('commands', { _id: item._id })
-      global.parser.unregister(item.command)
+      await global.db.engine.remove('commands', { alias: item.alias })
     }
     items = await global.db.engine.find('settings')
     for (let item of items) {
-      await global.db.engine.remove('settings', { _id: item._id })
+      await global.db.engine.remove('settings', { key: item.key })
     }
+    global.parser.unregister('!meee')
   })
   describe('#fnc', () => {
     describe('add()', () => {

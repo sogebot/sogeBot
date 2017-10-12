@@ -1,4 +1,4 @@
-/* global describe it beforeEach afterEach */
+/* global describe it beforeEach */
 
 const assert = require('chai').assert
 const until = require('test-until')
@@ -9,17 +9,16 @@ require('./general.js')
 const owner = { username: 'soge__' }
 
 describe('System - Alias', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     global.commons.sendMessage.reset()
-  })
-  afterEach(async function () {
+
     let items = await global.db.engine.find('alias')
     for (let item of items) {
-      await global.db.engine.remove('alias', { _id: item._id })
+      await global.db.engine.remove('alias', { alias: item.alias })
     }
     items = await global.db.engine.find('settings')
     for (let item of items) {
-      await global.db.engine.remove('settings', { _id: item._id })
+      await global.db.engine.remove('settings', { key: item.key })
     }
     global.parser.unregister('!meee')
   })
