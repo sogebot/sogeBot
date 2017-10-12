@@ -23,6 +23,10 @@ describe('System - Cooldowns', () => {
     for (let item of items) {
       await global.db.engine.remove('cooldowns', { key: item.key })
     }
+    items = await global.db.engine.find('keywords')
+    for (let item of items) {
+      await global.db.engine.remove('keywords', { key: item.key })
+    }
   })
   describe('#fnc', () => {
     describe('set()', () => {
@@ -68,7 +72,7 @@ describe('System - Cooldowns', () => {
         assert.empty(item)
       })
     })
-    describe('check()', () => {
+    describe('check() command', () => {
       it('user', async () => {
         if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
 
@@ -162,6 +166,120 @@ describe('System - Cooldowns', () => {
         spy.reset()
 
         global.parser.parse(testUser2, '!me')
+        await until(() => {
+          if (spy.called) {
+            let isFalse = false
+            for (let args of spy.args) {
+              if (!args[1]) isFalse = true
+            }
+            return isFalse
+          }
+          return false
+        }, 5000)
+        spy.reset()
+        if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
+      })
+    })
+    describe('check() keyword', () => {
+      it('user', async () => {
+        if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
+
+        global.systems.keywords.add(global.systems.keywords, owner, 'me (!me)')
+        await until(() => global.commons.sendMessage.calledWith(global.translate('keywords.success.add')), 5000)
+
+        global.systems.cooldown.set(global.systems.cooldown, owner, 'me user 60 true')
+        await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
+          .replace(/\$command/g, 'me')
+          .replace(/\$type/g, 'user')
+          .replace(/\$seconds/g, '60'), sinon.match(owner)), 5000)
+
+        let item = await global.db.engine.findOne('cooldowns', { key: 'me' })
+        assert.notEmpty(item)
+
+        var spy = sinon.spy(global, 'updateQueue')
+        global.parser.parse(testUser, 'me')
+        await until(() => {
+          if (spy.called) {
+            let isTrue = true
+            for (let args of spy.args) {
+              if (!args[1]) isTrue = false
+            }
+            return isTrue
+          }
+          return false
+        }, 5000)
+        spy.reset()
+
+        spy.reset()
+        global.parser.parse(testUser, 'me')
+        await until(() => {
+          if (spy.called) {
+            let isFalse = false
+            for (let args of spy.args) {
+              if (!args[1]) isFalse = true
+            }
+            return isFalse
+          }
+          return false
+        }, 5000)
+        spy.reset()
+
+        global.parser.parse(testUser2, 'me')
+        await until(() => {
+          if (spy.called) {
+            let isTrue = true
+            for (let args of spy.args) {
+              if (!args[1]) isTrue = false
+            }
+            return isTrue
+          }
+          return false
+        }, 5000)
+        spy.reset()
+      })
+      it('global', async () => {
+        if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
+
+        global.systems.keywords.add(global.systems.keywords, owner, 'me (!me)')
+        await until(() => global.commons.sendMessage.calledWith(global.translate('keywords.success.add')), 5000)
+
+        global.systems.cooldown.set(global.systems.cooldown, owner, 'me global 60 true')
+        await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
+          .replace(/\$command/g, 'me')
+          .replace(/\$type/g, 'global')
+          .replace(/\$seconds/g, '60'), sinon.match(owner)), 5000)
+
+        let item = await global.db.engine.findOne('cooldowns', { key: 'me' })
+        assert.notEmpty(item)
+
+        var spy = sinon.spy(global, 'updateQueue')
+        global.parser.parse(testUser, 'me')
+        await until(() => {
+          if (spy.called) {
+            let isTrue = true
+            for (let args of spy.args) {
+              if (!args[1]) isTrue = false
+            }
+            return isTrue
+          }
+          return false
+        }, 5000)
+        spy.reset()
+
+        global.parser.parse(testUser, 'me')
+        await until(() => {
+          if (spy.called) {
+            let isFalse = false
+            for (let args of spy.args) {
+              if (!args[1]) isFalse = true
+            }
+            return isFalse
+          }
+          return false
+        }, 5000)
+        spy.reset()
+
+        global.parser.parse(testUser2, 'me')
         await until(() => {
           if (spy.called) {
             let isFalse = false

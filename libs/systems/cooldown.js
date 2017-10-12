@@ -97,7 +97,7 @@ Cooldown.prototype.set = async function (self, sender, text) {
 }
 
 Cooldown.prototype.check = async function (self, id, sender, text) {
-  debug('check start')
+  debug('check(self, %s, %j, %s)', id, sender, text)
   var data, cmdMatch, viewer, timestamp, now
 
   cmdMatch = text.match(/^(![\u0500-\u052F\u0400-\u04FF\w]+)/)
@@ -118,15 +118,13 @@ Cooldown.prototype.check = async function (self, id, sender, text) {
       owner: cooldown.owner
     }]
   } else { // text
-    let keywords = global.db.engine.find('keywords')
-    let cooldowns = global.db.engine.find('cooldowns')
-
-    await keywords
-    await cooldowns
+    let keywords = await global.db.engine.find('keywords')
+    let cooldowns = await global.db.engine.find('cooldowns')
 
     keywords = _.filter(keywords, function (o) {
       return text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
     })
+
     data = []
     _.each(keywords, (keyword) => {
       let cooldown = _.find(cooldowns, (o) => o.key === keyword.keyword)
