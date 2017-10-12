@@ -5,6 +5,7 @@ var crypto = require('crypto')
 var _ = require('lodash')
 var mathjs = require('mathjs')
 const snekfetch = require('snekfetch')
+const safeEval = require('safe-eval')
 
 const config = require('../config.json')
 const debug = require('debug')('parser')
@@ -375,6 +376,14 @@ Parser.prototype.parseMessage = async function (message, attr) {
       return mathjs.eval(toEvaluate)
     }
   }
+  let evaluate = {
+    '(eval#)': async function (filter) {
+      let toEvaluate = filter.replace('(eval ', '').slice(0, -1)
+      return (safeEval(
+        `(function evaluation () { ${toEvaluate} })()`
+      ))
+    }
+  }
 
   let msg = await this.parseMessageOnline(online, message)
   msg = await this.parseMessageCommand(command, msg)
@@ -385,6 +394,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
   msg = await this.parseMessageEach(info, msg)
   msg = await this.parseMessageEach(list, msg)
   msg = await this.parseMessageEach(math, msg)
+  msg = await this.parseMessageEach(evaluate, msg)
   msg = await this.parseMessageApi(msg)
   return msg
 }
@@ -477,7 +487,7 @@ Parser.prototype.parseMessageEach = async function (filters, msg) {
     let regexp = _.escapeRegExp(key)
 
     // we want to handle # as \w - number in regexp
-    regexp = regexp.replace(/#/g, '(\\S+)')
+    regexp = regexp.replace(/#/g, '([\\S ]+)')
     let rMessage = msg.match((new RegExp('(' + regexp + ')', 'g')))
     if (!_.isNull(rMessage)) {
       for (var bkey in rMessage) {
