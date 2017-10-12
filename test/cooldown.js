@@ -8,7 +8,8 @@ require('./general.js')
 
 // users
 const owner = { username: 'soge__' }
-const testUser = { username: 'test', mod: true }
+const mod = { username: 'mod', mod: true }
+const testUser = { username: 'test' }
 const testUser2 = { username: 'test2' }
 
 // load up a bot
@@ -84,7 +85,6 @@ describe('System - Cooldowns', () => {
 
         let item = await global.db.engine.findOne('cooldowns', { key: '!me' })
         assert.notEmpty(item)
-
         var spy = sinon.spy(global, 'updateQueue')
         global.parser.parse(testUser, '!me')
         await until(() => {
@@ -97,7 +97,6 @@ describe('System - Cooldowns', () => {
           }
           return false
         }, 5000)
-        spy.reset()
 
         spy.reset()
         global.parser.parse(testUser, '!me')
@@ -369,7 +368,7 @@ describe('System - Cooldowns', () => {
           await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.toggle.moderator.enabled')
             .replace(/\$command/g, '!me'), sinon.match(owner)), 5000)
 
-          global.parser.parse(testUser, '!me')
+          global.parser.parse(mod, '!me')
           await until(() => {
             if (spy.called) {
               let isTrue = true
@@ -382,7 +381,7 @@ describe('System - Cooldowns', () => {
           }, 5000)
           spy.reset()
 
-          global.parser.parse(testUser, '!me')
+          global.parser.parse(mod, '!me')
           await until(() => {
             if (spy.called) {
               let isFalse = false
