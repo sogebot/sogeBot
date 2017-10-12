@@ -36,6 +36,7 @@ class IMongoDB extends Interface {
     this.on(table) // init table
 
     where = where || {}
+    where = flatten(where)
 
     let db = await this.connection(table)
     let collection = await db.collection(table)
@@ -51,6 +52,7 @@ class IMongoDB extends Interface {
     this.on(table) // init table
 
     where = where || {}
+    where = flatten(where)
 
     // get from cache
     var keys = this.cache[table].keys()
@@ -86,6 +88,9 @@ class IMongoDB extends Interface {
   async increment (table, where, object) {
     this.on(table) // init table
 
+    where = where || {}
+    where = flatten(where)
+
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
     delete object._id
 
@@ -118,6 +123,8 @@ class IMongoDB extends Interface {
     this.on(table) // init table
 
     if (_.isEmpty(where)) throw Error('Object to delete cannot be empty')
+    where = flatten(where)
+
 
     // remove cache
     var keys = this.cache[table].keys()
@@ -139,6 +146,8 @@ class IMongoDB extends Interface {
 
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
     delete object._id
+
+    where = flatten(where)
 
     // invalidate cache on update
     var keys = this.cache[table].keys()
