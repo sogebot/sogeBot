@@ -136,7 +136,7 @@ Cooldown.prototype.check = function (self, id, sender, text) {
       return text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
     })
     data = []
-    _.each(keywords, function (o) { if (o.enabled) data.push({'command': o.keyword, 'miliseconds': self.list[o.keyword].miliseconds, 'type': self.list[o.keyword].type, 'timestamp': self.list[o.keyword].timestamp, 'quiet': self.list[o.keyword].quiet, 'enabled': self.list[o.keyword].enabled, 'moderator': self.list[o.keyword].moderator, 'owner': self.list[o.keyword].owner}) })
+    _.each(keywords, function (o) { if (o.enabled && !_.isNil(self.list[o.keyword])) data.push({'command': o.keyword, 'miliseconds': self.list[o.keyword].miliseconds, 'type': self.list[o.keyword].type, 'timestamp': self.list[o.keyword].timestamp, 'quiet': self.list[o.keyword].quiet, 'enabled': self.list[o.keyword].enabled, 'moderator': self.list[o.keyword].moderator, 'owner': self.list[o.keyword].owner}) })
   }
 
   if (!_.some(data, { enabled: true })) { // parse ok if all cooldowns are disabled
