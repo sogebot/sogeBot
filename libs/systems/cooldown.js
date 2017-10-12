@@ -10,9 +10,9 @@ const debug = require('debug')('systems:cooldown')
 
 /*
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
- * !cooldown toggle moderators [keyword|!command]                    - enable/disable specified keyword or !command cooldown for moderators
- * !cooldown toggle owners [keyword|!command]                        - enable/disable specified keyword or !command cooldown for owners
- * !cooldown toggle enabled [keyword|!command]                       - enable/disable specified keyword or !command cooldown
+ * !cooldown toggle moderators [keyword|!command] [global|user]      - enable/disable specified keyword or !command cooldown for moderators
+ * !cooldown toggle owners [keyword|!command] [global|user]          - enable/disable specified keyword or !command cooldown for owners
+ * !cooldown toggle enabled [keyword|!command] [global|user]         - enable/disable specified keyword or !command cooldown
  */
 
 function Cooldown () {
@@ -190,7 +190,6 @@ Cooldown.prototype.check = async function (self, id, sender, text) {
 
 Cooldown.prototype.toggle = async function (self, sender, text, type) {
   const toggle = text.match(/^([!\u0500-\u052F\u0400-\u04FF\w]+) (global|user)$/)
-
   if (_.isNil(toggle)) {
     global.commons.sendMessage(global.translate('cooldown.failed.parse'), sender)
     return false
