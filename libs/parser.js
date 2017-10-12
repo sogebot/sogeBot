@@ -165,12 +165,14 @@ Parser.prototype.isBroadcaster = function (user) {
 }
 
 Parser.prototype.isMod = async function (user) {
-  if (!_.isNil(user)) return false
+  if (_.isNil(user)) return false
 
   if (_.isString(user)) user = await global.users.get(user)
-  else user = await global.users.get(user.username)
+  else user = { is: { mod: user.mod } }
 
-  return (!_.isNil(user.is.mod) ? user.is.mod : false)
+  return new Promise((resolve, reject) => {
+    resolve(!_.isNil(user.is.mod) ? user.is.mod : false)
+  })
 }
 
 Parser.prototype.isRegular = async function (user) {
