@@ -128,7 +128,7 @@ global.client.on('message', async function (channel, sender, message, fromSelf) 
         if (!message.startsWith('!')) global.users.messagesInc(user.username)
 
         // set is.mod
-        global.users.set(user.username, { is: { mod: user.mod } })
+        global.users.set(user.username, { is: { mod: sender.mod } })
       })()
 
       global.parser.parse(sender, message)
