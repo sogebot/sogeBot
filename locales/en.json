@@ -53,6 +53,35 @@
     }
   },
   "webpanel": {
+    "responses": {
+      "variable": {
+        "sender": "User who initiated",
+        "title": "Current title",
+        "game": "Current game",
+        "viewers": "Current viewers count",
+        "views": "Current views count",
+        "hosts": "Current hosts count",
+        "followers": "Current followers count",
+        "subscribers": "Current subscribers count",
+        "arg": "Argument",
+        "alias": "Alias",
+        "command": "Command",
+        "keyword": "Keyword",
+        "response": "Response",
+        "list": "Populated list",
+        "type": "Type",
+        "hours": "Hours",
+        "minutes": "Minutes",
+        "seconds": "Seconds",
+        "description": "Description",
+        "quiet": "Quiet (bool)",
+        "id": "ID",
+        "amount": "Amount",
+        "pointsName": "Points name",
+        "rank": "Rank",
+        "username": "Username"
+      }
+    },
     "page-settings": {
       "systems": {
         "whispers": {
@@ -493,20 +522,20 @@
   },
   "alias": {
     "success": {
-      "add": "Alias was added to database",
-      "remove": "Alias was deleted from database",
-      "list": "List of aliases",
-      "enabled": "Alias !$alias was enabled",
-      "disabled": "Alias !$alias was disabled",
-      "visible": "Alias !$alias will be visible in list",
-      "invisible": "Alias !$alias will not be visible in list"
+      "add": "$sender, alias !$alias was added to database",
+      "remove": "$sender, alias !$alias was deleted from database",
+      "list": "$sender, list of aliases: $list",
+      "enabled": "$sender, alias !$alias  was enabled",
+      "disabled": "$sender, alias !$alias was disabled",
+      "visible": "$sender, alias !$alias will be visible in list",
+      "invisible": "$sender, alias !$alias will not be visible in list"
     },
     "failed": {
-      "add": "This alias already exists in database",
-      "remove": "This alias cannot be found in database",
-      "list": "List of aliases is empty",
+      "add": "$sender, alias !$alias already exists in database",
+      "remove": "$sender, alias !$alias cannot be found in database",
+      "list": "$sender, list of aliases is empty",
       "parse": "{core.command-parse} !alias",
-      "toggle": "Alias !$alias was not found",
+      "toggle": "$sender, alias !$alias was not found",
       "visible": "{alias.failed.remove}"
     }
   },

@@ -15,12 +15,12 @@ describe('System - Alias', () => {
     let items = await global.db.engine.find('alias')
     for (let item of items) {
       await global.db.engine.remove('alias', { alias: item.alias })
+      global.parser.unregister(item.alias)
     }
     items = await global.db.engine.find('settings')
     for (let item of items) {
       await global.db.engine.remove('settings', { key: item.key })
     }
-    global.parser.unregister('!meee')
   })
   describe('#fnc', () => {
     describe('add()', () => {
@@ -40,7 +40,7 @@ describe('System - Alias', () => {
       })
       it('text: !uptime !mee', async () => {
         global.systems.alias.add(global.systems.alias, owner, '!uptime !mee')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.success.add'), sinon.match(owner)), 5000)
+        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.success.add').replace(/\$alias/g, 'mee'), sinon.match(owner)), 5000)
 
         let item = await global.db.engine.findOne('alias', { alias: 'mee' })
         assert.notEmpty(item)
@@ -59,18 +59,17 @@ describe('System - Alias', () => {
       })
       it('list: /not empty/', async () => {
         global.systems.alias.add(global.systems.alias, owner, '!mee !test1')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.success.add'), sinon.match(owner)), 5000)
+        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.success.add').replace(/\$alias/g, 'test1'), sinon.match(owner)), 5000)
         global.commons.sendMessage.reset()
 
         global.systems.alias.add(global.systems.alias, owner, '!meee !test2')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.success.add'), sinon.match(owner)), 5000)
-
+        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.success.add').replace(/\$alias/g, 'test2'), sinon.match(owner)), 5000)
         global.systems.alias.list(global.systems.alias, owner)
         await until(() =>
           global.commons.sendMessage.calledWith(
-            global.translate('alias.success.list') + ': !test1, !test2', sinon.match(owner)) ||
+            global.translate('alias.success.list').replace(/\$list/g, '!test1, !test2'), sinon.match(owner)) ||
           global.commons.sendMessage.calledWith(
-            global.translate('alias.success.list') + ': !test2, !test1', sinon.match(owner)), 5000)
+            global.translate('alias.success.list').replace(/\$list/g, '!test2, !test1'), sinon.match(owner)), 5000)
       })
     })
     describe('toggle()', () => {
@@ -86,7 +85,7 @@ describe('System - Alias', () => {
       })
       it('text: /correct alias/', async () => {
         global.systems.alias.add(global.systems.alias, owner, '!uptime !meee')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.success.add'), sinon.match(owner)), 5000)
+        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.success.add').replace(/\$alias/g, 'meee'), sinon.match(owner)), 5000)
 
         await global.systems.alias.toggle(global.systems.alias, owner, '!meee')
         await until(() => global.commons.sendMessage.calledWith(
@@ -112,7 +111,7 @@ describe('System - Alias', () => {
       })
       it('text: /correct alias/', async () => {
         global.systems.alias.add(global.systems.alias, owner, '!uptime !meee')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.success.add'), sinon.match(owner)), 5000)
+        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.success.add').replace(/\$alias/g, 'meee'), sinon.match(owner)), 5000)
 
         await global.systems.alias.visible(global.systems.alias, owner, '!meee')
         await until(() => global.commons.sendMessage.calledWith(
@@ -132,16 +131,16 @@ describe('System - Alias', () => {
       })
       it('text: /incorrect id/', async () => {
         global.systems.alias.remove(global.systems.alias, owner, '!asdasd')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.failed.remove'), sinon.match(owner)), 5000)
+        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.failed.remove').replace(/\$alias/g, 'asdasd'), sinon.match(owner)), 5000)
       })
       it('text: /correct id/', async () => {
         global.systems.alias.add(global.systems.alias, owner, '!uptime !meee')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.success.add'), sinon.match(owner)), 5000)
+        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.success.add').replace(/\$alias/g, 'meee'), sinon.match(owner)), 5000)
         let item = await global.db.engine.findOne('alias', { alias: 'meee' })
         assert.isNotEmpty(item)
 
         await global.systems.alias.remove(global.systems.alias, owner, '!meee')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.success.remove'), sinon.match(owner)), 5000)
+        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.success.remove').replace(/\$alias/g, 'meee'), sinon.match(owner)), 5000)
 
         assert.isFalse(global.parser.isRegistered('!meee'))
       })

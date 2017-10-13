@@ -351,8 +351,30 @@
           $("#pages").empty()
           if (page !== 'dashboard') $("#pages").append($('<div id="P' + page + '">').load('pages/' + page + '.html', function () {
             commons.translate()
+            new BootstrapMenu(".custom-response", {
+              fetchElementData: function($el) {
+                return $el.data();
+              },
+              actions: [{
+                name: 'Revert to default',
+                iconClass: 'fa-refresh',
+                onClick: function(data) {
+                  socket.emit('responses.revert', { key: data.id }, function () {
+                    window[data.id.split('.')[0]].responses(data.id) // recall responses() on alias, notices, etc. on current translation
+                  })
+                }
+              }]
+            })
+            $('a[data-toggle="tab"]').off()
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+              var target = $(e.target).attr("href") // activated tab
+              if (target === '#manage') {
+                $('.plus-button').prop('disabled', false)
+              } else {
+                $('.plus-button').prop('disabled', true)
+              }
+            })
           }))
-
           $(".widgets").css('visibility', visibility)
           $("#addWidget").css('visibility', visibility)
         })
@@ -484,34 +506,112 @@
       })
 
 
-    var commons = {
+      var commons = {
+        stub: function (id, value) {
+          return // do nothing
+        },
+        setResponse: function (key, value) {
+          socket.emit('responses.set', { key: key, value: commons.cleanResponseText(value) })
+        },
         translate: function () {
           _.each($('[data-lang]'), function (el) {
             var key = ($(el).data('lang'))
             $(el).text(_.at(translations, key)[0])
+            if (_.isNil(_.at(translations, key)[0])) {
+              if (key.startsWith('responses.variable.')) $(el).text('Unknown variable $' + key.replace('responses.variable.', ''))
+              else $(el).text('undefined: ' + key)
+            }
           })
         },
-        editable: function (string, id, fnc) {
-          id = id || ''
-          var output = '<abbr title="click to edit" data-id="' + id + '" onclick="commons.editableSwap(\'' + id + '\')">' + string + '</abbr>'
-          output += '<input style="display: none" data-fnc="' + fnc + '" class="form-control input-sm" data-id="' + id + '" type="text" value="' + string + '"/>'
+        translateLoop: function (el, key) {
+
+        },
+        editable: function (options) {
+          options.id = !_.isNil(options.id) ? options.id : ''
+          options.text = !_.isNil(options.text) ? options.text.toString() : ''
+          options.fnc = !_.isNil(options.fnc) ? options.fnc : null
+          options.filters = !_.isNil(options.filters) ? options.filters : []
+
+          var filtersRegExp = new RegExp('\\$(' + _.keys(translations.responses.variable).join('|') + ')', 'g')
+          var stringAbbr = options.text.replace(filtersRegExp, '<span contenteditable="false" style="user-select: none; display: inline-block; font-family: monospace; color: #e00956; border: 1px solid #cbcbcb; border-radius: 5px !important; padding: 0 4px 0 4px; background-color: #f5f4f7" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;')
+          var output = '<abbr style="width: 100%" title="click to edit" data-id="' + options.id + '" data-fnc="' + options.fnc + '" data-filters="' + options.filters.join(',') + '" contenteditable="true">' + stringAbbr + '</abbr>'
+
+          setTimeout(function() {
+            commons.translate()
+
+            $('.remove').off()
+            $('.remove').on("DOMNodeRemoved", function() {
+                $(this).prev(".tgt").remove()
+            })
+
+            $('[contenteditable=true]').off()
+            $('[contenteditable=true]')
+              // When you click on item, record into data("initialText") content of this item.
+              .focus(function() {
+                  var self = this
+
+                  $(this).html(commons.cleanResponseText($(this).html()))
+                  if ($(this).html().trim().length === 0) $(this).html('&nbsp;') // don't lose cursor if empty
+
+                  $(this).data("initialText", $(this).html())
+
+                  var div = $('<div id="helper" style="display: none; user-select: none; cursor: pointer; border: 2px solid #dea189; border-top: 1px dotted #cbcbcb; padding: 0 10px 5px 10px; background-color: #fafafa; margin-top: 5px; margin-left: -7px; position: absolute" contenteditable="false"></div>')
+                  // show filters
+                  if (_.includes($(this).data('filters').split(','), 'global')) {
+                      div.append('<div style="display: inline-block; padding: 5px;">' +
+                        '<div class="text-primary" style="font-size:14px; font-weight: bold">Global variables: </div> ' +
+                        '<span style="display: block; font-family: monospace; color: #e00956; border: 1px solid #cbcbcb; border-radius: 5px !important; padding: 0 5px 0 5px; background-color: #f5f4f7" data-var="sender" data-lang="responses.variable.sender"></span> ' +
+                        '<span style="display: block; font-family: monospace; color: #e00956; border: 1px solid #cbcbcb; border-radius: 5px !important; padding: 0 5px 0 5px; background-color: #f5f4f7" data-var="title" data-lang="responses.variable.title"></span> ' +
+                        '<span style="display: block; font-family: monospace; color: #e00956; border: 1px solid #cbcbcb; border-radius: 5px !important; padding: 0 5px 0 5px; background-color: #f5f4f7" data-var="game" data-lang="responses.variable.game"></span> ' +
+                        '<span style="display: block; font-family: monospace; color: #e00956; border: 1px solid #cbcbcb; border-radius: 5px !important; padding: 0 5px 0 5px; background-color: #f5f4f7" data-var="viewers" data-lang="responses.variable.viewers"></span> ' +
+                        '<span style="display: block; font-family: monospace; color: #e00956; border: 1px solid #cbcbcb; border-radius: 5px !important; padding: 0 5px 0 5px; background-color: #f5f4f7" data-var="views" data-lang="responses.variable.views"></span> ' +
+                        '<span style="display: block; font-family: monospace; color: #e00956; border: 1px solid #cbcbcb; border-radius: 5px !important; padding: 0 5px 0 5px; background-color: #f5f4f7" data-var="hosts" data-lang="responses.variable.hosts"></span> ' +
+                        '<span style="display: block; font-family: monospace; color: #e00956; border: 1px solid #cbcbcb; border-radius: 5px !important; padding: 0 5px 0 5px; background-color: #f5f4f7" data-var="followers" data-lang="responses.variable.followers"></span> ' +
+                        '<span style="display: block; font-family: monospace; color: #e00956; border: 1px solid #cbcbcb; border-radius: 5px !important; padding: 0 5px 0 5px; background-color: #f5f4f7" data-var="subscribers" data-lang="responses.variable.subscribers"></span> ' +
+                      '</div>')
+                      div.css('display', 'block')
+                  }
+
+                  // show custom filters
+                  var localFilters
+                  _.each($(this).data('filters').split(','), function (filter) {
+                    if (filter === 'global' || filter.length === 0) return true
+                    if (_.isNil(localFilters)) localFilters = '<div style="display: inline-block;vertical-align:top; padding: 5px;"><div class="text-primary" style="font-size:14px; font-weight: bold">Local variables: </div>'
+                    localFilters = localFilters + '<span style="display: block; font-family: monospace; color: #e00956; border: 1px solid #cbcbcb; border-radius: 5px !important; padding: 0 5px 0 5px; background-color: #f5f4f7" data-var="' + filter + '" data-lang="responses.variable.' + filter + '"></span> '
+                    div.css('display', 'block')
+                  })
+                  if (!_.isNil(localFilters)) div.append(localFilters + '</div>')
+
+                  $(self).on('keyup keydown', function () {
+                    if ($(self).html().trim().startsWith('<div id="helper"')) $('#helper').before('&nbsp;')
+                  })
+
+                  $(this).append(div)
+                  div.children('div').children('span').click(function (ev) {
+                    $('#helper').before('$' + $(ev.currentTarget).data('var'))
+                  })
+                  commons.translate()
+              })
+              // When you leave an item...
+              .blur(function() {
+                $('#helper').remove()
+                var newString = commons.cleanResponseText($(this).html())
+                var filtersRegExp = new RegExp('\\$(' + _.keys(translations.responses.variable).join('|') + ')', 'g')
+                $(this).html(newString.replace(filtersRegExp, '<span contenteditable="false" style="user-select: none; display: inline-block; font-family: monospace; color: #e00956; border: 1px solid #cbcbcb; border-radius: 5px !important; padding: 0 5px 0 5px; background-color: #f5f4f7" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;'))
+                // ...if content is different...
+                if ($(this).data("initialText").trim() !== newString.trim()) {
+                  var fnc = $(this).data('fnc').split('.')
+                  window[fnc[0]][fnc[1]]($(this).data('id'), newString)
+                }
+                commons.translate()
+            });
+          }, 100)
           return output
         },
-        editableSwap: function (id) {
-          if ($('abbr[data-id="' + id + '"]').css('display') == 'inline') $('abbr[data-id="' + id + '"]').css('display', 'none')
-          else $('abbr[data-id="' + id + '"]').css('display', 'inline')
-          if ($('input[data-id="' + id + '"]').css('display') == 'inline-block') $('input[data-id="' + id + '"]').css('display', 'none')
-          else {
-            $('input[data-id="' + id + '"]').css('display', 'inline-block')
-              .focus()
-              .off('focusout')
-              .on('focusout', function (ev) {
-                commons.editableSwap(id)
-                $('abbr[data-id="' + id + '"]').text($(ev.target).val())
-                var fnc = ev.target.dataset.fnc.split('.')
-                window[fnc[0]][fnc[1]](id, $(ev.target).val())
-              })
-          }
+        cleanResponseText: function (text) {
+          return text.replace(/&nbsp;/g, ' ')
+            .replace(/<span.+?data-lang="responses\.variable\.(.+?)">.*?<\/span> /g, '!%%!$1')
+            .replace(/!%%!/g, '$').trim()
         },
         getDateString: function (d) {
           return ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +

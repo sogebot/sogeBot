@@ -2,10 +2,9 @@
 
 var _ = require('lodash')
 var chalk = require('chalk')
+const debug = require('debug')('commons')
 
 const config = require('../config.json')
-
-const debug = require('debug')('commons')
 
 function Commons () {
   global.configuration.register('atUsername', 'core.settings.atUsername', 'bool', true)
@@ -38,6 +37,7 @@ Commons.prototype.sendToOwners = function (text) {
 
 Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
   debug('sendMessage(%s, %j, %j)', message, sender, attr)
+  if (_.isNil(sender) || _.isNil(sender.username)) sender = null
   attr.sender = sender
   message = await global.parser.parseMessage(message, attr)
   if (message === '') return false // if message is empty, don't send anything

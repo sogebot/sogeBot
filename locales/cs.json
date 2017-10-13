@@ -53,6 +53,30 @@
     }
   },
   "webpanel": {
+    "responses": {
+      "variable": {
+        "sender": "Uživatel, který inicioval",
+        "title": "Aktuální název",
+        "game": "Aktuální hra",
+        "viewers": "Aktuální počet diváků",
+        "views": "Aktuální počet zobrazení",
+        "hosts": "Aktuální počet hostů",
+        "followers": "Aktuální počet followerů",
+        "subscribers": "Aktuální počet subscriberů",
+        "list": "Zaplněný seznam",
+        "type": "Typ",
+        "hours": "Hodiny",
+        "minutes": "Minuty",
+        "seconds": "Sekundy",
+        "description": "Popisek",
+        "quiet": "Potichu (bool)",
+        "id": "ID",
+        "amount": "Počet",
+        "pointsName": "Název bodů",
+        "rank": "Rank",
+        "username": "Uživatelské jméno"
+      }
+    },
     "page-settings": {
       "systems": {
         "whispers": {
@@ -493,20 +517,20 @@
   },
   "alias": {
     "success": {
-      "add": "Alias byl pridan do databaze",
-      "remove": "Alias byl smazany z databaze",
-      "list": "Seznam aliasu",
-      "enabled": "Alias !$alias byl zapnut",
-      "disabled": "Alias !$alias byl vypnut",
-      "visible": "Alias !$alias bude zobrazen v listu",
-      "invisible": "Alias !$alias nebude zobrazen v listu"
+      "add": "$sender, alias !$alias byl pridan do databaze",
+      "remove": "$sender, alias !$alias byl smazany z databaze",
+      "list": "$sender, seznam aliasu: $list",
+      "enabled": "$sender, alias !$alias byl zapnut",
+      "disabled": "$sender, alias !$alias byl vypnut",
+      "visible": "$sender, alias !$alias bude zobrazen v listu",
+      "invisible": "$sender, alias !$alias nebude zobrazen v listu"
     },
     "failed": {
-      "add": "Tento alias uz existuje v databazi",
-      "remove": "Tento alias v databazi neexistuje",
-      "list": "Seznam aliasu je prazdny",
+      "add": "$sender, alias !$alias uz existuje v databazi",
+      "remove": "$sender, alias !$alias v databazi neexistuje",
+      "list": "$sender, seznam aliasu je prazdny",
       "parse": "{core.command-parse} !alias",
-      "toggle": "Alias !$alias neni v databazi!",
+      "toggle": "$sender, alias !$alias neni v databazi!",
       "visible": "{alias.failed.remove}"
     }
   },

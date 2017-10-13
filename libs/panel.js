@@ -4,6 +4,7 @@ var express = require('express')
 var http = require('http')
 var path = require('path')
 var basicAuth = require('basic-auth')
+const flatten = require('flat')
 var _ = require('lodash')
 
 const config = require('../config.json')
@@ -84,6 +85,22 @@ function Panel () {
     socket.on('editUserTwitchTitle', function (data) { global.twitch.editUserTwitchTitle(global.twitch, socket, data) })
     socket.on('updateGameAndTitle', function (data) { global.twitch.updateGameAndTitle(global.twitch, socket, data) })
 
+    socket.on('responses.get', function (at, callback) {
+      var responses = flatten(global.translations[global.configuration.getValue('lang')][at])
+      _.each(responses, function (value, key) {
+        responses[key] = global.translate(at + '.' + key) // needed for nested translations
+      })
+      callback(responses)
+    })
+    socket.on('responses.set', function (data) {
+      _.remove(global.customTranslations, function (o) { return o.key === data.key })
+      global.customTranslations.push(data)
+    })
+    socket.on('responses.revert', function (data, callback) {
+      _.remove(global.customTranslations, function (o) { return o.key === data.key })
+      callback()
+    })
+
     socket.on('getWidgetList', function () { self.sendWidgetList(self, socket) })
     socket.on('addWidget', function (widget, row) { self.addWidgetToDb(self, widget, row, socket) })
     socket.on('deleteWidget', function (widget) { self.deleteWidgetFromDb(self, widget) })
@@ -111,12 +128,13 @@ function Panel () {
     })
 
     _.each(self.socketListeners, function (listener) {
-      socket.on(listener.on, function (data) {
+      socket.on(listener.on, async function (data) {
         if (typeof listener.fnc !== 'function') {
           throw new Error('Function for this listener is undefined' +
             ' widget=' + listener.self.constructor.name + ' on=' + listener.on)
         }
-        listener.fnc(listener.self, self.io, data)
+        await listener.fnc(listener.self, self.io, data)
+        if (listener.finally && listener.finally !== listener.fnc) listener.finally(listener.self, self.io)
       })
     })
 
@@ -176,4 +194,13 @@ Panel.prototype.deleteWidgetFromDb = function (self, widget) {
 Panel.prototype.socketListening = function (self, on, fnc) {
   this.socketListeners.push({self: self, on: on, fnc: fnc})
 }
+
+Panel.prototype.registerSockets = function (options) {
+  const name = options.self.constructor.name.toLowerCase()
+  for (let fnc of options.expose) {
+    if (!_.isFunction(options.self[fnc])) global.log.error(`Function ${options.self[fnc]} of ${options.self.constructor.name} is undefined`)
+    else this.socketListeners.push({self: options.self, on: `${name}.${fnc}`, fnc: options.self[fnc], finally: options.finally})
+  }
+}
+
 module.exports = Panel
