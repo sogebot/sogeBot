@@ -352,7 +352,7 @@ Events.prototype.fire = function (event, attr) {
         }
         return false
       } else if (_.isFunction(self.operations[operation.name])) {
-        self.operations[operation.name](_.merge(operation, attr))
+        self.operations[operation.name](_.merge(_.clone(operation), _.clone(attr))) // clone ops and attrs to not rewrite in db
       } else {
         global.log.warning('Operation doesn\'t exist', operation.name)
       }
