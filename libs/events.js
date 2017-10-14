@@ -61,15 +61,16 @@ function Events () {
       _.each(attr, function (val, name) {
         command = attr.command.replace('$' + name, val)
       })
-      attr.command = await global.parser.parseMessage(command)
+      command = await global.parser.parseMessage(command)
       global.parser.parseCommands((attr.quiet) ? null : { username: global.parser.getOwner() }, command)
     },
     'play-sound': function (attr) {
       // attr.sound can be filename or url
-      if (!_.includes(attr.sound, 'http')) {
-        attr.sound = 'dist/soundboard/' + attr.sound + '.mp3'
+      let sound = attr.sound
+      if (!_.includes(sound, 'http')) {
+        attr.sound = 'dist/soundboard/' + sound + '.mp3'
       }
-      global.panel.io.emit('play-sound', attr.sound)
+      global.panel.io.emit('play-sound', sound)
     },
     'emote-explosion': function (attr) {
       // attr.emotes is string with emotes to show
@@ -80,15 +81,15 @@ function Events () {
       global.client.commercial(global.configuration.get().twitch.channel, attr.duration)
     },
     'log': function (attr) {
-      let message = attr.message.replace(/\$username/g, attr.username)
-      _.each(message.match(/\$(\w+)/gi), function (match) {
+      let string = attr.string.replace(/\$username/g, attr.username)
+      _.each(string.match(/\$(\w+)/gi), function (match) {
         let value = !_.isNil(attr[match.replace('$', '')]) ? attr[match.replace('$', '')] : 'none'
-        message = message.replace(match, value)
+        string = string.replace(match, value)
       })
-      global.log[attr.level](message)
+      global.log[attr.level](string)
     },
     '_function': function (attr) {
-      attr.fnc(attr)
+      attr.fnc(_.clone(attr))
     }
   }
 
@@ -113,33 +114,33 @@ Events.prototype.loadSystemEvents = function (self) {
   self.events = self.removeSystemEvents(self)
 
   self.events['timeout'].push([
-    { system: true, name: 'log', message: 'username: $username, reason: $reason, duration: $duration', level: 'timeout' }
+    { system: true, name: 'log', string: 'username: $username, reason: $reason, duration: $duration', level: 'timeout' }
   ])
   self.events['follow'].push([
-    { system: true, name: 'log', message: '$username', level: 'follow' },
+    { system: true, name: 'log', string: '$username', level: 'follow' },
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'follow' }
   ])
   self.events['resub'].push([
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'resub' },
-    { system: true, name: 'log', message: '$username, months: $months, message: $message', level: 'resub' }
+    { system: true, name: 'log', string: '$username, months: $months, message: $message', level: 'resub' }
   ])
   self.events['subscription'].push([
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'sub' },
-    { system: true, name: 'log', message: '$username, method: (method)', level: 'sub' }
+    { system: true, name: 'log', string: '$username, method: (method)', level: 'sub' }
   ])
   self.events['unfollow'].push([
-    { system: true, name: 'log', message: '$username', level: 'unfollow' }
+    { system: true, name: 'log', string: '$username', level: 'unfollow' }
   ])
   self.events['ban'].push([
-    { system: true, name: 'log', message: '$username, reason: $reason', level: 'ban' }
+    { system: true, name: 'log', string: '$username, reason: $reason', level: 'ban' }
   ])
   self.events['hosted'].push([
-    { system: true, name: 'log', message: '$username', level: 'host' },
+    { system: true, name: 'log', string: '$username', level: 'host' },
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'host' }
   ])
   self.events['cheer'].push([
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'cheer' },
-    { system: true, name: 'log', message: '$username, bits: $bits, message: $message', level: 'cheer' }
+    { system: true, name: 'log', string: '$username, bits: $bits, message: $message', level: 'cheer' }
   ])
 }
 
@@ -302,7 +303,6 @@ Events.prototype.fire = function (event, attr) {
   if (_.isNil(this.events[event])) return true
 
   let operationsBulk = this.events[event]
-
   var self = this
   _.each(operationsBulk, function (operations) {
     _.each(operations, function (operation) {
@@ -359,7 +359,7 @@ Events.prototype.fire = function (event, attr) {
         }
         return false
       } else if (_.isFunction(self.operations[operation.name])) {
-        self.operations[operation.name](_.merge(operation, attr))
+        self.operations[operation.name](_.merge(_.clone(operation), _.clone(attr)))
       } else {
         global.log.warning('Operation doesn\'t exist', operation.name)
       }
