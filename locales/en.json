@@ -424,7 +424,9 @@
     "gamblingCooldownBypass": "Bypass gambling cooldowns for mods/caster",
     "click-to-highlight": "highlight",
     "commercial": "commercial started",
-    "start-commercial": "run a commercial"
+    "start-commercial": "run a commercial",
+    "omit": "omit",
+    "comply": "comply"
   },
   "raffle": {
     "announceInterval": "Opened raffles will be announced every $value minute",
@@ -934,26 +936,26 @@
   "cooldown": {
     "toggle": {
       "moderator": {
-        "enabled": "Cooldown for $command was enabled for moderators",
-        "disabled": "Cooldown for $command was disabled for moderators",
+        "enabled": "$sender, cooldown for $command was enabled for moderators",
+        "disabled": "$sender, cooldown for $command was disabled for moderators",
         "failed": "Sorry, $sender, this cooldown doesn't exist"
       },
       "owner": {
-        "enabled": "Cooldown for $command was enabled for owners",
-        "disabled": "Cooldown for $command was disabled for owners",
+        "enabled": "$sender, cooldown for $command was enabled for owners",
+        "disabled": "$sender, cooldown for $command was disabled for owners",
         "failed": "Sorry, $sender, this cooldown doesn't exist"
       }
     },
     "failed": {
       "parse": "{core.command-parse} !cooldown [keyword|!command] [global|user] [seconds] [true/false]",
       "cooldown": "$sender, you cannot use $command, remaining $secondss",
-      "toggle": "Cooldown for $command was not found!"
+      "toggle": "$sender, cooldown for $command was not found!"
     },
     "success": {
-      "set": "$type cooldown for $command was set to $secondss",
-      "unset": "Cooldown for $command was unset",
-      "enabled": "Cooldown for $command was enabled",
-      "disabled": "Cooldown for $command was disabled"
+      "set": "$sender, $type cooldown for $command was set to $secondss",
+      "unset": "$sender, cooldown for $command was unset",
+      "enabled": "$sender, cooldown for $command was enabled",
+      "disabled": "$sender, cooldown for $command was disabled"
     }
   },
   "gambling": {

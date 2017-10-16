@@ -531,6 +531,7 @@
           options.text = !_.isNil(options.text) ? options.text.toString() : ''
           options.fnc = !_.isNil(options.fnc) ? options.fnc : null
           options.filters = !_.isNil(options.filters) ? options.filters : []
+          options.options = !_.isNil(options.options) ? options.options : []
 
           var filtersRegExp = new RegExp('\\$(' + _.keys(translations.responses.variable).join('|') + ')', 'g')
           var stringAbbr = options.text.replace(filtersRegExp, '<span contenteditable="false" style="user-select: none; display: inline-block; font-family: monospace; color: #e00956; border: 1px solid #cbcbcb; border-radius: 5px !important; padding: 0 4px 0 4px; background-color: #f5f4f7" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;')
@@ -601,7 +602,7 @@
                 // ...if content is different...
                 if ($(this).data("initialText").trim() !== newString.trim()) {
                   var fnc = $(this).data('fnc').split('.')
-                  window[fnc[0]][fnc[1]]($(this).data('id'), newString)
+                  window[fnc[0]][fnc[1]]($(this).data('id'), newString, options.options)
                 }
                 commons.translate()
             });

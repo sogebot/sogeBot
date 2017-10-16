@@ -419,7 +419,9 @@
     "gamblingCooldownBypass": "Ignorovat herní cooldowny pro mody/castera",
     "click-to-highlight": "highlight",
     "commercial": "reklama zahájena",
-    "start-commercial": "spustit reklamu"
+    "start-commercial": "spustit reklamu",
+    "omit": "vynechat",
+    "comply": "dodržovat"
   },
   "raffle": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych $value minut",
@@ -929,26 +931,26 @@
   "cooldown": {
     "toggle": {
       "moderator": {
-        "enabled": "Cooldown pro $command je nastaven i pro moderatory",
-        "disabled": "Cooldown pro $command ignoruje moderatory",
+        "enabled": "$sender, cooldown pro $command je nastaven i pro moderatory",
+        "disabled": "$sender, cooldown pro $command ignoruje moderatory",
         "failed": "Promin, $sender, ale tento cooldown neexistuje"
       },
       "owner": {
-        "enabled": "Cooldown pro $command je nastaven i pro vlastnika",
-        "disabled": "Cooldown pro $command ignoruje vlastnika",
+        "enabled": "$sender, cooldown pro $command je nastaven i pro vlastnika",
+        "disabled": "$sender, cooldown pro $command ignoruje vlastnika",
         "failed": "Promin, $sender, ale tento cooldown neexistuje"
       }
     },
     "failed": {
       "parse": "{core.command-parse} !cooldown [keyword|!command] [global|user] [seconds] [true/false]",
       "cooldown": "$sender, jeste nemuzes pouzit $command, zbyva jeste $secondss",
-      "toggle": "Cooldown pro $command neni v databazi!"
+      "toggle": "$sender, cooldown pro $command neni v databazi!"
     },
     "success": {
-      "set": "$type cooldown pro $command byl nastaven na $secondss",
-      "unset": "Cooldown pro $command byl odebran",
-      "enabled": "Cooldown pro $command byl zapnut",
-      "disabled": "Cooldown pro $command byl vypnut"
+      "set": "$sender, $type cooldown pro $command byl nastaven na $secondss",
+      "unset": "$sender, cooldown pro $command byl odebran",
+      "enabled": "$sender, cooldown pro $command byl zapnut",
+      "disabled": "$sender, cooldown pro $command byl vypnut"
     }
   },
   "gambling": {
