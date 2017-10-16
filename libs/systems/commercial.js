@@ -11,17 +11,22 @@ var constants = require('../constants')
  * !commercial [duration] [?message]  - run commercial
  */
 
-function Commercial () {
-  if (global.commons.isSystemEnabled(this)) {
-    global.parser.register(this, '!commercial', this.run, constants.OWNER_ONLY)
+class Commercial {
+  constructor () {
+    if (global.commons.isSystemEnabled(this)) {
+      global.parser.register(this, '!commercial', this.run, constants.OWNER_ONLY)
 
-    global.parser.registerHelper('!commercial')
+      global.parser.registerHelper('!commercial')
+    }
   }
-}
 
-Commercial.prototype.run = function (self, sender, text) {
-  try {
+  run (self, sender, text) {
     let parsed = text.match(/^([\d]+)? ?([\u0500-\u052F\u0400-\u04FF\S\s]+)?$/)
+
+    if (_.isNil(parsed)) {
+      global.commons.sendMessage('$sender, something went wrong with !commercial', sender)
+    }
+
     let commercial = {
       duration: !_.isNil(parsed[1]) ? parseInt(parsed[1], 10) : null,
       message: !_.isNil(parsed[2]) ? parsed[2] : null
@@ -40,9 +45,6 @@ Commercial.prototype.run = function (self, sender, text) {
     } else {
       global.commons.sendMessage('$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', sender)
     }
-  } catch (e) {
-    global.log.error(e, 'Commercial.prototype.run')
-    global.commons.sendMessage('something went wrong with !commercial', sender)
   }
 }
 
