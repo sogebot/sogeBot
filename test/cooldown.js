@@ -184,7 +184,7 @@ describe('System - Cooldowns', () => {
         if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
 
         global.systems.keywords.add(global.systems.keywords, owner, 'me (!me)')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('keywords.success.add')), 5000)
+        await until(() => global.commons.sendMessage.calledWith(global.translate('keywords.success.add').replace(/\$keyword/g, 'me')), 5000)
 
         global.systems.cooldown.set(global.systems.cooldown, owner, 'me user 60 true')
         await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
@@ -240,7 +240,7 @@ describe('System - Cooldowns', () => {
         if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
 
         global.systems.keywords.add(global.systems.keywords, owner, 'me (!me)')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('keywords.success.add')), 5000)
+        await until(() => global.commons.sendMessage.calledWith(global.translate('keywords.success.add').replace(/\$keyword/g, 'me')), 5000)
 
         global.systems.cooldown.set(global.systems.cooldown, owner, 'me global 60 true')
         await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')

@@ -562,18 +562,18 @@
   },
   "keywords": {
     "success": {
-      "add": "Keyword was added to database",
-      "remove": "Keyword was deleted from database",
-      "list": "List of keywords",
-      "enabled": "Keyword $keyword was enabled",
-      "disabled": "Keyword $keyword was disabled"
+      "add": "$sender, keyword $keyword was added to database",
+      "remove": "$sender, keyword $keyword  was deleted from database",
+      "list": "$sender, list of keywords: $list",
+      "enabled": "$sender, keyword $keyword was enabled",
+      "disabled": "$sender, keyword $keyword was disabled"
     },
     "failed": {
-      "add": "This keyword already exists in database",
-      "remove": "This keyword cannot be found in database",
-      "list": "List of keywords is empty",
+      "add": "$sender, keyword $keyword already exists in database",
+      "remove": "$sender, keyword $keyword cannot be found in database",
+      "list": "$sender, list of keywords is empty",
       "parse": "{core.command-parse} !keyword",
-      "toggle": "Keyword $keyword was not found"
+      "toggle": "$sender, keyword $keyword was not found"
     }
   },
   "notice": {

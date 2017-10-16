@@ -1,87 +1,233 @@
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-8">
-  <div class="widget">
-    <h2 class="title" data-lang="keywords"></h2>
-    <table class="table table-striped table-responsive table-condensed">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th data-lang="keyword"></th>
-          <th data-lang="response"></th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="Keywords"></tbody>
-    </table>
-  </div>
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+  <ul class="nav nav-pills">
+    <li>
+      <span data-lang="keywords" class="title text-default"></span>
+    </li>
+    <li>
+      <button class="btn btn-success plus-button" onclick="keywords.new()" style="padding: 9px 15px;">
+        <i class="fa fa-plus" aria-hidden="true"></i>
+      </button>
+    </li>
+    <li class="active">
+      <a data-toggle="tab" href="#manage">Manage</a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#responses">Responses</a>
+    </li>
+  </ul>
 </div>
 
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="manage">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <table class="table table-striped table-responsive table-condensed">
+          <tbody id="Keywords"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-  <div class="widget">
-    <h2 class="title" data-lang="create"></h2>
-    <form class="form-horizontal">
-      <div class="form-group">
-        <div class="col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group">
-          <div class="input-group-addon" data-lang="keyword"></div>
-          <input type="text" class="form-control" id="inputKeyword" placeholder="e.g. facebook">
-        </div>
+  <div role="tabpanel" class="tab-pane" id="responses">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <table class="table table-striped table-responsive table-condensed">
+          <tbody id="Responses">
+            <tr>
+              <td colspan="2">
+                <kbd>!keyword add $keyword $response</kbd>
+                <span class="label label-primary">Response</span>
+                <span class="label label-success">Success</span>
+                <span class="custom-response" data-id="keywords.success.add"></span>
+              </td>
+              <td colspan="2">
+                <kbd>!keyword add $keyword $response</kbd>
+                <span class="label label-primary">Response</span>
+                <span class="label label-danger">Failure</span>
+                <span class="custom-response" data-id="keywords.failed.add"></span>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <kbd>!keyword remove !$keyword</kbd>
+                <span class="label label-primary">Response</span>
+                <span class="label label-success">Success</span>
+                <span class="custom-response" data-id="keywords.success.remove"></span>
+              </td>
+              <td colspan="2">
+                <kbd>!keyword remove !$keyword</kbd>
+                <span class="label label-primary">Response</span>
+                <span class="label label-danger">Failure</span>
+                <span class="custom-response" data-id="keywords.failed.remove"></span>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <kbd>!keyword list</kbd>
+                <span class="label label-primary">Response</span>
+                <span class="label label-success">Populated $list</span>
+                <span class="custom-response" data-id="keywords.success.list"></span>
+              </td>
+              <td colspan="2">
+                <kbd>!keyword list</kbd>
+                <span class="label label-primary">Response</span>
+                <span class="label label-warning">Empty</span>
+                <span class="custom-response" data-id="keywords.failed.list"></span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <kbd>!keyword toggle !$keyword</kbd>
+                <span class="label label-primary">Response</span>
+                <span class="label label-success">Enabled</span>
+                <span class="custom-response" data-id="keywords.success.enabled"></span>
+              </td>
+              <td colspan="2">
+                <kbd>!keyword toggle !$keyword</kbd>
+                <span class="label label-primary">Response</span>
+                <span class="label label-warning">Disabled</span>
+                <span class="custom-response" data-id="keywords.success.disabled"></span>
+              </td>
+              <td>
+                <kbd>!keyword toggle !$keyword</kbd>
+                <span class="label label-primary">Response</span>
+                <span class="label label-danger">Failure</span>
+                <span class="custom-response" data-id="keywords.failed.toggle"></span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <div class="form-group">
-        <div class="col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group">
-          <div class="input-group-addon" data-lang="response"></div>
-          <input type="text" class="form-control" id="inputResponse" placeholder="e.g. This is my facebook link!">
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="col-xs-12 col-sm-12 text-center">
-          <button class="btn btn-primary" onclick="keywords.createKeyword(event)" data-lang="confirm"></button>
-        </div>
-      </div>
-    </form>
+    </div>
   </div>
 </div>
 
 <script>
   var keywords = {
-    updateKeywords: function (list) {
+    list: {},
+    cancel: function () {
+      $('#new-keyword').css('display', 'none')
+      $('.new-confirm-btn').css('display', 'none')
+      this.update(this.list)
+    },
+    new: function () {
+      $('#new-keyword').css('display', 'table-row')
+      $('.new-confirm-btn').css('display', 'block')
+    },
+    update: function (list) {
+      this.list = list
       $("#Keywords").empty()
-      _.each(list, function(item, index) {
-        $("#Keywords").append((item.enabled ? '<tr>' : '<tr style="text-decoration: line-through">') +
-          '<td>' + (index + 1) + '</td>' +
-          '<td>' + item.keyword + '</td>' +
-          '<td>' + commons.editable(item.response, item.keyword, 'keywords.editKeyword') + '</td>' +
-          '<td class="tableMenu">' +
-          '<button type="button" class="btn btn-' + (!item.enabled ? 'success' : 'danger') + '" data-keyword="' + item.keyword + '" onclick="keywords.toggleKeyword(this)">' + (!item.enabled ? translations['enable'] : translations['disable']) + '</button>' +
-          '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
-          '<button type="button" style="display: none" class="btn btn-success btn-confirm" onclick="keywords.deleteKeyword(this)" data-keyword="' + item.keyword + '"><span class="glyphicon glyphicon-ok"></span></button>' +
-          '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="glyphicon glyphicon-remove"></span></button>' +
+      $("#Keywords").append('<tr id="new-keyword" style="display:none">' +
+        '<td style="vertical-align: top !important;min-width: 150px;"><span class="label label-default">New keyword</span>' +
+        commons.editable({
+          text: '',
+          id: '_new!',
+          fnc: 'commons.stub'
+        }) + '</td>' +
+        '<td style="vertical-align: top !important;"><span class="label label-primary">Response</span> ' +
+        commons.editable({
+          text: '&nbsp;',
+          id: '_new!',
+          fnc: 'commons.stub'
+        }) +
+        '<div class="btn-group pull-right">' +
+        '<button class="save-button btn btn-success new-confirm-btn" style="display:none" onclick="keywords.create(event)">SAVE</button>' +
+        '<button class="btn btn-warning new-confirm-btn" style="display:none" onclick="keywords.cancel()">CANCEL</button>' +
+        '</div>' +
+        '</td>' +
+        '</tr>');
+      _.each(list, function (item, index) {
+        $("#Keywords").append('<tr class="page-data-row">' +
+          '<td style="vertical-align: top !important;min-width: 150px;"><span class="label label-default">Keyword</span>' +
+          commons.editable({
+            text: item.keyword,
+            id: item.keyword,
+            fnc: 'keywords.editName'
+          }) + '</td>' +
+          '<td style="vertical-align: top !important;"><span class="label label-primary">Response</span> ' +
+          '<span style="cursor: pointer;" class="label label-' + (item.enabled ? "success" : "danger") +
+          '" data-id="' + item.keyword + '" onclick="keywords.toggle(this)">' + (item.enabled ? "enabled" :
+            "disabled") + '</span>' +
+          '<span style="cursor: not-allowed; float:right; padding: 4px;" class="label label-danger btn-remove" data-id="' +
+          item.keyword + '"  onclick="commons.confirm(this)">delete</span>' +
+          '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="label label-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
+          '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="label label-success btn-confirm" onclick="keywords.delete(this)" data-id="' +
+          item.keyword + '">confirm</span>' +
+          commons.editable({
+            text: item.response,
+            id: item.keyword,
+            fnc: 'keywords.edit'
+          }) +
           '</td>' +
-          '</tr>');
+          '</tr>')
       })
     },
-    editKeyword: function (id, value) {
-      socket.emit('keywords.edit', {id: id, value: value})
+    editName: function (id, value) {
+      socket.emit('keywords.editKeyword', {
+        id: id,
+        value: value
+      })
     },
-    deleteKeyword: function (el) {
-      socket.emit('keywords.delete', el.dataset.keyword)
+    edit: function (id, value) {
+      socket.emit('keywords.editResponse', {
+        id: id,
+        value: value
+      })
     },
-    toggleKeyword: function (el) {
-      socket.emit('keywords.toggle', el.dataset.keyword)
+    delete: function (el) {
+      socket.emit('keywords.remove', el.dataset.id)
     },
-    createKeyword: function (event) {
+    toggle: function (el) {
+      socket.emit('keywords.toggle', el.dataset.id)
+    },
+    create: function (event) {
       event.preventDefault()
-      var data = {keyword: $("#inputKeyword").val(), response: $("#inputResponse").val()}
-      socket.emit('keywords.create', data)
-      $("#inputKeyword").val('')
-      $("#inputResponse").val('')
+      var inputs = $('[data-id="_new!"]')
+      var data = {
+        keyword: $(inputs[0]).text().replace('!', ''),
+        response: commons.cleanResponseText($(inputs[1]).html())
+      }
+      socket.emit('keywords.add', `${data.keyword} ${data.response}`)
+      $('.new-confirm-btn').css('display', 'none')
+    },
+    responses: function () {
+      socket.emit('responses.get', 'keywords', function (data) {
+        _.each(data, function (value, key) {
+          var filters = ['global']
+
+          if (key === 'success.add' || key === 'failed.add') {
+            filters.push('keyword')
+            filters.push('response')
+          }
+
+          if (key === 'success.remove' || key === 'failed.remove' || key === 'success.enabled' ||
+            key === 'success.disabled' || key === 'failed.toggle') {
+            filters.push('keyword')
+          }
+          if (key === 'success.list') {
+            filters.push('list')
+          }
+
+          key = 'keywords.' + key
+          $('[data-id="' + key + '"]').html(commons.editable({
+            text: value,
+            id: key,
+            fnc: 'commons.setResponse',
+            filters: filters
+          }))
+        })
+      })
     }
   }
 
-  socket.emit('keywords.get');
+  keywords.responses()
+  keywords.update([])
 
-  socket.on('keywords.update', function(list) {
-    keywords.updateKeywords(list)
-  });
+  socket.emit('keywords.send')
+  socket.on('keywords', function (list) {
+    keywords.update(list)
+  })
 
   window.keywords = keywords
+
 </script>
