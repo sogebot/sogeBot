@@ -1,7 +1,8 @@
 'use strict'
 
 // 3rdparty libraries
-var _ = require('lodash')
+const _ = require('lodash')
+const debug = require('debug')('systems:commands')
 
 // bot libraries
 var constants = require('../constants')
@@ -71,6 +72,7 @@ class CustomCommands {
   }
 
   async add (self, sender, text) {
+    debug('add(%j,%j,%j)', self, sender, text)
     let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
 
     if (_.isNil(parsed)) {
@@ -82,7 +84,7 @@ class CustomCommands {
 
     let exists = await global.db.engine.findOne('commands', { command: parsed[1] })
     if (!_.isEmpty(exists)) {
-      global.commons.sendMessage(global.translate('customcmds.failed.add'), sender)
+      global.commons.sendMessage(global.translate('customcmds.failed.add').replace(/\$command/g, parsed[1]), sender)
       return false
     }
 
@@ -93,7 +95,7 @@ class CustomCommands {
 
     await global.db.engine.insert('commands', command)
     await self.register(self)
-    global.commons.sendMessage(global.translate('customcmds.success.add'), sender)
+    global.commons.sendMessage(global.translate('customcmds.success.add').replace(/\$command/g, parsed[1]), sender)
   }
 
   async run (self, sender, msg, fullMsg) {
@@ -105,14 +107,16 @@ class CustomCommands {
 
   async list (self, sender, text) {
     let commands = await global.db.engine.find('commands', { visible: true })
-    var output = (commands.length === 0 ? global.translate('customcmds.failed.list') : global.translate('customcmds.success.list') + ': !' + _.map(commands, 'command').join(', !'))
+    var output = (commands.length === 0 ? global.translate('customcmds.failed.list') : global.translate('customcmds.success.list').replace(/\$list/g, '!' + _.map(commands, 'command').join(', !')))
     global.commons.sendMessage(output, sender)
   }
 
   async toggle (self, sender, text) {
+    debug('toggle(%j,%j,%j)', self, sender, text)
     let id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)
     if (_.isNil(id)) {
       global.commons.sendMessage(global.translate('customcmds.failed.parse'), sender)
+      debug(global.translate('customcmds.failed.parse'))
       return false
     }
     id = id[1]
@@ -121,6 +125,7 @@ class CustomCommands {
     if (_.isEmpty(command)) {
       global.commons.sendMessage(global.translate('customcmds.failed.toggle')
         .replace(/\$command/g, id), sender)
+      debug(global.translate('customcmds.failed.toggle').replace(/\$command/g, id))
       return false
     }
 
@@ -129,6 +134,7 @@ class CustomCommands {
 
     global.commons.sendMessage(global.translate(!command.enabled ? 'customcmds.success.enabled' : 'customcmds.success.disabled')
       .replace(/\$command/g, command.command), sender)
+    debug(global.translate(!command.enabled ? 'customcmds.success.enabled' : 'customcmds.success.disabled').replace(/\$command/g, command.command))
   }
 
   async visible (self, sender, text) {
@@ -161,11 +167,11 @@ class CustomCommands {
 
     let removed = await global.db.engine.remove('commands', { command: id })
     if (!removed) {
-      global.commons.sendMessage(global.translate('customcmds.failed.remove'), sender)
+      global.commons.sendMessage(global.translate('customcmds.failed.remove').replace(/\$command/g, id), sender)
       return false
     }
     global.parser.unregister('!' + id)
-    global.commons.sendMessage(global.translate('customcmds.success.remove'), sender)
+    global.commons.sendMessage(global.translate('customcmds.success.remove').replace(/\$command/g, id), sender)
   }
 }
 
