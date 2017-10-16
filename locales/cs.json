@@ -536,20 +536,20 @@
   },
   "customcmds": {
     "success": {
-      "add": "Prikaz byl pridan do databaze",
-      "remove": "Prikaz byl smazany z databaze",
-      "list": "Seznam prikazu",
-      "enabled": "Prikaz !$command byl zapnut",
-      "disabled": "Prikaz !$command byl vypnut",
-      "visible": "Prikaz !$command bude zobrazen v listu",
-      "invisible": "Prikaz !$command nebude zobrazen v listu"
+      "add": "$sender, prikaz !$command byl pridan do databaze",
+      "remove": "$sender, prikaz !$command byl smazany z databaze",
+      "list": "$sender, seznam prikazu: $list",
+      "enabled": "$sender, prikaz !$command byl zapnut",
+      "disabled": "$sender, prikaz !$command byl vypnut",
+      "visible": "$sender, prikaz !$command bude zobrazen v listu",
+      "invisible": "$sender, prikaz !$command nebude zobrazen v listu"
     },
     "failed": {
-      "add": "Tento prikaz uz existuje v databazi",
-      "remove": "Tento prikaz v databazi neexistuje",
-      "list": "Seznam prikazu je prazdny",
+      "add": "$sender, prikaz !$command uz existuje v databazi",
+      "remove": "$sender, prikaz !$command v databazi neexistuje",
+      "list": "$sender, seznam prikazu je prazdny",
       "parse": "{core.command-parse} !command",
-      "toggle": "Prikaz !$command neni v databazi!",
+      "toggle": "$sender, prikaz !$command neni v databazi!",
       "visible": "{customcmds.failed.remove}"
     }
   },

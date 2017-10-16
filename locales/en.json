@@ -541,20 +541,20 @@
   },
   "customcmds": {
     "success": {
-      "add": "Command was added to database",
-      "remove": "Command was deleted from database",
-      "list": "List of commands",
-      "enabled": "Command !$command was enabled",
-      "disabled": "Command !$command was disabled",
-      "visible": "Command !$command will be visible in list",
-      "invisible": "Command !$command will not be visible in list"
+      "add": "$sender, command !$command was added to database",
+      "remove": "$sender, command !$command was deleted from database",
+      "list": "$sender, list of commands: $list",
+      "enabled": "$sender, command !$command was enabled",
+      "disabled": "$sender, command !$command was disabled",
+      "visible": "$sender, command !$command will be visible in list",
+      "invisible": "$sender, command !$command will not be visible in list"
     },
     "failed": {
-      "add": "This command already exists in database",
-      "remove": "This command cannot be found in database",
-      "list": "List of commands is empty",
+      "add": "$sender, command !$command already exists in database",
+      "remove": "$sender, command !$command cannot be found in database",
+      "list": "$sender, list of commands is empty",
       "parse": "{core.command-parse} !command",
-      "toggle": "Command !$command was not found",
+      "toggle": "$sender, command !$command was not found",
       "visible": "{customcmds.failed.remove}"
     }
   },
