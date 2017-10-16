@@ -986,10 +986,9 @@
         loadedWidgets.splice(loadedWidgets.indexOf(id), 1)
       }
 
-
       var saveHighlight = function () {
-        console.debug('EMIT [highlight.save]')
-        socket.emit('highlight.save')
+        console.debug('EMIT [highlights.highlight]')
+        socket.emit('highlights.highlight', '')
 
       }
       var switchTheme = function () {
