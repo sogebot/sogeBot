@@ -145,8 +145,6 @@ class IMongoDB extends Interface {
     this.on(table) // init table
 
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
-    delete object._id
-
     where = flatten(where)
 
     // invalidate cache on update

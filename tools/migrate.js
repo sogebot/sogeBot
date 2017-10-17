@@ -74,10 +74,10 @@ let migration = {
       }
     }
   }],
-  notices: [{
+  timers: [{
     version: '5.8.0',
     do: async () => {
-      console.info('Migration notices to %s', '5.8.0')
+      console.info('Migration notices -> timers to %s', '5.8.0')
       const db = new OldDatabase({ filename: 'sogeBot.db', autoload: true })
       let items = await db.findOne({ _id: 'notices' })
       if (_.isNil(items) || _.size(items.notices) === 0) {
@@ -85,11 +85,10 @@ let migration = {
         return
       }
 
-      console.info('Migrating %i notices', _.size(items.notices))
+      console.info('Migrating %i notices to timers', _.size(items.notices))
+      let timer = await global.db.engine.insert('timers', { name: 'notices', messages: 0, seconds: 300, enabled: true })
       for (let item of _.values(items.notices)) {
-        item.key = item.id
-        delete item.id
-        await global.db.engine.update('notices', item, item)
+        await global.db.engine.insert('timersResponses', { timerId: timer._id, enabled: item.enabled, response: item.text, timestamp: new Date().getTime() })
       }
     }
   }],

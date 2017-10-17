@@ -37,6 +37,8 @@ Commons.prototype.sendToOwners = function (text) {
 
 Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
   debug('sendMessage(%s, %j, %j)', message, sender, attr)
+
+  if (_.isString(sender)) sender = { username: sender }
   if (_.isNil(sender) || _.isNil(sender.username)) sender = null
   attr.sender = sender
   message = await global.parser.parseMessage(message, attr)
@@ -50,18 +52,19 @@ Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
     return true
   }
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
-  if (_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === config.settings.bot_username && !attr.force)) return false // we don't want to reply on bot commands
+  if (_.isNil(sender) || (!_.isUndefined(sender) && sender.username === config.settings.bot_username && !attr.force)) return false // we don't want to reply on bot commands
   message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + sender.username) : message
 
   // global variables
   message = message.replace(/\$game/g, global.twitch.current.game)
-    .replace(/\$title/g, global.twitch.current.status)
-    .replace(/\$viewers/g, global.twitch.current.viewers)
-    .replace(/\$views/g, global.twitch.current.views)
-    .replace(/\$followers/g, global.twitch.current.followers)
-    .replace(/\$hosts/g, global.twitch.current.hosts)
-    .replace(/\$subscribers/g, global.twitch.current.subscribers)
-    .replace(/\$bits/g, global.twitch.current.bits)
+  .replace(/\$title/g, global.twitch.current.status)
+  .replace(/\$viewers/g, global.twitch.current.viewers)
+  .replace(/\$views/g, global.twitch.current.views)
+  .replace(/\$followers/g, global.twitch.current.followers)
+  .replace(/\$hosts/g, global.twitch.current.hosts)
+  .replace(/\$subscribers/g, global.twitch.current.subscribers)
+  .replace(/\$bits/g, global.twitch.current.bits)
+  debug(message)
 
   if (!global.configuration.getValue('mute') || attr.force) {
     if (sender['message-type'] === 'whisper') {

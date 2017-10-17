@@ -1,7 +1,6 @@
 'use strict'
 
 var _ = require('lodash')
-var log = global.log
 var constants = require('../constants')
 
 function RafflesWidget () {
@@ -65,8 +64,10 @@ RafflesWidget.prototype.sendWinner = function (self, user) {
   global.panel.io.emit('raffleWinner', user)
 }
 
-RafflesWidget.prototype.removeRaffle = function (self, socket) {
-  global.botDB.remove({ _id: 'raffle' }, { multi: true })
+RafflesWidget.prototype.removeRaffle = async function (self, socket) {
+  let raffles = await global.db.engine.find('raffles')
+  for (let raffle of raffles) { await global.db.engine.remove('raffles', { _id: raffle._id }) }
+
   self.clearRaffleParticipants(self, socket)
   global.parser.unregister('!' + global.systems.raffles.keyword)
   global.systems.raffles.keyword = null
@@ -118,34 +119,31 @@ RafflesWidget.prototype.searchRafflesParticipants = function (self, socket, data
 }
 
 RafflesWidget.prototype.getRaffle = async function (self, socket) {
-  socket.emit('raffle', await global.db.engine.findOne('raffle'))
+  socket.emit('raffles', await global.db.engine.findOne('raffles'))
 }
 
 RafflesWidget.prototype.setEligibility = function (self, socket, data) {
   global.systems.raffles.participants[data.username].eligible = true
 }
 
-RafflesWidget.prototype.setRafflesFollowersOnly = function (self, socket, followersOnly) {
-  global.botDB.update({ _id: 'raffle' }, { $set: { followers: followersOnly } })
+RafflesWidget.prototype.setRafflesFollowersOnly = async function (self, socket, followersOnly) {
+  await global.db.engine.update('raffles', {}, { followers: followersOnly })
 
   // update elegibility
-  global.botDB.find({ $where: function () { return this._id.startsWith('raffle_participant_') } }, function (err, items) {
-    if (err) { log.error(err, { fnc: 'RafflesWidget.prototype.setRafflesFollowersOnly' }); return err }
-    _.each(items, function (item) {
-      if (item.forced === false) { // update non-forced only
-        if (!followersOnly && item.eligible === false) { // update only if neccessary
-          item.eligible = true
-          global.botDB.update({ _id: item._id }, item)
-          self.forceSendRaffleParticipants(self)
-        } else {
-          const user = global.users.get(item.username)
-          item.eligible = _.isUndefined(user.is.follower) ? false : user.is.follower
-          global.botDB.update({ _id: item._id }, item)
-          self.forceSendRaffleParticipants(self)
-        }
+  let raffle = await global.db.engine.findOne('raffles', { locked: false })
+  let participants = await global.db.engine.find('raffle_participants', { raffle_id: raffle._id })
+  for (let participant of participants) {
+    if (participant.forced === false) { // update non-forced only
+      if (!followersOnly && participant.eligible === false) { // update only if neccessary
+        await global.db.engine.update('raffle_participants', { _id: participant._id }, { eligible: true })
+        self.forceSendRaffleParticipants(self)
+      } else {
+        const user = global.users.get(participant.username)
+        await global.db.engine.update('raffle_participants', { _id: participant._id }, { eligible: _.isUndefined(user.is.follower) ? false : user.is.follower })
+        self.forceSendRaffleParticipants(self)
       }
-    })
-  })
+    }
+  }
 }
 
 module.exports = new RafflesWidget()

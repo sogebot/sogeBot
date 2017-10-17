@@ -225,8 +225,8 @@
     "keywords": "Keywords",
     "keyword": "Keyword",
     "moderation": "Moderation",
-    "notice": "Notice",
-    "notices": "Notices",
+    "timer": "Timer",
+    "timers": "Timers",
     "price": "Price",
     "ranks": "Ranks",
     "event-listeners": "Event listeners",
@@ -574,26 +574,6 @@
       "list": "$sender, list of keywords is empty",
       "parse": "{core.command-parse} !keyword",
       "toggle": "$sender, keyword $keyword was not found"
-    }
-  },
-  "notice": {
-    "success": {
-      "add": "Notice was added to database",
-      "remove": "Notice was deleted from database",
-      "list": "List of notices",
-      "enabled": "Notice $notice was enabled",
-      "disabled": "Notice $notice was disabled"
-    },
-    "failed": {
-      "add": "This notice already exists in database",
-      "notFound": "This notice cannot be found in database",
-      "list": "List of notices is empty",
-      "parse": "{core.command-parse} !notice",
-      "toggle": "Notice $notice was not found"
-    },
-    "settings": {
-      "noticeInterval": "Notice minimal interval succesfully set to $value minutes",
-      "noticeMsgReq": "Notice minimal required message chat count set to $value"
     }
   },
   "points": {
