@@ -933,6 +933,24 @@
       "disabled": "$sender, cooldown pro $command byl vypnut"
     }
   },
+  "timers": {
+    "id-must-be-defined": "$sender, id odpovedi musi byt zadano.",
+    "name-must-be-defined": "$sender, jmeno timeru musi byt zadano.",
+    "response-must-be-defined": "$sender, odpoved timeru musi byt zadana.",
+    "cannot-set-messages-and-seconds-0": "$sender, nelze mit nastaveny zpravy a vteriny na 0.",
+    "timer-was-set": "$sender, timer $name byl nastaven na spusteni co $messages zprav a $seconds vterin",
+    "timer-not-found": "$sender, timer (name: $name) nebyl nalezen v databazi. Pro list timeru -> !timers list",
+    "timer-deleted": "$sender, timer $name a jeho odpovedi byly smazany.",
+    "timer-enabled": "$sender, timer (name: $name) byl zapnut.",
+    "timer-disabled": "$sender, timer (name: $name) byl vypnut.",
+    "timers-list": "$sender, seznam timeru: $list",
+    "responses-list": "$sender, seznam pro timer (name: $name)",
+    "response-deleted": "$sender, odpoved (id: $id) byla smazana.",
+    "response-was-added": "$sender, odpoved (id: $id) pro timer (name: $name) byla pridana - '$response'",
+    "response-not-found": "$sender, odpoved (id: $id) nebyla nalezena v databazi.",
+    "response-enabled": "$sender, odpoved (id: $id) byla zapnuta.",
+    "response-disabled": "$sender, odpoved (id: $id) byla vypnuta."
+  },
   "gambling": {
     "cooldown": {
       "duel": "Cooldown pro !duel je nastaven na $values",

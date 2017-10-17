@@ -938,6 +938,24 @@
       "disabled": "$sender, cooldown for $command was disabled"
     }
   },
+  "timers": {
+    "id-must-be-defined": "$sender, response id must be defined.",
+    "name-must-be-defined": "$sender, timer name must be defined.",
+    "response-must-be-defined": "$sender, timer response must be defined.",
+    "cannot-set-messages-and-seconds-0": "$sender, you cannot set both messages and seconds to 0.",
+    "timer-was-set": "$sender, timer $name was set with $messages messages and $seconds seconds to trigger",
+    "timer-not-found": "$sender, timer (name: $name) was not found in database. Check timers with !timers list",
+    "timer-deleted": "$sender, timer $name and its responses was deleted.",
+    "timer-enabled": "$sender, timer (name: $name) was enabled",
+    "timer-disabled": "$sender, timer (name: $name) was disabled",
+    "timers-list": "$sender, timers list: $list",
+    "responses-list": "$sender, timer (name: $name) list",
+    "response-deleted": "$sender, response (id: $id) was deleted.",
+    "response-was-added": "$sender, response (id: $id) for timer (name: $name) was added - '$response'",
+    "response-not-found": "$sender, response (id: $id) was not found in database",
+    "response-enabled": "$sender, response (id: $id) was enabled",
+    "response-disabled": "$sender, response (id: $id) was disabled"
+  },
   "gambling": {
     "cooldown": {
       "duel": "Cooldown for !duel is set to $values",

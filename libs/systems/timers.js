@@ -48,7 +48,16 @@ class Timers {
   }
 
   help (self, sender) {
-    global.commons.sendMessage(global.translate('core.usage') + ': TBD', sender)
+    global.commons.sendMessage('╔ ' + global.translate('core.usage') + ' - !timers', sender)
+    global.commons.sendMessage(`║ !timers - gets an info about timers usage`, sender)
+    global.commons.sendMessage(`║ !timers set -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60] - add new timer`, sender)
+    global.commons.sendMessage(`║ !timers unset -name [name-of-timer] - remove timer`, sender)
+    global.commons.sendMessage(`║ !timers add -name [name-of-timer] -response '[response]' - add new response to timer`, sender)
+    global.commons.sendMessage(`║ !timers rm -id [response-id] - remove response by id`, sender)
+    global.commons.sendMessage(`║ !timers toggle -name [name-of-timer] - enable/disable timer by name`, sender)
+    global.commons.sendMessage(`║ !timers toggle -id [id-of-response] - enable/disable response by id`, sender)
+    global.commons.sendMessage(`║ !timers list - get timers list`, sender)
+    global.commons.sendMessage(`╚ !timers list -name [name-of-timer] - get list of responses on timer`, sender)
   }
 
   async init () {
@@ -91,7 +100,7 @@ class Timers {
     let seconds = text.match(/-seconds ([0-9]+)/)
 
     if (_.isNil(name)) {
-      global.commons.sendMessage('$sender, timer name must be defined.', sender)
+      global.commons.sendMessage(global.translate('timers.name-must-be-defined'), sender)
       return false
     } else {
       name = name[1]
@@ -101,13 +110,13 @@ class Timers {
     seconds = _.isNil(seconds) ? 60 : parseInt(seconds[1], 10)
 
     if (messages === 0 && seconds === 0) {
-      global.commons.sendMessage('$sender, you cannot set both messages and seconds to 0', sender)
+      global.commons.sendMessage(global.translate('timers.cannot-set-messages-and-seconds-0'), sender)
       return false
     }
     debug(name, messages, seconds)
 
     await global.db.engine.update('timers', { name: name }, { name: name, messages: messages, seconds: seconds, enabled: true, trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
-    global.commons.sendMessage('$sender, timer $name was set with $messages messages and $seconds seconds to trigger'
+    global.commons.sendMessage(global.translate('timers.timer-was-set')
       .replace(/\$name/g, name)
       .replace(/\$messages/g, messages)
       .replace(/\$seconds/g, seconds), sender)
@@ -120,7 +129,7 @@ class Timers {
     let name = text.match(/-name ([a-zA-Z0-9]+)/)
 
     if (_.isNil(name)) {
-      global.commons.sendMessage('$sender, timer name must be defined.', sender)
+      global.commons.sendMessage(global.translate('timers.name-must-be-defined'), sender)
       return false
     } else {
       name = name[1]
@@ -128,13 +137,13 @@ class Timers {
 
     let timer = await global.db.engine.findOne('timers', { name: name })
     if (_.isEmpty(timer)) {
-      global.commons.sendMessage('$sender, timer (name: $name) was not found in database'.replace(/\$name/g, name), global.parser.getOwner())
+      global.commons.sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), global.parser.getOwner())
       return false
     }
 
     await global.db.engine.remove('timers', { name: name })
     await global.db.engine.remove('timersResponses', { timerId: timer._id })
-    global.commons.sendMessage('$sender, timer $name and its responses was deleted.'
+    global.commons.sendMessage(global.translate('timers.timer-deleted')
       .replace(/\$name/g, name), sender)
   }
 
@@ -145,14 +154,14 @@ class Timers {
     let id = text.match(/-id ([a-zA-Z0-9]+)/)
 
     if (_.isNil(id)) {
-      global.commons.sendMessage('$sender, response id must be defined.', sender)
+      global.commons.sendMessage(global.translate('timers.id-must-be-defined'), sender)
       return false
     } else {
       id = id[1]
     }
 
     await global.db.engine.remove('timersResponses', { _id: id })
-    global.commons.sendMessage('$sender, response (id: $id) was deleted.'
+    global.commons.sendMessage(global.translate('timers.response-deleted')
       .replace(/\$id/g, id), sender)
   }
 
@@ -164,14 +173,14 @@ class Timers {
     let response = text.match(/-response ['"](.+)['"]/)
 
     if (_.isNil(name)) {
-      global.commons.sendMessage('$sender, timer name must be defined.', sender)
+      global.commons.sendMessage(global.translate('timers.name-must-be-defined'), sender)
       return false
     } else {
       name = name[1]
     }
 
     if (_.isNil(response)) {
-      global.commons.sendMessage('$sender, timer response must be defined.', sender)
+      global.commons.sendMessage(global.translate('timers.response-must-be-defined'), sender)
       return false
     } else {
       response = response[1]
@@ -180,13 +189,13 @@ class Timers {
 
     let timer = await global.db.engine.findOne('timers', { name: name })
     if (_.isEmpty(timer)) {
-      global.commons.sendMessage('$sender, timer (name: $name) was not found in database. Check timers with !timers list'
+      global.commons.sendMessage(global.translate('timers.timer-not-found')
         .replace(/\$name/g, name), sender)
       return false
     }
 
     let item = await global.db.engine.insert('timersResponses', { response: response, timestamp: new Date().getTime(), enabled: true, timerId: timer._id })
-    global.commons.sendMessage('$sender, response (id: $id) for timer (name: $name) was added - \'$response\''
+    global.commons.sendMessage(global.translate('timers.response-was-added')
       .replace(/\$id/g, item._id)
       .replace(/\$name/g, name)
       .replace(/\$response/g, response), sender)
@@ -200,15 +209,15 @@ class Timers {
 
     if (_.isNil(name)) {
       let timers = await global.db.engine.find('timers')
-      global.commons.sendMessage('$sender, timers list: $list'.replace(/\$list/g, _.map(timers, (o) => (o.enabled ? `⚫ ` : `⚪ `) + ' ' + o.name).join(', ')), sender)
+      global.commons.sendMessage(global.translate('timers.timers-list').replace(/\$list/g, _.map(timers, (o) => (o.enabled ? `⚫ ` : `⚪ `) + ' ' + o.name).join(', ')), sender)
       return true
     } else { name = name[1] }
 
-    global.commons.sendMessage('$sender, timer (name: $name) list'.replace(/\$name/g, name), sender)
+    global.commons.sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), sender)
 
     let timer = await global.db.engine.findOne('timers', { name: name })
     if (_.isEmpty(timer)) {
-      global.commons.sendMessage('$sender, timer (name: $name) was not found in database. Check timers with !timers list'
+      global.commons.sendMessage(global.translate('timers.timer-not-found')
         .replace(/\$name/g, name), sender)
       return false
     }
@@ -226,7 +235,7 @@ class Timers {
     let name = text.match(/-name ([a-zA-Z0-9]+)/)
 
     if (_.isNil(id) && _.isNil(name)) {
-      global.commons.sendMessage('$sender, timer name or response id must be defined.', sender)
+      global.commons.sendMessage(global.translate('timers.id-must-be-defined'), sender)
       return false
     }
 
@@ -235,14 +244,14 @@ class Timers {
       id = id[1]
       let response = await global.db.engine.findOne('timersResponses', { _id: id })
       if (_.isEmpty(response)) {
-        debug('$sender, response (id: $id) was not found in database'.replace(/\$id/g, id))
-        global.commons.sendMessage('$sender, response (id: $id) was not found in database'.replace(/\$id/g, id), sender)
+        debug(global.translate('timers.response-not-found').replace(/\$id/g, id))
+        global.commons.sendMessage(global.translate('timers.response-not-found').replace(/\$id/g, id), sender)
         return false
       }
 
       await global.db.engine.update('timersResponses', { _id: id }, { enabled: !response.enabled })
-      debug((!response.enabled ? '$sender, response (id: $id) was enabled' : '$sender, response (id: $id) was disabled').replace(/\$id/g, id))
-      global.commons.sendMessage((!response.enabled ? '$sender, response (id: $id) was enabled' : '$sender, response (id: $id) was disabled')
+      debug(global.translate(!response.enabled ? 'timers.response-enabled' : 'timers.response-disabled').replace(/\$id/g, id))
+      global.commons.sendMessage(global.translate(!response.enabled ? 'timers.response-enabled' : 'timers.response-disabled')
         .replace(/\$id/g, id), sender)
       return true
     }
@@ -251,19 +260,15 @@ class Timers {
       name = name[1]
       let timer = await global.db.engine.findOne('timers', { name: name })
       if (_.isEmpty(timer)) {
-        global.commons.sendMessage('$sender, response (id: $id) was not found in database'.replace(/\$id/g, id), sender)
+        global.commons.sendMessage(global.translate('timers.timer-not-found').replace(/\$id/g, id), sender)
         return false
       }
 
       await global.db.engine.update('timers', { name: name }, { enabled: !timer.enabled })
-      global.commons.sendMessage((!timer.enabled ? '$sender, timer (name: $name) was enabled' : '$sender, response (name: $name) was disabled')
+      global.commons.sendMessage(global.translate(!timer.enabled ? 'timers.timer-enabled' : 'timers.timer-disabled')
         .replace(/\$name/g, name), sender)
       return true
     }
-
-    await global.db.engine.remove('timersResponses', { _id: id })
-    global.commons.sendMessage('$sender, response (id: $id) was deleted.'
-      .replace(/\$id/g, id), sender)
   }
 }
 
