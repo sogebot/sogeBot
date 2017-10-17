@@ -35,7 +35,16 @@ class Timers {
       global.parser.registerHelper('!timers')
 
       global.panel.addMenu({category: 'manage', name: 'timers', id: 'timers'})
+      global.panel.registerSockets({
+        self: this,
+        expose: ['set', 'unset', 'add', 'rm', 'toggle', 'editResponse', 'send'],
+        finally: this.send
+      })
     }
+  }
+
+  async send (self, socket) {
+    socket.emit('timers', { timers: await global.db.engine.find('timers'), responses: await global.db.engine.find('timersResponses') })
   }
 
   help (self, sender) {
@@ -66,6 +75,11 @@ class Timers {
 
       global.db.engine.update('timers', { _id: timer._id }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
     }
+  }
+
+  async editResponse (self, socket, data) {
+    if (data.value.length === 0) await self.rm(self, null, `-id ${data.id}`)
+    else global.db.engine.update('timersResponses', { _id: data.id }, { response: data.value })
   }
 
   async set (self, sender, text) {
@@ -125,7 +139,7 @@ class Timers {
   }
 
   async rm (self, sender, text) {
-    // -name [name-of-timer]
+    // -id [id-of-response]
     debug('rm(%j, %j, %j)', self, sender, text)
 
     let id = text.match(/-id ([a-zA-Z0-9]+)/)
@@ -217,14 +231,17 @@ class Timers {
     }
 
     if (!_.isNil(id)) {
+      debug('toggle response - %s', id)
       id = id[1]
-      let response = await global.db.engine.findOne('timersResponse', { _id: id })
+      let response = await global.db.engine.findOne('timersResponses', { _id: id })
       if (_.isEmpty(response)) {
+        debug('$sender, response (id: $id) was not found in database'.replace(/\$id/g, id))
         global.commons.sendMessage('$sender, response (id: $id) was not found in database'.replace(/\$id/g, id), sender)
         return false
       }
 
-      await global.db.engine.update('timersResponse', { _id: id }, { enabled: !response.enabled })
+      await global.db.engine.update('timersResponses', { _id: id }, { enabled: !response.enabled })
+      debug((!response.enabled ? '$sender, response (id: $id) was enabled' : '$sender, response (id: $id) was disabled').replace(/\$id/g, id))
       global.commons.sendMessage((!response.enabled ? '$sender, response (id: $id) was enabled' : '$sender, response (id: $id) was disabled')
         .replace(/\$id/g, id), sender)
       return true

@@ -796,3 +796,21 @@ kbd {
 .label-global, .label-trigger {
   background-color: #A830FF
 }
+
+.deleteTab {
+  display: none !important;
+  position: absolute !important;
+  right:0;
+  top: 0;
+  padding: 10px 5px 10px 5px;
+}
+
+li.active a.withDelete {
+  padding-right: 35px;
+}
+
+li.active .deleteTab {
+  display: inline-block !important;
+  background-color: rgb(169, 68, 66) !important;
+  color: white;
+}
