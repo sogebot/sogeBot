@@ -8,7 +8,7 @@ require('./general.js')
 // users
 const owner = { username: 'soge__' }
 
-describe.only('System - Alias', () => {
+describe('System - Alias', () => {
   beforeEach(async () => {
     global.commons.sendMessage.reset()
 
