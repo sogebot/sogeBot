@@ -4,3 +4,7 @@ node_js:
   - "8"
 before_install:
 - npm install -g mocha standard
+script:
+- npm run test
+- npm run test:nedb
+- npm run test:mongodb
