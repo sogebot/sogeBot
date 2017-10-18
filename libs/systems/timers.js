@@ -211,7 +211,7 @@ class Timers {
 
     if (_.isNil(name)) {
       let timers = await global.db.engine.find('timers')
-      global.commons.sendMessage(global.translate('timers.timers-list').replace(/\$list/g, _.map(timers, (o) => (o.enabled ? `⚫ ` : `⚪ `) + ' ' + o.name).join(', ')), sender)
+      global.commons.sendMessage(global.translate('timers.timers-list').replace(/\$list/g, _.map(_.orderBy(timers, 'name'), (o) => (o.enabled ? `⚫` : `⚪`) + ' ' + o.name).join(', ')), sender)
       return true
     } else { name = name[1] }
 
