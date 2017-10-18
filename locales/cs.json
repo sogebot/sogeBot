@@ -935,6 +935,7 @@
   },
   "timers": {
     "id-must-be-defined": "$sender, id odpovedi musi byt zadano.",
+    "id-or-name-must-be-defined": "$sender, id odpovedi nebo jmeno timeru musi byt zadano.",
     "name-must-be-defined": "$sender, jmeno timeru musi byt zadano.",
     "response-must-be-defined": "$sender, odpoved timeru musi byt zadana.",
     "cannot-set-messages-and-seconds-0": "$sender, nelze mit nastaveny zpravy a vteriny na 0.",

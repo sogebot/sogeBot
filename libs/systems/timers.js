@@ -236,8 +236,8 @@ class Timers {
     let id = text.match(/-id ([a-zA-Z0-9]+)/)
     let name = text.match(/-name ([a-zA-Z0-9]+)/)
 
-    if (_.isNil(id) && _.isNil(name)) {
-      global.commons.sendMessage(global.translate('timers.id-must-be-defined'), sender)
+    if ((_.isNil(id) && _.isNil(name)) || (!_.isNil(id) && !_.isNil(name))) {
+      global.commons.sendMessage(global.translate('timers.id-or-name-must-be-defined'), sender)
       return false
     }
 
@@ -262,7 +262,7 @@ class Timers {
       name = name[1]
       let timer = await global.db.engine.findOne('timers', { name: name })
       if (_.isEmpty(timer)) {
-        global.commons.sendMessage(global.translate('timers.timer-not-found').replace(/\$id/g, id), sender)
+        global.commons.sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), sender)
         return false
       }
 

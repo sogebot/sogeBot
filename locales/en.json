@@ -940,6 +940,7 @@
   },
   "timers": {
     "id-must-be-defined": "$sender, response id must be defined.",
+    "id-or-name-must-be-defined": "$sender, response id or timer name must be defined.",
     "name-must-be-defined": "$sender, timer name must be defined.",
     "response-must-be-defined": "$sender, timer response must be defined.",
     "cannot-set-messages-and-seconds-0": "$sender, you cannot set both messages and seconds to 0.",
