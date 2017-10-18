@@ -8,7 +8,7 @@ require('./general.js')
 // users
 const owner = { username: 'soge__' }
 
-describe('System - Alias', () => {
+describe.only('System - Alias', () => {
   beforeEach(async () => {
     global.commons.sendMessage.reset()
 
@@ -39,17 +39,37 @@ describe('System - Alias', () => {
         assert.empty(item)
       })
       it('text: !uptime !mee', async () => {
-        global.systems.alias.add(global.systems.alias, owner, '!uptime !mee')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('alias.success.add').replace(/\$alias/g, 'mee'), sinon.match(owner)), 5000)
+        await global.systems.alias.add(global.systems.alias, owner, '!uptime !mee')
+
+        await until(setError => {
+          let expected = global.commons.prepare('alias.success.add', { alias: 'mee' })
+          try {
+            assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(owner)))
+            return true
+          } catch (err) {
+            return setError('\nExpected message: ' + expected + '\nActual message: ' + global.commons.sendMessage.lastCall.args[0])
+          }
+        })
 
         let item = await global.db.engine.findOne('alias', { alias: 'mee' })
         assert.notEmpty(item)
         assert.equal(item.alias, 'mee')
         assert.equal(item.command, 'uptime')
 
-        global.commons.sendMessage.reset()
+        // force uptime to be 0 (bypass cached db)
+        global.twitch.when.online = null
+        global.twitch.when.offline = null
         global.parser.parse(owner, '!mee')
-        await until(() => global.commons.sendMessage.calledWith('Stream is currently offline for ', sinon.match(owner)), 5000)
+
+        await until(setError => {
+          let expected = 'Stream is currently offline for '
+          try {
+            assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(owner)))
+            return true
+          } catch (err) {
+            return setError('\nExpected message: ' + expected + '\nActual message: ' + global.commons.sendMessage.lastCall.args[0])
+          }
+        })
       })
     })
     describe('list()', () => {
