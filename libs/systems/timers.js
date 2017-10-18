@@ -62,7 +62,7 @@ class Timers {
 
   async init () {
     let timers = await global.db.engine.find('timers')
-    for (let timer of timers) await global.db.engine.update('timers', { _id: timer._id }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
+    for (let timer of timers) await global.db.engine.update('timers', { _id: timer._id.toString() }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
     setInterval(() => this.check(), 1000)
   }
 
@@ -73,7 +73,7 @@ class Timers {
       if (timer.seconds > 0 && new Date().getTime() - timer.trigger.timestamp < timer.seconds * 1000) continue // not ready to trigger with seconds
 
       debug('ready to fire - %j', timer)
-      let responses = await global.db.engine.find('timersResponses', { timerId: timer._id, enabled: true })
+      let responses = await global.db.engine.find('timersResponses', { timerId: timer._id.toString(), enabled: true })
       let response = _.orderBy(responses, 'timestamp', 'asc')[0]
 
       if (!_.isNil(response)) {
@@ -81,7 +81,7 @@ class Timers {
         global.commons.sendMessage(response.response, global.parser.getOwner())
         global.db.engine.update('timersResponses', { _id: response._id }, { timestamp: new Date().getTime() })
       }
-      global.db.engine.update('timers', { _id: timer._id }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
+      global.db.engine.update('timers', { _id: timer._id.toString() }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
     }
   }
 
@@ -142,7 +142,7 @@ class Timers {
     }
 
     await global.db.engine.remove('timers', { name: name })
-    await global.db.engine.remove('timersResponses', { timerId: timer._id })
+    await global.db.engine.remove('timersResponses', { timerId: timer._id.toString() })
     debug(global.translate('timers.timer-deleted').replace(/\$name/g, name))
     global.commons.sendMessage(global.translate('timers.timer-deleted')
       .replace(/\$name/g, name), sender)
@@ -195,7 +195,7 @@ class Timers {
       return false
     }
 
-    let item = await global.db.engine.insert('timersResponses', { response: response, timestamp: new Date().getTime(), enabled: true, timerId: timer._id })
+    let item = await global.db.engine.insert('timersResponses', { response: response, timestamp: new Date().getTime(), enabled: true, timerId: timer._id.toString() })
     debug(item)
     global.commons.sendMessage(global.translate('timers.response-was-added')
       .replace(/\$id/g, item._id)
@@ -215,16 +215,16 @@ class Timers {
       return true
     } else { name = name[1] }
 
-    global.commons.sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), sender)
-
     let timer = await global.db.engine.findOne('timers', { name: name })
     if (_.isEmpty(timer)) {
       global.commons.sendMessage(global.translate('timers.timer-not-found')
-        .replace(/\$name/g, name), sender)
+      .replace(/\$name/g, name), sender)
       return false
     }
 
-    let responses = await global.db.engine.find('timersResponses', { timerId: timer._id })
+    let responses = await global.db.engine.find('timersResponses', { timerId: timer._id.toString() })
+    debug(responses)
+    global.commons.sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), sender)
     for (let response of responses) { global.commons.sendMessage((response.enabled ? `⚫ ` : `⚪ `) + `${response._id} - ${response.response}`, sender) }
     return true
   }

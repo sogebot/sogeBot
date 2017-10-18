@@ -17,8 +17,8 @@ describe('Timers - list()', () => {
     await db.cleanup('timersResponses')
     await global.db.engine.insert('timers', {name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() }})
     let timer = await global.db.engine.insert('timers', {name: 'test2', messages: 0, seconds: 60, enabled: false, trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() }})
-    global.db.engine.insert('timersResponses', {response: 'Lorem Ipsum', timerId: timer._id, enabled: true})
-    global.db.engine.insert('timersResponses', {response: 'Lorem Ipsum 2', timerId: timer._id, enabled: false})
+    global.db.engine.insert('timersResponses', {response: 'Lorem Ipsum', timerId: timer._id.toString(), enabled: true})
+    global.db.engine.insert('timersResponses', {response: 'Lorem Ipsum 2', timerId: timer._id.toString(), enabled: false})
     global.commons.sendMessage.reset()
   })
 
@@ -63,7 +63,7 @@ describe('Timers - list()', () => {
     let response2 = await global.db.engine.findOne('timersResponses', { response: 'Lorem Ipsum 2' })
 
     await until(setError => {
-      let expected = `⚫ ${response1._id} - ${response1.response}`
+      let expected = global.commons.prepare('timers.responses-list', { name: 'test2' })
       let user = owner
       try {
         assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
@@ -74,6 +74,19 @@ describe('Timers - list()', () => {
           '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
       }
     })
+
+    await until(setError => {
+      let expected = `⚫ ${response1._id} - ${response1.response}`
+      let user = owner
+      try {
+        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
+        return true
+      } catch (err) {
+        return setError(
+          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
+      }
+    },)
 
     await until(setError => {
       let expected = `⚪ ${response2._id} - ${response2.response}`
