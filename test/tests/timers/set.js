@@ -3,6 +3,7 @@
 const assert = require('chai').assert
 const sinon = require('sinon')
 const until = require('test-until')
+const _ = require('lodash')
 require('../../general.js')
 
 const db = require('../../general.js').db
@@ -21,11 +22,14 @@ describe('Timers - set()', () => {
 
     await until(setError => {
       let expected = global.commons.prepare('timers.name-must-be-defined')
+      let user = owner
       try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(owner)))
+        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
         return true
       } catch (err) {
-        return setError('\nExpected message: ' + expected + '\nActual message: ' + global.commons.sendMessage.lastCall.args[0])
+        return setError(
+          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
       }
     })
   })
@@ -34,11 +38,14 @@ describe('Timers - set()', () => {
 
     await until(setError => {
       let expected = global.commons.prepare('timers.timer-was-set', { name: 'test', messages: 0, seconds: 60 })
+      let user = owner
       try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(owner)))
+        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
         return true
       } catch (err) {
-        return setError('\nExpected message: ' + expected + '\nActual message: ' + global.commons.sendMessage.lastCall.args[0])
+        return setError(
+          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
       }
     })
 
@@ -52,11 +59,14 @@ describe('Timers - set()', () => {
 
     await until(setError => {
       let expected = global.commons.prepare('timers.timer-was-set', { name: 'test', messages: 0, seconds: 20 })
+      let user = owner
       try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(owner)))
+        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
         return true
       } catch (err) {
-        return setError('\nExpected message: ' + expected + '\nActual message: ' + global.commons.sendMessage.lastCall.args[0])
+        return setError(
+          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
       }
     })
 
@@ -70,11 +80,14 @@ describe('Timers - set()', () => {
 
     await until(setError => {
       let expected = global.commons.prepare('timers.cannot-set-messages-and-seconds-0')
+      let user = owner
       try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(owner)))
+        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
         return true
       } catch (err) {
-        return setError('\nExpected message: ' + expected + '\nActual message: ' + global.commons.sendMessage.lastCall.args[0])
+        return setError(
+          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
       }
     })
 
@@ -86,11 +99,14 @@ describe('Timers - set()', () => {
 
     await until(setError => {
       let expected = global.commons.prepare('timers.timer-was-set', { name: 'test', messages: 20, seconds: 60 })
+      let user = owner
       try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(owner)))
+        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
         return true
       } catch (err) {
-        return setError('\nExpected message: ' + expected + '\nActual message: ' + global.commons.sendMessage.lastCall.args[0])
+        return setError(
+          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
       }
     })
 
@@ -104,11 +120,14 @@ describe('Timers - set()', () => {
 
     await until(setError => {
       let expected = global.commons.prepare('timers.timer-was-set', { name: 'test', messages: 0, seconds: 60 })
+      let user = owner
       try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(owner)))
+        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
         return true
       } catch (err) {
-        return setError('\nExpected message: ' + expected + '\nActual message: ' + global.commons.sendMessage.lastCall.args[0])
+        return setError(
+          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
       }
     })
 
@@ -122,11 +141,14 @@ describe('Timers - set()', () => {
 
     await until(setError => {
       let expected = global.commons.prepare('timers.cannot-set-messages-and-seconds-0')
+      let user = owner
       try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(owner)))
+        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
         return true
       } catch (err) {
-        return setError('\nExpected message: ' + expected + '\nActual message: ' + global.commons.sendMessage.lastCall.args[0])
+        return setError(
+          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
       }
     })
 
@@ -138,11 +160,14 @@ describe('Timers - set()', () => {
 
     await until(setError => {
       let expected = global.commons.prepare('timers.timer-was-set', { name: 'test', messages: 6, seconds: 5 })
+      let user = owner
       try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(owner)))
+        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
         return true
       } catch (err) {
-        return setError('\nExpected message: ' + expected + '\nActual message: ' + global.commons.sendMessage.lastCall.args[0])
+        return setError(
+          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
       }
     })
 

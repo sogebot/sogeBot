@@ -2,10 +2,11 @@
 
 const assert = require('chai').assert
 const sinon = require('sinon')
+const _ = require('lodash')
+const until = require('test-until')
 require('../../general.js')
 
 const db = require('../../general.js').db
-const until = require('test-until')
 
 // users
 const owner = { username: 'soge__' }
@@ -22,11 +23,14 @@ describe('Timers - unset()', () => {
 
     await until(setError => {
       let expected = global.commons.prepare('timers.name-must-be-defined')
+      let user = owner
       try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(owner)))
+        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
         return true
       } catch (err) {
-        return setError('\nExpected message: ' + expected + '\nActual message: ' + global.commons.sendMessage.lastCall.args[0])
+        return setError(
+          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
       }
     })
   })
@@ -35,14 +39,16 @@ describe('Timers - unset()', () => {
 
     await until(setError => {
       let expected = global.commons.prepare('timers.timer-deleted', { name: 'test' })
+      let user = owner
       try {
-        if (!global.commons.sendMessage.called) return false
-        assert.equal(global.commons.sendMessage.lastCall.args[0], expected)
+        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
         return true
       } catch (err) {
-        return setError('\nExpected message: ' + expected + '\nActual message: ' + global.commons.sendMessage.lastCall.args[0])
+        return setError(
+          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
       }
-    }, 1000)
+    })
 
     let item = await global.db.engine.findOne('timers', { name: 'test' })
     assert.empty(item)
@@ -52,14 +58,16 @@ describe('Timers - unset()', () => {
 
     await until(setError => {
       let expected = global.commons.prepare('timers.timer-not-found', { name: 'nonexistent' })
+      let user = owner
       try {
-        if (!global.commons.sendMessage.called) return false
-        assert.equal(global.commons.sendMessage.lastCall.args[0], expected)
+        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
         return true
       } catch (err) {
-        return setError('\nExpected message: ' + expected + '\nActual message: ' + global.commons.sendMessage.lastCall.args[0])
+        return setError(
+          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
       }
-    }, 1000)
+    })
 
     let item = await global.db.engine.findOne('timers', { name: 'test' })
     assert.notEmpty(item)
