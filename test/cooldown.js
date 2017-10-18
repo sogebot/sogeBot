@@ -110,7 +110,7 @@ describe('System - Cooldowns', () => {
         }, 5000)
 
         await until(setError => {
-          let expected = '$sender | 0.0h | 1 point | 0 messages'
+          let expected = '$sender | 0.0h | 0 points | 0 messages'
           let user = testUser
           try {
             assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
