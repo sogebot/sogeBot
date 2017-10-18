@@ -96,8 +96,6 @@ class INeDB extends Interface {
   async remove (table, where) {
     this.on(table) // init table
 
-    if (_.isEmpty(where)) throw Error('Object to delete cannot be empty')
-
     // remove from cache
     var keys = this.cache[table].keys()
     for (let key of keys) {

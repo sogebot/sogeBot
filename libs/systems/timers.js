@@ -62,7 +62,7 @@ class Timers {
 
   async init () {
     let timers = await global.db.engine.find('timers')
-    for (let timer of timers) { global.db.engine.update('timers', { _id: timer._id }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } }) }
+    for (let timer of timers) await global.db.engine.update('timers', { _id: timer._id }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
     setInterval(() => this.check(), 1000)
   }
 
@@ -81,7 +81,6 @@ class Timers {
         global.commons.sendMessage(response.response, global.parser.getOwner())
         global.db.engine.update('timersResponses', { _id: response._id }, { timestamp: new Date().getTime() })
       }
-
       global.db.engine.update('timers', { _id: timer._id }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
     }
   }
@@ -137,12 +136,14 @@ class Timers {
 
     let timer = await global.db.engine.findOne('timers', { name: name })
     if (_.isEmpty(timer)) {
-      global.commons.sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), global.parser.getOwner())
+      debug(global.translate('timers.timer-not-found').replace(/\$name/g, name))
+      global.commons.sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), sender)
       return false
     }
 
     await global.db.engine.remove('timers', { name: name })
     await global.db.engine.remove('timersResponses', { timerId: timer._id })
+    debug(global.translate('timers.timer-deleted').replace(/\$name/g, name))
     global.commons.sendMessage(global.translate('timers.timer-deleted')
       .replace(/\$name/g, name), sender)
   }
@@ -195,6 +196,7 @@ class Timers {
     }
 
     let item = await global.db.engine.insert('timersResponses', { response: response, timestamp: new Date().getTime(), enabled: true, timerId: timer._id })
+    debug(item)
     global.commons.sendMessage(global.translate('timers.response-was-added')
       .replace(/\$id/g, item._id)
       .replace(/\$name/g, name)

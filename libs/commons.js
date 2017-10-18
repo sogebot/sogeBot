@@ -35,6 +35,13 @@ Commons.prototype.sendToOwners = function (text) {
   }
 }
 
+Commons.prototype.prepare = function (translate, attr) {
+  attr = attr || {}
+  let msg = global.translate(translate)
+  for (let [key, value] of Object.entries(attr)) msg = msg.replace(new RegExp('[$]' + key, 'g'), value)
+  return msg
+}
+
 Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
   debug('sendMessage(%s, %j, %j)', message, sender, attr)
 

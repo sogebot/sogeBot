@@ -1,4 +1,5 @@
 const client = require('mongodb').MongoClient
+const ObjectID = require('mongodb').ObjectID
 
 const Interface = require('./interface')
 const config = require('../../config.json')
@@ -36,7 +37,8 @@ class IMongoDB extends Interface {
     this.on(table) // init table
 
     where = where || {}
-    where = flatten(where)
+    if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
+    else where = flatten(where)
 
     let db = await this.connection(table)
     let collection = await db.collection(table)
@@ -52,7 +54,8 @@ class IMongoDB extends Interface {
     this.on(table) // init table
 
     where = where || {}
-    where = flatten(where)
+    if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
+    else where = flatten(where)
 
     // get from cache
     var keys = this.cache[table].keys()
@@ -82,14 +85,15 @@ class IMongoDB extends Interface {
     let item = await collection.insert(object)
 
     this.cache[table].put(item._id, item)
-    return _.size(item)
+    return item.ops[0]
   }
 
   async increment (table, where, object) {
     this.on(table) // init table
 
     where = where || {}
-    where = flatten(where)
+    if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
+    else where = flatten(where)
 
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
     delete object._id
@@ -113,18 +117,14 @@ class IMongoDB extends Interface {
         multi: _.isEmpty(where)
       }
     )
-    if (table === 'alias') {
-      console.log(result)
-    }
     return result.result.n
   }
 
   async remove (table, where) {
     this.on(table) // init table
 
-    if (_.isEmpty(where)) throw Error('Object to delete cannot be empty')
-    where = flatten(where)
-
+    if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
+    else where = flatten(where)
 
     // remove cache
     var keys = this.cache[table].keys()
@@ -136,7 +136,6 @@ class IMongoDB extends Interface {
 
     let db = await this.connection(table)
     let collection = await db.collection(table)
-    if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
     let result = await collection.remove(where)
     return result.result.n
   }
@@ -145,7 +144,9 @@ class IMongoDB extends Interface {
     this.on(table) // init table
 
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
-    where = flatten(where)
+
+    if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
+    else where = flatten(where)
 
     // invalidate cache on update
     var keys = this.cache[table].keys()
