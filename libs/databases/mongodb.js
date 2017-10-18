@@ -37,8 +37,11 @@ class IMongoDB extends Interface {
     this.on(table) // init table
 
     where = where || {}
-    if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
-    else where = flatten(where)
+    if (!_.isNil(where._id)) {
+      let regexp = new RegExp('^[0-9a-fA-F]{24}$')
+      if (regexp.test(where._id)) where._id = new ObjectID(where._id)
+      else return {}
+    } else where = flatten(where)
 
     let db = await this.connection(table)
     let collection = await db.collection(table)
@@ -54,8 +57,11 @@ class IMongoDB extends Interface {
     this.on(table) // init table
 
     where = where || {}
-    if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
-    else where = flatten(where)
+    if (!_.isNil(where._id)) {
+      let regexp = new RegExp('^[0-9a-fA-F]{24}$')
+      if (regexp.test(where._id)) where._id = new ObjectID(where._id)
+      else return {}
+    } else where = flatten(where)
 
     // get from cache
     var keys = this.cache[table].keys()

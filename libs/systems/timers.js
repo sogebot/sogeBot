@@ -242,8 +242,8 @@ class Timers {
     }
 
     if (!_.isNil(id)) {
-      debug('toggle response - %s', id)
       id = id[1]
+      debug('toggle response - %s', id)
       let response = await global.db.engine.findOne('timersResponses', { _id: id })
       if (_.isEmpty(response)) {
         debug(global.translate('timers.response-not-found').replace(/\$id/g, id))

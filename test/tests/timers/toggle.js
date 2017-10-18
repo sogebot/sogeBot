@@ -11,7 +11,7 @@ const db = require('../../general.js').db
 // users
 const owner = { username: 'soge__' }
 
-describe.only('Timers - toggle()', () => {
+describe('Timers - toggle()', () => {
   beforeEach(async () => {
     await db.cleanup('timers')
     await db.cleanup('timersResponses')
