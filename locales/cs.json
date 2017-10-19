@@ -71,6 +71,8 @@
         "description": "Popisek",
         "quiet": "Potichu (bool)",
         "id": "ID",
+        "name": "Název",
+        "messages": "Zprávy",
         "amount": "Počet",
         "pointsName": "Název bodů",
         "rank": "Rank",
@@ -219,8 +221,8 @@
     "keywords": "Klíčová slova",
     "keyword": "Klíčové slovo",
     "moderation": "Pravidla chatu",
-    "notice": "Oznámení",
-    "notices": "Oznámení",
+    "timer": "Časovač",
+    "timers": "Časovače",
     "price": "Cena příkazů",
     "ranks": "Hodnosti",
     "event-listeners": "Události",
@@ -569,26 +571,6 @@
       "list": "$sender, seznam keywordu je prazdny",
       "parse": "{core.command-parse} !keyword",
       "toggle": "$sender, keyword $keyword neni v databazi!"
-    }
-  },
-  "notice": {
-    "success": {
-      "add": "Oznameni bylo pridano do databaze",
-      "remove": "Oznameni bylo smazano z database",
-      "list": "Seznam oznameni",
-      "enabled": "Oznameni $notice bylo zapnuto",
-      "disabled": "Oznameni $notice bylo vypnuto"
-    },
-    "failed": {
-      "add": "Toto oznameni jiz existuje v databazi",
-      "notFound": "Toto oznameni v databazi neexistuje",
-      "list": "Seznam oznameni je prazdny",
-      "parse": "{core.command-parse} !notice",
-      "toggle": "Oznameni $notice neni v databazi!"
-    },
-    "settings": {
-      "noticeInterval": "Minimalni interval pro zobrazeni oznameni je nastaven na $value minut",
-      "noticeMsgReq": "Minimalni pocet zprav pro zobrazeni oznameni je nastaven na $value"
     }
   },
   "points": {
@@ -952,6 +934,25 @@
       "enabled": "$sender, cooldown pro $command byl zapnut",
       "disabled": "$sender, cooldown pro $command byl vypnut"
     }
+  },
+  "timers": {
+    "id-must-be-defined": "$sender, id odpovedi musi byt zadano.",
+    "id-or-name-must-be-defined": "$sender, id odpovedi nebo jmeno timeru musi byt zadano.",
+    "name-must-be-defined": "$sender, jmeno timeru musi byt zadano.",
+    "response-must-be-defined": "$sender, odpoved timeru musi byt zadana.",
+    "cannot-set-messages-and-seconds-0": "$sender, nelze mit nastaveny zpravy a vteriny na 0.",
+    "timer-was-set": "$sender, timer $name byl nastaven na spusteni co $messages zprav a $seconds vterin",
+    "timer-not-found": "$sender, timer (name: $name) nebyl nalezen v databazi. Pro list timeru -> !timers list",
+    "timer-deleted": "$sender, timer $name a jeho odpovedi byly smazany.",
+    "timer-enabled": "$sender, timer (name: $name) byl zapnut.",
+    "timer-disabled": "$sender, timer (name: $name) byl vypnut.",
+    "timers-list": "$sender, seznam timeru: $list",
+    "responses-list": "$sender, seznam pro timer (name: $name)",
+    "response-deleted": "$sender, odpoved (id: $id) byla smazana.",
+    "response-was-added": "$sender, odpoved (id: $id) pro timer (name: $name) byla pridana - '$response'",
+    "response-not-found": "$sender, odpoved (id: $id) nebyla nalezena v databazi.",
+    "response-enabled": "$sender, odpoved (id: $id) byla zapnuta.",
+    "response-disabled": "$sender, odpoved (id: $id) byla vypnuta."
   },
   "gambling": {
     "cooldown": {

@@ -1098,11 +1098,11 @@
 
       // update top offset every second and on page resize
       $(window).resize(function() {
-        $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
+        if (!_.isNil($(".widgets").offset())) $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
       })
       setInterval(function() {
-        $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
-      })
+        if (!_.isNil($(".widgets").offset())) $('.pages-wrapper').css('top', $(".widgets").offset().top + 20)
+      }, 1000)
   </script>
 </body>
 

@@ -6,6 +6,8 @@ const crypto = require('crypto')
 const sinon = require('sinon')
 require('./general.js')
 
+const db = require('./general.js').db
+
 // users
 const owner = { username: 'soge__' }
 
@@ -14,16 +16,9 @@ require('../main.js')
 
 describe('System - Custom Commands', () => {
   beforeEach(async () => {
+    await db.cleanup('commands')
+    await db.cleanup('settings')
     global.commons.sendMessage.reset()
-
-    let items = await global.db.engine.find('commands')
-    for (let item of items) {
-      await global.db.engine.remove('commands', { alias: item.alias })
-    }
-    items = await global.db.engine.find('settings')
-    for (let item of items) {
-      await global.db.engine.remove('settings', { key: item.key })
-    }
     global.parser.unregister('!meee')
   })
   describe('#fnc', () => {
@@ -58,8 +53,17 @@ describe('System - Custom Commands', () => {
     })
     describe('list()', () => {
       it('list: /empty/', async () => {
-        global.systems.customCommands.list(global.systems.customCommands, owner)
-        await until(() => global.commons.sendMessage.calledWith(global.translate('customcmds.failed.list'), sinon.match(owner)), 5000)
+        await global.systems.customCommands.list(global.systems.customCommands, owner)
+
+        await until(setError => {
+          let expected = global.commons.prepare('customcmds.failed.list')
+          try {
+            assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(owner)))
+            return true
+          } catch (err) {
+            return setError('\nExpected message: ' + expected + '\nActual message: ' + global.commons.sendMessage.lastCall.args[0])
+          }
+        })
       })
       it('list: /not empty/', async () => {
         let id1 = crypto.randomBytes(4).toString('hex')
@@ -71,7 +75,7 @@ describe('System - Custom Commands', () => {
         global.systems.customCommands.add(global.systems.customCommands, owner, '!' + id2 + ' Lorem Ipsum')
         await until(() => global.commons.sendMessage.calledWith(global.translate('customcmds.success.add').replace(/\$command/g, id2), sinon.match(owner)), 5000)
 
-        global.systems.customCommands.list(global.systems.customCommands, owner)
+        await global.systems.customCommands.list(global.systems.customCommands, owner)
         await until(() =>
           global.commons.sendMessage.calledWith(
             global.translate('customcmds.success.list').replace(/\$list/g, `!${id1}, !${id2}`), sinon.match(owner)) ||

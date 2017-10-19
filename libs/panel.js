@@ -98,6 +98,7 @@ function Panel () {
     })
     socket.on('responses.revert', function (data, callback) {
       _.remove(global.customTranslations, function (o) { return o.key === data.key })
+      global.db.engine.remove('customTranslations', { key: data.key })
       callback()
     })
 

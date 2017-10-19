@@ -12,3 +12,7 @@ require('../main.js')
 
 sinon.stub(global.commons, 'sendMessage')
 sinon.stub(global.commons, 'timeout')
+
+module.exports = {
+  db: require('./helpers/db')
+}

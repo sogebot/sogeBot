@@ -1,4 +1,4 @@
-/* global describe it beforeEach afterEach it */
+/* global describe it beforeEach it */
 
 const assert = require('chai').assert
 const until = require('test-until')
@@ -16,17 +16,23 @@ const testUser2 = { username: 'test2' }
 require('../main.js')
 
 describe('System - Cooldowns', () => {
-  beforeEach(function () {
+  beforeEach(async function () {
     global.commons.sendMessage.reset()
-  })
-  afterEach(async function () {
+
     let items = await global.db.engine.find('cooldowns')
     for (let item of items) {
       await global.db.engine.remove('cooldowns', { key: item.key })
     }
+
+    items = await global.db.engine.find('alias')
+    for (let item of items) {
+      await global.db.engine.remove('alias', { _id: item._id })
+      global.parser.unregister(item.alias)
+    }
+
     items = await global.db.engine.find('keywords')
     for (let item of items) {
-      await global.db.engine.remove('keywords', { key: item.key })
+      await global.db.engine.remove('keywords', { _id: item._id })
     }
   })
   describe('#fnc', () => {
@@ -78,10 +84,15 @@ describe('System - Cooldowns', () => {
         if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
 
         global.systems.cooldown.set(global.systems.cooldown, owner, '!me user 60 true')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
-          .replace(/\$command/g, '!me')
-          .replace(/\$type/g, 'user')
-          .replace(/\$seconds/g, '60'), sinon.match(owner)), 5000)
+        await until(setError => {
+          let expected = global.commons.prepare('cooldown.success.set', { command: '!me', type: 'user', seconds: 60 })
+          try {
+            assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(owner)))
+            return true
+          } catch (err) {
+            return setError('\nExpected message: ' + expected + '\nActual message: ' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : ''))
+          }
+        })
 
         let item = await global.db.engine.findOne('cooldowns', { key: '!me' })
         assert.notEmpty(item)
@@ -97,6 +108,19 @@ describe('System - Cooldowns', () => {
           }
           return false
         }, 5000)
+
+        await until(setError => {
+          let expected = '$sender | 0.0h | 0 points | 0 messages'
+          let user = testUser
+          try {
+            assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
+            return true
+          } catch (err) {
+            return setError(
+              '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+              '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
+          }
+        })
 
         spy.reset()
         global.parser.parse(testUser, '!me')
@@ -123,6 +147,7 @@ describe('System - Cooldowns', () => {
           }
           return false
         }, 5000)
+
         spy.reset()
       })
       it('global', async () => {
@@ -183,8 +208,20 @@ describe('System - Cooldowns', () => {
       it('user', async () => {
         if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
 
-        global.systems.keywords.add(global.systems.keywords, owner, 'me (!me)')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('keywords.success.add').replace(/\$keyword/g, 'me')), 5000)
+        await global.systems.keywords.add(global.systems.keywords, owner, 'me (!me)')
+
+        await until(setError => {
+          let expected = global.commons.prepare('keywords.success.add', { keyword: 'me' })
+          let user = owner
+          try {
+            assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
+            return true
+          } catch (err) {
+            return setError(
+              '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+              '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
+          }
+        })
 
         global.systems.cooldown.set(global.systems.cooldown, owner, 'me user 60 true')
         await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')

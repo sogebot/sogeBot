@@ -182,6 +182,7 @@ class Cooldown {
       cooldown[type] = cooldown[type] === 'global' ? 'user' : 'global'
     } else cooldown[type] = !cooldown[type]
 
+    delete cooldown._id
     await global.db.engine.update('cooldowns', { key: toggle[1], type: toggle[2] }, cooldown)
 
     let translation = 'cooldown.success'

@@ -26,7 +26,7 @@
     }
   },
   "systems": {
-    "notice": true,
+    "timers": true,
     "customcommands": true,
     "keywords": true,
     "points": true,
