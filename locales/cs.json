@@ -520,23 +520,17 @@
       "removed": "Vyprsel cas na vsazeni! Nikdo si nevsadil -> automaticky uzaviram"
   },
   "alias": {
-    "success": {
-      "add": "$sender, alias !$alias byl pridan do databaze",
-      "remove": "$sender, alias !$alias byl smazany z databaze",
-      "list": "$sender, seznam aliasu: $list",
-      "enabled": "$sender, alias !$alias byl zapnut",
-      "disabled": "$sender, alias !$alias byl vypnut",
-      "visible": "$sender, alias !$alias bude zobrazen v listu",
-      "invisible": "$sender, alias !$alias nebude zobrazen v listu"
-    },
-    "failed": {
-      "add": "$sender, alias !$alias uz existuje v databazi",
-      "remove": "$sender, alias !$alias v databazi neexistuje",
-      "list": "$sender, seznam aliasu je prazdny",
-      "parse": "{core.command-parse} !alias",
-      "toggle": "$sender, alias !$alias neni v databazi!",
-      "visible": "{alias.failed.remove}"
-    }
+    "alias-parse-failed": "{core.command-parse} !alias",
+    "alias-was-not-found": "$sender, alias !$alias byl pridan do database",
+    "alias-was-edited": "$sender, alias !$alias je nyni pro !$command",
+    "alias-was-added": "$sender, alias !$alias pro !$command byl pridan",
+    "list-is-not-empty": "$sender, seznam aliasu: $list",
+    "list-is-empty": "$sender, seznam aliasu je prazdny",
+    "alias-was-enabled": "$sender, alias !$alias byl zapnut",
+    "alias-was-disabled": "$sender, alias !$alias byl vypnut",
+    "alias-was-concealed": "$sender, alias !$alias byl skryt",
+    "alias-was-exposed": "$sender, alias !$alias byl odkryt",
+    "alias-was-removed": "$sender, alias !$alias byl smazan"
   },
   "customcmds": {
     "success": {

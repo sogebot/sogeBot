@@ -30,94 +30,7 @@
 
   <div role="tabpanel" class="tab-pane" id="responses">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <table class="table table-striped table-responsive table-condensed">
-          <tbody id="Responses">
-            <tr>
-              <td colspan="2">
-                <kbd>!alias add !$command !$alias</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-success">Success</span>
-                <span class="custom-response" data-id="alias.success.add"></span>
-              </td>
-              <td colspan="2">
-                <kbd>!alias add !$command !$alias</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-danger">Failure</span>
-                <span class="custom-response" data-id="alias.failed.add"></span>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <kbd>!alias remove !$alias</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-success">Success</span>
-                <span class="custom-response" data-id="alias.success.remove"></span>
-              </td>
-              <td colspan="2">
-                <kbd>!alias remove !$alias</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-danger">Failure</span>
-                <span class="custom-response" data-id="alias.failed.remove"></span>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <kbd>!alias list</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-success">Populated $list</span>
-                <span class="custom-response" data-id="alias.success.list"></span>
-              </td>
-              <td colspan="2">
-                <kbd>!alias list</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-warning">Empty</span>
-                <span class="custom-response" data-id="alias.failed.list"></span>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <kbd>!alias toggle !$alias</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-success">Enabled</span>
-                <span class="custom-response" data-id="alias.success.enabled"></span>
-              </td>
-              <td colspan="2">
-                <kbd>!alias toggle !$alias</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-warning">Disabled</span>
-                <span class="custom-response" data-id="alias.success.disabled"></span>
-              </td>
-              <td>
-                <kbd>!alias toggle !$alias</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-danger">Failure</span>
-                <span class="custom-response" data-id="alias.failed.toggle"></span>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <kbd>!alias toggle-visibility !$alias</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-success">Visible</span>
-                <span class="custom-response" data-id="alias.success.visible"></span>
-              </td>
-              <td colspan="2">
-                <kbd>!alias toggle-visibility !$alias</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-warning">Invisible</span>
-                <span class="custom-response" data-id="alias.success.invisible"></span>
-              </td>
-              <td>
-                <kbd>!alias toggle-visibility !$alias</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-danger">Failure</span>
-                <span class="custom-response" data-id="alias.failed.visible"></span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <div class="widget" id="bot-responses"></div>
     </div>
   </div>
 </div>
@@ -226,6 +139,44 @@
         socket.emit('alias.add', `!${data.command} !${data.alias}`)
         $('.new-confirm-btn').css('display', 'none')
       },
+      responses: (id) => {
+        id = id || null
+        socket.emit('responses.get', 'alias', function (data) {
+          for (let [key, entry] of Object.entries(data)) {
+            if (!_.isNil(id) && 'timers.' + key !== id) return true // continue if we want only specific id
+            var filters = ['global']
+
+            let div = $('<div>')
+              .css('margin', '5px')
+            let response = $('<span>')
+              .text('Response')
+              .addClass('label label-primary label-bot-response')
+            let kbd = $('<kbd>')
+              .text(key.replace(/-/g, ' '))
+              .addClass('kbd-bot-response')
+            let span = $('<span>').addClass('custom-response')
+              .attr('data-id', `timers.${key}`)
+              .css('font-size', '80%')
+
+            $('#bot-responses').append(div.append(response).append(kbd).append(span))
+
+            if (_.includes(['timer-was-set', 'timer-not-found', 'timer-deleted', 'timer-enabled', 'timer-disabled', 'responses-list', 'response-was-added'], key)) filters.push('name')
+            if (_.includes(['response-was-added', 'response-deleted', 'response-not-found', 'response-enabled', 'response-disabled'], key)) filters.push('id')
+            if (key === 'timer-was-set') filters.push('messages', 'seconds')
+            if (key === 'timers-list') filters.push('list')
+            if (key === 'response-was-added') filters.push('response')
+
+            key = 'timers.' + key
+            $('[data-id="' + key + '"]').html(commons.editable({
+              text: entry,
+              id: key,
+              fnc: 'commons.setResponse',
+              filters: filters
+            }))
+          }
+        })
+      }
+/*
       responses: function (id) {
         id = id || null
         socket.emit('responses.get', 'alias', function (data) {
@@ -255,7 +206,7 @@
             }))
           })
         })
-      }
+      }*/
     }
 
     alias.responses()

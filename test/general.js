@@ -14,5 +14,6 @@ sinon.stub(global.commons, 'sendMessage')
 sinon.stub(global.commons, 'timeout')
 
 module.exports = {
-  db: require('./helpers/db')
+  db: require('./helpers/db'),
+  message: require('./helpers/messages')
 }

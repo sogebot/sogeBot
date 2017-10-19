@@ -40,7 +40,7 @@
     "minutes": "minute|minutes",
     "messages": "message|messages",
     "links": "link|links",
-    "isRegistered": "$sender, you cannot use $keyword, because is already in use for another action!"
+    "isRegistered": "$sender, you cannot use !$keyword, because is already in use for another action!"
   },
   "overlay": {
     "emotes": {
@@ -525,23 +525,17 @@
       "removed": "Betting time is up! No bets were sent -> automatically closing"
   },
   "alias": {
-    "success": {
-      "add": "$sender, alias !$alias was added to database",
-      "remove": "$sender, alias !$alias was deleted from database",
-      "list": "$sender, list of aliases: $list",
-      "enabled": "$sender, alias !$alias  was enabled",
-      "disabled": "$sender, alias !$alias was disabled",
-      "visible": "$sender, alias !$alias will be visible in list",
-      "invisible": "$sender, alias !$alias will not be visible in list"
-    },
-    "failed": {
-      "add": "$sender, alias !$alias already exists in database",
-      "remove": "$sender, alias !$alias cannot be found in database",
-      "list": "$sender, list of aliases is empty",
-      "parse": "{core.command-parse} !alias",
-      "toggle": "$sender, alias !$alias was not found",
-      "visible": "{alias.failed.remove}"
-    }
+    "alias-parse-failed": "{core.command-parse} !alias",
+    "alias-was-not-found": "$sender, alias !$alias was not found in database",
+    "alias-was-edited": "$sender, alias !$alias is changed to !$command",
+    "alias-was-added": "$sender, alias !$alias for !$command was added",
+    "list-is-not-empty": "$sender, list of aliases: $list",
+    "list-is-empty": "$sender, list of aliases is empty",
+    "alias-was-enabled": "$sender, alias !$alias was enabled",
+    "alias-was-disabled": "$sender, alias !$alias was disabled",
+    "alias-was-concealed": "$sender, alias !$alias was concealed",
+    "alias-was-exposed": "$sender, alias !$alias was exposed",
+    "alias-was-removed": "$sender, alias !$alias was removed"
   },
   "customcmds": {
     "success": {

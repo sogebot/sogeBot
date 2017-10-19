@@ -9,7 +9,8 @@ var constants = require('../constants')
 
 /*
  * !alias                            - gets an info about alias usage
- * !alias add ![cmd] ![alias]        - add alias for specified command
+ * !alias add ![alias] ![cmd]        - add alias for specified command
+ * !alias edit ![alias] ![cmd]        - add alias for specified command
  * !alias remove ![alias]            - remove specified alias
  * !alias toggle ![alias]            - enable/disable specified alias
  * !alias toggle-visibility ![alias] - enable/disable specified alias
@@ -20,6 +21,7 @@ class Alias {
   constructor () {
     if (global.commons.isSystemEnabled(this)) {
       global.parser.register(this, '!alias add', this.add, constants.OWNER_ONLY)
+      global.parser.register(this, '!alias edit', this.edit, constants.OWNER_ONLY)
       global.parser.register(this, '!alias list', this.list, constants.OWNER_ONLY)
       global.parser.register(this, '!alias remove', this.remove, constants.OWNER_ONLY)
       global.parser.register(this, '!alias toggle-visibility', this.visible, constants.OWNER_ONLY)
@@ -70,39 +72,63 @@ class Alias {
   }
 
   help (self, sender) {
-    global.commons.sendMessage(global.translate('core.usage') + ': !alias add <!command> <!alias> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', sender)
+    global.commons.sendMessage(global.translate('core.usage') + ': !alias add <!alias> <!command> | !alias edit <!alias> <!command> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', sender)
+  }
+
+  async edit (self, sender, text) {
+    debug('edit(%j, %j, %j)', self, sender, text)
+    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w\S ]+) !([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
+
+    if (_.isNil(parsed)) {
+      let message = global.commons.prepare('alias.alias-parse-failed')
+      debug(message); global.commons.sendMessage(message, sender)
+      return false
+    }
+
+    const alias = parsed[1]
+    const command = parsed[2]
+
+    let item = await global.db.engine.findOne('alias', { alias: alias })
+    if (_.isEmpty(item)) {
+      let message = global.commons.prepare('alias.alias-was-not-found', { alias: alias })
+      debug(message); global.commons.sendMessage(message, sender)
+      return false
+    }
+
+    await global.db.engine.update('alias', { alias: alias }, { command: command })
+
+    let message = global.commons.prepare('alias.alias-was-edited', { alias: alias, command: command })
+    debug(message); global.commons.sendMessage(message, sender)
   }
 
   async add (self, sender, text) {
     debug('add(%j, %j, %j)', self, sender, text)
-    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w\S ]+) !([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
+    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+) !([\u0500-\u052F\u0400-\u04FF\w\S ]+)$/)
 
     if (_.isNil(parsed)) {
-      debug(global.translate('alias.failed.parse'))
-      global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
+      let message = global.commons.prepare('alias.alias-parse-failed')
+      debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
     let alias = {
-      alias: parsed[2],
-      command: parsed[1],
+      alias: parsed[1],
+      command: parsed[2],
       enabled: true,
       visible: true
     }
 
     if (global.parser.isRegistered(alias.alias)) {
-      debug(global.translate('core.isRegistered').replace(/\$keyword/g, '!' + alias.alias))
-      global.commons.sendMessage(global.translate('core.isRegistered').replace(/\$keyword/g, '!' + alias.alias), sender)
+      let message = global.commons.prepare('core.isRegistered', { keyword: alias.alias })
+      debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
     await global.db.engine.insert('alias', alias)
     await self.register(self)
 
-    debug(global.translate('alias.success.add').replace(/\$alias/g, alias.alias))
-    global.commons.sendMessage(
-      global.translate('alias.success.add')
-        .replace(/\$alias/g, alias.alias), sender)
+    let message = global.commons.prepare('alias.alias-was-added', alias)
+    debug(message); global.commons.sendMessage(message, sender)
   }
 
   async run (self, sender, msg, fullMsg) {
@@ -116,7 +142,7 @@ class Alias {
   async list (self, sender) {
     debug('list(%j, %j)', self, sender)
     let alias = await global.db.engine.find('alias', { visible: true })
-    var output = (alias.length === 0 ? global.translate('alias.failed.list') : global.translate('alias.success.list').replace(/\$list/g, '!' + (_.map(alias, 'alias')).join(', !')))
+    var output = (alias.length === 0 ? global.translate('alias.list-is-empty') : global.translate('alias.list-is-not-empty').replace(/\$list/g, '!' + (_.map(_.orderBy(alias, 'alias'), 'alias')).join(', !')))
     debug(output)
     global.commons.sendMessage(output, sender)
   }
@@ -126,71 +152,68 @@ class Alias {
     let id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
 
     if (_.isNil(id)) {
-      debug(global.translate('alias.failed.parse'))
-      global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
+      let message = global.commons.prepare('alias.alias-parse-failed')
+      debug(message); global.commons.sendMessage(message, sender)
       return false
     }
     id = id[1]
     const alias = await global.db.engine.findOne('alias', { alias: id })
     if (_.isEmpty(alias)) {
-      debug(global.translate('alias.failed.toggle').replace(/\$alias/g, id))
-      global.commons.sendMessage(global.translate('alias.failed.toggle')
-        .replace(/\$alias/g, id), sender)
+      let message = global.commons.prepare('alias.alias-was-not-found', { alias: id })
+      debug(message); global.commons.sendMessage(message, sender)
       return
     }
 
     await global.db.engine.update('alias', { alias: id }, { enabled: !alias.enabled })
     self.register(self)
 
-    debug(global.translate(!alias.enabled ? 'alias.success.enabled' : 'alias.success.disabled').replace(/\$alias/g, id))
-    global.commons.sendMessage(global.translate(!alias.enabled ? 'alias.success.enabled' : 'alias.success.disabled')
-      .replace(/\$alias/g, alias.alias), sender)
+    let message = global.commons.prepare(!alias.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', { alias: id })
+    debug(message); global.commons.sendMessage(message, sender)
   }
 
   async visible (self, sender, text) {
     let id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
 
     if (_.isNil(id)) {
-      global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
+      let message = global.commons.prepare('alias.alias-parse-failed')
+      debug(message); global.commons.sendMessage(message, sender)
       return false
     }
     id = id[1]
 
     const alias = await global.db.engine.findOne('alias', { alias: id })
     if (_.isEmpty(alias)) {
-      global.commons.sendMessage(global.translate('alias.failed.visible')
-        .replace(/\$alias/g, id), sender)
-      return
+      let message = global.commons.prepare('alias.alias-was-not-found', { alias: id })
+      debug(message); global.commons.sendMessage(message, sender)
+      return false
     }
 
     await global.db.engine.update('alias', { alias: id }, { visible: !alias.visible })
 
-    global.commons.sendMessage(global.translate(!alias.visible ? 'alias.success.visible' : 'alias.success.invisible')
-        .replace(/\$alias/g, alias.alias), sender)
+    let message = global.commons.prepare(!alias.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', alias)
+    debug(message); global.commons.sendMessage(message, sender)
   }
 
   async remove (self, sender, text) {
     debug('remove(%j, %j, %j)', self, sender, text)
     let id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
     if (_.isNil(id)) {
-      debug(global.translate('alias.failed.parse'))
-      global.commons.sendMessage(global.translate('alias.failed.parse'), sender)
+      let message = global.commons.prepare('alias.alias-parse-failed')
+      debug(message); global.commons.sendMessage(message, sender)
       return false
     }
     id = id[1]
 
     let removed = await global.db.engine.remove('alias', { alias: id })
     if (!removed) {
-      debug(global.translate('alias.failed.remove').replace(/\$alias/g, text.replace('!', '')))
-      global.commons.sendMessage(global.translate('alias.failed.remove')
-        .replace(/\$alias/g, text.replace('!', '')), sender)
+      let message = global.commons.prepare('alias.alias-was-not-found', { alias: id })
+      debug(message); global.commons.sendMessage(message, sender)
       return false
     }
     global.parser.unregister(text)
 
-    debug(global.translate('alias.success.remove').replace(/\$alias/g, text.replace('!', '')))
-    global.commons.sendMessage(global.translate('alias.success.remove')
-      .replace(/\$alias/g, text.replace('!', '')), sender)
+    let message = global.commons.prepare('alias.alias-was-removed', { alias: id })
+    debug(message); global.commons.sendMessage(message, sender)
   }
 }
 

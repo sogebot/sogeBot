@@ -1,0 +1,41 @@
+/* global describe it beforeEach */
+
+const assert = require('chai').assert
+require('../../general.js')
+
+const db = require('../../general.js').db
+const message = require('../../general.js').message
+
+// users
+const owner = { username: 'soge__' }
+
+describe('Alias - run()', () => {
+  beforeEach(async () => {
+    global.commons.sendMessage.reset()
+
+    await db.cleanup('settings')
+    let items = await global.db.engine.find('alias')
+    for (let item of items) {
+      await global.db.engine.remove('alias', { alias: item.alias })
+      global.parser.unregister(item.alias)
+    }
+  })
+
+  it('!a will show !uptime', async () => {
+    global.systems.alias.add(global.systems.alias, owner, '!a !uptime')
+    await message.isSent('alias.alias-was-added', owner, { alias: 'a', command: 'uptime' })
+
+    // force uptime to be 0 (bypass cached db)
+    global.twitch.when.online = null
+    global.twitch.when.offline = null
+
+    global.parser.parse(owner, '!a')
+    await message.isSent('core.offline', owner, { time: '' })
+
+    global.systems.alias.remove(global.systems.alias, owner, '!a')
+    await message.isSent('alias.alias-was-removed', owner, { alias: 'a' })
+
+    // !a is not registered anymore
+    assert.isUndefined(global.parser.registeredCmds['!a'])
+  })
+})
