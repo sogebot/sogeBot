@@ -88,7 +88,7 @@ let migration = {
       console.info('Migrating %i notices to timers', _.size(items.notices))
       let timer = await global.db.engine.insert('timers', { name: 'notices', messages: 0, seconds: 300, enabled: true })
       for (let item of _.values(items.notices)) {
-        await global.db.engine.insert('timersResponses', { timerId: timer._id, enabled: item.enabled, response: item.text, timestamp: new Date().getTime() })
+        await global.db.engine.insert('timersResponses', { timerId: timer._id.toString(), enabled: item.enabled, response: item.text, timestamp: new Date().getTime() })
       }
     }
   }],
