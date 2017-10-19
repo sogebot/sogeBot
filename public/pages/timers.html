@@ -31,9 +31,6 @@
   <div role="tabpanel" class="tab-pane" id="responses">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
       <div class="widget" id="bot-responses">
-        <!--table class="table table-striped table-responsive table-condensed">
-          <tbody id="responses"></tbody>
-        </table-->
       </div>
     </div>
   </div>
@@ -191,6 +188,12 @@
 
             $('#bot-responses').append(div.append(response).append(kbd).append(span))
 
+            if (_.includes(['timer-was-set', 'timer-not-found', 'timer-deleted', 'timer-enabled', 'timer-disabled', 'responses-list', 'response-was-added'], key)) filters.push('name')
+            if (_.includes(['response-was-added', 'response-deleted', 'response-not-found', 'response-enabled', 'response-disabled'], key)) filters.push('id')
+            if (key === 'timer-was-set') filters.push('messages', 'seconds')
+            if (key === 'timers-list') filters.push('list')
+            if (key === 'response-was-added') filters.push('response')
+
             key = 'timers.' + key
             $('[data-id="' + key + '"]').html(commons.editable({
               text: entry,
@@ -198,45 +201,6 @@
               fnc: 'commons.setResponse',
               filters: filters
             }))
-              /*
-
-
-            <tr>
-              <td colspan="2">
-                <kbd>!alias add !$command !$alias</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-success">Success</span>
-                <span class="custom-response" data-id="alias.success.add"></span>
-              </td>
-              <td colspan="2">
-                <kbd>!alias add !$command !$alias</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-danger">Failure</span>
-                <span class="custom-response" data-id="alias.failed.add"></span>
-              </td>
-            </tr>
-
-
-            // add command and reponse filters
-            if (key === 'success.add' || key === 'failed.add') {
-              filters.push('command')
-              filters.push('alias')
-            }
-            if (key === 'success.remove' || key === 'failed.remove' || key === 'success.enabled' ||
-              key === 'success.disabled' || key === 'failed.toggle' || key === 'success.visible' ||
-              key === 'success.invisible' || key === 'failed.visible') {
-              filters.push('alias')
-            }
-            if (key === 'success.list') {
-              filters.push('list')
-            }
-            key = 'alias.' + key
-            $('[data-id="' + key + '"]').html(commons.editable({
-              text: value,
-              id: key,
-              fnc: 'commons.setResponse',
-              filters: filters
-            }))*/
           }
         })
       }
