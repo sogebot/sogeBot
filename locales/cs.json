@@ -71,6 +71,8 @@
         "description": "Popisek",
         "quiet": "Potichu (bool)",
         "id": "ID",
+        "name": "Název",
+        "messages": "Zprávy",
         "amount": "Počet",
         "pointsName": "Název bodů",
         "rank": "Rank",

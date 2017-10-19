@@ -76,6 +76,8 @@
         "description": "Description",
         "quiet": "Quiet (bool)",
         "id": "ID",
+        "name": "Name",
+        "messages": "Messages",
         "amount": "Amount",
         "pointsName": "Points name",
         "rank": "Rank",
