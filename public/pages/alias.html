@@ -176,37 +176,6 @@
           }
         })
       }
-/*
-      responses: function (id) {
-        id = id || null
-        socket.emit('responses.get', 'alias', function (data) {
-          _.each(data, function (value, key) {
-            if (!_.isNil(id) && 'alias.' + key !== id) return true // continue if we want only specific id
-            var filters = ['global']
-
-            // add command and reponse filters
-            if (key === 'success.add' || key === 'failed.add') {
-              filters.push('command')
-              filters.push('alias')
-            }
-            if (key === 'success.remove' || key === 'failed.remove' || key === 'success.enabled' ||
-              key === 'success.disabled' || key === 'failed.toggle' || key === 'success.visible' ||
-              key === 'success.invisible' || key === 'failed.visible') {
-              filters.push('alias')
-            }
-            if (key === 'success.list') {
-              filters.push('list')
-            }
-            key = 'alias.' + key
-            $('[data-id="' + key + '"]').html(commons.editable({
-              text: value,
-              id: key,
-              fnc: 'commons.setResponse',
-              filters: filters
-            }))
-          })
-        })
-      }*/
     }
 
     alias.responses()
