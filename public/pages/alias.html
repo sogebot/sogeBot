@@ -141,9 +141,10 @@
       },
       responses: (id) => {
         id = id || null
-        socket.emit('responses.get', 'alias', function (data) {
+        let system = 'alias'
+        socket.emit('responses.get', system, function (data) {
           for (let [key, entry] of Object.entries(data)) {
-            if (!_.isNil(id) && 'timers.' + key !== id) return true // continue if we want only specific id
+            if (!_.isNil(id) && `${system}.${key}` !== id) return true // continue if we want only specific id
             var filters = ['global']
 
             let div = $('<div>')
@@ -155,19 +156,15 @@
               .text(key.replace(/-/g, ' '))
               .addClass('kbd-bot-response')
             let span = $('<span>').addClass('custom-response')
-              .attr('data-id', `timers.${key}`)
+              .attr('data-id', `${system}.${key}`)
               .css('font-size', '80%')
 
             $('#bot-responses').append(div.append(response).append(kbd).append(span))
 
-            if (_.includes(['timer-was-set', 'timer-not-found', 'timer-deleted', 'timer-enabled', 'timer-disabled', 'responses-list', 'response-was-added'], key)) filters.push('name')
-            if (_.includes(['response-was-added', 'response-deleted', 'response-not-found', 'response-enabled', 'response-disabled'], key)) filters.push('id')
-            if (key === 'timer-was-set') filters.push('messages', 'seconds')
-            if (key === 'timers-list') filters.push('list')
-            if (key === 'response-was-added') filters.push('response')
+            if (_.includes(['alias-was-not-found', 'alias-was-edited', 'alias-was-added', 'alias-was-enabled', 'alias-was-disabled', 'alias-was-concealed', 'alias-was-exposed', 'alias-was-removed'], key)) filters.push('alias')
+            if (_.includes(['list-is-not-empty'], key)) filters.push('list')
 
-            key = 'timers.' + key
-            $('[data-id="' + key + '"]').html(commons.editable({
+            $(`[data-id="${system}.${key}"]`).html(commons.editable({
               text: entry,
               id: key,
               fnc: 'commons.setResponse',
