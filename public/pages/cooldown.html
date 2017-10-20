@@ -161,9 +161,9 @@
               '<span style="cursor: pointer;" class="label label-' + (item.moderator ? "success": "danger") + '" data-type="' + item.type + '" data-id="' + item.key + '" onclick="cooldown.toggleModerators(this)">moderators:' + translations[item.moderator ? "comply": "omit"] + '</span> ' +
               '<span style="cursor: pointer;" class="label label-' + (item.owner ? "success": "danger") + '" data-type="' + item.type + '" data-id="' + item.key + '" onclick="cooldown.toggleOwners(this)">owners:' + translations[item.owner ? "comply": "omit"] + '</span> ' +
               '<span style="cursor: pointer;" class="label label-' + (item.enabled ? "success": "danger") + '" data-type="' + item.type + '" data-id="' + item.key + '" onclick="cooldown.toggle(this)">' + (item.enabled ? "enabled": "disabled") + '</span>' +
-              '<span style="cursor: not-allowed; float:right; padding: 4px;" class="label label-danger btn-remove" data-type="' + item.type + '" data-id="' + item.key + '"  onclick="commons.confirm(this)">delete</span>' +
-              '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="label label-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
-              '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="label label-success btn-confirm" onclick="cooldown.delete(this)" data-type="' + item.type + '" data-id="' + item.key + '">confirm</span>' +
+              '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="label label-danger btn-remove" data-type="' + item.type + '" data-id="' + item.key + '"  onclick="commons.confirm(this)">delete</span>' +
+              '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em display: none" class="label label-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
+              '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em display: none" class="label label-success btn-confirm" onclick="cooldown.delete(this)" data-type="' + item.type + '" data-id="' + item.key + '">confirm</span>' +
               commons.editable({ text: item.miliseconds / 1000, id: item.key, fnc: 'cooldown.edit', options: { type: item.type } }) +
             '</td>' +
           '</tr>');

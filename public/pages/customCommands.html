@@ -73,9 +73,9 @@
             '<td style="vertical-align: top !important;"><span class="label label-primary">Response</span> ' +
               '<span style="cursor: pointer;" class="label label-' + (item.visible ? "success": "danger") + '" " data-command="' + item.command + '" onclick="cc.toggleVisibility(this)">' + (item.visible ? "visible": "hidden") + '</span> ' +
               '<span style="cursor: pointer;" class="label label-' + (item.enabled ? "success": "danger") + '" data-command="' + item.command + '" onclick="cc.toggle(this)">' + (item.enabled ? "enabled": "disabled") + '</span>' +
-              '<span style="cursor: not-allowed; float:right; padding: 4px;" class="label label-danger btn-remove" data-command="' + item.command + '"  onclick="commons.confirm(this)">delete</span>' +
-              '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="label label-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
-              '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="label label-success btn-confirm" onclick="cc.delete(this)" data-command="' + item.command + '">confirm</span>' +
+              '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="label label-danger btn-remove" data-command="' + item.command + '"  onclick="commons.confirm(this)">delete</span>' +
+              '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em display: none" class="label label-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
+              '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em display: none" class="label label-success btn-confirm" onclick="cc.delete(this)" data-command="' + item.command + '">confirm</span>' +
               commons.editable({ text: item.response, id: item.command, fnc: 'cc.edit', filters: ['global'] }) +
             '</td>' +
           '</tr>');

@@ -779,9 +779,12 @@ abbr[data-original-title], abbr[title] {
 }
 
 .label {
-  font-size: 90%;
+  text-shadow: 1px 1px black, -1px -1px black, -1px 1px black, 1px -1px black;
+  font-size: 100%;
+  text-transform: uppercase;
   font-weight: bold;
   font-family: 'PT Sans';
+  padding: 0.2em;
 }
 
 kbd {
@@ -818,9 +821,10 @@ li.active .deleteTab {
 }
 
 .label-bot-response {
+  text-shadow: 1px 1px black, -1px -1px black, -1px 1px black, 1px -1px black;
   font-size: 80%;
   text-transform: uppercase;
-  font-weight: normal;
+  font-weight: bold;
   font-family: 'PT Sans';
   padding: 0.2em;
 }

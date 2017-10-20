@@ -57,7 +57,7 @@
           '" data-id="' + timer.name + '" onclick="timers.toggle(this)">' + (timer.enabled ? "enabled" :
             "disabled") + '</span>' +
           commons.editable({ text: timer.name, id: timer.name, fnc: 'timers.editName' }) + '</td>' +
-          '<td style="vertical-align: top !important;"><span class="label label-info"># Responses</span><strong style="display: block; padding: 8px">' +
+          '<td style="vertical-align: top !important;"><span class="label label-user"># Responses</span><strong style="display: block; padding: 8px">' +
             `⚫ ${responses.enabled} ⚪ ${responses.disabled}</strong></td>` +
           '</td>' +
           '<td style="vertical-align: top !important;"><span class="label label-primary">Messages</span> ' +
