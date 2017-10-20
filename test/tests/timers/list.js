@@ -16,8 +16,8 @@ describe('Timers - list()', () => {
     await db.cleanup()
     await global.db.engine.insert('timers', {name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() }})
     let timer = await global.db.engine.insert('timers', {name: 'test2', messages: 0, seconds: 60, enabled: false, trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() }})
-    global.db.engine.insert('timersResponses', {response: 'Lorem Ipsum', timerId: timer._id.toString(), enabled: true})
-    global.db.engine.insert('timersResponses', {response: 'Lorem Ipsum 2', timerId: timer._id.toString(), enabled: false})
+    await global.db.engine.insert('timersResponses', {response: 'Lorem Ipsum', timerId: timer._id.toString(), enabled: true})
+    await global.db.engine.insert('timersResponses', {response: 'Lorem Ipsum 2', timerId: timer._id.toString(), enabled: false})
     global.commons.sendMessage.reset()
   })
 
