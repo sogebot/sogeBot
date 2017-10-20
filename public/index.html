@@ -516,15 +516,14 @@
         translate: function () {
           _.each($('[data-lang]'), function (el) {
             var key = ($(el).data('lang'))
-            $(el).text(_.at(translations, key)[0])
-            if (_.isNil(_.at(translations, key)[0])) {
-              if (key.startsWith('responses.variable.')) $(el).text('Unknown variable $' + key.replace('responses.variable.', ''))
-              else $(el).text('undefined: ' + key)
+            if ($(el).text().trim().length === 0) {
+              $(el).text(_.at(translations, key)[0])
+              if (_.isNil(_.at(translations, key)[0])) {
+                if (key.startsWith('responses.variable.')) $(el).text('Unknown variable $' + key.replace('responses.variable.', ''))
+                else $(el).text('undefined: ' + key)
+              }
             }
           })
-        },
-        translateLoop: function (el, key) {
-
         },
         editable: function (options) {
           options.id = !_.isNil(options.id) ? options.id : ''
