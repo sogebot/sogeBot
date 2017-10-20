@@ -13,7 +13,7 @@ const owner = { username: 'soge__' }
 
 describe('Timers - unset()', () => {
   beforeEach(async () => {
-    await db.cleanup('timers')
+    await db.cleanup()
     await global.db.engine.insert('timers', {name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() }})
     global.commons.sendMessage.reset()
   })

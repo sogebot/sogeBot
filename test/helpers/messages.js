@@ -17,6 +17,18 @@ module.exports = {
           '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
       }
     })
+  },
+  isSentRaw: async function (expected, user) {
+    await until(setError => {
+      try {
+        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
+        return true
+      } catch (err) {
+        return setError(
+          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
+      }
+    })
   }
 }
 

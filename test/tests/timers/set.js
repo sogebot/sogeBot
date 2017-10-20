@@ -13,7 +13,7 @@ const owner = { username: 'soge__' }
 
 describe('Timers - set()', () => {
   beforeEach(async () => {
-    await db.cleanup('timers')
+    await db.cleanup()
     global.commons.sendMessage.reset()
   })
 

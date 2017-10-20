@@ -13,8 +13,7 @@ const owner = { username: 'soge__' }
 
 describe('Timers - toggle()', () => {
   beforeEach(async () => {
-    await db.cleanup('timers')
-    await db.cleanup('timersResponses')
+    await db.cleanup()
     let timer = await global.db.engine.insert('timers', {name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() }})
     global.db.engine.insert('timersResponses', {response: 'Lorem Ipsum', timerId: timer._id, enabled: true})
     global.commons.sendMessage.reset()

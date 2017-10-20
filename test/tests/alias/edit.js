@@ -11,13 +11,7 @@ const owner = { username: 'soge__' }
 describe('Alias - edit()', () => {
   beforeEach(async () => {
     global.commons.sendMessage.reset()
-
-    await db.cleanup('settings')
-    let items = await global.db.engine.find('alias')
-    for (let item of items) {
-      await global.db.engine.remove('alias', { alias: item.alias })
-      global.parser.unregister(item.alias)
-    }
+    await db.cleanup()
   })
 
   it('', async () => {
