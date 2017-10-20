@@ -17,7 +17,7 @@
   </ul>
 </div>
 
-<div class="tab-content">
+<div class="tab-content tab-content-timers">
   <div role="tabpanel" class="tab-pane active" id="manage">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
       <div class="widget">
@@ -112,7 +112,7 @@
           '</div>' +
         '</div>'
 
-      $('.tab-content').append(content)
+      $('.tab-content-timers').append(content)
     },
     toggle: (el) => {
       socket.emit('timers.toggle', `-name ${el.dataset.id}`)
