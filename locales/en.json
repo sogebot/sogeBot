@@ -538,23 +538,17 @@
     "alias-was-removed": "$sender, alias !$alias was removed"
   },
   "customcmds": {
-    "success": {
-      "add": "$sender, command !$command was added to database",
-      "remove": "$sender, command !$command was deleted from database",
-      "list": "$sender, list of commands: $list",
-      "enabled": "$sender, command !$command was enabled",
-      "disabled": "$sender, command !$command was disabled",
-      "visible": "$sender, command !$command will be visible in list",
-      "invisible": "$sender, command !$command will not be visible in list"
-    },
-    "failed": {
-      "add": "$sender, command !$command already exists in database",
-      "remove": "$sender, command !$command cannot be found in database",
-      "list": "$sender, list of commands is empty",
-      "parse": "{core.command-parse} !command",
-      "toggle": "$sender, command !$command was not found",
-      "visible": "{customcmds.failed.remove}"
-    }
+    "commands-parse-failed": "{core.command-parse} !commands",
+    "command-was-not-found": "$sender, command !$command was not found in database",
+    "command-was-edited": "$sender, command !$command is changed to '$response'",
+    "command-was-added": "$sender, command !$command was added",
+    "list-is-not-empty": "$sender, list of commands: $list",
+    "list-is-empty": "$sender, list of commands is empty",
+    "command-was-enabled": "$sender, command !$command was enabled",
+    "command-was-disabled": "$sender, command !$command was disabled",
+    "command-was-concealed": "$sender, command !$command was concealed",
+    "command-was-exposed": "$sender, command !$command was exposed",
+    "command-was-removed": "$sender, command !$command was removed"
   },
   "keywords": {
     "success": {

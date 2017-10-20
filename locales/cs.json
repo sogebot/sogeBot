@@ -521,7 +521,7 @@
   },
   "alias": {
     "alias-parse-failed": "{core.command-parse} !alias",
-    "alias-was-not-found": "$sender, alias !$alias byl pridan do database",
+    "alias-was-not-found": "$sender, alias !$alias nebyl nalezen",
     "alias-was-edited": "$sender, alias !$alias je nyni pro !$command",
     "alias-was-added": "$sender, alias !$alias pro !$command byl pridan",
     "list-is-not-empty": "$sender, seznam aliasu: $list",
@@ -533,23 +533,17 @@
     "alias-was-removed": "$sender, alias !$alias byl smazan"
   },
   "customcmds": {
-    "success": {
-      "add": "$sender, prikaz !$command byl pridan do databaze",
-      "remove": "$sender, prikaz !$command byl smazany z databaze",
-      "list": "$sender, seznam prikazu: $list",
-      "enabled": "$sender, prikaz !$command byl zapnut",
-      "disabled": "$sender, prikaz !$command byl vypnut",
-      "visible": "$sender, prikaz !$command bude zobrazen v listu",
-      "invisible": "$sender, prikaz !$command nebude zobrazen v listu"
-    },
-    "failed": {
-      "add": "$sender, prikaz !$command uz existuje v databazi",
-      "remove": "$sender, prikaz !$command v databazi neexistuje",
-      "list": "$sender, seznam prikazu je prazdny",
-      "parse": "{core.command-parse} !command",
-      "toggle": "$sender, prikaz !$command neni v databazi!",
-      "visible": "{customcmds.failed.remove}"
-    }
+    "commands-parse-failed": "{core.command-parse} !commands",
+    "command-was-not-found": "$sender, prikaz !$command nebyl nalezen",
+    "command-was-edited": "$sender, prikaz !$command is changed to '$response'",
+    "command-was-added": "$sender, prikaz !$command byl pridan",
+    "list-is-not-empty": "$sender, seznam prikazu: $list",
+    "list-is-empty": "$sender, seznam prikazu je prazdny",
+    "command-was-enabled": "$sender, prikaz !$command byl zapnut",
+    "command-was-disabled": "$sender, prikaz !$command byl vypnut",
+    "command-was-concealed": "$sender, prikaz !$command byl skryt",
+    "command-was-exposed": "$sender, prikaz !$command byl odkryt",
+    "command-was-removed": "$sender, prikaz !$command byl smazan"
   },
   "keywords": {
     "success": {
