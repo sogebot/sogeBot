@@ -201,6 +201,7 @@
     <button class="btn btn-info btn-xs" id="percentage-btn" data-show-percentage="true" onclick="switchPercentageShow()">%</button>
     <button class="btn btn-default btn-xs text-muted" id="mute-btn" data-muted="false" onclick="switchMute()" data-lang="mute"></button>
     <button class="btn btn-default btn-xs text-muted" id="theme-btn" onclick="switchTheme()" data-lang="dark"></button>
+    <button class="btn btn-default btn-xs text-muted" id="me-btn" onclick="switchMe()">/me</button>
     <button style="border-right:0;" class="btn btn-default btn-xs text-muted" id="stats-btn" onclick="switchStats()"><i class="fa fa-angle-up" aria-hidden="true"></i> <span>hide</span> <i class="fa fa-angle-up" aria-hidden="true"></i></button>
   </div>
 
@@ -313,6 +314,11 @@
         var btn = $('#percentage-btn')
         btn.data('showPercentage', !data.percentage)
         switchPercentageShow(false)
+
+        /* ME BUTTON */
+        var btn = $('#me-btn')
+        btn.data('sendWithMe', !data.sendWithMe)
+        switchMe(false)
       })
 
       setInterval(function () { console.debug('EMIT [getConnectionStatus]'); socket.emit('getConnectionStatus'); setStatus('SOC', socket.connected ? 3 : 0) }, 1000)
@@ -1047,6 +1053,21 @@
         if (update) {
           console.debug('EMIT [saveConfiguration]', {'percentage': btn.data('showPercentage')})
           socket.emit('saveConfiguration', {'percentage': btn.data('showPercentage')})
+        }
+      }
+
+      var switchMe = function(update = true) {
+        var btn = $('#me-btn')
+        btn.removeClass()
+        if (btn.data('sendWithMe')) {
+          btn.addClass('btn btn-default btn-xs')
+        } else {
+          btn.addClass('btn btn-info btn-xs')
+        }
+        btn.data('sendWithMe', !btn.data('sendWithMe'))
+        if (update) {
+          console.debug('EMIT [saveConfiguration]', {'sendWithMe': btn.data('sendWithMe')})
+          socket.emit('saveConfiguration', {'sendWithMe': btn.data('sendWithMe')})
         }
       }
 
