@@ -10,6 +10,7 @@ module.exports = {
       let expected = global.commons.prepare(entry, opts)
       try {
         assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
+        global.commons.sendMessage.reset()
         return true
       } catch (err) {
         return setError(

@@ -11,6 +11,7 @@ module.exports = {
       global.parser.unregister(item.command)
     }
 
+    await global.db.engine.remove('keywords', {})
     await global.db.engine.remove('settings', {})
     await global.db.engine.remove('timers', {})
     await global.db.engine.remove('timersResponses', {})

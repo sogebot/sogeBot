@@ -551,20 +551,16 @@
     "command-was-removed": "$sender, command !$command was removed"
   },
   "keywords": {
-    "success": {
-      "add": "$sender, keyword $keyword was added to database",
-      "remove": "$sender, keyword $keyword  was deleted from database",
-      "list": "$sender, list of keywords: $list",
-      "enabled": "$sender, keyword $keyword was enabled",
-      "disabled": "$sender, keyword $keyword was disabled"
-    },
-    "failed": {
-      "add": "$sender, keyword $keyword already exists in database",
-      "remove": "$sender, keyword $keyword cannot be found in database",
-      "list": "$sender, list of keywords is empty",
-      "parse": "{core.command-parse} !keyword",
-      "toggle": "$sender, keyword $keyword was not found"
-    }
+    "keyword-parse-failed": "{core.command-parse} !keyword",
+    "keyword-was-not-found": "$sender, keyword $keyword was not found in database",
+    "keyword-was-edited": "$sender, keyword $keyword is changed to '$response'",
+    "keyword-was-added": "$sender, keyword $keyword was added",
+    "keyword-already-exist": "$sender, keyword $keyword already exist",
+    "list-is-not-empty": "$sender, list of keywords: $list",
+    "list-is-empty": "$sender, list of keywords is empty",
+    "keyword-was-enabled": "$sender, keyword $keyword was enabled",
+    "keyword-was-disabled": "$sender, keyword $keyword was disabled",
+    "keyword-was-removed": "$sender, keyword $keyword was removed"
   },
   "points": {
     "success": {

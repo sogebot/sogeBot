@@ -29,77 +29,10 @@
   </div>
 
   <div role="tabpanel" class="tab-pane" id="responses">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <table class="table table-striped table-responsive table-condensed">
-          <tbody id="Responses">
-            <tr>
-              <td colspan="2">
-                <kbd>!keyword add $keyword $response</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-success">Success</span>
-                <span class="custom-response" data-id="keywords.success.add"></span>
-              </td>
-              <td colspan="2">
-                <kbd>!keyword add $keyword $response</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-danger">Failure</span>
-                <span class="custom-response" data-id="keywords.failed.add"></span>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <kbd>!keyword remove !$keyword</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-success">Success</span>
-                <span class="custom-response" data-id="keywords.success.remove"></span>
-              </td>
-              <td colspan="2">
-                <kbd>!keyword remove !$keyword</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-danger">Failure</span>
-                <span class="custom-response" data-id="keywords.failed.remove"></span>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <kbd>!keyword list</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-success">Populated $list</span>
-                <span class="custom-response" data-id="keywords.success.list"></span>
-              </td>
-              <td colspan="2">
-                <kbd>!keyword list</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-warning">Empty</span>
-                <span class="custom-response" data-id="keywords.failed.list"></span>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <kbd>!keyword toggle !$keyword</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-success">Enabled</span>
-                <span class="custom-response" data-id="keywords.success.enabled"></span>
-              </td>
-              <td colspan="2">
-                <kbd>!keyword toggle !$keyword</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-warning">Disabled</span>
-                <span class="custom-response" data-id="keywords.success.disabled"></span>
-              </td>
-              <td>
-                <kbd>!keyword toggle !$keyword</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-danger">Failure</span>
-                <span class="custom-response" data-id="keywords.failed.toggle"></span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="widget" id="bot-responses"></div>
       </div>
     </div>
-  </div>
 </div>
 
 <script>
@@ -190,32 +123,39 @@
       socket.emit('keywords.add', `${data.keyword} ${data.response}`)
       $('.new-confirm-btn').css('display', 'none')
     },
-    responses: function () {
-      socket.emit('responses.get', 'keywords', function (data) {
-        _.each(data, function (value, key) {
+    responses: (id) => {
+      id = id || null
+      let system = 'keywords'
+      socket.emit('responses.get', system, function (data) {
+        for (let [key, entry] of Object.entries(data)) {
+          if (!_.isNil(id) && `${system}.${key}` !== id) return true // continue if we want only specific id
           var filters = ['global']
 
-          if (key === 'success.add' || key === 'failed.add') {
-            filters.push('keyword')
-            filters.push('response')
-          }
+          let div = $('<div>')
+            .css('margin', '5px')
+          let response = $('<span>')
+            .text('Response')
+            .addClass('label label-primary label-bot-response')
+          let kbd = $('<kbd>')
+            .text(key.replace(/-/g, ' '))
+            .addClass('kbd-bot-response')
+          let span = $('<span>').addClass('custom-response')
+            .attr('data-id', `${system}.${key}`)
+            .css('font-size', '80%')
 
-          if (key === 'success.remove' || key === 'failed.remove' || key === 'success.enabled' ||
-            key === 'success.disabled' || key === 'failed.toggle') {
-            filters.push('keyword')
-          }
-          if (key === 'success.list') {
-            filters.push('list')
-          }
+          $('#bot-responses').append(div.append(response).append(kbd).append(span))
 
-          key = 'keywords.' + key
-          $('[data-id="' + key + '"]').html(commons.editable({
-            text: value,
+          if (_.includes(['keyword-was-not-found', 'keyword-was-edited', 'keyword-already-exist', 'keyword-was-added', 'keyword-was-enabled', 'keyword-was-disabled', 'keyword-was-removed'], key)) filters.push('keyword')
+          if (_.includes(['list-is-not-empty'], key)) filters.push('list')
+          if (_.includes(['keyword-was-edited'], key)) filters.push('response')
+
+          $(`[data-id="${system}.${key}"]`).html(commons.editable({
+            text: entry,
             id: key,
             fnc: 'commons.setResponse',
             filters: filters
           }))
-        })
+        }
       })
     }
   }

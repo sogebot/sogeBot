@@ -546,20 +546,16 @@
     "command-was-removed": "$sender, prikaz !$command byl smazan"
   },
   "keywords": {
-    "success": {
-      "add": "$sender, keyword $keyword byl pridan do databaze",
-      "remove": "$sender, keyword $keywordeyword byl smazany z databaze",
-      "list": "$sender, seznam keywordu: $list",
-      "enabled": "$sender, keyword $keyword byl zapnut",
-      "disabled": "$sender, keyword $keyword byl vypnut"
-    },
-    "failed": {
-      "add": "$sender, keyword $keyword uz existuje v databazi",
-      "remove": "$sender, keyword $keyword v databazi neexistuje",
-      "list": "$sender, seznam keywordu je prazdny",
-      "parse": "{core.command-parse} !keyword",
-      "toggle": "$sender, keyword $keyword neni v databazi!"
-    }
+    "keywords-parse-failed": "{core.command-parse} !commands",
+    "keyword-was-not-found": "$sender, keyword $keyword nebyl nalezen",
+    "keyword-was-edited": "$sender, keyword $keyword is changed to '$response'",
+    "keyword-was-added": "$sender, keyword $keyword byl pridan",
+    "keyword-already-exist": "$sender, keyword $keyword jiz existuje",
+    "list-is-not-empty": "$sender, seznam prikazu: $list",
+    "list-is-empty": "$sender, seznam prikazu je prazdny",
+    "keyword-was-enabled": "$sender, keyword $keyword byl zapnut",
+    "keyword-was-disabled": "$sender, keyword $keyword byl vypnut",
+    "keyword-was-removed": "$sender, keyword $keyword byl smazan"
   },
   "points": {
     "success": {

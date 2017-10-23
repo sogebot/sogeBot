@@ -10,6 +10,7 @@ var constants = require('../constants')
 /*
  * !keyword                      - gets an info about keyword usage
  * !keyword add [kwd] [response] - add keyword with specified response
+ * !keyword edit [kwd] [response] - add keyword with specified response
  * !keyword remove [kwd]         - remove specified keyword
  * !keyword toggle [kwd]         - enable/disable specified keyword
  * !keyword list                 - get keywords list
@@ -19,6 +20,7 @@ class Keywords {
   constructor () {
     if (global.commons.isSystemEnabled(this)) {
       global.parser.register(this, '!keyword add', this.add, constants.OWNER_ONLY)
+      global.parser.register(this, '!keyword edit', this.edit, constants.OWNER_ONLY)
       global.parser.register(this, '!keyword list', this.list, constants.OWNER_ONLY)
       global.parser.register(this, '!keyword remove', this.remove, constants.OWNER_ONLY)
       global.parser.register(this, '!keyword toggle', this.toggle, constants.OWNER_ONLY)
@@ -37,6 +39,31 @@ class Keywords {
     }
   }
 
+  async edit (self, sender, text) {
+    debug('edit(%j, %j, %j)', self, sender, text)
+    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S]+) (.*)$/)
+
+    if (_.isNil(parsed)) {
+      let message = global.commons.prepare('keywords.keyword-parse-failed')
+      debug(message); global.commons.sendMessage(message, sender)
+      return false
+    }
+
+    const keyword = parsed[1]
+    const response = parsed[2]
+
+    let item = await global.db.engine.findOne('keywords', { keyword: keyword })
+    if (_.isEmpty(item)) {
+      let message = global.commons.prepare('keywords.keyword-was-not-found', { keyword: keyword })
+      debug(message); global.commons.sendMessage(message, sender)
+      return false
+    }
+
+    await global.db.engine.update('keywords', { keyword: keyword }, { response: response })
+    let message = global.commons.prepare('keywords.keyword-was-edited', { keyword: keyword, response: response })
+    debug(message); global.commons.sendMessage(message, sender)
+  }
+
   async send (self, socket) {
     socket.emit('keywords', await global.db.engine.find('keywords'))
   }
@@ -52,7 +79,7 @@ class Keywords {
   }
 
   help (self, sender) {
-    global.commons.sendMessage(global.translate('core.usage') + ': !keyword add <keyword> <response> | !keyword remove <keyword> | !keyword list', sender)
+    global.commons.sendMessage(global.translate('core.usage') + ': !keyword add <keyword> <response> | !keyword edit <keyword> <response> | !keyword remove <keyword> | !keyword list', sender)
   }
 
   async add (self, sender, text) {
@@ -60,22 +87,23 @@ class Keywords {
     let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S]+) (.*)$/)
 
     if (_.isNil(parsed)) {
-      global.commons.sendMessage(global.translate('keywords.failed.parse'), sender)
-      debug(global.translate('keywords.failed.parse'))
+      let message = global.commons.prepare('keywords.keyword-parse-failed')
+      debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
+    if (parsed[1].startsWith('!')) parsed[1] = parsed[1].replace('!', '')
     let keyword = { keyword: parsed[1], response: parsed[2], enabled: true }
 
     if (!_.isEmpty(await global.db.engine.findOne('keywords', { keyword: parsed[1] }))) {
-      global.commons.sendMessage(global.translate('keywords.failed.add').replace(/\$keyword/g, parsed[1]), sender)
-      debug(global.translate('keywords.failed.add').replace(/\$keyword/g, parsed[1]))
+      let message = global.commons.prepare('keywords.keyword-already-exist', { keyword: parsed[1] })
+      debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
     await global.db.engine.update('keywords', { keyword: parsed[1] }, keyword)
-    global.commons.sendMessage(global.translate('keywords.success.add').replace(/\$keyword/g, parsed[1]), sender)
-    debug(global.translate('keywords.success.add').replace(/\$keyword/g, parsed[1]))
+    let message = global.commons.prepare('keywords.keyword-was-added', { keyword: parsed[1] })
+    debug(message); global.commons.sendMessage(message, sender)
   }
 
   async run (self, id, sender, text) {
@@ -90,9 +118,8 @@ class Keywords {
   async list (self, sender) {
     debug('list(%j,%j)', self, sender)
     let keywords = await global.db.engine.find('keywords')
-    var output = (keywords.length === 0 ? global.translate('keywords.failed.list') : global.translate('keywords.success.list').replace(/\$list/g, _.map(keywords, 'keyword').join(', ')))
-    global.commons.sendMessage(output, sender)
-    debug(output)
+    var output = (keywords.length === 0 ? global.translate('keywords.list-is-empty') : global.translate('keywords.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(keywords, 'keyword'), 'keyword').join(', ')))
+    debug(output); global.commons.sendMessage(output, sender)
   }
 
   async toggle (self, sender, text) {
@@ -100,23 +127,23 @@ class Keywords {
     let id = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
 
     if (_.isNil(id)) {
-      global.commons.sendMessage(global.translate('keywords.failed.parse'), sender)
-      debug(global.translate('keywords.failed.parse'))
+      let message = global.commons.prepare('keywords.keyword-parse-failed')
+      debug(message); global.commons.sendMessage(message, sender)
       return false
     }
     id = id[1]
 
     const keyword = await global.db.engine.findOne('keywords', { keyword: id })
     if (_.isEmpty(keyword)) {
-      global.commons.sendMessage(global.translate('keywords.failed.toggle').replace(/\$keyword/g, id), sender)
-      debug(global.translate('keywords.failed.toggle').replace(/\$keyword/g, id))
+      let message = global.commons.prepare('keywords.keyword-was-not-found', { keyword: id })
+      debug(message); global.commons.sendMessage(message, sender)
       return
     }
 
     await global.db.engine.update('keywords', { keyword: id }, { enabled: !keyword.enabled })
 
-    global.commons.sendMessage(global.translate(!keyword.enabled ? 'keywords.success.enabled' : 'keywords.success.disabled').replace(/\$keyword/g, keyword.keyword), sender)
-    debug(global.translate(keyword.enabled ? 'keywords.success.enabled' : 'keywords.success.disabled').replace(/\$keyword/g, keyword.keyword))
+    let message = global.commons.prepare(!keyword.enabled ? 'keywords.keyword-was-enabled' : 'keywords.keyword-was-disabled', { keyword: keyword.keyword })
+    debug(message); global.commons.sendMessage(message, sender)
   }
 
   async remove (self, sender, text) {
@@ -124,20 +151,20 @@ class Keywords {
     let id = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
 
     if (_.isNil(id)) {
-      global.commons.sendMessage(global.translate('keywords.failed.parse'), sender)
-      debug(global.translate('keywords.failed.parse'))
+      let message = global.commons.prepare('keywords.keyword-parse-failed')
+      debug(message); global.commons.sendMessage(message, sender)
       return false
     }
     id = id[1]
 
     let removed = await global.db.engine.remove('keywords', { keyword: id })
     if (!removed) {
-      global.commons.sendMessage(global.translate('keywords.failed.remove').replace(/\$keyword/g, id), sender)
-      debug(global.translate('keywords.failed.remove').replace(/\$keyword/g, id))
+      let message = global.commons.prepare('keywords.keyword-was-not-found', { keyword: id })
+      debug(message); global.commons.sendMessage(message, sender)
       return false
     }
-    global.commons.sendMessage(global.translate('keywords.success.remove').replace(/\$keyword/g, id), sender)
-    debug(global.translate('keywords.success.remove').replace(/\$keyword/g, id))
+    let message = global.commons.prepare('keywords.keyword-was-removed', { keyword: id })
+    debug(message); global.commons.sendMessage(message, sender)
   }
 }
 
