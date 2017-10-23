@@ -79,7 +79,8 @@ Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
       global.client.whisper(sender.username, message)
     } else {
       global.log.chatOut(message, {username: sender.username})
-      if (!_.isNil(config.settings['bot_use_/me']) && config.settings['bot_use_/me']) global.client.action(config.settings.broadcaster_username, message)
+
+      if (global.configuration.getValue('sendWithMe')) global.client.action(config.settings.broadcaster_username, message)
       else global.client.say(config.settings.broadcaster_username, message)
     }
   }

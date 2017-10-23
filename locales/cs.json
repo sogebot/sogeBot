@@ -31,6 +31,10 @@
       "atUsername": {
         "true": "Uzivatelske jmena budou zobrazena s @ takto @foo",
         "false": "Uzivatelske jmena budou zobrazena bez @ takto foo"
+      },
+      "sendWithMe": {
+        "true": "Bot bude posilat zpravy pomoci /me",
+        "false": "Bot nebude posilat zpravy pomoci /me"
       }
     },
     "years": "rok|4:roky|roku",

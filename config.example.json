@@ -6,7 +6,6 @@
     "bot_oauth": "bot_oauth_here",
     "bot_color": "OrangeRed",
     "bot_owners": "bot_owners_here_separated_by_comma",
-    "bot_use_/me": false,
     "broadcaster_username": "broadcaster_username_here",
     "client_id": "1wjn1i3792t71tl90fmyvd0zl6ri2vg"
   },
