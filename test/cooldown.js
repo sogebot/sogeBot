@@ -211,7 +211,7 @@ describe('System - Cooldowns', () => {
         await global.systems.keywords.add(global.systems.keywords, owner, 'me (!me)')
 
         await until(setError => {
-          let expected = global.commons.prepare('keywords.success.add', { keyword: 'me' })
+          let expected = global.commons.prepare('keywords.keyword-was-added', { keyword: 'me' })
           let user = owner
           try {
             assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
@@ -277,7 +277,7 @@ describe('System - Cooldowns', () => {
         if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
 
         global.systems.keywords.add(global.systems.keywords, owner, 'me (!me)')
-        await until(() => global.commons.sendMessage.calledWith(global.translate('keywords.success.add').replace(/\$keyword/g, 'me')), 5000)
+        await until(() => global.commons.sendMessage.calledWith(global.translate('keywords.keyword-was-added').replace(/\$keyword/g, 'me')), 5000)
 
         global.systems.cooldown.set(global.systems.cooldown, owner, 'me global 60 true')
         await until(() => global.commons.sendMessage.calledWith(global.translate('cooldown.success.set')
