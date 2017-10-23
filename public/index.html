@@ -532,16 +532,19 @@
           })
         },
         editable: function (options) {
+          options = options || {}
           options.id = !_.isNil(options.id) ? options.id : ''
           options.text = !_.isNil(options.text) ? options.text.toString() : ''
           options.fnc = !_.isNil(options.fnc) ? options.fnc : null
           options.filters = !_.isNil(options.filters) ? options.filters : []
           options.options = !_.isNil(options.options) ? options.options : []
 
+          var id = window.crypto.getRandomValues(new Uint32Array(1))
+
           var filtersRegExp = new RegExp('\\$(' + _.keys(translations.responses.variable).join('|') + ')', 'g')
           var stringAbbr = options.text.replace(filtersRegExp, '<span contenteditable="false" style="user-select: none; display: inline-block; font-family: monospace; color: #e00956; border: 1px solid #cbcbcb; border-radius: 5px !important; padding: 0 4px 0 4px; background-color: #f5f4f7" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;')
-          var output = '<abbr style="width: 100%" title="click to edit" data-id="' + options.id + '" data-fnc="' + options.fnc + '" data-filters="' + options.filters.join(',') + '" contenteditable="true">' + stringAbbr + '</abbr>'
-
+          var output = '<abbr style="width: 100%" title="click to edit" id="' + id + '" data-id="' + options.id + '" data-fnc="' + options.fnc + '" data-filters="' + options.filters.join(',') + '" contenteditable="true">' + stringAbbr + '</abbr>'
+       
           setTimeout(function() {
             commons.translate()
 
@@ -550,8 +553,8 @@
                 $(this).prev(".tgt").remove()
             })
 
-            $('[contenteditable=true]').off()
-            $('[contenteditable=true]')
+            $(`#${id}[contenteditable=true]`).off()
+            $(`#${id}[contenteditable=true]`)
               // When you click on item, record into data("initialText") content of this item.
               .focus(function() {
                   var self = this
