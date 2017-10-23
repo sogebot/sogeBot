@@ -57,6 +57,7 @@
     "test:config:nedb": "cp config.json config.backup.json > /dev/null; cp config.example.json config.json",
     "start": "node ./tools/migrate && npm run copy:dist && node ./main || true",
     "start-no-migration": "npm run copy:dist && node ./main || true",
+    "cleanup": "node ./tools/cleanup.js || true",
     "debug": "npm run copy:dist && node --inspect ./main || true",
     "cleanup:dist": "rm -rf ./public/dist/bootstrap* ./public/dist/carousel/* ./public/dist/gallery/* ./public/dist/jquery ./public/dist/lodash ./public/dist/velocity-animate",
     "copy:dist": "node tools/copy-dist-files.js"
