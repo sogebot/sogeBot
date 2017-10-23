@@ -1,95 +1,77 @@
 'use strict'
 
 var _ = require('lodash')
-var Database = require('nedb-promise')
-var DB = new Database({
-  filename: './sogeBot.db',
-  autoload: true
-})
+const Database = require('../libs/databases/database')
+const db = new Database()
 
-async function clean_users () {
-  let users = await DB.findOne({ _id: 'users' })
-  let size = _.size(users.users)
+async function cleanUsersWithoutTime () {
+  let users = await db.engine.find('users')
+  let size = _.size(users)
 
-  users = _.filter(users.users, function (o) {
+  users = _.filter(users, function (o) {
     return !_.isNil(o.time) && !_.isNil(o.time.watched) && o.time.watched > 0
   })
 
-  let newUsers = {}
-  for (var i = 0, len = users.length; i < len; i++) {
-    let username = users[i].username
-    newUsers[username] = users[i]
+  await db.engine.remove('users', {})
+  for (let user of users) {
+    delete user._id
+    await db.engine.insert('users', user)
   }
-  users = {
-    _id: 'users',
-    users: newUsers
-  }
-  await DB.remove({ _id: 'users' })
-  await DB.insert(users)
-  console.log('Cleaned ' + (size - _.size(users.users) + ' users'))
+  console.log('Cleaned ' + (size - _.size(users) + ' users'))
 }
 
-async function clean_users_without_id () {
-  let users = await DB.findOne({ _id: 'users' })
-  let size = _.size(users.users)
+async function cleanUsersWithoutID () {
+  let users = await db.engine.find('users')
+  let size = _.size(users)
 
-  users = _.filter(users.users, function (o) {
-    return !_.isNil(o.id)
-  })
+  users = _.filter(users, (o) => !_.isNil(o.id))
 
-  let newUsers = {}
-  for (var i = 0, len = users.length; i < len; i++) {
-    let username = users[i].username
-    newUsers[username] = users[i]
+  await db.engine.remove('users', {})
+  for (let user of users) {
+    delete user._id
+    await db.engine.insert('users', user)
   }
-
-  users = {
-    _id: 'users',
-    users: newUsers
-  }
-  await DB.remove({ _id: 'users' })
-  await DB.insert(users)
-  console.log('Cleaned ' + (size - _.size(users.users) + ' users'))
+  console.log('Cleaned ' + (size - _.size(users) + ' users'))
 }
 
-async function clean_users_duplicates () {
-  let users = await DB.findOne({ _id: 'users' })
+async function cleanUsersDuplicates () {
+  let users = await db.engine.find('users')
   let uniqueUsernames = []
 
-  _.each(users.users, function (user) {
+  for (let user of users) {
     uniqueUsernames.push(user.username.toLowerCase())
-  })
+  }
 
   let size = _.size(uniqueUsernames)
 
-  let newUsers = {}
+  let newUsers = []
   for (var i = 0, len = uniqueUsernames.length; i < len; i++) {
-    if (_.isNil(users.users[uniqueUsernames[i]])) continue
-    newUsers[users.users[uniqueUsernames[i]].username] = users.users[uniqueUsernames[i]]
+    let user = _.filter(users, (o) => o.username === uniqueUsernames[i])
+    if (user.length > 0) newUsers.push(user[0])
+    else continue
   }
-  users = {
-    _id: 'users',
-    users: newUsers
+  await db.engine.remove('users', {})
+  for (let user of newUsers) {
+    delete user._id
+    await db.engine.insert('users', user)
   }
-  await DB.remove({ _id: 'users' })
-  await DB.insert(users)
 
   console.log('Cleaned ' + (size - _.size(_.uniq(uniqueUsernames)) + ' users'))
-
 }
 
 async function main () {
   console.log('Cleaning up duplicates users')
-  await clean_users_duplicates()
+  await cleanUsersDuplicates()
   console.log('- DONE')
 
   console.log('Cleaning up users without watched time')
-  await clean_users()
+  await cleanUsersWithoutTime()
   console.log('- DONE')
 
   console.log('Cleaning up users without id')
-  await clean_users_without_id()
+  await cleanUsersWithoutID()
   console.log('- DONE')
+  process.exit()
 }
 
 main()
