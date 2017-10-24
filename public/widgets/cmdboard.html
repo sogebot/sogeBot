@@ -19,7 +19,8 @@
       <div class="queue-list-group list-group" id="cmdboard-list">
       </div>
       <div class="clearfix"></div>
-    </div> <!-- /MAIN -->
+    </div>
+    <!-- /MAIN -->
 
     <div role="tabpanel" class="tab-pane" id="cmdboard-settings">
       <div class="input-group">
@@ -33,7 +34,9 @@
 
       <button type="button" class="btn btn-success btn-block" onclick="cmdboard.add()" data-lang="confirm"></button>
       <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('cmdboard')" style="margin-top: 20px;" data-lang="remove-widget"></button>
-    </div> <!-- /SETTINGS -->
+    </div>
+    <!-- /SETTINGS -->
+  </div>
 </div>
 
 <script>
@@ -41,11 +44,16 @@
     el: null,
 
     add: function () {
-      var name = $('#cmdboard-name').val(); $('#cmdboard-name').val('')
-      var command = $('#cmdboard-command').val(); $('#cmdboard-command').val('')
+      var name = $('#cmdboard-name').val();
+      $('#cmdboard-name').val('')
+      var command = $('#cmdboard-command').val();
+      $('#cmdboard-command').val('')
 
       $('a[href="#cmdboard-main"]').tab('show')
-      socket.emit('cmdboard.widget.add', { name: name, command: command })
+      socket.emit('cmdboard.widget.add', {
+        name: name,
+        command: command
+      })
     },
     emit: function (ev, el) {
       ev.preventDefault()
@@ -53,16 +61,16 @@
     },
     resize: function () {
       _.each($(".soundboard-list-group-item span"), function (el) {
-          $(el).css('font-size', '18px')
-          cmdboard.resizeEl(el, 18)
-        })
+        $(el).css('font-size', '18px')
+        cmdboard.resizeEl(el, 18)
+      })
     },
     resizeEl: function (el, size) {
-      if ($(el).height() >= ((2*size)/5 + (98/5))) {
-        $(el).css('font-size', (size-1) + 'px')
-        $(el).css('top', Math.round((3*size)/7 - 57/7) + 'px')
-        if ($(el).height() >= ((2*size)/5 + (98/5))) {
-          cmdboard.resizeEl(el, size-1)
+      if ($(el).height() >= ((2 * size) / 5 + (98 / 5))) {
+        $(el).css('font-size', (size - 1) + 'px')
+        $(el).css('top', Math.round((3 * size) / 7 - 57 / 7) + 'px')
+        if ($(el).height() >= ((2 * size) / 5 + (98 / 5))) {
+          cmdboard.resizeEl(el, size - 1)
         }
       }
     }
@@ -74,28 +82,33 @@
   socket.on('cmdboard.widget.data', function (data) {
     $("#cmdboard-list").empty()
     _.each(data, function (name) {
-      $("#cmdboard-list").append('<a class="soundboard-list-group-item list-group-item cmdboard-item"  style="padding: 10px 0 0 0" data-name="' + name.text + '" onclick="cmdboard.emit(event, this)" type="button"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0"></div><span>' + name.text + '</span></a>');
+      $("#cmdboard-list").append(
+        '<a class="soundboard-list-group-item list-group-item cmdboard-item"  style="padding: 10px 0 0 0" data-name="' +
+        name.text +
+        '" onclick="cmdboard.emit(event, this)" type="button"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0"></div><span>' +
+        name.text + '</span></a>');
     })
     cmdboard.resize()
   })
 
-  $(window).resize(function() {
+  $(window).resize(function () {
     cmdboard.resize()
   })
 
 
   // deletion right-click menu
   var menu = new BootstrapMenu(".cmdboard-item", {
-    fetchElementData: function($el) {
+    fetchElementData: function ($el) {
       return $el.data();
     },
     actions: [{
       name: 'Delete',
       classNames: ['action-danger'],
       iconClass: 'fa-trash-o',
-      onClick: function(data) {
+      onClick: function (data) {
         socket.emit('cmdboard.widget.remove', data)
       }
     }]
   })
+
 </script>

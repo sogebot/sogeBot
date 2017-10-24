@@ -18,44 +18,56 @@
     <div role="tabpanel" class="tab-pane active" id="commercial-main">
       <div class="text-center">
         <div class="btn-group">
-          <button type="button" class="btn btn-default" data-seconds="30" onclick="commercial.run(this)"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>30s</button>
-          <button type="button" class="btn btn-default" data-seconds="60" onclick="commercial.run(this)"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>60s</button>
-          <button type="button" class="btn btn-default" data-seconds="90" onclick="commercial.run(this)"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>90s</button>
-          <button type="button" class="btn btn-default" data-seconds="120" onclick="commercial.run(this)"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>120s</button>
-          <button type="button" class="btn btn-default" data-seconds="150" onclick="commercial.run(this)"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>150s</button>
-          <button type="button" class="btn btn-default" data-seconds="180" onclick="commercial.run(this)"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>180s</button>
+          <button type="button" class="btn btn-default" data-seconds="30" onclick="commercial.run(this)">
+            <div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>30s</button>
+          <button type="button" class="btn btn-default" data-seconds="60" onclick="commercial.run(this)">
+            <div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>60s</button>
+          <button type="button" class="btn btn-default" data-seconds="90" onclick="commercial.run(this)">
+            <div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>90s</button>
+          <button type="button" class="btn btn-default" data-seconds="120" onclick="commercial.run(this)">
+            <div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>120s</button>
+          <button type="button" class="btn btn-default" data-seconds="150" onclick="commercial.run(this)">
+            <div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>150s</button>
+          <button type="button" class="btn btn-default" data-seconds="180" onclick="commercial.run(this)">
+            <div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0; left: 0"></div>180s</button>
         </div>
       </div>
-    </div> <!-- /MAIN -->
+    </div>
+    <!-- /MAIN -->
 
     <div role="tabpanel" class="tab-pane" id="commercial-settings">
       <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('commercial')" style="margin-top: 20px;" data-lang="remove-widget"></button>
-    </div> <!-- /SETTINGS -->
+    </div>
+    <!-- /SETTINGS -->
+  </div>
 </div>
 
 <script>
-const commercial = {
-  countdown: 0,
-  run: function(el) {
-    $(el).children('div').animate({
-      width: '100%'
-    }, $(el).data('seconds') * 1000, 'linear', function () {
-      $(el).children('div').css('width', 0)
-    })
+  const commercial = {
+    countdown: 0,
+    run: function (el) {
+      $(el).children('div').animate({
+        width: '100%'
+      }, $(el).data('seconds') * 1000, 'linear', function () {
+        $(el).children('div').css('width', 0)
+      })
 
-    socket.emit('commercial.run', { seconds: $(el).data('seconds') })
-    this.countdown = $(el).data('seconds')
-  }
-}
-
-setInterval(function() {
-  if (commercial.countdown === 0) {
-    $('#commercial-status').css('display', 'none')
-    return
+      socket.emit('commercial.run', {
+        seconds: $(el).data('seconds')
+      })
+      this.countdown = $(el).data('seconds')
+    }
   }
 
-  commercial.countdown--
-  $('#commercial-status').css('display', 'inline')
-  $('#commercial-countdown').text(commercial.countdown)
-}, 1000)
+  setInterval(function () {
+    if (commercial.countdown === 0) {
+      $('#commercial-status').css('display', 'none')
+      return
+    }
+
+    commercial.countdown--
+      $('#commercial-status').css('display', 'inline')
+    $('#commercial-countdown').text(commercial.countdown)
+  }, 1000)
+
 </script>

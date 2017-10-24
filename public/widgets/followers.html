@@ -17,7 +17,8 @@
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="followers-main">
       <div id="followers-widget"></div>
-    </div> <!-- /MAIN -->
+    </div>
+    <!-- /MAIN -->
 
     <div role="tabpanel" class="tab-pane" id="followers-settings">
       <div class="input-group">
@@ -25,21 +26,25 @@
         <input type="text" class="form-control" id="followersShow">
         <span class="input-group-addon" data-lang="followers-show"></span>
       </div>
-        <div class="input-group">
-          <span class="input-group-addon" data-lang="followers-size"></span>
-          <input type="text" class="form-control" id="followersSize">
-        </div>
-      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('followers')" style="margin-top: 20px;"  data-lang="remove-widget"></button>
-    </div> <!-- /SETTINGS -->
+      <div class="input-group">
+        <span class="input-group-addon" data-lang="followers-size"></span>
+        <input type="text" class="form-control" id="followersSize">
+      </div>
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('followers')" style="margin-top: 20px;" data-lang="remove-widget"></button>
+    </div>
+    <!-- /SETTINGS -->
+  </div>
 </div>
 
 <script>
   if (!_.isUndefined(IFollowers)) window.clearInterval(IFollowers)
-  var IFollowers = setInterval(function() { socket.emit('followers.latest.get') }, 2000)
+  var IFollowers = setInterval(function () {
+    socket.emit('followers.latest.get')
+  }, 2000)
 
   socket.emit('followers.configuration.get')
   socket.off('followers.configuration')
-  socket.on('followers.configuration', function(data) {
+  socket.on('followers.configuration', function (data) {
     $("#followersShow").val(data.followersWidgetShow)
     $("#followersSize").val(data.followersWidgetFontSize)
   })
@@ -49,9 +54,10 @@
     $("#followers-widget").empty()
     var toShow = $("#followersShow").val()
     var output = ''
-    _.each(items, function(item, index) {
+    _.each(items, function (item, index) {
       if (index < toShow) {
-        output += '<p class="text-center text-uppercase" style="font-size: ' + $('#followersSize').val() + 'px">' + item + '</p>'
+        output += '<p class="text-center text-uppercase" style="font-size: ' + $('#followersSize').val() +
+          'px">' + item + '</p>'
       } else return false
     })
     $("#followers-widget").html(output)
@@ -59,7 +65,7 @@
 
   var $followersShow = $('#followersShow')
   $followersShow.off()
-  $followersShow.on('focusout', function() {
+  $followersShow.on('focusout', function () {
     var value = $followersShow.val()
     var data = {}
     data['followersWidgetShow'] = value
@@ -68,10 +74,11 @@
 
   var $followersSize = $('#followersSize')
   $followersSize.off()
-  $followersSize.on('focusout', function() {
+  $followersSize.on('focusout', function () {
     var value = $followersSize.val()
     var data = {}
     data['followersWidgetFontSize'] = value
     socket.emit('saveConfiguration', data)
   })
+
 </script>

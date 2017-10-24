@@ -19,27 +19,30 @@
       <form class="form-horizontal">
         <div class="form-group" style="margin-bottom: 0">
           <div class="col-sm-8" style="padding-right: 0">
-            <input type="text" id="twitterInput" class="form-control"/>
+            <input type="text" id="twitterInput" class="form-control" />
           </div>
           <div class="col-sm-4" style="padding-left: 0">
             <button id="twitterInputSubmit" class="form-control btn btn-primary" data-lang="twitter-send-message"></button>
           </div>
         </div>
       </form>
-    </div> <!-- /MAIN -->
+    </div>
+    <!-- /MAIN -->
 
     <div role="tabpanel" class="tab-pane" id="twitter-settings">
       <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('twitter')" style="margin-top: 20px;" data-lang="remove-widget"></button>
-    </div> <!-- /SETTINGS -->
+    </div>
+    <!-- /SETTINGS -->
+  </div>
 </div>
 
 <script>
-
   $('#twitterInputSubmit').on('click', function (ev) {
-      ev.preventDefault()
-      var message = $('#twitterInput').val()
-      $('#twitterInput').val('')
+    ev.preventDefault()
+    var message = $('#twitterInput').val()
+    $('#twitterInput').val('')
 
-      if (message.length > 0) socket.emit('twitter.send', message)
+    if (message.length > 0) socket.emit('twitter.send', message)
   })
+
 </script>

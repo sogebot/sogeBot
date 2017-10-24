@@ -21,21 +21,26 @@
           <tbody id="ClipsWidget"></tbody>
         </table>
       </div>
-    </div> <!-- /MAIN -->
+    </div>
+    <!-- /MAIN -->
 
     <div role="tabpanel" class="tab-pane" id="clips-settings">
-      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('clips')" style="margin-top: 20px;"  data-lang="remove-widget"></button>
-    </div> <!-- /SETTINGS -->
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('clips')" style="margin-top: 20px;" data-lang="remove-widget"></button>
+    </div>
+    <!-- /SETTINGS -->
+  </div>
 </div>
 
 <script>
   if (!_.isUndefined(IClips)) window.clearInterval(IClips)
-  var IClips = setInterval(function() { socket.emit('getLatestClips') }, 2000)
+  var IClips = setInterval(function () {
+    socket.emit('getLatestClips')
+  }, 2000)
 
   socket.off('LatestClips')
   socket.on('LatestClips', function (items) {
     $("#ClipsWidget").empty()
-    _.each(items, function(item, index) {
+    _.each(items, function (item, index) {
       $("#ClipsWidget").append('<tr>' +
         '<td><a href="' + item.clip_uri + '">' + item.slug + '</a><br>' +
         item.game + '<br>' +
@@ -45,4 +50,5 @@
         '</tr>');
     })
   })
+
 </script>

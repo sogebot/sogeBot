@@ -1,33 +1,37 @@
 <div class="widget">
   <h6 data-lang="widget-title-ytplayer"></h6>
-    <ul class="nav nav-pills" role="tablist">
-      <li role="presentation">
-        <a href="#yt-song-requests" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
-          <span id="yt-song-requests-count">0</span>
-          <i class="fa fa-user" aria-hidden="true"></i>
-        </a>
-      </li>
-      <li role="presentation" class="active" style="height:40px;">
-        <a href="#yt-player" aria-controls="home" role="tab" data-toggle="tab" title="" style="max-width: 210px;display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">
-          <i class="fa fa-music" aria-hidden="true"></i>
-          <span id="yt-player-currentsong"></span>
-        </a>
-      </li>
-      <li role="presentation">
-        <a href="#yt-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-          <i class="fa fa-cog" aria-hidden="true"></i>
-        </a>
-      </li>
-    </ul>
+  <ul class="nav nav-pills" role="tablist">
+    <li role="presentation">
+      <a href="#yt-song-requests" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
+        <span id="yt-song-requests-count">0</span>
+        <i class="fa fa-user" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li role="presentation" class="active" style="height:40px;">
+      <a href="#yt-player" aria-controls="home" role="tab" data-toggle="tab" title="" style="max-width: 210px;display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">
+        <i class="fa fa-music" aria-hidden="true"></i>
+        <span id="yt-player-currentsong"></span>
+      </a>
+    </li>
+    <li role="presentation">
+      <a href="#yt-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+        <i class="fa fa-cog" aria-hidden="true"></i>
+      </a>
+    </li>
+  </ul>
 
   <!-- Tab panes -->
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="yt-player">
       <div id="YTPlayer"></div>
       <div class="row">
-        <div class="btn-group" role="group" aria-label="..." style="width: 100%; padding-left:15px; padding-right: 15px; height: 34px;" >
-          <button type="button" class="btn btn-default" id="YTControl"><i class="fa fa-play text-success" aria-hidden="true"></i></button>
-          <button type="button" class="btn btn-default" onclick="skipSong()"><i class="fa fa-forward" aria-hidden="true"></i></button>
+        <div class="btn-group" role="group" aria-label="..." style="width: 100%; padding-left:15px; padding-right: 15px; height: 34px;">
+          <button type="button" class="btn btn-default" id="YTControl">
+            <i class="fa fa-play text-success" aria-hidden="true"></i>
+          </button>
+          <button type="button" class="btn btn-default" onclick="skipSong()">
+            <i class="fa fa-forward" aria-hidden="true"></i>
+          </button>
 
           <div class="btn-group" role="group">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -36,27 +40,36 @@
             </button>
             <ul class="dropdown-menu">
               <li class="dropdown-header">Playlist</li>
-              <li><a href="#" onclick="stealToPlaylist()">Steal to playlist</a></li>
+              <li>
+                <a href="#" onclick="stealToPlaylist()">Steal to playlist</a>
+              </li>
               <li class="dropdown-header">Others</li>
-              <li><a href="#" onclick="banSong()">Ban Song</a></li>
+              <li>
+                <a href="#" onclick="banSong()">Ban Song</a>
+              </li>
             </ul>
             <div style="height:34px; display: inline-block">
-              <input id="volumeSlider" data-slider-handle="custom" data-slider-tooltip="hide" data-slider-orientation="vertical" data-slider-id='volumeSlider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="50"/>
+              <input id="volumeSlider" data-slider-handle="custom" data-slider-tooltip="hide" data-slider-orientation="vertical" data-slider-id='volumeSlider'
+                type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="50" />
             </div>
           </div>
-          <div class="progress" style="height:34px; padding-left:0px; padding-right: 0" >
-            <div class="progress-bar progress-bar-danger" id="youtube-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+          <div class="progress" style="height:34px; padding-left:0px; padding-right: 0">
+            <div class="progress-bar progress-bar-danger" id="youtube-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+              style="width: 0%;"></div>
           </div>
         </div>
       </div>
-    </div> <!-- /YT-PLAYER -->
+    </div>
+    <!-- /YT-PLAYER -->
 
     <div role="tabpanel" class="tab-pane" id="yt-song-requests">
       <table id="songRequestsWidget" class="table table-condensed"></table>
-    </div> <!-- /YT-SONG-REQUESTS -->
+    </div>
+    <!-- /YT-SONG-REQUESTS -->
     <div role="tabpanel" class="tab-pane" id="yt-settings">
       <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('ytplayer')" style="margin-top: 20px;" data-lang="remove-widget"></button>
-    </div> <!-- /SETTINGS -->
+    </div>
+    <!-- /SETTINGS -->
 
     <div class="clearfix"></div>
   </div>
@@ -66,10 +79,13 @@
   if (loadedJS.indexOf('ytplayer') === -1) {
     loadedJS.push('ytplayer')
 
-    $("#volumeSlider").on("change", function(slideEvt) {
-      socket.emit('saveConfiguration', {'songs_volume': slideEvt.value.newValue, '_quiet': true})
+    $("#volumeSlider").on("change", function (slideEvt) {
+      socket.emit('saveConfiguration', {
+        'songs_volume': slideEvt.value.newValue,
+        '_quiet': true
+      })
       setTimeout(function () {
-          socket.emit('getVolume')
+        socket.emit('getVolume')
       })
     })
 
@@ -80,10 +96,10 @@
     socket.emit('getConfiguration')
     socket.once('configuration', function (data) {
       $('#volumeSlider').slider({
-  	    reversed : true,
+        reversed: true,
         value: data.songs_volume,
-        formatter: function(value) {
-        	return value + '%';
+        formatter: function (value) {
+          return value + '%';
         }
       })
     })
@@ -97,15 +113,15 @@
     var loading = false
     var progressUpdate = null
 
-    function stealToPlaylist () {
+    function stealToPlaylist() {
       socket.emit('stealSong')
     }
 
-    function skipSong () {
+    function skipSong() {
       socket.emit('skipSong')
     }
 
-    function banSong () {
+    function banSong() {
       socket.emit('banSong')
     }
 
@@ -123,8 +139,9 @@
 
     function initialize() {
       clearInterval(time_update_interval);
-      time_update_interval = setInterval(function() {
-        if (!loading && (player.getPlayerState() === 0 || player.getPlayerState() === 5) && $("#YTControl i").hasClass('text-danger')) {
+      time_update_interval = setInterval(function () {
+        if (!loading && (player.getPlayerState() === 0 || player.getPlayerState() === 5) && $("#YTControl i").hasClass(
+            'text-danger')) {
           loading = true
           socket.emit('getVideoID');
         }
@@ -138,8 +155,8 @@
       }
     }
 
-    socket.on('videoID', function(video) {
-      if(player.getPlayerState() === YT.PlayerState.PAUSED) return // do nothing if player is PAUSED
+    socket.on('videoID', function (video) {
+      if (player.getPlayerState() === YT.PlayerState.PAUSED) return // do nothing if player is PAUSED
 
       if (video === null) {
         loading = false
@@ -160,14 +177,14 @@
       player.setVolume(video.volume)
       player.setPlaybackQuality('small') // set playback to lowest possible
       player.playVideo();
-      setTimeout(function() {
+      setTimeout(function () {
         loading = false
       }, 10000)
     });
 
     var retries = 0
-    unstartedCheck = setInterval(function() {
-      if(player.getPlayerState() === -1 && retries < 5) {
+    unstartedCheck = setInterval(function () {
+      if (player.getPlayerState() === -1 && retries < 5) {
         player.playVideo();
         retries++
       } else if (player.getPlayerState() === -1 && retries === 5) {
@@ -176,7 +193,7 @@
       }
     }, 1000)
 
-    progressUpdate = setInterval(function() {
+    progressUpdate = setInterval(function () {
       var duration = player.getDuration()
       var played = player.getCurrentTime()
 
@@ -190,7 +207,7 @@
     $('#YTPlayer').text('Refresh your browser to use YouTube Player')
   }
 
-  $("#YTControl").on('click', function() {
+  $("#YTControl").on('click', function () {
     if ($("#YTControl i").hasClass('text-success')) {
       if (player.getPlayerState() === YT.PlayerState.CUED) socket.emit('getVideoID')
       player.playVideo()
@@ -201,19 +218,20 @@
     }
   })
 
-  $(".progress").on('click', function(e) {
+  $(".progress").on('click', function (e) {
     player.seekTo(player.getDuration() / 100 * (Math.floor(e.offsetX * 100 / this.offsetWidth)))
   })
 
-  setInterval(function() {
+  setInterval(function () {
     socket.emit('getSongRequests');
   }, 2000)
-  socket.on('songRequestsList', function(list) {
+  socket.on('songRequestsList', function (list) {
     $("#yt-song-requests-count").text(list.length)
 
     $("table#songRequestsWidget").empty();
     if (_.isEmpty(list)) {
-      $("table#songRequestsWidget").append('<tr><td colspan=3 class="text-info text-center"><strong>No song requests found</strong></td></tr>');
+      $("table#songRequestsWidget").append(
+        '<tr><td colspan=3 class="text-info text-center"><strong>No song requests found</strong></td></tr>');
     }
     for (var index in list) {
       if (list.hasOwnProperty(index)) {
@@ -221,8 +239,10 @@
           requestedBy = list[index].username,
           length_seconds = list[index].length_seconds,
           videoID = list[index].videoID;
-        $("table#songRequestsWidget").append('<tr><td>' + (new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + '</td><td>' + title + '</td><td>' + requestedBy + '</td></tr>');
+        $("table#songRequestsWidget").append('<tr><td>' + (new Date(length_seconds * 1000)).toUTCString().match(
+          /(\d\d:\d\d:\d\d)/)[0] + '</td><td>' + title + '</td><td>' + requestedBy + '</td></tr>');
       }
     }
   });
+
 </script>

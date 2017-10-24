@@ -19,11 +19,14 @@
       <div class="queue-list-group list-group" id="soundboard-list">
       </div>
       <div class="clearfix"></div>
-    </div> <!-- /MAIN -->
+    </div>
+    <!-- /MAIN -->
 
     <div role="tabpanel" class="tab-pane" id="soundboard-settings">
       <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('soundboard')" style="margin-top: 20px;" data-lang="remove-widget"></button>
-    </div> <!-- /SETTINGS -->
+    </div>
+    <!-- /SETTINGS -->
+  </div>
 </div>
 
 <script>
@@ -33,16 +36,16 @@
 
     resize: function () {
       _.each($(".soundboard-list-group-item span"), function (el) {
-          $(el).css('font-size', '18px')
-          soundboard.resizeEl(el, 18)
-        })
+        $(el).css('font-size', '18px')
+        soundboard.resizeEl(el, 18)
+      })
     },
     resizeEl: function (el, size) {
-      if ($(el).height() >= ((2*size)/5 + (98/5))) {
-        $(el).css('font-size', (size-1) + 'px')
-        $(el).css('top', Math.round((3*size)/7 - 57/7) + 'px')
-        if ($(el).height() >= ((2*size)/5 + (98/5))) {
-          soundboard.resizeEl(el, size-1)
+      if ($(el).height() >= ((2 * size) / 5 + (98 / 5))) {
+        $(el).css('font-size', (size - 1) + 'px')
+        $(el).css('top', Math.round((3 * size) / 7 - 57 / 7) + 'px')
+        if ($(el).height() >= ((2 * size) / 5 + (98 / 5))) {
+          soundboard.resizeEl(el, size - 1)
         }
       }
     },
@@ -51,7 +54,7 @@
       if (!_.isNil(soundboard.audio)) soundboard.audio.pause()
       if (!_.isNil(soundboard.el)) soundboard.el.stop(true, true)
       soundboard.audio = new Audio('dist/soundboard/' + el.dataset.sound + '.mp3')
-      soundboard.audio.addEventListener('loadedmetadata', function() {
+      soundboard.audio.addEventListener('loadedmetadata', function () {
         soundboard.el = $(el).children('div')
         $(el).children('div').animate({
           width: '100%'
@@ -69,12 +72,17 @@
   socket.on('soundBoardSounds', function (sounds) {
     $("#soundboard-list").empty()
     _.each(sounds, function (sound) {
-      $("#soundboard-list").append('<a class="soundboard-list-group-item list-group-item"  style="padding: 10px 0 0 0" onclick="soundboard.play(event, this)" data-sound="' + sound + '" type="button"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0"></div><span>' + sound + '</span></a>');
+      $("#soundboard-list").append(
+        '<a class="soundboard-list-group-item list-group-item"  style="padding: 10px 0 0 0" onclick="soundboard.play(event, this)" data-sound="' +
+        sound +
+        '" type="button"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0"></div><span>' +
+        sound + '</span></a>');
     })
     soundboard.resize()
   })
 
-  $(window).resize(function() {
+  $(window).resize(function () {
     soundboard.resize()
   })
+
 </script>
