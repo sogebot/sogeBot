@@ -1,0 +1,62 @@
+<div class="widget">
+  <h6 data-lang="widget-title-joinpart"></h6>
+  <ul class="nav nav-pills" role="tablist">
+    <li role="presentation" class="active">
+      <a href="#join-part-list-panel" aria-controls="home" role="tab" data-toggle="tab" title="Join/Part list">
+        <i class="fa fa-sign-in" aria-hidden="true"></i>
+      </a>
+    </li>
+    <li role="presentation">
+      <a href="#join-part-list-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+        <i class="fa fa-cog" aria-hidden="true"></i>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="join-part-list-panel">
+      <div id="join-part-list">
+        <ul style="list-style-type: none; margin:0; padding: 0;" id="join-part-list-data"></ul>
+      </div>
+    </div>
+    <!-- /JOIN/PART LIST -->
+
+    <div role="tabpanel" class="tab-pane" id="join-part-list-settings">
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('joinpart')" style="margin-top: 20px;" data-lang="remove-widget"></button>
+    </div>
+    <!-- /SETTINGS -->
+  </div>
+</div>
+
+<script>
+  let lastType = null
+  socket.on('joinpart', (data) => {
+    let type = data.type
+    let username = data.username
+
+    if (data.type !== lastType) { // create new li if different type
+      let li = $('<li>')
+
+      let i = $('<i>')
+        .addClass('fa')
+        .attr('style', 'width: 27px; font-size: 150%; padding: 7px; padding-top:0; display: inline-block; vertical-align: top;')
+
+      if (data.type === 'join') i.addClass('fa-sign-in text-success')
+      else i.addClass('fa-sign-out text-danger')
+
+      let span = $('<span>')
+        .attr('style', 'font-size: 17px; line-height:20px; display: inline-block; width: 93%; margin-left: 2px;')
+        .text(data.username)
+
+      // prepend <hr> first
+      if (!_.isNil(lastType)) $("ul#join-part-list-data").prepend($('<li>').append($('<hr style="width: 100%;padding: 0;margin-top: 0;margin-bottom: 0;">')))
+
+      $("ul#join-part-list-data").prepend(li.append(i, span))
+    } else { // just add username to first type
+      $("ul#join-part-list-data li span").first().text($("ul#join-part-list-data li span").first().text() + ', ' + data.username)
+    }
+
+    lastType = data.type
+  })
+</script>

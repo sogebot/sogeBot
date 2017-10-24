@@ -113,6 +113,12 @@ Events.prototype.removeSystemEvents = function (self) {
 Events.prototype.loadSystemEvents = function (self) {
   self.events = self.removeSystemEvents(self)
 
+  self.events['user-joined-channel'].push([
+    { system: true, name: '_function', fnc: global.widgets.joinpart.send, type: 'join' }
+  ])
+  self.events['user-parted-channel'].push([
+    { system: true, name: '_function', fnc: global.widgets.joinpart.send, type: 'part' }
+  ])
   self.events['timeout'].push([
     { system: true, name: 'log', string: 'username: $username, reason: $reason, duration: $duration', level: 'timeout' }
   ])
