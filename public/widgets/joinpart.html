@@ -37,6 +37,7 @@
 
     if (data.type !== lastType) { // create new li if different type
       let li = $('<li>')
+        .attr('style', 'padding-top: 5px;')
 
       let i = $('<i>')
         .addClass('fa')
@@ -53,6 +54,10 @@
       if (!_.isNil(lastType)) $("ul#join-part-list-data").prepend($('<li>').append($('<hr style="width: 100%;padding: 0;margin-top: 0;margin-bottom: 0;">')))
 
       $("ul#join-part-list-data").prepend(li.append(i, span))
+
+      // want only last 6
+      $('ul#join-part-list-data li:gt(11)').remove();
+
     } else { // just add username to first type
       $("ul#join-part-list-data li span").first().text($("ul#join-part-list-data li span").first().text() + ', ' + data.username)
     }
