@@ -7,6 +7,12 @@
       </a>
     </li>
     <li role="presentation">
+      <a href="#chat-viewers-panel" aria-controls="home" role="tab" data-toggle="tab" title="Viewer list">
+        <i class="fa fa-users" aria-hidden="true"> </i>
+        <span id="chat-viewers-count">0</span>
+      </a>
+    </li>
+    <li role="presentation">
       <a href="#chat-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
         <i class="fa fa-cog" aria-hidden="true"></i>
       </a>
@@ -30,6 +36,14 @@
     </div>
     <!-- /CHAT-ROOM -->
 
+    <div role="tabpanel" class="tab-pane active" id="chat-viewers-panel">
+      <div id="chat-viewers">
+        <ul style="list-style-type: none; -webkit-column-count: 3; -moz-column-count: 3; column-count: 3; margin: 0;" id="chat-viewers-data"></ul>
+      </div>
+    </div>
+    <!-- /VIEWER LIST -->
+
+
     <div role="tabpanel" class="tab-pane" id="chat-settings">
       <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('chat')" style="margin-top: 20px;" data-lang="remove-widget"></button>
     </div>
@@ -38,6 +52,20 @@
 </div>
 
 <script>
+socket.on('chatChatters', (data) => {
+    $('ul#chat-viewers-data').empty()
+    $('#chat-viewers-count').text(data._total)
+
+    let chatters = []
+    for (let [type, chatter] of Object.entries(data.chatters)) {
+      chatters.push(chatter)
+    }
+    chatters = _.sortedUniq(_.flatten(chatters))
+    for (let chatter of chatters) {
+      $('ul#chat-viewers-data').append($('<li>').text(chatter))
+    }
+  })
+
   socket.emit('getChatRoom');
   socket.on('chatRoom', function (room) {
     if (loadedJS.indexOf('chat') === -1) {
