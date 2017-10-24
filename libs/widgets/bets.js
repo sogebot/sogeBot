@@ -4,7 +4,7 @@ function BetsWidget () {
   if (!global.commons.isSystemEnabled('bets')) return
   this.cachedTime = 0
 
-  global.panel.addWidget('bets', 'widget-title-bets', 'knight')
+  global.panel.addWidget('bets', 'widget-title-bets', 'money')
   global.panel.socketListening(this, 'getBetsTemplates', this.getBetsTemplates)
   global.panel.socketListening(this, 'getRunningBet', this.getRunningBet)
   global.panel.socketListening(this, 'closeBet', this.closeBet)

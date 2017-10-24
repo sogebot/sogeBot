@@ -17,7 +17,7 @@
         $("#widgets").append('<div style="font-weight: bold; position: absolute; width: 100%; text-align: center; top: -4px; font-size: 20px; text-align: center; font-family: \'Catamaran\'; color: white">- WIDGETS TO ADD -</div><hr style="border-top: 1px solid #ccc">')
       _.each(list, function(widget) {
         $("#widgets").append('<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">' +
-                              '<span class="glyphicon glyphicon-' + widget.icon + '"></span>' +
+                              '<span class="fa fa-' + widget.icon + '"></span>' +
                               '<span data-lang="' + widget.name + '"></span>' +
                               '<div class="col-md-offset-1 col-lg-offset-1 col-md-3 col-lg-3"><a data-id="' + widget.id + '" data-align="1"><span class="glyphicon glyphicon-object-align-left"></span></a></div>' +
                               '<div class="col-md-4 col-lg-4 text-center"><a data-id="' + widget.id + '" data-align="2"><span class="glyphicon glyphicon-object-align-vertical"></span></a></div>' +
@@ -25,7 +25,7 @@
                               '</div>')
       })
       $("#widgets").append('<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">' +
-                              '<a data-id="exit"><span class="widgets-exit glyphicon glyphicon-remove"></span>' +
+                              '<a data-id="exit"><span class="widgets-exit fa fa-remove"></span>' +
                               '<span style="font-size: 12px;" data-lang="close"></span></a>' +
                               '</div>')
       commons.translate()

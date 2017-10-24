@@ -307,7 +307,7 @@ span.title {
   text-align: center;
 }
 
-#widgets div > span.glyphicon, #widgets .widgets-exit {
+#widgets div > span.fa, #widgets .widgets-exit {
   font-size: 80px;
 }
 

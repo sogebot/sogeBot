@@ -292,7 +292,7 @@ Twitch.prototype.saveStream = function (stream) {
 }
 
 Twitch.prototype.webPanel = function () {
-  global.panel.addWidget('twitch', 'widget-title-monitor', 'facetime-video')
+  global.panel.addWidget('twitch', 'widget-title-monitor', 'television')
   global.panel.socketListening(this, 'getTwitchVideo', this.sendTwitchVideo)
   global.panel.socketListening(this, 'getStats', this.sendStats)
 }
