@@ -340,9 +340,11 @@ Parser.prototype.parseMessage = async function (message, attr) {
     '(list.#)': async function (filter) {
       let system = filter.replace('(list.', '').replace(')', '')
 
-      const alias = await global.db.engine.find('alias', { visible: true, enabled: true })
-      const commands = await global.db.engine.find('commands', { visible: true, enabled: true })
-      const cooldowns = await global.db.engine.find('cooldowns', { enabled: true })
+      let [alias, commands, cooldowns, ranks] = await Promise.all([
+        global.db.engine.find('alias', { visible: true, enabled: true }),
+        global.db.engine.find('commands', { visible: true, enabled: true }),
+        global.db.engine.find('cooldowns', { enabled: true }),
+        global.db.engine.find('ranks')])
 
       switch (system) {
         case 'alias':
@@ -363,6 +365,11 @@ Parser.prototype.parseMessage = async function (message, attr) {
           list = _.map(cooldowns, function (o, k) {
             const time = o.miliseconds
             return '!' + o.key + ': ' + (parseInt(time, 10) / 1000) + 's'
+          }).join(', ')
+          return list.length > 0 ? list : ' '
+        case 'ranks':
+          list = _.map(_.orderBy(ranks, 'hours', 'asc'), (o) => {
+            return `${o.value} (${o.hours}h)`
           }).join(', ')
           return list.length > 0 ? list : ' '
         default:
