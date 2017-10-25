@@ -901,30 +901,18 @@
       "failed": "$sender, something went wrong. Current game is still set to: $game"
     }
   },
-  "cooldown": {
-    "toggle": {
-      "moderator": {
-        "enabled": "$sender, cooldown for $command was enabled for moderators",
-        "disabled": "$sender, cooldown for $command was disabled for moderators",
-        "failed": "Sorry, $sender, this cooldown doesn't exist"
-      },
-      "owner": {
-        "enabled": "$sender, cooldown for $command was enabled for owners",
-        "disabled": "$sender, cooldown for $command was disabled for owners",
-        "failed": "Sorry, $sender, this cooldown doesn't exist"
-      }
-    },
-    "failed": {
-      "parse": "{core.command-parse} !cooldown [keyword|!command] [global|user] [seconds] [true/false]",
-      "cooldown": "$sender, you cannot use $command, remaining $secondss",
-      "toggle": "$sender, cooldown for $command was not found!"
-    },
-    "success": {
-      "set": "$sender, $type cooldown for $command was set to $secondss",
-      "unset": "$sender, cooldown for $command was unset",
-      "enabled": "$sender, cooldown for $command was enabled",
-      "disabled": "$sender, cooldown for $command was disabled"
-    }
+  "cooldowns": {
+    "cooldown-parse-failed": "{core.command-parse} !cooldown [keyword|!command] [global|user] [seconds] [true/false]",
+    "cooldown-was-set": "$sender, $type cooldown for $command was set to $secondss",
+    "cooldown-was-unset": "$sender, $type cooldown for $command was unset",
+    "cooldown-triggered": "$sender, you cannot use $command, remaining $secondss",
+    "cooldown-not-found": "$sender, cooldown for $command was not found",
+    "cooldown-was-enabled": "$sender, cooldown for $command was enabled",
+    "cooldown-was-disabled": "$sender, cooldown for $command was disabled",
+    "cooldown-was-enabled-for-moderators": "$sender, cooldown for $command was enabled for moderators",
+    "cooldown-was-disabled-for-moderators": "$sender, cooldown for $command was disabled for moderators",
+    "cooldown-was-enabled-for-owners": "$sender, cooldown for $command was enabled for owners",
+    "cooldown-was-disabled-for-owners": "$sender, cooldown for $command was disabled for owners"
   },
   "timers": {
     "id-must-be-defined": "$sender, response id must be defined.",

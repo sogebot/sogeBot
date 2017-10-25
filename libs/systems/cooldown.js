@@ -49,27 +49,25 @@ class Cooldown {
   }
 
   async set (self, sender, text) {
-    var data, match
+    const parsed = text.match(/^([!\u0500-\u052F\u0400-\u04FF\w]+) (global|user) (\d+) ?(\w+)?/)
 
-    try {
-      match = text.match(/^([!\u0500-\u052F\u0400-\u04FF\w]+) (global|user) (\d+) ?(\w+)?/)
-      data = {'command': match[1], 'seconds': match[3], 'type': match[2], 'quiet': match[4] !== 'false', 'enabled': true}
-    } catch (e) {
-      global.commons.sendMessage(global.translate('cooldown.failed.parse'), sender)
+    if (_.isNil(parsed)) {
+      let message = global.commons.prepare('cooldowns.cooldown-parse-failed')
+      debug(message); global.commons.sendMessage(message, sender)
+      return false
+    }
+
+    let [command, type, seconds, quiet] = parsed.slice(1)
+    if (seconds === 0) {
+      await global.db.engine.remove('cooldowns', { key: command, type: type })
+      let message = global.commons.prepare('cooldowns.cooldown-was-unset', { type: type, command: command })
+      debug(message); global.commons.sendMessage(message, sender)
       return
     }
 
-    if (parseInt(data.seconds, 10) !== 0) {
-      await global.db.engine.update('cooldowns', { key: data.command, type: data.type }, { miliseconds: data.seconds * 1000, type: data.type, timestamp: 0, quiet: data.quiet, enabled: data.enabled, owner: false, moderator: false })
-      global.commons.sendMessage(global.translate('cooldown.success.set')
-        .replace(/\$command/g, data.command)
-        .replace(/\$type/g, data.type)
-        .replace(/\$seconds/g, data.seconds), sender)
-    } else {
-      await global.db.engine.remove('cooldowns', { key: data.command, type: data.type })
-      global.commons.sendMessage(global.translate('cooldown.success.unset')
-        .replace(/\$command/g, data.command), sender)
-    }
+    await global.db.engine.update('cooldowns', { key: command, type: type }, { miliseconds: seconds * 1000, type: type, timestamp: 0, quiet: _.isNil(quiet) ? false : quiet, enabled: true, owner: false, moderator: false })
+    let message = global.commons.prepare('cooldowns.cooldown-was-set', { seconds: seconds, type: type, command: command })
+    debug(message); global.commons.sendMessage(message, sender)
   }
 
   async check (self, id, sender, text) {
@@ -151,9 +149,8 @@ class Cooldown {
       } else {
         if (!cooldown.quiet && !global.configuration.getValue('disableCooldownWhispers')) {
           sender['message-type'] = 'whisper' // we want to whisp cooldown message
-          global.commons.sendMessage(global.translate('cooldown.failed.cooldown')
-            .replace(/\$command/g, cooldown.key)
-            .replace(/\$seconds/g, Math.ceil((cooldown.miliseconds - now + timestamp) / 1000)), sender)
+          let message = global.commons.prepare('cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) })
+          debug(message); global.commons.sendMessage(message, sender)
         }
         result = false
         return false // disable _.each and updateQueue with false
@@ -166,15 +163,17 @@ class Cooldown {
   async toggle (self, sender, text, type) {
     debug('toggle(%j, %j, %j, %j', self, sender, text, type)
     const toggle = text.match(/^([!\u0500-\u052F\u0400-\u04FF\w]+) (global|user)$/)
+
     if (_.isNil(toggle)) {
-      global.commons.sendMessage(global.translate('cooldown.failed.parse'), sender)
+      let message = global.commons.prepare('cooldowns.cooldown-parse-failed')
+      debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
     const cooldown = await global.db.engine.findOne('cooldowns', { key: toggle[1], type: toggle[2] })
     if (_.isEmpty(cooldown)) {
-      global.commons.sendMessage(global.translate('cooldown.failed.toggle')
-      .replace(/\$command/g, toggle[1]), sender)
+      let message = global.commons.prepare('cooldowns.cooldown-not-found', { command: toggle[1] })
+      debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
@@ -185,11 +184,15 @@ class Cooldown {
     delete cooldown._id
     await global.db.engine.update('cooldowns', { key: toggle[1], type: toggle[2] }, cooldown)
 
-    let translation = 'cooldown.success'
-    if (type !== 'enabled') translation = `cooldown.toggle.${type}`
+    let path = ''
+    let status = cooldown[type] ? 'enabled' : 'disabled'
 
-    global.commons.sendMessage(global.translate(cooldown[type] ? `${translation}.enabled` : `${translation}.disabled`)
-      .replace(/\$command/g, cooldown.key), sender)
+    if (type === 'moderator') path = '-for-moderators'
+    if (type === 'owner') path = '-for-owners'
+    if (type === 'quiet' || type === 'type') return // those two are setable only from dashboard
+
+    let message = global.commons.prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.key })
+    debug(message); global.commons.sendMessage(message, sender)
   }
 
   async toggleEnabled (self, sender, text) { await self.toggle(self, sender, text, 'enabled') }

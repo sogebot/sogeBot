@@ -896,30 +896,18 @@
       "failed": "$sender, neco se pokazilo. Hra je stale nastavena na: $game"
     }
   },
-  "cooldown": {
-    "toggle": {
-      "moderator": {
-        "enabled": "$sender, cooldown pro $command je nastaven i pro moderatory",
-        "disabled": "$sender, cooldown pro $command ignoruje moderatory",
-        "failed": "Promin, $sender, ale tento cooldown neexistuje"
-      },
-      "owner": {
-        "enabled": "$sender, cooldown pro $command je nastaven i pro vlastnika",
-        "disabled": "$sender, cooldown pro $command ignoruje vlastnika",
-        "failed": "Promin, $sender, ale tento cooldown neexistuje"
-      }
-    },
-    "failed": {
-      "parse": "{core.command-parse} !cooldown [keyword|!command] [global|user] [seconds] [true/false]",
-      "cooldown": "$sender, jeste nemuzes pouzit $command, zbyva jeste $secondss",
-      "toggle": "$sender, cooldown pro $command neni v databazi!"
-    },
-    "success": {
-      "set": "$sender, $type cooldown pro $command byl nastaven na $secondss",
-      "unset": "$sender, cooldown pro $command byl odebran",
-      "enabled": "$sender, cooldown pro $command byl zapnut",
-      "disabled": "$sender, cooldown pro $command byl vypnut"
-    }
+  "cooldowns": {
+    "cooldown-parse-failed": "{core.command-parse} !cooldown [keyword|!command] [global|user] [seconds] [true/false]",
+    "cooldown-was-set": "$sender, $type cooldown pro $command byl nastaven na $secondss",
+    "cooldown-was-unset": "$sender, $type cooldown pro $command byl zrusen",
+    "cooldown-triggered": "$sender, jeste nemuzes pouzit $command, zbyva jeste $secondss",
+    "cooldown-not-found": "$sender, cooldown pro $command nebyl nalezen",
+    "cooldown-was-enabled": "$sender, cooldown pro $command byl zapnut",
+    "cooldown-was-disabled": "$sender, cooldown pro $command byl vypnut",
+    "cooldown-was-enabled-for-moderators": "$sender, cooldown pro $command je nastaven i pro moderatory",
+    "cooldown-was-disabled-for-moderators": "$sender, cooldown pro $command ignoruje moderatory",
+    "cooldown-was-enabled-for-owners": "$sender, cooldown pro $command je nastaven i pro vlastnika",
+    "cooldown-was-disabled-for-owners": "$sender, cooldown pro $command ignoruje vlastnika"
   },
   "timers": {
     "id-must-be-defined": "$sender, id odpovedi musi byt zadano.",

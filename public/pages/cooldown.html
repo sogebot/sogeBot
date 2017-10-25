@@ -31,97 +31,12 @@
 
   <div role="tabpanel" class="tab-pane" id="responses">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <table class="table table-striped table-responsive table-condensed">
-          <tbody id="Responses">
-            <tr>
-              <td colspan="2">
-                <kbd>!cooldown $command $type $seconds $quiet</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-success">Set</span>
-                <span class="custom-response" data-id="cooldown.success.set"></span>
-              </td>
-              <td colspan="2">
-                <kbd>!cooldown $command $type $seconds $quiet</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-danger">Unset (0s)</span>
-                <span class="custom-response" data-id="cooldown.success.unset"></span>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <kbd>!cooldown toggle moderators $command</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-success">Enabled</span>
-                <span class="custom-response" data-id="cooldown.toggle.moderator.enabled"></span>
-              </td>
-              <td colspan="2">
-                <kbd>!cooldown toggle moderators $command</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-warning">Disabled</span>
-                <span class="custom-response" data-id="cooldown.toggle.moderator.disabled"></span>
-              </td>
-              <td>
-                <kbd>!cooldown toggle moderators $command</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-danger">Failure</span>
-                <span class="custom-response" data-id="cooldown.toggle.moderator.failed"></span>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <kbd>!cooldown toggle owners $command</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-success">Enabled</span>
-                <span class="custom-response" data-id="cooldown.toggle.owner.enabled"></span>
-              </td>
-              <td colspan="2">
-                <kbd>!cooldown toggle owners $command</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-warning">Disabled</span>
-                <span class="custom-response" data-id="cooldown.toggle.owner.disabled"></span>
-              </td>
-              <td>
-                <kbd>!cooldown toggle owners $command</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-danger">Failure</span>
-                <span class="custom-response" data-id="cooldown.toggle.owner.failed"></span>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <kbd>!cooldown toggle enabled $command</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-success">Enabled</span>
-                <span class="custom-response" data-id="cooldown.success.enabled"></span>
-              </td>
-              <td colspan="2">
-                <kbd>!cooldown toggle enabled $command</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-warning">Disabled</span>
-                <span class="custom-response" data-id="cooldown.success.disabled"></span>
-              </td>
-              <td>
-                <kbd>!cooldown toggle enabled $command</kbd>
-                <span class="label label-primary">Response</span>
-                <span class="label label-danger">Failure</span>
-                <span class="custom-response" data-id="cooldown.failed.toggle"></span>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="4">
-                <span class="label label-trigger">Cooldown triggered</span>
-                <span class="label label-primary">Response</span>
-                <span class="custom-response" data-id="cooldown.failed.cooldown"></span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <div class="widget" id="bot-responses"></div>
     </div>
   </div>
+</div>
 
-  <script>
+<script>
   var cooldown = {
     list: {},
     cancel: function () {
@@ -143,29 +58,68 @@
       this.list = list
       $("#Cooldowns").empty()
       $("#Cooldowns").append('<tr id="new-cooldown" style="display:none">' +
-          '<td style="vertical-align: top !important;min-width: 150px;"><span class="label label-default">New !command/keyword</span>' + commons.editable({ text: '', id: '_new!', fnc: 'commons.stub' }) + '</td>' +
-          '<td style="vertical-align: top !important;"><span class="label label-primary">Cooldown</span> ' +
-              commons.editable({ text: '&nbsp;', id: '_new!', fnc: 'commons.stub' }) +
-          '<div class="btn-group pull-right">' +
-            '<button class="save-button btn btn-success new-confirm-btn" style="display:none" onclick="cooldown.create(event)">SAVE</button>' +
-            '<button class="btn btn-warning new-confirm-btn" style="display:none" onclick="cooldown.cancel()">CANCEL</button>' +
-          '</div>' +
-          '</td>' +
-          '</tr>');
+        '<td style="vertical-align: top !important;min-width: 150px;"><span class="label label-default">New !command/keyword</span>' +
+        commons.editable({
+          text: '',
+          id: '_new!',
+          fnc: 'commons.stub'
+        }) + '</td>' +
+        '<td style="vertical-align: top !important;"><span class="label label-primary">Cooldown</span> ' +
+        commons.editable({
+          text: '&nbsp;',
+          id: '_new!',
+          fnc: 'commons.stub'
+        }) +
+        '<div class="btn-group pull-right">' +
+        '<button class="save-button btn btn-success new-confirm-btn" style="display:none" onclick="cooldown.create(event)">SAVE</button>' +
+        '<button class="btn btn-warning new-confirm-btn" style="display:none" onclick="cooldown.cancel()">CANCEL</button>' +
+        '</div>' +
+        '</td>' +
+        '</tr>');
       for (let item of list) {
         $("#Cooldowns").append('<tr class="page-data-row">' +
-            '<td style="vertical-align: top !important;min-width: 150px;"><span class="label label-default">' + (item.key.startsWith('!') ? 'Command' : "Keyword") + '</span>' + commons.editable({ text: item.key, id: item.key, fnc: 'cooldown.editName', options: { type: item.type }}) + '</td>' +
-            '<td style="vertical-align: top !important;"><span class="label label-primary">Cooldown</span> ' +
-              '<span style="cursor: pointer;" class="label label-' + (item.type) + '" " data-type="' + item.type + '" data-id="' + item.key + '" onclick="cooldown.toggleType(this)">type:' + translations[item.type] + '</span> ' +
-              '<span style="cursor: pointer;" class="label label-' + (item.quiet ? "danger": "success") + '" " data-type="' + item.type + '" data-id="' + item.key + '" onclick="cooldown.toggleNotify(this)">notify:' + translations[item.quiet ? 'cooldown-quiet-toggle-yes' : 'cooldown-quiet-toggle-no'] + '</span> ' +
-              '<span style="cursor: pointer;" class="label label-' + (item.moderator ? "success": "danger") + '" data-type="' + item.type + '" data-id="' + item.key + '" onclick="cooldown.toggleModerators(this)">moderators:' + translations[item.moderator ? "comply": "omit"] + '</span> ' +
-              '<span style="cursor: pointer;" class="label label-' + (item.owner ? "success": "danger") + '" data-type="' + item.type + '" data-id="' + item.key + '" onclick="cooldown.toggleOwners(this)">owners:' + translations[item.owner ? "comply": "omit"] + '</span> ' +
-              '<span style="cursor: pointer;" class="label label-' + (item.enabled ? "success": "danger") + '" data-type="' + item.type + '" data-id="' + item.key + '" onclick="cooldown.toggle(this)">' + (item.enabled ? "enabled": "disabled") + '</span>' +
-              '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="label label-danger btn-remove" data-type="' + item.type + '" data-id="' + item.key + '"  onclick="commons.confirm(this)">delete</span>' +
-              '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
-              '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-success btn-confirm" onclick="cooldown.delete(this)" data-type="' + item.type + '" data-id="' + item.key + '">confirm</span>' +
-              commons.editable({ text: item.miliseconds / 1000, id: item.key, fnc: 'cooldown.edit', options: { type: item.type } }) +
-            '</td>' +
+          '<td style="vertical-align: top !important;min-width: 150px;"><span class="label label-default">' + (
+            item.key.startsWith('!') ? 'Command' : "Keyword") + '</span>' + commons.editable({
+            text: item.key,
+            id: item.key,
+            fnc: 'cooldown.editName',
+            options: {
+              type: item.type
+            }
+          }) + '</td>' +
+          '<td style="vertical-align: top !important;"><span class="label label-primary">Cooldown</span> ' +
+          '<span style="cursor: pointer;" class="label label-' + (item.type) + '" " data-type="' + item.type +
+          '" data-id="' + item.key + '" onclick="cooldown.toggleType(this)">type:' + translations[item.type] +
+          '</span> ' +
+          '<span style="cursor: pointer;" class="label label-' + (item.quiet ? "danger" : "success") +
+          '" " data-type="' + item.type + '" data-id="' + item.key +
+          '" onclick="cooldown.toggleNotify(this)">notify:' + translations[item.quiet ?
+            'cooldown-quiet-toggle-yes' : 'cooldown-quiet-toggle-no'] + '</span> ' +
+          '<span style="cursor: pointer;" class="label label-' + (item.moderator ? "success" : "danger") +
+          '" data-type="' + item.type + '" data-id="' + item.key +
+          '" onclick="cooldown.toggleModerators(this)">moderators:' + translations[item.moderator ? "comply" :
+            "omit"] + '</span> ' +
+          '<span style="cursor: pointer;" class="label label-' + (item.owner ? "success" : "danger") +
+          '" data-type="' + item.type + '" data-id="' + item.key +
+          '" onclick="cooldown.toggleOwners(this)">owners:' + translations[item.owner ? "comply" : "omit"] +
+          '</span> ' +
+          '<span style="cursor: pointer;" class="label label-' + (item.enabled ? "success" : "danger") +
+          '" data-type="' + item.type + '" data-id="' + item.key + '" onclick="cooldown.toggle(this)">' + (item
+            .enabled ? "enabled" : "disabled") + '</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="label label-danger btn-remove" data-type="' +
+          item.type + '" data-id="' + item.key + '"  onclick="commons.confirm(this)">delete</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-success btn-confirm" onclick="cooldown.delete(this)" data-type="' +
+          item.type + '" data-id="' + item.key + '">confirm</span>' +
+          commons.editable({
+            text: item.miliseconds / 1000,
+            id: item.key,
+            fnc: 'cooldown.edit',
+            options: {
+              type: item.type
+            }
+          }) +
+          '</td>' +
           '</tr>');
       }
     },
@@ -173,7 +127,11 @@
       socket.emit('cooldown.set', `${id} ${options.type} ${value}`)
     },
     editName: function (id, value, options) {
-      socket.emit('cooldown.editName', {id: id, value: value, type: options.type})
+      socket.emit('cooldown.editName', {
+        id: id,
+        value: value,
+        type: options.type
+      })
     },
     toggle: function (el) {
       socket.emit('cooldown.toggleEnabled', `${el.dataset.id} ${el.dataset.type}`)
@@ -185,10 +143,10 @@
       socket.emit('cooldown.toggleOwners', `${el.dataset.id} ${el.dataset.type}`)
     },
     toggleNotify: function (el) {
-      socket.emit('cooldown.toggleNotify', `${el.dataset.id} ${el.dataset.type}` )
+      socket.emit('cooldown.toggleNotify', `${el.dataset.id} ${el.dataset.type}`)
     },
     toggleType: function (el) {
-      socket.emit('cooldown.toggleType', `${el.dataset.id} ${el.dataset.type}` )
+      socket.emit('cooldown.toggleType', `${el.dataset.id} ${el.dataset.type}`)
     },
     delete: function (el) {
       socket.emit('cooldown.set', `${el.dataset.id} ${el.dataset.type} 0`)
@@ -204,25 +162,43 @@
       }
       socket.emit('cooldown.set', `${data.command} ${data.type} ${data.seconds} ${data.quiet}`)
     },
-    responses: function () {
-      socket.emit('responses.get', 'cooldown', function (data) {
-        _.each(data, function (value, key) {
+    responses: (id) => {
+      id = id || null
+      let system = 'cooldowns'
+      socket.emit('responses.get', system, function (data) {
+        for (let [key, entry] of Object.entries(data)) {
+          if (!_.isNil(id) && `${system}.${key}` !== id) return true // continue if we want only specific id
           var filters = ['global']
 
-          // add command and reponse filters
-          filters.push('command')
-          if (key === 'success.set' || key === 'success.unset') {
-            filters.push('type')
-            filters.push('seconds')
-            filters.push('quiet')
-          }
+          let div = $('<div>')
+            .css('padding', '4px 5px 4px 5px')
+          let response = $('<span>')
+            .text('Response')
+            .addClass('label label-primary label-bot-response')
+          let kbd = $('<kbd>')
+            .text(key.replace(/-/g, ' '))
+            .addClass('kbd-bot-response')
+          let span = $('<span>').addClass('custom-response')
+            .attr('data-id', `${system}.${key}`)
+            .css('font-size', '80%')
 
-          if (key === 'failed.cooldown') {
-            filters.push('seconds')
-          }
-          key = 'cooldown.' + key
-          $('[data-id="' + key + '"]').html(commons.editable({ text: value, id: key, fnc: 'commons.setResponse', filters: filters }))
-        })
+          $('#bot-responses').append(div.append(response).append(kbd).append(span))
+
+          if (_.includes(['cooldown-was-set', 'cooldown-was-unset', 'cooldown-triggered',
+              'cooldown-not-found', 'cooldown-was-enabled', 'cooldown-was-disabled',
+              'cooldown-was-enabled-for-moderators', 'cooldown-was-disabled-for-moderators',
+              'cooldown-was-enabled-for-owners', 'cooldown-was-disabled-for-owners'
+            ], key)) filters.push('command')
+          if (_.includes(['cooldown-was-set', 'cooldown-triggered'], key)) filters.push('seconds')
+          if (_.includes(['cooldown-was-set', 'cooldown-was-unset'], key)) filters.push('type')
+
+          $(`[data-id="${system}.${key}"]`).html(commons.editable({
+            text: entry,
+            id: key,
+            fnc: 'commons.setResponse',
+            filters: filters
+          }))
+        }
       })
     }
   }
@@ -231,8 +207,8 @@
   cooldown.update([])
 
   socket.emit('cooldown.send');
-  socket.on('cooldown', function(list) {
+  socket.on('cooldown', function (list) {
     cooldown.update(list)
   });
 
-  </script>
+</script>
