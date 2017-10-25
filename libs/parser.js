@@ -489,7 +489,7 @@ Parser.prototype.parseMessageEach = async function (filters, msg) {
     let regexp = _.escapeRegExp(key)
 
     // we want to handle # as \w - number in regexp
-    regexp = regexp.replace(/#/g, '([\\S ]+)')
+    regexp = regexp.replace(/#/g, '([\\S ]+?)')
     let rMessage = msg.match((new RegExp('(' + regexp + ')', 'g')))
     if (!_.isNull(rMessage)) {
       for (var bkey in rMessage) {
