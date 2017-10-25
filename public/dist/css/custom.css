@@ -838,3 +838,7 @@ li.active .deleteTab {
   color: #888;
   background-color: rgba(0,0,0,0);
 }
+
+#bot-responses {
+  column-count: 2;
+}
