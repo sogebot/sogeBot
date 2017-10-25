@@ -37,17 +37,17 @@
 
     if (data.type !== lastType) { // create new li if different type
       let li = $('<li>')
-        .attr('style', 'padding-top: 5px;')
+        .attr('style', 'padding-top: 5px')
 
       let i = $('<i>')
         .addClass('fa')
-        .attr('style', 'width: 27px; font-size: 150%; padding: 7px; padding-top:0; display: inline-block; vertical-align: top;')
+        .attr('style', 'position: absolute; width: 27px; font-size: 150%; padding: 7px; padding-top:0; display: inline-block; vertical-align: top; column-width: 50px')
 
       if (data.type === 'join') i.addClass('fa-sign-in text-success')
       else i.addClass('fa-sign-out text-danger')
 
       let span = $('<span>')
-        .attr('style', 'font-size: 17px; line-height:20px; display: inline-block; width: 93%; margin-left: 2px;')
+        .attr('style', 'padding-left: 30px; font-size: 17px; line-height:20px; display: block; margin-left: 2px;')
         .text(data.username)
 
       // prepend <hr> first
