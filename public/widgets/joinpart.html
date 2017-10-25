@@ -59,7 +59,8 @@
       $('ul#join-part-list-data li:gt(11)').remove();
 
     } else { // just add username to first type
-      $("ul#join-part-list-data li span").first().text($("ul#join-part-list-data li span").first().text() + ', ' + data.username)
+      let users = $("ul#join-part-list-data li span").first().text()
+      if (!_.includes(users, data.username)) $("ul#join-part-list-data li span").first().text(users + ', ' + data.username)
     }
 
     lastType = data.type
