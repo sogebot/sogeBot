@@ -80,6 +80,7 @@
         "amount": "Počet",
         "pointsName": "Název bodů",
         "rank": "Rank",
+        "nextrank": "Další rank",
         "username": "Uživatelské jméno"
       }
     },
@@ -654,25 +655,20 @@
       "toggle": "Cena za !$command nebyla nalezena"
     }
   },
-  "rank": {
-    "next-rank": "Dalsi rank - ",
-    "success": {
-      "add": "Novy rank byl pridan do bota",
-      "remove" : "Rank byl smazan",
-      "list": "Seznam ranku",
-      "set": "$username ma nastaveny rank na $rank",
-      "unset": "Vlastni rank byl vymazan pro $username",
-      "show": "$sender ma prave $rank rank. $nextrank"
-    },
-    "failed": {
-      "parse": "{core.command-parse} !rank help",
-      "add": "Rank pro tuto hodinu jiz existuje",
-      "list": "Seznam ranku je prazdny",
-      "set": "{core.command-parse} !rank set <username> <rank>",
-      "unset": "{core.command-parse} !rank unset <username>",
-      "notFound": "Nebyl nalezen zadny rank k teto hodine",
-      "show": "$sender nema zatim zadny rank."
-    }
+  "ranks": {
+    "rank-parse-failed": "{core.command-parse} !rank help",
+    "rank-was-added": "$sender, novy $rank($hoursh) byl pridan",
+    "rank-was-edited": "$sender, rank pro $hoursh byl zmenen na $rank",
+    "rank-was-removed": "$sender, rank pro $hoursh byl smazan",
+    "rank-already-exist": "$sender,rank pro $hoursh uz existuje",
+    "rank-was-not-found": "$sender, rank pro $hoursh nebyl nalezen",
+    "custom-rank-was-set-to-user": "$sender, nastavil si rank $rank uzivateli $username",
+    "custom-rank-was-unset-for-user": "$sender, $username byl odebran vlastni rank",
+    "list-is-empty": "$sender, nebyly nalezeny zadne ranky",
+    "list-is-not-empty": "$sender, seznam ranku: $list",
+    "show-rank-without-next-rank": "$sender, tvuj soucasny rank je $rank",
+    "show-rank-with-next-rank": "$sender, tvuj soucasny rank je $rank. Dalsi rank - $nextrank",
+    "user-dont-have-rank": "$sender, jeste nemas prirazeny zadny rank"
   },
   "followage": {
     "success": {

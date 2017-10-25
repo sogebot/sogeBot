@@ -85,6 +85,7 @@
         "amount": "Amount",
         "pointsName": "Points name",
         "rank": "Rank",
+        "nextrank": "Next rank",
         "username": "Username"
       }
     },
@@ -659,25 +660,20 @@
       "toggle": "Price for !$command was not found"
     }
   },
-  "rank": {
-    "next-rank": "Next rank - ",
-    "success": {
-      "add": "New rank was added to bot",
-      "remove" : "Rank was deleted from bot",
-      "list": "List of ranks",
-      "set": "$username have rank set to $rank",
-      "unset": "Custom rank was unset for $username",
-      "show": "$sender have $rank rank. $nextrank"
-    },
-    "failed": {
-      "parse": "{core.command-parse} !rank help",
-      "add": "Rank for this hour already exists",
-      "list": "List of ranks is empty",
-      "set": "{core.command-parse} !rank set <username> <rank>",
-      "unset": "{core.command-parse} !rank unset <username>",
-      "notFound": "No rank is associated with this hour",
-      "show": "$sender doesn't have a rank yet."
-    }
+  "ranks": {
+    "rank-parse-failed": "{core.command-parse} !rank help",
+    "rank-was-added": "$sender, new rank $rank($hoursh) was added",
+    "rank-was-edited": "$sender, rank for $hoursh was changed to $rank",
+    "rank-was-removed": "$sender, rank for $hoursh was removed",
+    "rank-already-exist": "$sender, there is already a rank for $hoursh",
+    "rank-was-not-found": "$sender, rank for $hoursh was not found",
+    "custom-rank-was-set-to-user": "$sender, you set $rank to $username",
+    "custom-rank-was-unset-for-user": "$sender, custom rank for $username was unset",
+    "list-is-empty": "$sender, no ranks was found",
+    "list-is-not-empty": "$sender, ranks list: $list",
+    "show-rank-without-next-rank": "$sender, you have $rank rank",
+    "show-rank-with-next-rank": "$sender, you have $rank rank. Next rank - $nextrank",
+    "user-dont-have-rank": "$sender, you don't have a rank yet"
   },
   "followage": {
     "success": {

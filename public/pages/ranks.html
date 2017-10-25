@@ -1,81 +1,178 @@
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-8">
-  <div class="widget">
-    <h2 class="title" data-lang="ranks"></h2>
-    <table class="table table-striped table-responsive table-condensed">
-      <thead>
-        <tr>
-          <th><span data-lang="watched-time"></span> (<span data-lang="hours"></span>)</th>
-          <th data-lang="name"></th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="Ranks" >
-      </tbody>
-    </table>
-  </div>
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+  <ul class="nav nav-pills">
+    <li>
+      <span data-lang="ranks" class="title text-default"></span>
+    </li>
+    <li>
+      <button class="btn btn-success plus-button" onclick="ranks.new()" style="padding: 9px 15px;">
+        <i class="fa fa-plus" aria-hidden="true"></i>
+      </button>
+    </li>
+    <li class="active">
+      <a data-toggle="tab" href="#manage" data-lang="manage"></a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#responses" data-lang="bot-responses"></a>
+    </li>
+  </ul>
 </div>
 
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="manage">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <table class="table table-striped table-responsive table-condensed">
+          <tbody id="ranks"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-  <div class="widget">
-    <h2 class="title" data-lang="create"></h2>
-    <form class="form-horizontal">
-      <div class="form-group">
-        <div class="col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group">
-          <div class="input-group-addon"><span data-lang="watched-time"></span> (<span data-lang="hours"></span>)</div>
-          <input type="text" class="form-control" id="inputWatched" placeholder="e.g. 10">
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="col-xs-offset-2 col-xs-8 col-sm-offset-2 col-sm-8 input-group">
-          <div class="input-group-addon" data-lang="name"></div>
-          <input type="text" class="form-control" id="inputName" placeholder="e.g. Novice">
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="col-xs-12 col-sm-12 text-center">
-          <button class="btn btn-primary" onclick="ranks.create(event)" data-lang="confirm"></button>
-        </div>
-      </div>
-    </form>
+  <div role="tabpanel" class="tab-pane" id="responses">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget" id="bot-responses"></div>
+    </div>
   </div>
 </div>
 
 <script>
   var ranks = {
+    list: {},
+    cancel: function () {
+      $('#new-rank').css('display', 'none')
+      $('.new-confirm-btn').css('display', 'none')
+      this.update(this.list)
+    },
+    new: function () {
+      $('#new-rank').css('display', 'table-row')
+      $('.new-confirm-btn').css('display', 'block')
+    },
+    editHours: function (id, value) {
+      socket.emit('ranks.editHours', {
+        id: id,
+        value: value
+      })
+    },
     edit: function (id, value) {
-      socket.emit('ranks.edit', {id: id, value: value})
+      socket.emit('ranks.edit', `${id} ${value}`)
     },
     update: function (list) {
-      $("#Ranks").empty()
-      _.each(list, function(item, index) {
-        item.hours = item.hours.toString()
-        $("#Ranks").append('<tr>' +
-          '<td>' + item.hours + '</td>' +
-          '<td>' + commons.editable(item.value, item.hours, 'ranks.edit') + '</td>' +
-          '<td class="tableMenu">' +
-          '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
-          '<button type="button" style="display: none" class="btn btn-success btn-confirm" onclick="ranks.delete(this)" data-hours="' + item.hours + '"><span class="glyphicon glyphicon-ok"></span></button>' +
-          '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="glyphicon glyphicon-remove"></span></button>' +
-          '</td>' +
+      this.list = list
+      $("#ranks").empty()
+      $("#ranks").append('<tr id="new-rank" style="display:none">' +
+        '<td style="vertical-align: top !important; width: 20%;"><span class="label label-primary">Hours</span> ' +
+        commons.editable({
+          text: '&nbsp;',
+          id: '_new!',
+          fnc: 'commons.stub'
+        }) + '</td>' +
+        '<td style="vertical-align: top !important"><span class="label label-default">New rank</span>' +
+        commons.editable({
+          text: '',
+          id: '_new!',
+          fnc: 'commons.stub'
+        }) +
+        '<div class="btn-group pull-right">' +
+        '<button class="save-button btn btn-success new-confirm-btn" style="display:none" onclick="ranks.create(event)">SAVE</button>' +
+        '<button class="btn btn-warning new-confirm-btn" style="display:none" onclick="ranks.cancel()">CANCEL</button>' +
+        '</div>' +
+        '</td>' +
+        '</tr>');
+      _.each(list, function (item, index) {
+        $("#ranks").append('<tr class="page-data-row">' +
+          '<td style="vertical-align: top !important; width:20%;"><span class="label label-primary">Hours</span> ' +
+          commons.editable({
+            text: item.hours,
+            id: item.hours,
+            fnc: 'ranks.editHours'
+          }) + '</td>' +
+          '<td style="vertical-align: top !important"><span class="label label-default">Rank</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="label label-danger btn-remove" data-id="' +
+          item.hours + '"  onclick="commons.confirm(this)">delete</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-success btn-confirm" onclick="ranks.delete(this)" data-id="' +
+          item.hours + '">confirm</span>' +
+          commons.editable({
+            text: item.value,
+            id: item.hours,
+            fnc: 'ranks.edit'
+          }) + '</td>' +
           '</tr>');
       })
     },
     delete: function (el) {
-      socket.emit('deleteRank', el.dataset.hours)
+      socket.emit('ranks.remove', _.isObject(el) ? `${el.dataset.id}` : `${el}`)
+    },
+    toggle: function (el) {
+      socket.emit('ranks.toggle', `!${el.dataset.id}`)
     },
     create: function (event) {
       event.preventDefault()
-      var data = {hours: $("#inputWatched").val(), value: $("#inputName").val()}
-      socket.emit('createRank', data)
-      $("#inputWatched").val('')
-      $("#inputName").val('')
+      var inputs = $('[data-id="_new!"]')
+      var data = {
+        value: $(inputs[1]).text().replace('!', ''),
+        hours: commons.cleanResponseText($(inputs[0]).html().replace('!', ''))
+      }
+      socket.emit('ranks.add', `${data.hours} ${data.value}`)
+      $('.new-confirm-btn').css('display', 'none')
+    },
+    responses: (id) => {
+      id = id || null
+      let system = 'ranks'
+      socket.emit('responses.get', system, function (data) {
+        for (let [key, entry] of Object.entries(data)) {
+          if (!_.isNil(id) && `${system}.${key}` !== id) return true // continue if we want only specific id
+          var filters = ['global']
+
+          let div = $('<div>')
+            .css('margin', '5px')
+          let response = $('<span>')
+            .text('Response')
+            .addClass('label label-primary label-bot-response')
+          let kbd = $('<kbd>')
+            .text(key.replace(/-/g, ' '))
+            .addClass('kbd-bot-response')
+          let span = $('<span>').addClass('custom-response')
+            .attr('data-id', `${system}.${key}`)
+            .css('font-size', '80%')
+
+          $('#bot-responses').append(div.append(response).append(kbd).append(span))
+
+          if (_.includes(['rank-was-edited', 'rank-was-added', 'rank-was-enabled', 'custom-rank-was-set-to-user', 'show-rank-without-next-rank', 'show-rank-with-next-rank'], key))
+            filters.push('rank')
+          if (_.includes(['rank-was-added', 'rank-was-edited', 'rank-was-removed', 'rank-already-exist', 'rank-was-not-found'], key)) filters.push('hours')
+          if (_.includes(['custom-rank-was-set-to-user', 'custom-rank-was-unset-for-user'], key)) filters.push('username')
+          if (_.includes(['show-rank-with-next-rank'], key)) filters.push('nextrank')
+          if (_.includes(['list-is-not-empty'], key)) filters.push('list')
+
+          $(`[data-id="${system}.${key}"]`).html(commons.editable({
+            text: entry,
+            id: key,
+            fnc: 'commons.setResponse',
+            filters: filters
+          }))
+        }
+      })
     }
   }
 
-  socket.emit('getRanks');
+  ranks.responses()
+  ranks.update([])
 
-  socket.on('Ranks', function(list) {
+  socket.emit('ranks.send');
+
+  socket.on('ranks', function (list) {
     ranks.update(list)
-  });
+  })
+
+  socket.on('ranks.check', function (data) {
+    if (data.isRegistered) {
+      $('.status').removeClass().addClass('label label-danger status')
+      $('.save-button').prop('disabled', true)
+    } else {
+      $('.status').removeClass().addClass('label label-success status')
+      $('.save-button').prop('disabled', false)
+    }
+  })
+
 </script>
