@@ -81,9 +81,7 @@ function Gambling () {
           .replace(/\$winner/g, (global.configuration.getValue('atUsername') ? '@' : '') + username), { username: username }, { force: true })
 
         // give user his points
-        const user = await global.users.get(username)
-        user.points = parseInt(_.isNil(user.points) ? 0 : user.points, 10) + parseInt(total, 10)
-        global.users.set(username, { points: user.points })
+        global.db.engine.increment('users', { username: username }, { points: parseInt(total, 10) })
 
         // reset duel
         self.current.duel = {}
