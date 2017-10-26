@@ -139,8 +139,8 @@ Gambling.prototype.duel = async function (self, sender, text) {
     if (_.isNil(self.current.duel._timestamp)) {
       self.current.duel._timestamp = new Date().getTime()
       global.commons.sendMessage(global.translate('gambling.duel.new')
-        .replace(/\$minutes/g, 5)
-        .replace(/\$minutesName/g, global.parser.getLocalizedName(5, 'core.minutes')), sender)
+        .replace(/\$minutesName/g, global.parser.getLocalizedName(5, 'core.minutes')
+        .replace(/\$minutes/g, 5)), sender)
     }
 
     // save points to _total
