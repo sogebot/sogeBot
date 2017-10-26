@@ -111,7 +111,11 @@ class Keywords {
     keywords = _.filter(keywords, function (o) {
       return text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
     })
-    _.each(keywords, function (o) { if (o.enabled) global.commons.sendMessage(o.response, sender) })
+    for (let keyword of keywords) {
+      if (!keyword.enabled) continue
+      let message = await global.parser.parseMessage(keyword.response, { sender: sender })
+      global.commons.sendMessage(message, sender)
+    }
     global.updateQueue(id, true)
   }
 
