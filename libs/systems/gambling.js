@@ -105,7 +105,7 @@ Gambling.prototype.duel = async function (self, sender, text) {
 
     const user = await global.users.get(sender.username)
     if (_.isNil(user.points) || user.points < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
-    global.users.set(sender.username, { points: parseInt(user.points, 10) - parseInt(points, 10) })
+    global.db.engine.increment('users', { username: sender.username }, { points: parseInt(points, 10) * -1 })
 
     // check if user is already in duel and add points
     let newDuelist = true
@@ -297,15 +297,15 @@ Gambling.prototype.gamble = async function (self, sender, text) {
     const user = await global.users.get(sender.username)
     if (_.isNil(user.points) || user.points < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
 
-    global.users.set(sender.username, { points: parseInt(user.points, 10) - parseInt(points, 10) })
+    global.db.engine.increment('users', { username: sender.username }, { points: parseInt(points, 10) * -1 })
     if (_.random(0, 1)) {
-      global.users.set(sender.username, { points: parseInt(user.points, 10) + (parseInt(points, 10) * 2) })
+      global.db.engine.increment('users', { username: sender.username }, { points: parseInt(points, 10) * 2 })
       global.commons.sendMessage(global.translate('gambling.gamble.win')
-        .replace(/\$points/g, user.points)
+        .replace(/\$points/g, (parseInt(user.points, 10) + (parseInt(points, 10) * 2)))
         .replace(/\$pointsName/g, global.systems.points.getPointsName(user.points)), sender)
     } else {
       global.commons.sendMessage(global.translate('gambling.gamble.lose')
-        .replace(/\$points/g, user.points)
+        .replace(/\$points/g, parseInt(user.points, 10) - parseInt(points, 10))
         .replace(/\$pointsName/g, global.systems.points.getPointsName(user.points)), sender)
     }
   } catch (e) {

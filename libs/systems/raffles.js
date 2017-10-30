@@ -196,7 +196,7 @@ Raffles.prototype.participate = async function (self, sender, text) {
   }
 
   if (participant.eligible) {
-    if (raffle.type === TYPE_TICKETS) global.users.set(sender.username, { points: parseInt(user.points, 10) - parseInt(tickets, 10) })
+    if (raffle.type === TYPE_TICKETS) global.db.engine.increment('users', { username: sender.username }, { points: parseInt(tickets, 10) * -1 })
     if (!global.configuration.getValue('disableRaffleWhispers')) global.commons.sendMessage(global.translate('raffle.participation.success'), sender)
 
     global.db.engine.update('raffle_participants', { raffle_id: participant.raffle_id, username: sender.username }, participant)

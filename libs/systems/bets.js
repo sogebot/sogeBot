@@ -120,7 +120,7 @@ Bets.prototype.saveBet = function (self, sender, text) {
     } else {
       var newBet = _.isUndefined(self.bet.bets[bet.option][sender.username]) ? removePts : parseInt(self.bet.bets[bet.option][sender.username], 10) + removePts
       self.bet.bets[bet.option][sender.username] = newBet
-      global.users.set(sender.username, { points: availablePts - removePts })
+      global.db.engine.increment('users', { username: sender.username }, { points: parseInt(removePts, 10) * -1 })
 
       global.commons.sendMessage(global.translate('bets.newBet')
         .replace(/\$option/g, bet.option)
@@ -159,10 +159,7 @@ Bets.prototype.refundAll = function (self, sender) {
     if (_.isNull(self.bet)) throw Error(ERROR_NOT_RUNNING)
     _.each(self.bet.bets, function (users) {
       _.each(users, function (bet, buser) {
-        const user = global.users.get(buser)
-        var availablePts = parseInt(user.points, 10)
-        var addPts = parseInt(bet, 10)
-        global.users.set(buser, { points: availablePts + addPts })
+        global.db.engine.increment('users', { username: buser }, { points: parseInt(bet, 10) })
       })
     })
     global.commons.sendMessage(global.translate('bets.refund'), sender)
@@ -192,10 +189,7 @@ Bets.prototype.close = function (self, sender, text) {
     var percentGain = (Object.keys(self.bet.bets).length * parseInt(global.configuration.getValue('betPercentGain'), 10)) / 100
     _.each(self.bet.bets[wOption], function (bet, buser) {
       usersToPay.push(buser)
-      const user = global.users.get(buser)
-      var availablePts = parseInt(user.points, 10)
-      var addPts = parseInt(bet, 10) + Math.round((parseInt(bet, 10) * percentGain))
-      global.users.set(buser, { points: availablePts + addPts })
+      global.db.engine.increment('users', { username: buser }, { points: parseInt(bet, 10) + Math.round((parseInt(bet, 10) * percentGain)) })
     })
 
     global.commons.sendMessage(global.translate('bets.closed')
