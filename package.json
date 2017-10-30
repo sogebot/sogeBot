@@ -17,7 +17,7 @@
     "bootstrap-menu": "^1.0.14",
     "bootstrap-slider": "^9.9.0",
     "bootstrap-toggle": "^2.2.2",
-    "chalk": "^2.2.0",
+    "chalk": "^2.3.0",
     "debug": "^3.1.0",
     "express": "^4.16.2",
     "figlet": "^1.2.0",
@@ -36,7 +36,7 @@
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "safe-eval": "^0.3.0",
-    "snekfetch": "3.5.5",
+    "snekfetch": "3.5.8",
     "socket.io": "^2.0.4",
     "tmi.js": "^1.2.1",
     "twitch-emoticons": "^2.1.0",
@@ -71,7 +71,7 @@
     "locate-path": "^2.0.0",
     "mocha": "4.0.1",
     "pre-commit": "^1.2.2",
-    "sinon": "^4.0.1",
+    "sinon": "^4.0.2",
     "standard": "^10.0.3",
     "test-until": "^1.1.1"
   }
