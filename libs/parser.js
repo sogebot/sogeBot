@@ -27,16 +27,6 @@ function Parser () {
 
   var self = this
   setInterval(function () {
-    if (self.messages.length > 0) {
-      let messages = _.cloneDeep(self.messages)
-      self.messages = []
-
-      _.each(messages, function (message) {
-        self.linesParsed++
-        self.registeredParsers === {} ? self.parseCommands(message.user, message.message, message.skip) : self.addToQueue(message.user, message.message, message.skip)
-      })
-    }
-
     _.each(queue, function (val, id) {
       if (queue.hasOwnProperty(id) && queue[id].success === queue[id].started && queue[id].started > 0) {
         self.parseCommands(queue[id].user, queue[id].message, queue[id].skip)
@@ -63,7 +53,8 @@ function Parser () {
 
 Parser.prototype.parse = function (user, message, skip) {
   skip = skip || false
-  this.messages.push({user: user, message: message, skip: skip})
+  this.linesParsed++
+  this.registeredParsers === {} ? this.parseCommands(user, message, skip) : this.addToQueue(user, message, skip)
 }
 
 Parser.prototype.addToQueue = async function (user, message, skip) {
