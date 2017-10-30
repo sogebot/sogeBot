@@ -29,6 +29,8 @@ function Emotes () {
   this.fetcher = new EmoteFetcher()
   this.fetcher.fetchTwitchEmotes().catch(function (reason) {})
   this.fetcher.fetchBTTVEmotes().catch(function (reason) {})
+  this.fetcher.fetchFFZEmotes().catch(function (reason) {})
+  this.fetcher.fetchFFZEmotes(config.settings.broadcaster_username).catch(function (reason) {})
   this.fetcher.fetchBTTVEmotes(config.settings.broadcaster_username).catch(function (reason) {})
   this.fetcher.fetchTwitchEmotes(config.settings.broadcaster_username).catch(function (reason) {})
 
