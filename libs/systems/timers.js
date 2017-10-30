@@ -63,7 +63,7 @@ class Timers {
   async init () {
     let timers = await global.db.engine.find('timers')
     for (let timer of timers) await global.db.engine.update('timers', { _id: timer._id.toString() }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
-    setInterval(() => this.check(), 1000)
+    this.check()
   }
 
   async check () {
@@ -79,10 +79,11 @@ class Timers {
       if (!_.isNil(response)) {
         debug(response.response, global.parser.getOwner())
         global.commons.sendMessage(response.response, global.parser.getOwner())
-        global.db.engine.update('timersResponses', { _id: response._id }, { timestamp: new Date().getTime() })
+        await global.db.engine.update('timersResponses', { _id: response._id }, { timestamp: new Date().getTime() })
       }
-      global.db.engine.update('timers', { _id: timer._id.toString() }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
+      await global.db.engine.update('timers', { _id: timer._id.toString() }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
     }
+    setTimeout(() => this.check, 1000) // this will run check 1s after full check is correctly done
   }
 
   async editResponse (self, socket, data) {
