@@ -50,6 +50,7 @@ describe('Cooldowns - toggleModerators()', () => {
     }, 5000)
     spy.reset()
 
+    global.parser.parse(mod, '!me')
     await until(() => {
       if (spy.called) {
         let isFalse = false

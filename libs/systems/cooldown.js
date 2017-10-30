@@ -123,7 +123,9 @@ class Cooldown {
 
     let result = false
     let isMod = await global.parser.isMod(sender)
+    debug('isMod: %j', isMod)
     _.each(data, function (cooldown) {
+      debug('Is for mods: %j', cooldown.moderator)
       if ((global.parser.isOwner(sender) && !cooldown.owner) || (isMod && !cooldown.moderator)) {
         result = true
         return true
