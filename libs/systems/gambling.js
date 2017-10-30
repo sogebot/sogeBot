@@ -6,6 +6,7 @@ var _ = require('lodash')
 // bot libraries
 var constants = require('../constants')
 const config = require('../../config.json')
+const debug = require('debug')('systems:gambling')
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0'
 const ERROR_ZERO_BET = '1'
@@ -226,16 +227,18 @@ Gambling.prototype.fightme = async function (self, sender, text) {
 
     // vs broadcaster
     if (global.parser.isBroadcaster(sender) || global.parser.isBroadcaster(username)) {
+      debug('vs broadcaster')
       global.commons.sendMessage(global.translate('gambling.fightme.broadcaster')
         .replace(/\$winner/g, global.parser.isBroadcaster(sender) ? sender.username : username), sender)
       isMod = global.parser.isBroadcaster(sender) ? isMod.user : isMod.sender
-      if (!isMod) global.client.timeout(config.settings.broadcaster_username, global.parser.isBroadcaster(sender) ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
+      if (!isMod) global.client.timeout(config.settings.broadcaster_username, global.parser.isBroadcaster(sender) ? username : sender.username, global.configuration.getValue('fightmeTimeout'))
       self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
       return
     }
 
     // mod vs mod
     if (isMod.user && isMod.sender) {
+      debug('mod vs mod')
       global.commons.sendMessage(global.translate('gambling.fightme.bothModerators')
         .replace(/\$challenger/g, username), sender)
       self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
@@ -244,13 +247,15 @@ Gambling.prototype.fightme = async function (self, sender, text) {
 
     // vs mod
     if (isMod.user || isMod.sender) {
+      debug('vs mod')
       global.commons.sendMessage(global.translate('gambling.fightme.oneModerator')
         .replace(/\$winner/g, isMod.sender ? sender.username : username), sender)
-      global.client.timeout(config.settings.broadcaster_username, isMod.sender ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
+      global.client.timeout(config.settings.broadcaster_username, isMod.sender ? username : sender.username, global.configuration.getValue('fightmeTimeout'))
       self.current.fightme[username] = _.pull(self.current.fightme[username], sender.username)
       return
     }
 
+    debug('user vs user')
     global.client.timeout(config.settings.broadcaster_username, winner ? sender.username : username, global.configuration.getValue('fightmeTimeout'))
     global.commons.sendMessage(global.translate('gambling.fightme.winner')
       .replace(/\$winner/g, winner ? username : sender.username), sender)
