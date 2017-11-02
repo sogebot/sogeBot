@@ -143,8 +143,7 @@ class Alias {
     debug('list(%j, %j)', self, sender)
     let alias = await global.db.engine.find('alias', { visible: true })
     var output = (alias.length === 0 ? global.translate('alias.list-is-empty') : global.translate('alias.list-is-not-empty').replace(/\$list/g, '!' + (_.map(_.orderBy(alias, 'alias'), 'alias')).join(', !')))
-    debug(output)
-    global.commons.sendMessage(output, sender)
+    debug(output); global.commons.sendMessage(output, sender)
   }
 
   async toggle (self, sender, text) {

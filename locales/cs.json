@@ -645,20 +645,15 @@
     "removeSongPlaylist": "$title byla odstranena z playlistu"
   },
   "price": {
-    "success": {
-      "set": "Cena za !$command byla nastavena na $amount $pointsName",
-      "remove" : "Cena za !$command byla zrusena",
-      "list": "Seznam cen",
-      "enabled": "Cena za !$command byla zapnuta",
-      "disabled": "Cena za !$command byla vypnuta"
-    },
-    "failed": {
-      "parse": "{core.command-parse} !price",
-      "remove": "Cena za !$command nebyla v databazi",
-      "list": "Nejsou nastaveny zadne ceny",
-      "notEnough": "Promin, $sender, ale nemas $amount $pointsName k pouziti !$command",
-      "toggle": "Cena za !$command nebyla nalezena"
-    }
+    "price-parse-failed": "{core.command-parse} !price",
+    "price-was-set": "$sender, cena za $command byla nastavena na $amount $pointsName",
+    "price-was-unset": "$sender, cena za $command byla zrusena",
+    "price-not-found": "$sender, cena za $command nebyla nalezena",
+    "price-was-enabled": "$sender, cena za $command byla zapnuta",
+    "price-was-disabled": "$sender, cena za $command byla vypnuta",
+    "user-have-not-enough-points": "Promin, $sender, ale nemas $amount $pointsName k pouziti $command",
+    "list-is-empty": "$sender, nejsou nastaveny zadne ceny",
+    "list-is-not-empty": "$sender, seznam cen: $list"
   },
   "ranks": {
     "rank-parse-failed": "{core.command-parse} !rank help",

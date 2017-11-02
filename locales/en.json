@@ -645,20 +645,15 @@
     "removeSongPlaylist": "$title was removed from playlist"
   },
   "price": {
-    "success": {
-      "set": "Price for !$command was set to $amount $pointsName",
-      "remove" : "Price for !$command was unset",
-      "list": "List of prices",
-      "enabled": "Price for !$command was enabled",
-      "disabled": "Price for !$command was disabled"
-    },
-    "failed": {
-      "parse": "{core.command-parse} !price",
-      "remove": "No price was set for !$command",
-      "list": "List of prices is empty",
-      "notEnough": "Sorry, $sender, but you don't have $amount $pointsName to use !$command",
-      "toggle": "Price for !$command was not found"
-    }
+    "price-parse-failed": "{core.command-parse} !price",
+    "price-was-set": "$sender, price for $command was set to $amount $pointsName",
+    "price-was-unset": "$sender, price for $command was unset",
+    "price-was-not-found": "$sender, price for $command was not found",
+    "price-was-enabled": "$sender, price for $command was enabled",
+    "price-was-disabled": "$sender, price for $command was disabled",
+    "user-have-not-enough-points": "Sorry, $sender, but you don't have $amount $pointsName to use $command",
+    "list-is-empty": "$sender, list of prices is empty",
+    "list-is-not-empty": "$sender, list of prices: $list"
   },
   "ranks": {
     "rank-parse-failed": "{core.command-parse} !rank help",
