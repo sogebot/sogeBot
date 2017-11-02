@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="/dist/css/sortable-theme-bootstrap.css">
     <link rel="stylesheet" href="/dist/bootstrap-toggle/css/bootstrap-toggle.min.css" />
     <link rel="stylesheet" href="/dist/css/custom.css">
+    <script type="text/javascript" src="/auth/token.js"></script>
     <script src="/socket.io/socket.io.js"></script>
   </head>
   <body style="padding-top: 10px;">
@@ -66,7 +67,7 @@
         list: {}
       }
 
-      var socket = io();
+      var socket = io({query: "token="+token});
 
       var translations = {}
       socket.on('lang', function (data) {
