@@ -142,6 +142,10 @@
       socket.emit('timers.unset', `-name ${el.dataset.id}`)
       $(`#${el.dataset.id}_tab`).remove()
     },
+    editName: (id, val) => {
+      $("li#" + id + "_tab").remove()
+      socket.emit('timers.editName', { id: id, value: val })
+    },
     editSeconds: (id, val, opts) => {
       let messages = opts.messages
       socket.emit('timers.set', `-name ${id} -seconds ${val} -messages ${messages}`)

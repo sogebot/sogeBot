@@ -37,7 +37,7 @@ class Timers {
       global.panel.addMenu({category: 'manage', name: 'timers', id: 'timers'})
       global.panel.registerSockets({
         self: this,
-        expose: ['set', 'unset', 'add', 'rm', 'toggle', 'editResponse', 'send'],
+        expose: ['set', 'unset', 'add', 'rm', 'toggle', 'editName', 'editResponse', 'send'],
         finally: this.send
       })
     }
@@ -84,6 +84,11 @@ class Timers {
       await global.db.engine.update('timers', { _id: timer._id.toString() }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
     }
     setTimeout(() => this.check, 1000) // this will run check 1s after full check is correctly done
+  }
+
+  async editName (self, socket, data) {
+    if (data.value.length === 0) await self.unset(self, null, `-name ${data.id}`)
+    else await global.db.engine.update('timers', { name: data.id }, { name: data.value })
   }
 
   async editResponse (self, socket, data) {
