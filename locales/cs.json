@@ -993,10 +993,9 @@
     }
   },
   "merge": {
-    "noUsername": "$sender, musis zadat uzivatelske jmeno!",
-    "success": "$sender, $username ma nyni data $merged-username",
-    "noID": "$sender, pro toto uzivatelske jmeno neexistuje ID, proto nelze zmenit",
-    "noUsernameToMerge": "$sender, nebylo nalezeno jine uzivatelske jmeno"
+    "no-from-user-set": "$sender, musi byt zadan uzivatel, ze ktereho se budou brat data",
+    "no-to-user-set": "$sender, musi byt zadan uzivatel, kteremu se predaji data",
+    "user-merged": "$sender, uzivatel $fromUsername byl nakopirovan uzivateli $toUsername"
   },
   "highlights": {
     "saved": {

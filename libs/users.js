@@ -5,6 +5,7 @@ var moment = require('moment')
 var constants = require('./constants')
 
 const config = require('../config.json')
+const debug = require('debug')('users')
 
 function Users () {
   this.rate_limit_follower_check = []
@@ -42,35 +43,31 @@ function Users () {
   }, 60000)
 }
 
+/*
+ * Will merge (rename) old user to new user (used in case of user rename) - no merging is done for simplicity
+ * Usage: !merge -from oldusername -to newusername
+*/
 Users.prototype.merge = async function (self, sender, text) {
-  global.log.error('Merge is not implemented!')
+  let [fromUser, toUser] = [text.match(/-from ([a-zA-Z0-9_]+)/), text.match(/-to ([a-zA-Z0-9_]+)/)]
 
-  /*
-  let username = text.trim()
-  if (username.length === 0) {
-    global.commons.sendMessage(global.translate('merge.noUsername'), sender)
+  if (_.isNil(fromUser)) {
+    let message = global.commons.prepare('merge.no-from-user-set')
+    debug(message); global.commons.sendMessage(message, sender)
     return
-  }
+  } else { fromUser = fromUser[1] }
 
-  let user = await self.get(username)
-  if (!_.isNil(user.id)) {
-    let oldUser = _.filter(self.users, function (o) { return o.id === user.id && o.username !== username })
-    if (oldUser.length > 0) {
-      self.users[username] = _.clone(oldUser[0])
-      self.users[username].username = username
-      global.commons.sendMessage(global.translate('merge.success')
-        .replace(/\$username/g, username)
-        .replace('$merged-username', oldUser[0].username), sender)
-      delete self.users[oldUser[0].username]
-    } else {
-      global.commons.sendMessage(global.translate('merge.noUsernameToMerge')
-        .replace(/\$username/g, username), sender)
-    }
-  } else {
-    global.commons.sendMessage(global.translate('merge.noID')
-      .replace(/\$username/g, username), sender)
-  }
-  */
+  if (_.isNil(toUser)) {
+    let message = global.commons.prepare('merge.no-to-user-set')
+    debug(message); global.commons.sendMessage(message, sender)
+    return
+  } else { toUser = toUser[1] }
+
+  // cannot use Promise.all as it may delete merged user
+  await global.db.engine.remove('users', { username: toUser })
+  await self.set(fromUser, { username: toUser })
+
+  let message = global.commons.prepare('merge.user-merged', { fromUsername: fromUser, toUsername: toUser })
+  debug(message); global.commons.sendMessage(message, sender)
 }
 
 Users.prototype.get = async function (username) {
