@@ -29,7 +29,7 @@ class Ranks {
       global.parser.register(this, '!rank', this.show, constants.VIEWERS)
 
       // count Points
-      setInterval(() => this.update(), 60000)
+      this.update()
 
       global.panel.addMenu({category: 'manage', name: 'ranks', id: 'ranks'})
       global.panel.registerSockets({
@@ -199,20 +199,22 @@ class Ranks {
     let [users, ranks] = await Promise.all([global.users.getAll({ is: { online: true } }), global.db.engine.find('ranks')])
     debug('update() %i online users and %i ranks loaded', users.length, ranks.length)
 
-    _.each(users, function (user) {
+    for (let user of users) {
       var watchTime = user.time.watched
       watchTime = _.isFinite(parseInt(watchTime, 10)) && _.isNumber(parseInt(watchTime, 10)) ? (watchTime / 1000 / 60 / 60).toFixed(0) : 0
 
       let rankToUpdate
-      _.each(_.orderBy(ranks, 'hours', 'asc'), function (rank) {
+      for (let rank of _.orderBy(ranks, 'hours', 'asc')) {
         if (watchTime >= parseInt(rank.hours, 10)) {
           rankToUpdate = rank.value
         } else {
-          global.users.set(user.username, {rank: rankToUpdate})
+          if (user.rank !== rankToUpdate) await global.users.set(user.username, {rank: rankToUpdate})
           return false
         }
-      })
-    })
+      }
+    }
+
+    setTimeout(() => this.update(), 60000)
   }
 }
 
