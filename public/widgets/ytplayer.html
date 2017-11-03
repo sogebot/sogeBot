@@ -85,7 +85,7 @@
         '_quiet': true
       })
       setTimeout(function () {
-        socket.emit('getVolume')
+        socket.emit('songs.getCurrentVolume')
       })
     })
 
@@ -118,11 +118,11 @@
     }
 
     function skipSong() {
-      socket.emit('skipSong')
+      socket.emit('songs.sendNextSongID')
     }
 
     function banSong() {
-      socket.emit('banSong')
+      socket.emit('banSong', '')
     }
 
     function onYouTubeIframeAPIReady() {
@@ -143,7 +143,7 @@
         if (!loading && (player.getPlayerState() === 0 || player.getPlayerState() === 5) && $("#YTControl i").hasClass(
             'text-danger')) {
           loading = true
-          socket.emit('getVideoID');
+          socket.emit('songs.sendNextSongID');
         }
       }, 2000)
     }
@@ -151,7 +151,7 @@
     function onPlayerStateChange(event) {
       if (event.data == YT.PlayerState.ENDED && !loading) {
         loading = true
-        socket.emit('getVideoID');
+        socket.emit('songs.sendNextSongID');
       }
     }
 
@@ -209,7 +209,7 @@
 
   $("#YTControl").on('click', function () {
     if ($("#YTControl i").hasClass('text-success')) {
-      if (player.getPlayerState() === YT.PlayerState.CUED) socket.emit('getVideoID')
+      if (player.getPlayerState() === YT.PlayerState.CUED) socket.emit('songs.sendNextSongID')
       player.playVideo()
       $("#YTControl i").removeClass().addClass('glyphicon glyphicon-pause text-danger')
     } else {

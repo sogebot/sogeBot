@@ -81,7 +81,7 @@
       setInterval(function() {
         socket.emit('getSongRequests');
       }, 2000)
-      socket.emit('getPlaylist');
+      socket.emit('songs.sendPlaylist');
 
       socket.on('songPlaylistList', function(list) {
         updatePlaylist(list)

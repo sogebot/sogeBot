@@ -292,7 +292,7 @@
 
   socket.emit('getPointsConfiguration')
   socket.emit('getNoticeConfiguration')
-  socket.emit('getSongsConfiguration')
+  socket.emit('songs.sendConfiguration')
   socket.emit('getConfiguration')
 
   socket.once('configuration', function (data) {
