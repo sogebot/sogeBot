@@ -39,7 +39,7 @@
     "snekfetch": "3.5.8",
     "socket.io": "^2.0.4",
     "tmi.js": "^1.2.1",
-    "twitch-emoticons": "^2.1.0",
+    "twitch-emoticons": "git+https://github.com/sogehige/twitch-emoticons.git#v3api",
     "twitter": "^1.7.1",
     "velocity-animate": "^1.5.0",
     "winston": "^2.4.0",
