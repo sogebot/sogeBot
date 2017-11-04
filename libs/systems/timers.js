@@ -62,7 +62,7 @@ class Timers {
 
   async init () {
     let timers = await global.db.engine.find('timers')
-    for (let timer of timers) await global.db.engine.update('timers', { _id: timer._id.toString() }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
+    for (let timer of timers) await global.db.engine.update('timers', { _id: timer._id.toString() }, { trigger: { messages: 0, timestamp: new Date().getTime() } })
     this.check()
   }
 
