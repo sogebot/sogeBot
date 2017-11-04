@@ -67,6 +67,7 @@ class Timers {
   }
 
   async check () {
+    debug('checking timers')
     let timers = await global.db.engine.find('timers', { enabled: true })
     for (let timer of timers) {
       if (timer.messages > 0 && timer.trigger.messages - global.parser.linesParsed + timer.messages > 0) continue // not ready to trigger with messages
@@ -83,7 +84,7 @@ class Timers {
       }
       await global.db.engine.update('timers', { _id: timer._id.toString() }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
     }
-    setTimeout(() => this.check, 1000) // this will run check 1s after full check is correctly done
+    setTimeout(() => this.check(), 1000) // this will run check 1s after full check is correctly done
   }
 
   async editName (self, socket, data) {
