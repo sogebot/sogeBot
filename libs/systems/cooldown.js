@@ -58,14 +58,14 @@ class Cooldown {
     }
 
     let [command, type, seconds, quiet] = parsed.slice(1)
-    if (seconds === 0) {
+    if (parseInt(seconds, 10) === 0) {
       await global.db.engine.remove('cooldowns', { key: command, type: type })
       let message = global.commons.prepare('cooldowns.cooldown-was-unset', { type: type, command: command })
       debug(message); global.commons.sendMessage(message, sender)
       return
     }
 
-    await global.db.engine.update('cooldowns', { key: command, type: type }, { miliseconds: seconds * 1000, type: type, timestamp: 0, quiet: _.isNil(quiet) ? false : quiet, enabled: true, owner: false, moderator: false })
+    await global.db.engine.update('cooldowns', { key: command, type: type }, { miliseconds: parseInt(seconds, 10) * 1000, type: type, timestamp: 0, quiet: _.isNil(quiet) ? false : quiet, enabled: true, owner: false, moderator: false })
     let message = global.commons.prepare('cooldowns.cooldown-was-set', { seconds: seconds, type: type, command: command })
     debug(message); global.commons.sendMessage(message, sender)
   }
