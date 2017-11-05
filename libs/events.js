@@ -2,6 +2,7 @@
 
 var moment = require('moment')
 var _ = require('lodash')
+const debug = require('debug')('events')
 
 function Events () {
   this.events = {
@@ -284,7 +285,11 @@ Events.prototype._new = function (self, socket, data) {
 Events.prototype._update = async function (self) {
   let events = await global.db.engine.find('events')
   _.each(events, function (event) {
-    self.events[event.key] = [event.value]
+    try {
+      self.events[event.key] = JSON.parse(event.value)
+    } catch (e) { // little bit of hack for backward compatibility
+      self.events[event.key] = [event.value]
+    }
   })
   self.loadSystemEvents(self)
 }
@@ -292,7 +297,9 @@ Events.prototype._update = async function (self) {
 Events.prototype._save = function (self) {
   let events = self.removeSystemEvents(self)
   _.each(events, function (event, key) {
-    global.db.engine.update('events', { key: key }, { key: key, value: event[0] })
+    debug('Saving event %s: %j', key, event)
+    debug('events', { key: key }, { key: key, value: event })
+    global.db.engine.update('events', { key: key }, { key: key, value: JSON.stringify(event) })
   })
 }
 
