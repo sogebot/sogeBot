@@ -41,7 +41,7 @@ class Songs {
       global.panel.addWidget('ytplayer', 'widget-title-ytplayer', 'headphones')
       global.panel.registerSockets({
         self: this,
-        expose: ['getCurrentVolume', 'send', 'setTrim', 'sendConfiguration', 'banSong', 'getSongRequests', 'stealSong', 'sendNextSongID'],
+        expose: ['getCurrentVolume', 'send', 'setTrim', 'sendConfiguration', 'banSong', 'getSongRequests', 'stealSong', 'sendNextSongID', 'removeSongFromPlaylist', 'unbanSong'],
         finally: this.send
       })
     }
@@ -105,7 +105,7 @@ class Songs {
   }
 
   async banCurrentSong (self, sender) {
-    let update = await global.db.engine.update('bannedsong', { videoID: self.currentSong.videoID }, { videoID: self.currentSong.videoID, title: self.currentSong.title })
+    let update = await global.db.engine.update('bannedsong', { videoId: self.currentSong.videoID }, { videoId: self.currentSong.videoID, title: self.currentSong.title })
     if (update > 0) {
       let message = global.commons.prepare('songs.song-was-banned', { name: self.currentSong.title })
       debug(message); global.commons.sendMessage(message, sender)
@@ -125,7 +125,7 @@ class Songs {
       if (err) global.log.error(err, { fnc: 'Songs.prototype.banSongById#1' })
       if (_.isNil(videoInfo.title)) return
 
-      let updated = await global.db.engine.update('bannedsong', { videoID: text }, { videoID: text, title: videoInfo.title })
+      let updated = await global.db.engine.update('bannedsong', { videoId: text }, { videoId: text, title: videoInfo.title })
       if (updated > 0) {
         global.commons.sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, self.currentSong.title), sender)
 
@@ -140,7 +140,7 @@ class Songs {
   }
 
   async unbanSong (self, sender, text) {
-    let removed = await global.db.engine.remove('bannedsong', { videoID: text.trim() })
+    let removed = await global.db.engine.remove('bannedsong', { videoId: text.trim() })
     if (removed > 0) global.commons.sendMessage(global.translate('songs.song-was-unbanned'), sender)
     else global.commons.sendMessage(global.translate('songs.song-was-not-banned'), sender)
   }

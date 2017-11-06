@@ -103,10 +103,24 @@
   socket.on('bannedSongsList', function (list) {
     $("#banned-songs-table").empty()
     _.each(list, function (song) {
-      $("#banned-songs-table").append('<tr><td><a href="http://youtu.be/' + song.videoId + '">' + song.videoId +
+      $("#banned-songs-table").append('<tr class="bannedsong-item" data-videoid="' + song.videoId + '"><td><a href="http://youtu.be/' + song.videoId + '">' + song.videoId +
         '</a></td><td>' +
         song.title + '</td></tr>')
     })
+
+    new BootstrapMenu(".bannedsong-item", {
+        fetchElementData: function($el) {
+          return $el.data();
+        },
+        actions: [{
+          name: 'Unban Song',
+          classNames: ['action-danger'],
+          iconClass: 'fa-trash-o',
+          onClick: function(data) {
+            socket.emit('songs.unbanSong', data.videoid)
+          }
+        }]
+      })
   });
 
   var updatePlaylist = function (list) {
@@ -127,7 +141,7 @@
         var lowValue = (new Date(startTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
         var highValue = (new Date(endTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
 
-        $("#Playlist").append('<tr><td><a href="http://youtu.be/' + videoID + '">' + videoID + '</a></td><td>' +
+        $("#Playlist").append('<tr class="playlist-song" data-videoid="' + videoID + '"><td><a href="http://youtu.be/' + videoID + '">' + videoID + '</a></td><td>' +
           title + '</td><td>' + (new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] +
           '</td><td>' + volume + '%</td><td><div id="slider___' + videoID + '___' + length_seconds +
           '"></div><div class="trim"><abbr title="click to edit" class="lowValue__' + videoID + '">' + lowValue +
@@ -141,6 +155,19 @@
         playlist.makeEditable(videoID, $(".highValue__" + videoID), $(".highValueInput__" + videoID), length_seconds)
       }
     }
+    new BootstrapMenu(".playlist-song", {
+        fetchElementData: function($el) {
+          return $el.data();
+        },
+        actions: [{
+          name: 'Delete Song From Playlist',
+          classNames: ['action-danger'],
+          iconClass: 'fa-trash-o',
+          onClick: function(data) {
+            socket.emit('songs.removeSongFromPlaylist', data.videoid)
+          }
+        }]
+      })
   }
 
   $('#shuffleToggle').bootstrapToggle()
