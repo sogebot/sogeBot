@@ -209,7 +209,7 @@ class Ranks {
           rankToUpdate = rank.value
         } else {
           if (user.rank !== rankToUpdate) await global.users.set(user.username, {rank: rankToUpdate})
-          return false
+          break
         }
       }
     }
