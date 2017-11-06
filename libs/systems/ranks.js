@@ -175,7 +175,7 @@ class Ranks {
     }
 
     if (!_.isNil(rank)) {
-      let message = global.commons.prepare('user-dont-have-rank')
+      let message = global.commons.prepare('ranks.user-dont-have-rank')
       debug(message); global.commons.sendMessage(message, sender)
       return true
     }
@@ -183,12 +183,12 @@ class Ranks {
     if (!_.isNil(nextRank)) {
       let toWatch = (nextRank.hours - (watched / 1000 / 60 / 60))
       let percentage = (toWatch / nextRank.hours) * 100
-      let message = global.commons.prepare('show-rank-with-next-rank', { rank: rank, nextrank: `${nextRank.value} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)}h)` })
+      let message = global.commons.prepare('ranks.show-rank-with-next-rank', { rank: rank, nextrank: `${nextRank.value} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)}h)` })
       debug(message); global.commons.sendMessage(message, sender)
       return true
     }
 
-    let message = global.commons.prepare('show-rank-without-next-rank', { rank: rank })
+    let message = global.commons.prepare('ranks.show-rank-without-next-rank', { rank: rank })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
