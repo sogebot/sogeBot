@@ -16,7 +16,7 @@ describe('System - Moderation', function () {
     await until(() => {
       if (global.commons.sendMessage.called) {
         return global.commons.sendMessage.calledWith(
-          global.translate('moderation.settings.moderationLinksWithSpaces.true'))
+          global.translate('core.settings.moderation.moderationLinksWithSpaces.true'))
       } else return false
     }, 5000)
   })
@@ -289,15 +289,15 @@ describe('System - Moderation', function () {
         global.commons.sendMessage.reset()
         global.parser.parse(owner, '!permit')
         await until(() => global.commons.sendMessage.calledOnce, 5000)
-        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('moderation.failed.parsePermit'))
+        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('moderation.permit-parse-failed'))
       })
     })
     describe('parsing \'!permit [username]\'', function () {
       it('should send success message', async function () {
         global.parser.parse(owner, '!permit test')
         await until(() => global.commons.sendMessage.calledOnce, 5000)
-        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('moderation.permit')
-          .replace('$who', '@test')
+        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('moderation.user-have-link-permit')
+          .replace('$username', '@test')
           .replace('$count', 1)
           .replace('$link', 'link'))
       })
@@ -314,8 +314,8 @@ describe('System - Moderation', function () {
       it('should send success message', async function () {
         global.parser.parse(owner, '!permit TEST')
         await until(() => global.commons.sendMessage.calledOnce, 5000)
-        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('moderation.permit')
-          .replace('$who', '@test')
+        assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('moderation.user-have-link-permit')
+          .replace('$username', '@test')
           .replace('$count', 1)
           .replace('$link', 'link'))
       })

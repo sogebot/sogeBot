@@ -1,495 +1,520 @@
-<div class="row">
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-  <div class="widget">
-    <div class="title">
-      <span data-lang="links"></span>
-      <input id="moderationLinksToggle" type="checkbox" data-size="mini" data-onstyle="success" data-offstyle="danger">
-    </div>
-    <table class="table table-striped">
-      <tr>
-        <td><strong data-lang="timeout-duration"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationLinksTimeout" onclick="commons.configEditable(this, 's')" id="moderationLinksTimeout"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationLinksTimeout_group">
-            <div class="input-group-addon" data-lang="seconds"></div>
-            <input style="width: 6em" id="input_moderationLinksTimeout" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
-        <td>
-          <input id="moderationLinksSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="moderation-spaces-toggle"></strong></td>
-        <td>
-          <input id="moderationLinksWithSpacesToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message-warning"></strong>
-          <br/><small><strong>$count</strong> - warnings left</small></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationLinksWarningCustomMessage" onclick="commons.configEditable(this, '')" id="moderationLinksWarningCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationLinksWarningCustomMessage_group">
-            <input style="width: 100%" id="input_moderationLinksWarningCustomMessage" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationLinksCustomMessage" onclick="commons.configEditable(this, '')" id="moderationLinksCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationLinksCustomMessage_group">
-            <input style="width: 100%" id="input_moderationLinksCustomMessage" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+  <ul class="nav nav-pills">
+    <li>
+      <span data-lang="moderation" class="title text-default"></span>
+    </li>
+    <li class="active">
+      <a data-toggle="tab" href="#links" data-lang="links"></a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#symbols" data-lang="symbols"></a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#long-messages" data-lang="long-messages"></a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#capitals" data-lang="capitals"></a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#spam" data-lang="spam"></a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#colors" data-lang="colors"></a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#emotes" data-lang="emotes"></a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#timeout-settings" data-lang="timeout-settings"></a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#blacklist" data-lang="timeout-blacklist"></a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#whitelist" data-lang="timeout-whitelist"></a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#responses" data-lang="bot-responses"></a>
+    </li>
+  </ul>
 </div>
 
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-  <div class="widget">
-    <div class="title">
-      <span data-lang="symbols"></span>
-      <input id="moderationSymbolsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-    </div>
-    <table class="table table-striped">
-      <tr>
-        <td><strong data-lang="timeout-duration"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationSymbolsTimeout" onclick="commons.configEditable(this, 's')" id="moderationSymbolsTimeout"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationSymbolsTimeout_group">
-            <div class="input-group-addon" data-lang="seconds"></div>
-            <input style="width: 6em" id="input_moderationSymbolsTimeout" class="form-control input-sm" type="text"/>
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="links">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <div class="settings">
+          <div>
+            <strong data-lang="enabled"></strong>
           </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
-        <td>
-          <input id="moderationSymbolsSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="trigger-length-of-message"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationSymbolsTriggerLength" onclick="commons.configEditable(this, '')" id="moderationSymbolsTriggerLength"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationSymbolsTriggerLength_group">
-            <input style="width: 6em" id="input_moderationSymbolsTriggerLength" class="form-control input-sm" type="text"/>
+          <div>
+            <input id="moderationLinksToggle" type="checkbox" data-onstyle="success" data-offstyle="danger">
           </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="max-symbols-consecutively"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationSymbolsMaxConsecutively" onclick="commons.configEditable(this, '')" id="moderationSymbolsMaxConsecutively"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationSymbolsMaxConsecutively_group">
-            <input style="width: 6em" id="input_moderationSymbolsMaxConsecutively" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="max-symbols-percentage"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationSymbolsMaxPercent" onclick="commons.configEditable(this, '%')" id="moderationSymbolsMaxPercent"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationSymbolsMaxPercent_group">
-            <div class="input-group-addon">%</div>
-            <input style="width: 6em" id="input_moderationSymbolsMaxPercent" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message-warning"></strong>
-          <br/><small><strong>$count</strong> - warnings left</small></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationSymbolsWarningCustomMessage" onclick="commons.configEditable(this, '')" id="moderationSymbolsWarningCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationSymbolsWarningCustomMessage_group">
-            <input style="width: 100%" id="input_moderationSymbolsWarningCustomMessage" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationSymbolsCustomMessage" onclick="commons.configEditable(this, '')" id="moderationSymbolsCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationSymbolsCustomMessage_group">
-            <input style="width: 100%" id="input_moderationSymbolsCustomMessage" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
-</div>
+        </div>
 
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-  <div class="widget">
-    <div class="title">
-      <span data-lang="long-messages"></span>
-      <input id="moderationLongMessageToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-    </div>
-    <table class="table table-striped">
-      <tr>
-        <td><strong data-lang="timeout-duration"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationLongMessageTimeout" onclick="commons.configEditable(this, 's')" id="moderationLongMessageTimeout"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationLongMessageTimeout_group">
-            <div class="input-group-addon" data-lang="seconds"></div>
-            <input style="width: 6em" id="input_moderationLongMessageTimeout" class="form-control input-sm" type="text"/>
+        <div class="settings">
+          <div>
+            <strong data-lang="timeout-duration"></strong>
           </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
-        <td>
-          <input id="moderationLongMessageSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="trigger-length-of-message"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationLongMessageTriggerLength" onclick="commons.configEditable(this, '')" id="moderationLongMessageTriggerLength"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationLongMessageTriggerLength_group">
-            <input style="width: 6em" id="input_moderationLongMessageTriggerLength" class="form-control input-sm" type="text"/>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationLinksTimeout" onclick="commons.configEditable(this, 's')" id="moderationLinksTimeout"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationLinksTimeout_group">
+              <div class="input-group-addon" data-lang="seconds"></div>
+              <input style="width: 6em" id="input_moderationLinksTimeout" class="form-control input-sm" type="text" />
+            </div>
           </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message-warning"></strong>
-          <br/><small><strong>$count</strong> - warnings left</small></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationLongMessageWarningCustomMessage" onclick="commons.configEditable(this, '')" id="moderationLongMessageWarningCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationLongMessageWarningCustomMessage_group">
-            <input style="width: 100%" id="input_moderationLongMessageWarningCustomMessage" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationLongMessageCustomMessage" onclick="commons.configEditable(this, '')" id="moderationLongMessageCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationLongMessageCustomMessage_group">
-            <input style="width: 100%" id="input_moderationLongMessageCustomMessage" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
-</div>
-</div>
+        </div>
 
-<div class="row">
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-  <div class="widget">
-    <div class="title">
-      <span data-lang="capitals"></span>
-      <input id="moderationCapsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-    </div>
-    <table class="table table-striped">
-      <tr>
-        <td><strong data-lang="timeout-duration"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationCapsTimeout" onclick="commons.configEditable(this, 's')" id="moderationCapsTimeout"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationCapsTimeout_group">
-            <div class="input-group-addon" data-lang="seconds"></div>
-            <input style="width: 6em" id="input_moderationCapsTimeout" class="form-control input-sm" type="text"/>
+        <div class="settings">
+          <div>
+            <strong data-lang="moderation-subscribers-toggle"></strong>
           </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
-        <td>
-          <input id="moderationCapsSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="trigger-length-of-message"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationCapsTriggerLength" onclick="commons.configEditable(this, '')" id="moderationCapsTriggerLength"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationCapsTriggerLength_group">
-            <input style="width: 6em" id="input_moderationCapsTriggerLength" class="form-control input-sm" type="text"/>
+          <div>
+            <input id="moderationLinksSubsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
           </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="max-capitals-percentage"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationCapsMaxPercent" onclick="commons.configEditable(this, '%')" id="moderationCapsMaxPercent"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationCapsMaxPercent_group">
-            <div class="input-group-addon">%</div>
-            <input style="width: 6em" id="input_moderationCapsMaxPercent" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message-warning"></strong>
-          <br/><small><strong>$count</strong> - warnings left</small></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationCapsWarningCustomMessage" onclick="commons.configEditable(this, '')" id="moderationCapsWarningCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationCapsWarningCustomMessage_group">
-            <input style="width: 100%" id="input_moderationCapsWarningCustomMessage" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationCapsCustomMessage" onclick="commons.configEditable(this, '')" id="moderationCapsCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationCapsCustomMessage_group">
-            <input style="width: 100%" id="input_moderationCapsCustomMessage" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
-</div>
+        </div>
 
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-  <div class="widget">
-    <div class="title">
-      <span data-lang="spam"></span>
-      <input id="moderationSpamToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
+        <div class="settings">
+          <div>
+            <strong data-lang="moderation-spaces-toggle"></strong>
+          </div>
+          <div>
+            <input id="moderationLinksWithSpacesToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+      </div>
     </div>
-    <table class="table table-striped">
-      <tr>
-        <td><strong data-lang="timeout-duration"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationSpamTimeout" onclick="commons.configEditable(this, 's')" id="moderationSpamTimeout"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationSpamTimeout_group">
-            <div class="input-group-addon" data-lang="seconds"></div>
-            <input style="width: 6em" id="input_moderationSpamTimeout" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
-        <td>
-          <input id="moderationSpamSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="trigger-length-of-message"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationSpamTriggerLength" onclick="commons.configEditable(this, '')" id="moderationSpamTriggerLength"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationSpamTriggerLength_group">
-            <input style="width: 6em" id="input_moderationSpamTriggerLength" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="max-spam-length"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationSpamMaxLength" onclick="commons.configEditable(this, '')" id="moderationSpamMaxLength"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationSpamMaxLength_group">
-            <input style="width: 6em" id="input_moderationSpamMaxLength" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message-warning"></strong>
-          <br/><small><strong>$count</strong> - warnings left</small></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationSpamWarningCustomMessage" onclick="commons.configEditable(this, '')" id="moderationSpamWarningCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationSpamWarningCustomMessage_group">
-            <input style="width: 100%" id="input_moderationSpamWarningCustomMessage" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationSpamCustomMessage" onclick="commons.configEditable(this, '')" id="moderationSpamCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationSpamCustomMessage_group">
-            <input style="width: 100%" id="input_moderationSpamCustomMessage" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-    </table>
   </div>
-</div>
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-  <div class="widget">
-    <div class="title">
-      <span data-lang="colors"></span>
-      <input id="moderationColorToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-    </div>
-    <table class="table table-striped">
-      <tr>
-        <td><strong data-lang="timeout-duration"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationColorTimeout" onclick="commons.configEditable(this, 's')" id="moderationColorTimeout"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationColorTimeout_group">
-            <div class="input-group-addon" data-lang="seconds"></div>
-            <input style="width: 6em" id="input_moderationColorTimeout" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
-        <td>
-          <input id="moderationColorSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message-warning"></strong>
-          <br/><small><strong>$count</strong> - warnings left</small></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationColorWarningCustomMessage" onclick="commons.configEditable(this, '')" id="moderationColorWarningCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationColorWarningCustomMessage_group">
-            <input style="width: 100%" id="input_moderationColorWarningCustomMessage" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationColorCustomMessage" onclick="commons.configEditable(this, '')" id="moderationColorCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationColorCustomMessage_group">
-            <input style="width: 100%" id="input_moderationColorCustomMessage" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
-</div>
-</div>
 
-<div class="row">
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-  <div class="widget">
-    <div class="title">
-      <span data-lang="emotes"></span>
-      <input id="moderationEmotesToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-    </div>
-    <table class="table table-striped">
-      <tr>
-        <td><strong data-lang="timeout-duration"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationEmotesTimeout" onclick="commons.configEditable(this, 's')" id="moderationEmotesTimeout"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationEmotesTimeout_group">
-            <div class="input-group-addon" data-lang="seconds"></div>
-            <input style="width: 6em" id="input_moderationEmotesTimeout" class="form-control input-sm" type="text"/>
+  <div role="tabpanel" class="tab-pane" id="symbols">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <div class="settings">
+          <div>
+            <strong data-lang="enabled"></strong>
           </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
-        <td>
-          <input id="moderationEmotesSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="max-emotes-in-message"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationEmotesMaxCount" onclick="commons.configEditable(this, '')" id="moderationEmotesMaxCount"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationEmotesMaxCount_group">
-            <input style="width: 6em" id="input_moderationEmotesMaxCount" class="form-control input-sm" type="text"/>
+          <div>
+            <input id="moderationSymbolsToggle" type="checkbox" data-onstyle="success" data-offstyle="danger">
           </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message-warning"></strong>
-          <br/><small><strong>$count</strong> - warnings left</small></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationEmotesWarningCustomMessage" onclick="commons.configEditable(this, '')" id="moderationEmotesWarningCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationEmotesWarningCustomMessage_group">
-            <input style="width: 100%" id="input_moderationEmotesWarningCustomMessage" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationEmotesCustomMessage" onclick="commons.configEditable(this, '')" id="moderationEmotesCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationEmotesCustomMessage_group">
-            <input style="width: 100%" id="input_moderationEmotesCustomMessage" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
-</div>
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-  <div class="widget">
-    <div class="title" data-lang="timeout-settings"></div>
-    <table class="table table-striped">
-      <tr>
-        <td><strong data-lang="warnings-before-user-timeout"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationWarnings" onclick="commons.configEditable(this, '')" id="moderationWarnings"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationWarnings_group">
-            <input style="width: 6em" id="input_moderationWarnings" class="form-control input-sm" type="text"/>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="warning-should-be-timeout"></strong></td>
-        <td>
-          <input id="moderationWarningsTimeoutsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="announce-timeouts-in-chat"></strong></td>
-        <td>
-          <input id="moderationAnnounceTimeoutsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-        </td>
-      </tr>
-    </table>
-  </div>
-</div>
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-  <div class="widget">
-    <div class="title"><span data-lang="timeout-blacklist"></span> <small data-lang="one-record-per-line"></small></div>
-    <textarea class="form-control" rows="10" id="blacklist"></textarea>
+        </div>
 
-    <table class="table table-striped">
-      <tr>
-        <td><strong data-lang="moderation-subscribers-toggle"></strong></td>
-        <td>
-          <input id="moderationBlacklistSubsToggle" type="checkbox" data-toggle="toggle"  data-size="mini" data-onstyle="success" data-offstyle="danger">
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="timeout-duration"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationBlacklistTimeout" onclick="commons.configEditable(this, 's')" id="moderationBlacklistTimeout"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationBlacklistTimeout_group">
-            <div class="input-group-addon" data-lang="seconds"></div>
-            <input style="width: 6em" id="input_moderationBlacklistTimeout" class="form-control input-sm" type="text"/>
+        <div class="settings">
+          <div>
+            <strong data-lang="timeout-duration"></strong>
           </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message-warning"></strong>
-          <br/><small><strong>$count</strong> - warnings left</small></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationBlacklistWarningCustomMessage" onclick="commons.configEditable(this, '')" id="moderationBlacklistWarningCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationBlacklistWarningCustomMessage_group">
-            <input style="width: 100%" id="input_moderationBlacklistWarningCustomMessage" class="form-control input-sm" type="text"/>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationSymbolsTimeout" onclick="commons.configEditable(this, 's')" id="moderationSymbolsTimeout"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationSymbolsTimeout_group">
+              <div class="input-group-addon" data-lang="seconds"></div>
+              <input style="width: 6em" id="input_moderationSymbolsTimeout" class="form-control input-sm" type="text" />
+            </div>
           </div>
-        </td>
-      </tr>
-      <tr>
-        <td><strong data-lang="custom-ban-message"></strong></td>
-        <td>
-          <abbr title="click to edit" data-config-id="moderationBlacklistCustomMessage" onclick="commons.configEditable(this, '')" id="moderationBlacklistCustomMessage"></abbr>
-          <div class="input-group" style="display:none;" id="input_moderationBlacklistCustomMessage_group">
-            <input style="width: 100%" id="input_moderationBlacklistCustomMessage" class="form-control input-sm" type="text"/>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="moderation-subscribers-toggle"></strong>
           </div>
-        </td>
-      </tr>
-    </table>
+          <div>
+            <input id="moderationSymbolsSubsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="trigger-length-of-message"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationSymbolsTriggerLength" onclick="commons.configEditable(this, '')" id="moderationSymbolsTriggerLength"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationSymbolsTriggerLength_group">
+              <input style="width: 6em" id="input_moderationSymbolsTriggerLength" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="max-symbols-consecutively"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationSymbolsMaxConsecutively" onclick="commons.configEditable(this, '')"
+              id="moderationSymbolsMaxConsecutively"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationSymbolsMaxConsecutively_group">
+              <input style="width: 6em" id="input_moderationSymbolsMaxConsecutively" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="max-symbols-percentage"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationSymbolsMaxPercent" onclick="commons.configEditable(this, '%')" id="moderationSymbolsMaxPercent"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationSymbolsMaxPercent_group">
+              <div class="input-group-addon">%</div>
+              <input style="width: 6em" id="input_moderationSymbolsMaxPercent" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-  <div class="widget">
-    <div class="title"><span data-lang="timeout-whitelist"></span> <small data-lang="one-record-per-line"></small></div>
-    <textarea class="form-control" rows="10" id="whitelist"></textarea>
+
+  <div role="tabpanel" class="tab-pane" id="long-messages">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <div class="settings">
+          <div>
+            <strong data-lang="enabled"></strong>
+          </div>
+          <div>
+            <input id="moderationLongMessageToggle" type="checkbox" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="timeout-duration"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationLongMessageTimeout" onclick="commons.configEditable(this, 's')" id="moderationLongMessageTimeout"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationLongMessageTimeout_group">
+              <div class="input-group-addon" data-lang="seconds"></div>
+              <input style="width: 6em" id="input_moderationLongMessageTimeout" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="moderation-subscribers-toggle"></strong>
+          </div>
+          <div>
+            <input id="moderationLongMessageSubsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="trigger-length-of-message"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationLongMessageTriggerLength" onclick="commons.configEditable(this, '')"
+              id="moderationLongMessageTriggerLength"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationLongMessageTriggerLength_group">
+              <input style="width: 6em" id="input_moderationLongMessageTriggerLength" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+
+  <div role="tabpanel" class="tab-pane" id="capitals">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <div class="settings">
+          <div>
+            <strong data-lang="enabled"></strong>
+          </div>
+          <div>
+            <input id="moderationCapsToggle" type="checkbox" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="timeout-duration"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationCapsTimeout" onclick="commons.configEditable(this, 's')" id="moderationCapsTimeout"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationCapsTimeout_group">
+              <div class="input-group-addon" data-lang="seconds"></div>
+              <input style="width: 6em" id="input_moderationCapsTimeout" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="moderation-subscribers-toggle"></strong>
+          </div>
+          <div>
+            <input id="moderationCapsSubsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="trigger-length-of-message"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationCapsTriggerLength" onclick="commons.configEditable(this, '')" id="moderationCapsTriggerLength"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationCapsTriggerLength_group">
+              <input style="width: 6em" id="input_moderationCapsTriggerLength" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="max-capitals-percentage"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationCapsMaxPercent" onclick="commons.configEditable(this, '%')" id="moderationCapsMaxPercent"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationCapsMaxPercent_group">
+              <div class="input-group-addon">%</div>
+              <input style="width: 6em" id="input_moderationCapsMaxPercent" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div role="tabpanel" class="tab-pane" id="spam">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <div class="settings">
+          <div>
+            <strong data-lang="enabled"></strong>
+          </div>
+          <div>
+            <input id="moderationSpamToggle" type="checkbox" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="timeout-duration"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationSpamTimeout" onclick="commons.configEditable(this, 's')" id="moderationSpamTimeout"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationSpamTimeout_group">
+              <div class="input-group-addon" data-lang="seconds"></div>
+              <input style="width: 6em" id="input_moderationSpamTimeout" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="moderation-subscribers-toggle"></strong>
+          </div>
+          <div>
+            <input id="moderationSpamSubsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="trigger-length-of-message"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationSpamTriggerLength" onclick="commons.configEditable(this, '')" id="moderationSpamTriggerLength"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationSpamTriggerLength_group">
+              <input style="width: 6em" id="input_moderationSpamTriggerLength" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="max-spam-length"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationSpamMaxLength" onclick="commons.configEditable(this, '')" id="moderationSpamMaxLength"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationSpamMaxLength_group">
+              <input style="width: 6em" id="input_moderationSpamMaxLength" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div role="tabpanel" class="tab-pane" id="colors">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <div class="settings">
+          <div>
+            <strong data-lang="enabled"></strong>
+          </div>
+          <div>
+            <input id="moderationColorToggle" type="checkbox" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="timeout-duration"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationColorTimeout" onclick="commons.configEditable(this, 's')" id="moderationColorTimeout"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationColorTimeout_group">
+              <div class="input-group-addon" data-lang="seconds"></div>
+              <input style="width: 6em" id="input_moderationColorTimeout" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="moderation-subscribers-toggle"></strong>
+          </div>
+          <div>
+            <input id="moderationColorSubsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div role="tabpanel" class="tab-pane" id="emotes">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <div class="settings">
+          <div>
+            <strong data-lang="enabled"></strong>
+          </div>
+          <div>
+            <input id="moderationEmotesToggle" type="checkbox" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="timeout-duration"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationEmotesTimeout" onclick="commons.configEditable(this, 's')" id="moderationEmotesTimeout"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationEmotesTimeout_group">
+              <div class="input-group-addon" data-lang="seconds"></div>
+              <input style="width: 6em" id="input_moderationEmotesTimeout" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="moderation-subscribers-toggle"></strong>
+          </div>
+          <div>
+            <input id="moderationEmotesSubsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="max-emotes-in-message"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationEmotesMaxCount" onclick="commons.configEditable(this, '')" id="moderationEmotesMaxCount"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationEmotesMaxCount_group">
+              <input style="width: 6em" id="input_moderationEmotesMaxCount" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div role="tabpanel" class="tab-pane" id="timeout-settings">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <div class="settings">
+          <div>
+            <strong data-lang="warnings-before-user-timeout"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationWarnings" onclick="commons.configEditable(this, '')" id="moderationWarnings"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationWarnings_group">
+              <input style="width: 6em" id="input_moderationWarnings" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="warning-should-be-timeout"></strong>
+          </div>
+          <div>
+            <input id="moderationWarningsTimeoutsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="announce-timeouts-in-chat"></strong>
+          </div>
+          <div>
+            <input id="moderationAnnounceTimeoutsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div role="tabpanel" class="tab-pane" id="blacklist">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <div class="settings" style="column-count: 1">
+          <div>
+            <strong data-lang="timeout-blacklist"></strong>
+            <small data-lang="one-record-per-line"></small>
+          </div>
+          <div>
+            <textarea class="form-control" rows="10" id="blacklist-textarea"></textarea>
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="moderation-subscribers-toggle"></strong>
+          </div>
+          <div>
+            <input id="moderationBlacklistSubsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+
+        <div class="settings">
+          <div>
+            <strong data-lang="timeout-duration"></strong>
+          </div>
+          <div>
+            <abbr title="click to edit" data-config-id="moderationBlacklistTimeout" onclick="commons.configEditable(this, 's')" id="moderationBlacklistTimeout"></abbr>
+            <div class="input-group" style="display:none;" id="input_moderationBlacklistTimeout_group">
+              <div class="input-group-addon" data-lang="seconds"></div>
+              <input style="width: 6em" id="input_moderationBlacklistTimeout" class="form-control input-sm" type="text" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div role="tabpanel" class="tab-pane" id="whitelist">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <div class="settings" style="column-count: 1">
+          <div>
+            <strong data-lang="timeout-whitelist"></strong>
+            <small data-lang="one-record-per-line"></small>
+          </div>
+          <div>
+            <textarea class="form-control" rows="10" id="whitelist-textarea"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div role="tabpanel" class="tab-pane" id="responses">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget" id="bot-responses"></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -497,11 +522,14 @@
   socket.emit('moderation.lists.get')
 
   var createToggle = function (id, value, options) {
-    options = options || {on: translations['on'], off: translations['off']}
+    options = options || {
+      on: translations['on'],
+      off: translations['off']
+    }
     $('#' + id + 'Toggle').bootstrapToggle(options)
     $('#' + id + 'Toggle').bootstrapToggle(value ? 'on' : 'off')
     $('#' + id + 'Toggle').off('change')
-    $('#' + id + 'Toggle').on('change', function() {
+    $('#' + id + 'Toggle').on('change', function () {
       var data = {}
       data[id] = $(this).prop('checked')
       if ($('#' + id + 'Toggle').data('init')) socket.emit('saveConfiguration', data)
@@ -509,13 +537,11 @@
     $('#' + id + 'Toggle').data('init', true)
   }
 
-  socket.once('configuration', function(data) {
+  socket.once('configuration', function (data) {
     createToggle('moderationLinks', data.moderationLinks)
     createToggle('moderationLinksSubs', data.moderationLinksSubs)
     createToggle('moderationLinksWithSpaces', data.moderationLinksWithSpaces)
     $("#moderationLinksTimeout").text(data.moderationLinksTimeout + 's')
-    $("#moderationLinksCustomMessage").text(data.moderationLinksCustomMessage.length > 0 ? data.moderationLinksCustomMessage : '< empty >')
-    $("#moderationLinksWarningCustomMessage").text(data.moderationLinksWarningCustomMessage.length > 0 ? data.moderationLinksWarningCustomMessage : '< empty >')
 
     createToggle('moderationSymbols', data.moderationSymbols)
     createToggle('moderationSymbolsSubs', data.moderationSymbolsSubs)
@@ -523,64 +549,108 @@
     $("#moderationSymbolsTriggerLength").text(data.moderationSymbolsTriggerLength)
     $("#moderationSymbolsMaxConsecutively").text(data.moderationSymbolsMaxConsecutively)
     $("#moderationSymbolsMaxPercent").text(data.moderationSymbolsMaxPercent + '%')
-    $("#moderationSymbolsCustomMessage").text(data.moderationSymbolsCustomMessage.length > 0 ? data.moderationSymbolsCustomMessage : '< empty >')
-    $("#moderationSymbolsWarningCustomMessage").text(data.moderationSymbolsWarningCustomMessage.length > 0 ? data.moderationSymbolsWarningCustomMessage : '< empty >')
 
     createToggle('moderationLongMessage', data.moderationLongMessage)
     createToggle('moderationLongMessageSubs', data.moderationLongMessageSubs)
     $("#moderationLongMessageTimeout").text(data.moderationLongMessageTimeout + 's')
     $("#moderationLongMessageTriggerLength").text(data.moderationLongMessageTriggerLength)
-    $("#moderationLongMessageCustomMessage").text(data.moderationLongMessageCustomMessage.length > 0 ? data.moderationLongMessageCustomMessage : '< empty >')
-    $("#moderationLongMessageWarningCustomMessage").text(data.moderationLongMessageWarningCustomMessage.length > 0 ? data.moderationLongMessageWarningCustomMessage : '< empty >')
 
     createToggle('moderationCaps', data.moderationCaps)
     createToggle('moderationCapsSubs', data.moderationCapsSubs)
     $("#moderationCapsTimeout").text(data.moderationCapsTimeout + 's')
     $("#moderationCapsTriggerLength").text(data.moderationCapsTriggerLength)
     $("#moderationCapsMaxPercent").text(data.moderationCapsMaxPercent + '%')
-    $("#moderationCapsCustomMessage").text(data.moderationCapsCustomMessage.length > 0 ? data.moderationCapsCustomMessage : '< empty >')
-    $("#moderationCapsWarningCustomMessage").text(data.moderationCapsWarningCustomMessage.length > 0 ? data.moderationCapsWarningCustomMessage : '< empty >')
 
     createToggle('moderationSpam', data.moderationSpam)
     createToggle('moderationSpamSubs', data.moderationSpamSubs)
     $("#moderationSpamTimeout").text(data.moderationSpamTimeout + 's')
     $("#moderationSpamTriggerLength").text(data.moderationSpamTriggerLength)
     $("#moderationSpamMaxLength").text(data.moderationSpamMaxLength)
-    $("#moderationSpamCustomMessage").text(data.moderationSpamCustomMessage.length > 0 ? data.moderationSpamCustomMessage : '< empty >')
-    $("#moderationSpamWarningCustomMessage").text(data.moderationSpamWarningCustomMessage.length > 0 ? data.moderationSpamWarningCustomMessage : '< empty >')
 
     createToggle('moderationColor', data.moderationColor)
     createToggle('moderationColorSubs', data.moderationColorSubs)
     $("#moderationColorTimeout").text(data.moderationColorTimeout + 's')
-    $("#moderationColorCustomMessage").text(data.moderationColorCustomMessage.length > 0 ? data.moderationColorCustomMessage : '< empty >')
-    $("#moderationColorWarningCustomMessage").text(data.moderationColorWarningCustomMessage.length > 0 ? data.moderationColorWarningCustomMessage : '< empty >')
 
     createToggle('moderationEmotes', data.moderationEmotes)
     createToggle('moderationEmotesSubs', data.moderationEmotesSubs)
     $("#moderationEmotesTimeout").text(data.moderationEmotesTimeout + 's')
     $("#moderationEmotesMaxCount").text(data.moderationEmotesMaxCount)
-    $("#moderationEmotesCustomMessage").text(data.moderationEmotesCustomMessage.length > 0 ? data.moderationEmotesCustomMessage : '< empty >')
-    $("#moderationEmotesWarningCustomMessage").text(data.moderationEmotesWarningCustomMessage.length > 0 ? data.moderationEmotesWarningCustomMessage : '< empty >')
 
     createToggle('moderationBlacklistSubs', data.moderationBlacklistSubs)
     $("#moderationBlacklistTimeout").text(data.moderationBlacklistTimeout + 's')
-    $("#moderationBlacklistCustomMessage").text(data.moderationBlacklistCustomMessage.length > 0 ? data.moderationBlacklistCustomMessage : '< empty >')
-    $("#moderationBlacklistWarningCustomMessage").text(data.moderationBlacklistWarningCustomMessage.length > 0 ? data.moderationBlacklistWarningCustomMessage : '< empty >')
 
     $("#moderationWarnings").text(data.moderationWarnings)
-    createToggle('moderationWarningsTimeouts', data.moderationWarningsTimeouts, {on: translations['will-timeout'], off: translations['warning']})
+    createToggle('moderationWarningsTimeouts', data.moderationWarningsTimeouts, {
+      on: translations['will-timeout'],
+      off: translations['warning']
+    })
 
     $("#moderationAnnounceTimeouts").text(data.moderationAnnounceTimeouts)
-    createToggle('moderationAnnounceTimeouts', data.moderationAnnounceTimeouts, {on: translations['announce'], off: translations['muted']})
+    createToggle('moderationAnnounceTimeouts', data.moderationAnnounceTimeouts, {
+      on: translations['announce'],
+      off: translations['muted']
+    })
   })
 
   socket.off('moderation.lists')
-  socket.on('moderation.lists', function(lists) {
-    $('#blacklist').val(lists.blacklist.join('\n'))
-    $('#whitelist').val(lists.whitelist.join('\n'))
+  socket.on('moderation.lists', function (lists) {
+    $('#blacklist-textarea').val(!_.isNil(lists.blacklist) ? lists.blacklist.join('\n') : '')
+    $('#whitelist-textarea').val(!_.isNil(lists.whitelist) ? lists.whitelist.join('\n') : '')
   })
 
   $('#blacklist, #whitelist').off().on('focusout', function (ev) {
-    socket.emit('moderation.lists.set', { blacklist: $('#blacklist').val().split('\n'), whitelist: $('#whitelist').val().split('\n') })
+    socket.emit('moderation.lists.set', {
+      blacklist: $('#blacklist-textarea').val().split('\n'),
+      whitelist: $('#whitelist-textarea').val().split('\n')
+    })
   })
+
+  var moderation = {
+    responses: (id) => {
+      id = id || null
+      let system = 'moderation'
+      socket.emit('responses.get', system, function (data) {
+        for (let [key, entry] of Object.entries(data)) {
+          if (!_.isNil(id) && `${system}.${key}` !== id) continue // continue if we want only specific id
+          if (!_.isNil(id)) {
+            $(`abbr[data-id="${id}"]`).text(entry)
+            $(`abbr[data-id="${id}"]`).focus()
+            $(`abbr[data-id="${id}"]`).blur()
+            break
+          }
+
+          var filters = ['global']
+
+          let div = $('<div>')
+            .css('padding', '4px 5px 4px 5px')
+          let response = $('<span>')
+            .text('Response')
+            .addClass('label label-primary label-bot-response')
+          let kbd = $('<kbd>')
+            .text(key.replace(/-/g, ' '))
+            .addClass('kbd-bot-response')
+          let span = $('<span>').addClass('custom-response')
+            .attr('data-id', `${system}.${key}`)
+            .css('font-size', '80%')
+
+          $('#bot-responses').append(div.append(response).append(kbd).append(span))
+
+          if (_.includes(['alias-was-not-found', 'alias-was-edited', 'alias-was-added', 'alias-was-enabled',
+              'alias-was-disabled', 'alias-was-concealed', 'alias-was-exposed', 'alias-was-removed'
+            ], key)) filters.push('alias')
+          if (_.includes(['list-is-not-empty'], key)) filters.push('list')
+
+          $(`[data-id="${system}.${key}"]`).html(commons.editable({
+            text: entry,
+            id: `${system}.${key}`,
+            fnc: 'commons.setResponse',
+            filters: filters
+          }))
+        }
+      })
+    }
+  }
+
+  moderation.responses()
+
 </script>
