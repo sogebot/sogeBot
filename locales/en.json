@@ -35,6 +35,22 @@
       "sendWithMe": {
         "true": "Bot will send messages using /me",
         "false": "Bot won't send messages using /me"
+      },
+      "songs": {
+        "songrequest": {
+          "true": "Song requests are {core.enabled}",
+          "false": "Song requests are {core.disabled}"
+        },
+        "playlist": {
+          "true": "Playlist is {core.enabled}",
+          "false": "Playlist is {core.disabled}"
+        },
+        "volume": "Volume succesfully set to $value%",
+        "duration": "Maximum song length set to $value minutes.",
+        "shuffle": {
+          "true": "Songs will play randomly",
+          "false": "Songs will play by time added in playlist"
+        }
       }
     },
     "years": "year|years",
@@ -86,7 +102,8 @@
         "pointsName": "Points name",
         "rank": "Rank",
         "nextrank": "Next rank",
-        "username": "Username"
+        "username": "Username",
+        "value": "Value"
       }
     },
     "page-settings": {
@@ -609,41 +626,21 @@
     }
   },
   "songs": {
-    "settings": {
-      "songrequest": {
-        "text": "Song requests are ",
-        "true": "{songs.settings.songrequest.text} {core.enabled}",
-        "false": "{songs.settings.songrequest.text} {core.disabled}"
-      },
-      "playlist": {
-        "text": "Playlist is ",
-        "true": "{songs.settings.playlist.text} {core.enabled}",
-        "false": "{songs.settings.playlist.text} {core.disabled}"
-      },
-      "volume": "Volume succesfully set to $value%",
-      "duration": "Maximum song length set to $value minutes.",
-      "shuffle": {
-        "true": "Songs will play randomly",
-        "false": "Songs will play by time added in playlist"
-      }
-    },
-    "bannedSong": "Song $title was banned and will never play again!",
-    "bannedSongTimeout": "You've got timeout for posting banned song",
-    "unbannedSong": "Song was succesfully unbanned",
-    "notBannedSong": "This song was not banned",
-    "currentSong": {
-      "songrequest": "Current song is $title requested by $username",
-      "playlist": "Current song is $title from playlist"
-    },
-    "noCurrentSong": "No song is currently playing",
-    "isBanned": "Sorry, $sender, but this song is banned",
-    "notFound": "Sorry, $sender, but this song was not found",
-    "tooLong": "Sorry, $sender, but this song is too long",
-    "addedSong": "$title was added to queue by $sender",
-    "addedSongPlaylist": "$title was added to playlist",
-    "removeSongQueue": "$title was removed from queue",
-    "alreadyInPlaylist": "Song $title is already in playlist",
-    "removeSongPlaylist": "$title was removed from playlist"
+    "song-was-banned": "Song $name was banned and will never play again!",
+    "song-was-banned-timeout-message": "You've got timeout for posting banned song",
+    "song-was-unbanned": "Song was succesfully unbanned",
+    "song-was-not-banned": "This song was not banned",
+    "no-song-is-currently-playing": "No song is currently playing",
+    "current-song-from-playlist": "Current song is $name from playlist",
+    "current-song-from-songrequest": "Current song is $name requested by $username",
+    "song-is-banned": "Sorry, $sender, but this song is banned",
+    "song-was-not-found": "Sorry, $sender, but this song was not found",
+    "song-is-too-long": "Sorry, $sender, but this song is too long",
+    "song-was-added-to-queue": "$sender, song $name was added to queue",
+    "song-was-added-to-playlist": "$sender, song $name was added to playlist",
+    "song-is-already-in-playlist": "$sender, song $name is already in playlist",
+    "song-was-removed-from-playlist": "$sender, song $name was removed from playlist",
+    "song-was-removed-from-queue": "$sender, your song $name was removed from queue"
   },
   "price": {
     "price-parse-failed": "{core.command-parse} !price",

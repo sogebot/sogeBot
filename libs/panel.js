@@ -199,7 +199,7 @@ Panel.prototype.socketListening = function (self, on, fnc) {
 Panel.prototype.registerSockets = function (options) {
   const name = options.self.constructor.name.toLowerCase()
   for (let fnc of options.expose) {
-    if (!_.isFunction(options.self[fnc])) global.log.error(`Function ${options.self[fnc]} of ${options.self.constructor.name} is undefined`)
+    if (!_.isFunction(options.self[fnc])) global.log.error(`Function ${fnc} of ${options.self.constructor.name} is undefined`)
     else this.socketListeners.push({self: options.self, on: `${name}.${fnc}`, fnc: options.self[fnc], finally: options.finally})
   }
 }

@@ -36,7 +36,7 @@
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
       <div class="widget">
         <table class="table table-striped table-responsive table-condensed">
-          <tbody id="banned-songs"></tbody>
+          <tbody id="banned-songs-table"></tbody>
         </table>
       </div>
     </div>
@@ -94,10 +94,19 @@
     list: {}
   }
 
-  socket.emit('songs.sendPlaylist');
+  socket.emit('songs.send');
 
   socket.on('songPlaylistList', function (list) {
     updatePlaylist(list)
+  });
+
+  socket.on('bannedSongsList', function (list) {
+    $("#banned-songs-table").empty()
+    _.each(list, function (song) {
+      $("#banned-songs-table").append('<tr><td><a href="http://youtu.be/' + song.videoId + '">' + song.videoId +
+        '</a></td><td>' +
+        song.title + '</td></tr>')
+    })
   });
 
   var updatePlaylist = function (list) {
@@ -135,5 +144,47 @@
   }
 
   $('#shuffleToggle').bootstrapToggle()
+
+  var songs = {
+    responses: (id) => {
+      id = id || null
+      let system = 'songs'
+      socket.emit('responses.get', system, function (data) {
+        for (let [key, entry] of Object.entries(data)) {
+          if (!_.isNil(id) && `${system}.${key}` !== id) return true // continue if we want only specific id
+          var filters = ['global']
+
+          let div = $('<div>')
+            .css('padding', '4px 5px 4px 5px')
+          let response = $('<span>')
+            .text('Response')
+            .addClass('label label-primary label-bot-response')
+          let kbd = $('<kbd>')
+            .text(key.replace(/-/g, ' '))
+            .addClass('kbd-bot-response')
+          let span = $('<span>').addClass('custom-response')
+            .attr('data-id', `${system}.${key}`)
+            .css('font-size', '80%')
+
+          $('#bot-responses').append(div.append(response).append(kbd).append(span))
+
+          if (_.includes(['song-was-banned', 'song-was-added-to-queue', 'song-was-added-to-playlist',
+              'song-is-already-in-playlist', 'song-was-removed-from-playlist', 'current-song-from-playlist',
+              'current-song-from-songrequest', 'song-was-removed-from-queue'
+            ], key)) filters.push('name')
+          if (_.includes(['current-song-from-songrequest'], key)) filters.push('username')
+
+          $(`[data-id="${system}.${key}"]`).html(commons.editable({
+            text: entry,
+            id: key,
+            fnc: 'commons.setResponse',
+            filters: filters
+          }))
+        }
+      })
+    }
+  }
+
+  songs.responses()
 
 </script>
