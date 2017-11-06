@@ -160,8 +160,10 @@ class Ranks {
     debug('show(%j, %j)', self, sender)
 
     let user = await global.users.get(sender.username)
-    let rank = !_.isUndefined(user.rank) ? user.rank : null
+    let rank = !_.isNil(user.rank) ? user.rank : null
+    debug('Users rank: %j', rank)
     rank = !_.isNil(user.custom.rank) ? user.custom.rank : rank
+    debug('Users rank w/ custom: %j', rank)
 
     let watched = !_.isNil(user.time) && !_.isNil(user.time.watched) ? user.time.watched : 0
     let ranks = await global.db.engine.find('ranks')
@@ -174,7 +176,7 @@ class Ranks {
       }
     }
 
-    if (!_.isNil(rank)) {
+    if (_.isNil(rank)) {
       let message = global.commons.prepare('ranks.user-dont-have-rank')
       debug(message); global.commons.sendMessage(message, sender)
       return true
