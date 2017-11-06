@@ -35,6 +35,22 @@
       "sendWithMe": {
         "true": "Bot bude posilat zpravy pomoci /me",
         "false": "Bot nebude posilat zpravy pomoci /me"
+      },
+      "songs": {
+        "songrequest": {
+          "true": "Prehravani song requestu je {core.enabled}",
+          "false": "Prehravani song requestu je {core.disabled}"
+        },
+        "playlist": {
+          "true": "Prehravani playlistu je {core.enabled}",
+          "false": "Prehravani playlistu je {core.disabled}"
+        },
+        "volume": "Hlasitost nastavena na $value%",
+        "duration": "Maximalni delka pisne nastavena na $value minut.",
+        "shuffle": {
+          "true": "Pisnicky budou hrat nahodne",
+          "false": "Pisnicky budou hrat podle casu pridani"
+        }
       }
     },
     "years": "rok|4:roky|roku",
@@ -86,7 +102,8 @@
         "pointsName": "Název bodů",
         "rank": "Rank",
         "nextrank": "Další rank",
-        "username": "Uživatelské jméno"
+        "username": "Uživatelské jméno",
+        "value": "Hodnota"
       }
     },
     "page-settings": {
@@ -299,7 +316,8 @@
     "cost": "Cena",
     "name": "Název",
     "playlist": "Playlist",
-    "public-link": "veřejný odkaz",
+    "public-link": "Veřejný odkaz",
+    "banned-songs": "Zabanované písničky",
     "youtube-id": "YouTube ID",
     "length": "Doba trvání",
     "volume": "Hlasitost",
@@ -608,41 +626,21 @@
     }
   },
   "songs": {
-    "settings": {
-      "songrequest": {
-        "text": "Prehravani song requestu je ",
-        "true": "{songs.settings.songrequest.text} {core.enabled}",
-        "false": "{songs.settings.songrequest.text} {core.disabled}"
-      },
-      "playlist": {
-        "text": "Prehravani playlistu je ",
-        "true": "{songs.settings.playlist.text} {core.enabled}",
-        "false": "{songs.settings.playlist.text} {core.disabled}"
-      },
-      "volume": "Hlasitost nastavena na $value%",
-      "duration": "Maximalni delka pisne nastavena na $value minut.",
-      "shuffle": {
-        "true": "Pisnicky budou hrat nahodne",
-        "false": "Pisnicky budou hrat podle casu pridani"
-      }
-    },
-    "bannedSong": "Pisen $title byla zabanovana a nebude uz nikdy hrat!",
-    "bannedSongTimeout": "Dostal si timeout za zabanovanou pisen",
-    "unbannedSong": "Pisen byla uspesne odbanovana",
-    "notBannedSong": "Tato pisen nebyla zabanovana",
-    "currentSong": {
-      "songrequest": "Prave hrajici pisen je $title pridana uzivatelem $username",
-      "playlist": "Prave hrajici pisen je $title z playlistu"
-    },
-    "noCurrentSong": "Nic momentalne nehraje",
-    "isBanned": "Promin, $sender, ale tahle pisen je zabanovana",
-    "notFound": "Promin, $sender, ale tahle pisen nebyla nalezena",
-    "tooLong": "Promin, $sender, ale tahle pisen je moc dlouha",
-    "addedSong": "$title byla pridana do queue uzivatelem $sender",
-    "addedSongPlaylist": "$title byla pridana do playlistu",
-    "removeSongQueue": "$title byla odstranena z queue",
-    "alreadyInPlaylist": "Pisen $title jiz je v playlistu",
-    "removeSongPlaylist": "$title byla odstranena z playlistu"
+    "song-was-banned": "Pisen $name byla zabanovana a nebude uz nikdy hrat!",
+    "song-was-banned-timeout-message": "Dostal si timeout za zabanovanou pisen",
+    "song-was-unbanned": "Pisen byla uspesne odbanovana",
+    "song-was-not-banned": "Tato pisen nebyla zabanovana",
+    "no-song-is-currently-playing": "Nic momentalne nehraje",
+    "current-song-from-playlist": "Prave hrajici pisen je $name z playlistu",
+    "current-song-from-songrequest": "Prave hrajici pisen je $name pridana uzivatelem $username",
+    "song-is-banned": "Promin, $sender, ale tahle pisen je zabanovana",
+    "song-was-not-found": "Promin, $sender, ale tahle pisen nebyla nalezena",
+    "song-is-too-long": "Promin, $sender, ale tahle pisen je moc dlouha",
+    "song-was-added-to-queue": "$sender, pisen $name byla pridana do queue",
+    "song-was-added-to-playlist": "$sender, pisen $name byla pridana do playlistu",
+    "song-is-already-in-playlist": "$sender, pisen $name je jiz v playlistu",
+    "song-was-removed-from-playlist": "$sender, pisen $name byla odstranena z playlistu",
+    "song-was-removed-from-queue": "$sender, tva pisen $name byla odstranena z queue"
   },
   "price": {
     "price-parse-failed": "{core.command-parse} !price",

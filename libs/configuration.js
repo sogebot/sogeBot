@@ -31,40 +31,43 @@ Configuration.prototype.register = function (cfgName, success, filter, defaultVa
   this.default[cfgName] = {value: defaultValue}
 }
 
-Configuration.prototype.setValue = async function (self, sender, text) {
+Configuration.prototype.setValue = async function (self, sender, text, quiet) {
   try {
     var cmd = text.split(' ')[0]
     var value = text.replace(text.split(' ')[0], '').trim()
     var filter = self.cfgL[cmd].filter
+    quiet = _.isBoolean(quiet) ? quiet : false
 
     if (value.length === 0) value = self.default[cmd].value
-    debug('key: %s', cmd)
     debug('filter: %s', filter)
+    debug('key: %s', cmd)
     debug('value to set: %s', value)
+    debug('text: %s', text)
+    debug('isQuiet: %s', quiet)
 
     if (_.isString(value)) value = value.trim()
     if (filter === 'number' && Number.isInteger(parseInt(value, 10))) {
       value = parseInt(value, 10)
 
       await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
-      global.commons.sendToOwners(global.translate(self.cfgL[cmd].success).replace(/\$value/g, value))
+      if (!quiet) global.commons.sendToOwners(global.translate(self.cfgL[cmd].success).replace(/\$value/g, value))
 
       self.cfgL[cmd].value = value
     } else if (filter === 'bool' && (value === 'true' || value === 'false' || _.isBoolean(value))) {
       value = !_.isBoolean(value) ? (value.toLowerCase() === 'true') : value
 
       await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
-      global.commons.sendToOwners(global.translate(self.cfgL[cmd].success + '.' + value).replace(/\$value/g, value))
+      if (!quiet) global.commons.sendToOwners(global.translate(self.cfgL[cmd].success + '.' + value).replace(/\$value/g, value))
 
       self.cfgL[cmd].value = value
     } else if (filter === 'string' && !(value === 'true' || value === 'false' || _.isBoolean(value)) && !Number.isInteger(parseInt(value, 10))) {
       self.cfgL[cmd].value = value
       if (cmd === 'lang') {
-        global.commons.sendToOwners(global.translate('core.lang-selected'))
+        if (!quiet) global.commons.sendToOwners(global.translate('core.lang-selected'))
         global.panel.io.emit('lang', global.translate({root: 'webpanel'}))
       }
       await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
-      if (cmd !== 'lang') global.commons.sendToOwners(global.translate(self.cfgL[cmd].success).replace(/\$value/g, value))
+      if (cmd !== 'lang' && !quiet) global.commons.sendToOwners(global.translate(self.cfgL[cmd].success).replace(/\$value/g, value))
     } else global.commons.sendMessage('Sorry, $sender, cannot parse !set command.', sender)
 
     let emit = {}

@@ -1,32 +1,64 @@
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <div class="widget">
-    <h2 class="title"><span data-lang="playlist"></span> <small><a href="/playlist/" data-lang="public-link"></a></h2>
-    <table class="table table-striped table-responsive">
-      <thead>
-        <tr>
-          <th data-lang="youtube-id"></th>
-          <th data-lang="title"></th>
-          <th data-lang="length"></th>
-          <th data-lang="volume"></th>
-          <th><span data-lang="start-time"></span> - <span data-lang="end-time"></span></th>
-        </tr>
-      </thead>
-      <tbody id="Playlist" >
-      </tbody>
-    </table>
+  <ul class="nav nav-pills">
+    <li>
+      <span data-lang="playlist" class="title text-default"></span>
+    </li>
+    <li class="active">
+      <a data-toggle="tab" href="#manage" data-lang="manage"></a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#banned-songs" data-lang="banned-songs"></a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#responses" data-lang="bot-responses"></a>
+    </li>
+    <li>
+      <a href="/playlist/" target="_blank">
+        <span data-lang="public-link"></span>
+        <i class="fa fa-external-link" aria-hidden="true"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="manage">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <table class="table table-striped table-responsive table-condensed">
+          <tbody id="Playlist"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div role="tabpanel" class="tab-pane" id="banned-songs">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+        <table class="table table-striped table-responsive table-condensed">
+          <tbody id="banned-songs-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div role="tabpanel" class="tab-pane" id="responses">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget" id="bot-responses"></div>
+    </div>
   </div>
 </div>
 
 <script>
   var playlist = {
-    makeEditable: function(id, el, input, endTime) {
-      el.on('click', function() {
+    makeEditable: function (id, el, input, endTime) {
+      el.on('click', function () {
         el.css('display', 'none')
         input.css('display', 'inline')
         input.focus()
       })
 
-      input.on('focusout', function() {
+      input.on('focusout', function () {
         var value = input.val()
         var valueBefore = el.text()
         input.css('display', 'none')
@@ -35,7 +67,8 @@
         /* check if value match correct pattern */
         var pattern = value.match(/^(\d\d):(\d\d):(\d\d)/)
         if (pattern !== null) {
-          var currentValue = parseInt(pattern[1], 10) * 3600 + parseInt(pattern[2], 10) * 60 + parseInt(pattern[3], 10)
+          var currentValue = parseInt(pattern[1], 10) * 3600 + parseInt(pattern[2], 10) * 60 + parseInt(pattern[
+            3], 10)
           if (currentValue > endTime) currentValue = endTime
           var out = new Date(currentValue * 1000).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
           el.text(out)
@@ -43,10 +76,16 @@
 
           /* emit update */
           var lowValuePtrn = $(".lowValue__" + id).text().match(/^(\d\d):(\d\d):(\d\d)/)
-          var lowValue = parseInt(lowValuePtrn[1], 10) * 3600 + parseInt(lowValuePtrn[2], 10) * 60 + parseInt(lowValuePtrn[3], 10)
+          var lowValue = parseInt(lowValuePtrn[1], 10) * 3600 + parseInt(lowValuePtrn[2], 10) * 60 + parseInt(
+            lowValuePtrn[3], 10)
           var highValuePtrn = $(".highValue__" + id).text().match(/^(\d\d):(\d\d):(\d\d)/)
-          var highValue = parseInt(highValuePtrn[1], 10) * 3600 + parseInt(highValuePtrn[2], 10) * 60 + parseInt(highValuePtrn[3], 10)
-          socket.emit('setTrim', {id:id, lowValue:lowValue, highValue:highValue});
+          var highValue = parseInt(highValuePtrn[1], 10) * 3600 + parseInt(highValuePtrn[2], 10) * 60 +
+            parseInt(highValuePtrn[3], 10)
+          socket.emit('songs.setTrim', {
+            id: id,
+            lowValue: lowValue,
+            highValue: highValue
+          });
         } else {
           input.val(valueBefore) // reset value
         }
@@ -55,13 +94,38 @@
     list: {}
   }
 
-  socket.emit('getPlaylist');
+  socket.emit('songs.send');
 
-  socket.on('songPlaylistList', function(list) {
+  socket.on('songPlaylistList', function (list) {
     updatePlaylist(list)
   });
 
-  var updatePlaylist = function(list) {
+  socket.on('bannedSongsList', function (list) {
+    $("#banned-songs-table").empty()
+    _.each(list, function (song) {
+      $("#banned-songs-table").append('<tr class="bannedsong-item" data-title="' + song.title + '" data-videoid="' + song.videoId + '"><td><a href="http://youtu.be/' + song.videoId + '">' + song.videoId +
+        '</a></td><td>' +
+        song.title + '</td></tr>')
+    })
+
+    new BootstrapMenu(".bannedsong-item", {
+        fetchElementData: function($el) {
+          return $el.data();
+        },
+        actions: [{
+          name: function(data) {
+            return 'Unban <strong>' + data.title + '</strong>'
+          },
+          classNames: ['action-danger'],
+          iconClass: 'fa-trash-o',
+          onClick: function(data) {
+            socket.emit('songs.unbanSong', data.videoid)
+          }
+        }]
+      })
+  });
+
+  var updatePlaylist = function (list) {
     playlist.list = list
     $("#Playlist").empty();
     for (var index in list) {
@@ -79,13 +143,79 @@
         var lowValue = (new Date(startTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
         var highValue = (new Date(endTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
 
-        $("#Playlist").append('<tr><td><a href="http://youtu.be/' + videoID + '">' + videoID + '</a></td><td>' + title + '</td><td>' + (new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] + '</td><td>' + volume + '%</td><td><div id="slider___' + videoID + '___' + length_seconds + '"></div><div class="trim"><abbr title="click to edit" class="lowValue__' + videoID + '">' + lowValue + '</abbr><input style="width: 6em; display: none" class="form-control input-sm lowValueInput__' + videoID + ' type="text" value="' + lowValue + '"/> - <abbr title="click to edit" class="highValue__' + videoID + '">' + highValue + '</abbr><input style="width: 6em; display: none" class="form-control input-sm highValueInput__' + videoID + ' type="text" value="' + highValue + '"/></div></td></tr>');
+        $("#Playlist").append('<tr class="playlist-song" data-title="' + title + '" data-videoid="' + videoID + '"><td><a href="http://youtu.be/' + videoID + '">' + videoID + '</a></td><td>' +
+          title + '</td><td>' + (new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] +
+          '</td><td>' + volume + '%</td><td><div id="slider___' + videoID + '___' + length_seconds +
+          '"></div><div class="trim"><abbr title="click to edit" class="lowValue__' + videoID + '">' + lowValue +
+          '</abbr><input style="width: 6em; display: none" class="form-control input-sm lowValueInput__' + videoID +
+          ' type="text" value="' + lowValue + '"/> - <abbr title="click to edit" class="highValue__' + videoID +
+          '">' + highValue +
+          '</abbr><input style="width: 6em; display: none" class="form-control input-sm highValueInput__' + videoID +
+          ' type="text" value="' + highValue + '"/></div></td></tr>');
 
         playlist.makeEditable(videoID, $(".lowValue__" + videoID), $(".lowValueInput__" + videoID), endTime)
         playlist.makeEditable(videoID, $(".highValue__" + videoID), $(".highValueInput__" + videoID), length_seconds)
       }
     }
+    new BootstrapMenu(".playlist-song", {
+        fetchElementData: function($el) {
+          return $el.data();
+        },
+        actions: [{
+          name: function(data) {
+            return 'Delete <strong>' + data.title + '</strong> From Playlist'
+          },
+          classNames: ['action-danger'],
+          iconClass: 'fa-trash-o',
+          onClick: function(data) {
+            socket.emit('songs.removeSongFromPlaylist', data.videoid)
+          }
+        }]
+      })
   }
 
   $('#shuffleToggle').bootstrapToggle()
+
+  var songs = {
+    responses: (id) => {
+      id = id || null
+      let system = 'songs'
+      socket.emit('responses.get', system, function (data) {
+        for (let [key, entry] of Object.entries(data)) {
+          if (!_.isNil(id) && `${system}.${key}` !== id) return true // continue if we want only specific id
+          var filters = ['global']
+
+          let div = $('<div>')
+            .css('padding', '4px 5px 4px 5px')
+          let response = $('<span>')
+            .text('Response')
+            .addClass('label label-primary label-bot-response')
+          let kbd = $('<kbd>')
+            .text(key.replace(/-/g, ' '))
+            .addClass('kbd-bot-response')
+          let span = $('<span>').addClass('custom-response')
+            .attr('data-id', `${system}.${key}`)
+            .css('font-size', '80%')
+
+          $('#bot-responses').append(div.append(response).append(kbd).append(span))
+
+          if (_.includes(['song-was-banned', 'song-was-added-to-queue', 'song-was-added-to-playlist',
+              'song-is-already-in-playlist', 'song-was-removed-from-playlist', 'current-song-from-playlist',
+              'current-song-from-songrequest', 'song-was-removed-from-queue'
+            ], key)) filters.push('name')
+          if (_.includes(['current-song-from-songrequest'], key)) filters.push('username')
+
+          $(`[data-id="${system}.${key}"]`).html(commons.editable({
+            text: entry,
+            id: key,
+            fnc: 'commons.setResponse',
+            filters: filters
+          }))
+        }
+      })
+    }
+  }
+
+  songs.responses()
+
 </script>
