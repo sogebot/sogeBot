@@ -175,7 +175,13 @@
         id = id || null
         socket.emit('responses.get', 'timers', function (data) {
           for (let [key, entry] of Object.entries(data)) {
-            if (!_.isNil(id) && 'timers.' + key !== id) return true // continue if we want only specific id
+          if (!_.isNil(id) && `${system}.${key}` !== id) continue // continue if we want only specific id
+          if (!_.isNil(id)) {
+            $(`abbr[data-id="${id}"]`).text(entry)
+            $(`abbr[data-id="${id}"]`).focus()
+            $(`abbr[data-id="${id}"]`).blur()
+            break
+          }
             var filters = ['global']
 
             let div = $('<div>')

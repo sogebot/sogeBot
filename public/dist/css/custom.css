@@ -842,3 +842,26 @@ li.active .deleteTab {
 #bot-responses {
   column-count: 2;
 }
+
+.settings {
+  width: 100%;
+  font-family: 'PT Sans Narrow', sans-serif;
+  font-size: 20px !important;
+  padding: 10px;
+  column-count: 2;
+}
+
+.settings strong {
+  font-weight: bold !important;
+  text-transform: uppercase;
+}
+
+.settings div label {
+  text-transform: uppercase !important;
+  font-size: 20px !important;
+}
+
+.toggle.btn {
+  min-width: 150px !important;
+  min-height: 40px;
+}

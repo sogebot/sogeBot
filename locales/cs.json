@@ -51,6 +51,114 @@
           "true": "Pisnicky budou hrat nahodne",
           "false": "Pisnicky budou hrat podle casu pridani"
         }
+      },
+      "moderation": {
+        "moderationAnnounceTimeouts": {
+          "true": "Bot bude posilat timeout zpravy do chatu",
+          "false": "Bot nebude posilat timeout zpravy do chatu"
+        },
+        "moderationLinks": {
+          "text": "Moderovani linku je",
+          "true": "{core.settings.moderation.moderationLinks.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationLinks.text} {core.disabled}"
+        },
+        "moderationLinksWithSpaces": {
+          "text": "Moderovani linku s mezerama je",
+          "true": "{core.settings.moderation.moderationLinksWithSpaces.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationLinksWithSpaces.text} {core.disabled}"
+        },
+        "moderationLinksSubs": {
+          "text": "Moderovani linku pro subscribery je",
+          "true": "{core.settings.moderation.moderationLinksSubs.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationLinksSubs.text} {core.disabled}"
+        },
+        "moderationLinksTimeout": "Timeout pri pouziti linku je nastaven na $values",
+        "moderationSymbols": {
+          "text": "Moderovani symbolu je",
+          "true": "{core.settings.moderation.moderationSymbols.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationSymbols.text} {core.disabled}"
+        },
+        "moderationSymbolsSubs": {
+          "text": "Moderovani symbolu pro subscribery je",
+          "true": "{core.settings.moderation.moderationSymbolsSubs.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationSymbolsSubs.text} {core.disabled}"
+        },
+        "moderationSymbolsTimeout": "Timeout pri pouziti symbolu je nastaven na $values",
+        "moderationSymbolsTriggerLength": "Moderovani symbolu zapnuto od $value poctu znaku",
+        "moderationSymbolsMaxConsecutively": "Maximum symbolu zapsanych za sebou je nastaveno na $value",
+        "moderationSymbolsMaxPercent": "Maximum symbolu v cele zprave je nastaveno na $value%",
+        "moderationLongMessage": {
+          "text": "Moderovani dlouhych zprav je",
+          "true": "{core.settings.moderation.moderationLongMessage.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationLongMessage.text} {core.disabled}"
+        },
+        "moderationLongMessageSubs": {
+          "text": "Moderovani dlouhych zprav pro subscribery je",
+          "true": "{core.settings.moderation.moderationLongMessageSubs.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationLongMessageSubs.text} {core.disabled}"
+        },
+        "moderationLongMessageTimeout": "Timeout pro dlouhe zpravy je nastaven na  $values",
+        "moderationLongMessageTriggerLength": "Moderovani dlouhych zprav zapnuto od $value poctu znaku",
+        "moderationCaps": {
+          "text": "Moderovani velkych pismen je",
+          "true": "{core.settings.moderation.moderationCaps.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationCaps.text} {core.disabled}"
+        },
+        "moderationCapsSubs": {
+          "text": "Moderovani velkych pismen pro subscribery je",
+          "true": "{core.settings.moderation.moderationCapsSubs.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationCapsSubs.text} {core.disabled}"
+        },
+        "moderationCapsTimeout": "Timeout pri pouziti celkych pismen je nastaven na $values",
+        "moderationCapsTriggerLength": "Moderovani velkych pismen zapnuto od $value poctu znaku",
+        "moderationCapsMaxPercent": "Maximum velkych pismen v cele zprave je nastaveno na $value%",
+        "moderationColor": {
+          "text": "Moderovani pouziti barev (/me) je",
+          "true": "{core.settings.moderation.moderationColor.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationColor.text} {core.disabled}"
+        },
+        "moderationColorSubs": {
+          "text": "Moderovani pouziti barev (/me) pro subscribery je",
+          "true": "{core.settings.moderation.moderationColorSubs.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationColorSubs.text} {core.disabled}"
+        },
+        "moderationColorTimeout": "Timeout pri pouziti barev (/me) je nastaven na $values",
+        "moderationSpam": {
+          "text": "Moderovani spamu je",
+          "true": "{core.settings.moderation.moderationSpam.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationSpam.text} {core.disabled}"
+        },
+        "moderationSpamSubs": {
+          "text": "Moderovani spamu pro subscribery je",
+          "true": "{core.settings.moderation.moderationSpamSubs.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationSpamSubs.text} {core.disabled}"
+        },
+        "moderationSpamTimeout": "Timeout pri spamovani je nastaven na $values",
+        "moderationSpamTriggerLength": "Moderovani spamu zapnuto od $value poctu znaku",
+        "moderationSpamMaxLength": "Maximalni delka spamu je nastavena na $value",
+        "moderationEmotes": {
+          "text": "Moderovani smajliku je",
+          "true": "{core.settings.moderation.moderationEmotes.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationEmotes.text} {core.disabled}"
+        },
+        "moderationEmotesSubs": {
+          "text": "Moderovani smajliku pro subscribery je",
+          "true": "{core.settings.moderation.moderationEmotesSubs.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationEmotesSubs.text} {core.disabled}"
+        },
+        "moderationEmotesTimeout": "Timeout pri spamovani smajliku je nastaven na $values",
+        "moderationEmotesMaxCount": "Maximalni pocet smajliky ku ve jedne zprave je nastaveno na $value",
+        "moderationBlacklistTimeout": "Timeout pri pouzivani zakazanych slov je nastaven na $values",
+        "moderationBlacklistSubs": {
+          "text": "Moderovani blacklistu pro subscribery je",
+          "true": "{core.settings.moderation.moderationBlacklistSubs.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationBlacklistSubs.text} {core.disabled}"
+        },
+        "moderationWarnings": "Uzivatel bude $valuex varovan, nez dostane timeout",
+        "moderationWarningsTimeouts": {
+          "true": "Varovanim pro uzivatele bude 1s timeout",
+          "false": "Varovanim pro uzivatele bude pouze zprava v chatu"
+        }
       }
     },
     "years": "rok|4:roky|roku",
@@ -103,7 +211,9 @@
         "rank": "Rank",
         "nextrank": "Další rank",
         "username": "Uživatelské jméno",
-        "value": "Hodnota"
+        "value": "Hodnota",
+        "count": "Počet",
+        "link": "Link (přeloženo)"
       }
     },
     "page-settings": {
@@ -305,6 +415,7 @@
     "create": "Vytvořit",
     "cooldown": "Cooldown",
     "confirm": "Potvrdit",
+    "enabled": "Zapnuto",
     "enable": "Zapnout",
     "disable": "Vypnout",
     "slug": "Slug",
@@ -714,153 +825,24 @@
     "without-permission": "Nemas dostatecne opravneni pro '$command'"
   },
   "moderation": {
-    "warning": "[zbyva $count varovani]",
-    "permit": "Uzivatel $who muze nyni postnout $count $link do chatu",
-    "links": "Nejsou povoleny linky, pozadej o !permit",
-    "symbols": "Prilisne pouzivani symbolu neni povoleno",
-    "longMessage": "Tva zprava je prilis dlouha",
-    "caps": "Prilisne pouzivani velkych pismen neni povoleno",
-    "spam": "Spamovani neni povoleno",
-    "color": "Pouzivani /me neni povoleno",
-    "emotes": "Zadne spamovani smajlikama!",
-    "blacklist": "Zadne zakazane slova!",
-    "failed": {
-      "parsePermit": "{core.command-parse} !permit [username]"
-    },
-    "warnings": {
-      "links": "{moderation.links} {moderation.warning}",
-      "symbols": "{moderation.symbols} {moderation.warning}",
-      "longMessage": "{moderation.longMessage} {moderation.warning}",
-      "caps": "{moderation.caps} {moderation.warning}",
-      "spam": "{moderation.spam} {moderation.warning}",
-      "color": "{moderation.color} {moderation.warning}",
-      "emotes": "{moderation.emotes} {moderation.warning}",
-      "blacklist": "{moderation.blacklist} {moderation.warning}"
-    },
-    "settings": {
-      "moderationLinksCustomMessage": "Vlastni zprava pro moderovani linku je nastavena na '$value'",
-      "moderationLinksWarningCustomMessage": "Vlastni varovna zprava pro moderovani linku je nastavena na '$value'",
-      "moderationSymbolsCustomMessage": "Vlastni zprava pro moderovani symbolu je nastavena na '$value'",
-      "moderationSymbolsWarningCustomMessage": "Vlastni varovna zprava pro moderovani symbolu je nastavena na '$value'",
-      "moderationLongMessageCustomMessage": "Vlastni zprava pro moderovani dlouhych zprav je nastavena na '$value'",
-      "moderationLongMessageWarningCustomMessage": "Vlastni varovna zprava pro moderovani dlouhych zprav je nastavena na '$value'",
-      "moderationCapsCustomMessage": "Vlastni zprava pro moderovani velkych pismen je nastavena na '$value'",
-      "moderationCapsWarningCustomMessage": "Vlastni varovna zprava pro moderovani velkych pismen je nastavena na '$value'",
-      "moderationSpamCustomMessage": "Vlastni zprava pro moderovani spamu je nastavena na '$value'",
-      "moderationSpamWarningCustomMessage": "Vlastni varovna zprava pro moderovani spamu je nastavena na '$value'",
-      "moderationColorCustomMessage": "Vlastni zprava pro moderovani /me je nastavena na '$value'",
-      "moderationColorWarningCustomMessage": "Vlastni varovna zprava pro moderovani /me je nastavena na '$value'",
-      "moderationEmotesCustomMessage": "Vlastni zprava pro moderovani smajliku je nastavena na '$value'",
-      "moderationEmotesWarningCustomMessage": "Vlastni varovna zprava pro moderovani smajliku je nastavena na '$value'",
-      "moderationBlacklistCustomMessage": "Vlastni zprava pro moderovani blacklistu je nastavena na '$value'",
-      "moderationBlacklistWarningCustomMessage": "Vlastni varovna zprava pro moderovani blacklistu je nastavena na '$value'",
-      "moderationAnnounceTimeouts": {
-        "true": "Bot bude posilat timeout zpravy do chatu",
-        "false": "Bot nebude posilat timeout zpravy do chatu"
-      },
-      "moderationLinks": {
-        "text": "Moderovani linku je",
-        "true": "{moderation.settings.moderationLinks.text} {core.enabled}",
-        "false": "{moderation.settings.moderationLinks.text} {core.disabled}"
-      },
-      "moderationLinksWithSpaces": {
-        "text": "Moderovani linku s mezerama je",
-        "true": "{moderation.settings.moderationLinksWithSpaces.text} {core.enabled}",
-        "false": "{moderation.settings.moderationLinksWithSpaces.text} {core.disabled}"
-      },
-      "moderationLinksSubs": {
-        "text": "Moderovani linku pro subscribery je",
-        "true": "{moderation.settings.moderationLinksSubs.text} {core.enabled}",
-        "false": "{moderation.settings.moderationLinksSubs.text} {core.disabled}"
-      },
-      "moderationLinksTimeout": "Timeout pri pouziti linku je nastaven na $values",
-      "moderationSymbols": {
-        "text": "Moderovani symbolu je",
-        "true": "{moderation.settings.moderationSymbols.text} {core.enabled}",
-        "false": "{moderation.settings.moderationSymbols.text} {core.disabled}"
-      },
-      "moderationSymbolsSubs": {
-        "text": "Moderovani symbolu pro subscribery je",
-        "true": "{moderation.settings.moderationSymbolsSubs.text} {core.enabled}",
-        "false": "{moderation.settings.moderationSymbolsSubs.text} {core.disabled}"
-      },
-      "moderationSymbolsTimeout": "Timeout pri pouziti symbolu je nastaven na $values",
-      "moderationSymbolsTriggerLength": "Moderovani symbolu zapnuto od $value poctu znaku",
-      "moderationSymbolsMaxConsecutively": "Maximum symbolu zapsanych za sebou je nastaveno na $value",
-      "moderationSymbolsMaxPercent": "Maximum symbolu v cele zprave je nastaveno na $value%",
-      "moderationLongMessage": {
-        "text": "Moderovani dlouhych zprav je",
-        "true": "{moderation.settings.moderationLongMessage.text} {core.enabled}",
-        "false": "{moderation.settings.moderationLongMessage.text} {core.disabled}"
-      },
-      "moderationLongMessageSubs": {
-        "text": "Moderovani dlouhych zprav pro subscribery je",
-        "true": "{moderation.settings.moderationLongMessageSubs.text} {core.enabled}",
-        "false": "{moderation.settings.moderationLongMessageSubs.text} {core.disabled}"
-      },
-      "moderationLongMessageTimeout": "Timeout pro dlouhe zpravy je nastaven na  $values",
-      "moderationLongMessageTriggerLength": "Moderovani dlouhych zprav zapnuto od $value poctu znaku",
-      "moderationCaps": {
-        "text": "Moderovani velkych pismen je",
-        "true": "{moderation.settings.moderationCaps.text} {core.enabled}",
-        "false": "{moderation.settings.moderationCaps.text} {core.disabled}"
-      },
-      "moderationCapsSubs": {
-        "text": "Moderovani velkych pismen pro subscribery je",
-        "true": "{moderation.settings.moderationCapsSubs.text} {core.enabled}",
-        "false": "{moderation.settings.moderationCapsSubs.text} {core.disabled}"
-      },
-      "moderationCapsTimeout": "Timeout pri pouziti celkych pismen je nastaven na $values",
-      "moderationCapsTriggerLength": "Moderovani velkych pismen zapnuto od $value poctu znaku",
-      "moderationCapsMaxPercent": "Maximum velkych pismen v cele zprave je nastaveno na $value%",
-      "moderationColor": {
-        "text": "Moderovani pouziti barev (/me) je",
-        "true": "{moderation.settings.moderationColor.text} {core.enabled}",
-        "false": "{moderation.settings.moderationColor.text} {core.disabled}"
-      },
-      "moderationColorSubs": {
-        "text": "Moderovani pouziti barev (/me) pro subscribery je",
-        "true": "{moderation.settings.moderationColorSubs.text} {core.enabled}",
-        "false": "{moderation.settings.moderationColorSubs.text} {core.disabled}"
-      },
-      "moderationColorTimeout": "Timeout pri pouziti barev (/me) je nastaven na $values",
-      "moderationSpam": {
-        "text": "Moderovani spamu je",
-        "true": "{moderation.settings.moderationSpam.text} {core.enabled}",
-        "false": "{moderation.settings.moderationSpam.text} {core.disabled}"
-      },
-      "moderationSpamSubs": {
-        "text": "Moderovani spamu pro subscribery je",
-        "true": "{moderation.settings.moderationSpamSubs.text} {core.enabled}",
-        "false": "{moderation.settings.moderationSpamSubs.text} {core.disabled}"
-      },
-      "moderationSpamTimeout": "Timeout pri spamovani je nastaven na $values",
-      "moderationSpamTriggerLength": "Moderovani spamu zapnuto od $value poctu znaku",
-      "moderationSpamMaxLength": "Maximalni delka spamu je nastavena na $value",
-      "moderationEmotes": {
-        "text": "Moderovani smajliku je",
-        "true": "{moderation.settings.moderationEmotes.text} {core.enabled}",
-        "false": "{moderation.settings.moderationEmotes.text} {core.disabled}"
-      },
-      "moderationEmotesSubs": {
-        "text": "Moderovani smajliku pro subscribery je",
-        "true": "{moderation.settings.moderationEmotesSubs.text} {core.enabled}",
-        "false": "{moderation.settings.moderationEmotesSubs.text} {core.disabled}"
-      },
-      "moderationEmotesTimeout": "Timeout pri spamovani smajliku je nastaven na $values",
-      "moderationEmotesMaxCount": "Maximalni pocet smajliky ku ve jedne zprave je nastaveno na $value",
-      "moderationBlacklistTimeout": "Timeout pri pouzivani zakazanych slov je nastaven na $values",
-      "moderationBlacklistSubs": {
-        "text": "Moderovani blacklistu pro subscribery je",
-        "true": "{moderation.settings.moderationBlacklistSubs.text} {core.enabled}",
-        "false": "{moderation.settings.moderationBlacklistSubs.text} {core.disabled}"
-      },
-      "moderationWarnings": "Uzivatel bude $valuex varovan, nez dostane timeout",
-      "moderationWarningsTimeouts": {
-        "true": "Varovanim pro uzivatele bude 1s timeout",
-        "false": "Varovanim pro uzivatele bude pouze zprava v chatu"
-      }
-    }
+    "user-have-link-permit": "Uzivatel $username muze nyni postnout $count $link do chatu",
+    "permit-parse-failed": "{core.command-parse} !permit [username]",
+    "user-is-warned-about-links": "Nejsou povoleny linky, pozadej o !permit [zbyva $count varovani]",
+    "user-is-warned-about-symbols": "Prilisne pouzivani symbolu neni povoleno",
+    "user-is-warned-about-long-message": "Tva zprava je prilis dlouha",
+    "user-is-warned-about-caps": "Prilisne pouzivani velkych pismen neni povoleno",
+    "user-is-warned-about-spam": "Spamovani neni povoleno",
+    "user-is-warned-about-color": "Pouzivani /me neni povoleno",
+    "user-is-warned-about-emotes": "Zadne spamovani smajlikama!",
+    "user-is-warned-about-blacklist": "Zadne zakazane slova",
+    "user-have-timeout-for-links": "Nejsou povoleny linky, pozadej o !permit",
+    "user-have-timeout-for-symbols": "Prilisne pouzivani symbolu neni povoleno [zbyva $count varovani]",
+    "user-have-timeout-for-long-message": "Tva zprava je prilis dlouha [zbyva $count varovani]",
+    "user-have-timeout-for-caps": "Prilisne pouzivani velkych pismen neni povoleno [zbyva $count varovani]",
+    "user-have-timeout-for-spam": "Spamovani neni povoleno [zbyva $count varovani]",
+    "user-have-timeout-for-color": "Pouzivani /me neni povoleno [zbyva $count varovani]",
+    "user-have-timeout-for-emotes": "Zadne spamovani smajlikama! [zbyva $count varovani]",
+    "user-have-timeout-for-blacklist": "Zadne zakazane slova [zbyva $count varovani]"
   },
   "queue": {
     "info": {

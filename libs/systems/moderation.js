@@ -24,66 +24,50 @@ function Moderation () {
     global.parser.registerParser(this, 'moderationEmotes', this.emotes, constants.VIEWERS)
     global.parser.registerParser(this, 'moderationBlacklist', this.blacklist, constants.VIEWERS)
 
-    global.configuration.register('moderationLinks', 'moderation.settings.moderationLinks', 'bool', true)
-    global.configuration.register('moderationLinksWithSpaces', 'moderation.settings.moderationLinksWithSpaces', 'bool', false)
-    global.configuration.register('moderationLinksSubs', 'moderation.settings.moderationLinksSubs', 'bool', true)
-    global.configuration.register('moderationLinksTimeout', 'moderation.settings.moderationLinksTimeout', 'number', 120)
-    global.configuration.register('moderationLinksCustomMessage', 'moderation.settings.moderationLinksCustomMessage', 'string', '')
-    global.configuration.register('moderationLinksWarningCustomMessage', 'moderation.settings.moderationLinksWarningCustomMessage', 'string', '')
+    global.configuration.register('moderationLinks', 'core.settings.moderation.moderationLinks', 'bool', true)
+    global.configuration.register('moderationLinksWithSpaces', 'core.settings.moderation.moderationLinksWithSpaces', 'bool', false)
+    global.configuration.register('moderationLinksSubs', 'core.settings.moderation.moderationLinksSubs', 'bool', true)
+    global.configuration.register('moderationLinksTimeout', 'core.settings.moderation.moderationLinksTimeout', 'number', 120)
 
-    global.configuration.register('moderationSymbols', 'moderation.settings.moderationSymbols', 'bool', true)
-    global.configuration.register('moderationSymbolsSubs', 'moderation.settings.moderationSymbolsSubs', 'bool', true)
-    global.configuration.register('moderationSymbolsTimeout', 'moderation.settings.moderationSymbolsTimeout', 'number', 120)
-    global.configuration.register('moderationSymbolsTriggerLength', 'moderation.settings.moderationSymbolsTriggerLength', 'number', 15)
-    global.configuration.register('moderationSymbolsMaxConsecutively', 'moderation.settings.moderationSymbolsMaxConsecutively', 'number', 10)
-    global.configuration.register('moderationSymbolsMaxPercent', 'moderation.settings.moderationSymbolsMaxPercent', 'number', 50)
-    global.configuration.register('moderationSymbolsCustomMessage', 'moderation.settings.moderationSymbolsCustomMessage', 'string', '')
-    global.configuration.register('moderationSymbolsWarningCustomMessage', 'moderation.settings.moderationSymbolsWarningCustomMessage', 'string', '')
+    global.configuration.register('moderationSymbols', 'core.settings.moderation.moderationSymbols', 'bool', true)
+    global.configuration.register('moderationSymbolsSubs', 'core.settings.moderation.moderationSymbolsSubs', 'bool', true)
+    global.configuration.register('moderationSymbolsTimeout', 'core.settings.moderation.moderationSymbolsTimeout', 'number', 120)
+    global.configuration.register('moderationSymbolsTriggerLength', 'core.settings.moderation.moderationSymbolsTriggerLength', 'number', 15)
+    global.configuration.register('moderationSymbolsMaxConsecutively', 'core.settings.moderation.moderationSymbolsMaxConsecutively', 'number', 10)
+    global.configuration.register('moderationSymbolsMaxPercent', 'core.settings.moderation.moderationSymbolsMaxPercent', 'number', 50)
 
-    global.configuration.register('moderationLongMessage', 'moderation.settings.moderationLongMessage', 'bool', true)
-    global.configuration.register('moderationLongMessageSubs', 'moderation.settings.moderationLongMessageSubs', 'bool', true)
-    global.configuration.register('moderationLongMessageTimeout', 'moderation.settings.moderationLongMessageTimeout', 'number', 120)
-    global.configuration.register('moderationLongMessageTriggerLength', 'moderation.settings.moderationLongMessageTriggerLength', 'number', 300)
-    global.configuration.register('moderationLongMessageCustomMessage', 'moderation.settings.moderationLongMessageCustomMessage', 'string', '')
-    global.configuration.register('moderationLongMessageWarningCustomMessage', 'moderation.settings.moderationLongMessageWarningCustomMessage', 'string', '')
+    global.configuration.register('moderationLongMessage', 'core.settings.moderation.moderationLongMessage', 'bool', true)
+    global.configuration.register('moderationLongMessageSubs', 'core.settings.moderation.moderationLongMessageSubs', 'bool', true)
+    global.configuration.register('moderationLongMessageTimeout', 'core.settings.moderation.moderationLongMessageTimeout', 'number', 120)
+    global.configuration.register('moderationLongMessageTriggerLength', 'core.settings.moderation.moderationLongMessageTriggerLength', 'number', 300)
 
-    global.configuration.register('moderationCaps', 'moderation.settings.moderationCaps', 'bool', true)
-    global.configuration.register('moderationCapsSubs', 'moderation.settings.moderationCapsSubs', 'bool', true)
-    global.configuration.register('moderationCapsTimeout', 'moderation.settings.moderationCapsTimeout', 'number', 120)
-    global.configuration.register('moderationCapsTriggerLength', 'moderation.settings.moderationCapsTriggerLength', 'number', 15)
-    global.configuration.register('moderationCapsMaxPercent', 'moderation.settings.moderationCapsMaxPercent', 'number', 50)
-    global.configuration.register('moderationCapsCustomMessage', 'moderation.settings.moderationCapsCustomMessage', 'string', '')
-    global.configuration.register('moderationCapsWarningCustomMessage', 'moderation.settings.moderationCapsWarningCustomMessage', 'string', '')
+    global.configuration.register('moderationCaps', 'core.settings.moderation.moderationCaps', 'bool', true)
+    global.configuration.register('moderationCapsSubs', 'core.settings.moderation.moderationCapsSubs', 'bool', true)
+    global.configuration.register('moderationCapsTimeout', 'core.settings.moderation.moderationCapsTimeout', 'number', 120)
+    global.configuration.register('moderationCapsTriggerLength', 'core.settings.moderation.moderationCapsTriggerLength', 'number', 15)
+    global.configuration.register('moderationCapsMaxPercent', 'core.settings.moderation.moderationCapsMaxPercent', 'number', 50)
 
-    global.configuration.register('moderationSpam', 'moderation.settings.moderationSpam', 'bool', true)
-    global.configuration.register('moderationSpamSubs', 'moderation.settings.moderationSpamSubs', 'bool', true)
-    global.configuration.register('moderationSpamTimeout', 'moderation.settings.moderationSpamTimeout', 'number', 300)
-    global.configuration.register('moderationSpamTriggerLength', 'moderation.settings.moderationSpamTriggerLength', 'number', 15)
-    global.configuration.register('moderationSpamMaxLength', 'moderation.settings.moderationSpamMaxLength', 'number', 15)
-    global.configuration.register('moderationSpamCustomMessage', 'moderation.settings.moderationSpamCustomMessage', 'string', '')
-    global.configuration.register('moderationSpamWarningCustomMessage', 'moderation.settings.moderationSpamWarningCustomMessage', 'string', '')
+    global.configuration.register('moderationSpam', 'core.settings.moderation.moderationSpam', 'bool', true)
+    global.configuration.register('moderationSpamSubs', 'core.settings.moderation.moderationSpamSubs', 'bool', true)
+    global.configuration.register('moderationSpamTimeout', 'core.settings.moderation.moderationSpamTimeout', 'number', 300)
+    global.configuration.register('moderationSpamTriggerLength', 'core.settings.moderation.moderationSpamTriggerLength', 'number', 15)
+    global.configuration.register('moderationSpamMaxLength', 'core.settings.moderation.moderationSpamMaxLength', 'number', 15)
 
-    global.configuration.register('moderationColor', 'moderation.settings.moderationColor', 'bool', true)
-    global.configuration.register('moderationColorSubs', 'moderation.settings.moderationColorSubs', 'bool', true)
-    global.configuration.register('moderationColorTimeout', 'moderation.settings.moderationColorTimeout', 'number', 120)
-    global.configuration.register('moderationColorCustomMessage', 'moderation.settings.moderationColorCustomMessage', 'string', '')
-    global.configuration.register('moderationColorWarningCustomMessage', 'moderation.settings.moderationColorWarningCustomMessage', 'string', '')
+    global.configuration.register('moderationColor', 'core.settings.moderation.moderationColor', 'bool', true)
+    global.configuration.register('moderationColorSubs', 'core.settings.moderation.moderationColorSubs', 'bool', true)
+    global.configuration.register('moderationColorTimeout', 'core.settings.moderation.moderationColorTimeout', 'number', 120)
 
-    global.configuration.register('moderationEmotes', 'moderation.settings.moderationEmotes', 'bool', true)
-    global.configuration.register('moderationEmotesSubs', 'moderation.settings.moderationEmotesSubs', 'bool', true)
-    global.configuration.register('moderationEmotesTimeout', 'moderation.settings.moderationEmotesTimeout', 'number', 120)
-    global.configuration.register('moderationEmotesMaxCount', 'moderation.settings.moderationEmotesMaxCount', 'number', 15)
-    global.configuration.register('moderationEmotesCustomMessage', 'moderation.settings.moderationEmotesCustomMessage', 'string', '')
-    global.configuration.register('moderationEmotesWarningCustomMessage', 'moderation.settings.moderationEmotesWarningCustomMessage', 'string', '')
+    global.configuration.register('moderationEmotes', 'core.settings.moderation.moderationEmotes', 'bool', true)
+    global.configuration.register('moderationEmotesSubs', 'core.settings.moderation.moderationEmotesSubs', 'bool', true)
+    global.configuration.register('moderationEmotesTimeout', 'core.settings.moderation.moderationEmotesTimeout', 'number', 120)
+    global.configuration.register('moderationEmotesMaxCount', 'core.settings.moderation.moderationEmotesMaxCount', 'number', 15)
 
-    global.configuration.register('moderationBlacklistTimeout', 'moderation.settings.moderationBlacklistTimeout', 'number', 120)
-    global.configuration.register('moderationBlacklistSubs', 'moderation.settings.moderationBlacklistSubs', 'bool', true)
-    global.configuration.register('moderationBlacklistCustomMessage', 'moderation.settings.moderationBlacklistCustomMessage', 'string', '')
-    global.configuration.register('moderationBlacklistWarningCustomMessage', 'moderation.settings.moderationBlacklistWarningCustomMessage', 'string', '')
+    global.configuration.register('moderationBlacklistTimeout', 'core.settings.moderation.moderationBlacklistTimeout', 'number', 120)
+    global.configuration.register('moderationBlacklistSubs', 'core.settings.moderation.moderationBlacklistSubs', 'bool', true)
 
-    global.configuration.register('moderationWarnings', 'moderation.settings.moderationWarnings', 'number', 3)
-    global.configuration.register('moderationAnnounceTimeouts', 'moderation.settings.moderationAnnounceTimeouts', 'bool', true)
-    global.configuration.register('moderationWarningsTimeouts', 'moderation.settings.moderationWarningsTimeouts', 'bool', true)
+    global.configuration.register('moderationWarnings', 'core.settings.moderation.moderationWarnings', 'number', 3)
+    global.configuration.register('moderationAnnounceTimeouts', 'core.settings.moderation.moderationAnnounceTimeouts', 'bool', true)
+    global.configuration.register('moderationWarningsTimeouts', 'core.settings.moderation.moderationWarningsTimeouts', 'bool', true)
 
     var self = this
     // purge warnings older than hour
@@ -190,19 +174,15 @@ Moderation.prototype.permitLink = function (self, sender, text) {
       self.permits.push(parsed[1].toLowerCase())
     })
 
-    global.commons.sendMessage(global.translate('moderation.permit')
-      .replace(/\$who/g, (global.configuration.getValue('atUsername') ? '@' : '') + parsed[1].toLowerCase())
-      .replace(/\$link/g, global.parser.getLocalizedName(count, 'core.links'))
-      .replace(/\$count/g, count), sender)
+    let m = global.commons.prepare('moderation.user-have-link-permit', { username: (global.configuration.getValue('atUsername') ? '@' : '') + parsed[1].toLowerCase(), link: global.parser.getLocalizedName(count, 'core.links'), count: count })
+    debug(m); global.commons.sendMessage(m, sender)
   } catch (e) {
-    global.commons.sendMessage(global.translate('moderation.failed.parsePermit'), sender)
+    global.commons.sendMessage(global.translate('moderation.permit-parse-failed'), sender)
   }
 }
 
 Moderation.prototype.containsLink = async function (self, id, sender, text, skip) {
   debug('containLinks(%s, %j, %s, %s', id, sender, text, skip)
-  const customMessage = global.configuration.getValue('moderationLinksCustomMessage')
-  const customMessageWarning = global.configuration.getValue('moderationLinksWarningCustomMessage')
   const isMod = await global.parser.isMod(sender)
 
   var timeout = global.configuration.getValue('moderationLinksTimeout')
@@ -230,8 +210,8 @@ Moderation.prototype.containsLink = async function (self, id, sender, text, skip
     } else {
       log.info(sender.username + ' [link] ' + timeout + 's timeout: ' + text)
       self.timeoutUser(self, sender,
-        customMessageWarning.length > 0 ? customMessageWarning : global.translate('moderation.warnings.links'),
-        customMessage.length > 0 ? customMessage : global.translate('moderation.links'), timeout)
+        global.translate('moderation.user-is-warned-about-links'),
+        global.translate('moderation.user-have-timeout-for-links'), timeout)
       global.updateQueue(id, false)
     }
   } else {
@@ -242,8 +222,6 @@ Moderation.prototype.containsLink = async function (self, id, sender, text, skip
 Moderation.prototype.symbols = async function (self, id, sender, text, skip) {
   text = self.whitelist(text)
 
-  const customMessage = global.configuration.getValue('moderationSymbolsCustomMessage')
-  const customMessageWarning = global.configuration.getValue('moderationSymbolsWarningCustomMessage')
   const isMod = await global.parser.isMod(sender)
 
   var timeout = global.configuration.getValue('moderationSymbolsTimeout')
@@ -267,8 +245,8 @@ Moderation.prototype.symbols = async function (self, id, sender, text, skip) {
         global.updateQueue(id, false)
         log.info(sender.username + ' [symbols] ' + timeout + 's timeout: ' + text)
         self.timeoutUser(self, sender,
-          customMessageWarning.length > 0 ? customMessageWarning : global.translate('moderation.warnings.symbols'),
-          customMessage.length > 0 ? customMessage : global.translate('moderation.symbols'), timeout)
+          global.translate('moderation.user-is-warned-about-symbols'),
+          global.translate('moderation.user-have-timeout-for-symbols'), timeout)
         return
       }
       symbolsLength = symbolsLength + symbols.length
@@ -285,9 +263,6 @@ Moderation.prototype.symbols = async function (self, id, sender, text, skip) {
 
 Moderation.prototype.longMessage = async function (self, id, sender, text, skip) {
   text = self.whitelist(text)
-
-  const customMessage = global.configuration.getValue('moderationLongMessageCustomMessage')
-  const customMessageWarning = global.configuration.getValue('moderationLongMessageWarningCustomMessage')
   const isMod = await global.parser.isMod(sender)
 
   var timeout = global.configuration.getValue('moderationLongMessageTimeout')
@@ -300,8 +275,8 @@ Moderation.prototype.longMessage = async function (self, id, sender, text, skip)
     global.updateQueue(id, false)
     log.info(sender.username + ' [longMessage] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender,
-      customMessageWarning.length > 0 ? customMessageWarning : global.translate('moderation.warnings.longMessage'),
-      customMessage.length > 0 ? customMessage : global.translate('moderation.longMessage'), timeout)
+      global.translate('moderation.user-is-warned-about-long-message'),
+      global.translate('moderation.user-have-timeout-for-long-message'), timeout)
   }
 }
 
@@ -309,8 +284,6 @@ Moderation.prototype.caps = async function (self, id, sender, text, skip) {
   debug('caps(%s, %j, %s, %s', id, sender, text, skip)
   text = self.whitelist(text)
 
-  const customMessage = global.configuration.getValue('moderationCapsCustomMessage')
-  const customMessageWarning = global.configuration.getValue('moderationCapsWarningCustomMessage')
   const isMod = await global.parser.isMod(sender)
 
   var emotesCharList = [] // remove emotes from caps checking
@@ -354,8 +327,8 @@ Moderation.prototype.caps = async function (self, id, sender, text, skip) {
     global.updateQueue(id, false)
     log.info(sender.username + ' [caps] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender,
-      customMessageWarning.length > 0 ? customMessageWarning : global.translate('moderation.warnings.caps'),
-      customMessage.length > 0 ? customMessage : global.translate('moderation.caps'), timeout)
+      global.translate('moderation.user-is-warned-about-caps'),
+      global.translate('moderation.user-have-timeout-for-caps'), timeout)
     return
   }
   global.updateQueue(id, true)
@@ -364,8 +337,6 @@ Moderation.prototype.caps = async function (self, id, sender, text, skip) {
 Moderation.prototype.spam = async function (self, id, sender, text, skip) {
   text = self.whitelist(text)
 
-  const customMessage = global.configuration.getValue('moderationSpamCustomMessage')
-  const customMessageWarning = global.configuration.getValue('moderationSpamWarningCustomMessage')
   const isMod = await global.parser.isMod(sender)
 
   var timeout = global.configuration.getValue('moderationSpamTimeout')
@@ -384,8 +355,8 @@ Moderation.prototype.spam = async function (self, id, sender, text, skip) {
       global.updateQueue(id, false)
       log.info(sender.username + ' [spam] ' + timeout + 's timeout: ' + text)
       self.timeoutUser(self, sender,
-        customMessageWarning.length > 0 ? customMessageWarning : global.translate('moderation.warnings.spam'),
-        customMessage.length > 0 ? customMessage : global.translate('moderation.spam'), timeout)
+        global.translate('moderation.user-have-timeout-for-spam'),
+        global.translate('moderation.user-is-warned-about-spam'), timeout)
       break
     }
   }
@@ -393,8 +364,6 @@ Moderation.prototype.spam = async function (self, id, sender, text, skip) {
 }
 
 Moderation.prototype.color = async function (self, id, sender, text, skip) {
-  const customMessage = global.configuration.getValue('moderationColorCustomMessage')
-  const customMessageWarning = global.configuration.getValue('moderationColorWarningCustomMessage')
   const isMod = await global.parser.isMod(sender)
 
   var timeout = global.configuration.getValue('moderationColorTimeout')
@@ -408,16 +377,13 @@ Moderation.prototype.color = async function (self, id, sender, text, skip) {
     global.updateQueue(id, false)
     log.info(sender.username + ' [color] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender,
-      customMessageWarning.length > 0 ? customMessageWarning : global.translate('moderation.warnings.color'),
-      customMessage.length > 0 ? customMessage : global.translate('moderation.color'), timeout)
+      global.translate('moderation.user-is-warned-about-color'),
+      global.translate('moderation.user-have-timeout-for-color'), timeout)
   } else global.updateQueue(id, true)
 }
 
 Moderation.prototype.emotes = async function (self, id, sender, text, skip) {
   text = self.whitelist(text)
-
-  const customMessage = global.configuration.getValue('moderationEmotesCustomMessage')
-  const customMessageWarning = global.configuration.getValue('moderationEmotesWarningCustomMessage')
   const isMod = await global.parser.isMod(sender)
 
   var timeout = global.configuration.getValue('moderationSpamTimeout')
@@ -437,8 +403,8 @@ Moderation.prototype.emotes = async function (self, id, sender, text, skip) {
     global.updateQueue(id, false)
     log.info(sender.username + ' [emotes] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender,
-      customMessageWarning.length > 0 ? customMessageWarning : global.translate('moderation.warnings.emotes'),
-      customMessage.length > 0 ? customMessage : global.translate('moderation.emotes'), timeout)
+      global.translate('moderation.user-is-warned-about-emotes'),
+      global.translate('moderation.user-have-timeout-for-emotes'), timeout)
   } else global.updateQueue(id, true)
 }
 
@@ -449,17 +415,14 @@ Moderation.prototype.blacklist = async function (self, id, sender, text, skip) {
     return
   }
 
-  const customMessage = global.configuration.getValue('moderationBlacklistCustomMessage')
-  const customMessageWarning = global.configuration.getValue('moderationBlacklistWarningCustomMessage')
-
   var timeout = global.configuration.getValue('moderationBlacklistTimeout')
   _.each(self.lists.blacklist, function (value) {
     value = value.trim()
     if (text.indexOf(value) !== -1 && value.length > 0) {
       log.info(sender.username + ' [blacklist] ' + timeout + 's timeout: ' + text)
       self.timeoutUser(self, sender,
-        customMessageWarning.length > 0 ? customMessageWarning : global.translate('moderation.warnings.blacklist'),
-        customMessage.length > 0 ? customMessage : global.translate('moderation.blacklist'), timeout)
+        global.translate('moderation.user-is-warned-about-blacklist'),
+        global.translate('moderation.user-have-timeout-for-blacklist'), timeout)
       global.updateQueue(id, false)
       return false
     }
