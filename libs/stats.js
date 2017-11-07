@@ -15,7 +15,6 @@ function Stats () {
 }
 
 Stats.prototype.webPanel = function () {
-  global.panel.addMenu({category: 'manage', name: 'stats', id: 'stats'})
   global.panel.addMenu({category: 'manage', name: 'viewers', id: 'viewers'})
   global.panel.socketListening(this, 'getLatestStats', this.getLatestStats)
   global.panel.socketListening(this, 'getStatsData', this.getStatsData)
