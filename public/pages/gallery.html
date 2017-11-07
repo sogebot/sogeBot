@@ -1,77 +1,111 @@
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <div class="widget">
-    <h2 class="title" data-lang="gallery"></h2>
-    <input type="file" name="file" id="file-input-gallery" accept=".jpg,.png,.gif,.mp3,.ogg,.mp4" style="width: 0.1px;height: 0.1px;opacity: 0;overflow: hidden;position: absolute;z-index: -1;" />
-    <label for="file-input-gallery" class="btn btn-success" style="position: relative; top: -14px; left: 20px;">Upload a file</label>
-    <div class="alert alert-success" id="gallery-upload-success" role="alert" style="display:none;"><b>Success!</b> File was uploaded.</div>
-    <div class="alert alert-danger" id="gallery-upload-failed" role="alert" style="display:none;"><b>Something went wrong!</b> File was <b>NOT</b> uploaded. Supported filetypes are: ogg, mp3, mp4, png, jpg and gif.</div>
+  <ul class="nav nav-pills">
+    <li>
+      <span data-lang="gallery" class="title text-default"></span>
+    </li>
+    <li>
+      <input type="file" name="file" id="file-input-gallery" accept=".jpg,.png,.gif,.mp3,.ogg,.mp4" style="width: 0.1px;height: 0.1px;opacity: 0;overflow: hidden;position: absolute;z-index: -1;"
+      />
+      <label for="file-input-gallery" class="btn btn-success" style="padding: 9px 15px;"> <i class="fa fa-plus" aria-hidden="true"></i></label>
+    </li>
+    <li>
+        <div class="alert alert-success" id="gallery-upload-success" role="alert" style="padding: 9px 15px; margin:0; display:none;">
+            <b>Success!</b> File was uploaded.</div>
+          <div class="alert alert-danger" id="gallery-upload-failed" role="alert" style="padding: 9px 15px; margin:0; display:none;">
+            <b>Something went wrong!</b> File was
+            <b>NOT</b> uploaded. Supported filetypes are: ogg, mp3, mp4, png, jpg and gif.</div>
+    </li>
+  </ul>
+</div>
 
-    <div id="gallery">
-      <ul id="gallery-list"></ul>
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="manage">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="widget">
+
+
+        <div id="gallery">
+          <ul id="gallery-list"></ul>
+        </div>
+
+        <span class="clearfix"></span>
+      </div>
     </div>
-
-    <span class="clearfix"></span>
   </div>
 </div>
-<script>
-  socket.emit('overlay.gallery.get')
-  socket.on('overlay.gallery.list', function (data) {
-    $('#gallery-list').empty()
-    _.each(data, function (filename) {
-      if (filename.endsWith('.jpg') || filename.endsWith('.png') || filename.endsWith('.gif')) {
-        $('#gallery-list').append('<li class="gallery-item" data-filename="' + filename + '">' +
+
+  <script>
+    socket.emit('overlay.gallery.get')
+    socket.on('overlay.gallery.list', function (data) {
+      $('#gallery-list').empty()
+      _.each(data, function (filename) {
+        if (filename.endsWith('.jpg') || filename.endsWith('.png') || filename.endsWith('.gif')) {
+          $('#gallery-list').append('<li class="gallery-item" data-filename="' + filename + '">' +
             '<a href="/dist/gallery/' + filename + '">' +
             '<span>' + filename + '</span>' +
             '<img src="/dist/gallery/' + filename + '">' +
             '</a>' +
-          '</li>')
-      } else {
-        $('#gallery-list').append('<li class="gallery-item" data-filename="' + filename + '">' +
+            '</li>')
+        } else {
+          $('#gallery-list').append('<li class="gallery-item" data-filename="' + filename + '">' +
             '<a href="/dist/gallery/' + filename + '">' +
             '<span>' + filename + '</span>' +
             '<i class="fa fa-play" aria-hidden="true"></i>' +
             '</a>' +
-          '</li>')
-      }
+            '</li>')
+        }
+      })
+      var menu = new BootstrapMenu(".gallery-item", {
+        fetchElementData: function ($el) {
+          var data = $el.data()
+          data.el = $el
+          return data;
+        },
+        actions: [{
+          name: 'Delete',
+          iconClass: 'fa-trash-o',
+          onClick: function (data) {
+            console.debug('EMIT [overlay.gallery.delete]', data.filename)
+            socket.emit('overlay.gallery.delete', data.filename)
+          }
+        }]
+      })
     })
-    var menu = new BootstrapMenu(".gallery-item", {
-          fetchElementData: function($el) {
-            var data = $el.data()
-            data.el = $el
-            return data;
-          },
-          actions: [{
-            name: 'Delete',
-            iconClass: 'fa-trash-o',
-            onClick: function(data) {
-              console.debug('EMIT [overlay.gallery.delete]', data.filename)
-              socket.emit('overlay.gallery.delete', data.filename)
-            }
-          }]
-        })
-  })
 
-  $('#file-input-gallery').on('change', function (ev) {
-    var reader = new FileReader()
-    reader.onload = function(event) {
-      socket.emit('overlay.gallery.upload', event.target.result)
+    $('#file-input-gallery').on('change', function (ev) {
+      var reader = new FileReader()
+      reader.onload = function (event) {
+        socket.emit('overlay.gallery.upload', event.target.result)
+      }
+      reader.readAsDataURL(event.target.files[0])
+    })
+
+    function deleteItem(el) {
+      socket.emit('overlay.gallery.delete', $(el).data('image'))
     }
-    reader.readAsDataURL(event.target.files[0])
-  })
 
-  function deleteItem (el) {
-    socket.emit('overlay.gallery.delete', $(el).data('image'))
-  }
+    socket.on('overlay.gallery.upload.success', function () {
+      $('#gallery-upload-success')
+        .velocity("fadeIn", {
+          delay: 0,
+          duration: 500
+        })
+        .velocity("fadeOut", {
+          delay: 5000,
+          duration: 500
+        });
+    })
 
-  socket.on('overlay.gallery.upload.success', function () {
-    $('#gallery-upload-success')
-      .velocity("fadeIn", { delay: 0, duration: 500 })
-      .velocity("fadeOut", { delay: 5000, duration: 500 });
-  })
+    socket.on('overlay.gallery.upload.failed', function () {
+      $('#gallery-upload-failed')
+        .velocity("fadeIn", {
+          delay: 0,
+          duration: 500
+        })
+        .velocity("fadeOut", {
+          delay: 5000,
+          duration: 500
+        });
+    })
 
-  socket.on('overlay.gallery.upload.failed', function () {
-    $('#gallery-upload-failed')
-      .velocity("fadeIn", { delay: 0, duration: 500 })
-      .velocity("fadeOut", { delay: 5000, duration: 500 });
-  })
-</script>
+  </script>
