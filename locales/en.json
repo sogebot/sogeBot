@@ -218,6 +218,9 @@
     },
     "page-settings": {
       "systems": {
+        "others": {
+          "title": "Others"
+        },
         "whispers": {
           "title": "Whispers",
           "toggle": {
@@ -316,8 +319,7 @@
     "cooldown-quiet-toggle-yes": "Won't notify",
     "cooldown-moderators": "Moderators",
     "cooldown-owners": "Owners",
-    "at-username": "Usernames",
-    "show-with-at": "Show with @",
+    "show-usernames-with-at": "Show usernames with @",
     "twitter-send-message": "Tweet",
     "send-message-as-a-bot": "Send message as a bot",
     "chat-as-bot": "Chat (as bot)",

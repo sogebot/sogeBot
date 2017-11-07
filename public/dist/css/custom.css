@@ -762,6 +762,10 @@ th:first-letter {
   margin-top: 15%;
 }
 
+abbr {
+  display: inline-block;
+}
+
 abbr[data-original-title], abbr[title] {
   text-decoration: none;
   line-height: 25px;
@@ -851,9 +855,14 @@ li.active .deleteTab {
   column-count: 2;
 }
 
+.settings:nth-child(even) {
+  background-color: #337eb70c;
+}
+
 .settings strong {
   font-weight: bold !important;
   text-transform: uppercase;
+  line-height: 40px;
 }
 
 .settings div label {

@@ -19,7 +19,6 @@ function Points () {
 
     // default is <singular>|<plural> | in some languages can be set with custom <singular>|<x:multi>|<plural> where x <= 10
     global.configuration.register('pointsName', 'points.settings.pointsName', 'string', '')
-    global.configuration.register('pointsResponse', 'points.settings.pointsResponse', 'string', '')
     global.configuration.register('pointsInterval', 'points.settings.pointsInterval', 'number', 10)
     global.configuration.register('pointsPerInterval', 'points.settings.pointsPerInterval', 'number', 1)
     global.configuration.register('pointsIntervalOffline', 'points.settings.pointsIntervalOffline', 'number', 30)
@@ -71,12 +70,8 @@ Points.prototype.sendConfiguration = function (self, socket) {
     pointsNames = global.configuration.getValue('pointsName')
   }
 
-  var pointsResponse = global.configuration.getValue('pointsResponse')
-  pointsResponse = pointsResponse.length === 0 ? global.translate('points.defaults.pointsResponse') : pointsResponse
-
   socket.emit('pointsConfiguration', {
     pointsName: pointsNames,
-    pointsResponse: pointsResponse,
     pointsInterval: global.configuration.getValue('pointsInterval'),
     pointsPerInterval: global.configuration.getValue('pointsPerInterval'),
     pointsIntervalOffline: global.configuration.getValue('pointsIntervalOffline'),
@@ -209,9 +204,8 @@ Points.prototype.getPointsFromUser = async function (self, sender, text) {
     let user = await global.users.get(sender.username)
     const username = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
 
-    var pointsResponse = (global.configuration.getValue('pointsResponse').length > 0 ? global.configuration.getValue('pointsResponse') : global.translate('points.defaults.pointsResponse'))
     var points = (_.isUndefined(user.points) ? 0 : user.points)
-    global.commons.sendMessage(pointsResponse
+    global.commons.sendMessage(global.translate('points.defaults.pointsResponse')
       .replace(/\$amount/g, points)
       .replace(/\$username/g, username)
       .replace(/\$pointsName/g, self.getPointsName(points)), sender)
