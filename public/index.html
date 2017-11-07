@@ -544,7 +544,7 @@
           var filtersRegExp = new RegExp('\\$(' + _.keys(translations.responses.variable).join('|') + ')', 'g')
           var stringAbbr = options.text.replace(filtersRegExp, '<span contenteditable="false" style="user-select: none; display: inline-block; font-family: monospace; color: #e00956; border: 1px solid #cbcbcb; border-radius: 5px !important; padding: 0 4px 0 4px; background-color: #f5f4f7" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;')
           var output = '<abbr style="width: 100%" title="click to edit" id="' + id + '" data-id="' + options.id + '" data-fnc="' + options.fnc + '" data-filters="' + options.filters.join(',') + '" contenteditable="true">' + stringAbbr + '</abbr>'
-       
+
           setTimeout(function() {
             commons.translate()
 
@@ -555,6 +555,11 @@
 
             $(`#${id}[contenteditable=true]`).off()
             $(`#${id}[contenteditable=true]`)
+              .bind('paste', function(e) {
+                e.preventDefault()
+                var text = (e.originalEvent || e).clipboardData.getData('text/plain') || ''
+                document.execCommand('insertText', false, text);
+              })
               // When you click on item, record into data("initialText") content of this item.
               .focus(function() {
                   var self = this
