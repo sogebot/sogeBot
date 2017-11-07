@@ -36,7 +36,6 @@ class Songs {
 
       this.getMeanLoudness(this)
 
-      global.panel.addMenu({category: 'settings', name: 'systems', id: 'systems'})
       global.panel.addMenu({category: 'manage', name: 'songs', id: 'songs'})
       global.panel.addWidget('ytplayer', 'widget-title-ytplayer', 'headphones')
       global.panel.registerSockets({

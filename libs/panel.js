@@ -64,6 +64,8 @@ function Panel () {
   global.configuration.register('theme', 'core.theme', 'string', 'light')
   global.configuration.register('percentage', 'core.percentage', 'bool', true)
 
+  this.addMenu({category: 'settings', name: 'systems', id: 'systems'})
+
   this.io.use(function (socket, next) {
     if (config.panel.token.trim() === socket.request._query['token']) next()
     return false
