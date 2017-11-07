@@ -63,6 +63,9 @@ Gallery.prototype._upload = function (self, socket, data) {
     case 'video/mp4':
       ext = 'mp4'
       break
+    case 'video/x-flv':
+      ext = 'flv'
+      break
     default:
       socket.emit('overlay.gallery.upload.failed')
       return false
