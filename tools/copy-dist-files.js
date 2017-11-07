@@ -4,6 +4,9 @@ var path = require('path')
 var _ = require('lodash')
 
 var dist = {
+  'flv.js': {
+    'js': 'dist/flv.min.js'
+  },
   'bootstrap': {
     'js': 'dist/js/bootstrap.min.js',
     'css': 'dist/css/bootstrap.min.css',

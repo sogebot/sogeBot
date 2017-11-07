@@ -14,6 +14,7 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="/auth/token.js"></script>
+    <script type="text/javascript" src="/dist/flv.js/js/flv.min.js"></script>
 
     <style>
       html, body {
@@ -85,7 +86,7 @@
     <div id="video-pos">
       <div id="video-rel-pos">
         <video id="video">
-          <source src="" type="video/mp4" />
+          <source src=""/>
         </video>
         <div id="replay-label" style="vertical-align: top; opacity:0; text-shadow: 0px 0px 2px black; position: absolute; font-family: 'Roboto Condensed', sans; color: red; font-weight: bold; text-transform: uppercase; margin-top: 5px; margin-left: -90px; width: 100%; text-align: left;"><i class="fa fa-circle" style="position:relative; top: -3px;" aria-hidden="true"></i>
           <span style="font-size:20px">REPLAY</span>
@@ -286,11 +287,12 @@
       }
 
       function showVideo(id, video) {
-        if (!_.endsWith(video.url, '.mp4')) {
-          console.error('ERROR: Only mp4 files can be played')
+        if (!_.endsWith(video.url, '.mp4') && !_.endsWith(video.url , '.flv') ) {
+          console.error('ERROR: Only mp4 and flv files can be played')
           alertsQueue[id].finished++;
           return
         }
+
         video.volume = _.isNil(video.volume) ? 1 : parseInt(video.volume, 10) / 100
         video.delay = _.isNil(video.delay) ? 0 : parseInt(video.delay, 10)
         video.class = _.isNil(video.class) ? 'video' : video.class
@@ -335,8 +337,18 @@
           style += ';top:' + video['y-offset'] + 'px'
         }
 
-        $('video source').attr('src', video.url)
-        $('video')[0].load()
+          if (flvjs.isSupported()) {
+            var videoElement = document.getElementById('video');
+            var flvPlayer = flvjs.createPlayer({
+                type: _.endsWith(video.url , '.flv') ? 'flv' : 'mp4',
+                url: video.url
+            });
+            flvPlayer.attachMediaElement(videoElement);
+            flvPlayer.load();
+            flvPlayer.play();
+            checkLoad()
+            return
+        }
 
         function checkLoad() {
           if ($('video')[0].readyState === 4) {
@@ -370,7 +382,7 @@
               $("#replay-label").velocity("stop");
               $('#replay-label').velocity("fadeOut", { duration: video.duration });
               $('#video').velocity("fadeOut", { duration: video.duration, complete: function(e) {
-                alertsQueue[id].finished++
+                if (!_.isNil(alertsQueue[id])) alertsQueue[id].finished++
                 $('video').removeClass(video.class)
                 if (!_.isNil(video.filter)) {
                   $('video').removeClass(video.filter)
