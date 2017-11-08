@@ -73,13 +73,15 @@ function Gambling () {
         const tickets = parseInt(self.current.duel[username], 10)
         const probability = tickets / (parseInt(total, 10) / 100)
 
-        global.commons.sendMessage(global.translate((_.size(self.current.duel) === 1) ? 'gambling.duel.noContestant' : 'gambling.duel.winner')
-          .replace(/\$pointsName/g, global.systems.points.getPointsName(total))
-          .replace(/\$points/g, total)
-          .replace(/\$probability/g, _.round(probability, 2))
-          .replace(/\$ticketsName/g, global.systems.points.getPointsName(tickets))
-          .replace(/\$tickets/g, tickets)
-          .replace(/\$winner/g, (global.configuration.getValue('atUsername') ? '@' : '') + username), { username: username }, { force: true })
+        let m = global.commons.prepare(_.size(self.current.duel) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
+          pointsName: global.systems.points.getPointsName(total),
+          points: total,
+          probability: _.round(probability, 2),
+          ticketsName: global.systems.points.getPointsName(tickets),
+          tickets: tickets,
+          winner: username
+        })
+        debug(m); global.commons.sendMessage(m, { username: username }, { force: true })
 
         // give user his points
         global.db.engine.increment('users', { username: username }, { points: parseInt(total, 10) })

@@ -4,6 +4,7 @@ var constants = require('./constants')
 var moment = require('moment')
 var request = require('request-promise')
 var _ = require('lodash')
+const debug = require('debug')('twitch')
 require('moment-precise-range-plugin')
 
 const config = require('../config.json')
@@ -438,10 +439,11 @@ Twitch.prototype.watched = async function (self, sender, text) {
     const user = await global.users.get(text.trim() < 1 ? sender.username : parsed[0])
     watched = parseInt(!_.isNil(user) && !_.isNil(user.time) && !_.isNil(user.time.watched) ? user.time.watched : 0) / 1000 / 60 / 60
 
-    let username = (global.configuration.getValue('atUsername') ? '@' : '') + user.username
-    global.commons.sendMessage(global.translate('watched.success.time')
-      .replace(/\$time/g, watched.toFixed(1))
-      .replace(/\$username/g, username), sender)
+    let m = global.commons.prepare('watched.success.time', {
+      time: watched.toFixed(1),
+      username: user.username
+    })
+    debug(m); global.commons.sendMessage(m, sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('watched.failed.parse'), sender)
   }

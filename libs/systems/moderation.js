@@ -174,7 +174,7 @@ Moderation.prototype.permitLink = function (self, sender, text) {
       self.permits.push(parsed[1].toLowerCase())
     })
 
-    let m = global.commons.prepare('moderation.user-have-link-permit', { username: (global.configuration.getValue('atUsername') ? '@' : '') + parsed[1].toLowerCase(), link: global.parser.getLocalizedName(count, 'core.links'), count: count })
+    let m = global.commons.prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: global.parser.getLocalizedName(count, 'core.links'), count: count })
     debug(m); global.commons.sendMessage(m, sender)
   } catch (e) {
     global.commons.sendMessage(global.translate('moderation.permit-parse-failed'), sender)
