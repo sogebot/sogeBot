@@ -38,7 +38,10 @@ Commons.prototype.sendToOwners = function (text) {
 Commons.prototype.prepare = function (translate, attr) {
   attr = attr || {}
   let msg = global.translate(translate)
-  for (let [key, value] of Object.entries(attr)) msg = msg.replace(new RegExp('[$]' + key, 'g'), value)
+  for (let [key, value] of Object.entries(attr)) {
+    if (_.includes(['username', 'who', 'winner'], key)) value = global.configuration.getValue('atUsername') ? `@${value}` : value
+    msg = msg.replace(new RegExp('[$]' + key, 'g'), value)
+  }
   return msg
 }
 

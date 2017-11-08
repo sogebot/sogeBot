@@ -187,7 +187,7 @@ class Songs {
       if (self.currentSong.type === 'playlist') translation = 'songs.current-song-from-playlist'
       else translation = 'songs.current-song-from-songrequest'
     }
-    let message = global.commons.prepare(translation, { name: self.currentSong.title, username: (global.configuration.getValue('atUsername') ? '@' : '') + self.currentSong.username })
+    let message = global.commons.prepare(translation, { name: self.currentSong.title, username: self.currentSong.username })
     debug(message); global.commons.sendMessage(message, {username: config.settings.broadcaster_username})
   }
 
