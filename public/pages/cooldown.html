@@ -1,38 +1,32 @@
-<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <ul class="nav nav-pills">
-    <li>
-      <span data-lang="cooldowns" class="title text-default"></span>
-    </li>
-    <li>
-      <button class="btn btn-success plus-button" onclick="cooldown.new()" style="padding: 9px 15px;">
-        <i class="fa fa-plus" aria-hidden="true"></i>
-      </button>
-    </li>
-    <li class="active">
-      <a data-toggle="tab" href="#manage" data-lang="manage"></a>
-    </li>
-    <li>
-      <a data-toggle="tab" href="#responses" data-lang="bot-responses"></a>
-    </li>
-  </ul>
-</div>
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <span data-lang="cooldowns" class="title text-default"></span>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link btn-outline-success plus-button" onclick="cooldown.new()">
+      <i class="fa fa-plus" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#manage" data-lang="manage"></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#responses" data-lang="bot-responses"></a>
+  </li>
+</ul>
 
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="manage">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <table class="table table-striped table-responsive table-condensed">
-          <tbody id="Cooldowns">
-          </tbody>
-        </table>
-      </div>
+    <div class="widget">
+      <table class="table table-striped">
+        <tbody id="Cooldowns">
+        </tbody>
+      </table>
     </div>
   </div>
 
   <div role="tabpanel" class="tab-pane" id="responses">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget" id="bot-responses"></div>
-    </div>
+    <div class="widget" id="bot-responses"></div>
   </div>
 </div>
 
@@ -58,13 +52,13 @@
       this.list = list
       $("#Cooldowns").empty()
       $("#Cooldowns").append('<tr id="new-cooldown" style="display:none">' +
-        '<td style="vertical-align: top !important;min-width: 150px;"><span class="label label-default">New !command/keyword</span>' +
+        '<td style="vertical-align: top !important;min-width: 150px;"><span class="badge badge-default">New !command/keyword</span>' +
         commons.editable({
           text: '',
           id: '_new!',
           fnc: 'commons.stub'
         }) + '</td>' +
-        '<td style="vertical-align: top !important;"><span class="label label-primary">Cooldown</span> ' +
+        '<td style="vertical-align: top !important;"><span class="badge badge-primary">Cooldown</span> ' +
         commons.editable({
           text: '&nbsp;',
           id: '_new!',
@@ -78,7 +72,7 @@
         '</tr>');
       for (let item of list) {
         $("#Cooldowns").append('<tr class="page-data-row">' +
-          '<td style="vertical-align: top !important;min-width: 150px;"><span class="label label-default">' + (
+          '<td style="vertical-align: top !important;min-width: 150px;"><span class="badge badge-default">' + (
             item.key.startsWith('!') ? 'Command' : "Keyword") + '</span>' + commons.editable({
             text: item.key,
             id: item.key,
@@ -87,29 +81,29 @@
               type: item.type
             }
           }) + '</td>' +
-          '<td style="vertical-align: top !important;"><span class="label label-primary">Cooldown</span> ' +
-          '<span style="cursor: pointer;" class="label label-' + (item.type) + '" " data-type="' + item.type +
+          '<td style="vertical-align: top !important;"><span class="badge badge-primary">Cooldown</span> ' +
+          '<span style="cursor: pointer;" class="badge badge-' + (item.type) + '" " data-type="' + item.type +
           '" data-id="' + item.key + '" onclick="cooldown.toggleType(this)">type:' + translations[item.type] +
           '</span> ' +
-          '<span style="cursor: pointer;" class="label label-' + (item.quiet ? "danger" : "success") +
+          '<span style="cursor: pointer;" class="badge badge-' + (item.quiet ? "danger" : "success") +
           '" " data-type="' + item.type + '" data-id="' + item.key +
           '" onclick="cooldown.toggleNotify(this)">notify:' + translations[item.quiet ?
             'cooldown-quiet-toggle-yes' : 'cooldown-quiet-toggle-no'] + '</span> ' +
-          '<span style="cursor: pointer;" class="label label-' + (item.moderator ? "success" : "danger") +
+          '<span style="cursor: pointer;" class="badge badge-' + (item.moderator ? "success" : "danger") +
           '" data-type="' + item.type + '" data-id="' + item.key +
           '" onclick="cooldown.toggleModerators(this)">moderators:' + translations[item.moderator ? "comply" :
             "omit"] + '</span> ' +
-          '<span style="cursor: pointer;" class="label label-' + (item.owner ? "success" : "danger") +
+          '<span style="cursor: pointer;" class="badge badge-' + (item.owner ? "success" : "danger") +
           '" data-type="' + item.type + '" data-id="' + item.key +
           '" onclick="cooldown.toggleOwners(this)">owners:' + translations[item.owner ? "comply" : "omit"] +
           '</span> ' +
-          '<span style="cursor: pointer;" class="label label-' + (item.enabled ? "success" : "danger") +
+          '<span style="cursor: pointer;" class="badge badge-' + (item.enabled ? "success" : "danger") +
           '" data-type="' + item.type + '" data-id="' + item.key + '" onclick="cooldown.toggle(this)">' + (item
             .enabled ? "enabled" : "disabled") + '</span>' +
-          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="label label-danger btn-remove" data-type="' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="badge badge-danger btn-remove" data-type="' +
           item.type + '" data-id="' + item.key + '"  onclick="commons.confirm(this)">delete</span>' +
-          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
-          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-success btn-confirm" onclick="cooldown.delete(this)" data-type="' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="badge badge-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="badge badge-success btn-confirm" onclick="cooldown.delete(this)" data-type="' +
           item.type + '" data-id="' + item.key + '">confirm</span>' +
           commons.editable({
             text: item.miliseconds / 1000,
@@ -180,13 +174,13 @@
             .css('padding', '4px 5px 4px 5px')
           let response = $('<span>')
             .text('Response')
-            .addClass('label label-primary label-bot-response')
+            .addClass('badge badge-primary badge-bot-response')
           let kbd = $('<kbd>')
             .text(key.replace(/-/g, ' '))
             .addClass('kbd-bot-response')
           let span = $('<span>').addClass('custom-response')
             .attr('data-id', `${system}.${key}`)
-            .css('font-size', '80%')
+
 
           $('#bot-responses').append(div.append(response).append(kbd).append(span))
 

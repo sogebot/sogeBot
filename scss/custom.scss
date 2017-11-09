@@ -1,19 +1,18 @@
-* {
-  border-radius: 0 !important;
-}
-
 [data-lang] {
   font-style: normal;
 }
 
 body {
-  padding-top: 50px;
-  background-color: #eee;
   font-family: 'PT Sans', sans-serif;
+  padding-top: 50px;
 }
 
 .navbar-fixed-top {
   border: 0;
+}
+
+.navbar {
+  border-bottom: 1px solid $gray-500;
 }
 
 .sidebar {
@@ -30,26 +29,9 @@ body {
     padding: 20px;
     overflow-x: hidden;
     overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-    background-color: #f5f5f5;
-    border-right: 1px solid #eee;
+    background-color: $gray-200;
+    border-right: 1px solid $gray-300;
   }
-}
-
-/* Sidebar navigation */
-.nav-sidebar {
-  margin-right: -21px; /* 20px padding + 1px border */
-  margin-bottom: 20px;
-  margin-left: -20px;
-}
-.nav-sidebar > li > a {
-  padding-right: 20px;
-  padding-left: 20px;
-}
-.nav-sidebar > .active > a,
-.nav-sidebar > .active > a:hover,
-.nav-sidebar > .active > a:focus {
-  color: #fff;
-  background-color: #428bca;
 }
 
 /* TOP */
@@ -59,11 +41,9 @@ a.active {
 
 /* STREAM DASHBOARD INFORMATIONS */
 .stream-info-container {
-  line-height: 50px;
-  background: white;
-  border-bottom: 1px solid #ADB2B5;
-  border-radius: 4px;
-  width: 100%;
+  background: $white;
+  padding: 10px;
+  border-bottom: 1px solid $gray-500;
 }
 
 .stream-info {
@@ -71,6 +51,7 @@ a.active {
   overflow: hidden;
   white-space: nowrap;
   cursor: pointer;
+  padding-top: 6px;
 }
 
 .stream-info > h2 > small {
@@ -82,19 +63,16 @@ a.active {
 }
 
 .stream-info h2 {
-  position: absolute;
-  top: -10px;
   font-size: 12px;
   font-weight: bold;
   text-transform: uppercase;
+  margin: 0;
 }
 
 .stream-info span.data {
-  color: #999;
+  color: $gray-700;
   margin-left: 5px;
   font-size: small;
-  position: relative;
-  top: 5px;
 }
 
 .stream-info #diffFollowers {
@@ -104,42 +82,32 @@ a.active {
 
 .stream-info #diffFollowers.up {
   font-size: 18px;
-  color: #3c763d;
+  color: $green;
 }
 
 .stream-info #diffFollowers.down {
   font-size: 18px;
-  color: #a94442;
+  color: $red;
 }
 
 .stream-info span.stats {
-  position: relative;
-  top: 5px;
   font-size: small;
 }
 
-.stream-info span.stats span.stats-up, .stream-info span.stats span.stats-down, .stream-info span.stats span.stats-mid {
-  font-style: italic;
-}
-
-.stream-info span.stats span.glyphicon {
+.stream-info span.stats i {
   font-size: smaller;
 }
 
-.stream-info span.stats span.stats-up span.glyphicon {
+.stream-info span.stats span.stats-up {
   vertical-align: super;
 }
 
-.stream-info span.stats span.stats-mid span.glyphicon {
+.stream-info span.stats span.stats-mid {
   vertical-align: initial;
 }
 
-.stream-info span.stats span.stats-down span.glyphicon {
+.stream-info span.stats span.stats-down{
   vertical-align: sub;
-}
-
-.stream-info:first-child::before {
-  border-left: 0
 }
 
 
@@ -190,7 +158,7 @@ a.active {
 }
 
 #raffles-participants-list li:hover {
-  background-color: #eee;
+  background-color: $gray-200;
 }
 
 #raffles-participants-list li {
@@ -201,7 +169,7 @@ a.active {
 }
 
 .btn-label {
-  background-color: white !important;
+  background-color: $white !important;
   border: 0px !important;
   font-weight: bold;
 }
@@ -216,8 +184,8 @@ a.active {
 
 
 .widgetAdd {
-  color: #888;
-  border: 3px dashed #ADB2B5;
+  color: $gray-800;
+  border: 3px dashed $gray-400;
   border-radius: 4px;
   padding: 10px;
   text-align: center;
@@ -228,9 +196,8 @@ a.active {
 
 .widget {
   min-height: 30px;
-  color: #888;
-  background: white;
-  border: 1px solid #ADB2B5;
+  color: $gray-700;
+  background: $white;
   border-radius: 4px;
   margin-bottom: 10px;
 }
@@ -243,7 +210,7 @@ a.active {
   line-height: 0;
   font-weight: bold;
   text-shadow: 0 0 2px #000, 0 0 4px #888, 0 0 8px #888;
-  color:white;
+  color:$white;
   font-family: 'PT Sans', sans-serif !important;
 
 }
@@ -254,18 +221,18 @@ span.title {
   font-weight: bold !important;
   text-transform: uppercase;
   border: 0 !important;
-  padding:0 10px 3px 10px !important;
+  padding:0 10px !important;
   margin-bottom: 0;
   font-family: 'PT Sans Narrow', sans-serif;
   font-weight: 100;
-  color: #777;
+  color: $gray-700;
 }
 
 span.title-part {
   font-size:18px !important;
-  border: 1px solid #ADB2B5 !important;
+  border: 1px solid $blue !important;
   border-bottom: 0 !important;
-  background-color: white;
+  background-color: $white;
   position: relative;
   top: 1px;
 }
@@ -298,7 +265,7 @@ span.title-part {
 }
 
 .widget .controls .not-active {
-  color: #888 !important;
+  color: $gray-800 !important;
 
 }
 
@@ -311,7 +278,7 @@ span.title-part {
 }
 
 #widgets div span {
-  color: white;
+  color: $white;
   padding-top: 5px;
   display: block;
   text-align: center;
@@ -331,13 +298,12 @@ span.title-part {
 }
 
 #widgets a:hover span {
-  color: #337ab7 !important;
+  color: $blue !important;
   text-decoration: none;
 }
 
 .widget .table {
   margin-bottom: 0;
-  font-size: 10px;
 }
 
 .widget .table tr:first-child > td {
@@ -346,7 +312,7 @@ span.title-part {
 
 .widget .table tr > td {
   border-top: 1px dotted #eee;
-  font-size: 12px
+  font-size: .8rem
 }
 
 #settings .widget .table tr > td {
@@ -408,8 +374,8 @@ span.title-part {
 .footer {
   position: fixed;
   bottom: 0; right: 0;
-  background-color: white;
-  border: 1px dotted #ADB2B5;
+  background-color: $white;
+  border: 1px dotted $gray-400;
   font-size: 10px;
   padding: 5px;
   line-height: 10px;
@@ -481,7 +447,7 @@ table td {
 table a {
   font-family: 'PT Mono', monospace;
   font-size: 10px;
-  color:#999;
+  color: $gray-900;
 }
 
 /* QUEUE-WIDGET */
@@ -532,10 +498,10 @@ a.soundboard-list-group-item span {
 #change-game-search-list {
   list-style-type: none;
   padding: 0;
-  border: 1px dotted #ccc;
+  border: 1px dotted $gray-300;
   border-top: 0;
   position: absolute;
-  background-color: white;
+  background-color: $white;
   width: 100%;
   z-index: 9000;
   display: none;
@@ -552,7 +518,7 @@ a.soundboard-list-group-item span {
 }
 
 #change-game-search-list li:hover {
-  color: #337ab7
+  color: $blue
 }
 
 .dlg-game-and-title {
@@ -587,8 +553,8 @@ a.soundboard-list-group-item span {
 
 .carousel-games-control {
   background-image: none !important;
-  background: white;
-  color: black;
+  background: $white;
+  color: $black;
   width: 5%;
 }
 
@@ -637,10 +603,10 @@ a.soundboard-list-group-item span {
 
 .form-chainops label {
   font-size: 20px;
-  color:white;
+  color:$white;
   font-variant: small-caps;
   text-transform: lowercase;
-  text-shadow: 0 0 2px #000, 0 0 4px #888, 0 0 8px #888;
+  text-shadow: 0 0 2px $black, 0 0 4px $gray-800, 0 0 8px $gray-800;
 }
 
 .form-chainops small {
@@ -663,10 +629,10 @@ a.soundboard-list-group-item span {
 
 #events-current label {
     font-size: 20px;
-    color:white;
+    color:$white;
     font-variant: small-caps;
     text-transform: lowercase;
-    text-shadow: 0 0 2px #000, 0 0 4px #888, 0 0 8px #888;
+    text-shadow: 0 0 2px $black, 0 0 4px $gray-800, 0 0 8px $gray-800;
     padding-left: 10px;
 }
 
@@ -706,11 +672,11 @@ a.soundboard-list-group-item span {
 }
 
 #events-current > div:nth-child(2n) {
-  background-color: rgb(250, 250, 250);
+  background-color: $gray-100;
 }
 
 .action-danger > a {
-  color: #a94442 !important;
+  color: $red !important;
 }
 
 th:first-letter {
@@ -739,11 +705,11 @@ th:first-letter {
   width: 100% !important;
   left: 0 !important;
   background-image: none;
-  background-color: #337ab7;
+  background-color: $blue;
 }
 
 .menu-container {
-  border-bottom: 1px solid #ADB2B5;
+  border-bottom: 1px solid $gray-500;
 }
 
 #gallery-list {
@@ -781,10 +747,10 @@ abbr[data-original-title], abbr[title] {
   line-height: 25px;
   display: inline-block;
   padding: 10px;
-  border: 1px solid #cbcbcb;
+  border: 1px solid $gray-300;
   border-radius: 5px !important;
   padding: 5px;
-  background-color: white;
+  background-color: $white;
   cursor: text;
 }
 
@@ -792,8 +758,7 @@ abbr[data-original-title], abbr[title] {
   top: -30px;
 }
 
-.label {
-  text-shadow: 1px 1px black, -1px -1px black, -1px 1px black, 1px -1px black;
+.badge {
   font-size: 100%;
   text-transform: uppercase;
   font-weight: bold;
@@ -807,12 +772,14 @@ kbd {
   font-size: 100%
 }
 
-.label-user {
-  background-color: #FF9630
+.badge-user {
+  background-color: $orange;
+  color: $white;
 }
 
-.label-global, .label-trigger {
-  background-color: #A830FF
+.badge-global, .badge-trigger {
+  background-color: $purple;
+  color: $white;
 }
 
 .deleteTab {
@@ -830,13 +797,11 @@ li.active a.withDelete {
 
 li.active .deleteTab {
   display: inline-block !important;
-  background-color: rgb(169, 68, 66) !important;
-  color: white;
+  background-color: $red !important;
+  color: $white;
 }
 
-.label-bot-response {
-  text-shadow: 1px 1px black, -1px -1px black, -1px 1px black, 1px -1px black;
-  font-size: 80%;
+.badge-bot-response {
   text-transform: uppercase;
   font-weight: bold;
   font-family: 'PT Sans';
@@ -847,14 +812,16 @@ li.active .deleteTab {
   font-weight: bold;
   padding: 3px;
   font-family: 'PT Mono', monospace;
-  font-size: 70%;
   text-transform: uppercase;
-  color: #888;
-  background-color: rgba(0,0,0,0);
+  color: $gray-800;
+  background-color: $white;
 }
+
 
 #bot-responses {
   column-count: 2;
+  font-size: .8rem;
+  padding-top: 0.5rem;
 }
 
 .settings {
@@ -866,7 +833,7 @@ li.active .deleteTab {
 }
 
 .settings:nth-child(even) {
-  background-color: #337eb70c;
+  background-color: $gray-200;
 }
 
 .settings strong {
@@ -894,4 +861,57 @@ li.active .deleteTab {
 
 #carousel-image-list div img {
   width: 100%;
+}
+
+.plus-button {
+  color: $green !important;
+}
+
+.plus-button.disabled { color: $gray-300 !important; }
+
+.plus-button:hover {
+  color: $white !important;
+}
+
+.table th {
+  border-top: 0;
+  font-size: 1rem !important;
+}
+
+.editable-variable {
+  user-select: none;
+  display: inline-block;
+  font-family: monospace;
+  color: $bot-response-text-color;
+  border: 1px solid $bot-response-border-color;
+  border-radius: 5px !important;
+  padding: 0 4px 0 4px;
+  background-color: $bot-response-bg-color;
+  font-size: 130%;
+}
+
+.editable-variable.block {
+  display: block;
+}
+
+#helper {
+  display: none;
+  user-select: none;
+  cursor: pointer;
+  border: 2px solid #dea189;
+  border-top: 1px dotted $gray-200;
+  padding: 0 10px 5px 10px;
+  background-color: $white;
+  margin-top: 5px;
+  margin-left: -7px;
+  position: absolute;
+}
+
+table tr td hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid $black;
+  margin: 1em 0;
+  padding: 0;
 }

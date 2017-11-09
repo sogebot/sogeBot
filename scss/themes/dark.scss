@@ -1,0 +1,59 @@
+// Variables
+//
+// Variables should follow the `$component-state-property-size` formula for
+// consistent naming. Ex: $nav-link-disabled-color and $modal-content-box-shadow-xs.
+
+
+//
+// Color system
+//
+
+// stylelint-disable
+$black:    #fff !default;
+$gray-900: #f8f9fa !default;
+$gray-800: #e9ecef !default;
+$gray-700: #dee2e6 !default;
+$gray-600: #ced4da !default;
+$gray-500: #adb5bd !default;
+$gray-400: #868e96 !default;
+$gray-300: #495057 !default;
+$gray-200: #343a40 !default;
+$gray-100: #212529 !default;
+$white:    #000 !default;
+
+$grays: () !default;
+$grays: map-merge((
+  "100": $gray-100,
+  "200": $gray-200,
+  "300": $gray-300,
+  "400": $gray-400,
+  "500": $gray-500,
+  "600": $gray-600,
+  "700": $gray-700,
+  "800": $gray-800,
+  "900": $gray-900
+), $grays);
+
+$blue:    #004084 !default;
+$indigo:  #350982 !default;
+$purple:  #472c79 !default;
+$pink:    #9d2961 !default;
+$red:     #9b2432 !default;
+$orange:  #813f09 !default;
+$yellow:  #836304 !default;
+$green:   #1d7530 !default;
+$teal:    #117255 !default;
+$cyan:    #0d5763 !default;
+
+$bot-response-text-color: #ff425b !default;
+$bot-response-bg-color: #181b1d !default;
+$bot-response-border-color: $gray-200 !default;
+$bot-response-text-strong: false;
+
+
+$enable-rounded: false;
+$enable-gradients: false;
+$enable-hover-media-query: true;
+
+@import "../../node_modules/bootstrap/scss/bootstrap";
+@import "../custom.scss";
