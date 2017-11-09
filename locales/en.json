@@ -284,8 +284,8 @@
       }
     },
     "stats-panel": {
-      "show": "show",
-      "hide": "hide"
+      "show": "Show stats",
+      "hide": "Hide stats"
     },
     "bot-responses": "Bot responses",
     "duration": "Duration",

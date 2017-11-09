@@ -1,41 +1,50 @@
-<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <div class="widget">
-    <h2 class="title" data-lang="logger"></h2>
-    <div class="btn-group" style="float: right; padding-top: 10px; padding-right: 10px;">
-      <button class="btn btn-default btn-label"><span data-lang="page-logger.labels.order"></span>:</button>
-      <select class="form-control" style="display: inline-block; width: auto;" onchange="filter.toggle(this, 'order')">
-        <option value="asc" data-lang="page-logger.order.asc"></option>
-        <option value="desc" data-lang="page-logger.order.desc"></option>
-      </select>
-    </div>
-    <div class="btn-group" style="float: right; padding-top: 10px; padding-right: 10px;">
-      <button class="btn btn-default btn-label"><span data-lang="page-logger.labels.range"></span>:</button>
-      <select class="form-control" style="display: inline-block; width: auto;" onchange="filter.toggle(this, 'range')">
-        <option value="24" data-lang="page-logger.range.day"></option>
-        <option value="168" data-lang="page-logger.range.week"></option>
-        <option value="672" data-lang="page-logger.range.month"></option>
-        <option value="8064" data-lang="page-logger.range.year"></option>
-        <option value="0" data-lang="page-logger.range.all"></option>
-      </select>
-    </div>
-    <div class="btn-group" style="float: right; padding-top: 10px; padding-right: 10px;">
-      <button class="btn btn-default btn-label"><span data-lang="page-logger.labels.filters"></span>:</button>
-      <button class="btn btn-danger" onclick="filter.toggle(this, 'messages')" data-lang="page-logger.buttons.messages"></button>
-      <button class="btn btn-danger" onclick="filter.toggle(this, 'follow')" data-lang="page-logger.buttons.follows"></button>
-      <button class="btn btn-danger" onclick="filter.toggle(this, 'sub')" data-lang="page-logger.buttons.subs"></button>
-      <button class="btn btn-danger" onclick="filter.toggle(this, 'cheer')" data-lang="page-logger.buttons.cheers"></button>
-      <button class="btn btn-danger" onclick="filter.toggle(this, 'responses')" data-lang="page-logger.buttons.responses"></button>
-      <button class="btn btn-danger" onclick="filter.toggle(this, 'whispers')" data-lang="page-logger.buttons.whispers"></button>
-      <button class="btn btn-danger" onclick="filter.toggle(this, 'host')" data-lang="page-logger.buttons.hosts"></button>
-      <button class="btn btn-danger" onclick="filter.toggle(this, 'ban')" data-lang="page-logger.buttons.bans"></button>
-      <button class="btn btn-danger" onclick="filter.toggle(this, 'timeout')" data-lang="page-logger.buttons.timeouts"></button>
-    </div>
-    <textarea readonly class="form-control" rows="3" id="logger-data" style="height: 800px; color: lawngreen; background-color: #000; font-size: 100%"></textarea>
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <span data-lang="logger" class="title text-default"></span>
+  </li>
+</ul>
+
+<div style="position: absolute; right: 10px; top:-10px;">
+  <div class="btn-group" style="float: right; padding-top: 10px; padding-right: 10px;">
+    <button class="btn btn-default btn-label">
+      <span data-lang="page-logger.labels.order"></span>:</button>
+    <select class="form-control" style="display: inline-block; width: auto;" onchange="filter.toggle(this, 'order')">
+      <option value="asc" data-lang="page-logger.order.asc"></option>
+      <option value="desc" data-lang="page-logger.order.desc"></option>
+    </select>
+  </div>
+  <div class="btn-group" style="float: right; padding-top: 10px; padding-right: 10px;">
+    <button class="btn btn-default btn-label">
+      <span data-lang="page-logger.labels.range"></span>:</button>
+    <select class="form-control" style="display: inline-block; width: auto;" onchange="filter.toggle(this, 'range')">
+      <option value="24" data-lang="page-logger.range.day"></option>
+      <option value="168" data-lang="page-logger.range.week"></option>
+      <option value="672" data-lang="page-logger.range.month"></option>
+      <option value="8064" data-lang="page-logger.range.year"></option>
+      <option value="0" data-lang="page-logger.range.all"></option>
+    </select>
+  </div>
+  <div class="btn-group" style="float: right; padding-top: 10px; padding-right: 10px;">
+    <button class="btn btn-default btn-label">
+      <span data-lang="page-logger.labels.filters"></span>:</button>
+    <button class="btn btn-danger" onclick="filter.toggle(this, 'messages')" data-lang="page-logger.buttons.messages"></button>
+    <button class="btn btn-danger" onclick="filter.toggle(this, 'follow')" data-lang="page-logger.buttons.follows"></button>
+    <button class="btn btn-danger" onclick="filter.toggle(this, 'sub')" data-lang="page-logger.buttons.subs"></button>
+    <button class="btn btn-danger" onclick="filter.toggle(this, 'cheer')" data-lang="page-logger.buttons.cheers"></button>
+    <button class="btn btn-danger" onclick="filter.toggle(this, 'responses')" data-lang="page-logger.buttons.responses"></button>
+    <button class="btn btn-danger" onclick="filter.toggle(this, 'whispers')" data-lang="page-logger.buttons.whispers"></button>
+    <button class="btn btn-danger" onclick="filter.toggle(this, 'host')" data-lang="page-logger.buttons.hosts"></button>
+    <button class="btn btn-danger" onclick="filter.toggle(this, 'ban')" data-lang="page-logger.buttons.bans"></button>
+    <button class="btn btn-danger" onclick="filter.toggle(this, 'timeout')" data-lang="page-logger.buttons.timeouts"></button>
   </div>
 </div>
+<textarea readonly class="form-control" rows="3" id="logger-data" style="height: 800px; color: lawngreen; background-color: #000; font-size: 100%"></textarea>
 
 <script>
-  socket.emit('log.get', { range: 24, order: 'asc' })
+  socket.emit('log.get', {
+    range: 24,
+    order: 'asc'
+  })
 
   var filter = {
     data: {
@@ -74,4 +83,5 @@
   socket.on('log', function (log) {
     $("#logger-data").val(log)
   })
+
 </script>

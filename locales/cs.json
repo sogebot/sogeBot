@@ -284,8 +284,8 @@
       }
     },
     "stats-panel": {
-      "show": "ukázat",
-      "hide": "skrýt"
+      "show": "Ukázat statistiky",
+      "hide": "Skrýt statistiky"
     },
     "bot-responses": "Odpovědi bota",
     "duration": "Trvání",

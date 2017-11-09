@@ -8165,11 +8165,17 @@ span.title {
 
 span.title-part {
   font-size: 18px !important;
-  border: 1px solid #004084 !important;
-  border-bottom: 0 !important;
+  margin-top: 1rem;
+  margin-left: .2rem;
+  border-left: 0.3rem solid #004084 !important;
   background-color: #000;
   position: relative;
   top: 1px;
+}
+
+span.title.title-part.text-default + div.widget {
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .widget .title:first-letter {
@@ -8729,21 +8735,16 @@ kbd {
 
 .deleteTab {
   display: none !important;
-  position: absolute !important;
-  right: 0;
-  top: 0;
   font-weight: normal;
-  padding: 10px 5px 10px 5px;
 }
 
 li.active a.withDelete {
   padding-right: 35px;
 }
 
-li.active .deleteTab {
+li a.active .deleteTab {
   display: inline-block !important;
-  background-color: #9b2432 !important;
-  color: #000;
+  color: #9b2432 !important;
 }
 
 .badge-bot-response {
@@ -8772,19 +8773,20 @@ li.active .deleteTab {
 .settings {
   width: 100%;
   font-family: 'PT Sans Narrow', sans-serif;
-  font-size: 20px !important;
+  font-size: 1.2rem !important;
   padding: 10px;
-  column-count: 2;
 }
 
-.settings:nth-child(even) {
-  background-color: #343a40;
+.settings-part {
+  font-size: 1.0rem !important;
+  padding: 0 2rem;
 }
 
 .settings strong {
   font-weight: bold !important;
   text-transform: uppercase;
   line-height: 40px;
+  color: #ced4da;
 }
 
 .settings div label {

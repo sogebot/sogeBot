@@ -95,7 +95,7 @@
         <div class="dropdown-menu dropdown-menu-right" style="right: 0; left: auto;" aria-labelledby="settingsButton">
           <h6 class="dropdown-header">UI</h6>
           <button class="dropdown-item" href="#" id="percentage-btn" data-show-percentage="true" onclick="switchPercentageShow()">Show percentage in stats</button>
-          <button class="dropdown-item" href="#" id="stats-btn" onclick="switchStats()">Hide stats</button>
+          <button class="dropdown-item" href="#" id="stats-btn" onclick="switchStats()" data-lang="stats-panel.hide">Hide stats</button>
 
           <h6 class="dropdown-header">BOT</h6>
           <button class="dropdown-item" id="mute-btn" data-muted="false" onclick="switchMute()" data-lang="mute"></button>
@@ -1143,14 +1143,12 @@
       var btn = $('#stats-btn')
       var container = $('.stream-info-container')
 
-      if (btn.children('span').text() === translations['stats-panel'].hide) {
+      if (btn.text() === translations['stats-panel'].hide) {
         container.css('display', 'none')
-        btn.children('span').text(translations['stats-panel'].show)
-        btn.children('i').removeClass().addClass('fa fa-angle-down')
+        btn.text(translations['stats-panel'].show)
       } else {
         container.css('display', 'block')
-        btn.children('span').text(translations['stats-panel'].hide)
-        btn.children('i').removeClass().addClass('fa fa-angle-up')
+        btn.text(translations['stats-panel'].hide)
       }
     }
 

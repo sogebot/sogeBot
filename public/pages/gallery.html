@@ -1,37 +1,30 @@
-<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <ul class="nav nav-pills">
-    <li>
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
       <span data-lang="gallery" class="title text-default"></span>
     </li>
-    <li>
+    <li class="nav-item">
       <input type="file" name="file" id="file-input-gallery" accept=".jpg,.png,.gif,.mp3,.ogg,.mp4,.flv" style="width: 0.1px;height: 0.1px;opacity: 0;overflow: hidden;position: absolute;z-index: -1;"
       />
-      <label for="file-input-gallery" class="btn btn-success" style="padding: 9px 15px;"> <i class="fa fa-plus" aria-hidden="true"></i></label>
+      <label style="padding: .42rem; margin: 0;" for="file-input-gallery" class="nav-link btn-outline-success plus-button"> <i class="fa fa-plus" aria-hidden="true"></i></label>
     </li>
-    <li>
-        <div class="alert alert-success" id="gallery-upload-success" role="alert" style="padding: 9px 15px; margin:0; display:none;">
+    <li class="nav-item">
+        <div class="alert alert-success" id="gallery-upload-success" role="alert" style="padding: 0.39rem; margin:0; display:none;">
             <b>Success!</b> File was uploaded.</div>
-          <div class="alert alert-danger" id="gallery-upload-failed" role="alert" style="padding: 9px 15px; margin:0; display:none;">
+          <div class="alert alert-danger" id="gallery-upload-failed" role="alert" style="padding: 0.39rem; margin:0; display:none;">
             <b>Something went wrong!</b> File was
             <b>NOT</b> uploaded. Supported filetypes are: ogg, mp3, mp4, flv, png, jpg and gif.</div>
-    </li>
+    </li-->
   </ul>
-</div>
 
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="manage">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
       <div class="widget">
-
-
         <div id="gallery">
           <ul id="gallery-list"></ul>
         </div>
-
         <span class="clearfix"></span>
       </div>
     </div>
-  </div>
 </div>
 
   <script>

@@ -1,368 +1,340 @@
-<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <ul class="nav nav-pills">
-    <li>
-      <span data-lang="overlays" class="title text-default"></span>
-    </li>
-    <li class="active">
-      <a data-toggle="tab" href="#emotes" data-lang="emotes"></a>
-    </li>
-    <li>
-      <a data-toggle="tab" href="#stats" data-lang="stats"></a>
-    </li>
-    <li>
-      <a data-toggle="tab" href="#eventlist" data-lang="eventlist"></a>
-    </li>
-    <li>
-      <a data-toggle="tab" href="#alerts" data-lang="alerts"></a>
-    </li>
-    <li>
-      <a data-toggle="tab" href="#carousel" data-lang="carousel"></a>
-    </li>
-  </ul>
-</div>
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <span data-lang="overlays" class="title text-default"></span>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#emotes" data-lang="emotes"></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#stats" data-lang="stats"></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#eventlist" data-lang="eventlist"></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#alerts" data-lang="alerts"></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#carousel" data-lang="carousel"></a>
+  </li>
+</ul>
 
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="emotes">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <div class="settings">
-          <div>
-            <strong>XSplit / OBS link</strong>
-          </div>
-          <div>
-            <a class="btn btn-success" href="/overlays/emotes" target="_blank">/overlays/emotes (1920x1080 or 1280x720)</a>
-          </div>
-        </div>
+    <div class="row settings">
+      <div class="col">
+        <strong>XSplit / OBS link</strong>
+      </div>
+      <div class="col">
+        <a class="btn btn-success" href="/overlays/emotes" target="_blank">/overlays/emotes (1920x1080 or 1280x720)</a>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong>Overlay testing</strong>
-          </div>
-          <div>
-            <button class="btn btn-default" onclick="emotesTest('explosion')">Test explosion</button>
-            <button class="btn btn-default" onclick="emotesTest('emote')">Test emote</button>
-          </div>
-        </div>
+      <div class="col">
+        <strong>Overlay testing</strong>
+      </div>
+      <div class="col">
+        <button class="btn btn-default" onclick="emotesTest('explosion')">Test explosion</button>
+        <button class="btn btn-default" onclick="emotesTest('emote')">Test emote</button>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="overlay-emotes-size"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="OEmotesSize" onclick="commons.configEditable(this, '')" id="configOEmotesSize"></abbr>
-            <div class="input-group" style="display:none;" id="input_OEmotesSize_group">
-              <div class="input-group-addon">0-2</div>
-              <input id="input_OEmotesSize" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="overlay-emotes-size"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="OEmotesSize" onclick="commons.configEditable(this, '')" id="configOEmotesSize"></abbr>
+        <div class="input-group" style="display:none;" id="input_OEmotesSize_group">
+          <div class="input-group-addon">0-2</div>
+          <input id="input_OEmotesSize" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="overlay-emotes-max"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="OEmotesMax" onclick="commons.configEditable(this, '')" id="configOEmotesMax"></abbr>
-            <div class="input-group" style="display:none;" id="input_OEmotesMax_group">
-              <input id="input_OEmotesMax" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="overlay-emotes-max"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="OEmotesMax" onclick="commons.configEditable(this, '')" id="configOEmotesMax"></abbr>
+        <div class="input-group" style="display:none;" id="input_OEmotesMax_group">
+          <input id="input_OEmotesMax" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="overlay-emotes-animation"></strong>
-          </div>
-          <div>
-            <select id="overlay-emotes-animation-select" class="form-control" onchange="saveEmotesAnimation()">
-              <option value="fadeup" data-lang="fade-out-top"></option>
-              <option value="fadezoom" data-lang="fade-out-zoom"></option>
-            </select>
-          </div>
-        </div>
+      <div class="col">
+        <strong data-lang="overlay-emotes-animation"></strong>
+      </div>
+      <div class="col">
+        <select id="overlay-emotes-animation-select" class="form-control" onchange="saveEmotesAnimation()">
+          <option value="fadeup" data-lang="fade-out-top"></option>
+          <option value="fadezoom" data-lang="fade-out-zoom"></option>
+        </select>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="overlay-emotes-animation-time"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="OEmotesAnimationTime" onclick="commons.configEditable(this, 'ms')" id="configOEmotesAnimationTime"></abbr>
-            <div class="input-group" style="display:none;" id="input_OEmotesAnimationTime_group">
-              <input id="input_OEmotesAnimationTime" class="form-control input-sm" type="text" />
-              <div class="input-group-addon">ms</div>
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="overlay-emotes-animation-time"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="OEmotesAnimationTime" onclick="commons.configEditable(this, 'ms')" id="configOEmotesAnimationTime"></abbr>
+        <div class="input-group" style="display:none;" id="input_OEmotesAnimationTime_group">
+          <input id="input_OEmotesAnimationTime" class="form-control input-sm" type="text" />
+          <div class="input-group-addon">ms</div>
         </div>
       </div>
     </div>
   </div>
 
   <div role="tabpanel" class="tab-pane" id="stats">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <div class="settings">
-          <div>
-            <strong>XSplit / OBS link</strong>
-          </div>
-          <div>
-            <a class="btn btn-success" href="/overlays/stats" target="_blank">/overlays/stats (500x55)</a>
-          </div>
-        </div>
+    <div class="row settings">
+      <div class="col">
+        <strong>XSplit / OBS link</strong>
+      </div>
+      <div class="col">
+        <a class="btn btn-success" href="/overlays/stats" target="_blank">/overlays/stats (500x55)</a>
       </div>
     </div>
   </div>
 
   <div role="tabpanel" class="tab-pane" id="eventlist">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <div class="settings">
-          <div>
-            <strong>XSplit / OBS link</strong>
-          </div>
-          <div>
-            <a class="btn btn-success" href="/overlays/eventlist" target="_blank">/overlays/eventlist (350x220)</a>
-          </div>
-        </div>
+    <div class="row settings">
+      <div class="col">
+        <strong>XSplit / OBS link</strong>
+      </div>
+      <div class="col">
+        <a class="btn btn-success" href="/overlays/eventlist" target="_blank">/overlays/eventlist (350x220)</a>
       </div>
     </div>
   </div>
 
   <div role="tabpanel" class="tab-pane" id="alerts">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <div class="settings">
-          <div>
-            <strong>XSplit / OBS link</strong>
-          </div>
-          <div>
-            <a class="btn btn-success" href="/overlays/alerts" target="_blank">/overlays/alerts (1920x1080 or 1280x720)</a>
-          </div>
-        </div>
-
-        <div class="settings">
-          <div>
-            <strong>Overlay testing</strong>
-          </div>
-          <div>
-            <button class="btn btn-default" onclick="replayTest()">Test replay</button>
-          </div>
-        </div>
+    <div class="row settings">
+      <div class="col">
+        <strong>XSplit / OBS link</strong>
       </div>
+      <div class="col">
+        <a class="btn btn-success" href="/overlays/alerts" target="_blank">/overlays/alerts (1920x1080 or 1280x720)</a>
+      </div>
+      <div class="w-100"></div>
 
+      <div class="col">
+        <strong>Overlay testing</strong>
+      </div>
+      <div class="col">
+        <button class="btn btn-default" onclick="replayTest()">Test replay</button>
+      </div>
+    </div>
+
+    <div class="col">
       <span class="title title-part text-default">Replay settings
         <a href="https://github.com/sogehige/sogeBot/wiki/OBS-replays-through-alert-systems">
           <small>How to setup</small>
         </a>
       </span>
-      <div class="widget">
-        <div class="settings">
-          <div>
-            <strong data-lang="page-settings.overlays.replay.position"></strong>
-          </div>
-          <div>
-            <select id="overlay-replay-position-select" class="form-control" onchange="saveReplayPos()">
-              <option value="left" data-lang="page-settings.overlays.replay.posleft"></option>
-              <option value="right" data-lang="page-settings.overlays.replay.posright"></option>
-            </select>
-          </div>
-        </div>
+    </div>
+    <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="page-settings.overlays.replay.filter.title"></strong>
-          </div>
-          <div>
-            <select id="overlay-replay-filter-select" class="form-control" onchange="saveReplayFil()">
-              <option value="none" data-lang="page-settings.overlays.replay.filter.none"></option>
-              <option value="grayscale" data-lang="page-settings.overlays.replay.filter.grayscale"></option>
-              <option value="sepia" data-lang="page-settings.overlays.replay.filter.sepia"></option>
-              <option value="tint" data-lang="page-settings.overlays.replay.filter.tint"></option>
-              <option value="washed" data-lang="page-settings.overlays.replay.filter.washed"></option>
-            </select>
-          </div>
-        </div>
+    <div class="row settings settings-part">
+      <div class="col">
+        <strong data-lang="page-settings.overlays.replay.position"></strong>
+      </div>
+      <div class="col">
+        <select id="overlay-replay-position-select" class="form-control" onchange="saveReplayPos()">
+          <option value="left" data-lang="page-settings.overlays.replay.posleft"></option>
+          <option value="right" data-lang="page-settings.overlays.replay.posright"></option>
+        </select>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="page-settings.overlays.replay.offsetX"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="replayOffsetX" onclick="commons.configEditable(this, '')" id="configReplayOffsetX"></abbr>
-            <div class="input-group" style="display:none;" id="input_replayOffsetX_group">
-              <div class="input-group-addon">px</div>
-              <input id="input_replayOffsetX" class="form-control input-sm" type="text" />
-            </div>
-          </div>
-        </div>
+      <div class="col">
+        <strong data-lang="page-settings.overlays.replay.filter.title"></strong>
+      </div>
+      <div class="col">
+        <select id="overlay-replay-filter-select" class="form-control" onchange="saveReplayFil()">
+          <option value="none" data-lang="page-settings.overlays.replay.filter.none"></option>
+          <option value="grayscale" data-lang="page-settings.overlays.replay.filter.grayscale"></option>
+          <option value="sepia" data-lang="page-settings.overlays.replay.filter.sepia"></option>
+          <option value="tint" data-lang="page-settings.overlays.replay.filter.tint"></option>
+          <option value="washed" data-lang="page-settings.overlays.replay.filter.washed"></option>
+        </select>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="page-settings.overlays.replay.offsetY"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="replayOffsetY" onclick="commons.configEditable(this, '')" id="configReplayOffsetY"></abbr>
-            <div class="input-group" style="display:none;" id="input_replayOffsetY_group">
-              <div class="input-group-addon">px</div>
-              <input id="input_replayOffsetY" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="page-settings.overlays.replay.offsetX"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="replayOffsetX" onclick="commons.configEditable(this, '')" id="configReplayOffsetX"></abbr>
+        <div class="input-group" style="display:none;" id="input_replayOffsetX_group">
+          <div class="input-group-addon">px</div>
+          <input id="input_replayOffsetX" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="page-settings.overlays.replay.size"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="replaySize" onclick="commons.configEditable(this, '')" id="configReplaySize"></abbr>
-            <div class="input-group" style="display:none;" id="input_replaySize_group">
-              <div class="input-group-addon">px</div>
-              <input id="input_replaySize" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="page-settings.overlays.replay.offsetY"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="replayOffsetY" onclick="commons.configEditable(this, '')" id="configReplayOffsetY"></abbr>
+        <div class="input-group" style="display:none;" id="input_replayOffsetY_group">
+          <div class="input-group-addon">px</div>
+          <input id="input_replayOffsetY" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="page-settings.overlays.replay.volume"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="replayVolume" onclick="commons.configEditable(this, '')" id="configReplayVolume"></abbr>
-            <div class="input-group" style="display:none;" id="input_replayVolume_group">
-              <div class="input-group-addon">0-100</div>
-              <input id="input_replayVolume" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="page-settings.overlays.replay.size"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="replaySize" onclick="commons.configEditable(this, '')" id="configReplaySize"></abbr>
+        <div class="input-group" style="display:none;" id="input_replaySize_group">
+          <div class="input-group-addon">px</div>
+          <input id="input_replaySize" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="page-settings.overlays.replay.label"></strong>
-          </div>
-          <div>
-            <input id="replayLabelToggle" type="checkbox" data-toggle="toggle" data-size="mini" data-onstyle="success" data-offstyle="danger">
-          </div>
+      <div class="col">
+        <strong data-lang="page-settings.overlays.replay.volume"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="replayVolume" onclick="commons.configEditable(this, '')" id="configReplayVolume"></abbr>
+        <div class="input-group" style="display:none;" id="input_replayVolume_group">
+          <div class="input-group-addon">0-100</div>
+          <input id="input_replayVolume" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
+
+      <div class="col">
+        <strong data-lang="page-settings.overlays.replay.label"></strong>
+      </div>
+      <div class="col">
+        <input id="replayLabelToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
       </div>
     </div>
   </div>
 
   <div role="tabpanel" class="tab-pane" id="carousel">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <div class="settings">
-          <div>
-            <strong>XSplit / OBS link</strong>
-          </div>
-          <div>
-            <a class="btn btn-success" href="/overlays/carousel" target="_blank">/overlays/carousel</a>
-          </div>
-        </div>
-
-        <div class="settings">
-          <div>
-            <strong data-lang="overlay-carousel-upload"></strong>
-          </div>
-          <div>
-            <input type="file" id="file-input-carousel" accept="image/*" />
-          </div>
-        </div>
+    <div class="row settings">
+      <div class="col">
+        <strong>XSplit / OBS link</strong>
       </div>
+      <div class="col">
+        <a class="btn btn-success" href="/overlays/carousel" target="_blank">/overlays/carousel</a>
+      </div>
+      <div class="w-100"></div>
 
-      <span class="title title-part text-default">Images</span>
-      <div class="widget">
+      <div class="col">
+        <strong data-lang="overlay-carousel-upload"></strong>
+      </div>
+      <div class="col">
+        <input type="file" id="file-input-carousel" accept="image/*" />
+      </div>
+      <div class="w-100"></div>
+
+      <div class="row settings settings-part">
+        <div class="col">
+          <span class="title title-part text-default">Images</span>
+        </div>
+        <div class="w-100"></div>
+
         <div id="carousel-image-list"></div>
       </div>
     </div>
   </div>
-</div>
+  </div>
 
-<script>
-  socket.off('configuration')
+  <script>
+    socket.off('configuration')
 
-  socket.emit('getConfiguration')
-  socket.once('configuration', function (data) {
-    $("#configOEmotesSize").text(data.OEmotesSize)
-    $("#configOEmotesMax").text(data.OEmotesMax)
-    $("#configOEmotesAnimationTime").text(data.OEmotesAnimationTime + 'ms')
+    socket.emit('getConfiguration')
+    socket.once('configuration', function (data) {
+      $("#configOEmotesSize").text(data.OEmotesSize)
+      $("#configOEmotesMax").text(data.OEmotesMax)
+      $("#configOEmotesAnimationTime").text(data.OEmotesAnimationTime + 'ms')
 
-    $('#overlay-emotes-animation-select option[value=' + data.OEmotesAnimation + ']').prop('selected', true)
+      $('#overlay-emotes-animation-select option[value=' + data.OEmotesAnimation + ']').prop('selected', true)
 
-    // replay settings
-    $("#configReplayOffsetX").text(data.replayOffsetX)
-    $("#configReplayOffsetY").text(data.replayOffsetY)
-    $("#configReplaySize").text(data.replaySize)
-    $("#configReplayVolume").text(data.replayVolume)
+      // replay settings
+      $("#configReplayOffsetX").text(data.replayOffsetX)
+      $("#configReplayOffsetY").text(data.replayOffsetY)
+      $("#configReplaySize").text(data.replaySize)
+      $("#configReplayVolume").text(data.replayVolume)
 
-    var options = {
-      on: translations['on'],
-      off: translations['off']
+      var options = {
+        on: translations['on'],
+        off: translations['off']
+      }
+      $('#replayLabelToggle').bootstrapToggle(options)
+      $('#replayLabelToggle').bootstrapToggle(data.replayLabel ? 'on' : 'off')
+      $('#replayLabelToggle').off('change')
+      $('#replayLabelToggle').on('change', function () {
+        var data = {}
+        data['replayLabel'] = $(this).prop('checked')
+        if ($('#replayLabelToggle').data('init')) socket.emit('saveConfiguration', data)
+      })
+      $('#replayLabelToggle').data('init', true)
+
+      $('#overlay-replay-position-select option[value=' + data.replayPosition + ']').prop('selected', true)
+      $('#overlay-replay-filter-select option[value=' + data.replayFilter + ']').prop('selected', true)
+    })
+
+    socket.emit('overlay.images.get')
+    socket.on('overlay.image.list', function (data) {
+      $('#carousel-image-list').empty()
+      _.each(data, function (image) {
+        $('#carousel-image-list').append('<div>' +
+          '<a target="_blank" href="/dist/carousel/' + image + '">' +
+          '<img src="/dist/carousel/' + image + '">' +
+          '</a>' +
+          '<button data-image="' + image +
+          '" class="btn btn-danger" style="position: absolute; margin-left: -35px;" onclick="deleteCarouselImage(this)">X</button>' +
+          '</div>')
+      })
+      $('#carousel-image-list').append('<br style="clear: both;">')
+    })
+
+    $('#file-input-carousel').on('change', function (ev) {
+      var reader = new FileReader()
+      reader.onload = function (event) {
+        socket.emit('overlay.image.upload', event.target.result)
+      }
+      reader.readAsDataURL(event.target.files[0])
+    })
+
+    function deleteCarouselImage(el) {
+      socket.emit('overlay.image.delete', $(el).data('image'))
     }
-    $('#replayLabelToggle').bootstrapToggle(options)
-    $('#replayLabelToggle').bootstrapToggle(data.replayLabel ? 'on' : 'off')
-    $('#replayLabelToggle').off('change')
-    $('#replayLabelToggle').on('change', function () {
-      var data = {}
-      data['replayLabel'] = $(this).prop('checked')
-      if ($('#replayLabelToggle').data('init')) socket.emit('saveConfiguration', data)
-    })
-    $('#replayLabelToggle').data('init', true)
 
-    $('#overlay-replay-position-select option[value=' + data.replayPosition + ']').prop('selected', true)
-    $('#overlay-replay-filter-select option[value=' + data.replayFilter + ']').prop('selected', true)
-  })
-
-  socket.emit('overlay.images.get')
-  socket.on('overlay.image.list', function (data) {
-    $('#carousel-image-list').empty()
-    _.each(data, function (image) {
-      $('#carousel-image-list').append('<div>' +
-      '<a target="_blank" href="/dist/carousel/' + image + '">'+
-      '<img src="/dist/carousel/' + image + '">' +
-      '</a>' +
-      '<button data-image="' + image +
-        '" class="btn btn-danger" style="position: absolute; margin-left: -35px;" onclick="deleteCarouselImage(this)">X</button>' +
-      '</div>')
-    })
-    $('#carousel-image-list').append('<br style="clear: both;">')
-  })
-
-  $('#file-input-carousel').on('change', function (ev) {
-    var reader = new FileReader()
-    reader.onload = function (event) {
-      socket.emit('overlay.image.upload', event.target.result)
+    function saveEmotesAnimation() {
+      socket.emit('saveConfiguration', {
+        'OEmotesAnimation': $('#overlay-emotes-animation-select').val()
+      })
     }
-    reader.readAsDataURL(event.target.files[0])
-  })
 
-  function deleteCarouselImage(el) {
-    socket.emit('overlay.image.delete', $(el).data('image'))
-  }
+    function emotesTest(type) {
+      if (type === 'explosion') socket.emit('emote.testExplosion')
+      if (type === 'emote') socket.emit('emote.test')
+    }
 
-  function saveEmotesAnimation() {
-    socket.emit('saveConfiguration', {
-      'OEmotesAnimation': $('#overlay-emotes-animation-select').val()
-    })
-  }
+    function replayTest() {
+      socket.emit('replay-video', '/dist/video/instant_replay.mp4')
+    }
 
-  function emotesTest(type) {
-    if (type === 'explosion') socket.emit('emote.testExplosion')
-    if (type === 'emote') socket.emit('emote.test')
-  }
+    function saveReplayPos() {
+      socket.emit('saveConfiguration', {
+        'replayPosition': $('#overlay-replay-position-select').val()
+      })
+    }
 
-  function replayTest() {
-    socket.emit('replay-video', '/dist/video/instant_replay.mp4')
-  }
+    function saveReplayFil() {
+      socket.emit('saveConfiguration', {
+        'replayFilter': $('#overlay-replay-filter-select').val()
+      })
+    }
 
-  function saveReplayPos() {
-    socket.emit('saveConfiguration', {
-      'replayPosition': $('#overlay-replay-position-select').val()
-    })
-  }
-
-  function saveReplayFil() {
-    socket.emit('saveConfiguration', {
-      'replayFilter': $('#overlay-replay-filter-select').val()
-    })
-  }
-
-</script>
+  </script>
