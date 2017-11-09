@@ -764,6 +764,7 @@ abbr[data-original-title], abbr[title] {
   font-weight: bold;
   font-family: 'PT Sans';
   padding: 0.2em;
+  padding-top: 0.3rem;
 }
 
 kbd {
@@ -806,6 +807,7 @@ li.active .deleteTab {
   font-weight: bold;
   font-family: 'PT Sans';
   padding: 0.2em;
+  padding-top: 0.3rem;
 }
 
 .kbd-bot-response {
@@ -816,7 +818,6 @@ li.active .deleteTab {
   color: $gray-800;
   background-color: $white;
 }
-
 
 #bot-responses {
   column-count: 2;
@@ -914,4 +915,25 @@ table tr td hr {
   border-top: 1px solid $black;
   margin: 1em 0;
   padding: 0;
+}
+
+.nav-link {
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+}
+
+.nav-tabs .nav-link {
+  padding: .5rem;
+}
+
+.dropdown-header:nth-of-type(1) {
+  padding: 0 0.5rem;
+}
+
+.dropdown-header {
+  padding: 1rem 0.5rem 0.1rem 0.5rem;
+}
+
+.dropdown-item {
+  padding: 0.1rem 1rem;
 }
