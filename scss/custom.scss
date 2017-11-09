@@ -274,22 +274,26 @@ span.title.title-part.text-default + div.widget {
 
 }
 
-#widgets > div {
+#widgets > div, #widgets-close > a {
   padding: 10px;
   font-family: 'PT Sans', sans-serif !important;
   font-weight: bold;
-  font-size: 12px;
-  text-shadow: 0 0 2px #000, 0 0 4px #888, 0 0 8px #888
+  font-size: 1rem;
 }
 
-#widgets div span {
-  color: $white;
+#widgets-close a:hover, #widgets-close a:hover span {
+  color: $blue !important;
+  text-decoration: none;
+}
+
+#widgets div span, #widgets-close a span {
+  color: $gray-700;
   padding-top: 5px;
   display: block;
   text-align: center;
 }
 
-#widgets div > span.fa, #widgets .widgets-exit {
+#widgets div > span.fa, #widgets-close a > span.fa {
   font-size: 80px;
 }
 
