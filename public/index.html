@@ -94,8 +94,8 @@
         </button>
         <div class="dropdown-menu dropdown-menu-right" style="right: 0; left: auto;" aria-labelledby="settingsButton">
           <h6 class="dropdown-header">UI</h6>
-          <button class="dropdown-item" href="#" id="percentage-btn" data-show-percentage="true" onclick="switchPercentageShow()">Show percentage in stats</button>
-          <button class="dropdown-item" href="#" id="stats-btn" onclick="switchStats()" data-lang="stats-panel.hide">Hide stats</button>
+          <button class="dropdown-item" id="percentage-btn" data-show-percentage="true" onclick="switchPercentageShow()">Show percentage in stats</button>
+          <button class="dropdown-item" id="stats-btn" onclick="switchStats()" data-lang="stats-panel.hide">Hide stats</button>
 
           <h6 class="dropdown-header">BOT</h6>
           <button class="dropdown-item" id="mute-btn" data-muted="false" onclick="switchMute()" data-lang="mute"></button>
@@ -264,21 +264,14 @@
   </div>
 
   <div class="container-fluid">
-    <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-12">
-        <!-- widgets -->
-        <div class="widgets">
-          <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4" id="widgetRow1"></div>
-          <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4" id="widgetRow2"></div>
-          <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4" id="widgetRow3"></div>
-        </div>
+    <!-- widgets -->
+    <div class="widgets row"></div>
+    <div class="w-100"></div>
 
-        <div class="col-xs-12 col-sm-12 col-md-12" id="addWidget">
-          <div class="widgetAdd">
-            <span class="glyphicon glyphicon-plus"></span>
-            <span data-lang="add-widget">
-          </div>
-        </div>
+    <div class="col" id="addWidget">
+      <div class="widgetAdd">
+        <span class="glyphicon glyphicon-plus"></span>
+        <span data-lang="add-widget">
       </div>
     </div>
   </div>
@@ -464,23 +457,63 @@
     })
 
     socket.on('widgets', function (widgets) {
-      _.each(widgets, function (widget) {
-        if (loadedWidgets.indexOf(widget.widget) === -1) {
-          $("#widgetRow" + widget.column).append($('<div id="' + widget.widget + '">').load('widgets/' +
-            widget
-            .widget + '.html',
-            function () {
-              commons.translate()
-            }))
-          loadedWidgets.push(widget.widget)
+      let rows = {
+        'left': _.filter(widgets, (o) => o.column == 1),
+        'middle': _.filter(widgets, (o) => o.column == 2),
+        'right': _.filter(widgets, (o) => o.column == 3)
+      }
+      let maxWidgetsInRow = _.max([rows.left.length, rows.middle.length, rows.right.length])
+
+      let rowsDivs = {
+        'left': $('<div class="col">'),
+        'middle': $('<div class="col">'),
+        'right': $('<div class="col">')
+      }
+
+      for (let i = 0; i < maxWidgetsInRow; i++) {
+        if (!_.isNil(rows.left[i])) {
+          rowsDivs.left.append($('<div id="' + rows.left[i].widget + '">')
+            .load('widgets/' +
+              rows.left[i].widget + '.html',
+              function () {
+                commons.translate()
+              }))
+          loadedWidgets.push(rows.left[i].widget)
         }
-      })
+
+        if (!_.isNil(rows.middle[i])) {
+          rowsDivs.middle.append($('<div id="' + rows.middle[i].widget + '">')
+            .load('widgets/' +
+              rows.middle[i].widget + '.html',
+              function () {
+                commons.translate()
+              }))
+          loadedWidgets.push(rows.middle[i].widget)
+        }
+
+        if (!_.isNil(rows.right[i])) {
+          rowsDivs.right.append($('<div id="' + rows.right[i].widget + '">')
+            .load('widgets/' +
+              rows.right[i].widget + '.html',
+              function () {
+                commons.translate()
+              }))
+          loadedWidgets.push(rows.right[i].widget)
+        }
+      }
+
+      $('.widgets')
+        .empty()
+        .append(rowsDivs.left)
+        .append(rowsDivs.middle)
+        .append(rowsDivs.right)
+        .append('<div class="w-100"></div>')
     })
 
     // addWidget
     $("#addWidget").on('click', function (ev) {
       if (!addingWidget) {
-        $(".widgets").append($('<div>').load('widgets/widget_create.html'))
+        $(".widgets").append($('<div class="col">').load('widgets/widget_create.html'))
         $("#addWidget").css('display', 'none')
         addingWidget = true
       }

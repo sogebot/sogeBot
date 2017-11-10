@@ -21,12 +21,11 @@
         addingWidget = false
       }, 2000)
     } else {
-      //$("#widgets").append('<div style="font-weight: bold; position: absolute; width: 100%; text-align: center; top: -4px; font-size: 20px; text-align: center; font-family: \'Catamaran\'; color: white">- WIDGETS TO ADD -</div><hr style="border-top: 1px solid #ccc">')
       let i = 0
       _.each(list, function (widget) {
         $("#widgets").append('<div class="col-3">' +
           '<span class="fa fa-' + widget.icon + '"></span>' +
-          '<span data-lang="' + widget.name + '"></span>' +
+          '<span>' + translations[widget.name].toUpperCase() + '</span>' +
           '<div class="row justify-content-md-center">' +
           '<div class="col col-xs-1 text-right"><a data-id="' + widget.id +
           '" data-align="1"><span class="fa fa-align-left"></span></a></div>' +
@@ -45,14 +44,12 @@
       commons.translate()
       $('[data-id="widgets-exit"]').on('click', function (ev) {
         $("#addWidget").css('display', 'block')
-        $("#widgets").remove()
-        $("#widgets-close").remove()
+        $("#widgets").parent().remove()
         addingWidget = false
       })
       $("#widgets a").on('click', function (ev) {
         $("#addWidget").css('display', 'block')
-        $("#widgets-close").remove()
-        $("#widgets").remove()
+        $("#widgets").parent().remove()
         addingWidget = false
         if (ev.currentTarget.dataset.id !== 'exit') {
           socket.emit('addWidget', ev.currentTarget.dataset.id, ev.currentTarget.dataset.align)

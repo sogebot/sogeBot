@@ -234,107 +234,104 @@
       <div class="col">
         <input type="file" id="file-input-carousel" accept="image/*" />
       </div>
-      <div class="w-100"></div>
+    </div>
 
-      <div class="row settings settings-part">
-        <div class="col">
-          <span class="title title-part text-default">Images</span>
-        </div>
-        <div class="w-100"></div>
-
-        <div id="carousel-image-list"></div>
-      </div>
+    <div class="col">
+      <span class="title title-part text-default">Images</span>
+    </div>
+    <div class="row settings settings-part">
+      <div id="carousel-image-list"></div>
     </div>
   </div>
-  </div>
+</div>
 
-  <script>
-    socket.off('configuration')
+<script>
+  socket.off('configuration')
 
-    socket.emit('getConfiguration')
-    socket.once('configuration', function (data) {
-      $("#configOEmotesSize").text(data.OEmotesSize)
-      $("#configOEmotesMax").text(data.OEmotesMax)
-      $("#configOEmotesAnimationTime").text(data.OEmotesAnimationTime + 'ms')
+  socket.emit('getConfiguration')
+  socket.once('configuration', function (data) {
+    $("#configOEmotesSize").text(data.OEmotesSize)
+    $("#configOEmotesMax").text(data.OEmotesMax)
+    $("#configOEmotesAnimationTime").text(data.OEmotesAnimationTime + 'ms')
 
-      $('#overlay-emotes-animation-select option[value=' + data.OEmotesAnimation + ']').prop('selected', true)
+    $('#overlay-emotes-animation-select option[value=' + data.OEmotesAnimation + ']').prop('selected', true)
 
-      // replay settings
-      $("#configReplayOffsetX").text(data.replayOffsetX)
-      $("#configReplayOffsetY").text(data.replayOffsetY)
-      $("#configReplaySize").text(data.replaySize)
-      $("#configReplayVolume").text(data.replayVolume)
+    // replay settings
+    $("#configReplayOffsetX").text(data.replayOffsetX)
+    $("#configReplayOffsetY").text(data.replayOffsetY)
+    $("#configReplaySize").text(data.replaySize)
+    $("#configReplayVolume").text(data.replayVolume)
 
-      var options = {
-        on: translations['on'],
-        off: translations['off']
-      }
-      $('#replayLabelToggle').bootstrapToggle(options)
-      $('#replayLabelToggle').bootstrapToggle(data.replayLabel ? 'on' : 'off')
-      $('#replayLabelToggle').off('change')
-      $('#replayLabelToggle').on('change', function () {
-        var data = {}
-        data['replayLabel'] = $(this).prop('checked')
-        if ($('#replayLabelToggle').data('init')) socket.emit('saveConfiguration', data)
-      })
-      $('#replayLabelToggle').data('init', true)
-
-      $('#overlay-replay-position-select option[value=' + data.replayPosition + ']').prop('selected', true)
-      $('#overlay-replay-filter-select option[value=' + data.replayFilter + ']').prop('selected', true)
+    var options = {
+      on: translations['on'],
+      off: translations['off']
+    }
+    $('#replayLabelToggle').bootstrapToggle(options)
+    $('#replayLabelToggle').bootstrapToggle(data.replayLabel ? 'on' : 'off')
+    $('#replayLabelToggle').off('change')
+    $('#replayLabelToggle').on('change', function () {
+      var data = {}
+      data['replayLabel'] = $(this).prop('checked')
+      if ($('#replayLabelToggle').data('init')) socket.emit('saveConfiguration', data)
     })
+    $('#replayLabelToggle').data('init', true)
 
-    socket.emit('overlay.images.get')
-    socket.on('overlay.image.list', function (data) {
-      $('#carousel-image-list').empty()
-      _.each(data, function (image) {
-        $('#carousel-image-list').append('<div>' +
-          '<a target="_blank" href="/dist/carousel/' + image + '">' +
-          '<img src="/dist/carousel/' + image + '">' +
-          '</a>' +
-          '<button data-image="' + image +
-          '" class="btn btn-danger" style="position: absolute; margin-left: -35px;" onclick="deleteCarouselImage(this)">X</button>' +
-          '</div>')
-      })
-      $('#carousel-image-list').append('<br style="clear: both;">')
+    $('#overlay-replay-position-select option[value=' + data.replayPosition + ']').prop('selected', true)
+    $('#overlay-replay-filter-select option[value=' + data.replayFilter + ']').prop('selected', true)
+  })
+
+  socket.emit('overlay.images.get')
+  socket.on('overlay.image.list', function (data) {
+    $('#carousel-image-list').empty()
+    _.each(data, function (image) {
+      $('#carousel-image-list').append('<div>' +
+        '<a target="_blank" href="/dist/carousel/' + image + '">' +
+        '<img src="/dist/carousel/' + image + '">' +
+        '</a>' +
+        '<button data-image="' + image +
+        '" class="btn btn-danger" style="position: absolute; margin-left: -35px;" onclick="deleteCarouselImage(this)">X</button>' +
+        '</div>')
     })
+    $('#carousel-image-list').append('<br style="clear: both;">')
+  })
 
-    $('#file-input-carousel').on('change', function (ev) {
-      var reader = new FileReader()
-      reader.onload = function (event) {
-        socket.emit('overlay.image.upload', event.target.result)
-      }
-      reader.readAsDataURL(event.target.files[0])
+  $('#file-input-carousel').on('change', function (ev) {
+    var reader = new FileReader()
+    reader.onload = function (event) {
+      socket.emit('overlay.image.upload', event.target.result)
+    }
+    reader.readAsDataURL(event.target.files[0])
+  })
+
+  function deleteCarouselImage(el) {
+    socket.emit('overlay.image.delete', $(el).data('image'))
+  }
+
+  function saveEmotesAnimation() {
+    socket.emit('saveConfiguration', {
+      'OEmotesAnimation': $('#overlay-emotes-animation-select').val()
     })
+  }
 
-    function deleteCarouselImage(el) {
-      socket.emit('overlay.image.delete', $(el).data('image'))
-    }
+  function emotesTest(type) {
+    if (type === 'explosion') socket.emit('emote.testExplosion')
+    if (type === 'emote') socket.emit('emote.test')
+  }
 
-    function saveEmotesAnimation() {
-      socket.emit('saveConfiguration', {
-        'OEmotesAnimation': $('#overlay-emotes-animation-select').val()
-      })
-    }
+  function replayTest() {
+    socket.emit('replay-video', '/dist/video/instant_replay.mp4')
+  }
 
-    function emotesTest(type) {
-      if (type === 'explosion') socket.emit('emote.testExplosion')
-      if (type === 'emote') socket.emit('emote.test')
-    }
+  function saveReplayPos() {
+    socket.emit('saveConfiguration', {
+      'replayPosition': $('#overlay-replay-position-select').val()
+    })
+  }
 
-    function replayTest() {
-      socket.emit('replay-video', '/dist/video/instant_replay.mp4')
-    }
+  function saveReplayFil() {
+    socket.emit('saveConfiguration', {
+      'replayFilter': $('#overlay-replay-filter-select').val()
+    })
+  }
 
-    function saveReplayPos() {
-      socket.emit('saveConfiguration', {
-        'replayPosition': $('#overlay-replay-position-select').val()
-      })
-    }
-
-    function saveReplayFil() {
-      socket.emit('saveConfiguration', {
-        'replayFilter': $('#overlay-replay-filter-select').val()
-      })
-    }
-
-  </script>
+</script>

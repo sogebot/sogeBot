@@ -1,13 +1,13 @@
 <div class="widget">
   <h6 data-lang="widget-title-cmdboard"></h6>
   <ul class="nav nav-pills" role="tablist">
-    <li role="presentation" class="active">
-      <a href="#cmdboard-main" aria-controls="home" role="tab" data-toggle="tab" title="CommandBoard">
+    <li role="presentation" class="nav-item">
+      <a class="nav-link active" href="#cmdboard-main" aria-controls="home" role="tab" data-toggle="tab" title="CommandBoard">
         <i class="fa fa-terminal" aria-hidden="true"></i>
       </a>
     </li>
-    <li role="presentation">
-      <a href="#cmdboard-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+    <li role="presentation" class="nav-item">
+      <a class="nav-link" href="#cmdboard-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
         <i class="fa fa-cog" aria-hidden="true"></i>
       </a>
     </li>
@@ -16,7 +16,7 @@
   <!-- Tab panes -->
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="cmdboard-main">
-      <div class="queue-list-group list-group" id="cmdboard-list">
+      <div class="queue-list-group row" id="cmdboard-list">
       </div>
       <div class="clearfix"></div>
     </div>
@@ -60,7 +60,7 @@
       socket.emit('cmdboard.widget.run', el.dataset.name)
     },
     resize: function () {
-      _.each($(".soundboard-list-group-item span"), function (el) {
+      _.each($(".cmdboard-list-group-item"), function (el) {
         $(el).css('font-size', '18px')
         cmdboard.resizeEl(el, 18)
       })
@@ -81,13 +81,21 @@
   socket.off('cmdboard.widget.data')
   socket.on('cmdboard.widget.data', function (data) {
     $("#cmdboard-list").empty()
+    let i = 0;
     _.each(data, function (name) {
       $("#cmdboard-list").append(
-        '<a class="soundboard-list-group-item list-group-item cmdboard-item"  style="padding: 10px 0 0 0" data-name="' +
+        '<div class="col-4"><button style="border: 0" class="btn btn-outline-secondary cmdboard-list-group-item" data-name="' +
         name.text +
-        '" onclick="cmdboard.emit(event, this)" type="button"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0"></div><span>' +
-        name.text + '</span></a>');
+        '" onclick="cmdboard.emit(event, this)" type="button"><span>' +
+        name.text + '</span></button></div>');
+      i++
+      if (i % 3 === 0) {
+        $("#soundboard-list").append('<div class="w-100"></div>')
+      }
     })
+    for (; i % 3 == 0; i++) {
+      $("#soundboard-list").append('<div class="col"></div>')
+    }
     cmdboard.resize()
   })
 

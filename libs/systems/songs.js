@@ -104,6 +104,8 @@ class Songs {
   }
 
   async banCurrentSong (self, sender) {
+    if (_.isNil(self.currentSong.videoID)) return
+
     let update = await global.db.engine.update('bannedsong', { videoId: self.currentSong.videoID }, { videoId: self.currentSong.videoID, title: self.currentSong.title })
     if (update > 0) {
       let message = global.commons.prepare('songs.song-was-banned', { name: self.currentSong.title })
@@ -111,7 +113,7 @@ class Songs {
 
       await Promise.all([global.db.engine.remove('playlist', { videoID: self.currentSong.videoID }), global.db.engine.remove('songrequest', { videoID: self.currentSong.videoID })])
 
-      global.commons.timeout(self.currentSong.username, global.translate('song-was-banned-timeout-message'), 300)
+      global.commons.timeout(self.currentSong.username, global.translate('songs.song-was-banned-timeout-message'), 300)
       self.getMeanLoudness(self)
       self.sendNextSongID(self, global.panel.io)
       self.send(self, global.panel.io)
@@ -271,6 +273,8 @@ class Songs {
   }
 
   async addSongToPlaylist (self, sender, text) {
+    if (_.isNil(text)) return
+
     var urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/
     var match = text.trim().match(urlRegex)
     var videoID = (match && match[1].length === 11) ? match[1] : text.trim()

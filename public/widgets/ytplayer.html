@@ -1,20 +1,19 @@
 <div class="widget">
   <h6 data-lang="widget-title-ytplayer"></h6>
   <ul class="nav nav-pills" role="tablist">
-    <li role="presentation">
-      <a href="#yt-song-requests" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
+    <li role="presentation" class="nav-item">
+      <a class="nav-link" href="#yt-song-requests" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
         <span id="yt-song-requests-count">0</span>
         <i class="fa fa-user" aria-hidden="true"></i>
       </a>
     </li>
-    <li role="presentation" class="active" style="height:40px;">
-      <a href="#yt-player" aria-controls="home" role="tab" data-toggle="tab" title="" style="max-width: 210px;display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">
+    <li role="presentation" class="nav-item">
+      <a class="nav-link active" href="#yt-player" aria-controls="home" role="tab" data-toggle="tab">
         <i class="fa fa-music" aria-hidden="true"></i>
-        <span id="yt-player-currentsong"></span>
       </a>
     </li>
-    <li role="presentation">
-      <a href="#yt-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+    <li role="presentation" class="nav-item">
+      <a class="nav-link" href="#yt-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
         <i class="fa fa-cog" aria-hidden="true"></i>
       </a>
     </li>
@@ -26,39 +25,38 @@
       <div id="YTPlayer"></div>
       <div class="row">
         <div class="btn-group" role="group" aria-label="..." style="width: 100%; padding-left:15px; padding-right: 15px; height: 34px;">
-          <button type="button" class="btn btn-default" id="YTControl">
-            <i class="fa fa-play text-success" aria-hidden="true"></i>
+          <button type="button" class="btn btn-success" id="YTControl">
+            <i class="fa fa-play" aria-hidden="true"></i>
           </button>
-          <button type="button" class="btn btn-default" onclick="skipSong()">
+          <button type="button" class="btn btn-secondary" onclick="skipSong()">
             <i class="fa fa-forward" aria-hidden="true"></i>
           </button>
 
           <div class="btn-group" role="group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-sliders" aria-hidden="true"></i>
               <span class="caret"></span>
             </button>
-            <ul class="dropdown-menu">
-              <li class="dropdown-header">Playlist</li>
-              <li>
-                <a href="#" onclick="stealToPlaylist()">Steal to playlist</a>
-              </li>
-              <li class="dropdown-header">Others</li>
-              <li>
-                <a href="#" onclick="banSong()">Ban Song</a>
-              </li>
-            </ul>
+            <div class="dropdown-menu">
+              <h6 class="dropdown-header">PLAYLIST</h6>
+              <button class="dropdown-item" id="percentage-btn" data-show-percentage="true" onclick="stealToPlaylist()">Steal to playlist</button>
+
+              <h6 class="dropdown-header">OTHERS</h6>
+              <button class="dropdown-item" id="percentage-btn" data-show-percentage="true" onclick="banSong()">Ban song</button>
+            </div>
             <div style="height:34px; display: inline-block">
               <input id="volumeSlider" data-slider-handle="custom" data-slider-tooltip="hide" data-slider-orientation="vertical" data-slider-id='volumeSlider'
                 type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="50" />
             </div>
           </div>
-          <div class="progress" style="height:34px; padding-left:0px; padding-right: 0">
+          <div class="progress" style="height:34px; padding-left:0px; padding-right: 0; width: 100%;">
             <div class="progress-bar progress-bar-danger" id="youtube-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100"
               style="width: 0%;"></div>
           </div>
         </div>
       </div>
+
+      <div style="font-size: 0.8rem" class="bg-faded"><strong>Current Song: </strong><span id="yt-player-currentsong"></span></div>
     </div>
     <!-- /YT-PLAYER -->
 
@@ -208,13 +206,16 @@
   }
 
   $("#YTControl").on('click', function () {
-    if ($("#YTControl i").hasClass('text-success')) {
+    console.log($("#YTControl button"))
+    if ($("#YTControl").hasClass('btn-success')) {
       if (player.getPlayerState() === YT.PlayerState.CUED) socket.emit('songs.sendNextSongID')
       player.playVideo()
-      $("#YTControl i").removeClass().addClass('glyphicon glyphicon-pause text-danger')
+      $("#YTControl").removeClass().addClass('btn btn-danger')
+      $("#YTControl i").removeClass().addClass('fa fa-pause')
     } else {
       player.pauseVideo()
-      $("#YTControl i").removeClass().addClass('glyphicon glyphicon-play text-success')
+      $("#YTControl").removeClass().addClass('btn btn-success')
+      $("#YTControl i").removeClass().addClass('fa fa-play')
     }
   })
 
@@ -223,7 +224,7 @@
   })
 
   setInterval(function () {
-    socket.emit('getSongRequests');
+    socket.emit('songs.getSongRequests');
   }, 2000)
   socket.on('songRequestsList', function (list) {
     $("#yt-song-requests-count").text(list.length)

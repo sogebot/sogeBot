@@ -1,13 +1,13 @@
 <div class="widget">
   <h6 data-lang="widget-title-soundboard"></h6>
   <ul class="nav nav-pills" role="tablist">
-    <li role="presentation" class="active">
-      <a href="#soundboard-main" aria-controls="home" role="tab" data-toggle="tab" title="SoundBoard">
+    <li role="presentation" class="nav-item">
+      <a class="nav-link active" href="#soundboard-main" aria-controls="home" role="tab" data-toggle="tab" title="SoundBoard">
         <i class="fa fa-music" aria-hidden="true"></i>
       </a>
     </li>
-    <li role="presentation">
-      <a href="#soundboard-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+    <li role="presentation" class="nav-item">
+      <a class="nav-link" href="#soundboard-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
         <i class="fa fa-cog" aria-hidden="true"></i>
       </a>
     </li>
@@ -16,7 +16,7 @@
   <!-- Tab panes -->
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="soundboard-main">
-      <div class="queue-list-group list-group" id="soundboard-list">
+      <div id="soundboard-list" class="row">
       </div>
       <div class="clearfix"></div>
     </div>
@@ -38,28 +38,36 @@
       _.each($(".soundboard-list-group-item span"), function (el) {
         $(el).css('font-size', '18px')
         soundboard.resizeEl(el, 18)
+        soundboard.resizeProgress(el)
       })
     },
     resizeEl: function (el, size) {
-      if ($(el).height() >= ((2 * size) / 5 + (98 / 5))) {
+      if ($(el).width() >= $(el).parent().width() - 10) {
         $(el).css('font-size', (size - 1) + 'px')
         $(el).css('top', Math.round((3 * size) / 7 - 57 / 7) + 'px')
-        if ($(el).height() >= ((2 * size) / 5 + (98 / 5))) {
+        if ($(el).width() >= ((2 * size) / 5 + (98 / 5))) {
           soundboard.resizeEl(el, size - 1)
         }
       }
+    },
+    resizeProgress: function (el) {
+      let spanW = $(el).width();
+      $(el).parent().children('div').children('.progress').css('width', `${spanW}px`)
+
     },
     play: function (ev, el) {
       ev.preventDefault()
       if (!_.isNil(soundboard.audio)) soundboard.audio.pause()
       if (!_.isNil(soundboard.el)) soundboard.el.stop(true, true)
+      $('.progress .progress-bar').finish()
+
       soundboard.audio = new Audio('dist/soundboard/' + el.dataset.sound + '.mp3')
       soundboard.audio.addEventListener('loadedmetadata', function () {
-        soundboard.el = $(el).children('div')
-        $(el).children('div').animate({
+        soundboard.el = $(el).children('div').children('.progress')
+        soundboard.el.children('.progress-bar').animate({
           width: '100%'
         }, soundboard.audio.duration * 1000, 'linear', function () {
-          $(el).children('div').css('width', 0)
+          soundboard.el.children('.progress-bar').css('width', 0)
         })
         soundboard.audio.play()
       })
@@ -71,13 +79,25 @@
   socket.off('soundBoardSounds')
   socket.on('soundBoardSounds', function (sounds) {
     $("#soundboard-list").empty()
+    let i = 0;
     _.each(sounds, function (sound) {
       $("#soundboard-list").append(
-        '<a class="soundboard-list-group-item list-group-item"  style="padding: 10px 0 0 0" onclick="soundboard.play(event, this)" data-sound="' +
+        '<div class="col-4"><button style="border: 0;" class="btn btn-outline-secondary soundboard-list-group-item" style="padding: 0; padding-bottom: 0.4rem;" onclick="soundboard.play(event, this)" data-sound="' +
         sound +
-        '" type="button"><div style="width: 0%; height: 5px; background-color: #337ab7; position: absolute; top: 0"></div><span>' +
-        sound + '</span></a>');
+        '" type="button">' +
+        '<div class="d-flex justify-content-center">' +
+        '<div class="progress" style="text-align: center; background-color: transparent !important; height: 0.4rem">' +
+        '<div class="progress-bar bg-secondary" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>' +
+        '</div></div><span>' +
+        sound + '</span></button></div>');
+      i++
+      if (i % 3 === 0) {
+        $("#soundboard-list").append('<div class="w-100"></div>')
+      }
     })
+    for (; i % 3 == 0; i++) {
+      $("#soundboard-list").append('<div class="col"></div>')
+    }
     soundboard.resize()
   })
 

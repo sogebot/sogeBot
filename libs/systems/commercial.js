@@ -5,6 +5,7 @@ var _ = require('lodash')
 
 // bot libraries
 var constants = require('../constants')
+const config = require('../../config')
 
 /*
  * !commercial                        - gets an info about alias usage
@@ -40,7 +41,7 @@ class Commercial {
     // check if duration is correct (30, 60, 90, 120, 150, 180)
     if (_.includes([30, 60, 90, 120, 150, 180], commercial.duration)) {
       global.events.fire('commercial', { duration: commercial.duration })
-      global.client.commercial(global.configuration.get().twitch.channel, commercial.duration)
+      global.client.commercial(config.settings.broadcaster_username, commercial.duration)
       if (!_.isNil(commercial.message)) global.commons.sendMessage(commercial.message, sender)
     } else {
       global.commons.sendMessage('$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', sender)

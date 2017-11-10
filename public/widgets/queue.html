@@ -1,19 +1,19 @@
 <div class="widget">
   <h6 data-lang="widget-title-queue"></h6>
     <ul class="nav nav-pills" role="tablist">
-      <li role="presentation" class="active">
-        <a href="#queue-main" aria-controls="home" role="tab" data-toggle="tab" title="Queue">
+      <li role="presentation" class="nav-item">
+        <a class="active nav-link" href="#queue-main" aria-controls="home" role="tab" data-toggle="tab" title="Queue">
           <i id="queue-toggle-icon" class="fa fa-lock" aria-hidden="true"></i>
           <span id="queue-participants-count">0</span>
         </a>
       </li>
-      <li role="presentation">
-        <a href="#queue-pick" aria-controls="home" role="tab" data-toggle="tab" title="Picked Users" style="display:none">
+      <li role="presentation" class="nav-item">
+        <a class="nav-link" href="#queue-pick" aria-controls="home" role="tab" data-toggle="tab" title="Picked Users" style="display:none">
           <i class="fa fa-user" aria-hidden="true"></i>
         </a>
       </li>
-      <li role="presentation">
-        <a href="#queue-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+      <li role="presentation" class="nav-item">
+        <a class="nav-link" href="#queue-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
           <i class="fa fa-cog" aria-hidden="true"></i>
         </a>
       </li>
@@ -84,6 +84,7 @@
         this.el.pickList.empty()
         var self = this
         _.each(queue.picked, function (value, key) {
+          console.log(value)
           if (key === queue.picked.length - 1) {
             self.el.pickList.append(
               '<div style="text-align: center"><strong style="font-size: 30px"><i class="fa fa-twitch" aria-hidden="true"></i> <span class="raffles-winner-name"> ' + value.username + ' </span></strong></div>'
