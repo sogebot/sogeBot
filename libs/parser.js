@@ -394,7 +394,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
   msg = await this.parseMessageEach(info, msg)
   msg = await this.parseMessageEach(list, msg)
   msg = await this.parseMessageEach(math, msg)
-  msg = await this.parseMessageEach(evaluate, msg)
+  msg = await this.parseMessageEval(evaluate, msg)
   msg = await this.parseMessageApi(msg)
   return msg
 }
@@ -472,6 +472,28 @@ Parser.prototype.parseMessageOnline = async function (filters, msg) {
         else {
           msg = msg.replace(rMessage[bkey], '').trim()
         }
+      }
+    }
+  }
+  return msg
+}
+
+Parser.prototype.parseMessageEval = async function (filters, msg) {
+  if (msg.length === 0) return msg
+  for (var key in filters) {
+    if (!filters.hasOwnProperty(key)) continue
+
+    let fnc = filters[key]
+    let regexp = _.escapeRegExp(key)
+
+    // we want to handle # as \w - number in regexp
+    regexp = regexp.replace(/#/g, '([\\S ]+)')
+    let rMessage = msg.match((new RegExp('(' + regexp + ')', 'g')))
+    if (!_.isNull(rMessage)) {
+      for (var bkey in rMessage) {
+        let newString = await fnc(rMessage[bkey])
+        if (_.isUndefined(newString) || newString.length === 0) msg = ''
+        msg = msg.replace(rMessage[bkey], newString).trim()
       }
     }
   }
