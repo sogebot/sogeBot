@@ -404,7 +404,7 @@ Parser.prototype.parseMessageApi = async function (msg) {
   let rMessage = msg.match(/\(api\|(http\S+)\)/i)
   if (!_.isNil(rMessage) && !_.isNil(rMessage[1])) {
     msg = msg.replace(rMessage[0], '').trim() // remove api command from message
-    let url = rMessage[1]
+    let url = rMessage[1].replace(/&amp;/g, '&')
     let response = await snekfetch.get(url)
     if (response.status !== 200) {
       return global.translate('core.api.error')
