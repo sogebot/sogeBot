@@ -1,7 +1,6 @@
 const _ = require('lodash')
 const flatten = require('flat')
 const fs = require('fs')
-const cache = require('memory-cache')
 
 const Interface = require('./interface')
 const Datastore = require('nedb')
@@ -17,7 +16,6 @@ class INeDB extends Interface {
     if (!fs.existsSync('./db/nedb')) fs.mkdirSync('./db/nedb')
 
     this.table = {}
-    this.cache = {}
 
     if (debug.enabled) debug('NeDB initialized')
   }
@@ -26,9 +24,6 @@ class INeDB extends Interface {
     if (_.isNil(this.table[table])) {
       this.table[table] = new Datastore({ filename: './db/nedb/' + table + '.db', autoload: true })
       this.table[table].persistence.setAutocompactionInterval(60000)
-    }
-    if (_.isNil(this.cache[table])) {
-      this.cache[table] = new cache.Cache()
     }
     return this.table[table]
   }
@@ -43,10 +38,6 @@ class INeDB extends Interface {
       self.on(table).find(flatten(where), function (err, items) {
         if (err) reject(err)
         if (debug.enabled) debug('find() \n\ttable: %s \n\twhere: %j \n\titems: %j', table, where, items)
-
-        for (let item of items) {
-          self.cache[table].put(item._id, item)
-        }
         resolve(items)
       })
     })
@@ -57,20 +48,11 @@ class INeDB extends Interface {
 
     where = where || {}
 
-    // get from cache
-    var keys = this.cache[table].keys()
-    for (let key of keys) {
-      if (!_.isEmpty((_.filter(this.cache[table].get(key), where)))) {
-        return this.cache[table].get(key)
-      }
-    }
-
     var self = this
     return new Promise(function (resolve, reject) {
       self.on(table).findOne(flatten(where), function (err, item) {
         if (err) reject(err)
         if (debug.enabled) debug('findOne() \n\ttable: %s \n\twhere: %j \n\titem: %j', table, where, _.isNil(item) ? {} : item)
-        if (!_.isNil(item)) self.cache[table].put(item._id, item)
         resolve(_.isNil(item) ? {} : item)
       })
     })
@@ -87,7 +69,6 @@ class INeDB extends Interface {
         if (err) reject(err)
         if (debug.enabled) debug('insert() \n\ttable: %s \n\tobject: %j', table, object)
 
-        self.cache[table].put(item._id, item)
         resolve(item)
       })
     })
@@ -95,14 +76,6 @@ class INeDB extends Interface {
 
   async remove (table, where) {
     this.on(table) // init table
-
-    // remove from cache
-    var keys = this.cache[table].keys()
-    for (let key of keys) {
-      if (!_.isEmpty((_.filter(this.cache[table].get(key), where)))) {
-        this.cache[table].del(key)
-      }
-    }
 
     var self = this
     return new Promise(function (resolve, reject) {
@@ -119,14 +92,6 @@ class INeDB extends Interface {
 
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
 
-    // invalidate cache on update
-    var keys = this.cache[table].keys()
-    for (let key of keys) {
-      if (!_.isEmpty((_.filter(this.cache[table].get(key), where)))) {
-        this.cache[table].del(key)
-      }
-    }
-
     var self = this
     return new Promise(function (resolve, reject) {
       self.on(table).update(flatten(where), { $set: flatten(object) }, { upsert: (_.isNil(where._id) && !_.isEmpty(where)), multi: (_.isEmpty(where)) }, function (err, numReplaced) {
@@ -141,14 +106,6 @@ class INeDB extends Interface {
     this.on(table) // init table
 
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
-
-    // invalidate cache on update
-    var keys = this.cache[table].keys()
-    for (let key of keys) {
-      if (!_.isEmpty((_.filter(this.cache[table].get(key), where)))) {
-        this.cache[table].del(key)
-      }
-    }
 
     var self = this
     return new Promise(function (resolve, reject) {
