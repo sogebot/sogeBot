@@ -9,3 +9,5 @@ config.json
 public/dist/*
 !public/dist/css
 !public/dist/js
+public/dist/css/dark.css
+public/dist/css/light.css
