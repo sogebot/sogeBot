@@ -5,7 +5,6 @@ var _ = require('lodash')
 
 function EventList () {
   global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
-  global.panel.addWidget('eventlist', 'eventlist', 'calendar-o')
   global.panel.socketListening(this, 'overlay.eventlist.get', this._get)
 }
 

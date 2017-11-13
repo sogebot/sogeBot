@@ -1011,7 +1011,10 @@ table tr td hr {
   background-color: $gray-100;
 }
 
-
+.nav-btn {
+  height: 100%;
+  border: 0 !important;
+}
 
 /* animations */
 .row:hover > .col-auto i.anim-heartbeat {

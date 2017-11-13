@@ -6,6 +6,31 @@
         <i class="fa fa-calendar-o" aria-hidden="true"></i>
       </a>
     </li>
+    <li role="presentation" class="nav-item">
+      <button data-id="follow" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+        <i class="fa fa-heart"></i>
+      </button>
+    </li>
+    <li role="presentation" class="nav-item">
+      <button data-id="host" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+        <i class="fa fa-bullhorn"></i>
+      </button>
+    </li>
+    <li role="presentation" class="nav-item">
+      <button data-id="cheer" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+        <i class="fa fa-diamond"></i>
+      </button>
+    </li>
+    <li role="presentation" class="nav-item">
+      <button data-id="sub" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+        <i class="fa fa-star"></i>
+      </button>
+    </li>
+    <li role="presentation" class="nav-item">
+      <button data-id="resub" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+        <i class="fa fa-star-half-o"></i>
+      </button>
+    </li>
     <li role="presentation">
       <a class="nav-link" href="#eventlist-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
         <i class="fa fa-cog" aria-hidden="true"></i>
@@ -26,9 +51,51 @@
 </div>
 
 <script>
-  //setInterval(function () {
-  socket.emit('overlay.eventlist.get')
-  //}, 1000)
+  var eventlist = {
+    config: {},
+    toggle: function (el) {
+      this.config[el.dataset.id] = !this.config[el.dataset.id]
+      $(el).removeClass().addClass('nav-btn btn ' + (this.config[el.dataset.id] ? 'btn-outline-success' : 'btn-outline-danger'))
+
+      socket.emit('saveConfiguration', {
+        'widgetEventlistFollows': this.config.follow,
+        'widgetEventlistHosts': this.config.host,
+        'widgetEventlistCheers': this.config.cheer,
+        'widgetEventlistSubs': this.config.sub,
+        'widgetEventlistResubs': this.config.resub
+      })
+    }
+
+  }
+
+  setInterval(function () {
+    socket.emit('overlay.eventlist.get')
+  }, 1000)
+
+  socket.once('configuration', function (data) {
+    if (!data.widgetEventlistFollows) {
+      $('button[data-id="follow"]').removeClass().addClass('nav-btn btn btn-outline-danger')
+    }
+    if (!data.widgetEventlistHosts) {
+      $('button[data-id="host"]').removeClass().addClass('nav-btn btn btn-outline-danger')
+    }
+    if (!data.widgetEventlistCheers) {
+      $('button[data-id="cheer"]').removeClass().addClass('nav-btn btn btn-outline-danger')
+    }
+    if (!data.widgetEventlistSubs) {
+      $('button[data-id="sub"]').removeClass().addClass('nav-btn btn btn-outline-danger')
+    }
+    if (!data.widgetEventlistResubs) {
+      $('button[data-id="resub"]').removeClass().addClass('nav-btn btn btn-outline-danger')
+    }
+    eventlist.config = {
+      follow: data.widgetEventlistFollows,
+      host: data.widgetEventlistHosts,
+      cheer: data.widgetEventlistCheers,
+      sub: data.widgetEventlistSubs,
+      resub: data.widgetEventlistResubs
+    }
+  })
 
   socket.on('overlay.eventlist', function (o) {
     let icons = {
@@ -55,11 +122,12 @@
       cheer: 'yellow'
     }
 
-    let eventlist = $('#eventlist-main')
-    eventlist.empty()
+    let eventlistEl = $('#eventlist-main')
+    eventlistEl.empty()
 
     let i = 0
     for (let event of o) {
+      if (!(eventlist.config[event.event])) continue
       i++
       let icon = $('<i>')
         .addClass('fa')
@@ -106,7 +174,7 @@
         .append(colIcon)
         .append(username)
 
-      eventlist.append(row)
+      eventlistEl.append(row)
       if (i >= 5) break
     }
   })
