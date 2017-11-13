@@ -454,8 +454,7 @@ Twitch.prototype.showMe = async function (self, sender, text) {
     const user = await global.users.get(sender.username)
     var message = ['$sender']
     // rank
-    var rank = !_.isUndefined(user.rank) ? user.rank : null
-    rank = !_.isNil(user.custom.rank) ? user.custom.rank : rank
+    var rank = await global.systems.ranks.get(user)
     if (global.commons.isSystemEnabled('ranks') && !_.isNull(rank)) message.push(rank)
 
     // watchTime

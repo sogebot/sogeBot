@@ -28,9 +28,6 @@ class Ranks {
       global.parser.register(this, '!rank help', this.help, constants.OWNER_ONLY)
       global.parser.register(this, '!rank', this.show, constants.VIEWERS)
 
-      // count Points
-      this.update()
-
       global.panel.addMenu({category: 'manage', name: 'ranks', id: 'ranks'})
       global.panel.registerSockets({
         self: this,
@@ -160,10 +157,8 @@ class Ranks {
     debug('show(%j, %j)', self, sender)
 
     let user = await global.users.get(sender.username)
-    let rank = !_.isNil(user.rank) ? user.rank : null
+    let rank = await self.get(user)
     debug('Users rank: %j', rank)
-    rank = !_.isNil(user.custom.rank) ? user.custom.rank : rank
-    debug('Users rank w/ custom: %j', rank)
 
     let watched = !_.isNil(user.time) && !_.isNil(user.time.watched) ? user.time.watched : 0
     let ranks = await global.db.engine.find('ranks')
@@ -194,29 +189,23 @@ class Ranks {
     debug(message); global.commons.sendMessage(message, sender)
   }
 
-  async update () {
+  async get (user) {
     debug('update()')
-    if (!global.twitch.isOnline) return
 
-    let [users, ranks] = await Promise.all([global.users.getAll({ is: { online: true } }), global.db.engine.find('ranks')])
-    debug('update() %i online users and %i ranks loaded', users.length, ranks.length)
+    if (!_.isObject(user)) user = await global.users.get(user)
+    if (!_.isNil(user.custom.rank)) return user.custom.rank
 
-    for (let user of users) {
-      var watchTime = user.time.watched
-      watchTime = _.isFinite(parseInt(watchTime, 10)) && _.isNumber(parseInt(watchTime, 10)) ? (watchTime / 1000 / 60 / 60).toFixed(0) : 0
+    let ranks = await global.db.engine.find('ranks')
+    let watchTime = user.time.watched
+    watchTime = _.isFinite(parseInt(watchTime, 10)) && _.isNumber(parseInt(watchTime, 10)) ? (watchTime / 1000 / 60 / 60).toFixed(0) : 0
 
-      let rankToUpdate
-      for (let rank of _.orderBy(ranks, 'hours', 'asc')) {
-        if (watchTime >= parseInt(rank.hours, 10)) {
-          rankToUpdate = rank.value
-        } else {
-          if (user.rank !== rankToUpdate) await global.users.set(user.username, {rank: rankToUpdate})
-          break
-        }
-      }
+    let rankToReturn = null
+    for (let rank of _.orderBy(ranks, 'hours', 'asc')) {
+      if (watchTime >= parseInt(rank.hours, 10)) {
+        rankToReturn = rank.value
+      } else break
     }
-
-    setTimeout(() => this.update(), 60000)
+    return rankToReturn
   }
 }
 
