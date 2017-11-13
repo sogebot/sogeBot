@@ -100,81 +100,6 @@
           }) +
           '</td>' +
           '</tr>');
-<<<<<<< HEAD
-        _.each(list, function (item, index) {
-          $("#Alias").append('<tr class="page-data-row">' +
-            '<td style="vertical-align: top !important;min-width: 150px;"><span class="label label-default">Alias</span>' +
-            commons.editable({
-              text: '!' + item.alias,
-              id: item.alias,
-              fnc: 'alias.editName'
-            }) + '</td>' +
-            '<td style="vertical-align: top !important;"><span class="label label-primary">Command</span> ' +
-            '<span style="cursor: pointer;" class="label label-' + (item.visible ? "success" : "danger") +
-            '" " data-id="' + item.alias + '" onclick="alias.toggleVisibility(this)">' + (item.visible ?
-              "visible" : "hidden") + '</span> ' +
-            '<span style="cursor: pointer;" class="label label-' + (item.enabled ? "success" : "danger") +
-            '" data-id="' + item.alias + '" onclick="alias.toggle(this)">' + (item.enabled ? "enabled" :
-              "disabled") + '</span>' +
-            '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="label label-danger btn-remove" data-id="' +
-            item.alias + '"  onclick="commons.confirm(this)">delete</span>' +
-            '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
-            '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-success btn-confirm" onclick="alias.delete(this)" data-id="' +
-            item.alias + '">confirm</span>' +
-            commons.editable({
-              text: '!' + item.command,
-              id: item.alias,
-              fnc: 'alias.edit'
-            }) +
-            '</td>' +
-            '</tr>');
-        })
-      },
-      editName: function (id, value) {
-        socket.emit('alias.editAlias', {
-          id: id,
-          value: value
-        })
-      },
-      edit: function (id, value) {
-        socket.emit('alias.editCommand', {
-          id: id,
-          value: value
-        })
-      },
-      delete: function (el) {
-        socket.emit('alias.remove', _.isObject(el) ? `!${el.dataset.id}` : `!${el}`)
-      },
-      toggle: function (el) {
-        socket.emit('alias.toggle', `!${el.dataset.id}`)
-      },
-      toggleVisibility: function (el) {
-        socket.emit('alias.visible', `!${el.dataset.id}`)
-      },
-      create: function (event) {
-        event.preventDefault()
-        var inputs = $('[data-id="_new!"]')
-        var data = {
-          alias: $(inputs[0]).text().replace('!', ''),
-          command: commons.cleanResponseText($(inputs[1]).html().replace('!', ''))
-        }
-        socket.emit('alias.add', `!${data.alias} !${data.command}`)
-        $('.new-confirm-btn').css('display', 'none')
-      },
-      responses: (id) => {
-        id = id || null
-        let system = 'alias'
-        socket.emit('responses.get', system, function (data) {
-          for (let [key, entry] of Object.entries(data)) {
-            if (!_.isNil(id) && `${system}.${key}` !== id) continue // continue if we want only specific id
-            if (!_.isNil(id)) {
-              $(`abbr[data-id="${id}"]`).text(entry)
-              $(`abbr[data-id="${id}"]`).focus()
-              $(`abbr[data-id="${id}"]`).blur()
-              break
-            }
-            var filters = ['global']
-=======
       })
     },
     editName: function (id, value) {
@@ -221,7 +146,6 @@
             break
           }
           var filters = ['global']
->>>>>>> panel: CSS build light/dark theme, UI updates
 
           let div = $('<div>')
             .css('padding', '4px 5px 4px 5px')
