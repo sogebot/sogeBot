@@ -40,15 +40,6 @@
       </div>
       <div class="w-100"></div>
 
-      <div class="col systems-raffles-only">
-        <strong data-lang="page-settings.systems.whispers.toggle.raffle"></strong>
-      </div>
-      <div class="col systems-raffles-only">
-        <input id="disableRaffleWhispers" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-size="mini"
-          data-onstyle="success" data-offstyle="danger">
-      </div>
-      <div class="w-100 systems-raffles-only"></div>
-
       <div class="col">
         <strong data-lang="page-settings.systems.whispers.toggle.permissions"></strong>
       </div>
@@ -311,7 +302,6 @@
   console.log(systems)
   if (!systems.points) $("#points-tab-link").css('display', 'none')
   if (!systems.songs) $("#songs-tab-link").css('display', 'none')
-  if (!systems.raffles) $(".systems-raffles-only").css('display', 'none')
   if (!systems.cooldown) $(".systems-cooldown-only").css('display', 'none')
 
   socket.emit('getPointsConfiguration')
@@ -365,15 +355,6 @@
       })
     })
     $('#disableSettingsWhispers').data('init', true)
-
-    $('#disableRaffleWhispers').off('change')
-    $('#disableRaffleWhispers').bootstrapToggle(!data.disableRaffleWhispers ? 'on' : 'off')
-    $('#disableRaffleWhispers').change(function () {
-      if ($('#disableRaffleWhispers').data('init')) socket.emit('saveConfiguration', {
-        'disableRaffleWhispers': !$(this).prop('checked')
-      })
-    })
-    $('#disableRaffleWhispers').data('init', true)
 
     $('#disablePermissionWhispers').off('change')
     $('#disablePermissionWhispers').bootstrapToggle(!data.disablePermissionWhispers ? 'on' : 'off')
