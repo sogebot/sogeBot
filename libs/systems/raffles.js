@@ -16,6 +16,7 @@ const TYPE_TICKETS = 1
  *                                       - open a new raffle with selected keyword,
  *                                       - -min # - minimal of tickets to join, -max # - max of tickets to join -> ticket raffle
  *                                       - -for followers,subscribers - who can join raffle, if empty -> everyone
+ * !raffle remove                        - remove raffle without winner
  * !raffle pick                          - pick or repick a winner of raffle
  * ![raffle-keyword]                     - join a raffle
  * !set raffleAnnounceInterval [minutes] - reannounce raffle interval each x minutes
@@ -29,6 +30,7 @@ class Raffles {
 
       global.parser.register(this, '!raffle pick', this.pick, constants.OWNER_ONLY)
       global.parser.register(this, '!raffle close', this.close, constants.OWNER_ONLY)
+      global.parser.register(this, '!raffle remove', this.remove, constants.OWNER_ONLY)
       global.parser.register(this, '!raffle open', this.open, constants.OWNER_ONLY)
       global.parser.register(this, '!raffle', this.info, constants.VIEWERS)
       global.parser.registerHelper('!raffle')
@@ -37,13 +39,40 @@ class Raffles {
 
       global.parser.registerParser(this, 'rafflesMessages', this.messages, constants.VIEWERS)
 
+      global.panel.registerSockets({
+        self: this,
+        expose: ['refresh'],
+        finally: this.refresh
+      })
+
       this.register()
       this.announce()
+      this.refresh()
     }
   }
 
+  async refresh (self) {
+    debug('[WIDGET REFRESH]')
+    const SOCKET = global.panel.io
+
+    let raffles = await global.db.engine.find('raffles')
+    debug('Raffles: %o', raffles)
+    if (_.isEmpty(raffles)) return
+
+    let raffle = _.orderBy(raffles, 'timestamp', 'desc')[0]
+    debug('Selected raffle: %o', raffle)
+
+    let participants = await global.db.engine.find('raffle_participants')
+    debug('Raffle participants: %o', participants)
+
+    SOCKET.emit('raffles.refresh.data', {
+      raffle: raffle,
+      participants: participants
+    })
+  }
+
   async messages (self, id, sender, text) {
-    debug('# MESSAGE PARSER')
+    debug('[MESSAGE PARSER]')
     let raffles = await global.db.engine.find('raffles')
     debug('Raffles: %o', raffles)
     if (_.isEmpty(raffles)) {
@@ -68,6 +97,7 @@ class Raffles {
       })
       debug({ username: sender.username, raffle_id: raffle._id }, { messages: winner.messages })
       await global.db.engine.update('raffle_participants', { username: sender.username, raffle_id: raffle._id }, { messages: winner.messages })
+      this.refresh()
     }
     global.updateQueue(id, true)
   }
@@ -106,6 +136,19 @@ class Raffles {
     if (_.isEmpty(raffle)) return
     global.parser.unregister(raffle.keyword)
     global.parser.register(this, raffle.keyword, this.participate, constants.VIEWERS)
+  }
+
+  async remove (self) {
+    let raffle = await global.db.engine.findOne('raffles', { winner: null })
+    if (_.isEmpty(raffle)) return
+    global.parser.unregister(raffle.keyword)
+
+    await Promise.all([
+      global.db.engine.remove('raffles', { _id: raffle._id.toString() }),
+      global.db.engine.remove('raffle_participants', { raffle_id: raffle._id.toString() })
+    ])
+
+    self.refresh()
   }
 
   async open (self, sender, text, dashboard = false) {
@@ -174,6 +217,7 @@ class Raffles {
 
     // register raffle keyword
     self.register()
+    self.refresh()
     self.lastAnnounce = _.now()
   }
 
@@ -256,6 +300,7 @@ class Raffles {
     if (participantUser.eligible) {
       if (raffle.type === TYPE_TICKETS) global.db.engine.increment('users', { username: sender.username }, { points: parseInt(tickets, 10) * -1 })
       global.db.engine.update('raffle_participants', { raffle_id: raffle._id, username: sender.username }, participantUser)
+      this.refresh()
     }
   }
 
@@ -305,6 +350,8 @@ class Raffles {
     debug(message); global.commons.sendMessage(message, sender)
 
     global.parser.unregister(raffle.keyword) // disable raffle keyword on pick
+
+    this.refresh()
   }
 }
 
