@@ -31,14 +31,45 @@ class Raffles {
       global.parser.register(this, '!raffle close', this.close, constants.OWNER_ONLY)
       global.parser.register(this, '!raffle open', this.open, constants.OWNER_ONLY)
       global.parser.register(this, '!raffle', this.info, constants.VIEWERS)
-
       global.parser.registerHelper('!raffle')
 
       global.configuration.register('raffleAnnounceInterval', 'raffle.announceInterval', 'number', 10)
 
+      global.parser.registerParser(this, 'rafflesMessages', this.messages, constants.VIEWERS)
+
       this.register()
       this.announce()
     }
+  }
+
+  async messages (self, id, sender, text) {
+    debug('# MESSAGE PARSER')
+    let raffles = await global.db.engine.find('raffles')
+    debug('Raffles: %o', raffles)
+    if (_.isNil(raffles)) {
+      global.updateQueue(id, true)
+      return
+    }
+
+    let raffle = _.orderBy(raffles, 'timestamp', 'desc')[0]
+    debug('Selected raffle: %o', raffle)
+
+    let isWinner = !_.isNil(raffle.winner) && raffle.winner === sender.username
+    let isInTwoMinutesTreshold = _.now() - raffle.timestamp <= 1000 * 60 * 2
+
+    debug('current time: %s, raffle pick time: %s, diff: %s', _.now(), raffle.timestamp, _.now() - raffle.timestamp)
+    debug('Is raffle in 2 minutes treshold: %s', isInTwoMinutesTreshold)
+    debug('Is user a winner: %s', isWinner)
+    if (isWinner && isInTwoMinutesTreshold) {
+      let winner = await global.db.engine.findOne('raffle_participants', { username: sender.username, raffle_id: raffle._id })
+      winner.messages.push({
+        timestamp: sender['sent-ts'],
+        text: text
+      })
+      debug({ username: sender.username, raffle_id: raffle._id }, { messages: winner.messages })
+      await global.db.engine.update('raffle_participants', { username: sender.username, raffle_id: raffle._id }, { messages: winner.messages })
+    }
+    global.updateQueue(id, true)
   }
 
   async announce () {
@@ -165,8 +196,8 @@ class Raffles {
 
     let message = global.commons.prepare(locale, {
       keyword: raffle.keyword,
-      min: raffle.minTickets,
-      max: raffle.maxTickets,
+      min: raffle.min,
+      max: raffle.max,
       eligibility: eligibility.join(', ')
     })
     debug(message); global.commons.sendMessage(message, global.parser.getOwner())
@@ -185,6 +216,7 @@ class Raffles {
     if ((!_.isFinite(tickets) || tickets <= 0 || tickets > parseInt(raffle.max, 10) || tickets < parseInt(raffle.min, 10)) && raffle.type === TYPE_TICKETS) {
       return true
     }
+    if (!_.isFinite(tickets)) tickets = 0
 
     let participant = await global.db.engine.findOne('raffle_participants', { raffle_id: raffle._id, username: sender.username })
     let curTickets = 0
@@ -266,13 +298,13 @@ class Raffles {
     ])
 
     let message = global.commons.prepare('raffles.raffle-winner-is', {
-      username: winner.username,
+      username: winner,
       keyword: raffle.keyword,
       probability: _.round(probability, 2)
     })
     debug(message); global.commons.sendMessage(message, sender)
 
-    global.parser.uregister(raffle.keyword) // disable raffle keyword on pick
+    global.parser.unregister(raffle.keyword) // disable raffle keyword on pick
   }
 }
 
