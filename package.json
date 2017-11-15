@@ -33,6 +33,8 @@
     "nedb": "^1.8.0",
     "nedb-promise": "^2.0.1",
     "node-hue-api": "^2.4.2",
+    "node-sass": "^4.6.0",
+    "npm-run-all": "^4.1.2",
     "popper.js": "^1.12.6",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
@@ -45,9 +47,7 @@
     "velocity-animate": "^1.5.0",
     "winston": "^2.4.0",
     "youtube-search": "^1.0.10",
-    "ytdl-core": "^0.18.1",
-    "npm-run-all": "^4.1.2",
-    "node-sass": "^4.6.0"
+    "ytdl-core": "^0.18.1"
   },
   "scripts": {
     "build-css": "npm-run-all --parallel css-theme-light-compile css-theme-dark-compile",
