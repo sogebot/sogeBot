@@ -74,11 +74,11 @@
 
       <ul class="navbar-nav mr-auto">
         <li class="nav-item" style="font-size: 0.6rem; position: relative; top: .2rem">
-          <span class="text-warning" id="APIStatus" title="API checking">API</span>
-          <span class="text-warning" id="TMIStatus" title="TMI checking">TMI</span>
-          <span class="text-warning" id="SOCStatus" title="SOC checking">SOC</span>
-          <span class="text-warning" id="MODStatus" title="MOD checking">MOD</span>
-          <span class="text-warning" id="RESStatus" title="RES checking">0ms</span>
+          <span class="alert alert-warning" style="padding:0;" id="APIStatus" title="API checking">API</span>
+          <span class="alert alert-warning" style="padding:0;" id="TMIStatus" title="TMI checking">TMI</span>
+          <span class="alert alert-warning" style="padding:0;" id="SOCStatus" title="SOC checking">SOC</span>
+          <span class="alert alert-warning" style="padding:0;" id="MODStatus" title="MOD checking">MOD</span>
+          <span class="alert alert-warning" style="padding:0;" id="RESStatus" title="RES checking">0ms</span>
         </li>
       </ul>
 
@@ -350,6 +350,7 @@
         console.log('LOCAL version', parseInt(version.split('.').join(''), 10))
         $('#version').text(response.tag_name)
         $('#current_version').text(version)
+        $('title').text($('title').text() + ' ' + version)
         if (parseInt(response.tag_name.split('.').join(''), 10) > parseInt(version.split('.').join(''), 10)) $('#new-version-notice').css('display', 'inline')
       })
     })
@@ -1254,44 +1255,47 @@
 
       if (id === 'SOC' && status === 0) {
         $("[id$='Status']").removeClass()
-        $("[id$='Status']").addClass('text-muted')
+        $("[id$='Status']").addClass('alert alert-muted')
       }
 
       if (id === 'RES') {
         $("#" + id + "Status").attr('title', 'Average bot response ' + status + 'ms')
         if (status >= 1500) {
-          $("#" + id + "Status").addClass('text-danger')
+          $("#" + id + "Status").addClass('alert alert-danger')
         } else if (status < 1500 && status >= 800) {
-          $("#" + id + "Status").addClass('text-warning')
+          $("#" + id + "Status").addClass('alert alert-warning')
         } else {
-          $("#" + id + "Status").addClass('text-success')
+          $("#" + id + "Status").addClass('alert alert-success')
         }
         $("#" + id + "Status").text(status + 'ms')
+        $("#" + id + "Status").css('padding', '0')
       }
 
       if (id === 'MOD') {
         $("#" + id + "Status").attr('title', 'Bot is' + (status ? ' ' : ' not ') + 'a MOD')
-        $("#" + id + "Status").addClass('text-' + (status ? 'success' : 'danger'))
+        $("#" + id + "Status").addClass('alert alert-' + (status ? 'success' : 'danger'))
+        $("#" + id + "Status").css('padding', '0')
         return
       }
 
       switch (status) {
         case 0:
           $("#" + id + "Status").attr('title', id + ' disconnected')
-          $("#" + id + "Status").addClass('text-danger')
+          $("#" + id + "Status").addClass('alert alert-danger')
           break;
         case 1:
           $("#" + id + "Status").attr('title', id + ' connecting')
-          $("#" + id + "Status").addClass('text-warning')
+          $("#" + id + "Status").addClass('alert alert-warning')
           break;
         case 2:
           $("#" + id + "Status").attr('title', id + ' reconnecting')
-          $("#" + id + "Status").addClass('text-warning')
+          $("#" + id + "Status").addClass('alert alert-warning')
         case 3:
           $("#" + id + "Status").attr('title', id + ' connected')
-          $("#" + id + "Status").addClass('text-success')
+          $("#" + id + "Status").addClass('alert alert-success')
           break;
       }
+      $("#" + id + "Status").css('padding', '0')
     }
 
     // update top offset every second and on page resize

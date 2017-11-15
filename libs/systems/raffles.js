@@ -46,7 +46,7 @@ class Raffles {
     debug('# MESSAGE PARSER')
     let raffles = await global.db.engine.find('raffles')
     debug('Raffles: %o', raffles)
-    if (_.isNil(raffles)) {
+    if (_.isEmpty(raffles)) {
       global.updateQueue(id, true)
       return
     }
