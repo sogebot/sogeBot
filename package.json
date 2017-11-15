@@ -61,7 +61,7 @@
     "test:nedb": "npm run test:config:nedb; mocha --recursive --timeout 4000 --exit",
     "test:config:mongodb": "cp config.json config.backup.json > /dev/null; cp config.example.json config.json; sed -i -- 's/nedb/mongodb/g' config.json",
     "test:config:nedb": "cp config.json config.backup.json > /dev/null; cp config.example.json config.json",
-    "start": "node ./tools/migrate && npm-run-all --parallel build-css copy:dist && node ./main || true",
+    "start": "node ./tools/migrate && npm-run-all --parallel build-css copy:dist && NODE_ENV=production node ./main || true",
     "start-no-migration": "npm run copy:dist && node ./main || true",
     "cleanup": "node ./tools/cleanup.js || true",
     "debug": "npm run copy:dist && node --inspect ./main || true",
