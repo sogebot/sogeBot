@@ -45,7 +45,7 @@
 
 
   <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
-    <a class="navbar-brand" href="#">sogeBot UI</a>
+    <a class="navbar-brand" href="#">sogeBot UI <span id="current_version"></span></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault"
       aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -73,17 +73,20 @@
       </ul>
 
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item" style="font-weight: bold">
+        <li class="nav-item" style="font-size: 0.6rem; position: relative; top: .2rem">
           <span class="text-warning" id="APIStatus" title="API checking">API</span>
           <span class="text-warning" id="TMIStatus" title="TMI checking">TMI</span>
           <span class="text-warning" id="SOCStatus" title="SOC checking">SOC</span>
           <span class="text-warning" id="MODStatus" title="MOD checking">MOD</span>
           <span class="text-warning" id="RESStatus" title="RES checking">0ms</span>
         </li>
+      </ul>
+
+      <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <a class="text-danger nav-link" id="new-version-notice" style="display: none; font-weight: bold; padding-left: 30px; cursor: pointer;"
+          <a class="btn btn-outline-danger" href="#" id="new-version-notice" style="display: none; font-weight: bold; cursor: pointer;"
             data-toggle="modal" data-target="#new_version_dlg">
-            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> New version available
+            <i class="fa fa-code-fork" aria-hidden="true"></i> Version <span id="version"></span> available
           </a>
         </li>
       </ul>
@@ -343,7 +346,11 @@
 
         $('#new_version_dlg .modal-body').html(md.render(response.body.replace('**Changelog**', '').trim()))
         $('#new_version_dlg .modal-header small').text(response.tag_name)
-        if (response.tag_name !== version) $('#new-version-notice').css('display', 'inline')
+        console.log('GITHUB version', parseInt(response.tag_name.split('.').join(''), 10))
+        console.log('LOCAL version', parseInt(version.split('.').join(''), 10))
+        $('#version').text(response.tag_name)
+        $('#current_version').text(version)
+        if (parseInt(response.tag_name.split('.').join(''), 10) > parseInt(version.split('.').join(''), 10)) $('#new-version-notice').css('display', 'inline')
       })
     })
 
