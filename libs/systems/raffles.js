@@ -25,7 +25,6 @@ const TYPE_TICKETS = 1
 class Raffles {
   constructor () {
     if (global.commons.isSystemEnabled(this)) {
-      this.status = null
       this.lastAnnounce = _.now()
 
       global.parser.register(this, '!raffle pick', this.pick, constants.OWNER_ONLY)
