@@ -337,7 +337,7 @@ class Raffles {
     let participants = await global.db.engine.find('raffle_participants', { raffle_id: raffle._id.toString(), eligible: true })
     if (participants.length === 0) {
       let message = global.commons.prepare('raffles.no-participants-to-pick-winner')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, global.parser.getOwner())
       return true
     }
 
@@ -369,7 +369,7 @@ class Raffles {
       keyword: raffle.keyword,
       probability: _.round(probability, 2)
     })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, global.parser.getOwner())
 
     global.parser.unregister(raffle.keyword) // disable raffle keyword on pick
 
