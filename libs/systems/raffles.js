@@ -235,7 +235,7 @@ class Raffles {
       min: minTickets,
       max: maxTickets
     })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, global.parser.getOwner())
 
     // register raffle keyword
     self.register()
