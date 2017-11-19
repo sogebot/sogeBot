@@ -171,7 +171,8 @@ a.active {
 }
 
 .btn-label {
-  background-color: $white !important;
+  background-color: transparent !important;
+  color: $black !important;
   border: 0px !important;
   font-weight: bold;
 }
