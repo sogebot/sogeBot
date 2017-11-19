@@ -783,14 +783,14 @@
   },
   "followage": {
     "success": {
-      "never": "$sender, @$username is not a channel follower",
-      "time": "$sender, @$username is following channel $diff"
+      "never": "$sender, $username is not a channel follower",
+      "time": "$sender, $username is following channel $diff"
     }
   },
   "age": {
-    "failed": "$sender, I don't have data for @$username account age",
+    "failed": "$sender, I don't have data for $username account age",
     "success": {
-      "withUsername": "$sender, account age for @$username is $diff",
+      "withUsername": "$sender, account age for $username is $diff",
       "withoutUsername": "$sender, your account age is $diff"
     }
   },

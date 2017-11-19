@@ -370,15 +370,17 @@ Twitch.prototype.lastseenUpdate = async function (self, id, sender, text) {
 
 Twitch.prototype.followage = async function (self, sender, text) {
   let username
-  let parsed = text.match(/^(\S?)+$/g)
-  if (parsed[0].length > 0) username = parsed[0].toLowerCase()
-  else username = sender.username
+  let parsed = text.match(/([^@]\S*)/g)
+
+  if (_.isNil(parsed)) username = sender.username
+  else username = parsed[0].toLowerCase()
 
   global.users.isFollower(username)
 
   const user = await global.users.get(username)
   if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.follow) || _.isNil(user.is.follower) || !user.is.follower) {
-    global.commons.sendMessage(global.translate('followage.success.never').replace(/\$username/g, username), sender)
+    let message = global.commons.prepare('followage.success.never', { username: username })
+    debug(message); global.commons.sendMessage(message, sender)
   } else {
     let diff = moment.preciseDiff(user.time.follow, moment(), true)
     let output = []
@@ -388,21 +390,26 @@ Twitch.prototype.followage = async function (self, sender, text) {
     if (diff.hours) output.push(diff.hours + ' ' + global.parser.getLocalizedName(diff.hours, 'core.hours'))
     if (diff.minutes) output.push(diff.minutes + ' ' + global.parser.getLocalizedName(diff.minutes, 'core.minutes'))
     if (output.length === 0) output.push(0 + ' ' + global.parser.getLocalizedName(0, 'core.minutes'))
-    global.commons.sendMessage(global.translate('followage.success.time')
-      .replace(/\$username/g, username)
-      .replace(/\$diff/g, output.join(', ')), sender)
+
+    let message = global.commons.prepare('followage.success.time', {
+      username: username,
+      diff: output.join(', ')
+    })
+    debug(message); global.commons.sendMessage(message, sender)
   }
 }
 
 Twitch.prototype.age = async function (self, sender, text) {
   let username
-  let parsed = text.match(/^(\S?)+$/g)
-  if (parsed[0].length > 0) username = parsed[0].toLowerCase()
-  else username = sender.username
+  let parsed = text.match(/([^@]\S*)/g)
+
+  if (_.isNil(parsed)) username = sender.username
+  else username = parsed[0].toLowerCase()
 
   const user = await global.users.get(username)
   if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.created_at)) {
-    global.commons.sendMessage(global.translate('age.failed').replace(/\$username/g, username), sender)
+    let message = global.commons.prepare('age.failed', { username: username })
+    debug(message); global.commons.sendMessage(message, sender)
   } else {
     let diff = moment.preciseDiff(user.time.created_at, moment(), true)
     let output = []
@@ -410,9 +417,11 @@ Twitch.prototype.age = async function (self, sender, text) {
     if (diff.months) output.push(diff.months + ' ' + global.parser.getLocalizedName(diff.months, 'core.months'))
     if (diff.days) output.push(diff.days + ' ' + global.parser.getLocalizedName(diff.days, 'core.days'))
     if (diff.hours) output.push(diff.hours + ' ' + global.parser.getLocalizedName(diff.hours, 'core.hours'))
-    global.commons.sendMessage(global.translate(sender.username.toLowerCase() !== username.toLowerCase() ? 'age.success.withUsername' : 'age.success.withoutUsername')
-      .replace(/\$username/g, username)
-      .replace(/\$diff/g, output.join(', ')), sender)
+    let message = global.commons.prepare(!_.isNil(parsed) ? 'age.success.withUsername' : 'age.success.withoutUsername', {
+      username: username,
+      diff: output.join(', ')
+    })
+    debug(message); global.commons.sendMessage(message, sender)
   }
 }
 
