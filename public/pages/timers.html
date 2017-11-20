@@ -46,7 +46,7 @@
     },
     addRow: (timer, responses) => {
       $("#timers").append('<tr class="page-data-row">' +
-          '<td style="vertical-align: top !important;min-width: 150px;"><span class="badge badge-default">Name</span>' +
+          '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">Name</span>' +
           '<span style="cursor: pointer;" class="badge badge-' + (timer.enabled ? "success" : "danger") +
           '" data-id="' + timer.name + '" onclick="timers.toggle(this)">' + (timer.enabled ? "enabled" :
             "disabled") + '</span>' +
@@ -54,10 +54,10 @@
           '<td style="vertical-align: top !important;"><span class="badge badge-user"># Responses</span><strong style="display: block; padding: 8px">' +
             `⚫ ${responses.enabled} ⚪ ${responses.disabled}</strong></td>` +
           '</td>' +
-          '<td style="vertical-align: top !important;"><span class="badge badge-primary">Messages</span> ' +
+          '<td style="vertical-align: top !important;width: 20rem; max-width: 20rem;"><span class="badge badge-primary">Messages</span> ' +
             commons.editable({ text: timer.messages, id: timer.name, fnc: 'timers.editMessages', options: { seconds: timer.seconds }}) + '</td>' +
           '</td>' +
-          '<td style="vertical-align: top !important;"><span class="badge badge-primary">Seconds</span> ' +
+          '<td style="vertical-align: top !important;width: 20rem; max-width: 20rem;"><span class="badge badge-primary">Seconds</span> ' +
             commons.editable({ text: timer.seconds, id: timer.name, fnc: 'timers.editSeconds', options: { messages: timer.messages }}) + '</td>' +
           '<span style="cursor: not-allowed; float:right; padding: 4px;" class="badge badge-danger btn-remove" data-id="' +
           timer.name + '"  onclick="commons.confirm(this)">delete</span>' +
@@ -74,7 +74,7 @@
               '<table class="table table-striped">' +
                 '<tbody>'
       content += '<tr id="' + name + '_content_new" style="display:none">' +
-        '<td style="vertical-align: top !important;min-width: 150px;"><span class="badge badge-default">Response</span>' + commons.editable({ text: '', id: name + '_new!', fnc: 'commons.stub' }) +
+        '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">Response</span>' + commons.editable({ text: '', id: name + '_new!', fnc: 'commons.stub' }) +
         '<div class="btn-group pull-right">' +
           '<button class="save-button btn btn-success new-confirm-btn" style="display:none" data-id="' + name + '" onclick="timers.addResponse(event)">SAVE</button>' +
           '<button class="btn btn-warning new-confirm-btn" style="display:none" onclick="timers.cancel()">CANCEL</button>' +
@@ -219,7 +219,7 @@
     $(".tab-content [id$='_content']").remove()
 
     $("#timers").append('<tr id="manage_new" style="display:none">' +
-        '<td style="vertical-align: top !important;min-width: 150px;"><span class="badge badge-default">Name</span>' + commons.editable({ text: '', id: '_new!', fnc: 'commons.stub' }) + '</td>' +
+        '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">Name</span>' + commons.editable({ text: '', id: '_new!', fnc: 'commons.stub' }) + '</td>' +
         '<td colspan=2 style="vertical-align: top !important;"><span class="badge badge-primary">Messages</span> ' +
           commons.editable({ text: '0', id: '_new!', fnc: 'commons.stub' }) +
         '</td><td style="vertical-align: top !important;"><span class="badge badge-primary">Seconds</span> ' +

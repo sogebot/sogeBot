@@ -55,7 +55,7 @@
       this.list = list
       $("#Commands").empty()
       $("#Commands").append('<tr id="new-command" style="display:none">' +
-        '<td style="vertical-align: top !important;min-width: 150px;"><span class="badge badge-default">New command</span> <span class="status badge badge-warning">available</span>' +
+        '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">New command</span> <span class="status badge badge-warning">available</span>' +
         commons.editable({
           text: '',
           id: '_new!',
@@ -76,7 +76,7 @@
         '</tr>');
       _.each(list, function (item, index) {
         $("#Commands").append('<tr class="page-data-row">' +
-          '<td style="vertical-align: top !important;min-width: 150px;"><span class="badge badge-default">Command</span>' +
+          '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">Command</span>' +
           commons.editable({
             text: '!' + item.command,
             id: item.command,
