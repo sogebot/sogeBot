@@ -360,10 +360,6 @@ span.title.title-part.text-default + div.widget {
   font-weight: bold;
 }
 
-.input-group-addon:last-child, .input-group-addon:first-child {
-  border-right: 0; border-left: 0
-}
-
 .input-group .form-control:first-child {
   border-left: 0; border-right: 0;
 }
@@ -502,6 +498,52 @@ span.queue-list-group-item {
 }
 
 /* MODAL GAME AND TITLE */
+
+.carousel-games-inner {
+  text-align: center;
+}
+
+.titles-list-item {
+  padding:0;
+  display: inline-block;
+  margin: 0 .5% 0 .5%;
+}
+
+.titles-list-item.focus {
+  border-bottom: .3rem solid $blue;
+}
+
+.carousel-control-next, .carousel-control-prev {
+  color: $black;
+  width: 8%;
+}
+
+.carousel-control-next:hover, .carousel-control-prev:hover {
+  color: $blue;
+}
+
+.carousel-control-next:focus, .carousel-control-prev:focus {
+  color: $black;
+  opacity: 0.5;
+}
+
+
+.carousel-control-prev {
+  justify-content: left;
+}
+
+.carousel-control-next {
+  justify-content: flex-end;
+}
+
+#change-game-input + ul#change-game-search-list {
+  display: none;
+}
+
+#change-game-input:focus + ul#change-game-search-list, #change-game-search-list:hover {
+  display: block !important;
+}
+
 #change-game-search-list {
   list-style-type: none;
   padding: 0;
@@ -509,9 +551,8 @@ span.queue-list-group-item {
   border-top: 0;
   position: absolute;
   background-color: $white;
-  width: 100%;
+  width: auto;
   z-index: 9000;
-  display: none;
   height: auto;
   max-height: 200px;
   overflow: auto;
@@ -531,43 +572,6 @@ span.queue-list-group-item {
 .dlg-game-and-title {
   padding-bottom: 0;
   margin-bottom: 0;
-}
-.carousel-games-inner > div > div > img {
-  width: 100%;
-}
-.carousel-games-inner > div > div > i {
-  font-size: 30px;
-  line-height: 125px;
-}
-
-.carousel-games-inner > div > div {
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-.carousel-games-inner > div > div.col-md-1 {
-  padding-left: 0px;
-  padding-right: 0px;
-}
-
-.carousel-games-inner > div > div.col-md-2.focus > img {
-  border-bottom:5px solid greenyellow
-}
-
-.carousel-games-inner > div > div.col-md-2 > img {
-  border-bottom:5px solid white
-}
-
-.carousel-games-control {
-  background-image: none !important;
-  background: $white;
-  color: $black;
-  width: 5%;
-}
-
-.carousel-games-inner .item {
-  padding-left: 10%;
-  padding-right: 10%;
 }
 
 .form-control-feedback {
@@ -915,7 +919,7 @@ li a.active .deleteTab {
   display: none;
   user-select: none;
   cursor: pointer;
-  border: 2px solid #dea189;
+  border: 2px solid $orange;
   border-top: 1px dotted $gray-200;
   padding: 0 10px 5px 10px;
   background-color: $white;
@@ -1078,4 +1082,8 @@ table tr td hr {
   0% { transform:rotate(0deg) }
   42.85714% { transform:rotate(359deg) }
   100% { transform:rotate(359deg) }
+}
+
+.is-checking {
+  border-color: $orange;
 }
