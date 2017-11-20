@@ -259,7 +259,12 @@
     }
 
     if (!_.isNil(WINNER)) {
-      $('a[href="#raffles-winner"]').css('display', 'block') // go to winner tab
+      $('a[href="#raffles-winner"]').css('display', 'block') // show
+
+      if (raffles.switchToWinner) {
+        // go to winners tab
+        $('a[href="#raffles-winner"]').tab('show')
+      }
 
       var following = $('#raffleWinnerFollowing')
       following.children('span').css('color', WINNER.is.follower ? 'green' : 'red')
@@ -281,10 +286,12 @@
           1000).format("HH:mm:ss") + '</td></tr>')
       }
     }
+    raffles.switchToWinner = false // reset variable (only once per click)
     console.groupEnd()
   })
 
   var raffles = {
+    switchToWinner: false,
     toggleBtn: function (el) {
       console.group('raffles widget - toggleBtn()')
       console.debug('element', el)
@@ -429,6 +436,7 @@
       })
     },
     pick: function () {
+      this.switchToWinner = true
       socket.emit('raffles.pick')
     }
   }
