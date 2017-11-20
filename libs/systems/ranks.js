@@ -161,7 +161,8 @@ class Ranks {
     debug('Users rank: %j', rank)
 
     let watched = !_.isNil(user.time) && !_.isNil(user.time.watched) ? user.time.watched : 0
-    let ranks = await global.db.engine.find('ranks')
+    let [ranks, current] = await Promise.all([global.db.engine.find('ranks'), global.db.engine.findOne('ranks', { value: rank })])
+
     let nextRank = null
     for (let _rank of _.orderBy(ranks, 'hours', 'desc')) {
       if (_rank.hours > watched / 1000 / 60 / 60) {
@@ -178,8 +179,10 @@ class Ranks {
     }
 
     if (!_.isNil(nextRank)) {
-      let toWatch = (nextRank.hours - (watched / 1000 / 60 / 60))
-      let percentage = (toWatch / nextRank.hours) * 100
+      let toNextRank = nextRank.hours - current.hours
+      let toNextRankWatched = watched / 1000 / 60 / 60 - current.hours
+      let toWatch = (toNextRank - toNextRankWatched)
+      let percentage = 100 - (((toWatch) / toNextRank) * 100)
       let message = global.commons.prepare('ranks.show-rank-with-next-rank', { rank: rank, nextrank: `${nextRank.value} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)}h)` })
       debug(message); global.commons.sendMessage(message, sender)
       return true
