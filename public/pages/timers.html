@@ -95,7 +95,8 @@
           commons.editable({
             text: response.response,
             id: response._id,
-            fnc: 'timers.editResponse'
+            fnc: 'timers.editResponse',
+            filters: ['global']
           }) +
           '</td></tr>'
       }
