@@ -302,8 +302,6 @@
     var socket = io({
       query: "token=" + token
     });
-    var loadedWidgets = []
-    var loadedJS = []
     var loadedMenu = false
     var addingWidget = false
     var systems
@@ -476,7 +474,6 @@
               function () {
                 commons.translate()
               }))
-          loadedWidgets.push(rows.left[i].widget)
         }
 
         if (!_.isNil(rows.middle[i])) {
@@ -486,7 +483,6 @@
               function () {
                 commons.translate()
               }))
-          loadedWidgets.push(rows.middle[i].widget)
         }
 
         if (!_.isNil(rows.right[i])) {
@@ -496,7 +492,6 @@
               function () {
                 commons.translate()
               }))
-          loadedWidgets.push(rows.right[i].widget)
         }
       }
 
@@ -1141,7 +1136,6 @@
       $('#' + id).remove();
       console.debug('EMIT [deleteWidget]', 0)
       socket.emit('deleteWidget', id)
-      loadedWidgets.splice(loadedWidgets.indexOf(id), 1)
     }
 
     var saveHighlight = function () {

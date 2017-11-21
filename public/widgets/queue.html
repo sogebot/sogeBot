@@ -68,7 +68,6 @@
         this.el.toggle.addClass('btn ' + (!queue.locked ? 'btn-danger' : 'btn-success'))
         this.el.toggle.text((!queue.locked ? translations['close-queue'] : translations['open-queue']))
 
-        console.log(this.el.toggle.data())
         this.el.toggleIcon.removeClass()
         this.el.toggleIcon.addClass('fa ' + (queue.locked ? 'fa-lock' : 'fa-unlock'))
       },

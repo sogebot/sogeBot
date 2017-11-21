@@ -44,9 +44,8 @@
               <h6 class="dropdown-header">OTHERS</h6>
               <button class="dropdown-item" id="percentage-btn" data-show-percentage="true" onclick="banSong()">Ban song</button>
             </div>
-            <div style="height:34px; display: inline-block">
-              <input id="volumeSlider" data-slider-handle="custom" data-slider-tooltip="hide" data-slider-orientation="vertical" data-slider-id='volumeSlider'
-                type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="50" />
+            <div style="height:34px; display: inline-block" id="volumeSliderContainer">
+
             </div>
           </div>
           <div class="progress" style="height:34px; padding-left:0px; padding-right: 0; width: 100%;">
@@ -56,7 +55,10 @@
         </div>
       </div>
 
-      <div style="font-size: 0.8rem" class="bg-faded"><strong>Current Song: </strong><span id="yt-player-currentsong"></span></div>
+      <div style="font-size: 0.8rem" class="bg-faded">
+        <strong>Current Song: </strong>
+        <span id="yt-player-currentsong"></span>
+      </div>
     </div>
     <!-- /YT-PLAYER -->
 
@@ -74,136 +76,136 @@
 </div>
 
 <script>
-  if (loadedJS.indexOf('ytplayer') === -1) {
-    loadedJS.push('ytplayer')
-
-    $("#volumeSlider").on("change", function (slideEvt) {
-      socket.emit('saveConfiguration', {
-        'songs_volume': slideEvt.value.newValue,
-        '_quiet': true
-      })
-      setTimeout(function () {
-        socket.emit('songs.getCurrentVolume')
-      })
+  $("#volumeSlider").on("change", function (slideEvt) {
+    socket.emit('saveConfiguration', {
+      'songs_volume': slideEvt.value.newValue,
+      '_quiet': true
     })
-
-    socket.on('newVolume', function (vol) {
-      player.setVolume(vol)
+    setTimeout(function () {
+      socket.emit('songs.getCurrentVolume')
     })
+  })
 
-    socket.emit('songs.sendConfiguration')
-    socket.once('configuration', function (data) {
-      $('#volumeSlider').slider({
-        reversed: true,
-        value: data.songs_volume,
-        formatter: function (value) {
-          return value + '%';
-        }
-      })
+  socket.on('newVolume', function (vol) {
+    player.setVolume(vol)
+  })
+
+  socket.emit('songs.sendConfiguration')
+  socket.on('songsConfiguration', function (data) {
+    let vol = $('<input id="volumeSlider" data-slider-handle="custom" data-slider-tooltip="hide" data-slider-orientation="vertical" data-slider-id="volumeSlider"' +
+                'type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="50" />')
+    $('#volumeSlider').detach()
+    $('#volumeSliderContainer').empty().append(vol)
+    $('#volumeSlider').slider({
+      reversed: true,
+      value: data.songs_volume,
+      formatter: function (value) {
+        return value + '%';
+      }
     })
+    console.log('UPDATING')
 
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  })
 
-    var player, time_update_interval;
-    var loading = false
-    var progressUpdate = null
+  var tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-    function stealToPlaylist() {
-      socket.emit('songs.stealSong')
-    }
+  var player, time_update_interval;
+  var loading = false
+  var progressUpdate = null
 
-    function skipSong() {
-      socket.emit('songs.sendNextSongID')
-    }
+  function stealToPlaylist() {
+    socket.emit('songs.stealSong')
+  }
 
-    function banSong() {
-      socket.emit('songs.banSong', '')
-    }
+  function skipSong() {
+    socket.emit('songs.sendNextSongID')
+  }
 
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('YTPlayer', {
-        width: 1,
-        height: 1,
-        videoId: '',
-        events: {
-          onReady: initialize,
-          onStateChange: onPlayerStateChange
-        }
-      })
-    }
+  function banSong() {
+    socket.emit('songs.banSong', '')
+  }
 
-    function initialize() {
-      clearInterval(time_update_interval);
-      time_update_interval = setInterval(function () {
-        if (!loading && (player.getPlayerState() === 0 || player.getPlayerState() === 5) && $("#YTControl i").hasClass(
-            'text-danger')) {
-          loading = true
-          socket.emit('songs.sendNextSongID');
-        }
-      }, 2000)
-    }
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('YTPlayer', {
+      width: 1,
+      height: 1,
+      videoId: '',
+      events: {
+        onReady: initialize,
+        onStateChange: onPlayerStateChange
+      }
+    })
+  }
 
-    function onPlayerStateChange(event) {
-      if (event.data == YT.PlayerState.ENDED && !loading) {
+  function initialize() {
+    clearInterval(time_update_interval);
+    time_update_interval = setInterval(function () {
+      if (!loading && (player.getPlayerState() === 0 || player.getPlayerState() === 5) && $("#YTControl i").hasClass(
+          'text-danger')) {
         loading = true
         socket.emit('songs.sendNextSongID');
       }
+    }, 2000)
+  }
+
+  function onPlayerStateChange(event) {
+    if (event.data == YT.PlayerState.ENDED && !loading) {
+      loading = true
+      socket.emit('songs.sendNextSongID');
+    }
+  }
+
+  socket.on('videoID', function (video) {
+    if (player.getPlayerState() === YT.PlayerState.PAUSED) return // do nothing if player is PAUSED
+
+    if (video === null) {
+      loading = false
+      player.stopVideo()
+      return
     }
 
-    socket.on('videoID', function (video) {
-      if (player.getPlayerState() === YT.PlayerState.PAUSED) return // do nothing if player is PAUSED
+    player.stopVideo()
+    data = {
+      'videoId': video.videoID
+    }
 
-      if (video === null) {
-        loading = false
-        player.stopVideo()
-        return
-      }
+    $("#yt-player-currentsong").html(video.title)
+    $("#yt-player-currentsong").parent().attr('title', video.title)
+    if (typeof video.startTime !== 'undefined') data.startSeconds = video.startTime
+    if (typeof video.endTime !== 'undefined') data.endSeconds = video.endTime
+    player.loadVideoById(data);
+    player.setVolume(video.volume)
+    player.setPlaybackQuality('small') // set playback to lowest possible
+    player.playVideo();
+    setTimeout(function () {
+      loading = false
+    }, 10000)
+  });
 
-      player.stopVideo()
-      data = {
-        'videoId': video.videoID
-      }
-
-      $("#yt-player-currentsong").html(video.title)
-      $("#yt-player-currentsong").parent().attr('title', video.title)
-      if (typeof video.startTime !== 'undefined') data.startSeconds = video.startTime
-      if (typeof video.endTime !== 'undefined') data.endSeconds = video.endTime
-      player.loadVideoById(data);
-      player.setVolume(video.volume)
-      player.setPlaybackQuality('small') // set playback to lowest possible
+  var retries = 0
+  unstartedCheck = setInterval(function () {
+    if (player.getPlayerState() === -1 && retries < 5) {
       player.playVideo();
-      setTimeout(function () {
-        loading = false
-      }, 10000)
-    });
+      retries++
+    } else if (player.getPlayerState() === -1 && retries === 5) {
+      retries = 0
+      skipSong()
+    }
+  }, 1000)
 
-    var retries = 0
-    unstartedCheck = setInterval(function () {
-      if (player.getPlayerState() === -1 && retries < 5) {
-        player.playVideo();
-        retries++
-      } else if (player.getPlayerState() === -1 && retries === 5) {
-        retries = 0
-        skipSong()
-      }
-    }, 1000)
+  progressUpdate = setInterval(function () {
+    var duration = player.getDuration()
+    var played = player.getCurrentTime()
 
-    progressUpdate = setInterval(function () {
-      var duration = player.getDuration()
-      var played = player.getCurrentTime()
+    var percentage = played / (duration / 100)
 
-      var percentage = played / (duration / 100)
-
-      if (!_.isFinite(percentage)) percentage = 0
-      else percentage = Math.floor(percentage)
-      $("#youtube-progress").css('width', percentage + '%')
-    }, 1000)
-  } else {
-    $('#YTPlayer').text('Refresh your browser to use YouTube Player')
-  }
+    if (!_.isFinite(percentage)) percentage = 0
+    else percentage = Math.floor(percentage)
+    $("#youtube-progress").css('width', percentage + '%')
+  }, 1000)
 
   $("#YTControl").on('click', function () {
     console.log($("#YTControl button"))
@@ -245,5 +247,4 @@
       }
     }
   });
-
 </script>

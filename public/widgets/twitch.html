@@ -33,17 +33,14 @@
   })
 
   socket.once('twitchVideo', function (room) {
-    if (loadedJS.indexOf('twitch') === -1) {
-      loadedJS.push('twitch')
-      $("#twitchVideoWidget").empty()
-      var player = new Twitch.Player("twitchVideoWidget", {
-        width: "100%",
-        channel: room
-      })
-      player.addEventListener(Twitch.Player.ONLINE, function () {
-        player.play()
-      })
-    }
+    $("#twitchVideoWidget").empty()
+    var player = new Twitch.Player("twitchVideoWidget", {
+      width: "100%",
+      channel: room
+    })
+    player.addEventListener(Twitch.Player.ONLINE, function () {
+      player.play()
+    })
   })
 
 </script>
