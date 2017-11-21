@@ -1,7 +1,5 @@
 'use strict'
 
-var _ = require('lodash')
-
 function QueueWidget () {
   this.timestamp = 0
 
@@ -22,11 +20,12 @@ QueueWidget.prototype._send = function (self) {
   self.sendQueue(self, global.panel.io)
 }
 
-QueueWidget.prototype.sendQueue = function (self, socket) {
+QueueWidget.prototype.sendQueue = async function (self, socket) {
   let picked = []
-  _.each(global.systems.queue.picked, function (username) {
-    picked.push(global.users.get(username.split('@')[1]))
-  })
+  for (let username of global.systems.queue.picked) {
+    let user = await global.users.get(username.replace('@', ''))
+    picked.push(user)
+  }
   socket.emit('queue', {
     locked: global.systems.queue.locked,
     picked: picked,
@@ -35,15 +34,15 @@ QueueWidget.prototype.sendQueue = function (self, socket) {
 }
 
 QueueWidget.prototype.setLocked = function (self, socket, locked) {
-  global.parser.parse({username: global.configuration.get().twitch.channel}, '!queue ' + (locked ? 'close' : 'open'))
+  global.parser.parse({username: global.parser.getOwner()}, '!queue ' + (locked ? 'close' : 'open'))
 }
 
 QueueWidget.prototype.clear = function (self, socket) {
-  global.parser.parse({username: global.configuration.get().twitch.channel}, '!queue clear')
+  global.parser.parse({username: global.parser.getOwner()}, '!queue clear')
 }
 
 QueueWidget.prototype.pick = function (self, socket, count) {
-  global.parser.parse({username: global.configuration.get().twitch.channel}, '!queue pick ' + count)
+  global.parser.parse({username: global.parser.getOwner()}, '!queue pick ' + count)
 }
 
 module.exports = new QueueWidget()

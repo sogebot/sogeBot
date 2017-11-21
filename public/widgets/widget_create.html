@@ -1,40 +1,61 @@
-<div id="widgets" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+<div class="container-fluid row" id="widgets"></div>
+
+<div class="row justify-content-end" id="widgets-close">
+  <a href="#" class="col" data-id="widgets-exit">
+      <span class="widgets-exit fa fa-remove"></span>
+      <span style="font-size:1rem; text-transform:uppercase;" data-lang="close"></span>
+  </a>
 </div>
 
 <script>
   socket.emit('getWidgetList');
 
-  socket.on('widgetList', function(list) {
+  socket.on('widgetList', function (list) {
     $("#widgets").empty()
     if (list.length === 0) {
       $("#widgets").append('<p>There is no widget to add</p>');
-      setTimeout(function() {
+      setTimeout(function () {
         $("#addWidget").css('display', 'block')
         $("#widgets").remove()
+        $("#widgets-close").remove()
         addingWidget = false
       }, 2000)
     } else {
-        $("#widgets").append('<div style="font-weight: bold; position: absolute; width: 100%; text-align: center; top: -4px; font-size: 20px; text-align: center; font-family: \'Catamaran\'; color: white">- WIDGETS TO ADD -</div><hr style="border-top: 1px solid #ccc">')
-      _.each(list, function(widget) {
-        $("#widgets").append('<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">' +
-                              '<span class="fa fa-' + widget.icon + '"></span>' +
-                              '<span data-lang="' + widget.name + '"></span>' +
-                              '<div class="col-md-offset-1 col-lg-offset-1 col-md-3 col-lg-3"><a data-id="' + widget.id + '" data-align="1"><span class="glyphicon glyphicon-object-align-left"></span></a></div>' +
-                              '<div class="col-md-4 col-lg-4 text-center"><a data-id="' + widget.id + '" data-align="2"><span class="glyphicon glyphicon-object-align-vertical"></span></a></div>' +
-                              '<div class="col-md-3 col-lg-3 text-right"><a data-id="' + widget.id + '" data-align="3"><span class="glyphicon glyphicon-object-align-right"></span></a></div>' +
-                              '</div>')
+      let i = 0
+      _.each(list, function (widget) {
+        $("#widgets").append('<div class="col-3">' +
+          '<span class="fa fa-' + widget.icon + '"></span>' +
+          '<span>' + translations[widget.name].toUpperCase() + '</span>' +
+          '<div class="row justify-content-md-center">' +
+          '<div class="col col-xs-1 text-right"><a data-id="' + widget.id +
+          '" data-align="1"><span class="fa fa-align-left"></span></a></div>' +
+          '<div class="col col-xs-1 text-center"><a data-id="' + widget.id +
+          '" data-align="2"><span class="fa fa-align-justify"></span></a></div>' +
+          '<div class="col col-xs-1 text-left"><a data-id="' + widget.id +
+          '" data-align="3"><span class="fa fa-align-right"></span></a></div>' +
+          '</div>' +
+          '</div>')
+        i++;
+        if (i % 4 == 0) {
+          $("#widgets").append('<div class="w-100"></div>')
+        }
       })
-      $("#widgets").append('<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">' +
-                              '<a data-id="exit"><span class="widgets-exit fa fa-remove"></span>' +
-                              '<span style="font-size: 12px;" data-lang="close"></span></a>' +
-                              '</div>')
+
       commons.translate()
-      $("#widgets a").on('click', function(ev) {
+      $('[data-id="widgets-exit"]').on('click', function (ev) {
         $("#addWidget").css('display', 'block')
-        $("#widgets").remove()
+        $("#widgets").parent().remove()
         addingWidget = false
-        if (ev.currentTarget.dataset.id !== 'exit') socket.emit('addWidget', ev.currentTarget.dataset.id, ev.currentTarget.dataset.align)
+      })
+      $("#widgets a").on('click', function (ev) {
+        $("#addWidget").css('display', 'block')
+        $("#widgets").parent().remove()
+        addingWidget = false
+        if (ev.currentTarget.dataset.id !== 'exit') {
+          socket.emit('addWidget', ev.currentTarget.dataset.id, ev.currentTarget.dataset.align)
+        }
       })
     }
   })
+
 </script>

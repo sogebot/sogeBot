@@ -1,38 +1,32 @@
-<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <ul class="nav nav-pills">
-    <li>
-      <span data-lang="custom-commands" class="title text-default"></span>
-    </li>
-    <li>
-      <button class="btn btn-success plus-button" onclick="cc.new()" style="padding: 9px 15px;">
-        <i class="fa fa-plus" aria-hidden="true"></i>
-      </button>
-    </li>
-    <li class="active">
-      <a data-toggle="tab" href="#manage" data-lang="manage"></a>
-    </li>
-    <li>
-      <a data-toggle="tab" href="#responses" data-lang="bot-responses"></a>
-    </li>
-  </ul>
-</div>
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <span data-lang="custom-commands" class="title text-default"></span>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link btn-outline-success plus-button" onclick="cc.new()">
+      <i class="fa fa-plus" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#manage" data-lang="manage"></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#responses" data-lang="bot-responses"></a>
+  </li>
+</ul>
 
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="manage">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <table class="table table-striped table-responsive table-condensed">
-          <tbody id="Commands"></tbody>
-        </table>
-      </div>
+    <div class="widget">
+      <table class="table table-striped">
+        <tbody id="Commands"></tbody>
+      </table>
     </div>
   </div>
 
   <div role="tabpanel" class="tab-pane" id="responses">
-      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-        <div class="widget" id="bot-responses"></div>
-      </div>
-    </div>
+    <div class="widget" id="bot-responses"></div>
+  </div>
 </div>
 
 <script>
@@ -51,41 +45,76 @@
       $('#new-command [contenteditable=true]:first').keyup(function (ev) {
         var command = $(ev.target).text().trim()
         if (!command.startsWith('!')) command = '!' + command
-        socket.emit('parser.isRegistered', { emit: 'command.check', command: command })
+        socket.emit('parser.isRegistered', {
+          emit: 'command.check',
+          command: command
+        })
       })
     },
     update: function (list) {
       this.list = list
       $("#Commands").empty()
       $("#Commands").append('<tr id="new-command" style="display:none">' +
-          '<td style="vertical-align: top !important;min-width: 150px;"><span class="label label-default">New command</span> <span class="status label label-warning">available</span>' + commons.editable({ text: '', id: '_new!', fnc: 'commons.stub' }) + '</td>' +
-          '<td style="vertical-align: top !important;"><span class="label label-primary">Response</span> ' +
-              commons.editable({ text: '&nbsp;', id: '_new!', fnc: 'commons.stub', filters: ['global'] }) +
-          '<div class="btn-group pull-right">' +
-            '<button class="save-button btn btn-success new-confirm-btn" style="display:none" onclick="cc.create(event)">SAVE</button>' +
-            '<button class="btn btn-warning new-confirm-btn" style="display:none" onclick="cc.cancel()">CANCEL</button>' +
-          '</div>' +
-          '</td>' +
-          '</tr>');
-      _.each(list, function(item, index) {
+        '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">New command</span> <span class="status badge badge-warning">available</span>' +
+        commons.editable({
+          text: '',
+          id: '_new!',
+          fnc: 'commons.stub'
+        }) + '</td>' +
+        '<td style="vertical-align: top !important;"><span class="badge badge-primary">Response</span> ' +
+        commons.editable({
+          text: '&nbsp;',
+          id: '_new!',
+          fnc: 'commons.stub',
+          filters: ['global']
+        }) +
+        '<div class="btn-group pull-right">' +
+        '<button class="save-button btn btn-success new-confirm-btn" style="display:none" onclick="cc.create(event)">SAVE</button>' +
+        '<button class="btn btn-warning new-confirm-btn" style="display:none" onclick="cc.cancel()">CANCEL</button>' +
+        '</div>' +
+        '</td>' +
+        '</tr>');
+      _.each(list, function (item, index) {
         $("#Commands").append('<tr class="page-data-row">' +
-            '<td style="vertical-align: top !important;min-width: 150px;"><span class="label label-default">Command</span>' + commons.editable({ text: '!' + item.command, id: item.command, fnc: 'cc.editName' }) + '</td>' +
-            '<td style="vertical-align: top !important;"><span class="label label-primary">Response</span> ' +
-              '<span style="cursor: pointer;" class="label label-' + (item.visible ? "success": "danger") + '" " data-command="' + item.command + '" onclick="cc.toggleVisibility(this)">' + (item.visible ? "visible": "hidden") + '</span> ' +
-              '<span style="cursor: pointer;" class="label label-' + (item.enabled ? "success": "danger") + '" data-command="' + item.command + '" onclick="cc.toggle(this)">' + (item.enabled ? "enabled": "disabled") + '</span>' +
-              '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="label label-danger btn-remove" data-command="' + item.command + '"  onclick="commons.confirm(this)">delete</span>' +
-              '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
-              '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-success btn-confirm" onclick="cc.delete(this)" data-command="' + item.command + '">confirm</span>' +
-              commons.editable({ text: item.response, id: item.command, fnc: 'cc.edit', filters: ['global'] }) +
-            '</td>' +
+          '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">' + translations['command'] + '</span>' +
+          commons.editable({
+            text: '!' + item.command,
+            id: item.command,
+            fnc: 'cc.editName'
+          }) + '</td>' +
+          '<td style="vertical-align: top !important;"><span class="badge badge-primary">' + translations['response'] + '</span> ' +
+          '<span style="cursor: pointer;" class="badge badge-' + (item.visible ? "success" : "danger") +
+          '" " data-command="' + item.command + '" onclick="cc.toggleVisibility(this)">' + (item.visible ?
+            translations['visible'] : translations['hidden']) + '</span> ' +
+          '<span style="cursor: pointer;" class="badge badge-' + (item.enabled ? "success" : "danger") +
+          '" data-command="' + item.command + '" onclick="cc.toggle(this)">' + (item.enabled ? translations['enabled'] :
+            translations['disabled']) + '</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="badge badge-danger btn-remove" data-command="' +
+          item.command + '"  onclick="commons.confirm(this)">' + translations['delete'] + '</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="badge badge-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="badge badge-success btn-confirm" onclick="cc.delete(this)" data-command="' +
+          item.command + '">confirm</span>' +
+          commons.editable({
+            text: item.response,
+            id: item.command,
+            fnc: 'cc.edit',
+            filters: ['global']
+          }) +
+          '</td>' +
           '</tr>');
       })
     },
     editName: function (id, value) {
-      socket.emit('customcommands.editCommand', {id: id, value: value})
+      socket.emit('customcommands.editCommand', {
+        id: id,
+        value: value
+      })
     },
     edit: function (id, value) {
-      socket.emit('customcommands.editResponse', {id: id, value: value})
+      socket.emit('customcommands.editResponse', {
+        id: id,
+        value: value
+      })
     },
     delete: function (el) {
       socket.emit('customcommands.remove', _.isObject(el) ? `!${el.dataset.command}` : `!${el}`)
@@ -99,7 +128,10 @@
     create: function (event) {
       event.preventDefault()
       var inputs = $('[data-id="_new!"]')
-      var data = {command: $(inputs[0]).text().replace('!', ''), response: commons.cleanResponseText($(inputs[1]).html())}
+      var data = {
+        command: $(inputs[0]).text().replace('!', ''),
+        response: commons.cleanResponseText($(inputs[1]).html())
+      }
       socket.emit('customcommands.add', `!${data.command} ${data.response}`)
       $('.new-confirm-btn').css('display', 'none')
     },
@@ -120,18 +152,20 @@
           let div = $('<div>')
             .css('padding', '4px 5px 4px 5px')
           let response = $('<span>')
-            .text('Response')
-            .addClass('label label-primary label-bot-response')
+            .text(translations['response'])
+            .addClass('badge badge-primary badge-bot-response')
           let kbd = $('<kbd>')
             .text(key.replace(/-/g, ' '))
             .addClass('kbd-bot-response')
           let span = $('<span>').addClass('custom-response')
             .attr('data-id', `${system}.${key}`)
-            .css('font-size', '80%')
 
           $('#bot-responses').append(div.append(response).append(kbd).append(span))
 
-          if (_.includes(['command-was-not-found', 'command-was-edited', 'command-was-added', 'command-was-enabled', 'command-was-disabled', 'command-was-concealed', 'command-was-exposed', 'command-was-removed'], key)) filters.push('command')
+          if (_.includes(['command-was-not-found', 'command-was-edited', 'command-was-added',
+              'command-was-enabled', 'command-was-disabled', 'command-was-concealed', 'command-was-exposed',
+              'command-was-removed'
+            ], key)) filters.push('command')
           if (_.includes(['list-is-not-empty'], key)) filters.push('list')
           if (_.includes(['command-was-edited'], key)) filters.push('response')
 
@@ -151,17 +185,18 @@
 
   socket.emit('customcommands.send');
 
-  socket.on('commands', function(list) {
+  socket.on('commands', function (list) {
     cc.update(list)
   });
 
   socket.on('command.check', function (data) {
     if (data.isRegistered) {
-      $('.status').removeClass().addClass('label label-danger status')
+      $('.status').removeClass().addClass('badge badge-danger status')
       $('.save-button').prop('disabled', true)
     } else {
-      $('.status').removeClass().addClass('label label-success status')
+      $('.status').removeClass().addClass('badge badge-success status')
       $('.save-button').prop('disabled', false)
     }
   })
+
 </script>

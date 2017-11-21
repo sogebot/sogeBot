@@ -284,8 +284,8 @@
       }
     },
     "stats-panel": {
-      "show": "show",
-      "hide": "hide"
+      "show": "Show stats",
+      "hide": "Hide stats"
     },
     "bot-responses": "Bot responses",
     "duration": "Duration",
@@ -366,6 +366,7 @@
     "timers": "Timers",
     "price": "Price",
     "ranks": "Ranks",
+    "rank": "Rank",
     "event-listeners": "Event listeners",
     "logger": "Logs",
     "songs": "Songs",
@@ -418,7 +419,9 @@
     "create": "Create",
     "cooldown": "Cooldown",
     "confirm": "Confirm",
+    "delete": "Delete",
     "enabled": "Enabled",
+    "disabled": "Disabled",
     "enable": "Enable",
     "disable": "Disable",
     "slug": "Slug",
@@ -427,6 +430,7 @@
     "time": "Time",
     "type": "Type",
     "response": "Response",
+    "num-of-responses": "# Responses",
     "cost": "Cost",
     "name": "Name",
     "playlist": "Playlist",
@@ -566,79 +570,26 @@
     "commercial": "commercial started",
     "start-commercial": "run a commercial",
     "omit": "omit",
-    "comply": "comply"
+    "comply": "comply",
+    "visible": "visible",
+    "hidden": "hidden"
   },
-  "raffle": {
+  "raffles": {
     "announceInterval": "Opened raffles will be announced every $value minute",
-    "announceCustomMessage": "Raffle custom announce message set to `$value`",
-    "announceTitleTemplate": "Template title set to `$value`",
-    "minWatchedTime": "and you need to have at least $time watched hours to parcitipate",
-    "participation": {
-      "success": "You just entered in current raffle! Good luck!",
-      "failed": "Sorry, you are not eligible to enter the raffle! If you want to know conditions to enter, whisper me !raffle"
-    },
-    "info": {
-      "opened": {
-        "everyone": "$sender, raffle is opened. To enter type !$keyword. Everyone can participate",
-        "everyoneAndProduct": "$sender, raffle is opened for `$product`. To enter type !$keyword. Everyone can participate",
-        "followers": "$sender, raffle is opened. To enter type !$keyword. Only followers can participate",
-        "followersAndProduct": "$sender, raffle is opened for `$product`. To enter type !$keyword. Only followers can participate",
-        "subscribers": "$sender, raffle is opened. To enter type !$keyword. Only subscribers can participate",
-        "subscribersAndProduct": "$sender, raffle is opened for `$product`. To enter type !$keyword. Only subscribers can participate",
-        "everyoneTickets": "$sender, ticket raffle is opened. To enter type !$keyword <$min-$max>. Everyone can participate",
-        "everyoneAndProductTickets": "$sender, ticket raffle is opened for `$product`. To enter type !$keyword <$min-$max>. Everyone can participate",
-        "followersTickets": "$sender, ticket raffle is opened. To enter type !$keyword <$min-$max>. Only followers can participate",
-        "followersAndProductTickets": "$sender, ticket raffle is opened for `$product`. To enter type !$keyword <$min-$max>. Only followers can participate",
-        "subscribersTickets": "$sender, ticket raffle is opened. To enter type !$keyword <$min-$max>. Only subscribers can participate",
-        "subscribersAndProductTickets": "$sender, ticket raffle is opened for `$product`. To enter type !$keyword <$min-$max>. Only subscribers can participate"
-      },
-      "closed": "$sender Raffle is closed, but winner is not picked yet!",
-      "notRunning": "$sender No raffle is currently opened!"
-    },
-    "open": {
-      "error": "$sender Raffle was not opened! Use: !raffle open [raffle-keyword] [product(optional)] [time=#(optional)] [followers(optional)]",
-      "running": "$sender Raffle is already running! Keyword for raffle is !$keyword",
-      "locked": "$sender Raffle is closed! Choose winner with !raffle pick",
-      "ok": {
-        "everyone": "New raffle is opened. To enter type !$keyword. Everyone can participate",
-        "everyoneAndProduct": "New raffle is opened for `$product`. To enter type !$keyword. Everyone can participate",
-        "followers": "New raffle is opened. To enter type !$keyword. Only followers can participate",
-        "followersAndProduct": "New raffle is opened for `$product`. To enter type !$keyword. Only followers can participate",
-        "subscribers": "New raffle is opened. To enter type !$keyword. Only subscribers can participate",
-        "subscribersAndProduct": "New raffle is opened for `$product`. To enter type !$keyword. Only subscribers can participate",
-        "everyoneTickets": "New raffle is opened. To enter type !$keyword <$min-$max>. Everyone can participate",
-        "everyoneAndProductTickets": "New ticket raffle is opened for `$product`. To enter type !$keyword <$min-$max>. Everyone can participate",
-        "followersTickets": "New ticket raffle is opened. To enter type !$keyword <$min-$max>. Only followers can participate",
-        "followersAndProductTickets": "New ticket raffle is opened for `$product`. To enter type !$keyword <$min-$max>. Only followers can participate",
-        "subscribersTickets": "New ticket raffle is opened. To enter type !$keyword <$min-$max>. Only subscribers can participate",
-        "subscribersAndProductTickets": "New ticket raffle is opened for `$product`. To enter type !$keyword <$min-$max>. Only subscribers can participate"
-      },
-      "notice": {
-        "everyone": "Raffle is currently running. To enter type !$keyword. Everyone can participate",
-        "everyoneAndProduct": "Raffle is currently running for `$product`. To enter type !$keyword. Everyone can participate",
-        "followers": "Raffle is currently running. To enter type !$keyword. Only followers can participate",
-        "followersAndProduct": "Raffle is currently running for `$product`. To enter type !$keyword. Only followers can participate",
-        "subscribers": "Raffle is currently running. To enter type !$keyword. Only subscribers can participate",
-        "subscribersAndProduct": "Raffle is currently running for `$product`. To enter type !$keyword. Only subscribers can participate",
-        "everyoneTickets": "Ticket raffle is currently running. To enter type !$keyword <$min-$max>. Everyone can participate",
-        "everyoneAndProductTickets": "Ticket raffle is currently running for `$product`. To enter type !$keyword <$min-$max>. Everyone can participate",
-        "followersTickets": "Ticket raffle is currently running. To enter type !$keyword <$min-$max>. Only followers can participate",
-        "followersAndProductTickets": "Ticket raffle is currently running for `$product`. To enter type !$keyword <$min-$max>. Only followers can participate",
-        "subscribersTickets": "Ticket raffle is currently running. To enter type !$keyword <$min-$max>. Only subscribers can participate",
-        "subscribersAndProductTickets": "Ticket raffle is currently running for `$product`. To enter type !$keyword <$min-$max>. Only subscribers can participate"
-      }
-    },
-    "close": {
-      "ok": "Current raffle was closed! You cannot participate anymore!",
-      "notRunning": "$sender No raffle is currently running!"
-    },
-    "pick": {
-      "winner": {
-        "withoutProduct": "Congratulations @$winner, you just won a raffle! Win probability was $probability%",
-        "withProduct": "Congratulations @$winner, you just won a raffle for `$product`! Win probability was $probability%"
-      },
-      "noParticipants": "There were no participants in this raffle! No winner selected."
-    }
+
+    "eligibility-followers-item": "followers",
+    "eligibility-subscribers-item": "subscribers",
+    "eligibility-everyone-item": "everyone",
+
+    "announce-raffle": "Raffle is running. To enter type $keyword. Raffle is opened for $eligibility",
+    "announce-ticket-raffle": "Raffle is running. To enter type $keyword <$min-$max>. Raffle is opened for $eligibility",
+
+    "cannot-create-raffle-without-keyword": "Sorry, $sender, but you cannot create raffle without keyword",
+    "raffle-is-already-running": "Sorry, $sender, raffle is already running with keyword !$keyword",
+    "no-raffle-is-currently-running": "$sender, no raffles without winners are currently running",
+
+    "no-participants-to-pick-winner": "$sender, nobody joined a raffle",
+    "raffle-winner-is": "Winner of raffle $keyword is $username! Win probability was $probability%!"
   },
   "bets": {
       "newBet": "$sender, your current bet is $amount $pointsName on $option. You can win $winAmount $winPointsName!",
@@ -999,10 +950,6 @@
       "disableSettingsWhispers": {
         "true": "Bot won't send settings notifications",
         "false": "Bot will send settings notifications through whispers"
-      },
-      "disableRaffleWhispers": {
-        "true": "Bot won't send raffle notifications",
-        "false": "Bot will send raffle notifications through whispers"
       },
       "disablePermissionWhispers": {
         "true": "Bot won't send permissions insufficient errors",

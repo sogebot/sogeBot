@@ -1,63 +1,62 @@
-<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <ul class="nav nav-pills">
-    <li>
-      <span data-lang="viewers" class="title text-default"></span>
-    </li>
-  </ul>
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <span data-lang="viewers" class="title text-default"></span>
+  </li>
+</ul>
+
+<div style="position: absolute; right: 10px; top:-10px;">
+  <ul class="paging"></ul>
+  <div class="dropdown pull-right" style="margin-top:10px;">
+    <button class="btn btn-danger dropdown-toggle" type="button" data-toggle="dropdown">
+      <span data-lang="viewers-reset-attributes"></span>
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" style="font-variant: small-caps">
+      <li>
+        <button class="dropdown-item" id="reset-points-of-all-users" data-lang="viewers-points-of-all-users"></button>
+      </li>
+    </ul>
+  </div>
+  <input type="text" class="form-control form-search" placeholder="Search by username" id="viewersSearch" onkeyup="viewers.updateSearch()">
 </div>
 
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="viewers">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <ul class="paging"></ul>
-        <div class="dropdown pull-right" style="margin-top:10px;">
-          <button class="btn btn-danger dropdown-toggle" type="button" data-toggle="dropdown">
-            <span data-lang="viewers-reset-attributes"></span>
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" style="font-variant: small-caps">
-            <li>
-              <a href="#" id="reset-points-of-all-users" data-lang="viewers-points-of-all-users"></a>
-            </li>
-          </ul>
-        </div>
-        <input type="text" class="form-control form-search" placeholder="Search by username" id="viewersSearch" onkeyup="viewers.updateSearch()">
-        <table class="table table-striped table-responsive table-condensed">
-          <thead>
-            <tr>
-              <th class="sortable" onclick="viewers.sort(this)" data-sort="username">
-                <span data-lang="username"></span>
-                <i class="fa fa-sort-asc" aria-hidden="true"></i>
-              </th>
-              <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="time.message">
-                <span data-lang="last-seen"></span>
-                <i class="fa" aria-hidden="true"></i>
-              </th>
-              <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="time.watched">
-                <span data-lang="watched-time"></span>
-                <i class="fa" aria-hidden="true"></i>
-              </th>
-              <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="time.follow">
-                <span data-lang="followed-since"></span>
-                <i class="fa" aria-hidden="true"></i>
-              </th>
-              <th id="viewers-points" class="sortable text-center" onclick="viewers.sort(this)" data-sort="points">
-                <span data-lang="points"></span>
-                <i class="fa" aria-hidden="true"></i>
-              </th>
-              <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="stats.messages">
-                <span data-lang="messages"></span>
-                <i class="fa" aria-hidden="true"></i>
-              </th>
-              <th></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="Users">
-          </tbody>
-        </table>
-      </div>
+    <div class="widget">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th class="sortable" onclick="viewers.sort(this)" data-sort="username">
+              <span data-lang="username"></span>
+              <i class="fa fa-sort-asc" aria-hidden="true"></i>
+            </th>
+            <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="time.message">
+              <span data-lang="last-seen"></span>
+              <i class="fa" aria-hidden="true"></i>
+            </th>
+            <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="time.watched">
+              <span data-lang="watched-time"></span>
+              <i class="fa" aria-hidden="true"></i>
+            </th>
+            <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="time.follow">
+              <span data-lang="followed-since"></span>
+              <i class="fa" aria-hidden="true"></i>
+            </th>
+            <th id="viewers-points" class="sortable text-center" onclick="viewers.sort(this)" data-sort="points">
+              <span data-lang="points"></span>
+              <i class="fa" aria-hidden="true"></i>
+            </th>
+            <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="stats.messages">
+              <span data-lang="messages"></span>
+              <i class="fa" aria-hidden="true"></i>
+            </th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="Users">
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -85,10 +84,10 @@
     toggle: function (type, username) {
       var id = '#' + type + '-' + username
       var bool = false
-      if ($(id).hasClass('text-success')) {
-        $(id).removeClass().addClass('text-danger')
+      if ($(id).hasClass('btn-success')) {
+        $(id).removeClass().addClass('btn btn-danger')
       } else {
-        $(id).removeClass().addClass('text-success')
+        $(id).removeClass().addClass('btn btn-success')
         bool = true
       }
       socket.emit('viewers.toggle', {
@@ -119,22 +118,22 @@
             0 : item.stats.messages) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.messages) ?
             0 : item.stats.messages) + '</td>' +
           '<td style="font-weight: bold; cursor: pointer; user-select: none;">' +
-          '<span id="subscriber-' + item.username + '" class="' + (item.is.subscriber ? "text-success" :
-            "text-danger") + '" onclick="viewers.toggle(\'subscriber\', \'' + item.username +
-          '\')"> SUBSCRIBER </span>' +
-          '<span id="follower-' + item.username + '" class="' + (item.is.follower ? "text-success" :
-            "text-danger") + '" onclick="viewers.toggle(\'follower\', \'' + item.username +
-          '\')"> FOLLOWER </span>' +
-          '<span id="regular-' + item.username + '" class="' + (item.is.regular ? "text-success" :
-            "text-danger") + '" onclick="viewers.toggle(\'regular\', \'' + item.username +
-          '\')"> REGULAR </span>' +
-          '<span class="' + (item.is.online ? "text-success" : "text-danger") + '"> ONLINE </span></td>' +
+          '<button id="subscriber-' + item.username + '" class="btn ' + (item.is.subscriber ? "btn-success" :
+            "btn-danger") + '" onclick="viewers.toggle(\'subscriber\', \'' + item.username +
+          '\')"> SUBSCRIBER </button>' +
+          '<button id="follower-' + item.username + '" class="btn ' + (item.is.follower ? "btn-success" :
+            "btn-danger") + '" onclick="viewers.toggle(\'follower\', \'' + item.username +
+          '\')"> FOLLOWER </button>' +
+          '<button id="regular-' + item.username + '" class="btn ' + (item.is.regular ? "btn-success" :
+            "btn-danger") + '" onclick="viewers.toggle(\'regular\', \'' + item.username +
+          '\')"> REGULAR </button>' +
+          '<button disabled class="btn ' + (item.is.online ? "btn-success" : "btn-danger") + '"> ONLINE </button></td>' +
           '<td class="tableMenu">' +
-          '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="glyphicon glyphicon-trash"></span></button>' +
+          '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="fa fa-trash"></span></button>' +
           '<button type="button" style="display: none" class="btn btn-success btn-confirm" data-username="' +
           item.username +
-          '" onclick="viewers.delete(this)"><span class="glyphicon glyphicon-ok"></span></button>' +
-          '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="glyphicon glyphicon-remove"></span></button>' +
+          '" onclick="viewers.delete(this)"><span class="fa fa-check"></span></button>' +
+          '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="fa fa-remove"></span></button>' +
           '</td>' +
           '</tr>');
         if (!systems.points) {

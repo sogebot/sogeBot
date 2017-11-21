@@ -1,357 +1,299 @@
-<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <ul class="nav nav-pills">
-    <li>
-      <span data-lang="systems" class="title text-default"></span>
-    </li>
-    <li class="active">
-      <a data-toggle="tab" href="#whispers" data-lang="page-settings.systems.whispers.title"></a>
-    </li>
-    <li>
-      <a data-toggle="tab" href="#points" data-lang="points" id="points-tab-link"></a>
-    </li>
-    <li>
-      <a data-toggle="tab" href="#songs" data-lang="songs" id="songs-tab-link"></a>
-    </li>
-    <li>
-      <a data-toggle="tab" href="#gambling" data-lang="gambling"></a>
-    </li>
-    <li>
-      <a data-toggle="tab" href="#others" data-lang="page-settings.systems.others.title"></a>
-    </li>
-  </ul>
-</div>
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <span data-lang="systems" class="title text-default"></span>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#whispers" data-lang="page-settings.systems.whispers.title"></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#points" data-lang="points" id="points-tab-link"></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#songs" data-lang="songs" id="songs-tab-link"></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#gambling" data-lang="gambling"></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#others" data-lang="page-settings.systems.others.title"></a>
+  </li>
+</ul>
 
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="whispers">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <div class="settings">
-          <div>
-            <strong data-lang="page-settings.systems.whispers.toggle.listener"></strong>
-          </div>
-          <div>
-            <input id="disableWhisperListener" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-onstyle="success"
-              data-offstyle="danger">
-          </div>
-        </div>
+    <div class="row settings">
+      <div class="col">
+        <strong data-lang="page-settings.systems.whispers.toggle.listener"></strong>
+      </div>
+      <div class="col">
+        <input id="disableWhisperListener" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-onstyle="success"
+          data-offstyle="danger">
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="page-settings.systems.whispers.toggle.settings"></strong>
-          </div>
-          <div>
-            <input id="disableSettingsWhispers" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-onstyle="success"
-              data-offstyle="danger">
-          </div>
-        </div>
+      <div class="col">
+        <strong data-lang="page-settings.systems.whispers.toggle.settings"></strong>
+      </div>
+      <div class="col">
+        <input id="disableSettingsWhispers" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-onstyle="success"
+          data-offstyle="danger">
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings systems-raffles-only">
-          <div>
-            <strong data-lang="page-settings.systems.whispers.toggle.raffle"></strong>
-          </div>
-          <div>
-            <input id="disableRaffleWhispers" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-size="mini"
-              data-onstyle="success" data-offstyle="danger">
-          </div>
-        </div>
+      <div class="col">
+        <strong data-lang="page-settings.systems.whispers.toggle.permissions"></strong>
+      </div>
+      <div class="col">
+        <input id="disablePermissionWhispers" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-onstyle="success"
+          data-offstyle="danger">
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="page-settings.systems.whispers.toggle.permissions"></strong>
-          </div>
-          <div>
-            <input id="disablePermissionWhispers" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-onstyle="success"
-              data-offstyle="danger">
-          </div>
-        </div>
-
-        <div class="settings systems-cooldown-only">
-          <div>
-            <strong data-lang="page-settings.systems.whispers.toggle.cooldowns"></strong>
-          </div>
-          <div>
-            <input id="disableCooldownWhispers" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-onstyle="success"
-              data-offstyle="danger">
-          </div>
-        </div>
+      <div class="col systems-cooldown-only">
+        <strong data-lang="page-settings.systems.whispers.toggle.cooldowns"></strong>
+      </div>
+      <div class="col systems-cooldown-only">
+        <input id="disableCooldownWhispers" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-onstyle="success"
+          data-offstyle="danger">
       </div>
     </div>
   </div>
 
   <div role="tabpanel" class="tab-pane" id="points">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <div class="settings">
-          <div>
-            <strong data-lang="points-name"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="pointsName" onclick="commons.configEditable(this, '')" id="configPointsName"></abbr>
-            <div class="input-group" style="display:none;" id="input_pointsName_group">
-              <div class="input-group-addon" data-lang="points-single-multi"></div>
-              <input id="input_pointsName" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+    <div class="row settings">
+      <div class="col">
+        <strong data-lang="points-name"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="pointsName" onclick="commons.configEditable(this, '')" id="configPointsName"></abbr>
+        <div class="input-group" style="display:none;" id="input_pointsName_group">
+          <div class="input-group-addon" data-lang="points-single-multi"></div>
+          <input id="input_pointsName" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="points-interval"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="pointsInterval" onclick="commons.configEditable(this, 'min')" id="configPointsInterval"></abbr>
-            <div class="input-group" style="display:none;" id="input_pointsInterval_group">
-              <div class="input-group-addon" data-lang="minutes"></div>
-              <input id="input_pointsInterval" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="points-interval"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="pointsInterval" onclick="commons.configEditable(this, 'min')" id="configPointsInterval"></abbr>
+        <div class="input-group" style="display:none;" id="input_pointsInterval_group">
+          <div class="input-group-addon" data-lang="minutes"></div>
+          <input id="input_pointsInterval" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="points-per-interval"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="pointsPerInterval" onclick="commons.configEditable(this, '')" id="configPointsPerInterval"></abbr>
-            <div class="input-group" style="display:none;" id="input_pointsPerInterval_group">
-              <div class="input-group-addon" data-lang="points"></div>
-              <input id="input_pointsPerInterval" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="points-per-interval"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="pointsPerInterval" onclick="commons.configEditable(this, '')" id="configPointsPerInterval"></abbr>
+        <div class="input-group" style="display:none;" id="input_pointsPerInterval_group">
+          <div class="input-group-addon" data-lang="points"></div>
+          <input id="input_pointsPerInterval" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="points-interval-offline"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="pointsIntervalOffline" onclick="commons.configEditable(this, 'min')" id="configPointsIntervalOffline"></abbr>
-            <div class="input-group" style="display:none;" id="input_pointsIntervalOffline_group">
-              <div class="input-group-addon" data-lang="minutes"></div>
-              <input id="input_pointsIntervalOffline" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="points-interval-offline"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="pointsIntervalOffline" onclick="commons.configEditable(this, 'min')" id="configPointsIntervalOffline"></abbr>
+        <div class="input-group" style="display:none;" id="input_pointsIntervalOffline_group">
+          <div class="input-group-addon" data-lang="minutes"></div>
+          <input id="input_pointsIntervalOffline" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="points-per-interval-offline"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="pointsPerIntervalOffline" onclick="commons.configEditable(this, '')" id="configPointsPerIntervalOffline"></abbr>
-            <div class="input-group" style="display:none;" id="input_pointsPerIntervalOffline_group">
-              <div class="input-group-addon" data-lang="points"></div>
-              <input id="input_pointsPerIntervalOffline" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="points-per-interval-offline"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="pointsPerIntervalOffline" onclick="commons.configEditable(this, '')" id="configPointsPerIntervalOffline"></abbr>
+        <div class="input-group" style="display:none;" id="input_pointsPerIntervalOffline_group">
+          <div class="input-group-addon" data-lang="points"></div>
+          <input id="input_pointsPerIntervalOffline" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="points-per-message-interval"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="pointsMessageInterval" onclick="commons.configEditable(this, '')" id="configPointsMessageInterval"></abbr>
-            <div class="input-group" style="display:none;" id="input_pointsMessageInterval_group">
-              <div class="input-group-addon" data-lang="points"></div>
-              <input id="input_pointsMessageInterval" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="points-per-message-interval"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="pointsMessageInterval" onclick="commons.configEditable(this, '')" id="configPointsMessageInterval"></abbr>
+        <div class="input-group" style="display:none;" id="input_pointsMessageInterval_group">
+          <div class="input-group-addon" data-lang="points"></div>
+          <input id="input_pointsMessageInterval" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="points-per-message"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="pointsPerMessageInterval" onclick="commons.configEditable(this, '')" id="configPointsPerMessageInterval"></abbr>
-            <div class="input-group" style="display:none;" id="input_pointsPerMessageInterval_group">
-              <div class="input-group-addon" data-lang="points"></div>
-              <input id="input_pointsPerMessageInterval" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="points-per-message"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="pointsPerMessageInterval" onclick="commons.configEditable(this, '')" id="configPointsPerMessageInterval"></abbr>
+        <div class="input-group" style="display:none;" id="input_pointsPerMessageInterval_group">
+          <div class="input-group-addon" data-lang="points"></div>
+          <input id="input_pointsPerMessageInterval" class="form-control input-sm" type="text" />
         </div>
       </div>
     </div>
   </div>
 
   <div role="tabpanel" class="tab-pane" id="songs">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <div class="settings">
-          <div>
-            <strong data-lang="volume"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="songs_volume" onclick="commons.configEditable(this, '%')" id="configVolume"></abbr>
-            <div class="input-group" style="display:none;" id="input_songs_volume_group">
-              <div class="input-group-addon">%</div>
-              <input id="input_songs_volume" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+    <div class="row settings">
+      <div class="col">
+        <strong data-lang="volume"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="songs_volume" onclick="commons.configEditable(this, '%')" id="configVolume"></abbr>
+        <div class="input-group" style="display:none;" id="input_songs_volume_group">
+          <div class="input-group-addon">%</div>
+          <input id="input_songs_volume" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="max-duration"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="songs_duration" onclick="commons.configEditable(this, 'min')" id="configDuration"></abbr>
-            <div class="input-group" style="display:none;" id="input_songs_duration_group">
-              <div class="input-group-addon" data-lang="minutes"></div>
-              <input id="input_songs_duration" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="max-duration"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="songs_duration" onclick="commons.configEditable(this, 'min')" id="configDuration"></abbr>
+        <div class="input-group" style="display:none;" id="input_songs_duration_group">
+          <div class="input-group-addon" data-lang="minutes"></div>
+          <input id="input_songs_duration" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="shuffle"></strong>
-          </div>
-          <div>
-            <input id="shuffleToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-        </div>
+      <div class="col">
+        <strong data-lang="shuffle"></strong>
+      </div>
+      <div class="col">
+        <input id="shuffleToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="song-requests"></strong>
-          </div>
-          <div>
+      <div class="col">
+        <strong data-lang="song-requests"></strong>
+      </div>
+      <div class="col">
+        <input id="songrequestToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+      </div>
+      <div class="w-100"></div>
 
-            <input id="songrequestToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-        </div>
-
-        <div class="settings">
-          <div>
-            <strong data-lang="playlist"></strong>
-          </div>
-          <div>
-            <input id="playlistToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-        </div>
+      <div class="col">
+        <strong data-lang="playlist"></strong>
+      </div>
+      <div class="col">
+        <input id="playlistToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
       </div>
     </div>
   </div>
 
   <div role="tabpanel" class="tab-pane" id="gambling">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <div class="settings">
-          <div>
-            <strong data-lang="seppukuTimeout"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="seppukuTimeout" onclick="commons.configEditable(this, 's')" id="configSeppukuTimeout"></abbr>
-            <div class="input-group" style="display:none;" id="input_seppukuTimeout_group">
-              <div class="input-group-addon" data-lang="seconds"></div>
-              <input id="input_seppukuTimeout" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+    <div class="row settings">
+      <div class="col">
+        <strong data-lang="seppukuTimeout"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="seppukuTimeout" onclick="commons.configEditable(this, 's')" id="configSeppukuTimeout"></abbr>
+        <div class="input-group" style="display:none;" id="input_seppukuTimeout_group">
+          <div class="input-group-addon" data-lang="seconds"></div>
+          <input id="input_seppukuTimeout" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="rouletteTimeout"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="rouletteTimeout" onclick="commons.configEditable(this, 's')" id="configRouletteTimeout"></abbr>
-            <div class="input-group" style="display:none;" id="input_rouletteTimeout_group">
-              <div class="input-group-addon" data-lang="seconds"></div>
-              <input id="input_rouletteTimeout" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="rouletteTimeout"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="rouletteTimeout" onclick="commons.configEditable(this, 's')" id="configRouletteTimeout"></abbr>
+        <div class="input-group" style="display:none;" id="input_rouletteTimeout_group">
+          <div class="input-group-addon" data-lang="seconds"></div>
+          <input id="input_rouletteTimeout" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="fightmeTimeout"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="fightmeTimeout" onclick="commons.configEditable(this, 's')" id="configFightmeTimeout"></abbr>
-            <div class="input-group" style="display:none;" id="input_fightmeTimeout_group">
-              <div class="input-group-addon" data-lang="seconds"></div>
-              <input id="input_fightmeTimeout" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="fightmeTimeout"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="fightmeTimeout" onclick="commons.configEditable(this, 's')" id="configFightmeTimeout"></abbr>
+        <div class="input-group" style="display:none;" id="input_fightmeTimeout_group">
+          <div class="input-group-addon" data-lang="seconds"></div>
+          <input id="input_fightmeTimeout" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="duelCooldown"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="duelCooldown" onclick="commons.configEditable(this, 's')" id="configDuelCooldown"></abbr>
-            <div class="input-group" style="display:none;" id="input_duelCooldown_group">
-              <div class="input-group-addon" data-lang="seconds"></div>
-              <input id="input_duelCooldown" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="duelCooldown"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="duelCooldown" onclick="commons.configEditable(this, 's')" id="configDuelCooldown"></abbr>
+        <div class="input-group" style="display:none;" id="input_duelCooldown_group">
+          <div class="input-group-addon" data-lang="seconds"></div>
+          <input id="input_duelCooldown" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="fightmeCooldown"></strong>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="fightmeCooldown" onclick="commons.configEditable(this, 's')" id="configFightmeCooldown"></abbr>
-            <div class="input-group" style="display:none;" id="input_fightmeCooldown_group">
-              <div class="input-group-addon" data-lang="seconds"></div>
-              <input id="input_fightmeCooldown" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong data-lang="fightmeCooldown"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="fightmeCooldown" onclick="commons.configEditable(this, 's')" id="configFightmeCooldown"></abbr>
+        <div class="input-group" style="display:none;" id="input_fightmeCooldown_group">
+          <div class="input-group-addon" data-lang="seconds"></div>
+          <input id="input_fightmeCooldown" class="form-control input-sm" type="text" />
         </div>
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong data-lang="gamblingCooldownBypass"></strong>
-          </div>
-          <div>
-            <input id="gamblingCooldownBypassToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-        </div>
+      <div class="col">
+        <strong data-lang="gamblingCooldownBypass"></strong>
+      </div>
+      <div class="col">
+        <input id="gamblingCooldownBypassToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
       </div>
     </div>
   </div>
 
   <div role="tabpanel" class="tab-pane" id="others">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <div class="settings">
-          <div>
-            <strong data-lang="show-usernames-with-at"></strong>
-          </div>
-          <div>
-            <input id="atUsernameToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-        </div>
+    <div class="row settings">
+      <div class="col">
+        <strong data-lang="show-usernames-with-at"></strong>
+      </div>
+      <div class="col">
+        <input id="atUsernameToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+      </div>
+      <div class="w-100"></div>
 
-        <div class="settings">
-          <div>
-            <strong>
-              <span data-lang="uptime"></span>
-              <span data-lang="format"></span>
-            </strong>
-            <small style="font-size: 60%">
-              <strong>
-                <span data-lang="available"></span>:</strong> $days, $hours, $minutes, $seconds</small>
-          </div>
-          <div>
-            <abbr title="click to edit" data-config-id="uptimeFormat" onclick="commons.configEditable(this, '')" id="configUptimeFormat"></abbr>
-            <div class="input-group" style="display:none;" id="input_uptimeFormat_group">
-              <div class="input-group-addon" data-lang="string"></div>
-              <input id="input_uptimeFormat" class="form-control input-sm" type="text" />
-            </div>
-          </div>
+      <div class="col">
+        <strong>
+          <span data-lang="uptime"></span>
+          <span data-lang="format"></span>
+        </strong>
+        <small style="font-size: 60%">
+          <strong>
+            <span data-lang="available"></span>:</strong> $days, $hours, $minutes, $seconds</small>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="uptimeFormat" onclick="commons.configEditable(this, '')" id="configUptimeFormat"></abbr>
+        <div class="input-group" style="display:none;" id="input_uptimeFormat_group">
+          <div class="input-group-addon" data-lang="string"></div>
+          <input id="input_uptimeFormat" class="form-control input-sm" type="text" />
         </div>
       </div>
-    </div>
-  </div>
-
-  <div role="tabpanel" class="tab-pane" id="responses">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget" id="bot-responses"></div>
     </div>
   </div>
 </div>
@@ -360,7 +302,6 @@
   console.log(systems)
   if (!systems.points) $("#points-tab-link").css('display', 'none')
   if (!systems.songs) $("#songs-tab-link").css('display', 'none')
-  if (!systems.raffles) $(".systems-raffles-only").css('display', 'none')
   if (!systems.cooldown) $(".systems-cooldown-only").css('display', 'none')
 
   socket.emit('getPointsConfiguration')
@@ -414,15 +355,6 @@
       })
     })
     $('#disableSettingsWhispers').data('init', true)
-
-    $('#disableRaffleWhispers').off('change')
-    $('#disableRaffleWhispers').bootstrapToggle(!data.disableRaffleWhispers ? 'on' : 'off')
-    $('#disableRaffleWhispers').change(function () {
-      if ($('#disableRaffleWhispers').data('init')) socket.emit('saveConfiguration', {
-        'disableRaffleWhispers': !$(this).prop('checked')
-      })
-    })
-    $('#disableRaffleWhispers').data('init', true)
 
     $('#disablePermissionWhispers').off('change')
     $('#disablePermissionWhispers').bootstrapToggle(!data.disablePermissionWhispers ? 'on' : 'off')
@@ -492,4 +424,5 @@
     })
     $('#playlistToggle').data('init', true)
   })
+
 </script>

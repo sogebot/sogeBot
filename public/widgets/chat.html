@@ -1,19 +1,19 @@
 <div class="widget">
   <h6 data-lang="widget-title-chat"></h6>
   <ul class="nav nav-pills" role="tablist">
-    <li role="presentation" class="active">
-      <a href="#chat-room-panel" aria-controls="home" role="tab" data-toggle="tab" title="Chat room">
+    <li role="presentation" class="nav-item">
+      <a class="nav-link active" href="#chat-room-panel" aria-controls="home" role="tab" data-toggle="tab" title="Chat room">
         <i class="fa fa-commenting-o" aria-hidden="true"></i>
       </a>
     </li>
-    <li role="presentation">
-      <a href="#chat-viewers-panel" aria-controls="home" role="tab" data-toggle="tab" title="Viewer list">
+    <li role="presentation" class="nav-item">
+      <a class="nav-link" href="#chat-viewers-panel" aria-controls="home" role="tab" data-toggle="tab" title="Viewer list">
         <i class="fa fa-users" aria-hidden="true"> </i>
         <span id="chat-viewers-count">0</span>
       </a>
     </li>
-    <li role="presentation">
-      <a href="#chat-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+    <li role="presentation" class="nav-item">
+      <a class="nav-link" href="#chat-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
         <i class="fa fa-cog" aria-hidden="true"></i>
       </a>
     </li>
@@ -23,12 +23,13 @@
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="chat-room-panel">
       <div id="chat-room"></div>
-      <form class="form-horizontal">
-        <div class="form-group" style="margin-bottom: 0">
-          <div class="col-sm-8" style="padding-right: 0">
+
+      <form>
+        <div class="form-row">
+          <div class="col">
             <input type="text" id="chatInput" class="form-control" />
           </div>
-          <div class="col-sm-4" style="padding-left: 0">
+          <div class="col">
             <button id="chatInputSubmit" class="form-control btn btn-primary" data-lang="chat-as-bot"></button>
           </div>
         </div>
@@ -52,7 +53,7 @@
 </div>
 
 <script>
-socket.on('chatChatters', (data) => {
+  socket.on('chatChatters', (data) => {
     $('ul#chat-viewers-data').empty()
     $('#chat-viewers-count').text(data._total)
 
@@ -68,11 +69,8 @@ socket.on('chatChatters', (data) => {
 
   socket.emit('getChatRoom');
   socket.on('chatRoom', function (room) {
-    if (loadedJS.indexOf('chat') === -1) {
-      loadedJS.push('chat')
-      $("#chat-room").html('<iframe frameborder="0" scrolling="no" src="' + window.location.protocol +
-        '//twitch.tv/' + room + '/chat?popout=" width="100%"></iframe>')
-    }
+    $("#chat-room").html('<iframe frameborder="0" scrolling="no" src="' + window.location.protocol +
+      '//twitch.tv/' + room + '/chat?popout=" width="100%"></iframe>')
   })
 
   $('#chatInput').attr('placeholder', translations['send-message-as-a-bot'])

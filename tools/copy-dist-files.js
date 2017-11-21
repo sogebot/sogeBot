@@ -8,18 +8,13 @@ var dist = {
     'js': 'dist/flv.min.js'
   },
   'bootstrap': {
-    'js': 'dist/js/bootstrap.min.js',
-    'css': 'dist/css/bootstrap.min.css',
-    'fonts': [
-      'dist/fonts/glyphicons-halflings-regular.eot',
-      'dist/fonts/glyphicons-halflings-regular.svg',
-      'dist/fonts/glyphicons-halflings-regular.ttf',
-      'dist/fonts/glyphicons-halflings-regular.woff',
-      'dist/fonts/glyphicons-halflings-regular.woff2'
-    ]
+    'js': 'dist/js/bootstrap.min.js'
   },
   'jquery': {
     'js': 'dist/jquery.min.js'
+  },
+  'popper.js': {
+    'js': 'dist/umd/popper.min.js'
   },
   'lodash': {
     'js': 'lodash.min.js'

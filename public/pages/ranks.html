@@ -1,37 +1,31 @@
-<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <ul class="nav nav-pills">
-    <li>
-      <span data-lang="ranks" class="title text-default"></span>
-    </li>
-    <li>
-      <button class="btn btn-success plus-button" onclick="ranks.new()" style="padding: 9px 15px;">
-        <i class="fa fa-plus" aria-hidden="true"></i>
-      </button>
-    </li>
-    <li class="active">
-      <a data-toggle="tab" href="#manage" data-lang="manage"></a>
-    </li>
-    <li>
-      <a data-toggle="tab" href="#responses" data-lang="bot-responses"></a>
-    </li>
-  </ul>
-</div>
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <span data-lang="ranks" class="title text-default"></span>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link btn-outline-success plus-button" onclick="ranks.new()">
+      <i class="fa fa-plus" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#manage" data-lang="manage"></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#responses" data-lang="bot-responses"></a>
+  </li>
+</ul>
 
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="manage">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <table class="table table-striped table-responsive table-condensed">
-          <tbody id="ranks"></tbody>
-        </table>
-      </div>
+    <div class="widget">
+      <table class="table table-striped">
+        <tbody id="ranks"></tbody>
+      </table>
     </div>
   </div>
 
   <div role="tabpanel" class="tab-pane" id="responses">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget" id="bot-responses"></div>
-    </div>
+    <div class="widget" id="bot-responses"></div>
   </div>
 </div>
 
@@ -60,13 +54,13 @@
       this.list = list
       $("#ranks").empty()
       $("#ranks").append('<tr id="new-rank" style="display:none">' +
-        '<td style="vertical-align: top !important; width: 20%;"><span class="label label-primary">Hours</span> ' +
+        '<td style="vertical-align: top !important; width: 20%;"><span class="badge badge-primary">Hours</span> ' +
         commons.editable({
           text: '&nbsp;',
           id: '_new!',
           fnc: 'commons.stub'
         }) + '</td>' +
-        '<td style="vertical-align: top !important"><span class="label label-default">New rank</span>' +
+        '<td style="vertical-align: top !important"><span class="badge badge-default">New rank</span>' +
         commons.editable({
           text: '',
           id: '_new!',
@@ -80,17 +74,17 @@
         '</tr>');
       _.each(list, function (item, index) {
         $("#ranks").append('<tr class="page-data-row">' +
-          '<td style="vertical-align: top !important; width:20%;"><span class="label label-primary">Hours</span> ' +
+          '<td style="vertical-align: top !important; width:20%;"><span class="badge badge-primary">' + translations['hours'] + '</span> ' +
           commons.editable({
             text: item.hours,
             id: item.hours,
             fnc: 'ranks.editHours'
           }) + '</td>' +
-          '<td style="vertical-align: top !important"><span class="label label-default">Rank</span>' +
-          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="label label-danger btn-remove" data-id="' +
-          item.hours + '"  onclick="commons.confirm(this)">delete</span>' +
-          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
-          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-success btn-confirm" onclick="ranks.delete(this)" data-id="' +
+          '<td style="vertical-align: top !important"><span class="badge badge-default">' + translations['rank'] + '</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="badge badge-danger btn-remove" data-id="' +
+          item.hours + '"  onclick="commons.confirm(this)">' + translations['delete'] + '</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="badge badge-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="badge badge-success btn-confirm" onclick="ranks.delete(this)" data-id="' +
           item.hours + '">confirm</span>' +
           commons.editable({
             text: item.value,
@@ -133,21 +127,26 @@
           let div = $('<div>')
             .css('padding', '4px 5px 4px 5px')
           let response = $('<span>')
-            .text('Response')
-            .addClass('label label-primary label-bot-response')
+            .text(translations['response'])
+            .addClass('badge badge-primary badge-bot-response')
           let kbd = $('<kbd>')
             .text(key.replace(/-/g, ' '))
             .addClass('kbd-bot-response')
           let span = $('<span>').addClass('custom-response')
             .attr('data-id', `${system}.${key}`)
-            .css('font-size', '80%')
+
 
           $('#bot-responses').append(div.append(response).append(kbd).append(span))
 
-          if (_.includes(['rank-was-edited', 'rank-was-added', 'rank-was-enabled', 'custom-rank-was-set-to-user', 'show-rank-without-next-rank', 'show-rank-with-next-rank'], key))
+          if (_.includes(['rank-was-edited', 'rank-was-added', 'rank-was-enabled',
+              'custom-rank-was-set-to-user', 'show-rank-without-next-rank', 'show-rank-with-next-rank'
+            ], key))
             filters.push('rank')
-          if (_.includes(['rank-was-added', 'rank-was-edited', 'rank-was-removed', 'rank-already-exist', 'rank-was-not-found'], key)) filters.push('hours')
-          if (_.includes(['custom-rank-was-set-to-user', 'custom-rank-was-unset-for-user'], key)) filters.push('username')
+          if (_.includes(['rank-was-added', 'rank-was-edited', 'rank-was-removed', 'rank-already-exist',
+              'rank-was-not-found'
+            ], key)) filters.push('hours')
+          if (_.includes(['custom-rank-was-set-to-user', 'custom-rank-was-unset-for-user'], key)) filters.push(
+            'username')
           if (_.includes(['show-rank-with-next-rank'], key)) filters.push('nextrank')
           if (_.includes(['list-is-not-empty'], key)) filters.push('list')
 
@@ -173,10 +172,10 @@
 
   socket.on('ranks.check', function (data) {
     if (data.isRegistered) {
-      $('.status').removeClass().addClass('label label-danger status')
+      $('.status').removeClass().addClass('badge badge-danger status')
       $('.save-button').prop('disabled', true)
     } else {
-      $('.status').removeClass().addClass('label label-success status')
+      $('.status').removeClass().addClass('badge badge-success status')
       $('.save-button').prop('disabled', false)
     }
   })

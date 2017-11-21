@@ -1,203 +1,199 @@
-<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-  <ul class="nav nav-pills">
-    <li>
-      <span data-lang="aliases" class="title text-default"></span>
-    </li>
-    <li>
-      <button class="btn btn-success plus-button" onclick="alias.new()" style="padding: 9px 15px;">
-        <i class="fa fa-plus" aria-hidden="true"></i>
-      </button>
-    </li>
-    <li class="active">
-      <a data-toggle="tab" href="#manage" data-lang="manage"></a>
-    </li>
-    <li>
-      <a data-toggle="tab" href="#responses" data-lang="bot-responses"></a>
-    </li>
-  </ul>
-</div>
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <span data-lang="aliases" class="title text-default"></span>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link btn-outline-success plus-button" onclick="alias.new()">
+      <i class="fa fa-plus" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#manage" data-lang="manage"></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#responses" data-lang="bot-responses"></a>
+  </li>
+</ul>
 
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="manage">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget">
-        <table class="table table-striped table-responsive table-condensed">
-          <tbody id="Alias"></tbody>
-        </table>
-      </div>
+    <div class="widget">
+      <table class="table table-striped">
+        <tbody id="Alias"></tbody>
+      </table>
     </div>
   </div>
 
   <div role="tabpanel" class="tab-pane" id="responses">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget" id="bot-responses"></div>
-    </div>
+    <div class="widget" id="bot-responses"></div>
   </div>
 </div>
 
-  <script>
-    var alias = {
-      list: {},
-      cancel: function () {
-        $('#new-alias').css('display', 'none')
-        $('.new-confirm-btn').css('display', 'none')
-        this.update(this.list)
-      },
-      new: function () {
-        $('#new-alias').css('display', 'table-row')
-        $('.new-confirm-btn').css('display', 'block')
+<script>
+  var alias = {
+    list: {},
+    cancel: function () {
+      $('#new-alias').css('display', 'none')
+      $('.new-confirm-btn').css('display', 'none')
+      this.update(this.list)
+    },
+    new: function () {
+      $('#new-alias').css('display', 'table-row')
+      $('.new-confirm-btn').css('display', 'block')
 
-        $('#new-alias [contenteditable=true]:first').off()
-        $('#new-alias [contenteditable=true]:first').keyup(function (ev) {
-          var alias = $(ev.target).text().trim()
-          if (!alias.startsWith('!')) alias = '!' + alias
-          socket.emit('parser.isRegistered', {
-            emit: 'alias.check',
-            command: alias
-          })
+      $('#new-alias [contenteditable=true]:first').off()
+      $('#new-alias [contenteditable=true]:first').keyup(function (ev) {
+        var alias = $(ev.target).text().trim()
+        if (!alias.startsWith('!')) alias = '!' + alias
+        socket.emit('parser.isRegistered', {
+          emit: 'alias.check',
+          command: alias
         })
-      },
-      update: function (list) {
-        this.list = list
-        $("#Alias").empty()
-        $("#Alias").append('<tr id="new-alias" style="display:none">' +
-          '<td style="vertical-align: top !important;min-width: 150px;"><span class="label label-default">New alias</span> <span class="status label label-warning">available</span>' +
+      })
+    },
+    update: function (list) {
+      this.list = list
+      $("#Alias").empty()
+      $("#Alias").append('<tr id="new-alias" style="display:none">' +
+        '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;"><span class="badge badge-default">New alias</span> <span class="status badge badge-warning">available</span>' +
+        commons.editable({
+          text: '',
+          id: '_new!',
+          fnc: 'commons.stub'
+        }) + '</td>' +
+        '<td style="vertical-align: top !important;"><span class="badge badge-primary">' + translations['command'] + '</span> ' +
+        commons.editable({
+          text: '&nbsp;',
+          id: '_new!',
+          fnc: 'commons.stub'
+        }) +
+        '<div class="btn-group pull-right">' +
+        '<button class="save-button btn btn-success new-confirm-btn" style="display:none" onclick="alias.create(event)">SAVE</button>' +
+        '<button class="btn btn-warning new-confirm-btn" style="display:none" onclick="alias.cancel()">CANCEL</button>' +
+        '</div>' +
+        '</td>' +
+        '</tr>');
+      _.each(list, function (item, index) {
+        $("#Alias").append('<tr class="page-data-row">' +
+          '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;"><span class="badge badge-default">' + translations['alias'] + '</span>' +
           commons.editable({
-            text: '',
-            id: '_new!',
-            fnc: 'commons.stub'
+            text: '!' + item.alias,
+            id: item.alias,
+            fnc: 'alias.editName'
           }) + '</td>' +
-          '<td style="vertical-align: top !important;"><span class="label label-primary">Command</span> ' +
+          '<td style="vertical-align: top !important;"><span class="badge badge-primary">' + translations['command'] + '</span> ' +
+          '<span style="cursor: pointer;" class="badge badge-' + (item.visible ? "success" : "danger") +
+          '" " data-id="' + item.alias + '" onclick="alias.toggleVisibility(this)">' + (item.visible ?
+            translations['visible'] : translations['hidden']) + '</span> ' +
+          '<span style="cursor: pointer;" class="badge badge-' + (item.enabled ? "success" : "danger") +
+          '" data-id="' + item.alias + '" onclick="alias.toggle(this)">' + (item.enabled ? translations['enabled'] :
+            translations['disabled']) + '</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="badge badge-danger btn-remove" data-id="' +
+          item.alias + '"  onclick="commons.confirm(this)">' + translations['delete'] + '</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="badge badge-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
+          '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="badge badge-success btn-confirm" onclick="alias.delete(this)" data-id="' +
+          item.alias + '">confirm</span>' +
           commons.editable({
-            text: '&nbsp;',
-            id: '_new!',
-            fnc: 'commons.stub'
+            text: '!' + item.command,
+            id: item.alias,
+            fnc: 'alias.edit'
           }) +
-          '<div class="btn-group pull-right">' +
-          '<button class="save-button btn btn-success new-confirm-btn" style="display:none" onclick="alias.create(event)">SAVE</button>' +
-          '<button class="btn btn-warning new-confirm-btn" style="display:none" onclick="alias.cancel()">CANCEL</button>' +
-          '</div>' +
           '</td>' +
           '</tr>');
-        _.each(list, function (item, index) {
-          $("#Alias").append('<tr class="page-data-row">' +
-            '<td style="vertical-align: top !important;min-width: 150px;"><span class="label label-default">Alias</span>' +
-            commons.editable({
-              text: '!' + item.alias,
-              id: item.alias,
-              fnc: 'alias.editName'
-            }) + '</td>' +
-            '<td style="vertical-align: top !important;"><span class="label label-primary">Command</span> ' +
-            '<span style="cursor: pointer;" class="label label-' + (item.visible ? "success" : "danger") +
-            '" " data-id="' + item.alias + '" onclick="alias.toggleVisibility(this)">' + (item.visible ?
-              "visible" : "hidden") + '</span> ' +
-            '<span style="cursor: pointer;" class="label label-' + (item.enabled ? "success" : "danger") +
-            '" data-id="' + item.alias + '" onclick="alias.toggle(this)">' + (item.enabled ? "enabled" :
-              "disabled") + '</span>' +
-            '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="label label-danger btn-remove" data-id="' +
-            item.alias + '"  onclick="commons.confirm(this)">delete</span>' +
-            '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
-            '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="label label-success btn-confirm" onclick="alias.delete(this)" data-id="' +
-            item.alias + '">confirm</span>' +
-            commons.editable({
-              text: '!' + item.command,
-              id: item.alias,
-              fnc: 'alias.edit'
-            }) +
-            '</td>' +
-            '</tr>');
-        })
-      },
-      editName: function (id, value) {
-        socket.emit('alias.editAlias', {
-          id: id,
-          value: value
-        })
-      },
-      edit: function (id, value) {
-        socket.emit('alias.editCommand', {
-          id: id,
-          value: value
-        })
-      },
-      delete: function (el) {
-        socket.emit('alias.remove', _.isObject(el) ? `!${el.dataset.id}` : `!${el}`)
-      },
-      toggle: function (el) {
-        socket.emit('alias.toggle', `!${el.dataset.id}`)
-      },
-      toggleVisibility: function (el) {
-        socket.emit('alias.visible', `!${el.dataset.id}`)
-      },
-      create: function (event) {
-        event.preventDefault()
-        var inputs = $('[data-id="_new!"]')
-        var data = {
-          alias: $(inputs[0]).text().replace('!', ''),
-          command: commons.cleanResponseText($(inputs[1]).html().replace('!', ''))
-        }
-        socket.emit('alias.add', `!${data.alias} !${data.command}`)
-        $('.new-confirm-btn').css('display', 'none')
-      },
-      responses: (id) => {
-        id = id || null
-        let system = 'alias'
-        socket.emit('responses.get', system, function (data) {
-          for (let [key, entry] of Object.entries(data)) {
-            if (!_.isNil(id) && `${system}.${key}` !== id) continue // continue if we want only specific id
-            if (!_.isNil(id)) {
-              $(`abbr[data-id="${id}"]`).text(entry)
-              $(`abbr[data-id="${id}"]`).focus()
-              $(`abbr[data-id="${id}"]`).blur()
-              break
-            }
-            var filters = ['global']
-
-            let div = $('<div>')
-              .css('padding', '4px 5px 4px 5px')
-            let response = $('<span>')
-              .text('Response')
-              .addClass('label label-primary label-bot-response')
-            let kbd = $('<kbd>')
-              .text(key.replace(/-/g, ' '))
-              .addClass('kbd-bot-response')
-            let span = $('<span>').addClass('custom-response')
-              .attr('data-id', `${system}.${key}`)
-              .css('font-size', '80%')
-
-            $('#bot-responses').append(div.append(response).append(kbd).append(span))
-
-            if (_.includes(['alias-was-not-found', 'alias-was-edited', 'alias-was-added', 'alias-was-enabled', 'alias-was-disabled', 'alias-was-concealed', 'alias-was-exposed', 'alias-was-removed'], key)) filters.push('alias')
-            if (_.includes(['list-is-not-empty'], key)) filters.push('list')
-
-            $(`[data-id="${system}.${key}"]`).html(commons.editable({
-              text: entry,
-              id: `${system}.${key}`,
-              fnc: 'commons.setResponse',
-              filters: filters
-            }))
+      })
+    },
+    editName: function (id, value) {
+      socket.emit('alias.editAlias', {
+        id: id,
+        value: value
+      })
+    },
+    edit: function (id, value) {
+      socket.emit('alias.editCommand', {
+        id: id,
+        value: value
+      })
+    },
+    delete: function (el) {
+      socket.emit('alias.remove', _.isObject(el) ? `!${el.dataset.id}` : `!${el}`)
+    },
+    toggle: function (el) {
+      socket.emit('alias.toggle', `!${el.dataset.id}`)
+    },
+    toggleVisibility: function (el) {
+      socket.emit('alias.visible', `!${el.dataset.id}`)
+    },
+    create: function (event) {
+      event.preventDefault()
+      var inputs = $('[data-id="_new!"]')
+      var data = {
+        alias: $(inputs[0]).text().replace('!', ''),
+        command: commons.cleanResponseText($(inputs[1]).html().replace('!', ''))
+      }
+      socket.emit('alias.add', `!${data.command} !${data.alias}`)
+      $('.new-confirm-btn').css('display', 'none')
+    },
+    responses: (id) => {
+      id = id || null
+      let system = 'alias'
+      socket.emit('responses.get', system, function (data) {
+        for (let [key, entry] of Object.entries(data)) {
+          if (!_.isNil(id) && `${system}.${key}` !== id) continue // continue if we want only specific id
+          if (!_.isNil(id)) {
+            $(`abbr[data-id="${id}"]`).text(entry)
+            $(`abbr[data-id="${id}"]`).focus()
+            $(`abbr[data-id="${id}"]`).blur()
+            break
           }
-        })
-      }
+          var filters = ['global']
+
+          let div = $('<div>')
+            .css('padding', '4px 5px 4px 5px')
+          let response = $('<span>')
+            .text(translations['response'])
+            .addClass('badge badge-primary badge-bot-response')
+          let kbd = $('<kbd>')
+            .text(key.replace(/-/g, ' '))
+            .addClass('kbd-bot-response')
+          let span = $('<span>').addClass('custom-response')
+            .attr('data-id', `${system}.${key}`)
+
+
+          $('#bot-responses').append(div.append(response).append(kbd).append(span))
+
+          if (_.includes(['alias-was-not-found', 'alias-was-edited', 'alias-was-added', 'alias-was-enabled',
+              'alias-was-disabled', 'alias-was-concealed', 'alias-was-exposed', 'alias-was-removed'
+            ], key)) filters.push('alias')
+          if (_.includes(['list-is-not-empty'], key)) filters.push('list')
+
+          $(`[data-id="${system}.${key}"]`).html(commons.editable({
+            text: entry,
+            id: `${system}.${key}`,
+            fnc: 'commons.setResponse',
+            filters: filters
+          }))
+        }
+      })
     }
+  }
 
-    alias.responses()
-    alias.update([])
+  alias.responses()
+  alias.update([])
 
-    socket.emit('alias.send');
+  socket.emit('alias.send');
 
-    socket.on('alias', function (list) {
-      alias.update(list)
-    })
+  socket.on('alias', function (list) {
+    alias.update(list)
+  })
 
-    socket.on('alias.check', function (data) {
-      if (data.isRegistered) {
-        $('.status').removeClass().addClass('label label-danger status')
-        $('.save-button').prop('disabled', true)
-      } else {
-        $('.status').removeClass().addClass('label label-success status')
-        $('.save-button').prop('disabled', false)
-      }
-    })
+  socket.on('alias.check', function (data) {
+    if (data.isRegistered) {
+      $('.status').removeClass().addClass('badge badge-danger status')
+      $('.save-button').prop('disabled', true)
+    } else {
+      $('.status').removeClass().addClass('badge badge-success status')
+      $('.save-button').prop('disabled', false)
+    }
+  })
 
-  </script>
+</script>

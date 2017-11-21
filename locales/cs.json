@@ -284,8 +284,8 @@
       }
     },
     "stats-panel": {
-      "show": "ukázat",
-      "hide": "skrýt"
+      "show": "Ukázat statistiky",
+      "hide": "Skrýt statistiky"
     },
     "bot-responses": "Odpovědi bota",
     "duration": "Trvání",
@@ -365,6 +365,7 @@
     "timers": "Časovače",
     "price": "Cena příkazů",
     "ranks": "Hodnosti",
+    "rank": "Hodnost",
     "event-listeners": "Události",
     "logger": "Záznamy",
     "songs": "Písničky",
@@ -417,7 +418,9 @@
     "create": "Vytvořit",
     "cooldown": "Cooldown",
     "confirm": "Potvrdit",
+    "delete": "Smazat",
     "enabled": "Zapnuto",
+    "disabled": "Vypnuto",
     "enable": "Zapnout",
     "disable": "Vypnout",
     "slug": "Slug",
@@ -426,6 +429,7 @@
     "time": "Čas",
     "type": "Typ",
     "response": "Odpověď",
+    "num-of-responses": "# Odpovědí",
     "cost": "Cena",
     "name": "Název",
     "playlist": "Playlist",
@@ -566,79 +570,26 @@
     "commercial": "reklama zahájena",
     "start-commercial": "spustit reklamu",
     "omit": "vynechat",
-    "comply": "dodržovat"
+    "comply": "dodržovat",
+    "visible": "viditelné",
+    "hidden": "skryté"
   },
-  "raffle": {
+  "raffles": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych $value minut",
-    "announceCustomMessage": "Vlastni oznameni pro raffle nastaveno na `$value`",
-    "announceTitleTemplate": "Sablona pro nadpis nastavena na `$value`",
-    "minWatchedTime": "a take je potreba minimalne $timeh sledovat tento stream",
-    "participation": {
-      "success": "Ucastnis se prave probihajiciho raffle! Hodne stesti!",
-      "failed": "Promin, ale nesplnujes podminky pro vstup do raffle! Pokud te zajimaji podminky, zaseptej mi !raffle"
-    },
-    "info": {
-      "opened": {
-        "everyone": "$sender, raffle je spustena. Pro vstup do raffle napis !$keyword. Vstup je otevreny vsem",
-        "everyoneAndProduct": "$sender, raffle je spustena o `$product`. Pro vstup do raffle napis !$keyword. Vstup je otevreny vsem",
-        "followers": "$sender, raffle je spustena. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze followerum",
-        "followersAndProduct": "$sender, raffle je spustena o `$product`. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze followerum",
-        "subscribers": "$sender, raffle je spustena. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze subscriberum",
-        "subscribersAndProduct": "$sender, raffle je spustena o `$product`. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze subscriberum",
-        "everyoneTickets": "$sender, ticket raffle je spustena. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je otevreny vsem",
-        "everyoneAndProductTickets": "$sender, ticket raffle je spustena o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je otevreny vsem",
-        "followersTickets": "$sender, ticket raffle je spustena. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze followerum",
-        "followersAndProductTickets": "$sender, ticket raffle je spustena o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze followerum",
-        "subscribersTickets": "$sender, ticket raffle je spustena. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze subscriberum",
-        "subscribersAndProductTickets": "$sender, ticket raffle je spustena o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze subscriberum"
-      },
-      "closed": "$sender Raffle je uzavrena, ale vitez jeste nebyl vybran!",
-      "notRunning": "$sender Zadne raffle neni momentalne otevreno!"
-    },
-    "open": {
-      "error": "$sender Raffle neni otevreno! Pouzij: !raffle open [raffle-keyword] [product(optional)] [time=#(optional)] [followers(optional)]",
-      "running": "$sender Raffle nyni jiz bezi! Keyword pro raffle je !$keyword",
-      "locked": "$sender Raffle je nyni uzavreno! Vyber viteze pomoci !raffle pick",
-      "ok": {
-        "everyone": "Nova raffle byla spustena. Pro vstup do raffle napis !$keyword. Vstup je otevreny vsem",
-        "everyoneAndProduct": "Nova raffle byla spustena o `$product`. Pro vstup do raffle napis !$keyword. Vstup je otevreny vsem",
-        "followers": "Nova raffle byla spustena. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze followerum",
-        "followersAndProduct": "Nova raffle byla spustena o `$product`. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze followerum",
-        "subscribers": "Nova raffle byla spustena. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze subscriberum",
-        "subscribersAndProduct": "Nova raffle byla spustena o `$product`. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze subscriberum",
-        "everyoneTickets": "Nova ticket raffle byla spustena. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je otevreny vsem",
-        "everyoneAndProductTickets": "Nova ticket raffle byla spustena o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je otevreny vsem",
-        "followersTickets": "Nova ticket raffle byla spustena. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze followerum",
-        "followersAndProductTickets": "Nova ticket affle byla spustena o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze followerum",
-        "subscribersTickets": "Nova ticket raffle byla spustena. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze subscriberum",
-        "subscribersAndProductTickets": "Nova ticket raffle byla spustena o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze subscriberum"
-      },
-      "notice": {
-        "everyone": "Raffle prave bezi. Pro vstup do raffle napis !$keyword. Vstup je otevreny vsem",
-        "everyoneAndProduct": "Raffle prave bezi o `$product`. Pro vstup do raffle napis !$keyword. Vstup je otevreny vsem",
-        "followers": "Raffle prave bezi. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze followerum",
-        "followersAndProduct": "Raffle prave bezi o `$product`. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze followerum",
-        "subscribers": "Raffle prave bezi. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze subscriberum",
-        "subscribersAndProduct": "Raffle prave bezi o `$product`. Pro vstup do raffle napis !$keyword. Vstup je mozny pouze subscriberum",
-        "everyoneTickets": "Ticket raffle prave bezi. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je otevreny vsem",
-        "everyoneAndProductTickets": "Ticket raffle prave bezi o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je otevreny vsem",
-        "followersTickets": "Ticket raffle prave bezi. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze followerum",
-        "followersAndProductTickets": "Ticket raffle prave bezi o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze followerum",
-        "subscribersTickets": "Ticket raffle prave bezi. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze subscriberum",
-        "subscribersAndProductTickets": "Ticket raffle prave bezi o `$product`. Pro vstup do raffle napis !$keyword <$min-$max>. Vstup je mozny pouze subscriberum"
-      }
-    },
-    "close": {
-      "ok": "Raffle byla uzavrena! Uz se nemuzes zucastnit!",
-      "notRunning": "$sender Zadna raffle momentalne neni otevrena!"
-    },
-    "pick": {
-      "winner": {
-        "withoutProduct": "Gratulace @$winner, prave si vyhral raffle (pravdepodobnost vyhry byla $probability%)!",
-        "withProduct": "Gratulace @$winner, prave si vyhral raffle o `$product` (pravdepodobnost vyhry byla $probability%)!"
-      },
-      "noParticipants": "Nikdo se nezucastnil raffle! Zadny vitez nebyl vybran."
-    }
+
+    "eligibility-followers-item": "followery",
+    "eligibility-subscribers-item": "subscribery",
+    "eligibility-everyone-item": "vsechny",
+
+    "announce-raffle": "Raffle prave bezi. Pro vstup do raffle napis $keyword. Vstup je mozny pro $eligibility",
+    "announce-ticket-raffle": "Raffle prave bezi. Pro vstup do raffle napis $keyword <$min-$max>. Vstup je mozny pro $eligibility",
+
+    "cannot-create-raffle-without-keyword": "Promin, $sender, ale nemuzes vytvorit raffle bez klicoveho slova",
+    "raffle-is-already-running": "Promin, $sender, ale raffle jiz bezi s keywordem !$keyword",
+    "no-raffle-is-currently-running": "$sender, zadne raffle bez viteze momentalne nebezi",
+
+    "no-participants-to-pick-winner": "$sender, nikdo se nezucastnil teto raffle",
+    "raffle-winner-is": "Vitezem raffle $keyword se stava $username! Pravdepodobnost vyhry byla $probability%!"
   },
   "bets": {
       "newBet": "$sender, nyni mas vsazeno $amount $pointsName na $option. Muzes vyhrat $winAmount $winPointsName!",
@@ -999,10 +950,6 @@
       "disableSettingsWhispers": {
         "true": "Bot nebude posilat oznameni o zmene nastaveni",
         "false": "Bot bude posilat oznameni o zmene nastaveni pres whisper"
-      },
-      "disableRaffleWhispers": {
-        "true": "Bot nebude posilat oznameni o vstupu do raffle",
-        "false": "Bot bude posilat oznameni o vstupu do raffle pres whisper"
       },
       "disablePermissionWhispers": {
         "true": "Bot nebude posilat chyby opravneni",
