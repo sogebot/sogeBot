@@ -173,6 +173,20 @@
     }
   })
 
+  socket.emit('getConfiguration')
+  socket.once('configuration', (data) => {
+    $('#raffleAnnounce').val(data.raffleAnnounceInterval)
+  })
+
+  var $raffleAnnounce = $('#raffleAnnounce')
+  $raffleAnnounce.off()
+  $raffleAnnounce.on('focusout', function () {
+    var value = $raffleAnnounce.val()
+    var data = {}
+    data['raffleAnnounceInterval'] = value
+    socket.emit('saveConfiguration', data)
+  })
+
   socket.emit('raffles.refresh')
   socket.on('raffles.refresh.data', (data) => {
     console.group('raffles widget - raffles.refresh.data')
