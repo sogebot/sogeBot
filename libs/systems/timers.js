@@ -101,7 +101,7 @@ class Timers {
     // -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60]
     debug('set(%j, %j, %j)', self, sender, text)
 
-    let name = text.match(/-name ([a-zA-Z0-9]+)/)
+    let name = text.match(/-name ([\S]+)/)
     let messages = text.match(/-messages ([0-9]+)/)
     let seconds = text.match(/-seconds ([0-9]+)/)
 
@@ -132,7 +132,7 @@ class Timers {
     // -name [name-of-timer]
     debug('unset(%j, %j, %j)', self, sender, text)
 
-    let name = text.match(/-name ([a-zA-Z0-9]+)/)
+    let name = text.match(/-name ([\S]+)/)
 
     if (_.isNil(name)) {
       global.commons.sendMessage(global.translate('timers.name-must-be-defined'), sender)
@@ -177,7 +177,7 @@ class Timers {
     // -name [name-of-timer] -response '[response]'
     debug('add(%j, %j, %j)', self, sender, text)
 
-    let name = text.match(/-name ([a-zA-Z0-9]+)/)
+    let name = text.match(/-name ([\S]+)/)
     let response = text.match(/-response ['"](.+)['"]/)
 
     if (_.isNil(name)) {
@@ -214,7 +214,7 @@ class Timers {
     // !timers list -name [name-of-timer]
     debug('list(%j, %j, %j)', self, sender, text)
 
-    let name = text.match(/-name ([a-zA-Z0-9]+)/)
+    let name = text.match(/-name ([\S]+)/)
 
     if (_.isNil(name)) {
       let timers = await global.db.engine.find('timers')
@@ -241,7 +241,7 @@ class Timers {
     debug('toggle(%j, %j, %j)', self, sender, text)
 
     let id = text.match(/-id ([a-zA-Z0-9]+)/)
-    let name = text.match(/-name ([a-zA-Z0-9]+)/)
+    let name = text.match(/-name ([\S]+)/)
 
     if ((_.isNil(id) && _.isNil(name)) || (!_.isNil(id) && !_.isNil(name))) {
       global.commons.sendMessage(global.translate('timers.id-or-name-must-be-defined'), sender)
