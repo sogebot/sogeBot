@@ -365,6 +365,7 @@
     "timers": "Časovače",
     "price": "Cena příkazů",
     "ranks": "Hodnosti",
+    "rank": "Hodnost",
     "event-listeners": "Události",
     "logger": "Záznamy",
     "songs": "Písničky",
@@ -417,7 +418,9 @@
     "create": "Vytvořit",
     "cooldown": "Cooldown",
     "confirm": "Potvrdit",
+    "delete": "Smazat",
     "enabled": "Zapnuto",
+    "disabled": "Vypnuto",
     "enable": "Zapnout",
     "disable": "Vypnout",
     "slug": "Slug",
@@ -426,6 +429,7 @@
     "time": "Čas",
     "type": "Typ",
     "response": "Odpověď",
+    "num-of-responses": "# Odpovědí",
     "cost": "Cena",
     "name": "Název",
     "playlist": "Playlist",
@@ -566,7 +570,9 @@
     "commercial": "reklama zahájena",
     "start-commercial": "spustit reklamu",
     "omit": "vynechat",
-    "comply": "dodržovat"
+    "comply": "dodržovat",
+    "visible": "viditelné",
+    "hidden": "skryté"
   },
   "raffles": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych $value minut",

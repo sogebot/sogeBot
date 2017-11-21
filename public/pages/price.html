@@ -65,18 +65,18 @@
         '</tr>');
       _.each(list, function (item, index) {
         $("#Prices").append('<tr class="page-data-row">' +
-          '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">Command</span>' +
+          '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">' + translations['command'] + '</span>' +
           commons.editable({
             text: '!' + item.command,
             id: item.command,
             fnc: 'price.editCommand'
           }) + '</td>' +
-          '<td style="vertical-align: top !important;"><span class="badge badge-primary">Price</span> ' +
+          '<td style="vertical-align: top !important;"><span class="badge badge-primary">' + translations['price'] + '</span> ' +
           '<span style="cursor: pointer;" class="badge badge-' + (item.enabled ? "success" : "danger") +
-          '" data-id="' + item.command + '" onclick="price.toggle(this)">' + (item.enabled ? "enabled" :
-            "disabled") + '</span>' +
+          '" data-id="' + item.command + '" onclick="price.toggle(this)">' + (item.enabled ? translations['enabled'] :
+            translations['disabled']) + '</span>' +
           '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="badge badge-danger btn-remove" data-id="' +
-          item.command + '"  onclick="commons.confirm(this)">delete</span>' +
+          item.command + '"  onclick="commons.confirm(this)">' + translations['delete'] + '</span>' +
           '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="badge badge-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
           '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="badge badge-success btn-confirm" onclick="price.delete(this)" data-id="' +
           item.command + '">confirm</span>' +
@@ -131,7 +131,7 @@
           let div = $('<div>')
             .css('padding', '4px 5px 4px 5px')
           let response = $('<span>')
-            .text('Response')
+            .text(translations['response'])
             .addClass('badge badge-primary badge-bot-response')
           let kbd = $('<kbd>')
             .text(key.replace(/-/g, ' '))

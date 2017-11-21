@@ -58,7 +58,7 @@
           id: '_new!',
           fnc: 'commons.stub'
         }) + '</td>' +
-        '<td style="vertical-align: top !important;"><span class="badge badge-primary">Cooldown</span> ' +
+        '<td style="vertical-align: top !important;"><span class="badge badge-primary">' + translations['cooldown'] + '</span> ' +
         commons.editable({
           text: '&nbsp;',
           id: '_new!',
@@ -73,7 +73,7 @@
       for (let item of list) {
         $("#Cooldowns").append('<tr class="page-data-row">' +
           '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">' + (
-            item.key.startsWith('!') ? 'Command' : "Keyword") + '</span>' + commons.editable({
+            item.key.startsWith('!') ? translations['command'] : translations['keyword']) + '</span>' + commons.editable({
             text: item.key,
             id: item.key,
             fnc: 'cooldown.editName',
@@ -81,7 +81,7 @@
               type: item.type
             }
           }) + '</td>' +
-          '<td style="vertical-align: top !important;"><span class="badge badge-primary">Cooldown</span> ' +
+          '<td style="vertical-align: top !important;"><span class="badge badge-primary">' + translations['cooldown'] + '</span> ' +
           '<span style="cursor: pointer;" class="badge badge-' + (item.type) + '" " data-type="' + item.type +
           '" data-id="' + item.key + '" onclick="cooldown.toggleType(this)">type:' + translations[item.type] +
           '</span> ' +
@@ -99,9 +99,9 @@
           '</span> ' +
           '<span style="cursor: pointer;" class="badge badge-' + (item.enabled ? "success" : "danger") +
           '" data-type="' + item.type + '" data-id="' + item.key + '" onclick="cooldown.toggle(this)">' + (item
-            .enabled ? "enabled" : "disabled") + '</span>' +
+            .enabled ? translations['enabled'] : translations['disabled']) + '</span>' +
           '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em" class="badge badge-danger btn-remove" data-type="' +
-          item.type + '" data-id="' + item.key + '"  onclick="commons.confirm(this)">delete</span>' +
+          item.type + '" data-id="' + item.key + '"  onclick="commons.confirm(this)">' + translations['delete'] + '</span>' +
           '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="badge badge-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
           '<span style="cursor: not-allowed; float:right; padding-top: 0.3em; padding-bottom: 0.2em; display: none" class="badge badge-success btn-confirm" onclick="cooldown.delete(this)" data-type="' +
           item.type + '" data-id="' + item.key + '">confirm</span>' +
@@ -173,7 +173,7 @@
           let div = $('<div>')
             .css('padding', '4px 5px 4px 5px')
           let response = $('<span>')
-            .text('Response')
+            .text(translations['response'])
             .addClass('badge badge-primary badge-bot-response')
           let kbd = $('<kbd>')
             .text(key.replace(/-/g, ' '))

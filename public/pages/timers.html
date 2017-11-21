@@ -46,21 +46,21 @@
     },
     addRow: (timer, responses) => {
       $("#timers").append('<tr class="page-data-row">' +
-          '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">Name</span>' +
+          '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">' + translations['name'] + '</span>' +
           '<span style="cursor: pointer;" class="badge badge-' + (timer.enabled ? "success" : "danger") +
-          '" data-id="' + timer.name + '" onclick="timers.toggle(this)">' + (timer.enabled ? "enabled" :
-            "disabled") + '</span>' +
+          '" data-id="' + timer.name + '" onclick="timers.toggle(this)">' + (timer.enabled ? translations['enabled'] :
+          translations['disabled']) + '</span>' +
           commons.editable({ text: timer.name, id: timer.name, fnc: 'timers.editName' }) + '</td>' +
-          '<td style="vertical-align: top !important;"><span class="badge badge-user"># Responses</span><strong style="display: block; padding: 8px">' +
+          '<td style="vertical-align: top !important;"><span class="badge badge-user">' + translations['num-of-responses'] + '</span><strong style="display: block; padding: 8px">' +
             `⚫ ${responses.enabled} ⚪ ${responses.disabled}</strong></td>` +
           '</td>' +
-          '<td style="vertical-align: top !important;width: 20rem; max-width: 20rem;"><span class="badge badge-primary">Messages</span> ' +
+          '<td style="vertical-align: top !important;width: 20rem; max-width: 20rem;"><span class="badge badge-primary">' + translations['messages'] + '</span> ' +
             commons.editable({ text: timer.messages, id: timer.name, fnc: 'timers.editMessages', options: { seconds: timer.seconds }}) + '</td>' +
           '</td>' +
-          '<td style="vertical-align: top !important;width: 20rem; max-width: 20rem;"><span class="badge badge-primary">Seconds</span> ' +
+          '<td style="vertical-align: top !important;width: 20rem; max-width: 20rem;"><span class="badge badge-primary">' + translations['seconds'] + '</span> ' +
             commons.editable({ text: timer.seconds, id: timer.name, fnc: 'timers.editSeconds', options: { messages: timer.messages }}) + '</td>' +
           '<span style="cursor: not-allowed; float:right; padding: 4px;" class="badge badge-danger btn-remove" data-id="' +
-          timer.name + '"  onclick="commons.confirm(this)">delete</span>' +
+          timer.name + '"  onclick="commons.confirm(this)">' + translations['delete'] + '</span>' +
           '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="badge badge-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
           '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="badge badge-success btn-confirm" onclick="timers.unset(this)" data-id="' +
           timer.name + '">confirm</span>' +
@@ -74,7 +74,7 @@
               '<table class="table table-striped">' +
                 '<tbody>'
       content += '<tr id="' + name + '_content_new" style="display:none">' +
-        '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">Response</span>' + commons.editable({ text: '', id: name + '_new!', fnc: 'commons.stub' }) +
+        '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">' + translations['response'] + '</span>' + commons.editable({ text: '', id: name + '_new!', fnc: 'commons.stub' }) +
         '<div class="btn-group pull-right">' +
           '<button class="save-button btn btn-success new-confirm-btn" style="display:none" data-id="' + name + '" onclick="timers.addResponse(event)">SAVE</button>' +
           '<button class="btn btn-warning new-confirm-btn" style="display:none" onclick="timers.cancel()">CANCEL</button>' +
@@ -83,12 +83,12 @@
         '</tr>'
       for (let response of responses) {
         content += '<tr class="page-data-row">' +
-          '<td style="vertical-align: top !important;"><span class="badge badge-primary">Response</span> ' +
+          '<td style="vertical-align: top !important;"><span class="badge badge-primary">' + translations['response'] + '</span> ' +
           '<span style="cursor: pointer;" class="badge badge-' + (response.enabled ? "success" : "danger") +
-          '" data-id="' + response._id + '" onclick="timers.toggleResponse(this)">' + (response.enabled ? "enabled" :
-            "disabled") + '</span>' +
+          '" data-id="' + response._id + '" onclick="timers.toggleResponse(this)">' + (response.enabled ? translations['enabled'] :
+          translations['disabled']) + '</span>' +
           '<span style="cursor: not-allowed; float:right; padding: 4px;" class="badge badge-danger btn-remove" data-id="' +
-          response._id + '"  onclick="commons.confirm(this)">delete</span>' +
+          response._id + '"  onclick="commons.confirm(this)">' + translations['delete'] + '</span>' +
           '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="badge badge-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
           '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="badge badge-success btn-confirm" onclick="timers.deleteResponse(this)" data-id="' +
           response._id + '">confirm</span>' +
@@ -182,7 +182,7 @@
             let div = $('<div>')
               .css('margin', '5px')
             let response = $('<span>')
-              .text('Response')
+              .text(translations['response'])
               .addClass('badge badge-primary badge-bot-response')
             let kbd = $('<kbd>')
               .text(key.replace(/-/g, ' '))

@@ -366,6 +366,7 @@
     "timers": "Timers",
     "price": "Price",
     "ranks": "Ranks",
+    "rank": "Rank",
     "event-listeners": "Event listeners",
     "logger": "Logs",
     "songs": "Songs",
@@ -418,7 +419,9 @@
     "create": "Create",
     "cooldown": "Cooldown",
     "confirm": "Confirm",
+    "delete": "Delete",
     "enabled": "Enabled",
+    "disabled": "Disabled",
     "enable": "Enable",
     "disable": "Disable",
     "slug": "Slug",
@@ -427,6 +430,7 @@
     "time": "Time",
     "type": "Type",
     "response": "Response",
+    "num-of-responses": "# Responses",
     "cost": "Cost",
     "name": "Name",
     "playlist": "Playlist",
@@ -566,7 +570,9 @@
     "commercial": "commercial started",
     "start-commercial": "run a commercial",
     "omit": "omit",
-    "comply": "comply"
+    "comply": "comply",
+    "visible": "visible",
+    "hidden": "hidden"
   },
   "raffles": {
     "announceInterval": "Opened raffles will be announced every $value minute",
