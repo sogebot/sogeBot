@@ -15,7 +15,7 @@
     "basic-auth": "^2.0.0",
     "bootstrap": "^4.0.0-beta.2",
     "bootstrap-menu": "^1.0.14",
-    "bootstrap-slider": "^9.9.0",
+    "bootstrap-slider": "^10.0.0",
     "bootstrap-toggle": "^2.2.2",
     "chalk": "^2.3.0",
     "cross-env": "^5.1.1",
@@ -27,16 +27,16 @@
     "glob": "^7.1.2",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
-    "mathjs": "^3.16.5",
-    "moment": "^2.19.1",
+    "mathjs": "^3.17.0",
+    "moment": "^2.19.2",
     "moment-precise-range-plugin": "^1.2.4",
     "mongodb": "^2.2.33",
     "nedb": "^1.8.0",
     "nedb-promise": "^2.0.1",
     "node-hue-api": "^2.4.2",
-    "node-sass": "^4.6.0",
+    "node-sass": "^4.7.2",
     "npm-run-all": "^4.1.2",
-    "popper.js": "^1.12.6",
+    "popper.js": "^1.12.9",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "safe-eval": "^0.3.0",
@@ -48,7 +48,7 @@
     "velocity-animate": "^1.5.0",
     "winston": "^2.4.0",
     "youtube-search": "^1.0.10",
-    "ytdl-core": "^0.18.1"
+    "ytdl-core": "^0.18.2"
   },
   "scripts": {
     "build-css": "npm-run-all --parallel css-theme-light-compile css-theme-dark-compile",
@@ -78,7 +78,7 @@
     "locate-path": "^2.0.0",
     "mocha": "4.0.1",
     "pre-commit": "^1.2.2",
-    "sinon": "^4.0.2",
+    "sinon": "^4.1.2",
     "standard": "^10.0.3",
     "test-until": "^1.1.1"
   }
