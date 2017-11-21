@@ -243,7 +243,7 @@
     }
 
     // reshow tab
-    let id = $("ul#timers-tab li.active a").attr('href')
+    let id = $("ul#timers-tab li a.active").attr('href')
     if (id !== '#manage' && id !== '#responses') {
       $('a[href="#manage"]').tab('show'); // this is needed to properly refocus tab
       $(`a[href="${id}"]`).tab('show');
