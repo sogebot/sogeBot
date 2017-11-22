@@ -54,8 +54,6 @@ let updates = async (from, to) => {
   for (let i of _.orderBy(migrate, 'version', 'asc')) { await i.do() }
 }
 
-// TODO: change versions to 5.8.0
-
 let migration = {
   users: [{
     version: '5.8.0',
