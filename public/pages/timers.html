@@ -139,7 +139,7 @@
     },
     editName: (id, val) => {
       $("li#" + id + "_tab").remove()
-      socket.emit('timers.editName', { id: id, value: val })
+      socket.emit('timers.editName', { id: id, value: val.replace(/ /g, '_') })
     },
     editSeconds: (id, val, opts) => {
       let messages = opts.messages

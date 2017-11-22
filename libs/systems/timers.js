@@ -89,7 +89,7 @@ class Timers {
 
   async editName (self, socket, data) {
     if (data.value.length === 0) await self.unset(self, null, `-name ${data.id}`)
-    else await global.db.engine.update('timers', { name: data.id }, { name: data.value })
+    else await global.db.engine.update('timers', { name: data.id.toString() }, { name: data.value.toString() })
   }
 
   async editResponse (self, socket, data) {
