@@ -1,22 +1,36 @@
 'use strict'
 
 // 3rdparty libraries
-var _ = require('lodash')
+const _ = require('lodash')
+const crypto = require('crypto')
 
 function EventList () {
   global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
-  global.panel.socketListening(this, 'overlay.eventlist.get', this._get)
+  global.panel.socketListening(this, 'overlay.eventlist.get', this._getOverlay)
+  global.panel.socketListening(this, 'widget.eventlist.get', this._getWidget)
 }
 
 EventList.prototype._get = async function (self) {
+  self._getWidget(self)
+  self._getOverlay(self)
+}
+
+EventList.prototype._getWidget = async function (self) {
+  let events = await global.db.engine.find('widgetsEventList')
+  global.panel.io.emit('widget.eventlist', _.chunk(_.orderBy(events, 'timestamp', 'desc'), 20)[0])
+}
+
+EventList.prototype._getOverlay = async function (self) {
   let events = await global.db.engine.find('widgetsEventList')
 
-  global.panel.io.emit('overlay.eventlist', _.chunk(_.orderBy(events, 'timestamp', 'desc'), 20)[0])
+  events = _.uniqBy(_.orderBy(events, 'timestamp', 'desc'), (o) => {
+    if (o.event === 'cheer') o.event = crypto.randomBytes(64).toString('hex') // force cheer to show
+    return o.username + o.event
+  })
+  global.panel.io.emit('overlay.eventlist', _.chunk(events, 20)[0])
 }
 
 EventList.prototype.add = async function (data) {
-  let events = await global.db.engine.find('widgetsEventList')
-
   const newEvent = {
     event: data.type,
     timestamp: _.now(),
@@ -24,16 +38,7 @@ EventList.prototype.add = async function (data) {
     months: _.isNil(data.months) ? 0 : data.months,
     bits: _.isNil(data.bits) ? 0 : data.bits
   }
-
-  const event = _.find(events, function (o) {
-    return o.event === data.type && o.username === data.username && _.now() - o.timestamp < 1000 * 60 * 60 * 24 && data.event !== 'cheer'
-  })
-
-  // only save when event is not in list for 24h
-  if (_.isNil(event) || data.type === 'cheer') {
-    if (_.size(events) > 0 && events[0].event === data.type && events[0].username === data.username && data.type !== 'cheer') return
-    await global.db.engine.insert('widgetsEventList', newEvent)
-  }
+  global.db.engine.insert('widgetsEventList', newEvent)
   global.overlays.eventlist._get(global.overlays.eventlist)
 }
 

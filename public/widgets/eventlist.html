@@ -64,13 +64,11 @@
         'widgetEventlistSubs': this.config.sub,
         'widgetEventlistResubs': this.config.resub
       })
+      socket.emit('widget.eventlist.get')
     }
-
   }
 
-  setInterval(function () {
-    socket.emit('overlay.eventlist.get')
-  }, 1000)
+  socket.emit('widget.eventlist.get')
 
   socket.once('configuration', function (data) {
     if (!data.widgetEventlistFollows) {
@@ -97,7 +95,7 @@
     }
   })
 
-  socket.on('overlay.eventlist', function (o) {
+  socket.on('widget.eventlist', function (o) {
     let icons = {
       host: 'fa-bullhorn',
       follow: 'fa-heart',
