@@ -2,7 +2,7 @@
 [![Discord](https://img.shields.io/discord/317348946144002050.svg?style=flat-square)](https://discordapp.com/invite/52KpmuH)
 [![Build Status](https://img.shields.io/travis/sogehige/sogeBot.svg?style=flat-square)](https://travis-ci.org/sogehige/sogeBot)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](http://standardjs.com/)
-[![nodejs](https://img.shields.io/badge/node.js-9.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org/en/)
+[![nodejs](https://img.shields.io/badge/node.js-9.2.0-brightgreen.svg?style=flat-square)](https://nodejs.org/en/)
 [![GitHub release](https://img.shields.io/github/release/sogehige/sogebot.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
 [![Downloads](https://img.shields.io/github/downloads/sogehige/sogebot/total.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9ZTX5DS2XB5EN)
@@ -10,12 +10,7 @@
 Free Twitch Bot built on Node.js
 
 #### Screenshots
-<img src="https://github.com/sogehige/SogeBot/blob/master/screenshots/1.png?raw=true" width="200">
-<img src="https://github.com/sogehige/SogeBot/blob/master/screenshots/2.png?raw=true" width="200">
-<img src="https://github.com/sogehige/SogeBot/blob/master/screenshots/3.png?raw=true" width="200">
-<img src="https://github.com/sogehige/SogeBot/blob/master/screenshots/4.png?raw=true" width="200">
-<img src="https://github.com/sogehige/SogeBot/blob/master/screenshots/5.png?raw=true" width="200">
-<img src="https://github.com/sogehige/SogeBot/blob/master/screenshots/6.png?raw=true" width="200">
+<img src="https://drive.google.com/uc?id=1yaD6hiHQ8CuZ1konVSK_Iy_7Dbb3-WQC" width="200"> <img src="https://drive.google.com/uc?id=1j0immtX6yutNcNGErHDSwjtqDz2AGfLS" width="200"> <img src="https://drive.google.com/uc?id=1Nshe2MqYpd3fzNyCXmbWDJmR61_RWpVE" width="200"> <img src="https://drive.google.com/uc?id=1mPg3wkFdP_F3jVV5eYenf1CiCenvuU-P" width="200"> <img src="https://drive.google.com/uc?id=1k7vyakPrKid73rGx7qfJcxzBUGcxl8dS" width="200"> <img src="https://drive.google.com/uc?id=1AAZMLew__TkpiQ_QbRZPxV-r9p_So7vG" width="200"> <img src="https://drive.google.com/uc?id=1jcS7GDld7gaMqDYbdGqM8wOqWEpP7Jfo" width="200">
 
 #### Issues
 If you found an issue with a bot, feel free to create issue at https://github.com/sogehige/SogeBot/issues.
