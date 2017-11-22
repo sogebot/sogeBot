@@ -18,8 +18,22 @@ Commons.prototype.isSystemEnabled = function (fn) {
 }
 
 Commons.prototype.isIntegrationEnabled = function (fn) {
-  var name = (typeof fn === 'object') ? fn.constructor.name : fn
-  var enabled = !_.isNil(config.integrations) && !_.isNil(config.integrations[name.toLowerCase()]) ? (_.isBoolean(config.integrations[name.toLowerCase()] ? config.integrations[name.toLowerCase()] : config.integrations[name.toLowerCase()].enabled)) : false
+  const name = (typeof fn === 'object') ? fn.constructor.name : fn
+  let enabled = false
+
+  let isExists = !_.isNil(config.integrations) && !_.isNil(config.integrations[name.toLowerCase()])
+  debug('Checking integration %s is enabled', name)
+  debug('Exist in config.json', isExists)
+
+  if (isExists) {
+    let isBool = _.isBoolean(config.integrations[name.toLowerCase()])
+    debug('Is directly a bool', isBool)
+    if (!isBool) {
+      let isEnabled = config.integrations[name.toLowerCase()].enabled
+      debug('integration enabled attribute', isEnabled)
+      enabled = isEnabled
+    } else enabled = config.integrations[name.toLowerCase()]
+  }
   if (typeof fn === 'object') global.log.info(name + ' integration ' + global.translate('core.loaded') + ' ' + (enabled ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
   return enabled
 }
