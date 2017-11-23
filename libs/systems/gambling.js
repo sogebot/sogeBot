@@ -84,7 +84,7 @@ function Gambling () {
         debug(m); global.commons.sendMessage(m, { username: username }, { force: true })
 
         // give user his points
-        global.db.engine.increment('users', { username: username }, { points: parseInt(total, 10) })
+        global.db.engine.incrementOne('users', { username: username }, { points: parseInt(total, 10) })
 
         // reset duel
         self.current.duel = {}
@@ -107,7 +107,7 @@ Gambling.prototype.duel = async function (self, sender, text) {
 
     const user = await global.users.get(sender.username)
     if (_.isNil(user.points) || user.points < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
-    global.db.engine.increment('users', { username: sender.username }, { points: parseInt(points, 10) * -1 })
+    global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * -1 })
 
     // check if user is already in duel and add points
     let newDuelist = true
@@ -299,16 +299,18 @@ Gambling.prototype.gamble = async function (self, sender, text) {
     const user = await global.users.get(sender.username)
     if (_.isNil(user.points) || user.points < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
 
-    global.db.engine.increment('users', { username: sender.username }, { points: parseInt(points, 10) * -1 })
+    await global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * -1 })
     if (_.random(0, 1)) {
-      global.db.engine.increment('users', { username: sender.username }, { points: parseInt(points, 10) * 2 })
+      let updatedUser = await global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * 2 })
       global.commons.sendMessage(global.translate('gambling.gamble.win')
-        .replace(/\$points/g, (parseInt(user.points, 10) + (parseInt(points, 10) * 2)))
-        .replace(/\$pointsName/g, global.systems.points.getPointsName(user.points)), sender)
+        .replace(/\$pointsName/g, global.systems.points.getPointsName(user.points))
+        .replace(/\$points/g, (parseInt(updatedUser.points, 10)))
+        , sender)
     } else {
       global.commons.sendMessage(global.translate('gambling.gamble.lose')
+        .replace(/\$pointsName/g, global.systems.points.getPointsName(user.points))
         .replace(/\$points/g, parseInt(user.points, 10) - parseInt(points, 10))
-        .replace(/\$pointsName/g, global.systems.points.getPointsName(user.points)), sender)
+        , sender)
     }
   } catch (e) {
     switch (e.message) {
@@ -324,6 +326,7 @@ Gambling.prototype.gamble = async function (self, sender, text) {
         .replace(/\$pointsName/g, global.systems.points.getPointsName(points).toLowerCase()), sender)
         break
       default:
+        global.log.error(e.stack)
         global.commons.sendMessage(global.translate('core.error'), sender)
     }
   }

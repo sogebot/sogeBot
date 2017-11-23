@@ -94,10 +94,25 @@ class INeDB extends Interface {
 
     var self = this
     return new Promise(function (resolve, reject) {
-      self.on(table).update(flatten(where), { $set: flatten(object) }, { upsert: (_.isNil(where._id) && !_.isEmpty(where)), multi: (_.isEmpty(where)) }, function (err, numReplaced) {
+      self.on(table).update(flatten(where), { $set: flatten(object) }, { upsert: (_.isNil(where._id) && !_.isEmpty(where)), multi: (_.isEmpty(where)), returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
         if (err) reject(err)
         if (debug.enabled) debug('update() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
-        resolve(numReplaced)
+        resolve(affectedDocs)
+      })
+    })
+  }
+
+  async incrementOne (table, where, object) {
+    this.on(table) // init table
+
+    if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
+
+    var self = this
+    return new Promise(function (resolve, reject) {
+      self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: false, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
+        if (err) reject(err)
+        if (debug.enabled) debug('increment() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
+        resolve(affectedDocs)
       })
     })
   }
@@ -109,10 +124,10 @@ class INeDB extends Interface {
 
     var self = this
     return new Promise(function (resolve, reject) {
-      self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: (_.isEmpty(where)) }, function (err, numReplaced) {
+      self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: true, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
         if (err) reject(err)
         if (debug.enabled) debug('increment() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
-        resolve(numReplaced)
+        resolve(affectedDocs)
       })
     })
   }

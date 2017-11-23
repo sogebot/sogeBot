@@ -26,7 +26,6 @@ class IMongoDB extends Interface {
   }
 
   async find (table, where) {
-
     where = where || {}
     if (!_.isNil(where._id)) {
       let regexp = new RegExp('^[0-9a-fA-F]{24}$')
@@ -42,7 +41,6 @@ class IMongoDB extends Interface {
   }
 
   async findOne (table, where) {
-
     where = where || {}
     if (!_.isNil(where._id)) {
       let regexp = new RegExp('^[0-9a-fA-F]{24}$')
@@ -58,7 +56,6 @@ class IMongoDB extends Interface {
   }
 
   async insert (table, object) {
-
     if (_.isEmpty(object)) throw Error('Object cannot be empty')
     delete object._id
 
@@ -70,8 +67,7 @@ class IMongoDB extends Interface {
     return item.ops[0]
   }
 
-  async increment (table, where, object) {
-
+  async incrementOne (table, where, object) {
     where = where || {}
     if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
     else where = flatten(where)
@@ -83,18 +79,41 @@ class IMongoDB extends Interface {
     let collection = await db.collection(table)
     if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
 
-    let result = await collection.update(
+    let item = await collection.findAndModify(
+      where,
+      { _id: 1 },
+      { $inc: flatten(object) }
+    )
+
+    return item.value
+  }
+
+  async increment (table, where, object) {
+    where = where || {}
+    if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
+    else where = flatten(where)
+
+    if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
+    delete object._id
+
+    let db = await this.connection(table)
+    let collection = await db.collection(table)
+    if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
+
+    await collection.update(
       where,
       { $inc: flatten(object) }, {
         upsert: true,
         multi: _.isEmpty(where)
       }
     )
-    return result.result.n
+
+    // workaround for return of updated objects
+    let items = await collection.find(where).toArray()
+    return items
   }
 
   async remove (table, where) {
-
     if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
     else where = flatten(where)
 
@@ -105,7 +124,6 @@ class IMongoDB extends Interface {
   }
 
   async update (table, where, object) {
-
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
 
     if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
@@ -117,18 +135,20 @@ class IMongoDB extends Interface {
     let collection = await db.collection(table)
     if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
 
-    let result
     if (_.size(where) === 0) {
-      result = await collection.updateMany({}, { $set: flatten(object) })
+      await collection.updateMany({}, { $set: flatten(object) })
     } else {
-      result = await collection.update(
+      await collection.update(
         where,
         { $set: flatten(object) }, {
           upsert: _.isNil(where._id)
         }
       )
     }
-    return _.isNil(result.result.upserted) ? result.result.nModified : _.size(result.result.upserted)
+
+    // workaround for return of updated objects
+    let items = await collection.find(where).toArray()
+    return items
   }
 }
 
