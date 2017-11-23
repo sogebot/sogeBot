@@ -14,9 +14,10 @@ function Twitch () {
 
   this.maxViewers = 0
   this.chatMessagesAtStart = global.parser.linesParsed
-  this.maxRetries = 12
+  this.maxRetries = 5
   this.curRetries = 0
   this.newChatters = 0
+  this.streamType = 'live'
 
   this.current = {
     viewers: 0,
@@ -71,7 +72,8 @@ function Twitch () {
 
       if (res.statusCode === 200 && !_.isNull(body.stream)) {
         self.curRetries = 0
-        if (!self.isOnline) { // if we are switching from offline - bots restarts? We want refresh to correct data for start as well
+        if (!self.isOnline || self.streamType !== body.stream_type) { // if we are switching from offline or vodcast<->live we want refresh to correct data for start as well
+          self.when.online = null
           self.chatMessagesAtStart = global.parser.linesParsed
           self.current.viewers = 0
           self.current.bits = 0
@@ -82,6 +84,7 @@ function Twitch () {
           global.events.fire('every-x-seconds', { reset: true })
         }
         self.saveStream(body.stream)
+        self.streamType = body.stream_type
         self.isOnline = true
         self.when.offline = null
         global.events.fire('number-of-viewers-is-at-least-x')
