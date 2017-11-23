@@ -765,13 +765,13 @@ abbr {
 abbr[data-original-title], abbr[title] {
   text-decoration: none;
   line-height: 25px;
-  display: inline-block;
-  padding: 10px;
+  display: flex;
+  padding: 5px;
   border: 1px solid $gray-300;
   border-radius: 5px !important;
-  padding: 5px;
   background-color: $white;
   cursor: text;
+  font-size: 1rem;
 }
 
 #pages {

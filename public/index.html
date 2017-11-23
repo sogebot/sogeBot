@@ -773,7 +773,7 @@
         var $inputGroup = $('#input_' + el.dataset.configId + '_group')
         var $input = $('#input_' + el.dataset.configId)
         $(el).css('display', 'none')
-        $inputGroup.css('display', 'table')
+        $inputGroup.css('display', 'flex')
         $input.focus()
         $input.val($(el).text().replace(suffix, '').replace('< empty >', ''))
 
@@ -783,7 +783,7 @@
           var data = {}
           data[el.dataset.configId] = value
           $inputGroup.css('display', 'none')
-          $(el).css('display', 'inline')
+          $(el).css('display', 'flex')
 
           if (value.length === 0) $(el).text('< empty >')
           else $(el).text(value + suffix)
