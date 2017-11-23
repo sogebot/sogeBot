@@ -130,7 +130,7 @@
         alias: $(inputs[0]).text().replace('!', ''),
         command: commons.cleanResponseText($(inputs[1]).html().replace('!', ''))
       }
-      socket.emit('alias.add', `!${data.command} !${data.alias}`)
+      socket.emit('alias.add', `!${data.alias} !${data.command}`)
       $('.new-confirm-btn').css('display', 'none')
     },
     responses: (id) => {
