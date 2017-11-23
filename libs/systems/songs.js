@@ -107,7 +107,7 @@ class Songs {
     if (_.isNil(self.currentSong.videoID)) return
 
     let update = await global.db.engine.update('bannedsong', { videoId: self.currentSong.videoID }, { videoId: self.currentSong.videoID, title: self.currentSong.title })
-    if (update > 0) {
+    if (update.length > 0) {
       let message = global.commons.prepare('songs.song-was-banned', { name: self.currentSong.title })
       debug(message); global.commons.sendMessage(message, sender)
 
@@ -127,7 +127,7 @@ class Songs {
       if (_.isNil(videoInfo.title)) return
 
       let updated = await global.db.engine.update('bannedsong', { videoId: text }, { videoId: text, title: videoInfo.title })
-      if (updated > 0) {
+      if (updated.length > 0) {
         global.commons.sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, self.currentSong.title), sender)
 
         await Promise.all([global.db.engine.remove('playlist', { videoID: text }), global.db.engine.remove('songrequest', { videoID: text })])
