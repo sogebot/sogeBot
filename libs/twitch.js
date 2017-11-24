@@ -72,7 +72,7 @@ function Twitch () {
 
       if (res.statusCode === 200 && !_.isNull(body.stream)) {
         self.curRetries = 0
-        if (!self.isOnline || self.streamType !== body.stream_type) { // if we are switching from offline or vodcast<->live we want refresh to correct data for start as well
+        if (!self.isOnline || self.streamType !== body.stream.stream_type) { // if we are switching from offline or vodcast<->live we want refresh to correct data for start as well
           self.when.online = null
           self.chatMessagesAtStart = global.parser.linesParsed
           self.current.viewers = 0
