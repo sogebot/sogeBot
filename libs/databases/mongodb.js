@@ -34,9 +34,7 @@ class IMongoDB extends Interface {
     } else where = flatten(where)
 
     let db = await this.connection(table)
-    let collection = await db.collection(table)
-    if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
-    let items = await collection.find(where).toArray()
+    let items = await db.collection(table).find(where).toArray()
     return items
   }
 
@@ -49,9 +47,7 @@ class IMongoDB extends Interface {
     } else where = flatten(where)
 
     let db = await this.connection(table)
-    let collection = await db.collection(table)
-    if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
-    let item = await collection.findOne(where)
+    let item = await db.collection(table).findOne(where)
     return item || {}
   }
 
@@ -60,9 +56,7 @@ class IMongoDB extends Interface {
     delete object._id
 
     let db = await this.connection(table)
-    let collection = await db.collection(table)
-    if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
-    let item = await collection.insert(object)
+    let item = await db.collection(table).insert(object)
 
     return item.ops[0]
   }
@@ -76,13 +70,11 @@ class IMongoDB extends Interface {
     delete object._id
 
     let db = await this.connection(table)
-    let collection = await db.collection(table)
-    if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
-
-    let item = await collection.findAndModify(
+    let item = await db.collection(table).findAndModify(
       where,
       { _id: 1 },
-      { $inc: flatten(object) }
+      { $inc: flatten(object) },
+      { new: true } // will return updated item
     )
 
     return item.value
@@ -97,10 +89,8 @@ class IMongoDB extends Interface {
     delete object._id
 
     let db = await this.connection(table)
-    let collection = await db.collection(table)
-    if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
 
-    await collection.update(
+    await db.collection(table).update(
       where,
       { $inc: flatten(object) }, {
         upsert: true,
@@ -109,7 +99,7 @@ class IMongoDB extends Interface {
     )
 
     // workaround for return of updated objects
-    let items = await collection.find(where).toArray()
+    let items = await db.collection(table).find(where).toArray()
     return items
   }
 
@@ -118,8 +108,7 @@ class IMongoDB extends Interface {
     else where = flatten(where)
 
     let db = await this.connection(table)
-    let collection = await db.collection(table)
-    let result = await collection.remove(where)
+    let result = await db.collection(table).remove(where)
     return result.result.n
   }
 
@@ -132,13 +121,11 @@ class IMongoDB extends Interface {
     if (debug.enabled) debug('update() \n\ttable: %s \n\twhere: %j', table, where)
 
     let db = await this.connection(table)
-    let collection = await db.collection(table)
-    if (table === 'users') collection.createIndex({'_id': 1, 'username': 1})
 
     if (_.size(where) === 0) {
-      await collection.updateMany({}, { $set: flatten(object) })
+      await db.collection(table).updateMany({}, { $set: flatten(object) })
     } else {
-      await collection.update(
+      await db.collection(table).update(
         where,
         { $set: flatten(object) }, {
           upsert: _.isNil(where._id)
@@ -147,7 +134,7 @@ class IMongoDB extends Interface {
     }
 
     // workaround for return of updated objects
-    let items = await collection.find(where).toArray()
+    let items = await db.collection(table).find(where).toArray()
     return items
   }
 }

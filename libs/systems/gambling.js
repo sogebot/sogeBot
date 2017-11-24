@@ -303,7 +303,7 @@ Gambling.prototype.gamble = async function (self, sender, text) {
     if (_.random(0, 1)) {
       let updatedUser = await global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * 2 })
       global.commons.sendMessage(global.translate('gambling.gamble.win')
-        .replace(/\$pointsName/g, global.systems.points.getPointsName(user.points))
+        .replace(/\$pointsName/g, global.systems.points.getPointsName(updatedUser.points))
         .replace(/\$points/g, (parseInt(updatedUser.points, 10)))
         , sender)
     } else {
