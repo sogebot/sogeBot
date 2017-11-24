@@ -294,7 +294,7 @@ Points.prototype.updatePoints = async function () {
 
   let users = await global.users.getAll({ is: { online: true } })
   _.each(users, function (user) {
-    user.time.points = _.isUndefined(user.time.points) ? 0 : user.time.points
+    user.time.points = _.isNil(user.time) || _.isNil(user.time.points) ? 0 : user.time.points
     if (new Date().getTime() - user.time.points >= interval) {
       global.db.engine.increment('users', { username: user.username }, { points: parseInt(ptsPerInterval, 10) })
       global.users.set(user.username, {
