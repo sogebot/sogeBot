@@ -19,8 +19,15 @@ class IMongoDB extends Interface {
 
   async connection (table) {
     if (_.isNil(this._connection[table])) {
-      this._connection[table] = await client.connect(config.database.mongodb.url, { poolSize: 100 })
-      debug(this._connection[table])
+      try {
+        this._connection[table] = await client.connect(config.database.mongodb.url, { poolSize: 100 })
+        debug(this._connection[table])
+      } catch (e) {
+        if (e.message.match(/ENOTFOUND/g)) {
+          global.log.error(`Cannot connect to ${config.database.mongodb.url}`)
+          process.exit()
+        }
+      }
     }
     return this._connection[table]
   }
@@ -33,9 +40,16 @@ class IMongoDB extends Interface {
       else return {}
     } else where = flatten(where)
 
-    let db = await this.connection(table)
-    let items = await db.collection(table).find(where).toArray()
-    return items
+    try {
+      let db = await this.connection(table)
+      let items = await db.collection(table).find(where).toArray()
+      return items
+    } catch (e) {
+      if (e.message.match(/EPIPE/g)) {
+        global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
+        process.exit()
+      }
+    }
   }
 
   async findOne (table, where) {
@@ -46,19 +60,32 @@ class IMongoDB extends Interface {
       else return {}
     } else where = flatten(where)
 
-    let db = await this.connection(table)
-    let item = await db.collection(table).findOne(where)
-    return item || {}
+    try {
+      let db = await this.connection(table)
+      let item = await db.collection(table).findOne(where)
+      return item || {}
+    } catch (e) {
+      if (e.message.match(/EPIPE/g)) {
+        global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
+        process.exit()
+      }
+    }
   }
 
   async insert (table, object) {
     if (_.isEmpty(object)) throw Error('Object cannot be empty')
     delete object._id
 
-    let db = await this.connection(table)
-    let item = await db.collection(table).insert(object)
-
-    return item.ops[0]
+    try {
+      let db = await this.connection(table)
+      let item = await db.collection(table).insert(object)
+      return item.ops[0]
+    } catch (e) {
+      if (e.message.match(/EPIPE/g)) {
+        global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
+        process.exit()
+      }
+    }
   }
 
   async incrementOne (table, where, object) {
@@ -69,15 +96,22 @@ class IMongoDB extends Interface {
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
     delete object._id
 
-    let db = await this.connection(table)
-    let item = await db.collection(table).findAndModify(
-      where,
-      { _id: 1 },
-      { $inc: flatten(object) },
-      { new: true } // will return updated item
-    )
+    try {
+      let db = await this.connection(table)
+      let item = await db.collection(table).findAndModify(
+        where,
+        { _id: 1 },
+        { $inc: flatten(object) },
+        { new: true } // will return updated item
+      )
 
-    return item.value
+      return item.value
+    } catch (e) {
+      if (e.message.match(/EPIPE/g)) {
+        global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
+        process.exit()
+      }
+    }
   }
 
   async increment (table, where, object) {
@@ -88,28 +122,42 @@ class IMongoDB extends Interface {
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
     delete object._id
 
-    let db = await this.connection(table)
+    try {
+      let db = await this.connection(table)
 
-    await db.collection(table).update(
-      where,
-      { $inc: flatten(object) }, {
-        upsert: true,
-        multi: _.isEmpty(where)
+      await db.collection(table).update(
+        where,
+        { $inc: flatten(object) }, {
+          upsert: true,
+          multi: _.isEmpty(where)
+        }
+      )
+
+      // workaround for return of updated objects
+      let items = await db.collection(table).find(where).toArray()
+      return items
+    } catch (e) {
+      if (e.message.match(/EPIPE/g)) {
+        global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
+        process.exit()
       }
-    )
-
-    // workaround for return of updated objects
-    let items = await db.collection(table).find(where).toArray()
-    return items
+    }
   }
 
   async remove (table, where) {
     if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
     else where = flatten(where)
 
-    let db = await this.connection(table)
-    let result = await db.collection(table).remove(where)
-    return result.result.n
+    try {
+      let db = await this.connection(table)
+      let result = await db.collection(table).remove(where)
+      return result.result.n
+    } catch (e) {
+      if (e.message.match(/EPIPE/g)) {
+        global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
+        process.exit()
+      }
+    }
   }
 
   async update (table, where, object) {
@@ -120,22 +168,29 @@ class IMongoDB extends Interface {
 
     if (debug.enabled) debug('update() \n\ttable: %s \n\twhere: %j', table, where)
 
-    let db = await this.connection(table)
+    try {
+      let db = await this.connection(table)
 
-    if (_.size(where) === 0) {
-      await db.collection(table).updateMany({}, { $set: flatten(object) })
-    } else {
-      await db.collection(table).update(
-        where,
-        { $set: flatten(object) }, {
-          upsert: _.isNil(where._id)
-        }
-      )
+      if (_.size(where) === 0) {
+        await db.collection(table).updateMany({}, { $set: flatten(object) })
+      } else {
+        await db.collection(table).update(
+          where,
+          { $set: flatten(object) }, {
+            upsert: _.isNil(where._id)
+          }
+        )
+      }
+
+      // workaround for return of updated objects
+      let items = await db.collection(table).find(where).toArray()
+      return items
+    } catch (e) {
+      if (e.message.match(/EPIPE/g)) {
+        global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
+        process.exit()
+      }
     }
-
-    // workaround for return of updated objects
-    let items = await db.collection(table).find(where).toArray()
-    return items
   }
 }
 
