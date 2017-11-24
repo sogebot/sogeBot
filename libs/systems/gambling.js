@@ -139,9 +139,8 @@ Gambling.prototype.duel = async function (self, sender, text) {
     // if new duel, we want to save timestamp
     if (_.isNil(self.current.duel._timestamp)) {
       self.current.duel._timestamp = new Date().getTime()
-      global.commons.sendMessage(global.translate('gambling.duel.new')
-        .replace(/\$minutesName/g, global.parser.getLocalizedName(5, 'core.minutes')
-        .replace(/\$minutes/g, 5)), sender)
+      let message = global.commons.prepare('gambling.duel.new', { minutesName: global.parser.getLocalizedName(5, 'core.minutes'), minutes: 5 })
+      debug(message); global.commons.sendMessage(message, sender)
     }
 
     // save points to _total
