@@ -18,7 +18,7 @@
     "token": "7911776886"
   },
   "database": {
-    "__README__": "TBD",
+    "__README__": "https://github.com/sogehige/sogeBot/wiki/Database-configuration",
     "type": "nedb",
     "mongodb": {
       "url": "mongodb://localhost:27017/changeit"
