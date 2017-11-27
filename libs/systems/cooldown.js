@@ -65,7 +65,10 @@ class Cooldown {
       return
     }
 
-    await global.db.engine.update('cooldowns', { key: command, type: type }, { miliseconds: parseInt(seconds, 10) * 1000, type: type, timestamp: 0, quiet: _.isNil(quiet) ? false : quiet, enabled: true, owner: false, moderator: false })
+    let cooldown = await global.db.engine.findOne('cooldowns', { key: command, type: type })
+    if (_.isEmpty(cooldown)) await global.db.engine.update('cooldowns', { key: command, type: type }, { miliseconds: parseInt(seconds, 10) * 1000, type: type, timestamp: 0, quiet: _.isNil(quiet) ? false : quiet, enabled: true, owner: false, moderator: false })
+    else await global.db.engine.update('cooldowns', { key: command, type: type }, { miliseconds: parseInt(seconds, 10) * 1000 })
+
     let message = global.commons.prepare('cooldowns.cooldown-was-set', { seconds: seconds, type: type, command: command })
     debug(message); global.commons.sendMessage(message, sender)
   }
