@@ -1,13 +1,13 @@
 <div class="widget">
   <h6 data-lang="widget-title-twitter"></h6>
   <ul class="nav nav-pills" role="tablist">
-    <li role="presentation" class="active">
-      <a href="#twitter-main" aria-controls="home" role="tab" data-toggle="tab" title="Send a twitch status">
+    <li role="presentation" class="nav-item">
+      <a class="nav-link active" href="#twitter-main" aria-controls="home" role="tab" data-toggle="tab" title="Send a twitch status">
         <i class="fa fa-twitter" aria-hidden="true"></i>
       </a>
     </li>
-    <li role="presentation">
-      <a href="#twitter-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+    <li role="presentation" class="nav-item">
+      <a class="nav-link" href="#twitter-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
         <i class="fa fa-cog" aria-hidden="true"></i>
       </a>
     </li>
@@ -16,13 +16,15 @@
   <!-- Tab panes -->
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="twitter-main">
-      <form class="form-horizontal">
-        <div class="form-group" style="margin-bottom: 0">
-          <div class="col-sm-8" style="padding-right: 0">
+
+
+      <form>
+        <div class="form-row">
+          <div class="col">
             <input type="text" id="twitterInput" class="form-control" />
           </div>
-          <div class="col-sm-4" style="padding-left: 0">
-            <button id="twitterInputSubmit" class="form-control btn btn-primary" data-lang="twitter-send-message"></button>
+          <div class="col-auto">
+            <button id="twitterInputSubmit" class="form-control btn btn-primary">Tweet</button>
           </div>
         </div>
       </form>

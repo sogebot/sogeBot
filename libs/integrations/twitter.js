@@ -15,7 +15,7 @@ function Twitter () {
     })
 
     this.addEvent(this)
-    global.panel.addWidget('twitter', 'widget-title-twitter', 'pencil')
+    global.panel.addWidget('twitter', 'widget-title-twitter', 'twitter')
     global.panel.socketListening(this, 'twitter.send', this.send)
   }
 }
