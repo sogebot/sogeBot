@@ -97,26 +97,24 @@
       $("#soundboard-list").append('<div class="col"></div>')
     }
     cmdboard.resize()
+
+    // deletion right-click menu
+    var menu = new BootstrapMenu(".cmdboard-list-group-item", {
+      fetchElementData: function ($el) {
+        return $el.data();
+      },
+      actions: [{
+        name: 'Delete',
+        classNames: ['action-danger'],
+        iconClass: 'fa-trash-o',
+        onClick: function (data) {
+          socket.emit('cmdboard.widget.remove', data)
+        }
+      }]
+    })
   })
 
   $(window).resize(function () {
     cmdboard.resize()
   })
-
-
-  // deletion right-click menu
-  var menu = new BootstrapMenu(".cmdboard-item", {
-    fetchElementData: function ($el) {
-      return $el.data();
-    },
-    actions: [{
-      name: 'Delete',
-      classNames: ['action-danger'],
-      iconClass: 'fa-trash-o',
-      onClick: function (data) {
-        socket.emit('cmdboard.widget.remove', data)
-      }
-    }]
-  })
-
 </script>
