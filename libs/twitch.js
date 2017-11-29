@@ -84,7 +84,7 @@ function Twitch () {
           global.events.fire('every-x-seconds', { reset: true })
         }
         self.saveStream(body.stream)
-        self.streamType = body.stream_type
+        self.streamType = body.stream.stream_type
         self.isOnline = true
         self.when.offline = null
         global.events.fire('number-of-viewers-is-at-least-x')
