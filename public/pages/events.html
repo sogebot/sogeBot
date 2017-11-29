@@ -26,6 +26,10 @@
               <strong>$months</strong>
               <span data-lang="events-months-of-subscription"></span>
             </div>
+            <div id="monthsNameInfo">
+              <strong>$monthsName</strong>
+              <span data-lang="events-monthsName-of-subscription"></span>
+            </div>
             <div id="messageInfo">
               <strong>$message</strong>
               <span data-lang="events-user-message"></span>
@@ -150,6 +154,7 @@
     $('#usernameInfo').css('display', 'none')
     $('#methodInfo').css('display', 'none')
     $('#monthsInfo').css('display', 'none')
+    $('#monthsNameInfo').css('display', 'none')
     $('#messageInfo').css('display', 'none')
     $('#bitsInfo').css('display', 'none')
     $('#reasonInfo').css('display', 'none')
@@ -181,6 +186,7 @@
       case 'resub':
         $('#usernameInfo').css('display', 'block')
         $('#monthsInfo').css('display', 'block')
+        $('#monthsNameInfo').css('display', 'block')
         $('#messageInfo').css('display', 'block')
         break
       case 'cheer':

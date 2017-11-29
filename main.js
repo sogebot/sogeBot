@@ -210,7 +210,7 @@ global.client.on('subscription', async function (channel, username, method) {
 global.client.on('resub', async function (channel, username, months, message) {
   if (debug.enabled) debug('Resub: %s (%s months) - %s', username, months, message)
   global.users.set(username, { is: { subscriber: true } })
-  global.events.fire('resub', { username: username, months: months, message: message })
+  global.events.fire('resub', { username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
 
   if (!_.isArray(global.twitch.cached.subscribers)) global.twitch.cached.subscribers = []
   global.twitch.cached.subscribers.unshift(username + ', ' + months + ' ' + global.parser.getLocalizedName(months, 'core.months'))

@@ -294,6 +294,7 @@
     "events-user-triggered-event": "uživatel, který spustil event",
     "events-method-used-to-subscribe": "metoda použita pro subscribe",
     "events-months-of-subscription": "počet měsíců",
+    "events-monthsName-of-subscription": "skloňované slovo 'měsíc' (1 měsíc, 2 měsíce)",
     "events-user-message": "zpráva uživatele",
     "events-bits-user-sent": "počet poslaných bitů",
     "events-reason-for-ban-timeout": "důvod pro ban/timeout",
