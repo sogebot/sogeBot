@@ -1,0 +1,172 @@
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <span data-lang="translations" class="title text-default"></span>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#manage" data-lang="manage"></a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="manage">
+    <div class="widget">
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th scope="col">Key</td>
+            <th scope="col">Value</td>
+          </tr>
+        </thead>
+        <tbody id="translations-tbody">
+          <tr>
+            <td colspan="2" class="text-center">
+              <div class="alert alert-primary" role="alert">
+                <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>
+                <strong style="font-size: 2rem;">loading translations <small>(this may take a while)</small></strong>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div role="tabpanel" class="tab-pane" id="responses">
+    <div class="widget" id="bot-responses"></div>
+  </div>
+</div>
+
+<script>
+  var t = {
+    revert: (el) => {
+      socket.emit('responses.revert', { key: el.dataset.id }, (orig) => {
+        let text = t.format(orig)
+        $(el).parent().children('span').html(text)
+        $(el).parent().children('input').val(orig)
+        $(el).parent().children('button').removeClass('d-block').addClass('d-none')
+        commons.translate()
+      })
+    },
+    format: (text) => {
+      var filtersRegExp = new RegExp('\\$(' + _.keys(translations.responses.variable).join('|') + ')', 'g')
+      return text.replace(filtersRegExp,
+            '<span contenteditable="false" class="editable-variable" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;'
+          ).replace(' <span', '&nbsp; <span')
+    },
+    responses: () => {
+      const tbody = $('#translations-tbody')
+      socket.emit('responses.get', null, function (data) {
+        tbody.empty()
+        for (let [key, entry] of Object.entries(data)) {
+          if (key.match(/core|settings|webpanel.responses/g)) continue
+
+          var filters = ['global']
+
+          // get custom filters from default
+          var filtersRegExp = new RegExp('\\$(' + _.keys(translations.responses.variable).join('|') + ')', 'g')
+          let local = _.map(entry.default.match(filtersRegExp), (o) => o.replace('$', ''))
+          if (!_.isNil(local)) filters = _.flatten(['global', local])
+
+          let stringAbbr = t.format(entry.current)
+
+          isDiff = entry.current !== entry.default
+          let o = $(
+            `<tr>
+              <td style="cursor: default">${key}</td>
+              <td style="display: flex">
+                <span class="editable" data-id="${key}" data-edit="true">${stringAbbr}</span>
+                <input type="text" class="form-control editable d-none" value="${entry.current}"/>
+                <button class="btn btn-default ${isDiff ? `d-block` : `d-none`}" data-id="${key}" onclick="t.revert(this)">revert</button>
+              </td>
+            </tr>`)
+            .click(function (ev) {
+              if ($(ev.target).data('edit')) {
+                console.log('Editing', $(ev.target).data('id'))
+
+                $(ev.target).css('display', 'none')
+                let i = $(ev.target).parent().children('input')
+                i.removeClass('d-none').addClass('d-flex')
+                  .focus()
+                  .blur(() => {
+                    i.removeClass('d-flex').addClass('d-none')
+                    $(ev.target).css('display', 'flex')
+
+                    let n = i.val()
+                    if (entry.current != n) {
+                      socket.emit('responses.set', { key: $(ev.target).data('id'), value: n })
+                      $(ev.target).html(t.format(n))
+                      $(ev.target).parent().children('button').removeClass('d-none').addClass('d-block')
+                      commons.translate()
+                    }
+                  })
+              }
+            })
+
+          tbody.append(o)
+            /*
+          let tr = $('<tr>')
+          let ktd = $('<td>').text(key)
+
+          let span = $('<span>').addClass('custom-response')
+            .attr('data-id', `${key}`)
+          let etd = $('<td>').append(span)
+
+          tbody.append(
+            tr.append(ktd).append(etd)
+          )*/
+
+          /*$(`[data-id="${key}"]`).html(commons.editable({
+            text: entry.current,
+            id: `${key}`,
+            fnc: 'commons.setResponse',
+            filters: filters
+          }))*/
+
+
+
+
+          /*if (!_.isNil(id) && `${system}.${key}` !== id) continue // continue if we want only specific id
+          if (!_.isNil(id)) {
+            $(`abbr[data-id="${id}"]`).text(entry)
+            $(`abbr[data-id="${id}"]`).focus()
+            $(`abbr[data-id="${id}"]`).blur()
+            break
+          }
+          var filters = ['global']
+
+          let div = $('<div>')
+            .css('padding', '4px 5px 4px 5px')
+          let response = $('<span>')
+            .text(translations['response'])
+            .addClass('badge badge-primary badge-bot-response')
+          let kbd = $('<kbd>')
+            .text(key.replace(/-/g, ' '))
+            .addClass('kbd-bot-response')
+          let span = $('<span>').addClass('custom-response')
+            .attr('data-id', `${system}.${key}`)
+
+
+          $('#bot-responses').append(div.append(response).append(kbd).append(span))
+
+          if (_.includes(['price-was-not-found', 'price-was-set', 'price-was-enabled',
+              'price-was-disabled', 'price-was-unset', 'user-have-not-enough-points', 'price-was-not-found'
+            ], key)) filters.push('command')
+          if (_.includes(['list-is-not-empty'], key)) filters.push('list')
+          if (_.includes(['price-was-set', 'user-have-not-enough-points'], key)) filters.push('amount',
+            'pointsName')
+
+          $(`[data-id="${system}.${key}"]`).html(commons.editable({
+            text: entry,
+            id: `${system}.${key}`,
+            fnc: 'commons.setResponse',
+            filters: filters
+          }))*/
+        }
+        commons.translate()
+      })
+    }
+  }
+
+
+  t.responses()
+</script>

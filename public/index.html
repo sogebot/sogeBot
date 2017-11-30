@@ -419,22 +419,6 @@
           '.html',
           function () {
             commons.translate()
-            new BootstrapMenu(".custom-response", {
-              fetchElementData: function ($el) {
-                return $el.data();
-              },
-              actions: [{
-                name: 'Revert to default',
-                iconClass: 'fa-refresh',
-                onClick: function (data) {
-                  socket.emit('responses.revert', {
-                    key: data.id
-                  }, function () {
-                    window[data.id.split('.')[0]].responses(data.id) // recall responses() on alias, notices, etc. on current translation
-                  })
-                }
-              }]
-            })
             $('a[data-toggle="tab"]').off()
             $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
               var target = $(e.target).attr("href") // activated tab
@@ -660,8 +644,8 @@
           '<span contenteditable="false" class="editable-variable" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;'
         )
         var output = '<abbr style="width: 100%" title="click to edit" id="' + id + '" data-id="' + options.id +
-          '" data-fnc="' + options.fnc + '" data-filters="' + options.filters.join(',') +
-          '" contenteditable="true">' + stringAbbr + '</abbr>'
+        '" data-fnc="' + options.fnc + '" data-filters="' + options.filters.join(',') +
+        '" contenteditable="true">' + stringAbbr + '</abbr>'
 
         setTimeout(function () {
           commons.translate()

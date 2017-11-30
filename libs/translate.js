@@ -5,52 +5,61 @@ var fs = require('fs')
 var path = require('path')
 var _ = require('lodash')
 
-global.translations = {}
-global.customTranslations = []
+class Translate {
+  constructor () {
+    this.custom = {}
+    this.translations = {}
 
-_loadTranslations()
-global.watcher.watch(global, 'customTranslations', _saveTranslations)
-
-async function _loadTranslations () {
-  global.customTranslations = await global.db.engine.find('customTranslations')
-}
-
-function _saveTranslations () {
-  for (let custom of global.customTranslations) {
-    global.db.engine.update('customTranslations', { key: custom.key }, { key: custom.key, value: custom.value })
+    global.panel.addMenu({category: 'settings', name: 'translations', id: 'translations'})
   }
-}
 
-function Translate (text) {
-  if (_.isUndefined(global.translations[global.configuration.getValue('lang')]) && !_.isUndefined(text)) return '{missing_translation: ' + global.configuration.getValue('lang') + '.' + text + '}'
-  else if (typeof text === 'object') return global.translations[global.configuration.getValue('lang')][text.root]
-  else if (typeof text !== 'undefined') return getTranslation(text)
-  else {
-    return new Promise(function (resolve, reject) {
-      glob('./locales/*.json', function (err, files) {
+  async _load () {
+    this.custom = await global.db.engine.find('customTranslations')
+    return new Promise((resolve, reject) => {
+      glob('./locales/*.json', (err, files) => {
         if (err) reject(err)
-        _.each(files, function (file) {
-          global.translations[path.basename(file, '.json')] = JSON.parse(fs.readFileSync(file, 'utf8'))
-        })
-        resolve(true)
+        for (let f of files) {
+          this.translations[path.basename(f, '.json')] = JSON.parse(fs.readFileSync(f, 'utf8'))
+        }
+        resolve()
       })
     })
   }
-}
 
-function getTranslation (text) {
-  try {
-    var translated
-    var customTranslated = _.find(global.customTranslations, function (o) { return o.key === text })
-    if (!_.isNil(customTranslated)) {
-      translated = customTranslated.value
-    } else {
-      translated = text.split('.').reduce((o, i) => o[i], global.translations[global.configuration.getValue('lang')])
+  async _save () {
+    const self = global.lib.translate
+    for (let c of self.custom) {
+      global.db.engine.update('customTranslations', { key: c.key }, { key: c.key, value: c.value })
     }
-    _.each(translated.match(/(\{[\w-.]+\})/g), function (toTranslate) { translated = translated.replace(toTranslate, getTranslation(toTranslate.replace('{', '').replace('}', ''))) })
-    return translated
-  } catch (err) {
-    return '{missing_translation: ' + global.configuration.getValue('lang') + '.' + text + '}'
+  }
+
+  translate (text, orig) {
+    orig = orig || false
+    const self = global.lib.translate
+    if (_.isUndefined(self.translations[global.configuration.getValue('lang')]) && !_.isUndefined(text)) return '{missing_translation: ' + global.configuration.getValue('lang') + '.' + text + '}'
+    else if (typeof text === 'object') {
+      let t = self.translations[global.configuration.getValue('lang')][text.root]
+      for (let c of self.custom) { t[c.key.replace(`${text.root}.`, '')] = c.value }
+      return t
+    } else if (typeof text !== 'undefined') return self.get(text, orig)
+    return null
+  }
+
+  get (text, orig) {
+    try {
+      const self = global.lib.translate
+      var translated
+      var customTranslated = _.find(self.custom, function (o) { return o.key === text })
+      if (!_.isNil(customTranslated) && !orig) {
+        translated = customTranslated.value
+      } else {
+        translated = text.split('.').reduce((o, i) => o[i], self.translations[global.configuration.getValue('lang')])
+      }
+      _.each(translated.match(/(\{[\w-.]+\})/g), function (toTranslate) { translated = translated.replace(toTranslate, self.get(toTranslate.replace('{', '').replace('}', ''))) })
+      return translated
+    } catch (err) {
+      return '{missing_translation: ' + global.configuration.getValue('lang') + '.' + text + '}'
+    }
   }
 }
 
