@@ -125,11 +125,9 @@ Points.prototype.setPoints = function (self, sender, text) {
 
 Points.prototype.givePoints = async function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
-    var givePts = parseInt(parsed[2], 10)
-
-    const user = await global.users.get(sender.username)
-    const user2 = await global.users.get(parsed[1])
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\d]+|all)$/)
+    const [user, user2] = await Promise.all([global.users.get(sender.username), global.users.get(parsed[1])])
+    var givePts = parsed[2] === 'all' && !_.isNil(user.points) ? user.points : parsed[2]
     if (parseInt(user.points, 10) >= givePts) {
       if (user.username !== user2.username) {
         global.db.engine.increment('users', { username: user.username }, { points: (parseInt(givePts, 10) * -1) })
@@ -264,10 +262,11 @@ Points.prototype.addPoints = function (self, sender, text) {
   }
 }
 
-Points.prototype.removePoints = function (self, sender, text) {
+Points.prototype.removePoints = async function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
-    let removePts = parseInt(parsed[2], 10)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\d]+|all)$/)
+    const user = await global.users.get(parsed[1])
+    let removePts = parsed[2] === 'all' && !_.isNil(user.points) ? user.points : parsed[2]
 
     global.db.engine.increment('users', { username: parsed[1] }, { points: (removePts * -1) })
 
