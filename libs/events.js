@@ -283,6 +283,14 @@ Events.prototype._new = function (self, socket, data) {
 }
 
 Events.prototype._update = async function (self) {
+  // wait for widgets to load and repeat
+  if (_.isNil(global.widgets)) {
+    setTimeout(() => {
+      this._update(this)
+    }, 1000)
+    return
+  }
+
   let events = await global.db.engine.find('events')
   _.each(events, function (event) {
     try {
