@@ -878,7 +878,7 @@
       "new": "$sender je vas novy vyzyvatel pro duel! Zucastni se take pomoci !duel [points], zbyva ti $minutes $minutesName pro ucast.",
       "zeroBet": "$sender, nemuzes na sebe vsadit 0 $pointsName",
       "notEnoughOptions": "$sender, k duelu musis neco vsadit",
-      "notEnoughPoints": "$sender, nemas dostatek $pointsName pro duel!",
+      "notEnoughPoints": "$sender, nemas $points $pointsName pro duel!",
       "noContestant": "Pouze $sender se odvazil zucastnit duelu! Jeho sazka $points $pointsName mu byla vracena.",
       "winner": "Gratulace $winner! Je poslednim prezivsim a ziskal $points $pointsName ($probability% se sazkou $tickets $ticketsName)!!"
     },
@@ -909,7 +909,7 @@
     "gamble": {
       "zeroBet": "$sender, nemuzes hrat o 0 $pointsName",
       "notEnoughOptions": "$sender, musis hrat o nejake body",
-      "notEnoughPoints": "$sender, nemas dostatek $pointsName abys o ne hral",
+      "notEnoughPoints": "$sender, nemas $points $pointsName abys o ne hral",
       "win": "$sender, VYHRALS! Aktualne mas $points $pointsName",
       "lose": "$sender, PROHRALS! Aktualne mas $points $pointsName"
     }

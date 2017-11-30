@@ -95,12 +95,13 @@ Bets.prototype.info = function (self, sender) {
   }
 }
 
-Bets.prototype.saveBet = function (self, sender, text) {
+Bets.prototype.saveBet = async function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) (\d+)$/)
+    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) (\d|all+)$/)
     if (parsed.length < 2) { throw new Error(ERROR_NOT_ENOUGH_OPTIONS) }
 
-    let bet = { option: parsed[1], amount: parsed[2] }
+    const user = await global.users.get(sender.username)
+    let bet = { option: parsed[1], amount: parsed[2] === 'all' && !_.isNil(user.points) ? user.points : parsed[2] }
 
     if (parseInt(bet.amount, 10) === 0) throw Error(ERROR_ZERO_BET)
     if (_.isNull(self.bet)) throw Error(ERROR_NOT_RUNNING)
@@ -110,7 +111,6 @@ Bets.prototype.saveBet = function (self, sender, text) {
 
     var percentGain = (Object.keys(self.bet.bets).length * parseInt(global.configuration.getValue('betPercentGain'), 10)) / 100
 
-    const user = global.users.get(sender.username)
     var availablePts = parseInt(user.points, 10)
     var removePts = parseInt(bet.amount, 10)
     if (!_.isFinite(availablePts) || !_.isNumber(availablePts) || availablePts < removePts) {

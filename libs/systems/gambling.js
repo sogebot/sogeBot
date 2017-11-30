@@ -96,16 +96,17 @@ function Gambling () {
 }
 
 Gambling.prototype.duel = async function (self, sender, text) {
+  let points, message
+
   sender['message-type'] = 'chat' // force responses to chat
-  let points = 0
   try {
-    let parsed = text.trim().match(/^([\d]+)$/)
+    let parsed = text.trim().match(/^([\d]+|all)$/)
     if (_.isNil(parsed)) throw Error(ERROR_NOT_ENOUGH_OPTIONS)
 
-    points = parsed[1]
-    if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
-
     const user = await global.users.get(sender.username)
+    points = parsed[1] === 'all' && !_.isNil(user.points) ? user.points : parsed[1]
+
+    if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
     if (_.isNil(user.points) || user.points < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
     global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * -1 })
 
@@ -129,9 +130,10 @@ Gambling.prototype.duel = async function (self, sender, text) {
         if (!(global.configuration.getValue('gamblingCooldownBypass') && (isMod || global.parser.isBroadcaster(sender)))) self.cooldown.duel = new Date().getTime()
         self.current.duel[sender.username.toLowerCase()] = parseInt(points, 10)
       } else {
-        global.commons.sendMessage(global.translate('gambling.fightme.cooldown')
-          .replace(/\$cooldown/g, Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.duel)) / 1000 / 60))
-          .replace(/\$minutesName/g, global.parser.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.duel)) / 1000 / 60), 'core.minutes')), sender)
+        message = global.commons.prepare('gambling.fightme.cooldown', {
+          minutesName: global.parser.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.duel)) / 1000 / 60), 'core.minutes'),
+          cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - self.cooldown.duel)) / 1000 / 60) })
+        debug(message); global.commons.sendMessage(message, sender)
         return true
       }
     }
@@ -139,29 +141,41 @@ Gambling.prototype.duel = async function (self, sender, text) {
     // if new duel, we want to save timestamp
     if (_.isNil(self.current.duel._timestamp)) {
       self.current.duel._timestamp = new Date().getTime()
-      let message = global.commons.prepare('gambling.duel.new', { minutesName: global.parser.getLocalizedName(5, 'core.minutes'), minutes: 5 })
+      message = global.commons.prepare('gambling.duel.new', {
+        minutesName: global.parser.getLocalizedName(5, 'core.minutes'),
+        minutes: 5 })
       debug(message); global.commons.sendMessage(message, sender)
     }
 
     // save points to _total
     self.current.duel._total = parseInt(self.current.duel._total, 10) + parseInt(points, 10)
 
-    global.commons.sendMessage(global.translate(newDuelist ? 'gambling.duel.joined' : 'gambling.duel.added')
-      .replace(/\$pointsName/g, global.systems.points.getPointsName(self.current.duel[sender.username.toLowerCase()]))
-      .replace(/\$points/g, self.current.duel[sender.username.toLowerCase()]), sender)
+    message = global.commons.prepare(newDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
+      pointsName: global.systems.points.getPointsName(self.current.duel[sender.username.toLowerCase()]),
+      points: self.current.duel[sender.username.toLowerCase()]
+    })
+    debug(message); global.commons.sendMessage(message, sender)
   } catch (e) {
     switch (e.message) {
       case ERROR_NOT_ENOUGH_OPTIONS:
         global.commons.sendMessage(global.translate('gambling.duel.notEnoughOptions'), sender)
         break
       case ERROR_ZERO_BET:
-        global.commons.sendMessage(global.translate('gambling.duel.zeroBet')
-        .replace(/\$pointsName/g, global.systems.points.getPointsName(0)), sender)
+        message = global.commons.prepare('gambling.duel.zeroBet', {
+          pointsName: global.systems.points.getPointsName(0)
+        })
+        debug(message); global.commons.sendMessage(message, sender)
         break
       case ERROR_NOT_ENOUGH_POINTS:
-        global.commons.sendMessage(global.translate('gambling.duel.notEnoughPoints')
-        .replace(/\$pointsName/g, global.systems.points.getPointsName(points).toLowerCase()), sender)
+        message = global.commons.prepare('gambling.duel.notEnoughPoints', {
+          pointsName: global.systems.points.getPointsName(points),
+          points: points
+        })
+        debug(message); global.commons.sendMessage(message, sender)
         break
+      default:
+        global.log.error(e.stack)
+        global.commons.sendMessage(global.translate('core.error'), sender)
     }
   }
 }
@@ -286,43 +300,51 @@ Gambling.prototype.fightme = async function (self, sender, text) {
 }
 
 Gambling.prototype.gamble = async function (self, sender, text) {
+  let points, message
+
   sender['message-type'] = 'chat' // force responses to chat
-  let points = 0
   try {
-    let parsed = text.trim().match(/^([\d]+)$/)
+    let parsed = text.trim().match(/^([\d]+|all)$/)
     if (_.isNil(parsed)) throw Error(ERROR_NOT_ENOUGH_OPTIONS)
 
-    points = parsed[1]
-    if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
-
     const user = await global.users.get(sender.username)
+    points = parsed[1] === 'all' && !_.isNil(user.points) ? user.points : parsed[1]
+
+    if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
     if (_.isNil(user.points) || user.points < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
 
     await global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * -1 })
     if (_.random(0, 1)) {
       let updatedUser = await global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * 2 })
-      global.commons.sendMessage(global.translate('gambling.gamble.win')
-        .replace(/\$pointsName/g, global.systems.points.getPointsName(updatedUser.points))
-        .replace(/\$points/g, (parseInt(updatedUser.points, 10)))
-        , sender)
+      message = global.commons.prepare('gambling.gamble.win', {
+        pointsName: global.systems.points.getPointsName(updatedUser.points),
+        points: updatedUser.points
+      })
+      debug(message); global.commons.sendMessage(message, sender)
     } else {
-      global.commons.sendMessage(global.translate('gambling.gamble.lose')
-        .replace(/\$pointsName/g, global.systems.points.getPointsName(user.points))
-        .replace(/\$points/g, parseInt(user.points, 10) - parseInt(points, 10))
-        , sender)
+      message = global.commons.prepare('gambling.gamble.lose', {
+        pointsName: global.systems.points.getPointsName(user.points),
+        points: parseInt(user.points, 10) - parseInt(points, 10)
+      })
+      debug(message); global.commons.sendMessage(message, sender)
     }
   } catch (e) {
     switch (e.message) {
       case ERROR_ZERO_BET:
-        global.commons.sendMessage(global.translate('gambling.gamble.zeroBet')
-        .replace(/\$pointsName/g, global.systems.points.getPointsName(0)), sender)
+        message = global.commons.prepare('gambling.gamble.zeroBet', {
+          pointsName: global.systems.points.getPointsName(0)
+        })
+        debug(message); global.commons.sendMessage(message, sender)
         break
       case ERROR_NOT_ENOUGH_OPTIONS:
         global.commons.sendMessage(global.translate('gambling.gamble.notEnoughOptions'), sender)
         break
       case ERROR_NOT_ENOUGH_POINTS:
-        global.commons.sendMessage(global.translate('gambling.gamble.notEnoughPoints')
-        .replace(/\$pointsName/g, global.systems.points.getPointsName(points).toLowerCase()), sender)
+        message = global.commons.prepare('gambling.gamble.notEnoughPoints', {
+          pointsName: global.systems.points.getPointsName(points),
+          points: points
+        })
+        debug(message); global.commons.sendMessage(message, sender)
         break
       default:
         global.log.error(e.stack)

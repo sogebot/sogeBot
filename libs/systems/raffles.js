@@ -270,9 +270,9 @@ class Raffles {
   }
 
   async participate (self, sender, text) {
-    let tickets = parseInt(text.trim(), 10)
+    const [raffle, user] = await Promise.all([global.db.engine.findOne('raffles', { winner: null }), global.users.get(sender.username)])
+    let tickets = text.trim() === 'all' && !_.isNil(user.points) ? user.points : parseInt(text.trim(), 10)
 
-    let raffle = await global.db.engine.findOne('raffles', { winner: null })
     if (_.isEmpty(raffle)) { // shouldn't happen, but just to be sure (user can join when closing raffle)
       let message = global.commons.prepare('no-raffle-is-currently-running')
       debug(message); global.commons.sendMessage(message, sender)
@@ -307,7 +307,6 @@ class Raffles {
     }
     debug('new participant: %j', participantUser)
 
-    const user = await global.users.get(sender.username)
     debug('not enough points: %o', raffle.type === TYPE_TICKETS && user.points < tickets)
     if (raffle.type === TYPE_TICKETS && user.points < tickets) return // user doesn't have enough points
 

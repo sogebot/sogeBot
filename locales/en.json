@@ -601,7 +601,7 @@
       "info": "Bets are opened! Use !bet [$options] [points] to win! $timemin left to bet!",
       "parseError": "{core.command-parse} !bet to check usage",
       "diffBet": "$sender, you already made a bet on $option and you cannot bet to different option!",
-      "notEnoughPoints": "Sorry, $sender, but you dont have $amount $pointsName to bet!",
+      "notEnoughPoints": "Sorry, $sender, but you dont have $points $pointsName to bet!",
       "undefinedBet": "Sorry, $sender, but this bet option doesn't exist, use !bet to check usage",
       "betPercentGain": "Bet percent gain per option was set to $value%",
       "betCloseTimer": "Bets will be automatically closed after $valuemin",
@@ -878,7 +878,7 @@
       "new": "$sender is your new duel challenger! To participate use !duel [points], you have $minutes $minutesName left to join.",
       "zeroBet": "$sender, you cannot duel 0 $pointsName",
       "notEnoughOptions": "$sender, you need to specify points to dueling",
-      "notEnoughPoints": "$sender, you don't have enough $pointsName to duel!",
+      "notEnoughPoints": "$sender, you don't have $points $pointsName to duel!",
       "noContestant": "Only $sender have courage to join duel! Your bet of $points $pointsName are returned to you.",
       "winner": "Congratulations to $winner! He is last man standing and he won $points $pointsName ($probability% with bet of $tickets $ticketsName)!"
     },
@@ -909,7 +909,7 @@
     "gamble": {
       "zeroBet": "$sender, you cannot gamble 0 $pointsName",
       "notEnoughOptions": "$sender, you need to specify points to gamble",
-      "notEnoughPoints": "$sender, you don't have enough $pointsName to gamble",
+      "notEnoughPoints": "$sender, you don't have $points $pointsName to gamble",
       "win": "$sender, you WON! You now have $points $pointsName",
       "lose": "$sender, you LOST! You now have $points $pointsName"
     }
