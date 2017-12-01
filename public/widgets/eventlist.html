@@ -96,6 +96,8 @@
   })
 
   socket.on('widget.eventlist', function (o) {
+    if (_.isNil(o)) return
+
     let icons = {
       host: 'fa-bullhorn',
       follow: 'fa-heart',
