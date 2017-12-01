@@ -1,17 +1,14 @@
-  <ul class="nav nav-tabs" id="timers-tab">
+<ul class="nav nav-tabs" style="position: relative; top: 1px">
     <li>
       <span data-lang="timers" class="title text-default"></span>
     </li>
-    <li>
+    <li class="nav-item">
       <a class="nav-link btn-outline-success plus-button" onclick="timers.new()">
         <i class="fa fa-plus" aria-hidden="true"></i>
       </a>
     </li>
     <li class="nav-item">
       <a class="nav-link active" data-toggle="tab" href="#manage" data-lang="manage"></a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#responses" data-lang="bot-responses"></a>
     </li>
   </ul>
 
@@ -23,11 +20,6 @@
         </table>
       </div>
   </div>
-
-  <div role="tabpanel" class="tab-pane" id="responses">
-      <div class="widget" id="bot-responses">
-      </div>
-    </div>
 </div>
 
 <script>
@@ -165,53 +157,8 @@
     cancel: (event) =>  {
       $("[id$='_new']").css('display', 'none')
       $('.new-confirm-btn').css('display', 'none')
-    },
-    responses: (id) => {
-        id = id || null
-        socket.emit('responses.get', 'timers', function (data) {
-          for (let [key, entry] of Object.entries(data)) {
-          if (!_.isNil(id) && `${system}.${key}` !== id) continue // continue if we want only specific id
-          if (!_.isNil(id)) {
-            $(`abbr[data-id="${id}"]`).text(entry)
-            $(`abbr[data-id="${id}"]`).focus()
-            $(`abbr[data-id="${id}"]`).blur()
-            break
-          }
-            var filters = ['global']
-
-            let div = $('<div>')
-              .css('margin', '5px')
-            let response = $('<span>')
-              .text(translations['response'])
-              .addClass('badge badge-primary badge-bot-response')
-            let kbd = $('<kbd>')
-              .text(key.replace(/-/g, ' '))
-              .addClass('kbd-bot-response')
-            let span = $('<span>').addClass('custom-response')
-              .attr('data-id', `timers.${key}`)
-
-
-            $('#bot-responses').append(div.append(response).append(kbd).append(span))
-
-            if (_.includes(['timer-was-set', 'timer-not-found', 'timer-deleted', 'timer-enabled', 'timer-disabled', 'responses-list', 'response-was-added'], key)) filters.push('name')
-            if (_.includes(['response-was-added', 'response-deleted', 'response-not-found', 'response-enabled', 'response-disabled'], key)) filters.push('id')
-            if (key === 'timer-was-set') filters.push('messages', 'seconds')
-            if (key === 'timers-list') filters.push('list')
-            if (key === 'response-was-added') filters.push('response')
-
-            key = 'timers.' + key
-            $('[data-id="' + key + '"]').html(commons.editable({
-              text: entry,
-              id: key,
-              fnc: 'commons.setResponse',
-              filters: filters
-            }))
-          }
-        })
-      }
+    }
   }
-
-  timers.responses()
 
   socket.emit('timers.send')
   socket.on('timers', (data) => {

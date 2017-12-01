@@ -9,9 +9,6 @@
     <a class="nav-link" data-toggle="tab" href="#banned-songs" data-lang="banned-songs"></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#responses" data-lang="bot-responses"></a>
-  </li>
-  <li class="nav-item">
     <a class="nav-link" href="/playlist/" target="_blank">
       <span data-lang="public-link"></span>
       <i class="fa fa-external-link" aria-hidden="true"></i>
@@ -33,12 +30,6 @@
       <table class="table table-striped">
         <tbody id="banned-songs-table"></tbody>
       </table>
-    </div>
-  </div>
-
-  <div role="tabpanel" class="tab-pane" id="responses">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="widget" id="bot-responses"></div>
     </div>
   </div>
 </div>
@@ -171,53 +162,4 @@
   }
 
   $('#shuffleToggle').bootstrapToggle()
-
-  var songs = {
-    responses: (id) => {
-      id = id || null
-      let system = 'songs'
-      socket.emit('responses.get', system, function (data) {
-        for (let [key, entry] of Object.entries(data)) {
-          if (!_.isNil(id) && `${system}.${key}` !== id) continue // continue if we want only specific id
-          if (!_.isNil(id)) {
-            $(`abbr[data-id="${id}"]`).text(entry)
-            $(`abbr[data-id="${id}"]`).focus()
-            $(`abbr[data-id="${id}"]`).blur()
-            break
-          }
-          var filters = ['global']
-
-          let div = $('<div>')
-            .css('padding', '4px 5px 4px 5px')
-          let response = $('<span>')
-            .text(translations['response'])
-            .addClass('badge badge-primary badge-bot-response')
-          let kbd = $('<kbd>')
-            .text(key.replace(/-/g, ' '))
-            .addClass('kbd-bot-response')
-          let span = $('<span>').addClass('custom-response')
-            .attr('data-id', `${system}.${key}`)
-
-
-          $('#bot-responses').append(div.append(response).append(kbd).append(span))
-
-          if (_.includes(['song-was-banned', 'song-was-added-to-queue', 'song-was-added-to-playlist',
-              'song-is-already-in-playlist', 'song-was-removed-from-playlist', 'current-song-from-playlist',
-              'current-song-from-songrequest', 'song-was-removed-from-queue'
-            ], key)) filters.push('name')
-          if (_.includes(['current-song-from-songrequest'], key)) filters.push('username')
-
-          $(`[data-id="${system}.${key}"]`).html(commons.editable({
-            text: entry,
-            id: `${system}.${key}`,
-            fnc: 'commons.setResponse',
-            filters: filters
-          }))
-        }
-      })
-    }
-  }
-
-  songs.responses()
-
 </script>

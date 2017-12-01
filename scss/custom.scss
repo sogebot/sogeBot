@@ -403,10 +403,9 @@ h2.title {
 }
 
 .paging {
-  padding: 10px;
+  padding: 0 10px;
   text-align: right;
   display: inline-block;
-  float: right;
 }
 
 .pages-wrapper {
@@ -579,9 +578,7 @@ span.queue-list-group-item {
 }
 
 .form-search {
-  float: right;
   width: auto;
-  margin: 10px;
 }
 
 .form-chainops {
@@ -906,9 +903,8 @@ li a.active .deleteTab {
   color: $bot-response-text-color;
   border: 1px solid $bot-response-border-color;
   border-radius: 5px !important;
-  padding: 0 4px 0 4px;
+  padding: 0 4px;
   background-color: $bot-response-bg-color;
-  font-size: 130%;
 }
 
 .editable-variable.block {
@@ -957,11 +953,6 @@ table tr td hr {
 
 .dropdown-item {
   padding: 0.1rem 1rem;
-}
-
-.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
-  position: relative;
-  top: 1px;
 }
 
 .nav-tabs {
@@ -1087,4 +1078,25 @@ table tr td hr {
 
 .is-checking {
   border-color: $orange;
+}
+
+.editable {
+  text-decoration: none;
+  line-height: 25px;
+  flex-grow: 1;
+  padding: 5px;
+  border: 0;
+  border-bottom: 1px solid $gray-300;
+  border-radius: 5px !important;
+  background-color: $white;
+  cursor: text;
+  min-height: 2rem;
+}
+
+.editable-variable-click {
+  padding: 5px;
+}
+
+.form-control.editable {
+  font-size: .8rem !important;
 }

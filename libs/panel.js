@@ -88,20 +88,27 @@ function Panel () {
     socket.on('updateGameAndTitle', function (data) { global.twitch.updateGameAndTitle(global.twitch, socket, data) })
 
     socket.on('responses.get', function (at, callback) {
-      var responses = flatten(global.translations[global.configuration.getValue('lang')][at])
+      const responses = flatten(!_.isNil(at) ? global.lib.translate.translations[global.configuration.getValue('lang')][at] : global.lib.translate.translations[global.configuration.getValue('lang')])
       _.each(responses, function (value, key) {
-        responses[key] = global.translate(at + '.' + key) // needed for nested translations
+        let _at = !_.isNil(at) ? at + '.' + key : key
+        responses[key] = {} // remap to obj
+        responses[key].default = global.translate(_at, true)
+        responses[key].current = global.translate(_at)
       })
       callback(responses)
     })
     socket.on('responses.set', function (data) {
-      _.remove(global.customTranslations, function (o) { return o.key === data.key })
-      global.customTranslations.push(data)
+      _.remove(global.lib.translate.custom, function (o) { return o.key === data.key })
+      global.lib.translate.custom.push(data)
+      global.lib.translate._save()
+
+      socket.emit('lang', global.translate({root: 'webpanel'}))
     })
-    socket.on('responses.revert', function (data, callback) {
-      _.remove(global.customTranslations, function (o) { return o.key === data.key })
-      global.db.engine.remove('customTranslations', { key: data.key })
-      callback()
+    socket.on('responses.revert', async function (data, callback) {
+      _.remove(global.lib.translate.custom, function (o) { return o.key === data.key })
+      await global.db.engine.remove('customTranslations', { key: data.key })
+      let translate = global.translate(data.key)
+      callback(translate)
     })
 
     socket.on('getWidgetList', function () { self.sendWidgetList(self, socket) })

@@ -563,11 +563,11 @@ Twitch.prototype.setTitleAndGame = async function (self, sender, args) {
     if (!_.isNull(args.title)) {
       if (response.status === args.title.trim()) {
         global.commons.sendMessage(global.translate('title.change.success')
-          .replace(/\$status/g, response.status), sender)
+          .replace(/\$title/g, response.status), sender)
         self.current.status = response.status
       } else {
         global.commons.sendMessage(global.translate('title.change.failed')
-          .replace(/\$status/g, self.current.status), sender)
+          .replace(/\$title/g, self.current.status), sender)
       }
     }
   } catch (e) {

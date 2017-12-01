@@ -199,6 +199,7 @@
         "list": "Zaplněný seznam",
         "type": "Typ",
         "hours": "Hodiny",
+        "minutesName": "Skloňování slova minuta (1 minuta, 2 minuty)",
         "minutes": "Minuty",
         "seconds": "Sekundy",
         "description": "Popisek",
@@ -208,12 +209,31 @@
         "messages": "Zprávy",
         "amount": "Počet",
         "pointsName": "Název bodů",
+        "points": "Body",
         "rank": "Rank",
         "nextrank": "Další rank",
         "username": "Uživatelské jméno",
         "value": "Hodnota",
         "count": "Počet",
-        "link": "Link (přeloženo)"
+        "link": "Link (přeloženo)",
+        "winner": "Vítěz",
+        "challenger": "Vyzyvatel",
+        "min": "Minimum",
+        "max": "Maximum",
+        "eligibility": "Způsobilost",
+        "probability": "Pravděpodobnost",
+        "time": "Čas",
+        "options": "Volby",
+        "option": "Volba",
+        "when": "Kdy",
+        "diff": "Rozdíl",
+        "users": "Uživatelé",
+        "cooldown": "Cooldown",
+        "tickets": "Tikety",
+        "ticketsName": "Název ticketů",
+        "fromUsername": "Od uživatele",
+        "toUsername": "K uživateli",
+        "items": "Položky"
       }
     },
     "page-settings": {
@@ -287,6 +307,7 @@
       "show": "Ukázat statistiky",
       "hide": "Skrýt statistiky"
     },
+    "translations": "Vlastní překlad",
     "bot-responses": "Odpovědi bota",
     "duration": "Trvání",
     "viewers-reset-attributes": "Vymazat data",
@@ -819,8 +840,8 @@
   "title": {
     "current": "$sender, titulek streamu je '$title'.",
     "change": {
-      "success": "$sender, titulek byl nastaven na: $status",
-      "failed": "$sender, neco se pokazilo. Titulek je stale nastaveny na: $status"
+      "success": "$sender, titulek byl nastaven na: $title",
+      "failed": "$sender, neco se pokazilo. Titulek je stale nastaveny na: $title"
     }
   },
   "game": {

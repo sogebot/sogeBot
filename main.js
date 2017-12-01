@@ -21,6 +21,7 @@ const debug = require('debug')('tmijs')
 
 // bot libraries
 var Configuration = require('./libs/configuration')
+var Translate = require('./libs/translate')
 var Parser = require('./libs/parser')
 var Twitch = require('./libs/twitch')
 var Commons = require('./libs/commons')
@@ -48,7 +49,10 @@ global.twitch = new Twitch()
 global.stats = new Stats()
 global.events = new Events()
 global.permissions = new Permissions()
-global.translate = require('./libs/translate')
+
+global.lib = {}
+global.lib.translate = new Translate()
+global.translate = global.lib.translate.translate
 
 // panel
 global.logger._panel()
@@ -77,7 +81,7 @@ global.channelId = null
 
 global.client = new irc.Client(options)
 
-global.translate().then(function () {
+global.lib.translate._load().then(function () {
   global.systems = require('auto-load')('./libs/systems/')
   global.integrations = require('auto-load')('./libs/integrations/')
   global.widgets = require('auto-load')('./libs/widgets/')
