@@ -2,23 +2,25 @@
   <li class="nav-item">
     <span data-lang="viewers" class="title text-default"></span>
   </li>
-</ul>
 
-<div style="position: absolute; right: 10px; top:-10px;">
-  <ul class="paging"></ul>
-  <div class="dropdown pull-right" style="margin-top:10px;">
-    <button class="btn btn-danger dropdown-toggle" type="button" data-toggle="dropdown">
-      <span data-lang="viewers-reset-attributes"></span>
-      <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu" style="font-variant: small-caps">
-      <li>
-        <button class="dropdown-item" id="reset-points-of-all-users" data-lang="viewers-points-of-all-users"></button>
-      </li>
-    </ul>
-  </div>
-  <input type="text" class="form-control form-search" placeholder="Search by username" id="viewersSearch" onkeyup="viewers.updateSearch()">
-</div>
+  <li class="nav-item ml-auto" style="position: relative; top: -.3rem">
+    <div class="btn-group">
+        <input type="text" class="form-control form-search" style="margin:0 4px; padding: 8px 5px;" placeholder="Search by username" id="viewersSearch" onkeyup="viewers.updateSearch()">
+      <div class="dropdown">
+        <button class="btn btn-danger dropdown-toggle" type="button" style="margin:0; padding: 8px 5px;" data-toggle="dropdown">
+          <span data-lang="viewers-reset-attributes"></span>
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" style="font-variant: small-caps">
+          <li>
+            <button class="dropdown-item" id="reset-points-of-all-users" data-lang="viewers-points-of-all-users"></button>
+          </li>
+        </ul>
+      </div>
+      <ul class="paging"></ul>
+    </div>
+  </li>
+</ul>
 
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="viewers">
@@ -226,12 +228,12 @@
       paging.empty()
       _.each(list, function (v, i) {
         if (list.length < 10) {
-          paging.append('<li onclick="viewers.page(' + (i + 1) + ')" class="btn ' + (page === i + 1 ?
+          paging.append('<li style="margin:0; padding: 8px 5px;" onclick="viewers.page(' + (i + 1) + ')" class="btn ' + (page === i + 1 ?
             'btn-primary' : 'btn-default') + '">' + (i + 1) + '</li>')
         } else {
           if ((i >= page - 3 && i < page + 2) || (i > list.length - 4) || i % 10 === Math.floor(list.length /
               10) || i < 3) {
-            paging.append('<li onclick="viewers.page(' + (i + 1) + ')" class="btn ' + (page === i + 1 ?
+            paging.append('<li style="margin:0; padding: 8px 5px;" onclick="viewers.page(' + (i + 1) + ')" class="btn ' + (page === i + 1 ?
               'btn-primary' : 'btn-default') + '">' + (i + 1) + '</li>')
             if (!(i + 1 > page - 2 && i + 1 < page + 2) || !(i + 1 > list.length - 4)) {
               empty = true
@@ -243,7 +245,7 @@
         }
       })
       if (list.length === 0) {
-        paging.append('<li onclick="viewers.page(1)" class="btn btn-primary">1</li>')
+        paging.append('<li onclick="viewers.page(1)" style="margin:0; padding: 8px 5px;" class="btn btn-primary">1</li>')
       }
       return list[page - 1];
     }

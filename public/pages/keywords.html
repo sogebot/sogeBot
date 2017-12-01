@@ -1,4 +1,4 @@
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs" style="position: relative; top: 1px">
   <li class="nav-item">
     <span data-lang="keywords" class="title text-default"></span>
   </li>
@@ -10,9 +10,6 @@
   <li class="nav-item">
     <a class="nav-link active" data-toggle="tab" href="#manage" data-lang="manage"></a>
   </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#responses" data-lang="bot-responses"></a>
-  </li>
 </ul>
 
 <div class="tab-content">
@@ -22,10 +19,6 @@
         <tbody id="Keywords"></tbody>
       </table>
     </div>
-  </div>
-
-  <div role="tabpanel" class="tab-pane" id="responses">
-    <div class="widget" id="bot-responses"></div>
   </div>
 </div>
 
@@ -117,53 +110,9 @@
       }
       socket.emit('keywords.add', `${data.keyword} ${data.response}`)
       $('.new-confirm-btn').css('display', 'none')
-    },
-    responses: (id) => {
-      id = id || null
-      let system = 'keywords'
-      socket.emit('responses.get', system, function (data) {
-        for (let [key, entry] of Object.entries(data)) {
-          if (!_.isNil(id) && `${system}.${key}` !== id) continue // continue if we want only specific id
-          if (!_.isNil(id)) {
-            $(`abbr[data-id="${id}"]`).text(entry)
-            $(`abbr[data-id="${id}"]`).focus()
-            $(`abbr[data-id="${id}"]`).blur()
-            break
-          }
-          var filters = ['global']
-
-          let div = $('<div>')
-            .css('padding', '4px 5px 4px 5px')
-          let response = $('<span>')
-            .text(translations['response'])
-            .addClass('badge badge-primary badge-bot-response')
-          let kbd = $('<kbd>')
-            .text(key.replace(/-/g, ' '))
-            .addClass('kbd-bot-response')
-          let span = $('<span>').addClass('custom-response')
-            .attr('data-id', `${system}.${key}`)
-
-
-          $('#bot-responses').append(div.append(response).append(kbd).append(span))
-
-          if (_.includes(['keyword-was-not-found', 'keyword-was-edited', 'keyword-already-exist',
-              'keyword-was-added', 'keyword-was-enabled', 'keyword-was-disabled', 'keyword-was-removed'
-            ], key)) filters.push('keyword')
-          if (_.includes(['list-is-not-empty'], key)) filters.push('list')
-          if (_.includes(['keyword-was-edited'], key)) filters.push('response')
-
-          $(`[data-id="${system}.${key}"]`).html(commons.editable({
-            text: entry,
-            id: `${system}.${key}`,
-            fnc: 'commons.setResponse',
-            filters: filters
-          }))
-        }
-      })
     }
   }
 
-  keywords.responses()
   keywords.update([])
 
   socket.emit('keywords.send')

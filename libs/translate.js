@@ -4,6 +4,7 @@ var glob = require('glob')
 var fs = require('fs')
 var path = require('path')
 var _ = require('lodash')
+const flatten = require('flat')
 
 class Translate {
   constructor () {
@@ -20,6 +21,14 @@ class Translate {
         if (err) reject(err)
         for (let f of files) {
           this.translations[path.basename(f, '.json')] = JSON.parse(fs.readFileSync(f, 'utf8'))
+        }
+
+        for (let c of this.custom) {
+          if (_.isNil(flatten(this.translations[global.configuration.getValue('lang')])[c.key])) {
+            // remove if lang doesn't exist anymore
+            global.db.engine.remove('customTranslations', { key: c.key })
+            this.custom = _.remove(this.custom, (i) => i.key === c.key)
+          }
         }
         resolve()
       })
@@ -55,7 +64,7 @@ class Translate {
       } else {
         translated = text.split('.').reduce((o, i) => o[i], self.translations[global.configuration.getValue('lang')])
       }
-      _.each(translated.match(/(\{[\w-.]+\})/g), function (toTranslate) { translated = translated.replace(toTranslate, self.get(toTranslate.replace('{', '').replace('}', ''))) })
+      _.each(translated.match(/(\{[\w-.]+\})/g), function (toTranslate) { translated = translated.replace(toTranslate, self.get(toTranslate.replace('{', '').replace('}', ''), orig)) })
       return translated
     } catch (err) {
       return '{missing_translation: ' + global.configuration.getValue('lang') + '.' + text + '}'

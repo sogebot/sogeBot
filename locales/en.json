@@ -199,6 +199,7 @@
         "list": "Populated list",
         "type": "Type",
         "hours": "Hours",
+        "minutesName": "Singular or Plural of word minute",
         "minutes": "Minutes",
         "seconds": "Seconds",
         "description": "Description",
@@ -208,12 +209,31 @@
         "messages": "Messages",
         "amount": "Amount",
         "pointsName": "Points name",
+        "points": "Points",
         "rank": "Rank",
         "nextrank": "Next rank",
         "username": "Username",
         "value": "Value",
         "count": "Count",
-        "link": "Link (translated)"
+        "link": "Link (translated)",
+        "winner": "Winner",
+        "challenger": "Challenger",
+        "min": "Minimum",
+        "max": "Maximum",
+        "eligibility": "Eligibility",
+        "probability": "Probability",
+        "time": "Time",
+        "options": "Options",
+        "option": "Option",
+        "when": "When",
+        "diff": "Difference",
+        "users": "Users",
+        "cooldown": "Cooldown",
+        "tickets": "Tickets",
+        "ticketsName": "Tickets name",
+        "fromUsername": "From username",
+        "toUsername": "To username",
+        "items": "Items"
       }
     },
     "page-settings": {
@@ -820,8 +840,8 @@
   "title": {
     "current": "$sender, title of stream is '$title'.",
     "change": {
-      "success": "$sender, title was set to: $status",
-      "failed": "$sender, something went wrong. Current title is still set to: $status"
+      "success": "$sender, title was set to: $title",
+      "failed": "$sender, something went wrong. Current title is still set to: $title"
     }
   },
   "game": {
