@@ -416,9 +416,9 @@ Parser.prototype.parseMessageApi = async function (msg) {
     if (_.isNil(rData)) {
       msg = msg.replace('(api._response)', response.body.toString().replace(/^"(.*)"/, '$1'))
     } else {
-      let data = JSON.parse(response.body.toString())
+      debug('API response %s: %o', url, response.body)
       _.each(rData, function (tag) {
-        let path = data
+        let path = response.body
         let ids = tag.replace('(api.', '').replace(')', '').split('.')
         _.each(ids, function (id) {
           let isArray = id.match(/(\S+)\[(\d+)\]/i)
