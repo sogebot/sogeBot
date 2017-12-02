@@ -133,7 +133,7 @@ Events.prototype.loadSystemEvents = function (self) {
   ])
   self.events['subscription'].push([
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'sub' },
-    { system: true, name: 'log', string: '$username, method: (method)', level: 'sub' }
+    { system: true, name: 'log', string: '$username, method: $method', level: 'sub' }
   ])
   self.events['unfollow'].push([
     { system: true, name: 'log', string: '$username', level: 'unfollow' }
