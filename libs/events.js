@@ -56,12 +56,15 @@ function Events () {
       delete attr.username
     },
     'run-command': async function (attr) {
+      debug(attr)
       let command = attr.command
 
       if (_.isNil(attr.quiet)) attr.quiet = false
       _.each(attr, function (val, name) {
-        command = attr.command.replace('$' + name, val)
+        debug('replace $%s with value: %s', name, val)
+        command = command.replace('$' + name, val)
       })
+      debug(command)
       command = await global.parser.parseMessage(command)
       global.parser.parseCommands((attr.quiet) ? null : { username: global.parser.getOwner() }, command)
     },
