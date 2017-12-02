@@ -762,7 +762,6 @@ abbr {
 abbr[data-original-title], abbr[title] {
   text-decoration: none;
   line-height: 25px;
-  display: flex;
   padding: 5px;
   border: 1px solid $gray-300;
   border-radius: 5px !important;
@@ -919,7 +918,7 @@ li a.active .deleteTab {
   border-top: 1px dotted $gray-200;
   padding: 0 10px 5px 10px;
   background-color: $white;
-  margin-top: 30px;
+  margin-top: 5px;
   margin-left: -7px;
   position: absolute;
 
