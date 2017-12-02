@@ -40,7 +40,7 @@
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "safe-eval": "^0.3.0",
-    "snekfetch": "3.5.8",
+    "snekfetch": "3.6.0",
     "socket.io": "^2.0.4",
     "tmi.js": "^1.2.1",
     "twitch-emoticons": "git+https://github.com/sogehige/twitch-emoticons.git#v3api",
