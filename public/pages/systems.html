@@ -276,30 +276,11 @@
       <div class="col">
         <input id="atUsernameToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
       </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong>
-          <span data-lang="uptime"></span>
-          <span data-lang="format"></span>
-        </strong>
-        <small style="font-size: 60%">
-          <strong>
-            <span data-lang="available"></span>:</strong> $days, $hours, $minutes, $seconds</small>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="uptimeFormat" onclick="commons.configEditable(this, '')" id="configUptimeFormat"></abbr>
-        <div class="input-group" style="display:none;" id="input_uptimeFormat_group">
-          <div class="input-group-addon" data-lang="string"></div>
-          <input id="input_uptimeFormat" class="form-control input-sm" type="text" />
-        </div>
-      </div>
     </div>
   </div>
 </div>
 
 <script>
-  console.log(systems)
   if (!systems.points) $("#points-tab-link").css('display', 'none')
   if (!systems.songs) $("#songs-tab-link").css('display', 'none')
   if (!systems.cooldown) $(".systems-cooldown-only").css('display', 'none')
@@ -310,8 +291,6 @@
   socket.emit('getConfiguration')
 
   socket.once('configuration', function (data) {
-    $("#configUptimeFormat").text(data.uptimeFormat)
-
     $("#configSeppukuTimeout").text(data.seppukuTimeout + 's')
     $("#configRouletteTimeout").text(data.rouletteTimeout + 's')
     $("#configFightmeTimeout").text(data.fightmeTimeout + 's')

@@ -245,7 +245,6 @@ function Twitch () {
 
   global.parser.registerParser(this, 'lastseen', this.lastseenUpdate, constants.VIEWERS)
 
-  global.configuration.register('uptimeFormat', 'core.settings.uptime-format', 'string', '$days$hours$minutes$seconds')
   global.configuration.register('sendWithMe', 'core.settings.sendWithMe', 'bool', false)
 
   this.webPanel()
@@ -352,12 +351,11 @@ Twitch.prototype.getTime = function (time, isChat) {
 
 Twitch.prototype.uptime = function (self, sender) {
   const time = self.getTime(self.isOnline ? self.when.online : self.when.offline, true)
-  global.commons.sendMessage(global.translate(self.isOnline ? 'core.online' : 'core.offline')
-    .replace(/\$time/g, global.configuration.getValue('uptimeFormat')
+  global.commons.sendMessage(global.translate(self.isOnline ? 'uptime.online' : 'uptime.offline')
     .replace(/\$days/g, time.days)
     .replace(/\$hours/g, time.hours)
     .replace(/\$minutes/g, time.minutes)
-    .replace(/\$seconds/g, time.seconds)), sender)
+    .replace(/\$seconds/g, time.seconds), sender)
 }
 
 Twitch.prototype.lastseenUpdate = async function (self, id, sender, text) {

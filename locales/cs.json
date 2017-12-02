@@ -4,8 +4,6 @@
     "enabled": "zapnuto",
     "disabled": "vypnuto",
     "usage": "Pouziti",
-    "online": "Stream je online $time",
-    "offline": "Stream je offline $time",
     "lang-selected": "Bot je nyni prepnuty do cestiny",
     "command-parse": "Promin, $sender, ale tento prikaz neni spravne, pouzij",
     "error": "Promin, $sender, ale neco se pokazilo!",
@@ -170,6 +168,10 @@
     "links": "odkaz|4:odkazy|odkazu",
     "isRegistered": "$sender, nelze pouzit $keyword, protoze je uz prirazena k jine akci!"
   },
+  "uptime": {
+    "online": "Stream je online $days $hours $minutes $seconds",
+    "offline": "Stream je offline $days $hours $minutes $seconds"
+  },
   "overlay": {
     "emotes": {
       "settings": {
@@ -198,6 +200,7 @@
         "response": "Odpověď",
         "list": "Zaplněný seznam",
         "type": "Typ",
+        "days": "Dny",
         "hours": "Hodiny",
         "minutesName": "Skloňování slova minuta (1 minuta, 2 minuty)",
         "minutes": "Minuty",

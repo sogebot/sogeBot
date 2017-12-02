@@ -95,7 +95,7 @@
               local.push(`<span class="editable-variable editable-variable-click block" data-var="${f}" data-lang="responses.variable.${f}"></span>`)
             }
           }
-
+          
           let o = $(
             `<tr>
               <td style="cursor: default">${key}</td>
@@ -127,7 +127,7 @@
                   <span class="filters d-none">
                     <div class="text-primary" style="font-weight: bold">Local variables:</div>
                     <div style="display: flex; flex-wrap: wrap;">
-                      ${local.join()}
+                      ${local.join('')}
                     </div>
                   </span>
                 ` : ``}
