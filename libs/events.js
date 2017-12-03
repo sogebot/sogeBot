@@ -3,6 +3,7 @@
 var moment = require('moment')
 var _ = require('lodash')
 const debug = require('debug')('events')
+const config = require('../config.json')
 
 function Events () {
   this.events = {
@@ -82,7 +83,7 @@ function Events () {
     },
     'start-commercial': function (attr) {
       // attr.duration - duration of commercial
-      global.client.commercial(global.configuration.get().twitch.channel, attr.duration)
+      global.client.commercial(config.settings.broadcaster_username, attr.duration)
     },
     'log': function (attr) {
       let string = attr.string.replace(/\$username/g, attr.username)
