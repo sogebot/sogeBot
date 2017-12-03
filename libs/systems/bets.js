@@ -53,7 +53,7 @@ Bets.prototype.open = function (self, sender, text) {
 
     self.bet = {locked: false, bets: {}}
     _.each(parsed, function (option) { self.bet.bets[option] = {} })
-    global.commons.sendMessage(global.translate('bets.opened', {username: global.configuration.get().twitch.channel})
+    global.commons.sendMessage(global.translate('bets.opened', {username: global.parser.getOwner()})
       .replace(/\$options/g, Object.keys(self.bet.bets).join(' | '))
       .replace(/\$minutes/g, global.configuration.getValue('betCloseTimer')), sender)
 
@@ -64,7 +64,7 @@ Bets.prototype.open = function (self, sender, text) {
       self.bet.locked = true
       self.bet.count = 0
       _.each(self.bet.bets, function (bet) { self.bet.count += _.size(bet) })
-      if (self.bet.count > 0) global.commons.sendMessage(global.translate('bets.locked'), {username: global.configuration.get().twitch.channel})
+      if (self.bet.count > 0) global.commons.sendMessage(global.translate('bets.locked'), {username: global.parser.getOwner()})
       else {
         global.commons.sendMessage(global.translate('bets.removed'), sender)
         self.bet = null
