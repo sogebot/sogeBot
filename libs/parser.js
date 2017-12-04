@@ -6,6 +6,7 @@ var _ = require('lodash')
 var mathjs = require('mathjs')
 const snekfetch = require('snekfetch')
 const safeEval = require('safe-eval')
+const decode = require('decode-html')
 
 const config = require('../config.json')
 const debug = require('debug')('parser')
@@ -514,7 +515,7 @@ Parser.prototype.parseMessageEval = async function (filters, msg) {
       for (var bkey in rMessage) {
         let newString = await fnc(rMessage[bkey])
         if (_.isUndefined(newString) || newString.length === 0) msg = ''
-        msg = msg.replace(rMessage[bkey], newString).trim()
+        msg = msg.replace(rMessage[bkey], decode(newString)).trim()
       }
     }
   }
