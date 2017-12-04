@@ -169,8 +169,8 @@
     "isRegistered": "$sender, nelze pouzit $keyword, protoze je uz prirazena k jine akci!"
   },
   "uptime": {
-    "online": "Stream je online $days $hours $minutes $seconds",
-    "offline": "Stream je offline $days $hours $minutes $seconds"
+    "online": "Stream je online (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
+    "offline": "Stream je offline (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
   "overlay": {
     "emotes": {

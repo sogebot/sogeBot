@@ -332,10 +332,10 @@ Twitch.prototype.getTime = function (time, isChat) {
   var now, days, hours, minutes, seconds
   now = _.isNull(time) || !time ? {days: 0, hours: 0, minutes: 0, seconds: 0} : moment().preciseDiff(time, true)
   if (isChat) {
-    days = now.days > 0 ? now.days + 'd' : ''
-    hours = now.hours > 0 ? now.hours + 'h' : ''
-    minutes = now.minutes > 0 ? now.minutes + 'm' : ''
-    seconds = now.seconds > 0 ? now.seconds + 's' : ''
+    days = now.days > 0 ? now.days : ''
+    hours = now.hours > 0 ? now.hours : ''
+    minutes = now.minutes > 0 ? now.minutes : ''
+    seconds = now.seconds > 0 ? now.seconds : ''
     return { days: days,
       hours: hours,
       minutes: minutes,

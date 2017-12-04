@@ -385,8 +385,27 @@ Parser.prototype.parseMessage = async function (message, attr) {
       ))
     }
   }
+  let ifp = {
+    '(if#)': async function (filter) {
+      // (if $days>2|More than 2 days|Less than 2 days)
+      try {
+        let toEvaluate = filter.replace('(if ', '').slice(0, -1)
+        let [check, ifTrue, ifFalse] = toEvaluate.split('|')
+        check = check.startsWith('>') || check.startsWith('<') || check.startsWith('=') ? false : check // force check to false if starts with comparation
+
+        debug(toEvaluate, check, safeEval(check), ifTrue, ifFalse)
+        if (_.isNil(ifTrue)) return
+        if (safeEval(check)) return ifTrue
+        return _.isNil(ifFalse) ? '' : ifFalse
+      } catch (e) {
+        debug(e)
+        return ''
+      }
+    }
+  }
 
   let msg = await this.parseMessageEval(evaluate, message)
+  msg = await this.parseMessageEach(ifp, msg, false)
   msg = await this.parseMessageOnline(online, msg)
   msg = await this.parseMessageCommand(command, msg)
   msg = await this.parseMessageEach(random, msg)
@@ -502,7 +521,9 @@ Parser.prototype.parseMessageEval = async function (filters, msg) {
   return msg
 }
 
-Parser.prototype.parseMessageEach = async function (filters, msg) {
+Parser.prototype.parseMessageEach = async function (filters, msg, removeWhenEmpty) {
+  if (_.isNil(removeWhenEmpty)) removeWhenEmpty = true
+
   if (msg.length === 0) return msg
   for (var key in filters) {
     if (!filters.hasOwnProperty(key)) continue
@@ -516,7 +537,7 @@ Parser.prototype.parseMessageEach = async function (filters, msg) {
     if (!_.isNull(rMessage)) {
       for (var bkey in rMessage) {
         let newString = await fnc(rMessage[bkey])
-        if (_.isUndefined(newString) || newString.length === 0) msg = ''
+        if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) msg = ''
         msg = msg.replace(rMessage[bkey], newString).trim()
       }
     }
