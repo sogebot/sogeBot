@@ -386,7 +386,8 @@ Parser.prototype.parseMessage = async function (message, attr) {
     }
   }
 
-  let msg = await this.parseMessageOnline(online, message)
+  let msg = await this.parseMessageEval(evaluate, message)
+  msg = await this.parseMessageOnline(online, msg)
   msg = await this.parseMessageCommand(command, msg)
   msg = await this.parseMessageEach(random, msg)
   msg = await this.parseMessageEach(price, msg)
@@ -395,7 +396,6 @@ Parser.prototype.parseMessage = async function (message, attr) {
   msg = await this.parseMessageEach(info, msg)
   msg = await this.parseMessageEach(list, msg)
   msg = await this.parseMessageEach(math, msg)
-  msg = await this.parseMessageEval(evaluate, msg)
   msg = await this.parseMessageApi(msg)
   return msg
 }
