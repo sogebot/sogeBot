@@ -39,7 +39,7 @@ Permissions.prototype.removePermission = function (self, command) {
 
 Permissions.prototype.overridePermission = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(viewer|mods|owner|regular|disable) ([\u0500-\u052F\u0400-\u04FF\w].+)$/)
+    var parsed = text.match(/^(viewer|mods|owner|regular|disable) ([\u0500-\u052F\u0400-\u04FF\w].*)$/)
     var command = parsed[2]
     var permission
     switch (parsed[1]) {
