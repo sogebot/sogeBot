@@ -302,11 +302,12 @@ Parser.prototype.parseMessage = async function (message, attr) {
   }
   let command = {
     '(!#)': async function (filter) {
+      if (!_.isString(attr.sender)) attr.sender = attr.sender.username
       let cmd = filter.replace('(', '')
       .replace(')', '')
       .replace('.', ' ')
-      .replace('sender', attr.sender.username)
-      global.parser.parse({ username: attr.sender.username }, cmd, true)
+      .replace('sender', attr.sender)
+      global.parser.parse({ username: attr.sender }, cmd, true)
       return ''
     }
   }
