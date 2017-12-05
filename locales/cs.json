@@ -907,11 +907,11 @@
       "winner": "Gratulace $winner! Je poslednim prezivsim a ziskal $points $pointsName ($probability% se sazkou $tickets $ticketsName)!!"
     },
     "roulette": {
-      "trigger": "$sender stiskl spoust",
-      "alive": "a nic se nestalo",
-      "dead": "a kulka rozmaznula jeho mozek po zdi",
-      "mod": "a vubec se netrefil!",
-      "broadcaster": "a pouzil slepe!",
+      "trigger": "$sender pokousi svuj osud a stiskl spoust",
+      "alive": "$sender je nazivu! Vubec nic se nestalo.",
+      "dead": "$sender, tvuj mozek se shledal s kulkou, ktera ho rozmaznula po zdi! ",
+      "mod": "$sender je nesika, vubec svou hlavu netrefil!",
+      "broadcaster": "$sender pouzil slepe, buu!",
       "timeout": "Roulette timeout nastaven na $values"
     },
     "seppuku": {

@@ -907,11 +907,11 @@
       "winner": "Congratulations to $winner! He is last man standing and he won $points $pointsName ($probability% with bet of $tickets $ticketsName)!"
     },
     "roulette": {
-      "trigger": "$sender pulled a trigger",
-      "alive": "and nothing happened",
-      "dead": "and bullet splashed his brain on the wall",
-      "mod": "and he completely missed!",
-      "broadcaster": "and he is using blanks!",
+      "trigger": "$sender is trying his luck and pulled a trigger",
+      "alive": "$sender is alive! Nothing happened.",
+      "dead": "$sender's brain was splashed on the wall!",
+      "mod": "$sender is incompement and completely missed his head!",
+      "broadcaster": "$sender is using blanks, boo!",
       "timeout": "Roulette timeout set to $values"
     },
     "seppuku": {

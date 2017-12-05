@@ -184,24 +184,25 @@ Gambling.prototype.roulette = async function (self, sender) {
   sender['message-type'] = 'chat' // force responses to chat
 
   let isAlive = _.random(0, 1, false)
-  let message = [
-    global.translate('gambling.roulette.trigger'),
-    isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead')
-  ]
   const isMod = await global.parser.isMod(sender)
 
+  global.commons.sendMessage(global.translate('gambling.roulette.trigger'), sender)
   if (global.parser.isBroadcaster(sender)) {
-    global.commons.sendMessage(global.translate('gambling.roulette.trigger') + ' ' + global.translate('gambling.roulette.broadcaster'), sender)
+    setTimeout(() => global.commons.sendMessage(global.translate('gambling.roulette.broadcaster'), sender), 2000)
     return
   }
 
   if (isMod) {
-    global.commons.sendMessage(global.translate('gambling.roulette.trigger') + ' ' + global.translate('gambling.roulette.mod'), sender)
+    setTimeout(() => global.commons.sendMessage(global.translate('gambling.roulette.mod'), sender), 2000)
     return
   }
 
-  if (!isAlive) global.client.timeout(config.settings.broadcaster_username, sender.username, global.configuration.getValue('rouletteTimeout'))
-  global.commons.sendMessage(message.join(' '), sender)
+  if (!isAlive) {
+    setTimeout(() => {
+      global.client.timeout(config.settings.broadcaster_username, sender.username, global.configuration.getValue('rouletteTimeout'))
+      global.commons.sendMessage(isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead'), sender)
+    }, 2000)
+  }
 }
 
 Gambling.prototype.seppuku = async function (self, sender) {
