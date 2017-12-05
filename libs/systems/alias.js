@@ -44,7 +44,9 @@ class Alias {
   async register (self) {
     let aliases = await global.db.engine.find('alias')
     for (let alias of aliases) {
-      global.parser.register(self, '!' + alias.alias, self.run, constants.VIEWERS)
+      // check permission of command
+      let permission = global.parser.isRegistered(`!${alias.command}`) ? global.parser.permissionsCmds[`!${alias.command}`] : constants.VIEWERS
+      global.parser.register(self, '!' + alias.alias, self.run, permission)
     }
   }
 
