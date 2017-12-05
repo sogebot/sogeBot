@@ -340,6 +340,12 @@ span.title.title-part.text-default + div.widget {
   height: 315px;
 }
 
+#yt-song-requests {
+  max-height: 300px !important;
+  text-overflow: clip;
+  overflow: overlay;
+}
+
 #YTPlayer {
   display: block;
   position: absolute;
