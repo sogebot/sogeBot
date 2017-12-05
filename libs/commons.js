@@ -3,6 +3,7 @@
 var _ = require('lodash')
 var chalk = require('chalk')
 const debug = require('debug')('commons')
+const decode = require('decode-html')
 
 const config = require('../config.json')
 
@@ -66,6 +67,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
   if (_.isNil(sender) || _.isNil(sender.username)) sender = null
   attr.sender = sender
   message = await global.parser.parseMessage(message, attr)
+  message = decode(message)
   if (message === '') return false // if message is empty, don't send anything
   if (config.debug.all || config.debug.console) {
     if (_.isUndefined(sender) || _.isNull(sender)) sender = { username: null }
