@@ -1,200 +1,244 @@
-<ul class="nav nav-tabs" style="position: relative; top: 1px">
-    <li>
-      <span data-lang="timers" class="title text-default"></span>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link btn-outline-success plus-button" onclick="timers.new()">
-        <i class="fa fa-plus" aria-hidden="true"></i>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link active" data-toggle="tab" href="#manage" data-lang="manage"></a>
-    </li>
-  </ul>
+<ul class="nav nav-tabs" id="timers-tab" style="position: relative; top: 1px">
+  <li>
+    <span data-lang="timers" class="title text-default"></span>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link btn-outline-success plus-button" onclick="timers.new()">
+      <i class="fa fa-plus" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#manage" data-lang="manage"></a>
+  </li>
+</ul>
 
 <div class="tab-content tab-content-timers">
-  <div role="tabpanel" class="tab-pane active" id="manage">
-      <div class="widget">
-        <table class="table table-striped">
-          <tbody id="timers"></tbody>
-        </table>
-      </div>
-  </div>
+<div role="tabpanel" class="tab-pane active" id="manage">
+    <div class="widget">
+      <table class="table table-striped">
+        <tbody id="timers"></tbody>
+      </table>
+    </div>
 </div>
 
 <script>
-  var timers = {
-    new: () => {
-      // get opened tab
-      let id = $("ul#timers-tab li a.active").attr('href')
-      $(`${id}_new`).css('display', 'table-row')
-      $('.new-confirm-btn').css('display', 'block')
+var timers = {
+  new: () => {
+    // get opened tab
+    let id = $("ul#timers-tab li a.active").attr('href')
+    $(`${id}_new`).css('display', 'table-row')
+    $('.new-confirm-btn').css('display', 'block')
 
-    },
-    addTab: (name) => {
-      let li = $(`<li id="${name}_tab" class="nav-item"><a class="nav-link withDelete" data-toggle="tab" href="#${name}_content" style="display: inline-block;">${name} <span class="deleteTab" onclick="timers.deleteTimer(this)" data-id="${name}"><i class="fa fa-times" aria-hidden="true"></i></span></a> </li>`)
-      if ($(`#${name}_tab`).length === 0) $('#timers-tab li:eq(2)').after(li)
-      li.on('click', () => $('.plus-button').prop('disabled', false))
-    },
-    addRow: (timer, responses) => {
-      $("#timers").append('<tr class="page-data-row">' +
-          '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">' + translations['name'] + '</span>' +
-          '<span style="cursor: pointer;" class="badge badge-' + (timer.enabled ? "success" : "danger") +
-          '" data-id="' + timer.name + '" onclick="timers.toggle(this)">' + (timer.enabled ? translations['enabled'] :
-          translations['disabled']) + '</span>' +
-          commons.editable({ text: timer.name, id: timer.name, fnc: 'timers.editName' }) + '</td>' +
-          '<td style="vertical-align: top !important;"><span class="badge badge-user">' + translations['num-of-responses'] + '</span><strong style="display: block; padding: 8px">' +
-            `⚫ ${responses.enabled} ⚪ ${responses.disabled}</strong></td>` +
-          '</td>' +
-          '<td style="vertical-align: top !important;width: 20rem; max-width: 20rem;"><span class="badge badge-primary">' + translations['messages'] + '</span> ' +
-            commons.editable({ text: timer.messages, id: timer.name, fnc: 'timers.editMessages', options: { seconds: timer.seconds }}) + '</td>' +
-          '</td>' +
-          '<td style="vertical-align: top !important;width: 20rem; max-width: 20rem;"><span class="badge badge-primary">' + translations['seconds'] + '</span> ' +
-            commons.editable({ text: timer.seconds, id: timer.name, fnc: 'timers.editSeconds', options: { messages: timer.messages }}) + '</td>' +
-          '<span style="cursor: not-allowed; float:right; padding: 4px;" class="badge badge-danger btn-remove" data-id="' +
-          timer.name + '"  onclick="commons.confirm(this)">' + translations['delete'] + '</span>' +
-          '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="badge badge-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
-          '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="badge badge-success btn-confirm" onclick="timers.unset(this)" data-id="' +
-          timer.name + '">confirm</span>' +
-          '</td>' +
-          '</tr>');
-    },
-    addTabPane: (name, responses) => {
-      let content = `<div role="tabpanel" class="tab-pane" id="${name}_content">` +
-          '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">' +
-            '<div class="widget">' +
-              '<table class="table table-striped">' +
-                '<tbody>'
-      content += '<tr id="' + name + '_content_new" style="display:none">' +
-        '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">' + translations['response'] + '</span>' + commons.editable({ text: '', id: name + '_new!', fnc: 'commons.stub' }) +
-        '<div class="btn-group pull-right">' +
-          '<button class="save-button btn btn-success new-confirm-btn" style="display:none" data-id="' + name + '" onclick="timers.addResponse(event)">SAVE</button>' +
-          '<button class="btn btn-warning new-confirm-btn" style="display:none" onclick="timers.cancel()">CANCEL</button>' +
-        '</div>' +
+  },
+  addTab: (name) => {
+    let li = $(`<li id="${name}_tab" class="nav-item"><a class="nav-link withDelete" data-toggle="tab" href="#${name}_content" style="display: inline-block;">${name} <span class="deleteTab" onclick="timers.deleteTimer(this)" data-id="${name}"><i class="fa fa-times" aria-hidden="true"></i></span></a> </li>`)
+    if ($(`#${name}_tab`).length === 0) $('#timers-tab li:eq(2)').after(li)
+    li.on('click', () => $('.plus-button').prop('disabled', false))
+  },
+  addRow: (timer, responses) => {
+    $("#timers").append('<tr class="page-data-row">' +
+        '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">' + translations['name'] + '</span>' +
+        '<span style="cursor: pointer;" class="badge badge-' + (timer.enabled ? "success" : "danger") +
+        '" data-id="' + timer.name + '" onclick="timers.toggle(this)">' + (timer.enabled ? translations['enabled'] :
+        translations['disabled']) + '</span>' +
+        commons.editable({ text: timer.name, id: timer.name, fnc: 'timers.editName' }) + '</td>' +
+        '<td style="vertical-align: top !important;"><span class="badge badge-user">' + translations['num-of-responses'] + '</span><strong style="display: block; padding: 8px">' +
+          `⚫ ${responses.enabled} ⚪ ${responses.disabled}</strong></td>` +
         '</td>' +
-        '</tr>'
-      for (let response of responses) {
-        content += '<tr class="page-data-row">' +
-          '<td style="vertical-align: top !important;"><span class="badge badge-primary">' + translations['response'] + '</span> ' +
-          '<span style="cursor: pointer;" class="badge badge-' + (response.enabled ? "success" : "danger") +
-          '" data-id="' + response._id + '" onclick="timers.toggleResponse(this)">' + (response.enabled ? translations['enabled'] :
-          translations['disabled']) + '</span>' +
-          '<span style="cursor: not-allowed; float:right; padding: 4px;" class="badge badge-danger btn-remove" data-id="' +
-          response._id + '"  onclick="commons.confirm(this)">' + translations['delete'] + '</span>' +
-          '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="badge badge-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
-          '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="badge badge-success btn-confirm" onclick="timers.deleteResponse(this)" data-id="' +
-          response._id + '">confirm</span>' +
-          commons.editable({
-            text: response.response,
-            id: response._id,
-            fnc: 'timers.editResponse',
-            filters: ['global']
-          }) +
-          '</td></tr>'
-      }
-
-      content += '</tbody>' +
-              '</table>' +
-            '</div>' +
-          '</div>' +
-        '</div>'
-
-      $('.tab-content-timers').append(content)
-    },
-    toggle: (el) => {
-      socket.emit('timers.toggle', `-name ${el.dataset.id}`)
-    },
-    addResponse: (event,) => {
-      event.preventDefault()
-
-      var inputs = $('[data-id="' + event.currentTarget.dataset.id + '_new!"]')
-      if ($(inputs[0]).text().length === 0) return false
-      var data = {
-        name: event.currentTarget.dataset.id,
-        text: $(inputs[0]).text()
-      }
-      socket.emit('timers.add', `-name ${data.name} -response '${data.text}'`)
-      $('.new-confirm-btn').css('display', 'none')
-    },
-    toggleResponse: (el) => {
-      socket.emit('timers.toggle', `-id ${el.dataset.id}`)
-    },
-    editResponse: (id, val) => {
-      socket.emit('timers.editResponse', {id: id, value: val})
-    },
-    deleteResponse: (el) => {
-      socket.emit('timers.rm', `-id ${el.dataset.id}`)
-    },
-    deleteTimer: (el) => {
-      socket.emit('timers.unset', `-name ${el.dataset.id}`)
-      $(`#${el.dataset.id}_tab`).remove()
-    },
-    editName: (id, val) => {
-      $("li#" + id + "_tab").remove()
-      socket.emit('timers.editName', { id: id, value: val.replace(/ /g, '_') })
-    },
-    editSeconds: (id, val, opts) => {
-      let messages = opts.messages
-      socket.emit('timers.set', `-name ${id} -seconds ${val} -messages ${messages}`)
-    },
-    editMessages: (id, val, opts) => {
-      let seconds = opts.seconds
-      socket.emit('timers.set', `-name ${id} -seconds ${seconds} -messages ${val}`)
-    },
-    set: (event) => {
-      event.preventDefault()
-      var inputs = $('[data-id="_new!"]')
-
-      if ($(inputs[0]).text().length === 0) return false
-      var data = {
-        name: $(inputs[0]).text(),
-        messages: $(inputs[1]).text().length !== 0 ? $(inputs[1]).text() : 0,
-        seconds: $(inputs[2]).text().length !== 0 ? $(inputs[2]).text() : 0
-      }
-      socket.emit('timers.set', `-name ${data.name} -messages ${data.messages} -seconds ${data.seconds}`)
-      $('.new-confirm-btn').css('display', 'none')
-    },
-    cancel: (event) =>  {
-      $("[id$='_new']").css('display', 'none')
-      $('.new-confirm-btn').css('display', 'none')
-    }
-  }
-
-  socket.emit('timers.send')
-  socket.on('timers', (data) => {
-    $("#timers").empty()
-    $("#timers-tabs-pane").empty()
-    $(".tab-content [id$='_content']").remove()
-
-    $("#timers").append('<tr id="manage_new" style="display:none">' +
-        '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">Name</span>' + commons.editable({ text: '', id: '_new!', fnc: 'commons.stub' }) + '</td>' +
-        '<td colspan=2 style="vertical-align: top !important;"><span class="badge badge-primary">Messages</span> ' +
-          commons.editable({ text: '0', id: '_new!', fnc: 'commons.stub' }) +
-        '</td><td style="vertical-align: top !important;"><span class="badge badge-primary">Seconds</span> ' +
-          commons.editable({ text: '60', id: '_new!', fnc: 'commons.stub' }) +
-        '<div class="btn-group pull-right">' +
-          '<button class="save-button btn btn-success new-confirm-btn" style="display:none" onclick="timers.set(event)">SAVE</button>' +
-          '<button class="btn btn-warning new-confirm-btn" style="display:none" onclick="timers.cancel()">CANCEL</button>' +
-        '</div>' +
+        '<td style="vertical-align: top !important;width: 20rem; max-width: 20rem;"><span class="badge badge-primary">' + translations['messages'] + '</span> ' +
+          commons.editable({ text: timer.messages, id: timer.name, fnc: 'timers.editMessages', options: { seconds: timer.seconds }}) + '</td>' +
+        '</td>' +
+        '<td style="vertical-align: top !important;width: 20rem; max-width: 20rem;"><span class="badge badge-primary">' + translations['seconds'] + '</span> ' +
+          commons.editable({ text: timer.seconds, id: timer.name, fnc: 'timers.editSeconds', options: { messages: timer.messages }}) + '</td>' +
+        '<span style="cursor: not-allowed; float:right; padding: 4px;" class="badge badge-danger btn-remove" data-id="' +
+        timer.name + '"  onclick="commons.confirm(this)">' + translations['delete'] + '</span>' +
+        '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="badge badge-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
+        '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="badge badge-success btn-confirm" onclick="timers.unset(this)" data-id="' +
+        timer.name + '">confirm</span>' +
         '</td>' +
         '</tr>');
+  },
+  addTabPane: (name, responses) => {
+    let content = `<div role="tabpanel" class="tab-pane" id="${name}_content">` +
+        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">' +
+          '<div class="widget">' +
+            '<table class="table table-striped">' +
+              '<tbody>'
+    content += '<tr id="' + name + '_content_new" style="display:none">' +
+      '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">' + translations['response'] + '</span>' + commons.editable({ text: '', id: name + '_new!', fnc: 'commons.stub' }) +
+      '<div class="btn-group pull-right">' +
+        '<button class="save-button btn btn-success new-confirm-btn" style="display:none" data-id="' + name + '" onclick="timers.addResponse(event)">SAVE</button>' +
+        '<button class="btn btn-warning new-confirm-btn" style="display:none" onclick="timers.cancel()">CANCEL</button>' +
+      '</div>' +
+      '</td>' +
+      '</tr>'
+    for (let response of responses) {
+      content += '<tr class="page-data-row">' +
+        '<td style="vertical-align: top !important;"><span class="badge badge-primary">' + translations['response'] + '</span> ' +
+        '<span style="cursor: pointer;" class="badge badge-' + (response.enabled ? "success" : "danger") +
+        '" data-id="' + response._id + '" onclick="timers.toggleResponse(this)">' + (response.enabled ? translations['enabled'] :
+        translations['disabled']) + '</span>' +
+        '<span style="cursor: not-allowed; float:right; padding: 4px;" class="badge badge-danger btn-remove" data-id="' +
+        response._id + '"  onclick="commons.confirm(this)">' + translations['delete'] + '</span>' +
+        '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="badge badge-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
+        '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="badge badge-success btn-confirm" onclick="timers.deleteResponse(this)" data-id="' +
+        response._id + '">confirm</span>' +
+        commons.editable({
+          text: response.response,
+          id: response._id,
+          fnc: 'timers.editResponse',
+          filters: ['global']
+        }) +
+        '</td></tr>'
+    }
 
-    for (let timer of data.timers) {
-      timers.addRow(timer, {
-        _total: _.filter(data.responses, (o) => o.timerId === timer._id).length,
-        enabled: _.filter(data.responses, (o) => o.timerId === timer._id && o.enabled).length,
-        disabled: _.filter(data.responses, (o) => o.timerId === timer._id && !o.enabled).length
+    content += '</tbody>' +
+            '</table>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+
+    $('.tab-content-timers').append(content)
+  },
+  toggle: (el) => {
+    socket.emit('timers.toggle', `-name ${el.dataset.id}`)
+  },
+  addResponse: (event,) => {
+    event.preventDefault()
+
+    var inputs = $('[data-id="' + event.currentTarget.dataset.id + '_new!"]')
+    if ($(inputs[0]).text().length === 0) return false
+    var data = {
+      name: event.currentTarget.dataset.id,
+      text: $(inputs[0]).text()
+    }
+    socket.emit('timers.add', `-name ${data.name} -response '${data.text}'`)
+    $('.new-confirm-btn').css('display', 'none')
+  },
+  toggleResponse: (el) => {
+    socket.emit('timers.toggle', `-id ${el.dataset.id}`)
+  },
+  editResponse: (id, val) => {
+    socket.emit('timers.editResponse', {id: id, value: val})
+  },
+  deleteResponse: (el) => {
+    socket.emit('timers.rm', `-id ${el.dataset.id}`)
+  },
+  deleteTimer: (el) => {
+    socket.emit('timers.unset', `-name ${el.dataset.id}`)
+    $(`#${el.dataset.id}_tab`).remove()
+  },
+  editName: (id, val) => {
+    $("li#" + id + "_tab").remove()
+    socket.emit('timers.editName', { id: id, value: val.replace(/ /g, '_') })
+  },
+  editSeconds: (id, val, opts) => {
+    let messages = opts.messages
+    socket.emit('timers.set', `-name ${id} -seconds ${val} -messages ${messages}`)
+  },
+  editMessages: (id, val, opts) => {
+    let seconds = opts.seconds
+    socket.emit('timers.set', `-name ${id} -seconds ${seconds} -messages ${val}`)
+  },
+  set: (event) => {
+    event.preventDefault()
+    var inputs = $('[data-id="_new!"]')
+
+    if ($(inputs[0]).text().length === 0) return false
+    var data = {
+      name: $(inputs[0]).text(),
+      messages: $(inputs[1]).text().length !== 0 ? $(inputs[1]).text() : 0,
+      seconds: $(inputs[2]).text().length !== 0 ? $(inputs[2]).text() : 0
+    }
+    socket.emit('timers.set', `-name ${data.name} -messages ${data.messages} -seconds ${data.seconds}`)
+    $('.new-confirm-btn').css('display', 'none')
+  },
+  cancel: (event) =>  {
+    $("[id$='_new']").css('display', 'none')
+    $('.new-confirm-btn').css('display', 'none')
+  },
+  responses: (id) => {
+      id = id || null
+      socket.emit('responses.get', 'timers', function (data) {
+        for (let [key, entry] of Object.entries(data)) {
+        if (!_.isNil(id) && `${system}.${key}` !== id) continue // continue if we want only specific id
+        if (!_.isNil(id)) {
+          $(`abbr[data-id="${id}"]`).text(entry)
+          $(`abbr[data-id="${id}"]`).focus()
+          $(`abbr[data-id="${id}"]`).blur()
+          break
+        }
+          var filters = ['global']
+
+          let div = $('<div>')
+            .css('margin', '5px')
+          let response = $('<span>')
+            .text(translations['response'])
+            .addClass('badge badge-primary badge-bot-response')
+          let kbd = $('<kbd>')
+            .text(key.replace(/-/g, ' '))
+            .addClass('kbd-bot-response')
+          let span = $('<span>').addClass('custom-response')
+            .attr('data-id', `timers.${key}`)
+
+
+          $('#bot-responses').append(div.append(response).append(kbd).append(span))
+
+          if (_.includes(['timer-was-set', 'timer-not-found', 'timer-deleted', 'timer-enabled', 'timer-disabled', 'responses-list', 'response-was-added'], key)) filters.push('name')
+          if (_.includes(['response-was-added', 'response-deleted', 'response-not-found', 'response-enabled', 'response-disabled'], key)) filters.push('id')
+          if (key === 'timer-was-set') filters.push('messages', 'seconds')
+          if (key === 'timers-list') filters.push('list')
+          if (key === 'response-was-added') filters.push('response')
+
+          key = 'timers.' + key
+          $('[data-id="' + key + '"]').html(commons.editable({
+            text: entry,
+            id: key,
+            fnc: 'commons.setResponse',
+            filters: filters
+          }))
+        }
       })
-      timers.addTabPane(timer.name, _.filter(data.responses, (o) => o.timerId === timer._id))
-      timers.addTab(timer.name)
     }
+}
 
-    // reshow tab
-    let id = $("ul#timers-tab li a.active").attr('href')
-    if (id !== '#manage' && id !== '#responses') {
-      $('a[href="#manage"]').tab('show'); // this is needed to properly refocus tab
-      $(`a[href="${id}"]`).tab('show');
-      $('.plus-button').prop('disabled', false)
-    }
-  })
+timers.responses()
+
+socket.emit('timers.send')
+socket.on('timers', (data) => {
+  $("#timers").empty()
+  $("#timers-tabs-pane").empty()
+  $(".tab-content [id$='_content']").remove()
+
+  $("#timers").append('<tr id="manage_new" style="display:none">' +
+      '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">Name</span>' + commons.editable({ text: '', id: '_new!', fnc: 'commons.stub' }) + '</td>' +
+      '<td colspan=2 style="vertical-align: top !important;"><span class="badge badge-primary">Messages</span> ' +
+        commons.editable({ text: '0', id: '_new!', fnc: 'commons.stub' }) +
+      '</td><td style="vertical-align: top !important;"><span class="badge badge-primary">Seconds</span> ' +
+        commons.editable({ text: '60', id: '_new!', fnc: 'commons.stub' }) +
+      '<div class="btn-group pull-right">' +
+        '<button class="save-button btn btn-success new-confirm-btn" style="display:none" onclick="timers.set(event)">SAVE</button>' +
+        '<button class="btn btn-warning new-confirm-btn" style="display:none" onclick="timers.cancel()">CANCEL</button>' +
+      '</div>' +
+      '</td>' +
+      '</tr>');
+
+  for (let timer of data.timers) {
+    timers.addRow(timer, {
+      _total: _.filter(data.responses, (o) => o.timerId === timer._id).length,
+      enabled: _.filter(data.responses, (o) => o.timerId === timer._id && o.enabled).length,
+      disabled: _.filter(data.responses, (o) => o.timerId === timer._id && !o.enabled).length
+    })
+    timers.addTabPane(timer.name, _.filter(data.responses, (o) => o.timerId === timer._id))
+    timers.addTab(timer.name)
+  }
+
+  // reshow tab
+  let id = $("ul#timers-tab li a.active").attr('href')
+  if (id !== '#manage' && id !== '#responses') {
+    $('a[href="#manage"]').tab('show'); // this is needed to properly refocus tab
+    $(`a[href="${id}"]`).tab('show');
+    $('.plus-button').prop('disabled', false)
+  }
+})
 </script>
