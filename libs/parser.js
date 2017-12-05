@@ -381,9 +381,29 @@ Parser.prototype.parseMessage = async function (message, attr) {
       let toEvaluate = filter.replace('(eval ', '').slice(0, -1)
       let param = (!_.isUndefined(attr.param) && attr.param.length !== 0) ? `var param="${attr.param}";` : ''
       if (_.isObject(attr.sender)) attr.sender = attr.sender.username
+
+      let randomsArr = await Promise.all([
+        global.users.getAll({ is: { online: true } }),
+        global.users.getAll({ is: { online: true, follower: true } }),
+        global.users.getAll({ is: { online: true, subscriber: true } }),
+        global.users.getAll(),
+        global.users.getAll({ is: { follower: true } }),
+        global.users.getAll({ is: { subscriber: true } })
+      ])
+      let randomVar = {
+        online: {
+          viewer: randomsArr[0].length > 0 ? _.sample(randomsArr[0]).username : null,
+          follower: randomsArr[1].length > 0 ? _.sample(randomsArr[1]).username : null,
+          subscriber: randomsArr[2].length > 0 ? _.sample(randomsArr[2]).username : null
+        },
+        viewer: randomsArr[3].length > 0 ? _.sample(randomsArr[3]).username : null,
+        follower: randomsArr[4].length > 0 ? _.sample(randomsArr[4]).username : null,
+        subscriber: randomsArr[5].length > 0 ? _.sample(randomsArr[5]).username : null
+      }
       let sender = `var sender="${global.configuration.getValue('atUsername') ? `@${attr.sender}` : `${attr.sender}`}";`
+      debug(`(function evaluation () { var random=${JSON.stringify(randomVar)}; ${param} ${sender} ${toEvaluate} })()`)
       return (safeEval(
-        `(function evaluation () { ${param} ${sender} ${toEvaluate} })()`
+        `(function evaluation () { var random=${JSON.stringify(randomVar)}; ${param} ${sender} ${toEvaluate} })()`
       ))
     }
   }
