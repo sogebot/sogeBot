@@ -97,12 +97,24 @@
         </button>
         <div class="dropdown-menu dropdown-menu-right" style="right: 0; left: auto;" aria-labelledby="settingsButton">
           <h6 class="dropdown-header">UI</h6>
-          <button class="dropdown-item" id="percentage-btn" data-show-percentage="true" onclick="switchPercentageShow()">Show percentage in stats</button>
-          <button class="dropdown-item" id="stats-btn" onclick="switchStats()" data-lang="stats-panel.hide">Hide stats</button>
+          <button class="dropdown-item" id="percentage-btn" data-show-percentage="true" onclick="switchPercentageShow()">
+            <i class="fa fa-check-square-o" aria-hidden="true"></i>
+            Percentage in stats
+          </button>
+          <button class="dropdown-item" id="stats-btn" data-show-stats="true" onclick="switchStats()">
+            <i class="fa fa-check-square-o" aria-hidden="true"></i>
+            <span data-lang="stats-panel.show">Quick stats</span>
+          </button>
 
           <h6 class="dropdown-header">BOT</h6>
-          <button class="dropdown-item" id="mute-btn" data-muted="false" onclick="switchMute()" data-lang="mute"></button>
-          <button class="dropdown-item" id="me-btn" onclick="switchMe()">use /me</button>
+          <button class="dropdown-item" id="mute-btn" data-muted="false" onclick="switchMute()">
+            <i class="fa fa-square-o" aria-hidden="true"></i>
+            <span data-lang="mute"></span>
+          </button>
+          <button class="dropdown-item" id="me-btn" onclick="switchMe()">
+            <i class="fa fa-square-o" aria-hidden="true"></i>
+            use /me
+          </button>
 
           <h6 class="dropdown-header">THEMES</h6>
           <button class="dropdown-item" id="theme-btn" onclick="switchTheme()" data-lang="dark"></button>
@@ -1162,24 +1174,31 @@
       var btn = $('#stats-btn')
       var container = $('.stream-info-container')
 
-      if (btn.text() === translations['stats-panel'].hide) {
+      btn.data('show-stats', _.isString(btn.data('show-stats')) ? true : btn.data('show-stats'))
+
+      if (btn.data('show-stats')) {
         container.css('display', 'none')
-        btn.text(translations['stats-panel'].show)
+        btn.children('i').removeClass().addClass('fa fa-square-o')
       } else {
         container.css('display', 'block')
-        btn.text(translations['stats-panel'].hide)
+        btn.children('i').removeClass().addClass('fa fa-check-square-o')
       }
+
+      btn.data('show-stats', !btn.data('show-stats'))
     }
 
     var switchMute = function (update = true) {
       var btn = $('#mute-btn')
-      btn.removeClass()
+      btn.data('muted', _.isString(btn.data('muted')) ? true : btn.data('muted'))
+
       if (btn.data('muted')) {
-        btn.addClass('dropdown-item text-dark')
+        btn.children('i').removeClass().addClass('fa fa-square-o')
       } else {
-        btn.addClass('dropdown-item text-danger')
+        btn.children('i').removeClass().addClass('fa fa-check-square-o')
       }
+
       btn.data('muted', !btn.data('muted'))
+
       if (update) {
         console.debug('EMIT [saveConfiguration]', {
           'mute': btn.data('muted')
@@ -1192,13 +1211,16 @@
 
     var switchPercentageShow = function (update = true) {
       var btn = $('#percentage-btn')
-      btn.removeClass()
+      btn.data('showPercentage', _.isString(btn.data('showPercentage')) ? true : btn.data('showPercentage'))
+
       if (btn.data('showPercentage')) {
-        btn.addClass('dropdown-item text-success')
+        btn.children('i').removeClass().addClass('fa fa-square-o')
       } else {
-        btn.addClass('dropdown-item text-dark')
+        btn.children('i').removeClass().addClass('fa fa-check-square-o')
       }
+
       btn.data('showPercentage', !btn.data('showPercentage'))
+
       if (update) {
         console.debug('EMIT [saveConfiguration]', {
           'percentage': btn.data('showPercentage')
@@ -1211,13 +1233,16 @@
 
     var switchMe = function (update = true) {
       var btn = $('#me-btn')
-      btn.removeClass()
+      btn.data('sendWithMe', _.isString(btn.data('sendWithMe')) ? true : btn.data('sendWithMe'))
+
       if (btn.data('sendWithMe')) {
-        btn.addClass('dropdown-item text-success')
+        btn.children('i').removeClass().addClass('fa fa-square-o')
       } else {
-        btn.addClass('dropdown-item text-dark')
+        btn.children('i').removeClass().addClass('fa fa-check-square-o')
       }
+
       btn.data('sendWithMe', !btn.data('sendWithMe'))
+
       if (update) {
         console.debug('EMIT [saveConfiguration]', {
           'sendWithMe': btn.data('sendWithMe')
