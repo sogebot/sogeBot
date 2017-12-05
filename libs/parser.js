@@ -400,11 +400,11 @@ Parser.prototype.parseMessage = async function (message, attr) {
         follower: randomsArr[4].length > 0 ? _.sample(randomsArr[4]).username : null,
         subscriber: randomsArr[5].length > 0 ? _.sample(randomsArr[5]).username : null
       }
+
+      let user = await global.users.get(attr.sender)
       let sender = `var sender="${global.configuration.getValue('atUsername') ? `@${attr.sender}` : `${attr.sender}`}";`
-      debug(`(function evaluation () { var random=${JSON.stringify(randomVar)}; ${param} ${sender} ${toEvaluate} })()`)
-      return (safeEval(
-        `(function evaluation () { var random=${JSON.stringify(randomVar)}; ${param} ${sender} ${toEvaluate} })()`
-      ))
+      let toEval = `(function evaluation () { var is=${JSON.stringify(user.is)}; var random=${JSON.stringify(randomVar)}; ${param} ${sender} ${toEvaluate} })()`
+      debug(toEval); return (safeEval(toEval))
     }
   }
   let ifp = {
