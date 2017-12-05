@@ -15,6 +15,9 @@ function Users () {
   global.parser.register(this, '!regular remove', this.rmRegular, constants.OWNER_ONLY)
   global.parser.register(this, '!merge', this.merge, constants.MODS)
 
+  global.panel.addMenu({category: 'manage', name: 'viewers', id: 'viewers'})
+  global.panel.socketListening(this, 'getViewers', this.getViewers)
+  global.panel.socketListening(this, 'deleteViewer', this.deleteViewer)
   global.panel.socketListening(this, 'viewers.toggle', this.toggleIs)
 
   // set all users offline on start
@@ -41,6 +44,16 @@ function Users () {
       global.db.engine.increment('users', { username: username }, { stats: { messages: inc } })
     })
   }, 60000)
+}
+
+Users.prototype.getViewers = async function (self, socket) {
+  let viewers = await global.users.getAll()
+  socket.emit('Viewers', Buffer.from(JSON.stringify(viewers)).toString('base64'))
+}
+
+Users.prototype.deleteViewer = function (self, socket, username) {
+  global.users.delete(username)
+  self.getViewers(self, socket)
 }
 
 /*
