@@ -1,10 +1,11 @@
 'use strict'
 
 // 3rdparty libraries
-var _ = require('lodash')
+const _ = require('lodash')
+const debug = require('debug')('systems:points')
 // bot libraries
 const config = require('../../config.json')
-var constants = require('../constants')
+const constants = require('../constants')
 
 function Points () {
   if (global.commons.isSystemEnabled(this)) {
@@ -114,10 +115,13 @@ Points.prototype.setPoints = function (self, sender, text) {
   try {
     var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
     global.users.set(parsed[1], { points: parseInt(parsed[2], 10) })
-    global.commons.sendMessage(global.translate('points.success.set')
-      .replace(/\$amount/g, parsed[2])
-      .replace(/\$username/g, parsed[1])
-      .replace(/\$pointsName/g, self.getPointsName(parsed[2])), sender)
+
+    let message = global.commons.prepare('points.success.set', {
+      amount: parsed[2],
+      username: parsed[1],
+      pointsName: self.getPointsName(parsed[2])
+    })
+    debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.set'), sender)
   }
@@ -133,15 +137,19 @@ Points.prototype.givePoints = async function (self, sender, text) {
         global.db.engine.increment('users', { username: user.username }, { points: (parseInt(givePts, 10) * -1) })
         global.db.engine.increment('users', { username: user2.username }, { points: parseInt(givePts, 10) })
       }
-      global.commons.sendMessage(global.translate('points.success.give')
-        .replace(/\$amount/g, givePts)
-        .replace(/\$username/g, user2.username)
-        .replace(/\$pointsName/g, self.getPointsName(givePts)), sender)
+      let message = global.commons.prepare('points.success.give', {
+        amount: givePts,
+        username: user2.username,
+        pointsName: self.getPointsName(givePts)
+      })
+      debug(message); global.commons.sendMessage(message, sender)
     } else {
-      global.commons.sendMessage(global.translate('points.failed.giveNotEnough')
-      .replace(/\$amount/g, givePts)
-      .replace(/\$username/g, user2.username)
-      .replace(/\$pointsName/g, self.getPointsName(givePts)), sender)
+      let message = global.commons.prepare('points.failed.giveNotEnough', {
+        amount: givePts,
+        username: user2.username,
+        pointsName: self.getPointsName(givePts)
+      })
+      debug(message); global.commons.sendMessage(message, sender)
     }
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.give'), sender)
@@ -203,10 +211,12 @@ Points.prototype.getPointsFromUser = async function (self, sender, text) {
     const username = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
 
     var points = (_.isUndefined(user.points) ? 0 : user.points)
-    global.commons.sendMessage(global.translate('points.defaults.pointsResponse')
-      .replace(/\$amount/g, points)
-      .replace(/\$username/g, username)
-      .replace(/\$pointsName/g, self.getPointsName(points)), sender)
+    let message = global.commons.prepare('points.defaults.pointsResponse', {
+      amount: points,
+      username: username,
+      pointsName: self.getPointsName(points)
+    })
+    debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.get'), sender)
   }
@@ -221,9 +231,11 @@ Points.prototype.allPoints = async function (self, sender, text) {
     _.each(users, function (user) {
       global.db.engine.increment('users', { username: user.username }, { points: parseInt(givePts, 10) })
     })
-    global.commons.sendMessage(global.translate('points.success.all')
-      .replace(/\$amount/g, givePts)
-      .replace(/\$pointsName/g, self.getPointsName(givePts)), sender)
+    let message = global.commons.prepare('points.success.all', {
+      amount: givePts,
+      pointsName: self.getPointsName(givePts)
+    })
+    debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.all'), sender)
   }
@@ -238,10 +250,11 @@ Points.prototype.rainPoints = async function (self, sender, text) {
     _.each(users, function (user) {
       global.db.engine.increment('users', { username: user.username }, { points: parseInt(Math.floor(Math.random() * givePts), 10) })
     })
-
-    global.commons.sendMessage(global.translate('points.success.rain')
-      .replace(/\$amount/g, givePts)
-      .replace(/\$pointsName/g, self.getPointsName(givePts)), sender)
+    let message = global.commons.prepare('points.success.rain', {
+      amount: givePts,
+      pointsName: self.getPointsName(givePts)
+    })
+    debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.rain'), sender)
   }
@@ -253,10 +266,12 @@ Points.prototype.addPoints = function (self, sender, text) {
     let givePts = parseInt(parsed[2], 10)
     global.db.engine.increment('users', { username: parsed[1] }, { points: givePts })
 
-    global.commons.sendMessage(global.translate('points.success.add')
-      .replace(/\$amount/g, givePts)
-      .replace(/\$username/g, parsed[1])
-      .replace(/\$pointsName/g, self.getPointsName(givePts)), sender)
+    let message = global.commons.prepare('points.success.add', {
+      amount: givePts,
+      username: parsed[1],
+      pointsName: self.getPointsName(givePts)
+    })
+    debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.add'), sender)
   }
@@ -270,10 +285,12 @@ Points.prototype.removePoints = async function (self, sender, text) {
 
     global.db.engine.increment('users', { username: parsed[1] }, { points: (removePts * -1) })
 
-    global.commons.sendMessage(global.translate('points.success.remove')
-      .replace(/\$amount/g, removePts)
-      .replace(/\$username/g, parsed[1])
-      .replace(/\$pointsName/g, self.getPointsName(removePts)), sender)
+    let message = global.commons.prepare('points.success.remove', {
+      amount: removePts,
+      username: parsed[1],
+      pointsName: self.getPointsName(removePts)
+    })
+    debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
     global.commons.sendMessage(global.translate('points.failed.remove'), sender)
   }
