@@ -497,12 +497,20 @@
     })
 
     /* STATS */
+    console.debug('EMIT [getLatestStats]')
+    socket.emit('getLatestStats')
+    setInterval(function () {
+      console.debug('EMIT [getLatestStats]')
+      socket.emit('getLatestStats')
+    }, 30000)
+
+    console.debug('EMIT [getStats]')
+    socket.emit('getStats')
     setInterval(function () {
       console.debug('EMIT [getStats]')
-      console.debug('EMIT [getLatestStats]')
       socket.emit('getStats')
-      socket.emit('getLatestStats')
     }, 1000)
+
 
     socket.on('latestStats', function (data) {
       var getPercentage = function (cur, orig) {

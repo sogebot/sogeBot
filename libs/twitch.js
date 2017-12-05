@@ -289,8 +289,6 @@ Twitch.prototype.saveStream = function (stream) {
     currentViews: this.current.views,
     maxViewers: this.maxViewers,
     newChatters: this.newChatters,
-    game: this.current.game,
-    status: this.current.status,
     currentHosts: this.current.hosts
   })
 }
