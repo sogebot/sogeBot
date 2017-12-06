@@ -379,7 +379,6 @@ Parser.prototype.parseMessage = async function (message, attr) {
   let evaluate = {
     '(eval#)': async function (filter) {
       let toEvaluate = filter.replace('(eval ', '').slice(0, -1)
-      let param = (!_.isUndefined(attr.param) && attr.param.length !== 0) ? `var param="${attr.param}";` : ''
       if (_.isObject(attr.sender)) attr.sender = attr.sender.username
 
       let randomsArr = await Promise.all([
@@ -388,8 +387,10 @@ Parser.prototype.parseMessage = async function (message, attr) {
         global.users.getAll({ is: { online: true, subscriber: true } }),
         global.users.getAll(),
         global.users.getAll({ is: { follower: true } }),
-        global.users.getAll({ is: { subscriber: true } })
+        global.users.getAll({ is: { subscriber: true } }),
+        global.users.get(attr.sender)
       ])
+
       let randomVar = {
         online: {
           viewer: randomsArr[0].length > 0 ? _.sample(randomsArr[0]).username : null,
@@ -400,11 +401,19 @@ Parser.prototype.parseMessage = async function (message, attr) {
         follower: randomsArr[4].length > 0 ? _.sample(randomsArr[4]).username : null,
         subscriber: randomsArr[5].length > 0 ? _.sample(randomsArr[5]).username : null
       }
+      let users = randomsArr[3]
+      let is = randomsArr[6].is
 
-      let user = await global.users.get(attr.sender)
-      let sender = `var sender="${global.configuration.getValue('atUsername') ? `@${attr.sender}` : `${attr.sender}`}";`
-      let toEval = `(function evaluation () { var is=${JSON.stringify(user.is)}; var random=${JSON.stringify(randomVar)}; ${param} ${sender} ${toEvaluate} })()`
-      debug(toEval); return (safeEval(toEval))
+      let toEval = `(function evaluation () {  ${toEvaluate} })()`
+      const context = {
+        _: _,
+        users: users,
+        is: is,
+        random: randomVar,
+        sender: global.configuration.getValue('atUsername') ? `@${attr.sender}` : `${attr.sender}`,
+        param: _.isNil(param) ? null : param
+      }
+      debug(toEval, context); return (safeEval(toEval, context))
     }
   }
   let ifp = {
