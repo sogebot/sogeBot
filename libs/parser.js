@@ -381,28 +381,23 @@ Parser.prototype.parseMessage = async function (message, attr) {
       let toEvaluate = filter.replace('(eval ', '').slice(0, -1)
       if (_.isObject(attr.sender)) attr.sender = attr.sender.username
 
-      let randomsArr = await Promise.all([
-        global.users.getAll({ is: { online: true } }),
-        global.users.getAll({ is: { online: true, follower: true } }),
-        global.users.getAll({ is: { online: true, subscriber: true } }),
+      let awaits = await Promise.all([
         global.users.getAll(),
-        global.users.getAll({ is: { follower: true } }),
-        global.users.getAll({ is: { subscriber: true } }),
         global.users.get(attr.sender)
       ])
 
       let randomVar = {
         online: {
-          viewer: randomsArr[0].length > 0 ? _.sample(randomsArr[0]).username : null,
-          follower: randomsArr[1].length > 0 ? _.sample(randomsArr[1]).username : null,
-          subscriber: randomsArr[2].length > 0 ? _.sample(randomsArr[2]).username : null
+          viewer: _.sample(_.map(_.filter(awaits[0], (o) => o.is.online), 'username')),
+          follower: _.sample(_.map(_.filter(awaits[0], (o) => o.is.online && o.is.follower), 'username')),
+          subscriber: _.sample(_.map(_.filter(awaits[0], (o) => o.is.online && o.is.subscriber), 'username'))
         },
-        viewer: randomsArr[3].length > 0 ? _.sample(randomsArr[3]).username : null,
-        follower: randomsArr[4].length > 0 ? _.sample(randomsArr[4]).username : null,
-        subscriber: randomsArr[5].length > 0 ? _.sample(randomsArr[5]).username : null
+        viewer: _.sample(_.map(awaits[0], 'username')),
+        follower: _.sample(_.map(_.filter(awaits[0], (o) => o.is.follower), 'username')),
+        subscriber: _.sample(_.map(_.filter(awaits[0], (o) => o.is.subscriber), 'username'))
       }
-      let users = randomsArr[3]
-      let is = randomsArr[6].is
+      let users = awaits[0]
+      let is = awaits[1].is
 
       let toEval = `(function evaluation () {  ${toEvaluate} })()`
       const context = {
@@ -411,7 +406,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
         is: is,
         random: randomVar,
         sender: global.configuration.getValue('atUsername') ? `@${attr.sender}` : `${attr.sender}`,
-        param: _.isNil(param) ? null : param
+        param: _.isNil(attr.param) ? null : attr.param
       }
       debug(toEval, context); return (safeEval(toEval, context))
     }
