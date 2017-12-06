@@ -6,6 +6,7 @@ var _ = require('lodash')
 var mathjs = require('mathjs')
 const snekfetch = require('snekfetch')
 const safeEval = require('safe-eval')
+const decode = require('decode-html')
 
 const config = require('../config.json')
 const debug = require('debug')('parser')
@@ -425,7 +426,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
     }
   }
 
-  let msg = await this.parseMessageEval(evaluate, message)
+  let msg = await this.parseMessageEval(evaluate, decode(message))
   msg = await this.parseMessageOnline(online, msg)
   msg = await this.parseMessageCommand(command, msg)
   msg = await this.parseMessageEach(random, msg)
