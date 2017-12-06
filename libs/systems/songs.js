@@ -300,7 +300,7 @@ class Songs {
         global.commons.sendMessage(global.translate('songs.song-was-not-found'), sender)
         return
       }
-      global.bot.engine.update('playlist', { videoID: videoID }, {videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1})
+      global.db.engine.update('playlist', { videoID: videoID }, {videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1})
       let message = global.commons.prepare('songs.song-was-added-to-playlist', { name: videoInfo.title })
       debug(message); global.commons.sendMessage(message, sender)
       self.send(self, global.panel.io)
