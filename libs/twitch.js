@@ -127,13 +127,22 @@ function Twitch () {
       if (res.statusCode === 200 && !_.isNull(body)) {
         self.current.followers = body._total
 
-        for (let follower of body.follows) {
-          // if follower is not in cache, add as first
+        // if follower is not in cache, add as first
+        for (let follower of body.current.followers) {
           if (!_.includes(self.cached.followers, follower.user.name)) {
             if (_.isNil(self.cached.followers)) self.cached.followers = []
             self.cached.followers.unshift(follower.user.name)
           }
         }
+
+        // fallback if webhooks are not working correctly
+        _.each(body.follows, async function (follower) {
+          let user = await global.users.get(follower.user.name)
+          if (!user.is.follower) {
+            if (new Date().getTime() - moment(follower.created_at).format('X') * 1000 < 60000 * 60) global.events.fire('follow', { username: follower.user.name })
+          }
+          global.users.set(follower.user.name, { id: follower.user._id, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(follower.created_at).format('X') * 1000 } })
+        })
       }
     })
 
