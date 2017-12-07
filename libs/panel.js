@@ -1,6 +1,7 @@
 'use strict'
 
 var express = require('express')
+const bodyParser = require('body-parser')
 var http = require('http')
 var path = require('path')
 var basicAuth = require('basic-auth')
@@ -14,8 +15,17 @@ const NOT_AUTHORIZED = '0'
 function Panel () {
   // setup static server
   var app = express()
+  app.use(bodyParser.json())
+  app.use(bodyParser.urlencoded({ extended: true }))
+
   var server = http.createServer(app)
   var port = process.env.PORT || config.panel.port
+
+  // webhooks integration
+  app.post('/webhooks/hub', (req, res) => {
+    console.log('aaaa')
+    global.webhooks.event(req.body)
+  })
 
   // static routing
   app.get('/auth/token.js', function (req, res) {

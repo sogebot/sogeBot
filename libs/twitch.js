@@ -1,9 +1,9 @@
 'use strict'
 
-var constants = require('./constants')
-var moment = require('moment')
-var request = require('request-promise')
-var _ = require('lodash')
+const constants = require('./constants')
+const moment = require('moment')
+const request = require('request-promise')
+const _ = require('lodash')
 const debug = require('debug')('twitch')
 require('moment-precise-range-plugin')
 
@@ -134,15 +134,6 @@ function Twitch () {
             self.cached.followers.unshift(follower.user.name)
           }
         }
-
-        // TODO: move to v5 webhooks
-        _.each(body.follows, async function (follower) {
-          let user = await global.users.get(follower.user.name)
-          if (!user.is.follower) {
-            if (new Date().getTime() - moment(follower.created_at).format('X') * 1000 < 60000 * 60) global.events.fire('follow', { username: follower.user.name })
-          }
-          global.users.set(follower.user.name, { id: follower.user._id, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(follower.created_at).format('X') * 1000 } })
-        })
       }
     })
 
