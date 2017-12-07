@@ -39,7 +39,6 @@
     "npm-run-all": "^4.1.2",
     "popper.js": "^1.12.9",
     "request": "^2.83.0",
-    "request-promise": "^4.2.2",
     "safe-eval": "^0.3.0",
     "snekfetch": "3.6.0",
     "socket.io": "^2.0.4",
