@@ -1,5 +1,6 @@
 const _ = require('lodash')
-const req = require('snekfetch')
+const snekfetch = require('snekfetch')
+const moment = require('moment')
 const config = require('../config.json')
 const debug = require('debug')('webhooks')
 
@@ -29,7 +30,7 @@ class Webhooks {
 
     switch (type) {
       case 'follows':
-        let res = await req.post(request.join('&')).set('Client-ID', config.settings.client_id)
+        let res = await snekfetch.post(request.join('&')).set('Client-ID', config.settings.client_id)
         debug('Subscribe response: %o', res)
         if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: follows subscribed')
         else global.log.error('WEBHOOK: follows NOT subscribed')
@@ -43,21 +44,35 @@ class Webhooks {
   }
 
   async event (aEvent) {
-    console.log(aEvent)
-    /*
-            // TODO: move to v5 webhooks
-        _.each(body.follows, async function (follower) {
-          let user = await global.users.get(follower.user.name)
-          if (!user.is.follower) {
-            if (new Date().getTime() - moment(follower.created_at).format('X') * 1000 < 60000 * 60) global.events.fire('follow', { username: follower.user.name })
-          }
-          global.users.set(follower.user.name, { id: follower.user._id, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(follower.created_at).format('X') * 1000 } })
-        })
-        */
+    switch (aEvent.topic) {
+      case `https://api.twitch.tv/helix/users/follows?to_id=${global.channelId}`:
+        this.follower(aEvent)
+        break
+    }
   }
 
   async challenge (req, res) {
     res.send(req.query['hub.challenge'])
+  }
+
+  async follower (aEvent) {
+    const fid = aEvent.data.from_id
+    debug('new follower - %s', fid)
+    // check if user exists in db
+    let user = await global.db.engine.findOne('users', { id: fid })
+    if (_.isEmpty(user)) {
+      debug('user not in db')
+      // user doesn't exist - get username from api GET https://api.twitch.tv/helix/users?id=<user ID>
+      let userGetFromApi = await snekfetch.get(`https://api.twitch.tv/helix/users?id=${fid}`)
+        .set('Client-ID', config.settings.client_id)
+        .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+      global.events.fire('follow', { username: userGetFromApi.data[0].login }) // we can safely fire event as user doesn't exist in db
+      await global.db.engine.insert('users', { id: fid, username: userGetFromApi.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
+    } else {
+      debug('user in db')
+      if (!user.is.follower && new Date().getTime() - moment().format('X') * 1000 < 60000 * 60) global.events.fire('follow', { username: user.username })
+      global.users.set(user.username, { id: fid, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
+    }
   }
 }
 
