@@ -1,6 +1,7 @@
 const _ = require('lodash')
 const req = require('snekfetch')
 const config = require('../config.json')
+const debug = require('debug')('webhooks')
 
 class Webhooks {
   constructor () {
@@ -15,7 +16,7 @@ class Webhooks {
 
     const leaseSeconds = 864000
     const mode = 'subscribe'
-    const callback = `http://${config.webhooks.callback}/webhooks/hub`
+    const callback = `http://${config.panel.domain}/webhooks/hub`
 
     const request = [
       `https://api.twitch.tv/helix/webhooks/hub?`,
@@ -24,6 +25,7 @@ class Webhooks {
       `hub.callback=${callback}`,
       `hub.lease_seconds=${leaseSeconds}`
     ]
+    debug('Subscribe request: %o', request)
 
     switch (type) {
       case 'follows':
