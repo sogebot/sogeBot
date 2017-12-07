@@ -66,8 +66,9 @@ class Webhooks {
       let userGetFromApi = await snekfetch.get(`https://api.twitch.tv/helix/users?id=${fid}`)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
-      global.events.fire('follow', { username: userGetFromApi.data[0].login }) // we can safely fire event as user doesn't exist in db
-      await global.db.engine.insert('users', { id: fid, username: userGetFromApi.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
+      debug('user API data" %o', userGetFromApi.body)
+      global.events.fire('follow', { username: userGetFromApi.body.data[0].login }) // we can safely fire event as user doesn't exist in db
+      await global.db.engine.insert('users', { id: fid, username: userGetFromApi.body.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
     } else {
       debug('user in db')
       if (!user.is.follower && new Date().getTime() - moment().format('X') * 1000 < 60000 * 60) global.events.fire('follow', { username: user.username })
