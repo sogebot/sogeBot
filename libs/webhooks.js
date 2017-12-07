@@ -71,6 +71,7 @@ class Webhooks {
       await global.db.engine.insert('users', { id: fid, username: userGetFromApi.body.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
     } else {
       debug('user in db')
+      debug('is follower: %s, current time: %s, user time follow: %s', user.is.follower, moment().format('X') * 1000, user.time.follow)
       if (!user.is.follower && moment().format('X') * 1000 - user.time.follow < 60000 * 60) global.events.fire('follow', { username: user.username })
       global.users.set(user.username, { id: fid, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
     }
