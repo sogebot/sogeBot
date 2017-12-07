@@ -43,12 +43,13 @@ class Webhooks {
     setTimeout(() => this.subscribe(type), leaseSeconds * 1000)
   }
 
-  async event (aEvent) {
+  async event (aEvent, res) {
     switch (aEvent.topic) {
       case `https://api.twitch.tv/helix/users/follows?to_id=${global.channelId}`:
         this.follower(aEvent)
         break
     }
+    res.sendStatus(200)
   }
 
   async challenge (req, res) {

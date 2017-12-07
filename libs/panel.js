@@ -23,7 +23,7 @@ function Panel () {
 
   // webhooks integration
   app.post('/webhooks/hub', (req, res) => {
-    global.webhooks.event(req.body)
+    global.webhooks.event(req.body, res)
   })
 
   app.get('/webhooks/hub', (req, res) => {
