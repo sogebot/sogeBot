@@ -128,7 +128,7 @@ function Twitch () {
         self.current.followers = body._total
 
         // if follower is not in cache, add as first
-        for (let follower of body.current.followers) {
+        for (let follower of body.follows) {
           if (!_.includes(self.cached.followers, follower.user.name)) {
             if (_.isNil(self.cached.followers)) self.cached.followers = []
             self.cached.followers.unshift(follower.user.name)
