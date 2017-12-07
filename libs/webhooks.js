@@ -25,11 +25,12 @@ class Webhooks {
       `hub.callback=${callback}`,
       `hub.lease_seconds=${leaseSeconds}`
     ]
-    debug('Subscribe request: %o', request)
+    debug('Subscribe request: %s', request.join('$'))
 
     switch (type) {
       case 'follows':
         let res = await req.post(request.join('&')).set('Client-ID', config.settings.client_id)
+        debug('Subscribe response: %o', res)
         if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: follows subscribed')
         else global.log.error('WEBHOOK: follows NOT subscribed')
         break
