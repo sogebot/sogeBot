@@ -1,9 +1,9 @@
 'use strict'
 
-var constants = require('./constants')
-var moment = require('moment')
-var request = require('request-promise')
-var _ = require('lodash')
+const constants = require('./constants')
+const moment = require('moment')
+const request = require('request-promise')
+const _ = require('lodash')
 const debug = require('debug')('twitch')
 require('moment-precise-range-plugin')
 
@@ -127,15 +127,15 @@ function Twitch () {
       if (res.statusCode === 200 && !_.isNull(body)) {
         self.current.followers = body._total
 
+        // if follower is not in cache, add as first
         for (let follower of body.follows) {
-          // if follower is not in cache, add as first
           if (!_.includes(self.cached.followers, follower.user.name)) {
             if (_.isNil(self.cached.followers)) self.cached.followers = []
             self.cached.followers.unshift(follower.user.name)
           }
         }
 
-        // TODO: move to v5 webhooks
+        // fallback if webhooks are not working correctly
         _.each(body.follows, async function (follower) {
           let user = await global.users.get(follower.user.name)
           if (!user.is.follower) {

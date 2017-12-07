@@ -32,6 +32,7 @@ var Watcher = require('./libs/watcher')
 var Events = require('./libs/events')
 var Permissions = require('./libs/permissions')
 var constants = require('./libs/constants')
+var Webhooks = require('./libs/webhooks')
 
 console.log(figlet.textSync('sogeBot ' + process.env.npm_package_version, {
   font: 'ANSI Shadow',
@@ -49,6 +50,7 @@ global.twitch = new Twitch()
 global.stats = new Stats()
 global.events = new Events()
 global.permissions = new Permissions()
+global.webhooks = new Webhooks()
 
 global.lib = {}
 global.lib.translate = new Translate()
