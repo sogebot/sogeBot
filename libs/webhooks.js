@@ -15,7 +15,7 @@ class Webhooks {
 
     const leaseSeconds = 864000
     const mode = 'subscribe'
-    const callback = `http://${config.panel.domain}:${config.panel.port}/webhooks/hub`
+    const callback = `http://${config.webhooks.callback}/webhooks/hub`
 
     const request = [
       `https://api.twitch.tv/helix/webhooks/hub?`,
