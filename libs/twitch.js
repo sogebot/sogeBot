@@ -129,7 +129,10 @@ function Twitch () {
 
         for (let follower of body.follows) {
           // if follower is not in cache, add as first
-          if (!_.includes(self.cached.followers, follower.user.name)) self.cached.followers.unshift(follower.user.name)
+          if (!_.includes(self.cached.followers, follower.user.name)) {
+            if (_.isNil(self.cached.followers)) self.cached.followers = []
+            self.cached.followers.unshift(follower.user.name)
+          }
         }
 
         // TODO: move to v5 webhooks
