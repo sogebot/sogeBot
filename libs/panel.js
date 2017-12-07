@@ -28,7 +28,7 @@ function Panel () {
   })
 
   app.get('/webhooks/hub', (req, res) => {
-    global.webhooks.challenge(req.body)
+    global.webhooks.challenge(req)
   })
 
   // static routing
