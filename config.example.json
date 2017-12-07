@@ -9,10 +9,6 @@
     "broadcaster_username": "broadcaster_username_here",
     "client_id": "1wjn1i3792t71tl90fmyvd0zl6ri2vg"
   },
-  "webhooks": {
-    "__COMMENT__": "webhooks callback needs to be set to exposed domain:port of a bot, if not correctly set, bot will not receive new follows, etc",
-    "callback": "your_bot_accessible_from_internet_url:port"
-  },
   "panel": {
     "__COMMENT__": "set correctly your domain and to be safe, change your token",
     "username": "admin",
