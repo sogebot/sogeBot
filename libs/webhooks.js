@@ -56,8 +56,9 @@ class Webhooks {
         */
   }
 
-  async challenge (aChallenge) {
-    console.log(aChallenge)
+  async challenge (aChallenge, aRes) {
+    const challenge = aChallenge.query.hub.challenge
+    aRes.send(challenge)
   }
 }
 
