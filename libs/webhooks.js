@@ -73,7 +73,9 @@ class Webhooks {
       debug('user in db')
       debug('username: %s, is follower: %s, current time: %s, user time follow: %s', user.username, user.is.follower, moment().format('X') * 1000, user.time.follow)
       if (!user.is.follower && moment().format('X') * 1000 - user.time.follow < 60000 * 60) global.events.fire('follow', { username: user.username })
-      global.users.set(user.username, { id: fid, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
+
+      if (user.is.follower) global.users.set(user.username, {id: fid, time: { followCheck: new Date().getTime() }})
+      else global.users.set(user.username, { id: fid, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
     }
   }
 }
