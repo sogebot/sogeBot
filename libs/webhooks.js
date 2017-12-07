@@ -55,6 +55,10 @@ class Webhooks {
         })
         */
   }
+
+  async challenge (aChallenge) {
+    console.log(aChallenge)
+  }
 }
 
 module.exports = Webhooks

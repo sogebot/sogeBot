@@ -27,6 +27,10 @@ function Panel () {
     global.webhooks.event(req.body)
   })
 
+  app.get('/webhooks/hub', (req, res) => {
+    global.webhooks.challenge(req.body)
+  })
+
   // static routing
   app.get('/auth/token.js', function (req, res) {
     const origin = req.headers.referer ? req.headers.referer.substring(0, req.headers.referer.length - 1) : undefined
