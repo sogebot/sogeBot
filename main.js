@@ -227,26 +227,30 @@ setInterval(function () {
 }, 60000)
 
 // get and save channel_id
-global.client.api({
-  url: 'https://api.twitch.tv/kraken/users?login=' + config.settings.broadcaster_username,
-  headers: {
-    Accept: 'application/vnd.twitchtv.v5+json',
-    'Client-ID': config.settings.client_id
-  }
-}, function (err, res, body) {
-  if (err) {
-    global.log.error(err)
-    return
-  }
+const getChannelID = function () {
+  global.client.api({
+    url: 'https://api.twitch.tv/kraken/users?login=' + config.settings.broadcaster_username,
+    headers: {
+      Accept: 'application/vnd.twitchtv.v5+json',
+      'Client-ID': config.settings.client_id
+    }
+  }, function (err, res, body) {
+    if (err) {
+      global.log.error(err)
+      setTimeout(() => getChannelID(), 1000)
+      return
+    }
 
-  if (_.isNil(body.users[0])) {
-    global.log.error('Channel ' + config.settings.broadcaster_username + ' not found!')
-    process.exit()
-  } else {
-    global.channelId = body.users[0]._id
-    global.log.info('Broadcaster channel ID set to ' + global.channelId)
-  }
-})
+    if (_.isNil(body.users[0])) {
+      global.log.error('Channel ' + config.settings.broadcaster_username + ' not found!')
+      process.exit()
+    } else {
+      global.channelId = body.users[0]._id
+      global.log.info('Broadcaster channel ID set to ' + global.channelId)
+    }
+  })
+}
+getChannelID()
 
 if (config.debug.all) {
   global.log.warning('+------------------------------------+')
