@@ -121,7 +121,7 @@ global.client.on('disconnected', function (address, port) {
 global.client.on('message', async function (channel, sender, message, fromSelf) {
   if (debug.enabled) debug('Message received: %s\n\tuserstate: %s', message, JSON.stringify(sender))
   if (!fromSelf && config.settings.bot_username !== sender.username) {
-    global.users.set(sender.username, { id: sender['user-id'] })
+    global.users.set(sender.username, { id: sender['user-id'], is: { online: true } })
     if (sender['message-type'] !== 'whisper') {
       global.parser.timer.push({ 'id': sender.id, 'received': new Date().getTime() })
       global.log.chatIn(message, {username: sender.username})
