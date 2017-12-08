@@ -388,13 +388,13 @@ Parser.prototype.parseMessage = async function (message, attr) {
 
       let randomVar = {
         online: {
-          viewer: _.sample(_.map(_.filter(awaits[0], (o) => o.is.online), 'username')),
-          follower: _.sample(_.map(_.filter(awaits[0], (o) => o.is.online && o.is.follower), 'username')),
-          subscriber: _.sample(_.map(_.filter(awaits[0], (o) => o.is.online && o.is.subscriber), 'username'))
+          viewer: _.sample(_.map(_.filter(awaits[0], (o) => _.get(o, 'is.online', false)), 'username')),
+          follower: _.sample(_.map(_.filter(awaits[0], (o) => _.get(o, 'is.online', false) && _.get(o, 'is.follower', false)), 'username')),
+          subscriber: _.sample(_.map(_.filter(awaits[0], (o) => _.get(o, 'is.online', false) && _.get(o, 'is.subscriber', false)), 'username'))
         },
         viewer: _.sample(_.map(awaits[0], 'username')),
-        follower: _.sample(_.map(_.filter(awaits[0], (o) => o.is.follower), 'username')),
-        subscriber: _.sample(_.map(_.filter(awaits[0], (o) => o.is.subscriber), 'username'))
+        follower: _.sample(_.map(_.filter(awaits[0], (o) => _.get(o, 'is.follower', false)), 'username')),
+        subscriber: _.sample(_.map(_.filter(awaits[0], (o) => _.get(o, 'is.subscriber', false)), 'username'))
       }
       let users = awaits[0]
       let is = awaits[1].is
