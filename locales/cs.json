@@ -315,6 +315,8 @@
     "duration": "Trvání",
     "viewers-reset-attributes": "Vymazat data",
     "viewers-points-of-all-users": "Body všech uživatelů",
+    "viewers-watchtime-of-all-users": "Čas sledování všech uživatelů",
+    "viewers-messages-of-all-users": "Zprávy všech uživatelů",
     "events-user-triggered-event": "uživatel, který spustil event",
     "events-method-used-to-subscribe": "metoda použita pro subscribe",
     "events-months-of-subscription": "počet měsíců",

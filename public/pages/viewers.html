@@ -15,6 +15,12 @@
           <li>
             <button class="dropdown-item" id="reset-points-of-all-users" data-lang="viewers-points-of-all-users"></button>
           </li>
+          <li>
+            <button class="dropdown-item" id="reset-messages-of-all-users" data-lang="viewers-messages-of-all-users"></button>
+          </li>
+          <li>
+            <button class="dropdown-item" id="reset-watchtime-of-all-users" data-lang="viewers-watchtime-of-all-users"></button>
+          </li>
         </ul>
       </div>
       <ul class="paging"></ul>
@@ -73,6 +79,24 @@
   $("#reset-points-of-all-users").on('click', function (ev) {
     ev.preventDefault()
     socket.emit('resetPoints')
+    setTimeout(function () {
+      socket.emit('getViewers')
+    }, 1000)
+  })
+
+  $("#reset-watchtime-of-all-users").off('click')
+  $("#reset-watchtime-of-all-users").on('click', function (ev) {
+    ev.preventDefault()
+    socket.emit('resetWatchTime')
+    setTimeout(function () {
+      socket.emit('getViewers')
+    }, 1000)
+  })
+
+  $("#reset-messages-of-all-users").off('click')
+  $("#reset-messages-of-all-users").on('click', function (ev) {
+    ev.preventDefault()
+    socket.emit('resetMessages')
     setTimeout(function () {
       socket.emit('getViewers')
     }, 1000)

@@ -19,6 +19,8 @@ function Users () {
   global.panel.socketListening(this, 'getViewers', this.getViewers)
   global.panel.socketListening(this, 'deleteViewer', this.deleteViewer)
   global.panel.socketListening(this, 'viewers.toggle', this.toggleIs)
+  global.panel.socketListening(this, 'resetMessages', this.resetMessages)
+  global.panel.socketListening(this, 'resetWatchTime', this.resetWatchTime)
 
   // set all users offline on start
   this.setAll({ is: { online: false } })
@@ -44,6 +46,14 @@ function Users () {
       global.db.engine.increment('users', { username: username }, { stats: { messages: inc } })
     })
   }, 60000)
+}
+
+Users.prototype.resetMessages = function (self, socket, data) {
+  self.setAll({stats: {messages: 0}})
+}
+
+Users.prototype.resetWatchTime = function (self, socket, data) {
+  self.setAll({time: {watched: 0}})
 }
 
 Users.prototype.getViewers = async function (self, socket) {
