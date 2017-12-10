@@ -197,12 +197,10 @@ Gambling.prototype.roulette = async function (self, sender) {
     return
   }
 
-  if (!isAlive) {
-    setTimeout(() => {
-      global.client.timeout(config.settings.broadcaster_username, sender.username, global.configuration.getValue('rouletteTimeout'))
-      global.commons.sendMessage(isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead'), sender)
-    }, 2000)
-  }
+  setTimeout(() => {
+    if (!isAlive) global.client.timeout(config.settings.broadcaster_username, sender.username, global.configuration.getValue('rouletteTimeout'))
+    global.commons.sendMessage(isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead'), sender)
+  }, 2000)
 }
 
 Gambling.prototype.seppuku = async function (self, sender) {
