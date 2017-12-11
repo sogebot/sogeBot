@@ -118,14 +118,14 @@ Moderation.prototype.timeoutUser = function (self, sender, warning, msg, time) {
   var warningsAllowed = global.configuration.getValue('moderationWarnings')
   var warningsTimeout = global.configuration.getValue('moderationWarningsTimeouts')
   if (warningsAllowed === 0) {
-    global.commons.timeout(sender.username, msg, time)
+    global.commons.timeout(sender.username, msg.replace(/\$count/g, -1), time)
     return
   }
 
   let warnings = _.isUndefined(self.warnings[sender.username]) ? [] : self.warnings[sender.username]
 
   if (warnings.length >= warningsAllowed) {
-    global.commons.timeout(sender.username, msg, time)
+    global.commons.timeout(sender.username, msg.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length), time)
     delete self.warnings[sender.username]
     return
   }
@@ -134,7 +134,7 @@ Moderation.prototype.timeoutUser = function (self, sender, warning, msg, time) {
   if (warningsTimeout) {
     global.commons.timeout(sender.username, warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length), 1)
   } else {
-    global.commons.sendMessage('$sender: ' + warning.replace('$count', parseInt(warningsAllowed, 10) - warnings.length), sender)
+    global.commons.sendMessage('$sender: ' + warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length), sender)
   }
 
   self.warnings[sender.username] = warnings
