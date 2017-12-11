@@ -83,9 +83,9 @@ class Twitch {
   async _load () {
     let cache = await global.db.engine.findOne('cache')
 
-    this.cGamesTitles = !_.isNil(cache.cachedGamesTitles) ? cache.cachedGamesTitles : {}
-    this.when = !_.isNil(cache.when) ? cache.when : {}
-    this.cached = !_.isNil(cache.cached) ? cache.cached : {}
+    this.cGamesTitles = _.get(cache, 'cachedGamesTitles', this.cGamesTitles)
+    this.when = _.get(cache, 'when', this.when)
+    this.cached = _.get(cache, 'cached', this.cached)
   }
 
   async _save () {
