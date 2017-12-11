@@ -14,8 +14,6 @@ install:
   - set PATH=%APPDATA%\npm;%PATH%
   # Typical npm stuff.
   - npm install
-  - npm shrinkwrap
-
 
 # Post-install test scripts.
 test_script:
@@ -23,8 +21,12 @@ test_script:
   - node --version
   - npm --version
   # run tests
+  - npm run standard
+
+  - npm run test:config:mongodb
   - npm run test
-  - npm run test:mongodb
-  - npm run test:nedb
+
+  - npm run test:config:nedb
+  - npm run test
 
 build: off
