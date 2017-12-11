@@ -8,7 +8,6 @@ const flatten = require('flat')
 
 class Translate {
   constructor () {
-    this.custom = {}
     this.translations = {}
 
     global.panel.addMenu({category: 'settings', name: 'translations', id: 'translations'})
@@ -16,7 +15,8 @@ class Translate {
 
   async _load () {
     this.custom = await global.db.engine.find('customTranslations')
-    console.log(this.custom)
+    if (_.isNil(this.custom)) this.custom = []
+
     return new Promise((resolve, reject) => {
       glob('./locales/*.json', (err, files) => {
         if (err) reject(err)
