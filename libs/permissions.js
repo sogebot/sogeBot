@@ -34,7 +34,8 @@ Permissions.prototype.changeSocket = function (self, socket, data) {
 }
 
 Permissions.prototype.removePermission = function (self, command) {
-  global.db.engine.remove('permissions', { key: command })
+  // command should be without !
+  global.db.engine.remove('permissions', { key: command.replace('!', '') })
 }
 
 Permissions.prototype.overridePermission = function (self, sender, text) {
