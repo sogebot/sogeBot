@@ -15,7 +15,6 @@ class Translate {
 
   async _load () {
     this.custom = await global.db.engine.find('customTranslations')
-    if (_.isNil(this.custom)) this.custom = []
 
     return new Promise((resolve, reject) => {
       glob('./locales/*.json', (err, files) => {
