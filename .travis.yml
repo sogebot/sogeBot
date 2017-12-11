@@ -6,6 +6,8 @@ node_js:
 before_install:
 - npm install -g mocha standard
 script:
+- npm run standard
+- npm run test:config:nedb
 - npm run test
-- npm run test:nedb
-- npm run test:mongodb
+- npm run test:config:mongodb
+- npm run test
