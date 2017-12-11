@@ -58,7 +58,7 @@
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
     "standard": "standard main.js && standard test/* && standard libs/* && standard libs/systems/* && standard libs/overlays/* && standard libs/widgets/*",
     "test": "mocha --recursive --timeout 4000 --exit",
-    "test:config:mongodb": "cp config.example.json config.json; sed -i -- 's/nedb/mongodb/g' config.json",
+    "test:config:mongodb": "cp config.example.json config.json && sed -i -- 's/nedb/mongodb/g' config.json",
     "test:config:nedb": "cp config.example.json config.json",
     "start": "node ./tools/migrate && npm-run-all --parallel build-css copy:dist && cross-env NODE_ENV=production node ./main || true",
     "start-no-migration": "npm run copy:dist && node ./main || true",
