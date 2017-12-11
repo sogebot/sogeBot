@@ -953,6 +953,7 @@
     }
   },
   "merge": {
+    "from-user-not-found": "$sender, uzivatel $fromUsername neexistuje v databazi",
     "no-from-user-set": "$sender, musi byt zadan uzivatel, ze ktereho se budou brat data",
     "no-to-user-set": "$sender, musi byt zadan uzivatel, kteremu se predaji data",
     "user-merged": "$sender, uzivatel $fromUsername byl nakopirovan uzivateli $toUsername"

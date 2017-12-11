@@ -85,9 +85,25 @@ Users.prototype.merge = async function (self, sender, text) {
     return
   } else { toUser = toUser[1] }
 
-  // cannot use Promise.all as it may delete merged user
-  await global.db.engine.remove('users', { username: toUser })
-  await self.set(fromUser, { username: toUser })
+  let [toUserFromDb, fromUserFromDb] = await Promise.all([
+    global.db.engine.findOne('users', { username: toUser }),
+    global.db.engine.findOne('users', { username: fromUser })
+  ])
+
+  if (_.isEmpty(fromUserFromDb)) {
+    let message = global.commons.prepare('merge.from-user-not-found', { fromUsername: fromUser })
+    debug(message); global.commons.sendMessage(message, sender)
+    return
+  }
+
+  if (!_.isEmpty(toUserFromDb)) {
+    await Promise.all([
+      global.db.engine.remove('users', { _id: toUserFromDb._id.toString() }),
+      global.db.engine.update('users', { _id: fromUserFromDb._id.toString() }, { username: toUserFromDb.username })
+    ])
+  } else {
+    await global.db.engine.update('users', { _id: fromUserFromDb._id.toString() }, { username: toUser })
+  }
 
   let message = global.commons.prepare('merge.user-merged', { fromUsername: fromUser, toUsername: toUser })
   debug(message); global.commons.sendMessage(message, sender)
@@ -181,7 +197,7 @@ Users.prototype.rmRegular = function (self, sender, text) {
 }
 
 Users.prototype.set = async function (username, object) {
-  if (_.isNil(username)) global.log.error('username is NULL!\n' + new Error().stack)
+  if (_.isNil(username)) return global.log.error('username is NULL!\n' + new Error().stack)
 
   username = username.toLowerCase()
   if (username === config.settings.bot_username || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot

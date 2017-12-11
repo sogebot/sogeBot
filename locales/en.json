@@ -953,6 +953,7 @@
     }
   },
   "merge": {
+    "from-user-not-found": "$sender, user $fromUsername was not found in db",
     "no-from-user-set": "$sender, you need to specify from which username to merge",
     "no-to-user-set": "$sender, you need to specify to which username merge",
     "user-merged": "$sender, user $fromUsername was merged to $toUsername"
