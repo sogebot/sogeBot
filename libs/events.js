@@ -67,7 +67,7 @@ function Events () {
       })
       debug(command)
       command = await global.parser.parseMessage(command)
-      global.parser.parseCommands((attr.quiet) ? null : { username: global.parser.getOwner() }, command)
+      global.parser.parseCommands({ username: (attr.quiet) ? null : global.parser.getOwner() }, command)
     },
     'play-sound': function (attr) {
       // attr.sound can be filename or url
