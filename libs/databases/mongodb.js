@@ -172,11 +172,11 @@ class IMongoDB extends Interface {
       let db = await this.connection(table)
 
       if (_.size(where) === 0) {
-        await db.collection(table).updateMany({}, { $set: flatten(object) })
+        await db.collection(table).updateMany({}, { $set: object })
       } else {
         await db.collection(table).update(
           where,
-          { $set: flatten(object) }, {
+          { $set: object }, {
             upsert: _.isNil(where._id)
           }
         )
