@@ -128,7 +128,7 @@ global.client.on('disconnected', function (address, port) {
 global.client.on('message', async function (channel, sender, message, fromSelf) {
   if (debug.enabled) debug('Message received: %s\n\tuserstate: %s', message, JSON.stringify(sender))
   if (!fromSelf && config.settings.bot_username !== sender.username) {
-    global.users.set(sender.username, { id: sender['user-id'], is: { online: true } })
+    global.users.set(sender.username, { id: sender['user-id'], is: { online: true, subscriber: _.get(sender, 'subscriber', false) } })
     if (sender['message-type'] !== 'whisper') {
       global.parser.timer.push({ 'id': sender.id, 'received': new Date().getTime() })
       global.log.chatIn(message, {username: sender.username})
@@ -233,9 +233,10 @@ global.client.on('subscription', async function (channel, username, method) {
   global.users.set(username, { is: { subscriber: true } })
   global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
 
-  if (!_.isArray(global.twitch.cached.subscribers)) global.twitch.cached.subscribers = []
-  global.twitch.cached.subscribers.unshift(username)
-  global.twitch.cached.subscribers = _.chunk(global.twitch.cached.subscribers, 100)[0]
+  let cached = await global.twitch.cached()
+  cached.subscribers.unshift(username)
+  cached.subscribers = _.chunk(global.twitch.cached.subscribers, 100)[0]
+  await global.twitch.cached(cached)
 })
 
 global.client.on('resub', async function (channel, username, months, message) {
@@ -243,9 +244,10 @@ global.client.on('resub', async function (channel, username, months, message) {
   global.users.set(username, { is: { subscriber: true } })
   global.events.fire('resub', { username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
 
-  if (!_.isArray(global.twitch.cached.subscribers)) global.twitch.cached.subscribers = []
-  global.twitch.cached.subscribers.unshift(username + ', ' + months + ' ' + global.parser.getLocalizedName(months, 'core.months'))
-  global.twitch.cached.subscribers = _.chunk(global.twitch.cached.subscribers, 100)[0]
+  let cached = await global.twitch.cached()
+  cached.subscribers.unshift(username)
+  cached.subscribers = _.chunk(global.twitch.cached.subscribers, 100)[0]
+  await global.twitch.cached(cached)
 })
 
 // Bot is checking if it is a mod

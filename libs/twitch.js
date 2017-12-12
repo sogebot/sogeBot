@@ -33,10 +33,11 @@ class Twitch {
 
     this.updateWatchTime()
     this.getCurrentStreamData()
-    this.getLatest100Followers()
+    this.getLatest100Followers(false)
     this.updateChannelViews()
     this.getChannelHosts()
 
+    this.getChannelSubscribersOldAPI() // remove this after twitch add total subscribers
     this.getChannelFollowersOldAPI() // remove this after twitch add total followers
     this.getChannelDataOldAPI() // remove this after twitch game and status for new API
 
@@ -127,6 +128,31 @@ class Twitch {
       let cache = await global.db.engine.findOne('cache')
       return _.get(cache, 'games_and_titles', {})
     }
+  }
+
+  async getChannelSubscribersOldAPI () {
+    const d = debug('twitch:getChannelSubscribersOldAPI')
+    if (_.isNil(global.channelId)) {
+      setTimeout(() => this.getChannelSubscribersOldAPI(), 1000)
+      return
+    }
+
+    var request
+    const url = `https://api.twitch.tv/kraken/channels/${global.channelId}/subscriptions?limit=100`
+    try {
+      request = await snekfetch.get(url)
+        .set('Accept', 'application/vnd.twitchtv.v5+json')
+        .set('Authorization', 'OAuth ' + config.settings.broadcaster_oauth.split(':')[1])
+        .set('Client-ID', config.settings.client_id)
+    } catch (e) {
+      global.log.error(`API: ${url} - ${e.message}`)
+      setTimeout(() => this.getChannelSubscribersOldAPI(), 30000)
+      return
+    }
+    d(`Current subscribers count: ${request.body._total}`)
+    this.current.subscribers = request.body._total
+
+    setTimeout(() => this.getChannelSubscribersOldAPI(), 10000)
   }
 
   async getChannelFollowersOldAPI () {
@@ -244,9 +270,9 @@ class Twitch {
     }
   }
 
-  async getLatest100Followers () {
+  async getLatest100Followers (quiet) {
     if (_.isNil(global.channelId)) {
-      setTimeout(() => this.getLatest100Followers(), 1000)
+      setTimeout(() => this.getLatest100Followers(true), 1000)
       return
     }
 
@@ -257,7 +283,7 @@ class Twitch {
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
     } catch (e) {
       global.log.error(`API: https://api.twitch.tv/helix/users/follows?to_id=${global.channelId}&first=100 - ${e.message}`)
-      setTimeout(() => this.getLatest100Followers(), 60000)
+      setTimeout(() => this.getLatest100Followers(false), 60000)
       return
     }
 
@@ -281,14 +307,14 @@ class Twitch {
       for (let follower of usersFromApi.body.data) {
         let user = await global.users.get(follower.login)
         if (!user.is.follower) {
-          if (new Date().getTime() - moment(user.time.follow).format('X') * 1000 < 60000 * 60) global.events.fire('follow', { username: follower.login })
+          if (new Date().getTime() - moment(user.time.follow).format('X') * 1000 < 60000 * 60 && !quiet) global.events.fire('follow', { username: follower.login })
           global.users.set(follower.login, { id: follower.id, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
         } else {
           global.users.set(follower.login, { id: follower.id, is: { follower: true }, time: { followCheck: new Date().getTime() } })
         }
       }
     }
-    setTimeout(() => this.getLatest100Followers(), 30000)
+    setTimeout(() => this.getLatest100Followers(false), 30000)
   }
 
   async getGameFromId (gid) {
@@ -714,7 +740,6 @@ class Twitch {
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
     } catch (e) {
       global.log.error(`API: ${url} - ${e.message}`)
-      setTimeout(() => this.getLatest100Followers(), 60000)
       return
     }
     d(request.body)
