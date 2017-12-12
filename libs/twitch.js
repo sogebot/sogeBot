@@ -412,7 +412,7 @@ class Twitch {
 
     global.stats.save({
       timestamp: new Date().getTime(),
-      whenOnline: await this.when().online,
+      whenOnline: (await this.when()).online,
       currentViewers: this.current.viewers,
       currentSubscribers: this.current.subscribers,
       currentBits: this.current.bits,
@@ -426,7 +426,7 @@ class Twitch {
   }
 
   async sendStreamData (self, socket) {
-    const whenOnline = await self.when().online
+    const whenOnline = (await self.when()).online
     var data = {
       uptime: self.getTime(whenOnline, false),
       currentViewers: self.current.viewers,
