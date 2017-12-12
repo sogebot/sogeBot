@@ -71,8 +71,14 @@ let migration = {
           upsert: true
         }
 
-        global.db.engine.remove('cache', {_id: cache._id.toString()})
-        global.db.engine.insert('cache', newCache)
+        await global.db.engine.remove('cache', {_id: cache._id.toString()})
+        await global.db.engine.insert('cache', newCache)
+      }
+
+      // remove all cache where is no upsert
+      let caches = await global.db.engine.find('cache', {})
+      for (let c of caches) {
+        if (_.isNil(c.upsert)) await global.db.engine.remove('cache', { _id: c._id.toString() })
       }
     }
   }]
