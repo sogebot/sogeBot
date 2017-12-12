@@ -150,7 +150,7 @@ class Twitch {
       return
     }
     d(`Current subscribers count: ${request.body._total}`)
-    this.current.subscribers = request.body._total
+    this.current.subscribers = request.body._total - 1 // remove broadcaster itself
 
     setTimeout(() => this.getChannelSubscribersOldAPI(), 10000)
   }
