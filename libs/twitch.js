@@ -296,13 +296,13 @@ class Twitch {
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
 
       // if follower is not in cache, add as first
+      let cached = await this.cached()
       for (let follower of usersFromApi.body.data) {
-        let cached = await this.cached()
         if (!_.includes(cached.followers, follower.login)) {
           cached.followers.unshift(follower.login)
-          this.cached(cached)
         }
       }
+      this.cached(cached)
 
       for (let follower of usersFromApi.body.data) {
         let user = await global.users.get(follower.login)
