@@ -290,14 +290,6 @@ Parser.prototype.parseMessage = async function (message, attr) {
     },
     '(status)': async function (filter) {
       return global.twitch.currentStatus
-    },
-    '(uptime)': async function (filter) {
-      const time = global.twitch.getTime(global.twitch.isOnline ? global.twitch.when.online : global.twitch.when.offline, true)
-      return global.configuration.getValue('uptimeFormat')
-        .replace(/\$days/g, time.days)
-        .replace(/\$hours/g, time.hours)
-        .replace(/\$minutes/g, time.minutes)
-        .replace(/\$seconds/g, time.seconds)
     }
   }
   let command = {
