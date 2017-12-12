@@ -60,18 +60,20 @@ let migration = {
       console.info('Migration cache to %s', '5.10.0')
       let cache = await global.db.engine.findOne('cache')
 
-      let newCache = {
-        when: {
-          offline: null,
-          online: null
-        },
-        followers: cache.followers,
-        games_and_titles: cache.cGamesTitles,
-        upsert: true
-      }
+      if (!_.isNil(cache.cGamesTitles)) {
+        let newCache = {
+          when: {
+            offline: null,
+            online: null
+          },
+          followers: cache.followers,
+          games_and_titles: cache.cGamesTitles,
+          upsert: true
+        }
 
-      global.db.engine.remove('cache', {_id: cache._id.toString()})
-      global.db.engine.insert('cache', newCache)
+        global.db.engine.remove('cache', {_id: cache._id.toString()})
+        global.db.engine.insert('cache', newCache)
+      }
     }
   }]
 }
