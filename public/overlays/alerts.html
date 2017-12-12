@@ -24,11 +24,14 @@
         margin: 0;
         padding: 0;
       }
-      #images, #video-pos, #alerts {
+      #images, #video-pos, #alerts, #html {
         display: table;
         position: absolute;
         height: 100%;
         width: 100%;
+      }
+      #html {
+        opacity: 0;
       }
       #alerts > div {
         float:right;
@@ -81,6 +84,7 @@
     </style>
   </head>
   <body>
+    <iframe id="html"></iframe>
     <div id="alerts"></div>
     <div id="images"></div>
     <div id="video-pos">
@@ -119,6 +123,7 @@
             if (d.type === 'audio') playAudio(alert_not_running.id, d)
             if (d.type === 'text') showText(alert_not_running.id, d)
             if (d.type === 'video') showVideo(alert_not_running.id, d)
+            if (d.type === 'html') showHtml(alert_not_running.id, d)
           })
         }
       }, 1000)
@@ -395,6 +400,22 @@
         }
 
         checkLoad()
+      }
+
+      function showHtml(id, html) {
+        html.duration = _.isNil(html.duration) ? 1000 : parseInt(html.duration) // how long to animate
+        html.time = _.isNil(html.time) ? 1000 : parseInt(html.time, 10) // how long to show
+
+        $('iframe#html').attr('src', html.url)
+        $('iframe#html').off('load')
+        $('iframe#html').on('load', function () {
+          $('iframe#html').velocity("fadeIn", { duration: html.duration })
+
+          setTimeout(() => {
+            $('iframe#html').velocity("fadeOut", { duration: html.duration });
+            setTimeout(() => alertsQueue[id].finished++, html.duration)
+          }, html.duration + html.time)
+        })
       }
 
     </script>
