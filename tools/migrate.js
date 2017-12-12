@@ -44,7 +44,7 @@ let updates = async (from, to) => {
 
   for (let table of _.values(migration)) {
     for (let i of table) {
-      if (parseInt(i.version.replace(/\./g, ''), 10) > parseInt(from.replace(/\./g, ''), 10) &&
+      if (parseInt(i.version.replace(/\./g, ''), 10) >= parseInt(from.replace(/\./g, ''), 10) &&
           parseInt(i.version.replace(/\./g, ''), 10) <= parseInt(to.replace(/\./g, ''), 10)) {
         migrate.push(i)
       }
