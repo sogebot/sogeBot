@@ -144,7 +144,7 @@
       if (event.event === 'host') {
         username.append($('<div class="w-100">'))
         username.append($('<div class="col">')
-            .text(translations['events-viewers-of-hosting'] + ': ' + event.viewers)
+            .text(translations['events-viewers-of-hosting'] + ': ' + _.get(event, 'viewers', 'n/a'))
             .css('font-size', "0.7rem")
             .css('font-weight', 'normal')
             .css('position', 'relative')
