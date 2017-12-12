@@ -1,8 +1,39 @@
 'use strict'
 
-var _ = require('lodash')
+const _ = require('lodash')
+const term = require('terminal-kit').terminal
+
 const Database = require('../libs/databases/database')
 const db = new Database()
+
+function doYouHaveBackup () {
+  term('DO YOU HAVE A BACKUP OF YOUR DB? [y|N]\n')
+  term.yesOrNo({ yes: ['y'], no: ['n', 'ENTER'] }, (error, result) => {
+    if (error) process.exit(error)
+
+    if (result) {
+      areYouSure()
+    } else {
+      term.red("'No' detected, backup your DB before cleanup!\n")
+      process.exit()
+    }
+  })
+}
+
+function areYouSure () {
+  term('DO YOU KNOW WHAT ARE YOU DOING? [y|N]\n')
+  term.yesOrNo({ yes: ['y'], no: ['n', 'ENTER'] }, (error, result) => {
+    if (error) process.exit(error)
+
+    if (result) {
+      main()
+    } else {
+      term.red("'No' detected, if you don't know what are you doing, ask on https://discordapp.com/invite/52KpmuH\n")
+      process.exit()
+    }
+  })
+}
+
 
 async function cleanUsersWithoutTime () {
   let users = await db.engine.find('users')
@@ -53,6 +84,7 @@ async function cleanUsersDuplicates () {
   await db.engine.remove('users', {})
   for (let user of newUsers) {
     delete user._id
+    console.log(user)
     await db.engine.insert('users', user)
   }
 
@@ -74,4 +106,4 @@ async function main () {
   process.exit()
 }
 
-main()
+doYouHaveBackup()

@@ -42,6 +42,7 @@
     "safe-eval": "^0.3.0",
     "snekfetch": "3.6.1",
     "socket.io": "^2.0.4",
+    "terminal-kit": "^1.14.3",
     "tmi.js": "^1.2.1",
     "twitch-emoticons": "git+https://github.com/sogehige/twitch-emoticons.git#v3api",
     "twitter": "^1.7.1",
