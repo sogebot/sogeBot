@@ -137,8 +137,7 @@
         .addClass(iconsAnimation[event.event])
 
       let username = $('<div>')
-        .addClass('row')
-        .addClass('eventlist-username')
+        .addClass('col-auto row eventlist-username')
         .html('<div class="col">' + event.username + '</div>')
 
       if (event.event === 'host') {
