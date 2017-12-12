@@ -266,11 +266,12 @@
         }
 
         if (!_.isNil(image['x-offset'])) {
-          style += ';left:' + image['x-offset'] + 'px'
+          style += ';position: relative;left:' + image['x-offset'] + 'px'
         }
 
         if (!_.isNil(image['y-offset'])) {
-          style += ';top:' + image['y-offset'] + 'px'
+          style += ';position: relative;top:' + image['y-offset'] + 'px'
+
         }
 
         $('#images').append('<div style="' + style + '"><img src="' + image.url + '?x=' + Math.random() + '"></img></div>')
