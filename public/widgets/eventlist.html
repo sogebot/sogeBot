@@ -137,19 +137,20 @@
         .addClass(iconsAnimation[event.event])
 
       let username = $('<div>')
-        .addClass('col-auto row eventlist-username')
-        .html('<div class="col">' + event.username + '</div>')
+        .addClass('col-10 eventlist-username')
+        .html(`<div style="text-overflow: ellipsis; overflow: hidden" title="${event.username}">${event.username}</div>`)
 
       if (event.event === 'host') {
-        username.append($('<div class="w-100">'))
-        username.append($('<div class="col">')
+        //username.append($('<div class="w-100">'))
+        username.append($('<span>')
             .text(translations['events-viewers-of-hosting'] + ': ' + _.get(event, 'viewers', 'n/a'))
             .css('font-size', "0.7rem")
             .css('font-weight', 'normal')
             .css('position', 'relative')
-            .css('top', '-1.2rem'))
+            .css('top', '-0.4rem'))
+          .css('display', 'block')
           .css('position', 'relative')
-          .css('top', '.6rem')
+          .css('top', '.7rem')
       }
 
       if (event.event === 'resub') {
@@ -177,15 +178,17 @@
       }
 
       let colIcon = $('<div>')
-        .addClass('col-auto')
+        .addClass('col-2')
         .append(icon)
 
       let row = $('<div>')
         .addClass('row')
         .append(colIcon)
         .append(username)
+      let cont = $('<div>')
+        .addClass('container')
 
-      eventlistEl.append(row)
+      eventlistEl.append(cont.append(row))
       if (i >= 5) break
     }
   })
