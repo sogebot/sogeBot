@@ -141,6 +141,18 @@
         .addClass('eventlist-username')
         .html('<div class="col">' + event.username + '</div>')
 
+      if (event.event === 'host') {
+        username.append($('<div class="w-100">'))
+        username.append($('<div class="col">')
+            .text(translations['events-viewers-of-hosting'] + ': ' + event.viewers)
+            .css('font-size', "0.7rem")
+            .css('font-weight', 'normal')
+            .css('position', 'relative')
+            .css('top', '-1.2rem'))
+          .css('position', 'relative')
+          .css('top', '.6rem')
+      }
+
       if (event.event === 'resub') {
         username.append($('<div class="w-100">'))
         username.append($('<div class="col">')

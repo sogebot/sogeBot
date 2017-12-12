@@ -65,10 +65,9 @@ global.status = {
   'MOD': false
 }
 
-var options = {
-  options: {
-    debug: false
-  },
+global.channelId = null
+
+global.client = new irc.Client({
   connection: {
     reconnect: true
   },
@@ -77,11 +76,18 @@ var options = {
     password: config.settings.bot_oauth
   },
   channels: ['#' + config.settings.broadcaster_username]
-}
+})
 
-global.channelId = null
-
-global.client = new irc.Client(options)
+global.broadcasterClient = new irc.Client({
+  connection: {
+    reconnect: true
+  },
+  identity: {
+    username: config.settings.broadcaster_username,
+    password: config.settings.broadcaster_oauth
+  },
+  channels: ['#' + config.settings.broadcaster_username]
+})
 
 global.lib.translate._load().then(function () {
   global.systems = require('auto-load')('./libs/systems/')
@@ -90,8 +96,9 @@ global.lib.translate._load().then(function () {
   global.overlays = require('auto-load')('./libs/overlays/')
 })
 
-// Connect the client to the server..
+// Connect the clients to the server..
 global.client.connect()
+global.broadcasterClient.connect()
 
 global.client.on('connected', function (address, port) {
   if (debug.enabled) debug('Bot is connected to TMI server - %s:%s', address, port)
@@ -184,6 +191,24 @@ global.client.on('timeout', function (channel, username, reason, duration) {
 global.client.on('hosting', function (channel, target, viewers) {
   if (debug.enabled) debug('Hosting: %s with %s viewers', target, viewers)
   global.events.fire('hosting', { target: target, viewers: viewers })
+})
+
+global.broadcasterClient.on('hosted', async (channel, username, viewers, autohost) => {
+  debug(`Hosted by ${username} with ${viewers} viewers - autohost: ${autohost}`)
+
+  let cached = await global.twitch.cached()
+  let cache = _.filter(cached, (o) => o.username === username)
+  if (viewers <= 1) return // don't want to fire event if viewers are 1
+  if (cache.length > 0) return // don't want to fire event if its already in cache
+
+  const data = {
+    username: username,
+    viewers: viewers,
+    autohost: autohost
+  }
+  cached.hosts.unshift(data)
+  global.twitch.cached(cached)
+  global.events.fire('hosted', data)
 })
 
 global.client.on('mod', async function (channel, username) {

@@ -31,23 +31,6 @@ class Twitch {
       game: ''
     }
 
-    this.cached = {
-      followers: [],
-      subscribers: [],
-      hosts: []
-    }
-
-    this.when = {
-      online: null,
-      offline: null
-    }
-
-    this.cGamesTitles = {} // cached Games and Titles
-    global.watcher.watch(this, 'cGamesTitles', this._save)
-    global.watcher.watch(this, 'when', this._save)
-    global.watcher.watch(this, 'cached', this._save)
-    this._load(this)
-
     this.updateWatchTime()
     this.getCurrentStreamData()
     this.getLatest100Followers()
@@ -81,26 +64,69 @@ class Twitch {
     })
   }
 
-  async _load () {
-    let cache = await global.db.engine.findOne('cache')
-
-    this.cGamesTitles = _.get(cache, 'cachedGamesTitles', this.cGamesTitles)
-    this.when = _.get(cache, 'when', this.when)
-    this.cached = _.get(cache, 'cached', this.cached)
+  // attribute
+  async when (data) {
+    if (data) {
+      // setter
+      await global.db.engine.update('cache', { upsert: true }, {
+        when: {
+          online: _.get(data, 'online', null),
+          offline: _.get(data, 'offline', null)
+        }
+      })
+      return {
+        online: _.get(data, 'online', null),
+        offline: _.get(data, 'offline', null)
+      }
+    } else {
+      // getter
+      let cache = await global.db.engine.findOne('cache')
+      return {
+        online: _.get(cache, 'when.online', null),
+        offline: _.get(cache, 'when.offline', null)
+      }
+    }
   }
 
-  async _save () {
-    let caches = await global.db.engine.find('cache')
-    _.each(caches, function (cache) {
-      global.db.engine.remove('cache', { _id: cache._id })
-    })
+  // attribute
+  async cached (data) {
+    if (data) {
+      // setter
+      await global.db.engine.update('cache', { upsert: true }, {
+        cached: {
+          followers: _.get(data, 'followers', []),
+          hosts: _.get(data, 'hosts', []),
+          subscribers: _.get(data, 'subscribers', [])
+        }
+      })
+      return {
+        followers: _.get(data, 'followers', []),
+        hosts: _.get(data, 'hosts', []),
+        subscribers: _.get(data, 'subscribers', [])
+      }
+    } else {
+      // getter
+      let cache = await global.db.engine.findOne('cache')
+      return {
+        followers: _.get(cache, 'cached.followers', []),
+        hosts: _.get(cache, 'cached.hosts', []),
+        subscribers: _.get(cache, 'cached.subscribers', [])
+      }
+    }
+  }
 
-    global.db.engine.insert('cache', {
-      cachedGamesTitles: this.cGamesTitles,
-      when: this.when,
-      cached: this.cached
-    })
-    this.timestamp = new Date().getTime()
+  async gamesTitles (data) {
+    if (data) {
+      // setter
+      await global.db.engine.update('cache', { upsert: true }, {
+        games_and_titles: data
+      })
+      return data
+    } else {
+      // getter
+      let cache = await global.db.engine.findOne('cache')
+      return _.get(cache, 'games_and_titles', {})
+    }
   }
 
   async getChannelFollowersOldAPI () {
@@ -169,18 +195,7 @@ class Twitch {
       return
     }
     d('Current host count: %s, Hosts: %s', request.body.hosts.length, _.map(request.body.hosts, 'host_login').join(', '))
-
     this.current.hosts = request.body.hosts.length
-    if (this.current.hosts > 0) {
-      for (let host of request.body.hosts) {
-        if (!_.includes(this.cached.hosts, host.host_login)) {
-          global.events.fire('hosted', { username: host.host_login })
-
-          if (_.isNil(this.cached.hosts)) this.cached.hosts = []
-          this.cached.hosts.unshift(host.host_login)
-        }
-      }
-    }
     setTimeout(() => this.getChannelHosts(), 30000)
   }
 
@@ -256,9 +271,10 @@ class Twitch {
 
       // if follower is not in cache, add as first
       for (let follower of usersFromApi.body.data) {
-        if (!_.includes(this.cached.followers, follower.login)) {
-          if (_.isNil(this.cached.followers)) this.cached.followers = []
-          this.cached.followers.unshift(follower.login)
+        let cached = await this.cached()
+        if (!_.includes(cached.followers, follower.login)) {
+          cached.followers.unshift(follower.login)
+          this.cached(cached)
         }
       }
 
@@ -307,7 +323,6 @@ class Twitch {
       return
     }
     d(request.body)
-
     global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
     if (request.status === 200 && !_.isNil(request.body.data[0])) {
       // correct status and we've got a data - stream online
@@ -317,7 +332,7 @@ class Twitch {
       this.current.game = await this.getGameFromId(stream.game_id)
 
       if (!this.isOnline || this.streamType !== stream.type) {
-        this.when.online = null
+        this.when({ online: stream.started_at })
         this.chatMessagesAtStart = global.parser.linesParsed
         this.current.viewers = 0
         this.current.bits = 0
@@ -325,7 +340,8 @@ class Twitch {
         this.newChatters = 0
         this.chatMessagesAtStart = global.parser.linesParsed
 
-        this.cached.hosts = [] // we dont want to have cached hosts on stream off
+        let cached = await this.cached()
+        this.cached({ followers: cached.followers, subscribers: cached.subscribers }) // we dont want to have cached hosts on stream off
 
         global.events.fire('stream-started')
         global.events.fire('every-x-seconds', { reset: true })
@@ -335,7 +351,6 @@ class Twitch {
       this.saveStreamData(stream)
       this.streamType = stream.type
       this.isOnline = true
-      this.when.offline = null
 
       global.events.fire('number-of-viewers-is-at-least-x')
       global.events.fire('stream-is-running-x-minutes')
@@ -350,27 +365,26 @@ class Twitch {
         // stream is really offline
         this.curRetries = 0
         this.isOnline = false
-        if (_.isNil(this.when.offline)) {
-          this.when.offline = moment()
+
+        let when = await this.when()
+        if (_.isNil(when.offline)) {
+          this.when({ offline: moment().format() })
           global.events.fire('stream-stopped')
           global.events.fire('stream-is-running-x-minutes', { reset: true })
           global.events.fire('number-of-viewers-is-at-least-x', { reset: true })
         }
-        this.when.online = null
       }
     }
     setTimeout(() => this.getCurrentStreamData(), 30000)
   }
 
   async saveStreamData (stream) {
-    if (_.isNil(this.when.online)) this.when.online = stream.started_at
-
     this.current.viewers = stream.viewer_count
     this.maxViewers = this.maxViewers < this.current.viewers ? this.current.viewers : this.maxViewers
 
     global.stats.save({
       timestamp: new Date().getTime(),
-      whenOnline: this.when.online,
+      whenOnline: await this.when().online,
       currentViewers: this.current.viewers,
       currentSubscribers: this.current.subscribers,
       currentBits: this.current.bits,
@@ -383,9 +397,10 @@ class Twitch {
     })
   }
 
-  sendStreamData (self, socket) {
+  async sendStreamData (self, socket) {
+    const whenOnline = await self.when().online
     var data = {
-      uptime: self.getTime(self.when.online, false),
+      uptime: self.getTime(whenOnline, false),
       currentViewers: self.current.viewers,
       currentSubscribers: self.current.subscribers,
       currentBits: self.current.bits,
@@ -430,8 +445,9 @@ class Twitch {
     }
   }
 
-  uptime (self, sender) {
-    const time = self.getTime(self.isOnline ? self.when.online : self.when.offline, true)
+  async uptime (self, sender) {
+    const when = await self.when()
+    const time = self.getTime(self.isOnline ? when.online : when.offline, true)
     global.commons.sendMessage(global.translate(self.isOnline ? 'uptime.online' : 'uptime.offline')
       .replace(/\$days/g, time.days)
       .replace(/\$hours/g, time.hours)
@@ -623,50 +639,53 @@ class Twitch {
     self.setTitleAndGame(self, sender, { game: text })
   }
 
-  deleteUserTwitchGame (self, socket, game) {
-    delete self.cGamesTitles[game]
+  async deleteUserTwitchGame (self, socket, game) {
+    let gamesTitles = await self.gamesTitles(); delete gamesTitles[game]
+    await self.gamesTitles(gamesTitles)
     self.sendUserTwitchGamesAndTitles(self, socket)
   }
 
-  deleteUserTwitchTitle (self, socket, data) {
-    _.remove(self.cGamesTitles[data.game], function (aTitle) {
+  async deleteUserTwitchTitle (self, socket, data) {
+    let gamesTitles = await self.gamesTitles()
+    _.remove(gamesTitles[data.game], function (aTitle) {
       return aTitle === data.title
     })
+    await self.gamesTitles(gamesTitles)
     self.sendUserTwitchGamesAndTitles(self, socket)
   }
 
-  editUserTwitchTitle (self, socket, data) {
+  async editUserTwitchTitle (self, socket, data) {
     if (data.new.length === 0) {
       self.deleteUserTwitchTitle(self, socket, data)
       return
     }
 
-    if (_.isUndefined(self.cGamesTitles[data.game])) { // create key if doesnt exists
-      self.cGamesTitles[data.game] = []
-    }
-
-    if (self.cGamesTitles[data.game].indexOf(data.title) === -1) { // if unique
-      self.cGamesTitles[data.game].push(data.new) // also, we need to add game and title to cached property
+    let gamesTitles = await self.gamesTitles()
+    if (gamesTitles[data.game].indexOf(data.title) === -1) { // if unique
+      gamesTitles[data.game].push(data.new) // also, we need to add game and title to cached property
     } else {
-      self.cGamesTitles[data.game][self.cGamesTitles[data.game].indexOf(data.title)] = data.new
+      gamesTitles[data.game][gamesTitles[data.game].indexOf(data.title)] = data.new
     }
-    self._save(self) // force save
+    await self.gamesTitles(gamesTitles)
   }
 
-  sendUserTwitchGamesAndTitles (self, socket) {
-    socket.emit('sendUserTwitchGamesAndTitles', self.cGamesTitles)
+  async sendUserTwitchGamesAndTitles (self, socket) {
+    let gamesTitles = await self.gamesTitles()
+    socket.emit('sendUserTwitchGamesAndTitles', gamesTitles)
   }
 
-  updateGameAndTitle (self, socket, data) {
+  async updateGameAndTitle (self, socket, data) {
     self.setTitleAndGame(self, null, data)
 
-    if (_.isUndefined(self.cGamesTitles[data.game])) { // create key if doesnt exists
-      self.cGamesTitles[data.game] = []
-    }
+    let gamesTitles = await self.gamesTitles()
 
-    if (self.cGamesTitles[data.game].indexOf(data.title) === -1) { // if unique
-      self.cGamesTitles[data.game].push(data.title) // also, we need to add game and title to cached property
+    // create game if not in cache
+    if (_.isNil(gamesTitles[data.game])) gamesTitles[data.game] = []
+
+    if (gamesTitles[data.game].indexOf(data.title) === -1) { // if unique
+      gamesTitles[data.game].push(data.title) // also, we need to add game and title to cached property
     }
+    await self.gamesTitles(gamesTitles)
     self.sendStreamData(self, global.panel.io) // force dashboard update
   }
 

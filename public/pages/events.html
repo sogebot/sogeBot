@@ -56,7 +56,7 @@
             </div>
             <div id="viewersInfo">
               <strong>$viewers</strong>
-              <span data-lang="events-viewers-of-your-hosting"></span>
+              <span data-lang="events-viewers-of-hosting"></span>
             </div>
           </small>
         </div>
@@ -208,6 +208,7 @@
         $('#viewersInfo').css('display', 'block')
         break
       case 'hosted':
+        $('#viewersInfo').css('display', 'block')
         $('#usernameInfo').css('display', 'block')
         break
       case 'command-send-x-times':
