@@ -201,9 +201,8 @@ global.broadcasterClient.on('hosted', async (channel, username, viewers, autohos
 
   let cached = await global.twitch.cached()
   let cache = _.filter(cached, (o) => o.username === username)
-  if (viewers < hostsViewersAtLeast) return // don't want to fire event if viewers are less than hostsViewersAtLeast
+
   if (cache.length > 0) return // don't want to fire event if its already in cache
-  if (hostsIgnoreAutohost && autohost) return // don't want to fire event if autohost and set to ignore autohost
 
   const data = {
     username: username,
@@ -212,6 +211,8 @@ global.broadcasterClient.on('hosted', async (channel, username, viewers, autohos
   }
   cached.hosts.unshift(data)
   global.twitch.cached(cached)
+
+  if (viewers < hostsViewersAtLeast && (hostsIgnoreAutohost && autohost)) return // don't want to fire event if autohost and set to ignore autohost
   global.events.fire('hosted', data)
 })
 
