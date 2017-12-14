@@ -137,44 +137,43 @@
         .addClass(iconsAnimation[event.event])
 
       let username = $('<div>')
-        .addClass('col-10 eventlist-username')
+        .addClass('col-9 eventlist-username')
         .html(`<div style="text-overflow: ellipsis; overflow: hidden" title="${event.username}">${event.username}</div>`)
 
       if (event.event === 'host') {
-        //username.append($('<div class="w-100">'))
         username.append($('<span>')
             .text(translations['events-viewers-of-hosting'] + ': ' + _.get(event, 'viewers', 'n/a'))
             .css('font-size', "0.7rem")
             .css('font-weight', 'normal')
             .css('position', 'relative')
-            .css('top', '-0.4rem'))
-          .css('display', 'block')
+            .css('top', '-0.4rem')
+          )
           .css('position', 'relative')
-          .css('top', '.7rem')
+          .css('top', '0.2rem')
       }
 
       if (event.event === 'resub') {
-        username.append($('<div class="w-100">'))
-        username.append($('<div class="col">')
+        username.append($('<span>')
             .text(translations['events-months-of-subscription'] + ': ' + event.months)
             .css('font-size', "0.7rem")
             .css('font-weight', 'normal')
             .css('position', 'relative')
-            .css('top', '-1.2rem'))
+            .css('top', '-0.4rem')
+          )
           .css('position', 'relative')
-          .css('top', '.6rem')
+          .css('top', '0.2rem')
       }
 
       if (event.event === 'cheer') {
-        username.append($('<div class="w-100">'))
-        username.append($('<div class="col">')
+        username.append($('<span>')
             .html('<i class="fa fa-diamond">' + '</i> ' + event.bits)
             .css('font-size', "0.7rem")
             .css('font-weight', 'normal')
             .css('position', 'relative')
-            .css('top', '-1.2rem'))
+            .css('top', '-0.4rem')
+          )
           .css('position', 'relative')
-          .css('top', '.6rem')
+          .css('top', '0.2rem')
       }
 
       let colIcon = $('<div>')
@@ -185,10 +184,8 @@
         .addClass('row')
         .append(colIcon)
         .append(username)
-      let cont = $('<div>')
-        .addClass('container')
 
-      eventlistEl.append(cont.append(row))
+      eventlistEl.append(row)
       if (i >= 5) break
     }
   })

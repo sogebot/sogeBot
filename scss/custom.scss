@@ -996,17 +996,27 @@ table tr td hr {
 }
 
 .eventlist-icon {
-  padding: 1rem;
-  font-size: 2rem;
+  font-size: 1.5rem;
+  text-align: center;
+  display: block;
+  padding: 0.5rem 0 0.5rem 0;
+  justify-content: center;
 }
 
 .eventlist-username {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   text-transform: uppercase;
   font-weight: bold;
-  color: $gray-700;
+  color: $gray-700; 
+  justify-content: center;
 }
+
+.eventlist-username * {
+  flex-basis: 100%;
+}
+
 #eventlist-main .row {
   margin: 0;
 }
