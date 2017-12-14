@@ -212,7 +212,7 @@ global.broadcasterClient.on('hosted', async (channel, username, viewers, autohos
   cached.hosts.unshift(data)
   global.twitch.cached(cached)
 
-  if (viewers < hostsViewersAtLeast && (hostsIgnoreAutohost && autohost)) return // don't want to fire event if autohost and set to ignore autohost
+  if (viewers < hostsViewersAtLeast || (hostsIgnoreAutohost && autohost)) return // don't want to fire event if autohost and set to ignore autohost
   global.events.fire('hosted', data)
 })
 
