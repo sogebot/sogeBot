@@ -33,7 +33,7 @@ class Twitch {
 
     this.updateWatchTime()
     this.getCurrentStreamData()
-    this.getLatest100Followers(false)
+    this.getLatest100Followers(true)
     this.updateChannelViews()
     this.getChannelHosts()
 
@@ -306,13 +306,18 @@ class Twitch {
       // if follower is not in cache, add as first
       let cached = await this.cached()
       for (let follower of usersFromApi.body.data) {
+        if (follower.login.toLowerCase() === config.settings.bot_username) continue // skip a bot
+
         if (!_.includes(cached.followers, follower.login)) {
           cached.followers.unshift(follower.login)
         }
       }
+      cached.followers = _.uniq(cached.followers)
       this.cached(cached)
 
       for (let follower of usersFromApi.body.data) {
+        if (follower.login.toLowerCase() === config.settings.bot_username) continue // skip a bot
+
         let user = await global.users.get(follower.login)
         if (!user.is.follower) {
           if (new Date().getTime() - moment(user.time.follow).format('X') * 1000 < 60000 * 60 && !quiet) global.events.fire('follow', { username: follower.login })
