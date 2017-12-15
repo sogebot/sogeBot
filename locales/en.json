@@ -599,7 +599,8 @@
     "omit": "omit",
     "comply": "comply",
     "visible": "visible",
-    "hidden": "hidden"
+    "hidden": "hidden",
+    "gamblingChanceToWin": "Chance to win !gamble"
   },
   "raffles": {
     "announceInterval": "Opened raffles will be announced every $value minute",
@@ -933,6 +934,7 @@
       "oneModerator": "¯\\_(ツ)_/¯ $winner is under divine protection. Sorry."
     },
     "gamble": {
+      "chanceToWin": "$sender, chance to win !gamble set to $value%",
       "zeroBet": "$sender, you cannot gamble 0 $pointsName",
       "notEnoughOptions": "$sender, you need to specify points to gamble",
       "notEnoughPoints": "$sender, you don't have $points $pointsName to gamble",

@@ -13,7 +13,7 @@ const ERROR_ZERO_BET = '1'
 const ERROR_NOT_ENOUGH_POINTS = '2'
 
 /*
- * !gamble [amount] - gamble [amount] points with 50/50 chance
+ * !gamble [amount] - gamble [amount] points with `chanceToWin` chance
  * !seppuku         - timeout yourself
  * !roulette        - 50/50 chance to timeout yourself
  * !duel [points]   - start or participate in duel
@@ -50,6 +50,8 @@ function Gambling () {
     global.configuration.register('gamblingCooldownBypass', 'gambling.cooldown.bypass', 'bool', false)
     global.configuration.register('duelCooldown', 'gambling.cooldown.duel', 'number', 0)
     global.configuration.register('fightmeCooldown', 'gambling.cooldown.fightme', 'number', 0)
+
+    global.configuration.register('gamblingChanceToWin', 'gambling.gamble.chanceToWin', 'number', 50)
 
     const self = this
     setInterval(async function () {
@@ -313,7 +315,7 @@ Gambling.prototype.gamble = async function (self, sender, text) {
     if (_.isNil(user.points) || user.points < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
 
     await global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * -1 })
-    if (_.random(0, 1)) {
+    if (_.random(0, 100, false) <= global.configuration.getValue('gamblingChanceToWin')) {
       let updatedUser = await global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * 2 })
       message = global.commons.prepare('gambling.gamble.win', {
         pointsName: global.systems.points.getPointsName(updatedUser.points),

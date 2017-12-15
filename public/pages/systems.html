@@ -200,6 +200,18 @@
   <div role="tabpanel" class="tab-pane" id="gambling">
     <div class="row settings">
       <div class="col">
+        <strong data-lang="gamblingChanceToWin"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="gamblingChanceToWin" onclick="commons.configEditable(this, '%')" id="configGamblingChanceToWin"></abbr>
+        <div class="input-group" style="display:none;" id="input_gamblingChanceToWin_group">
+          <div class="input-group-addon">%</div>
+          <input id="input_gamblingChanceToWin" class="form-control input-sm" type="text" />
+        </div>
+      </div>
+      <div class="w-100"></div>
+
+      <div class="col">
         <strong data-lang="seppukuTimeout"></strong>
       </div>
       <div class="col">
@@ -291,6 +303,8 @@
   socket.emit('getConfiguration')
 
   socket.once('configuration', function (data) {
+    $("#configGamblingChanceToWin").text(data.gamblingChanceToWin + '%')
+
     $("#configSeppukuTimeout").text(data.seppukuTimeout + 's')
     $("#configRouletteTimeout").text(data.rouletteTimeout + 's')
     $("#configFightmeTimeout").text(data.fightmeTimeout + 's')

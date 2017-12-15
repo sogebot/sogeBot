@@ -599,7 +599,8 @@
     "omit": "vynechat",
     "comply": "dodržovat",
     "visible": "viditelné",
-    "hidden": "skryté"
+    "hidden": "skryté",
+    "gamblingChanceToWin": "Šance na výhru !gamble"
   },
   "raffles": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych $value minut",
@@ -933,6 +934,7 @@
       "oneModerator": "¯\\_(ツ)_/¯ $winner je pod ochranou. Sorry."
     },
     "gamble": {
+      "chanceToWin": "$sender, sance na vyhru v !gamble nastavena na $value%",
       "zeroBet": "$sender, nemuzes hrat o 0 $pointsName",
       "notEnoughOptions": "$sender, musis hrat o nejake body",
       "notEnoughPoints": "$sender, nemas $points $pointsName abys o ne hral",
