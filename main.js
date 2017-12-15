@@ -65,10 +65,9 @@ global.status = {
   'MOD': false
 }
 
-var options = {
-  options: {
-    debug: false
-  },
+global.channelId = null
+
+global.client = new irc.Client({
   connection: {
     reconnect: true
   },
@@ -77,11 +76,18 @@ var options = {
     password: config.settings.bot_oauth
   },
   channels: ['#' + config.settings.broadcaster_username]
-}
+})
 
-global.channelId = null
-
-global.client = new irc.Client(options)
+global.broadcasterClient = new irc.Client({
+  connection: {
+    reconnect: true
+  },
+  identity: {
+    username: config.settings.broadcaster_username,
+    password: config.settings.broadcaster_oauth
+  },
+  channels: ['#' + config.settings.broadcaster_username]
+})
 
 global.lib.translate._load().then(function () {
   global.systems = require('auto-load')('./libs/systems/')
@@ -90,20 +96,35 @@ global.lib.translate._load().then(function () {
   global.overlays = require('auto-load')('./libs/overlays/')
 })
 
-// Connect the client to the server..
+// Connect the clients to the server..
 global.client.connect()
+if (!_.isNil(config.settings.broadcaster_oauth) && config.settings.broadcaster_oauth.match(/oauth:[\w]*/)) {
+  global.broadcasterClient.connect()
+} else {
+  global.log.error('Broadcaster oauth is not properly set - hosts will not be loaded')
+}
 
 global.client.on('connected', function (address, port) {
-  if (debug.enabled) debug('Bot is connected to TMI server - %s:%s', address, port)
+  debug('Bot is connected to TMI server - %s:%s', address, port)
   global.log.info('Bot is connected to TMI server')
   global.client.color(config.settings.bot_color)
   global.status.TMI = constants.CONNECTED
 })
 
 global.client.on('connecting', function (address, port) {
-  if (debug.enabled) debug('Bot is connecting to TMI server - %s:%s', address, port)
+  debug('Bot is connecting to TMI server - %s:%s', address, port)
   global.log.info('Bot is connecting to TMI server')
   global.status.TMI = constants.CONNECTING
+})
+
+global.broadcasterClient.on('connected', function (address, port) {
+  debug('Broadcaster is connected to TMI server - %s:%s', address, port)
+  global.log.info('Broadcaster is connected to TMI server')
+})
+
+global.broadcasterClient.on('connecting', function (address, port) {
+  debug('Broadcaster is connecting to TMI server - %s:%s', address, port)
+  global.log.info('Broadcaster is connecting to TMI server')
 })
 
 global.client.on('reconnect', function (address, port) {
@@ -121,7 +142,7 @@ global.client.on('disconnected', function (address, port) {
 global.client.on('message', async function (channel, sender, message, fromSelf) {
   if (debug.enabled) debug('Message received: %s\n\tuserstate: %s', message, JSON.stringify(sender))
   if (!fromSelf && config.settings.bot_username !== sender.username) {
-    global.users.set(sender.username, { id: sender['user-id'], is: { online: true } })
+    global.users.set(sender.username, { id: sender['user-id'], is: { online: true, subscriber: _.get(sender, 'subscriber', false) } })
     if (sender['message-type'] !== 'whisper') {
       global.parser.timer.push({ 'id': sender.id, 'received': new Date().getTime() })
       global.log.chatIn(message, {username: sender.username})
@@ -186,6 +207,38 @@ global.client.on('hosting', function (channel, target, viewers) {
   global.events.fire('hosting', { target: target, viewers: viewers })
 })
 
+global.broadcasterClient.on('hosted', async (channel, username, viewers, autohost) => {
+  debug(`Hosted by ${username} with ${viewers} viewers - autohost: ${autohost}`)
+  global.log.host(`${username}, viewers: ${viewers}, autohost: ${autohost}`)
+
+  const hostsViewersAtLeast = global.configuration.getValue('hostsViewersAtLeast')
+  const hostsIgnoreAutohost = global.configuration.getValue('hostsIgnoreAutohost')
+
+  let cached = await global.twitch.cached()
+  let cache = _.filter(cached, (o) => o.username === username)
+
+  debug('Is in cache? %s', cache.length > 0)
+  if (cache.length > 0) return // don't want to fire event if its already in cache
+
+  const data = {
+    username: username,
+    viewers: viewers,
+    autohost: autohost
+  }
+  debug('Cache hosts: %o', cached.hosts)
+  cached.hosts.unshift(data)
+  global.twitch.cached(cached)
+  debug('Cache hosts (after save): %o', cached.hosts)
+
+  data.type = 'host'
+  global.overlays.eventlist.add(data)
+
+  debug('At least viewers filtered? %s', viewers < hostsViewersAtLeast)
+  debug('Autohost ignored? %s', hostsIgnoreAutohost && autohost)
+  if (viewers < hostsViewersAtLeast || (hostsIgnoreAutohost && autohost)) return // don't want to fire event if autohost and set to ignore autohost
+  global.events.fire('hosted', data)
+})
+
 global.client.on('mod', async function (channel, username) {
   if (debug.enabled) debug('User mod: %s', username)
   const user = await global.users.get(username)
@@ -208,9 +261,10 @@ global.client.on('subscription', async function (channel, username, method) {
   global.users.set(username, { is: { subscriber: true } })
   global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
 
-  if (!_.isArray(global.twitch.cached.subscribers)) global.twitch.cached.subscribers = []
-  global.twitch.cached.subscribers.unshift(username)
-  global.twitch.cached.subscribers = _.chunk(global.twitch.cached.subscribers, 100)[0]
+  let cached = await global.twitch.cached()
+  cached.subscribers.unshift(username)
+  cached.subscribers = _.chunk(global.twitch.cached.subscribers, 100)[0]
+  await global.twitch.cached(cached)
 })
 
 global.client.on('resub', async function (channel, username, months, message) {
@@ -218,9 +272,10 @@ global.client.on('resub', async function (channel, username, months, message) {
   global.users.set(username, { is: { subscriber: true } })
   global.events.fire('resub', { username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
 
-  if (!_.isArray(global.twitch.cached.subscribers)) global.twitch.cached.subscribers = []
-  global.twitch.cached.subscribers.unshift(username + ', ' + months + ' ' + global.parser.getLocalizedName(months, 'core.months'))
-  global.twitch.cached.subscribers = _.chunk(global.twitch.cached.subscribers, 100)[0]
+  let cached = await global.twitch.cached()
+  cached.subscribers.unshift(username)
+  cached.subscribers = _.chunk(global.twitch.cached.subscribers, 100)[0]
+  await global.twitch.cached(cached)
 })
 
 // Bot is checking if it is a mod

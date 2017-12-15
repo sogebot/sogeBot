@@ -19,9 +19,8 @@ describe('Alias - run()', () => {
     global.systems.alias.add(global.systems.alias, owner, '!a !uptime')
     await message.isSent('alias.alias-was-added', owner, { alias: 'a', command: 'uptime' })
     // force uptime to be 0 (bypass cached db)
-    global.twitch.when.online = null
-    global.twitch.when.offline = null
-    
+    await global.twitch.when({})
+
     global.parser.parse(owner, '!a')
     await message.isSent('uptime.offline', owner, { days: '', hours: '', minutes: '', seconds: '' })
 

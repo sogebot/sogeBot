@@ -157,6 +157,11 @@
           "true": "Warnings are set to be 1s timeout",
           "false": "Warnings are set to chat message only"
         }
+      },
+      "hostsViewersAtLeast": "To trigger host event, host need at least $value viewers",
+      "hostsIgnoreAutohost": {
+        "true": "Autohosts will not trigger host event",
+        "false": "Autohosts will trigger host event"
       }
     },
     "years": "year|years",
@@ -241,6 +246,11 @@
     },
     "page-settings": {
       "systems": {
+        "events": {
+          "title": "Events",
+          "autohost-ignore": "Ignore AutoHost",
+          "host-at-least-viewers": "Minimal count of viewers on hosting"
+        },
         "others": {
           "title": "Others"
         },
@@ -327,7 +337,7 @@
     "events-duration-of-timeout": "duration of timeout",
     "events-duration-of-commercial": "duration of commercial",
     "events-target-of-your-hosting": "target of your hosting",
-    "events-viewers-of-your-hosting": "viewers of your hosting",
+    "events-viewers-of-hosting": "viewers of hosting",
     "overlays-eventlist-resub": "resub",
     "overlays-eventlist-host": "host",
     "overlays-eventlist-sub": "sub",

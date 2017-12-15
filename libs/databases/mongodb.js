@@ -101,6 +101,7 @@ class IMongoDB extends Interface {
       let item = await db.collection(table).findAndModify(
         where,
         { _id: 1 },
+        // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
         { $inc: flatten(object) },
         { new: true } // will return updated item
       )
@@ -127,6 +128,7 @@ class IMongoDB extends Interface {
 
       await db.collection(table).update(
         where,
+        // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
         { $inc: flatten(object) }, {
           upsert: true,
           multi: _.isEmpty(where)
@@ -172,11 +174,13 @@ class IMongoDB extends Interface {
       let db = await this.connection(table)
 
       if (_.size(where) === 0) {
-        await db.collection(table).updateMany({}, { $set: flatten(object) })
+        // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
+        await db.collection(table).updateMany({}, { $set: flatten(object, { safe: true }) })
       } else {
         await db.collection(table).update(
           where,
-          { $set: flatten(object) }, {
+          // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
+          { $set: flatten(object, { safe: true }) }, {
             upsert: _.isNil(where._id)
           }
         )

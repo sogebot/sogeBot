@@ -157,6 +157,11 @@
           "true": "Varovanim pro uzivatele bude 1s timeout",
           "false": "Varovanim pro uzivatele bude pouze zprava v chatu"
         }
+      },
+      "hostsViewersAtLeast": "Je potreba $value divaku v hostu, aby byl spusten host event",
+      "hostsIgnoreAutohost": {
+        "true": "Autohost nebude spoustet host event",
+        "false": "Autohost bude spoustet host event"
       }
     },
     "years": "rok|4:roky|roku",
@@ -241,6 +246,11 @@
     },
     "page-settings": {
       "systems": {
+        "events": {
+          "title": "Eventy",
+          "autohost-ignore": "Ignorovat AutoHost",
+          "host-at-least-viewers": "Minimální počet diváků při hostingu"
+        },
         "others": {
           "title": "Ostatní"
         },
@@ -327,7 +337,7 @@
     "events-duration-of-timeout": "doba trvání timeoutu",
     "events-duration-of-commercial": "doba trvání reklamy",
     "events-target-of-your-hosting": "koho hostuješ",
-    "events-viewers-of-your-hosting": "diváků při tvém hostingu",
+    "events-viewers-of-hosting": "diváků při hostingu",
     "overlays-eventlist-resub": "resub",
     "overlays-eventlist-host": "host",
     "overlays-eventlist-sub": "sub",

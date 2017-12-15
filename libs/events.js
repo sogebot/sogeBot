@@ -23,7 +23,7 @@ function Events () {
     'action': [], // $username
     'ban': [], // $username, $reason
     'hosting': [], // $target, $viewers
-    'hosted': [], // $username
+    'hosted': [], // $username, $viewers, $autohost
     'mod': [], // $username
     'commercial': [], // $duration
     'timeout': [], // $username, $reason, $duration
@@ -144,10 +144,6 @@ Events.prototype.loadSystemEvents = function (self) {
   ])
   self.events['ban'].push([
     { system: true, name: 'log', string: '$username, reason: $reason', level: 'ban' }
-  ])
-  self.events['hosted'].push([
-    { system: true, name: 'log', string: '$username', level: 'host' },
-    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'host' }
   ])
   self.events['cheer'].push([
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'cheer' },

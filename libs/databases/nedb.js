@@ -94,7 +94,8 @@ class INeDB extends Interface {
 
     var self = this
     return new Promise(function (resolve, reject) {
-      self.on(table).update(flatten(where), { $set: flatten(object) }, { upsert: (_.isNil(where._id) && !_.isEmpty(where)), multi: (_.isEmpty(where)), returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
+      // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
+      self.on(table).update(flatten(where), { $set: flatten(object, { safe: true }) }, { upsert: (_.isNil(where._id) && !_.isEmpty(where)), multi: (_.isEmpty(where)), returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
         if (err) reject(err)
         if (debug.enabled) debug('update() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
         resolve(affectedDocs)
@@ -109,6 +110,7 @@ class INeDB extends Interface {
 
     var self = this
     return new Promise(function (resolve, reject) {
+      // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
       self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: false, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
         if (err) reject(err)
         if (debug.enabled) debug('increment() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
@@ -124,6 +126,7 @@ class INeDB extends Interface {
 
     var self = this
     return new Promise(function (resolve, reject) {
+      // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
       self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: true, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
         if (err) reject(err)
         if (debug.enabled) debug('increment() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)

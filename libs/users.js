@@ -33,12 +33,6 @@ function Users () {
   }, 1000) // run follower ONE request every second
 
   setInterval(async () => {
-    // count subscribers
-    let users = await global.users.getAll({ is: { subscriber: true } })
-    global.twitch.current.subscribers = _.size(users)
-  }, 10000)
-
-  setInterval(async () => {
     let increment = this.increment
     this.increment = {}
 
