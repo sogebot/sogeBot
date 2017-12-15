@@ -991,5 +991,6 @@
   },
   "phillipsHue": {
     "list": "$sender, Seznam pripojenych Phillips Hue zarovek: "
-  }
+  },
+  "time": "Aktualni cas streamera v jeho casove zone je $time"
 }

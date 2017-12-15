@@ -991,5 +991,6 @@
   },
   "phillipsHue": {
     "list": "$sender, List of Phillips Hue connected lights: "
-  }
+  },
+  "time": "Current streamers time in his timezone is $time"
 }

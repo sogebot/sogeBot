@@ -58,6 +58,7 @@ class Twitch {
     this.getChannelDataOldAPI() // remove this after twitch game and status for new API
 
     global.parser.register(this, '!uptime', this.uptime, constants.VIEWERS)
+    global.parser.register(this, '!time', this.time, constants.VIEWERS)
     global.parser.register(this, '!lastseen', this.lastseen, constants.VIEWERS)
     global.parser.register(this, '!watched', this.watched, constants.VIEWERS)
     global.parser.register(this, '!followage', this.followage, constants.VIEWERS)
@@ -436,6 +437,11 @@ class Twitch {
       .replace(/\$hours/g, time.hours)
       .replace(/\$minutes/g, time.minutes)
       .replace(/\$seconds/g, time.seconds), sender)
+  }
+
+  time (self, sender) {
+    let message = global.commons.prepare('time', { time: moment().format('LTS') })
+    debug(message); global.commons.sendMessage(message, sender)
   }
 
   async lastseenUpdate (self, id, sender, text) {
