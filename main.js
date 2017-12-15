@@ -101,16 +101,26 @@ global.client.connect()
 global.broadcasterClient.connect()
 
 global.client.on('connected', function (address, port) {
-  if (debug.enabled) debug('Bot is connected to TMI server - %s:%s', address, port)
+  debug('Bot is connected to TMI server - %s:%s', address, port)
   global.log.info('Bot is connected to TMI server')
   global.client.color(config.settings.bot_color)
   global.status.TMI = constants.CONNECTED
 })
 
 global.client.on('connecting', function (address, port) {
-  if (debug.enabled) debug('Bot is connecting to TMI server - %s:%s', address, port)
+  debug('Bot is connecting to TMI server - %s:%s', address, port)
   global.log.info('Bot is connecting to TMI server')
   global.status.TMI = constants.CONNECTING
+})
+
+global.broadcasterClient.on('connected', function (address, port) {
+  debug('Broadcaster is connected to TMI server - %s:%s', address, port)
+  global.log.info('Broadcaster is connected to TMI server')
+})
+
+global.broadcasterClient.on('connecting', function (address, port) {
+  debug('Broadcaster is connecting to TMI server - %s:%s', address, port)
+  global.log.info('Broadcaster is connecting to TMI server')
 })
 
 global.client.on('reconnect', function (address, port) {
@@ -195,6 +205,7 @@ global.client.on('hosting', function (channel, target, viewers) {
 
 global.broadcasterClient.on('hosted', async (channel, username, viewers, autohost) => {
   debug(`Hosted by ${username} with ${viewers} viewers - autohost: ${autohost}`)
+  global.log.host(`${username}, viewers: ${viewers}, autohost: ${autohost}`)
 
   const hostsViewersAtLeast = global.configuration.getValue('hostsViewersAtLeast')
   const hostsIgnoreAutohost = global.configuration.getValue('hostsIgnoreAutohost')
@@ -202,6 +213,7 @@ global.broadcasterClient.on('hosted', async (channel, username, viewers, autohos
   let cached = await global.twitch.cached()
   let cache = _.filter(cached, (o) => o.username === username)
 
+  debug('Is in cache? %s', cache.length > 0)
   if (cache.length > 0) return // don't want to fire event if its already in cache
 
   const data = {
@@ -209,9 +221,16 @@ global.broadcasterClient.on('hosted', async (channel, username, viewers, autohos
     viewers: viewers,
     autohost: autohost
   }
+  debug('Cache hosts: %o', cached.hosts)
   cached.hosts.unshift(data)
   global.twitch.cached(cached)
+  debug('Cache hosts (after save): %o', cached.hosts)
 
+  data.type = 'host'
+  global.overlays.eventlist.add(data)
+
+  debug('At least viewers filtered? %s', viewers < hostsViewersAtLeast)
+  debug('Autohost ignored? %s', hostsIgnoreAutohost && autohost)
   if (viewers < hostsViewersAtLeast || (hostsIgnoreAutohost && autohost)) return // don't want to fire event if autohost and set to ignore autohost
   global.events.fire('hosted', data)
 })

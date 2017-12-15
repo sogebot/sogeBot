@@ -145,10 +145,6 @@ Events.prototype.loadSystemEvents = function (self) {
   self.events['ban'].push([
     { system: true, name: 'log', string: '$username, reason: $reason', level: 'ban' }
   ])
-  self.events['hosted'].push([
-    { system: true, name: 'log', string: '$username, viewers: $viewers, autohost: $autohost', level: 'host' },
-    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'host' }
-  ])
   self.events['cheer'].push([
     { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'cheer' },
     { system: true, name: 'log', string: '$username, bits: $bits, message: $message', level: 'cheer' }
