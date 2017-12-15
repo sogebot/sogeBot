@@ -90,7 +90,7 @@
           isDiff = entry.current !== entry.default
 
           local = []
-          for (let f of lFilters) {
+          for (let f of _.uniq(lFilters)) {
             if (!_.includes(['sender', 'title', 'game', 'viewers', 'views', 'hosts', 'followers', 'subscribers'], f)) {
               local.push(`<span class="editable-variable editable-variable-click block" data-var="${f}" data-lang="responses.variable.${f}"></span>`)
             }
