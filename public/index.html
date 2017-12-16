@@ -787,7 +787,7 @@
           var data = {}
           data[el.dataset.configId] = value
           $inputGroup.css('display', 'none')
-          $(el).css('display', 'flex')
+          $(el).css('display', 'inline-block')
 
           if (value.length === 0) $(el).text('< empty >')
           else $(el).text(value + suffix)
