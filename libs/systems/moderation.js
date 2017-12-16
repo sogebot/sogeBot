@@ -140,13 +140,13 @@ Moderation.prototype.timeoutUser = function (self, sender, warning, msg, time) {
   self.warnings[sender.username] = warnings
 }
 
-Moderation.prototype.whitelist = function (text) {
+Moderation.prototype.whitelist = async function (text) {
   let ytRegex, clipsRegex
 
   // check if songrequest -or- alias of songrequest contain youtube link -> change it to ID
   if (global.commons.isSystemEnabled('songs')) {
-    let alias = _.find(global.systems.alias.alias, function (oAlias) { return oAlias.command === 'songrequest' })
-    if (!_.isUndefined(alias) && alias.enabled && global.commons.isSystemEnabled('alias')) {
+    let alias = await global.db.engine.findOne('alias', { command: 'songrequest' })
+    if (!_.isEmpty(alias) && alias.enabled && global.commons.isSystemEnabled('alias')) {
       ytRegex = new RegExp('^(!songrequest|!' + alias.alias + ') \\S+(?:youtu.be\\/|v\\/|e\\/|u\\/\\w+\\/|embed\\/|v=)([^#&?]*).*', 'gi')
     } else {
       ytRegex = /^(!songrequest) \S+(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/gi
@@ -186,7 +186,7 @@ Moderation.prototype.containsLink = async function (self, id, sender, text, skip
   const isMod = await global.parser.isMod(sender)
 
   var timeout = global.configuration.getValue('moderationLinksTimeout')
-  text = self.whitelist(text)
+  text = await self.whitelist(text)
 
   debug('should check links - %s', global.configuration.getValue('moderationLinks'))
   debug('skip: %s', skip)
@@ -220,7 +220,7 @@ Moderation.prototype.containsLink = async function (self, id, sender, text, skip
 }
 
 Moderation.prototype.symbols = async function (self, id, sender, text, skip) {
-  text = self.whitelist(text)
+  text = await self.whitelist(text)
 
   const isMod = await global.parser.isMod(sender)
 
@@ -262,7 +262,7 @@ Moderation.prototype.symbols = async function (self, id, sender, text, skip) {
 }
 
 Moderation.prototype.longMessage = async function (self, id, sender, text, skip) {
-  text = self.whitelist(text)
+  text = await self.whitelist(text)
   const isMod = await global.parser.isMod(sender)
 
   var timeout = global.configuration.getValue('moderationLongMessageTimeout')
@@ -282,7 +282,7 @@ Moderation.prototype.longMessage = async function (self, id, sender, text, skip)
 
 Moderation.prototype.caps = async function (self, id, sender, text, skip) {
   debug('caps(%s, %j, %s, %s', id, sender, text, skip)
-  text = self.whitelist(text)
+  text = await self.whitelist(text)
 
   const isMod = await global.parser.isMod(sender)
 
@@ -335,7 +335,7 @@ Moderation.prototype.caps = async function (self, id, sender, text, skip) {
 }
 
 Moderation.prototype.spam = async function (self, id, sender, text, skip) {
-  text = self.whitelist(text)
+  text = await self.whitelist(text)
 
   const isMod = await global.parser.isMod(sender)
 
@@ -383,7 +383,7 @@ Moderation.prototype.color = async function (self, id, sender, text, skip) {
 }
 
 Moderation.prototype.emotes = async function (self, id, sender, text, skip) {
-  text = self.whitelist(text)
+  text = await self.whitelist(text)
   const isMod = await global.parser.isMod(sender)
 
   var timeout = global.configuration.getValue('moderationSpamTimeout')
