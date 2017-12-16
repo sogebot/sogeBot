@@ -155,7 +155,7 @@ class Songs {
         self.currentSong = sr
         self.currentSong.volume = self.getVolume(self, self.currentSong)
         socket.emit('videoID', self.currentSong)
-        await global.db.engine.remove('songrequests', { _id: sr._id })
+        await global.db.engine.remove('songrequests', { _id: sr._id.toString() })
         return
       }
     }
@@ -163,6 +163,10 @@ class Songs {
     // get song from playlist
     if (global.configuration.getValue('songs_playlist')) {
       let pl = await global.db.engine.find('playlist')
+      if (_.isEmpty(pl)) {
+        socket.emit('videoID', null) // send null and skip to next empty song
+        return // don't do anything if no songs in playlist
+      }
       pl = _.head(_.orderBy(pl, [(global.configuration.getValue('songs_shuffle') ? 'seed' : 'lastPlayedAt')], ['asc']))
 
       // shuffled song is played again
@@ -172,7 +176,7 @@ class Songs {
         return
       }
 
-      await global.db.engine.update('playlist', { _id: pl._id }, { seed: 1, lastPlayedAt: new Date().getTime() })
+      await global.db.engine.update('playlist', { _id: pl._id.toString() }, { seed: 1, lastPlayedAt: new Date().getTime() })
       self.currentSong = pl
       self.currentSong.volume = self.getVolume(self, self.currentSong)
       socket.emit('videoID', self.currentSong)
@@ -204,7 +208,7 @@ class Songs {
   async createRandomSeeds () {
     let playlist = await global.db.engine.find('playlist')
     _.each(playlist, function (item) {
-      global.db.engine.update('playlist', { _id: item._id }, { seed: Math.random() })
+      global.db.engine.update('playlist', { _id: item._id.toString() }, { seed: Math.random() })
     })
   }
 
@@ -265,7 +269,7 @@ class Songs {
     let sr = await global.db.engine.find('songrequests', { username: sender.username })
     sr = _.head(_.orderBy(sr, ['addedAt'], ['desc']))
     if (!_.isNil(sr)) {
-      await global.db.engine.remove('songrequests', { username: sender.username, _id: sr._id })
+      await global.db.engine.remove('songrequests', { username: sender.username, _id: sr._id.toString() })
       let m = global.commons.prepare('songs.song-was-removed-from-queue', { name: sr.title })
       debug(m); global.commons.sendMessage(m, sender)
       self.getMeanLoudness(self)

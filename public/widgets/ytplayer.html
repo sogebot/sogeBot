@@ -76,16 +76,6 @@
 </div>
 
 <script>
-  $("#volumeSlider").on("change", function (slideEvt) {
-    socket.emit('saveConfiguration', {
-      'songs_volume': slideEvt.value.newValue,
-      '_quiet': true
-    })
-    setTimeout(function () {
-      socket.emit('songs.getCurrentVolume')
-    })
-  })
-
   socket.on('newVolume', function (vol) {
     player.setVolume(vol)
   })
@@ -102,6 +92,17 @@
       formatter: function (value) {
         return value + '%';
       }
+    })
+    
+    $("#volumeSlider").off()
+    $("#volumeSlider").on("change", function (slideEvt) {
+      socket.emit('saveConfiguration', {
+        'songs_volume': slideEvt.value.newValue,
+        '_quiet': true
+      })
+      setTimeout(function () {
+        socket.emit('songs.getCurrentVolume')
+      })
     })
   })
 
@@ -162,6 +163,7 @@
     if (video === null) {
       loading = false
       player.stopVideo()
+      setTimeout(() => socket.emit('songs.sendNextSongID'), 1000)
       return
     }
 
