@@ -295,10 +295,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
   let command = {
     '(!#)': async function (filter) {
       if (!_.isString(attr.sender)) attr.sender = attr.sender.username
-      let cmd = filter.replace('(', '')
-      .replace(')', '')
-      .replace('.', ' ')
-      .replace('sender', attr.sender)
+      let cmd = filter.replace(/\(|\)/g, '')
       global.parser.parse({ username: attr.sender }, cmd, true)
       return ''
     }
@@ -482,7 +479,7 @@ Parser.prototype.parseMessageCommand = async function (filters, msg) {
     let regexp = _.escapeRegExp(key)
 
     // we want to handle # as \w - number in regexp
-    regexp = regexp.replace(/#/g, '(\\S+)')
+    regexp = regexp.replace(/#/g, '.*?')
     let rMessage = msg.match((new RegExp('(' + regexp + ')', 'g')))
     if (!_.isNull(rMessage)) {
       for (var bkey in rMessage) {
