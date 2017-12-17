@@ -295,7 +295,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
   let command = {
     '(!#)': async function (filter) {
       if (!_.isString(attr.sender)) attr.sender = attr.sender.username
-      let cmd = filter.replace(/\(|\)/g, '')
+      let cmd = filter.replace(/\(|\)/g, '').replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + attr.sender)
       global.parser.parse({ username: attr.sender }, cmd, true)
       return ''
     }
