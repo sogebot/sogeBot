@@ -16,8 +16,9 @@ SubscribersWidget.prototype.sendConfiguration = function (self, socket) {
   })
 }
 
-SubscribersWidget.prototype.emitLatestSubscribers = function (self, socket) {
-  socket.emit('subscribers.latest', global.twitch.cached.subscribers)
+SubscribersWidget.prototype.emitLatestSubscribers = async function (self, socket) {
+  const cached = await global.twitch.cached()
+  socket.emit('subscribers.latest', cached.subscribers)
 }
 
 module.exports = new SubscribersWidget()

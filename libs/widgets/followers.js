@@ -16,8 +16,9 @@ FollowersWidget.prototype.sendConfiguration = function (self, socket) {
   })
 }
 
-FollowersWidget.prototype.emitLatestFollowers = function (self, socket) {
-  socket.emit('followers.latest', global.twitch.cached.followers)
+FollowersWidget.prototype.emitLatestFollowers = async function (self, socket) {
+  const cached = await global.twitch.cached()
+  socket.emit('followers.latest', cached.followers)
 }
 
 module.exports = new FollowersWidget()
