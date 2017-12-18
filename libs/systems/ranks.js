@@ -199,12 +199,10 @@ class Ranks {
     if (!_.isNil(user.custom.rank)) return user.custom.rank
 
     let ranks = await global.db.engine.find('ranks')
-    let watchTime = user.time.watched
-    watchTime = _.isFinite(parseInt(watchTime, 10)) && _.isNumber(parseInt(watchTime, 10)) ? (watchTime / 1000 / 60 / 60).toFixed(0) : 0
-
     let rankToReturn = null
+
     for (let rank of _.orderBy(ranks, 'hours', 'asc')) {
-      if (watchTime >= parseInt(rank.hours, 10)) {
+      if (_.get(user, 'time.watched', 0) / 1000 / 60 / 60 >= rank.hours) {
         rankToReturn = rank.value
       } else break
     }
