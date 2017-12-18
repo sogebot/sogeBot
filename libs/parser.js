@@ -279,7 +279,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
     }
   }
   let param = {
-    '(param)': async function (filter) {
+    '$param': async function (filter) {
       if (!_.isUndefined(attr.param) && attr.param.length !== 0) return attr.param
       return ''
     }
