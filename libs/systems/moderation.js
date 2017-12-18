@@ -87,11 +87,7 @@ function Moderation () {
 }
 
 Moderation.prototype._update = async function (self) {
-  let blacklist = global.db.engine.findOne('settings', { key: 'blacklist' })
-  let whitelist = global.db.engine.findOne('settings', { key: 'whitelist' })
-
-  await blacklist
-  await whitelist
+  let [blacklist, whitelist] = await Promise.all([global.db.engine.findOne('settings', { key: 'blacklist' }), global.db.engine.findOne('settings', { key: 'whitelist' })])
 
   self.lists.blacklist = blacklist.value
   self.lists.whitelist = whitelist.value
