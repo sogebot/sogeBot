@@ -44,6 +44,11 @@
     <!-- /MAIN -->
 
     <div role="tabpanel" class="tab-pane" id="eventlist-settings">
+      <div class="input-group">
+        <span class="input-group-addon" data-lang="eventlist-show-number"></span>
+        <input type="text" class="form-control" id="eventlistShow">
+        <span class="input-group-addon" data-lang="eventlist-show"></span>
+      </div>
       <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('eventlist')" style="margin-top: 20px;" data-lang="remove-widget"></button>
     </div>
     <!-- /SETTINGS -->
@@ -68,7 +73,7 @@
     }
   }
 
-  socket.emit('widget.eventlist.get')
+  setInterval(() => socket.emit('widget.eventlist.get'), 1000)
 
   socket.once('configuration', function (data) {
     if (!data.widgetEventlistFollows) {
@@ -87,12 +92,15 @@
       $('button[data-id="resub"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
     eventlist.config = {
+      show: data.widgetEventlistShow,
       follow: data.widgetEventlistFollows,
       host: data.widgetEventlistHosts,
       cheer: data.widgetEventlistCheers,
       sub: data.widgetEventlistSubs,
       resub: data.widgetEventlistResubs
     }
+
+    $('#eventlistShow').val(data.widgetEventlistShow)
   })
 
   socket.on('widget.eventlist', function (o) {
@@ -186,8 +194,17 @@
         .append(username)
 
       eventlistEl.append(row)
-      if (i >= 5) break
+      if (i >= eventlist.config.show) break
     }
   })
 
+  var $eventlistShow = $('#eventlistShow')
+  $eventlistShow.off()
+  $eventlistShow.on('focusout', function () {
+    var value = $eventlistShow.val()
+    var data = {}
+    data['widgetEventlistShow'] = value
+    eventlist.config.show = value
+    socket.emit('saveConfiguration', data)
+  })
 </script>
