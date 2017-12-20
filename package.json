@@ -53,7 +53,7 @@
   },
   "scripts": {
     "build-css": "npm-run-all --parallel css-theme-light-compile css-theme-dark-compile",
-    "build-zip": "npm run cleanup:dist; rm -rf node_modules; rm npm-shrinkwrap.json; npm install; npm shrinkwrap; echo Removing sogeBot-$npm_package_version.zip; rm sogeBot-$npm_package_version.zip; echo Creating new sogeBot-$npm_package_version.zip; zip -qr sogeBot-$npm_package_version.zip npm-shrinkwrap.json config.example.json libs/ locales/ main.js public/ launch.sh LICENSE migrate.js package.json README.md tools/ bin/ bat/ scss/",
+    "build-zip": "npm run cleanup:dist; rm -rf node_modules; rm npm-shrinkwrap.json; npm install; npm shrinkwrap; echo Removing sogeBot-$npm_package_version.zip; rm sogeBot-$npm_package_version.zip; echo Creating new sogeBot-$npm_package_version.zip; zip -qr sogeBot-$npm_package_version.zip AUTHORS npm-shrinkwrap.json config.example.json libs/ locales/ main.js public/ launch.sh LICENSE migrate.js package.json README.md tools/ bin/ bat/ scss/",
     "css-theme-light-compile": "node-sass --output-style expanded --precision 6 scss/themes/light.scss public/dist/css/light.css",
     "css-theme-dark-compile": "node-sass --output-style expanded --precision 6 scss/themes/dark.scss public/dist/css/dark.css",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
