@@ -994,22 +994,18 @@ table tr td hr {
   color: $yellow;
 }
 
-.eventlist-icon {
-  font-size: 1.5rem;
+.eventlist-text {
+  font-size: .8rem;
   text-align: center;
   display: block;
-  padding: 0.5rem 0 0.5rem 0;
-  justify-content: center;
 }
 
 .eventlist-username {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  text-transform: uppercase;
   font-weight: bold;
   color: $gray-700; 
-  justify-content: center;
+  line-height: 1rem;
 }
 
 .eventlist-username * {
