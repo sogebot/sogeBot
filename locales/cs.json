@@ -190,7 +190,7 @@
   "webpanel": {
     "eventlist-events": {
       "follow": "ti dal <strong>follow</strong>",
-      "host": "tě <strong>hostuje</strong> s $viewers divaky",
+      "host": "tě <strong>hostuje</strong> s $viewers diváky",
       "sub": "ti dal <strong>sub</strong>",
       "resub": "ti dal <strong>resub</strong> $months měsíců",
       "cheer": "ti dal <strong>cheer</strong> $bits bitů"
