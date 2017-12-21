@@ -106,22 +106,6 @@
   socket.on('widget.eventlist', function (o) {
     if (_.isNil(o)) return
 
-    let icons = {
-      host: 'fa-bullhorn',
-      follow: 'fa-heart',
-      cheer: 'fa-diamond',
-      sub: 'fa-star',
-      resub: 'fa-star-half-o'
-    }
-
-    let iconsAnimation = {
-      host: 'anim-shake',
-      follow: 'anim-heartbeat',
-      cheer: 'anim-float',
-      sub: 'anim-spin',
-      resub: 'anim-burst'
-    }
-
     let colors = {
       follow: 'red',
       host: 'orange',
@@ -137,55 +121,60 @@
     for (let event of o) {
       if (!(eventlist.config[event.event])) continue
       i++
+
+      let timestamp = moment(event.timestamp).fromNow()
       let icon = $('<i>')
-        .addClass('fa')
-        .addClass(icons[event.event])
-        .addClass('text-' + colors[event.event])
-        .addClass('eventlist-icon')
-        .addClass(iconsAnimation[event.event])
+        .text(timestamp)
+        .attr('title', moment(event.timestamp).format('LLLL'))
+        .addClass('eventlist-text')
 
       let username = $('<div>')
         .addClass('col-9 eventlist-username')
-        .html(`<div style="text-overflow: ellipsis; overflow: hidden" title="${event.username}">${event.username}</div>`)
+        .html(`<div title="${event.username}">${event.username}</div>`)
+
+      let t = translations['eventlist-events'][event.event]
+      if (event.event === 'follow') {
+        username.append($('<span>')
+            .html(t)
+            .css('font-size', "0.7rem")
+            .css('font-weight', 'normal')
+          )
+      }
 
       if (event.event === 'host') {
         username.append($('<span>')
-            .html('<i class="fa fa-eye">' + '</i> ' + _.get(event, 'viewers', 'n/a'))
+            .html(t.replace('$viewers', '<strong>' + _.get(event, 'viewers', '0') + '</strong>'))
             .css('font-size', "0.7rem")
             .css('font-weight', 'normal')
-            .css('position', 'relative')
-            .css('top', '-0.4rem')
           )
-          .css('position', 'relative')
-          .css('top', '0.2rem')
+      }
+
+      if (event.event === 'sub') {
+        username.append($('<span>')
+            .html(t)
+            .css('font-size', "0.7rem")
+            .css('font-weight', 'normal')
+          )
       }
 
       if (event.event === 'resub') {
         username.append($('<span>')
-            .text(translations['events-months-of-subscription'] + ': ' + event.months)
+            .html(t.replace('$months', '<strong>' + _.get(event, 'months', '0') + '</strong>'))
             .css('font-size', "0.7rem")
             .css('font-weight', 'normal')
-            .css('position', 'relative')
-            .css('top', '-0.4rem')
           )
-          .css('position', 'relative')
-          .css('top', '0.2rem')
       }
 
       if (event.event === 'cheer') {
         username.append($('<span>')
-            .html('<i class="fa fa-diamond">' + '</i> ' + event.bits)
+            .html(t.replace('$bits', '<strong>' + _.get(event, 'bits', '0') + '</strong>'))
             .css('font-size', "0.7rem")
             .css('font-weight', 'normal')
-            .css('position', 'relative')
-            .css('top', '-0.4rem')
           )
-          .css('position', 'relative')
-          .css('top', '0.2rem')
       }
 
       let colIcon = $('<div>')
-        .addClass('col-2')
+        .addClass('col-3')
         .append(icon)
 
       let row = $('<div>')

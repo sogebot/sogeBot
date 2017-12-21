@@ -305,7 +305,7 @@
   <script type="text/javascript" src="./dist/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
   <script type="text/javascript" src="./dist/bootstrap-slider/js/bootstrap-slider.min.js"></script>
   <script type="text/javascript" src="./dist/bootstrap-menu/js/BootstrapMenu.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment-with-locales.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.1/markdown-it.js"></script>
   <script type="text/javascript" src="/auth/token.js"></script>
   <script src="/dist/velocity-animate/js/velocity.min.js"></script>
@@ -364,6 +364,7 @@
     console.debug('EMIT [getConfiguration]')
     socket.emit('getConfiguration')
     socket.on('configuration', function (data) {
+      moment.locale(data.lang) // set moment locale
       /* THEME */
       if (data.theme === 'dark') {
         $('head').append('<link rel="stylesheet" href="./dist/css/dark.css">')
