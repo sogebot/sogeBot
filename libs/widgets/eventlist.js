@@ -13,6 +13,7 @@ function EventList () {
   global.configuration.register('widgetEventlistSubs', 'core.no-response-bool', 'bool', true)
   global.configuration.register('widgetEventlistResubs', 'core.no-response-bool', 'bool', true)
   global.configuration.register('widgetEventlistShow', 'core.no-response', 'number', 5)
+  global.configuration.register('widgetEventlistOverflowHeight', 'core.no-response', 'number', 500)
 }
 
 EventList.prototype._get = async function (self) {
