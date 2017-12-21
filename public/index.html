@@ -52,7 +52,7 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-      <ul class="navbar-nav mr-auto" id="menu-main">
+      <ul class="navbar-nav mr-auto page-menu">
         <li class="nav-item" id="menuDashboard">
           <a href="#" data-page="dashboard" class="nav-link active" data-lang="dashboard"></a>
         </li>
@@ -73,8 +73,8 @@
       </ul>
 
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item" style="font-size: 0.6rem; position: relative; top: .2rem">
-          <span class="alert alert-warning" style="padding:0;" id="APIStatus" title="API checking">API</span>
+        <li class="nav-item page-menu" style="font-size: 0.6rem; position: relative; top: .2rem">
+          <a class="alert alert-warning" style="padding:0; cursor: pointer;" id="APIStatus" data-page="apistats" title="API checking" >API</a>
           <span class="alert alert-warning" style="padding:0;" id="TMIStatus" title="TMI checking">TMI</span>
           <span class="alert alert-warning" style="padding:0;" id="SOCStatus" title="SOC checking">SOC</span>
           <span class="alert alert-warning" style="padding:0;" id="MODStatus" title="MOD checking">MOD</span>
@@ -305,6 +305,7 @@
   <script type="text/javascript" src="./dist/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
   <script type="text/javascript" src="./dist/bootstrap-slider/js/bootstrap-slider.min.js"></script>
   <script type="text/javascript" src="./dist/bootstrap-menu/js/BootstrapMenu.min.js"></script>
+  <script type="text/javascript" src="./dist/chart.js/js/Chart.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment-with-locales.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.3.1/markdown-it.js"></script>
   <script type="text/javascript" src="/auth/token.js"></script>
@@ -419,12 +420,12 @@
       })
       loadedMenu = true
 
-      $("#menu-main a").on('click', function (ev) {
+      $(".page-menu a").on('click', function (ev) {
         var page = ev.currentTarget.dataset.page
         var visibility = page !== 'dashboard' ? 'hidden' : 'visible'
         if (_.isUndefined(page)) return
 
-        $("#menu-main a").removeClass('active')
+        $(".page-menu a").removeClass('active')
         $(ev.currentTarget).addClass('active')
 
         $("#pages").empty()

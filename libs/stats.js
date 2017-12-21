@@ -4,6 +4,7 @@ var _ = require('lodash')
 function Stats () {
   this.latestTimestamp = 0
   global.panel.socketListening(this, 'getLatestStats', this.getLatestStats)
+  global.panel.socketListening(this, 'getApiStats', this.getApiStats)
 }
 
 Stats.prototype.save = async function (data) {
@@ -25,6 +26,12 @@ Stats.prototype.getLatestStats = async function (self, socket) {
     stats = _.orderBy(stats, 'timestamp', 'desc')[1]
   } else stats = {}
   socket.emit('latestStats', stats)
+}
+
+Stats.prototype.getApiStats = async function (self, socket) {
+  let stats = await global.db.engine.find('APIStats')
+  // return hour of data
+  socket.emit('APIStats', _.filter(stats, (o) => _.now() - o.timestamp < 1000 * 60 * 60))
 }
 
 module.exports = Stats

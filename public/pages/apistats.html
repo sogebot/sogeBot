@@ -1,0 +1,164 @@
+<ul class="nav nav-tabs" style="position: relative; top: 1px">
+  <li class="nav-item">
+    <span class="title text-default">API stats</span>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#helix">HELIX</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#kraken">KRAKEN</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#tmi">TMI</a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="helix">
+    <div class="widget">
+      <canvas id="helixChart" width="400" height="100"></canvas>
+      <table class="table table-responsive">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">time</th>
+            <th scope="col">call</th>
+            <th scope="col">endpoint</th>
+          </tr>
+        </thead>
+        <tbody class="helixData"></tbody>
+      </table>
+    </div>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="kraken">
+    <div class="widget">
+      <canvas id="krakenChart" width="400" height="100"></canvas>
+      <table class="table table-responsive">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">time</th>
+            <th scope="col">call</th>
+            <th scope="col">endpoint</th>
+          </tr>
+        </thead>
+        <tbody class="krakenData"></tbody>
+      </table>
+    </div>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="tmi">
+    <div class="widget">
+      <canvas id="tmiChart" width="400" height="100"></canvas>
+      <table class="table table-responsive">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">time</th>
+            <th scope="col">call</th>
+            <th scope="col">endpoint</th>
+          </tr>
+        </thead>
+        <tbody class="tmiData"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  socket.emit('getApiStats')
+  setInterval(() => socket.emit('getApiStats'), 60000)
+
+  var helixChart = new Chart(document.getElementById("helixChart").getContext('2d'), { type: 'line' })
+  var krakenChart = new Chart(document.getElementById("krakenChart").getContext('2d'), { type: 'line' })
+  var tmiChart = new Chart(document.getElementById("tmiChart").getContext('2d'), { type: 'line' })
+
+  socket.on('APIStats', (data) => {
+    data = _.orderBy(data, 'timestamp', 'desc')
+    
+    $('.tmiData').empty()
+    $('.helixData').empty()
+    $('.krakenData').empty()
+
+    for (c of data) {
+      let tBody = `.${c.api}Data`
+      $(tBody).append(
+        `
+          <tr>
+            <th scope="row">${moment(c.timestamp).format('LTS')}</th>
+            <td>${c.call}</td>
+            <td><div style="word-wrap: break-word; font-family: Monospace">${c.endpoint}</div></td>
+          </tr>
+        `
+      )
+    }
+
+    const helixData = _.filter(data, (o) => o.api === 'helix')
+    const krakenData = _.filter(data, (o) => o.api === 'kraken')
+    const tmiData = _.filter(data, (o) => o.api === 'tmi')
+
+    let helixTimestampsPerMinute = {}
+    let krakenTimestampsPerMinute = {}
+    let tmiTimestampsPerMinute = {}
+
+    let lastTimestampSaved = 0
+    for (let timestamp of _.reverse(_.map(helixData, 'timestamp'))) {
+      // timestamps needs to be reversed as we have data from newest to oldest
+      if (timestamp >= lastTimestampSaved + 60000) {
+        lastTimestampSaved = timestamp
+        helixTimestampsPerMinute[lastTimestampSaved] = []
+      }
+      helixTimestampsPerMinute[lastTimestampSaved].push(timestamp)
+    }
+
+    for (let index in helixTimestampsPerMinute) {
+      helixTimestampsPerMinute[index] = helixTimestampsPerMinute[index].length
+    }
+
+    lastTimestampSaved = 0
+    for (let timestamp of _.reverse(_.map(krakenData, 'timestamp'))) {
+      // timestamps needs to be reversed as we have data from newest to oldest
+      if (timestamp >= lastTimestampSaved + 60000) {
+        lastTimestampSaved = timestamp
+        krakenTimestampsPerMinute[lastTimestampSaved] = []
+      }
+      krakenTimestampsPerMinute[lastTimestampSaved].push(timestamp)
+    }
+
+    for (let index in krakenTimestampsPerMinute) {
+      krakenTimestampsPerMinute[index] = krakenTimestampsPerMinute[index].length
+    }
+
+    lastTimestampSaved = 0
+    for (let timestamp of _.reverse(_.map(tmiData, 'timestamp'))) {
+      // timestamps needs to be reversed as we have data from newest to oldest
+      if (timestamp >= lastTimestampSaved + 60000) {
+        lastTimestampSaved = timestamp
+        tmiTimestampsPerMinute[lastTimestampSaved] = []
+      }
+      tmiTimestampsPerMinute[lastTimestampSaved].push(timestamp)
+    }
+
+    for (let index in tmiTimestampsPerMinute) {
+      tmiTimestampsPerMinute[index] = tmiTimestampsPerMinute[index].length
+    }
+
+    helixChart.data.labels = _.map(_.keys(helixTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))
+    helixChart.data.datasets = [{
+      label: 'HELIX API calls',
+      data: _.values(helixTimestampsPerMinute)
+    }]
+    helixChart.update()
+
+    krakenChart.data.labels = _.map(_.keys(krakenTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))
+    krakenChart.data.datasets = [{
+      label: 'KRAKEN API calls',
+      data: _.values(krakenTimestampsPerMinute)
+    }]
+    krakenChart.update()
+    
+    tmiChart.data.labels = _.map(_.keys(tmiTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))
+    tmiChart.data.datasets = [{
+      label: 'TMI API calls',
+      data: _.values(tmiTimestampsPerMinute)
+    }]
+    tmiChart.update()
+  })
+
+</script>
