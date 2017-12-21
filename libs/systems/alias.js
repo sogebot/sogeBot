@@ -134,11 +134,37 @@ class Alias {
   }
 
   async run (self, sender, msg, fullMsg) {
-    let parsed = fullMsg.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
-    let alias = await global.db.engine.findOne('alias', { alias: parsed[1].toLowerCase(), enabled: true })
+    var alias
 
-    if (!_.isEmpty(alias)) global.parser.parse(sender, fullMsg.replace(parsed[1], alias.command), true)
-    else global.parser.unregister(fullMsg)
+    let cmdArray = fullMsg.split(' ')
+    for (let i in fullMsg.split(' ')) { // search for correct alias
+      debug(`${i} - Searching for ${cmdArray.join(' ')} in aliases`)
+      alias = await global.db.engine.findOne('alias', { alias: cmdArray.join(' ').replace('!', ''), enabled: true })
+      debug(alias)
+      if (!_.isEmpty(alias)) break
+      cmdArray.pop() // remove last array item if not found
+    }
+    if (_.isEmpty(alias)) return // no alias was found - return
+    debug('Alias found: %j', alias)
+
+    cmdArray = fullMsg.replace(alias.alias, alias.command).split(' ')
+    let tryingToBypass = false
+    for (let i in fullMsg.split(' ')) { // search if it is not trying to bypass permissions
+      if (cmdArray.length === alias.command.split(' ').length) break // command is correct (have same number of parameters as command)
+      debug(`${i} - Searching if ${cmdArray.join(' ')} is registered as command`)
+      debug(`Is registered: %s`, global.parser.isRegistered(cmdArray.join(' ')))
+
+      if (global.parser.isRegistered(cmdArray.join(' '))) {
+        tryingToBypass = true
+        break
+      }
+      cmdArray.pop() // remove last array item if not found
+    }
+    debug(`Is trying to bypass command permission: %s`, tryingToBypass)
+
+    if (!tryingToBypass) {
+      global.parser.parse(sender, fullMsg.replace(alias.alias, alias.command), true)
+    }
   }
 
   async list (self, sender) {
