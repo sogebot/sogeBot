@@ -18,6 +18,7 @@
     "bootstrap-slider": "^10.0.0",
     "bootstrap-toggle": "^2.2.2",
     "chalk": "^2.3.0",
+    "chart.js": "^2.7.1",
     "cross-env": "^5.1.1",
     "debug": "^3.1.0",
     "decode-html": "^2.0.0",

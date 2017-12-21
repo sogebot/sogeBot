@@ -4,6 +4,9 @@ var path = require('path')
 var _ = require('lodash')
 
 var dist = {
+  'chart.js': {
+    'js': 'dist/Chart.min.js'
+  },
   'flv.js': {
     'js': 'dist/flv.min.js'
   },

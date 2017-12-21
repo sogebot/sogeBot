@@ -223,6 +223,7 @@ Users.prototype.isFollowerUpdate = async function (username) {
 
   if (_.isNil(user.id)) return // skip check if ID doesn't exist
 
+  global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'kraken', endpoint: 'https://api.twitch.tv/kraken/users/' + user.id + '/follows/channels/' + global.channelId })
   global.client.api({
     url: 'https://api.twitch.tv/kraken/users/' + user.id + '/follows/channels/' + global.channelId,
     headers: {
