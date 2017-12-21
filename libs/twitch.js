@@ -284,6 +284,7 @@ class Twitch {
   }
 
   async getLatest100Followers (quiet) {
+    const d = debug('twitch:getLatest100Followers')
     if (_.isNil(global.channelId)) {
       setTimeout(() => this.getLatest100Followers(true), 1000)
       return
@@ -304,34 +305,51 @@ class Twitch {
 
     global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
     if (request.status === 200 && !_.isNil(request.body.data)) {
-      let fids = _.map(request.body.data, (o) => `id=${o.from_id}`)
+      // check if user id is in db, not in db load username from API
+      let fidsToLoadFromAPI = []
+      let followersUsername = []
+      for (let u of request.body.data) {
+        let user = await global.db.engine.findOne('users', { id: u.from_id })
+        d('Searching id %s in users db: %j', u.from_id, user)
+        if (_.isEmpty(user)) fidsToLoadFromAPI.push(u.from_id)
+        else followersUsername.push(user.username)
+      }
+      d('Usernames from db: %j', followersUsername)
+      d('IDs to load from API: %j', fidsToLoadFromAPI)
 
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}` })
-      let usersFromApi = await snekfetch.get(`https://api.twitch.tv/helix/users?${fids.join('&')}`)
-        .set('Client-ID', config.settings.client_id)
-        .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+      if (fidsToLoadFromAPI.length > 0) {
+        let fids = _.map(fidsToLoadFromAPI, (o) => `id=${o}`)
+        global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}` })
+        let usersFromApi = await snekfetch.get(`https://api.twitch.tv/helix/users?${fids.join('&')}`)
+          .set('Client-ID', config.settings.client_id)
+          .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+        for (let follower of usersFromApi.body.data) {
+          if (follower.login.toLowerCase() === config.settings.bot_username) continue
+          else followersUsername.push(follower.login.toLowerCase())
+          d('Saving user %s id %s', follower.login.toLowerCase(), follower.id)
+          global.users.set(follower.login.toLowerCase(), {id: follower.id})
+        }
+      }
 
       // if follower is not in cache, add as first
       let cached = await this.cached()
-      for (let follower of usersFromApi.body.data) {
-        if (follower.login.toLowerCase() === config.settings.bot_username) continue // skip a bot
-
-        if (!_.includes(cached.followers, follower.login)) {
-          cached.followers.unshift(follower.login)
+      for (let follower of followersUsername) {
+        if (!_.includes(cached.followers, follower)) {
+          cached.followers.unshift(follower)
         }
       }
       cached.followers = _.uniq(cached.followers)
       this.cached(cached)
 
-      for (let follower of usersFromApi.body.data) {
-        if (follower.login.toLowerCase() === config.settings.bot_username) continue // skip a bot
-
-        let user = await global.users.get(follower.login)
+      for (let follower of followersUsername) {
+        let user = await global.users.get(follower)
         if (!user.is.follower) {
-          if (new Date().getTime() - moment(user.time.follow).format('X') * 1000 < 60000 * 60 && !quiet) global.events.fire('follow', { username: follower.login })
-          global.users.set(follower.login, { id: follower.id, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
+          if (new Date().getTime() - moment(user.time.follow).format('X') * 1000 < 60000 * 60 && !quiet) global.events.fire('follow', { username: follower })
+          d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
+          global.users.set(follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
         } else {
-          global.users.set(follower.login, { id: follower.id, is: { follower: true }, time: { followCheck: new Date().getTime() } })
+          d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime() } })
+          global.users.set(follower, { is: { follower: true }, time: { followCheck: new Date().getTime() } })
         }
       }
     }
