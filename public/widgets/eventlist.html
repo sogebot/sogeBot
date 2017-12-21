@@ -45,6 +45,11 @@
 
     <div role="tabpanel" class="tab-pane" id="eventlist-settings">
       <div class="input-group">
+        <span class="input-group-addon" data-lang="eventlist-overflow-height"></span>
+        <input type="text" class="form-control" id="eventlistOverflowHeight">
+        <span class="input-group-addon">px</span>
+      </div>
+      <div class="input-group">
         <span class="input-group-addon" data-lang="eventlist-show-number"></span>
         <input type="text" class="form-control" id="eventlistShow">
         <span class="input-group-addon" data-lang="eventlist-show"></span>
@@ -92,6 +97,7 @@
       $('button[data-id="resub"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
     eventlist.config = {
+      height: data.widgetEventlistOverflowHeight,
       show: data.widgetEventlistShow,
       follow: data.widgetEventlistFollows,
       host: data.widgetEventlistHosts,
@@ -101,6 +107,7 @@
     }
 
     $('#eventlistShow').val(data.widgetEventlistShow)
+    $('#eventlistOverflowHeight').val(data.widgetEventlistOverflowHeight)
   })
 
   socket.on('widget.eventlist', function (o) {
@@ -116,6 +123,9 @@
 
     let eventlistEl = $('#eventlist-main')
     eventlistEl.empty()
+    eventlistEl
+      .css('max-height', eventlist.config.height + 'px')
+      .css('overflow', 'overlay')
 
     let i = 0
     for (let event of o) {
@@ -196,4 +206,14 @@
     eventlist.config.show = value
     socket.emit('saveConfiguration', data)
   })
+
+var $eventlistOverflow = $('#eventlistOverflowHeight')
+$eventlistOverflow.off()
+$eventlistOverflow.on('focusout', function () {
+  var value = $eventlistOverflow.val()
+  var data = {}
+  data['widgetEventlistOverflowHeight'] = value
+  eventlist.config.height = value
+  socket.emit('saveConfiguration', data)
+})
 </script>
