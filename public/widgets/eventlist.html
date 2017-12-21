@@ -79,6 +79,7 @@
   }
 
   setInterval(() => socket.emit('widget.eventlist.get'), 1000)
+  socket.emit('widget.eventlist.get')
 
   socket.once('configuration', function (data) {
     if (!data.widgetEventlistFollows) {
@@ -121,6 +122,14 @@
       cheer: 'yellow'
     }
 
+    let icons = {
+        follow: 'heart',
+        host: 'bullhorn',
+        sub: 'star',
+        resub: 'star-half-o',
+        cheer: 'diamond'
+      }
+
     let eventlistEl = $('#eventlist-main')
     eventlistEl.empty()
     eventlistEl
@@ -140,7 +149,7 @@
 
       let username = $('<div>')
         .addClass('col-9 eventlist-username')
-        .html(`<div title="${event.username}">${event.username}</div>`)
+        .html(`<div title="${event.username}" style="z-index: 9999">${event.username}</div>`)
 
       let t = translations['eventlist-events'][event.event]
       if (event.event === 'follow') {
@@ -149,6 +158,7 @@
             .css('font-size', "0.7rem")
             .css('font-weight', 'normal')
           )
+        username.append(`<i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>`)
       }
 
       if (event.event === 'host') {
@@ -157,6 +167,7 @@
             .css('font-size', "0.7rem")
             .css('font-weight', 'normal')
           )
+        username.append(`<i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>`)
       }
 
       if (event.event === 'sub') {
@@ -165,6 +176,7 @@
             .css('font-size', "0.7rem")
             .css('font-weight', 'normal')
           )
+          username.append(`<i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>`)
       }
 
       if (event.event === 'resub') {
@@ -173,6 +185,7 @@
             .css('font-size', "0.7rem")
             .css('font-weight', 'normal')
           )
+        username.append(`<i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>`)
       }
 
       if (event.event === 'cheer') {
@@ -181,6 +194,7 @@
             .css('font-size', "0.7rem")
             .css('font-weight', 'normal')
           )
+        username.append(`<i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>`)
       }
 
       let colIcon = $('<div>')
