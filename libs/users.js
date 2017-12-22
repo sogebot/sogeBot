@@ -3,6 +3,7 @@
 var _ = require('lodash')
 var moment = require('moment')
 var constants = require('./constants')
+const snekfetch = require('snekfetch')
 
 const config = require('../config.json')
 const debug = require('debug')('users')
@@ -30,7 +31,7 @@ function Users () {
       this.rate_limit_follower_check = _.uniq(this.rate_limit_follower_check)
       this.isFollowerUpdate(this.rate_limit_follower_check.shift())
     }
-  }, 1000) // run follower ONE request every second
+  }, 30000) // run follower ONE request every 30 second
 
   setInterval(async () => {
     let increment = this.increment
@@ -208,40 +209,44 @@ Users.prototype.isFollower = async function (username) {
 }
 
 Users.prototype.isFollowerUpdate = async function (username) {
-  let user = await global.users.get(username)
+  const d = require('debug')('users:isFollowerUpdate')
 
+  if (username === config.settings.broadcaster_username || username === config.settings.bot_username) {
+    // skip if bot or broadcaster
+    d('IsFollowerUpdate SKIP for user %s', username)
+    return
+  }
+
+  let user = await global.users.get(username)
   if (_.isNil(user.id)) return // skip check if ID doesn't exist
 
-  global.client.api({
-    url: 'https://api.twitch.tv/kraken/users/' + user.id + '/follows/channels/' + global.channelId,
-    headers: {
-      Accept: 'application/vnd.twitchtv.v5+json',
-      'Client-ID': config.settings.client_id
+  const url = `https://api.twitch.tv/helix/users/follows?from_id=${user.id}&to_id=${global.channelId}`
+  try {
+    d('IsFollowerUpdate check for user %s', username)
+    var request = await snekfetch.get(url)
+      .set('Accept', 'application/vnd.twitchtv.v5+json')
+      .set('Authorization', 'OAuth ' + config.settings.broadcaster_oauth.split(':')[1])
+      .set('Client-ID', config.settings.client_id)
+    global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status })
+    d('Request done: %j', request.body)
+  } catch (e) {
+    global.log.error(`API: ${url} - ${e.message}`)
+    global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.message })
+    return
+  }
+
+  if (request.body.total === 0) {
+    // not a follower
+    // if was follower, fire unfollow event
+    if (user.is.follower) global.events.fire('unfollow', { username: username })
+    global.users.set(username, { is: { follower: false }, time: { followCheck: new Date().getTime(), follow: 0 } }, user.is.follower)
+  } else {
+    // is follower
+    if (!user.is.follower && new Date().getTime() - moment(request.body.data[0].followed_at).format('X') * 1000 < 60000 * 60) {
+      global.events.fire('follow', { username: username })
     }
-  }, async function (err, res, body) {
-    if (err) {
-      global.log.error(err, { fnc: 'Users.prototype.isFollowerUpdate#1' })
-      return
-    }
-    global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'kraken', endpoint: 'https://api.twitch.tv/kraken/users/' + user.id + '/follows/channels/' + global.channelId, code: res.statusCode })
-    if (res.statusCode === 400) {
-      body.username = username
-      body.user_id = user.id
-      body.channel_id = global.channelId
-      body.url = 'https://api.twitch.tv/kraken/users/' + user.id + '/follows/channels/' + global.channelId
-      global.log.error(JSON.stringify(body), { fnc: 'Users.prototype.isFollowerUpdate#2' })
-      return
-    }
-    if (res.statusCode === 404) {
-      if (user.is.follower) global.events.fire('unfollow', { username: username })
-      global.users.set(username, { is: { follower: false }, time: { followCheck: new Date().getTime(), follow: 0 } }, user.is.follower)
-    } else {
-      if (!user.is.follower && new Date().getTime() - moment(body.created_at).format('X') * 1000 < 60000 * 60) {
-        global.events.fire('follow', { username: username })
-      }
-      global.users.set(username, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(body.created_at).format('X') * 1000 } }, !user.is.follower)
-    }
-  })
+    global.users.set(username, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(request.body.data[0].followed_at).format('X') * 1000 } }, !user.is.follower)
+  }
 }
 
 Users.prototype.messagesInc = function (username) {
