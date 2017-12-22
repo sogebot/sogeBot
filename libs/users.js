@@ -28,13 +28,9 @@ function Users () {
 
   setInterval(async () => {
     // we are in bounds of safe rate limit, wait until limit is refreshed
-    if (this.remainingAPICalls <= 5 && this.refreshAPICalls * 1000 > _.now()) {
-      debug('Waiting for rate-limit to refresh')
-    } else {
-      if (this.rate_limit_follower_check.length > 0) {
-        this.rate_limit_follower_check = _.uniq(this.rate_limit_follower_check)
-        this.isFollowerUpdate(this.rate_limit_follower_check.shift())
-      }
+    if (this.rate_limit_follower_check.length > 0) {
+      this.rate_limit_follower_check = _.uniq(this.rate_limit_follower_check)
+      this.isFollowerUpdate(this.rate_limit_follower_check.shift())
     }
   }, 5000) // run follower ONE request every 5 second
 
@@ -216,6 +212,12 @@ Users.prototype.isFollower = async function (username) {
 Users.prototype.isFollowerUpdate = async function (username) {
   const d = require('debug')('users:isFollowerUpdate')
 
+  if ((global.twitch.remainingAPICalls <= 10 && global.twitch.refreshAPICalls > _.now() / 1000)) {
+    d('Skip for rate-limit to refresh and re-add user to queue')
+    global.users.rate_limit_follower_check.push(username)
+    return
+  }
+
   if (username === config.settings.broadcaster_username || username === config.settings.bot_username) {
     // skip if bot or broadcaster
     d('IsFollowerUpdate SKIP for user %s', username)
@@ -232,11 +234,11 @@ Users.prototype.isFollowerUpdate = async function (username) {
       .set('Accept', 'application/vnd.twitchtv.v5+json')
       .set('Authorization', 'OAuth ' + config.settings.broadcaster_oauth.split(':')[1])
       .set('Client-ID', config.settings.client_id)
-    global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status })
+    global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
     d('Request done: %j', request.body)
   } catch (e) {
     global.log.error(`API: ${url} - ${e.message}`)
-    global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.message })
+    global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.message, remaining: global.twitch.remainingAPICalls })
     return
   }
 
