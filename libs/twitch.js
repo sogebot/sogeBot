@@ -324,8 +324,7 @@ class Twitch {
           .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
         global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.status })
         for (let follower of usersFromApi.body.data) {
-          if (follower.login.toLowerCase() === config.settings.bot_username) continue
-          else followersUsername.push(follower.login.toLowerCase())
+          followersUsername.push(follower.login.toLowerCase())
           d('Saving user %s id %s', follower.login.toLowerCase(), follower.id)
           global.users.set(follower.login.toLowerCase(), {id: follower.id})
         }
