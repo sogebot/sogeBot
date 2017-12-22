@@ -23,6 +23,7 @@
             <th scope="col">time</th>
             <th scope="col">call</th>
             <th scope="col">endpoint</th>
+            <th scope="col">status</th>
           </tr>
         </thead>
         <tbody class="helixData"></tbody>
@@ -38,6 +39,7 @@
             <th scope="col">time</th>
             <th scope="col">call</th>
             <th scope="col">endpoint</th>
+            <th scope="col">status</th>
           </tr>
         </thead>
         <tbody class="krakenData"></tbody>
@@ -53,6 +55,7 @@
             <th scope="col">time</th>
             <th scope="col">call</th>
             <th scope="col">endpoint</th>
+            <th scope="col">status</th>
           </tr>
         </thead>
         <tbody class="tmiData"></tbody>
@@ -78,12 +81,15 @@
 
     for (c of data) {
       let tBody = `.${c.api}Data`
+      c.code = _.get(c, 'code', 200) // set default to 200
+      
       $(tBody).append(
         `
-          <tr>
+          <tr class="${c.code.toString().startsWith('2') ? '' : 'font-weight-bold'}">
             <th scope="row">${moment(c.timestamp).format('LTS')}</th>
             <td>${c.call}</td>
             <td><div style="word-wrap: break-word; font-family: Monospace">${c.endpoint}</div></td>
+            <td class="${c.code.toString().startsWith('2') ? '' : 'text-danger'}">${c.code}</td>
           </tr>
         `
       )

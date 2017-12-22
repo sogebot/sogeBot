@@ -148,11 +148,11 @@ class Twitch {
     var request
     const url = `https://api.twitch.tv/kraken/channels/${global.channelId}/subscriptions?limit=100`
     try {
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url })
       request = await snekfetch.get(url)
         .set('Accept', 'application/vnd.twitchtv.v5+json')
         .set('Authorization', 'OAuth ' + config.settings.broadcaster_oauth.split(':')[1])
         .set('Client-ID', config.settings.client_id)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.message}`)
       setTimeout(() => this.getChannelSubscribersOldAPI(), 30000)
@@ -174,10 +174,10 @@ class Twitch {
     var request
     const url = `https://api.twitch.tv/kraken/channels/${global.channelId}/follows?limit=100`
     try {
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelFollowersOldAPI', api: 'kraken', endpoint: url })
       request = await snekfetch.get(url)
         .set('Accept', 'application/vnd.twitchtv.v5+json')
         .set('Client-ID', config.settings.client_id)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelFollowersOldAPI', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.message}`)
       setTimeout(() => this.getChannelFollowersOldAPI(), 30000)
@@ -199,10 +199,10 @@ class Twitch {
     var request
     const url = `https://api.twitch.tv/kraken/channels/${global.channelId}`
     try {
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url })
       request = await snekfetch.get(url)
         .set('Accept', 'application/vnd.twitchtv.v5+json')
         .set('Client-ID', config.settings.client_id)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.message}`)
       setTimeout(() => this.getChannelDataOldAPI(), 30000)
@@ -225,8 +225,8 @@ class Twitch {
     var request
     const url = `http://tmi.twitch.tv/hosts?include_logins=1&target=${global.channelId}`
     try {
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url })
       request = await snekfetch.get(url)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.message}`)
       setTimeout(() => this.getChannelHosts(), 30000)
@@ -247,10 +247,10 @@ class Twitch {
     var request
     const url = `https://api.twitch.tv/helix/users/?id=${global.channelId}`
     try {
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url })
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.message}`)
       setTimeout(() => this.updateChannelViews(), 120000)
@@ -293,10 +293,10 @@ class Twitch {
     var request
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${global.channelId}&first=100`
     try {
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url })
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: https://api.twitch.tv/helix/users/follows?to_id=${global.channelId}&first=100 - ${e.message}`)
       setTimeout(() => this.getLatest100Followers(false), 60000)
@@ -319,10 +319,10 @@ class Twitch {
 
       if (fidsToLoadFromAPI.length > 0) {
         let fids = _.map(fidsToLoadFromAPI, (o) => `id=${o}`)
-        global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}` })
         let usersFromApi = await snekfetch.get(`https://api.twitch.tv/helix/users?${fids.join('&')}`)
           .set('Client-ID', config.settings.client_id)
           .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+        global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.status })
         for (let follower of usersFromApi.body.data) {
           if (follower.login.toLowerCase() === config.settings.bot_username) continue
           else followersUsername.push(follower.login.toLowerCase())
@@ -369,10 +369,10 @@ class Twitch {
     if (!_.isNil(gids[gid])) return gids[gid]
 
     try {
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url })
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.message}`)
       return this.current.game
@@ -395,10 +395,10 @@ class Twitch {
     var request
     const url = `https://api.twitch.tv/helix/streams?user_id=${global.channelId}`
     try {
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url })
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: https://api.twitch.tv/helix/streams?user_id=${global.channelId} - ${e.message}`)
       setTimeout(() => this.getCurrentStreamData(), 60000)
