@@ -13,6 +13,9 @@ class Twitch {
   constructor () {
     this.isOnline = false
 
+    this.remainingAPICalls = 30
+    this.refreshAPICalls = _.now() / 1000
+
     this.maxViewers = 0
     this.chatMessagesAtStart = global.parser.linesParsed
     this.maxRetries = 5
@@ -249,7 +252,10 @@ class Twitch {
 
   async updateChannelViews () {
     const d = debug('twitch:updateChannelViews')
-    if (_.isNil(global.channelId)) {
+    if (_.isNil(global.channelId) || (this.remainingAPICalls <= 5 && this.refreshAPICalls * 1000 > _.now())) {
+      if ((this.remainingAPICalls <= 5 && this.refreshAPICalls > _.now() / 1000)) {
+        d('Waiting for rate-limit to refresh')
+      }
       setTimeout(() => this.updateChannelViews(), 1000)
       return
     }
@@ -267,6 +273,11 @@ class Twitch {
       setTimeout(() => this.updateChannelViews(), 120000)
       return
     }
+
+    // save remaining api calls
+    this.remainingAPICalls = request.headers['ratelimit-remaining']
+    this.refreshAPICalls = request.headers['ratelimit-reset']
+
     d(request.body.data)
     this.current.views = request.body.data[0].view_count
     setTimeout(() => this.updateChannelViews(), 120000)
@@ -296,8 +307,13 @@ class Twitch {
 
   async getLatest100Followers (quiet) {
     const d = debug('twitch:getLatest100Followers')
-    if (_.isNil(global.channelId)) {
-      setTimeout(() => this.getLatest100Followers(true), 1000)
+
+    // if channelId is not set and we are in bounds of safe rate limit, wait until limit is refreshed
+    if (_.isNil(global.channelId) || (this.remainingAPICalls <= 5 && this.refreshAPICalls * 1000 > _.now())) {
+      if ((this.remainingAPICalls <= 5 && this.refreshAPICalls > _.now() / 1000)) {
+        d('Waiting for rate-limit to refresh')
+      }
+      setTimeout(() => this.getLatest100Followers(quiet), 1000)
       return
     }
 
@@ -314,6 +330,10 @@ class Twitch {
       setTimeout(() => this.getLatest100Followers(false), 60000)
       return
     }
+
+    // save remaining api calls
+    this.remainingAPICalls = request.headers['ratelimit-remaining']
+    this.refreshAPICalls = request.headers['ratelimit-reset']
 
     global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
     if (request.status === 200 && !_.isNil(request.body.data)) {
@@ -334,6 +354,11 @@ class Twitch {
         let usersFromApi = await snekfetch.get(`https://api.twitch.tv/helix/users?${fids.join('&')}`)
           .set('Client-ID', config.settings.client_id)
           .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+
+        // save remaining api calls
+        this.remainingAPICalls = usersFromApi.headers['ratelimit-remaining']
+        this.refreshAPICalls = usersFromApi.headers['ratelimit-reset']
+
         global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.status })
         for (let follower of usersFromApi.body.data) {
           followersUsername.push(follower.login.toLowerCase())
@@ -364,7 +389,7 @@ class Twitch {
         }
       }
     }
-    setTimeout(() => this.getLatest100Followers(false), 60000)
+    setTimeout(() => this.getLatest100Followers(false), 5000)
   }
 
   async getGameFromId (gid) {
@@ -399,7 +424,12 @@ class Twitch {
 
   async getCurrentStreamData () {
     const d = debug('twitch:getCurrentStreamData')
-    if (_.isNil(global.channelId)) {
+
+    // if channelId is not set and we are in bounds of safe rate limit, wait until limit is refreshed
+    if (_.isNil(global.channelId) || (this.remainingAPICalls <= 5 && this.refreshAPICalls * 1000 > _.now())) {
+      if ((this.remainingAPICalls <= 5 && this.refreshAPICalls > _.now() / 1000)) {
+        d('Waiting for rate-limit to refresh')
+      }
       setTimeout(() => this.getCurrentStreamData(), 1000)
       return
     }
@@ -408,8 +438,8 @@ class Twitch {
     const url = `https://api.twitch.tv/helix/streams?user_id=${global.channelId}`
     try {
       request = await snekfetch.get(url)
-        .set('Client-ID', config.settings.client_id)
-        .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+      .set('Client-ID', config.settings.client_id)
+      .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: https://api.twitch.tv/helix/streams?user_id=${global.channelId} - ${e.message}`)
@@ -417,6 +447,11 @@ class Twitch {
       setTimeout(() => this.getCurrentStreamData(), 60000)
       return
     }
+
+    // save remaining api calls
+    this.remainingAPICalls = request.headers['ratelimit-remaining']
+    this.refreshAPICalls = request.headers['ratelimit-reset']
+
     d(request.body)
     global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
     if (request.status === 200 && !_.isNil(request.body.data[0])) {
