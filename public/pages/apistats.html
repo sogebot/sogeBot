@@ -24,6 +24,7 @@
             <th scope="col">call</th>
             <th scope="col">endpoint</th>
             <th scope="col">status</th>
+            <th scope="col">remaining API calls</th>
           </tr>
         </thead>
         <tbody class="helixData"></tbody>
@@ -97,6 +98,7 @@
             <td>${c.call}</td>
             <td><div style="word-wrap: break-word; font-family: Monospace">${c.endpoint}</div></td>
             <td>${c.code}</td>
+            ${c.remaining ? `<td>${c.remaining}</td>` : ''}
           </tr>
         `
       )
