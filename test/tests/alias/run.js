@@ -15,14 +15,12 @@ describe('Alias - run()', () => {
     await db.cleanup()
   })
 
-  it('!a will show !uptime', async () => {
-    global.systems.alias.add(global.systems.alias, owner, '!a !uptime')
-    await message.isSent('alias.alias-was-added', owner, { alias: 'a', command: 'uptime' })
-    // force uptime to be 0 (bypass cached db)
-    await global.twitch.when({})
+  it('!a will show !duel', async () => {
+    global.systems.alias.add(global.systems.alias, owner, '!a !duel')
+    await message.isSent('alias.alias-was-added', owner, { alias: 'a', command: 'duel' })
 
     global.parser.parse(owner, '!a')
-    await message.isSent('uptime.offline', owner, { days: '', hours: '', minutes: '', seconds: '' })
+    await message.isSent('gambling.duel.notEnoughOptions', owner, { })
 
     global.systems.alias.remove(global.systems.alias, owner, '!a')
     await message.isSent('alias.alias-was-removed', owner, { alias: 'a' })
