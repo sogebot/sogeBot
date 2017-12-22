@@ -155,13 +155,13 @@ class Twitch {
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.message}`)
-      setTimeout(() => this.getChannelSubscribersOldAPI(), 30000)
+      setTimeout(() => this.getChannelSubscribersOldAPI(), 60000)
       return
     }
     d(`Current subscribers count: ${request.body._total}`)
     this.current.subscribers = request.body._total - 1 // remove broadcaster itself
 
-    setTimeout(() => this.getChannelSubscribersOldAPI(), 10000)
+    setTimeout(() => this.getChannelSubscribersOldAPI(), 30000)
   }
 
   async getChannelFollowersOldAPI () {
@@ -180,13 +180,13 @@ class Twitch {
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelFollowersOldAPI', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.message}`)
-      setTimeout(() => this.getChannelFollowersOldAPI(), 30000)
+      setTimeout(() => this.getChannelFollowersOldAPI(), 60000)
       return
     }
     d(`Current followers count: ${request.body._total}`)
     this.current.followers = request.body._total
 
-    setTimeout(() => this.getChannelFollowersOldAPI(), 10000)
+    setTimeout(() => this.getChannelFollowersOldAPI(), 30000)
   }
 
   async getChannelDataOldAPI () {
@@ -205,14 +205,14 @@ class Twitch {
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.message}`)
-      setTimeout(() => this.getChannelDataOldAPI(), 30000)
+      setTimeout(() => this.getChannelDataOldAPI(), 60000)
       return
     }
     d(`Current game: ${request.body.game}, Current Status: ${request.body.status}`)
     this.current.game = request.body.game
     this.current.status = request.body.status
 
-    setTimeout(() => this.getChannelDataOldAPI(), 10000)
+    setTimeout(() => this.getChannelDataOldAPI(), 30000)
   }
 
   async getChannelHosts () {
