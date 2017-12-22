@@ -357,8 +357,17 @@ class Twitch {
   }
 
   async getGameFromId (gid) {
+    const d = debug('twitch:getGameFromId')
     var request
     const url = `https://api.twitch.tv/helix/games?id=${gid}`
+
+    let cache = await global.db.engine.findOne('cache', { upsert: true })
+    let gids = _.get(cache, 'gidToGame', {})
+
+    d('Cached id for game? %s', !_.isNil(gids[gid]))
+    // check if id is cached
+    if (!_.isNil(gids[gid])) return gids[gid]
+
     try {
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url })
       request = await snekfetch.get(url)
@@ -368,6 +377,11 @@ class Twitch {
       global.log.error(`API: ${url} - ${e.message}`)
       return this.current.game
     }
+
+    // add id->game to cache
+    gids[gid] = request.body.data[0].name
+    d('Saving id %s -> %s to cache', gid, request.body.data[0].name)
+    global.db.engine.update('cache', { upsert: true }, { gidToGame: gids })
     return request.body.data[0].name
   }
 
