@@ -154,6 +154,7 @@ class Songs {
       if (!_.isNil(sr)) {
         self.currentSong = sr
         self.currentSong.volume = self.getVolume(self, self.currentSong)
+        self.currentSong.type = 'songrequests'
         socket.emit('videoID', self.currentSong)
         await global.db.engine.remove('songrequests', { _id: sr._id.toString() })
         return
@@ -179,6 +180,7 @@ class Songs {
       await global.db.engine.update('playlist', { _id: pl._id.toString() }, { seed: 1, lastPlayedAt: new Date().getTime() })
       self.currentSong = pl
       self.currentSong.volume = self.getVolume(self, self.currentSong)
+      self.currentSong.type = 'playlist'
       socket.emit('videoID', self.currentSong)
       return
     }
