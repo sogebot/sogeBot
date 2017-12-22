@@ -65,25 +65,32 @@
 </div>
 
 <script>
+  var lastTimestampFetched = 0
   socket.emit('getApiStats')
-  setInterval(() => socket.emit('getApiStats'), 60000)
+  setInterval(() => socket.emit('getApiStats', { from: lastTimestampFetched }), 60000)
 
   var helixChart = new Chart(document.getElementById("helixChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
   var krakenChart = new Chart(document.getElementById("krakenChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
   var tmiChart = new Chart(document.getElementById("tmiChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
+  
+  $('.helixData').empty()
+  $('.krakenData').empty()
+  $('.tmiData').empty()
+  
+  helixChart.clear()
+  krakenChart.clear()
+  tmiChart.clear()
 
+  socket.off('APIStats')
   socket.on('APIStats', (data) => {
-    data = _.orderBy(data, 'timestamp', 'desc')
-    
-    $('.tmiData').empty()
-    $('.helixData').empty()
-    $('.krakenData').empty()
+    data = _.orderBy(data, 'timestamp', 'asc')
+    lastTimestampFetched = _.get(data[data.length - 1], 'timestamp', 0)
 
     for (c of data) {
       let tBody = `.${c.api}Data`
       c.code = _.get(c, 'code', 200) // set default to 200
       
-      $(tBody).append(
+      $(tBody).prepend(
         `
           <tr class="${c.code.toString().startsWith('2') ? '' : 'font-weight-bold text-danger'}">
             <th scope="row">${moment(c.timestamp).format('LTS')}</th>
@@ -107,7 +114,7 @@
     let tmiTimestampsErrorsPerMinute = {}
 
     let lastTimestampSaved = 0
-    for (let timestamp of _.reverse(_.map(helixData, 'timestamp'))) {
+    for (let timestamp of _.map(helixData, 'timestamp')) {
       // timestamps needs to be reversed as we have data from newest to oldest
       if (timestamp >= lastTimestampSaved + 60000) {
         lastTimestampSaved = timestamp
@@ -130,7 +137,7 @@
     }
 
     lastTimestampSaved = 0
-    for (let timestamp of _.reverse(_.map(krakenData, 'timestamp'))) {
+    for (let timestamp of _.map(krakenData, 'timestamp')) {
       // timestamps needs to be reversed as we have data from newest to oldest
       if (timestamp >= lastTimestampSaved + 60000) {
         lastTimestampSaved = timestamp
@@ -153,7 +160,7 @@
     }
 
     lastTimestampSaved = 0
-    for (let timestamp of _.reverse(_.map(tmiData, 'timestamp'))) {
+    for (let timestamp of _.map(tmiData, 'timestamp')) {
       // timestamps needs to be reversed as we have data from newest to oldest
       if (timestamp >= lastTimestampSaved + 60000) {
         lastTimestampSaved = timestamp
@@ -175,46 +182,110 @@
       tmiTimestampsErrorsPerMinute[index] = tmiTimestampsErrorsPerMinute[index].length
     }
 
-    helixChart.data.labels = _.map(_.keys(helixTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))
-    helixChart.data.datasets = [{
-      label: 'HELIX API calls',
-      data: _.values(helixTimestampsPerMinute),
-      backgroundColor: 'rgba(0, 0, 255, 0.2)',
-      borderColor: 'rgba(0, 0, 255, 0.5)'
-    }, {
-      label: 'errors',
-      data: _.values(helixTimestampsErrorsPerMinute),
-      backgroundColor: 'rgba(255, 0, 0, 0.2)',
-      borderColor: 'rgba(255, 0, 0, 0.5)',
-    }]
+    /* HELIX CHART DATA*/
+    for (let label of _.map(_.keys(helixTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))) {
+      helixChart.data.labels.push(label)
+    }
+
+    for (let count of _.values(helixTimestampsPerMinute)) {
+      if (_.isNil(helixChart.data.datasets[0])) {
+        helixChart.data.datasets.push({
+          label: 'HELIX API calls',
+          data: [ count ],
+          backgroundColor: 'rgba(0, 0, 255, 0.2)',
+          borderColor: 'rgba(0, 0, 255, 0.5)'
+        })
+      } else helixChart.data.datasets[0].data.push(count)
+    }
+
+    for (let count of _.values(helixTimestampsErrorsPerMinute)) {
+      if (_.isNil(helixChart.data.datasets[1])) {
+        helixChart.data.datasets.push({
+          label: 'ERRORS',
+          data: [ count ],
+          backgroundColor: 'rgba(255, 0, 0, 0.2)',
+          borderColor: 'rgba(255, 0, 0, 0.5)',
+        })
+      } else helixChart.data.datasets[1].data.push(count)
+    }
     helixChart.update()
 
-    krakenChart.data.labels = _.map(_.keys(krakenTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))
-    krakenChart.data.datasets = [{
-      label: 'KRAKEN API calls',
-      data: _.values(krakenTimestampsPerMinute),
-      backgroundColor: 'rgba(0, 0, 255, 0.2)',
-      borderColor: 'rgba(0, 0, 255, 0.5)'
-    }, {
-      label: 'errors',
-      data: _.values(krakenTimestampsErrorsPerMinute),
-      backgroundColor: 'rgba(255, 0, 0, 0.2)',
-      borderColor: 'rgba(255, 0, 0, 0.5)'
-    }]
+    for (let count of _.values(helixTimestampsPerMinute)) {
+      if (_.isNil(helixChart.data.datasets[0])) {
+        helixChart.data.datasets.push({
+          label: 'HELIX API calls',
+          data: [ count ],
+          backgroundColor: 'rgba(0, 0, 255, 0.2)',
+          borderColor: 'rgba(0, 0, 255, 0.5)'
+        })
+      } else helixChart.data.datasets[0].data.push(count)
+    }
+
+    for (let count of _.values(helixTimestampsErrorsPerMinute)) {
+      if (_.isNil(helixChart.data.datasets[1])) {
+        helixChart.data.datasets.push({
+          label: 'ERRORS',
+          data: [ count ],
+          backgroundColor: 'rgba(255, 0, 0, 0.2)',
+          borderColor: 'rgba(255, 0, 0, 0.5)',
+        })
+      } else helixChart.data.datasets[1].data.push(count)
+    }
+    helixChart.update()
+
+    /* KRAKEN CHART DATA */
+    for (let label of _.map(_.keys(krakenTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))) {
+      krakenChart.data.labels.push(label)
+    }
+
+    for (let count of _.values(krakenTimestampsPerMinute)) {
+      if (_.isNil(krakenChart.data.datasets[0])) {
+        krakenChart.data.datasets.push({
+          label: 'KRAKEN API calls',
+          data: [ count ],
+          backgroundColor: 'rgba(0, 0, 255, 0.2)',
+          borderColor: 'rgba(0, 0, 255, 0.5)'
+        })
+      } else krakenChart.data.datasets[0].data.push(count)
+    }
+
+    for (let count of _.values(krakenTimestampsErrorsPerMinute)) {
+      if (_.isNil(krakenChart.data.datasets[1])) {
+        krakenChart.data.datasets.push({
+          label: 'ERRORS',
+          data: [ count ],
+          backgroundColor: 'rgba(255, 0, 0, 0.2)',
+          borderColor: 'rgba(255, 0, 0, 0.5)',
+        })
+      } else krakenChart.data.datasets[1].data.push(count)
+    }
     krakenChart.update()
-    
-    tmiChart.data.labels = _.map(_.keys(tmiTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))
-    tmiChart.data.datasets = [{
-      label: 'TMI API calls',
-      data: _.values(tmiTimestampsPerMinute),
-      backgroundColor: 'rgba(0, 0, 255, 0.2)',
-      borderColor: 'rgba(0, 0, 255, 0.5)',
-    }, {
-      label: 'errors',
-      data: _.values(tmiTimestampsErrorsPerMinute),
-      backgroundColor: 'rgba(255, 0, 0, 0.2)',
-      borderColor: 'rgba(255, 0, 0, 0.5)',
-    }]
+
+    /* TMI CHART DATA */$
+    for (let label of _.map(_.keys(tmiTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))) {
+      tmiChart.data.labels.push(label)
+    }
+    for (let count of _.values(tmiTimestampsPerMinute)) {
+      if (_.isNil(tmiChart.data.datasets[0])) {
+        tmiChart.data.datasets.push({
+          label: 'TMI API calls',
+          data: [ count ],
+          backgroundColor: 'rgba(0, 0, 255, 0.2)',
+          borderColor: 'rgba(0, 0, 255, 0.5)'
+        })
+      } else tmiChart.data.datasets[0].data.push(count)
+    }
+
+    for (let count of _.values(tmiTimestampsErrorsPerMinute)) {
+      if (_.isNil(tmiChart.data.datasets[1])) {
+        tmiChart.data.datasets.push({
+          label: 'ERRORS',
+          data: [ count ],
+          backgroundColor: 'rgba(255, 0, 0, 0.2)',
+          borderColor: 'rgba(255, 0, 0, 0.5)',
+        })
+      } else tmiChart.data.datasets[1].data.push(count)
+    }
     tmiChart.update()
   })
 
