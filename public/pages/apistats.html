@@ -85,11 +85,11 @@
       
       $(tBody).append(
         `
-          <tr class="${c.code.toString().startsWith('2') ? '' : 'font-weight-bold'}">
+          <tr class="${c.code.toString().startsWith('2') ? '' : 'font-weight-bold text-danger'}">
             <th scope="row">${moment(c.timestamp).format('LTS')}</th>
             <td>${c.call}</td>
             <td><div style="word-wrap: break-word; font-family: Monospace">${c.endpoint}</div></td>
-            <td class="${c.code.toString().startsWith('2') ? '' : 'text-danger'}">${c.code}</td>
+            <td>${c.code}</td>
           </tr>
         `
       )
@@ -100,8 +100,11 @@
     const tmiData = _.filter(data, (o) => o.api === 'tmi')
 
     let helixTimestampsPerMinute = {}
+    let helixTimestampsErrorsPerMinute = {}
     let krakenTimestampsPerMinute = {}
+    let krakenTimestampsErrorsPerMinute = {}
     let tmiTimestampsPerMinute = {}
+    let tmiTimestampsErrorsPerMinute = {}
 
     let lastTimestampSaved = 0
     for (let timestamp of _.reverse(_.map(helixData, 'timestamp'))) {
@@ -109,6 +112,11 @@
       if (timestamp >= lastTimestampSaved + 60000) {
         lastTimestampSaved = timestamp
         helixTimestampsPerMinute[lastTimestampSaved] = []
+        helixTimestampsErrorsPerMinute[lastTimestampSaved] = []
+      }
+
+      if (_.find(helixData, (o) => o.code !== 200 && o.timestamp === timestamp)) {
+        helixTimestampsErrorsPerMinute[lastTimestampSaved].push(timestamp)
       }
       helixTimestampsPerMinute[lastTimestampSaved].push(timestamp)
     }
@@ -117,12 +125,21 @@
       helixTimestampsPerMinute[index] = helixTimestampsPerMinute[index].length
     }
 
+    for (let index in helixTimestampsErrorsPerMinute) {
+      helixTimestampsErrorsPerMinute[index] = helixTimestampsErrorsPerMinute[index].length
+    }
+
     lastTimestampSaved = 0
     for (let timestamp of _.reverse(_.map(krakenData, 'timestamp'))) {
       // timestamps needs to be reversed as we have data from newest to oldest
       if (timestamp >= lastTimestampSaved + 60000) {
         lastTimestampSaved = timestamp
         krakenTimestampsPerMinute[lastTimestampSaved] = []
+        krakenTimestampsErrorsPerMinute[lastTimestampSaved] = []
+      }
+      
+      if (_.find(krakenData, (o) => o.code !== 200 && o.timestamp === timestamp)) {
+        krakenTimestampsErrorsPerMinute[lastTimestampSaved].push(timestamp)
       }
       krakenTimestampsPerMinute[lastTimestampSaved].push(timestamp)
     }
@@ -131,12 +148,21 @@
       krakenTimestampsPerMinute[index] = krakenTimestampsPerMinute[index].length
     }
 
+    for (let index in krakenTimestampsErrorsPerMinute) {
+      krakenTimestampsErrorsPerMinute[index] = krakenTimestampsErrorsPerMinute[index].length
+    }
+
     lastTimestampSaved = 0
     for (let timestamp of _.reverse(_.map(tmiData, 'timestamp'))) {
       // timestamps needs to be reversed as we have data from newest to oldest
       if (timestamp >= lastTimestampSaved + 60000) {
         lastTimestampSaved = timestamp
         tmiTimestampsPerMinute[lastTimestampSaved] = []
+        tmiTimestampsErrorsPerMinute[lastTimestampSaved] = []
+      }
+
+      if (_.find(tmiData, (o) => o.code !== 200 && o.timestamp === timestamp)) {
+        tmiTimestampsErrorsPerMinute[lastTimestampSaved].push(timestamp)
       }
       tmiTimestampsPerMinute[lastTimestampSaved].push(timestamp)
     }
@@ -145,24 +171,49 @@
       tmiTimestampsPerMinute[index] = tmiTimestampsPerMinute[index].length
     }
 
+    for (let index in tmiTimestampsErrorsPerMinute) {
+      tmiTimestampsErrorsPerMinute[index] = tmiTimestampsErrorsPerMinute[index].length
+    }
+
     helixChart.data.labels = _.map(_.keys(helixTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))
     helixChart.data.datasets = [{
       label: 'HELIX API calls',
-      data: _.values(helixTimestampsPerMinute)
+      data: _.values(helixTimestampsPerMinute),
+      backgroundColor: 'rgba(0, 0, 255, 0.2)',
+      borderColor: 'rgba(0, 0, 255, 0.5)'
+    }, {
+      label: 'errors',
+      data: _.values(helixTimestampsErrorsPerMinute),
+      backgroundColor: 'rgba(255, 0, 0, 0.2)',
+      borderColor: 'rgba(255, 0, 0, 0.5)',
     }]
     helixChart.update()
 
     krakenChart.data.labels = _.map(_.keys(krakenTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))
     krakenChart.data.datasets = [{
       label: 'KRAKEN API calls',
-      data: _.values(krakenTimestampsPerMinute)
+      data: _.values(krakenTimestampsPerMinute),
+      backgroundColor: 'rgba(0, 0, 255, 0.2)',
+      borderColor: 'rgba(0, 0, 255, 0.5)'
+    }, {
+      label: 'errors',
+      data: _.values(krakenTimestampsErrorsPerMinute),
+      backgroundColor: 'rgba(255, 0, 0, 0.2)',
+      borderColor: 'rgba(255, 0, 0, 0.5)'
     }]
     krakenChart.update()
     
     tmiChart.data.labels = _.map(_.keys(tmiTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))
     tmiChart.data.datasets = [{
       label: 'TMI API calls',
-      data: _.values(tmiTimestampsPerMinute)
+      data: _.values(tmiTimestampsPerMinute),
+      backgroundColor: 'rgba(0, 0, 255, 0.2)',
+      borderColor: 'rgba(0, 0, 255, 0.5)',
+    }, {
+      label: 'errors',
+      data: _.values(tmiTimestampsErrorsPerMinute),
+      backgroundColor: 'rgba(255, 0, 0, 0.2)',
+      borderColor: 'rgba(255, 0, 0, 0.5)',
     }]
     tmiChart.update()
   })
