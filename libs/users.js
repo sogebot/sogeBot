@@ -27,11 +27,16 @@ function Users () {
   this.setAll({ is: { online: false } })
 
   setInterval(async () => {
-    if (this.rate_limit_follower_check.length > 0) {
-      this.rate_limit_follower_check = _.uniq(this.rate_limit_follower_check)
-      this.isFollowerUpdate(this.rate_limit_follower_check.shift())
+    // we are in bounds of safe rate limit, wait until limit is refreshed
+    if (this.remainingAPICalls <= 5 && this.refreshAPICalls * 1000 > _.now()) {
+      debug('Waiting for rate-limit to refresh')
+    } else {
+      if (this.rate_limit_follower_check.length > 0) {
+        this.rate_limit_follower_check = _.uniq(this.rate_limit_follower_check)
+        this.isFollowerUpdate(this.rate_limit_follower_check.shift())
+      }
     }
-  }, 30000) // run follower ONE request every 30 second
+  }, 5000) // run follower ONE request every 5 second
 
   setInterval(async () => {
     let increment = this.increment
@@ -234,6 +239,9 @@ Users.prototype.isFollowerUpdate = async function (username) {
     global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.message })
     return
   }
+
+  global.twitch.remainingAPICalls = request.headers['ratelimit-remaining']
+  global.twitch.refreshAPICalls = request.headers['ratelimit-reset']
 
   if (request.body.total === 0) {
     // not a follower
