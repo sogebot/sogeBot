@@ -223,7 +223,6 @@ Users.prototype.isFollowerUpdate = async function (username) {
 
   if (_.isNil(user.id)) return // skip check if ID doesn't exist
 
-  global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'kraken', endpoint: 'https://api.twitch.tv/kraken/users/' + user.id + '/follows/channels/' + global.channelId })
   global.client.api({
     url: 'https://api.twitch.tv/kraken/users/' + user.id + '/follows/channels/' + global.channelId,
     headers: {
@@ -235,6 +234,7 @@ Users.prototype.isFollowerUpdate = async function (username) {
       global.log.error(err, { fnc: 'Users.prototype.isFollowerUpdate#1' })
       return
     }
+    global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'kraken', endpoint: 'https://api.twitch.tv/kraken/users/' + user.id + '/follows/channels/' + global.channelId, code: res.statusCode })
     if (res.statusCode === 400) {
       body.username = username
       body.user_id = user.id
