@@ -389,7 +389,7 @@ class Twitch {
         }
       }
     }
-    setTimeout(() => this.getLatest100Followers(false), 5000)
+    setTimeout(() => this.getLatest100Followers(false), 60000)
   }
 
   async getGameFromId (gid) {
