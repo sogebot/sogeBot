@@ -266,10 +266,10 @@ class Twitch {
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status })
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: e.message })
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: e.message, remaining: this.remainingAPICalls })
       setTimeout(() => this.updateChannelViews(), 120000)
       return
     }
@@ -323,10 +323,10 @@ class Twitch {
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status })
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
       global.log.error(`API: https://api.twitch.tv/helix/users/follows?to_id=${global.channelId}&first=100 - ${e.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.message })
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.message, remaining: this.remainingAPICalls })
       setTimeout(() => this.getLatest100Followers(false), 60000)
       return
     }
@@ -359,7 +359,7 @@ class Twitch {
         this.remainingAPICalls = usersFromApi.headers['ratelimit-remaining']
         this.refreshAPICalls = usersFromApi.headers['ratelimit-reset']
 
-        global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.status })
+        global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.status, remaining: this.remainingAPICalls })
         for (let follower of usersFromApi.body.data) {
           followersUsername.push(follower.login.toLowerCase())
           d('Saving user %s id %s', follower.login.toLowerCase(), follower.id)
@@ -408,10 +408,10 @@ class Twitch {
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status })
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.message })
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.message, remaining: this.remainingAPICalls })
       return this.current.game
     }
 
@@ -440,10 +440,10 @@ class Twitch {
       request = await snekfetch.get(url)
       .set('Client-ID', config.settings.client_id)
       .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status })
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
       global.log.error(`API: https://api.twitch.tv/helix/streams?user_id=${global.channelId} - ${e.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.message })
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.message, remaining: this.remainingAPICalls })
       setTimeout(() => this.getCurrentStreamData(), 60000)
       return
     }
@@ -845,10 +845,10 @@ class Twitch {
         .set('Accept', 'application/vnd.twitchtv.v5+json')
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateGameAndTitle', api: 'helix', endpoint: url, code: request.status })
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateGameAndTitle', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateGameAndTitle', api: 'helix', endpoint: url, code: e.message })
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateGameAndTitle', api: 'helix', endpoint: url, code: e.message, remaining: this.remainingAPICalls })
       return
     }
     d(request.body)
