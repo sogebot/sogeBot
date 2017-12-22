@@ -161,12 +161,12 @@ class Twitch {
         global.log.info('Broadcaster is not affiliate/partner, will not check subs')
         this.current.subscribers = 0
         // caster is not affiliate or partner, don't do calls again
-        return
       } else {
         global.log.error(`API: ${url} - ${e.message}`)
         global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: e.message })
         setTimeout(() => this.getChannelSubscribersOldAPI(), 60000)
       }
+      return
     }
     d(`Current subscribers count: ${request.body._total}`)
     this.current.subscribers = request.body._total - 1 // remove broadcaster itself
