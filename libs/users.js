@@ -106,17 +106,6 @@ Users.prototype.merge = async function (self, sender, text) {
 Users.prototype.get = async function (username) {
   username = username.toLowerCase()
 
-  if (_.isNil(username)) global.log.error('username is NULL!\n' + new Error().stack)
-  if (username === config.settings.bot_username || _.isNil(username)) {
-    return {
-      username: username,
-      time: {},
-      is: {},
-      stats: {},
-      custom: {}
-    }
-  }
-
   let user = await global.db.engine.findOne('users', { username: username })
 
   // return all default values
