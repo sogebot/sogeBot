@@ -68,9 +68,9 @@
   socket.emit('getApiStats')
   setInterval(() => socket.emit('getApiStats'), 60000)
 
-  var helixChart = new Chart(document.getElementById("helixChart").getContext('2d'), { type: 'line' })
-  var krakenChart = new Chart(document.getElementById("krakenChart").getContext('2d'), { type: 'line' })
-  var tmiChart = new Chart(document.getElementById("tmiChart").getContext('2d'), { type: 'line' })
+  var helixChart = new Chart(document.getElementById("helixChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
+  var krakenChart = new Chart(document.getElementById("krakenChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
+  var tmiChart = new Chart(document.getElementById("tmiChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
 
   socket.on('APIStats', (data) => {
     data = _.orderBy(data, 'timestamp', 'desc')
