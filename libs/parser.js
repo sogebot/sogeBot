@@ -422,18 +422,18 @@ Parser.prototype.parseMessage = async function (message, attr) {
     }
   }
 
-  let msg = await this.parseMessageEval(evaluate, decode(message))
-  msg = await this.parseMessageOnline(online, msg)
-  msg = await this.parseMessageCommand(command, msg)
-  msg = await this.parseMessageEach(random, msg)
-  msg = await this.parseMessageEach(price, msg)
-  msg = await this.parseMessageEach(custom, msg)
-  msg = await this.parseMessageEach(param, msg)
-  msg = await this.parseMessageEach(info, msg)
-  msg = await this.parseMessageEach(list, msg)
-  msg = await this.parseMessageEach(math, msg)
-  msg = await this.parseMessageApi(msg)
-  msg = await this.parseMessageEach(ifp, msg, false)
+  let msg = await this.parseMessageEval(evaluate, decode(message)); debug('parseMessageEval: %s', msg)
+  msg = await this.parseMessageOnline(online, msg); debug('parseMessageOnline: %s', msg)
+  msg = await this.parseMessageCommand(command, msg); debug('parseMessageCommand: %s', msg)
+  msg = await this.parseMessageEach(random, msg); debug('parseMessageEach: %s', msg)
+  msg = await this.parseMessageEach(price, msg); debug('parseMessageEach: %s', msg)
+  msg = await this.parseMessageEach(custom, msg); debug('parseMessageEach: %s', msg)
+  msg = await this.parseMessageEach(param, msg); debug('parseMessageEach: %s', msg)
+  msg = await this.parseMessageEach(info, msg); debug('parseMessageEach: %s', msg)
+  msg = await this.parseMessageEach(list, msg); debug('parseMessageEach: %s', msg)
+  msg = await this.parseMessageEach(math, msg); debug('parseMessageEach: %s', msg)
+  msg = await this.parseMessageApi(msg); debug('parseMessageApi: %s', msg)
+  msg = await this.parseMessageEach(ifp, msg, false); debug('parseMessageEach: %s', msg)
   return msg
 }
 

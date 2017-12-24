@@ -37,7 +37,8 @@ Alerts.prototype.replay = function (self, socket, data) {
   self.overlay(self, null, replay.join(' '))
 }
 
-Alerts.prototype.overlay = function (self, sender, text) {
+Alerts.prototype.overlay = async function (self, sender, text) {
+  text = await global.parser.parseMessage(text)
   let send = []
   let objectString = text.trim().split(' | ')
   _.each(objectString, function (o) {
