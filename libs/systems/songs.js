@@ -33,6 +33,7 @@ class Songs {
       global.configuration.register('songs_shuffle', 'core.settings.songs.shuffle', 'bool', false)
       global.configuration.register('songs_songrequest', 'core.settings.songs.songrequest', 'bool', true)
       global.configuration.register('songs_playlist', 'core.settings.songs.playlist', 'bool', true)
+      global.configuration.register('songs_notify', 'core.settings.songs.notify', 'bool', false)
 
       this.getMeanLoudness(this)
 
@@ -86,7 +87,8 @@ class Songs {
       shuffle: global.configuration.getValue('songs_shuffle'),
       duration: global.configuration.getValue('songs_duration'),
       songrequest: global.configuration.getValue('songs_songrequest'),
-      playlist: global.configuration.getValue('songs_playlist')
+      playlist: global.configuration.getValue('songs_playlist'),
+      notify: global.configuration.getValue('songs_notify')
     })
   }
 
@@ -155,6 +157,9 @@ class Songs {
         self.currentSong = sr
         self.currentSong.volume = self.getVolume(self, self.currentSong)
         self.currentSong.type = 'songrequests'
+
+        if (global.configuration.getValue('songs_notify')) self.notifySong(self)
+
         socket.emit('videoID', self.currentSong)
         await global.db.engine.remove('songrequests', { _id: sr._id.toString() })
         return
@@ -181,6 +186,9 @@ class Songs {
       self.currentSong = pl
       self.currentSong.volume = self.getVolume(self, self.currentSong)
       self.currentSong.type = 'playlist'
+
+      if (global.configuration.getValue('songs_notify')) self.notifySong(self)
+
       socket.emit('videoID', self.currentSong)
       return
     }
@@ -195,6 +203,16 @@ class Songs {
       if (self.currentSong.type === 'playlist') translation = 'songs.current-song-from-playlist'
       else translation = 'songs.current-song-from-songrequest'
     }
+    let message = global.commons.prepare(translation, { name: self.currentSong.title, username: self.currentSong.username })
+    debug(message); global.commons.sendMessage(message, {username: config.settings.broadcaster_username})
+  }
+
+  notifySong (self) {
+    var translation
+    if (!_.isNil(self.currentSong.title)) {
+      if (self.currentSong.type === 'playlist') translation = 'songs.current-song-from-playlist'
+      else translation = 'songs.current-song-from-songrequest'
+    } else return
     let message = global.commons.prepare(translation, { name: self.currentSong.title, username: self.currentSong.username })
     debug(message); global.commons.sendMessage(message, {username: config.settings.broadcaster_username})
   }
