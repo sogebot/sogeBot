@@ -35,6 +35,10 @@
         "false": "Bot nebude posilat zpravy pomoci /me"
       },
       "songs": {
+        "notify": {
+          "true": "Oznamovani prave prehravaneho songu je {core.enabled}",
+          "false": "Oznamovani prave prehravaneho songu je {core.disabled}"
+        },
         "songrequest": {
           "true": "Prehravani song requestu je {core.enabled}",
           "false": "Prehravani song requestu je {core.disabled}"
@@ -510,6 +514,7 @@
     "max-duration": "Maximální délka",
     "shuffle": "Hrát náhodně",
     "song-requests": "Song Requests",
+    "song-notify": "Notifikace na začátku písně",
     "format": "Formát",
     "available": "Dostupné",
     "links": "Linky",

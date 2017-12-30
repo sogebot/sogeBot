@@ -35,6 +35,10 @@
         "false": "Bot won't send messages using /me"
       },
       "songs": {
+        "notify": {
+          "true": "Notification of current playing song is {core.enabled}",
+          "false": "Notification of current playing song is {core.disabled}"
+        },
         "songrequest": {
           "true": "Song requests are {core.enabled}",
           "false": "Song requests are {core.disabled}"
@@ -511,6 +515,7 @@
     "max-duration": "Max duration",
     "shuffle": "Shuffle",
     "song-requests": "Song Requests",
+    "song-notify": "Notification on beginning of a song",
     "format": "Format",
     "available": "Available",
     "links": "Links",

@@ -192,6 +192,14 @@
       <div class="w-100"></div>
 
       <div class="col">
+        <strong data-lang="song-notify"></strong>
+      </div>
+      <div class="col">
+        <input id="notifyToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+      </div>
+      <div class="w-100"></div>
+
+      <div class="col">
         <strong data-lang="playlist"></strong>
       </div>
       <div class="col">
@@ -433,6 +441,15 @@
       })
     })
     $('#shuffleToggle').data('init', true)
+
+    $('#notifyToggle').bootstrapToggle(data.notify ? 'on' : 'off')
+    $('#notifyToggle').off('change')
+    $('#notifyToggle').change(function () {
+      if ($('#notifyToggle').data('init')) socket.emit('saveConfiguration', {
+        'songs_notify': $(this).prop('checked')
+      })
+    })
+    $('#notifyToggle').data('init', true)
 
     $('#songrequestToggle').bootstrapToggle(data.songrequest ? 'on' : 'off')
     $('#songrequestToggle').off('change')
