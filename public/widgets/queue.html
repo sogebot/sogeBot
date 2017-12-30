@@ -26,7 +26,9 @@
         <span class="input-group-btn">
           <button class="btn btn-success" type="button" title="Open queue" onclick="queue.toggleLocked()" id="queue-toggle-btn"></button>
         </span>
-        <span class="input-group-addon" data-lang="number-of-users"></span>
+        <div class="input-group-prepend">
+          <span class="input-group-text" data-lang="number-of-users"></span>
+        </div>
         <input type="number" class="form-control" placeholder="How many users should be picked?" min="1" value="1" style="text-align:right" id="queue-pick-count">
 
         <span class="input-group-btn">

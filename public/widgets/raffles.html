@@ -42,7 +42,9 @@
 
     <div role="tabpanel" class="tab-pane active" id="raffles-giveaway">
       <div class="input-group">
-        <span class="input-group-addon">!</span>
+        <div class="input-group-prepend">
+            <span class="input-group-text">!</span>
+        </div>
         <input type="text" class="form-control" placeholder="Enter keyword..." id="rafflesWidgetKeyword">
         <span class="input-group-btn">
           <button class="btn btn-success" id="openBtn" type="button" title="" onclick="raffles.open()">
@@ -88,13 +90,17 @@
         <div class="w-100"></div>
         <div class="col" style="padding-right:0;">
           <div class="input-group">
-            <span class="input-group-addon">min</span>
+            <div class="input-group-prepend">
+              <span class="input-group-text">min</span>
+            </div>
             <input type="number" class="form-control" placeholder="0" id="minTickets" min="0">
           </div>
         </div>
         <div class="col" style="padding-left:0;">
           <div class="input-group">
-            <span class="input-group-addon">max</span>
+            <div class="input-group-prepend">
+                <span class="input-group-text">max</span>
+            </div>
             <input type="number" class="form-control" placeholder="100" id="maxTickets" min="0">
           </div>
         </div>
@@ -154,9 +160,13 @@
     <!-- /WINNER -->
     <div role="tabpanel" class="tab-pane" id="raffles-settings">
       <div class="input-group">
-        <span class="input-group-addon" data-lang="announce-every"></span>
+        <div class="input-group-prepend">
+            <span class="input-group-text" data-lang="announce-every"></span>
+        </div>
         <input type="text" class="form-control" id="raffleAnnounce">
-        <span class="input-group-addon" data-lang="minutes"></span>
+        <div class="input-group-append">
+            <span class="input-group-text" data-lang="minutes"></span>
+        </div>
       </div>
       <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('raffles')" style="margin-top: 20px;" data-lang="remove-widget"></button>
     </div>

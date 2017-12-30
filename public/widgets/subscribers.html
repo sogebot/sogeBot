@@ -22,12 +22,18 @@
 
     <div role="tabpanel" class="tab-pane" id="subscribers-settings">
       <div class="input-group">
-        <span class="input-group-addon" data-lang="followers-show-number"></span>
+        <div class="input-group-prepend">
+          <span class="input-group-text" data-lang="followers-show-number"></span>
+        </div>
         <input type="text" class="form-control" id="subscribersShow">
-        <span class="input-group-addon" data-lang="subscribers-show"></span>
+        <div class="input-group-append">
+          <span class="input-group-text" data-lang="subscribers-show"></span>
+        </div>
       </div>
       <div class="input-group">
-        <span class="input-group-addon" data-lang="followers-size"></span>
+        <div class="input-group-prepend">
+          <span class="input-group-text" data-lang="followers-size"></span>
+        </div>
         <input type="text" class="form-control" id="subscribersSize">
       </div>
       <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('subscribers')" style="margin-top: 20px;" data-lang="remove-widget"></button>

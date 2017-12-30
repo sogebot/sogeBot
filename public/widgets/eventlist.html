@@ -45,14 +45,22 @@
 
     <div role="tabpanel" class="tab-pane" id="eventlist-settings">
       <div class="input-group">
-        <span class="input-group-addon" data-lang="eventlist-overflow-height"></span>
+        <div class="input-group-prepend">
+          <span class="input-group-text" data-lang="eventlist-overflow-height"></span>
+        </div>
         <input type="text" class="form-control" id="eventlistOverflowHeight">
-        <span class="input-group-addon">px</span>
+        <div class="input-group-append">
+          <span class="input-group-text">px</span>
+        </div>
       </div>
       <div class="input-group">
-        <span class="input-group-addon" data-lang="eventlist-show-number"></span>
+        <div class="input-group-prepend">
+          <span class="input-group-text" data-lang="eventlist-show-number"></span>
+        </div>
         <input type="text" class="form-control" id="eventlistShow">
-        <span class="input-group-addon" data-lang="eventlist-show"></span>
+        <div class="input-group-append">
+          <span class="input-group-text" data-lang="eventlist-show"></span>
+        </div>
       </div>
       <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('eventlist')" style="margin-top: 20px;" data-lang="remove-widget"></button>
     </div>
