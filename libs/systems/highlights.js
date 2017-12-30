@@ -4,8 +4,11 @@
 var _ = require('lodash')
 var moment = require('moment')
 require('moment-precise-range-plugin')
+const debug = require('debug')
+
 // bot libraries
-var constants = require('../constants')
+const constants = require('../constants')
+const config = require('../../config.json')
 
 const ERROR_STREAM_NOT_ONLINE = '1'
 
@@ -34,48 +37,61 @@ class Highlights {
     }
   }
 
-  highlight (self, sender, description) {
+  async highlight (self, sender, description) {
+    const d = debug('systems:highlight:highlight')
     description = description.trim().length > 0 ? description : null
 
     let highlight = {}
 
     try {
-      if (_.isNil(global.twitch.when.online)) throw Error(ERROR_STREAM_NOT_ONLINE)
+      const when = await global.twitch.when()
+      if (_.isNil(when.online)) throw Error(ERROR_STREAM_NOT_ONLINE)
 
-      let timestamp = moment.preciseDiff(global.twitch.when.online, moment(), true)
+      let timestamp = moment.preciseDiff(when.online, moment(), true)
       timestamp = { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds }
-      highlight.stream_id = moment(global.twitch.when.online).format('X')
-      highlight.stream = global.twitch.when.online
+      highlight.stream_id = moment(when.online).format('X')
+      highlight.stream = when.online
       highlight.timestamp = timestamp
       highlight.description = description
       highlight.title = global.twitch.current.status
       highlight.game = global.twitch.current.game
       highlight.created_at = moment().format('X')
 
-      if (self.cached.created_at === global.twitch.when.online && !_.isNil(self.cached.id) && !_.isNil(self.cached.created_at)) {
+      d('Created at (cached): %s', self.cached.created_at)
+      d('When online: %s', when.online)
+      d('Current video id: %s', self.cached.id)
+
+      if (self.cached.created_at === when.online && !_.isNil(self.cached.id) && !_.isNil(self.cached.created_at)) {
+        d('Using from cache')
         highlight.video_id = self.cached.id
         self.add(self, highlight, timestamp, sender)
       } else {
+        d('Searching in API')
         // we need to load video id
+        const url = 'https://api.twitch.tv/kraken/channels/' + global.channelId + '/videos?broadcast_type=archive&limit=1'
         let options = {
-          url: 'https://api.twitch.tv/kraken/channels/' + global.channelId + '/videos?broadcast_type=archive&limit=1',
+          url: url,
           headers: {
             Accept: 'application/vnd.twitchtv.v5+json',
-            'Client-ID': global.configuration.get().twitch.clientId
+            'Client-ID': config.settings.client_id
           }
         }
         global.client.api(options, function (err, res, body) {
           if (err) {
             global.log.error(err, { fnc: 'Highlights#1' })
+            global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: err })
             return
           }
+          global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: 200 })
           const video = body.videos[0]
           self.cached.id = video._id
+          self.cached.created_at = when.online
           highlight.video_id = self.cached.id
           self.add(self, highlight, timestamp, sender)
         })
       }
     } catch (e) {
+      d(e)
       switch (e.message) {
         case ERROR_STREAM_NOT_ONLINE:
           global.commons.sendMessage(global.translate('highlights.offline'), sender)
