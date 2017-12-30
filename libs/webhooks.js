@@ -6,6 +6,10 @@ const debug = require('debug')('webhooks')
 
 class Webhooks {
   constructor () {
+    this.enabled = {
+      follows: false
+    }
+
     this.subscribe('follows')
   }
 
@@ -32,7 +36,7 @@ class Webhooks {
       case 'follows':
         let res = await snekfetch.post(request.join('&')).set('Client-ID', config.settings.client_id)
         debug('Subscribe response: %o', res)
-        if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: follows subscribed')
+        if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: follows waiting for challenge')
         else global.log.error('WEBHOOK: follows NOT subscribed')
         break
       default:
@@ -53,6 +57,13 @@ class Webhooks {
   }
 
   async challenge (req, res) {
+    // set webhooks enabled
+    switch (req.query['hub.topic']) {
+      case `https://api.twitch.tv/helix/users/follows?to_id=${global.channelId}`:
+        global.log.info('WEBHOOK: follows subscribed')
+        this.enabled.follows = true
+        break
+    }
     res.send(req.query['hub.challenge'])
   }
 
