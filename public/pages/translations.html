@@ -6,7 +6,7 @@
     <a class="nav-link active" data-toggle="tab" href="#manage" data-lang="manage"></a>
   </li>
   <li class="nav-item ml-auto" style="position: relative; top: -.3rem">
-    <div class="btn-group" data-toggle="buttons">
+    <div class="btn-group btn-group-toggle" data-toggle="buttons">
         <input type="text" class="form-control" placeholder="search by key..." style="margin:0 4px; padding: 8px 5px;" id="translations-search-input">
         <label class="btn btn-secondary" style="margin:0; padding: 8px 5px;">
           <input type="checkbox" autocomplete="off" id="translations-only-changed-checkbox"> Show only changed
@@ -97,7 +97,7 @@
               local.push(`<span class="editable-variable editable-variable-click block" data-var="${f}" data-lang="responses.variable.${f}"></span>`)
             }
           }
-          
+
           let o = $(
             `<tr>
               <td style="cursor: default">${key}</td>
