@@ -983,7 +983,8 @@
               $(ev.currentTarget).children('span').children('input[type=radio]').attr('checked', true)
               this.selectedTitle = $(ev.currentTarget).data('title')
             })
-          let inputGroupAddon = $('<span>').addClass('input-group-addon')
+          let inputGroupPrepend = $('<span>').addClass('input-group-prepend')
+          let inputGroupText = $('<span>').addClass('input-group-text')
           let radio = $('<input>')
             .attr('type', 'radio')
             .attr('checked', 'checked')
@@ -995,8 +996,8 @@
             .addClass("form-control")
             .val(curTitle)
 
-          inputGroupAddon.append(radio)
-          inputGroup.append(inputGroupAddon)
+          inputGroupPrepend.append(inputGroupText.append(radio))
+          inputGroup.append(inputGroupPrepend)
           inputGroup.append(input)
           col.append(inputGroup)
 
@@ -1008,7 +1009,9 @@
         for (let item of this.cachedData[this.selectedGame]) {
           let col = $('<div>').addClass('col-12')
           let inputGroup = $('<div>').addClass('input-group')
-          let inputGroupAddon = $('<span>').addClass('input-group-addon')
+          let inputGroupPrepend = $('<span>').addClass('input-group-prepend')
+          let inputGroupText = $('<span>').addClass('input-group-text')
+          let inputGroupTextRight = $('<span>').addClass('input-group-text')
           let radio = $('<input>').attr('type', 'radio').attr('name', 'title')
             .data('title', item)
             .data('game', this.selectedGame)
@@ -1020,8 +1023,8 @@
               $(ev.currentTarget).attr('checked', true)
               this.selectedTitle = $(ev.currentTarget).data('title')
             })
-          let inputGroupAddonRight = $('<span>')
-            .addClass('input-group-addon')
+          let inputGroupAppendRight = $('<span>')
+            .addClass('input-group-append')
             .data('title', item)
             .data('game', this.selectedGame)
             .on('click', (ev) => {
@@ -1066,12 +1069,12 @@
               this.selectedTitle = $(ev.currentTarget).val()
             })
 
-          inputGroupAddon.append(radio)
-          inputGroupAddonRight.append(deleteBtn)
+          inputGroupPrepend.append(inputGroupText.append(radio))
+          inputGroupAppendRight.append(inputGroupTextRight.append(deleteBtn))
 
-          inputGroup.append(inputGroupAddon)
+          inputGroup.append(inputGroupPrepend)
           inputGroup.append(input)
-          inputGroup.append(inputGroupAddonRight)
+          inputGroup.append(inputGroupAppendRight)
           col.append(inputGroup)
 
           row.append(col)
@@ -1080,7 +1083,8 @@
 
         let col = $('<div>').addClass('col-12')
         let inputGroup = $('<div>').addClass('input-group')
-        let inputGroupAddon = $('<span>').addClass('input-group-addon')
+        let inputGroupPrepend = $('<span>').addClass('input-group-prepend')
+        let inputGroupText = $('<span>').addClass('input-group-text')
         let radio = $('<input>').attr('type', 'radio').attr('name', 'title')
         let input = $('<input>').attr('type', 'text').addClass("form-control").attr('id', 'change-title').attr('placeholder', 'Create and use a new title')
           .on('click', function (ev) {
@@ -1096,9 +1100,8 @@
             changeGT.checkEmptyTitle(this)
           })
 
-        inputGroupAddon.append(radio)
-
-        inputGroup.append(inputGroupAddon)
+        inputGroupPrepend.append(inputGroupText.append(radio))
+        inputGroup.append(inputGroupPrepend)
         inputGroup.append(input)
         col.append(inputGroup)
 
