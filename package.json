@@ -13,7 +13,7 @@
     "async-request": "^1.2.0",
     "auto-load": "^3.0.0",
     "basic-auth": "^2.0.0",
-    "bootstrap": "^4.0.0-beta.2",
+    "bootstrap": "^4.0.0-beta.3",
     "bootstrap-menu": "^1.0.14",
     "bootstrap-slider": "^10.0.0",
     "bootstrap-toggle": "^2.2.2",
