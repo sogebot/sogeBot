@@ -425,7 +425,7 @@
         var visibility = page !== 'dashboard' ? 'hidden' : 'visible'
         if (_.isUndefined(page)) return
 
-        $(".page-menu a").removeClass('active')
+        $(".page-menu a,#menu-main a").removeClass('active')
         $(ev.currentTarget).addClass('active')
 
         $("#pages").empty()
