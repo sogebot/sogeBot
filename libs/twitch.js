@@ -124,9 +124,14 @@ class Twitch {
   async gamesTitles (data) {
     if (data) {
       // setter
-      await global.db.engine.update('cache', { upsert: true }, {
-        games_and_titles: data
-      })
+
+      // re-save full object - NeDB issue with $set on object workaround - NeDB is not deleting missing keys
+      let fullCacheObj = await global.db.engine.findOne('cache')
+      fullCacheObj['games_and_titles'] = data
+
+      await global.db.engine.remove('cache', {})
+      await global.db.engine.insert('cache', fullCacheObj)
+
       return data
     } else {
       // getter
