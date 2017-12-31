@@ -77,7 +77,7 @@ See LICENSE file
 
 #### Special thanks
 
-Special thanks goes to team behing tmi.js (you can check it on https://www.tmijs.org/). They did really awesome job.
+Special thanks goes to team behing tmi.js (you can check it on https://www.tmijs.org/) and twitch-js (https://github.com/marcandrews/twitch-js). They did really awesome job.
 
 #### Support [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9ZTX5DS2XB5EN)
 
