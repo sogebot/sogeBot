@@ -7,6 +7,7 @@ var mathjs = require('mathjs')
 const snekfetch = require('snekfetch')
 const safeEval = require('safe-eval')
 const decode = require('decode-html')
+const querystring = require('querystring')
 
 const config = require('../config.json')
 const debug = require('debug')('parser')
@@ -284,6 +285,12 @@ Parser.prototype.parseMessage = async function (message, attr) {
       return ''
     }
   }
+  let qs = {
+    '$querystring': async function (filter) {
+      if (!_.isUndefined(attr.param) && attr.param.length !== 0) return querystring.escape(attr.param)
+      return ''
+    }
+  }
   let info = {
     '(game)': async function (filter) {
       return global.twitch.currentGame
@@ -429,6 +436,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
   msg = await this.parseMessageEach(price, msg); debug('parseMessageEach: %s', msg)
   msg = await this.parseMessageEach(custom, msg); debug('parseMessageEach: %s', msg)
   msg = await this.parseMessageEach(param, msg); debug('parseMessageEach: %s', msg)
+  msg = await this.parseMessageEach(qs, msg); debug('parseMessageEach: %s', msg)
   msg = await this.parseMessageEach(info, msg); debug('parseMessageEach: %s', msg)
   msg = await this.parseMessageEach(list, msg); debug('parseMessageEach: %s', msg)
   msg = await this.parseMessageEach(math, msg); debug('parseMessageEach: %s', msg)
@@ -439,6 +447,8 @@ Parser.prototype.parseMessage = async function (message, attr) {
 
 Parser.prototype.parseMessageApi = async function (msg) {
   if (msg.length === 0) return msg
+
+  console.log(msg)
   let rMessage = msg.match(/\(api\|(http\S+)\)/i)
   if (!_.isNil(rMessage) && !_.isNil(rMessage[1])) {
     msg = msg.replace(rMessage[0], '').trim() // remove api command from message
