@@ -1,7 +1,7 @@
 'use strict'
 
 // 3rd party libraries
-var irc = require('tmi.js')
+var irc = require('twitch-js')
 var _ = require('lodash')
 const figlet = require('figlet')
 
