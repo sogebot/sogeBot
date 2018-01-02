@@ -51,7 +51,9 @@ class Twitch {
     global.parser.register(this, '!followage', this.followage, constants.VIEWERS)
     global.parser.register(this, '!age', this.age, constants.VIEWERS)
     global.parser.register(this, '!me', this.showMe, constants.VIEWERS)
-    global.parser.register(this, '!top', this.showTop, constants.OWNER_ONLY)
+    global.parser.register(this, '!top time', this.showTopTime, constants.OWNER_ONLY)
+    if (global.commons.isSystemEnabled('points')) global.parser.register(this, '!top points', this.showTopPoints, constants.OWNER_ONLY)
+    global.parser.register(this, '!top messages', this.showTopMessages, constants.OWNER_ONLY)
     global.parser.register(this, '!title', this.setTitle, constants.OWNER_ONLY)
     global.parser.register(this, '!game', this.setGame, constants.OWNER_ONLY)
 
@@ -725,6 +727,18 @@ class Twitch {
     } catch (e) {
       global.log.error(e, { fnc: 'Twitch.prototype.showMe' })
     }
+  }
+
+  showTopMessages (self, sender, text) {
+    self.showTop(self, sender, 'messages')
+  }
+
+  showTopPoints (self, sender, text) {
+    self.showTop(self, sender, 'points')
+  }
+
+  showTopTime (self, sender, text) {
+    self.showTop(self, sender, 'time')
   }
 
   async showTop (self, sender, text) {
