@@ -10,6 +10,7 @@ jobs:
   include:
     - stage: STANDARD Compliance tests
     - script: npm run standard
-    - stage: Bot tests
+    - stage: NEDB
     - script: npm run test:config:nedb && npm run test
+    - stage: MONGODB
     - script: npm run test:config:mongodb && npm run test
