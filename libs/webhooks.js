@@ -10,9 +10,31 @@ class Webhooks {
       follows: false,
       streams: false
     }
+    this.cache = []
 
     this.subscribe('follows')
     this.subscribe('streams')
+
+    this.clearCache()
+  }
+
+  addIdToCache (type, id) {
+    this.cache.push({
+      id: id,
+      type: type,
+      timestamp: _.now()
+    })
+  }
+
+  clearCache () {
+    debug('Clearing cache')
+    this.cache = _.filter(this.cache, (o) => o.timestamp >= _.now() - 600000)
+    setTimeout(() => this.clearCache(), 600000)
+  }
+
+  existsInCache (type, id) {
+    debug('Checking if id:%s exists on topic %s - %s', id, type, !_.isEmpty(_.find(this.cache, (o) => o.type === type && o.id === id)))
+    return !_.isEmpty(_.find(this.cache, (o) => o.type === type && o.id === id))
   }
 
   async subscribe (type) {
@@ -86,6 +108,13 @@ class Webhooks {
   async follower (aEvent) {
     debug('Follow event received: %j', aEvent)
     const fid = aEvent.data.from_id
+
+    // is in webhooks cache
+    if (this.existsInCache('follow', aEvent.data.from_id)) return
+
+    // add to cache
+    this.addIdToCache('follow', aEvent.data.from_id)
+
     // check if user exists in db
     let user = await global.db.engine.findOne('users', { id: fid })
     if (_.isEmpty(user)) {
