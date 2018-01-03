@@ -9,6 +9,11 @@ jobs:
   include:
     - script: npm run standard
     - stage: NEDB
+      node_js: "8"
+      before_script: npm run test:config:nedb
+      script: npm run test
+    - stage: NEDB
+      node_js: "9"
       before_script: npm run test:config:nedb
       script: npm run test
     - stage: MONGODB
