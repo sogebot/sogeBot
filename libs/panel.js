@@ -22,11 +22,19 @@ function Panel () {
   var port = process.env.PORT || config.panel.port
 
   // webhooks integration
-  app.post('/webhooks/hub', (req, res) => {
-    global.webhooks.event(req.body, res)
+  app.post('/webhooks/hub/follows', (req, res) => {
+    global.webhooks.follower(req.body)
+    res.sendStatus(200)
+  })
+  app.post('/webhooks/hub/streams', (req, res) => {
+    global.webhooks.stream(req.body)
+    res.sendStatus(200)
   })
 
-  app.get('/webhooks/hub', (req, res) => {
+  app.get('/webhooks/hub/follows', (req, res) => {
+    global.webhooks.challenge(req, res)
+  })
+  app.get('/webhooks/hub/streams', (req, res) => {
     global.webhooks.challenge(req, res)
   })
 

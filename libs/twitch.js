@@ -18,7 +18,7 @@ class Twitch {
 
     this.maxViewers = 0
     this.chatMessagesAtStart = global.parser.linesParsed
-    this.maxRetries = 5
+    this.maxRetries = 3
     this.curRetries = 0
     this.newChatters = 0
     this.streamType = 'live'
@@ -480,8 +480,10 @@ class Twitch {
         let cached = await this.cached()
         this.cached({ followers: cached.followers, subscribers: cached.subscribers }) // we dont want to have cached hosts on stream off
 
-        global.events.fire('stream-started')
-        global.events.fire('every-x-seconds', { reset: true })
+        if (!global.webhooks.enabled.streamss) {
+          global.events.fire('stream-started')
+          global.events.fire('every-x-seconds', { reset: true })
+        }
       }
 
       this.curRetries = 0
@@ -496,7 +498,8 @@ class Twitch {
       if (this.isOnline && this.curRetries < this.maxRetries) {
         // retry if it is not just some network / twitch issue
         this.curRetries = this.curRetries + 1
-        setTimeout(() => this.getCurrentStreamData(), 1000)
+        d('Retry stream offline check, cur: %s, max: %s', this.curRetries, this.maxRetries)
+        setTimeout(() => this.getCurrentStreamData(), 20000)
         return
       } else {
         // stream is really offline
@@ -513,9 +516,9 @@ class Twitch {
       }
     }
 
-    // less polling when stream is online
-    if (!this.isOnline) setTimeout(() => this.getCurrentStreamData(), 30000)
-    else setTimeout(() => this.getCurrentStreamData(), 60000)
+    if (global.webhooks.enabled.streams) {
+      setTimeout(() => this.getCurrentStreamData(), 120000)
+    } else setTimeout(() => this.getCurrentStreamData(), 60000)
   }
 
   async saveStreamData (stream) {
