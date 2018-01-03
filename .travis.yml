@@ -9,8 +9,8 @@ jobs:
     - script: npm run standard
     - stage: NEDB
       before_script: npm run test:config:nedb
-    - script: npm run test
+      script: npm run test
     - stage: MONGODB
       services: mongodb
       before_script: npm run test:config:mongodb
-    - script: npm run test
+      script: npm run test
