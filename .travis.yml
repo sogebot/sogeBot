@@ -6,6 +6,11 @@ node_js:
 before_install:
 - npm install -g mocha standard
 
+stages:
+  - STANDARD Compliance tests
+  - NEDB
+  - MONGODB
+
 jobs:
   include:
     - stage: STANDARD Compliance tests
