@@ -8,6 +8,8 @@ before_install:
 
 jobs:
   include:
+    - stage: STANDARD Compliance tests
     - script: npm run standard
+    - stage: Bot tests
     - script: npm run test:config:nedb && npm run test
     - script: npm run test:config:mongodb && npm run test
