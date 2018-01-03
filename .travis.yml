@@ -1,27 +1,15 @@
 language: node_js
 before_install:
-- npm install -g mocha standard
+  - npm install -g mocha standard
 
 node_js:
-- "8"
-- "9"
-
-stages:
-  - NEDB
-  - MONGODB
+  - "9"
 
 jobs:
   include:
     - script: npm run standard
-      node_js: "9"
     - stage: NEDB
-      node_js:
-      - "8"
-      - "9"
     - script: npm run test:config:nedb && npm run test
     - stage: MONGODB
       services: mongodb
-      node_js:
-      - "8"
-      - "9"
     - script: npm run test:config:mongodb && npm run test
