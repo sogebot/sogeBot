@@ -1,20 +1,24 @@
 language: node_js
-services: mongodb
-matrix:
-  include:
-    - node_js: "8"
-    - node_js: "9"
 before_install:
 - npm install -g mocha standard
 
 stages:
+  - STANDARD Compliance tests
   - NEDB
   - MONGODB
 
 jobs:
   include:
     - script: npm run standard
+      node_js: "9"
     - stage: NEDB
+      node_js:
+      - "8"
+      - "9"
     - script: npm run test:config:nedb && npm run test
     - stage: MONGODB
+      services: mongodb
+      node_js:
+      - "8"
+      - "9"
     - script: npm run test:config:mongodb && npm run test
