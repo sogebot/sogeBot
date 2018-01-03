@@ -1094,7 +1094,7 @@
             $('#titles-list input[type=radio]').attr('checked', false)
 
             // set check on current radio
-            $(ev.currentTarget).parent().children('span').children('input[type=radio]').attr('checked', true)
+            $(ev.currentTarget).parent().children('span').children('span').children('input[type=radio]').attr('checked', true)
           })
           .on('keyup', function (ev) {
             changeGT.checkEmptyTitle(this)
@@ -1120,7 +1120,7 @@
       save: function () {
         let value = $("#change-title").val()
         let invalid = $("#change-title").hasClass('is-invalid')
-        let checked = $("#change-title").parent().children('span').children('input[type=radio').prop('checked')
+        let checked = $("#change-title").parent().children('span').children('span').children('input[type=radio').prop('checked')
 
         if (invalid && checked) {
           $("#title-error").css('display', 'inline-block')
