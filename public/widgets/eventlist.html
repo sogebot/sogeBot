@@ -40,6 +40,10 @@
   <!-- Tab panes -->
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="eventlist-main">
+        <div class="alert alert-primary" role="alert">
+          <i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i>
+          <strong>loading data...</strong>
+        </div>
     </div>
     <!-- /MAIN -->
 
@@ -86,8 +90,7 @@
     }
   }
 
-  setInterval(() => socket.emit('widget.eventlist.get'), 1000)
-  socket.emit('widget.eventlist.get')
+  setTimeout(() => socket.emit('widget.eventlist.get'), 5000)
 
   socket.once('configuration', function (data) {
     if (!data.widgetEventlistFollows) {
@@ -149,70 +152,54 @@
       if (!(eventlist.config[event.event])) continue
       i++
 
+      let username
       let timestamp = moment(event.timestamp).fromNow()
-      let icon = $('<i>')
-        .text(timestamp)
-        .attr('title', moment(event.timestamp).format('LLLL'))
-        .addClass('eventlist-text')
-
-      let username = $('<div>')
-        .addClass('col-9 eventlist-username')
-        .html(`<div title="${event.username}" style="z-index: 9">${event.username}</div>`)
-
+      let icon = `<i title="${moment(event.timestamp).format('LLLL')}" class="eventlist-text">${moment(event.timestamp).fromNow()}</i>`
       let t = translations['eventlist-events'][event.event]
       if (event.event === 'follow') {
-        username.append($('<span>')
-            .html(t)
-            .css('font-size', "0.7rem")
-            .css('font-weight', 'normal')
-          )
-        username.append(`<i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>`)
+        username = `<div class="col-9 eventlist-username">
+          <div title="${event.username}" style="z-index: 9">${event.username}</div>
+          <span style="font-size:0.7rem; font-weight: normal">${t}</span>
+          <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+        </div>`
       }
 
       if (event.event === 'host') {
-        username.append($('<span>')
-            .html(t.replace('$viewers', '<strong>' + _.get(event, 'viewers', '0') + '</strong>'))
-            .css('font-size', "0.7rem")
-            .css('font-weight', 'normal')
-          )
-        username.append(`<i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>`)
+        username = `<div class="col-9 eventlist-username">
+          <div title="${event.username}" style="z-index: 9">${event.username}</div>
+          <span style="font-size:0.7rem; font-weight: normal">${t.replace('$viewers', '<strong>' + _.get(event, 'viewers', '0') + '</strong>')}</span>
+          <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+        </div>`
       }
 
       if (event.event === 'sub') {
-        username.append($('<span>')
-            .html(t)
-            .css('font-size', "0.7rem")
-            .css('font-weight', 'normal')
-          )
-          username.append(`<i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>`)
+        username = `<div class="col-9 eventlist-username">
+          <div title="${event.username}" style="z-index: 9">${event.username}</div>
+          <span style="font-size:0.7rem; font-weight: normal">${t}</span>
+          <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+        </div>`
       }
 
       if (event.event === 'resub') {
-        username.append($('<span>')
-            .html(t.replace('$months', '<strong>' + _.get(event, 'months', '0') + '</strong>'))
-            .css('font-size', "0.7rem")
-            .css('font-weight', 'normal')
-          )
-        username.append(`<i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>`)
+        username = `<div class="col-9 eventlist-username">
+          <div title="${event.username}" style="z-index: 9">${event.username}</div>
+          <span style="font-size:0.7rem; font-weight: normal">${t.replace('$months', '<strong>' + _.get(event, 'months', '0') + '</strong>')}</span>
+          <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+        </div>`
       }
 
       if (event.event === 'cheer') {
-        username.append($('<span>')
-            .html(t.replace('$bits', '<strong>' + _.get(event, 'bits', '0') + '</strong>'))
-            .css('font-size', "0.7rem")
-            .css('font-weight', 'normal')
-          )
-        username.append(`<i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>`)
+        username = `<div class="col-9 eventlist-username">
+          <div title="${event.username}" style="z-index: 9">${event.username}</div>
+          <span style="font-size:0.7rem; font-weight: normal">${t.replace('$bits', '<strong>' + _.get(event, 'bits', '0') + '</strong>')}</span>
+          <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+        </div>`
       }
 
-      let colIcon = $('<div>')
-        .addClass('col-3')
-        .append(icon)
-
-      let row = $('<div>')
-        .addClass('row')
-        .append(colIcon)
-        .append(username)
+      let row = `<div class="row">
+        <div class="col-3">${icon}</div>
+        ${username}
+        </div>`
 
       eventlistEl.append(row)
       if (i >= eventlist.config.show) break

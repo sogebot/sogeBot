@@ -41,6 +41,7 @@ EventList.prototype.add = async function (data) {
   }
   global.db.engine.insert('widgetsEventList', newEvent)
   global.overlays.eventlist._get(global.overlays.eventlist)
+  global.widgets.eventlist._get(global.widgets.eventlist)
 }
 
 module.exports = new EventList()
