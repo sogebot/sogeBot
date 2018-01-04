@@ -227,9 +227,14 @@ class Twitch {
       setTimeout(() => this.getChannelDataOldAPI(), 60000)
       return
     }
-    d(`Current game: ${request.body.game}, Current Status: ${request.body.status}`)
-    this.current.game = request.body.game
-    this.current.status = request.body.status
+
+    if (!this.current.gameOrTitleChangedManually) {
+      d(`Current game: ${request.body.game}, Current Status: ${request.body.status}`)
+      this.current.game = request.body.game
+      this.current.status = request.body.status
+    } else {
+      this.current.gameOrTitleChangedManually = false
+    }
 
     setTimeout(() => this.getChannelDataOldAPI(), 30000)
   }
@@ -468,8 +473,10 @@ class Twitch {
       // correct status and we've got a data - stream online
       let stream = request.body.data[0]; d(stream)
 
-      this.current.status = stream.title
-      this.current.game = await this.getGameFromId(stream.game_id)
+      if (!this.current.gameOrTitleChangedManually) {
+        this.current.status = stream.title
+        this.current.game = await this.getGameFromId(stream.game_id)
+      }
 
       if (!this.isOnline || this.streamType !== stream.type) {
         this.when({ online: stream.started_at })
@@ -902,6 +909,7 @@ class Twitch {
             .replace(/\$title/g, self.current.status), sender)
         }
       }
+      this.current.gameOrTitleChangedManually = true
     }
   }
 
