@@ -869,8 +869,8 @@ class Twitch {
       request = await snekfetch.put(url, {
         data: {
           channel: {
-            game: !_.isNull(args.game) ? args.game : self.current.game,
-            status: !_.isNull(args.title) ? args.title : self.current.status
+            game: !_.isNull(args.game) ? args.game.trim() : self.current.game,
+            status: !_.isNull(args.title) ? args.title.trim() : self.current.status
           }
         }
       })
@@ -889,7 +889,7 @@ class Twitch {
     if (request.status === 200 && !_.isNil(request.body)) {
       const response = request.body
       if (!_.isNull(args.game)) {
-        if (response.game === args.game.trim()) {
+        if (response.game.trim() === args.game.trim()) {
           global.commons.sendMessage(global.translate('game.change.success')
             .replace(/\$game/g, response.game), sender)
           self.current.game = response.game
@@ -900,7 +900,7 @@ class Twitch {
       }
 
       if (!_.isNull(args.title)) {
-        if (response.status === args.title.trim()) {
+        if (response.status.trim() === args.title.trim()) {
           global.commons.sendMessage(global.translate('title.change.success')
             .replace(/\$title/g, response.status), sender)
           self.current.status = response.status
