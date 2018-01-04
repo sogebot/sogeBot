@@ -49,6 +49,7 @@ class Twitch {
     global.parser.register(this, '!lastseen', this.lastseen, constants.VIEWERS)
     global.parser.register(this, '!watched', this.watched, constants.VIEWERS)
     global.parser.register(this, '!followage', this.followage, constants.VIEWERS)
+    global.parser.register(this, '!subage', this.subage, constants.VIEWERS)
     global.parser.register(this, '!age', this.age, constants.VIEWERS)
     global.parser.register(this, '!me', this.showMe, constants.VIEWERS)
     global.parser.register(this, '!top time', this.showTopTime, constants.OWNER_ONLY)
@@ -646,8 +647,6 @@ class Twitch {
     if (_.isNil(parsed)) username = sender.username
     else username = parsed[0].toLowerCase()
 
-    global.users.isFollower(username)
-
     const user = await global.users.get(username)
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.follow) || _.isNil(user.is.follower) || !user.is.follower) {
       let message = global.commons.prepare('followage.success.never', { username: username })
@@ -663,6 +662,35 @@ class Twitch {
       if (output.length === 0) output.push(0 + ' ' + global.parser.getLocalizedName(0, 'core.minutes'))
 
       let message = global.commons.prepare('followage.success.time', {
+        username: username,
+        diff: output.join(', ')
+      })
+      debug(message); global.commons.sendMessage(message, sender)
+    }
+  }
+
+  async subage (self, sender, text) {
+    let username
+    let parsed = text.match(/([^@]\S*)/g)
+
+    if (_.isNil(parsed)) username = sender.username
+    else username = parsed[0].toLowerCase()
+
+    const user = await global.users.get(username)
+    if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.subscribed_at) || _.isNil(user.is.subscriber) || !user.is.subscriber) {
+      let message = global.commons.prepare('subage.success.never', { username: username })
+      debug(message); global.commons.sendMessage(message, sender)
+    } else {
+      let diff = moment.preciseDiff(user.time.subscribed_at, moment(), true)
+      let output = []
+      if (diff.years) output.push(diff.years + ' ' + global.parser.getLocalizedName(diff.years, 'core.years'))
+      if (diff.months) output.push(diff.months + ' ' + global.parser.getLocalizedName(diff.months, 'core.months'))
+      if (diff.days) output.push(diff.days + ' ' + global.parser.getLocalizedName(diff.days, 'core.days'))
+      if (diff.hours) output.push(diff.hours + ' ' + global.parser.getLocalizedName(diff.hours, 'core.hours'))
+      if (diff.minutes) output.push(diff.minutes + ' ' + global.parser.getLocalizedName(diff.minutes, 'core.minutes'))
+      if (output.length === 0) output.push(0 + ' ' + global.parser.getLocalizedName(0, 'core.minutes'))
+
+      let message = global.commons.prepare('subage.success.time', {
         username: username,
         diff: output.join(', ')
       })

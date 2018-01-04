@@ -792,6 +792,12 @@
       "time": "$sender, $username sleduje tento kanal jiz $diff"
     }
   },
+  "subage": {
+    "success": {
+      "never": "$sender, $username neni subscriberem kanalu",
+      "time": "$sender, $username je subscriberem tohoto kanalu jiz $diff"
+    }
+  },
   "age": {
     "failed": "$sender, nemam zatim data o stari uctu $username",
     "success": {
