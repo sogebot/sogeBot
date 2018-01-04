@@ -1052,8 +1052,8 @@
               // set check on current radio
               $(ev.currentTarget).parent().children('span').children('span').children('input[type=radio]').attr('checked', true)
             })
-            .on('keyup', (ev) => {
-              console.group('Title keyup event')
+            .on('change', (ev) => {
+              console.group('Title change event')
               console.debug('Game:', $(ev.currentTarget).data('game'))
               console.debug('Original title:', $(ev.currentTarget).data('title'))
               console.debug('New title:', $(ev.currentTarget).val())
