@@ -178,6 +178,20 @@ class Twitch {
     d(`Current subscribers count: ${request.body._total}`)
     this.current.subscribers = request.body._total - 1 // remove broadcaster itself
 
+    const subscribers = _.map(request.body.subscriptions, 'user')
+
+    // if subscriber is not in cache, add as first
+    let cached = await this.cached()
+    for (let subscriber of subscribers) {
+      if (subscriber.name === config.settings.broadcaster_username || subscriber.name === config.settings.bot_username) continue
+
+      if (!_.includes(cached.subscribers, subscriber.name)) {
+        cached.subscribers.unshift(subscriber.name)
+      }
+    }
+    cached.subscribers = _.uniq(cached.subscribers)
+    this.cached(cached)
+
     setTimeout(() => this.getChannelSubscribersOldAPI(), 30000)
   }
 
