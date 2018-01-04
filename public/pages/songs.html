@@ -19,7 +19,7 @@
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="manage">
     <div class="widget">
-      <table class="table table-striped">
+      <table class="table table-striped table-sm">
         <tbody id="Playlist"></tbody>
       </table>
     </div>
@@ -36,18 +36,9 @@
 
 <script>
   var playlist = {
-    makeEditable: function (id, el, input, endTime) {
-      el.on('click', function () {
-        el.css('display', 'none')
-        input.css('display', 'inline')
-        input.focus()
-      })
-
-      input.on('focusout', function () {
+    makeEditable: function (id, input, valueBefore, endTime) {
+      input.on('change', function () {
         var value = input.val()
-        var valueBefore = el.text()
-        input.css('display', 'none')
-        el.css('display', 'inline')
 
         /* check if value match correct pattern */
         var pattern = value.match(/^(\d\d):(\d\d):(\d\d)/)
@@ -56,14 +47,12 @@
             3], 10)
           if (currentValue > endTime) currentValue = endTime
           var out = new Date(currentValue * 1000).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
-          el.text(out)
-          input.val(out)
 
           /* emit update */
-          var lowValuePtrn = $(".lowValue__" + id).text().match(/^(\d\d):(\d\d):(\d\d)/)
+          var lowValuePtrn = $(".lowValueInput__" + id).val().match(/^(\d\d):(\d\d):(\d\d)/)
           var lowValue = parseInt(lowValuePtrn[1], 10) * 3600 + parseInt(lowValuePtrn[2], 10) * 60 + parseInt(
             lowValuePtrn[3], 10)
-          var highValuePtrn = $(".highValue__" + id).text().match(/^(\d\d):(\d\d):(\d\d)/)
+          var highValuePtrn = $(".highValueInput__" + id).val().match(/^(\d\d):(\d\d):(\d\d)/)
           var highValue = parseInt(highValuePtrn[1], 10) * 3600 + parseInt(highValuePtrn[2], 10) * 60 +
             parseInt(highValuePtrn[3], 10)
           socket.emit('songs.setTrim', {
@@ -129,19 +118,27 @@
         var lowValue = (new Date(startTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
         var highValue = (new Date(endTime * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
 
-        $("#Playlist").append('<tr class="playlist-song" data-title="' + title + '" data-videoid="' + videoID +
-          '"><td><a href="http://youtu.be/' + videoID + '">' + videoID + '</a></td><td>' +
-          title + '</td><td>' + (new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0] +
-          '</td><td>' + volume + '%</td><td><div id="slider___' + videoID + '___' + length_seconds +
-          '"></div><div class="trim"><abbr title="click to edit" class="lowValue__' + videoID + '">' + lowValue +
-          '</abbr><input style="width: 6em; display: none" class="form-control input-sm lowValueInput__' + videoID +
-          ' type="text" value="' + lowValue + '"/> - <abbr title="click to edit" class="highValue__' + videoID +
-          '">' + highValue +
-          '</abbr><input style="width: 6em; display: none" class="form-control input-sm highValueInput__' + videoID +
-          ' type="text" value="' + highValue + '"/></div></td></tr>');
+        $("#Playlist").append(`
+          <tr class="playlist-song" data-title="${title}" data-videoid="${videoID}">
+            <td>
+              <a href="http://youtu.be/${videoID}">${videoID}</a>
+            </td>
+            <td>${title}</td>
+            <td>${(new Date(length_seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]}</td>
+            <td>${volume}%</td>
+            <td>
+              <div class="input-group">
+                <input type="text" class="form-control input-sm lowValueInput__${videoID}" style="max-width: 6rem; border-left: 1px solid rgb(206, 212, 218)" value="${lowValue}"></input>
+                <div class="input-group-append">
+                  <div class="input-group-text" style="border-right: 0;">-</div>
+                </div>
+                <input type="text" class="form-control input-sm highValueInput__${videoID}" style="max-width: 6rem; border-left: 0" value="${highValue}"></input>
+              </div>
+            </td>
+          </tr>`)
 
-        playlist.makeEditable(videoID, $(".lowValue__" + videoID), $(".lowValueInput__" + videoID), endTime)
-        playlist.makeEditable(videoID, $(".highValue__" + videoID), $(".highValueInput__" + videoID), length_seconds)
+        playlist.makeEditable(videoID, $(".lowValueInput__" + videoID), lowValue, endTime)
+        playlist.makeEditable(videoID, $(".highValueInput__" + videoID), highValue, length_seconds)
       }
     }
     new BootstrapMenu(".playlist-song", {
