@@ -41,8 +41,7 @@ class Songs {
       global.panel.addWidget('ytplayer', 'widget-title-ytplayer', 'headphones')
       global.panel.registerSockets({
         self: this,
-        expose: ['getCurrentVolume', 'send', 'setTrim', 'sendConfiguration', 'banSong', 'getSongRequests', 'stealSong', 'sendNextSongID', 'removeSongFromPlaylist', 'unbanSong'],
-        finally: this.send
+        expose: ['getCurrentVolume', 'send', 'setTrim', 'sendConfiguration', 'banSong', 'getSongRequests', 'stealSong', 'sendNextSongID', 'removeSongFromPlaylist', 'unbanSong']
       })
     }
   }
