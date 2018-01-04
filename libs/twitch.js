@@ -842,6 +842,9 @@ class Twitch {
   async updateGameAndTitle (self, socket, data) {
     self.setTitleAndGame(self, null, data)
 
+    data.title = data.title.trim()
+    data.game = data.game.trim()
+
     let gamesTitles = await self.gamesTitles()
 
     // create game if not in cache
