@@ -899,13 +899,15 @@ class Twitch {
   }
 
   async editUserTwitchTitle (self, socket, data) {
+    data.new = data.new.trim()
+
     if (data.new.length === 0) {
-      self.deleteUserTwitchTitle(self, socket, data)
+      await self.deleteUserTwitchTitle(self, socket, data)
       return
     }
 
     let gamesTitles = await self.gamesTitles()
-    if (gamesTitles[data.game].indexOf(data.title) === -1) { // if unique
+    if (_.isEmpty(_.find(gamesTitles[data.game], (v) => v.trim() === data.title.trim()))) {
       gamesTitles[data.game].push(data.new) // also, we need to add game and title to cached property
     } else {
       gamesTitles[data.game][gamesTitles[data.game].indexOf(data.title)] = data.new
@@ -929,9 +931,10 @@ class Twitch {
     // create game if not in cache
     if (_.isNil(gamesTitles[data.game])) gamesTitles[data.game] = []
 
-    if (gamesTitles[data.game].indexOf(data.title) === -1) { // if unique
+    if (_.isEmpty(_.find(gamesTitles[data.game], (v) => v.trim() === data.title))) {
       gamesTitles[data.game].push(data.title) // also, we need to add game and title to cached property
     }
+
     await self.gamesTitles(gamesTitles)
     self.sendStreamData(self, global.panel.io) // force dashboard update
   }
