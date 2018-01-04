@@ -10,6 +10,7 @@ const debug = require('debug')('users')
 
 function Users () {
   this.rate_limit_follower_check = []
+  this.rate_limit_subscriber_check = []
   this.increment = {}
 
   global.parser.register(this, '!regular add', this.addRegular, constants.OWNER_ONLY)
@@ -31,6 +32,10 @@ function Users () {
     if (this.rate_limit_follower_check.length > 0) {
       this.rate_limit_follower_check = _.uniq(this.rate_limit_follower_check)
       this.isFollowerUpdate(this.rate_limit_follower_check.shift())
+    }
+    if (this.rate_limit_subscriber_check.length > 0) {
+      this.rate_limit_subscriber_check = _.uniq(this.rate_limit_subscriber_check)
+      this.getSubLengthUpdate(this.rate_limit_subscriber_check.shift())
     }
   }, 2000) // run follower ONE request every 2 second
 
@@ -200,6 +205,10 @@ Users.prototype.delete = function (username) {
   global.db.engine.remove('users', { username: username })
 }
 
+Users.prototype.getSubLength = async function (username) {
+  global.users.rate_limit_subscriber_check.push(username)
+}
+
 Users.prototype.isFollower = async function (username) {
   let user = await global.users.get(username)
   if (new Date().getTime() - user.time.followCheck < 1000 * 60 * 30) { // check can be performed _only_ every 30 minutes
@@ -207,6 +216,37 @@ Users.prototype.isFollower = async function (username) {
   }
 
   global.users.rate_limit_follower_check.push(username)
+}
+
+Users.prototype.getSubLengthUpdate = async function (username) {
+  const d = require('debug')('users:getSubLengthUpdate')
+
+  if (_.isNil(config.settings.broadcaster_oauth) || !config.settings.broadcaster_oauth.match(/oauth:[\w]*/)) {
+    d('Broadcaster oauth is not properly set - subscribers cannot be checked')
+    return
+  }
+
+  let user = await global.users.get(username)
+  if (_.isNil(user.id)) return // skip check if ID doesn't exist
+
+  const url = `https://api.twitch.tv/kraken/channels/${global.channelId}/subscriptions/${user.id}`
+  try {
+    d('getSubLengthUpdate check for user %s', username)
+    var request = await snekfetch.get(url)
+      .set('Accept', 'application/vnd.twitchtv.v5+json')
+      .set('Authorization', 'OAuth ' + config.settings.broadcaster_oauth.split(':')[1])
+      .set('Client-ID', config.settings.client_id)
+    global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getSubLengthUpdate', api: 'kraken', endpoint: url, code: request.status })
+    d('Request done: %j', request.body)
+  } catch (e) {
+    global.log.error(`API: ${url} - ${e.message}`)
+    global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getSubLengthUpdate', api: 'kraken', endpoint: url, code: e.message })
+    return
+  }
+
+  if (!_.isNil(request.body.created_at)) {
+    global.users.set(username, { time: { subscribed_at: moment(request.body.created_at).format('X') * 1000 } })
+  }
 }
 
 Users.prototype.isFollowerUpdate = async function (username) {

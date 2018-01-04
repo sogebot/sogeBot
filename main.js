@@ -152,6 +152,7 @@ global.client.on('message', async function (channel, sender, message, fromSelf) 
         const user = await global.users.get(sender.username)
 
         if (!_.isNil(user.id)) global.users.isFollower(user.username)
+        if (_.get(sender, 'subscriber', false) && _.isNil(user.time.subscribed_at)) global.users.getSubLength(user.username)
         if (!message.startsWith('!')) global.users.messagesInc(user.username)
 
         // set is.mod
