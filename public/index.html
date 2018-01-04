@@ -422,7 +422,7 @@
 
       $(".page-menu a,#menu-main a").on('click', function (ev) {
         var page = ev.currentTarget.dataset.page
-        var visibility = page !== 'dashboard' ? 'hidden' : 'visible'
+        var visibility = page !== 'dashboard' ? 'none' : 'flex'
         if (_.isUndefined(page)) return
 
         $(".page-menu a,#menu-main a").removeClass('active')
@@ -445,8 +445,8 @@
               }
             })
           }))
-        $(".widgets").css('visibility', visibility)
-        $("#addWidget").css('visibility', visibility)
+        $(".widgets").css('display', visibility)
+        $("#addWidget").css('display', visibility)
       })
     })
 
@@ -1305,14 +1305,6 @@
       }
       $("#" + id + "Status").css('padding', '0')
     }
-
-    // update top offset every second and on page resize
-    $(window).resize(function () {
-      if (!_.isNil($(".widgets").offset())) $('.pages-wrapper').css('top', $(".widgets").offset().top + 10)
-    })
-    setInterval(function () {
-      if (!_.isNil($(".widgets").offset())) $('.pages-wrapper').css('top', $(".widgets").offset().top + 10)
-    }, 1000)
 
   </script>
 </body>

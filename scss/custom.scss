@@ -186,7 +186,12 @@ a.active {
 }
 
 
+#addWidget {
+  display: flex;
+}
+
 .widgetAdd {
+  flex-grow: 1;
   color: $gray-800;
   border: 3px dashed $gray-400;
   border-radius: 4px;
@@ -412,12 +417,6 @@ h2.title {
   padding: 0 10px;
   text-align: right;
   display: inline-block;
-}
-
-.pages-wrapper {
-  position: absolute;
-  top: 170px;
-  width: 100%;
 }
 
 .tableMenu {
@@ -777,7 +776,8 @@ abbr[data-original-title], abbr[title] {
 }
 
 #pages {
-  top: -30px;
+  position: relative;
+  top: 5px;
 }
 
 .badge {
@@ -1004,7 +1004,7 @@ table tr td hr {
   display: flex;
   flex-wrap: wrap;
   font-weight: bold;
-  color: $gray-700; 
+  color: $gray-700;
   line-height: 1rem;
 }
 
