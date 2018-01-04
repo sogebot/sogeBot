@@ -1050,7 +1050,7 @@
               this.selectedTitle = $(ev.currentTarget).val()
 
               // set check on current radio
-              $(ev.currentTarget).parent().children('span').children('input[type=radio]').attr('checked', true)
+              $(ev.currentTarget).parent().children('span').children('span').children('input[type=radio]').attr('checked', true)
             })
             .on('keyup', (ev) => {
               console.group('Title keyup event')
