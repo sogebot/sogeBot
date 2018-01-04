@@ -391,7 +391,7 @@
 
     setInterval(function () {
       console.debug('EMIT [getConnectionStatus]');
-      socket.emit('getConnectionStatus');
+      socket.emit('getConnectionStatus')
       setStatus('SOC', socket.connected ? 3 : 0)
     }, 1000)
     socket.on('connectionStatus', function (data) {
@@ -1259,6 +1259,9 @@
     }
 
     var setStatus = function (id, status) {
+      if ($("#" + id + "Status").data('status') === status) return // nothing changed, do nothing
+      $("#" + id + "Status").data('status', status)
+
       $("#" + id + "Status").removeClass()
 
       if (id === 'SOC' && status === 0) {
