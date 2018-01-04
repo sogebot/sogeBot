@@ -56,7 +56,6 @@
       </div>
 
       <div style="font-size: 0.8rem" class="bg-faded">
-        <strong>Current Song: </strong>
         <span id="yt-player-currentsong"></span>
       </div>
     </div>
@@ -93,7 +92,7 @@
         return value + '%';
       }
     })
-    
+
     $("#volumeSlider").off()
     $("#volumeSlider").on("change", function (slideEvt) {
       socket.emit('saveConfiguration', {
@@ -172,7 +171,8 @@
       'videoId': video.videoID
     }
 
-    $("#yt-player-currentsong").html(video.title)
+    let currentSong = ' <i class="fa fa-music" style="margin-left:3px;" aria-hidden="true"></i> ' + video.title + (!_.isNil(video.username) ? ` <strong class="alert alert-light" style="padding:0">${video.username}</strong>` : '')
+    $("#yt-player-currentsong").html(currentSong)
     $("#yt-player-currentsong").parent().attr('title', video.title)
     if (typeof video.startTime !== 'undefined') data.startSeconds = video.startTime
     if (typeof video.endTime !== 'undefined') data.endSeconds = video.endTime
