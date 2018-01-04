@@ -50,6 +50,10 @@
               <span data-lang="followed-since"></span>
               <i class="fa" aria-hidden="true"></i>
             </th>
+            <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="time.subscribed_at">
+              <span data-lang="subscribed-since"></span>
+              <i class="fa" aria-hidden="true"></i>
+            </th>
             <th id="viewers-points" class="sortable text-center" onclick="viewers.sort(this)" data-sort="points">
               <span data-lang="points"></span>
               <i class="fa" aria-hidden="true"></i>
@@ -133,8 +137,10 @@
           '>' + viewers.getDateString(item.time.message) + '</td>' +
           '<td class="text-center" data-value=' + (_.isUndefined(item.time.watched) ? 0 : item.time.watched) +
           '>' + viewers.styleWatched(item.time.watched) + '</td>' +
-          '<td class="text-center"  data-value=' + (_.isUndefined(item.time.follow) ? 0 : item.time.follow) +
-          '>' + viewers.styleFollowTime(item.time.follow) + '</td>' +
+          '<td class="text-center"  data-value=' + (_.isUndefined(item.time.follow) || !item.is.follower ? 0 : item.time.follow) +
+          '>' + viewers.styleFollowTime((_.isUndefined(item.time.follow) || !item.is.follower ? 0 : item.time.follow)) + '</td>' +
+          '<td class="text-center"  data-value=' + (_.isUndefined(item.time.subscribed_at) || !item.is.subscriber ? 0 : item.time.subscribed_at) +
+          '>' + viewers.styleFollowTime((_.isUndefined(item.time.subscribed_at) || !item.is.subscriber ? 0 : item.time.subscribed_at)) + '</td>' +
           '<td class="text-center" id="viewers-points-data" data-value=' + item.points + '>' +
           '<abbr title="click to edit" data-id="' + item.username +
           '" onclick="viewers.pointsEditable(this)">' + item.points + '</abbr>' +
