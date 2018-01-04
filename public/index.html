@@ -980,7 +980,7 @@
               $('#titles-list input[type=radio]').attr('checked', false)
 
               //check current radio
-              $(ev.currentTarget).children('span').children('input[type=radio]').attr('checked', true)
+              $(ev.currentTarget).children('span').children('span').children('input[type=radio]').attr('checked', true)
               this.selectedTitle = $(ev.currentTarget).data('title')
             })
           let inputGroupPrepend = $('<span>').addClass('input-group-prepend')
