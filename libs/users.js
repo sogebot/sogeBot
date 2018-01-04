@@ -32,7 +32,7 @@ function Users () {
       this.rate_limit_follower_check = _.uniq(this.rate_limit_follower_check)
       this.isFollowerUpdate(this.rate_limit_follower_check.shift())
     }
-  }, 5000) // run follower ONE request every 5 second
+  }, 2000) // run follower ONE request every 2 second
 
   setInterval(async () => {
     let increment = this.increment
@@ -232,7 +232,7 @@ Users.prototype.isFollowerUpdate = async function (username) {
     d('IsFollowerUpdate check for user %s', username)
     var request = await snekfetch.get(url)
       .set('Accept', 'application/vnd.twitchtv.v5+json')
-      .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+      .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
       .set('Client-ID', config.settings.client_id)
     global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
     d('Request done: %j', request.body)
