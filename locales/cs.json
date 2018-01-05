@@ -1026,5 +1026,7 @@
   "phillipsHue": {
     "list": "$sender, Seznam pripojenych Phillips Hue zarovek: "
   },
-  "time": "Aktualni cas streamera v jeho casove zone je $time"
+  "time": "Aktualni cas streamera v jeho casove zone je $time",
+  "subs": "$sender, je zde prave $onlineSubCount online subscriberu. Posledni sub/resub byl $lastSubUsername $lastSubAgo",
+  "followers": "$sender, je zde prave $onlineFollowersCount online followeru. Posledni follow byl $lastFollowUsername $lastFollowAgo"
 }

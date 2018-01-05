@@ -50,6 +50,8 @@ class Twitch {
     global.parser.register(this, '!watched', this.watched, constants.VIEWERS)
     global.parser.register(this, '!followage', this.followage, constants.VIEWERS)
     global.parser.register(this, '!subage', this.subage, constants.VIEWERS)
+    global.parser.register(this, '!followers', this.followers, constants.VIEWERS)
+    global.parser.register(this, '!subs', this.subs, constants.VIEWERS)
     global.parser.register(this, '!age', this.age, constants.VIEWERS)
     global.parser.register(this, '!me', this.showMe, constants.VIEWERS)
     global.parser.register(this, '!top time', this.showTopTime, constants.OWNER_ONLY)
@@ -103,12 +105,14 @@ class Twitch {
       // setter
       await global.db.engine.update('cache', { upsert: true }, {
         cached: {
+          time: _.get(data, 'time', []),
           followers: _.get(data, 'followers', []),
           hosts: _.get(data, 'hosts', []),
           subscribers: _.get(data, 'subscribers', [])
         }
       })
       return {
+        time: _.get(data, 'time', []),
         followers: _.get(data, 'followers', []),
         hosts: _.get(data, 'hosts', []),
         subscribers: _.get(data, 'subscribers', [])
@@ -117,6 +121,7 @@ class Twitch {
       // getter
       let cache = await global.db.engine.findOne('cache')
       return {
+        time: _.get(data, 'cached.time', []),
         followers: _.get(cache, 'cached.followers', []),
         hosts: _.get(cache, 'cached.hosts', []),
         subscribers: _.get(cache, 'cached.subscribers', [])
@@ -402,7 +407,6 @@ class Twitch {
         }
       }
       cached.followers = _.uniq(cached.followers)
-      this.cached(cached)
 
       for (let follower of followersUsername) {
         let user = await global.users.get(follower)
@@ -410,14 +414,17 @@ class Twitch {
           if (new Date().getTime() - moment(user.time.follow).format('X') * 1000 < 60000 * 60 && !quiet && !global.webhooks.existsInCache('follow', user.id)) {
             global.webhooks.addIdToCache('follow', user.id)
             global.events.fire('follow', { username: follower })
+            cached.time.followed_at = moment().format('x')
           }
-          d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
-          global.users.set(follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('X') * 1000 } })
+          d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('x') } })
+          global.users.set(follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('x') } })
         } else {
           d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime() } })
           global.users.set(follower, { is: { follower: true }, time: { followCheck: new Date().getTime() } })
         }
       }
+
+      this.cached(cached)
     }
     setTimeout(() => this.getLatest100Followers(false), 60000)
   }
@@ -667,6 +674,36 @@ class Twitch {
       })
       debug(message); global.commons.sendMessage(message, sender)
     }
+  }
+
+  async followers (self, sender) {
+    let [cache, users] = await Promise.all([self.cached(), global.users.getAll({ is: { online: true, follower: true } })])
+
+    let lastFollowAgo = _.get(cache, 'time.followed_at', 0) > 0 ? moment(cache.time.followed_at).fromNow() : ''
+    let lastFollowUsername = _.get(cache, 'followers[0]', 'n/a')
+    let onlineFollowersCount = _.size(_.filter(users, (o) => o.username !== config.settings.broadcaster_username && o.username !== config.settings.bot_username)) // except bot and user
+
+    let message = global.commons.prepare('followers', {
+      lastFollowAgo: lastFollowAgo,
+      lastFollowUsername: lastFollowUsername,
+      onlineFollowersCount: onlineFollowersCount
+    })
+    debug(message); global.commons.sendMessage(message, sender)
+  }
+
+  async subs (self, sender) {
+    let [cache, users] = await Promise.all([self.cached(), global.users.getAll({ is: { online: true, subscriber: true } })])
+
+    let lastSubAgo = _.get(cache, 'time.subscribed_at', 0) > 0 ? moment(cache.time.subscribed_at).fromNow() : ''
+    let lastSubUsername = _.get(cache, 'subscribers[0]', 'n/a')
+    let onlineSubCount = _.size(_.filter(users, (o) => o.username !== config.settings.broadcaster_username && o.username !== config.settings.bot_username)) // except bot and user
+
+    let message = global.commons.prepare('subs', {
+      lastSubAgo: lastSubAgo,
+      lastSubUsername: lastSubUsername,
+      onlineSubCount: onlineSubCount
+    })
+    debug(message); global.commons.sendMessage(message, sender)
   }
 
   async subage (self, sender, text) {
