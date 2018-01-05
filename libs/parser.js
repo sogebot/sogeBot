@@ -448,7 +448,6 @@ Parser.prototype.parseMessage = async function (message, attr) {
 Parser.prototype.parseMessageApi = async function (msg) {
   if (msg.length === 0) return msg
 
-  console.log(msg)
   let rMessage = msg.match(/\(api\|(http\S+)\)/i)
   if (!_.isNil(rMessage) && !_.isNil(rMessage[1])) {
     msg = msg.replace(rMessage[0], '').trim() // remove api command from message
