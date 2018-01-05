@@ -75,8 +75,8 @@
 <script>
   var eventlist = {
     toggle: function (el) {
-      let boolValue = window.localStorage.getItem(`config.eventlist.${el.dataset.id}`) === 'true' ? true : (window.localStorage.getItem(`config.eventlist.${el.dataset.id}`) === 'false' ? false : window.localStorage.getItem(`config.eventlist.${el.dataset.id}`));
-      window.localStorage.setItem(
+      let boolValue = window.sessionStorage.getItem(`config.eventlist.${el.dataset.id}`) === 'true' ? true : (window.sessionStorage.getItem(`config.eventlist.${el.dataset.id}`) === 'false' ? false : window.sessionStorage.getItem(`config.eventlist.${el.dataset.id}`));
+      window.sessionStorage.setItem(
         `config.eventlist.${el.dataset.id}`,
         !boolValue
       ) // swap true/false
@@ -87,11 +87,11 @@
       $(el).removeClass().addClass('nav-btn btn ' + (!boolValue ? 'btn-outline-success' : 'btn-outline-danger'))
 
       socket.emit('saveConfiguration', {
-        'widgetEventlistFollows':  window.localStorage.getItem(`config.eventlist.follow`),
-        'widgetEventlistHosts': window.localStorage.getItem(`config.eventlist.host`),
-        'widgetEventlistCheers': window.localStorage.getItem(`config.eventlist.cheer`),
-        'widgetEventlistSubs': window.localStorage.getItem(`config.eventlist.sub`),
-        'widgetEventlistResubs': window.localStorage.getItem(`config.eventlist.resub`)
+        'widgetEventlistFollows':  window.sessionStorage.getItem(`config.eventlist.follow`),
+        'widgetEventlistHosts': window.sessionStorage.getItem(`config.eventlist.host`),
+        'widgetEventlistCheers': window.sessionStorage.getItem(`config.eventlist.cheer`),
+        'widgetEventlistSubs': window.sessionStorage.getItem(`config.eventlist.sub`),
+        'widgetEventlistResubs': window.sessionStorage.getItem(`config.eventlist.resub`)
       })
       socket.emit('widget.eventlist.get')
     }
@@ -110,29 +110,29 @@
     console.debug('widgetEventlistShow', data.widgetEventlistShow)
     console.groupEnd()
 
-    if (data.widgetEventlistFollows.trim().toLowerCase() !== 'true') {
+    if (data.widgetEventlistFollows.toString().trim().toLowerCase() !== 'true') {
       $('button[data-id="follow"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
-    if (data.widgetEventlistHosts.trim().toLowerCase() !== 'true') {
+    if (data.widgetEventlistHosts.toString().trim().toLowerCase() !== 'true') {
       $('button[data-id="host"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
-    if (data.widgetEventlistCheers.trim().toLowerCase() !== 'true') {
+    if (data.widgetEventlistCheers.toString().trim().toLowerCase() !== 'true') {
       $('button[data-id="cheer"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
-    if (data.widgetEventlistSubs.trim().toLowerCase() !== 'true') {
+    if (data.widgetEventlistSubs.toString().trim().toLowerCase() !== 'true') {
       $('button[data-id="sub"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
-    if (data.widgetEventlistResubs.trim().toLowerCase() !== 'true') {
+    if (data.widgetEventlistResubs.toString().trim().toLowerCase() !== 'true') {
       $('button[data-id="resub"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
 
-    window.localStorage.setItem('config.eventlist.height', data.widgetEventlistOverflowHeight)
-    window.localStorage.setItem('config.eventlist.show', data.widgetEventlistShow)
-    window.localStorage.setItem('config.eventlist.follow', data.widgetEventlistFollows)
-    window.localStorage.setItem('config.eventlist.host', data.widgetEventlistHosts)
-    window.localStorage.setItem('config.eventlist.cheer', data.widgetEventlistCheers)
-    window.localStorage.setItem('config.eventlist.sub', data.widgetEventlistSubs)
-    window.localStorage.setItem('config.eventlist.resub', data.widgetEventlistResubs)
+    window.sessionStorage.setItem('config.eventlist.height', data.widgetEventlistOverflowHeight)
+    window.sessionStorage.setItem('config.eventlist.show', data.widgetEventlistShow)
+    window.sessionStorage.setItem('config.eventlist.follow', data.widgetEventlistFollows)
+    window.sessionStorage.setItem('config.eventlist.host', data.widgetEventlistHosts)
+    window.sessionStorage.setItem('config.eventlist.cheer', data.widgetEventlistCheers)
+    window.sessionStorage.setItem('config.eventlist.sub', data.widgetEventlistSubs)
+    window.sessionStorage.setItem('config.eventlist.resub', data.widgetEventlistResubs)
 
     $('#eventlistShow').val(data.widgetEventlistShow)
     $('#eventlistOverflowHeight').val(data.widgetEventlistOverflowHeight)
@@ -161,15 +161,15 @@
     let eventlistEl = $('#eventlist-main')
     eventlistEl.empty()
     eventlistEl
-      .css('max-height', window.localStorage.getItem('config.eventlist.height') + 'px')
+      .css('max-height', window.sessionStorage.getItem('config.eventlist.height') + 'px')
       .css('overflow', 'auto')
 
     let i = 0
+    console.group('Eventlist events')
     for (let event of o) {
-      console.group('Eventlist event')
-      console.debug(window.localStorage.getItem(`config.eventlist.${event.event}`).trim().toLowerCase() !== 'true')
-      console.groupEnd()
-      if (window.localStorage.getItem(`config.eventlist.${event.event}`).trim().toLowerCase() !== 'true') continue
+      console.debug(event)
+      console.debug('^ Should be hidden:', window.sessionStorage.getItem(`config.eventlist.${event.event}`).toString().trim().toLowerCase() !== 'true')
+      if (window.sessionStorage.getItem(`config.eventlist.${event.event}`).toString().trim().toLowerCase() !== 'true') continue
       i++
 
       let username
@@ -222,8 +222,9 @@
         </div>`
 
       eventlistEl.append(row)
-      if (i >= window.localStorage.getItem('config.eventlist.show')) break
+      if (i >= window.sessionStorage.getItem('config.eventlist.show')) break
     }
+    console.groupEnd()
   })
 
   var $eventlistShow = $('#eventlistShow')
@@ -232,7 +233,7 @@
     var value = $eventlistShow.val()
     var data = {}
     data['widgetEventlistShow'] = value
-    window.localStorage.setItem('config.eventlist.show', value)
+    window.sessionStorage.setItem('config.eventlist.show', value)
     socket.emit('saveConfiguration', data)
   })
 
@@ -242,7 +243,7 @@ $eventlistOverflow.on('focusout', function () {
   var value = $eventlistOverflow.val()
   var data = {}
   data['widgetEventlistOverflowHeight'] = value
-  window.localStorage.setItem('config.eventlist.height', value)
+  window.sessionStorage.setItem('config.eventlist.height', value)
   socket.emit('saveConfiguration', data)
 })
 </script>
