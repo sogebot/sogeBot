@@ -75,12 +75,16 @@
 <script>
   var eventlist = {
     toggle: function (el) {
+      let boolValue = window.localStorage.getItem(`config.eventlist.${el.dataset.id}`) === 'true' ? true : (window.localStorage.getItem(`config.eventlist.${el.dataset.id}`) === 'false' ? false : window.localStorage.getItem(`config.eventlist.${el.dataset.id}`));
       window.localStorage.setItem(
         `config.eventlist.${el.dataset.id}`,
-        window.localStorage.getItem(`config.eventlist.${el.dataset.id}`) !== 'true'
-     ) // swap true/false
+        !boolValue
+      ) // swap true/false
 
-      $(el).removeClass().addClass('nav-btn btn ' + (window.localStorage.getItem(`config.eventlist.${el.dataset.id}`) === 'true' ? 'btn-outline-success' : 'btn-outline-danger'))
+      console.group('Switching config.eventlist')
+      console.debug(`Setting config.eventlist.${el.dataset.id}`, !boolValue)
+      console.groupEnd()
+      $(el).removeClass().addClass('nav-btn btn ' + (!boolValue ? 'btn-outline-success' : 'btn-outline-danger'))
 
       socket.emit('saveConfiguration', {
         'widgetEventlistFollows':  window.localStorage.getItem(`config.eventlist.follow`),
@@ -95,20 +99,30 @@
 
   socket.emit('widget.eventlist.get')
 
-  socket.on('configuration', function (data) {
-    if (!data.widgetEventlistFollows) {
+  socket.once('configuration', function (data) {
+    console.group('Eventlist widgets settings')
+    console.debug('widgetEventlistFollows', data.widgetEventlistFollows)
+    console.debug('widgetEventlistHosts', data.widgetEventlistHosts)
+    console.debug('widgetEventlistCheers', data.widgetEventlistCheers)
+    console.debug('widgetEventlistSubs', data.widgetEventlistSubs)
+    console.debug('widgetEventlistResubs', data.widgetEventlistResubs)
+    console.debug('widgetEventlistOverflowHeight', data.widgetEventlistOverflowHeight)
+    console.debug('widgetEventlistShow', data.widgetEventlistShow)
+    console.groupEnd()
+
+    if (data.widgetEventlistFollows.trim().toLowerCase() !== 'true') {
       $('button[data-id="follow"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
-    if (!data.widgetEventlistHosts) {
+    if (data.widgetEventlistHosts.trim().toLowerCase() !== 'true') {
       $('button[data-id="host"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
-    if (!data.widgetEventlistCheers) {
+    if (data.widgetEventlistCheers.trim().toLowerCase() !== 'true') {
       $('button[data-id="cheer"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
-    if (!data.widgetEventlistSubs) {
+    if (data.widgetEventlistSubs.trim().toLowerCase() !== 'true') {
       $('button[data-id="sub"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
-    if (!data.widgetEventlistResubs) {
+    if (data.widgetEventlistResubs.trim().toLowerCase() !== 'true') {
       $('button[data-id="resub"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
 
@@ -152,8 +166,10 @@
 
     let i = 0
     for (let event of o) {
-      console.log(window.localStorage.getItem(`config.eventlist.${event.event}`))
-      if (window.localStorage.getItem(`config.eventlist.${event.event}`) === 'false') continue
+      console.group('Eventlist event')
+      console.debug(window.localStorage.getItem(`config.eventlist.${event.event}`).trim().toLowerCase() !== 'true')
+      console.groupEnd()
+      if (window.localStorage.getItem(`config.eventlist.${event.event}`).trim().toLowerCase() !== 'true') continue
       i++
 
       let username
@@ -216,7 +232,7 @@
     var value = $eventlistShow.val()
     var data = {}
     data['widgetEventlistShow'] = value
-    window.localStorage.getItem('config.eventlist.show') = value
+    window.localStorage.setItem('config.eventlist.show', value)
     socket.emit('saveConfiguration', data)
   })
 
@@ -226,7 +242,7 @@ $eventlistOverflow.on('focusout', function () {
   var value = $eventlistOverflow.val()
   var data = {}
   data['widgetEventlistOverflowHeight'] = value
-  window.localStorage.getItem('config.eventlist.height') = value
+  window.localStorage.setItem('config.eventlist.height', value)
   socket.emit('saveConfiguration', data)
 })
 </script>
