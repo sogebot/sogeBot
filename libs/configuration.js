@@ -51,7 +51,7 @@ Configuration.prototype.debug = async function (self, sender) {
   }
 
   global.commons.sendMessage(`======= COPY DEBUG MESSAGE FROM HERE =======`, sender)
-  global.commons.sendMessage(`GENERAL | OS: ${process.env.npm_config_user_agent} | Bot version: ${process.env.npm_package_version} | Bot uptime: ${process.uptime()} | Bot lang: ${global.configuration.getValue('lang')} | Bot mute: ${global.configuration.getValue('mute')}`, sender)
+  global.commons.sendMessage(`GENERAL | OS: ${process.env.npm_config_user_agent} | DB: ${config.database.type} | Bot version: ${process.env.npm_package_version} | Bot uptime: ${process.uptime()} | Bot lang: ${global.configuration.getValue('lang')} | Bot mute: ${global.configuration.getValue('mute')}`, sender)
   global.commons.sendMessage(`SYSTEMS | ${_.keys(_.pickBy(config.systems)).join(', ')}`, sender)
   global.commons.sendMessage(`WIDGETS | ${_.map(widgets, 'widget').join(', ')}`, sender)
   global.commons.sendMessage(`API | HELIX ${stats.helix.total}/${stats.helix.errors} | KRAKEN ${stats.kraken.total}/${stats.kraken.errors} | TMI ${stats.tmi.total}/${stats.tmi.errors}`, sender)
