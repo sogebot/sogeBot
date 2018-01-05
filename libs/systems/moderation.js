@@ -110,11 +110,13 @@ Moderation.prototype.setLists = function (self, socket, data) {
   global.db.engine.update('settings', { key: 'whitelist' }, { value: self.lists.whitelist })
 }
 
-Moderation.prototype.timeoutUser = function (self, sender, warning, msg, time) {
+Moderation.prototype.timeoutUser = async function (self, sender, warning, msg, time) {
   var warningsAllowed = global.configuration.getValue('moderationWarnings')
   var warningsTimeout = global.configuration.getValue('moderationWarningsTimeouts')
+
   if (warningsAllowed === 0) {
-    global.commons.timeout(sender.username, msg.replace(/\$count/g, -1), time)
+    msg = await global.parser.parseMessage(msg.replace(/\$count/g, -1))
+    global.commons.timeout(sender.username, msg, time)
     return
   }
 
@@ -127,10 +129,11 @@ Moderation.prototype.timeoutUser = function (self, sender, warning, msg, time) {
   }
 
   warnings.push(new Date().getTime())
+  warning = await global.parser.parseMessage(warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length))
   if (warningsTimeout) {
-    global.commons.timeout(sender.username, warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length), 1)
+    global.commons.timeout(sender.username, warning, 1)
   } else {
-    global.commons.sendMessage('$sender: ' + warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length), sender)
+    global.commons.sendMessage('$sender: ' + warning, sender)
   }
 
   self.warnings[sender.username] = warnings
