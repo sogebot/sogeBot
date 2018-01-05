@@ -1,7 +1,8 @@
 'use strict'
 
-var constants = require('./constants')
-var _ = require('lodash')
+const constants = require('./constants')
+const _ = require('lodash')
+const config = require('../config.json')
 const debug = require('debug')('configuration')
 
 function Configuration () {
@@ -11,6 +12,7 @@ function Configuration () {
 
   global.parser.register(this, '!set list', this.listSets, constants.OWNER_ONLY)
   global.parser.register(this, '!set', this.setValue, constants.OWNER_ONLY)
+  global.parser.register(this, '!_debug', this.debug, constants.OWNER_ONLY)
 
   this.register('lang', '', 'string', 'en')
   this.register('mute', 'core.mute', 'bool', false)
@@ -20,6 +22,42 @@ function Configuration () {
 
   const self = this
   setTimeout(function () { global.log.info('Bot is loading configuration data'); self.loadValues() }, 2000)
+}
+
+Configuration.prototype.debug = async function (self, sender) {
+  let [api, widgets] = await Promise.all([
+    global.db.engine.find('APIStats'),
+    global.db.engine.find('widgets')
+  ])
+
+  let stats = {
+    'helix': {
+      'total': _.size(_.filter(api, (o) => o.api === 'helix')),
+      'errors': _.size(_.filter(api, (o) => o.api === 'helix' && o.code !== 200))
+    },
+    'kraken': {
+      'total': _.size(_.filter(api, (o) => o.api === 'kraken')),
+      'errors': _.size(_.filter(api, (o) => o.api === 'kraken' && o.code !== 200))
+    },
+    'tmi': {
+      'total': _.size(_.filter(api, (o) => o.api === 'tmi')),
+      'errors': _.size(_.filter(api, (o) => o.api === 'tmi' && o.code !== 200))
+    }
+  }
+
+  let oauth = {
+    broadcaster: _.isNil(config.settings.broadcaster_oauth) || !config.settings.broadcaster_oauth.match(/oauth:[\w]*/),
+    bot: _.isNil(config.settings.bot_oauth) || !config.settings.bot_oauth.match(/oauth:[\w]*/)
+  }
+
+  global.commons.sendMessage(`======= COPY DEBUG MESSAGE FROM HERE =======`, sender)
+  global.commons.sendMessage(`GENERAL | OS: ${process.env.npm_config_user_agent} | Bot version: ${process.env.npm_package_version} | Bot uptime: ${process.uptime()} | Bot lang: ${global.configuration.getValue('lang')} | Bot mute: ${global.configuration.getValue('mute')}`, sender)
+  global.commons.sendMessage(`SYSTEMS | ${_.keys(_.pickBy(config.systems)).join(', ')}`, sender)
+  global.commons.sendMessage(`WIDGETS | ${_.map(widgets, 'widget').join(', ')}`, sender)
+  global.commons.sendMessage(`API | HELIX ${stats.helix.total}/${stats.helix.errors} | KRAKEN ${stats.kraken.total}/${stats.kraken.errors} | TMI ${stats.tmi.total}/${stats.tmi.errors}`, sender)
+  global.commons.sendMessage(`WEBHOOKS | ${_.keys(_.pickBy(global.webhooks.enabled)).join(', ')}`, sender)
+  global.commons.sendMessage(`OAUTH | BOT ${!oauth.bot} | BROADCASTER ${!oauth.broadcaster}`, sender)
+  global.commons.sendMessage('======= END OF DEBUG MESSAGE =======', sender)
 }
 
 Configuration.prototype.get = function () {
