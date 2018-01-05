@@ -74,25 +74,28 @@
 
 <script>
   var eventlist = {
-    config: {},
     toggle: function (el) {
-      this.config[el.dataset.id] = !this.config[el.dataset.id]
-      $(el).removeClass().addClass('nav-btn btn ' + (this.config[el.dataset.id] ? 'btn-outline-success' : 'btn-outline-danger'))
+      window.localStorage.setItem(
+        `config.eventlist.${el.dataset.id}`,
+        window.localStorage.getItem(`config.eventlist.${el.dataset.id}`) !== 'true'
+     ) // swap true/false
+
+      $(el).removeClass().addClass('nav-btn btn ' + (window.localStorage.getItem(`config.eventlist.${el.dataset.id}`) === 'true' ? 'btn-outline-success' : 'btn-outline-danger'))
 
       socket.emit('saveConfiguration', {
-        'widgetEventlistFollows': this.config.follow,
-        'widgetEventlistHosts': this.config.host,
-        'widgetEventlistCheers': this.config.cheer,
-        'widgetEventlistSubs': this.config.sub,
-        'widgetEventlistResubs': this.config.resub
+        'widgetEventlistFollows':  window.localStorage.getItem(`config.eventlist.follow`),
+        'widgetEventlistHosts': window.localStorage.getItem(`config.eventlist.host`),
+        'widgetEventlistCheers': window.localStorage.getItem(`config.eventlist.cheer`),
+        'widgetEventlistSubs': window.localStorage.getItem(`config.eventlist.sub`),
+        'widgetEventlistResubs': window.localStorage.getItem(`config.eventlist.resub`)
       })
       socket.emit('widget.eventlist.get')
     }
   }
 
-  setTimeout(() => socket.emit('widget.eventlist.get'), 5000)
+  socket.emit('widget.eventlist.get')
 
-  socket.once('configuration', function (data) {
+  socket.on('configuration', function (data) {
     if (!data.widgetEventlistFollows) {
       $('button[data-id="follow"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
@@ -108,20 +111,20 @@
     if (!data.widgetEventlistResubs) {
       $('button[data-id="resub"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
-    eventlist.config = {
-      height: data.widgetEventlistOverflowHeight,
-      show: data.widgetEventlistShow,
-      follow: data.widgetEventlistFollows,
-      host: data.widgetEventlistHosts,
-      cheer: data.widgetEventlistCheers,
-      sub: data.widgetEventlistSubs,
-      resub: data.widgetEventlistResubs
-    }
+
+    window.localStorage.setItem('config.eventlist.height', data.widgetEventlistOverflowHeight)
+    window.localStorage.setItem('config.eventlist.show', data.widgetEventlistShow)
+    window.localStorage.setItem('config.eventlist.follow', data.widgetEventlistFollows)
+    window.localStorage.setItem('config.eventlist.host', data.widgetEventlistHosts)
+    window.localStorage.setItem('config.eventlist.cheer', data.widgetEventlistCheers)
+    window.localStorage.setItem('config.eventlist.sub', data.widgetEventlistSubs)
+    window.localStorage.setItem('config.eventlist.resub', data.widgetEventlistResubs)
 
     $('#eventlistShow').val(data.widgetEventlistShow)
     $('#eventlistOverflowHeight').val(data.widgetEventlistOverflowHeight)
   })
 
+  socket.off('widget.eventlist')
   socket.on('widget.eventlist', function (o) {
     if (_.isNil(o)) return
 
@@ -144,12 +147,13 @@
     let eventlistEl = $('#eventlist-main')
     eventlistEl.empty()
     eventlistEl
-      .css('max-height', eventlist.config.height + 'px')
+      .css('max-height', window.localStorage.getItem('config.eventlist.height') + 'px')
       .css('overflow', 'auto')
 
     let i = 0
     for (let event of o) {
-      if (!(eventlist.config[event.event])) continue
+      console.log(window.localStorage.getItem(`config.eventlist.${event.event}`))
+      if (window.localStorage.getItem(`config.eventlist.${event.event}`) === 'false') continue
       i++
 
       let username
@@ -202,7 +206,7 @@
         </div>`
 
       eventlistEl.append(row)
-      if (i >= eventlist.config.show) break
+      if (i >= window.localStorage.getItem('config.eventlist.show')) break
     }
   })
 
@@ -212,7 +216,7 @@
     var value = $eventlistShow.val()
     var data = {}
     data['widgetEventlistShow'] = value
-    eventlist.config.show = value
+    window.localStorage.getItem('config.eventlist.show') = value
     socket.emit('saveConfiguration', data)
   })
 
@@ -222,7 +226,7 @@ $eventlistOverflow.on('focusout', function () {
   var value = $eventlistOverflow.val()
   var data = {}
   data['widgetEventlistOverflowHeight'] = value
-  eventlist.config.height = value
+  window.localStorage.getItem('config.eventlist.height') = value
   socket.emit('saveConfiguration', data)
 })
 </script>
