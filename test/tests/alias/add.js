@@ -44,6 +44,21 @@ describe('Alias - add()', () => {
     await message.isSent('alias.alias-was-added', owner, { alias: 'a', command: 'me' })
   })
 
+  it('!한국어 !me', async () => {
+    global.systems.alias.add(global.systems.alias, owner, '!한국어 !me')
+    await message.isSent('alias.alias-was-added', owner, { alias: '한국어', command: 'me' })
+  })
+
+  it('!русский !me', async () => {
+    global.systems.alias.add(global.systems.alias, owner, '!русский !me')
+    await message.isSent('alias.alias-was-added', owner, { alias: 'русский', command: 'me' })
+  })
+
+  it('!a with spaces !top messages', async () => {
+    global.systems.alias.add(global.systems.alias, owner, '!a with spaces !top messages')
+    await message.isSent('alias.alias-was-added', owner, { alias: 'a with spaces', command: 'top messages' })
+  })
+
   it('2x - !a !me', async () => {
     global.systems.alias.add(global.systems.alias, owner, '!a !me')
     await message.isSent('alias.alias-was-added', owner, { alias: 'a', command: 'me' })

@@ -29,6 +29,18 @@ define(
 )
 
 define(
+  'COMMAND_REGEXP_WITH_SPACES',
+  XRegExp(`!(?<command> [\\pL ]* ) # command`, 'ix')
+)
+
+define(
+  'ALIAS_REGEXP',
+  XRegExp(`!(?<alias> [\\pL ]*   ) # alias
+           \\s                     # empty space
+           !(?<command> [\\pL ]* ) # command`, 'ix')
+)
+
+define(
   'COMMAND_REGEXP_WITH_RESPONSE',
   XRegExp(`!(?<command> [\\pL]* ) # command
            \\s                    # empty space

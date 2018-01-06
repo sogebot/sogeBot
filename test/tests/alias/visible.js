@@ -34,4 +34,37 @@ describe('Alias - visible()', () => {
     global.systems.alias.visible(global.systems.alias, owner, '!a')
     await message.isSent('alias.alias-was-exposed', owner, { alias: 'a' })
   })
+
+  it('!a with spaces', async () => {
+    global.systems.alias.add(global.systems.alias, owner, '!a with spaces !uptime')
+    await message.isSent('alias.alias-was-added', owner, { alias: 'a with spaces', command: 'uptime' })
+
+    global.systems.alias.visible(global.systems.alias, owner, '!a with spaces')
+    await message.isSent('alias.alias-was-concealed', owner, { alias: 'a with spaces' })
+
+    global.systems.alias.visible(global.systems.alias, owner, '!a with spaces')
+    await message.isSent('alias.alias-was-exposed', owner, { alias: 'a with spaces' })
+  })
+
+  it('!한국어', async () => {
+    global.systems.alias.add(global.systems.alias, owner, '!한국어 !uptime')
+    await message.isSent('alias.alias-was-added', owner, { alias: '한국어', command: 'uptime' })
+
+    global.systems.alias.visible(global.systems.alias, owner, '!한국어')
+    await message.isSent('alias.alias-was-concealed', owner, { alias: '한국어' })
+
+    global.systems.alias.visible(global.systems.alias, owner, '!한국어')
+    await message.isSent('alias.alias-was-exposed', owner, { alias: '한국어' })
+  })
+
+  it('!русский', async () => {
+    global.systems.alias.add(global.systems.alias, owner, '!русский !uptime')
+    await message.isSent('alias.alias-was-added', owner, { alias: 'русский', command: 'uptime' })
+
+    global.systems.alias.visible(global.systems.alias, owner, '!русский')
+    await message.isSent('alias.alias-was-concealed', owner, { alias: 'русский' })
+
+    global.systems.alias.visible(global.systems.alias, owner, '!русский')
+    await message.isSent('alias.alias-was-exposed', owner, { alias: 'русский' })
+  })
 })

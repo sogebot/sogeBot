@@ -42,4 +42,46 @@ describe('Alias - run()', () => {
     // !a is not registered anymore
     assert.isUndefined(global.parser.registeredCmds['!test'])
   })
+
+  it('!a with spaces - will show !duel', async () => {
+    global.systems.alias.add(global.systems.alias, owner, '!a with spaces !duel')
+    await message.isSent('alias.alias-was-added', owner, { alias: 'a with spaces', command: 'duel' })
+
+    global.parser.parse(owner, '!a with spaces')
+    await message.isSent('gambling.duel.notEnoughOptions', owner, { })
+
+    global.systems.alias.remove(global.systems.alias, owner, '!a with spaces')
+    await message.isSent('alias.alias-was-removed', owner, { alias: 'a with spaces' })
+
+    // !a is not registered anymore
+    assert.isUndefined(global.parser.registeredCmds['!a with spaces'])
+  })
+
+  it('!한국어 - will show !duel', async () => {
+    global.systems.alias.add(global.systems.alias, owner, '!한국어 !duel')
+    await message.isSent('alias.alias-was-added', owner, { alias: '한국어', command: 'duel' })
+
+    global.parser.parse(owner, '!한국어')
+    await message.isSent('gambling.duel.notEnoughOptions', owner, { })
+
+    global.systems.alias.remove(global.systems.alias, owner, '!한국어')
+    await message.isSent('alias.alias-was-removed', owner, { alias: '한국어' })
+
+    // !a is not registered anymore
+    assert.isUndefined(global.parser.registeredCmds['!a with spaces'])
+  })
+
+  it('!русский - will show !duel', async () => {
+    global.systems.alias.add(global.systems.alias, owner, '!русский !duel')
+    await message.isSent('alias.alias-was-added', owner, { alias: 'русский', command: 'duel' })
+
+    global.parser.parse(owner, '!русский')
+    await message.isSent('gambling.duel.notEnoughOptions', owner, { })
+
+    global.systems.alias.remove(global.systems.alias, owner, '!русский')
+    await message.isSent('alias.alias-was-removed', owner, { alias: 'русский' })
+
+    // !a is not registered anymore
+    assert.isUndefined(global.parser.registeredCmds['!русский'])
+  })
 })
