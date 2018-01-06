@@ -691,6 +691,7 @@ class Twitch {
   async followers (self, sender) {
     let [when, cache, users] = await Promise.all([self.when(), self.cached(), global.users.getAll({ is: { online: true, follower: true } })])
 
+    moment.locale(global.configuration.getValue('lang'))
     let lastFollowAgo = _.get(when, 'followed_at', 0) > 0 ? moment(when.followed_at).fromNow() : ''
     let lastFollowUsername = _.get(cache, 'followers[0]', 'n/a')
     let onlineFollowersCount = _.size(_.filter(users, (o) => o.username !== config.settings.broadcaster_username && o.username !== config.settings.bot_username)) // except bot and user
@@ -706,6 +707,7 @@ class Twitch {
   async subs (self, sender) {
     let [when, cache, users] = await Promise.all([self.when(), self.cached(), global.users.getAll({ is: { online: true, subscriber: true } })])
 
+    moment.locale(global.configuration.getValue('lang'))
     let lastSubAgo = _.get(when, 'subscribed_at', 0) > 0 ? moment(when.subscribed_at).fromNow() : ''
     let lastSubUsername = _.get(cache, 'subscribers[0]', 'n/a')
     let onlineSubCount = _.size(_.filter(users, (o) => o.username !== config.settings.broadcaster_username && o.username !== config.settings.bot_username)) // except bot and user
