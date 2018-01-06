@@ -207,10 +207,12 @@
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$months', '<strong>' + _.get(event, 'months', '0') + '</strong>')}</span>
           <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
-        message = `
-            <div class="col-1"></div>
-            <div class="col-10 eventlist-blockquote">${event.message}</div>
-        `
+        if (event.message.trim().length > 0) {
+          message = `
+              <div class="col-1"></div>
+              <div class="col-10 eventlist-blockquote">${event.message}</div>
+          `
+        }
       }
 
       if (event.event === 'cheer') {
@@ -219,10 +221,12 @@
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$bits', '<strong>' + _.get(event, 'bits', '0') + '</strong>')}</span>
           <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
-        message = `
-            <div class="col-1"></div>
-            <div class="col-10 eventlist-blockquote">${event.message}</div>
-        `
+        if (event.message.trim().length > 0) {
+          message = `
+              <div class="col-1"></div>
+              <div class="col-10 eventlist-blockquote">${event.message}</div>
+          `
+        }
       }
 
       let row = `
