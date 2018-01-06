@@ -3,6 +3,7 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const debug = require('debug')('systems:commands')
+const XRegExp = require('xregexp')
 
 // bot libraries
 var constants = require('../constants')
@@ -75,41 +76,38 @@ class CustomCommands {
 
   async edit (self, sender, text) {
     debug('edit(%j, %j, %j)', self, sender, text)
-    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w\S]+) ([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
+    const match = XRegExp.exec(text, constants.COMMAND_REGEXP_WITH_RESPONSE)
 
-    if (_.isNil(parsed)) {
+    if (_.isNil(match)) {
       let message = global.commons.prepare('customcmds.commands-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
-    const command = parsed[1]
-    const response = parsed[2]
-
-    let item = await global.db.engine.findOne('commands', { command: command })
+    let item = await global.db.engine.findOne('commands', { command: match.command })
     if (_.isEmpty(item)) {
-      let message = global.commons.prepare('customcmds.command-was-not-found', { command: command })
+      let message = global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
-    await global.db.engine.update('commands', { command: command }, { response: response })
-    let message = global.commons.prepare('customcmds.command-was-edited', { command: command, response: response })
+    await global.db.engine.update('commands', { command: match.command }, { response: match.response })
+    let message = global.commons.prepare('customcmds.command-was-edited', { command: match.command, response: match.response })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
   async add (self, sender, text) {
     debug('add(%j,%j,%j)', self, sender, text)
-    let parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w\S].+)$/)
+    const match = XRegExp.exec(text, constants.COMMAND_REGEXP_WITH_RESPONSE)
 
-    if (_.isNil(parsed)) {
+    if (_.isNil(match)) {
       let message = global.commons.prepare('customcmds.commands-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
-    debug(parsed)
-    let command = { command: parsed[1], response: parsed[2], enabled: true, visible: true }
+    debug(match)
+    let command = { command: match.command, response: match.response, enabled: true, visible: true }
 
     if (global.parser.isRegistered(command.command)) {
       let message = global.commons.prepare('core.isRegistered', { keyword: command.command })
@@ -119,14 +117,14 @@ class CustomCommands {
 
     await global.db.engine.insert('commands', command)
     await self.register(self)
-    let message = global.commons.prepare('customcmds.command-was-added', { command: parsed[1] })
+    let message = global.commons.prepare('customcmds.command-was-added', { command: match.command })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
   async run (self, sender, msg, fullMsg) {
-    let parsed = fullMsg.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+) ?(.*)$/)
-    let command = await global.db.engine.findOne('commands', { command: parsed[1].toLowerCase(), enabled: true })
-    if (!_.isEmpty(command)) global.commons.sendMessage(command.response, sender, {'param': msg, 'cmd': command})
+    const match = XRegExp.exec(fullMsg, constants.COMMAND_REGEXP_WITH_OPTIONAL_RESPONSE)
+    let command = await global.db.engine.findOne('commands', { command: match.command.toLowerCase(), enabled: true })
+    if (!_.isEmpty(command)) global.commons.sendMessage(command.response, sender, {'param': match.response, 'cmd': match.command})
     else global.parser.unregister(fullMsg)
   }
 
@@ -138,22 +136,21 @@ class CustomCommands {
 
   async toggle (self, sender, text) {
     debug('toggle(%j,%j,%j)', self, sender, text)
-    let id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    if (_.isNil(id)) {
+    const match = XRegExp.exec(text, constants.COMMAND_REGEXP)
+    if (_.isNil(match)) {
       let message = global.commons.prepare('customcmds.commands-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
-    id = id[1]
 
-    const command = await global.db.engine.findOne('commands', { command: id })
+    const command = await global.db.engine.findOne('commands', { command: match.command })
     if (_.isEmpty(command)) {
-      let message = global.commons.prepare('customcmds.command-was-not-found', { command: id })
+      let message = global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
-    await global.db.engine.update('commands', { command: id }, { enabled: !command.enabled })
+    await global.db.engine.update('commands', { command: match.command }, { enabled: !command.enabled })
     await self.register(self)
 
     let message = global.commons.prepare(!command.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: command.command })
@@ -161,43 +158,41 @@ class CustomCommands {
   }
 
   async visible (self, sender, text) {
-    let id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    if (_.isNil(id)) {
+    const match = XRegExp.exec(text, constants.COMMAND_REGEXP)
+    if (_.isNil(match)) {
       let message = global.commons.prepare('customcmds.commands-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
-    id = id[1]
 
-    const command = await global.db.engine.findOne('commands', { command: id })
+    const command = await global.db.engine.findOne('commands', { command: match.command })
     if (_.isEmpty(command)) {
-      let message = global.commons.prepare('customcmds.command-was-not-found', { command: id })
+      let message = global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
-    await global.db.engine.update('commands', { command: id }, { visible: !command.visible })
+    await global.db.engine.update('commands', { command: match.command }, { visible: !command.visible })
     let message = global.commons.prepare(!command.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: command.command })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
   async remove (self, sender, text) {
-    let id = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)$/)
-    if (_.isNil(id)) {
+    const match = XRegExp.exec(text, constants.COMMAND_REGEXP)
+    if (_.isNil(match)) {
       let message = global.commons.prepare('customcmds.commands-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
-    id = id[1]
 
-    let removed = await global.db.engine.remove('commands', { command: id })
+    let removed = await global.db.engine.remove('commands', { command: match.command })
     if (!removed) {
-      let message = global.commons.prepare('customcmds.command-was-not-found', { command: id })
+      let message = global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
-    global.parser.unregister('!' + id)
-    let message = global.commons.prepare('customcmds.command-was-removed', { command: id })
+    global.parser.unregister('!' + match.command)
+    let message = global.commons.prepare('customcmds.command-was-removed', { command: match.command })
     debug(message); global.commons.sendMessage(message, sender)
   }
 }

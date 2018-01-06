@@ -49,6 +49,7 @@
     "twitter": "^1.7.1",
     "velocity-animate": "^1.5.0",
     "winston": "^2.4.0",
+    "xregexp": "^4.0.0",
     "youtube-search": "^1.0.10",
     "ytdl-core": "^0.18.4"
   },

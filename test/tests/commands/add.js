@@ -19,32 +19,19 @@ describe('Custom Commands - add()', () => {
     await message.isSent('customcmds.commands-parse-failed', owner)
   })
 
-  it('!alias', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!alias')
+  it('!cmd', async () => {
+    global.systems.customCommands.add(global.systems.customCommands, owner, '!cmd')
     await message.isSent('customcmds.commands-parse-failed', owner)
   })
 
-  it('alias', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'alias')
+  it('cmd', async () => {
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'cmd')
     await message.isSent('customcmds.commands-parse-failed', owner)
   })
 
-  it('!new asd', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!new asd')
-    await message.isSent('customcmds.command-was-added', owner, { command: 'new' })
-
-    global.parser.parse(owner, '!new')
-    await message.isSentRaw('asd', owner)
-  })
-
-  it('alias !asd', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'alias !asd')
+  it('cmd !asd', async () => {
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'cmd !asd')
     await message.isSent('customcmds.commands-parse-failed', owner)
-  })
-
-  it('!alias !me', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!alias !me')
-    await message.isSent('core.isRegistered', owner, { keyword: 'alias' })
   })
 
   it('2x - !a Lorem Ipsum', async () => {
@@ -53,5 +40,29 @@ describe('Custom Commands - add()', () => {
 
     global.systems.customCommands.add(global.systems.customCommands, owner, '!a me')
     await message.isSent('core.isRegistered', owner, { keyword: 'a' })
+  })
+
+  it('!cmd this is command response', async () => {
+    global.systems.customCommands.add(global.systems.customCommands, owner, '!cmd this is command response')
+    await message.isSent('customcmds.command-was-added', owner, { response: 'this is command response', command: 'cmd' })
+
+    global.parser.parse(owner, '!cmd')
+    await message.isSentRaw('this is command response', owner)
+  })
+
+  it('!한국어 this is command response', async () => {
+    global.systems.customCommands.add(global.systems.customCommands, owner, '!한국어 this is command response')
+    await message.isSent('customcmds.command-was-added', owner, { response: 'this is command response', command: '한국어' })
+
+    global.parser.parse(owner, '!한국어')
+    await message.isSentRaw('this is command response', owner)
+  })
+
+  it('!русский this is command response', async () => {
+    global.systems.customCommands.add(global.systems.customCommands, owner, '!русский this is command response')
+    await message.isSent('customcmds.command-was-added', owner, { response: 'this is command response', command: 'русский' })
+
+    global.parser.parse(owner, '!русский')
+    await message.isSentRaw('this is command response', owner)
   })
 })

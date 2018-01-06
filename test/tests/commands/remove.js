@@ -41,6 +41,28 @@ describe('Custom Commands - remove()', () => {
     assert.isUndefined(global.parser.registeredCmds['!a'])
   })
 
+  it('!한글', async () => {
+    global.systems.customCommands.add(global.systems.customCommands, owner, '!한글 !me')
+    await message.isSent('customcmds.command-was-added', owner, { command: '한글', response: '!me' })
+
+    global.systems.customCommands.remove(global.systems.customCommands, owner, '!한글')
+    await message.isSent('customcmds.command-was-removed', owner, { command: '한글' })
+
+    // !a is not registered anymore
+    assert.isUndefined(global.parser.registeredCmds['!한글'])
+  })
+
+  it('!русский', async () => {
+    global.systems.customCommands.add(global.systems.customCommands, owner, '!русский !me')
+    await message.isSent('customcmds.command-was-added', owner, { command: 'русский', response: '!me' })
+
+    global.systems.customCommands.remove(global.systems.customCommands, owner, '!русский')
+    await message.isSent('customcmds.command-was-removed', owner, { command: 'русский' })
+
+    // !a is not registered anymore
+    assert.isUndefined(global.parser.registeredCmds['!русский'])
+  })
+
   it('2x - !a !me', async () => {
     global.systems.customCommands.add(global.systems.customCommands, owner, '!a !me')
     await message.isSent('customcmds.command-was-added', owner, { command: 'a', response: '!me' })
