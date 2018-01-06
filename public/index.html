@@ -846,11 +846,16 @@
         }, 1000)
       },
       gameInputStatus: function (games) {
+        console.group('gameInputStatus')
+        console.debug('Game list', games)
+        console.debug('Selected game', $('#change-game-input').val())
+        console.debug('Is searched game in list', _.includes(games, $('#change-game-input').val()))
+        console.groupEnd()
         if (games !== false) {
-          if (games[0] === $('#change-game-input').val()) {
+          if (_.includes(games, $('#change-game-input').val())) {
             this.group.children('input').removeClass().addClass('form-control is-valid')
-            this.setSelectedGame(games[0])
-            this.update(this.cachedData, games[0])
+            this.setSelectedGame(_.find(games, (o) => o === $('#change-game-input').val()))
+            this.update(this.cachedData, _.find(games, (o) => o === $('#change-game-input').val()))
           } else {
             this.group.children('input').removeClass().addClass('form-control is-invalid')
             $('#change-game-search-list').empty()
