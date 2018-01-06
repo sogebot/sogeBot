@@ -55,7 +55,7 @@ class Highlights {
       highlight.description = description
       highlight.title = global.twitch.current.status
       highlight.game = global.twitch.current.game
-      highlight.created_at = moment().format('X')
+      highlight.created_at = _.now()
 
       d('Created at (cached): %s', self.cached.created_at)
       d('When online: %s', when.online)

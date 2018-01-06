@@ -1,6 +1,5 @@
 const _ = require('lodash')
 const snekfetch = require('snekfetch')
-const moment = require('moment')
 const config = require('../config.json')
 const debug = require('debug')('webhooks')
 
@@ -127,20 +126,20 @@ class Webhooks {
 
       // save followed_at to cache
       let cache = await global.twitch.cached()
-      cache.time.followed_at = moment().format('x')
+      cache.time.followed_at = _.now()
 
       global.events.fire('follow', { username: userGetFromApi.body.data[0].login }) // we can safely fire event as user doesn't exist in db
       await Promise.all([
         global.twitch.cached(cache),
-        global.db.engine.insert('users', { id: fid, username: userGetFromApi.body.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('x') } })
+        global.db.engine.insert('users', { id: fid, username: userGetFromApi.body.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
       ])
     } else {
       debug('user in db')
-      debug('username: %s, is follower: %s, current time: %s, user time follow: %s', user.username, user.is.follower, moment().format('x'), user.time.follow)
-      if (!user.is.follower && moment().format('x') - user.time.follow > 60000 * 60) global.events.fire('follow', { username: user.username })
+      debug('username: %s, is follower: %s, current time: %s, user time follow: %s', user.username, user.is.follower, _.now(), user.time.follow)
+      if (!user.is.follower && _.now() - user.time.follow > 60000 * 60) global.events.fire('follow', { username: user.username })
 
       if (user.is.follower) global.users.set(user.username, {id: fid, time: { followCheck: new Date().getTime() }})
-      else global.users.set(user.username, { id: fid, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('x') } })
+      else global.users.set(user.username, { id: fid, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
     }
   }
 

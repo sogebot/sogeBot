@@ -152,7 +152,7 @@ Logger.prototype.doFilter = function (self, content) {
     var line = sContent[i]
 
     var time = line.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})/g)
-    var curTime = moment().format('X')
+    var curTime = _.now()
 
     if (_.isNull(time)) continue
     time = moment(time[0].replace(/[-:]/g, '')).format('X')
