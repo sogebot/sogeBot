@@ -1,7 +1,8 @@
 'use strict'
 
 // 3rdparty libraries
-var _ = require('lodash')
+const _ = require('lodash')
+const XRegExp = require('xregexp')
 
 // bot libraries
 var constants = require('../constants')
@@ -49,39 +50,38 @@ class Cooldown {
   }
 
   async set (self, sender, text) {
-    const parsed = text.match(/^([!\u0500-\u052F\u0400-\u04FF\w]+) (global|user) (\d+) ?(\w+)?/)
+    const match = XRegExp.exec(text, constants.COOLDOWN_REGEXP_SET)
 
-    if (_.isNil(parsed)) {
+    if (_.isNil(match)) {
       let message = global.commons.prepare('cooldowns.cooldown-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
-    let [command, type, seconds, quiet] = parsed.slice(1)
-    if (parseInt(seconds, 10) === 0) {
-      await global.db.engine.remove('cooldowns', { key: command, type: type })
-      let message = global.commons.prepare('cooldowns.cooldown-was-unset', { type: type, command: command })
+    if (parseInt(match.seconds, 10) === 0) {
+      await global.db.engine.remove('cooldowns', { key: match.command, type: match.type })
+      let message = global.commons.prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command })
       debug(message); global.commons.sendMessage(message, sender)
       return
     }
 
-    let cooldown = await global.db.engine.findOne('cooldowns', { key: command, type: type })
-    if (_.isEmpty(cooldown)) await global.db.engine.update('cooldowns', { key: command, type: type }, { miliseconds: parseInt(seconds, 10) * 1000, type: type, timestamp: 0, quiet: _.isNil(quiet) ? false : quiet, enabled: true, owner: false, moderator: false })
-    else await global.db.engine.update('cooldowns', { key: command, type: type }, { miliseconds: parseInt(seconds, 10) * 1000 })
+    let cooldown = await global.db.engine.findOne('cooldowns', { key: match.command, type: match.type })
+    if (_.isEmpty(cooldown)) await global.db.engine.update('cooldowns', { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000, type: match.type, timestamp: 0, quiet: _.isNil(match.quiet) ? false : match.quiet, enabled: true, owner: false, moderator: false })
+    else await global.db.engine.update('cooldowns', { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000 })
 
-    let message = global.commons.prepare('cooldowns.cooldown-was-set', { seconds: seconds, type: type, command: command })
+    let message = global.commons.prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
   async check (self, id, sender, text) {
     debug('check(self, %s, %j, %s)', id, sender, text)
-    var data, cmdMatch, viewer, timestamp, now
 
-    cmdMatch = text.match(/^(![\u0500-\u052F\u0400-\u04FF\w]+)/)
-    if (!_.isNil(cmdMatch)) { // command
-      let cooldown = await global.db.engine.findOne('cooldowns', { key: cmdMatch[1] })
+    var data, viewer, timestamp, now
+    const match = XRegExp.exec(text, constants.COMMAND_REGEXP)
+    if (!_.isNil(match)) { // command
+      let cooldown = await global.db.engine.findOne('cooldowns', { key: `!${match.command}` })
       if (_.isEmpty(cooldown)) { // command is not on cooldown -> recheck with text only
-        self.check(self, id, sender, text.replace(cmdMatch[1], ''))
+        self.check(self, id, sender, text.replace(`!${match.command}`, ''))
         return // do nothing
       }
       data = [{
@@ -167,17 +167,17 @@ class Cooldown {
 
   async toggle (self, sender, text, type) {
     debug('toggle(%j, %j, %j, %j', self, sender, text, type)
-    const toggle = text.match(/^([!\u0500-\u052F\u0400-\u04FF\w]+) (global|user)$/)
+    const match = XRegExp.exec(text, constants.COOLDOWN_REGEXP)
 
-    if (_.isNil(toggle)) {
+    if (_.isNil(match)) {
       let message = global.commons.prepare('cooldowns.cooldown-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
-    const cooldown = await global.db.engine.findOne('cooldowns', { key: toggle[1], type: toggle[2] })
+    const cooldown = await global.db.engine.findOne('cooldowns', { key: match.command, type: match.type })
     if (_.isEmpty(cooldown)) {
-      let message = global.commons.prepare('cooldowns.cooldown-not-found', { command: toggle[1] })
+      let message = global.commons.prepare('cooldowns.cooldown-not-found', { command: match.command })
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
@@ -187,7 +187,7 @@ class Cooldown {
     } else cooldown[type] = !cooldown[type]
 
     delete cooldown._id
-    await global.db.engine.update('cooldowns', { key: toggle[1], type: toggle[2] }, cooldown)
+    await global.db.engine.update('cooldowns', { key: match.command, type: match.type }, cooldown)
 
     let path = ''
     let status = cooldown[type] ? 'enabled' : 'disabled'

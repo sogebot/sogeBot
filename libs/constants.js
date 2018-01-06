@@ -41,6 +41,24 @@ define(
 )
 
 define(
+  'COOLDOWN_REGEXP',
+  XRegExp(`(?<command> !?[\\pL ]* ) # command
+           \\s                      # empty space
+           (?<type> global|user   ) # type`, 'ix')
+)
+
+define(
+  'COOLDOWN_REGEXP_SET',
+  XRegExp(`(?<command> !?[\\pL ]* ) # command
+           \\s                      # empty space
+           (?<type> global|user   ) # type
+           \\s                      # empty space
+           (?<seconds> \\d*       ) # seconds
+           ?\\s                     # empty space
+           ?(?<quiet> \\w*        ) # optional-quiet`, 'ix')
+)
+
+define(
   'COMMAND_REGEXP_WITH_RESPONSE',
   XRegExp(`!(?<command> [\\pL]* ) # command
            \\s                    # empty space
