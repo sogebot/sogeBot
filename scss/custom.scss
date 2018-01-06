@@ -994,6 +994,42 @@ table tr td hr {
   color: $yellow;
 }
 
+blockquote {
+  border:none;
+  font-family:Georgia, "Times New Roman", Times, serif;
+  margin-bottom:-30px;
+  position: relative;
+  max-width: 400px;
+  margin: 0 auto;
+  padding-left: 0.4em;
+}
+
+.eventlist-blockquote {
+  font-size: 0.7rem;
+  line-height: 1rem;
+  margin-bottom: 2px;
+}
+
+.eventlist-blockquote:before {
+    content: "\201C";
+    font-weight: bold;
+    color: $gray-400;
+    font-size: 1rem;
+    left: -0.1rem;
+    position: relative;
+    font-family: 'Georgia';
+}
+.eventlist-blockquote:after {
+    content: "\201D";
+    font-weight: bold;
+    color: $gray-400;
+    font-size: 1rem;
+    position: relative;
+    left: 0.1rem;
+    top: .7rem;
+    font-family: 'Georgia';
+}
+
 .eventlist-text {
   font-size: .8rem;
   text-align: center;

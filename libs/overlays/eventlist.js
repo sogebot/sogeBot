@@ -35,6 +35,7 @@ EventList.prototype.add = async function (data) {
     event: data.type,
     timestamp: _.now(),
     username: data.username,
+    message: data.message,
     months: _.isNil(data.months) ? 0 : data.months,
     bits: _.isNil(data.bits) ? 0 : data.bits,
     viewers: _.isNil(data.viewers) ? 0 : data.viewers
