@@ -411,10 +411,16 @@ class Twitch {
       for (let follower of followersUsername) {
         let user = await global.users.get(follower)
         if (!user.is.follower) {
-          if (new Date().getTime() - moment(user.time.follow).format('X') * 1000 < 60000 * 60 && !quiet && !global.webhooks.existsInCache('follow', user.id)) {
+          if (new Date().getTime() - moment(user.time.follow).format('X') * 1000 < 60000 * 60 && !global.webhooks.existsInCache('follow', user.id)) {
             global.webhooks.addIdToCache('follow', user.id)
-            global.events.fire('follow', { username: follower })
             cached.time.followed_at = moment().format('x')
+            if (!quiet) global.events.fire('follow', { username: follower })
+            else {
+              global.overlays.eventlist.add({
+                type: 'follow',
+                username: user.username
+              }) // save to widget but not trigger event
+            }
           }
           d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('x') } })
           global.users.set(follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('x') } })
