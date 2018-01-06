@@ -28,4 +28,32 @@ describe('Custom Commands - run()', () => {
     // !a is not registered anymore
     assert.isUndefined(global.parser.registeredCmds['!a'])
   })
+
+  it('!한글 will show Lorem Ipsum', async () => {
+    global.systems.customCommands.add(global.systems.customCommands, owner, '!한글 Lorem Ipsum')
+    await message.isSent('customcmds.command-was-added', owner, { command: '한글', response: 'Lorem Ipsum' })
+
+    global.parser.parse(owner, '!한글')
+    await message.isSentRaw('Lorem Ipsum', owner)
+
+    global.systems.customCommands.remove(global.systems.customCommands, owner, '!한글')
+    await message.isSent('customcmds.command-was-removed', owner, { command: '한글' })
+
+    // !a is not registered anymore
+    assert.isUndefined(global.parser.registeredCmds['!한글'])
+  })
+
+  it('!русский will show Lorem Ipsum', async () => {
+    global.systems.customCommands.add(global.systems.customCommands, owner, '!русский Lorem Ipsum')
+    await message.isSent('customcmds.command-was-added', owner, { command: 'русский', response: 'Lorem Ipsum' })
+
+    global.parser.parse(owner, '!русский')
+    await message.isSentRaw('Lorem Ipsum', owner)
+
+    global.systems.customCommands.remove(global.systems.customCommands, owner, '!русский')
+    await message.isSent('customcmds.command-was-removed', owner, { command: 'русский' })
+
+    // !a is not registered anymore
+    assert.isUndefined(global.parser.registeredCmds['!русский'])
+  })
 })

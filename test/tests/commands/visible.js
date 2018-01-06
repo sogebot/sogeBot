@@ -24,14 +24,25 @@ describe('Custom Commands - visible()', () => {
     await message.isSent('customcmds.command-was-not-found', owner, { command: 'unknown' })
   })
 
-  it('!a', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!a !uptime')
-    await message.isSent('customcmds.command-was-added', owner, { command: 'a' })
+  it('!한글', async () => {
+    global.systems.customCommands.add(global.systems.customCommands, owner, '!한글 !uptime')
+    await message.isSent('customcmds.command-was-added', owner, { command: '한글' })
 
-    global.systems.customCommands.visible(global.systems.customCommands, owner, '!a')
-    await message.isSent('customcmds.command-was-concealed', owner, { command: 'a' })
+    global.systems.customCommands.visible(global.systems.customCommands, owner, '!한글')
+    await message.isSent('customcmds.command-was-concealed', owner, { command: '한글' })
 
-    global.systems.customCommands.visible(global.systems.customCommands, owner, '!a')
-    await message.isSent('customcmds.command-was-exposed', owner, { command: 'a' })
+    global.systems.customCommands.visible(global.systems.customCommands, owner, '!한글')
+    await message.isSent('customcmds.command-was-exposed', owner, { command: '한글' })
+  })
+
+  it('!русский', async () => {
+    global.systems.customCommands.add(global.systems.customCommands, owner, '!русский !uptime')
+    await message.isSent('customcmds.command-was-added', owner, { command: 'русский' })
+
+    global.systems.customCommands.visible(global.systems.customCommands, owner, '!русский')
+    await message.isSent('customcmds.command-was-concealed', owner, { command: 'русский' })
+
+    global.systems.customCommands.visible(global.systems.customCommands, owner, '!русский')
+    await message.isSent('customcmds.command-was-exposed', owner, { command: 'русский' })
   })
 })
