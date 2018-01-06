@@ -81,11 +81,15 @@ class Twitch {
       // setter
       await global.db.engine.update('cache', { upsert: true }, {
         when: {
+          subscribed_at: _.get(data, 'subscribed_at', null),
+          followed_at: _.get(data, 'followed_at', null),
           online: _.get(data, 'online', null),
           offline: _.get(data, 'offline', null)
         }
       })
       return {
+        subscribed_at: _.get(data, 'subscribed_at', null),
+        followed_at: _.get(data, 'followed_at', null),
         online: _.get(data, 'online', null),
         offline: _.get(data, 'offline', null)
       }
@@ -93,6 +97,8 @@ class Twitch {
       // getter
       let cache = await global.db.engine.findOne('cache')
       return {
+        subscribed_at: _.get(cache, 'when.subscribed_at', null),
+        followed_at: _.get(cache, 'when.followed_at', null),
         online: _.get(cache, 'when.online', null),
         offline: _.get(cache, 'when.offline', null)
       }
@@ -105,14 +111,12 @@ class Twitch {
       // setter
       await global.db.engine.update('cache', { upsert: true }, {
         cached: {
-          time: _.get(data, 'time', []),
           followers: _.get(data, 'followers', []),
           hosts: _.get(data, 'hosts', []),
           subscribers: _.get(data, 'subscribers', [])
         }
       })
       return {
-        time: _.get(data, 'time', []),
         followers: _.get(data, 'followers', []),
         hosts: _.get(data, 'hosts', []),
         subscribers: _.get(data, 'subscribers', [])
@@ -121,7 +125,6 @@ class Twitch {
       // getter
       let cache = await global.db.engine.findOne('cache')
       return {
-        time: _.get(data, 'cached.time', []),
         followers: _.get(cache, 'cached.followers', []),
         hosts: _.get(cache, 'cached.hosts', []),
         subscribers: _.get(cache, 'cached.subscribers', [])
@@ -407,13 +410,18 @@ class Twitch {
         }
       }
       cached.followers = _.uniq(cached.followers)
+      await this.cached(cached)
 
       for (let follower of followersUsername) {
         let user = await global.users.get(follower)
         if (!user.is.follower) {
           if (new Date().getTime() - moment(user.time.follow).format('X') * 1000 < 60000 * 60 && !global.webhooks.existsInCache('follow', user.id)) {
             global.webhooks.addIdToCache('follow', user.id)
-            cached.time.followed_at = _.now()
+
+            let when = await this.when()
+            when.followed_at = _.now()
+            await this.when(when)
+
             if (!quiet) global.events.fire('follow', { username: follower })
             else {
               global.overlays.eventlist.add({
@@ -429,8 +437,6 @@ class Twitch {
           global.users.set(follower, { is: { follower: true }, time: { followCheck: new Date().getTime() } })
         }
       }
-
-      this.cached(cached)
     }
     setTimeout(() => this.getLatest100Followers(false), 60000)
   }
@@ -683,9 +689,9 @@ class Twitch {
   }
 
   async followers (self, sender) {
-    let [cache, users] = await Promise.all([self.cached(), global.users.getAll({ is: { online: true, follower: true } })])
+    let [when, cache, users] = await Promise.all([self.when(), self.cached(), global.users.getAll({ is: { online: true, follower: true } })])
 
-    let lastFollowAgo = _.get(cache, 'time.followed_at', 0) > 0 ? moment(cache.time.followed_at).fromNow() : ''
+    let lastFollowAgo = _.get(when, 'followed_at', 0) > 0 ? moment(when.followed_at).fromNow() : ''
     let lastFollowUsername = _.get(cache, 'followers[0]', 'n/a')
     let onlineFollowersCount = _.size(_.filter(users, (o) => o.username !== config.settings.broadcaster_username && o.username !== config.settings.bot_username)) // except bot and user
 
@@ -698,9 +704,9 @@ class Twitch {
   }
 
   async subs (self, sender) {
-    let [cache, users] = await Promise.all([self.cached(), global.users.getAll({ is: { online: true, subscriber: true } })])
+    let [when, cache, users] = await Promise.all([self.when(), self.cached(), global.users.getAll({ is: { online: true, subscriber: true } })])
 
-    let lastSubAgo = _.get(cache, 'time.subscribed_at', 0) > 0 ? moment(cache.time.subscribed_at).fromNow() : ''
+    let lastSubAgo = _.get(when, 'subscribed_at', 0) > 0 ? moment(when.subscribed_at).fromNow() : ''
     let lastSubUsername = _.get(cache, 'subscribers[0]', 'n/a')
     let onlineSubCount = _.size(_.filter(users, (o) => o.username !== config.settings.broadcaster_username && o.username !== config.settings.bot_username)) // except bot and user
 

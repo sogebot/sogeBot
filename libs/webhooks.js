@@ -125,12 +125,12 @@ class Webhooks {
       debug('user API data" %o', userGetFromApi.body)
 
       // save followed_at to cache
-      let cache = await global.twitch.cached()
-      cache.time.followed_at = _.now()
+      let when = await global.twitch.when()
+      when.followed_at = _.now()
 
       global.events.fire('follow', { username: userGetFromApi.body.data[0].login }) // we can safely fire event as user doesn't exist in db
       await Promise.all([
-        global.twitch.cached(cache),
+        global.twitch.when(when),
         global.db.engine.insert('users', { id: fid, username: userGetFromApi.body.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
       ])
     } else {

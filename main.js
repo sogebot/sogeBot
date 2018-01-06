@@ -262,11 +262,11 @@ global.client.on('subscription', async function (channel, username, method) {
   global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: _.now() } })
   global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
 
-  let cached = await global.twitch.cached()
-  cached.time.subscribed_at = _.now()
+  let [cached, when] = await Promise.all([global.twitch.cached(), global.twitch.when()])
+  when.subscribed_at = _.now()
   cached.subscribers.unshift(username)
   cached.subscribers = _.chunk(global.twitch.cached.subscribers, 100)[0]
-  await global.twitch.cached(cached)
+  await Promise.all([global.twitch.cached(cached), global.twitch.when(when)])
 })
 
 global.client.on('resub', async function (channel, username, months, message) {
