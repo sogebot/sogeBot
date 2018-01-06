@@ -36,4 +36,28 @@ describe('Alias - edit()', () => {
     global.systems.alias.edit(global.systems.alias, owner, '!a !uptime')
     await message.isSent('alias.alias-was-edited', owner, { alias: 'a', command: 'uptime' })
   })
+
+  it('!한국어 !me -> !한국어 !uptime', async () => {
+    global.systems.alias.add(global.systems.alias, owner, '!한국어 !me')
+    await message.isSent('alias.alias-was-added', owner, { alias: '한국어', command: 'me' })
+
+    global.systems.alias.edit(global.systems.alias, owner, '!한국어 !uptime')
+    await message.isSent('alias.alias-was-edited', owner, { alias: '한국어', command: 'uptime' })
+  })
+
+  it('!русский !me -> !русский !uptime', async () => {
+    global.systems.alias.add(global.systems.alias, owner, '!русский !me')
+    await message.isSent('alias.alias-was-added', owner, { alias: 'русский', command: 'me' })
+
+    global.systems.alias.edit(global.systems.alias, owner, '!русский !uptime')
+    await message.isSent('alias.alias-was-edited', owner, { alias: 'русский', command: 'uptime' })
+  })
+
+  it('!a with spaces -> !a with spaces !uptime', async () => {
+    global.systems.alias.add(global.systems.alias, owner, '!a with spaces !me')
+    await message.isSent('alias.alias-was-added', owner, { alias: 'a with spaces', command: 'me' })
+
+    global.systems.alias.edit(global.systems.alias, owner, '!a with spaces !uptime')
+    await message.isSent('alias.alias-was-edited', owner, { alias: 'a with spaces', command: 'uptime' })
+  })
 })
