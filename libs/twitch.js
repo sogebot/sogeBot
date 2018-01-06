@@ -413,7 +413,7 @@ class Twitch {
         if (!user.is.follower) {
           if (new Date().getTime() - moment(user.time.follow).format('X') * 1000 < 60000 * 60 && !global.webhooks.existsInCache('follow', user.id)) {
             global.webhooks.addIdToCache('follow', user.id)
-            cached.time.followed_at = moment().format('x')
+            cached.time.followed_at = _.now()
             if (!quiet) global.events.fire('follow', { username: follower })
             else {
               global.overlays.eventlist.add({
@@ -422,8 +422,8 @@ class Twitch {
               }) // save to widget but not trigger event
             }
           }
-          d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('x') } })
-          global.users.set(follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment().format('x') } })
+          d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
+          global.users.set(follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
         } else {
           d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime() } })
           global.users.set(follower, { is: { follower: true }, time: { followCheck: new Date().getTime() } })
