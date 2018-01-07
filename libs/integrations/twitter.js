@@ -22,7 +22,17 @@ function Twitter () {
 
 Twitter.prototype.addEvent = function (self) {
   global.events.operations['send-twitter-message'] = async function (attr) {
-    self.send(self, null, attr.send)
+    // global variables
+    let send = attr.send
+      .replace(/\$game/g, global.twitch.current.game)
+      .replace(/\$title/g, global.twitch.current.status)
+      .replace(/\$viewers/g, global.twitch.current.viewers)
+      .replace(/\$views/g, global.twitch.current.views)
+      .replace(/\$followers/g, global.twitch.current.followers)
+      .replace(/\$hosts/g, global.twitch.current.hosts)
+      .replace(/\$subscribers/g, global.twitch.current.subscribers)
+      .replace(/\$bits/g, global.twitch.current.bits)
+    self.send(self, null, send)
   }
 }
 
