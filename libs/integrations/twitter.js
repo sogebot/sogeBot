@@ -32,6 +32,7 @@ Twitter.prototype.addEvent = function (self) {
       .replace(/\$hosts/g, global.twitch.current.hosts)
       .replace(/\$subscribers/g, global.twitch.current.subscribers)
       .replace(/\$bits/g, global.twitch.current.bits)
+    send = await global.parser.parseMessage(send, attr)
     self.send(self, null, send)
   }
 }
