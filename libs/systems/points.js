@@ -114,11 +114,11 @@ Points.prototype.messagePoints = async function (self, id, sender, text, skip) {
 Points.prototype.setPoints = function (self, sender, text) {
   try {
     var parsed = text.match(/^@?([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
-    global.users.set(parsed[1], { points: parseInt(parsed[2], 10) })
+    global.users.set(parsed[1].toLowerCase(), { points: parseInt(parsed[2], 10) })
 
     let message = global.commons.prepare('points.success.set', {
       amount: parsed[2],
-      username: parsed[1],
+      username: parsed[1].toLowerCase(),
       pointsName: self.getPointsName(parsed[2])
     })
     debug(message); global.commons.sendMessage(message, sender)
@@ -264,11 +264,11 @@ Points.prototype.addPoints = function (self, sender, text) {
   try {
     var parsed = text.match(/^@?([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
     let givePts = parseInt(parsed[2], 10)
-    global.db.engine.increment('users', { username: parsed[1] }, { points: givePts })
+    global.db.engine.increment('users', { username: parsed[1].toLowerCase() }, { points: givePts })
 
     let message = global.commons.prepare('points.success.add', {
       amount: givePts,
-      username: parsed[1],
+      username: parsed[1].toLowerCase(),
       pointsName: self.getPointsName(givePts)
     })
     debug(message); global.commons.sendMessage(message, sender)
@@ -283,11 +283,11 @@ Points.prototype.removePoints = async function (self, sender, text) {
     const user = await global.users.get(parsed[1])
     let removePts = parsed[2] === 'all' && !_.isNil(user.points) ? user.points : parsed[2]
 
-    global.db.engine.increment('users', { username: parsed[1] }, { points: (removePts * -1) })
+    global.db.engine.increment('users', { username: parsed[1].toLowerCase() }, { points: (removePts * -1) })
 
     let message = global.commons.prepare('points.success.remove', {
       amount: removePts,
-      username: parsed[1],
+      username: parsed[1].toLowerCase(),
       pointsName: self.getPointsName(removePts)
     })
     debug(message); global.commons.sendMessage(message, sender)
