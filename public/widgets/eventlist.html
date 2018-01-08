@@ -242,6 +242,13 @@
     console.groupEnd()
   })
 
+  // refresh timestamps
+  setInterval(() => {
+    $('.eventlist-text').each(function (i) {
+      $(this).text(moment($(this).attr('title')).fromNow())
+    })
+  }, 60000)
+
   var $eventlistShow = $('#eventlistShow')
   $eventlistShow.off()
   $eventlistShow.on('focusout', function () {
