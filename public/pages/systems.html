@@ -12,7 +12,7 @@
     <a class="nav-link" data-toggle="tab" href="#songs" data-lang="songs" id="songs-tab-link"></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#gambling" data-lang="gambling"></a>
+    <a class="nav-link" data-toggle="tab" href="#gambling" data-lang="gambling" id="gambling-tab-link"></a>
   </li>
   <li class="nav-item">
     <a class="nav-link" data-toggle="tab" href="#events" data-lang="page-settings.systems.events.title"></a>
@@ -358,6 +358,8 @@
   if (!systems.points) $("#points-tab-link").css('display', 'none')
   if (!systems.songs) $("#songs-tab-link").css('display', 'none')
   if (!systems.cooldown) $(".systems-cooldown-only").css('display', 'none')
+  if (!systems.gambling) $("#gambling-tab-link").css('display', 'none')
+
 
   socket.emit('getPointsConfiguration')
   socket.emit('getNoticeConfiguration')
