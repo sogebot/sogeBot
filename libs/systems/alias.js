@@ -136,8 +136,8 @@ class Alias {
   async run (self, sender, msg, fullMsg) {
     var alias
 
-    let cmdArray = fullMsg.split(' ')
-    for (let i in fullMsg.split(' ')) { // search for correct alias
+    let cmdArray = fullMsg.toLowerCase().split(' ')
+    for (let i in fullMsg.toLowerCase().split(' ')) { // search for correct alias
       debug(`${i} - Searching for ${cmdArray.join(' ')} in aliases`)
       alias = await global.db.engine.findOne('alias', { alias: cmdArray.join(' ').replace('!', ''), enabled: true })
       debug(alias)
@@ -147,7 +147,8 @@ class Alias {
     if (_.isEmpty(alias)) return // no alias was found - return
     debug('Alias found: %j', alias)
 
-    cmdArray = fullMsg.replace(alias.alias, alias.command).split(' ')
+    let replace = new RegExp(`!${alias.alias}`, 'i')
+    cmdArray = fullMsg.replace(replace, `!${alias.command}`).split(' ')
     let tryingToBypass = false
     for (let i in fullMsg.split(' ')) { // search if it is not trying to bypass permissions
       if (cmdArray.length === alias.command.split(' ').length) break // command is correct (have same number of parameters as command)
@@ -162,8 +163,9 @@ class Alias {
     }
     debug(`Is trying to bypass command permission: %s`, tryingToBypass)
 
+    debug('Running: %s', fullMsg.replace(replace, `!${alias.command}`))
     if (!tryingToBypass) {
-      global.parser.parse(sender, fullMsg.replace(alias.alias, alias.command), true)
+      global.parser.parse(sender, fullMsg.replace(replace, `!${alias.command}`), true)
     }
   }
 
