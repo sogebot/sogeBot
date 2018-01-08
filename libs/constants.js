@@ -54,6 +54,8 @@ define(
            !?(?<command> [\\pL ]*                     ) # command`, 'ix')
 )
 
+define('KEYWORD_REGEXP', XRegExp(`(?<keyword> !?[\\pL]*)\\s(?<response> .*)`, 'ix'))
+
 define(
   'COOLDOWN_REGEXP_SET',
   XRegExp(`(?<command> !?[\\pL ]* ) # command
