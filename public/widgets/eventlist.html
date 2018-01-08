@@ -175,7 +175,7 @@
       let username
       let message = ''
       let timestamp = moment(event.timestamp).fromNow()
-      let icon = `<i title="${moment(event.timestamp).format('LLLL')}" class="eventlist-text">${moment(event.timestamp).fromNow()}</i>`
+      let icon = `<i title="${moment(event.timestamp).format('LLLL')}" data-timestamp="${event.timestamp}" class="eventlist-text">${moment(event.timestamp).fromNow()}</i>`
       let t = translations['eventlist-events'][event.event]
       if (event.event === 'follow') {
         username = `<div class="col-9 eventlist-username">
@@ -245,7 +245,7 @@
   // refresh timestamps
   setInterval(() => {
     $('.eventlist-text').each(function (i) {
-      $(this).text(moment($(this).attr('title')).fromNow())
+      $(this).text(moment($(this).data('timestamp')).fromNow())
     })
   }, 60000)
 
