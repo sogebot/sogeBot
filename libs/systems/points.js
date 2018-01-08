@@ -113,7 +113,7 @@ Points.prototype.messagePoints = async function (self, id, sender, text, skip) {
 
 Points.prototype.setPoints = function (self, sender, text) {
   try {
-    var parsed = text.match(/^@?([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
+    var parsed = text.match(/^@?([\S]+) ([0-9]+)$/)
     global.users.set(parsed[1].toLowerCase(), { points: parseInt(parsed[2], 10) })
 
     let message = global.commons.prepare('points.success.set', {
@@ -129,7 +129,7 @@ Points.prototype.setPoints = function (self, sender, text) {
 
 Points.prototype.givePoints = async function (self, sender, text) {
   try {
-    var parsed = text.match(/^@?([\u0500-\u052F\u0400-\u04FF\w]+) ([\d]+|all)$/)
+    var parsed = text.match(/^@?([\S]+) ([\d]+|all)$/)
     const [user, user2] = await Promise.all([global.users.get(sender.username), global.users.get(parsed[1])])
     var givePts = parsed[2] === 'all' && !_.isNil(user.points) ? user.points : parsed[2]
     if (parseInt(user.points, 10) >= givePts) {
@@ -208,7 +208,7 @@ Points.prototype.getPointsName = function (points) {
 Points.prototype.getPointsFromUser = async function (self, sender, text) {
   try {
     let user = await global.users.get(sender.username)
-    const username = text.match(/^@?([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+    const username = text.match(/^@?([\S]+)$/)[1]
 
     var points = (_.isUndefined(user.points) ? 0 : user.points)
     let message = global.commons.prepare('points.defaults.pointsResponse', {
@@ -262,7 +262,7 @@ Points.prototype.rainPoints = async function (self, sender, text) {
 
 Points.prototype.addPoints = function (self, sender, text) {
   try {
-    var parsed = text.match(/^@?([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
+    var parsed = text.match(/^@?([\S]+) ([0-9]+)$/)
     let givePts = parseInt(parsed[2], 10)
     global.db.engine.increment('users', { username: parsed[1].toLowerCase() }, { points: givePts })
 
@@ -279,7 +279,7 @@ Points.prototype.addPoints = function (self, sender, text) {
 
 Points.prototype.removePoints = async function (self, sender, text) {
   try {
-    var parsed = text.match(/^@?([\u0500-\u052F\u0400-\u04FF\w]+) ([\d]+|all)$/)
+    var parsed = text.match(/^@?([\S]+) ([\d]+|all)$/)
     const user = await global.users.get(parsed[1])
     let removePts = parsed[2] === 'all' && !_.isNil(user.points) ? user.points : parsed[2]
 

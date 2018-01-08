@@ -77,6 +77,6 @@ define(
 define(
   'COMMAND_REGEXP_WITH_OPTIONAL_RESPONSE',
   XRegExp(`!(?<command> [\\pL]* ) # command
-           ?\\s           match        # empty space
+           ?\\s                   # empty space
            ?(?<response> .*     ) # optional response`, 'ix')
 )

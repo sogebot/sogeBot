@@ -22,7 +22,7 @@ class Commercial {
   }
 
   run (self, sender, text) {
-    let parsed = text.match(/^([\d]+)? ?([\u0500-\u052F\u0400-\u04FF\S\s]+)?$/)
+    let parsed = text.match(/^([\d]+)? ?(.*)?$/)
 
     if (_.isNil(parsed)) {
       global.commons.sendMessage('$sender, something went wrong with !commercial', sender)

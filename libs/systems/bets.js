@@ -47,7 +47,7 @@ function Bets () {
 
 Bets.prototype.open = function (self, sender, text) {
   try {
-    var parsed = text.match(/([\u0500-\u052F\u0400-\u04FF\S]+)/g)
+    var parsed = text.match(/([\S]+)/g)
     if (parsed.length < 2) { throw new Error(ERROR_NOT_ENOUGH_OPTIONS) }
     if (!_.isNull(self.bet)) { throw new Error(ERROR_ALREADY_OPENED) }
 
@@ -97,7 +97,7 @@ Bets.prototype.info = function (self, sender) {
 
 Bets.prototype.saveBet = async function (self, sender, text) {
   try {
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) (\d|all+)$/)
+    var parsed = text.match(/^([\S]+) (\d|all+)$/)
     if (parsed.length < 2) { throw new Error(ERROR_NOT_ENOUGH_OPTIONS) }
 
     const user = await global.users.get(sender.username)
@@ -180,7 +180,7 @@ Bets.prototype.refundAll = function (self, sender) {
 
 Bets.prototype.close = function (self, sender, text) {
   try {
-    var wOption = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)[1]
+    var wOption = text.match(/^([\S]+)$/)[1]
     var usersToPay = []
 
     if (_.isNull(self.bet)) throw Error(ERROR_NOT_RUNNING)
