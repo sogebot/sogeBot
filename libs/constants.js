@@ -48,6 +48,13 @@ define(
 )
 
 define(
+  'PERMISSION_REGEXP',
+  XRegExp(`(?<type> viewer|mods|owner|regular|disable ) # type
+           \\s                                          # empty space
+           !?(?<command> [\\pL ]*                     ) # command`, 'ix')
+)
+
+define(
   'COOLDOWN_REGEXP_SET',
   XRegExp(`(?<command> !?[\\pL ]* ) # command
            \\s                      # empty space
@@ -68,6 +75,6 @@ define(
 define(
   'COMMAND_REGEXP_WITH_OPTIONAL_RESPONSE',
   XRegExp(`!(?<command> [\\pL]* ) # command
-           ?\\s                   # empty space
+           ?\\s           match        # empty space
            ?(?<response> .*     ) # optional response`, 'ix')
 )

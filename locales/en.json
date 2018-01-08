@@ -829,7 +829,7 @@
   },
   "permissions": {
     "success": {
-      "change": "Permission for command was succesfully changed"
+      "change": "Permission for '$command' was succesfully changed"
     },
     "failed": {
       "parse": "Usage: !permission viewer|mods|owner|regular|disable [command]",
