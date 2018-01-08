@@ -2,9 +2,10 @@
 
 var constants = require('./constants')
 var _ = require('lodash')
+const XRegExp = require('xregexp')
 
 function Permissions () {
-  global.parser.register(this, '!permission', this.overridePermission, constants.OWNER_ONLY)
+  global.parser.register(this, '!permission', this.override, constants.OWNER_ONLY)
 
   global.configuration.register('disablePermissionWhispers', 'whisper.settings.disablePermissionWhispers', 'bool', true)
 
@@ -29,7 +30,7 @@ Permissions.prototype.sendSocket = function (self, socket) {
 }
 
 Permissions.prototype.changeSocket = function (self, socket, data) {
-  self.overridePermission(self, null, data.permission + ' ' + data.command)
+  self.override(self, null, data.permission + ' ' + data.command)
   self.sendSocket(self, socket)
 }
 
@@ -38,12 +39,11 @@ Permissions.prototype.removePermission = function (self, command) {
   global.db.engine.remove('permissions', { key: command.replace('!', '') })
 }
 
-Permissions.prototype.overridePermission = function (self, sender, text) {
+Permissions.prototype.override = function (self, sender, text) {
   try {
-    var parsed = text.match(/^(viewer|mods|owner|regular|disable) ([\u0500-\u052F\u0400-\u04FF\w].*)$/)
-    var command = parsed[2]
+    const match = XRegExp.exec(text, constants.PERMISSION_REGEXP)
     var permission
-    switch (parsed[1]) {
+    switch (match.type) {
       case 'viewer':
         permission = constants.VIEWERS
         break
@@ -60,10 +60,10 @@ Permissions.prototype.overridePermission = function (self, sender, text) {
         permission = constants.OWNER_ONLY
     }
 
-    if (!_.isUndefined(global.parser.permissionsCmds['!' + command])) {
-      global.parser.permissionsCmds['!' + command] = permission
-      global.db.engine.update('permissions', { key: command }, { key: command, permission: permission })
-      global.commons.sendMessage(global.translate('permissions.success.change').replace(/\$command/g, parsed[1]), sender)
+    if (!_.isUndefined(global.parser.permissionsCmds['!' + match.command])) {
+      global.parser.permissionsCmds['!' + match.command] = permission
+      global.db.engine.update('permissions', { key: match.command }, { key: match.command, permission: permission })
+      global.commons.sendMessage(global.translate('permissions.success.change').replace(/\$command/g, match.command), sender)
     } else {
       global.commons.sendMessage(global.translate('permissions.failed.noCmd'), sender)
     }

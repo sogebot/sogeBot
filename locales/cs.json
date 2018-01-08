@@ -829,7 +829,7 @@
   },
   "permissions": {
     "success": {
-      "change": "Prava pro pouziti prikazu byla zmenena"
+      "change": "Prava pro pouziti '$command' byla zmenena"
     },
     "failed": {
       "parse": "Pouziti: !permission viewer|mods|owner|regular|disable [command]",
