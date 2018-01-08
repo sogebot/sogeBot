@@ -3,6 +3,7 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const debug = require('debug')('systems:keywords')
+const XRegExp = require('xregexp')
 
 // bot libraries
 var constants = require('../constants')
@@ -41,26 +42,23 @@ class Keywords {
 
   async edit (self, sender, text) {
     debug('edit(%j, %j, %j)', self, sender, text)
-    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S]+) (.*)$/)
+    const match = XRegExp.exec(text, constants.KEYWORD_REGEXP)
 
-    if (_.isNil(parsed)) {
+    if (_.isNil(match)) {
       let message = global.commons.prepare('keywords.keyword-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
-    const keyword = parsed[1]
-    const response = parsed[2]
-
-    let item = await global.db.engine.findOne('keywords', { keyword: keyword })
+    let item = await global.db.engine.findOne('keywords', { keyword: match.keyword })
     if (_.isEmpty(item)) {
-      let message = global.commons.prepare('keywords.keyword-was-not-found', { keyword: keyword })
+      let message = global.commons.prepare('keywords.keyword-was-not-found', { keyword: match.keyword })
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
-    await global.db.engine.update('keywords', { keyword: keyword }, { response: response })
-    let message = global.commons.prepare('keywords.keyword-was-edited', { keyword: keyword, response: response })
+    await global.db.engine.update('keywords', { keyword: match.keyword }, { response: match.response })
+    let message = global.commons.prepare('keywords.keyword-was-edited', { keyword: match.keyword, response: match.response })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
@@ -84,25 +82,25 @@ class Keywords {
 
   async add (self, sender, text) {
     debug('add(%j,%j,%j)', self, sender, text)
-    let parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w\S]+) (.*)$/)
+    const match = XRegExp.exec(text, constants.KEYWORD_REGEXP)
 
-    if (_.isNil(parsed)) {
+    if (_.isNil(match)) {
       let message = global.commons.prepare('keywords.keyword-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
-    if (parsed[1].startsWith('!')) parsed[1] = parsed[1].replace('!', '')
-    let keyword = { keyword: parsed[1], response: parsed[2], enabled: true }
+    if (match.keyword.startsWith('!')) match.keyword = match.keyword.replace('!', '')
+    let keyword = { keyword: match.keyword, response: match.response, enabled: true }
 
-    if (!_.isEmpty(await global.db.engine.findOne('keywords', { keyword: parsed[1] }))) {
-      let message = global.commons.prepare('keywords.keyword-already-exist', { keyword: parsed[1] })
+    if (!_.isEmpty(await global.db.engine.findOne('keywords', { keyword: match.keyword }))) {
+      let message = global.commons.prepare('keywords.keyword-already-exist', { keyword: match.keyword })
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
-    await global.db.engine.update('keywords', { keyword: parsed[1] }, keyword)
-    let message = global.commons.prepare('keywords.keyword-was-added', { keyword: parsed[1] })
+    await global.db.engine.update('keywords', { keyword: match.keyword }, keyword)
+    let message = global.commons.prepare('keywords.keyword-was-added', { keyword: match.keyword })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
@@ -128,14 +126,13 @@ class Keywords {
 
   async toggle (self, sender, text) {
     debug('toggle(%j,%j,%j)', self, sender, text)
-    let id = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
 
-    if (_.isNil(id)) {
+    if (text.trim().length === 0) {
       let message = global.commons.prepare('keywords.keyword-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
-    id = id[1]
+    let id = text.trim()
 
     const keyword = await global.db.engine.findOne('keywords', { keyword: id })
     if (_.isEmpty(keyword)) {
@@ -152,14 +149,13 @@ class Keywords {
 
   async remove (self, sender, text) {
     debug('remove(%j,%j,%j)', self, sender, text)
-    let id = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
 
-    if (_.isNil(id)) {
+    if (text.trim().length === 0) {
       let message = global.commons.prepare('keywords.keyword-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
-    id = id[1]
+    let id = text.trim()
 
     let removed = await global.db.engine.remove('keywords', { keyword: id })
     if (!removed) {

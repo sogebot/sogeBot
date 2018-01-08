@@ -21,7 +21,7 @@ describe('Keywords - remove()', () => {
 
   it('!alias', async () => {
     global.systems.keywords.remove(global.systems.keywords, owner, '!alias')
-    await message.isSent('keywords.keyword-parse-failed', owner)
+    await message.isSent('keywords.keyword-was-not-found', owner, { keyword: '!alias' })
   })
 
   it('alias', async () => {
