@@ -165,7 +165,7 @@ Moderation.prototype.whitelist = async function (text) {
 
 Moderation.prototype.permitLink = function (self, sender, text) {
   try {
-    var parsed = text.match(/^@?([\u0500-\u052F\u0400-\u04FF\w]+) ?(\d+)?$/)
+    var parsed = text.match(/^@?([\S]+) ?(\d+)?$/)
     let count = 1
     if (!_.isNil(parsed[2])) count = parseInt(parsed[2], 10)
 

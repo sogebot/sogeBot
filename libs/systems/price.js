@@ -45,7 +45,7 @@ class Price {
   }
 
   async set (self, sender, text) {
-    const parsed = text.match(/^!?([\u0500-\u052F\u0400-\u04FF\w]+) ([0-9]+)$/)
+    const parsed = text.match(/^!?([\S]+) ([0-9]+)$/)
 
     if (_.isNil(parsed)) {
       let message = global.commons.prepare('price.price-parse-failed')
@@ -65,7 +65,7 @@ class Price {
   }
 
   async unset (self, sender, text) {
-    const parsed = text.match(/^!?([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+    const parsed = text.match(/^!?([\S]+)$/)
 
     if (_.isNil(parsed)) {
       let message = global.commons.prepare('price.price-parse-failed')
@@ -81,7 +81,7 @@ class Price {
 
   async toggle (self, sender, text) {
     debug('toggle(%j,%j,%j)', self, sender, text)
-    const parsed = text.match(/^!?([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+    const parsed = text.match(/^!?([\S]+)$/)
 
     if (_.isNil(parsed)) {
       let message = global.commons.prepare('price.price-parse-failed')
@@ -119,7 +119,7 @@ class Price {
   }
 
   async check (self, id, sender, text) {
-    const parsed = text.match(/^!([\u0500-\u052F\u0400-\u04FF\w]+)/)
+    const parsed = text.match(/^!([\S]+)/)
     if (global.parser.registeredHelpers.includes(text.trim()) || global.parser.isOwner(sender) || _.isNil(parsed)) {
       global.updateQueue(id, true)
       return true

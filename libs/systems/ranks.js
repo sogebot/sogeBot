@@ -39,7 +39,7 @@ class Ranks {
 
   async add (self, sender, text) {
     debug('add(%j, %j, %j)', self, sender, text)
-    const parsed = text.match(/^(\d+) ([\u0500-\u052F\u0400-\u04FF\w].+)$/)
+    const parsed = text.match(/^(\d+) ([\S].+)$/)
 
     if (_.isNil(parsed)) {
       let message = global.commons.prepare('ranks.rank-parse-failed')
@@ -71,7 +71,7 @@ class Ranks {
 
   async edit (self, sender, text) {
     debug('edit(%j, %j, %j)', self, sender, text)
-    let parsed = text.match(/^(\d+) ([\u0500-\u052F\u0400-\u04FF\w].+)$/)
+    let parsed = text.match(/^(\d+) ([\S].+)$/)
 
     if (_.isNil(parsed)) {
       let message = global.commons.prepare('ranks.rank-parse-failed')
@@ -96,7 +96,7 @@ class Ranks {
 
   set (self, sender, text) {
     debug('set(%j, %j, %j)', self, sender, text)
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+) ([\u0500-\u052F\u0400-\u04FF\w ]+)$/)
+    var parsed = text.match(/^([\S]+) ([\S ]+)$/)
 
     if (_.isNil(parsed)) {
       let message = global.commons.prepare('ranks.rank-parse-failed')
@@ -112,7 +112,7 @@ class Ranks {
 
   unset (self, sender, text) {
     debug('unset(%j, %j, %j)', self, sender, text)
-    var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+    var parsed = text.match(/^([\S]+)$/)
 
     if (_.isNil(parsed)) {
       let message = global.commons.prepare('ranks.rank-parse-failed')

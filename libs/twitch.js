@@ -777,7 +777,7 @@ class Twitch {
 
   async lastseen (self, sender, text) {
     try {
-      var parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+      var parsed = text.match(/^([\S]+)$/)
       const user = await global.users.get(parsed[0])
       if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.message)) {
         global.commons.sendMessage(global.translate('lastseen.success.never').replace(/\$username/g, parsed[0]), sender)
@@ -794,7 +794,7 @@ class Twitch {
   async watched (self, sender, text) {
     try {
       let watched, parsed
-      parsed = text.match(/^([\u0500-\u052F\u0400-\u04FF\w]+)$/)
+      parsed = text.match(/^([\S]+)$/)
       const user = await global.users.get(text.trim() < 1 ? sender.username : parsed[0])
       watched = parseInt(!_.isNil(user) && !_.isNil(user.time) && !_.isNil(user.time.watched) ? user.time.watched : 0) / 1000 / 60 / 60
 
