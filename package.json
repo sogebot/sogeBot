@@ -51,7 +51,7 @@
     "winston": "^2.4.0",
     "xregexp": "^4.0.0",
     "youtube-search": "^1.0.10",
-    "ytdl-core": "^0.18.4"
+    "ytdl-core": "^0.18.7"
   },
   "scripts": {
     "prebuild": "npm install rimraf bestzip npm-run-all cross-var -g",
