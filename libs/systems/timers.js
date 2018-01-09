@@ -89,7 +89,11 @@ class Timers {
 
   async editName (self, socket, data) {
     if (data.value.length === 0) await self.unset(self, null, `-name ${data.id}`)
-    else await global.db.engine.update('timers', { name: data.id.toString() }, { name: data.value.toString() })
+    else {
+      let name = data.value.match(/([a-zA-Z0-9_]+)/)
+      if (_.isNil(name)) return
+      await global.db.engine.update('timers', { name: data.id.toString() }, { name: name[0] })
+    }
   }
 
   async editResponse (self, socket, data) {
@@ -101,7 +105,7 @@ class Timers {
     // -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60]
     debug('set(%j, %j, %j)', self, sender, text)
 
-    let name = text.match(/-name ([\S]+)/)
+    let name = text.match(/-name ([a-zA-Z0-9_]+)/)
     let messages = text.match(/-messages ([0-9]+)/)
     let seconds = text.match(/-seconds ([0-9]+)/)
 
