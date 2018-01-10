@@ -41,7 +41,10 @@ var timers = {
         '<span style="cursor: pointer;" class="badge badge-' + (timer.enabled ? "success" : "danger") +
         '" data-id="' + timer.name + '" onclick="timers.toggle(this)">' + (timer.enabled ? translations['enabled'] :
         translations['disabled']) + '</span>' +
-        commons.editable({ text: timer.name, id: timer.name, fnc: 'timers.editName' }) + '</td>' +
+        '<div class="form-group has-danger">' +
+        '<input value="' +  timer.name + '" data-id="' + timer.name + '" type="text" class="form-control" pattern="[a-zA-Z0-9_.]" title="Timer name can contain only a-z, A-Z, 0-9, _" onchange="timers.editName(this)" id="' + timer.name + '"></input>' +
+        '<div class="invalid-feedback">Sorry, timer name can contain only a-z, A-Z, 0-9, _</div>' +
+        '</div></td>' +
         '<td style="vertical-align: top !important;"><span class="badge badge-user">' + translations['num-of-responses'] + '</span><strong style="display: block; padding: 8px">' +
           `⚫ ${responses.enabled} ⚪ ${responses.disabled}</strong></td>` +
         '</td>' +
@@ -128,9 +131,18 @@ var timers = {
     socket.emit('timers.unset', `-name ${el.dataset.id}`)
     $(`#${el.dataset.id}_tab`).remove()
   },
-  editName: (id, val) => {
-    $("li#" + id + "_tab").remove()
-    socket.emit('timers.editName', { id: id, value: val.replace(/ /g, '_') })
+  editName: (el) => {
+    console.group('TIMERS - editName')
+    console.log({ id: $(el).data().id, value: $(el).val().replace(/ /g, '_') })
+    let toValidate = $(el).val().replace(/ /g, '_')
+    if (toValidate.match(/^([^\W]+)$/)) {
+      $(el).removeClass('is-invalid')
+      $("li#" + $(el).data().id + "_tab").remove()
+      socket.emit('timers.editName', { id: $(el).data().id, value: toValidate })
+    } else {
+      $(el).addClass('is-invalid')
+    }
+    console.groupEnd()
   },
   editSeconds: (id, val, opts) => {
     let messages = opts.messages
@@ -144,9 +156,9 @@ var timers = {
     event.preventDefault()
     var inputs = $('[data-id="_new!"]')
 
-    if ($(inputs[0]).text().length === 0) return false
+    if ($(inputs[0]).val().length === 0) return false
     var data = {
-      name: $(inputs[0]).text(),
+      name: $(inputs[0]).val(),
       messages: $(inputs[1]).text().length !== 0 ? $(inputs[1]).text() : 0,
       seconds: $(inputs[2]).text().length !== 0 ? $(inputs[2]).text() : 0
     }
@@ -211,7 +223,11 @@ socket.on('timers', (data) => {
   $(".tab-content [id$='_content']").remove()
 
   $("#timers").append('<tr id="manage_new" style="display:none">' +
-      '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">Name</span>' + commons.editable({ text: '', id: '_new!', fnc: 'commons.stub' }) + '</td>' +
+      '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">Name</span>' +
+      '<div class="form-group has-danger">' +
+      '<input type="text" class="form-control" pattern="[a-zA-Z0-9_.]" data-id="_new!" title="Timer name can contain only a-z, A-Z, 0-9, _" id="_new"></input>' +
+      '<div class="invalid-feedback">Sorry, timer name can contain only a-z, A-Z, 0-9, _</div>' +
+      '</div></td>' +
       '<td colspan=2 style="vertical-align: top !important;"><span class="badge badge-primary">Messages</span> ' +
         commons.editable({ text: '0', id: '_new!', fnc: 'commons.stub' }) +
       '</td><td style="vertical-align: top !important;"><span class="badge badge-primary">Seconds</span> ' +
@@ -240,5 +256,17 @@ socket.on('timers', (data) => {
     $(`a[href="${id}"]`).tab('show');
     $('.plus-button').prop('disabled', false)
   }
+
+  $('#_new').off('keyup')
+  $('#_new').on('keyup', function () {
+    let toValidate = $(this).val()
+    if (toValidate.match(/^([^\W]+)$/)) {
+      $(this).removeClass('is-invalid')
+      $('.save-button').removeAttr('disabled')
+    } else {
+      $(this).addClass('is-invalid')
+      $('.save-button').attr('disabled', 'disabled')
+    }
+  })
 })
 </script>
