@@ -4,6 +4,7 @@ var _ = require('lodash')
 var moment = require('moment')
 var constants = require('./constants')
 const snekfetch = require('snekfetch')
+const XRegExp = require('xregexp')
 
 const config = require('../config.json')
 const debug = require('debug')('users')
@@ -17,12 +18,19 @@ function Users () {
   global.parser.register(this, '!regular remove', this.rmRegular, constants.OWNER_ONLY)
   global.parser.register(this, '!merge', this.merge, constants.MODS)
 
+  /* ignore commands */
+  global.parser.register(this, '!ignore add', this.ignoreAdd, constants.OWNER_ONLY)
+  global.parser.register(this, '!ignore rm', this.ignoreRm, constants.OWNER_ONLY)
+  global.parser.register(this, '!ignore check', this.ignoreCheck, constants.OWNER_ONLY)
+
   global.panel.addMenu({category: 'manage', name: 'viewers', id: 'viewers'})
   global.panel.socketListening(this, 'getViewers', this.getViewers)
   global.panel.socketListening(this, 'deleteViewer', this.deleteViewer)
   global.panel.socketListening(this, 'viewers.toggle', this.toggleIs)
   global.panel.socketListening(this, 'resetMessages', this.resetMessages)
   global.panel.socketListening(this, 'resetWatchTime', this.resetWatchTime)
+
+  this.sockets()
 
   // set all users offline on start
   this.setAll({ is: { online: false } })
@@ -43,6 +51,77 @@ function Users () {
       global.db.engine.increment('users', { username: username }, { stats: { messages: inc } })
     })
   }, 60000)
+}
+
+Users.prototype.sockets = function (self) {
+  const io = global.panel.io.of('/users')
+
+  io.on('connection', (socket) => {
+    debug('Socket connected, registering sockets')
+    socket.on('ignore.list.save', async function (data, callback) {
+      try {
+        await global.db.engine.remove('users_ignorelist', {})
+
+        let promises = []
+        for (let username of data) {
+          if (username.trim().length === 0) continue
+          username = username.trim().toLowerCase()
+          promises.push(
+            global.db.engine.update('users_ignorelist', { username: username }, { username: username })
+          )
+        }
+        await Promise.all(promises)
+        callback(null, null)
+      } catch (e) {
+        callback(e, null)
+      }
+    })
+
+    socket.on('ignore.list', async function (callback) {
+      const users = await global.db.engine.find('users_ignorelist')
+      callback(null, _.orderBy(users, 'username', 'asc'))
+    })
+  })
+}
+
+Users.prototype.ignoreAdd = async function (self, sender, text) {
+  const match = XRegExp.exec(text, constants.USERNAME_REGEXP)
+  if (_.isNil(match)) return
+
+  match.username = match.username.toLowerCase()
+
+  await global.db.engine.update('users_ignorelist', { username: match.username }, { username: match.username })
+  let message = global.commons.prepare('ignore.user.is.added', { username: match.username })
+  debug(message); global.commons.sendMessage(message, sender)
+}
+
+Users.prototype.ignoreRm = function (self, sender, text) {
+  const match = XRegExp.exec(text, constants.USERNAME_REGEXP)
+  if (_.isNil(match)) return
+
+  match.username = match.username.toLowerCase()
+
+  global.db.engine.remove('users_ignorelist', { username: match.username })
+  let message = global.commons.prepare('ignore.user.is.removed', { username: match.username })
+  debug(message); global.commons.sendMessage(message, sender)
+}
+
+Users.prototype.ignoreCheck = async function (self, sender, text) {
+  const match = XRegExp.exec(text, constants.USERNAME_REGEXP)
+  if (_.isNil(match)) return
+
+  match.username = match.username.toLowerCase()
+
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: match.username })
+  console.log(match.username, ignoredUser)
+  let message
+  if (!_.isEmpty(ignoredUser)) {
+    message = global.commons.prepare('ignore.user.is.ignored', { username: match.username })
+  } else {
+    message = global.commons.prepare('ignore.user.is.not.ignored', { username: match.username })
+  }
+  debug(message); global.commons.sendMessage(message, sender)
+  return !_.isEmpty(ignoredUser)
 }
 
 Users.prototype.resetMessages = function (self, socket, data) {

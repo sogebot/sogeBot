@@ -3,7 +3,15 @@
     <span data-lang="viewers" class="title text-default"></span>
   </li>
 
-  <li class="nav-item ml-auto" style="position: relative; top: -.3rem">
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#manage" data-lang="manage"></a>
+  </li>
+
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#ignorelist" data-lang="ignorelist"></a>
+  </li>
+
+  <li class="nav-item ml-auto" id="users-search" style="position: relative; top: -.2rem">
     <div class="btn-group">
         <input type="text" class="form-control form-search" style="margin:0 4px; padding: 8px 5px;" placeholder="Search by username" id="viewersSearch" onkeyup="viewers.updateSearch()">
       <div class="dropdown">
@@ -29,7 +37,7 @@
 </ul>
 
 <div class="tab-content">
-  <div role="tabpanel" class="tab-pane active" id="viewers">
+  <div role="tabpanel" class="tab-pane active" id="manage">
     <div class="widget">
       <table class="table table-striped">
         <thead>
@@ -71,8 +79,29 @@
       </table>
     </div>
   </div>
+
+  <div role="tabpanel" class="tab-pane" id="ignorelist">
+    <div class="row settings">
+      <div class="col">
+        <strong data-lang="ignorelist"></strong>
+        <small data-lang="one-record-per-line"></small>
+      </div>
+      <div class="w-100"></div>
+      <div class="col">
+        <textarea class="form-control" rows="10" id="ignorelist-textarea"></textarea>
+        <button class="btn btn-lg btn-outline-info float-right" id="ignorelist-submit">Save changes</button>
+        <div class="alert alert-info d-none" role="alert" id="ignorelist-alert-info"><i class="fa fa-spinner fa-pulse fa-fw" ></i>Saving changes</div>
+        <div class="alert alert-danger d-none" role="alert" id="ignorelist-alert-danger">Something went wrong!</div>
+        <div class="alert alert-success d-none" role="alert" id="ignorelist-alert-success">Saved OK!</div>
+      </div>
+    </div>
+  </div>
 </div>
 <script>
+  var userSocket = io('/users', {
+    query: "token=" + token
+  });
+
   var page = 1
 
   if (!systems.points) {
@@ -280,6 +309,48 @@
       return list[page - 1];
     }
   }
+
+  $(document)
+    .off('show.bs.tab', 'a[href="#ignorelist"]')
+    .on('show.bs.tab', 'a[href="#ignorelist"]', () => {
+      $('#users-search').addClass('d-none')
+      userSocket.emit('ignore.list', (err, data) => {
+        $('#ignorelist-textarea').val(!_.isEmpty(data) ? _.map(data, 'username').join('\n') : '')
+      })
+    })
+  $(document)
+    .off('show.bs.tab', 'a[href="#manage"]')
+    .on('show.bs.tab', 'a[href="#manage"]', () => { $('#users-search').removeClass('d-none') })
+
+  $('#ignorelist-submit').on('click', () => {
+    let users = $('#ignorelist-textarea').val().split('\n')
+
+    /* do fadeIn and hide button */
+    $('#ignorelist-submit').velocity('fadeOut', { duration: 250 })
+    $('#ignorelist-alert-info')
+      .removeClass('d-none')
+      .css('opacity', '0')
+      .velocity('fadeIn', { duration: 250 })
+
+    userSocket.emit('ignore.list.save', users, (err) => {
+      $('#ignorelist-alert-info').velocity('fadeOut', { duration: 250 })
+      if (err) {
+        $('#ignorelist-alert-danger')
+          .removeClass('d-none')
+          .css('opacity', '0')
+          .velocity('fadeIn', { delay: 500, duration: 250 })
+          .velocity('fadeOut', { delay: 1000, duration: 250})
+      } else {
+        $('#ignorelist-alert-success')
+          .removeClass('d-none')
+          .css('opacity', '0')
+          .velocity('fadeIn', { delay: 500, duration: 250 })
+          .velocity('fadeOut', { delay: 1000, duration: 250})
+      }
+      $('#ignorelist-submit').velocity('fadeIn', { delay: 250, duration: 250 })
+    })
+  })
+
 
   socket.emit('getViewers')
 

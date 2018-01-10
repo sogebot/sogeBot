@@ -311,8 +311,14 @@ Events.prototype._save = function (self) {
   })
 }
 
-Events.prototype.fire = function (event, attr) {
+Events.prototype.fire = async function (event, attr) {
   attr = attr || {}
+
+  if (!_.isNil(attr.username)) {
+    let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: attr.username })
+    if (!_.isEmpty(ignoredUser) && attr.username !== config.settings.broadcaster_username) return
+  }
+
   if (_.isNil(this.events[event])) return true
 
   let operationsBulk = this.events[event]
