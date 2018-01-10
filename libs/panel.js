@@ -18,7 +18,7 @@ function Panel () {
   app.use(bodyParser.json())
   app.use(bodyParser.urlencoded({ extended: true }))
 
-  var server = http.createServer(app)
+  this.server = http.createServer(app)
   var port = process.env.PORT || config.panel.port
 
   // webhooks integration
@@ -73,11 +73,11 @@ function Panel () {
   })
   app.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')))
 
-  server.listen(port, function () {
+  this.server.listen(port, function () {
     global.log.info('WebPanel is available at http://localhost:%s', port)
   })
 
-  this.io = require('socket.io')(server)
+  this.io = require('socket.io')(this.server)
   this.menu = [{category: 'main', name: 'dashboard', id: 'dashboard'}]
   this.widgets = []
   this.socketListeners = []

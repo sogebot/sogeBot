@@ -1147,3 +1147,7 @@ blockquote {
 .form-control.editable {
   font-size: .8rem !important;
 }
+
+#ignorelist-textarea:focus + button {
+  display: block;
+}

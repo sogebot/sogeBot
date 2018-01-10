@@ -24,6 +24,11 @@ define('CONNECTED', 3)
 
 // regexp
 define(
+  'USERNAME_REGEXP',
+  XRegExp(`@?(?<username> .* )`, 'ix')
+)
+
+define(
   'COMMAND_REGEXP',
   XRegExp(`!(?<command> [\\pL]* ) # command`, 'ix')
 )

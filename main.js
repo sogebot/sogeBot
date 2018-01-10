@@ -142,6 +142,10 @@ global.client.on('disconnected', function (address, port) {
 
 global.client.on('message', async function (channel, sender, message, fromSelf) {
   if (debug.enabled) debug('Message received: %s\n\tuserstate: %s', message, JSON.stringify(sender))
+
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: sender.username })
+  if (!_.isEmpty(ignoredUser) && sender.username !== config.settings.broadcaster_username) return
+
   if (!fromSelf && config.settings.bot_username !== sender.username) {
     global.users.set(sender.username, { id: sender['user-id'], is: { online: true, subscriber: _.get(sender, 'subscriber', false) } })
     if (sender['message-type'] !== 'whisper') {
@@ -169,6 +173,10 @@ global.client.on('message', async function (channel, sender, message, fromSelf) 
 
 global.client.on('join', async function (channel, username, fromSelf) {
   if (debug.enabled) debug('User joined: %s', username)
+
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
+  if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
+
   if (!fromSelf) {
     let user = await global.users.get(username)
     if (!_.isNil(user) && !_.isNil(user.id)) {
@@ -181,15 +189,24 @@ global.client.on('join', async function (channel, username, fromSelf) {
 
 global.client.on('part', async function (channel, username, fromSelf) {
   if (debug.enabled) debug('User parted: %s', username)
+
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
+  if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
+
   if (!fromSelf) {
     global.users.set(username, { is: { online: false } })
     global.events.fire('user-parted-channel', { username: username })
   }
 })
 
-global.client.on('action', function (channel, userstate, message, self) {
+global.client.on('action', async function (channel, userstate, message, self) {
   if (debug.enabled) debug('User action: %s\n\tuserstate', message, JSON.stringify(userstate))
+
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: userstate.username })
+  if (!_.isEmpty(ignoredUser) && userstate.username !== config.settings.broadcaster_username) return
+
   if (self) return
+
   global.events.fire('action', { username: userstate.username.toLowerCase() })
 })
 
@@ -247,8 +264,12 @@ global.client.on('mod', async function (channel, username) {
   global.users.set(username, { is: { mod: true } })
 })
 
-global.client.on('cheer', function (channel, userstate, message) {
+global.client.on('cheer', async function (channel, userstate, message) {
   if (debug.enabled) debug('Cheer: %s\n\tuserstate: %s', message, JSON.stringify(userstate))
+
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: userstate.username })
+  if (!_.isEmpty(ignoredUser) && userstate.username !== config.settings.broadcaster_username) return
+
   global.events.fire('cheer', { username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
   if (global.twitch.isOnline) global.twitch.current.bits = global.twitch.current.bits + parseInt(userstate.bits, 10)
 })
@@ -259,6 +280,10 @@ global.client.on('clearchat', function (channel) {
 
 global.client.on('subscription', async function (channel, username, method) {
   if (debug.enabled) debug('Subscription: %s from %s', username, method)
+
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
+  if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
+
   global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: _.now() } })
   global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
 
@@ -271,6 +296,10 @@ global.client.on('subscription', async function (channel, username, method) {
 
 global.client.on('resub', async function (channel, username, months, message) {
   if (debug.enabled) debug('Resub: %s (%s months) - %s', username, months, message)
+
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
+  if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
+
   global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: moment().subtract(months, 'months').format('X') * 1000 } })
   global.events.fire('resub', { username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
 
