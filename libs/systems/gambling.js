@@ -2,8 +2,6 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const Decimal = require('decimal.js')
-Decimal.set({ toExpPos: 99 })
 
 // bot libraries
 const constants = require('../constants')
@@ -66,7 +64,7 @@ function Gambling () {
 }
 
 Gambling.prototype.pickDuelWinner = async function (self) {
-  const total = new Decimal(self.current.duel._total)
+  const total = self.current.duel._total
   let winner = _.random(0, total, false)
 
   delete self.current.duel._total
@@ -82,7 +80,7 @@ Gambling.prototype.pickDuelWinner = async function (self) {
   }
 
   const username = winnerUsername
-  const tickets = new Decimal(self.current.duel[username])
+  const tickets = self.current.duel[username]
   const probability = tickets / (total / 100)
 
   let m = global.commons.prepare(_.size(self.current.duel) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
