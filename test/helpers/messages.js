@@ -7,14 +7,26 @@ module.exports = {
   isSent: async function (entry, user, opts) {
     opts = opts || {}
     await until(setError => {
-      let expected = global.commons.prepare(entry, opts)
+      let expected = []
+      if (_.isArray(opts)) {
+        for (let o of opts) {
+          expected.push(global.commons.prepare(entry, o))
+        }
+      } else expected = [global.commons.prepare(entry, opts)]
       try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
+        let isCorrectlyCalled = false
+        for (let e of expected) {
+          if (global.commons.sendMessage.calledWith(e, sinon.match(user))) {
+            isCorrectlyCalled = true
+            break
+          }
+        }
+        assert.isTrue(isCorrectlyCalled)
         global.commons.sendMessage.reset()
         return true
       } catch (err) {
         return setError(
-          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
+          '\nExpected message: "' + JSON.stringify(expected) + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
           '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
       }
     }, 3000)

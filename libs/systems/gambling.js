@@ -1,10 +1,12 @@
 'use strict'
 
 // 3rdparty libraries
-var _ = require('lodash')
+const _ = require('lodash')
+const Decimal = require('decimal.js')
+Decimal.set({ toExpPos: 99 })
 
 // bot libraries
-var constants = require('../constants')
+const constants = require('../constants')
 const config = require('../../config.json')
 const debug = require('debug')('systems:gambling')
 
@@ -56,45 +58,50 @@ function Gambling () {
     const self = this
     setInterval(async function () {
       if (_.isNil(self.current.duel._timestamp)) return true
-
       if (new Date().getTime() - self.current.duel._timestamp > 1000 * 60 * 5) {
-        let winner = _.random(0, parseInt(self.current.duel._total, 10) - 1, false)
-        const total = self.current.duel._total
-
-        delete self.current.duel._total
-        delete self.current.duel._timestamp
-
-        let winnerArray = []
-        _.each(self.current.duel, function (v, k) {
-          for (let i = 0; i < v; i++) {
-            winnerArray.push(k)
-          }
-        })
-
-        const username = winnerArray[winner]
-        const tickets = parseInt(self.current.duel[username], 10)
-        const probability = tickets / (parseInt(total, 10) / 100)
-
-        let m = global.commons.prepare(_.size(self.current.duel) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
-          pointsName: global.systems.points.getPointsName(total),
-          points: total,
-          probability: _.round(probability, 2),
-          ticketsName: global.systems.points.getPointsName(tickets),
-          tickets: tickets,
-          winner: username
-        })
-        debug(m); global.commons.sendMessage(m, { username: username }, { force: true })
-
-        // give user his points
-        global.db.engine.incrementOne('users', { username: username }, { points: parseInt(total, 10) })
-
-        // reset duel
-        self.current.duel = {}
-        self.current.duel._timestamp = null
-        self.current.duel._total = 0
+        self.pickDuelWinner(self)
       }
     }, 30000)
   }
+}
+
+Gambling.prototype.pickDuelWinner = async function (self) {
+  const total = new Decimal(self.current.duel._total)
+  let winner = _.random(0, total, false)
+
+  delete self.current.duel._total
+  delete self.current.duel._timestamp
+
+  let winnerUsername
+  for (let [user, tickets] of Object.entries(self.current.duel)) {
+    winner = winner - tickets
+    if (winner <= 0) { // winner tickets are <= 0 , we have winner
+      winnerUsername = user
+      break
+    }
+  }
+
+  const username = winnerUsername
+  const tickets = new Decimal(self.current.duel[username])
+  const probability = tickets / (total / 100)
+
+  let m = global.commons.prepare(_.size(self.current.duel) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
+    pointsName: global.systems.points.getPointsName(total),
+    points: total,
+    probability: _.round(probability, 2),
+    ticketsName: global.systems.points.getPointsName(tickets),
+    tickets: tickets.toString(),
+    winner: username
+  })
+  debug(m); global.commons.sendMessage(m, { username: username }, { force: true })
+
+  // give user his points
+  global.db.engine.incrementOne('users', { username: username }, { points: parseInt(total, 10) })
+
+  // reset duel
+  self.current.duel = {}
+  self.current.duel._timestamp = null
+  self.current.duel._total = 0
 }
 
 Gambling.prototype.duel = async function (self, sender, text) {

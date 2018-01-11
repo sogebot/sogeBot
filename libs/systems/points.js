@@ -3,6 +3,9 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const debug = require('debug')('systems:points')
+const Decimal = require('decimal.js')
+Decimal.set({ toExpPos: 99 })
+
 // bot libraries
 const config = require('../../config.json')
 const constants = require('../constants')
@@ -212,9 +215,9 @@ Points.prototype.getPointsFromUser = async function (self, sender, text) {
 
     var points = (_.isUndefined(user.points) ? 0 : user.points)
     let message = global.commons.prepare('points.defaults.pointsResponse', {
-      amount: points,
+      amount: new Decimal(points),
       username: username,
-      pointsName: self.getPointsName(points)
+      pointsName: self.getPointsName(new Decimal(points))
     })
     debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
