@@ -821,8 +821,7 @@ class Twitch {
       message.push((watchTime / 1000 / 60 / 60).toFixed(1) + 'h')
 
       // points
-      var points = !_.isUndefined(user.points) ? user.points : 0
-      if (global.commons.isSystemEnabled('points')) message.push(points + ' ' + global.systems.points.getPointsName(points))
+      if (global.commons.isSystemEnabled('points')) message.push(user.points + ' ' + global.systems.points.getPointsName(user.points))
 
       // message count
       var messages = !_.isUndefined(user.stats.messages) ? user.stats.messages : 0

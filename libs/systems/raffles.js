@@ -271,16 +271,23 @@ class Raffles {
 
   async participate (self, sender, text) {
     const [raffle, user] = await Promise.all([global.db.engine.findOne('raffles', { winner: null }), global.users.get(sender.username)])
+    text = text.toString()
     let tickets = text.trim() === 'all' && !_.isNil(user.points) ? user.points : parseInt(text.trim(), 10)
+    debug('User in db: %j', user)
+    debug('Text: %s', text)
+    debug('Tickets in text: %s', parseInt(text.trim(), 10))
 
     if (_.isEmpty(raffle)) { // shouldn't happen, but just to be sure (user can join when closing raffle)
       let message = global.commons.prepare('no-raffle-is-currently-running')
       debug(message); global.commons.sendMessage(message, sender)
-      return true
+      return false
     }
 
+    debug('Tickets to bet: %s', tickets)
+    debug('Tickets are number: %s', _.isFinite(tickets))
+    debug('Tickets <= 0: %s', tickets <= 0)
     if ((!_.isFinite(tickets) || tickets <= 0 || tickets > parseInt(raffle.max, 10) || tickets < parseInt(raffle.min, 10)) && raffle.type === TYPE_TICKETS) {
-      return true
+      return false
     }
     if (!_.isFinite(tickets)) tickets = 0
 
@@ -323,6 +330,7 @@ class Raffles {
       global.db.engine.update('raffle_participants', { raffle_id: raffle._id.toString(), username: sender.username }, participantUser)
       self.refresh()
     }
+    return true
   }
 
   async pick (self, sender) {
@@ -340,31 +348,35 @@ class Raffles {
       return true
     }
 
-    let winnerArray = []
     let _total = 0
-    _.each(participants, function (dict) {
-      if (!dict.eligible) return true
-      _total = _total + parseInt(dict.tickets)
-      for (let i = 0; i < dict.tickets; i++) {
-        winnerArray.push(dict.username)
+    for (let participant of _.filter(participants, (o) => o.eligible)) {
+      _total = _total + parseInt(participant.tickets, 10)
+    }
+
+    let winNumber = _.random(0, parseInt(_total, 10) - 1, false)
+    debug('Total tickets: %s', _total)
+    debug('Win number: %s', winNumber)
+
+    let winner
+    for (let participant of _.filter(participants, (o) => o.eligible)) {
+      winNumber = winNumber - participant.tickets
+      if (winNumber <= 0) {
+        winner = participant
+        break
       }
-    })
-    if (debug.enabled) debug('winnerArray: %j', winnerArray)
+    }
 
-    let winner = winnerArray[_.random(0, parseInt(_total, 10) - 1, false)]
-
-    let participant = _.find(participants, (o) => o.username === winner)
-    if (debug.enabled) debug('winner participant: %j', participant)
-    let probability = parseInt(participant.tickets, 10) / (parseInt(_total, 10) / 100)
+    debug('Raffle winner: %s', winner)
+    let probability = parseInt(winner.tickets, 10) / (parseInt(_total, 10) / 100)
 
     // uneligible winner (don't want to pick second time same user if repick)
     await Promise.all([
-      global.db.engine.update('raffle_participants', { raffle_id: raffle._id.toString(), username: winner }, { eligible: false }),
-      global.db.engine.update('raffles', { _id: raffle._id.toString() }, { winner: winner, timestamp: new Date().getTime() })
+      global.db.engine.update('raffle_participants', { raffle_id: raffle._id.toString(), username: winner.username }, { eligible: false }),
+      global.db.engine.update('raffles', { _id: raffle._id.toString() }, { winner: winner.username, timestamp: new Date().getTime() })
     ])
 
     let message = global.commons.prepare('raffles.raffle-winner-is', {
-      username: winner,
+      username: winner.username,
       keyword: raffle.keyword,
       probability: _.round(probability, 2)
     })
