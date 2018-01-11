@@ -785,6 +785,16 @@ span.badge {
   padding-top: 0.3rem;
 }
 
+h5 .badge {
+  font-size: 0.7rem;
+  text-transform: initial;
+  font-weight: normal;
+  padding: .3rem;
+  border-radius: 1rem;
+  position: relative;
+  bottom: .1rem;
+}
+
 kbd {
   padding: 3px 4px;
   font-family: 'PT Mono', monospace;
