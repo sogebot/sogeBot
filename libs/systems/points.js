@@ -3,8 +3,6 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const debug = require('debug')('systems:points')
-const Decimal = require('decimal.js')
-Decimal.set({ toExpPos: 99 })
 
 // bot libraries
 const config = require('../../config.json')
@@ -117,12 +115,13 @@ Points.prototype.messagePoints = async function (self, id, sender, text, skip) {
 Points.prototype.setPoints = function (self, sender, text) {
   try {
     var parsed = text.match(/^@?([\S]+) ([0-9]+)$/)
-    global.users.set(parsed[1].toLowerCase(), { points: parseInt(parsed[2], 10) })
+    const points = parseInt(parsed[2], 10)
 
+    global.users.set(parsed[1].toLowerCase(), { points: points })
     let message = global.commons.prepare('points.success.set', {
-      amount: parsed[2],
+      amount: points,
       username: parsed[1].toLowerCase(),
-      pointsName: self.getPointsName(parsed[2])
+      pointsName: self.getPointsName(points)
     })
     debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
@@ -213,11 +212,10 @@ Points.prototype.getPointsFromUser = async function (self, sender, text) {
     let user = await global.users.get(sender.username)
     const username = text.match(/^@?([\S]+)$/)[1]
 
-    var points = (_.isUndefined(user.points) ? 0 : user.points)
     let message = global.commons.prepare('points.defaults.pointsResponse', {
-      amount: new Decimal(points),
+      amount: user.points,
       username: username,
-      pointsName: self.getPointsName(new Decimal(points))
+      pointsName: self.getPointsName(user.points)
     })
     debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
@@ -314,6 +312,7 @@ Points.prototype.updatePoints = async function () {
   let users = await global.users.getAll({ is: { online: true } })
   _.each(users, function (user) {
     if (_.isNil(user.time)) user.time = {}
+
     user.time.points = _.isNil(user.time.points) ? 0 : user.time.points
     if (new Date().getTime() - user.time.points >= interval) {
       global.db.engine.increment('users', { username: user.username }, { points: parseInt(ptsPerInterval, 10) })

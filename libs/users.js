@@ -111,12 +111,13 @@ Users.prototype.get = async function (username) {
 
   let user = await global.db.engine.findOne('users', { username: username })
 
-  // return all default values
-  if (_.isUndefined(user.username)) user.username = username
-  if (_.isUndefined(user.time)) user.time = {}
-  if (_.isUndefined(user.is)) user.is = { }
-  if (_.isUndefined(user.stats)) user.stats = {}
-  if (_.isUndefined(user.custom)) user.custom = {}
+  user.points = _.get(user, 'points', 0) >= Number.MAX_SAFE_INTEGER / 1000000 ? Math.floor(Number.MAX_SAFE_INTEGER / 1000000) : parseInt(_.get(user, 'points', 0), 10)
+  user.username = _.get(user, 'username', username).toLowerCase()
+  user.time = _.get(user, 'time', {})
+  user.is = _.get(user, 'is', {})
+  user.stats = _.get(user, 'stats', {})
+  user.custom = _.get(user, 'custom', {})
+
   if (_.isNil(user.time.created_at) && !_.isNil(user.id)) this.fetchAccountAge(this, username, user.id)
 
   return user
@@ -187,6 +188,13 @@ Users.prototype.set = async function (username, object) {
 
   username = username.toLowerCase()
   if (username === config.settings.bot_username || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
+
+  // force max value of points
+  object.points = _.get(object, 'points', 0) >= Number.MAX_SAFE_INTEGER / 1000000 ? Math.floor(Number.MAX_SAFE_INTEGER / 1000000) : parseInt(_.get(object, 'points', 0), 10)
+  if (object.points === 0) { // or re-set from db
+    const user = await global.users.get(username)
+    object.points = user.points
+  }
 
   let result = await global.db.engine.update('users', { username: username }, object)
   return result
