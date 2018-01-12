@@ -143,9 +143,6 @@ global.client.on('disconnected', function (address, port) {
 global.client.on('message', async function (channel, sender, message, fromSelf) {
   if (debug.enabled) debug('Message received: %s\n\tuserstate: %s', message, JSON.stringify(sender))
 
-  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: sender.username })
-  if (!_.isEmpty(ignoredUser) && sender.username !== config.settings.broadcaster_username) return
-
   if (!fromSelf && config.settings.bot_username !== sender.username) {
     global.users.set(sender.username, { id: sender['user-id'], is: { online: true, subscriber: _.get(sender, 'subscriber', false) } })
     if (sender['message-type'] !== 'whisper') {
