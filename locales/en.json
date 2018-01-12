@@ -1029,5 +1029,17 @@
   },
   "time": "Current streamers time in his timezone is $time",
   "subs": "$sender, there is currently $onlineSubCount online subscribers. Last sub/resub was $lastSubUsername $lastSubAgo",
-  "followers": "$sender, there is currently $onlineFollowersCount online followers. Last follow was $lastFollowUsername $lastFollowAgo"
+  "followers": "$sender, there is currently $onlineFollowersCount online followers. Last follow was $lastFollowUsername $lastFollowAgo",
+  "ignore": {
+    "user": {
+      "is": {
+        "not": {
+          "ignored": "$sender, user $username is not ignored by bot"
+        },
+        "added": "$sender, user $username is added to bot ignorelist",
+        "removed": "$sender, user $username is removed from bot ignorelist",
+        "ignored": "$sender, user $username is ignored by bot"
+      }
+    }
+  }
 }

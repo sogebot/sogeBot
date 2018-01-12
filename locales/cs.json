@@ -1029,5 +1029,17 @@
   },
   "time": "Aktualni cas streamera v jeho casove zone je $time",
   "subs": "$sender, je zde prave $onlineSubCount online subscriberu. Posledni sub/resub byl $lastSubUsername $lastSubAgo",
-  "followers": "$sender, je zde prave $onlineFollowersCount online followeru. Posledni follow byl $lastFollowUsername $lastFollowAgo"
+  "followers": "$sender, je zde prave $onlineFollowersCount online followeru. Posledni follow byl $lastFollowUsername $lastFollowAgo",
+  "ignore": {
+    "user": {
+      "is": {
+        "not": {
+          "ignored": "$sender, uzivatel $username neni botem ignorovan"
+        },
+        "added": "$sender, uzivatel $username byl pridan do botova ignorelistu",
+        "removed": "$sender, uzivatel $username byl odebran z botova ignorelistu",
+        "ignored": "$sender, uzivatel $username je botem ignorovan"
+      }
+    }
+  }
 }
