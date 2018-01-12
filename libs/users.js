@@ -113,7 +113,6 @@ Users.prototype.ignoreCheck = async function (self, sender, text) {
   match.username = match.username.toLowerCase()
 
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: match.username })
-  console.log(match.username, ignoredUser)
   let message
   if (!_.isEmpty(ignoredUser)) {
     message = global.commons.prepare('ignore.user.is.ignored', { username: match.username })

@@ -92,8 +92,11 @@ Parser.prototype.addToQueue = async function (user, message, skip) {
 }
 
 Parser.prototype.parseCommands = async function (user, message, skip) {
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: user.username })
   message = message.trim()
-  if (!message.startsWith('!')) return // do nothing, this is not a command
+  if (!_.isEmpty(ignoredUser) && user.username !== config.settings.broadcaster_username) return
+
+  if (!message.startsWith('!')) return // do nothing, this is not a command or user is ignored
   for (var cmd in this.registeredCmds) {
     let onlyParams = message.trim().toLowerCase().replace(cmd, '')
     if (message.trim().toLowerCase().startsWith(cmd) && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {

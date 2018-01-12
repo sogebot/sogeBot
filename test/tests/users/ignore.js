@@ -5,6 +5,7 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
+const until = require('test-until')
 
 // users
 const owner = { username: 'soge__' }
@@ -52,6 +53,11 @@ describe('Users - ignore', () => {
     it('testuser is ignored', (done) => {
       global.parser.parse(testuser, '!duel')
       setTimeout(() => { assert.isTrue(global.commons.sendMessage.notCalled); done() }, 2000)
+    })
+
+    it('even when ignored, user should have timeout for link', async () => {
+      global.parser.parse(testuser, 'http://www.google.com')
+      await until(() => global.commons.timeout.calledOnce, 5000)
     })
 
     it('remove testuser from ignore list', async () => {
