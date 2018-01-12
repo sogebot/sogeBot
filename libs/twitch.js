@@ -866,6 +866,16 @@ class Twitch {
       sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.stats) && !_.isNil(o.stats.messages) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'stats.messages', 'desc')
     }
 
+    // remove ignored users
+    if (sorted.length > 0) {
+      let ignored = []
+      for (let user of sorted) {
+        let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: user.username })
+        if (!_.isEmpty(ignoredUser)) ignored.push(user.username)
+      }
+      _.remove(sorted, (o) => _.includes(ignored, o.username))
+    }
+
     sorted = _.chunk(sorted, 10)[0]
     for (let user of sorted) {
       message += (i + 1) + '. ' + (global.configuration.getValue('atUsername') ? '@' : '') + user.username + ' - '
