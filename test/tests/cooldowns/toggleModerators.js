@@ -16,6 +16,7 @@ const mod = { username: 'mod', mod: true }
 
 describe('Cooldowns - toggleModerators()', () => {
   beforeEach(async () => {
+    await tmi.waitForConnection()
     global.commons.sendMessage.reset()
     await db.cleanup()
     if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()

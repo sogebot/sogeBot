@@ -7,6 +7,7 @@ const tmi = require('../../general.js').tmi
 
 describe('Gambling - duel', () => {
   before(async () => {
+    await tmi.waitForConnection()
     global.commons.sendMessage.reset()
     await db.cleanup()
   })

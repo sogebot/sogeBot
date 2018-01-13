@@ -18,6 +18,7 @@ const testUser2 = { username: 'test2' }
 
 describe('Cooldowns - check()', () => {
   beforeEach(async () => {
+    await tmi.waitForConnection()
     global.commons.sendMessage.reset()
     await db.cleanup()
     if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()

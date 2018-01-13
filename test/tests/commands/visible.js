@@ -11,6 +11,7 @@ const owner = { username: 'soge__' }
 
 describe('Custom Commands - visible()', () => {
   beforeEach(async () => {
+    await tmi.waitForConnection()
     global.commons.sendMessage.reset()
     await db.cleanup()
   })
