@@ -72,7 +72,7 @@ let migration = {
           upsert: true
         }
         let newCache = {
-          games_and_titles: cache.cachedGamesTitles,
+          games_and_titles: cache.games_and_titles,
           upsert: true
         }
 
