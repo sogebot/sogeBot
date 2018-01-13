@@ -91,6 +91,9 @@ function Events () {
         let value = !_.isNil(attr[match.replace('$', '')]) ? attr[match.replace('$', '')] : 'none'
         string = string.replace(match, value)
       })
+      if (attr.webhooks) {
+        string = string + '(webhooks)'
+      }
       global.log[attr.level](string)
     },
     '_function': function (attr) {
