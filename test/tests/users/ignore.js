@@ -5,6 +5,7 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
+const tmi = require('../../general.js').tmi
 const until = require('test-until')
 
 // users
@@ -15,6 +16,7 @@ const testuser3 = { username: 'testuser3' }
 
 describe('Users - ignore', () => {
   before(async () => {
+    await tmi.waitForConnection()
     global.commons.sendMessage.reset()
     await db.cleanup()
   })

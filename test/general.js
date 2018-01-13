@@ -16,5 +16,6 @@ sinon.stub(global.log, 'info')
 
 module.exports = {
   db: require('./helpers/db'),
-  message: require('./helpers/messages')
+  message: require('./helpers/messages'),
+  tmi: require('./helpers/tmi')
 }

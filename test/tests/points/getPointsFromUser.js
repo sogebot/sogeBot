@@ -4,12 +4,14 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
+const tmi = require('../../general.js').tmi
 
 const hugePointsUser = { username: 'hugeuser', points: 99999999999999999999999999999999 }
 const tinyPointsUser = { username: 'tinyuser', points: 100 }
 
 describe('Points - getPointsFromUser()', () => {
   before(async () => {
+    await tmi.waitForConnection()
     global.commons.sendMessage.reset()
     await db.cleanup()
   })

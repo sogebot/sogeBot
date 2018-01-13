@@ -12,12 +12,16 @@ jobs:
       before_script:
         - npm run test:config:nedb
         - cat config.json
+        - sed -i -- 's/bot_username_here/test__________bot/g' config.json
+        - sed -i -- 's/bot_oauth_here/96wi94nziumq4fk2w3ocj8g97wb5uj/g' config.json
       script: npm run test
     - stage: NEDB
       node_js: "9"
       before_script:
         - npm run test:config:nedb
         - cat config.json
+        - sed -i -- 's/bot_username_here/test__________bot/g' config.json
+        - sed -i -- 's/bot_oauth_here/96wi94nziumq4fk2w3ocj8g97wb5uj/g' config.json
       script: npm run test
     - stage: MONGODB
       node_js: "8"
@@ -25,6 +29,8 @@ jobs:
       before_script:
         - npm run test:config:mongodb
         - cat config.json
+        - sed -i -- 's/bot_username_here/test__________bot/g' config.json
+        - sed -i -- 's/bot_oauth_here/96wi94nziumq4fk2w3ocj8g97wb5uj/g' config.json
       script: npm run test
     - stage: MONGODB
       node_js: "9"
@@ -32,4 +38,6 @@ jobs:
       before_script:
         - npm run test:config:mongodb
         - cat config.json
+        - sed -i -- 's/bot_username_here/test__________bot/g' config.json
+        - sed -i -- 's/bot_oauth_here/96wi94nziumq4fk2w3ocj8g97wb5uj/g' config.json
       script: npm run test

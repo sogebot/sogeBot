@@ -4,6 +4,7 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
+const tmi = require('../../general.js').tmi
 
 const moment = require('moment')
 const assert = require('chai').assert
@@ -14,6 +15,7 @@ const testuser3 = { username: 'testuser3' }
 
 describe('lib/twitch - addUserInFollowerCache()', () => {
   before(async () => {
+    await tmi.waitForConnection()
     global.commons.sendMessage.reset()
     await db.cleanup()
   })

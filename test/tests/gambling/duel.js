@@ -3,6 +3,7 @@
 require('../../general.js')
 
 const db = require('../../general.js').db
+const tmi = require('../../general.js').tmi
 
 describe('Gambling - duel', () => {
   before(async () => {

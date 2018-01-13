@@ -1,4 +1,12 @@
 module.exports = {
+  waitForConnection: async function () {
+    await new Promise((resolve, reject) => {
+      global.client.on('connected', function (address, port) {
+        resolve(true)
+      })
+      setTimeout(() => reject(new Error('Not connected in specified time')), 3000)
+    })
+  },
   cleanup: async function () {
     let items = await global.db.engine.find('alias')
     for (let item of items) {

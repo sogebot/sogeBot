@@ -4,6 +4,7 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
+const tmi = require('../../general.js').tmi
 
 const assert = require('chai').assert
 
@@ -15,6 +16,7 @@ const testuser2 = { username: 'testuser2' }
 
 describe('Raffles - pick()', () => {
   before(async () => {
+    await tmi.waitForConnection()
     global.commons.sendMessage.reset()
     await db.cleanup()
   })

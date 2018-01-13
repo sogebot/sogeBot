@@ -1,16 +1,17 @@
 /* global describe it beforeEach */
 
-const assert = require('chai').assert
 require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
+const tmi = require('../../general.js').tmi
 
 // users
 const owner = { username: 'soge__' }
 
 describe('Permissions - override()', () => {
   beforeEach(async () => {
+    await tmi.waitForConnection()
     global.commons.sendMessage.reset()
     await db.cleanup()
   })

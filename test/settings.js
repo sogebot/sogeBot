@@ -5,6 +5,8 @@ const until = require('test-until')
 const _ = require('lodash')
 require('./general.js')
 
+const tmi = require('../../general.js').tmi
+
 // users
 const owner = { username: 'soge__' }
 
@@ -17,7 +19,8 @@ describe('Settings tests', () => {
     global.configuration.register('testNumber', 'settings.testNumber', 'number', 1)
     global.configuration.register('testString', 'settings.testString', 'string', 'test')
   })
-  beforeEach(function () {
+  beforeEach(async function () {
+    await tmi.waitForConnection()
     global.commons.sendMessage.reset()
   })
   after(async function () {

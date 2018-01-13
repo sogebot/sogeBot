@@ -9,6 +9,7 @@ const until = require('test-until')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
+const tmi = require('../../general.js').tmi
 
 // users
 const owner = { username: 'soge__' }

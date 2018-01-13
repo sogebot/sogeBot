@@ -7,12 +7,14 @@ const _ = require('lodash')
 require('../../general.js')
 
 const db = require('../../general.js').db
+const tmi = require('../../general.js').tmi
 
 // users
 const owner = { username: 'soge__' }
 
 describe('Timers - set()', () => {
   beforeEach(async () => {
+    await tmi.waitForConnection()
     await db.cleanup()
     global.commons.sendMessage.reset()
   })
