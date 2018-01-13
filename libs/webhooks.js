@@ -127,7 +127,7 @@ class Webhooks {
       global.events.fire('follow', { username: userGetFromApi.body.data[0].login }) // we can safely fire event as user doesn't exist in db
       await Promise.all([
         global.db.engine.insert('users', { id: fid, username: userGetFromApi.body.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } }),
-        global.twitch.addUserInFollowerCache(user.username)
+        global.twitch.addUserInFollowerCache(userGetFromApi.body.data[0].login)
       ])
     } else {
       debug('user in db')
