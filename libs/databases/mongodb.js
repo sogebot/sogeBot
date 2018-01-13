@@ -23,8 +23,8 @@ class IMongoDB extends Interface {
         this._connection[table] = await client.connect(config.database.mongodb.url, { poolSize: 100 })
         debug(this._connection[table])
       } catch (e) {
-        global.log.error(e)
-        if (e.message.match(/ENOTFOUND/g)) {
+        global.log.error(e.message)
+        if (e.message.match(/ENOTFOUND/g) || e.message.match(/ECONNREFUSED/g)) {
           global.log.error(`Cannot connect to ${config.database.mongodb.url}`)
           process.exit()
         }
@@ -45,7 +45,7 @@ class IMongoDB extends Interface {
       let items = await db.collection(table).find(where).toArray()
       return items
     } catch (e) {
-      global.log.error(e)
+      global.log.error(e.message)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
         process.exit()
@@ -66,6 +66,7 @@ class IMongoDB extends Interface {
       let item = await db.collection(table).findOne(where)
       return item || {}
     } catch (e) {
+      global.log.error(e.message)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
         process.exit()
@@ -109,6 +110,7 @@ class IMongoDB extends Interface {
 
       return item.value
     } catch (e) {
+      global.log.error(e.message)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
         process.exit()
@@ -140,6 +142,7 @@ class IMongoDB extends Interface {
       let items = await db.collection(table).find(where).toArray()
       return items
     } catch (e) {
+      global.log.error(e.message)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
         process.exit()
@@ -156,6 +159,7 @@ class IMongoDB extends Interface {
       let result = await db.collection(table).remove(where)
       return result.result.n
     } catch (e) {
+      global.log.error(e.message)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
         process.exit()
@@ -191,6 +195,7 @@ class IMongoDB extends Interface {
       let items = await db.collection(table).find(where).toArray()
       return items
     } catch (e) {
+      global.log.error(e.message)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
         process.exit()
