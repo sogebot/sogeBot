@@ -9,19 +9,27 @@ jobs:
       script: npm run standard
     - stage: NEDB
       node_js: "8"
-      before_script: npm run test:config:nedb
+      before_script:
+        - npm run test:config:nedb
+        - cat config.json
       script: npm run test
     - stage: NEDB
       node_js: "9"
-      before_script: npm run test:config:nedb
+      before_script:
+        - npm run test:config:nedb
+        - cat config.json
       script: npm run test
     - stage: MONGODB
       node_js: "8"
       services: mongodb
-      before_script: npm run test:config:mongodb
+      before_script:
+        - npm run test:config:mongodb
+        - cat config.json
       script: npm run test
     - stage: MONGODB
       node_js: "9"
       services: mongodb
-      before_script: npm run test:config:mongodb
+      before_script:
+        - npm run test:config:mongodb
+        - cat config.json
       script: npm run test
