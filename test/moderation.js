@@ -19,7 +19,7 @@ describe('System - Moderation', function () {
     await until(() => {
       // bot is loaded
       return global.log.info.calledWith('Bot loaded configuration data')
-    }, 5000)
+    }, 10000)
 
     global.parser.parse(owner, '!set moderationLinksWithSpaces true')
     await until(() => {
