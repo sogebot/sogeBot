@@ -139,6 +139,14 @@ Configuration.prototype.loadValues = async function () {
     if (!_.isUndefined(self.cfgL[obj.key])) self.cfgL[obj.key].value = obj.value
   })
   global.log.info('Bot loaded configuration data')
+
+  global.client.connect()
+  if (_.get(config, 'settings.broadcaster_oauth', '').match(/oauth:[\w]*/)) {
+    global.broadcasterClient.connect()
+  } else {
+    global.log.error('Broadcaster oauth is not properly set - hosts will not be loaded')
+    global.log.error('Broadcaster oauth is not properly set - subscribers will not be loaded')
+  }
 }
 
 module.exports = Configuration

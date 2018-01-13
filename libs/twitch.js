@@ -154,8 +154,7 @@ class Twitch {
   async getChannelSubscribersOldAPI () {
     const d = debug('twitch:getChannelSubscribersOldAPI')
 
-    if (_.isNil(config.settings.broadcaster_oauth) || !config.settings.broadcaster_oauth.match(/oauth:[\w]*/)) {
-      global.log.error('Broadcaster oauth is not properly set - subscribers will not be loaded')
+    if (_.get(config, 'settings.broadcaster_oauth', '').match(/oauth:[\w]*/)) {
       return
     }
 

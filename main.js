@@ -97,14 +97,6 @@ global.lib.translate._load().then(function () {
   global.overlays = require('auto-load')('./libs/overlays/')
 })
 
-// Connect the clients to the server..
-global.client.connect()
-if (!_.isNil(config.settings.broadcaster_oauth) && config.settings.broadcaster_oauth.match(/oauth:[\w]*/)) {
-  global.broadcasterClient.connect()
-} else {
-  global.log.error('Broadcaster oauth is not properly set - hosts will not be loaded')
-}
-
 global.client.on('connected', function (address, port) {
   debug('Bot is connected to TMI server - %s:%s', address, port)
   global.log.info('Bot is connected to TMI server')
