@@ -35,7 +35,7 @@ describe('lib/twitch - addUserInFollowerCache()', () => {
 
   it('cached.followers should have 2 values', async () => {
     let cached = await global.twitch.cached()
-    assert.equal(cached.followers.length, 2)
+    assert.lengthOf(cached.followers, 2, JSON.stringify(cached.followers))
   })
 
   it('!followers should return testuser2', async () => {
@@ -60,7 +60,7 @@ describe('lib/twitch - addUserInFollowerCache()', () => {
 
   it('cached.followers should have 3 values', async () => {
     let cached = await global.twitch.cached()
-    assert.equal(cached.followers.length, 3)
+    assert.lengthOf(cached.followers, 3, JSON.stringify(cached.followers))
   })
 
   it('!followers should return testuser3', async () => {
