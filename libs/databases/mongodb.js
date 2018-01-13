@@ -23,6 +23,7 @@ class IMongoDB extends Interface {
         this._connection[table] = await client.connect(config.database.mongodb.url, { poolSize: 100 })
         debug(this._connection[table])
       } catch (e) {
+        global.log.error(e)
         if (e.message.match(/ENOTFOUND/g)) {
           global.log.error(`Cannot connect to ${config.database.mongodb.url}`)
           process.exit()
@@ -39,12 +40,12 @@ class IMongoDB extends Interface {
       if (regexp.test(where._id)) where._id = new ObjectID(where._id)
       else return {}
     } else where = flatten(where)
-
     try {
       let db = await this.connection(table)
       let items = await db.collection(table).find(where).toArray()
       return items
     } catch (e) {
+      global.log.error(e)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
         process.exit()
