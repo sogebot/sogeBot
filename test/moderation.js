@@ -8,7 +8,7 @@ require('./general.js')
 const owner = { username: 'soge__' }
 const testUser = { username: 'test' }
 
-const tmi = require('../../general.js').tmi
+const tmi = require('./general.js').tmi
 
 describe('System - Moderation', function () {
   before(async () => {

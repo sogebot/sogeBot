@@ -5,7 +5,7 @@ const until = require('test-until')
 const _ = require('lodash')
 require('./general.js')
 
-const tmi = require('../../general.js').tmi
+const tmi = require('./general.js').tmi
 
 // users
 const owner = { username: 'soge__' }
