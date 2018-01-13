@@ -60,27 +60,25 @@ let migration = {
       console.info('Migration cache to %s', '5.12.0')
       let cache = await global.db.engine.findOne('cache')
 
-      if (!_.isNil(cache.cachedGamesTitles)) {
-        let when = {
-          offline: null,
-          online: null,
-          upsert: true
-        }
-        let users = {
-          followers: cache.followers,
-          subscribers: cache.subscribers,
-          upsert: true
-        }
-        let newCache = {
-          games_and_titles: cache.games_and_titles,
-          upsert: true
-        }
-
-        await global.db.engine.remove('cache', {_id: cache._id.toString()})
-        await global.db.engine.insert('cache', newCache)
-        await global.db.engine.insert('cache.when', when)
-        await global.db.engine.insert('cache.users', users)
+      let when = {
+        offline: null,
+        online: null,
+        upsert: true
       }
+      let users = {
+        followers: cache.followers,
+        subscribers: cache.subscribers,
+        upsert: true
+      }
+      let newCache = {
+        games_and_titles: _.get(cache, 'games_and_titles', {}),
+        gidToGame: _.get(cache, 'gidToGame', {}),
+        upsert: true
+      }
+      await global.db.engine.remove('cache', {_id: cache._id.toString()})
+      await global.db.engine.insert('cache', newCache)
+      await global.db.engine.insert('cache.when', when)
+      await global.db.engine.insert('cache.users', users)
     }
   }]
 }
