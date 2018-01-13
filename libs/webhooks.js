@@ -124,19 +124,18 @@ class Webhooks {
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
       debug('user API data" %o', userGetFromApi.body)
 
-      // save followed_at to cache
-      let when = await global.twitch.when()
-      when.followed_at = _.now()
-
       global.events.fire('follow', { username: userGetFromApi.body.data[0].login }) // we can safely fire event as user doesn't exist in db
       await Promise.all([
-        global.twitch.when(when),
-        global.db.engine.insert('users', { id: fid, username: userGetFromApi.body.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
+        global.db.engine.insert('users', { id: fid, username: userGetFromApi.body.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } }),
+        global.twitch.addUserInFollowerCache(user.username)
       ])
     } else {
       debug('user in db')
       debug('username: %s, is follower: %s, current time: %s, user time follow: %s', user.username, user.is.follower, _.now(), user.time.follow)
-      if (!user.is.follower && _.now() - user.time.follow > 60000 * 60) global.events.fire('follow', { username: user.username })
+      if (!user.is.follower && _.now() - user.time.follow > 60000 * 60) {
+        global.events.fire('follow', { username: user.username })
+        await global.twitch.addUserInFollowerCache(user.username)
+      }
 
       if (user.is.follower) global.users.set(user.username, {id: fid, time: { followCheck: new Date().getTime() }})
       else global.users.set(user.username, { id: fid, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })

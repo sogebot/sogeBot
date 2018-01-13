@@ -417,10 +417,7 @@ class Twitch {
         if (!user.is.follower) {
           if (new Date().getTime() - moment(user.time.follow).format('X') * 1000 < 60000 * 60 && !global.webhooks.existsInCache('follow', user.id)) {
             global.webhooks.addIdToCache('follow', user.id)
-
-            let when = await this.when()
-            when.followed_at = _.now()
-            await this.when(when)
+            await this.addUserInFollowerCache(user.username)
 
             if (!quiet) global.events.fire('follow', { username: follower })
             else {
@@ -1044,6 +1041,40 @@ class Twitch {
     } else {
       socket.emit('sendGameFromTwitch', _.map(request.body.games, 'name'))
     }
+  }
+
+  /* Correctly saves user in cached.followers and
+   * set when.followed_at
+   */
+  async addUserInFollowerCache (username) {
+    username = username.toLowerCase()
+    // save followed_at to cache
+    let [when, cached] = await Promise.all([this.when(), this.cached()])
+
+    when.followed_at = _.now()
+    if (!_.includes(cached.followers, username)) {
+      cached.followers.unshift(username)
+      cached.followers = _.uniq(cached.followers)
+      cached.followers = _.chunk(cached.followers, 100)[0]
+    }
+    await Promise.all([this.when(when), this.cached(cached)])
+  }
+
+  /* Correctly saves user in cached.subscribers and
+   * set when.subscribed_at
+   */
+  async addUserInSubscriberCache (username) {
+    username = username.toLowerCase()
+    // save subscribed_at to cache
+    let [when, cached] = await Promise.all([this.when(), this.cached()])
+
+    when.subscribed_at = _.now()
+    if (!_.includes(cached.subscribers, username)) {
+      cached.subscribers.unshift(username)
+      cached.subscribers = _.uniq(cached.subscribers)
+      cached.subscribers = _.chunk(cached.subscribers, 100)[0]
+    }
+    await Promise.all([this.when(when), this.cached(cached)])
   }
 }
 
