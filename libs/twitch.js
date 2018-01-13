@@ -153,8 +153,7 @@ class Twitch {
 
   async getChannelSubscribersOldAPI () {
     const d = debug('twitch:getChannelSubscribersOldAPI')
-
-    if (_.get(config, 'settings.broadcaster_oauth', '').match(/oauth:[\w]*/)) {
+    if (_.isNil(_.get(config, 'settings.broadcaster_oauth', '').match(/oauth:[\w]*/))) {
       return
     }
 
