@@ -55,30 +55,31 @@ let updates = async (from, to) => {
 
 let migration = {
   cache: [{
-    version: '5.10.0',
+    version: '5.12.0',
     do: async () => {
-      console.info('Migration cache to %s', '5.10.0')
+      console.info('Migration cache to %s', '5.12.0')
       let cache = await global.db.engine.findOne('cache')
 
       if (!_.isNil(cache.cachedGamesTitles)) {
-        let newCache = {
-          when: {
-            offline: null,
-            online: null
-          },
+        let when = {
+          offline: null,
+          online: null,
+          upsert: true
+        }
+        let users = {
           followers: cache.followers,
+          subscribers: cache.subscribers,
+          upsert: true
+        }
+        let newCache = {
           games_and_titles: cache.cachedGamesTitles,
           upsert: true
         }
 
         await global.db.engine.remove('cache', {_id: cache._id.toString()})
         await global.db.engine.insert('cache', newCache)
-      }
-
-      // remove all cache where is no upsert
-      let caches = await global.db.engine.find('cache', {})
-      for (let c of caches) {
-        if (_.isNil(c.upsert)) await global.db.engine.remove('cache', { _id: c._id.toString() })
+        await global.db.engine.insert('cache.when', when)
+        await global.db.engine.insert('cache.users', users)
       }
     }
   }]

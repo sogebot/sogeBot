@@ -28,5 +28,7 @@ module.exports = {
     await global.db.engine.remove('raffles', {})
     await global.db.engine.remove('users_ignorelist', {})
     await global.db.engine.remove('cache', {})
+    await global.db.engine.remove('cache.when', {})
+    await global.db.engine.remove('cache.users', {})
   }
 }
