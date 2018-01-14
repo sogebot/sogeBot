@@ -66,8 +66,8 @@ let migration = {
         upsert: true
       }
       let users = {
-        followers: cache.followers,
-        subscribers: cache.subscribers,
+        followers: _.get(cache, 'followers', []),
+        subscribers: _.get(cache, 'subscribers', []),
         upsert: true
       }
       let newCache = {
@@ -75,7 +75,8 @@ let migration = {
         gidToGame: _.get(cache, 'gidToGame', {}),
         upsert: true
       }
-      await global.db.engine.remove('cache', {_id: cache._id.toString()})
+
+      if (!_.isEmpty(cache)) await global.db.engine.remove('cache', {_id: cache._id.toString()})
       await global.db.engine.insert('cache', newCache)
       await global.db.engine.insert('cache.when', when)
       await global.db.engine.insert('cache.users', users)
