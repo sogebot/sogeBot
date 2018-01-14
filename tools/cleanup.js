@@ -84,7 +84,6 @@ async function cleanUsersDuplicates () {
   await db.engine.remove('users', {})
   for (let user of newUsers) {
     delete user._id
-    console.log(user)
     await db.engine.insert('users', user)
   }
 
