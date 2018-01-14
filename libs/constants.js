@@ -30,24 +30,24 @@ define(
 
 define(
   'COMMAND_REGEXP',
-  XRegExp(`!(?<command> [\\pL]* ) # command`, 'ix')
+  XRegExp(`!(?<command> [\\pL0-9]* ) # command`, 'ix')
 )
 
 define(
   'COMMAND_REGEXP_WITH_SPACES',
-  XRegExp(`!(?<command> [\\pL ]* ) # command`, 'ix')
+  XRegExp(`!(?<command> [\\pL0-9 ]* ) # command`, 'ix')
 )
 
 define(
   'ALIAS_REGEXP',
-  XRegExp(`!(?<alias> [\\pL ]*   ) # alias
+  XRegExp(`!(?<alias> [\\pL0-9 ]*   ) # alias
            \\s                     # empty space
-           !(?<command> [\\pL ]* ) # command`, 'ix')
+           !(?<command> [\\pL0-9 ]* ) # command`, 'ix')
 )
 
 define(
   'COOLDOWN_REGEXP',
-  XRegExp(`(?<command> !?[\\pL ]* ) # command
+  XRegExp(`(?<command> !?[\\pL0-9 ]* ) # command
            \\s                      # empty space
            (?<type> global|user   ) # type`, 'ix')
 )
@@ -56,14 +56,14 @@ define(
   'PERMISSION_REGEXP',
   XRegExp(`(?<type> viewer|mods|owner|regular|disable ) # type
            \\s                                          # empty space
-           !?(?<command> [\\pL ]*                     ) # command`, 'ix')
+           !?(?<command> [\\pL0-9 ]*                     ) # command`, 'ix')
 )
 
-define('KEYWORD_REGEXP', XRegExp(`(?<keyword> !?[\\pL]*)\\s(?<response> .*)`, 'ix'))
+define('KEYWORD_REGEXP', XRegExp(`(?<keyword> !?[\\pL0-9]*)\\s(?<response> .*)`, 'ix'))
 
 define(
   'COOLDOWN_REGEXP_SET',
-  XRegExp(`(?<command> !?[\\pL ]* ) # command
+  XRegExp(`(?<command> !?[\\pL0-9 ]* ) # command
            \\s                      # empty space
            (?<type> global|user   ) # type
            \\s                      # empty space
@@ -74,14 +74,14 @@ define(
 
 define(
   'COMMAND_REGEXP_WITH_RESPONSE',
-  XRegExp(`!(?<command> [\\pL]* ) # command
+  XRegExp(`!(?<command> [\\pL0-9]* ) # command
            \\s                    # empty space
            (?<response> .*      ) # response`, 'ix')
 )
 
 define(
   'COMMAND_REGEXP_WITH_OPTIONAL_RESPONSE',
-  XRegExp(`!(?<command> [\\pL]* ) # command
+  XRegExp(`!(?<command> [\\pL0-9]* ) # command
            ?\\s                   # empty space
            ?(?<response> .*     ) # optional response`, 'ix')
 )
