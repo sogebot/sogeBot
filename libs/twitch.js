@@ -80,12 +80,10 @@ class Twitch {
     if (data) {
       // setter
       await global.db.engine.update('cache.when', { upsert: true }, {
-        when: {
-          subscribed_at: _.get(data, 'subscribed_at', null),
-          followed_at: _.get(data, 'followed_at', null),
-          online: _.get(data, 'online', null),
-          offline: _.get(data, 'offline', null)
-        }
+        subscribed_at: _.get(data, 'subscribed_at', null),
+        followed_at: _.get(data, 'followed_at', null),
+        online: _.get(data, 'online', null),
+        offline: _.get(data, 'offline', null)
       })
       return {
         subscribed_at: _.get(data, 'subscribed_at', null),
@@ -97,10 +95,10 @@ class Twitch {
       // getter
       let cache = await global.db.engine.findOne('cache.when')
       return {
-        subscribed_at: _.get(cache, 'when.subscribed_at', null),
-        followed_at: _.get(cache, 'when.followed_at', null),
-        online: _.get(cache, 'when.online', null),
-        offline: _.get(cache, 'when.offline', null)
+        subscribed_at: _.get(cache, 'subscribed_at', null),
+        followed_at: _.get(cache, 'followed_at', null),
+        online: _.get(cache, 'online', null),
+        offline: _.get(cache, 'offline', null)
       }
     }
   }
@@ -110,11 +108,9 @@ class Twitch {
     if (data) {
       // setter
       await global.db.engine.update('cache.users', { upsert: true }, {
-        cached: {
-          followers: _.get(data, 'followers', []),
-          hosts: _.get(data, 'hosts', []),
-          subscribers: _.get(data, 'subscribers', [])
-        }
+        followers: _.get(data, 'followers', []),
+        hosts: _.get(data, 'hosts', []),
+        subscribers: _.get(data, 'subscribers', [])
       })
       return {
         followers: _.get(data, 'followers', []),
@@ -125,9 +121,9 @@ class Twitch {
       // getter
       let cache = await global.db.engine.findOne('cache.users')
       return {
-        followers: _.get(cache, 'cached.followers', []),
-        hosts: _.get(cache, 'cached.hosts', []),
-        subscribers: _.get(cache, 'cached.subscribers', [])
+        followers: _.get(cache, 'followers', []),
+        hosts: _.get(cache, 'hosts', []),
+        subscribers: _.get(cache, 'subscribers', [])
       }
     }
   }
