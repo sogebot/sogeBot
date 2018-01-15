@@ -134,8 +134,8 @@ Configuration.prototype.getValue = function (cfgName) {
 
 Configuration.prototype.loadValues = async function () {
   var self = this
-  let config = await global.db.engine.find('settings')
-  _.each(config, function (obj) {
+  let settings = await global.db.engine.find('settings')
+  _.each(settings, function (obj) {
     if (!_.isUndefined(self.cfgL[obj.key])) self.cfgL[obj.key].value = obj.value
   })
   global.log.info('Bot loaded configuration data')
