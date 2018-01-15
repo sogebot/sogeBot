@@ -74,6 +74,7 @@ async function cleanUsersDuplicates () {
   }
 
   let size = _.size(uniqueUsernames)
+  uniqueUsernames = _.uniq(uniqueUsernames)
 
   let newUsers = []
   for (var i = 0, len = uniqueUsernames.length; i < len; i++) {
