@@ -48,7 +48,7 @@ function Panel () {
       return
     }
 
-    if (origin.match(new RegExp('https?://' + domain))) {
+    if (origin.match(new RegExp('^((http|https)\\:\\/\\/|)([\\w|-]+\\.)?' + domain))) {
       res.set('Content-Type', 'application/javascript')
       res.send('const token="' + config.panel.token.trim() + '"')
     } else {
