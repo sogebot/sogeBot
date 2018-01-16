@@ -991,6 +991,7 @@ class Twitch {
         if (response.game.trim() === args.game.trim()) {
           global.commons.sendMessage(global.translate('game.change.success')
             .replace(/\$game/g, response.game), sender)
+          global.events.fire('game-changed', { oldGame: self.current.game, game: response.game })
           self.current.game = response.game
         } else {
           global.commons.sendMessage(global.translate('game.change.failed')

@@ -58,6 +58,14 @@
               <strong>$viewers</strong>
               <span data-lang="events-viewers-of-hosting"></span>
             </div>
+            <div id="gameInfo">
+              <strong>$game</strong>
+              <span data-lang="events-game-after-change"></span>
+            </div>
+            <div id="oldGameInfo">
+              <strong>$oldGame</strong>
+              <span data-lang="events-game-before-change"></span>
+            </div>
           </small>
         </div>
 
@@ -162,6 +170,8 @@
     $('#durationCommercialInfo').css('display', 'none')
     $('#targetInfo').css('display', 'none')
     $('#viewersInfo').css('display', 'none')
+    $('#gameInfo').css('display', 'none')
+    $('#oldGameInfo').css('display', 'none')
 
     $('#command2').val('')
     $('#count').val('')
@@ -230,6 +240,9 @@
         $('#countGroup').css('display', 'inline-block')
         $('#count').attr('placeholder', 'seconds to activate')
         break
+      case 'game-changed':
+        $('#gameInfo').css('display', 'block')
+        $('#oldGameInfo').css('display', 'block')
     }
   })
 
