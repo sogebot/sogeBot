@@ -66,6 +66,15 @@
           <span class="input-group-text" data-lang="eventlist-show"></span>
         </div>
       </div>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text" data-lang="followers-size"></span>
+        </div>
+        <input type="text" class="form-control" id="eventlistSize">
+        <div class="input-group-append">
+          <span class="input-group-text">px</span>
+        </div>
+      </div>
       <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('eventlist')" style="margin-top: 20px;" data-lang="remove-widget"></button>
     </div>
     <!-- /SETTINGS -->
@@ -108,6 +117,7 @@
     console.debug('widgetEventlistResubs', data.widgetEventlistResubs)
     console.debug('widgetEventlistOverflowHeight', data.widgetEventlistOverflowHeight)
     console.debug('widgetEventlistShow', data.widgetEventlistShow)
+    console.debug('widgetEventlistSize', data.widgetEventlistSize)
     console.groupEnd()
 
     if (data.widgetEventlistFollows.toString().trim().toLowerCase() !== 'true') {
@@ -127,6 +137,7 @@
     }
 
     window.sessionStorage.setItem('config.eventlist.height', data.widgetEventlistOverflowHeight)
+    window.sessionStorage.setItem('config.eventlist.size', data.widgetEventlistSize)
     window.sessionStorage.setItem('config.eventlist.show', data.widgetEventlistShow)
     window.sessionStorage.setItem('config.eventlist.follow', data.widgetEventlistFollows)
     window.sessionStorage.setItem('config.eventlist.host', data.widgetEventlistHosts)
@@ -135,6 +146,7 @@
     window.sessionStorage.setItem('config.eventlist.resub', data.widgetEventlistResubs)
 
     $('#eventlistShow').val(data.widgetEventlistShow)
+    $('#eventlistSize').val(data.widgetEventlistSize)
     $('#eventlistOverflowHeight').val(data.widgetEventlistOverflowHeight)
   })
 
@@ -178,7 +190,7 @@
       let icon = `<i title="${moment(event.timestamp).format('LLLL')}" data-timestamp="${event.timestamp}" class="eventlist-text">${moment(event.timestamp).fromNow()}</i>`
       let t = translations['eventlist-events'][event.event]
       if (event.event === 'follow') {
-        username = `<div class="col-9 eventlist-username">
+        username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t}</span>
           <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
@@ -266,6 +278,16 @@ $eventlistOverflow.on('focusout', function () {
   var data = {}
   data['widgetEventlistOverflowHeight'] = value
   window.sessionStorage.setItem('config.eventlist.height', value)
+  socket.emit('saveConfiguration', data)
+})
+
+var $eventlistSize = $('#eventlistSize')
+$eventlistSize.off()
+$eventlistSize.on('focusout', function () {
+  var value = $eventlistSize.val()
+  var data = {}
+  data['widgetEventlistSize'] = value
+  window.sessionStorage.setItem('config.eventlist.size', value)
   socket.emit('saveConfiguration', data)
 })
 </script>
