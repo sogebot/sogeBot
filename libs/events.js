@@ -27,7 +27,8 @@ function Events () {
     'mod': [], // $username
     'commercial': [], // $duration
     'timeout': [], // $username, $reason, $duration
-    'every-x-seconds': [] // needs definition = { definition: true, tTrigerred: new Date(), tCount: 60 }
+    'every-x-seconds': [], // needs definition = { definition: true, tTrigerred: new Date(), tCount: 60 }
+    'game-changed': [] // $oldGame, $game
   }
   this.eventsTemplate = _.cloneDeep(this.events)
 
@@ -35,23 +36,25 @@ function Events () {
     'send-chat-message': async function (attr) {
       if (_.isNil(attr.send)) return
 
-      let username = attr.username
+      let username = _.get(attr, 'username', global.parser.getOwner())
       let message = attr.send
       _.each(attr, function (val, name) {
-        let replace = new RegExp(`$${name}`, 'g')
+        debug(`Replacing $${name} with ${val}`)
+        let replace = new RegExp(`\\$${name}`, 'g')
         message = message.replace(replace, val)
       })
       message = await global.parser.parseMessage(message)
+
       global.commons.sendMessage(message, { username: username })
       delete attr.username
     },
     'send-whisper': async function (attr) {
       if (_.isNil(attr.username) || _.isNil(attr.send)) return
 
-      let username = attr.username
+      let username = _.get(attr, 'username', global.parser.getOwner())
       let message = attr.send
       _.each(attr, function (val, name) {
-        let replace = new RegExp(`$${name}`, 'g')
+        let replace = new RegExp(`\\$${name}`, 'g')
         message = message.replace(replace, val)
       })
       message = await global.parser.parseMessage(message)
@@ -65,7 +68,7 @@ function Events () {
       if (_.isNil(attr.quiet)) attr.quiet = false
       _.each(attr, function (val, name) {
         debug('replace $%s with value: %s', name, val)
-        let replace = new RegExp(`$${name}`, 'g')
+        let replace = new RegExp(`\\$${name}`, 'g')
         command = command.replace(replace, val)
       })
       debug(command)
@@ -320,6 +323,9 @@ Events.prototype._save = function (self) {
 Events.prototype.fire = async function (event, attr) {
   attr = attr || {}
 
+  debug('Event fired: %j', event)
+  debug('Attr: %j', attr)
+
   if (!_.isNil(attr.username)) {
     let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: attr.username })
     if (!_.isEmpty(ignoredUser) && attr.username !== config.settings.broadcaster_username) return
@@ -332,6 +338,7 @@ Events.prototype.fire = async function (event, attr) {
   var self = this
   _.each(operationsBulk, function (operations) {
     _.each(operations, function (operation) {
+      debug('Running op: %j', operation)
       if (operation.definition) {
         switch (event) {
           case 'command-send-x-times':
@@ -381,10 +388,11 @@ Events.prototype.fire = async function (event, attr) {
             }
             break
           default:
-            return false
+            return true
         }
         return false
       } else if (_.isFunction(self.operations[operation.name])) {
+        debug('Attribute ops to run: %j', _.merge(_.clone(operation), _.clone(attr)))
         self.operations[operation.name](_.merge(_.clone(operation), _.clone(attr))) // clone ops and attrs to not rewrite in db
       } else {
         global.log.warning('Operation doesn\'t exist', operation.name)
