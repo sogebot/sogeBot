@@ -38,7 +38,8 @@ function Events () {
       let username = attr.username
       let message = attr.send
       _.each(attr, function (val, name) {
-        message = message.replace('$' + name, val)
+        let replace = new RegExp(`$${name}`, 'g')
+        message = message.replace(replace, val)
       })
       message = await global.parser.parseMessage(message)
       global.commons.sendMessage(message, { username: username })
@@ -50,7 +51,8 @@ function Events () {
       let username = attr.username
       let message = attr.send
       _.each(attr, function (val, name) {
-        message = message.replace('$' + name, val)
+        let replace = new RegExp(`$${name}`, 'g')
+        message = message.replace(replace, val)
       })
       message = await global.parser.parseMessage(message)
       global.commons.sendMessage(message, { username: username, 'message-type': 'whisper' })
@@ -63,7 +65,8 @@ function Events () {
       if (_.isNil(attr.quiet)) attr.quiet = false
       _.each(attr, function (val, name) {
         debug('replace $%s with value: %s', name, val)
-        command = command.replace('$' + name, val)
+        let replace = new RegExp(`$${name}`, 'g')
+        command = command.replace(replace, val)
       })
       debug(command)
       command = await global.parser.parseMessage(command)
