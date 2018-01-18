@@ -133,7 +133,7 @@ class Webhooks {
       debug('user in db')
       debug('username: %s, is follower: %s, current time: %s, user time follow: %s', user.username, _.get(user, 'is.follower', false), _.now(), _.get(user, 'time.follow', 0))
       if (!_.get(user, 'is.follower', false) && _.now() - _.get(user, 'time.follow', 0) > 60000 * 60) {
-        global.events.fire('follow', { username: user.username, webhooks: true })
+        if (!global.parser.isBot(user.username)) global.events.fire('follow', { username: user.username, webhooks: true })
         await global.twitch.addUserInFollowerCache(user.username)
       }
 

@@ -413,7 +413,7 @@ class Twitch {
             global.webhooks.addIdToCache('follow', user.id)
             await this.addUserInFollowerCache(user.username)
 
-            if (!quiet) global.events.fire('follow', { username: follower })
+            if (!quiet && !global.parser.isBot(user.username)) global.events.fire('follow', { username: follower })
             else {
               global.overlays.eventlist.add({
                 type: 'follow',

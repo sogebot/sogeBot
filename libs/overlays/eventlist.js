@@ -31,6 +31,7 @@ EventList.prototype._getOverlay = async function (self) {
 }
 
 EventList.prototype.add = async function (data) {
+  if (global.parser.isBot(data.username)) return // don't save event from a bot
   const newEvent = {
     event: data.type,
     timestamp: _.now(),

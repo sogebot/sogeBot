@@ -184,6 +184,17 @@ Parser.prototype.isRegular = async function (user) {
   return (!_.isNil(user.is.regular) ? user.is.regular : false)
 }
 
+Parser.prototype.isBot = function (user) {
+  debug('isBot(%j)', user)
+  try {
+    if (_.isString(user)) user = { username: user }
+    return config.settings.bot_username.toLowerCase().trim() === user.username.toLowerCase().trim()
+  } catch (e) {
+    debug(e)
+    return true // we can expect, if user is null -> bot or admin
+  }
+}
+
 Parser.prototype.isOwner = function (user) {
   debug('isOwner(%j)', user)
   try {
