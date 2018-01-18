@@ -1,6 +1,189 @@
+<!-- New Event Listener Dialog -->
+<div class="modal fade" id="event-listener-new" tabindex="-1" role="dialog" aria-labelledby="event-listener-newLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="event-listener-newLabel">New event listener</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="event-listener-new-events-name">Name</label>
+            <input class="form-control" type="text" id="event-listener-new-events-name" placeholder="Set name of your event listener (if empty id is set as name)"
+            />
+          </div>
+          <div class="form-group">
+            <label for="event-listener-new-events" data-lang="event"></label>
+            <select class="form-control" data-load-events="1" id="event-listener-new-events"></select>
+          </div>
+          <div class="form-group">
+            <label data-usable-events="1">Usable events variables</label>
+            <small>
+              <div id="usernameInfo">
+                <strong>$username</strong>
+                <span data-lang="events-user-triggered-event"></span>
+              </div>
+              <div id="methodInfo">
+                <strong>$method</strong>
+                <span data-lang="events-method-used-to-subscribe"></span>
+              </div>
+              <div id="monthsInfo">
+                <strong>$months</strong>
+                <span data-lang="events-months-of-subscription"></span>
+              </div>
+              <div id="monthsNameInfo">
+                <strong>$monthsName</strong>
+                <span data-lang="events-monthsName-of-subscription"></span>
+              </div>
+              <div id="messageInfo">
+                <strong>$message</strong>
+                <span data-lang="events-user-message"></span>
+              </div>
+              <div id="bitsInfo">
+                <strong>$bits</strong>
+                <span data-lang="events-user-message"></span>
+              </div>
+              <div id="reasonInfo">
+                <strong>$reason</strong>
+                <span data-lang="events-reason-for-ban-timeout"></span>
+              </div>
+              <div id="durationInfo">
+                <strong>$duration</strong>
+                <span data-lang="events-duration-of-timeout"></span>
+              </div>
+              <div id="durationCommercialInfo">
+                <strong>$duration</strong>
+                <span data-lang="events-duration-of-commercial"></span>
+              </div>
+              <div id="targetInfo">
+                <strong>$target</strong>
+                <span data-lang="events-target-of-your-hosting"></span>
+              </div>
+              <div id="viewersInfo">
+                <strong>$viewers</strong>
+                <span data-lang="events-viewers-of-hosting"></span>
+              </div>
+              <div id="gameInfo">
+                <strong>$game</strong>
+                <span data-lang="events-game-after-change"></span>
+              </div>
+              <div id="oldGameInfo">
+                <strong>$oldGame</strong>
+                <span data-lang="events-game-before-change"></span>
+              </div>
+            </small>
+          </div>
+
+          <div class="form-group">
+              <button class="btn btn-outline-primary">
+                <i class="fa fa-plus" aria-hidden="true"></i> Filter
+              </button>
+              <button class="btn btn-outline-primary">
+                <i class="fa fa-plus" aria-hidden="true"></i> Operation
+              </button>
+            </div>
+
+          <div class="card">
+            <div class="card-header">
+              Event settings
+            </div>
+            <div class="card-body">
+              <div class="form-group" id="commandGroup" style="display: none">
+                <label for="command" data-lang="command"></label>
+                <input id="command" class="form-control" placeholder="Set your !command">
+              </div>
+
+              <div class="form-group" id="countGroup" style="display: none">
+                <label for="count" data-lang="count"></label>
+                <input id="count" class="form-control" placeholder="commands to activate">
+              </div>
+
+              <div class="form-group" id="timestampGroup" style="display: none">
+                <label for="timestamp" data-lang="timestamp"></label>
+                <input id="timestamp" class="form-control" placeholder="activate every x seconds">
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              Filters
+            </div>
+            <div class="card-body">
+              <textarea class="form-control">$sender.username -eq 'soge__' || $sender.username -eq 'satont'</textarea>
+              <select class="form-control">
+                <option>AND</option>
+                <option>OR</option>
+              </select>
+              <textarea class="form-control">$sender.is.follower is true</textarea>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              Operations
+            </div>
+            <div class="card-body">
+              <div class="operation-group">
+                <div class="input-group">
+                  <select class="form-control" data-load-operations="1" id="event-listener-new-operations"></select>
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-danger" type="button">
+                      <i class="fa fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="input-group" id="messageGroup">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" data-lang="message"></span>
+                  </div>
+                  <input id="message" class="form-control" placeholder="message to send">
+                </div>
+              </div>
+
+              <hr>
+
+              <div class="operation-group">
+                <div class="input-group">
+                  <select class="form-control" data-load-operations="1" id="event-listener-new-operations"></select>
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-danger" type="button">
+                      <i class="fa fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="input-group" id="messageGroup">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" data-lang="message"></span>
+                  </div>
+                  <input id="message" class="form-control" placeholder="message to send">
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <ul class="nav nav-tabs">
   <li class="nav-item">
     <span data-lang="event-listeners" class="title text-default"></span>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link btn-outline-success plus-button" data-toggle="modal" data-target="#event-listener-new">
+      <i class="fa fa-plus" aria-hidden="true"></i> EVENT
+    </button>
   </li>
 </ul>
 
@@ -9,80 +192,7 @@
     <div class="widget">
 
       <form class="form-inline form-chainops">
-        <div class="form-group">
-          <label for="Events" data-lang="event"></label>
-          <select id="events-list" class="form-control"></select>
 
-          <small>
-            <div id="usernameInfo">
-              <strong>$username</strong>
-              <span data-lang="events-user-triggered-event"></span>
-            </div>
-            <div id="methodInfo">
-              <strong>$method</strong>
-              <span data-lang="events-method-used-to-subscribe"></span>
-            </div>
-            <div id="monthsInfo">
-              <strong>$months</strong>
-              <span data-lang="events-months-of-subscription"></span>
-            </div>
-            <div id="monthsNameInfo">
-              <strong>$monthsName</strong>
-              <span data-lang="events-monthsName-of-subscription"></span>
-            </div>
-            <div id="messageInfo">
-              <strong>$message</strong>
-              <span data-lang="events-user-message"></span>
-            </div>
-            <div id="bitsInfo">
-              <strong>$bits</strong>
-              <span data-lang="events-user-message"></span>
-            </div>
-            <div id="reasonInfo">
-              <strong>$reason</strong>
-              <span data-lang="events-reason-for-ban-timeout"></span>
-            </div>
-            <div id="durationInfo">
-              <strong>$duration</strong>
-              <span data-lang="events-duration-of-timeout"></span>
-            </div>
-            <div id="durationCommercialInfo">
-              <strong>$duration</strong>
-              <span data-lang="events-duration-of-commercial"></span>
-            </div>
-            <div id="targetInfo">
-              <strong>$target</strong>
-              <span data-lang="events-target-of-your-hosting"></span>
-            </div>
-            <div id="viewersInfo">
-              <strong>$viewers</strong>
-              <span data-lang="events-viewers-of-hosting"></span>
-            </div>
-            <div id="gameInfo">
-              <strong>$game</strong>
-              <span data-lang="events-game-after-change"></span>
-            </div>
-            <div id="oldGameInfo">
-              <strong>$oldGame</strong>
-              <span data-lang="events-game-before-change"></span>
-            </div>
-          </small>
-        </div>
-
-        <div class="form-group" id="commandGroup" style="display: none">
-          <label for="command" data-lang="command"></label>
-          <input id="command" class="form-control" placeholder="Set your !command">
-        </div>
-
-        <div class="form-group" id="countGroup" style="display: none">
-          <label for="count" data-lang="count"></label>
-          <input id="count" class="form-control" placeholder="commands to activate">
-        </div>
-
-        <div class="form-group" id="timestampGroup" style="display: none">
-          <label for="timestamp" data-lang="timestamp"></label>
-          <input id="timestamp" class="form-control" placeholder="activate every x seconds">
-        </div>
 
         <br>
 
@@ -155,7 +265,7 @@
     }
   })
 
-  $('#events-list').on('change', function (ev) {
+  $('[data-load-events="1"]').on('change', function (ev) {
     $('#commandGroup').css('display', 'none')
     $('#countGroup').css('display', 'none')
     $('#timestampGroup').css('display', 'none')
@@ -172,6 +282,7 @@
     $('#viewersInfo').css('display', 'none')
     $('#gameInfo').css('display', 'none')
     $('#oldGameInfo').css('display', 'none')
+    $('[data-usable-events="1"]').css('display', 'none')
 
     $('#command2').val('')
     $('#count').val('')
@@ -185,64 +296,74 @@
       case 'action':
       case 'mod':
         $('#usernameInfo').css('display', 'block')
+        $('[data-usable-events="1"]').css('display', 'block')
         break
       case 'subscription':
         $('#usernameInfo').css('display', 'block')
         $('#methodInfo').css('display', 'block')
+        $('[data-usable-events="1"]').css('display', 'block')
         break
       case 'commercial':
         $('#durationCommercialInfo').css('display', 'block')
+        $('[data-usable-events="1"]').css('display', 'block')
         break
       case 'resub':
         $('#usernameInfo').css('display', 'block')
         $('#monthsInfo').css('display', 'block')
         $('#monthsNameInfo').css('display', 'block')
         $('#messageInfo').css('display', 'block')
+        $('[data-usable-events="1"]').css('display', 'block')
         break
       case 'cheer':
         $('#usernameInfo').css('display', 'block')
         $('#bitsInfo').css('display', 'block')
         $('#messageInfo').css('display', 'block')
+        $('[data-usable-events="1"]').css('display', 'block')
         break
       case 'ban':
         $('#usernameInfo').css('display', 'block')
         $('#reasonInfo').css('display', 'block')
+        $('[data-usable-events="1"]').css('display', 'block')
         break
       case 'timeout':
         $('#usernameInfo').css('display', 'block')
         $('#reasonInfo').css('display', 'block')
         $('#durationInfo').css('display', 'block')
+        $('[data-usable-events="1"]').css('display', 'block')
         break
       case 'hosting':
         $('#targetInfo').css('display', 'block')
         $('#viewersInfo').css('display', 'block')
+        $('[data-usable-events="1"]').css('display', 'block')
         break
       case 'hosted':
         $('#viewersInfo').css('display', 'block')
         $('#usernameInfo').css('display', 'block')
+        $('[data-usable-events="1"]').css('display', 'block')
         break
       case 'command-send-x-times':
-        $('#commandGroup').css('display', 'inline-block')
-        $('#countGroup').css('display', 'inline-block')
+        $('#commandGroup').css('display', 'block')
+        $('#countGroup').css('display', 'block')
         $('#count').attr('placeholder', 'commands to activate')
-        $('#timestampGroup').css('display', 'inline-block')
+        $('#timestampGroup').css('display', 'block')
         break
       case 'number-of-viewers-is-at-least-x':
-        $('#countGroup').css('display', 'inline-block')
+        $('#countGroup').css('display', 'block')
         $('#count').attr('placeholder', 'viewers to activate')
-        $('#timestampGroup').css('display', 'inline-block')
+        $('#timestampGroup').css('display', 'block')
         break
       case 'stream-is-running-x-minutes':
-        $('#countGroup').css('display', 'inline-block')
+        $('#countGroup').css('display', 'block')
         $('#count').attr('placeholder', 'minutes to activate')
         break
       case 'every-x-seconds':
-        $('#countGroup').css('display', 'inline-block')
+        $('#countGroup').css('display', 'block')
         $('#count').attr('placeholder', 'seconds to activate')
         break
       case 'game-changed':
         $('#gameInfo').css('display', 'block')
         $('#oldGameInfo').css('display', 'block')
+        $('[data-usable-events="1"]').css('display', 'block')
     }
   })
 
@@ -263,20 +384,20 @@
       case 'send-chat-message':
       case 'send-twitter-message':
       case 'send-whisper':
-        $('#messageGroup').css('display', 'inline-block')
+        $('#messageGroup').css('display', 'block')
         break
       case 'run-command':
-        $('#command2Group').css('display', 'inline-block')
-        $('#quietGroup').css('display', 'inline-block')
+        $('#command2Group').css('display', 'block')
+        $('#quietGroup').css('display', 'block')
         break
       case 'play-sound':
-        $('#soundGroup').css('display', 'inline-block')
+        $('#soundGroup').css('display', 'block')
         break
       case 'emote-explosion':
-        $('#emotesGroup').css('display', 'inline-block')
+        $('#emotesGroup').css('display', 'block')
         break
       case 'start-commercial':
-        $('#commercialGroup').css('display', 'inline-block')
+        $('#commercialGroup').css('display', 'block')
         break
     }
   })
@@ -380,10 +501,11 @@
       case 'mod':
       case 'timeout':
       case 'commercial':
+      case 'game-changed':
         delete data.definition
     }
     socket.emit('events.new', data)
-    $('#messageGroup').css('display', 'inline-block')
+    $('#messageGroup').css('display', 'block')
     $('#message').val('')
     $('#soundGroup').css('display', 'none')
     $('#emotesGroup').css('display', 'none')
@@ -400,8 +522,10 @@
     $('#operations-list').empty()
 
     _.each(data.events, function (o, k) {
-      $('#events-list').append(
+      $('[data-load-events="1"]').append(
         $('<option></option').attr('value', k).text(translations[k]))
+      $('[data-load-events="1"]').trigger('change') // manually trigger change to load correct data
+
       if (o.length) {
         let div_part
         let div_main = $('<div id="' + k + '"></div>')
@@ -431,28 +555,28 @@
 
               if (operation.command) {
                 div_part = $(
-                    '<div style="min-width:100px;display:inline-block;padding-top:0;" ></div>')
+                    '<div style="min-width:100px;display:block;padding-top:0;" ></div>')
                   .append($('<label></label>').text(translations['command']))
                   .append($('<div style="display:block;"></div>').text(operation.command))
                 div_def.append(div_part)
               }
               if (operation.tCount) {
                 div_part = $(
-                    '<div style="min-width:100px;display:inline-block;padding-top:0;" ></div>')
+                    '<div style="min-width:100px;display:block;padding-top:0;" ></div>')
                   .append($('<label></label>').text(translations['count']))
                   .append($('<div style="display:block;"></div>').text(operation.tCount))
                 div_def.append(div_part)
               }
               if (operation.viewers) {
                 div_part = $(
-                    '<div style="min-width:100px;display:inline-block;padding-top:0;" ></div>')
+                    '<div style="min-width:100px;display:block;padding-top:0;" ></div>')
                   .append($('<label></label>').text(translations['count']))
                   .append($('<div style="display:block;"></div>').text(operation.viewers))
                 div_def.append(div_part)
               }
               if (operation.tTimestamp) {
                 div_part = $(
-                    '<div style="min-width:100px;display:inline-block;padding-top:0;" ></div>')
+                    '<div style="min-width:100px;display:block;padding-top:0;" ></div>')
                   .append($('<label></label>').text(translations['timestamp']))
                   .append($('<div style="display:block"></div>').text(operation.tTimestamp))
                 div_def.append(div_part)
@@ -510,31 +634,14 @@
           })
         })
         $('#events-current').append(div_main)
-
-        // refresh right-click menu
-        var menu = new BootstrapMenu(".operation", {
-          fetchElementData: function ($el) {
-            return $el.data();
-          },
-          actions: [{
-            name: 'Delete Operation',
-            classNames: ['action-danger'],
-            iconClass: 'fa-trash-o',
-            onClick: function (data) {
-              socket.emit('events.delete', data)
-            }
-          }]
-        })
       }
     })
     _.each(data.operations, function (o) {
       if (o === 'log') return true
-      $('#operations-list').append(
+      $('[data-load-operations="1"]').append(
         $('<option></option').attr('value', o).text(translations[o])
       )
     })
   })
-
-  $('#usernameInfo').css('display', 'block')
 
 </script>
