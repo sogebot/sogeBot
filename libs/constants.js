@@ -37,7 +37,7 @@ define(
   'ALIAS_REGEXP',
   XRegExp(`!(?<alias> [\\pL ]*   ) # alias
            \\s                     # empty space
-           !(?<command> [\\pL ]* ) # command`, 'ix')
+           !(?<command> .* ) # command`, 'ix')
 )
 
 define(
