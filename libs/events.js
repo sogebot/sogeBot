@@ -1,35 +1,72 @@
 'use strict'
 
-var moment = require('moment')
 var _ = require('lodash')
-const debug = require('debug')('events')
-const config = require('../config.json')
+const debug = require('debug')
 
-function Events () {
-  this.events = {
-    'user-joined-channel': [], // $username
-    'user-parted-channel': [], // $username
-    'follow': [], // $username
-    'unfollow': [], // $username
-    'subscription': [], // $username, (method)
-    'resub': [], // $username, $months, $message
-    'command-send-x-times': [], // needs definition => { definition: true, command: '!smile', tCount: 10, tSent: 0, tTimestamp: 40000, tTriggered: new Date() }
-    'number-of-viewers-is-at-least-x': [], // needs definition => { definition: true, viewers: 100, tTriggered: false, tTimestamp: 40000 } (if tTimestamp === 0 run once)
-    'stream-started': [],
-    'stream-stopped': [],
-    'stream-is-running-x-minutes': [], // needs definition = { definition: true, tCount: 100, tTriggered: false }
-    'cheer': [], // $username, $bits, $message
-    'clearchat': [],
-    'action': [], // $username
-    'ban': [], // $username, $reason
-    'hosting': [], // $target, $viewers
-    'hosted': [], // $username, $viewers, $autohost
-    'mod': [], // $username
-    'commercial': [], // $duration
-    'timeout': [], // $username, $reason, $duration
-    'every-x-seconds': [], // needs definition = { definition: true, tTrigerred: new Date(), tCount: 60 }
-    'game-changed': [] // $oldGame, $game
+class Events {
+  constructor () {
+    this.supportedEventsList = [
+      { id: 'user-joined-channel', variables: [ 'username', 'userObject' ] },
+      { id: 'user-parted-channel', variables: [ 'username', 'userObject' ] },
+      { id: 'follow', variables: [ 'username', 'userObject' ] },
+      { id: 'unfollow', variables: [ 'username', 'userObject' ] },
+      { id: 'subscription', variables: [ 'username', 'userObject', 'method' ] },
+      { id: 'resub', variables: [ 'username', 'userObject', 'months', 'monthsName', 'message' ] },
+      { id: 'command-send-x-times', variables: [ 'command', 'count' ], definitions: { runEveryXCommands: 10, commandToWatch: '', runInterval: 0 } }, // runInterval 0 or null - disabled; > 0 every x seconds
+      { id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 } }, // runInterval 0 or null - disabled; > 0 every x seconds
+      { id: 'stream-started' },
+      { id: 'stream-stopped' },
+      { id: 'stream-is-running-x-minutes', definitions: { runEveryXMinutes: 100 } },
+      { id: 'cheer', variables: [ 'username', 'userObject', 'bits', 'message' ] },
+      { id: 'clearchat' },
+      { id: 'action', variables: [ 'username', 'userObject' ] },
+      { id: 'ban', variables: [ 'username', 'userObject', 'reason' ] },
+      { id: 'hosting', variables: [ 'target', 'viewers' ] },
+      { id: 'hosted', variables: [ 'username', 'userObject', 'viewers', 'autohost' ] },
+      { id: 'mod', variables: [ 'username', 'userObject' ] },
+      { id: 'commercial', variables: [ 'duration' ] },
+      { id: 'timeout', variables: [ 'username', 'userObject', 'reason', 'duration' ] },
+      { id: 'every-x-seconds', definitions: { runEveryXSeconds: 600 } },
+      { id: 'game-changed', variables: [ 'oldGame', 'game' ] }
+    ]
+
+    this.supportedOperationsList = [
+      { id: 'send-chat-message', definitions: { messageToSend: '' } },
+      { id: 'send-whisper', definitions: { messageToSend: '' } },
+      { id: 'run-command', definitions: { commandToRun: '', isCommandQuiet: false } },
+      { id: 'play-sound', definitions: { urlOfSoundFile: '' } },
+      { id: 'emote-explosion', definitions: { emotesToExplode: '' } },
+      { id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] } }
+      /* TODO: twitter tweet update */
+      /* TODO: move event logging outside of ops list */
+    ]
+
+    global.panel.addMenu({category: 'manage', name: 'event-listeners', id: 'events'})
+    this.sockets()
   }
+
+  async fire (eventId, attributes) {
+    const d = debug('events:fire')
+    if (!_.isNil(attributes.username)) attributes.senderObj = await global.users.get(attributes.username)
+    d('Firing event %s with attrs: %j', eventId, attributes)
+  }
+
+  sockets () {
+    const d = debug('events:sockets')
+    const io = global.panel.io.of('/events')
+
+    io.on('connection', (socket) => {
+      d('Socket /events connected, registering sockets')
+      socket.on('list.supported.events', (callback) => {
+        callback(this.supportedEventsList); d('list.supported.events => %s, %j', null, this.supportedEventsList)
+      })
+      socket.on('list.supported.operations', (callback) => {
+        callback(this.supportedOperationsList); d('list.supported.operations => %s, %j', null, this.supportedOperationsList)
+      })
+    })
+  }
+}
+/*
   this.eventsTemplate = _.cloneDeep(this.events)
 
   this.operations = {
@@ -400,5 +437,5 @@ Events.prototype.fire = async function (event, attr) {
     })
   })
 }
-
+*/
 module.exports = Events

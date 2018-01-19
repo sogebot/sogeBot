@@ -192,6 +192,54 @@
     }
   },
   "webpanel": {
+    "events": {
+      "definitions": {
+        "runEveryXCommands": {
+          "label": "Run Every X Commands",
+          "placeholder": "Number of commands before event is triggered"
+        },
+        "commandToWatch": {
+          "label": "Command To Watch",
+          "placeholder": "Set your !commandToWatch"
+        },
+        "viewersAtLeast": {
+          "label": "Viewers At Least",
+          "placeholder": "How many viewers at least to trigger event"
+        },
+        "runInterval": {
+          "label": "Run Interval (0 = run once per stream)",
+          "placeholder": "Trigger event every x seconds"
+        },
+        "runEveryXMinutes": {
+          "label": "Run Every X Minutes",
+          "placeholder": "Trigger event every x minutes"
+        },
+        "messageToSend": {
+          "label": "Message To Send",
+          "placeholder": "Set your message"
+        },
+        "commandToRun": {
+          "label": "Command To Run",
+          "placeholder": "Set your !commandToRun"
+        },
+        "isCommandQuiet": {
+          "label": "Should be command quiet",
+          "placeholder": "Toggle to set command quiet"
+        },
+        "urlOfSoundFile": {
+          "label": "Url Of Your Sound File",
+          "placeholder": "http://www.pathToYour.url/where/is/file.mp3"
+        },
+        "emotesToExplode": {
+          "label": "Emotes To Explode",
+          "placeholder": "List of emotes to explode, e.g. Kappa PurpleHeart"
+        },
+        "durationOfCommercial": {
+          "label": "Duration Of Commercial",
+          "placeholder": "Available durations - 30, 60, 90, 120, 150, 180"
+        }
+      }
+    },
     "eventlist-events": {
       "follow": "<strong>followed</strong> you",
       "host": "<strong>hosted</strong> you with $viewers viewers",
@@ -253,7 +301,18 @@
         "ticketsName": "Tickets name",
         "fromUsername": "From username",
         "toUsername": "To username",
-        "items": "Items"
+        "items": "Items",
+        "bits": "Bits",
+        "message": "Message",
+        "reason": "Reason",
+        "target": "Target",
+        "autohost": "Autohost (true/false)",
+        "duration": "Duration",
+        "method": "Method",
+        "months": "Months",
+        "monthsName": "localized name of month (1 month, 2 months)",
+        "oldGame": "Game before change",
+        "userObject": "Full user object"
       }
     },
     "page-settings": {

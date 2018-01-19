@@ -10,102 +10,38 @@
       </div>
       <div class="modal-body">
         <form>
-          <div class="form-group">
-            <label for="event-listener-new-events-name">Name</label>
-            <input class="form-control" type="text" id="event-listener-new-events-name" placeholder="Set name of your event listener (if empty id is set as name)"
-            />
-          </div>
-          <div class="form-group">
-            <label for="event-listener-new-events" data-lang="event"></label>
-            <select class="form-control" data-load-events="1" id="event-listener-new-events"></select>
-          </div>
-          <div class="form-group">
-            <label data-usable-events="1">Usable events variables</label>
-            <small>
-              <div id="usernameInfo">
-                <strong>$username</strong>
-                <span data-lang="events-user-triggered-event"></span>
-              </div>
-              <div id="methodInfo">
-                <strong>$method</strong>
-                <span data-lang="events-method-used-to-subscribe"></span>
-              </div>
-              <div id="monthsInfo">
-                <strong>$months</strong>
-                <span data-lang="events-months-of-subscription"></span>
-              </div>
-              <div id="monthsNameInfo">
-                <strong>$monthsName</strong>
-                <span data-lang="events-monthsName-of-subscription"></span>
-              </div>
-              <div id="messageInfo">
-                <strong>$message</strong>
-                <span data-lang="events-user-message"></span>
-              </div>
-              <div id="bitsInfo">
-                <strong>$bits</strong>
-                <span data-lang="events-user-message"></span>
-              </div>
-              <div id="reasonInfo">
-                <strong>$reason</strong>
-                <span data-lang="events-reason-for-ban-timeout"></span>
-              </div>
-              <div id="durationInfo">
-                <strong>$duration</strong>
-                <span data-lang="events-duration-of-timeout"></span>
-              </div>
-              <div id="durationCommercialInfo">
-                <strong>$duration</strong>
-                <span data-lang="events-duration-of-commercial"></span>
-              </div>
-              <div id="targetInfo">
-                <strong>$target</strong>
-                <span data-lang="events-target-of-your-hosting"></span>
-              </div>
-              <div id="viewersInfo">
-                <strong>$viewers</strong>
-                <span data-lang="events-viewers-of-hosting"></span>
-              </div>
-              <div id="gameInfo">
-                <strong>$game</strong>
-                <span data-lang="events-game-after-change"></span>
-              </div>
-              <div id="oldGameInfo">
-                <strong>$oldGame</strong>
-                <span data-lang="events-game-before-change"></span>
-              </div>
-            </small>
-          </div>
-
-          <div class="form-group">
-              <button class="btn btn-outline-primary">
-                <i class="fa fa-plus" aria-hidden="true"></i> Filter
-              </button>
-              <button class="btn btn-outline-primary">
-                <i class="fa fa-plus" aria-hidden="true"></i> Operation
-              </button>
-            </div>
-
           <div class="card">
             <div class="card-header">
-              Event settings
+              Event
             </div>
             <div class="card-body">
-              <div class="form-group" id="commandGroup" style="display: none">
-                <label for="command" data-lang="command"></label>
-                <input id="command" class="form-control" placeholder="Set your !command">
+              <div class="form-group">
+                <label for="event-listener-new-events-name">Name</label>
+                <input class="form-control" type="text" id="event-listener-new-events-name" placeholder="Set name of your event listener (if empty id is set as name)"
+                />
               </div>
 
-              <div class="form-group" id="countGroup" style="display: none">
-                <label for="count" data-lang="count"></label>
-                <input id="count" class="form-control" placeholder="commands to activate">
-              </div>
-
-              <div class="form-group" id="timestampGroup" style="display: none">
-                <label for="timestamp" data-lang="timestamp"></label>
-                <input id="timestamp" class="form-control" placeholder="activate every x seconds">
+              <div class="form-group">
+                <label for="event-listener-new-events" data-lang="event"></label>
+                <select class="form-control" data-load-events="1" id="event-listener-new-events"></select>
               </div>
             </div>
+          </div>
+
+          <div class="card" data-event-variables>
+            <div class="card-header">
+                Usable events variables
+            </div>
+            <div class="card-body">
+              <small></small>
+            </div>
+          </div>
+
+          <div class="card" data-event-definitions>
+            <div class="card-header">
+              Settings
+            </div>
+            <div class="card-body"></div>
           </div>
 
           <div class="card">
@@ -113,58 +49,18 @@
               Filters
             </div>
             <div class="card-body">
-              <textarea class="form-control">$sender.username -eq 'soge__' || $sender.username -eq 'satont'</textarea>
-              <select class="form-control">
-                <option>AND</option>
-                <option>OR</option>
-              </select>
-              <textarea class="form-control">$sender.is.follower is true</textarea>
+              <textarea class="form-control"></textarea>
             </div>
           </div>
 
           <div class="card">
             <div class="card-header">
+              <button class="btn btn-outline-primary" onclick="addEventOperation(event)">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+              </button>
               Operations
             </div>
-            <div class="card-body">
-              <div class="operation-group">
-                <div class="input-group">
-                  <select class="form-control" data-load-operations="1" id="event-listener-new-operations"></select>
-                  <div class="input-group-append">
-                    <button class="btn btn-outline-danger" type="button">
-                      <i class="fa fa-minus"></i>
-                    </button>
-                  </div>
-                </div>
-
-                <div class="input-group" id="messageGroup">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" data-lang="message"></span>
-                  </div>
-                  <input id="message" class="form-control" placeholder="message to send">
-                </div>
-              </div>
-
-              <hr>
-
-              <div class="operation-group">
-                <div class="input-group">
-                  <select class="form-control" data-load-operations="1" id="event-listener-new-operations"></select>
-                  <div class="input-group-append">
-                    <button class="btn btn-outline-danger" type="button">
-                      <i class="fa fa-minus"></i>
-                    </button>
-                  </div>
-                </div>
-
-                <div class="input-group" id="messageGroup">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" data-lang="message"></span>
-                  </div>
-                  <input id="message" class="form-control" placeholder="message to send">
-                </div>
-              </div>
-            </div>
+            <div class="card-body" data-event-operations></div>
           </div>
         </form>
       </div>
@@ -190,65 +86,152 @@
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="viewers">
     <div class="widget">
-
-      <form class="form-inline form-chainops">
-
-
-        <br>
-
-        <div class="form-group" id="operationsGroup">
-          <label for="Operations" data-lang="operation"></label>
-          <select id="operations-list" class="form-control"></select>
-        </div>
-
-        <div class="form-group" id="messageGroup">
-          <label for="message" data-lang="message"></label>
-          <input id="message" class="form-control" placeholder="message to send">
-        </div>
-
-        <div class="form-group" id="command2Group" style="display: none">
-          <label for="command2" data-lang="command"></label>
-          <input id="command2" class="form-control" placeholder="!command to run">
-        </div>
-
-        <div class="form-group" id="quietGroup" style="display: none">
-          <label for="quiet" data-lang="quiet"></label>
-          <button class="btn btn-danger" id="quietToggle" data-lang="false"></button>
-        </div>
-
-        <div class="form-group" id="soundGroup" style="display: none">
-          <label for="sound" data-lang="sound"></label>
-          <input id="sound" class="form-control" placeholder="link or soundboard name">
-        </div>
-
-        <div class="form-group" id="emotesGroup" style="display: none">
-          <label for="emotes" data-lang="emotes"></label>
-          <input id="emotes" class="form-control" placeholder="Kappa :) purpleHeart">
-        </div>
-
-        <div class="form-group" id="commercialGroup" style="display: none">
-          <label for="duration" data-lang="duration"></label>
-          <select class="form-control" id="commercial-list">
-            <option value="30">30s</option>
-            <option value="60">60s</option>
-            <option value="90">90s</option>
-            <option value="120">120s</option>
-            <option value="150">150s</option>
-            <option value="180">180s</option>
-          </select>
-        </div>
-
-        <button type="button" class="btn btn-success pull-right" data-lang="create-a-new-event-listener" onclick="newEvent()"></button>
-        <div class="clearfix"></div>
-      </form>
-      <hr>
-
-      <div id="events-current"></div>
     </div>
   </div>
 </div>
 
 <script>
+  var eventsSocket = io('/events', {
+    query: "token=" + token
+  })
+
+  var supportedEventsList = []
+  eventsSocket.emit('list.supported.events', (cb) => {
+    supportedEventsList = cb
+    console.debug('Loaded list of supported events:', supportedEventsList)
+    // load options to event select
+    for (let value of _.map(supportedEventsList, 'id')) $('[data-load-events="1"]').append(
+      `<option value='${value}'>${translations[value]}</option>`)
+    $('[data-load-events]').trigger('change')
+  })
+
+  $('[data-load-events="1"]').change((ev) => {
+    const event = _.find(supportedEventsList, (o) => o.id === ev.currentTarget.value)
+    const variables = _.get(event, 'variables', [])
+    const definitions = _.get(event, 'definitions', [])
+    console.debug('Event selected', event)
+
+    // VARIABLES ////////////////////////////////////////////////////////////////
+    if (variables.length > 0) {
+      $('[data-event-variables]').css('display', 'block')
+      $('[data-event-variables] small').empty()
+
+      const whatsthis =
+        `<a data-events-whats-this class="badge badge-pill badge-light" data-html="true"
+                                title="<em>Example of user object data</em>
+                                       <br> <b>userObject.id</b>: '123456'
+                                       <br> <b>userObject.username</b>: 'exampleuser'
+                                       <br> <b>userObject.is.online</b>: true
+                                       <br> <b>userObject.is.follower</b>: true <br> <b>userObject.is.regular</b>: true
+                                       <br> <b>userObject.is.subscriber</b>: true">
+                          what's this?
+                        </a>`
+      for (let variable of variables) {
+        $('[data-event-variables] small').append(
+          `
+          <div>
+            <strong>$${variable}</strong> - ${translations.responses.variable[variable]}
+            ${variable === 'userObject'
+              ? whatsthis
+              : ``}
+          </div>
+        `
+        )
+
+        if (variable === 'userObject') {
+          $('[data-events-whats-this]').tooltip()
+        }
+      }
+    } else {
+      $('[data-event-variables]').css('display', 'none')
+    }
+    // !VARIABLES ///////////////////////////////////////////////////////////////
+
+    // DEFINITIONS ////////////////////////////////////////////////////////////
+    $('[data-event-definitions] .card-body').empty()
+    if (_.size(definitions) > 0) {
+      $('[data-event-definitions]').css('display', 'block')
+      console.debug('Definitions', definitions)
+      for (let [key, value] of Object.entries(definitions))
+      {
+        $('[data-event-definitions] .card-body').append(`
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">${translations.events.definitions[key].label}</span>
+            </div>
+            <input id="definition[${key}]" class="form-control" placeholder="${translations.events.definitions[key].placeholder}" value="${value}">
+          </div>
+        `)
+      }
+    } else {
+      $('[data-event-definitions]').css('display', 'none')
+    }
+    // !DEFINITIONS ///////////////////////////////////////////////////////////
+  })
+
+  var supportedOperationsList = []
+  eventsSocket.emit('list.supported.operations', (cb) => {
+    supportedOperationsList = cb
+    console.debug('Loaded list of supported operations:', supportedOperationsList)
+  })
+
+  // dynamic on change for operations
+  $('[data-event-operations]').on('change', 'select', (ev) => {
+    const operation = _.find(supportedOperationsList, (o) => o.id === ev.currentTarget.value)
+    const definitions = _.get(operation, 'definitions', [])
+    console.debug('Operation selected', operation)
+
+    // DEFINITIONS ////////////////////////////////////////////////////////////
+    const definitionsElement = $(ev.currentTarget).parents('.operation-group').children('.event-operation-definitions')
+    definitionsElement.empty()
+    console.debug('Definitions', definitions)
+    for (let [key, value] of Object.entries(definitions))
+    {
+      definitionsElement  .append(`
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">${translations.events.definitions[key].label}</span>
+          </div>
+          <input id="definition[${key}]" class="form-control" placeholder="${translations.events.definitions[key].placeholder}" value="${value}">
+        </div>
+      `)
+    }
+    // !DEFINITIONS /////////////////////////////////////////////////////////
+  });
+
+  // HELPERS //////////////////////////////////////////////////////////////////
+  var addEventOperation = (ev) => {
+    ev.preventDefault()
+
+    let operationOptions = () => {
+      let r = []
+      for (let id of _.map(supportedOperationsList, 'id')) r.push(`<option value="${id}">${translations[id]}</option>`)
+      return r.join()
+    }
+
+    $('[data-event-operations]').append(`
+      <div class="operation-group">
+        <div class="input-group">
+          <select class="form-control">
+            ${operationOptions()}
+          </select>
+          <div class="input-group-append">
+            <button class="btn btn-outline-danger" type="button" onclick="removeEventOperation(event, this)">
+              <i class="fa fa-minus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="event-operation-definitions"></div>
+      </div>
+    `)
+  }
+
+  let removeEventOperation = (ev, self) => {
+    ev.preventDefault()
+    $(self).parents('.operation-group').remove()
+  }
+
+  /*
   socket.emit('events.get');
 
   $("#quietToggle").on('click', function (ev) {
@@ -643,5 +626,6 @@
       )
     })
   })
+*/
 
 </script>

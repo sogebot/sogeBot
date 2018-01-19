@@ -776,7 +776,7 @@ abbr[data-original-title], abbr[title] {
   top: 5px;
 }
 
-.badge {
+span.badge {
   font-size: 100%;
   text-transform: uppercase;
   font-weight: bold;
@@ -1146,4 +1146,19 @@ blockquote {
 
 #ignorelist-textarea:focus + button {
   display: block;
+}
+
+.operation-group:first-child() {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.operation-group:last-child() {
+  padding-bottom: 0;
+}
+
+.operation-group {
+  padding-top: .5rem;
+  padding-bottom: .5rem;
+  border-top: 1px dotted $gray-200
 }
