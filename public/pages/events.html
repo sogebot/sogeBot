@@ -243,8 +243,9 @@
       return r.join()
     }
 
+    const id = new Date().getTime()
     $('[data-event-operations]').append(`
-      <div class="operation-group" id="${new Date().getTime()}">
+      <div class="operation-group" id="${id}">
         <div class="input-group">
           <select class="form-control" data-event-operation-select>
             ${operationOptions()}
@@ -258,7 +259,7 @@
         <div class="event-operation-definitions"></div>
       </div>
     `)
-    $('[data-event-operations] select').trigger('change')
+    $(`#${id} select`).trigger('change')
   }
 
   var removeEventOperation = (ev, self) => {
