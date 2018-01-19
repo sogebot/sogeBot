@@ -14,9 +14,12 @@ function Twitter () {
       access_token_secret: config.integrations.twitter.secretToken
     })
 
+    console.warn('TODO: twitter events deprecated')
+    /*
     this.addEvent(this)
     global.panel.addWidget('twitter', 'widget-title-twitter', 'twitter')
     global.panel.socketListening(this, 'twitter.send', this.send)
+    */
   }
 }
 

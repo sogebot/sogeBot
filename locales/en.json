@@ -224,7 +224,8 @@
         },
         "isCommandQuiet": {
           "label": "Should be command quiet",
-          "placeholder": "Toggle to set command quiet"
+          "true": "Command will be quiet",
+          "false": "Command won't be quiet"
         },
         "urlOfSoundFile": {
           "label": "Url Of Your Sound File",

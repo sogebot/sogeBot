@@ -37,7 +37,6 @@ class Events {
       { id: 'play-sound', definitions: { urlOfSoundFile: '' } },
       { id: 'emote-explosion', definitions: { emotesToExplode: '' } },
       { id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] } }
-      /* TODO: twitter tweet update */
       /* TODO: move event logging outside of ops list */
     ]
 
@@ -47,7 +46,7 @@ class Events {
 
   async fire (eventId, attributes) {
     const d = debug('events:fire')
-    if (!_.isNil(attributes.username)) attributes.senderObj = await global.users.get(attributes.username)
+    if (!_.isNil(_.get(attributes, 'username', null))) attributes.senderObj = await global.users.get(attributes.username)
     d('Firing event %s with attrs: %j', eventId, attributes)
   }
 
@@ -62,6 +61,10 @@ class Events {
       })
       socket.on('list.supported.operations', (callback) => {
         callback(this.supportedOperationsList); d('list.supported.operations => %s, %j', null, this.supportedOperationsList)
+      })
+      socket.on('save-changes', (data, callback) => {
+        d('save-changes - %j', data)
+        callback(null, 'Saved ok Kappa')
       })
     })
   }
