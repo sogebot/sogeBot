@@ -337,8 +337,14 @@ class Twitch {
   async getLatest100Followers (quiet) {
     const d = debug('twitch:getLatest100Followers')
 
-    // if channelId is not set and we are in bounds of safe rate limit, wait until limit is refreshed
-    if (_.isNil(global.channelId) || (this.remainingAPICalls <= 5 && this.refreshAPICalls * 1000 > _.now())) {
+    // check if everything is properly loaded
+    if (_.isNil(global.channelId) && _.isNil(global.overlays)) {
+      setTimeout(() => this.getLatest100Followers(quiet), 1000)
+      return
+    }
+
+    // we are in bounds of safe rate limit, wait until limit is refreshed
+    if (this.remainingAPICalls <= 5 && this.refreshAPICalls * 1000 > _.now()) {
       if ((this.remainingAPICalls <= 5 && this.refreshAPICalls > _.now() / 1000)) {
         d('Waiting for rate-limit to refresh')
       }
