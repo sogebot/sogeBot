@@ -86,7 +86,7 @@
     editName: function (id, value) {
       socket.emit('keywords.editKeyword', {
         id: id,
-        value: value
+        value: value.replace(/(<([^>]+)>)/ig,"") // strip HTML from name
       })
     },
     edit: function (id, value) {

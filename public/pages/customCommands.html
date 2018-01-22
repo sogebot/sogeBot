@@ -100,7 +100,7 @@
     editName: function (id, value) {
       socket.emit('customcommands.editCommand', {
         id: id,
-        value: value
+        value: value.replace(/(<([^>]+)>)/ig,"") // strip HTML from name
       })
     },
     edit: function (id, value) {

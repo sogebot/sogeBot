@@ -133,7 +133,7 @@ var timers = {
   },
   editName: (el) => {
     console.group('TIMERS - editName')
-    console.log({ id: $(el).data().id, value: $(el).val().replace(/ /g, '_') })
+    console.log({ id: $(el).data().id, value: $(el).val().replace(/ /g, '_').replace(/(<([^>]+)>)/ig,"") })  // replace empty space with _ and strip HTML from name
     let toValidate = $(el).val().replace(/ /g, '_')
     if (toValidate.match(/^([^\W]+)$/)) {
       $(el).removeClass('is-invalid')
