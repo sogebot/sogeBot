@@ -234,7 +234,12 @@ Gambling.prototype.fightme = async function (self, sender, text) {
     username = text.trim().match(/^@?([\S]+)$/)[1].toLowerCase()
     sender.username = sender.username.toLowerCase()
   } catch (e) {
-    global.commons.sendMessage(global.translate('gambling.fightme.notEnoughOptions'), sender) // TODO
+    global.commons.sendMessage(global.translate('gambling.fightme.notEnoughOptions'), sender)
+    return
+  }
+
+  if (sender.username === username) {
+    global.commons.sendMessage(global.translate('gambling.fightme.cannotFightWithYourself'), sender)
     return
   }
 

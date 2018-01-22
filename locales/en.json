@@ -960,6 +960,7 @@
       "timeout": "Seppuku timeout set to $values"
     },
     "fightme": {
+      "cannotFightWithYourself": "$sender, you cannot fight with yourself!",
       "cooldown": "$sender, you cannot use !fightme for $cooldown $minutesName.",
       "timeout": "FightMe! timeout set to $values",
       "challenge": "(ง'̀-'́)ง $sender wants to fight you $username! If you accept, send !fightme $sender",
