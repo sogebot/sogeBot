@@ -81,11 +81,18 @@
       <i class="fa fa-plus" aria-hidden="true"></i> EVENT
     </button>
   </li>
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#manage" data-lang="manage"></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#test-wizard" data-lang="test-wizard"></a>
+  </li>
 </ul>
 
 <div class="tab-content">
-  <div role="tabpanel" class="tab-pane active" id="viewers">
+  <div role="tabpanel" class="tab-pane active" id="manage">
     <div class="widget">
+      <div class="card-columns p-2" id="eventlist-cards"></div>
     </div>
   </div>
 </div>
@@ -306,16 +313,16 @@
           break
         case 'TEXTAREA':
           if ($(element).attr('id') === 'event-listener-filter') {
-            eventListener.event.filters = $(element).val()
+            eventListener.filters = $(element).val()
           }
           break
         case 'SELECT':
           if ($(element).attr('id') === 'event-listener-new-events') {
-            eventListener.event.id = $(element).val()
+            eventListener.event.key = $(element).val()
           } else if (!_.isNil($(element).data('event-operation-select'))) {
             let parentId = $(element).parents('.operation-group').attr('id')
             if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = { id: null, definitions: {}}
-            eventListener.operations[parentId].id = $(element).val()
+            eventListener.operations[parentId].key = $(element).val()
           } else {
             console.debug('I dont know what to do', element)
           }
@@ -339,5 +346,35 @@
       console.log(cb)
     })
   }
+
+  eventsSocket.emit('list.events', (err, cb) => {
+    $('#eventlist-cards').empty()
+    for (let event of cb.events) {
+      $('#eventlist-cards').append(`
+        <div class="card">
+          <div class="card-body" style="display: none" data-card-delete-confirm="${event.name}">
+            <p>Are you sure you want to <strong class="text-danger">delete</strong> event '<strong>${event.name}</strong>'?</p>
+            <div class="text-center">
+              <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="timers.deleteTimer(this)">YES</a>
+              <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="flipCardBack(this)">NO</a>
+            </div>
+          </div>
+          <div class="card-body mb-0 pb-0 pt-2" data-card="${event.name}">
+            <h5 class="card-title">
+              ${event.enabled ? `<span class="badge badge-pill badge-primary">Enabled</span>` : `<span class="badge badge-pill badge-light">Disabled</span>` }
+              ${event.name}
+              <div style="float:right; font-size: 2rem; position: relative; top:-.4rem;" class="text-muted"><strong>5</strong></div>
+            </h5>
+          </div>
+
+        <div class="card-footer text-center">
+          <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="timers.toggle(this)">${event.enabled ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> Disable`: `<i class="fa fa-toggle-on" aria-hidden="true"></i> Enable`}</a>
+          <a href="#" class="btn btn-outline-secondary"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
+          <a href="#" class="btn btn-outline-danger" data-card="${event.name}" onclick="flipCard(this)"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a>
+        </div>
+      `)
+    }
+    console.log(cb)
+  })
 
 </script>

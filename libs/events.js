@@ -1,7 +1,8 @@
 'use strict'
 
-var _ = require('lodash')
+const _ = require('lodash')
 const debug = require('debug')
+const crypto = require('crypto')
 
 class Events {
   constructor () {
@@ -62,9 +63,55 @@ class Events {
       socket.on('list.supported.operations', (callback) => {
         callback(this.supportedOperationsList); d('list.supported.operations => %s, %j', null, this.supportedOperationsList)
       })
-      socket.on('save-changes', (data, callback) => {
+      socket.on('save-changes', async (data, callback) => {
         d('save-changes - %j', data)
-        callback(null, 'Saved ok Kappa')
+        if (_.isNil(data._id)) { // save event as new (without _id)
+          var eventId = null
+          try {
+            const event = {
+              name: data.name.trim().length ? data.name : 'events#' + crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5),
+              key: data.event.key,
+              enabled: true,
+              definitions: data.event.definitions
+            }
+            eventId = (await global.db.engine.insert('events', event))._id.toString()
+
+            let insertArray = []
+            insertArray.push(global.db.engine.insert('events.filters', {
+              eventId: eventId,
+              filters: data.filters
+            }))
+            for (let operation of Object.entries(data.operations)) {
+              operation = operation[1]
+              insertArray.push(global.db.engine.insert('events.operations', {
+                eventId: eventId,
+                key: operation.key,
+                definitions: operation.definitions
+              }))
+            }
+            await Promise.all(insertArray)
+            callback(null, true)
+          } catch (e) {
+            global.log.error(e.message)
+
+            if (!_.isNill(eventId)) { // eventId is created, rollback all changes
+              await Promise.all([
+                global.db.engine.remove('events', { _id: eventId }),
+                global.db.engine.remove('events.filter', { eventId: eventId }),
+                global.db.engine.remove('events.operation', { eventId: eventId })
+              ])
+            }
+            callback(e, e.message)
+          }
+        }
+      })
+      socket.on('list.events', async (callback) => {
+        let [events, operations, filters] = await Promise.all([
+          global.db.engine.find('events'),
+          global.db.engine.find('events.operations'),
+          global.db.engine.find('events.filters')
+        ])
+        callback(null, { events: events, operations: operations, filters: filters })
       })
     })
   }

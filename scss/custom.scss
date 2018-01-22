@@ -791,6 +791,16 @@ kbd {
   font-size: 100%
 }
 
+h5 .badge {
+  font-size: 0.7rem;
+  text-transform: initial;
+  font-weight: normal;
+  padding: .3rem;
+  border-radius: 1rem;
+  position: relative;
+  bottom: .3rem;
+}
+
 .badge-user {
   background-color: $orange;
   color: $white;
