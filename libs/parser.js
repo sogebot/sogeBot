@@ -54,8 +54,8 @@ function Parser () {
 }
 
 Parser.prototype.parse = async function (user, message, skip) {
-  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: user.username })
-  if (!_.isEmpty(ignoredUser) && user.username !== config.settings.broadcaster_username) return
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: _.get(user, 'username', '') })
+  if (!_.isEmpty(ignoredUser) && _.get(user, 'username', '') !== config.settings.broadcaster_username) return
 
   skip = skip || false
   this.linesParsed++
@@ -92,9 +92,9 @@ Parser.prototype.addToQueue = async function (user, message, skip) {
 }
 
 Parser.prototype.parseCommands = async function (user, message, skip) {
-  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: user.username })
   message = message.trim()
-  if (!_.isEmpty(ignoredUser) && user.username !== config.settings.broadcaster_username) return
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: _.get(user, 'username', '') })
+  if (!_.isEmpty(ignoredUser) && _.get(user, 'username', '') !== config.settings.broadcaster_username) return
 
   if (!message.startsWith('!')) return // do nothing, this is not a command or user is ignored
   for (var cmd in this.registeredCmds) {
@@ -176,7 +176,7 @@ Parser.prototype.isMod = async function (user) {
 }
 
 Parser.prototype.isRegular = async function (user) {
-  if (!_.isNil(user)) return false
+  if (_.isNil(user)) return false
 
   if (_.isString(user)) user = await global.users.get(user)
   else user = await global.users.get(user.username)
@@ -317,6 +317,16 @@ Parser.prototype.parseMessage = async function (message, attr) {
     }
   }
   let command = {
+    '(!!#)': async function (filter) {
+      if (!_.isString(attr.sender)) attr.sender = attr.sender.username
+      let cmd = filter
+        .replace('!', '') // replace first !
+        .replace(/\(|\)/g, '')
+        .replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + attr.sender)
+        .replace(/\$param/g, attr.param)
+      global.parser.parseCommands(null, cmd, true)
+      return ''
+    },
     '(!#)': async function (filter) {
       if (!_.isString(attr.sender)) attr.sender = attr.sender.username
       let cmd = filter
