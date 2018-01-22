@@ -289,7 +289,8 @@ Parser.prototype.parseMessage = async function (message, attr) {
       if ((global.parser.isOwner(attr.sender) || attr.sender.mod) &&
         (!_.isUndefined(attr.param) && attr.param.length !== 0)) {
         await global.db.engine.update('customvars', { key: variable }, { key: variable, value: attr.param })
-        global.commons.sendMessage('$sender ' + attr.param, attr.sender)
+        let msg = global.commons.prepare('filters.setVariable', { value: attr.param, variable: variable })
+        global.commons.sendMessage(msg, attr.sender)
         return ''
       }
       let cvar = await global.db.engine.findOne('customvars', { key: variable })

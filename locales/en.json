@@ -233,6 +233,7 @@
         "nextrank": "Next rank",
         "username": "Username",
         "value": "Value",
+        "variable": "Variable",
         "count": "Count",
         "link": "Link (translated)",
         "winner": "Winner",
@@ -1045,5 +1046,8 @@
         "ignored": "$sender, user $username is ignored by bot"
       }
     }
+  },
+  "filters": {
+    "setVariable": "$sender, $variable was set to $value."
   }
 }

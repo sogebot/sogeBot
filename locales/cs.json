@@ -233,6 +233,7 @@
         "nextrank": "Další rank",
         "username": "Uživatelské jméno",
         "value": "Hodnota",
+        "variable": "Proměnná",
         "count": "Počet",
         "link": "Link (přeloženo)",
         "winner": "Vítěz",
@@ -1045,5 +1046,8 @@
         "ignored": "$sender, uzivatel $username je botem ignorovan"
       }
     }
+  },
+  "filters": {
+    "setVariable": "$sender, $variable bylo nastaveno na $value."
   }
 }
