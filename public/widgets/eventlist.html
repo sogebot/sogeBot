@@ -269,6 +269,7 @@
     data['widgetEventlistShow'] = value
     window.sessionStorage.setItem('config.eventlist.show', value)
     socket.emit('saveConfiguration', data)
+    socket.emit('widget.eventlist.get')
   })
 
 var $eventlistOverflow = $('#eventlistOverflowHeight')
@@ -279,6 +280,7 @@ $eventlistOverflow.on('focusout', function () {
   data['widgetEventlistOverflowHeight'] = value
   window.sessionStorage.setItem('config.eventlist.height', value)
   socket.emit('saveConfiguration', data)
+  socket.emit('widget.eventlist.get')
 })
 
 var $eventlistSize = $('#eventlistSize')
@@ -289,5 +291,6 @@ $eventlistSize.on('focusout', function () {
   data['widgetEventlistSize'] = value
   window.sessionStorage.setItem('config.eventlist.size', value)
   socket.emit('saveConfiguration', data)
+  socket.emit('widget.eventlist.get')
 })
 </script>
