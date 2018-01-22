@@ -113,6 +113,21 @@ class Events {
         ])
         callback(null, { events: events, operations: operations, filters: filters })
       })
+      socket.on('toggle.event', async (eventId, callback) => {
+        let eventFromDb = await global.db.engine.findOne('events', { _id: eventId })
+        if (_.isEmpty(eventFromDb)) return callback(new Error('Event not found'), null)
+
+        let updatedEvent = await global.db.engine.update('events', { _id: eventId }, { enabled: !eventFromDb.enabled })
+        callback(null, updatedEvent)
+      })
+      socket.on('delete.event', async (eventId, callback) => {
+        await Promise.all([
+          global.db.engine.remove('events', { _id: eventId }),
+          global.db.engine.remove('events.filter', { eventId: eventId }),
+          global.db.engine.remove('events.operation', { eventId: eventId })
+        ])
+        callback(null, eventId)
+      })
     })
   }
 }

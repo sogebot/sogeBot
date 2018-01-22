@@ -102,6 +102,31 @@
     query: "token=" + token
   })
 
+  var events = {
+    toggle: (el) => {
+      eventsSocket.emit('toggle.event', el.dataset.id, (err, cb) => {
+        if (err) return console.error(err)
+
+        $(`.badge[data-id="${el.dataset.id}"]`)
+          .removeClass()
+          .addClass(cb.enabled? 'badge badge-pill badge-primary' : 'badge badge-pill badge-light')
+          .text(cb.enabled? 'Enabled' : 'Disabled')
+
+        $(`.btn-toggle[data-id="${el.dataset.id}"]`)
+          .html(cb.enabled
+            ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> Disable`
+            : `<i class="fa fa-toggle-on" aria-hidden="true"></i> Enable`)
+      })
+    },
+    delete: (el) => {
+      eventsSocket.emit('delete.event', el.dataset.id, (err, cb) => {
+        if (err) return console.error(err)
+        $(`[data-card-delete-popover=${cb}]`).popover('hide')
+        $(`.card[data-id='${cb}']`).velocity('fadeOut')
+      })
+    }
+  }
+
   var supportedEventsList = []
   eventsSocket.emit('list.supported.events', (cb) => {
     supportedEventsList = cb
@@ -350,31 +375,85 @@
   eventsSocket.emit('list.events', (err, cb) => {
     $('#eventlist-cards').empty()
     for (let event of cb.events) {
-      $('#eventlist-cards').append(`
-        <div class="card">
-          <div class="card-body" style="display: none" data-card-delete-confirm="${event.name}">
-            <p>Are you sure you want to <strong class="text-danger">delete</strong> event '<strong>${event.name}</strong>'?</p>
-            <div class="text-center">
-              <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="timers.deleteTimer(this)">YES</a>
-              <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="flipCardBack(this)">NO</a>
+      let operationsCount = _.filter(cb.operations, (o) => o.eventId === event._id.toString()).length
+      let filter = _.find(cb.filters, (o) => o.eventId === event._id.toString()).filters
+
+      let definitionOutput = []
+      for (let [key, value] of Object.entries(event.definitions)) {
+        definitionOutput.push(`
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">${translations.events.definitions[key].label}</span>
             </div>
+            <input class="form-control" value="${value}" disabled="disabled">
           </div>
+        `)
+      }
+
+      $('#eventlist-cards').append(`
+        <div class="card" data-id="${event._id.toString()}">
           <div class="card-body mb-0 pb-0 pt-2" data-card="${event.name}">
             <h5 class="card-title">
-              ${event.enabled ? `<span class="badge badge-pill badge-primary">Enabled</span>` : `<span class="badge badge-pill badge-light">Disabled</span>` }
-              ${event.name}
-              <div style="float:right; font-size: 2rem; position: relative; top:-.4rem;" class="text-muted"><strong>5</strong></div>
+              ${event.enabled ? `<span class="badge badge-pill badge-primary" data-id="${event._id.toString()}">Enabled</span>` : `<span class="badge badge-pill badge-light" data-id="${event._id.toString()}">Disabled</span>` }
+              <strong>${event.name}</strong> <small class="text-muted">${event.key}</small>
+              <div style="float:right; position: relative; top:-.4rem;" class="text-muted"><i class="fa fa-cogs" style="position: relative; top:-.3rem; font-size: 1rem;" aria-hidden="true"></i> <strong style="font-size: 2rem; ">${operationsCount}</strong></div>
             </h5>
           </div>
 
-        <div class="card-footer text-center">
-          <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="timers.toggle(this)">${event.enabled ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> Disable`: `<i class="fa fa-toggle-on" aria-hidden="true"></i> Enable`}</a>
-          <a href="#" class="btn btn-outline-secondary"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
-          <a href="#" class="btn btn-outline-danger" data-card="${event.name}" onclick="flipCard(this)"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a>
+          ${definitionOutput.join('')}
+
+          ${filter.length ? `<div class="card-footer" data-card="${event.name}">
+              <small style="font-family: Monospace">${filter}</small>
+              <i class="fa fa-filter text-muted" style="float: right; font-size: 1.5rem;"></i>
+            </div>` : ``}
+
+          <div class="card-footer text-center">
+            <a href="#" class="btn btn-outline-secondary btn-toggle" data-id="${event._id.toString()}" onclick="events.toggle(this)">${event.enabled ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> Disable`: `<i class="fa fa-toggle-on" aria-hidden="true"></i> Enable`}</a>
+            <a href="#" class="btn btn-outline-secondary"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
+            <a href="#" class="btn btn-outline-danger" data-card-delete-popover="${event._id.toString()}" data-container="body" data-toggle="popover"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a>
+          </div>
         </div>
       `)
+
+      $(`[data-card-delete-popover="${event._id.toString()}"]`).popover({
+        html: true,
+        content: `
+          <p>Are you sure you want to <strong class="text-danger">delete</strong> event '<strong>${event.name}</strong>'?</p>
+          <div class="text-center">
+            <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="events.delete(this)">YES</a>
+            <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="$('[data-card-delete-popover=${event._id.toString()}]').popover('hide')">NO</a>
+          </div>`
+      })
     }
-    console.log(cb)
   })
+
+  function flipCard (e) {
+   let card = $(e).data('card')
+
+   if ($(`div[data-card="${card}"]`).css('opacity') === '0') return
+
+   $(`div.card-body[data-card="${card}"], div.card-footer[data-card="${card}"]`)
+     .velocity('fadeOut', 500)
+   $(`div[data-card-delete-confirm="${card}"]`)
+     .css('height', height)
+     .velocity('fadeIn', {
+       delay: 500,
+       duration: 500
+     })
+ }
+
+ function flipCardBack (e) {
+   let card = $(e).data('id')
+
+   if ($(`div[data-card="${card}"]`).css('opacity') === '1') return
+
+   $(`div[data-card-delete-confirm="${card}"]`)
+     .velocity('fadeOut', 500)
+   $(`div[data-card="${card}"]`)
+     .velocity('fadeIn', {
+       delay: 500,
+       duration: 500
+     })
+ }
 
 </script>
