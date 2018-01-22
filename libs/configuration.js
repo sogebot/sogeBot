@@ -114,7 +114,6 @@ Configuration.prototype.setValue = async function (self, sender, text, quiet) {
     })
     global.panel.io.emit('configuration', emit)
   } catch (err) {
-    console.log(err)
     global.commons.sendMessage('Sorry, $sender, cannot parse !set command.', sender)
   }
 }

@@ -82,6 +82,7 @@
 </div>
 
 <script>
+  window.sessionStorage.setItem('config.eventlist.configured', false)
   var eventlist = {
     toggle: function (el) {
       let boolValue = window.sessionStorage.getItem(`config.eventlist.${el.dataset.id}`) === 'true' ? true : (window.sessionStorage.getItem(`config.eventlist.${el.dataset.id}`) === 'false' ? false : window.sessionStorage.getItem(`config.eventlist.${el.dataset.id}`));
@@ -105,8 +106,6 @@
       socket.emit('widget.eventlist.get')
     }
   }
-
-  socket.emit('widget.eventlist.get')
 
   socket.once('configuration', function (data) {
     console.group('Eventlist widgets settings')
@@ -136,6 +135,7 @@
       $('button[data-id="resub"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
 
+    window.sessionStorage.setItem('config.eventlist.configured', true)
     window.sessionStorage.setItem('config.eventlist.height', data.widgetEventlistOverflowHeight)
     window.sessionStorage.setItem('config.eventlist.size', data.widgetEventlistSize)
     window.sessionStorage.setItem('config.eventlist.show', data.widgetEventlistShow)
@@ -148,11 +148,18 @@
     $('#eventlistShow').val(data.widgetEventlistShow)
     $('#eventlistSize').val(data.widgetEventlistSize)
     $('#eventlistOverflowHeight').val(data.widgetEventlistOverflowHeight)
+
+    // emit after configuration is set
+    socket.emit('widget.eventlist.get')
   })
 
   socket.off('widget.eventlist')
   socket.on('widget.eventlist', function (o) {
     if (_.isNil(o)) return
+    if (window.sessionStorage.getItem('config.eventlist.configured') === 'false') {
+      console.debug('Eventlist is not properly configured yet, waiting')
+      return
+    }
 
     let colors = {
       follow: 'red',
@@ -293,4 +300,6 @@ $eventlistSize.on('focusout', function () {
   socket.emit('saveConfiguration', data)
   socket.emit('widget.eventlist.get')
 })
+
+socket.emit('getConfiguration')
 </script>
