@@ -116,7 +116,7 @@
     editName: function (id, value, options) {
       socket.emit('cooldown.editName', {
         id: id,
-        value: value,
+        value: value.replace(/(<([^>]+)>)/ig,""),  // strip HTML from name
         type: options.type
       })
     },
