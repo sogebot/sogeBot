@@ -1,5 +1,6 @@
 const _ = require('lodash')
 const figlet = require('figlet')
+const config = require('../config.json')
 
 // db
 const Database = require('../libs/databases/database')
@@ -25,6 +26,7 @@ global.db = new Database();
   console.info(('-').repeat(56))
   console.info('Current bot version: %s', process.env.npm_package_version)
   console.info('DB version: %s', dbVersion)
+  console.info('DB engine: %s', config.database.type)
   console.info(('-').repeat(56))
 
   await updates(dbVersion, process.env.npm_package_version)
@@ -76,7 +78,7 @@ let migration = {
         upsert: true
       }
 
-      if (!_.isEmpty(cache)) await global.db.engine.remove('cache', {_id: cache._id.toString()})
+      await global.db.engine.remove('cache', {_id: _.get(cache, '_id', '').toString()})
       await global.db.engine.insert('cache', newCache)
       await global.db.engine.insert('cache.when', when)
       await global.db.engine.insert('cache.users', users)
