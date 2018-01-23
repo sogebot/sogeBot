@@ -104,23 +104,28 @@
 
   var events = {
     toggle: (el) => {
+      $(el).removeClass().addClass('btn btn-info')
       eventsSocket.emit('toggle.event', el.dataset.id, (err, cb) => {
         if (err) return console.error(err)
+        $(el).removeClass().addClass('btn btn-outline-secondary')
 
         $(`.badge[data-id="${el.dataset.id}"]`)
           .removeClass()
           .addClass(cb.enabled? 'badge badge-pill badge-primary' : 'badge badge-pill badge-light')
           .text(cb.enabled? 'Enabled' : 'Disabled')
 
-        $(`.btn-toggle[data-id="${el.dataset.id}"]`)
+        $(el)
           .html(cb.enabled
             ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> Disable`
             : `<i class="fa fa-toggle-on" aria-hidden="true"></i> Enable`)
       })
     },
     delete: (el) => {
+      // change button to informative state
+      $(el).removeClass().addClass('btn btn-info')
       eventsSocket.emit('delete.event', el.dataset.id, (err, cb) => {
         if (err) return console.error(err)
+        $(el).removeClass().addClass('btn btn-outline-secondary')
         $(`[data-card-delete-popover=${cb}]`).popover('hide')
         $(`.card[data-id='${cb}']`).velocity('fadeOut')
       })
@@ -398,6 +403,7 @@
               <strong>${event.name}</strong> <small class="text-muted">${event.key}</small>
               <div style="float:right; position: relative; top:-.4rem;" class="text-muted"><i class="fa fa-cogs" style="position: relative; top:-.3rem; font-size: 1rem;" aria-hidden="true"></i> <strong style="font-size: 2rem; ">${operationsCount}</strong></div>
             </h5>
+            <div class="clearfix"></div>
           </div>
 
           ${definitionOutput.join('')}
