@@ -30,7 +30,7 @@ function Parser () {
   var self = this
   setInterval(function () {
     _.each(queue, function (val, id) {
-      if (queue.hasOwnProperty(id) && queue[id].success === queue[id].started && queue[id].started > 0) {
+      if (queue.hasOwnProperty(id) && queue[id].success === queue[id].started && queue[id].startedAll) {
         self.parseCommands(queue[id].user, queue[id].message, queue[id].skip)
 
         if (!_.isUndefined(queue[id].user.id)) {
@@ -70,25 +70,32 @@ Parser.prototype.addToQueue = async function (user, message, skip) {
     success: 0,
     user: user,
     message: message,
+    startedAll: false,
     skip: skip
   }
   queue[id] = data
 
-  for (var parser in _(this.registeredParsers).toPairs().sortBy(0).fromPairs().value()) {
-    if (typeof queue[id] === 'undefined') break
+  if (_.isNil(this.registeredParsersValues)) this.registeredParsersValues = _(this.registeredParsers).toPairs().sortBy(0).fromPairs().value()
+  debug('Parser list: %o', this.registeredParsersValues)
+  for (var parser in this.registeredParsersValues) {
+    if (typeof queue[id] === 'undefined') {
+      debug('Removed from queue')
+      break
+    }
 
-    let isRegular = await this.isRegular(user)
-    let isMod = await this.isMod(user)
+    let [isRegular, isMod] = await Promise.all([this.isRegular(user), this.isMod(user)])
     if (this.permissionsParsers[parser] === constants.VIEWERS ||
         (this.permissionsParsers[parser] === constants.REGULAR && (isRegular || isMod || this.isOwner(user))) ||
         (this.permissionsParsers[parser] === constants.MODS && (isMod || this.isOwner(user))) ||
         (this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user))) {
       if (!_.isNil(queue[id])) {
         queue[id].started = parseInt(queue[id].started, 10) + 1
-        this.registeredParsers[parser](this.selfParsers[parser], id, user, message, skip)
+        debug('Running parser - ' + parser)
+        await this.registeredParsers[parser](this.selfParsers[parser], id, user, message, skip)
       }
     }
   }
+  if (!_.isNil(queue[id])) queue[id].startedAll = true // set to startedAll if queue is still existing (didn't fail)
 }
 
 Parser.prototype.parseCommands = async function (user, message, skip) {
@@ -603,12 +610,14 @@ Parser.prototype.parseMessageEach = async function (filters, msg, removeWhenEmpt
 // these needs to be global, will be called from called parsers
 global.updateQueue = function (id, success) {
   if (success && typeof queue[id] !== 'undefined') {
+    debug(queue)
     queue[id].success = parseInt(queue[id].success, 10) + 1
   } else {
     if (!_.isUndefined(queue[id]) && !_.isUndefined(queue[id].user.id)) {
       const index = _.findIndex(global.parser.timer, function (o) { return o.id === queue[id].user.id })
       if (!_.isUndefined(global.parser.timer[index])) global.parser.timer[index].sent = new Date().getTime()
     }
+    debug('Removing in updateQueue')
     global.removeFromQueue(id)
   }
 }
