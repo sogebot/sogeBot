@@ -27,7 +27,7 @@ describe('System - Moderation', function () {
         return global.commons.sendMessage.calledWith(
           global.translate('core.settings.moderation.moderationLinksWithSpaces.true'))
       } else return false
-    }, 5000)
+    }, 10000)
   })
   beforeEach(() => {
     global.commons.timeout.reset()
@@ -38,12 +38,12 @@ describe('System - Moderation', function () {
       before(async () => {
         global.commons.sendMessage.reset()
         global.parser.parse(owner, '!set moderationLinks false')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledOnce, 10000)
       })
       after(async () => {
         global.commons.sendMessage.reset()
         global.parser.parse(owner, '!set moderationLinks true')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledOnce, 10000)
       })
       it('will not timeout user', function (done) {
         global.parser.parse(testUser, 'http://www.google.com')
@@ -71,85 +71,85 @@ describe('System - Moderation', function () {
     describe('http://google.COM', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'http://google.COM')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('google.COM', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'google.COM')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('google . com', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'google . com')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('http://google.com', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'http://google.com')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('http://google . com', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'http://google . com')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('http://www.google.com', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'http://www.google.com')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('http://www . google.com', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'http://www . google.com')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('http://youtu.be/123jAJD123', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'http://youtu.be/123jAJD123')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('https://google.com', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'https://google.com')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('https://www.google.com', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'https://www.google.com')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('https://youtu.be/123jAJD123', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'https://youtu.be/123jAJD123')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('google.com', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'google.com')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('www.google.com', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'www.google.com')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('youtu.be/123jAJD123', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'youtu.be/123jAJD123')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
   })
@@ -158,12 +158,12 @@ describe('System - Moderation', function () {
       before(async () => {
         global.commons.sendMessage.reset()
         global.parser.parse(owner, '!set moderationSymbols false')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledOnce, 10000)
       })
       after(async () => {
         global.commons.sendMessage.reset()
         global.parser.parse(owner, '!set moderationSymbols true')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledOnce, 10000)
       })
       it('will not timeout user', function (done) {
         global.parser.parse(testUser, '!@#$%^&*()(*&^%$#@#$%^&*)')
@@ -173,13 +173,13 @@ describe('System - Moderation', function () {
     describe('!@#$%^&*()(*&^%$#@#$%^&*)', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, '!@#$%^&*()(*&^%$#@#$%^&*)')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('!@#$%^&*( one two (*&^%$#@#', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, '!@#$%^&*( one two (*&^%$#@#')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('!@#$%^&*( one two three four (*&^%$#@ one two three four #$%^&*)', function () {
@@ -200,12 +200,12 @@ describe('System - Moderation', function () {
       before(async function () {
         global.commons.sendMessage.reset()
         global.parser.parse(owner, '!set moderationLongMessage false')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledOnce, 10000)
       })
       after(async function () {
         global.commons.sendMessage.reset()
         global.parser.parse(owner, '!set moderationLongMessage true')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledOnce, 10000)
       })
       it('will not timeout user', function (done) {
         global.parser.parse(testUser, 'asdfstVTzgo3KrfNekGTjomK7nBjEX9B3Vw4qctminLjzfqbT8q6Cd23pVSuw0wuWPAJE9vaBDC4PIYkKCleX8yBXBiQMKwJWb8uonmbOzNgpuMpcF6vpF3mRc8bbonrfVHqbT00QpjPJHXOF88XrjgR8v0BQVlsX61lpT8vbqjZRlizoMa2bruKU3GtONgZhtJJQyRJEVo3OTiAgha2kC0PHUa8ZSRNCoTsDWc76BTfa2JntlTgIXmX2aXTDQEyBomkSQAof4APE0sfX9HvEROQqP9SSf09VK1weXNcsmMs')
@@ -215,7 +215,7 @@ describe('System - Moderation', function () {
     describe('asdfstVTzgo3KrfNekGTjomK7nBjEX9B3Vw4qctminLjzfqbT8q6Cd23pVSuw0wuWPAJE9vaBDC4PIYkKCleX8yBXBiQMKwJWb8uonmbOzNgpuMpcF6vpF3mRc8bbonrfVHqbT00QpjPJHXOF88XrjgR8v0BQVlsX61lpT8vbqjZRlizoMa2bruKU3GtONgZhtJJQyRJEVo3OTiAgha2kC0PHUa8ZSRNCoTsDWc76BTfa2JntlTgIXmX2aXTDQEyBomkSQAof4APE0sfX9HvEROQqP9SSf09VK1weXNcsmMs', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'asdfstVTzgo3KrfNekGTjomK7nBjEX9B3Vw4qctminLjzfqbT8q6Cd23pVSuw0wuWPAJE9vaBDC4PIYkKCleX8yBXBiQMKwJWb8uonmbOzNgpuMpcF6vpF3mRc8bbonrfVHqbT00QpjPJHXOF88XrjgR8v0BQVlsX61lpT8vbqjZRlizoMa2bruKU3GtONgZhtJJQyRJEVo3OTiAgha2kC0PHUa8ZSRNCoTsDWc76BTfa2JntlTgIXmX2aXTDQEyBomkSQAof4APE0sfX9HvEROQqP9SSf09VK1weXNcsmMs')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
   })
@@ -225,12 +225,12 @@ describe('System - Moderation', function () {
         global.commons.sendMessage.reset()
         global.parser.parse(owner, '!set moderationCaps false')
         global.parser.parse(owner, '!set moderationSpam false')
-        await until(() => global.commons.sendMessage.calledTwice, 5000)
+        await until(() => global.commons.sendMessage.calledTwice, 10000)
       })
       after(async function () {
         global.commons.sendMessage.reset()
         global.parser.parse(owner, '!set moderationCaps true')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledOnce, 10000)
       })
       it('will not timeout user', function (done) {
         global.parser.parse(testUser, 'AAAAAAAAAAAAAAAAAAAAAA')
@@ -240,13 +240,13 @@ describe('System - Moderation', function () {
     describe('AAAAAAAAAAAAAAAAAAAAAA', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'AAAAAAAAAAAAAAAAAAAAAA')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('ЙЦУЦЙУЙЦУЙЦУЙЦУЙЦУЙЦ', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'ЙЦУЦЙУЙЦУЙЦУЙЦУЙЦУЙЦ')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('123123123213123123123123213123', function () {
@@ -258,7 +258,7 @@ describe('System - Moderation', function () {
     describe('AAAAAAAAAAAAAaaaaaaaaaaaa', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'AAAAAAAAAAAAAaaaaaaaaaaaa')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
   })
@@ -267,12 +267,12 @@ describe('System - Moderation', function () {
       before(async function () {
         global.commons.sendMessage.reset()
         global.parser.parse(owner, '!set moderationSpam false')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledOnce, 10000)
       })
       after(async function () {
         global.commons.sendMessage.reset()
         global.parser.parse(owner, '!set moderationSpam true')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledOnce, 10000)
       })
       it('will not timeout user', function (done) {
         global.parser.parse(testUser, 'Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum')
@@ -282,13 +282,13 @@ describe('System - Moderation', function () {
     describe('Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('Lorem Ipsum Lorem Ipsum test 1 2 3 4 Lorem Ipsum Lorem Ipsum', function () {
       it('timeout user', async () => {
         global.parser.parse(testUser, 'Lorem Ipsum Lorem Ipsum test 1 2 3 4 Lorem Ipsum Lorem Ipsum')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
   })
@@ -297,14 +297,14 @@ describe('System - Moderation', function () {
       it('should send parse error', async function () {
         global.commons.sendMessage.reset()
         global.parser.parse(owner, '!permit')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledOnce, 10000)
         assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('moderation.permit-parse-failed'))
       })
     })
     describe('parsing \'!permit [username]\'', function () {
       it('should send success message', async function () {
         global.parser.parse(owner, '!permit test')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledOnce, 10000)
         assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('moderation.user-have-link-permit')
           .replace('$username', '@test')
           .replace('$count', 1)
@@ -316,13 +316,13 @@ describe('System - Moderation', function () {
       })
       it('should timeout user on second link message', async function () {
         global.parser.parse(testUser, 'http://www.google.com')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
     describe('parsing \'!permit [username]\' - case sensitive test', function () {
       it('should send success message', async function () {
         global.parser.parse(owner, '!permit TEST')
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
+        await until(() => global.commons.sendMessage.calledOnce, 10000)
         assert.equal(global.commons.sendMessage.getCall(0).args[0], global.translate('moderation.user-have-link-permit')
           .replace('$username', '@test')
           .replace('$count', 1)
@@ -334,7 +334,7 @@ describe('System - Moderation', function () {
       })
       it('should timeout user on second link message', async function () {
         global.parser.parse(testUser, 'http://www.google.com')
-        await until(() => global.commons.timeout.calledOnce, 5000)
+        await until(() => global.commons.timeout.calledOnce, 10000)
       })
     })
   })
