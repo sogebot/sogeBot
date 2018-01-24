@@ -198,7 +198,7 @@
       }
 
       if (event.event === 'host') {
-        username = `<div class="col-9 eventlist-username">
+        username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$viewers', '<strong>' + _.get(event, 'viewers', '0') + '</strong>')}</span>
           <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
@@ -206,7 +206,7 @@
       }
 
       if (event.event === 'sub') {
-        username = `<div class="col-9 eventlist-username">
+        username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t}</span>
           <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
@@ -214,7 +214,7 @@
       }
 
       if (event.event === 'resub') {
-        username = `<div class="col-9 eventlist-username">
+        username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$months', '<strong>' + _.get(event, 'months', '0') + '</strong>')}</span>
           <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
@@ -228,7 +228,7 @@
       }
 
       if (event.event === 'cheer') {
-        username = `<div class="col-9 eventlist-username">
+        username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$bits', '<strong>' + _.get(event, 'bits', '0') + '</strong>')}</span>
           <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
