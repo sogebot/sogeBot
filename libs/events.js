@@ -94,7 +94,7 @@ class Events {
           } catch (e) {
             global.log.error(e.message)
 
-            if (!_.isNill(eventId)) { // eventId is created, rollback all changes
+            if (!_.isNil(eventId)) { // eventId is created, rollback all changes
               await Promise.all([
                 global.db.engine.remove('events', { _id: eventId }),
                 global.db.engine.remove('events.filter', { eventId: eventId }),

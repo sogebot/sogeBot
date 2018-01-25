@@ -30,7 +30,7 @@
 
           <div class="card" data-event-variables>
             <div class="card-header">
-                Usable events variables
+              Usable events variables
             </div>
             <div class="card-body">
               <small></small>
@@ -65,6 +65,12 @@
         </form>
       </div>
       <div class="modal-footer">
+        <div data-dialog-alert-success class="alert alert-success d-none" role="alert">
+          Event was <strong>successfully</strong> saved.
+        </div>
+        <div data-dialog-alert-fail class="alert alert-danger d-none" role="alert">
+          Something went <strong>wrong</strong>. <span data-id="errorMsg"></span>
+        </div>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" onclick="saveChanges(event)">Save changes</button>
       </div>
@@ -103,6 +109,67 @@
   })
 
   var events = {
+    refresh: () => {
+      eventsSocket.emit('list.events', (err, cb) => {
+        $('#eventlist-cards').empty()
+        for (let event of cb.events) {
+          let operationsCount = _.filter(cb.operations, (o) => o.eventId === event._id.toString()).length
+          let filter = _.find(cb.filters, (o) => o.eventId === event._id.toString()).filters
+
+          let definitionOutput = []
+          for (let [key, value] of Object.entries(event.definitions)) {
+            definitionOutput.push(
+              `
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">${translations.events.definitions[key].label}</span>
+            </div>
+            <input class="form-control" value="${value}" disabled="disabled">
+          </div>
+        `
+            )
+          }
+
+          $('#eventlist-cards').append(
+            `
+        <div class="card" data-id="${event._id.toString()}">
+          <div class="card-body mb-0 pb-0 pt-2" data-card="${event.name}">
+            <h5 class="card-title">
+              ${event.enabled ? `<span class="badge badge-pill badge-primary" data-id="${event._id.toString()}">Enabled</span>` : `<span class="badge badge-pill badge-light" data-id="${event._id.toString()}">Disabled</span>` }
+              <strong>${event.name}</strong> <small class="text-muted">${event.key}</small>
+              <div style="float:right; position: relative; top:-.4rem;" class="text-primary"><i class="fa fa-cogs" style="position: relative; top:-.3rem; font-size: 1rem;" aria-hidden="true"></i> <strong style="font-size: 2rem; ">${operationsCount}</strong></div>
+            </h5>
+            <div class="clearfix"></div>
+          </div>
+
+          ${definitionOutput.join('')}
+
+          ${filter.length ? `<div class="card-footer" data-card="${event.name}">
+              <small style="font-family: Monospace">${filter}</small>
+              <i class="fa fa-filter text-muted" style="float: right; font-size: 1.5rem;"></i>
+            </div>` : ``}
+
+          <div class="card-footer text-center">
+            <a href="#" class="btn btn-outline-secondary btn-toggle" data-id="${event._id.toString()}" onclick="events.toggle(this)">${event.enabled ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> Disable`: `<i class="fa fa-toggle-on" aria-hidden="true"></i> Enable`}</a>
+            <a href="#" class="btn btn-outline-secondary"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
+            <a href="#" class="btn btn-outline-danger" data-card-delete-popover="${event._id.toString()}" data-container="body" data-toggle="popover"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a>
+          </div>
+        </div>
+      `
+          )
+
+          $(`[data-card-delete-popover="${event._id.toString()}"]`).popover({
+            html: true,
+            content: `
+          <p>Are you sure you want to <strong class="text-danger">delete</strong> event '<strong>${event.name}</strong>'?</p>
+          <div class="text-center">
+            <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="events.delete(this)">YES</a>
+            <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="$('[data-card-delete-popover=${event._id.toString()}]').popover('hide')">NO</a>
+          </div>`
+          })
+        }
+      })
+    },
     toggle: (el) => {
       $(el).removeClass().addClass('btn btn-info')
       eventsSocket.emit('toggle.event', el.dataset.id, (err, cb) => {
@@ -111,13 +178,13 @@
 
         $(`.badge[data-id="${el.dataset.id}"]`)
           .removeClass()
-          .addClass(cb.enabled? 'badge badge-pill badge-primary' : 'badge badge-pill badge-light')
-          .text(cb.enabled? 'Enabled' : 'Disabled')
+          .addClass(cb.enabled ? 'badge badge-pill badge-primary' : 'badge badge-pill badge-light')
+          .text(cb.enabled ? 'Enabled' : 'Disabled')
 
         $(el)
-          .html(cb.enabled
-            ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> Disable`
-            : `<i class="fa fa-toggle-on" aria-hidden="true"></i> Enable`)
+          .html(cb.enabled ?
+            `<i class="fa fa-toggle-off" aria-hidden="true"></i> Disable` :
+            `<i class="fa fa-toggle-on" aria-hidden="true"></i> Enable`)
       })
     },
     delete: (el) => {
@@ -176,7 +243,9 @@
         )
 
         if (variable === 'userObject') {
-          $('[data-events-whats-this]').popover({trigger: 'hover'})
+          $('[data-events-whats-this]').popover({
+            trigger: 'hover'
+          })
         }
       }
     } else {
@@ -189,16 +258,17 @@
     if (_.size(definitions) > 0) {
       $('[data-event-definitions]').css('display', 'block')
       console.debug('Definitions', definitions)
-      for (let [key, value] of Object.entries(definitions))
-      {
-        $('[data-event-definitions] .card-body').append(`
+      for (let [key, value] of Object.entries(definitions)) {
+        $('[data-event-definitions] .card-body').append(
+          `
           <div class="input-group">
             <div class="input-group-prepend">
               <span class="input-group-text">${translations.events.definitions[key].label}</span>
             </div>
             <input id="definition-${key}" class="form-control" placeholder="${translations.events.definitions[key].placeholder}" value="${value}">
           </div>
-        `)
+        `
+        )
       }
     } else {
       $('[data-event-definitions]').css('display', 'none')
@@ -224,11 +294,13 @@
       } else if (_.isArray(v)) {
         let buttons = []
         for (let val of v) {
-          buttons.push(`
+          buttons.push(
+            `
             <label class="form-control btn btn-secondary ${buttons.length === 0 ? `active` : ``}">
               <input type="radio" name="radio-options-${k}" id="${k}-${val}" autocomplete="off" ${buttons.length === 0 ? `checked` : ``}> ${val}
             </label>
-          `)
+          `
+          )
         }
         return `
           <div class="btn-group btn-group-toggle" data-toggle="buttons" style="flex: 1 1 auto; position: relative; left: 1px">
@@ -241,19 +313,21 @@
     }
 
     // DEFINITIONS ////////////////////////////////////////////////////////////
-    const definitionsElement = $(ev.currentTarget).parents('.operation-group').children('.event-operation-definitions')
+    const definitionsElement = $(ev.currentTarget).parents('.operation-group').children(
+      '.event-operation-definitions')
     definitionsElement.empty()
     console.debug('Definitions', definitions)
-    for (let [key, value] of Object.entries(definitions))
-    {
-      definitionsElement.append(`
+    for (let [key, value] of Object.entries(definitions)) {
+      definitionsElement.append(
+        `
         <div class="input-group">
           <div class="input-group-prepend">
             <span class="input-group-text">${translations.events.definitions[key].label}</span>
           </div>
           ${createProperInput(key, value)}
         </div>
-      `)
+      `
+      )
     }
     // !DEFINITIONS ///////////////////////////////////////////////////////////
   });
@@ -276,12 +350,14 @@
 
     let operationOptions = () => {
       let r = []
-      for (let id of _.map(supportedOperationsList, 'id')) r.push(`<option value="${id}">${translations[id]}</option>`)
+      for (let id of _.map(supportedOperationsList, 'id')) r.push(
+        `<option value="${id}">${translations[id]}</option>`)
       return r.join()
     }
 
     const id = new Date().getTime()
-    $('[data-event-operations]').append(`
+    $('[data-event-operations]').append(
+      `
       <div class="operation-group" id="${id}">
         <div class="input-group">
           <select class="form-control" data-event-operation-select>
@@ -295,7 +371,8 @@
         </div>
         <div class="event-operation-definitions"></div>
       </div>
-    `)
+    `
+    )
     $(`#${id} select`).trigger('change')
   }
 
@@ -327,14 +404,20 @@
           } else if ($(element).attr('id').startsWith('operation-definition')) {
             let id = $(element).attr('id').split('-')[2]
             let parentId = $(element).parents('.operation-group').attr('id')
-            if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = { id: null, definitions: {}}
+            if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = {
+              id: null,
+              definitions: {}
+            }
             eventListener.operations[parentId].definitions[id] = $(element).val()
           } else if ($(element).attr('name').startsWith('radio-options')) {
             if ($(element).attr('checked')) {
               let id = $(element).attr('id').split('-')[0]
               let value = $(element).attr('id').split('-')[1]
               let parentId = $(element).parents('.operation-group').attr('id')
-              if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = { id: null, definitions: {}}
+              if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = {
+                id: null,
+                definitions: {}
+              }
               eventListener.operations[parentId].definitions[id] = value
             }
           } else {
@@ -351,7 +434,10 @@
             eventListener.event.key = $(element).val()
           } else if (!_.isNil($(element).data('event-operation-select'))) {
             let parentId = $(element).parents('.operation-group').attr('id')
-            if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = { id: null, definitions: {}}
+            if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = {
+              id: null,
+              definitions: {}
+            }
             eventListener.operations[parentId].key = $(element).val()
           } else {
             console.debug('I dont know what to do', element)
@@ -360,8 +446,12 @@
         case 'BUTTON':
           if (!_.isNil($(element).data('event-toggle-button'))) {
             let parentId = $(element).parents('.operation-group').attr('id')
-            if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = { id: null, definitions: {}}
-            eventListener.operations[parentId].definitions[$(element).data('id')] = $(element).data('value') === 'true'
+            if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = {
+              id: null,
+              definitions: {}
+            }
+            eventListener.operations[parentId].definitions[$(element).data('id')] = $(element).data('value') ===
+              'true'
           } else {
             console.debug('I dont know what to do', element)
           }
@@ -373,93 +463,77 @@
     console.debug(eventListener)
 
     eventsSocket.emit('save-changes', eventListener, (err, cb) => {
-      console.log(cb)
+      if (err) {
+        console.error(err)
+
+        $('[data-dialog-alert-success]')
+          .css('display', 'none')
+
+        $('[data-dialog-alert-fail]')
+          .removeClass('d-none')
+          .css('display', 'block')
+          .css('opacity: 0')
+
+        $('[data-dialog-alert-fail]')
+          .velocity('fadeIn', {
+            duration: 200
+          })
+        $('[data-id="errorMsg"]').html(`<i><small>(${cb})</small></i>`)
+      } else {
+        $('[data-dialog-alert-fail]')
+          .css('display', 'none')
+
+        $('[data-dialog-alert-success]')
+          .removeClass('d-none')
+          .css('display', 'block')
+          .css('opacity: 0')
+
+        $('[data-dialog-alert-success]')
+          .velocity('fadeIn', {
+            duration: 200
+          })
+
+        events.refresh()
+        setTimeout(() => {
+          $('#event-listener-new').modal('hide')
+
+          $('[data-dialog-alert-success]')
+            .velocity('fadeOut', {
+              duration: 200
+            })
+        }, 1000)
+      }
     })
   }
 
-  eventsSocket.emit('list.events', (err, cb) => {
-    $('#eventlist-cards').empty()
-    for (let event of cb.events) {
-      let operationsCount = _.filter(cb.operations, (o) => o.eventId === event._id.toString()).length
-      let filter = _.find(cb.filters, (o) => o.eventId === event._id.toString()).filters
+  function flipCard(e) {
+    let card = $(e).data('card')
 
-      let definitionOutput = []
-      for (let [key, value] of Object.entries(event.definitions)) {
-        definitionOutput.push(`
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text">${translations.events.definitions[key].label}</span>
-            </div>
-            <input class="form-control" value="${value}" disabled="disabled">
-          </div>
-        `)
-      }
+    if ($(`div[data-card="${card}"]`).css('opacity') === '0') return
 
-      $('#eventlist-cards').append(`
-        <div class="card" data-id="${event._id.toString()}">
-          <div class="card-body mb-0 pb-0 pt-2" data-card="${event.name}">
-            <h5 class="card-title">
-              ${event.enabled ? `<span class="badge badge-pill badge-primary" data-id="${event._id.toString()}">Enabled</span>` : `<span class="badge badge-pill badge-light" data-id="${event._id.toString()}">Disabled</span>` }
-              <strong>${event.name}</strong> <small class="text-muted">${event.key}</small>
-              <div style="float:right; position: relative; top:-.4rem;" class="text-primary"><i class="fa fa-cogs" style="position: relative; top:-.3rem; font-size: 1rem;" aria-hidden="true"></i> <strong style="font-size: 2rem; ">${operationsCount}</strong></div>
-            </h5>
-            <div class="clearfix"></div>
-          </div>
-
-          ${definitionOutput.join('')}
-
-          ${filter.length ? `<div class="card-footer" data-card="${event.name}">
-              <small style="font-family: Monospace">${filter}</small>
-              <i class="fa fa-filter text-muted" style="float: right; font-size: 1.5rem;"></i>
-            </div>` : ``}
-
-          <div class="card-footer text-center">
-            <a href="#" class="btn btn-outline-secondary btn-toggle" data-id="${event._id.toString()}" onclick="events.toggle(this)">${event.enabled ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> Disable`: `<i class="fa fa-toggle-on" aria-hidden="true"></i> Enable`}</a>
-            <a href="#" class="btn btn-outline-secondary"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
-            <a href="#" class="btn btn-outline-danger" data-card-delete-popover="${event._id.toString()}" data-container="body" data-toggle="popover"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a>
-          </div>
-        </div>
-      `)
-
-      $(`[data-card-delete-popover="${event._id.toString()}"]`).popover({
-        html: true,
-        content: `
-          <p>Are you sure you want to <strong class="text-danger">delete</strong> event '<strong>${event.name}</strong>'?</p>
-          <div class="text-center">
-            <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="events.delete(this)">YES</a>
-            <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="$('[data-card-delete-popover=${event._id.toString()}]').popover('hide')">NO</a>
-          </div>`
+    $(`div.card-body[data-card="${card}"], div.card-footer[data-card="${card}"]`)
+      .velocity('fadeOut', 500)
+    $(`div[data-card-delete-confirm="${card}"]`)
+      .css('height', height)
+      .velocity('fadeIn', {
+        delay: 500,
+        duration: 500
       })
-    }
-  })
+  }
 
-  function flipCard (e) {
-   let card = $(e).data('card')
+  function flipCardBack(e) {
+    let card = $(e).data('id')
 
-   if ($(`div[data-card="${card}"]`).css('opacity') === '0') return
+    if ($(`div[data-card="${card}"]`).css('opacity') === '1') return
 
-   $(`div.card-body[data-card="${card}"], div.card-footer[data-card="${card}"]`)
-     .velocity('fadeOut', 500)
-   $(`div[data-card-delete-confirm="${card}"]`)
-     .css('height', height)
-     .velocity('fadeIn', {
-       delay: 500,
-       duration: 500
-     })
- }
+    $(`div[data-card-delete-confirm="${card}"]`)
+      .velocity('fadeOut', 500)
+    $(`div[data-card="${card}"]`)
+      .velocity('fadeIn', {
+        delay: 500,
+        duration: 500
+      })
+  }
 
- function flipCardBack (e) {
-   let card = $(e).data('id')
-
-   if ($(`div[data-card="${card}"]`).css('opacity') === '1') return
-
-   $(`div[data-card-delete-confirm="${card}"]`)
-     .velocity('fadeOut', 500)
-   $(`div[data-card="${card}"]`)
-     .velocity('fadeIn', {
-       delay: 500,
-       duration: 500
-     })
- }
-
+  events.refresh()
 </script>
