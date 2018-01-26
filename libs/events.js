@@ -3,6 +3,7 @@
 const _ = require('lodash')
 const debug = require('debug')
 const crypto = require('crypto')
+const safeEval = require('safe-eval')
 
 class Events {
   constructor () {
@@ -46,8 +47,55 @@ class Events {
 
   async fire (eventId, attributes) {
     const d = debug('events:fire')
-    if (!_.isNil(_.get(attributes, 'username', null))) attributes.senderObj = await global.users.get(attributes.username)
+    if (!_.isNil(_.get(attributes, 'username', null))) attributes.userObject = await global.users.get(attributes.username)
     d('Firing event %s with attrs: %j', eventId, attributes)
+
+    let events = await global.db.engine.find('events', { key: eventId })
+    for (let event of events) {
+      let shouldRun = await this.checkFilter(event._id.toString(), attributes)
+      console.log(shouldRun)
+    }
+  }
+
+  async checkFilter (eventId, attributes) {
+    const d = debug('events:checkFilter')
+
+    const filter = (await global.db.engine.findOne('events.filters', { eventId: eventId })).filters
+    if (filter.trim().length === 0) return true
+
+    let toEval = `(function evaluation () { return ${filter} })()`
+    const context = {
+      _: _,
+      $username: _.get(attributes, 'username', null),
+      $userObject: _.get(attributes, 'userObject', null),
+      $method: _.get(attributes, 'method', null),
+      $months: _.get(attributes, 'months', null),
+      $monthsName: _.get(attributes, 'monthsName', null),
+      $message: _.get(attributes, 'message', null),
+      $command: _.get(attributes, 'command', null),
+      $count: _.get(attributes, 'count', null),
+      $bits: _.get(attributes, 'bits', null),
+      $reason: _.get(attributes, 'reason', null),
+      $target: _.get(attributes, 'target', null),
+      $viewers: _.get(attributes, 'viewers', null),
+      $autohost: _.get(attributes, 'autohost', null),
+      $duration: _.get(attributes, 'duration', null),
+      // add global variables
+      $game: global.twitch.current.game,
+      $title: global.twitch.current.status,
+      $views: global.twitch.current.views,
+      $followers: global.twitch.current.followers,
+      $hosts: global.twitch.current.hosts,
+      $subscribers: global.twitch.current.subscribers
+    }
+    var result = false
+    try {
+      result = safeEval(toEval, context)
+    } catch (e) {
+      // do nothing
+    }
+    d(toEval, context, result)
+    return !!result // force boolean
   }
 
   sockets () {
