@@ -17,7 +17,7 @@ class Events {
       { id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 } }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'stream-started' },
       { id: 'stream-stopped' },
-      { id: 'stream-is-running-x-minutes', definitions: { runEveryXMinutes: 100 } },
+      { id: 'stream-is-running-x-minutes', definitions: { runAfterXMinutes: 100 } },
       { id: 'cheer', variables: [ 'username', 'userObject', 'bits', 'message' ] },
       { id: 'clearchat' },
       { id: 'action', variables: [ 'username', 'userObject' ] },
@@ -27,7 +27,7 @@ class Events {
       { id: 'mod', variables: [ 'username', 'userObject' ] },
       { id: 'commercial', variables: [ 'duration' ] },
       { id: 'timeout', variables: [ 'username', 'userObject', 'reason', 'duration' ] },
-      { id: 'every-x-seconds', definitions: { runEveryXSeconds: 600 } },
+      { id: 'every-x-minutes', definitions: { runEveryXMinutes: 100 } },
       { id: 'game-changed', variables: [ 'oldGame', 'game' ] }
     ]
 
@@ -65,44 +65,50 @@ class Events {
       })
       socket.on('save-changes', async (data, callback) => {
         d('save-changes - %j', data)
-        if (_.isNil(data._id)) { // save event as new (without _id)
-          var eventId = null
-          try {
-            const event = {
-              name: data.name.trim().length ? data.name : 'events#' + crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5),
-              key: data.event.key,
-              enabled: true,
-              definitions: data.event.definitions
-            }
-            eventId = (await global.db.engine.insert('events', event))._id.toString()
-
-            let insertArray = []
-            insertArray.push(global.db.engine.insert('events.filters', {
-              eventId: eventId,
-              filters: data.filters
-            }))
-            for (let operation of Object.entries(data.operations)) {
-              operation = operation[1]
-              insertArray.push(global.db.engine.insert('events.operations', {
-                eventId: eventId,
-                key: operation.key,
-                definitions: operation.definitions
-              }))
-            }
-            await Promise.all(insertArray)
-            callback(null, true)
-          } catch (e) {
-            global.log.error(e.message)
-
-            if (!_.isNil(eventId)) { // eventId is created, rollback all changes
-              await Promise.all([
-                global.db.engine.remove('events', { _id: eventId }),
-                global.db.engine.remove('events.filter', { eventId: eventId }),
-                global.db.engine.remove('events.operation', { eventId: eventId })
-              ])
-            }
-            callback(e, e.message)
+        var eventId = data._id
+        try {
+          const event = {
+            name: data.name.trim().length ? data.name : 'events#' + crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5),
+            key: data.event.key,
+            enabled: true,
+            definitions: data.event.definitions
           }
+          if (_.isNil(eventId)) eventId = (await global.db.engine.insert('events', event))._id.toString()
+          else {
+            await Promise.all([
+              global.db.engine.update('events', { _id: eventId }, event),
+              global.db.engine.remove('events.filters', { eventId: eventId }),
+              global.db.engine.remove('events.operations', { eventId: eventId })
+            ])
+          }
+
+          let insertArray = []
+          insertArray.push(global.db.engine.insert('events.filters', {
+            eventId: eventId,
+            filters: data.filters
+          }))
+          for (let operation of Object.entries(data.operations)) {
+            operation = operation[1]
+            insertArray.push(global.db.engine.insert('events.operations', {
+              eventId: eventId,
+              key: operation.key,
+              definitions: operation.definitions
+            }))
+          }
+          await Promise.all(insertArray)
+
+          callback(null, true)
+        } catch (e) {
+          global.log.error(e.message)
+
+          if (!_.isNil(eventId)) { // eventId is created, rollback all changes
+            await Promise.all([
+              global.db.engine.remove('events', { _id: eventId }),
+              global.db.engine.remove('events.filters', { eventId: eventId }),
+              global.db.engine.remove('events.operations', { eventId: eventId })
+            ])
+          }
+          callback(e, e.message)
         }
       })
       socket.on('list.events', async (callback) => {
@@ -123,8 +129,8 @@ class Events {
       socket.on('delete.event', async (eventId, callback) => {
         await Promise.all([
           global.db.engine.remove('events', { _id: eventId }),
-          global.db.engine.remove('events.filter', { eventId: eventId }),
-          global.db.engine.remove('events.operation', { eventId: eventId })
+          global.db.engine.remove('events.filters', { eventId: eventId }),
+          global.db.engine.remove('events.operations', { eventId: eventId })
         ])
         callback(null, eventId)
       })

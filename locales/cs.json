@@ -192,6 +192,65 @@
     }
   },
   "webpanel": {
+    "events": {
+      "dialog": {
+        "title": {
+          "new": "Nová událost",
+          "edit": "Upravit událost"
+        }
+      },
+      "definitions": {
+        "runEveryXCommands": {
+          "label": "Spustit každých X příkazů",
+          "placeholder": "Počet příkazů před spuštěním události"
+        },
+        "commandToWatch": {
+          "label": "Sledovat tento příkaz",
+          "placeholder": "Nastav !prikazKeSledovani"
+        },
+        "viewersAtLeast": {
+          "label": "Nejméně diváků",
+          "placeholder": "Kolik diváků spustí událost"
+        },
+        "runInterval": {
+          "label": "Interval spuštění (0 = spustit jednou za stream)",
+          "placeholder": "Spustit událost každých x sekund"
+        },
+        "runAfterXMinutes": {
+          "label": "Spustit po x minutách",
+          "placeholder": "Spustit událost po x minutách"
+        },
+        "runEveryXMinutes": {
+          "label": "Spustit každých x minut",
+          "placeholder": "Spustit událost každých x minut"
+        },
+        "messageToSend": {
+          "label": "Poslat zprávu",
+          "placeholder": "Nastav svou zprávu"
+        },
+        "commandToRun": {
+          "label": "Příkaz ke spuštění",
+          "placeholder": "Nastav si !prikazKeSpusteni"
+        },
+        "isCommandQuiet": {
+          "label": "Měl by být příkaz potichu",
+          "true": "Příkaz bude potichu",
+          "false": "Příkaz mebude potichu"
+        },
+        "urlOfSoundFile": {
+          "label": "Adresa URL vašeho zvukového souboru",
+          "placeholder": "http://www.cesta.url/kde/je/soubor.mp3"
+        },
+        "emotesToExplode": {
+          "label": "Emotes k výbuchu",
+          "placeholder": "Seznam emotes k výbuchu, např. Kappa PurpleHeart"
+        },
+        "durationOfCommercial": {
+          "label": "Doba trvání reklamy",
+          "placeholder": "Dostupné trvání - 30, 60, 90, 120, 150, 180"
+        }
+      }
+    },
     "eventlist-events": {
       "follow": "ti dal <strong>follow</strong>",
       "host": "tě <strong>hostuje</strong> s $viewers diváky",
@@ -253,7 +312,18 @@
         "ticketsName": "Název ticketů",
         "fromUsername": "Od uživatele",
         "toUsername": "K uživateli",
-        "items": "Položky"
+        "items": "Položky",
+        "bits": "Bity",
+        "message": "Zpráva",
+        "reason": "Důvod",
+        "target": "Cíl",
+        "autohost": "Autohost (true/false)",
+        "duration": "Doba trvání",
+        "method": "Metoda",
+        "months": "Počet měsíců",
+        "monthsName": "Název měsíce (1 měsíc, 2 měsíce)",
+        "oldGame": "Hra před změnou",
+        "userObject": "Úplný uživatelský objekt"
       }
     },
     "page-settings": {
@@ -591,7 +661,7 @@
     "stream-started": "stream začal",
     "stream-stopped": "stream skončil",
     "stream-is-running-x-minutes": "stream trvá x minut",
-    "every-x-seconds": "každých x sekund",
+    "every-x-minutes": "každých x minut",
     "game-changed": "hra změněna",
     "cheer": "cheer byl získán",
     "clearchat": "chat byl vymazán",

@@ -523,7 +523,7 @@ class Twitch {
 
         if (!global.webhooks.enabled.streamss) {
           global.events.fire('stream-started')
-          global.events.fire('every-x-seconds', { reset: true })
+          global.events.fire('every-x-minutes', { reset: true })
         }
       }
 
@@ -534,7 +534,7 @@ class Twitch {
 
       global.events.fire('number-of-viewers-is-at-least-x')
       global.events.fire('stream-is-running-x-minutes')
-      global.events.fire('every-x-seconds')
+      global.events.fire('every-x-minutes')
     } else {
       if (this.isOnline && this.curRetries < this.maxRetries) {
         // retry if it is not just some network / twitch issue

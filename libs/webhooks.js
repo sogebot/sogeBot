@@ -181,7 +181,7 @@ class Webhooks {
         global.twitch.cached({ followers: cached.followers, subscribers: cached.subscribers }) // we dont want to have cached hosts on stream off
 
         global.events.fire('stream-started')
-        global.events.fire('every-x-seconds', { reset: true })
+        global.events.fire('every-x-minutes', { reset: true })
       }
 
       global.twitch.curRetries = 0

@@ -193,6 +193,12 @@
   },
   "webpanel": {
     "events": {
+      "dialog": {
+        "title": {
+          "new": "New event listener",
+          "edit": "Edit event listener"
+        }
+      },
       "definitions": {
         "runEveryXCommands": {
           "label": "Run Every X Commands",
@@ -209,6 +215,10 @@
         "runInterval": {
           "label": "Run Interval (0 = run once per stream)",
           "placeholder": "Trigger event every x seconds"
+        },
+        "runAfterXMinutes": {
+          "label": "Run After X Minutes",
+          "placeholder": "Trigger event after x minutes"
         },
         "runEveryXMinutes": {
           "label": "Run Every X Minutes",
@@ -651,7 +661,7 @@
     "stream-started": "stream started",
     "stream-stopped": "stream stopped",
     "stream-is-running-x-minutes": "stream is running x minutes",
-    "every-x-seconds": "every x seconds",
+    "every-x-minutes": "every x minutes",
     "game-changed": "game changed",
     "cheer": "received cheer",
     "clearchat": "chat was cleared",
