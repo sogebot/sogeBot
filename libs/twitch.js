@@ -419,12 +419,13 @@ class Twitch {
             global.webhooks.addIdToCache('follow', user.id)
             await this.addUserInFollowerCache(user.username)
 
-            if (!quiet && !global.parser.isBot(user.username)) global.events.fire('follow', { username: follower })
-            else {
-              global.overlays.eventlist.add({
-                type: 'follow',
-                username: user.username
-              }) // save to widget but not trigger event
+            global.overlays.eventlist.add({
+              type: 'follow',
+              username: user.username
+            })
+            if (!quiet && !global.parser.isBot(user.username)) {
+              global.log.follow(user.username)
+              global.events.fire('follow', { username: user.username })
             }
           }
           d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })

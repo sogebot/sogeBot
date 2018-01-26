@@ -38,7 +38,6 @@ class Events {
       { id: 'play-sound', definitions: { urlOfSoundFile: '' } },
       { id: 'emote-explosion', definitions: { emotesToExplode: '' } },
       { id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] } }
-      /* TODO: move event logging outside of ops list */
     ]
 
     global.panel.addMenu({category: 'manage', name: 'event-listeners', id: 'events'})
