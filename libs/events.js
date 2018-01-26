@@ -14,7 +14,7 @@ class Events {
       { id: 'unfollow', variables: [ 'username', 'userObject' ] },
       { id: 'subscription', variables: [ 'username', 'userObject', 'method' ] },
       { id: 'resub', variables: [ 'username', 'userObject', 'months', 'monthsName', 'message' ] },
-      { id: 'command-send-x-times', variables: [ 'command', 'count' ], definitions: { runEveryXCommands: 10, commandToWatch: '', runInterval: 0 } }, // runInterval 0 or null - disabled; > 0 every x seconds
+      { id: 'command-send-x-times', variables: [ 'command', 'count' ], definitions: { runEveryXCommands: 10, commandToWatch: '', runInterval: 0 }, check: this.checkCommandSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 } }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'stream-started' },
       { id: 'stream-stopped' },
@@ -33,7 +33,7 @@ class Events {
     ]
 
     this.supportedOperationsList = [
-      { id: 'send-chat-message', definitions: { messageToSend: '' } },
+      { id: 'send-chat-message', definitions: { messageToSend: '' }, fire: this.fireSendChatMessage },
       { id: 'send-whisper', definitions: { messageToSend: '' } },
       { id: 'run-command', definitions: { commandToRun: '', isCommandQuiet: false } },
       { id: 'play-sound', definitions: { urlOfSoundFile: '' } },
@@ -51,11 +51,79 @@ class Events {
     if (!_.isNil(_.get(attributes, 'username', null))) attributes.userObject = await global.users.get(attributes.username)
     d('Firing event %s with attrs: %j', eventId, attributes)
 
+    if (attributes.reset) return this.reset(eventId)
+
     let events = await global.db.engine.find('events', { key: eventId })
     for (let event of events) {
-      let shouldRun = await this.checkFilter(event._id.toString(), attributes)
-      console.log(shouldRun)
+      let [shouldRunByFilter, shouldRunByDefinition] = await Promise.all([
+        this.checkFilter(event._id.toString(), attributes),
+        this.checkDefinition(event, attributes)
+      ])
+      d('Should run by filter', shouldRunByFilter)
+      d('Should run by definition', shouldRunByDefinition)
+      if (!shouldRunByFilter || !shouldRunByDefinition) continue
+
+      for (let operation of (await global.db.engine.find('events.operations', { eventId: event._id.toString() }))) {
+        d('Firing %j', operation)
+        _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation, attributes)
+      }
     }
+  }
+
+  // set triggered attribute to empty object
+  async reset (eventId) {
+    const d = debug('events:reset')
+    let events = await global.db.engine.find('events', { key: eventId })
+    for (let event of events) {
+      d('Resetting %j', event)
+      event.triggered = {}
+      await global.db.engine.find('events', { _id: event._id.toString() }, event)
+    }
+  }
+
+  async fireSendChatMessage (operation, attributes) {
+    const d = debug('events:fireSendChatMessage')
+    d('Sending chat message with attrs:', attributes)
+
+    let username = _.get(attributes, 'username', global.parser.getOwner())
+    let message = operation.definitions.messageToSend
+    _.each(attributes, function (val, name) {
+      d(`Replacing $${name} with ${val}`)
+      let replace = new RegExp(`\\$${name}`, 'g')
+      message = message.replace(replace, val)
+    })
+    message = await global.parser.parseMessage(message)
+    global.commons.sendMessage(message, { username: username })
+  }
+
+  async checkCommandSendXTimes (event, attributes) {
+    const d = debug('events:checkCommandSendXTimes')
+    var shouldTrigger = false
+    if (attributes.message.startsWith(event.definitions.commandToWatch)) {
+      event.triggered = _.get(event, 'triggered', { runEveryXCommands: 0, runInterval: 0 })
+      event.triggered.runEveryXCommands++
+      shouldTrigger = event.triggered.runEveryXCommands >= event.definitions.runEveryXCommands && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000
+      if (shouldTrigger) {
+        event.triggered.runInterval = _.now()
+        event.triggered.runEveryXCommands = 0
+      }
+      d('Updating event to %j', event)
+      await global.db.engine.update('events', { _id: event._id.toString() }, event)
+    }
+    d('Attributes for check', attributes)
+    d('Should Trigger?', shouldTrigger)
+    return shouldTrigger
+  }
+
+  async checkDefinition (event, attributes) {
+    const d = debug('events:checkDefinition')
+
+    d('Searching check fnc for %j', event)
+    const check = (_.find(this.supportedEventsList, (o) => o.id === event.key)).check
+    if (_.isNil(check)) return true
+
+    d('Running check on %s', check.name)
+    return check(event, attributes)
   }
 
   async checkFilter (eventId, attributes) {
