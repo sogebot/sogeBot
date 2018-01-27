@@ -661,7 +661,7 @@
     "stream-started": "stream started",
     "stream-stopped": "stream stopped",
     "stream-is-running-x-minutes": "stream is running x minutes",
-    "every-x-minutes": "every x minutes",
+    "every-x-minutes-of-stream": "every x minutes of stream",
     "game-changed": "game changed",
     "cheer": "received cheer",
     "clearchat": "chat was cleared",

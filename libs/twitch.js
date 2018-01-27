@@ -522,10 +522,10 @@ class Twitch {
         let cached = await this.cached()
         this.cached({ followers: cached.followers, subscribers: cached.subscribers }) // we dont want to have cached hosts on stream off
 
-        if (!global.webhooks.enabled.streamss) {
+        if (!global.webhooks.enabled.streams) {
           global.events.fire('stream-started')
           global.events.fire('command-send-x-times', { reset: true })
-          global.events.fire('every-x-minutes', { reset: true })
+          global.events.fire('every-x-minutes-of-stream', { reset: true })
         }
       }
 
@@ -536,7 +536,7 @@ class Twitch {
 
       global.events.fire('number-of-viewers-is-at-least-x')
       global.events.fire('stream-is-running-x-minutes')
-      global.events.fire('every-x-minutes')
+      global.events.fire('every-x-minutes-of-stream')
     } else {
       if (this.isOnline && this.curRetries < this.maxRetries) {
         // retry if it is not just some network / twitch issue

@@ -4,6 +4,8 @@ const _ = require('lodash')
 const debug = require('debug')
 const crypto = require('crypto')
 const safeEval = require('safe-eval')
+const flatten = require('flat')
+const moment = require('moment')
 const config = require('../config.json')
 
 class Events {
@@ -16,10 +18,10 @@ class Events {
       { id: 'subscription', variables: [ 'username', 'userObject', 'method' ] },
       { id: 'resub', variables: [ 'username', 'userObject', 'months', 'monthsName', 'message' ] },
       { id: 'command-send-x-times', variables: [ 'username', 'userObject', 'command', 'count' ], definitions: { runEveryXCommands: 10, commandToWatch: '', runInterval: 0 }, check: this.checkCommandSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
-      { id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 } }, // runInterval 0 or null - disabled; > 0 every x seconds
+      { id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 }, check: this.checkNumberOfViewersIsAtLeast }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'stream-started' },
       { id: 'stream-stopped' },
-      { id: 'stream-is-running-x-minutes', definitions: { runAfterXMinutes: 100 } },
+      { id: 'stream-is-running-x-minutes', definitions: { runAfterXMinutes: 100 }, check: this.checkStreamIsRunningXMinutes },
       { id: 'cheer', variables: [ 'username', 'userObject', 'bits', 'message' ] },
       { id: 'clearchat' },
       { id: 'action', variables: [ 'username', 'userObject' ] },
@@ -29,7 +31,7 @@ class Events {
       { id: 'mod', variables: [ 'username', 'userObject' ] },
       { id: 'commercial', variables: [ 'duration' ] },
       { id: 'timeout', variables: [ 'username', 'userObject', 'reason', 'duration' ] },
-      { id: 'every-x-minutes', definitions: { runEveryXMinutes: 100 } },
+      { id: 'every-x-minutes-of-stream', definitions: { runEveryXMinutes: 100 }, check: this.everyXMinutesOfStream },
       { id: 'game-changed', variables: [ 'oldGame', 'game' ] }
     ]
 
@@ -40,7 +42,6 @@ class Events {
       { id: 'play-sound', definitions: { urlOfSoundFile: '' }, fire: this.firePlaySound },
       { id: 'emote-explosion', definitions: { emotesToExplode: '' }, fire: this.fireEmoteExplosion },
       { id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] }, fire: this.fireStartCommercial }
-      // TODO: don't forget twitter op
     ]
 
     global.panel.addMenu({category: 'manage', name: 'event-listeners', id: 'events'})
@@ -57,7 +58,7 @@ class Events {
 
     if (_.get(attributes, 'reset', false)) return this.reset(eventId)
 
-    let events = await global.db.engine.find('events', { key: eventId })
+    let events = await global.db.engine.find('events', { key: eventId, enabled: true })
     for (let event of events) {
       let [shouldRunByFilter, shouldRunByDefinition] = await Promise.all([
         this.checkFilter(event._id.toString(), attributes),
@@ -69,7 +70,15 @@ class Events {
 
       for (let operation of (await global.db.engine.find('events.operations', { eventId: event._id.toString() }))) {
         d('Firing %j', operation)
-        _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation.definitions, attributes)
+        if (!_.isNil(attributes.userObject)) {
+          // flatten userObject
+          let userObject = attributes.userObject
+          delete attributes.userObject
+          _.merge(attributes, flatten({userObject: userObject}))
+        }
+        const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key))
+        if (isOperationSupported) _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation.definitions, attributes)
+        else d(`Operation ${operation.key} is not supported!`)
       }
     }
   }
@@ -112,10 +121,9 @@ class Events {
     const d = debug('events:fireRunCommand')
     d('Run command with attrs:', operation, attributes)
 
-    // TODO: flatten userObject to replace
-
     let command = operation.commandToRun
     _.each(attributes, function (val, name) {
+      if (_.isObject(val) && _.size(val) === 0) return true // skip empty object
       d(`Replacing $${name} with ${val}`)
       let replace = new RegExp(`\\$${name}`, 'g')
       command = command.replace(replace, val)
@@ -130,6 +138,7 @@ class Events {
     let username = _.get(attributes, 'username', global.parser.getOwner())
     let message = operation.messageToSend
     _.each(attributes, function (val, name) {
+      if (_.isObject(val) && _.size(val) === 0) return true // skip empty object
       d(`Replacing $${name} with ${val}`)
       let replace = new RegExp(`\\$${name}`, 'g')
       message = message.replace(replace, val)
@@ -151,11 +160,65 @@ class Events {
     global.events.fireSendChatMessageOrWhisper(operation, attributes, false)
   }
 
+  async everyXMinutesOfStream (event, attributes) {
+    const d = debug('events:everyXMinutesOfStream')
+
+    // set to _.now() because 0 will trigger event immediatelly after stream start
+    let shouldSave = _.get(event, 'triggered.runEveryXMinutes', 0) === 0
+    event.triggered.runEveryXMinutes = _.get(event, 'triggered.runEveryXMinutes', _.now())
+
+    let shouldTrigger = _.now() - event.triggered.runEveryXMinutes >= event.definitions.runEveryXMinutes * 60 * 1000
+    if (shouldTrigger || shouldSave) {
+      event.triggered.runEveryXMinutes = _.now()
+      d('Updating event to %j', event)
+      await global.db.engine.update('events', { _id: event._id.toString() }, event)
+    }
+    return shouldTrigger
+  }
+
+  async checkStreamIsRunningXMinutes (event, attributes) {
+    const d = debug('events:checkStreamIsRunningXMinutes')
+    event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0)
+
+    let shouldTrigger = event.triggered.runAfterXMinutes === 0 &&
+                        moment(global.twitch.when.online).format('X') * 1000 > event.definitions.runAfterXMinutes * 60 * 1000
+    if (shouldTrigger) {
+      event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes
+      d('Updating event to %j', event)
+      await global.db.engine.update('events', { _id: event._id.toString() }, event)
+    }
+    return shouldTrigger
+  }
+
+  async checkNumberOfViewersIsAtLeast (event, attributes) {
+    const d = debug('events:checkNumberOfViewersIsAtLeast')
+    event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0)
+
+    event.definitions.runInterval = parseInt(event.definitions.runInterval, 10) // force Integer
+    event.definitions.viewersAtLeast = parseInt(event.definitions.viewersAtLeast, 10) // force Integer
+
+    d('Current viewers: %s, expected viewers: %s', global.twitch.current.viewers, event.definitions.viewersAtLeast)
+    d('Run Interval: %s, triggered: %s', event.definitions.runInterval, event.triggered.runInterval)
+
+    var shouldTrigger = global.twitch.current.viewers >= event.definitions.viewersAtLeast &&
+                        ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000) ||
+                        (event.definitions.runInterval === 0 && event.triggered.runInterval === 0))
+    if (shouldTrigger) {
+      event.triggered.runInterval = _.now()
+      d('Updating event to %j', event)
+      await global.db.engine.update('events', { _id: event._id.toString() }, event)
+    }
+    d('Attributes for check', attributes)
+    d('Should Trigger?', shouldTrigger)
+    return shouldTrigger
+  }
+
   async checkCommandSendXTimes (event, attributes) {
     const d = debug('events:checkCommandSendXTimes')
     var shouldTrigger = false
     if (attributes.message.startsWith(event.definitions.commandToWatch)) {
-      event.triggered = _.get(event, 'triggered', { runEveryXCommands: 0, runInterval: 0 })
+      event.triggered.runEveryXCommands = _.get(event, 'triggered.runEveryXCommands', 0)
+      event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0)
 
       event.definitions.runInterval = parseInt(event.definitions.runInterval, 10) // force Integer
       event.triggered.runInterval = parseInt(event.triggered.runInterval, 10) // force Integer
@@ -249,15 +312,17 @@ class Events {
             name: data.name.trim().length ? data.name : 'events#' + crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5),
             key: data.event.key,
             enabled: true,
-            definitions: data.event.definitions
+            definitions: data.event.definitions,
+            triggered: {}
           }
           if (_.isNil(eventId)) eventId = (await global.db.engine.insert('events', event))._id.toString()
           else {
             await Promise.all([
-              global.db.engine.update('events', { _id: eventId }, event),
+              global.db.engine.remove('events', { _id: eventId }, event),
               global.db.engine.remove('events.filters', { eventId: eventId }),
               global.db.engine.remove('events.operations', { eventId: eventId })
             ])
+            eventId = (await global.db.engine.insert('events', event))._id.toString()
           }
 
           let insertArray = []

@@ -194,7 +194,7 @@ class Webhooks {
 
         global.events.fire('stream-started')
         global.events.fire('command-send-x-times', { reset: true })
-        global.events.fire('every-x-minutes', { reset: true })
+        global.events.fire('every-x-minutes-of-stream', { reset: true })
       }
 
       global.twitch.curRetries = 0

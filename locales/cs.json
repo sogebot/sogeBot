@@ -661,7 +661,7 @@
     "stream-started": "stream začal",
     "stream-stopped": "stream skončil",
     "stream-is-running-x-minutes": "stream trvá x minut",
-    "every-x-minutes": "každých x minut",
+    "every-x-minutes-of-stream": "každých x minut streamu",
     "game-changed": "hra změněna",
     "cheer": "cheer byl získán",
     "clearchat": "chat byl vymazán",
