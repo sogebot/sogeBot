@@ -102,6 +102,7 @@ class Events {
 
   async fireBotWillLeaveChannel (operation, attributes) {
     global.client.part('#' + config.settings.broadcaster_username)
+    global.users.setAll({ is: { online: false } }) // force all users offline
   }
 
   async fireStartCommercial (operation, attributes) {
