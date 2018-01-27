@@ -524,6 +524,7 @@ class Twitch {
 
         if (!global.webhooks.enabled.streamss) {
           global.events.fire('stream-started')
+          global.events.fire('command-send-x-times', { reset: true })
           global.events.fire('every-x-minutes', { reset: true })
         }
       }
