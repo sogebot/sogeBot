@@ -4,6 +4,7 @@ const _ = require('lodash')
 const debug = require('debug')
 const crypto = require('crypto')
 const safeEval = require('safe-eval')
+const config = require('../config.json')
 
 class Events {
   constructor () {
@@ -14,7 +15,7 @@ class Events {
       { id: 'unfollow', variables: [ 'username', 'userObject' ] },
       { id: 'subscription', variables: [ 'username', 'userObject', 'method' ] },
       { id: 'resub', variables: [ 'username', 'userObject', 'months', 'monthsName', 'message' ] },
-      { id: 'command-send-x-times', variables: [ 'command', 'count' ], definitions: { runEveryXCommands: 10, commandToWatch: '', runInterval: 0 }, check: this.checkCommandSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
+      { id: 'command-send-x-times', variables: [ 'username', 'userObject', 'command', 'count' ], definitions: { runEveryXCommands: 10, commandToWatch: '', runInterval: 0 }, check: this.checkCommandSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 } }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'stream-started' },
       { id: 'stream-stopped' },
@@ -34,11 +35,11 @@ class Events {
 
     this.supportedOperationsList = [
       { id: 'send-chat-message', definitions: { messageToSend: '' }, fire: this.fireSendChatMessage },
-      { id: 'send-whisper', definitions: { messageToSend: '' } },
-      { id: 'run-command', definitions: { commandToRun: '', isCommandQuiet: false } },
-      { id: 'play-sound', definitions: { urlOfSoundFile: '' } },
-      { id: 'emote-explosion', definitions: { emotesToExplode: '' } },
-      { id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] } }
+      { id: 'send-whisper', definitions: { messageToSend: '' }, fire: this.fireSendWhisper },
+      { id: 'run-command', definitions: { commandToRun: '', isCommandQuiet: false }, fire: this.fireRunCommand },
+      { id: 'play-sound', definitions: { urlOfSoundFile: '' }, fire: this.firePlaySound },
+      { id: 'emote-explosion', definitions: { emotesToExplode: '' }, fire: this.fireEmoteExplosion },
+      { id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] }, fire: this.fireStartCommercial }
       // TODO: don't forget twitter op
     ]
 
@@ -48,10 +49,13 @@ class Events {
 
   async fire (eventId, attributes) {
     const d = debug('events:fire')
+
+    attributes = attributes || {}
+
     if (!_.isNil(_.get(attributes, 'username', null))) attributes.userObject = await global.users.get(attributes.username)
     d('Firing event %s with attrs: %j', eventId, attributes)
 
-    if (attributes.reset) return this.reset(eventId)
+    if (_.get(attributes, 'reset', false)) return this.reset(eventId)
 
     let events = await global.db.engine.find('events', { key: eventId })
     for (let event of events) {
@@ -65,7 +69,7 @@ class Events {
 
       for (let operation of (await global.db.engine.find('events.operations', { eventId: event._id.toString() }))) {
         d('Firing %j', operation)
-        _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation, attributes)
+        _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation.definitions, attributes)
       }
     }
   }
@@ -81,19 +85,70 @@ class Events {
     }
   }
 
-  async fireSendChatMessage (operation, attributes) {
-    const d = debug('events:fireSendChatMessage')
-    d('Sending chat message with attrs:', attributes)
+  async fireStartCommercial (operation, attributes) {
+    const d = debug('events:fireStartCommercial')
+    d('Start commercials with attrs:', operation, attributes)
+    global.client.commercial(config.settings.broadcaster_username, operation.durationOfCommercial)
+  }
 
+  async fireEmoteExplosion (operation, attributes) {
+    const d = debug('events:fireEmoteExplosion')
+    d('Emote explosion with attrs:', operation, attributes)
+    global.overlays.emotes.explode(global.overlays.emotes, global.panel.io, operation.emotesToExplode.split(' '))
+  }
+
+  async firePlaySound (operation, attributes) {
+    const d = debug('events:firePlaySound')
+    d('Play a sound with attrs:', operation, attributes)
+    // attr.sound can be filename or url
+    let sound = operation.urlOfSoundFile
+    if (!_.includes(sound, 'http')) {
+      sound = 'dist/soundboard/' + sound + '.mp3'
+    }
+    global.panel.io.emit('play-sound', sound)
+  }
+
+  async fireRunCommand (operation, attributes) {
+    const d = debug('events:fireRunCommand')
+    d('Run command with attrs:', operation, attributes)
+
+    // TODO: flatten userObject to replace
+
+    let command = operation.commandToRun
+    _.each(attributes, function (val, name) {
+      d(`Replacing $${name} with ${val}`)
+      let replace = new RegExp(`\\$${name}`, 'g')
+      command = command.replace(replace, val)
+    })
+    command = await global.parser.parseMessage(command)
+    d('Running command:', command)
+    global.parser.parseCommands((_.get(operation, 'isCommandQuiet', false) ? null : { username: global.parser.getOwner() }), command, true)
+  }
+
+  async fireSendChatMessageOrWhisper (operation, attributes, whisper) {
+    const d = debug('events:fireSendChatMessageOrWhisper')
     let username = _.get(attributes, 'username', global.parser.getOwner())
-    let message = operation.definitions.messageToSend
+    let message = operation.messageToSend
     _.each(attributes, function (val, name) {
       d(`Replacing $${name} with ${val}`)
       let replace = new RegExp(`\\$${name}`, 'g')
       message = message.replace(replace, val)
     })
     message = await global.parser.parseMessage(message)
-    global.commons.sendMessage(message, { username: username })
+    d('Sending message:', message)
+    global.commons.sendMessage(message, { username: username, 'message-type': (whisper ? 'whisper' : 'chat') })
+  }
+
+  async fireSendWhisper (operation, attributes) {
+    const d = debug('events:fireSendWhisper')
+    d('Sending whisper with attrs:', operation, attributes)
+    global.events.fireSendChatMessageOrWhisper(operation, attributes, true)
+  }
+
+  async fireSendChatMessage (operation, attributes) {
+    const d = debug('events:fireSendChatMessage')
+    d('Sending chat message with attrs:', operation, attributes)
+    global.events.fireSendChatMessageOrWhisper(operation, attributes, false)
   }
 
   async checkCommandSendXTimes (event, attributes) {
@@ -101,8 +156,15 @@ class Events {
     var shouldTrigger = false
     if (attributes.message.startsWith(event.definitions.commandToWatch)) {
       event.triggered = _.get(event, 'triggered', { runEveryXCommands: 0, runInterval: 0 })
+
+      event.definitions.runInterval = parseInt(event.definitions.runInterval, 10) // force Integer
+      event.triggered.runInterval = parseInt(event.triggered.runInterval, 10) // force Integer
+
       event.triggered.runEveryXCommands++
-      shouldTrigger = event.triggered.runEveryXCommands >= event.definitions.runEveryXCommands && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000
+      shouldTrigger =
+        event.triggered.runEveryXCommands >= event.definitions.runEveryXCommands &&
+        ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000) ||
+        (event.definitions.runInterval === 0 && event.triggered.runInterval === 0))
       if (shouldTrigger) {
         event.triggered.runInterval = _.now()
         event.triggered.runEveryXCommands = 0
@@ -163,7 +225,7 @@ class Events {
     } catch (e) {
       // do nothing
     }
-    d(toEval, context, result)
+    delete context._; d(context, result)
     return !!result // force boolean
   }
 
