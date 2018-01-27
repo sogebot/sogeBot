@@ -2,6 +2,8 @@
 
 // 3rdparty libraries
 const Client = require('twitter')
+const debug = require('debug')
+const _ = require('lodash')
 
 const config = require('../../config.json')
 
@@ -14,30 +16,28 @@ function Twitter () {
       access_token_secret: config.integrations.twitter.secretToken
     })
 
-    console.warn('TODO: twitter events deprecated')
-    /*
-    this.addEvent(this)
+    global.events.supportedOperationsList.push(
+      { id: 'send-twitter-message', definitions: { messageToSend: '' }, fire: this.fireSendTwitterMessage }
+    )
     global.panel.addWidget('twitter', 'widget-title-twitter', 'twitter')
     global.panel.socketListening(this, 'twitter.send', this.send)
-    */
   }
 }
 
-Twitter.prototype.addEvent = function (self) {
-  global.events.operations['send-twitter-message'] = async function (attr) {
-    // global variables
-    let send = attr.send
-      .replace(/\$game/g, global.twitch.current.game)
-      .replace(/\$title/g, global.twitch.current.status)
-      .replace(/\$viewers/g, global.twitch.current.viewers)
-      .replace(/\$views/g, global.twitch.current.views)
-      .replace(/\$followers/g, global.twitch.current.followers)
-      .replace(/\$hosts/g, global.twitch.current.hosts)
-      .replace(/\$subscribers/g, global.twitch.current.subscribers)
-      .replace(/\$bits/g, global.twitch.current.bits)
-    send = await global.parser.parseMessage(send, attr)
-    self.send(self, null, send)
-  }
+Twitter.prototype.fireSendTwitterMessage = async function (operation, attributes) {
+  const d = debug('events:fireSendTwitterMessage')
+
+  attributes.username = _.get(attributes, 'username', global.parser.getOwner())
+  let message = operation.messageToSend
+  _.each(attributes, function (val, name) {
+    if (_.isObject(val) && _.size(val) === 0) return true // skip empty object
+    d(`Replacing $${name} with ${val}`)
+    let replace = new RegExp(`\\$${name}`, 'g')
+    message = message.replace(replace, val)
+  })
+  message = await global.parser.parseMessage(message)
+  d('Tweeting message:', message)
+  global.integrations.twitter.send(global.integrations.twitter, null, message)
 }
 
 Twitter.prototype.send = function (self, socket, text) {
