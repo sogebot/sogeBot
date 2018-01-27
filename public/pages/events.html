@@ -547,7 +547,13 @@
           // if v in definition is array -> select
           let operationDefinition = _.find(Object.entries(supportedOperation.definitions), ([key, value]) => key === k)[1]
           console.debug('Operation definition on load:', operationDefinition)
-          if(_.isArray(operationDefinition)) {
+          if (_.isBoolean(operationDefinition)) {
+            const toggle = modal.find(`#${elementId} button[data-id="${k}"]`)
+            if (toggle.data('value') !== v.toString()) {
+              // trigger "click" if values doesn't match -> button should be toggled
+              toggle.trigger('click')
+            }
+          } else if(_.isArray(operationDefinition)) {
             modal.find(`#${elementId} #durationOfCommercial-${v}`).parent().button('toggle')
           } else {
             modal.find(`#${elementId} #operation-definition-${k}`).val(v)
