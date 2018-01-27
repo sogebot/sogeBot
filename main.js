@@ -168,7 +168,7 @@ global.client.on('join', async function (channel, username, fromSelf) {
       global.users.isFollower(username)
     }
     global.users.set(username, { is: { online: true } })
-    global.widgets.joinpart.send({ type: 'join' })
+    global.widgets.joinpart.send({ username: username, type: 'join' })
     global.events.fire('user-joined-channel', { username: username })
   }
 })
@@ -181,8 +181,7 @@ global.client.on('part', async function (channel, username, fromSelf) {
 
   if (!fromSelf) {
     global.users.set(username, { is: { online: false } })
-    // todo: fix global.widgets.joinpart.send
-    global.widgets.joinpart.send({ type: 'part' })
+    global.widgets.joinpart.send({ username: username, type: 'part' })
     global.events.fire('user-parted-channel', { username: username })
   }
 })
