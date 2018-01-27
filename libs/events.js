@@ -41,7 +41,9 @@ class Events {
       { id: 'run-command', definitions: { commandToRun: '', isCommandQuiet: false }, fire: this.fireRunCommand },
       { id: 'play-sound', definitions: { urlOfSoundFile: '' }, fire: this.firePlaySound },
       { id: 'emote-explosion', definitions: { emotesToExplode: '' }, fire: this.fireEmoteExplosion },
-      { id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] }, fire: this.fireStartCommercial }
+      { id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] }, fire: this.fireStartCommercial },
+      { id: 'bot-will-join-channel', definitions: {}, fire: this.fireBotWillJoinChannel },
+      { id: 'bot-will-leave-channel', definitions: {}, fire: this.fireBotWillLeaveChannel }
     ]
 
     global.panel.addMenu({category: 'manage', name: 'event-listeners', id: 'events'})
@@ -92,6 +94,14 @@ class Events {
       event.triggered = {}
       await global.db.engine.find('events', { _id: event._id.toString() }, event)
     }
+  }
+
+  async fireBotWillJoinChannel (operation, attributes) {
+    global.client.join('#' + config.settings.broadcaster_username)
+  }
+
+  async fireBotWillLeaveChannel (operation, attributes) {
+    global.client.part('#' + config.settings.broadcaster_username)
   }
 
   async fireStartCommercial (operation, attributes) {

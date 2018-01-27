@@ -697,6 +697,8 @@
     "click-to-highlight": "highlight",
     "commercial": "commercial started",
     "start-commercial": "run a commercial",
+    "bot-will-join-channel": "bot will join channel",
+    "bot-will-leave-channel": "bot will leave channel",
     "omit": "omit",
     "comply": "comply",
     "visible": "visible",

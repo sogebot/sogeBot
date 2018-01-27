@@ -697,6 +697,8 @@
     "click-to-highlight": "highlight",
     "commercial": "reklama zahájena",
     "start-commercial": "spustit reklamu",
+    "bot-will-join-channel": "bot se připojí k kanálu",
+    "bot-will-leave-channel": "bot opustí kanál",
     "omit": "vynechat",
     "comply": "dodržovat",
     "visible": "viditelné",

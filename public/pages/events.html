@@ -535,13 +535,16 @@
 
       // load operations
       for (let operations of _.filter(events.list.operations, (o) => o.eventId === eventId)) {
-        let elementId = addEventOperation(null)
         let supportedOperation = _.find(supportedOperationsList, (o) => o.id === operations.key)
+        if (_.isNil(supportedOperation)) continue // operation is not supported anymore
+
+        let elementId = addEventOperation(null)
+
         console.debug('Default values for operation', supportedOperation)
         modal.find(`#${elementId} select`).val(operations.key)
         modal.find(`#${elementId} select`).trigger('change')
 
-        // load valued for operation definitions
+        // load values for operation definitions
         // operation-definition-urlOfSoundFile
         for (let [k, v] of Object.entries(operations.definitions)) {
           // if v in definition is array -> select

@@ -157,7 +157,7 @@ global.client.on('message', async function (channel, sender, message, fromSelf) 
 })
 
 global.client.on('join', async function (channel, username, fromSelf) {
-  if (debug.enabled) debug('User joined: %s', username)
+  if (debug.enabled) debug('User joined: %s (isBot: %s)', username, fromSelf)
 
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
   if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
@@ -174,7 +174,7 @@ global.client.on('join', async function (channel, username, fromSelf) {
 })
 
 global.client.on('part', async function (channel, username, fromSelf) {
-  if (debug.enabled) debug('User parted: %s', username)
+  if (debug.enabled) debug('User parted: %s (isBot: %s)', username, fromSelf)
 
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
   if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
