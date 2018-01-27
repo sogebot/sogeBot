@@ -140,19 +140,15 @@ global.client.on('message', async function (channel, sender, message, fromSelf) 
     if (sender['message-type'] !== 'whisper') {
       global.parser.timer.push({ 'id': sender.id, 'received': new Date().getTime() })
       global.log.chatIn(message, {username: sender.username})
-      global.events.fire('command-send-x-times', { message: message });
-
-      (async () => {
-        const user = await global.users.get(sender.username)
-
-        if (!_.isNil(user.id)) global.users.isFollower(user.username)
-        if (!message.startsWith('!')) global.users.messagesInc(user.username)
-
-        // set is.mod
-        global.users.set(user.username, { is: { mod: sender.mod } })
-      })()
-
+      global.events.fire('command-send-x-times', { username: sender.username, message: message })
       global.parser.parse(sender, message)
+
+      const user = await global.users.get(sender.username)
+      if (!_.isNil(user.id)) global.users.isFollower(user.username)
+      if (!message.startsWith('!')) global.users.messagesInc(user.username)
+
+      // set is.mod
+      global.users.set(user.username, { is: { mod: sender.mod } })
     } else {
       global.log.whisperIn(message, {username: sender.username})
       if (!global.configuration.getValue('disableWhisperListener') || global.parser.isOwner(sender)) global.parser.parse(sender, message)
@@ -185,6 +181,7 @@ global.client.on('part', async function (channel, username, fromSelf) {
 
   if (!fromSelf) {
     global.users.set(username, { is: { online: false } })
+    // todo: fix global.widgets.joinpart.send
     global.widgets.joinpart.send({ type: 'part' })
     global.events.fire('user-parted-channel', { username: username })
   }
