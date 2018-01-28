@@ -325,6 +325,13 @@ class Events {
             definitions: data.event.definitions,
             triggered: {}
           }
+
+          // TODO -> check all definitions are correctly set -> no empty values
+
+          // TODO -> check all operations definitions are correctly set -> no empty values
+
+          // TODO -> if something is wrong -> throw error
+
           if (_.isNil(eventId)) eventId = (await global.db.engine.insert('events', event))._id.toString()
           else {
             await Promise.all([
@@ -354,7 +361,7 @@ class Events {
         } catch (e) {
           global.log.error(e.message)
 
-          if (!_.isNil(eventId)) { // eventId is created, rollback all changes
+          if (!_.isNil(eventId) && _.isNil(data._id)) { // eventId is __newly__ created, rollback all changes
             await Promise.all([
               global.db.engine.remove('events', { _id: eventId }),
               global.db.engine.remove('events.filters', { eventId: eventId }),
