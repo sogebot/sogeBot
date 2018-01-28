@@ -317,7 +317,10 @@ class Events {
       socket.on('save-changes', async (data, callback) => {
         d('save-changes - %j', data)
         var eventId = data._id
-        var errors = {}
+        var errors = {
+          definitions: {},
+          operations: {}
+        }
         try {
           const event = {
             name: data.name.trim().length ? data.name : 'events#' + crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5),
@@ -329,12 +332,18 @@ class Events {
 
           // check all definitions are correctly set -> no empty values
           for (let [key, value] of Object.entries(event.definitions)) {
-            if (value.length === 0) errors[key] = 'Value cannot be empty'
-            else if (key === 'commandToWatch' && !value.startsWith('!')) errors.commandToWatch = 'Command should start with !'
-            else if (key !== 'commandToWatch' && !value.match(/^\d+$/g)) errors[key] = 'This value must be a number'
+            if (value.length === 0) _.set(errors, `definitions.${key}`, 'Value cannot be empty')
+            else if (key === 'commandToWatch' && !value.startsWith('!')) _.set(errors, 'definitions.commandToWatch', 'Command should start with !')
+            else if (key !== 'commandToWatch' && !value.match(/^\d+$/g)) _.set(errors, `definitions.${key}`, 'This value must be a number')
           }
 
-          // TODO -> check all operations definitions are correctly set -> no empty values
+          // check all operations definitions are correctly set -> no empty values
+          for (let [timestamp, operation] of Object.entries(data.operations)) {
+            for (let [key, value] of Object.entries(operation.definitions)) {
+              if (value.length === 0) _.set(errors, `operations.${timestamp}.${key}`, 'Value cannot be empty')
+              else if (key === 'commandToRun' && !value.startsWith('!')) _.set(errors, `operations.${timestamp}.${key}`, 'Command should start with !')
+            }
+          }
 
           if (_.size(errors) > 0) throw Error(JSON.stringify(errors))
 
