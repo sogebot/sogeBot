@@ -11,43 +11,34 @@
       <div class="modal-body">
         <form id="event-form">
           <div class="card">
-            <div class="card-header">
-              Event
-            </div>
+            <div class="card-header" data-lang="events.dialog.event"></div>
             <div class="card-body">
               <div class="form-group">
-                <label for="event-listener-dlg-events-name">Name</label>
-                <input class="form-control" type="text" id="event-listener-dlg-events-name" placeholder="Set name of your event listener (if empty id is set as name)"
-                />
+                <label for="event-listener-dlg-events-name" data-lang="events.dialog.name"></label>
+                <input class="form-control" type="text" id="event-listener-dlg-events-name"/>
               </div>
 
               <div class="form-group">
-                <label for="event-listener-dlg-events" data-lang="event"></label>
+                <label for="event-listener-dlg-events" data-lang="events.dialog.event"></label>
                 <select class="form-control" data-load-events="1" id="event-listener-dlg-events"></select>
               </div>
             </div>
           </div>
 
           <div class="card" data-event-variables>
-            <div class="card-header">
-              Usable events variables
-            </div>
+            <div class="card-header" data-lang="events.dialog.usable-events-variables"></div>
             <div class="card-body">
               <small></small>
             </div>
           </div>
 
           <div class="card" data-event-definitions>
-            <div class="card-header">
-              Settings
-            </div>
+            <div class="card-header" data-lang="events.dialog.settings"></div>
             <div class="card-body"></div>
           </div>
 
           <div class="card">
-            <div class="card-header">
-              Filters
-            </div>
+            <div class="card-header" data-lang="events.dialog.filters"></div>
             <div class="card-body">
               <textarea id="event-listener-filter" class="form-control"></textarea>
             </div>
@@ -58,21 +49,17 @@
               <button class="btn btn-outline-primary" onclick="addEventOperation(event)">
                 <i class="fa fa-plus" aria-hidden="true"></i>
               </button>
-              Operations
+              <span data-lang="events.dialog.operations"></span>
             </div>
             <div class="card-body" data-event-operations></div>
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <div data-dialog-alert-success class="alert alert-success d-none" role="alert">
-          Event was <strong>successfully</strong> saved.
-        </div>
-        <div data-dialog-alert-fail class="alert alert-danger d-none" role="alert">
-          Something went <strong>wrong</strong>. <span data-id="errorMsg"></span>
-        </div>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" onclick="saveChanges(event, this)" id="event-listener-save-changes-btn">Save changes</button>
+        <div data-dialog-alert-success class="alert alert-success d-none" role="alert" data-lang="events.dialog.alerts.success"></div>
+        <div data-dialog-alert-fail class="alert alert-danger d-none" role="alert" data-lang="events.dialog.alerts.fail"></div>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" data-lang="events.dialog.close"></button>
+        <button type="button" class="btn btn-primary" onclick="saveChanges(event, this)" id="event-listener-save-changes-btn" data-lang="events.dialog.save-changes"></button>
       </div>
     </div>
   </div>
@@ -83,8 +70,8 @@
     <span data-lang="event-listeners" class="title text-default"></span>
   </li>
   <li class="nav-item">
-    <button class="nav-link btn-outline-success plus-button" data-toggle="modal" data-target="#event-listener-dlg">
-      <i class="fa fa-plus" aria-hidden="true"></i> EVENT
+    <button class="nav-link btn btn-success" data-toggle="modal" data-target="#event-listener-dlg">
+      <i class="fa fa-plus" aria-hidden="true"></i> <span data-lang="events.event">
     </button>
   </li>
   <li class="nav-item">
@@ -131,7 +118,7 @@
             <div class="card" data-id="${event._id.toString()}">
               <div class="card-body mb-0 pb-0 pt-2" data-card="${event.name}">
                 <h5 class="card-title">
-                  ${event.enabled ? `<span class="badge badge-pill badge-primary" data-id="${event._id.toString()}">Enabled</span>` : `<span class="badge badge-pill badge-light" data-id="${event._id.toString()}">Disabled</span>` }
+                  ${event.enabled ? `<span class="badge badge-pill badge-primary" data-id="${event._id.toString()}">${translations.events.badges.enabled}</span>` : `<span class="badge badge-pill badge-light" data-id="${event._id.toString()}">${translations.events.badges.disabled}</span>` }
                   <strong>${event.name}</strong> <small class="text-muted">${event.key}</small>
                   <div style="float:right; position: relative; top:-.4rem;" class="text-primary"><i class="fa fa-cogs" style="position: relative; top:-.3rem; font-size: 1rem;" aria-hidden="true"></i> <strong style="font-size: 2rem; ">${operationsCount}</strong></div>
                 </h5>
@@ -146,10 +133,10 @@
                 </div>` : ``}
 
               <div class="card-footer text-center">
-                <a href="#" class="btn btn-outline-primary" data-id="${event._id.toString()}" onclick="events.test(this)"><i class="fa fa-bell-o" aria-hidden="true"></i> Test</a>
-                <a href="#" class="btn btn-outline-secondary btn-toggle" data-id="${event._id.toString()}" onclick="events.toggle(this)">${event.enabled ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> Disable`: `<i class="fa fa-toggle-on" aria-hidden="true"></i> Enable`}</a>
-                <a href="#" class="btn btn-outline-secondary" data-toggle="modal" data-target="#event-listener-dlg" data-id="${event._id.toString()}"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
-                <a href="#" class="btn btn-outline-danger" data-card-delete-popover="${event._id.toString()}" data-container="body" data-toggle="popover"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a>
+                <a href="#" class="btn btn-outline-primary" data-id="${event._id.toString()}" onclick="events.test(this)"><i class="fa fa-bell-o" aria-hidden="true"></i> ${translations.events.buttons.test}</a>
+                <a href="#" class="btn btn-outline-secondary btn-toggle" data-id="${event._id.toString()}" onclick="events.toggle(this)">${event.enabled ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> ${translations.events.buttons.disable}`: `<i class="fa fa-toggle-on" aria-hidden="true"></i> ${translations.events.buttons.enable}`}</a>
+                <a href="#" class="btn btn-outline-secondary" data-toggle="modal" data-target="#event-listener-dlg" data-id="${event._id.toString()}"><i class="fa fa-pencil" aria-hidden="true"></i> ${translations.events.buttons.edit}</a>
+                <a href="#" class="btn btn-outline-danger" data-card-delete-popover="${event._id.toString()}" data-container="body" data-toggle="popover"><i class="fa fa-trash-o" aria-hidden="true"></i> ${translations.events.buttons.delete}</a>
               </div>
             </div>
           `)
@@ -157,10 +144,10 @@
           $(`[data-card-delete-popover="${event._id.toString()}"]`).popover({
             html: true,
             content: `
-          <p>Are you sure you want to <strong class="text-danger">delete</strong> event '<strong>${event.name}</strong>'?</p>
+          <p>${translations.events.popovers.are_you_sure_you_want_to_delete_event} '<strong>${event.name}</strong>'?</p>
           <div class="text-center">
-            <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="events.delete(this)">YES</a>
-            <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="$('[data-card-delete-popover=${event._id.toString()}]').popover('hide')">NO</a>
+            <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="events.delete(this)">${translations.events.buttons.yes}</a>
+            <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="$('[data-card-delete-popover=${event._id.toString()}]').popover('hide')">${translations.events.buttons.no}</a>
           </div>`
           })
         }
@@ -179,12 +166,12 @@
         $(`.badge[data-id="${el.dataset.id}"]`)
           .removeClass()
           .addClass(cb.enabled ? 'badge badge-pill badge-primary' : 'badge badge-pill badge-light')
-          .text(cb.enabled ? 'Enabled' : 'Disabled')
+          .text(cb.enabled ? translations.events.badges.enabled : translations.events.badges.disabled)
 
         $(el)
           .html(cb.enabled ?
-            `<i class="fa fa-toggle-off" aria-hidden="true"></i> Disable` :
-            `<i class="fa fa-toggle-on" aria-hidden="true"></i> Enable`)
+            `<i class="fa fa-toggle-off" aria-hidden="true"></i> ${translations.events.buttons.disable}` :
+            `<i class="fa fa-toggle-on" aria-hidden="true"></i> ${translations.events.buttons.enable}`)
       })
     },
     delete: (el) => {
@@ -222,13 +209,13 @@
 
       const whatsthis =
         `<a data-events-whats-this class="badge badge-pill badge-light" data-html="true"
-                                data-content="<em>Example of user object data</em>
+                                data-content="<em>${translations.events.popovers.example_of_user_object_data}</em>
                                               <br> <b>userObject.username</b>: 'exampleuser'
                                               <br> <b>userObject.id</b>: '123456'
                                               <br> <b>userObject.is.online</b>: true
                                               <br> <b>userObject.is.follower</b>: true <br> <b>userObject.is.regular</b>: true
                                               <br> <b>userObject.is.subscriber</b>: true">
-                          what's this?
+                          ${translations.events.whatsthis}
                         </a>`
       for (let variable of variables) {
         $('[data-event-variables] small').append(
@@ -397,7 +384,6 @@
       operations: {}
     }
 
-    console.warn('TODO: ADD REQUIRE CHECK')
     for (let element of $('form#event-form')[0]) {
       switch ($(element).prop('nodeName')) {
         case 'INPUT':
@@ -501,7 +487,6 @@
           .velocity('fadeIn', {
             duration: 200
           })
-        $('[data-id="errorMsg"]').html(`<i><small>(Form is not valid)</small></i>`)
       } else {
 
         $('[data-dialog-alert-success]')
@@ -531,6 +516,10 @@
     const button = $(event.relatedTarget) // Button that triggered the modal
     const eventId = button.data('id') || null
     const eventToEdit = _.find(events.list.events, (o) => eventId === o._id)
+
+    { // input locales
+      $("#event-listener-dlg-events-name").attr('placeholder', translations.events.dialog.placeholders.name)
+    }
 
     // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
     // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.

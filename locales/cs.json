@@ -193,16 +193,50 @@
   },
   "webpanel": {
     "events": {
+      "event": "Událost",
+      "whatsthis": "Co je to?",
+      "badges": {
+        "enabled": "Zapnuto",
+        "disabled": "Vypnuto"
+      },
+      "buttons": {
+        "test": "Test",
+        "enable": "Zapnout",
+        "disable": "Vypnout",
+        "edit": "Upravit",
+        "delete": "Smazat",
+        "yes": "Ano",
+        "no": "Ne"
+      },
+      "popovers": {
+        "are_you_sure_you_want_to_delete_event": "Opravdu chcete <strong class='text-danger'>smazat</strong> událost",
+        "example_of_user_object_data": "Příklad dat v objektu uživatele"
+      },
       "errors": {
-        "command-must-start-with-!": "Příkaz musí začít !",
-        "this-value-must-be-a-positive-number-or-0": "Tato hodnota musí být kladné číslo nebo 0",
-        "value-cannot-be-empty": "Hodnota nemůže být prázdná"
+        "command_must_start_with_!": "Příkaz musí začít !",
+        "this_value_must_be_a_positive_number_or_0": "Tato hodnota musí být kladné číslo nebo 0",
+        "value_cannot_be_empty": "Hodnota nemůže být prázdná"
       },
       "dialog": {
         "title": {
           "new": "Nová událost",
           "edit": "Upravit událost"
-        }
+        },
+        "placeholders": {
+          "name": "Nastavte jméno události (pokud je prázdné, jméno se vygeneruje)"
+        },
+        "alerts": {
+          "success": "Událost byla <strong>úspěšně</strong> uložena.",
+          "fail": "Něco se <strong>pokazilo</strong>."
+        },
+        "close": "Zavřít",
+        "save-changes": "Uložit změny",
+        "event": "Událost",
+        "name": "Název",
+        "usable-events-variables": "Použitelné proměnné události",
+        "settings": "Nastavení",
+        "filters": "Filtry",
+        "operations": "Operace"
       },
       "definitions": {
         "runEveryXCommands": {
@@ -240,7 +274,7 @@
         "isCommandQuiet": {
           "label": "Měl by být příkaz potichu",
           "true": "Příkaz bude potichu",
-          "false": "Příkaz mebude potichu"
+          "false": "Příkaz nebude potichu"
         },
         "urlOfSoundFile": {
           "label": "Adresa URL vašeho zvukového souboru",

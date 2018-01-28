@@ -193,16 +193,50 @@
   },
   "webpanel": {
     "events": {
+      "event": "Event",
+      "whatsthis": "what's this?",
+      "badges": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      },
+      "buttons": {
+        "test": "Test",
+        "enable": "Enable",
+        "disable": "Disable",
+        "edit": "Edit",
+        "delete": "Delete",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "popovers": {
+        "are_you_sure_you_want_to_delete_event": "Are you sure you want to <strong class='text-danger'>delete</strong> event",
+        "example_of_user_object_data": "Example of user object data"
+      },
       "errors": {
-        "command-must-start-with-!": "Command must start with !",
-        "this-value-must-be-a-positive-number-or-0": "This value must be a positive number or 0",
-        "value-cannot-be-empty": "Value cannot be empty"
+        "command_must_start_with_!": "Command must start with !",
+        "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
+        "value_cannot_be_empty": "Value cannot be empty"
       },
       "dialog": {
         "title": {
           "new": "New event listener",
           "edit": "Edit event listener"
-        }
+        },
+        "placeholders": {
+          "name": "Set name of your event listener (if empty, name will be generated)"
+        },
+        "alerts": {
+          "success": "Event was <strong>successfully</strong> saved.",
+          "fail": "Something went <strong>wrong</strong>."
+        },
+        "close": "Close",
+        "save-changes": "Save changes",
+        "event": "Event",
+        "name": "Name",
+        "usable-events-variables": "Usable events variables",
+        "settings": "Settings",
+        "filters": "Filters",
+        "operations": "Operations"
       },
       "definitions": {
         "runEveryXCommands": {

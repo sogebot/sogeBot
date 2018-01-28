@@ -332,16 +332,16 @@ class Events {
 
           // check all definitions are correctly set -> no empty values
           for (let [key, value] of Object.entries(event.definitions)) {
-            if (value.length === 0) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.value-cannot-be-empty'))
-            else if (key === 'commandToWatch' && !value.startsWith('!')) _.set(errors, 'definitions.commandToWatch', global.translate('webpanel.events.errors.command-must-start-with-!'))
-            else if (key !== 'commandToWatch' && !value.match(/^\d+$/g)) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.this-value-must-be-a-positive-number-or-0'))
+            if (value.length === 0) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.value_cannot_be_empty'))
+            else if (key === 'commandToWatch' && !value.startsWith('!')) _.set(errors, 'definitions.commandToWatch', global.translate('webpanel.events.errors.command_must_start_with_!'))
+            else if (key !== 'commandToWatch' && !value.match(/^\d+$/g)) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.this_value_must_be_a_positive_number_or_0'))
           }
 
           // check all operations definitions are correctly set -> no empty values
           for (let [timestamp, operation] of Object.entries(data.operations)) {
             for (let [key, value] of Object.entries(operation.definitions)) {
-              if (value.length === 0) _.set(errors, `operations.${timestamp}.${key}`, global.translate('webpanel.events.errors.value-cannot-be-empty'))
-              else if (key === 'commandToRun' && !value.startsWith('!')) _.set(errors, `operations.${timestamp}.${key}`, global.translate('webpanel.events.errors.command-must-start-with-!'))
+              if (value.length === 0) _.set(errors, `operations.${timestamp}.${key}`, global.translate('webpanel.events.errors.value_cannot_be_empty'))
+              else if (key === 'commandToRun' && !value.startsWith('!')) _.set(errors, `operations.${timestamp}.${key}`, global.translate('webpanel.events.errors.command_must_start_with_!'))
             }
           }
 
