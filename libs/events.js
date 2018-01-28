@@ -68,14 +68,13 @@ class Events {
       ])
       d('Should run by filter', shouldRunByFilter)
       d('Should run by definition', shouldRunByDefinition)
-      if (!shouldRunByFilter || !shouldRunByDefinition) continue
+      if ((!shouldRunByFilter || !shouldRunByDefinition)) continue
 
       for (let operation of (await global.db.engine.find('events.operations', { eventId: event._id.toString() }))) {
         d('Firing %j', operation)
         if (!_.isNil(attributes.userObject)) {
           // flatten userObject
           let userObject = attributes.userObject
-          delete attributes.userObject
           _.merge(attributes, flatten({userObject: userObject}))
         }
         const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key))
@@ -387,6 +386,30 @@ class Events {
           global.db.engine.remove('events.operations', { eventId: eventId })
         ])
         callback(null, eventId)
+      })
+      socket.on('test.event', async (eventId) => {
+        let generateUsername = () => {
+          const adject = ['Encouraging', 'Plucky', 'Glamorous', 'Endearing', 'Fast', 'Agitated', 'Mushy', 'Muddy', 'Sarcastic', 'Real', 'Boring']
+          const subject = ['Sloth', 'Beef', 'Fail', 'Fish', 'Fast', 'Raccoon', 'Dog', 'Man', 'Pepperonis', 'RuleFive', 'Slug', 'Cat', 'SogeBot']
+          return _.sample(adject) + _.sample(subject)
+        }
+
+        const username = _.sample(['short', 'someFreakingLongUsername', generateUsername()])
+        let attributes = {
+          username: username,
+          userObject: await global.users.get(username)
+        }
+        for (let operation of (await global.db.engine.find('events.operations', { eventId: eventId }))) {
+          d('Firing %j', operation)
+          if (!_.isNil(attributes.userObject)) {
+            // flatten userObject
+            let userObject = attributes.userObject
+            _.merge(attributes, flatten({userObject: userObject}))
+          }
+          const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key))
+          if (isOperationSupported) _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation.definitions, attributes)
+          else d(`Operation ${operation.key} is not supported!`)
+        }
       })
     })
   }

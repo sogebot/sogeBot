@@ -90,9 +90,6 @@
   <li class="nav-item">
     <a class="nav-link active" data-toggle="tab" href="#manage" data-lang="manage"></a>
   </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#test-wizard" data-lang="test-wizard"></a>
-  </li>
 </ul>
 
 <div class="tab-content">
@@ -149,6 +146,7 @@
                 </div>` : ``}
 
               <div class="card-footer text-center">
+                <a href="#" class="btn btn-outline-primary" data-id="${event._id.toString()}" onclick="events.test(this)"><i class="fa fa-bell-o" aria-hidden="true"></i> Test</a>
                 <a href="#" class="btn btn-outline-secondary btn-toggle" data-id="${event._id.toString()}" onclick="events.toggle(this)">${event.enabled ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> Disable`: `<i class="fa fa-toggle-on" aria-hidden="true"></i> Enable`}</a>
                 <a href="#" class="btn btn-outline-secondary" data-toggle="modal" data-target="#event-listener-dlg" data-id="${event._id.toString()}"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
                 <a href="#" class="btn btn-outline-danger" data-card-delete-popover="${event._id.toString()}" data-container="body" data-toggle="popover"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a>
@@ -167,6 +165,10 @@
           })
         }
       })
+    },
+    test: (el) => {
+      console.debug('Testing event operations:', el.dataset.id)
+      eventsSocket.emit('test.event', el.dataset.id)
     },
     toggle: (el) => {
       $(el).removeClass().addClass('btn btn-info')
