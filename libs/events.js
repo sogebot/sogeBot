@@ -317,6 +317,7 @@ class Events {
       socket.on('save-changes', async (data, callback) => {
         d('save-changes - %j', data)
         var eventId = data._id
+        var errors = {}
         try {
           const event = {
             name: data.name.trim().length ? data.name : 'events#' + crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5),
@@ -326,11 +327,16 @@ class Events {
             triggered: {}
           }
 
-          // TODO -> check all definitions are correctly set -> no empty values
+          // check all definitions are correctly set -> no empty values
+          for (let [key, value] of Object.entries(event.definitions)) {
+            if (value.length === 0) errors[key] = 'Value cannot be empty'
+            else if (key === 'commandToWatch' && !value.startsWith('!')) errors.commandToWatch = 'Command should start with !'
+            else if (key !== 'commandToWatch' && !value.match(/^\d+$/g)) errors[key] = 'This value must be a number'
+          }
 
           // TODO -> check all operations definitions are correctly set -> no empty values
 
-          // TODO -> if something is wrong -> throw error
+          if (_.size(errors) > 0) throw Error(JSON.stringify(errors))
 
           if (_.isNil(eventId)) eventId = (await global.db.engine.insert('events', event))._id.toString()
           else {
@@ -359,7 +365,7 @@ class Events {
 
           callback(null, true)
         } catch (e) {
-          global.log.error(e.message)
+          global.log.warning(e.message)
 
           if (!_.isNil(eventId) && _.isNil(data._id)) { // eventId is __newly__ created, rollback all changes
             await Promise.all([

@@ -459,7 +459,7 @@
 
     eventsSocket.emit('save-changes', eventListener, (err, cb) => {
       if (err) {
-        console.error(cb)
+        console.error(JSON.parse(cb))
 
         $('[data-dialog-alert-success]')
           .css('display', 'none')
