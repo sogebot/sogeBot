@@ -193,6 +193,11 @@
   },
   "webpanel": {
     "events": {
+      "errors": {
+        "command-must-start-with-!": "Command must start with !",
+        "this-value-must-be-a-positive-number-or-0": "This value must be a positive number or 0",
+        "value-cannot-be-empty": "Value cannot be empty"
+      },
       "dialog": {
         "title": {
           "new": "New event listener",

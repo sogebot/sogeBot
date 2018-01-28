@@ -193,6 +193,11 @@
   },
   "webpanel": {
     "events": {
+      "errors": {
+        "command-must-start-with-!": "Příkaz musí začít !",
+        "this-value-must-be-a-positive-number-or-0": "Tato hodnota musí být kladné číslo nebo 0",
+        "value-cannot-be-empty": "Hodnota nemůže být prázdná"
+      },
       "dialog": {
         "title": {
           "new": "Nová událost",

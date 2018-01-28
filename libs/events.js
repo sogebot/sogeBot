@@ -332,20 +332,20 @@ class Events {
 
           // check all definitions are correctly set -> no empty values
           for (let [key, value] of Object.entries(event.definitions)) {
-            if (value.length === 0) _.set(errors, `definitions.${key}`, 'Value cannot be empty')
-            else if (key === 'commandToWatch' && !value.startsWith('!')) _.set(errors, 'definitions.commandToWatch', 'Command should start with !')
-            else if (key !== 'commandToWatch' && !value.match(/^\d+$/g)) _.set(errors, `definitions.${key}`, 'This value must be a number')
+            if (value.length === 0) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.value-cannot-be-empty'))
+            else if (key === 'commandToWatch' && !value.startsWith('!')) _.set(errors, 'definitions.commandToWatch', global.translate('webpanel.events.errors.command-must-start-with-!'))
+            else if (key !== 'commandToWatch' && !value.match(/^\d+$/g)) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.this-value-must-be-a-positive-number-or-0'))
           }
 
           // check all operations definitions are correctly set -> no empty values
           for (let [timestamp, operation] of Object.entries(data.operations)) {
             for (let [key, value] of Object.entries(operation.definitions)) {
-              if (value.length === 0) _.set(errors, `operations.${timestamp}.${key}`, 'Value cannot be empty')
-              else if (key === 'commandToRun' && !value.startsWith('!')) _.set(errors, `operations.${timestamp}.${key}`, 'Command should start with !')
+              if (value.length === 0) _.set(errors, `operations.${timestamp}.${key}`, global.translate('webpanel.events.errors.value-cannot-be-empty'))
+              else if (key === 'commandToRun' && !value.startsWith('!')) _.set(errors, `operations.${timestamp}.${key}`, global.translate('webpanel.events.errors.command-must-start-with-!'))
             }
           }
 
-          if (_.size(errors) > 0) throw Error(JSON.stringify(errors))
+          if (_.size(errors.definitions) > 0 || _.size(errors.operations) > 0) throw Error(JSON.stringify(errors))
 
           if (_.isNil(eventId)) eventId = (await global.db.engine.insert('events', event))._id.toString()
           else {

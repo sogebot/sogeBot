@@ -261,11 +261,14 @@
       for (let [key, value] of Object.entries(definitions)) {
         $('[data-event-definitions] .card-body').append(
           `
-          <div class="input-group">
+          <div class="input-group" data-id="${key}">
             <div class="input-group-prepend">
               <span class="input-group-text">${translations.events.definitions[key].label}</span>
             </div>
-            <input id="definition-${key}" class="form-control" placeholder="${translations.events.definitions[key].placeholder}" value="${value}">
+            <div style="flex: 1 1 auto;">
+              <input id="definition-${key}" class="form-control" placeholder="${translations.events.definitions[key].placeholder}" value="${value}">
+              <div class="invalid-tooltip"></div>
+            </div>
           </div>
         `
         )
@@ -290,7 +293,7 @@
 
     const createProperInput = (k, v) => {
       if (_.isBoolean(v)) {
-        return `<button data-event-toggle-button data-id="${k}" data-value="${v}" style="flex: 1 1 auto;" class="btn ${v === true ? `btn-success` : `btn-danger`}">${translations.events.definitions[k][v]}</button>`
+        return `<button data-event-toggle-button data-id="${k}" data-value="${v}" style="width:100%" class="btn ${v === true ? `btn-success` : `btn-danger`}">${translations.events.definitions[k][v]}</button>`
       } else if (_.isArray(v)) {
         let buttons = []
         for (let val of v) {
@@ -301,7 +304,7 @@
           `)
         }
         return `
-          <div class="btn-group btn-group-toggle" data-toggle="buttons" style="flex: 1 1 auto; position: relative; left: 1px">
+          <div class="btn-group btn-group-toggle" data-toggle="buttons" style="width:100%; position: relative; left: 1px">
             ${buttons.join(' ')}
           </div>
         `
@@ -322,7 +325,10 @@
           <div class="input-group-prepend">
             <span class="input-group-text">${translations.events.definitions[key].label}</span>
           </div>
-          ${createProperInput(key, value)}
+          <div style="flex: 1 1 auto;">
+            ${createProperInput(key, value)}
+            <div class="invalid-tooltip"></div>
+          </div>
         </div>
       `
       )
@@ -458,11 +464,33 @@
     console.debug(eventListener)
 
     eventsSocket.emit('save-changes', eventListener, (err, cb) => {
-      if (err) {
-        console.error(JSON.parse(cb))
+      const modal = $('#event-listener-dlg')
 
+      { // reset form
+        modal.find('.is-invalid').removeClass('is-invalid')
+        $('[data-dialog-alert-fail]')
+          .css('display', 'none')
         $('[data-dialog-alert-success]')
           .css('display', 'none')
+      }
+
+      if (err) {
+        const errors = JSON.parse(cb)
+        console.error(errors)
+
+        // definitions errors
+        for (let [key, val] of Object.entries(errors.definitions)) {
+          $(`#definition-${key}`).addClass('is-invalid')
+          $(`.input-group[data-id="${key}"]`).find('.invalid-tooltip').text(val)
+        }
+
+        // operations errors
+        for (let [timestamp, operation] of Object.entries(errors.operations)) {
+          for (let [key, val] of Object.entries(operation)) {
+            $(`.operation-group[id="${timestamp}"]`).find(`#operation-definition-${key}`).addClass('is-invalid')
+            $(`.operation-group[id="${timestamp}"]`).find('.invalid-tooltip').text(val)
+          }
+        }
 
         $('[data-dialog-alert-fail]')
           .removeClass('d-none')
@@ -473,10 +501,8 @@
           .velocity('fadeIn', {
             duration: 200
           })
-        $('[data-id="errorMsg"]').html(`<i><small>(${cb})</small></i>`)
+        $('[data-id="errorMsg"]').html(`<i><small>(Form is not valid)</small></i>`)
       } else {
-        $('[data-dialog-alert-fail]')
-          .css('display', 'none')
 
         $('[data-dialog-alert-success]')
           .removeClass('d-none')
@@ -512,6 +538,9 @@
     modal.find('#event-listener-dlgLabel').text(_.isNil(eventToEdit)
       ? translations.events.dialog.title.new
       : translations.events.dialog.title.edit)
+
+    modal.find('[data-dialog-alert-fail]').css('display', 'none')
+    modal.find('[data-dialog-alert-success]').css('display', 'none')
 
     modal.find('#event-listener-dlg-events-name').val(_.isNil(eventToEdit)
       ? ''
@@ -559,7 +588,7 @@
               toggle.trigger('click')
             }
           } else if(_.isArray(operationDefinition)) {
-            modal.find(`#${elementId} #durationOfCommercial-${v}`).parent().button('toggle')
+            modal.find(`#${elementId} #${k}-${v}`).parent().button('toggle')
           } else {
             modal.find(`#${elementId} #operation-definition-${k}`).val(v)
           }
