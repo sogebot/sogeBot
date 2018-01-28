@@ -154,7 +154,7 @@ class Cooldown {
       } else {
         if (!cooldown.quiet && !global.configuration.getValue('disableCooldownWhispers')) {
           sender['message-type'] = 'whisper' // we want to whisp cooldown message
-          let message = global.commons.prepare('cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) })
+          let message = global.commons.prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) })
           debug(message); global.commons.sendMessage(message, sender)
         }
         result = false
