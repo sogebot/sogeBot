@@ -1,6 +1,6 @@
 const _ = require('lodash')
 const figlet = require('figlet')
-const config = require('../config.json')
+const crypto = require('crypto')
 
 // db
 const Database = require('../libs/databases/database')
@@ -57,9 +57,9 @@ let updates = async (from, to) => {
 
 let migration = {
   cache: [{
-    version: '5.12.0',
+    version: '6.0.0',
     do: async () => {
-      console.info('Migration cache to %s', '5.12.0')
+      console.info('Migration cache to %s', '6.0.0')
       let cache = await global.db.engine.findOne('cache')
 
       let when = {
@@ -82,6 +82,29 @@ let migration = {
       await global.db.engine.insert('cache', newCache)
       await global.db.engine.insert('cache.when', when)
       await global.db.engine.insert('cache.users', users)
+    }
+  }],
+  events: [{
+    version: '6.0.0',
+    do: async () => {
+      console.info('Migration events to %s', '6.0.0')
+      let events = await global.db.engine.find('events')
+
+      for (let event of events) {
+        const operations = JSON.parse(event.value)
+        if (_.isNil(event.definitions)) await global.db.engine.remove('events', { _id: event._id.toString() })
+        if (_.size(operations) === 0) continue
+
+        const eventId = (await global.db.engine.insert('events', {
+          name: 'events#' + crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5),
+          key: event.key,
+          definitions: {},
+          triggered: {}
+        }))._id.toString()
+
+        console.log(operations)
+      }
+      //{"key":"hosted","_id":"EvhtlWOJ9b0EDX9M","value":"[[{\"name\":\"run-command\",\"duration\":\"30\",\"command\":\"!alert type=text position=left class=follow text='Nový host' y-offset=-50 x-offset=-7 time=13500 | type=text position=left class=name text='$username - $viewers' y-offset=-50 x-offset=-30 time=11500 delay=2000 | type=audio url=http://sogebot.sogehige.tv/dist/gallery/7422e0116e.mp3 volume=20\",\"quiet\":false}]]"}
     }
   }]
 }
