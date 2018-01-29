@@ -426,7 +426,7 @@ class Events {
           message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
           viewers: _.random(0, 9999, false),
           autohost: _.random(0, 1, false) === 0,
-          bits: _.random(1, 1000000, false) === 0,
+          bits: _.random(1, 1000000, false),
           duration: _.sample([30, 60, 90, 120, 150, 180]),
           reason: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
           command: '!testcommand',
