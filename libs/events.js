@@ -423,7 +423,15 @@ class Events {
           userObject: await global.users.get(username),
           months: months,
           monthsName: global.parser.getLocalizedName(months, 'core.months'),
-          message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet'])
+          message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
+          viewers: _.random(0, 9999, false),
+          autohost: _.random(0, 1, false) === 0,
+          bits: _.random(1, 1000000, false) === 0,
+          duration: _.sample([30, 60, 90, 120, 150, 180]),
+          reason: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
+          command: '!testcommand',
+          count: _.random(0, 9999, false),
+          method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : ''
         }
         for (let operation of (await global.db.engine.find('events.operations', { eventId: eventId }))) {
           d('Firing %j', operation)
