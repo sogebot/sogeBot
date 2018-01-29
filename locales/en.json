@@ -192,6 +192,104 @@
     }
   },
   "webpanel": {
+    "events": {
+      "event": "Event",
+      "whatsthis": "what's this?",
+      "badges": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      },
+      "buttons": {
+        "test": "Test",
+        "enable": "Enable",
+        "disable": "Disable",
+        "edit": "Edit",
+        "delete": "Delete",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "popovers": {
+        "are_you_sure_you_want_to_delete_event": "Are you sure you want to <strong class='text-danger'>delete</strong> event",
+        "example_of_user_object_data": "Example of user object data"
+      },
+      "errors": {
+        "command_must_start_with_!": "Command must start with !",
+        "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
+        "value_cannot_be_empty": "Value cannot be empty"
+      },
+      "dialog": {
+        "title": {
+          "new": "New event listener",
+          "edit": "Edit event listener"
+        },
+        "placeholders": {
+          "name": "Set name of your event listener (if empty, name will be generated)"
+        },
+        "alerts": {
+          "success": "Event was <strong>successfully</strong> saved.",
+          "fail": "Something went <strong>wrong</strong>."
+        },
+        "close": "Close",
+        "save-changes": "Save changes",
+        "event": "Event",
+        "name": "Name",
+        "usable-events-variables": "Usable events variables",
+        "settings": "Settings",
+        "filters": "Filters",
+        "operations": "Operations"
+      },
+      "definitions": {
+        "runEveryXCommands": {
+          "label": "Run Every X Commands",
+          "placeholder": "Number of commands before event is triggered"
+        },
+        "commandToWatch": {
+          "label": "Command To Watch",
+          "placeholder": "Set your !commandToWatch"
+        },
+        "viewersAtLeast": {
+          "label": "Viewers At Least",
+          "placeholder": "How many viewers at least to trigger event"
+        },
+        "runInterval": {
+          "label": "Run Interval (0 = run once per stream)",
+          "placeholder": "Trigger event every x seconds"
+        },
+        "runAfterXMinutes": {
+          "label": "Run After X Minutes",
+          "placeholder": "Trigger event after x minutes"
+        },
+        "runEveryXMinutes": {
+          "label": "Run Every X Minutes",
+          "placeholder": "Trigger event every x minutes"
+        },
+        "messageToSend": {
+          "label": "Message To Send",
+          "placeholder": "Set your message"
+        },
+        "commandToRun": {
+          "label": "Command To Run",
+          "placeholder": "Set your !commandToRun"
+        },
+        "isCommandQuiet": {
+          "label": "Should be command quiet",
+          "true": "Command will be quiet",
+          "false": "Command won't be quiet"
+        },
+        "urlOfSoundFile": {
+          "label": "Url Of Your Sound File",
+          "placeholder": "http://www.pathToYour.url/where/is/file.mp3"
+        },
+        "emotesToExplode": {
+          "label": "Emotes To Explode",
+          "placeholder": "List of emotes to explode, e.g. Kappa PurpleHeart"
+        },
+        "durationOfCommercial": {
+          "label": "Duration Of Commercial",
+          "placeholder": "Available durations - 30, 60, 90, 120, 150, 180"
+        }
+      }
+    },
     "eventlist-events": {
       "follow": "<strong>followed</strong> you",
       "host": "<strong>hosted</strong> you with $viewers viewers",
@@ -253,7 +351,18 @@
         "ticketsName": "Tickets name",
         "fromUsername": "From username",
         "toUsername": "To username",
-        "items": "Items"
+        "items": "Items",
+        "bits": "Bits",
+        "message": "Message",
+        "reason": "Reason",
+        "target": "Target",
+        "autohost": "Autohost (true/false)",
+        "duration": "Duration",
+        "method": "Method",
+        "months": "Months",
+        "monthsName": "localized name of month (1 month, 2 months)",
+        "oldGame": "Game before change",
+        "userObject": "Full user object"
       }
     },
     "page-settings": {
@@ -591,7 +700,7 @@
     "stream-started": "stream started",
     "stream-stopped": "stream stopped",
     "stream-is-running-x-minutes": "stream is running x minutes",
-    "every-x-seconds": "every x seconds",
+    "every-x-minutes-of-stream": "every x minutes of stream",
     "game-changed": "game changed",
     "cheer": "received cheer",
     "clearchat": "chat was cleared",
@@ -627,6 +736,8 @@
     "click-to-highlight": "highlight",
     "commercial": "commercial started",
     "start-commercial": "run a commercial",
+    "bot-will-join-channel": "bot will join channel",
+    "bot-will-leave-channel": "bot will leave channel",
     "omit": "omit",
     "comply": "comply",
     "visible": "visible",

@@ -1,540 +1,619 @@
+<!-- New Event Listener Dialog -->
+<div class="modal fade" id="event-listener-dlg" tabindex="-1" role="dialog" aria-labelledby="event-listener-dlgLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="event-listener-dlgLabel"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="event-form">
+          <div class="card">
+            <div class="card-header" data-lang="events.dialog.event"></div>
+            <div class="card-body">
+              <div class="form-group">
+                <label for="event-listener-dlg-events-name" data-lang="events.dialog.name"></label>
+                <input class="form-control" type="text" id="event-listener-dlg-events-name"/>
+              </div>
+
+              <div class="form-group">
+                <label for="event-listener-dlg-events" data-lang="events.dialog.event"></label>
+                <select class="form-control" data-load-events="1" id="event-listener-dlg-events"></select>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-event-variables>
+            <div class="card-header" data-lang="events.dialog.usable-events-variables"></div>
+            <div class="card-body">
+              <small></small>
+            </div>
+          </div>
+
+          <div class="card" data-event-definitions>
+            <div class="card-header" data-lang="events.dialog.settings"></div>
+            <div class="card-body"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header" data-lang="events.dialog.filters"></div>
+            <div class="card-body">
+              <textarea id="event-listener-filter" class="form-control"></textarea>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <button class="btn btn-outline-primary" onclick="addEventOperation(event)">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+              </button>
+              <span data-lang="events.dialog.operations"></span>
+            </div>
+            <div class="card-body" data-event-operations></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <div data-dialog-alert-success class="alert alert-success d-none" role="alert" data-lang="events.dialog.alerts.success"></div>
+        <div data-dialog-alert-fail class="alert alert-danger d-none" role="alert" data-lang="events.dialog.alerts.fail"></div>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" data-lang="events.dialog.close"></button>
+        <button type="button" class="btn btn-primary" onclick="saveChanges(event, this)" id="event-listener-save-changes-btn" data-lang="events.dialog.save-changes"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <ul class="nav nav-tabs">
   <li class="nav-item">
     <span data-lang="event-listeners" class="title text-default"></span>
   </li>
+  <li class="nav-item">
+    <button class="nav-link btn btn-success" data-toggle="modal" data-target="#event-listener-dlg">
+      <i class="fa fa-plus" aria-hidden="true"></i> <span data-lang="events.event">
+    </button>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#manage" data-lang="manage"></a>
+  </li>
 </ul>
 
 <div class="tab-content">
-  <div role="tabpanel" class="tab-pane active" id="viewers">
+  <div role="tabpanel" class="tab-pane active" id="manage">
     <div class="widget">
-
-      <form class="form-inline form-chainops">
-        <div class="form-group">
-          <label for="Events" data-lang="event"></label>
-          <select id="events-list" class="form-control"></select>
-
-          <small>
-            <div id="usernameInfo">
-              <strong>$username</strong>
-              <span data-lang="events-user-triggered-event"></span>
-            </div>
-            <div id="methodInfo">
-              <strong>$method</strong>
-              <span data-lang="events-method-used-to-subscribe"></span>
-            </div>
-            <div id="monthsInfo">
-              <strong>$months</strong>
-              <span data-lang="events-months-of-subscription"></span>
-            </div>
-            <div id="monthsNameInfo">
-              <strong>$monthsName</strong>
-              <span data-lang="events-monthsName-of-subscription"></span>
-            </div>
-            <div id="messageInfo">
-              <strong>$message</strong>
-              <span data-lang="events-user-message"></span>
-            </div>
-            <div id="bitsInfo">
-              <strong>$bits</strong>
-              <span data-lang="events-user-message"></span>
-            </div>
-            <div id="reasonInfo">
-              <strong>$reason</strong>
-              <span data-lang="events-reason-for-ban-timeout"></span>
-            </div>
-            <div id="durationInfo">
-              <strong>$duration</strong>
-              <span data-lang="events-duration-of-timeout"></span>
-            </div>
-            <div id="durationCommercialInfo">
-              <strong>$duration</strong>
-              <span data-lang="events-duration-of-commercial"></span>
-            </div>
-            <div id="targetInfo">
-              <strong>$target</strong>
-              <span data-lang="events-target-of-your-hosting"></span>
-            </div>
-            <div id="viewersInfo">
-              <strong>$viewers</strong>
-              <span data-lang="events-viewers-of-hosting"></span>
-            </div>
-            <div id="gameInfo">
-              <strong>$game</strong>
-              <span data-lang="events-game-after-change"></span>
-            </div>
-            <div id="oldGameInfo">
-              <strong>$oldGame</strong>
-              <span data-lang="events-game-before-change"></span>
-            </div>
-          </small>
-        </div>
-
-        <div class="form-group" id="commandGroup" style="display: none">
-          <label for="command" data-lang="command"></label>
-          <input id="command" class="form-control" placeholder="Set your !command">
-        </div>
-
-        <div class="form-group" id="countGroup" style="display: none">
-          <label for="count" data-lang="count"></label>
-          <input id="count" class="form-control" placeholder="commands to activate">
-        </div>
-
-        <div class="form-group" id="timestampGroup" style="display: none">
-          <label for="timestamp" data-lang="timestamp"></label>
-          <input id="timestamp" class="form-control" placeholder="activate every x seconds">
-        </div>
-
-        <br>
-
-        <div class="form-group" id="operationsGroup">
-          <label for="Operations" data-lang="operation"></label>
-          <select id="operations-list" class="form-control"></select>
-        </div>
-
-        <div class="form-group" id="messageGroup">
-          <label for="message" data-lang="message"></label>
-          <input id="message" class="form-control" placeholder="message to send">
-        </div>
-
-        <div class="form-group" id="command2Group" style="display: none">
-          <label for="command2" data-lang="command"></label>
-          <input id="command2" class="form-control" placeholder="!command to run">
-        </div>
-
-        <div class="form-group" id="quietGroup" style="display: none">
-          <label for="quiet" data-lang="quiet"></label>
-          <button class="btn btn-danger" id="quietToggle" data-lang="false"></button>
-        </div>
-
-        <div class="form-group" id="soundGroup" style="display: none">
-          <label for="sound" data-lang="sound"></label>
-          <input id="sound" class="form-control" placeholder="link or soundboard name">
-        </div>
-
-        <div class="form-group" id="emotesGroup" style="display: none">
-          <label for="emotes" data-lang="emotes"></label>
-          <input id="emotes" class="form-control" placeholder="Kappa :) purpleHeart">
-        </div>
-
-        <div class="form-group" id="commercialGroup" style="display: none">
-          <label for="duration" data-lang="duration"></label>
-          <select class="form-control" id="commercial-list">
-            <option value="30">30s</option>
-            <option value="60">60s</option>
-            <option value="90">90s</option>
-            <option value="120">120s</option>
-            <option value="150">150s</option>
-            <option value="180">180s</option>
-          </select>
-        </div>
-
-        <button type="button" class="btn btn-success pull-right" data-lang="create-a-new-event-listener" onclick="newEvent()"></button>
-        <div class="clearfix"></div>
-      </form>
-      <hr>
-
-      <div id="events-current"></div>
+      <div class="card-columns p-2" id="eventlist-cards"></div>
     </div>
   </div>
 </div>
 
 <script>
-  socket.emit('events.get');
-
-  $("#quietToggle").on('click', function (ev) {
-    ev.preventDefault()
-    $el = $(ev.currentTarget)
-    if ($el.text() === translations['false']) {
-      $el.text(translations['true'])
-      $el.removeClass()
-      $el.addClass('btn btn-success')
-    } else {
-      $el.text(translations['false'])
-      $el.removeClass()
-      $el.addClass('btn btn-danger')
-    }
+  var eventsSocket = io('/events', {
+    query: "token=" + token
   })
 
-  $('#events-list').on('change', function (ev) {
-    $('#commandGroup').css('display', 'none')
-    $('#countGroup').css('display', 'none')
-    $('#timestampGroup').css('display', 'none')
-    $('#usernameInfo').css('display', 'none')
-    $('#methodInfo').css('display', 'none')
-    $('#monthsInfo').css('display', 'none')
-    $('#monthsNameInfo').css('display', 'none')
-    $('#messageInfo').css('display', 'none')
-    $('#bitsInfo').css('display', 'none')
-    $('#reasonInfo').css('display', 'none')
-    $('#durationInfo').css('display', 'none')
-    $('#durationCommercialInfo').css('display', 'none')
-    $('#targetInfo').css('display', 'none')
-    $('#viewersInfo').css('display', 'none')
-    $('#gameInfo').css('display', 'none')
-    $('#oldGameInfo').css('display', 'none')
+  var events = {
+    list: {},
+    refresh: () => {
+      eventsSocket.emit('list.events', (err, cb) => {
+        $('#eventlist-cards').empty()
+        events.list = cb
+        for (let event of cb.events) {
+          let operationsCount = _.filter(cb.operations, (o) => o.eventId === event._id.toString()).length
+          let filter = _.find(cb.filters, (o) => o.eventId === event._id.toString()).filters
 
-    $('#command2').val('')
-    $('#count').val('')
-    $('#timestamp').val('')
+          let definitionOutput = []
+          for (let [key, value] of Object.entries(event.definitions)) {
+            definitionOutput.push(`
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">${translations.events.definitions[key].label}</span>
+                </div>
+                <input class="form-control" value="${value}" disabled="disabled">
+              </div>
+            `)
+          }
 
-    switch (ev.currentTarget.value) {
-      case 'user-joined-channel':
-      case 'user-parted-channel':
-      case 'follow':
-      case 'unfollow':
-      case 'action':
-      case 'mod':
-        $('#usernameInfo').css('display', 'block')
-        break
-      case 'subscription':
-        $('#usernameInfo').css('display', 'block')
-        $('#methodInfo').css('display', 'block')
-        break
-      case 'commercial':
-        $('#durationCommercialInfo').css('display', 'block')
-        break
-      case 'resub':
-        $('#usernameInfo').css('display', 'block')
-        $('#monthsInfo').css('display', 'block')
-        $('#monthsNameInfo').css('display', 'block')
-        $('#messageInfo').css('display', 'block')
-        break
-      case 'cheer':
-        $('#usernameInfo').css('display', 'block')
-        $('#bitsInfo').css('display', 'block')
-        $('#messageInfo').css('display', 'block')
-        break
-      case 'ban':
-        $('#usernameInfo').css('display', 'block')
-        $('#reasonInfo').css('display', 'block')
-        break
-      case 'timeout':
-        $('#usernameInfo').css('display', 'block')
-        $('#reasonInfo').css('display', 'block')
-        $('#durationInfo').css('display', 'block')
-        break
-      case 'hosting':
-        $('#targetInfo').css('display', 'block')
-        $('#viewersInfo').css('display', 'block')
-        break
-      case 'hosted':
-        $('#viewersInfo').css('display', 'block')
-        $('#usernameInfo').css('display', 'block')
-        break
-      case 'command-send-x-times':
-        $('#commandGroup').css('display', 'inline-block')
-        $('#countGroup').css('display', 'inline-block')
-        $('#count').attr('placeholder', 'commands to activate')
-        $('#timestampGroup').css('display', 'inline-block')
-        break
-      case 'number-of-viewers-is-at-least-x':
-        $('#countGroup').css('display', 'inline-block')
-        $('#count').attr('placeholder', 'viewers to activate')
-        $('#timestampGroup').css('display', 'inline-block')
-        break
-      case 'stream-is-running-x-minutes':
-        $('#countGroup').css('display', 'inline-block')
-        $('#count').attr('placeholder', 'minutes to activate')
-        break
-      case 'every-x-seconds':
-        $('#countGroup').css('display', 'inline-block')
-        $('#count').attr('placeholder', 'seconds to activate')
-        break
-      case 'game-changed':
-        $('#gameInfo').css('display', 'block')
-        $('#oldGameInfo').css('display', 'block')
+          $('#eventlist-cards').append(`
+            <div class="card" data-id="${event._id.toString()}">
+              <div class="card-body mb-0 pb-0 pt-2" data-card="${event.name}">
+                <h5 class="card-title">
+                  ${event.enabled ? `<span class="badge badge-pill badge-primary" data-id="${event._id.toString()}">${translations.events.badges.enabled}</span>` : `<span class="badge badge-pill badge-light" data-id="${event._id.toString()}">${translations.events.badges.disabled}</span>` }
+                  <strong>${event.name}</strong> <small class="text-muted">${event.key}</small>
+                  <div style="float:right; position: relative; top:-.4rem;" class="text-primary"><i class="fa fa-cogs" style="position: relative; top:-.3rem; font-size: 1rem;" aria-hidden="true"></i> <strong style="font-size: 2rem; ">${operationsCount}</strong></div>
+                </h5>
+                <div class="clearfix"></div>
+              </div>
+
+              ${definitionOutput.join('')}
+
+              ${filter.length ? `<div class="card-footer" data-card="${event.name}">
+                  <small style="font-family: Monospace">${filter}</small>
+                  <i class="fa fa-filter text-muted" style="float: right; font-size: 1.5rem;"></i>
+                </div>` : ``}
+
+              <div class="card-footer text-center">
+                <a href="#" class="btn btn-outline-primary" data-id="${event._id.toString()}" onclick="events.test(this)"><i class="fa fa-bell-o" aria-hidden="true"></i> ${translations.events.buttons.test}</a>
+                <a href="#" class="btn btn-outline-secondary btn-toggle" data-id="${event._id.toString()}" onclick="events.toggle(this)">${event.enabled ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> ${translations.events.buttons.disable}`: `<i class="fa fa-toggle-on" aria-hidden="true"></i> ${translations.events.buttons.enable}`}</a>
+                <a href="#" class="btn btn-outline-secondary" data-toggle="modal" data-target="#event-listener-dlg" data-id="${event._id.toString()}"><i class="fa fa-pencil" aria-hidden="true"></i> ${translations.events.buttons.edit}</a>
+                <a href="#" class="btn btn-outline-danger" data-card-delete-popover="${event._id.toString()}" data-container="body" data-toggle="popover"><i class="fa fa-trash-o" aria-hidden="true"></i> ${translations.events.buttons.delete}</a>
+              </div>
+            </div>
+          `)
+
+          $(`[data-card-delete-popover="${event._id.toString()}"]`).popover({
+            html: true,
+            content: `
+          <p>${translations.events.popovers.are_you_sure_you_want_to_delete_event} '<strong>${event.name}</strong>'?</p>
+          <div class="text-center">
+            <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="events.delete(this)">${translations.events.buttons.yes}</a>
+            <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="$('[data-card-delete-popover=${event._id.toString()}]').popover('hide')">${translations.events.buttons.no}</a>
+          </div>`
+          })
+        }
+      })
+    },
+    test: (el) => {
+      console.debug('Testing event operations:', el.dataset.id)
+      eventsSocket.emit('test.event', el.dataset.id)
+    },
+    toggle: (el) => {
+      $(el).removeClass().addClass('btn btn-info')
+      eventsSocket.emit('toggle.event', el.dataset.id, (err, cb) => {
+        if (err) return console.error(err)
+        $(el).removeClass().addClass('btn btn-outline-secondary')
+
+        $(`.badge[data-id="${el.dataset.id}"]`)
+          .removeClass()
+          .addClass(cb.enabled ? 'badge badge-pill badge-primary' : 'badge badge-pill badge-light')
+          .text(cb.enabled ? translations.events.badges.enabled : translations.events.badges.disabled)
+
+        $(el)
+          .html(cb.enabled ?
+            `<i class="fa fa-toggle-off" aria-hidden="true"></i> ${translations.events.buttons.disable}` :
+            `<i class="fa fa-toggle-on" aria-hidden="true"></i> ${translations.events.buttons.enable}`)
+      })
+    },
+    delete: (el) => {
+      // change button to informative state
+      $(el).removeClass().addClass('btn btn-info')
+      eventsSocket.emit('delete.event', el.dataset.id, (err, cb) => {
+        if (err) return console.error(err)
+        $(el).removeClass().addClass('btn btn-outline-secondary')
+        $(`[data-card-delete-popover=${cb}]`).popover('hide')
+        $(`.card[data-id='${cb}']`).velocity('fadeOut')
+      })
     }
-  })
-
-  $('#operations-list').on('change', function (ev) {
-    $('#messageGroup').css('display', 'none')
-    $('#command2Group').css('display', 'none')
-    $('#soundGroup').css('display', 'none')
-    $('#emotesGroup').css('display', 'none')
-    $('#quietGroup').css('display', 'none')
-    $('#commercialGroup').css('display', 'none')
-
-    $('#message').val('')
-    $('#sound').val('')
-    $('#command2').val('')
-    $('#emotes').val('')
-
-    switch (ev.currentTarget.value) {
-      case 'send-chat-message':
-      case 'send-twitter-message':
-      case 'send-whisper':
-        $('#messageGroup').css('display', 'inline-block')
-        break
-      case 'run-command':
-        $('#command2Group').css('display', 'inline-block')
-        $('#quietGroup').css('display', 'inline-block')
-        break
-      case 'play-sound':
-        $('#soundGroup').css('display', 'inline-block')
-        break
-      case 'emote-explosion':
-        $('#emotesGroup').css('display', 'inline-block')
-        break
-      case 'start-commercial':
-        $('#commercialGroup').css('display', 'inline-block')
-        break
-    }
-  })
-
-  var newEvent = function () {
-    let validated = true
-    if ($('#commandGroup').css('display') !== 'none') {
-      if ($('#command').val().length === 0) {
-        $('#commandGroup').addClass('has-error')
-        validated = false
-      } else {
-        $('#commandGroup').removeClass('has-error')
-      }
-      if (validated && !$('#command').val().startsWith('!')) $('#command').val('!' + $('#command').val()) // add ! if it doesn't start with one
-    }
-
-    if ($('#countGroup').css('display') !== 'none' && ($('#count').val().length === 0 || !_.isFinite(parseInt($(
-        '#count').val(), 10)))) {
-      $('#countGroup').addClass('has-error')
-      validated = false
-    } else {
-      $('#countGroup').removeClass('has-error')
-    }
-
-    if ($('#timestampGroup').css('display') !== 'none' && ($('#timestamp').val().length === 0 || !_.isFinite(
-        parseInt($('#timestamp').val(), 10)))) {
-      $('#timestampGroup').addClass('has-error')
-      validated = false
-    } else {
-      $('#timestampGroup').removeClass('has-error')
-    }
-
-    if ($('#messageGroup').css('display') !== 'none' && $('#message').val().length === 0) {
-      $('#messageGroup').addClass('has-error')
-      validated = false
-    } else {
-      $('#messageGroup').removeClass('has-error')
-    }
-
-    if ($('#command2Group').css('display') !== 'none') {
-      if ($('#command2').val().length === 0) {
-        $('#command2Group').addClass('has-error')
-        validated = false
-      } else {
-        $('#command2Group').removeClass('has-error')
-      }
-      if (validated && !$('#command2').val().startsWith('!')) $('#command2').val('!' + $('#command2').val()) // add ! if it doesn't start with one
-    }
-
-    if ($('#soundGroup').css('display') !== 'none' && $('#sound').val().length === 0) {
-      $('#soundGroup').addClass('has-error')
-      validated = false
-    } else {
-      $('#soundGroup').removeClass('has-error')
-    }
-
-    if ($('#emotesGroup').css('display') !== 'none' && $('#emotes').val().length === 0) {
-      $('#emotesGroup').addClass('has-error')
-      validated = false
-    } else {
-      $('#emotesGroup').removeClass('has-error')
-    }
-
-    if (!validated) {
-      return 0
-    }
-
-    var data = {
-      event: $('#events-list').val(),
-      operation: {
-        name: $('#operations-list').val(),
-        duration: $('#commercial-list').val(),
-        send: $('#message').val(),
-        sound: $('#sound').val(),
-        command: $('#command2').val(),
-        emotes: $('#emotes').val(),
-        quiet: $('#quietToggle').text() === translations['true'] ? true : false
-      },
-      definition: {
-        command: $('#command').val().length > 0 ? $('#command').val() : null,
-        count: $('#count').val().length > 0 ? $('#count').val() : null,
-        timestamp: $('#timestamp').val().length > 0 ? $('#timestamp').val() : null
-      },
-    }
-
-    switch ($('#events-list').val()) {
-      case 'user-joined-channel':
-      case 'user-parted-channel':
-      case 'follow':
-      case 'unfollow':
-      case 'subscription':
-      case 'resub':
-      case 'stream-started':
-      case 'stream-stopped':
-      case 'cheer':
-      case 'clearchat':
-      case 'action':
-      case 'ban':
-      case 'hosting':
-      case 'hosted':
-      case 'mod':
-      case 'timeout':
-      case 'commercial':
-        delete data.definition
-    }
-    socket.emit('events.new', data)
-    $('#messageGroup').css('display', 'inline-block')
-    $('#message').val('')
-    $('#soundGroup').css('display', 'none')
-    $('#emotesGroup').css('display', 'none')
-    $('#command2Group').css('display', 'none')
-    $('#quietGroup').css('display', 'none')
-    $('#countGroup').css('display', 'none')
-    $('#commercialGroup').css('display', 'none')
   }
 
-  socket.off('events')
-  socket.on('events', function (data) {
-    $('#events-list').empty()
-    $('#events-current').empty()
-    $('#operations-list').empty()
-
-    _.each(data.events, function (o, k) {
-      $('#events-list').append(
-        $('<option></option').attr('value', k).text(translations[k]))
-      if (o.length) {
-        let div_part
-        let div_main = $('<div id="' + k + '"></div>')
-
-        div_part = $('<div style="min-width:14%"></div>')
-          .append($('<label></label>').text(translations['event']))
-          .append($('<div></div>').text(translations[k]))
-        div_main.append(div_part)
-
-        let firstDefinition = true
-        _.each(o, function (obj) {
-          let definition = null
-          _.each(obj, function (operation) {
-            let div_op = $('<div class="operation" data-event="' + k + '"></div>')
-            // is definition
-            let div_def
-            if (operation.definition) {
-              definition = operation
-              if (!firstDefinition) {
-                div_def = $(
-                  '<div class="definition" style="position:relative; left: 200px;"></div>')
-              } else {
-                div_def = $(
-                  '<div class="definition" style="position:absolute; left: 220px;"></div>')
-              }
-              firstDefinition = false
-
-              if (operation.command) {
-                div_part = $(
-                    '<div style="min-width:100px;display:inline-block;padding-top:0;" ></div>')
-                  .append($('<label></label>').text(translations['command']))
-                  .append($('<div style="display:block;"></div>').text(operation.command))
-                div_def.append(div_part)
-              }
-              if (operation.tCount) {
-                div_part = $(
-                    '<div style="min-width:100px;display:inline-block;padding-top:0;" ></div>')
-                  .append($('<label></label>').text(translations['count']))
-                  .append($('<div style="display:block;"></div>').text(operation.tCount))
-                div_def.append(div_part)
-              }
-              if (operation.viewers) {
-                div_part = $(
-                    '<div style="min-width:100px;display:inline-block;padding-top:0;" ></div>')
-                  .append($('<label></label>').text(translations['count']))
-                  .append($('<div style="display:block;"></div>').text(operation.viewers))
-                div_def.append(div_part)
-              }
-              if (operation.tTimestamp) {
-                div_part = $(
-                    '<div style="min-width:100px;display:inline-block;padding-top:0;" ></div>')
-                  .append($('<label></label>').text(translations['timestamp']))
-                  .append($('<div style="display:block"></div>').text(operation.tTimestamp))
-                div_def.append(div_part)
-              }
-              div_main.append(div_def)
-            } else {
-              div_op.data('name', operation.name)
-              div_part = $('<div></div>')
-                .append($('<label></label>').text(translations['operation']))
-                .append($('<div></div>').text(translations[operation.name]))
-              div_op.append(div_part)
-
-              switch (operation.name) {
-                case 'send-chat-message':
-                case 'send-twitter-message':
-                case 'send-whisper':
-                  div_op.data('send', operation.send)
-                  div_part = $('<div></div>')
-                    .append($('<label></label>').text(translations['message']))
-                    .append($('<div></div>').text(operation.send))
-                  break
-                case 'run-command':
-                  div_op.data('command', operation.command)
-                  div_part = $('<div></div>')
-                    .append($('<label></label>').text((operation.quiet ? translations['quiet'] +
-                      ' ' : '') + translations['command']))
-                    .append($('<div></div>').text(operation.command))
-                  break
-                case 'play-sound':
-                  div_op.data('sound', operation.sound)
-                  div_part = $('<div></div>')
-                    .append($('<label></label>').text(translations['sound']))
-                    .append($('<div></div>').text(operation.sound))
-                  break
-                case 'emote-explosion':
-                  div_op.data('emotes', operation.emotes)
-                  div_part = $('<div></div>')
-                    .append($('<label></label>').text(translations['emotes']))
-                    .append($('<div></div>').text(operation.emotes))
-                  break
-                case 'start-commercial':
-                  div_op.data('duration', operation.duration)
-                  div_part = $('<div></div>')
-                    .append($('<label></label>').text(translations['duration']))
-                    .append($('<div></div>').text(operation.duration + 's'))
-                  break
-              }
-
-              if (!_.isNil(definition) && _.size(definition) > 1) {
-                div_op.data('definition', definition)
-              }
-              div_op.append(div_part)
-              div_main.append(div_op)
-            }
-          })
-        })
-        $('#events-current').append(div_main)
-
-        // refresh right-click menu
-        var menu = new BootstrapMenu(".operation", {
-          fetchElementData: function ($el) {
-            return $el.data();
-          },
-          actions: [{
-            name: 'Delete Operation',
-            classNames: ['action-danger'],
-            iconClass: 'fa-trash-o',
-            onClick: function (data) {
-              socket.emit('events.delete', data)
-            }
-          }]
-        })
-      }
-    })
-    _.each(data.operations, function (o) {
-      if (o === 'log') return true
-      $('#operations-list').append(
-        $('<option></option').attr('value', o).text(translations[o])
-      )
-    })
+  var supportedEventsList = []
+  eventsSocket.emit('list.supported.events', (cb) => {
+    supportedEventsList = cb
+    console.debug('Loaded list of supported events:', supportedEventsList)
+    // load options to event select
+    for (let value of _.map(supportedEventsList, 'id')) $('[data-load-events="1"]').append(
+      `<option value='${value}'>${translations[value]}</option>`)
+    $('[data-load-events]').trigger('change')
   })
 
-  $('#usernameInfo').css('display', 'block')
+  $('[data-load-events="1"]').change((ev) => {
+    const event = _.find(supportedEventsList, (o) => o.id === ev.currentTarget.value)
+    const variables = _.get(event, 'variables', [])
+    const definitions = _.get(event, 'definitions', [])
+    console.debug('Event selected', event)
 
+    // VARIABLES ////////////////////////////////////////////////////////////////
+    if (variables.length > 0) {
+      $('[data-event-variables]').css('display', 'block')
+      $('[data-event-variables] small').empty()
+
+      const whatsthis =
+        `<a data-events-whats-this class="badge badge-pill badge-light" data-html="true"
+                                data-content="<em>${translations.events.popovers.example_of_user_object_data}</em>
+                                              <br> <b>userObject.username</b>: 'exampleuser'
+                                              <br> <b>userObject.id</b>: '123456'
+                                              <br> <b>userObject.is.online</b>: true
+                                              <br> <b>userObject.is.follower</b>: true <br> <b>userObject.is.regular</b>: true
+                                              <br> <b>userObject.is.subscriber</b>: true">
+                          ${translations.events.whatsthis}
+                        </a>`
+      for (let variable of variables) {
+        $('[data-event-variables] small').append(
+          `
+          <div>
+            <strong>$${variable}</strong> - ${translations.responses.variable[variable]}
+            ${variable === 'userObject'
+              ? whatsthis
+              : ``}
+          </div>
+        `
+        )
+
+        if (variable === 'userObject') {
+          $('[data-events-whats-this]').popover({
+            trigger: 'hover'
+          })
+        }
+      }
+    } else {
+      $('[data-event-variables]').css('display', 'none')
+    }
+    // !VARIABLES ///////////////////////////////////////////////////////////////
+
+    // DEFINITIONS ////////////////////////////////////////////////////////////
+    $('[data-event-definitions] .card-body').empty()
+    if (_.size(definitions) > 0) {
+      $('[data-event-definitions]').css('display', 'block')
+      console.debug('Definitions', definitions)
+      for (let [key, value] of Object.entries(definitions)) {
+        $('[data-event-definitions] .card-body').append(
+          `
+          <div class="input-group" data-id="${key}">
+            <div class="input-group-prepend">
+              <span class="input-group-text">${translations.events.definitions[key].label}</span>
+            </div>
+            <div style="flex: 1 1 auto;">
+              <input id="definition-${key}" class="form-control" placeholder="${translations.events.definitions[key].placeholder}" value="${value}">
+              <div class="invalid-tooltip"></div>
+            </div>
+          </div>
+        `
+        )
+      }
+    } else {
+      $('[data-event-definitions]').css('display', 'none')
+    }
+    // !DEFINITIONS ///////////////////////////////////////////////////////////
+  })
+
+  var supportedOperationsList = []
+  eventsSocket.emit('list.supported.operations', (cb) => {
+    supportedOperationsList = cb
+    console.debug('Loaded list of supported operations:', supportedOperationsList)
+  })
+
+  // dynamic on change for operations
+  $('[data-event-operations]').on('change', 'select', (ev) => {
+    const operation = _.find(supportedOperationsList, (o) => o.id === ev.currentTarget.value)
+    const definitions = _.get(operation, 'definitions', [])
+    console.debug('Operation selected', operation)
+
+    const createProperInput = (k, v) => {
+      if (_.isBoolean(v)) {
+        return `<button data-event-toggle-button data-id="${k}" data-value="${v}" style="width:100%" class="btn ${v === true ? `btn-success` : `btn-danger`}">${translations.events.definitions[k][v]}</button>`
+      } else if (_.isArray(v)) {
+        let buttons = []
+        for (let val of v) {
+          buttons.push(`
+            <label class="form-control btn btn-secondary ${buttons.length === 0 ? `active` : ``}">
+              <input type="radio" name="radio-options-${k}" id="${k}-${val}" autocomplete="off" ${buttons.length === 0 ? `checked` : ``}> ${val}
+            </label>
+          `)
+        }
+        return `
+          <div class="btn-group btn-group-toggle" data-toggle="buttons" style="width:100%; position: relative; left: 1px">
+            ${buttons.join(' ')}
+          </div>
+        `
+      } else {
+        return `<input id="operation-definition-${k}" class="form-control" placeholder="${translations.events.definitions[k].placeholder}" value="${v}">`
+      }
+    }
+
+    // DEFINITIONS ////////////////////////////////////////////////////////////
+    const definitionsElement = $(ev.currentTarget).parents('.operation-group').children(
+      '.event-operation-definitions')
+    definitionsElement.empty()
+    console.debug('Definitions', definitions)
+    for (let [key, value] of Object.entries(definitions)) {
+      definitionsElement.append(
+        `
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">${translations.events.definitions[key].label}</span>
+          </div>
+          <div style="flex: 1 1 auto;">
+            ${createProperInput(key, value)}
+            <div class="invalid-tooltip"></div>
+          </div>
+        </div>
+      `
+      )
+    }
+    // !DEFINITIONS ///////////////////////////////////////////////////////////
+  });
+
+  $('[data-event-operations]').on('click', '[data-event-toggle-button]', ((ev) => {
+    ev.preventDefault()
+    const target = $(ev.currentTarget)
+    const value = target.data('value') === 'true' ? false : true
+    target
+      .removeClass()
+      .addClass('btn')
+      .addClass(value ? 'btn-success' : 'btn-danger')
+      .text(translations.events.definitions[target.data('id')][value])
+      .data('value', value.toString())
+  }))
+
+  // HELPERS //////////////////////////////////////////////////////////////////
+  var addEventOperation = (ev) => {
+    if (!_.isNil(ev)) ev.preventDefault()
+
+    let operationOptions = () => {
+      let r = []
+      for (let id of _.map(supportedOperationsList, 'id')) r.push(
+        `<option value="${id}">${translations[id]}</option>`)
+      return r.join()
+    }
+
+    const id = new Date().getTime()
+    $('[data-event-operations]').append(
+      `
+      <div class="operation-group" id="${id}">
+        <div class="input-group">
+          <select class="form-control" data-event-operation-select>
+            ${operationOptions()}
+          </select>
+          <div class="input-group-append">
+            <button class="btn btn-outline-danger" type="button" onclick="removeEventOperation(event, this)">
+              <i class="fa fa-minus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="event-operation-definitions"></div>
+      </div>
+    `
+    )
+    $(`#${id} select`).trigger('change')
+    return id
+  }
+
+  var removeEventOperation = (ev, self) => {
+    ev.preventDefault()
+    $(self).parents('.operation-group').remove()
+  }
+
+  var saveChanges = (ev, self) => {
+    ev.preventDefault()
+    var eventListener = {
+      _id: $(self).attr('data-id') || null,
+      name: null,
+      event: {
+        definitions: {}
+      },
+      operations: {}
+    }
+
+    for (let element of $('form#event-form')[0]) {
+      switch ($(element).prop('nodeName')) {
+        case 'INPUT':
+          if ($(element).attr('id') === 'event-listener-dlg-events-name') {
+            eventListener.name = $(element).val()
+          } else if ($(element).attr('id').startsWith('definition')) {
+            let id = $(element).attr('id').split('-')[1]
+            eventListener.event.definitions[id] = $(element).val()
+          } else if ($(element).attr('id').startsWith('operation-definition')) {
+            let id = $(element).attr('id').split('-')[2]
+            let parentId = $(element).parents('.operation-group').attr('id')
+            if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = {
+              definitions: {}
+            }
+            eventListener.operations[parentId].definitions[id] = $(element).val()
+          } else if ($(element).attr('name').startsWith('radio-options')) {
+            if ($(element).parent().hasClass('active')) {
+              let id = $(element).attr('id').split('-')[0]
+              let value = $(element).attr('id').split('-')[1]
+              let parentId = $(element).parents('.operation-group').attr('id')
+              if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = {
+                definitions: {}
+              }
+              eventListener.operations[parentId].definitions[id] = value
+            }
+          } else {
+            console.debug('I dont know what to do', element)
+          }
+          break
+        case 'TEXTAREA':
+          if ($(element).attr('id') === 'event-listener-filter') {
+            eventListener.filters = $(element).val()
+          }
+          break
+        case 'SELECT':
+          if ($(element).attr('id') === 'event-listener-dlg-events') {
+            eventListener.event.key = $(element).val()
+          } else if (!_.isNil($(element).data('event-operation-select'))) {
+            let parentId = $(element).parents('.operation-group').attr('id')
+            if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = {
+              definitions: {}
+            }
+            eventListener.operations[parentId].key = $(element).val()
+          } else {
+            console.debug('I dont know what to do', element)
+          }
+          break
+        case 'BUTTON':
+          if (!_.isNil($(element).data('event-toggle-button'))) {
+            let parentId = $(element).parents('.operation-group').attr('id')
+            if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = {
+              definitions: {}
+            }
+            eventListener.operations[parentId].definitions[$(element).data('id')] = $(element).data('value') ===
+              'true'
+          } else {
+            console.debug('I dont know what to do', element)
+          }
+          break;
+        default:
+          console.debug('I dont know what to do', element)
+      }
+    }
+    console.debug(eventListener)
+
+    eventsSocket.emit('save-changes', eventListener, (err, cb) => {
+      const modal = $('#event-listener-dlg')
+
+      { // reset form
+        modal.find('.is-invalid').removeClass('is-invalid')
+        $('[data-dialog-alert-fail]')
+          .css('display', 'none')
+        $('[data-dialog-alert-success]')
+          .css('display', 'none')
+      }
+
+      if (err) {
+        const errors = JSON.parse(cb)
+        console.error(errors)
+
+        // definitions errors
+        for (let [key, val] of Object.entries(errors.definitions)) {
+          $(`#definition-${key}`).addClass('is-invalid')
+          $(`.input-group[data-id="${key}"]`).find('.invalid-tooltip').text(val)
+        }
+
+        // operations errors
+        for (let [timestamp, operation] of Object.entries(errors.operations)) {
+          for (let [key, val] of Object.entries(operation)) {
+            $(`.operation-group[id="${timestamp}"]`).find(`#operation-definition-${key}`).addClass('is-invalid')
+            $(`.operation-group[id="${timestamp}"]`).find('.invalid-tooltip').text(val)
+          }
+        }
+
+        $('[data-dialog-alert-fail]')
+          .removeClass('d-none')
+          .css('display', 'block')
+          .css('opacity: 0')
+
+        $('[data-dialog-alert-fail]')
+          .velocity('fadeIn', {
+            duration: 200
+          })
+      } else {
+
+        $('[data-dialog-alert-success]')
+          .removeClass('d-none')
+          .css('display', 'block')
+          .css('opacity: 0')
+
+        $('[data-dialog-alert-success]')
+          .velocity('fadeIn', {
+            duration: 200
+          })
+
+        events.refresh()
+        setTimeout(() => {
+          $('#event-listener-dlg').modal('hide')
+
+          $('[data-dialog-alert-success]')
+            .velocity('fadeOut', {
+              duration: 200
+            })
+        }, 1000)
+      }
+    })
+  }
+
+  $('#event-listener-dlg').on('show.bs.modal', function (event) {
+    const button = $(event.relatedTarget) // Button that triggered the modal
+    const eventId = button.data('id') || null
+    const eventToEdit = _.find(events.list.events, (o) => eventId === o._id)
+
+    { // input locales
+      $("#event-listener-dlg-events-name").attr('placeholder', translations.events.dialog.placeholders.name)
+    }
+
+    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var modal = $(this)
+    modal.find('#event-listener-dlgLabel').text(_.isNil(eventToEdit)
+      ? translations.events.dialog.title.new
+      : translations.events.dialog.title.edit)
+
+    modal.find('[data-dialog-alert-fail]').css('display', 'none')
+    modal.find('[data-dialog-alert-success]').css('display', 'none')
+
+    modal.find('#event-listener-dlg-events-name').val(_.isNil(eventToEdit)
+      ? ''
+      : eventToEdit.name)
+
+    modal.find('#event-listener-dlg-events').val(_.isNil(eventToEdit)
+      ? 'user-joined-channel' // select first | TODO: should be dynamic
+      : eventToEdit.key)
+    modal.find('#event-listener-dlg-events').trigger('change')
+
+    modal.find('#event-listener-filter').val(_.isNil(eventToEdit)
+      ? ''
+      : _.find(events.list.filters, (o) => o.eventId === eventId).filters)
+
+    modal.find('#event-listener-save-changes-btn').attr('data-id', eventId)
+
+    modal.find('[data-event-operations]').empty()
+    if (!_.isNil(eventToEdit)) {
+      // load values for event definitions
+      for (let [k, v] of Object.entries(eventToEdit.definitions)) {
+        modal.find(`#definition-${k}`).val(v)
+      }
+
+      // load operations
+      for (let operations of _.filter(events.list.operations, (o) => o.eventId === eventId)) {
+        let supportedOperation = _.find(supportedOperationsList, (o) => o.id === operations.key)
+        if (_.isNil(supportedOperation)) continue // operation is not supported anymore
+
+        let elementId = addEventOperation(null)
+
+        console.debug('Default values for operation', supportedOperation)
+        modal.find(`#${elementId} select`).val(operations.key)
+        modal.find(`#${elementId} select`).trigger('change')
+
+        // load values for operation definitions
+        // operation-definition-urlOfSoundFile
+        for (let [k, v] of Object.entries(operations.definitions)) {
+          // if v in definition is array -> select
+          let operationDefinition = _.find(Object.entries(supportedOperation.definitions), ([key, value]) => key === k)[1]
+          console.debug('Operation definition on load:', operationDefinition)
+          if (_.isBoolean(operationDefinition)) {
+            const toggle = modal.find(`#${elementId} button[data-id="${k}"]`)
+            if (toggle.data('value') !== v.toString()) {
+              // trigger "click" if values doesn't match -> button should be toggled
+              toggle.trigger('click')
+            }
+          } else if(_.isArray(operationDefinition)) {
+            modal.find(`#${elementId} #${k}-${v}`).parent().button('toggle')
+          } else {
+            modal.find(`#${elementId} #operation-definition-${k}`).val(v)
+          }
+        }
+      }
+    }
+  })
+
+  function flipCard(e) {
+    let card = $(e).data('card')
+
+    if ($(`div[data-card="${card}"]`).css('opacity') === '0') return
+
+    $(`div.card-body[data-card="${card}"], div.card-footer[data-card="${card}"]`)
+      .velocity('fadeOut', 500)
+    $(`div[data-card-delete-confirm="${card}"]`)
+      .css('height', height)
+      .velocity('fadeIn', {
+        delay: 500,
+        duration: 500
+      })
+  }
+
+  function flipCardBack(e) {
+    let card = $(e).data('id')
+
+    if ($(`div[data-card="${card}"]`).css('opacity') === '1') return
+
+    $(`div[data-card-delete-confirm="${card}"]`)
+      .velocity('fadeOut', 500)
+    $(`div[data-card="${card}"]`)
+      .velocity('fadeIn', {
+        delay: 500,
+        duration: 500
+      })
+  }
+
+  events.refresh()
 </script>

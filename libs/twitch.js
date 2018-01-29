@@ -419,12 +419,13 @@ class Twitch {
             global.webhooks.addIdToCache('follow', user.id)
             await this.addUserInFollowerCache(user.username)
 
-            if (!quiet && !global.parser.isBot(user.username)) global.events.fire('follow', { username: follower })
-            else {
-              global.overlays.eventlist.add({
-                type: 'follow',
-                username: user.username
-              }) // save to widget but not trigger event
+            global.overlays.eventlist.add({
+              type: 'follow',
+              username: user.username
+            })
+            if (!quiet && !global.parser.isBot(user.username)) {
+              global.log.follow(user.username)
+              global.events.fire('follow', { username: user.username })
             }
           }
           d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
@@ -521,9 +522,10 @@ class Twitch {
         let cached = await this.cached()
         this.cached({ followers: cached.followers, subscribers: cached.subscribers }) // we dont want to have cached hosts on stream off
 
-        if (!global.webhooks.enabled.streamss) {
+        if (!global.webhooks.enabled.streams) {
           global.events.fire('stream-started')
-          global.events.fire('every-x-seconds', { reset: true })
+          global.events.fire('command-send-x-times', { reset: true })
+          global.events.fire('every-x-minutes-of-stream', { reset: true })
         }
       }
 
@@ -534,7 +536,7 @@ class Twitch {
 
       global.events.fire('number-of-viewers-is-at-least-x')
       global.events.fire('stream-is-running-x-minutes')
-      global.events.fire('every-x-seconds')
+      global.events.fire('every-x-minutes-of-stream')
     } else {
       if (this.isOnline && this.curRetries < this.maxRetries) {
         // retry if it is not just some network / twitch issue

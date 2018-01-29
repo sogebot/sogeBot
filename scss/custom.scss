@@ -371,10 +371,6 @@ span.title.title-part.text-default + div.widget {
   font-weight: bold;
 }
 
-.input-group .form-control:first-child {
-  border-left: 0; border-right: 0;
-}
-
  .chat-block {
    padding-left: 10px; padding-right: 10px;
  }
@@ -780,7 +776,7 @@ abbr[data-original-title], abbr[title] {
   top: 5px;
 }
 
-.badge {
+span.badge {
   font-size: 100%;
   text-transform: uppercase;
   font-weight: bold;
@@ -793,6 +789,16 @@ kbd {
   padding: 3px 4px;
   font-family: 'PT Mono', monospace;
   font-size: 100%
+}
+
+h5 .badge {
+  font-size: 0.7rem;
+  text-transform: initial;
+  font-weight: normal;
+  padding: .3rem;
+  border-radius: 1rem;
+  position: relative;
+  bottom: .2rem;
 }
 
 .badge-user {
@@ -1150,4 +1156,28 @@ blockquote {
 
 #ignorelist-textarea:focus + button {
   display: block;
+}
+
+.operation-group:first-child() {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.operation-group:last-child() {
+  padding-bottom: 0;
+}
+
+.operation-group {
+  padding-top: .5rem;
+  padding-bottom: .5rem;
+  border-top: 1px dotted $gray-200
+}
+
+.modal-footer > .alert {
+  padding: 0.375rem 0.75rem;
+  margin-bottom: 0;
+}
+
+.invalid-tooltip {
+  top: -80%;
 }

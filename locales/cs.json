@@ -192,6 +192,104 @@
     }
   },
   "webpanel": {
+    "events": {
+      "event": "Událost",
+      "whatsthis": "Co je to?",
+      "badges": {
+        "enabled": "Zapnuto",
+        "disabled": "Vypnuto"
+      },
+      "buttons": {
+        "test": "Test",
+        "enable": "Zapnout",
+        "disable": "Vypnout",
+        "edit": "Upravit",
+        "delete": "Smazat",
+        "yes": "Ano",
+        "no": "Ne"
+      },
+      "popovers": {
+        "are_you_sure_you_want_to_delete_event": "Opravdu chcete <strong class='text-danger'>smazat</strong> událost",
+        "example_of_user_object_data": "Příklad dat v objektu uživatele"
+      },
+      "errors": {
+        "command_must_start_with_!": "Příkaz musí začít !",
+        "this_value_must_be_a_positive_number_or_0": "Tato hodnota musí být kladné číslo nebo 0",
+        "value_cannot_be_empty": "Hodnota nemůže být prázdná"
+      },
+      "dialog": {
+        "title": {
+          "new": "Nová událost",
+          "edit": "Upravit událost"
+        },
+        "placeholders": {
+          "name": "Nastavte jméno události (pokud je prázdné, jméno se vygeneruje)"
+        },
+        "alerts": {
+          "success": "Událost byla <strong>úspěšně</strong> uložena.",
+          "fail": "Něco se <strong>pokazilo</strong>."
+        },
+        "close": "Zavřít",
+        "save-changes": "Uložit změny",
+        "event": "Událost",
+        "name": "Název",
+        "usable-events-variables": "Použitelné proměnné události",
+        "settings": "Nastavení",
+        "filters": "Filtry",
+        "operations": "Operace"
+      },
+      "definitions": {
+        "runEveryXCommands": {
+          "label": "Spustit každých X příkazů",
+          "placeholder": "Počet příkazů před spuštěním události"
+        },
+        "commandToWatch": {
+          "label": "Sledovat tento příkaz",
+          "placeholder": "Nastav !prikazKeSledovani"
+        },
+        "viewersAtLeast": {
+          "label": "Nejméně diváků",
+          "placeholder": "Kolik diváků spustí událost"
+        },
+        "runInterval": {
+          "label": "Interval spuštění (0 = spustit jednou za stream)",
+          "placeholder": "Spustit událost každých x sekund"
+        },
+        "runAfterXMinutes": {
+          "label": "Spustit po x minutách",
+          "placeholder": "Spustit událost po x minutách"
+        },
+        "runEveryXMinutes": {
+          "label": "Spustit každých x minut",
+          "placeholder": "Spustit událost každých x minut"
+        },
+        "messageToSend": {
+          "label": "Poslat zprávu",
+          "placeholder": "Nastav svou zprávu"
+        },
+        "commandToRun": {
+          "label": "Příkaz ke spuštění",
+          "placeholder": "Nastav si !prikazKeSpusteni"
+        },
+        "isCommandQuiet": {
+          "label": "Měl by být příkaz potichu",
+          "true": "Příkaz bude potichu",
+          "false": "Příkaz nebude potichu"
+        },
+        "urlOfSoundFile": {
+          "label": "Adresa URL vašeho zvukového souboru",
+          "placeholder": "http://www.cesta.url/kde/je/soubor.mp3"
+        },
+        "emotesToExplode": {
+          "label": "Emotes k výbuchu",
+          "placeholder": "Seznam emotes k výbuchu, např. Kappa PurpleHeart"
+        },
+        "durationOfCommercial": {
+          "label": "Doba trvání reklamy",
+          "placeholder": "Dostupné trvání - 30, 60, 90, 120, 150, 180"
+        }
+      }
+    },
     "eventlist-events": {
       "follow": "ti dal <strong>follow</strong>",
       "host": "tě <strong>hostuje</strong> s $viewers diváky",
@@ -253,7 +351,18 @@
         "ticketsName": "Název ticketů",
         "fromUsername": "Od uživatele",
         "toUsername": "K uživateli",
-        "items": "Položky"
+        "items": "Položky",
+        "bits": "Bity",
+        "message": "Zpráva",
+        "reason": "Důvod",
+        "target": "Cíl",
+        "autohost": "Autohost (true/false)",
+        "duration": "Doba trvání",
+        "method": "Metoda",
+        "months": "Počet měsíců",
+        "monthsName": "Název měsíce (1 měsíc, 2 měsíce)",
+        "oldGame": "Hra před změnou",
+        "userObject": "Úplný uživatelský objekt"
       }
     },
     "page-settings": {
@@ -591,7 +700,7 @@
     "stream-started": "stream začal",
     "stream-stopped": "stream skončil",
     "stream-is-running-x-minutes": "stream trvá x minut",
-    "every-x-seconds": "každých x sekund",
+    "every-x-minutes-of-stream": "každých x minut streamu",
     "game-changed": "hra změněna",
     "cheer": "cheer byl získán",
     "clearchat": "chat byl vymazán",
@@ -627,6 +736,8 @@
     "click-to-highlight": "highlight",
     "commercial": "reklama zahájena",
     "start-commercial": "spustit reklamu",
+    "bot-will-join-channel": "bot se připojí k kanálu",
+    "bot-will-leave-channel": "bot opustí kanál",
     "omit": "vynechat",
     "comply": "dodržovat",
     "visible": "viditelné",

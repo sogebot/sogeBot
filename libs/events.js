@@ -1,404 +1,440 @@
 'use strict'
 
-var moment = require('moment')
-var _ = require('lodash')
-const debug = require('debug')('events')
+const _ = require('lodash')
+const debug = require('debug')
+const crypto = require('crypto')
+const safeEval = require('safe-eval')
+const flatten = require('flat')
+const moment = require('moment')
 const config = require('../config.json')
 
-function Events () {
-  this.events = {
-    'user-joined-channel': [], // $username
-    'user-parted-channel': [], // $username
-    'follow': [], // $username
-    'unfollow': [], // $username
-    'subscription': [], // $username, (method)
-    'resub': [], // $username, $months, $message
-    'command-send-x-times': [], // needs definition => { definition: true, command: '!smile', tCount: 10, tSent: 0, tTimestamp: 40000, tTriggered: new Date() }
-    'number-of-viewers-is-at-least-x': [], // needs definition => { definition: true, viewers: 100, tTriggered: false, tTimestamp: 40000 } (if tTimestamp === 0 run once)
-    'stream-started': [],
-    'stream-stopped': [],
-    'stream-is-running-x-minutes': [], // needs definition = { definition: true, tCount: 100, tTriggered: false }
-    'cheer': [], // $username, $bits, $message
-    'clearchat': [],
-    'action': [], // $username
-    'ban': [], // $username, $reason
-    'hosting': [], // $target, $viewers
-    'hosted': [], // $username, $viewers, $autohost
-    'mod': [], // $username
-    'commercial': [], // $duration
-    'timeout': [], // $username, $reason, $duration
-    'every-x-seconds': [], // needs definition = { definition: true, tTrigerred: new Date(), tCount: 60 }
-    'game-changed': [] // $oldGame, $game
-  }
-  this.eventsTemplate = _.cloneDeep(this.events)
+class Events {
+  constructor () {
+    this.supportedEventsList = [
+      { id: 'user-joined-channel', variables: [ 'username', 'userObject' ] },
+      { id: 'user-parted-channel', variables: [ 'username', 'userObject' ] },
+      { id: 'follow', variables: [ 'username', 'userObject' ] },
+      { id: 'unfollow', variables: [ 'username', 'userObject' ] },
+      { id: 'subscription', variables: [ 'username', 'userObject', 'method' ] },
+      { id: 'resub', variables: [ 'username', 'userObject', 'months', 'monthsName', 'message' ] },
+      { id: 'command-send-x-times', variables: [ 'username', 'userObject', 'command', 'count' ], definitions: { runEveryXCommands: 10, commandToWatch: '', runInterval: 0 }, check: this.checkCommandSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
+      { id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 }, check: this.checkNumberOfViewersIsAtLeast }, // runInterval 0 or null - disabled; > 0 every x seconds
+      { id: 'stream-started' },
+      { id: 'stream-stopped' },
+      { id: 'stream-is-running-x-minutes', definitions: { runAfterXMinutes: 100 }, check: this.checkStreamIsRunningXMinutes },
+      { id: 'cheer', variables: [ 'username', 'userObject', 'bits', 'message' ] },
+      { id: 'clearchat' },
+      { id: 'action', variables: [ 'username', 'userObject' ] },
+      { id: 'ban', variables: [ 'username', 'userObject', 'reason' ] },
+      { id: 'hosting', variables: [ 'target', 'viewers' ] },
+      { id: 'hosted', variables: [ 'username', 'userObject', 'viewers', 'autohost' ] },
+      { id: 'mod', variables: [ 'username', 'userObject' ] },
+      { id: 'commercial', variables: [ 'duration' ] },
+      { id: 'timeout', variables: [ 'username', 'userObject', 'reason', 'duration' ] },
+      { id: 'every-x-minutes-of-stream', definitions: { runEveryXMinutes: 100 }, check: this.everyXMinutesOfStream },
+      { id: 'game-changed', variables: [ 'oldGame', 'game' ] }
+    ]
 
-  this.operations = {
-    'send-chat-message': async function (attr) {
-      if (_.isNil(attr.send)) return
+    this.supportedOperationsList = [
+      { id: 'send-chat-message', definitions: { messageToSend: '' }, fire: this.fireSendChatMessage },
+      { id: 'send-whisper', definitions: { messageToSend: '' }, fire: this.fireSendWhisper },
+      { id: 'run-command', definitions: { commandToRun: '', isCommandQuiet: false }, fire: this.fireRunCommand },
+      { id: 'play-sound', definitions: { urlOfSoundFile: '' }, fire: this.firePlaySound },
+      { id: 'emote-explosion', definitions: { emotesToExplode: '' }, fire: this.fireEmoteExplosion },
+      { id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] }, fire: this.fireStartCommercial },
+      { id: 'bot-will-join-channel', definitions: {}, fire: this.fireBotWillJoinChannel },
+      { id: 'bot-will-leave-channel', definitions: {}, fire: this.fireBotWillLeaveChannel }
+    ]
 
-      let username = _.get(attr, 'username', global.parser.getOwner())
-      let message = attr.send
-      _.each(attr, function (val, name) {
-        debug(`Replacing $${name} with ${val}`)
-        let replace = new RegExp(`\\$${name}`, 'g')
-        message = message.replace(replace, val)
-      })
-      message = await global.parser.parseMessage(message)
-
-      global.commons.sendMessage(message, { username: username })
-      delete attr.username
-    },
-    'send-whisper': async function (attr) {
-      if (_.isNil(attr.username) || _.isNil(attr.send)) return
-
-      let username = _.get(attr, 'username', global.parser.getOwner())
-      let message = attr.send
-      _.each(attr, function (val, name) {
-        let replace = new RegExp(`\\$${name}`, 'g')
-        message = message.replace(replace, val)
-      })
-      message = await global.parser.parseMessage(message)
-      global.commons.sendMessage(message, { username: username, 'message-type': 'whisper' })
-      delete attr.username
-    },
-    'run-command': async function (attr) {
-      debug(attr)
-      let command = attr.command
-
-      if (_.isNil(attr.quiet)) attr.quiet = false
-      _.each(attr, function (val, name) {
-        debug('replace $%s with value: %s', name, val)
-        let replace = new RegExp(`\\$${name}`, 'g')
-        command = command.replace(replace, val)
-      })
-      debug(command)
-      command = await global.parser.parseMessage(command)
-      global.parser.parseCommands({ username: (attr.quiet) ? null : global.parser.getOwner() }, command)
-    },
-    'play-sound': function (attr) {
-      // attr.sound can be filename or url
-      let sound = attr.sound
-      if (!_.includes(sound, 'http')) {
-        sound = 'dist/soundboard/' + sound + '.mp3'
-      }
-      global.panel.io.emit('play-sound', sound)
-    },
-    'emote-explosion': function (attr) {
-      // attr.emotes is string with emotes to show
-      global.overlays.emotes.explode(global.overlays.emotes, global.panel.io, attr.emotes.split(' '))
-    },
-    'start-commercial': function (attr) {
-      // attr.duration - duration of commercial
-      global.client.commercial(config.settings.broadcaster_username, attr.duration)
-    },
-    'log': function (attr) {
-      let string = attr.string.replace(/\$username/g, attr.username)
-      _.each(string.match(/\$(\w+)/gi), function (match) {
-        let value = !_.isNil(attr[match.replace('$', '')]) ? attr[match.replace('$', '')] : 'none'
-        string = string.replace(match, value)
-      })
-      if (attr.webhooks) {
-        string = string + '(webhooks)'
-      }
-      global.log[attr.level](string)
-    },
-    '_function': function (attr) {
-      attr.fnc(_.clone(attr))
-    }
+    global.panel.addMenu({category: 'manage', name: 'event-listeners', id: 'events'})
+    this.sockets()
   }
 
-  this._update(this)
-  this._webpanel(this)
-}
+  async fire (eventId, attributes) {
+    const d = debug('events:fire')
 
-Events.prototype.removeSystemEvents = function (self) {
-  let nonSystemEvents = _.cloneDeep(self.eventsTemplate)
-  _.each(self.events, function (events, n) {
-    _.each(events, function (event, index) {
-      let filtered = _.filter(event, function (o, i) {
-        return !o.system
-      })
-      if (filtered.length > 0) nonSystemEvents[n].push(event)
-    })
-  })
-  return nonSystemEvents
-}
+    attributes = attributes || {}
 
-Events.prototype.loadSystemEvents = function (self) {
-  self.events = self.removeSystemEvents(self)
+    if (!_.isNil(_.get(attributes, 'username', null))) attributes.userObject = await global.users.get(attributes.username)
+    d('Firing event %s with attrs: %j', eventId, attributes)
 
-  self.events['user-joined-channel'].push([
-    { system: true, name: '_function', fnc: global.widgets.joinpart.send, type: 'join' }
-  ])
-  self.events['user-parted-channel'].push([
-    { system: true, name: '_function', fnc: global.widgets.joinpart.send, type: 'part' }
-  ])
-  self.events['timeout'].push([
-    { system: true, name: 'log', string: 'username: $username, reason: $reason, duration: $duration', level: 'timeout' }
-  ])
-  self.events['follow'].push([
-    { system: true, name: 'log', string: '$username', level: 'follow' },
-    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'follow' }
-  ])
-  self.events['resub'].push([
-    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'resub' },
-    { system: true, name: 'log', string: '$username, months: $months, message: $message', level: 'resub' }
-  ])
-  self.events['subscription'].push([
-    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'sub' },
-    { system: true, name: 'log', string: '$username, method: $method', level: 'sub' }
-  ])
-  self.events['unfollow'].push([
-    { system: true, name: 'log', string: '$username', level: 'unfollow' }
-  ])
-  self.events['ban'].push([
-    { system: true, name: 'log', string: '$username, reason: $reason', level: 'ban' }
-  ])
-  self.events['cheer'].push([
-    { system: true, name: '_function', fnc: global.overlays.eventlist.add, type: 'cheer' },
-    { system: true, name: 'log', string: '$username, bits: $bits, message: $message', level: 'cheer' }
-  ])
-}
+    if (_.get(attributes, 'reset', false)) return this.reset(eventId)
 
-Events.prototype._webpanel = function (self) {
-  global.panel.addMenu({category: 'manage', name: 'event-listeners', id: 'events'})
+    let events = await global.db.engine.find('events', { key: eventId, enabled: true })
+    for (let event of events) {
+      let [shouldRunByFilter, shouldRunByDefinition] = await Promise.all([
+        this.checkFilter(event._id.toString(), attributes),
+        this.checkDefinition(event, attributes)
+      ])
+      d('Should run by filter', shouldRunByFilter)
+      d('Should run by definition', shouldRunByDefinition)
+      if ((!shouldRunByFilter || !shouldRunByDefinition)) continue
 
-  global.panel.socketListening(this, 'events.get', this._send)
-  global.panel.socketListening(this, 'events.new', this._new)
-  global.panel.socketListening(this, 'events.delete', this._delete)
-}
-
-Events.prototype._delete = function (self, socket, data) {
-  if (data.definition) {
-    _.each(self.events[data.event], function (event, index) {
-      let keys = Object.keys(event[0])
-      for (let i = 0; i < keys.length; i++) {
-        if (event[0][keys[i]] !== data.definition[keys[i]] && keys[i] !== 'tTriggered' && keys[i] !== 'tSent') return true
-      }
-
-      let events = []
-      _.each(self.events[data.event], function (event, index2) {
-        if (index !== index2) {
-          events.push(event)
-          return true
+      for (let operation of (await global.db.engine.find('events.operations', { eventId: event._id.toString() }))) {
+        d('Firing %j', operation)
+        if (!_.isNil(attributes.userObject)) {
+          // flatten userObject
+          let userObject = attributes.userObject
+          _.merge(attributes, flatten({userObject: userObject}))
         }
-
-        let filtered = _.filter(event, function (o) {
-          if (o.definition) return true
-
-          let keys = Object.keys(o)
-          let isSame = true
-          for (let i = 0; i < keys.length; i++) {
-            // exclude message and reset as they are created in source
-            if (o[keys[i]] !== data[keys[i]] && !_.isUndefined(data[keys[i]])) isSame = false
-          }
-          return !isSame
-        })
-        // we don't want to store only definition
-        if (filtered.length > 1) events.push(filtered)
-      })
-      self.events[data.event] = events
-    })
-  } else {
-    let events = []
-    _.each(self.events[data.event], function (event) {
-      let filtered = _.filter(event, function (o) {
-        let keys = Object.keys(o)
-        let isSame = true
-        for (let i = 0; i < keys.length; i++) {
-          if (o[keys[i]] !== data[keys[i]] && !_.isUndefined(data[keys[i]])) isSame = false
-        }
-        return !isSame
-      })
-      if (filtered.length > 0) events.push(filtered)
-    })
-    self.events[data.event] = events
-  }
-  self._save(self)
-  self._send(self, socket)
-}
-
-Events.prototype._send = function (self, socket) {
-  let events = {}
-  _.each(self.events, function (o, n) {
-    if (o.length === 0) {
-      events[n] = self.events[n]
-      return true
-    }
-    events[n] = []
-    let eventBatch = []
-    _.each(o, function (v) {
-      _.each(v, function (v2) {
-        if (!v2.system) eventBatch.push(v2)
-      })
-    })
-    if (eventBatch.length !== 0) events[n].push(eventBatch)
-  })
-  socket.emit('events', { events: events, operations: _.filter(Object.keys(self.operations), function (o) { return !o.startsWith('_') }) })
-}
-
-Events.prototype._new = function (self, socket, data) {
-  let event = []
-  let operation = {}
-  let isAdd = -1
-
-  if (!_.isNil(data.definition)) {
-    let definition = { definition: true }
-    if (data.event === 'command-send-x-times') {
-      definition.command = data.definition.command
-      definition.tCount = data.definition.count
-      definition.tTimestamp = data.definition.timestamp
-      definition.tSent = 0
-      definition.tTriggered = new Date().getTime() - (data.definition.timestamp * 1000)
-    }
-
-    if (data.event === 'number-of-viewers-is-at-least-x') {
-      definition.viewers = data.definition.count
-      definition.tTriggered = data.definition.timestamp === 0 ? false : new Date().getTime() - (data.definition.timestamp * 1000)
-      definition.tTimestamp = data.definition.timestamp
-    }
-
-    if (data.event === 'stream-is-running-x-minutes') {
-      definition.tTriggered = false
-      definition.tCount = data.definition.count
-    }
-
-    if (data.event === 'every-x-seconds') {
-      definition.tCount = parseInt(data.definition.count, 10)
-      definition.tTriggered = new Date().getTime()
-    }
-
-    _.each(self.events[data.event], function (aEvent, index) {
-      let keys = Object.keys(aEvent[0])
-      // re-do definition
-      for (let i = 0; i < keys.length; i++) {
-        if (aEvent[0][keys[i]] !== definition[keys[i]] && keys[i] !== 'tTriggered' && keys[i] !== 'tSent') return true
+        const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key))
+        if (isOperationSupported) _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation.definitions, attributes)
+        else d(`Operation ${operation.key} is not supported!`)
       }
-      isAdd = index
-      event = self.events[data.event][index]
+    }
+  }
+
+  // set triggered attribute to empty object
+  async reset (eventId) {
+    const d = debug('events:reset')
+    let events = await global.db.engine.find('events', { key: eventId })
+    for (let event of events) {
+      d('Resetting %j', event)
+      event.triggered = {}
+      await global.db.engine.find('events', { _id: event._id.toString() }, event)
+    }
+  }
+
+  async fireBotWillJoinChannel (operation, attributes) {
+    global.client.join('#' + config.settings.broadcaster_username)
+  }
+
+  async fireBotWillLeaveChannel (operation, attributes) {
+    global.client.part('#' + config.settings.broadcaster_username)
+    global.users.setAll({ is: { online: false } }) // force all users offline
+  }
+
+  async fireStartCommercial (operation, attributes) {
+    const d = debug('events:fireStartCommercial')
+    d('Start commercials with attrs:', operation, attributes)
+    global.client.commercial(config.settings.broadcaster_username, operation.durationOfCommercial)
+  }
+
+  async fireEmoteExplosion (operation, attributes) {
+    const d = debug('events:fireEmoteExplosion')
+    d('Emote explosion with attrs:', operation, attributes)
+    global.overlays.emotes.explode(global.overlays.emotes, global.panel.io, operation.emotesToExplode.split(' '))
+  }
+
+  async firePlaySound (operation, attributes) {
+    const d = debug('events:firePlaySound')
+    d('Play a sound with attrs:', operation, attributes)
+    // attr.sound can be filename or url
+    let sound = operation.urlOfSoundFile
+    if (!_.includes(sound, 'http')) {
+      sound = 'dist/soundboard/' + sound + '.mp3'
+    }
+    global.panel.io.emit('play-sound', sound)
+  }
+
+  async fireRunCommand (operation, attributes) {
+    const d = debug('events:fireRunCommand')
+    d('Run command with attrs:', operation, attributes)
+
+    let command = operation.commandToRun
+    _.each(attributes, function (val, name) {
+      if (_.isObject(val) && _.size(val) === 0) return true // skip empty object
+      d(`Replacing $${name} with ${val}`)
+      let replace = new RegExp(`\\$${name}`, 'g')
+      command = command.replace(replace, val)
     })
-    if (isAdd === -1) event.push(definition)
-  }
-  _.each(data.operation, function (v, i) {
-    if (v.length === 0) return
-    operation[i] = v
-  })
-  event.push(operation)
-
-  if (isAdd > -1) self.events[data.event][isAdd] = event
-  else self.events[data.event].push(event)
-  self._save(self)
-  self._send(self, socket)
-}
-
-Events.prototype._update = async function (self) {
-  // wait for widgets to load and repeat
-  if (_.isNil(global.widgets)) {
-    setTimeout(() => {
-      this._update(this)
-    }, 1000)
-    return
+    command = await global.parser.parseMessage(command)
+    d('Running command:', command)
+    global.parser.parseCommands((_.get(operation, 'isCommandQuiet', false) ? null : { username: global.parser.getOwner() }), command, true)
   }
 
-  let events = await global.db.engine.find('events')
-  _.each(events, function (event) {
+  async fireSendChatMessageOrWhisper (operation, attributes, whisper) {
+    const d = debug('events:fireSendChatMessageOrWhisper')
+    let username = _.get(attributes, 'username', global.parser.getOwner())
+    let message = operation.messageToSend
+    _.each(attributes, function (val, name) {
+      if (_.isObject(val) && _.size(val) === 0) return true // skip empty object
+      d(`Replacing $${name} with ${val}`)
+      let replace = new RegExp(`\\$${name}`, 'g')
+      message = message.replace(replace, val)
+    })
+    message = await global.parser.parseMessage(message)
+    d('Sending message:', message)
+    global.commons.sendMessage(message, { username: username, 'message-type': (whisper ? 'whisper' : 'chat') })
+  }
+
+  async fireSendWhisper (operation, attributes) {
+    const d = debug('events:fireSendWhisper')
+    d('Sending whisper with attrs:', operation, attributes)
+    global.events.fireSendChatMessageOrWhisper(operation, attributes, true)
+  }
+
+  async fireSendChatMessage (operation, attributes) {
+    const d = debug('events:fireSendChatMessage')
+    d('Sending chat message with attrs:', operation, attributes)
+    global.events.fireSendChatMessageOrWhisper(operation, attributes, false)
+  }
+
+  async everyXMinutesOfStream (event, attributes) {
+    const d = debug('events:everyXMinutesOfStream')
+
+    // set to _.now() because 0 will trigger event immediatelly after stream start
+    let shouldSave = _.get(event, 'triggered.runEveryXMinutes', 0) === 0
+    event.triggered.runEveryXMinutes = _.get(event, 'triggered.runEveryXMinutes', _.now())
+
+    let shouldTrigger = _.now() - event.triggered.runEveryXMinutes >= event.definitions.runEveryXMinutes * 60 * 1000
+    if (shouldTrigger || shouldSave) {
+      event.triggered.runEveryXMinutes = _.now()
+      d('Updating event to %j', event)
+      await global.db.engine.update('events', { _id: event._id.toString() }, event)
+    }
+    return shouldTrigger
+  }
+
+  async checkStreamIsRunningXMinutes (event, attributes) {
+    const d = debug('events:checkStreamIsRunningXMinutes')
+    event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0)
+
+    let shouldTrigger = event.triggered.runAfterXMinutes === 0 &&
+                        moment(global.twitch.when.online).format('X') * 1000 > event.definitions.runAfterXMinutes * 60 * 1000
+    if (shouldTrigger) {
+      event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes
+      d('Updating event to %j', event)
+      await global.db.engine.update('events', { _id: event._id.toString() }, event)
+    }
+    return shouldTrigger
+  }
+
+  async checkNumberOfViewersIsAtLeast (event, attributes) {
+    const d = debug('events:checkNumberOfViewersIsAtLeast')
+    event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0)
+
+    event.definitions.runInterval = parseInt(event.definitions.runInterval, 10) // force Integer
+    event.definitions.viewersAtLeast = parseInt(event.definitions.viewersAtLeast, 10) // force Integer
+
+    d('Current viewers: %s, expected viewers: %s', global.twitch.current.viewers, event.definitions.viewersAtLeast)
+    d('Run Interval: %s, triggered: %s', event.definitions.runInterval, event.triggered.runInterval)
+
+    var shouldTrigger = global.twitch.current.viewers >= event.definitions.viewersAtLeast &&
+                        ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000) ||
+                        (event.definitions.runInterval === 0 && event.triggered.runInterval === 0))
+    if (shouldTrigger) {
+      event.triggered.runInterval = _.now()
+      d('Updating event to %j', event)
+      await global.db.engine.update('events', { _id: event._id.toString() }, event)
+    }
+    d('Attributes for check', attributes)
+    d('Should Trigger?', shouldTrigger)
+    return shouldTrigger
+  }
+
+  async checkCommandSendXTimes (event, attributes) {
+    const d = debug('events:checkCommandSendXTimes')
+    var shouldTrigger = false
+    if (attributes.message.startsWith(event.definitions.commandToWatch)) {
+      event.triggered.runEveryXCommands = _.get(event, 'triggered.runEveryXCommands', 0)
+      event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0)
+
+      event.definitions.runInterval = parseInt(event.definitions.runInterval, 10) // force Integer
+      event.triggered.runInterval = parseInt(event.triggered.runInterval, 10) // force Integer
+
+      event.triggered.runEveryXCommands++
+      shouldTrigger =
+        event.triggered.runEveryXCommands >= event.definitions.runEveryXCommands &&
+        ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000) ||
+        (event.definitions.runInterval === 0 && event.triggered.runInterval === 0))
+      if (shouldTrigger) {
+        event.triggered.runInterval = _.now()
+        event.triggered.runEveryXCommands = 0
+      }
+      d('Updating event to %j', event)
+      await global.db.engine.update('events', { _id: event._id.toString() }, event)
+    }
+    d('Attributes for check', attributes)
+    d('Should Trigger?', shouldTrigger)
+    return shouldTrigger
+  }
+
+  async checkDefinition (event, attributes) {
+    const d = debug('events:checkDefinition')
+
+    d('Searching check fnc for %j', event)
+    const check = (_.find(this.supportedEventsList, (o) => o.id === event.key)).check
+    if (_.isNil(check)) return true
+
+    d('Running check on %s', check.name)
+    return check(event, attributes)
+  }
+
+  async checkFilter (eventId, attributes) {
+    const d = debug('events:checkFilter')
+
+    const filter = (await global.db.engine.findOne('events.filters', { eventId: eventId })).filters
+    if (filter.trim().length === 0) return true
+
+    let toEval = `(function evaluation () { return ${filter} })()`
+    const context = {
+      _: _,
+      $username: _.get(attributes, 'username', null),
+      $userObject: _.get(attributes, 'userObject', null),
+      $method: _.get(attributes, 'method', null),
+      $months: _.get(attributes, 'months', null),
+      $monthsName: _.get(attributes, 'monthsName', null),
+      $message: _.get(attributes, 'message', null),
+      $command: _.get(attributes, 'command', null),
+      $count: _.get(attributes, 'count', null),
+      $bits: _.get(attributes, 'bits', null),
+      $reason: _.get(attributes, 'reason', null),
+      $target: _.get(attributes, 'target', null),
+      $viewers: _.get(attributes, 'viewers', null),
+      $autohost: _.get(attributes, 'autohost', null),
+      $duration: _.get(attributes, 'duration', null),
+      // add global variables
+      $game: global.twitch.current.game,
+      $title: global.twitch.current.status,
+      $views: global.twitch.current.views,
+      $followers: global.twitch.current.followers,
+      $hosts: global.twitch.current.hosts,
+      $subscribers: global.twitch.current.subscribers
+    }
+    var result = false
     try {
-      self.events[event.key] = JSON.parse(event.value)
-    } catch (e) { // little bit of hack for backward compatibility
-      self.events[event.key] = [event.value]
+      result = safeEval(toEval, context)
+    } catch (e) {
+      // do nothing
     }
-  })
-  self.loadSystemEvents(self)
-}
-
-Events.prototype._save = function (self) {
-  let events = self.removeSystemEvents(self)
-  _.each(events, function (event, key) {
-    debug('Saving event %s: %j', key, event)
-    debug('events', { key: key }, { key: key, value: event })
-    global.db.engine.update('events', { key: key }, { key: key, value: JSON.stringify(event) })
-  })
-}
-
-Events.prototype.fire = async function (event, attr) {
-  attr = attr || {}
-
-  debug('Event fired: %j', event)
-  debug('Attr: %j', attr)
-
-  if (!_.isNil(attr.username)) {
-    let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: attr.username })
-    if (!_.isEmpty(ignoredUser) && attr.username !== config.settings.broadcaster_username) return
+    delete context._; d(context, result)
+    return !!result // force boolean
   }
 
-  if (_.isNil(this.events[event])) return true
+  sockets () {
+    const d = debug('events:sockets')
+    const io = global.panel.io.of('/events')
 
-  let operationsBulk = this.events[event]
-
-  var self = this
-  _.each(operationsBulk, function (operations) {
-    _.each(operations, function (operation) {
-      debug('Running op: %j', operation)
-      if (operation.definition) {
-        switch (event) {
-          case 'command-send-x-times':
-            if (attr.message.startsWith(operation.command)) {
-              operation.tSent += 1
-              if (operation.tSent >= operation.tCount && new Date().getTime() - operation.tTriggered >= operation.tTimestamp * 1000) {
-                operation.tSent = 0
-                operation.tTriggered = new Date().getTime()
-                return true
-              }
-            }
-            break
-          case 'stream-is-running-x-minutes':
-            if (!_.isNil(attr.reset) && attr.reset) {
-              operation.tTriggered = false
-              return false
-            }
-            if (!operation.tTriggered && new Date().getTime() - (moment(global.twitch.when.online).format('X') * 1000) > operation.tCount * 60 * 1000) {
-              operation.tTriggered = true
-              return true
-            }
-            break
-          case 'number-of-viewers-is-at-least-x':
-            if (!_.isNil(attr.reset) && attr.reset) {
-              operation.tTriggered = false
-              return false
-            }
-
-            if (parseInt(operation.tTimestamp, 10) > 0) {
-              if (global.twitch.currentViewers >= parseInt(operation.viewers, 10) && new Date().getTime() - operation.tTriggered >= operation.tTimestamp * 1000) {
-                operation.tTriggered = new Date().getTime()
-                return true
-              }
-            } else if (!operation.tTriggered && global.twitch.currentViewers >= parseInt(operation.viewers, 10)) { // run only once if tTimestamp === 0
-              operation.tTriggered = true
-              return true
-            }
-            break
-          case 'every-x-seconds':
-            if (!_.isNil(attr.reset) && attr.reset) {
-              operation.tTriggered = new Date().getTime()
-              return false
-            }
-            if (new Date().getTime() - operation.tTriggered >= operation.tCount * 1000) {
-              operation.tTriggered = new Date().getTime()
-              return true
-            }
-            break
-          default:
-            return true
+    io.on('connection', (socket) => {
+      d('Socket /events connected, registering sockets')
+      socket.on('list.supported.events', (callback) => {
+        callback(this.supportedEventsList); d('list.supported.events => %s, %j', null, this.supportedEventsList)
+      })
+      socket.on('list.supported.operations', (callback) => {
+        callback(this.supportedOperationsList); d('list.supported.operations => %s, %j', null, this.supportedOperationsList)
+      })
+      socket.on('save-changes', async (data, callback) => {
+        d('save-changes - %j', data)
+        var eventId = data._id
+        var errors = {
+          definitions: {},
+          operations: {}
         }
-        return false
-      } else if (_.isFunction(self.operations[operation.name])) {
-        debug('Attribute ops to run: %j', _.merge(_.clone(operation), _.clone(attr)))
-        self.operations[operation.name](_.merge(_.clone(operation), _.clone(attr))) // clone ops and attrs to not rewrite in db
-      } else {
-        global.log.warning('Operation doesn\'t exist', operation.name)
-      }
+        try {
+          const event = {
+            name: data.name.trim().length ? data.name : 'events#' + crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5),
+            key: data.event.key,
+            enabled: true,
+            definitions: data.event.definitions,
+            triggered: {}
+          }
+
+          // check all definitions are correctly set -> no empty values
+          for (let [key, value] of Object.entries(event.definitions)) {
+            if (value.length === 0) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.value_cannot_be_empty'))
+            else if (key === 'commandToWatch' && !value.startsWith('!')) _.set(errors, 'definitions.commandToWatch', global.translate('webpanel.events.errors.command_must_start_with_!'))
+            else if (key !== 'commandToWatch' && !value.match(/^\d+$/g)) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.this_value_must_be_a_positive_number_or_0'))
+          }
+
+          // check all operations definitions are correctly set -> no empty values
+          for (let [timestamp, operation] of Object.entries(data.operations)) {
+            for (let [key, value] of Object.entries(operation.definitions)) {
+              if (value.length === 0) _.set(errors, `operations.${timestamp}.${key}`, global.translate('webpanel.events.errors.value_cannot_be_empty'))
+              else if (key === 'commandToRun' && !value.startsWith('!')) _.set(errors, `operations.${timestamp}.${key}`, global.translate('webpanel.events.errors.command_must_start_with_!'))
+            }
+          }
+
+          if (_.size(errors.definitions) > 0 || _.size(errors.operations) > 0) throw Error(JSON.stringify(errors))
+
+          if (_.isNil(eventId)) eventId = (await global.db.engine.insert('events', event))._id.toString()
+          else {
+            await Promise.all([
+              global.db.engine.remove('events', { _id: eventId }, event),
+              global.db.engine.remove('events.filters', { eventId: eventId }),
+              global.db.engine.remove('events.operations', { eventId: eventId })
+            ])
+            eventId = (await global.db.engine.insert('events', event))._id.toString()
+          }
+
+          let insertArray = []
+          insertArray.push(global.db.engine.insert('events.filters', {
+            eventId: eventId,
+            filters: data.filters
+          }))
+          for (let operation of Object.entries(data.operations)) {
+            operation = operation[1]
+            insertArray.push(global.db.engine.insert('events.operations', {
+              eventId: eventId,
+              key: operation.key,
+              definitions: operation.definitions
+            }))
+          }
+          await Promise.all(insertArray)
+
+          callback(null, true)
+        } catch (e) {
+          global.log.warning(e.message)
+
+          if (!_.isNil(eventId) && _.isNil(data._id)) { // eventId is __newly__ created, rollback all changes
+            await Promise.all([
+              global.db.engine.remove('events', { _id: eventId }),
+              global.db.engine.remove('events.filters', { eventId: eventId }),
+              global.db.engine.remove('events.operations', { eventId: eventId })
+            ])
+          }
+          callback(e, e.message)
+        }
+      })
+      socket.on('list.events', async (callback) => {
+        let [events, operations, filters] = await Promise.all([
+          global.db.engine.find('events'),
+          global.db.engine.find('events.operations'),
+          global.db.engine.find('events.filters')
+        ])
+        callback(null, { events: events, operations: operations, filters: filters })
+      })
+      socket.on('toggle.event', async (eventId, callback) => {
+        let eventFromDb = await global.db.engine.findOne('events', { _id: eventId })
+        if (_.isEmpty(eventFromDb)) return callback(new Error('Event not found'), null)
+
+        let updatedEvent = await global.db.engine.update('events', { _id: eventId }, { enabled: !eventFromDb.enabled })
+        callback(null, updatedEvent)
+      })
+      socket.on('delete.event', async (eventId, callback) => {
+        await Promise.all([
+          global.db.engine.remove('events', { _id: eventId }),
+          global.db.engine.remove('events.filters', { eventId: eventId }),
+          global.db.engine.remove('events.operations', { eventId: eventId })
+        ])
+        callback(null, eventId)
+      })
+      socket.on('test.event', async (eventId) => {
+        let generateUsername = () => {
+          const adject = ['Encouraging', 'Plucky', 'Glamorous', 'Endearing', 'Fast', 'Agitated', 'Mushy', 'Muddy', 'Sarcastic', 'Real', 'Boring']
+          const subject = ['Sloth', 'Beef', 'Fail', 'Fish', 'Fast', 'Raccoon', 'Dog', 'Man', 'Pepperonis', 'RuleFive', 'Slug', 'Cat', 'SogeBot']
+          return _.sample(adject) + _.sample(subject)
+        }
+
+        const username = _.sample(['short', 'someFreakingLongUsername', generateUsername()])
+        let attributes = {
+          username: username,
+          userObject: await global.users.get(username)
+        }
+        for (let operation of (await global.db.engine.find('events.operations', { eventId: eventId }))) {
+          d('Firing %j', operation)
+          if (!_.isNil(attributes.userObject)) {
+            // flatten userObject
+            let userObject = attributes.userObject
+            _.merge(attributes, flatten({userObject: userObject}))
+          }
+          const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key))
+          if (isOperationSupported) _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation.definitions, attributes)
+          else d(`Operation ${operation.key} is not supported!`)
+        }
+      })
     })
-  })
+  }
 }
 
 module.exports = Events

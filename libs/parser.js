@@ -464,7 +464,16 @@ Parser.prototype.parseMessage = async function (message, attr) {
     }
   }
 
-  let msg = await this.parseMessageEval(evaluate, decode(message)); debug('parseMessageEval: %s', msg)
+  // global variables
+  let msg = message.replace(/\$game/g, global.twitch.current.game)
+    .replace(/\$title/g, global.twitch.current.status)
+    .replace(/\$viewers/g, global.twitch.current.viewers)
+    .replace(/\$views/g, global.twitch.current.views)
+    .replace(/\$followers/g, global.twitch.current.followers)
+    .replace(/\$hosts/g, global.twitch.current.hosts)
+    .replace(/\$subscribers/g, global.twitch.current.subscribers)
+    .replace(/\$bits/g, global.twitch.current.bits)
+  msg = await this.parseMessageEval(evaluate, decode(msg)); debug('parseMessageEval: %s', msg)
   msg = await this.parseMessageOnline(online, msg); debug('parseMessageOnline: %s', msg)
   msg = await this.parseMessageCommand(command, msg); debug('parseMessageCommand: %s', msg)
   msg = await this.parseMessageEach(random, msg); debug('parseMessageEach: %s', msg)

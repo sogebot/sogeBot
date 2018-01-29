@@ -642,7 +642,7 @@
         _.each($('[data-lang]'), function (el) {
           var key = ($(el).data('lang'))
           if ($(el).text().trim().length === 0) {
-            $(el).text(_.at(translations, key)[0])
+            $(el).html(_.at(translations, key)[0])
             if (_.isNil(_.at(translations, key)[0])) {
               if (key.startsWith('responses.variable.')) $(el).text('Unknown variable $' + key.replace(
                 'responses.variable.', ''))

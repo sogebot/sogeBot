@@ -140,19 +140,15 @@ global.client.on('message', async function (channel, sender, message, fromSelf) 
     if (sender['message-type'] !== 'whisper') {
       global.parser.timer.push({ 'id': sender.id, 'received': new Date().getTime() })
       global.log.chatIn(message, {username: sender.username})
-      global.events.fire('command-send-x-times', { message: message });
-
-      (async () => {
-        const user = await global.users.get(sender.username)
-
-        if (!_.isNil(user.id)) global.users.isFollower(user.username)
-        if (!message.startsWith('!')) global.users.messagesInc(user.username)
-
-        // set is.mod
-        global.users.set(user.username, { is: { mod: sender.mod } })
-      })()
-
+      global.events.fire('command-send-x-times', { username: sender.username, message: message })
       global.parser.parse(sender, message)
+
+      const user = await global.users.get(sender.username)
+      if (!_.isNil(user.id)) global.users.isFollower(user.username)
+      if (!message.startsWith('!')) global.users.messagesInc(user.username)
+
+      // set is.mod
+      global.users.set(user.username, { is: { mod: sender.mod } })
     } else {
       global.log.whisperIn(message, {username: sender.username})
       if (!global.configuration.getValue('disableWhisperListener') || global.parser.isOwner(sender)) global.parser.parse(sender, message)
@@ -161,7 +157,7 @@ global.client.on('message', async function (channel, sender, message, fromSelf) 
 })
 
 global.client.on('join', async function (channel, username, fromSelf) {
-  if (debug.enabled) debug('User joined: %s', username)
+  if (debug.enabled) debug('User joined: %s (isBot: %s)', username, fromSelf)
 
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
   if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
@@ -172,18 +168,20 @@ global.client.on('join', async function (channel, username, fromSelf) {
       global.users.isFollower(username)
     }
     global.users.set(username, { is: { online: true } })
+    global.widgets.joinpart.send({ username: username, type: 'join' })
     global.events.fire('user-joined-channel', { username: username })
   }
 })
 
 global.client.on('part', async function (channel, username, fromSelf) {
-  if (debug.enabled) debug('User parted: %s', username)
+  if (debug.enabled) debug('User parted: %s (isBot: %s)', username, fromSelf)
 
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
   if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
 
   if (!fromSelf) {
     global.users.set(username, { is: { online: false } })
+    global.widgets.joinpart.send({ username: username, type: 'part' })
     global.events.fire('user-parted-channel', { username: username })
   }
 })
@@ -201,11 +199,13 @@ global.client.on('action', async function (channel, userstate, message, self) {
 
 global.client.on('ban', function (channel, username, reason) {
   if (debug.enabled) debug('User ban: %s with reason %s', username, reason)
+  global.log.ban(`${username}, reason: ${reason}`)
   global.events.fire('ban', { username: username.toLowerCase(), reason: reason })
 })
 
 global.client.on('timeout', function (channel, username, reason, duration) {
   if (debug.enabled) debug('User timeout: %s with reason %s for %ss', username, reason, duration)
+  global.log.timeout(`username: ${username.toLowerCase()}, reason: ${reason}, duration: ${duration}`)
   global.events.fire('timeout', { username: username.toLowerCase(), reason: reason, duration: duration })
 })
 
@@ -259,6 +259,8 @@ global.client.on('cheer', async function (channel, userstate, message) {
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: userstate.username })
   if (!_.isEmpty(ignoredUser) && userstate.username !== config.settings.broadcaster_username) return
 
+  global.overlays.eventlist.add({ type: 'cheer', username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
+  global.log.cheer(`${userstate.username.toLowerCase()}, bits: ${userstate.bits}, message: ${message}`)
   global.events.fire('cheer', { username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
   if (global.twitch.isOnline) global.twitch.current.bits = global.twitch.current.bits + parseInt(userstate.bits, 10)
 })
@@ -274,6 +276,8 @@ global.client.on('subscription', async function (channel, username, method) {
   if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
 
   global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: _.now() } })
+  global.overlays.eventlist.add({ type: 'sub', username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
+  global.log.sub(`${username}, method: ${method}`)
   global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
 
   await global.twitch.addUserInSubscriberCache(username)
@@ -286,6 +290,8 @@ global.client.on('resub', async function (channel, username, months, message) {
   if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
 
   global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: moment().subtract(months, 'months').format('X') * 1000 } })
+  global.overlays.eventlist.add({ type: 'resub', username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
+  global.log.resub(`${username}, months: ${months}, message: ${message}`)
   global.events.fire('resub', { username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
 
   await global.twitch.addUserInSubscriberCache(username)

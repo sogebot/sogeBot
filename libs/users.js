@@ -335,11 +335,19 @@ Users.prototype.isFollowerUpdate = async function (username) {
   if (request.body.total === 0) {
     // not a follower
     // if was follower, fire unfollow event
-    if (user.is.follower) global.events.fire('unfollow', { username: username })
+    if (user.is.follower) {
+      global.log.unfollow(username)
+      global.events.fire('unfollow', { username: username })
+    }
     global.users.set(username, { is: { follower: false }, time: { followCheck: new Date().getTime(), follow: 0 } }, user.is.follower)
   } else {
     // is follower
     if (!user.is.follower && new Date().getTime() - moment(request.body.data[0].followed_at).format('X') * 1000 < 60000 * 60) {
+      global.overlays.eventlist.add({
+        type: 'follow',
+        username: username
+      })
+      global.log.follow(username)
       global.events.fire('follow', { username: username })
     }
     global.users.set(username, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(request.body.data[0].followed_at).format('X') * 1000 } }, !user.is.follower)

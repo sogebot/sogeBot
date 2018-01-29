@@ -124,6 +124,11 @@ class Webhooks {
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
       debug('user API data" %o', userGetFromApi.body)
 
+      global.overlays.eventlist.add({
+        type: 'follow',
+        username: userGetFromApi.body.data[0].login
+      })
+      global.log.follow(userGetFromApi.body.data[0].login)
       global.events.fire('follow', { username: userGetFromApi.body.data[0].login }) // we can safely fire event as user doesn't exist in db
       await Promise.all([
         global.db.engine.update('users', { username: userGetFromApi.body.data[0].login }, { id: fid, username: userGetFromApi.body.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } }),
@@ -133,7 +138,14 @@ class Webhooks {
       debug('user in db')
       debug('username: %s, is follower: %s, current time: %s, user time follow: %s', user.username, _.get(user, 'is.follower', false), _.now(), _.get(user, 'time.follow', 0))
       if (!_.get(user, 'is.follower', false) && _.now() - _.get(user, 'time.follow', 0) > 60000 * 60) {
-        if (!global.parser.isBot(user.username)) global.events.fire('follow', { username: user.username, webhooks: true })
+        if (!global.parser.isBot(user.username)) {
+          global.overlays.eventlist.add({
+            type: 'follow',
+            username: user.username
+          })
+          global.log.follow(user.username)
+          global.events.fire('follow', { username: user.username, webhooks: true })
+        }
         await global.twitch.addUserInFollowerCache(user.username)
       }
 
@@ -181,7 +193,8 @@ class Webhooks {
         global.twitch.cached({ followers: cached.followers, subscribers: cached.subscribers }) // we dont want to have cached hosts on stream off
 
         global.events.fire('stream-started')
-        global.events.fire('every-x-seconds', { reset: true })
+        global.events.fire('command-send-x-times', { reset: true })
+        global.events.fire('every-x-minutes-of-stream', { reset: true })
       }
 
       global.twitch.curRetries = 0

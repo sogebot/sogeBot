@@ -1,6 +1,7 @@
 const _ = require('lodash')
 const figlet = require('figlet')
-const config = require('../config.json')
+const crypto = require('crypto')
+const compareVersions = require('compare-versions')
 
 // db
 const Database = require('../libs/databases/database')
@@ -46,8 +47,7 @@ let updates = async (from, to) => {
 
   for (let table of _.values(migration)) {
     for (let i of table) {
-      if (parseInt(i.version.replace(/\./g, ''), 10) >= parseInt(from.replace(/\./g, ''), 10) &&
-          parseInt(i.version.replace(/\./g, ''), 10) <= parseInt(to.replace(/\./g, ''), 10)) {
+      if (compareVersions(to.replace('-SNAPSHOT', ''), i.version) !== -1 && compareVersions(i.version, from.replace('-SNAPSHOT', '')) !== -1) {
         migrate.push(i)
       }
     }
@@ -57,9 +57,9 @@ let updates = async (from, to) => {
 
 let migration = {
   cache: [{
-    version: '5.12.0',
+    version: '6.0.0',
     do: async () => {
-      console.info('Migration cache to %s', '5.12.0')
+      console.info('Migration cache to %s', '6.0.0')
       let cache = await global.db.engine.findOne('cache')
 
       let when = {
@@ -82,6 +82,114 @@ let migration = {
       await global.db.engine.insert('cache', newCache)
       await global.db.engine.insert('cache.when', when)
       await global.db.engine.insert('cache.users', users)
+    }
+  }],
+  events: [{
+    version: '6.0.0',
+    do: async () => {
+      console.info('Migration events to %s', '6.0.0')
+      let events = await global.db.engine.find('events')
+
+      for (let event of events) {
+        event.value = event.value || '{}'
+        const operations = JSON.parse(event.value)
+        if (_.isNil(event.definitions)) await global.db.engine.remove('events', { _id: event._id.toString() })
+        if (_.size(operations) === 0) continue
+
+        let definitions = _.find(operations[0], (o) => o.definition)
+        let updatedDefinitions = {}
+        if (!_.isNil(definitions)) {
+          if (!_.isNil(definitions.command)) {
+            updatedDefinitions.commandToWatch = definitions.command
+          }
+
+          if (_.isNil(definitions.command) && !_.isNil(definitions.tCount) && event.key === 'stream-is-running-x-minutes') {
+            updatedDefinitions.runAfterXMinutes = definitions.tCount
+          } else if (_.isNil(definitions.command) && !_.isNil(definitions.tCount) && event.key === 'every-x-seconds') {
+            updatedDefinitions.runEveryXMinutes = definitions.tCount
+          } else if (!_.isNil(definitions.tCount)) {
+            updatedDefinitions.runEveryXCommands = definitions.tCount
+          }
+
+          if (!_.isNil(definitions.tTimestamp)) {
+            updatedDefinitions.runInterval = definitions.tTimestamp
+          }
+          if (!_.isNil(definitions.viewers)) {
+            updatedDefinitions.viewersAtLeast = definitions.viewers
+          }
+        } else updatedDefinitions = {}
+
+        if (event.key === 'every-x-seconds') event.key = 'every-x-minutes-of-stream'
+
+        const eventId = (await global.db.engine.insert('events', {
+          name: 'events#' + crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5),
+          key: event.key,
+          definitions: updatedDefinitions,
+          triggered: {},
+          enabled: true
+        }))._id.toString()
+
+        await global.db.engine.insert('events.filters', {
+          eventId: eventId,
+          filters: ''
+        })
+
+        for (let operation of operations) {
+          operation = operation[0]
+          if (!_.isNil(operation.definition)) continue
+
+          if (operation.name === 'run-command') {
+            await global.db.engine.insert('events.operations', {
+              eventId: eventId,
+              key: operation.name,
+              definitions: {
+                commandToRun: operation.command,
+                isCommandQuiet: operation.quiet
+              }
+            })
+          }
+
+          if (operation.name === 'emote-explosion') {
+            await global.db.engine.insert('events.operations', {
+              eventId: eventId,
+              key: operation.name,
+              definitions: {
+                emotesToExplode: operation.emotes
+              }
+            })
+          }
+
+          if (operation.name === 'send-chat-message' || operation.name === 'send-whisper') {
+            await global.db.engine.insert('events.operations', {
+              eventId: eventId,
+              key: operation.name,
+              definitions: {
+                messageToSend: operation.send
+              }
+            })
+          }
+
+          if (operation.name === 'play-sound') {
+            await global.db.engine.insert('events.operations', {
+              eventId: eventId,
+              key: operation.name,
+              definitions: {
+                urlOfSoundFile: operation.sound
+              }
+            })
+          }
+
+          if (operation.name === 'start-commercial') {
+            await global.db.engine.insert('events.operations', {
+              eventId: eventId,
+              key: operation.name,
+              definitions: {
+                durationOfCommercial: operation.duration
+              }
+            })
+          }
+        }
+      }
     }
   }]
 }
