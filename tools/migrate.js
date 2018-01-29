@@ -1,7 +1,7 @@
 const _ = require('lodash')
 const figlet = require('figlet')
 const crypto = require('crypto')
-const compareVersions = require('compare-versions');
+const compareVersions = require('compare-versions')
 
 // db
 const Database = require('../libs/databases/database')
