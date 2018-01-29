@@ -417,9 +417,13 @@ class Events {
         }
 
         const username = _.sample(['short', 'someFreakingLongUsername', generateUsername()])
+        const months = _.random(0, 99, false)
         let attributes = {
           username: username,
-          userObject: await global.users.get(username)
+          userObject: await global.users.get(username),
+          months: months,
+          monthsName: global.parser.getLocalizedName(months, 'core.months'),
+          message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet'])
         }
         for (let operation of (await global.db.engine.find('events.operations', { eventId: eventId }))) {
           d('Firing %j', operation)
