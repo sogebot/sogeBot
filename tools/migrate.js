@@ -1,5 +1,6 @@
 const _ = require('lodash')
 const figlet = require('figlet')
+const config = require('../config.json')
 const crypto = require('crypto')
 const compareVersions = require('compare-versions')
 
