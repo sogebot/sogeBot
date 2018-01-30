@@ -586,34 +586,5 @@
     }
   })
 
-  function flipCard(e) {
-    let card = $(e).data('card')
-
-    if ($(`div[data-card="${card}"]`).css('opacity') === '0') return
-
-    $(`div.card-body[data-card="${card}"], div.card-footer[data-card="${card}"]`)
-      .velocity('fadeOut', 500)
-    $(`div[data-card-delete-confirm="${card}"]`)
-      .css('height', height)
-      .velocity('fadeIn', {
-        delay: 500,
-        duration: 500
-      })
-  }
-
-  function flipCardBack(e) {
-    let card = $(e).data('id')
-
-    if ($(`div[data-card="${card}"]`).css('opacity') === '1') return
-
-    $(`div[data-card-delete-confirm="${card}"]`)
-      .velocity('fadeOut', 500)
-    $(`div[data-card="${card}"]`)
-      .velocity('fadeIn', {
-        delay: 500,
-        duration: 500
-      })
-  }
-
   events.refresh()
 </script>
