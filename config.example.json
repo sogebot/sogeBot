@@ -22,7 +22,8 @@
     "__README__": "https://github.com/sogehige/sogeBot/wiki/Database-configuration",
     "type": "nedb",
     "mongodb": {
-      "url": "mongodb://localhost:27017/changeit"
+      "url": "mongodb://localhost:27017/",
+      "dbName": "changeit"
     }
   },
   "systems": {

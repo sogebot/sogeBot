@@ -1,5 +1,4 @@
 const fs = require('fs')
-const sinon = require('sinon')
 
 // setup config
 const config = require('../config.json')
@@ -11,11 +10,6 @@ fs.writeFileSync('../config.json', JSON.stringify(config))
 
 // load up a bot
 require('../main.js')
-
-sinon.stub(global.commons, 'sendMessage')
-sinon.stub(global.commons, 'timeout')
-sinon.stub(global.events, 'fire')
-sinon.stub(global.log, 'info')
 
 module.exports = {
   db: require('./helpers/db'),

@@ -16,11 +16,6 @@ describe('System - Moderation', function () {
     // enable links with spaces to be moderated
     global.commons.sendMessage.reset()
 
-    await until(() => {
-      // bot is loaded
-      return global.log.info.calledWith('Bot loaded configuration data')
-    }, 10000)
-
     global.parser.parse(owner, '!set moderationLinksWithSpaces true')
     await until(() => {
       if (global.commons.sendMessage.called) {
