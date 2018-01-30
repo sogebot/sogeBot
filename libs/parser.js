@@ -54,9 +54,6 @@ function Parser () {
 }
 
 Parser.prototype.parse = async function (user, message, skip) {
-  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: _.get(user, 'username', '') })
-  if (!_.isEmpty(ignoredUser) && _.get(user, 'username', '') !== config.settings.broadcaster_username) return
-
   skip = skip || false
   this.linesParsed++
   this.registeredParsers === {} ? this.parseCommands(user, message, skip) : this.addToQueue(user, message, skip)

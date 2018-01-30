@@ -139,9 +139,12 @@ global.client.on('message', async function (channel, sender, message, fromSelf) 
     global.users.set(sender.username, { id: sender['user-id'], is: { online: true, subscriber: _.get(sender, 'subscriber', false) } })
     if (sender['message-type'] !== 'whisper') {
       global.parser.timer.push({ 'id': sender.id, 'received': new Date().getTime() })
+      global.parser.parse(sender, message)
+      let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: sender.username })
+      if (!_.isEmpty(ignoredUser) && sender.username !== config.settings.broadcaster_username) return
+
       global.log.chatIn(message, {username: sender.username})
       global.events.fire('command-send-x-times', { username: sender.username, message: message })
-      global.parser.parse(sender, message)
 
       const user = await global.users.get(sender.username)
       if (!_.isNil(user.id)) global.users.isFollower(user.username)
