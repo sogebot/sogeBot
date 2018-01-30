@@ -137,9 +137,14 @@ global.client.on('message', async function (channel, sender, message, fromSelf) 
 
   if (!fromSelf && config.settings.bot_username !== sender.username) {
     global.users.set(sender.username, { id: sender['user-id'], is: { online: true, subscriber: _.get(sender, 'subscriber', false) } })
+
+    // isUserIgnored
+    let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: _.get(sender.username, 'username', '') })
+    let isUserIgnored = !_.isEmpty(ignoredUser) && _.get(sender, 'username', '') !== config.settings.broadcaster_username
+
     if (sender['message-type'] !== 'whisper') {
       global.parser.timer.push({ 'id': sender.id, 'received': new Date().getTime() })
-      global.parser.parse(sender, message)
+      global.parser.parse(sender, message, false, isUserIgnored)
       let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: sender.username })
       if (!_.isEmpty(ignoredUser) && sender.username !== config.settings.broadcaster_username) return
 

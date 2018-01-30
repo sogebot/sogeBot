@@ -7,6 +7,7 @@ const db = require('../../general.js').db
 const message = require('../../general.js').message
 const tmi = require('../../general.js').tmi
 const until = require('test-until')
+const _ = require('lodash')
 
 // users
 const owner = { username: 'soge__' }
@@ -23,7 +24,8 @@ describe('Users - ignore', () => {
 
   describe('Ignore workflow', () => {
     it('testuser is not ignored by default', async () => {
-      global.parser.parse(testuser, '!duel')
+      let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: _.get(testuser, 'username', '') })
+      global.parser.parse(testuser, '!duel', false, !_.isEmpty(ignoredUser))
       await message.isSent('gambling.duel.notEnoughOptions', testuser, { })
     })
 
@@ -53,12 +55,15 @@ describe('Users - ignore', () => {
     })
 
     it('testuser is ignored', (done) => {
-      global.parser.parse(testuser, '!duel')
-      setTimeout(() => { assert.isTrue(global.commons.sendMessage.notCalled); done() }, 2000)
+      global.db.engine.findOne('users_ignorelist', { username: _.get(testuser, 'username', '') }).then((ignoredUser) => {
+        global.parser.parse(testuser, '!duel', false, !_.isEmpty(ignoredUser))
+        setTimeout(() => { assert.isTrue(global.commons.sendMessage.notCalled); done() }, 2000)
+      })
     })
 
     it('even when ignored, user should have timeout for link', async () => {
-      global.parser.parse(testuser, 'http://www.google.com')
+      let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: _.get(testuser, 'username', '') })
+      global.parser.parse(testuser, 'http://www.google.com', false, !_.isEmpty(ignoredUser))
       await until(() => global.commons.timeout.calledOnce, 5000)
     })
 
@@ -73,7 +78,8 @@ describe('Users - ignore', () => {
     })
 
     it('testuser is not ignored anymore', async () => {
-      global.parser.parse(testuser, '!duel')
+      let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: _.get(testuser, 'username', '') })
+      global.parser.parse(testuser, '!duel', false, !_.isEmpty(ignoredUser))
       await message.isSent('gambling.duel.notEnoughOptions', testuser, { })
     })
   })

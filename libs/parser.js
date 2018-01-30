@@ -10,7 +10,7 @@ const decode = require('decode-html')
 const querystring = require('querystring')
 
 const config = require('../config.json')
-const debug = require('debug')('parser')
+const debug = require('debug')
 
 var queue = {}
 
@@ -53,13 +53,15 @@ function Parser () {
   }, 100)
 }
 
-Parser.prototype.parse = async function (user, message, skip) {
+Parser.prototype.parse = async function (user, message, skip, isUserIgnored) {
   skip = skip || false
+  isUserIgnored = isUserIgnored || false
   this.linesParsed++
-  this.registeredParsers === {} ? this.parseCommands(user, message, skip) : this.addToQueue(user, message, skip)
+  this.registeredParsers === {} ? this.parseCommands(user, message, skip, isUserIgnored) : this.addToQueue(user, message, skip, isUserIgnored)
 }
 
-Parser.prototype.addToQueue = async function (user, message, skip) {
+Parser.prototype.addToQueue = async function (user, message, skip, isUserIgnored) {
+  const d = debug('parser:addToQueue'); d(user, message, skip, isUserIgnored)
   var id = crypto.createHash('md5').update(Math.random().toString()).digest('hex')
 
   var data = {
@@ -68,15 +70,16 @@ Parser.prototype.addToQueue = async function (user, message, skip) {
     user: user,
     message: message,
     startedAll: false,
-    skip: skip
+    skip: skip,
+    isUserIgnored: isUserIgnored
   }
   queue[id] = data
 
   if (_.isNil(this.registeredParsersValues)) this.registeredParsersValues = _(this.registeredParsers).toPairs().sortBy(0).fromPairs().value()
-  debug('Parser list: %o', this.registeredParsersValues)
+  d('Parser list: %o', this.registeredParsersValues)
   for (var parser in this.registeredParsersValues) {
     if (typeof queue[id] === 'undefined') {
-      debug('Removed from queue')
+      d('Removed from queue')
       break
     }
 
@@ -87,18 +90,20 @@ Parser.prototype.addToQueue = async function (user, message, skip) {
         (this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user))) {
       if (!_.isNil(queue[id])) {
         queue[id].started = parseInt(queue[id].started, 10) + 1
-        debug('Running parser - ' + parser)
-        await this.registeredParsers[parser](this.selfParsers[parser], id, user, message, skip)
+        if ((queue[id].isUserIgnored && parser.startsWith('moderation')) || !queue[id].isUserIgnored) {
+          // run only moderation if user is ignored, else run everything
+          d('Running parser - ' + parser)
+          await this.registeredParsers[parser](this.selfParsers[parser], id, user, message, skip)
+        }
       }
     }
   }
   if (!_.isNil(queue[id])) queue[id].startedAll = true // set to startedAll if queue is still existing (didn't fail)
 }
 
-Parser.prototype.parseCommands = async function (user, message, skip) {
+Parser.prototype.parseCommands = async function (user, message, skip, isUserIgnored) {
+  if (isUserIgnored) return
   message = message.trim()
-  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: _.get(user, 'username', '') })
-  if (!_.isEmpty(ignoredUser) && _.get(user, 'username', '') !== config.settings.broadcaster_username) return
 
   if (!message.startsWith('!')) return // do nothing, this is not a command or user is ignored
   for (var cmd in this.registeredCmds) {
@@ -189,32 +194,35 @@ Parser.prototype.isRegular = async function (user) {
 }
 
 Parser.prototype.isBot = function (user) {
-  debug('isBot(%j)', user)
+  const d = debug('parser:isBot')
+  d('isBot(%j)', user)
   try {
     if (_.isString(user)) user = { username: user }
     return config.settings.bot_username.toLowerCase().trim() === user.username.toLowerCase().trim()
   } catch (e) {
-    debug(e)
+    d(e)
     return true // we can expect, if user is null -> bot or admin
   }
 }
 
 Parser.prototype.isOwner = function (user) {
-  debug('isOwner(%j)', user)
+  const d = debug('parser:isOwner')
+  d('isOwner(%j)', user)
   try {
     if (_.isString(user)) user = { username: user }
     let owners = _.map(_.filter(config.settings.bot_owners.split(','), _.isString), function (owner) {
       return _.trim(owner.toLowerCase())
     })
-    debug('owners: %j', owners)
+    d('owners: %j', owners)
     return _.includes(owners, user.username.toLowerCase().trim())
   } catch (e) {
-    debug(e)
+    d(e)
     return true // we can expect, if user is null -> bot or admin
   }
 }
 
 Parser.prototype.parseMessage = async function (message, attr) {
+  const d = debug('parser:parseMessage')
   let random = {
     '(random.online.viewer)': async function () {
       let onlineViewers = await global.users.getAll({ is: { online: true } })
@@ -439,7 +447,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
         sender: global.configuration.getValue('atUsername') ? `@${attr.sender}` : `${attr.sender}`,
         param: _.isNil(attr.param) ? null : attr.param
       }
-      debug(toEval, context); return (safeEval(toEval, context))
+      d(toEval, context); return (safeEval(toEval, context))
     }
   }
   let ifp = {
@@ -450,12 +458,12 @@ Parser.prototype.parseMessage = async function (message, attr) {
         let [check, ifTrue, ifFalse] = toEvaluate.split('|')
         check = check.startsWith('>') || check.startsWith('<') || check.startsWith('=') ? false : check // force check to false if starts with comparation
 
-        debug(toEvaluate, check, safeEval(check), ifTrue, ifFalse)
+        d(toEvaluate, check, safeEval(check), ifTrue, ifFalse)
         if (_.isNil(ifTrue)) return
         if (safeEval(check)) return ifTrue
         return _.isNil(ifFalse) ? '' : ifFalse
       } catch (e) {
-        debug(e)
+        d(e)
         return ''
       }
     }
@@ -470,23 +478,24 @@ Parser.prototype.parseMessage = async function (message, attr) {
     .replace(/\$hosts/g, global.twitch.current.hosts)
     .replace(/\$subscribers/g, global.twitch.current.subscribers)
     .replace(/\$bits/g, global.twitch.current.bits)
-  msg = await this.parseMessageEval(evaluate, decode(msg)); debug('parseMessageEval: %s', msg)
-  msg = await this.parseMessageOnline(online, msg); debug('parseMessageOnline: %s', msg)
-  msg = await this.parseMessageCommand(command, msg); debug('parseMessageCommand: %s', msg)
-  msg = await this.parseMessageEach(random, msg); debug('parseMessageEach: %s', msg)
-  msg = await this.parseMessageEach(price, msg); debug('parseMessageEach: %s', msg)
-  msg = await this.parseMessageEach(custom, msg); debug('parseMessageEach: %s', msg)
-  msg = await this.parseMessageEach(param, msg); debug('parseMessageEach: %s', msg)
-  msg = await this.parseMessageEach(qs, msg); debug('parseMessageEach: %s', msg)
-  msg = await this.parseMessageEach(info, msg); debug('parseMessageEach: %s', msg)
-  msg = await this.parseMessageEach(list, msg); debug('parseMessageEach: %s', msg)
-  msg = await this.parseMessageEach(math, msg); debug('parseMessageEach: %s', msg)
-  msg = await this.parseMessageApi(msg); debug('parseMessageApi: %s', msg)
-  msg = await this.parseMessageEach(ifp, msg, false); debug('parseMessageEach: %s', msg)
+  msg = await this.parseMessageEval(evaluate, decode(msg)); d('parseMessageEval: %s', msg)
+  msg = await this.parseMessageOnline(online, msg); d('parseMessageOnline: %s', msg)
+  msg = await this.parseMessageCommand(command, msg); d('parseMessageCommand: %s', msg)
+  msg = await this.parseMessageEach(random, msg); d('parseMessageEach: %s', msg)
+  msg = await this.parseMessageEach(price, msg); d('parseMessageEach: %s', msg)
+  msg = await this.parseMessageEach(custom, msg); d('parseMessageEach: %s', msg)
+  msg = await this.parseMessageEach(param, msg); d('parseMessageEach: %s', msg)
+  msg = await this.parseMessageEach(qs, msg); d('parseMessageEach: %s', msg)
+  msg = await this.parseMessageEach(info, msg); d('parseMessageEach: %s', msg)
+  msg = await this.parseMessageEach(list, msg); d('parseMessageEach: %s', msg)
+  msg = await this.parseMessageEach(math, msg); d('parseMessageEach: %s', msg)
+  msg = await this.parseMessageApi(msg); d('parseMessageApi: %s', msg)
+  msg = await this.parseMessageEach(ifp, msg, false); d('parseMessageEach: %s', msg)
   return msg
 }
 
 Parser.prototype.parseMessageApi = async function (msg) {
+  const d = debug('parser:parseMessageApi')
   if (msg.length === 0) return msg
 
   let rMessage = msg.match(/\(api\|(http\S+)\)/i)
@@ -504,7 +513,7 @@ Parser.prototype.parseMessageApi = async function (msg) {
       msg = msg.replace('(api._response)', response.body.toString().replace(/^"(.*)"/, '$1'))
     } else {
       if (_.isBuffer(response.body)) response.body = JSON.parse(response.body.toString())
-      debug('API response %s: %o', url, response.body)
+      d('API response %s: %o', url, response.body)
       _.each(rData, function (tag) {
         let path = response.body
         let ids = tag.replace('(api.', '').replace(')', '').split('.')
@@ -615,15 +624,16 @@ Parser.prototype.parseMessageEach = async function (filters, msg, removeWhenEmpt
 
 // these needs to be global, will be called from called parsers
 global.updateQueue = function (id, success) {
+  const d = debug('updateQueue')
   if (success && typeof queue[id] !== 'undefined') {
-    debug(queue)
+    d(queue)
     queue[id].success = parseInt(queue[id].success, 10) + 1
   } else {
     if (!_.isUndefined(queue[id]) && !_.isUndefined(queue[id].user.id)) {
       const index = _.findIndex(global.parser.timer, function (o) { return o.id === queue[id].user.id })
       if (!_.isUndefined(global.parser.timer[index])) global.parser.timer[index].sent = new Date().getTime()
     }
-    debug('Removing in updateQueue')
+    d('Removing in updateQueue')
     global.removeFromQueue(id)
   }
 }
