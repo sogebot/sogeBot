@@ -4,11 +4,19 @@ const config = require('../config.json')
 const crypto = require('crypto')
 const compareVersions = require('compare-versions')
 
+// logger
+const Logger = require('../libs/logging')
+global.logger = new Logger()
+
 // db
 const Database = require('../libs/databases/database')
-global.db = new Database();
+global.db = new Database()
 
-(async () => {
+var runMigration = async function () {
+  if (!global.db.engine.connected) {
+    setTimeout(() => runMigration(), 1000)
+    return
+  }
   let info = await global.db.engine.find('info')
 
   let dbVersion = _.isEmpty(info) || _.isNil(_.find(info, (o) => !_.isNil(o.version)).version)
@@ -38,7 +46,8 @@ global.db = new Database();
   if (dbVersion !== '0.0.0') await global.db.engine.update('info', { version: dbVersion }, { version: process.env.npm_package_version })
   else await global.db.engine.insert('info', { version: process.env.npm_package_version })
   process.exit()
-})()
+}
+runMigration()
 
 let updates = async (from, to) => {
   console.info('Performing update from %s to %s', from, to)

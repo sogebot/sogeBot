@@ -12,6 +12,8 @@ class INeDB extends Interface {
   constructor () {
     super('nedb')
 
+    this.connected = true
+
     if (!fs.existsSync('./db')) fs.mkdirSync('./db')
     if (!fs.existsSync('./db/nedb')) fs.mkdirSync('./db/nedb')
 

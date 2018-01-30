@@ -17,9 +17,11 @@ Stats.prototype.clearAPIStats = async function (self) {
   // remove data older than 2h
   stats = _.filter(stats, (o) => _.now() - o.timestamp >= 1000 * 60 * 60)
   d('Stats to delete: %j', stats)
+  let items = []
   for (let s of stats) {
-    await global.db.engine.remove('APIStats', { _id: s._id.toString() })
+    items.push(global.db.engine.remove('APIStats', { _id: s._id.toString() }))
   }
+  await Promise.all(items)
 
   setTimeout(() => self.clearAPIStats(self), 1000 * 60 * 60)
 }

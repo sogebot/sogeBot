@@ -12,25 +12,17 @@ class IMongoDB extends Interface {
   constructor () {
     super('mongodb')
 
-    this._connection = {}
+    this.connected = false
+    this.client = null
+
+    this.connect()
 
     if (debug.enabled) debug('MongoDB initialized')
   }
 
-  async connection (table) {
-    if (_.isNil(this._connection[table])) {
-      try {
-        this._connection[table] = await client.connect(config.database.mongodb.url, { poolSize: 100 })
-        debug(this._connection[table])
-      } catch (e) {
-        global.log.error(e.message)
-        if (e.message.match(/ENOTFOUND/g) || e.message.match(/ECONNREFUSED/g)) {
-          global.log.error(`Cannot connect to ${config.database.mongodb.url}`)
-          process.exit()
-        }
-      }
-    }
-    return this._connection[table]
+  async connect () {
+    this.client = await client.connect(config.database.mongodb.url, { poolSize: 100 })
+    this.connected = true
   }
 
   async find (table, where) {
@@ -41,7 +33,7 @@ class IMongoDB extends Interface {
       else return {}
     } else where = flatten(where)
     try {
-      let db = await this.connection(table)
+      let db = this.client.db(config.database.mongodb.dbName)
       let items = await db.collection(table).find(where)
       return items.toArray()
     } catch (e) {
@@ -62,7 +54,7 @@ class IMongoDB extends Interface {
     } else where = flatten(where)
 
     try {
-      let db = await this.connection(table)
+      let db = this.client.db(config.database.mongodb.dbName)
       let item = await db.collection(table).findOne(where)
       return item || {}
     } catch (e) {
@@ -79,7 +71,7 @@ class IMongoDB extends Interface {
     delete object._id
 
     try {
-      let db = await this.connection(table)
+      let db = this.client.db(config.database.mongodb.dbName)
       let item = await db.collection(table).insert(object)
       return item.ops[0]
     } catch (e) {
@@ -99,7 +91,7 @@ class IMongoDB extends Interface {
     delete object._id
 
     try {
-      let db = await this.connection(table)
+      let db = this.client.db(config.database.mongodb.dbName)
       let item = await db.collection(table).findAndModify(
         where,
         { _id: 1 },
@@ -127,7 +119,7 @@ class IMongoDB extends Interface {
     delete object._id
 
     try {
-      let db = await this.connection(table)
+      let db = this.client.db(config.database.mongodb.dbName)
 
       await db.collection(table).update(
         where,
@@ -155,8 +147,8 @@ class IMongoDB extends Interface {
     else where = flatten(where)
 
     try {
-      let db = await this.connection(table)
-      let result = await db.collection(table).remove(where)
+      let db = this.client.db(config.database.mongodb.dbName)
+      let result = await db.collection(table).deleteMany(where)
       return result.result.n
     } catch (e) {
       global.log.error(e.message)
@@ -179,13 +171,13 @@ class IMongoDB extends Interface {
     if (debug.enabled) debug('update() \n\ttable: %s \n\twhere: %j', table, where)
 
     try {
-      let db = await this.connection(table)
+      let db = this.client.db(config.database.mongodb.dbName)
 
       if (_.size(where) === 0) {
         // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
         await db.collection(table).updateMany({}, { $set: flatten(object, { safe: true }) })
       } else {
-        await db.collection(table).update(
+        await db.collection(table).updateOne(
           where,
           // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
           { $set: flatten(object, { safe: true }) }, {
