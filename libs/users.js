@@ -195,8 +195,8 @@ Users.prototype.get = async function (username) {
   user.is = _.get(user, 'is', {})
   user.stats = _.get(user, 'stats', {})
   user.custom = _.get(user, 'custom', {})
-  user._id = user._id.toString() // force retype _id
 
+  if (!_.isNil(user._id)) user._id = user._id.toString() // force retype _id
   if (_.isNil(user.time.created_at) && !_.isNil(user.id)) this.fetchAccountAge(this, username, user.id)
 
   return user
