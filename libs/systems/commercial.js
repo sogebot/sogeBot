@@ -1,10 +1,11 @@
 'use strict'
 
 // 3rdparty libraries
-var _ = require('lodash')
+const _ = require('lodash')
+const snekfetch = require('snekfetch')
 
 // bot libraries
-var constants = require('../constants')
+const constants = require('../constants')
 const config = require('../../config')
 
 /*
@@ -21,7 +22,7 @@ class Commercial {
     }
   }
 
-  run (self, sender, text) {
+  async run (self, sender, text) {
     let parsed = text.match(/^([\d]+)? ?(.*)?$/)
 
     if (_.isNil(parsed)) {
@@ -40,9 +41,21 @@ class Commercial {
 
     // check if duration is correct (30, 60, 90, 120, 150, 180)
     if (_.includes([30, 60, 90, 120, 150, 180], commercial.duration)) {
-      global.events.fire('commercial', { duration: commercial.duration })
-      global.client.commercial(config.settings.broadcaster_username, commercial.duration)
-      if (!_.isNil(commercial.message)) global.commons.sendMessage(commercial.message, sender)
+      const url = `https://api.twitch.tv/kraken/channels/${global.channelId}/commercial`
+      try {
+        await snekfetch.post(url, { data: { length: commercial.duration } })
+          .set('Content-Type', 'application/json')
+          .set('Accept', 'application/vnd.twitchtv.v5+json')
+          .set('Client-ID', config.settings.client_id)
+          .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+
+        global.events.fire('commercial', { duration: commercial.duration })
+        global.client.commercial(config.settings.broadcaster_username, commercial.duration)
+        if (!_.isNil(commercial.message)) global.commons.sendMessage(commercial.message, sender)
+      } catch (e) {
+        global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
+        global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'commercial', api: 'kraken', endpoint: url, code: `${e.status} ${e.body.message}` })
+      }
     } else {
       global.commons.sendMessage('$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', sender)
     }
