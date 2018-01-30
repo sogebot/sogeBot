@@ -338,7 +338,7 @@ class Twitch {
     const d = debug('twitch:getLatest100Followers')
 
     // check if everything is properly loaded
-    if (_.isNil(global.channelId) && _.isNil(global.overlays)) {
+    if (_.isNil(global.channelId) || _.isNil(global.overlays)) {
       setTimeout(() => this.getLatest100Followers(quiet), 1000)
       return
     }
@@ -360,8 +360,8 @@ class Twitch {
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
-      global.log.error(`API: https://api.twitch.tv/helix/users/follows?to_id=${global.channelId}&first=100 - ${e.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.message, remaining: this.remainingAPICalls })
+      global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: `${e.status} ${e.body.message}`, remaining: this.remainingAPICalls })
       setTimeout(() => this.getLatest100Followers(false), 60000)
       return
     }
