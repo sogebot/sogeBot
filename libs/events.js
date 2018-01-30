@@ -62,15 +62,16 @@ class Events {
 
     let events = await global.db.engine.find('events', { key: eventId, enabled: true })
     for (let event of events) {
+      const eventId = event._id.toString()
       let [shouldRunByFilter, shouldRunByDefinition] = await Promise.all([
-        this.checkFilter(event._id.toString(), attributes),
-        this.checkDefinition(event, attributes)
+        this.checkFilter(eventId, attributes),
+        this.checkDefinition(_.clone(event), attributes)
       ])
       d('Should run by filter', shouldRunByFilter)
       d('Should run by definition', shouldRunByDefinition)
       if ((!shouldRunByFilter || !shouldRunByDefinition)) continue
 
-      for (let operation of (await global.db.engine.find('events.operations', { eventId: event._id.toString() }))) {
+      for (let operation of (await global.db.engine.find('events.operations', { eventId: eventId }))) {
         d('Firing %j', operation)
         if (!_.isNil(attributes.userObject)) {
           // flatten userObject
@@ -147,6 +148,7 @@ class Events {
     const d = debug('events:fireSendChatMessageOrWhisper')
     let username = _.get(attributes, 'username', global.parser.getOwner())
     let message = operation.messageToSend
+    console.log(attributes)
     _.each(attributes, function (val, name) {
       if (_.isObject(val) && _.size(val) === 0) return true // skip empty object
       d(`Replacing $${name} with ${val}`)

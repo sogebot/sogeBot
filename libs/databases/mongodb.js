@@ -42,8 +42,8 @@ class IMongoDB extends Interface {
     } else where = flatten(where)
     try {
       let db = await this.connection(table)
-      let items = await db.collection(table).find(where).toArray()
-      return items
+      let items = await db.collection(table).find(where)
+      return items.toArray()
     } catch (e) {
       global.log.error(e.message)
       if (e.message.match(/EPIPE/g)) {
@@ -172,6 +172,9 @@ class IMongoDB extends Interface {
 
     if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
     else where = flatten(where)
+
+    // remove _id from object
+    delete object._id
 
     if (debug.enabled) debug('update() \n\ttable: %s \n\twhere: %j', table, where)
 
