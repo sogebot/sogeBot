@@ -193,7 +193,7 @@ class IMongoDB extends Interface {
 
       // workaround for return of updated objects
       let items = await db.collection(table).find(where).toArray()
-      return items
+      return items.length === 1 ? items[0] : items
     } catch (e) {
       global.log.error(e.message)
       if (e.message.match(/EPIPE/g)) {
