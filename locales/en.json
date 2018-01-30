@@ -192,6 +192,55 @@
     }
   },
   "webpanel": {
+    "menu": {
+      "timers": "Timers",
+      "keywords": "Keywords",
+      "custom-commands": "Custom commands",
+      "event-listeners": "Event listeners",
+      "ranks": "Ranks",
+      "songs": "Songs",
+      "viewers": "Viewers",
+      "aliases": "Aliases",
+      "cooldowns": "Cooldowns",
+      "highlights": "Highlights",
+      "price": "Price",
+      "logger": "Logs",
+      "systems": "Systems",
+      "permissions": "Permissions",
+      "translations": "Custom translations",
+      "moderation": "Moderation",
+      "overlays": "Overlays",
+      "gallery": "Media gallery"
+    },
+    "timers": {
+      "title": "Timers",
+      "timer": "Timer",
+      "badges": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      },
+      "dialog": {
+        "timer": "Timer",
+        "name": "Name",
+        "interval": "Interval",
+        "responses": "Responses",
+        "title": {
+          "new": "New timer",
+          "edit": "Edit timer"
+        },
+        "placeholders": {
+          "name": "Set name of your timer, can contain only these characters a-zA-Z0-9_"
+        }
+      },
+      "buttons": {
+        "close": "Close",
+        "save-changes": "Save changes"
+      },
+      "alerts": {
+        "success": "Timer was <strong>successfully</strong> saved.",
+        "fail": "Something went <strong>wrong</strong>."
+      }
+    },
     "events": {
       "event": "Event",
       "whatsthis": "what's this?",
@@ -519,21 +568,14 @@
     "aliases": "Aliases",
     "alias": "Alias",
     "command": "Command",
-    "clips": "Clips",
     "cooldowns": "Cooldowns",
-    "custom-commands": "Custom commands",
     "title-template": "Title template",
-    "keywords": "Keywords",
     "keyword": "Keyword",
     "moderation": "Moderation",
     "timer": "Timer",
-    "timers": "Timers",
     "price": "Price",
-    "ranks": "Ranks",
     "rank": "Rank",
-    "event-listeners": "Event listeners",
     "logger": "Logs",
-    "songs": "Songs",
     "previous": "Previous",
     "next": "Next",
     "or": "- OR -",

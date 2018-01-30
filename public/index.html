@@ -429,7 +429,7 @@
           if ((obj.id === 'systems') && systems) return
           if ((obj.id === 'overlays') && overlays) return
           $('#menu-' + obj.category).append('<li class="nav-item"><a class="nav-link" href="#" data-page="' +
-            obj.id + '" data-lang="' + obj.name +
+            obj.id + '" data-lang="menu.' + obj.name +
             '"></a></li>')
         }
         if (obj.id === 'systems') systems = true
@@ -632,9 +632,15 @@
 
     socket.on('lang', function (data) {
       translations = data
-      _.each(data, function (value, key) {
-        $('[data-lang="' + key + '"]').text(value)
-      })
+      let elements = $('[data-lang]')
+      for (let el of elements) {
+        let translation = _.get(translations, $(el).data('lang'), null)
+        if(_.isNil(translation)) {
+          $(el).html(`{${$(el).data('lang')}}`)
+        } else {
+          $(el).html(translation)
+        }
+      }
       $('#change-game-input').attr('placeholder', translations['create-and-use-a-new-game'])
       $('#change-title').attr('placeholder', translations['create-and-use-a-new-title'])
     })

@@ -1,9 +1,57 @@
+<!-- Timers Dialog -->
+<div class="modal fade" id="timers-dlg" tabindex="-1" role="dialog" aria-labelledby="timers-dlgLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="timers-dlgLabel"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="event-form">
+          <div class="card">
+            <div class="card-header" data-lang="timers.dialog.timer"></div>
+            <div class="card-body">
+              <div class="form-group">
+                <label for="timers-dlg-timers-name" data-lang="timers.dialog.name"></label>
+                <input class="form-control" type="text" id="timers-dlg-timers-name"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-event-interval>
+            <div class="card-header" data-lang="timers.dialog.interval"></div>
+            <div class="card-body"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <button class="btn btn-outline-primary" onclick="AddTimerResponse(event)">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+              </button>
+              <span data-lang="timers.dialog.responses"></span>
+            </div>
+            <div class="card-body" data-event-responses></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <div data-dialog-alert-success class="alert alert-success d-none" role="alert" data-lang="timers.dialog.alerts.success"></div>
+        <div data-dialog-alert-fail class="alert alert-danger d-none" role="alert" data-lang="timers.dialog.alerts.fail"></div>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" data-lang="timers.buttons.close"></button>
+        <button type="button" class="btn btn-primary" onclick="saveChanges(event, this)" id="timers-save-changes-btn" data-lang="timers.buttons.save-changes"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <ul class="nav nav-tabs" id="timers-tab" style="position: relative; top: 1px">
   <li>
-    <span data-lang="timers" class="title text-default"></span>
+    <span data-lang="timers.title" class="title text-default"></span>
   </li>
   <li class="nav-item">
-    <button class="nav-link btn btn-success" data-toggle="modal" data-target="#timer-dlg">
+    <button class="nav-link btn btn-success" data-toggle="modal" data-target="#timers-dlg">
       <i class="fa fa-plus" aria-hidden="true"></i> <span data-lang="timers">
     </button>
   </li>
@@ -14,17 +62,13 @@
 
 <div class="tab-content tab-content-timers">
 <div role="tabpanel" class="tab-pane active" id="manage">
-    <div class="widget">
-      <div class="card-columns p-2" id="timers-cards"></div>
-    </div>
-
-    <div class="widget">
-      <table class="table table-striped">
-        <tbody id="timers"></tbody>
-      </table>
-    </div>  </div>
+  <div class="widget">
+    <div class="card-columns p-2" id="timers-cards"></div>
+  </div>
+</div>
 
 <script>
+  /*
 var timers = {
   new: () => {
     // get opened tab
@@ -108,7 +152,7 @@ var timers = {
         '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="badge badge-success btn-confirm" onclick="timers.unset(this)" data-id="' +
         timer.name + '">confirm</span>' +
         '</td>' +
-        '</tr>');*/
+        '</tr>');
   },
   addTabPane: (name, responses) => {
     let content = `<div role="tabpanel" class="tab-pane" id="${name}_content">` +
@@ -297,25 +341,42 @@ socket.on('timers', (data) => {
     timers.addTabPane(timer.name, _.filter(data.responses, (o) => o.timerId === timer._id))
     timers.addTab(timer.name)
   }
+})
+*/
 
-  // reshow tab
-  let id = $("ul#timers-tab li a.active").attr('href')
-  if (id !== '#manage' && id !== '#responses') {
-    $('a[href="#manage"]').tab('show'); // this is needed to properly refocus tab
-    $(`a[href="${id}"]`).tab('show');
-    $('.plus-button').prop('disabled', false)
+var timers = {
+  list: { }
+}
+
+$('#timers-dlg').on('show.bs.modal', function (event) {
+  const button = $(event.relatedTarget) // Button that triggered the modal
+  const timerName = button.data('id') || null
+  const timerToEdit = _.find(timers.list, (o) => timerName === o.name)
+
+  { // input locales
+    $("#timers-dlg-timers-name").attr('placeholder', translations.timers.dialog.placeholders.name)
   }
 
-  $('#_new').off('keyup')
-  $('#_new').on('keyup', function () {
-    let toValidate = $(this).val()
-    if (toValidate.match(/^([^\W]+)$/)) {
-      $(this).removeClass('is-invalid')
-      $('.save-button').removeAttr('disabled')
-    } else {
-      $(this).addClass('is-invalid')
-      $('.save-button').attr('disabled', 'disabled')
-    }
-  })
+  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+  var modal = $(this)
+  modal.find('#timers-dlgLabel').text(_.isNil(timerToEdit)
+    ? translations.timers.dialog.title.new
+    : translations.timers.dialog.title.edit)
+
+  modal.find('[data-dialog-alert-fail]').css('display', 'none')
+  modal.find('[data-dialog-alert-success]').css('display', 'none')
+
+  modal.find('#timers-dlg-timer-name').val(_.isNil(timerToEdit)
+    ? ''
+    : timerToEdit.name)
+
+  modal.find('#timers-save-changes-btn').attr('data-id', timerName)
+
+  modal.find('[data-event-responses]').empty()
+  if (!_.isNil(timerToEdit)) {
+    console.log('TODO')
+  }
 })
+
 </script>
