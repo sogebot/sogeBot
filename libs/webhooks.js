@@ -18,6 +18,7 @@ class Webhooks {
   }
 
   addIdToCache (type, id) {
+    debug(`Adding to ${type} cache - ${id}`)
     this.cache.push({
       id: id,
       type: type,
@@ -116,6 +117,7 @@ class Webhooks {
 
     // check if user exists in db
     let user = await global.db.engine.findOne('users', { id: fid })
+    debug(user)
     if (_.isEmpty(user)) {
       debug('user not in db')
       // user doesn't exist - get username from api GET https://api.twitch.tv/helix/users?id=<user ID>
@@ -124,28 +126,28 @@ class Webhooks {
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
       debug('user API data" %o', userGetFromApi.body)
 
-      global.overlays.eventlist.add({
-        type: 'follow',
-        username: userGetFromApi.body.data[0].login
-      })
-      await Promise.all([
-        global.db.engine.update('users', { username: userGetFromApi.body.data[0].login }, { id: fid, username: userGetFromApi.body.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } }),
+      if (!global.parser.isBot(userGetFromApi.body.data[0].login)) {
+        global.overlays.eventlist.add({
+          type: 'follow',
+          username: userGetFromApi.body.data[0].login
+        })
+        await global.db.engine.update('users', { username: userGetFromApi.body.data[0].login }, { id: fid, username: userGetFromApi.body.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
         global.twitch.addUserInFollowerCache(userGetFromApi.body.data[0].login)
-      ])
-      global.log.follow(userGetFromApi.body.data[0].login)
-      global.events.fire('follow', { username: userGetFromApi.body.data[0].login }) // we can safely fire event as user doesn't exist in db
+        global.log.follow(userGetFromApi.body.data[0].login)
+        debug('Firing follow event'); global.events.fire('follow', { username: userGetFromApi.body.data[0].login }) // we can safely fire event as user doesn't exist in db
+      }
     } else {
       debug('user in db')
       debug('username: %s, is follower: %s, current time: %s, user time follow: %s', user.username, _.get(user, 'is.follower', false), _.now(), _.get(user, 'time.follow', 0))
       if (!_.get(user, 'is.follower', false) && _.now() - _.get(user, 'time.follow', 0) > 60000 * 60) {
-        await global.twitch.addUserInFollowerCache(user.username)
         if (!global.parser.isBot(user.username)) {
+          global.twitch.addUserInFollowerCache(user.username)
           global.overlays.eventlist.add({
             type: 'follow',
             username: user.username
           })
           global.log.follow(user.username)
-          global.events.fire('follow', { username: user.username, webhooks: true })
+          debug('Firing follow event'); global.events.fire('follow', { username: user.username, webhooks: true })
         }
       }
 

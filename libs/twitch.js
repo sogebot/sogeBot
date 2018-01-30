@@ -417,7 +417,7 @@ class Twitch {
         if (!user.is.follower) {
           if (new Date().getTime() - moment(user.time.follow).format('X') * 1000 < 60000 * 60 && !global.webhooks.existsInCache('follow', user.id)) {
             global.webhooks.addIdToCache('follow', user.id)
-            await this.addUserInFollowerCache(user.username)
+            this.addUserInFollowerCache(user.username)
 
             global.overlays.eventlist.add({
               type: 'follow',
@@ -1060,7 +1060,7 @@ class Twitch {
       cached.followers = _.uniq(cached.followers)
       cached.followers = _.chunk(cached.followers, 100)[0]
     }
-    await Promise.all([this.when(when), this.cached(cached)])
+    return Promise.all([this.when(when), this.cached(cached)])
   }
 
   /* Correctly saves user in cached.subscribers and
