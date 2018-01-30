@@ -62,6 +62,7 @@ let migration = {
     do: async () => {
       console.info('Migration cache to %s', '6.0.0')
       let cache = await global.db.engine.findOne('cache')
+      if (_.isEmpty(cache)) return
 
       let when = {
         offline: null,
@@ -93,7 +94,7 @@ let migration = {
 
       for (let event of events) {
         event.value = event.value || '{}'
-        const operations = JSON.parse(event.value)
+        const operations = _.isArray(event.value) ? event.value : JSON.parse(event.value)
         if (_.isNil(event.definitions)) await global.db.engine.remove('events', { _id: event._id.toString() })
         if (_.size(operations) === 0) continue
 
