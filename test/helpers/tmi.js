@@ -8,7 +8,7 @@ module.exports = {
           connected = true
           resolve(true)
         })
-        setTimeout(() => reject(new Error('Not connected in specified time')), 3000)
+        setTimeout(() => reject(new Error('Not connected in specified time')), 10000)
       } else resolve(true)
     })
   }
