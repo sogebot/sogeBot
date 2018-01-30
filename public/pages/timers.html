@@ -3,9 +3,9 @@
     <span data-lang="timers" class="title text-default"></span>
   </li>
   <li class="nav-item">
-    <a class="nav-link btn-outline-success plus-button" onclick="timers.new()">
-      <i class="fa fa-plus" aria-hidden="true"></i>
-    </a>
+    <button class="nav-link btn btn-success" data-toggle="modal" data-target="#timer-dlg">
+      <i class="fa fa-plus" aria-hidden="true"></i> <span data-lang="timers">
+    </button>
   </li>
   <li class="nav-item">
     <a class="nav-link active" data-toggle="tab" href="#manage" data-lang="manage"></a>
@@ -41,13 +41,6 @@ var timers = {
   addRow: (timer, responses) => {
     $('#timers-cards').append(`
       <div class="card"">
-        <div class="card-body" style="display: none" data-card-delete-confirm="${timer.name}">
-          <p>Are you sure you want to <strong class="text-danger">delete</strong> timer '<strong>${timer.name}</strong>'?</p>
-          <div class="text-center">
-            <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="timers.deleteTimer(this)">YES</a>
-            <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="flipCardBack(this)">NO</a>
-          </div>
-        </div>
         <div class="card-body mb-0 pb-0 pt-2" data-card="${timer.name}">
           <h5 class="card-title">
             ${timer.enabled ? `<span class="badge badge-pill badge-primary">Enabled</span>` : `<span class="badge badge-pill badge-dark">Disabled</span>` }
@@ -78,9 +71,20 @@ var timers = {
       <div class="card-footer text-center">
         <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="timers.toggle(this)">${timer.enabled ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> Disable`: `<i class="fa fa-toggle-on" aria-hidden="true"></i> Enable`}</a>
         <a href="#" class="btn btn-outline-secondary"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
-        <a href="#" class="btn btn-outline-secondary" data-card="${timer.name}" onclick="flipCard(this)"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a>
+        <a href="#" class="btn btn-outline-secondary" data-card-delete-popover="${timer.name}"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a>
       </div>
     `)
+
+
+    $(`[data-card-delete-popover="${timer.name}"]`).popover({
+            html: true,
+            content: `
+          <p>${translations.events.popovers.are_you_sure_you_want_to_delete_event} '<strong>${timer.name}</strong>'?</p>
+          <div class="text-center">
+            <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="events.delete(this)">${translations.events.buttons.yes}</a>
+            <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="$('[data-card-delete-popover=${timer.name}]').popover('hide')">${translations.events.buttons.no}</a>
+          </div>`
+          })
     /*$("#timers").append('<tr class="page-data-row">' +
         '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">' + translations['name'] + '</span>' +
         '<span style="cursor: pointer;" class="badge badge-' + (timer.enabled ? "success" : "danger") +
@@ -314,35 +318,4 @@ socket.on('timers', (data) => {
     }
   })
 })
-
-function flipCard (e) {
-  let card = $(e).data('card')
-
-  if ($(`div[data-card="${card}"]`).css('opacity') === '0') return
-
-  let height = $(`div[data-card="${card}"]`).css('height')
-
-  $(`div[data-card="${card}"]`)
-    .velocity('fadeOut', 500)
-  $(`div[data-card-delete-confirm="${card}"]`)
-    .css('height', height)
-    .velocity('fadeIn', {
-      delay: 500,
-      duration: 500
-    })
-}
-
-function flipCardBack (e) {
-  let card = $(e).data('id')
-
-  if ($(`div[data-card="${card}"]`).css('opacity') === '1') return
-
-  $(`div[data-card-delete-confirm="${card}"]`)
-    .velocity('fadeOut', 500)
-  $(`div[data-card="${card}"]`)
-    .velocity('fadeIn', {
-      delay: 500,
-      duration: 500
-    })
-}
 </script>
