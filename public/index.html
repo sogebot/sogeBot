@@ -347,12 +347,29 @@
 
         $('#new_version_dlg .modal-body').html(md.render(response.body.replace('**Changelog**', '').trim()))
         $('#new_version_dlg .modal-header small').text(response.tag_name)
-        console.debug('GITHUB version', parseInt(response.tag_name.split('.').join(''), 10))
-        console.debug('LOCAL version', parseInt(version.split('.').join(''), 10))
+        console.debug('GITHUB version', response.tag_name)
+        console.debug('LOCAL version', version)
         $('#version').text(response.tag_name)
         $('#current_version').text(version)
         $('title').text($('title').text() + ' ' + version)
-        if (parseInt(response.tag_name.split('.').join(''), 10) > parseInt(version.split('.').join(''), 10)) $('#new-version-notice').css('display', 'inline')
+
+        let botVersion = version.replace('-SNAPSHOT', '').split('.')
+        let gitVersion = response.tag_name.split('.')
+
+        let isNewer = false
+        for (let index in botVersion) {
+          botVersion[index] = parseInt(botVersion[index], 10)
+          gitVersion[index] = parseInt(gitVersion[index], 10)
+          if (botVersion[index] < gitVersion[index]) {
+            isNewer = true
+            break
+          } else if (botVersion[index] === gitVersion[index]) continue
+          else {
+            isNewer = false
+            break
+          }
+        }
+        if (isNewer) $('#new-version-notice').css('display', 'inline')
       })
     })
 
