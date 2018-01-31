@@ -426,10 +426,13 @@ class Events {
         }
 
         const username = _.sample(['short', 'someFreakingLongUsername', generateUsername()])
+        const recipient = _.sample(['short', 'someFreakingLongUsername', generateUsername()])
         const months = _.random(0, 99, false)
         let attributes = {
           username: username,
           userObject: await global.users.get(username),
+          recipient: recipient,
+          recipientObject: await global.users.get(recipient),
           months: months,
           monthsName: global.parser.getLocalizedName(months, 'core.months'),
           message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
