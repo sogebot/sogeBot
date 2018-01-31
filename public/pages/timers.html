@@ -68,6 +68,10 @@
 </div>
 
 <script>
+  var timersSocket = io('/timers', {
+    query: "token=" + token
+  })
+
   /*
 var timers = {
   new: () => {
@@ -81,78 +85,6 @@ var timers = {
     let li = $(`<li id="${name}_tab" class="nav-item"><a class="nav-link withDelete" data-toggle="tab" href="#${name}_content" style="display: inline-block;">${name} <span class="deleteTab" onclick="timers.deleteTimer(this)" data-id="${name}"><i class="fa fa-times" aria-hidden="true"></i></span></a> </li>`)
     if ($(`#${name}_tab`).length === 0) $('#timers-tab li:eq(2)').after(li)
     li.on('click', () => $('.plus-button').prop('disabled', false))
-  },
-  addRow: (timer, responses) => {
-    $('#timers-cards').append(`
-      <div class="card"">
-        <div class="card-body mb-0 pb-0 pt-2" data-card="${timer.name}">
-          <h5 class="card-title">
-            ${timer.enabled ? `<span class="badge badge-pill badge-primary">Enabled</span>` : `<span class="badge badge-pill badge-dark">Disabled</span>` }
-            ${timer.name}
-          </h5>
-
-          <dl class="row mb-0 pb-0">
-            <dt class="col-sm-4">${translations['num-of-responses']}</dt>
-            <dd class="col-sm-8">
-              <p class="m-0">
-                <span class="fa-stack" style="font-size: 0.7rem">
-                  <i class="fa fa-eye fa-stack-1x fa-fw"></i>
-                </span> ${responses.enabled}</p>
-              <p class="m-0">
-                <span class="fa-stack" style="font-size: 0.7rem">
-                  <i class="fa fa-eye fa-stack-1x fa-fw"></i>
-                  <i class="fa fa-ban fa-stack-2x text-danger fa-fw"></i>
-                </span> ${responses.disabled}</p>
-            </dd>
-            <dt class="col-sm-4">${translations['interval']}</dt>
-            <dd class="col-sm-8">
-              <p class="m-0">${timer.messages} messages</p>
-              <p class="m-0">${timer.seconds} seconds</p>
-            </dd>
-          </dl>
-        </div>
-
-      <div class="card-footer text-center">
-        <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="timers.toggle(this)">${timer.enabled ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> Disable`: `<i class="fa fa-toggle-on" aria-hidden="true"></i> Enable`}</a>
-        <a href="#" class="btn btn-outline-secondary"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</a>
-        <a href="#" class="btn btn-outline-secondary" data-card-delete-popover="${timer.name}"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a>
-      </div>
-    `)
-
-
-    $(`[data-card-delete-popover="${timer.name}"]`).popover({
-            html: true,
-            content: `
-          <p>${translations.events.popovers.are_you_sure_you_want_to_delete_event} '<strong>${timer.name}</strong>'?</p>
-          <div class="text-center">
-            <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="events.delete(this)">${translations.events.buttons.yes}</a>
-            <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="$('[data-card-delete-popover=${timer.name}]').popover('hide')">${translations.events.buttons.no}</a>
-          </div>`
-          })
-    /*$("#timers").append('<tr class="page-data-row">' +
-        '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">' + translations['name'] + '</span>' +
-        '<span style="cursor: pointer;" class="badge badge-' + (timer.enabled ? "success" : "danger") +
-        '" data-id="' + timer.name + '" onclick="timers.toggle(this)">' + (timer.enabled ? translations['enabled'] :
-        translations['disabled']) + '</span>' +
-        '<div class="form-group has-danger">' +
-        '<input value="' +  timer.name + '" data-id="' + timer.name + '" type="text" class="form-control" pattern="[a-zA-Z0-9_.]" title="Timer name can contain only a-z, A-Z, 0-9, _" onchange="timers.editName(this)" id="' + timer.name + '"></input>' +
-        '<div class="invalid-feedback">Sorry, timer name can contain only a-z, A-Z, 0-9, _</div>' +
-        '</div></td>' +
-        '<td style="vertical-align: top !important;"><span class="badge badge-user">' + translations['num-of-responses'] + '</span><strong style="display: block; padding: 8px">' +
-          `⚫ ${responses.enabled} ⚪ ${responses.disabled}</strong></td>` +
-        '</td>' +
-        '<td style="vertical-align: top !important;width: 20rem; max-width: 20rem;"><span class="badge badge-primary">' + translations['messages'] + '</span> ' +
-          commons.editable({ text: timer.messages, id: timer.name, fnc: 'timers.editMessages', options: { seconds: timer.seconds }}) + '</td>' +
-        '</td>' +
-        '<td style="vertical-align: top !important;width: 20rem; max-width: 20rem;"><span class="badge badge-primary">' + translations['seconds'] + '</span> ' +
-          commons.editable({ text: timer.seconds, id: timer.name, fnc: 'timers.editSeconds', options: { messages: timer.messages }}) + '</td>' +
-        '<span style="cursor: not-allowed; float:right; padding: 4px;" class="badge badge-danger btn-remove" data-id="' +
-        timer.name + '"  onclick="commons.confirm(this)">' + translations['delete'] + '</span>' +
-        '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="badge badge-warning btn-confirm" onclick="commons.unconfirm(this)">cancel</span>' +
-        '<span style="cursor: not-allowed; float:right; padding: 4px; display: none" class="badge badge-success btn-confirm" onclick="timers.unset(this)" data-id="' +
-        timer.name + '">confirm</span>' +
-        '</td>' +
-        '</tr>');
   },
   addTabPane: (name, responses) => {
     let content = `<div role="tabpanel" class="tab-pane" id="${name}_content">` +
@@ -345,8 +277,93 @@ socket.on('timers', (data) => {
 */
 
 var timers = {
-  list: { }
+  list: {},
+  refresh: () => {
+    timersSocket.emit('list.timers', (err, cb) => {
+      console.debug(cb)
+      $('#timers-cards').empty()
+      for (let timer of cb.timers) {
+        const responses = {
+          _total: _.filter(cb.responses, (o) => o.timerId === timer._id).length,
+          enabled: _.filter(cb.responses, (o) => o.timerId === timer._id && o.enabled).length,
+          disabled: _.filter(cb.responses, (o) => o.timerId === timer._id && !o.enabled).length
+        }
+        $('#timers-cards').append(`
+        <div class="card" data-id="${timer.name}">
+          <div class="card-body mb-0 pb-0 pt-2" data-card="${timer.name}">
+            <h5 class="card-title">
+              ${timer.enabled ? `<span class="badge badge-pill badge-primary" data-id="${timer.name}">${translations.timers.badges.enabled}</span>` : `<span class="badge badge-pill badge-light" data-id="${timer.name}">${translations.timers.badges.disabled}</span>` }
+              <strong>${timer.name}</strong>
+            </h5>
+
+            <dl class="row mb-0 pb-0">
+              <dt class="col-sm-4">${translations['num-of-responses']}</dt>
+              <dd class="col-sm-8">
+                <p class="m-0">
+                  <span class="fa-stack" style="font-size: 0.7rem">
+                    <i class="fa fa-eye fa-stack-1x fa-fw"></i>
+                  </span> ${responses.enabled}</p>
+                <p class="m-0">
+                  <span class="fa-stack" style="font-size: 0.7rem">
+                    <i class="fa fa-eye fa-stack-1x fa-fw"></i>
+                    <i class="fa fa-ban fa-stack-2x text-danger fa-fw"></i>
+                  </span> ${responses.disabled}</p>
+              </dd>
+              <dt class="col-sm-4">${translations['interval']}</dt>
+              <dd class="col-sm-8">
+                <p class="m-0">${timer.messages} ${translations.timers.messages}</p>
+                <p class="m-0">${timer.seconds} ${translations.timers.seconds}</p>
+              </dd>
+            </dl>
+          </div>
+
+          <div class="card-footer text-center">
+            <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="timers.toggle(this)">${timer.enabled ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> ${translations.timers.buttons.disable}`: `<i class="fa fa-toggle-on" aria-hidden="true"></i> ${translations.timers.buttons.enable}`}</a>
+            <a href="#" class="btn btn-outline-secondary"><i class="fa fa-pencil" aria-hidden="true"></i> ${translations.timers.buttons.edit}</a>
+            <a href="#" class="btn btn-outline-danger" data-card-delete-popover="${timer.name}"><i class="fa fa-trash-o" aria-hidden="true"></i> ${translations.timers.buttons.delete}</a>
+          </div>
+        `)
+        $(`[data-card-delete-popover="${timer.name}"]`).popover({
+          html: true,
+          content: `<p>${translations.timers.popovers.are_you_sure_you_want_to_delete_timer} '<strong>${timer.name}</strong>'?</p>
+                    <div class="text-center">
+                      <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="timers.delete(this)">${translations.timers.buttons.yes}</a>
+                      <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="$('[data-card-delete-popover=${timer.name}]').popover('hide')">${translations.timers.buttons.no}</a>
+                    </div>`
+        })
+      }
+    })
+  },
+  toggle: (el) => {
+      $(el).removeClass().addClass('btn btn-info')
+      timersSocket.emit('toggle.timer', el.dataset.id, (err, cb) => {
+        if (err) return console.error(err)
+        $(el).removeClass().addClass('btn btn-outline-secondary')
+
+        $(`.badge[data-id="${el.dataset.id}"]`)
+          .removeClass()
+          .addClass(cb.enabled ? 'badge badge-pill badge-primary' : 'badge badge-pill badge-light')
+          .text(cb.enabled ? translations.timers.badges.enabled : translations.timers.badges.disabled)
+
+        $(el)
+          .html(cb.enabled ?
+            `<i class="fa fa-toggle-off" aria-hidden="true"></i> ${translations.timers.buttons.disable}` :
+            `<i class="fa fa-toggle-on" aria-hidden="true"></i> ${translations.timers.buttons.enable}`)
+      })
+    },
+    delete: (el) => {
+      // change button to informative state
+      $(el).removeClass().addClass('btn btn-info')
+      timersSocket.emit('delete.timer', el.dataset.id, (err, cb) => {
+        if (err) return console.error(err)
+        $(el).removeClass().addClass('btn btn-outline-secondary')
+        $(`[data-card-delete-popover=${cb}]`).popover('hide')
+        $(`.card[data-id='${cb}']`).velocity('fadeOut')
+      })
+    }
 }
+
+timers.refresh()
 
 $('#timers-dlg').on('show.bs.modal', function (event) {
   const button = $(event.relatedTarget) // Button that triggered the modal

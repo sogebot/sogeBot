@@ -215,6 +215,8 @@
     "timers": {
       "title": "Timers",
       "timer": "Timer",
+      "messages": "messages",
+      "seconds": "seconds",
       "badges": {
         "enabled": "Enabled",
         "disabled": "Disabled"
@@ -234,7 +236,16 @@
       },
       "buttons": {
         "close": "Close",
-        "save-changes": "Save changes"
+        "save-changes": "Save changes",
+        "disable": "Disable",
+        "enable": "Enable",
+        "edit": "Edit",
+        "delete": "Delete",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "popovers": {
+        "are_you_sure_you_want_to_delete_timer": "Are you sure you want to <strong class='text-danger'>delete</strong> timer"
       },
       "alerts": {
         "success": "Timer was <strong>successfully</strong> saved.",
