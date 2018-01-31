@@ -74,7 +74,7 @@ describe('Timers - add()', () => {
   it('-name test -response "Lorem Ipsum"', async () => {
     await global.systems.timers.add(global.systems.timers, owner, '-name test -response "Lorem Ipsum"')
 
-    let item = await global.db.engine.findOne('timersResponses', { response: 'Lorem Ipsum' })
+    let item = await global.db.engine.findOne('timers.responses', { response: 'Lorem Ipsum' })
     assert.notEmpty(item)
 
     await until(setError => {
