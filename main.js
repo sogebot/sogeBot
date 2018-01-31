@@ -281,6 +281,10 @@ function main () {
     if (global.twitch.isOnline) global.twitch.current.bits = global.twitch.current.bits + parseInt(userstate.bits, 10)
   })
 
+  global.client.on('subgift', async function (channel, username, recipient) {
+    subgift(channel, username, recipient)
+  })
+
   global.client.on('clearchat', function (channel) {
     global.events.fire('clearchat')
   })
@@ -343,6 +347,21 @@ function main () {
     })
   }
   getChannelID()
+}
+
+async function subgift (channel, username, recipient) {
+  recipient = recipient.toLowerCase()
+  if (debug.enabled) debug('Subgift: from %s to %s', username, recipient)
+
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
+  if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
+
+  global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: _.now() } })
+  global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username })
+  global.events.fire('subgift', { username: username, recipient: recipient })
+  global.log.subgift(`${recipient}, from: ${username}`)
+
+  await global.twitch.addUserInSubscriberCache(recipient)
 }
 
 if (config.debug.all) {

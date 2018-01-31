@@ -225,11 +225,14 @@
             ${variable === 'userObject'
               ? whatsthis
               : ``}
+            ${variable === 'recipientObject'
+              ? whatsthis.replace(/userObject/g, 'recipientObject')
+              : ``}
           </div>
         `
         )
 
-        if (variable === 'userObject') {
+        if (variable === 'userObject' || variable === 'recipientObject') {
           $('[data-events-whats-this]').popover({
             trigger: 'hover'
           })

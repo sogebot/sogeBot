@@ -16,6 +16,7 @@ class Events {
       { id: 'follow', variables: [ 'username', 'userObject' ] },
       { id: 'unfollow', variables: [ 'username', 'userObject' ] },
       { id: 'subscription', variables: [ 'username', 'userObject', 'method' ] },
+      { id: 'subgift', variables: [ 'username', 'userObject', 'recipient', 'recipientObject' ] },
       { id: 'resub', variables: [ 'username', 'userObject', 'months', 'monthsName', 'message' ] },
       { id: 'command-send-x-times', variables: [ 'username', 'userObject', 'command', 'count' ], definitions: { runEveryXCommands: 10, commandToWatch: '', runInterval: 0 }, check: this.checkCommandSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 }, check: this.checkNumberOfViewersIsAtLeast }, // runInterval 0 or null - disabled; > 0 every x seconds
@@ -56,6 +57,7 @@ class Events {
     attributes = attributes || {}
 
     if (!_.isNil(_.get(attributes, 'username', null))) attributes.userObject = await global.users.get(attributes.username)
+    if (!_.isNil(_.get(attributes, 'recipient', null))) attributes.recipientObject = await global.users.get(attributes.recipient)
     d('Firing event %s with attrs: %j', eventId, attributes)
 
     if (_.get(attributes, 'reset', false)) return this.reset(eventId)
@@ -77,6 +79,11 @@ class Events {
           // flatten userObject
           let userObject = attributes.userObject
           _.merge(attributes, flatten({userObject: userObject}))
+        }
+        if (!_.isNil(attributes.recipientObject)) {
+          // flatten recipientObject
+          let recipientObject = attributes.recipientObject
+          _.merge(attributes, flatten({recipientObject: recipientObject}))
         }
         const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key))
         if (isOperationSupported) _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation.definitions, attributes)

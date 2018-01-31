@@ -39,7 +39,8 @@ EventList.prototype.add = async function (data) {
     message: data.message,
     months: _.isNil(data.months) ? 0 : data.months,
     bits: _.isNil(data.bits) ? 0 : data.bits,
-    viewers: _.isNil(data.viewers) ? 0 : data.viewers
+    viewers: _.isNil(data.viewers) ? 0 : data.viewers,
+    from: _.isNil(data.from) ? 'n/a' : data.from
   }
   global.db.engine.insert('widgetsEventList', newEvent)
   global.overlays.eventlist._get(global.overlays.eventlist)

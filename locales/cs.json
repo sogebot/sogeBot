@@ -294,6 +294,7 @@
       "follow": "ti dal <strong>follow</strong>",
       "host": "tě <strong>hostuje</strong> s $viewers diváky",
       "sub": "ti dal <strong>sub</strong>",
+      "subgift": "byl <strong>darován</strong> sub od $username",
       "resub": "ti dal <strong>resub</strong> $months měsíců",
       "cheer": "ti dal <strong>cheer</strong> $bits bitů"
     },
@@ -362,7 +363,9 @@
         "months": "Počet měsíců",
         "monthsName": "Název měsíce (1 měsíc, 2 měsíce)",
         "oldGame": "Hra před změnou",
-        "userObject": "Úplný uživatelský objekt"
+        "userObject": "Úplný uživatelský objekt",
+        "recipientObject": "Úplný objekt příjemce",
+        "recipient": "Příjemce"
       }
     },
     "page-settings": {
@@ -694,6 +697,7 @@
     "follow": "nový follower",
     "unfollow": "ztráta followera",
     "subscription": "nový subscription",
+    "subgift": "nový subgift",
     "resub": "uživatel resubscribed",
     "command-send-x-times": "příkaz poslán x-krát",
     "number-of-viewers-is-at-least-x": "počet diváků je alespoň x",

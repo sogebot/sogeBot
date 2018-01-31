@@ -23,6 +23,7 @@ global.log = new (winston.Logger)({
     unfollow: 7,
     cheer: 7,
     sub: 7,
+    subgift: 7,
     resub: 7,
     timeout: 7,
     ban: 9,
@@ -55,6 +56,7 @@ global.log = new (winston.Logger)({
         if (level === 'unfollow') level = '-follow'
         if (level === 'cheer') level = '+cheer'
         if (level === 'sub') level = '+sub'
+        if (level === 'subgift') level = '+subgift'
         if (level === 'resub') level = '+resub'
         let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
         let fnc = !_.isUndefined(options.meta.fnc) ? options.meta.fnc : ''

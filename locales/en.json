@@ -294,6 +294,7 @@
       "follow": "<strong>followed</strong> you",
       "host": "<strong>hosted</strong> you with $viewers viewers",
       "sub": "<strong>subbed</strong> you",
+      "subgift": "have <strong>gifted</strong> sub from $username",
       "resub": "<strong>resubbed</strong> you for $months months",
       "cheer": "<strong>cheered</strong> you for $bits bits"
     },
@@ -362,7 +363,9 @@
         "months": "Months",
         "monthsName": "localized name of month (1 month, 2 months)",
         "oldGame": "Game before change",
-        "userObject": "Full user object"
+        "userObject": "Full user object",
+        "recipientObject": "Full recipient object",
+        "recipient": "Recipient"
       }
     },
     "page-settings": {
@@ -694,6 +697,7 @@
     "follow": "new follow",
     "unfollow": "unfollow",
     "subscription": "new subscription",
+    "subgift": "new subgift",
     "resub": "user resubscribed",
     "command-send-x-times": "command was send x times",
     "number-of-viewers-is-at-least-x": "number of viewers is at least x",
