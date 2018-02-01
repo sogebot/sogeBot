@@ -192,6 +192,75 @@
     }
   },
   "webpanel": {
+    "menu": {
+      "timers": "Timers",
+      "keywords": "Keywords",
+      "custom-commands": "Custom commands",
+      "event-listeners": "Event listeners",
+      "ranks": "Ranks",
+      "songs": "Songs",
+      "viewers": "Viewers",
+      "aliases": "Aliases",
+      "cooldowns": "Cooldowns",
+      "highlights": "Highlights",
+      "price": "Price",
+      "logger": "Logs",
+      "systems": "Systems",
+      "permissions": "Permissions",
+      "translations": "Custom translations",
+      "moderation": "Moderation",
+      "overlays": "Overlays",
+      "gallery": "Media gallery"
+    },
+    "timers": {
+      "title": "Časovače",
+      "timer": "Časovač",
+      "messages": "zprávy",
+      "seconds": "vteřiny",
+      "badges": {
+        "enabled": "Zapnuto",
+        "disabled": "Vypnuto"
+      },
+      "errors": {
+        "timer_name_must_be_compliant": "Tato hodnota může obsahovat jen tyto znaky a-zA-Z09_",
+        "this_value_must_be_a_positive_number_or_0": "Tato hodnota musí být kladné číslo nebo 0",
+        "value_cannot_be_empty": "Hodnota nemůže být prázdná"
+      },
+      "dialog": {
+        "timer": "Časovač",
+        "name": "Název",
+        "interval": "Interval",
+        "responses": "Odpovědi",
+        "messages": "každých x zpráv",
+        "seconds": "každých x vteřin",
+        "title": {
+          "new": "Novým časovač",
+          "edit": "Upravit časovač"
+        },
+        "placeholders": {
+          "name": "Nastavte jméno časovače, může obsahovat pouze tyto znaky a-zA-Z0-9_ (pokud je prázdné, jméno se vygeneruje)",
+          "messages": "Spustit každých x zpráv",
+          "seconds": "Spustit každých x vteřin"
+        },
+        "alerts": {
+          "success": "Časovač byl <strong>úspěšně</strong> uložen.",
+          "fail": "Něco se <strong>pokazilo</strong>."
+        }
+      },
+      "buttons": {
+        "close": "Zavřít",
+        "save-changes": "Uložit změny",
+        "disable": "Vypnout",
+        "enable": "Zapnout",
+        "edit": "Upravit",
+        "delete": "Smazat",
+        "yes": "Ano",
+        "no": "Ne"
+      },
+      "popovers": {
+        "are_you_sure_you_want_to_delete_timer": "Opravdu chcete <strong class='text-danger'>smazat</strong> časovač"
+      }
+    },
     "events": {
       "event": "Událost",
       "whatsthis": "Co je to?",
@@ -526,7 +595,6 @@
     "keyword": "Klíčové slovo",
     "moderation": "Pravidla chatu",
     "timer": "Časovač",
-    "timers": "Časovače",
     "price": "Cena příkazů",
     "ranks": "Hodnosti",
     "rank": "Hodnost",

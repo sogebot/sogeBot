@@ -3,6 +3,7 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const debug = require('debug')
+const crypto = require('crypto')
 
 // bot libraries
 var constants = require('../constants')
@@ -72,6 +73,74 @@ class Timers {
           global.db.engine.remove('timers.responses', { timerId: timerId })
         ])
         callback(null, timerName)
+      })
+      socket.on('save-changes', async (data, callback) => {
+        d('save-changes - %j', data)
+        var timerId = data._id
+        var errors = {}
+        try {
+          const timer = {
+            name: data.name.trim().length ? data.name.replace(/ /g, '_') : crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5),
+            messages: data.messages,
+            seconds: data.seconds,
+            enabled: true,
+            trigger: {
+              messages: 0,
+              timestamp: new Date().getTime()
+            }
+          }
+
+          // check if name is compliant
+          if (!timer.name.match(/^[a-zA-Z0-9_]+$/)) _.set(errors, 'name', global.translate('webpanel.timers.errors.timer_name_must_be_compliant'))
+
+          if (_.isNil(timer.messages) || timer.messages.toString().trim().length === 0) _.set(errors, 'messages', global.translate('webpanel.timers.errors.value_cannot_be_empty'))
+          else if (!timer.messages.match(/^[0-9]+$/)) _.set(errors, 'messages', global.translate('webpanel.timers.errors.this_value_must_be_a_positive_number_or_0'))
+
+          if (_.isNil(timer.seconds) || timer.seconds.toString().trim().length === 0) _.set(errors, 'seconds', global.translate('webpanel.timers.errors.value_cannot_be_empty'))
+          else if (!timer.seconds.match(/^[0-9]+$/)) _.set(errors, 'seconds', global.translate('webpanel.timers.errors.this_value_must_be_a_positive_number_or_0'))
+
+          // remove empty operations
+          _.remove(data.responses, (o) => o.response.trim().length === 0)
+
+          if (_.size(errors) > 0) throw Error(JSON.stringify(errors))
+
+          // load _proper_ timerId
+          if (!_.isNil(timerId)) {
+            let _timer = await global.db.engine.findOne('timers', { 'name': timerId })
+            timerId = _.get(_timer, '_id', null)
+            timerId = timerId ? timerId.toString() : null
+          }
+
+          if (_.isNil(timerId)) timerId = (await global.db.engine.insert('timers', timer))._id.toString()
+          else {
+            await Promise.all([
+              global.db.engine.remove('timers', { _id: timerId }),
+              global.db.engine.remove('timers.responses', { timerId: timerId })
+            ])
+            timerId = (await global.db.engine.insert('timers', timer))._id.toString()
+          }
+          var insertArray = []
+          for (let response of data.responses) {
+            insertArray.push(global.db.engine.insert('timers.responses', {
+              timerId: timerId,
+              response: response.response,
+              enabled: response.enabled
+            }))
+          }
+          await Promise.all(insertArray)
+
+          callback(null, true)
+        } catch (e) {
+          global.log.warning(e.message); d(e)
+
+          if (!_.isNil(timerId) && _.isNil(data._id)) { // timerId is __newly__ created, rollback all changes
+            await Promise.all([
+              global.db.engine.remove('timers', { _id: timerId }),
+              global.db.engine.remove('timers.responses', { timerId: timerId })
+            ])
+          }
+          callback(e, e.message)
+        }
       })
     })
   }

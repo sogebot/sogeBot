@@ -688,7 +688,7 @@
         var stringAbbr = options.text.replace(filtersRegExp,
           '<span contenteditable="false" class="editable-variable" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;'
         )
-        var output = '<abbr style="width: 100%" title="click to edit" id="' + id + '" data-id="' + options.id +
+        var output = '<abbr class="form-control" title="click to edit" id="' + id + '" data-id="' + options.id +
         '" data-fnc="' + options.fnc + '" data-filters="' + options.filters.join(',') +
         '" contenteditable="true">' + stringAbbr + '</abbr>'
 
@@ -723,7 +723,6 @@
               if (_.includes($(this).data('filters').split(','), 'global')) {
                 div.append('<div style="display: inline-block; padding: 5px;">' +
                   '<div class="text-primary" style="font-size:14px; font-weight: bold">Global variables: </div> ' +
-                  '<span class="editable-variable block" data-var="sender" data-lang="responses.variable.sender"></span> ' +
                   '<span class="editable-variable block" data-var="title" data-lang="responses.variable.title"></span> ' +
                   '<span class="editable-variable block" data-var="game" data-lang="responses.variable.game"></span> ' +
                   '<span class="editable-variable block" data-var="viewers" data-lang="responses.variable.viewers"></span> ' +
@@ -761,7 +760,7 @@
             // When you leave an item...
             .blur(function () {
               $('#helper').remove()
-              var newString = commons.cleanResponseText($(this).html())
+              var newString = commons.cleanResponseText($(this).text()) // we need to use .text() to strip unnecessary HTML tags
               var filtersRegExp = new RegExp('\\$(' + _.keys(translations.responses.variable).join('|') +
                 ')',
                 'g')
@@ -770,8 +769,10 @@
               ))
               // ...if content is different...
               if ($(this).data("initialText").trim() !== newString.trim()) {
-                var fnc = $(this).data('fnc').split('.')
-                window[fnc[0]][fnc[1]]($(this).data('id'), newString, options.options)
+                if (!_.isNil($(this).data('fnc'))) {
+                  var fnc = $(this).data('fnc').split('.')
+                  window[fnc[0]][fnc[1]]($(this).data('id'), newString, options.options)
+                }
               }
               commons.translate()
             });

@@ -304,7 +304,7 @@
     }
 
     // DEFINITIONS ////////////////////////////////////////////////////////////
-    const definitionsElement = $(ev.currentTarget).parents('.operation-group').children(
+    const definitionsElement = $(ev.currentTarget).parents('.dialog-group').children(
       '.event-operation-definitions')
     definitionsElement.empty()
     console.debug('Definitions', definitions)
@@ -352,14 +352,14 @@
     const id = new Date().getTime()
     $('[data-event-operations]').append(
       `
-      <div class="operation-group" id="${id}">
+      <div class="dialog-group" id="${id}">
         <div class="input-group">
           <select class="form-control" data-event-operation-select>
             ${operationOptions()}
           </select>
           <div class="input-group-append">
-            <button class="btn btn-outline-danger" type="button" onclick="removeEventOperation(event, this)">
-              <i class="fa fa-minus"></i>
+            <button class="btn btn-danger" type="button" onclick="removeEventOperation(event, this)">
+              <i class="fa fa-trash-o"></i>
             </button>
           </div>
         </div>
@@ -373,7 +373,7 @@
 
   var removeEventOperation = (ev, self) => {
     ev.preventDefault()
-    $(self).parents('.operation-group').remove()
+    $(self).parents('.dialog-group').remove()
   }
 
   var saveChanges = (ev, self) => {
@@ -397,7 +397,7 @@
             eventListener.event.definitions[id] = $(element).val()
           } else if ($(element).attr('id').startsWith('operation-definition')) {
             let id = $(element).attr('id').split('-')[2]
-            let parentId = $(element).parents('.operation-group').attr('id')
+            let parentId = $(element).parents('.dialog-group').attr('id')
             if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = {
               definitions: {}
             }
@@ -406,7 +406,7 @@
             if ($(element).parent().hasClass('active')) {
               let id = $(element).attr('id').split('-')[0]
               let value = $(element).attr('id').split('-')[1]
-              let parentId = $(element).parents('.operation-group').attr('id')
+              let parentId = $(element).parents('.dialog-group').attr('id')
               if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = {
                 definitions: {}
               }
@@ -425,7 +425,7 @@
           if ($(element).attr('id') === 'event-listener-dlg-events') {
             eventListener.event.key = $(element).val()
           } else if (!_.isNil($(element).data('event-operation-select'))) {
-            let parentId = $(element).parents('.operation-group').attr('id')
+            let parentId = $(element).parents('.dialog-group').attr('id')
             if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = {
               definitions: {}
             }
@@ -436,7 +436,7 @@
           break
         case 'BUTTON':
           if (!_.isNil($(element).data('event-toggle-button'))) {
-            let parentId = $(element).parents('.operation-group').attr('id')
+            let parentId = $(element).parents('.dialog-group').attr('id')
             if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = {
               definitions: {}
             }
@@ -476,8 +476,8 @@
         // operations errors
         for (let [timestamp, operation] of Object.entries(errors.operations)) {
           for (let [key, val] of Object.entries(operation)) {
-            $(`.operation-group[id="${timestamp}"]`).find(`#operation-definition-${key}`).addClass('is-invalid')
-            $(`.operation-group[id="${timestamp}"]`).find('.invalid-tooltip').text(val)
+            $(`.dialog-group[id="${timestamp}"]`).find(`#operation-definition-${key}`).addClass('is-invalid')
+            $(`.dialog-group[id="${timestamp}"]`).find('.invalid-tooltip').text(val)
           }
         }
 

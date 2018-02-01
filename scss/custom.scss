@@ -1168,16 +1168,16 @@ blockquote {
   display: block;
 }
 
-.operation-group:first-child() {
+.dialog-group:first-child() {
   padding-top: 0;
   border-top: 0;
 }
 
-.operation-group:last-child() {
+.dialog-group:last-child() {
   padding-bottom: 0;
 }
 
-.operation-group {
+.dialog-group {
   padding-top: .5rem;
   padding-bottom: .5rem;
   border-top: 1px dotted $gray-200

@@ -359,7 +359,7 @@ class Events {
           if (_.isNil(eventId)) eventId = (await global.db.engine.insert('events', event))._id.toString()
           else {
             await Promise.all([
-              global.db.engine.remove('events', { _id: eventId }, event),
+              global.db.engine.remove('events', { _id: eventId }),
               global.db.engine.remove('events.filters', { eventId: eventId }),
               global.db.engine.remove('events.operations', { eventId: eventId })
             ])
