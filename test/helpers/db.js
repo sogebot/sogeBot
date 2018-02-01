@@ -14,7 +14,7 @@ module.exports = {
     await global.db.engine.remove('keywords', {})
     await global.db.engine.remove('settings', {})
     await global.db.engine.remove('timers', {})
-    await global.db.engine.remove('timersResponses', {})
+    await global.db.engine.remove('timers.responses', {})
     await global.db.engine.remove('users', {})
     await global.db.engine.remove('cooldowns', {})
     await global.db.engine.remove('raffles', {})

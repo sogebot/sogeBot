@@ -192,6 +192,75 @@
     }
   },
   "webpanel": {
+    "menu": {
+      "timers": "Timers",
+      "keywords": "Keywords",
+      "custom-commands": "Custom commands",
+      "event-listeners": "Event listeners",
+      "ranks": "Ranks",
+      "songs": "Songs",
+      "viewers": "Viewers",
+      "aliases": "Aliases",
+      "cooldowns": "Cooldowns",
+      "highlights": "Highlights",
+      "price": "Price",
+      "logger": "Logs",
+      "systems": "Systems",
+      "permissions": "Permissions",
+      "translations": "Custom translations",
+      "moderation": "Moderation",
+      "overlays": "Overlays",
+      "gallery": "Media gallery"
+    },
+    "timers": {
+      "title": "Timers",
+      "timer": "Timer",
+      "messages": "messages",
+      "seconds": "seconds",
+      "badges": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      },
+      "errors": {
+        "timer_name_must_be_compliant": "This value can contain only a-zA-Z09_",
+        "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
+        "value_cannot_be_empty": "Value cannot be empty"
+      },
+      "dialog": {
+        "timer": "Timer",
+        "name": "Name",
+        "interval": "Interval",
+        "responses": "Responses",
+        "messages": "Trigger every X Messages",
+        "seconds": "Trigger every X Seconds",
+        "title": {
+          "new": "New timer",
+          "edit": "Edit timer"
+        },
+        "placeholders": {
+          "name": "Set name of your timer, can contain only these characters a-zA-Z0-9_, if empty, name will be generated",
+          "messages": "Trigger timer each X messages",
+          "seconds": "Trigger timer each X seconds"
+        },
+        "alerts": {
+          "success": "Timer was <strong>successfully</strong> saved.",
+          "fail": "Something went <strong>wrong</strong>."
+        }
+      },
+      "buttons": {
+        "close": "Close",
+        "save-changes": "Save changes",
+        "disable": "Disable",
+        "enable": "Enable",
+        "edit": "Edit",
+        "delete": "Delete",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "popovers": {
+        "are_you_sure_you_want_to_delete_timer": "Are you sure you want to <strong class='text-danger'>delete</strong> timer"
+      }
+    },
     "events": {
       "event": "Event",
       "whatsthis": "what's this?",
@@ -519,21 +588,14 @@
     "aliases": "Aliases",
     "alias": "Alias",
     "command": "Command",
-    "clips": "Clips",
     "cooldowns": "Cooldowns",
-    "custom-commands": "Custom commands",
     "title-template": "Title template",
-    "keywords": "Keywords",
     "keyword": "Keyword",
     "moderation": "Moderation",
     "timer": "Timer",
-    "timers": "Timers",
     "price": "Price",
-    "ranks": "Ranks",
     "rank": "Rank",
-    "event-listeners": "Event listeners",
     "logger": "Logs",
-    "songs": "Songs",
     "previous": "Previous",
     "next": "Next",
     "or": "- OR -",

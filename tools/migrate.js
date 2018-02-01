@@ -3,6 +3,7 @@ const figlet = require('figlet')
 const config = require('../config.json')
 const crypto = require('crypto')
 const compareVersions = require('compare-versions')
+const fs = require('fs')
 
 // logger
 const Logger = require('../libs/logging')
@@ -200,6 +201,24 @@ let migration = {
             })
           }
         }
+      }
+    }
+  }],
+  timers: [{
+    version: '6.0.0',
+    do: async () => {
+      console.info('Migration timers to %s', '6.0.0')
+      let responses = await global.db.engine.find('timersResponses')
+      if (_.isEmpty(responses)) return
+      for (let response of responses) {
+        await global.db.engine.insert('timers.responses', response)
+      }
+
+      if (config.database.type === 'nedb') {
+        fs.unlinkSync('./db/nedb/timersResponses.db')
+      } else if (config.database.type === 'mongodb') {
+        let db = await global.db.engine.client.db(global.db.engine.dbName)
+        db.collection('timersResponses').drop()
       }
     }
   }]

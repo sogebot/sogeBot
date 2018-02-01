@@ -18,8 +18,8 @@ describe('Timers - list()', () => {
     await db.cleanup()
     await global.db.engine.insert('timers', {name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() }})
     let timer = await global.db.engine.insert('timers', {name: 'test2', messages: 0, seconds: 60, enabled: false, trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() }})
-    await global.db.engine.insert('timersResponses', {response: 'Lorem Ipsum', timerId: timer._id.toString(), enabled: true})
-    await global.db.engine.insert('timersResponses', {response: 'Lorem Ipsum 2', timerId: timer._id.toString(), enabled: false})
+    await global.db.engine.insert('timers.responses', {response: 'Lorem Ipsum', timerId: timer._id.toString(), enabled: true})
+    await global.db.engine.insert('timers.responses', {response: 'Lorem Ipsum 2', timerId: timer._id.toString(), enabled: false})
     global.commons.sendMessage.reset()
   })
 
@@ -60,8 +60,8 @@ describe('Timers - list()', () => {
   it('-name test2', async () => {
     global.systems.timers.list(global.systems.timers, owner, '-name test2')
 
-    let response1 = await global.db.engine.findOne('timersResponses', { response: 'Lorem Ipsum' })
-    let response2 = await global.db.engine.findOne('timersResponses', { response: 'Lorem Ipsum 2' })
+    let response1 = await global.db.engine.findOne('timers.responses', { response: 'Lorem Ipsum' })
+    let response2 = await global.db.engine.findOne('timers.responses', { response: 'Lorem Ipsum 2' })
 
     await until(setError => {
       let expected = global.commons.prepare('timers.responses-list', { name: 'test2' })

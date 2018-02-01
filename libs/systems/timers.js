@@ -2,7 +2,8 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const debug = require('debug')('systems:timers')
+const debug = require('debug')
+const crypto = require('crypto')
 
 // bot libraries
 var constants = require('../constants')
@@ -35,16 +36,117 @@ class Timers {
       global.parser.registerHelper('!timers')
 
       global.panel.addMenu({category: 'manage', name: 'timers', id: 'timers'})
-      global.panel.registerSockets({
-        self: this,
-        expose: ['set', 'unset', 'add', 'rm', 'toggle', 'editName', 'editResponse', 'send'],
-        finally: this.send
-      })
+
+      this.sockets()
     }
   }
 
+  async sockets () {
+    const d = debug('timers:sockets')
+    const io = global.panel.io.of('/timers')
+
+    io.on('connection', (socket) => {
+      d('Socket /events connected, registering sockets')
+      socket.on('list.timers', async (callback) => {
+        let [timers, responses] = await Promise.all([
+          global.db.engine.find('timers'),
+          global.db.engine.find('timers.responses')
+        ])
+        callback(null, { timers: timers, responses: responses }); d('list.timers => %j', { timers: timers, responses: responses })
+      })
+      socket.on('toggle.timer', async (timerName, callback) => {
+        let fromDb = await global.db.engine.findOne('timers', { name: timerName })
+        if (_.isEmpty(fromDb)) return callback(new Error('Timer not found'), null)
+
+        let updated = await global.db.engine.update('timers', { name: timerName }, { enabled: !fromDb.enabled })
+        callback(null, updated)
+      })
+      socket.on('delete.timer', async (timerName, callback) => {
+        let timerId
+        try {
+          timerId = (await global.db.engine.findOne('timers', { name: timerName }))._id.toString()
+        } catch (e) {
+          return callback(new Error('Timer not found'), null)
+        }
+        await Promise.all([
+          global.db.engine.remove('timers', { name: timerName }),
+          global.db.engine.remove('timers.responses', { timerId: timerId })
+        ])
+        callback(null, timerName)
+      })
+      socket.on('save-changes', async (data, callback) => {
+        d('save-changes - %j', data)
+        var timerId = data._id
+        var errors = {}
+        try {
+          const timer = {
+            name: data.name.trim().length ? data.name.replace(/ /g, '_') : crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5),
+            messages: data.messages,
+            seconds: data.seconds,
+            enabled: true,
+            trigger: {
+              messages: 0,
+              timestamp: new Date().getTime()
+            }
+          }
+
+          // check if name is compliant
+          if (!timer.name.match(/^[a-zA-Z0-9_]+$/)) _.set(errors, 'name', global.translate('webpanel.timers.errors.timer_name_must_be_compliant'))
+
+          if (_.isNil(timer.messages) || timer.messages.toString().trim().length === 0) _.set(errors, 'messages', global.translate('webpanel.timers.errors.value_cannot_be_empty'))
+          else if (!timer.messages.match(/^[0-9]+$/)) _.set(errors, 'messages', global.translate('webpanel.timers.errors.this_value_must_be_a_positive_number_or_0'))
+
+          if (_.isNil(timer.seconds) || timer.seconds.toString().trim().length === 0) _.set(errors, 'seconds', global.translate('webpanel.timers.errors.value_cannot_be_empty'))
+          else if (!timer.seconds.match(/^[0-9]+$/)) _.set(errors, 'seconds', global.translate('webpanel.timers.errors.this_value_must_be_a_positive_number_or_0'))
+
+          // remove empty operations
+          _.remove(data.responses, (o) => o.response.trim().length === 0)
+
+          if (_.size(errors) > 0) throw Error(JSON.stringify(errors))
+
+          // load _proper_ timerId
+          if (!_.isNil(timerId)) {
+            let _timer = await global.db.engine.findOne('timers', { 'name': timerId })
+            timerId = _.get(_timer, '_id', null)
+            timerId = timerId ? timerId.toString() : null
+          }
+
+          if (_.isNil(timerId)) timerId = (await global.db.engine.insert('timers', timer))._id.toString()
+          else {
+            await Promise.all([
+              global.db.engine.remove('timers', { _id: timerId }),
+              global.db.engine.remove('timers.responses', { timerId: timerId })
+            ])
+            timerId = (await global.db.engine.insert('timers', timer))._id.toString()
+          }
+          var insertArray = []
+          for (let response of data.responses) {
+            insertArray.push(global.db.engine.insert('timers.responses', {
+              timerId: timerId,
+              response: response.response,
+              enabled: response.enabled
+            }))
+          }
+          await Promise.all(insertArray)
+
+          callback(null, true)
+        } catch (e) {
+          global.log.warning(e.message); d(e)
+
+          if (!_.isNil(timerId) && _.isNil(data._id)) { // timerId is __newly__ created, rollback all changes
+            await Promise.all([
+              global.db.engine.remove('timers', { _id: timerId }),
+              global.db.engine.remove('timers.responses', { timerId: timerId })
+            ])
+          }
+          callback(e, e.message)
+        }
+      })
+    })
+  }
+
   async send (self, socket) {
-    socket.emit('timers', { timers: await global.db.engine.find('timers'), responses: await global.db.engine.find('timersResponses') })
+    socket.emit('timers', { timers: await global.db.engine.find('timers'), responses: await global.db.engine.find('timers.responses') })
   }
 
   help (self, sender) {
@@ -67,20 +169,21 @@ class Timers {
   }
 
   async check () {
-    debug('checking timers')
+    const d = debug('timers:check')
+    d('checking timers')
     let timers = await global.db.engine.find('timers', { enabled: true })
     for (let timer of timers) {
       if (timer.messages > 0 && timer.trigger.messages - global.parser.linesParsed + timer.messages > 0) continue // not ready to trigger with messages
       if (timer.seconds > 0 && new Date().getTime() - timer.trigger.timestamp < timer.seconds * 1000) continue // not ready to trigger with seconds
 
-      debug('ready to fire - %j', timer)
-      let responses = await global.db.engine.find('timersResponses', { timerId: timer._id.toString(), enabled: true })
+      d('ready to fire - %j', timer)
+      let responses = await global.db.engine.find('timers.responses', { timerId: timer._id.toString(), enabled: true })
       let response = _.orderBy(responses, 'timestamp', 'asc')[0]
 
       if (!_.isNil(response)) {
-        debug(response.response, global.parser.getOwner())
+        d(response.response, global.parser.getOwner())
         global.commons.sendMessage(response.response, global.parser.getOwner())
-        await global.db.engine.update('timersResponses', { _id: response._id }, { timestamp: new Date().getTime() })
+        await global.db.engine.update('timers.responses', { _id: response._id }, { timestamp: new Date().getTime() })
       }
       await global.db.engine.update('timers', { _id: timer._id.toString() }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
     }
@@ -98,12 +201,13 @@ class Timers {
 
   async editResponse (self, socket, data) {
     if (data.value.length === 0) await self.rm(self, null, `-id ${data.id}`)
-    else global.db.engine.update('timersResponses', { _id: data.id }, { response: data.value })
+    else global.db.engine.update('timers.responses', { _id: data.id }, { response: data.value })
   }
 
   async set (self, sender, text) {
     // -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60]
-    debug('set(%j, %j, %j)', self, sender, text)
+    const d = debug('timers:set')
+    d('set(%j, %j, %j)', self, sender, text)
 
     let name = text.match(/-name ([a-zA-Z0-9_]+)/)
     let messages = text.match(/-messages ([0-9]+)/)
@@ -123,7 +227,7 @@ class Timers {
       global.commons.sendMessage(global.translate('timers.cannot-set-messages-and-seconds-0'), sender)
       return false
     }
-    debug(name, messages, seconds)
+    d(name, messages, seconds)
 
     await global.db.engine.update('timers', { name: name }, { name: name, messages: messages, seconds: seconds, enabled: true, trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
     global.commons.sendMessage(global.translate('timers.timer-was-set')
@@ -134,7 +238,8 @@ class Timers {
 
   async unset (self, sender, text) {
     // -name [name-of-timer]
-    debug('unset(%j, %j, %j)', self, sender, text)
+    const d = debug('timers:unset')
+    d('unset(%j, %j, %j)', self, sender, text)
 
     let name = text.match(/-name ([\S]+)/)
 
@@ -147,21 +252,22 @@ class Timers {
 
     let timer = await global.db.engine.findOne('timers', { name: name })
     if (_.isEmpty(timer)) {
-      debug(global.translate('timers.timer-not-found').replace(/\$name/g, name))
+      d(global.translate('timers.timer-not-found').replace(/\$name/g, name))
       global.commons.sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), sender)
       return false
     }
 
     await global.db.engine.remove('timers', { name: name })
-    await global.db.engine.remove('timersResponses', { timerId: timer._id.toString() })
-    debug(global.translate('timers.timer-deleted').replace(/\$name/g, name))
+    await global.db.engine.remove('timers.responses', { timerId: timer._id.toString() })
+    d(global.translate('timers.timer-deleted').replace(/\$name/g, name))
     global.commons.sendMessage(global.translate('timers.timer-deleted')
       .replace(/\$name/g, name), sender)
   }
 
   async rm (self, sender, text) {
     // -id [id-of-response]
-    debug('rm(%j, %j, %j)', self, sender, text)
+    const d = debug('timers:rm')
+    d('rm(%j, %j, %j)', self, sender, text)
 
     let id = text.match(/-id ([a-zA-Z0-9]+)/)
 
@@ -172,14 +278,15 @@ class Timers {
       id = id[1]
     }
 
-    await global.db.engine.remove('timersResponses', { _id: id })
+    await global.db.engine.remove('timers.responses', { _id: id })
     global.commons.sendMessage(global.translate('timers.response-deleted')
       .replace(/\$id/g, id), sender)
   }
 
   async add (self, sender, text) {
     // -name [name-of-timer] -response '[response]'
-    debug('add(%j, %j, %j)', self, sender, text)
+    const d = debug('timers:add')
+    d('add(%j, %j, %j)', self, sender, text)
 
     let name = text.match(/-name ([\S]+)/)
     let response = text.match(/-response ['"](.+)['"]/)
@@ -197,7 +304,7 @@ class Timers {
     } else {
       response = response[1]
     }
-    debug(name, response)
+    d(name, response)
 
     let timer = await global.db.engine.findOne('timers', { name: name })
     if (_.isEmpty(timer)) {
@@ -206,8 +313,8 @@ class Timers {
       return false
     }
 
-    let item = await global.db.engine.insert('timersResponses', { response: response, timestamp: new Date().getTime(), enabled: true, timerId: timer._id.toString() })
-    debug(item)
+    let item = await global.db.engine.insert('timers.responses', { response: response, timestamp: new Date().getTime(), enabled: true, timerId: timer._id.toString() })
+    d(item)
     global.commons.sendMessage(global.translate('timers.response-was-added')
       .replace(/\$id/g, item._id)
       .replace(/\$name/g, name)
@@ -216,7 +323,8 @@ class Timers {
 
   async list (self, sender, text) {
     // !timers list -name [name-of-timer]
-    debug('list(%j, %j, %j)', self, sender, text)
+    const d = debug('timers:list')
+    d('list(%j, %j, %j)', self, sender, text)
 
     let name = text.match(/-name ([\S]+)/)
 
@@ -233,8 +341,8 @@ class Timers {
       return false
     }
 
-    let responses = await global.db.engine.find('timersResponses', { timerId: timer._id.toString() })
-    debug(responses)
+    let responses = await global.db.engine.find('timers.responses', { timerId: timer._id.toString() })
+    d(responses)
     global.commons.sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), sender)
     for (let response of responses) { global.commons.sendMessage((response.enabled ? `⚫ ` : `⚪ `) + `${response._id} - ${response.response}`, sender) }
     return true
@@ -242,7 +350,8 @@ class Timers {
 
   async toggle (self, sender, text) {
     // -name [name-of-timer] or -id [id-of-response]
-    debug('toggle(%j, %j, %j)', self, sender, text)
+    const d = debug('timers:toggle')
+    d('toggle(%j, %j, %j)', self, sender, text)
 
     let id = text.match(/-id ([a-zA-Z0-9]+)/)
     let name = text.match(/-name ([\S]+)/)
@@ -254,16 +363,16 @@ class Timers {
 
     if (!_.isNil(id)) {
       id = id[1]
-      debug('toggle response - %s', id)
-      let response = await global.db.engine.findOne('timersResponses', { _id: id })
+      d('toggle response - %s', id)
+      let response = await global.db.engine.findOne('timers.responses', { _id: id })
       if (_.isEmpty(response)) {
-        debug(global.translate('timers.response-not-found').replace(/\$id/g, id))
+        d(global.translate('timers.response-not-found').replace(/\$id/g, id))
         global.commons.sendMessage(global.translate('timers.response-not-found').replace(/\$id/g, id), sender)
         return false
       }
 
-      await global.db.engine.update('timersResponses', { _id: id }, { enabled: !response.enabled })
-      debug(global.translate(!response.enabled ? 'timers.response-enabled' : 'timers.response-disabled').replace(/\$id/g, id))
+      await global.db.engine.update('timers.responses', { _id: id }, { enabled: !response.enabled })
+      d(global.translate(!response.enabled ? 'timers.response-enabled' : 'timers.response-disabled').replace(/\$id/g, id))
       global.commons.sendMessage(global.translate(!response.enabled ? 'timers.response-enabled' : 'timers.response-disabled')
         .replace(/\$id/g, id), sender)
       return true

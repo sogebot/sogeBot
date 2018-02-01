@@ -17,7 +17,7 @@ describe('Timers - toggle()', () => {
     await tmi.waitForConnection()
     await db.cleanup()
     let timer = await global.db.engine.insert('timers', {name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() }})
-    await global.db.engine.insert('timersResponses', {response: 'Lorem Ipsum', timerId: timer._id, enabled: true})
+    await global.db.engine.insert('timers.responses', {response: 'Lorem Ipsum', timerId: timer._id, enabled: true})
     global.commons.sendMessage.reset()
   })
 
@@ -73,7 +73,7 @@ describe('Timers - toggle()', () => {
   })
 
   it('-id response_id', async () => {
-    let response = await global.db.engine.findOne('timersResponses', { response: 'Lorem Ipsum' })
+    let response = await global.db.engine.findOne('timers.responses', { response: 'Lorem Ipsum' })
 
     global.systems.timers.toggle(global.systems.timers, owner, '-id ' + response._id)
     await until(setError => {
