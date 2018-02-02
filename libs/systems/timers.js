@@ -79,19 +79,10 @@ class Timers {
         var timerId = data._id
         var errors = {}
         try {
-          const timer = {
-            name: data.name.trim().length ? data.name.replace(/ /g, '_') : crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5),
-            messages: _.toNumber(data.messages),
-            seconds: _.toNumber(data.seconds),
-            enabled: true,
-            trigger: {
-              messages: 0,
-              timestamp: new Date().getTime()
-            }
-          }
+          const name = data.name.trim().length ? data.name.replace(/ /g, '_') : crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5)
 
           // check if name is compliant
-          if (!timer.name.match(/^[a-zA-Z0-9_]+$/)) _.set(errors, 'name', global.translate('webpanel.timers.errors.timer_name_must_be_compliant'))
+          if (!name.match(/^[a-zA-Z0-9_]+$/)) _.set(errors, 'name', global.translate('webpanel.timers.errors.timer_name_must_be_compliant'))
 
           if (_.isNil(data.messages) || data.messages.toString().trim().length === 0) _.set(errors, 'messages', global.translate('webpanel.timers.errors.value_cannot_be_empty'))
           else if (!data.messages.match(/^[0-9]+$/)) _.set(errors, 'messages', global.translate('webpanel.timers.errors.this_value_must_be_a_positive_number_or_0'))
@@ -105,10 +96,23 @@ class Timers {
           if (_.size(errors) > 0) throw Error(JSON.stringify(errors))
 
           // load _proper_ timerId
+          var enabled = true
           if (!_.isNil(timerId)) {
             let _timer = await global.db.engine.findOne('timers', { 'name': timerId })
             timerId = _.get(_timer, '_id', null)
+            enabled = _.get(_timer, 'enabled', true)
             timerId = timerId ? timerId.toString() : null
+          }
+
+          const timer = {
+            name: name,
+            messages: _.toNumber(data.messages),
+            seconds: _.toNumber(data.seconds),
+            enabled: enabled,
+            trigger: {
+              messages: 0,
+              timestamp: new Date().getTime()
+            }
           }
 
           if (_.isNil(timerId)) timerId = (await global.db.engine.insert('timers', timer))._id.toString()
