@@ -1,0 +1,306 @@
+<div class="widget">
+  <h6 data-lang="widget-title-customvariables"></h6>
+  <ul class="nav nav-pills" role="tablist">
+    <li role="presentation" class="nav-item">
+      <a class="nav-link active" href="#customvariables-main" aria-controls="home" role="tab" data-toggle="tab" title="Custom Variables">
+        <i class="fa fa-usd" aria-hidden="true"></i>_
+      </a>
+    </li>
+    <li role="presentation">
+      <a class="nav-link" href="#customvariables-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+        <i class="fa fa-cog" aria-hidden="true"></i>
+      </a>
+    </li>
+  </ul>
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="customvariables-main"></div>
+    <!-- /MAIN -->
+
+    <div role="tabpanel" class="tab-pane" id="customvariables-settings">
+      <div id="customvariables-watch"></div>
+      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('customvariables')" style="margin-top: 20px;" data-lang="remove-widget"></button>
+    </div>
+    <!-- /SETTINGS -->
+  </div>
+</div>
+
+<script>
+var widgetsCustomVariablesSocket = io('/widgets/customVariables', { query: "token=" + token })
+
+var customVariablesWidget = {
+  save: function (el) {
+    if (!_.isNil(el.data)) {
+      name = el.name
+      value = el.value
+    } else {
+      name = $(el).data('name')
+      value = $(`input[data-name="${name}"]`).val()
+    }
+
+    widgetsCustomVariablesSocket.emit('save.variable', { key: name, value: value }, () => {
+      $(`button.btn.btn-secondary[data-name="${name}"]`).css('display', 'none')
+    })
+  },
+  increment: function (el) {
+    const name = $(el).data('name')
+    let value = $(`input[data-name="${name}"]`).val()
+    value = _.isFinite(parseInt(value, 10)) ? ++value : 0
+    $(`input[data-name="${name}"]`).val(value)
+    customVariablesWidget.save(el)
+  },
+  decrement: function (el) {
+    const name = $(el).data('name')
+    let value = $(`input[data-name="${name}"]`).val()
+    value = _.isFinite(parseInt(value, 10)) ? --value : 0
+    $(`input[data-name="${name}"]`).val(value)
+    customVariablesWidget.save(el)
+  },
+  saveValues: function (el) {
+    $(el).removeClass().addClass('btn btn-info')
+
+    const value = $(el).parents('.input-group').children('input').val()
+    widgetsCustomVariablesSocket.emit('save.values', {name: $(el).data('name'), value: value}, (err, cb) => {
+      if (err) return console.debug(err)
+
+      $(el).removeClass().addClass('btn btn-success')
+      customVariablesWidget.refresh()
+    })
+  },
+  generateLabels: function (values, current) {
+    current = current || null
+    values = values || 'You didn\'t set your options yet'
+    let out = ''
+    if (current && values.toLowerCase().indexOf(current.toLowerCase().trim()) === -1) {
+      out += `<label style="flex: 1 auto;" class="btn btn-secondary ${out.length === 0 ? 'active' : ''}">
+        <input type="radio" name="options" id="${current}" autocomplete="off" ${out.length === 0 ? 'checked' : ''}> ${current}
+      </label>`
+    }
+    for (value of values.split(',')) {
+      value = value.trim()
+      let isActive = (out.length === 0 && _.isNil(current)) || (current && value.toLowerCase().indexOf(current.toLowerCase().trim()) !== -1)
+      out += `<label style="flex: 1 auto;" class="btn btn-secondary ${isActive ? 'active' : ''}">
+        <input type="radio" name="options" id="${value}" autocomplete="off" ${isActive ? 'checked' : ''}> ${value}
+      </label>`
+    }
+    return out
+  },
+  watch: function (el) {
+    $(el).removeClass().addClass('btn btn-info')
+
+    const name = $('#customVariablesWidgetName input').val()
+    const type = $(el).parents('div.input-group').children('select').val()
+
+    $('#customVariablesWidgetName .form-control').removeClass('is-invalid')
+    $('#customVariablesWidgetName .invalid-tooltip').text()
+
+    console.debug({name: name, type: type})
+
+    widgetsCustomVariablesSocket.emit('watch', {name: name, type: type}, (err, cb) => {
+      if (err) {
+        $('#customVariablesWidgetName .invalid-tooltip').text(cb)
+        $('#customVariablesWidgetName .form-control').addClass('is-invalid')
+        $(el).removeClass().addClass('btn btn-primary')
+        return console.error(cb)
+      }
+      customVariablesWidget.refresh()
+    })
+  },
+  unwatch: function (el) {
+    $(el).removeClass().addClass('btn btn-info')
+    widgetsCustomVariablesSocket.emit('unwatch', $(el).data('name'), (err, cb) => {
+      if (err) return console.error(err)
+      $(`.input-group[data-variable-group='${cb}']`).velocity('fadeOut')
+      setTimeout(() => customVariablesWidget.refresh(), 500)
+    })
+  },
+  refresh: function () {
+    widgetsCustomVariablesSocket.emit('list.variables', (err, variables) => {
+      if (err) return console.error(err)
+      var i
+
+      // SET customvariables-main /////////////////////////////////////////////////
+      const main = $('#customvariables-main')
+      main.empty()
+
+      i = 0
+      for (let variable of variables) {
+        let variableEl = ''
+        switch(variable.type) {
+          case 'number':
+            variableEl = $(`
+              <div class="input-group" data-variable-group="${variable.name}" ${(i!==0) ? 'style="margin-top: 0.2rem"' : ''}>
+                <div class="input-group-prepend">
+                  <span class="input-group-text">$_${variable.name}</span>
+                </div>
+                <input type="text" class="form-control" data-custom-variable-input data-name="${variable.name}" value="0">
+
+                <div class="input-group-append">
+                  <button class="btn btn-secondary d-none" data-name="${variable.name}" onclick="customVariablesWidget.save(this)" type="button"><i class="fa fa-download"></i></button>
+                  <button class="btn btn-danger" data-name="${variable.name}" onclick="customVariablesWidget.decrement(this)" type="button"><i class="fa fa-minus"></i></button>
+                  <button class="btn btn-success" data-name="${variable.name}" onclick="customVariablesWidget.increment(this)" data-button="plus" type="button"><i class="fa fa-plus"></i></button>
+                </div>
+              </div>
+            `)
+            break
+          case 'text':
+            variableEl = $(`
+              <div class="input-group" data-variable-group="${variable.name}" ${(i!==0) ? 'style="margin-top: 0.2rem"' : ''}>
+                <div class="input-group-prepend">
+                  <span class="input-group-text">$_${variable.name}</span>
+                </div>
+                <input type="text" class="form-control" data-custom-variable-input data-name="${variable.name}">
+
+                <div class="input-group-append">
+                  <button class="btn btn-secondary d-none" data-name="${variable.name}" onclick="customVariablesWidget.save(this)" type="button"><i class="fa fa-download"></i></button>
+                </div>
+              </div>
+            `)
+            break
+          case 'options':
+            variableEl = $(`
+              <div class="input-group" data-variable-group="${variable.name}" ${(i!==0) ? 'style="margin-top: 0.2rem"' : ''}>
+                <div class="input-group-prepend">
+                  <span class="input-group-text">$_${variable.name}</span>
+                </div>
+
+                <div style="display: flex; flex: 1 1 auto;">
+                  <div style="flex: 1 auto;" class="btn-group btn-group-toggle" data-toggle="buttons">
+                    ${customVariablesWidget.generateLabels(variable.value)}
+                  </div>
+                </div>
+              </div>
+            `)
+            break
+        }
+        main.append(variableEl)
+        i++
+
+        // load variable custom value
+        widgetsCustomVariablesSocket.emit('load.variable', variable.name, (err, cb) => {
+          if (err) return console.error(err)
+          if (variable.type === 'number' || variable.type === 'text') {
+            $(`input[data-name="${cb.key}"]`).val(cb.value)
+          } else {
+            $(`[data-variable-group="${variable.name}"] div[data-toggle="buttons"]`).html(customVariablesWidget.generateLabels(variable.value, cb.value))
+          }
+        })
+      }
+      // set message if variables are empty
+      if (i === 0) {
+        main.append('<div style="margin-left: 3.2rem" class="text-primary"><sup class="fa fa-caret-up"></sup> Set your variables to watch here</div>')
+      }
+      // /SET customvariables-main ////////////////////////////////////////////////
+
+      // SET customvariables-watch ////////////////////////////////////////////////
+      const watch = $('#customvariables-watch')
+      watch.empty()
+
+      i = 0
+      for (let variable of variables) {
+        let watchEl = ''
+        switch(variable.type) {
+          case 'number':
+          case 'text':
+            watchEl = $(`
+              <div class="input-group" data-variable-group="${variable.name}" style="margin-bottom: 0.2rem">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">$_</span>
+                </div>
+                <input type="text" class="form-control" value="${variable.name}" disabled="disabled"/>
+                <div class="input-group-prepend">
+                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">type</span>
+                </div>
+                <select class="form-control" disabled="disabled">
+                  <option>${variable.type}</option>
+                </select>
+                <div class="input-group-append">
+                  <button type="button" data-name="${variable.name}" onclick="customVariablesWidget.unwatch(this)" class="btn btn-danger">Unwatch</button>
+                </div>
+              </div>
+            `)
+            break
+          case 'options':
+            watchEl = $(`
+            <div class="input-group" data-variable-group="${variable.name}">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">$_</span>
+                </div>
+                <input type="text" class="form-control" value="${variable.name}" disabled="disabled">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">type</span>
+                </div>
+                <select class="form-control" disabled="disabled">
+                  <option>options</option>
+                </select>
+                <div class="input-group-append">
+                  <button type="button" data-name="${variable.name}" onclick="customVariablesWidget.unwatch(this)" class="btn btn-danger">Unwatch</button>
+                </div>
+              </div>
+
+              <div class="input-group" data-variable-group="${variable.name}" style="margin-top: -1px; margin-bottom: 0.2rem">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">options</span>
+                </div>
+                <input type="text" class="form-control" data-custom-variable-input data-name="${variable.name}" placeholder="option1, option2, option3, here is option 4" value="${variable.value ? variable.value : ''}">
+                <div class="input-group-append" style="margin-top:1px;">
+                  <button class="btn btn-secondary d-none" type="button" data-name="${variable.name}" onclick="customVariablesWidget.saveValues(this)"><i class="fa fa-download"></i></button>
+                </div>
+              </div>
+            `)
+            break
+        }
+        watch.append(watchEl)
+      }
+      watch.append(`
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">$_</span>
+          </div>
+          <div id="customVariablesWidgetName" style="flex: 1 1 auto; width: 5%">
+            <input type="text" class="form-control">
+            <div class="invalid-tooltip"></div>
+          </div>
+          <div class="input-group-prepend">
+            <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">type</span>
+          </div>
+          <select class="form-control">
+            <option value="number">number</option>
+            <option value="text">text</option>
+            <option value="options">options</option>
+          </select>
+          <div class="input-group-append">
+            <button type="button" class="btn btn-primary" onclick="customVariablesWidget.watch(this)">Watch</button>
+          </div>
+        </div>
+      `)
+      // /SET customvariables-watch ///////////////////////////////////////////////
+    })
+  }
+}
+
+$(document).on('click', `[data-variable-group] div[data-toggle="buttons"] label`, (event) => {
+  let name = $(event.currentTarget).parents('[data-variable-group]').data('variable-group')
+  let value = $(event.currentTarget).children('input').attr('id')
+  console.debug(name, value)
+  customVariablesWidget.save({ name: name, value: value, data: true })
+})
+
+$(document).on('keydown', '[data-custom-variable-input]', (event) => {
+  let name = $(event.currentTarget).data('name')
+
+  if (event.which == 13) { // enter to save
+    $(`button.btn.btn-secondary[data-name="${name}"]`).trigger('click')
+    $(event.currentTarget).blur()
+  } else {
+    $(`button.btn.btn-secondary[data-name="${name}"]`).removeClass('d-none')
+    $(`button.btn.btn-secondary[data-name="${name}"]`).css('display', 'inline-block')
+  }
+})
+
+customVariablesWidget.refresh()
+
+widgetsCustomVariablesSocket.off('refresh').on('refresh', () => {
+  customVariablesWidget.refresh()
+})
+</script>

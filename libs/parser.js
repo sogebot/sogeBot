@@ -298,6 +298,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
         await global.db.engine.update('customvars', { key: variable }, { key: variable, value: attr.param })
         let msg = global.commons.prepare('filters.setVariable', { value: attr.param, variable: variable })
         global.commons.sendMessage(msg, attr.sender)
+        global.widgets.custom_variables.io.emit('refresh') // send update to widget
         return ''
       }
       let cvar = await global.db.engine.findOne('customvars', { key: variable })
