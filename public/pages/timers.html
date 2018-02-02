@@ -347,7 +347,7 @@ $('[data-timer-responses]').on('click', '[data-timer-toggle-button]', ((ev) => {
 $('#timers-dlg').on('show.bs.modal', function (event) {
   const button = $(event.relatedTarget) // Button that triggered the modal
   const timerName = button.data('id') || null
-  const timerToEdit = _.find(timers.list.timers, (o) => timerName === o.name)
+  const timerToEdit = _.find(timers.list.timers, (o) => timerName.toString() === o.name.toString())
 
   { // input locales
     $("#timers-dlg-timers-name").attr('placeholder', translations.timers.dialog.placeholders.name)
