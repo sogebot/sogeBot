@@ -358,6 +358,15 @@ $('#timers-dlg').on('show.bs.modal', function (event) {
   // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
   // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
   var modal = $(this)
+
+  { // reset form
+    modal.find('.is-invalid').removeClass('is-invalid')
+    $('[data-dialog-alert-fail]')
+      .css('display', 'none')
+    $('[data-dialog-alert-success]')
+      .css('display', 'none')
+  }
+
   modal.find('#timers-dlgLabel').text(_.isNil(timerToEdit)
     ? translations.timers.dialog.title.new
     : translations.timers.dialog.title.edit)
