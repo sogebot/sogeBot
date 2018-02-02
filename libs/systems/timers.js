@@ -81,8 +81,8 @@ class Timers {
         try {
           const timer = {
             name: data.name.trim().length ? data.name.replace(/ /g, '_') : crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5),
-            messages: data.messages,
-            seconds: data.seconds,
+            messages: _.toNumber(data.messages),
+            seconds: _.toNumber(data.seconds),
             enabled: true,
             trigger: {
               messages: 0,
@@ -93,11 +93,11 @@ class Timers {
           // check if name is compliant
           if (!timer.name.match(/^[a-zA-Z0-9_]+$/)) _.set(errors, 'name', global.translate('webpanel.timers.errors.timer_name_must_be_compliant'))
 
-          if (_.isNil(timer.messages) || timer.messages.toString().trim().length === 0) _.set(errors, 'messages', global.translate('webpanel.timers.errors.value_cannot_be_empty'))
-          else if (!timer.messages.match(/^[0-9]+$/)) _.set(errors, 'messages', global.translate('webpanel.timers.errors.this_value_must_be_a_positive_number_or_0'))
+          if (_.isNil(data.messages) || data.messages.toString().trim().length === 0) _.set(errors, 'messages', global.translate('webpanel.timers.errors.value_cannot_be_empty'))
+          else if (!data.messages.match(/^[0-9]+$/)) _.set(errors, 'messages', global.translate('webpanel.timers.errors.this_value_must_be_a_positive_number_or_0'))
 
-          if (_.isNil(timer.seconds) || timer.seconds.toString().trim().length === 0) _.set(errors, 'seconds', global.translate('webpanel.timers.errors.value_cannot_be_empty'))
-          else if (!timer.seconds.match(/^[0-9]+$/)) _.set(errors, 'seconds', global.translate('webpanel.timers.errors.this_value_must_be_a_positive_number_or_0'))
+          if (_.isNil(data.seconds) || data.seconds.toString().trim().length === 0) _.set(errors, 'seconds', global.translate('webpanel.timers.errors.value_cannot_be_empty'))
+          else if (!data.seconds.match(/^[0-9]+$/)) _.set(errors, 'seconds', global.translate('webpanel.timers.errors.this_value_must_be_a_positive_number_or_0'))
 
           // remove empty operations
           _.remove(data.responses, (o) => o.response.trim().length === 0)
@@ -124,7 +124,8 @@ class Timers {
             insertArray.push(global.db.engine.insert('timers.responses', {
               timerId: timerId,
               response: response.response,
-              enabled: response.enabled
+              enabled: response.enabled,
+              timestamp: 0
             }))
           }
           await Promise.all(insertArray)
