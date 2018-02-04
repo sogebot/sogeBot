@@ -144,6 +144,9 @@ function main () {
     if (debug.enabled) debug('Message received: %s\n\tuserstate: %s', message, JSON.stringify(sender))
 
     if (!fromSelf && config.settings.bot_username !== sender.username) {
+      // check moderation and skip if moderated
+      if (!global.parser.isModerated(sender, message)) return
+
       global.users.set(sender.username, { id: sender['user-id'], is: { online: true, subscriber: _.get(sender, 'subscriber', false) } })
 
       // isUserIgnored
