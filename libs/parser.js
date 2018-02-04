@@ -19,6 +19,7 @@ function Parser () {
   this.registeredCmds = {}
   this.permissionsCmds = {}
   this.selfCmds = {}
+  this.moderationParsers = {}
   this.registeredParsers = {}
   this.permissionsParsers = {}
   this.selfParsers = {}
@@ -62,6 +63,8 @@ Parser.prototype.parse = async function (user, message, skip, isUserIgnored) {
 
 Parser.prototype.addToQueue = async function (user, message, skip, isUserIgnored) {
   const d = debug('parser:addToQueue'); d(user, message, skip, isUserIgnored)
+  if (isUserIgnored) return // do nothing if user is ignored
+
   var id = crypto.createHash('md5').update(Math.random().toString()).digest('hex')
 
   var data = {
@@ -90,11 +93,8 @@ Parser.prototype.addToQueue = async function (user, message, skip, isUserIgnored
         (this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user))) {
       if (!_.isNil(queue[id])) {
         queue[id].started = parseInt(queue[id].started, 10) + 1
-        if ((queue[id].isUserIgnored && parser.startsWith('moderation')) || !queue[id].isUserIgnored) {
-          // run only moderation if user is ignored, else run everything
-          d('Running parser - ' + parser)
-          await this.registeredParsers[parser](this.selfParsers[parser], id, user, message, skip)
-        }
+        d('Running parser - ' + parser)
+        await this.registeredParsers[parser](this.selfParsers[parser], id, user, message, skip)
       }
     }
   }
@@ -145,6 +145,11 @@ Parser.prototype.register = function (self, cmd, fnc, permission) {
 Parser.prototype.registerParser = function (self, parser, fnc, permission) {
   this.registeredParsers[parser] = fnc
   this.permissionsParsers[parser] = permission
+  this.selfParsers[parser] = self
+}
+
+Parser.prototype.registerModerationParser = function (self, parser, fnc) {
+  this.moderationParsers[parser] = fnc
   this.selfParsers[parser] = self
 }
 
@@ -679,6 +684,21 @@ Parser.prototype.getLocalizedName = function (number, translation) {
     }
   }
   return name
+}
+
+Parser.prototype.isModerated = async function (data) {
+  const d = debug('parser:isModerated')
+  if (global.commons.isSystemEnabled('moderation')) {
+    let waitFor = []
+    for (let [name, fnc] of Object.entries(this.moderationParsers)) {
+      d('Running moderation - %s', name)
+      waitFor.push(fnc(global.systems.moderation, data.username, data.message))
+    }
+    let result = await Promise.all(waitFor)
+    return _.every(result)
+  } else {
+    return true
+  }
 }
 
 global.removeFromQueue = function (id) {
