@@ -145,7 +145,7 @@ function main () {
 
     if (!fromSelf && config.settings.bot_username !== sender.username) {
       // check moderation and skip if moderated
-      if (!global.parser.isModerated({ message: message, username: sender.username })) return
+      if (!global.parser.isModerated(sender, message)) return
 
       global.users.set(sender.username, { id: sender['user-id'], is: { online: true, subscriber: _.get(sender, 'subscriber', false) } })
 

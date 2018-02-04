@@ -686,13 +686,13 @@ Parser.prototype.getLocalizedName = function (number, translation) {
   return name
 }
 
-Parser.prototype.isModerated = async function (data) {
+Parser.prototype.isModerated = async function (sender, message) {
   const d = debug('parser:isModerated')
   if (global.commons.isSystemEnabled('moderation')) {
     let waitFor = []
     for (let [name, fnc] of Object.entries(this.moderationParsers)) {
       d('Running moderation - %s', name)
-      waitFor.push(fnc(global.systems.moderation, data.username, data.message))
+      waitFor.push(fnc(global.systems.moderation, sender, message))
     }
     let result = await Promise.all(waitFor)
     return _.every(result)
