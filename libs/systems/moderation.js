@@ -404,7 +404,8 @@ Moderation.prototype.blacklist = async function (self, sender, text) {
 
   var timeout = global.configuration.getValue('moderationBlacklistTimeout')
   _.each(self.lists.blacklist, function (value) {
-    value = value.trim()
+    value = value.trim().toLowerCase()
+    text = text.trim().toLowerCase()
     if (text.indexOf(value) !== -1 && value.length > 0) {
       log.info(sender.username + ' [blacklist] ' + timeout + 's timeout: ' + text)
       self.timeoutUser(self, sender,
