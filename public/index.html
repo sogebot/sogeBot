@@ -702,11 +702,6 @@
 
           $(`#${id}[contenteditable=true]`).off()
           $(`#${id}[contenteditable=true]`)
-            .bind('paste', function (e) {
-              e.preventDefault()
-              var text = (e.originalEvent || e).clipboardData.getData('text/plain') || ''
-              document.execCommand('insertText', false, text);
-            })
             // When you click on item, record into data("initialText") content of this item.
             .focus(function () {
               var self = this
@@ -760,7 +755,7 @@
             // When you leave an item...
             .blur(function () {
               $('#helper').remove()
-              var newString = commons.cleanResponseText($(this).text()) // we need to use .text() to strip unnecessary HTML tags
+              var newString = commons.cleanResponseText($(this).html())
               var filtersRegExp = new RegExp('\\$(' + _.keys(translations.responses.variable).join('|') +
                 ')',
                 'g')
@@ -1338,7 +1333,39 @@
       $("#" + id + "Status").css('padding', '0')
     }
 
+   // dont save as html anywhere on contenteditables
+   $(document).on("paste","[contenteditable=true]", function(e) {
+    var text = '';
+    var that = $(this);
+
+    if (e.clipboardData)
+        text = e.clipboardData.getData('text/plain');
+    else if (window.clipboardData)
+        text = window.clipboardData.getData('Text');
+    else if (e.originalEvent.clipboardData)
+        text = $('<div></div>').text(e.originalEvent.clipboardData.getData('text'));
+
+    if (document.queryCommandSupported('insertText')) {
+        document.execCommand('insertHTML', false, $(text).html());
+        return false;
+    }
+    else { // IE > 7
+      that.find('*').each(function () {
+            $(this).addClass('within');
+      });
+
+      setTimeout(function () {
+            // nochmal alle durchlaufen
+            that.find('*').each(function () {
+                  // wenn das element keine klasse 'within' hat, dann unwrap
+                  // http://api.jquery.com/unwrap/
+                  $(this).not('.within').contents().unwrap();
+            });
+      }, 1);
+    }
+    })
   </script>
 </body>
 
 </html>
+
