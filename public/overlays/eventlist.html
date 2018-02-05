@@ -84,26 +84,28 @@
         $('#eventlist').empty()
 
         var order = $.urlParam('order') || 'desc'
+        var display = $.urlParam('display') || 'username,event'; display = display.split(',')
         var ignore = $.urlParam('ignore') || ''; ignore = ignore.split(',')
         var count = $.urlParam('count') || 5
 
-        data = _.orderBy(data, 'timestamp', order);
-        for (let i = 0; i<count; i++) {
-          if (_.isNil(data[i])) break
+        data = _.chunk(
+          _.orderBy(
+            // filter out ignored events
+            _.filter(data, (o) => !_.includes(ignore, o.event))
+            , 'timestamp', 'desc'), count)[0] // order by desc first to get chunk of data
+        data = _.orderBy(data, 'timestamp', order) // re-order as set in order
 
-          if (_.includes(ignore, data[i].event)) {
-            count++
-            continue
+        for (let event of data) {
+          if (event.event === 'resub') event.event = event.months + 'x ' + translations['overlays-eventlist-resub']
+          else if (event.event === 'cheer') event.event = event.bits + ' ' + translations['overlays-eventlist-cheer']
+          else event.event = translations['overlays-eventlist-' + event.event]
+
+          let generatedOutput = ''
+          for (let toShow of display) {
+            if (toShow === 'username') generatedOutput += `<strong class="username">${event.username}</strong>`
+            else generatedOutput += `<span class="${toShow}">${event[toShow]}</span>`
           }
-
-          if (data[i].event === 'resub') data[i].event = data[i].months + 'x ' + translations['overlays-eventlist-resub']
-          else if (data[i].event === 'cheer') data[i].event = data[i].bits + ' ' + translations['overlays-eventlist-cheer']
-          else data[i].event = translations['overlays-eventlist-' + data[i].event]
-
-          $('#eventlist').append('<li>' +
-            '<strong>' + data[i].username + '</strong> ' +
-            '<span>' + data[i].event + '</span>' +
-          '</li>')
+          $('#eventlist').append(`<li class="event ${event.event}">${generatedOutput}</li>`)
         }
       })
 
