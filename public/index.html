@@ -778,8 +778,12 @@
         return $(`<div>
             ${text.replace(/&nbsp;/g, ' ')
                   .replace(/<span.+?data-lang="responses\.variable\.(.+?)">.*?<\/span> /g, '!%%!$1')
-                  .replace(/!%%!/g, '$').trim()}
-          </div>`).text()
+                  .replace(/!%%!/g, '$')
+                  .trim()}
+          </div>`)
+            .text()
+            .replace(/\\n|\n|\t|\s{2}/g, ' ') // remove all \n and more than 1 empty space
+            .trim()
       },
       getDateString: function (d) {
         return ("0" + d.getDate()).slice(-2) + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
@@ -1370,4 +1374,3 @@
 </body>
 
 </html>
-
