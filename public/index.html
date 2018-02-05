@@ -775,9 +775,11 @@
         return output
       },
       cleanResponseText: function (text) {
-        return text.replace(/&nbsp;/g, ' ')
-          .replace(/<span.+?data-lang="responses\.variable\.(.+?)">.*?<\/span> /g, '!%%!$1')
-          .replace(/!%%!/g, '$').trim()
+        return $(`<div>
+            ${text.replace(/&nbsp;/g, ' ')
+                  .replace(/<span.+?data-lang="responses\.variable\.(.+?)">.*?<\/span> /g, '!%%!$1')
+                  .replace(/!%%!/g, '$').trim()}
+          </div>`).text()
       },
       getDateString: function (d) {
         return ("0" + d.getDate()).slice(-2) + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
