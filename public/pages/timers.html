@@ -240,17 +240,6 @@ var saveChanges
             console.debug('Ignoring', element)
           }
           break
-        case 'ABBR':
-          if ($(element).attr('id').startsWith('response')) {
-            const data = {
-              id: $(element).attr('id').split('-')[1],
-              response: $(element).text(),
-              enabled: $(element).parent('.dialog-group').find('[data-timer-toggle-button]').data('value')
-            }
-            timer.responses.push(data)
-          } else {
-            console.debug('Ignoring', element)
-          }
         default:
           console.debug('I dont know what to do', element)
       }
@@ -261,7 +250,7 @@ var saveChanges
       console.log($(element).parents('.input-group'))
       const data = {
         _id: $(element).data('id').split('-')[1],
-        response: $(element).text(),
+        response: commons.cleanResponseText($(element).html()),
         enabled: $(element).parents('.input-group').find('[data-timer-toggle-button]').data('value')
       }
       timer.responses.push(data)
