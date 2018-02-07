@@ -1,4 +1,35 @@
+const crypto = require('crypto')
+const _ = require('lodash')
+
 class Interface {
+  constructor () {
+    this.threads = {}
+  }
+
+  async waitForThread (table, query) {
+    const queryHash = crypto.createHash('md5').update(table + query).digest('hex')
+    const threadHash = crypto.createHash('md5').update(_.random(true).toString()).digest('hex')
+
+    // check if queryHash exists
+    if (_.isNil(this.threads[queryHash])) this.threads[queryHash] = []
+
+    // check if threadHash exists in queryHash
+    if (!_.find(this.threads[queryHash], (o) => o === threadHash)) this.threads[queryHash].push(threadHash)
+
+    return new Promise((resolve, reject) => {
+      const check = (resolve) => {
+        if (_.get(this.threads[queryHash], '[0]', null) === threadHash) {
+          resolve(threadHash)
+        } else setTimeout(() => check(resolve), 1)
+      }
+      check(resolve)
+    })
+  }
+
+  async freeThread (table, query, threadHash) {
+    _.remove(this.threads[crypto.createHash('md5').update(table + query).digest('hex')], (o) => o === threadHash)
+  }
+
   /**
    * Asynchronous find several results on db
    * @param {string} table table to search
