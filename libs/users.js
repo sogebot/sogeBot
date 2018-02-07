@@ -95,13 +95,13 @@ Users.prototype.ignoreAdd = async function (self, sender, text) {
   debug(message); global.commons.sendMessage(message, sender)
 }
 
-Users.prototype.ignoreRm = function (self, sender, text) {
+Users.prototype.ignoreRm = async function (self, sender, text) {
   const match = XRegExp.exec(text, constants.USERNAME_REGEXP)
   if (_.isNil(match)) return
 
   match.username = match.username.toLowerCase()
 
-  global.db.engine.remove('users_ignorelist', { username: match.username })
+  await global.db.engine.remove('users_ignorelist', { username: match.username })
   let message = global.commons.prepare('ignore.user.is.removed', { username: match.username })
   debug(message); global.commons.sendMessage(message, sender)
 }
