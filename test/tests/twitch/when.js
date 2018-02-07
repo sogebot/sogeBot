@@ -15,7 +15,12 @@ describe('lib/twitch - when()', () => {
     await db.cleanup()
   })
 
-  it('await when() 20-times at once', async () => {
+  it('when should not be in db', async () => {
+    let when = await global.db.engine.find('cache.when')
+    assert.lengthOf(when, 0, JSON.stringify(when))
+  })
+
+  it('await when() x-times at once', async () => {
     let toAwait = []
     for (let i = 0; i < 15; i++) {
       toAwait.push(global.twitch.when({
