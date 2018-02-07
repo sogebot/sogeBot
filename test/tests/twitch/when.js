@@ -22,7 +22,7 @@ describe('lib/twitch - when()', () => {
 
   it('await when() x-times at once', async () => {
     let toAwait = []
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 20; i++) {
       toAwait.push(global.twitch.when({
         subcribed_at: _.now(),
         followed_at: _.now(),

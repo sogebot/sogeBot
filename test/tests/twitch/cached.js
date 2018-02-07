@@ -22,7 +22,7 @@ describe('lib/twitch - cached()', () => {
 
   it('await users() x-times at once', async () => {
     let toAwait = []
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 20; i++) {
       toAwait.push(global.twitch.cached({
         followers: ['Lorem', 'Ipsum'],
         hosts: ['Dolor', 'Sit'],
