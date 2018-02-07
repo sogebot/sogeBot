@@ -17,12 +17,12 @@ class Interface {
     if (!_.find(this.threads[queryHash], (o) => o === threadHash)) this.threads[queryHash].push(threadHash)
 
     return new Promise((resolve, reject) => {
-      var interval = setInterval(() => {
+      const check = (resolve) => {
         if (_.get(this.threads[queryHash], '[0]', null) === threadHash) {
-          clearInterval(interval)
           resolve(threadHash)
-        }
-      }, 10)
+        } else setTimeout(() => check(resolve), 1)
+      }
+      check(resolve)
     })
   }
 
