@@ -1,8 +1,9 @@
 'use strict'
 
 // 3rdparty libraries
-var _ = require('lodash')
+const _ = require('lodash')
 const debug = require('debug')('moderation')
+const XRegExp = require('xregexp')
 // bot libraries
 var constants = require('../constants')
 var log = global.log
@@ -402,19 +403,21 @@ Moderation.prototype.blacklist = async function (self, sender, text) {
     return true
   }
 
+  let isOK = true
   var timeout = global.configuration.getValue('moderationBlacklistTimeout')
   _.each(self.lists.blacklist, function (value) {
-    value = value.trim().toLowerCase()
-    text = text.trim().toLowerCase()
-    if (text.indexOf(value) !== -1 && value.length > 0) {
+    value = value.trim().replace(/\*/g, '[\\pL0-9]*').replace(/\+/g, '[\\pL0-9]+')
+    const regexp = XRegExp(`(?:^|\\s)${value}(?:^|\\s)`, 'gi')
+    // we need to change 'text' to ' text ' for regexp to correctly work
+    if (XRegExp.exec(` ${text} `, regexp) && value.length > 0) {
+      isOK = false
       log.info(sender.username + ' [blacklist] ' + timeout + 's timeout: ' + text)
       self.timeoutUser(self, sender,
         global.translate('moderation.user-is-warned-about-blacklist'),
         global.translate('moderation.user-have-timeout-for-blacklist'), timeout)
-      return false
     }
   })
-  return true
+  return isOK
 }
 
 module.exports = new Moderation()
