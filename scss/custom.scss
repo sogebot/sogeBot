@@ -1191,3 +1191,9 @@ blockquote {
 .invalid-tooltip {
   top: -80%;
 }
+
+[contenteditable=true]:empty:before {
+  content: attr(placeholder);
+  display: block; /* For Firefox */
+  color: $gray-500;
+}

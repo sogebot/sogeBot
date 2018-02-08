@@ -155,7 +155,6 @@ class Events {
     const d = debug('events:fireSendChatMessageOrWhisper')
     let username = _.get(attributes, 'username', global.parser.getOwner())
     let message = operation.messageToSend
-    console.log(attributes)
     _.each(attributes, function (val, name) {
       if (_.isObject(val) && _.size(val) === 0) return true // skip empty object
       d(`Replacing $${name} with ${val}`)
