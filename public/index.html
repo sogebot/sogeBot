@@ -681,6 +681,7 @@
         options.fnc = !_.isNil(options.fnc) ? options.fnc : null
         options.filters = !_.isNil(options.filters) ? options.filters : []
         options.options = !_.isNil(options.options) ? options.options : []
+        options.placeholder = !_.isNil(options.placeholder) ? options.placeholder : ''
 
         var id = window.crypto.getRandomValues(new Uint32Array(1))
 
@@ -690,7 +691,7 @@
         )
         var output = '<abbr class="form-control" title="click to edit" id="' + id + '" data-id="' + options.id +
         '" data-fnc="' + options.fnc + '" data-filters="' + options.filters.join(',') +
-        '" contenteditable="true">' + stringAbbr + '</abbr>'
+        '" contenteditable="true" placeholder="' + options.placeholder + '">' + stringAbbr + '</abbr>'
 
         setTimeout(function () {
           commons.translate()

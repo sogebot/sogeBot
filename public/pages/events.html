@@ -283,7 +283,7 @@
 
     const createProperInput = (k, v) => {
       if (_.isBoolean(v)) {
-        return `<button data-event-toggle-button data-id="${k}" data-value="${v}" style="width:100%" class="btn ${v === true ? `btn-success` : `btn-danger`}">${translations.events.definitions[k][v]}</button>`
+        return `<button data-event-toggle-button data-id="${k}" data-value="${v}" style="flex: 1" class="btn ${v === true ? `btn-success` : `btn-danger`}">${translations.events.definitions[k][v]}</button>`
       } else if (_.isArray(v)) {
         let buttons = []
         for (let val of v) {
@@ -294,12 +294,17 @@
           `)
         }
         return `
-          <div class="btn-group btn-group-toggle" data-toggle="buttons" style="width:100%; position: relative; left: 1px">
+          <div class="btn-group btn-group-toggle" data-toggle="buttons" style="flex: 1; position: relative; left: 1px">
             ${buttons.join(' ')}
           </div>
         `
       } else {
-        return `<input id="operation-definition-${k}" class="form-control" placeholder="${translations.events.definitions[k].placeholder}" value="${v}">`
+        return commons.editable({
+          id: `operation-definition-${k}`,
+          placeholder: translations.events.definitions[k].placeholder,
+          text: v
+        })
+//        return `<input id="operation-definition-${k}" class="form-control" placeholder="${translations.events.definitions[k].placeholder}" value="${v}">`
       }
     }
 
@@ -315,10 +320,8 @@
           <div class="input-group-prepend">
             <span class="input-group-text">${translations.events.definitions[key].label}</span>
           </div>
-          <div style="flex: 1 1 auto;">
-            ${createProperInput(key, value)}
-            <div class="invalid-tooltip"></div>
-          </div>
+          ${createProperInput(key, value)}
+          <div class="invalid-tooltip"></div>
         </div>
       `
       )
@@ -395,13 +398,6 @@
           } else if ($(element).attr('id').startsWith('definition')) {
             let id = $(element).attr('id').split('-')[1]
             eventListener.event.definitions[id] = $(element).val()
-          } else if ($(element).attr('id').startsWith('operation-definition')) {
-            let id = $(element).attr('id').split('-')[2]
-            let parentId = $(element).parents('.dialog-group').attr('id')
-            if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = {
-              definitions: {}
-            }
-            eventListener.operations[parentId].definitions[id] = $(element).val()
           } else if ($(element).attr('name').startsWith('radio-options')) {
             if ($(element).parent().hasClass('active')) {
               let id = $(element).attr('id').split('-')[0]
@@ -449,6 +445,14 @@
         default:
           console.debug('I dont know what to do', element)
       }
+    }
+    for (let element of $('abbr[data-id^="operation-definition"]')) {
+      let id = $(element).data('id').split('-')[2]
+      let parentId = $(element).parents('.dialog-group').attr('id')
+      if (_.isNil(eventListener.operations[parentId])) eventListener.operations[parentId] = {
+        definitions: {}
+      }
+      eventListener.operations[parentId].definitions[id] = commons.cleanResponseText($(element).html())
     }
     console.debug(eventListener)
 
@@ -582,7 +586,7 @@
           } else if(_.isArray(operationDefinition)) {
             modal.find(`#${elementId} #${k}-${v}`).parent().button('toggle')
           } else {
-            modal.find(`#${elementId} #operation-definition-${k}`).val(v)
+            modal.find(`#${elementId} [data-id="operation-definition-${k}"]`).text(v)
           }
         }
       }
