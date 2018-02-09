@@ -326,7 +326,7 @@
     socket.once('version', function (version) {
       $.get('https://api.github.com/repos/sogehige/sogebot/releases/latest', function (response) {
         var md = new markdownit()
-        var commits = new RegExp('[0-9a-f]{5,40}', 'gm')
+        var commits = new RegExp('[0-9a-f]{6,40}', 'gm')
         let commits_match = response.body.match(commits)
         if (!_.isNil(commits_match)) {
           for (let commit of commits_match) {
