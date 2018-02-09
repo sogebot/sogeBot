@@ -157,10 +157,12 @@ Moderation.prototype.whitelist = async function (text) {
   clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
   text = text.replace(clipsRegex, '')
 
-  _.each(this.lists.whitelist, function (value) {
-    text = text.replace(value, '')
-  })
-
+  for (let value of this.lists.whitelist) {
+    value = value.trim().replace(/\*/g, '[\\pL0-9]*').replace(/\+/g, '[\\pL0-9]+')
+    const regexp = XRegExp(`(?:^|\\s)${value}(?:^|\\s)`, 'gi')
+    // we need to change 'text' to ' text ' for regexp to correctly work
+    text = XRegExp.replace(` ${text} `, regexp, '').trim()
+  }
   return text
 }
 
