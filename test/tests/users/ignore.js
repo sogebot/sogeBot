@@ -19,6 +19,7 @@ describe('Users - ignore', () => {
   before(async () => {
     await tmi.waitForConnection()
     global.commons.sendMessage.reset()
+    global.commons.timeout.reset()
     await db.cleanup()
   })
 
@@ -65,7 +66,7 @@ describe('Users - ignore', () => {
       global.client.emits(['message'], [
         ['channel', { username: 'testuser' }, 'http://www.google.com', false]
       ])
-      await until(() => global.commons.timeout.calledOnce, 5000)
+      await until(() => global.commons.timeout.calledOnce, 20000)
     })
 
     it('remove testuser from ignore list', async () => {
