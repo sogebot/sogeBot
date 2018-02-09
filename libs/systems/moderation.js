@@ -90,8 +90,8 @@ function Moderation () {
 Moderation.prototype._update = async function (self) {
   let [blacklist, whitelist] = await Promise.all([global.db.engine.findOne('settings', { key: 'blacklist' }), global.db.engine.findOne('settings', { key: 'whitelist' })])
 
-  self.lists.blacklist = blacklist.value
-  self.lists.whitelist = whitelist.value
+  self.lists.blacklist = _.get(blacklist, 'value', [])
+  self.lists.whitelist = _.get(whitelist, 'value', [])
 }
 
 Moderation.prototype.webPanel = function () {
@@ -156,8 +156,7 @@ Moderation.prototype.whitelist = async function (text) {
 
   clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
   text = text.replace(clipsRegex, '')
-
-  for (let value of this.lists.whitelist) {
+  for (let value of global.systems.moderation.lists.whitelist) {
     value = value.trim().replace(/\*/g, '[\\pL0-9]*').replace(/\+/g, '[\\pL0-9]+')
     const regexp = XRegExp(`(?:^|\\s)${value}(?:^|\\s)`, 'gi')
     // we need to change 'text' to ' text ' for regexp to correctly work
