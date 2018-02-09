@@ -43,7 +43,7 @@
     "popper.js": "^1.12.9",
     "request": "^2.83.0",
     "safe-eval": "^0.3.0",
-    "snekfetch": "3.6.1",
+    "snekfetch": "3.6.4",
     "socket.io": "^2.0.4",
     "terminal-kit": "^1.14.3",
     "twitch-emoticons": "git+https://github.com/sogehige/twitch-emoticons.git#v3api",
@@ -53,7 +53,7 @@
     "winston": "^2.4.0",
     "xregexp": "^4.0.0",
     "youtube-search": "^1.0.10",
-    "ytdl-core": "^0.19.0"
+    "ytdl-core": "^0.20.1"
   },
   "scripts": {
     "prebuild": "npm install rimraf bestzip npm-run-all cross-var -g",
