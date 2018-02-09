@@ -62,8 +62,9 @@ describe('Users - ignore', () => {
     })
 
     it('even when ignored, user should have timeout for link', async () => {
-      let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: _.get(testuser, 'username', '') })
-      global.parser.parse(testuser, 'http://www.google.com', false, !_.isEmpty(ignoredUser))
+      global.client.emits(['message'], [
+        ['channel', { username: 'testuser' }, 'http://www.google.com', false]
+      ])
       await until(() => global.commons.timeout.calledOnce, 5000)
     })
 
