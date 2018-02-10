@@ -104,10 +104,10 @@ Points.prototype.messagePoints = async function (self, id, sender, text, skip) {
   let lastMessageCount = _.isNil(user.custom.lastMessagePoints) ? 0 : user.custom.lastMessagePoints
 
   if (lastMessageCount + interval <= user.stats.messages) {
-    global.db.engine.increment('users', { username: user.username }, { points: parseInt(points, 10) })
-    global.users.set(sender.username, {
-      custom: { lastMessagePoints: user.stats.messages }
-    })
+    await Promise.all([
+      global.db.engine.increment('users', { username: user.username }, { points: parseInt(points, 10) }),
+      global.db.engine.update('users', { username: user.username }, { custom: { lastMessagePoints: user.stats.messages } })
+    ])
   }
   global.updateQueue(id, true)
 }
@@ -310,17 +310,15 @@ Points.prototype.updatePoints = async function () {
   var ptsPerInterval = (global.twitch.isOnline ? global.configuration.getValue('pointsPerInterval') : global.configuration.getValue('pointsPerIntervalOffline'))
 
   let users = await global.users.getAll({ is: { online: true } })
-  _.each(users, function (user) {
-    if (_.isNil(user.time)) user.time = {}
-
-    user.time.points = _.isNil(user.time.points) ? 0 : user.time.points
+  for (let user of users) {
+    user.time.points = _.get(user, 'time.points', 0)
     if (new Date().getTime() - user.time.points >= interval) {
-      global.db.engine.increment('users', { username: user.username }, { points: parseInt(ptsPerInterval, 10) })
-      global.users.set(user.username, {
-        time: { points: new Date().getTime() }
-      })
+      await Promise.all([
+        global.db.engine.increment('users', { username: user.username }, { points: parseInt(ptsPerInterval, 10) }),
+        global.db.engine.update('users', { username: user.username }, { time: { points: new Date().getTime() } })
+      ])
     }
-  })
+  }
 }
 
 module.exports = new Points()
