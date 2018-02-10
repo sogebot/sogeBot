@@ -105,6 +105,7 @@ class IMongoDB extends Interface {
       this.freeThread(table, where, threadHash)
       return item.value
     } catch (e) {
+      this.freeThread(table, where, threadHash)
       global.log.error(e.message)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
@@ -139,6 +140,7 @@ class IMongoDB extends Interface {
       this.freeThread(table, where, threadHash)
       return items
     } catch (e) {
+      this.freeThread(table, where, threadHash)
       global.log.error(e.message)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
@@ -158,6 +160,7 @@ class IMongoDB extends Interface {
       this.freeThread(table, where, threadHash)
       return result.result.n
     } catch (e) {
+      this.freeThread(table, where, threadHash)
       global.log.error(e.message)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
@@ -199,6 +202,7 @@ class IMongoDB extends Interface {
       this.freeThread(table, where, threadHash)
       return items.length === 1 ? items[0] : items
     } catch (e) {
+      this.freeThread(table, where, threadHash)
       global.log.error(e.message)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
