@@ -78,7 +78,7 @@ class INeDB extends Interface {
     var self = this
     return new Promise(function (resolve, reject) {
       try {
-        self.on(table).insert(object, function (err, item) {
+        self.on(table).insert(flatten.unflatten(object), function (err, item) {
           if (err) reject(err)
           if (debug.enabled) debug('insert() \n\ttable: %s \n\tobject: %j', table, object)
 

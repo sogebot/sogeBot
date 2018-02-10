@@ -74,7 +74,7 @@ class IMongoDB extends Interface {
 
     try {
       let db = this.client.db(this.dbName)
-      let item = await db.collection(table).insert(object)
+      let item = await db.collection(table).insert(flatten.unflatten(object))
       return item.ops[0]
     } catch (e) {
       if (e.message.match(/EPIPE/g)) {
