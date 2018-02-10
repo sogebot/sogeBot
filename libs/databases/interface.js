@@ -7,7 +7,7 @@ class Interface {
   }
 
   async waitForThread (table, query) {
-    const queryHash = crypto.createHash('md5').update(table + query).digest('hex')
+    const queryHash = crypto.createHash('md5').update(table + JSON.stringify(query)).digest('hex')
     const threadHash = crypto.createHash('md5').update(_.random(true).toString()).digest('hex')
 
     // check if queryHash exists
@@ -27,7 +27,9 @@ class Interface {
   }
 
   async freeThread (table, query, threadHash) {
-    _.remove(this.threads[crypto.createHash('md5').update(table + query).digest('hex')], (o) => o === threadHash)
+    const queryHash = crypto.createHash('md5').update(table + JSON.stringify(query)).digest('hex')
+    _.remove(this.threads[queryHash], (o) => o === threadHash)
+    if (_.size(this.threads[queryHash]) === 0) delete this.threads[queryHash]
   }
 
   /**
