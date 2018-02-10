@@ -37,11 +37,16 @@ class INeDB extends Interface {
 
     var self = this
     return new Promise(function (resolve, reject) {
-      self.on(table).find(flatten(where), function (err, items) {
-        if (err) reject(err)
-        if (debug.enabled) debug('find() \n\ttable: %s \n\twhere: %j \n\titems: %j', table, where, items)
-        resolve(items)
-      })
+      try {
+        self.on(table).find(flatten(where), function (err, items) {
+          if (err) reject(err)
+          if (debug.enabled) debug('find() \n\ttable: %s \n\twhere: %j \n\titems: %j', table, where, items)
+          resolve(items)
+        })
+      } catch (e) {
+        global.log.error(e.message)
+        throw e
+      }
     })
   }
 
@@ -52,11 +57,16 @@ class INeDB extends Interface {
 
     var self = this
     return new Promise(function (resolve, reject) {
-      self.on(table).findOne(flatten(where), function (err, item) {
-        if (err) reject(err)
-        if (debug.enabled) debug('findOne() \n\ttable: %s \n\twhere: %j \n\titem: %j', table, where, _.isNil(item) ? {} : item)
-        resolve(_.isNil(item) ? {} : item)
-      })
+      try {
+        self.on(table).findOne(flatten(where), function (err, item) {
+          if (err) reject(err)
+          if (debug.enabled) debug('findOne() \n\ttable: %s \n\twhere: %j \n\titem: %j', table, where, _.isNil(item) ? {} : item)
+          resolve(_.isNil(item) ? {} : item)
+        })
+      } catch (e) {
+        global.log.error(e.message)
+        throw e
+      }
     })
   }
 
@@ -67,12 +77,17 @@ class INeDB extends Interface {
 
     var self = this
     return new Promise(function (resolve, reject) {
-      self.on(table).insert(object, function (err, item) {
-        if (err) reject(err)
-        if (debug.enabled) debug('insert() \n\ttable: %s \n\tobject: %j', table, object)
+      try {
+        self.on(table).insert(object, function (err, item) {
+          if (err) reject(err)
+          if (debug.enabled) debug('insert() \n\ttable: %s \n\tobject: %j', table, object)
 
-        resolve(item)
-      })
+          resolve(item)
+        })
+      } catch (e) {
+        global.log.error(e.message)
+        throw e
+      }
     })
   }
 
@@ -82,12 +97,17 @@ class INeDB extends Interface {
     var self = this
     const threadHash = await this.waitForThread(table, where)
     return new Promise(function (resolve, reject) {
-      self.on(table).remove(flatten(where), { multi: true }, function (err, numRemoved) {
-        if (err) reject(err)
-        if (debug.enabled) debug('remove() \n\ttable: %s \n\twhere: %j \n\tremoved: %j', table, where, numRemoved)
-        global.db.engine.freeThread(table, where, threadHash)
-        resolve(numRemoved)
-      })
+      try {
+        self.on(table).remove(flatten(where), { multi: true }, function (err, numRemoved) {
+          if (err) reject(err)
+          if (debug.enabled) debug('remove() \n\ttable: %s \n\twhere: %j \n\tremoved: %j', table, where, numRemoved)
+          global.db.engine.freeThread(table, where, threadHash)
+          resolve(numRemoved)
+        })
+      } catch (e) {
+        global.log.error(e.message)
+        throw e
+      }
     })
   }
 
@@ -100,12 +120,17 @@ class INeDB extends Interface {
     const threadHash = await this.waitForThread(table, where)
     return new Promise(function (resolve, reject) {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
-      self.on(table).update(flatten(where), { $set: flatten(object, { safe: true }) }, { upsert: (_.isNil(where._id) && !_.isEmpty(where)), multi: (_.isEmpty(where)), returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
-        if (err) reject(err)
-        if (debug.enabled) debug('update() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
-        global.db.engine.freeThread(table, where, threadHash)
-        resolve(affectedDocs)
-      })
+      try {
+        self.on(table).update(flatten(where), { $set: flatten(object, { safe: true }) }, { upsert: (_.isNil(where._id) && !_.isEmpty(where)), multi: (_.isEmpty(where)), returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
+          if (err) reject(err)
+          if (debug.enabled) debug('update() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
+          global.db.engine.freeThread(table, where, threadHash)
+          resolve(affectedDocs)
+        })
+      } catch (e) {
+        global.log.error(e.message)
+        throw e
+      }
     })
   }
 
@@ -118,12 +143,17 @@ class INeDB extends Interface {
     const threadHash = await this.waitForThread(table, where)
     return new Promise(function (resolve, reject) {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
-      self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: false, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
-        if (err) reject(err)
-        if (debug.enabled) debug('increment() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
-        global.db.engine.freeThread(table, where, threadHash)
-        resolve(affectedDocs)
-      })
+      try {
+        self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: false, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
+          if (err) reject(err)
+          if (debug.enabled) debug('increment() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
+          global.db.engine.freeThread(table, where, threadHash)
+          resolve(affectedDocs)
+        })
+      } catch (e) {
+        global.log.error(e.message)
+        throw e
+      }
     })
   }
 
@@ -136,12 +166,17 @@ class INeDB extends Interface {
     const threadHash = await this.waitForThread(table, where)
     return new Promise(function (resolve, reject) {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
-      self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: true, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
-        if (err) reject(err)
-        if (debug.enabled) debug('increment() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
-        global.db.engine.freeThread(table, where, threadHash)
-        resolve(affectedDocs)
-      })
+      try {
+        self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: true, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
+          if (err) reject(err)
+          if (debug.enabled) debug('increment() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
+          global.db.engine.freeThread(table, where, threadHash)
+          resolve(affectedDocs)
+        })
+      } catch (e) {
+        global.log.error(e.message)
+        throw e
+      }
     })
   }
 }
