@@ -54,7 +54,7 @@ class Events {
   async fire (eventId, attributes) {
     const d = debug('events:fire')
 
-    attributes = attributes || {}
+    attributes = _.clone(attributes) || {}
 
     if (!_.isNil(_.get(attributes, 'username', null))) attributes.userObject = await global.users.get(attributes.username)
     if (!_.isNil(_.get(attributes, 'recipient', null))) attributes.recipientObject = await global.users.get(attributes.recipient)
@@ -261,8 +261,8 @@ class Events {
   async checkDefinition (event, attributes) {
     const d = debug('events:checkDefinition')
 
-    d('Searching check fnc for %j', event)
     const check = (_.find(this.supportedEventsList, (o) => o.id === event.key)).check
+    d('Searching check fnc for %j | %j', event, check)
     if (_.isNil(check)) return true
 
     d('Running check on %s', check.name)
@@ -271,10 +271,9 @@ class Events {
 
   async checkFilter (eventId, attributes) {
     const d = debug('events:checkFilter')
-
+    d('Checking filters | %j, %j', eventId, attributes)
     const filter = (await global.db.engine.findOne('events.filters', { eventId: eventId })).filters
     if (filter.trim().length === 0) return true
-
     let toEval = `(function evaluation () { return ${filter} })()`
     const context = {
       _: _,
