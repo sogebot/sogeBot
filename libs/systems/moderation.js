@@ -417,6 +417,7 @@ Moderation.prototype.blacklist = async function (self, sender, text) {
         global.translate('moderation.user-is-warned-about-blacklist'),
         global.translate('moderation.user-have-timeout-for-blacklist'), timeout)
     }
+    return isOK
   })
   return isOK
 }
