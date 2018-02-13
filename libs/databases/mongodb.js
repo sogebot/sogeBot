@@ -23,7 +23,7 @@ class IMongoDB extends Interface {
   }
 
   async connect () {
-    this.client = await client.connect(config.database.mongodb.url, { poolSize: config.database.mongodb.poolSize })
+    this.client = await client.connect(config.database.mongodb.url, { poolSize: _.get(config, 'database.mongodb.poolSize', 5) })
     this.connected = true
   }
 
