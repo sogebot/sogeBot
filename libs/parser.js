@@ -291,18 +291,8 @@ Parser.prototype.parseMessage = async function (message, attr) {
     }
   }
   let custom = {
-    '(get.#)': async function (filter) {
-      let variable = filter.replace('(get.', '').replace(')', '')
-      let cvar = await global.db.engine.findOne('customvars', { key: variable })
-      return cvar.value
-    },
-    '(set.#)': async function (filter) {
-      let variable = filter.replace('(set.', '').replace(')', '')
-      await global.db.engine.update('customvars', { key: variable }, { key: variable, value: attr.param })
-      return ''
-    },
-    '(var.#)': async function (filter) {
-      let variable = filter.replace('(var.', '').replace(')', '')
+    '$_#': async function (filter) {
+      let variable = filter.replace('$_', '')
       if ((global.parser.isOwner(attr.sender) || attr.sender.mod) &&
         (!_.isUndefined(attr.param) && attr.param.length !== 0)) {
         await global.db.engine.update('customvars', { key: variable }, { key: variable, value: attr.param })
@@ -486,9 +476,9 @@ Parser.prototype.parseMessage = async function (message, attr) {
   msg = await this.parseMessageEval(evaluate, decode(msg)); d('parseMessageEval: %s', msg)
   msg = await this.parseMessageOnline(online, msg); d('parseMessageOnline: %s', msg)
   msg = await this.parseMessageCommand(command, msg); d('parseMessageCommand: %s', msg)
+  msg = await this.parseMessageVariables(custom, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageEach(random, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageEach(price, msg); d('parseMessageEach: %s', msg)
-  msg = await this.parseMessageEach(custom, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageEach(param, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageEach(qs, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageEach(info, msg); d('parseMessageEach: %s', msg)
@@ -596,6 +586,29 @@ Parser.prototype.parseMessageEval = async function (filters, msg) {
       for (var bkey in rMessage) {
         let newString = await fnc(rMessage[bkey])
         if (_.isUndefined(newString) || newString.length === 0) msg = ''
+        msg = msg.replace(rMessage[bkey], newString).trim()
+      }
+    }
+  }
+  return msg
+}
+
+Parser.prototype.parseMessageVariables = async function (filters, msg, removeWhenEmpty) {
+  if (_.isNil(removeWhenEmpty)) removeWhenEmpty = true
+
+  if (msg.length === 0) return msg
+  for (var key in filters) {
+    if (!filters.hasOwnProperty(key)) continue
+
+    let fnc = filters[key]
+    let regexp = _.escapeRegExp(key)
+
+    regexp = regexp.replace(/#/g, '([a-zA-Z_]+)')
+    let rMessage = msg.match((new RegExp('(' + regexp + ')', 'g')))
+    if (!_.isNull(rMessage)) {
+      for (var bkey in rMessage) {
+        let newString = await fnc(rMessage[bkey])
+        if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) msg = ''
         msg = msg.replace(rMessage[bkey], newString).trim()
       }
     }
