@@ -26,6 +26,7 @@ class CustomVariablesWidget {
       socket.on('save.values', async (data, cb) => {
         data.value = data.value.split(',').map((o) => o.trim()).filter(String).join(', ')
         await global.db.engine.update('widgets.customVariables', { name: data.name }, { value: data.value })
+        global.twitch.setTitleAndGame(global.twitch, null) // update title
         cb(null, data)
       })
       socket.on('load.variable', async (variable, callback) => {
@@ -34,6 +35,7 @@ class CustomVariablesWidget {
       })
       socket.on('save.variable', async (data, cb) => {
         await global.db.engine.update('customvars', { key: data.key }, { value: data.value })
+        global.twitch.setTitleAndGame(global.twitch, null) // update title
         cb(null, data)
       })
       socket.on('watch', async (data, callback) => {

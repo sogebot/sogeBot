@@ -298,7 +298,10 @@ Parser.prototype.parseMessage = async function (message, attr) {
         await global.db.engine.update('customvars', { key: variable }, { key: variable, value: attr.param })
         let msg = global.commons.prepare('filters.setVariable', { value: attr.param, variable: variable })
         global.commons.sendMessage(msg, attr.sender)
+
         global.widgets.custom_variables.io.emit('refresh') // send update to widget
+        global.twitch.setTitleAndGame(global.twitch, null) // update title
+
         return ''
       }
       let cvar = await global.db.engine.findOne('customvars', { key: variable })
@@ -319,10 +322,10 @@ Parser.prototype.parseMessage = async function (message, attr) {
   }
   let info = {
     '(game)': async function (filter) {
-      return global.twitch.currentGame
+      return global.twitch.current.game
     },
     '(status)': async function (filter) {
-      return global.twitch.currentStatus
+      return global.twitch.current.status
     }
   }
   let command = {
@@ -474,10 +477,10 @@ Parser.prototype.parseMessage = async function (message, attr) {
     .replace(/\$hosts/g, global.twitch.current.hosts)
     .replace(/\$subscribers/g, global.twitch.current.subscribers)
     .replace(/\$bits/g, global.twitch.current.bits)
+  msg = await this.parseMessageVariables(custom, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageEval(evaluate, decode(msg)); d('parseMessageEval: %s', msg)
   msg = await this.parseMessageOnline(online, msg); d('parseMessageOnline: %s', msg)
   msg = await this.parseMessageCommand(command, msg); d('parseMessageCommand: %s', msg)
-  msg = await this.parseMessageVariables(custom, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageEach(random, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageEach(price, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageEach(param, msg); d('parseMessageEach: %s', msg)

@@ -30,9 +30,12 @@ class Twitch {
       hosts: 0,
       subscribers: 0,
       bits: 0,
+      rawStatus: '',
       status: '',
       game: ''
     }
+
+    this._loadCachedStatusAndGame()
 
     this.updateWatchTime()
     this.getCurrentStreamData()
@@ -104,6 +107,36 @@ class Twitch {
   }
 
   // attribute
+  async gameCache (value) {
+    if (value) {
+      // setter
+      await global.db.engine.update('cache.game', { upsert: true }, {
+        value: value
+      })
+      return value
+    } else {
+      // getter
+      let cache = await global.db.engine.findOne('cache.game')
+      return _.get(cache, 'value', '')
+    }
+  }
+
+  // attribute
+  async rawStatus (value) {
+    if (value) {
+      // setter
+      await global.db.engine.update('cache.status', { upsert: true }, {
+        value: value
+      })
+      return value
+    } else {
+      // getter
+      let cache = await global.db.engine.findOne('cache.status')
+      return _.get(cache, 'value', '')
+    }
+  }
+
+  // attribute
   async cached (data) {
     if (data) {
       // setter
@@ -126,6 +159,10 @@ class Twitch {
         subscribers: _.get(cache, 'subscribers', [])
       }
     }
+  }
+
+  async _loadCachedStatusAndGame () {
+    [this.current.rawStatus, this.current.game] = await Promise.all([this.rawStatus(), this.gameCache()])
   }
 
   async gamesTitles (data) {
@@ -247,8 +284,13 @@ class Twitch {
 
     if (!this.current.gameOrTitleChangedManually) {
       d(`Current game: ${request.body.game}, Current Status: ${request.body.status}`)
+      // we changed title outside of bot
+      if (request.body.status !== this.current.status) this.current.rawStatus = request.body.status
+
       this.current.game = request.body.game
       this.current.status = request.body.status
+
+      await Promise.all([this.gameCache(this.current.game), this.rawStatus(this.current.rawStatus)])
     } else {
       this.current.gameOrTitleChangedManually = false
     }
@@ -506,8 +548,13 @@ class Twitch {
       let stream = request.body.data[0]; d(stream)
 
       if (!this.current.gameOrTitleChangedManually) {
+        // we changed title outside of bot
+        if (stream.title !== this.current.status) this.current.rawStatus = stream.title
+
         this.current.status = stream.title
         this.current.game = await this.getGameFromId(stream.game_id)
+
+        await Promise.all([this.gameCache(this.current.game), this.rawStatus(this.current.rawStatus)])
       }
 
       if (!this.isOnline || this.streamType !== stream.type) {
@@ -597,6 +644,7 @@ class Twitch {
       newChatters: self.newChatters,
       game: self.current.game,
       status: self.current.status,
+      rawStatus: self.current.rawStatus,
       currentHosts: self.current.hosts
     }
     socket.emit('stats', data)
@@ -961,6 +1009,27 @@ class Twitch {
     self.sendStreamData(self, global.panel.io) // force dashboard update
   }
 
+  async parseTitle (title) {
+    if (!_.isNil(title)) this.current.rawStatus = title
+    else title = this.current.rawStatus
+
+    // cache rawStatus
+    await this.rawStatus(this.current.rawStatus)
+
+    const regexp = new RegExp('\\$_[a-zA-Z0-9_]+', 'g')
+    const match = title.match(regexp)
+
+    if (!_.isNil(match)) {
+      for (let variable of title.match(regexp).map((o) => o.replace('$_', ''))) {
+        let variableFromDb = await global.db.engine.findOne('customvars', { key: variable })
+        if (_.isNil(variableFromDb.key)) variableFromDb = { key: variable, value: `not available` }
+        title = title.replace(new RegExp(`\\$_${variableFromDb.key}`, 'g'), variableFromDb.value)
+      }
+    }
+    this.current.status = title
+    return title
+  }
+
   async setTitleAndGame (self, sender, args) {
     args = _.defaults(args, { title: null }, { game: null })
     const d = debug('twitch:setTitleAndGame')
@@ -971,13 +1040,19 @@ class Twitch {
     }
 
     var request
+    var status
     const url = `https://api.twitch.tv/kraken/channels/${global.channelId}`
     try {
+      status = await this.parseTitle(args.title)
+
+      if (!_.isNil(args.game)) await this.gameCache(args.game) // save game to cache, if changing game
+      else args.game = await this.gameCache() // we are not setting game -> load last game
+
       request = await snekfetch.put(url, {
         data: {
           channel: {
             game: !_.isNull(args.game) ? args.game.trim() : self.current.game,
-            status: !_.isNull(args.title) ? args.title.trim() : self.current.status
+            status: status
           }
         }
       })
@@ -995,7 +1070,8 @@ class Twitch {
     global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
     if (request.status === 200 && !_.isNil(request.body)) {
       const response = request.body
-      if (!_.isNull(args.game)) {
+      if (!_.isNil(args.game)) {
+        response.game = _.isNil(response.game) ? '' : response.game
         if (response.game.trim() === args.game.trim()) {
           global.commons.sendMessage(global.translate('game.change.success')
             .replace(/\$game/g, response.game), sender)
@@ -1008,9 +1084,13 @@ class Twitch {
       }
 
       if (!_.isNull(args.title)) {
-        if (response.status.trim() === args.title.trim()) {
+        if (response.status.trim() === status.trim()) {
           global.commons.sendMessage(global.translate('title.change.success')
             .replace(/\$title/g, response.status), sender)
+
+          // we changed title outside of bot
+          if (response.status !== self.current.status) self.current.rawStatus = response.status
+
           self.current.status = response.status
         } else {
           global.commons.sendMessage(global.translate('title.change.failed')
