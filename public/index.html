@@ -594,7 +594,7 @@
       }
     })
 
-    socket.on('stats', function (data) {
+    socket.on('stats', async function (data) {
       var $curFollowers = $("#curFollowers")
 
       if (data.uptime === '' || data.uptime === '00:00:00') {
@@ -615,8 +615,11 @@
       $("#totalChatMsgs").text(data.chatMessages)
       $("#newChtr").text(data.newChatters)
       $("#curFollowers").text(data.currentFollowers)
-      $("#title").text(data.status)
-      $('#title').prop('title', data.status)
+
+      let title = await generateTitle(data.status, data.rawStatus)
+      $("#title").html(title)
+
+      $('#title').prop('title', data.rawStatus)
       $("#game").text(data.game)
       $('#game').prop('title', data.game)
     })
@@ -1292,31 +1295,31 @@
     var useRaw = false
     var cachedTitle = null
     var cachedRawTitle = null
-    var generateTitle = function (current, raw) {
+
+    var loadCustomVariableValue = async function (variable) {
+      return new Promise((resolve, reject) => {
+        socket.emit('custom.variable.value', variable, (err, value) => {
+          resolve(value)
+        })
+      })
+    }
+
+    var generateTitle = async function (current, raw) {
       if (raw.length === 0) return current
-      if (cachedTitle === current) return cachedTitle
-      cachedTitle = current
       cachedRawTitle = raw
 
-      // make regexp from raw - $_var -> (.*?)
-      const regexpFilter = raw.replace(/(\$_[a-zA-Z0-9_]+)/g, '([^\\s]+)').replace(/\|/g, '\\|')
-      let regexp = new RegExp(regexpFilter)
       let variables = raw.match(/(\$_[a-zA-Z0-9_]+)/g)
+      if (cachedTitle === current && _.isNil(variables)) return cachedTitle
 
-      $('strong[data-toggle="tooltip"]').detach()
-      let matched = current.match(regexp)
-      useRaw = false
-      if (!_.isNil(matched)) {
-        useRaw = true
-        for (let match of matched) {
-          if (match === current) continue
-          current = current.replace(match, `<strong style="border-bottom: 1px dotted gray" data-toggle="tooltip" data-placement="bottom" title="${variables.shift()}">${match}</strong>`)
+      if (!_.isNil(variables)) {
+        for (let variable of variables) {
+          useRaw = true
+          let value = await loadCustomVariableValue(variable)
+          raw = raw.replace(variable, `<strong style="border-bottom: 1px dotted gray" data-toggle="tooltip" data-placement="bottom" title="${variable}">${value}</strong>`)
         }
-        setTimeout(() => {
-          $('strong[data-toggle="tooltip"]').tooltip()
-        }, 1)
       }
-      return current
+      cachedTitle = raw
+      return raw
     }
 
     var setStatus = function (id, status) {

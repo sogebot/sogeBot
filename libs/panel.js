@@ -108,6 +108,13 @@ function Panel () {
     socket.on('editUserTwitchTitle', function (data) { global.twitch.editUserTwitchTitle(global.twitch, socket, data) })
     socket.on('updateGameAndTitle', function (data) { global.twitch.updateGameAndTitle(global.twitch, socket, data) })
 
+    // custom var
+    socket.on('custom.variable.value', async (variable, cb) => {
+      let variableFromDb = await global.db.engine.findOne('customvars', { key: variable.replace('$_', '') })
+      if (_.isNil(variableFromDb.key)) cb(null, 'not available')
+      else cb(null, variableFromDb.value)
+    })
+
     socket.on('responses.get', function (at, callback) {
       const responses = flatten(!_.isNil(at) ? global.lib.translate.translations[global.configuration.getValue('lang')][at] : global.lib.translate.translations[global.configuration.getValue('lang')])
       _.each(responses, function (value, key) {
