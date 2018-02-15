@@ -993,7 +993,7 @@
       updateRadios: function () {
         var self = this
         $('#titles-list').empty()
-        var curTitle = $('#title').text()
+        var curTitle = !_.isNil(cachedRawTitle) && useRaw ? cachedRawTitle : $('#title').text()
 
         // all
         var row = $('<div>').addClass('row')
@@ -1287,6 +1287,36 @@
           'sendWithMe': btn.data('sendWithMe')
         })
       }
+    }
+
+    var useRaw = false
+    var cachedTitle = null
+    var cachedRawTitle = null
+    var generateTitle = function (current, raw) {
+      if (raw.length === 0) return current
+      if (cachedTitle === current) return cachedTitle
+      cachedTitle = current
+      cachedRawTitle = raw
+
+      // make regexp from raw - $_var -> (.*?)
+      const regexpFilter = raw.replace(/(\$_[a-zA-Z0-9_]+)/g, '([^\\s]+)').replace(/\|/g, '\\|')
+      let regexp = new RegExp(regexpFilter)
+      let variables = raw.match(/(\$_[a-zA-Z0-9_]+)/g)
+
+      $('strong[data-toggle="tooltip"]').detach()
+      let matched = current.match(regexp)
+      useRaw = false
+      if (!_.isNil(matched)) {
+        useRaw = true
+        for (let match of matched) {
+          if (match === current) continue
+          current = current.replace(match, `<strong style="border-bottom: 1px dotted gray" data-toggle="tooltip" data-placement="bottom" title="${variables.shift()}">${match}</strong>`)
+        }
+        setTimeout(() => {
+          $('strong[data-toggle="tooltip"]').tooltip()
+        }, 1)
+      }
+      return current
     }
 
     var setStatus = function (id, status) {
