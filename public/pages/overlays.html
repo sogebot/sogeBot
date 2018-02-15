@@ -17,32 +17,35 @@
   <li class="nav-item">
     <a class="nav-link" data-toggle="tab" href="#carousel" data-lang="carousel"></a>
   </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#eventlist-text" data-lang="text"></a>
+  </li>
 </ul>
 
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="emotes">
     <div class="row settings">
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong>XSplit / OBS link</strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <a class="btn btn-success" href="/overlays/emotes" target="_blank">/overlays/emotes (1920x1080 or 1280x720)</a>
       </div>
       <div class="w-100"></div>
 
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong>Overlay testing</strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <button class="btn btn-default" onclick="emotesTest('explosion')">Test explosion</button>
         <button class="btn btn-default" onclick="emotesTest('emote')">Test emote</button>
       </div>
       <div class="w-100"></div>
 
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong data-lang="overlay-emotes-size"></strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <abbr title="click to edit" data-config-id="OEmotesSize" onclick="commons.configEditable(this, '')" id="configOEmotesSize"></abbr>
         <div class="input-group" style="display:none;" id="input_OEmotesSize_group">
           <div class="input-group-prepend">
@@ -53,10 +56,10 @@
       </div>
       <div class="w-100"></div>
 
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong data-lang="overlay-emotes-max"></strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <abbr title="click to edit" data-config-id="OEmotesMax" onclick="commons.configEditable(this, '')" id="configOEmotesMax"></abbr>
         <div class="input-group" style="display:none;" id="input_OEmotesMax_group">
           <input id="input_OEmotesMax" class="form-control input-sm" type="text" />
@@ -64,10 +67,10 @@
       </div>
       <div class="w-100"></div>
 
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong data-lang="overlay-emotes-animation"></strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <select id="overlay-emotes-animation-select" class="form-control" onchange="saveEmotesAnimation()">
           <option value="fadeup" data-lang="fade-out-top"></option>
           <option value="fadezoom" data-lang="fade-out-zoom"></option>
@@ -75,10 +78,10 @@
       </div>
       <div class="w-100"></div>
 
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong data-lang="overlay-emotes-animation-time"></strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <abbr title="click to edit" data-config-id="OEmotesAnimationTime" onclick="commons.configEditable(this, 'ms')" id="configOEmotesAnimationTime"></abbr>
         <div class="input-group" style="display:none;" id="input_OEmotesAnimationTime_group">
           <input id="input_OEmotesAnimationTime" class="form-control input-sm" type="text" />
@@ -92,10 +95,10 @@
 
   <div role="tabpanel" class="tab-pane" id="stats">
     <div class="row settings">
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong>XSplit / OBS link</strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <a class="btn btn-success" href="/overlays/stats" target="_blank">/overlays/stats (500x55)</a>
       </div>
     </div>
@@ -103,10 +106,10 @@
 
   <div role="tabpanel" class="tab-pane" id="eventlist-overlay">
     <div class="row settings">
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong>XSplit / OBS link</strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <a class="btn btn-success" href="/overlays/eventlist" target="_blank">/overlays/eventlist (350x220)</a>
       </div>
     </div>
@@ -114,23 +117,23 @@
 
   <div role="tabpanel" class="tab-pane" id="alerts">
     <div class="row settings">
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong>XSplit / OBS link</strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <a class="btn btn-success" href="/overlays/alerts" target="_blank">/overlays/alerts (1920x1080 or 1280x720)</a>
       </div>
       <div class="w-100"></div>
 
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong>Overlay testing</strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <button class="btn btn-default" onclick="replayTest()">Test replay</button>
       </div>
     </div>
 
-    <div class="col">
+    <div class="col" style="max-width: 50%">
       <span class="title title-part text-default">Replay settings
         <a href="https://github.com/sogehige/sogeBot/wiki/OBS-replays-through-alert-systems">
           <small>How to setup</small>
@@ -140,10 +143,10 @@
     <div class="w-100"></div>
 
     <div class="row settings settings-part">
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong data-lang="page-settings.overlays.replay.position"></strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <select id="overlay-replay-position-select" class="form-control" onchange="saveReplayPos()">
           <option value="left" data-lang="page-settings.overlays.replay.posleft"></option>
           <option value="right" data-lang="page-settings.overlays.replay.posright"></option>
@@ -151,10 +154,10 @@
       </div>
       <div class="w-100"></div>
 
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong data-lang="page-settings.overlays.replay.filter.title"></strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <select id="overlay-replay-filter-select" class="form-control" onchange="saveReplayFil()">
           <option value="none" data-lang="page-settings.overlays.replay.filter.none"></option>
           <option value="grayscale" data-lang="page-settings.overlays.replay.filter.grayscale"></option>
@@ -165,10 +168,10 @@
       </div>
       <div class="w-100"></div>
 
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong data-lang="page-settings.overlays.replay.offsetX"></strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <abbr title="click to edit" data-config-id="replayOffsetX" onclick="commons.configEditable(this, '')" id="configReplayOffsetX"></abbr>
         <div class="input-group" style="display:none;" id="input_replayOffsetX_group">
           <div class="input-group-prepend">
@@ -179,10 +182,10 @@
       </div>
       <div class="w-100"></div>
 
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong data-lang="page-settings.overlays.replay.offsetY"></strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <abbr title="click to edit" data-config-id="replayOffsetY" onclick="commons.configEditable(this, '')" id="configReplayOffsetY"></abbr>
         <div class="input-group" style="display:none;" id="input_replayOffsetY_group">
           <div class="input-group-prepend">
@@ -193,10 +196,10 @@
       </div>
       <div class="w-100"></div>
 
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong data-lang="page-settings.overlays.replay.size"></strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <abbr title="click to edit" data-config-id="replaySize" onclick="commons.configEditable(this, '')" id="configReplaySize"></abbr>
         <div class="input-group" style="display:none;" id="input_replaySize_group">
           <div class="input-group-prepend">
@@ -207,10 +210,10 @@
       </div>
       <div class="w-100"></div>
 
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong data-lang="page-settings.overlays.replay.volume"></strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <abbr title="click to edit" data-config-id="replayVolume" onclick="commons.configEditable(this, '')" id="configReplayVolume"></abbr>
         <div class="input-group" style="display:none;" id="input_replayVolume_group">
           <div class="input-group-prepend">
@@ -221,10 +224,10 @@
       </div>
       <div class="w-100"></div>
 
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong data-lang="page-settings.overlays.replay.label"></strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <input id="replayLabelToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
       </div>
     </div>
@@ -232,29 +235,56 @@
 
   <div role="tabpanel" class="tab-pane" id="carousel">
     <div class="row settings">
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong>XSplit / OBS link</strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <a class="btn btn-success" href="/overlays/carousel" target="_blank">/overlays/carousel</a>
       </div>
       <div class="w-100"></div>
 
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <strong data-lang="overlay-carousel-upload"></strong>
       </div>
-      <div class="col">
+      <div class="col" style="max-width: 50%">
         <input type="file" id="file-input-carousel" accept="image/*" />
       </div>
     </div>
 
-    <div class="col">
+    <div class="col" style="max-width: 50%">
       <span class="title title-part text-default">Images</span>
     </div>
     <div class="row settings settings-part">
       <div id="carousel-image-list"></div>
     </div>
   </div>
+
+  <div role="tabpanel" class="tab-pane" id="eventlist-text">
+      <div class="row settings">
+        <div class="col" style="max-width: 50%">
+          <strong>XSplit / OBS link</strong>
+        </div>
+        <div class="col" style="max-width: 50%">
+          <a class="btn btn-success" style="max-width: 100%; word-wrap: break-word; text-align: left; margin-bottom: .1rem; display: inline-block; white-space: normal;" id="text-url" href="/overlays/text" target="_blank">/overlays/text</a>
+        </div>
+        <div class="w-100"></div>
+
+        <div class="col" style="max-width: 50%">
+          <strong data-lang="overlay-text-link-generator"></strong>
+        </div>
+        <div class="col" style="max-width: 50%">
+          <textarea id="text-url-generator" class="form-control" placeholder="Paste your text or html to generate base64 below and URL above"></textarea>
+        </div>
+        <div class="w-100"></div>
+
+        <div class="col" style="max-width: 50%">
+          <strong data-lang="overlay-text-decode-base64"></strong>
+        </div>
+        <div class="col" style="max-width: 50%">
+          <textarea id="text-decode-base64" class="form-control" placeholder="Paste your base64 to generate URL and text above"></textarea>
+        </div>
+      </div>
+    </div>
 </div>
 
 <script>
@@ -346,4 +376,36 @@
     })
   }
 
+  // #text-url | #text-url-generator | #text-decode-b64
+  $('#text-url-generator').on('keyup', (event) => {
+    let value = $(event.currentTarget).val()
+    if (value.trim().length === 0) {
+      $('#text-url').attr('href', `/overlays/text`).text(`/overlays/text`)
+      $('#text-decode-base64').val('')
+      return
+    }
+    let b64string = btoa(value)
+    $('#text-url').attr('href', `/overlays/text?${b64string}`).text(`/overlays/text?${b64string}`)
+
+    $('#text-decode-base64').val(b64string)
+  })
+
+  $('#text-decode-base64').on('keyup', (event) => {
+    let value = $(event.currentTarget).val()
+    if (value.trim().length === 0) {
+      $('#text-url').attr('href', `/overlays/text`).text(`/overlays/text`)
+      $('#text-url-generator').val('')
+      return
+    }
+
+    let decoded = ''
+    try {
+      decoded = atob(value)
+    } catch (e) {
+      // pass
+    }
+
+    $('#text-url-generator').val(decoded)
+    $('#text-url').attr('href', `/overlays/text?${value}`).text(`/overlays/text?${value}`)
+  })
 </script>
