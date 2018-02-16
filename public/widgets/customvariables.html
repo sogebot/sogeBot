@@ -69,7 +69,7 @@ var customVariablesWidget = {
   },
   generateLabels: function (values, current) {
     current = current || null
-    values = values || 'You didn\'t set your options yet'
+    values = values || _.get(translations, 'custom-variables.no-options-set', '{custom-variables.no-options-set}')
     let out = ''
     if (current && values.toLowerCase().indexOf(current.toLowerCase().trim()) === -1) {
       out += `<label style="flex: 1 auto;" class="btn btn-secondary ${out.length === 0 ? 'active' : ''}">
@@ -188,7 +188,7 @@ var customVariablesWidget = {
       }
       // set message if variables are empty
       if (i === 0) {
-        main.append('<div style="margin-left: 3.2rem" class="text-primary"><sup class="fa fa-caret-up"></sup> Set your variables to watch here</div>')
+        main.append(`<div style="margin-left: 3.2rem" class="text-primary"><sup class="fa fa-caret-up"></sup> ${_.get(translations, 'custom-variables.set-your-variables-to-watch-here', '{custom-variables.set-your-variables-to-watch-here}')}</div>`)
       }
       // /SET customvariables-main ////////////////////////////////////////////////
 
@@ -209,13 +209,13 @@ var customVariablesWidget = {
                 </div>
                 <input type="text" class="form-control" value="${variable.name}" disabled="disabled"/>
                 <div class="input-group-prepend">
-                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">type</span>
+                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">${_.get(translations, 'custom-variables.type', '{custom-variables.type}')}</span>
                 </div>
                 <select class="form-control" disabled="disabled">
                   <option>${variable.type}</option>
                 </select>
                 <div class="input-group-append">
-                  <button type="button" data-name="${variable.name}" onclick="customVariablesWidget.unwatch(this)" class="btn btn-danger">Unwatch</button>
+                  <button type="button" data-name="${variable.name}" onclick="customVariablesWidget.unwatch(this)" class="btn btn-danger">${_.get(translations, 'custom-variables.unwatch', '{custom-variables.unwatch}')}</button>
                 </div>
               </div>
             `)
@@ -228,21 +228,21 @@ var customVariablesWidget = {
                 </div>
                 <input type="text" class="form-control" value="${variable.name}" disabled="disabled">
                 <div class="input-group-prepend">
-                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">type</span>
+                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">${_.get(translations, 'custom-variables.type', '{custom-variables.type}')}</span>
                 </div>
                 <select class="form-control" disabled="disabled">
-                  <option>options</option>
+                  <option>${_.get(translations, 'custom-variables.options', '{custom-variables.options}')}</option>
                 </select>
                 <div class="input-group-append">
-                  <button type="button" data-name="${variable.name}" onclick="customVariablesWidget.unwatch(this)" class="btn btn-danger">Unwatch</button>
+                  <button type="button" data-name="${variable.name}" onclick="customVariablesWidget.unwatch(this)" class="btn btn-danger">${_.get(translations, 'custom-variables.unwatch', '{custom-variables.unwatch}')}</button>
                 </div>
               </div>
 
               <div class="input-group" data-variable-group="${variable.name}" style="margin-top: -1px; margin-bottom: 0.2rem">
                 <div class="input-group-prepend">
-                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">options</span>
+                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">${_.get(translations, 'custom-variables.options', '{custom-variables.options}')}</span>
                 </div>
-                <input type="text" class="form-control" data-custom-variable-input data-name="${variable.name}" placeholder="option1, option2, option3, here is option 4" value="${variable.value ? variable.value : ''}">
+                <input type="text" class="form-control" data-custom-variable-input data-name="${variable.name}" placeholder="${_.get(translations, 'custom-variables.options-placeholder', '{custom-variables.options-placeholder}')}" value="${variable.value ? variable.value : ''}">
                 <div class="input-group-append" style="margin-top:1px;">
                   <button class="btn btn-secondary d-none" type="button" data-name="${variable.name}" onclick="customVariablesWidget.saveValues(this)"><i class="fa fa-download"></i></button>
                 </div>
@@ -262,15 +262,15 @@ var customVariablesWidget = {
             <div class="invalid-tooltip"></div>
           </div>
           <div class="input-group-prepend">
-            <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">type</span>
+            <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">${_.get(translations, 'custom-variables.type', '{custom-variables.type}')}</span>
           </div>
           <select class="form-control">
-            <option value="number">number</option>
-            <option value="text">text</option>
-            <option value="options">options</option>
+            <option value="number">${_.get(translations, 'custom-variables.number', '{custom-variables.number}')}</option>
+            <option value="text">${_.get(translations, 'custom-variables.text', '{custom-variables.text}')}</option>
+            <option value="options">${_.get(translations, 'custom-variables.options', '{custom-variables.options}')}</option>
           </select>
           <div class="input-group-append">
-            <button type="button" class="btn btn-primary" onclick="customVariablesWidget.watch(this)">Watch</button>
+            <button type="button" class="btn btn-primary" onclick="customVariablesWidget.watch(this)">${_.get(translations, 'custom-variables.watch', '{custom-variables.watch}')}</button>
           </div>
         </div>
       `)

@@ -1022,7 +1022,7 @@ class Twitch {
     if (!_.isNil(match)) {
       for (let variable of title.match(regexp).map((o) => o.replace('$_', ''))) {
         let variableFromDb = await global.db.engine.findOne('customvars', { key: variable })
-        if (_.isNil(variableFromDb.key)) variableFromDb = { key: variable, value: `not available` }
+        if (_.isNil(variableFromDb.key)) variableFromDb = { key: variable, value: global.translate('webpanel.not-available') }
         title = title.replace(new RegExp(`\\$_${variableFromDb.key}`, 'g'), variableFromDb.value)
       }
     }
