@@ -111,7 +111,7 @@ function Panel () {
     // custom var
     socket.on('custom.variable.value', async (variable, cb) => {
       let variableFromDb = await global.db.engine.findOne('customvars', { key: variable.replace('$_', '') })
-      if (_.isNil(variableFromDb.key)) cb(null, 'not available')
+      if (_.isNil(variableFromDb.key)) cb(null, global.translate('webpanel.not-available'))
       else cb(null, variableFromDb.value)
     })
 

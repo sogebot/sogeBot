@@ -212,6 +212,21 @@
       "overlays": "Overlaye",
       "gallery": "Galerie médií"
     },
+    "placeholders": {
+      "text-url-generator": "Vložte text nebo html pro vytvoření base64 níže a URL výše",
+      "text-decode-base64": "Vložte base64 a vygenerujte URL a text výše"
+    },
+    "custom-variables": {
+      "set-your-variables-to-watch-here": "Zde nastavte proměnné",
+      "type": "typ",
+      "unwatch": "Nesledovat",
+      "watch": "Sledovat",
+      "options": "možnosti",
+      "number": "číslo",
+      "text": "text",
+      "options-placeholder": "možnost1, možnost2, možnost3, zde je možnost 4",
+      "no-options-set": "Vaše možnosti jste ještě nenastavili"
+    },
     "timers": {
       "title": "Časovače",
       "timer": "Časovač",
@@ -617,7 +632,7 @@
     "change-game": "Změnit hru",
     "click-to-change": "kliknutím změňte",
     "uptime": "uptime",
-    "not-available": "Not Available",
+    "not-available": "Není k dispozici",
     "max-viewers": "Nejvíce diváků",
     "new-chatters": "Nových diváků",
     "chat-messages": "Zpráv v chatu",

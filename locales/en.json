@@ -212,6 +212,21 @@
       "overlays": "Overlays",
       "gallery": "Media gallery"
     },
+    "placeholders": {
+      "text-url-generator": "Paste your text or html to generate base64 below and URL above",
+      "text-decode-base64": "Paste your base64 to generate URL and text above"
+    },
+    "custom-variables": {
+      "set-your-variables-to-watch-here": "Set your variables to watch here",
+      "type": "type",
+      "unwatch": "Unwatch",
+      "watch": "Watch",
+      "options": "options",
+      "number": "number",
+      "text": "text",
+      "options-placeholder": "option1, option2, option3, here is option 4",
+      "no-options-set": "You didn't set your options yet"
+    },
     "timers": {
       "title": "Timers",
       "timer": "Timer",

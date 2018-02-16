@@ -273,7 +273,7 @@
           <strong data-lang="overlay-text-link-generator"></strong>
         </div>
         <div class="col" style="max-width: 50%">
-          <textarea id="text-url-generator" class="form-control" placeholder="Paste your text or html to generate base64 below and URL above"></textarea>
+          <textarea id="text-url-generator" class="form-control"></textarea>
         </div>
         <div class="w-100"></div>
 
@@ -281,7 +281,7 @@
           <strong data-lang="overlay-text-decode-base64"></strong>
         </div>
         <div class="col" style="max-width: 50%">
-          <textarea id="text-decode-base64" class="form-control" placeholder="Paste your base64 to generate URL and text above"></textarea>
+          <textarea id="text-decode-base64" class="form-control"></textarea>
         </div>
       </div>
     </div>
@@ -408,4 +408,7 @@
     $('#text-url-generator').val(decoded)
     $('#text-url').attr('href', `/overlays/text?${value}`).text(`/overlays/text?${value}`)
   })
+
+  $('#text-url-generator').attr('placeholder', _.get(translations, 'placeholders.text-url-generator', '{placeholders.text-url-generator}'))
+  $('#text-decode-base64').attr('placeholder', _.get(translations, 'placeholders.text-decode-base64', '{placeholders.text-decode-base64}'))
 </script>
