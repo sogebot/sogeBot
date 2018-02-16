@@ -20,6 +20,9 @@
   <li class="nav-item">
     <a class="nav-link" data-toggle="tab" href="#eventlist-text" data-lang="text"></a>
   </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#eventlist-credits" data-lang="credits"></a>
+  </li>
 </ul>
 
 <div class="tab-content">
@@ -285,6 +288,185 @@
         </div>
       </div>
     </div>
+
+    <div role="tabpanel" class="tab-pane" id="eventlist-credits">
+        <div class="row settings">
+          <div class="col" style="max-width: 50%">
+            <strong>XSplit / OBS link</strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <a class="btn btn-success" style="max-width: 100%; word-wrap: break-word; text-align: left; margin-bottom: .1rem; display: inline-block; white-space: normal;" href="/overlays/credits" target="_blank">/overlays/credits</a>
+          </div>
+        </div>
+
+        <div class="col" style="max-width: 50%">
+          <span class="title title-part text-default">Show</span>
+        </div>
+        <div class="row settings settings-part">
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-show-followers"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="creditsFollowersToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-show-hosts"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="creditsHostsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-show-subscribers"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="creditsSubscribersToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-show-subgifts"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="creditsSubgiftsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-show-resubs"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="creditsResubsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-show-cheers"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="creditsCheersToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+        </div>
+
+        <div class="col" style="max-width: 50%">
+          <span class="title title-part text-default">Rolling speed</span>
+        </div>
+        <div class="row settings settings-part">
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-speed"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsSpeed" class="form-control input-sm" type="text" />
+          </div>
+        </div>
+
+        <div class="col" style="max-width: 50%">
+          <span class="title title-part text-default">Text</span>
+        </div>
+        <div class="row settings settings-part">
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-last-message"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsLastMessage" class="form-control input-sm" type="text" />
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-last-submessage"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsLastSubMessage" class="form-control input-sm" type="text" />
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-stream-by"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsStreamBy" class="form-control input-sm" type="text" />
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-followed-by"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsFollowedBy" class="form-control input-sm" type="text" />
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-hosted-by"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsHostedBy" class="form-control input-sm" type="text" />
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-cheer-by"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsCheerBy" class="form-control input-sm" type="text" />
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-subscribed-by"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsSubscribedBy" class="form-control input-sm" type="text" />
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-resubscribed-by"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsResubscribedBy" class="form-control input-sm" type="text" />
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-subgift-by"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsSubgiftBy" class="form-control input-sm" type="text" />
+          </div>
+        </div>
+
+        <div class="col" style="max-width: 50%">
+          <span class="title title-part text-default">Social</span>
+        </div>
+        <div class="row settings settings-part">
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-social-facebook"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsSocialFacebook" class="form-control input-sm" type="text" />
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-social-twitter"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsSocialTwitter" class="form-control input-sm" type="text" />
+          </div>
+          <div class="w-100"></div>
+          <div class="col" style="max-width: 50%">
+
+            <strong data-lang="overlay-credits-social-twitch"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsSocialTwitch" class="form-control input-sm" type="text" />
+          </div>
+        </div>
+      </div>
 </div>
 
 <script>
@@ -320,6 +502,85 @@
 
     $('#overlay-replay-position-select option[value=' + data.replayPosition + ']').prop('selected', true)
     $('#overlay-replay-filter-select option[value=' + data.replayFilter + ']').prop('selected', true)
+
+    // CREDITS ////////////////////////////////////////////////////////////////
+    $('#input_creditsSpeed').val(data.creditsSpeed)
+    $('#input_creditsSpeed').attr('placeholder', _.get(translations, 'placeholders.creditsSpeed', '{placeholders.creditsSpeed}'))
+
+    $('#input_creditsLastMessage').val(data.creditsLastMessage)
+    $('#input_creditsLastSubMessage').val(data.creditsLastSubMessage)
+    $('#input_creditsStreamBy').val(data.creditsStreamBy)
+    $('#input_creditsFollowedBy').val(data.creditsFollowedBy)
+    $('#input_creditsHostedBy').val(data.creditsHostedBy)
+    $('#input_creditsCheerBy').val(data.creditsCheerBy)
+    $('#input_creditsSubscribedBy').val(data.creditsSubscribedBy)
+    $('#input_creditsResubscribedBy').val(data.creditsResubscribedBy)
+    $('#input_creditsSubgiftBy').val(data.creditsSubgiftBy)
+
+    $('#input_creditsSocialFacebook').val(data.creditsSocialFacebook)
+    $('#input_creditsSocialTwitter').val(data.creditsSocialTwitter)
+    $('#input_creditsSocialTwitch').val(data.creditsSocialTwitch)
+
+    $('#creditsFollowersToggle').bootstrapToggle(options)
+    $('#creditsFollowersToggle').bootstrapToggle(data.creditsFollowers ? 'on' : 'off')
+    $('#creditsFollowersToggle').off('change')
+    $('#creditsFollowersToggle').on('change', function () {
+      var data = {}
+      data['creditsFollowers'] = $(this).prop('checked')
+      if ($('#creditsFollowersToggle').data('init')) socket.emit('saveConfiguration', data)
+    })
+    $('#creditsFollowersToggle').data('init', true)
+
+    $('#creditsHostsToggle').bootstrapToggle(options)
+    $('#creditsHostsToggle').bootstrapToggle(data.creditsHosts ? 'on' : 'off')
+    $('#creditsHostsToggle').off('change')
+    $('#creditsHostsToggle').on('change', function () {
+      var data = {}
+      data['creditsHosts'] = $(this).prop('checked')
+      if ($('#creditsHostsToggle').data('init')) socket.emit('saveConfiguration', data)
+    })
+    $('#creditsHostsToggle').data('init', true)
+
+    $('#creditsSubscribersToggle').bootstrapToggle(options)
+    $('#creditsSubscribersToggle').bootstrapToggle(data.creditsSubscribers ? 'on' : 'off')
+    $('#creditsSubscribersToggle').off('change')
+    $('#creditsSubscribersToggle').on('change', function () {
+      var data = {}
+      data['creditsSubscribers'] = $(this).prop('checked')
+      if ($('#creditsSubscribersToggle').data('init')) socket.emit('saveConfiguration', data)
+    })
+    $('#creditsSubscribersToggle').data('init', true)
+
+    $('#creditsSubgiftsToggle').bootstrapToggle(options)
+    $('#creditsSubgiftsToggle').bootstrapToggle(data.creditsSubgifts ? 'on' : 'off')
+    $('#creditsSubgiftsToggle').off('change')
+    $('#creditsSubgiftsToggle').on('change', function () {
+      var data = {}
+      data['creditsSubgifts'] = $(this).prop('checked')
+      if ($('#creditsSubgiftsToggle').data('init')) socket.emit('saveConfiguration', data)
+    })
+    $('#creditsSubgiftsToggle').data('init', true)
+
+    $('#creditsResubsToggle').bootstrapToggle(options)
+    $('#creditsResubsToggle').bootstrapToggle(data.creditsResubs ? 'on' : 'off')
+    $('#creditsResubsToggle').off('change')
+    $('#creditsResubsToggle').on('change', function () {
+      var data = {}
+      data['creditsResubs'] = $(this).prop('checked')
+      if ($('#creditsResubsToggle').data('init')) socket.emit('saveConfiguration', data)
+    })
+    $('#creditsResubsToggle').data('init', true)
+
+    $('#creditsCheersToggle').bootstrapToggle(options)
+    $('#creditsCheersToggle').bootstrapToggle(data.creditsCheers ? 'on' : 'off')
+    $('#creditsCheersToggle').off('change')
+    $('#creditsCheersToggle').on('change', function () {
+      var data = {}
+      data['creditsCheers'] = $(this).prop('checked')
+      if ($('#creditsCheersToggle').data('init')) socket.emit('saveConfiguration', data)
+    })
+    $('#creditsCheersToggle').data('init', true)
+    // !CREDITS ///////////////////////////////////////////////////////////////
   })
 
   socket.emit('overlay.images.get')
@@ -411,4 +672,11 @@
 
   $('#text-url-generator').attr('placeholder', _.get(translations, 'placeholders.text-url-generator', '{placeholders.text-url-generator}'))
   $('#text-decode-base64').attr('placeholder', _.get(translations, 'placeholders.text-decode-base64', '{placeholders.text-decode-base64}'))
+
+  $('input[id^="input_credits"]').off('keyup').on('keyup', (event) => {
+    let value = $(event.currentTarget).val()
+    let id = $(event.currentTarget).attr('id').split('_')[1]
+    let data = {}; data[id] = value
+    socket.emit('saveConfiguration', data)
+  })
 </script>

@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Credits</title>
+    <meta charset="utf-8">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#f4f5f6">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#f4f5f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300" rel="stylesheet">
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/auth/token.js"></script>
+
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300);
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      .center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+      }
+
+      .end {
+        position: relative;
+        text-align: center;
+      }
+
+      html, body {
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      #wrapper {
+        position: absolute;
+        left: -500%;
+        width: 100%;
+        font: 300 30px/1 'Open Sans Condensed', sans-serif;
+        text-align: center;
+        text-transform: uppercase;
+        color: #fff;
+        text-shadow: 0px 0px 1rem #000;
+      }
+
+      #wrapper * {
+        opacity: 0;
+      }
+
+      .title {
+        font-size: 125px;
+        font-weight: bold;
+        margin-left: 5%;
+        margin-right: 5%;
+      }
+      .subtitle {
+        margin-left: 5%;
+        margin-right: 5%;
+        margin-bottom: 50px;
+        font-size: 50px;
+      }
+
+      .last-message {
+        margin-bottom: 10px;
+        font-weight: bold
+      }
+
+      .last-submessage {
+        margin-bottom: 10px;
+        margin-bottom: 200px;
+      }
+
+      .social {
+        margin-bottom: 10px;
+        margin-left: 10%;
+        font-size: 40px;
+        text-align: left;
+      }
+
+      .job {
+        font-size: 18px;
+      }
+
+      .hosted-by {
+        font-size: 45px;
+      }
+
+      .message {
+        font-size: 20px;
+        margin-bottom: 50px;
+      }
+
+      .last-message, .last-submessage {
+        margin-right: 5%;
+        margin-left: 5%;
+      }
+
+      .name, .host-name {
+        font-size: 35px;
+        width: 100%;
+        display: inline-block;
+      }
+
+      .host-name {
+        margin-bottom: 5px;
+        margin-top: 5px;
+      }
+
+      .hosted-column {
+        column-count: 2;
+      }
+    </style>
+    </head>
+    <body>
+      <div id='wrapper'>
+        <div class='title'><span id="game"></span></div>
+        <div class='subtitle'><span id="title"></span></div>
+
+        <div class='job' id="stream-by"></div>
+        <div class='name' id="streamer"></div>
+        <div class="message"></div>
+
+        <div id="events" class="no-fade"></div>
+
+        <div class='hosted-by' id="hosted-by"></div>
+        <div class='hosted-column' id="hosts"></div>
+
+        <div class="half-end"><!-- empty page --></div>
+        <div class="end no-fade">
+          <div class="center no-fade">
+            <div class="last-message no-fade"><span id="last-message" class="no-fade"></span></div>
+            <div class="last-submessage no-fade"><span id="last-submessage" class="no-fade"></span></div>
+
+            <div class="no-fade" id="social"></div>
+          </div>
+        </div>
+      </div>
+
+    <script src="/dist/jquery/js/jquery.min.js"></script>
+    <script src="/dist/lodash/js/lodash.min.js"></script>
+    <script src="/dist/velocity-animate/js/velocity.min.js"></script>
+
+    <script>
+      var resize = function (el, max, size, width) {
+        if (size === max) return size
+        width = width || 0
+        size = size || 1
+        $(el).css('font-size', (size + 1) + 'px')
+        if ($(el).width() >= width) {
+          return resize(el, max, size + 1, $(el).width())
+        } else {
+          $(el).css('font-size', (size - 1) + 'px')
+        }
+        return size
+      }
+
+      var socket = io('/overlays/credits', {query: "token="+token})
+      socket.emit('load', (err, events, streamer, game, title, hosts, socials, messages, custom, speed, show) => {
+        $('#streamer').text(streamer)
+        $('#game').text(game)
+        $('#title').text(title)
+
+        for (let [key, value] of Object.entries(messages)) {
+          $('.hosted-by').text(`${_.get(custom, 'hosted-by', 'hosted by')}`)
+          if (key === 'lastMessage')  $('#last-message').text(value)
+          else $('#last-submessage').text(value)
+        }
+
+        let size = resize('#game', 200)
+        resize('#title', size - Math.floor((size / 4))) // title should be smaller than game
+        size = resize('#last-message', 200)
+        resize('#last-submessage', size - Math.floor((size / 4))) // submessage should be smaller than message
+
+        let $events = $('#events')
+        let $hosts = $('#hosts')
+        for (let [index, event] of Object.entries(events)) {
+          event.message = _.get(event, 'message', '')
+          if (event.event === 'follow' && show.followers) {
+            $events.append(`
+              <div class='job'>${_.get(custom, 'followed-by', 'followed by')}</div>
+              <div class='name'>${event.username}</div>
+              <div class="message">${event.message}</div>
+            `)
+          } else if (event.event === 'cheer' && show.cheers) {
+            $events.append(`
+              <div class='job'>${_.get(custom, 'cheer-by', 'cheer <strong>$bits bits</strong> by').replace('$bits', event.bits)}</div>
+              <div class='name'>${event.username}</div>
+              <div class="message">${event.message}</div>
+            `)
+          } else if (event.event === 'sub' && show.subscribers) {
+            $events.append(`
+              <div class='job'>${_.get(custom, 'subscribed-by', 'subscribed by')}</div>
+              <div class='name'>${event.username}</div>
+              <div class="message">${event.message}</div>
+            `)
+          } else if (event.event === 'resub' && show.resubs) {
+            $events.append(`
+              <div class='job'>${_.get(custom, 'resubscribed-by', 'resubscribed <strong>$months months</strong> by').replace('$months', event.months)}</div>
+              <div class='name'>${event.username}</div>
+              <div class="message">${event.message}</div>
+            `)
+          } else if (event.event === 'subgift' && show.subgifts) {
+            $events.append(`
+              <div class='job'>${_.get(custom, 'subgift-by', '<strong>$from</strong> gifted subscribe to').replace('$from', event.from)}</div>
+              <div class='name'>${event.username}</div>
+              <div class="message">${event.message}</div>
+            `)
+          }
+        }
+
+        if (show.hosts) {
+          for (let host of hosts) {
+            $hosts.append(`<div class='host-name'>${host}</div>`)
+          }
+        }
+
+        for (let [key, value] of Object.entries(socials)) {
+          switch (key) {
+            case 'facebook':
+              $('#social').append(`
+                <div class="social no-fade"><i class="fab fa-${key}-square no-fade"></i> ${value}</div>
+              `)
+              break
+            default:
+              $('#social').append(`
+                <div class="social no-fade"><i class="fab fa-${key} no-fade"></i> ${value}</div>
+              `)
+          }
+        }
+
+        if ($hosts.text().length === 0) {
+          $('.hosted-by').remove()
+          $('.hosted-column').remove()
+        }
+
+        $('#stream-by').text(`${_.get(custom, 'stream-by', 'stream by')}`)
+
+        // window height
+        let wHeight = $(document).height()
+
+        // set windows height for end (to be on "separate" page)
+        $('.end').css('height', `${wHeight}px`)
+        $('.half-end').css('height', `${wHeight/2}px`)
+
+        // get height of wrapper
+        let height = $('#wrapper').innerHeight()
+        let delay = 0 //10 * 1000 // 10s delay
+
+        // set css of wrapper
+        $('#wrapper')
+          .css('left', 0)
+          .css('top', `${wHeight}px`)
+
+        // roll after delay
+        setTimeout(() => {
+          $('#wrapper').velocity({ top: (wHeight - height) + 'px' }, "linear", (wHeight + height) * speed)
+        }, delay)
+
+        let elements = $('#wrapper *')
+        //remove end from elements
+
+        // fade out
+        let outElements = _.clone(elements)
+        setInterval(() => {
+          for (let i in outElements) {
+            try {
+              if (!outElements.hasOwnProperty(i) || i === 'length' || i === 'prevObject') continue
+              if ($(outElements[i]).offset().top < 50 &&
+                !$(outElements[i]).hasClass('fab') &&
+                !$(outElements[i]).hasClass('no-fade') &&
+                !$(outElements[i]).hasClass('hosted-column')) {
+                $(outElements[i]).velocity({ opacity: 0 }, speed * 35)
+                delete outElements[i]
+              }
+            } catch (e) {
+              console.debug(e)
+              console.debug(outElements[i])
+              continue
+            }
+          }
+        }, 1)
+
+        // fade in
+        let inElements = _.clone(elements)
+        setInterval(() => {
+          for (let i in inElements) {
+            try {
+              if (!inElements.hasOwnProperty(i) || i === 'length' || i === 'prevObject') continue
+              if ($(inElements[i]).offset().top < wHeight - 50) {
+                $(inElements[i]).velocity({ opacity: 1 }, speed * 35)
+                delete inElements[i]
+              }
+            } catch (e) {
+              console.debug(e)
+              console.debug(inElements[i])
+              continue
+            }
+          }
+        }, 1)
+      })
+    </script>
+    </body>
+  </html>
