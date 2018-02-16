@@ -318,6 +318,15 @@ class Twitch {
     }
     d('Current host count: %s, Hosts: %s', request.body.hosts.length, _.map(request.body.hosts, 'host_login').join(', '))
     this.current.hosts = request.body.hosts.length
+
+    // save hosts list
+    let cached = await this.cached()
+    for (let host of _.map(request.body.hosts, 'host_login')) {
+      if (!_.includes(cached.hosts, host)) {
+        cached.hosts.unshift(host)
+      }
+    }
+    await this.cached(cached)
     setTimeout(() => this.getChannelHosts(), 30000)
   }
 
@@ -567,7 +576,7 @@ class Twitch {
         this.chatMessagesAtStart = global.parser.linesParsed
 
         let cached = await this.cached()
-        this.cached({ followers: cached.followers, subscribers: cached.subscribers }) // we dont want to have cached hosts on stream off
+        this.cached({ followers: cached.followers, subscribers: cached.subscribers, hosts: [] }) // we dont want to have cached hosts on stream off
 
         if (!global.webhooks.enabled.streams) {
           global.events.fire('stream-started')
