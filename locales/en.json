@@ -990,14 +990,14 @@
   },
   "followage": {
     "success": {
-      "never": "$sender, $username is not a channel follower",
-      "time": "$sender, $username is following channel $diff"
+      "never": "(if $sender=$username|$sender|$sender, $username) is not a channel follower",
+      "time": "(if $sender=$username|$sender|$sender, $username) is following channel $diff"
     }
   },
   "subage": {
     "success": {
-      "never": "$sender, $username is not a channel subscriber",
-      "time": "$sender, $username is subscriber of channel for $diff"
+      "never": "(if $sender=$username|$sender|$sender, $username) is not a channel subscriber",
+      "time": "(if $sender=$username|$sender|$sender, $username) is subscriber of channel for $diff"
     }
   },
   "age": {
