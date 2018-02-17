@@ -233,8 +233,11 @@ class Events {
 
   async checkCommandSendXTimes (event, attributes) {
     const d = debug('events:checkCommandSendXTimes')
+    const regexp = new RegExp(`^${event.definitions.commandToWatch}\\s`, 'i')
+
     var shouldTrigger = false
-    if (attributes.message.startsWith(event.definitions.commandToWatch)) {
+    attributes.message += ' '
+    if (attributes.message.match(regexp)) {
       event.triggered.runEveryXCommands = _.get(event, 'triggered.runEveryXCommands', 0)
       event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0)
 
