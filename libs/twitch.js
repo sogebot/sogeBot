@@ -1041,17 +1041,20 @@ class Twitch {
 
     var request
     var status
+    var game
     const url = `https://api.twitch.tv/kraken/channels/${global.channelId}`
     try {
       status = await this.parseTitle(args.title)
 
-      if (!_.isNil(args.game)) await this.gameCache(args.game) // save game to cache, if changing game
-      else args.game = await this.gameCache() // we are not setting game -> load last game
+      if (!_.isNil(args.game)) {
+        game = args.game
+        await this.gameCache(args.game) // save game to cache, if changing game
+      } else game = await this.gameCache() // we are not setting game -> load last game
 
       request = await snekfetch.put(url, {
         data: {
           channel: {
-            game: !_.isNull(args.game) ? args.game.trim() : self.current.game,
+            game: game,
             status: status
           }
         }
