@@ -736,12 +736,18 @@ class Twitch {
   }
 
   async followers (self, sender) {
-    let [when, cache, users] = await Promise.all([self.when(), self.cached(), global.users.getAll({ is: { online: true, follower: true } })])
+    let [events, users] = await Promise.all([global.db.engine.find('widgetsEventList'), global.users.getAll({ is: { online: true, follower: true } })])
 
+    events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'follow' })
     moment.locale(global.configuration.getValue('lang'))
-    let lastFollowAgo = _.get(when, 'followed_at', 0) > 0 ? moment(when.followed_at).fromNow() : ''
-    let lastFollowUsername = _.get(cache, 'followers[0]', 'n/a')
+
+    let lastFollowAgo = ''
+    let lastFollowUsername = 'n/a'
     let onlineFollowersCount = _.size(_.filter(users, (o) => o.username !== config.settings.broadcaster_username && o.username !== config.settings.bot_username)) // except bot and user
+    if (events.length > 0) {
+      lastFollowUsername = events[0].username
+      lastFollowAgo = moment(events[0].timestamp).fromNow()
+    }
 
     let message = global.commons.prepare('followers', {
       lastFollowAgo: lastFollowAgo,
@@ -752,12 +758,18 @@ class Twitch {
   }
 
   async subs (self, sender) {
-    let [when, cache, users] = await Promise.all([self.when(), self.cached(), global.users.getAll({ is: { online: true, subscriber: true } })])
+    let [events, users] = await Promise.all([global.db.engine.find('widgetsEventList'), global.users.getAll({ is: { online: true, subscriber: true } })])
 
+    events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'sub' || o.event === 'resub' || o.event === 'subgift' })
     moment.locale(global.configuration.getValue('lang'))
-    let lastSubAgo = _.get(when, 'subscribed_at', 0) > 0 ? moment(when.subscribed_at).fromNow() : ''
-    let lastSubUsername = _.get(cache, 'subscribers[0]', 'n/a')
+
+    let lastSubAgo = ''
+    let lastSubUsername = 'n/a'
     let onlineSubCount = _.size(_.filter(users, (o) => o.username !== config.settings.broadcaster_username && o.username !== config.settings.bot_username)) // except bot and user
+    if (events.length > 0) {
+      lastSubUsername = events[0].username
+      lastSubAgo = moment(events[0].timestamp).fromNow()
+    }
 
     let message = global.commons.prepare('subs', {
       lastSubAgo: lastSubAgo,
