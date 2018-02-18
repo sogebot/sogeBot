@@ -996,14 +996,14 @@
   },
   "followage": {
     "success": {
-      "never": "$sender, $username neni followerem kanalu",
-      "time": "$sender, $username sleduje tento kanal jiz $diff"
+      "never": "(if $sender=$username|$sender|$sender, $username) neni followerem kanalu",
+      "time": "(if $sender=$username|$sender|$sender, $username) sleduje tento kanal jiz $diff"
     }
   },
   "subage": {
     "success": {
-      "never": "$sender, $username neni subscriberem kanalu",
-      "time": "$sender, $username je subscriberem tohoto kanalu jiz $diff"
+      "never": "(if $sender=$username|$sender|$sender, $username) neni subscriberem kanalu",
+      "time": "(if $sender=$username|$sender|$sender, $username) je subscriberem tohoto kanalu jiz $diff"
     }
   },
   "age": {
