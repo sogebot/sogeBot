@@ -1139,9 +1139,9 @@ class Twitch {
 
     when.followed_at = _.now()
     if (!_.includes(cached.followers, username)) {
-      cached.followers.unshift(username)
       cached.followers = _.uniq(cached.followers)
       cached.followers = _.chunk(cached.followers, 100)[0]
+      cached.followers.unshift(username)
     }
     return Promise.all([this.when(when), this.cached(cached)])
   }
@@ -1156,9 +1156,9 @@ class Twitch {
 
     when.subscribed_at = _.now()
     if (!_.includes(cached.subscribers, username)) {
-      cached.subscribers.unshift(username)
       cached.subscribers = _.uniq(cached.subscribers)
       cached.subscribers = _.chunk(cached.subscribers, 100)[0]
+      cached.subscribers.unshift(username)
     }
     await Promise.all([this.when(when), this.cached(cached)])
   }
