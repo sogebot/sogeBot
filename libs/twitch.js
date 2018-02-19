@@ -83,14 +83,10 @@ class Twitch {
     if (data) {
       // setter
       await global.db.engine.update('cache.when', { upsert: true }, {
-        subscribed_at: _.get(data, 'subscribed_at', null),
-        followed_at: _.get(data, 'followed_at', null),
         online: _.get(data, 'online', null),
         offline: _.get(data, 'offline', null)
       })
       return {
-        subscribed_at: _.get(data, 'subscribed_at', null),
-        followed_at: _.get(data, 'followed_at', null),
         online: _.get(data, 'online', null),
         offline: _.get(data, 'offline', null)
       }
@@ -98,8 +94,6 @@ class Twitch {
       // getter
       let cache = await global.db.engine.findOne('cache.when')
       return {
-        subscribed_at: _.get(cache, 'subscribed_at', null),
-        followed_at: _.get(cache, 'followed_at', null),
         online: _.get(cache, 'online', null),
         offline: _.get(cache, 'offline', null)
       }
