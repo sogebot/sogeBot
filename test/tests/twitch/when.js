@@ -24,8 +24,6 @@ describe('lib/twitch - when()', () => {
     let toAwait = []
     for (let i = 0; i < 20; i++) {
       toAwait.push(global.twitch.when({
-        subcribed_at: _.now(),
-        followed_at: _.now(),
         online: null,
         offline: _.now()
       }))
