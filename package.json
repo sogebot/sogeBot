@@ -47,7 +47,7 @@
     "socket.io": "^2.0.4",
     "terminal-kit": "^1.14.3",
     "twitch-emoticons": "git+https://github.com/sogehige/twitch-emoticons.git#v3api",
-    "twitch-js": "^2.0.0-alpha.7",
+    "twitch-js": "1.2.10",
     "twitter": "^1.7.1",
     "velocity-animate": "^1.5.1",
     "winston": "^2.4.0",
