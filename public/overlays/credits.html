@@ -225,6 +225,7 @@
         }
 
         for (let [key, value] of Object.entries(socials)) {
+          if (value.trim().length === 0) continue
           switch (key) {
             case 'facebook':
               $('#social').append(`
