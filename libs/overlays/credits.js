@@ -83,7 +83,7 @@ class Credits {
           socials,
           messages,
           custom,
-          _.get(speed, '[0].value', 35),
+          speed,
           show
         )
       })
