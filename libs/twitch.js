@@ -220,17 +220,11 @@ class Twitch {
 
     const subscribers = _.map(request.body.subscriptions, 'user')
 
-    // if subscriber is not in cache, add as first
-    let cached = await this.cached()
+    // set subscribers
     for (let subscriber of subscribers) {
       if (subscriber.name === config.settings.broadcaster_username || subscriber.name === config.settings.bot_username) continue
-
-      if (!_.includes(cached.subscribers, subscriber.name)) {
-        cached.subscribers.unshift(subscriber.name)
-      }
+      await global.users.set(subscriber, { is: { subscriber: true } })
     }
-    cached.subscribers = _.uniq(cached.subscribers)
-    this.cached(cached)
 
     setTimeout(() => this.getChannelSubscribersOldAPI(), 30000)
   }
@@ -453,22 +447,11 @@ class Twitch {
         }
       }
 
-      // if follower is not in cache, add as first
-      let cached = await this.cached()
-      for (let follower of followersUsername) {
-        if (!_.includes(cached.followers, follower)) {
-          cached.followers.unshift(follower)
-        }
-      }
-      cached.followers = _.uniq(cached.followers)
-      await this.cached(cached)
-
       for (let follower of followersUsername) {
         let user = await global.users.get(follower)
         if (!user.is.follower) {
           if (new Date().getTime() - moment(user.time.follow).format('X') * 1000 < 60000 * 60 && !global.webhooks.existsInCache('follow', user.id)) {
             global.webhooks.addIdToCache('follow', user.id)
-            this.addUserInFollowerCache(user.username)
 
             global.overlays.eventlist.add({
               type: 'follow',
@@ -575,8 +558,7 @@ class Twitch {
         this.newChatters = 0
         this.chatMessagesAtStart = global.parser.linesParsed
 
-        let cached = await this.cached()
-        this.cached({ followers: cached.followers, subscribers: cached.subscribers, hosts: [] }) // we dont want to have cached hosts on stream off
+        this.cached({ hosts: [] }) // we dont want to have cached hosts on stream off
 
         if (!global.webhooks.enabled.streams) {
           global.events.fire('stream-started')
@@ -1150,40 +1132,6 @@ class Twitch {
     } else {
       socket.emit('sendGameFromTwitch', _.map(request.body.games, 'name'))
     }
-  }
-
-  /* Correctly saves user in cached.followers and
-   * set when.followed_at
-   */
-  async addUserInFollowerCache (username) {
-    username = username.toLowerCase()
-    // save followed_at to cache
-    let [when, cached] = await Promise.all([this.when(), this.cached()])
-
-    when.followed_at = _.now()
-    if (!_.includes(cached.followers, username)) {
-      cached.followers = _.uniq(cached.followers)
-      cached.followers.unshift(username)
-      cached.followers = _.chunk(cached.followers, 100)[0]
-    }
-    return Promise.all([this.when(when), this.cached(cached)])
-  }
-
-  /* Correctly saves user in cached.subscribers and
-   * set when.subscribed_at
-   */
-  async addUserInSubscriberCache (username) {
-    username = username.toLowerCase()
-    // save subscribed_at to cache
-    let [when, cached] = await Promise.all([this.when(), this.cached()])
-
-    when.subscribed_at = _.now()
-    if (!_.includes(cached.subscribers, username)) {
-      cached.subscribers = _.uniq(cached.subscribers)
-      cached.subscribers.unshift(username)
-      cached.subscribers = _.chunk(cached.subscribers, 100)[0]
-    }
-    await Promise.all([this.when(when), this.cached(cached)])
   }
 }
 
