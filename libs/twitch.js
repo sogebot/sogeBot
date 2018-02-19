@@ -217,7 +217,7 @@ class Twitch {
     // set subscribers
     for (let subscriber of subscribers) {
       if (subscriber.name === config.settings.broadcaster_username || subscriber.name === config.settings.bot_username) continue
-      await global.users.set(subscriber, { is: { subscriber: true } })
+      await global.users.set(subscriber.name, { is: { subscriber: true } })
     }
 
     setTimeout(() => this.getChannelSubscribersOldAPI(), 30000)
