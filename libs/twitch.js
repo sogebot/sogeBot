@@ -736,6 +736,7 @@ class Twitch {
   }
 
   async followers (self, sender) {
+    const d = debug('twitch:followers')
     let [events, users] = await Promise.all([global.db.engine.find('widgetsEventList'), global.users.getAll({ is: { online: true, follower: true } })])
 
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'follow' })
@@ -754,10 +755,11 @@ class Twitch {
       lastFollowUsername: lastFollowUsername,
       onlineFollowersCount: onlineFollowersCount
     })
-    debug(message); global.commons.sendMessage(message, sender)
+    d(message); global.commons.sendMessage(message, sender)
   }
 
   async subs (self, sender) {
+    const d = debug('twitch:subs')
     let [events, users] = await Promise.all([global.db.engine.find('widgetsEventList'), global.users.getAll({ is: { online: true, subscriber: true } })])
 
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'sub' || o.event === 'resub' || o.event === 'subgift' })
@@ -776,7 +778,7 @@ class Twitch {
       lastSubUsername: lastSubUsername,
       onlineSubCount: onlineSubCount
     })
-    debug(message); global.commons.sendMessage(message, sender)
+    d(message); global.commons.sendMessage(message, sender)
   }
 
   async subage (self, sender, text) {
@@ -1152,8 +1154,8 @@ class Twitch {
     when.followed_at = _.now()
     if (!_.includes(cached.followers, username)) {
       cached.followers = _.uniq(cached.followers)
-      cached.followers = _.chunk(cached.followers, 100)[0]
       cached.followers.unshift(username)
+      cached.followers = _.chunk(cached.followers, 100)[0]
     }
     return Promise.all([this.when(when), this.cached(cached)])
   }
@@ -1169,8 +1171,8 @@ class Twitch {
     when.subscribed_at = _.now()
     if (!_.includes(cached.subscribers, username)) {
       cached.subscribers = _.uniq(cached.subscribers)
-      cached.subscribers = _.chunk(cached.subscribers, 100)[0]
       cached.subscribers.unshift(username)
+      cached.subscribers = _.chunk(cached.subscribers, 100)[0]
     }
     await Promise.all([this.when(when), this.cached(cached)])
   }
