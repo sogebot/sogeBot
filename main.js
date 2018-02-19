@@ -302,8 +302,6 @@ function main () {
     global.overlays.eventlist.add({ type: 'sub', username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
     global.log.sub(`${username}, method: ${method}`)
     global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
-
-    await global.twitch.addUserInSubscriberCache(username)
   })
 
   global.client.on('resub', async function (channel, username, months, message) {
@@ -316,8 +314,6 @@ function main () {
     global.overlays.eventlist.add({ type: 'resub', username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
     global.log.resub(`${username}, months: ${months}, message: ${message}`)
     global.events.fire('resub', { username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
-
-    await global.twitch.addUserInSubscriberCache(username)
   })
 
   // Bot is checking if it is a mod
@@ -363,8 +359,6 @@ async function subgift (channel, username, recipient) {
   global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username })
   global.events.fire('subgift', { username: username, recipient: recipient })
   global.log.subgift(`${recipient}, from: ${username}`)
-
-  await global.twitch.addUserInSubscriberCache(recipient)
 }
 
 if (config.debug.all) {

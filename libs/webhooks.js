@@ -132,7 +132,6 @@ class Webhooks {
           username: userGetFromApi.body.data[0].login
         })
         await global.db.engine.update('users', { username: userGetFromApi.body.data[0].login }, { id: fid, username: userGetFromApi.body.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
-        global.twitch.addUserInFollowerCache(userGetFromApi.body.data[0].login)
         global.log.follow(userGetFromApi.body.data[0].login)
         debug('Firing follow event'); global.events.fire('follow', { username: userGetFromApi.body.data[0].login }) // we can safely fire event as user doesn't exist in db
       }
@@ -141,7 +140,6 @@ class Webhooks {
       debug('username: %s, is follower: %s, current time: %s, user time follow: %s', user.username, _.get(user, 'is.follower', false), _.now(), _.get(user, 'time.follow', 0))
       if (!_.get(user, 'is.follower', false) && _.now() - _.get(user, 'time.follow', 0) > 60000 * 60) {
         if (!global.parser.isBot(user.username)) {
-          global.twitch.addUserInFollowerCache(user.username)
           global.overlays.eventlist.add({
             type: 'follow',
             username: user.username
