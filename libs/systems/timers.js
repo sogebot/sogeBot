@@ -342,7 +342,7 @@ class Timers {
     let timer = await global.db.engine.findOne('timers', { name: name })
     if (_.isEmpty(timer)) {
       global.commons.sendMessage(global.translate('timers.timer-not-found')
-      .replace(/\$name/g, name), sender)
+        .replace(/\$name/g, name), sender)
       return false
     }
 
