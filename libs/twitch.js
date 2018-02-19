@@ -402,8 +402,8 @@ class Twitch {
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: `${e.status} ${e.body.message}`, remaining: this.remainingAPICalls })
+      global.log.error(`API: ${url} - ${e.status} ${e.message}`)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: `${e.status} ${e.message}`, remaining: this.remainingAPICalls })
       setTimeout(() => this.getLatest100Followers(false), 60000)
       return
     }
