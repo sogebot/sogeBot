@@ -44,7 +44,7 @@ class Credits {
           global.twitch.cached()
         ])
 
-        let timestamp = new Date(when.online).getTime() // 2018-02-16T18:02:50Z
+        let timestamp = new Date(_.get(when, 'online', _.now())).getTime() // 2018-02-16T18:02:50Z
         let socials = {
           facebook: global.configuration.getValue('creditsSocialFacebook'),
           twitter: global.configuration.getValue('creditsSocialTwitter'),
