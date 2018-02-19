@@ -17,7 +17,7 @@
     "bootstrap-menu": "^1.0.14",
     "bootstrap-slider": "^10.0.0",
     "bootstrap-toggle": "^2.2.2",
-    "chalk": "^2.3.0",
+    "chalk": "^2.3.1",
     "chart.js": "^2.7.1",
     "compare-versions": "^3.1.0",
     "cross-env": "^5.1.3",
@@ -29,8 +29,8 @@
     "flv.js": "^1.4.0",
     "glob": "^7.1.2",
     "jquery": "^3.3.1",
-    "lodash": "^4.17.4",
-    "mathjs": "^3.20.1",
+    "lodash": "^4.17.5",
+    "mathjs": "^3.20.2",
     "moment": "^2.20.1",
     "moment-precise-range-plugin": "^1.3.0",
     "mongodb": "^3.0.2",
@@ -47,7 +47,7 @@
     "socket.io": "^2.0.4",
     "terminal-kit": "^1.14.3",
     "twitch-emoticons": "git+https://github.com/sogehige/twitch-emoticons.git#v3api",
-    "twitch-js": "^1.2.10",
+    "twitch-js": "^2.0.0-alpha.7",
     "twitter": "^1.7.1",
     "velocity-animate": "^1.5.1",
     "winston": "^2.4.0",
@@ -85,10 +85,10 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "locate-path": "^2.0.0",
-    "mocha": "5.0.0",
+    "mocha": "5.0.1",
     "pre-commit": "^1.2.2",
-    "sinon": "^4.2.0",
-    "standard": "^10.0.3",
+    "sinon": "^4.3.0",
+    "standard": "^11.0.0",
     "test-until": "^1.1.1"
   }
 }
