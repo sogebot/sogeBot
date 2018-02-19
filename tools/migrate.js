@@ -67,6 +67,18 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  widgets: [{
+    version: '6.0.0',
+    do: async() => {
+      console.info('Migration widgets to %s', '6.0.0')
+      let widgets = await global.db.engine.find('widgets')
+      for (let widget of widgets) {
+        if (widget.widget === 'followers' || widget.widget === 'subscribers') {
+          await global.db.engine.remove('widgets', {_id: widget._id.toString()})
+        }
+      }
+    }
+  }],
   cache: [{
     version: '6.0.0',
     do: async () => {
