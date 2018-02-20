@@ -11,7 +11,7 @@ const assert = require('chai').assert
 const tests = {
   'test': {
     'should.return.false': [
-      'test', 'a test', 'test a', 'a test a'
+      'test', 'a test', 'test a', 'a test a', 'test?', '?test'
     ],
     'should.return.true': [
       'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test', 'testa', 'testaa', 'atesta', 'aatestaa', 'test1', '1test1', 'test11', '11test11', 'русскийtestрусский', 'testрусский', '한국어test한국어', 'test한국어'
@@ -19,7 +19,7 @@ const tests = {
   },
   '*test': {
     'should.return.false': [
-      'test', 'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test', 'a test', 'test a'
+      'test', 'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test', 'a test', 'test a', 'test?', '?test'
     ],
     'should.return.true': [
       'testa', 'testaa', 'atesta', 'aatestaa', 'test1', '1test1', 'test11', '11test11', 'русскийtestрусский', 'testрусский', '한국어test한국어', 'test한국어'
@@ -27,7 +27,7 @@ const tests = {
   },
   'test*': {
     'should.return.false': [
-      'test', 'a test', 'test a', 'testa', 'testaa', 'test1', 'test11', 'testрусский', 'test한국어'
+      'test', 'a test', 'test a', 'testa', 'testaa', 'test1', 'test11', 'testрусский', 'test한국어', 'test?', '?test'
     ],
     'should.return.true': [
       'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test', 'atesta', 'aatestaa', '1test1', '11test11', 'русскийtestрусский', '한국어test한국어'
@@ -38,47 +38,47 @@ const tests = {
       'abc'
     ],
     'should.return.false': [
-      'test', 'a test', 'test a', 'testa', 'testaa', 'test1', 'test11', 'testрусский', 'test한국어', 'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test', 'atesta', 'aatestaa', '1test1', '11test11', 'русскийtestрусский', '한국어test한국어'
+      'test', 'a test', 'test a', 'testa', 'testaa', 'test1', 'test11', 'testрусский', 'test한국어', 'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test', 'atesta', 'aatestaa', '1test1', '11test11', 'русскийtestрусский', '한국어test한국어', 'test?', '?test'
     ]
   },
   '+test': {
     'should.return.false': [
-      'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test'
+      'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test', 'atest?'
     ],
     'should.return.true': [
-      'test', 'a test', 'test a', 'testa', 'testaa', 'atesta', 'aatestaa', 'test1', '1test1', 'test11', '11test11', 'русскийtestрусский', 'testрусский', '한국어test한국어', 'test한국어'
+      'test', 'a test', 'test a', 'testa', 'testaa', 'atesta', 'aatestaa', 'test1', '1test1', 'test11', '11test11', 'русскийtestрусский', 'testрусский', '한국어test한국어', 'test한국어', '?test'
     ]
   },
   'test+': {
     'should.return.false': [
-      'testa', 'testaa', 'test1', 'test11', 'testрусский', 'test한국어'
+      'testa', 'testaa', 'test1', 'test11', 'testрусский', 'test한국어', '?testa'
     ],
     'should.return.true': [
-      'test', 'a test', 'test a', 'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test', 'atesta', 'aatestaa', '1test1', '11test11', 'русскийtestрусский', '한국어test한국어'
+      'test', 'a test', 'test a', 'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test', 'atesta', 'aatestaa', '1test1', '11test11', 'русскийtestрусский', '한국어test한국어', 'test?'
     ]
   },
   '+test+': {
-    'should.return.true': [
-      'test', 'abc', 'a test', 'test a', 'testa', 'testaa', 'test1', 'test11', 'testрусский', 'test한국어', 'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test'
-    ],
     'should.return.false': [
       'atesta', 'aatestaa', '1test1', '11test11', 'русскийtestрусский', '한국어test한국어'
+    ],
+    'should.return.true': [
+      'test', 'abc', 'a test', 'test a', 'testa', 'testaa', 'test1', 'test11', 'testрусский', 'test한국어', 'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test', 'test?', '?test'
     ]
   },
   '*test+': {
-    'should.return.true': [
-      'test', 'abc', 'a test', 'test a', 'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test'
-    ],
     'should.return.false': [
       'testa', 'testaa', 'test1', 'test11', 'testрусский', 'test한국어', 'atesta', 'aatestaa', '1test1', '11test11', 'русскийtestрусский', '한국어test한국어'
+    ],
+    'should.return.true': [
+      'test', 'abc', 'a test', 'test a', 'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test', 'test?', '?test'
     ]
   },
   '+test*': {
-    'should.return.true': [
-      'test', 'abc', 'a test', 'test a', 'testa', 'testaa', 'test1', 'test11', 'testрусский', 'test한국어'
-    ],
     'should.return.false': [
       'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test', 'atesta', 'aatestaa', '1test1', '11test11', 'русскийtestрусский', '한국어test한국어'
+    ],
+    'should.return.true': [
+      'test', 'abc', 'a test', 'test a', 'testa', 'testaa', 'test1', 'test11', 'testрусский', 'test한국어', 'test?', '?test'
     ]
   }
 }

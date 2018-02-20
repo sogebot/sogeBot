@@ -156,6 +156,7 @@ Moderation.prototype.whitelist = async function (text) {
 
   clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
   text = text.replace(clipsRegex, '')
+  text = text.replace(/[&/\\#,+()$~%.'":*?<>{}]/g, '') // remove all symbols
   for (let value of global.systems.moderation.lists.whitelist) {
     value = value.trim().replace(/\*/g, '[\\pL0-9]*').replace(/\+/g, '[\\pL0-9]+')
     const regexp = XRegExp(`(?:^|\\s)${value}(?:^|\\s)`, 'gi')
@@ -404,6 +405,7 @@ Moderation.prototype.blacklist = async function (self, sender, text) {
     return true
   }
 
+  text = text.replace(/[&/\\#,+()$~%.'":*?<>{}]/g, '') // remove all symbols
   let isOK = true
   var timeout = global.configuration.getValue('moderationBlacklistTimeout')
   _.each(self.lists.blacklist, function (value) {

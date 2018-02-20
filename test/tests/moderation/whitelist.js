@@ -11,7 +11,7 @@ const assert = require('chai').assert
 const tests = {
   'test': {
     'should.return.changed': [
-      'test', 'a test', 'test a', 'a test a'
+      'test', 'a test', 'test a', 'a test a', '?test', 'test?'
     ],
     'should.return.same': [
       'atest', 'aatest', '1test', '11test', 'русскийtest', '한국어test', 'testa', 'testaa', 'atesta', 'aatestaa', 'test1', '1test1', 'test11', '11test11', 'русскийtestрусский', 'testрусский', '한국어test한국어', 'test한국어'
