@@ -240,18 +240,13 @@ function main () {
     const hostsViewersAtLeast = global.configuration.getValue('hostsViewersAtLeast')
     const hostsIgnoreAutohost = global.configuration.getValue('hostsIgnoreAutohost')
 
-    let host = await global.db.engine.findOne('cache.hosts', { username: username })
-
-    debug('Is in cache? %s', !_.isNil(host))
-    if (!_.isNil(host)) return // don't want to fire event if its already in cache
+    global.db.engine.update('cache.hosts', { username: username }, { username: username })
 
     const data = {
       username: username,
       viewers: viewers,
       autohost: autohost
     }
-    debug('Cache hosts: %s', username)
-    global.db.engine.update('cache.hosts', { username: username }, { username: username })
 
     data.type = 'host'
     global.overlays.eventlist.add(data)
