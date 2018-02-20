@@ -189,7 +189,7 @@ class Webhooks {
         global.twitch.newChatters = 0
         global.twitch.chatMessagesAtStart = global.parser.linesParsed
 
-        global.twitch.cached({ hosts: [] }) // we dont want to have cached hosts on stream off
+        global.db.engine.remove('cache.hosts', {}) // we dont want to have cached hosts on stream start
 
         global.events.fire('stream-started')
         global.events.fire('command-send-x-times', { reset: true })

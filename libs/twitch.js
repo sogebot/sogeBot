@@ -130,31 +130,6 @@ class Twitch {
     }
   }
 
-  // attribute
-  async cached (data) {
-    if (data) {
-      // setter
-      await global.db.engine.update('cache.users', { upsert: true }, {
-        followers: _.get(data, 'followers', []),
-        hosts: _.get(data, 'hosts', []),
-        subscribers: _.get(data, 'subscribers', [])
-      })
-      return {
-        followers: _.get(data, 'followers', []),
-        hosts: _.get(data, 'hosts', []),
-        subscribers: _.get(data, 'subscribers', [])
-      }
-    } else {
-      // getter
-      let cache = await global.db.engine.findOne('cache.users')
-      return {
-        followers: _.get(cache, 'followers', []),
-        hosts: _.get(cache, 'hosts', []),
-        subscribers: _.get(cache, 'subscribers', [])
-      }
-    }
-  }
-
   async _loadCachedStatusAndGame () {
     [this.current.rawStatus, this.current.game] = await Promise.all([this.rawStatus(), this.gameCache()])
   }
@@ -308,13 +283,11 @@ class Twitch {
     this.current.hosts = request.body.hosts.length
 
     // save hosts list
-    let cached = await this.cached()
+    let toAwait = []
     for (let host of _.map(request.body.hosts, 'host_login')) {
-      if (!_.includes(cached.hosts, host)) {
-        cached.hosts.unshift(host)
-      }
+      toAwait.push(global.db.engine.update('cache.hosts', { username: host }, { username: host }))
     }
-    await this.cached(cached)
+    await Promise.all(toAwait)
     setTimeout(() => this.getChannelHosts(), 30000)
   }
 
@@ -552,7 +525,7 @@ class Twitch {
         this.newChatters = 0
         this.chatMessagesAtStart = global.parser.linesParsed
 
-        this.cached({ hosts: [] }) // we dont want to have cached hosts on stream off
+        global.db.engine.remove('cache.hosts', {}) // we dont want to have cached hosts on stream start
 
         if (!global.webhooks.enabled.streams) {
           global.events.fire('stream-started')
