@@ -240,21 +240,18 @@ function main () {
     const hostsViewersAtLeast = global.configuration.getValue('hostsViewersAtLeast')
     const hostsIgnoreAutohost = global.configuration.getValue('hostsIgnoreAutohost')
 
-    let cached = await global.twitch.cached()
-    let cache = _.filter(cached, (o) => o.username === username)
+    let host = await global.db.engine.findOne('cache.hosts', { username: username })
 
-    debug('Is in cache? %s', cache.length > 0)
-    if (cache.length > 0) return // don't want to fire event if its already in cache
+    debug('Is in cache? %s', !_.isNil(host))
+    if (!_.isNil(host)) return // don't want to fire event if its already in cache
 
     const data = {
       username: username,
       viewers: viewers,
       autohost: autohost
     }
-    debug('Cache hosts: %o', cached.hosts)
-    cached.hosts.unshift(data)
-    global.twitch.cached(cached)
-    debug('Cache hosts (after save): %o', cached.hosts)
+    debug('Cache hosts: %s', username)
+    global.db.engine.update('cache.hosts', { username: username }, { username: username })
 
     data.type = 'host'
     global.overlays.eventlist.add(data)

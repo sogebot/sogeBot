@@ -38,10 +38,10 @@ class Credits {
     this.io.on('connection', (socket) => {
       d('Socket /overlays/credits connected, registering sockets')
       socket.on('load', async (callback) => {
-        let [events, when, cached] = await Promise.all([
+        let [events, when, hosts] = await Promise.all([
           global.db.engine.find('widgetsEventList'),
           global.twitch.when(),
-          global.twitch.cached()
+          global.db.engine.find('cache.hosts')
         ])
 
         if (_.isNil(when.online)) when.online = _.now()
@@ -79,7 +79,7 @@ class Credits {
           config.settings.broadcaster_username,
           global.twitch.current.game,
           global.twitch.current.status,
-          cached.hosts,
+          hosts.map((o) => o.username),
           socials,
           messages,
           custom,
