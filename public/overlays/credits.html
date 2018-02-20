@@ -172,8 +172,8 @@
 
         for (let [key, value] of Object.entries(messages)) {
           $('.hosted-by').text(`${_.get(custom, 'hosted-by', 'hosted by')}`)
-          if (key === 'lastMessage')  $('#last-message').text(value)
-          else $('#last-submessage').text(value)
+          if (key === 'lastMessage')  $('#last-message').html(value)
+          else $('#last-submessage').html(value)
         }
 
         let size = resize('#game', 200)
