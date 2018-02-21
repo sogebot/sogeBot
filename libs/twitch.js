@@ -177,6 +177,9 @@ class Twitch {
         global.log.info('Broadcaster is not affiliate/partner, will not check subs')
         this.current.subscribers = 0
         // caster is not affiliate or partner, don't do calls again
+      } else if (e.message === '403 Forbidden') {
+        global.log.info('Broadcaster have not correct oauth, will not check subs')
+        this.current.subscribers = 0
       } else {
         global.log.error(`API: ${url} - ${e.message}`)
         global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: e.message })
