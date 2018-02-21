@@ -15,6 +15,8 @@ class Credits {
 
     global.configuration.register('creditsSpeed', 'core.no-response', 'number', 35)
 
+    global.configuration.register('creditsFadeAnimation', 'core.no-response-bool', 'bool', true)
+
     global.configuration.register('creditsLastMessage', 'core.no-response', 'string', 'Thanks for watching!')
     global.configuration.register('creditsLastSubMessage', 'core.no-response', 'string', '~ see you on the next stream ~')
 
@@ -84,7 +86,8 @@ class Credits {
           messages,
           custom,
           speed,
-          show
+          show,
+          global.configuration.getValue('creditsFadeAnimation')
         )
       })
     })

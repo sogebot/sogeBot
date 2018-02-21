@@ -352,7 +352,7 @@
         </div>
 
         <div class="col" style="max-width: 50%">
-          <span class="title title-part text-default">Rolling speed</span>
+          <span class="title title-part text-default">Configuration</span>
         </div>
         <div class="row settings settings-part">
           <div class="col" style="max-width: 50%">
@@ -360,6 +360,14 @@
           </div>
           <div class="col" style="max-width: 50%">
             <input id="input_creditsSpeed" class="form-control input-sm" type="text" />
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-fade-animation"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="creditsFadeAnimationToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
           </div>
         </div>
 
@@ -520,6 +528,16 @@
     $('#input_creditsSocialFacebook').val(data.creditsSocialFacebook)
     $('#input_creditsSocialTwitter').val(data.creditsSocialTwitter)
     $('#input_creditsSocialTwitch').val(data.creditsSocialTwitch)
+
+    $('#creditsFadeAnimationToggle').bootstrapToggle(options)
+    $('#creditsFadeAnimationToggle').bootstrapToggle(data.creditsFadeAnimation ? 'on' : 'off')
+    $('#creditsFadeAnimationToggle').off('change')
+    $('#creditsFadeAnimationToggle').on('change', function () {
+      var data = {}
+      data['creditsFadeAnimation'] = $(this).prop('checked')
+      if ($('#creditsFadeAnimationToggle').data('init')) socket.emit('saveConfiguration', data)
+    })
+    $('#creditsFadeAnimationToggle').data('init', true)
 
     $('#creditsFollowersToggle').bootstrapToggle(options)
     $('#creditsFollowersToggle').bootstrapToggle(data.creditsFollowers ? 'on' : 'off')

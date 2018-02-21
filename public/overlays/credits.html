@@ -35,6 +35,7 @@
       .end {
         position: relative;
         text-align: center;
+        opacity: 1;
       }
 
       html, body {
@@ -53,8 +54,8 @@
         text-shadow: 0px 0px 1rem #000;
       }
 
-      #wrapper * {
-        opacity: 0;
+      .no-fade {
+        opacity: 1 !important;
       }
 
       .title {
@@ -118,13 +119,14 @@
 
       .hosted-column {
         column-count: 2;
+        opacity: 1 !important;
       }
     </style>
     </head>
     <body>
       <div id='wrapper'>
-        <div class='title'><span id="game"></span></div>
-        <div class='subtitle'><span id="title"></span></div>
+        <div class='title'><span id="game" class="no-fade"></span></div>
+        <div class='subtitle'><span id="title" class="no-fade"></span></div>
 
         <div class='job' id="stream-by"></div>
         <div class='name' id="streamer"></div>
@@ -138,8 +140,8 @@
         <div class="half-end"><!-- empty page --></div>
         <div class="end no-fade">
           <div class="center no-fade">
-            <div class="last-message no-fade"><span id="last-message" class="no-fade"></span></div>
-            <div class="last-submessage no-fade"><span id="last-submessage" class="no-fade"></span></div>
+            <div class="last-message no-fade"><span id="last-message" class="no-fade-out"></span></div>
+            <div class="last-submessage no-fade"><span id="last-submessage" class="no-fade-out"></span></div>
 
             <div class="no-fade" id="social"></div>
           </div>
@@ -165,7 +167,11 @@
       }
 
       var socket = io('/overlays/credits', {query: "token="+token})
-      socket.emit('load', (err, events, streamer, game, title, hosts, socials, messages, custom, speed, show) => {
+      socket.emit('load', (err, events, streamer, game, title, hosts, socials, messages, custom, speed, show, fade) => {
+        if (fade) {
+          $('#wrapper *').css('opacity', 0)
+        }
+
         $('#streamer').text(streamer)
         $('#game').text(game)
         $('#title').text(title)
@@ -229,12 +235,12 @@
           switch (key) {
             case 'facebook':
               $('#social').append(`
-                <div class="social no-fade"><i class="fab fa-${key}-square no-fade"></i> ${value}</div>
+                <div class="social"><i class="fab fa-${key}-square no-fade"></i> ${value}</div>
               `)
               break
             default:
               $('#social').append(`
-                <div class="social no-fade"><i class="fab fa-${key} no-fade"></i> ${value}</div>
+                <div class="social"><i class="fab fa-${key} no-fade"></i> ${value}</div>
               `)
           }
         }
@@ -270,44 +276,56 @@
         let elements = $('#wrapper *')
         //remove end from elements
 
-        // fade out
-        let outElements = _.clone(elements)
-        setInterval(() => {
-          for (let i in outElements) {
-            try {
-              if (!outElements.hasOwnProperty(i) || i === 'length' || i === 'prevObject') continue
-              if ($(outElements[i]).offset().top < 50 &&
-                !$(outElements[i]).hasClass('fab') &&
-                !$(outElements[i]).hasClass('no-fade') &&
-                !$(outElements[i]).hasClass('hosted-column')) {
-                $(outElements[i]).velocity({ opacity: 0 }, speed * 35)
-                delete outElements[i]
+        if (fade) {
+          // fade out
+          let outElements = _.clone(elements)
+          setInterval(() => {
+            for (let i in outElements) {
+              try {
+                if (!outElements.hasOwnProperty(i) || i === 'length' || i === 'prevObject') continue
+                if ($(outElements[i]).offset().top < ($(outElements[i]).height() / 2) + 20 &&
+                  !$(outElements[i]).hasClass('fab') &&
+                  !$(outElements[i]).hasClass('no-fade') &&
+                  !$(outElements[i]).hasClass('no-fade-out') &&
+                  !$(outElements[i]).hasClass('hosted-column')) {
+                  $(outElements[i]).velocity({ opacity: 0 }, $(outElements[i]).height() * speed)
+                  delete outElements[i]
+                }
+                if ($(outElements[i]).hasClass('fab') ||
+                    $(outElements[i]).hasClass('no-fade') ||
+                    $(outElements[i]).hasClass('hosted-column')) {
+                  delete outElements[i]
+                }
+              } catch (e) {
+                console.debug(e)
+                console.debug(outElements[i])
+                continue
               }
-            } catch (e) {
-              console.debug(e)
-              console.debug(outElements[i])
-              continue
             }
-          }
-        }, 1)
+          }, 1)
 
-        // fade in
-        let inElements = _.clone(elements)
-        setInterval(() => {
-          for (let i in inElements) {
-            try {
-              if (!inElements.hasOwnProperty(i) || i === 'length' || i === 'prevObject') continue
-              if ($(inElements[i]).offset().top < wHeight - 50) {
-                $(inElements[i]).velocity({ opacity: 1 }, speed * 35)
-                delete inElements[i]
+          // fade in
+          let inElements = _.clone(elements)
+          setInterval(() => {
+            for (let i in inElements) {
+              try {
+                if (!inElements.hasOwnProperty(i) || i === 'length' || i === 'prevObject') continue
+                if ($(inElements[i]).offset().top < wHeight - ($(outElements[i]).height() / 2) - 20 &&
+                  !$(outElements[i]).hasClass('no-fade')) {
+                  $(inElements[i]).velocity({ opacity: 1 }, $(outElements[i]).height() * speed)
+                  delete inElements[i]
+                }
+                if ($(outElements[i]).hasClass('no-fade')) {
+                  delete outElements[i]
+                }
+              } catch (e) {
+                console.debug(e)
+                console.debug(inElements[i])
+                continue
               }
-            } catch (e) {
-              console.debug(e)
-              console.debug(inElements[i])
-              continue
             }
-          }
-        }, 1)
+          }, 1)
+        }
       })
     </script>
     </body>

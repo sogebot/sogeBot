@@ -214,7 +214,8 @@
     },
     "placeholders": {
       "text-url-generator": "Vložte text nebo html pro vytvoření base64 níže a URL výše",
-      "text-decode-base64": "Vložte base64 a vygenerujte URL a text výše"
+      "text-decode-base64": "Vložte base64 a vygenerujte URL a text výše",
+      "creditsSpeed": "Nastavte rychlost titulek, nižší = rychlejší"
     },
     "custom-variables": {
       "set-your-variables-to-watch-here": "Zde nastavte proměnné",
@@ -573,6 +574,7 @@
     "overlay-credits-social-facebook": "Facebook",
     "overlay-credits-social-twitter": "Twitter",
     "overlay-credits-social-twitch": "Twitch",
+    "overlay-credits-fade-animation": "Animace slábnutí",
     "credits": "Titulky",
     "requested-by": "Požadoval",
     "description": "Popisek",
