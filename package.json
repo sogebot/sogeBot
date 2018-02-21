@@ -57,7 +57,7 @@
   },
   "scripts": {
     "prebuild": "npm install rimraf bestzip npm-run-all cross-var -g",
-    "build": "npm-run-all --sequential cleanup:* build:modules build:shrinkwrap build:zip",
+    "build": "npm-run-all --sequential cleanup:* build:modules build:shrinkwrap test build:zip",
     "build:css": "npm-run-all --parallel compile:css:*",
     "build:modules": "npm install",
     "build:shrinkwrap": "npm shrinkwrap",
