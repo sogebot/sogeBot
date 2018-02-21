@@ -58,6 +58,17 @@
         opacity: 1 !important;
       }
 
+      .clip {
+        vertical-align: middle;
+        text-align: center;
+      }
+
+      iframe, img {
+        opacity: 1 !important;
+        width: 55%;
+        height: 55%;
+      }
+
       .title {
         font-size: 125px;
         font-weight: bold;
@@ -137,6 +148,8 @@
         <div class='hosted-by' id="hosted-by"></div>
         <div class='hosted-column' id="hosts"></div>
 
+        <div class="clips no-fade" id="clips"></div>
+
         <div class="half-end"><!-- empty page --></div>
         <div class="end no-fade">
           <div class="center no-fade">
@@ -167,7 +180,7 @@
       }
 
       var socket = io('/overlays/credits', {query: "token="+token})
-      socket.emit('load', (err, events, streamer, game, title, hosts, socials, messages, custom, speed, show, fade) => {
+      socket.emit('load', (err, events, streamer, game, title, hosts, socials, messages, custom, speed, show, fade, clips) => {
         if (fade) {
           $('#wrapper *').css('opacity', 0)
         }
@@ -255,6 +268,17 @@
         // window height
         let wHeight = $(document).height()
 
+        if (clips.list.length > 0) {
+          $('#clips').append(`<div class="half-end no-fade"></div>`)
+        }
+        for (let clip of clips.list) {
+          $('#clips').append(`
+            <div class="clip no-fade" style="height: ${wHeight}px" data-duration="${clip.duration}" data-embed="${clip.embed_html}" data-thumbnail="${clip.thumbnails.medium}">
+              <img src="${clip.thumbnails.medium}"></img>
+            </div>`)
+        }
+
+
         // set windows height for end (to be on "separate" page)
         $('.end').css('height', `${wHeight}px`)
         $('.half-end').css('height', `${wHeight/2}px`)
@@ -275,6 +299,35 @@
 
         let elements = $('#wrapper *')
         //remove end from elements
+
+        if (clips.list.length > 0 && clips.play) {
+          // check for clips
+          let clips = $('.clip')
+          let clipsBackup = _.clone(clips)
+          let triggerHeight = wHeight / 4
+          setInterval(() => {
+            for (let i in clips) {
+              try {
+                if (!clips.hasOwnProperty(i) || i === 'length' || i === 'prevObject') continue
+                if ($(clips[i]).offset().top <= triggerHeight) {
+                  $('#wrapper').velocity("pause")
+                  $(clips[i]).empty()
+                  $(clips[i]).append($(clips[i]).data('embed'))
+                  setTimeout(() => {
+                    $(clipsBackup[i]).empty()
+                    $(clipsBackup[i]).append(`<img src="${$(clipsBackup[i]).data('thumbnail')}"></img>`)
+                    $('#wrapper').velocity("resume")
+                  }, $(clipsBackup[i]).data('duration') * 1000)
+                  delete clips[i]
+                }
+              } catch (e) {
+                console.debug(e)
+                console.debug(clips[i])
+                continue
+              }
+            }
+          }, 100)
+        }
 
         if (fade) {
           // fade out
@@ -302,7 +355,7 @@
                 continue
               }
             }
-          }, 1)
+          }, 100)
 
           // fade in
           let inElements = _.clone(elements)
@@ -324,7 +377,7 @@
                 continue
               }
             }
-          }, 1)
+          }, 100)
         }
       })
     </script>
