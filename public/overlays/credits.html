@@ -283,10 +283,10 @@
           i++
           $('#clips').append(`
             <div class="clip-title" style="text-align:${i % 2 === 0 ? 'right' : 'left'}" data-id="${clip.tracking_id}">
+              <div style="position:absolute; opacity: 0.5; font-weight: bold; font-size: 10rem; ${i % 2 === 0 ? 'left: 15%;' : 'right: 15%;'}">${i}</div>
               <div class='name'>${clip.title} </div>
               <div class='name'><strong>${clip.game}</strong></div>
               <div class="name">${_.get(custom, 'clipped-by', 'clipped by')} ${clip.curator.display_name}</div>
-              <div style="position:absolute; margin-top: -11%; opacity: 0.5; font-weight: bold; font-size: 10rem; ${i % 2 === 0 ? 'left: 15%;' : 'right: 15%;'}">${i}</div>
             </div>
             <div class="clip" style="height: ${wHeight}px" data-duration="${clip.duration}" data-embed="${clip.embed_html}" data-thumbnail="${clip.thumbnails.medium}">
               <img src="${clip.thumbnails.medium}" data-id="${clip.tracking_id}"></img>
