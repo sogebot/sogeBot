@@ -4,7 +4,7 @@ function QueueWidget () {
   this.timestamp = 0
 
   if (!global.commons.isSystemEnabled('queue')) return
-  global.panel.addWidget('queue', 'widget-title-queue', 'users')
+  global.panel.addWidget('queue', 'widget-title-queue', 'fas fa-users')
   global.panel.socketListening(this, 'queue.get', this.sendQueue)
   global.panel.socketListening(this, 'queue.setLocked', this.setLocked)
   global.panel.socketListening(this, 'queue.clear', this.clear)

@@ -3,12 +3,12 @@
   <ul class="nav nav-pills" role="tablist">
     <li role="presentation" class="nav-item">
       <a class="nav-link active" href="#cmdboard-main" aria-controls="home" role="tab" data-toggle="tab" title="CommandBoard">
-        <i class="fa fa-terminal" aria-hidden="true"></i>
+        <i class="fas fa-terminal" aria-hidden="true"></i>
       </a>
     </li>
     <li role="presentation" class="nav-item">
       <a class="nav-link" href="#cmdboard-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-        <i class="fa fa-cog" aria-hidden="true"></i>
+        <i class="fas fa-cog" aria-hidden="true"></i>
       </a>
     </li>
   </ul>
@@ -110,7 +110,7 @@
       actions: [{
         name: 'Delete',
         classNames: ['action-danger'],
-        iconClass: 'fa-trash-o',
+        iconClass: 'fa-trash-alt',
         onClick: function (data) {
           socket.emit('cmdboard.widget.remove', data)
         }

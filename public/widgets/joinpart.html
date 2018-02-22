@@ -3,12 +3,12 @@
   <ul class="nav nav-pills" role="tablist">
     <li role="presentation" class="nav-item">
       <a class="nav-link active" href="#join-part-list-panel" aria-controls="home" role="tab" data-toggle="tab" title="Join/Part list">
-        <i class="fa fa-sign-in" aria-hidden="true"></i>
+        <i class="fas fa-sign-in-alt" aria-hidden="true"></i>
       </a>
     </li>
     <li role="presentation" class="nav-item">
       <a class="nav-link" href="#join-part-list-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-        <i class="fa fa-cog" aria-hidden="true"></i>
+        <i class="fas fa-cog" aria-hidden="true"></i>
       </a>
     </li>
   </ul>
@@ -40,13 +40,13 @@
         .attr('style', 'padding-top: 5px')
 
       let i = $('<i>')
-        .addClass('fa')
+        .addClass('fas')
         .attr('style',
           'position: absolute; width: 27px; font-size: 150%; padding: 7px; padding-top:0; display: inline-block; vertical-align: top; column-width: 50px'
         )
 
-      if (data.type === 'join') i.addClass('fa-sign-in text-success')
-      else i.addClass('fa-sign-out text-danger')
+      if (data.type === 'join') i.addClass('fa-sign-in-alt text-success')
+      else i.addClass('fa-sign-out-alt text-danger')
 
       let span = $('<span>')
         .attr('style', 'padding-left: 30px; font-size: 17px; line-height:20px; display: block; margin-left: 2px;')

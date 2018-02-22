@@ -47,7 +47,7 @@
           <div class="card">
             <div class="card-header">
               <button class="btn btn-outline-primary" onclick="addEventOperation(event)">
-                <i class="fa fa-plus" aria-hidden="true"></i>
+                <i class="fas fa-plus" aria-hidden="true"></i>
               </button>
               <span data-lang="events.dialog.operations"></span>
             </div>
@@ -71,7 +71,7 @@
   </li>
   <li class="nav-item">
     <button class="nav-link btn btn-success" data-toggle="modal" data-target="#event-listener-dlg">
-      <i class="fa fa-plus" aria-hidden="true"></i>
+      <i class="fas fa-plus" aria-hidden="true"></i>
     </button>
   </li>
   <li class="nav-item">
@@ -120,7 +120,7 @@
                 <h5 class="card-title">
                   ${event.enabled ? `<span class="badge badge-pill badge-primary" data-id="${event._id.toString()}">${translations.events.badges.enabled}</span>` : `<span class="badge badge-pill badge-light" data-id="${event._id.toString()}">${translations.events.badges.disabled}</span>` }
                   <strong>${event.name}</strong> <small class="text-muted">${event.key}</small>
-                  <div style="float:right; position: relative; top:-.4rem;" class="text-primary"><i class="fa fa-cogs" style="position: relative; top:-.3rem; font-size: 1rem;" aria-hidden="true"></i> <strong style="font-size: 2rem; ">${operationsCount}</strong></div>
+                  <div style="float:right; position: relative; top:-.4rem;" class="text-primary"><i class="fas fa-cogs" style="position: relative; top:-.3rem; font-size: 1rem;" aria-hidden="true"></i> <strong style="font-size: 2rem; ">${operationsCount}</strong></div>
                 </h5>
                 <div class="clearfix"></div>
               </div>
@@ -129,14 +129,14 @@
 
               ${filter.length ? `<div class="card-footer" data-card="${event.name}">
                   <small style="font-family: Monospace">${filter}</small>
-                  <i class="fa fa-filter text-muted" style="float: right; font-size: 1.5rem;"></i>
+                  <i class="fas fa-filter text-muted" style="float: right; font-size: 1.5rem;"></i>
                 </div>` : ``}
 
               <div class="card-footer text-center">
-                <a href="#" class="btn btn-outline-primary" data-id="${event._id.toString()}" onclick="events.test(this)"><i class="fa fa-bell-o" aria-hidden="true"></i> ${translations.events.buttons.test}</a>
-                <a href="#" class="btn btn-outline-secondary btn-toggle" data-id="${event._id.toString()}" onclick="events.toggle(this)">${event.enabled ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> ${translations.events.buttons.disable}`: `<i class="fa fa-toggle-on" aria-hidden="true"></i> ${translations.events.buttons.enable}`}</a>
-                <a href="#" class="btn btn-outline-secondary" data-toggle="modal" data-target="#event-listener-dlg" data-id="${event._id.toString()}"><i class="fa fa-pencil" aria-hidden="true"></i> ${translations.events.buttons.edit}</a>
-                <a href="#" class="btn btn-outline-danger" data-card-delete-popover="${event._id.toString()}" data-container="body" data-toggle="popover"><i class="fa fa-trash-o" aria-hidden="true"></i> ${translations.events.buttons.delete}</a>
+                <a href="#" class="btn btn-outline-primary" data-id="${event._id.toString()}" onclick="events.test(this)"><i class="far fa-bell" aria-hidden="true"></i> ${translations.events.buttons.test}</a>
+                <a href="#" class="btn btn-outline-secondary btn-toggle" data-id="${event._id.toString()}" onclick="events.toggle(this)">${event.enabled ? `<i class="fas fa-toggle-off" aria-hidden="true"></i> ${translations.events.buttons.disable}`: `<i class="fas fa-toggle-on" aria-hidden="true"></i> ${translations.events.buttons.enable}`}</a>
+                <a href="#" class="btn btn-outline-secondary" data-toggle="modal" data-target="#event-listener-dlg" data-id="${event._id.toString()}"><i class="fas fa-pencil-alt" aria-hidden="true"></i> ${translations.events.buttons.edit}</a>
+                <a href="#" class="btn btn-outline-danger" data-card-delete-popover="${event._id.toString()}" data-container="body" data-toggle="popover"><i class="far fa-trash-alt" aria-hidden="true"></i> ${translations.events.buttons.delete}</a>
               </div>
             </div>
           `)
@@ -170,8 +170,8 @@
 
         $(el)
           .html(cb.enabled ?
-            `<i class="fa fa-toggle-off" aria-hidden="true"></i> ${translations.events.buttons.disable}` :
-            `<i class="fa fa-toggle-on" aria-hidden="true"></i> ${translations.events.buttons.enable}`)
+            `<i class="fas fa-toggle-off" aria-hidden="true"></i> ${translations.events.buttons.disable}` :
+            `<i class="fas fa-toggle-on" aria-hidden="true"></i> ${translations.events.buttons.enable}`)
       })
     },
     delete: (el) => {
@@ -362,7 +362,7 @@
           </select>
           <div class="input-group-append">
             <button class="btn btn-danger" type="button" onclick="removeEventOperation(event, this)">
-              <i class="fa fa-trash-o"></i>
+              <i class="far fa-trash-alt"></i>
             </button>
           </div>
         </div>

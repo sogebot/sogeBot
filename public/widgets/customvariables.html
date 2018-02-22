@@ -3,12 +3,12 @@
   <ul class="nav nav-pills" role="tablist">
     <li role="presentation" class="nav-item">
       <a class="nav-link active" href="#customvariables-main" aria-controls="home" role="tab" data-toggle="tab" title="Custom Variables">
-        <i class="fa fa-usd" aria-hidden="true"></i>_
+        <i class="fas fa-dollar-sign" aria-hidden="true"></i>_
       </a>
     </li>
     <li role="presentation">
       <a class="nav-link" href="#customvariables-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-        <i class="fa fa-cog" aria-hidden="true"></i>
+        <i class="fas fa-cog" aria-hidden="true"></i>
       </a>
     </li>
   </ul>
@@ -136,9 +136,9 @@ var customVariablesWidget = {
                 <input type="text" class="form-control" data-custom-variable-input data-name="${variable.name}">
 
                 <div class="input-group-append">
-                  <button class="btn btn-secondary d-none" data-name="${variable.name}" onclick="customVariablesWidget.save(this)" type="button"><i class="fa fa-download"></i></button>
-                  <button class="btn btn-danger" data-name="${variable.name}" onclick="customVariablesWidget.decrement(this)" type="button"><i class="fa fa-minus"></i></button>
-                  <button class="btn btn-success" data-name="${variable.name}" onclick="customVariablesWidget.increment(this)" data-button="plus" type="button"><i class="fa fa-plus"></i></button>
+                  <button class="btn btn-secondary d-none" data-name="${variable.name}" onclick="customVariablesWidget.save(this)" type="button"><i class="fas fa-download"></i></button>
+                  <button class="btn btn-danger" data-name="${variable.name}" onclick="customVariablesWidget.decrement(this)" type="button"><i class="fas fa-minus"></i></button>
+                  <button class="btn btn-success" data-name="${variable.name}" onclick="customVariablesWidget.increment(this)" data-button="plus" type="button"><i class="fas fa-plus"></i></button>
                 </div>
               </div>
             `)
@@ -152,7 +152,7 @@ var customVariablesWidget = {
                 <input type="text" class="form-control" data-custom-variable-input data-name="${variable.name}">
 
                 <div class="input-group-append">
-                  <button class="btn btn-secondary d-none" data-name="${variable.name}" onclick="customVariablesWidget.save(this)" type="button"><i class="fa fa-download"></i></button>
+                  <button class="btn btn-secondary d-none" data-name="${variable.name}" onclick="customVariablesWidget.save(this)" type="button"><i class="fas fa-download"></i></button>
                 </div>
               </div>
             `)
@@ -188,7 +188,7 @@ var customVariablesWidget = {
       }
       // set message if variables are empty
       if (i === 0) {
-        main.append(`<div style="margin-left: 3.2rem" class="text-primary"><sup class="fa fa-caret-up"></sup> ${_.get(translations, 'custom-variables.set-your-variables-to-watch-here', '{custom-variables.set-your-variables-to-watch-here}')}</div>`)
+        main.append(`<div style="margin-left: 3.2rem" class="text-primary"><sup class="fas fa-caret-up"></sup> ${_.get(translations, 'custom-variables.set-your-variables-to-watch-here', '{custom-variables.set-your-variables-to-watch-here}')}</div>`)
       }
       // /SET customvariables-main ////////////////////////////////////////////////
 
@@ -244,7 +244,7 @@ var customVariablesWidget = {
                 </div>
                 <input type="text" class="form-control" data-custom-variable-input data-name="${variable.name}" placeholder="${_.get(translations, 'custom-variables.options-placeholder', '{custom-variables.options-placeholder}')}" value="${variable.value ? variable.value : ''}">
                 <div class="input-group-append" style="margin-top:1px;">
-                  <button class="btn btn-secondary d-none" type="button" data-name="${variable.name}" onclick="customVariablesWidget.saveValues(this)"><i class="fa fa-download"></i></button>
+                  <button class="btn btn-secondary d-none" type="button" data-name="${variable.name}" onclick="customVariablesWidget.saveValues(this)"><i class="fas fa-download"></i></button>
                 </div>
               </div>
             `)

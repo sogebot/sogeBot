@@ -44,7 +44,7 @@ class Raffles {
         finally: this.refresh
       })
 
-      global.panel.addWidget('raffles', 'widget-title-raffles', 'gift')
+      global.panel.addWidget('raffles', 'widget-title-raffles', 'fas fa-gift')
 
       this.register()
       this.announce()

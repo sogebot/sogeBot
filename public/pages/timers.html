@@ -51,7 +51,7 @@
           <div class="card">
             <div class="card-header">
               <button class="btn btn-outline-primary" onclick="addTimerResponse(event)">
-                <i class="fa fa-plus" aria-hidden="true"></i>
+                <i class="fas fa-plus" aria-hidden="true"></i>
               </button>
               <span data-lang="timers.dialog.responses"></span>
             </div>
@@ -75,7 +75,7 @@
   </li>
   <li class="nav-item">
     <button class="nav-link btn btn-success" data-toggle="modal" data-target="#timers-dlg">
-      <i class="fa fa-plus" aria-hidden="true"></i> <span data-lang="timers">
+      <i class="fas fa-plus" aria-hidden="true"></i> <span data-lang="timers">
     </button>
   </li>
   <li class="nav-item">
@@ -119,10 +119,10 @@ var timers = {
               <dt class="col-sm-4">${translations['num-of-responses']}</dt>
               <dd class="col-sm-8">
                 <p class="m-0">
-                  <i class="fa fa-eye"></i> ${responses.enabled}
+                  <i class="fas fa-eye"></i> ${responses.enabled}
                   <span class="fa-stack" style="font-size: 0.7rem">
-                    <i class="fa fa-eye fa-stack-1x fa-fw"></i>
-                    <i class="fa fa-ban fa-stack-2x text-danger fa-fw"></i>
+                    <i class="fas fa-eye fa-stack-1x fa-fw"></i>
+                    <i class="fas fa-ban fa-stack-2x text-danger fa-fw"></i>
                   </span> ${responses.disabled}</p>
               </dd>
               <dt class="col-sm-4">${translations['interval']}</dt>
@@ -133,9 +133,9 @@ var timers = {
           </div>
 
           <div class="card-footer text-center">
-            <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="timers.toggle(this)">${timer.enabled ? `<i class="fa fa-toggle-off" aria-hidden="true"></i> ${translations.timers.buttons.disable}`: `<i class="fa fa-toggle-on" aria-hidden="true"></i> ${translations.timers.buttons.enable}`}</a>
-            <a href="#" class="btn btn-outline-secondary" data-toggle="modal" data-target="#timers-dlg" data-id="${timer.name}"><i class="fa fa-pencil" aria-hidden="true"></i> ${translations.timers.buttons.edit}</a>
-            <a href="#" class="btn btn-outline-danger" data-card-delete-popover="${timer.name}"><i class="fa fa-trash-o" aria-hidden="true"></i> ${translations.timers.buttons.delete}</a>
+            <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="timers.toggle(this)">${timer.enabled ? `<i class="fas fa-toggle-off" aria-hidden="true"></i> ${translations.timers.buttons.disable}`: `<i class="fas fa-toggle-on" aria-hidden="true"></i> ${translations.timers.buttons.enable}`}</a>
+            <a href="#" class="btn btn-outline-secondary" data-toggle="modal" data-target="#timers-dlg" data-id="${timer.name}"><i class="fas fa-pencil-alt" aria-hidden="true"></i> ${translations.timers.buttons.edit}</a>
+            <a href="#" class="btn btn-outline-danger" data-card-delete-popover="${timer.name}"><i class="far fa-trash-alt" aria-hidden="true"></i> ${translations.timers.buttons.delete}</a>
           </div>
         `)
         $(`[data-card-delete-popover="${timer.name}"]`).popover({
@@ -162,8 +162,8 @@ var timers = {
 
         $(el)
           .html(cb.enabled ?
-            `<i class="fa fa-toggle-off" aria-hidden="true"></i> ${translations.timers.buttons.disable}` :
-            `<i class="fa fa-toggle-on" aria-hidden="true"></i> ${translations.timers.buttons.enable}`)
+            `<i class="fas fa-toggle-off" aria-hidden="true"></i> ${translations.timers.buttons.disable}` :
+            `<i class="fas fa-toggle-on" aria-hidden="true"></i> ${translations.timers.buttons.enable}`)
       })
     },
     delete: (el) => {
@@ -205,7 +205,7 @@ var saveChanges
           })}
           <div class="input-group-append">
             <button class="btn btn-danger" type="button" onclick="removeTimerResponse(event, this)">
-              <i class="fa fa-trash-o"></i>
+              <i class="far fa-trash-alt"></i>
             </button>
           </div>
         </div>

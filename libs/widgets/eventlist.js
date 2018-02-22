@@ -4,7 +4,7 @@
 var _ = require('lodash')
 
 function EventList () {
-  global.panel.addWidget('eventlist', 'eventlist', 'calendar-o')
+  global.panel.addWidget('eventlist', 'eventlist', 'far fa-calendar')
   global.panel.socketListening(this, 'widget.eventlist.get', this._get)
 
   global.configuration.register('widgetEventlistFollows', 'core.no-response-bool', 'bool', true)
