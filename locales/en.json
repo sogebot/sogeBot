@@ -475,6 +475,14 @@
         }
       },
       "overlays": {
+        "credits": {
+          "period": {
+            "day": "a day",
+            "week": "a week",
+            "month": "a month",
+            "all": "all"
+          }
+        },
         "replay": {
           "title": "Replay settings",
           "position": "Position",
@@ -591,6 +599,7 @@
     "overlay-credits-show-subgifts": "Show subgifts",
     "overlay-credits-show-resubs": "Show resubs",
     "overlay-credits-show-cheers": "Show cheers",
+    "overlay-credits-show-clips": "Show clips",
     "overlay-credits-speed": "Credits speed",
     "overlay-credits-last-message": "Last message",
     "overlay-credits-last-submessage": "Last submessage",
@@ -601,10 +610,14 @@
     "overlay-credits-subscribed-by": "Subscribed by",
     "overlay-credits-resubscribed-by": "Resubscribed by",
     "overlay-credits-subgift-by": "Subgift by",
+    "overlay-credits-clipped-by": "Clipped by",
     "overlay-credits-social-facebook": "Facebook",
     "overlay-credits-social-twitter": "Twitter",
     "overlay-credits-social-twitch": "Twitch",
-    "overlay-credits-fade-animation": "Fade animation",
+    "overlay-credits-clips-period": "Clips period",
+    "overlay-credits-clips-count": "Clips count",
+    "overlay-credits-clips-play": "Will clips play",
+    "overlay-credits-top-clips": "Top clips",
     "credits": "Credits",
     "fade-out-top": "fade up",
     "fade-out-zoom": "fade zoom",

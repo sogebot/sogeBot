@@ -35,7 +35,6 @@
       .end {
         position: relative;
         text-align: center;
-        opacity: 1;
       }
 
       html, body {
@@ -47,19 +46,34 @@
         position: absolute;
         left: -500%;
         width: 100%;
-        font: 300 30px/1 'Open Sans Condensed', sans-serif;
+        font: 300 3rem/1 'Open Sans Condensed', sans-serif;
         text-align: center;
         text-transform: uppercase;
         color: #fff;
         text-shadow: 0px 0px 1rem #000;
       }
 
-      .no-fade {
-        opacity: 1 !important;
+      .clip {
+        vertical-align: middle;
+        text-align: center;
+      }
+
+      .clip-title {
+        text-align: left;
+        margin-left: 13%; margin-right: 13%;
+        padding-bottom: 2rem;
+      }
+
+      .clip-title .name {
+        font-size: 3rem;
+      }
+
+      iframe, img {
+        width: 75%;
+        height: 75%;
       }
 
       .title {
-        font-size: 125px;
         font-weight: bold;
         margin-left: 5%;
         margin-right: 5%;
@@ -68,7 +82,6 @@
         margin-left: 5%;
         margin-right: 5%;
         margin-bottom: 50px;
-        font-size: 50px;
       }
 
       .last-message {
@@ -84,20 +97,25 @@
       .social {
         margin-bottom: 10px;
         margin-left: 10%;
-        font-size: 40px;
+        font-size: 3rem;
         text-align: left;
       }
 
       .job {
-        font-size: 18px;
+        font-size: 3rem;
       }
 
       .hosted-by {
-        font-size: 45px;
+        font-size: 6rem;
+      }
+
+      .top-clips {
+        font-size: 6rem;
+        margin-bottom: 150px;
       }
 
       .message {
-        font-size: 20px;
+        font-size: 4rem;
         margin-bottom: 50px;
       }
 
@@ -107,7 +125,7 @@
       }
 
       .name, .host-name {
-        font-size: 35px;
+        font-size: 4rem;
         width: 100%;
         display: inline-block;
       }
@@ -119,31 +137,32 @@
 
       .hosted-column {
         column-count: 2;
-        opacity: 1 !important;
       }
     </style>
     </head>
     <body>
       <div id='wrapper'>
-        <div class='title'><span id="game" class="no-fade"></span></div>
-        <div class='subtitle'><span id="title" class="no-fade"></span></div>
+        <div class='title'><span id="game"></span></div>
+        <div class='subtitle'><span id="title"></span></div>
 
         <div class='job' id="stream-by"></div>
         <div class='name' id="streamer"></div>
         <div class="message"></div>
 
-        <div id="events" class="no-fade"></div>
+        <div id="events"></div>
 
         <div class='hosted-by' id="hosted-by"></div>
         <div class='hosted-column' id="hosts"></div>
 
-        <div class="half-end"><!-- empty page --></div>
-        <div class="end no-fade">
-          <div class="center no-fade">
-            <div class="last-message no-fade"><span id="last-message" class="no-fade-out"></span></div>
-            <div class="last-submessage no-fade"><span id="last-submessage" class="no-fade-out"></span></div>
+        <div class="clips" id="clips"></div>
 
-            <div class="no-fade" id="social"></div>
+        <div class="half-end"><!-- empty page --></div>
+        <div class="end">
+          <div class="center">
+            <div class="last-message"><span id="last-message"></span></div>
+            <div class="last-submessage"><span id="last-submessage"></span></div>
+
+            <div id="social"></div>
           </div>
         </div>
       </div>
@@ -167,10 +186,7 @@
       }
 
       var socket = io('/overlays/credits', {query: "token="+token})
-      socket.emit('load', (err, events, streamer, game, title, hosts, socials, messages, custom, speed, show, fade) => {
-        if (fade) {
-          $('#wrapper *').css('opacity', 0)
-        }
+      socket.emit('load', (err, events, streamer, game, title, hosts, socials, messages, custom, speed, show, clips) => {
 
         $('#streamer').text(streamer)
         $('#game').text(game)
@@ -235,12 +251,12 @@
           switch (key) {
             case 'facebook':
               $('#social').append(`
-                <div class="social"><i class="fab fa-${key}-square no-fade"></i> ${value}</div>
+                <div class="social"><i class="fab fa-${key}-square"></i> ${value}</div>
               `)
               break
             default:
               $('#social').append(`
-                <div class="social"><i class="fab fa-${key} no-fade"></i> ${value}</div>
+                <div class="social"><i class="fab fa-${key}"></i> ${value}</div>
               `)
           }
         }
@@ -254,6 +270,29 @@
 
         // window height
         let wHeight = $(document).height()
+
+        if (clips.list.length > 0) {
+          $('#clips').append(`
+            <div class="half-end"></div>
+            <div class='top-clips'>${_.get(custom, 'top-clips', 'top clips')}</div>
+          `)
+        }
+
+        let i = 0
+        for (let clip of clips.list) {
+          i++
+          $('#clips').append(`
+            <div class="clip-title" style="text-align:${i % 2 === 0 ? 'right' : 'left'}" data-id="${clip.tracking_id}">
+              <div class='name'>${clip.title} </div>
+              <div class='name'><strong>${clip.game}</strong></div>
+              <div class="name">${_.get(custom, 'clipped-by', 'clipped by')} ${clip.curator.display_name}</div>
+              <div style="position:absolute; margin-top: -11%; opacity: 0.5; font-weight: bold; font-size: 10rem; ${i % 2 === 0 ? 'left: 15%;' : 'right: 15%;'}">${i}</div>
+            </div>
+            <div class="clip" style="height: ${wHeight}px" data-duration="${clip.duration}" data-embed="${clip.embed_html}" data-thumbnail="${clip.thumbnails.medium}">
+              <img src="${clip.thumbnails.medium}" data-id="${clip.tracking_id}"></img>
+            </div>`)
+        }
+
 
         // set windows height for end (to be on "separate" page)
         $('.end').css('height', `${wHeight}px`)
@@ -276,55 +315,33 @@
         let elements = $('#wrapper *')
         //remove end from elements
 
-        if (fade) {
-          // fade out
-          let outElements = _.clone(elements)
+        if (clips.list.length > 0 && clips.play) {
+          // check for clips
+          let clips = $('.clip')
+          let clipsBackup = _.clone(clips)
+          let triggerHeight = wHeight / 4.5
           setInterval(() => {
-            for (let i in outElements) {
+            for (let i in clips) {
               try {
-                if (!outElements.hasOwnProperty(i) || i === 'length' || i === 'prevObject') continue
-                if ($(outElements[i]).offset().top < ($(outElements[i]).height() / 2) + 20 &&
-                  !$(outElements[i]).hasClass('fab') &&
-                  !$(outElements[i]).hasClass('no-fade') &&
-                  !$(outElements[i]).hasClass('no-fade-out') &&
-                  !$(outElements[i]).hasClass('hosted-column')) {
-                  $(outElements[i]).velocity({ opacity: 0 }, $(outElements[i]).height() * speed)
-                  delete outElements[i]
-                }
-                if ($(outElements[i]).hasClass('fab') ||
-                    $(outElements[i]).hasClass('no-fade') ||
-                    $(outElements[i]).hasClass('hosted-column')) {
-                  delete outElements[i]
+                if (!clips.hasOwnProperty(i) || i === 'length' || i === 'prevObject') continue
+                if ($(clips[i]).offset().top <= triggerHeight) {
+                  $('#wrapper').velocity("pause")
+                  $(clips[i]).empty()
+                  $(clips[i]).append($(clips[i]).data('embed'))
+                  setTimeout(() => {
+                    $(clipsBackup[i]).empty()
+                    $(clipsBackup[i]).append(`<img src="${$(clipsBackup[i]).data('thumbnail')}"></img>`)
+                    $('#wrapper').velocity("resume")
+                  }, ($(clipsBackup[i]).data('duration') + 1) * 1000)
+                  delete clips[i]
                 }
               } catch (e) {
                 console.debug(e)
-                console.debug(outElements[i])
+                console.debug(clips[i])
                 continue
               }
             }
-          }, 1)
-
-          // fade in
-          let inElements = _.clone(elements)
-          setInterval(() => {
-            for (let i in inElements) {
-              try {
-                if (!inElements.hasOwnProperty(i) || i === 'length' || i === 'prevObject') continue
-                if ($(inElements[i]).offset().top < wHeight - ($(outElements[i]).height() / 2) - 20 &&
-                  !$(outElements[i]).hasClass('no-fade')) {
-                  $(inElements[i]).velocity({ opacity: 1 }, $(outElements[i]).height() * speed)
-                  delete inElements[i]
-                }
-                if ($(outElements[i]).hasClass('no-fade')) {
-                  delete outElements[i]
-                }
-              } catch (e) {
-                console.debug(e)
-                console.debug(inElements[i])
-                continue
-              }
-            }
-          }, 1)
+          }, 100)
         }
       })
     </script>

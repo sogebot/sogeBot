@@ -1,5 +1,6 @@
 const debug = require('debug')
 const _ = require('lodash')
+const snekfetch = require('snekfetch')
 const config = require('../../config.json')
 
 class Credits {
@@ -12,10 +13,9 @@ class Credits {
     global.configuration.register('creditsSubgifts', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsResubs', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsCheers', 'core.no-response-bool', 'bool', true)
+    global.configuration.register('creditsClips', 'core.no-response-bool', 'bool', true)
 
     global.configuration.register('creditsSpeed', 'core.no-response', 'number', 35)
-
-    global.configuration.register('creditsFadeAnimation', 'core.no-response-bool', 'bool', true)
 
     global.configuration.register('creditsLastMessage', 'core.no-response', 'string', 'Thanks for watching!')
     global.configuration.register('creditsLastSubMessage', 'core.no-response', 'string', '~ see you on the next stream ~')
@@ -27,10 +27,16 @@ class Credits {
     global.configuration.register('creditsSubscribedBy', 'core.no-response', 'string', 'Subscribed by')
     global.configuration.register('creditsResubscribedBy', 'core.no-response', 'string', 'Resubscribed <strong>$months months</strong> by')
     global.configuration.register('creditsSubgiftBy', 'core.no-response', 'string', '<strong>$from</strong> gifted subscribe to')
+    global.configuration.register('creditsClippedBy', 'core.no-response', 'string', 'Clipped by')
+    global.configuration.register('creditsTopClips', 'core.no-response', 'string', 'Top clips')
 
     global.configuration.register('creditsSocialFacebook', 'core.no-response', 'string', '')
     global.configuration.register('creditsSocialTwitter', 'core.no-response', 'string', '')
     global.configuration.register('creditsSocialTwitch', 'core.no-response', 'string', '')
+
+    global.configuration.register('creditsTopClipsPeriod', 'core.no-response', 'string', 'week') // possibilities day, week, month, all
+    global.configuration.register('creditsTopClipsPlay', 'core.no-response-bool', 'bool', true)
+    global.configuration.register('creditsTopClipsCount', 'core.no-response', 'number', 3)
   }
 
   sockets () {
@@ -65,7 +71,9 @@ class Credits {
           'cheer-by': global.configuration.getValue('creditsCheerBy'),
           'subscribed-by': global.configuration.getValue('creditsSubscribedBy'),
           'resubscribed by': global.configuration.getValue('creditsResubscribedBy'),
-          'subgift-by': global.configuration.getValue('creditsSubgiftBy')
+          'subgift-by': global.configuration.getValue('creditsSubgiftBy'),
+          'clipped-by': global.configuration.getValue('creditsClippedBy'),
+          'top-clips': global.configuration.getValue('creditsTopClips')
         }
         let show = {
           followers: global.configuration.getValue('creditsFollowers'),
@@ -74,6 +82,11 @@ class Credits {
           subgifts: global.configuration.getValue('creditsSubgifts'),
           resubs: global.configuration.getValue('creditsResubs'),
           cheers: global.configuration.getValue('creditsCheers')
+        }
+
+        let clips = { play: global.configuration.getValue('creditsTopClipsPlay'), list: [] }
+        if (global.configuration.getValue('creditsClips')) {
+          clips.list = await this.getTopClips()
         }
 
         callback(null,
@@ -87,10 +100,29 @@ class Credits {
           custom,
           speed,
           show,
-          global.configuration.getValue('creditsFadeAnimation')
+          clips
         )
       })
     })
+  }
+
+  async getTopClips () {
+    const period = _.includes(['day', 'week', 'month', 'all'], global.configuration.getValue('creditsTopClipsPeriod')) ? global.configuration.getValue('creditsTopClipsPeriod') : 'day'
+    const count = global.configuration.getValue('creditsTopClipsCount')
+    const channel = config.settings.broadcaster_username
+
+    var request
+    const url = `https://api.twitch.tv/kraken/clips/top?channel=${channel}&period=${period}&trending=false&limit=${count}`
+    try {
+      request = await snekfetch.get(url)
+        .set('Accept', 'application/vnd.twitchtv.v5+json')
+        .set('Client-ID', config.settings.client_id)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: request.status })
+    } catch (e) {
+      global.log.error(`API: ${url} - ${e.message}`)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: e.message })
+    }
+    return request.body.clips
   }
 }
 
