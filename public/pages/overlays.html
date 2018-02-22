@@ -349,6 +349,14 @@
           <div class="col" style="max-width: 50%">
             <input id="creditsCheersToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
           </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-show-clips"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="creditsClipsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
         </div>
 
         <div class="col" style="max-width: 50%">
@@ -360,14 +368,6 @@
           </div>
           <div class="col" style="max-width: 50%">
             <input id="input_creditsSpeed" class="form-control input-sm" type="text" />
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-fade-animation"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="creditsFadeAnimationToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
           </div>
         </div>
 
@@ -445,6 +445,55 @@
           <div class="col" style="max-width: 50%">
             <input id="input_creditsSubgiftBy" class="form-control input-sm" type="text" />
           </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-clipped-by"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsClippedBy" class="form-control input-sm" type="text" />
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-top-clips"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsTopClips" class="form-control input-sm" type="text" />
+          </div>
+        </div>
+
+        <div class="col" style="max-width: 50%">
+          <span class="title title-part text-default">Clips</span>
+        </div>
+        <div class="row settings settings-part">
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-clips-period"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <select id="overlay-credits-clips-period" class="form-control" onchange="saveClipsPeriod()">
+                <option value="day" data-lang="page-settings.overlays.credits.period.day"></option>
+                <option value="week" data-lang="page-settings.overlays.credits.period.week"></option>
+                <option value="month" data-lang="page-settings.overlays.credits.period.month"></option>
+                <option value="all" data-lang="page-settings.overlays.credits.period.all"></option>
+              </select>
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-clips-count"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="input_creditsTopClipsCount" class="form-control input-sm" type="text" />
+          </div>
+          <div class="w-100"></div>
+
+          <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-clips-play"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="creditsTopClipsPlayToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
         </div>
 
         <div class="col" style="max-width: 50%">
@@ -512,92 +561,35 @@
     $('#overlay-replay-filter-select option[value=' + data.replayFilter + ']').prop('selected', true)
 
     // CREDITS ////////////////////////////////////////////////////////////////
-    $('#input_creditsSpeed').val(data.creditsSpeed)
     $('#input_creditsSpeed').attr('placeholder', _.get(translations, 'placeholders.creditsSpeed', '{placeholders.creditsSpeed}'))
 
-    $('#input_creditsLastMessage').val(data.creditsLastMessage)
-    $('#input_creditsLastSubMessage').val(data.creditsLastSubMessage)
-    $('#input_creditsStreamBy').val(data.creditsStreamBy)
-    $('#input_creditsFollowedBy').val(data.creditsFollowedBy)
-    $('#input_creditsHostedBy').val(data.creditsHostedBy)
-    $('#input_creditsCheerBy').val(data.creditsCheerBy)
-    $('#input_creditsSubscribedBy').val(data.creditsSubscribedBy)
-    $('#input_creditsResubscribedBy').val(data.creditsResubscribedBy)
-    $('#input_creditsSubgiftBy').val(data.creditsSubgiftBy)
+    for (let input of $('input[id^="input_credits"]')) {
+      let key = $(input).attr('id').split('_')[1]
+      $(input).val(data[key])
+    }
 
-    $('#input_creditsSocialFacebook').val(data.creditsSocialFacebook)
-    $('#input_creditsSocialTwitter').val(data.creditsSocialTwitter)
-    $('#input_creditsSocialTwitch').val(data.creditsSocialTwitch)
+    $('#overlay-credits-clips-period option[value=' + data.creditsTopClipsPeriod + ']').prop('selected', true)
 
-    $('#creditsFadeAnimationToggle').bootstrapToggle(options)
-    $('#creditsFadeAnimationToggle').bootstrapToggle(data.creditsFadeAnimation ? 'on' : 'off')
-    $('#creditsFadeAnimationToggle').off('change')
-    $('#creditsFadeAnimationToggle').on('change', function () {
-      var data = {}
-      data['creditsFadeAnimation'] = $(this).prop('checked')
-      if ($('#creditsFadeAnimationToggle').data('init')) socket.emit('saveConfiguration', data)
-    })
-    $('#creditsFadeAnimationToggle').data('init', true)
+    const toggle = (id) => {
+      $(`#${id}Toggle`).bootstrapToggle(options)
+      $(`#${id}Toggle`).bootstrapToggle(data[id] ? 'on' : 'off')
+      $(`#${id}Toggle`).off('change')
+      $(`#${id}Toggle`).on('change', function () {
+        var data = {}
+        data[id] = $(this).prop('checked')
+        if ($(`#${id}Toggle`).data('init')) socket.emit('saveConfiguration', data)
+      })
+      $(`#${id}Toggle`).data('init', true)
+    }
 
-    $('#creditsFollowersToggle').bootstrapToggle(options)
-    $('#creditsFollowersToggle').bootstrapToggle(data.creditsFollowers ? 'on' : 'off')
-    $('#creditsFollowersToggle').off('change')
-    $('#creditsFollowersToggle').on('change', function () {
-      var data = {}
-      data['creditsFollowers'] = $(this).prop('checked')
-      if ($('#creditsFollowersToggle').data('init')) socket.emit('saveConfiguration', data)
-    })
-    $('#creditsFollowersToggle').data('init', true)
-
-    $('#creditsHostsToggle').bootstrapToggle(options)
-    $('#creditsHostsToggle').bootstrapToggle(data.creditsHosts ? 'on' : 'off')
-    $('#creditsHostsToggle').off('change')
-    $('#creditsHostsToggle').on('change', function () {
-      var data = {}
-      data['creditsHosts'] = $(this).prop('checked')
-      if ($('#creditsHostsToggle').data('init')) socket.emit('saveConfiguration', data)
-    })
-    $('#creditsHostsToggle').data('init', true)
-
-    $('#creditsSubscribersToggle').bootstrapToggle(options)
-    $('#creditsSubscribersToggle').bootstrapToggle(data.creditsSubscribers ? 'on' : 'off')
-    $('#creditsSubscribersToggle').off('change')
-    $('#creditsSubscribersToggle').on('change', function () {
-      var data = {}
-      data['creditsSubscribers'] = $(this).prop('checked')
-      if ($('#creditsSubscribersToggle').data('init')) socket.emit('saveConfiguration', data)
-    })
-    $('#creditsSubscribersToggle').data('init', true)
-
-    $('#creditsSubgiftsToggle').bootstrapToggle(options)
-    $('#creditsSubgiftsToggle').bootstrapToggle(data.creditsSubgifts ? 'on' : 'off')
-    $('#creditsSubgiftsToggle').off('change')
-    $('#creditsSubgiftsToggle').on('change', function () {
-      var data = {}
-      data['creditsSubgifts'] = $(this).prop('checked')
-      if ($('#creditsSubgiftsToggle').data('init')) socket.emit('saveConfiguration', data)
-    })
-    $('#creditsSubgiftsToggle').data('init', true)
-
-    $('#creditsResubsToggle').bootstrapToggle(options)
-    $('#creditsResubsToggle').bootstrapToggle(data.creditsResubs ? 'on' : 'off')
-    $('#creditsResubsToggle').off('change')
-    $('#creditsResubsToggle').on('change', function () {
-      var data = {}
-      data['creditsResubs'] = $(this).prop('checked')
-      if ($('#creditsResubsToggle').data('init')) socket.emit('saveConfiguration', data)
-    })
-    $('#creditsResubsToggle').data('init', true)
-
-    $('#creditsCheersToggle').bootstrapToggle(options)
-    $('#creditsCheersToggle').bootstrapToggle(data.creditsCheers ? 'on' : 'off')
-    $('#creditsCheersToggle').off('change')
-    $('#creditsCheersToggle').on('change', function () {
-      var data = {}
-      data['creditsCheers'] = $(this).prop('checked')
-      if ($('#creditsCheersToggle').data('init')) socket.emit('saveConfiguration', data)
-    })
-    $('#creditsCheersToggle').data('init', true)
+    toggle('creditsTopClipsPlay')
+    toggle('creditsFollowers')
+    toggle('creditsHosts')
+    toggle('creditsSubscribers')
+    toggle('creditsSubgifts')
+    toggle('creditsResubs')
+    toggle('creditsCheers')
+    toggle('creditsClips')
     // !CREDITS ///////////////////////////////////////////////////////////////
   })
 
@@ -652,6 +644,12 @@
   function saveReplayFil() {
     socket.emit('saveConfiguration', {
       'replayFilter': $('#overlay-replay-filter-select').val()
+    })
+  }
+
+  function saveClipsPeriod() {
+    socket.emit('saveConfiguration', {
+      'creditsTopClipsPeriod': $('#overlay-credits-clips-period').val()
     })
   }
 

@@ -475,6 +475,14 @@
         }
       },
       "overlays": {
+        "credits": {
+          "period": {
+            "day": "den",
+            "week": "týden",
+            "month": "měsíc",
+            "all": "bez omezení"
+          }
+        },
         "replay": {
           "title": "Nastavení replaye",
           "position": "Pozice",
@@ -561,6 +569,7 @@
     "overlay-credits-show-subgifts": "Zobrazit subgifty",
     "overlay-credits-show-resubs": "Zobrazit resuby",
     "overlay-credits-show-cheers": "Zobrazit cheery",
+    "overlay-credits-show-clips": "Zobrazit klipy",
     "overlay-credits-speed": "Rychlost titulek",
     "overlay-credits-last-message": "Poslední zpráva",
     "overlay-credits-last-submessage": "Poslední podzpráva",
@@ -571,10 +580,14 @@
     "overlay-credits-subscribed-by": "Subscribe od",
     "overlay-credits-resubscribed-by": "Resubscribe od",
     "overlay-credits-subgift-by": "Subgift od",
+    "overlay-credits-clipped-by": "Klip od",
     "overlay-credits-social-facebook": "Facebook",
     "overlay-credits-social-twitter": "Twitter",
     "overlay-credits-social-twitch": "Twitch",
-    "overlay-credits-fade-animation": "Animace slábnutí",
+    "overlay-credits-clips-period": "Klipy za období",
+    "overlay-credits-clips-count": "Počet klipů",
+    "overlay-credits-clips-play": "Bude klipy přehrávány",
+    "overlay-credits-top-clips": "Top klipy",
     "credits": "Titulky",
     "requested-by": "Požadoval",
     "description": "Popisek",

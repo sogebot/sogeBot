@@ -17,8 +17,6 @@ class Credits {
 
     global.configuration.register('creditsSpeed', 'core.no-response', 'number', 35)
 
-    global.configuration.register('creditsFadeAnimation', 'core.no-response-bool', 'bool', true)
-
     global.configuration.register('creditsLastMessage', 'core.no-response', 'string', 'Thanks for watching!')
     global.configuration.register('creditsLastSubMessage', 'core.no-response', 'string', '~ see you on the next stream ~')
 
@@ -29,6 +27,8 @@ class Credits {
     global.configuration.register('creditsSubscribedBy', 'core.no-response', 'string', 'Subscribed by')
     global.configuration.register('creditsResubscribedBy', 'core.no-response', 'string', 'Resubscribed <strong>$months months</strong> by')
     global.configuration.register('creditsSubgiftBy', 'core.no-response', 'string', '<strong>$from</strong> gifted subscribe to')
+    global.configuration.register('creditsClippedBy', 'core.no-response', 'string', 'Clipped by')
+    global.configuration.register('creditsTopClips', 'core.no-response', 'string', 'Top clips')
 
     global.configuration.register('creditsSocialFacebook', 'core.no-response', 'string', '')
     global.configuration.register('creditsSocialTwitter', 'core.no-response', 'string', '')
@@ -71,7 +71,9 @@ class Credits {
           'cheer-by': global.configuration.getValue('creditsCheerBy'),
           'subscribed-by': global.configuration.getValue('creditsSubscribedBy'),
           'resubscribed by': global.configuration.getValue('creditsResubscribedBy'),
-          'subgift-by': global.configuration.getValue('creditsSubgiftBy')
+          'subgift-by': global.configuration.getValue('creditsSubgiftBy'),
+          'clipped-by': global.configuration.getValue('creditsClippedBy'),
+          'top-clips': global.configuration.getValue('creditsTopClips')
         }
         let show = {
           followers: global.configuration.getValue('creditsFollowers'),
@@ -82,9 +84,9 @@ class Credits {
           cheers: global.configuration.getValue('creditsCheers')
         }
 
-        let clips = {
-          list: await this.getTopClips(),
-          play: global.configuration.getValue('creditsTopClipsPlay')
+        let clips = { play: global.configuration.getValue('creditsTopClipsPlay'), list: [] }
+        if (global.configuration.getValue('creditsClips')) {
+          clips.list = await this.getTopClips()
         }
 
         callback(null,
@@ -98,7 +100,6 @@ class Credits {
           custom,
           speed,
           show,
-          global.configuration.getValue('creditsFadeAnimation'),
           clips
         )
       })
