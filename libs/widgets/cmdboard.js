@@ -3,7 +3,7 @@
 var _ = require('lodash')
 
 function CmdboardWidget () {
-  global.panel.addWidget('cmdboard', 'widget-title-cmdboard', 'th')
+  global.panel.addWidget('cmdboard', 'widget-title-cmdboard', 'fas fa-th')
 
   global.panel.socketListening(this, 'cmdboard.widget.fetch', this.fetchCommands)
   global.panel.socketListening(this, 'cmdboard.widget.run', this.runCommand)

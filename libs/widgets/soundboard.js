@@ -4,7 +4,7 @@ var _ = require('lodash')
 var glob = require('glob')
 
 function SoundboardWidget () {
-  global.panel.addWidget('soundboard', 'widget-title-soundboard', 'music')
+  global.panel.addWidget('soundboard', 'widget-title-soundboard', 'fas fa-music')
 
   global.panel.socketListening(this, 'getSoundBoardSounds', this.getSoundBoardSounds)
 }

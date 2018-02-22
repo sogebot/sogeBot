@@ -2,7 +2,7 @@
 
 function CommercialWidget () {
   if (global.commons.isSystemEnabled('commercial')) {
-    global.panel.addWidget('commercial', 'widget-title-commercial', 'usd')
+    global.panel.addWidget('commercial', 'widget-title-commercial', 'fas fa-dollar-sign')
     global.panel.socketListening(this, 'commercial.run', this.runCommercial)
   }
 }

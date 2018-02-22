@@ -4,17 +4,17 @@
     <li role="presentation" class="nav-item">
       <a class="nav-link" href="#yt-song-requests" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
         <span id="yt-song-requests-count">0</span>
-        <i class="fa fa-user" aria-hidden="true"></i>
+        <i class="fas fa-user" aria-hidden="true"></i>
       </a>
     </li>
     <li role="presentation" class="nav-item">
       <a class="nav-link active" href="#yt-player" aria-controls="home" role="tab" data-toggle="tab">
-        <i class="fa fa-music" aria-hidden="true"></i>
+        <i class="fas fa-music" aria-hidden="true"></i>
       </a>
     </li>
     <li role="presentation" class="nav-item">
       <a class="nav-link" href="#yt-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-        <i class="fa fa-cog" aria-hidden="true"></i>
+        <i class="fas fa-cog" aria-hidden="true"></i>
       </a>
     </li>
   </ul>
@@ -26,15 +26,15 @@
       <div class="row">
         <div class="btn-group" role="group" aria-label="..." style="width: 100%; padding-left:15px; padding-right: 15px; height: 34px;">
           <button type="button" class="btn btn-success" id="YTControl">
-            <i class="fa fa-play" aria-hidden="true"></i>
+            <i class="fas fa-play" aria-hidden="true"></i>
           </button>
           <button type="button" class="btn btn-secondary" onclick="skipSong()">
-            <i class="fa fa-forward" aria-hidden="true"></i>
+            <i class="fas fa-forward" aria-hidden="true"></i>
           </button>
 
           <div class="btn-group" role="group">
             <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fa fa-sliders" aria-hidden="true"></i>
+              <i class="fas fa-sliders" aria-hidden="true"></i>
               <span class="caret"></span>
             </button>
             <div class="dropdown-menu">
@@ -171,7 +171,7 @@
       'videoId': video.videoID
     }
 
-    let currentSong = ' <i class="fa fa-music" style="margin-left:3px;" aria-hidden="true"></i> ' + video.title + (!_.isNil(video.username) ? ` <strong class="alert alert-light" style="padding:0">${video.username}</strong>` : '')
+    let currentSong = ' <i class="fas fa-music" style="margin-left:3px;" aria-hidden="true"></i> ' + video.title + (!_.isNil(video.username) ? ` <strong class="alert alert-light" style="padding:0">${video.username}</strong>` : '')
     $("#yt-player-currentsong").html(currentSong)
     $("#yt-player-currentsong").parent().attr('title', video.title)
     if (typeof video.startTime !== 'undefined') data.startSeconds = video.startTime

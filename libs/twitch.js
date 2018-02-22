@@ -69,7 +69,7 @@ class Twitch {
     global.configuration.register('hostsViewersAtLeast', 'core.settings.hostsViewersAtLeast', 'number', 2)
     global.configuration.register('hostsIgnoreAutohost', 'core.settings.hostsIgnoreAutohost', 'bool', false)
 
-    global.panel.addWidget('twitch', 'widget-title-monitor', 'television')
+    global.panel.addWidget('twitch', 'widget-title-monitor', 'fab fa-twitch')
 
     global.panel.registerSockets({
       self: this,

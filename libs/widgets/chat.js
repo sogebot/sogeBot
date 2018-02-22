@@ -4,7 +4,7 @@ const config = require('../../config.json')
 const fetch = require('snekfetch')
 
 function ChatWidget () {
-  global.panel.addWidget('chat', 'widget-title-chat', 'comment')
+  global.panel.addWidget('chat', 'widget-title-chat', 'far fa-comments')
   global.panel.socketListening(this, 'getChatRoom', this.sendChatRoom)
   global.panel.socketListening(this, 'chat.message.send', this.chatMessageSend)
 

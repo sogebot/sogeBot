@@ -38,7 +38,7 @@ class Songs {
       this.getMeanLoudness(this)
 
       global.panel.addMenu({category: 'manage', name: 'songs', id: 'songs'})
-      global.panel.addWidget('ytplayer', 'widget-title-ytplayer', 'headphones')
+      global.panel.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones')
       global.panel.registerSockets({
         self: this,
         expose: ['getCurrentVolume', 'send', 'setTrim', 'sendConfiguration', 'banSong', 'getSongRequests', 'stealSong', 'sendNextSongID', 'removeSongFromPlaylist', 'unbanSong']

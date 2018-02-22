@@ -11,7 +11,7 @@
   <li class="nav-item">
     <a class="nav-link" href="/playlist/" target="_blank">
       <span data-lang="public-link"></span>
-      <i class="fa fa-external-link" aria-hidden="true"></i>
+      <i class="fas fa-external-link" aria-hidden="true"></i>
     </a>
   </li>
 </ul>
@@ -92,7 +92,7 @@
           return 'Unban <strong>' + data.title + '</strong>'
         },
         classNames: ['action-danger'],
-        iconClass: 'fa-trash-o',
+        iconClass: 'fa-trash-alt',
         onClick: function (data) {
           socket.emit('songs.unbanSong', data.videoid)
         }
@@ -150,7 +150,7 @@
           return 'Delete <strong>' + data.title + '</strong> From Playlist'
         },
         classNames: ['action-danger'],
-        iconClass: 'fa-trash-o',
+        iconClass: 'fa-trash-alt',
         onClick: function (data) {
           socket.emit('songs.removeSongFromPlaylist', data.videoid)
         }

@@ -44,7 +44,7 @@
           <tr>
             <th class="sortable" onclick="viewers.sort(this)" data-sort="username">
               <span data-lang="username"></span>
-              <i class="fa fa-sort-asc" aria-hidden="true"></i>
+              <i class="fas fa-sort-asc" aria-hidden="true"></i>
             </th>
             <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="time.message">
               <span data-lang="last-seen"></span>
@@ -90,7 +90,7 @@
       <div class="col">
         <textarea class="form-control" rows="10" id="ignorelist-textarea"></textarea>
         <button class="btn btn-lg btn-outline-info float-right" id="ignorelist-submit">Save changes</button>
-        <div class="alert alert-info d-none" role="alert" id="ignorelist-alert-info"><i class="fa fa-spinner fa-pulse fa-fw" ></i>Saving changes</div>
+        <div class="alert alert-info d-none" role="alert" id="ignorelist-alert-info"><i class="fas fa-spinner fa-pulse fa-fw" ></i>Saving changes</div>
         <div class="alert alert-danger d-none" role="alert" id="ignorelist-alert-danger">Something went wrong!</div>
         <div class="alert alert-success d-none" role="alert" id="ignorelist-alert-success">Saved OK!</div>
       </div>
@@ -190,11 +190,11 @@
           '\')"> REGULAR </button>' +
           '<button disabled class="btn ' + (item.is.online ? "btn-success" : "btn-danger") + '"> ONLINE </button></td>' +
           '<td class="tableMenu">' +
-          '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="fa fa-trash"></span></button>' +
+          '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="fas fa-trash"></span></button>' +
           '<button type="button" style="display: none" class="btn btn-success btn-confirm" data-username="' +
           item.username +
-          '" onclick="viewers.delete(this)"><span class="fa fa-check"></span></button>' +
-          '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="fa fa-remove"></span></button>' +
+          '" onclick="viewers.delete(this)"><span class="fas fa-check"></span></button>' +
+          '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="fas fa-remove"></span></button>' +
           '</td>' +
           '</tr>');
         if (!systems.points) {

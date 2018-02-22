@@ -3,42 +3,45 @@
   <ul class="nav nav-pills" role="tablist">
     <li role="presentation" class="nav-item">
       <a class="nav-link active" href="#eventlist-main" aria-controls="home" role="tab" data-toggle="tab" title="EventList">
-        <i class="fa fa-calendar-o" aria-hidden="true"></i>
+        <i class="fas fa-calendar" aria-hidden="true"></i>
       </a>
     </li>
     <li role="presentation" class="nav-item">
       <button data-id="follow" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-        <i class="fa fa-heart"></i>
+        <i class="fas fa-heart"></i>
       </button>
     </li>
     <li role="presentation" class="nav-item">
       <button data-id="host" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-        <i class="fa fa-bullhorn"></i>
+        <i class="fas fa-bullhorn"></i>
       </button>
     </li>
     <li role="presentation" class="nav-item">
       <button data-id="cheer" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-        <i class="fa fa-diamond"></i>
+        <i class="fas fa-gem"></i>
       </button>
     </li>
     <li role="presentation" class="nav-item">
       <button data-id="sub" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-        <i class="fa fa-star"></i>
+        <i class="fas fa-star"></i>
       </button>
     </li>
     <li role="presentation" class="nav-item">
       <button data-id="subgift" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-        <i class="fa fa-gift"></i>
+        <i class="fas fa-gift"></i>
       </button>
     </li>
     <li role="presentation" class="nav-item">
       <button data-id="resub" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-        <i class="fa fa-star-half-o"></i>
+        <span class="fa-stack">
+          <i class="fas fa-star-half fa-stack-1x"></i>
+          <i class="fas fa-long-arrow-alt-right fa-stack-1x"></i>
+        </span>
       </button>
     </li>
     <li role="presentation">
       <a class="nav-link" href="#eventlist-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-        <i class="fa fa-cog" aria-hidden="true"></i>
+        <i class="fas fa-cog" aria-hidden="true"></i>
       </a>
     </li>
   </ul>
@@ -46,7 +49,7 @@
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="eventlist-main">
         <div class="alert alert-primary" role="alert">
-          <i class="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i>
+          <i class="fas fa-circle-o-notch fa-spin fa-1x fa-fw"></i>
           <strong>loading data...</strong>
         </div>
     </div>
@@ -186,8 +189,8 @@
         host: 'bullhorn',
         sub: 'star',
         subgift: 'gift',
-        resub: 'star-half-o',
-        cheer: 'diamond'
+        resub: 'star-half',
+        cheer: 'gem'
       }
 
     let eventlistEl = $('#eventlist-main')
@@ -213,7 +216,7 @@
         username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t}</span>
-          <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
       }
 
@@ -221,7 +224,7 @@
         username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$viewers', '<strong>' + _.get(event, 'viewers', '0') + '</strong>')}</span>
-          <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
       }
 
@@ -229,7 +232,7 @@
         username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t}</span>
-          <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
       }
 
@@ -237,7 +240,7 @@
         username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$username', _.get(event, 'from', 'n/a'))}</span>
-          <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
       }
 
@@ -245,7 +248,11 @@
         username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$months', '<strong>' + _.get(event, 'months', '0') + '</strong>')}</span>
-          <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+
+          <span class="fa-stack" style="position: absolute; right: 0.5rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true">
+            <i class="fas fa-star-half fa-stack-1x"></i>
+            <i class="fas fa-long-arrow-alt-right fa-stack-1x"></i>
+          </span>
         </div>`
         if (_.get(event, 'message', '').trim().length > 0) {
           message = `
@@ -259,7 +266,7 @@
         username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$bits', '<strong>' + _.get(event, 'bits', '0') + '</strong>')}</span>
-          <i class="fa fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
         if (_.get(event, 'message', '').trim().length > 0) {
           message = `

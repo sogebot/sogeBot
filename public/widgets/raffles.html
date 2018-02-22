@@ -4,23 +4,23 @@
     <li role="presentation" class="nav-item">
       <a class="nav-link" href="#raffles-participants" aria-controls="home" role="tab" data-toggle="tab" title="Participants">
         <span id="raffles-participants-count">0</span>
-        <i class="fa fa-users" aria-hidden="true"></i>
+        <i class="fas fa-users" aria-hidden="true"></i>
       </a>
     </li>
     <li role="presentation" class="nav-item">
       <a class="nav-link active" href="#raffles-giveaway" aria-controls="home" role="tab" data-toggle="tab" title="Giveaway">
-        <i class="fa fa-gift" aria-hidden="true"></i>
+        <i class="fas fa-gift" aria-hidden="true"></i>
       </a>
     </li>
     <li role="presentation" class="nav-item">
       <a class="nav-link" href="#raffles-winner" aria-controls="home" role="tab" data-toggle="tab" title="Last winner" style="display:none">
-        <i class="fa fa-trophy" aria-hidden="true"></i>
+        <i class="fas fa-trophy" aria-hidden="true"></i>
         <span class="raffles-winner-name"></span>
       </a>
     </li>
     <li role="presentation" class="nav-item">
       <a class="nav-link" href="#raffles-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-        <i class="fa fa-cog" aria-hidden="true"></i>
+        <i class="fas fa-cog" aria-hidden="true"></i>
       </a>
     </li>
   </ul>
@@ -32,7 +32,7 @@
         <input type="text" class="form-control" placeholder="Search..." id="rafflesWidgetSearch" onkeyup="raffles.search(this)">
         <span class="input-group-btn">
           <button class="btn btn-muted" type="button" title="Cancel search" onclick="raffles.clean()">
-            <i class="fa fa-close" aria-hidden="true"></i>
+            <i class="fas fa-close" aria-hidden="true"></i>
           </button>
         </span>
       </div>
@@ -48,10 +48,10 @@
         <input type="text" class="form-control" placeholder="Enter keyword..." id="rafflesWidgetKeyword">
         <span class="input-group-btn">
           <button class="btn btn-success" id="openBtn" type="button" title="" onclick="raffles.open()">
-              <i class="fa fa-plus" aria-hidden="true"></i>
+              <i class="fas fa-plus" aria-hidden="true"></i>
           </button>
           <button class="btn btn-danger" style="display: none" id="removeBtn" type="button" title="" onclick="raffles.remove()">
-            <i class="fa fa-close" aria-hidden="true"></i>
+            <i class="fas fa-close" aria-hidden="true"></i>
           </button>
         </span>
       </div>
@@ -114,7 +114,7 @@
     <div role="tabpanel" class="tab-pane" id="raffles-winner">
       <div style="text-align: center">
         <strong style="font-size: 30px">
-          <i class="fa fa-twitch" aria-hidden="true"></i>
+          <i class="fab fa-twitch" aria-hidden="true"></i>
           <span class="raffles-winner-name"></span>
         </strong>
       </div>
@@ -129,13 +129,13 @@
           </button>
           <button type="button" class="btn btn-link">
             <a href="" id="raffleWinnerMessage" target="_blank">
-              <i class="fa fa-envelope" aria-hidden="true"></i>
+              <i class="fas fa-envelope" aria-hidden="true"></i>
               <span data-lang="send-message"></span>
             </a>
           </button>
           <button type="button" class="btn btn-link" onclick="raffles.pick()">
             <span style="color: gray">
-              <i class="fa fa-refresh" aria-hidden="true"></i>
+              <i class="fas fa-refresh" aria-hidden="true"></i>
               <i data-lang="roll-again"></i>
             </span>
           </button>
@@ -147,7 +147,7 @@
           <thead>
             <tr>
               <td colspan="2" style="vertical-align: bottom; font-size: 18px;">
-                <i class="fa fa-comments-o" aria-hidden="true"></i>
+                <i class="fas fa-comments-o" aria-hidden="true"></i>
                 <i data-lang="messages"></i>
               </td>
             </tr>
@@ -406,13 +406,13 @@
       _.each(list, function (item) {
         max_show--
         $el.append('<li data-username="' + item.username + '" data-eligible="' + item.eligible +
-        '" onclick="raffles.toggleEligibility(this)" class="' + (max_show < 0 ? 'd-none' : '') + '"><i class="fa ' + (item.eligible ?
+        '" onclick="raffles.toggleEligibility(this)" class="' + (max_show < 0 ? 'd-none' : '') + '"><i class="fas ' + (item.eligible ?
         'fa-check-circle-o text-success' : 'fa-dot-circle-o') + '" aria-hidden="true"></i> ' + item.username +
         '</li>')
       })
 
       if (max_show < 0) {
-        $el.append('<li><i class="fa fa-eye-slash" aria-hidden="true" style="color: red"></i> ' + Math.abs(
+        $el.append('<li><i class="fas fa-eye-slash" aria-hidden="true" style="color: red"></i> ' + Math.abs(
           max_show) + ' hidden</li>')
       }
 

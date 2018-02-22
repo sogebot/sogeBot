@@ -5,7 +5,7 @@ const _ = require('lodash')
 
 class CustomVariablesWidget {
   constructor () {
-    global.panel.addWidget('customvariables', 'widget-title-customvariables', 'usd')
+    global.panel.addWidget('customvariables', 'widget-title-customvariables', 'fas fa-dollar-sign')
     this.sockets()
   }
 
