@@ -23,6 +23,11 @@ class Twitch {
     this.newChatters = 0
     this.streamType = 'live'
 
+    this.retries = {
+      getCurrentStreamData: 0,
+      getChannelDataOldAPI: 0
+    }
+
     this.current = {
       viewers: 0,
       views: 0,
@@ -247,11 +252,24 @@ class Twitch {
     }
 
     if (!this.current.gameOrTitleChangedManually) {
+      // Just polling update
       d(`Current game: ${request.body.game}, Current Status: ${request.body.status}`)
-      // we changed title outside of bot
+
       this.current.rawStatus = await this.rawStatus()
       let status = await this.parseTitle()
-      if (request.body.status !== status) this.current.rawStatus = request.body.status
+      if (request.body.status !== status) {
+        // check if status is same as updated status
+        if (this.retries.getChannelDataOldAPI >= 5) {
+          this.retries.getChannelDataOldAPI = 0
+          this.current.rawStatus = request.body.status
+        } else {
+          this.retries.getChannelDataOldAPI++
+          setTimeout(() => this.getChannelDataOldAPI(), 15000)
+          return
+        }
+      } else {
+        this.retries.getChannelDataOldAPI = 0
+      }
 
       this.current.game = request.body.game
       this.current.status = request.body.status
@@ -511,12 +529,24 @@ class Twitch {
 
       if (!this.current.gameOrTitleChangedManually) {
         this.current.rawStatus = await this.rawStatus()
-        // we changed title outside of bot
-        if (stream.title !== this.current.status) this.current.rawStatus = stream.title
+        let status = await this.parseTitle()
 
         this.current.status = stream.title
         this.current.game = await this.getGameFromId(stream.game_id)
 
+        if (stream.title !== status) {
+          // check if status is same as updated status
+          if (this.retries.getCurrentStreamData >= 5) {
+            this.retries.getCurrentStreamData = 0
+            this.current.rawStatus = stream.title
+          } else {
+            this.retries.getCurrentStreamData++
+            setTimeout(() => this.getCurrentStreamData(), 15000)
+            return
+          }
+        } else {
+          this.retries.getCurrentStreamData = 0
+        }
         await Promise.all([this.gameCache(this.current.game), this.rawStatus(this.current.rawStatus)])
       }
 
@@ -986,11 +1016,9 @@ class Twitch {
   }
 
   async parseTitle (title) {
-    if (!_.isNil(title)) this.current.rawStatus = title
-    else title = this.current.rawStatus
-
-    // cache rawStatus
-    await this.rawStatus(this.current.rawStatus)
+    if (_.isNil(title)) {
+      title = await this.rawStatus()
+    }
 
     const regexp = new RegExp('\\$_[a-zA-Z0-9_]+', 'g')
     const match = title.match(regexp)
@@ -1019,7 +1047,11 @@ class Twitch {
     var game
     const url = `https://api.twitch.tv/kraken/channels/${global.channelId}`
     try {
-      status = await this.parseTitle(args.title)
+      if (!_.isNil(args.title)) {
+        status = args.title
+        this.current.rawStatus = await this.rawStatus(args.title) // save raw status to cache, if changing title
+      } else this.current.rawStatus = await this.rawStatus() // we are not setting title -> load raw status
+      status = await this.parseTitle(this.current.rawStatus)
 
       if (!_.isNil(args.game)) {
         game = args.game
