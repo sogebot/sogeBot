@@ -16,6 +16,7 @@ class Credits {
     global.configuration.register('creditsClips', 'core.no-response-bool', 'bool', true)
 
     global.configuration.register('creditsSpeed', 'core.no-response', 'number', 35)
+    global.configuration.register('creditsMaxFontSize', 'core.no-response', 'number', 200)
 
     global.configuration.register('creditsLastMessage', 'core.no-response', 'string', 'Thanks for watching!')
     global.configuration.register('creditsLastSubMessage', 'core.no-response', 'string', '~ see you on the next stream ~')
@@ -100,7 +101,8 @@ class Credits {
           custom,
           speed,
           show,
-          clips
+          clips,
+          global.configuration.getValue('creditsMaxFontSize')
         )
       })
     })

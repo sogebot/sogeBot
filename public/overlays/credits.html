@@ -186,7 +186,7 @@
       }
 
       var socket = io('/overlays/credits', {query: "token="+token})
-      socket.emit('load', (err, events, streamer, game, title, hosts, socials, messages, custom, speed, show, clips) => {
+      socket.emit('load', (err, events, streamer, game, title, hosts, socials, messages, custom, speed, show, clips, maxFontSize) => {
 
         $('#streamer').text(streamer)
         $('#game').text(game)
@@ -198,9 +198,9 @@
           else $('#last-submessage').html(value)
         }
 
-        let size = resize('#game', 200)
+        let size = resize('#game', maxFontSize)
         resize('#title', size - Math.floor((size / 4))) // title should be smaller than game
-        size = resize('#last-message', 200)
+        size = resize('#last-message', maxFontSize)
         resize('#last-submessage', size - Math.floor((size / 4))) // submessage should be smaller than message
 
         let $events = $('#events')

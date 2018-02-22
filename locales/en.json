@@ -601,6 +601,7 @@
     "overlay-credits-show-cheers": "Show cheers",
     "overlay-credits-show-clips": "Show clips",
     "overlay-credits-speed": "Credits speed",
+    "overlay-credits-max-font-size": "Max title font size",
     "overlay-credits-last-message": "Last message",
     "overlay-credits-last-submessage": "Last submessage",
     "overlay-credits-stream-by": "Stream by",

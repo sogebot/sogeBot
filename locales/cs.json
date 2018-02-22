@@ -571,6 +571,7 @@
     "overlay-credits-show-cheers": "Zobrazit cheery",
     "overlay-credits-show-clips": "Zobrazit klipy",
     "overlay-credits-speed": "Rychlost titulek",
+    "overlay-credits-max-font-size": "Max velikost fontu titulku",
     "overlay-credits-last-message": "Poslední zpráva",
     "overlay-credits-last-submessage": "Poslední podzpráva",
     "overlay-credits-stream-by": "Streamoval",
