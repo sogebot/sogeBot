@@ -251,7 +251,9 @@ class Twitch {
     if (!this.current.gameOrTitleChangedManually) {
       d(`Current game: ${request.body.game}, Current Status: ${request.body.status}`)
       // we changed title outside of bot
-      if (request.body.status !== this.current.status) this.current.rawStatus = request.body.status
+      this.current.rawStatus = await this.rawStatus()
+      let status = await this.parseTitle()
+      if (request.body.status !== status) this.current.rawStatus = request.body.status
 
       this.current.game = request.body.game
       this.current.status = request.body.status
@@ -510,6 +512,7 @@ class Twitch {
       let stream = request.body.data[0]; d(stream)
 
       if (!this.current.gameOrTitleChangedManually) {
+        this.current.rawStatus = await this.rawStatus()
         // we changed title outside of bot
         if (stream.title !== this.current.status) this.current.rawStatus = stream.title
 
@@ -1001,7 +1004,6 @@ class Twitch {
         title = title.replace(new RegExp(`\\$_${variableFromDb.key}`, 'g'), variableFromDb.value)
       }
     }
-    this.current.status = title
     return title
   }
 
@@ -1067,8 +1069,7 @@ class Twitch {
             .replace(/\$title/g, response.status), sender)
 
           // we changed title outside of bot
-          if (response.status !== self.current.status) self.current.rawStatus = response.status
-
+          if (response.status !== status) self.current.rawStatus = response.status
           self.current.status = response.status
         } else {
           global.commons.sendMessage(global.translate('title.change.failed')
