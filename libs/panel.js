@@ -107,6 +107,11 @@ function Panel () {
     socket.on('deleteUserTwitchTitle', function (data) { global.twitch.deleteUserTwitchTitle(global.twitch, socket, data) })
     socket.on('editUserTwitchTitle', function (data) { global.twitch.editUserTwitchTitle(global.twitch, socket, data) })
     socket.on('updateGameAndTitle', function (data) { global.twitch.updateGameAndTitle(global.twitch, socket, data) })
+    socket.on('joinBot', () => { global.client.join('#' + config.settings.broadcaster_username) })
+    socket.on('leaveBot', () => {
+      global.client.part('#' + config.settings.broadcaster_username)
+      global.users.setAll({ is: { online: false } }) // force all users offline
+    })
 
     // custom var
     socket.on('custom.variable.value', async (variable, cb) => {
