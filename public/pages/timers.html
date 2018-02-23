@@ -247,7 +247,6 @@ var saveChanges
 
     // responses are ABBR -> not in tag list
     for (let element of $('abbr[data-id^="response"]')) {
-      console.log($(element).parents('.input-group'))
       const data = {
         _id: $(element).data('id').split('-')[1],
         response: commons.cleanResponseText($(element).html()),
@@ -256,6 +255,9 @@ var saveChanges
       timer.responses.push(data)
     }
     console.debug(timer)
+
+    // disable button
+    $(self).attr('disabled', 'disabled')
 
     timersSocket.emit('save-changes', timer, (err, cb) => {
       const modal = $('#timers-dlg')
@@ -271,6 +273,7 @@ var saveChanges
       if (err) {
         const errors = JSON.parse(cb)
         console.error(errors)
+        $(self).removeAttr('disabled')
 
         if (!_.isNil(errors.name)) {
           $("#timers-dlg-timers-name").addClass('is-invalid')
@@ -308,6 +311,7 @@ var saveChanges
         timers.refresh()
         setTimeout(() => {
           $('#timers-dlg').modal('hide')
+          $(self).removeAttr('disabled')
 
           $('[data-dialog-alert-success]')
             .velocity('fadeOut', {
