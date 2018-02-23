@@ -285,27 +285,11 @@ function main () {
   })
 
   global.client.on('subscription', async function (channel, username, method) {
-    if (debug.enabled) debug('Subscription: %s from %s', username, method)
-
-    let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
-    if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
-
-    global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: _.now() } })
-    global.overlays.eventlist.add({ type: 'sub', username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
-    global.log.sub(`${username}, method: ${method}`)
-    global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
+    subscription(channel, username, method)
   })
 
   global.client.on('resub', async function (channel, username, months, message) {
-    if (debug.enabled) debug('Resub: %s (%s months) - %s', username, months, message)
-
-    let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
-    if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
-
-    global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: moment().subtract(months, 'months').format('X') * 1000 } })
-    global.overlays.eventlist.add({ type: 'resub', username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
-    global.log.resub(`${username}, months: ${months}, message: ${message}`)
-    global.events.fire('resub', { username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
+    resub(channel, username, months, message)
   })
 
   // Bot is checking if it is a mod
@@ -340,6 +324,30 @@ function main () {
   getChannelID()
 }
 
+async function subscription (channel, username, method) {
+  if (debug.enabled) debug('Subscription: %s from %s', username, method)
+
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
+  if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
+
+  global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: _.now() } })
+  global.overlays.eventlist.add({ type: 'sub', username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
+  global.log.sub(`${username}, method: ${method}`)
+  global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
+}
+
+async function resub (channel, username, months, message) {
+  if (debug.enabled) debug('Resub: %s (%s months) - %s', username, months, message)
+
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
+  if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
+
+  global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: moment().subtract(months, 'months').format('X') * 1000 } })
+  global.overlays.eventlist.add({ type: 'resub', username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
+  global.log.resub(`${username}, months: ${months}, message: ${message}`)
+  global.events.fire('resub', { username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
+}
+
 async function subgift (channel, username, recipient) {
   recipient = recipient.toLowerCase()
   if (debug.enabled) debug('Subgift: from %s to %s', username, recipient)
@@ -347,11 +355,13 @@ async function subgift (channel, username, recipient) {
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
   if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
 
-  global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: _.now() } })
+  global.users.set(recipient, { is: { subscriber: true }, time: { subscribed_at: _.now() } })
   global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username })
   global.events.fire('subgift', { username: username, recipient: recipient })
   global.log.subgift(`${recipient}, from: ${username}`)
 }
+
+setTimeout(() => resub('soge__', 'testme', 2, ''), 5000)
 
 if (config.debug.all) {
   global.log.warning('+------------------------------------+')
