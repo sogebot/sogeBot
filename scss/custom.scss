@@ -1,3 +1,10 @@
+// remove annoying button glow
+.btn:focus,.btn:active:focus,.btn.active:focus,
+.btn.focus,.btn:active.focus,.btn.active.focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 [data-lang] {
   font-style: normal;
 }
