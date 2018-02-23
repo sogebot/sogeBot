@@ -379,6 +379,18 @@
             </div>
         </div>
 
+        <div class="col">
+          <span class="title title-part text-default">Custom texts <small>(html supported)</small></span>
+          <button class="btn btn-sm btn-success" style="margin-top: -3px; line-height: 1.25; position: relative; left: -4px;" type="button" onclick="addCustomTextInputs()"><i class="fas fa-plus"></i></button>
+
+          <div class="alert alert-primary float-right" data-custom-text-alert style="opacity: 0; padding: 0.2rem 1rem; margin: 0; position: relative; top: 0.8rem;" role="alert">
+              <strong>... saving ...</strong>
+            </div>
+        </div>
+        <div class="row settings settings-part">
+          <div id="credits-custom-texts" style="width: 100%"></div>
+        </div>
+
         <div class="col" style="max-width: 50%">
           <span class="title title-part text-default">Text</span>
         </div>
@@ -536,6 +548,17 @@
 
 <script>
   socket.off('configuration')
+
+  var el = document.getElementById('credits-custom-texts');
+  var sortable = new Sortable(el, { handle: ".sortable-handler", onEnd: () => saveCustomTextInputs() })
+
+  var creditsSocket = io('/overlays/credits', {query: "token="+token})
+
+  creditsSocket.emit('custom.text.load', (err, cb) => {
+    if (err) return console.error(err)
+    cb = _.sortBy(cb, 'order')
+    for (let input of cb) addCustomTextInputs(input)
+  })
 
   socket.emit('getConfiguration')
   socket.once('configuration', function (data) {
@@ -703,4 +726,104 @@
     let data = {}; data[id] = value
     socket.emit('saveConfiguration', data)
   })
+
+  function addCustomTextInputs(input) {
+    const id = _.get(input, 'order', _.now())
+    $('#credits-custom-texts').append(`
+      <div class="input-group" data-custom-text-id="${id}">
+        <div class="input-group-prepend">
+          <button class="btn sortable-handler disabled" type="button">
+            <i class="fas fa-ellipsis-v"></i>
+          </button>
+        </div>
+
+        <select class="form-control" data-custom-text-option data-custom-text-id="${id}" style="height: auto !important;">
+          <option value="bigHeader">Big Header</option>
+          <option value="header">Header</option>
+          <option value="text">Text</option>
+          <option value="smallText">Small Text</option>
+          <option value="separator">Separator</option>
+        </select>
+        <textarea data-custom-text-textarea class="form-control" style="resize: none;" readonly></textarea>
+        <textarea data-custom-text-textarea class="form-control" style="resize: none;"></textarea>
+        <textarea data-custom-text-textarea class="form-control" style="resize: none;" readonly></textarea>
+        <div class="input-group-append">
+          <button class="btn btn-danger" type="button" onclick="removeCustomTextInputs('${id}')">
+            <i class="far fa-trash-alt"></i>
+          </button>
+        </div>
+      </div>
+    `)
+
+    if (!_.isNil(input)) {
+      $(`select[data-custom-text-id="${id}"]`).val(input.type)
+      $(`select[data-custom-text-id="${id}"]`).trigger('change')
+      if (input.type !== 'separator') {
+        $($(`.input-group[data-custom-text-id="${id}"]`).children('textarea')[0]).text(input.text.left)
+        $($(`.input-group[data-custom-text-id="${id}"]`).children('textarea')[1]).text(input.text.middle)
+        $($(`.input-group[data-custom-text-id="${id}"]`).children('textarea')[2]).text(input.text.right)
+      }
+    }
+
+    if (_.isNil(input)) saveCustomTextInputs()
+  }
+
+  function removeCustomTextInputs(id) {
+    $(`[data-custom-text-id="${id}"]`).remove()
+    saveCustomTextInputs()
+  }
+
+  function saveCustomTextInputs() {
+    $(`[data-custom-text-alert]`).css('opacity', '1')
+
+    let data = {}
+    let order = 0;
+    for (let group of $('.input-group[data-custom-text-id]')) {
+      const type = ($(group).children('select')[0].value)
+
+      data[order] = { type: type, text: {} }
+      if (type !== 'separator') {
+        data[order].text.left = $($(group).children('textarea')[0]).val()
+        data[order].text.middle = $($(group).children('textarea')[1]).val()
+        data[order].text.right = $($(group).children('textarea')[2]).val()
+      }
+      order++
+    }
+    console.debug(data)
+
+    creditsSocket.emit('custom.text.save', data, (err, cb) => {
+      $(`[data-custom-text-alert]`).css('opacity', '0')
+      if (!_.isNil(err)) return console.debug(err)
+    })
+  }
+
+  $(document).on('change', '[data-custom-text-option]', (ev) => {
+    const id = $(ev.currentTarget).data('custom-text-id')
+    const value = $(ev.currentTarget).val()
+
+    $(`.input-group[data-custom-text-id="${id}"] textarea`).remove()
+    console.debug(id, value)
+
+    if (value === 'bigHeader') {
+      $(`.input-group[data-custom-text-id="${id}"] select`).after(`
+        <textarea data-custom-text-textarea class="form-control" style="resize: none;" readonly></textarea>
+        <textarea data-custom-text-textarea class="form-control" style="resize: none;"></textarea>
+        <textarea data-custom-text-textarea class="form-control" style="resize: none;" readonly></textarea>
+      `)
+    } else if (value !== 'separator') {
+      $(`.input-group[data-custom-text-id="${id}"] select`).after(`
+        <textarea data-custom-text-textarea class="form-control" style="resize: none;"></textarea>
+        <textarea data-custom-text-textarea class="form-control" style="resize: none;"></textarea>
+        <textarea data-custom-text-textarea class="form-control" style="resize: none;"></textarea>
+      `)
+    }
+
+    saveCustomTextInputs()
+  })
+
+  $(document).on('keyup', '[data-custom-text-textarea]', (event) => {
+    saveCustomTextInputs()
+  })
+
+
 </script>

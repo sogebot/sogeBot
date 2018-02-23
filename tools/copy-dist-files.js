@@ -16,6 +16,9 @@ var dist = {
   'jquery': {
     'js': 'dist/jquery.min.js'
   },
+  'sortablejs': {
+    'js': 'Sortable.min.js'
+  },
   'popper.js': {
     'js': 'dist/umd/popper.min.js'
   },

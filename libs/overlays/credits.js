@@ -105,6 +105,20 @@ class Credits {
           global.configuration.getValue('creditsMaxFontSize')
         )
       })
+      socket.on('custom.text.save', async (data, cb) => {
+        // remove all data
+        await global.db.engine.remove('overlay.credits.customTexts', {})
+
+        let toAwait = []
+        for (let [i, v] of Object.entries(data)) {
+          toAwait.push(global.db.engine.insert('overlay.credits.customTexts', { order: i, type: v.type, text: v.text }))
+        }
+        await Promise.all(toAwait)
+        cb(null, true)
+      })
+      socket.on('custom.text.load', async (cb) => {
+        cb(null, await global.db.engine.find('overlay.credits.customTexts'))
+      })
     })
   }
 
