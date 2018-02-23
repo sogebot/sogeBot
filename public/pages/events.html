@@ -456,6 +456,9 @@
     }
     console.debug(eventListener)
 
+    // disable button
+    $(self).attr('disabled', 'disabled')
+
     eventsSocket.emit('save-changes', eventListener, (err, cb) => {
       const modal = $('#event-listener-dlg')
 
@@ -470,6 +473,9 @@
       if (err) {
         const errors = JSON.parse(cb)
         console.error(errors)
+
+        // enable button
+        $(self).removeAttr('disabled')
 
         // definitions errors
         for (let [key, val] of Object.entries(errors.definitions)) {
@@ -509,6 +515,9 @@
         events.refresh()
         setTimeout(() => {
           $('#event-listener-dlg').modal('hide')
+
+          // enable button
+          $(self).removeAttr('disabled')
 
           $('[data-dialog-alert-success]')
             .velocity('fadeOut', {
