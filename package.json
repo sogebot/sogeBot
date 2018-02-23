@@ -45,6 +45,7 @@
     "safe-eval": "^0.3.0",
     "snekfetch": "3.6.4",
     "socket.io": "^2.0.4",
+    "sortablejs": "^1.7.0",
     "terminal-kit": "^1.14.3",
     "twitch-emoticons": "git+https://github.com/sogehige/twitch-emoticons.git#v3api",
     "twitch-js": "1.2.10",
