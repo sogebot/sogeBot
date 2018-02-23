@@ -61,7 +61,6 @@
     },
     format: (text) => {
       let responses = _.sortBy(_.keys(translations.responses.variable), (o) => { return o.length*-1 })
-      console.log(responses)
       var filtersRegExp = new RegExp('\\$(' + responses.join('|') + ')', 'g')
       return text.replace(filtersRegExp,
             '<span contenteditable="false" class="editable-variable" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;'
@@ -140,7 +139,6 @@
               if ($(ev.target).data('edit') || args.edit) {
                 let target = args.target || $(ev.target)
                 let id = target.data('id')
-                console.log('Editing', id)
 
                 target.css('display', 'none')
 
