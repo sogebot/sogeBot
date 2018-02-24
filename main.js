@@ -361,8 +361,6 @@ async function subgift (channel, username, recipient) {
   global.log.subgift(`${recipient}, from: ${username}`)
 }
 
-setTimeout(() => resub('soge__', 'testme', 2, ''), 5000)
-
 if (config.debug.all) {
   global.log.warning('+------------------------------------+')
   global.log.warning('| DEBUG MODE IS ENABLED              |')
