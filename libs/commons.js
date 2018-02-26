@@ -65,12 +65,12 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
   sender = sender || {}
 
   if (_.isString(sender)) sender = { username: sender }
-  if (_.isNil(sender) || _.isNil(sender.username)) sender.username = null
+  if (_.isNil(sender) || _.isNil(sender.username)) sender.username = undefined
   attr.sender = sender.username
   message = await global.parser.parseMessage(message, attr)
   if (message === '') return false // if message is empty, don't send anything
   if (config.debug.all || config.debug.console) {
-    if (_.isUndefined(sender) || _.isNull(sender)) sender = { username: null }
+    if (_.isUndefined(sender) || _.isNull(sender)) sender = { username: undefined }
     let username = (global.configuration.getValue('atUsername') ? '@' : '') + sender.username
     message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace(/\$sender/g, username) : message
     if ((_.isUndefined(sender) || _.isNull(sender) || (!_.isUndefined(sender) && sender.username === config.settings.bot_username))) message = '! ' + message
