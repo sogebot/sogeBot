@@ -2,7 +2,7 @@
 [![Discord](https://img.shields.io/discord/317348946144002050.svg?style=flat-square)](https://discordapp.com/invite/52KpmuH)
 [![Build Status](https://img.shields.io/travis/sogehige/sogeBot.svg?style=flat-square)](https://travis-ci.org/sogehige/sogeBot)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](http://standardjs.com/)
-[![nodejs](https://img.shields.io/badge/node.js-9.2.0-brightgreen.svg?style=flat-square)](https://nodejs.org/en/)
+[![nodejs](https://img.shields.io/badge/node.js-9.6.1-brightgreen.svg?style=flat-square)](https://nodejs.org/en/)
 [![GitHub release](https://img.shields.io/github/release/sogehige/sogebot.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
 [![Downloads](https://img.shields.io/github/downloads/sogehige/sogebot/total.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](https://www.paypal.me/sogetwitch/5eur)
