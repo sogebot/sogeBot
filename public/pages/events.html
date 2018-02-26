@@ -594,7 +594,7 @@
       for (let [k, v] of Object.entries(eventToEdit.definitions)) {
         if (_.isBoolean(v)) {
           const toggle = modal.find(`button[data-id="${k}"]`)
-          if (toggle.data('value') !== v.toString()) {
+          if (toggle.data('value').toString() !== v.toString()) {
             // trigger "click" if values doesn't match -> button should be toggled
             toggle.trigger('click')
           }
