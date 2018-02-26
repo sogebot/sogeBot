@@ -78,7 +78,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
     return true
   }
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
-  if (_.isNil(sender) || (!_.isUndefined(sender) && sender.username === config.settings.bot_username && !attr.force)) return false // we don't want to reply on bot commands
+  if (_.get(sender, 'username', config.settings.bot_username) === config.settings.bot_username && !attr.force) return false // we don't want to reply on bot commands
   message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + sender.username) : message
 
   if (!global.configuration.getValue('mute') || attr.force) {
