@@ -59,12 +59,14 @@ Commons.prototype.prepare = function (translate, attr) {
   return msg
 }
 
-Commons.prototype.sendMessage = async function (message, sender, attr = {}) {
+Commons.prototype.sendMessage = async function (message, sender, attr) {
   debug('sendMessage(%s, %j, %j)', message, sender, attr)
+  attr = attr || {}
+  sender = sender || {}
 
   if (_.isString(sender)) sender = { username: sender }
-  if (_.isNil(sender) || _.isNil(sender.username)) sender = null
-  attr.sender = sender
+  if (_.isNil(sender) || _.isNil(sender.username)) sender.username = null
+  attr.sender = sender.username
   message = await global.parser.parseMessage(message, attr)
   if (message === '') return false // if message is empty, don't send anything
   if (config.debug.all || config.debug.console) {

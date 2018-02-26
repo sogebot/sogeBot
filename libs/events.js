@@ -146,7 +146,7 @@ class Events {
       let replace = new RegExp(`\\$${name}`, 'g')
       command = command.replace(replace, val)
     })
-    command = await global.parser.parseMessage(command)
+    command = await global.parser.parseMessage(command, { username: global.parser.getOwner() })
     d('Running command:', command)
     global.parser.parseCommands((_.get(operation, 'isCommandQuiet', false) ? null : { username: global.parser.getOwner() }), command, true)
   }
@@ -161,7 +161,6 @@ class Events {
       let replace = new RegExp(`\\$${name}`, 'g')
       message = message.replace(replace, val)
     })
-    message = await global.parser.parseMessage(message)
     d('Sending message:', message)
     global.commons.sendMessage(message, { username: username, 'message-type': (whisper ? 'whisper' : 'chat') })
   }
