@@ -28,7 +28,7 @@ class Events {
       { id: 'action', variables: [ 'username', 'userObject' ] },
       { id: 'ban', variables: [ 'username', 'userObject', 'reason' ] },
       { id: 'hosting', variables: [ 'target', 'viewers' ] },
-      { id: 'hosted', variables: [ 'username', 'userObject', 'viewers', 'autohost' ] },
+      { id: 'hosted', variables: [ 'username', 'userObject', 'viewers', 'autohost' ], definitions: { viewersAtLeast: 1, ignoreAutohost: false }, check: this.checkHosted },
       { id: 'mod', variables: [ 'username', 'userObject' ] },
       { id: 'commercial', variables: [ 'duration' ] },
       { id: 'timeout', variables: [ 'username', 'userObject', 'reason', 'duration' ] },
@@ -193,6 +193,21 @@ class Events {
     return shouldTrigger
   }
 
+  async checkHosted (event, attributes) {
+    const d = debug('events:checkHosted')
+
+    event.definitions.viewersAtLeast = parseInt(event.definitions.viewersAtLeast, 10) // force Integer
+
+    d('Current viewers: %s, expected viewers: %s', attributes.viewers, event.definitions.viewersAtLeast)
+    d('Autohost: %s, ignore Autohost: %s', attributes.autohost, event.definitions.ignoreAutohost)
+
+    var shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast) &&
+                        ((!attributes.autohost && event.definitions.ignoreAutohost) || !event.definitions.ignoreAutohost)
+
+    d('Should trigger: %s', shouldTrigger)
+    return shouldTrigger
+  }
+
   async checkStreamIsRunningXMinutes (event, attributes) {
     const d = debug('events:checkStreamIsRunningXMinutes')
     event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0)
@@ -343,7 +358,7 @@ class Events {
           for (let [key, value] of Object.entries(event.definitions)) {
             if (value.length === 0) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.value_cannot_be_empty'))
             else if (key === 'commandToWatch' && !value.startsWith('!')) _.set(errors, 'definitions.commandToWatch', global.translate('webpanel.events.errors.command_must_start_with_!'))
-            else if (key !== 'commandToWatch' && !value.match(/^\d+$/g)) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.this_value_must_be_a_positive_number_or_0'))
+            else if (key !== 'commandToWatch' && !_.isBoolean(value) && !value.match(/^\d+$/g)) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.this_value_must_be_a_positive_number_or_0'))
           }
 
           // check all operations definitions are correctly set -> no empty values

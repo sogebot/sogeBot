@@ -1,9 +1,7 @@
 const _ = require('lodash')
 const figlet = require('figlet')
 const config = require('../config.json')
-const crypto = require('crypto')
 const compareVersions = require('compare-versions')
-const fs = require('fs')
 
 // logger
 const Logger = require('../libs/logging')
@@ -67,170 +65,20 @@ let updates = async (from, to) => {
 }
 
 let migration = {
-  widgets: [{
-    version: '6.0.0',
-    do: async() => {
-      console.info('Migration widgets to %s', '6.0.0')
-      let widgets = await global.db.engine.find('widgets')
-      for (let widget of widgets) {
-        if (widget.widget === 'followers' || widget.widget === 'subscribers') {
-          await global.db.engine.remove('widgets', {_id: widget._id.toString()})
-        }
-      }
-    }
-  }],
-  cache: [{
-    version: '6.0.0',
-    do: async () => {
-      console.info('Migration cache to %s', '6.0.0')
-      let cache = await global.db.engine.findOne('cache')
-      if (_.isEmpty(cache)) return
-
-      let when = {
-        offline: null,
-        online: null,
-        upsert: true
-      }
-      let users = {
-        followers: _.get(cache, 'followers', []),
-        subscribers: _.get(cache, 'subscribers', []),
-        upsert: true
-      }
-      let newCache = {
-        games_and_titles: _.get(cache, 'games_and_titles', {}),
-        gidToGame: _.get(cache, 'gidToGame', {}),
-        upsert: true
-      }
-
-      await global.db.engine.remove('cache', {_id: _.get(cache, '_id', '').toString()})
-      await global.db.engine.insert('cache', newCache)
-      await global.db.engine.insert('cache.when', when)
-      await global.db.engine.insert('cache.users', users)
-    }
-  }],
   events: [{
-    version: '6.0.0',
+    version: '6.1.0',
     do: async () => {
-      console.info('Migration events to %s', '6.0.0')
+      console.info('Migration events to %s', '6.1.0')
       let events = await global.db.engine.find('events')
-
       for (let event of events) {
-        event.value = event.value || '{}'
-        const operations = _.isArray(event.value) ? event.value : JSON.parse(event.value)
-        if (_.isNil(event.definitions)) await global.db.engine.remove('events', { _id: event._id.toString() })
-        if (_.size(operations) === 0) continue
-
-        let definitions = _.find(operations[0], (o) => o.definition)
-        let updatedDefinitions = {}
-        if (!_.isNil(definitions)) {
-          if (!_.isNil(definitions.command)) {
-            updatedDefinitions.commandToWatch = definitions.command
-          }
-
-          if (_.isNil(definitions.command) && !_.isNil(definitions.tCount) && event.key === 'stream-is-running-x-minutes') {
-            updatedDefinitions.runAfterXMinutes = definitions.tCount
-          } else if (_.isNil(definitions.command) && !_.isNil(definitions.tCount) && event.key === 'every-x-seconds') {
-            updatedDefinitions.runEveryXMinutes = definitions.tCount
-          } else if (!_.isNil(definitions.tCount)) {
-            updatedDefinitions.runEveryXCommands = definitions.tCount
-          }
-
-          if (!_.isNil(definitions.tTimestamp)) {
-            updatedDefinitions.runInterval = definitions.tTimestamp
-          }
-          if (!_.isNil(definitions.viewers)) {
-            updatedDefinitions.viewersAtLeast = definitions.viewers
-          }
-        } else updatedDefinitions = {}
-
-        if (event.key === 'every-x-seconds') event.key = 'every-x-minutes-of-stream'
-
-        const eventId = (await global.db.engine.insert('events', {
-          name: 'events#' + crypto.createHash('md5').update(new Date().getTime().toString()).digest('hex').slice(0, 5),
-          key: event.key,
-          definitions: updatedDefinitions,
-          triggered: {},
-          enabled: true
-        }))._id.toString()
-
-        await global.db.engine.insert('events.filters', {
-          eventId: eventId,
-          filters: ''
-        })
-
-        for (let operation of operations) {
-          operation = operation[0]
-          if (!_.isNil(operation.definition)) continue
-
-          if (operation.name === 'run-command') {
-            await global.db.engine.insert('events.operations', {
-              eventId: eventId,
-              key: operation.name,
-              definitions: {
-                commandToRun: operation.command,
-                isCommandQuiet: operation.quiet
-              }
-            })
-          }
-
-          if (operation.name === 'emote-explosion') {
-            await global.db.engine.insert('events.operations', {
-              eventId: eventId,
-              key: operation.name,
-              definitions: {
-                emotesToExplode: operation.emotes
-              }
-            })
-          }
-
-          if (operation.name === 'send-chat-message' || operation.name === 'send-whisper') {
-            await global.db.engine.insert('events.operations', {
-              eventId: eventId,
-              key: operation.name,
-              definitions: {
-                messageToSend: operation.send
-              }
-            })
-          }
-
-          if (operation.name === 'play-sound') {
-            await global.db.engine.insert('events.operations', {
-              eventId: eventId,
-              key: operation.name,
-              definitions: {
-                urlOfSoundFile: operation.sound
-              }
-            })
-          }
-
-          if (operation.name === 'start-commercial') {
-            await global.db.engine.insert('events.operations', {
-              eventId: eventId,
-              key: operation.name,
-              definitions: {
-                durationOfCommercial: operation.duration
-              }
-            })
-          }
+        if (event.key === 'hosted') {
+          await global.db.engine.update('events', {_id: event._id.toString()}, {
+            definitions: {
+              viewersAtLeast: _.get(event, 'definitions.viewersAtLeast', 1),
+              ignoreAutohost: _.get(event, 'definitions.ignoreAutohost', false)
+            }
+          })
         }
-      }
-    }
-  }],
-  timers: [{
-    version: '6.0.0',
-    do: async () => {
-      console.info('Migration timers to %s', '6.0.0')
-      let responses = await global.db.engine.find('timersResponses')
-      if (_.isEmpty(responses)) return
-      for (let response of responses) {
-        await global.db.engine.insert('timers.responses', response)
-      }
-
-      if (config.database.type === 'nedb') {
-        fs.unlinkSync('./db/nedb/timersResponses.db')
-      } else if (config.database.type === 'mongodb') {
-        let db = await global.db.engine.client.db(global.db.engine.dbName)
-        db.collection('timersResponses').drop()
       }
     }
   }]

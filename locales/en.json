@@ -161,11 +161,6 @@
           "true": "Warnings are set to be 1s timeout",
           "false": "Warnings are set to chat message only"
         }
-      },
-      "hostsViewersAtLeast": "To trigger host event, host need at least $value viewers",
-      "hostsIgnoreAutohost": {
-        "true": "Autohosts will not trigger host event",
-        "false": "Autohosts will trigger host event"
       }
     },
     "years": "year|years",
@@ -336,6 +331,11 @@
           "label": "Viewers At Least",
           "placeholder": "How many viewers at least to trigger event"
         },
+        "ignoreAutohost": {
+          "label": "Ignore Autohost",
+          "true": "Ignore",
+          "false": "Not ignore"
+        },
         "runInterval": {
           "label": "Run Interval (0 = run once per stream)",
           "placeholder": "Trigger event every x seconds"
@@ -455,11 +455,6 @@
     },
     "page-settings": {
       "systems": {
-        "events": {
-          "title": "Events",
-          "autohost-ignore": "Ignore AutoHost",
-          "host-at-least-viewers": "Minimal count of viewers on hosting"
-        },
         "others": {
           "title": "Others"
         },

@@ -15,9 +15,6 @@
     <a class="nav-link" data-toggle="tab" href="#gambling" data-lang="gambling" id="gambling-tab-link"></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#events" data-lang="page-settings.systems.events.title"></a>
-  </li>
-  <li class="nav-item">
     <a class="nav-link" data-toggle="tab" href="#others" data-lang="page-settings.systems.others.title"></a>
   </li>
 </ul>
@@ -321,27 +318,6 @@
     </div>
   </div>
 
-  <div role="tabpanel" class="tab-pane" id="events">
-    <div class="row settings">
-      <div class="col">
-        <strong data-lang="page-settings.systems.events.host-at-least-viewers"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="hostsViewersAtLeast" onclick="commons.configEditable(this, '')" id="hostsViewersAtLeast"></abbr>
-        <div class="input-group" style="display:none;" id="input_hostsViewersAtLeast_group">
-          <input id="input_hostsViewersAtLeast" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-      <div class="col">
-        <strong data-lang="page-settings.systems.events.autohost-ignore"></strong>
-      </div>
-      <div class="col">
-        <input id="hostsIgnoreAutohost" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-      </div>
-    </div>
-  </div>
-
   <div role="tabpanel" class="tab-pane" id="others">
     <div class="row settings">
       <div class="col">
@@ -393,17 +369,6 @@
       })
     })
     $('#atUsernameToggle').data('init', true)
-
-    /* events */
-    $("#hostsViewersAtLeast").text(data.hostsViewersAtLeast)
-    $('#hostsIgnoreAutohost').off('change')
-    $('#hostsIgnoreAutohost').bootstrapToggle(data.hostsIgnoreAutohost ? 'on' : 'off')
-    $('#hostsIgnoreAutohost').change(function () {
-      if ($('#hostsIgnoreAutohost').data('init')) socket.emit('saveConfiguration', {
-        'hostsIgnoreAutohost': $(this).prop('checked')
-      })
-    })
-    $('#hostsIgnoreAutohost').data('init', true)
 
     /* whispers */
     $('#disableWhisperListener').off('change')
