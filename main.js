@@ -237,9 +237,6 @@ function main () {
     debug(`Hosted by ${username} with ${viewers} viewers - autohost: ${autohost}`)
     global.log.host(`${username}, viewers: ${viewers}, autohost: ${autohost}`)
 
-    const hostsViewersAtLeast = global.configuration.getValue('hostsViewersAtLeast')
-    const hostsIgnoreAutohost = global.configuration.getValue('hostsIgnoreAutohost')
-
     global.db.engine.update('cache.hosts', { username: username }, { username: username })
 
     const data = {
@@ -250,10 +247,6 @@ function main () {
 
     data.type = 'host'
     global.overlays.eventlist.add(data)
-
-    debug('At least viewers filtered? %s', viewers < hostsViewersAtLeast)
-    debug('Autohost ignored? %s', hostsIgnoreAutohost && autohost)
-    if (viewers < hostsViewersAtLeast || (hostsIgnoreAutohost && autohost)) return // don't want to fire event if autohost and set to ignore autohost
     global.events.fire('hosted', data)
   })
 

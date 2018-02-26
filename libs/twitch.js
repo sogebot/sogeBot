@@ -66,8 +66,6 @@ class Twitch {
     global.parser.registerParser(this, 'lastseen', this.lastseenUpdate, constants.VIEWERS)
 
     global.configuration.register('sendWithMe', 'core.settings.sendWithMe', 'bool', false)
-    global.configuration.register('hostsViewersAtLeast', 'core.settings.hostsViewersAtLeast', 'number', 2)
-    global.configuration.register('hostsIgnoreAutohost', 'core.settings.hostsIgnoreAutohost', 'bool', false)
 
     global.panel.addWidget('twitch', 'widget-title-monitor', 'fab fa-twitch')
 
