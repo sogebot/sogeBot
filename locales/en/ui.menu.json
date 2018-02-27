@@ -1,0 +1,21 @@
+{
+  "timers": "Timers",
+  "keywords": "Keywords",
+  "custom-commands": "Custom commands",
+  "event-listeners": "Event listeners",
+  "ranks": "Ranks",
+  "songs": "Songs",
+  "viewers": "Viewers",
+  "aliases": "Aliases",
+  "cooldowns": "Cooldowns",
+  "highlights": "Highlights",
+  "price": "Price",
+  "logger": "Logs",
+  "systems": "Systems",
+  "permissions": "Permissions",
+  "translations": "Custom translations",
+  "moderation": "Moderation",
+  "overlays": "Overlays",
+  "gallery": "Media gallery",
+  "games": "Games"
+}

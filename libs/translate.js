@@ -2,7 +2,6 @@
 
 var glob = require('glob')
 var fs = require('fs')
-var path = require('path')
 var _ = require('lodash')
 const flatten = require('flat')
 
@@ -17,10 +16,12 @@ class Translate {
   async _load () {
     this.custom = await global.db.engine.find('customTranslations')
     return new Promise((resolve, reject) => {
-      glob('./locales/*.json', (err, files) => {
+      glob('./locales/**', (err, files) => {
         if (err) reject(err)
         for (let f of files) {
-          this.translations[path.basename(f, '.json')] = JSON.parse(fs.readFileSync(f, 'utf8'))
+          if (!f.endsWith('.json')) continue
+          let withoutLocales = f.replace('./locales/', '').replace('.json', '')
+          _.set(this.translations, withoutLocales.split('/').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')))
         }
 
         for (let c of this.custom) {

@@ -101,6 +101,7 @@ function main () {
   global.lib.translate._load().then(function () {
     global.systems = require('auto-load')('./libs/systems/')
     global.integrations = require('auto-load')('./libs/integrations/')
+    global.games = require('auto-load')('./libs/games/')
     global.widgets = require('auto-load')('./libs/widgets/')
     global.overlays = require('auto-load')('./libs/overlays/')
   })

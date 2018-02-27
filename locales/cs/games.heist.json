@@ -1,0 +1,29 @@
+{
+  "copsOnPatrol": "$sender, poldove porad hledaji minuly tym! Zkus to az za $cooldown.",
+  "copsCooldownMessage": "Vypada to, ze poldove maji nohy hore. Muzeme planovat dalsi loupez!",
+  "entryMessage": "$sender zacal planovat prepadeni banky! Hledaji se partaci do akce pro vetsi lup. Pridej se i ty!",
+  "lateEntryMessage": "$sender, loupez prave probiha!",
+  "entryInstruction": "$sender, napis $command [x] aby ses pripojil.",
+  "levelMessage": "S touhle partou si troufnem na $bank! Sezeneme vice lidi, abychom vyloupili $nextBank?",
+  "maxLevelMessage": "S touhle partou si troufnem na $bank! Lepsi uz to byt nemuze!",
+  "started": "Dobra chlapi, posledni kontrola vybaveni, tohle je to, na co jsme se pripravovali. Toto neni zadne cviceni, jde se na to! Jdem vyloupit $bank!",
+  "noUser": "Nikdo se nepridal k loupezi.",
+  "singleUserSuccess": "$user byl jako ninja. Nikdo si nevsiml chybejicich penez.",
+  "singleUserFailed": "$user se nepodarilo zbavit poldu a chvili si posedi v chladku.",
+  "result": {
+    "0": "Nekdo zvanil. Cekal na vas cely SWAT tym a nikomu se nepodarilo utect.",
+    "33": "Ostraha byla tentokrat ostra. Jen 1/3 tymu se dokazala dostat s lupem ven.",
+    "50": "Dlouhe vyjednavani s poldy zajistilo pulce tymu cas na to, aby stihli utect s lupem.",
+    "99": "Vypadalo to jako snadna akce, avsak nekterym z vas se nepodarilo utect s lupem. Ostatni si mnou ruce!",
+    "100": "Je to vubec mozne? Precizne naplanovana akce, precizni provedeni. 100% uspesnost. Takhle se to dela!"
+  },
+  "levels": {
+    "bankVan": "smenarnu",
+    "cityBank": "postu",
+    "stateBank": "obrnenou dodavku",
+    "nationalReserve": "banku",
+    "federalReserve": "narodni klenoty"
+  },
+  "results": "Lup si odnesli: $users",
+  "andXMore": "a $count dalsich ..."
+}
