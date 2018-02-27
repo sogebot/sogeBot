@@ -202,11 +202,16 @@
           if (input.type === 'separator') $custom.append(`<div class="${input.type}"></div>`)
           else if (input.type === 'bigHeader') $custom.append(`<div class="${input.type}">${input.text.middle}</div>`)
           else {
+            let columns = 0
+            if (input.text.left.trim().length > 0) columns++
+            if (input.text.middle.trim().length > 0) columns++
+            if (input.text.right.trim().length > 0) columns++
+            let width = 100 / columns
             $custom.append(`
               <div class="${input.type}" style="display: inline-flex; width: 100%; padding-left:5%; padding-right: 5%">
-                <div style="width:33%; text-align:left; display: inline-block;">${input.text.left}</div>
-                <div style="width:33%; display: inline-block;">${input.text.middle}</div>
-                <div style="width:33%; text-align:right; display: inline-block;">${input.text.right}</div>
+                <div style="width:${input.text.left.trim().length > 0 ? width : 0}%; text-align:left; display: inline-block;">${input.text.left}</div>
+                <div style="width:${input.text.middle.trim().length > 0 ? width : 0}%; display: inline-block;">${input.text.middle}</div>
+                <div style="width:${input.text.right.trim().length > 0 ? width : 0}%; text-align:right; display: inline-block;">${input.text.right}</div>
               </div>`)
           }
         }
