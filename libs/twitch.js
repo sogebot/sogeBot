@@ -466,6 +466,8 @@ class Twitch {
     var request
     const url = `https://api.twitch.tv/helix/games?id=${gid}`
 
+    if (gid.toString().trim().length === 0) return '' // return empty game if gid is empty
+
     let cache = await global.db.engine.findOne('cache', { upsert: true })
     let gids = _.get(cache, 'gidToGame', {})
 
