@@ -754,7 +754,7 @@
           <option value="xbox">XBox</option>
           <option value="youtube">YouTube</option>
         </select>
-        <input data-social-input class="form-control">
+        <input data-social-input class="form-control" value="${_.get(input, 'text', '')}">
         <div class="input-group-append">
           <button class="btn btn-danger" type="button" onclick="removeSocialInputs('${id}')">
             <i class="far fa-trash-alt"></i>
