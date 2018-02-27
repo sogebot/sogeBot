@@ -68,6 +68,9 @@ function Panel () {
   app.get('/', this.authUser, function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'))
   })
+  app.get('/:type/:subtype/:page', this.authUser, function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.subtype, req.params.page))
+  })
   app.get('/:type/:page', this.authUser, function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.page))
   })
@@ -135,7 +138,13 @@ function Panel () {
       global.lib.translate.custom.push(data)
       global.lib.translate._save()
 
-      socket.emit('lang', global.translate({root: 'webpanel'}))
+      let lang = {}
+      _.merge(
+        lang,
+        global.translate({root: 'webpanel'}),
+        global.translate({root: 'ui'}) // add ui root -> slowly refactoring to new name
+      )
+      socket.emit('lang', lang)
     })
     socket.on('responses.revert', async function (data, callback) {
       _.remove(global.lib.translate.custom, function (o) { return o.key === data.key })
@@ -182,7 +191,13 @@ function Panel () {
     })
 
     // send webpanel translations
-    socket.emit('lang', global.translate({root: 'webpanel'}))
+    let lang = {}
+    _.merge(
+      lang,
+      global.translate({root: 'webpanel'}),
+      global.translate({root: 'ui'}) // add ui root -> slowly refactoring to new name
+    )
+    socket.emit('lang', lang)
   })
 }
 

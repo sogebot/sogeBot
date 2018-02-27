@@ -1,0 +1,325 @@
+<div class="card">
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">
+      <div class="input-group">
+        <input class="form-control" id="heist-command" placeholder="!command to use"></input>
+        <div class="input-group-append">
+          <button class="btn btn-success" id="heist-enabled" type="button" onclick="heistPage.toggle.enabled()"></button>
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item" id="heist-settings"></li>
+    <li class="list-group-item" id="heist-messages"></li>
+    <li class="list-group-item" id="heist-outcomes"></li>
+    <li class="list-group-item" id="heist-results"></li>
+    <li class="list-group-item" id="heist-levels"></li>
+  </ul>
+</div>
+
+<script>
+  var heistsSocket = io('/games/heist', { query: "token=" + token })
+
+  var heistPage = {
+    set: {
+      default: (key) => {
+        heistsSocket.emit('set.default', key, (err, value) => {
+          if (err) return console.debug(err)
+          $(`[data-id='${key}']`).text(value).focus().blur()
+          $(`button.btn.btn-secondary[data-key="${key}"]`).css('display', 'none')
+
+          if (key.startsWith('level')) heistPage.load.levels()
+          if (key.startsWith('results')) heistPage.load.results()
+        })
+      },
+      variable: (key) => {
+        const value = commons.cleanResponseText($(`abbr[data-id='${key}']`).html())
+        heistsSocket.emit('set.variable', { key: key, value: value }, (err, value) => {
+          if (err) return console.debug(err)
+          $(`[data-id='${key}']`).text(value).focus().blur()
+          $(`button.btn.btn-secondary[data-key="${key}"]`).css('display', 'none')
+        })
+      },
+      toggleBtn: (value) => {
+        let $btn = $("#heist-enabled")
+        $btn.removeClass()
+            .addClass('btn')
+            .addClass(value ? 'btn-success' : 'btn-danger')
+            .text(commons.translate(value ? 'enabled' : 'disabled'))
+        $('#heist-status').removeClass('text-success')
+                          .removeClass('text-danger')
+                          .addClass(value ? 'text-success' : 'text-danger')
+      }
+    },
+    toggle: {
+      enabled: () => {
+        heistsSocket.emit('toggle.enabled', (err, cb) => {
+          if (err) return console.debug(err)
+          heistPage.set.toggleBtn(cb)
+        })
+      }
+    },
+    load: {
+      results: () => {
+        heistsSocket.emit('load.variable', 'results', (err, cb) => {
+          if (err) return console.debug(err)
+
+          $('#heist-results').empty()
+          $('#heist-results').append(`
+            <h5 class="card-title d-inline-block">Results</h5>
+            <button class="btn btn-outline-success btn-outline-bottom" style="position: relative; top:-3px" type="button" onclick="heistPage.add.result()">${commons.translate('add')}</button>
+            <button class="btn btn-outline-info btn-outline-bottom" style="position: relative; top:-3px" type="button" onclick="heistPage.set.default('results')">${commons.translate('set-default')}</button>
+          `)
+
+          let i = 0
+          cb = _.orderBy(cb, 'percentage', 'asc')
+          for (value of cb) {
+            let id = value._id.toString()
+
+            let editables = ''
+            let j = 0
+            for (let [k, v] of Object.entries(value)) {
+              if (k === '_id') continue
+              let filters = []
+              let match = null
+
+              if (k === 'percentage') match = { '^(100|\\d{1,2})$': 'Value must be a positive number and <= 100' }
+              if (k === 'message') match = { '.+' : 'Value must not be empty' }
+
+              editables += `
+                <div class="input-group ${j != 0 ? 'mt-1' : ''}">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">${commons.translate('games.heist.' + k)}
+                      ${commons.translate(k === 'message' ? `games.heist.tooltips.resultsMessage` : `games.heist.tooltips.${k}`).length > 0 ? `&nbsp;<a href="#" data-toggle="tooltip" title="${commons.translate(k === 'message' ? `games.heist.tooltips.resultsMessage` : `games.heist.tooltips.${k}`)}">[?]</a>` : ``}
+                    </span>
+                  </div>
+                  ${commons.editable({ id: `results.${id}.${k}`, text: v, match: match, errorContainer: `.heist-error[data-key='results.${id}.${k}']`, data: { 'data-heist-onchange-show-button' : null }, filters: filters })}
+                  <div class="input-group-append">
+                    <span class="form-error heist-error" data-key="results.${id}.${k}"></span>
+                    <button class="btn btn-secondary d-none" data-key="results.${id}.${k}" onclick="heistPage.set.variable('results.${id}.${k}')" type="button"><i class="fas fa-download"></i></button>
+                    ${j === 0 ? `<button class="btn btn-danger" data-key="results.${id}.${k}" onclick="heistPage.remove.result('${id}')" type="button"><i class="fas fa-trash"></i> Delete</button>` : ``}
+                  </div>
+                </div>
+              `
+              j++
+            }
+
+            $('#heist-results').append(`
+              <div class="card ${i != 0 ? 'mt-1' : ''}">
+                <div class="card-body">
+                  ${editables}
+                </div>
+              </div>
+            `)
+            i++
+          }
+          $('[data-toggle="tooltip"]').tooltip()
+        })
+      },
+      levels: () => {
+        heistsSocket.emit('load.variable', 'levels', (err, cb) => {
+          if (err) return console.debug(err)
+
+          $('#heist-levels').empty()
+          $('#heist-levels').append(`
+            <h5 class="card-title d-inline-block">Levels</h5>
+            <button class="btn btn-outline-info btn-outline-bottom" style="position: relative; top:-3px" type="button" onclick="heistPage.set.default('levels')">${commons.translate('set-default')}</button>
+          `)
+
+          let i = 0
+          cb = _.orderBy(cb, 'maxUsers', 'asc')
+          for (value of cb) {
+            let id = value._id.toString()
+
+            let editables = ''
+            let j = 0
+            for (let [k, v] of Object.entries(value)) {
+              if (i === 0 && k === 'message') continue
+
+              let filters = []
+              let match = null
+              if (k === '_id') continue
+              if (k === 'message') filters = ['global', 'bank', 'nextBank']
+              if (k === 'win%') match = { '^\\d{1,2}$': 'Value must be a positive number and < 100' }
+              if (k === 'maxUsers') match = { '^\\d+$': 'Value must be a positive number' }
+              if (k === 'payoutMultiplier') match = { '^([0-9]*[.])?[0-9]+$': 'Value must be positive number or float number' }
+              if (k === 'name') match = { '.+' : 'Value must not be empty' }
+
+              let maxUsers = _.find(cb, (o) => o._id === id).maxUsers
+              editables += `
+                <div class="input-group ${j != 0 ? 'mt-1' : ''}">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">${commons.translate('games.heist.' + k)}
+                      ${commons.translate(k === 'message' ? `games.heist.tooltips.levelsMessage` : `games.heist.tooltips.${k}`).length > 0 ? `&nbsp;<a href="#" data-toggle="tooltip" title="${commons.translate(k === 'message' ? `games.heist.tooltips.levelsMessage` : `games.heist.tooltips.${k}`)}">[?]</a>` : ``}
+                    </span>
+                  </div>
+                  ${commons.editable({ id: `levels.${id}.${k}`, text: v, match: match, errorContainer: `.heist-error[data-key='levels.${id}.${k}']`, data: { 'data-heist-onchange-show-button' : null }, filters: filters })}
+                  <div class="input-group-append">
+                    <span class="form-error heist-error" data-key="levels.${id}.${k}"></span>
+                    <button class="btn btn-secondary d-none" data-key="levels.${id}.${k}" onclick="heistPage.set.variable('levels.${id}.${k}')" type="button"><i class="fas fa-download"></i></button>
+                  </div>
+                </div>
+              `
+              j++
+            }
+
+            $('#heist-levels').append(`
+              <div class="card ${i != 0 ? 'mt-1' : ''}">
+                <div class="card-body">
+                  ${editables}
+                </div>
+              </div>
+            `)
+            i++
+          }
+          $('[data-toggle="tooltip"]').tooltip()
+        })
+      },
+      outcomes: () => {
+        heistsSocket.emit('load.variable', 'outcomes', (err, cb) => {
+          if (err) return console.debug(err)
+
+          let i = 0
+          $('#heist-outcomes').empty()
+          for ([key, value] of Object.entries(cb)) {
+            let filters = ['global']
+
+            if (key === 'results') filters.push('users')
+            if (key === 'singleUserSuccess') filters.push('user')
+            if (key === 'singleUserFailed') filters.push('user')
+            if (key === 'start') filters.push('bank')
+
+            $('#heist-outcomes').append(`
+              <div class="input-group ${i != 0 ? 'mt-1' : ''}">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">${commons.translate('games.heist.' + key)}
+                    ${commons.translate(`games.heist.tooltips.${key}`).length > 0 ? `&nbsp;<a href="#" data-toggle="tooltip" title="${commons.translate(`games.heist.tooltips.${key}`)}">[?]</a>` : ``}
+                  </span>
+                </div>
+                ${commons.editable({ id: `outcomes.${key}`, text: value, data: { 'data-heist-onchange-show-button' : null }, filters: filters})}
+                <div class="input-group-append">
+                  <button class="btn btn-secondary d-none" data-key="outcomes.${key}" onclick="heistPage.set.variable('outcomes.${key}')" type="button"><i class="fas fa-download"></i></button>
+                  <button class="btn btn-info" type="button" onclick="heistPage.set.default('outcomes.${key}')">${commons.translate('set-default')}</button>
+                </div>
+              </div>
+            `)
+            i++
+          }
+          $('[data-toggle="tooltip"]').tooltip()
+        })
+      },
+      settings: () => {
+        heistsSocket.emit('load.settings', (err, cb) => {
+          if (err) return console.debug(err)
+
+          // set command and enabled toggle
+          $('#heist-command').val(cb.command); delete cb.command
+          heistPage.set.toggleBtn(cb.enabled); delete cb.enabled
+
+          let i = 0
+          $('#heist-settings').empty()
+          for ([key, value] of Object.entries(cb)) {
+            $('#heist-settings').append(`
+              <div class="input-group ${i != 0 ? 'mt-1' : ''}">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">${commons.translate('games.heist.' + key)}
+                    ${commons.translate(`games.heist.tooltips.${key}`).length > 0 ? `&nbsp;<a href="#" data-toggle="tooltip" title="${commons.translate(`games.heist.tooltips.${key}`)}">[?]</a>` : ``}
+                  </span>
+                </div>
+                ${commons.editable({ id: key, text: value, match: { '^\\d+$': 'Value must be a number' }, errorContainer: `.heist-error[data-key='${key}']`, data: { 'data-heist-onchange-show-button' : null }})}
+                <div class="input-group-append">
+                  <span class="form-error heist-error" data-key="${key}"></span>
+                  <button class="btn btn-secondary d-none" data-key="${key}" onclick="heistPage.set.variable('${key}')" type="button"><i class="fas fa-download"></i></button>
+                  <button class="btn btn-info" type="button" onclick="heistPage.set.default('${key}')">${commons.translate('set-default')}</button>
+                </div>
+              </div>
+            `)
+            i++
+          }
+          $('[data-toggle="tooltip"]').tooltip()
+        })
+      },
+      messages: () => {
+        let variables = [
+          'entryMessage', 'copsOnPatrol', 'copsCooldownMessage', 'lateEntryMessage', 'entryInstruction', 'andXMore'
+        ]
+        $('#heist-messages').empty()
+
+        let i = 0
+        for (let variable of variables) {
+          heistsSocket.emit('load.variable', variable, (err, cb) => {
+            if (err) return console.debug(err)
+            let filters = ['global']
+
+            const key = variable
+            const value = cb
+
+            if (key === 'entryMessage') filters.push('sender')
+            if (key === 'copsOnPatrol') filters.push('sender', 'cooldown')
+            if (key === 'lateEntryMessage') filters.push('sender')
+            if (key === 'entryInstruction') filters.push('sender', 'command')
+            if (key === 'andXMore') filters.push('count')
+            $('#heist-messages').append(`
+              <div class="input-group ${i != 0 ? 'mt-1' : ''}">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">${commons.translate('games.heist.' + key)}&nbsp;
+                    ${commons.translate(`games.heist.tooltips.${key}`).length > 0 ? `<a href="#" data-toggle="tooltip" title="${commons.translate(key === 'message' ? `games.heist.tooltips.levels${key}` : `games.heist.tooltips.${key}`)}">[?]</a>` : ``}
+                  </span>
+                </div>
+                ${commons.editable({ id: key, text: value, data: { 'data-heist-onchange-show-button' : null }, filters: filters })}
+                <div class="input-group-append">
+                  <button class="btn btn-secondary d-none" data-key="${key}" onclick="heistPage.set.variable('${key}')" type="button"><i class="fas fa-download"></i></button>
+                  <button class="btn btn-info" type="button" onclick="heistPage.set.default('${key}')">${commons.translate('set-default')}</button>
+                </div>
+              </div>
+            `)
+
+            $('[data-toggle="tooltip"]').tooltip()
+            i++
+          })
+        }
+      }
+    },
+    add: {
+      result: () => {
+        heistsSocket.emit('add.result', (err, cb) => {
+          heistPage.load.results()
+        })
+      }
+    },
+    remove: {
+      result: (id) => {
+        heistsSocket.emit('remove.result', id, (err, cb) => {
+          heistPage.load.results()
+        })
+      }
+    }
+  }
+
+  heistPage.load.settings()
+  heistPage.load.outcomes()
+  heistPage.load.messages()
+  heistPage.load.levels()
+  heistPage.load.results()
+
+
+  $(document).on('keydown', '[data-heist-onchange-show-button]', (event) => {
+    if (event.which == 13) { event.preventDefault(); }
+  })
+
+  $(document).on('keyup', '[data-heist-onchange-show-button]', (event) => {
+    let key = $(event.currentTarget).data('id')
+
+    if ($(`.heist-error[data-key="${key}"]`).css('display') !== 'none') {
+      $(`button.btn.btn-secondary[data-key="${key}"]`).css('display', 'none')
+      return
+    }
+
+    if (event.which == 13) { // enter to save
+      $(event.currentTarget).blur()
+      $(`button.btn.btn-secondary[data-key="${key}"]`).trigger('click')
+    } else {
+      $(`button.btn.btn-secondary[data-key="${key}"]`).removeClass('d-none')
+      $(`button.btn.btn-secondary[data-key="${key}"]`).css('display', 'inline-block')
+    }
+  })
+</script>

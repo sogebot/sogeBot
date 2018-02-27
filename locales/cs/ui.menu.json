@@ -1,0 +1,21 @@
+{
+  "timers": "Časovače",
+  "keywords": "Klíčová slova",
+  "custom-commands": "Vlastní příkazy",
+  "event-listeners": "Události",
+  "ranks": "Hodnosti",
+  "songs": "Písničky",
+  "viewers": "Diváci",
+  "aliases": "Aliasy",
+  "cooldowns": "Cooldowny",
+  "highlights": "Highlighty",
+  "price": "Cena",
+  "logger": "Logy",
+  "systems": "Systémy",
+  "permissions": "Oprávnění",
+  "translations": "Vlastní překlady",
+  "moderation": "Pravidla v chatu",
+  "overlays": "Overlaye",
+  "gallery": "Galerie médií",
+  "games": "Hry"
+}

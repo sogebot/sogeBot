@@ -16,7 +16,6 @@ Commons.prototype.isSystemEnabled = function (fn) {
   if (typeof fn === 'object') global.log.info(name + ' system ' + global.translate('core.loaded') + ' ' + (enabled ? chalk.green(global.translate('core.enabled')) : chalk.red(global.translate('core.disabled'))))
   return enabled
 }
-
 Commons.prototype.isIntegrationEnabled = function (fn) {
   const name = (typeof fn === 'object') ? fn.constructor.name : fn
   let enabled = false

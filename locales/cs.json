@@ -192,26 +192,8 @@
     }
   },
   "webpanel": {
-    "menu": {
-      "timers": "Časovače",
-      "keywords": "Klíčová slova",
-      "custom-commands": "Vlastní příkazy",
-      "event-listeners": "Události",
-      "ranks": "Hodnosti",
-      "songs": "Písničky",
-      "viewers": "Diváci",
-      "aliases": "Aliasy",
-      "cooldowns": "Cooldowny",
-      "highlights": "Highlighty",
-      "price": "Cena",
-      "logger": "Logy",
-      "systems": "Systémy",
-      "permissions": "Oprávnění",
-      "translations": "Vlastní překlady",
-      "moderation": "Pravidla v chatu",
-      "overlays": "Overlaye",
-      "gallery": "Galerie médií"
-    },
+    "set-default": "Výchozí nastavení",
+    "add": "Přidat",
     "placeholders": {
       "text-url-generator": "Vložte text nebo html pro vytvoření base64 níže a URL výše",
       "text-decode-base64": "Vložte base64 a vygenerujte URL a text výše",
@@ -437,6 +419,9 @@
         "when": "Kdy",
         "diff": "Rozdíl",
         "users": "Uživatelé",
+        "user": "Uživatel",
+        "bank": "Banka",
+        "nextBank": "Další banka",
         "cooldown": "Cooldown",
         "tickets": "Tikety",
         "ticketsName": "Název ticketů",

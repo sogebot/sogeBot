@@ -192,26 +192,8 @@
     }
   },
   "webpanel": {
-    "menu": {
-      "timers": "Timers",
-      "keywords": "Keywords",
-      "custom-commands": "Custom commands",
-      "event-listeners": "Event listeners",
-      "ranks": "Ranks",
-      "songs": "Songs",
-      "viewers": "Viewers",
-      "aliases": "Aliases",
-      "cooldowns": "Cooldowns",
-      "highlights": "Highlights",
-      "price": "Price",
-      "logger": "Logs",
-      "systems": "Systems",
-      "permissions": "Permissions",
-      "translations": "Custom translations",
-      "moderation": "Moderation",
-      "overlays": "Overlays",
-      "gallery": "Media gallery"
-    },
+    "set-default": "Set default",
+    "add": "Add",
     "placeholders": {
       "text-url-generator": "Paste your text or html to generate base64 below and URL above",
       "text-decode-base64": "Paste your base64 to generate URL and text above",
@@ -437,6 +419,9 @@
         "when": "When",
         "diff": "Difference",
         "users": "Users",
+        "user": "User",
+        "bank": "Bank",
+        "nextBank": "Next bank",
         "cooldown": "Cooldown",
         "tickets": "Tickets",
         "ticketsName": "Tickets name",
