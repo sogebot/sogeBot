@@ -68,6 +68,14 @@
       <div class="w-100"></div>
 
       <div class="col">
+        <strong data-lang="moderation-clips-toggle"></strong>
+      </div>
+      <div class="col">
+        <input id="moderationLinksClipsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+      </div>
+      <div class="w-100"></div>
+
+      <div class="col">
         <strong data-lang="moderation-spaces-toggle"></strong>
       </div>
       <div class="col">
@@ -487,6 +495,7 @@
   socket.once('configuration', function (data) {
     createToggle('moderationLinks', data.moderationLinks)
     createToggle('moderationLinksSubs', data.moderationLinksSubs)
+    createToggle('moderationLinksClips', data.moderationLinksClips)
     createToggle('moderationLinksWithSpaces', data.moderationLinksWithSpaces)
     $("#moderationLinksTimeout").text(data.moderationLinksTimeout + 's')
 
