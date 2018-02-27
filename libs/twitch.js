@@ -485,6 +485,7 @@ class Twitch {
       global.db.engine.update('cache', { upsert: true }, { gidToGame: gids })
       return request.body.data[0].name
     } catch (e) {
+      global.log.warning(`Couldn't find name of game for gid ${gid} - fallback to ${this.current.game}`)
       global.log.error(`API: ${url} - ${e.message}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.message, remaining: this.remainingAPICalls })
       return this.current.game
