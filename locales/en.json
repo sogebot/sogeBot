@@ -74,6 +74,11 @@
           "true": "{core.settings.moderation.moderationLinksSubs.text} {core.enabled}",
           "false": "{core.settings.moderation.moderationLinksSubs.text} {core.disabled}"
         },
+        "moderationLinksClips": {
+          "text": "Moderation of clips links is",
+          "true": "{core.settings.moderation.moderationLinksSubs.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationLinksSubs.text} {core.disabled}"
+        },
         "moderationLinksTimeout": "Timeout because of links set to $values",
         "moderationSymbols": {
           "text": "Moderation of symbols is",
@@ -618,6 +623,7 @@
     "fade-out-top": "fade up",
     "fade-out-zoom": "fade zoom",
     "moderation-subscribers-toggle": "Timeout subscribers",
+    "moderation-clips-toggle": "Timeout clips",
     "moderation-spaces-toggle": "Timeout links with spaces",
     "global": "Global",
     "user": "User",

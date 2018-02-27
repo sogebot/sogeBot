@@ -35,7 +35,7 @@ var Permissions = require('./libs/permissions')
 var constants = require('./libs/constants')
 var Webhooks = require('./libs/webhooks')
 
-console.log(figlet.textSync('sogeBot ' + process.env.npm_package_version, {
+console.log(figlet.textSync('sogeBot ' + _.get(process, 'env.npm_package_version', 'x.y.z'), {
   font: 'ANSI Shadow',
   horizontalLayout: 'default',
   verticalLayout: 'default'

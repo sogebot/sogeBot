@@ -74,6 +74,11 @@
           "true": "{core.settings.moderation.moderationLinksSubs.text} {core.enabled}",
           "false": "{core.settings.moderation.moderationLinksSubs.text} {core.disabled}"
         },
+        "moderationLinksClips": {
+          "text": "Moderovani odkazu na klipy je",
+          "true": "{core.settings.moderation.moderationLinksSubs.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationLinksSubs.text} {core.disabled}"
+        },
         "moderationLinksTimeout": "Timeout pri pouziti linku je nastaven na $values",
         "moderationSymbols": {
           "text": "Moderovani symbolu je",
@@ -617,6 +622,7 @@
     "fade-out-top": "slábnout směrem nahoru",
     "fade-out-zoom": "slábnout přiblížením",
     "moderation-subscribers-toggle": "Postihovat i subscribery",
+    "moderation-clips-toggle": "Postihovat i clipy",
     "moderation-spaces-toggle": "Zahrnout linky s mezerou",
     "global": "Globální",
     "user": "Divák",
