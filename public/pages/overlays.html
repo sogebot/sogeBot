@@ -545,12 +545,14 @@
     if (err) return console.error(err)
     cb = _.sortBy(cb, 'order')
     for (let input of cb) addCustomTextInputs(input)
+    saveCustomTextInputs()
   })
 
   creditsSocket.emit('socials.load', (err, cb) => {
     if (err) return console.error(err)
     cb = _.sortBy(cb, 'order')
     for (let input of cb) addSocialInputs(input)
+    saveSocialInputs()
   })
 
   socket.emit('getConfiguration')
