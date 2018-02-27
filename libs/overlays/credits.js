@@ -31,10 +31,6 @@ class Credits {
     global.configuration.register('creditsClippedBy', 'core.no-response', 'string', 'Clipped by')
     global.configuration.register('creditsTopClips', 'core.no-response', 'string', 'Top clips')
 
-    global.configuration.register('creditsSocialFacebook', 'core.no-response', 'string', '')
-    global.configuration.register('creditsSocialTwitter', 'core.no-response', 'string', '')
-    global.configuration.register('creditsSocialTwitch', 'core.no-response', 'string', '')
-
     global.configuration.register('creditsTopClipsPeriod', 'core.no-response', 'string', 'week') // possibilities day, week, month, all
     global.configuration.register('creditsTopClipsPlay', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsTopClipsCount', 'core.no-response', 'number', 3)
@@ -47,19 +43,15 @@ class Credits {
     this.io.on('connection', (socket) => {
       d('Socket /overlays/credits connected, registering sockets')
       socket.on('load', async (callback) => {
-        let [events, when, hosts] = await Promise.all([
+        let [events, when, hosts, socials] = await Promise.all([
           global.db.engine.find('widgetsEventList'),
           global.twitch.when(),
-          global.db.engine.find('cache.hosts')
+          global.db.engine.find('cache.hosts'),
+          global.db.engine.find('overlay.credits.socials')
         ])
 
         if (_.isNil(when.online)) when.online = _.now()
         let timestamp = new Date(when.online).getTime() // 2018-02-16T18:02:50Z
-        let socials = {
-          facebook: global.configuration.getValue('creditsSocialFacebook'),
-          twitter: global.configuration.getValue('creditsSocialTwitter'),
-          twitch: global.configuration.getValue('creditsSocialTwitch')
-        }
         let messages = {
           lastMessage: global.configuration.getValue('creditsLastMessage'),
           lastSubMessge: global.configuration.getValue('creditsLastSubMessage')
@@ -104,6 +96,20 @@ class Credits {
           clips,
           global.configuration.getValue('creditsMaxFontSize')
         )
+      })
+      socket.on('socials.save', async (data, cb) => {
+        // remove all data
+        await global.db.engine.remove('overlay.credits.socials', {})
+
+        let toAwait = []
+        for (let [i, v] of Object.entries(data)) {
+          toAwait.push(global.db.engine.insert('overlay.credits.socials', { order: i, type: v.type, text: v.text }))
+        }
+        await Promise.all(toAwait)
+        cb(null, true)
+      })
+      socket.on('socials.load', async (cb) => {
+        cb(null, await global.db.engine.find('overlay.credits.socials'))
       })
       socket.on('custom.text.save', async (data, cb) => {
         // remove all data
