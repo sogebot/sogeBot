@@ -275,19 +275,11 @@
             }
           }
 
-          for (let [key, value] of Object.entries(socials)) {
-            if (value.trim().length === 0) continue
-            switch (key) {
-              case 'facebook':
-                $('#social').append(`
-                  <div class="social"><i class="fab fa-${key}-square"></i> ${value}</div>
-                `)
-                break
-              default:
-                $('#social').append(`
-                  <div class="social"><i class="fab fa-${key}"></i> ${value}</div>
-                `)
-            }
+          socials = _.orderBy(socials, 'order')
+          for (let social of socials) {
+            $('#social').append(`
+              <div class="social"><i class="fab fa-fw fa-${social.type}"></i> ${social.text}</div>
+            `)
           }
 
           if ($hosts.text().length === 0) {
