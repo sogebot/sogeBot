@@ -478,17 +478,17 @@ class Twitch {
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+
+      // add id->game to cache
+      gids[gid] = request.body.data[0].name
+      d('Saving id %s -> %s to cache', gid, request.body.data[0].name)
+      global.db.engine.update('cache', { upsert: true }, { gidToGame: gids })
+      return request.body.data[0].name
     } catch (e) {
       global.log.error(`API: ${url} - ${e.message}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.message, remaining: this.remainingAPICalls })
       return this.current.game
     }
-
-    // add id->game to cache
-    gids[gid] = request.body.data[0].name
-    d('Saving id %s -> %s to cache', gid, request.body.data[0].name)
-    global.db.engine.update('cache', { upsert: true }, { gidToGame: gids })
-    return request.body.data[0].name
   }
 
   async getCurrentStreamData () {
