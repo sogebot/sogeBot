@@ -265,7 +265,7 @@ class Twitch {
           this.current.rawStatus = request.body.status
         } else {
           this.retries.getChannelDataOldAPI++
-          setTimeout(() => this.getChannelDataOldAPI(), this.cooldown)
+          setTimeout(() => this.getChannelDataOldAPI(), this.retries.cooldown)
           return
         }
       } else {
@@ -585,7 +585,7 @@ class Twitch {
         // retry if it is not just some network / twitch issue
         this.curRetries = this.curRetries + 1
         d('Retry stream offline check, cur: %s, max: %s', this.curRetries, this.maxRetries)
-        setTimeout(() => this.getCurrentStreamData(), this.cooldown)
+        setTimeout(() => this.getCurrentStreamData(), this.retries.cooldown)
         return
       } else {
         // stream is really offline
