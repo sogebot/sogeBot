@@ -38,7 +38,16 @@
               <span class="caret"></span>
             </button>
             <div class="dropdown-menu">
+              <h6 class="dropdown-header">SONG REQUEST</h6>
+              <button class="dropdown-item" id="toggle-songrequest-btn" data-show-percentage="true" onclick="toggleSongsFromSongRequest()">
+                <i class="far fa-check-square" aria-hidden="true"></i> Play songs from song requests</button>
+              </button>
+
+
               <h6 class="dropdown-header">PLAYLIST</h6>
+              <button class="dropdown-item" id="toggle-playlist-btn" data-show-percentage="true" onclick="toggleSongsFromPlaylist()">
+                <i class="far fa-check-square" aria-hidden="true"></i> Play songs from playlist</button>
+              </button>
               <button class="dropdown-item" id="percentage-btn" data-show-percentage="true" onclick="stealToPlaylist()">Steal to playlist</button>
 
               <h6 class="dropdown-header">OTHERS</h6>
@@ -247,4 +256,28 @@
       }
     }
   });
+
+  function toggleSongsFromSongRequest() {
+    socket.emit('songs.toggleSongRequests')
+    $icon = $('button#toggle-songrequest-btn i')
+    if ($icon.hasClass('fa-check-square')) $icon.removeClass().addClass('far fa-square')
+    else $icon.removeClass().addClass('far fa-check-square')
+  }
+
+  function toggleSongsFromPlaylist() {
+    socket.emit('songs.togglePlaylist')
+    let $icon = $('button#toggle-playlist-btn i')
+    if ($icon.hasClass('fa-check-square')) $icon.removeClass().addClass('far fa-square')
+    else $icon.removeClass().addClass('far fa-check-square')
+  }
+
+  socket.on('songs.toggles', (data) => {
+    console.log(data)
+    let $icon
+
+    $icon = $('button#toggle-songrequest-btn i')
+    $icon.removeClass().addClass(`far ${data.songrequest ? `fa-check-square`: `fa-square`}`)
+    $icon = $('button#toggle-playlist-btn i')
+    $icon.removeClass().addClass(`far ${data.playlist ? `fa-check-square`: `fa-square`}`)
+  })
 </script>

@@ -36,14 +36,34 @@ class Songs {
       global.configuration.register('songs_notify', 'core.settings.songs.notify', 'bool', false)
 
       this.getMeanLoudness(this)
+      this.getToggles(this)
 
       global.panel.addMenu({category: 'manage', name: 'songs', id: 'songs'})
       global.panel.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones')
       global.panel.registerSockets({
         self: this,
-        expose: ['getCurrentVolume', 'send', 'setTrim', 'sendConfiguration', 'banSong', 'getSongRequests', 'stealSong', 'sendNextSongID', 'removeSongFromPlaylist', 'unbanSong']
+        expose: ['togglePlaylist', 'toggleSongRequests', 'getCurrentVolume', 'send', 'setTrim', 'sendConfiguration', 'banSong', 'getSongRequests', 'stealSong', 'sendNextSongID', 'removeSongFromPlaylist', 'unbanSong']
       })
     }
+  }
+
+  togglePlaylist () {
+    let value = global.configuration.getValue('songs_playlist').toString().toLowerCase() === 'true' ? 'false' : 'true'
+    global.configuration.setValue(global.configuration, { username: global.parser.getOwner() }, `songs_playlist ${value}`, true)
+  }
+
+  toggleSongRequests () {
+    let value = global.configuration.getValue('songs_songrequest').toString().toLowerCase() === 'true' ? 'false' : 'true'
+    global.configuration.setValue(global.configuration, { username: global.parser.getOwner() }, `songs_songrequest ${value}`, true)
+  }
+
+  async getToggles (self) {
+    setInterval(() => {
+      global.panel.io.emit('songs.toggles', {
+        playlist: global.configuration.getValue('songs_playlist'),
+        songrequest: global.configuration.getValue('songs_songrequest')
+      })
+    }, 1000)
   }
 
   async getMeanLoudness (self) {
