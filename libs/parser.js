@@ -477,6 +477,8 @@ Parser.prototype.parseMessage = async function (message, attr) {
     .replace(/\$hosts/g, global.twitch.current.hosts)
     .replace(/\$subscribers/g, global.twitch.current.subscribers)
     .replace(/\$bits/g, global.twitch.current.bits)
+  if (global.commons.isSystemEnabled('songs')) msg = message.replace(/\$currentSong/g, _.get(global.systems.songs.currentSong, 'title', ''))
+
   msg = await this.parseMessageVariables(custom, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageEval(evaluate, decode(msg)); d('parseMessageEval: %s', msg)
   msg = await this.parseMessageOnline(online, msg); d('parseMessageOnline: %s', msg)
