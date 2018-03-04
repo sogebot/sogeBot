@@ -440,7 +440,8 @@
         "oldGame": "Hra před změnou",
         "userObject": "Úplný uživatelský objekt",
         "recipientObject": "Úplný objekt příjemce",
-        "recipient": "Příjemce"
+        "recipient": "Příjemce",
+        "currentSong": "Aktuální píseň"
       }
     },
     "page-settings": {

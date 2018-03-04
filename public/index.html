@@ -762,16 +762,17 @@
                 )
                 // show filters
                 if (_.includes($(this).data('filters').split(','), 'global')) {
-                  div.append('<div style="display: inline-block; padding: 5px;">' +
-                    '<div class="text-primary" style="font-size:14px; font-weight: bold">Global variables: </div> ' +
-                    '<span class="editable-variable block" data-var="title" data-lang="responses.variable.title"></span> ' +
-                    '<span class="editable-variable block" data-var="game" data-lang="responses.variable.game"></span> ' +
-                    '<span class="editable-variable block" data-var="viewers" data-lang="responses.variable.viewers"></span> ' +
-                    '<span class="editable-variable block" data-var="views" data-lang="responses.variable.views"></span> ' +
-                    '<span class="editable-variable block" data-var="hosts" data-lang="responses.variable.hosts"></span> ' +
-                    '<span class="editable-variable block" data-var="followers" data-lang="responses.variable.followers"></span> ' +
-                    '<span class="editable-variable block" data-var="subscribers" data-lang="responses.variable.subscribers"></span> ' +
-                    '</div>')
+                  div.append(`<div style="display: inline-block; padding: 5px;">
+                    <div class="text-primary" style="font-size:14px; font-weight: bold">Global variables: </div>
+                    <span class="editable-variable block" data-var="title" data-lang="responses.variable.title"></span>
+                    <span class="editable-variable block" data-var="game" data-lang="responses.variable.game"></span>
+                    <span class="editable-variable block" data-var="viewers" data-lang="responses.variable.viewers"></span>
+                    <span class="editable-variable block" data-var="views" data-lang="responses.variable.views"></span>
+                    <span class="editable-variable block" data-var="hosts" data-lang="responses.variable.hosts"></span>
+                    <span class="editable-variable block" data-var="followers" data-lang="responses.variable.followers"></span>
+                    <span class="editable-variable block" data-var="subscribers" data-lang="responses.variable.subscribers"></span>
+                    ${systems.points ? `<span class="editable-variable block" data-var="currentSong" data-lang="responses.variable.currentSong"></span>` : ``}
+                    </div>`)
                   div.css('display', 'block')
                 }
 

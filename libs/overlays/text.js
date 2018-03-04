@@ -23,6 +23,7 @@ class TextOverlay {
             html = html.replace(new RegExp(`\\$_${variable.key}`, 'g'), value)
           }
         }
+        html = await global.parser.parseMessage(html) // global filters
         callback(html)
       })
     })

@@ -440,7 +440,8 @@
         "oldGame": "Game before change",
         "userObject": "Full user object",
         "recipientObject": "Full recipient object",
-        "recipient": "Recipient"
+        "recipient": "Recipient",
+        "currentSong": "Aktuální píseň"
       }
     },
     "page-settings": {
