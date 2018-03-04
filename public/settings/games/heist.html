@@ -1,12 +1,7 @@
 <div class="card">
   <ul class="list-group list-group-flush">
     <li class="list-group-item">
-      <div class="input-group">
-        <input class="form-control" id="heist-command" placeholder="!command to use"></input>
-        <div class="input-group-append">
-          <button class="btn btn-success" id="heist-enabled" type="button" onclick="heistPage.toggle.enabled()"></button>
-        </div>
-      </div>
+      <div id ="heist-command"></div>
     </li>
     <li class="list-group-item" id="heist-settings"></li>
     <li class="list-group-item" id="heist-messages"></li>
@@ -212,6 +207,18 @@
           if (err) return console.debug(err)
 
           // set command and enabled toggle
+          $('#heist-command').empty()
+          $('#heist-command').append(`
+            <div class="input-group">
+              ${commons.editable({ id: 'command', text: cb.command, match: { '^!.+$': 'Value must be a !command' }, errorContainer: `.heist-error[data-key='command']`, data: { 'data-heist-onchange-show-button' : null }})}
+              <div class="input-group-append">
+                <span class="form-error heist-error" data-key="command"></span>
+                <button class="btn btn-secondary d-none" data-key="command" onclick="heistPage.set.variable('command')" type="button"><i class="fas fa-download"></i></button>
+                <button class="btn btn-info" type="button" onclick="heistPage.set.default('command')">${commons.translate('set-default')}</button>
+                <button class="btn btn-success" id="heist-enabled" type="button" onclick="heistPage.toggle.enabled()"></button>
+              </div>
+            </div>
+          `)
           $('#heist-command').val(cb.command); delete cb.command
           heistPage.set.toggleBtn(cb.enabled); delete cb.enabled
 
