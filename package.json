@@ -71,7 +71,7 @@
     "test:config:mongodb": "cp config.example.json config.json && sed -i -- 's/nedb/mongodb/g' config.json",
     "test:config:nedb": "cp config.example.json config.json",
     "start": "node ./tools/migrate && npm-run-all --parallel build:css copy:dist && cross-env NODE_ENV=production node ./main || true",
-    "start-no-migration": "npm run copy:dist && node ./main || true",
+    "start-no-migration": "npm-run-all --parallel build:css copy:dist && cross-env NODE_ENV=production node ./main || true",
     "debug": "npm run copy:dist && node --inspect ./main || true",
     "cleanup": "node ./tools/cleanup.js || true",
     "cleanup:dist": "rimraf public/dist/bootstrap* public/dist/carousel/* public/dist/gallery/* public/dist/jquery public/dist/lodash public/dist/velocity-animate public/dist/popper.js public/dist/flv.js public/dist/css/dark.css public/dist/css/light.css",
