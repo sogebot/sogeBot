@@ -39,6 +39,7 @@ function Panel () {
   })
 
   // static routing
+  app.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')))
   app.get('/auth/token.js', function (req, res) {
     const origin = req.headers.referer ? req.headers.referer.substring(0, req.headers.referer.length - 1) : undefined
     const domain = config.panel.domain.trim()
@@ -74,7 +75,6 @@ function Panel () {
   app.get('/:type/:page', this.authUser, function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.page))
   })
-  app.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')))
 
   this.server.listen(port, function () {
     global.log.info('WebPanel is available at http://localhost:%s', port)
