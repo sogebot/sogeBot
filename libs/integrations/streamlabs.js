@@ -76,21 +76,19 @@ class Streamlabs {
   }
 
   async sockets () {
-    this.socket.on('connect', () => {
-      this.socket.on('event', (eventData) => {
-        if (eventData.type === 'donation') {
-          for (let event of eventData.message) {
-            global.overlays.eventlist.add({
-              type: 'tip',
-              amount: event.amount,
-              currency: event.currency,
-              username: event.from.toLowerCase(),
-              message: event.message
-            })
-            global.events.fire('tip', { username: event.from.toLowerCase(), amount: event.amount, message: event.message, currency: event.currency })
-          }
+    this.socket.on('event', (eventData) => {
+      if (eventData.type === 'donation') {
+        for (let event of eventData.message) {
+          global.overlays.eventlist.add({
+            type: 'tip',
+            amount: event.amount,
+            currency: event.currency,
+            username: event.from.toLowerCase(),
+            message: event.message
+          })
+          global.events.fire('tip', { username: event.from.toLowerCase(), amount: event.amount, message: event.message, currency: event.currency })
         }
-      })
+      }
     })
   }
 }
