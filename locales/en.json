@@ -306,6 +306,14 @@
         "operations": "Operations"
       },
       "definitions": {
+        "fadeOutXCommands": {
+          "label": "Fade Out X Commands",
+          "placeholder": "Number of commands subtracted every fade out interval"
+        },
+        "fadeOutInterval": {
+          "label": "Fade Out Interval (seconds)",
+          "placeholder": "Fade out interval of command subtracting"
+        },
         "runEveryXCommands": {
           "label": "Run Every X Commands",
           "placeholder": "Number of commands before event is triggered"

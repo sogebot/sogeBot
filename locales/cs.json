@@ -306,6 +306,14 @@
         "operations": "Operace"
       },
       "definitions": {
+        "fadeOutXCommands": {
+          "label": "Odečíst X příkazů",
+          "placeholder": "Počet příkazů, odečtených během fade out intervalu"
+        },
+        "fadeOutInterval": {
+          "label": "Interval odečítání příkazů (sekundy)",
+          "placeholder": "Fade out interval odečítání příkazů"
+        },
         "runEveryXCommands": {
           "label": "Spustit každých X příkazů",
           "placeholder": "Počet příkazů před spuštěním události"

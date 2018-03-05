@@ -18,7 +18,7 @@ class Events {
       { id: 'subscription', variables: [ 'username', 'userObject', 'method' ] },
       { id: 'subgift', variables: [ 'username', 'userObject', 'recipient', 'recipientObject' ] },
       { id: 'resub', variables: [ 'username', 'userObject', 'months', 'monthsName', 'message' ] },
-      { id: 'command-send-x-times', variables: [ 'username', 'userObject', 'command', 'count' ], definitions: { runEveryXCommands: 10, commandToWatch: '', runInterval: 0 }, check: this.checkCommandSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
+      { id: 'command-send-x-times', variables: [ 'username', 'userObject', 'command', 'count' ], definitions: { fadeOutXCommands: 0, fadeOutInterval: 0, runEveryXCommands: 10, commandToWatch: '', runInterval: 0 }, check: this.checkCommandSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 }, check: this.checkNumberOfViewersIsAtLeast }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'stream-started' },
       { id: 'stream-stopped' },
@@ -49,6 +49,33 @@ class Events {
 
     global.panel.addMenu({category: 'manage', name: 'event-listeners', id: 'events'})
     this.sockets()
+    this.fadeOut()
+  }
+
+  async fadeOut () {
+    const d = debug('events:fadeout')
+
+    try {
+      let events = await global.db.engine.find('events', { key: 'command-send-x-times' }); d(events)
+      for (let event of events) {
+        if (_.isNil(_.get(event, 'triggered.fadeOutInterval', null))) {
+          // fadeOutInterval init
+          await global.db.engine.update('events', { _id: event._id.toString() }, { triggered: { fadeOutInterval: _.now() } })
+        } else {
+          if (_.now() - event.triggered.fadeOutInterval >= event.definitions.fadeOutInterval * 1000) {
+            // fade out commands
+            if (!_.isNil(_.get(event, 'triggered.runEveryXCommands', null))) {
+              if (event.triggered.runEveryXCommands <= 0) continue
+              await global.db.engine.update('events', { _id: event._id.toString() }, { triggered: { fadeOutInterval: _.now(), runEveryXCommands: event.triggered.runEveryXCommands - event.definitions.fadeOutXCommands } })
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e.stack)
+    } finally {
+      setTimeout(() => this.fadeOut(), 1000)
+    }
   }
 
   async fire (eventId, attributes) {
