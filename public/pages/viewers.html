@@ -70,6 +70,10 @@
               <span data-lang="messages"></span>
               <i class="fa" aria-hidden="true"></i>
             </th>
+            <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="stats.bits">
+              <span data-lang="bits"></span>
+              <i class="fa" aria-hidden="true"></i>
+            </th>
             <th></th>
             <th></th>
           </tr>
@@ -178,6 +182,9 @@
           '<td class="text-center" data-value=' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.messages) ?
             0 : item.stats.messages) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.messages) ?
             0 : item.stats.messages) + '</td>' +
+          '<td class="text-center" data-value=' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.bits) ?
+            0 : item.stats.bits) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.bits) ?
+            0 : item.stats.bits) + '</td>' +
           '<td style="font-weight: bold; cursor: pointer; user-select: none;">' +
           '<button id="subscriber-' + item.username + '" class="btn ' + (item.is.subscriber ? "btn-success" :
             "btn-danger") + '" onclick="viewers.toggle(\'subscriber\', \'' + item.username +
