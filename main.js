@@ -350,6 +350,9 @@ async function subgift (channel, username, recipient) {
 async function cheer (channel, userstate, message) {
   if (debug.enabled) debug('Cheer: %s\n\tuserstate: %s', message, JSON.stringify(userstate))
 
+  // remove cheerX or channelCheerX from message
+  message = message.replace(/(.*?[cC]heer[\d]+)/g, '').trim()
+
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: userstate.username })
   if (!_.isEmpty(ignoredUser) && userstate.username !== config.settings.broadcaster_username) return
 
