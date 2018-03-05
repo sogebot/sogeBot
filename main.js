@@ -259,15 +259,7 @@ function main () {
   })
 
   global.client.on('cheer', async function (channel, userstate, message) {
-    if (debug.enabled) debug('Cheer: %s\n\tuserstate: %s', message, JSON.stringify(userstate))
-
-    let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: userstate.username })
-    if (!_.isEmpty(ignoredUser) && userstate.username !== config.settings.broadcaster_username) return
-
-    global.overlays.eventlist.add({ type: 'cheer', username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
-    global.log.cheer(`${userstate.username.toLowerCase()}, bits: ${userstate.bits}, message: ${message}`)
-    global.events.fire('cheer', { username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
-    if (global.twitch.isOnline) global.twitch.current.bits = global.twitch.current.bits + parseInt(userstate.bits, 10)
+    cheer(channel, userstate, message)
   })
 
   global.client.on('subgift', async function (channel, username, recipient) {
@@ -353,6 +345,19 @@ async function subgift (channel, username, recipient) {
   global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username })
   global.events.fire('subgift', { username: username, recipient: recipient })
   global.log.subgift(`${recipient}, from: ${username}`)
+}
+
+async function cheer (channel, userstate, message) {
+  if (debug.enabled) debug('Cheer: %s\n\tuserstate: %s', message, JSON.stringify(userstate))
+
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: userstate.username })
+  if (!_.isEmpty(ignoredUser) && userstate.username !== config.settings.broadcaster_username) return
+
+  global.overlays.eventlist.add({ type: 'cheer', username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
+  global.log.cheer(`${userstate.username.toLowerCase()}, bits: ${userstate.bits}, message: ${message}`)
+  global.db.engine.increment('users', { username: userstate.username.toLowerCase() }, { stats: { bits: userstate.bits } })
+  global.events.fire('cheer', { username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
+  if (global.twitch.isOnline) global.twitch.current.bits = global.twitch.current.bits + parseInt(userstate.bits, 10)
 }
 
 if (config.debug.all) {
