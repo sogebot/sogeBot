@@ -45,6 +45,7 @@ class Streamlabs {
       this.refreshToken = refreshTokenFromDb.value
       this.accessToken = accessTokenFromDb.value
       await this.refresh() // refresh instantly
+      this.connectSocket() // connect socket
     }
   }
 
@@ -72,7 +73,6 @@ class Streamlabs {
       global.db.engine.update('integrations.streamlabs', { key: 'refreshToken' }, { value: this.refreshToken })
     ])
     setTimeout(() => this.refresh(), 300000)
-    this.connectSocket() // connect socket
   }
 
   async sockets () {
