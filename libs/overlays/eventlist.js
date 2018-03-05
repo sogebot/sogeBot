@@ -32,15 +32,18 @@ EventList.prototype._getOverlay = async function (self) {
 
 EventList.prototype.add = async function (data) {
   if (global.parser.isBot(data.username)) return // don't save event from a bot
+
   const newEvent = {
     event: data.type,
     timestamp: _.now(),
     username: data.username,
     message: data.message,
-    months: _.isNil(data.months) ? 0 : data.months,
-    bits: _.isNil(data.bits) ? 0 : data.bits,
-    viewers: _.isNil(data.viewers) ? 0 : data.viewers,
-    from: _.isNil(data.from) ? 'n/a' : data.from
+    amount: _.isNil(data.amount) ? null : data.amount,
+    currency: _.isNil(data.currency) ? null : data.currency,
+    months: _.isNil(data.months) ? null : data.months,
+    bits: _.isNil(data.bits) ? null : data.bits,
+    viewers: _.isNil(data.viewers) ? null : data.viewers,
+    from: _.isNil(data.from) ? null : data.from
   }
   global.db.engine.insert('widgetsEventList', newEvent)
   global.overlays.eventlist._get(global.overlays.eventlist)

@@ -376,7 +376,8 @@
       "sub": "ti dal <strong>sub</strong>",
       "subgift": "byl <strong>darován</strong> sub od $username",
       "resub": "ti dal <strong>resub</strong> $months měsíců",
-      "cheer": "ti dal <strong>cheer</strong> $bits bitů"
+      "cheer": "ti dal <strong>cheer</strong> $bits bitů",
+      "tip": "ti dal <strong>tip</strong> $formatted_amount"
     },
     "responses": {
       "variable": {
@@ -406,6 +407,7 @@
         "name": "Název",
         "messages": "Zprávy",
         "amount": "Počet",
+        "currency": "Měna",
         "pointsName": "Název bodů",
         "points": "Body",
         "rank": "Rank",
@@ -557,6 +559,7 @@
     "overlays-eventlist-sub": "sub",
     "overlays-eventlist-follow": "follow",
     "overlays-eventlist-cheer": "bits",
+    "overlays-eventlist-tip": "tip",
     "overlay-credits-show-followers": "Zobrazit followery",
     "overlay-credits-show-hosts": "Zobrazit hosty",
     "overlay-credits-show-subscribers": "Zobrazit subscribery",
@@ -814,6 +817,7 @@
     "user-joined-channel": "uživatel se připojil do chatu",
     "user-parted-channel": "uživatel se odešel z chatu",
     "follow": "nový follower",
+    "tip": "nový tip",
     "unfollow": "ztráta followera",
     "subscription": "nový subscription",
     "subgift": "nový subgift",

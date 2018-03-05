@@ -18,6 +18,7 @@ class Events {
       { id: 'subscription', variables: [ 'username', 'userObject', 'method' ] },
       { id: 'subgift', variables: [ 'username', 'userObject', 'recipient', 'recipientObject' ] },
       { id: 'resub', variables: [ 'username', 'userObject', 'months', 'monthsName', 'message' ] },
+      { id: 'tip', variables: [ 'username', 'amount', 'currency', 'message' ] },
       { id: 'command-send-x-times', variables: [ 'username', 'userObject', 'command', 'count' ], definitions: { fadeOutXCommands: 0, fadeOutInterval: 0, runEveryXCommands: 10, commandToWatch: '', runInterval: 0 }, check: this.checkCommandSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 }, check: this.checkNumberOfViewersIsAtLeast }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'stream-started' },
@@ -485,7 +486,9 @@ class Events {
           reason: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
           command: '!testcommand',
           count: _.random(0, 9999, false),
-          method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : ''
+          method: _.random(0, 1, false) === 0 ? 'Twitch Prime' : '',
+          amount: _.random(0, 9999, true).toFixed(2),
+          currency: _.sample(['CZK', 'USD', 'EUR'])
         }
         for (let operation of (await global.db.engine.find('events.operations', { eventId: eventId }))) {
           d('Firing %j', operation)
