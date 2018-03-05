@@ -376,7 +376,8 @@
       "sub": "<strong>subbed</strong> you",
       "subgift": "have <strong>gifted</strong> sub from $username",
       "resub": "<strong>resubbed</strong> you for $months months",
-      "cheer": "<strong>cheered</strong> you for $bits bits"
+      "cheer": "<strong>cheered</strong> you for $bits bits",
+      "tip": "<strong>tipped</strong> you for $formatted_amount"
     },
     "responses": {
       "variable": {
@@ -406,6 +407,7 @@
         "name": "Name",
         "messages": "Messages",
         "amount": "Amount",
+        "currency": "Currency",
         "pointsName": "Points name",
         "points": "Points",
         "rank": "Rank",
@@ -557,6 +559,7 @@
     "overlays-eventlist-sub": "sub",
     "overlays-eventlist-follow": "follow",
     "overlays-eventlist-cheer": "bits",
+    "overlays-eventlist-tip": "tip",
     "requested-by": "Requested by",
     "description": "Description",
     "raffle-type": "Raffle type",
@@ -809,6 +812,7 @@
     "user-joined-channel": "user joined a channel",
     "user-parted-channel": "user parted a channel",
     "follow": "new follow",
+    "tip": "new tip",
     "unfollow": "unfollow",
     "subscription": "new subscription",
     "subgift": "new subgift",
