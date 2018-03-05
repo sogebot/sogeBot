@@ -272,9 +272,7 @@
   }
 
   socket.on('songs.toggles', (data) => {
-    console.log(data)
     let $icon
-
     $icon = $('button#toggle-songrequest-btn i')
     $icon.removeClass().addClass(`far ${data.songrequest ? `fa-check-square`: `fa-square`}`)
     $icon = $('button#toggle-playlist-btn i')
