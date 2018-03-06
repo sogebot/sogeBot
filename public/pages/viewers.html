@@ -106,7 +106,7 @@
     query: "token=" + token
   });
 
-  var page = 1
+  var pagination = 1
 
   if (!systems.points) {
     $("#viewers-points").remove()
@@ -257,8 +257,8 @@
       $(el).children('i').addClass('fa fa-sort-' + viewers.sortType)
       viewers.update(viewers.paging(viewers.list))
     },
-    page: function (i) {
-      page = i
+    pagination: function (i) {
+      pagination = i
       viewers.update(viewers.paging(viewers.list))
     },
     search: function (list) {
@@ -269,7 +269,7 @@
     },
     updateSearch: function () {
       viewers.toSearch = $('#viewersSearch').val()
-      page = 1
+      pagination = 1
       viewers.update(viewers.paging())
     },
     paging: function () {
@@ -294,14 +294,14 @@
       paging.empty()
       _.each(list, function (v, i) {
         if (list.length < 10) {
-          paging.append('<li style="margin:0; padding: 8px 5px;" onclick="viewers.page(' + (i + 1) + ')" class="btn ' + (page === i + 1 ?
+          paging.append('<li style="margin:0; padding: 8px 5px;" onclick="viewers.pagination(' + (i + 1) + ')" class="btn ' + (pagination === i + 1 ?
             'btn-primary' : 'btn-default') + '">' + (i + 1) + '</li>')
         } else {
-          if ((i >= page - 3 && i < page + 2) || (i > list.length - 4) || i % 10 === Math.floor(list.length /
+          if ((i >= pagination - 3 && i < pagination + 2) || (i > list.length - 4) || i % 10 === Math.floor(list.length /
               10) || i < 3) {
-            paging.append('<li style="margin:0; padding: 8px 5px;" onclick="viewers.page(' + (i + 1) + ')" class="btn ' + (page === i + 1 ?
+            paging.append('<li style="margin:0; padding: 8px 5px;" onclick="viewers.pagination(' + (i + 1) + ')" class="btn ' + (pagination === i + 1 ?
               'btn-primary' : 'btn-default') + '">' + (i + 1) + '</li>')
-            if (!(i + 1 > page - 2 && i + 1 < page + 2) || !(i + 1 > list.length - 4)) {
+            if (!(i + 1 > pagination - 2 && i + 1 < pagination + 2) || !(i + 1 > list.length - 4)) {
               empty = true
             }
           } else if (empty) {
@@ -311,9 +311,9 @@
         }
       })
       if (list.length === 0) {
-        paging.append('<li onclick="viewers.page(1)" style="margin:0; padding: 8px 5px;" class="btn btn-primary">1</li>')
+        paging.append('<li onclick="viewers.pagination(1)" style="margin:0; padding: 8px 5px;" class="btn btn-primary">1</li>')
       }
-      return list[page - 1];
+      return list[pagination - 1];
     }
   }
 
