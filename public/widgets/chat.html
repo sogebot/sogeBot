@@ -68,7 +68,7 @@
   })
 
   socket.emit('getChatRoom');
-  socket.on('chatRoom', function (room) {
+  socket.once('chatRoom', function (room) {
     $("#chat-room").html('<iframe frameborder="0" scrolling="no" id="chat_embed" src="' + window.location.protocol +
       '//twitch.tv/embed/' + room + '/chat" width="100%"></iframe>')
   })
