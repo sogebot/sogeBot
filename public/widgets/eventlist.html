@@ -227,7 +227,7 @@
       let timestamp = moment(event.timestamp).fromNow()
       let icon = `<i title="${moment(event.timestamp).format('LLLL')}" data-timestamp="${event.timestamp}" class="eventlist-text">${moment(event.timestamp).fromNow()}</i>`
       let t = translations['eventlist-events'][event.event]
-      event.message = event.message.replace(/(\w{10})/g, '$1<wbr>') // force newline for long texts
+      if (!_.isNil(event.message)) event.message = event.message.replace(/(\w{10})/g, '$1<wbr>') // force newline for long texts
       if (event.event === 'tip') {
         username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
