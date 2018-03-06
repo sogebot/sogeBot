@@ -411,7 +411,7 @@ class Heist {
     if (_.now() - startedAt > entryCooldown * 1000 && _.now() - self._lastAnnouncedHeistInProgress >= 60000) {
       self._lastAnnouncedHeistInProgress = _.now()
       global.commons.sendMessage(
-        (await self.get('lateEntryMessage')).replace('$command', self.command), sender)
+        (await self.get('lateEntryMessage')).replace('$command', command), sender)
       return
     }
 
@@ -421,7 +421,7 @@ class Heist {
     } catch (e) {
       if (!newHeist) {
         global.commons.sendMessage(
-          (await self.get('entryInstruction')).replace('$command', self.command), sender)
+          (await self.get('entryInstruction')).replace('$command', command), sender)
         global.log.warning(`${command} ${e.message}`)
         d(e.stack)
       }
