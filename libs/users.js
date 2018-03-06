@@ -325,8 +325,8 @@ Users.prototype.isFollowerUpdate = async function (username) {
     global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
     d('Request done: %j', request.body)
   } catch (e) {
-    global.log.error(`API: ${url} - ${e.message}`)
-    global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.message, remaining: global.twitch.remainingAPICalls })
+    global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
+    global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: `${e.status} ${e.body.message}`, remaining: global.twitch.remainingAPICalls })
     return
   }
 

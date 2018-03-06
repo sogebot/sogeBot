@@ -220,8 +220,8 @@ class Twitch {
         .set('Client-ID', config.settings.client_id)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelFollowersOldAPI', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelFollowersOldAPI', api: 'kraken', endpoint: url, code: e.message })
+      global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelFollowersOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${e.body.message}` })
       setTimeout(() => this.getChannelFollowersOldAPI(), 60000)
       return
     }
@@ -246,8 +246,8 @@ class Twitch {
         .set('Client-ID', config.settings.client_id)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: e.message })
+      global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${e.body.message}` })
       setTimeout(() => this.getChannelDataOldAPI(), 60000)
       return
     }
@@ -296,8 +296,8 @@ class Twitch {
       request = await snekfetch.get(url)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: e.message })
+      global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: `${e.status} ${e.body.message}` })
       setTimeout(() => this.getChannelHosts(), 30000)
       return
     }
@@ -331,8 +331,8 @@ class Twitch {
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: e.message, remaining: this.remainingAPICalls })
+      global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: `${e.status} ${e.body.message}`, remaining: this.remainingAPICalls })
       setTimeout(() => this.updateChannelViews(), 120000)
       return
     }
@@ -489,8 +489,8 @@ class Twitch {
       return request.body.data[0].name
     } catch (e) {
       global.log.warning(`Couldn't find name of game for gid ${gid} - fallback to ${this.current.game}`)
-      global.log.error(`API: ${url} - ${e.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.message, remaining: this.remainingAPICalls })
+      global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: `${e.status} ${e.body.message}`, remaining: this.remainingAPICalls })
       return this.current.game
     }
   }
@@ -516,7 +516,7 @@ class Twitch {
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
       global.log.error(`API: https://api.twitch.tv/helix/streams?user_id=${global.channelId} - ${e.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.message, remaining: this.remainingAPICalls })
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: `${e.status} ${e.body.message}`, remaining: this.remainingAPICalls })
       setTimeout(() => this.getCurrentStreamData(), 60000)
       return
     }
@@ -1075,8 +1075,8 @@ class Twitch {
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateGameAndTitle', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateGameAndTitle', api: 'kraken', endpoint: url, code: e.message })
+      global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateGameAndTitle', api: 'kraken', endpoint: url, code: `${e.status} ${e.body.message}` })
       return
     }
     d(request.body)
@@ -1126,8 +1126,8 @@ class Twitch {
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: e.message })
+      global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: `${e.status} ${e.body.message}` })
       return
     }
     d(request.body.games)
