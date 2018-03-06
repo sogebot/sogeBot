@@ -39,10 +39,45 @@ Stats.prototype.save = async function (data) {
   }
 }
 Stats.prototype.getLatestStats = async function (self, socket) {
-  let stats = await global.db.engine.find('stats')
-  if (stats.length > 1) {
+  let statsFromDb = await global.db.engine.find('stats')
+  let stats = {
+    currentViewers: 0,
+    currentSubscribers: 0,
+    currentBits: 0,
+    chatMessages: 0,
+    currentFollowers: 0,
+    currentViews: 0,
+    maxViewers: 0,
+    currentHosts: 0,
+    newChatters: 0
+  }
+  if (statsFromDb.length > 1) {
     // get second stream (first is current stream)
-    stats = _.orderBy(stats, 'timestamp', 'desc')[1]
+    statsFromDb = _.orderBy(statsFromDb, 'timestamp', 'desc')
+    statsFromDb.shift() // remove first element
+
+    let i = 0
+    for (let stat of statsFromDb) {
+      stats.currentViewers += stat.currentViewers
+      stats.currentBits += stat.currentBits
+      stats.chatMessages += stat.chatMessages
+      stats.maxViewers += stat.maxViewers
+      stats.newChatters += stat.newChatters
+      stats.currentHosts += stat.currentHosts
+      if (i === 0) {
+        // get only latest
+        stats.currentFollowers = stat.currentFollowers
+        stats.currentViews = stat.currentViews
+        stats.currentSubscribers = stat.currentSubscribers
+      }
+      i++
+    }
+    stats.currentViewers = parseFloat(stats.currentViewers / statsFromDb.length).toFixed(0)
+    stats.currentBits = parseFloat(stats.currentBits / statsFromDb.length).toFixed(0)
+    stats.chatMessages = parseFloat(stats.chatMessages / statsFromDb.length).toFixed(0)
+    stats.maxViewers = parseFloat(stats.maxViewers / statsFromDb.length).toFixed(0)
+    stats.newChatters = parseFloat(stats.newChatters / statsFromDb.length).toFixed(0)
+    stats.currentHosts = parseFloat(stats.currentHosts / statsFromDb.length).toFixed(0)
   } else stats = {}
   socket.emit('latestStats', stats)
 }
