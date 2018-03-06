@@ -185,8 +185,8 @@ class Twitch {
         global.log.warning('Broadcaster have not correct oauth, will not check subs')
         this.current.subscribers = 0
       } else {
-        global.log.error(`API: ${url} - ${e.message}`)
-        global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: e.message })
+        global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
+        global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${e.body.message}` })
         setTimeout(() => this.getChannelSubscribersOldAPI(), 60000)
       }
       return
