@@ -433,7 +433,11 @@ class Heist {
     points = points > user.points ? user.points : points // bet only user points
     d(`${command} - ${sender.username} betting ${points}`)
 
-    if (points === 0 || _.isNil(points) || _.isNaN(points)) return // ignore if 0 points or null (if all is used)
+    if (points === 0 || _.isNil(points) || _.isNaN(points)) {
+      global.commons.sendMessage(
+        (await self.get('entryInstruction')).replace('$command', command), sender)
+      return
+    } // send entryInstruction if command is not ok
 
     await Promise.all([
       global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * -1 }), // remove points from user
