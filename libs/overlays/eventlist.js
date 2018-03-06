@@ -37,13 +37,15 @@ EventList.prototype.add = async function (data) {
     event: data.type,
     timestamp: _.now(),
     username: data.username,
-    message: data.message,
-    amount: _.isNil(data.amount) ? null : data.amount,
-    currency: _.isNil(data.currency) ? null : data.currency,
-    months: _.isNil(data.months) ? null : data.months,
-    bits: _.isNil(data.bits) ? null : data.bits,
-    viewers: _.isNil(data.viewers) ? null : data.viewers,
-    from: _.isNil(data.from) ? null : data.from
+    message: _.isNil(data.message) ? undefined : data.message,
+    amount: _.isNil(data.amount) ? undefined : data.amount,
+    currency: _.isNil(data.currency) ? undefined : data.currency,
+    months: _.isNil(data.months) ? undefined : data.months,
+    bits: _.isNil(data.bits) ? undefined : data.bits,
+    viewers: _.isNil(data.viewers) ? undefined : data.viewers,
+    from: _.isNil(data.from) ? undefined : data.from,
+    song_title: _.isNil(data.song_title) ? undefined : data.song_title,
+    song_url: _.isNil(data.song_url) ? undefined : data.song_url
   }
   global.db.engine.insert('widgetsEventList', newEvent)
   global.overlays.eventlist._get(global.overlays.eventlist)

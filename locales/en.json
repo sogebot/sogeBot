@@ -748,6 +748,7 @@
     "max-duration": "Max duration",
     "shuffle": "Shuffle",
     "song-requests": "Song Requests",
+    "song-request": "Song Request",
     "song-notify": "Notification on beginning of a song",
     "format": "Format",
     "available": "Available",
