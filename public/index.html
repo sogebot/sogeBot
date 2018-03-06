@@ -541,6 +541,7 @@
     })
 
     /* STATS */
+    let latestStats
     console.debug('EMIT [getLatestStats]')
     socket.emit('getLatestStats')
     setInterval(function () {
@@ -557,54 +558,8 @@
 
 
     socket.on('latestStats', function (data) {
-      var getPercentage = function (cur, orig) {
-        var btn = $('#percentage-btn')
-        if (_.isNil(orig)) orig = 0
-        if (orig === cur) return 0
-        if (orig === 0) {
-          if (!btn.data('showPercentage')) return cur
-          else return cur * 100
-        }
-        if (btn.data('showPercentage')) return Math.round((cur - orig) / orig * 1000) / 10
-        return cur - orig
-      }
-      var setHtml = function (id, value) {
-        var btn = $('#percentage-btn')
-        if (parseInt(value, 10) === 0) {
-          $("#" + id).html('<span class="stats-mid"><i class="fas fa-caret-right"></i> ' +
-            Math.abs(value) + (btn.data('showPercentage') ? '%' : '') + '</span>')
-        } else {
-          $("#" + id).html('<span class="stats-' + (value < 0 ? 'down' : 'up') +
-            ' text-' + (value < 0 ? 'danger' : 'success') +
-            '"><i class="fas fa-caret-' + (value < 0 ? 'down' : 'up') +
-            '"></i> ' + Math.abs(value) + (btn.data('showPercentage') ? '%' : '') + '</span>')
-        }
-      }
-      if ($.isEmptyObject(data)) return
-
-      var uptime = $("#uptime").text()
-      if (uptime !== '00:00:00' && uptime !== '--:--:--') {
-        var maxViewers = getPercentage(parseInt($("#maxViewers").text(), 10), parseInt(data.maxViewers, 10))
-        var totalChatMsgs = getPercentage(parseInt($("#totalChatMsgs").text(), 10), parseInt(data.chatMessages,
-          10))
-        var newChtr = getPercentage(parseInt($("#newChtr").text(), 10), parseInt(data.newChatters, 10))
-        var curFollowers = getPercentage(parseInt($("#curFollowers").text(), 10), parseInt(data.currentFollowers,
-          10))
-        var curSubscribers = getPercentage(parseInt($("#curSubscribers").text(), 10), parseInt(data.currentSubscribers,
-          10))
-        var curBits = getPercentage(parseInt($("#curBits").text(), 10), parseInt(data.currentBits, 10))
-        var curViews = getPercentage(parseInt($("#curViews").text(), 10), parseInt(data.currentViews, 10))
-        var curHosts = getPercentage(parseInt($("#curHosts").text(), 10), parseInt(data.currentHosts, 10))
-
-        setHtml('maxViewersChange', maxViewers)
-        setHtml('totalChatMsgsChange', totalChatMsgs)
-        setHtml('newChtrChange', newChtr)
-        setHtml('curFollowersChange', curFollowers)
-        setHtml('curSubscribersChange', curSubscribers)
-        setHtml('curBitsChange', curBits)
-        setHtml('curViewsChange', curViews)
-        setHtml('curHostsChange', curHosts)
-      }
+      latestStats = data
+      latestStatsUpdateHTML(latestStats)
     })
 
     socket.on('stats', async function (data) {
@@ -1457,6 +1412,58 @@
 
     function leaveBot() {
       socket.emit('leaveBot')
+    }
+
+    setInterval(() => latestStatsUpdateHTML(latestStats), 1000)
+    function latestStatsUpdateHTML(data) {
+      var getPercentage = function (cur, orig) {
+        var btn = $('#percentage-btn')
+        if (_.isNil(orig)) orig = 0
+        if (orig === cur) return 0
+        if (orig === 0) {
+          if (!btn.data('showPercentage')) return cur
+          else return cur * 100
+        }
+        if (btn.data('showPercentage')) return Math.round((cur - orig) / orig * 1000) / 10
+        return cur - orig
+      }
+      var setHtml = function (id, value) {
+        var btn = $('#percentage-btn')
+        if (parseInt(value, 10) === 0) {
+          $("#" + id).html('<span class="stats-mid"><i class="fas fa-caret-right"></i> ' +
+            Math.abs(value) + (btn.data('showPercentage') ? '%' : '') + '</span>')
+        } else {
+          $("#" + id).html('<span class="stats-' + (value < 0 ? 'down' : 'up') +
+            ' text-' + (value < 0 ? 'danger' : 'success') +
+            '"><i class="fas fa-caret-' + (value < 0 ? 'down' : 'up') +
+            '"></i> ' + Math.abs(value) + (btn.data('showPercentage') ? '%' : '') + '</span>')
+        }
+      }
+      if ($.isEmptyObject(data)) return
+
+      var uptime = $("#uptime").text()
+      if (uptime !== '00:00:00' && uptime !== '--:--:--') {
+        var maxViewers = getPercentage(parseInt($("#maxViewers").text(), 10), parseInt(data.maxViewers, 10))
+        var totalChatMsgs = getPercentage(parseInt($("#totalChatMsgs").text(), 10), parseInt(data.chatMessages,
+          10))
+        var newChtr = getPercentage(parseInt($("#newChtr").text(), 10), parseInt(data.newChatters, 10))
+        var curFollowers = getPercentage(parseInt($("#curFollowers").text(), 10), parseInt(data.currentFollowers,
+          10))
+        var curSubscribers = getPercentage(parseInt($("#curSubscribers").text(), 10), parseInt(data.currentSubscribers,
+          10))
+        var curBits = getPercentage(parseInt($("#curBits").text(), 10), parseInt(data.currentBits, 10))
+        var curViews = getPercentage(parseInt($("#curViews").text(), 10), parseInt(data.currentViews, 10))
+        var curHosts = getPercentage(parseInt($("#curHosts").text(), 10), parseInt(data.currentHosts, 10))
+
+        setHtml('maxViewersChange', maxViewers)
+        setHtml('totalChatMsgsChange', totalChatMsgs)
+        setHtml('newChtrChange', newChtr)
+        setHtml('curFollowersChange', curFollowers)
+        setHtml('curSubscribersChange', curSubscribers)
+        setHtml('curBitsChange', curBits)
+        setHtml('curViewsChange', curViews)
+        setHtml('curHostsChange', curHosts)
+      }
     }
   </script>
 </body>
