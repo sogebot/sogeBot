@@ -1045,9 +1045,11 @@ blockquote {
 }
 
 .eventlist-blockquote {
-  font-size: 0.7rem;
+  font-size: 1rem;
   line-height: 1rem;
   margin-bottom: 2px;
+  padding: 1rem;
+  overflow-wrap: break-word;
 }
 
 .eventlist-blockquote:before {

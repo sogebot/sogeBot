@@ -192,7 +192,7 @@
       sub: 'blue',
       subgift: 'green',
       resub: 'indigo',
-      cheer: 'yellow',
+      cheer: 'GoldenRod',
       tip: 'darkgreen'
     }
 
@@ -227,16 +227,16 @@
       let timestamp = moment(event.timestamp).fromNow()
       let icon = `<i title="${moment(event.timestamp).format('LLLL')}" data-timestamp="${event.timestamp}" class="eventlist-text">${moment(event.timestamp).fromNow()}</i>`
       let t = translations['eventlist-events'][event.event]
+      event.message = event.message.replace(/(\w{10})/g, '$1<wbr>') // force newline for long texts
       if (event.event === 'tip') {
         username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$formatted_amount', '<strong>' + _.get(event, 'currency', '') + parseFloat(_.get(event, 'amount', '0')).toFixed(2) + '</strong>')}</span>
-          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
         if (_.get(event, 'message', '').trim().length > 0) {
           message = `
-              <div class="col-1"></div>
-              <div class="col-10 eventlist-blockquote">${event.message}</div>
+              <div class="eventlist-blockquote">${event.message}</div>
           `
         }
       }
@@ -245,7 +245,7 @@
         username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t}</span>
-          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
       }
 
@@ -253,7 +253,7 @@
         username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$viewers', '<strong>' + _.get(event, 'viewers', '0') + '</strong>')}</span>
-          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
       }
 
@@ -261,7 +261,7 @@
         username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t}</span>
-          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
       }
 
@@ -269,7 +269,7 @@
         username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$username', _.get(event, 'from', 'n/a'))}</span>
-          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
       }
 
@@ -278,15 +278,14 @@
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$months', '<strong>' + _.get(event, 'months', '0') + '</strong>')}</span>
 
-          <span class="fa-stack" style="position: absolute; right: 0.5rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true">
+          <span class="fa-stack" style="position: absolute; right: 0.5rem; top: .4rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true">
             <i class="fas fa-star-half fa-stack-1x"></i>
             <i class="fas fa-long-arrow-alt-right fa-stack-1x"></i>
           </span>
         </div>`
         if (_.get(event, 'message', '').trim().length > 0) {
           message = `
-              <div class="col-1"></div>
-              <div class="col-10 eventlist-blockquote">${event.message}</div>
+              <div class="eventlist-blockquote">${event.message}</div>
           `
         }
       }
@@ -295,12 +294,11 @@
         username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <div title="${event.username}" style="z-index: 9">${event.username}</div>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$bits', '<strong>' + _.get(event, 'bits', '0') + '</strong>')}</span>
-          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
         if (_.get(event, 'message', '').trim().length > 0) {
           message = `
-              <div class="col-1"></div>
-              <div class="col-10 eventlist-blockquote">${event.message}</div>
+              <div class="eventlist-blockquote">${event.message}</div>
           `
         }
       }
