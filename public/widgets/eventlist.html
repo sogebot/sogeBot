@@ -7,42 +7,47 @@
       </a>
     </li>
     <li role="presentation" class="nav-item">
-      <button data-id="follow" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-        <i class="fas fa-heart"></i>
+      <button class="btn nav-btn btn-outline-primary" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fas fa-eye"></i>
       </button>
-    </li>
-    <li role="presentation" class="nav-item">
-      <button data-id="host" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-        <i class="fas fa-bullhorn"></i>
-      </button>
-    </li>
-    <li role="presentation" class="nav-item">
-      <button data-id="cheer" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-        <i class="fas fa-gem"></i>
-      </button>
-    </li>
-    <li role="presentation" class="nav-item">
-      <button data-id="sub" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-        <i class="fas fa-star"></i>
-      </button>
-    </li>
-    <li role="presentation" class="nav-item">
-      <button data-id="subgift" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-        <i class="fas fa-gift"></i>
-      </button>
-    </li>
-    <li role="presentation" class="nav-item">
-      <button data-id="resub" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-        <span class="fa-stack">
-          <i class="fas fa-star-half fa-stack-1x"></i>
-          <i class="fas fa-long-arrow-alt-right fa-stack-1x"></i>
-        </span>
-      </button>
-    </li>
-    <li role="presentation" class="nav-item">
-      <button data-id="tip" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-        <i class="fas fa-dollar-sign"></i>
-      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="padding:0; margin: 0;">
+        <button data-id="follow" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+          <span class="fa-stack" style="height: 1em; line-height: 0.8em; width: 1em">
+            <i class="fas fa-heart fa-stack-1x"></i>
+          </span>
+        </button>
+        <button data-id="host" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+          <span class="fa-stack" style="height: 1em; line-height: 0.8em; width: 1em">
+            <i class="fas fa-bullhorn fa-stack-1x"></i>
+          </span>
+        </button>
+        <button data-id="cheer" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+          <span class="fa-stack" style="height: 1em; line-height: 0.8em; width: 1em">
+            <i class="fas fa-gem fa-stack-1x"></i>
+          </span>
+        </button>
+        <button data-id="sub" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+          <span class="fa-stack" style="height: 1em; line-height: 0.8em; width: 1em">
+            <i class="fas fa-star fa-stack-1x"></i>
+          </span>
+        </button>
+        <button data-id="subgift" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+          <span class="fa-stack" style="height: 1em; line-height: 0.8em; width: 1em">
+            <i class="fas fa-gift fa-stack-1x"></i>
+          </span>
+        </button>
+        <button data-id="resub" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+          <span class="fa-stack" style="height: 1em; line-height: 0.8em; width: 1em">
+            <i class="fas fa-star-half fa-stack-1x"></i>
+            <i class="fas fa-long-arrow-alt-right fa-stack-1x"></i>
+          </span>
+        </button>
+        <button data-id="tip" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+          <span class="fa-stack" style="height: 1em; line-height: 0.8em; width: 1em">
+            <i class="fas fa-dollar-sign fa-stack-1x"></i>
+          </span>
+        </button>
+      </div>
     </li>
     <li role="presentation">
       <a class="nav-link" href="#eventlist-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
