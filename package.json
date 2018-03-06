@@ -40,6 +40,7 @@
     "node-hue-api": "^2.4.2",
     "node-sass": "^4.7.2",
     "npm-run-all": "^4.1.2",
+    "pilotjs": "^2.3.0",
     "popper.js": "^1.12.9",
     "request": "^2.83.0",
     "safe-eval": "^0.3.0",
