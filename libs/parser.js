@@ -106,6 +106,7 @@ Parser.prototype.parseCommands = async function (user, message, skip, isUserIgno
   message = message.trim()
 
   if (!message.startsWith('!')) return // do nothing, this is not a command or user is ignored
+  this.registeredCmds = _(this.registeredCmds).toPairs().sortBy((o) => -o[0].length).fromPairs().value() // order by length
   for (var cmd in this.registeredCmds) {
     let onlyParams = message.trim().toLowerCase().replace(cmd, '')
     if (message.trim().toLowerCase().startsWith(cmd) && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
@@ -125,6 +126,7 @@ Parser.prototype.parseCommands = async function (user, message, skip, isUserIgno
         // user doesn't have permissions for command
         user['message-type'] = 'whisper'
         global.commons.sendMessage(global.translate('permissions.without-permission').replace(/\$command/g, message), user)
+        break // cmd have no permission
       }
     }
   }
