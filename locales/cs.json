@@ -793,6 +793,7 @@
     "eventlist-show": "eventů",
     "subscribers-show": "subscriberů",
     "followers-size": "Velikost fontu",
+    "followers-message-size": "Velikost fontu zpráv",
     "custom-message": "Vlastní zpráva",
     "custom-ban-message": "Vlastní ban zpráva",
     "custom-ban-message-warning": "Vlastní varování",

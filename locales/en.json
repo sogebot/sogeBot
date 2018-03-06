@@ -789,6 +789,7 @@
     "eventlist-show": "events",
     "subscribers-show": "subscribers",
     "followers-size": "Font size",
+    "followers-message-size": "Message font size",
     "custom-message": "Custom message",
     "custom-ban-message": "Custom ban message",
     "custom-ban-message-warning": "Custom warning message",
