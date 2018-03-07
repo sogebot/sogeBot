@@ -13,6 +13,8 @@ function Moderation () {
   this.warnings = {}
   this.permits = []
 
+  this._announcements = {}
+
   if (global.commons.isSystemEnabled(this)) {
     global.parser.register(this, '!permit', this.permitLink, constants.MODS)
 
@@ -112,13 +114,13 @@ Moderation.prototype.setLists = function (self, socket, data) {
   global.db.engine.update('settings', { key: 'whitelist' }, { value: self.lists.whitelist })
 }
 
-Moderation.prototype.timeoutUser = async function (self, sender, warning, msg, time) {
+Moderation.prototype.timeoutUser = async function (self, sender, warning, msg, time, silent) {
   var warningsAllowed = global.configuration.getValue('moderationWarnings')
   var warningsTimeout = global.configuration.getValue('moderationWarningsTimeouts')
 
   if (warningsAllowed === 0) {
     msg = await global.parser.parseMessage(msg.replace(/\$count/g, -1))
-    global.commons.timeout(sender.username, msg, time)
+    global.commons.timeout(sender.username, msg, time, silent)
     return
   }
 
@@ -133,9 +135,9 @@ Moderation.prototype.timeoutUser = async function (self, sender, warning, msg, t
   warnings.push(new Date().getTime())
   warning = await global.parser.parseMessage(warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length))
   if (warningsTimeout) {
-    global.commons.timeout(sender.username, warning, 1)
+    global.commons.timeout(sender.username, warning, 1, silent)
   } else {
-    global.commons.sendMessage('$sender: ' + warning, sender)
+    if (!silent) global.commons.sendMessage('$sender: ' + warning, sender)
   }
 
   self.warnings[sender.username] = warnings
@@ -216,7 +218,8 @@ Moderation.prototype.containsLink = async function (self, sender, text) {
       log.info(sender.username + ' [link] ' + timeout + 's timeout: ' + text)
       self.timeoutUser(self, sender,
         global.translate('moderation.user-is-warned-about-links'),
-        global.translate('moderation.user-have-timeout-for-links'), timeout)
+        global.translate('moderation.user-have-timeout-for-links'),
+        timeout, self.isSilent('links'))
       return true
     }
   } else {
@@ -249,7 +252,8 @@ Moderation.prototype.symbols = async function (self, sender, text) {
         log.info(sender.username + ' [symbols] ' + timeout + 's timeout: ' + text)
         self.timeoutUser(self, sender,
           global.translate('moderation.user-is-warned-about-symbols'),
-          global.translate('moderation.user-have-timeout-for-symbols'), timeout)
+          global.translate('moderation.user-have-timeout-for-symbols'),
+          timeout, self.isSilent('symbols'))
         return false
       }
       symbolsLength = symbolsLength + symbols.length
@@ -277,7 +281,8 @@ Moderation.prototype.longMessage = async function (self, sender, text) {
     log.info(sender.username + ' [longMessage] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender,
       global.translate('moderation.user-is-warned-about-long-message'),
-      global.translate('moderation.user-have-timeout-for-long-message'), timeout)
+      global.translate('moderation.user-have-timeout-for-long-message'),
+      timeout, self.isSilent('longmessage'))
     return false
   }
 }
@@ -327,7 +332,8 @@ Moderation.prototype.caps = async function (self, sender, text) {
     log.info(sender.username + ' [caps] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender,
       global.translate('moderation.user-is-warned-about-caps'),
-      global.translate('moderation.user-have-timeout-for-caps'), timeout)
+      global.translate('moderation.user-have-timeout-for-caps'),
+      timeout, self.isSilent('caps'))
     return false
   }
   return true
@@ -353,7 +359,8 @@ Moderation.prototype.spam = async function (self, sender, text) {
       log.info(sender.username + ' [spam] ' + timeout + 's timeout: ' + text)
       self.timeoutUser(self, sender,
         global.translate('moderation.user-have-timeout-for-spam'),
-        global.translate('moderation.user-is-warned-about-spam'), timeout)
+        global.translate('moderation.user-is-warned-about-spam'),
+        timeout, self.isSilent('spam'))
       return false
     }
   }
@@ -373,7 +380,8 @@ Moderation.prototype.color = async function (self, sender, text) {
     log.info(sender.username + ' [color] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender,
       global.translate('moderation.user-is-warned-about-color'),
-      global.translate('moderation.user-have-timeout-for-color'), timeout)
+      global.translate('moderation.user-have-timeout-for-color'),
+      timeout, self.isSilent('color'))
     return false
   } else return true
 }
@@ -398,7 +406,8 @@ Moderation.prototype.emotes = async function (self, sender, text) {
     log.info(sender.username + ' [emotes] ' + timeout + 's timeout: ' + text)
     self.timeoutUser(self, sender,
       global.translate('moderation.user-is-warned-about-emotes'),
-      global.translate('moderation.user-have-timeout-for-emotes'), timeout)
+      global.translate('moderation.user-have-timeout-for-emotes'),
+      timeout, self.isSilent('emotes'))
     return false
   } else return true
 }
@@ -418,13 +427,23 @@ Moderation.prototype.blacklist = async function (self, sender, text) {
     if (XRegExp.exec(` ${text} `, regexp) && value.length > 0) {
       isOK = false
       log.info(sender.username + ' [blacklist] ' + timeout + 's timeout: ' + text)
+
       self.timeoutUser(self, sender,
         global.translate('moderation.user-is-warned-about-blacklist'),
-        global.translate('moderation.user-have-timeout-for-blacklist'), timeout)
+        global.translate('moderation.user-have-timeout-for-blacklist'),
+        timeout, self.isSilent('blacklist'))
     }
     return isOK
   })
   return isOK
+}
+
+Moderation.prototype.isSilent = async function (name) {
+  if (_.now() - _.get(this, `_announcements.${name}`, 0) >= 60000) {
+    this._announcements[name] = _.now()
+    return false
+  }
+  return true
 }
 
 module.exports = new Moderation()

@@ -94,9 +94,9 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
   return true
 }
 
-Commons.prototype.timeout = function (username, reason, timeout) {
+Commons.prototype.timeout = function (username, reason, timeout, silent) {
   if (global.configuration.getValue('moderationAnnounceTimeouts')) {
-    global.commons.sendMessage('$sender, ' + reason[0].toLowerCase() + reason.substring(1), { username: username })
+    if (!silent) global.commons.sendMessage('$sender, ' + reason[0].toLowerCase() + reason.substring(1), { username: username })
     global.client.timeout(config.settings.broadcaster_username, username, timeout, reason)
   } else {
     global.client.timeout(config.settings.broadcaster_username, username, timeout, reason)
