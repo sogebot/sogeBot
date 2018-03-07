@@ -7,6 +7,8 @@ class Credits {
   constructor () {
     this.sockets()
 
+    global.configuration.register('creditsAggregate', 'core.no-response-bool', 'bool', false)
+
     global.configuration.register('creditsFollowers', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsHosts', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsSubscribers', 'core.no-response-bool', 'bool', true)
@@ -52,7 +54,7 @@ class Credits {
           global.db.engine.find('overlay.credits.socials')
         ])
 
-        if (_.isNil(when.online)) when.online = _.now() - 500000
+        if (_.isNil(when.online)) when.online = 0
         let timestamp = new Date(when.online).getTime() // 2018-02-16T18:02:50Z
         let messages = {
           lastMessage: global.configuration.getValue('creditsLastMessage'),
@@ -98,7 +100,8 @@ class Credits {
           speed,
           show,
           clips,
-          global.configuration.getValue('creditsMaxFontSize')
+          global.configuration.getValue('creditsMaxFontSize'),
+          global.configuration.getValue('creditsAggregate')
         )
       })
       socket.on('socials.save', async (data, cb) => {

@@ -590,6 +590,7 @@
     "overlay-carousel-upload": "Upload image",
     "overlay-text-link-generator": "URL generator",
     "overlay-text-decode-base64": "Decode base64",
+    "overlay-credits-aggregate": "Aggregate events",
     "overlay-credits-show-followers": "Show followers",
     "overlay-credits-show-hosts": "Show hosts",
     "overlay-credits-show-subscribers": "Show subscribers",

@@ -109,7 +109,7 @@
         padding-bottom: 4rem;
       }
 
-      .hosted-by, .bigHeader {
+      .hosted-by, .bigHeader, .aggregated-by {
         font-size: 6rem;
       }
 
@@ -139,7 +139,7 @@
         margin-top: 5px;
       }
 
-      .hosted-column {
+      .hosted-column, .aggregated-column {
         column-count: 2;
       }
     </style>
@@ -216,7 +216,7 @@
           }
         }
 
-        socket.emit('load', (err, events, streamer, game, title, hosts, socials, messages, custom, speed, show, clips, maxFontSize) => {
+        socket.emit('load', (err, events, streamer, game, title, hosts, socials, messages, custom, speed, show, clips, maxFontSize, aggregate) => {
           $('#streamer').text(streamer)
           $('#game').text(game)
           $('#title').text(title)
@@ -234,44 +234,102 @@
 
           let $events = $('#events')
           let $hosts = $('#hosts')
+
+          let followers = []
+          let cheers = []
+          let subs = []
+          let tips = []
           for (let [index, event] of Object.entries(events)) {
             event.message = _.get(event, 'message', '')
             if (event.event === 'follow' && show.followers) {
-              $events.append(`
+              if (aggregate) followers.push({ username: event.username })
+              else $events.append(`
                 <div class='job'>${_.get(custom, 'followed-by', 'followed by')}</div>
                 <div class='name'>${event.username}</div>
                 <div class="message">${event.message}</div>
               `)
             } else if (event.event === 'cheer' && show.cheers) {
-              $events.append(`
+              if (aggregate) cheers.push({ username: event.username, bits: event.bits })
+              else $events.append(`
                 <div class='job'>${_.get(custom, 'cheer-by', 'cheer <strong>$bits bits</strong> by').replace('$bits', event.bits)}</div>
                 <div class='name'>${event.username}</div>
                 <div class="message">${event.message}</div>
               `)
             } else if (event.event === 'sub' && show.subscribers) {
-              $events.append(`
+              if (aggregate) subs.push({ username: event.username })
+              else $events.append(`
                 <div class='job'>${_.get(custom, 'subscribed-by', 'subscribed by')}</div>
                 <div class='name'>${event.username}</div>
                 <div class="message">${event.message}</div>
               `)
             } else if (event.event === 'resub' && show.resubs) {
-              $events.append(`
+              if (aggregate) subs.push({ username: event.username, months: event.months })
+              else $events.append(`
                 <div class='job'>${_.get(custom, 'resubscribed-by', 'resubscribed <strong>$months months</strong> by').replace('$months', event.months)}</div>
                 <div class='name'>${event.username}</div>
                 <div class="message">${event.message}</div>
               `)
             } else if (event.event === 'subgift' && show.subgifts) {
-              $events.append(`
+              if (aggregate) subs.push({ username: event.username })
+              else $events.append(`
                 <div class='job'>${_.get(custom, 'subgift-by', '<strong>$from</strong> gifted subscribe to').replace('$from', event.from)}</div>
                 <div class='name'>${event.username}</div>
                 <div class="message">${event.message}</div>
               `)
             } else if (event.event === 'tip' && show.tips) {
-              $events.append(`
+              if (aggregate) tips.push({ username: event.username, currency: event.currency, amount: event.amount })
+              else $events.append(`
                 <div class='job'>${_.get(custom, 'tip-by', 'tip <strong>$currency$amount</strong>').replace('$currency', event.currency).replace('$amount', event.amount)}</div>
                 <div class='name'>${event.username}</div>
                 <div class="message">${event.message}</div>
               `)
+            }
+          }
+
+          if (aggregate) {
+            if (followers.length > 0) {
+              let output = `
+                  <div class='aggregated-by'>Follows</div>
+                  <div class='aggregated-column'>
+                  `
+              for (let follow of followers) {
+                output += `<div class='host-name'>${follow.username}</div>`
+              }
+              output += `</div>`
+              $events.append(output)
+            }
+            if (cheers.length > 0) {
+              let output = `
+                  <div class='aggregated-by'>Cheers</div>
+                  <div class='aggregated-column'>
+                  `
+              for (let cheer of _(cheers).groupBy('username').map((o, k) => ({ 'username': k, 'bits': _.sumBy(o, (o) => parseInt(o.bits, 10)) }))) {
+                output += `<div class='host-name'>${cheer.username} - ${cheer.bits} bits</div>`
+              }
+              output += `</div>`
+              $events.append(output)
+            }
+            if (subs.length > 0) {
+              let output = `
+                  <div class='aggregated-by'>Subs/Resubs</div>
+                  <div class='aggregated-column'>
+                  `
+              for (let sub of subs) {
+                output += `<div class='host-name'>${sub.months > 0 ? `${sub.months}x `: ``}${sub.username}</div>`
+              }
+              output += `</div>`
+              $events.append(output)
+            }
+            if (tips.length > 0) {
+              let output = `
+                  <div class='aggregated-by'>Tips</div>
+                  <div class='aggregated-column'>
+                  `
+              for (let tip of _(tips).groupBy('username').map((o, k) => ({ 'username': k, 'amount': _.sumBy(o, 'amount'), 'currency': _.find(tips, (b) => b.username === k).currency }))) {
+                output += `<div class='host-name'>${tip.username} ${tip.currency}${tip.amount}</div>`
+              }
+              output += `</div>`
+              $events.append(output)
             }
           }
 
