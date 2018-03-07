@@ -304,6 +304,13 @@
         </div>
         <div class="row settings settings-part">
           <div class="col" style="max-width: 50%">
+            <strong data-lang="overlay-credits-aggregate"></strong>
+          </div>
+          <div class="col" style="max-width: 50%">
+            <input id="creditsAggregateToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+          </div>
+          <div class="w-100"></div>
+          <div class="col" style="max-width: 50%">
             <strong data-lang="overlay-credits-show-followers"></strong>
           </div>
           <div class="col" style="max-width: 50%">
@@ -625,6 +632,7 @@
     }
 
     toggle('creditsTopClipsPlay')
+    toggle('creditsAggregate')
     toggle('creditsFollowers')
     toggle('creditsTips')
     toggle('creditsHosts')
