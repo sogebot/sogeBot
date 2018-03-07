@@ -232,7 +232,7 @@
     let i = 0
     console.group('Eventlist events')
     for (let event of o) {
-      event  = _.pick(event, _.identity)
+      event  = _.pickBy(event, _.identity)
       console.debug(event)
       if (_.isNil(window.sessionStorage.getItem(`config.eventlist.${event.event}`))) window.sessionStorage.setItem(`config.eventlist.${event.event}`, true)
       console.debug('^ Should be hidden:', window.sessionStorage.getItem(`config.eventlist.${event.event}`).toString().trim().toLowerCase() !== 'true')
