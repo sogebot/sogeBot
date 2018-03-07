@@ -133,17 +133,17 @@ var timers = {
           </div>
 
           <div class="card-footer text-center">
-            <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="timers.toggle(this)">${timer.enabled ? `<i class="fas fa-toggle-off" aria-hidden="true"></i> ${translations.timers.buttons.disable}`: `<i class="fas fa-toggle-on" aria-hidden="true"></i> ${translations.timers.buttons.enable}`}</a>
-            <a href="#" class="btn btn-outline-secondary" data-toggle="modal" data-target="#timers-dlg" data-id="${timer.name}"><i class="fas fa-pencil-alt" aria-hidden="true"></i> ${translations.timers.buttons.edit}</a>
-            <a href="#" class="btn btn-outline-danger" data-card-delete-popover="${timer.name}"><i class="far fa-trash-alt" aria-hidden="true"></i> ${translations.timers.buttons.delete}</a>
+            <button class="btn btn-outline-secondary" data-id="${timer.name}" onclick="timers.toggle(this)">${timer.enabled ? `<i class="fas fa-toggle-off" aria-hidden="true"></i> ${translations.timers.buttons.disable}`: `<i class="fas fa-toggle-on" aria-hidden="true"></i> ${translations.timers.buttons.enable}`}</button>
+            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#timers-dlg" data-id="${timer.name}"><i class="fas fa-pencil-alt" aria-hidden="true"></i> ${translations.timers.buttons.edit}</button>
+            <button class="btn btn-outline-danger" data-card-delete-popover="${timer.name}"><i class="far fa-trash-alt" aria-hidden="true"></i> ${translations.timers.buttons.delete}</button>
           </div>
         `)
         $(`[data-card-delete-popover="${timer.name}"]`).popover({
           html: true,
           content: `<p>${translations.timers.popovers.are_you_sure_you_want_to_delete_timer} '<strong>${timer.name}</strong>'?</p>
                     <div class="text-center">
-                      <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="timers.delete(this)">${translations.timers.buttons.yes}</a>
-                      <a href="#" class="btn btn-outline-secondary" data-id="${timer.name}" onclick="$('[data-card-delete-popover=${timer.name}]').popover('hide')">${translations.timers.buttons.no}</a>
+                      <button class="btn btn-outline-secondary" data-id="${timer.name}" onclick="timers.delete(this)">${translations.timers.buttons.yes}</button>
+                      <button class="btn btn-outline-secondary" data-id="${timer.name}" onclick="$('[data-card-delete-popover=${timer.name}]').popover('hide')">${translations.timers.buttons.no}</button>
                     </div>`
         })
       }

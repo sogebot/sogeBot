@@ -133,10 +133,10 @@
                 </div>` : ``}
 
               <div class="card-footer text-center">
-                <a href="#" class="btn btn-outline-primary" data-id="${event._id.toString()}" onclick="events.test(this)"><i class="far fa-bell" aria-hidden="true"></i> ${translations.events.buttons.test}</a>
-                <a href="#" class="btn btn-outline-secondary btn-toggle" data-id="${event._id.toString()}" onclick="events.toggle(this)">${event.enabled ? `<i class="fas fa-toggle-off" aria-hidden="true"></i> ${translations.events.buttons.disable}`: `<i class="fas fa-toggle-on" aria-hidden="true"></i> ${translations.events.buttons.enable}`}</a>
-                <a href="#" class="btn btn-outline-secondary" data-toggle="modal" data-target="#event-listener-dlg" data-id="${event._id.toString()}"><i class="fas fa-pencil-alt" aria-hidden="true"></i> ${translations.events.buttons.edit}</a>
-                <a href="#" class="btn btn-outline-danger" data-card-delete-popover="${event._id.toString()}" data-container="body" data-toggle="popover"><i class="far fa-trash-alt" aria-hidden="true"></i> ${translations.events.buttons.delete}</a>
+                <button class="btn btn-outline-primary" data-id="${event._id.toString()}" onclick="events.test(this)"><i class="far fa-bell" aria-hidden="true"></i> ${translations.events.buttons.test}</button>
+                <button class="btn btn-outline-secondary btn-toggle" data-id="${event._id.toString()}" onclick="events.toggle(this)">${event.enabled ? `<i class="fas fa-toggle-off" aria-hidden="true"></i> ${translations.events.buttons.disable}`: `<i class="fas fa-toggle-on" aria-hidden="true"></i> ${translations.events.buttons.enable}`}</button>
+                <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#event-listener-dlg" data-id="${event._id.toString()}"><i class="fas fa-pencil-alt" aria-hidden="true"></i> ${translations.events.buttons.edit}</button>
+                <button class="btn btn-outline-danger" data-card-delete-popover="${event._id.toString()}" data-container="body" data-toggle="popover"><i class="far fa-trash-alt" aria-hidden="true"></i> ${translations.events.buttons.delete}</button>
               </div>
             </div>
           `)
@@ -146,8 +146,8 @@
             content: `
           <p>${translations.events.popovers.are_you_sure_you_want_to_delete_event} '<strong>${event.name}</strong>'?</p>
           <div class="text-center">
-            <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="events.delete(this)">${translations.events.buttons.yes}</a>
-            <a href="#" class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="$('[data-card-delete-popover=${event._id.toString()}]').popover('hide')">${translations.events.buttons.no}</a>
+            <button class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="events.delete(this)">${translations.events.buttons.yes}</button>
+            <button class="btn btn-outline-secondary" data-id="${event._id.toString()}" onclick="$('[data-card-delete-popover=${event._id.toString()}]').popover('hide')">${translations.events.buttons.no}</button>
           </div>`
           })
         }
