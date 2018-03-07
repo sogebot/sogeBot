@@ -14,8 +14,8 @@ Stats.prototype.clearAPIStats = async function (self) {
   const d = debug('stats:clearAPIStats')
   let stats = await global.db.engine.find('APIStats')
 
-  // remove data older than 2h
-  stats = _.filter(stats, (o) => _.now() - o.timestamp >= 1000 * 60 * 60)
+  // remove data older than 24h
+  stats = _.filter(stats, (o) => _.now() - o.timestamp >= 1000 * 60 * 60 * 24)
   d('Stats to delete: %j', stats)
   let items = []
   for (let s of stats) {
