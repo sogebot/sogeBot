@@ -299,7 +299,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
         (!_.isUndefined(attr.param) && attr.param.length !== 0)) {
         await global.db.engine.update('customvars', { key: variable }, { key: variable, value: attr.param })
         let msg = global.commons.prepare('filters.setVariable', { value: attr.param, variable: variable })
-        global.commons.sendMessage(msg, attr.sender)
+        global.commons.sendMessage(msg, { username: attr.sender, quiet: _.get(attr, 'quiet', false) })
 
         global.widgets.custom_variables.io.emit('refresh') // send update to widget
         global.twitch.setTitleAndGame(global.twitch, null) // update title
@@ -338,7 +338,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
         .replace(/\(|\)/g, '')
         .replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + attr.sender)
         .replace(/\$param/g, attr.param)
-      global.parser.parseCommands(null, cmd, true)
+      global.parser.parse({ username: attr.sender, quiet: true }, cmd, true)
       return ''
     },
     '(!#)': async function (filter) {
@@ -347,7 +347,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
         .replace(/\(|\)/g, '')
         .replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + attr.sender)
         .replace(/\$param/g, attr.param)
-      global.parser.parse({ username: attr.sender }, cmd, true)
+      global.parser.parse({ username: attr.sender, quiet: _.get(attr, 'quiet', false) }, cmd, true)
       return ''
     }
   }

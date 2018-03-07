@@ -65,6 +65,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
 
   if (_.isString(sender)) sender = { username: sender }
   if (_.isNil(sender) || _.isNil(sender.username)) sender.username = undefined
+  if (!_.isNil(sender.quiet)) attr.quiet = sender.quiet
   attr.sender = sender.username
   message = await global.parser.parseMessage(message, attr)
   if (message === '') return false // if message is empty, don't send anything
@@ -79,8 +80,8 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
   if (_.get(sender, 'username', config.settings.bot_username) === config.settings.bot_username && !attr.force) return false // we don't want to reply on bot commands
   message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + sender.username) : message
-
   if (!global.configuration.getValue('mute') || attr.force) {
+    if ((!_.isNil(attr.quiet) && attr.quiet)) return true
     if (sender['message-type'] === 'whisper') {
       global.log.whisperOut(message, {username: sender.username})
       global.client.whisper(sender.username, message)
