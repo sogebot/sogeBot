@@ -704,7 +704,9 @@
       $('#text-decode-base64').val('')
       return
     }
-    let b64string = btoa(value)
+    let b64string = btoa(encodeURIComponent(value).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+        return String.fromCharCode(parseInt(p1, 16))
+    }))
     $('#text-url').attr('href', `/overlays/text?${b64string}`).text(`/overlays/text?${b64string}`)
 
     $('#text-decode-base64').val(b64string)
