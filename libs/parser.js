@@ -412,7 +412,19 @@ Parser.prototype.parseMessage = async function (message, attr) {
   }
   let math = {
     '(math.#)': async function (filter) {
-      let toEvaluate = filter.replace('(math.', '').replace(')', '')
+      let toEvaluate = filter.replace(/\(math./g, '').replace(/\)/g, '')
+
+      // check if custom variables are here
+      const regexp = /(\$_\w+)/g
+      let match = toEvaluate.match(regexp)
+      if (match) {
+        for (let variable of match) {
+          toEvaluate = toEvaluate.replace(
+            variable,
+            _.get((await global.db.engine.findOne('customvars', { key: variable.replace('$_', '') })), 'value', 0)
+          )
+        }
+      }
       return mathjs.eval(toEvaluate)
     }
   }
@@ -481,6 +493,7 @@ Parser.prototype.parseMessage = async function (message, attr) {
     .replace(/\$bits/g, global.twitch.current.bits)
   if (global.commons.isSystemEnabled('songs')) msg = msg.replace(/\$currentSong/g, _.get(global.systems.songs.currentSong, 'title', ''))
 
+  msg = await this.parseMessageEach(math, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageVariables(custom, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageEval(evaluate, decode(msg)); d('parseMessageEval: %s', msg)
   msg = await this.parseMessageOnline(online, msg); d('parseMessageOnline: %s', msg)
@@ -491,7 +504,6 @@ Parser.prototype.parseMessage = async function (message, attr) {
   msg = await this.parseMessageEach(qs, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageEach(info, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageEach(list, msg); d('parseMessageEach: %s', msg)
-  msg = await this.parseMessageEach(math, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageApi(msg); d('parseMessageApi: %s', msg)
   msg = await this.parseMessageEach(ifp, msg, false); d('parseMessageEach: %s', msg)
   return msg
