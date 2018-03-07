@@ -18,9 +18,9 @@ class TextOverlay {
         let match = html.match(regexp)
         if (!_.isNil(match)) {
           for (let variable of html.match(regexp).map((o) => o.replace('$_', ''))) {
-            variable = await global.db.engine.findOne('customvars', { key: variable })
-            let value = _.isEmpty(variable.value) ? '' : variable.value
-            html = html.replace(new RegExp(`\\$_${variable.key}`, 'g'), value)
+            let variableFromDB = await global.db.engine.findOne('customvars', { key: variable })
+            let value = _.isEmpty(variableFromDB.value) ? `<strong><i class="fas fa-dollar-sign">_${variable}</i></strong>` : variableFromDB.value
+            html = html.replace(new RegExp(`\\$_${variable}`, 'g'), value)
           }
         }
         html = await global.parser.parseMessage(html) // global filters
