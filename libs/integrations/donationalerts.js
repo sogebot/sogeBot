@@ -21,6 +21,7 @@ class Donationalerts {
   async sockets () {
     this.socket.on('donation', (data) => {
       data = JSON.parse(data)
+      if (parseInt(data.alert_type, 10) !== 1) return
       let additionalData = JSON.parse(data.additional_data)
       global.overlays.eventlist.add({
         type: 'tip',
@@ -28,8 +29,8 @@ class Donationalerts {
         currency: data.currency,
         username: data.username.toLowerCase(),
         message: data.message,
-        song_title: _.get(additionalData, 'media_data.title', null),
-        song_url: _.get(additionalData, 'media_data.url', null)
+        song_title: _.get(additionalData, 'media_data.title', undefined),
+        song_url: _.get(additionalData, 'media_data.url', undefined)
       })
       global.events.fire('tip', { username: data.username.toLowerCase(), amount: data.amount, message: data.message, currency: data.currency })
     })
