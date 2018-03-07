@@ -14,6 +14,7 @@ class Credits {
     global.configuration.register('creditsResubs', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsCheers', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsClips', 'core.no-response-bool', 'bool', true)
+    global.configuration.register('creditsTips', 'core.no-response-bool', 'bool', true)
 
     global.configuration.register('creditsSpeed', 'core.no-response', 'number', 35)
     global.configuration.register('creditsMaxFontSize', 'core.no-response', 'number', 200)
@@ -29,6 +30,7 @@ class Credits {
     global.configuration.register('creditsResubscribedBy', 'core.no-response', 'string', 'Resubscribed <strong>$months months</strong> by')
     global.configuration.register('creditsSubgiftBy', 'core.no-response', 'string', '<strong>$from</strong> gifted subscribe to')
     global.configuration.register('creditsClippedBy', 'core.no-response', 'string', 'Clipped by')
+    global.configuration.register('creditsTipsBy', 'core.no-response', 'string', 'tip <strong>$currency$amount</strong>')
     global.configuration.register('creditsTopClips', 'core.no-response', 'string', 'Top clips')
 
     global.configuration.register('creditsTopClipsPeriod', 'core.no-response', 'string', 'week') // possibilities day, week, month, all
@@ -50,7 +52,7 @@ class Credits {
           global.db.engine.find('overlay.credits.socials')
         ])
 
-        if (_.isNil(when.online)) when.online = _.now()
+        if (_.isNil(when.online)) when.online = _.now() - 500000
         let timestamp = new Date(when.online).getTime() // 2018-02-16T18:02:50Z
         let messages = {
           lastMessage: global.configuration.getValue('creditsLastMessage'),
@@ -66,7 +68,8 @@ class Credits {
           'resubscribed by': global.configuration.getValue('creditsResubscribedBy'),
           'subgift-by': global.configuration.getValue('creditsSubgiftBy'),
           'clipped-by': global.configuration.getValue('creditsClippedBy'),
-          'top-clips': global.configuration.getValue('creditsTopClips')
+          'top-clips': global.configuration.getValue('creditsTopClips'),
+          'tip-by': global.configuration.getValue('creditsTipsBy')
         }
         let show = {
           followers: global.configuration.getValue('creditsFollowers'),
@@ -74,7 +77,8 @@ class Credits {
           subscribers: global.configuration.getValue('creditsSubscribers'),
           subgifts: global.configuration.getValue('creditsSubgifts'),
           resubs: global.configuration.getValue('creditsResubs'),
-          cheers: global.configuration.getValue('creditsCheers')
+          cheers: global.configuration.getValue('creditsCheers'),
+          tips: global.configuration.getValue('creditsTips')
         }
 
         let clips = { play: global.configuration.getValue('creditsTopClipsPlay'), list: [] }
