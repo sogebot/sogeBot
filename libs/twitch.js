@@ -882,7 +882,6 @@ class Twitch {
 
       // message count
       var messages = !_.isUndefined(user.stats.messages) ? user.stats.messages : 0
-      if (!_.isNil(global.users.increment[user.username])) messages = messages + global.users.increment[user.username]
       message.push(messages + ' ' + global.parser.getLocalizedName(messages, 'core.messages'))
 
       global.commons.sendMessage(message.join(' | '), sender)
