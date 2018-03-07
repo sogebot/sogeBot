@@ -54,7 +54,7 @@ class Credits {
           global.db.engine.find('overlay.credits.socials')
         ])
 
-        if (_.isNil(when.online)) when.online = 0
+        if (_.isNil(when.online)) when.online = _.now() - 5000000
         let timestamp = new Date(when.online).getTime() // 2018-02-16T18:02:50Z
         let messages = {
           lastMessage: global.configuration.getValue('creditsLastMessage'),
