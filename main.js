@@ -149,6 +149,8 @@ function main () {
       if (!global.parser.isModerated(sender, message)) return
 
       global.users.set(sender.username, { id: sender['user-id'], is: { online: true, subscriber: _.get(sender, 'subscriber', false) } })
+      // unset tier if not subscriber
+      if (!_.get(sender, 'subscriber', false)) global.db.engine.update('users', { username: sender.username }, { stats: { tier: 0 } })
 
       // isUserIgnored
       let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: _.get(sender, 'username', '') })
@@ -311,13 +313,13 @@ function main () {
 }
 
 async function subscription (channel, username, method) {
-  if (debug.enabled) debug('Subscription: %s from %s', username, method)
+  if (debug.enabled) debug('Subscription: %s from %j', username, method)
 
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
   if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
 
-  global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: _.now() } })
-  global.overlays.eventlist.add({ type: 'sub', username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
+  global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: _.now() }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
+  global.overlays.eventlist.add({ type: 'sub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
   global.log.sub(`${username}, method: ${method}`)
   global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
 }
@@ -328,8 +330,9 @@ async function resub (channel, username, months, message) {
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
   if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
 
+  let user = await global.db.engine.findOne('users', { username: username })
   global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: moment().subtract(months, 'months').format('X') * 1000 } })
-  global.overlays.eventlist.add({ type: 'resub', username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
+  global.overlays.eventlist.add({ type: 'resub', tier: user.tier, username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
   global.log.resub(`${username}, months: ${months}, message: ${message}`)
   global.events.fire('resub', { username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
 }

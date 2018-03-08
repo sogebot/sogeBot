@@ -74,6 +74,10 @@
               <span data-lang="bits"></span>
               <i class="fa" aria-hidden="true"></i>
             </th>
+            <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="stats.tier">
+              <span data-lang="tier"></span>
+              <i class="fa" aria-hidden="true"></i>
+            </th>
             <th></th>
             <th></th>
           </tr>
@@ -102,17 +106,197 @@
   </div>
 </div>
 <script>
-  let Viewers = () => {
+  var pagination = 1
+  var viewers = {
+    sortBy: 'username',
+    sortType: 'asc',
+    toSearch: '',
+    list: {},
+    toggle: function (type, username) {
+      var id = '#' + type + '-' + username
+      var bool = false
+      if ($(id).hasClass('btn-success')) {
+        $(id).removeClass().addClass('btn btn-danger')
+      } else {
+        $(id).removeClass().addClass('btn btn-success')
+        bool = true
+      }
+      socket.emit('viewers.toggle', {
+        type: type,
+        username: username,
+        is: bool
+      })
+    },
+    update: function (list) {
+      $("#Users").empty()
+      _.each(list, function (item, index) {
+        item.points = _.isUndefined(item.points) ? 0 : item.points
+        item.time = _.isNil(item.time) ? {} : item.time
+        $("#Users").append('<tr>' +
+          '<td>' + item.username + '</td>' +
+          '<td class="text-center" data-value=' + (_.isUndefined(item.time.message) ? 0 : item.time.message) +
+          '>' + viewers.getDateString(item.time.message) + '</td>' +
+          '<td class="text-center" data-value=' + (_.isUndefined(item.time.watched) ? 0 : item.time.watched) +
+          '>' + viewers.styleWatched(item.time.watched) + '</td>' +
+          '<td class="text-center"  data-value=' + (_.isUndefined(item.time.follow) || !item.is.follower ? 0 : item.time.follow) +
+          '>' + viewers.styleFollowTime((_.isUndefined(item.time.follow) || !item.is.follower ? 0 : item.time.follow)) + '</td>' +
+          '<td class="text-center"  data-value=' + (_.isUndefined(item.time.subscribed_at) || !item.is.subscriber ? 0 : item.time.subscribed_at) +
+          '>' + viewers.styleFollowTime((_.isUndefined(item.time.subscribed_at) || !item.is.subscriber ? 0 : item.time.subscribed_at)) + '</td>' +
+          '<td class="text-center" id="viewers-points-data" data-value=' + item.points + '>' +
+          '<abbr title="click to edit" data-id="' + item.username +
+          '" onclick="viewers.pointsEditable(this)">' + item.points + '</abbr>' +
+          '<input id="points_' + item.username +
+          '" style="width: 6em; display: none" class="form-control input-sm" type="text"/></td>' +
+          '<td class="text-center" data-value=' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.messages) ?
+            0 : item.stats.messages) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.messages) ?
+            0 : item.stats.messages) + '</td>' +
+          '<td class="text-center" data-value=' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.bits) ?
+            0 : item.stats.bits) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.bits) ?
+            0 : item.stats.bits) + '</td>' +
+          '<td class="text-center" data-value=' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.tier) ?
+            0 : item.stats.tier) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.tier) || parseInt(item.stats.tier, 10) === 0 ?
+            '<hr>' : item.stats.tier) + '</td>' +
+          '<td style="font-weight: bold; cursor: pointer; user-select: none;">' +
+          '<button id="subscriber-' + item.username + '" class="btn ' + (item.is.subscriber ? "btn-success" :
+            "btn-danger") + '" onclick="viewers.toggle(\'subscriber\', \'' + item.username +
+          '\')"> SUBSCRIBER </button>' +
+          '<button id="follower-' + item.username + '" class="btn ' + (item.is.follower ? "btn-success" :
+            "btn-danger") + '" onclick="viewers.toggle(\'follower\', \'' + item.username +
+          '\')"> FOLLOWER </button>' +
+          '<button id="regular-' + item.username + '" class="btn ' + (item.is.regular ? "btn-success" :
+            "btn-danger") + '" onclick="viewers.toggle(\'regular\', \'' + item.username +
+          '\')"> REGULAR </button>' +
+          '<button disabled class="btn ' + (item.is.online ? "btn-success" : "btn-danger") + '"> ONLINE </button></td>' +
+          '<td class="tableMenu">' +
+          '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="fas fa-trash"></span></button>' +
+          '<button type="button" style="display: none" class="btn btn-success btn-confirm" data-username="' +
+          item.username +
+          '" onclick="viewers.delete(this)"><span class="fas fa-check"></span></button>' +
+          '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="fas fa-remove"></span></button>' +
+          '</td>' +
+          '</tr>');
+        if (!systems.points) {
+          $("#viewers-points-data").remove()
+          $("#viewers-points").remove()
+        }
+      })
+    },
+    getDateString: function (timestamp) {
+      if (_.isUndefined(timestamp) || timestamp === 0) return '<hr>'
+      return moment(timestamp).format('HH:mm:ss, YYYY-MM-DD')
+    },
+    styleFollowTime: function (timestamp) {
+      if (_.isUndefined(timestamp) || timestamp === 0) return '<hr>'
+      return moment(timestamp).format('HH:mm:ss, YYYY-MM-DD')
+    },
+    styleWatched: function (timestamp) {
+      if (_.isUndefined(timestamp)) timestamp = 0
+      return (timestamp / 1000 / 60 / 60).toFixed(1) + 'h'
+    },
+    delete: function (el) {
+      socket.emit('deleteViewer', el.dataset.username)
+    },
+    pointsEditable: function (el) {
+      var $input = $('#points_' + el.dataset.id)
+      $(el).css('display', 'none')
+      $input.css('display', 'table')
+      $input.focus()
+      $input.val($(el).text())
+
+      $input.off()
+      $input.on('focusout', function () {
+        var value = $input.val()
+        $input.css('display', 'none')
+        $(el).css('display', 'inline')
+        $(el).text(value)
+        socket.emit('setPoints', {
+          username: el.dataset.id,
+          value: value
+        })
+      })
+    },
+    sort: function (el) {
+      $('table tr th i').removeClass()
+
+      if (viewers.sortBy === el.dataset.sort) {
+        viewers.sortType = viewers.sortType === 'asc' ? 'desc' : 'asc'
+      } else {
+        viewers.sortType = 'desc'
+        if (el.dataset.sort === 'username') viewers.sortType = 'asc'
+      }
+      viewers.sortBy = el.dataset.sort
+      $(el).children('i').addClass('fa fa-sort-' + viewers.sortType)
+      viewers.update(viewers.paging(viewers.list))
+    },
+    pagination: function (i) {
+      pagination = i
+      viewers.update(viewers.paging(viewers.list))
+    },
+    search: function (list) {
+      return _.filter(list, function (o) {
+        if (viewers.search.length === 0) return true
+        return o.username.toLowerCase().indexOf(viewers.toSearch.toLowerCase()) >= 0;
+      })
+    },
+    updateSearch: function () {
+      viewers.toSearch = $('#viewersSearch').val()
+      pagination = 1
+      viewers.update(viewers.paging())
+    },
+    paging: function () {
+      var list = _.sortBy(viewers.search(viewers.list), [function (o) {
+        var split = viewers.sortBy.split('.')
+        var sort
+        if (split.length == 2) {
+          sort = (!_.isUndefined(o[split[0]]) && !_.isUndefined(o[split[0]][split[1]])) ? o[split[0]][split[1]] :
+            0
+        } else {
+          sort = !_.isUndefined(o[viewers.sortBy]) ? o[viewers.sortBy] : 0
+        }
+        if (viewers.sortBy !== 'username') {
+          return parseFloat(sort === 'Prime' ? 0.1 : sort) // set Prime value as 0
+        }
+        return sort
+      }])
+      if (viewers.sortType === 'desc') list = list.reverse()
+      list = _.chunk(list, 50)
+      var paging = $('.paging')
+      var empty = false
+      paging.empty()
+      _.each(list, function (v, i) {
+        if (list.length < 10) {
+          paging.append('<li style="margin:0; padding: 8px 5px;" onclick="viewers.pagination(' + (i + 1) + ')" class="btn ' + (pagination === i + 1 ?
+            'btn-primary' : 'btn-default') + '">' + (i + 1) + '</li>')
+        } else {
+          if ((i >= pagination - 3 && i < pagination + 2) || (i > list.length - 4) || i % 10 === Math.floor(list.length /
+              10) || i < 3) {
+            paging.append('<li style="margin:0; padding: 8px 5px;" onclick="viewers.pagination(' + (i + 1) + ')" class="btn ' + (pagination === i + 1 ?
+              'btn-primary' : 'btn-default') + '">' + (i + 1) + '</li>')
+            if (!(i + 1 > pagination - 2 && i + 1 < pagination + 2) || !(i + 1 > list.length - 4)) {
+              empty = true
+            }
+          } else if (empty) {
+            paging.append('<li class="btn btn-link disabled"></li>')
+            empty = false
+          }
+        }
+      })
+      if (list.length === 0) {
+        paging.append('<li onclick="viewers.pagination(1)" style="margin:0; padding: 8px 5px;" class="btn btn-primary">1</li>')
+      }
+      return list[pagination - 1];
+    }
+  }
+
+  function ViewersPage () {
     if (_.isNil(systems)) {
-      setTimeout(() => Viewers(), 1)
+      setTimeout(() => ViewersPage(), 1)
       return
     }
 
     var userSocket = io('/users', {
       query: "token=" + token
     });
-
-    var pagination = 1
 
     if (!systems.points) {
       $("#viewers-points").remove()
@@ -144,184 +328,6 @@
         socket.emit('getViewers')
       }, 1000)
     })
-
-    var viewers = {
-      sortBy: 'username',
-      sortType: 'asc',
-      toSearch: '',
-      list: {},
-      toggle: function (type, username) {
-        var id = '#' + type + '-' + username
-        var bool = false
-        if ($(id).hasClass('btn-success')) {
-          $(id).removeClass().addClass('btn btn-danger')
-        } else {
-          $(id).removeClass().addClass('btn btn-success')
-          bool = true
-        }
-        socket.emit('viewers.toggle', {
-          type: type,
-          username: username,
-          is: bool
-        })
-      },
-      update: function (list) {
-        $("#Users").empty()
-        _.each(list, function (item, index) {
-          item.points = _.isUndefined(item.points) ? 0 : item.points
-          item.time = _.isNil(item.time) ? {} : item.time
-          $("#Users").append('<tr>' +
-            '<td>' + item.username + '</td>' +
-            '<td class="text-center" data-value=' + (_.isUndefined(item.time.message) ? 0 : item.time.message) +
-            '>' + viewers.getDateString(item.time.message) + '</td>' +
-            '<td class="text-center" data-value=' + (_.isUndefined(item.time.watched) ? 0 : item.time.watched) +
-            '>' + viewers.styleWatched(item.time.watched) + '</td>' +
-            '<td class="text-center"  data-value=' + (_.isUndefined(item.time.follow) || !item.is.follower ? 0 : item.time.follow) +
-            '>' + viewers.styleFollowTime((_.isUndefined(item.time.follow) || !item.is.follower ? 0 : item.time.follow)) + '</td>' +
-            '<td class="text-center"  data-value=' + (_.isUndefined(item.time.subscribed_at) || !item.is.subscriber ? 0 : item.time.subscribed_at) +
-            '>' + viewers.styleFollowTime((_.isUndefined(item.time.subscribed_at) || !item.is.subscriber ? 0 : item.time.subscribed_at)) + '</td>' +
-            '<td class="text-center" id="viewers-points-data" data-value=' + item.points + '>' +
-            '<abbr title="click to edit" data-id="' + item.username +
-            '" onclick="viewers.pointsEditable(this)">' + item.points + '</abbr>' +
-            '<input id="points_' + item.username +
-            '" style="width: 6em; display: none" class="form-control input-sm" type="text"/></td>' +
-            '<td class="text-center" data-value=' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.messages) ?
-              0 : item.stats.messages) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.messages) ?
-              0 : item.stats.messages) + '</td>' +
-            '<td class="text-center" data-value=' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.bits) ?
-              0 : item.stats.bits) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.bits) ?
-              0 : item.stats.bits) + '</td>' +
-            '<td style="font-weight: bold; cursor: pointer; user-select: none;">' +
-            '<button id="subscriber-' + item.username + '" class="btn ' + (item.is.subscriber ? "btn-success" :
-              "btn-danger") + '" onclick="viewers.toggle(\'subscriber\', \'' + item.username +
-            '\')"> SUBSCRIBER </button>' +
-            '<button id="follower-' + item.username + '" class="btn ' + (item.is.follower ? "btn-success" :
-              "btn-danger") + '" onclick="viewers.toggle(\'follower\', \'' + item.username +
-            '\')"> FOLLOWER </button>' +
-            '<button id="regular-' + item.username + '" class="btn ' + (item.is.regular ? "btn-success" :
-              "btn-danger") + '" onclick="viewers.toggle(\'regular\', \'' + item.username +
-            '\')"> REGULAR </button>' +
-            '<button disabled class="btn ' + (item.is.online ? "btn-success" : "btn-danger") + '"> ONLINE </button></td>' +
-            '<td class="tableMenu">' +
-            '<button type="button" onclick="commons.confirm(this)" style="border-top-right-radius:4px; border-bottom-right-radius:4px;" class="btn btn-danger btn-remove"><span class="fas fa-trash"></span></button>' +
-            '<button type="button" style="display: none" class="btn btn-success btn-confirm" data-username="' +
-            item.username +
-            '" onclick="viewers.delete(this)"><span class="fas fa-check"></span></button>' +
-            '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="fas fa-remove"></span></button>' +
-            '</td>' +
-            '</tr>');
-          if (!systems.points) {
-            $("#viewers-points-data").remove()
-            $("#viewers-points").remove()
-          }
-        })
-      },
-      getDateString: function (timestamp) {
-        if (_.isUndefined(timestamp) || timestamp === 0) return '<hr>'
-        return moment(timestamp).format('HH:mm:ss, YYYY-MM-DD')
-      },
-      styleFollowTime: function (timestamp) {
-        if (_.isUndefined(timestamp) || timestamp === 0) return '<hr>'
-        return moment(timestamp).format('HH:mm:ss, YYYY-MM-DD')
-      },
-      styleWatched: function (timestamp) {
-        if (_.isUndefined(timestamp)) timestamp = 0
-        return (timestamp / 1000 / 60 / 60).toFixed(1) + 'h'
-      },
-      delete: function (el) {
-        socket.emit('deleteViewer', el.dataset.username)
-      },
-      pointsEditable: function (el) {
-        var $input = $('#points_' + el.dataset.id)
-        $(el).css('display', 'none')
-        $input.css('display', 'table')
-        $input.focus()
-        $input.val($(el).text())
-
-        $input.off()
-        $input.on('focusout', function () {
-          var value = $input.val()
-          $input.css('display', 'none')
-          $(el).css('display', 'inline')
-          $(el).text(value)
-          socket.emit('setPoints', {
-            username: el.dataset.id,
-            value: value
-          })
-        })
-      },
-      sort: function (el) {
-        $('table tr th i').removeClass()
-
-        if (viewers.sortBy === el.dataset.sort) {
-          viewers.sortType = viewers.sortType === 'asc' ? 'desc' : 'asc'
-        } else {
-          viewers.sortType = 'desc'
-          if (el.dataset.sort === 'username') viewers.sortType = 'asc'
-        }
-        viewers.sortBy = el.dataset.sort
-        $(el).children('i').addClass('fa fa-sort-' + viewers.sortType)
-        viewers.update(viewers.paging(viewers.list))
-      },
-      pagination: function (i) {
-        pagination = i
-        viewers.update(viewers.paging(viewers.list))
-      },
-      search: function (list) {
-        return _.filter(list, function (o) {
-          if (viewers.search.length === 0) return true
-          return o.username.toLowerCase().indexOf(viewers.toSearch.toLowerCase()) >= 0;
-        })
-      },
-      updateSearch: function () {
-        viewers.toSearch = $('#viewersSearch').val()
-        pagination = 1
-        viewers.update(viewers.paging())
-      },
-      paging: function () {
-        var list = _.sortBy(viewers.search(viewers.list), [function (o) {
-          var split = viewers.sortBy.split('.')
-          var sort
-          if (split.length == 2) {
-            sort = (!_.isUndefined(o[split[0]]) && !_.isUndefined(o[split[0]][split[1]])) ? o[split[0]][split[1]] :
-              0
-          } else {
-            sort = !_.isUndefined(o[viewers.sortBy]) ? o[viewers.sortBy] : 0
-          }
-          if (viewers.sortBy !== 'username') {
-            return parseInt(sort, 10)
-          }
-          return sort
-        }])
-        if (viewers.sortType === 'desc') list = list.reverse()
-        list = _.chunk(list, 50)
-        var paging = $('.paging')
-        var empty = false
-        paging.empty()
-        _.each(list, function (v, i) {
-          if (list.length < 10) {
-            paging.append('<li style="margin:0; padding: 8px 5px;" onclick="viewers.pagination(' + (i + 1) + ')" class="btn ' + (pagination === i + 1 ?
-              'btn-primary' : 'btn-default') + '">' + (i + 1) + '</li>')
-          } else {
-            if ((i >= pagination - 3 && i < pagination + 2) || (i > list.length - 4) || i % 10 === Math.floor(list.length /
-                10) || i < 3) {
-              paging.append('<li style="margin:0; padding: 8px 5px;" onclick="viewers.pagination(' + (i + 1) + ')" class="btn ' + (pagination === i + 1 ?
-                'btn-primary' : 'btn-default') + '">' + (i + 1) + '</li>')
-              if (!(i + 1 > pagination - 2 && i + 1 < pagination + 2) || !(i + 1 > list.length - 4)) {
-                empty = true
-              }
-            } else if (empty) {
-              paging.append('<li class="btn btn-link disabled"></li>')
-              empty = false
-            }
-          }
-        })
-        if (list.length === 0) {
-          paging.append('<li onclick="viewers.pagination(1)" style="margin:0; padding: 8px 5px;" class="btn btn-primary">1</li>')
-        }
-        return list[pagination - 1];
-      }
-    }
 
     $(document)
       .off('show.bs.tab', 'a[href="#ignorelist"]')
@@ -376,6 +382,6 @@
     $('#viewersSearch').attr('placeholder', translations['search-by-username'])
   }
 
-  Viewers()
+  ViewersPage()
 
 </script>

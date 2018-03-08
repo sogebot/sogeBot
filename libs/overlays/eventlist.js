@@ -44,6 +44,7 @@ EventList.prototype.add = async function (data) {
     bits: _.isNil(data.bits) ? undefined : data.bits,
     viewers: _.isNil(data.viewers) ? undefined : data.viewers,
     from: _.isNil(data.from) ? undefined : data.from,
+    tier: _.isNil(data.tier) ? undefined : data.tier,
     song_title: _.isNil(data.song_title) ? undefined : data.song_title,
     song_url: _.isNil(data.song_url) ? undefined : data.song_url
   }
