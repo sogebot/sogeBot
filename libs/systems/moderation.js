@@ -438,7 +438,7 @@ Moderation.prototype.blacklist = async function (self, sender, text) {
   return isOK
 }
 
-Moderation.prototype.isSilent = async function (name) {
+Moderation.prototype.isSilent = function (name) {
   if (_.now() - _.get(this, `_announcements.${name}`, 0) >= 60000) {
     this._announcements[name] = _.now()
     return false
