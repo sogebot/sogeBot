@@ -185,9 +185,9 @@ class Twitch {
         global.log.warning('Broadcaster have not correct oauth, will not check subs')
         this.current.subscribers = 0
       } else {
+        setTimeout(() => this.getChannelSubscribersOldAPI(), 60000)
         global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
         global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${e.body.message}` })
-        setTimeout(() => this.getChannelSubscribersOldAPI(), 60000)
       }
       return
     }
@@ -220,9 +220,9 @@ class Twitch {
         .set('Client-ID', config.settings.client_id)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelFollowersOldAPI', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
+      setTimeout(() => this.getChannelFollowersOldAPI(), 60000)
       global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelFollowersOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${e.body.message}` })
-      setTimeout(() => this.getChannelFollowersOldAPI(), 60000)
       return
     }
     d(`Current followers count: ${request.body._total}`)
@@ -246,9 +246,9 @@ class Twitch {
         .set('Client-ID', config.settings.client_id)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
+      setTimeout(() => this.getChannelDataOldAPI(), 60000)
       global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${e.body.message}` })
-      setTimeout(() => this.getChannelDataOldAPI(), 60000)
       return
     }
 
@@ -296,9 +296,9 @@ class Twitch {
       request = await snekfetch.get(url)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status })
     } catch (e) {
+      setTimeout(() => this.getChannelHosts(), 30000)
       global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: `${e.status} ${e.body.message}` })
-      setTimeout(() => this.getChannelHosts(), 30000)
       return
     }
     d('Current host count: %s, Hosts: %s', request.body.hosts.length, _.map(request.body.hosts, 'host_login').join(', '))
@@ -331,9 +331,9 @@ class Twitch {
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
+      setTimeout(() => this.updateChannelViews(), 120000)
       global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: `${e.status} ${e.body.message}`, remaining: this.remainingAPICalls })
-      setTimeout(() => this.updateChannelViews(), 120000)
       return
     }
 
