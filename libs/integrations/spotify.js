@@ -59,11 +59,12 @@ class Spotify {
 
   async IRefreshToken () {
     try {
-      this.client.refreshAccessToken()
+      let data = await this.client.refreshAccessToken()
+      this.accessToken = data.body['access_token']
     } catch (e) {
       global.log.error(e.stack)
     }
-    setTimeout(() => this.IRefreshToken(), 600000)
+    setTimeout(() => this.IRefreshToken(), 60000)
   }
 
   get enabled () {
