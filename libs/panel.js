@@ -40,6 +40,9 @@ function Panel () {
 
   // static routing
   app.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')))
+  app.get('/popout/', this.authUser, function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'))
+  })
   app.get('/oauth/:page', this.authUser, function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'oauth', req.params.page + '.html'))
   })
