@@ -65,7 +65,7 @@
     "build:css": "npm-run-all --parallel compile:css:*",
     "build:modules": "npm install",
     "build:shrinkwrap": "npm shrinkwrap",
-    "build:zip": "cross-var bestzip sogeBot-$npm_package_version.zip npm-shrinkwrap.json config.example.json libs/ locales/ main.js public/ LICENSE package.json README.md AUTHORS tools/ bin/ bat/ scss/",
+    "build:zip": "cross-var bestzip sogeBot-$npm_package_version.zip npm-shrinkwrap.json config.example.json libs/ locales/ main.js public/ LICENSE package.json README.md AUTHORS tools/ bin/ bat/ scss/ dist/",
     "compile:css:light": "node-sass --output-style expanded --precision 6 scss/themes/light.scss public/dist/css/light.css",
     "compile:css:dark": "node-sass --output-style expanded --precision 6 scss/themes/dark.scss public/dist/css/dark.css",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
