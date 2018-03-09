@@ -50,7 +50,6 @@ class Twitch {
     this.getChannelHosts()
 
     this.getChannelSubscribersOldAPI() // remove this after twitch add total subscribers
-    this.getChannelFollowersOldAPI() // remove this after twitch add total followers
     this.getChannelDataOldAPI() // remove this after twitch game and status for new API
 
     global.parser.register(this, '!uptime', this.uptime, constants.VIEWERS)
@@ -203,32 +202,6 @@ class Twitch {
     }
 
     setTimeout(() => this.getChannelSubscribersOldAPI(), 30000)
-  }
-
-  async getChannelFollowersOldAPI () {
-    const d = debug('twitch:getChannelFollowersOldAPI')
-    if (_.isNil(global.channelId)) {
-      setTimeout(() => this.getChannelFollowersOldAPI(), 1000)
-      return
-    }
-
-    var request
-    const url = `https://api.twitch.tv/kraken/channels/${global.channelId}/follows?limit=100`
-    try {
-      request = await snekfetch.get(url)
-        .set('Accept', 'application/vnd.twitchtv.v5+json')
-        .set('Client-ID', config.settings.client_id)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelFollowersOldAPI', api: 'kraken', endpoint: url, code: request.status })
-    } catch (e) {
-      setTimeout(() => this.getChannelFollowersOldAPI(), 60000)
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelFollowersOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
-      return
-    }
-    d(`Current followers count: ${request.body._total}`)
-    this.current.followers = request.body._total
-
-    setTimeout(() => this.getChannelFollowersOldAPI(), 30000)
   }
 
   async getChannelDataOldAPI () {
@@ -460,7 +433,11 @@ class Twitch {
         }
       }
     }
-    setTimeout(() => this.getLatest100Followers(false), 60000)
+
+    d(`Current followers count: ${request.body.total}`)
+    this.current.followers = request.body.total
+
+    setTimeout(() => this.getLatest100Followers(false), 30000)
   }
 
   async getGameFromId (gid) {
