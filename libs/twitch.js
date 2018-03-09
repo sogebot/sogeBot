@@ -387,7 +387,7 @@ class Twitch {
     }
 
     var request
-    const url = `https://api.twitch.tv/helix/users/users/follows?to_id=${global.channelId}&first=100`
+    const url = `https://api.twitch.tv/helix/users/follows?to_id=${global.channelId}&first=100`
     try {
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
