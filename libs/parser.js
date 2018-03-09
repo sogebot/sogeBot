@@ -492,7 +492,12 @@ Parser.prototype.parseMessage = async function (message, attr) {
     .replace(/\$hosts/g, global.twitch.current.hosts)
     .replace(/\$subscribers/g, global.twitch.current.subscribers)
     .replace(/\$bits/g, global.twitch.current.bits)
-  if (global.commons.isSystemEnabled('songs')) msg = msg.replace(/\$currentSong/g, _.get(global.systems.songs.currentSong, 'title', ''))
+
+  // $currentSong - Spotify -> YTPlayer
+  if ((await global.integrations.spotify.enabled) && !_.isNil(global.integrations.spotify.currentSong)) {
+    msg = msg.replace(/\$currentSong/g, global.integrations.spotify.currentSong.is_playing ? global.integrations.spotify.currentSong.song + ' (' + global.integrations.spotify.currentSong.artist + ')' : 'Not playing')
+  } else if (global.commons.isSystemEnabled('songs')) msg = msg.replace(/\$currentSong/g, _.get(global.systems.songs.currentSong, 'title', 'Not Available'))
+  else msg = msg.replace(/\$currentSong/g, 'Not Available')
 
   msg = await this.parseMessageEach(math, msg); d('parseMessageEach: %s', msg)
   msg = await this.parseMessageVariables(custom, msg); d('parseMessageEach: %s', msg)
