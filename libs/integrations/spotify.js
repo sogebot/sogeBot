@@ -38,7 +38,6 @@ class Spotify {
       let data = await this.client.getMe()
       return data.body.display_name
     } catch (e) {
-      console.error(e)
       return null
     }
   }
@@ -53,7 +52,6 @@ class Spotify {
       }
       this.currentSong = song
     } catch (e) {
-      console.error(e)
       this.currentSong = null
     }
     setTimeout(() => this.ICurrentSong(), 10000)
@@ -130,7 +128,7 @@ class Spotify {
     return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne(this.collection, { key: 'refreshToken' }), 'value', null)))
   }
   set refreshToken (v) {
-    this.client.setRefreshToken(v)
+    if (!_.isNil(this.client)) this.client.setRefreshToken(v)
     global.db.engine.update(this.collection, { key: 'refreshToken' }, { value: _.isNil(v) || v.trim().length === 0 ? null : v })
   }
 
@@ -138,7 +136,7 @@ class Spotify {
     return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne(this.collection, { key: 'accessToken' }), 'value', null)))
   }
   set accessToken (v) {
-    this.client.setAccessToken(v)
+    if (!_.isNil(this.client)) this.client.setAccessToken(v)
     global.db.engine.update(this.collection, { key: 'accessToken' }, { value: _.isNil(v) || v.trim().length === 0 ? null : v })
   }
 
@@ -181,7 +179,11 @@ class Spotify {
         cb(null, !enabled)
       })
       socket.on('set.variable', async (data, cb) => {
-        this[data.key] = data.value
+        try {
+          this[data.key] = data.value
+        } catch (e) {
+          console.error(e)
+        }
         cb(null, data.value)
       })
       socket.on('authorize', async (cb) => {
