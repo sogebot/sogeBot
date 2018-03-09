@@ -53,8 +53,8 @@ class Commercial {
         global.client.commercial(config.settings.broadcaster_username, commercial.duration)
         if (!_.isNil(commercial.message)) global.commons.sendMessage(commercial.message, sender)
       } catch (e) {
-        global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
-        global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'commercial', api: 'kraken', endpoint: url, code: `${e.status} ${e.body.message}` })
+        global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
+        global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'commercial', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
       }
     } else {
       global.commons.sendMessage('$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', sender)

@@ -148,8 +148,8 @@ class Credits {
         .set('Client-ID', config.settings.client_id)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${e.body.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: `${e.status} ${e.body.message}` })
+      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
     }
     return request.body.clips
   }
