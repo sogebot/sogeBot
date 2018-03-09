@@ -994,6 +994,7 @@
     }
   },
   "songs": {
+    "not-playing": "Nic nehraje",
     "song-was-banned": "Pisen $name byla zabanovana a nebude uz nikdy hrat!",
     "song-was-banned-timeout-message": "Dostal si timeout za zabanovanou pisen",
     "song-was-unbanned": "Pisen byla uspesne odbanovana",

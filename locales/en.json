@@ -988,6 +988,7 @@
     }
   },
   "songs": {
+    "not-playing": "Not Playing",
     "song-was-banned": "Song $name was banned and will never play again!",
     "song-was-banned-timeout-message": "You've got timeout for posting banned song",
     "song-was-unbanned": "Song was succesfully unbanned",
