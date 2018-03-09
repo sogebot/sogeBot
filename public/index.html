@@ -69,6 +69,13 @@
           </a>
           <ul class="dropdown-menu" id="menu-settings"></ul>
         </li>
+        <li class="nav-item dropdown">
+          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            <span data-lang="menu.integrations"></span>
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" id="menu-integrations"></ul>
+        </li>
       </ul>
 
       <ul class="navbar-nav mr-auto">
@@ -737,7 +744,7 @@
                     <span class="editable-variable block" data-var="hosts" data-lang="responses.variable.hosts"></span>
                     <span class="editable-variable block" data-var="followers" data-lang="responses.variable.followers"></span>
                     <span class="editable-variable block" data-var="subscribers" data-lang="responses.variable.subscribers"></span>
-                    ${systems.points ? `<span class="editable-variable block" data-var="currentSong" data-lang="responses.variable.currentSong"></span>` : ``}
+                    <span class="editable-variable block" data-var="currentSong" data-lang="responses.variable.currentSong"></span>
                     </div>`)
                   div.css('display', 'block')
                 }

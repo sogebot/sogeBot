@@ -1,0 +1,63 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>sogeBot UI</title>
+  <meta charset="utf-8">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#f4f5f6">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#f4f5f6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Poppins|PT+Sans|PT+Sans+Narrow|PT+Mono" rel="stylesheet">
+  <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="../../dist/css/light.css">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="../../dist/css/sortable-theme-bootstrap.css">
+  <link rel="stylesheet" href="../../dist/bootstrap-toggle/css/bootstrap-toggle.min.css" />
+  <link rel="stylesheet" href="../../dist/bootstrap-slider/css/bootstrap-slider.min.css" />
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <div class="alert alert-danger d-none" role="alert" id="stateError">Unexpected error, please try to authenticate again</div>
+  <div class="alert alert-success d-none" role="alert" id="stateOk">Saving token to a bot, refreshing back to a bot.</div>
+
+  <!-- jQuery and Popper (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="../../dist/jquery/js/jquery.min.js"></script>
+  <!-- LoDash goodness -->
+  <script src="../../dist/lodash/js/lodash.min.js"></script>
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="../../dist/bootstrap/js/bootstrap.min.js" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/auth/token.js"></script>
+
+  <script>
+    var socket = io('/integrations/spotify', { query: "token=" + token })
+
+    if(window.location.hash || window.location.search) {
+      socket.emit('state', (err, state) => {
+        let urlState = null
+        let urlCode = null
+        for (let url of window.location.search.split('&')) {
+          if (url.startsWith('?code=') || url.startsWith('code=')) {
+            urlCode = url.replace(/\??code=/, '')
+          }
+          if (url.startsWith('?state=') || url.startsWith('state=')) {
+            urlState = url.replace(/\??state=/, '')
+          }
+        }
+
+        if (urlState === state) {
+          $('#stateOk').removeClass('d-none')
+          socket.emit('code', urlCode, (err, cb) => {
+            setTimeout(() => window.location.href = window.location.origin + "/#integrations-spotify", 5000)
+          })
+        } else {
+          $('#stateError').removeClass('d-none')
+        }
+      })
+    }
+  </script>
+</body>

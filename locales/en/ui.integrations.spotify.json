@@ -1,0 +1,15 @@
+{
+  "enabled": "Status",
+  "clientId": "clientId",
+  "clientSecret": "clientSecret",
+  "redirectURI": "redirectURI",
+  "tooltips": {
+    "clientId": "",
+    "clientSecret": "",
+    "redirectURI": "",
+    "authorizedUser": ""
+  },
+  "authorizedUser": "Authorized user",
+  "revoke": "Revoke",
+  "authorize": "Authorize"
+}
