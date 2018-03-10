@@ -276,8 +276,8 @@ function main () {
     subscription(channel, username, method)
   })
 
-  global.client.on('resub', async function (channel, username, months, message) {
-    resub(channel, username, months, message)
+  global.client.on('resub', async function (channel, username, months, message, userstate, method) {
+    resub(channel, username, months, message, userstate, method)
   })
 
   // Bot is checking if it is a mod
@@ -320,20 +320,19 @@ async function subscription (channel, username, method) {
 
   global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: _.now() }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
   global.overlays.eventlist.add({ type: 'sub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
-  global.log.sub(`${username}, method: ${method}`)
+  global.log.sub(`${username}, method: ${method}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
   global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
 }
 
-async function resub (channel, username, months, message) {
-  if (debug.enabled) debug('Resub: %s (%s months) - %s', username, months, message)
+async function resub (channel, username, months, message, userstate, method) {
+  if (debug.enabled) debug('Resub: %s (%s months) - %s', username, months, message, userstate, method)
 
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
   if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
 
-  let user = await global.db.engine.findOne('users', { username: username })
-  global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: moment().subtract(months, 'months').format('X') * 1000 } })
-  global.overlays.eventlist.add({ type: 'resub', tier: user.tier, username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
-  global.log.resub(`${username}, months: ${months}, message: ${message}`)
+  global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: moment().subtract(months, 'months').format('X') * 1000 }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
+  global.overlays.eventlist.add({ type: 'resub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
+  global.log.resub(`${username}, months: ${months}, message: ${message}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
   global.events.fire('resub', { username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
 }
 
