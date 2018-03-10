@@ -1,4 +1,4 @@
-/* global translations socket _ $*/
+/* global translations socket _ $ atob btoa */
 
 var commons = {
   stub: function (id, value) {
@@ -29,6 +29,16 @@ var commons = {
       return _.isNil(_.at(translations, key)[0]) ? `{${key}}` : _.at(translations, key)[0]
     }
   },
+  hash: function (value) {
+    return btoa(encodeURIComponent(value).replace(/%([0-9A-F]{2})/g, function (match, p1) {
+      return String.fromCharCode(parseInt(p1, 16))
+    }))
+  },
+  unhash: function (value) {
+    return decodeURIComponent(Array.prototype.map.call(atob(value), function (c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+    }).join(''))
+  },
   editable: function (options) {
     try {
       options = options || {}
@@ -57,7 +67,7 @@ var commons = {
 
       var output = '<abbr class="form-control" id="' + id + '" data-id="' + options.id +
       '" data-fnc="' + options.fnc + '" data-filters="' + options.filters.join(',') +
-      '" data-errorcontainer="' + options.errorContainer + '" data-value="' + stringAbbr + '" contenteditable="true" placeholder="' + options.placeholder + '" ' + dataArr.join(' ') +' data-match="' + options.match + '">' + (!_.isNil(options.mask) ? stringAbbr.replace(/./g, options.mask) : stringAbbr) + '</abbr>'
+      '" data-errorcontainer="' + options.errorContainer + '" data-value="' + commons.hash(options.text) + '" contenteditable="true" placeholder="' + options.placeholder + '" ' + dataArr.join(' ') + ' data-match="' + options.match + '">' + (!_.isNil(options.mask) ? options.text.replace(/./g, options.mask) : stringAbbr) + '</abbr>'
       setTimeout(function () {
         commons.translate()
 
@@ -86,7 +96,7 @@ var commons = {
           .focus(function () {
             var self = this
 
-            $(this).html(commons.cleanResponseText($(this).data('value')))
+            $(this).html(commons.cleanResponseText(commons.unhash($(this).data('value'))))
             if ($(this).html().trim().length === 0) $(this).html('&nbsp;') // don't lose cursor if empty
 
             $(this).data("initialText", $(this).html())
@@ -137,7 +147,7 @@ var commons = {
           .blur(function () {
             $('#helper').remove()
             var newString = commons.cleanResponseText($(this).html())
-            $(this).data('value', commons.cleanResponseText($(this).html()))
+            $(this).data('value', commons.hash(commons.cleanResponseText($(this).html())))
             var filtersRegExp = new RegExp('\\$(' + _.keys(translations.responses.variable).join('|') +
               ')',
               'g')
