@@ -1267,7 +1267,9 @@
     }
 
     $(document).on('click', '.widget-popout a', (ev) => {
+      ev.preventDefault()
       let widget = $(ev.currentTarget).attr('href').split('#')[1]
+      window.open($(ev.currentTarget).attr('href'),widget,'height=600,width=600');
       $(`#${widget}`).css('opacity', '0.2')
       $(`#${widget}`).css('max-height', '40px')
       $(`#${widget}`).css('overflow', 'hidden')
