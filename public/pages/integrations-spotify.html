@@ -40,7 +40,7 @@
           this.socket.emit('toggle.enabled', () => this.getSettings())
         }
         setVariable (key) {
-          const value = commons.cleanResponseText($(`abbr[data-id='${key}']`).html())
+          const value = commons.cleanResponseText($(`abbr[data-id='${key}']`).data('value'))
           this.socket.emit('set.variable', { key: key, value: value }, (err, value) => {
             if (err) return console.debug(err)
             $(`[data-id='${key}']`).text(value).focus().blur()
@@ -63,6 +63,8 @@
             `)
             delete cb.enabled
             for (let [key, value] of Object.entries(cb)) {
+              let mask = null
+              if (key === 'clientSecret') mask = '*'
               $('#spotify-settings').append(`
                 <div class="input-group mt-1">
                   <div class="input-group-prepend">
@@ -70,7 +72,7 @@
                       ${commons.translate(`integrations.spotify.tooltips.${key}`).length > 0 ? `&nbsp;<a href="#" data-toggle="tooltip" title="${commons.translate(`integrations.spotify.tooltips.${key}`)}">[?]</a>` : ``}
                     </span>
                   </div>
-                  ${commons.editable({ id: key, text: value, match: { '.+' : 'Value must not be empty' }, errorContainer: `.spotify-error[data-key='${key}']`, data: { 'data-spotify-onchange-show-button' : null }})}
+                  ${commons.editable({ id: key, mask: mask, text: value, match: { '.+' : 'Value must not be empty' }, errorContainer: `.spotify-error[data-key='${key}']`, data: { 'data-spotify-onchange-show-button' : null }})}
                   <div class="input-group-append">
                     <span class="form-error spotify-error" data-key="${key}"></span>
                     <button class="btn btn-secondary d-none" data-key="${key}" onclick="spotify.setVariable('${key}')" type="button"><i class="fas fa-download"></i></button>

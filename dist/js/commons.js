@@ -1,3 +1,5 @@
+/* global translations socket _ $*/
+
 var commons = {
   stub: function (id, value) {
     return // do nothing
@@ -39,6 +41,7 @@ var commons = {
       options.options = !_.isNil(options.options) ? options.options : []
       options.data = !_.isNil(options.data) ? options.data : {}
       options.placeholder = !_.isNil(options.placeholder) ? options.placeholder : '&nbsp;'
+      options.mask = !_.isNil(options.mask) ? options.mask : null
 
       var id = window.crypto.getRandomValues(new Uint32Array(1))
 
@@ -54,7 +57,7 @@ var commons = {
 
       var output = '<abbr class="form-control" id="' + id + '" data-id="' + options.id +
       '" data-fnc="' + options.fnc + '" data-filters="' + options.filters.join(',') +
-      '" data-errorcontainer="' + options.errorContainer + '" contenteditable="true" placeholder="' + options.placeholder + '" ' + dataArr.join(' ') +' data-match="' + options.match + '">' + stringAbbr + '</abbr>'
+      '" data-errorcontainer="' + options.errorContainer + '" data-value="' + stringAbbr + '" contenteditable="true" placeholder="' + options.placeholder + '" ' + dataArr.join(' ') +' data-match="' + options.match + '">' + (!_.isNil(options.mask) ? stringAbbr.replace(/./g, options.mask) : stringAbbr) + '</abbr>'
       setTimeout(function () {
         commons.translate()
 
@@ -83,7 +86,7 @@ var commons = {
           .focus(function () {
             var self = this
 
-            $(this).html(commons.cleanResponseText($(this).html()))
+            $(this).html(commons.cleanResponseText($(this).data('value')))
             if ($(this).html().trim().length === 0) $(this).html('&nbsp;') // don't lose cursor if empty
 
             $(this).data("initialText", $(this).html())
@@ -134,12 +137,14 @@ var commons = {
           .blur(function () {
             $('#helper').remove()
             var newString = commons.cleanResponseText($(this).html())
+            $(this).data('value', commons.cleanResponseText($(this).html()))
             var filtersRegExp = new RegExp('\\$(' + _.keys(translations.responses.variable).join('|') +
               ')',
               'g')
-            $(this).html(newString.replace(filtersRegExp,
-              '<span contenteditable="false" class="editable-variable" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;'
-            ))
+            if (!_.isNil(options.mask)) $(this).html(newString.replace(/./g, options.mask))
+            else {
+              $(this).html(newString.replace(filtersRegExp, '<span contenteditable="false" class="editable-variable" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;'))
+            }
             // ...if content is different...
             if ($(this).data("initialText").trim() !== newString.trim()) {
               if (!_.isNil($(this).data('fnc'))) {
