@@ -7,20 +7,9 @@ const crypto = require('crypto')
 function EventList () {
   global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
   global.panel.socketListening(this, 'overlay.eventlist.get', this._getOverlay)
-  global.panel.socketListening(this, 'widget.eventlist.get', this._getWidget)
 }
 
 EventList.prototype._get = async function (self) {
-  self._getWidget(self)
-  self._getOverlay(self)
-}
-
-EventList.prototype._getWidget = async function (self) {
-  let events = await global.db.engine.find('widgetsEventList')
-  global.panel.io.emit('widget.eventlist', _.chunk(_.orderBy(events, 'timestamp', 'desc'), 20)[0])
-}
-
-EventList.prototype._getOverlay = async function (self) {
   let events = await global.db.engine.find('widgetsEventList')
 
   events = _.uniqBy(_.orderBy(events, 'timestamp', 'desc'), (o) => {

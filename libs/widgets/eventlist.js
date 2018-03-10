@@ -21,7 +21,11 @@ function EventList () {
 }
 
 EventList.prototype._get = async function (self) {
-  let events = await global.db.engine.find('widgetsEventList')
-  global.panel.io.emit('widgets.eventlist', _.chunk(_.orderBy(events, 'timestamp', 'desc'), 50)[0])
+  try {
+    let events = await global.db.engine.find('widgetsEventList')
+    global.panel.io.emit('widget.eventlist', _.chunk(_.orderBy(events, 'timestamp', 'desc'), 50)[0])
+  } catch (e) {
+    global.panel.io.emit('widget.eventlist', [])
+  }
 }
 module.exports = new EventList()
