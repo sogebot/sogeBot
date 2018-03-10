@@ -59,8 +59,10 @@ class Spotify {
 
   async IRefreshToken () {
     try {
-      let data = await this.client.refreshAccessToken()
-      this.accessToken = data.body['access_token']
+      if (!_.isNil(this.client)) {
+        let data = await this.client.refreshAccessToken()
+        this.accessToken = data.body['access_token']
+      }
     } catch (e) {
       global.log.error(e.stack)
     }
