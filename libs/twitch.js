@@ -184,6 +184,10 @@ class Twitch {
         global.log.warning('Broadcaster have not correct oauth, will not check subs')
         this.current.subscribers = 0
       } else {
+        if (e.code === 'ECONNREFUSED' || e.code === 'ETIMEDOUT') {
+          global.log.error(`API: ${url} - ${e.message}`)
+          return setTimeout(() => this.getChannelSubscribersOldAPI(), 1000)
+        }
         setTimeout(() => this.getChannelSubscribersOldAPI(), 60000)
         global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
         global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
@@ -219,6 +223,10 @@ class Twitch {
         .set('Client-ID', config.settings.client_id)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
+      if (e.code === 'ECONNREFUSED' || e.code === 'ETIMEDOUT') {
+        global.log.error(`API: ${url} - ${e.message}`)
+        return setTimeout(() => this.getChannelDataOldAPI(), 1000)
+      }
       setTimeout(() => this.getChannelDataOldAPI(), 60000)
       global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
@@ -269,6 +277,10 @@ class Twitch {
       request = await snekfetch.get(url)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status })
     } catch (e) {
+      if (e.code === 'ECONNREFUSED' || e.code === 'ETIMEDOUT') {
+        global.log.error(`API: ${url} - ${e.message}`)
+        return setTimeout(() => this.getChannelHosts(), 1000)
+      }
       setTimeout(() => this.getChannelHosts(), 30000)
       global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
@@ -304,6 +316,10 @@ class Twitch {
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
+      if (e.code === 'ECONNREFUSED' || e.code === 'ETIMEDOUT') {
+        global.log.error(`API: ${url} - ${e.message}`)
+        return setTimeout(() => this.updateChannelViews(), 1000)
+      }
       setTimeout(() => this.updateChannelViews(), 120000)
       global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
@@ -367,10 +383,13 @@ class Twitch {
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
-      if (e.code === 'ECONNREFUSED' || e.code === 'ETIMEDOUT') { return setTimeout(() => this.getLatest100Followers(false), 1000) }
+      if (e.code === 'ECONNREFUSED' || e.code === 'ETIMEDOUT') {
+        global.log.error(`API: ${url} - ${e.message}`)
+        return setTimeout(() => this.getLatest100Followers(quiet), 1000)
+      }
+      setTimeout(() => this.getLatest100Followers(quiet), 60000)
       global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
-      setTimeout(() => this.getLatest100Followers(false), 60000)
       return
     }
 
@@ -493,9 +512,13 @@ class Twitch {
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
+      if (e.code === 'ECONNREFUSED' || e.code === 'ETIMEDOUT') {
+        global.log.error(`API: ${url} - ${e.message}`)
+        return setTimeout(() => this.getCurrentStreamData(), 1000)
+      }
+      setTimeout(() => this.getCurrentStreamData(), 60000)
       global.log.error(`API: https://api.twitch.tv/helix/streams?user_id=${global.channelId} - ${e.message}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
-      setTimeout(() => this.getCurrentStreamData(), 60000)
       return
     }
 
