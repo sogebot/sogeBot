@@ -13,7 +13,13 @@ class Donationalerts {
   }
 
   async connect () {
-    this.socket = require('socket.io-client').connect('http://socket.donationalerts.ru:3001')
+    this.socket = require('socket.io-client').connect('http://socket.donationalerts.ru:3001',
+      {
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        reconnectionAttempts: Infinity
+      })
     this.socket.emit('add-user', {token: config.integrations.donationalerts.secretToken, type: 'minor'})
     this.sockets()
   }
