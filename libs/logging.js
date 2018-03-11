@@ -146,8 +146,6 @@ Logger.prototype.doFilter = function (self, content) {
   // remove startup, debug and errors
   var sContent = content.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z? \| .*/g, '')
     .replace(/.\[39m/g, '', '')
-    .replace(/.*DEBUG:.*/g, '')
-    .replace(/.*!!! ERROR !!!.*/g, '')
     .split('\n')
   content = []
 
