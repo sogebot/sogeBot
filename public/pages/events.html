@@ -627,7 +627,7 @@
           } else if(_.isArray(operationDefinition)) {
             modal.find(`#${elementId} #${k}-${v}`).parent().button('toggle')
           } else {
-            modal.find(`#${elementId} [data-id="operation-definition-${k}"]`).text(v)
+            modal.find(`#${elementId} [data-id="operation-definition-${k}"]`).text(v).data('value', commons.hash(v))
           }
         }
       }
