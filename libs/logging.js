@@ -1,13 +1,12 @@
 'use strict'
 
 var winston = require('winston')
+require('winston-logrotate')
 var fs = require('fs')
 var _ = require('lodash')
 var logDir = './logs'
 var moment = require('moment')
 const glob = require('glob')
-
-const datetime = moment().format('YYYY-MM-DDTHH_mm_ss')
 
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir)
 
@@ -63,7 +62,7 @@ global.log = new (winston.Logger)({
         return moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + (level ? ' ' + level + ' ' : ' ') + (options.message ? options.message : '') + (username ? ' [' + username + ']' : '') + (fnc ? ' [function: ' + fnc + ']' : '') + (_.size(options.meta) > 0 && level === 'DEBUG:' ? '\n' + options.timestamp() + ' DEBUG: ' + JSON.stringify(options.meta) : '')
       }
     }),
-    new winston.transports.File({
+    new winston.transports.Rotate({
       level: 'info',
       timestamp: function () {
         return new Date().toISOString()
@@ -95,12 +94,14 @@ global.log = new (winston.Logger)({
           (username ? ' [' + username + ']' : '') +
           (_.size(options.meta) > 0 && level === 'DEBUG:' ? '\n' + moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + ' DEBUG: ' + JSON.stringify(options.meta) : '')
       },
-      filename: logDir + '/sogebot-' + datetime + '.log',
+      file: logDir + '/sogebot.log',
       handleExceptions: false,
+      colorize: false,
       json: false,
-      maxsize: 5242880,
-      maxFiles: 5,
-      colorize: false })
+      size: '5m',
+      keep: 5,
+      compress: true
+    })
   ],
   exceptionHandlers: [
     new winston.transports.File({
