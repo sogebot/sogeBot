@@ -24,7 +24,7 @@ class Twitch {
     this.streamType = 'live'
 
     this.retries = {
-      cooldown: 30000,
+      cooldown: 45000,
       getCurrentStreamData: 0,
       getChannelDataOldAPI: 0
     }
