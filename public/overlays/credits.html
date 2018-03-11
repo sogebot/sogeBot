@@ -60,12 +60,18 @@
 
       .clip-title {
         text-align: left;
-        margin-left: 13%; margin-right: 13%;
-        padding-bottom: 2rem;
+        padding-bottom: 1rem;
       }
 
       .clip-title .name {
         font-size: 3rem;
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding-left: 14%; padding-right: 14%;
+        padding-top: 15px; margin-top: -15px;
+        padding-bottom: 15px; margin-bottom: -15px;
       }
 
       iframe, img {
@@ -372,10 +378,10 @@
             i++
             $('#clips').append(`
               <div class="clip-title" style="text-align:${i % 2 === 0 ? 'right' : 'left'}" data-id="${clip.tracking_id}">
-                <div style="position:absolute; opacity: 0.5; font-weight: bold; font-size: 10rem; ${i % 2 === 0 ? 'left: 15%;' : 'right: 15%;'}">${i}</div>
-                <div class='name'>${clip.title} </div>
-                <div class='name'><strong>${clip.game}</strong></div>
-                <div class="name">${_.get(custom, 'clipped-by', 'clipped by')} ${clip.curator.display_name}</div>
+                <div style="position:absolute; opacity: 0.5; font-weight: bold; margin-top: -5px; font-size: 10rem; ${i % 2 === 0 ? 'left: 15%;' : 'right: 15%;'}">${i}</div>
+                <div class='name' style="padding-${i % 2 === 0 ? 'left' : 'right'}: 22%">${clip.title}</div>
+                <div class='name' style="padding-${i % 2 === 0 ? 'left' : 'right'}: 22%"><strong>${clip.game}</strong></div>
+                <div class="name" style="padding-${i % 2 === 0 ? 'left' : 'right'}: 22%">${_.get(custom, 'clipped-by', 'clipped by')} ${clip.curator.display_name}</div>
               </div>
               <div class="clip" style="height: ${wHeight}px" data-duration="${clip.duration}" data-embed="${clip.embed_html}" data-thumbnail="${clip.thumbnails.medium}">
                 <img src="${clip.thumbnails.medium}" data-id="${clip.tracking_id}"></img>
