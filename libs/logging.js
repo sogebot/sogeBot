@@ -133,7 +133,7 @@ Logger.prototype.send = async function (self, socket, filters) {
   var content = ''
 
   self.filter = filters
-  self.files = glob.sync(logDir + '/sogebot-*.log')
+  self.files = glob.sync(logDir + '/sogebot.log')
   for (var i = 0; i < self.files.length; i++) {
     content += await fs.readFileSync(self.files[i], 'utf-8')
   }
