@@ -2,6 +2,6 @@
   "enabled": "Status",
   "socketToken": "Socket token",
   "tooltips": {
-    "socketToken": "Get socket token from streamlabs dashboad API settings->API tokens->Your Socket API Token"
+    "socketToken": "Get socket token from streamlabs dashboard API settings->API tokens->Your Socket API Token"
   }
 }
