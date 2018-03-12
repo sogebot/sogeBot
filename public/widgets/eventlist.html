@@ -1,4 +1,4 @@
-<div class="widget">
+<div class="card widget">
   <h6 data-lang="eventlist"></h6>
   <ul class="nav nav-pills" role="tablist">
     <li role="presentation" class="nav-item">
@@ -7,43 +7,43 @@
       </a>
     </li>
     <li role="presentation" class="nav-item">
-      <button class="btn nav-btn btn-outline-primary" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <a class="nav-link nav-dropdown" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="fas fa-eye"></i>
-      </button>
+      </a>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="padding:0; margin: 0;">
         <button data-id="follow" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-          <span class="fa-stack" style="height: 1em; line-height: 0.8em; width: 1em">
+          <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
             <i class="fas fa-heart fa-stack-1x"></i>
           </span>
         </button>
         <button data-id="host" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-          <span class="fa-stack" style="height: 1em; line-height: 0.8em; width: 1em">
+          <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
             <i class="fas fa-bullhorn fa-stack-1x"></i>
           </span>
         </button>
         <button data-id="cheer" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-          <span class="fa-stack" style="height: 1em; line-height: 0.8em; width: 1em">
+          <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
             <i class="fas fa-gem fa-stack-1x"></i>
           </span>
         </button>
         <button data-id="sub" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-          <span class="fa-stack" style="height: 1em; line-height: 0.8em; width: 1em">
+          <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
             <i class="fas fa-star fa-stack-1x"></i>
           </span>
         </button>
         <button data-id="subgift" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-          <span class="fa-stack" style="height: 1em; line-height: 0.8em; width: 1em">
+          <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
             <i class="fas fa-gift fa-stack-1x"></i>
           </span>
         </button>
         <button data-id="resub" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-          <span class="fa-stack" style="height: 1em; line-height: 0.8em; width: 1em">
+          <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
             <i class="fas fa-star-half fa-stack-1x"></i>
             <i class="fas fa-long-arrow-alt-right fa-stack-1x"></i>
           </span>
         </button>
         <button data-id="tip" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-          <span class="fa-stack" style="height: 1em; line-height: 0.8em; width: 1em">
+          <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
             <i class="fas fa-dollar-sign fa-stack-1x"></i>
           </span>
         </button>
@@ -61,55 +61,47 @@
     </li>
   </ul>
   <!-- Tab panes -->
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="eventlist-main">
-        <div class="alert alert-primary" role="alert">
-          <i class="fas fa-circle-o-notch fa-spin fa-1x fa-fw"></i>
-          <strong>loading data...</strong>
-        </div>
-    </div>
-    <!-- /MAIN -->
+  <div class="card-body">
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="eventlist-main">
+          <div class="alert alert-primary" role="alert">
+            <i class="fas fa-circle-o-notch fa-spin fa-1x fa-fw"></i>
+            <strong>loading data...</strong>
+          </div>
+      </div>
+      <!-- /MAIN -->
 
-    <div role="tabpanel" class="tab-pane" id="eventlist-settings">
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text" data-lang="eventlist-overflow-height"></span>
+      <div role="tabpanel" class="tab-pane" id="eventlist-settings">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" data-lang="eventlist-show-number"></span>
+          </div>
+          <input type="text" class="form-control" id="eventlistShow">
+          <div class="input-group-append">
+            <span class="input-group-text" data-lang="eventlist-show"></span>
+          </div>
         </div>
-        <input type="text" class="form-control" id="eventlistOverflowHeight">
-        <div class="input-group-append">
-          <span class="input-group-text">px</span>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" data-lang="followers-size"></span>
+          </div>
+          <input type="text" class="form-control" id="eventlistSize">
+          <div class="input-group-append">
+            <span class="input-group-text">px</span>
+          </div>
         </div>
-      </div>
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text" data-lang="eventlist-show-number"></span>
-        </div>
-        <input type="text" class="form-control" id="eventlistShow">
-        <div class="input-group-append">
-          <span class="input-group-text" data-lang="eventlist-show"></span>
-        </div>
-      </div>
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text" data-lang="followers-size"></span>
-        </div>
-        <input type="text" class="form-control" id="eventlistSize">
-        <div class="input-group-append">
-          <span class="input-group-text">px</span>
-        </div>
-      </div>
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text" data-lang="followers-message-size"></span>
-        </div>
-        <input type="text" class="form-control" id="eventlistMessageSize">
-        <div class="input-group-append">
-          <span class="input-group-text">px</span>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" data-lang="followers-message-size"></span>
+          </div>
+          <input type="text" class="form-control" id="eventlistMessageSize">
+          <div class="input-group-append">
+            <span class="input-group-text">px</span>
+          </div>
         </div>
       </div>
-      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('eventlist')" style="margin-top: 20px;" data-lang="remove-widget"></button>
+      <!-- /SETTINGS -->
     </div>
-    <!-- /SETTINGS -->
   </div>
 </div>
 
@@ -150,7 +142,6 @@
     console.debug('widgetEventlistSubgifts', data.widgetEventlistSubgifts)
     console.debug('widgetEventlistResubs', data.widgetEventlistResubs)
     console.debug('widgetEventlistTips', data.widgetEventlistTips)
-    console.debug('widgetEventlistOverflowHeight', data.widgetEventlistOverflowHeight)
     console.debug('widgetEventlistShow', data.widgetEventlistShow)
     console.debug('widgetEventlistSize', data.widgetEventlistSize)
     console.debug('widgetEventlistMessageSize', data.widgetEventlistMessageSize)
@@ -179,7 +170,6 @@
     }
 
     window.sessionStorage.setItem('config.eventlist.configured', true)
-    window.sessionStorage.setItem('config.eventlist.height', data.widgetEventlistOverflowHeight)
     window.sessionStorage.setItem('config.eventlist.size', data.widgetEventlistSize)
     window.sessionStorage.setItem('config.eventlist.messageSize', data.widgetEventlistMessageSize)
     window.sessionStorage.setItem('config.eventlist.show', data.widgetEventlistShow)
@@ -194,7 +184,6 @@
     $('#eventlistShow').val(data.widgetEventlistShow)
     $('#eventlistSize').val(data.widgetEventlistSize)
     $('#eventlistMessageSize').val(data.widgetEventlistMessageSize)
-    $('#eventlistOverflowHeight').val(data.widgetEventlistOverflowHeight)
 
     // emit after configuration is set
     socket.emit('widget.eventlist.get')
@@ -230,9 +219,7 @@
 
     let eventlistEl = $('#eventlist-main')
     eventlistEl.empty()
-    eventlistEl
-      .css('max-height', window.sessionStorage.getItem('config.eventlist.height') + 'px')
-      .css('overflow', 'auto')
+    eventlistEl.css('overflow', 'auto')
 
     let i = 0
     console.group('Eventlist events')
@@ -358,17 +345,6 @@
     socket.emit('saveConfiguration', data)
     socket.emit('widget.eventlist.get')
   })
-
-var $eventlistOverflow = $('#eventlistOverflowHeight')
-$eventlistOverflow.off()
-$eventlistOverflow.on('focusout', function () {
-  var value = $eventlistOverflow.val()
-  var data = {}
-  data['widgetEventlistOverflowHeight'] = value
-  window.sessionStorage.setItem('config.eventlist.height', value)
-  socket.emit('saveConfiguration', data)
-  socket.emit('widget.eventlist.get')
-})
 
 var $eventlistSize = $('#eventlistSize')
 $eventlistSize.off()

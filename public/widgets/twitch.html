@@ -1,4 +1,4 @@
-<div class="widget">
+<div class="card widget">
   <h6 data-lang="widget-title-monitor"></h6>
   <ul class="nav nav-pills" role="tablist">
     <li role="presentation" class="nav-item">
@@ -6,33 +6,23 @@
         <i class="fab fa-twitch" aria-hidden="true"></i>
       </a>
     </li>
-    <li role="presentation" class="nav-item">
-      <a class="nav-link" href="#twitch-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-        <i class="fas fa-cog" aria-hidden="true"></i>
-      </a>
-    </li>
   </ul>
-
-  <!-- Tab panes -->
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="twitch-main">
+  <div class="card-body">
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="twitch-main">
+      </div>
+      <!-- /MAIN -->
     </div>
-    <!-- /MAIN -->
-
-    <div role="tabpanel" class="tab-pane" id="twitch-settings">
-      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('twitch')" style="margin-top: 20px;" data-lang="remove-widget"></button>
-    </div>
-    <!-- /SETTINGS -->
   </div>
 </div>
 
 <script>
   socket.emit('twitch.sendTwitchVideo')
   socket.once('twitchVideo', function (room) {
-    $("#twitch-main").append(`<iframe style="width: 100%; height: 220px"
+    $("#twitch-main").append(`<iframe style="width: 100%; height: 100%"
       src="http://player.twitch.tv/?channel=${room}&autoplay=true&muted=true"
       frameborder="0">
     </iframe>`)
   })
-
 </script>

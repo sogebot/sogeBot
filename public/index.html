@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="./dist/css/sortable-theme-bootstrap.css">
   <link rel="stylesheet" href="./dist/bootstrap-toggle/css/bootstrap-toggle.min.css" />
   <link rel="stylesheet" href="./dist/bootstrap-slider/css/bootstrap-slider.min.css" />
+  <link rel="stylesheet" href="./dist/gridstack/css/gridstack.min.css" />
   <script src="/socket.io/socket.io.js"></script>
 </head>
 
@@ -290,7 +291,9 @@
 
   <div class="container-fluid">
     <!-- widgets -->
-    <div class="widgets row"></div>
+    <div class="widgets">
+      <div class="grid-stack"></div>
+    </div>
     <div class="w-100"></div>
 
     <div class="col" id="addWidget">
@@ -320,6 +323,9 @@
   <script src="./dist/page/js/page.js"></script>
   <!-- LoDash goodness -->
   <script src="./dist/lodash/js/lodash.min.js"></script>
+  <!-- Widgets drag'n'drop -->
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+  <script src="./dist/gridstack/js/gridstack.all.js"></script>
   <!-- Latest compiled and minified JavaScript -->
   <script src="./dist/bootstrap/js/bootstrap.min.js" crossorigin="anonymous"></script>
   <script src="./dist/sortablejs/js/Sortable.min.js" crossorigin="anonymous"></script>
@@ -446,6 +452,7 @@
       const id = p.hash.length === 0 ? 'dashboard' : p.hash
 
       var visibility = id !== 'dashboard' ? 'none' : 'flex'
+      var visibilityBlock = id !== 'dashboard' ? 'none' : 'block'
 
       $("#pages").empty()
 
@@ -465,7 +472,7 @@
             }
           })
         }))
-      $(".widgets").css('display', visibility)
+      $(".widgets").css('display', visibilityBlock)
       $("#addWidget").css('display', visibility)
     })
     page({ popstate:true })
@@ -499,54 +506,51 @@
     })
 
     socket.on('widgets', function (widgets) {
-      let rows = {
-        'left': _.filter(widgets, (o) => o.column == 1),
-        'middle': _.filter(widgets, (o) => o.column == 2),
-        'right': _.filter(widgets, (o) => o.column == 3)
+      $('.widgets').empty().append($('<div class="grid-stack"></div>'))
+      for (let widget of widgets) {
+        if (_.isNil(widget.id)) continue
+        $('.grid-stack').append(`
+          <div class="grid-stack-item" id="widget-${widget.id}" data-gs-x="${widget.position.x}" data-gs-y="${widget.position.y}" data-gs-width="${widget.size.width}" data-gs-height="${widget.size.height}">
+            <div class="grid-stack-item-content"></div>
+          </div>
+        `)
+        $(`#widget-${widget.id} .grid-stack-item-content`).load(`widgets/${widget.id}.html`, () => commons.translate())
       }
-      let maxWidgetsInRow = _.max([rows.left.length, rows.middle.length, rows.right.length])
-
-      let rowsDivs = {
-        'left': $('<div class="col">'),
-        'middle': $('<div class="col">'),
-        'right': $('<div class="col">')
-      }
-
-      for (let i = 0; i < maxWidgetsInRow; i++) {
-        if (!_.isNil(rows.left[i])) {
-          rowsDivs.left.append($('<div id="' + rows.left[i].widget + '">')
-            .load('widgets/' +
-              rows.left[i].widget + '.html',
-              function () {
-                commons.translate()
-              }))
+      $('.grid-stack').gridstack({ cellHeight: 50, verticalMargin: 10, removable: true, removeTimeout: 100 })
+      $('.grid-stack').off('removed').on('removed', function(event, items) {
+        let widgets = []
+        for (let item of items) {
+          widgets.push({
+            id: item.el[0].id.split('-')[1],
+            position: {
+              x: item.x,
+              y: item.y
+            },
+            size: {
+              height: item.height,
+              width: item.width
+            }
+          })
         }
-
-        if (!_.isNil(rows.middle[i])) {
-          rowsDivs.middle.append($('<div id="' + rows.middle[i].widget + '">')
-            .load('widgets/' +
-              rows.middle[i].widget + '.html',
-              function () {
-                commons.translate()
-              }))
+        socket.emit('updateWidgets', widgets)
+      })
+      $('.grid-stack').off('change').on('change', function(event, items) {
+        let widgets = []
+        for (let item of items) {
+          widgets.push({
+            id: item.el[0].id.split('-')[1],
+            position: {
+              x: item.x,
+              y: item.y
+            },
+            size: {
+              height: item.height,
+              width: item.width
+            }
+          })
         }
-
-        if (!_.isNil(rows.right[i])) {
-          rowsDivs.right.append($('<div id="' + rows.right[i].widget + '">')
-            .load('widgets/' +
-              rows.right[i].widget + '.html',
-              function () {
-                commons.translate()
-              }))
-        }
-      }
-
-      $('.widgets')
-        .empty()
-        .append(rowsDivs.left)
-        .append(rowsDivs.middle)
-        .append(rowsDivs.right)
-        .append('<div class="w-100"></div>')
+        socket.emit('updateWidgets', widgets)
+      })
     })
 
     // addWidget
@@ -973,13 +977,6 @@
         })
         $('#game_and_title_dlg').modal('hide')
       }
-    }
-
-    /* WIDGETS */
-    var deleteWidget = function (id) {
-      $('#' + id).remove();
-      console.debug('EMIT [deleteWidget]', 0)
-      socket.emit('deleteWidget', id)
     }
 
     var saveHighlight = function () {

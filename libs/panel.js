@@ -160,8 +160,8 @@ function Panel () {
     })
 
     socket.on('getWidgetList', function () { self.sendWidgetList(self, socket) })
-    socket.on('addWidget', function (widget, row) { self.addWidgetToDb(self, widget, row, socket) })
-    socket.on('deleteWidget', function (widget) { self.deleteWidgetFromDb(self, widget) })
+    socket.on('addWidget', function (widget) { self.addWidgetToDb(self, widget, socket) })
+    socket.on('updateWidgets', function (widgets) { self.updateWidgetsInDb(self, widgets, socket) })
     socket.on('getConnectionStatus', function () { socket.emit('connectionStatus', global.status) })
     socket.on('saveConfiguration', function (data) {
       _.each(data, function (index, value) {
@@ -238,7 +238,7 @@ Panel.prototype.sendWidgetList = async function (self, socket) {
   else {
     var sendWidgets = []
     _.each(self.widgets, function (widget) {
-      if (!_.includes(_.map(widgets, 'widget'), widget.id)) {
+      if (!_.includes(_.map(widgets, 'id'), widget.id)) {
         sendWidgets.push(widget)
       }
     })
@@ -246,13 +246,18 @@ Panel.prototype.sendWidgetList = async function (self, socket) {
   }
 }
 
-Panel.prototype.addWidgetToDb = async function (self, widget, row, socket) {
-  await global.db.engine.update('widgets', { widget: widget }, { widget: widget, column: row })
-  self.sendWidget(socket)
+Panel.prototype.updateWidgetsInDb = async function (self, widgets, socket) {
+  await global.db.engine.remove('widgets', {}) // remove widgets
+  let toAwait = []
+  for (let widget of widgets) {
+    toAwait.push(global.db.engine.update('widgets', { id: widget.id }, { id: widget.id, position: {x: widget.position.x, y: widget.position.y}, size: { width: widget.size.width, height: widget.size.height } }))
+  }
+  await Promise.all(toAwait)
 }
 
-Panel.prototype.deleteWidgetFromDb = function (self, widget) {
-  global.db.engine.remove('widgets', { widget: widget })
+Panel.prototype.addWidgetToDb = async function (self, widget, socket) {
+  await global.db.engine.update('widgets', { id: widget }, { id: widget, position: {x: 0, y: 0}, size: { width: 4, height: 3 } })
+  self.sendWidget(socket)
 }
 
 Panel.prototype.socketListening = function (self, on, fnc) {

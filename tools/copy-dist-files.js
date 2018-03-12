@@ -10,6 +10,10 @@ var dist = {
 }
 
 var modules = {
+  'gridstack': {
+    'js': 'dist/gridstack.all.js',
+    'css': 'dist/gridstack.min.css'
+  },
   'page': {
     'js': 'page.js'
   },

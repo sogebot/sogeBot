@@ -1,4 +1,4 @@
-<div class="widget">
+<div class="card widget">
   <h6 data-lang="widget-title-chat"></h6>
   <ul class="nav nav-pills" role="tablist">
     <li role="presentation" class="nav-item">
@@ -12,49 +12,39 @@
         <span id="chat-viewers-count">0</span>
       </a>
     </li>
-    <li role="presentation" class="nav-item">
-      <a class="nav-link" href="#chat-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-        <i class="fas fa-cog" aria-hidden="true"></i>
-      </a>
-    </li>
     <li role="presentation" class="nav-item widget-popout">
       <a class="nav-link" title="Popout" target="_blank" href="/popout/#chat">
         <i class="fas fa-external-link-alt"></i>
       </a>
     </li>
-
   </ul>
 
   <!-- Tab panes -->
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="chat-room-panel">
-      <div id="chat-room"></div>
+  <div class="card-body">
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="chat-room-panel">
+        <div id="chat-room" style="height: 100%"></div>
 
-      <form>
-        <div class="form-row">
-          <div class="col">
-            <input type="text" id="chatInput" class="form-control" />
+        <form style="margin-top: -38px;">
+          <div class="form-row">
+            <div class="col">
+              <input type="text" id="chatInput" class="form-control" />
+            </div>
+            <div class="col">
+              <button id="chatInputSubmit" class="form-control btn btn-primary" data-lang="chat-as-bot"></button>
+            </div>
           </div>
-          <div class="col">
-            <button id="chatInputSubmit" class="form-control btn btn-primary" data-lang="chat-as-bot"></button>
-          </div>
-        </div>
-      </form>
-    </div>
-    <!-- /CHAT-ROOM -->
-
-    <div role="tabpanel" class="tab-pane" id="chat-viewers-panel">
-      <div id="chat-viewers">
-        <ul style="list-style-type: none; -webkit-column-count: 3; -moz-column-count: 3; column-count: 3; margin: 0;" id="chat-viewers-data"></ul>
+        </form>
       </div>
-    </div>
-    <!-- /VIEWER LIST -->
+      <!-- /CHAT-ROOM -->
 
-
-    <div role="tabpanel" class="tab-pane" id="chat-settings">
-      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('chat')" style="margin-top: 20px;" data-lang="remove-widget"></button>
+      <div role="tabpanel" class="tab-pane" id="chat-viewers-panel">
+        <div id="chat-viewers">
+          <ul style="list-style-type: none; -webkit-column-count: 3; -moz-column-count: 3; column-count: 3; margin: 0;" id="chat-viewers-data"></ul>
+        </div>
+      </div>
+      <!-- /VIEWER LIST -->
     </div>
-    <!-- /SETTINGS -->
   </div>
 </div>
 
