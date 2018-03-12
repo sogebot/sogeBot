@@ -70,13 +70,6 @@
           </a>
           <ul class="dropdown-menu" id="menu-settings"></ul>
         </li>
-        <li class="nav-item dropdown">
-          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-            <span data-lang="menu.integrations"></span>
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu" id="menu-integrations"></ul>
-        </li>
       </ul>
 
       <ul class="navbar-nav mr-auto">
@@ -483,17 +476,20 @@
       /* at first, clear all menu */
       $('#menu-*').empty()
       var systems = false // we want only systems settings once
+      var integrations = false // we want only systems settings once
       var overlays = false // we want only overlays settings once
       _.each(menu, function (obj) {
         if (obj.id !== 'dashboard') {
           if ((obj.id === 'systems') && systems) return
           if ((obj.id === 'overlays') && overlays) return
+          if ((obj.id === 'integrations') && integrations) return
           $('#menu-' + obj.category).append('<li class="nav-item"><a class="nav-link" href="#" data-page="' +
             obj.id + '" data-lang="menu.' + obj.name +
             '"></a></li>')
         }
         if (obj.id === 'systems') systems = true
         if (obj.id === 'overlays') overlays = true
+        if (obj.id === 'integrations') integrations = true
       })
       loadedMenu = true
 

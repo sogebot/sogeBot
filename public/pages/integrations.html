@@ -1,0 +1,12 @@
+<div class="integrations row mt-3">
+  <div class="_load col-sm-6" data-id="spotify"></div>
+  <div class="_load col-sm-6" data-id="donationalerts"></div>
+</div>
+<script>
+
+  // load pages
+  for (let page of $('._load')) {
+    let id = $(page).data('id')
+    $(page).load(`settings/integrations/${id.replace('#', '')}.html`, () => { commons.translate() })
+  }
+</script>
