@@ -40,7 +40,7 @@
           this.socket.emit('toggle.enabled', () => this.getSettings())
         }
         setVariable (key) {
-          const value = commons.cleanResponseText($(`abbr[data-id='${key}']`).data('value'))
+          const value = commons.cleanResponseText(commons.unhash($(`abbr[data-id='${key}']`).data('value')))
           this.socket.emit('set.variable', { key: key, value: value }, (err, value) => {
             if (err) return console.debug(err)
             $(`[data-id='${key}']`).text(value).focus().blur()
