@@ -1,81 +1,81 @@
 'use strict'
 
 // 3rdparty libraries
-const snekfetch = require('snekfetch')
 const _ = require('lodash')
-
-const config = require('../../config.json')
+const io = require('socket.io-client')
+const debug = require('debug')
+const chalk = require('chalk')
 
 class Streamlabs {
   constructor () {
-    if (global.commons.isIntegrationEnabled(this)) {
-      if (!config.integrations.streamlabs.oauth.match(/oauth:[\w]*/)) {
-        console.error('Streamlabs oauth is not correct, disabling')
-        return
-      }
+    this.collection = 'integrations.streamlabs'
+    this.socket = null
 
-      this.connect()
-    }
-  }
+    global.panel.addMenu({category: 'main', name: 'integrations', id: 'integrations'})
 
-  async connect () {
-    let accessTokenFromDb = await global.db.engine.findOne('integrations.streamlabs', { key: 'accessToken' })
-    let refreshTokenFromDb = await global.db.engine.findOne('integrations.streamlabs', { key: 'refreshToken' })
-
-    if (_.isNil(accessTokenFromDb.value)) {
-      // get tokens
-      let tokens = await snekfetch
-        .post('https://streamlabs.com/api/v1.0/token')
-        .send({
-          grant_type: 'authorization_code',
-          client_id: 'uG8feqO86Gc8N0fOqiuZGYGsOBp2ronnjHKILOcR',
-          client_secret: '014i1cwixvI4ICyoZE7707i5qsPKftOMKyGv9sz3',
-          redirect_uri: 'http://oauth.sogehige.tv/',
-          code: config.integrations.streamlabs.oauth.replace('oauth:', '').trim()
-        })
-      this.refreshToken = tokens.body.refresh_token
-      this.accessToken = tokens.body.access_token
-      await Promise.all([
-        global.db.engine.update('integrations.streamlabs', { key: 'accessToken' }, { value: this.accessToken }),
-        global.db.engine.update('integrations.streamlabs', { key: 'refreshToken' }, { value: this.refreshToken })
-      ])
-      setTimeout(() => this.refresh(), 300000) // init token refresh
-      this.connectSocket() // connect socket
-    } else {
-      this.refreshToken = refreshTokenFromDb.value
-      this.accessToken = accessTokenFromDb.value
-      await this.refresh() // refresh instantly
-      this.connectSocket() // connect socket
-    }
-  }
-
-  async connectSocket () {
-    let token = await snekfetch.get('https://streamlabs.com/api/v1.0/socket/token', { query: { access_token: this.accessToken } })
-    this.socketToken = token.body.socket_token
-    this.socket = require('socket.io-client').connect('https://sockets.streamlabs.com?token=' + this.socketToken)
+    this.status({ connect: true })
     this.sockets()
   }
 
-  async refresh () {
-    let tokens = await snekfetch
-      .post('https://streamlabs.com/api/v1.0/token')
-      .send({
-        grant_type: 'refresh_token',
-        client_id: 'uG8feqO86Gc8N0fOqiuZGYGsOBp2ronnjHKILOcR',
-        client_secret: '014i1cwixvI4ICyoZE7707i5qsPKftOMKyGv9sz3',
-        redirect_uri: 'http://oauth.sogehige.tv/',
-        refresh_token: this.refreshToken
-      })
-    this.accessToken = tokens.body.access_token
-    this.refreshToken = tokens.body.refresh_token
-    await Promise.all([
-      global.db.engine.update('integrations.streamlabs', { key: 'accessToken' }, { value: this.accessToken }),
-      global.db.engine.update('integrations.streamlabs', { key: 'refreshToken' }, { value: this.refreshToken })
-    ])
-    setTimeout(() => this.refresh(), 300000)
+  get enabled () {
+    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne(this.collection, { key: 'enabled' }), 'value', false)))
+  }
+  set enabled (v) {
+    (async () => {
+      v = !!v // force boolean
+      await global.db.engine.update(this.collection, { key: 'enabled' }, { value: v })
+      if (!v) this.disconnect()
+      if (v) this.status({ connect: true })
+    })()
   }
 
-  async sockets () {
+  get socketToken () {
+    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne(this.collection, { key: 'socketToken' }), 'value', null)))
+  }
+  set socketToken (v) {
+    this.enabled = false
+    global.db.engine.update(this.collection, { key: 'socketToken' }, { value: _.isNil(v) || v.trim().length === 0 ? null : v })
+  }
+
+  sockets () {
+    const d = debug('streamlabs:sockets')
+    const io = global.panel.io.of('/integrations/streamlabs')
+
+    io.on('connection', (socket) => {
+      d('Socket /integrations/streamlabs connected, registering sockets')
+      socket.on('settings', async (callback) => {
+        callback(null, {
+          socketToken: await this.socketToken,
+          enabled: await this.status({ log: false, connect: false })
+        })
+      })
+      socket.on('toggle.enabled', async (cb) => {
+        let enabled = await this.enabled
+        this.enabled = !enabled
+        cb(null, !enabled)
+      })
+      socket.on('set.variable', async (data, cb) => {
+        try {
+          this[data.key] = data.value
+        } catch (e) {
+          console.error(e)
+        }
+        cb(null, data.value)
+      })
+    })
+  }
+
+  async disconnect () {
+    if (!_.isNil(this.socket)) this.socket.close().off()
+  }
+
+  async connect () {
+    this.disconnect()
+    this.socket = io.connect('https://sockets.streamlabs.com?token=' + (await this.socketToken))
+
+    this.socket.on('disconnect', () => global.log.info('Streamlabs socket disconnected'))
+    this.socket.on('connect', () => global.log.info('Streamlabs socket connected'))
+
     this.socket.on('event', (eventData) => {
       if (eventData.type === 'donation') {
         for (let event of eventData.message) {
@@ -90,6 +90,22 @@ class Streamlabs {
         }
       }
     })
+  }
+
+  async status (options) {
+    options = _.defaults(options, { log: true, connect: false })
+    const d = debug('streamlabs:status')
+    let [enabled, socketToken] = await Promise.all([this.enabled, this.socketToken])
+    d(enabled, socketToken)
+    enabled = !(_.isNil(socketToken)) && enabled
+
+    let color = enabled ? chalk.green : chalk.red
+    if (options.log) global.log.info(`${color(enabled ? 'ENABLED' : 'DISABLED')}: Streamlabs Integration`)
+
+    if (options.connect) {
+      enabled ? this.connect() : this.disconnect()
+    }
+    return enabled
   }
 }
 

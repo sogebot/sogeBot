@@ -45,11 +45,6 @@
     "commercial": true
   },
   "integrations": {
-    "streamlabs": {
-      "__COMMENT__": "get streamlabs oauth at http://oauth.sogehige.tv",
-      "enabled": false,
-      "oauth": "paste_your_oauth_here"
-    },
     "twitter": {
       "enabled": false,
       "user": "YourTwitterUserName",
