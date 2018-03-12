@@ -1267,10 +1267,6 @@
       ev.preventDefault()
       let widget = $(ev.currentTarget).attr('href').split('#')[1]
       window.open($(ev.currentTarget).attr('href'),widget,'height=600,width=600');
-      $(`#${widget}`).css('opacity', '0.2')
-      $(`#${widget}`).css('max-height', '40px')
-      $(`#${widget}`).css('overflow', 'hidden')
-      $(`#${widget}`).after('<strong class="text-primary text-center" style="position: relative; left: 10px; top: -32px">Shown as popout - refresh to show widget</i></strong>')
     })
   </script>
 </body>
