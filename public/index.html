@@ -532,16 +532,16 @@
       })
       $('.grid-stack').off('change').on('change', function(event, items) {
         let widgets = []
-        for (let item of items) {
+        for (let item of $('.grid-stack-item')) {
           widgets.push({
-            id: item.el[0].id.split('-')[1],
+            id: $(item).attr('id').split('-')[1],
             position: {
-              x: item.x,
-              y: item.y
+              x: $(item).attr('data-gs-x'),
+              y: $(item).attr('data-gs-y')
             },
             size: {
-              height: item.height,
-              width: item.width
+              height: $(item).attr('data-gs-height'),
+              width: $(item).attr('data-gs-width')
             }
           })
         }
