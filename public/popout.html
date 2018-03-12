@@ -19,9 +19,25 @@
   <link rel="stylesheet" href="../dist/bootstrap-toggle/css/bootstrap-toggle.min.css" />
   <link rel="stylesheet" href="../dist/bootstrap-slider/css/bootstrap-slider.min.css" />
   <script src="/socket.io/socket.io.js"></script>
+
+  <style>
+    html {
+      height: 100%;
+    }
+
+    #widget {
+      height:100%
+    }
+
+    .card, .widget {
+      border: 0;
+    }
+
+    .card
+  </style>
 </head>
 
-<body style="padding-top: 0">
+<body style="padding-top: 0; height: 100%; width: 100%">
   <div id="widget"> </div>
 
   <!-- jQuery and Popper (necessary for Bootstrap's JavaScript plugins) -->
@@ -48,6 +64,12 @@
 
     var translations = {}
 
+
+    socket.emit('getConfiguration')
+    socket.on('configuration', function (data) {
+      moment.locale(data.lang) // set moment locale
+    })
+
     socket.on('lang', function (data) {
       translations = data
       let elements = $('[data-lang]')
@@ -66,15 +88,13 @@
     page('/', function(p){
       const id = p.hash.length === 0 ? 'dashboard' : p.hash
       // load widget
-      $('#widget').append($('<div id="widget">')
+      $('#widget')
         .load('../widgets/' +
           p.hash + '.html',
           function () {
-            $('[data-lang="remove-widget"]').remove()
             $('.widget-popout').remove()
-            setInterval(() => $('.tab-pane').removeAttr('style'), 100)
             commons.translate()
-          }))
+          })
     })
     page({ popstate:true })
   </script>

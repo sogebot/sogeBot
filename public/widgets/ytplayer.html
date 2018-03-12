@@ -12,11 +12,6 @@
         <i class="fas fa-music" aria-hidden="true"></i>
       </a>
     </li>
-    <li role="presentation" class="nav-item">
-      <a class="nav-link" href="#yt-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-        <i class="fas fa-cog" aria-hidden="true"></i>
-      </a>
-    </li>
   </ul>
 
   <!-- Tab panes -->
@@ -74,10 +69,6 @@
       <table id="songRequestsWidget" class="table table-condensed"></table>
     </div>
     <!-- /YT-SONG-REQUESTS -->
-    <div role="tabpanel" class="tab-pane" id="yt-settings">
-      <button type="button" class="btn btn-danger btn-block" onclick="deleteWidget('ytplayer')" style="margin-top: 20px;" data-lang="remove-widget"></button>
-    </div>
-    <!-- /SETTINGS -->
 
     <div class="clearfix"></div>
   </div>
@@ -94,7 +85,7 @@
                 'type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="50" />')
     $('#volumeSlider').detach()
     $('#volumeSliderContainer').empty().append(vol)
-    $('#volumeSlider').slider({
+    $('#volumeSlider').bootstrapSlider({
       reversed: true,
       value: data.songs_volume,
       formatter: function (value) {

@@ -206,6 +206,7 @@ a.active {
 
 .widgets {
   padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 
@@ -226,12 +227,19 @@ a.active {
 }
 
 .widget {
-  min-height: 30px;
+  overflow: hidden;
   color: $gray-700;
   background: $white;
-  border-radius: 4px;
-  margin-bottom: 10px;
+  padding: 0;
+  height: 100%;
+  width: 100%;
   border: 1px solid $gray-400
+}
+
+.widget .card-body {
+  padding: 0;
+  height: 100%;
+  padding-top: 44px;
 }
 
 .widget > h6 {
@@ -325,19 +333,6 @@ span.title.title-part.text-default + div.widget {
   text-align: center;
 }
 
-#widgets div > span.fas, #widgets-close a > span.fas, #widgets div > span.far, #widgets-close a > span.far, #widgets div > span.fab, #widgets-close a > span.fab {
-  font-size: 80px;
-}
-
-#widgets a {
-  font-size: 30px;
-  display:inline-block
-}
-
-#widgets a:hover {
-  text-decoration: none;
-}
-
 #widgets a:hover span {
   color: $blue !important;
   text-decoration: none;
@@ -345,6 +340,10 @@ span.title.title-part.text-default + div.widget {
 
 .widget .table {
   margin-bottom: 0;
+}
+
+.widget .tab-content, .widget .tab-pane.active {
+  height: 100%;
 }
 
 .widget .table tr:first-child > td {
@@ -362,10 +361,6 @@ span.title.title-part.text-default + div.widget {
 
 #wGAS dl {
   margin: 0;
-}
-
-#twitchVideoWidget iframe {
-  height: 315px;
 }
 
 #yt-song-requests {
@@ -399,7 +394,8 @@ span.title.title-part.text-default + div.widget {
  }
 
 #chat-room iframe {
-  height: 600px;
+  height: 100%;
+  padding-bottom: 40px;
 }
 #chat-room iframe > .chat-header {
   display: none !important;
@@ -1101,6 +1097,13 @@ blockquote {
 .nav-btn {
   height: 100%;
   border: 0 !important;
+}
+
+.nav-dropdown {
+  color: $blue !important;
+}
+.nav-dropdown[aria-expanded=true] {
+  color: $white !important;
 }
 
 /* animations */
