@@ -167,7 +167,7 @@ function main () {
 
         const user = await global.users.get(sender.username)
         if (!_.isNil(user.id)) global.users.isFollower(user.username)
-        if (!message.startsWith('!') && global.twitch.isOnline()) global.db.engine.increment('users', { username: user.username }, { stats: { messages: 1 } })
+        if (!message.startsWith('!') && global.twitch.isOnline) global.db.engine.increment('users', { username: user.username }, { stats: { messages: 1 } })
 
         // set is.mod
         global.users.set(user.username, { is: { mod: sender.mod } })
