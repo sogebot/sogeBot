@@ -27,31 +27,38 @@ function Parser () {
   this.timer = []
 
   this.messages = []
+}
 
-  var self = this
-  setInterval(function () {
-    _.each(queue, function (val, id) {
-      if (queue.hasOwnProperty(id) && queue[id].success === queue[id].started && queue[id].startedAll) {
-        self.parseCommands(queue[id].user, queue[id].message, queue[id].skip)
+Parser.prototype.runQueue = async function () {
+  this.queueRunning = true
+  try {
+    for (let [id, item] of Object.entries(queue)) {
+      if (item.success === item.started && item.startedAll) {
+        this.parseCommands(item.user, item.message, item.skip)
+        global.removeFromQueue(id)
 
-        if (!_.isUndefined(queue[id].user.id)) {
-          const index = _.findIndex(global.parser.timer, function (o) { return o.id === queue[id].user.id })
-          if (!_.isUndefined(global.parser.timer[index])) global.parser.timer[index].sent = new Date().getTime()
+        if (!_.isNil(item.user.id)) {
+          const index = _.findIndex(global.parser.timer, function (o) { return o.id === item.user.id })
+          if (!_.isNil(global.parser.timer[index])) global.parser.timer[index].sent = new Date().getTime()
           if (global.parser.timer.length > 100) {
             global.parser.timer.shift()
           }
           let avgTime = 0
           let length = global.parser.timer.length
           for (var i = 0; i < length; i++) {
-            if (_.isUndefined(global.parser.timer[i].sent)) continue
+            if (_.isNil(global.parser.timer[i].sent)) continue
             avgTime += global.parser.timer[i].sent - global.parser.timer[i].received
           }
           global.status['RES'] = (avgTime / length).toFixed(0)
         }
-        global.removeFromQueue(id)
       }
-    })
-  }, 100)
+    }
+  } catch (e) {
+    global.log.error(e.stack)
+  } finally {
+    if (_.size(queue) > 0) setTimeout(() => this.runQueue(), 5)
+    else this.queueRunning = false
+  }
 }
 
 Parser.prototype.parse = async function (user, message, skip, isUserIgnored) {
@@ -99,6 +106,8 @@ Parser.prototype.addToQueue = async function (user, message, skip, isUserIgnored
     }
   }
   if (!_.isNil(queue[id])) queue[id].startedAll = true // set to startedAll if queue is still existing (didn't fail)
+
+  if (!global.parser.queueRunning) global.parser.runQueue()
 }
 
 Parser.prototype.parseCommands = async function (user, message, skip, isUserIgnored) {
