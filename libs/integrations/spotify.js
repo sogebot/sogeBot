@@ -64,7 +64,7 @@ class Spotify {
         this.accessToken = data.body['access_token']
       }
     } catch (e) {
-      global.log.error(e.stack)
+      global.log.error('Spotify refresh token failed')
     }
     setTimeout(() => this.IRefreshToken(), 60000)
   }
@@ -182,11 +182,7 @@ class Spotify {
         cb(null, !enabled)
       })
       socket.on('set.variable', async (data, cb) => {
-        try {
-          this[data.key] = data.value
-        } catch (e) {
-          console.error(e)
-        }
+        this[data.key] = data.value
         cb(null, data.value)
       })
       socket.on('authorize', async (cb) => {
