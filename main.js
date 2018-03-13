@@ -159,8 +159,7 @@ function main () {
       if (sender['message-type'] !== 'whisper') {
         global.parser.timer.push({ 'id': sender.id, 'received': new Date().getTime() })
         global.parser.parse(sender, message, false, isUserIgnored)
-        let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: sender.username })
-        if (!_.isEmpty(ignoredUser) && sender.username !== config.settings.broadcaster_username) return
+        if (isUserIgnored) return
 
         global.log.chatIn(message, {username: sender.username})
         global.events.fire('command-send-x-times', { username: sender.username, message: message })
