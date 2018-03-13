@@ -5,8 +5,6 @@ const _ = require('lodash')
 const debug = require('debug')
 const chalk = require('chalk')
 
-const config = require('../../config.json')
-
 class Donationalerts {
   constructor () {
     this.collection = 'integrations.donationalerts'
@@ -51,7 +49,8 @@ class Donationalerts {
           reconnectionAttempts: Infinity
         })
     } else this.socket.connect()
-    this.socket.emit('add-user', {token: config.integrations.donationalerts.secretToken, type: 'minor'})
+
+    this.socket.emit('add-user', {token: (await this.clientSecret), type: 'minor'})
     this.socket.off('donation').on('donation', (data) => {
       data = JSON.parse(data)
       if (parseInt(data.alert_type, 10) !== 1) return
