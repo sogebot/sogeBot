@@ -45,7 +45,7 @@
     "popper.js": "^1.14.0",
     "request": "^2.85.0",
     "safe-eval": "^0.3.0",
-    "snekfetch": "4.0.0-beta.0",
+    "snekfetch": "3.6.4",
     "socket.io": "^2.0.4",
     "sortablejs": "^1.7.0",
     "spotify-web-api-node": "^3.0.0",
