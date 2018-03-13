@@ -1276,6 +1276,10 @@ blockquote {
   font-family: 'PT Sans Narrow', sans-serif;
 }
 
-.btn-secondary, .btn-light {
+.btn-secondary, .btn-secondary:hover {
   color: $white
+}
+
+.btn-light, .btn-light:hover {
+  color: $black
 }
