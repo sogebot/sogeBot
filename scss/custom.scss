@@ -1276,10 +1276,10 @@ blockquote {
   font-family: 'PT Sans Narrow', sans-serif;
 }
 
-.btn-secondary, .btn-secondary:hover {
+.btn-secondary, .btn-secondary:hover, .btn-secondary:not(:disabled):not(.disabled):active, .btn-secondary:not(:disabled):not(.disabled).active, .show > .btn-secondary.dropdown-toggle {
   color: $white
 }
 
-.btn-light, .btn-light:hover {
+.btn-light, .btn-light:hover, .btn-light:not(:disabled):not(.disabled):active, .btn-light:not(:disabled):not(.disabled).active, .show > .btn-light.dropdown-toggle {
   color: $black
 }
