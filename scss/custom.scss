@@ -1275,3 +1275,7 @@ blockquote {
 .btn {
   font-family: 'PT Sans Narrow', sans-serif;
 }
+
+.btn-secondary, .btn-light {
+  color: $white
+}
