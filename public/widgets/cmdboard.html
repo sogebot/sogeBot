@@ -1,4 +1,4 @@
-<div class="widget">
+<div class="card widget">
   <h6 data-lang="widget-title-cmdboard"></h6>
   <ul class="nav nav-pills" role="tablist">
     <li role="presentation" class="nav-item">
@@ -14,31 +14,31 @@
   </ul>
 
   <!-- Tab panes -->
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="cmdboard-main">
-      <div class="queue-list-group row" id="cmdboard-list">
+  <div class="card-body">
+    <div class="tab-content">
+      <div role="tabpanel" style="overflow: auto" class="tab-pane active" id="cmdboard-main">
+        <div class="list-group" id="cmdboard-list"></div>
       </div>
-      <div class="clearfix"></div>
-    </div>
-    <!-- /MAIN -->
+      <!-- /MAIN -->
 
-    <div role="tabpanel" class="tab-pane" id="cmdboard-settings">
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text" data-lang="name"></span>
+      <div role="tabpanel" class="tab-pane" id="cmdboard-settings">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" data-lang="name"></span>
+          </div>
+          <input type="text" class="form-control" id="cmdboard-name">
         </div>
-        <input type="text" class="form-control" id="cmdboard-name">
-      </div>
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text" data-lang="command"></span>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" data-lang="command"></span>
+          </div>
+          <input type="text" class="form-control" id="cmdboard-command">
         </div>
-        <input type="text" class="form-control" id="cmdboard-command">
-      </div>
 
-      <button type="button" class="btn btn-success btn-block" onclick="cmdboard.add()" data-lang="confirm"></button>
+        <button type="button" class="btn btn-success btn-block" onclick="cmdboard.add()" data-lang="confirm"></button>
+      </div>
+      <!-- /SETTINGS -->
     </div>
-    <!-- /SETTINGS -->
   </div>
 </div>
 
@@ -62,44 +62,21 @@
       ev.preventDefault()
       socket.emit('cmdboard.widget.run', el.dataset.name)
     },
-    resize: function () {
-      _.each($(".cmdboard-list-group-item"), function (el) {
-        $(el).css('font-size', '18px')
-        cmdboard.resizeEl(el, 18)
-      })
-    },
-    resizeEl: function (el, size) {
-      if ($(el).height() >= ((2 * size) / 5 + (98 / 5))) {
-        $(el).css('font-size', (size - 1) + 'px')
-        $(el).css('top', Math.round((3 * size) / 7 - 57 / 7) + 'px')
-        if ($(el).height() >= ((2 * size) / 5 + (98 / 5))) {
-          cmdboard.resizeEl(el, size - 1)
-        }
-      }
-    }
   }
 
   socket.emit('cmdboard.widget.fetch')
 
   socket.off('cmdboard.widget.data')
-  socket.on('cmdboard.widget.data', function (data) {
+  socket.on('cmdboard.widget.data', function (cb) {
     $("#cmdboard-list").empty()
-    let i = 0;
-    _.each(data, function (name) {
-      $("#cmdboard-list").append(
-        '<div class="col-4"><button style="border: 0" class="btn btn-outline-secondary cmdboard-list-group-item" data-name="' +
-        name.text +
-        '" onclick="cmdboard.emit(event, this)" type="button"><span>' +
-        name.text + '</span></button></div>');
-      i++
-      if (i % 3 === 0) {
-        $("#soundboard-list").append('<div class="w-100"></div>')
-      }
-    })
-    for (; i % 3 == 0; i++) {
-      $("#soundboard-list").append('<div class="col"></div>')
-    }
-    cmdboard.resize()
+    for (let command of cb)
+      $("#cmdboard-list").append(`
+        <button type="button" class="list-group-item list-group-item-action cmdboard-list-group-item" data-name="${command.text}"
+         onclick="cmdboard.emit(event, this)" type="button">
+          ${command.text}
+          <small>${command.command}</small>
+        </button>
+      `)
 
     // deletion right-click menu
     var menu = new BootstrapMenu(".cmdboard-list-group-item", {
@@ -115,9 +92,5 @@
         }
       }]
     })
-  })
-
-  $(window).resize(function () {
-    cmdboard.resize()
   })
 </script>

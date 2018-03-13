@@ -507,13 +507,21 @@ span.queue-list-group-item {
 .soundboard-list-group-item, .cmdboard-list-group-item {
   font-size: 18px;
   font-weight: bold;
-  text-transform: uppercase;
   text-align: center;
   cursor: pointer;
 }
 
+.cmdboard-list-group-item {
+  border-left: 0;
+  border-right: 0;
+  text-align: left;
+  height: 55.3333px;
+}
+
 #soundboard-list button, #cmdboard-list button {
   width: 100%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* MODAL GAME AND TITLE */
