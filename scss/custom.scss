@@ -169,6 +169,10 @@ a.active {
 }
 
 /* WIDGETS */
+.nav-pills {
+  height: 40px;
+}
+
 .nav-pills > li > a {
   border-radius: 0px;
   font-weight: bold;
@@ -236,21 +240,25 @@ a.active {
   border: 1px solid $gray-400
 }
 
+.widget .card-header {
+  padding: 0;
+}
+
 .widget .card-body {
   padding: 0;
   height: 100%;
-  padding-top: 44px;
+  padding-bottom: 40px;
 }
 
-.widget > h6 {
+h6 {
   font-size: .9rem;
-  position:absolute;
   text-transform: uppercase;
-  right: 8%;
   margin-top: 0;
   line-height: 2.6rem;
   font-weight: bold;
   color:$blue;
+  margin-right: .5rem;
+  margin-left: .5rem;
   font-family: 'PT Sans', sans-serif !important;
 
 }
@@ -515,7 +523,7 @@ span.queue-list-group-item {
   border-left: 0;
   border-right: 0;
   text-align: left;
-  height: 55.3333px;
+  height: 56.5px;
 }
 
 #soundboard-list button, #cmdboard-list button {
@@ -1078,12 +1086,11 @@ blockquote {
 
 .eventlist-text {
   font-size: .8rem;
-  text-align: center;
-  display: block;
+  position: relative;
+  top: -2px;
 }
 
 .eventlist-username {
-  display: flex;
   flex-wrap: wrap;
   font-weight: bold;
   color: $gray-700;

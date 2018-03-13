@@ -510,7 +510,7 @@
             <div class="grid-stack-item-content"></div>
           </div>
         `)
-        $(`#widget-${widget.id} .grid-stack-item-content`).load(`widgets/${widget.id}.html`, () => commons.translate())
+        $(`#widget-${widget.id} .grid-stack-item-content`).load(`widgets/${widget.id}.html`, () => commons.translate()).prepend(`<h6 class="widget-title" data-lang="widget-title-cmdboard"></h6>`)
       }
       $('.grid-stack').gridstack({ cellHeight: 45, verticalMargin: 10, removable: true, removeTimeout: 100 })
       $('.grid-stack').off('removed').on('removed', function(event, items) {

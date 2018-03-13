@@ -1,5 +1,5 @@
-<div class="widget">
-    <h6 data-lang="widget-title-bets"></h6>
+<div class="card widget">
+  <div class="card-header">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#bets-templates" aria-controls="home" role="tab" data-toggle="tab" title="Betting templates">
@@ -17,38 +17,44 @@
           <i class="fas fa-cog" aria-hidden="true"></i>
         </a>
       </li>
+      <li class="nav-item ml-auto">
+        <h6 class="widget-title" data-lang="widget-title-bets"></h6>
+      </li>
     </ul>
+  </div>
 
   <!-- Tab panes -->
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="bets-templates">
-    </div> <!-- /BETS-TEMPLATES -->
+  <div class="card-body">
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="bets-templates">
+      </div> <!-- /BETS-TEMPLATES -->
 
-    <div role="tabpanel" class="tab-pane" id="bets-running">
-    </div> <!-- /BETS -->
+      <div role="tabpanel" class="tab-pane" id="bets-running">
+      </div> <!-- /BETS -->
 
-    <div role="tabpanel" class="tab-pane" id="bets-settings">
-      <div class="input-group">
-        <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="close-bet-after"></span>
+      <div role="tabpanel" class="tab-pane" id="bets-settings">
+        <div class="input-group">
+          <div class="input-group-prepend">
+              <span class="input-group-text" data-lang="close-bet-after"></span>
+          </div>
+          <input type="text" class="form-control" id="bets-close-after">
+          <div class="input-group-append">
+              <span class="input-group-text" data-lang="minutes"></span>
+          </div>
         </div>
-        <input type="text" class="form-control" id="bets-close-after">
-        <div class="input-group-append">
-            <span class="input-group-text" data-lang="minutes"></span>
+        <div class="input-group">
+          <div class="input-group-prepend">
+              <span class="input-group-text" data-lang="gain-every-option"></span>
+          </div>
+          <input type="text" class="form-control" id="bets-percent-gain">
+          <div class="input-group-append">
+              <span class="input-group-text">%</span>
+          </div>
         </div>
-      </div>
-      <div class="input-group">
-        <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="gain-every-option"></span>
-        </div>
-        <input type="text" class="form-control" id="bets-percent-gain">
-        <div class="input-group-append">
-            <span class="input-group-text">%</span>
-        </div>
-      </div>
-    </div> <!-- /SETTINGS -->
+      </div> <!-- /SETTINGS -->
 
-    <div class="clearfix"></div>
+      <div class="clearfix"></div>
+    </div>
   </div>
 </div>
 

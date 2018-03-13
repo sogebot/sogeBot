@@ -1,5 +1,5 @@
-<div class="widget">
-  <h6 data-lang="widget-title-queue"></h6>
+<div class="card widget">
+  <div class="card-header">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="active nav-link" href="#queue-main" aria-controls="home" role="tab" data-toggle="tab" title="Queue">
@@ -12,32 +12,38 @@
           <i class="fas fa-user" aria-hidden="true"></i>
         </a>
       </li>
+      <li class="nav-item ml-auto">
+        <h6 class="widget-title" data-lang="widget-title-queue"></h6>
+      </li>
     </ul>
+  </div>
 
   <!-- Tab panes -->
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="queue-main">
-      <div class="input-group" style="width: 100.1%">
-        <span class="input-group-btn">
-          <button class="btn btn-success" type="button" title="Open queue" onclick="queue.toggleLocked()" id="queue-toggle-btn"></button>
-        </span>
-        <div class="input-group-prepend">
-          <span class="input-group-text" data-lang="number-of-users"></span>
+  <div class="card-body">
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="queue-main">
+        <div class="input-group" style="width: 100.1%">
+          <span class="input-group-btn">
+            <button class="btn btn-success" type="button" title="Open queue" onclick="queue.toggleLocked()" id="queue-toggle-btn"></button>
+          </span>
+          <div class="input-group-prepend">
+            <span class="input-group-text" data-lang="number-of-users"></span>
+          </div>
+          <input type="number" class="form-control" placeholder="How many users should be picked?" min="1" value="1" style="text-align:right" id="queue-pick-count">
+
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" title="Pick from queue" onclick="queue.pick()"><i class="fas fa-user-secret" aria-hidden="true"></i></button>
+            <button class="btn btn-warning" type="button" title="Clear queue" onclick="queue.clear()"><i class="far fa-trash-alt" aria-hidden="true"></i></button>
+          </span>
         </div>
-        <input type="number" class="form-control" placeholder="How many users should be picked?" min="1" value="1" style="text-align:right" id="queue-pick-count">
+      </div> <!-- /MAIN -->
 
-        <span class="input-group-btn">
-          <button class="btn btn-default" type="button" title="Pick from queue" onclick="queue.pick()"><i class="fas fa-user-secret" aria-hidden="true"></i></button>
-          <button class="btn btn-warning" type="button" title="Clear queue" onclick="queue.clear()"><i class="far fa-trash-alt" aria-hidden="true"></i></button>
-        </span>
-      </div>
-    </div> <!-- /MAIN -->
+      <div role="tabpanel" class="tab-pane" id="queue-pick">
+        <div id="queue-pick-list"></div>
+      </div> <!-- /PICK -->
 
-    <div role="tabpanel" class="tab-pane" id="queue-pick">
-      <div id="queue-pick-list"></div>
-    </div> <!-- /PICK -->
-
-    <div class="clearfix"></div>
+      <div class="clearfix"></div>
+    </div>
   </div>
 </div>
 

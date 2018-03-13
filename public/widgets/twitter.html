@@ -1,30 +1,34 @@
-<div class="widget">
-  <h6 data-lang="widget-title-twitter"></h6>
-  <ul class="nav nav-pills" role="tablist">
-    <li role="presentation" class="nav-item">
-      <a class="nav-link active" href="#twitter-main" aria-controls="home" role="tab" data-toggle="tab" title="Send a twitch status">
-        <i class="fab fa-twitter" aria-hidden="true"></i>
-      </a>
-    </li>
-  </ul>
+<div class="card widget">
+  <div class="card-header">
+    <ul class="nav nav-pills" role="tablist">
+      <li role="presentation" class="nav-item">
+        <a class="nav-link active" href="#twitter-main" aria-controls="home" role="tab" data-toggle="tab" title="Send a twitch status">
+          <i class="fab fa-twitter" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li class="nav-item ml-auto">
+        <h6 class="widget-title" data-lang="widget-title-twitter"></h6>
+      </li>
+    </ul>
+  </div>
 
   <!-- Tab panes -->
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="twitter-main">
-
-
-      <form>
-        <div class="form-row">
-          <div class="col">
-            <input type="text" id="twitterInput" class="form-control" />
+  <div class="card-body">
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="twitter-main">
+        <form>
+          <div class="form-row">
+            <div class="col">
+              <input type="text" id="twitterInput" class="form-control" />
+            </div>
+            <div class="col-auto">
+              <button id="twitterInputSubmit" class="form-control btn btn-primary">Tweet</button>
+            </div>
           </div>
-          <div class="col-auto">
-            <button id="twitterInputSubmit" class="form-control btn btn-primary">Tweet</button>
-          </div>
-        </div>
-      </form>
+        </form>
+      </div>
+      <!-- /MAIN -->
     </div>
-    <!-- /MAIN -->
   </div>
 </div>
 

@@ -1,177 +1,183 @@
-<div class="widget">
-  <h6 data-lang="widget-title-raffles"></h6>
-  <ul class="nav nav-pills" role="tablist">
-    <li role="presentation" class="nav-item">
-      <a class="nav-link" href="#raffles-participants" aria-controls="home" role="tab" data-toggle="tab" title="Participants">
-        <span id="raffles-participants-count">0</span>
-        <i class="fas fa-users" aria-hidden="true"></i>
-      </a>
-    </li>
-    <li role="presentation" class="nav-item">
-      <a class="nav-link active" href="#raffles-giveaway" aria-controls="home" role="tab" data-toggle="tab" title="Giveaway">
-        <i class="fas fa-gift" aria-hidden="true"></i>
-      </a>
-    </li>
-    <li role="presentation" class="nav-item">
-      <a class="nav-link" href="#raffles-winner" aria-controls="home" role="tab" data-toggle="tab" title="Last winner" style="display:none">
-        <i class="fas fa-trophy" aria-hidden="true"></i>
-        <span class="raffles-winner-name"></span>
-      </a>
-    </li>
-    <li role="presentation" class="nav-item">
-      <a class="nav-link" href="#raffles-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-        <i class="fas fa-cog" aria-hidden="true"></i>
-      </a>
-    </li>
-  </ul>
+<div class="card widget">
+  <div class="card-header">
+    <ul class="nav nav-pills" role="tablist">
+      <li role="presentation" class="nav-item">
+        <a class="nav-link" href="#raffles-participants" aria-controls="home" role="tab" data-toggle="tab" title="Participants">
+          <span id="raffles-participants-count">0</span>
+          <i class="fas fa-users" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li role="presentation" class="nav-item">
+        <a class="nav-link active" href="#raffles-giveaway" aria-controls="home" role="tab" data-toggle="tab" title="Giveaway">
+          <i class="fas fa-gift" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li role="presentation" class="nav-item">
+        <a class="nav-link" href="#raffles-winner" aria-controls="home" role="tab" data-toggle="tab" title="Last winner" style="display:none">
+          <i class="fas fa-trophy" aria-hidden="true"></i>
+          <span class="raffles-winner-name"></span>
+        </a>
+      </li>
+      <li role="presentation" class="nav-item">
+        <a class="nav-link" href="#raffles-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+          <i class="fas fa-cog" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li class="nav-item ml-auto">
+        <h6 class="widget-title" data-lang="widget-title-raffles"></h6>
+      </li>
+    </ul>
+  </div>
 
   <!-- Tab panes -->
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane" id="raffles-participants">
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search..." id="rafflesWidgetSearch" onkeyup="raffles.search(this)">
-        <span class="input-group-btn">
-          <button class="btn btn-muted" type="button" title="Cancel search" onclick="raffles.clean()">
-            <i class="fas fa-close" aria-hidden="true"></i>
-          </button>
-        </span>
-      </div>
-      <ul class="list-unstyled" id="raffles-participants-list"></ul>
-    </div>
-    <!-- /PARTICIPANTS -->
-
-    <div role="tabpanel" class="tab-pane active" id="raffles-giveaway">
-      <div class="input-group">
-        <div class="input-group-prepend">
-            <span class="input-group-text">!</span>
+  <div class="card-body">
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane" id="raffles-participants">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Search..." id="rafflesWidgetSearch" onkeyup="raffles.search(this)">
+          <span class="input-group-btn">
+            <button class="btn btn-muted" type="button" title="Cancel search" onclick="raffles.clean()">
+              <i class="fas fa-close" aria-hidden="true"></i>
+            </button>
+          </span>
         </div>
-        <input type="text" class="form-control" placeholder="Enter keyword..." id="rafflesWidgetKeyword">
-        <span class="input-group-btn">
-          <button class="btn btn-success" id="openBtn" type="button" title="" onclick="raffles.open()">
-              <i class="fas fa-plus" aria-hidden="true"></i>
-          </button>
-          <button class="btn btn-danger" style="display: none" id="removeBtn" type="button" title="" onclick="raffles.remove()">
-            <i class="fas fa-times"></i>
-          </button>
-        </span>
+        <ul class="list-unstyled" id="raffles-participants-list"></ul>
       </div>
+      <!-- /PARTICIPANTS -->
 
-      <div class="row">
-        <div class="col">
-          <button type="button" class="btn btn-default btn-label" disabled="disabled" data-lang="eligible-to-enter"></button>
-        </div>
-        <div class="w-100"></div>
-        <div class="col text-center">
-          <div class="btn-group" role="group">
-            <button type="button" class="btn btn-outline-danger" id="followersCheckbox" onclick="raffles.toggleBtn(this)" data-lang="followers"></button>
-            <button type="button" class="btn btn-outline-danger" id="subscribersCheckbox" onclick="raffles.toggleBtn(this)" data-lang="subscribers"></button>
-            <button type="button" class="btn btn-outline-success" id="everyoneCheckbox" onclick="raffles.toggleBtn(this)" data-lang="everyone"></button>
+      <div role="tabpanel" class="tab-pane active" id="raffles-giveaway">
+        <div class="input-group">
+          <div class="input-group-prepend">
+              <span class="input-group-text">!</span>
           </div>
+          <input type="text" class="form-control" placeholder="Enter keyword..." id="rafflesWidgetKeyword">
+          <span class="input-group-btn">
+            <button class="btn btn-success" id="openBtn" type="button" title="" onclick="raffles.open()">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+            </button>
+            <button class="btn btn-danger" style="display: none" id="removeBtn" type="button" title="" onclick="raffles.remove()">
+              <i class="fas fa-times"></i>
+            </button>
+          </span>
         </div>
-      </div>
 
-      <div class="row">
-        <div class="col">
-          <button type="button" class="btn btn-default btn-label" disabled="disabled" data-lang="raffle-type"></button>
-        </div>
-        <div class="w-100"></div>
-        <div class="col text-center">
-          <div class="btn-group" role="group">
-            <button type="button" class="btn btn-outline-primary" id="keywordRadio" onclick="raffles.toggleBtn(this)" data-lang="raffle-type-keywords"></button>
-            <button type="button" class="btn btn-outline-dark" id="ticketsRadio" onclick="raffles.toggleBtn(this)" data-lang="raffle-type-tickets"></button>
+        <div class="row">
+          <div class="col">
+            <button type="button" class="btn btn-default btn-label" disabled="disabled" data-lang="eligible-to-enter"></button>
           </div>
-        </div>
-      </div>
-
-      <div class="row" id="tickets-settings" style="display:none">
-        <div class="col">
-          <button type="button" class="btn btn-default btn-label" disabled data-lang="raffle-tickets-range"></button>
-        </div>
-        <div class="w-100"></div>
-        <div class="col" style="padding-right:0;">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text">min</span>
+          <div class="w-100"></div>
+          <div class="col text-center">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-outline-danger" id="followersCheckbox" onclick="raffles.toggleBtn(this)" data-lang="followers"></button>
+              <button type="button" class="btn btn-outline-danger" id="subscribersCheckbox" onclick="raffles.toggleBtn(this)" data-lang="subscribers"></button>
+              <button type="button" class="btn btn-outline-success" id="everyoneCheckbox" onclick="raffles.toggleBtn(this)" data-lang="everyone"></button>
             </div>
-            <input type="number" class="form-control" placeholder="0" id="minTickets" min="0">
           </div>
         </div>
-        <div class="col" style="padding-left:0;">
-          <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">max</span>
+
+        <div class="row">
+          <div class="col">
+            <button type="button" class="btn btn-default btn-label" disabled="disabled" data-lang="raffle-type"></button>
+          </div>
+          <div class="w-100"></div>
+          <div class="col text-center">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-outline-primary" id="keywordRadio" onclick="raffles.toggleBtn(this)" data-lang="raffle-type-keywords"></button>
+              <button type="button" class="btn btn-outline-dark" id="ticketsRadio" onclick="raffles.toggleBtn(this)" data-lang="raffle-type-tickets"></button>
             </div>
-            <input type="number" class="form-control" placeholder="100" id="maxTickets" min="0">
+          </div>
+        </div>
+
+        <div class="row" id="tickets-settings" style="display:none">
+          <div class="col">
+            <button type="button" class="btn btn-default btn-label" disabled data-lang="raffle-tickets-range"></button>
+          </div>
+          <div class="w-100"></div>
+          <div class="col" style="padding-right:0;">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">min</span>
+              </div>
+              <input type="number" class="form-control" placeholder="0" id="minTickets" min="0">
+            </div>
+          </div>
+          <div class="col" style="padding-left:0;">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                  <span class="input-group-text">max</span>
+              </div>
+              <input type="number" class="form-control" placeholder="100" id="maxTickets" min="0">
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-disabled btn-block" style="margin-top: 20px;" id="raffleWidgetRoll" onclick="raffles.pick()"
+          data-lang="roll-a-winner"></button>
+      </div>
+
+      <!-- /GIVEAWAY -->
+      <div role="tabpanel" class="tab-pane" id="raffles-winner">
+        <div style="text-align: center">
+          <strong style="font-size: 30px">
+            <i class="fab fa-twitch" aria-hidden="true"></i>
+            <span class="raffles-winner-name"></span>
+          </strong>
+        </div>
+
+        <div class="text-center">
+          <div class="btn-group" role="group ">
+            <button type="button" class="btn btn-link" disabled="disabled" id="raffleWinnerFollowing">
+              <span>
+                <i aria-hidden="true"></i>
+                <span data-lang="follower"></span>
+              </span>
+            </button>
+            <button type="button" class="btn btn-link">
+              <a href="" id="raffleWinnerMessage" target="_blank">
+                <i class="fas fa-envelope" aria-hidden="true"></i>
+                <span data-lang="send-message"></span>
+              </a>
+            </button>
+            <button type="button" class="btn btn-link" onclick="raffles.pick()">
+              <span style="color: gray">
+                <i class="fas fa-refresh" aria-hidden="true"></i>
+                <i data-lang="roll-again"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive" style="margin-top: 0; padding-left: 10px; padding-right: 10px;">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <td colspan="2" style="vertical-align: bottom; font-size: 18px;">
+                  <i class="fas fa-comments-o" aria-hidden="true"></i>
+                  <i data-lang="messages"></i>
+                </td>
+              </tr>
+            </thead>
+            <tbody style="font-size:10px;" id="raffleMessages">
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- /WINNER -->
+      <div role="tabpanel" class="tab-pane" id="raffles-settings">
+        <div class="input-group">
+          <div class="input-group-prepend">
+              <span class="input-group-text" data-lang="announce-every"></span>
+          </div>
+          <input type="text" class="form-control" id="raffleAnnounce">
+          <div class="input-group-append">
+              <span class="input-group-text" data-lang="minutes"></span>
           </div>
         </div>
       </div>
+      <!-- /SETTINGS -->
 
-      <button type="button" class="btn btn-disabled btn-block" style="margin-top: 20px;" id="raffleWidgetRoll" onclick="raffles.pick()"
-        data-lang="roll-a-winner"></button>
+      <div class="clearfix"></div>
     </div>
-
-    <!-- /GIVEAWAY -->
-    <div role="tabpanel" class="tab-pane" id="raffles-winner">
-      <div style="text-align: center">
-        <strong style="font-size: 30px">
-          <i class="fab fa-twitch" aria-hidden="true"></i>
-          <span class="raffles-winner-name"></span>
-        </strong>
-      </div>
-
-      <div class="text-center">
-        <div class="btn-group" role="group ">
-          <button type="button" class="btn btn-link" disabled="disabled" id="raffleWinnerFollowing">
-            <span>
-              <i aria-hidden="true"></i>
-              <span data-lang="follower"></span>
-            </span>
-          </button>
-          <button type="button" class="btn btn-link">
-            <a href="" id="raffleWinnerMessage" target="_blank">
-              <i class="fas fa-envelope" aria-hidden="true"></i>
-              <span data-lang="send-message"></span>
-            </a>
-          </button>
-          <button type="button" class="btn btn-link" onclick="raffles.pick()">
-            <span style="color: gray">
-              <i class="fas fa-refresh" aria-hidden="true"></i>
-              <i data-lang="roll-again"></i>
-            </span>
-          </button>
-        </div>
-      </div>
-
-      <div class="table-responsive" style="margin-top: 0; padding-left: 10px; padding-right: 10px;">
-        <table class="table table-sm">
-          <thead>
-            <tr>
-              <td colspan="2" style="vertical-align: bottom; font-size: 18px;">
-                <i class="fas fa-comments-o" aria-hidden="true"></i>
-                <i data-lang="messages"></i>
-              </td>
-            </tr>
-          </thead>
-          <tbody style="font-size:10px;" id="raffleMessages">
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <!-- /WINNER -->
-    <div role="tabpanel" class="tab-pane" id="raffles-settings">
-      <div class="input-group">
-        <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="announce-every"></span>
-        </div>
-        <input type="text" class="form-control" id="raffleAnnounce">
-        <div class="input-group-append">
-            <span class="input-group-text" data-lang="minutes"></span>
-        </div>
-      </div>
-    </div>
-    <!-- /SETTINGS -->
-
-    <div class="clearfix"></div>
   </div>
 </div>
 

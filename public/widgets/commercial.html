@@ -1,55 +1,62 @@
-<div class="widget">
-  <h6 data-lang="widget-title-commercial"></h6>
-  <ul class="nav nav-pills" role="tablist">
-    <li role="presentation" class="nav-item">
-      <a class="nav-link active" href="#commercial-main" aria-controls="home" role="tab" data-toggle="tab" title="Commercials">
-        <i class="fas fa-dollar-sign" aria-hidden="true"></i>
-      </a>
-    </li>
-  </ul>
+<div class="card widget">
+  <div class="card-header">
+    <ul class="nav nav-pills" role="tablist">
+      <li role="presentation" class="nav-item">
+        <a class="nav-link active" href="#commercial-main" aria-controls="home" role="tab" data-toggle="tab" title="Commercials">
+          <i class="fas fa-dollar-sign" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li class="nav-item ml-auto">
+        <h6 class="widget-title" data-lang="widget-title-commercial"></h6>
+      </li>
+    </ul>
+  </div>
+
   <!-- Tab panes -->
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="commercial-main">
-      <div class="text-center row row-widget">
-        <div class="col col-widget">
-          <button type="button" class="btn btn-outline-secondary btn-widget" data-seconds="30" onclick="commercial.run(this)">
-            <div class="progress" style="text-align: center; background-color: transparent !important; height: 0.4rem">
-              <div class="progress-bar bg-secondary" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>30s</button>
-        </div>
-        <div class="col col-widget">
-          <button type="button" class="btn btn-outline-secondary btn-widget" data-seconds="60" onclick="commercial.run(this)">
-            <div class="progress" style="text-align: center; background-color: transparent !important; height: 0.4rem">
-              <div class="progress-bar bg-secondary" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>60s</button>
-        </div>
-        <div class="col col-widget">
-          <button type="button" class="btn btn-outline-secondary btn-widget" data-seconds="90" onclick="commercial.run(this)">
-            <div class="progress" style="text-align: center; background-color: transparent !important; height: 0.4rem">
-              <div class="progress-bar bg-secondary" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>90s</button>
-        </div>
-        <div class="col col-widget">
-          <button type="button" class="btn btn-outline-secondary btn-widget" data-seconds="120" onclick="commercial.run(this)">
-            <div class="progress" style="text-align: center; background-color: transparent !important; height: 0.4rem">
-              <div class="progress-bar bg-secondary" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>120s</button>
-        </div>
-        <div class="col col-widget">
-          <button type="button" class="btn btn-outline-secondary btn-widget" data-seconds="150" onclick="commercial.run(this)">
-            <div class="progress" style="text-align: center; background-color: transparent !important; height: 0.4rem">
-              <div class="progress-bar bg-secondary" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>150s</button>
-        </div>
-        <div class="col col-widget">
-          <button type="button" class="btn btn-outline-secondary btn-widget" data-seconds="180" onclick="commercial.run(this)">
-            <div class="progress" style="text-align: center; background-color: transparent !important; height: 0.4rem">
-              <div class="progress-bar bg-secondary" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>180s</button>
+  <div class="card-body">
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="commercial-main">
+        <div class="text-center row row-widget">
+          <div class="col col-widget">
+            <button type="button" class="btn btn-outline-secondary btn-widget" data-seconds="30" onclick="commercial.run(this)">
+              <div class="progress" style="text-align: center; background-color: transparent !important; height: 0.4rem">
+                <div class="progress-bar bg-secondary" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>30s</button>
+          </div>
+          <div class="col col-widget">
+            <button type="button" class="btn btn-outline-secondary btn-widget" data-seconds="60" onclick="commercial.run(this)">
+              <div class="progress" style="text-align: center; background-color: transparent !important; height: 0.4rem">
+                <div class="progress-bar bg-secondary" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>60s</button>
+          </div>
+          <div class="col col-widget">
+            <button type="button" class="btn btn-outline-secondary btn-widget" data-seconds="90" onclick="commercial.run(this)">
+              <div class="progress" style="text-align: center; background-color: transparent !important; height: 0.4rem">
+                <div class="progress-bar bg-secondary" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>90s</button>
+          </div>
+          <div class="col col-widget">
+            <button type="button" class="btn btn-outline-secondary btn-widget" data-seconds="120" onclick="commercial.run(this)">
+              <div class="progress" style="text-align: center; background-color: transparent !important; height: 0.4rem">
+                <div class="progress-bar bg-secondary" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>120s</button>
+          </div>
+          <div class="col col-widget">
+            <button type="button" class="btn btn-outline-secondary btn-widget" data-seconds="150" onclick="commercial.run(this)">
+              <div class="progress" style="text-align: center; background-color: transparent !important; height: 0.4rem">
+                <div class="progress-bar bg-secondary" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>150s</button>
+          </div>
+          <div class="col col-widget">
+            <button type="button" class="btn btn-outline-secondary btn-widget" data-seconds="180" onclick="commercial.run(this)">
+              <div class="progress" style="text-align: center; background-color: transparent !important; height: 0.4rem">
+                <div class="progress-bar bg-secondary" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>180s</button>
+          </div>
         </div>
       </div>
+      <!-- /MAIN -->
     </div>
-    <!-- /MAIN -->
   </div>
 </div>
 

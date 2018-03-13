@@ -1,69 +1,74 @@
 <div class="card widget">
-  <h6 data-lang="eventlist"></h6>
-  <ul class="nav nav-pills" role="tablist">
-    <li role="presentation" class="nav-item">
-      <a class="nav-link active" href="#eventlist-main" aria-controls="home" role="tab" data-toggle="tab" title="EventList">
-        <i class="fas fa-calendar" aria-hidden="true"></i>
-      </a>
-    </li>
-    <li role="presentation" class="nav-item">
-      <a class="nav-link nav-dropdown" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="fas fa-eye"></i>
-      </a>
-      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="padding:0; margin: 0;">
-        <button data-id="follow" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-          <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
-            <i class="fas fa-heart fa-stack-1x"></i>
-          </span>
-        </button>
-        <button data-id="host" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-          <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
-            <i class="fas fa-bullhorn fa-stack-1x"></i>
-          </span>
-        </button>
-        <button data-id="cheer" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-          <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
-            <i class="fas fa-gem fa-stack-1x"></i>
-          </span>
-        </button>
-        <button data-id="sub" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-          <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
-            <i class="fas fa-star fa-stack-1x"></i>
-          </span>
-        </button>
-        <button data-id="subgift" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-          <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
-            <i class="fas fa-gift fa-stack-1x"></i>
-          </span>
-        </button>
-        <button data-id="resub" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-          <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
-            <i class="fas fa-star-half fa-stack-1x"></i>
-            <i class="fas fa-long-arrow-alt-right fa-stack-1x"></i>
-          </span>
-        </button>
-        <button data-id="tip" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
-          <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
-            <i class="fas fa-dollar-sign fa-stack-1x"></i>
-          </span>
-        </button>
-      </div>
-    </li>
-    <li role="presentation">
-      <a class="nav-link" href="#eventlist-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-        <i class="fas fa-cog" aria-hidden="true"></i>
-      </a>
-    </li>
-    <li role="presentation" class="nav-item widget-popout">
-      <a class="nav-link" title="Popout" target="_blank" href="/popout/#eventlist">
-        <i class="fas fa-external-link-alt"></i>
-      </a>
-    </li>
-  </ul>
+  <div class="card-header">
+    <ul class="nav nav-pills" role="tablist">
+      <li role="presentation" class="nav-item">
+        <a class="nav-link active" href="#eventlist-main" aria-controls="home" role="tab" data-toggle="tab" title="EventList">
+          <i class="fas fa-calendar" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li role="presentation" class="nav-item">
+        <a class="nav-link nav-dropdown" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-eye"></i>
+        </a>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="padding:0; margin: 0;">
+          <button data-id="follow" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+            <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
+              <i class="fas fa-heart fa-stack-1x"></i>
+            </span>
+          </button>
+          <button data-id="host" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+            <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
+              <i class="fas fa-bullhorn fa-stack-1x"></i>
+            </span>
+          </button>
+          <button data-id="cheer" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+            <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
+              <i class="fas fa-gem fa-stack-1x"></i>
+            </span>
+          </button>
+          <button data-id="sub" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+            <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
+              <i class="fas fa-star fa-stack-1x"></i>
+            </span>
+          </button>
+          <button data-id="subgift" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+            <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
+              <i class="fas fa-gift fa-stack-1x"></i>
+            </span>
+          </button>
+          <button data-id="resub" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+            <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
+              <i class="fas fa-star-half fa-stack-1x"></i>
+              <i class="fas fa-long-arrow-alt-right fa-stack-1x"></i>
+            </span>
+          </button>
+          <button data-id="tip" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+            <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
+              <i class="fas fa-dollar-sign fa-stack-1x"></i>
+            </span>
+          </button>
+        </div>
+      </li>
+      <li role="presentation">
+        <a class="nav-link" href="#eventlist-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
+          <i class="fas fa-cog" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li role="presentation" class="nav-item widget-popout">
+        <a class="nav-link" title="Popout" target="_blank" href="/popout/#eventlist">
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+      </li>
+      <li class="nav-item ml-auto">
+        <h6 class="widget-title" data-lang="eventlist"></h6>
+      </li>
+    </ul>
+  </div>
   <!-- Tab panes -->
   <div class="card-body">
     <div class="tab-content">
       <div role="tabpanel" class="tab-pane active" id="eventlist-main">
+          <div class="list-group" id="events-list"></div>
           <div class="alert alert-primary" role="alert">
             <i class="fas fa-circle-o-notch fa-spin fa-1x fa-fw"></i>
             <strong>loading data...</strong>
@@ -239,11 +244,11 @@
       let t = translations['eventlist-events'][event.event]
       if (!_.isNil(event.message)) event.message = event.message.replace(/(\w{10})/g, '$1<wbr>') // force newline for long texts
       if (event.event === 'tip') {
-        username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
-          <div title="${event.username}" style="z-index: 9">${event.username}</div>
+        username = `<div class="eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
+          <span title="${event.username}" style="z-index: 9">${event.username}</span>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$formatted_amount', '<strong>' + _.get(event, 'currency', '') + parseFloat(_.get(event, 'amount', '0')).toFixed(2) + '</strong>')}</span>
           ${_.get(event, 'song_url', '').trim().length > 0 && _.get(event, 'song_title', '').trim().length > 0 ? `<small style="font-size: 0.7rem"><strong>${commons.translate('song-request')}:</strong> <a href="${event.song_url}">${event.song_title}</a></small>` : ``}
-          <i class="fas fa-fw fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-fw fa-${icons[event.event]}" style="position: absolute; right: 1rem; margin-top: -0.8rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
         if (_.get(event, 'message', '').trim().length > 0) {
           message += `
@@ -253,45 +258,45 @@
       }
 
       if (event.event === 'follow') {
-        username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
-          <div title="${event.username}" style="z-index: 9">${event.username}</div>
+        username = `<div class="eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
+          <span title="${event.username}" style="z-index: 9">${event.username}</span>
           <span style="font-size:0.7rem; font-weight: normal">${t}</span>
-          <i class="fas fa-fw fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-fw fa-${icons[event.event]}" style="position: absolute; right: 1rem; margin-top: -0.8rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
       }
 
       if (event.event === 'host') {
-        username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
-          <div title="${event.username}" style="z-index: 9">${event.username}</div>
+        username = `<div class="eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
+          <span title="${event.username}" style="z-index: 9">${event.username}</span>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$viewers', '<strong>' + _.get(event, 'viewers', '0') + '</strong>')}</span>
-          <i class="fas fa-fw fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-fw fa-${icons[event.event]}" style="position: absolute; right: 1rem; margin-top: -0.8rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
       }
 
       if (event.event === 'sub') {
         if (_.isNil(event.tier)) event.tier = 'n/a'
-        username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
-          <div title="${event.username}" style="z-index: 9">${event.username}</div>
+        username = `<div class="eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
+          <span title="${event.username}" style="z-index: 9">${event.username}</span>
           <span style="font-size:0.7rem; font-weight: normal">${t} - ${commons.translate('tier')} <strong>${event.tier}</strong></span>
-          <i class="fas fa-fw fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-fw fa-${icons[event.event]}" style="position: absolute; right: 1rem; margin-top: -0.8rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
       }
 
       if (event.event === 'subgift') {
-        username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
-          <div title="${event.username}" style="z-index: 9">${event.username}</div>
+        username = `<div class="eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
+          <span title="${event.username}" style="z-index: 9">${event.username}</span>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$username', _.get(event, 'from', 'n/a'))}</span>
-          <i class="fas fa-fw fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-fw fa-${icons[event.event]}" style="position: absolute; right: 1rem; margin-top: -0.8rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
       }
 
       if (event.event === 'resub') {
         if (_.isNil(event.tier)) event.tier = 'n/a'
-        username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
-          <div title="${event.username}" style="z-index: 9">${event.username}</div>
+        username = `<div class="eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
+          <span title="${event.username}" style="z-index: 9">${event.username}</span>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$months', '<strong>' + _.get(event, 'months', '0') + '</strong>')} | ${commons.translate('tier')} <strong>${event.tier}</strong></span>
 
-          <span class="fa-stack fa-fw" style="position: absolute; right: 0.5rem; top: .4rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true">
+          <span class="fa-stack fa-fw" style="position: absolute; right: 0.5rem; margin-top: -0.8rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true">
             <i class="fas fa-star-half fa-stack-1x"></i>
             <i class="fas fa-long-arrow-alt-right fa-stack-1x"></i>
           </span>
@@ -304,10 +309,10 @@
       }
 
       if (event.event === 'cheer') {
-        username = `<div class="col-9 eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
-          <div title="${event.username}" style="z-index: 9">${event.username}</div>
+        username = `<div class="eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
+          <span title="${event.username}" style="z-index: 9">${event.username}</span>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$bits', '<strong>' + _.get(event, 'bits', '0') + '</strong>')}</span>
-          <i class="fas fa-fw fa-${icons[event.event]}" style="position: absolute; right: 1rem; top: .4rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-fw fa-${icons[event.event]}" style="position: absolute; right: 1rem; margin-top: -0.8rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
         </div>`
         if (_.get(event, 'message', '').trim().length > 0) {
           message = `
@@ -316,8 +321,8 @@
         }
       }
       let row = `
-        <div class="row">
-          <div class="col-3">${icon}</div>
+        <div class="list-group-item" style="border-left: 0; border-right: 0; padding: 0.2rem 1.25rem 0.4rem 1.25rem">
+          ${icon}
           ${username}
           ${message}
         </div>`
