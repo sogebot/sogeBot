@@ -96,17 +96,13 @@
           <i class="fas fa-bars" aria-hidden="true"></i>
         </button>
         <div class="dropdown-menu dropdown-menu-right" style="right: 0; left: auto;" aria-labelledby="settingsButton">
-          <button class="dropdown-item" id="me-btn" onclick="joinBot()">
-            <span class="text-success">
-              <i class="fas fa-sign-in-alt"></i>
-              join channel
-            </span>
+          <button class="dropdown-item text-success" id="me-btn" onclick="joinBot()">
+            <i class="fas fa-sign-in-alt"></i>
+            join channel
           </button>
-          <button class="dropdown-item" id="me-btn" onclick="leaveBot()">
-            <span class="text-danger">
-              <i class="fas fa-sign-out-alt"></i>
-              leave from channel
-            </span>
+          <button class="dropdown-item text-danger" id="me-btn" onclick="leaveBot()">
+            <i class="fas fa-sign-out-alt"></i>
+            leave from channel
           </button>
           <br/>
 
@@ -181,7 +177,7 @@
           <button type="button" class="btn btn-danger disabled" style="display: none" id="title-error">
             <i data-lang="custom-title-empty-error"></i>
           </button>
-          <button type="button" class="btn btn-default" data-dismiss="modal">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
             <i data-lang="close"></i>
           </button>
           <button type="button" class="btn btn-primary" onclick="changeGT.save()">

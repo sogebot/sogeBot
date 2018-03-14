@@ -202,16 +202,6 @@
       return
     }
 
-    let colors = {
-      follow: 'red',
-      host: 'orange',
-      sub: 'blue',
-      subgift: 'green',
-      resub: 'indigo',
-      cheer: 'GoldenRod',
-      tip: 'darkgreen'
-    }
-
     let icons = {
         follow: 'heart',
         host: 'bullhorn',
@@ -248,7 +238,7 @@
           <span title="${event.username}" style="z-index: 9">${event.username}</span>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$formatted_amount', '<strong>' + _.get(event, 'currency', '') + parseFloat(_.get(event, 'amount', '0')).toFixed(2) + '</strong>')}</span>
           ${_.get(event, 'song_url', '').trim().length > 0 && _.get(event, 'song_title', '').trim().length > 0 ? `<small style="font-size: 0.7rem"><strong>${commons.translate('song-request')}:</strong> <a href="${event.song_url}">${event.song_title}</a></small>` : ``}
-          <i class="fas fa-fw fa-${icons[event.event]}" style="position: absolute; right: 1rem; margin-top: -0.8rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true"></i>
+          <i class="fas fa-fw fa-${icons[event.event]} icon-${event.event}" aria-hidden="true"></i>
         </div>`
         if (_.get(event, 'message', '').trim().length > 0) {
           message += `

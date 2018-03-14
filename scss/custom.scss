@@ -899,8 +899,6 @@ li a.active .deleteTab {
   font-size: 1.2rem !important;
   padding: 10px;
   margin: 0;
-  border: 1px solid $gray-400;
-  background-color: $white;
   border-radius: 4px;
 }
 
@@ -1283,3 +1281,7 @@ blockquote {
 .btn-light, .btn-light:hover, .btn-light:not(:disabled):not(.disabled):active, .btn-light:not(:disabled):not(.disabled).active, .show > .btn-light.dropdown-toggle {
   color: $black
 }
+
+.dropdown-menu.show button { cursor: pointer; }
+.page-menu .alert { cursor: default; }
+.page-menu a.alert { cursor: help !important; }
