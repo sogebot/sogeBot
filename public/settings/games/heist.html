@@ -247,7 +247,7 @@
       },
       messages: () => {
         let variables = [
-          'entryMessage', 'copsOnPatrol', 'copsCooldownMessage', 'lateEntryMessage', 'entryInstruction', 'andXMore'
+          'started', 'entryMessage', 'copsOnPatrol', 'copsCooldownMessage', 'lateEntryMessage', 'entryInstruction', 'andXMore'
         ]
         $('#heist-messages').empty()
 
@@ -315,8 +315,7 @@
 
   $(document).on('keyup', '[data-heist-onchange-show-button]', (event) => {
     let key = $(event.currentTarget).data('id')
-
-    if ($(`.heist-error[data-key="${key}"]`).css('display') !== 'none') {
+    if ($(`.heist-error[data-key="${key}"]`).length > 0 && $(`.heist-error[data-key="${key}"]`).css('display') !== 'none') {
       $(`button.btn.btn-secondary[data-key="${key}"]`).css('display', 'none')
       return
     }

@@ -79,9 +79,9 @@ var commons = {
         $(`#${id}[contenteditable=true]`).off()
         $(`#${id}[contenteditable=true]`)
           .keyup(function () {
+            if (_.isNil($(this).data('match')) || _.isNil($(this).data('errorcontainer'))) return
             let matchRegexp = JSON.parse(window.atob($(this).data('match')))
             let errorContainer = window.atob($(this).data('errorcontainer'))
-            if (matchRegexp === 'null') return
 
             $(errorContainer).css('display', 'none')
             for (let [regexp, error] of Object.entries(matchRegexp)) {

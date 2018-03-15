@@ -235,8 +235,7 @@ class Heist {
           command: await this.get('command'),
           copsCooldown: await this.get('copsCooldown'),
           entryCooldown: await this.get('entryCooldown'),
-          showMaxUsers: await this.get('showMaxUsers'),
-          started: await this.get('started')
+          showMaxUsers: await this.get('showMaxUsers')
         })
       })
     })
