@@ -139,3 +139,4 @@ input, .editable, abbr { background-color: $input-bg !important; color: $input-t
 .icon-subgift { color: map-get($eventlist, subgift) !important; }
 .icon-resub { color: map-get($eventlist, resub) !important; }
 .icon-cheer { color: map-get($eventlist, cheer) !important; }
+.icon-tip { color: map-get($eventlist, tip) !important; }
