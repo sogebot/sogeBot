@@ -35,9 +35,14 @@ class Spotify {
 
   async getMe () {
     try {
-      let data = await this.client.getMe()
-      return data.body.display_name
+      const enabled = await this.status({ log: false })
+      if (enabled) {
+        let data = await this.client.getMe()
+        return data.body.display_name
+      } else return null
     } catch (e) {
+      global.log.error('Spotify user get failed')
+      global.log.error(e.stack)
       return null
     }
   }
