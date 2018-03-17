@@ -65,6 +65,7 @@ class Spotify {
       }
     } catch (e) {
       global.log.error('Spotify refresh token failed')
+      global.log.error(e.stack)
     }
     setTimeout(() => this.IRefreshToken(), 60000)
   }
