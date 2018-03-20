@@ -1,138 +1,10 @@
 hr { border-color: $hr !important }
 
-.navbar-brand { color: $bot-title !important }
-.navbar-brand span { color: $bot-version !important }
+.navbar-brand span { color: theme-color("primary") !important }
 
-.nav-link, .navbar-nav, .dropdown-toggle { color: $menu-item !important }
-.nav-link.active, .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link { color: $menu-item-active !important; }
+.stream-info h2, .stream-info h2 i { color: theme-color("primary") !important }
 
-.dropdown-menu.show, .dropdown-menu.show button:hover { background-color: $menu-dropdown-bg !important; border-color: $menu-dropdown-border !important; }
-.dropdown-menu.show .nav-link:hover, .dropdown-menu.show button:hover { background-color: $menu-dropdown-item-hover-bg !important; color: $menu-dropdown-item-hover !important; }
-.dropdown-menu.show button.text-success { color: $menu-dropdown-item-success !important; }
-.dropdown-menu.show button.text-success:hover { color: $menu-dropdown-item-success-hover !important; background-color: $menu-dropdown-item-success-hover-bg !important; }
-.dropdown-menu.show button.text-danger { color: $menu-dropdown-item-danger !important; }
-.dropdown-menu.show button.text-danger:hover { color: $menu-dropdown-item-danger-hover !important; background-color: $menu-dropdown-item-danger-hover-bg !important; }
-.dropdown-header { color: $menu-dropdown-header }
-
-.page-menu .alert-danger { border-color: $status-not-connected-border; color: $status-not-connected !important; background-color: $status-not-connected-bg !important; }
-.page-menu .alert-warning { border-color: $status-connecting-border; color: $status-connecting !important; background-color: $status-connecting-bg !important; }
-.page-menu .alert-success { border-color: $status-connected-border; color: $status-connected !important; background-color: $status-connected-bg !important; }
-
-.stream-info-container { background-color: $info-panel-bg !important }
-.stream-info h2 { color: $info-panel-title !important }
-.stream-info h2 i { color: $info-panel-title !important }
-.stream-info h2 small { color: $info-panel-link !important }
-.stream-info .data { color: $info-panel-value !important }
-.stream-info .stats .stats-mid { color: $info-panel-diff !important }
-.stream-info .stats .stats-down { color: $info-panel-diff-dn !important }
-.stream-info .stats .stats-up { color: $info-panel-diff-up !important }
-
-.widget { background-color: map-get($widget, background) !important; border-color: map-get($widget, border) !important }
-.widget-title { color: map-get($widget, title) !important }
-.widget .nav-link { background-color: nth(map-get(map-get($widget, nav), normal), 1) !important; color: nth(map-get(map-get($widget, nav), normal), 3) !important; border-color: nth(map-get(map-get($widget, nav), normal), 2); }
-.widget .nav-link:hover { background-color: nth(map-get(map-get($widget, nav), hover), 1) !important; color: nth(map-get(map-get($widget, nav), hover), 3) !important; border-color: nth(map-get(map-get($widget, nav), hover), 2); }
-.widget .nav-link.active { background-color: nth(map-get(map-get($widget, nav), active), 1) !important; color: nth(map-get(map-get($widget, nav), active), 3) !important; border-color: nth(map-get(map-get($widget, nav), active), 2); }
-
-.card { border-color: map-get($widget, border) !important }
-.card-body { background-color: map-get($widget, background) !important }
-.card-title { color: map-get($widget, title) !important }
-
-.settings { background-color: map-get($widget, background) !important; border-color: map-get($widget, border) !important; border-width: 1px 1px 1px 1px; border-style: solid; }
-
-.list-group-item { background-color: nth(map-get($list-group-item, normal), 1) !important; color: nth(map-get($list-group-item, normal), 3) !important; border-color: nth(map-get($list-group-item, normal), 2); }
-.list-group-item:hover { background-color: nth(map-get($list-group-item, hover), 1) !important; color: nth(map-get($list-group-item, hover), 3) !important; border-color: nth(map-get($list-group-item, hover), 2); }
-
-.modal-content { background-color: $dlg-bg; }
-input, .editable, abbr { background-color: $input-bg !important; color: $input-text !important; border-color: $input-border !important; }
-.form-control:disabled, .form-control[readonly] { background-color: $input-disabled-bg !important; color: $input-disabled-text !important }
-.input-group-text { background-color: $input-group-bg; color: $input-group-text; border-color: $input-group-border}
-
-.nav-tabs .nav-item .nav-link { background-color: nth(map-get($nav-tab, normal), 1) !important; color: nth(map-get($nav-tab, normal), 3) !important; border-color: nth(map-get($nav-tab, normal), 2) !important; }
-.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-item .nav-link.active { background-color: nth(map-get($nav-tab, active), 1) !important; color: nth(map-get($nav-tab, active), 3) !important; border-color: nth(map-get($nav-tab, active), 2) !important; }
-.nav-tabs .nav-item:hover .nav-link { background-color: nth(map-get($nav-tab, hover), 1) !important; color: nth(map-get($nav-tab, hover), 3) !important; border-color: nth(map-get($nav-tab, hover), 2) !important; }
-
-.btn-primary { background-color: nth(map-get(map-get($buttons, primary), normal), 1) !important; color: nth(map-get(map-get($buttons, primary), normal), 3) !important; border-color: nth(map-get(map-get($buttons, primary), normal), 2); }
-.btn-primary:hover { background-color: nth(map-get(map-get($buttons, primary), hover), 1) !important; color: nth(map-get(map-get($buttons, primary), hover), 3) !important; border-color: nth(map-get(map-get($buttons, primary), hover), 2); }
-.btn-primary.active, .btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active, .show > .btn-primary.dropdown-toggle { background-color: nth(map-get(map-get($buttons, primary), active), 1) !important; color: nth(map-get(map-get($buttons, primary), active), 3) !important; border-color: nth(map-get(map-get($buttons, primary), active), 2); }
-.btn-primary.disabled, .btn-primary:disabled, .btn-primary.disabled:hover { background-color: nth(map-get(map-get($buttons, primary), disabled), 1) !important; color: nth(map-get(map-get($buttons, primary), disabled), 3) !important; border-color: nth(map-get(map-get($buttons, primary), disabled), 2); }
-.btn-outline-primary { background-color: transparent !important; color: nth(map-get(map-get($buttons, primary), normal), 1) !important; border-color: nth(map-get(map-get($buttons, primary), normal), 2); }
-.btn-outline-primary:hover { background-color: nth(map-get(map-get($buttons, primary), normal), 1) !important; color: nth(map-get(map-get($buttons, primary), normal), 3) !important; border-color: nth(map-get(map-get($buttons, primary), normal), 2); }
-.btn-outline-primary.active, .btn-outline-primary:not(:disabled):not(.disabled):active, .btn-outline-primary:not(:disabled):not(.disabled).active, .show > .btn-outline-primary.dropdown-toggle { background-color: nth(map-get(map-get($buttons, primary), normal), 1) !important; color: nth(map-get(map-get($buttons, primary), normal), 3) !important; border-color: nth(map-get(map-get($buttons, primary), normal), 2); }
-.btn-outline-primary.disabled, .btn-outline-primary:disabled, .btn-outline-primary.disabled:hover { background-color: transparent !important; color: nth(map-get(map-get($buttons, primary), disabled), 1) !important; border-color: nth(map-get(map-get($buttons, primary), disabled), 2); }
-
-.btn-secondary { background-color: nth(map-get(map-get($buttons, secondary), normal), 1) !important; color: nth(map-get(map-get($buttons, secondary), normal), 3) !important; border-color: nth(map-get(map-get($buttons, secondary), normal), 2); }
-.btn-secondary:hover { background-color: nth(map-get(map-get($buttons, secondary), hover), 1) !important; color: nth(map-get(map-get($buttons, secondary), hover), 3) !important; border-color: nth(map-get(map-get($buttons, secondary), hover), 2); }
-.btn-secondary.active, .btn-secondary:not(:disabled):not(.disabled):active, .btn-secondary:not(:disabled):not(.disabled).active, .show > .btn-secondary.dropdown-toggle { background-color: nth(map-get(map-get($buttons, secondary), active), 1) !important; color: nth(map-get(map-get($buttons, secondary), active), 3) !important; border-color: nth(map-get(map-get($buttons, secondary), active), 2); }
-.btn-secondary.disabled, .btn-secondary:disabled, .btn-secondary.disabled:hover { background-color: nth(map-get(map-get($buttons, secondary), disabled), 1) !important; color: nth(map-get(map-get($buttons, secondary), disabled), 3) !important; border-color: nth(map-get(map-get($buttons, secondary), disabled), 2); }
-.btn-outline-secondary { background-color: transparent !important; color: nth(map-get(map-get($buttons, secondary), normal), 1) !important; border-color: nth(map-get(map-get($buttons, secondary), normal), 2); }
-.btn-outline-secondary:hover { background-color: nth(map-get(map-get($buttons, secondary), normal), 1) !important; color: nth(map-get(map-get($buttons, secondary), normal), 3) !important; border-color: nth(map-get(map-get($buttons, secondary), normal), 2); }
-.btn-outline-secondary.active, .btn-outline-secondary:not(:disabled):not(.disabled):active, .btn-outline-secondary:not(:disabled):not(.disabled).active, .show > .btn-outline-secondary.dropdown-toggle { background-color: nth(map-get(map-get($buttons, secondary), normal), 1) !important; color: nth(map-get(map-get($buttons, secondary), normal), 3) !important; border-color: nth(map-get(map-get($buttons, secondary), normal), 2); }
-.btn-outline-secondary.disabled, .btn-outline-secondary:disabled, .btn-outline-secondary.disabled:hover { background-color: transparent !important; color: nth(map-get(map-get($buttons, secondary), disabled), 1) !important; border-color: nth(map-get(map-get($buttons, secondary), disabled), 2); }
-
-.btn-success { background-color: nth(map-get(map-get($buttons, success), normal), 1) !important; color: nth(map-get(map-get($buttons, success), normal), 3) !important; border-color: nth(map-get(map-get($buttons, success), normal), 2); }
-.btn-success:hover { background-color: nth(map-get(map-get($buttons, success), hover), 1) !important; color: nth(map-get(map-get($buttons, success), hover), 3) !important; border-color: nth(map-get(map-get($buttons, success), hover), 2); }
-.btn-success.active, .btn-success:not(:disabled):not(.disabled):active, .btn-success:not(:disabled):not(.disabled).active, .show > .btn-success.dropdown-toggle { background-color: nth(map-get(map-get($buttons, success), active), 1) !important; color: nth(map-get(map-get($buttons, success), active), 3) !important; border-color: nth(map-get(map-get($buttons, success), active), 2); }
-.btn-success.disabled, .btn-success:disabled, .btn-success.disabled:hover { background-color: nth(map-get(map-get($buttons, success), disabled), 1) !important; color: nth(map-get(map-get($buttons, success), disabled), 3) !important; border-color: nth(map-get(map-get($buttons, success), disabled), 2); }
-.btn-outline-success { background-color: transparent !important; color: nth(map-get(map-get($buttons, success), normal), 1) !important; border-color: nth(map-get(map-get($buttons, success), normal), 2); }
-.btn-outline-success:hover { background-color: nth(map-get(map-get($buttons, success), normal), 1) !important; color: nth(map-get(map-get($buttons, success), normal), 3) !important; border-color: nth(map-get(map-get($buttons, success), normal), 2); }
-.btn-outline-success.active, .btn-outline-success:not(:disabled):not(.disabled):active, .btn-outline-success:not(:disabled):not(.disabled).active, .show > .btn-outline-success.dropdown-toggle { background-color: nth(map-get(map-get($buttons, success), normal), 1) !important; color: nth(map-get(map-get($buttons, success), normal), 3) !important; border-color: nth(map-get(map-get($buttons, success), normal), 2); }
-.btn-outline-success.disabled, .btn-outline-success:disabled, .btn-outline-success.disabled:hover { background-color: transparent !important; color: nth(map-get(map-get($buttons, success), disabled), 1) !important; border-color: nth(map-get(map-get($buttons, success), disabled), 2); }
-
-.btn-danger { background-color: nth(map-get(map-get($buttons, danger), normal), 1) !important; color: nth(map-get(map-get($buttons, danger), normal), 3) !important; border-color: nth(map-get(map-get($buttons, danger), normal), 2); }
-.btn-danger:hover { background-color: nth(map-get(map-get($buttons, danger), hover), 1) !important; color: nth(map-get(map-get($buttons, danger), hover), 3) !important; border-color: nth(map-get(map-get($buttons, danger), hover), 2); }
-.btn-danger.active, .btn-danger:not(:disabled):not(.disabled):active, .btn-danger:not(:disabled):not(.disabled).active, .show > .btn-danger.dropdown-toggle { background-color: nth(map-get(map-get($buttons, danger), active), 1) !important; color: nth(map-get(map-get($buttons, danger), active), 3) !important; border-color: nth(map-get(map-get($buttons, danger), active), 2); }
-.btn-danger.disabled, .btn-danger:disabled, .btn-danger.disabled:hover { background-color: nth(map-get(map-get($buttons, danger), disabled), 1) !important; color: nth(map-get(map-get($buttons, danger), disabled), 3) !important; border-color: nth(map-get(map-get($buttons, danger), disabled), 2); }
-.btn-outline-danger { background-color: transparent !important; color: nth(map-get(map-get($buttons, danger), normal), 1) !important; border-color: nth(map-get(map-get($buttons, danger), normal), 2); }
-.btn-outline-danger:hover { background-color: nth(map-get(map-get($buttons, danger), normal), 1) !important; color: nth(map-get(map-get($buttons, danger), normal), 3) !important; border-color: nth(map-get(map-get($buttons, danger), normal), 2); }
-.btn-outline-danger.active, .btn-outline-danger:not(:disabled):not(.disabled):active, .btn-outline-danger:not(:disabled):not(.disabled).active, .show > .btn-outline-danger.dropdown-toggle { background-color: nth(map-get(map-get($buttons, danger), normal), 1) !important; color: nth(map-get(map-get($buttons, danger), normal), 3) !important; border-color: nth(map-get(map-get($buttons, danger), normal), 2); }
-.btn-outline-danger.disabled, .btn-outline-danger:disabled, .btn-outline-danger.disabled:hover { background-color: transparent !important; color: nth(map-get(map-get($buttons, danger), disabled), 1) !important; border-color: nth(map-get(map-get($buttons, danger), disabled), 2); }
-
-.btn-warning { background-color: nth(map-get(map-get($buttons, warning), normal), 1) !important; color: nth(map-get(map-get($buttons, warning), normal), 3) !important; border-color: nth(map-get(map-get($buttons, warning), normal), 2); }
-.btn-warning:hover { background-color: nth(map-get(map-get($buttons, warning), hover), 1) !important; color: nth(map-get(map-get($buttons, warning), hover), 3) !important; border-color: nth(map-get(map-get($buttons, warning), hover), 2); }
-.btn-warning.active, .btn-warning:not(:disabled):not(.disabled):active, .btn-warning:not(:disabled):not(.disabled).active, .show > .btn-warning.dropdown-toggle { background-color: nth(map-get(map-get($buttons, warning), active), 1) !important; color: nth(map-get(map-get($buttons, warning), active), 3) !important; border-color: nth(map-get(map-get($buttons, warning), active), 2); }
-.btn-warning.disabled, .btn-warning:disabled, .btn-warning.disabled:hover { background-color: nth(map-get(map-get($buttons, warning), disabled), 1) !important; color: nth(map-get(map-get($buttons, warning), disabled), 3) !important; border-color: nth(map-get(map-get($buttons, warning), disabled), 2); }
-.btn-outline-warning { background-color: transparent !important; color: nth(map-get(map-get($buttons, warning), normal), 1) !important; border-color: nth(map-get(map-get($buttons, warning), normal), 2); }
-.btn-outline-warning:hover { background-color: nth(map-get(map-get($buttons, warning), normal), 1) !important; color: nth(map-get(map-get($buttons, warning), normal), 3) !important; border-color: nth(map-get(map-get($buttons, warning), normal), 2); }
-.btn-outline-warning.active, .btn-outline-warning:not(:disabled):not(.disabled):active, .btn-outline-warning:not(:disabled):not(.disabled).active, .show > .btn-outline-warning.dropdown-toggle { background-color: nth(map-get(map-get($buttons, warning), normal), 1) !important; color: nth(map-get(map-get($buttons, warning), normal), 3) !important; border-color: nth(map-get(map-get($buttons, warning), normal), 2); }
-.btn-outline-warning.disabled, .btn-outline-warning:disabled, .btn-outline-warning.disabled:hover { background-color: transparent !important; color: nth(map-get(map-get($buttons, warning), disabled), 1) !important; border-color: nth(map-get(map-get($buttons, warning), disabled), 2); }
-
-.btn-info { background-color: nth(map-get(map-get($buttons, info), normal), 1) !important; color: nth(map-get(map-get($buttons, info), normal), 3) !important; border-color: nth(map-get(map-get($buttons, info), normal), 2); }
-.btn-info:hover { background-color: nth(map-get(map-get($buttons, info), hover), 1) !important; color: nth(map-get(map-get($buttons, info), hover), 3) !important; border-color: nth(map-get(map-get($buttons, info), hover), 2); }
-.btn-info.active, .btn-info:not(:disabled):not(.disabled):active, .btn-info:not(:disabled):not(.disabled).active, .show > .btn-info.dropdown-toggle { background-color: nth(map-get(map-get($buttons, info), active), 1) !important; color: nth(map-get(map-get($buttons, info), active), 3) !important; border-color: nth(map-get(map-get($buttons, info), active), 2); }
-.btn-info.disabled, .btn-info:disabled, .btn-info.disabled:hover { background-color: nth(map-get(map-get($buttons, info), disabled), 1) !important; color: nth(map-get(map-get($buttons, info), disabled), 3) !important; border-color: nth(map-get(map-get($buttons, info), disabled), 2); }
-.btn-outline-info { background-color: transparent !important; color: nth(map-get(map-get($buttons, info), normal), 1) !important; border-color: nth(map-get(map-get($buttons, info), normal), 2); }
-.btn-outline-info:hover { background-color: nth(map-get(map-get($buttons, info), normal), 1) !important; color: nth(map-get(map-get($buttons, info), normal), 3) !important; border-color: nth(map-get(map-get($buttons, info), normal), 2); }
-.btn-outline-info.active, .btn-outline-info:not(:disabled):not(.disabled):active, .btn-outline-info:not(:disabled):not(.disabled).active, .show > .btn-outline-info.dropdown-toggle { background-color: nth(map-get(map-get($buttons, info), normal), 1) !important; color: nth(map-get(map-get($buttons, info), normal), 3) !important; border-color: nth(map-get(map-get($buttons, info), normal), 2); }
-.btn-outline-info.disabled, .btn-outline-info:disabled, .btn-outline-info.disabled:hover { background-color: transparent !important; color: nth(map-get(map-get($buttons, info), disabled), 1) !important; border-color: nth(map-get(map-get($buttons, info), disabled), 2); }
-
-.btn-light { background-color: nth(map-get(map-get($buttons, light), normal), 1) !important; color: nth(map-get(map-get($buttons, light), normal), 3) !important; border-color: nth(map-get(map-get($buttons, light), normal), 2); }
-.btn-light:hover { background-color: nth(map-get(map-get($buttons, light), hover), 1) !important; color: nth(map-get(map-get($buttons, light), hover), 3) !important; border-color: nth(map-get(map-get($buttons, light), hover), 2); }
-.btn-light.active, .btn-light:not(:disabled):not(.disabled):active, .btn-light:not(:disabled):not(.disabled).active, .show > .btn-light.dropdown-toggle { background-color: nth(map-get(map-get($buttons, light), active), 1) !important; color: nth(map-get(map-get($buttons, light), active), 3) !important; border-color: nth(map-get(map-get($buttons, light), active), 2); }
-.btn-light.disabled, .btn-light:disabled, .btn-light.disabled:hover { background-color: nth(map-get(map-get($buttons, light), disabled), 1) !important; color: nth(map-get(map-get($buttons, light), disabled), 3) !important; border-color: nth(map-get(map-get($buttons, light), disabled), 2); }
-.btn-outline-light { background-color: transparent !important; color: nth(map-get(map-get($buttons, light), normal), 1) !important; border-color: nth(map-get(map-get($buttons, light), normal), 2); }
-.btn-outline-light:hover { background-color: nth(map-get(map-get($buttons, light), normal), 1) !important; color: nth(map-get(map-get($buttons, light), normal), 3) !important; border-color: nth(map-get(map-get($buttons, light), normal), 2); }
-.btn-outline-light.active, .btn-outline-light:not(:disabled):not(.disabled):active, .btn-outline-light:not(:disabled):not(.disabled).active, .show > .btn-outline-light.dropdown-toggle { background-color: nth(map-get(map-get($buttons, light), normal), 1) !important; color: nth(map-get(map-get($buttons, light), normal), 3) !important; border-color: nth(map-get(map-get($buttons, light), normal), 2); }
-.btn-outline-light.disabled, .btn-outline-light:disabled, .btn-outline-light.disabled:hover { background-color: transparent !important; color: nth(map-get(map-get($buttons, light), disabled), 1) !important; border-color: nth(map-get(map-get($buttons, light), disabled), 2); }
-
-.btn-dark { background-color: nth(map-get(map-get($buttons, dark), normal), 1) !important; color: nth(map-get(map-get($buttons, dark), normal), 3) !important; border-color: nth(map-get(map-get($buttons, dark), normal), 2); }
-.btn-dark:hover { background-color: nth(map-get(map-get($buttons, dark), hover), 1) !important; color: nth(map-get(map-get($buttons, dark), hover), 3) !important; border-color: nth(map-get(map-get($buttons, dark), hover), 2); }
-.btn-dark.active, .btn-dark:not(:disabled):not(.disabled):active, .btn-dark:not(:disabled):not(.disabled).active, .show > .btn-dark.dropdown-toggle { background-color: nth(map-get(map-get($buttons, dark), active), 1) !important; color: nth(map-get(map-get($buttons, dark), active), 3) !important; border-color: nth(map-get(map-get($buttons, dark), active), 2); }
-.btn-dark.disabled, .btn-dark:disabled, .btn-dark.disabled:hover { background-color: nth(map-get(map-get($buttons, dark), disabled), 1) !important; color: nth(map-get(map-get($buttons, dark), disabled), 3) !important; border-color: nth(map-get(map-get($buttons, dark), disabled), 2); }
-.btn-outline-dark { background-color: transparent !important; color: nth(map-get(map-get($buttons, dark), normal), 1) !important; border-color: nth(map-get(map-get($buttons, dark), normal), 2); }
-.btn-outline-dark:hover { background-color: nth(map-get(map-get($buttons, dark), normal), 1) !important; color: nth(map-get(map-get($buttons, dark), normal), 3) !important; border-color: nth(map-get(map-get($buttons, dark), normal), 2); }
-.btn-outline-dark.active, .btn-outline-dark:not(:disabled):not(.disabled):active, .btn-outline-dark:not(:disabled):not(.disabled).active, .show > .btn-outline-dark.dropdown-toggle { background-color: nth(map-get(map-get($buttons, dark), normal), 1) !important; color: nth(map-get(map-get($buttons, dark), normal), 3) !important; border-color: nth(map-get(map-get($buttons, dark), normal), 2); }
-.btn-outline-dark.disabled, .btn-outline-dark:disabled, .btn-outline-dark.disabled:hover { background-color: transparent !important; color: nth(map-get(map-get($buttons, dark), disabled), 1) !important; border-color: nth(map-get(map-get($buttons, dark), disabled), 2); }
-
-.btn-link { background-color: nth(map-get(map-get($buttons, link), normal), 1) !important; color: nth(map-get(map-get($buttons, link), normal), 3) !important; border-color: nth(map-get(map-get($buttons, link), normal), 2); }
-.btn-link:hover { background-color: nth(map-get(map-get($buttons, link), hover), 1) !important; color: nth(map-get(map-get($buttons, link), hover), 3) !important; border-color: nth(map-get(map-get($buttons, link), hover), 2); }
-.btn-link.active, .btn-link:not(:disabled):not(.disabled):active, .btn-link:not(:disabled):not(.disabled).active, .show > .btn-link.dropdown-toggle { background-color: nth(map-get(map-get($buttons, link), active), 1) !important; color: nth(map-get(map-get($buttons, link), active), 3) !important; border-color: nth(map-get(map-get($buttons, link), active), 2); }
-.btn-link.disabled, .btn-link:disabled, .btn-link.disabled:hover { background-color: nth(map-get(map-get($buttons, link), disabled), 1) !important; color: nth(map-get(map-get($buttons, link), disabled), 3) !important; border-color: nth(map-get(map-get($buttons, link), disabled), 2); }
-.btn-outline-link { background-color: transparent !important; color: nth(map-get(map-get($buttons, link), normal), 1) !important; border-color: nth(map-get(map-get($buttons, link), normal), 2); }
-.btn-outline-link:hover { background-color: nth(map-get(map-get($buttons, link), normal), 1) !important; color: nth(map-get(map-get($buttons, link), normal), 3) !important; border-color: nth(map-get(map-get($buttons, link), normal), 2); }
-.btn-outline-link.active, .btn-outline-link:not(:disabled):not(.disabled):active, .btn-outline-link:not(:disabled):not(.disabled).active, .show > .btn-outline-link.dropdown-toggle { background-color: nth(map-get(map-get($buttons, link), normal), 1) !important; color: nth(map-get(map-get($buttons, link), normal), 3) !important; border-color: nth(map-get(map-get($buttons, link), normal), 2); }
-.btn-outline-link.disabled, .btn-outline-link:disabled, .btn-outline-link.disabled:hover { background-color: transparent !important; color: nth(map-get(map-get($buttons, link), disabled), 1) !important; border-color: nth(map-get(map-get($buttons, link), disabled), 2); }
-
-.icon-follow, .icon-host, .icon-sub, .icon-subgift, .icon-resub, .icon-cheer, .icon-tip { position: absolute; right: 1rem; margin-top: -0.8rem; font-size: 1.4rem; opacity: 0.4; }
+.icon-follow, .icon-host, .icon-sub, .icon-subgift, .icon-resub, .icon-cheer, .icon-tip { position: absolute; right: 1rem; margin-top: -0.8rem; font-size: 1.4rem; }
 .icon-follow { color: map-get($eventlist, follow) !important; }
 .icon-host { color: map-get($eventlist, host) !important; }
 .icon-sub { color: map-get($eventlist, sub) !important; }
@@ -140,3 +12,12 @@ input, .editable, abbr { background-color: $input-bg !important; color: $input-t
 .icon-resub { color: map-get($eventlist, resub) !important; }
 .icon-cheer { color: map-get($eventlist, cheer) !important; }
 .icon-tip { color: map-get($eventlist, tip) !important; }
+
+.page-menu .alert-danger { border-color: $status-not-connected-border; color: $status-not-connected !important; background-color: $status-not-connected-bg !important; }
+.page-menu .alert-warning { border-color: $status-connecting-border; color: $status-connecting !important; background-color: $status-connecting-bg !important; }
+.page-menu .alert-success { border-color: $status-connected-border; color: $status-connected !important; background-color: $status-connected-bg !important; }
+
+.settings {
+  border: 1px solid $gray-300 !important;
+  background-color: $white !important;
+}

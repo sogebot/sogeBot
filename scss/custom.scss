@@ -257,7 +257,7 @@ h6 {
   margin-top: 0;
   line-height: 2.6rem;
   font-weight: bold;
-  color:$blue;
+  color:theme-color("primary");
   margin-right: .5rem;
   margin-left: .5rem;
   font-family: 'PT Sans', sans-serif !important;
@@ -331,7 +331,7 @@ span.title.title-part.text-default + div.widget {
 }
 
 #widgets-close a:hover, #widgets-close a:hover span {
-  color: $blue !important;
+  color: theme-color("primary") !important;
   text-decoration: none;
 }
 
@@ -343,7 +343,7 @@ span.title.title-part.text-default + div.widget {
 }
 
 #widgets a:hover span {
-  color: $blue !important;
+  color: theme-color("primary") !important;
   text-decoration: none;
 }
 
@@ -546,7 +546,7 @@ span.queue-list-group-item {
 }
 
 .titles-list-item.focus {
-  border-bottom: .3rem solid $blue;
+  border-bottom: .3rem solid theme-color("primary");
 }
 
 .carousel-control-next, .carousel-control-prev {
@@ -555,7 +555,7 @@ span.queue-list-group-item {
 }
 
 .carousel-control-next:hover, .carousel-control-prev:hover {
-  color: $blue;
+  color: theme-color("primary");
 }
 
 .carousel-control-next:focus, .carousel-control-prev:focus {
@@ -602,7 +602,7 @@ span.queue-list-group-item {
 }
 
 #change-game-search-list li:hover {
-  color: $blue
+  color: theme-color("primary")
 }
 
 .dlg-game-and-title {
@@ -750,7 +750,7 @@ th:first-letter {
   width: 100% !important;
   left: 0 !important;
   background-image: none;
-  background-color: $blue !important;
+  background-color: theme-color("primary") !important;
 }
 
 .slider-selection {
@@ -758,7 +758,7 @@ th:first-letter {
 }
 
 .slider-track-high {
-  background-color: $blue !important;
+  background-color: theme-color("primary") !important;
   border-radius: 0 !important;
 }
 
@@ -1034,7 +1034,7 @@ table tr td hr {
 }
 
 .text-blue {
-  color: $blue;
+  color: theme-color("primary");
 }
 
 .text-indigo {
@@ -1114,7 +1114,7 @@ blockquote {
 }
 
 .nav-dropdown {
-  color: $blue !important;
+  color: theme-color("primary") !important;
 }
 .nav-dropdown[aria-expanded=true] {
   color: $white !important;
