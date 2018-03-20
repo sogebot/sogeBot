@@ -286,7 +286,7 @@
           <span title="${event.username}" style="z-index: 9">${event.username}</span>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$months', '<strong>' + _.get(event, 'months', '0') + '</strong>')} | ${commons.translate('tier')} <strong>${event.tier}</strong></span>
 
-          <span class="fa-stack fa-fw" style="position: absolute; right: 0.5rem; margin-top: -0.8rem; font-size: 1.4rem; opacity: 0.4; color: ${colors[event.event]}" aria-hidden="true">
+          <span class="fa-stack fa-fw fa-${icons[event.event]}" aria-hidden="true">
             <i class="fas fa-star-half fa-stack-1x"></i>
             <i class="fas fa-long-arrow-alt-right fa-stack-1x"></i>
           </span>

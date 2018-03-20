@@ -1,15 +1,8 @@
-// Variables
-//
-// Variables should follow the `$component-state-property-size` formula for
-// consistent naming. Ex: $nav-link-disabled-color and $modal-content-box-shadow-xs.
+$enable-rounded: false;
+$enable-gradients: false;
+$enable-hover-media-query: true;
 
-
-//
-// Color system
-//
-
-// stylelint-disable
-$black:    #000 !default;
+$white:    #000 !default;
 $gray-900: #f8f9fa !default;
 $gray-800: #e9ecef !default;
 $gray-700: #dee2e6 !default;
@@ -19,7 +12,10 @@ $gray-400: #868e96 !default;
 $gray-300: #495057 !default;
 $gray-200: #343a40 !default;
 $gray-100: #212529 !default;
-$white:    #fff !default;
+$black:    #fff !default;
+
+$body-bg: $white;
+$body-color: $black;
 
 $grays: () !default;
 $grays: map-merge((
@@ -35,175 +31,51 @@ $grays: map-merge((
 ), $grays);
 
 $blue:    #007bff !default;
-$indigo:  #4200bd !default;
-$purple:  #4200bd !default;
-$pink:    #c90061 !default;
-$red:     #bd0019 !default;
-$lightred:#f15066 !default;
-$orange-1: #ffa32b !default;
-$orange:  #cc5c00 !default;
-$yellow:  #b39e00 !default;
-
-$green:      #00b324 !default;
+$indigo:  #6610f2 !default;
+$purple:  #6f42c1 !default;
+$pink:    #e83e8c !default;
+$red:     #dc3545 !default;
+$orange:  #fd7e14 !default;
+$yellow:  #ffc107 !default;
+$green:      #28a745 !default;
 $lightgreen: greenyellow !default;
+$teal:    #20c997 !default;
+$cyan:    #17a2b8 !default;
 
-$teal:    #00b680 !default;
-$cyan:    #0099b1 !default;
+$bot-response-text-color: $red !default;
+$bot-response-bg-color: $gray-200 !default;
+$bot-response-border-color: $gray-400 !default;
 
-$bot-response-text-color: #ff425b !default;
-$bot-response-bg-color: #181b1d !default;
-$bot-response-border-color: $gray-200 !default;
-$bot-response-text-strong: false;
+$bot-version: $blue !default;
 
+$hr: $gray-800 !default;
 
-$enable-rounded: false;
-$enable-gradients: false;
-$enable-hover-media-query: true;
-
-$bot-title:   $white !default;
-$bot-version: $orange-1 !default;
-
-$hr: $orange-1 !default;
-
-$nav-tab: (
-  normal: ($gray-100, transparent transparent #686868 transparent, #6b7782),
-  hover: ($gray-100, transparent transparent #686868 transparent, $orange-1),
-  active: (#1b1b1b, #686868 #686868 rgb(58, 58, 58), $orange-1)
+$theme-colors: (
+  "primary": #fd7e14
 );
 
-$menu-item:                   $white !default;
-$menu-item-bg:                 rgb(27, 27, 27) !default;
-$menu-item-active:            $orange-1 !default;
-$menu-dropdown-bg:          rgb(27, 27, 27) !default;
-$menu-dropdown-border:        $gray-300 !default;
-$menu-dropdown-item:          $white !default;
-$menu-dropdown-header:          $orange-1 !default;
-$menu-dropdown-item-hover:    $black !default;
-$menu-dropdown-item-hover-bg: $orange-1 !default;
-$menu-dropdown-item-success:  $lightgreen !default;
-$menu-dropdown-item-success-hover:  $black !default;
-$menu-dropdown-item-success-hover-bg:  $lightgreen !default;
-$menu-dropdown-item-danger:   $lightred !default;
-$menu-dropdown-item-danger-hover:  $white !default;
-$menu-dropdown-item-danger-hover-bg:  $lightred !default;
+$eventlist: (
+  follow: rgb(255, 80, 80),
+  host: rgb(255, 138, 43),
+  sub: rgb(104, 104, 255),
+  subgift: rgb(239, 59, 255),
+  resub: rgb(166, 41, 255),
+  cheer: rgb(255, 200, 61),
+  tip: rgb(100, 255, 53)
+);
 
 $status-connected:        darken($lightgreen, 50) !default;
 $status-connected-bg:     $lightgreen !default;
 $status-connected-border: $lightgreen !default;
 
-$status-not-connected:        lighten($lightred, 50) !default;
-$status-not-connected-bg:     $lightred !default;
-$status-not-connected-border: $lightred !default;
+$status-not-connected:        lighten($red, 50) !default;
+$status-not-connected-bg:     $red !default;
+$status-not-connected-border: $red !default;
 
-$status-connecting:        darken($orange-1, 50) !default;
-$status-connecting-bg:     $orange-1 !default;
-$status-connecting-border: $orange-1 !default;
-
-$info-panel-bg:     rgb(27, 27, 27) !default;
-$info-panel-link:    $orange-1 !default;
-$info-panel-title:   $orange-1 !default;
-$info-panel-value:   $gray-600 !default;
-$info-panel-diff:    $white !default;
-$info-panel-diff-up: $lightgreen !default;
-$info-panel-diff-dn: $lightred !default;
-
-$dlg-bg: $gray-100 !default;
-
-$input-bg: rgb(27, 27, 27) !default;
-$input-text: $gray-600 !default;
-$input-border: $gray-200 !default;
-
-$input-disabled-bg: lighten($input-bg, 10) !default;
-$input-disabled-text: lighten($input-text, 10) !default;
-
-$input-group-bg: lighten($input-bg, 5) !default;
-$input-group-text: $input-text !default;
-$input-group-border: $input-border !default;
-
-$eventlist: (
-  follow: $lightred,
-  host: $orange-1,
-  sub: $blue,
-  subgift: $lightgreen,
-  resub: rgb(149, 0, 255),
-  cheer: rgb(255, 214, 109),
-  tip: rgb(0, 253, 0)
-);
-
-$widget: (
-  nav: (
-    normal: (black, black, white),
-    hover: ($orange-1, $orange-1, black),
-    active: ($orange-1, $orange-1, black)
-  ),
-  title: $orange-1,
-  background: #1b1b1b,
-  border: lighten(#1b1b1b, 30)
-);
-
-$buttons: (
-  primary: (
-    /* bg, border, text */
-    normal: ($orange-1, $orange-1, darken($orange-1, 30)),
-    hover: (lighten($orange-1, 10), lighten($orange-1, 10), darken($orange-1, 30)),
-    active: (lighten($orange-1, 10), lighten($orange-1, 10), darken($orange-1, 30)),
-    disabled: (darken($orange-1, 10), darken($orange-1, 10), lighten($orange-1, 30))
-  ),
-  secondary: (
-    normal: (rgb(58, 58, 58), rgb(58, 58, 58), white),
-    hover: (darken(rgb(58, 58, 58), 10), darken(rgb(58, 58, 58), 10), white),
-    active: (lighten(rgb(58, 58, 58), 10), lighten(rgb(58, 58, 58), 10), white),
-    disabled: (lighten(rgb(58, 58, 58), 30), lighten(rgb(58, 58, 58), 30), darken(lighten(rgb(58, 58, 58), 30), 30))
-  ),
-  success: (
-    normal: ($lightgreen, $lightgreen, darken($lightgreen, 30)),
-    hover: (lighten($lightgreen, 10), lighten($lightgreen, 10), darken($lightgreen, 30)),
-    active: (lighten($lightgreen, 10), lighten($lightgreen, 10), darken($lightgreen, 30)),
-    disabled: (lighten($lightgreen, 30), lighten($lightgreen, 30), darken(lighten($lightgreen, 30), 30))
-  ),
-  danger: (
-    normal: ($lightred, $lightred, lighten($lightred, 30)),
-    hover: (lighten($lightred, 10), lighten($lightred, 10), lighten($lightred, 30)),
-    active: (lighten($lightred, 10), lighten($lightred, 10), lighten($lightred, 30)),
-    disabled: (lighten($lightred, 30), lighten($lightred, 30), darken(lighten($lightred, 30), 30))
-  ),
-  warning: (
-    normal: ($orange, $orange, white),
-    hover: (lighten($orange, 10), lighten($orange, 10), white),
-    active: (lighten($orange, 10), lighten($orange, 10), white),
-    disabled: (lighten($orange, 30), lighten($orange, 30), darken(lighten($orange, 30), 30))
-  ),
-  info: (
-    normal: ($cyan, $cyan, white),
-    hover: (lighten($cyan, 10), lighten($cyan, 10), white),
-    active: (lighten($cyan, 10), lighten($cyan, 10), white),
-    disabled: (lighten($cyan, 30), lighten($cyan, 30), darken(lighten($cyan, 30), 30))
-  ),
-  light: (
-    normal: (transparent, transparent, white),
-    hover: (lighten(#000, 10), lighten(#000, 10), white),
-    active: (lighten(#000, 10), lighten(#000, 10), white),
-    disabled: (lighten(#000, 30), lighten(#000, 30), darken(lighten(#000, 30), 30))
-  ),
-  dark: (
-    normal: (transparent, transparent, white),
-    hover: (lighten(#fff, 10), lighten(#fff, 10), white),
-    active: (lighten(#fff, 10), lighten(#fff, 10), white),
-    disabled: (lighten(#fff, 30), lighten(#fff, 30), darken(lighten(#fff, 30), 30))
-  ),
-  link: (
-    normal: ($blue, $blue, white),
-    hover: (lighten($blue, 10), lighten($blue, 10), white),
-    active: (lighten($blue, 10), lighten($blue, 10), white),
-    disabled: (transparent, transparent, white)
-  )
-);
-
-$list-group-item: (
-  normal: (rgb(27, 27, 27), #6e6e6e, white),
-  hover: (lighten(rgb(27, 27, 27), 10), #6e6e6e, white)
-);
+$status-connecting:        darken(#fd7e14, 50) !default;
+$status-connecting-bg:     #fd7e14 !default;
+$status-connecting-border: #fd7e14 !default;
 
 @import "../../node_modules/bootstrap/scss/bootstrap";
-@import "../colors.scss";
 @import "../custom.scss";
+@import "../colors.scss";

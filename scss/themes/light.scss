@@ -1,14 +1,7 @@
-// Variables
-//
-// Variables should follow the `$component-state-property-size` formula for
-// consistent naming. Ex: $nav-link-disabled-color and $modal-content-box-shadow-xs.
+$enable-rounded: false;
+$enable-gradients: false;
+$enable-hover-media-query: true;
 
-
-//
-// Color system
-//
-
-// stylelint-disable
 $white:    #fff !default;
 $gray-100: #f8f9fa !default;
 $gray-200: #e9ecef !default;
@@ -41,10 +34,8 @@ $pink:    #e83e8c !default;
 $red:     #dc3545 !default;
 $orange:  #fd7e14 !default;
 $yellow:  #ffc107 !default;
-
 $green:      #28a745 !default;
 $lightgreen: greenyellow !default;
-
 $teal:    #20c997 !default;
 $cyan:    #17a2b8 !default;
 
@@ -52,32 +43,21 @@ $bot-response-text-color: $red !default;
 $bot-response-bg-color: $gray-200 !default;
 $bot-response-border-color: $gray-400 !default;
 
-$bot-title:   $black !default;
 $bot-version: $blue !default;
 
 $hr: $gray-800 !default;
 
-$nav-tab: (
-  normal: ($gray-100, transparent transparent #dee2e6 transparent, #495057),
-  hover: (darken(#fff, 10), transparent transparent #dee2e6 transparent, #495057),
-  active: (lighten(#fff, 10), #dee2e6 #dee2e6 #fff, #495057)
+$eventlist: (
+  follow: $red,
+  host: $orange,
+  sub: $blue,
+  subgift: $green,
+  resub: indigo,
+  cheer: goldenrod,
+  tip: darkgreen
 );
 
-$menu-item:                   $black !default;
-$menu-item-bg:                 white !default;
-$menu-item-active:            $black !default;
-$menu-dropdown-bg:            $white !default;
-$menu-dropdown-border:        $gray-500 !default;
-$menu-dropdown-item:          $white !default;
-$menu-dropdown-header:          $blue !default;
-$menu-dropdown-item-hover:    $white !default;
-$menu-dropdown-item-hover-bg: $blue !default;
-$menu-dropdown-item-success:  $green !default;
-$menu-dropdown-item-success-hover:  $white !default;
-$menu-dropdown-item-success-hover-bg:  $green !default;
-$menu-dropdown-item-danger:   $red !default;
-$menu-dropdown-item-danger-hover:  $white !default;
-$menu-dropdown-item-danger-hover-bg:  $red !default;
+
 
 $status-connected:        lighten($green, 50) !default;
 $status-connected-bg:     $green !default;
@@ -91,115 +71,6 @@ $status-connecting:        darken($yellow, 50) !default;
 $status-connecting-bg:     $yellow !default;
 $status-connecting-border: $yellow !default;
 
-$info-panel-bg:      $gray-100 !default;
-$info-panel-link:    $blue !default;
-$info-panel-title:   $black !default;
-$info-panel-value:   $gray-600 !default;
-$info-panel-diff:    $black !default;
-$info-panel-diff-up: $green !default;
-$info-panel-diff-dn: $red !default;
-
-$dlg-bg: $gray-100 !default;
-
-$input-bg: #fff !default;
-$input-text: $gray-600 !default;
-$input-border: $gray-200 !default;
-
-$input-disabled-bg: darken($input-bg, 10) !default;
-$input-disabled-text: darken($input-text, 10) !default;
-
-$input-group-bg: darken($input-bg, 5) !default;
-$input-group-text: $input-text !default;
-$input-group-border: $input-border !default;
-
-$enable-rounded: false;
-$enable-gradients: false;
-$enable-hover-media-query: true;
-
-$eventlist: (
-  follow: $red,
-  host: $orange,
-  sub: $blue,
-  subgift: $green,
-  resub: indigo,
-  cheer: goldenrod,
-  tip: darkgreen
-);
-
-$widget: (
-  nav: (
-    normal: (transparent, transparent, $blue),
-    hover: (transparent, transparent, darken($blue, 10)),
-    active: ($blue, $blue, white)
-  ),
-  title: $blue,
-  background: #fff,
-  border: darken(#fff, 10)
-);
-
-$buttons: (
-  /* bg, border, text */
-  primary: (
-    normal: ($blue, $blue, white),
-    hover: (darken($blue, 10), darken($blue, 10), white),
-    active: (darken($blue, 10), darken($blue, 10), white),
-    disabled: (lighten($blue, 10), lighten($blue, 10), white)
-  ),
-  secondary: (
-    normal: ($gray-300, $gray-300, darken($gray-300, 40)),
-    hover: (darken($gray-300, 10), darken($gray-300, 10), darken($gray-300, 40)),
-    active: (darken($gray-300, 10), darken($gray-300, 10), darken($gray-300, 40)),
-    disabled: (lighten($gray-300, 10), lighten($gray-300, 10), darken($gray-300, 40))
-  ),
-  success: (
-    normal: ($green, $green, white),
-    hover: (darken($green, 10), darken($green, 10), white),
-    active: (darken($green, 10), darken($green, 10), white),
-    disabled: (lighten($green, 10), lighten($green, 10), white)
-  ),
-  danger: (
-    normal: ($red, $red, white),
-    hover: (darken($red, 10), darken($red, 10), white),
-    active: (darken($red, 10), darken($red, 10), white),
-    disabled: (lighten($red, 10), lighten($red, 10), white)
-  ),
-  warning: (
-    normal: ($orange, $orange, white),
-    hover: (darken($orange, 10), darken($orange, 10), white),
-    active: (darken($orange, 10), darken($orange, 10), white),
-    disabled: (lighten($orange, 10), lighten($orange, 10), white)
-  ),
-  info: (
-    normal: ($cyan, $cyan, white),
-    hover: (darken($cyan, 10), darken($cyan, 10), white),
-    active: (darken($cyan, 10), darken($cyan, 10), white),
-    disabled: (lighten($cyan, 10), lighten($cyan, 10), white)
-  ),
-  light: (
-    normal: (transparent, transparent, black),
-    hover: (darken(#fff, 10), darken(#fff, 10), black),
-    active: (darken(#fff, 10), darken(#fff, 10), black),
-    disabled: (lighten(#fff, 10), lighten(#fff, 10), black)
-  ),
-  dark: (
-    normal: (transparent, transparent, white),
-    hover: (darken(#000, 10), darken(#000, 10), white),
-    active: (darken(#000, 10), darken(#000, 10), white),
-    disabled: (lighten(#000, 10), lighten(#000, 10), white)
-  ),
-  link: (
-    normal: ($blue, $blue, white),
-    hover: (darken($blue, 10), darken($blue, 10), white),
-    active: (darken($blue, 10), darken($blue, 10), white),
-    disabled: (transparent, transparent, white)
-  )
-);
-
-$list-group-item: (
-  normal: (white, #ced4da, black),
-  hover: (darken(white, 10), #ced4da, black)
-);
-
 @import "../../node_modules/bootstrap/scss/bootstrap";
-@import "../colors.scss";
 @import "../custom.scss";
+@import "../colors.scss";
