@@ -21,6 +21,7 @@
     "chart.js": "^2.7.2",
     "compare-versions": "^3.1.0",
     "cross-env": "^5.1.4",
+    "currency-symbol-map": "^4.0.4",
     "debug": "^3.1.0",
     "decode-html": "^2.0.0",
     "express": "^4.16.3",
