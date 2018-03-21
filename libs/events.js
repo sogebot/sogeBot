@@ -238,10 +238,10 @@ class Events {
 
   async checkStreamIsRunningXMinutes (event, attributes) {
     const d = debug('events:checkStreamIsRunningXMinutes')
+    const when = await global.twitch.when()
     event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0)
-
     let shouldTrigger = event.triggered.runAfterXMinutes === 0 &&
-                        moment(global.twitch.when.online).format('X') * 1000 > event.definitions.runAfterXMinutes * 60 * 1000
+                        moment().format('X') - moment(when.online).format('X') > event.definitions.runAfterXMinutes * 60
     if (shouldTrigger) {
       event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes
       d('Updating event to %j', event)
