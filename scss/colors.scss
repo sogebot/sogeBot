@@ -19,5 +19,9 @@ hr { border-color: $hr !important }
 
 .settings {
   border: 1px solid $gray-300 !important;
-  background-color: $white !important;
+  background-color: $card-bg !important;
+}
+
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+  background-color: $card-bg !important;
 }

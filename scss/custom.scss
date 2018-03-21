@@ -65,7 +65,7 @@ a.active {
 
 /* STREAM DASHBOARD INFORMATIONS */
 .stream-info-container {
-  background: $white;
+  background: $info-bg;
   padding: 10px;
   border-bottom: 1px solid $gray-500;
 }
@@ -234,7 +234,7 @@ a.active {
 .widget {
   overflow: hidden;
   color: $gray-700;
-  background: $white;
+  background: $card-bg;
   padding: 0;
   height: 100%;
   width: 100%;

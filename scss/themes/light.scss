@@ -14,6 +14,9 @@ $gray-800: #343a40 !default;
 $gray-900: #212529 !default;
 $black:    #000 !default;
 
+$card-bg: $white;
+$info-bg: $white;
+
 $grays: () !default;
 $grays: map-merge((
   "100": $gray-100,

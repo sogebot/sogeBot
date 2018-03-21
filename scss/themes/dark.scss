@@ -17,6 +17,9 @@ $black:    #fff !default;
 $body-bg: $white;
 $body-color: $black;
 
+$card-bg: #171a1d;
+$info-bg: #171a1d;
+
 $grays: () !default;
 $grays: map-merge((
   "100": $gray-100,
