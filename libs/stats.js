@@ -38,12 +38,14 @@ Stats.prototype.save = async function (data) {
     this.latestTimestamp = data.timestamp
   }
 }
+
 Stats.prototype.getLatestStats = async function (self, socket) {
   let statsFromDb = await global.db.engine.find('stats')
   let stats = {
     currentViewers: 0,
     currentSubscribers: 0,
     currentBits: 0,
+    currentTips: 0,
     chatMessages: 0,
     currentFollowers: 0,
     currentViews: 0,
@@ -60,6 +62,7 @@ Stats.prototype.getLatestStats = async function (self, socket) {
     for (let stat of statsFromDb) {
       stats.currentViewers += stat.currentViewers
       stats.currentBits += stat.currentBits
+      stats.currentTips += stat.currentTips
       stats.chatMessages += stat.chatMessages
       stats.maxViewers += stat.maxViewers
       stats.newChatters += stat.newChatters
@@ -74,6 +77,7 @@ Stats.prototype.getLatestStats = async function (self, socket) {
     }
     stats.currentViewers = parseFloat(stats.currentViewers / statsFromDb.length).toFixed(0)
     stats.currentBits = parseFloat(stats.currentBits / statsFromDb.length).toFixed(0)
+    stats.currentTips = parseFloat(stats.currentTips / statsFromDb.length).toFixed(0)
     stats.chatMessages = parseFloat(stats.chatMessages / statsFromDb.length).toFixed(0)
     stats.maxViewers = parseFloat(stats.maxViewers / statsFromDb.length).toFixed(0)
     stats.newChatters = parseFloat(stats.newChatters / statsFromDb.length).toFixed(0)

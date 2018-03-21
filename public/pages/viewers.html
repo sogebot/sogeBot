@@ -70,6 +70,10 @@
               <span data-lang="messages"></span>
               <i class="fa" aria-hidden="true"></i>
             </th>
+            <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="stats.tips">
+              <span data-lang="tips"></span>
+              <i class="fa" aria-hidden="true"></i>
+            </th>
             <th class="sortable text-center" onclick="viewers.sort(this)" data-sort="stats.bits">
               <span data-lang="bits"></span>
               <i class="fa" aria-hidden="true"></i>
@@ -150,6 +154,9 @@
           '<td class="text-center" data-value=' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.messages) ?
             0 : item.stats.messages) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.messages) ?
             0 : item.stats.messages) + '</td>' +
+          '<td class="text-center" data-value=' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.tips) ?
+            0 : item.stats.tips) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.tips) ?
+            0 : `${item.stats.tips}${item.custom.currency}`) + '</td>' +
           '<td class="text-center" data-value=' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.bits) ?
             0 : item.stats.bits) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.bits) ?
             0 : item.stats.bits) + '</td>' +

@@ -65,6 +65,10 @@ class Donationalerts {
         song_url: _.get(additionalData, 'media_data.url', undefined)
       })
       global.events.fire('tip', { username: data.username.toLowerCase(), amount: data.amount, message: data.message, currency: data.currency })
+      global.db.engine.increment('users', { username: data.username.toLowerCase() }, { stats: { tips: parseFloat(data.amount) } })
+      global.db.engine.update('users', { username: data.username.toLowerCase() }, { custom: { currency: data.currency } })
+      if (global.twitch.isOnline) global.twitch.current.tips = global.twitch.current.tips + parseFloat(data.amount)
+      global.twitch.current.currency = data.currency
     })
   }
   sockets () {

@@ -185,6 +185,7 @@ class Webhooks {
         global.twitch.chatMessagesAtStart = global.parser.linesParsed
         global.twitch.current.viewers = 0
         global.twitch.current.bits = 0
+        global.twitch.current.tips = 0
         global.twitch.maxViewers = 0
         global.twitch.newChatters = 0
         global.twitch.chatMessagesAtStart = global.parser.linesParsed
