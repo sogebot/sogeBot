@@ -930,8 +930,8 @@ class Twitch {
       message = global.translate('top.listWatched').replace(/\$amount/g, 10)
       sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.time) && !_.isNil(o.time.watched) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'time.watched', 'desc')
     } else if (type === 'tips') {
-      message = global.translate('top.listTips').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.stats) && !_.isNil(o.stats.tips) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'stats.tips', 'desc')
+      let tips = await global.db.engine.find('users.tips')
+      sorted = _(tips).groupBy('username').map((o, k) => ({ 'username': k, 'amount': Number.parseFloat(_.sumBy(o, 'amount')).toFixed(2), 'currency': _.find(tips, (b) => b.username === k).currency }))
     } else {
       message = global.translate('top.listMessages').replace(/\$amount/g, 10)
       sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.stats) && !_.isNil(o.stats.messages) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'stats.messages', 'desc')
