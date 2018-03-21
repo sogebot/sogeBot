@@ -122,7 +122,37 @@ Users.prototype.resetWatchTime = function (self, socket, data) {
 }
 
 Users.prototype.getViewers = async function (self, socket) {
-  let viewers = await global.users.getAll()
+  let [viewers, tips, bits] = await Promise.all([
+    global.users.getAll(),
+    global.db.engine.find('users.tips'),
+    global.db.engine.find('users.bits')
+  ])
+  for (let viewer of viewers) {
+    // TIPS
+    let tipsOfViewer = _.filter(tips, (o) => o.username === viewer.username)
+    if (!_.isEmpty(tipsOfViewer)) {
+      let tipsAmount = 0
+      for (let tip of tipsOfViewer) {
+        // TODO: Add currency exchange
+        tipsAmount += tip.amount
+      }
+      _.set(viewer, 'stats.tips', tipsAmount)
+      _.set(viewer, 'custom.currency', tipsOfViewer[0].currency)
+    } else {
+      _.set(viewer, 'stats.tips', 0)
+      _.set(viewer, 'custom.currency', '')
+    }
+
+    // BITS
+    let bitsOfViewer = _.filter(bits, (o) => o.username === viewer.username)
+    if (!_.isEmpty(bitsOfViewer)) {
+      let bitsAmount = 0
+      for (let bit of bitsOfViewer) bitsAmount += bit.amount
+      _.set(viewer, 'stats.bits', bitsAmount)
+    } else {
+      _.set(viewer, 'stats.bits', 0)
+    }
+  }
   socket.emit('Viewers', Buffer.from(JSON.stringify(viewers)).toString('base64'))
 }
 
