@@ -257,6 +257,13 @@
         <span class="data" id="curBits">-</span>
         <span class="stats" id="curBitsChange">&nbsp;</span>
       </div>
+
+      <div class="col-sm stream-info">
+        <h2 data-lang="tips"></h2>
+        <span class="data" id="curTips">-</span>
+        <span class="data ml-0 pl-0" id="curTipsCurrency">-</span>
+        <span class="stats" id="curTipsChange">&nbsp;</span>
+      </div>
     </div>
 
     <div class="row">
@@ -593,6 +600,8 @@
       $("#curHosts").text(data.currentHosts)
       $("#curSubscribers").text(data.currentSubscribers)
       $("#curBits").text(data.currentBits)
+      $("#curTips").text(Number(data.currentTips).toFixed(2))
+      $("#curTipsCurrency").text(data.currency)
       $("#maxViewers").text(data.maxViewers)
       $("#totalChatMsgs").text(data.chatMessages)
       $("#newChtr").text(data.newChatters)
@@ -1241,6 +1250,7 @@
         var curSubscribers = getPercentage(parseInt($("#curSubscribers").text(), 10), parseInt(data.currentSubscribers,
           10))
         var curBits = getPercentage(parseInt($("#curBits").text(), 10), parseInt(data.currentBits, 10))
+        var curTips = getPercentage(parseInt($("#curTips").text(), 10), parseInt(data.currentTips, 10))
         var curViews = getPercentage(parseInt($("#curViews").text(), 10), parseInt(data.currentViews, 10))
         var curHosts = getPercentage(parseInt($("#curHosts").text(), 10), parseInt(data.currentHosts, 10))
 
@@ -1250,6 +1260,7 @@
         setHtml('curFollowersChange', curFollowers)
         setHtml('curSubscribersChange', curSubscribers)
         setHtml('curBitsChange', curBits)
+        setHtml('curTipsChange', curTips)
         setHtml('curViewsChange', curViews)
         setHtml('curHostsChange', curHosts)
       }
