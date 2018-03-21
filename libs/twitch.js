@@ -36,9 +36,11 @@ class Twitch {
       hosts: 0,
       subscribers: 0,
       bits: 0,
+      tips: 0,
       rawStatus: '',
       status: '',
-      game: ''
+      game: '',
+      currency: 'n/a'
     }
 
     this._loadCachedStatusAndGame()
@@ -560,6 +562,7 @@ class Twitch {
         this.chatMessagesAtStart = global.parser.linesParsed
         this.current.viewers = 0
         this.current.bits = 0
+        this.current.tips = 0
         this.maxViewers = 0
         this.newChatters = 0
         this.chatMessagesAtStart = global.parser.linesParsed
@@ -618,6 +621,7 @@ class Twitch {
       currentViewers: this.current.viewers,
       currentSubscribers: this.current.subscribers,
       currentBits: this.current.bits,
+      currentTips: this.current.tips,
       chatMessages: global.parser.linesParsed - this.chatMessagesAtStart,
       currentFollowers: this.current.followers,
       currentViews: this.current.views,
@@ -634,6 +638,8 @@ class Twitch {
       currentViewers: self.current.viewers,
       currentSubscribers: self.current.subscribers,
       currentBits: self.current.bits,
+      currentTips: self.current.tips,
+      currency: self.current.currency,
       chatMessages: self.isOnline ? global.parser.linesParsed - self.chatMessagesAtStart : 0,
       currentFollowers: self.current.followers,
       currentViews: self.current.views,
