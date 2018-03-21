@@ -339,7 +339,7 @@
                   <div class='aggregated-by'>Tips</div>
                   <div class='aggregated-column'>
                   `
-              for (let tip of _(tips).groupBy('username').map((o, k) => ({ 'username': k, 'amount': _.sumBy(o, 'amount'), 'currency': _.find(tips, (b) => b.username === k).currency }))) {
+              for (let tip of _(tips).groupBy('username').map((o, k) => ({ 'username': k, 'amount': Number.parseFloat(_.sumBy(o, 'amount')).toFixed(2), 'currency': _.find(tips, (b) => b.username === k).currency }))) {
                 output += `<div class='host-name'>${tip.username} ${tip.currency}${tip.amount}</div>`
               }
               output += `</div>`
