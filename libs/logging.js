@@ -1,7 +1,9 @@
 'use strict'
 
 var winston = require('winston')
-require('winston-logrotate')
+
+const format = winston.format
+
 var fs = require('fs')
 var _ = require('lodash')
 var logDir = './logs'
@@ -10,113 +12,61 @@ const glob = require('glob')
 
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir)
 
-global.log = new (winston.Logger)({
-  levels: {
-    error: 0,
-    chatIn: 1,
-    chatOut: 2,
-    whisperIn: 3,
-    whisperOut: 4,
-    host: 5,
-    follow: 6,
-    unfollow: 7,
-    cheer: 7,
-    sub: 7,
-    subgift: 7,
-    resub: 7,
-    timeout: 7,
-    ban: 9,
-    warning: 10,
-    debug: 11,
-    info: 12
-  },
-  transports: [
-    new (winston.transports.Console)({
-      handleExceptions: true,
-      timestamp: function () {
-        return new Date().toISOString()
-      },
-      formatter: function (options) {
-        // Return string will be passed to logger.
-        let level = options.level
-        options.meta = options.meta || {}
-        if (level === 'error') level = '!!! ERROR !!!'
-        if (level === 'debug') level = 'DEBUG:'
-        if (level === 'chatIn') level = '<<<'
-        if (level === 'chatOut') level = '>>>'
-        if (level === 'whisperIn') level = '<w<'
-        if (level === 'whisperOut') level = '>w>'
-        if (level === 'info') level = '|'
-        if (level === 'warning') level = '|!'
-        if (level === 'timeout') level = '+timeout'
-        if (level === 'ban') level = '+ban'
-        if (level === 'follow') level = '+follow'
-        if (level === 'host') level = '+host'
-        if (level === 'unfollow') level = '-follow'
-        if (level === 'cheer') level = '+cheer'
-        if (level === 'sub') level = '+sub'
-        if (level === 'subgift') level = '+subgift'
-        if (level === 'resub') level = '+resub'
-        let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
-        let fnc = !_.isUndefined(options.meta.fnc) ? options.meta.fnc : ''
-        return moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + (level ? ' ' + level + ' ' : ' ') + (options.message ? options.message : '') + (username ? ' [' + username + ']' : '') + (fnc ? ' [function: ' + fnc + ']' : '') + (_.size(options.meta) > 0 && level === 'DEBUG:' ? '\n' + options.timestamp() + ' DEBUG: ' + JSON.stringify(options.meta) : '')
-      }
-    }),
-    new winston.transports.Rotate({
-      level: 'info',
-      timestamp: function () {
-        return new Date().toISOString()
-      },
-      formatter: function (options) {
-        // Return string will be passed to logger.
-        let level = options.level
-        options.meta = options.meta || {}
-        if (level === 'error') level = '!!! ERROR !!!'
-        if (level === 'debug') level = 'DEBUG:'
-        if (level === 'chatIn') level = '<<<'
-        if (level === 'chatOut') level = '>>>'
-        if (level === 'whisperIn') level = '<w<'
-        if (level === 'whisperOut') level = '>w>'
-        if (level === 'info') level = '|'
-        if (level === 'warning') level = '|!'
-        if (level === 'timeout') level = '+timeout'
-        if (level === 'ban') level = '+ban'
-        if (level === 'follow') level = '+follow'
-        if (level === 'host') level = '+host'
-        if (level === 'unfollow') level = '-follow'
-        if (level === 'cheer') level = '+cheer'
-        if (level === 'sub') level = '+sub'
-        if (level === 'resub') level = '+resub'
-        let username = !_.isUndefined(options.meta.username) ? options.meta.username : ''
-        return moment().format('YYYY-MM-DDTHH:mm:ss.SSS') +
-          (level ? ' ' + level + ' ' : ' ') +
-          (options.message ? options.message : '') +
-          (username ? ' [' + username + ']' : '') +
-          (_.size(options.meta) > 0 && level === 'DEBUG:' ? '\n' + moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + ' DEBUG: ' + JSON.stringify(options.meta) : '')
-      },
-      file: logDir + '/sogebot.log',
-      handleExceptions: false,
-      colorize: false,
-      json: false,
-      size: '5m',
-      keep: 5,
-      compress: true
+const levels = {
+  error: 1,
+  chatIn: 2,
+  chatOut: 2,
+  whisperIn: 2,
+  whisperOut: 2,
+  host: 5,
+  follow: 5,
+  unfollow: 5,
+  cheer: 5,
+  sub: 5,
+  subgift: 5,
+  resub: 5,
+  timeout: 8,
+  ban: 8,
+  warning: 11,
+  info: 12,
+  debug: 13
+}
+
+global.log = winston.createLogger({
+  exitOnError: true,
+  json: false,
+  levels: levels,
+  level: 'debug',
+  format: format.combine(
+    format.timestamp(),
+    format.printf(info => {
+      let level
+      if (info.level === 'error') level = '!!! ERROR !!!'
+      if (info.level === 'debug') level = 'DEBUG:'
+      if (info.level === 'chatIn') level = '<<<'
+      if (info.level === 'chatOut') level = '>>>'
+      if (info.level === 'whisperIn') level = '<w<'
+      if (info.level === 'whisperOut') level = '>w>'
+      if (info.level === 'info') level = '|'
+      if (info.level === 'warning') level = '|!'
+      if (info.level === 'timeout') level = '+timeout'
+      if (info.level === 'ban') level = '+ban'
+      if (info.level === 'follow') level = '+follow'
+      if (info.level === 'host') level = '+host'
+      if (info.level === 'unfollow') level = '-follow'
+      if (info.level === 'cheer') level = '+cheer'
+      if (info.level === 'sub') level = '+sub'
+      if (info.level === 'subgift') level = '+subgift'
+      if (info.level === 'resub') level = '+resub'
+      return `${info.timestamp} ${level} ${info.message}`
     })
-  ],
+  ),
   exceptionHandlers: [
-    new winston.transports.File({
-      exitOnError: true,
-      filename: logDir + '/exceptions-' + moment().format('YYYY-MM-DDTHH_mm_ss') + '.log',
-      json: false,
-      formatter: function (options) {
-        global.log.error('+------------------------------------------------------------------------------+')
-        global.log.error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')
-        global.log.error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
-        global.log.error('| AND ADD logs/exceptions.log file to your report                              |')
-        global.log.error('+------------------------------------------------------------------------------+')
-        return JSON.stringify(options.meta)
-      }
-    })
+    new winston.transports.File({ filename: logDir + '/exceptions.log', colorize: false, maxsize: 5000 })
+  ],
+  transports: [
+    new winston.transports.File({ filename: logDir + '/sogebot.log', colorize: false, maxsize: 5000, maxFiles: 5 }),
+    new winston.transports.Console()
   ]
 })
 

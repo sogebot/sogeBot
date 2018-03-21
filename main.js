@@ -377,4 +377,14 @@ process.on('unhandledRejection', function (reason, p) {
   global.log.error(p)
 })
 
+process.on('uncaughtException', (err) => {
+  global.log.error(err.stack)
+  global.log.error('+------------------------------------------------------------------------------+')
+  global.log.error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')
+  global.log.error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
+  global.log.error('| AND ADD logs/exceptions.log file to your report                              |')
+  global.log.error('+------------------------------------------------------------------------------+')
+  process.exit(1)
+})
+
 exports = module.exports = global
