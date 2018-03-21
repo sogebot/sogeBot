@@ -65,6 +65,7 @@ class Twitch {
     global.parser.register(this, '!age', this.age, constants.VIEWERS)
     global.parser.register(this, '!me', this.showMe, constants.VIEWERS)
     global.parser.register(this, '!top time', this.showTopTime, constants.OWNER_ONLY)
+    global.parser.register(this, '!top tips', this.showTopTips, constants.OWNER_ONLY)
     if (global.commons.isSystemEnabled('points')) global.parser.register(this, '!top points', this.showTopPoints, constants.OWNER_ONLY)
     global.parser.register(this, '!top messages', this.showTopMessages, constants.OWNER_ONLY)
     global.parser.register(this, '!title', this.setTitle, constants.OWNER_ONLY)
@@ -901,6 +902,10 @@ class Twitch {
     self.showTop(self, sender, 'messages')
   }
 
+  showTopTips (self, sender, text) {
+    self.showTop(self, sender, 'tips')
+  }
+
   showTopPoints (self, sender, text) {
     self.showTop(self, sender, 'points')
   }
@@ -911,7 +916,7 @@ class Twitch {
 
   async showTop (self, sender, text) {
     let sorted, message
-    let type = text.trim().match(/^(time|points|messages)$/)
+    let type = text.trim().match(/^(time|points|messages|tips)$/)
     let i = 0
 
     if (_.isNil(type)) type = 'time'
@@ -924,6 +929,9 @@ class Twitch {
     } else if (type === 'time') {
       message = global.translate('top.listWatched').replace(/\$amount/g, 10)
       sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.time) && !_.isNil(o.time.watched) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'time.watched', 'desc')
+    } else if (type === 'tips') {
+      message = global.translate('top.listTips').replace(/\$amount/g, 10)
+      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.stats) && !_.isNil(o.stats.tips) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'stats.tips', 'desc')
     } else {
       message = global.translate('top.listMessages').replace(/\$amount/g, 10)
       sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.stats) && !_.isNil(o.stats.messages) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'stats.messages', 'desc')
@@ -943,6 +951,7 @@ class Twitch {
     for (let user of sorted) {
       message += (i + 1) + '. ' + (global.configuration.getValue('atUsername') ? '@' : '') + user.username + ' - '
       if (type === 'time') message += (user.time.watched / 1000 / 60 / 60).toFixed(1) + 'h'
+      else if (type === 'tips') message += user.stats.tips.toFixed(2) + user.custom.currency
       else if (type === 'points') message += user.points + ' ' + global.systems.points.getPointsName(user.points)
       else message += user.stats.messages
       if (i + 1 < 10 && !_.isNil(sorted[i + 1])) message += ', '

@@ -1076,6 +1076,7 @@
   },
   "top": {
     "listWatched": "Top $amount (cas sledovani): ",
+    "listTips": "Top $amount (spropitne): ",
     "listPoints": "Top $amount (body): ",
     "listMessages": "Top $amount (zpravy): "
   },
