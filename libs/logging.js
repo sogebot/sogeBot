@@ -58,7 +58,7 @@ global.log = winston.createLogger({
       if (info.level === 'sub') level = '+sub'
       if (info.level === 'subgift') level = '+subgift'
       if (info.level === 'resub') level = '+resub'
-      return `${info.timestamp} ${level} ${info.message}`
+      return `${info.timestamp} ${level} ${info.message} ${info.username ? `[${info.username}]` : ``}`
     })
   ),
   exceptionHandlers: [
