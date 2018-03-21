@@ -50,14 +50,15 @@ Configuration.prototype.debug = async function (self, sender) {
     bot: _.isNil(config.settings.bot_oauth) || !config.settings.bot_oauth.match(/oauth:[\w]*/)
   }
 
-  global.commons.sendMessage(`======= COPY DEBUG MESSAGE FROM HERE =======`, sender)
-  global.commons.sendMessage(`GENERAL | OS: ${process.env.npm_config_user_agent} | DB: ${config.database.type} | Bot version: ${process.env.npm_package_version} | Bot uptime: ${process.uptime()} | Bot lang: ${global.configuration.getValue('lang')} | Bot mute: ${global.configuration.getValue('mute')}`, sender)
-  global.commons.sendMessage(`SYSTEMS | ${_.keys(_.pickBy(config.systems)).join(', ')}`, sender)
-  global.commons.sendMessage(`WIDGETS | ${_.map(widgets, 'widget').join(', ')}`, sender)
-  global.commons.sendMessage(`API | HELIX ${stats.helix.total}/${stats.helix.errors} | KRAKEN ${stats.kraken.total}/${stats.kraken.errors} | TMI ${stats.tmi.total}/${stats.tmi.errors}`, sender)
-  global.commons.sendMessage(`WEBHOOKS | ${_.keys(_.pickBy(global.webhooks.enabled)).join(', ')}`, sender)
-  global.commons.sendMessage(`OAUTH | BOT ${!oauth.bot} | BROADCASTER ${!oauth.broadcaster}`, sender)
-  global.commons.sendMessage('======= END OF DEBUG MESSAGE =======', sender)
+  global.log.debug(`======= COPY DEBUG MESSAGE FROM HERE =======`)
+  global.log.debug(`GENERAL | OS: ${process.env.npm_config_user_agent} | DB: ${config.database.type} | Bot version: ${process.env.npm_package_version} | Bot uptime: ${process.uptime()} | Bot lang: ${global.configuration.getValue('lang')} | Bot mute: ${global.configuration.getValue('mute')}`)
+  global.log.debug(`SYSTEMS | ${_.keys(_.pickBy(config.systems)).join(', ')}`)
+  global.log.debug(`WIDGETS | ${_.map(widgets, 'widget').join(', ')}`)
+  global.log.debug(`API | HELIX ${stats.helix.total}/${stats.helix.errors} | KRAKEN ${stats.kraken.total}/${stats.kraken.errors} | TMI ${stats.tmi.total}/${stats.tmi.errors}`)
+  global.log.debug(`WEBHOOKS | ${_.keys(_.pickBy(global.webhooks.enabled)).join(', ')}`)
+  global.log.debug(`OAUTH | BOT ${!oauth.bot} | BROADCASTER ${!oauth.broadcaster}`)
+  global.log.debug(`QUEUE: ${JSON.stringify(global.parser.getQueue())}`)
+  global.log.debug('======= END OF DEBUG MESSAGE =======')
 }
 
 Configuration.prototype.get = function () {
