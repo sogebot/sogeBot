@@ -33,7 +33,7 @@ Parser.prototype.runQueue = async function () {
   this.queueRunning = true
   try {
     for (let [id, item] of Object.entries(queue)) {
-      if (item.success === item.started && item.startedAll) {
+      if (_.size(item.started) === 0 && item.startedAll) {
         this.parseCommands(item.user, item.message, item.skip)
         global.removeFromQueue(id)
 
@@ -75,8 +75,8 @@ Parser.prototype.addToQueue = async function (user, message, skip, isUserIgnored
   var id = crypto.createHash('md5').update(Math.random().toString()).digest('hex')
 
   var data = {
-    started: 0,
-    success: 0,
+    started: [],
+    success: [],
     user: user,
     message: message,
     startedAll: false,
@@ -99,9 +99,9 @@ Parser.prototype.addToQueue = async function (user, message, skip, isUserIgnored
         (this.permissionsParsers[parser] === constants.MODS && (isMod || this.isOwner(user))) ||
         (this.permissionsParsers[parser] === constants.OWNER_ONLY && this.isOwner(user))) {
       if (!_.isNil(queue[id])) {
-        queue[id].started = parseInt(queue[id].started, 10) + 1
+        queue[id].started.push(parser)
         d('Running parser - ' + parser)
-        await this.registeredParsers[parser](this.selfParsers[parser], id, user, message, skip)
+        await this.registeredParsers[parser](this.selfParsers[parser], { id: id, name: parser }, user, message, skip)
       }
     }
   }
@@ -676,18 +676,20 @@ Parser.prototype.parseMessageEach = async function (filters, msg, removeWhenEmpt
 }
 
 // these needs to be global, will be called from called parsers
-global.updateQueue = function (id, success) {
+global.updateQueue = function (opts, success) {
   const d = debug('updateQueue')
-  if (success && typeof queue[id] !== 'undefined') {
-    d(queue)
-    queue[id].success = parseInt(queue[id].success, 10) + 1
-  } else {
-    if (!_.isUndefined(queue[id]) && !_.isUndefined(queue[id].user.id)) {
-      const index = _.findIndex(global.parser.timer, function (o) { return o.id === queue[id].user.id })
-      if (!_.isUndefined(global.parser.timer[index])) global.parser.timer[index].sent = new Date().getTime()
-    }
+
+  if (_.isNil(queue[opts.id])) return // do nothing, already removed from queue
+
+  _.remove(queue[opts.id].started, (o) => o === opts.name)
+  if (success) queue[opts.id].success.push(opts.name)
+
+  const index = _.findIndex(global.parser.timer, function (o) { return o.id === queue[opts.id].user.id })
+  if (!_.isNil(global.parser.timer[index])) global.parser.timer[index].sent = new Date().getTime()
+
+  if (!success) {
     d('Removing in updateQueue')
-    global.removeFromQueue(id)
+    global.removeFromQueue(opts.id)
   }
 }
 
@@ -747,6 +749,10 @@ Parser.prototype.isModerated = async function (sender, message) {
   } else {
     return true
   }
+}
+
+Parser.prototype.getQueue = function () {
+  return queue
 }
 
 global.removeFromQueue = function (id) {
