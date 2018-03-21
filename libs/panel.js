@@ -83,7 +83,7 @@ function Panel () {
   })
 
   this.server.listen(port, function () {
-    global.log.info('WebPanel is available at http://localhost:%s', port)
+    global.log.info(`WebPanel is available at http://localhost:${port}`)
   })
 
   this.io = require('socket.io')(this.server)
