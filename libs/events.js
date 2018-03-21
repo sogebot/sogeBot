@@ -181,7 +181,7 @@ class Events {
 
   async fireSendChatMessageOrWhisper (operation, attributes, whisper) {
     const d = debug('events:fireSendChatMessageOrWhisper')
-    let username = _.get(attributes, 'username', global.parser.getOwner())
+    let username = _.isNil(attributes.username) ? global.parser.getOwner() : attributes.username
     let message = operation.messageToSend
     _.each(attributes, function (val, name) {
       if (_.isObject(val) && _.size(val) === 0) return true // skip empty object
