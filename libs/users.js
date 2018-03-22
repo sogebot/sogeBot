@@ -149,7 +149,7 @@ Users.prototype.getViewers = async function (self, socket) {
       _.set(viewer, 'stats.bits', 0)
     }
   }
-  socket.emit('Viewers', Buffer.from(JSON.stringify(viewers)).toString('base64'))
+  socket.emit('Viewers', Buffer.from(JSON.stringify(viewers), 'utf8').toString('base64'))
 }
 
 Users.prototype.deleteViewer = function (self, socket, username) {
