@@ -7,6 +7,8 @@ class Currency {
     this.base = 'USD'
     this.rates = {}
 
+    global.configuration.register('currency', 'core.no-response', 'string', 'EUR')
+
     this.updateRates()
   }
 
@@ -16,8 +18,11 @@ class Currency {
 
   exchange (value, from, to) {
     try {
+      this.rates[this.base] = 1 // base is always 1:1
+
+      if (from.toLowerCase().trim() === to.toLowerCase().trim()) return value // nothing to do
       if (_.isNil(this.rates[from])) throw Error(`${from} code was not found`)
-      if (_.isNil(this.rates[to])) throw Error(`${to} code was not found`)
+      if (_.isNil(this.rates[to]) && to.toLowerCase().trim() !== this.base.toLowerCase().trim()) throw Error(`${to} code was not found`)
 
       if (to.toLowerCase().trim() !== this.base.toLowerCase().trim()) {
         return (value / this.rates[from]) * this.rates[to]

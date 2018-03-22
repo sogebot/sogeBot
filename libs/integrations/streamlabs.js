@@ -88,8 +88,7 @@ class Streamlabs {
           })
           global.events.fire('tip', { username: event.from.toLowerCase(), amount: event.amount, message: event.message, currency: event.currency })
           global.db.engine.insert('users.tips', { username: event.from.toLowerCase(), amount: event.amount, message: event.message, currency: event.currency, timestamp: _.now() })
-          if (global.twitch.isOnline) global.twitch.current.tips = global.twitch.current.tips + parseFloat(event.amount)
-          global.twitch.current.currency = event.currency
+          if (global.twitch.isOnline) global.twitch.current.tips = global.twitch.current.tips + parseFloat(global.currency.exchange(event.amount, event.currency, global.configuration.getValue('currency')))
         }
       }
     })

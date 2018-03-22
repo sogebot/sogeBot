@@ -132,16 +132,12 @@ Users.prototype.getViewers = async function (self, socket) {
     let tipsOfViewer = _.filter(tips, (o) => o.username === viewer.username)
     if (!_.isEmpty(tipsOfViewer)) {
       let tipsAmount = 0
-      for (let tip of tipsOfViewer) {
-        // TODO: Add currency exchange
-        tipsAmount += tip.amount
-      }
+      for (let tip of tipsOfViewer) tipsAmount += global.currency.exchange(tip.amount, tip.currency, global.configuration.getValue('currency'))
       _.set(viewer, 'stats.tips', tipsAmount)
-      _.set(viewer, 'custom.currency', tipsOfViewer[0].currency)
     } else {
       _.set(viewer, 'stats.tips', 0)
-      _.set(viewer, 'custom.currency', '')
     }
+    _.set(viewer, 'custom.currency', global.currency.symbol(global.configuration.getValue('currency')))
 
     // BITS
     let bitsOfViewer = _.filter(bits, (o) => o.username === viewer.username)
