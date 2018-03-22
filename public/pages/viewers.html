@@ -382,7 +382,9 @@
 
     socket.off('Viewers')
     socket.on('Viewers', function (list) {
-      viewers.list = JSON.parse(atob(list))
+      viewers.list = JSON.parse(decodeURIComponent(Array.prototype.map.call(atob(list), function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+      }).join('')))
       viewers.update(viewers.paging())
     });
 
