@@ -379,8 +379,7 @@ process.on('unhandledRejection', function (reason, p) {
   global.log.error(p)
 })
 
-process.on('uncaughtException', (err) => {
-  global.log.error(err.stack)
+process.on('uncaughtException', () => {
   global.log.error('+------------------------------------------------------------------------------+')
   global.log.error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')
   global.log.error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
