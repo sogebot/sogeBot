@@ -62,10 +62,10 @@ global.log = winston.createLogger({
     })
   ),
   exceptionHandlers: [
-    new winston.transports.File({ filename: logDir + '/exceptions.log', colorize: false, maxsize: 5000 })
+    new winston.transports.File({ filename: logDir + '/exceptions.log', colorize: false, maxsize: 5242880 })
   ],
   transports: [
-    new winston.transports.File({ filename: logDir + '/sogebot.log', colorize: false, maxsize: 5000, maxFiles: 5 }),
+    new winston.transports.File({ filename: logDir + '/sogebot.log', colorize: false, maxsize: 5242880, maxFiles: 5 }),
     new winston.transports.Console()
   ]
 })
