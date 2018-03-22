@@ -457,7 +457,8 @@
     "page-settings": {
       "systems": {
         "others": {
-          "title": "Ostatní"
+          "title": "Ostatní",
+          "currency": "Měna"
         },
         "whispers": {
           "title": "Šeptání",
