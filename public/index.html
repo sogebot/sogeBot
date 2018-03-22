@@ -260,8 +260,7 @@
 
       <div class="col-sm stream-info">
         <h2 data-lang="tips"></h2>
-        <span class="data" id="curTips">-</span>
-        <span class="data ml-0 pl-0" id="curTipsCurrency">-</span>
+        <span class="data" id="curTips">-</span><span class="data ml-0 pl-0" id="curTipsCurrency">-</span>
         <span class="stats" id="curTipsChange">&nbsp;</span>
       </div>
     </div>
@@ -1216,7 +1215,7 @@
     function latestStatsUpdateHTML(data) {
       var getPercentage = function (cur, orig) {
         var btn = $('#percentage-btn')
-        if (_.isNil(orig)) orig = 0
+        if (_.isNil(orig) || _.isNaN(orig)) orig = 0
         if (orig === cur) return 0
         if (orig === 0) {
           if (!btn.data('showPercentage')) return cur
@@ -1250,7 +1249,7 @@
         var curSubscribers = getPercentage(parseInt($("#curSubscribers").text(), 10), parseInt(data.currentSubscribers,
           10))
         var curBits = getPercentage(parseInt($("#curBits").text(), 10), parseInt(data.currentBits, 10))
-        var curTips = getPercentage(parseInt($("#curTips").text(), 10), parseInt(data.currentTips, 10))
+        var curTips = getPercentage(parseFloat($("#curTips").text()), parseFloat(data.currentTips, 10))
         var curViews = getPercentage(parseInt($("#curViews").text(), 10), parseInt(data.currentViews, 10))
         var curHosts = getPercentage(parseInt($("#curHosts").text(), 10), parseInt(data.currentHosts, 10))
 

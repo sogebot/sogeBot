@@ -156,7 +156,7 @@
             0 : item.stats.messages) + '</td>' +
           '<td class="text-center" data-value=' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.tips) ?
             0 : item.stats.tips) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.tips) ?
-            0 : `${item.stats.tips}${item.custom.currency}`) + '</td>' +
+            0 : `${parseFloat(item.stats.tips).toFixed(2)}${item.custom.currency}`) + '</td>' +
           '<td class="text-center" data-value=' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.bits) ?
             0 : item.stats.bits) + '>' + (_.isUndefined(item.stats) || _.isUndefined(item.stats.bits) ?
             0 : item.stats.bits) + '</td>' +

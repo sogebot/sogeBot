@@ -88,6 +88,17 @@ class Credits {
           clips.list = await this.getTopClips()
         }
 
+        // change tips if neccessary for aggregated events (need same currency)
+        events = events.filter((o) => o.timestamp >= timestamp)
+        for (let event of events) {
+          if (!_.isNil(event.amount) && !_.isNil(event.currency)) {
+            event.amount = global.configuration.getValue('creditsAggregate')
+              ? global.currency.exchange(event.amount, event.currency, global.configuration.getValue('currency'))
+              : event.amount
+            event.currency = global.currency.symbol(global.configuration.getValue('creditsAggregate') ? global.configuration.getValue('currency') : event.currency)
+          }
+        }
+
         callback(null,
           events.filter((o) => o.timestamp >= timestamp),
           config.settings.broadcaster_username,
