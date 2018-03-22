@@ -65,20 +65,20 @@ let updates = async (from, to) => {
 }
 
 let migration = {
-  events: [{
-    version: '6.1.0',
+  bits: [{
+    version: '6.3.0',
     do: async () => {
-      console.info('Migration events to %s', '6.1.0')
-      let events = await global.db.engine.find('events')
-      for (let event of events) {
-        if (event.key === 'hosted') {
-          await global.db.engine.update('events', {_id: event._id.toString()}, {
-            definitions: {
-              viewersAtLeast: _.get(event, 'definitions.viewersAtLeast', 1),
-              ignoreAutohost: _.get(event, 'definitions.ignoreAutohost', false)
-            }
-          })
-        }
+      console.info('Migration bits to %s', '6.3.0')
+      let users = await global.db.engine.find('users')
+      for (let user of users) {
+        if (!_.has(user, 'stats.bits') || _.isNil(user.stats.bits)) continue // skip if bits are null/undefined
+        await Promise.all([
+          global.db.engine.remove('users', { _id: user._id.toString() }),
+          global.db.engine.insert('users.bits', { username: user.username, amount: user.stats.bits, message: 'Migrated from 6.x', timestamp: _.now() })
+        ])
+        delete user.stats.bits
+        delete user._id
+        await global.db.engine.insert('users', user)
       }
     }
   }]
