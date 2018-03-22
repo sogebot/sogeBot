@@ -18,6 +18,7 @@ class Currency {
 
   exchange (value, from, to) {
     try {
+      value = parseFloat(value)
       this.rates[this.base] = 1 // base is always 1:1
 
       if (from.toLowerCase().trim() === to.toLowerCase().trim()) return value // nothing to do
@@ -25,11 +26,11 @@ class Currency {
       if (_.isNil(this.rates[to]) && to.toLowerCase().trim() !== this.base.toLowerCase().trim()) throw Error(`${to} code was not found`)
 
       if (to.toLowerCase().trim() !== this.base.toLowerCase().trim()) {
-        return (value / this.rates[from]) * this.rates[to]
-      } else return value / this.rates[from]
+        return parseFloat((value / this.rates[from]) * this.rates[to])
+      } else return parseFloat(value / this.rates[from])
     } catch (e) {
       global.log.warning(`Currency exchange error - ${e.message}`)
-      return value // don't change rate if code not found
+      return parseFloat(value) // don't change rate if code not found
     }
   }
 

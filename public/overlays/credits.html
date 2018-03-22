@@ -293,7 +293,7 @@
             } else if (event.event === 'tip' && show.tips) {
               if (aggregate) tips.push({ username: event.username, currency: event.currency, amount: event.amount })
               else $events.append(`
-                <div class='job'>${_.get(custom, 'tip-by', 'tip <strong>$currency$amount</strong>').replace('$currency', event.currency).replace('$amount', event.amount)}</div>
+                <div class='job'>${_.get(custom, 'tip-by', 'tip <strong>$currency$amount</strong>').replace('$currency', event.currency).replace('$amount', parseFloat(event.amount).toFixed(2))}</div>
                 <div class='name'>${event.username}</div>
                 <div class="message">${event.message}</div>
               `)
