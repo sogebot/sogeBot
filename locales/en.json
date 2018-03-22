@@ -457,7 +457,8 @@
     "page-settings": {
       "systems": {
         "others": {
-          "title": "Others"
+          "title": "Others",
+          "currency": "Currency"
         },
         "whispers": {
           "title": "Whispers",
