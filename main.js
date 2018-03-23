@@ -5,6 +5,7 @@ var irc = require('twitch-js')
 var _ = require('lodash')
 const figlet = require('figlet')
 const moment = require('moment')
+const util = require('util')
 
 // config
 const config = require('./config.json')
@@ -375,8 +376,7 @@ if (config.debug.all) {
 }
 
 process.on('unhandledRejection', function (reason, p) {
-  global.log.error('Possibly Unhandled Rejection')
-  global.log.error(p)
+  global.log.error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
 })
 
 process.on('uncaughtException', () => {
