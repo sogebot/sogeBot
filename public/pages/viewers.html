@@ -1,11 +1,18 @@
 <!-- Viewers Modal Dlg -->
-<div class="modal" id="viewersDlg" tabindex="-1" role="dialog" aria-labelledby="new_version_dlg">
+<div class="modal" id="viewersDlg" role="dialog" aria-labelledby="new_version_dlg">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">User <strong id="viewers_username"></strong></h4>
       </div>
       <div class="modal-body">
+        <div class="dialog-group">
+          <div class="input-group flex-nowrap">
+            <button class="btn btn-success w-100" id="viewers_follower_toggle">Follower</button>
+            <button class="btn btn-success w-100" id="viewers_subscriber_toggle">Subscriber</button>
+            <button class="btn btn-success w-100" id="viewers_regular_toggle">Regular</button>
+          </div>
+        </div>
         <div class="dialog-group">
           <div class="input-group">
             <div class="input-group-prepend">
@@ -239,7 +246,7 @@
               <span class="alert alert-${item.is.subscriber ? 'success' : 'danger'}" style="padding: 0 1.25rem">SUBSCRIBER</span>
               <span class="alert alert-${item.is.follower ? 'success' : 'danger'}" style="padding: 0 1.25rem">FOLLOWER</span>
               <span class="alert alert-${item.is.regular ? 'success' : 'danger'}" style="padding: 0 1.25rem">REGULAR</span>
-              <span class="alert alert-${item.is.online ? 'success' : 'danger'}" style="padding: 0 1.25rem">ONLINE</span>
+              <span class="alert alert-${item.is.online ? 'success' : 'danger'}" style="padding: 0 1.25rem">ACTIVE</span>
 
             </td>
           </tr>
@@ -439,6 +446,11 @@
       $('#viewers_username').text(viewer.username)
       $('#viewers_tier').val(viewer.stats.tier)
 
+      /* toggles */
+      $('#viewers_follower_toggle').removeClass().addClass((viewer.is.follower ? 'btn-success' : 'btn-danger') + ' btn w-100')
+      $('#viewers_subscriber_toggle').removeClass().addClass((viewer.is.subscriber ? 'btn-success' : 'btn-danger') + ' btn w-100')
+      $('#viewers_regular_toggle').removeClass().addClass((viewer.is.regular ? 'btn-success' : 'btn-danger') + ' btn w-100')
+
       const datepickeropts = {
         icons: {
           time: "far fa-clock",
@@ -481,51 +493,55 @@
         }
         for (let tip of tips) {
           $('#viewers_tips').append(`
-            <tr data-viewer-tip-popover
-                data-viewer-tip-amount="${tip.amount}"
-                data-viewer-tip-timestamp="${tip.timestamp}"
-                data-viewer-tip-currency="${tip.currency}"
-                data-viewer-tip-message="${tip.message}"
-                data-viewer-tip-id="${tip._id.toString()}">
+            <tr data-viewer-tip-id="${tip._id.toString()}">
               <td style="border-top: 0">${viewers.styleFollowTime(tip.timestamp)}</td>
               <td style="border-top: 0"><strong>${parseFloat(tip.amount).toFixed(2)}${tip.currency}</strong></td>
               <td style="border-top: 0">${tip.message}</td>
             </tr>
           `)
+
+          $(`#viewers_tips tr[data-viewer-tip-id="${tip._id.toString()}"]`).popover({
+            html: true,
+            placement: 'auto',
+            template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body p-0"></div></div>',
+            content: `
+              <div class="card">
+                <div class="card-body p-0">
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-clock"></i></span>
+                    </div>
+                    <input type="text" class="form-control border-top-0 border-left-0 border-right-0" id="tip-${tip._id.toString()}"/>
+                  </div>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-money-bill-alt"></i></span>
+                    </div>
+                    <input type="text" class="border-top-0 border-left-0 border-right-0 form-control" id="viewers_tip" value="${parseFloat(tip.amount).toFixed(2)}${tip.currency}"/>
+                  </div>
+                  <div class="input-group mb-1">
+                    <div class="input-group-prepend">
+                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-comment"></i></span>
+                    </div>
+                    <textarea rows="5" class="border-top-0 border-left-0 border-right-0 form-control">${tip.message}</textarea>
+                  </div>
+                </div>
+                <div class="card-footer d-flex p-0 border-top-0">
+                  <button class="btn btn-danger w-100">${commons.translate('delete')}</button>
+                  <button class="btn btn-primary w-100">${commons.translate('save-changes')}</button>
+                </div>
+              </div>
+            `
+          })
+          $(`#viewers_tips tr[data-viewer-tip-id="${tip._id.toString()}"]`).off('shown.bs.popover').on('shown.bs.popover', () => {
+            $(`#tip-${tip._id.toString()}`).datetimepicker('destroy')
+            $(`#tip-${tip._id.toString()}`).datetimepicker(datepickeropts)
+            if (!_.isNil(tip.timestamp) && tip.timestamp > 0) $(`#tip-${tip._id.toString()}`).datetimepicker('defaultDate', viewers.styleFollowTime(tip.timestamp))
+            else $(`#tip-${tip._id.toString()}`).datetimepicker('defaultDate', false)
+            $(`#tip-${tip._id.toString()}`).off('click').on('click', () => $(`#tip-${tip._id.toString()}`).datetimepicker('toggle'))
+            $(`#tip-${tip._id.toString()}`).off('blur').on('blur', () => $(`#tip-${tip._id.toString()}`).datetimepicker('hide'))
+          })
         }
-        $(`#viewers_tips tr[data-viewer-tip-popover]`).popover({
-          html: true,
-          placement: 'auto',
-          template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body p-0"></div></div>',
-          content: `
-            <div class="card">
-              <div class="card-body">
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" data-lang="timestamp"></span>
-                  </div>
-                  <input type="text" class="form-control datetimepicker-input" id="viewers_timestamp" data-toggle="datetimepicker" data-target="#viewers_timestamp"/>
-                </div>
-                <div class="input-group mt-1">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" data-lang="tip"></span>
-                  </div>
-                  <input type="text" class="form-control" id="viewers_tip"/>
-                </div>
-                <div class="input-group mt-1">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" data-lang="message"></span>
-                  </div>
-                  <input type="text" class="form-control" id="viewers_message"/>
-                </div>
-              </div>
-              <div class="card-footer d-flex">
-                <button class="btn btn-danger">Delete</button>
-                <button class="btn btn-primary ml-auto">Save</button>
-              </div>
-            </div>
-          `
-        })
       })
 
       $('#viewers_bits').empty()
@@ -541,14 +557,61 @@
         }
         for (let bit of bits) {
           $('#viewers_bits').append(`
-            <tr>
+            <tr data-viewer-bit-id="${bit._id.toString()}">
               <td style="border-top: 0">${viewers.styleFollowTime(bit.timestamp)}</td>
               <td style="border-top: 0"><strong>${parseInt(bit.amount, 10)}</strong></td>
               <td style="border-top: 0">${bit.message}</td>
             </tr>
           `)
+
+          $(`#viewers_bits tr[data-viewer-bit-id="${bit._id.toString()}"]`).popover({
+            html: true,
+            placement: 'auto',
+            template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body p-0"></div></div>',
+            content: `
+              <div class="card">
+                <div class="card-body p-0">
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-clock"></i></span>
+                    </div>
+                    <input type="text" class="form-control datetimepicker-input border-top-0 border-left-0 border-right-0" id="bit-${bit._id.toString()}"/>
+                  </div>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-money-bill-alt"></i></span>
+                    </div>
+                    <input type="text" class="border-top-0 border-left-0 border-right-0 form-control" id="viewers_tip" value="${parseInt(bit.amount, 10)}"/>
+                  </div>
+                  <div class="input-group mb-1">
+                    <div class="input-group-prepend">
+                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-comment"></i></span>
+                    </div>
+                    <textarea rows="5" class="border-top-0 border-left-0 border-right-0 form-control">${bit.message}</textarea>
+                  </div>
+                </div>
+                <div class="card-footer d-flex p-0 border-top-0">
+                  <button class="btn btn-danger w-100">${commons.translate('delete')}</button>
+                  <button class="btn btn-primary w-100">${commons.translate('save-changes')}</button>
+                </div>
+              </div>
+            `
+          })
+          $(`#viewers_bits tr[data-viewer-bit-id="${bit._id.toString()}"]`).off('shown.bs.popover').on('shown.bs.popover', () => {
+            $(`#bit-${bit._id.toString()}`).datetimepicker('destroy')
+            $(`#bit-${bit._id.toString()}`).datetimepicker(datepickeropts)
+            if (!_.isNil(bit.timestamp) && bit.timestamp > 0) $(`#bit-${bit._id.toString()}`).datetimepicker('defaultDate', viewers.styleFollowTime(bit.timestamp))
+            else $(`#bit-${bit._id.toString()}`).datetimepicker('defaultDate', false)
+            $(`#bit-${bit._id.toString()}`).off('click').on('click', () => $(`#bit-${bit._id.toString()}`).datetimepicker('toggle'))
+            $(`#bit-${bit._id.toString()}`).off('blur').on('blur', () => $(`#bit-${bit._id.toString()}`).datetimepicker('hide'))
+          })
         }
       })
+    })
+
+    $('#viewers_follower_toggle, #viewers_subscriber_toggle, #viewers_regular_toggle').off('click').on('click', (ev) => {
+      let id = $(ev.currentTarget).attr('id')
+      $(`#${id}`).toggleClass('btn-success btn-danger')
     })
   }
 
