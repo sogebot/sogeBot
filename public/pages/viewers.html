@@ -52,6 +52,15 @@
         </div>
 
         <div class="dialog-group">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" data-lang="tier"></span>
+            </div>
+            <input type="text" class="form-control" id="viewers_tier"/>
+          </div>
+        </div>
+
+        <div class="dialog-group">
           <div class="card">
             <div class="card-header" style="display: flex; padding: 0;">
               <div data-lang="bits" style="line-height: 1.9rem; padding-left: 1rem;"></div>
@@ -59,23 +68,7 @@
             </div>
             <div class="card-body p-0">
               <table class="table table-sm m-0 table-hover">
-                <tbody>
-                  <tr>
-                    <td style="border-top: 0">21:21:37, 2016-07-09</td>
-                    <td style="border-top: 0"><strong>15</strong></td>
-                    <td style="border-top: 0"><em>Lorem Ipsum Dolor Sit Amet</em></td>
-                  </tr>
-                  <tr>
-                    <td>21:21:37, 2016-07-09</td>
-                    <td><strong>1522</strong></td>
-                    <td><em>Lorem Ipsum Dolor Sit Amet</em></td>
-                  </tr>
-                  <tr>
-                    <td>21:21:37, 2016-07-09</td>
-                    <td><strong>158</strong></td>
-                    <td><em>Lorem Ipsum Dolor Sit Amet</em></td>
-                  </tr>
-                </tbody>
+                <tbody id="viewers_bits"></tbody>
               </table>
             </div>
           </div>
@@ -87,23 +80,7 @@
             </div>
             <div class="card-body p-0">
               <table class="table table-sm m-0 table-hover">
-                <tbody>
-                  <tr>
-                    <td style="border-top: 0">21:21:37, 2016-07-09</td>
-                    <td style="border-top: 0"><strong>15$</strong></td>
-                    <td style="border-top: 0">Lorem Ipsum Dolor Sit Amet</td>
-                  </tr>
-                  <tr>
-                    <td>21:21:37, 2016-07-09</td>
-                    <td><strong>1522CZK</strong></td>
-                    <td>Lorem Ipsum Dolor Sit Amet</td>
-                  </tr>
-                  <tr>
-                    <td>21:21:37, 2016-07-09</td>
-                    <td><strong>158RUB</strong></td>
-                    <td>Lorem Ipsum Dolor Sit Amet</td>
-                  </tr>
-                </tbody>
+                <tbody id="viewers_tips"></tbody>
               </table>
             </div>
           </div>
@@ -460,6 +437,7 @@
       /* load up all viewer data */
       let viewer = _.find(viewers.list, (o) => String(o.username) === String($(ev.relatedTarget).data('username')))
       $('#viewers_username').text(viewer.username)
+      $('#viewers_tier').val(viewer.stats.tier)
 
       const datepickeropts = {
         icons: {
@@ -490,8 +468,48 @@
       $('#viewers_points').val(_.get(viewer, 'points', 0))
       $('#viewers_messages').val(_.get(viewer, 'stats.messages', 0))
 
-      userSocket.emit('user.tips', viewer.username, (tips) => {
-        console.log(tips)
+      $('#viewers_tips').empty()
+      userSocket.emit('users.tips', viewer.username, (err, tips) => {
+        if (err) return console.error(err)
+
+        if (tips.length === 0) {
+          $('#viewers_tips').append(`
+            <tr>
+              <td style="border-top: 0" colspan="3"><em class="text-info">No tips data were found for this user</em></td>
+            </tr>
+          `)
+        }
+        for (let tip of tips) {
+          $('#viewers_tips').append(`
+            <tr>
+              <td style="border-top: 0">${viewers.styleFollowTime(tip.timestamp)}</td>
+              <td style="border-top: 0"><strong>${parseFloat(tip.amount).toFixed(2)}${tip.currency}</strong></td>
+              <td style="border-top: 0">${tip.message}</td>
+            </tr>
+          `)
+        }
+      })
+
+      $('#viewers_bits').empty()
+      userSocket.emit('users.bits', viewer.username, (err, bits) => {
+        if (err) return console.error(err)
+
+        if (bits.length === 0) {
+          $('#viewers_bits').append(`
+            <tr>
+              <td style="border-top: 0" colspan="3"><em class="text-info">No bits data were found for this user</em></td>
+            </tr>
+          `)
+        }
+        for (let bit of bits) {
+          $('#viewers_bits').append(`
+            <tr>
+              <td style="border-top: 0">${viewers.styleFollowTime(bit.timestamp)}</td>
+              <td style="border-top: 0"><strong>${parseInt(bit.amount, 10)}</strong></td>
+              <td style="border-top: 0">${bit.message}</td>
+            </tr>
+          `)
+        }
       })
     })
   }
