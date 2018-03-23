@@ -69,6 +69,16 @@ Users.prototype.sockets = function (self) {
       const users = await global.db.engine.find('users_ignorelist')
       callback(null, _.orderBy(users, 'username', 'asc'))
     })
+
+    socket.on('users.tips', async (username, cb) => {
+      const tips = await global.db.engine.find('users.tips', { username: username })
+      cb(null, _.orderBy(tips, 'timestamp', 'desc'))
+    })
+
+    socket.on('users.bits', async (username, cb) => {
+      const bits = await global.db.engine.find('users.bits', { username: username })
+      cb(null, _.orderBy(bits, 'timestamp', 'desc'))
+    })
   })
 }
 

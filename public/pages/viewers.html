@@ -63,17 +63,17 @@
                   <tr>
                     <td style="border-top: 0">21:21:37, 2016-07-09</td>
                     <td style="border-top: 0"><strong>15</strong></td>
-                    <td style="border-top: 0">Lorem Ipsum Dolor Sit Amet</td>
+                    <td style="border-top: 0"><em>Lorem Ipsum Dolor Sit Amet</em></td>
                   </tr>
                   <tr>
                     <td>21:21:37, 2016-07-09</td>
                     <td><strong>1522</strong></td>
-                    <td>Lorem Ipsum Dolor Sit Amet</td>
+                    <td><em>Lorem Ipsum Dolor Sit Amet</em></td>
                   </tr>
                   <tr>
                     <td>21:21:37, 2016-07-09</td>
                     <td><strong>158</strong></td>
-                    <td>Lorem Ipsum Dolor Sit Amet</td>
+                    <td><em>Lorem Ipsum Dolor Sit Amet</em></td>
                   </tr>
                 </tbody>
               </table>
@@ -489,6 +489,10 @@
       $('#viewers_watched').val(viewers.styleWatched(viewer.time.watched))
       $('#viewers_points').val(_.get(viewer, 'points', 0))
       $('#viewers_messages').val(_.get(viewer, 'stats.messages', 0))
+
+      userSocket.emit('user.tips', viewer.username, (tips) => {
+        console.log(tips)
+      })
     })
   }
 
