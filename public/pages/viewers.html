@@ -481,13 +481,51 @@
         }
         for (let tip of tips) {
           $('#viewers_tips').append(`
-            <tr>
+            <tr data-viewer-tip-popover
+                data-viewer-tip-amount="${tip.amount}"
+                data-viewer-tip-timestamp="${tip.timestamp}"
+                data-viewer-tip-currency="${tip.currency}"
+                data-viewer-tip-message="${tip.message}"
+                data-viewer-tip-id="${tip._id.toString()}">
               <td style="border-top: 0">${viewers.styleFollowTime(tip.timestamp)}</td>
               <td style="border-top: 0"><strong>${parseFloat(tip.amount).toFixed(2)}${tip.currency}</strong></td>
               <td style="border-top: 0">${tip.message}</td>
             </tr>
           `)
         }
+        $(`#viewers_tips tr[data-viewer-tip-popover]`).popover({
+          html: true,
+          placement: 'auto',
+          template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body p-0"></div></div>',
+          content: `
+            <div class="card">
+              <div class="card-body">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" data-lang="timestamp"></span>
+                  </div>
+                  <input type="text" class="form-control datetimepicker-input" id="viewers_timestamp" data-toggle="datetimepicker" data-target="#viewers_timestamp"/>
+                </div>
+                <div class="input-group mt-1">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" data-lang="tip"></span>
+                  </div>
+                  <input type="text" class="form-control" id="viewers_tip"/>
+                </div>
+                <div class="input-group mt-1">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" data-lang="message"></span>
+                  </div>
+                  <input type="text" class="form-control" id="viewers_message"/>
+                </div>
+              </div>
+              <div class="card-footer d-flex">
+                <button class="btn btn-danger">Delete</button>
+                <button class="btn btn-primary ml-auto">Save</button>
+              </div>
+            </div>
+          `
+        })
       })
 
       $('#viewers_bits').empty()
