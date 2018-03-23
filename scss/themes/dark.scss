@@ -1,3 +1,4 @@
+
 $enable-rounded: false;
 $enable-gradients: false;
 $enable-hover-media-query: true;
@@ -54,7 +55,8 @@ $bot-version: $blue !default;
 $hr: $gray-800 !default;
 
 $theme-colors: (
-  "primary": #fd7e14
+  "primary": #fd7e14,
+  "secondary": #606b77
 );
 
 $eventlist: (
@@ -82,3 +84,8 @@ $status-connecting-border: #fd7e14 !default;
 @import "../../node_modules/bootstrap/scss/bootstrap";
 @import "../custom.scss";
 @import "../colors.scss";
+
+// Force text color on secondary button to be more readable (yiq is somehow too dark)
+.btn-secondary {
+  color: #b1c6db !important;
+}
