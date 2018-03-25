@@ -60,13 +60,13 @@ Stats.prototype.getLatestStats = async function (self, socket) {
 
     let i = 0
     for (let stat of statsFromDb) {
-      stats.currentViewers += stat.currentViewers
-      stats.currentBits += stat.currentBits
-      stats.currentTips += stat.currentTips
-      stats.chatMessages += stat.chatMessages
-      stats.maxViewers += stat.maxViewers
-      stats.newChatters += stat.newChatters
-      stats.currentHosts += stat.currentHosts
+      stats.currentViewers += parseFloat(_.isNil(stat.currentViewers) ? 0 : stat.currentViewers)
+      stats.currentBits += parseFloat(_.isNil(stat.currentBits) ? 0 : stat.currentBits)
+      stats.currentTips += parseFloat(_.isNil(stat.currentTips) ? 0 : stat.currentTips)
+      stats.chatMessages += parseFloat(_.isNil(stat.chatMessages) ? 0 : stat.chatMessages)
+      stats.maxViewers += parseFloat(_.isNil(stat.maxViewers) ? 0 : stat.maxViewers)
+      stats.newChatters += parseFloat(_.isNil(stat.newChatters) ? 0 : stat.newChatters)
+      stats.currentHosts += parseFloat(_.isNil(stat.currentHosts) ? 0 : stat.currentHosts)
       if (i === 0) {
         // get only latest
         stats.currentFollowers = stat.currentFollowers
