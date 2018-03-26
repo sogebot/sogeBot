@@ -71,7 +71,7 @@
           <div class="card">
             <div class="card-header" style="display: flex; padding: 0;">
               <div data-lang="bits" style="line-height: 1.9rem; padding-left: 1rem;"></div>
-              <button class="ml-auto btn btn-sm btn-primary" id="newBits"><i class="fas fa-plus" aria-hidden="true"></i></button>
+              <button class="ml-auto btn btn-sm btn-primary" id="new_bits"><i class="fas fa-plus" aria-hidden="true"></i></button>
             </div>
             <div class="card-body p-0">
               <table class="table table-sm m-0 table-hover">
@@ -83,7 +83,7 @@
           <div class="card mt-2">
             <div class="card-header" style="display: flex; padding: 0;">
               <div data-lang="tips" style="line-height: 1.9rem; padding-left: 1rem;"></div>
-              <button class="ml-auto btn btn-sm btn-primary" id="newTips"><i class="fas fa-plus" aria-hidden="true"></i></button>
+              <button class="ml-auto btn btn-sm btn-primary" id="new_tips"><i class="fas fa-plus" aria-hidden="true"></i></button>
             </div>
             <div class="card-body p-0">
               <table class="table table-sm m-0 table-hover">
@@ -221,6 +221,7 @@
 <script>
   var pagination = 1
   var viewers = {
+    socket: null,
     sortBy: 'username',
     sortType: 'up',
     toSearch: '',
@@ -342,6 +343,31 @@
         paging.append('<li onclick="viewers.pagination(1)" style="margin:0; padding: 8px 5px;" class="btn btn-primary">1</li>')
       }
       return list[pagination - 1];
+    },
+    addBitsAndTips: function (button) {
+      if ($(button).attr('disabled')) return
+
+      $(button).attr('disabled', 'disabled')
+      $(button).toggleClass('btn-primary btn-info').text(commons.translate('saving'))
+      let data = {
+        username: 'test',
+        amount: '10',
+        message: null
+      }
+      this.socket.emit(`users.${$(button).data('type')}.add`, data, (err) => {
+        if (err) {
+          $(button).toggleClass('btn-info btn-danger').text(commons.translate('error'))
+          setTimeout(() => {
+            $(button).toggleClass('btn-danger btn-primary').text(commons.translate('save-changes'))
+            $(button).removeAttr('disabled')
+          }, 1000)
+        } else {
+          $(button).toggleClass('btn-info btn-success').text(commons.translate('done'))
+          setTimeout(() => {
+            $(`#new_${$(button).data('type')}`).popover('hide')
+          }, 1000)
+        }
+      })
     }
   }
 
@@ -360,10 +386,10 @@
       },
       format: 'HH:mm:ss, YYYY-MM-DD' // 21:21:37, 2016-07-09
     }
-
     var userSocket = io('/users', {
       query: "token=" + token
     });
+    viewers.socket = userSocket
 
     if (!systems.points) {
       $("#viewers-points").remove()
@@ -581,7 +607,7 @@
                     <div class="input-group-prepend">
                       <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-money-bill-alt"></i></span>
                     </div>
-                    <input type="text" class="border-top-0 border-left-0 border-right-0 form-control" id="viewers_tip" value="${parseInt(bit.amount, 10)}"/>
+                    <input type="number" class="border-top-0 border-left-0 border-right-0 form-control" value="${parseInt(bit.amount, 10)}"/>
                   </div>
                   <div class="input-group mb-1">
                     <div class="input-group-prepend">
@@ -609,7 +635,7 @@
       })
 
       // set up new bit popover
-      $(`#newBits`).popover({
+      $(`#new_bits`).popover({
         html: true,
         placement: 'auto',
         template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body p-0"></div></div>',
@@ -626,7 +652,7 @@
                 <div class="input-group-prepend">
                   <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-money-bill-alt"></i></span>
                 </div>
-                <input type="text" class="border-top-0 border-left-0 border-right-0 form-control" id="viewers_tip" value=""/>
+                <input type="number" class="border-top-0 border-left-0 border-right-0 form-control" value="0"/>
               </div>
               <div class="input-group mb-1">
                 <div class="input-group-prepend">
@@ -636,13 +662,13 @@
               </div>
             </div>
             <div class="card-footer d-flex p-0 border-top-0">
-              <button class="btn btn-warning w-100" onclick="$('#newBits').popover('hide')">${commons.translate('close')}</button>
-              <button class="btn btn-primary w-100">${commons.translate('save-changes')}</button>
+              <button class="btn btn-warning w-100" onclick="$('#new_bits').popover('hide')">${commons.translate('close')}</button>
+              <button class="btn btn-primary w-100" onclick="viewers.addBitsAndTips(this)" data-type="bits">${commons.translate('save-changes')}</button>
             </div>
           </div>
         `
       })
-      $(`#newBits`).off('shown.bs.popover').on('shown.bs.popover', () => {
+      $(`#new_bits`).off('shown.bs.popover').on('shown.bs.popover', () => {
         $(`#bit-new`).datetimepicker('destroy')
         $(`#bit-new`).datetimepicker(datepickeropts)
         $(`#bit-new`).datetimepicker('defaultDate', viewers.styleFollowTime(_.now()))
@@ -652,7 +678,7 @@
     })
 
     // set up new tip popover
-    $(`#newTips`).popover({
+    $(`#new_tips`).popover({
       html: true,
       placement: 'auto',
       template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body p-0"></div></div>',
@@ -679,13 +705,13 @@
             </div>
           </div>
           <div class="card-footer d-flex p-0 border-top-0">
-            <button class="btn btn-warning w-100" onclick="$('#newTips').popover('hide')">${commons.translate('close')}</button>
-            <button class="btn btn-primary w-100">${commons.translate('save-changes')}</button>
+            <button class="btn btn-warning w-100" onclick="$('#new_tips').popover('hide')">${commons.translate('close')}</button>
+            <button class="btn btn-primary w-100" id="new_tips_submit_button" onclick="viewers.addBitsAndTips(this)" data-type="tips">${commons.translate('save-changes')}</button>
           </div>
         </div>
       `
     })
-    $(`#newTips`).off('shown.bs.popover').on('shown.bs.popover', () => {
+    $(`#new_tips`).off('shown.bs.popover').on('shown.bs.popover', () => {
       $(`#tip-new`).datetimepicker('destroy')
       $(`#tip-new`).datetimepicker(datepickeropts)
       $(`#tip-new`).datetimepicker('defaultDate', viewers.styleFollowTime(_.now()))

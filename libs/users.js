@@ -79,6 +79,14 @@ Users.prototype.sockets = function (self) {
       const bits = await global.db.engine.find('users.bits', { username: username })
       cb(null, _.orderBy(bits, 'timestamp', 'desc'))
     })
+
+    socket.on('users.bits.add', async (data, cb) => {
+      setTimeout(() => cb(null, null), 5000)
+    })
+
+    socket.on('users.tips.add', async (data, cb) => {
+      setTimeout(() => cb(null, null), 5000)
+    })
   })
 }
 
