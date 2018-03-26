@@ -71,7 +71,7 @@
           <div class="card">
             <div class="card-header" style="display: flex; padding: 0;">
               <div data-lang="bits" style="line-height: 1.9rem; padding-left: 1rem;"></div>
-              <button class="ml-auto btn btn-sm btn-primary" onclick="addEventOperation(event)"><i class="fas fa-plus" aria-hidden="true"></i></button>
+              <button class="ml-auto btn btn-sm btn-primary" id="newBits"><i class="fas fa-plus" aria-hidden="true"></i></button>
             </div>
             <div class="card-body p-0">
               <table class="table table-sm m-0 table-hover">
@@ -83,7 +83,7 @@
           <div class="card mt-2">
             <div class="card-header" style="display: flex; padding: 0;">
               <div data-lang="tips" style="line-height: 1.9rem; padding-left: 1rem;"></div>
-              <button class="ml-auto btn btn-sm btn-primary" onclick="addEventOperation(event)"><i class="fas fa-plus" aria-hidden="true"></i></button>
+              <button class="ml-auto btn btn-sm btn-primary" id="newTips"><i class="fas fa-plus" aria-hidden="true"></i></button>
             </div>
             <div class="card-body p-0">
               <table class="table table-sm m-0 table-hover">
@@ -351,6 +351,16 @@
       return
     }
 
+    const datepickeropts = {
+      icons: {
+        time: "far fa-clock",
+        date: "far fa-calendar-alt",
+        up: "fas fa-angle-up",
+        down: "fas fa-angle-down"
+      },
+      format: 'HH:mm:ss, YYYY-MM-DD' // 21:21:37, 2016-07-09
+    }
+
     var userSocket = io('/users', {
       query: "token=" + token
     });
@@ -451,16 +461,6 @@
       $('#viewers_subscriber_toggle').removeClass().addClass((viewer.is.subscriber ? 'btn-success' : 'btn-danger') + ' btn w-100')
       $('#viewers_regular_toggle').removeClass().addClass((viewer.is.regular ? 'btn-success' : 'btn-danger') + ' btn w-100')
 
-      const datepickeropts = {
-        icons: {
-          time: "far fa-clock",
-          date: "far fa-calendar-alt",
-          up: "fas fa-angle-up",
-          down: "fas fa-angle-down"
-        },
-        format: 'HH:mm:ss, YYYY-MM-DD' // 21:21:37, 2016-07-09
-      }
-
       $('#viewers_last_seen').datetimepicker('destroy')
       $('#viewers_last_seen').datetimepicker(datepickeropts)
       if (!_.isNil(viewer.time.message) && viewer.time.message > 0) $('#viewers_last_seen').datetimepicker('defaultDate', viewers.styleFollowTime(viewer.time.message))
@@ -494,13 +494,13 @@
         for (let tip of tips) {
           $('#viewers_tips').append(`
             <tr data-viewer-tip-id="${tip._id.toString()}">
-              <td style="border-top: 0">${viewers.styleFollowTime(tip.timestamp)}</td>
-              <td style="border-top: 0"><strong>${parseFloat(tip.amount).toFixed(2)}${tip.currency}</strong></td>
+              <td style="border-top: 0; width: 160px;">${viewers.styleFollowTime(tip.timestamp)}</td>
+              <td style="border-top: 0" class="text-center"><strong>${parseFloat(tip.amount).toFixed(2)}${tip.currency}</strong></td>
               <td style="border-top: 0">${tip.message}</td>
             </tr>
           `)
 
-          $(`#viewers_tips tr[data-viewer-tip-id="${tip._id.toString()}"]`).popover({
+          $(`tr[data-viewer-tip-id="${tip._id.toString()}"]`).popover({
             html: true,
             placement: 'auto',
             template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body p-0"></div></div>',
@@ -533,7 +533,7 @@
               </div>
             `
           })
-          $(`#viewers_tips tr[data-viewer-tip-id="${tip._id.toString()}"]`).off('shown.bs.popover').on('shown.bs.popover', () => {
+          $(`tr[data-viewer-tip-id="${tip._id.toString()}"]`).off('shown.bs.popover').on('shown.bs.popover', () => {
             $(`#tip-${tip._id.toString()}`).datetimepicker('destroy')
             $(`#tip-${tip._id.toString()}`).datetimepicker(datepickeropts)
             if (!_.isNil(tip.timestamp) && tip.timestamp > 0) $(`#tip-${tip._id.toString()}`).datetimepicker('defaultDate', viewers.styleFollowTime(tip.timestamp))
@@ -558,13 +558,13 @@
         for (let bit of bits) {
           $('#viewers_bits').append(`
             <tr data-viewer-bit-id="${bit._id.toString()}">
-              <td style="border-top: 0">${viewers.styleFollowTime(bit.timestamp)}</td>
-              <td style="border-top: 0"><strong>${parseInt(bit.amount, 10)}</strong></td>
+              <td style="border-top: 0; width: 160px;">${viewers.styleFollowTime(bit.timestamp)}</td>
+              <td style="border-top: 0" class="text-center"><strong>${parseInt(bit.amount, 10)}</strong></td>
               <td style="border-top: 0">${bit.message}</td>
             </tr>
           `)
 
-          $(`#viewers_bits tr[data-viewer-bit-id="${bit._id.toString()}"]`).popover({
+          $(`tr[data-viewer-bit-id="${bit._id.toString()}"]`).popover({
             html: true,
             placement: 'auto',
             template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body p-0"></div></div>',
@@ -597,7 +597,7 @@
               </div>
             `
           })
-          $(`#viewers_bits tr[data-viewer-bit-id="${bit._id.toString()}"]`).off('shown.bs.popover').on('shown.bs.popover', () => {
+          $(`tr[data-viewer-bit-id="${bit._id.toString()}"]`).off('shown.bs.popover').on('shown.bs.popover', () => {
             $(`#bit-${bit._id.toString()}`).datetimepicker('destroy')
             $(`#bit-${bit._id.toString()}`).datetimepicker(datepickeropts)
             if (!_.isNil(bit.timestamp) && bit.timestamp > 0) $(`#bit-${bit._id.toString()}`).datetimepicker('defaultDate', viewers.styleFollowTime(bit.timestamp))
@@ -607,6 +607,90 @@
           })
         }
       })
+
+      // set up new bit popover
+      $(`#newBits`).popover({
+        html: true,
+        placement: 'auto',
+        template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body p-0"></div></div>',
+        content: `
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-clock"></i></span>
+                </div>
+                <input type="text" class="form-control border-top-0 border-left-0 border-right-0" id="bit-new"/>
+              </div>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-money-bill-alt"></i></span>
+                </div>
+                <input type="text" class="border-top-0 border-left-0 border-right-0 form-control" id="viewers_tip" value=""/>
+              </div>
+              <div class="input-group mb-1">
+                <div class="input-group-prepend">
+                  <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-comment"></i></span>
+                </div>
+                <textarea rows="5" class="border-top-0 border-left-0 border-right-0 form-control"></textarea>
+              </div>
+            </div>
+            <div class="card-footer d-flex p-0 border-top-0">
+              <button class="btn btn-warning w-100" onclick="$('#newBits').popover('hide')">${commons.translate('close')}</button>
+              <button class="btn btn-primary w-100">${commons.translate('save-changes')}</button>
+            </div>
+          </div>
+        `
+      })
+      $(`#newBits`).off('shown.bs.popover').on('shown.bs.popover', () => {
+        $(`#bit-new`).datetimepicker('destroy')
+        $(`#bit-new`).datetimepicker(datepickeropts)
+        $(`#bit-new`).datetimepicker('defaultDate', viewers.styleFollowTime(_.now()))
+        $(`#bit-new`).off('click').on('click', () => $(`#bit-new`).datetimepicker('toggle'))
+        $(`#bit-new`).off('blur').on('blur', () => $(`#bit-new`).datetimepicker('hide'))
+      })
+    })
+
+    // set up new tip popover
+    $(`#newTips`).popover({
+      html: true,
+      placement: 'auto',
+      template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body p-0"></div></div>',
+      content: `
+        <div class="card">
+          <div class="card-body p-0">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-clock"></i></span>
+              </div>
+              <input type="text" class="form-control border-top-0 border-left-0 border-right-0" id="tip-new"/>
+            </div>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-money-bill-alt"></i></span>
+              </div>
+              <input type="text" class="border-top-0 border-left-0 border-right-0 form-control" id="viewers_tip" value=""/>
+            </div>
+            <div class="input-group mb-1">
+              <div class="input-group-prepend">
+                <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-comment"></i></span>
+              </div>
+              <textarea rows="5" class="border-top-0 border-left-0 border-right-0 form-control"></textarea>
+            </div>
+          </div>
+          <div class="card-footer d-flex p-0 border-top-0">
+            <button class="btn btn-warning w-100" onclick="$('#newTips').popover('hide')">${commons.translate('close')}</button>
+            <button class="btn btn-primary w-100">${commons.translate('save-changes')}</button>
+          </div>
+        </div>
+      `
+    })
+    $(`#newTips`).off('shown.bs.popover').on('shown.bs.popover', () => {
+      $(`#tip-new`).datetimepicker('destroy')
+      $(`#tip-new`).datetimepicker(datepickeropts)
+      $(`#tip-new`).datetimepicker('defaultDate', viewers.styleFollowTime(_.now()))
+      $(`#tip-new`).off('click').on('click', () => $(`#tip-new`).datetimepicker('toggle'))
+      $(`#tip-new`).off('blur').on('blur', () => $(`#tip-new`).datetimepicker('hide'))
     })
 
     $('#viewers_follower_toggle, #viewers_subscriber_toggle, #viewers_regular_toggle').off('click').on('click', (ev) => {
