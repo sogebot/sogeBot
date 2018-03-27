@@ -54,8 +54,7 @@ var commons = {
       options.mask = !_.isNil(options.mask) ? options.mask : null
 
       var id = window.crypto.getRandomValues(new Uint32Array(1))
-
-      var filtersRegExp = new RegExp('\\$(' + _.keys(translations.responses.variable).join('|') + ')', 'g')
+      var filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(translations.responses.variable), (o) => -o.length).join('|') + ')', 'g')
       var stringAbbr = options.text.replace(filtersRegExp,
         '<span contenteditable="false" class="editable-variable" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;'
       )
@@ -99,7 +98,7 @@ var commons = {
             $(this).html(commons.cleanResponseText(commons.unhash($(this).data('value'))))
             if ($(this).html().trim().length === 0) $(this).html('&nbsp;') // don't lose cursor if empty
 
-            $(this).data("initialText", $(this).html())
+            $(this).data('initialText', $(this).html())
 
             var div = $(
               '<div id="helper" contenteditable="false"></div>'
@@ -148,22 +147,20 @@ var commons = {
             $('#helper').remove()
             var newString = commons.cleanResponseText($(this).html())
             $(this).data('value', commons.hash(commons.cleanResponseText($(this).html())))
-            var filtersRegExp = new RegExp('\\$(' + _.keys(translations.responses.variable).join('|') +
-              ')',
-              'g')
+            var filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(translations.responses.variable), (o) => -o.length).join('|') + ')', 'g')
             if (!_.isNil(options.mask)) $(this).html(newString.replace(/./g, options.mask))
             else {
               $(this).html(newString.replace(filtersRegExp, '<span contenteditable="false" class="editable-variable" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;'))
             }
             // ...if content is different...
-            if ($(this).data("initialText").trim() !== newString.trim()) {
+            if ($(this).data('initialText').trim() !== newString.trim()) {
               if (!_.isNil($(this).data('fnc'))) {
                 var fnc = $(this).data('fnc').split('.')
                 window[fnc[0]][fnc[1]]($(this).data('id'), newString, options.options)
               }
             }
             commons.translate()
-          });
+          })
       }, 100)
       return output
     } catch (e) {
