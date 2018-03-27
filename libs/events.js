@@ -183,6 +183,8 @@ class Events {
     const d = debug('events:fireSendChatMessageOrWhisper')
     let username = _.isNil(attributes.username) ? global.parser.getOwner() : attributes.username
     let message = operation.messageToSend
+
+    attributes = _(attributes).toPairs().sortBy((o) => -o[0].length).fromPairs().value() // reorder attributes by key length
     _.each(attributes, function (val, name) {
       if (_.isObject(val) && _.size(val) === 0) return true // skip empty object
       d(`Replacing $${name} with ${val}`)
