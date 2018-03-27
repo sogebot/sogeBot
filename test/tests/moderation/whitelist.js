@@ -1,9 +1,10 @@
-/* global describe it before after */
+/* global describe it before */
+
+if (require('cluster').isWorker) process.exit()
 
 require('../../general.js')
 
 const db = require('../../general.js').db
-const tmi = require('../../general.js').tmi
 
 const _ = require('lodash')
 const assert = require('chai').assert
@@ -85,26 +86,20 @@ const tests = {
 
 describe('systems/moderation - whitelist()', () => {
   before(async () => {
-    await tmi.waitForConnection()
-    global.commons.sendMessage.reset()
     await db.cleanup()
-  })
-
-  after(async () => {
-    global.systems.moderation.lists.whitelist = []
   })
 
   for (let [pattern, test] of Object.entries(tests)) {
     for (let text of _.get(test, 'should.return.changed', [])) {
       it(`pattern '${pattern}' should change '${text}'`, async () => {
-        global.systems.moderation.lists.whitelist = [pattern]
+        await global.db.engine.update('settings', { key: 'whitelist' }, { value: [pattern] })
         let result = await global.systems.moderation.whitelist(text)
         assert.isTrue(text !== result)
       })
     }
     for (let text of _.get(test, 'should.return.same', [])) {
       it(`pattern '${pattern}' should not change '${text}'`, async () => {
-        global.systems.moderation.lists.whitelist = [pattern]
+        await global.db.engine.update('settings', { key: 'whitelist' }, { value: [pattern] })
         let result = await global.systems.moderation.whitelist(text)
         assert.isTrue(text === result)
       })

@@ -38,7 +38,8 @@ class Webhooks {
   }
 
   async subscribe (type) {
-    if (_.isNil(global.channelId)) {
+    const cid = await global.cache.channelId()
+    if (_.isNil(cid)) {
       setTimeout(() => this.subscribe(type), 1000)
       return
     }
@@ -63,14 +64,14 @@ class Webhooks {
     var res
     switch (type) {
       case 'follows':
-        request.push(`hub.topic=https://api.twitch.tv/helix/users/follows?to_id=${global.channelId}`)
+        request.push(`hub.topic=https://api.twitch.tv/helix/users/follows?to_id=${cid}`)
         res = await snekfetch.post(request.join('&')).set('Client-ID', config.settings.client_id)
         debug('Subscribe response: %o', res)
         if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: follows waiting for challenge')
         else global.log.error('WEBHOOK: follows NOT subscribed')
         break
       case 'streams':
-        request.push(`hub.topic=https://api.twitch.tv/helix/streams?user_id=${global.channelId}`)
+        request.push(`hub.topic=https://api.twitch.tv/helix/streams?user_id=${cid}`)
         res = await snekfetch.post(request.join('&')).set('Client-ID', config.settings.client_id)
         debug('Subscribe response: %o', res)
         if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: streams waiting for challenge')
@@ -86,22 +87,24 @@ class Webhooks {
 
   async event (aEvent, res) {
     debug('Event received: %j', aEvent)
+    const cid = await global.cache.channelId()
 
     // somehow stream doesn't have a topic
-    if (_.get(aEvent, 'topic', null) === `https://api.twitch.tv/helix/users/follows?to_id=${global.channelId}`) this.follower(aEvent) // follow
+    if (_.get(aEvent, 'topic', null) === `https://api.twitch.tv/helix/users/follows?to_id=${cid}`) this.follower(aEvent) // follow
     else if (_.get(!_.isNil(aEvent.data[0]) ? aEvent.data[0] : {}, 'type', null) === 'live') this.stream(aEvent) // streams
 
     res.sendStatus(200)
   }
 
   async challenge (req, res) {
+    const cid = await global.cache.channelId()
     // set webhooks enabled
     switch (req.query['hub.topic']) {
-      case `https://api.twitch.tv/helix/users/follows?to_id=${global.channelId}`:
+      case `https://api.twitch.tv/helix/users/follows?to_id=${cid}`:
         global.log.info('WEBHOOK: follows subscribed')
         this.enabled.follows = true
         break
-      case `https://api.twitch.tv/helix/streams?user_id=${global.channelId}`:
+      case `https://api.twitch.tv/helix/streams?user_id=${cid}`:
         global.log.info('WEBHOOK: streams subscribed')
         this.enabled.streams = true
         break
@@ -111,8 +114,10 @@ class Webhooks {
   }
 
   async follower (aEvent) {
+    if (_.isNil(global.api.channelId)) setTimeout(() => this.follower(aEvent), 10) // wait until channelId is set
+
     debug('Follow event received: %j', aEvent)
-    if (parseInt(aEvent.data.to_id, 10) !== parseInt(global.channelId, 10)) return debug(`This events doesn't belong to this channel`)
+    if (parseInt(aEvent.data.to_id, 10) !== parseInt(global.api.channelId, 10)) return debug(`This events doesn't belong to this channel`)
 
     const fid = aEvent.data.from_id
 
@@ -133,7 +138,7 @@ class Webhooks {
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
       debug('user API data" %o', userGetFromApi.body)
 
-      if (!global.parser.isBot(userGetFromApi.body.data[0].login)) {
+      if (!global.commons.isBot(userGetFromApi.body.data[0].login)) {
         global.overlays.eventlist.add({
           type: 'follow',
           username: userGetFromApi.body.data[0].login
@@ -146,7 +151,7 @@ class Webhooks {
       debug('user in db')
       debug('username: %s, is follower: %s, current time: %s, user time follow: %s', user.username, _.get(user, 'is.follower', false), _.now(), _.get(user, 'time.follow', 0))
       if (!_.get(user, 'is.follower', false) && _.now() - _.get(user, 'time.follow', 0) > 60000 * 60) {
-        if (!global.parser.isBot(user.username)) {
+        if (!global.commons.isBot(user.username)) {
           global.overlays.eventlist.add({
             type: 'follow',
             username: user.username
@@ -184,18 +189,18 @@ class Webhooks {
     // stream is online
     if (aEvent.data.length > 0) {
       let stream = aEvent.data[0]
-      global.twitch.current.status = stream.title
-      global.twitch.current.game = await global.twitch.getGameFromId(stream.game_id)
+      global.api.current.status = stream.title
+      global.api.current.game = await global.twitch.getGameFromId(stream.game_id)
 
-      if (!global.twitch.isOnline || global.twitch.streamType !== stream.type) {
-        global.twitch.when({ online: stream.started_at })
-        global.twitch.chatMessagesAtStart = global.parser.linesParsed
-        global.twitch.current.viewers = 0
-        global.twitch.current.bits = 0
-        global.twitch.current.tips = 0
-        global.twitch.maxViewers = 0
-        global.twitch.newChatters = 0
-        global.twitch.chatMessagesAtStart = global.parser.linesParsed
+      if (!await global.cache.isOnline() || global.twitch.streamType !== stream.type) {
+        global.cache.when({ online: stream.started_at })
+        global.api.chatMessagesAtStart = global.linesParsed
+        global.api.current.viewers = 0
+        global.api.current.bits = 0
+        global.api.current.tips = 0
+        global.api.maxViewers = 0
+        global.api.newChatters = 0
+        global.api.chatMessagesAtStart = global.linesParsed
 
         global.db.engine.remove('cache.hosts', {}) // we dont want to have cached hosts on stream start
 
@@ -207,7 +212,7 @@ class Webhooks {
       global.twitch.curRetries = 0
       global.twitch.saveStreamData(stream)
       global.twitch.streamType = stream.type
-      global.twitch.isOnline = true
+      await global.cache.isOnline(true)
     } else {
       // stream is offline - add curRetry + 1 and call getCurrentStreamData to do retries
       global.twitch.curRetries = global.twitch.curRetries + 1

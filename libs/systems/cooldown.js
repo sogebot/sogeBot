@@ -19,23 +19,36 @@ const debug = require('debug')('systems:cooldown')
 class Cooldown {
   constructor () {
     if (global.commons.isSystemEnabled(this)) {
-      this.viewers = {}
-
-      global.parser.register(this, '!cooldown toggle moderators', this.toggleModerators, constants.OWNER_ONLY)
-      global.parser.register(this, '!cooldown toggle owners', this.toggleOwners, constants.OWNER_ONLY)
-      global.parser.register(this, '!cooldown toggle enabled', this.toggleEnabled, constants.OWNER_ONLY)
-      global.parser.register(this, '!cooldown', this.set, constants.OWNER_ONLY)
-      global.parser.registerParser(this, '0-cooldown', this.check, constants.VIEWERS)
-
       global.configuration.register('disableCooldownWhispers', 'whisper.settings.disableCooldownWhispers', 'bool', false)
 
-      global.panel.addMenu({category: 'manage', name: 'cooldowns', id: 'cooldown'})
-      global.panel.registerSockets({
-        self: this,
-        expose: ['set', 'toggleModerators', 'toggleOwners', 'toggleEnabled', 'toggleNotify', 'toggleType', 'editName', 'send'],
-        finally: this.send
-      })
+      if (require('cluster').isMaster) {
+        global.panel.addMenu({category: 'manage', name: 'cooldowns', id: 'cooldown'})
+        global.panel.registerSockets({
+          self: this,
+          expose: ['set', 'toggleModerators', 'toggleOwners', 'toggleEnabled', 'toggleNotify', 'toggleType', 'editName', 'send'],
+          finally: this.send
+        })
+      }
     }
+  }
+
+  commands () {
+    return !global.commons.isSystemEnabled('cooldown')
+      ? []
+      : [
+        {this: this, command: '!cooldown toggle moderators', fnc: this.toggleModerators, permission: constants.OWNER_ONLY},
+        {this: this, command: '!cooldown toggle owners', fnc: this.toggleOwners, permission: constants.OWNER_ONLY},
+        {this: this, command: '!cooldown toggle enabled', fnc: this.toggleEnabled, permission: constants.OWNER_ONLY},
+        {this: this, command: '!cooldown', fnc: this.set, permission: constants.OWNER_ONLY}
+      ]
+  }
+
+  parsers () {
+    return !global.commons.isSystemEnabled('cooldown')
+      ? []
+      : [
+        {this: this, name: 'cooldown', fnc: this.check, permission: constants.VIEWERS, priority: constants.HIGH}
+      ]
   }
 
   async send (self, socket) {
@@ -73,16 +86,13 @@ class Cooldown {
     debug(message); global.commons.sendMessage(message, sender)
   }
 
-  async check (self, id, sender, text) {
-    debug('check(self, %s, %j, %s)', id, sender, text)
-
+  async check (self, sender, text) {
     var data, viewer, timestamp, now
     const match = XRegExp.exec(text, constants.COMMAND_REGEXP)
     if (!_.isNil(match)) { // command
       let cooldown = await global.db.engine.findOne('cooldowns', { key: `!${match.command}` })
       if (_.isEmpty(cooldown)) { // command is not on cooldown -> recheck with text only
-        self.check(self, id, sender, text.replace(`!${match.command}`, ''))
-        return // do nothing
+        return self.check(self, sender, text.replace(`!${match.command}`, ''))
       }
       data = [{
         key: cooldown.key,
@@ -120,37 +130,35 @@ class Cooldown {
     }
     if (!_.some(data, { enabled: true })) { // parse ok if all cooldowns are disabled
       debug('cooldowns disabled')
-      global.updateQueue(id, true)
-      return
+      return true
     }
 
     let result = false
-    let isMod = await global.parser.isMod(sender)
+    let isMod = await global.commons.isMod(sender)
     debug('isMod: %j', isMod)
-    _.each(data, function (cooldown) {
+    for (let cooldown of data) {
       debug('Is for mods: %j', cooldown.moderator)
-      if ((global.parser.isOwner(sender) && !cooldown.owner) || (isMod && !cooldown.moderator)) {
+      if ((global.commons.isOwner(sender) && !cooldown.owner) || (isMod && !cooldown.moderator)) {
         result = true
-        return true
+        continue
       }
 
-      viewer = _.isUndefined(self.viewers[sender.username]) ? {} : self.viewers[sender.username]
+      viewer = await global.db.engine.findOne('cooldown.viewers', { username: sender.username, key: cooldown.key })
       if (cooldown.type === 'global') {
         timestamp = cooldown.timestamp
       } else {
-        timestamp = _.isUndefined(viewer[cooldown.key]) ? 0 : viewer[cooldown.key]
+        timestamp = _.isNil(viewer.timestamp) ? 0 : viewer.timestamp
       }
       now = new Date().getTime()
 
       if (now - timestamp >= cooldown.miliseconds) {
         if (cooldown.type === 'global') {
-          global.db.engine.update('cooldowns', { key: cooldown.key, type: 'global' }, { timestamp: now, key: cooldown.key, type: 'global' })
+          await global.db.engine.update('cooldowns', { key: cooldown.key, type: 'global' }, { timestamp: now, key: cooldown.key, type: 'global' })
         } else {
-          viewer[cooldown.key] = now
-          self.viewers[sender.username] = viewer
+          await global.db.engine.update('cooldown.viewers', { username: sender.username, key: cooldown.key }, { timestamp: now })
         }
         result = true
-        return true
+        continue
       } else {
         if (!cooldown.quiet && !global.configuration.getValue('disableCooldownWhispers')) {
           sender['message-type'] = 'whisper' // we want to whisp cooldown message
@@ -158,11 +166,11 @@ class Cooldown {
           debug(message); global.commons.sendMessage(message, sender)
         }
         result = false
-        return false // disable _.each and updateQueue with false
+        break // disable _.each and updateQueue with false
       }
-    })
+    }
     debug('cooldowns result %s', result)
-    global.updateQueue(id, result)
+    return result
   }
 
   async toggle (self, sender, text, type) {

@@ -18,16 +18,7 @@ const constants = require('../constants')
 
 class Ranks {
   constructor () {
-    if (global.commons.isSystemEnabled(this)) {
-      global.parser.register(this, '!rank add', this.add, constants.OWNER_ONLY)
-      global.parser.register(this, '!rank edit', this.edit, constants.OWNER_ONLY)
-      global.parser.register(this, '!rank set', this.set, constants.OWNER_ONLY)
-      global.parser.register(this, '!rank unset', this.unset, constants.OWNER_ONLY)
-      global.parser.register(this, '!rank list', this.list, constants.OWNER_ONLY)
-      global.parser.register(this, '!rank remove', this.remove, constants.OWNER_ONLY)
-      global.parser.register(this, '!rank help', this.help, constants.OWNER_ONLY)
-      global.parser.register(this, '!rank', this.show, constants.VIEWERS)
-
+    if (global.commons.isSystemEnabled(this) && require('cluster').isMaster) {
       global.panel.addMenu({category: 'manage', name: 'ranks', id: 'ranks'})
       global.panel.registerSockets({
         self: this,
@@ -35,6 +26,21 @@ class Ranks {
         finally: this.send
       })
     }
+  }
+
+  commands () {
+    return !global.commons.isSystemEnabled('ranks')
+      ? []
+      : [
+        {this: this, command: '!rank add', fnc: this.add, permission: constants.OWNER_ONLY},
+        {this: this, command: '!rank edit', fnc: this.edit, permission: constants.OWNER_ONLY},
+        {this: this, command: '!rank set', fnc: this.set, permission: constants.OWNER_ONLY},
+        {this: this, command: '!rank unset', fnc: this.unset, permission: constants.OWNER_ONLY},
+        {this: this, command: '!rank list', fnc: this.list, permission: constants.OWNER_ONLY},
+        {this: this, command: '!rank remove', fnc: this.remove, permission: constants.OWNER_ONLY},
+        {this: this, command: '!rank help', fnc: this.help, permission: constants.OWNER_ONLY},
+        {this: this, command: '!rank', fnc: this.show, permission: constants.VIEWERS}
+      ]
   }
 
   async add (self, sender, text) {

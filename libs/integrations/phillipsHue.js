@@ -4,6 +4,7 @@
 const _ = require('lodash')
 const HueApi = require('node-hue-api').HueApi
 const lightState = require('node-hue-api').lightState
+const cluster = require('cluster')
 
 // bot libraries
 const config = require('../../config.json')
@@ -17,9 +18,13 @@ const constants = require('../constants')
  */
 
 function PhillipsHue () {
+  if (cluster.isWorker) return
+
   if (global.commons.isIntegrationEnabled(this)) {
-    global.parser.register(this, '!hue list', this.getLights, constants.OWNER_ONLY)
-    global.parser.register(this, '!hue', this.hue, constants.OWNER_ONLY)
+    cluster.on('message', (worker, message) => {
+      if (message.type !== 'phillipshue') return
+      this[message.fnc](this, message.sender, message.text)
+    })
 
     var host = config.integrations.phillipshue.host
     var user = config.integrations.phillipshue.user
@@ -69,7 +74,17 @@ function PhillipsHue () {
   }
 }
 
+PhillipsHue.prototype.commands = function () {
+  return !global.commons.isIntegrationEnabled('phillipshue')
+    ? []
+    : [
+      {this: this, command: '!hue list', fnc: this.getLights, permission: constants.OWNER_ONLY},
+      {this: this, command: '!hue', fnc: this.hue, permission: constants.OWNER_ONLY}
+    ]
+}
+
 PhillipsHue.prototype.getLights = function (self, sender, text) {
+  if (cluster.isWorker) return process.send({type: 'phillipshue', fnc: 'getLights', sender: sender, text: text})
   self.api.lights()
     .then(function (lights) {
       var output = []
@@ -82,6 +97,7 @@ PhillipsHue.prototype.getLights = function (self, sender, text) {
 }
 
 PhillipsHue.prototype.hue = function (self, sender, text) {
+  if (cluster.isWorker) return process.send({type: 'phillipshue', fnc: 'hue', sender: sender, text: text})
   var rgb = self.parseText(text, 'rgb', '255,255,255').split(',')
   if (rgb.length < 3) rgb = [255, 255, 255]
 

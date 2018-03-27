@@ -7,6 +7,11 @@ var path = require('path')
 var basicAuth = require('basic-auth')
 const flatten = require('flat')
 var _ = require('lodash')
+const moment = require('moment')
+
+const cluster = require('cluster')
+
+const Parser = require('./parser')
 
 const config = require('../config.json')
 
@@ -82,9 +87,11 @@ function Panel () {
     res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.page))
   })
 
-  this.server.listen(port, function () {
-    global.log.info(`WebPanel is available at http://localhost:${port}`)
-  })
+  if (cluster.isMaster) {
+    this.server.listen(port, function () {
+      global.log.info(`WebPanel is available at http://localhost:${port}`)
+    })
+  }
 
   this.io = require('socket.io')(this.server)
   this.menu = [{category: 'main', name: 'dashboard', id: 'dashboard'}]
@@ -95,6 +102,12 @@ function Panel () {
   global.configuration.register('percentage', 'core.percentage', 'bool', true)
 
   this.addMenu({category: 'settings', name: 'systems', id: 'systems'})
+
+  this.registerSockets({
+    self: this,
+    expose: ['sendStreamData'],
+    finally: null
+  })
 
   this.io.use(function (socket, next) {
     if (config.panel.token.trim() === socket.request._query['token']) next()
@@ -110,16 +123,57 @@ function Panel () {
     self.sendWidget(socket)
 
     // twitch game and title change
-    socket.on('getGameFromTwitch', function (game) { global.twitch.sendGameFromTwitch(global.twitch, socket, game) })
-    socket.on('getUserTwitchGames', function () { global.twitch.sendUserTwitchGamesAndTitles(global.twitch, socket) })
-    socket.on('deleteUserTwitchGame', function (game) { global.twitch.deleteUserTwitchGame(global.twitch, socket, game) })
-    socket.on('deleteUserTwitchTitle', function (data) { global.twitch.deleteUserTwitchTitle(global.twitch, socket, data) })
-    socket.on('editUserTwitchTitle', function (data) { global.twitch.editUserTwitchTitle(global.twitch, socket, data) })
-    socket.on('updateGameAndTitle', function (data) { global.twitch.updateGameAndTitle(global.twitch, socket, data) })
+    socket.on('getGameFromTwitch', function (game) { global.api.sendGameFromTwitch(global.api, socket, game) })
+    socket.on('getUserTwitchGames', async () => { socket.emit('sendUserTwitchGamesAndTitles', await self.gamesTitles()) })
+    socket.on('deleteUserTwitchGame', async (game) => {
+      let gamesTitles = await self.gamesTitles(); delete gamesTitles[game]
+      socket.emit('sendUserTwitchGamesAndTitles', await self.gamesTitles(gamesTitles))
+    })
+    socket.on('deleteUserTwitchTitle', async (data) => {
+      let gamesTitles = await self.gamesTitles()
+      _.remove(gamesTitles[data.game], function (aTitle) {
+        return aTitle === data.title
+      })
+      socket.emit('sendUserTwitchGamesAndTitles', await self.gamesTitles(gamesTitles))
+    })
+    socket.on('editUserTwitchTitle', async (data) => {
+      data.new = data.new.trim()
+
+      if (data.new.length === 0) {
+        await self.deleteUserTwitchTitle(self, socket, data)
+        return
+      }
+
+      let gamesTitles = await self.gamesTitles()
+      if (_.isEmpty(_.find(gamesTitles[data.game], (v) => v.trim() === data.title.trim()))) {
+        gamesTitles[data.game].push(data.new) // also, we need to add game and title to cached property
+      } else {
+        gamesTitles[data.game][gamesTitles[data.game].indexOf(data.title)] = data.new
+      }
+      await self.gamesTitles(gamesTitles)
+    })
+    socket.on('updateGameAndTitle', async (data) => {
+      global.api.setTitleAndGame(global.api, null, data)
+
+      data.title = data.title.trim()
+      data.game = data.game.trim()
+
+      let gamesTitles = await self.gamesTitles()
+
+      // create game if not in cache
+      if (_.isNil(gamesTitles[data.game])) gamesTitles[data.game] = []
+
+      if (_.isEmpty(_.find(gamesTitles[data.game], (v) => v.trim() === data.title))) {
+        gamesTitles[data.game].push(data.title) // also, we need to add game and title to cached property
+      }
+
+      await self.gamesTitles(gamesTitles)
+      self.sendStreamData(self, global.panel.io) // force dashboard update
+    })
     socket.on('joinBot', () => { global.client.join('#' + config.settings.broadcaster_username) })
     socket.on('leaveBot', () => {
       global.client.part('#' + config.settings.broadcaster_username)
-      global.users.setAll({ is: { online: false } }) // force all users offline
+      global.db.engine.update('users', {}, { is: { online: false } }) // force all users offline
     })
 
     // custom var
@@ -129,8 +183,8 @@ function Panel () {
       else cb(null, variableFromDb.value)
     })
 
-    socket.on('responses.get', function (at, callback) {
-      const responses = flatten(!_.isNil(at) ? global.lib.translate.translations[global.configuration.getValue('lang')][at] : global.lib.translate.translations[global.configuration.getValue('lang')])
+    socket.on('responses.get', async function (at, callback) {
+      const responses = flatten(!_.isNil(at) ? global.lib.translate.translations[await global.configuration.getValue('lang')][at] : global.lib.translate.translations[await global.configuration.getValue('lang')])
       _.each(responses, function (value, key) {
         let _at = !_.isNil(at) ? at + '.' + key : key
         responses[key] = {} // remap to obj
@@ -166,14 +220,12 @@ function Panel () {
     socket.on('saveConfiguration', function (data) {
       _.each(data, function (index, value) {
         if (value.startsWith('_')) return true
-        global.configuration.setValue(global.configuration, { username: global.parser.getOwner() }, value + ' ' + index, data._quiet)
+        global.configuration.setValue(global.configuration, { username: global.commons.getOwner() }, value + ' ' + index, data._quiet)
       })
     })
-    socket.on('getConfiguration', function () {
+    socket.on('getConfiguration', async function () {
       var data = {}
-      _.each(global.configuration.sets(global.configuration), function (key) {
-        data[key] = global.configuration.getValue(key)
-      })
+      for (let key of global.configuration.sets(global.configuration)) data[key] = await global.configuration.getValue(key)
       socket.emit('configuration', data)
     })
 
@@ -182,7 +234,7 @@ function Panel () {
     socket.on('getVersion', function () { socket.emit('version', process.env.npm_package_version) })
 
     socket.on('parser.isRegistered', function (data) {
-      socket.emit(data.emit, { isRegistered: global.parser.isRegistered(data.command) })
+      socket.emit(data.emit, { isRegistered: new Parser().find(data.command) })
     })
 
     _.each(self.socketListeners, function (listener) {
@@ -205,6 +257,22 @@ function Panel () {
     )
     socket.emit('lang', lang)
   })
+}
+
+Panel.prototype.gamesTitles = async function (data) {
+  if (data) {
+    // setter
+    // re-save full object - NeDB issue with $set on object workaround - NeDB is not deleting missing keys
+    let fullCacheObj = await global.db.engine.findOne('cache')
+    fullCacheObj['games_and_titles'] = data
+    await global.db.engine.remove('cache', {})
+    await global.db.engine.insert('cache', fullCacheObj)
+    return data
+  } else {
+    // getter
+    let cache = await global.db.engine.findOne('cache')
+    return _.get(cache, 'games_and_titles', {})
+  }
 }
 
 Panel.prototype.authUser = function (req, res, next) {
@@ -269,6 +337,49 @@ Panel.prototype.registerSockets = function (options) {
   for (let fnc of options.expose) {
     if (!_.isFunction(options.self[fnc])) global.log.error(`Function ${fnc} of ${options.self.constructor.name} is undefined`)
     else this.socketListeners.push({self: options.self, on: `${name}.${fnc}`, fnc: options.self[fnc], finally: options.finally})
+  }
+}
+
+Panel.prototype.sendStreamData = async function (self, socket) {
+  const whenOnline = (await global.cache.when()).online
+  var data = {
+    uptime: self.getTime(whenOnline, false),
+    currentViewers: global.api.current.viewers,
+    currentSubscribers: global.api.current.subscribers,
+    currentBits: global.api.current.bits,
+    currentTips: global.api.current.tips,
+    currency: global.currency.symbol(await global.configuration.getValue('currency')),
+    chatMessages: await global.cache.isOnline() ? global.linesParsed - global.api.chatMessagesAtStart : 0,
+    currentFollowers: global.api.current.followers,
+    currentViews: global.api.current.views,
+    maxViewers: global.api.maxViewers,
+    newChatters: global.api.newChatters,
+    game: global.api.current.game,
+    status: global.api.current.status,
+    rawStatus: global.api.current.rawStatus,
+    currentHosts: global.api.current.hosts
+  }
+  socket.emit('stats', data)
+}
+
+Panel.prototype.getTime = function (time, isChat) {
+  var now, days, hours, minutes, seconds
+  now = _.isNull(time) || !time ? {days: 0, hours: 0, minutes: 0, seconds: 0} : moment().preciseDiff(time, true)
+  if (isChat) {
+    days = now.days > 0 ? now.days : ''
+    hours = now.hours > 0 ? now.hours : ''
+    minutes = now.minutes > 0 ? now.minutes : ''
+    seconds = now.seconds > 0 ? now.seconds : ''
+    return { days: days,
+      hours: hours,
+      minutes: minutes,
+      seconds: seconds }
+  } else {
+    days = now.days > 0 ? now.days + 'd' : ''
+    hours = now.hours >= 0 && now.hours < 10 ? '0' + now.hours + ':' : now.hours + ':'
+    minutes = now.minutes >= 0 && now.minutes < 10 ? '0' + now.minutes + ':' : now.minutes + ':'
+    seconds = now.seconds >= 0 && now.seconds < 10 ? '0' + now.seconds : now.seconds
+    return days + hours + minutes + seconds
   }
 }
 

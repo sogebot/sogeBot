@@ -589,11 +589,11 @@
       socket.emit('getLatestStats')
     }, 30000)
 
-    console.debug('EMIT [twitch.sendStreamData]')
-    socket.emit('twitch.sendStreamData')
+    console.debug('EMIT [panel.sendStreamData]')
+    socket.emit('panel.sendStreamData')
     setInterval(function () {
-      console.debug('EMIT [twitch.sendStreamData]')
-      socket.emit('twitch.sendStreamData')
+      console.debug('EMIT [panel.sendStreamData]')
+      socket.emit('panel.sendStreamData')
     }, 1000)
 
 

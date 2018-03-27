@@ -39,7 +39,7 @@ class IMongoDB extends Interface {
       let items = await db.collection(table).find(where)
       return items.toArray()
     } catch (e) {
-      global.log.error(e.message)
+      global.log.error(e.stack)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
         process.exit()
@@ -60,7 +60,7 @@ class IMongoDB extends Interface {
       let item = await db.collection(table).findOne(where)
       return item || {}
     } catch (e) {
-      global.log.error(e.message)
+      global.log.error(e.stack)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
         process.exit()
@@ -106,7 +106,7 @@ class IMongoDB extends Interface {
       return item.value
     } catch (e) {
       this.freeThread(table, where, threadHash)
-      global.log.error(e.message)
+      global.log.error(e.stack)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
         process.exit()
@@ -141,7 +141,7 @@ class IMongoDB extends Interface {
       return items
     } catch (e) {
       this.freeThread(table, where, threadHash)
-      global.log.error(e.message)
+      global.log.error(e.stack)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
         process.exit()
@@ -161,7 +161,7 @@ class IMongoDB extends Interface {
       return result.result.n
     } catch (e) {
       this.freeThread(table, where, threadHash)
-      global.log.error(e.message)
+      global.log.error(e.stack)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
         process.exit()
@@ -203,7 +203,7 @@ class IMongoDB extends Interface {
       return items.length === 1 ? items[0] : items
     } catch (e) {
       this.freeThread(table, where, threadHash)
-      global.log.error(e.message)
+      global.log.error(e.stack)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
         process.exit()

@@ -1,7 +1,8 @@
 'use strict'
 
 // 3rdparty libraries
-var _ = require('lodash')
+const _ = require('lodash')
+const cluster = require('cluster')
 // bot libraries
 var constants = require('../constants')
 // debug
@@ -27,32 +28,52 @@ class Raffles {
     if (global.commons.isSystemEnabled(this)) {
       this.lastAnnounce = _.now()
 
-      global.parser.register(this, '!raffle pick', this.pick, constants.OWNER_ONLY)
-      global.parser.register(this, '!raffle close', this.close, constants.OWNER_ONLY)
-      global.parser.register(this, '!raffle remove', this.remove, constants.OWNER_ONLY)
-      global.parser.register(this, '!raffle open', this.open, constants.OWNER_ONLY)
-      global.parser.register(this, '!raffle', this.info, constants.VIEWERS)
-      global.parser.registerHelper('!raffle')
-
       global.configuration.register('raffleAnnounceInterval', 'raffle.announceInterval', 'number', 10)
 
-      global.parser.registerParser(this, 'rafflesMessages', this.messages, constants.VIEWERS)
+      if (cluster.isMaster) {
+        global.panel.registerSockets({
+          self: this,
+          expose: ['refresh', 'remove', 'eligibility', 'open', 'pick'],
+          finally: this.refresh
+        })
 
-      global.panel.registerSockets({
-        self: this,
-        expose: ['refresh', 'remove', 'eligibility', 'open', 'pick'],
-        finally: this.refresh
-      })
+        global.panel.addWidget('raffles', 'widget-title-raffles', 'fas fa-gift')
 
-      global.panel.addWidget('raffles', 'widget-title-raffles', 'fas fa-gift')
+        this.announce()
+        this.refresh()
 
-      this.register()
-      this.announce()
-      this.refresh()
+        cluster.on('message', (worker, message) => {
+          if (message.type !== 'raffles') return
+          this[message.fnc](this)
+        })
+      }
     }
   }
 
+  commands () {
+    return !global.commons.isSystemEnabled('raffles')
+      ? []
+      : [
+        {this: this, command: '!raffle pick', fnc: this.pick, permission: constants.OWNER_ONLY},
+        {this: this, command: '!raffle close', fnc: this.close, permission: constants.OWNER_ONLY},
+        {this: this, command: '!raffle remove', fnc: this.remove, permission: constants.OWNER_ONLY},
+        {this: this, command: '!raffle open', fnc: this.open, permission: constants.OWNER_ONLY},
+        {this: this, command: '!raffle', fnc: this.info, permission: constants.VIEWERS}
+      ]
+  }
+
+  parsers () {
+    return !global.commons.isSystemEnabled('raffles')
+      ? []
+      : [
+        {this: this, name: 'raffle_winner_messages', fnc: this.messages, permission: constants.VIEWERS, priority: constants.LOW, fireAndForget: true},
+        {this: this, name: 'raffle_participate', fnc: this.participate, permission: constants.VIEWERS, priority: constants.LOW}
+      ]
+  }
+
   async refresh (self) {
+    if (cluster.isWorker) return process.send({type: 'raffles', fnc: 'refresh'})
+
     debug('[WIDGET REFRESH]')
     const SOCKET = global.panel.io
 
@@ -88,18 +109,14 @@ class Raffles {
     })
   }
 
-  async messages (self, id, sender, text, skip) {
-    if (skip) {
-      global.updateQueue(id, true)
-      return
-    }
+  async messages (self, sender, text, skip) {
+    if (skip) return true
 
     debug('[MESSAGE PARSER]')
     let raffles = await global.db.engine.find('raffles')
     debug('Raffles: %o', raffles)
     if (_.isEmpty(raffles)) {
-      global.updateQueue(id, true)
-      return
+      return true
     }
 
     let raffle = _.orderBy(raffles, 'timestamp', 'desc')[0]
@@ -114,19 +131,19 @@ class Raffles {
     if (isWinner && isInTwoMinutesTreshold) {
       let winner = await global.db.engine.findOne('raffle_participants', { username: sender.username, raffle_id: raffle._id.toString() })
       winner.messages.push({
-        timestamp: sender['sent-ts'],
+        timestamp: _.now(),
         text: text
       })
       debug({ username: sender.username, raffle_id: raffle._id.toString() }, { messages: winner.messages })
       await global.db.engine.update('raffle_participants', { username: sender.username, raffle_id: raffle._id.toString() }, { messages: winner.messages })
       self.refresh()
     }
-    global.updateQueue(id, true)
+    return true
   }
 
   async announce () {
     let raffle = await global.db.engine.findOne('raffles', { winner: null })
-    if (_.isEmpty(raffle) || _.now() - this.lastAnnounce < (global.configuration.getValue('raffleAnnounceInterval') * 60 * 1000)) {
+    if (_.isEmpty(raffle) || _.now() - this.lastAnnounce < (await global.configuration.getValue('raffleAnnounceInterval') * 60 * 1000)) {
       setTimeout(() => this.announce(), 60000)
       return
     }
@@ -147,23 +164,14 @@ class Raffles {
       max: raffle.max,
       eligibility: eligibility.join(', ')
     })
-    debug(message); global.commons.sendMessage(message, global.parser.getOwner())
+    debug(message); global.commons.sendMessage(message, global.commons.getOwner())
 
-    this.register()
     setTimeout(() => this.announce(), 60000)
-  }
-
-  async register () {
-    let raffle = await global.db.engine.findOne('raffles', { winner: null })
-    if (_.isEmpty(raffle)) return
-    global.parser.unregister(raffle.keyword)
-    global.parser.register(this, raffle.keyword, this.participate, constants.VIEWERS)
   }
 
   async remove (self) {
     let raffle = await global.db.engine.findOne('raffles', { winner: null })
     if (_.isEmpty(raffle)) return
-    global.parser.unregister(raffle.keyword)
 
     await Promise.all([
       global.db.engine.remove('raffles', { _id: raffle._id.toString() }),
@@ -198,13 +206,6 @@ class Raffles {
     }
     keyword = keyword[1]
 
-    // check if keyword is free
-    if (global.parser.isRegistered(keyword)) {
-      let message = global.commons.prepare('core.isRegistered', { keyword: keyword })
-      debug(message); global.commons.sendMessage(message, sender)
-      return
-    }
-
     // check if raffle running
     let raffle = await global.db.engine.findOne('raffles', { winner: null })
     if (!_.isEmpty(raffle)) {
@@ -235,10 +236,8 @@ class Raffles {
       min: minTickets,
       max: maxTickets
     })
-    debug(message); global.commons.sendMessage(message, global.parser.getOwner())
+    debug(message); global.commons.sendMessage(message, global.commons.getOwner())
 
-    // register raffle keyword
-    self.register()
     self.refresh()
     self.lastAnnounce = _.now()
   }
@@ -266,12 +265,17 @@ class Raffles {
       max: raffle.max,
       eligibility: eligibility.join(', ')
     })
-    debug(message); global.commons.sendMessage(message, global.parser.getOwner())
+    debug(message); global.commons.sendMessage(message, global.commons.getOwner())
   }
 
   async participate (self, sender, text) {
     const [raffle, user] = await Promise.all([global.db.engine.findOne('raffles', { winner: null }), global.users.get(sender.username)])
-    text = text.toString()
+
+    const isStartingWithRaffleKeyword = text.startsWith(raffle.keyword)
+    debug('isStartingWithRaffleKeyword: %s', isStartingWithRaffleKeyword)
+    if (!isStartingWithRaffleKeyword || _.isEmpty(raffle)) return true
+
+    text = text.toString().replace(raffle.keyword, '')
     let tickets = text.trim() === 'all' && !_.isNil(user.points) ? user.points : parseInt(text.trim(), 10)
     debug('User in db: %j', user)
     debug('Text: %s', text)
@@ -344,7 +348,7 @@ class Raffles {
     let participants = await global.db.engine.find('raffle_participants', { raffle_id: raffle._id.toString(), eligible: true })
     if (participants.length === 0) {
       let message = global.commons.prepare('raffles.no-participants-to-pick-winner')
-      debug(message); global.commons.sendMessage(message, global.parser.getOwner())
+      debug(message); global.commons.sendMessage(message, global.commons.getOwner())
       return true
     }
 
@@ -380,9 +384,7 @@ class Raffles {
       keyword: raffle.keyword,
       probability: _.round(probability, 2)
     })
-    debug(message); global.commons.sendMessage(message, global.parser.getOwner())
-
-    global.parser.unregister(raffle.keyword) // disable raffle keyword on pick
+    debug(message); global.commons.sendMessage(message, global.commons.getOwner())
 
     self.refresh()
   }

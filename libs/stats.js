@@ -4,10 +4,14 @@ const debug = require('debug')
 
 function Stats () {
   this.latestTimestamp = 0
+  this.sockets()
+  this.clearAPIStats(this)
+}
+
+Stats.prototype.sockets = function () {
+  if (_.isNil(global.panel)) return setTimeout(() => this.sockets(), 10)
   global.panel.socketListening(this, 'getLatestStats', this.getLatestStats)
   global.panel.socketListening(this, 'getApiStats', this.getApiStats)
-
-  this.clearAPIStats(this)
 }
 
 Stats.prototype.clearAPIStats = async function (self) {

@@ -1,34 +1,33 @@
 /* global describe it beforeEach */
+if (require('cluster').isWorker) process.exit()
 
 require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
-const tmi = require('../../general.js').tmi
 
 // users
 const owner = { username: 'soge__' }
 
 describe('Custom Commands - list()', () => {
   beforeEach(async () => {
-    await tmi.waitForConnection()
-    global.commons.sendMessage.reset()
     await db.cleanup()
+    await message.prepare()
   })
 
   it('empty list', async () => {
     global.systems.customCommands.list(global.systems.customCommands, owner, '')
-    await message.isSent('customcmds.list-is-empty', owner)
+    await message.isSent('customcmds.list-is-empty', owner, { sender: owner.username })
   })
 
   it('populated list', async () => {
     global.systems.customCommands.add(global.systems.customCommands, owner, '!a !me')
-    await message.isSent('customcmds.command-was-added', owner, { command: 'a' })
+    await message.isSent('customcmds.command-was-added', owner, { command: 'a', sender: owner.username })
 
     global.systems.customCommands.add(global.systems.customCommands, owner, '!b !me')
-    await message.isSent('customcmds.command-was-added', owner, { command: 'b' })
+    await message.isSent('customcmds.command-was-added', owner, { command: 'b', sender: owner.username })
 
     global.systems.customCommands.list(global.systems.customCommands, owner, '')
-    await message.isSent('customcmds.list-is-not-empty', owner, { list: '!a, !b' })
+    await message.isSent('customcmds.list-is-not-empty', owner, { list: '!a, !b', sender: owner.username })
   })
 })

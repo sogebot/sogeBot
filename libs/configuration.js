@@ -3,25 +3,24 @@
 const constants = require('./constants')
 const _ = require('lodash')
 const config = require('../config.json')
-const debug = require('debug')('configuration')
+const debug = require('debug')
 
 function Configuration () {
   this.config = null
   this.cfgL = {}
   this.default = {}
 
-  global.parser.register(this, '!set list', this.listSets, constants.OWNER_ONLY)
-  global.parser.register(this, '!set', this.setValue, constants.OWNER_ONLY)
-  global.parser.register(this, '!_debug', this.debug, constants.OWNER_ONLY)
-
-  this.register('lang', '', 'string', 'en')
   this.register('mute', 'core.mute', 'bool', false)
-
   this.register('disableWhisperListener', 'whisper.settings.disableWhisperListener', 'bool', true)
   this.register('disableSettingsWhispers', 'whisper.settings.disableSettingsWhispers', 'bool', false)
+}
 
-  const self = this
-  setTimeout(function () { global.log.info('Bot is loading configuration data'); self.loadValues() }, 2000)
+Configuration.prototype.commands = function () {
+  return [
+    { this: this, command: '!set list', fnc: this.listSets, permission: constants.OWNER_ONLY },
+    { this: this, command: '!set', fnc: this.setValue, permission: constants.OWNER_ONLY },
+    { this: this, command: '!_debug', fnc: this.debug, permission: constants.OWNER_ONLY }
+  ]
 }
 
 Configuration.prototype.debug = async function (self, sender) {
@@ -57,7 +56,6 @@ Configuration.prototype.debug = async function (self, sender) {
   global.log.debug(`API | HELIX ${stats.helix.total}/${stats.helix.errors} | KRAKEN ${stats.kraken.total}/${stats.kraken.errors} | TMI ${stats.tmi.total}/${stats.tmi.errors}`)
   global.log.debug(`WEBHOOKS | ${_.keys(_.pickBy(global.webhooks.enabled)).join(', ')}`)
   global.log.debug(`OAUTH | BOT ${!oauth.bot} | BROADCASTER ${!oauth.broadcaster}`)
-  global.log.debug(`QUEUE: ${JSON.stringify(global.parser.getQueue())}`)
   global.log.debug('======= END OF DEBUG MESSAGE =======')
 }
 
@@ -66,6 +64,7 @@ Configuration.prototype.get = function () {
 }
 
 Configuration.prototype.register = function (cfgName, success, filter, defaultValue) {
+  debug('configuration:register')(`Registering ${cfgName}:${filter} with default value ${defaultValue}`)
   this.cfgL[cfgName] = {success: success, value: defaultValue, filter: filter}
   this.default[cfgName] = {value: defaultValue}
 }
@@ -73,16 +72,17 @@ Configuration.prototype.register = function (cfgName, success, filter, defaultVa
 Configuration.prototype.setValue = async function (self, sender, text, quiet) {
   try {
     var cmd = text.split(' ')[0]
+    debug('configuration:setValue')('cmd: %s', cmd)
     var value = text.replace(text.split(' ')[0], '').trim()
     var filter = self.cfgL[cmd].filter
     quiet = _.isBoolean(quiet) ? quiet : false
 
     if (value.length === 0) value = self.default[cmd].value
-    debug('filter: %s', filter)
-    debug('key: %s', cmd)
-    debug('value to set: %s', value)
-    debug('text: %s', text)
-    debug('isQuiet: %s', quiet)
+    debug('configuration:setValue')('filter: %s', filter)
+    debug('configuration:setValue')('key: %s', cmd)
+    debug('configuration:setValue')('value to set: %s', value)
+    debug('configuration:setValue')('text: %s', text)
+    debug('configuration:setValue')('isQuiet: %s', quiet)
 
     if (_.isString(value)) value = value.trim()
     if (filter === 'number' && Number.isInteger(parseInt(value, 10))) {
@@ -110,11 +110,11 @@ Configuration.prototype.setValue = async function (self, sender, text, quiet) {
     } else global.commons.sendMessage('Sorry, $sender, cannot parse !set command.', sender)
 
     let emit = {}
-    _.each(self.sets(self), function (key) {
-      emit[key] = self.getValue(key)
+    _.each(self.sets(self), async function (key) {
+      emit[key] = await self.getValue(key)
     })
-    global.panel.io.emit('configuration', emit)
   } catch (err) {
+    console.log(err)
     global.commons.sendMessage('Sorry, $sender, cannot parse !set command.', sender)
   }
 }
@@ -128,25 +128,11 @@ Configuration.prototype.listSets = function (self, sender, text) {
   global.commons.sendMessage(setL.length === 0 ? 'Sorry, $sender, you cannot configure anything' : 'List of possible settings: ' + setL, sender)
 }
 
-Configuration.prototype.getValue = function (cfgName) {
-  return this.cfgL[cfgName].value
-}
-
-Configuration.prototype.loadValues = async function () {
-  var self = this
-  let settings = await global.db.engine.find('settings')
-  _.each(settings, function (obj) {
-    if (!_.isUndefined(self.cfgL[obj.key])) self.cfgL[obj.key].value = obj.value
-  })
-  global.log.info('Bot loaded configuration data')
-
-  global.client.connect()
-  if (_.get(config, 'settings.broadcaster_oauth', '').match(/oauth:[\w]*/)) {
-    global.broadcasterClient.connect()
-  } else {
-    global.log.error('Broadcaster oauth is not properly set - hosts will not be loaded')
-    global.log.error('Broadcaster oauth is not properly set - subscribers will not be loaded')
-  }
+Configuration.prototype.getValue = async function (cfgName) {
+  let item = await global.db.engine.findOne('settings', { key: cfgName })
+  if (_.isEmpty(item)) return this.cfgL[cfgName].value // return default value if not saved
+  if (_.includes(['true', 'false'], item.value.toString().toLowerCase())) return item.value.toString().toLowerCase() === 'true'
+  else return item.value
 }
 
 module.exports = Configuration

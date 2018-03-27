@@ -9,6 +9,14 @@ function define (name, value) {
   })
 }
 
+// PRIORITIES
+define('MODERATION', -1)
+define('HIGHEST', 0)
+define('HIGH', 1)
+define('MEDIUM', 2)
+define('LOW', 3)
+define('LOWEST', 4)
+
 // Permissions
 define('OWNER_ONLY', 0)
 define('VIEWERS', 1)

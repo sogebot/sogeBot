@@ -5,7 +5,7 @@ const config = require('../../config.json')
 
 class Credits {
   constructor () {
-    this.sockets()
+    if (require('cluster').isMaster) this.sockets()
 
     global.configuration.register('creditsAggregate', 'core.no-response-bool', 'bool', false)
 
@@ -49,7 +49,7 @@ class Credits {
       socket.on('load', async (callback) => {
         let [events, when, hosts, socials] = await Promise.all([
           global.db.engine.find('widgetsEventList'),
-          global.twitch.when(),
+          global.cache.when(),
           global.db.engine.find('cache.hosts'),
           global.db.engine.find('overlay.credits.socials')
         ])
@@ -102,8 +102,8 @@ class Credits {
         callback(null,
           events.filter((o) => o.timestamp >= timestamp),
           config.settings.broadcaster_username,
-          global.twitch.current.game,
-          global.twitch.current.status,
+          global.api.current.game,
+          global.api.current.status,
           hosts.map((o) => o.username),
           socials,
           messages,

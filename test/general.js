@@ -8,8 +8,24 @@ config.settings.bot_owners = 'soge__'
 config.settings.broadcaster_username = 'test__________bot'
 fs.writeFileSync('../config.json', JSON.stringify(config))
 
+// set process and debug mode to have only one cpu
+process.send = process.send || function () {} // process is not in mocha somehow
+
+global.client = {
+  say: function () { },
+  color: function () {},
+  timeout: function () {},
+  on: function () {},
+  connect: function () {},
+  readyState: function () { return 'OPEN' },
+  isMod: function () { return true }
+}
+
 // load up a bot
-require('../main.js')
+if (require('cluster').isMaster) {
+  global.cluster = false
+  require('../main.js')
+}
 
 module.exports = {
   db: require('./helpers/db'),

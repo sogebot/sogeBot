@@ -1,153 +1,56 @@
 /* global describe it beforeEach */
+if (require('cluster').isWorker) process.exit()
 
-const assert = require('chai').assert
-const sinon = require('sinon')
-const until = require('test-until')
-const _ = require('lodash')
 require('../../general.js')
 
 const db = require('../../general.js').db
-const tmi = require('../../general.js').tmi
+const message = require('../../general.js').message
 
 // users
 const owner = { username: 'soge__' }
 
 describe('Timers - toggle()', () => {
   beforeEach(async () => {
-    await tmi.waitForConnection()
     await db.cleanup()
-    let timer = await global.db.engine.insert('timers', {name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() }})
+    await message.prepare()
+    let timer = await global.db.engine.insert('timers', {name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() }})
     await global.db.engine.insert('timers.responses', {response: 'Lorem Ipsum', timerId: timer._id, enabled: true})
-    global.commons.sendMessage.reset()
   })
 
   it('', async () => {
     global.systems.timers.toggle(global.systems.timers, owner, '')
-
-    await until(setError => {
-      let expected = global.commons.prepare('timers.id-or-name-must-be-defined')
-      let user = owner
-      try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
-        return true
-      } catch (err) {
-        return setError(
-          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
-          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
-      }
-    })
+    await message.isSent('timers.id-or-name-must-be-defined', owner, { sender: owner.username })
   })
 
   it('-id something -name something', async () => {
     global.systems.timers.toggle(global.systems.timers, owner, '-id something -name something')
-
-    await until(setError => {
-      let expected = global.commons.prepare('timers.id-or-name-must-be-defined')
-      let user = owner
-      try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
-        return true
-      } catch (err) {
-        return setError(
-          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
-          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
-      }
-    })
+    await message.isSent('timers.id-or-name-must-be-defined', owner, { sender: owner.username })
   })
 
   it('-id unknown', async () => {
     global.systems.timers.toggle(global.systems.timers, owner, '-id unknown')
-
-    await until(setError => {
-      let expected = global.commons.prepare('timers.response-not-found', { id: 'unknown' })
-      let user = owner
-      try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
-        return true
-      } catch (err) {
-        return setError(
-          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
-          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
-      }
-    })
+    await message.isSent('timers.response-not-found', owner, { id: 'unknown', sender: owner.username })
   })
 
   it('-id response_id', async () => {
     let response = await global.db.engine.findOne('timers.responses', { response: 'Lorem Ipsum' })
+    global.systems.timers.toggle(global.systems.timers, owner, '-id ' + response._id)
+    await message.isSent('timers.response-disabled', owner, { id: response._id, sender: owner.username })
 
     global.systems.timers.toggle(global.systems.timers, owner, '-id ' + response._id)
-    await until(setError => {
-      let expected = global.commons.prepare('timers.response-disabled', { id: response._id })
-      let user = owner
-      try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
-        return true
-      } catch (err) {
-        return setError(
-          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
-          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
-      }
-    })
-
-    global.systems.timers.toggle(global.systems.timers, owner, '-id ' + response._id)
-    await until(setError => {
-      let expected = global.commons.prepare('timers.response-enabled', { id: response._id })
-      let user = owner
-      try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
-        return true
-      } catch (err) {
-        return setError(
-          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
-          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
-      }
-    })
+    await message.isSent('timers.response-enabled', owner, { id: response._id, sender: owner.username })
   })
 
   it('-name unknown', async () => {
     global.systems.timers.toggle(global.systems.timers, owner, '-name unknown')
-
-    await until(setError => {
-      let expected = global.commons.prepare('timers.timer-not-found', { name: 'unknown' })
-      let user = owner
-      try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
-        return true
-      } catch (err) {
-        return setError(
-          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
-          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
-      }
-    })
+    await message.isSent('timers.timer-not-found', owner, { name: 'unknown', sender: owner.username })
   })
 
   it('-name test', async () => {
     global.systems.timers.toggle(global.systems.timers, owner, '-name test')
-    await until(setError => {
-      let expected = global.commons.prepare('timers.timer-disabled', { name: 'test' })
-      let user = owner
-      try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
-        return true
-      } catch (err) {
-        return setError(
-          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
-          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
-      }
-    })
+    await message.isSent('timers.timer-disabled', owner, { name: 'test', sender: owner.username })
 
     global.systems.timers.toggle(global.systems.timers, owner, '-name test')
-    await until(setError => {
-      let expected = global.commons.prepare('timers.timer-enabled', { name: 'test' })
-      let user = owner
-      try {
-        assert.isTrue(global.commons.sendMessage.calledWith(expected, sinon.match(user)))
-        return true
-      } catch (err) {
-        return setError(
-          '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? global.commons.sendMessage.lastCall.args[0] : '') + '"' +
-          '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.commons.sendMessage.lastCall) ? JSON.stringify(global.commons.sendMessage.lastCall.args[1]) : '') + '"')
-      }
-    })
+    await message.isSent('timers.timer-enabled', owner, { name: 'test', sender: owner.username })
   })
 })

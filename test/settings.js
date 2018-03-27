@@ -1,11 +1,10 @@
-/* global describe it before beforeEach after */
+/* global describe it before */
 
 const assert = require('chai').assert
-const until = require('test-until')
-const _ = require('lodash')
 require('./general.js')
 
-const tmi = require('./general.js').tmi
+const db = require('./general.js').db
+const message = require('./general.js').message
 
 // users
 const owner = { username: 'soge__' }
@@ -14,31 +13,20 @@ const owner = { username: 'soge__' }
 require('../main.js')
 
 describe('Settings tests', () => {
-  before(() => {
+  before(async () => {
+    await db.cleanup()
+    await message.prepare()
     global.configuration.register('testBool', 'settings.testBool', 'bool', true)
     global.configuration.register('testNumber', 'settings.testNumber', 'number', 1)
     global.configuration.register('testString', 'settings.testString', 'string', 'test')
   })
-  beforeEach(async function () {
-    await tmi.waitForConnection()
-    global.commons.sendMessage.reset()
-  })
-  after(async function () {
-    let items = await global.db.engine.find('settings')
-    _.each(items, async (item) => {
-      await global.db.engine.remove('settings', { _id: item._id })
-    })
-  })
   describe('testBool', () => {
     describe('/bool/', function () {
       before(function () {
-        global.parser.parse(owner, '!set testBool false')
+        global.configuration.setValue(global.configuration, owner, 'testBool false')
       })
       it('success message expected', async function () {
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-
-        let message = global.commons.sendMessage.getCall(0).args[0]
-        assert.equal(message, '{missing_translation: en.settings.testBool.false}')
+        await message.isWarned('settings.testBool.false', owner, { sender: owner.username })
       })
       it('should be set in db', async function () {
         let item = await global.db.engine.findOne('settings', { key: 'testBool' })
@@ -48,13 +36,10 @@ describe('Settings tests', () => {
     })
     describe('/string/', function () {
       before(function () {
-        global.parser.parse(owner, '!set testBool test')
+        global.configuration.setValue(global.configuration, owner, 'testBool test')
       })
       it('fail message expected', async function () {
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-
-        let message = global.commons.sendMessage.getCall(0).args[0]
-        assert.equal(message, 'Sorry, $sender, cannot parse !set command.')
+        await message.isSentRaw(`Sorry, @${owner.username}, cannot parse !set command.`, owner, { sender: owner.username })
       })
       it('should not be set in db', async function () {
         let item = await global.db.engine.findOne('settings', { key: 'testBool' })
@@ -63,13 +48,10 @@ describe('Settings tests', () => {
     })
     describe('/number/', function () {
       before(function () {
-        global.parser.parse(owner, '!set testBool 10')
+        global.configuration.setValue(global.configuration, owner, 'testBool 10')
       })
       it('fail message expected', async function () {
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-
-        let message = global.commons.sendMessage.getCall(0).args[0]
-        assert.equal(message, 'Sorry, $sender, cannot parse !set command.')
+        await message.isSentRaw(`Sorry, @${owner.username}, cannot parse !set command.`, owner, { sender: owner.username })
       })
       it('should not be set in db', async function () {
         let item = await global.db.engine.findOne('settings', { key: 'testBool' })
@@ -78,13 +60,10 @@ describe('Settings tests', () => {
     })
     describe('/empty/', function () {
       before(function () {
-        global.parser.parse(owner, '!set testBool')
+        global.configuration.setValue(global.configuration, owner, 'testBool')
       })
       it('success message expected', async function () {
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-
-        let message = global.commons.sendMessage.getCall(0).args[0]
-        assert.equal(message, '{missing_translation: en.settings.testBool.true}')
+        await message.isWarned('settings.testBool.true', owner, { sender: owner.username })
       })
       it('should be set in db as default', async function () {
         let item = await global.db.engine.findOne('settings', { key: 'testBool' })
@@ -95,13 +74,10 @@ describe('Settings tests', () => {
   describe('testNumber', () => {
     describe('/number/', function () {
       before(function () {
-        global.parser.parse(owner, '!set testNumber 10')
+        global.configuration.setValue(global.configuration, owner, 'testNumber 10')
       })
       it('success message expected', async function () {
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-
-        let message = global.commons.sendMessage.getCall(0).args[0]
-        assert.equal(message, '{missing_translation: en.settings.testNumber}')
+        await message.isWarned('settings.testNumber', owner, { sender: owner.username })
       })
       it('should be set in db', async function () {
         let item = await global.db.engine.findOne('settings', { key: 'testNumber' })
@@ -111,13 +87,10 @@ describe('Settings tests', () => {
     })
     describe('/string/', function () {
       before(function () {
-        global.parser.parse(owner, '!set testNumber test')
+        global.configuration.setValue(global.configuration, owner, 'testNumber test')
       })
       it('fail message expected', async function () {
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-
-        let message = global.commons.sendMessage.getCall(0).args[0]
-        assert.equal(message, 'Sorry, $sender, cannot parse !set command.')
+        await message.isSentRaw(`Sorry, @${owner.username}, cannot parse !set command.`, owner, { sender: owner.username })
       })
       it('should not be set in db', async function () {
         let item = await global.db.engine.findOne('settings', { key: 'testNumber' })
@@ -126,13 +99,10 @@ describe('Settings tests', () => {
     })
     describe('/bool/', function () {
       before(function () {
-        global.parser.parse(owner, '!set testNumber true')
+        global.configuration.setValue(global.configuration, owner, 'testNumber true')
       })
       it('fail message expected', async function () {
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-
-        let message = global.commons.sendMessage.getCall(0).args[0]
-        assert.equal(message, 'Sorry, $sender, cannot parse !set command.')
+        await message.isSentRaw(`Sorry, @${owner.username}, cannot parse !set command.`, owner, { sender: owner.username })
       })
       it('should not be set in db', async function () {
         let item = await global.db.engine.findOne('settings', { key: 'testNumber' })
@@ -141,13 +111,10 @@ describe('Settings tests', () => {
     })
     describe('/empty/', function () {
       before(function () {
-        global.parser.parse(owner, '!set testNumber')
+        global.configuration.setValue(global.configuration, owner, 'testNumber')
       })
       it('success message expected', async function () {
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-
-        let message = global.commons.sendMessage.getCall(0).args[0]
-        assert.equal(message, '{missing_translation: en.settings.testNumber}')
+        await message.isWarned('settings.testNumber', owner, { sender: owner.username })
       })
       it('should be set in db as default', async function () {
         let item = await global.db.engine.findOne('settings', { key: 'testNumber' })
@@ -158,13 +125,10 @@ describe('Settings tests', () => {
   describe('testString', () => {
     describe('/string/', function () {
       before(function () {
-        global.parser.parse(owner, '!set testString testMe!')
+        global.configuration.setValue(global.configuration, owner, 'testString testMe!')
       })
       it('success message expected', async function () {
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-
-        let message = global.commons.sendMessage.getCall(0).args[0]
-        assert.equal(message, '{missing_translation: en.settings.testString}')
+        await message.isWarned('settings.testString', owner, { sender: owner.username })
       })
       it('should be set in db', async function () {
         let item = await global.db.engine.findOne('settings', { key: 'testString' })
@@ -174,13 +138,10 @@ describe('Settings tests', () => {
     })
     describe('/number/', function () {
       before(function () {
-        global.parser.parse(owner, '!set testString 10')
+        global.configuration.setValue(global.configuration, owner, 'testString 10')
       })
       it('fail message expected', async function () {
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-
-        let message = global.commons.sendMessage.getCall(0).args[0]
-        assert.equal(message, 'Sorry, $sender, cannot parse !set command.')
+        await message.isSentRaw(`Sorry, @${owner.username}, cannot parse !set command.`, owner, { sender: owner.username })
       })
       it('should not be set in db', async function () {
         let item = await global.db.engine.findOne('settings', { key: 'testString' })
@@ -189,13 +150,10 @@ describe('Settings tests', () => {
     })
     describe('/bool/', function () {
       before(function () {
-        global.parser.parse(owner, '!set testString true')
+        global.configuration.setValue(global.configuration, owner, 'testString true')
       })
       it('fail message expected', async function () {
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-
-        let message = global.commons.sendMessage.getCall(0).args[0]
-        assert.equal(message, 'Sorry, $sender, cannot parse !set command.')
+        await message.isSentRaw(`Sorry, @${owner.username}, cannot parse !set command.`, owner, { sender: owner.username })
       })
       it('should not be set in db', async function () {
         let item = await global.db.engine.findOne('settings', { key: 'testString' })
@@ -204,13 +162,10 @@ describe('Settings tests', () => {
     })
     describe('/empty/', function () {
       before(function () {
-        global.parser.parse(owner, '!set testString')
+        global.configuration.setValue(global.configuration, owner, 'testString')
       })
       it('success message expected', async function () {
-        await until(() => global.commons.sendMessage.calledOnce, 5000)
-
-        let message = global.commons.sendMessage.getCall(0).args[0]
-        assert.equal(message, '{missing_translation: en.settings.testString}')
+        await message.isWarned('settings.testString', owner, { sender: owner.username })
       })
       it('should be set in db as default', async function () {
         let item = await global.db.engine.findOne('settings', { key: 'testString' })

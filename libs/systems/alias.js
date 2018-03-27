@@ -2,11 +2,12 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const debug = require('debug')('systems:alias')
+const debug = require('debug')
 const XRegExp = require('xregexp')
 
 // bot libraries
-var constants = require('../constants')
+const Parser = require('../parser')
+const constants = require('../constants')
 
 /*
  * !alias                            - gets an info about alias usage
@@ -20,35 +21,76 @@ var constants = require('../constants')
 
 class Alias {
   constructor () {
-    if (global.commons.isSystemEnabled(this)) {
-      global.parser.register(this, '!alias add', this.add, constants.OWNER_ONLY)
-      global.parser.register(this, '!alias edit', this.edit, constants.OWNER_ONLY)
-      global.parser.register(this, '!alias list', this.list, constants.OWNER_ONLY)
-      global.parser.register(this, '!alias remove', this.remove, constants.OWNER_ONLY)
-      global.parser.register(this, '!alias toggle-visibility', this.visible, constants.OWNER_ONLY)
-      global.parser.register(this, '!alias toggle', this.toggle, constants.OWNER_ONLY)
-      global.parser.register(this, '!alias', this.help, constants.OWNER_ONLY)
-
-      global.parser.registerHelper('!alias')
-
+    if (require('cluster').isMaster && global.commons.isSystemEnabled(this)) {
       global.panel.addMenu({category: 'manage', name: 'aliases', id: 'alias'})
       global.panel.registerSockets({
         self: this,
         expose: ['add', 'remove', 'visible', 'toggle', 'editCommand', 'editAlias', 'send'],
         finally: this.send
       })
-
-      this.register(this)
     }
   }
 
-  async register (self) {
-    let aliases = await global.db.engine.find('alias')
-    for (let alias of aliases) {
-      // check permission of command
-      let permission = global.parser.isRegistered(`!${alias.command}`) ? global.parser.permissionsCmds[`!${alias.command}`] : constants.VIEWERS
-      global.parser.register(self, '!' + alias.alias, self.run, permission)
+  commands () {
+    if (global.commons.isSystemEnabled('alias')) {
+      return [
+        { command: '!alias add', fnc: this.add, permission: constants.OWNER_ONLY, this: this },
+        { command: '!alias edit', fnc: this.edit, permission: constants.OWNER_ONLY, this: this },
+        { command: '!alias list', fnc: this.list, permission: constants.OWNER_ONLY, this: this },
+        { command: '!alias remove', fnc: this.remove, permission: constants.OWNER_ONLY, this: this },
+        { command: '!alias toggle-visibility', fnc: this.visibility, permission: constants.OWNER_ONLY, this: this },
+        { command: '!alias toggle', fnc: this.toggle, permission: constants.OWNER_ONLY, this: this },
+        { command: '!alias', fnc: this.help, permission: constants.OWNER_ONLY, isHelper: true, this: this }
+      ]
+    } else return []
+  }
+
+  parsers () {
+    if (global.commons.isSystemEnabled('alias')) {
+      return [
+        { name: 'alias', fnc: this.run, priority: constants.LOW, permission: constants.VIEWERS, this: this }
+      ]
+    } else return []
+  }
+
+  async run (self, sender, msg) {
+    const d = debug('alias:run')
+    var alias
+
+    let cmdArray = msg.toLowerCase().split(' ')
+    for (let i in msg.toLowerCase().split(' ')) { // search for correct alias
+      d(`${i} - Searching for ${cmdArray.join(' ')} in aliases`)
+      alias = await global.db.engine.findOne('alias', { alias: cmdArray.join(' ').replace('!', ''), enabled: true })
+      d(alias)
+      if (!_.isEmpty(alias)) break
+      cmdArray.pop() // remove last array item if not found
     }
+    if (_.isEmpty(alias)) return true // no alias was found - return
+    d('Alias found: %j', alias)
+
+    let replace = new RegExp(`!${alias.alias}`, 'i')
+    cmdArray = msg.replace(replace, `!${alias.command}`).split(' ')
+    let tryingToBypass = false
+
+    for (let i in msg.split(' ')) { // search if it is not trying to bypass permissions
+      if (cmdArray.length === alias.command.split(' ').length) break // command is correct (have same number of parameters as command)
+      d(`${i} - Searching if ${cmdArray.join(' ')} is registered as command`)
+      d(`Is registered: %s`, new Parser().find(cmdArray.join(' ')))
+
+      if (new Parser().find(cmdArray.join(' '))) {
+        tryingToBypass = true
+        break
+      }
+      cmdArray.pop() // remove last array item if not found
+    }
+    d(`Is trying to bypass command permission: %s`, tryingToBypass)
+
+    d('Running: %s', msg.replace(replace, `!${alias.command}`))
+    if (!tryingToBypass) {
+      global.log.process({ type: 'parse', sender: sender, message: msg.replace(replace, `!${alias.command}`) })
+      process.send({ type: 'parse', sender: sender, message: msg.replace(replace, `!${alias.command}`) })
+    }
+    return true
   }
 
   async send (self, socket) {
@@ -118,53 +160,9 @@ class Alias {
       visible: true
     }
 
-    if (global.parser.isRegistered(alias.alias)) {
-      let message = global.commons.prepare('core.isRegistered', { keyword: alias.alias })
-      debug(message); global.commons.sendMessage(message, sender)
-      return false
-    }
-
     await global.db.engine.insert('alias', alias)
-    await self.register(self)
-
     let message = global.commons.prepare('alias.alias-was-added', alias)
     debug(message); global.commons.sendMessage(message, sender)
-  }
-
-  async run (self, sender, msg, fullMsg) {
-    var alias
-
-    let cmdArray = fullMsg.toLowerCase().split(' ')
-    for (let i in fullMsg.toLowerCase().split(' ')) { // search for correct alias
-      debug(`${i} - Searching for ${cmdArray.join(' ')} in aliases`)
-      alias = await global.db.engine.findOne('alias', { alias: cmdArray.join(' ').replace('!', ''), enabled: true })
-      debug(alias)
-      if (!_.isEmpty(alias)) break
-      cmdArray.pop() // remove last array item if not found
-    }
-    if (_.isEmpty(alias)) return // no alias was found - return
-    debug('Alias found: %j', alias)
-
-    let replace = new RegExp(`!${alias.alias}`, 'i')
-    cmdArray = fullMsg.replace(replace, `!${alias.command}`).split(' ')
-    let tryingToBypass = false
-    for (let i in fullMsg.split(' ')) { // search if it is not trying to bypass permissions
-      if (cmdArray.length === alias.command.split(' ').length) break // command is correct (have same number of parameters as command)
-      debug(`${i} - Searching if ${cmdArray.join(' ')} is registered as command`)
-      debug(`Is registered: %s`, global.parser.isRegistered(cmdArray.join(' ')))
-
-      if (global.parser.isRegistered(cmdArray.join(' '))) {
-        tryingToBypass = true
-        break
-      }
-      cmdArray.pop() // remove last array item if not found
-    }
-    debug(`Is trying to bypass command permission: %s`, tryingToBypass)
-
-    debug('Running: %s', fullMsg.replace(replace, `!${alias.command}`))
-    if (!tryingToBypass) {
-      global.parser.parse(sender, fullMsg.replace(replace, `!${alias.command}`), true)
-    }
   }
 
   async list (self, sender) {
@@ -191,8 +189,6 @@ class Alias {
     }
 
     await global.db.engine.update('alias', { alias: match.command }, { enabled: !alias.enabled })
-    self.register(self)
-
     let message = global.commons.prepare(!alias.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', { alias: match.command })
     debug(message); global.commons.sendMessage(message, sender)
   }
@@ -234,7 +230,6 @@ class Alias {
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
-    global.parser.unregister(text)
 
     let message = global.commons.prepare('alias.alias-was-removed', { alias: match.command })
     debug(message); global.commons.sendMessage(message, sender)

@@ -1,114 +1,155 @@
 'use strict'
 
-// 3rd party libraries
-var irc = require('twitch-js')
-var _ = require('lodash')
 const figlet = require('figlet')
-const moment = require('moment')
+const cluster = require('cluster')
+const irc = require('twitch-js')
+const os = require('os')
 const util = require('util')
+const debug = require('debug')('tmijs')
+const _ = require('lodash')
+const moment = require('moment')
 
-// config
+const constants = require('./libs/constants')
 const config = require('./config.json')
 
-// logger
-const Logger = require('./libs/logging')
-global.logger = new Logger()
+// this is disabled in tests
+global.cluster = _.isNil(global.cluster) ? true : global.cluster
 
-// db
-const Database = require('./libs/databases/database')
-global.db = new Database()
+global.commons = new (require('./libs/commons'))()
+global.cache = new (require('./libs/cache'))()
 
-// debug
-const debug = require('debug')('tmijs')
+global.linesParsed = 0
+global.avgResponse = []
 
-// bot libraries
-var Configuration = require('./libs/configuration')
-var Translate = require('./libs/translate')
-var Parser = require('./libs/parser')
-var Twitch = require('./libs/twitch')
-var Commons = require('./libs/commons')
-var Users = require('./libs/users')
-var Currency = require('./libs/currency')
-var Panel = require('./libs/panel')
-var Stats = require('./libs/stats')
-var Watcher = require('./libs/watcher')
-var Events = require('./libs/events')
-var Permissions = require('./libs/permissions')
-var constants = require('./libs/constants')
-var Webhooks = require('./libs/webhooks')
+global.status = { // TODO: move it?
+  'TMI': constants.DISCONNECTED,
+  'API': constants.DISCONNECTED,
+  'MOD': false,
+  'RES': 0
+}
 
-console.log(figlet.textSync('sogeBot ' + _.get(process, 'env.npm_package_version', 'x.y.z'), {
-  font: 'ANSI Shadow',
-  horizontalLayout: 'default',
-  verticalLayout: 'default'
-}))
+require('./libs/logging') // logger is on master / worker have own global.log sending data through process
 
-global.client = new irc.Client({
-  connection: {
-    reconnect: true
-  },
-  identity: {
-    username: config.settings.bot_username,
-    password: config.settings.bot_oauth
-  },
-  channels: ['#' + config.settings.broadcaster_username]
-})
-
-global.broadcasterClient = new irc.Client({
-  connection: {
-    reconnect: true
-  },
-  identity: {
-    username: config.settings.broadcaster_username,
-    password: config.settings.broadcaster_oauth
-  },
-  channels: ['#' + config.settings.broadcaster_username]
-})
-
-main()
+global.db = new (require('./libs/databases/database'))(global.cluster)
+if (cluster.isMaster) {
+  // spin up forks first
+  global.cpu = config.cpu === 'auto' ? os.cpus().length : parseInt(config.cpu, 10)
+  if (config.database.type === 'nedb') global.cpu = 1 // nedb can have only one fork
+  for (let i = 0; i < global.cpu; i++) fork()
+  cluster.on('disconnect', (worker) => fork())
+  main()
+} else {
+  require('./cluster.js')
+}
 
 function main () {
-  if (!global.db.engine.connected) {
-    setTimeout(() => main(), 10)
-    return
-  }
+  if (!global.db.engine.connected) return setTimeout(() => main(), 10)
 
-  global.watcher = new Watcher()
-  global.parser = new Parser()
-  global.configuration = new Configuration()
-  global.commons = new Commons()
-  global.panel = new Panel()
-  global.currency = new Currency()
-  global.users = new Users()
-  global.twitch = new Twitch()
-  global.stats = new Stats()
-  global.events = new Events()
-  global.permissions = new Permissions()
-  global.webhooks = new Webhooks()
+  global.configuration = new (require('./libs/configuration.js'))()
+  global.currency = new (require('./libs/currency.js'))()
+  global.stats = new (require('./libs/stats.js'))()
+  global.users = new (require('./libs/users.js'))()
+  global.logger = new (require('./libs/logging.js'))()
+
+  global.events = new (require('./libs/events.js'))()
+
+  global.panel = new (require('./libs/panel'))()
+  global.webhooks = new (require('./libs/webhooks'))()
+  global.api = new (require('./libs/api'))()
+  global.twitch = new (require('./libs/twitch'))()
+  global.permissions = new (require('./libs/permissions'))()
 
   global.lib = {}
-  global.lib.translate = new Translate()
+  global.lib.translate = new (require('./libs/translate'))()
   global.translate = global.lib.translate.translate
 
   // panel
   global.logger._panel()
 
-  global.status = {
-    'TMI': constants.DISCONNECTED,
-    'API': constants.DISCONNECTED,
-    'MOD': false
+  console.log(figlet.textSync('sogeBot ' + _.get(process, 'env.npm_package_version', 'x.y.z'), {
+    font: 'ANSI Shadow',
+    horizontalLayout: 'default',
+    verticalLayout: 'default'
+  }))
+
+  // connect to tmis
+  global.client = global.client || new irc.Client({
+    connection: {
+      reconnect: true
+    },
+    identity: {
+      username: config.settings.bot_username,
+      password: config.settings.bot_oauth
+    },
+    channels: ['#' + config.settings.broadcaster_username]
+  })
+  global.client.connect()
+
+  global.broadcasterClient = new irc.Client({
+    connection: {
+      reconnect: true
+    },
+    identity: {
+      username: config.settings.broadcaster_username,
+      password: config.settings.broadcaster_oauth
+    },
+    channels: ['#' + config.settings.broadcaster_username]
+  })
+  if (_.get(config, 'settings.broadcaster_oauth', '').match(/oauth:[\w]*/)) {
+    global.broadcasterClient.connect()
+  } else {
+    global.log.error('Broadcaster oauth is not properly set - hosts will not be loaded')
+    global.log.error('Broadcaster oauth is not properly set - subscribers will not be loaded')
   }
 
-  global.channelId = null
+  loadClientListeners()
 
   global.lib.translate._load().then(function () {
     global.systems = require('auto-load')('./libs/systems/')
-    global.integrations = require('auto-load')('./libs/integrations/')
-    global.games = require('auto-load')('./libs/games/')
     global.widgets = require('auto-load')('./libs/widgets/')
     global.overlays = require('auto-load')('./libs/overlays/')
+    global.games = require('auto-load')('./libs/games/')
+    global.integrations = require('auto-load')('./libs/integrations/')
   })
 
+  setInterval(function () {
+    global.status.MOD = global.client.isMod('#' + config.settings.broadcaster_username, config.settings.bot_username)
+  }, 60000)
+}
+
+function fork () {
+  let worker = cluster.fork()
+  // processing messages from workers
+  worker.on('message', async (msg) => {
+    if (msg.type === 'log') {
+      return global.log[msg.level](msg.message, msg.params)
+    } else if (msg.type === 'stats') {
+      let avgTime = 0
+      global.avgResponse.push(msg.value)
+      if (global.avgResponse.length > 100) global.avgResponse.shift()
+      for (let time of global.avgResponse) avgTime += parseInt(time, 10)
+      global.status['RES'] = (avgTime / global.avgResponse.length).toFixed(0)
+    } else if (msg.type === 'say') {
+      global.client.say(msg.sender, msg.message)
+    } else if (msg.type === 'action') {
+      global.client.action(msg.sender, msg.message)
+    } else if (msg.type === 'whisper') {
+      global.client.whisper(msg.sender, msg.message)
+    } else if (msg.type === 'parse') {
+      _.sample(cluster.workers).send({ type: 'message', sender: msg.sender, message: msg.message, skip: true }) // resend to random worker
+    } else if (msg.type === 'db') {
+      // do nothing on db
+    } else if (msg.type === 'timeout') {
+      global.client.timeout(config.settings.broadcaster_username, msg.username, msg.timeout, msg.reason)
+    } else if (msg.type === 'api') {
+      global.api[msg.fnc](msg.username, msg.id)
+    } else if (msg.type === 'event') {
+      global.events.fire(msg.eventId, msg.attributes)
+    }
+  })
+}
+
+function loadClientListeners (client) {
   global.client.on('connected', function (address, port) {
     debug('Bot is connected to TMI server - %s:%s', address, port)
     global.log.info('Bot is connected to TMI server')
@@ -120,6 +161,48 @@ function main () {
     debug('Bot is connecting to TMI server - %s:%s', address, port)
     global.log.info('Bot is connecting to TMI server')
     global.status.TMI = constants.CONNECTING
+  })
+
+  global.client.on('reconnect', function (address, port) {
+    debug('Bot is reconnecting to TMI server - %s:%s', address, port)
+    global.log.info('Bot is trying to reconnect to TMI server')
+    global.status.TMI = constants.RECONNECTING
+  })
+
+  global.client.on('message', async function (channel, sender, message, fromSelf) {
+    debug('Message received: %s\n\tuserstate: %s', message, JSON.stringify(sender))
+
+    if (!fromSelf && config.settings.bot_username !== sender.username) {
+      sendMessageToWorker(sender, message)
+      global.linesParsed++
+    }
+  })
+
+  global.client.on('mod', async function (channel, username) {
+    if (debug.enabled) debug('User mod: %s', username)
+    const user = await global.users.get(username)
+    if (!user.is.mod) global.events.fire('mod', { username: username })
+    global.users.set(username, { is: { mod: true } })
+  })
+
+  global.client.on('cheer', async function (channel, userstate, message) {
+    cheer(channel, userstate, message)
+  })
+
+  global.client.on('subgift', async function (channel, username, recipient) {
+    subgift(channel, username, recipient)
+  })
+
+  global.client.on('clearchat', function (channel) {
+    global.events.fire('clearchat')
+  })
+
+  global.client.on('subscription', async function (channel, username, method) {
+    subscription(channel, username, method)
+  })
+
+  global.client.on('resub', async function (channel, username, months, message, userstate, method) {
+    resub(channel, username, months, message, userstate, method)
   })
 
   global.broadcasterClient.on('connected', function (address, port) {
@@ -144,39 +227,15 @@ function main () {
     global.status.TMI = constants.DISCONNECTED
   })
 
-  global.client.on('message', async function (channel, sender, message, fromSelf) {
-    if (debug.enabled) debug('Message received: %s\n\tuserstate: %s', message, JSON.stringify(sender))
+  global.client.on('action', async function (channel, userstate, message, self) {
+    if (debug.enabled) debug('User action: %s\n\tuserstate', message, JSON.stringify(userstate))
 
-    if (!fromSelf && config.settings.bot_username !== sender.username) {
-      // check moderation and skip if moderated
-      if (!global.parser.isModerated(sender, message)) return
+    let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: userstate.username })
+    if (!_.isEmpty(ignoredUser) && userstate.username !== config.settings.broadcaster_username) return
 
-      global.users.set(sender.username, { id: sender['user-id'], is: { online: true, subscriber: _.get(sender, 'subscriber', false) } })
-      // unset tier if not subscriber
-      if (!_.get(sender, 'subscriber', false)) global.db.engine.update('users', { username: sender.username }, { stats: { tier: 0 } })
+    if (self) return
 
-      // isUserIgnored
-      let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: _.get(sender, 'username', '') })
-      let isUserIgnored = !_.isEmpty(ignoredUser) && _.get(sender, 'username', '') !== config.settings.broadcaster_username
-
-      if (sender['message-type'] !== 'whisper') {
-        global.parser.timer.push({ 'id': sender.id, 'received': new Date().getTime() })
-        global.parser.parse(sender, message, false, isUserIgnored)
-        if (isUserIgnored) return
-
-        global.log.chatIn(message, {username: sender.username})
-        global.events.fire('command-send-x-times', { username: sender.username, message: message })
-
-        global.users.isFollower(sender.username)
-        if (!message.startsWith('!') && global.twitch.isOnline) global.db.engine.increment('users', { username: sender.username }, { stats: { messages: 1 } })
-
-        // set is.mod
-        global.users.set(sender.username, { is: { mod: sender.mod } })
-      } else {
-        global.log.whisperIn(message, {username: sender.username})
-        if (!global.configuration.getValue('disableWhisperListener') || global.parser.isOwner(sender)) global.parser.parse(sender, message)
-      }
-    }
+    global.events.fire('action', { username: userstate.username.toLowerCase() })
   })
 
   global.client.on('join', async function (channel, username, fromSelf) {
@@ -186,10 +245,7 @@ function main () {
     if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
 
     if (!fromSelf) {
-      let user = await global.users.get(username)
-      if (!_.isNil(user) && !_.isNil(user.id)) {
-        global.users.isFollower(username)
-      }
+      global.api.isFollower(username)
       global.users.set(username, { is: { online: true } })
       global.widgets.joinpart.send({ username: username, type: 'join' })
       global.events.fire('user-joined-channel', { username: username })
@@ -207,17 +263,6 @@ function main () {
       global.widgets.joinpart.send({ username: username, type: 'part' })
       global.events.fire('user-parted-channel', { username: username })
     }
-  })
-
-  global.client.on('action', async function (channel, userstate, message, self) {
-    if (debug.enabled) debug('User action: %s\n\tuserstate', message, JSON.stringify(userstate))
-
-    let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: userstate.username })
-    if (!_.isEmpty(ignoredUser) && userstate.username !== config.settings.broadcaster_username) return
-
-    if (self) return
-
-    global.events.fire('action', { username: userstate.username.toLowerCase() })
   })
 
   global.client.on('ban', function (channel, username, reason) {
@@ -253,64 +298,23 @@ function main () {
     global.overlays.eventlist.add(data)
     global.events.fire('hosted', data)
   })
+}
 
-  global.client.on('mod', async function (channel, username) {
-    if (debug.enabled) debug('User mod: %s', username)
-    const user = await global.users.get(username)
-    if (!user.is.mod) global.events.fire('mod', { username: username })
-    global.users.set(username, { is: { mod: true } })
+if (cluster.isMaster) {
+  process.on('unhandledRejection', function (reason, p) {
+    global.log.error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
   })
 
-  global.client.on('cheer', async function (channel, userstate, message) {
-    cheer(channel, userstate, message)
+  process.on('uncaughtException', (error) => {
+    if (_.isNil(global.log)) return console.log(error)
+    global.log.error(util.inspect(error))
+    global.log.error('+------------------------------------------------------------------------------+')
+    global.log.error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')
+    global.log.error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
+    global.log.error('| AND ADD logs/exceptions.log file to your report                              |')
+    global.log.error('+------------------------------------------------------------------------------+')
+    process.exit(1)
   })
-
-  global.client.on('subgift', async function (channel, username, recipient) {
-    subgift(channel, username, recipient)
-  })
-
-  global.client.on('clearchat', function (channel) {
-    global.events.fire('clearchat')
-  })
-
-  global.client.on('subscription', async function (channel, username, method) {
-    subscription(channel, username, method)
-  })
-
-  global.client.on('resub', async function (channel, username, months, message, userstate, method) {
-    resub(channel, username, months, message, userstate, method)
-  })
-
-  // Bot is checking if it is a mod
-  setInterval(function () {
-    global.status.MOD = global.client.isMod('#' + config.settings.broadcaster_username, config.settings.bot_username)
-  }, 60000)
-
-  // get and save channel_id
-  const getChannelID = function () {
-    global.client.api({
-      url: 'https://api.twitch.tv/kraken/users?login=' + config.settings.broadcaster_username,
-      headers: {
-        Accept: 'application/vnd.twitchtv.v5+json',
-        'Client-ID': config.settings.client_id
-      }
-    }, function (err, res, body) {
-      if (err) {
-        global.log.error(err)
-        setTimeout(() => getChannelID(), 1000)
-        return
-      }
-
-      if (_.isNil(body.users[0])) {
-        global.log.error('Channel ' + config.settings.broadcaster_username + ' not found!')
-        process.exit()
-      } else {
-        global.channelId = body.users[0]._id
-        global.log.info('Broadcaster channel ID set to ' + global.channelId)
-      }
-    })
-  }
-  getChannelID()
 }
 
 async function subscription (channel, username, method) {
@@ -334,7 +338,7 @@ async function resub (channel, username, months, message, userstate, method) {
   global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: moment().subtract(months, 'months').format('X') * 1000 }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
   global.overlays.eventlist.add({ type: 'resub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
   global.log.resub(`${username}, months: ${months}, message: ${message}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
-  global.events.fire('resub', { username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
+  global.events.fire('resub', { username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: message })
 }
 
 async function subgift (channel, username, recipient) {
@@ -363,28 +367,21 @@ async function cheer (channel, userstate, message) {
   global.log.cheer(`${userstate.username.toLowerCase()}, bits: ${userstate.bits}, message: ${message}`)
   global.db.engine.insert('users.bits', { username: userstate.username.toLowerCase(), amount: userstate.bits, message: message, timestamp: _.now() })
   global.events.fire('cheer', { username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
-  if (global.twitch.isOnline) global.twitch.current.bits = global.twitch.current.bits + parseInt(userstate.bits, 10)
+  if (global.api.isOnline) global.api.current.bits = global.api.current.bits + parseInt(userstate.bits, 10)
 }
 
-if (config.debug.all) {
-  global.log.warning('+------------------------------------+')
-  global.log.warning('| DEBUG MODE IS ENABLED              |')
-  global.log.warning('| PLEASE DISABLE IT IN CONFIG.INI    |')
-  global.log.warning('| UNLESS YOU KNOW WHAT YOU ARE DOING |')
-  global.log.warning('+------------------------------------+')
+function sendMessageToWorker (sender, message) {
+  let worker = _.sample(cluster.workers)
+  if (worker.isConnected()) worker.send({ type: 'message', sender: sender, message: message })
+  else setTimeout(() => sendMessageToWorker(sender, message), 10) // refresh if worker is disconnected
 }
 
-process.on('unhandledRejection', function (reason, p) {
-  global.log.error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
-})
-
-process.on('uncaughtException', () => {
-  global.log.error('+------------------------------------------------------------------------------+')
-  global.log.error('| BOT HAS UNEXPECTEDLY CRASHED                                                 |')
-  global.log.error('| PLEASE CHECK https://github.com/sogehige/SogeBot/wiki/How-to-report-an-issue |')
-  global.log.error('| AND ADD logs/exceptions.log file to your report                              |')
-  global.log.error('+------------------------------------------------------------------------------+')
-  process.exit(1)
-})
-
-exports = module.exports = global
+if (cluster.isMaster) {
+  setInterval(() => {
+    if (global.cpu > 1) { // refresh if there is more than one worker
+      let worker = _.sample(cluster.workers)
+      worker.send({ type: 'shutdown' })
+      worker.disconnect()
+    }
+  }, 1000 * 60 * 60 * 2) // every 2 hour spin up new worker and kill old
+}

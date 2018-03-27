@@ -1,14 +1,10 @@
 /* global describe it before */
+if (require('cluster').isWorker) process.exit()
 
 require('../../general.js')
 
 const db = require('../../general.js').db
-const message = require('../../general.js').message
-const tmi = require('../../general.js').tmi
-
 const assert = require('chai').assert
-
-const owner = { username: 'soge__' }
 
 const tests = {
   'clips': [
@@ -60,13 +56,9 @@ const tests = {
 describe('systems/moderation - containsLink()', () => {
   describe('moderationLinksClips=true & moderationLinksWithSpaces=true', async () => {
     before(async () => {
-      await tmi.waitForConnection()
-      global.commons.sendMessage.reset()
       await db.cleanup()
-      global.parser.parse(owner, '!set moderationLinksWithSpaces true')
-      await message.isSent('core.settings.moderation.moderationLinksWithSpaces.true', owner)
-      global.parser.parse(owner, '!set moderationLinksClips true')
-      await message.isSent('core.settings.moderation.moderationLinksClips.true', owner)
+      await global.db.engine.insert('settings', { key: 'moderationLinksWithSpaces', value: 'true' })
+      await global.db.engine.insert('settings', { key: 'moderationLinksClips', value: 'true' })
     })
 
     for (let [type, listOfTests] of Object.entries(tests)) {
@@ -75,7 +67,7 @@ describe('systems/moderation - containsLink()', () => {
         for (let protocol of protocols) {
           for (let test of listOfTests) {
             it(`link '${protocol}${test}' should timeout`, async () => {
-              assert.isTrue(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, protocol + test))
+              assert.isFalse(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, protocol + test))
             })
           }
         }
@@ -86,7 +78,7 @@ describe('systems/moderation - containsLink()', () => {
         for (let protocol of protocols) {
           for (let test of listOfTests) {
             it(`clip '${protocol}${test}' should timeout`, async () => {
-              assert.isTrue(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, protocol + test))
+              assert.isFalse(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, protocol + test))
             })
           }
         }
@@ -95,7 +87,7 @@ describe('systems/moderation - containsLink()', () => {
       if (type === 'texts') {
         for (let test of listOfTests) {
           it(`text '${test}' should not timeout`, async () => {
-            assert.isFalse(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, test))
+            assert.isTrue(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, test))
           })
         }
       }
@@ -103,13 +95,9 @@ describe('systems/moderation - containsLink()', () => {
   })
   describe('moderationLinksClips=false & moderationLinksWithSpaces=true', async () => {
     before(async () => {
-      await tmi.waitForConnection()
-      global.commons.sendMessage.reset()
       await db.cleanup()
-      global.parser.parse(owner, '!set moderationLinksWithSpaces true')
-      await message.isSent('core.settings.moderation.moderationLinksWithSpaces.true', owner)
-      global.parser.parse(owner, '!set moderationLinksClips false')
-      await message.isSent('core.settings.moderation.moderationLinksClips.false', owner)
+      await global.db.engine.insert('settings', { key: 'moderationLinksWithSpaces', value: 'true' })
+      await global.db.engine.insert('settings', { key: 'moderationLinksClips', value: 'false' })
     })
 
     for (let [type, listOfTests] of Object.entries(tests)) {
@@ -118,7 +106,7 @@ describe('systems/moderation - containsLink()', () => {
         for (let protocol of protocols) {
           for (let test of listOfTests) {
             it(`link '${protocol}${test}' should timeout`, async () => {
-              assert.isTrue(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, protocol + test))
+              assert.isFalse(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, protocol + test))
             })
           }
         }
@@ -129,7 +117,7 @@ describe('systems/moderation - containsLink()', () => {
         for (let protocol of protocols) {
           for (let test of listOfTests) {
             it(`clip '${protocol}${test}' should not timeout`, async () => {
-              assert.isFalse(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, protocol + test))
+              assert.isTrue(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, protocol + test))
             })
           }
         }
@@ -138,7 +126,7 @@ describe('systems/moderation - containsLink()', () => {
       if (type === 'texts') {
         for (let test of listOfTests) {
           it(`text '${test}' should not timeout`, async () => {
-            assert.isFalse(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, test))
+            assert.isTrue(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, test))
           })
         }
       }
@@ -146,13 +134,9 @@ describe('systems/moderation - containsLink()', () => {
   })
   describe('moderationLinksClips=true & moderationLinksWithSpaces=false', async () => {
     before(async () => {
-      await tmi.waitForConnection()
-      global.commons.sendMessage.reset()
       await db.cleanup()
-      global.parser.parse(owner, '!set moderationLinksWithSpaces false')
-      await message.isSent('core.settings.moderation.moderationLinksWithSpaces.false', owner)
-      global.parser.parse(owner, '!set moderationLinksClips true')
-      await message.isSent('core.settings.moderation.moderationLinksClips.true', owner)
+      await global.db.engine.insert('settings', { key: 'moderationLinksWithSpaces', value: 'false' })
+      await global.db.engine.insert('settings', { key: 'moderationLinksClips', value: 'true' })
     })
 
     for (let [type, listOfTests] of Object.entries(tests)) {
@@ -162,11 +146,11 @@ describe('systems/moderation - containsLink()', () => {
           for (let test of listOfTests) {
             if (test.indexOf(' ') > -1 && test.toLowerCase().indexOf('www. ') === -1) { // even if moderationLinksWithSpaces is false - www. google.com should be timeouted
               it(`link '${protocol}${test}' should not timeout`, async () => {
-                assert.isFalse(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, protocol + test))
+                assert.isTrue(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, protocol + test))
               })
             } else {
               it(`link '${protocol}${test}' should timeout`, async () => {
-                assert.isTrue(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, protocol + test))
+                assert.isFalse(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, protocol + test))
               })
             }
           }
@@ -178,7 +162,7 @@ describe('systems/moderation - containsLink()', () => {
         for (let protocol of protocols) {
           for (let test of listOfTests) {
             it(`clip '${protocol}${test}' should timeout`, async () => {
-              assert.isTrue(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, test))
+              assert.isFalse(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, test))
             })
           }
         }
@@ -187,7 +171,7 @@ describe('systems/moderation - containsLink()', () => {
       if (type === 'texts') {
         for (let test of listOfTests) {
           it(`text '${test}' should not timeout`, async () => {
-            assert.isFalse(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, test))
+            assert.isTrue(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'testuser' }, test))
           })
         }
       }

@@ -10,10 +10,12 @@ const carouselDir = './public/dist/carousel/'
 if (!fs.existsSync(carouselDir)) fs.mkdirSync(carouselDir)
 
 function ImageCarousel () {
-  global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
-  global.panel.socketListening(this, 'overlay.images.get', this._get)
-  global.panel.socketListening(this, 'overlay.image.delete', this._delete)
-  global.panel.socketListening(this, 'overlay.image.upload', this._upload)
+  if (require('cluster').isMaster) {
+    global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
+    global.panel.socketListening(this, 'overlay.images.get', this._get)
+    global.panel.socketListening(this, 'overlay.image.delete', this._delete)
+    global.panel.socketListening(this, 'overlay.image.upload', this._upload)
+  }
 }
 
 ImageCarousel.prototype._get = function (self, socket) {

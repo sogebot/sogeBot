@@ -6,10 +6,15 @@ const crypto = require('crypto')
 const safeEval = require('safe-eval')
 const flatten = require('flat')
 const moment = require('moment')
+const cluster = require('cluster')
 const config = require('../config.json')
+
+const Message = require('./message')
 
 class Events {
   constructor () {
+    if (cluster.isWorker) return // dont do anything on worker
+
     this.supportedEventsList = [
       { id: 'user-joined-channel', variables: [ 'username', 'userObject' ] },
       { id: 'user-parted-channel', variables: [ 'username', 'userObject' ] },
@@ -48,9 +53,19 @@ class Events {
       { id: 'bot-will-leave-channel', definitions: {}, fire: this.fireBotWillLeaveChannel }
     ]
 
+    this.panel()
+    this.fadeOut()
+
+    cluster.on('message', (worker, data) => {
+      if (data !== 'event') return // throw away another events
+      this.fire(data.eventId, data.attributes)
+    })
+  }
+
+  async panel () {
+    if (_.isNil(global.panel)) return setTimeout(() => this.panel(), 10)
     global.panel.addMenu({category: 'manage', name: 'event-listeners', id: 'events'})
     this.sockets()
-    this.fadeOut()
   }
 
   async fadeOut () {
@@ -81,8 +96,12 @@ class Events {
 
   async fire (eventId, attributes) {
     const d = debug('events:fire')
-
     attributes = _.clone(attributes) || {}
+
+    if (cluster.isWorker) { // emit process to master
+      process.send({ type: 'event', eventId: eventId, attributes: attributes })
+      return
+    }
 
     if (!_.isNil(_.get(attributes, 'username', null))) attributes.userObject = await global.users.get(attributes.username)
     if (!_.isNil(_.get(attributes, 'recipient', null))) attributes.recipientObject = await global.users.get(attributes.recipient)
@@ -174,14 +193,14 @@ class Events {
       let replace = new RegExp(`\\$${name}`, 'g')
       command = command.replace(replace, val)
     })
-    command = await global.parser.parseMessage(command, { username: global.parser.getOwner() })
+    command = await new Message(command).parse({ username: global.commons.getOwner() })
     d('Running command:', command)
-    global.parser.parseCommands((_.get(operation, 'isCommandQuiet', false) ? null : { username: global.parser.getOwner() }), command, true)
+    global.parser.parseCommands((_.get(operation, 'isCommandQuiet', false) ? null : { username: global.commons.getOwner() }), command, true)
   }
 
   async fireSendChatMessageOrWhisper (operation, attributes, whisper) {
     const d = debug('events:fireSendChatMessageOrWhisper')
-    let username = _.isNil(attributes.username) ? global.parser.getOwner() : attributes.username
+    let username = _.isNil(attributes.username) ? global.commons.getOwner() : attributes.username
     let message = operation.messageToSend
 
     attributes = _(attributes).toPairs().sortBy((o) => -o[0].length).fromPairs().value() // reorder attributes by key length
@@ -240,7 +259,7 @@ class Events {
 
   async checkStreamIsRunningXMinutes (event, attributes) {
     const d = debug('events:checkStreamIsRunningXMinutes')
-    const when = await global.twitch.when()
+    const when = await global.cache.when()
     event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0)
     let shouldTrigger = event.triggered.runAfterXMinutes === 0 &&
                         moment().format('X') - moment(when.online).format('X') > event.definitions.runAfterXMinutes * 60
@@ -259,10 +278,10 @@ class Events {
     event.definitions.runInterval = parseInt(event.definitions.runInterval, 10) // force Integer
     event.definitions.viewersAtLeast = parseInt(event.definitions.viewersAtLeast, 10) // force Integer
 
-    d('Current viewers: %s, expected viewers: %s', global.twitch.current.viewers, event.definitions.viewersAtLeast)
+    d('Current viewers: %s, expected viewers: %s', global.api.current.viewers, event.definitions.viewersAtLeast)
     d('Run Interval: %s, triggered: %s', event.definitions.runInterval, event.triggered.runInterval)
 
-    var shouldTrigger = global.twitch.current.viewers >= event.definitions.viewersAtLeast &&
+    var shouldTrigger = global.api.current.viewers >= event.definitions.viewersAtLeast &&
                         ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000) ||
                         (event.definitions.runInterval === 0 && event.triggered.runInterval === 0))
     if (shouldTrigger) {
@@ -339,12 +358,12 @@ class Events {
       $autohost: _.get(attributes, 'autohost', null),
       $duration: _.get(attributes, 'duration', null),
       // add global variables
-      $game: global.twitch.current.game,
-      $title: global.twitch.current.status,
-      $views: global.twitch.current.views,
-      $followers: global.twitch.current.followers,
-      $hosts: global.twitch.current.hosts,
-      $subscribers: global.twitch.current.subscribers
+      $game: global.api.current.game,
+      $title: global.api.current.status,
+      $views: global.api.current.views,
+      $followers: global.api.current.followers,
+      $hosts: global.api.current.hosts,
+      $subscribers: global.api.current.subscribers
     }
     var result = false
     try {
@@ -479,7 +498,7 @@ class Events {
           recipient: recipient,
           recipientObject: await global.users.get(recipient),
           months: months,
-          monthsName: global.parser.getLocalizedName(months, 'core.months'),
+          monthsName: global.commons.getLocalizedName(months, 'core.months'),
           message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),
           viewers: _.random(0, 9999, false),
           autohost: _.random(0, 1, false) === 0,

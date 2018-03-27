@@ -19,15 +19,7 @@ const ERROR_STREAM_NOT_ONLINE = '1'
 
 class Highlights {
   constructor () {
-    this.cached = {
-      id: null,
-      created_at: null
-    }
-
-    if (global.commons.isSystemEnabled(this)) {
-      global.parser.register(this, '!highlight list', this.list, constants.OWNER_ONLY)
-      global.parser.register(this, '!highlight', this.highlight, constants.OWNER_ONLY)
-
+    if (global.commons.isSystemEnabled(this) && require('cluster').isMaster) {
       global.panel.addMenu({category: 'manage', name: 'highlights', id: 'highlights'})
       global.panel.registerSockets({
         self: this,
@@ -37,6 +29,15 @@ class Highlights {
     }
   }
 
+  commands () {
+    return !global.commons.isSystemEnabled('highlights')
+      ? []
+      : [
+        {this: this, command: '!highlight list', fnc: this.list, permission: constants.OWNER_ONLY},
+        {this: this, command: '!highlight', fnc: this.highlight, permission: constants.OWNER_ONLY}
+      ]
+  }
+
   async highlight (self, sender, description) {
     const d = debug('systems:highlight:highlight')
     description = description.trim().length > 0 ? description : null
@@ -44,7 +45,10 @@ class Highlights {
     let highlight = {}
 
     try {
-      const when = await global.twitch.when()
+      const [when, cid] = await Promise.all([
+        global.cache.when(),
+        global.cache.channelId()
+      ])
       if (_.isNil(when.online)) throw Error(ERROR_STREAM_NOT_ONLINE)
 
       let timestamp = moment.preciseDiff(when.online, moment(), true)
@@ -59,37 +63,30 @@ class Highlights {
 
       d('Created at (cached): %s', self.cached.created_at)
       d('When online: %s', when.online)
-      d('Current video id: %s', self.cached.id)
 
-      if (self.cached.created_at === when.online && !_.isNil(self.cached.id) && !_.isNil(self.cached.created_at)) {
-        d('Using from cache')
+      d('Searching in API')
+      // we need to load video id
+      const url = `https://api.twitch.tv/kraken/channels/${cid}/videos?broadcast_type=archive&limit=1`
+      let options = {
+        url: url,
+        headers: {
+          Accept: 'application/vnd.twitchtv.v5+json',
+          'Client-ID': config.settings.client_id
+        }
+      }
+      global.client.api(options, function (err, res, body) {
+        if (err) {
+          global.log.error(err, { fnc: 'Highlights#1' })
+          global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: err })
+          return
+        }
+        global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: 200 })
+        const video = body.videos[0]
+        self.cached.id = video._id
+        self.cached.created_at = when.online
         highlight.video_id = self.cached.id
         self.add(self, highlight, timestamp, sender)
-      } else {
-        d('Searching in API')
-        // we need to load video id
-        const url = 'https://api.twitch.tv/kraken/channels/' + global.channelId + '/videos?broadcast_type=archive&limit=1'
-        let options = {
-          url: url,
-          headers: {
-            Accept: 'application/vnd.twitchtv.v5+json',
-            'Client-ID': config.settings.client_id
-          }
-        }
-        global.client.api(options, function (err, res, body) {
-          if (err) {
-            global.log.error(err, { fnc: 'Highlights#1' })
-            global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: err })
-            return
-          }
-          global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: 200 })
-          const video = body.videos[0]
-          self.cached.id = video._id
-          self.cached.created_at = when.online
-          highlight.video_id = self.cached.id
-          self.add(self, highlight, timestamp, sender)
-        })
-      }
+      })
     } catch (e) {
       d(e)
       switch (e.message) {

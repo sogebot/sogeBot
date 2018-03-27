@@ -37,7 +37,7 @@
           <input type="text" class="form-control" placeholder="Search..." id="rafflesWidgetSearch" onkeyup="raffles.search(this)">
           <span class="input-group-btn">
             <button class="btn btn-muted" type="button" title="Cancel search" onclick="raffles.clean()">
-              <i class="fas fa-close" aria-hidden="true"></i>
+              <i class="fas fa-trash"></i>
             </button>
           </span>
         </div>
@@ -411,8 +411,8 @@
       _.each(list, function (item) {
         max_show--
         $el.append('<li data-username="' + item.username + '" data-eligible="' + item.eligible +
-        '" onclick="raffles.toggleEligibility(this)" class="' + (max_show < 0 ? 'd-none' : '') + '"><i class="fas ' + (item.eligible ?
-        'fa-check-circle-o text-success' : 'fa-dot-circle-o') + '" aria-hidden="true"></i> ' + item.username +
+        '" onclick="raffles.toggleEligibility(this)" class="' + (max_show < 0 ? 'd-none' : '') + '"><i class="far ' + (item.eligible ?
+        'fa-check-circle text-success' : 'fa-circle') + '" aria-hidden="true"></i> ' + item.username +
         '</li>')
       })
 

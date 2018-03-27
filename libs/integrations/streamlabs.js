@@ -8,6 +8,7 @@ const chalk = require('chalk')
 
 class Streamlabs {
   constructor () {
+    if (require('cluster').isWorker) return
     this.collection = 'integrations.streamlabs'
     this.socket = null
 
@@ -76,7 +77,7 @@ class Streamlabs {
     this.socket.on('disconnect', () => global.log.info('Streamlabs socket disconnected'))
     this.socket.on('connect', () => global.log.info('Streamlabs socket connected'))
 
-    this.socket.on('event', (eventData) => {
+    this.socket.on('event', async (eventData) => {
       if (eventData.type === 'donation') {
         for (let event of eventData.message) {
           global.overlays.eventlist.add({
@@ -88,7 +89,7 @@ class Streamlabs {
           })
           global.events.fire('tip', { username: event.from.toLowerCase(), amount: event.amount, message: event.message, currency: event.currency })
           global.db.engine.insert('users.tips', { username: event.from.toLowerCase(), amount: event.amount, message: event.message, currency: event.currency, timestamp: _.now() })
-          if (global.twitch.isOnline) global.twitch.current.tips = global.twitch.current.tips + parseFloat(global.currency.exchange(event.amount, event.currency, global.configuration.getValue('currency')))
+          if (await global.cache.isOnline()) global.api.current.tips = global.api.current.tips + parseFloat(global.currency.exchange(event.amount, event.currency, global.configuration.getValue('currency')))
         }
       }
     })

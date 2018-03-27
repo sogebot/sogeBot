@@ -10,14 +10,14 @@ const constants = require('../constants')
 
 function Points () {
   if (global.commons.isSystemEnabled(this)) {
-    global.parser.register(this, '!points add', this.addPoints, constants.OWNER_ONLY)
-    global.parser.register(this, '!points remove', this.removePoints, constants.OWNER_ONLY)
-    global.parser.register(this, '!points all', this.allPoints, constants.OWNER_ONLY)
-    global.parser.register(this, '!points set', this.setPoints, constants.OWNER_ONLY)
-    global.parser.register(this, '!points get', this.getPointsFromUser, constants.OWNER_ONLY)
-    global.parser.register(this, '!points give', this.givePoints, constants.VIEWERS)
-    global.parser.register(this, '!makeitrain', this.rainPoints, constants.OWNER_ONLY)
-    global.parser.register(this, '!points', this.getPoints, constants.VIEWERS)
+    if (require('cluster').isMaster) {
+      // add events for join/part
+      setTimeout(() => this.addEvents(this), 1000)
+      // count Points - every 30s check points
+      setInterval(() => this.updatePoints(), 30000)
+
+      this.webPanel()
+    }
 
     // default is <singular>|<plural> | in some languages can be set with custom <singular>|<x:multi>|<plural> where x <= 10
     global.configuration.register('pointsName', 'points.settings.pointsName', 'string', '')
@@ -27,21 +27,30 @@ function Points () {
     global.configuration.register('pointsPerIntervalOffline', 'points.settings.pointsPerIntervalOffline', 'number', 1)
     global.configuration.register('pointsMessageInterval', 'points.settings.pointsMessageInterval', 'number', 5)
     global.configuration.register('pointsPerMessageInterval', 'points.settings.pointsPerMessageInterval', 'number', 1)
-
-    global.parser.registerParser(this, '9-points', this.messagePoints, constants.VIEWERS)
-
-    // add events for join/part
-    var self = this
-    setTimeout(function () {
-      self.addEvents(self)
-    }, 1000)
-    // count Points - every 30s check points
-    setInterval(function () {
-      self.updatePoints()
-    }, 30000)
-
-    this.webPanel()
   }
+}
+
+Points.prototype.commands = function () {
+  return !global.commons.isSystemEnabled('points')
+    ? []
+    : [
+      {this: this, command: '!points add', fnc: this.addPoints, permission: constants.OWNER_ONLY},
+      {this: this, command: '!points remove', fnc: this.removePoints, permission: constants.OWNER_ONLY},
+      {this: this, command: '!points all', fnc: this.allPoints, permission: constants.OWNER_ONLY},
+      {this: this, command: '!points set', fnc: this.setPoints, permission: constants.OWNER_ONLY},
+      {this: this, command: '!points get', fnc: this.getPointsFromUser, permission: constants.OWNER_ONLY},
+      {this: this, command: '!points give', fnc: this.givePoints, permission: constants.VIEWERS},
+      {this: this, command: '!makeitrain', fnc: this.rainPoints, permission: constants.OWNER_ONLY},
+      {this: this, command: '!points', fnc: this.getPoints, permission: constants.VIEWERS}
+    ]
+}
+
+Points.prototype.parsers = function () {
+  return !global.commons.isSystemEnabled('points')
+    ? []
+    : [
+      {this: this, name: 'points', fnc: this.messagePoints, permission: constants.VIEWERS, priority: constants.LOWEST}
+    ]
 }
 
 Points.prototype.webPanel = function () {
@@ -91,11 +100,8 @@ Points.prototype.addEvents = function (self) {
   })
 }
 
-Points.prototype.messagePoints = async function (self, id, sender, text, skip) {
-  if (skip || text.startsWith('!')) {
-    global.updateQueue(id, true)
-    return
-  }
+Points.prototype.messagePoints = async function (self, sender, text, skip) {
+  if (skip || text.startsWith('!')) return true
 
   const points = parseInt(global.configuration.getValue('pointsPerMessageInterval'), 10)
   const interval = parseInt(global.configuration.getValue('pointsMessageInterval'), 10)
@@ -109,10 +115,10 @@ Points.prototype.messagePoints = async function (self, id, sender, text, skip) {
       global.db.engine.update('users', { username: user.username }, { custom: { lastMessagePoints: user.stats.messages } })
     ])
   }
-  global.updateQueue(id, true)
+  return true
 }
 
-Points.prototype.setPoints = function (self, sender, text) {
+Points.prototype.setPoints = async function (self, sender, text) {
   try {
     var parsed = text.match(/^@?([\S]+) ([0-9]+)$/)
     const points = parseInt(parsed[2], 10)
@@ -121,7 +127,7 @@ Points.prototype.setPoints = function (self, sender, text) {
     let message = global.commons.prepare('points.success.set', {
       amount: points,
       username: parsed[1].toLowerCase(),
-      pointsName: self.getPointsName(points)
+      pointsName: await self.getPointsName(points)
     })
     debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
@@ -142,14 +148,14 @@ Points.prototype.givePoints = async function (self, sender, text) {
       let message = global.commons.prepare('points.success.give', {
         amount: givePts,
         username: user2.username,
-        pointsName: self.getPointsName(givePts)
+        pointsName: await self.getPointsName(givePts)
       })
       debug(message); global.commons.sendMessage(message, sender)
     } else {
       let message = global.commons.prepare('points.failed.giveNotEnough', {
         amount: givePts,
         username: user2.username,
-        pointsName: self.getPointsName(givePts)
+        pointsName: await self.getPointsName(givePts)
       })
       debug(message); global.commons.sendMessage(message, sender)
     }
@@ -158,11 +164,11 @@ Points.prototype.givePoints = async function (self, sender, text) {
   }
 }
 
-Points.prototype.getPointsName = function (points) {
-  var pointsNames = global.configuration.getValue('pointsName').split('|').map(Function.prototype.call, String.prototype.trim)
+Points.prototype.getPointsName = async function (points) {
+  var pointsNames = (await global.configuration.getValue('pointsName')).split('|').map(Function.prototype.call, String.prototype.trim)
   var single, multi, xmulti
   // get single|x:multi|multi from pointsName
-  if (global.configuration.getValue('pointsName').length === 0) {
+  if ((await global.configuration.getValue('pointsName')).length === 0) {
     xmulti = global.translate('points.defaults.pointsName.xmulti')
     single = global.translate('points.defaults.pointsName.single')
     multi = global.translate('points.defaults.pointsName.multi')
@@ -215,7 +221,7 @@ Points.prototype.getPointsFromUser = async function (self, sender, text) {
     let message = global.commons.prepare('points.defaults.pointsResponse', {
       amount: user.points,
       username: username,
-      pointsName: self.getPointsName(user.points)
+      pointsName: await self.getPointsName(user.points)
     })
     debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
@@ -234,7 +240,7 @@ Points.prototype.allPoints = async function (self, sender, text) {
     })
     let message = global.commons.prepare('points.success.all', {
       amount: givePts,
-      pointsName: self.getPointsName(givePts)
+      pointsName: await self.getPointsName(givePts)
     })
     debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
@@ -253,7 +259,7 @@ Points.prototype.rainPoints = async function (self, sender, text) {
     })
     let message = global.commons.prepare('points.success.rain', {
       amount: givePts,
-      pointsName: self.getPointsName(givePts)
+      pointsName: await self.getPointsName(givePts)
     })
     debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
@@ -261,7 +267,7 @@ Points.prototype.rainPoints = async function (self, sender, text) {
   }
 }
 
-Points.prototype.addPoints = function (self, sender, text) {
+Points.prototype.addPoints = async function (self, sender, text) {
   try {
     var parsed = text.match(/^@?([\S]+) ([0-9]+)$/)
     let givePts = parseInt(parsed[2], 10)
@@ -270,7 +276,7 @@ Points.prototype.addPoints = function (self, sender, text) {
     let message = global.commons.prepare('points.success.add', {
       amount: givePts,
       username: parsed[1].toLowerCase(),
-      pointsName: self.getPointsName(givePts)
+      pointsName: await self.getPointsName(givePts)
     })
     debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
@@ -289,7 +295,7 @@ Points.prototype.removePoints = async function (self, sender, text) {
     let message = global.commons.prepare('points.success.remove', {
       amount: removePts,
       username: parsed[1].toLowerCase(),
-      pointsName: self.getPointsName(removePts)
+      pointsName: await self.getPointsName(removePts)
     })
     debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
@@ -306,8 +312,8 @@ Points.prototype.startCounting = function (username) {
 }
 
 Points.prototype.updatePoints = async function () {
-  var interval = (global.twitch.isOnline ? global.configuration.getValue('pointsInterval') * 60 * 1000 : global.configuration.getValue('pointsIntervalOffline') * 60 * 1000)
-  var ptsPerInterval = (global.twitch.isOnline ? global.configuration.getValue('pointsPerInterval') : global.configuration.getValue('pointsPerIntervalOffline'))
+  var interval = (await global.cache.isOnline() ? global.configuration.getValue('pointsInterval') * 60 * 1000 : global.configuration.getValue('pointsIntervalOffline') * 60 * 1000)
+  var ptsPerInterval = (await global.cache.isOnline() ? global.configuration.getValue('pointsPerInterval') : global.configuration.getValue('pointsPerIntervalOffline'))
 
   let users = await global.users.getAll({ is: { online: true } })
   for (let user of users) {

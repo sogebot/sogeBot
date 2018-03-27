@@ -4,7 +4,7 @@ const _ = require('lodash')
 const term = require('terminal-kit').terminal
 
 const Database = require('../libs/databases/database')
-const db = new Database()
+const db = new Database(false)
 
 function doYouHaveBackup () {
   term('DO YOU HAVE A BACKUP OF YOUR DB? [y|N]\n')

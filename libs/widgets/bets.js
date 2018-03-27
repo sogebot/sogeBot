@@ -1,7 +1,9 @@
 'use strict'
 
+const _ = require('lodash')
+
 function BetsWidget () {
-  if (!global.commons.isSystemEnabled('bets')) return
+  if (!global.commons.isSystemEnabled('bets') || require('cluster').isWorker) return
   this.cachedTime = 0
 
   global.panel.addWidget('bets', 'widget-title-bets', 'far fa-money-bill-alt')
@@ -22,27 +24,31 @@ function BetsWidget () {
   }, 1000)
 }
 
-BetsWidget.prototype.sendConfiguration = function (self, socket) {
+BetsWidget.prototype.sendConfiguration = async function (self, socket) {
   socket.emit('betsConfiguration', {
-    betCloseTimer: global.configuration.getValue('betCloseTimer'),
-    betPercentGain: global.configuration.getValue('betPercentGain')
+    betCloseTimer: await global.configuration.getValue('betCloseTimer'),
+    betPercentGain: await global.configuration.getValue('betPercentGain')
   })
 }
 
 BetsWidget.prototype.getBetsTemplates = function (self, socket) {
-  socket.emit('betsTemplates', global.systems.bets.templates)
+  socket.emit('betsTemplates', null) // TODO: Fix templates
 }
 
-BetsWidget.prototype.getRunningBet = function (self, socket) {
-  socket.emit('runningBet', global.systems.bets.bet)
+BetsWidget.prototype.getRunningBet = async function (self, socket) {
+  socket.emit('runningBet', await global.db.engine.findOne('cache', { key: 'bets' }))
 }
 
 BetsWidget.prototype.closeBet = function (self, socket, option) {
-  global.parser.parse({username: global.parser.getOwner()}, '!bet ' + (option === 'refund' ? option : 'close ' + option))
+  const message = '!bet ' + (option === 'refund' ? option : 'close ' + option)
+  global.log.process({ type: 'parse', sender: { username: global.commons.getOwner() }, message: message })
+  _.sample(require('cluster').workers).send({ type: 'message', sender: { username: global.commons.getOwner() }, message: message, skip: true })
 }
 
 BetsWidget.prototype.reuseBet = function (self, socket, options) {
-  global.parser.parse({username: global.parser.getOwner()}, '!bet open ' + options.join(' '))
+  const message = '!bet open ' + options.join(' ')
+  global.log.process({ type: 'parse', sender: { username: global.commons.getOwner() }, message: message })
+  _.sample(require('cluster').workers).send({ type: 'message', sender: { username: global.commons.getOwner() }, message: message, skip: true })
 }
 
 BetsWidget.prototype.removeBetTemplate = function (self, socket, id) {

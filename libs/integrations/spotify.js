@@ -18,6 +18,7 @@ const urljoin = require('url-join')
 
 class Spotify {
   constructor () {
+    if (require('cluster').isWorker) return
     this.collection = 'integrations.spotify'
     this.scopes = [ 'user-read-currently-playing', 'user-read-private', 'user-read-email' ]
     this.client = null
@@ -27,10 +28,16 @@ class Spotify {
     this.status()
     this.sockets()
 
-    this.currentSong = {}
-
     setTimeout(() => this.IRefreshToken(), 60000)
     setTimeout(() => this.ICurrentSong(), 10000)
+  }
+
+  get currentSong () {
+    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne('cache', { key: 'integration_spotify_currentSong' }), 'value', {})))
+  }
+
+  set currentSong (v) {
+    global.db.engine.update('cache', { key: 'integration_spotify_currentSong' }, { value: v })
   }
 
   async getMe () {
@@ -53,11 +60,12 @@ class Spotify {
       let song = {
         song: data.body.item.name,
         artist: data.body.item.artists[0].name,
-        is_playing: data.body.is_playing
+        is_playing: data.body.is_playing,
+        is_enabled: await this.status({ log: false })
       }
       this.currentSong = song
     } catch (e) {
-      this.currentSong = null
+      this.currentSong = {}
     }
     setTimeout(() => this.ICurrentSong(), 10000)
   }
@@ -82,6 +90,7 @@ class Spotify {
     (async () => {
       v = !!v // force boolean
       await global.db.engine.update(this.collection, { key: 'enabled' }, { value: v })
+      if (v === false) this.currentSong = {}
       this.status()
     })()
   }
