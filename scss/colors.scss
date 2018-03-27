@@ -26,3 +26,8 @@ hr { border-color: $hr !important }
 .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
   background-color: $card-bg !important;
 }
+
+.invalid-feedback-popover {
+  background-color: theme-color("danger");
+  color: color-yiq(theme-color("danger"));
+}

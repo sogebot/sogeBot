@@ -263,8 +263,8 @@
       return moment(timestamp).format('HH:mm:ss, YYYY-MM-DD')
     },
     styleFollowTime: function (timestamp) {
-      if (_.isUndefined(timestamp) || timestamp === 0) return '<hr>'
-      return moment(timestamp).format('HH:mm:ss, YYYY-MM-DD')
+      if (_.isUndefined(timestamp) || parseInt(timestamp, 10) === 0) return '<hr>'
+      return moment(parseInt(timestamp, 10)).format('HH:mm:ss, YYYY-MM-DD')
     },
     styleWatched: function (timestamp) {
       if (_.isUndefined(timestamp)) timestamp = 0
@@ -349,30 +349,175 @@
 
       $(button).attr('disabled', 'disabled')
       $(button).toggleClass('btn-primary btn-info').text(commons.translate('saving'))
+
+      const popover = $(button).parents('.card').children('.card-body').children('.input-group')
+      const inputs = $(popover).children('input')
+      const textarea = $(popover).children('textarea')
+
       let data = {
-        username: 'test',
-        amount: '10',
-        message: null
+        username: $('#viewers_username').text(),
+        timestamp: $(inputs[0]).datetimepicker('date').format('x'),
+        amount: $(inputs[1]).val(),
+        message: $(textarea).val()
       }
       this.socket.emit(`users.${$(button).data('type')}.add`, data, (err) => {
         if (err) {
+          const errors = JSON.parse(err)
+
+          if (!_.isNil(errors.amount)) {
+            $(inputs[1]).addClass('is-invalid')
+            $(inputs[1]).parents().find('.invalid-feedback').text(errors.amount)
+          }
+
           $(button).toggleClass('btn-info btn-danger').text(commons.translate('error'))
           setTimeout(() => {
             $(button).toggleClass('btn-danger btn-primary').text(commons.translate('save-changes'))
             $(button).removeAttr('disabled')
           }, 1000)
         } else {
+          viewers.updateUserBits(data.username)
+          viewers.updateUserTips(data.username)
           $(button).toggleClass('btn-info btn-success').text(commons.translate('done'))
           setTimeout(() => {
             $(`#new_${$(button).data('type')}`).popover('hide')
           }, 1000)
         }
       })
+    },
+    updateUserBits: function (username) {
+      $('#viewers_bits').empty()
+      this.socket.emit('users.bits', username, (err, bits) => {
+        if (err) return console.error(err)
+
+        if (bits.length === 0) {
+          $('#viewers_bits').append(`
+            <tr>
+              <td style="border-top: 0" colspan="3"><em class="text-info">No bits data were found for this user</em></td>
+            </tr>
+          `)
+        }
+        for (let bit of bits) {
+          $('#viewers_bits').append(`
+            <tr data-viewer-bit-id="${bit._id.toString()}">
+              <td style="border-top: 0; width: 160px;">${viewers.styleFollowTime(bit.timestamp)}</td>
+              <td style="border-top: 0" class="text-center"><strong>${parseInt(bit.amount, 10)}</strong></td>
+              <td style="border-top: 0">${bit.message}</td>
+            </tr>
+          `)
+
+          $(`tr[data-viewer-bit-id="${bit._id.toString()}"]`).popover({
+            html: true,
+            placement: 'auto',
+            template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body p-0"></div></div>',
+            content: `
+              <div class="card">
+                <div class="card-body p-0">
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-clock"></i></span>
+                    </div>
+                    <input type="text" class="form-control datetimepicker-input border-top-0 border-left-0 border-right-0" id="bit-${bit._id.toString()}"/>
+                  </div>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-money-bill-alt"></i></span>
+                    </div>
+                    <input type="number" class="border-top-0 border-left-0 border-right-0 form-control" value="${parseInt(bit.amount, 10)}"/>
+                  </div>
+                  <div class="input-group mb-1">
+                    <div class="input-group-prepend">
+                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-comment"></i></span>
+                    </div>
+                    <textarea rows="5" class="border-top-0 border-left-0 border-right-0 form-control">${bit.message}</textarea>
+                  </div>
+                </div>
+                <div class="card-footer d-flex p-0 border-top-0">
+                  <button class="btn btn-danger w-100">${commons.translate('delete')}</button>
+                  <button class="btn btn-primary w-100">${commons.translate('save-changes')}</button>
+                </div>
+              </div>
+            `
+          })
+          $(`tr[data-viewer-bit-id="${bit._id.toString()}"]`).off('shown.bs.popover').on('shown.bs.popover', () => {
+            $(`#bit-${bit._id.toString()}`).datetimepicker('destroy')
+            $(`#bit-${bit._id.toString()}`).datetimepicker(datepickeropts)
+            if (!_.isNil(bit.timestamp) && bit.timestamp > 0) $(`#bit-${bit._id.toString()}`).datetimepicker('defaultDate', viewers.styleFollowTime(bit.timestamp))
+            else $(`#bit-${bit._id.toString()}`).datetimepicker('defaultDate', false)
+            $(`#bit-${bit._id.toString()}`).off('click').on('click', () => $(`#bit-${bit._id.toString()}`).datetimepicker('toggle'))
+            $(`#bit-${bit._id.toString()}`).off('blur').on('blur', () => $(`#bit-${bit._id.toString()}`).datetimepicker('hide'))
+          })
+        }
+      })
+    },
+    updateUserTips: function (username) {
+      $('#viewers_tips').empty()
+      this.socket.emit('users.tips', username, (err, tips) => {
+        if (err) return console.error(err)
+
+        if (tips.length === 0) {
+          $('#viewers_tips').append(`
+            <tr>
+              <td style="border-top: 0" colspan="3"><em class="text-info">No tips data were found for this user</em></td>
+            </tr>
+          `)
+        }
+        for (let tip of tips) {
+          $('#viewers_tips').append(`
+            <tr data-viewer-tip-id="${tip._id.toString()}">
+              <td style="border-top: 0; width: 160px;">${viewers.styleFollowTime(tip.timestamp)}</td>
+              <td style="border-top: 0" class="text-center"><strong>${parseFloat(tip.amount).toFixed(2)}${tip.currency}</strong></td>
+              <td style="border-top: 0">${tip.message}</td>
+            </tr>
+          `)
+
+          $(`tr[data-viewer-tip-id="${tip._id.toString()}"]`).popover({
+            html: true,
+            placement: 'auto',
+            template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body p-0"></div></div>',
+            content: `
+              <div class="card">
+                <div class="card-body p-0">
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-clock"></i></span>
+                    </div>
+                    <input type="text" class="form-control border-top-0 border-left-0 border-right-0" id="tip-${tip._id.toString()}"/>
+                  </div>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-money-bill-alt"></i></span>
+                    </div>
+                    <input type="text" class="border-top-0 border-left-0 border-right-0 form-control" id="viewers_tip" value="${parseFloat(tip.amount).toFixed(2)}${tip.currency}"/>
+                  </div>
+                  <div class="input-group mb-1">
+                    <div class="input-group-prepend">
+                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-comment"></i></span>
+                    </div>
+                    <textarea rows="5" class="border-top-0 border-left-0 border-right-0 form-control">${tip.message}</textarea>
+                  </div>
+                </div>
+                <div class="card-footer d-flex p-0 border-top-0">
+                  <button class="btn btn-danger w-100">${commons.translate('delete')}</button>
+                  <button class="btn btn-primary w-100">${commons.translate('save-changes')}</button>
+                </div>
+              </div>
+            `
+          })
+          $(`tr[data-viewer-tip-id="${tip._id.toString()}"]`).off('shown.bs.popover').on('shown.bs.popover', () => {
+            $(`#tip-${tip._id.toString()}`).datetimepicker('destroy')
+            $(`#tip-${tip._id.toString()}`).datetimepicker(datepickeropts)
+            if (!_.isNil(tip.timestamp) && tip.timestamp > 0) $(`#tip-${tip._id.toString()}`).datetimepicker('defaultDate', viewers.styleFollowTime(tip.timestamp))
+            else $(`#tip-${tip._id.toString()}`).datetimepicker('defaultDate', false)
+            $(`#tip-${tip._id.toString()}`).off('click').on('click', () => $(`#tip-${tip._id.toString()}`).datetimepicker('toggle'))
+            $(`#tip-${tip._id.toString()}`).off('blur').on('blur', () => $(`#tip-${tip._id.toString()}`).datetimepicker('hide'))
+          })
+        }
+      })
     }
   }
 
   function ViewersPage () {
-    if (_.isNil(systems)) {
+    if (_.isNil(systems) || _.isNil(configuration)) {
       setTimeout(() => ViewersPage(), 1)
       return
     }
@@ -506,133 +651,8 @@
       $('#viewers_points').val(_.get(viewer, 'points', 0))
       $('#viewers_messages').val(_.get(viewer, 'stats.messages', 0))
 
-      $('#viewers_tips').empty()
-      userSocket.emit('users.tips', viewer.username, (err, tips) => {
-        if (err) return console.error(err)
-
-        if (tips.length === 0) {
-          $('#viewers_tips').append(`
-            <tr>
-              <td style="border-top: 0" colspan="3"><em class="text-info">No tips data were found for this user</em></td>
-            </tr>
-          `)
-        }
-        for (let tip of tips) {
-          $('#viewers_tips').append(`
-            <tr data-viewer-tip-id="${tip._id.toString()}">
-              <td style="border-top: 0; width: 160px;">${viewers.styleFollowTime(tip.timestamp)}</td>
-              <td style="border-top: 0" class="text-center"><strong>${parseFloat(tip.amount).toFixed(2)}${tip.currency}</strong></td>
-              <td style="border-top: 0">${tip.message}</td>
-            </tr>
-          `)
-
-          $(`tr[data-viewer-tip-id="${tip._id.toString()}"]`).popover({
-            html: true,
-            placement: 'auto',
-            template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body p-0"></div></div>',
-            content: `
-              <div class="card">
-                <div class="card-body p-0">
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-clock"></i></span>
-                    </div>
-                    <input type="text" class="form-control border-top-0 border-left-0 border-right-0" id="tip-${tip._id.toString()}"/>
-                  </div>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-money-bill-alt"></i></span>
-                    </div>
-                    <input type="text" class="border-top-0 border-left-0 border-right-0 form-control" id="viewers_tip" value="${parseFloat(tip.amount).toFixed(2)}${tip.currency}"/>
-                  </div>
-                  <div class="input-group mb-1">
-                    <div class="input-group-prepend">
-                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-comment"></i></span>
-                    </div>
-                    <textarea rows="5" class="border-top-0 border-left-0 border-right-0 form-control">${tip.message}</textarea>
-                  </div>
-                </div>
-                <div class="card-footer d-flex p-0 border-top-0">
-                  <button class="btn btn-danger w-100">${commons.translate('delete')}</button>
-                  <button class="btn btn-primary w-100">${commons.translate('save-changes')}</button>
-                </div>
-              </div>
-            `
-          })
-          $(`tr[data-viewer-tip-id="${tip._id.toString()}"]`).off('shown.bs.popover').on('shown.bs.popover', () => {
-            $(`#tip-${tip._id.toString()}`).datetimepicker('destroy')
-            $(`#tip-${tip._id.toString()}`).datetimepicker(datepickeropts)
-            if (!_.isNil(tip.timestamp) && tip.timestamp > 0) $(`#tip-${tip._id.toString()}`).datetimepicker('defaultDate', viewers.styleFollowTime(tip.timestamp))
-            else $(`#tip-${tip._id.toString()}`).datetimepicker('defaultDate', false)
-            $(`#tip-${tip._id.toString()}`).off('click').on('click', () => $(`#tip-${tip._id.toString()}`).datetimepicker('toggle'))
-            $(`#tip-${tip._id.toString()}`).off('blur').on('blur', () => $(`#tip-${tip._id.toString()}`).datetimepicker('hide'))
-          })
-        }
-      })
-
-      $('#viewers_bits').empty()
-      userSocket.emit('users.bits', viewer.username, (err, bits) => {
-        if (err) return console.error(err)
-
-        if (bits.length === 0) {
-          $('#viewers_bits').append(`
-            <tr>
-              <td style="border-top: 0" colspan="3"><em class="text-info">No bits data were found for this user</em></td>
-            </tr>
-          `)
-        }
-        for (let bit of bits) {
-          $('#viewers_bits').append(`
-            <tr data-viewer-bit-id="${bit._id.toString()}">
-              <td style="border-top: 0; width: 160px;">${viewers.styleFollowTime(bit.timestamp)}</td>
-              <td style="border-top: 0" class="text-center"><strong>${parseInt(bit.amount, 10)}</strong></td>
-              <td style="border-top: 0">${bit.message}</td>
-            </tr>
-          `)
-
-          $(`tr[data-viewer-bit-id="${bit._id.toString()}"]`).popover({
-            html: true,
-            placement: 'auto',
-            template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body p-0"></div></div>',
-            content: `
-              <div class="card">
-                <div class="card-body p-0">
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-clock"></i></span>
-                    </div>
-                    <input type="text" class="form-control datetimepicker-input border-top-0 border-left-0 border-right-0" id="bit-${bit._id.toString()}"/>
-                  </div>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-money-bill-alt"></i></span>
-                    </div>
-                    <input type="number" class="border-top-0 border-left-0 border-right-0 form-control" value="${parseInt(bit.amount, 10)}"/>
-                  </div>
-                  <div class="input-group mb-1">
-                    <div class="input-group-prepend">
-                      <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-comment"></i></span>
-                    </div>
-                    <textarea rows="5" class="border-top-0 border-left-0 border-right-0 form-control">${bit.message}</textarea>
-                  </div>
-                </div>
-                <div class="card-footer d-flex p-0 border-top-0">
-                  <button class="btn btn-danger w-100">${commons.translate('delete')}</button>
-                  <button class="btn btn-primary w-100">${commons.translate('save-changes')}</button>
-                </div>
-              </div>
-            `
-          })
-          $(`tr[data-viewer-bit-id="${bit._id.toString()}"]`).off('shown.bs.popover').on('shown.bs.popover', () => {
-            $(`#bit-${bit._id.toString()}`).datetimepicker('destroy')
-            $(`#bit-${bit._id.toString()}`).datetimepicker(datepickeropts)
-            if (!_.isNil(bit.timestamp) && bit.timestamp > 0) $(`#bit-${bit._id.toString()}`).datetimepicker('defaultDate', viewers.styleFollowTime(bit.timestamp))
-            else $(`#bit-${bit._id.toString()}`).datetimepicker('defaultDate', false)
-            $(`#bit-${bit._id.toString()}`).off('click').on('click', () => $(`#bit-${bit._id.toString()}`).datetimepicker('toggle'))
-            $(`#bit-${bit._id.toString()}`).off('blur').on('blur', () => $(`#bit-${bit._id.toString()}`).datetimepicker('hide'))
-          })
-        }
-      })
+      viewers.updateUserTips(viewer.username)
+      viewers.updateUserBits(viewer.username)
 
       // set up new bit popover
       $(`#new_bits`).popover({
@@ -647,18 +667,21 @@
                   <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-clock"></i></span>
                 </div>
                 <input type="text" class="form-control border-top-0 border-left-0 border-right-0" id="bit-new"/>
+                <div class="invalid-feedback-popover invalid-feedback"></div>
               </div>
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-money-bill-alt"></i></span>
                 </div>
-                <input type="number" class="border-top-0 border-left-0 border-right-0 form-control" value="0"/>
+                <input type="number" class="border-top-0 border-left-0 border-right-0 form-control" value="50"/>
+                <div class="invalid-feedback-popover invalid-feedback"></div>
               </div>
               <div class="input-group mb-1">
                 <div class="input-group-prepend">
                   <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-comment"></i></span>
                 </div>
                 <textarea rows="5" class="border-top-0 border-left-0 border-right-0 form-control"></textarea>
+                <div class="invalid-feedback-popover invalid-feedback"></div>
               </div>
             </div>
             <div class="card-footer d-flex p-0 border-top-0">
@@ -690,18 +713,21 @@
                 <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-clock"></i></span>
               </div>
               <input type="text" class="form-control border-top-0 border-left-0 border-right-0" id="tip-new"/>
+              <div class="invalid-feedback-popover invalid-feedback"></div>
             </div>
             <div class="input-group">
               <div class="input-group-prepend">
                 <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-money-bill-alt"></i></span>
               </div>
-              <input type="text" class="border-top-0 border-left-0 border-right-0 form-control" id="viewers_tip" value=""/>
+              <input type="text" class="border-top-0 border-left-0 border-right-0 form-control" id="viewers_tip" value="50${configuration.currency}"/>
+              <div class="invalid-feedback-popover invalid-feedback"></div>
             </div>
             <div class="input-group mb-1">
               <div class="input-group-prepend">
                 <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-comment"></i></span>
               </div>
               <textarea rows="5" class="border-top-0 border-left-0 border-right-0 form-control"></textarea>
+              <div class="invalid-feedback-popover invalid-feedback"></div>
             </div>
           </div>
           <div class="card-footer d-flex p-0 border-top-0">

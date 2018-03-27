@@ -365,6 +365,7 @@
     var loadedMenu = false
     var addingWidget = false
     var systems
+    var configuration
 
     var translations = {}
 
@@ -429,6 +430,7 @@
     console.debug('EMIT [getConfiguration]')
     socket.emit('getConfiguration')
     socket.on('configuration', function (data) {
+      configuration = data
       moment.locale(data.lang) // set moment locale
       /* THEME */
       if (data.theme === 'dark') {

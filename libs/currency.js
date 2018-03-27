@@ -12,6 +12,10 @@ class Currency {
     this.updateRates()
   }
 
+  isCodeSupported (code) {
+    return code === this.base || !_.isNil(this.rates[code])
+  }
+
   symbol (code) {
     return getSymbolFromCurrency(code)
   }
