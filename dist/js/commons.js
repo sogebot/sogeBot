@@ -54,10 +54,7 @@ var commons = {
       options.mask = !_.isNil(options.mask) ? options.mask : null
 
       var id = window.crypto.getRandomValues(new Uint32Array(1))
-      var filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(translations.responses.variable), (o) => -o.length).join('|') + ')', 'g')
-      var stringAbbr = options.text.replace(filtersRegExp,
-        '<span contenteditable="false" class="editable-variable" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;'
-      )
+      var stringAbbr = commons.withFilters(options.text)
       var dataArr = []
       for (let [key, value] of Object.entries(options.data)) {
         if (_.isNil(value) || value === 'null') dataArr.push(`${key}`)
@@ -147,10 +144,9 @@ var commons = {
             $('#helper').remove()
             var newString = commons.cleanResponseText($(this).html())
             $(this).data('value', commons.hash(commons.cleanResponseText($(this).html())))
-            var filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(translations.responses.variable), (o) => -o.length).join('|') + ')', 'g')
             if (!_.isNil(options.mask)) $(this).html(newString.replace(/./g, options.mask))
             else {
-              $(this).html(newString.replace(filtersRegExp, '<span contenteditable="false" class="editable-variable" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;'))
+              $(this).html(commons.withFilters(newString))
             }
             // ...if content is different...
             if ($(this).data('initialText').trim() !== newString.trim()) {
@@ -166,6 +162,10 @@ var commons = {
     } catch (e) {
       return e
     }
+  },
+  withFilters: function (text) {
+    var filtersRegExp = new RegExp('\\$(' + _.sortBy(_.keys(translations.responses.variable), (o) => -o.length).join('|') + ')', 'g')
+    return text.replace(filtersRegExp, '<span contenteditable="false" class="editable-variable" data-lang="responses.variable.$1"></span><span class="remove"></span>&nbsp;')
   },
   cleanResponseText: function (text) {
     return $(`<div>
