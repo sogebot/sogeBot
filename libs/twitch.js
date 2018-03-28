@@ -449,8 +449,8 @@ class Twitch {
             }
           }
         }
-        d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x') } })
-        global.users.set(follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x') } })
+        d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
+        global.users.set(follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
       }
     }
 
