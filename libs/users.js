@@ -359,7 +359,7 @@ Users.prototype.isFollowerUpdate = async function (username) {
     global.users.set(username, { is: { follower: false }, time: { followCheck: new Date().getTime(), follow: 0 } }, user.is.follower)
   } else {
     // is follower
-    if (!user.is.follower && new Date().getTime() - moment(request.body.data[0].followed_at).format('X') * 1000 < 60000 * 60) {
+    if (!user.is.follower && new Date().getTime() - moment(request.body.data[0].followed_at).format('x') < 60000 * 60) {
       global.overlays.eventlist.add({
         type: 'follow',
         username: username
@@ -367,7 +367,7 @@ Users.prototype.isFollowerUpdate = async function (username) {
       global.log.follow(username)
       global.events.fire('follow', { username: username })
     }
-    global.users.set(username, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(request.body.data[0].followed_at).format('X') * 1000 } }, !user.is.follower)
+    global.users.set(username, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(request.body.data[0].followed_at).format('x'), 10) } }, !user.is.follower)
   }
 }
 
