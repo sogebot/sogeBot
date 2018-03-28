@@ -76,8 +76,8 @@
         },
         "moderationLinksClips": {
           "text": "Moderovani odkazu na klipy je",
-          "true": "{core.settings.moderation.moderationLinksSubs.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationLinksSubs.text} {core.disabled}"
+          "true": "{core.settings.moderation.moderationLinksClips.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationLinksClips.text} {core.disabled}"
         },
         "moderationLinksTimeout": "Timeout pri pouziti linku je nastaven na $values",
         "moderationSymbols": {

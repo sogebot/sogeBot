@@ -76,8 +76,8 @@
         },
         "moderationLinksClips": {
           "text": "Moderation of clips links is",
-          "true": "{core.settings.moderation.moderationLinksSubs.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationLinksSubs.text} {core.disabled}"
+          "true": "{core.settings.moderation.moderationLinksClips.text} {core.enabled}",
+          "false": "{core.settings.moderation.moderationLinksClips.text} {core.disabled}"
         },
         "moderationLinksTimeout": "Timeout because of links set to $values",
         "moderationSymbols": {
