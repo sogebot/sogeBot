@@ -402,9 +402,11 @@ class Twitch {
     global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
     if (request.status === 200 && !_.isNil(request.body.data)) {
       // check if user id is in db, not in db load username from API
+      let fTime = []
       let fidsToLoadFromAPI = []
       let followersUsername = []
       for (let u of request.body.data) {
+        fTime.push({ id: u.from_id, followed_at: u.followed_at })
         let user = await global.db.engine.findOne('users', { id: u.from_id })
         d('Searching id %s in users db: %j', u.from_id, user)
         if (_.isEmpty(user)) fidsToLoadFromAPI.push(u.from_id)
@@ -446,12 +448,9 @@ class Twitch {
               global.events.fire('follow', { username: user.username })
             }
           }
-          d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
-          global.users.set(follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
-        } else {
-          d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime() } })
-          global.users.set(follower, { is: { follower: true }, time: { followCheck: new Date().getTime() } })
         }
+        d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('X') } })
+        global.users.set(follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('X') } })
       }
     }
 
