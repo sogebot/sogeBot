@@ -167,12 +167,11 @@ function main () {
         global.log.chatIn(message, {username: sender.username})
         global.events.fire('command-send-x-times', { username: sender.username, message: message })
 
-        const user = await global.users.get(sender.username)
-        if (!_.isNil(user.id)) global.users.isFollower(user.username)
-        if (!message.startsWith('!') && global.twitch.isOnline) global.db.engine.increment('users', { username: user.username }, { stats: { messages: 1 } })
+        global.users.isFollower(sender.username)
+        if (!message.startsWith('!') && global.twitch.isOnline) global.db.engine.increment('users', { username: sender.username }, { stats: { messages: 1 } })
 
         // set is.mod
-        global.users.set(user.username, { is: { mod: sender.mod } })
+        global.users.set(sender.username, { is: { mod: sender.mod } })
       } else {
         global.log.whisperIn(message, {username: sender.username})
         if (!global.configuration.getValue('disableWhisperListener') || global.parser.isOwner(sender)) global.parser.parse(sender, message)
