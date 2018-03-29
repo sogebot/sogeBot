@@ -36,7 +36,7 @@ function Users () {
 
   setInterval(async () => {
     // we are in bounds of safe rate limit, wait until limit is refreshed
-    if (this.rate_limit_follower_check.length > 0) {
+    if (this.rate_limit_follower_check.length > 0 && !_.isNil(global.overlays)) {
       this.rate_limit_follower_check = _.uniq(this.rate_limit_follower_check)
       this.isFollowerUpdate(this.rate_limit_follower_check.shift())
     }
