@@ -336,6 +336,26 @@
   <script src="/dist/velocity-animate/js/velocity.min.js"></script>
 
   <script>
+    if (typeof token === 'undefined') {
+      $('body').empty().append(`
+      <div class="alert alert-danger ml-5 mr-5" role="alert">
+        This domain is not set as accessible in your <strong>config.json</strong>. Update your file and restart a bot to propagate changes. Example below:
+      </div>
+      <pre class="alert alert-info ml-5 mr-5" style="font-family: Monospace">
+  ... config.json ...
+  "panel": {
+    "__COMMENT__": "set correctly your domain and to be safe, change your token",
+    "username": "***",
+    "password": "***",
+    "port": ***,
+    "domain": "yourdomain1, ${window.location.host.split(':')[0]}",
+    "token": "***"
+  },
+  ... config.json ...
+      </pre>
+      `)
+    }
+
     var socket = io({
       query: "token=" + token
     });
