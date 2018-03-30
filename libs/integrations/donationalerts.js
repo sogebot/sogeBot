@@ -51,8 +51,17 @@ class Donationalerts {
     } else this.socket.connect()
 
     this.socket.emit('add-user', {token: (await this.clientSecret), type: 'minor'})
+
+    this.socket.off('connect').on('connect', () => debug('donationalerts:onConnect')('Successfully connected socket to service'))
+    this.socket.off('reconnect_attempt').on('reconnect_attempt', () => debug('donationalerts:onReconnectAttempt')('Trying to reconnect to service'))
+    this.socket.off('disconnect').on('disconnect', () => {
+      debug('donationalerts:onDisconnect')('Socket disconnected from service, trying to reconnect to service')
+      this.socket.open()
+    })
+
     this.socket.off('donation').on('donation', (data) => {
       data = JSON.parse(data)
+      debug('donationalerts:onDonation')('Data sent from donationalerts\n%j', data)
       if (parseInt(data.alert_type, 10) !== 1) return
       let additionalData = JSON.parse(data.additional_data)
       global.overlays.eventlist.add({
@@ -101,7 +110,7 @@ class Donationalerts {
     options = _.defaults(options, { log: true })
     const d = debug('donationalerts:status')
     let [enabled, clientSecret] = await Promise.all([this.enabled, this.clientSecret, this.clientId, this.redirectURI, this.code, this.accessToken, this.refreshToken])
-    d(enabled, clientSecret)
+    d('Enabled: %s, clientSecret: %s', enabled, clientSecret)
     enabled = !(_.isNil(clientSecret)) && enabled
 
     let color = enabled ? chalk.green : chalk.red
