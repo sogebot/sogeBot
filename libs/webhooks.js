@@ -43,9 +43,14 @@ class Webhooks {
       return
     }
 
+    // get proper domain
+    let domains = config.panel.domain.split(',').map((o) => o.trim()).filter((o) => o !== 'localhost')
+    if (domains.length === 0) return global.log.warning(`No suitable domain found to use with ${type} webhook ... localhost is not suitable`)
+    let domain = domains[0]
+
     const leaseSeconds = 864000
     const mode = 'subscribe'
-    const callback = `http://${config.panel.domain}/webhooks/hub`
+    const callback = `http://${domain}/webhooks/hub`
 
     const request = [
       `https://api.twitch.tv/helix/webhooks/hub?`,
