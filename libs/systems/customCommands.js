@@ -64,10 +64,7 @@ class CustomCommands {
 
   async editResponse (self, socket, data) {
     if (data.value.length === 0) await self.remove(self, null, '!' + data.id)
-    else {
-      if (data.value.startsWith('!')) data.value = data.value.replace('!', '')
-      await global.db.engine.update('commands', { command: data.id }, { response: data.value })
-    }
+    else await global.db.engine.update('commands', { command: data.id }, { response: data.value })
   }
 
   help (self, sender) {
