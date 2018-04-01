@@ -112,6 +112,8 @@ class Webhooks {
 
   async follower (aEvent) {
     debug('Follow event received: %j', aEvent)
+    if (parseInt(aEvent.data.to_id, 10) !== parseInt(global.channelId, 10)) return debug(`This events doesn't belong to this channel`)
+
     const fid = aEvent.data.from_id
 
     // is in webhooks cache
