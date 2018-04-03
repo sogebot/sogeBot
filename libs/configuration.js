@@ -103,7 +103,6 @@ Configuration.prototype.setValue = async function (self, sender, text, quiet) {
       self.cfgL[cmd].value = value
       if (cmd === 'lang') {
         if (!quiet) global.commons.sendToOwners(global.translate('core.lang-selected'))
-        global.panel.io.emit('lang', global.translate({root: 'webpanel'}))
       }
       await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
       if (cmd !== 'lang' && !quiet) global.commons.sendToOwners(global.translate(self.cfgL[cmd].success).replace(/\$value/g, value))
