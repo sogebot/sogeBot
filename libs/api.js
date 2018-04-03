@@ -563,9 +563,7 @@ class API {
         }
       }
     }
-    if (global.webhooks.enabled.streams) {
-      setTimeout(() => this.getCurrentStreamData(), 120000)
-    } else setTimeout(() => this.getCurrentStreamData(), 60000)
+    setTimeout(() => this.getCurrentStreamData(), 30000)
   }
 
   async saveStreamData (stream) {
