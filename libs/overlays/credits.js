@@ -147,8 +147,8 @@ class Credits {
   }
 
   async getTopClips () {
-    const period = _.includes(['day', 'week', 'month', 'all'], global.configuration.getValue('creditsTopClipsPeriod')) ? global.configuration.getValue('creditsTopClipsPeriod') : 'day'
-    const count = global.configuration.getValue('creditsTopClipsCount')
+    const period = _.includes(['day', 'week', 'month', 'all'], await global.configuration.getValue('creditsTopClipsPeriod')) ? global.configuration.getValue('creditsTopClipsPeriod') : 'day'
+    const count = await global.configuration.getValue('creditsTopClipsCount')
     const channel = config.settings.broadcaster_username
 
     var request
