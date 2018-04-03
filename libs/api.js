@@ -741,7 +741,7 @@ class API {
 
     if (_.isNil(user.id)) return // skip check if ID doesn't exist
 
-    if ((global.api.remainingAPICalls <= 10 && global.api.refreshAPICalls > _.now() / 1000)) {
+    if ((global.api.remainingAPICalls <= 10 && global.api.refreshAPICalls > _.now() / 1000) || _.isNil(cid)) {
       d('Skip for rate-limit to refresh and re-add user to queue')
       this.rate_limit_follower_check.push(user.username)
       return
