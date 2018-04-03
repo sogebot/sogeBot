@@ -125,10 +125,11 @@ class Moderation {
     }
 
     await global.db.engine.insert('moderation.warnings', { username: sender.username, timestamp: _.now() })
+    warning = await new Message(warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length)).parse()
     if (warningsTimeout) {
       global.commons.timeout(sender.username, warning, 1, silent)
     } else {
-      if (!silent) global.commons.sendMessage('$sender: ' + await new Message(warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length)).parse(), sender)
+      if (!silent) global.commons.sendMessage('$sender: ' + warning.parse(), sender)
     }
 
     // cleanup warnings
