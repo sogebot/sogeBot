@@ -209,14 +209,14 @@ class Webhooks {
         global.events.fire('every-x-minutes-of-stream', { reset: true })
       }
 
-      global.twitch.curRetries = 0
-      global.twitch.saveStreamData(stream)
-      global.twitch.streamType = stream.type
+      global.api.curRetries = 0
+      global.api.saveStreamData(stream)
+      global.api.streamType = stream.type
       await global.cache.isOnline(true)
     } else {
       // stream is offline - add curRetry + 1 and call getCurrentStreamData to do retries
-      global.twitch.curRetries = global.twitch.curRetries + 1
-      global.twitch.getCurrentStreamData()
+      global.api.curRetries = global.api.curRetries + 1
+      global.api.getCurrentStreamData()
     }
   }
 }
