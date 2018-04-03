@@ -7,6 +7,11 @@ class CustomVariablesWidget {
   constructor () {
     global.panel.addWidget('customvariables', 'widget-title-customvariables', 'fas fa-dollar-sign')
     this.sockets()
+
+    require('cluster').on('message', (worker, message) => {
+      if (message.type !== 'widget_custom_variables') return
+      this.io.emit(message.emit) // send update to widget
+    })
   }
 
   sockets () {

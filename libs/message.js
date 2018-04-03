@@ -101,7 +101,8 @@ class Message {
           let msg = global.commons.prepare('filters.setVariable', { value: attr.param, variable: variable })
           global.commons.sendMessage(msg, { username: attr.sender, quiet: _.get(attr, 'quiet', false) })
 
-          global.widgets.custom_variables.io.emit('refresh') // send update to widget
+          if (require('cluster').isWorker) process.send({ type: 'widget_custom_variables', emit: 'refresh' })
+          else global.widgets.custom_variables.io.emit('refresh') // send update to widget
           global.twitch.setTitleAndGame(global.twitch, null) // update title
 
           return ''
