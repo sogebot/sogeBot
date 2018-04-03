@@ -36,7 +36,11 @@ describe('Timers - list()', () => {
     let response2 = await global.db.engine.findOne('timers.responses', { response: 'Lorem Ipsum 2' })
 
     await message.isSent('timers.responses-list', owner, { name: 'test2', sender: owner.username })
-    await message.isSentRaw(`⚫ ${response1._id} - ${response1.response}`, owner, { name: 'test2', sender: owner.username })
-    await message.isSentRaw(`⚪ ${response2._id} - ${response2.response}`, owner, { name: 'test2', sender: owner.username })
+    await message.isSentRaw([
+      `⚫ ${response1._id} - ${response1.response}`,
+      `⚪ ${response2._id} - ${response2.response}`], owner, { name: 'test2', sender: owner.username })
+    await message.isSentRaw([
+      `⚫ ${response1._id} - ${response1.response}`,
+      `⚪ ${response2._id} - ${response2.response}`], owner, { name: 'test2', sender: owner.username })
   })
 })

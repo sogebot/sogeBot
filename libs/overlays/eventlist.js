@@ -39,7 +39,7 @@ EventList.prototype.add = async function (data) {
     song_title: _.isNil(data.song_title) ? undefined : data.song_title,
     song_url: _.isNil(data.song_url) ? undefined : data.song_url
   }
-  global.db.engine.insert('widgetsEventList', newEvent)
+  await global.db.engine.insert('widgetsEventList', newEvent)
   global.overlays.eventlist._get(global.overlays.eventlist)
   global.widgets.eventlist._get(global.widgets.eventlist)
 }

@@ -96,7 +96,18 @@ module.exports = {
   isSentRaw: async function (expected, user) {
     await until(setError => {
       try {
-        assert.isTrue(global.log.chatOut.calledWith(expected, sinon.match(user)))
+        let isOK = false
+        if (_.isArray(expected)) {
+          for (let e of expected) {
+            if (global.log.chatOut.calledWith(e, sinon.match(user))) {
+              isOK = true
+              break
+            }
+          }
+        } else {
+          isOK = global.log.chatOut.calledWith(expected, sinon.match(user))
+        }
+        assert.isTrue(isOK)
         return true
       } catch (err) {
         return setError(

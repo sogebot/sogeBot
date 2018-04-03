@@ -350,8 +350,8 @@ class Timers {
 
     let responses = await global.db.engine.find('timers.responses', { timerId: timer._id.toString() })
     d(responses)
-    global.commons.sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), sender)
-    for (let response of responses) { global.commons.sendMessage((response.enabled ? `⚫ ` : `⚪ `) + `${response._id} - ${response.response}`, sender) }
+    await global.commons.sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), sender)
+    for (let response of responses) await global.commons.sendMessage((response.enabled ? `⚫ ` : `⚪ `) + `${response._id} - ${response.response}`, sender)
     return true
   }
 
