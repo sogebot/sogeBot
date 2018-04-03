@@ -132,9 +132,9 @@ function fork () {
       for (let time of global.avgResponse) avgTime += parseInt(time, 10)
       global.status['RES'] = (avgTime / global.avgResponse.length).toFixed(0)
     } else if (msg.type === 'say') {
-      global.client.say(msg.sender, msg.message)
+      global.client.say(config.settings.broadcaster_username, msg.message)
     } else if (msg.type === 'action') {
-      global.client.action(msg.sender, msg.message)
+      global.client.action(config.settings.broadcaster_username, msg.message)
     } else if (msg.type === 'whisper') {
       global.client.whisper(msg.sender, msg.message)
     } else if (msg.type === 'parse') {
