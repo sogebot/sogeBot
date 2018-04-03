@@ -102,13 +102,14 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
   attr = attr || {}
   sender = sender || {}
 
-  if (message === '') return false // if message is empty, don't send anything
   if (_.isString(sender)) sender = { username: sender }
   if (_.isNil(sender) || _.isNil(sender.username)) sender.username = undefined
   if (!_.isNil(sender.quiet)) attr.quiet = sender.quiet
   attr.sender = sender.username
 
   message = await new Message(message).parse(attr)
+  if (message === '') return false // if message is empty, don't send anything
+
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
   if (_.get(sender, 'username', config.settings.bot_username) === config.settings.bot_username && !attr.force) return false // we don't want to reply on bot commands
   message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + sender.username) : message
@@ -121,11 +122,11 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
     } else {
       global.log.chatOut(message, {username: sender.username})
       if (await global.configuration.getValue('sendWithMe')) {
-        if (cluster.isWorker) process.send({type: 'action', sender: config.settings.broadcaster_username, message: message})
-        else global.client.action(sender.username, message)
+        if (cluster.isWorker) process.send({type: 'action', sender: sender.username, message: message})
+        else global.client.action(config.settings.broadcaster_username, message)
       } else {
-        if (cluster.isWorker) process.send({type: 'say', sender: config.settings.broadcaster_username, message: message})
-        else global.client.say(sender.username, message)
+        if (cluster.isWorker) process.send({type: 'say', sender: sender.username, message: message})
+        else global.client.say(config.settings.broadcaster_username, message)
       }
     }
   }
