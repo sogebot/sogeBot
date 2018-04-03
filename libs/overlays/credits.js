@@ -57,34 +57,34 @@ class Credits {
         if (_.isNil(when.online)) when.online = _.now() - 5000000
         let timestamp = new Date(when.online).getTime() // 2018-02-16T18:02:50Z
         let messages = {
-          lastMessage: global.configuration.getValue('creditsLastMessage'),
-          lastSubMessge: global.configuration.getValue('creditsLastSubMessage')
+          lastMessage: await global.configuration.getValue('creditsLastMessage'),
+          lastSubMessge: await global.configuration.getValue('creditsLastSubMessage')
         }
-        let speed = global.configuration.getValue('creditsSpeed')
+        let speed = await global.configuration.getValue('creditsSpeed')
         let custom = {
-          'stream-by': global.configuration.getValue('creditsStreamBy'),
-          'followed-by': global.configuration.getValue('creditsFollowedBy'),
-          'hosted-by': global.configuration.getValue('creditsHostedBy'),
-          'cheer-by': global.configuration.getValue('creditsCheerBy'),
-          'subscribed-by': global.configuration.getValue('creditsSubscribedBy'),
-          'resubscribed by': global.configuration.getValue('creditsResubscribedBy'),
-          'subgift-by': global.configuration.getValue('creditsSubgiftBy'),
-          'clipped-by': global.configuration.getValue('creditsClippedBy'),
-          'top-clips': global.configuration.getValue('creditsTopClips'),
-          'tip-by': global.configuration.getValue('creditsTipsBy')
+          'stream-by': await global.configuration.getValue('creditsStreamBy'),
+          'followed-by': await global.configuration.getValue('creditsFollowedBy'),
+          'hosted-by': await global.configuration.getValue('creditsHostedBy'),
+          'cheer-by': await global.configuration.getValue('creditsCheerBy'),
+          'subscribed-by': await global.configuration.getValue('creditsSubscribedBy'),
+          'resubscribed by': await global.configuration.getValue('creditsResubscribedBy'),
+          'subgift-by': await global.configuration.getValue('creditsSubgiftBy'),
+          'clipped-by': await global.configuration.getValue('creditsClippedBy'),
+          'top-clips': await global.configuration.getValue('creditsTopClips'),
+          'tip-by': await global.configuration.getValue('creditsTipsBy')
         }
         let show = {
-          followers: global.configuration.getValue('creditsFollowers'),
-          hosts: global.configuration.getValue('creditsHosts'),
-          subscribers: global.configuration.getValue('creditsSubscribers'),
-          subgifts: global.configuration.getValue('creditsSubgifts'),
-          resubs: global.configuration.getValue('creditsResubs'),
-          cheers: global.configuration.getValue('creditsCheers'),
-          tips: global.configuration.getValue('creditsTips')
+          followers: await global.configuration.getValue('creditsFollowers'),
+          hosts: await global.configuration.getValue('creditsHosts'),
+          subscribers: await global.configuration.getValue('creditsSubscribers'),
+          subgifts: await global.configuration.getValue('creditsSubgifts'),
+          resubs: await global.configuration.getValue('creditsResubs'),
+          cheers: await global.configuration.getValue('creditsCheers'),
+          tips: await global.configuration.getValue('creditsTips')
         }
 
-        let clips = { play: global.configuration.getValue('creditsTopClipsPlay'), list: [] }
-        if (global.configuration.getValue('creditsClips')) {
+        let clips = { play: await global.configuration.getValue('creditsTopClipsPlay'), list: [] }
+        if (await global.configuration.getValue('creditsClips')) {
           clips.list = await this.getTopClips()
         }
 
@@ -92,10 +92,10 @@ class Credits {
         events = events.filter((o) => o.timestamp >= timestamp)
         for (let event of events) {
           if (!_.isNil(event.amount) && !_.isNil(event.currency)) {
-            event.amount = global.configuration.getValue('creditsAggregate')
-              ? global.currency.exchange(event.amount, event.currency, global.configuration.getValue('currency'))
+            event.amount = await global.configuration.getValue('creditsAggregate')
+              ? global.currency.exchange(event.amount, event.currency, await global.configuration.getValue('currency'))
               : event.amount
-            event.currency = global.currency.symbol(global.configuration.getValue('creditsAggregate') ? global.configuration.getValue('currency') : event.currency)
+            event.currency = global.currency.symbol(await global.configuration.getValue('creditsAggregate') ? await global.configuration.getValue('currency') : event.currency)
           }
         }
 
@@ -111,8 +111,8 @@ class Credits {
           speed,
           show,
           clips,
-          global.configuration.getValue('creditsMaxFontSize'),
-          global.configuration.getValue('creditsAggregate')
+          await global.configuration.getValue('creditsMaxFontSize'),
+          await global.configuration.getValue('creditsAggregate')
         )
       })
       socket.on('socials.save', async (data, cb) => {
@@ -147,8 +147,8 @@ class Credits {
   }
 
   async getTopClips () {
-    const period = _.includes(['day', 'week', 'month', 'all'], await global.configuration.getValue('creditsTopClipsPeriod')) ? global.configuration.getValue('creditsTopClipsPeriod') : 'day'
-    const count = await global.configuration.getValue('creditsTopClipsCount')
+    const period = _.includes(['day', 'week', 'month', 'all'], await await global.configuration.getValue('creditsTopClipsPeriod')) ? await global.configuration.getValue('creditsTopClipsPeriod') : 'day'
+    const count = await await global.configuration.getValue('creditsTopClipsCount')
     const channel = config.settings.broadcaster_username
 
     var request

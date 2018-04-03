@@ -258,7 +258,7 @@ class Message {
           users: users,
           is: is,
           random: randomVar,
-          sender: global.configuration.getValue('atUsername') ? `@${attr.sender}` : `${attr.sender}`,
+          sender: await global.configuration.getValue('atUsername') ? `@${attr.sender}` : `${attr.sender}`,
           param: _.isNil(attr.param) ? null : attr.param
         }
         d(toEval, context); return (safeEval(toEval, context))

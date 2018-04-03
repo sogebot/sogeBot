@@ -67,9 +67,9 @@ Points.prototype.resetPoints = function (self, socket, data) {
   global.users.setAll({points: 0})
 }
 
-Points.prototype.sendConfiguration = function (self, socket) {
+Points.prototype.sendConfiguration = async function (self, socket) {
   var pointsNames
-  if (global.configuration.getValue('pointsName').length === 0) {
+  if (await global.configuration.getValue('pointsName').length === 0) {
     pointsNames = []
     pointsNames.push(global.translate('points.defaults.pointsName.single'))
     if (global.translate('points.defaults.pointsName.xmulti').indexOf('missing_translation') === -1) {
@@ -78,17 +78,17 @@ Points.prototype.sendConfiguration = function (self, socket) {
     pointsNames.push(global.translate('points.defaults.pointsName.multi'))
     pointsNames = pointsNames.join('|')
   } else {
-    pointsNames = global.configuration.getValue('pointsName')
+    pointsNames = await global.configuration.getValue('pointsName')
   }
 
   socket.emit('pointsConfiguration', {
     pointsName: pointsNames,
-    pointsInterval: global.configuration.getValue('pointsInterval'),
-    pointsPerInterval: global.configuration.getValue('pointsPerInterval'),
-    pointsIntervalOffline: global.configuration.getValue('pointsIntervalOffline'),
-    pointsPerIntervalOffline: global.configuration.getValue('pointsPerIntervalOffline'),
-    pointsMessageInterval: global.configuration.getValue('pointsMessageInterval'),
-    pointsPerMessageInterval: global.configuration.getValue('pointsPerMessageInterval')
+    pointsInterval: await global.configuration.getValue('pointsInterval'),
+    pointsPerInterval: await global.configuration.getValue('pointsPerInterval'),
+    pointsIntervalOffline: await global.configuration.getValue('pointsIntervalOffline'),
+    pointsPerIntervalOffline: await global.configuration.getValue('pointsPerIntervalOffline'),
+    pointsMessageInterval: await global.configuration.getValue('pointsMessageInterval'),
+    pointsPerMessageInterval: await global.configuration.getValue('pointsPerMessageInterval')
   })
 }
 
@@ -312,8 +312,8 @@ Points.prototype.startCounting = function (username) {
 }
 
 Points.prototype.updatePoints = async function () {
-  var interval = (await global.cache.isOnline() ? global.configuration.getValue('pointsInterval') * 60 * 1000 : global.configuration.getValue('pointsIntervalOffline') * 60 * 1000)
-  var ptsPerInterval = (await global.cache.isOnline() ? global.configuration.getValue('pointsPerInterval') : global.configuration.getValue('pointsPerIntervalOffline'))
+  var interval = (await global.cache.isOnline() ? global.configuration.getValue('pointsInterval') * 60 * 1000 : await global.configuration.getValue('pointsIntervalOffline') * 60 * 1000)
+  var ptsPerInterval = (await global.cache.isOnline() ? global.configuration.getValue('pointsPerInterval') : await global.configuration.getValue('pointsPerIntervalOffline'))
 
   let users = await global.users.getAll({ is: { online: true } })
   for (let user of users) {
