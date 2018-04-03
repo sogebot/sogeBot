@@ -98,7 +98,7 @@ class Message {
         if ((global.commons.isOwner(attr.sender) || isMod) &&
           (!_.isUndefined(attr.param) && attr.param.length !== 0)) {
           await global.db.engine.update('customvars', { key: variable }, { key: variable, value: attr.param })
-          let msg = global.commons.prepare('filters.setVariable', { value: attr.param, variable: variable })
+          let msg = await global.commons.prepare('filters.setVariable', { value: attr.param, variable: variable })
           global.commons.sendMessage(msg, { username: attr.sender, quiet: _.get(attr, 'quiet', false) })
 
           if (require('cluster').isWorker) process.send({ type: 'widget_custom_variables', emit: 'refresh' })

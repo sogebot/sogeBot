@@ -124,7 +124,7 @@ Points.prototype.setPoints = async function (self, sender, text) {
     const points = parseInt(parsed[2], 10)
 
     global.users.set(parsed[1].toLowerCase(), { points: points })
-    let message = global.commons.prepare('points.success.set', {
+    let message = await global.commons.prepare('points.success.set', {
       amount: points,
       username: parsed[1].toLowerCase(),
       pointsName: await self.getPointsName(points)
@@ -145,14 +145,14 @@ Points.prototype.givePoints = async function (self, sender, text) {
         global.db.engine.increment('users', { username: user.username }, { points: (parseInt(givePts, 10) * -1) })
         global.db.engine.increment('users', { username: user2.username }, { points: parseInt(givePts, 10) })
       }
-      let message = global.commons.prepare('points.success.give', {
+      let message = await global.commons.prepare('points.success.give', {
         amount: givePts,
         username: user2.username,
         pointsName: await self.getPointsName(givePts)
       })
       debug(message); global.commons.sendMessage(message, sender)
     } else {
-      let message = global.commons.prepare('points.failed.giveNotEnough', {
+      let message = await global.commons.prepare('points.failed.giveNotEnough', {
         amount: givePts,
         username: user2.username,
         pointsName: await self.getPointsName(givePts)
@@ -218,7 +218,7 @@ Points.prototype.getPointsFromUser = async function (self, sender, text) {
     let user = await global.users.get(sender.username)
     const username = text.match(/^@?([\S]+)$/)[1]
 
-    let message = global.commons.prepare('points.defaults.pointsResponse', {
+    let message = await global.commons.prepare('points.defaults.pointsResponse', {
       amount: user.points,
       username: username,
       pointsName: await self.getPointsName(user.points)
@@ -238,7 +238,7 @@ Points.prototype.allPoints = async function (self, sender, text) {
     _.each(users, function (user) {
       global.db.engine.increment('users', { username: user.username }, { points: parseInt(givePts, 10) })
     })
-    let message = global.commons.prepare('points.success.all', {
+    let message = await global.commons.prepare('points.success.all', {
       amount: givePts,
       pointsName: await self.getPointsName(givePts)
     })
@@ -257,7 +257,7 @@ Points.prototype.rainPoints = async function (self, sender, text) {
     _.each(users, function (user) {
       global.db.engine.increment('users', { username: user.username }, { points: parseInt(Math.floor(Math.random() * givePts), 10) })
     })
-    let message = global.commons.prepare('points.success.rain', {
+    let message = await global.commons.prepare('points.success.rain', {
       amount: givePts,
       pointsName: await self.getPointsName(givePts)
     })
@@ -273,7 +273,7 @@ Points.prototype.addPoints = async function (self, sender, text) {
     let givePts = parseInt(parsed[2], 10)
     global.db.engine.increment('users', { username: parsed[1].toLowerCase() }, { points: givePts })
 
-    let message = global.commons.prepare('points.success.add', {
+    let message = await global.commons.prepare('points.success.add', {
       amount: givePts,
       username: parsed[1].toLowerCase(),
       pointsName: await self.getPointsName(givePts)
@@ -292,7 +292,7 @@ Points.prototype.removePoints = async function (self, sender, text) {
 
     global.db.engine.increment('users', { username: parsed[1].toLowerCase() }, { points: (removePts * -1) })
 
-    let message = global.commons.prepare('points.success.remove', {
+    let message = await global.commons.prepare('points.success.remove', {
       amount: removePts,
       username: parsed[1].toLowerCase(),
       pointsName: await self.getPointsName(removePts)

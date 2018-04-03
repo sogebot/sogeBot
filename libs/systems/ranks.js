@@ -48,7 +48,7 @@ class Ranks {
     const parsed = text.match(/^(\d+) ([\S].+)$/)
 
     if (_.isNil(parsed)) {
-      let message = global.commons.prepare('ranks.rank-parse-failed')
+      let message = await global.commons.prepare('ranks.rank-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
@@ -61,7 +61,7 @@ class Ranks {
     var ranks = await global.db.engine.find('ranks', { hours: values.hours })
     if (ranks.length === 0) { global.db.engine.insert('ranks', values) }
 
-    let message = global.commons.prepare(ranks.length === 0 ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: values.value, hours: values.hours })
+    let message = await global.commons.prepare(ranks.length === 0 ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: values.value, hours: values.hours })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
@@ -80,7 +80,7 @@ class Ranks {
     let parsed = text.match(/^(\d+) ([\S].+)$/)
 
     if (_.isNil(parsed)) {
-      let message = global.commons.prepare('ranks.rank-parse-failed')
+      let message = await global.commons.prepare('ranks.rank-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
@@ -90,44 +90,44 @@ class Ranks {
 
     let item = await global.db.engine.findOne('ranks', { hours: parseInt(hours, 10) })
     if (_.isEmpty(item)) {
-      let message = global.commons.prepare('ranks.rank-was-not-found', { hours: hours })
+      let message = await global.commons.prepare('ranks.rank-was-not-found', { hours: hours })
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
     await global.db.engine.update('ranks', { hours: parseInt(hours, 10) }, { value: rank })
-    let message = global.commons.prepare('ranks.rank-was-edited', { hours: parseInt(hours, 10), rank: rank })
+    let message = await global.commons.prepare('ranks.rank-was-edited', { hours: parseInt(hours, 10), rank: rank })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
-  set (self, sender, text) {
+  async set (self, sender, text) {
     debug('set(%j, %j, %j)', self, sender, text)
     var parsed = text.match(/^([\S]+) ([\S ]+)$/)
 
     if (_.isNil(parsed)) {
-      let message = global.commons.prepare('ranks.rank-parse-failed')
+      let message = await global.commons.prepare('ranks.rank-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
     global.users.set(parsed[1], { custom: { rank: parsed[2].trim() } })
 
-    let message = global.commons.prepare('ranks.custom-rank-was-set-to-user', { rank: parsed[2].trim(), username: parsed[1] })
+    let message = await global.commons.prepare('ranks.custom-rank-was-set-to-user', { rank: parsed[2].trim(), username: parsed[1] })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
-  unset (self, sender, text) {
+  async unset (self, sender, text) {
     debug('unset(%j, %j, %j)', self, sender, text)
     var parsed = text.match(/^([\S]+)$/)
 
     if (_.isNil(parsed)) {
-      let message = global.commons.prepare('ranks.rank-parse-failed')
+      let message = await global.commons.prepare('ranks.rank-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
     global.users.set(parsed[1], { custom: { rank: null } })
-    let message = global.commons.prepare('ranks.custom-rank-was-unset-for-user', { username: parsed[1] })
+    let message = await global.commons.prepare('ranks.custom-rank-was-unset-for-user', { username: parsed[1] })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
@@ -138,7 +138,7 @@ class Ranks {
   async list (self, sender) {
     debug('list(%j, %j)', self, sender)
     let ranks = await global.db.engine.find('ranks')
-    var output = global.commons.prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'hours', 'asc'), function (l) { return l.hours + 'h - ' + l.value }).join(', ') })
+    var output = await global.commons.prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'hours', 'asc'), function (l) { return l.hours + 'h - ' + l.value }).join(', ') })
     debug(output); global.commons.sendMessage(output, sender)
   }
 
@@ -147,7 +147,7 @@ class Ranks {
 
     const parsed = text.match(/^(\d+)$/)
     if (_.isNil(parsed)) {
-      let message = global.commons.prepare('ranks.rank-parse-failed')
+      let message = await global.commons.prepare('ranks.rank-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
@@ -155,7 +155,7 @@ class Ranks {
     const hours = parseInt(parsed[1], 10)
     const removed = await global.db.engine.remove('ranks', { hours: hours })
 
-    let message = global.commons.prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found', { hours: hours })
+    let message = await global.commons.prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found', { hours: hours })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
@@ -178,7 +178,7 @@ class Ranks {
     }
 
     if (_.isNil(rank)) {
-      let message = global.commons.prepare('ranks.user-dont-have-rank')
+      let message = await global.commons.prepare('ranks.user-dont-have-rank')
       debug(message); global.commons.sendMessage(message, sender)
       return true
     }
@@ -188,12 +188,12 @@ class Ranks {
       let toNextRankWatched = _.get(user, 'time.watched', 0) / 1000 / 60 / 60 - current.hours
       let toWatch = (toNextRank - toNextRankWatched)
       let percentage = 100 - (((toWatch) / toNextRank) * 100)
-      let message = global.commons.prepare('ranks.show-rank-with-next-rank', { rank: rank, nextrank: `${nextRank.value} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)}h)` })
+      let message = await global.commons.prepare('ranks.show-rank-with-next-rank', { rank: rank, nextrank: `${nextRank.value} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)}h)` })
       debug(message); global.commons.sendMessage(message, sender)
       return true
     }
 
-    let message = global.commons.prepare('ranks.show-rank-without-next-rank', { rank: rank })
+    let message = await global.commons.prepare('ranks.show-rank-without-next-rank', { rank: rank })
     debug(message); global.commons.sendMessage(message, sender)
   }
 

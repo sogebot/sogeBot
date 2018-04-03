@@ -34,16 +34,16 @@ module.exports = {
   },
   isWarned: async function (entry, user, opts) {
     opts = opts || {}
-    await until(setError => {
+    await until(async setError => {
       let expected = []
       if (_.isArray(opts)) {
         for (let o of opts) {
           o.sender = _.isNil(user.username) ? '' : user.username
-          expected.push(global.commons.prepare(entry, o))
+          expected.push(await global.commons.prepare(entry, o))
         }
       } else {
         opts.sender = _.isNil(user.username) ? '' : user.username
-        expected = [global.commons.prepare(entry, opts)]
+        expected = [await global.commons.prepare(entry, opts)]
       }
       try {
         let isCorrectlyCalled = false
@@ -64,16 +64,16 @@ module.exports = {
   },
   isSent: async function (entry, user, opts) {
     opts = opts || {}
-    await until(setError => {
+    await until(async setError => {
       let expected = []
       if (_.isArray(opts)) {
         for (let o of opts) {
           o.sender = _.isNil(user.username) ? '' : user.username
-          expected.push(global.commons.prepare(entry, o))
+          expected.push(await global.commons.prepare(entry, o))
         }
       } else {
         opts.sender = _.isNil(user.username) ? '' : user.username
-        expected = [global.commons.prepare(entry, opts)]
+        expected = [await global.commons.prepare(entry, opts)]
       }
       try {
         let isCorrectlyCalled = false

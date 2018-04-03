@@ -123,7 +123,7 @@ class Gambling {
     const tickets = users[username]
     const probability = tickets / (total / 100)
 
-    let m = global.commons.prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
+    let m = await global.commons.prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
       pointsName: await global.systems.points.getPointsName(total),
       points: total,
       probability: _.round(probability, 2),
@@ -182,7 +182,7 @@ class Gambling {
           newUser[sender.username.toLowerCase()] = parseInt(points, 10)
           self.duelUsers = newUser
         } else {
-          message = global.commons.prepare('gambling.fightme.cooldown', {
+          message = await global.commons.prepare('gambling.fightme.cooldown', {
             minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - (await self.duelCooldown))) / 1000 / 60), 'core.minutes'),
             cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - (await self.duelCooldown))) / 1000 / 60) })
           debug(message); global.commons.sendMessage(message, sender)
@@ -193,13 +193,13 @@ class Gambling {
       // if new duel, we want to save timestamp
       if ((await self.duelTimestamp) === 0) {
         self.duelTimestamp = new Date().getTime()
-        message = global.commons.prepare('gambling.duel.new', {
+        message = await global.commons.prepare('gambling.duel.new', {
           minutesName: global.commons.getLocalizedName(5, 'core.minutes'),
           minutes: 5 })
         debug(message); global.commons.sendMessage(message, sender)
       }
 
-      message = global.commons.prepare(newDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
+      message = await global.commons.prepare(newDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
         pointsName: await global.systems.points.getPointsName((await self.duelUsers)[sender.username.toLowerCase()]),
         points: (await self.duelUsers)[sender.username.toLowerCase()]
       })
@@ -210,13 +210,13 @@ class Gambling {
           global.commons.sendMessage(global.translate('gambling.duel.notEnoughOptions'), sender)
           break
         case ERROR_ZERO_BET:
-          message = global.commons.prepare('gambling.duel.zeroBet', {
+          message = await global.commons.prepare('gambling.duel.zeroBet', {
             pointsName: await global.systems.points.getPointsName(0)
           })
           debug(message); global.commons.sendMessage(message, sender)
           break
         case ERROR_NOT_ENOUGH_POINTS:
-          message = global.commons.prepare('gambling.duel.notEnoughPoints', {
+          message = await global.commons.prepare('gambling.duel.notEnoughPoints', {
             pointsName: await global.systems.points.getPointsName(points),
             points: points
           })
@@ -347,7 +347,7 @@ class Gambling {
 
       const isAlreadyChallenged = !_.isEmpty(await global.db.engine.findOne(`${self.collection}.fightme`, { key: '_users', user: sender.username, challenging: username }))
       if (!isAlreadyChallenged) await global.db.engine.insert(`${self.collection}.fightme`, { key: '_users', user: sender.username, challenging: username })
-      global.commons.sendMessage(global.commons.prepare('gambling.fightme.challenge', { username: username }), sender)
+      global.commons.sendMessage(await global.commons.prepare('gambling.fightme.challenge', { username: username }), sender)
     }
   }
 
@@ -368,13 +368,13 @@ class Gambling {
       await global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * -1 })
       if (_.random(0, 100, false) <= await global.configuration.getValue('gamblingChanceToWin')) {
         let updatedUser = await global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * 2 })
-        message = global.commons.prepare('gambling.gamble.win', {
+        message = await global.commons.prepare('gambling.gamble.win', {
           pointsName: await global.systems.points.getPointsName(updatedUser.points),
           points: updatedUser.points
         })
         debug(message); global.commons.sendMessage(message, sender)
       } else {
-        message = global.commons.prepare('gambling.gamble.lose', {
+        message = await global.commons.prepare('gambling.gamble.lose', {
           pointsName: await global.systems.points.getPointsName(user.points),
           points: parseInt(user.points, 10) - parseInt(points, 10)
         })
@@ -383,7 +383,7 @@ class Gambling {
     } catch (e) {
       switch (e.message) {
         case ERROR_ZERO_BET:
-          message = global.commons.prepare('gambling.gamble.zeroBet', {
+          message = await global.commons.prepare('gambling.gamble.zeroBet', {
             pointsName: await global.systems.points.getPointsName(0)
           })
           debug(message); global.commons.sendMessage(message, sender)
@@ -392,7 +392,7 @@ class Gambling {
           global.commons.sendMessage(global.translate('gambling.gamble.notEnoughOptions'), sender)
           break
         case ERROR_NOT_ENOUGH_POINTS:
-          message = global.commons.prepare('gambling.gamble.notEnoughPoints', {
+          message = await global.commons.prepare('gambling.gamble.notEnoughPoints', {
             pointsName: await global.systems.points.getPointsName(points),
             points: points
           })

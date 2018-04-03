@@ -106,7 +106,6 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
   if (_.isNil(sender) || _.isNil(sender.username)) sender.username = undefined
   if (!_.isNil(sender.quiet)) attr.quiet = sender.quiet
   attr.sender = sender.username
-
   message = await new Message(message).parse(attr)
   if (message === '') return false // if message is empty, don't send anything
 

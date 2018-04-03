@@ -59,7 +59,7 @@ class Price {
     const parsed = text.match(/^!?([\S]+) ([0-9]+)$/)
 
     if (_.isNil(parsed)) {
-      let message = global.commons.prepare('price.price-parse-failed')
+      let message = await global.commons.prepare('price.price-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
@@ -71,7 +71,7 @@ class Price {
     }
 
     await global.db.engine.update('prices', { command: command }, { command: command, price: parseInt(price, 10), enabled: true })
-    let message = global.commons.prepare('price.price-was-set', { command: `!${command}`, amount: parseInt(price, 10), pointsName: await global.systems.points.getPointsName(price) })
+    let message = await global.commons.prepare('price.price-was-set', { command: `!${command}`, amount: parseInt(price, 10), pointsName: await global.systems.points.getPointsName(price) })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
@@ -79,14 +79,14 @@ class Price {
     const parsed = text.match(/^!?([\S]+)$/)
 
     if (_.isNil(parsed)) {
-      let message = global.commons.prepare('price.price-parse-failed')
+      let message = await global.commons.prepare('price.price-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
     const command = parsed[1]
     await global.db.engine.remove('prices', { command: command })
-    let message = global.commons.prepare('price.price-was-unset', { command: `!${command}` })
+    let message = await global.commons.prepare('price.price-was-unset', { command: `!${command}` })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
@@ -95,7 +95,7 @@ class Price {
     const parsed = text.match(/^!?([\S]+)$/)
 
     if (_.isNil(parsed)) {
-      let message = global.commons.prepare('price.price-parse-failed')
+      let message = await global.commons.prepare('price.price-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
@@ -103,13 +103,13 @@ class Price {
     const command = parsed[1]
     const price = await global.db.engine.findOne('prices', { command: command })
     if (_.isEmpty(price)) {
-      let message = global.commons.prepare('price.price-was-not-found', { command: `!${command}` })
+      let message = await global.commons.prepare('price.price-was-not-found', { command: `!${command}` })
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
     await global.db.engine.update('prices', { command: command }, { enabled: !price.enabled })
-    let message = global.commons.prepare(!price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command: `!${command}` })
+    let message = await global.commons.prepare(!price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command: `!${command}` })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
@@ -148,7 +148,7 @@ class Price {
     var removePts = parseInt(price.price, 10)
     let result = !_.isFinite(availablePts) || !_.isNumber(availablePts) || availablePts < removePts
     if (result) {
-      let message = global.commons.prepare('price.user-have-not-enough-points', { amount: removePts, command: `!${price.command}`, pointsName: await global.systems.points.getPointsName(removePts) })
+      let message = await global.commons.prepare('price.user-have-not-enough-points', { amount: removePts, command: `!${price.command}`, pointsName: await global.systems.points.getPointsName(removePts) })
       debug(message); global.commons.sendMessage(message, sender)
     } else {
       global.db.engine.increment('users', { username: sender.username }, { points: (removePts * -1) })

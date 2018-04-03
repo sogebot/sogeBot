@@ -178,7 +178,7 @@ class Moderation {
 
       for (let i = 0; i < count; i++) await global.db.engine.insert('moderation.permit', { username: parsed[1].toLowerCase() })
 
-      let m = global.commons.prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: global.commons.getLocalizedName(count, 'core.links'), count: count })
+      let m = await global.commons.prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: global.commons.getLocalizedName(count, 'core.links'), count: count })
       debug(m); global.commons.sendMessage(m, sender)
     } catch (e) {
       global.commons.sendMessage(global.translate('moderation.permit-parse-failed'), sender)

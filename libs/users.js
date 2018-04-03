@@ -79,7 +79,7 @@ Users.prototype.ignoreAdd = async function (self, sender, text) {
   match.username = match.username.toLowerCase()
 
   await global.db.engine.update('users_ignorelist', { username: match.username }, { username: match.username })
-  let message = global.commons.prepare('ignore.user.is.added', { username: match.username })
+  let message = await global.commons.prepare('ignore.user.is.added', { username: match.username })
   debug(message); global.commons.sendMessage(message, sender)
 }
 
@@ -90,7 +90,7 @@ Users.prototype.ignoreRm = async function (self, sender, text) {
   match.username = match.username.toLowerCase()
 
   await global.db.engine.remove('users_ignorelist', { username: match.username })
-  let message = global.commons.prepare('ignore.user.is.removed', { username: match.username })
+  let message = await global.commons.prepare('ignore.user.is.removed', { username: match.username })
   debug(message); global.commons.sendMessage(message, sender)
 }
 
@@ -103,9 +103,9 @@ Users.prototype.ignoreCheck = async function (self, sender, text) {
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: match.username })
   let message
   if (!_.isEmpty(ignoredUser)) {
-    message = global.commons.prepare('ignore.user.is.ignored', { username: match.username })
+    message = await global.commons.prepare('ignore.user.is.ignored', { username: match.username })
   } else {
-    message = global.commons.prepare('ignore.user.is.not.ignored', { username: match.username })
+    message = await global.commons.prepare('ignore.user.is.not.ignored', { username: match.username })
   }
   debug(message); global.commons.sendMessage(message, sender)
   return !_.isEmpty(ignoredUser)
@@ -163,13 +163,13 @@ Users.prototype.merge = async function (self, sender, text) {
   let [fromUser, toUser] = [text.match(/-from ([a-zA-Z0-9_]+)/), text.match(/-to ([a-zA-Z0-9_]+)/)]
 
   if (_.isNil(fromUser)) {
-    let message = global.commons.prepare('merge.no-from-user-set')
+    let message = await global.commons.prepare('merge.no-from-user-set')
     debug(message); global.commons.sendMessage(message, sender)
     return
   } else { fromUser = fromUser[1] }
 
   if (_.isNil(toUser)) {
-    let message = global.commons.prepare('merge.no-to-user-set')
+    let message = await global.commons.prepare('merge.no-to-user-set')
     debug(message); global.commons.sendMessage(message, sender)
     return
   } else { toUser = toUser[1] }
@@ -180,7 +180,7 @@ Users.prototype.merge = async function (self, sender, text) {
   ])
 
   if (_.isEmpty(fromUserFromDb)) {
-    let message = global.commons.prepare('merge.from-user-not-found', { fromUsername: fromUser })
+    let message = await global.commons.prepare('merge.from-user-not-found', { fromUsername: fromUser })
     debug(message); global.commons.sendMessage(message, sender)
     return
   }
@@ -194,7 +194,7 @@ Users.prototype.merge = async function (self, sender, text) {
     await global.db.engine.update('users', { _id: fromUserFromDb._id.toString() }, { username: toUser })
   }
 
-  let message = global.commons.prepare('merge.user-merged', { fromUsername: fromUser, toUsername: toUser })
+  let message = await global.commons.prepare('merge.user-merged', { fromUsername: fromUser, toUsername: toUser })
   debug(message); global.commons.sendMessage(message, sender)
 }
 

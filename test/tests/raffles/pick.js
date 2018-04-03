@@ -24,7 +24,7 @@ describe('Raffles - pick()', () => {
       global.systems.raffles.open(global.systems.raffles, owner, '!winme -min 0 -max ' + max)
       await message.isSent('raffles.announce-ticket-raffle', owner, {
         keyword: '!winme',
-        eligibility: global.commons.prepare('raffles.eligibility-everyone-item'),
+        eligibility: await global.commons.prepare('raffles.eligibility-everyone-item'),
         min: 0,
         max: max
       })

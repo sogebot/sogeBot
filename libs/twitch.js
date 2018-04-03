@@ -63,8 +63,8 @@ class Twitch {
       .replace(/\$seconds/g, time.seconds), sender)
   }
 
-  time (self, sender) {
-    let message = global.commons.prepare('time', { time: moment().format('LTS') })
+  async time (self, sender) {
+    let message = await global.commons.prepare('time', { time: moment().format('LTS') })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
@@ -87,7 +87,7 @@ class Twitch {
 
     const user = await global.users.get(username)
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.follow) || _.isNil(user.is.follower) || !user.is.follower) {
-      let message = global.commons.prepare('followage.success.never', { username: username })
+      let message = await global.commons.prepare('followage.success.never', { username: username })
       debug(message); global.commons.sendMessage(message, sender)
     } else {
       let diff = moment.preciseDiff(user.time.follow, moment(), true)
@@ -99,7 +99,7 @@ class Twitch {
       if (diff.minutes) output.push(diff.minutes + ' ' + global.commons.getLocalizedName(diff.minutes, 'core.minutes'))
       if (output.length === 0) output.push(0 + ' ' + global.commons.getLocalizedName(0, 'core.minutes'))
 
-      let message = global.commons.prepare('followage.success.time', {
+      let message = await global.commons.prepare('followage.success.time', {
         username: username,
         diff: output.join(', ')
       })
@@ -122,7 +122,7 @@ class Twitch {
       lastFollowAgo = moment(events[0].timestamp).fromNow()
     }
 
-    let message = global.commons.prepare('followers', {
+    let message = await global.commons.prepare('followers', {
       lastFollowAgo: lastFollowAgo,
       lastFollowUsername: lastFollowUsername,
       onlineFollowersCount: onlineFollowersCount
@@ -145,7 +145,7 @@ class Twitch {
       lastSubAgo = moment(events[0].timestamp).fromNow()
     }
 
-    let message = global.commons.prepare('subs', {
+    let message = await global.commons.prepare('subs', {
       lastSubAgo: lastSubAgo,
       lastSubUsername: lastSubUsername,
       onlineSubCount: onlineSubCount
@@ -162,7 +162,7 @@ class Twitch {
 
     const user = await global.users.get(username)
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.subscribed_at) || _.isNil(user.is.subscriber) || !user.is.subscriber) {
-      let message = global.commons.prepare('subage.success.never', { username: username })
+      let message = await global.commons.prepare('subage.success.never', { username: username })
       debug(message); global.commons.sendMessage(message, sender)
     } else {
       let diff = moment.preciseDiff(user.time.subscribed_at, moment(), true)
@@ -174,7 +174,7 @@ class Twitch {
       if (diff.minutes) output.push(diff.minutes + ' ' + global.commons.getLocalizedName(diff.minutes, 'core.minutes'))
       if (output.length === 0) output.push(0 + ' ' + global.commons.getLocalizedName(0, 'core.minutes'))
 
-      let message = global.commons.prepare('subage.success.time', {
+      let message = await global.commons.prepare('subage.success.time', {
         username: username,
         diff: output.join(', ')
       })
@@ -191,7 +191,7 @@ class Twitch {
 
     const user = await global.users.get(username)
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.created_at)) {
-      let message = global.commons.prepare('age.failed', { username: username })
+      let message = await global.commons.prepare('age.failed', { username: username })
       debug(message); global.commons.sendMessage(message, sender)
     } else {
       let diff = moment.preciseDiff(user.time.created_at, moment(), true)
@@ -200,7 +200,7 @@ class Twitch {
       if (diff.months) output.push(diff.months + ' ' + global.commons.getLocalizedName(diff.months, 'core.months'))
       if (diff.days) output.push(diff.days + ' ' + global.commons.getLocalizedName(diff.days, 'core.days'))
       if (diff.hours) output.push(diff.hours + ' ' + global.commons.getLocalizedName(diff.hours, 'core.hours'))
-      let message = global.commons.prepare(!_.isNil(parsed) ? 'age.success.withUsername' : 'age.success.withoutUsername', {
+      let message = await global.commons.prepare(!_.isNil(parsed) ? 'age.success.withUsername' : 'age.success.withoutUsername', {
         username: username,
         diff: output.join(', ')
       })
@@ -231,7 +231,7 @@ class Twitch {
       const user = await global.users.get(text.trim() < 1 ? sender.username : parsed[0])
       watched = parseInt(!_.isNil(user) && !_.isNil(user.time) && !_.isNil(user.time.watched) ? user.time.watched : 0) / 1000 / 60 / 60
 
-      let m = global.commons.prepare('watched.success.time', {
+      let m = await global.commons.prepare('watched.success.time', {
         time: watched.toFixed(1),
         username: user.username
       })

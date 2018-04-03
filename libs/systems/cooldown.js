@@ -66,14 +66,14 @@ class Cooldown {
     const match = XRegExp.exec(text, constants.COOLDOWN_REGEXP_SET)
 
     if (_.isNil(match)) {
-      let message = global.commons.prepare('cooldowns.cooldown-parse-failed')
+      let message = await global.commons.prepare('cooldowns.cooldown-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
     if (parseInt(match.seconds, 10) === 0) {
       await global.db.engine.remove('cooldowns', { key: match.command, type: match.type })
-      let message = global.commons.prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command })
+      let message = await global.commons.prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command })
       debug(message); global.commons.sendMessage(message, sender)
       return
     }
@@ -82,7 +82,7 @@ class Cooldown {
     if (_.isEmpty(cooldown)) await global.db.engine.update('cooldowns', { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000, type: match.type, timestamp: 0, quiet: _.isNil(match.quiet) ? false : match.quiet, enabled: true, owner: false, moderator: false })
     else await global.db.engine.update('cooldowns', { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000 })
 
-    let message = global.commons.prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command })
+    let message = await global.commons.prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
@@ -162,7 +162,7 @@ class Cooldown {
       } else {
         if (!cooldown.quiet && !global.configuration.getValue('disableCooldownWhispers')) {
           sender['message-type'] = 'whisper' // we want to whisp cooldown message
-          let message = global.commons.prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) })
+          let message = await global.commons.prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) })
           debug(message); global.commons.sendMessage(message, sender)
         }
         result = false
@@ -178,14 +178,14 @@ class Cooldown {
     const match = XRegExp.exec(text, constants.COOLDOWN_REGEXP)
 
     if (_.isNil(match)) {
-      let message = global.commons.prepare('cooldowns.cooldown-parse-failed')
+      let message = await global.commons.prepare('cooldowns.cooldown-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
     const cooldown = await global.db.engine.findOne('cooldowns', { key: match.command, type: match.type })
     if (_.isEmpty(cooldown)) {
-      let message = global.commons.prepare('cooldowns.cooldown-not-found', { command: match.command })
+      let message = await global.commons.prepare('cooldowns.cooldown-not-found', { command: match.command })
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
@@ -204,7 +204,7 @@ class Cooldown {
     if (type === 'owner') path = '-for-owners'
     if (type === 'quiet' || type === 'type') return // those two are setable only from dashboard
 
-    let message = global.commons.prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.key })
+    let message = await global.commons.prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.key })
     debug(message); global.commons.sendMessage(message, sender)
   }
 

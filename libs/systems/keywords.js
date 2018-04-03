@@ -54,20 +54,20 @@ class Keywords {
     const match = XRegExp.exec(text, constants.KEYWORD_REGEXP)
 
     if (_.isNil(match)) {
-      let message = global.commons.prepare('keywords.keyword-parse-failed')
+      let message = await global.commons.prepare('keywords.keyword-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
     let item = await global.db.engine.findOne('keywords', { keyword: match.keyword })
     if (_.isEmpty(item)) {
-      let message = global.commons.prepare('keywords.keyword-was-not-found', { keyword: match.keyword })
+      let message = await global.commons.prepare('keywords.keyword-was-not-found', { keyword: match.keyword })
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
     await global.db.engine.update('keywords', { keyword: match.keyword }, { response: match.response })
-    let message = global.commons.prepare('keywords.keyword-was-edited', { keyword: match.keyword, response: match.response })
+    let message = await global.commons.prepare('keywords.keyword-was-edited', { keyword: match.keyword, response: match.response })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
@@ -94,7 +94,7 @@ class Keywords {
     const match = XRegExp.exec(text, constants.KEYWORD_REGEXP)
 
     if (_.isNil(match)) {
-      let message = global.commons.prepare('keywords.keyword-parse-failed')
+      let message = await global.commons.prepare('keywords.keyword-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
@@ -103,13 +103,13 @@ class Keywords {
     let keyword = { keyword: match.keyword, response: match.response, enabled: true }
 
     if (!_.isEmpty(await global.db.engine.findOne('keywords', { keyword: match.keyword }))) {
-      let message = global.commons.prepare('keywords.keyword-already-exist', { keyword: match.keyword })
+      let message = await global.commons.prepare('keywords.keyword-already-exist', { keyword: match.keyword })
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
 
     await global.db.engine.update('keywords', { keyword: match.keyword }, keyword)
-    let message = global.commons.prepare('keywords.keyword-was-added', { keyword: match.keyword })
+    let message = await global.commons.prepare('keywords.keyword-was-added', { keyword: match.keyword })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
@@ -137,7 +137,7 @@ class Keywords {
     debug('toggle(%j,%j,%j)', self, sender, text)
 
     if (text.trim().length === 0) {
-      let message = global.commons.prepare('keywords.keyword-parse-failed')
+      let message = await global.commons.prepare('keywords.keyword-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
@@ -145,14 +145,14 @@ class Keywords {
 
     const keyword = await global.db.engine.findOne('keywords', { keyword: id })
     if (_.isEmpty(keyword)) {
-      let message = global.commons.prepare('keywords.keyword-was-not-found', { keyword: id })
+      let message = await global.commons.prepare('keywords.keyword-was-not-found', { keyword: id })
       debug(message); global.commons.sendMessage(message, sender)
       return
     }
 
     await global.db.engine.update('keywords', { keyword: id }, { enabled: !keyword.enabled })
 
-    let message = global.commons.prepare(!keyword.enabled ? 'keywords.keyword-was-enabled' : 'keywords.keyword-was-disabled', { keyword: keyword.keyword })
+    let message = await global.commons.prepare(!keyword.enabled ? 'keywords.keyword-was-enabled' : 'keywords.keyword-was-disabled', { keyword: keyword.keyword })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
@@ -160,7 +160,7 @@ class Keywords {
     debug('remove(%j,%j,%j)', self, sender, text)
 
     if (text.trim().length === 0) {
-      let message = global.commons.prepare('keywords.keyword-parse-failed')
+      let message = await global.commons.prepare('keywords.keyword-parse-failed')
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
@@ -168,11 +168,11 @@ class Keywords {
 
     let removed = await global.db.engine.remove('keywords', { keyword: id })
     if (!removed) {
-      let message = global.commons.prepare('keywords.keyword-was-not-found', { keyword: id })
+      let message = await global.commons.prepare('keywords.keyword-was-not-found', { keyword: id })
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
-    let message = global.commons.prepare('keywords.keyword-was-removed', { keyword: id })
+    let message = await global.commons.prepare('keywords.keyword-was-removed', { keyword: id })
     debug(message); global.commons.sendMessage(message, sender)
   }
 }
