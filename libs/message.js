@@ -103,7 +103,7 @@ class Message {
 
           if (require('cluster').isWorker) process.send({ type: 'widget_custom_variables', emit: 'refresh' })
           else global.widgets.custom_variables.io.emit('refresh') // send update to widget
-          global.twitch.setTitleAndGame(global.twitch, null) // update title
+          global.api.setTitleAndGame(global.api, null) // update title
 
           return ''
         }
