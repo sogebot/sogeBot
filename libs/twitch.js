@@ -54,8 +54,8 @@ class Twitch {
   }
 
   async uptime (self, sender) {
-    const when = await self.when()
-    const time = self.getTime(self.isOnline ? when.online : when.offline, true)
+    const when = await global.cache.when()
+    const time = global.commons.getTime(self.isOnline ? when.online : when.offline, true)
     global.commons.sendMessage(global.translate(self.isOnline ? 'uptime.online' : 'uptime.offline')
       .replace(/\$days/g, time.days)
       .replace(/\$hours/g, time.hours)
@@ -294,10 +294,10 @@ class Twitch {
     let users = await global.users.getAll()
     if (type === 'points' && global.commons.isSystemEnabled('points')) {
       message = global.translate('top.listPoints').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.points) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'points', 'desc')
+      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.points) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username }), 'points', 'desc')
     } else if (type === 'time') {
       message = global.translate('top.listWatched').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.time) && !_.isNil(o.time.watched) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'time.watched', 'desc')
+      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.time) && !_.isNil(o.time.watched) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username }), 'time.watched', 'desc')
     } else if (type === 'tips') {
       sorted = {}
       message = global.translate('top.listTips').replace(/\$amount/g, 10)
@@ -309,7 +309,7 @@ class Twitch {
       sorted = _.orderBy(sorted, 'amount', 'desc')
     } else {
       message = global.translate('top.listMessages').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.stats) && !_.isNil(o.stats.messages) && !global.parser.isOwner(o.username) && o.username !== config.settings.bot_username }), 'stats.messages', 'desc')
+      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.stats) && !_.isNil(o.stats.messages) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username }), 'stats.messages', 'desc')
     }
 
     // remove ignored users

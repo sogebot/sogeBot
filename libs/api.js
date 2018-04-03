@@ -394,7 +394,7 @@ class API {
               type: 'follow',
               username: user.username
             })
-            if (!quiet && !global.parser.isBot(user.username)) {
+            if (!quiet && !global.commons.isBot(user.username)) {
               global.log.follow(user.username)
               global.events.fire('follow', { username: user.username })
             }

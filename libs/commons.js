@@ -3,6 +3,7 @@
 var _ = require('lodash')
 var chalk = require('chalk')
 const debug = require('debug')
+const moment = require('moment')
 
 const config = require('../config.json')
 
@@ -72,6 +73,27 @@ Commons.prototype.prepare = function (translate, attr) {
     msg = msg.replace(new RegExp('[$]' + key, 'g'), value)
   }
   return msg
+}
+
+Commons.prototype.getTime = function (time, isChat) {
+  var now, days, hours, minutes, seconds
+  now = _.isNull(time) || !time ? {days: 0, hours: 0, minutes: 0, seconds: 0} : moment().preciseDiff(time, true)
+  if (isChat) {
+    days = now.days > 0 ? now.days : ''
+    hours = now.hours > 0 ? now.hours : ''
+    minutes = now.minutes > 0 ? now.minutes : ''
+    seconds = now.seconds > 0 ? now.seconds : ''
+    return { days: days,
+      hours: hours,
+      minutes: minutes,
+      seconds: seconds }
+  } else {
+    days = now.days > 0 ? now.days + 'd' : ''
+    hours = now.hours >= 0 && now.hours < 10 ? '0' + now.hours + ':' : now.hours + ':'
+    minutes = now.minutes >= 0 && now.minutes < 10 ? '0' + now.minutes + ':' : now.minutes + ':'
+    seconds = now.seconds >= 0 && now.seconds < 10 ? '0' + now.seconds : now.seconds
+    return days + hours + minutes + seconds
+  }
 }
 
 Commons.prototype.sendMessage = async function (message, sender, attr) {

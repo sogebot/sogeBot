@@ -10,7 +10,7 @@ function Stats () {
 Stats.prototype._get = async function (self, socket) {
   const when = await global.cache.when()
   const stats = {
-    uptime: global.twitch.getTime(await global.cache.isOnline() ? when.online : 0, false),
+    uptime: global.commons.getTime(await global.cache.isOnline() ? when.online : 0, false),
     viewers: global.api.current.viewers,
     followers: global.api.current.followers,
     subscribers: global.api.current.subscribers,

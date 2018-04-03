@@ -7,7 +7,6 @@ var path = require('path')
 var basicAuth = require('basic-auth')
 const flatten = require('flat')
 var _ = require('lodash')
-const moment = require('moment')
 
 const cluster = require('cluster')
 
@@ -343,7 +342,7 @@ Panel.prototype.registerSockets = function (options) {
 Panel.prototype.sendStreamData = async function (self, socket) {
   const whenOnline = (await global.cache.when()).online
   var data = {
-    uptime: self.getTime(whenOnline, false),
+    uptime: global.commons.getTime(whenOnline, false),
     currentViewers: global.api.current.viewers,
     currentSubscribers: global.api.current.subscribers,
     currentBits: global.api.current.bits,
@@ -360,27 +359,6 @@ Panel.prototype.sendStreamData = async function (self, socket) {
     currentHosts: global.api.current.hosts
   }
   socket.emit('stats', data)
-}
-
-Panel.prototype.getTime = function (time, isChat) {
-  var now, days, hours, minutes, seconds
-  now = _.isNull(time) || !time ? {days: 0, hours: 0, minutes: 0, seconds: 0} : moment().preciseDiff(time, true)
-  if (isChat) {
-    days = now.days > 0 ? now.days : ''
-    hours = now.hours > 0 ? now.hours : ''
-    minutes = now.minutes > 0 ? now.minutes : ''
-    seconds = now.seconds > 0 ? now.seconds : ''
-    return { days: days,
-      hours: hours,
-      minutes: minutes,
-      seconds: seconds }
-  } else {
-    days = now.days > 0 ? now.days + 'd' : ''
-    hours = now.hours >= 0 && now.hours < 10 ? '0' + now.hours + ':' : now.hours + ':'
-    minutes = now.minutes >= 0 && now.minutes < 10 ? '0' + now.minutes + ':' : now.minutes + ':'
-    seconds = now.seconds >= 0 && now.seconds < 10 ? '0' + now.seconds : now.seconds
-    return days + hours + minutes + seconds
-  }
 }
 
 module.exports = Panel

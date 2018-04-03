@@ -94,8 +94,8 @@ class Message {
     let custom = {
       '$_#': async function (filter) {
         let variable = filter.replace('$_', '')
-        let isMod = await global.parser.isMod(attr.sender)
-        if ((global.parser.isOwner(attr.sender) || isMod) &&
+        let isMod = await global.commons.isMod(attr.sender)
+        if ((global.commons.isOwner(attr.sender) || isMod) &&
           (!_.isUndefined(attr.param) && attr.param.length !== 0)) {
           await global.db.engine.update('customvars', { key: variable }, { key: variable, value: attr.param })
           let msg = global.commons.prepare('filters.setVariable', { value: attr.param, variable: variable })

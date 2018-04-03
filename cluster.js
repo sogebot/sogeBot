@@ -86,7 +86,7 @@ function cluster () {
 
     const parse = new Parser({ sender: sender, message: message, skip: skip })
 
-    if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.parser.isOwner(sender))) {
+    if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {
       global.log.whisperIn(message, {username: sender.username})
     } else if (!skip && !global.commons.isBot(sender.username)) global.log.chatIn(message, {username: sender.username})
 
