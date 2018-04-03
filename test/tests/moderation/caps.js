@@ -54,4 +54,16 @@ describe('systems/moderation - Caps()', () => {
       })
     }
   })
+  describe('#884 - message length - 15, max caps 80%, message: FrankerZ FrankerZ', async () => {
+    before(async () => {
+      await db.cleanup()
+      await global.db.engine.insert('settings', { key: 'moderationCaps', value: 'true' })
+      await global.db.engine.insert('settings', { key: 'moderationCapsMaxPercent', value: 80 })
+      await global.db.engine.insert('settings', { key: 'moderationCapsTriggerLength', value: 15 })
+    })
+
+    it(`message 'FrankerZ FrankerZ' should not timeout`, async () => {
+      assert.isTrue(await global.systems.moderation.caps(global.systems.moderation, { username: 'testuser' }, 'FrankerZ FrankerZ'))
+    })
+  })
 })
