@@ -95,19 +95,19 @@ function cluster () {
       global.commons.isIgnored(sender)
     ])
 
-    if (!isModerated && !isIgnored && !global.commons.isBot(sender.username)) {
-      let data = { id: sender['user-id'], is: { online: true, subscriber: _.get(sender, 'subscriber', false), mod: _.get(sender, 'mod', false) } }
-      if (!_.get(sender, 'subscriber', false)) _.set(data, 'stats.tier', 0) // unset tier if sender is not subscriber
+    if (!isModerated && !isIgnored) {
+      if (!skip && !_.isNil(sender.username)) {
+        let data = { id: sender['user-id'], is: { online: true, subscriber: _.get(sender, 'subscriber', false), mod: _.get(sender, 'mod', false) } }
+        if (!_.get(sender, 'subscriber', false)) _.set(data, 'stats.tier', 0) // unset tier if sender is not subscriber
+        await global.db.engine.update('users', { username: sender.username }, data)
+        process.send({ type: 'api', fnc: 'isFollower', username: sender.username })
 
-      await Promise.all([
-        global.db.engine.update('users', { username: sender.username }, data),
-        parse.process()
-      ])
-      process.send({ type: 'api', fnc: 'isFollower', username: sender.username })
+        if (message.startsWith('!')) {
+          global.events.fire('command-send-x-times', { username: sender.username, message: message })
+        } else if (!message.startsWith('!') && await global.cache.isOnline()) global.db.engine.increment('users', { username: sender.username }, { stats: { messages: 1 } })
+      }
 
-      if (message.startsWith('!')) {
-        global.events.fire('command-send-x-times', { username: sender.username, message: message })
-      } else if (!message.startsWith('!') && await global.cache.isOnline()) global.db.engine.increment('users', { username: sender.username }, { stats: { messages: 1 } })
+      await parse.process()
     }
     process.send({ type: 'stats', of: 'parser', value: parse.time() })
   }
