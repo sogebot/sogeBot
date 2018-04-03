@@ -317,9 +317,11 @@ class Moderation {
     var msgLength = whitelisted.trim().length
     var capsLength = 0
 
-    debug('should check caps - %s', global.configuration.getValue('moderationLinks'))
-    debug('isOwner: %s', global.commons.isOwner(sender))
-    debug('isMod: %s', isMod)
+    debug('moderation:caps')('should check caps - %s', isEnabled)
+    debug('moderation:caps')('isOwner: %s', global.commons.isOwner(sender))
+    debug('moderation:caps')('isMod: %s', isMod)
+    debug('moderation:caps')('msgLength: %s', msgLength)
+    debug('moderation:caps')('triggerLength: %s', triggerLength)
     if (global.commons.isOwner(sender) || isMod || msgLength < triggerLength || !isEnabled || (sender.subscriber && !isEnabledForSubs)) {
       return true
     }
@@ -334,8 +336,8 @@ class Moderation {
       if (!_.isFinite(parseInt(whitelisted.charAt(i), 10)) && whitelisted.charAt(i).toUpperCase() === whitelisted.charAt(i) && whitelisted.charAt(i) !== ' ') capsLength += 1
     }
 
-    debug('capped chars: %i', capsLength)
-    debug('capped percent: %i%', Math.ceil(capsLength / (msgLength / 100)))
+    debug('moderation:caps')('capped chars: %i', capsLength)
+    debug('moderation:caps')('capped percent: %i%', Math.ceil(capsLength / (msgLength / 100)))
     if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
       log.info(sender.username + ' [caps] ' + timeout + 's timeout: ' + text)
       self.timeoutUser(self, sender,
