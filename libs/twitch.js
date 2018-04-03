@@ -55,8 +55,8 @@ class Twitch {
 
   async uptime (self, sender) {
     const when = await global.cache.when()
-    const time = global.commons.getTime(await global.cache.isOnline ? when.online : when.offline, true)
-    global.commons.sendMessage(global.translate(await global.cache.isOnline ? 'uptime.online' : 'uptime.offline')
+    const time = global.commons.getTime(await global.cache.isOnline() ? when.online : when.offline, true)
+    global.commons.sendMessage(global.translate(await global.cache.isOnline() ? 'uptime.online' : 'uptime.offline')
       .replace(/\$days/g, time.days)
       .replace(/\$hours/g, time.hours)
       .replace(/\$minutes/g, time.minutes)
