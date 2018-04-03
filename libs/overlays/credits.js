@@ -121,7 +121,7 @@ class Credits {
 
         let toAwait = []
         for (let [i, v] of Object.entries(data)) {
-          toAwait.push(global.db.engine.insert('overlay.credits.socials', { order: i, type: v.type, text: v.text }))
+          toAwait.push(global.db.engine.update('overlay.credits.socials', { order: i }, { order: i, type: v.type, text: v.text }))
         }
         await Promise.all(toAwait)
         cb(null, true)
@@ -135,7 +135,8 @@ class Credits {
 
         let toAwait = []
         for (let [i, v] of Object.entries(data)) {
-          toAwait.push(global.db.engine.insert('overlay.credits.customTexts', { order: i, type: v.type, text: v.text }))
+          console.log(v)
+          toAwait.push(global.db.engine.update('overlay.credits.customTexts', { order: i }, { order: i, type: v.type, text: v.text }))
         }
         await Promise.all(toAwait)
         cb(null, true)
