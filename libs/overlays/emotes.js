@@ -74,6 +74,8 @@ Emotes.prototype.explode = async function (self, socket, data) {
 }
 
 Emotes.prototype.containsEmotes = async function (self, sender, text) {
+  if (_.isNil(sender)) return true
+
   let OEmotesMax = await global.configuration.getValue('OEmotesMax')
   let OEmotesSize = await global.configuration.getValue('OEmotesSize')
 

@@ -269,6 +269,8 @@ class Raffles {
   }
 
   async participate (self, sender, text) {
+    if (_.isNil(sender)) return true
+
     const [raffle, user] = await Promise.all([global.db.engine.findOne('raffles', { winner: null }), global.users.get(sender.username)])
 
     const isStartingWithRaffleKeyword = text.startsWith(raffle.keyword)
