@@ -194,8 +194,7 @@ class Events {
       command = command.replace(replace, val)
     })
     command = await new Message(command).parse({ username: global.commons.getOwner() })
-    d('Running command:', command)
-    global.parser.parseCommands((_.get(operation, 'isCommandQuiet', false) ? null : { username: global.commons.getOwner() }), command, true)
+    _.sample(cluster.workers).send({ type: 'message', sender: (_.get(operation, 'isCommandQuiet', false) ? null : { username: global.commons.getOwner() }), message: command, skip: true })
   }
 
   async fireSendChatMessageOrWhisper (operation, attributes, whisper) {
