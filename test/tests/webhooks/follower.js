@@ -24,7 +24,7 @@ describe('libs/webhooks - follower()', () => {
   })
 
   it('testuser payload for follower() several times', async () => {
-    global.api.channelId = 190389471
+    await global.cache.channelId(190389471)
     for (let i = 0; i < 5; i++) {
       await global.webhooks.follower({
         data: {

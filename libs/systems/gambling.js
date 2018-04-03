@@ -183,7 +183,7 @@ class Gambling {
           self.duelUsers = newUser
         } else {
           message = global.commons.prepare('gambling.fightme.cooldown', {
-            minutesName: global.parser.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - (await self.duelCooldown))) / 1000 / 60), 'core.minutes'),
+            minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - (await self.duelCooldown))) / 1000 / 60), 'core.minutes'),
             cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - (await self.duelCooldown))) / 1000 / 60) })
           debug(message); global.commons.sendMessage(message, sender)
           return true
@@ -338,7 +338,7 @@ class Gambling {
         !(await global.configuration.getValue('gamblingCooldownBypass') && (isMod || global.commons.isBroadcaster(sender)))) {
         global.commons.sendMessage(global.translate('gambling.fightme.cooldown')
           .replace(/\$cooldown/g, Math.round(((cooldown * 1000) - (new Date().getTime() - (await self.fightmeCooldown))) / 1000 / 60))
-          .replace(/\$minutesName/g, global.parser.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - (await self.fightmeCooldown))) / 1000 / 60), 'core.minutes')), sender)
+          .replace(/\$minutesName/g, global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - (await self.fightmeCooldown))) / 1000 / 60), 'core.minutes')), sender)
         return
       }
 

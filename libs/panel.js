@@ -123,17 +123,17 @@ function Panel () {
 
     // twitch game and title change
     socket.on('getGameFromTwitch', function (game) { global.api.sendGameFromTwitch(global.api, socket, game) })
-    socket.on('getUserTwitchGames', async () => { socket.emit('sendUserTwitchGamesAndTitles', await self.gamesTitles()) })
+    socket.on('getUserTwitchGames', async () => { socket.emit('sendUserTwitchGamesAndTitles', await global.cache.gamesTitles()) })
     socket.on('deleteUserTwitchGame', async (game) => {
-      let gamesTitles = await self.gamesTitles(); delete gamesTitles[game]
-      socket.emit('sendUserTwitchGamesAndTitles', await self.gamesTitles(gamesTitles))
+      let gamesTitles = await global.cache.gamesTitles(); delete gamesTitles[game]
+      socket.emit('sendUserTwitchGamesAndTitles', await global.cache.gamesTitles(gamesTitles))
     })
     socket.on('deleteUserTwitchTitle', async (data) => {
-      let gamesTitles = await self.gamesTitles()
+      let gamesTitles = await global.cache.gamesTitles()
       _.remove(gamesTitles[data.game], function (aTitle) {
         return aTitle === data.title
       })
-      socket.emit('sendUserTwitchGamesAndTitles', await self.gamesTitles(gamesTitles))
+      socket.emit('sendUserTwitchGamesAndTitles', await global.cache.gamesTitles(gamesTitles))
     })
     socket.on('editUserTwitchTitle', async (data) => {
       data.new = data.new.trim()
@@ -143,13 +143,13 @@ function Panel () {
         return
       }
 
-      let gamesTitles = await self.gamesTitles()
+      let gamesTitles = await global.cache.gamesTitles()
       if (_.isEmpty(_.find(gamesTitles[data.game], (v) => v.trim() === data.title.trim()))) {
         gamesTitles[data.game].push(data.new) // also, we need to add game and title to cached property
       } else {
         gamesTitles[data.game][gamesTitles[data.game].indexOf(data.title)] = data.new
       }
-      await self.gamesTitles(gamesTitles)
+      await global.cache.gamesTitles(gamesTitles)
     })
     socket.on('updateGameAndTitle', async (data) => {
       global.api.setTitleAndGame(global.api, null, data)
@@ -157,7 +157,7 @@ function Panel () {
       data.title = data.title.trim()
       data.game = data.game.trim()
 
-      let gamesTitles = await self.gamesTitles()
+      let gamesTitles = await global.cache.gamesTitles()
 
       // create game if not in cache
       if (_.isNil(gamesTitles[data.game])) gamesTitles[data.game] = []
@@ -166,7 +166,7 @@ function Panel () {
         gamesTitles[data.game].push(data.title) // also, we need to add game and title to cached property
       }
 
-      await self.gamesTitles(gamesTitles)
+      await global.cache.gamesTitles(gamesTitles)
       self.sendStreamData(self, global.panel.io) // force dashboard update
     })
     socket.on('joinBot', () => { global.client.join('#' + config.settings.broadcaster_username) })
@@ -256,22 +256,6 @@ function Panel () {
     )
     socket.emit('lang', lang)
   })
-}
-
-Panel.prototype.gamesTitles = async function (data) {
-  if (data) {
-    // setter
-    // re-save full object - NeDB issue with $set on object workaround - NeDB is not deleting missing keys
-    let fullCacheObj = await global.db.engine.findOne('cache')
-    fullCacheObj['games_and_titles'] = data
-    await global.db.engine.remove('cache', {})
-    await global.db.engine.insert('cache', fullCacheObj)
-    return data
-  } else {
-    // getter
-    let cache = await global.db.engine.findOne('cache')
-    return _.get(cache, 'games_and_titles', {})
-  }
 }
 
 Panel.prototype.authUser = function (req, res, next) {

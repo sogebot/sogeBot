@@ -85,7 +85,7 @@ class API {
     if (_.isNil(request.body.users[0])) {
       global.log.error('Channel ' + config.settings.broadcaster_username + ' not found!')
     } else {
-      global.cache.channelId(request.body.users[0]._id)
+      await global.cache.channelId(request.body.users[0]._id)
       global.log.info('Broadcaster channel ID set to ' + request.body.users[0]._id)
     }
   }

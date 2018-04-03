@@ -422,7 +422,7 @@ class Heist {
         self._lastAnnouncedCops = _.now()
         global.commons.sendMessage(
           (await self.get('copsOnPatrol'))
-            .replace('$cooldown', minutesLeft + ' ' + global.parser.getLocalizedName(minutesLeft, 'core.minutes')), sender)
+            .replace('$cooldown', minutesLeft + ' ' + global.commons.getLocalizedName(minutesLeft, 'core.minutes')), sender)
       }
       return
     }

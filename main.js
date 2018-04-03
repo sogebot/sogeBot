@@ -336,7 +336,7 @@ async function resub (channel, username, months, message, userstate, method) {
   if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
 
   global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: moment().subtract(months, 'months').format('X') * 1000 }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
-  global.overlays.eventlist.add({ type: 'resub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, monthsName: global.parser.getLocalizedName(months, 'core.months'), months: months, message: message })
+  global.overlays.eventlist.add({ type: 'resub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: message })
   global.log.resub(`${username}, months: ${months}, message: ${message}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
   global.events.fire('resub', { username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: message })
 }
