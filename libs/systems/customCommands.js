@@ -20,31 +20,36 @@ var constants = require('../constants')
 
 class CustomCommands {
   constructor () {
-    if (global.commons.isSystemEnabled(this)) {
-      global.parser.register(this, '!command add', this.add, constants.OWNER_ONLY)
-      global.parser.register(this, '!command edit', this.edit, constants.OWNER_ONLY)
-      global.parser.register(this, '!command list', this.list, constants.OWNER_ONLY)
-      global.parser.register(this, '!command remove', this.remove, constants.OWNER_ONLY)
-      global.parser.register(this, '!command toggle-visibility', this.visible, constants.OWNER_ONLY)
-      global.parser.register(this, '!command toggle', this.toggle, constants.OWNER_ONLY)
-      global.parser.register(this, '!command', this.help, constants.OWNER_ONLY)
-
-      global.parser.registerHelper('!command')
-
+    if (global.commons.isSystemEnabled(this) && require('cluster').isMaster) {
       global.panel.addMenu({category: 'manage', name: 'custom-commands', id: 'customCommands'})
       global.panel.registerSockets({
         self: this,
         expose: ['add', 'remove', 'visible', 'toggle', 'editCommand', 'editResponse', 'send'],
         finally: this.send
       })
-
-      this.register(this)
     }
   }
 
-  async register (self) {
-    let commands = await global.db.engine.find('commands')
-    _.each(commands, function (o) { global.parser.register(self, '!' + o.command, self.run, constants.VIEWERS) })
+  commands () {
+    return !global.commons.isSystemEnabled('customcommands')
+      ? []
+      : [
+        { command: '!command add', fnc: this.add, permission: constants.OWNER_ONLY, this: this },
+        { command: '!command edit', fnc: this.edit, permission: constants.OWNER_ONLY, this: this },
+        { command: '!command list', fnc: this.list, permission: constants.OWNER_ONLY, this: this },
+        { command: '!command remove', fnc: this.remove, permission: constants.OWNER_ONLY, this: this },
+        { command: '!command toggle-visibility', fnc: this.visibility, permission: constants.OWNER_ONLY, this: this },
+        { command: '!command toggle', fnc: this.toggle, permission: constants.OWNER_ONLY, this: this },
+        { command: '!command', fnc: this.help, permission: constants.OWNER_ONLY, isHelper: true, this: this }
+      ]
+  }
+
+  parsers () {
+    return !global.commons.isSystemEnabled('customcommands')
+      ? []
+      : [
+        { name: 'command', fnc: this.run, priority: constants.LOW, permission: constants.VIEWERS, this: this }
+      ]
   }
 
   async send (self, socket) {
@@ -106,23 +111,27 @@ class CustomCommands {
     debug(match)
     let command = { command: match.command, response: match.response, enabled: true, visible: true }
 
-    if (global.parser.isRegistered(command.command)) {
-      let message = global.commons.prepare('core.isRegistered', { keyword: command.command })
-      debug(message); global.commons.sendMessage(message, sender)
-      return false
-    }
-
     await global.db.engine.insert('commands', command)
-    await self.register(self)
     let message = global.commons.prepare('customcmds.command-was-added', { command: match.command })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
-  async run (self, sender, msg, fullMsg) {
-    const match = XRegExp.exec(fullMsg, constants.COMMAND_REGEXP_WITH_OPTIONAL_RESPONSE)
-    let command = await global.db.engine.findOne('commands', { command: match.command.toLowerCase(), enabled: true })
-    if (!_.isEmpty(command)) global.commons.sendMessage(command.response, sender, {'param': match.response, 'cmd': match.command})
-    else global.parser.unregister(fullMsg)
+  async run (self, sender, msg) {
+    if (!msg.startsWith('!')) return true // do nothing if it is not a command
+
+    var command
+    let cmdArray = msg.toLowerCase().split(' ')
+    for (let i in msg.toLowerCase().split(' ')) { // search for correct command
+      debug(`${i} - Searching for ${cmdArray.join(' ')} in commands`)
+      command = await global.db.engine.findOne('commands', { command: cmdArray.join(' ').replace('!', ''), enabled: true })
+      debug(command)
+      if (!_.isEmpty(command)) break
+      cmdArray.pop() // remove last array item if not found
+    }
+    if (_.isEmpty(command)) return true // no command was found - return
+    debug('Command found: %j', command)
+    const param = msg.replace(cmdArray.join(' '), '') // remove found command from message to get param
+    global.commons.sendMessage(command.response, sender, {'param': param, 'cmd': command.command})
   }
 
   async list (self, sender, text) {
@@ -148,7 +157,6 @@ class CustomCommands {
     }
 
     await global.db.engine.update('commands', { command: match.command }, { enabled: !command.enabled })
-    await self.register(self)
 
     let message = global.commons.prepare(!command.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: command.command })
     debug(message); global.commons.sendMessage(message, sender)
@@ -188,7 +196,6 @@ class CustomCommands {
       debug(message); global.commons.sendMessage(message, sender)
       return false
     }
-    global.parser.unregister('!' + match.command)
     let message = global.commons.prepare('customcmds.command-was-removed', { command: match.command })
     debug(message); global.commons.sendMessage(message, sender)
   }

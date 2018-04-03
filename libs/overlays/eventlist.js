@@ -5,8 +5,10 @@ const _ = require('lodash')
 const crypto = require('crypto')
 
 function EventList () {
-  global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
-  global.panel.socketListening(this, 'overlay.eventlist.get', this._get)
+  if (require('cluster').isMaster) {
+    global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
+    global.panel.socketListening(this, 'overlay.eventlist.get', this._get)
+  }
 }
 
 EventList.prototype._get = async function (self) {
@@ -20,7 +22,7 @@ EventList.prototype._get = async function (self) {
 }
 
 EventList.prototype.add = async function (data) {
-  if (global.parser.isBot(data.username)) return // don't save event from a bot
+  if (global.commons.isBot(data.username)) return // don't save event from a bot
 
   const newEvent = {
     event: data.type,
@@ -37,7 +39,7 @@ EventList.prototype.add = async function (data) {
     song_title: _.isNil(data.song_title) ? undefined : data.song_title,
     song_url: _.isNil(data.song_url) ? undefined : data.song_url
   }
-  global.db.engine.insert('widgetsEventList', newEvent)
+  await global.db.engine.insert('widgetsEventList', newEvent)
   global.overlays.eventlist._get(global.overlays.eventlist)
   global.widgets.eventlist._get(global.widgets.eventlist)
 }

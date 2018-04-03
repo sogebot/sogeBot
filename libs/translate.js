@@ -5,17 +5,23 @@ var fs = require('fs')
 var _ = require('lodash')
 const flatten = require('flat')
 
+const cluster = require('cluster')
+
 class Translate {
   constructor () {
-    this.custom = {}
+    this.custom = []
     this.translations = {}
 
-    global.panel.addMenu({category: 'settings', name: 'translations', id: 'translations'})
+    this.lang = 'en'
+    global.configuration.register('lang', '', 'string', this.lang)
+
+    if (cluster.isMaster) global.panel.addMenu({category: 'settings', name: 'translations', id: 'translations'})
   }
 
   async _load () {
-    this.custom = await global.db.engine.find('customTranslations')
-    return new Promise((resolve, reject) => {
+    if (cluster.isWorker) this.custom = await global.db.engine.find('customTranslations') // master doesn't need custom translations as it is serving UI only
+    return new Promise(async (resolve, reject) => {
+      this.lang = await global.configuration.getValue('lang')
       glob('./locales/**', (err, files) => {
         if (err) reject(err)
         for (let f of files) {
@@ -23,9 +29,8 @@ class Translate {
           let withoutLocales = f.replace('./locales/', '').replace('.json', '')
           _.set(this.translations, withoutLocales.split('/').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')))
         }
-
         for (let c of this.custom) {
-          if (_.isNil(flatten(this.translations[global.configuration.getValue('lang')])[c.key])) {
+          if (_.isNil(flatten(this.translations[this.lang])[c.key])) {
             // remove if lang doesn't exist anymore
             global.db.engine.remove('customTranslations', { key: c.key })
             this.custom = _.remove(this.custom, (i) => i.key === c.key)
@@ -46,9 +51,9 @@ class Translate {
   translate (text, orig) {
     orig = orig || false
     const self = global.lib.translate
-    if (_.isUndefined(self.translations[global.configuration.getValue('lang')]) && !_.isUndefined(text)) return '{missing_translation: ' + global.configuration.getValue('lang') + '.' + text + '}'
+    if (_.isUndefined(self.translations[self.lang]) && !_.isUndefined(text)) return '{missing_translation: ' + self.lang + '.' + text + '}'
     else if (typeof text === 'object') {
-      let t = self.translations[global.configuration.getValue('lang')][text.root]
+      let t = self.translations[self.lang][text.root]
       for (let c of self.custom) { t[c.key.replace(`${text.root}.`, '')] = c.value }
       return t
     } else if (typeof text !== 'undefined') return self.get(text, orig)
@@ -63,12 +68,12 @@ class Translate {
       if (!_.isNil(customTranslated) && !orig) {
         translated = customTranslated.value
       } else {
-        translated = text.split('.').reduce((o, i) => o[i], self.translations[global.configuration.getValue('lang')])
+        translated = text.split('.').reduce((o, i) => o[i], self.translations[self.lang])
       }
       _.each(translated.match(/(\{[\w-.]+\})/g), function (toTranslate) { translated = translated.replace(toTranslate, self.get(toTranslate.replace('{', '').replace('}', ''), orig)) })
       return translated
     } catch (err) {
-      return '{missing_translation: ' + global.configuration.getValue('lang') + '.' + text + '}'
+      return '{missing_translation: ' + this.lang + '.' + text + '}'
     }
   }
 }

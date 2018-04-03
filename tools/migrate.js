@@ -9,7 +9,7 @@ global.logger = new Logger()
 
 // db
 const Database = require('../libs/databases/database')
-global.db = new Database()
+global.db = new Database(false)
 
 var runMigration = async function () {
   if (!global.db.engine.connected) {

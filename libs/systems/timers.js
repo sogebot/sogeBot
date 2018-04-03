@@ -22,23 +22,25 @@ var constants = require('../constants')
 
 class Timers {
   constructor () {
-    if (global.commons.isSystemEnabled(this)) {
+    if (global.commons.isSystemEnabled(this) && require('cluster').isMaster) {
       this.init()
-
-      global.parser.register(this, '!timers set', this.set, constants.OWNER_ONLY)
-      global.parser.register(this, '!timers unset', this.unset, constants.OWNER_ONLY)
-      global.parser.register(this, '!timers add', this.add, constants.OWNER_ONLY)
-      global.parser.register(this, '!timers rm', this.rm, constants.OWNER_ONLY)
-      global.parser.register(this, '!timers list', this.list, constants.OWNER_ONLY)
-      global.parser.register(this, '!timers toggle', this.toggle, constants.OWNER_ONLY)
-      global.parser.register(this, '!timers', this.help, constants.OWNER_ONLY)
-
-      global.parser.registerHelper('!timers')
-
       global.panel.addMenu({category: 'manage', name: 'timers', id: 'timers'})
-
       this.sockets()
     }
+  }
+
+  commands () {
+    return !global.commons.isSystemEnabled('timers')
+      ? []
+      : [
+        {this: this, command: '!timers set', fnc: this.set, permission: constants.OWNER_ONLY},
+        {this: this, command: '!timers unset', fnc: this.unset, permission: constants.OWNER_ONLY},
+        {this: this, command: '!timers add', fnc: this.add, permission: constants.OWNER_ONLY},
+        {this: this, command: '!timers rm', fnc: this.rm, permission: constants.OWNER_ONLY},
+        {this: this, command: '!timers list', fnc: this.list, permission: constants.OWNER_ONLY},
+        {this: this, command: '!timers toggle', fnc: this.toggle, permission: constants.OWNER_ONLY},
+        {this: this, command: '!timers', fnc: this.help, permission: constants.OWNER_ONLY}
+      ]
   }
 
   async sockets () {
@@ -178,7 +180,7 @@ class Timers {
     d('checking timers')
     let timers = await global.db.engine.find('timers', { enabled: true })
     for (let timer of timers) {
-      if (timer.messages > 0 && timer.trigger.messages - global.parser.linesParsed + timer.messages > 0) continue // not ready to trigger with messages
+      if (timer.messages > 0 && timer.trigger.messages - global.linesParsed + timer.messages > 0) continue // not ready to trigger with messages
       if (timer.seconds > 0 && new Date().getTime() - timer.trigger.timestamp < timer.seconds * 1000) continue // not ready to trigger with seconds
 
       d('ready to fire - %j', timer)
@@ -186,11 +188,11 @@ class Timers {
       let response = _.orderBy(responses, 'timestamp', 'asc')[0]
 
       if (!_.isNil(response)) {
-        d(response.response, global.parser.getOwner())
-        global.commons.sendMessage(response.response, global.parser.getOwner())
+        d(response.response, global.commons.getOwner())
+        global.commons.sendMessage(response.response, global.commons.getOwner())
         await global.db.engine.update('timers.responses', { _id: response._id }, { timestamp: new Date().getTime() })
       }
-      await global.db.engine.update('timers', { _id: timer._id.toString() }, { trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
+      await global.db.engine.update('timers', { _id: timer._id.toString() }, { trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
     }
     setTimeout(() => this.check(), 1000) // this will run check 1s after full check is correctly done
   }
@@ -234,7 +236,7 @@ class Timers {
     }
     d(name, messages, seconds)
 
-    await global.db.engine.update('timers', { name: name }, { name: name, messages: messages, seconds: seconds, enabled: true, trigger: { messages: global.parser.linesParsed, timestamp: new Date().getTime() } })
+    await global.db.engine.update('timers', { name: name }, { name: name, messages: messages, seconds: seconds, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
     global.commons.sendMessage(global.translate('timers.timer-was-set')
       .replace(/\$name/g, name)
       .replace(/\$messages/g, messages)
@@ -348,8 +350,8 @@ class Timers {
 
     let responses = await global.db.engine.find('timers.responses', { timerId: timer._id.toString() })
     d(responses)
-    global.commons.sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), sender)
-    for (let response of responses) { global.commons.sendMessage((response.enabled ? `⚫ ` : `⚪ `) + `${response._id} - ${response.response}`, sender) }
+    await global.commons.sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), sender)
+    for (let response of responses) await global.commons.sendMessage((response.enabled ? `⚫ ` : `⚪ `) + `${response._id} - ${response.response}`, sender)
     return true
   }
 

@@ -4,7 +4,6 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
-const tmi = require('../../general.js').tmi
 
 const moment = require('moment')
 
@@ -14,9 +13,8 @@ const testuser3 = { username: 'testuser3' }
 
 describe('lib/twitch - subs()', () => {
   before(async () => {
-    await tmi.waitForConnection()
-    global.commons.sendMessage.reset()
     await db.cleanup()
+    await message.prepare()
   })
 
   it('add testuser to event', async () => {
@@ -35,7 +33,7 @@ describe('lib/twitch - subs()', () => {
 
   it('!subs should return testuser2', async () => {
     let fromDb = await global.db.engine.findOne('widgetsEventList', {'username': 'testuser2', type: 'sub'})
-    global.parser.parse(testuser, '!subs')
+    global.twitch.subs(global.twitch, testuser)
     await message.isSent('subs', testuser, {
       lastSubAgo: moment(fromDb.timestamp).fromNow(),
       lastSubUsername: testuser2.username,
@@ -52,7 +50,7 @@ describe('lib/twitch - subs()', () => {
 
   it('!subs should return testuser3', async () => {
     let fromDb = await global.db.engine.findOne('widgetsEventList', {'username': 'testuser3', type: 'sub'})
-    global.parser.parse(testuser, '!subs')
+    global.twitch.subs(global.twitch, testuser)
     await message.isSent('subs', testuser, {
       lastSubAgo: moment(fromDb.timestamp).fromNow(),
       lastSubUsername: testuser3.username,

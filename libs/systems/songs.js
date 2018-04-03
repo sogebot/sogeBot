@@ -8,26 +8,11 @@ const ytsearch = require('youtube-search')
 const config = require('../../config.json')
 const constants = require('../constants')
 const debug = require('debug')('systems:songs')
+const cluster = require('cluster')
 
 class Songs {
   constructor () {
     if (global.commons.isSystemEnabled(this)) {
-      this.currentSong = {}
-      this.meanLoudness = -15
-
-      global.parser.register(this, '!songrequest', this.addSongToQueue, constants.VIEWERS)
-      global.parser.register(this, '!wrongsong', this.removeSongFromQueue, constants.VIEWERS)
-      global.parser.register(this, '!currentsong', this.getCurrentSong, constants.VIEWERS)
-      global.parser.register(this, '!skipsong', this.sendNextSongID, constants.OWNER_ONLY)
-      global.parser.register(this, '!bansong', this.banSong, constants.OWNER_ONLY)
-      global.parser.register(this, '!unbansong', this.unbanSong, constants.OWNER_ONLY)
-      global.parser.register(this, '!playlist add', this.addSongToPlaylist, constants.OWNER_ONLY)
-      global.parser.register(this, '!playlist remove', this.removeSongFromPlaylist, constants.OWNER_ONLY)
-      global.parser.register(this, '!playlist steal', this.stealSong, constants.OWNER_ONLY)
-      global.parser.register(this, '!playlist', this.help, constants.OWNER_ONLY)
-
-      global.parser.registerHelper('!songrequest')
-
       global.configuration.register('songs_volume', 'core.settings.songs.volume', 'number', 25)
       global.configuration.register('songs_duration', 'core.settings.songs.duration', 'number', 10)
       global.configuration.register('songs_shuffle', 'core.settings.songs.shuffle', 'bool', false)
@@ -35,33 +20,74 @@ class Songs {
       global.configuration.register('songs_playlist', 'core.settings.songs.playlist', 'bool', true)
       global.configuration.register('songs_notify', 'core.settings.songs.notify', 'bool', false)
 
-      this.getMeanLoudness(this)
-      this.getToggles(this)
+      if (cluster.isMaster) {
+        cluster.on('message', (worker, d) => {
+          if (d.type !== 'songs') return
+          this[d.fnc](this, global.panel.io)
+        })
 
-      global.panel.addMenu({category: 'manage', name: 'songs', id: 'songs'})
-      global.panel.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones')
-      global.panel.registerSockets({
-        self: this,
-        expose: ['togglePlaylist', 'toggleSongRequests', 'getCurrentVolume', 'send', 'setTrim', 'sendConfiguration', 'banSong', 'getSongRequests', 'stealSong', 'sendNextSongID', 'removeSongFromPlaylist', 'unbanSong']
-      })
+        this.getMeanLoudness(this)
+        this.getToggles(this)
+
+        global.panel.addMenu({category: 'manage', name: 'songs', id: 'songs'})
+        global.panel.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones')
+        global.panel.registerSockets({
+          self: this,
+          expose: ['togglePlaylist', 'toggleSongRequests', 'getCurrentVolume', 'send', 'setTrim', 'sendConfiguration', 'banSong', 'getSongRequests', 'stealSong', 'sendNextSongID', 'removeSongFromPlaylist', 'unbanSong']
+        })
+      }
     }
   }
 
-  togglePlaylist () {
-    let value = global.configuration.getValue('songs_playlist').toString().toLowerCase() === 'true' ? 'false' : 'true'
+  get meanLoudness () {
+    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne('cache', { key: 'songs_meanLoudness' }), 'value', -15)))
+  }
+
+  set meanLoudness (v) {
+    global.db.engine.update('cache', { key: 'songs_meanLoudness' }, { value: v })
+  }
+
+  get currentSong () {
+    return new Promise(async (resolve, reject) => resolve(await global.db.engine.findOne('cache', { key: 'songs_currentSong' })))
+  }
+
+  set currentSong (v) {
+    delete v._id
+    global.db.engine.update('cache', { key: 'songs_currentSong' }, v)
+  }
+
+  commands () {
+    return !global.commons.isSystemEnabled('songs')
+      ? []
+      : [
+        {this: this, command: '!songrequest', fnc: this.addSongToQueue, permission: constants.VIEWERS},
+        {this: this, command: '!wrongsong', fnc: this.removeSongFromQueue, permission: constants.VIEWERS},
+        {this: this, command: '!currentsong', fnc: this.getCurrentSong, permission: constants.VIEWERS},
+        {this: this, command: '!skipsong', fnc: this.sendNextSongID, permission: constants.OWNER_ONLY},
+        {this: this, command: '!bansong', fnc: this.banSong, permission: constants.OWNER_ONLY},
+        {this: this, command: '!unbansong', fnc: this.unbanSong, permission: constants.OWNER_ONLY},
+        {this: this, command: '!playlist add', fnc: this.addSongToPlaylist, permission: constants.OWNER_ONLY},
+        {this: this, command: '!playlist remove', fnc: this.removeSongFromPlaylist, permission: constants.OWNER_ONLY},
+        {this: this, command: '!playlist steal', fnc: this.stealSong, permission: constants.OWNER_ONLY},
+        {this: this, command: '!playlist', fnc: this.help, permission: constants.OWNER_ONLY}
+      ]
+  }
+
+  async togglePlaylist () {
+    let value = (await global.configuration.getValue('songs_playlist')).toString().toLowerCase() === 'true' ? 'false' : 'true'
     global.configuration.setValue(global.configuration, { username: global.parser.getOwner() }, `songs_playlist ${value}`, true)
   }
 
-  toggleSongRequests () {
-    let value = global.configuration.getValue('songs_songrequest').toString().toLowerCase() === 'true' ? 'false' : 'true'
+  async toggleSongRequests () {
+    let value = (await global.configuration.getValue('songs_songrequest')).toString().toLowerCase() === 'true' ? 'false' : 'true'
     global.configuration.setValue(global.configuration, { username: global.parser.getOwner() }, `songs_songrequest ${value}`, true)
   }
 
   async getToggles (self) {
-    setInterval(() => {
+    setInterval(async () => {
       global.panel.io.emit('songs.toggles', {
-        playlist: global.configuration.getValue('songs_playlist'),
-        songrequest: global.configuration.getValue('songs_songrequest')
+        playlist: await global.configuration.getValue('songs_playlist'),
+        songrequest: await global.configuration.getValue('songs_songrequest')
       })
     }, 1000)
   }
@@ -70,7 +96,7 @@ class Songs {
     let playlist = await global.db.engine.find('playlist')
     if (_.isEmpty(playlist)) {
       self.meanLoudness = -15
-      return self.meanLoudness
+      return -15
     }
 
     var loudness = 0
@@ -82,38 +108,41 @@ class Songs {
       }
     }
     self.meanLoudness = loudness / playlist.length
-    return self.meanLoudness
+    return loudness / playlist.length
   }
 
-  getVolume (self, item) {
+  async getVolume (self, item) {
     item.loudness = !_.isNil(item.loudness) ? item.loudness : -15
-    var correction = Math.ceil((global.configuration.getValue('songs_volume') / 100) * 3)
-    var loudnessDiff = parseFloat(parseFloat(self.meanLoudness) - item.loudness)
-    return Math.round(global.configuration.getValue('songs_volume') + (correction * loudnessDiff))
+    const volume = await global.configuration.getValue('songs_volume')
+    var correction = Math.ceil((volume / 100) * 3)
+    var loudnessDiff = parseFloat(parseFloat(await self.meanLoudness) - item.loudness)
+    return Math.round(volume + (correction * loudnessDiff))
   }
 
-  getCurrentVolume (self, socket) {
-    socket.emit('newVolume', self.getVolume(self, self.currentSong))
+  async getCurrentVolume (self, socket) {
+    socket.emit('newVolume', await self.getVolume(self, await self.currentSong))
   }
 
   setTrim (self, socket, data) {
     global.db.engine.update('playlist', { videoID: data.id }, { startTime: data.lowValue, endTime: data.highValue })
   }
 
-  sendConfiguration (self, socket) {
+  async sendConfiguration (self, socket) {
     socket.emit('songsConfiguration', {
-      volume: global.configuration.getValue('songs_volume'),
-      shuffle: global.configuration.getValue('songs_shuffle'),
-      duration: global.configuration.getValue('songs_duration'),
-      songrequest: global.configuration.getValue('songs_songrequest'),
-      playlist: global.configuration.getValue('songs_playlist'),
-      notify: global.configuration.getValue('songs_notify')
+      volume: await global.configuration.getValue('songs_volume'),
+      shuffle: await global.configuration.getValue('songs_shuffle'),
+      duration: await global.configuration.getValue('songs_duration'),
+      songrequest: await global.configuration.getValue('songs_songrequest'),
+      playlist: await global.configuration.getValue('songs_playlist'),
+      notify: await global.configuration.getValue('songs_notify')
     })
   }
 
   async send (self, socket) {
+    if (cluster.isWorker) return process.send({ type: 'songs', fnc: 'send' })
+
     let playlist = await global.db.engine.find('playlist')
-    _.each(playlist, function (item) { item.volume = self.getVolume(self, item) })
+    _.each(playlist, async function (item) { item.volume = await self.getVolume(self, item) })
     socket.emit('songPlaylistList', _.orderBy(playlist, ['addedAt'], ['asc']))
 
     let bannedSongs = await global.db.engine.find('bannedsong')
@@ -125,19 +154,21 @@ class Songs {
   }
 
   async banCurrentSong (self, sender) {
-    if (_.isNil(self.currentSong.videoID)) return
+    let currentSong = await self.currentSong
+    if (_.isNil(currentSong.videoID)) return
 
-    let update = await global.db.engine.update('bannedsong', { videoId: self.currentSong.videoID }, { videoId: self.currentSong.videoID, title: self.currentSong.title })
+    let update = await global.db.engine.update('bannedsong', { videoId: currentSong.videoID }, { videoId: currentSong.videoID, title: currentSong.title })
     if (update.length > 0) {
-      let message = global.commons.prepare('songs.song-was-banned', { name: self.currentSong.title })
+      let message = global.commons.prepare('songs.song-was-banned', { name: currentSong.title })
       debug(message); global.commons.sendMessage(message, sender)
 
-      await Promise.all([global.db.engine.remove('playlist', { videoID: self.currentSong.videoID }), global.db.engine.remove('songrequest', { videoID: self.currentSong.videoID })])
+      await Promise.all([global.db.engine.remove('playlist', { videoID: currentSong.videoID }), global.db.engine.remove('songrequest', { videoID: currentSong.videoID })])
 
-      global.commons.timeout(self.currentSong.username, global.translate('songs.song-was-banned-timeout-message'), 300)
+      global.commons.timeout(currentSong.username, global.translate('songs.song-was-banned-timeout-message'), 300)
       self.getMeanLoudness(self)
-      self.sendNextSongID(self, global.panel.io)
-      self.send(self, global.panel.io)
+
+      self.sendNextSongID(self)
+      self.send(self)
     }
   }
 
@@ -149,14 +180,16 @@ class Songs {
 
       let updated = await global.db.engine.update('bannedsong', { videoId: text }, { videoId: text, title: videoInfo.title })
       if (updated.length > 0) {
-        global.commons.sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, self.currentSong.title), sender)
+        global.commons.sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, videoInfo.title), sender)
 
         await Promise.all([global.db.engine.remove('playlist', { videoID: text }), global.db.engine.remove('songrequest', { videoID: text })])
 
-        global.commons.timeout(self.currentSong.username, global.translate('songs.bannedSongTimeout'), 300)
+        const currentSong = await self.currentSong
+        global.commons.timeout(currentSong.username, global.translate('songs.bannedSongTimeout'), 300)
+
         self.getMeanLoudness(self)
-        self.sendNextSongID(self, global.panel.io)
-        self.send(self, global.panel.io)
+        self.sendNextSongID(self)
+        self.send(self)
       }
     })
   }
@@ -168,47 +201,49 @@ class Songs {
   }
 
   async sendNextSongID (self, socket) {
+    if (cluster.isWorker) return process.send({ type: 'songs', fnc: 'sendNextSongID' })
     // check if there are any requests
-    if (global.configuration.getValue('songs_songrequest')) {
+    if (await global.configuration.getValue('songs_songrequest')) {
       let sr = await global.db.engine.find('songrequests')
       sr = _.head(_.orderBy(sr, ['addedAt'], ['asc']))
       if (!_.isNil(sr)) {
-        self.currentSong = sr
-        self.currentSong.volume = self.getVolume(self, self.currentSong)
-        self.currentSong.type = 'songrequests'
+        let currentSong = sr
+        currentSong.volume = await self.getVolume(self, currentSong)
+        currentSong.type = 'songrequests'
+        self.currentSong = currentSong
 
-        if (global.configuration.getValue('songs_notify')) self.notifySong(self)
-
-        socket.emit('videoID', self.currentSong)
-        await global.db.engine.remove('songrequests', { _id: sr._id.toString() })
+        if (await global.configuration.getValue('songs_notify')) self.notifySong(self)
+        socket.emit('videoID', currentSong)
+        await global.db.engine.remove('songrequests', { videoID: sr.videoID })
         return
       }
     }
 
     // get song from playlist
-    if (global.configuration.getValue('songs_playlist')) {
+    if (await global.configuration.getValue('songs_playlist')) {
       let pl = await global.db.engine.find('playlist')
       if (_.isEmpty(pl)) {
         socket.emit('videoID', null) // send null and skip to next empty song
         return // don't do anything if no songs in playlist
       }
-      pl = _.head(_.orderBy(pl, [(global.configuration.getValue('songs_shuffle') ? 'seed' : 'lastPlayedAt')], ['asc']))
+      pl = _.head(_.orderBy(pl, [(await global.configuration.getValue('songs_shuffle') ? 'seed' : 'lastPlayedAt')], ['asc']))
 
       // shuffled song is played again
-      if (global.configuration.getValue('songs_shuffle') && pl.seed === 1) {
+      if (await global.configuration.getValue('songs_shuffle') && pl.seed === 1) {
         self.createRandomSeeds()
         self.sendNextSongID(self, socket) // retry with new seeds
         return
       }
 
       await global.db.engine.update('playlist', { _id: pl._id.toString() }, { seed: 1, lastPlayedAt: new Date().getTime() })
-      self.currentSong = pl
-      self.currentSong.volume = self.getVolume(self, self.currentSong)
-      self.currentSong.type = 'playlist'
+      let currentSong = pl
+      currentSong.volume = await self.getVolume(self, currentSong)
+      currentSong.type = 'playlist'
+      self.currentSong = currentSong
 
-      if (global.configuration.getValue('songs_notify')) self.notifySong(self)
+      if (await global.configuration.getValue('songs_notify')) self.notifySong(self)
 
-      socket.emit('videoID', self.currentSong)
+      socket.emit('videoID', currentSong)
       return
     }
 
@@ -216,29 +251,32 @@ class Songs {
     socket.emit('videoID', null)
   }
 
-  getCurrentSong (self) {
+  async getCurrentSong (self) {
     let translation = 'songs.no-song-is-currently-playing'
-    if (!_.isNil(self.currentSong.title)) {
-      if (self.currentSong.type === 'playlist') translation = 'songs.current-song-from-playlist'
+    const currentSong = await self.currentSong
+    if (!_.isNil(currentSong.title)) {
+      if (currentSong.type === 'playlist') translation = 'songs.current-song-from-playlist'
       else translation = 'songs.current-song-from-songrequest'
     }
-    let message = global.commons.prepare(translation, { name: self.currentSong.title, username: self.currentSong.username })
+    let message = global.commons.prepare(translation, { name: currentSong.title, username: currentSong.username })
     debug(message); global.commons.sendMessage(message, {username: config.settings.broadcaster_username})
   }
 
-  notifySong (self) {
+  async notifySong (self) {
     var translation
-    if (!_.isNil(self.currentSong.title)) {
-      if (self.currentSong.type === 'playlist') translation = 'songs.current-song-from-playlist'
+    const currentSong = await self.currentSong
+    if (!_.isNil(currentSong.title)) {
+      if (currentSong.type === 'playlist') translation = 'songs.current-song-from-playlist'
       else translation = 'songs.current-song-from-songrequest'
     } else return
-    let message = global.commons.prepare(translation, { name: self.currentSong.title, username: self.currentSong.username })
+    let message = global.commons.prepare(translation, { name: currentSong.title, username: currentSong.username })
     debug(message); global.commons.sendMessage(message, {username: config.settings.broadcaster_username})
   }
 
-  stealSong (self) {
+  async stealSong (self) {
     try {
-      self.addSongToPlaylist(self, null, self.currentSong.videoID)
+      const currentSong = await self.currentSong
+      self.addSongToPlaylist(self, null, currentSong.videoID)
     } catch (err) {
       global.commons.sendMessage(global.translate('songs.noCurrentSong'), {username: config.settings.broadcaster_username})
     }
@@ -261,8 +299,8 @@ class Songs {
   }
 
   async addSongToQueue (self, sender, text) {
-    if (text.length < 1 || !global.configuration.getValue('songs_songrequest')) {
-      if (global.configuration.getValue('songs_songrequest')) {
+    if (text.length < 1 || !await global.configuration.getValue('songs_songrequest')) {
+      if (await global.configuration.getValue('songs_songrequest')) {
         global.commons.sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', sender)
       } else {
         global.commons.sendMessage('$sender, ' + global.translate('core.settings.songs.songrequest.false'), sender)
@@ -290,11 +328,11 @@ class Songs {
       return
     }
 
-    ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, function (err, videoInfo) {
+    ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async function (err, videoInfo) {
       if (err) return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' })
       if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
         global.commons.sendMessage(global.translate('songs.song-was-not-found'), sender)
-      } else if (videoInfo.length_seconds / 60 > global.configuration.getValue('songs_duration')) global.commons.sendMessage(global.translate('songs.tooLong'), sender)
+      } else if (videoInfo.length_seconds / 60 > await global.configuration.getValue('songs_duration')) global.commons.sendMessage(global.translate('songs.tooLong'), sender)
       else {
         global.db.engine.update('songrequests', { addedAt: new Date().getTime() }, { videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: sender.username })
         let message = global.commons.prepare('songs.song-was-added-to-queue', { name: videoInfo.title })

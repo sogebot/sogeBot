@@ -2,11 +2,12 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
+const constants = require('../constants')
+const cluster = require('cluster')
 const { EmoteFetcher } = require('twitch-emoticons')
 
 // bot libraries
 const config = require('../../config')
-const constants = require('../constants')
 
 function Emotes () {
   this.simpleEmotes = {
@@ -26,24 +27,36 @@ function Emotes () {
     '<3': 'https://static-cdn.jtvnw.net/emoticons/v1/9/'
   }
 
-  this.fetcher = new EmoteFetcher()
-  this.fetcher.fetchTwitchEmotes().catch(function (reason) {})
-  this.fetcher.fetchBTTVEmotes().catch(function (reason) {})
-  this.fetcher.fetchFFZEmotes().catch(function (reason) {})
-  this.fetcher.fetchFFZEmotes(config.settings.broadcaster_username).catch(function (reason) {})
-  this.fetcher.fetchBTTVEmotes(config.settings.broadcaster_username).catch(function (reason) {})
-  this.fetcher.fetchTwitchEmotes(config.settings.broadcaster_username).catch(function (reason) {})
-
-  global.parser.registerParser(this, 'emotes', this.containsEmotes, constants.VIEWERS)
-
   global.configuration.register('OEmotesSize', 'overlay.emotes.settings.OEmotesSize', 'number', 0)
   global.configuration.register('OEmotesMax', 'overlay.emotes.settings.OEmotesMax', 'number', 5)
   global.configuration.register('OEmotesAnimation', 'overlay.emotes.settings.OEmotesAnimation', 'string', 'fadeup')
   global.configuration.register('OEmotesAnimationTime', 'overlay.emotes.settings.OEmotesAnimationTime', 'number', 4000)
 
-  global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
-  global.panel.socketListening(this, 'emote.testExplosion', this._testExplosion)
-  global.panel.socketListening(this, 'emote.test', this._test)
+  if (cluster.isMaster) {
+    global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
+    global.panel.socketListening(this, 'emote.testExplosion', this._testExplosion)
+    global.panel.socketListening(this, 'emote.test', this._test)
+
+    // major bottleneck on worker
+    this.fetcher = new EmoteFetcher()
+    this.fetcher.fetchTwitchEmotes().catch(function (reason) {})
+    this.fetcher.fetchBTTVEmotes().catch(function (reason) {})
+    this.fetcher.fetchFFZEmotes().catch(function (reason) {})
+    this.fetcher.fetchFFZEmotes(config.settings.broadcaster_username).catch(function (reason) {})
+    this.fetcher.fetchBTTVEmotes(config.settings.broadcaster_username).catch(function (reason) {})
+    this.fetcher.fetchTwitchEmotes(config.settings.broadcaster_username).catch(function (reason) {})
+
+    cluster.on('message', (worker, data) => {
+      if (data.type !== 'emotes') return
+      if (data.fnc === 'emitEmote') global.panel.io.emit('emote', data.emote)
+    })
+  }
+}
+
+Emotes.prototype.parsers = function () {
+  return [
+    {this: this, name: 'emotes', fnc: this.containsEmotes, permission: constants.VIEWERS, priority: constants.LOW, fireAndForget: true}
+  ]
 }
 
 Emotes.prototype._testExplosion = async function (self, socket) {
@@ -51,7 +64,7 @@ Emotes.prototype._testExplosion = async function (self, socket) {
 }
 
 Emotes.prototype._test = async function (self, socket) {
-  let OEmotesSize = global.configuration.getValue('OEmotesSize')
+  let OEmotesSize = await global.configuration.getValue('OEmotesSize')
   socket.emit('emote', 'https://static-cdn.jtvnw.net/emoticons/v1/9/' + (OEmotesSize + 1) + '.0')
 }
 
@@ -60,17 +73,15 @@ Emotes.prototype.explode = async function (self, socket, data) {
   socket.emit('emote.explode', emotes)
 }
 
-Emotes.prototype.containsEmotes = async function (self, id, sender, text) {
-  global.updateQueue(id, true)
-
-  let OEmotesMax = global.configuration.getValue('OEmotesMax')
-  let OEmotesSize = global.configuration.getValue('OEmotesSize')
+Emotes.prototype.containsEmotes = async function (self, sender, text) {
+  let OEmotesMax = await global.configuration.getValue('OEmotesMax')
+  let OEmotesSize = await global.configuration.getValue('OEmotesSize')
 
   _.each(sender.emotes, function (v, emote) {
     let limit = 0
     _.each(v, function () {
       if (limit === OEmotesMax) return false
-      global.panel.io.emit('emote', 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote + '/' + (OEmotesSize + 1) + '.0')
+      process.send({ type: 'emotes', fnc: 'emitEmote', emote: 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote + '/' + (OEmotesSize + 1) + '.0' })
       limit++
     })
   })
@@ -87,10 +98,11 @@ Emotes.prototype.containsEmotes = async function (self, id, sender, text) {
     // we don't want to output error when BTTV emotes doesn't exist
     return true
   }
+  return true
 }
 
 Emotes.prototype.parseEmotes = async function (self, emotes) {
-  let OEmotesSize = global.configuration.getValue('OEmotesSize')
+  let OEmotesSize = await global.configuration.getValue('OEmotesSize')
   let emotesArray = []
 
   for (var i = 0; i < emotes.length; i++) {

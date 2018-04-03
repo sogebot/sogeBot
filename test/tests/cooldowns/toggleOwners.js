@@ -1,69 +1,45 @@
 /* global describe it beforeEach */
+if (require('cluster').isWorker) process.exit()
 
 require('../../general.js')
 
-const _ = require('lodash')
-const sinon = require('sinon')
-const until = require('test-until')
+const assert = require('chai').assert
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
-const tmi = require('../../general.js').tmi
 
 // users
 const owner = { username: 'soge__' }
 
 describe('Cooldowns - toggleOwners()', () => {
   beforeEach(async () => {
-    await tmi.waitForConnection()
-    global.commons.sendMessage.reset()
     await db.cleanup()
-    if (_.isFunction(global.updateQueue.restore)) global.updateQueue.restore()
+    await message.prepare()
   })
 
   it('incorrect toggle', async () => {
     let [command, type, seconds, quiet] = ['!me', 'user', '60', true]
     global.systems.cooldown.set(global.systems.cooldown, owner, `${command} ${type} ${seconds} ${quiet}`)
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds })
+    await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
     global.systems.cooldown.toggleOwners(global.systems.cooldown, owner, command)
-    await message.isSent('cooldowns.cooldown-parse-failed', owner)
+    await message.isSent('cooldowns.cooldown-parse-failed', owner, { sender: owner.username })
   })
 
   it('correct toggle', async () => {
-    var spy = sinon.spy(global, 'updateQueue')
     let [command, type, seconds, quiet] = ['!me', 'user', '60', true]
     global.systems.cooldown.set(global.systems.cooldown, owner, `${command} ${type} ${seconds} ${quiet}`)
-    await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds })
+    await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
     global.systems.cooldown.toggleOwners(global.systems.cooldown, owner, `${command} ${type}`)
-    await message.isSent('cooldowns.cooldown-was-enabled-for-owners', owner, { command: command })
-    global.parser.parse(owner, '!me')
-    await until(() => {
-      if (spy.called) {
-        let isTrue = true
-        for (let args of spy.args) {
-          if (!args[1]) isTrue = false
-        }
-        return isTrue
-      }
-      return false
-    }, 5000)
-    spy.reset()
+    await message.isSent('cooldowns.cooldown-was-enabled-for-owners', owner, { command: command, sender: owner.username })
 
-    global.parser.parse(owner, '!me')
-    await until(() => {
-      if (spy.called) {
-        let isFalse = false
-        for (let args of spy.args) {
-          if (!args[1]) isFalse = true
-        }
-        return isFalse
-      }
-      return false
-    }, 5000)
+    let isOk = await global.systems.cooldown.check(global.systems.cooldown, owner, '!me')
+    assert.isTrue(isOk)
+    isOk = await global.systems.cooldown.check(global.systems.cooldown, owner, '!me')
+    assert.isFalse(isOk)
 
     global.systems.cooldown.toggleOwners(global.systems.cooldown, owner, `${command} ${type}`)
-    await message.isSent('cooldowns.cooldown-was-disabled-for-owners', owner, { command: command })
+    await message.isSent('cooldowns.cooldown-was-disabled-for-owners', owner, { command: command, sender: owner.username })
   })
 })

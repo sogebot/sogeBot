@@ -120,7 +120,8 @@
     },
 
     toggleLocked: function (el) {
-      socket.emit('queue.setLocked', !this.locked)
+      this.locked = !this.locked
+      socket.emit('queue.setLocked', this.locked)
       this.html.locked()
     },
 

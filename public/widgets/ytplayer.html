@@ -93,7 +93,7 @@
     $('#volumeSliderContainer').empty().append(vol)
     $('#volumeSlider').bootstrapSlider({
       reversed: true,
-      value: data.songs_volume,
+      value: data.volume,
       formatter: function (value) {
         return value + '%';
       }

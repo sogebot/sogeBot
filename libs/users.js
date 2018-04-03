@@ -1,26 +1,35 @@
 'use strict'
 
 var _ = require('lodash')
-var moment = require('moment')
 var constants = require('./constants')
-const snekfetch = require('snekfetch')
 const XRegExp = require('xregexp')
+const cluster = require('cluster')
 
 const config = require('../config.json')
 const debug = require('debug')('users')
 
 function Users () {
-  this.rate_limit_follower_check = []
-  this.rate_limit_subscriber_check = []
+  if (cluster.isMaster) {
+    this.panel()
+  }
 
-  global.parser.register(this, '!regular add', this.addRegular, constants.OWNER_ONLY)
-  global.parser.register(this, '!regular remove', this.rmRegular, constants.OWNER_ONLY)
-  global.parser.register(this, '!merge', this.merge, constants.MODS)
+  // set all users offline on start
+  this.setAll({ is: { online: false } })
+}
 
-  /* ignore commands */
-  global.parser.register(this, '!ignore add', this.ignoreAdd, constants.OWNER_ONLY)
-  global.parser.register(this, '!ignore rm', this.ignoreRm, constants.OWNER_ONLY)
-  global.parser.register(this, '!ignore check', this.ignoreCheck, constants.OWNER_ONLY)
+Users.prototype.commands = function () {
+  return [
+    {this: this, command: '!regular add', fnc: this.addRegular, permission: constants.OWNER_ONLY},
+    {this: this, command: '!regular remove', fnc: this.rmRegular, permission: constants.OWNER_ONLY},
+    {this: this, command: '!merge', fnc: this.merge, permission: constants.MODS},
+    {this: this, command: '!ignore add', fnc: this.ignoreAdd, permission: constants.OWNER_ONLY},
+    {this: this, command: '!ignore rm', fnc: this.ignoreRm, permission: constants.OWNER_ONLY},
+    {this: this, command: '!ignore check', fnc: this.ignoreCheck, permission: constants.OWNER_ONLY}
+  ]
+}
+
+Users.prototype.panel = function () {
+  if (_.isNil(global.panel)) return setTimeout(() => this.panel(), 10)
 
   global.panel.addMenu({category: 'manage', name: 'viewers', id: 'viewers'})
   global.panel.socketListening(this, 'getViewers', this.getViewers)
@@ -30,17 +39,6 @@ function Users () {
   global.panel.socketListening(this, 'resetWatchTime', this.resetWatchTime)
 
   this.sockets()
-
-  // set all users offline on start
-  this.setAll({ is: { online: false } })
-
-  setInterval(async () => {
-    // we are in bounds of safe rate limit, wait until limit is refreshed
-    if (this.rate_limit_follower_check.length > 0 && !_.isNil(global.overlays)) {
-      this.rate_limit_follower_check = _.uniq(this.rate_limit_follower_check)
-      this.isFollowerUpdate(this.rate_limit_follower_check.shift())
-    }
-  }, 1000) // run follower ONE request every 1 second
 }
 
 Users.prototype.sockets = function (self) {
@@ -132,12 +130,12 @@ Users.prototype.getViewers = async function (self, socket) {
     let tipsOfViewer = _.filter(tips, (o) => o.username === viewer.username)
     if (!_.isEmpty(tipsOfViewer)) {
       let tipsAmount = 0
-      for (let tip of tipsOfViewer) tipsAmount += global.currency.exchange(tip.amount, tip.currency, global.configuration.getValue('currency'))
+      for (let tip of tipsOfViewer) tipsAmount += global.currency.exchange(tip.amount, tip.currency, await global.configuration.getValue('currency'))
       _.set(viewer, 'stats.tips', tipsAmount)
     } else {
       _.set(viewer, 'stats.tips', 0)
     }
-    _.set(viewer, 'custom.currency', global.currency.symbol(global.configuration.getValue('currency')))
+    _.set(viewer, 'custom.currency', global.currency.symbol(await global.configuration.getValue('currency')))
 
     // BITS
     let bitsOfViewer = _.filter(bits, (o) => o.username === viewer.username)
@@ -212,25 +210,16 @@ Users.prototype.get = async function (username) {
   user.stats = _.get(user, 'stats', {})
   user.custom = _.get(user, 'custom', {})
 
-  if (!_.isNil(user._id)) user._id = user._id.toString() // force retype _id
-  if (_.isNil(user.time.created_at) && !_.isNil(user.id)) this.fetchAccountAge(this, username, user.id)
-
+  try {
+    if (!_.isNil(user._id)) user._id = user._id.toString() // force retype _id
+    if (_.isNil(user.time.created_at) && !_.isNil(user.id)) { // this is accessing master (in points) and worker
+      if (cluster.isMaster) global.api.fetchAccountAge(username, user.id)
+      else process.send({type: 'api', fnc: 'fetchAccountAge', username: username, id: user.id})
+    }
+  } catch (e) {
+    global.log.error(e.stack)
+  }
   return user
-}
-
-Users.prototype.fetchAccountAge = function (self, username, id) {
-  global.client.api({
-    url: 'https://api.twitch.tv/kraken/users/' + id,
-    headers: {
-      Accept: 'application/vnd.twitchtv.v5+json',
-      'Client-ID': config.settings.client_id
-    }
-  }, function (err, res, body) {
-    if (err) { return }
-    if (res.statusCode === 200) {
-      self.set(username, { time: { created_at: moment(body.created_at).format('X') * 1000 } })
-    }
-  })
 }
 
 Users.prototype.getAll = async function (object) {
@@ -302,73 +291,6 @@ Users.prototype.setAll = async function (object) {
 
 Users.prototype.delete = function (username) {
   global.db.engine.remove('users', { username: username })
-}
-
-Users.prototype.isFollower = async function (username) {
-  let user = await global.users.get(username)
-  if (new Date().getTime() - user.time.followCheck < 1000 * 60 * 30) { // check can be performed _only_ every 30 minutes
-    return
-  }
-
-  global.users.rate_limit_follower_check.push(username)
-}
-
-Users.prototype.isFollowerUpdate = async function (username) {
-  const d = require('debug')('users:isFollowerUpdate')
-
-  if ((global.twitch.remainingAPICalls <= 10 && global.twitch.refreshAPICalls > _.now() / 1000)) {
-    d('Skip for rate-limit to refresh and re-add user to queue')
-    global.users.rate_limit_follower_check.push(username)
-    return
-  }
-
-  if (username === config.settings.broadcaster_username || username === config.settings.bot_username) {
-    // skip if bot or broadcaster
-    d('IsFollowerUpdate SKIP for user %s', username)
-    return
-  }
-
-  let user = await global.users.get(username)
-  if (_.isNil(user.id)) return // skip check if ID doesn't exist
-
-  const url = `https://api.twitch.tv/helix/users/follows?from_id=${user.id}&to_id=${global.channelId}`
-  try {
-    d('IsFollowerUpdate check for user %s', username)
-    var request = await snekfetch.get(url)
-      .set('Accept', 'application/vnd.twitchtv.v5+json')
-      .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
-      .set('Client-ID', config.settings.client_id)
-    global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
-    d('Request done: %j', request.body)
-  } catch (e) {
-    global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
-    global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: global.twitch.remainingAPICalls })
-    return
-  }
-
-  global.twitch.remainingAPICalls = request.headers['ratelimit-remaining']
-  global.twitch.refreshAPICalls = request.headers['ratelimit-reset']
-
-  if (request.body.total === 0) {
-    // not a follower
-    // if was follower, fire unfollow event
-    if (user.is.follower) {
-      global.log.unfollow(username)
-      global.events.fire('unfollow', { username: username })
-    }
-    global.users.set(username, { is: { follower: false }, time: { followCheck: new Date().getTime(), follow: 0 } }, user.is.follower)
-  } else {
-    // is follower
-    if (!user.is.follower && new Date().getTime() - moment(request.body.data[0].followed_at).format('x') < 60000 * 60) {
-      global.overlays.eventlist.add({
-        type: 'follow',
-        username: username
-      })
-      global.log.follow(username)
-      global.events.fire('follow', { username: username })
-    }
-    global.users.set(username, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(request.body.data[0].followed_at).format('x'), 10) } }, !user.is.follower)
-  }
 }
 
 module.exports = Users

@@ -1,15 +1,12 @@
 'use strict'
 
 // 3rdparty libraries
-var _ = require('lodash')
-
-// bot libraries
-var constants = require('../constants')
+const _ = require('lodash')
+const constants = require('../constants.js')
+const cluster = require('cluster')
+const Message = require('../message')
 
 function Alerts () {
-  global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
-  global.parser.register(this, '!alert', this.overlay, constants.OWNER_ONLY)
-
   global.configuration.register('replayPosition', 'core.no-response', 'string', 'right')
   global.configuration.register('replayOffsetX', 'core.no-response', 'number', '-50')
   global.configuration.register('replayOffsetY', 'core.no-response', 'number', '-300')
@@ -18,7 +15,21 @@ function Alerts () {
   global.configuration.register('replayFilter', 'core.no-response', 'string', 'none')
   global.configuration.register('replayLabel', 'core.no-response-bool', 'bool', true)
 
-  global.panel.socketListening(this, 'replay-video', this.replay)
+  if (cluster.isMaster) {
+    global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
+    global.panel.socketListening(this, 'replay-video', this.replay)
+
+    cluster.on('message', (worker, d) => {
+      if (d.type !== 'alert') return
+      this[d.fnc](this, d.sender, d.text)
+    })
+  }
+}
+
+Alerts.prototype.commands = function () {
+  return [
+    {this: this, command: '!alert', fnc: this.overlay, permission: constants.OWNER_ONLY}
+  ]
 }
 
 Alerts.prototype.replay = function (self, socket, data) {
@@ -38,7 +49,11 @@ Alerts.prototype.replay = function (self, socket, data) {
 }
 
 Alerts.prototype.overlay = async function (self, sender, text) {
-  text = await global.parser.parseMessage(text)
+  text = await new Message(text).parse()
+  if (cluster.isWorker) {
+    return process.send({ type: 'alert', fnc: 'overlay', sender: sender, text: text })
+  }
+
   let send = []
   let objectString = text.trim().split(' | ')
   _.each(objectString, function (o) {

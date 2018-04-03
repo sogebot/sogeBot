@@ -9,6 +9,7 @@ var _ = require('lodash')
 var logDir = './logs'
 var moment = require('moment')
 const glob = require('glob')
+const cluster = require('cluster')
 
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir)
 
@@ -29,47 +30,82 @@ const levels = {
   ban: 8,
   warning: 11,
   info: 12,
-  debug: 13
+  debug: 13,
+  process: 99999
 }
 
-global.log = winston.createLogger({
-  exitOnError: true,
-  json: false,
-  levels: levels,
-  level: 'debug',
-  format: format.combine(
-    format.timestamp(),
-    format.printf(info => {
-      let level
-      if (info.level === 'error') level = '!!! ERROR !!!'
-      if (info.level === 'debug') level = 'DEBUG:'
-      if (info.level === 'chatIn') level = '<<<'
-      if (info.level === 'chatOut') level = '>>>'
-      if (info.level === 'whisperIn') level = '<w<'
-      if (info.level === 'whisperOut') level = '>w>'
-      if (info.level === 'info') level = '|'
-      if (info.level === 'warning') level = '|!'
-      if (info.level === 'timeout') level = '+timeout'
-      if (info.level === 'ban') level = '+ban'
-      if (info.level === 'follow') level = '+follow'
-      if (info.level === 'host') level = '+host'
-      if (info.level === 'unfollow') level = '-follow'
-      if (info.level === 'cheer') level = '+cheer'
-      if (info.level === 'sub') level = '+sub'
-      if (info.level === 'subgift') level = '+subgift'
-      if (info.level === 'resub') level = '+resub'
-      return `${info.timestamp} ${level} ${info.message} ${info.username ? `[${info.username}]` : ``}`
-    })
-  ),
-  exceptionHandlers: [
-    new winston.transports.File({ filename: logDir + '/exceptions.log', colorize: false, maxsize: 5242880 }),
-    new winston.transports.Console()
-  ],
-  transports: [
-    new winston.transports.File({ filename: logDir + '/sogebot.log', colorize: false, maxsize: 5242880, maxFiles: 5 }),
-    new winston.transports.Console()
-  ]
-})
+if (cluster.isWorker) {
+  global.log = {}
+  for (let level of Object.entries(levels)) {
+    global.log[level[0]] = function (message, params) {
+      process.send({ type: 'log', level: level[0], message: message, params: params })
+    }
+  }
+  /*
+  global.log = {
+    info: function (message) {
+      process.send({ type: 'log', level: 'info', message: message })
+    },
+    error: function (message) {
+      process.send({ type: 'log', level: 'error', message: message })
+    },
+    chatIn: function (message, params) {
+      process.send({ type: 'log', level: 'chatIn', message: message, params: params })
+    },
+    chatOut: function (message, params) {
+      process.send({ type: 'log', level: 'chatOut', message: message, params: params })
+    },
+    whisperIn: function (message, params) {
+      process.send({ type: 'log', level: 'whisperIn', message: message, params: params })
+    },
+    whisperOut: function (message, params) {
+      process.send({ type: 'log', level: 'whisperOut', message: message, params: params })
+    },
+    warning: function (message) {
+      process.send({ type: 'log', level: 'warning', message: message })
+    }
+  }
+  */
+} else {
+  global.log = winston.createLogger({
+    exitOnError: true,
+    json: false,
+    levels: levels,
+    level: 'debug',
+    format: format.combine(
+      format.timestamp(),
+      format.printf(info => {
+        let level
+        if (info.level === 'error') level = '!!! ERROR !!!'
+        if (info.level === 'debug') level = 'DEBUG:'
+        if (info.level === 'chatIn') level = '<<<'
+        if (info.level === 'chatOut') level = '>>>'
+        if (info.level === 'whisperIn') level = '<w<'
+        if (info.level === 'whisperOut') level = '>w>'
+        if (info.level === 'info') level = '|'
+        if (info.level === 'warning') level = '|!'
+        if (info.level === 'timeout') level = '+timeout'
+        if (info.level === 'ban') level = '+ban'
+        if (info.level === 'follow') level = '+follow'
+        if (info.level === 'host') level = '+host'
+        if (info.level === 'unfollow') level = '-follow'
+        if (info.level === 'cheer') level = '+cheer'
+        if (info.level === 'sub') level = '+sub'
+        if (info.level === 'subgift') level = '+subgift'
+        if (info.level === 'resub') level = '+resub'
+        return `${info.timestamp} ${level} ${info.message} ${info.username ? `[${info.username}]` : ``}`
+      })
+    ),
+    exceptionHandlers: [
+      new winston.transports.File({ filename: logDir + '/exceptions.log', colorize: false, maxsize: 5242880 }),
+      new winston.transports.Console()
+    ],
+    transports: [
+      new winston.transports.File({ filename: logDir + '/sogebot.log', colorize: false, maxsize: 5242880, maxFiles: 5 }),
+      new winston.transports.Console()
+    ]
+  })
+}
 
 function Logger () {
   this.files = []

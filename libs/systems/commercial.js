@@ -15,11 +15,15 @@ const config = require('../../config')
 
 class Commercial {
   constructor () {
-    if (global.commons.isSystemEnabled(this)) {
-      global.parser.register(this, '!commercial', this.run, constants.OWNER_ONLY)
+    global.commons.isSystemEnabled(this)
+  }
 
-      global.parser.registerHelper('!commercial')
-    }
+  commands () {
+    return !global.commons.isSystemEnabled('commercial')
+      ? []
+      : [
+        { command: '!commercial', fnc: this.run, permission: constants.OWNER_ONLY, isHelper: true, this: this }
+      ]
   }
 
   async run (self, sender, text) {
@@ -39,9 +43,10 @@ class Commercial {
       return
     }
 
+    const cid = await global.cache.channelId()
     // check if duration is correct (30, 60, 90, 120, 150, 180)
     if (_.includes([30, 60, 90, 120, 150, 180], commercial.duration)) {
-      const url = `https://api.twitch.tv/kraken/channels/${global.channelId}/commercial`
+      const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`
       try {
         await snekfetch.post(url, { data: { length: commercial.duration } })
           .set('Content-Type', 'application/json')

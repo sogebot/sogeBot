@@ -18,28 +18,28 @@
   var permissions = {
     update: function (list) {
       $("#Permissions").empty()
-      _.each(_.sortKeysBy(list), function (permission, command) {
+      for (let command of list) {
         $("#Permissions").append('<tr>' +
-          '<td>' + command + '</td>' +
+          '<td>' + command.command + '</td>' +
           '<td>' +
-          '<button onclick="permissions.change(this)" data-command="' + command +
-          '" data-permission="owner" type="button" class="btn ' + (permission === 0 ? 'btn-success' :
+          '<button onclick="permissions.change(this)" data-command="' + command.command +
+          '" data-permission="owner" type="button" class="btn ' + (command.permission === 0 ? 'btn-success' :
             'btn-link') + '" title="Owner">OWNER</button>' +
-          '<button onclick="permissions.change(this)" data-command="' + command +
-          '" data-permission="mods" type="button" class="btn ' + (permission === 2 ? 'btn-primary' :
+          '<button onclick="permissions.change(this)" data-command="' + command.command +
+          '" data-permission="mods" type="button" class="btn ' + (command.permission === 2 ? 'btn-primary' :
             'btn-link') + '" title="Moderator">MOD</button>' +
-          '<button onclick="permissions.change(this)" data-command="' + command +
-          '" data-permission="regular" type="button" class="btn ' + (permission === 3 ? 'btn-info' :
+          '<button onclick="permissions.change(this)" data-command="' + command.command +
+          '" data-permission="regular" type="button" class="btn ' + (command.permission === 3 ? 'btn-info' :
             'btn-link') + '" title="Regulars">REGULAR</button>' +
-          '<button onclick="permissions.change(this)" data-command="' + command +
-          '" data-permission="viewer" type="button" class="btn ' + (permission === 1 ? 'btn-warning' :
+          '<button onclick="permissions.change(this)" data-command="' + command.command +
+          '" data-permission="viewer" type="button" class="btn ' + (command.permission === 1 ? 'btn-warning' :
             'btn-link') + '" title="Viewer">VIEWER</i></button>' +
-          '<button onclick="permissions.change(this)" data-command="' + command +
-          '" data-permission="disable" type="button" class="btn ' + (permission === -1 ? 'btn-danger' :
+          '<button onclick="permissions.change(this)" data-command="' + command.command +
+          '" data-permission="disable" type="button" class="btn ' + (command.permission === -1 ? 'btn-danger' :
             'btn-link') + '" title="Disable">DISABLE</button>' +
           '</td>' +
           '</tr>');
-      })
+      }
     },
     change: function (el) {
       var data = {

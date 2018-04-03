@@ -12,11 +12,6 @@ class Heist {
   constructor () {
     this.collection = 'games.heist'
 
-    this._lastAnnouncedLevel = null
-    this._lastAnnouncedCops = null
-    this._lastAnnouncedHeistInProgress = null
-    this._lastAnnouncedStart = null
-
     this.enabled = true
     this.startedAt = null
     this.lastHeistTimestamp = null
@@ -26,16 +21,55 @@ class Heist {
     this.entryCooldown = 120 // seconds
     this.showMaxUsers = 20
 
-    global.panel.addMenu({category: 'settings', name: 'games', id: 'games'})
-    global.parser.registerParser(this, 'heist', this.run, constants.VIEWERS)
+    if (require('cluster').isMaster) {
+      global.panel.addMenu({category: 'settings', name: 'games', id: 'games'})
 
-    this.status()
-    this.sockets()
+      this.status()
+      this.sockets()
 
-    setTimeout(() => Promise.all([this.levels, this.results]), 5000) // init levels and results
+      setTimeout(() => Promise.all([this.levels, this.results]), 5000) // init levels and results
 
-    // intervals
-    setTimeout(() => this.iCheckFinished(), 10000) // wait for proper config startup
+      // intervals
+      setTimeout(() => this.iCheckFinished(), 10000) // wait for proper config startup
+    }
+  }
+
+  parsers () {
+    return [
+      {this: this, name: 'heist', fnc: this.run, permission: constants.VIEWERS, priority: constants.LOW, fireAndForget: true}
+    ]
+  }
+
+  get _lastAnnouncedLevel () {
+    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne('cache', { key: 'heist_lastAnnouncedLevel' }), 'value', -15)))
+  }
+
+  set _lastAnnouncedLevel (v) {
+    global.db.engine.update('cache', { key: 'heist_lastAnnouncedLevel' }, { value: v })
+  }
+
+  get _lastAnnouncedCops () {
+    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne('cache', { key: 'heist_lastAnnouncedCops' }), 'value', null)))
+  }
+
+  set _lastAnnouncedCops (v) {
+    global.db.engine.update('cache', { key: 'heist_lastAnnouncedCops' }, { value: v })
+  }
+
+  get _lastAnnouncedHeistInProgress () {
+    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne('cache', { key: 'heist_lastAnnouncedHeistInProgress' }), 'value', null)))
+  }
+
+  set _lastAnnouncedHeistInProgress (v) {
+    global.db.engine.update('cache', { key: 'heist_lastAnnouncedHeistInProgress' }, { value: v })
+  }
+
+  get _lastAnnouncedStart () {
+    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne('cache', { key: 'heist_lastAnnouncedStart' }), 'value', null)))
+  }
+
+  set _lastAnnouncedStart (v) {
+    global.db.engine.update('cache', { key: 'heist_lastAnnouncedStart' }, { value: v })
   }
 
   get andXMore () { return global.translate('games.heist.andXMore') }
@@ -267,7 +301,7 @@ class Heist {
       let level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers)) // find appropriate level or max level
 
       if (users.length === 0) {
-        global.commons.sendMessage(outcomes.noUser, global.parser.getOwner())
+        global.commons.sendMessage(outcomes.noUser, global.commons.getOwner())
         // cleanup
         await global.db.engine.remove(this.collection, { key: 'startedAt' })
         await global.db.engine.remove(`${this.collection}.users`, {})
@@ -275,7 +309,7 @@ class Heist {
         return
       }
 
-      global.commons.sendMessage(started.replace('$bank', level.name), global.parser.getOwner())
+      global.commons.sendMessage(started.replace('$bank', level.name), global.commons.getOwner())
 
       d('Closing heist ----------')
       d('Users: %s', users.length)
@@ -286,7 +320,7 @@ class Heist {
         let isSurvivor = _.random(0, 100, false) <= level['win%']
         let user = users[0]
         let outcome = isSurvivor ? outcomes.singleUserSuccess : outcomes.singleUserFailed
-        setTimeout(() => { global.commons.sendMessage(outcome.replace('$user', (global.configuration.getValue('atUsername') ? '@' : '') + user.username), global.parser.getOwner()) }, 5000)
+        setTimeout(() => { global.commons.sendMessage(outcome.replace('$user', (global.configuration.getValue('atUsername') ? '@' : '') + user.username), global.commons.getOwner()) }, 5000)
 
         if (isSurvivor) {
           // add points to user
@@ -306,7 +340,7 @@ class Heist {
         let percentage = (100 / users.length) * winners.length
         let ordered = _.orderBy(results, [(o) => parseInt(o.percentage)], 'asc')
         let result = _.find(ordered, (o) => o.percentage >= percentage)
-        setTimeout(() => { global.commons.sendMessage(_.isNil(result) ? '' : result.message, global.parser.getOwner()) }, 5000)
+        setTimeout(() => { global.commons.sendMessage(_.isNil(result) ? '' : result.message, global.commons.getOwner()) }, 5000)
         if (winners.length > 0) {
           setTimeout(async () => {
             winners = _.chunk(winners, await this.get('showMaxUsers'))
@@ -315,7 +349,7 @@ class Heist {
 
             let message = outcomes.results.replace('$users', winnersList.map((o) => (global.configuration.getValue('atUsername') ? '@' : '') + o).join(', '))
             if (andXMore > 0) message = message + ' ' + (await this.get('andXMore')).replace('$count', andXMore)
-            global.commons.sendMessage(message, global.parser.getOwner())
+            global.commons.sendMessage(message, global.commons.getOwner())
           }, 5500)
         }
       }
@@ -331,7 +365,7 @@ class Heist {
     // check if cops done patrolling
     if (!_.isNil(lastHeistTimestamp) && _.now() - lastHeistTimestamp >= copsCooldown * 60000) {
       await global.db.engine.remove(this.collection, { key: 'lastHeistTimestamp' })
-      global.commons.sendMessage((await this.get('copsCooldownMessage')), global.parser.getOwner())
+      global.commons.sendMessage((await this.get('copsCooldownMessage')), global.commons.getOwner())
     }
     setTimeout(() => this.iCheckFinished(), 10000)
   }
@@ -360,11 +394,9 @@ class Heist {
     return this.status()
   }
 
-  async run (self, id, sender, message) {
+  async run (self, sender, message) {
     const d = debug('heist:run')
     const expects = new Expects()
-
-    global.updateQueue(id, true)
 
     if (!global.commons.isSystemEnabled('points')) return // is points system enabled?
 
@@ -386,7 +418,7 @@ class Heist {
     if (_.now() - lastHeistTimestamp < copsCooldown * 60000) {
       d('Minutes left: %s', copsCooldown - (_.now() - lastHeistTimestamp) / 60000)
       let minutesLeft = Number.parseFloat(copsCooldown - (_.now() - lastHeistTimestamp) / 60000).toFixed(1)
-      if (_.now() - self._lastAnnouncedCops >= 60000) {
+      if (_.now() - (await self._lastAnnouncedCops) >= 60000) {
         self._lastAnnouncedCops = _.now()
         global.commons.sendMessage(
           (await self.get('copsOnPatrol'))
@@ -400,14 +432,14 @@ class Heist {
       newHeist = true
       startedAt = _.now() // set startedAt
       await global.db.engine.update(self.collection, { key: 'startedAt' }, { value: startedAt })
-      if (_.now() - self._lastAnnouncedStart >= 60000) {
+      if (_.now() - (await self._lastAnnouncedStart) >= 60000) {
         self._lastAnnouncedStart = _.now()
         global.commons.sendMessage(await self.get('entryMessage'), sender)
       }
     }
 
     // is heist in progress?
-    if (_.now() - startedAt > entryCooldown * 1000 && _.now() - self._lastAnnouncedHeistInProgress >= 60000) {
+    if (_.now() - startedAt > entryCooldown * 1000 && _.now() - (await self._lastAnnouncedHeistInProgress) >= 60000) {
       self._lastAnnouncedHeistInProgress = _.now()
       global.commons.sendMessage(
         (await self.get('lateEntryMessage')).replace('$command', command), sender)
@@ -448,7 +480,7 @@ class Heist {
     let level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers))
     let nextLevel = _.find(levels, (o) => o.maxUsers > level.maxUsers)
 
-    if (self._lastAnnouncedLevel !== level.name) {
+    if (await self._lastAnnouncedLevel !== level.name) {
       self._lastAnnouncedLevel = level.name
       global.commons.sendMessage(level.message
         .replace('$bank', level.name)

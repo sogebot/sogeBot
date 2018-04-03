@@ -3,25 +3,24 @@
 require('../../general.js')
 
 const db = require('../../general.js').db
-const tmi = require('../../general.js').tmi
+const message = require('../../general.js').message
 
 const assert = require('chai').assert
 
 const owner = { username: 'soge__' }
 const notOwner = { username: 'testuser' }
 
-describe('lib/parser - isOwner()', () => {
+describe('lib/commons - isOwner()', () => {
   before(async () => {
-    await tmi.waitForConnection()
-    global.commons.sendMessage.reset()
     await db.cleanup()
+    await message.prepare()
   })
 
   it('should be returned as owner', async () => {
-    assert.isTrue(global.parser.isOwner(owner))
+    assert.isTrue(global.commons.isOwner(owner))
   })
 
   it('should not be returned as owner', async () => {
-    assert.isFalse(global.parser.isOwner(notOwner))
+    assert.isFalse(global.commons.isOwner(notOwner))
   })
 })

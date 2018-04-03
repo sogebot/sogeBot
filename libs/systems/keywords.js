@@ -7,6 +7,7 @@ const XRegExp = require('xregexp')
 
 // bot libraries
 var constants = require('../constants')
+const Message = require('../message')
 
 /*
  * !keyword                      - gets an info about keyword usage
@@ -19,18 +20,7 @@ var constants = require('../constants')
 
 class Keywords {
   constructor () {
-    if (global.commons.isSystemEnabled(this)) {
-      global.parser.register(this, '!keyword add', this.add, constants.OWNER_ONLY)
-      global.parser.register(this, '!keyword edit', this.edit, constants.OWNER_ONLY)
-      global.parser.register(this, '!keyword list', this.list, constants.OWNER_ONLY)
-      global.parser.register(this, '!keyword remove', this.remove, constants.OWNER_ONLY)
-      global.parser.register(this, '!keyword toggle', this.toggle, constants.OWNER_ONLY)
-      global.parser.register(this, '!keyword', this.help, constants.OWNER_ONLY)
-
-      global.parser.registerHelper('!keyword')
-
-      global.parser.registerParser(this, 'keywords', this.run, constants.VIEWERS)
-
+    if (global.commons.isSystemEnabled(this) && require('cluster').isMaster) {
       global.panel.addMenu({category: 'manage', name: 'keywords', id: 'keywords'})
       global.panel.registerSockets({
         self: this,
@@ -38,6 +28,25 @@ class Keywords {
         finally: this.send
       })
     }
+  }
+
+  commands () {
+    return !global.commons.isSystemEnabled('keywords')
+      ? []
+      : [
+        {this: this, command: '!keyword add', fnc: this.add, permission: constants.OWNER_ONLY},
+        {this: this, command: '!keyword edit', fnc: this.edit, permission: constants.OWNER_ONLY},
+        {this: this, command: '!keyword list', fnc: this.list, permission: constants.OWNER_ONLY},
+        {this: this, command: '!keyword remove', fnc: this.remove, permission: constants.OWNER_ONLY},
+        {this: this, command: '!keyword toggle', fnc: this.toggle, permission: constants.OWNER_ONLY},
+        {this: this, command: '!keyword', fnc: this.help, permission: constants.OWNER_ONLY}
+      ]
+  }
+
+  parsers () {
+    return [
+      {this: this, name: 'keywords', fnc: this.run, permission: constants.VIEWERS, priority: constants.LOW}
+    ]
   }
 
   async edit (self, sender, text) {
@@ -104,17 +113,17 @@ class Keywords {
     debug(message); global.commons.sendMessage(message, sender)
   }
 
-  async run (self, id, sender, text) {
+  async run (self, sender, text) {
     let keywords = await global.db.engine.find('keywords')
     keywords = _.filter(keywords, function (o) {
       return text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
     })
     for (let keyword of keywords) {
       if (!keyword.enabled) continue
-      let message = await global.parser.parseMessage(keyword.response, { sender: sender })
+      let message = await new Message(keyword.response).parse({ sender: sender })
       global.commons.sendMessage(message, sender)
     }
-    global.updateQueue(id, true)
+    return true
   }
 
   async list (self, sender) {

@@ -1,9 +1,10 @@
 const debug = require('debug')
 const _ = require('lodash')
+const Message = require('../message')
 
 class TextOverlay {
   constructor () {
-    this.sockets()
+    if (require('cluster').isMaster) this.sockets()
   }
 
   sockets () {
@@ -23,7 +24,7 @@ class TextOverlay {
             html = html.replace(new RegExp(`\\$_${variable}`, 'g'), value)
           }
         }
-        html = await global.parser.parseMessage(html) // global filters
+        html = await new Message(html).parse()
         callback(html)
       })
     })

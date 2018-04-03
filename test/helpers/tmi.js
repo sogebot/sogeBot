@@ -1,12 +1,13 @@
 
 const sinon = require('sinon')
+const _ = require('lodash')
 
 var connected = false
 
 module.exports = {
   waitForConnection: async function () {
     await new Promise((resolve, reject) => {
-      if (!connected) {
+      if (!connected || _.isNil(global.client)) {
         global.client.on('connected', function (address, port) {
           connected = true
 
