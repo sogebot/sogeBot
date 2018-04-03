@@ -117,7 +117,7 @@ class Webhooks {
     if (_.isEmpty(await global.cache.channelId())) setTimeout(() => this.follower(aEvent), 10) // wait until channelId is set
 
     debug('Follow event received: %j', aEvent)
-    if (parseInt(aEvent.data.to_id, 10) !== parseInt(await global.cache.channelId, 10)) return debug(`This events doesn't belong to this channel`)
+    if (parseInt(aEvent.data.to_id, 10) !== parseInt(await global.cache.channelId(), 10)) return debug(`This events doesn't belong to this channel`)
 
     const fid = aEvent.data.from_id
 

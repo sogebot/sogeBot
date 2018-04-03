@@ -29,7 +29,7 @@ describe('libs/webhooks - follower()', () => {
       await global.webhooks.follower({
         data: {
           from_id: 1,
-          to_id: 190389471
+          to_id: await global.cache.channelId()
         }
       })
     }
