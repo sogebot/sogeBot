@@ -69,7 +69,7 @@ class Cache {
 
   // attribute
   async isOnline (value) {
-    if (value) {
+    if (!_.isNil(value)) {
       // setter
       await global.db.engine.update('cache', { key: 'isOnline' }, {
         value: value
@@ -78,7 +78,7 @@ class Cache {
     } else {
       // getter
       let cache = await global.db.engine.findOne('cache', { key: 'isOnline' })
-      return _.get(cache, 'value', null)
+      return _.get(cache, 'value', false)
     }
   }
 
