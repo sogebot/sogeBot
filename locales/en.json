@@ -534,6 +534,12 @@
       "show": "Show stats",
       "hide": "Hide stats"
     },
+    "permissions_list": {
+      "0": "owner",
+      "1": "viewer",
+      "2": "mod",
+      "3": "regular"
+    },
     "translations": "Custom translations",
     "bot-responses": "Bot responses",
     "duration": "Duration",

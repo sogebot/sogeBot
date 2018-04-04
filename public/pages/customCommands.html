@@ -33,22 +33,12 @@
     new: function () {
       $('#new-command').css('display', 'table-row')
       $('.new-confirm-btn').css('display', 'block')
-
-      $('#new-command [contenteditable=true]:first').off()
-      $('#new-command [contenteditable=true]:first').keyup(function (ev) {
-        var command = $(ev.target).text().trim()
-        if (!command.startsWith('!')) command = '!' + command
-        socket.emit('parser.isRegistered', {
-          emit: 'command.check',
-          command: command
-        })
-      })
     },
     update: function (list) {
       this.list = list
       $("#Commands").empty()
       $("#Commands").append('<tr id="new-command" style="display:none">' +
-        '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">New command</span> <span class="status badge badge-warning">available</span>' +
+        '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;;"><span class="badge badge-default">New command</span></span>' +
         commons.editable({
           text: '',
           id: '_new!',
@@ -79,6 +69,8 @@
           '<span style="cursor: pointer;" class="badge badge-' + (item.visible ? "success" : "danger") +
           '" " data-command="' + item.command + '" onclick="cc.toggleVisibility(this)">' + (item.visible ?
             translations['visible'] : translations['hidden']) + '</span> ' +
+          '<span style="cursor: pointer;" class="badge badge-info' +
+          '" " data-command="' + item.command +'" onclick="cc.togglePermission(this)">' + commons.translate(`permissions_list.${item.permission}`) + '</span> ' +
           '<span style="cursor: pointer;" class="badge badge-' + (item.enabled ? "success" : "danger") +
           '" data-command="' + item.command + '" onclick="cc.toggle(this)">' + (item.enabled ? translations['enabled'] :
             translations['disabled']) + '</span>' +
@@ -115,6 +107,9 @@
     toggle: function (el) {
       socket.emit('customcommands.toggle', `!${el.dataset.command}`)
     },
+    togglePermission: function (el) {
+      socket.emit('customcommands.togglePermission', `!${el.dataset.command}`)
+    },
     toggleVisibility: function (el) {
       socket.emit('customcommands.visible', `!${el.dataset.command}`)
     },
@@ -123,9 +118,9 @@
       var inputs = $('[data-id="_new!"]')
       var data = {
         command: $(inputs[0]).text().replace('!', ''),
-        response: commons.cleanResponseText($(inputs[1]).html())
+        response: commons.cleanResponseText($(inputs[1]).html()),
       }
-      socket.emit('customcommands.add', `!${data.command} ${data.response}`)
+      socket.emit('customcommands.add', `viewer !${data.command} ${data.response}`)
       $('.new-confirm-btn').css('display', 'none')
     }
   }
@@ -136,16 +131,6 @@
 
   socket.on('commands', function (list) {
     cc.update(list)
-  });
-
-  socket.on('command.check', function (data) {
-    if (data.isRegistered) {
-      $('.status').removeClass().addClass('badge badge-danger status')
-      $('.save-button').prop('disabled', true)
-    } else {
-      $('.status').removeClass().addClass('badge badge-success status')
-      $('.save-button').prop('disabled', false)
-    }
   })
 
 </script>

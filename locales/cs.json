@@ -534,6 +534,12 @@
       "show": "Ukázat statistiky",
       "hide": "Skrýt statistiky"
     },
+    "permissions_list": {
+      "0": "owner",
+      "1": "viewer",
+      "2": "mod",
+      "3": "regular"
+    },
     "translations": "Vlastní překlad",
     "bot-responses": "Odpovědi bota",
     "duration": "Trvání",
