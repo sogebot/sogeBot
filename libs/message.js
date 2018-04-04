@@ -326,7 +326,7 @@ class Message {
       } else {
         if (_.isBuffer(response.body)) response.body = JSON.parse(response.body.toString())
         d('API response %s: %o', url, response.body)
-        _.each(rData, function (tag) {
+        for (let tag of rData) {
           let path = response.body
           let ids = tag.replace('(api.', '').replace(')', '').split('.')
           _.each(ids, function (id) {
@@ -338,7 +338,7 @@ class Message {
             }
           })
           this.message = this.message.replace(tag, !_.isNil(path) ? path : global.translate('core.api.not-available'))
-        })
+        }
       }
     }
   }
