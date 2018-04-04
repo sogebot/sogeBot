@@ -65,6 +65,17 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  commands: [{
+    version: '7.0.0',
+    do: async () => {
+      console.info('Migration commands to %s', '7.0.0')
+      let commands = await global.db.engine.find('commands')
+      const constants = require('../libs/constants')
+      for (let command of commands) {
+        await global.db.engine.update('commands', { _id: command._id.toString() }, { permission: constants.VIEWERS })
+      }
+    }
+  }],
   bits: [{
     version: '7.0.0',
     do: async () => {
@@ -77,7 +88,7 @@ let migration = {
           global.db.engine.insert('users.bits', { username: user.username, amount: user.stats.bits, message: 'Migrated from 6.x', timestamp: _.now() })
         ])
         delete user.stats.bits
-        delete user._id
+        delete user._id``
         await global.db.engine.insert('users', user)
       }
     }
