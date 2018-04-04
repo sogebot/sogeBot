@@ -48,9 +48,11 @@ define(
 
 define(
   'ALIAS_REGEXP',
-  XRegExp(`!(?<alias> [\\pL0-9 ]*   ) # alias
-           \\s                        # empty space
-           !(?<command> .*          ) # command`, 'ix')
+  XRegExp(`(?<premission> owner|mod|regular|viewer) # permission
+           \\s                                      # empty space
+           !(?<alias> [\\pL0-9 ]*                 ) # alias
+           \\s                                      # empty space
+           !(?<command> .*                        ) # command`, 'ix')
 )
 
 define(

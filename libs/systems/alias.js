@@ -10,13 +10,13 @@ const Parser = require('../parser')
 const constants = require('../constants')
 
 /*
- * !alias                            - gets an info about alias usage
- * !alias add ![alias] ![cmd]        - add alias for specified command
- * !alias edit ![alias] ![cmd]        - add alias for specified command
- * !alias remove ![alias]            - remove specified alias
- * !alias toggle ![alias]            - enable/disable specified alias
- * !alias toggle-visibility ![alias] - enable/disable specified alias
- * !alias list                       - get alias list
+ * !alias                                               - gets an info about alias usage
+ * !alias add owner|mod|regular|viewer ![alias] ![cmd]  - add alias for specified command
+ * !alias edit owner|mod|regular|viewer ![alias] ![cmd] - add alias for specified command
+ * !alias remove ![alias]                               - remove specified alias
+ * !alias toggle ![alias]                               - enable/disable specified alias
+ * !alias toggle-visibility ![alias]                    - enable/disable specified alias
+ * !alias list                                          - get alias list
  */
 
 class Alias {
@@ -25,7 +25,7 @@ class Alias {
       global.panel.addMenu({category: 'manage', name: 'aliases', id: 'alias'})
       global.panel.registerSockets({
         self: this,
-        expose: ['add', 'remove', 'visible', 'toggle', 'editCommand', 'editAlias', 'send'],
+        expose: ['add', 'remove', 'visible', 'toggle', 'togglePermission', 'editCommand', 'editAlias', 'send'],
         finally: this.send
       })
     }
@@ -87,8 +87,22 @@ class Alias {
 
     d('Running: %s', msg.replace(replace, `!${alias.command}`))
     if (!tryingToBypass) {
-      global.log.process({ type: 'parse', sender: sender, message: msg.replace(replace, `!${alias.command}`) })
-      process.send({ type: 'parse', sender: sender, message: msg.replace(replace, `!${alias.command}`) })
+      debug('Checking if permissions are ok')
+      let [isRegular, isMod, isOwner] = await Promise.all([
+        global.commons.isRegular(sender),
+        global.commons.isMod(sender),
+        global.commons.isOwner(sender)
+      ])
+      debug('isRegular: %s', isRegular)
+      debug('isMod: %s', isMod)
+      debug('isOwner: %s', isOwner)
+      if (alias.permission === constants.VIEWERS ||
+        (alias.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
+        (alias.permission === constants.MODS && (isMod || isOwner)) ||
+        (alias.permission === constants.OWNER_ONLY && isOwner)) {
+        global.log.process({ type: 'parse', sender: sender, message: msg.replace(replace, `!${alias.command}`) })
+        process.send({ type: 'parse', sender: sender, message: msg.replace(replace, `!${alias.command}`) })
+      }
     }
     return true
   }
@@ -117,7 +131,7 @@ class Alias {
   }
 
   help (self, sender) {
-    global.commons.sendMessage(global.translate('core.usage') + ': !alias add <!alias> <!command> | !alias edit <!alias> <!command> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', sender)
+    global.commons.sendMessage(global.translate('core.usage') + ': !alias add owner|mod|regular|viewer <!alias> <!command> | !alias edit owner|mod|regular|viewer <!alias> <!command> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', sender)
   }
 
   async edit (self, sender, text) {
@@ -137,7 +151,20 @@ class Alias {
       return false
     }
 
-    await global.db.engine.update('alias', { alias: match.alias }, { command: match.command })
+    let permission = constants.VIEWERS
+    switch (match.permission) {
+      case 'owner':
+        permission = constants.OWNER_ONLY
+        break
+      case 'mod':
+        permission = constants.MODS
+        break
+      case 'regular':
+        permission = constants.REGULAR
+        break
+    }
+
+    await global.db.engine.update('alias', { alias: match.alias }, { command: match.command, permission: permission })
 
     let message = await global.commons.prepare('alias.alias-was-edited', { alias: match.alias, command: match.command })
     debug(message); global.commons.sendMessage(message, sender)
@@ -153,11 +180,25 @@ class Alias {
       return false
     }
 
+    let permission = constants.VIEWERS
+    switch (match.permission) {
+      case 'owner':
+        permission = constants.OWNER_ONLY
+        break
+      case 'mod':
+        permission = constants.MODS
+        break
+      case 'regular':
+        permission = constants.REGULAR
+        break
+    }
+
     let alias = {
       alias: match.alias,
       command: match.command,
       enabled: true,
-      visible: true
+      visible: true,
+      permission: permission
     }
 
     await global.db.engine.insert('alias', alias)
@@ -170,6 +211,14 @@ class Alias {
     let alias = await global.db.engine.find('alias', { visible: true })
     var output = (alias.length === 0 ? global.translate('alias.list-is-empty') : global.translate('alias.list-is-not-empty').replace(/\$list/g, '!' + (_.map(_.orderBy(alias, 'alias'), 'alias')).join(', !')))
     debug(output); global.commons.sendMessage(output, sender)
+  }
+
+  async togglePermission (self, sender, text) {
+    debug('togglePermission(%j,%j,%j)', self, sender, text)
+    const alias = await global.db.engine.findOne('alias', { alias: text.replace('!', '') })
+    if (!_.isEmpty(alias)) {
+      await global.db.engine.update('alias', { _id: alias._id.toString() }, { permission: alias.permission === 3 ? 0 : ++alias.permission })
+    }
   }
 
   async toggle (self, sender, text) {

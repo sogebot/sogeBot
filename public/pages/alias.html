@@ -33,22 +33,12 @@
     new: function () {
       $('#new-alias').css('display', 'table-row')
       $('.new-confirm-btn').css('display', 'block')
-
-      $('#new-alias [contenteditable=true]:first').off()
-      $('#new-alias [contenteditable=true]:first').keyup(function (ev) {
-        var alias = $(ev.target).text().trim()
-        if (!alias.startsWith('!')) alias = '!' + alias
-        socket.emit('parser.isRegistered', {
-          emit: 'alias.check',
-          command: alias
-        })
-      })
     },
     update: function (list) {
       this.list = list
       $("#Alias").empty()
       $("#Alias").append('<tr id="new-alias" style="display:none">' +
-        '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;"><span class="badge badge-default">New alias</span> <span class="status badge badge-warning">available</span>' +
+        '<td style="vertical-align: top !important; width: 20rem; max-width: 20rem;"><span class="badge badge-default">New alias</span>' +
         commons.editable({
           text: '',
           id: '_new!',
@@ -75,6 +65,8 @@
             fnc: 'alias.editName'
           }) + '</td>' +
           '<td style="vertical-align: top !important;"><span class="badge badge-primary">' + translations['command'] + '</span> ' +
+          '<span style="cursor: pointer;" class="badge badge-info' +
+          '" " data-id="' + item.alias +'" onclick="alias.togglePermission(this)">' + commons.translate(`permissions_list.${item.permission}`) + '</span> ' +
           '<span style="cursor: pointer;" class="badge badge-' + (item.visible ? "success" : "danger") +
           '" " data-id="' + item.alias + '" onclick="alias.toggleVisibility(this)">' + (item.visible ?
             translations['visible'] : translations['hidden']) + '</span> ' +
@@ -113,6 +105,9 @@
     toggle: function (el) {
       socket.emit('alias.toggle', `!${el.dataset.id}`)
     },
+    togglePermission: function (el) {
+      socket.emit('alias.togglePermission', `!${el.dataset.id}`)
+    },
     toggleVisibility: function (el) {
       socket.emit('alias.visible', `!${el.dataset.id}`)
     },
@@ -123,7 +118,7 @@
         alias: $(inputs[0]).text().replace('!', ''),
         command: commons.cleanResponseText($(inputs[1]).html().replace('!', ''))
       }
-      socket.emit('alias.add', `!${data.alias} !${data.command}`)
+      socket.emit('alias.add', `viewer !${data.alias} !${data.command}`)
       $('.new-confirm-btn').css('display', 'none')
     }
   }
@@ -134,16 +129,6 @@
 
   socket.on('alias', function (list) {
     alias.update(list)
-  })
-
-  socket.on('alias.check', function (data) {
-    if (data.isRegistered) {
-      $('.status').removeClass().addClass('badge badge-danger status')
-      $('.save-button').prop('disabled', true)
-    } else {
-      $('.status').removeClass().addClass('badge badge-success status')
-      $('.save-button').prop('disabled', false)
-    }
   })
 
 </script>
