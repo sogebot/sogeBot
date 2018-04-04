@@ -335,6 +335,9 @@
   <script type="text/javascript" src="./dist/js/commons/commons.js"></script>
   <script src="/dist/velocity-animate/js/velocity.min.js"></script>
 
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/js/tempusdominus-bootstrap-4.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/css/tempusdominus-bootstrap-4.min.css" />
+
   <script>
     if (typeof token === 'undefined') {
       $('body').empty().append(`
@@ -362,6 +365,7 @@
     var loadedMenu = false
     var addingWidget = false
     var systems
+    var configuration
 
     var translations = {}
 
@@ -426,6 +430,7 @@
     console.debug('EMIT [getConfiguration]')
     socket.emit('getConfiguration')
     socket.on('configuration', function (data) {
+      configuration = data
       moment.locale(data.lang) // set moment locale
       /* THEME */
       if (data.theme === 'dark') {

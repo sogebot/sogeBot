@@ -69,6 +69,138 @@ Users.prototype.sockets = function (self) {
       const users = await global.db.engine.find('users_ignorelist')
       callback(null, _.orderBy(users, 'username', 'asc'))
     })
+
+    socket.on('save', async (data, cb) => {
+      await global.db.engine.update('users', { username: data.username }, data)
+      cb(null, null)
+    })
+
+    socket.on('delete', async (username, cb) => {
+      await global.db.engine.remove('users', { username: username })
+      await global.db.engine.remove('users.tips', { username: username })
+      await global.db.engine.remove('users.bits', { username: username })
+      cb(null, null)
+    })
+
+    socket.on('users.tips', async (username, cb) => {
+      const tips = await global.db.engine.find('users.tips', { username: username })
+      cb(null, _.orderBy(tips, 'timestamp', 'desc'))
+    })
+
+    socket.on('users.bits', async (username, cb) => {
+      const bits = await global.db.engine.find('users.bits', { username: username })
+      cb(null, _.orderBy(bits, 'timestamp', 'desc'))
+    })
+
+    socket.on('users.bits.add', async (data, cb) => {
+      var errors = {}
+      try {
+        if (parseInt(data.amount, 10) <= 0 || String(data.amount).trim().length === 0) errors.amount = global.translate('ui.errors.this_value_must_be_a_positive_number_and_greater_then_0')
+
+        if (String(data.timestamp).trim().length === 0) errors.message = global.translate('ui.errors.value_cannot_be_empty')
+        else if (parseInt(data.timestamp, 10) <= 0) errors.timestamp = global.translate('ui.errors.this_value_must_be_a_positive_number_and_greater_then_0')
+
+        if (_.size(errors) > 0) throw Error(JSON.stringify(errors))
+
+        await global.db.engine.insert('users.bits', data)
+        cb(null, null)
+      } catch (e) {
+        global.log.warning(e.message)
+        cb(e.message, null)
+      }
+    })
+
+    socket.on('users.bits.update', async (data, cb) => {
+      var errors = {}
+      try {
+        if (parseInt(data.amount, 10) <= 0 || String(data.amount).trim().length === 0) errors.amount = global.translate('ui.errors.this_value_must_be_a_positive_number_and_greater_then_0')
+
+        if (String(data.timestamp).trim().length === 0) errors.message = global.translate('ui.errors.value_cannot_be_empty')
+        else if (parseInt(data.timestamp, 10) <= 0) errors.timestamp = global.translate('ui.errors.this_value_must_be_a_positive_number_and_greater_then_0')
+
+        if (_.size(errors) > 0) throw Error(JSON.stringify(errors))
+
+        const _id = data._id; delete data._id
+        await global.db.engine.update('users.bits', { _id: _id }, data)
+        cb(null, null)
+      } catch (e) {
+        global.log.warning(e.message)
+        cb(e.message, null)
+      }
+    })
+
+    socket.on('users.bits.delete', async (_id, cb) => {
+      try {
+        await global.db.engine.remove('users.bits', { _id: _id })
+        cb(null, null)
+      } catch (e) {
+        global.log.warning(e.message)
+        cb(e.message, null)
+      }
+    })
+
+    socket.on('users.tips.delete', async (_id, cb) => {
+      try {
+        await global.db.engine.remove('users.tips', { _id: _id })
+        cb(null, null)
+      } catch (e) {
+        global.log.warning(e.message)
+        cb(e.message, null)
+      }
+    })
+
+    socket.on('users.tips.add', async (data, cb) => {
+      var errors = {}
+      try {
+        const cash = XRegExp.exec(data.amount, XRegExp(`(?<amount> [0-9.]*)\\s?(?<currency> .*)`, 'ix'))
+
+        if (_.isNil(cash)) errors.amount = global.translate('ui.errors.something_went_wrong')
+        else {
+          if (_.isNil(cash.amount) || parseFloat(cash.amount) <= 0) errors.amount = global.translate('ui.errors.this_value_must_be_a_positive_number_and_greater_then_0')
+          if (_.isNil(cash.currency) || !global.currency.isCodeSupported(cash.currency.toUpperCase())) errors.amount = global.translate('ui.errors.this_currency_is_not_supported')
+        }
+
+        if (String(data.timestamp).trim().length === 0) errors.message = global.translate('ui.errors.value_cannot_be_empty')
+        else if (parseInt(data.timestamp, 10) <= 0) errors.timestamp = global.translate('ui.errors.this_value_must_be_a_positive_number_and_greater_then_0')
+
+        if (_.size(errors) > 0) throw Error(JSON.stringify(errors))
+
+        data.currency = cash.currency.toUpperCase()
+        data.amount = parseFloat(cash.amount)
+        await global.db.engine.insert('users.tips', data)
+        cb(null, null)
+      } catch (e) {
+        global.log.warning(e.message)
+        cb(e.message, null)
+      }
+    })
+
+    socket.on('users.tips.update', async (data, cb) => {
+      var errors = {}
+      try {
+        const cash = XRegExp.exec(data.amount, XRegExp(`(?<amount> [0-9.]*)\\s?(?<currency> .*)`, 'ix'))
+
+        if (_.isNil(cash)) errors.amount = global.translate('ui.errors.something_went_wrong')
+        else {
+          if (_.isNil(cash.amount) || parseFloat(cash.amount) <= 0) errors.amount = global.translate('ui.errors.this_value_must_be_a_positive_number_and_greater_then_0')
+          if (_.isNil(cash.currency) || !global.currency.isCodeSupported(cash.currency.toUpperCase())) errors.amount = global.translate('ui.errors.this_currency_is_not_supported')
+        }
+
+        if (String(data.timestamp).trim().length === 0) errors.message = global.translate('ui.errors.value_cannot_be_empty')
+        else if (parseInt(data.timestamp, 10) <= 0) errors.timestamp = global.translate('ui.errors.this_value_must_be_a_positive_number_and_greater_then_0')
+
+        if (_.size(errors) > 0) throw Error(JSON.stringify(errors))
+
+        data.currency = cash.currency.toUpperCase()
+        data.amount = parseFloat(cash.amount)
+        const _id = data._id; delete data._id
+        await global.db.engine.update('users.tips', { _id: _id }, data)
+        cb(null, null)
+      } catch (e) {
+        global.log.warning(e.message)
+        cb(e.message, null)
+      }
+    })
   })
 }
 
@@ -141,7 +273,7 @@ Users.prototype.getViewers = async function (self, socket) {
     let bitsOfViewer = _.filter(bits, (o) => o.username === viewer.username)
     if (!_.isEmpty(bitsOfViewer)) {
       let bitsAmount = 0
-      for (let bit of bitsOfViewer) bitsAmount += bit.amount
+      for (let bit of bitsOfViewer) bitsAmount += parseInt(bit.amount, 10)
       _.set(viewer, 'stats.bits', bitsAmount)
     } else {
       _.set(viewer, 'stats.bits', 0)

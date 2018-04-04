@@ -1,0 +1,8 @@
+{
+  "this_value_must_be_a_positive_number_and_greater_then_0": "This value must be a positive number or greater then 0",
+  "command_must_start_with_!": "Command must start with !",
+  "this_value_must_be_a_positive_number_or_0": "This value must be a positive number or 0",
+  "value_cannot_be_empty": "Value cannot be empty",
+  "this_currency_is_not_supported": "This currency is not supported",
+  "something_went_wrong": "Something went wrong"
+}

@@ -66,9 +66,9 @@ let updates = async (from, to) => {
 
 let migration = {
   bits: [{
-    version: '6.3.0',
+    version: '7.0.0',
     do: async () => {
-      console.info('Migration bits to %s', '6.3.0')
+      console.info('Migration bits to %s', '7.0.0')
       let users = await global.db.engine.find('users')
       for (let user of users) {
         if (!_.has(user, 'stats.bits') || _.isNil(user.stats.bits)) continue // skip if bits are null/undefined
