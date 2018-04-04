@@ -26,7 +26,7 @@ describe('Custom Commands - toggle()', () => {
   })
 
   it('!a', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!a !uptime')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !a !uptime')
     await message.isSent('customcmds.command-was-added', owner, { command: 'a', sender: owner.username })
 
     global.systems.customCommands.toggle(global.systems.customCommands, owner, '!a')
@@ -37,7 +37,7 @@ describe('Custom Commands - toggle()', () => {
   })
 
   it('!한글', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!한글 !uptime')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !한글 !uptime')
     await message.isSent('customcmds.command-was-added', owner, { command: '한글', sender: owner.username })
 
     global.systems.customCommands.toggle(global.systems.customCommands, owner, '!한글')
@@ -48,7 +48,7 @@ describe('Custom Commands - toggle()', () => {
   })
 
   it('!русский', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!русский !uptime')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !русский !uptime')
     await message.isSent('customcmds.command-was-added', owner, { command: 'русский', sender: owner.username })
 
     global.systems.customCommands.toggle(global.systems.customCommands, owner, '!русский')

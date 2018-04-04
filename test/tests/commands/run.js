@@ -16,7 +16,7 @@ describe('Custom Commands - run()', () => {
   })
 
   it('!a will show Lorem Ipsum', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!a Lorem Ipsum')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !a Lorem Ipsum')
     await message.isSent('customcmds.command-was-added', owner, { command: 'a', response: 'Lorem Ipsum', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!a')
@@ -27,7 +27,7 @@ describe('Custom Commands - run()', () => {
   })
 
   it('!한글 will show Lorem Ipsum', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!한글 Lorem Ipsum')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !한글 Lorem Ipsum')
     await message.isSent('customcmds.command-was-added', owner, { command: '한글', response: 'Lorem Ipsum', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!한글')
@@ -38,7 +38,7 @@ describe('Custom Commands - run()', () => {
   })
 
   it('!русский will show Lorem Ipsum', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!русский Lorem Ipsum')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !русский Lorem Ipsum')
     await message.isSent('customcmds.command-was-added', owner, { command: 'русский', response: 'Lorem Ipsum', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!русский')
