@@ -21,10 +21,10 @@ describe('Custom Commands - list()', () => {
   })
 
   it('populated list', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!a !me')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !a !me')
     await message.isSent('customcmds.command-was-added', owner, { command: 'a', sender: owner.username })
 
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!b !me')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !b !me')
     await message.isSent('customcmds.command-was-added', owner, { command: 'b', sender: owner.username })
 
     global.systems.customCommands.list(global.systems.customCommands, owner, '')

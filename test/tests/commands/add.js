@@ -36,15 +36,15 @@ describe('Custom Commands - add()', () => {
   })
 
   it('2x - !a Lorem Ipsum', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!a Lorem Ipsum')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !a Lorem Ipsum')
     await message.isSent('customcmds.command-was-added', owner, { response: 'Lorem Ipsum', command: 'a', sender: owner.username })
 
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!a me')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !a me')
     await message.isSent('customcmds.command-was-added', owner, { response: 'Lorem Ipsum', command: 'a', sender: owner.username })
   })
 
   it('!cmd this is command response', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!cmd this is command response')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !cmd this is command response')
     await message.isSent('customcmds.command-was-added', owner, { response: 'this is command response', command: 'cmd', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!cmd')
@@ -52,7 +52,7 @@ describe('Custom Commands - add()', () => {
   })
 
   it('!한국어 this is command response', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!한국어 this is command response')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !한국어 this is command response')
     await message.isSent('customcmds.command-was-added', owner, { response: 'this is command response', command: '한국어', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!한국어')
@@ -60,7 +60,7 @@ describe('Custom Commands - add()', () => {
   })
 
   it('!русский this is command response', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!русский this is command response')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !русский this is command response')
     await message.isSent('customcmds.command-was-added', owner, { response: 'this is command response', command: 'русский', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!русский')

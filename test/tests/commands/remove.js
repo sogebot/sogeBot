@@ -31,7 +31,7 @@ describe('Custom Commands - remove()', () => {
   })
 
   it('!a', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!a !me')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !a !me')
     await message.isSent('customcmds.command-was-added', owner, { command: 'a', response: '!me', sender: owner.username })
 
     global.systems.customCommands.remove(global.systems.customCommands, owner, '!a')
@@ -39,7 +39,7 @@ describe('Custom Commands - remove()', () => {
   })
 
   it('!한글', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!한글 !me')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !한글 !me')
     await message.isSent('customcmds.command-was-added', owner, { command: '한글', response: '!me', sender: owner.username })
 
     global.systems.customCommands.remove(global.systems.customCommands, owner, '!한글')
@@ -47,7 +47,7 @@ describe('Custom Commands - remove()', () => {
   })
 
   it('!русский', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!русский !me')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !русский !me')
     await message.isSent('customcmds.command-was-added', owner, { command: 'русский', response: '!me', sender: owner.username })
 
     global.systems.customCommands.remove(global.systems.customCommands, owner, '!русский')
@@ -55,7 +55,7 @@ describe('Custom Commands - remove()', () => {
   })
 
   it('2x - !a !me', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!a !me')
+    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !a !me')
     await message.isSent('customcmds.command-was-added', owner, { command: 'a', response: '!me', sender: owner.username })
 
     global.systems.customCommands.remove(global.systems.customCommands, owner, '!a')
