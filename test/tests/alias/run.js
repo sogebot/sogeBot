@@ -17,7 +17,7 @@ describe('Alias - run()', () => {
   })
 
   it('!a will show !duel', async () => {
-    global.systems.alias.add(global.systems.alias, owner, '!a !duel')
+    global.systems.alias.add(global.systems.alias, owner, 'viewer !a !duel')
     await message.isSent('alias.alias-was-added', owner, { alias: 'a', command: 'duel', sender: owner.username })
 
     global.systems.alias.run(global.systems.alias, owner, '!a')
@@ -30,7 +30,7 @@ describe('Alias - run()', () => {
   })
 
   it('#668 - alias is case insensitive', async () => {
-    global.systems.alias.add(global.systems.alias, owner, '!a !duel')
+    global.systems.alias.add(global.systems.alias, owner, 'viewer !a !duel')
     await message.isSent('alias.alias-was-added', owner, { alias: 'a', command: 'duel', sender: owner.username })
 
     global.systems.alias.run(global.systems.alias, owner, '!A')
@@ -43,7 +43,7 @@ describe('Alias - run()', () => {
   })
 
   it('!a with spaces - will show !duel', async () => {
-    global.systems.alias.add(global.systems.alias, owner, '!a with spaces !duel')
+    global.systems.alias.add(global.systems.alias, owner, 'viewer !a with spaces !duel')
     await message.isSent('alias.alias-was-added', owner, { alias: 'a with spaces', command: 'duel', sender: owner.username })
 
     global.systems.alias.run(global.systems.alias, owner, '!a with spaces')
@@ -56,7 +56,7 @@ describe('Alias - run()', () => {
   })
 
   it('!한국어 - will show !duel', async () => {
-    global.systems.alias.add(global.systems.alias, owner, '!한국어 !duel')
+    global.systems.alias.add(global.systems.alias, owner, 'viewer !한국어 !duel')
     await message.isSent('alias.alias-was-added', owner, { alias: '한국어', command: 'duel', sender: owner.username })
 
     global.systems.alias.run(global.systems.alias, owner, '!한국어')
@@ -69,7 +69,7 @@ describe('Alias - run()', () => {
   })
 
   it('!русский - will show !duel', async () => {
-    global.systems.alias.add(global.systems.alias, owner, '!русский !duel')
+    global.systems.alias.add(global.systems.alias, owner, 'viewer !русский !duel')
     await message.isSent('alias.alias-was-added', owner, { alias: 'русский', command: 'duel', sender: owner.username })
 
     global.systems.alias.run(global.systems.alias, owner, '!русский')

@@ -26,7 +26,7 @@ describe('Alias - toggle()', () => {
   })
 
   it('!a', async () => {
-    global.systems.alias.add(global.systems.alias, owner, '!a !uptime')
+    global.systems.alias.add(global.systems.alias, owner, 'viewer !a !uptime')
     await message.isSent('alias.alias-was-added', owner, { sender: owner.username, alias: 'a', command: 'uptime' })
 
     global.systems.alias.toggle(global.systems.alias, owner, '!a')
@@ -37,7 +37,7 @@ describe('Alias - toggle()', () => {
   })
 
   it('!a with spaces', async () => {
-    global.systems.alias.add(global.systems.alias, owner, '!a with spaces !uptime')
+    global.systems.alias.add(global.systems.alias, owner, 'viewer !a with spaces !uptime')
     await message.isSent('alias.alias-was-added', owner, { sender: owner.username, alias: 'a with spaces', command: 'uptime' })
 
     global.systems.alias.toggle(global.systems.alias, owner, '!a with spaces')
@@ -48,7 +48,7 @@ describe('Alias - toggle()', () => {
   })
 
   it('!한국어', async () => {
-    global.systems.alias.add(global.systems.alias, owner, '!한국어 !uptime')
+    global.systems.alias.add(global.systems.alias, owner, 'viewer !한국어 !uptime')
     await message.isSent('alias.alias-was-added', owner, { sender: owner.username, alias: '한국어', command: 'uptime' })
 
     global.systems.alias.toggle(global.systems.alias, owner, '!한국어')
@@ -59,7 +59,7 @@ describe('Alias - toggle()', () => {
   })
 
   it('!русский', async () => {
-    global.systems.alias.add(global.systems.alias, owner, '!русский !uptime')
+    global.systems.alias.add(global.systems.alias, owner, 'viewer !русский !uptime')
     await message.isSent('alias.alias-was-added', owner, { sender: owner.username, alias: 'русский', command: 'uptime' })
 
     global.systems.alias.toggle(global.systems.alias, owner, '!русский')
