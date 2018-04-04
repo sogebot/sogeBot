@@ -132,6 +132,7 @@ class CustomCommands {
     debug('Command found: %j', command)
     const param = msg.replace(cmdArray.join(' '), '') // remove found command from message to get param
     global.commons.sendMessage(command.response, sender, {'param': param, 'cmd': command.command})
+    return true
   }
 
   async list (self, sender, text) {
