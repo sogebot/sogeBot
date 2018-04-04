@@ -129,9 +129,15 @@ Configuration.prototype.listSets = function (self, sender, text) {
 
 Configuration.prototype.getValue = async function (cfgName) {
   let item = await global.db.engine.findOne('settings', { key: cfgName })
-  if (_.isEmpty(item)) return this.cfgL[cfgName].value // return default value if not saved
-  if (_.includes(['true', 'false'], item.value.toString().toLowerCase())) return item.value.toString().toLowerCase() === 'true'
-  else return item.value
+  try {
+    if (_.isEmpty(item)) return this.cfgL[cfgName].value // return default value if not saved
+    if (_.includes(['true', 'false'], item.value.toString().toLowerCase())) return item.value.toString().toLowerCase() === 'true'
+    else return item.value
+  } catch (e) {
+    global.log.error(`Error when loading ${cfgName} value`)
+    global.log.error(e.stack)
+    return null
+  }
 }
 
 module.exports = Configuration

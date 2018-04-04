@@ -317,27 +317,34 @@ class Moderation {
     var msgLength = whitelisted.trim().length
     var capsLength = 0
 
+    debug('moderation:caps')('emotes - %j', sender['emotes'])
     debug('moderation:caps')('should check caps - %s', isEnabled)
     debug('moderation:caps')('isOwner: %s', global.commons.isOwner(sender))
     debug('moderation:caps')('isMod: %s', isMod)
-    debug('moderation:caps')('msgLength: %s', msgLength)
-    debug('moderation:caps')('triggerLength: %s', triggerLength)
-    if (global.commons.isOwner(sender) || isMod || msgLength < triggerLength || !isEnabled || (sender.subscriber && !isEnabledForSubs)) {
-      return true
-    }
 
     const regexp = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-./:;<=>?@[\]^_`{|}~]/gi
+    whitelisted = whitelisted.trim()
     for (let i = 0; i < whitelisted.length; i++) {
       // if is emote or symbol - continue
       if (_.includes(emotesCharList, i) || !_.isNull(whitelisted.charAt(i).match(regexp))) {
+        debug('moderation:caps')(`Emotes char at position ${i}, ${whitelisted.charAt(i)}`)
         msgLength = parseInt(msgLength, 10) - 1
         continue
+      } else if (!_.isFinite(parseInt(whitelisted.charAt(i), 10)) && whitelisted.charAt(i).toUpperCase() === whitelisted.charAt(i) && whitelisted.charAt(i) !== ' ') {
+        debug('moderation:caps')(`Capped char at position ${i}, ${whitelisted.charAt(i)}`)
+        capsLength += 1
       }
-      if (!_.isFinite(parseInt(whitelisted.charAt(i), 10)) && whitelisted.charAt(i).toUpperCase() === whitelisted.charAt(i) && whitelisted.charAt(i) !== ' ') capsLength += 1
     }
 
+    debug('moderation:caps')('msgLength: %s', msgLength)
+    debug('moderation:caps')('triggerLength: %s', triggerLength)
     debug('moderation:caps')('capped chars: %i', capsLength)
+    debug('moderation:caps')('triggerPercent: %i%', maxCapsPercent)
     debug('moderation:caps')('capped percent: %i%', Math.ceil(capsLength / (msgLength / 100)))
+
+    if (global.commons.isOwner(sender) || isMod || msgLength < triggerLength || !isEnabled || (sender.subscriber && !isEnabledForSubs)) {
+      return true
+    }
     if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
       log.info(sender.username + ' [caps] ' + timeout + 's timeout: ' + text)
       self.timeoutUser(self, sender,
