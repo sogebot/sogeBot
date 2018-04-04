@@ -219,7 +219,7 @@
   </div>
 </div>
 <script>
-  const datepickeropts = {
+  var datepickeropts = {
     icons: {
       time: "far fa-clock",
       date: "far fa-calendar-alt",
@@ -387,6 +387,73 @@
       }
       return list[pagination - 1];
     },
+    deleteBitsAndTips: function (button, id) {
+      if ($(button).attr('disabled')) return
+
+      $(button).attr('disabled', 'disabled')
+      $(button).toggleClass('btn-danger btn-info').text(commons.translate('deleting'))
+
+      const popover = $(button).parents('.card').children('.card-body').children('.input-group')
+      console.log(`users.${$(button).data('type')}.delete`, id.replace('tip-','').replace('bit-',''))
+      this.socket.emit(`users.${$(button).data('type')}.delete`, id.replace('tip-','').replace('bit-',''), (err) => {
+        if (err) {
+        } else {
+          $(button).toggleClass('btn-info btn-danger').text(commons.translate('done'))
+          setTimeout(() => {
+            $(`tr[data-viewer-tip-id="${id.replace('tip-','').replace('bit-','')}"]`).popover('hide')
+            $(`tr[data-viewer-bit-id="${id.replace('tip-','').replace('bit-','')}"]`).popover('hide')
+            viewers.updateUserBits($('#viewers_username').text())
+            viewers.updateUserTips($('#viewers_username').text())
+            socket.emit('getViewers')
+          }, 1000)
+        }
+      })
+    },
+    updateBitsAndTips: function (button, id) {
+      if ($(button).attr('disabled')) return
+
+      $(button).attr('disabled', 'disabled')
+      $(button).toggleClass('btn-primary btn-info').text(commons.translate('saving'))
+
+      const popover = $(button).parents('.card').children('.card-body').children('.input-group')
+      const inputs = $(popover).children('input')
+      const textarea = $(popover).children('textarea')
+
+      let data = {
+        _id: id.replace('tip-','').replace('bit-',''),
+        username: $('#viewers_username').text(),
+        timestamp: $(inputs[0]).datetimepicker('date').format('x'),
+        amount: $(inputs[1]).val(),
+        message: $(textarea).val()
+      }
+
+      console.log(`users.${$(button).data('type')}.update`, data)
+      this.socket.emit(`users.${$(button).data('type')}.update`, data, (err) => {
+        if (err) {
+          const errors = JSON.parse(err)
+
+          if (!_.isNil(errors.amount)) {
+            $(inputs[1]).addClass('is-invalid')
+            $(inputs[1]).parents().find('.invalid-feedback').text(errors.amount)
+          }
+
+          $(button).toggleClass('btn-info btn-danger').text(commons.translate('error'))
+          setTimeout(() => {
+            $(button).toggleClass('btn-danger btn-primary').text(commons.translate('save-changes'))
+            $(button).removeAttr('disabled')
+          }, 1000)
+        } else {
+          $(button).toggleClass('btn-info btn-success').text(commons.translate('done'))
+          setTimeout(() => {
+            $(`tr[data-viewer-tip-id="${id.replace('tip-','').replace('bit-','')}"]`).popover('hide')
+            $(`tr[data-viewer-bit-id="${id.replace('tip-','').replace('bit-','')}"]`).popover('hide')
+            viewers.updateUserBits(data.username)
+            viewers.updateUserTips(data.username)
+            socket.emit('getViewers')
+          }, 1000)
+        }
+      })
+    },
     addBitsAndTips: function (button) {
       if ($(button).attr('disabled')) return
 
@@ -420,6 +487,7 @@
         } else {
           viewers.updateUserBits(data.username)
           viewers.updateUserTips(data.username)
+          socket.emit('getViewers')
           $(button).toggleClass('btn-info btn-success').text(commons.translate('done'))
           setTimeout(() => {
             $(`#new_${$(button).data('type')}`).popover('hide')
@@ -460,23 +528,26 @@
                       <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-clock"></i></span>
                     </div>
                     <input type="text" class="form-control datetimepicker-input border-top-0 border-left-0 border-right-0" id="bit-${bit._id.toString()}"/>
+                    <div class="invalid-feedback-popover invalid-feedback"></div>
                   </div>
                   <div class="input-group">
                     <div class="input-group-prepend">
                       <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-money-bill-alt"></i></span>
                     </div>
-                    <input type="number" class="border-top-0 border-left-0 border-right-0 form-control" value="${parseInt(bit.amount, 10)}"/>
+                    <input type="number" class="border-top-0 border-left-0 border-right-0 form-control" value="${parseInt(bit.amount, 10)}"/>4
+                    <div class="invalid-feedback-popover invalid-feedback"></div>
                   </div>
                   <div class="input-group mb-1">
                     <div class="input-group-prepend">
                       <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-comment"></i></span>
                     </div>
                     <textarea rows="5" class="border-top-0 border-left-0 border-right-0 form-control">${bit.message}</textarea>
+                    <div class="invalid-feedback-popover invalid-feedback"></div>
                   </div>
                 </div>
                 <div class="card-footer d-flex p-0 border-top-0">
-                  <button class="btn btn-danger w-100">${commons.translate('delete')}</button>
-                  <button class="btn btn-primary w-100">${commons.translate('save-changes')}</button>
+                  <button class="btn btn-danger w-100" data-type="bits" onclick="viewers.deleteBitsAndTips(this, 'bit-${bit._id.toString()}')">${commons.translate('delete')}</button>
+                  <button class="btn btn-primary w-100" data-type="bits" onclick="viewers.updateBitsAndTips(this, 'bit-${bit._id.toString()}')">${commons.translate('save-changes')}</button>
                 </div>
               </div>
             `
@@ -525,23 +596,26 @@
                       <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-clock"></i></span>
                     </div>
                     <input type="text" class="form-control border-top-0 border-left-0 border-right-0" id="tip-${tip._id.toString()}"/>
+                    <div class="invalid-feedback-popover invalid-feedback"></div>
                   </div>
                   <div class="input-group">
                     <div class="input-group-prepend">
                       <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-money-bill-alt"></i></span>
                     </div>
                     <input type="text" class="border-top-0 border-left-0 border-right-0 form-control" value="${parseFloat(tip.amount).toFixed(2)}${tip.currency}"/>
+                    <div class="invalid-feedback-popover invalid-feedback"></div>
                   </div>
                   <div class="input-group mb-1">
                     <div class="input-group-prepend">
                       <span class="border-top-0 border-left-0 border-right-0 input-group-text"><i class="far fa-fw fa-comment"></i></span>
                     </div>
                     <textarea rows="5" class="border-top-0 border-left-0 border-right-0 form-control">${tip.message}</textarea>
+                    <div class="invalid-feedback-popover invalid-feedback"></div>
                   </div>
                 </div>
                 <div class="card-footer d-flex p-0 border-top-0">
-                  <button class="btn btn-danger w-100">${commons.translate('delete')}</button>
-                  <button class="btn btn-primary w-100">${commons.translate('save-changes')}</button>
+                  <button class="btn btn-danger w-100" data-type="tips" onclick="viewers.deleteBitsAndTips(this, 'tip-${tip._id.toString()}')">${commons.translate('delete')}</button>
+                  <button class="btn btn-primary w-100" data-type="tips" onclick="viewers.updateBitsAndTips(this, 'tip-${tip._id.toString()}')">${commons.translate('save-changes')}</button>
                 </div>
               </div>
             `

@@ -665,6 +665,7 @@
     "close": "Zavřít",
     "save-changes": "Uložit změny",
     "saving": "Ukládám...",
+    "deleting": "Mazání...",
     "done": "Hotovo",
     "error": "Chyba",
     "custom-title-empty-error": "Vlastní nadpis je zaškrtnut, ale pole je prázdné!",
