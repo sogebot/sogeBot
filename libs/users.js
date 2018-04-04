@@ -70,6 +70,18 @@ Users.prototype.sockets = function (self) {
       callback(null, _.orderBy(users, 'username', 'asc'))
     })
 
+    socket.on('save', async (data, cb) => {
+      await global.db.engine.update('users', { username: data.username }, data)
+      cb(null, null)
+    })
+
+    socket.on('delete', async (username, cb) => {
+      await global.db.engine.remove('users', { username: username })
+      await global.db.engine.remove('users.tips', { username: username })
+      await global.db.engine.remove('users.bits', { username: username })
+      cb(null, null)
+    })
+
     socket.on('users.tips', async (username, cb) => {
       const tips = await global.db.engine.find('users.tips', { username: username })
       cb(null, _.orderBy(tips, 'timestamp', 'desc'))

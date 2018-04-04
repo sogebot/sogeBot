@@ -94,13 +94,13 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger mr-auto">
+        <button type="button" class="btn btn-danger mr-auto" onclick="viewers.delete(this)">
           <i data-lang="delete"></i>
         </button>
         <button type="button" class="btn btn-default" data-dismiss="modal">
           <i data-lang="close"></i>
         </button>
-        <button type="button" class="btn btn-primary">
+        <button type="button" class="btn btn-primary" onclick="viewers.save(this)">
           <i data-lang="save-changes"></i>
         </button>
       </div>
@@ -219,6 +219,16 @@
   </div>
 </div>
 <script>
+  const datepickeropts = {
+    icons: {
+      time: "far fa-clock",
+      date: "far fa-calendar-alt",
+      up: "fas fa-angle-up",
+      down: "fas fa-angle-down"
+    },
+    format: 'HH:mm:ss, YYYY-MM-DD' // 21:21:37, 2016-07-09
+  }
+
   var pagination = 1
   var viewers = {
     socket: null,
@@ -226,6 +236,36 @@
     sortType: 'up',
     toSearch: '',
     list: {},
+    save: function (el) {
+      let user = {
+        username: $('#viewers_username').text(),
+        is: {
+          follower: $('#viewers_follower_toggle').hasClass('btn-success'),
+          subscriber: $('#viewers_subscriber_toggle').hasClass('btn-success'),
+          regular: $('#viewers_regular_toggle').hasClass('btn-success')
+        },
+        time: {
+          message: _.isNil($('#viewers_last_seen').datetimepicker('date')) ? null : parseInt($('#viewers_last_seen').datetimepicker('date').format('x'), 10),
+          follow: _.isNil($('#viewers_followed_at').datetimepicker('date')) ? null : parseInt($('#viewers_followed_at').datetimepicker('date').format('x'), 10),
+          subscribed_at: _.isNil($('#viewers_subscribed_at').datetimepicker('date')) ? null : parseInt($('#viewers_subscribed_at').datetimepicker('date').format('x'), 10),
+          watched: $('#viewers_watched').val() * 1000 * 60 * 60
+        },
+        points: $('#viewers_points').val().length === 0 ? 0 : $('#viewers_points').val(),
+        stats: {
+          messages: $('#viewers_messages').val().length === 0 ? 0 : $('#viewers_messages').val(),
+          tier: $('#viewers_tier').val().length === 0 ? null : $('#viewers_tier').val()
+        }
+      }
+
+      // toggle save button to btn-info and disable\
+      $(el).toggleClass('btn-primary btn-info').attr('disabled', 'disabled').html('<i class="fas fa-circle-notch fa-spin"></i> ' + commons.translate('saving'))
+      viewers.socket.emit('save', user, (err) => {
+        if (err) return console.error(err)
+        $(el).toggleClass('btn-primary btn-info').removeAttr('disabled').html(commons.translate('save-changes'))
+        $('#viewersDlg').modal('hide')
+        socket.emit('getViewers')
+      })
+    },
     update: function (list) {
       $("#Users").empty()
       _.each(list, function (item, index) {
@@ -271,7 +311,10 @@
       return (timestamp / 1000 / 60 / 60).toFixed(1)
     },
     delete: function (el) {
-      socket.emit('deleteViewer', el.dataset.username)
+      viewers.socket.emit('delete', $('#viewers_username').text(), () => {
+        $('#viewersDlg').modal('hide')
+        socket.emit('getViewers')
+      })
     },
     sort: function (el) {
       $('table tr th i').removeClass()
@@ -520,16 +563,6 @@
     if (_.isNil(systems) || _.isNil(configuration)) {
       setTimeout(() => ViewersPage(), 1)
       return
-    }
-
-    const datepickeropts = {
-      icons: {
-        time: "far fa-clock",
-        date: "far fa-calendar-alt",
-        up: "fas fa-angle-up",
-        down: "fas fa-angle-down"
-      },
-      format: 'HH:mm:ss, YYYY-MM-DD' // 21:21:37, 2016-07-09
     }
     var userSocket = io('/users', {
       query: "token=" + token
