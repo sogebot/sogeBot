@@ -19,7 +19,6 @@ class API {
     this.streamType = 'live'
 
     this.retries = {
-      cooldown: 45000,
       getCurrentStreamData: 0,
       getChannelDataOldAPI: 0
     }
@@ -65,6 +64,9 @@ class API {
   async getChannelID () {
     var request
     const url = `https://api.twitch.tv/kraken/users?login=${config.settings.broadcaster_username}`
+    let timeout = 60000
+
+    debug('api:getChannelID')(`GET ${url}`)
     try {
       request = await snekfetch.get(url)
         .set('Accept', 'application/vnd.twitchtv.v5+json')
@@ -72,14 +74,12 @@ class API {
         .set('Client-ID', config.settings.client_id)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelID', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      if (e.code === 'ECONNREFUSED' || e.code === 'ETIMEDOUT') {
-        global.log.error(`API: ${url} - ${e.message}`)
-        return setTimeout(() => this.getChannelID(), 1000)
-      }
-      setTimeout(() => this.getChannelID(), 60000)
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
+      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+      global.log.error(`${url} - ${e.message}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelID', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
       return
+    } finally {
+      if (timeout === 1000) setTimeout(() => this.getChannelID(), timeout)
     }
 
     if (_.isNil(request.body.users[0])) {
@@ -91,20 +91,22 @@ class API {
   }
 
   async getChannelSubscribersOldAPI () {
-    const d = debug('api:getChannelSubscribersOldAPI')
     const cid = await global.cache.channelId()
+    const url = `https://api.twitch.tv/kraken/channels/${cid}/subscriptions?limit=100`
 
     if (_.isNil(_.get(config, 'settings.broadcaster_oauth', '').match(/oauth:[\w]*/))) {
       return
     }
 
-    if (_.isNil(cid)) {
+    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    debug('api:getChannelSubscribersOldAPI')(`GET ${url}\nwait: ${needToWait}`)
+    if (needToWait) {
       setTimeout(() => this.getChannelSubscribersOldAPI(), 1000)
       return
     }
 
     var request
-    const url = `https://api.twitch.tv/kraken/channels/${cid}/subscriptions?limit=100`
+    let timeout = 30000
     try {
       request = await snekfetch.get(url)
         .set('Accept', 'application/vnd.twitchtv.v5+json')
@@ -113,26 +115,27 @@ class API {
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
       if (e.message === '422 Unprocessable Entity') {
+        timeout = 0
         global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
         this.current.subscribers = 0
         global.db.engine.update('api.current', { key: 'subscribers' }, { value: this.current.subscribers })
         // caster is not affiliate or partner, don't do calls again
       } else if (e.message === '403 Forbidden') {
+        timeout = 0
         global.log.warning('Broadcaster have not correct oauth, will not check subs')
         this.current.subscribers = 0
         global.db.engine.update('api.current', { key: 'subscribers' }, { value: this.current.subscribers })
       } else {
-        if (e.code === 'ECONNREFUSED' || e.code === 'ETIMEDOUT') {
-          global.log.error(`API: ${url} - ${e.message}`)
-          return setTimeout(() => this.getChannelSubscribersOldAPI(), 1000)
-        }
-        setTimeout(() => this.getChannelSubscribersOldAPI(), 60000)
-        global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
+        timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+        global.log.error(`${url} - ${e.message}`)
         global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
       }
       return
+    } finally {
+      if (timeout !== 0) setTimeout(() => this.getChannelSubscribersOldAPI(), timeout)
     }
-    d(`Current subscribers count: ${request.body._total}`)
+
+    debug('api:getChannelSubscribersOldAPI')(`Current subscribers count: ${request.body._total}`)
     this.current.subscribers = request.body._total - 1 // remove broadcaster itself
     global.db.engine.update('api.current', { key: 'subscribers' }, { value: this.current.subscribers })
 
@@ -143,21 +146,21 @@ class API {
       if (subscriber.name === config.settings.broadcaster_username || subscriber.name === config.settings.bot_username) continue
       await global.db.engine.update('users', { username: subscriber.name }, { is: { subscriber: true } })
     }
-
-    setTimeout(() => this.getChannelSubscribersOldAPI(), 30000)
   }
 
   async getChannelDataOldAPI () {
-    const d = debug('api:getChannelDataOldAPI')
     const cid = await global.cache.channelId()
+    const url = `https://api.twitch.tv/kraken/channels/${cid}`
 
-    if (_.isNil(cid)) {
+    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    debug('api:getChannelDataOldAPI')(`GET ${url}\nwait: ${needToWait}`)
+    if (needToWait) {
       setTimeout(() => this.getChannelDataOldAPI(), 1000)
       return
     }
 
     var request
-    const url = `https://api.twitch.tv/kraken/channels/${cid}`
+    let timeout = 60000
     try {
       request = await snekfetch.get(url)
         .set('Accept', 'application/vnd.twitchtv.v5+json')
@@ -165,30 +168,27 @@ class API {
         .set('Client-ID', config.settings.client_id)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      if (e.code === 'ECONNREFUSED' || e.code === 'ETIMEDOUT') {
-        global.log.error(`API: ${url} - ${e.message}`)
-        return setTimeout(() => this.getChannelDataOldAPI(), 1000)
-      }
-      setTimeout(() => this.getChannelDataOldAPI(), 60000)
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
+      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+      global.log.error(`${url} - ${e.message}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
       return
+    } finally {
+      setTimeout(() => this.getChannelDataOldAPI(), timeout)
     }
 
     if (!this.current.gameOrTitleChangedManually) {
       // Just polling update
-      d(`Current game: ${request.body.game}, Current Status: ${request.body.status}`)
+      debug('api:getChannelDataOldAPI')(`Current game: ${request.body.game}, Current Status: ${request.body.status}`)
 
       this.current.rawStatus = await global.cache.rawStatus()
       let status = await this.parseTitle()
       if (request.body.status !== status) {
         // check if status is same as updated status
-        if (this.retries.getChannelDataOldAPI >= 5) {
+        if (this.retries.getChannelDataOldAPI >= 15) {
           this.retries.getChannelDataOldAPI = 0
           this.current.rawStatus = request.body.status
         } else {
           this.retries.getChannelDataOldAPI++
-          setTimeout(() => this.getChannelDataOldAPI(), this.retries.cooldown)
           return
         }
       } else {
@@ -205,8 +205,6 @@ class API {
     } else {
       this.current.gameOrTitleChangedManually = false
     }
-
-    setTimeout(() => this.getChannelDataOldAPI(), 30000)
   }
 
   async getChannelHosts () {
@@ -220,19 +218,19 @@ class API {
 
     var request
     const url = `http://tmi.twitch.tv/hosts?include_logins=1&target=${cid}`
+    let timeout = 30000
     try {
       request = await snekfetch.get(url)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status })
     } catch (e) {
-      if (e.code === 'ECONNREFUSED' || e.code === 'ETIMEDOUT') {
-        global.log.error(`API: ${url} - ${e.message}`)
-        return setTimeout(() => this.getChannelHosts(), 1000)
-      }
-      setTimeout(() => this.getChannelHosts(), 30000)
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
+      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+      global.log.error(`${url} - ${e.message}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
       return
+    } finally {
+      setTimeout(() => this.getChannelHosts(), timeout)
     }
+
     d('Current host count: %s, Hosts: %s', request.body.hosts.length, _.map(request.body.hosts, 'host_login').join(', '))
     this.current.hosts = request.body.hosts.length
     global.db.engine.update('api.current', { key: 'hosts' }, { value: this.current.hosts })
@@ -243,47 +241,44 @@ class API {
       toAwait.push(global.db.engine.update('cache.hosts', { username: host }, { username: host }))
     }
     await Promise.all(toAwait)
-    setTimeout(() => this.getChannelHosts(), 30000)
   }
 
   async updateChannelViews () {
-    const d = debug('api:updateChannelViews')
     const cid = await global.cache.channelId()
+    const url = `https://api.twitch.tv/helix/users/?id=${cid}`
 
-    if (_.isNil(cid) || (this.remainingAPICalls <= 5 && this.refreshAPICalls * 1000 > _.now())) {
-      if ((this.remainingAPICalls <= 5 && this.refreshAPICalls > _.now() / 1000)) {
-        d('Waiting for rate-limit to refresh')
-      }
+    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
+    debug('api:updateChannelViews')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
+    if (needToWait || notEnoughAPICalls) {
+      if (notEnoughAPICalls) debug('api:updateChannelViews')('Waiting for rate-limit to refresh')
       setTimeout(() => this.updateChannelViews(), 1000)
       return
     }
 
     var request
-    const url = `https://api.twitch.tv/helix/users/?id=${cid}`
+    let timeout = 60000
     try {
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
-      if (e.code === 'ECONNREFUSED' || e.code === 'ETIMEDOUT') {
-        global.log.error(`API: ${url} - ${e.message}`)
-        return setTimeout(() => this.updateChannelViews(), 1000)
-      }
-      setTimeout(() => this.updateChannelViews(), 120000)
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
+      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+      global.log.error(`${url} - ${e.message}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
       return
+    } finally {
+      setTimeout(() => this.updateChannelViews(), timeout)
     }
 
     // save remaining api calls
     this.remainingAPICalls = request.headers['ratelimit-remaining']
     this.refreshAPICalls = request.headers['ratelimit-reset']
 
-    d(request.body.data)
+    debug('api:updateChannelViews')(request.body.data)
     this.current.views = request.body.data[0].view_count
     global.db.engine.update('api.current', { key: 'views' }, { value: this.current.views })
-    setTimeout(() => this.updateChannelViews(), 120000)
   }
 
   // TODO: this should be moved to users
@@ -302,46 +297,37 @@ class API {
         if (_.isNil(user.time.watched) || user.time.watched === 0) this.newChatters++
         global.db.engine.increment('users', { username: user.username }, { time: { watched: 60000 } })
       }
-      setTimeout(() => this.updateWatchTime(), 60000)
-    } else {
-      d('doing nothing, stream offline')
-      setTimeout(() => this.updateWatchTime(), 1000)
     }
   }
 
   async getLatest100Followers (quiet) {
-    const d = debug('api:getLatest100Followers')
     const cid = await global.cache.channelId()
+    const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`
 
-    // check if everything is properly loaded
-    if (_.isNil(cid) || _.isNil(global.overlays)) {
-      setTimeout(() => this.getLatest100Followers(quiet), 1000)
-      return
-    }
-
-    // we are in bounds of safe rate limit, wait until limit is refreshed
-    if ((global.api.remainingAPICalls <= 10 && global.api.refreshAPICalls > _.now() / 1000)) {
-      d('Waiting for rate-limit to refresh')
+    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
+    debug('api:getLatest100Followers')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
+    if (needToWait || notEnoughAPICalls) {
+      if (notEnoughAPICalls) debug('api:getLatest100Followers')('Waiting for rate-limit to refresh')
       setTimeout(() => this.getLatest100Followers(quiet), 1000)
       return
     }
 
     var request
-    const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`
+    let timeout = 30000
     try {
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+      quiet = false
     } catch (e) {
-      if (e.code === 'ECONNREFUSED' || e.code === 'ETIMEDOUT') {
-        global.log.error(`API: ${url} - ${e.message}`)
-        return setTimeout(() => this.getLatest100Followers(quiet), 1000)
-      }
-      setTimeout(() => this.getLatest100Followers(quiet), 60000)
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
+      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+      global.log.error(`${url} - ${e.message}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
       return
+    } finally {
+      setTimeout(() => this.getLatest100Followers(quiet), timeout)
     }
 
     // save remaining api calls
@@ -357,12 +343,12 @@ class API {
       for (let u of request.body.data) {
         fTime.push({ id: u.from_id, followed_at: u.followed_at })
         let user = await global.db.engine.findOne('users', { id: u.from_id })
-        d('Searching id %s in users db: %j', u.from_id, user)
+        debug('api:getLatest100Followers:users')('Searching id %s in users db: %j', u.from_id, user)
         if (_.isEmpty(user)) fidsToLoadFromAPI.push(u.from_id)
         else followersUsername.push(user.username)
       }
-      d('Usernames from db: %j', followersUsername)
-      d('IDs to load from API: %j', fidsToLoadFromAPI)
+      debug('api:getLatest100Followers:users')('Usernames from db: %j', followersUsername)
+      debug('api:getLatest100Followers:users')('IDs to load from API: %j', fidsToLoadFromAPI)
 
       if (fidsToLoadFromAPI.length > 0) {
         let fids = _.map(fidsToLoadFromAPI, (o) => `id=${o}`)
@@ -378,7 +364,7 @@ class API {
         let toAwait = []
         for (let follower of usersFromApi.body.data) {
           followersUsername.push(follower.login.toLowerCase())
-          d('Saving user %s id %s', follower.login.toLowerCase(), follower.id)
+          debug('api:getLatest100Followers:users')('Saving user %s id %s', follower.login.toLowerCase(), follower.id)
           toAwait.push(global.db.engine.update('users', { username: follower.login.toLowerCase() }, { id: follower.id }))
         }
         await Promise.all(toAwait)
@@ -400,16 +386,14 @@ class API {
             }
           }
         }
-        d('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
+        debug('api:getLatest100Followers:users')('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
         global.db.engine.update('users', { username: follower }, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
       }
     }
 
-    d(`Current followers count: ${request.body.total}`)
+    debug('api:getLatest100Followers')(`Current followers count: ${request.body.total}`)
     this.current.followers = request.body.total
     global.db.engine.update('api.current', { key: 'followers' }, { value: this.current.followers })
-
-    setTimeout(() => this.getLatest100Followers(false), 30000)
   }
 
   async getGameFromId (gid) {
@@ -446,45 +430,43 @@ class API {
   }
 
   async getCurrentStreamData () {
-    const d = debug('api:getCurrentStreamData')
     const cid = await global.cache.channelId()
+    const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`
 
-    // if channelId is not set and we are in bounds of safe rate limit, wait until limit is refreshed
-    if (_.isNil(cid) || (this.remainingAPICalls <= 5 && this.refreshAPICalls * 1000 > _.now())) {
-      if ((this.remainingAPICalls <= 5 && this.refreshAPICalls > _.now() / 1000)) {
-        d('Waiting for rate-limit to refresh')
-      }
+    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
+    debug('api:getCurrentStreamData')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
+    if (needToWait || notEnoughAPICalls) {
+      if (notEnoughAPICalls) debug('api:getCurrentStreamData')('Waiting for rate-limit to refresh')
       setTimeout(() => this.getCurrentStreamData(), 1000)
       return
     }
 
     var request
-    const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`
+    let timeout = 15000
     try {
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
-      if (e.code === 'ECONNREFUSED' || e.code === 'ETIMEDOUT') {
-        global.log.error(`API: ${url} - ${e.message}`)
-        return setTimeout(() => this.getCurrentStreamData(), 1000)
-      }
-      setTimeout(() => this.getCurrentStreamData(), 60000)
-      global.log.error(`API: https://api.twitch.tv/helix/streams?user_id=${cid} - ${e.message}`)
+      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+      global.log.error(`${url} - ${e.message}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
       return
+    } finally {
+      setTimeout(() => this.getCurrentStreamData(), timeout)
     }
 
     // save remaining api calls
     this.remainingAPICalls = request.headers['ratelimit-remaining']
     this.refreshAPICalls = request.headers['ratelimit-reset']
 
-    d(request.body)
+    debug('api:getCurrentStreamData')(request.body)
     global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
     if (request.status === 200 && !_.isNil(request.body.data[0])) {
       // correct status and we've got a data - stream online
-      let stream = request.body.data[0]; d(stream)
+      let stream = request.body.data[0]; debug('api:getCurrentStreamData')(stream)
 
       if (!this.current.gameOrTitleChangedManually) {
         this.current.rawStatus = await global.cache.rawStatus()
@@ -498,12 +480,11 @@ class API {
 
         if (stream.title !== status) {
           // check if status is same as updated status
-          if (this.retries.getCurrentStreamData >= 5) {
+          if (this.retries.getCurrentStreamData >= 15) {
             this.retries.getCurrentStreamData = 0
             this.current.rawStatus = stream.title
           } else {
             this.retries.getCurrentStreamData++
-            setTimeout(() => this.getCurrentStreamData(), 15000)
             return
           }
         } else {
@@ -546,9 +527,7 @@ class API {
       if (await global.cache.isOnline() && this.curRetries < this.maxRetries) {
         // retry if it is not just some network / twitch issue
         this.curRetries = this.curRetries + 1
-        d('Retry stream offline check, cur: %s, max: %s', this.curRetries, this.maxRetries)
-        setTimeout(() => this.getCurrentStreamData(), this.retries.cooldown)
-        return
+        debug('api:getCurrentStreamData')('Retry stream offline check, cur: %s, max: %s', this.curRetries, this.maxRetries)
       } else {
         // stream is really offline
         this.curRetries = 0
@@ -563,7 +542,6 @@ class API {
         }
       }
     }
-    setTimeout(() => this.getCurrentStreamData(), 30000)
   }
 
   async saveStreamData (stream) {
@@ -608,10 +586,12 @@ class API {
 
   async setTitleAndGame (self, sender, args) {
     args = _.defaults(args, { title: null }, { game: null })
-    const d = debug('api:setTitleAndGame')
     const cid = await global.cache.channelId()
+    const url = `https://api.twitch.tv/kraken/channels/${cid}`
 
-    if (_.isNil(cid)) {
+    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    debug('api:setTitleAndGame')(`PUT ${url}\nwait: ${needToWait}`)
+    if (needToWait) {
       setTimeout(() => this.setTitleAndGame(self, sender, args), 10)
       return
     }
@@ -619,7 +599,6 @@ class API {
     var request
     var status
     var game
-    const url = `https://api.twitch.tv/kraken/channels/${cid}`
     try {
       if (!_.isNil(args.title)) {
         this.current.rawStatus = await global.cache.rawStatus(args.title) // save raw status to cache, if changing title
@@ -648,7 +627,7 @@ class API {
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
       return
     }
-    d(request.body)
+    debug('api:setTitleAndGame')(request.body)
 
     global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
     if (request.status === 200 && !_.isNil(request.body)) {
@@ -734,32 +713,30 @@ class API {
   }
 
   async isFollowerUpdate (user) {
-    const d = require('debug')('api:isFollowerUpdate')
     const cid = await global.cache.channelId()
-
-    if (_.isNil(user.id)) return // skip check if ID doesn't exist
-
-    if ((global.api.remainingAPICalls <= 10 && global.api.refreshAPICalls > _.now() / 1000) || _.isNil(cid)) {
-      d('Skip for rate-limit to refresh and re-add user to queue')
-      this.rate_limit_follower_check.push(user.username)
-      return
-    }
-
-    if (user.username === config.settings.broadcaster_username || user.username === config.settings.bot_username) {
-      // skip if bot or broadcaster
-      d('IsFollowerUpdate SKIP for user %s', user.username)
-      return
-    }
-
     const url = `https://api.twitch.tv/helix/users/follows?from_id=${user.id}&to_id=${cid}`
+
+    const userHaveId = _.isNil(user.id)
+    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
+    const isSkipped = user.username === config.settings.broadcaster_username || user.username === config.settings.bot_username
+    debug('api:isFollowerUpdate')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}\nskipped: ${isSkipped}`)
+    if (needToWait || notEnoughAPICalls || !userHaveId || isSkipped) {
+      if (notEnoughAPICalls) debug('api:isFollowerUpdate')('Waiting for rate-limit to refresh')
+      if (!userHaveId) return
+      if (isSkipped) return debug('api:isFollowerUpdate')('IsFollowerUpdate SKIP for user %s', user.username)
+      setTimeout(() => this.isFollowerUpdate(user), 1000)
+      return
+    }
+
     try {
-      d('IsFollowerUpdate check for user %s', user.username)
+      debug('api:isFollowerUpdate')('IsFollowerUpdate check for user %s', user.username)
       var request = await snekfetch.get(url)
         .set('Accept', 'application/vnd.twitchtv.v5+json')
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
         .set('Client-ID', config.settings.client_id)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
-      d('Request done: %j', request.body)
+      debug('api:isFollowerUpdate')('Request done: %j', request.body)
     } catch (e) {
       global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: global.twitch.remainingAPICalls })
