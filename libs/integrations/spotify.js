@@ -45,8 +45,8 @@ class Spotify {
       const enabled = await this.status({ log: false })
       if (enabled && !_.isNil(this.client)) {
         let data = await this.client.getMe()
-        debug('spotify:getMe')('Authorized user: ' + data.body.display_name)
-        return data.body.display_name
+        debug('spotify:getMe')('Authorized user: %j', data.body)
+        return data.body.display_name ? data.body.display_name : data.body.id
       } else return null
     } catch (e) {
       if (e.message !== 'Unauthorized') {
