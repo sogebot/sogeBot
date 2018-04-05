@@ -1,0 +1,1 @@
+git --no-pager log --pretty=format:"%h - %s" --reverse | sed 's/ - / `/g' | sed 's/: /`: /g'
