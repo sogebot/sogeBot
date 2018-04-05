@@ -73,24 +73,24 @@
   var helixChart = new Chart(document.getElementById("helixChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
   var krakenChart = new Chart(document.getElementById("krakenChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
   var tmiChart = new Chart(document.getElementById("tmiChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
-  
+
   $('.helixData').empty()
   $('.krakenData').empty()
   $('.tmiData').empty()
-  
+
   helixChart.clear()
   krakenChart.clear()
   tmiChart.clear()
 
-  socket.off('APIStats')
-  socket.on('APIStats', (data) => {
+  socket.off('api.stats')
+  socket.on('api.stats', (data) => {
     data = _.orderBy(data, 'timestamp', 'asc')
     lastTimestampFetched = _.get(data[data.length - 1], 'timestamp', 0)
 
     for (c of data) {
       let tBody = `.${c.api}Data`
       c.code = _.get(c, 'code', 200) // set default to 200
-      
+
       $(tBody).prepend(
         `
           <tr class="${c.code.toString().startsWith('2') ? '' : 'font-weight-bold text-danger'}">
@@ -146,7 +146,7 @@
         krakenTimestampsPerMinute[lastTimestampSaved] = []
         krakenTimestampsErrorsPerMinute[lastTimestampSaved] = []
       }
-      
+
       if (_.find(krakenData, (o) => o.code !== 200 && o.timestamp === timestamp)) {
         krakenTimestampsErrorsPerMinute[lastTimestampSaved].push(timestamp)
       }

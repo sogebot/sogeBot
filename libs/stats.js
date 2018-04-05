@@ -16,12 +16,12 @@ Stats.prototype.sockets = function () {
 
 Stats.prototype.clearAPIStats = async function (self) {
   const d = debug('stats:clearAPIStats')
-  let stats = await global.db.engine.find('APIStats')
+  let stats = await global.db.engine.find('api.stats')
 
   // remove data older than 24h
   stats = _.filter(stats, (o) => _.now() - o.timestamp >= 1000 * 60 * 60 * 24)
   d('Stats to delete: %j', stats)
-  for (let s of stats) await global.db.engine.remove('APIStats', { _id: s._id.toString() })
+  for (let s of stats) await global.db.engine.remove('api.stats', { _id: s._id.toString() })
 
   setTimeout(() => self.clearAPIStats(self), 1000 * 60 * 60)
 }
@@ -89,9 +89,9 @@ Stats.prototype.getLatestStats = async function (self, socket) {
 Stats.prototype.getApiStats = async function (self, socket, options) {
   const [from, to] = [_.get(options, 'from', _.now() - 1000 * 60 * 60), _.get(options, 'to', _.now())]
 
-  let stats = await global.db.engine.find('APIStats')
+  let stats = await global.db.engine.find('api.stats')
   // return hour of data
-  socket.emit('APIStats', _.filter(stats, (o) => from < o.timestamp && to >= o.timestamp))
+  socket.emit('api.stats', _.filter(stats, (o) => from < o.timestamp && to >= o.timestamp))
 }
 
 module.exports = Stats

@@ -77,10 +77,10 @@ class Highlights {
       global.client.api(options, function (err, res, body) {
         if (err) {
           global.log.error(err, { fnc: 'Highlights#1' })
-          global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: err })
+          global.db.engine.insert('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: err })
           return
         }
-        global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: 200 })
+        global.db.engine.insert('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: 200 })
         const video = body.videos[0]
         self.cached.id = video._id
         self.cached.created_at = when.online

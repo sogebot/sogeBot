@@ -25,7 +25,7 @@ Configuration.prototype.commands = function () {
 
 Configuration.prototype.debug = async function (self, sender) {
   let [api, widgets] = await Promise.all([
-    global.db.engine.find('APIStats'),
+    global.db.engine.find('api.stats'),
     global.db.engine.find('widgets')
   ])
 
