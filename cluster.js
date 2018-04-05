@@ -2,7 +2,7 @@
 
 const util = require('util')
 const _ = require('lodash')
-const debug = require('debug')('cluster:worker')
+const debug = require('debug')
 
 const Parser = require('./libs/parser')
 
@@ -18,6 +18,9 @@ function cluster () {
     setTimeout(() => cluster(), 10)
     return
   }
+
+  let dbData = []
+  setInterval(() => sendDBDataUntilAck(), 10)
 
   global.configuration = new (require('./libs/configuration.js'))()
   global.currency = new (require('./libs/currency.js'))()
@@ -36,7 +39,7 @@ function cluster () {
     global.games = require('auto-load')('./libs/games/')
     global.integrations = require('auto-load')('./libs/integrations/')
 
-    debug(`Worker ${process.pid} has started.`)
+    debug('cluster:worker')(`Worker ${process.pid} has started.`)
 
     process.on('message', async (data) => {
       switch (data.type) {
@@ -48,8 +51,11 @@ function cluster () {
           await message(data)
           workerIsFree.message = true
           break
+        case 'dbAck':
+          debug('cluster:dbAck')(data)
+          dbData = _.filter(dbData, (o) => o.id !== data.id)
+          break
         case 'db':
-          workerIsFree.db = false
           switch (data.fnc) {
             case 'find':
               data.items = await global.db.engine.find(data.table, data.where)
@@ -72,12 +78,22 @@ function cluster () {
             case 'update':
               data.items = await global.db.engine.update(data.table, data.where, data.object)
               break
+            default:
+              global.log.error('This db call is not correct\n%j', data)
           }
-          process.send(data)
-          workerIsFree.db = true
+          dbData.push(data)
       }
     })
   })
+
+  function sendDBDataUntilAck () {
+    debug('cluster:sendDBDataUntilAck:data')(dbData.length)
+    for (let data of dbData) {
+      debug('cluster:sendDBDataUntilAck')(data)
+      process.send(data)
+    }
+    workerIsFree.db = dbData.length === 0
+  }
 
   async function message (data) {
     let sender = data.sender
@@ -130,7 +146,7 @@ process.on('uncaughtException', (error) => {
 
 function gracefullyExit () {
   if (_.every(workerIsFree)) {
-    debug(`Exiting gracefully worker ${process.pid}`)
+    debug('cluster:worker')(`Exiting gracefully worker ${process.pid}`)
     process.exit()
   } else setTimeout(() => gracefullyExit(), 10)
 }

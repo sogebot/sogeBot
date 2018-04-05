@@ -10,23 +10,24 @@ class IMasterController extends Interface {
   constructor () {
     super('master')
 
+    cluster.on('message', (worker, message) => {
+      debug('db:master:incoming')(`Got data from Worker#${worker.id}\n${util.inspect(message)}`)
+      worker.send({ type: 'dbAck', id: message.id })
+      this.data[message.id] = message.items // make data available
+    })
+
     this.connected = false
     this.data = {}
 
     this.connect()
-
-    cluster.on('message', (worker, message) => {
-      debug('db:master')(`Got data from Worker#${worker.id}\n${util.inspect(message)}`)
-      this.data[message.id] = message.items // make data available
-    })
   }
 
   async connect () {
-    let atLeastOneOnline = false
+    let allOnline = true
     for (let worker in cluster.workers) {
-      if (cluster.workers[worker].state === 'online') atLeastOneOnline = true
+      if (cluster.workers[worker].state !== 'online') allOnline = false
     }
-    if (atLeastOneOnline) setTimeout(() => { this.connected = true }, 5000) // TODO: send workers db find and if returned then its ok
+    if (allOnline) setTimeout(() => { this.connected = true; debug('db:master')('Connected') }, 5000) // TODO: send workers db find and if returned then its ok
     else setTimeout(() => this.connect(), 10)
   }
 
@@ -48,7 +49,10 @@ class IMasterController extends Interface {
 
   async findOne (table, where) {
     const id = crypto.randomBytes(64).toString('hex')
-    _.sample(cluster.workers).send({ type: 'db', fnc: 'findOne', table: table, where: where, id: id })
+    const worker = _.sample(cluster.workers)
+    const data = { type: 'db', fnc: 'findOne', table: table, where: where, id: id }
+    debug('db:master:findOne')(`Sending to worker#${worker.id} - is connected: ${worker.isConnected()}\n%j`, data)
+    worker.send(data)
 
     return new Promise((resolve, reject) => {
       let returnData = (resolve, reject, id) => {
@@ -80,7 +84,10 @@ class IMasterController extends Interface {
 
   async remove (table, where) {
     const id = crypto.randomBytes(64).toString('hex')
-    _.sample(cluster.workers).send({ type: 'db', fnc: 'remove', table: table, where: where, id: id })
+    const worker = _.sample(cluster.workers)
+    const data = { type: 'db', fnc: 'remove', table: table, where: where, id: id }
+    debug('db:master:remove')(`Sending to worker#${worker.id} - is connected: ${worker.isConnected()}\n%j`, data)
+    worker.send(data)
 
     return new Promise((resolve, reject) => {
       let returnData = (resolve, reject, id) => {

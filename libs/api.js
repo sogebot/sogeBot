@@ -83,11 +83,11 @@ class API {
 
     const user = request.body.users[0]
     debug('api:getChannelID')(user)
-    if (_.isNil()) {
+    if (_.isNil(user)) {
       global.log.error('Channel ' + config.settings.broadcaster_username + ' not found!')
     } else {
-      await global.cache.channelId(user)
-      global.log.info('Broadcaster channel ID set to ' + user)
+      await global.cache.channelId(user._id)
+      global.log.info('Broadcaster channel ID set to ' + user._id)
     }
   }
 
@@ -237,11 +237,9 @@ class API {
     global.db.engine.update('api.current', { key: 'hosts' }, { value: this.current.hosts })
 
     // save hosts list
-    let toAwait = []
     for (let host of _.map(request.body.hosts, 'host_login')) {
-      toAwait.push(global.db.engine.update('cache.hosts', { username: host }, { username: host }))
+      await global.db.engine.update('cache.hosts', { username: host }, { username: host })
     }
-    await Promise.all(toAwait)
   }
 
   async updateChannelViews () {
@@ -437,7 +435,7 @@ class API {
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
       return
     } finally {
-      if (opts.interval) setTimeout(() => this.getCurrentStreamData(), timeout)
+      if (opts.interval) setTimeout(() => this.getCurrentStreamData(opts), timeout)
     }
 
     // save remaining api calls

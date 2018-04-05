@@ -102,6 +102,8 @@ function main () {
     global.games = require('auto-load')('./libs/games/')
     global.integrations = require('auto-load')('./libs/integrations/')
 
+    global.panel.expose()
+
     global.client.connect()
     if (_.get(config, 'settings.broadcaster_oauth', '').match(/oauth:[\w]*/)) {
       global.broadcasterClient.connect()

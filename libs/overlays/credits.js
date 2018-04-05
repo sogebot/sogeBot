@@ -135,7 +135,6 @@ class Credits {
 
         let toAwait = []
         for (let [i, v] of Object.entries(data)) {
-          console.log(v)
           toAwait.push(global.db.engine.update('overlay.credits.customTexts', { order: i }, { order: i, type: v.type, text: v.text }))
         }
         await Promise.all(toAwait)

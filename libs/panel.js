@@ -8,8 +8,6 @@ var basicAuth = require('basic-auth')
 const flatten = require('flat')
 var _ = require('lodash')
 
-const cluster = require('cluster')
-
 const Parser = require('./parser')
 
 const config = require('../config.json')
@@ -23,7 +21,7 @@ function Panel () {
   app.use(bodyParser.urlencoded({ extended: true }))
 
   this.server = http.createServer(app)
-  var port = process.env.PORT || config.panel.port
+  this.port = process.env.PORT || config.panel.port
 
   // webhooks integration
   app.post('/webhooks/hub/follows', (req, res) => {
@@ -85,12 +83,6 @@ function Panel () {
   app.get('/:type/:page', this.authUser, function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.page))
   })
-
-  if (cluster.isMaster) {
-    this.server.listen(port, function () {
-      global.log.info(`WebPanel is available at http://localhost:${port}`)
-    })
-  }
 
   this.io = require('socket.io')(this.server)
   this.menu = [{category: 'main', name: 'dashboard', id: 'dashboard'}]
@@ -255,6 +247,12 @@ function Panel () {
       global.translate({root: 'ui'}) // add ui root -> slowly refactoring to new name
     )
     socket.emit('lang', lang)
+  })
+}
+
+Panel.prototype.expose = function () {
+  this.server.listen(global.panel.port, function () {
+    global.log.info(`WebPanel is available at http://localhost:${global.panel.port}`)
   })
 }
 

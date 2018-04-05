@@ -133,11 +133,9 @@ class Moderation {
     }
 
     // cleanup warnings
-    let toAwait = []
     for (let warning of _.filter(warnings, (o) => _.now() - o.timestamp < 3600)) {
-      toAwait.push(global.db.engine.remove('moderation.warnings', { _id: warning._id.toString() }))
+      await global.db.engine.remove('moderation.warnings', { _id: warning._id.toString() })
     }
-    await Promise.all(toAwait)
   }
 
   async whitelist (text) {
