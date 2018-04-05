@@ -105,21 +105,25 @@ class Moderation {
     global.db.engine.update('settings', { key: 'whitelist' }, { value: data.whitelist.filter(entry => entry.trim() !== '') })
   }
 
-  async timeoutUser (self, sender, warning, msg, time, silent) {
-    let [warningsAllowed, warningsTimeout, warnings] = await Promise.all([
+  async timeoutUser (self, sender, text, warning, msg, time, type) {
+    let [warningsAllowed, warningsTimeout, warnings, silent] = await Promise.all([
       global.configuration.getValue('moderationWarnings'),
       global.configuration.getValue('moderationWarningsTimeouts'),
-      global.db.engine.find('moderation.warnings')
+      global.db.engine.find('moderation.warnings'),
+      self.isSilent(type)
     ])
 
     if (warningsAllowed === 0) {
       msg = await new Message(msg.replace(/\$count/g, -1)).parse()
+      log.timeout(`${sender.username} [${type}] ${time}s timeout | ${text}`)
       global.commons.timeout(sender.username, msg, time, silent)
       return
     }
 
     if (_.filter(warnings, (o) => o.username === sender.username).length >= warningsAllowed) {
-      global.commons.timeout(sender.username, await new Message(warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length)).parse(), time)
+      msg = await new Message(warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length)).parse()
+      log.timeout(`${sender.username} [${type}] ${time}s timeout | ${text}`)
+      global.commons.timeout(sender.username, msg, time)
       await global.db.engine.remove('moderation.warnings', { username: sender.username })
       return
     }
@@ -127,6 +131,7 @@ class Moderation {
     await global.db.engine.insert('moderation.warnings', { username: sender.username, timestamp: _.now() })
     warning = await new Message(warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length)).parse()
     if (warningsTimeout) {
+      log.timeout(`${sender.username} [${type}] ${time}s timeout | ${text}`)
       global.commons.timeout(sender.username, warning, 1, silent)
     } else {
       if (!silent) global.commons.sendMessage('$sender: ' + warning.parse(), sender)
@@ -215,11 +220,10 @@ class Moderation {
         await global.db.engine.remove('moderation.permit', { _id: permit._id.toString() })
         return true
       } else {
-        log.info(sender.username + ' [link] ' + timeout + 's timeout: ' + whitelisted)
-        self.timeoutUser(self, sender,
+        self.timeoutUser(self, sender, whitelisted,
           global.translate('moderation.user-is-warned-about-links'),
           global.translate('moderation.user-have-timeout-for-links'),
-          timeout, await self.isSilent('links'))
+          timeout, 'links')
         return false
       }
     } else {
@@ -251,19 +255,17 @@ class Moderation {
       if (out.hasOwnProperty(item)) {
         var symbols = out[item]
         if (symbols.length >= maxSymbolsConsecutively) {
-          log.info(sender.username + ' [symbols] ' + timeout + 's timeout: ' + text)
-          self.timeoutUser(self, sender,
+          self.timeoutUser(self, sender, text,
             global.translate('moderation.user-is-warned-about-symbols'),
             global.translate('moderation.user-have-timeout-for-symbols'),
-            timeout, await self.isSilent('symbols'))
+            timeout, 'symbols')
           return false
         }
         symbolsLength = symbolsLength + symbols.length
       }
     }
     if (Math.ceil(symbolsLength / (msgLength / 100)) >= maxSymbolsPercent) {
-      log.info(sender.username + ' [symbols] ' + timeout + 's timeout: ' + text)
-      self.timeoutUser(self, sender, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout)
+      self.timeoutUser(self, sender, text, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout, 'symbols')
       return false
     }
     return true
@@ -283,11 +285,10 @@ class Moderation {
     if (global.commons.isOwner(sender) || isMod || msgLength < triggerLength || !isEnabled || (sender.subscriber && !isEnabledForSubs)) {
       return true
     } else {
-      log.info(sender.username + ' [longMessage] ' + timeout + 's timeout: ' + text)
-      self.timeoutUser(self, sender,
+      self.timeoutUser(self, sender, text,
         global.translate('moderation.user-is-warned-about-long-message'),
         global.translate('moderation.user-have-timeout-for-long-message'),
-        timeout, await self.isSilent('longmessage'))
+        timeout, 'longmessage')
       return false
     }
   }
@@ -344,11 +345,10 @@ class Moderation {
       return true
     }
     if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
-      log.info(sender.username + ' [caps] ' + timeout + 's timeout: ' + text)
-      self.timeoutUser(self, sender,
+      self.timeoutUser(self, sender, text,
         global.translate('moderation.user-is-warned-about-caps'),
         global.translate('moderation.user-have-timeout-for-caps'),
-        timeout, await self.isSilent('caps'))
+        timeout, 'caps')
       return false
     }
     return true
@@ -373,11 +373,10 @@ class Moderation {
     var out = whitelisted.match(/(.+)(\1+)/g)
     for (var item in out) {
       if (out.hasOwnProperty(item) && out[item].length >= maxSpamLength) {
-        log.info(sender.username + ' [spam] ' + timeout + 's timeout: ' + text)
-        self.timeoutUser(self, sender,
+        self.timeoutUser(self, sender, text,
           global.translate('moderation.user-have-timeout-for-spam'),
           global.translate('moderation.user-is-warned-about-spam'),
-          timeout, await self.isSilent('spam'))
+          timeout, 'spam')
         return false
       }
     }
@@ -397,11 +396,10 @@ class Moderation {
     }
 
     if (sender['message-type'] === 'action') {
-      log.info(sender.username + ' [color] ' + timeout + 's timeout: ' + text)
-      self.timeoutUser(self, sender,
+      self.timeoutUser(self, sender, text,
         global.translate('moderation.user-is-warned-about-color'),
         global.translate('moderation.user-have-timeout-for-color'),
-        timeout, await self.isSilent('color'))
+        timeout, 'color')
       return false
     } else return true
   }
@@ -425,11 +423,10 @@ class Moderation {
     })
 
     if (count > maxCount) {
-      log.info(sender.username + ' [emotes] ' + timeout + 's timeout: ' + text)
-      self.timeoutUser(self, sender,
+      self.timeoutUser(self, sender, text,
         global.translate('moderation.user-is-warned-about-emotes'),
         global.translate('moderation.user-have-timeout-for-emotes'),
-        timeout, await self.isSilent('emotes'))
+        timeout, 'emotes')
       return false
     } else return true
   }
@@ -452,12 +449,10 @@ class Moderation {
       // we need to change 'text' to ' text ' for regexp to correctly work
       if (XRegExp.exec(` ${text} `, regexp) && value.length > 0) {
         isOK = false
-        log.info(sender.username + ' [blacklist] ' + timeout + 's timeout: ' + text)
-
-        self.timeoutUser(self, sender,
+        self.timeoutUser(self, sender, text,
           global.translate('moderation.user-is-warned-about-blacklist'),
           global.translate('moderation.user-have-timeout-for-blacklist'),
-          timeout, await self.isSilent('blacklist'))
+          timeout, 'blacklist')
       }
       return isOK
     }
@@ -465,9 +460,9 @@ class Moderation {
   }
 
   async isSilent (name) {
-    let item = await global.db.engine.find('moderation.message.cooldown', { key: name })
-    if (!_.isNil(item) && (_.now() - item.value) >= 60000) {
-      await global.db.engine.update('moderation.message.cooldown', { key: name, value: _.now() })
+    let item = await global.db.engine.findOne('moderation.message.cooldown', { key: name })
+    if (_.isEmpty(item) || (_.now() - item.value) >= 60000) {
+      await global.db.engine.update('moderation.message.cooldown', { key: name }, { value: _.now() })
       return false
     }
     return true
