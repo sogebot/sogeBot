@@ -87,6 +87,7 @@ class Cache {
       // setter
       // re-save full object - NeDB issue with $set on object workaround - NeDB is not deleting missing keys
       let fullCacheObj = await global.db.engine.findOne('cache', { key: 'gamesTitles' })
+      fullCacheObj.key = 'gamesTitles'
       fullCacheObj['games_and_titles'] = data
       delete fullCacheObj._id
       await global.db.engine.remove('cache', { key: 'gamesTitles' })
@@ -94,7 +95,7 @@ class Cache {
       return data
     } else {
       // getter
-      let cache = await global.db.engine.findOne('cache')
+      let cache = await global.db.engine.findOne('cache', { key: 'gamesTitles' })
       return _.get(cache, 'games_and_titles', {})
     }
   }
