@@ -118,7 +118,7 @@ class Moderation {
     if (warningsAllowed === 0) {
       msg = await new Message(msg.replace(/\$count/g, -1)).parse()
       log.timeout(`${sender.username} [${type}] ${time}s timeout | ${text}`)
-      global.commons.timeout(sender.username, msg, time, silent)
+      global.commons.timeout(sender.username, msg, time)
       return
     }
 
@@ -134,7 +134,7 @@ class Moderation {
     warning = await new Message(warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length)).parse()
     if (warningsTimeout) {
       log.timeout(`${sender.username} [${type}] ${time}s timeout | ${text}`)
-      global.commons.timeout(sender.username, warning, 1, silent)
+      global.commons.timeout(sender.username, warning, 1)
     }
 
     if (announceTimeouts && !silent) {

@@ -132,13 +132,9 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
   return true
 }
 
-Commons.prototype.timeout = function (username, reason, timeout, silent) {
-  if (global.configuration.getValue('moderationAnnounceTimeouts')) {
-    if (!silent) process.send({type: 'say', sender: username, message: '$sender, ' + reason[0].toLowerCase() + reason.substring(1)})
-    process.send({type: 'timeout', username: username, timeout: timeout, reason: reason})
-  } else {
-    process.send({type: 'timeout', username: username, timeout: timeout, reason: reason})
-  }
+Commons.prototype.timeout = function (username, reason, timeout) {
+  if (cluster.isMaster) global.client.timeout(config.settings.broadcaster_username, username, timeout, reason)
+  else process.send({type: 'timeout', username: username, timeout: timeout, reason: reason})
 }
 
 Commons.prototype.getOwner = function () {

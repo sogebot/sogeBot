@@ -148,7 +148,7 @@ function fork () {
     } else if (msg.type === 'db') {
       // do nothing on db
     } else if (msg.type === 'timeout') {
-      global.client.timeout(config.settings.broadcaster_username, msg.username, msg.timeout, msg.reason)
+      global.commons.timeout(msg.username, msg.reason, msg.timeout)
     } else if (msg.type === 'api') {
       global.api[msg.fnc](msg.username, msg.id)
     } else if (msg.type === 'event') {
