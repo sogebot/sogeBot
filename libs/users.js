@@ -15,6 +15,7 @@ function Users () {
 
   // set all users offline on start
   this.setAll({ is: { online: false } })
+  setInterval(() => this.updateWatchTime(), 60000)
 }
 
 Users.prototype.commands = function () {
@@ -423,6 +424,25 @@ Users.prototype.setAll = async function (object) {
 
 Users.prototype.delete = function (username) {
   global.db.engine.remove('users', { username: username })
+}
+
+Users.prototype.updateWatchTime = async function () {
+  // count watching time when stream is online
+  debug('init')
+
+  if (await global.cache.isOnline()) {
+    let users = await global.users.getAll({ is: { online: true } })
+
+    debug(users)
+    for (let user of users) {
+      // add user as a new chatter in a stream
+      if (_.isNil(user.time)) user.time = {}
+      if (_.isNil(user.time.watched) || user.time.watched === 0) this.newChatters++
+      global.db.engine.increment('users', { username: user.username }, { time: { watched: 60000 } })
+    }
+  } else {
+    debug('Doing nothing, stream offline')
+  }
 }
 
 module.exports = Users

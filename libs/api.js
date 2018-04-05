@@ -38,11 +38,10 @@ class API {
 
     this._loadCachedStatusAndGame()
     this.getChannelID()
-    this.getCurrentStreamData()
+    this.getCurrentStreamData({ interval: true })
     this.getLatest100Followers(true)
     this.updateChannelViews()
     this.getChannelHosts()
-    this.updateWatchTime()
 
     this.getChannelSubscribersOldAPI() // remove this after twitch add total subscribers
     this.getChannelDataOldAPI() // remove this after twitch game and status for new API
@@ -70,7 +69,7 @@ class API {
     try {
       request = await snekfetch.get(url)
         .set('Accept', 'application/vnd.twitchtv.v5+json')
-        .set('Authorization', 'OAuth ' + config.settings.broadcaster_oauth.split(':')[1])
+        .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
         .set('Client-ID', config.settings.client_id)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelID', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
@@ -82,11 +81,13 @@ class API {
       if (timeout === 1000) setTimeout(() => this.getChannelID(), timeout)
     }
 
-    if (_.isNil(request.body.users[0])) {
+    const user = request.body.users[0]
+    debug('api:getChannelID')(user)
+    if (_.isNil()) {
       global.log.error('Channel ' + config.settings.broadcaster_username + ' not found!')
     } else {
-      await global.cache.channelId(request.body.users[0]._id)
-      global.log.info('Broadcaster channel ID set to ' + request.body.users[0]._id)
+      await global.cache.channelId(user)
+      global.log.info('Broadcaster channel ID set to ' + user)
     }
   }
 
@@ -164,7 +165,7 @@ class API {
     try {
       request = await snekfetch.get(url)
         .set('Accept', 'application/vnd.twitchtv.v5+json')
-        .set('Authorization', 'OAuth ' + config.settings.broadcaster_oauth.split(':')[1])
+        .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
         .set('Client-ID', config.settings.client_id)
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
@@ -279,25 +280,6 @@ class API {
     debug('api:updateChannelViews')(request.body.data)
     this.current.views = request.body.data[0].view_count
     global.db.engine.update('api.current', { key: 'views' }, { value: this.current.views })
-  }
-
-  // TODO: this should be moved to users
-  async updateWatchTime () {
-    // count watching time when stream is online
-    const d = debug('api:updateWatchTime')
-    d('init')
-
-    if (await global.cache.isOnline()) {
-      let users = await global.users.getAll({ is: { online: true } })
-
-      d(users)
-      for (let user of users) {
-        // add user as a new chatter in a stream
-        if (_.isNil(user.time)) user.time = {}
-        if (_.isNil(user.time.watched) || user.time.watched === 0) this.newChatters++
-        global.db.engine.increment('users', { username: user.username }, { time: { watched: 60000 } })
-      }
-    }
   }
 
   async getLatest100Followers (quiet) {
@@ -429,7 +411,7 @@ class API {
     }
   }
 
-  async getCurrentStreamData () {
+  async getCurrentStreamData (opts) {
     const cid = await global.cache.channelId()
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`
 
@@ -438,7 +420,7 @@ class API {
     debug('api:getCurrentStreamData')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
     if (needToWait || notEnoughAPICalls) {
       if (notEnoughAPICalls) debug('api:getCurrentStreamData')('Waiting for rate-limit to refresh')
-      setTimeout(() => this.getCurrentStreamData(), 1000)
+      setTimeout(() => this.getCurrentStreamData(opts), 1000)
       return
     }
 
@@ -455,7 +437,7 @@ class API {
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
       return
     } finally {
-      setTimeout(() => this.getCurrentStreamData(), timeout)
+      if (opts.interval) setTimeout(() => this.getCurrentStreamData(), timeout)
     }
 
     // save remaining api calls
