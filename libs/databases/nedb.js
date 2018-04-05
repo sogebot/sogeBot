@@ -35,7 +35,7 @@ class INeDB extends Interface {
           this.table[table].ensureIndex({fieldName: 'timestamp'})
           break
         case 'users':
-          this.table[table].ensureIndex({fieldName: 'username'})
+          this.table[table].ensureIndex({fieldName: 'username', unique: true})
           break
         case 'cache':
           this.table[table].ensureIndex({fieldName: 'key'})
