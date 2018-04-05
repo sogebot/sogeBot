@@ -43,13 +43,16 @@ class Spotify {
   async getMe () {
     try {
       const enabled = await this.status({ log: false })
-      if (enabled) {
+      if (enabled && !_.isNil(this.client)) {
         let data = await this.client.getMe()
+        debug('spotify:getMe')('Authorized user: ' + data.body.display_name)
         return data.body.display_name
       } else return null
     } catch (e) {
-      global.log.error('Spotify user get failed')
-      global.log.error(e.stack)
+      if (e.message !== 'Unauthorized') {
+        global.log.error('Spotify user get failed')
+        global.log.error(e.message)
+      }
       return null
     }
   }
@@ -74,11 +77,12 @@ class Spotify {
     try {
       if (!_.isNil(this.client)) {
         let data = await this.client.refreshAccessToken()
+        debug('spotify:IRefreshToken')('New access token: ' + data.body['access_token'])
         this.accessToken = data.body['access_token']
       }
     } catch (e) {
       global.log.error('Spotify refresh token failed')
-      global.log.error(e.stack)
+      global.log.error(e)
     }
     setTimeout(() => this.IRefreshToken(), 60000)
   }
@@ -204,6 +208,7 @@ class Spotify {
         cb(null, await this.authorizeURI())
       })
       socket.on('revoke', async (cb) => {
+        debug('spotify:revoke')('User access have been revoked')
         this.accessToken = null
         this.refreshToken = null
         this.currentSong = null
@@ -237,12 +242,17 @@ class Spotify {
       if (!_.isNil(code) && !_.isNil(this.client) && enabled) {
         this.client.authorizationCodeGrant(code)
           .then((data) => {
+            debug('spotify:authorizationCodeGrant')('The token expires in ' + data.body['expires_in'])
+            debug('spotify:authorizationCodeGrant')('The access token is ' + data.body['access_token'])
+            debug('spotify:authorizationCodeGrant')('The refresh token is ' + data.body['refresh_token'])
             this.accessToken = data.body['access_token']
             this.refreshToken = data.body['refresh_token']
           })
         this.code = null
       }
       if (!_.isNil(this.client) && enabled && !_.isNil(accessToken)) {
+        debug('spotify:enabled')('The access token is ' + accessToken)
+        debug('spotify:enabled')('The refresh token is ' + refreshToken)
         this.client.setAccessToken(accessToken)
         this.client.setRefreshToken(refreshToken)
       }
