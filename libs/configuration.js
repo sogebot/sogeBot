@@ -101,10 +101,12 @@ Configuration.prototype.setValue = async function (self, sender, text, quiet) {
       self.cfgL[cmd].value = value
     } else if (filter === 'string' && !(value === 'true' || value === 'false' || _.isBoolean(value)) && !Number.isInteger(parseInt(value, 10))) {
       self.cfgL[cmd].value = value
+      await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
       if (cmd === 'lang') {
+        process.send({ type: 'lang' })
+        await global.lib.translate._load()
         if (!quiet) global.commons.sendToOwners(global.translate('core.lang-selected'))
       }
-      await global.db.engine.update('settings', { key: cmd }, { key: cmd, value: value })
       if (cmd !== 'lang' && !quiet) global.commons.sendToOwners(global.translate(self.cfgL[cmd].success).replace(/\$value/g, value))
     } else global.commons.sendMessage('Sorry, $sender, cannot parse !set command.', sender)
 
@@ -113,7 +115,6 @@ Configuration.prototype.setValue = async function (self, sender, text, quiet) {
       emit[key] = await self.getValue(key)
     })
   } catch (err) {
-    console.log(err)
     global.commons.sendMessage('Sorry, $sender, cannot parse !set command.', sender)
   }
 }

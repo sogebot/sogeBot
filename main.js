@@ -125,6 +125,10 @@ function fork () {
   debug('cluster:fork')(`New worker ${worker.id} was created.`)
   // processing messages from workers
   worker.on('message', async (msg) => {
+    if (msg.type === 'lang') {
+      for (let worker in cluster.workers) cluster.workers[worker].send({ type: 'lang' })
+      await global.lib.translate._load()
+    }
     if (msg.type === 'log') {
       return global.log[msg.level](msg.message, msg.params)
     } else if (msg.type === 'stats') {

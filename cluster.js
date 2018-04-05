@@ -43,6 +43,9 @@ function cluster () {
 
     process.on('message', async (data) => {
       switch (data.type) {
+        case 'lang':
+          await global.lib.translate._load()
+          break
         case 'shutdown':
           gracefullyExit()
           break
