@@ -41,31 +41,6 @@ if (cluster.isWorker) {
       process.send({ type: 'log', level: level[0], message: message, params: params })
     }
   }
-  /*
-  global.log = {
-    info: function (message) {
-      process.send({ type: 'log', level: 'info', message: message })
-    },
-    error: function (message) {
-      process.send({ type: 'log', level: 'error', message: message })
-    },
-    chatIn: function (message, params) {
-      process.send({ type: 'log', level: 'chatIn', message: message, params: params })
-    },
-    chatOut: function (message, params) {
-      process.send({ type: 'log', level: 'chatOut', message: message, params: params })
-    },
-    whisperIn: function (message, params) {
-      process.send({ type: 'log', level: 'whisperIn', message: message, params: params })
-    },
-    whisperOut: function (message, params) {
-      process.send({ type: 'log', level: 'whisperOut', message: message, params: params })
-    },
-    warning: function (message) {
-      process.send({ type: 'log', level: 'warning', message: message })
-    }
-  }
-  */
 } else {
   global.log = winston.createLogger({
     exitOnError: true,
