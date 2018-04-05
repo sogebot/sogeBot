@@ -5,7 +5,6 @@ const _ = require('lodash')
 
 // bot libraries
 const constants = require('../constants')
-const config = require('../../config.json')
 const debug = require('debug')('systems:gambling')
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0'
@@ -247,7 +246,7 @@ class Gambling {
     }
 
     setTimeout(async () => {
-      if (!isAlive) global.client.timeout(config.settings.broadcaster_username, sender.username, await global.configuration.getValue('rouletteTimeout'))
+      if (!isAlive) global.commons.timeout(sender.username, null, await global.configuration.getValue('rouletteTimeout'))
       global.commons.sendMessage(isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead'), sender)
     }, 2000)
   }
@@ -265,7 +264,7 @@ class Gambling {
     }
 
     global.commons.sendMessage(global.translate('gambling.seppuku.text'), sender)
-    global.client.timeout(config.settings.broadcaster_username, sender.username, await global.configuration.getValue('seppukuTimeout'))
+    global.commons.timeout(sender.username, null, await global.configuration.getValue('seppukuTimeout'))
   }
 
   async fightme (self, sender, text) {
@@ -301,7 +300,7 @@ class Gambling {
         global.commons.sendMessage(global.translate('gambling.fightme.broadcaster')
           .replace(/\$winner/g, global.commons.isBroadcaster(sender) ? sender.username : username), sender)
         isMod = global.commons.isBroadcaster(sender) ? isMod.user : isMod.sender
-        if (!isMod) global.client.timeout(config.settings.broadcaster_username, global.commons.isBroadcaster(sender) ? username : sender.username, await global.configuration.getValue('fightmeTimeout'))
+        if (!isMod) global.commons.timeout(global.commons.isBroadcaster(sender) ? username : sender.username, null, await global.configuration.getValue('fightmeTimeout'))
         global.db.engine.remove(`${self.collection}.fightme`, { _id: challenge._id.toString() })
         return
       }
@@ -320,13 +319,13 @@ class Gambling {
         debug('vs mod')
         global.commons.sendMessage(global.translate('gambling.fightme.oneModerator')
           .replace(/\$winner/g, isMod.sender ? sender.username : username), sender)
-        global.client.timeout(config.settings.broadcaster_username, isMod.sender ? username : sender.username, await global.configuration.getValue('fightmeTimeout'))
+        global.client.timeout(isMod.sender ? username : sender.username, await global.configuration.getValue('fightmeTimeout'))
         global.db.engine.remove(`${self.collection}.fightme`, { _id: challenge._id.toString() })
         return
       }
 
       debug('user vs user')
-      global.client.timeout(config.settings.broadcaster_username, winner ? sender.username : username, await global.configuration.getValue('fightmeTimeout'))
+      global.client.timeout(winner ? sender.username : username, await global.configuration.getValue('fightmeTimeout'))
       global.commons.sendMessage(global.translate('gambling.fightme.winner')
         .replace(/\$winner/g, winner ? username : sender.username), sender)
       global.db.engine.remove(`${self.collection}.fightme`, { _id: challenge._id.toString() })

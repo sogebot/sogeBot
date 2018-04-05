@@ -867,7 +867,7 @@
     "light": "light theme",
     "dark": "dark theme",
     "gambling": "Gambling",
-    "seppukuTimeout": "Timeout for !sepukku",
+    "seppukuTimeout": "Timeout for !seppuku",
     "rouletteTimeout": "Timeout for !roulette",
     "fightmeTimeout": "Timeout for !fightme",
     "duelCooldown": "Cooldown for !duel",
