@@ -341,13 +341,11 @@ class API {
         this.refreshAPICalls = usersFromApi.headers['ratelimit-reset']
 
         global.db.engine.insert('api.stats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.status, remaining: this.remainingAPICalls })
-        let toAwait = []
         for (let follower of usersFromApi.body.data) {
           followersUsername.push(follower.login.toLowerCase())
           debug('api:getLatest100Followers:users')('Saving user %s id %s', follower.login.toLowerCase(), follower.id)
-          toAwait.push(global.db.engine.update('users', { username: follower.login.toLowerCase() }, { id: follower.id }))
+          await global.db.engine.update('users', { username: follower.login.toLowerCase() }, { id: follower.id })
         }
-        await Promise.all(toAwait)
       }
 
       for (let follower of followersUsername) {
@@ -366,8 +364,17 @@ class API {
             }
           }
         }
-        debug('api:getLatest100Followers:users')('Saving user %s: %j', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
-        global.db.engine.update('users', { username: follower }, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
+        try {
+          if (!_.isNil(_.find(fTime, (o) => o.id === user.id))) {
+            debug('api:getLatest100Followers:users')('Saving user %s\n%f', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
+            global.db.engine.update('users', { username: follower }, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
+          } else {
+            debug('api:getLatest100Followers:users')('Saving user %s\n%f', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment().format('x')) } })
+            global.db.engine.update('users', { username: follower }, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment().format('x')) } })
+          }
+        } catch (e) {
+          global.log.error(e.stack)
+        }
       }
     }
 
