@@ -118,27 +118,28 @@ class Moderation {
     if (warningsAllowed === 0) {
       msg = await new Message(msg.replace(/\$count/g, -1)).parse()
       log.timeout(`${sender.username} [${type}] ${time}s timeout | ${text}`)
-      global.commons.timeout(sender.username, msg, time, silent)
+      global.commons.timeout(sender.username, msg, time)
       return
     }
 
-    if (_.filter(warnings, (o) => o.username === sender.username).length >= warningsAllowed) {
+    const isWarningCountAboveThreshold = _.filter(warnings, (o) => o.username === sender.username).length >= warningsAllowed
+    if (isWarningCountAboveThreshold) {
       msg = await new Message(warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length)).parse()
       log.timeout(`${sender.username} [${type}] ${time}s timeout | ${text}`)
       global.commons.timeout(sender.username, msg, time)
       await global.db.engine.remove('moderation.warnings', { username: sender.username })
-      return
-    }
+    } else {
+      await global.db.engine.insert('moderation.warnings', { username: sender.username, timestamp: _.now() })
+      const warningsLeft = parseInt(warningsAllowed, 10) - warnings.length
+      warning = await new Message(warning.replace(/\$count/g, warningsLeft)).parse()
+      if (warningsTimeout) {
+        log.timeout(`${sender.username} [${type}] 1s timeout, warnings left ${warningsLeft} | ${text}`)
+        global.commons.timeout(sender.username, warning, 1)
+      }
 
-    await global.db.engine.insert('moderation.warnings', { username: sender.username, timestamp: _.now() })
-    warning = await new Message(warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length)).parse()
-    if (warningsTimeout) {
-      log.timeout(`${sender.username} [${type}] ${time}s timeout | ${text}`)
-      global.commons.timeout(sender.username, warning, 1, silent)
-    }
-
-    if (announceTimeouts && !silent) {
-      global.commons.sendMessage('$sender, ' + warning, sender)
+      if (announceTimeouts && !silent) {
+        global.commons.sendMessage('$sender, ' + warning, sender)
+      }
     }
 
     // cleanup warnings
