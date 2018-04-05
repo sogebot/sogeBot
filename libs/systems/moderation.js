@@ -106,12 +106,14 @@ class Moderation {
   }
 
   async timeoutUser (self, sender, text, warning, msg, time, type) {
-    let [warningsAllowed, warningsTimeout, warnings, silent] = await Promise.all([
+    let [warningsAllowed, warningsTimeout, announceTimeouts, warnings, silent] = await Promise.all([
       global.configuration.getValue('moderationWarnings'),
       global.configuration.getValue('moderationWarningsTimeouts'),
+      global.configuration.getValue('moderationAnnounceTimeouts'),
       global.db.engine.find('moderation.warnings'),
       self.isSilent(type)
     ])
+    text = text.trim()
 
     if (warningsAllowed === 0) {
       msg = await new Message(msg.replace(/\$count/g, -1)).parse()
@@ -133,8 +135,10 @@ class Moderation {
     if (warningsTimeout) {
       log.timeout(`${sender.username} [${type}] ${time}s timeout | ${text}`)
       global.commons.timeout(sender.username, warning, 1, silent)
-    } else {
-      if (!silent) global.commons.sendMessage('$sender: ' + warning.parse(), sender)
+    }
+
+    if (announceTimeouts && !silent) {
+      global.commons.sendMessage('$sender, ' + warning, sender)
     }
 
     // cleanup warnings

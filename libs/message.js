@@ -29,6 +29,15 @@ class Message {
     const d = debug('parser:parse')
     await this.global()
 
+    // local replaces
+    if (!_.isNil(attr)) {
+      const isWithAt = await global.configuration.getValue('atUsername')
+      for (let [key, value] of Object.entries(attr)) {
+        if (_.includes(['sender'], key)) value = isWithAt ? `@${value}` : value
+        this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value)
+      }
+    }
+
     let random = {
       '(random.online.viewer)': async function () {
         let onlineViewers = await global.users.getAll({ is: { online: true } })

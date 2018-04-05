@@ -281,7 +281,6 @@ function loadClientListeners (client) {
 
   global.client.on('timeout', function (channel, username, reason, duration) {
     debug('tmijs')('User timeout: %s with reason %s for %ss', username, reason, duration)
-    global.log.timeout(`username: ${username.toLowerCase()}, reason: ${reason}, duration: ${duration}`)
     global.events.fire('timeout', { username: username.toLowerCase(), reason: reason, duration: duration })
   })
 
