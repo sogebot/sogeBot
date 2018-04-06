@@ -90,7 +90,7 @@ class Twitch {
       let message = await global.commons.prepare('followage.success.never', { username: username })
       debug(message); global.commons.sendMessage(message, sender)
     } else {
-      let diff = moment.preciseDiff(user.time.follow, moment(), true)
+      let diff = moment.preciseDiff(moment(user.time.follow).valueOf(), moment().valueOf(), true)
       let output = []
       if (diff.years) output.push(diff.years + ' ' + global.commons.getLocalizedName(diff.years, 'core.years'))
       if (diff.months) output.push(diff.months + ' ' + global.commons.getLocalizedName(diff.months, 'core.months'))
@@ -165,7 +165,7 @@ class Twitch {
       let message = await global.commons.prepare('subage.success.never', { username: username })
       debug(message); global.commons.sendMessage(message, sender)
     } else {
-      let diff = moment.preciseDiff(user.time.subscribed_at, moment(), true)
+      let diff = moment.preciseDiff(moment(user.time.subscribed_at).valueOf(), moment().valueOf(), true)
       let output = []
       if (diff.years) output.push(diff.years + ' ' + global.commons.getLocalizedName(diff.years, 'core.years'))
       if (diff.months) output.push(diff.months + ' ' + global.commons.getLocalizedName(diff.months, 'core.months'))
@@ -194,7 +194,7 @@ class Twitch {
       let message = await global.commons.prepare('age.failed', { username: username })
       debug(message); global.commons.sendMessage(message, sender)
     } else {
-      let diff = moment.preciseDiff(user.time.created_at, moment(), true)
+      let diff = moment.preciseDiff(moment(user.time.created_at).valueOf(), moment().valueOf(), true)
       let output = []
       if (diff.years) output.push(diff.years + ' ' + global.commons.getLocalizedName(diff.years, 'core.years'))
       if (diff.months) output.push(diff.months + ' ' + global.commons.getLocalizedName(diff.months, 'core.months'))

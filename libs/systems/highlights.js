@@ -51,7 +51,7 @@ class Highlights {
       ])
       if (_.isNil(when.online)) throw Error(ERROR_STREAM_NOT_ONLINE)
 
-      let timestamp = moment.preciseDiff(when.online, moment(), true)
+      let timestamp = moment.preciseDiff(moment().valueOf(), moment(when.online).valueOf(), true)
       timestamp = { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds }
       highlight.stream_id = moment(when.online).format('X')
       highlight.stream = when.online

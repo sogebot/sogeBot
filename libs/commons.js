@@ -77,7 +77,7 @@ Commons.prototype.prepare = async function (translate, attr) {
 
 Commons.prototype.getTime = function (time, isChat) {
   var now, days, hours, minutes, seconds
-  now = _.isNull(time) || !time ? {days: 0, hours: 0, minutes: 0, seconds: 0} : moment().preciseDiff(time, true)
+  now = _.isNull(time) || !time ? {days: 0, hours: 0, minutes: 0, seconds: 0} : moment.preciseDiff(moment().valueOf(), moment(time).valueOf(), true)
   if (isChat) {
     days = now.days > 0 ? now.days : ''
     hours = now.hours > 0 ? now.hours : ''
