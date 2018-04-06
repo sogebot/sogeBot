@@ -106,7 +106,7 @@ class API {
       global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
       return
     } finally {
-      if (timeout !== 0) setTimeout(() => this.getChannelChattersUnofficialAPI(), timeout)
+      setTimeout(() => this.getChannelChattersUnofficialAPI(), timeout)
     }
 
     const chatters = _.flatMap(request.body.chatters)
