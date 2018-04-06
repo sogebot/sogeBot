@@ -192,7 +192,18 @@
               <span data-lang="tier"></span>
               <i class="fa" aria-hidden="true"></i>
             </th>
-            <th></th>
+            <th class="text-center" style="width: 1px; cursor: pointer; user-select: none">
+              <span class="alert alert-secondary" style="padding: 0 1.25rem" onclick="viewers.toggle(this)" data-toggle="subscriber">SUBSCRIBER</span>
+            </th>
+            <th class="text-center" style="width: 1px; cursor: pointer; user-select: none">
+              <span class="alert alert-secondary" style="padding: 0 1.25rem" onclick="viewers.toggle(this)" data-toggle="follower">FOLLOWER</span>
+            </th>
+            <th class="text-center" style="width: 1px; cursor: pointer; user-select: none">
+              <span class="alert alert-secondary" style="padding: 0 1.25rem" onclick="viewers.toggle(this)" data-toggle="regular">REGULAR</span>
+            </th>
+            <th class="text-center" style="width: 1px; cursor: pointer; user-select: none">
+              <span class="alert alert-secondary" style="padding: 0 1.25rem" onclick="viewers.toggle(this)" data-toggle="active">ACTIVE</span>
+            </th>
           </tr>
         </thead>
         <tbody id="Users">
@@ -236,6 +247,17 @@
     sortType: 'up',
     toSearch: '',
     list: {},
+    toggle: function (el) {
+      const type = $(el).data('toggle')
+      if ($(el).hasClass('alert-secondary')) {
+        $(el).removeClass('alert-secondary').addClass('alert-success')
+      } else if ($(el).hasClass('alert-danger')) {
+        $(el).removeClass('alert-danger').addClass('alert-secondary')
+      } else {
+        $(el).removeClass('alert-success').addClass('alert-danger')
+      }
+      viewers.update(viewers.paging())
+    },
     save: function (el) {
       let user = {
         username: $('#viewers_username').text(),
@@ -283,13 +305,19 @@
             <td class="text-center" data-value='${_.get(item, 'stats.tips', 0)}'>${_.get(item, 'stats.tips', 0).toFixed(2)}${item.custom.currency}</td>
             <td class="text-center" data-value='${_.get(item, 'stats.bits', 0)}'>${_.get(item, 'stats.bits', 0)}</td>
             <td class="text-center" data-value='${_.get(item, 'stats.tier', 0)}'>${_.get(item, 'stats.tier', 0) === 0 ? '<hr>' : _.get(item, 'stats.tier', 0)}</td>
-            <td>
+            <td class="text-center">
               <span class="alert alert-${item.is.subscriber ? 'success' : 'danger'}" style="padding: 0 1.25rem">SUBSCRIBER</span>
-              <span class="alert alert-${item.is.follower ? 'success' : 'danger'}" style="padding: 0 1.25rem">FOLLOWER</span>
-              <span class="alert alert-${item.is.regular ? 'success' : 'danger'}" style="padding: 0 1.25rem">REGULAR</span>
-              <span class="alert alert-${item.is.online ? 'success' : 'danger'}" style="padding: 0 1.25rem">ACTIVE</span>
-
             </td>
+            <td class="text-center">
+              <span class="alert alert-${item.is.follower ? 'success' : 'danger'}" style="padding: 0 1.25rem">FOLLOWER</span>
+            </td>
+            <td class="text-center">
+              <span class="alert alert-${item.is.regular ? 'success' : 'danger'}" style="padding: 0 1.25rem">REGULAR</span>
+            </td>
+            <td class="text-center">
+              <span class="alert alert-${item.is.online ? 'success' : 'danger'}" style="padding: 0 1.25rem">ACTIVE</span>
+            </td>
+            <td>
           </tr>
         `)
         if (!systems.points) {
@@ -345,7 +373,22 @@
       viewers.update(viewers.paging())
     },
     paging: function () {
-      var list = _.sortBy(viewers.search(viewers.list), [function (o) {
+      var list = _.sortBy(_.filter(viewers.search(viewers.list), (o) => {
+        const subscriberFilter = ($('[data-toggle="subscriber"]').hasClass('alert-success') && o.is.subscriber)
+          || ($('[data-toggle="subscriber"]').hasClass('alert-danger') && !o.is.subscriber)
+          || $('[data-toggle="subscriber"]').hasClass('alert-secondary')
+        const followerFilter = ($('[data-toggle="follower"]').hasClass('alert-success') && o.is.follower)
+          || ($('[data-toggle="follower"]').hasClass('alert-danger') && !o.is.follower)
+          || $('[data-toggle="follower"]').hasClass('alert-secondary')
+        const regularFilter = ($('[data-toggle="regular"]').hasClass('alert-success') && o.is.regular)
+          || ($('[data-toggle="regular"]').hasClass('alert-danger') && !o.is.regular)
+          || $('[data-toggle="regular"]').hasClass('alert-secondary')
+        const activeFilter = ($('[data-toggle="active"]').hasClass('alert-success') && o.is.online)
+          || ($('[data-toggle="active"]').hasClass('alert-danger') && !o.is.online)
+          || $('[data-toggle="active"]').hasClass('alert-secondary')
+        console.log(subscriberFilter, followerFilter, regularFilter, activeFilter)
+        return subscriberFilter && followerFilter && regularFilter && activeFilter
+      }), [function (o) {
         var split = viewers.sortBy.split('.')
         var sort
         if (split.length == 2) {
