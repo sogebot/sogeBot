@@ -99,11 +99,11 @@ class API {
     var request
     try {
       request = await snekfetch.get(url)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: request.status })
+      global.db.engine.insert('api.stats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: request.status })
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+      global.db.engine.insert('api.stats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
       return
     } finally {
       setTimeout(() => this.getChannelChattersUnofficialAPI(), timeout)
