@@ -11,6 +11,9 @@
   <li class="nav-item">
     <a class="nav-link" data-toggle="tab" href="#tmi">TMI</a>
   </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#unofficial">UNOFFICIAL</a>
+  </li>
 </ul>
 
 <div class="tab-content">
@@ -63,6 +66,22 @@
       </table>
     </div>
   </div>
+  <div role="tabpanel" class="tab-pane" id="unofficial">
+    <div class="widget">
+      <canvas id="unofficialChart" width="400" height="100"></canvas>
+      <table class="table table-responsive">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">time</th>
+            <th scope="col">call</th>
+            <th scope="col">endpoint</th>
+            <th scope="col">status</th>
+          </tr>
+        </thead>
+        <tbody class="unofficialData"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -73,14 +92,17 @@
   var helixChart = new Chart(document.getElementById("helixChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
   var krakenChart = new Chart(document.getElementById("krakenChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
   var tmiChart = new Chart(document.getElementById("tmiChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
+  var unofficialChart = new Chart(document.getElementById("unofficialChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
 
   $('.helixData').empty()
   $('.krakenData').empty()
   $('.tmiData').empty()
+  $('.unofficialChart').empty()
 
   helixChart.clear()
   krakenChart.clear()
   tmiChart.clear()
+  unofficialChart.clear()
 
   socket.off('api.stats')
   socket.on('api.stats', (data) => {
@@ -107,6 +129,7 @@
     const helixData = _.filter(data, (o) => o.api === 'helix')
     const krakenData = _.filter(data, (o) => o.api === 'kraken')
     const tmiData = _.filter(data, (o) => o.api === 'tmi')
+    const unofficialData = _.filter(data, (o) => o.api === 'unofficial')
 
     let helixTimestampsPerMinute = {}
     let helixTimestampsErrorsPerMinute = {}
@@ -114,6 +137,8 @@
     let krakenTimestampsErrorsPerMinute = {}
     let tmiTimestampsPerMinute = {}
     let tmiTimestampsErrorsPerMinute = {}
+    let unofficialTimestampsPerMinute = {}
+    let unofficialTimestampsErrorsPerMinute = {}
 
     let lastTimestampSaved = 0
     for (let timestamp of _.map(helixData, 'timestamp')) {
@@ -182,6 +207,29 @@
 
     for (let index in tmiTimestampsErrorsPerMinute) {
       tmiTimestampsErrorsPerMinute[index] = tmiTimestampsErrorsPerMinute[index].length
+    }
+
+    lastTimestampSaved = 0
+    for (let timestamp of _.map(unofficialData, 'timestamp')) {
+      // timestamps needs to be reversed as we have data from newest to oldest
+      if (timestamp >= lastTimestampSaved + 60000) {
+        lastTimestampSaved = timestamp
+        unofficialTimestampsPerMinute[lastTimestampSaved] = []
+        unofficialTimestampsErrorsPerMinute[lastTimestampSaved] = []
+      }
+
+      if (_.find(unofficialData, (o) => o.code !== 200 && o.timestamp === timestamp)) {
+        unofficialTimestampsErrorsPerMinute[lastTimestampSaved].push(timestamp)
+      }
+      unofficialTimestampsPerMinute[lastTimestampSaved].push(timestamp)
+    }
+
+    for (let index in unofficialTimestampsPerMinute) {
+      unofficialTimestampsPerMinute[index] = unofficialTimestampsPerMinute[index].length
+    }
+
+    for (let index in unofficialTimestampsErrorsPerMinute) {
+      unofficialTimestampsErrorsPerMinute[index] = unofficialTimestampsErrorsPerMinute[index].length
     }
 
     /* HELIX CHART DATA*/
@@ -289,6 +337,33 @@
       } else tmiChart.data.datasets[1].data.push(count)
     }
     tmiChart.update()
+
+    /* UNOFFICIAL CHART DATA */$
+    for (let label of _.map(_.keys(unofficialTimestampsPerMinute), (o) => moment(parseInt(o, 10)).format('LTS'))) {
+      unofficialChart.data.labels.push(label)
+    }
+    for (let count of _.values(unofficialTimestampsPerMinute)) {
+      if (_.isNil(unofficialChart.data.datasets[0])) {
+        unofficialChart.data.datasets.push({
+          label: 'unofficial API calls',
+          data: [ count ],
+          backgroundColor: 'rgba(0, 0, 255, 0.2)',
+          borderColor: 'rgba(0, 0, 255, 0.5)'
+        })
+      } else unofficialChart.data.datasets[0].data.push(count)
+    }
+
+    for (let count of _.values(unofficialTimestampsErrorsPerMinute)) {
+      if (_.isNil(unofficialChart.data.datasets[1])) {
+        unofficialChart.data.datasets.push({
+          label: 'ERRORS',
+          data: [ count ],
+          backgroundColor: 'rgba(255, 0, 0, 0.2)',
+          borderColor: 'rgba(255, 0, 0, 0.5)',
+        })
+      } else unofficialChart.data.datasets[1].data.push(count)
+    }
+    unofficialChart.update()
   })
 
 </script>

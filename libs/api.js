@@ -43,6 +43,8 @@ class API {
     this.updateChannelViews()
     this.getChannelHosts()
 
+    this.getChannelChattersUnofficialAPI()
+
     this.getChannelSubscribersOldAPI() // remove this after twitch add total subscribers
     this.getChannelDataOldAPI() // remove this after twitch game and status for new API
 
@@ -88,6 +90,49 @@ class API {
     } else {
       await global.cache.channelId(user._id)
       global.log.info('Broadcaster channel ID set to ' + user._id)
+    }
+  }
+
+  async getChannelChattersUnofficialAPI () {
+    const url = `https://tmi.twitch.tv/group/user/${config.settings.broadcaster_username.toLowerCase()}/chatters`
+    let timeout = 60000
+    var request
+    try {
+      request = await snekfetch.get(url)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: request.status })
+    } catch (e) {
+      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+      global.log.error(`${url} - ${e.message}`)
+      global.db.engine.insert('APIStats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+      return
+    } finally {
+      if (timeout !== 0) setTimeout(() => this.getChannelChattersUnofficialAPI(), timeout)
+    }
+
+    const chatters = _.flatMap(request.body.chatters)
+    debug('api:getChannelChattersUnofficialAPI')(chatters)
+
+    for (let chatter of chatters) {
+      const isIgnored = !_.isEmpty(await global.db.engine.findOne('users_ignorelist', { username: chatter }))
+      if (!isIgnored) {
+        const user = await global.db.engine.findOne('users', { username: chatter })
+        if (!_.get(user, 'is.online', false)) {
+          global.api.isFollower(chatter)
+          global.users.set(chatter, { is: { online: true } })
+          global.widgets.joinpart.send({ username: chatter, type: 'join' })
+          global.events.fire('user-joined-channel', { username: chatter })
+        }
+      }
+    }
+
+    const allOnlineUsers = await global.db.engine.find('users', { is: { online: true } })
+    for (let user of allOnlineUsers) {
+      if (!_.includes(chatters, user.username)) {
+        // user is no longer in channel
+        global.users.set(user.username, { is: { online: false } })
+        global.widgets.joinpart.send({ username: user.username, type: 'part' })
+        global.events.fire('user-parted-channel', { username: user.username })
+      }
     }
   }
 

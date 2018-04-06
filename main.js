@@ -252,7 +252,8 @@ function loadClientListeners (client) {
     let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
     if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
 
-    if (!fromSelf) {
+    const user = await global.db.engine.findOne('users', { username: username })
+    if (!fromSelf && !_.get(user, 'is.online', false)) {
       global.api.isFollower(username)
       global.users.set(username, { is: { online: true } })
       global.widgets.joinpart.send({ username: username, type: 'join' })
@@ -266,7 +267,8 @@ function loadClientListeners (client) {
     let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
     if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
 
-    if (!fromSelf) {
+    const user = await global.db.engine.findOne('users', { username: username })
+    if (!fromSelf && !_.get(user, 'is.online', true)) {
       global.users.set(username, { is: { online: false } })
       global.widgets.joinpart.send({ username: username, type: 'part' })
       global.events.fire('user-parted-channel', { username: username })

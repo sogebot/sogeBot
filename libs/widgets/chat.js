@@ -9,7 +9,7 @@ function ChatWidget () {
   global.panel.socketListening(this, 'chat.message.send', this.chatMessageSend)
 
   this.refresh()
-  setInterval(() => this.refresh(), 30000)
+  setInterval(() => this.refresh(), 60000)
 }
 
 ChatWidget.prototype.refresh = async (self, socket) => {
