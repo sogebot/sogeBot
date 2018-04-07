@@ -134,10 +134,10 @@ class Message {
     }
     let info = {
       '(game)': async function (filter) {
-        return global.api.current.game
+        return _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')
       },
       '(status)': async function (filter) {
-        return global.api.current.status
+        return _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a')
       }
     }
     let command = {
