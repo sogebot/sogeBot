@@ -20,7 +20,7 @@
   <div role="tabpanel" class="tab-pane active" id="helix">
     <div class="widget">
       <canvas id="helixChart" width="400" height="100"></canvas>
-      <table class="table table-responsive">
+      <table class="table">
         <thead class="thead-dark">
           <tr>
             <th scope="col">time</th>
@@ -28,6 +28,7 @@
             <th scope="col">endpoint</th>
             <th scope="col">status</th>
             <th scope="col">remaining API calls</th>
+            <th scope="col">data</th>
           </tr>
         </thead>
         <tbody class="helixData"></tbody>
@@ -44,6 +45,8 @@
             <th scope="col">call</th>
             <th scope="col">endpoint</th>
             <th scope="col">status</th>
+            <th scope="col">remaining API calls</th>
+            <th scope="col">data</th>
           </tr>
         </thead>
         <tbody class="krakenData"></tbody>
@@ -60,6 +63,8 @@
             <th scope="col">call</th>
             <th scope="col">endpoint</th>
             <th scope="col">status</th>
+            <th scope="col">remaining API calls</th>
+            <th scope="col">data</th>
           </tr>
         </thead>
         <tbody class="tmiData"></tbody>
@@ -76,6 +81,8 @@
             <th scope="col">call</th>
             <th scope="col">endpoint</th>
             <th scope="col">status</th>
+            <th scope="col">remaining API calls</th>
+            <th scope="col">data</th>
           </tr>
         </thead>
         <tbody class="unofficialData"></tbody>
@@ -108,19 +115,22 @@
   socket.on('api.stats', (data) => {
     data = _.orderBy(data, 'timestamp', 'asc')
     lastTimestampFetched = _.get(data[data.length - 1], 'timestamp', 0)
+    for (let c of data) {
 
-    for (c of data) {
       let tBody = `.${c.api}Data`
       c.code = _.get(c, 'code', 200) // set default to 200
+      c.data = !_.isNil(c.data) ? JSON.stringify(c.data) : 'n/a'
+      c.remaining = !_.isNil(c.remaining) ? c.remaining : 'n/a'
 
       $(tBody).prepend(
         `
           <tr class="${c.code.toString().startsWith('2') ? '' : 'font-weight-bold text-danger'}">
             <th scope="row">${moment(c.timestamp).format('LTS')}</th>
             <td>${c.call}</td>
-            <td><div style="word-wrap: break-word; font-family: Monospace">${c.endpoint}</div></td>
+            <td><div style="word-wrap: break-word; font-family: Monospace; width: 200px;">${c.endpoint}</div></td>
             <td>${c.code}</td>
-            ${c.remaining ? `<td>${c.remaining}</td>` : ''}
+            <td>${c.remaining}</td>
+            <td><div style="word-wrap: break-word; font-family: Monospace; width: 100%;">${c.data}</div></td>
           </tr>
         `
       )
