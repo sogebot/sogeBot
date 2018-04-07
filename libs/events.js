@@ -277,10 +277,11 @@ class Events {
     event.definitions.runInterval = parseInt(event.definitions.runInterval, 10) // force Integer
     event.definitions.viewersAtLeast = parseInt(event.definitions.viewersAtLeast, 10) // force Integer
 
-    d('Current viewers: %s, expected viewers: %s', global.api.current.viewers, event.definitions.viewersAtLeast)
+    const viewers = (await global.db.engine.findOne('api.current', { key: 'viewers' })).value
+    d('Current viewers: %s, expected viewers: %s', viewers, event.definitions.viewersAtLeast)
     d('Run Interval: %s, triggered: %s', event.definitions.runInterval, event.triggered.runInterval)
 
-    var shouldTrigger = global.api.current.viewers >= event.definitions.viewersAtLeast &&
+    var shouldTrigger = viewers >= event.definitions.viewersAtLeast &&
                         ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000) ||
                         (event.definitions.runInterval === 0 && event.triggered.runInterval === 0))
     if (shouldTrigger) {
@@ -357,12 +358,12 @@ class Events {
       $autohost: _.get(attributes, 'autohost', null),
       $duration: _.get(attributes, 'duration', null),
       // add global variables
-      $game: global.api.current.game,
-      $title: global.api.current.status,
-      $views: global.api.current.views,
-      $followers: global.api.current.followers,
-      $hosts: global.api.current.hosts,
-      $subscribers: global.api.current.subscribers
+      $game: _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a'),
+      $title: _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a'),
+      $views: _.get(await global.db.engine.findOne('api.current', { key: 'views' }), 'value', 0),
+      $followers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
+      $hosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0),
+      $subscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0)
     }
     var result = false
     try {
