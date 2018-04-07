@@ -94,13 +94,11 @@ let migration = {
       let users = await global.db.engine.find('users')
       for (let user of users) {
         if (!_.has(user, 'stats.bits') || _.isNil(user.stats.bits)) continue // skip if bits are null/undefined
-        await Promise.all([
-          global.db.engine.remove('users', { _id: user._id.toString() }),
-          global.db.engine.insert('users.bits', { username: user.username, amount: user.stats.bits, message: 'Migrated from 6.x', timestamp: _.now() })
-        ])
+        await global.db.engine.remove('users', { username: user.username })
+        await global.db.engine.insert('users.bits', { username: user.username, amount: user.stats.bits, message: 'Migrated from 6.x', timestamp: _.now() })
         delete user.stats.bits
-        delete user._id``
-        await global.db.engine.insert('users', user)
+        delete user._id
+        await global.db.engine.update('users', { username: user.username }, user)
       }
     }
   }]
