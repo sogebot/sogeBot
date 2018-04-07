@@ -49,12 +49,13 @@ Configuration.prototype.debug = async function (self, sender) {
     bot: _.isNil(config.settings.bot_oauth) || !config.settings.bot_oauth.match(/oauth:[\w]*/)
   }
 
+  const lang = await global.configuration.getValue('lang')
+  const mute = await global.configuration.getValue('mute')
   global.log.debug(`======= COPY DEBUG MESSAGE FROM HERE =======`)
-  global.log.debug(`GENERAL | OS: ${process.env.npm_config_user_agent} | DB: ${config.database.type} | Bot version: ${process.env.npm_package_version} | Bot uptime: ${process.uptime()} | Bot lang: ${global.configuration.getValue('lang')} | Bot mute: ${global.configuration.getValue('mute')}`)
+  global.log.debug(`GENERAL | OS: ${process.env.npm_config_user_agent} | DB: ${config.database.type} | Bot version: ${process.env.npm_package_version} | Bot uptime: ${process.uptime()} | Bot lang: ${lang} | Bot mute: ${mute}`)
   global.log.debug(`SYSTEMS | ${_.keys(_.pickBy(config.systems)).join(', ')}`)
   global.log.debug(`WIDGETS | ${_.map(widgets, 'widget').join(', ')}`)
   global.log.debug(`API | HELIX ${stats.helix.total}/${stats.helix.errors} | KRAKEN ${stats.kraken.total}/${stats.kraken.errors} | TMI ${stats.tmi.total}/${stats.tmi.errors}`)
-  global.log.debug(`WEBHOOKS | ${_.keys(_.pickBy(global.webhooks.enabled)).join(', ')}`)
   global.log.debug(`OAUTH | BOT ${!oauth.bot} | BROADCASTER ${!oauth.broadcaster}`)
   global.log.debug('======= END OF DEBUG MESSAGE =======')
 }
