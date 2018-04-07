@@ -304,7 +304,7 @@ class Twitch {
       let tips = await global.db.engine.find('users.tips')
       for (let tip of tips) {
         if (_.isNil(sorted[tip.username])) sorted[tip.username] = { username: tip.username, amount: 0 }
-        sorted[tip.username].amount += global.currency.exchange(tip.amount, tip.currency, global.configuration.getValue('currency'))
+        sorted[tip.username].amount += global.currency.exchange(tip.amount, tip.currency, await global.configuration.getValue('currency'))
       }
       sorted = _.orderBy(sorted, 'amount', 'desc')
     } else {
@@ -324,9 +324,9 @@ class Twitch {
 
     sorted = _.chunk(sorted, 10)[0]
     for (let user of sorted) {
-      message += (i + 1) + '. ' + (global.configuration.getValue('atUsername') ? '@' : '') + user.username + ' - '
+      message += (i + 1) + '. ' + (await global.configuration.getValue('atUsername') ? '@' : '') + user.username + ' - '
       if (type === 'time') message += (user.time.watched / 1000 / 60 / 60).toFixed(1) + 'h'
-      else if (type === 'tips') message += user.amount.toFixed(2) + global.currency.symbol(global.configuration.getValue('currency'))
+      else if (type === 'tips') message += user.amount.toFixed(2) + global.currency.symbol(await global.configuration.getValue('currency'))
       else if (type === 'points') message += user.points + ' ' + await global.systems.points.getPointsName(user.points)
       else message += user.stats.messages
       if (i + 1 < 10 && !_.isNil(sorted[i + 1])) message += ', '
