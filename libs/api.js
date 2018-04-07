@@ -565,7 +565,6 @@ class API {
       currentBits: _.get(await global.db.engine.findOne('api.current', { key: 'bits' }), 'value', 0),
       currentTips: _.get(await global.db.engine.findOne('api.current', { key: 'tips' }), 'value', 0),
       chatMessages: global.linesParsed - this.chatMessagesAtStart,
-      currentFollowers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
       currentViews: _.get(await global.db.engine.findOne('api.current', { key: 'views' }), 'value', 0),
       maxViewers: _.get(await global.db.engine.findOne('api.max', { key: 'viewers' }), 'value', 0),
       newChatters: _.get(await global.db.engine.findOne('api.new', { key: 'chatters' }), 'value', 0),
