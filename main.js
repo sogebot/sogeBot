@@ -376,7 +376,7 @@ async function cheer (channel, userstate, message) {
   global.log.cheer(`${userstate.username.toLowerCase()}, bits: ${userstate.bits}, message: ${message}`)
   global.db.engine.insert('users.bits', { username: userstate.username.toLowerCase(), amount: userstate.bits, message: message, timestamp: _.now() })
   global.events.fire('cheer', { username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
-  if (global.api.isOnline) global.api.current.bits = global.api.current.bits + parseInt(userstate.bits, 10)
+  if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
 }
 
 function sendMessageToWorker (sender, message) {
