@@ -76,7 +76,7 @@ class Donationalerts {
       })
       global.events.fire('tip', { username: data.username.toLowerCase(), amount: data.amount, message: data.message, currency: data.currency })
       global.db.engine.insert('users.tips', { username: data.username.toLowerCase(), amount: data.amount, message: data.message, currency: data.currency, timestamp: _.now() })
-      if (await global.cache.isOnline()) global.api.current.tips = global.api.current.tips + parseFloat(global.currency.exchange(data.amount, data.currency, global.configuration.getValue('currency')))
+      if (await global.cache.isOnline()) global.api.current.tips = global.api.current.tips + parseFloat(global.currency.exchange(data.amount, data.currency, await global.configuration.getValue('currency')))
     })
   }
   sockets () {
