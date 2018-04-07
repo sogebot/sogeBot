@@ -11,29 +11,16 @@ class API {
     this.refreshAPICalls = _.now() / 1000
     this.rate_limit_follower_check = []
 
-    this.maxViewers = 0
     this.chatMessagesAtStart = global.linesParsed
     this.maxRetries = 3
     this.curRetries = 0
-    this.newChatters = 0
     this.streamType = 'live'
+
+    this.gameOrTitleChangedManually = false
 
     this.retries = {
       getCurrentStreamData: 0,
       getChannelDataOldAPI: 0
-    }
-
-    this.current = {
-      viewers: 0,
-      views: 0,
-      followers: 0,
-      hosts: 0,
-      subscribers: 0,
-      bits: 0,
-      tips: 0,
-      rawStatus: '',
-      status: '',
-      game: ''
     }
 
     this._loadCachedStatusAndGame()
@@ -58,8 +45,7 @@ class API {
   }
 
   async _loadCachedStatusAndGame () {
-    [this.current.rawStatus, this.current.game] = await Promise.all([global.cache.rawStatus(), global.cache.gameCache()])
-    global.db.engine.update('api.current', { key: 'game' }, { value: this.current.game })
+    global.db.engine.update('api.current', { key: 'game' }, { value: await global.cache.gameCache() })
   }
 
   async getChannelID () {
@@ -163,14 +149,12 @@ class API {
       if (e.message === '422 Unprocessable Entity') {
         timeout = 0
         global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
-        this.current.subscribers = 0
-        global.db.engine.update('api.current', { key: 'subscribers' }, { value: this.current.subscribers })
+        global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
         // caster is not affiliate or partner, don't do calls again
       } else if (e.message === '403 Forbidden') {
         timeout = 0
         global.log.warning('Broadcaster have not correct oauth, will not check subs')
-        this.current.subscribers = 0
-        global.db.engine.update('api.current', { key: 'subscribers' }, { value: this.current.subscribers })
+        global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
       } else {
         timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
         global.log.error(`${url} - ${e.message}`)
@@ -182,8 +166,7 @@ class API {
     }
 
     debug('api:getChannelSubscribersOldAPI')(`Current subscribers count: ${request.body._total}`)
-    this.current.subscribers = request.body._total - 1 // remove broadcaster itself
-    global.db.engine.update('api.current', { key: 'subscribers' }, { value: this.current.subscribers })
+    await global.db.engine.update('api.current', { key: 'subscribers' }, { value: request.body._total - 1 })
 
     const subscribers = _.map(request.body.subscriptions, 'user')
 
@@ -222,17 +205,17 @@ class API {
       setTimeout(() => this.getChannelDataOldAPI(), timeout)
     }
 
-    if (!this.current.gameOrTitleChangedManually) {
+    if (!this.gameOrTitleChangedManually) {
       // Just polling update
       debug('api:getChannelDataOldAPI')(`Current game: ${request.body.game}, Current Status: ${request.body.status}`)
 
-      this.current.rawStatus = await global.cache.rawStatus()
+      let rawStatus = await global.cache.rawStatus()
       let status = await this.parseTitle()
       if (request.body.status !== status) {
         // check if status is same as updated status
         if (this.retries.getChannelDataOldAPI >= 15) {
           this.retries.getChannelDataOldAPI = 0
-          this.current.rawStatus = request.body.status
+          await global.cache.rawStatus(request.body.status)
         } else {
           this.retries.getChannelDataOldAPI++
           return
@@ -241,15 +224,12 @@ class API {
         this.retries.getChannelDataOldAPI = 0
       }
 
-      this.current.game = request.body.game
-      this.current.status = request.body.status
-
-      global.db.engine.update('api.current', { key: 'game' }, { value: this.current.game })
-      global.db.engine.update('api.current', { key: 'status' }, { value: this.current.status })
-
-      await Promise.all([global.cache.gameCache(this.current.game), global.cache.rawStatus(this.current.rawStatus)])
+      const game = request.body.game
+      await global.db.engine.update('api.current', { key: 'game' }, { value: game })
+      await global.db.engine.update('api.current', { key: 'status' }, { value: request.body.status })
+      await Promise.all([global.cache.gameCache(game), global.cache.rawStatus(rawStatus)])
     } else {
-      this.current.gameOrTitleChangedManually = false
+      this.gameOrTitleChangedManually = false
     }
   }
 
@@ -278,8 +258,7 @@ class API {
     }
 
     d('Current host count: %s, Hosts: %s', request.body.hosts.length, _.map(request.body.hosts, 'host_login').join(', '))
-    this.current.hosts = request.body.hosts.length
-    global.db.engine.update('api.current', { key: 'hosts' }, { value: this.current.hosts })
+    await global.db.engine.update('api.current', { key: 'hosts' }, { value: request.body.hosts.length })
 
     // save hosts list
     for (let host of _.map(request.body.hosts, 'host_login')) {
@@ -321,8 +300,7 @@ class API {
     this.refreshAPICalls = request.headers['ratelimit-reset']
 
     debug('api:updateChannelViews')(request.body.data)
-    this.current.views = request.body.data[0].view_count
-    global.db.engine.update('api.current', { key: 'views' }, { value: this.current.views })
+    await global.db.engine.update('api.current', { key: 'views' }, { value: request.body.data[0].view_count })
   }
 
   async getLatest100Followers (quiet) {
@@ -424,8 +402,7 @@ class API {
     }
 
     debug('api:getLatest100Followers')(`Current followers count: ${request.body.total}`)
-    this.current.followers = request.body.total
-    global.db.engine.update('api.current', { key: 'followers' }, { value: this.current.followers })
+    global.db.engine.update('api.current', { key: 'followers' }, { value: request.body.total })
   }
 
   async getGameFromId (gid) {
@@ -451,13 +428,14 @@ class API {
       // add id->game to cache
       gids[gid] = request.body.data[0].name
       d('Saving id %s -> %s to cache', gid, request.body.data[0].name)
-      global.db.engine.update('cache', { upsert: true }, { gidToGame: gids })
+      await global.db.engine.update('cache', { key: 'gidToGame' }, { gidToGame: gids })
       return request.body.data[0].name
     } catch (e) {
-      global.log.warning(`Couldn't find name of game for gid ${gid} - fallback to ${this.current.game}`)
+      const game = await global.db.engine.findOne('api.current', { key: 'game' })
+      global.log.warning(`Couldn't find name of game for gid ${gid} - fallback to ${game.value}`)
       global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
       global.db.engine.insert('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
-      return this.current.game
+      return game.value
     }
   }
 
@@ -500,21 +478,20 @@ class API {
       // correct status and we've got a data - stream online
       let stream = request.body.data[0]; debug('api:getCurrentStreamData')(stream)
 
-      if (!this.current.gameOrTitleChangedManually) {
-        this.current.rawStatus = await global.cache.rawStatus()
+      if (!this.gameOrTitleChangedManually) {
+        let rawStatus = await global.cache.rawStatus()
         let status = await this.parseTitle()
+        const game = await this.getGameFromId(stream.game_id)
 
-        this.current.status = stream.title
-        this.current.game = await this.getGameFromId(stream.game_id)
-
-        global.db.engine.update('api.current', { key: 'status' }, { value: this.current.status })
-        global.db.engine.update('api.current', { key: 'game' }, { value: this.current.game })
+        await global.db.engine.update('api.current', { key: 'status' }, { value: stream.title })
+        await global.db.engine.update('api.current', { key: 'game' }, { value: game })
 
         if (stream.title !== status) {
           // check if status is same as updated status
           if (this.retries.getCurrentStreamData >= 15) {
             this.retries.getCurrentStreamData = 0
-            this.current.rawStatus = stream.title
+            rawStatus = stream.title
+            await global.cache.rawStatus(rawStatus)
           } else {
             this.retries.getCurrentStreamData++
             return
@@ -522,23 +499,20 @@ class API {
         } else {
           this.retries.getCurrentStreamData = 0
         }
-        await Promise.all([global.cache.gameCache(this.current.game), global.cache.rawStatus(this.current.rawStatus)])
+        await Promise.all([global.cache.gameCache(game), global.cache.rawStatus(rawStatus)])
       }
 
       if (!await global.cache.isOnline() || this.streamType !== stream.type) {
         global.cache.when({ online: stream.started_at })
         this.chatMessagesAtStart = global.linesParsed
-        this.current.viewers = 0
-        this.current.bits = 0
-        this.current.tips = 0
-        this.maxViewers = 0
-        this.newChatters = 0
 
-        global.db.engine.update('api.current', { key: 'viewers' }, { value: this.current.viewers })
-        global.db.engine.update('api.current', { key: 'bits' }, { value: this.current.bits })
-        global.db.engine.update('api.current', { key: 'tips' }, { value: this.current.tips })
+        await global.db.engine.update('api.max', { key: 'viewers' }, { value: 0 })
+        await global.db.engine.update('api.new', { key: 'chatters' }, { value: 0 })
+        await global.db.engine.update('api.current', { key: 'viewers' }, { value: 0 })
+        await global.db.engine.update('api.current', { key: 'bits' }, { value: 0 })
+        await global.db.engine.update('api.current', { key: 'tips' }, { value: 0 })
 
-        global.db.engine.remove('cache.hosts', {}) // we dont want to have cached hosts on stream start
+        await global.db.engine.remove('cache.hosts', {}) // we dont want to have cached hosts on stream start
 
         if (!global.webhooks.enabled.streams) {
           global.events.fire('stream-started')
@@ -577,24 +551,24 @@ class API {
   }
 
   async saveStreamData (stream) {
-    this.current.viewers = stream.viewer_count
-    global.db.engine.update('api.current', { key: 'viewers' }, { value: this.current.viewers })
+    await global.db.engine.update('api.current', { key: 'viewers' }, { value: stream.viewer_count })
 
-    this.maxViewers = this.maxViewers < this.current.viewers ? this.current.viewers : this.maxViewers
+    let maxViewers = await global.db.engine.findOne('api.max', { key: 'viewers' })
+    if (maxViewers.value < stream.viewer_count) await global.db.engine.update('api.max', { key: 'viewers' }, { value: stream.viewer_count })
 
     global.stats.save({
       timestamp: new Date().getTime(),
       whenOnline: (await global.cache.when()).online,
-      currentViewers: this.current.viewers,
-      currentSubscribers: this.current.subscribers,
-      currentBits: this.current.bits,
-      currentTips: this.current.tips,
+      currentViewers: _.get(await global.db.engine.findOne('api.current', { key: 'viewers' }), 'value', 0),
+      currentSubscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
+      currentBits: _.get(await global.db.engine.findOne('api.current', { key: 'bits' }), 'value', 0),
+      currentTips: _.get(await global.db.engine.findOne('api.current', { key: 'tips' }), 'value', 0),
       chatMessages: global.linesParsed - this.chatMessagesAtStart,
-      currentFollowers: this.current.followers,
-      currentViews: this.current.views,
-      maxViewers: this.maxViewers,
-      newChatters: this.newChatters,
-      currentHosts: this.current.hosts
+      currentFollowers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
+      currentViews: _.get(await global.db.engine.findOne('api.current', { key: 'views' }), 'value', 0),
+      maxViewers: _.get(await global.db.engine.findOne('api.max', { key: 'viewers' }), 'value', 0),
+      newChatters: _.get(await global.db.engine.findOne('api.new', { key: 'chatters' }), 'value', 0),
+      currentHosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0)
     })
   }
 
@@ -633,9 +607,9 @@ class API {
     var game
     try {
       if (!_.isNil(args.title)) {
-        this.current.rawStatus = await global.cache.rawStatus(args.title) // save raw status to cache, if changing title
-      } else this.current.rawStatus = await global.cache.rawStatus() // we are not setting title -> load raw status
-      status = await this.parseTitle(this.current.rawStatus)
+        await global.cache.rawStatus(args.title) // save raw status to cache, if changing title
+      }
+      status = await this.parseTitle(await global.cache.rawStatus())
 
       if (!_.isNil(args.game)) {
         game = args.game
@@ -669,11 +643,11 @@ class API {
         if (response.game.trim() === args.game.trim()) {
           global.commons.sendMessage(global.translate('game.change.success')
             .replace(/\$game/g, response.game), sender)
-          global.events.fire('game-changed', { oldGame: self.current.game, game: response.game })
-          self.current.game = response.game
+          global.events.fire('game-changed', { oldGame: (await global.db.engine.findOne('api.current', { key: 'game' })).value, game: response.game })
+          await global.db.engine.update('api.current', { key: 'game' }, { value: response.game })
         } else {
           global.commons.sendMessage(global.translate('game.change.failed')
-            .replace(/\$game/g, self.current.game), sender)
+            .replace(/\$game/g, (await global.db.engine.findOne('api.current', { key: 'game' })).value), sender)
         }
       }
 
@@ -683,14 +657,14 @@ class API {
             .replace(/\$title/g, response.status), sender)
 
           // we changed title outside of bot
-          if (response.status !== status) self.current.rawStatus = response.status
-          self.current.status = response.status
+          if (response.status !== status) await global.cache.rawStatus(response.status)
+          await global.db.engine.update('api.current', { key: 'status' }, { value: response.status })
         } else {
           global.commons.sendMessage(global.translate('title.change.failed')
-            .replace(/\$title/g, self.current.status), sender)
+            .replace(/\$title/g, (await global.db.engine.findOne('api.current', { key: 'status' })).value), sender)
         }
       }
-      this.current.gameOrTitleChangedManually = true
+      this.gameOrTitleChangedManually = true
     }
   }
 
