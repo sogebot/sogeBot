@@ -23,6 +23,8 @@ module.exports = {
       await global.db.engine.remove('cache.users', {})
       await global.db.engine.remove('gambling.duel', {})
       await global.db.engine.remove('widgetsEventList', {})
+      await global.db.engine.remove('moderation.permit', {})
+      await global.db.engine.remove('moderation.warnings', {})
       resolve()
     }
     return new Promise((resolve, reject) => {
