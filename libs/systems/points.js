@@ -312,8 +312,8 @@ Points.prototype.startCounting = function (username) {
 }
 
 Points.prototype.updatePoints = async function () {
-  var interval = (await global.cache.isOnline() ? global.configuration.getValue('pointsInterval') * 60 * 1000 : await global.configuration.getValue('pointsIntervalOffline') * 60 * 1000)
-  var ptsPerInterval = (await global.cache.isOnline() ? global.configuration.getValue('pointsPerInterval') : await global.configuration.getValue('pointsPerIntervalOffline'))
+  var interval = (await global.cache.isOnline() ? await global.configuration.getValue('pointsInterval') * 60 * 1000 : await global.configuration.getValue('pointsIntervalOffline') * 60 * 1000)
+  var ptsPerInterval = (await global.cache.isOnline() ? await global.configuration.getValue('pointsPerInterval') : await global.configuration.getValue('pointsPerIntervalOffline'))
 
   let users = await global.users.getAll({ is: { online: true } })
   for (let user of users) {

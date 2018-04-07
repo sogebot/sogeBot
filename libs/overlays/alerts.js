@@ -32,17 +32,17 @@ Alerts.prototype.commands = function () {
   ]
 }
 
-Alerts.prototype.replay = function (self, socket, data) {
+Alerts.prototype.replay = async function (self, socket, data) {
   const replay = [
     'type=video',
     'url=' + data,
-    'position=' + global.configuration.getValue('replayPosition'),
-    'x-offset=' + global.configuration.getValue('replayOffsetX'),
-    'y-offset=' + global.configuration.getValue('replayOffsetY'),
-    'size=' + global.configuration.getValue('replaySize'),
-    'volume=' + global.configuration.getValue('replayVolume'),
-    'label=' + global.configuration.getValue('replayLabel'),
-    'filter=' + global.configuration.getValue('replayFilter'),
+    'position=' + await global.configuration.getValue('replayPosition'),
+    'x-offset=' + await global.configuration.getValue('replayOffsetX'),
+    'y-offset=' + await global.configuration.getValue('replayOffsetY'),
+    'size=' + await global.configuration.getValue('replaySize'),
+    'volume=' + await global.configuration.getValue('replayVolume'),
+    'label=' + await global.configuration.getValue('replayLabel'),
+    'filter=' + await global.configuration.getValue('replayFilter'),
     'class=replay'
   ]
   self.overlay(self, null, replay.join(' '))
