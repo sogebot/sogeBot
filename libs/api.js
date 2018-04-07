@@ -561,6 +561,7 @@ class API {
       whenOnline: (await global.cache.when()).online,
       currentViewers: _.get(await global.db.engine.findOne('api.current', { key: 'viewers' }), 'value', 0),
       currentSubscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
+      currentFollowers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
       currentBits: _.get(await global.db.engine.findOne('api.current', { key: 'bits' }), 'value', 0),
       currentTips: _.get(await global.db.engine.findOne('api.current', { key: 'tips' }), 'value', 0),
       chatMessages: global.linesParsed - this.chatMessagesAtStart,
