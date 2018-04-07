@@ -1,4 +1,4 @@
-/* global describe it beforeEach */
+/* global describe it before */
 if (require('cluster').isWorker) process.exit()
 
 require('../../general.js')
@@ -10,7 +10,7 @@ const assert = require('chai').assert
 const owner = { username: 'soge__' }
 
 describe('systems/moderation - permitLink()', () => {
-  beforeEach(async () => {
+  before(async () => {
     await db.cleanup()
     await message.prepare()
   })
@@ -19,6 +19,20 @@ describe('systems/moderation - permitLink()', () => {
       it('should send parse error', async function () {
         global.systems.moderation.permitLink(global.systems.moderation, owner, '')
         await message.isSent('moderation.permit-parse-failed', owner)
+      })
+    })
+    describe('parsing \'!permit [username] 1000\'', function () {
+      it('should send success message', async function () {
+        global.systems.moderation.permitLink(global.systems.moderation, owner, 'test 1000')
+        await message.isSent('moderation.user-have-link-permit', owner, { username: 'test', count: 1000, link: global.commons.getLocalizedName(1000, 'core.links') })
+      })
+      it('should not timeout user 1000 messages', async () => {
+        for (let i = 0; i < 1000; i++) {
+          assert.isTrue(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'test' }, 'http://www.google.com'))
+        }
+      })
+      it('should timeout user on 1001 message', async function () {
+        assert.isFalse(await global.systems.moderation.containsLink(global.systems.moderation, { username: 'test' }, 'http://www.google.com'))
       })
     })
     describe('parsing \'!permit [username]\'', function () {
