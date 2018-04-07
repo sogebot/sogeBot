@@ -325,20 +325,20 @@ Panel.prototype.sendStreamData = async function (self, socket) {
   const whenOnline = (await global.cache.when()).online
   var data = {
     uptime: global.commons.getTime(whenOnline, false),
-    currentViewers: global.api.current.viewers,
-    currentSubscribers: global.api.current.subscribers,
-    currentBits: global.api.current.bits,
-    currentTips: global.api.current.tips,
+    currentViewers: _.get(await global.db.engine.findOne('api.current', { key: 'viewers' }), 'value', 0),
+    currentSubscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0),
+    currentBits: _.get(await global.db.engine.findOne('api.current', { key: 'bits' }), 'value', 0),
+    currentTips: _.get(await global.db.engine.findOne('api.current', { key: 'tips' }), 'value', 0),
     currency: global.currency.symbol(await global.configuration.getValue('currency')),
     chatMessages: await global.cache.isOnline() ? global.linesParsed - global.api.chatMessagesAtStart : 0,
-    currentFollowers: global.api.current.followers,
-    currentViews: global.api.current.views,
-    maxViewers: global.api.maxViewers,
-    newChatters: global.api.newChatters,
-    game: global.api.current.game,
-    status: global.api.current.status,
-    rawStatus: global.api.current.rawStatus,
-    currentHosts: global.api.current.hosts
+    currentFollowers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
+    currentViews: _.get(await global.db.engine.findOne('api.current', { key: 'views' }), 'value', 0),
+    maxViewers: _.get(await global.db.engine.findOne('api.max', { key: 'viewers' }), 'value', 0),
+    newChatters: _.get(await global.db.engine.findOne('api.new', { key: 'chatters' }), 'value', 0),
+    game: _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', null),
+    status: _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', null),
+    rawStatus: await global.cache.rawStatus(),
+    currentHosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0)
   }
   socket.emit('stats', data)
 }

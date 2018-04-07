@@ -195,12 +195,11 @@ class Webhooks {
       if (!await global.cache.isOnline() || global.twitch.streamType !== stream.type) {
         global.cache.when({ online: stream.started_at })
         global.api.chatMessagesAtStart = global.linesParsed
-        global.api.current.viewers = 0
-        global.api.current.bits = 0
-        global.api.current.tips = 0
-        global.api.maxViewers = 0
-        global.api.newChatters = 0
-        global.api.chatMessagesAtStart = global.linesParsed
+        await global.db.engine.update('api.max', { key: 'viewers' }, { value: 0 })
+        await global.db.engine.update('api.new', { key: 'chatters' }, { value: 0 })
+        await global.db.engine.update('api.current', { key: 'viewers' }, { value: 0 })
+        await global.db.engine.update('api.current', { key: 'bits' }, { value: 0 })
+        await global.db.engine.update('api.current', { key: 'tips' }, { value: 0 })
 
         global.db.engine.remove('cache.hosts', {}) // we dont want to have cached hosts on stream start
 
