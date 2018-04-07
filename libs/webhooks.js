@@ -189,8 +189,8 @@ class Webhooks {
     // stream is online
     if (aEvent.data.length > 0) {
       let stream = aEvent.data[0]
-      global.api.current.status = stream.title
-      global.api.current.game = await global.api.getGameFromId(stream.game_id)
+      await global.db.engine.update('api.current', { key: 'status' }, { value: stream.title })
+      await global.db.engine.update('api.current', { key: 'game' }, { value: await global.api.getGameFromId(stream.game_id) })
 
       if (!await global.cache.isOnline() || global.twitch.streamType !== stream.type) {
         global.cache.when({ online: stream.started_at })
