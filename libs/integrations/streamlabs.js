@@ -89,7 +89,7 @@ class Streamlabs {
           })
           global.events.fire('tip', { username: event.from.toLowerCase(), amount: event.amount, message: event.message, currency: event.currency })
           global.db.engine.insert('users.tips', { username: event.from.toLowerCase(), amount: event.amount, message: event.message, currency: event.currency, timestamp: _.now() })
-          if (await global.cache.isOnline()) global.api.current.tips = global.api.current.tips + parseFloat(global.currency.exchange(event.amount, event.currency, await global.configuration.getValue('currency')))
+          if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(event.amount, event.currency, await global.configuration.getValue('currency'))) })
         }
       }
     })
