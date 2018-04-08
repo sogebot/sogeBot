@@ -46,18 +46,27 @@ class IMasterController extends Interface {
 
   async find (table, where) {
     const id = crypto.randomBytes(64).toString('hex')
-    _.sample(cluster.workers).send({ type: 'db', fnc: 'find', table: table, where: where, id: id })
+    const data = { type: 'db', fnc: 'find', table: table, where: where, id: id }
+    _.sample(cluster.workers).send(data)
 
     return new Promise((resolve, reject) => {
       const start = _.now()
+      let retries = 1
       let returnData = (resolve, reject, id) => {
-        if (_.now() - start > 5000) {
-          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'find', table: table, where: where, id: id }))
-          reject('Return data was not found')
+        if ((_.now() - start > 4000 * retries && retries < 5)) {
+          _.sample(cluster.workers).send(data) // retry
+          debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
+          retries++
+        } else if (_.now() - start > 30000) {
+          debug('db:master:retry')('DB operation failed - ' + util.inspect(data))
+          resolve([])
         }
+
         if (!_.isNil(this.data[id])) {
+          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(data))
+          const items = this.data[id].items
           this.data[id].finished = true
-          resolve(this.data[id].items)
+          resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
       returnData(resolve, reject, id)
@@ -68,19 +77,26 @@ class IMasterController extends Interface {
     const id = crypto.randomBytes(64).toString('hex')
     const worker = _.sample(cluster.workers)
     const data = { type: 'db', fnc: 'findOne', table: table, where: where, id: id }
-    debug('db:master:findOne')(`Sending to worker#${worker.id} - is connected: ${worker.isConnected()}\n%j`, data)
     worker.send(data)
 
     return new Promise((resolve, reject) => {
       const start = _.now()
+      let retries = 1
       let returnData = (resolve, reject, id) => {
-        if (_.now() - start > 5000) {
-          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'findOne', table: table, where: where, id: id }))
-          reject('Return data was not found')
+        if ((_.now() - start > 4000 * retries && retries < 5)) {
+          _.sample(cluster.workers).send(data) // retry
+          debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
+          retries++
+        } else if (_.now() - start > 30000) {
+          debug('db:master:retry')('DB operation failed - ' + util.inspect(data))
+          resolve([])
         }
+
         if (!_.isNil(this.data[id])) {
+          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(data))
+          const items = this.data[id].items
           this.data[id].finished = true
-          resolve(this.data[id].items)
+          resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
       returnData(resolve, reject, id)
@@ -89,18 +105,27 @@ class IMasterController extends Interface {
 
   async insert (table, object) {
     const id = crypto.randomBytes(64).toString('hex')
-    _.sample(cluster.workers).send({ type: 'db', fnc: 'insert', table: table, object: object, id: id })
+    const data = { type: 'db', fnc: 'insert', table: table, object: object, id: id }
+    _.sample(cluster.workers).send(data)
 
     return new Promise((resolve, reject) => {
       const start = _.now()
+      let retries = 1
       let returnData = (resolve, reject, id) => {
-        if (_.now() - start > 5000) {
-          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'insert', table: table, object: object, id: id }))
-          reject('Return data was not found')
+        if ((_.now() - start > 4000 * retries && retries < 5)) {
+          _.sample(cluster.workers).send(data) // retry
+          debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
+          retries++
+        } else if (_.now() - start > 30000) {
+          debug('db:master:retry')('DB operation failed - ' + util.inspect(data))
+          resolve([])
         }
+
         if (!_.isNil(this.data[id])) {
+          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(data))
+          const items = this.data[id].items
           this.data[id].finished = true
-          resolve(this.data[id].items)
+          resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
       returnData(resolve, reject, id)
@@ -111,19 +136,26 @@ class IMasterController extends Interface {
     const id = crypto.randomBytes(64).toString('hex')
     const worker = _.sample(cluster.workers)
     const data = { type: 'db', fnc: 'remove', table: table, where: where, id: id }
-    debug('db:master:remove')(`Sending to worker#${worker.id} - is connected: ${worker.isConnected()}\n%j`, data)
     worker.send(data)
 
     return new Promise((resolve, reject) => {
       const start = _.now()
+      let retries = 1
       let returnData = (resolve, reject, id) => {
-        if (_.now() - start > 5000) {
-          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'remove', table: table, where: where, id: id }))
-          reject('Return data was not found')
+        if ((_.now() - start > 4000 * retries && retries < 5)) {
+          _.sample(cluster.workers).send(data) // retry
+          debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
+          retries++
+        } else if (_.now() - start > 30000) {
+          debug('db:master:retry')('DB operation failed - ' + util.inspect(data))
+          resolve([])
         }
+
         if (!_.isNil(this.data[id])) {
+          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(data))
+          const items = this.data[id].items
           this.data[id].finished = true
-          resolve(this.data[id].items)
+          resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
       returnData(resolve, reject, id)
@@ -132,18 +164,27 @@ class IMasterController extends Interface {
 
   async update (table, where, object) {
     const id = crypto.randomBytes(64).toString('hex')
-    _.sample(cluster.workers).send({ type: 'db', fnc: 'update', table: table, where: where, object: object, id: id })
+    const data = { type: 'db', fnc: 'update', table: table, where: where, object: object, id: id }
+    _.sample(cluster.workers).send(data)
 
     return new Promise((resolve, reject) => {
       const start = _.now()
+      let retries = 1
       let returnData = (resolve, reject, id) => {
-        if (_.now() - start > 5000) {
-          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'update', table: table, where: where, object: object, id: id }))
-          reject('Return data was not found')
+        if ((_.now() - start > 4000 * retries && retries < 5)) {
+          _.sample(cluster.workers).send(data) // retry
+          debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
+          retries++
+        } else if (_.now() - start > 30000) {
+          debug('db:master:retry')('DB operation failed - ' + util.inspect(data))
+          resolve([])
         }
+
         if (!_.isNil(this.data[id])) {
+          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(data))
+          const items = this.data[id].items
           this.data[id].finished = true
-          resolve(this.data[id].items)
+          resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
       returnData(resolve, reject, id)
@@ -152,15 +193,27 @@ class IMasterController extends Interface {
 
   async incrementOne (table, where, object) {
     const id = crypto.randomBytes(64).toString('hex')
-    _.sample(cluster.workers).send({ type: 'db', fnc: 'incrementOne', table: table, where: where, object: object, id: id })
+    const data = { type: 'db', fnc: 'incrementOne', table: table, where: where, object: object, id: id }
+    _.sample(cluster.workers).send(data)
 
     return new Promise((resolve, reject) => {
       const start = _.now()
+      let retries = 1
       let returnData = (resolve, reject, id) => {
-        if (_.now() - start > 60000) reject('Return data was not found')
+        if ((_.now() - start > 4000 * retries && retries < 5)) {
+          _.sample(cluster.workers).send(data) // retry
+          debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
+          retries++
+        } else if (_.now() - start > 30000) {
+          debug('db:master:retry')('DB operation failed - ' + util.inspect(data))
+          resolve([])
+        }
+
         if (!_.isNil(this.data[id])) {
+          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(data))
+          const items = this.data[id].items
           this.data[id].finished = true
-          resolve(this.data[id].items)
+          resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
       returnData(resolve, reject, id)
@@ -169,18 +222,27 @@ class IMasterController extends Interface {
 
   async increment (table, where, object) {
     const id = crypto.randomBytes(64).toString('hex')
-    _.sample(cluster.workers).send({ type: 'db', fnc: 'increment', table: table, where: where, object: object, id: id })
+    const data = { type: 'db', fnc: 'increment', table: table, where: where, object: object, id: id }
+    _.sample(cluster.workers).send(data)
 
     return new Promise((resolve, reject) => {
       const start = _.now()
+      let retries = 1
       let returnData = (resolve, reject, id) => {
-        if (_.now() - start > 5000) {
-          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'increment', table: table, where: where, object: object, id: id }))
-          reject('Return data was not found')
+        if ((_.now() - start > 4000 * retries && retries < 5)) {
+          _.sample(cluster.workers).send(data) // retry
+          debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
+          retries++
+        } else if (_.now() - start > 30000) {
+          debug('db:master:retry')('DB operation failed - ' + util.inspect(data))
+          resolve([])
         }
+
         if (!_.isNil(this.data[id])) {
+          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(data))
+          const items = this.data[id].items
           this.data[id].finished = true
-          resolve(this.data[id].items)
+          resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
       returnData(resolve, reject, id)
