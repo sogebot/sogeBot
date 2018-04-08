@@ -3,6 +3,7 @@
 const util = require('util')
 const _ = require('lodash')
 const debug = require('debug')
+const crypto = require('crypto')
 
 const Parser = require('./libs/parser')
 
@@ -85,20 +86,23 @@ function cluster () {
   })
 
   async function message (data) {
+    const id = crypto.randomBytes(64).toString('hex').slice(0, 5)
+    debug(`cluster:worker:onMessage:${id}`)(data)
     let sender = data.sender
     let message = data.message
     let skip = data.skip
 
+    debug(`cluster:worker:onMessage:${id}`)('Init of parser')
     const parse = new Parser({ sender: sender, message: message, skip: skip })
 
+    debug(`cluster:worker:onMessage:${id}`)('Checking msg type')
     if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {
       global.log.whisperIn(message, {username: sender.username})
     } else if (!skip && !global.commons.isBot(sender.username)) global.log.chatIn(message, {username: sender.username})
 
-    let [isModerated, isIgnored] = await Promise.all([
-      parse.isModerated(),
-      global.commons.isIgnored(sender)
-    ])
+    debug(`cluster:worker:onMessage:${id}`)('IsModerated, isIgnored')
+    const isModerated = await parse.isModerated()
+    const isIgnored = await global.commons.isIgnored(sender)
 
     if (!isModerated && !isIgnored) {
       if (!skip && !_.isNil(sender.username)) {
@@ -112,8 +116,10 @@ function cluster () {
         } else if (!message.startsWith('!') && await global.cache.isOnline()) global.db.engine.increment('users', { username: sender.username }, { stats: { messages: 1 } })
       }
 
+      debug(`cluster:worker:onMessage:${id}`)('Process parser')
       await parse.process()
     }
+    debug(`cluster:worker:onMessage:${id}`)('Stats sending')
     process.send({ type: 'stats', of: 'parser', value: parse.time() })
   }
 }
