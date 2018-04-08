@@ -117,13 +117,11 @@ class INeDB extends Interface {
     this.on(table) // init table
 
     var self = this
-    const threadHash = await this.waitForThread(table, where)
     return new Promise(function (resolve, reject) {
       try {
         self.on(table).remove(flatten(where), { multi: true }, function (err, numRemoved) {
           if (err) reject(err)
           if (debug.enabled) debug('remove() \n\ttable: %s \n\twhere: %j \n\tremoved: %j', table, where, numRemoved)
-          global.db.engine.freeThread(table, where, threadHash)
           resolve(numRemoved)
         })
       } catch (e) {
@@ -139,14 +137,12 @@ class INeDB extends Interface {
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
 
     var self = this
-    const threadHash = await this.waitForThread(table, where)
     return new Promise(function (resolve, reject) {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
       try {
         self.on(table).update(flatten(where), { $set: flatten(object, { safe: true }) }, { upsert: (_.isNil(where._id) && !_.isEmpty(where)), multi: (_.isEmpty(where)), returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
           if (err) reject(err)
           if (debug.enabled) debug('update() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
-          global.db.engine.freeThread(table, where, threadHash)
           resolve(affectedDocs)
         })
       } catch (e) {
@@ -162,14 +158,12 @@ class INeDB extends Interface {
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
 
     var self = this
-    const threadHash = await this.waitForThread(table, where)
     return new Promise(function (resolve, reject) {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
       try {
         self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: false, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
           if (err) reject(err)
           if (debug.enabled) debug('increment() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
-          global.db.engine.freeThread(table, where, threadHash)
           resolve(affectedDocs)
         })
       } catch (e) {
@@ -185,14 +179,12 @@ class INeDB extends Interface {
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
 
     var self = this
-    const threadHash = await this.waitForThread(table, where)
     return new Promise(function (resolve, reject) {
       // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
       try {
         self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: true, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
           if (err) reject(err)
           if (debug.enabled) debug('increment() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
-          global.db.engine.freeThread(table, where, threadHash)
           resolve(affectedDocs)
         })
       } catch (e) {

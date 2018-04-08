@@ -102,7 +102,6 @@ class IMongoDB extends Interface {
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
     delete object._id
 
-    const threadHash = await this.waitForThread(table, where)
     try {
       let db = this.client.db(this.dbName)
       let item = await db.collection(table).findAndModify(
@@ -112,10 +111,8 @@ class IMongoDB extends Interface {
         { $inc: flatten(object) },
         { new: true } // will return updated item
       )
-      this.freeThread(table, where, threadHash)
       return item.value
     } catch (e) {
-      this.freeThread(table, where, threadHash)
       global.log.error(e.stack)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
@@ -132,7 +129,6 @@ class IMongoDB extends Interface {
     if (_.isEmpty(object)) throw Error('Object to update cannot be empty')
     delete object._id
 
-    const threadHash = await this.waitForThread(table, where)
     try {
       let db = this.client.db(this.dbName)
 
@@ -147,10 +143,8 @@ class IMongoDB extends Interface {
 
       // workaround for return of updated objects
       let items = await db.collection(table).find(where).toArray()
-      this.freeThread(table, where, threadHash)
       return items
     } catch (e) {
-      this.freeThread(table, where, threadHash)
       global.log.error(e.stack)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
@@ -163,14 +157,11 @@ class IMongoDB extends Interface {
     if (!_.isNil(where._id)) where._id = new ObjectID(where._id)
     else where = flatten(where)
 
-    const threadHash = await this.waitForThread(table, where)
     try {
       let db = this.client.db(this.dbName)
       let result = await db.collection(table).deleteMany(where)
-      this.freeThread(table, where, threadHash)
       return result.result.n
     } catch (e) {
-      this.freeThread(table, where, threadHash)
       global.log.error(e.stack)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
@@ -187,10 +178,6 @@ class IMongoDB extends Interface {
 
     // remove _id from object
     delete object._id
-
-    const threadHash = await this.waitForThread(table, where)
-    if (debug.enabled) debug('update() \n\ttable: %s \n\twhere: %j \n\thash: %s', table, where, threadHash)
-
     try {
       let db = this.client.db(this.dbName)
 
@@ -209,10 +196,8 @@ class IMongoDB extends Interface {
 
       // workaround for return of updated objects
       let items = await db.collection(table).find(where).toArray()
-      this.freeThread(table, where, threadHash)
       return items.length === 1 ? items[0] : items
     } catch (e) {
-      this.freeThread(table, where, threadHash)
       global.log.error(e.stack)
       if (e.message.match(/EPIPE/g)) {
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
