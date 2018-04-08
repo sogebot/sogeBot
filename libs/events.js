@@ -156,7 +156,7 @@ class Events {
 
   async fireBotWillLeaveChannel (operation, attributes) {
     global.client.part('#' + config.settings.broadcaster_username)
-    global.users.setAll({ is: { online: false } }) // force all users offline
+    global.db.engine.remove('users.online', {}) // force all users offline
   }
 
   async fireStartCommercial (operation, attributes) {

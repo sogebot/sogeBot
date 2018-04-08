@@ -72,8 +72,9 @@ class Twitch {
     if (!_.isNull(sender)) {
       global.users.set(sender.username, {
         time: { message: new Date().getTime() },
-        is: { online: true, subscriber: !_.isNil(sender.subscriber) ? sender.subscriber : false }
+        is: { subscriber: !_.isNil(sender.subscriber) ? sender.subscriber : false }
       }, true)
+      global.db.engine.update('users.online', { username: sender.username }, { username: sender.username })
     }
     return true
   }
@@ -109,14 +110,21 @@ class Twitch {
 
   async followers (self, sender) {
     const d = debug('twitch:followers')
-    let [events, users] = await Promise.all([global.db.engine.find('widgetsEventList'), global.users.getAll({ is: { online: true, follower: true } })])
+    let events = global.db.engine.find('widgetsEventList')
+    const onlineViewers = await global.db.engine.find('users.online')
+
+    let onlineFollowers = []
+    for (let viewer of onlineViewers) {
+      let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } })
+      if (!_.isEmpty(user)) onlineFollowers.append(user.username)
+    }
 
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'follow' })
     moment.locale(await global.configuration.getValue('lang'))
 
     let lastFollowAgo = ''
     let lastFollowUsername = 'n/a'
-    let onlineFollowersCount = _.size(_.filter(users, (o) => o.username !== config.settings.broadcaster_username && o.username !== config.settings.bot_username)) // except bot and user
+    let onlineFollowersCount = _.size(_.filter(onlineFollowers, (o) => o !== config.settings.broadcaster_username && o !== config.settings.bot_username)) // except bot and user
     if (events.length > 0) {
       lastFollowUsername = events[0].username
       lastFollowAgo = moment(events[0].timestamp).fromNow()
@@ -132,14 +140,21 @@ class Twitch {
 
   async subs (self, sender) {
     const d = debug('twitch:subs')
-    let [events, users] = await Promise.all([global.db.engine.find('widgetsEventList'), global.users.getAll({ is: { online: true, subscriber: true } })])
+    let events = global.db.engine.find('widgetsEventList')
+    const onlineViewers = await global.db.engine.find('users.online')
+
+    let onlineSubscribers = []
+    for (let viewer of onlineViewers) {
+      let user = await global.db.engine.find('users', { username: viewer.username, is: { subscriber: true } })
+      if (!_.isEmpty(user)) onlineSubscribers.append(user.username)
+    }
 
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'sub' || o.event === 'resub' || o.event === 'subgift' })
     moment.locale(await global.configuration.getValue('lang'))
 
     let lastSubAgo = ''
     let lastSubUsername = 'n/a'
-    let onlineSubCount = _.size(_.filter(users, (o) => o.username !== config.settings.broadcaster_username && o.username !== config.settings.bot_username)) // except bot and user
+    let onlineSubCount = _.size(_.filter(onlineSubscribers, (o) => o !== config.settings.broadcaster_username && o !== config.settings.bot_username)) // except bot and user
     if (events.length > 0) {
       lastSubUsername = events[0].username
       lastSubAgo = moment(events[0].timestamp).fromNow()

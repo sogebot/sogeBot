@@ -164,7 +164,7 @@ function Panel () {
     socket.on('joinBot', () => { global.client.join('#' + config.settings.broadcaster_username) })
     socket.on('leaveBot', () => {
       global.client.part('#' + config.settings.broadcaster_username)
-      global.db.engine.update('users', {}, { is: { online: false } }) // force all users offline
+      global.db.engine.remove('users.online', {}) // force all users offline
     })
 
     // custom var

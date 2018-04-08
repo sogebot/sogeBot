@@ -100,21 +100,20 @@ class API {
     for (let chatter of chatters) {
       const isIgnored = !_.isEmpty(await global.db.engine.findOne('users_ignorelist', { username: chatter }))
       if (!isIgnored) {
-        const user = await global.db.engine.findOne('users', { username: chatter })
-        if (!_.get(user, 'is.online', false)) {
-          global.api.isFollower(chatter)
-          global.users.set(chatter, { is: { online: true } })
+        const user = await global.db.engine.findOne('users.online', { username: chatter })
+        if (_.isEmpty(user)) {
+          await global.db.engine.insert('users.online', { username: chatter })
           global.widgets.joinpart.send({ username: chatter, type: 'join' })
           global.events.fire('user-joined-channel', { username: chatter })
         }
       }
     }
 
-    const allOnlineUsers = await global.db.engine.find('users', { is: { online: true } })
+    const allOnlineUsers = await global.db.engine.find('users.online')
     for (let user of allOnlineUsers) {
       if (!_.includes(chatters, user.username)) {
         // user is no longer in channel
-        global.users.set(user.username, { is: { online: false } })
+        await global.db.engine.remove('users.online', { username: user.username })
         global.widgets.joinpart.send({ username: user.username, type: 'part' })
         global.events.fire('user-parted-channel', { username: user.username })
       }
@@ -226,7 +225,8 @@ class API {
       const game = request.body.game
       await global.db.engine.update('api.current', { key: 'game' }, { value: game })
       await global.db.engine.update('api.current', { key: 'status' }, { value: request.body.status })
-      await Promise.all([global.cache.gameCache(game), global.cache.rawStatus(rawStatus)])
+      await global.cache.gameCache(game)
+      await global.cache.rawStatus(rawStatus)
     } else {
       this.gameOrTitleChangedManually = false
     }
@@ -395,6 +395,7 @@ class API {
             global.db.engine.update('users', { username: follower }, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment().format('x')) } })
           }
         } catch (e) {
+          global.log.error(e)
           global.log.error(e.stack)
         }
       }
@@ -526,7 +527,8 @@ class API {
         } else {
           this.retries.getCurrentStreamData = 0
         }
-        await Promise.all([global.cache.gameCache(game), global.cache.rawStatus(rawStatus)])
+        await global.cache.gameCache(game)
+        await global.cache.rawStatus(rawStatus)
       }
     } else {
       if (await global.cache.isOnline() && this.curRetries < this.maxRetries) {

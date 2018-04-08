@@ -30,6 +30,7 @@ class IMongoDB extends Interface {
     await db.collection('users.bits').createIndex('timestamp')
     await db.collection('users.tips').createIndex('timestamp')
     await db.collection('users').createIndex('username')
+    await db.collection('users.online').createIndex('username')
     await db.collection('cache').createIndex('key')
     await db.collection('api.stats').createIndex('timestamp', { expireAfterSeconds: 60 * 60 * 24 })
     await db.collection('stats').createIndex('whenOnline')

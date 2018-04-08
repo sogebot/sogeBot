@@ -14,7 +14,7 @@ function Users () {
   }
 
   // set all users offline on start
-  this.setAll({ is: { online: false } })
+  global.db.engine.remove('users.online')
   setInterval(() => this.updateWatchTime(), 60000)
 }
 
@@ -431,13 +431,14 @@ Users.prototype.updateWatchTime = async function () {
   debug('init')
 
   if (await global.cache.isOnline()) {
-    let users = await global.users.getAll({ is: { online: true } })
+    let users = await global.db.engine.find('users.online')
 
     debug(users)
-    for (let user of users) {
+    for (let onlineUser of users) {
+      let user = await global.db.engine.findOne('users', { username: onlineUser.username })
       // add user as a new chatter in a stream
       if (_.isNil(user.time)) user.time = {}
-      if (_.isNil(user.time.watched) || user.time.watched === 0) this.newChatters++
+      if (_.isNil(user.time.watched) || user.time.watched === 0) await global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
       global.db.engine.increment('users', { username: user.username }, { time: { watched: 60000 } })
     }
   } else {

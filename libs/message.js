@@ -40,22 +40,32 @@ class Message {
 
     let random = {
       '(random.online.viewer)': async function () {
-        let onlineViewers = await global.users.getAll({ is: { online: true } })
+        let onlineViewers = await global.db.engine.find('users.online')
         onlineViewers = _.filter(onlineViewers, function (o) { return o.username !== attr.sender.username })
         if (onlineViewers.length === 0) return 'unknown'
         return onlineViewers[_.random(0, onlineViewers.length - 1)].username
       },
       '(random.online.follower)': async function () {
-        let onlineFollower = await global.users.getAll({ is: { online: true, follower: true } })
-        onlineFollower = _.filter(onlineFollower, function (o) { return o.username !== attr.sender.username })
-        if (onlineFollower.length === 0) return 'unknown'
-        return onlineFollower[_.random(0, onlineFollower.length - 1)].username
+        let onlineViewers = await global.db.engine.find('users.online')
+        let onlineFollowers = []
+        for (let viewer of onlineViewers) {
+          let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } })
+          if (!_.isEmpty(user)) onlineFollowers.append(user.username)
+        }
+        onlineFollowers = _.filter(onlineFollowers, function (o) { return o !== attr.sender.username })
+        if (onlineFollowers.length === 0) return 'unknown'
+        return onlineFollowers[_.random(0, onlineFollowers.length - 1)]
       },
       '(random.online.subscriber)': async function () {
-        let onlineSubscriber = await global.users.getAll({ is: { online: true, subscriber: true } })
-        onlineSubscriber = _.filter(onlineSubscriber, function (o) { return o.username !== attr.sender.username })
-        if (onlineSubscriber.length === 0) return 'unknown'
-        return onlineSubscriber[_.random(0, onlineSubscriber.length - 1)].username
+        let onlineViewers = await global.db.engine.find('users.online')
+        let onlineSubscribers = []
+        for (let viewer of onlineViewers) {
+          let user = await global.db.engine.find('users', { username: viewer.username, is: { subscriber: true } })
+          if (!_.isEmpty(user)) onlineSubscribers.append(user.username)
+        }
+        onlineSubscribers = _.filter(onlineSubscribers, function (o) { return o !== attr.sender.username })
+        if (onlineSubscribers.length === 0) return 'unknown'
+        return onlineSubscribers[_.random(0, onlineSubscribers.length - 1)]
       },
       '(random.viewer)': async function () {
         let viewer = await global.users.getAll()
@@ -248,11 +258,27 @@ class Message {
           global.users.get(attr.sender)
         ])
 
+        let onlineViewers = await global.db.engine.find('users.online')
+
+        let onlineSubscribers = []
+        for (let viewer of onlineViewers) {
+          let user = await global.db.engine.find('users', { username: viewer.username, is: { ubscriber: true } })
+          if (!_.isEmpty(user)) onlineSubscribers.append(user.username)
+        }
+        onlineSubscribers = _.filter(onlineSubscribers, function (o) { return o !== attr.sender.username })
+
+        let onlineFollowers = []
+        for (let viewer of onlineViewers) {
+          let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } })
+          if (!_.isEmpty(user)) onlineFollowers.append(user.username)
+        }
+        onlineFollowers = _.filter(onlineFollowers, function (o) { return o !== attr.sender.username })
+
         let randomVar = {
           online: {
-            viewer: _.sample(_.map(_.filter(awaits[0], (o) => _.get(o, 'is.online', false)), 'username')),
-            follower: _.sample(_.map(_.filter(awaits[0], (o) => _.get(o, 'is.online', false) && _.get(o, 'is.follower', false)), 'username')),
-            subscriber: _.sample(_.map(_.filter(awaits[0], (o) => _.get(o, 'is.online', false) && _.get(o, 'is.subscriber', false)), 'username'))
+            viewer: _.sample(onlineViewers),
+            follower: _.sample(onlineFollowers),
+            subscriber: _.sample(onlineSubscribers)
           },
           viewer: _.sample(_.map(awaits[0], 'username')),
           follower: _.sample(_.map(_.filter(awaits[0], (o) => _.get(o, 'is.follower', false)), 'username')),

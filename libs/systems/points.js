@@ -234,7 +234,7 @@ Points.prototype.allPoints = async function (self, sender, text) {
     var parsed = text.match(/^([0-9]+)$/)
     var givePts = parseInt(parsed[1], 10)
 
-    let users = await global.users.getAll({ is: { online: true } })
+    let users = await global.db.engine.find('users.online')
     _.each(users, function (user) {
       global.db.engine.increment('users', { username: user.username }, { points: parseInt(givePts, 10) })
     })
@@ -253,7 +253,7 @@ Points.prototype.rainPoints = async function (self, sender, text) {
     var parsed = text.match(/^([0-9]+)$/)
     var givePts = parseInt(parsed[1], 10)
 
-    let users = await global.users.getAll({ is: { online: true } })
+    let users = await global.db.engine.find('users.online')
     _.each(users, function (user) {
       global.db.engine.increment('users', { username: user.username }, { points: parseInt(Math.floor(Math.random() * givePts), 10) })
     })
@@ -315,7 +315,7 @@ Points.prototype.updatePoints = async function () {
   var interval = (await global.cache.isOnline() ? await global.configuration.getValue('pointsInterval') * 60 * 1000 : await global.configuration.getValue('pointsIntervalOffline') * 60 * 1000)
   var ptsPerInterval = (await global.cache.isOnline() ? await global.configuration.getValue('pointsPerInterval') : await global.configuration.getValue('pointsPerIntervalOffline'))
 
-  let users = await global.users.getAll({ is: { online: true } })
+  let users = await global.db.engine.find('users.online')
   for (let user of users) {
     _.set(user, 'time.points', _.get(user, 'time.points', 0))
     if (new Date().getTime() - user.time.points >= interval) {
