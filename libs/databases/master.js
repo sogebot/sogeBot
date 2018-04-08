@@ -15,7 +15,8 @@ class IMasterController extends Interface {
       worker.send({ type: 'dbAck', id: message.id })
       this.data[message.id] = {
         items: message.items,
-        timestamp: _.now()
+        timestamp: _.now(),
+        finished: false
       }
     })
 
@@ -24,13 +25,13 @@ class IMasterController extends Interface {
 
     this.connect()
 
-    setInterval(() => this.cleanup(), 1000)
+    setInterval(() => this.cleanup(), 100)
   }
 
   cleanup () {
     const size = _.size(this.data)
     for (let [id, values] of Object.entries(this.data)) {
-      if (_.now() - values.timestamp > 5000) delete this.data[id]
+      if (_.now() - values.timestamp > 5000 || values.finished) delete this.data[id]
     }
     debug('db:master:cleanup')('Cleaned up ' + (size - _.size(this.data)))
   }
@@ -56,6 +57,7 @@ class IMasterController extends Interface {
           reject('Return data was not found')
         }
         if (!_.isNil(this.data[id])) {
+          this.data[id].finished = true
           resolve(this.data[id].items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
@@ -78,6 +80,7 @@ class IMasterController extends Interface {
           reject('Return data was not found')
         }
         if (!_.isNil(this.data[id])) {
+          this.data[id].finished = true
           resolve(this.data[id].items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
@@ -97,6 +100,7 @@ class IMasterController extends Interface {
           reject('Return data was not found')
         }
         if (!_.isNil(this.data[id])) {
+          this.data[id].finished = true
           resolve(this.data[id].items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
@@ -119,6 +123,7 @@ class IMasterController extends Interface {
           reject('Return data was not found')
         }
         if (!_.isNil(this.data[id])) {
+          this.data[id].finished = true
           resolve(this.data[id].items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
@@ -138,6 +143,7 @@ class IMasterController extends Interface {
           reject('Return data was not found')
         }
         if (!_.isNil(this.data[id])) {
+          this.data[id].finished = true
           resolve(this.data[id].items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
@@ -154,6 +160,7 @@ class IMasterController extends Interface {
       let returnData = (resolve, reject, id) => {
         if (_.now() - start > 60000) reject('Return data was not found')
         if (!_.isNil(this.data[id])) {
+          this.data[id].finished = true
           resolve(this.data[id].items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
@@ -170,6 +177,7 @@ class IMasterController extends Interface {
       let returnData = (resolve, reject, id) => {
         if (_.now() - start > 60000) reject('Return data was not found')
         if (!_.isNil(this.data[id])) {
+          this.data[id].finished = true
           resolve(this.data[id].items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
