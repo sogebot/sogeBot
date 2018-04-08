@@ -23,16 +23,21 @@ class IMasterController extends Interface {
     this.data = {}
 
     this.connect()
-
-    setInterval(() => this.cleanup(), 100)
+    this.cleanup()
   }
 
   cleanup () {
-    const size = _.size(this.data)
-    for (let [id, values] of Object.entries(this.data)) {
-      if (_.now() - values.timestamp > 10000 || values.finished) delete this.data[id]
+    try {
+      const size = _.size(this.data)
+      for (let [id, values] of Object.entries(this.data)) {
+        if (_.now() - values.timestamp > 10000 || values.finished) delete this.data[id]
+      }
+      debug('db:master:cleanup')('Cleaned up ' + (size - _.size(this.data)))
+    } catch (e) {
+      global.log.error(e.stack)
+    } finally {
+      setTimeout(() => this.cleanup(), 1)
     }
-    debug('db:master:cleanup')('Cleaned up ' + (size - _.size(this.data)))
   }
 
   async connect () {
