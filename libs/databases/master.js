@@ -12,15 +12,16 @@ class IMasterController extends Interface {
 
     cluster.on('message', (worker, message) => {
       debug('db:master:incoming')(`Got data from Worker#${worker.id}\n${util.inspect(message)}`)
-      this.data[message.id] = {
+      this.data.push({
+        id: message.id,
         items: message.items,
         timestamp: _.now(),
         finished: false
-      }
+      })
     })
 
     this.connected = false
-    this.data = {}
+    this.data = []
 
     this.connect()
     this.cleanup()
@@ -28,15 +29,16 @@ class IMasterController extends Interface {
 
   cleanup () {
     try {
-      const size = _.size(this.data)
-      for (let [id, values] of Object.entries(this.data)) {
-        if (_.now() - values.timestamp > 10000 || values.finished) delete this.data[id]
+      const size = this.data.length
+      _.remove(this.data, (o) => o.finished)
+      for (let item of this.data) {
+        if (_.now() - item.timestamp > 5000) _.remove(this.data, (o) => o.finished)
       }
-      debug('db:master:cleanup')('Cleaned up ' + (size - _.size(this.data)))
+      debug('db:master:cleanup')('Cleaned up ' + (size - this.data.length))
     } catch (e) {
       global.log.error(e.stack)
     } finally {
-      setTimeout(() => this.cleanup(), 1)
+      setTimeout(() => this.cleanup(), 1000)
     }
   }
 
@@ -67,10 +69,12 @@ class IMasterController extends Interface {
           resolve([])
         }
 
-        if (!_.isNil(this.data[id])) {
-          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(data))
-          const items = this.data[id].items
-          this.data[id].finished = true
+        let dataFromWorker = _.find(this.data, (o) => o.id === id)
+        if (!_.isNil(dataFromWorker)) {
+          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(dataFromWorker))
+          const items = dataFromWorker.items
+          dataFromWorker.finished = true
+          _.remove(this.data, (o) => o.id === id)
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
@@ -97,10 +101,12 @@ class IMasterController extends Interface {
           resolve([])
         }
 
-        if (!_.isNil(this.data[id])) {
-          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(data))
-          const items = this.data[id].items
-          this.data[id].finished = true
+        let dataFromWorker = _.find(this.data, (o) => o.id === id)
+        if (!_.isNil(dataFromWorker)) {
+          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(dataFromWorker))
+          const items = dataFromWorker.items
+          dataFromWorker.finished = true
+          _.remove(this.data, (o) => o.id === id)
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
@@ -126,10 +132,12 @@ class IMasterController extends Interface {
           resolve([])
         }
 
-        if (!_.isNil(this.data[id])) {
-          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(data))
-          const items = this.data[id].items
-          this.data[id].finished = true
+        let dataFromWorker = _.find(this.data, (o) => o.id === id)
+        if (!_.isNil(dataFromWorker)) {
+          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(dataFromWorker))
+          const items = dataFromWorker.items
+          dataFromWorker.finished = true
+          _.remove(this.data, (o) => o.id === id)
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
@@ -156,10 +164,12 @@ class IMasterController extends Interface {
           resolve([])
         }
 
-        if (!_.isNil(this.data[id])) {
-          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(data))
-          const items = this.data[id].items
-          this.data[id].finished = true
+        let dataFromWorker = _.find(this.data, (o) => o.id === id)
+        if (!_.isNil(dataFromWorker)) {
+          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(dataFromWorker))
+          const items = dataFromWorker.items
+          dataFromWorker.finished = true
+          _.remove(this.data, (o) => o.id === id)
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
@@ -185,10 +195,12 @@ class IMasterController extends Interface {
           resolve([])
         }
 
-        if (!_.isNil(this.data[id])) {
-          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(data))
-          const items = this.data[id].items
-          this.data[id].finished = true
+        let dataFromWorker = _.find(this.data, (o) => o.id === id)
+        if (!_.isNil(dataFromWorker)) {
+          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(dataFromWorker))
+          const items = dataFromWorker.items
+          dataFromWorker.finished = true
+          _.remove(this.data, (o) => o.id === id)
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
@@ -214,10 +226,12 @@ class IMasterController extends Interface {
           resolve([])
         }
 
-        if (!_.isNil(this.data[id])) {
-          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(data))
-          const items = this.data[id].items
-          this.data[id].finished = true
+        let dataFromWorker = _.find(this.data, (o) => o.id === id)
+        if (!_.isNil(dataFromWorker)) {
+          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(dataFromWorker))
+          const items = dataFromWorker.items
+          dataFromWorker.finished = true
+          _.remove(this.data, (o) => o.id === id)
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
@@ -243,10 +257,12 @@ class IMasterController extends Interface {
           resolve([])
         }
 
-        if (!_.isNil(this.data[id])) {
-          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(data))
-          const items = this.data[id].items
-          this.data[id].finished = true
+        let dataFromWorker = _.find(this.data, (o) => o.id === id)
+        if (!_.isNil(dataFromWorker)) {
+          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(dataFromWorker))
+          const items = dataFromWorker.items
+          dataFromWorker.finished = true
+          _.remove(this.data, (o) => o.id === id)
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
