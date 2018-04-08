@@ -81,6 +81,14 @@ class API {
 
   async getChannelChattersUnofficialAPI () {
     const url = `https://tmi.twitch.tv/group/user/${config.settings.broadcaster_username.toLowerCase()}/chatters`
+
+    const needToWait = _.isNil(global.widgets)
+    debug('api:getChannelChattersUnofficialAPI')(`GET ${url}\nwait: ${needToWait}`)
+    if (needToWait) {
+      setTimeout(() => this.getChannelChattersUnofficialAPI(), 1000)
+      return
+    }
+
     let timeout = 60000
     var request
     try {
