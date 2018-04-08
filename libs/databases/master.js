@@ -12,7 +12,6 @@ class IMasterController extends Interface {
 
     cluster.on('message', (worker, message) => {
       debug('db:master:incoming')(`Got data from Worker#${worker.id}\n${util.inspect(message)}`)
-      worker.send({ type: 'dbAck', id: message.id })
       this.data[message.id] = {
         items: message.items,
         timestamp: _.now(),

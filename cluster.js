@@ -19,9 +19,6 @@ function cluster () {
     return
   }
 
-  let dbData = []
-  setInterval(() => sendDBDataUntilAck(), 10)
-
   global.configuration = new (require('./libs/configuration.js'))()
   global.currency = new (require('./libs/currency.js'))()
   global.users = new (require('./libs/users.js'))()
@@ -54,11 +51,8 @@ function cluster () {
           await message(data)
           workerIsFree.message = true
           break
-        case 'dbAck':
-          debug('cluster:dbAck')(data)
-          dbData = _.filter(dbData, (o) => o.id !== data.id)
-          break
         case 'db':
+          workerIsFree.db = false
           switch (data.fnc) {
             case 'find':
               data.items = await global.db.engine.find(data.table, data.where)
@@ -84,19 +78,11 @@ function cluster () {
             default:
               global.log.error('This db call is not correct\n%j', data)
           }
-          dbData.push(data)
+          process.send(data)
+          workerIsFree.db = true
       }
     })
   })
-
-  function sendDBDataUntilAck () {
-    debug('cluster:sendDBDataUntilAck:data')(dbData.length)
-    for (let data of dbData) {
-      debug('cluster:sendDBDataUntilAck')(data)
-      process.send(data)
-    }
-    workerIsFree.db = dbData.length === 0
-  }
 
   async function message (data) {
     let sender = data.sender
