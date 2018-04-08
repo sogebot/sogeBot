@@ -27,6 +27,14 @@ class IMongoDB extends Interface {
 
     // create indexes
     let db = this.client.db(this.dbName)
+    await db.collection('users.bits').dropIndexes()
+    await db.collection('users.tips').dropIndexes()
+    await db.collection('users').dropIndexes()
+    await db.collection('users.online').dropIndexes()
+    await db.collection('cache').dropIndexes()
+    await db.collection('api.stats').dropIndexes()
+    await db.collection('stats').dropIndexes()
+
     await db.collection('users.bits').createIndex('timestamp')
     await db.collection('users.tips').createIndex('timestamp')
     await db.collection('users').createIndex('username')
