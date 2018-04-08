@@ -53,7 +53,7 @@ class IMasterController extends Interface {
       const start = _.now()
       let returnData = (resolve, reject, id) => {
         if (_.now() - start > 5000) {
-          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'update', table: table, where: where, id: id }))
+          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'find', table: table, where: where, id: id }))
           reject('Return data was not found')
         }
         if (!_.isNil(this.data[id])) {
@@ -76,7 +76,7 @@ class IMasterController extends Interface {
       const start = _.now()
       let returnData = (resolve, reject, id) => {
         if (_.now() - start > 5000) {
-          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'update', table: table, where: where, id: id }))
+          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'findOne', table: table, where: where, id: id }))
           reject('Return data was not found')
         }
         if (!_.isNil(this.data[id])) {
@@ -96,7 +96,7 @@ class IMasterController extends Interface {
       const start = _.now()
       let returnData = (resolve, reject, id) => {
         if (_.now() - start > 5000) {
-          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'update', table: table, object: object, id: id }))
+          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'insert', table: table, object: object, id: id }))
           reject('Return data was not found')
         }
         if (!_.isNil(this.data[id])) {
@@ -119,7 +119,7 @@ class IMasterController extends Interface {
       const start = _.now()
       let returnData = (resolve, reject, id) => {
         if (_.now() - start > 5000) {
-          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'update', table: table, where: where, id: id }))
+          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'remove', table: table, where: where, id: id }))
           reject('Return data was not found')
         }
         if (!_.isNil(this.data[id])) {
@@ -175,7 +175,10 @@ class IMasterController extends Interface {
     return new Promise((resolve, reject) => {
       const start = _.now()
       let returnData = (resolve, reject, id) => {
-        if (_.now() - start > 60000) reject('Return data was not found')
+        if (_.now() - start > 5000) {
+          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'increment', table: table, where: where, object: object, id: id }))
+          reject('Return data was not found')
+        }
         if (!_.isNil(this.data[id])) {
           this.data[id].finished = true
           resolve(this.data[id].items)
