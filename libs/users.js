@@ -14,7 +14,7 @@ function Users () {
   }
 
   // set all users offline on start
-  global.db.engine.remove('users.online')
+  global.db.engine.remove('users.online', {})
   setInterval(() => this.updateWatchTime(), 60000)
 }
 
