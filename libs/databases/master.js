@@ -31,7 +31,7 @@ class IMasterController extends Interface {
   cleanup () {
     const size = _.size(this.data)
     for (let [id, values] of Object.entries(this.data)) {
-      if (_.now() - values.timestamp > 5000 || values.finished) delete this.data[id]
+      if (_.now() - values.timestamp > 10000 || values.finished) delete this.data[id]
     }
     debug('db:master:cleanup')('Cleaned up ' + (size - _.size(this.data)))
   }
