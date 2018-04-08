@@ -478,30 +478,6 @@ class API {
       // correct status and we've got a data - stream online
       let stream = request.body.data[0]; debug('api:getCurrentStreamData')(stream)
 
-      if (!this.gameOrTitleChangedManually) {
-        let rawStatus = await global.cache.rawStatus()
-        let status = await this.parseTitle()
-        const game = await this.getGameFromId(stream.game_id)
-
-        await global.db.engine.update('api.current', { key: 'status' }, { value: stream.title })
-        await global.db.engine.update('api.current', { key: 'game' }, { value: game })
-
-        if (stream.title !== status) {
-          // check if status is same as updated status
-          if (this.retries.getCurrentStreamData >= 15) {
-            this.retries.getCurrentStreamData = 0
-            rawStatus = stream.title
-            await global.cache.rawStatus(rawStatus)
-          } else {
-            this.retries.getCurrentStreamData++
-            return
-          }
-        } else {
-          this.retries.getCurrentStreamData = 0
-        }
-        await Promise.all([global.cache.gameCache(game), global.cache.rawStatus(rawStatus)])
-      }
-
       if (!await global.cache.isOnline() || this.streamType !== stream.type) {
         global.cache.when({ online: stream.started_at })
         this.chatMessagesAtStart = global.linesParsed
@@ -529,6 +505,30 @@ class API {
       global.events.fire('number-of-viewers-is-at-least-x')
       global.events.fire('stream-is-running-x-minutes')
       global.events.fire('every-x-minutes-of-stream')
+
+      if (!this.gameOrTitleChangedManually) {
+        let rawStatus = await global.cache.rawStatus()
+        let status = await this.parseTitle()
+        const game = await this.getGameFromId(stream.game_id)
+
+        await global.db.engine.update('api.current', { key: 'status' }, { value: stream.title })
+        await global.db.engine.update('api.current', { key: 'game' }, { value: game })
+
+        if (stream.title !== status) {
+          // check if status is same as updated status
+          if (this.retries.getCurrentStreamData >= 15) {
+            this.retries.getCurrentStreamData = 0
+            rawStatus = stream.title
+            await global.cache.rawStatus(rawStatus)
+          } else {
+            this.retries.getCurrentStreamData++
+            return
+          }
+        } else {
+          this.retries.getCurrentStreamData = 0
+        }
+        await Promise.all([global.cache.gameCache(game), global.cache.rawStatus(rawStatus)])
+      }
     } else {
       if (await global.cache.isOnline() && this.curRetries < this.maxRetries) {
         // retry if it is not just some network / twitch issue
