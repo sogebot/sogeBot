@@ -13,13 +13,26 @@ class IMasterController extends Interface {
     cluster.on('message', (worker, message) => {
       debug('db:master:incoming')(`Got data from Worker#${worker.id}\n${util.inspect(message)}`)
       worker.send({ type: 'dbAck', id: message.id })
-      this.data[message.id] = message.items // make data available
+      this.data[message.id] = {
+        items: message.items,
+        timestamp: _.now()
+      }
     })
 
     this.connected = false
     this.data = {}
 
     this.connect()
+
+    setInterval(() => this.cleanup(), 1000)
+  }
+
+  cleanup () {
+    const size = _.size(this.data)
+    for (let [id, values] of Object.entries(this.data)) {
+      if (_.now() - values.timestamp > 5000) delete this.data[id]
+    }
+    debug('db:master:cleanup')('Cleaned up ' + (size - _.size(this.data)))
   }
 
   async connect () {
@@ -36,11 +49,14 @@ class IMasterController extends Interface {
     _.sample(cluster.workers).send({ type: 'db', fnc: 'find', table: table, where: where, id: id })
 
     return new Promise((resolve, reject) => {
+      const start = _.now()
       let returnData = (resolve, reject, id) => {
+        if (_.now() - start > 5000) {
+          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'update', table: table, where: where, id: id }))
+          reject('Return data was not found')
+        }
         if (!_.isNil(this.data[id])) {
-          const data = this.data[id]
-          delete this.data[id] // remove data
-          resolve(data)
+          resolve(this.data[id].items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
       returnData(resolve, reject, id)
@@ -55,11 +71,14 @@ class IMasterController extends Interface {
     worker.send(data)
 
     return new Promise((resolve, reject) => {
+      const start = _.now()
       let returnData = (resolve, reject, id) => {
+        if (_.now() - start > 5000) {
+          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'update', table: table, where: where, id: id }))
+          reject('Return data was not found')
+        }
         if (!_.isNil(this.data[id])) {
-          const data = this.data[id]
-          delete this.data[id] // remove data
-          resolve(data)
+          resolve(this.data[id].items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
       returnData(resolve, reject, id)
@@ -71,11 +90,14 @@ class IMasterController extends Interface {
     _.sample(cluster.workers).send({ type: 'db', fnc: 'insert', table: table, object: object, id: id })
 
     return new Promise((resolve, reject) => {
+      const start = _.now()
       let returnData = (resolve, reject, id) => {
+        if (_.now() - start > 5000) {
+          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'update', table: table, object: object, id: id }))
+          reject('Return data was not found')
+        }
         if (!_.isNil(this.data[id])) {
-          const data = this.data[id]
-          delete this.data[id] // remove data
-          resolve(data)
+          resolve(this.data[id].items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
       returnData(resolve, reject, id)
@@ -90,11 +112,14 @@ class IMasterController extends Interface {
     worker.send(data)
 
     return new Promise((resolve, reject) => {
+      const start = _.now()
       let returnData = (resolve, reject, id) => {
+        if (_.now() - start > 5000) {
+          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'update', table: table, where: where, id: id }))
+          reject('Return data was not found')
+        }
         if (!_.isNil(this.data[id])) {
-          const data = this.data[id]
-          delete this.data[id] // remove data
-          resolve(data)
+          resolve(this.data[id].items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
       returnData(resolve, reject, id)
@@ -106,11 +131,14 @@ class IMasterController extends Interface {
     _.sample(cluster.workers).send({ type: 'db', fnc: 'update', table: table, where: where, object: object, id: id })
 
     return new Promise((resolve, reject) => {
+      const start = _.now()
       let returnData = (resolve, reject, id) => {
+        if (_.now() - start > 5000) {
+          global.log.error('DB operation failed - ' + util.inspect({ type: 'db', fnc: 'update', table: table, where: where, object: object, id: id }))
+          reject('Return data was not found')
+        }
         if (!_.isNil(this.data[id])) {
-          const data = this.data[id]
-          delete this.data[id] // remove data
-          resolve(data)
+          resolve(this.data[id].items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
       returnData(resolve, reject, id)
@@ -122,11 +150,11 @@ class IMasterController extends Interface {
     _.sample(cluster.workers).send({ type: 'db', fnc: 'incrementOne', table: table, where: where, object: object, id: id })
 
     return new Promise((resolve, reject) => {
+      const start = _.now()
       let returnData = (resolve, reject, id) => {
+        if (_.now() - start > 60000) reject('Return data was not found')
         if (!_.isNil(this.data[id])) {
-          const data = this.data[id]
-          delete this.data[id] // remove data
-          resolve(data)
+          resolve(this.data[id].items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
       returnData(resolve, reject, id)
@@ -138,11 +166,11 @@ class IMasterController extends Interface {
     _.sample(cluster.workers).send({ type: 'db', fnc: 'increment', table: table, where: where, object: object, id: id })
 
     return new Promise((resolve, reject) => {
+      const start = _.now()
       let returnData = (resolve, reject, id) => {
+        if (_.now() - start > 60000) reject('Return data was not found')
         if (!_.isNil(this.data[id])) {
-          const data = this.data[id]
-          delete this.data[id] // remove data
-          resolve(data)
+          resolve(this.data[id].items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
       returnData(resolve, reject, id)
