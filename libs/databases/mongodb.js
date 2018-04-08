@@ -26,14 +26,15 @@ class IMongoDB extends Interface {
     this.client = await client.connect(config.database.mongodb.url, { poolSize: _.get(config, 'database.mongodb.poolSize', 5) })
 
     // create indexes
-    let db = this.client.db(this.dbName)
-    await db.collection('users.bits').dropIndexes()
-    await db.collection('users.tips').dropIndexes()
-    await db.collection('users').dropIndexes()
-    await db.collection('users.online').dropIndexes()
-    await db.collection('cache').dropIndexes()
-    await db.collection('api.stats').dropIndexes()
-    await db.collection('stats').dropIndexes()
+    let db = await this.client.db(this.dbName)
+    const collections = await db.listCollections().toArray()
+    if (_.find(collections, (o) => o.name === 'users.bits')) await db.collection('users.bits').dropIndexes()
+    if (_.find(collections, (o) => o.name === 'users.tips')) await db.collection('users.tips').dropIndexes()
+    if (_.find(collections, (o) => o.name === 'users.online')) await db.collection('users.online').dropIndexes()
+    if (_.find(collections, (o) => o.name === 'cache')) await db.collection('cache').dropIndexes()
+    if (_.find(collections, (o) => o.name === 'users')) await db.collection('users').dropIndexes()
+    if (_.find(collections, (o) => o.name === 'api.stats')) await db.collection('api.stats').dropIndexes()
+    if (_.find(collections, (o) => o.name === 'stats')) await db.collection('stats').dropIndexes()
 
     await db.collection('users.bits').createIndex('timestamp')
     await db.collection('users.tips').createIndex('timestamp')
