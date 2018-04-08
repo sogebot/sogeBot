@@ -116,7 +116,7 @@ class Twitch {
     let onlineFollowers = []
     for (let viewer of onlineViewers) {
       let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } })
-      if (!_.isEmpty(user)) onlineFollowers.append(user.username)
+      if (!_.isEmpty(user)) onlineFollowers.push(user.username)
     }
 
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'follow' })
@@ -146,7 +146,7 @@ class Twitch {
     let onlineSubscribers = []
     for (let viewer of onlineViewers) {
       let user = await global.db.engine.find('users', { username: viewer.username, is: { subscriber: true } })
-      if (!_.isEmpty(user)) onlineSubscribers.append(user.username)
+      if (!_.isEmpty(user)) onlineSubscribers.push(user.username)
     }
 
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'sub' || o.event === 'resub' || o.event === 'subgift' })

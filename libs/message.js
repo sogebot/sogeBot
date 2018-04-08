@@ -50,7 +50,7 @@ class Message {
         let onlineFollowers = []
         for (let viewer of onlineViewers) {
           let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } })
-          if (!_.isEmpty(user)) onlineFollowers.append(user.username)
+          if (!_.isEmpty(user)) onlineFollowers.push(user.username)
         }
         onlineFollowers = _.filter(onlineFollowers, function (o) { return o !== attr.sender.username })
         if (onlineFollowers.length === 0) return 'unknown'
@@ -61,7 +61,7 @@ class Message {
         let onlineSubscribers = []
         for (let viewer of onlineViewers) {
           let user = await global.db.engine.find('users', { username: viewer.username, is: { subscriber: true } })
-          if (!_.isEmpty(user)) onlineSubscribers.append(user.username)
+          if (!_.isEmpty(user)) onlineSubscribers.push(user.username)
         }
         onlineSubscribers = _.filter(onlineSubscribers, function (o) { return o !== attr.sender.username })
         if (onlineSubscribers.length === 0) return 'unknown'
@@ -263,14 +263,14 @@ class Message {
         let onlineSubscribers = []
         for (let viewer of onlineViewers) {
           let user = await global.db.engine.find('users', { username: viewer.username, is: { ubscriber: true } })
-          if (!_.isEmpty(user)) onlineSubscribers.append(user.username)
+          if (!_.isEmpty(user)) onlineSubscribers.push(user.username)
         }
         onlineSubscribers = _.filter(onlineSubscribers, function (o) { return o !== attr.sender.username })
 
         let onlineFollowers = []
         for (let viewer of onlineViewers) {
           let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } })
-          if (!_.isEmpty(user)) onlineFollowers.append(user.username)
+          if (!_.isEmpty(user)) onlineFollowers.push(user.username)
         }
         onlineFollowers = _.filter(onlineFollowers, function (o) { return o !== attr.sender.username })
 
