@@ -30,9 +30,11 @@ class INeDB extends Interface {
       // create indexes
       if (this.cluster) {
         switch (table) {
+          case 'api.stats':
+            this.table[table].ensureIndex({fieldName: 'timestamp', expireAfterSeconds: 60 * 60 * 24})
+            break
           case 'users.bits':
           case 'users.tips':
-          case 'api.stats':
             this.table[table].ensureIndex({fieldName: 'timestamp'})
             break
           case 'users':

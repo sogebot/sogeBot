@@ -1,29 +1,15 @@
 'use strict'
 var _ = require('lodash')
-const debug = require('debug')
 
 function Stats () {
   this.latestTimestamp = 0
   this.sockets()
-  this.clearAPIStats(this)
 }
 
 Stats.prototype.sockets = function () {
   if (_.isNil(global.panel)) return setTimeout(() => this.sockets(), 10)
   global.panel.socketListening(this, 'getLatestStats', this.getLatestStats)
   global.panel.socketListening(this, 'getApiStats', this.getApiStats)
-}
-
-Stats.prototype.clearAPIStats = async function (self) {
-  const d = debug('stats:clearAPIStats')
-  let stats = await global.db.engine.find('api.stats')
-
-  // remove data older than 24h
-  stats = _.filter(stats, (o) => _.now() - o.timestamp >= 1000 * 60 * 60 * 24)
-  d('Stats to delete: %j', stats)
-  for (let s of stats) await global.db.engine.remove('api.stats', { _id: s._id.toString() })
-
-  setTimeout(() => self.clearAPIStats(self), 1000 * 60 * 60)
 }
 
 Stats.prototype.save = async function (data) {
