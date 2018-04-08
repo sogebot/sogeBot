@@ -253,10 +253,11 @@ Users.prototype.resetWatchTime = function (self, socket, data) {
 }
 
 Users.prototype.getViewers = async function (self, socket) {
-  let [viewers, tips, bits] = await Promise.all([
+  let [viewers, tips, bits, online] = await Promise.all([
     global.users.getAll(),
     global.db.engine.find('users.tips'),
-    global.db.engine.find('users.bits')
+    global.db.engine.find('users.bits'),
+    global.db.engine.find('users.online')
   ])
   for (let viewer of viewers) {
     // TIPS
@@ -279,6 +280,11 @@ Users.prototype.getViewers = async function (self, socket) {
     } else {
       _.set(viewer, 'stats.bits', 0)
     }
+
+    // ONLINE
+    let isOnline = _.filter(online, (o) => o.username === viewer.username)
+    if (isOnline) _.set(viewer, 'is.online', true)
+    else _.set(viewer, 'is.online', false)
   }
   socket.emit('Viewers', Buffer.from(JSON.stringify(viewers), 'utf8').toString('base64'))
 }
@@ -435,7 +441,7 @@ Users.prototype.updateWatchTime = async function () {
 
     debug(users)
     for (let onlineUser of users) {
-      let user = await global.db.engine.findOne('users', { username: onlineUser.username })
+      let user = await this.get(onlineUser.username)
       // add user as a new chatter in a stream
       if (_.isNil(user.time)) user.time = {}
       if (_.isNil(user.time.watched) || user.time.watched === 0) await global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
