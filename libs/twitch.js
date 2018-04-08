@@ -110,7 +110,7 @@ class Twitch {
 
   async followers (self, sender) {
     const d = debug('twitch:followers')
-    let events = global.db.engine.find('widgetsEventList')
+    let events = await global.db.engine.find('widgetsEventList')
     const onlineViewers = await global.db.engine.find('users.online')
 
     let onlineFollowers = []
@@ -140,7 +140,7 @@ class Twitch {
 
   async subs (self, sender) {
     const d = debug('twitch:subs')
-    let events = global.db.engine.find('widgetsEventList')
+    let events = await global.db.engine.find('widgetsEventList')
     const onlineViewers = await global.db.engine.find('users.online')
 
     let onlineSubscribers = []
