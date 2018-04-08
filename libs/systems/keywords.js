@@ -44,9 +44,11 @@ class Keywords {
   }
 
   parsers () {
-    return [
-      {this: this, name: 'keywords', fnc: this.run, permission: constants.VIEWERS, priority: constants.LOW}
-    ]
+    return !global.commons.isSystemEnabled('keywords')
+      ? []
+      : [
+        {this: this, name: 'keywords', fnc: this.run, permission: constants.VIEWERS, priority: constants.LOW}
+      ]
   }
 
   async edit (self, sender, text) {
