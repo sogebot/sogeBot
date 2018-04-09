@@ -41,7 +41,7 @@ class Message {
     let random = {
       '(random.online.viewer)': async function () {
         let onlineViewers = await global.db.engine.find('users.online')
-        onlineViewers = _.filter(onlineViewers, function (o) { return o.username !== attr.sender.username })
+        onlineViewers = _.filter(onlineViewers, function (o) { return o.username !== attr.sender })
         if (onlineViewers.length === 0) return 'unknown'
         return onlineViewers[_.random(0, onlineViewers.length - 1)].username
       },
@@ -52,7 +52,7 @@ class Message {
           let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } })
           if (!_.isEmpty(user)) onlineFollowers.push(user.username)
         }
-        onlineFollowers = _.filter(onlineFollowers, function (o) { return o !== attr.sender.username })
+        onlineFollowers = _.filter(onlineFollowers, function (o) { return o !== attr.sender })
         if (onlineFollowers.length === 0) return 'unknown'
         return onlineFollowers[_.random(0, onlineFollowers.length - 1)]
       },
@@ -63,25 +63,25 @@ class Message {
           let user = await global.db.engine.find('users', { username: viewer.username, is: { subscriber: true } })
           if (!_.isEmpty(user)) onlineSubscribers.push(user.username)
         }
-        onlineSubscribers = _.filter(onlineSubscribers, function (o) { return o !== attr.sender.username })
+        onlineSubscribers = _.filter(onlineSubscribers, function (o) { return o !== attr.sender })
         if (onlineSubscribers.length === 0) return 'unknown'
         return onlineSubscribers[_.random(0, onlineSubscribers.length - 1)]
       },
       '(random.viewer)': async function () {
         let viewer = await global.users.getAll()
-        viewer = _.filter(viewer, function (o) { return o.username !== attr.sender.username })
+        viewer = _.filter(viewer, function (o) { return o.username !== attr.sender })
         if (viewer.length === 0) return 'unknown'
         return viewer[_.random(0, viewer.length - 1)].username
       },
       '(random.follower)': async function () {
         let follower = await global.users.getAll({ is: { follower: true } })
-        follower = _.filter(follower, function (o) { return o.username !== attr.sender.username })
+        follower = _.filter(follower, function (o) { return o.username !== attr.sender })
         if (follower.length === 0) return 'unknown'
         return follower[_.random(0, follower.length - 1)].username
       },
       '(random.subscriber)': async function () {
         let subscriber = await global.users.getAll({ is: { subscriber: true } })
-        subscriber = _.filter(subscriber, function (o) { return o.username !== attr.sender.username })
+        subscriber = _.filter(subscriber, function (o) { return o.username !== attr.sender })
         if (subscriber.length === 0) return 'unknown'
         return subscriber[_.random(0, subscriber.length - 1)].username
       },
