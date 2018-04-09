@@ -94,6 +94,7 @@ class IMongoDB extends Interface {
 
     try {
       let db = this.client.db(this.dbName)
+      if (_.isArray(object)) await db.collection(table).insertMany(object)
       let item = await db.collection(table).insert(flatten.unflatten(object))
       return item.ops[0]
     } catch (e) {
