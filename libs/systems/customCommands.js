@@ -166,7 +166,7 @@ class CustomCommands {
       (command.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
       (command.permission === constants.MODS && (isMod || isOwner)) ||
       (command.permission === constants.OWNER_ONLY && isOwner)) {
-      const param = msg.replace(cmdArray.join(' '), '') // remove found command from message to get param
+      const param = msg.trim().replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim() // remove found command from message to get param
       global.commons.sendMessage(command.response, sender, {'param': param, 'cmd': command.command})
     }
     return true
