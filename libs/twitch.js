@@ -4,6 +4,7 @@ const constants = require('./constants')
 const moment = require('moment')
 const _ = require('lodash')
 const debug = require('debug')
+const cluster = require('cluster')
 require('moment-precise-range-plugin')
 
 const config = require('../config.json')
@@ -356,7 +357,8 @@ class Twitch {
         .replace(/\$title/g, self.current.status), sender)
       return
     }
-    global.api.setTitleAndGame(self, sender, { title: text })
+    if (cluster.isMaster) global.api.setTitleAndGame(self, sender, { title: text })
+    else process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: { 0: sender, 1: { title: text } } })
   }
 
   setGame (self, sender, text) {
@@ -365,7 +367,8 @@ class Twitch {
         .replace(/\$game/g, self.current.game), sender)
       return
     }
-    global.api.setTitleAndGame(self, sender, { game: text })
+    if (cluster.isMaster) global.api.setTitleAndGame(self, sender, { game: text })
+    else process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: { 0: sender, 1: { game: text } } })
   }
 }
 

@@ -128,8 +128,9 @@ function fork () {
     if (msg.type === 'lang') {
       for (let worker in cluster.workers) cluster.workers[worker].send({ type: 'lang' })
       await global.lib.translate._load()
-    }
-    if (msg.type === 'log') {
+    } else if (msg.type === 'call') {
+      global[msg.ns][msg.fnc](global[msg.ns], _.get(msg.args, '0', null), _.get(msg.args, '1', null), _.get(msg.args, '2', null))
+    } else if (msg.type === 'log') {
       return global.log[msg.level](msg.message, msg.params)
     } else if (msg.type === 'stats') {
       let avgTime = 0
