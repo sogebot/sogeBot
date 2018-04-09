@@ -30,7 +30,7 @@ class API {
     this.updateChannelViews()
     this.getChannelHosts()
 
-    this.getChannelChattersUnofficialAPI()
+    this.getChannelChattersUnofficialAPI({ saveToWidget: false })
 
     this.getChannelSubscribersOldAPI() // remove this after twitch add total subscribers
     this.getChannelDataOldAPI() // remove this after twitch game and status for new API
@@ -79,13 +79,25 @@ class API {
     }
   }
 
-  async getChannelChattersUnofficialAPI () {
-    const url = `https://tmi.twitch.tv/group/user/${config.settings.broadcaster_username.toLowerCase()}/chatters`
+  async getChannelChattersUnofficialAPI (opts) {
+    const sendJoinEvent = async function (bulk) {
+      for (let user of bulk) {
+        await new Promise((resolve) => setTimeout(() => resolve(), 100))
+        global.events.fire('user-joined-channel', { username: user.username })
+      }
+    }
+    const sendPartEvent = async function (bulk) {
+      for (let user of bulk) {
+        await new Promise((resolve) => setTimeout(() => resolve(), 100))
+        global.events.fire('user-parted-channel', { username: user.username })
+      }
+    }
 
+    const url = `https://tmi.twitch.tv/group/user/${config.settings.broadcaster_username.toLowerCase()}/chatters`
     const needToWait = _.isNil(global.widgets)
     debug('api:getChannelChattersUnofficialAPI')(`GET ${url}\nwait: ${needToWait}`)
     if (needToWait) {
-      setTimeout(() => this.getChannelChattersUnofficialAPI(), 1000)
+      setTimeout(() => this.getChannelChattersUnofficialAPI(opts), 1000)
       return
     }
 
@@ -94,36 +106,44 @@ class API {
     try {
       request = await snekfetch.get(url)
       global.db.engine.insert('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: request.status })
+      opts.saveToWidget = true
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.db.engine.insert('api.stats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
       return
     } finally {
-      setTimeout(() => this.getChannelChattersUnofficialAPI(), timeout)
+      setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
     }
 
     const chatters = _.flatMap(request.body.chatters)
     debug('api:getChannelChattersUnofficialAPI')(chatters)
 
-    for (let chatter of chatters) {
-      const isIgnored = !_.isEmpty(await global.db.engine.findOne('users_ignorelist', { username: chatter }))
-      if (!isIgnored) {
-        const user = await global.db.engine.findOne('users.online', { username: chatter })
-        if (_.isEmpty(user)) {
-          await global.db.engine.insert('users.online', { username: chatter })
-          global.widgets.joinpart.send({ username: chatter, type: 'join' })
-          global.events.fire('user-joined-channel', { username: chatter })
-        }
+    let bulkInsert = []
+    let bulkParted = []
+    let allOnlineUsers = (await global.db.engine.find('users.online')).map((o) => o.username)
+    let ignoredUsers = (await global.db.engine.find('users_ignorelist')).map((o) => o.username)
+
+    for (let user of allOnlineUsers) {
+      if (!_.includes(chatters, user) && !_.includes(ignoredUsers, user)) {
+        bulkParted.push({ username: user })
+        // user is no longer in channel
+        await global.db.engine.remove('users.online', { username: user })
+        global.widgets.joinpart.send({ username: user, type: 'part' })
       }
     }
+    if (opts.saveToWidget) sendPartEvent(bulkParted)
 
-    const allOnlineUsers = await global.db.engine.find('users.online')
-    for (let user of allOnlineUsers) {
-      if (!_.includes(chatters, user.username)) {
-        // user is no longer in channel
-        await global.db.engine.remove('users.online', { username: user.username })
-        global.widgets.joinpart.send({ username: user.username, type: 'part' })
-        global.events.fire('user-parted-channel', { username: user.username })
+    for (let chatter of chatters) {
+      if (!_.includes(allOnlineUsers, chatter) && !_.includes(ignoredUsers, chatter)) {
+        bulkInsert.push({ username: chatter })
+        global.widgets.joinpart.send({ username: chatter, type: 'join' })
+      }
+    }
+    if (opts.saveToWidget) sendJoinEvent(bulkInsert)
+
+    if (bulkInsert.length > 0) {
+      for (let chunk of _.chunk(bulkInsert, 100)) {
+        await global.db.engine.insert('users.online', chunk)
       }
     }
   }
