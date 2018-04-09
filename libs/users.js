@@ -282,7 +282,7 @@ Users.prototype.getViewers = async function (self, socket) {
     }
 
     // ONLINE
-    let isOnline = _.filter(online, (o) => o.username === viewer.username)
+    let isOnline = !_.isEmpty(_.filter(online, (o) => o.username === viewer.username))
     if (isOnline) _.set(viewer, 'is.online', true)
     else _.set(viewer, 'is.online', false)
   }
