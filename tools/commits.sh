@@ -1,1 +1,1 @@
-git --no-pager log --pretty=format:"%h - %s" --reverse  $1^..HEAD | sed 's/ - / `/g' | sed 's/: /`: /g'
+git --no-pager log --pretty=format:"- %h - %s" --reverse  $1^..HEAD | sed 's/ - / `/g' | sed 's/: /`: /g'
