@@ -74,10 +74,19 @@ class Streamlabs {
     this.disconnect()
     this.socket = io.connect('https://sockets.streamlabs.com?token=' + (await this.socketToken))
 
-    this.socket.on('disconnect', () => global.log.info('Streamlabs socket disconnected'))
-    this.socket.on('connect', () => global.log.info('Streamlabs socket connected'))
+    this.socket.off('reconnect_attempt').on('reconnect_attempt', () => debug('streamlabs:onReconnectAttempt')('Trying to reconnect to service'))
+    this.socket.off('connect').on('connect', () => {
+      debug('streamlabs:onConnect')('Successfully connected socket to service')
+      global.log.info('Streamlabs socket connected')
+    })
+    this.socket.off('disconnect').on('disconnect', () => {
+      debug('streamlabs:onDisconnect')('Socket disconnected from service, trying to reconnect to service')
+      global.log.info('Streamlabs socket disconnected')
+      this.socket.open()
+    })
 
     this.socket.on('event', async (eventData) => {
+      debug('streamlabs:onEvent')(eventData)
       if (eventData.type === 'donation') {
         for (let event of eventData.message) {
           global.overlays.eventlist.add({
