@@ -89,6 +89,10 @@ class Streamlabs {
       debug('streamlabs:onEvent')(eventData)
       if (eventData.type === 'donation') {
         for (let event of eventData.message) {
+          if (!event.isTest) {
+            global.db.engine.insert('users.tips', { username: event.from.toLowerCase(), amount: event.amount, message: event.message, currency: event.currency, timestamp: _.now() })
+            if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(event.amount, event.currency, await global.configuration.getValue('currency'))) })
+          }
           global.overlays.eventlist.add({
             type: 'tip',
             amount: event.amount,
@@ -97,8 +101,6 @@ class Streamlabs {
             message: event.message
           })
           global.events.fire('tip', { username: event.from.toLowerCase(), amount: event.amount, message: event.message, currency: event.currency })
-          global.db.engine.insert('users.tips', { username: event.from.toLowerCase(), amount: event.amount, message: event.message, currency: event.currency, timestamp: _.now() })
-          if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'tips' }, { value: parseFloat(global.currency.exchange(event.amount, event.currency, await global.configuration.getValue('currency'))) })
         }
       }
     })
