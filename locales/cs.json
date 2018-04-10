@@ -367,6 +367,18 @@
         "durationOfCommercial": {
           "label": "Doba trvání reklamy",
           "placeholder": "Dostupné trvání - 30, 60, 90, 120, 150, 180"
+        },
+        "customVariable": {
+          "label": "$_",
+          "placeholder": "Vlastní proměnná, kterou chcete aktualizovat"
+        },
+        "numberToIncrement": {
+          "label": "Kolik přičíst",
+          "placeholder": ""
+        },
+        "numberToDecrement": {
+          "label": "Kolik odečíst",
+          "placeholder": ""
         }
       }
     },
@@ -884,6 +896,8 @@
     "start-commercial": "spustit reklamu",
     "bot-will-join-channel": "bot se připojí k kanálu",
     "bot-will-leave-channel": "bot opustí kanál",
+    "increment-custom-variable": "Přičíst do vlastní proměnné",
+    "decrement-custom-variable": "odečíst z vlastní proměnné",
     "omit": "vynechat",
     "comply": "dodržovat",
     "visible": "viditelné",

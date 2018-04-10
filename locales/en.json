@@ -367,6 +367,18 @@
         "durationOfCommercial": {
           "label": "Duration Of Commercial",
           "placeholder": "Available durations - 30, 60, 90, 120, 150, 180"
+        },
+        "customVariable": {
+          "label": "$_",
+          "placeholder": "Custom variable to update"
+        },
+        "numberToIncrement": {
+          "label": "Number to increment",
+          "placeholder": ""
+        },
+        "numberToDecrement": {
+          "label": "Number to decrement",
+          "placeholder": ""
         }
       }
     },
@@ -878,6 +890,8 @@
     "start-commercial": "run a commercial",
     "bot-will-join-channel": "bot will join channel",
     "bot-will-leave-channel": "bot will leave channel",
+    "increment-custom-variable": "increment a custom variable",
+    "decrement-custom-variable": "decrement a custom variable",
     "omit": "omit",
     "comply": "comply",
     "visible": "visible",

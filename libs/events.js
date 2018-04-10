@@ -50,7 +50,9 @@ class Events {
       { id: 'emote-explosion', definitions: { emotesToExplode: '' }, fire: this.fireEmoteExplosion },
       { id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] }, fire: this.fireStartCommercial },
       { id: 'bot-will-join-channel', definitions: {}, fire: this.fireBotWillJoinChannel },
-      { id: 'bot-will-leave-channel', definitions: {}, fire: this.fireBotWillLeaveChannel }
+      { id: 'bot-will-leave-channel', definitions: {}, fire: this.fireBotWillLeaveChannel },
+      { id: 'increment-custom-variable', definitions: { customVariable: '', numberToIncrement: '' }, fire: this.fireIncrementCustomVariable },
+      { id: 'decrement-custom-variable', definitions: { customVariable: '', numberToDecrement: '' }, fire: this.fireDeccrementCustomVariable }
     ]
 
     this.panel()
@@ -223,6 +225,48 @@ class Events {
     const d = debug('events:fireSendChatMessage')
     d('Sending chat message with attrs:', operation, attributes)
     global.events.fireSendChatMessageOrWhisper(operation, attributes, false)
+  }
+
+  async fireIncrementCustomVariable (operation, attributes) {
+    debug('events:fireIncrementCustomVariable')('Sending chat message with attrs:', operation, attributes)
+    const customVariableName = operation.customVariable
+    const numberToIncrement = operation.numberToIncrement
+
+    // check if value is number
+    let cvFromDb = await global.db.engine.findOne('customvars', { key: customVariableName })
+    let value = null
+    if (_.isEmpty(cvFromDb)) {
+      await global.db.engine.insert('customvars', { key: customVariableName, value: numberToIncrement })
+    } else {
+      if (!_.isFinite(parseInt(cvFromDb.value, 10))) value = numberToIncrement
+      else value = parseInt(cvFromDb.value, 10) + parseInt(numberToIncrement, 10)
+      await global.db.engine.update('customvars', { _id: cvFromDb._id.toString() }, { value: value })
+    }
+
+    // Update widgets and titles
+    global.widgets.custom_variables.io.emit('refresh')
+    global.api.setTitleAndGame(global.api, null)
+  }
+
+  async fireDecrementCustomVariable (operation, attributes) {
+    debug('events:fireDecrementCustomVariable')('Sending chat message with attrs:', operation, attributes)
+    const customVariableName = operation.customVariable
+    const numberToDecrement = operation.numberToIncrement
+
+    // check if value is number
+    let cvFromDb = await global.db.engine.findOne('customvars', { key: customVariableName })
+    let value = null
+    if (_.isEmpty(cvFromDb)) {
+      await global.db.engine.insert('customvars', { key: customVariableName, value: numberToDecrement })
+    } else {
+      if (!_.isFinite(parseInt(cvFromDb.value, 10))) value = numberToDecrement * -1
+      else value = parseInt(cvFromDb.value, 10) - parseInt(numberToDecrement, 10)
+      await global.db.engine.update('customvars', { _id: cvFromDb._id.toString() }, { value: value })
+    }
+
+    // Update widgets and titles
+    global.widgets.custom_variables.io.emit('refresh')
+    global.api.setTitleAndGame(global.api, null)
   }
 
   async everyXMinutesOfStream (event, attributes) {
