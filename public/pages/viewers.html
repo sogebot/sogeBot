@@ -44,7 +44,7 @@
               <span class="input-group-text">h</span>
             </div>
           </div>
-          <div class="input-group mt-1">
+          <div class="input-group mt-1 points-enabled">
             <div class="input-group-prepend">
               <span class="input-group-text" data-lang="points"></span>
             </div>
@@ -278,6 +278,7 @@
           tier: $('#viewers_tier').val().length === 0 ? null : $('#viewers_tier').val()
         }
       }
+      if (!systems.points) delete user.points
 
       // toggle save button to btn-info and disable\
       $(el).toggleClass('btn-primary btn-info').attr('disabled', 'disabled').html('<i class="fas fa-circle-notch fa-spin"></i> ' + commons.translate('saving'))
@@ -300,7 +301,7 @@
             <td class="text-center" data-value='${_.get(item, 'time.watched', 0)}'>${viewers.styleWatched(item.time.watched)}h</td>
             <td class="text-center" data-value='${!item.is.follower ? 0 : _.get(item, 'time.follow', 0)}'>${viewers.styleFollowTime(!item.is.follower ? 0 : _.get(item, 'time.follow', 0))}</td>
             <td class="text-center" data-value='${!item.is.subscriber ? 0 : _.get(item, 'time.subscribed_at', 0)}'>${viewers.styleFollowTime(!item.is.subscriber ? 0 : _.get(item, 'time.subscribed_at', 0))}</td>
-            <td class="text-center" data-value='${_.get(item, 'points', 0)}'>${_.get(item, 'points', 0)}</td>
+            ${systems.points ? `<td class="text-center" data-value='${_.get(item, 'points', 0)}'>${_.get(item, 'points', 0)}</td>` : ``}
             <td class="text-center" data-value='${_.get(item, 'stats.messages', 0)}'>${_.get(item, 'stats.messages', 0)}</td>
             <td class="text-center" data-value='${_.get(item, 'stats.tips', 0)}'>${_.get(item, 'stats.tips', 0).toFixed(2)}${item.custom.currency}</td>
             <td class="text-center" data-value='${_.get(item, 'stats.bits', 0)}'>${_.get(item, 'stats.bits', 0)}</td>
@@ -321,6 +322,7 @@
           </tr>
         `)
         if (!systems.points) {
+          $(".points-enabled").remove()
           $("#viewers-points-data").remove()
           $("#viewers-points").remove()
         }
