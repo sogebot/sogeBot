@@ -130,8 +130,7 @@ class Message {
 
           if (require('cluster').isWorker) process.send({ type: 'widget_custom_variables', emit: 'refresh' })
           else global.widgets.custom_variables.io.emit('refresh') // send update to widget
-          global.api.setTitleAndGame(global.api, null) // update title
-
+          process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: { 0: null } })
           return ''
         }
         let cvar = await global.db.engine.findOne('customvars', { key: variable })
@@ -160,7 +159,7 @@ class Message {
     }
     let command = {
       '(!!#)': async function (filter) {
-        if (!_.isString(attr.sender)) attr.sender = attr.sender.username
+        if (!_.isString(attr.sender)) attr.sender = _.get(attr, 'sender.username', null)
         let cmd = filter
           .replace('!', '') // replace first !
           .replace(/\(|\)/g, '')
@@ -170,7 +169,7 @@ class Message {
         return ''
       },
       '(!#)': async function (filter) {
-        if (!_.isString(attr.sender)) attr.sender = attr.sender.username
+        if (!_.isString(attr.sender)) attr.sender = _.get(attr, 'sender.username', null)
         let cmd = filter
           .replace(/\(|\)/g, '')
           .replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + attr.sender)
