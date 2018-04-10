@@ -52,7 +52,7 @@ class Events {
       { id: 'bot-will-join-channel', definitions: {}, fire: this.fireBotWillJoinChannel },
       { id: 'bot-will-leave-channel', definitions: {}, fire: this.fireBotWillLeaveChannel },
       { id: 'increment-custom-variable', definitions: { customVariable: '', numberToIncrement: '' }, fire: this.fireIncrementCustomVariable },
-      { id: 'decrement-custom-variable', definitions: { customVariable: '', numberToDecrement: '' }, fire: this.fireDeccrementCustomVariable }
+      { id: 'decrement-custom-variable', definitions: { customVariable: '', numberToDecrement: '' }, fire: this.fireDecrementCustomVariable }
     ]
 
     this.panel()
@@ -245,13 +245,15 @@ class Events {
 
     // Update widgets and titles
     global.widgets.custom_variables.io.emit('refresh')
-    global.api.setTitleAndGame(global.api, null)
+    const regexp = new RegExp(`\\$_${customVariableName}`, 'ig')
+    let title = await global.cache.rawStatus()
+    if (title.match(regexp)) global.api.setTitleAndGame(global.api, null)
   }
 
   async fireDecrementCustomVariable (operation, attributes) {
     debug('events:fireDecrementCustomVariable')('Sending chat message with attrs:', operation, attributes)
     const customVariableName = operation.customVariable
-    const numberToDecrement = operation.numberToIncrement
+    const numberToDecrement = operation.numberToDecrement
 
     // check if value is number
     let cvFromDb = await global.db.engine.findOne('customvars', { key: customVariableName })
@@ -266,7 +268,9 @@ class Events {
 
     // Update widgets and titles
     global.widgets.custom_variables.io.emit('refresh')
-    global.api.setTitleAndGame(global.api, null)
+    const regexp = new RegExp(`\\$_${customVariableName}`, 'ig')
+    let title = await global.cache.rawStatus()
+    if (title.match(regexp)) global.api.setTitleAndGame(global.api, null)
   }
 
   async everyXMinutesOfStream (event, attributes) {
