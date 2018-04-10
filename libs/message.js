@@ -130,7 +130,9 @@ class Message {
 
           if (require('cluster').isWorker) process.send({ type: 'widget_custom_variables', emit: 'refresh' })
           else global.widgets.custom_variables.io.emit('refresh') // send update to widget
-          process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: { 0: null } })
+          const regexp = new RegExp(`\\$_${variable}`, 'ig')
+          let title = await global.cache.rawStatus()
+          if (title.match(regexp)) process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: { 0: null } })
           return ''
         }
         let cvar = await global.db.engine.findOne('customvars', { key: variable })
