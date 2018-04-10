@@ -13,7 +13,6 @@ const fs = require('fs')
 const Datastore = require('nedb')
 
 const client = require('mongodb').MongoClient
-const ObjectID = require('mongodb').ObjectID
 const mongodbUri = require('mongodb-uri')
 
 if (!fs.existsSync('./db') || (!fs.existsSync('./db/nedb'))) console.error('No NeDB directory was found')
