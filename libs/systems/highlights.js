@@ -39,16 +39,22 @@ class Highlights {
   }
 
   async highlight (self, sender, description) {
-    const d = debug('systems:highlight:highlight')
     description = description.trim().length > 0 ? description : null
+
+    const d = debug('systems:highlight:highlight')
+    const cid = await global.cache.channelId()
+    const when = await global.cache.when()
+    const url = `https://api.twitch.tv/kraken/channels/${cid}/videos?broadcast_type=archive&limit=1`
+
+    const needToWait = _.isNil(cid)
+    if (needToWait) {
+      setTimeout(() => this.highlight(self, sender, description), 1000)
+      return
+    }
 
     let highlight = {}
 
     try {
-      const [when, cid] = await Promise.all([
-        global.cache.when(),
-        global.cache.channelId()
-      ])
       if (_.isNil(when.online)) throw Error(ERROR_STREAM_NOT_ONLINE)
 
       let timestamp = moment.preciseDiff(moment().valueOf(), moment(when.online).valueOf(), true)
@@ -57,16 +63,15 @@ class Highlights {
       highlight.stream = when.online
       highlight.timestamp = timestamp
       highlight.description = description
-      highlight.title = global.twitch.current.status
-      highlight.game = global.twitch.current.game
+      highlight.title = _.get(await global.db.engine.findOne('api.current', { 'key': 'status' }), 'value', 'n/a')
+      highlight.game = _.get(await global.db.engine.findOne('api.current', { 'key': 'status' }), 'value', 'n/a')
       highlight.created_at = _.now()
 
-      d('Created at (cached): %s', self.cached.created_at)
+      d('Created at (cached): %s', _.get(await global.db.engine.findOne('cache', { 'key': 'highlights.created_at' }), 'value', 0))
       d('When online: %s', when.online)
 
       d('Searching in API')
       // we need to load video id
-      const url = `https://api.twitch.tv/kraken/channels/${cid}/videos?broadcast_type=archive&limit=1`
       let options = {
         url: url,
         headers: {
@@ -82,13 +87,18 @@ class Highlights {
         }
         global.db.engine.insert('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: 200 })
         const video = body.videos[0]
-        self.cached.id = video._id
-        self.cached.created_at = when.online
-        highlight.video_id = self.cached.id
+
+        global.db.engine.update('cache', { 'key': 'highlights.id' }, { value: video._id })
+        global.db.engine.update('cache', { 'key': 'highlights.created_at' }, { value: when.online })
+        highlight.video_id = video._id
         self.add(self, highlight, timestamp, sender)
+        global.db.engine.insert('api.stats', { data: body, timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: res.status })
       })
     } catch (e) {
-      d(e)
+      if (e.message !== ERROR_STREAM_NOT_ONLINE) {
+        global.db.engine.insert('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+        global.log.error(e.stack)
+      }
       switch (e.message) {
         case ERROR_STREAM_NOT_ONLINE:
           global.commons.sendMessage(global.translate('highlights.offline'), sender)
