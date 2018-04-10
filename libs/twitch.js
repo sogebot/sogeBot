@@ -112,14 +112,10 @@ class Twitch {
   async followers (self, sender) {
     const d = debug('twitch:followers')
     let events = await global.db.engine.find('widgetsEventList')
-    const onlineViewers = await global.db.engine.find('users.online')
+    const onlineViewers = (await global.db.engine.find('users.online')).map((o) => o.username)
+    const followers = (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username)
 
-    let onlineFollowers = []
-    for (let viewer of onlineViewers) {
-      let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } })
-      if (!_.isEmpty(user)) onlineFollowers.push(user.username)
-    }
-
+    let onlineFollowers = _.intersection(onlineViewers, followers)
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'follow' })
     moment.locale(await global.configuration.getValue('lang'))
 
@@ -142,14 +138,10 @@ class Twitch {
   async subs (self, sender) {
     const d = debug('twitch:subs')
     let events = await global.db.engine.find('widgetsEventList')
-    const onlineViewers = await global.db.engine.find('users.online')
+    const onlineViewers = (await global.db.engine.find('users.online')).map((o) => o.username)
+    const subscribers = (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username)
 
-    let onlineSubscribers = []
-    for (let viewer of onlineViewers) {
-      let user = await global.db.engine.find('users', { username: viewer.username, is: { subscriber: true } })
-      if (!_.isEmpty(user)) onlineSubscribers.push(user.username)
-    }
-
+    let onlineSubscribers = _.intersection(onlineViewers, subscribers)
     events = _.filter(_.orderBy(events, 'timestamp', 'desc'), (o) => { return o.event === 'sub' || o.event === 'resub' || o.event === 'subgift' })
     moment.locale(await global.configuration.getValue('lang'))
 
