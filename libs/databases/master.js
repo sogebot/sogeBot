@@ -54,11 +54,18 @@ class IMasterController extends Interface {
   async find (table, where) {
     const id = crypto.randomBytes(64).toString('hex')
     const data = { type: 'db', fnc: 'find', table: table, where: where, id: id }
-    _.sample(cluster.workers).send(data)
 
     return new Promise((resolve, reject) => {
       const start = _.now()
       let retries = 1
+      let sendRequest = (resolve, reject, id) => {
+        try {
+          _.sample(cluster.workers).send(data)
+          returnData(resolve, reject, id)
+        } catch (e) {
+          setTimeout(() => sendRequest(resolve, reject, id), 1)
+        }
+      }
       let returnData = (resolve, reject, id) => {
         if ((_.now() - start > 4000 * retries && retries < 5)) {
           _.sample(cluster.workers).send(data) // retry
@@ -78,19 +85,25 @@ class IMasterController extends Interface {
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
-      returnData(resolve, reject, id)
+      sendRequest(resolve, reject, id)
     })
   }
 
   async findOne (table, where) {
     const id = crypto.randomBytes(64).toString('hex')
-    const worker = _.sample(cluster.workers)
     const data = { type: 'db', fnc: 'findOne', table: table, where: where, id: id }
-    worker.send(data)
 
     return new Promise((resolve, reject) => {
       const start = _.now()
       let retries = 1
+      let sendRequest = (resolve, reject, id) => {
+        try {
+          _.sample(cluster.workers).send(data)
+          returnData(resolve, reject, id)
+        } catch (e) {
+          setTimeout(() => sendRequest(resolve, reject, id), 1)
+        }
+      }
       let returnData = (resolve, reject, id) => {
         if ((_.now() - start > 4000 * retries && retries < 5)) {
           _.sample(cluster.workers).send(data) // retry
@@ -117,11 +130,18 @@ class IMasterController extends Interface {
   async insert (table, object) {
     const id = crypto.randomBytes(64).toString('hex')
     const data = { type: 'db', fnc: 'insert', table: table, object: object, id: id }
-    _.sample(cluster.workers).send(data)
 
     return new Promise((resolve, reject) => {
       const start = _.now()
       let retries = 1
+      let sendRequest = (resolve, reject, id) => {
+        try {
+          _.sample(cluster.workers).send(data)
+          returnData(resolve, reject, id)
+        } catch (e) {
+          setTimeout(() => sendRequest(resolve, reject, id), 1)
+        }
+      }
       let returnData = (resolve, reject, id) => {
         if ((_.now() - start > 4000 * retries && retries < 5)) {
           _.sample(cluster.workers).send(data) // retry
@@ -147,13 +167,19 @@ class IMasterController extends Interface {
 
   async remove (table, where) {
     const id = crypto.randomBytes(64).toString('hex')
-    const worker = _.sample(cluster.workers)
     const data = { type: 'db', fnc: 'remove', table: table, where: where, id: id }
-    worker.send(data)
 
     return new Promise((resolve, reject) => {
       const start = _.now()
       let retries = 1
+      let sendRequest = (resolve, reject, id) => {
+        try {
+          _.sample(cluster.workers).send(data)
+          returnData(resolve, reject, id)
+        } catch (e) {
+          setTimeout(() => sendRequest(resolve, reject, id), 1)
+        }
+      }
       let returnData = (resolve, reject, id) => {
         if ((_.now() - start > 4000 * retries && retries < 5)) {
           _.sample(cluster.workers).send(data) // retry
@@ -180,11 +206,18 @@ class IMasterController extends Interface {
   async update (table, where, object) {
     const id = crypto.randomBytes(64).toString('hex')
     const data = { type: 'db', fnc: 'update', table: table, where: where, object: object, id: id }
-    _.sample(cluster.workers).send(data)
 
     return new Promise((resolve, reject) => {
       const start = _.now()
       let retries = 1
+      let sendRequest = (resolve, reject, id) => {
+        try {
+          _.sample(cluster.workers).send(data)
+          returnData(resolve, reject, id)
+        } catch (e) {
+          setTimeout(() => sendRequest(resolve, reject, id), 1)
+        }
+      }
       let returnData = (resolve, reject, id) => {
         if ((_.now() - start > 4000 * retries && retries < 5)) {
           _.sample(cluster.workers).send(data) // retry
@@ -211,11 +244,18 @@ class IMasterController extends Interface {
   async incrementOne (table, where, object) {
     const id = crypto.randomBytes(64).toString('hex')
     const data = { type: 'db', fnc: 'incrementOne', table: table, where: where, object: object, id: id }
-    _.sample(cluster.workers).send(data)
 
     return new Promise((resolve, reject) => {
       const start = _.now()
       let retries = 1
+      let sendRequest = (resolve, reject, id) => {
+        try {
+          _.sample(cluster.workers).send(data)
+          returnData(resolve, reject, id)
+        } catch (e) {
+          setTimeout(() => sendRequest(resolve, reject, id), 1)
+        }
+      }
       let returnData = (resolve, reject, id) => {
         if ((_.now() - start > 4000 * retries && retries < 5)) {
           _.sample(cluster.workers).send(data) // retry
@@ -242,11 +282,18 @@ class IMasterController extends Interface {
   async increment (table, where, object) {
     const id = crypto.randomBytes(64).toString('hex')
     const data = { type: 'db', fnc: 'increment', table: table, where: where, object: object, id: id }
-    _.sample(cluster.workers).send(data)
 
     return new Promise((resolve, reject) => {
       const start = _.now()
       let retries = 1
+      let sendRequest = (resolve, reject, id) => {
+        try {
+          _.sample(cluster.workers).send(data)
+          returnData(resolve, reject, id)
+        } catch (e) {
+          setTimeout(() => sendRequest(resolve, reject, id), 1)
+        }
+      }
       let returnData = (resolve, reject, id) => {
         if ((_.now() - start > 4000 * retries && retries < 5)) {
           _.sample(cluster.workers).send(data) // retry
