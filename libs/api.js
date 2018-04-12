@@ -34,6 +34,7 @@ class API {
 
     this.getChannelSubscribersOldAPI() // remove this after twitch add total subscribers
     this.getChannelDataOldAPI() // remove this after twitch game and status for new API
+    this.cleanupApiStats()
 
     setInterval(async () => {
       // we are in bounds of safe rate limit, wait until limit is refreshed
@@ -46,6 +47,22 @@ class API {
 
   async _loadCachedStatusAndGame () {
     global.db.engine.update('api.current', { key: 'game' }, { value: await global.cache.gameCache() })
+  }
+
+  async cleanupApiStats () {
+    // nedb's expire doesn't work properly, need to expire it manually
+    let stats = _.filter(await global.db.engine.find('api.stats'), (o) => _.now() > parseInt(o.timestamp, 10) + (1000 * 60 * 60 * 2))
+    this.apiStatsCleanupProcess(stats)
+  }
+
+  async apiStatsCleanupProcess (stats) {
+    if (stats.length > 0) {
+      let stat = stats.shift()
+      await global.db.engine.remove('api.stats', { _id: stat._id.toString() })
+      setTimeout(() => this.apiStatsCleanupProcess(stats), 100)
+    } else {
+      setTimeout(() => this.cleanupApiStats(), 60000)
+    }
   }
 
   async getChannelID () {
