@@ -523,8 +523,8 @@ class API {
       // correct status and we've got a data - stream online
       let stream = request.body.data[0]; debug('api:getCurrentStreamData')(stream)
 
+      if (!moment.preciseDiff(moment(stream.started_at), moment((await global.cache.when()).online), true).firstDateWasLater) await global.cache.when({ online: stream.started_at })
       if (!await global.cache.isOnline() || this.streamType !== stream.type) {
-        global.cache.when({ online: stream.started_at })
         this.chatMessagesAtStart = global.linesParsed
 
         await global.db.engine.update('api.max', { key: 'viewers' }, { value: 0 })
