@@ -402,6 +402,8 @@
         "followers": "Current followers count",
         "subscribers": "Current subscribers count",
         "arg": "Argument",
+        "param": "Parameter (required)",
+        "!param": "Parameter (not required)",
         "alias": "Alias",
         "command": "Command",
         "keyword": "Keyword",

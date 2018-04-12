@@ -402,6 +402,8 @@
         "followers": "Aktuální počet followerů",
         "subscribers": "Aktuální počet subscriberů",
         "arg": "Argument",
+        "param": "Parametr (nutny)",
+        "!param": "Parametr (neni nutny)",
         "alias": "Alias",
         "command": "Příkazy",
         "keyword": "Klíčové slovo",

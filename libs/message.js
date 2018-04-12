@@ -28,16 +28,6 @@ class Message {
 
   async parse (attr) {
     const d = debug('parser:parse')
-    await this.global()
-
-    // local replaces
-    if (!_.isNil(attr)) {
-      const isWithAt = await global.configuration.getValue('atUsername')
-      for (let [key, value] of Object.entries(attr)) {
-        if (_.includes(['sender'], key)) value = isWithAt ? `@${value}` : value
-        this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value)
-      }
-    }
 
     let random = {
       '(random.online.viewer)': async function () {
@@ -143,6 +133,10 @@ class Message {
       '$param': async function (filter) {
         if (!_.isUndefined(attr.param) && attr.param.length !== 0) return attr.param
         return ''
+      },
+      '$!param': async function (filter) {
+        if (!_.isUndefined(attr.param) && attr.param.length !== 0) return attr.param
+        return 'n/a'
       }
     }
     let qs = {
@@ -333,6 +327,17 @@ class Message {
     } else if (global.commons.isSystemEnabled('songs')) this.message = this.message.replace(/\$currentSong/g, _.get(await global.systems.songs.currentSong, 'title', global.translate('songs.not-playing')))
     else this.message = this.message.replace(/\$currentSong/g, global.translate('songs.not-playing'))
 
+    await this.global()
+
+    await this.parseMessageEach(param, true); d('parseMessageEach: %s', this.message)
+    // local replaces
+    if (!_.isNil(attr)) {
+      const isWithAt = await global.configuration.getValue('atUsername')
+      for (let [key, value] of Object.entries(attr)) {
+        if (_.includes(['sender'], key)) value = isWithAt ? `@${value}` : value
+        this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value)
+      }
+    }
     await this.parseMessageEach(math); d('parseMessageEach: %s', this.message)
     await this.parseMessageVariables(custom); d('parseMessageEach: %s', this.message)
     await this.parseMessageEval(evaluate, decode(this.message)); d('parseMessageEval: %s', this.message)
@@ -340,7 +345,6 @@ class Message {
     await this.parseMessageCommand(command); d('parseMessageCommand: %s', this.message)
     await this.parseMessageEach(random); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(price); d('parseMessageEach: %s', this.message)
-    await this.parseMessageEach(param); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(qs); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(info); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(list); d('parseMessageEach: %s', this.message)
@@ -488,6 +492,7 @@ class Message {
       if (!_.isNull(rMessage)) {
         for (var bkey in rMessage) {
           let newString = await fnc(rMessage[bkey])
+          console.log(newString)
           if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) this.message = ''
           this.message = this.message.replace(rMessage[bkey], newString).trim()
         }
