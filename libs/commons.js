@@ -55,7 +55,7 @@ Commons.prototype.isIntegrationEnabled = function (fn) {
 }
 
 Commons.prototype.sendToOwners = function (text) {
-  if (global.configuration.getValue('disableSettingsWhispers')) return global.log.warning(text)
+  if (global.configuration.getValue('disableSettingsWhispers')) return text.length > 0 ? global.log.warning(text) : ''
   for (let owner of global.commons.getOwners()) {
     owner = {
       username: owner,
