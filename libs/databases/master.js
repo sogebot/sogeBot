@@ -123,7 +123,7 @@ class IMasterController extends Interface {
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
-      returnData(resolve, reject, id)
+      sendRequest(resolve, reject, id)
     })
   }
 
@@ -161,7 +161,7 @@ class IMasterController extends Interface {
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
-      returnData(resolve, reject, id)
+      sendRequest(resolve, reject, id)
     })
   }
 
@@ -199,7 +199,7 @@ class IMasterController extends Interface {
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
-      returnData(resolve, reject, id)
+      sendRequest(resolve, reject, id)
     })
   }
 
@@ -237,7 +237,7 @@ class IMasterController extends Interface {
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
-      returnData(resolve, reject, id)
+      sendRequest(resolve, reject, id)
     })
   }
 
@@ -275,7 +275,7 @@ class IMasterController extends Interface {
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
-      returnData(resolve, reject, id)
+      sendRequest(resolve, reject, id)
     })
   }
 
@@ -313,7 +313,7 @@ class IMasterController extends Interface {
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 1)
       }
-      returnData(resolve, reject, id)
+      sendRequest(resolve, reject, id)
     })
   }
 }
