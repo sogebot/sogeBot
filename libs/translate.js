@@ -19,7 +19,7 @@ class Translate {
   }
 
   async _load () {
-    if (cluster.isWorker) this.custom = await global.db.engine.find('customTranslations') // master doesn't need custom translations as it is serving UI only
+    this.custom = await global.db.engine.find('customTranslations')
     return new Promise(async (resolve, reject) => {
       this.lang = await global.configuration.getValue('lang')
       glob('./locales/**', (err, files) => {
@@ -44,7 +44,9 @@ class Translate {
   async _save () {
     const self = global.lib.translate
     for (let c of self.custom) {
-      global.db.engine.update('customTranslations', { key: c.key }, { key: c.key, value: c.value })
+      await global.db.engine.update('customTranslations', { key: c.key }, { key: c.key, value: c.value })
+      for (let worker in cluster.workers) cluster.workers[worker].send({ type: 'lang' })
+      await global.lib.translate._load()
     }
   }
 
