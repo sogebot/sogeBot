@@ -9,6 +9,8 @@ function CmdboardWidget () {
   global.panel.socketListening(this, 'cmdboard.widget.run', this.runCommand)
   global.panel.socketListening(this, 'cmdboard.widget.add', this.addCommand)
   global.panel.socketListening(this, 'cmdboard.widget.remove', this.removeCommand)
+
+  global.configuration.register('widgetCmdBoardDisplayAs', 'core.no-response', 'string', 'list')
 }
 
 CmdboardWidget.prototype.fetchCommands = async function (self, socket) {

@@ -192,6 +192,7 @@
     }
   },
   "webpanel": {
+    "display-as": "Display as",
     "set-default": "Set default",
     "add": "Add",
     "placeholders": {

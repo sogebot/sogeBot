@@ -38,6 +38,19 @@
           </div>
           <input type="text" class="form-control" id="cmdboard-command">
         </div>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" data-lang="display-as"></span>
+          </div>
+          <div class="btn-group btn-group-toggle d-flex" data-toggle="buttons" style="flex: 1 auto;">
+            <label class="btn btn-secondary active" style="flex: 1 auto;">
+              <input type="radio" name="options" id="cmdboard-display-as-list" autocomplete="off" checked> List
+            </label>
+            <label class="btn btn-secondary" style="flex: 1 auto;">
+              <input type="radio" name="options" id="cmdboard-display-as-grid" autocomplete="off"> Grid
+            </label>
+          </div>
+        </div>
 
         <button type="button" class="btn btn-success btn-block" onclick="cmdboard.add()" data-lang="confirm"></button>
       </div>
@@ -49,7 +62,6 @@
 <script>
   var cmdboard = {
     el: null,
-
     add: function () {
       var name = $('#cmdboard-name').val();
       $('#cmdboard-name').val('')
@@ -69,6 +81,37 @@
   }
 
   socket.emit('cmdboard.widget.fetch')
+
+  socket.on('configuration', (data) => {
+    if (data.widgetCmdBoardDisplayAs === 'list') {
+      $('#cmdboard-display-as-list').parent().removeClass('active').addClass('active')
+      $('#cmdboard-display-as-grid').parent().removeClass('active')
+      $('.cmdboard-list-group-item').css('width', '100%')
+      $('#cmdboard-list').css('flex-direction', 'column')
+      $('#cmdboard-list').css('display', 'flex')
+    } else {
+      $('.cmdboard-list-group-item').css('width', '50%')
+      $('#cmdboard-list').css('flex-flow', 'wrap')
+      $('#cmdboard-display-as-list').parent().removeClass('active')
+      $('#cmdboard-display-as-grid').parent().removeClass('active').addClass('active')
+    }
+  })
+
+  $('#cmdboard-display-as-list').change(() => {
+    socket.emit('saveConfiguration', {
+      widgetCmdBoardDisplayAs: 'list'
+    })
+    $('.cmdboard-list-group-item').css('width', '100%')
+    $('#cmdboard-list').css('flex-direction', 'column')
+    $('#cmdboard-list').css('display', 'flex')
+  })
+  $('#cmdboard-display-as-grid').change(() => {
+    socket.emit('saveConfiguration', {
+      widgetCmdBoardDisplayAs: 'grid'
+    })
+    $('.cmdboard-list-group-item').css('width', '50%')
+    $('#cmdboard-list').css('flex-flow', 'wrap')
+  })
 
   socket.off('cmdboard.widget.data')
   socket.on('cmdboard.widget.data', function (cb) {
