@@ -93,13 +93,13 @@
 
 <script>
   var lastTimestampFetched = 0
-  socket.emit('getApiStats')
-  setInterval(() => socket.emit('getApiStats', { from: lastTimestampFetched }), 60000)
 
   var helixChart = new Chart(document.getElementById("helixChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
   var krakenChart = new Chart(document.getElementById("krakenChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
   var tmiChart = new Chart(document.getElementById("tmiChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
   var unofficialChart = new Chart(document.getElementById("unofficialChart").getContext('2d'), { type: 'line', options: { scales: { yAxes: [{ ticks: { beginAtZero:true, stepSize: 1 } }] } } })
+
+  var apiData = []
 
   $('.helixData').empty()
   $('.krakenData').empty()
@@ -112,34 +112,33 @@
   unofficialChart.clear()
 
   socket.off('api.stats')
-  socket.on('api.stats', (data) => {
-    data = _.orderBy(data, 'timestamp', 'asc')
-    lastTimestampFetched = _.get(data[data.length - 1], 'timestamp', 0)
-    for (let c of data) {
+  socket.on('api.stats', (c) => {
+    let tBody = `.${c.api}Data`
+    c.code = _.get(c, 'code', 200) // set default to 200
+    c.data = !_.isNil(c.data) ? JSON.stringify(c.data) : 'n/a'
+    c.remaining = !_.isNil(c.remaining) ? c.remaining : 'n/a'
 
-      let tBody = `.${c.api}Data`
-      c.code = _.get(c, 'code', 200) // set default to 200
-      c.data = !_.isNil(c.data) ? JSON.stringify(c.data) : 'n/a'
-      c.remaining = !_.isNil(c.remaining) ? c.remaining : 'n/a'
+    $(tBody).prepend(
+      `
+        <tr class="${c.code.toString().startsWith('2') ? '' : 'font-weight-bold text-danger'}">
+          <th scope="row">${moment(c.timestamp).format('LTS')}</th>
+          <td>${c.call}</td>
+          <td><div style="word-wrap: break-word; font-family: Monospace; width: 200px;">${c.endpoint}</div></td>
+          <td>${c.code}</td>
+          <td>${c.remaining}</td>
+          <td><div style="word-wrap: break-word; font-family: Monospace; width: 100%;">${c.data}</div></td>
+        </tr>
+      `
+    )
+    apiData.push(c)
+    refreshApiGraphs()
+  })
 
-      $(tBody).prepend(
-        `
-          <tr class="${c.code.toString().startsWith('2') ? '' : 'font-weight-bold text-danger'}">
-            <th scope="row">${moment(c.timestamp).format('LTS')}</th>
-            <td>${c.call}</td>
-            <td><div style="word-wrap: break-word; font-family: Monospace; width: 200px;">${c.endpoint}</div></td>
-            <td>${c.code}</td>
-            <td>${c.remaining}</td>
-            <td><div style="word-wrap: break-word; font-family: Monospace; width: 100%;">${c.data}</div></td>
-          </tr>
-        `
-      )
-    }
-
-    const helixData = _.filter(data, (o) => o.api === 'helix')
-    const krakenData = _.filter(data, (o) => o.api === 'kraken')
-    const tmiData = _.filter(data, (o) => o.api === 'tmi')
-    const unofficialData = _.filter(data, (o) => o.api === 'unofficial')
+  function refreshApiGraphs () {
+    const helixData = _.filter(apiData, (o) => o.api === 'helix')
+    const krakenData = _.filter(apiData, (o) => o.api === 'kraken')
+    const tmiData = _.filter(apiData, (o) => o.api === 'tmi')
+    const unofficialData = _.filter(apiData, (o) => o.api === 'unofficial')
 
     let helixTimestampsPerMinute = {}
     let helixTimestampsErrorsPerMinute = {}
@@ -374,6 +373,6 @@
       } else unofficialChart.data.datasets[1].data.push(count)
     }
     unofficialChart.update()
-  })
+  }
 
 </script>

@@ -9,7 +9,6 @@ function Stats () {
 Stats.prototype.sockets = function () {
   if (_.isNil(global.panel)) return setTimeout(() => this.sockets(), 10)
   global.panel.socketListening(this, 'getLatestStats', this.getLatestStats)
-  global.panel.socketListening(this, 'getApiStats', this.getApiStats)
 }
 
 Stats.prototype.save = async function (data) {
@@ -70,14 +69,6 @@ Stats.prototype.getLatestStats = async function (self, socket) {
     stats.currentHosts = parseFloat(stats.currentHosts / statsFromDb.length).toFixed(0)
   } else stats = {}
   socket.emit('latestStats', stats)
-}
-
-Stats.prototype.getApiStats = async function (self, socket, options) {
-  const [from, to] = [_.get(options, 'from', _.now() - 1000 * 60 * 60), _.get(options, 'to', _.now())]
-
-  let stats = await global.db.engine.find('api.stats')
-  // return hour of data
-  socket.emit('api.stats', _.filter(stats, (o) => from < o.timestamp && to >= o.timestamp))
 }
 
 module.exports = Stats
