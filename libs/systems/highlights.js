@@ -82,21 +82,21 @@ class Highlights {
       global.client.api(options, function (err, res, body) {
         if (err) {
           global.log.error(err, { fnc: 'Highlights#1' })
-          global.db.engine.insert('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: err })
+          global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: err })
           return
         }
-        global.db.engine.insert('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: 200 })
+        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: 200 })
         const video = body.videos[0]
 
         global.db.engine.update('cache', { 'key': 'highlights.id' }, { value: video._id })
         global.db.engine.update('cache', { 'key': 'highlights.created_at' }, { value: when.online })
         highlight.video_id = video._id
         self.add(self, highlight, timestamp, sender)
-        global.db.engine.insert('api.stats', { data: body, timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: res.status })
+        global.panel.io.emit('api.stats', { data: body, timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: res.status })
       })
     } catch (e) {
       if (e.message !== ERROR_STREAM_NOT_ONLINE) {
-        global.db.engine.insert('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
         global.log.error(e.stack)
       }
       switch (e.message) {

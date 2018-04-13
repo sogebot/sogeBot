@@ -34,7 +34,6 @@ class IMongoDB extends Interface {
     if (_.find(collections, (o) => o.name === 'cache')) await db.collection('cache').dropIndexes()
     if (_.find(collections, (o) => o.name === 'customTranslations')) await db.collection('customTranslations').dropIndexes()
     if (_.find(collections, (o) => o.name === 'users')) await db.collection('users').dropIndexes()
-    if (_.find(collections, (o) => o.name === 'api.stats')) await db.collection('api.stats').dropIndexes()
     if (_.find(collections, (o) => o.name === 'stats')) await db.collection('stats').dropIndexes()
 
     await db.collection('users.bits').createIndex('timestamp')
@@ -43,7 +42,6 @@ class IMongoDB extends Interface {
     await db.collection('users.online').createIndex('username')
     await db.collection('cache').createIndex('key')
     await db.collection('customTranslations').createIndex('key')
-    await db.collection('api.stats').createIndex('timestamp', { expireAfterSeconds: 60 * 60 * 24 })
     await db.collection('stats').createIndex('whenOnline')
 
     this.connected = true

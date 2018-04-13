@@ -24,25 +24,7 @@ Configuration.prototype.commands = function () {
 }
 
 Configuration.prototype.debug = async function (self, sender) {
-  let [api, widgets] = await Promise.all([
-    global.db.engine.find('api.stats'),
-    global.db.engine.find('widgets')
-  ])
-
-  let stats = {
-    'helix': {
-      'total': _.size(_.filter(api, (o) => o.api === 'helix')),
-      'errors': _.size(_.filter(api, (o) => o.api === 'helix' && o.code !== 200))
-    },
-    'kraken': {
-      'total': _.size(_.filter(api, (o) => o.api === 'kraken')),
-      'errors': _.size(_.filter(api, (o) => o.api === 'kraken' && o.code !== 200))
-    },
-    'tmi': {
-      'total': _.size(_.filter(api, (o) => o.api === 'tmi')),
-      'errors': _.size(_.filter(api, (o) => o.api === 'tmi' && o.code !== 200))
-    }
-  }
+  let widgets = await global.db.engine.find('widgets')
 
   let oauth = {
     broadcaster: _.isNil(config.settings.broadcaster_oauth) || !config.settings.broadcaster_oauth.match(/oauth:[\w]*/),
@@ -55,7 +37,6 @@ Configuration.prototype.debug = async function (self, sender) {
   global.log.debug(`GENERAL | OS: ${process.env.npm_config_user_agent} | DB: ${config.database.type} | Bot version: ${process.env.npm_package_version} | Bot uptime: ${process.uptime()} | Bot lang: ${lang} | Bot mute: ${mute}`)
   global.log.debug(`SYSTEMS | ${_.keys(_.pickBy(config.systems)).join(', ')}`)
   global.log.debug(`WIDGETS | ${_.map(widgets, 'widget').join(', ')}`)
-  global.log.debug(`API | HELIX ${stats.helix.total}/${stats.helix.errors} | KRAKEN ${stats.kraken.total}/${stats.kraken.errors} | TMI ${stats.tmi.total}/${stats.tmi.errors}`)
   global.log.debug(`OAUTH | BOT ${!oauth.bot} | BROADCASTER ${!oauth.broadcaster}`)
   global.log.debug('======= END OF DEBUG MESSAGE =======')
 }
