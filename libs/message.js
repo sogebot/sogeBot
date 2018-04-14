@@ -161,7 +161,7 @@ class Message {
           .replace(/\(|\)/g, '')
           .replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
-        process.send({ type: 'parse', sender: attr.sender, message: cmd, skip: true, quiet: true })
+        process.send({ type: 'parse', sender: { username: attr.sender }, message: cmd, skip: true, quiet: true })
         return ''
       },
       '(!#)': async function (filter) {
@@ -170,7 +170,7 @@ class Message {
           .replace(/\(|\)/g, '')
           .replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
-        process.send({ type: 'parse', sender: attr.sender, message: cmd, skip: true, quiet: false })
+        process.send({ type: 'parse', sender: { username: attr.sender }, message: cmd, skip: true, quiet: false })
         return ''
       }
     }
@@ -268,14 +268,14 @@ class Message {
           let user = await global.db.engine.find('users', { username: viewer.username, is: { ubscriber: true } })
           if (!_.isEmpty(user)) onlineSubscribers.push(user.username)
         }
-        onlineSubscribers = _.filter(onlineSubscribers, function (o) { return o !== attr.sender.username })
+        onlineSubscribers = _.filter(onlineSubscribers, function (o) { return o !== attr.sender })
 
         let onlineFollowers = []
         for (let viewer of onlineViewers) {
           let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } })
           if (!_.isEmpty(user)) onlineFollowers.push(user.username)
         }
-        onlineFollowers = _.filter(onlineFollowers, function (o) { return o !== attr.sender.username })
+        onlineFollowers = _.filter(onlineFollowers, function (o) { return o !== attr.sender })
 
         let randomVar = {
           online: {
