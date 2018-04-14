@@ -181,7 +181,7 @@ function loadClientListeners (client) {
   global.client.on('message', async function (channel, sender, message, fromSelf) {
     debug('tmijs')('Message received: %s\n\tuserstate: %s', message, JSON.stringify(sender))
 
-    if (!fromSelf && config.settings.bot_username !== sender.username) {
+    if (!fromSelf && config.settings.bot_username.toLowerCase() !== sender.username) {
       sendMessageToWorker(sender, message)
       global.linesParsed++
     }

@@ -410,7 +410,7 @@ Users.prototype.set = async function (username, object) {
   if (_.isNil(username)) return global.log.error('username is NULL!\n' + new Error().stack)
 
   username = username.toLowerCase()
-  if (username === config.settings.bot_username || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
+  if (username === config.settings.bot_username.toLowerCase() || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
 
   // force max value of points
   object.points = _.get(object, 'points', 0) >= Number.MAX_SAFE_INTEGER / 1000000 ? Math.floor(Number.MAX_SAFE_INTEGER / 1000000) : parseInt(_.get(object, 'points', 0), 10)

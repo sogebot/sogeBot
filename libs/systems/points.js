@@ -60,7 +60,7 @@ Points.prototype.webPanel = function () {
 }
 
 Points.prototype.setSocket = function (self, socket, data) {
-  self.setPoints(self, {username: config.settings.bot_username}, data.username + ' ' + data.value) // we want to show this in chat
+  self.setPoints(self, {username: config.settings.bot_username.toLowerCase()}, data.username + ' ' + data.value) // we want to show this in chat
 }
 
 Points.prototype.resetPoints = function (self, socket, data) {

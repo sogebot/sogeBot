@@ -198,7 +198,7 @@ class API {
 
     // set subscribers
     for (let subscriber of subscribers) {
-      if (subscriber.name === config.settings.broadcaster_username || subscriber.name === config.settings.bot_username) continue
+      if (subscriber.name === config.settings.broadcaster_username || subscriber.name === config.settings.bot_username.toLowerCase()) continue
       await global.db.engine.update('users', { username: subscriber.name }, { is: { subscriber: true } })
     }
   }
@@ -754,7 +754,7 @@ class API {
     const userHaveId = _.isNil(user.id)
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
-    const isSkipped = user.username === config.settings.broadcaster_username || user.username === config.settings.bot_username
+    const isSkipped = user.username === config.settings.broadcaster_username || user.username === config.settings.bot_username.toLowerCase()
     debug('api:isFollowerUpdate')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}\nskipped: ${isSkipped}`)
     if (needToWait || notEnoughAPICalls || !userHaveId || isSkipped) {
       if (notEnoughAPICalls) debug('api:isFollowerUpdate')('Waiting for rate-limit to refresh')

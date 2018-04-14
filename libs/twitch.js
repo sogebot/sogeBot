@@ -121,7 +121,7 @@ class Twitch {
 
     let lastFollowAgo = ''
     let lastFollowUsername = 'n/a'
-    let onlineFollowersCount = _.size(_.filter(onlineFollowers, (o) => o !== config.settings.broadcaster_username && o !== config.settings.bot_username)) // except bot and user
+    let onlineFollowersCount = _.size(_.filter(onlineFollowers, (o) => o !== config.settings.broadcaster_username && o !== config.settings.bot_username.toLowerCase())) // except bot and user
     if (events.length > 0) {
       lastFollowUsername = events[0].username
       lastFollowAgo = moment(events[0].timestamp).fromNow()
@@ -147,7 +147,7 @@ class Twitch {
 
     let lastSubAgo = ''
     let lastSubUsername = 'n/a'
-    let onlineSubCount = _.size(_.filter(onlineSubscribers, (o) => o !== config.settings.broadcaster_username && o !== config.settings.bot_username)) // except bot and user
+    let onlineSubCount = _.size(_.filter(onlineSubscribers, (o) => o !== config.settings.broadcaster_username && o !== config.settings.bot_username.toLowerCase())) // except bot and user
     if (events.length > 0) {
       lastSubUsername = events[0].username
       lastSubAgo = moment(events[0].timestamp).fromNow()
@@ -302,10 +302,10 @@ class Twitch {
     let users = await global.users.getAll()
     if (type === 'points' && global.commons.isSystemEnabled('points')) {
       message = global.translate('top.listPoints').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.points) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username }), 'points', 'desc')
+      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.points) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'points', 'desc')
     } else if (type === 'time') {
       message = global.translate('top.listWatched').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.time) && !_.isNil(o.time.watched) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username }), 'time.watched', 'desc')
+      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.time) && !_.isNil(o.time.watched) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'time.watched', 'desc')
     } else if (type === 'tips') {
       sorted = {}
       message = global.translate('top.listTips').replace(/\$amount/g, 10)
@@ -317,7 +317,7 @@ class Twitch {
       sorted = _.orderBy(sorted, 'amount', 'desc')
     } else {
       message = global.translate('top.listMessages').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.stats) && !_.isNil(o.stats.messages) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username }), 'stats.messages', 'desc')
+      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.stats) && !_.isNil(o.stats.messages) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'stats.messages', 'desc')
     }
 
     // remove ignored users

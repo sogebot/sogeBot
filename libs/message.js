@@ -34,7 +34,7 @@ class Message {
         let onlineUsers = await global.db.engine.find('users.online')
         let onlineViewers = []
         for (let user of onlineUsers) {
-          if (user.username !== attr.sender && user.username !== config.settings.bot_username) {
+          if (user.username !== attr.sender && user.username !== config.settings.bot_username.toLowerCase()) {
             onlineViewers.push(user.username)
           }
         }
@@ -45,7 +45,7 @@ class Message {
         let onlineViewers = await global.db.engine.find('users.online')
         let onlineFollowers = []
         for (let viewer of onlineViewers) {
-          if (viewer.username !== attr.sender && viewer.username !== config.settings.bot_username) {
+          if (viewer.username !== attr.sender && viewer.username !== config.settings.bot_username.toLowerCase()) {
             let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } })
             if (!_.isEmpty(user)) onlineFollowers.push(user.username)
           }
@@ -57,7 +57,7 @@ class Message {
         let onlineViewers = await global.db.engine.find('users.online')
         let onlineSubscribers = []
         for (let viewer of onlineViewers) {
-          if (viewer.username !== attr.sender && viewer.username !== config.settings.bot_username) {
+          if (viewer.username !== attr.sender && viewer.username !== config.settings.bot_username.toLowerCase()) {
             let user = await global.db.engine.find('users', { username: viewer.username, is: { subscriber: true } })
             if (!_.isEmpty(user)) onlineSubscribers.push(user.username)
           }
@@ -67,19 +67,19 @@ class Message {
       },
       '(random.viewer)': async function () {
         let viewer = await global.users.getAll()
-        viewer = _.filter(viewer, function (o) { return o.username !== attr.sender && o.username !== config.settings.bot_username })
+        viewer = _.filter(viewer, function (o) { return o.username !== attr.sender && o.username !== config.settings.bot_username.toLowerCase() })
         if (viewer.length === 0) return 'unknown'
         return _.sample(viewer).username
       },
       '(random.follower)': async function () {
         let follower = await global.users.getAll({ is: { follower: true } })
-        follower = _.filter(follower, function (o) { return o.username !== attr.sender && o.username !== config.settings.bot_username })
+        follower = _.filter(follower, function (o) { return o.username !== attr.sender && o.username !== config.settings.bot_username.toLowerCase() })
         if (follower.length === 0) return 'unknown'
         return _.sample(follower).username
       },
       '(random.subscriber)': async function () {
         let subscriber = await global.users.getAll({ is: { subscriber: true } })
-        subscriber = _.filter(subscriber, function (o) { return o.username !== attr.sender && o.username !== config.settings.bot_username })
+        subscriber = _.filter(subscriber, function (o) { return o.username !== attr.sender && o.username !== config.settings.bot_username.toLowerCase() })
         if (subscriber.length === 0) return 'unknown'
         return _.sample(subscriber).username
       },

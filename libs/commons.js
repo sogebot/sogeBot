@@ -110,7 +110,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
   if (message === '') return false // if message is empty, don't send anything
 
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
-  if (_.get(sender, 'username', config.settings.bot_username) === config.settings.bot_username && !attr.force) return false // we don't want to reply on bot commands
+  if (_.get(sender, 'username', config.settings.bot_username.toLowerCase()) === config.settings.bot_username.toLowerCase() && !attr.force) return false // we don't want to reply on bot commands
   message = !_.isUndefined(sender) && !_.isUndefined(sender.username) ? message.replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + sender.username) : message
   if (!(await global.configuration.getValue('mute')) || attr.force) {
     if ((!_.isNil(attr.quiet) && attr.quiet)) return true
@@ -173,7 +173,7 @@ Commons.prototype.isBot = function (user) {
   d('isBot(%j)', user)
   try {
     if (_.isString(user)) user = { username: user }
-    return config.settings.bot_username.toLowerCase().trim() === user.username.toLowerCase().trim()
+    return config.settings.bot_username.toLowerCase().toLowerCase().trim() === user.username.toLowerCase().trim()
   } catch (e) {
     d(e)
     return true // we can expect, if user is null -> bot or admin

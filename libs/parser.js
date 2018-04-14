@@ -165,7 +165,7 @@ class Parser {
       (command.permission === constants.MODS && (isMod || isOwner)) ||
       (command.permission === constants.OWNER_ONLY && isOwner)) {
       var text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim()
-      if (typeof command.fnc === 'function') command.fnc(command.this, _.isNil(sender) ? { username: config.settings.bot_username } : sender, text.trim(), message)
+      if (typeof command.fnc === 'function') command.fnc(command.this, _.isNil(sender) ? { username: config.settings.bot_username.toLowerCase() } : sender, text.trim(), message)
       else global.log.error(command.command + ' have wrong null function registered!', { fnc: 'Parser.prototype.parseCommands' })
     } else {
       // user doesn't have permissions for command
