@@ -267,19 +267,18 @@
           regular: $('#viewers_regular_toggle').hasClass('btn-success')
         },
         time: {
-          message: _.isNil($('#viewers_last_seen').datetimepicker('date')) ? null : parseInt($('#viewers_last_seen').datetimepicker('date').format('x'), 10),
-          follow: _.isNil($('#viewers_followed_at').datetimepicker('date')) ? null : parseInt($('#viewers_followed_at').datetimepicker('date').format('x'), 10),
-          subscribed_at: _.isNil($('#viewers_subscribed_at').datetimepicker('date')) ? null : parseInt($('#viewers_subscribed_at').datetimepicker('date').format('x'), 10),
+          message: $('#viewers_last_seen').val().trim().length === 0 ? null : parseInt(moment($('#viewers_last_seen').val(), "HH:mm:ss YYYY-MM-DD").format('x'), 10),
+          follow: $('#viewers_followed_at').val().trim().length === 0 ? null : parseInt(moment($('#viewers_followed_at').val(), "HH:mm:ss YYYY-MM-DD").format('x'), 10),
+          subscribed_at: $('#viewers_subscribed_at').val().trim().length === 0 ? null : parseInt(moment($('#viewers_subscribed_at').val(), "HH:mm:ss YYYY-MM-DD").format('x'), 10),
           watched: $('#viewers_watched').val() * 1000 * 60 * 60
         },
-        points: $('#viewers_points').val().length === 0 ? 0 : $('#viewers_points').val(),
+        points: !systems.points || $('#viewers_points').val().length === 0 ? 0 : $('#viewers_points').val(),
         stats: {
           messages: $('#viewers_messages').val().length === 0 ? 0 : $('#viewers_messages').val(),
           tier: $('#viewers_tier').val().length === 0 ? null : $('#viewers_tier').val()
         }
       }
       if (!systems.points) delete user.points
-
       // toggle save button to btn-info and disable\
       $(el).toggleClass('btn-primary btn-info').attr('disabled', 'disabled').html('<i class="fas fa-circle-notch fa-spin"></i> ' + commons.translate('saving'))
       viewers.socket.emit('save', user, (err) => {
@@ -294,18 +293,23 @@
       _.each(list, function (item, index) {
         item.points = _.isUndefined(item.points) ? 0 : item.points
         item.time = _.isNil(item.time) ? {} : item.time
+        let followed_at = viewers.styleFollowTime(_.get(item, 'time.follow', 0))
+        followed_at = item.is.follower ? followed_at : `<span class="text-muted">${followed_at}</span>`
+        let subscribed_at = viewers.styleFollowTime(_.get(item, 'time.subscribed_at', 0))
+        subscribed_at = item.is.follower ? subscribed_at : `<span class="text-muted">${subscribed_at}</span>`
+        let lastseen = viewers.styleFollowTime(_.get(item, 'time.message', 0))
         $("#Users").append(`
           <tr data-username="${item.username}" data-toggle="modal" data-target="#viewersDlg">
             <td>${item.username}</td>
-            <td class="text-center" data-value='${_.get(item, 'time.message', 0)}'>${viewers.getDateString(item.time.message)}</td>
+            <td class="text-center" data-value='${_.get(item, 'time.message', 0)}'>${lastseen}</td>
             <td class="text-center" data-value='${_.get(item, 'time.watched', 0)}'>${viewers.styleWatched(item.time.watched)}h</td>
-            <td class="text-center" data-value='${!item.is.follower ? 0 : _.get(item, 'time.follow', 0)}'>${viewers.styleFollowTime(!item.is.follower ? 0 : _.get(item, 'time.follow', 0))}</td>
-            <td class="text-center" data-value='${!item.is.subscriber ? 0 : _.get(item, 'time.subscribed_at', 0)}'>${viewers.styleFollowTime(!item.is.subscriber ? 0 : _.get(item, 'time.subscribed_at', 0))}</td>
+            <td class="text-center" data-value='${!item.is.follower ? 0 : _.get(item, 'time.follow', 0)}'>${followed_at}</td>
+            <td class="text-center" data-value='${!item.is.subscriber ? 0 : _.get(item, 'time.subscribed_at', 0)}'>${subscribed_at}</td>
             ${systems.points ? `<td class="text-center" data-value='${_.get(item, 'points', 0)}'>${_.get(item, 'points', 0)}</td>` : ``}
             <td class="text-center" data-value='${_.get(item, 'stats.messages', 0)}'>${_.get(item, 'stats.messages', 0)}</td>
             <td class="text-center" data-value='${_.get(item, 'stats.tips', 0)}'>${_.get(item, 'stats.tips', 0).toFixed(2)}${item.custom.currency}</td>
             <td class="text-center" data-value='${_.get(item, 'stats.bits', 0)}'>${_.get(item, 'stats.bits', 0)}</td>
-            <td class="text-center" data-value='${_.get(item, 'stats.tier', 0)}'>${_.get(item, 'stats.tier', 0) === 0 ? '<hr>' : _.get(item, 'stats.tier', 0)}</td>
+            <td class="text-center" data-value='${_.get(item, 'stats.tier', 0)}'>${_.isNil(_.get(item, 'stats.tier', 0)) || parseInt(_.get(item, 'stats.tier', 0), 10) === 0 ? '<hr>' : _.get(item, 'stats.tier', 0)}</td>
             <td class="text-center">
               <span class="alert alert-${item.is.subscriber ? 'success' : 'danger'}" style="padding: 0 1.25rem">SUBSCRIBER</span>
             </td>
@@ -388,7 +392,6 @@
         const activeFilter = ($('[data-toggle="active"]').hasClass('alert-success') && o.is.online)
           || ($('[data-toggle="active"]').hasClass('alert-danger') && !o.is.online)
           || $('[data-toggle="active"]').hasClass('alert-secondary')
-        console.log(subscriberFilter, followerFilter, regularFilter, activeFilter)
         return subscriberFilter && followerFilter && regularFilter && activeFilter
       }), [function (o) {
         var split = viewers.sortBy.split('.')
@@ -784,20 +787,17 @@
       $('#viewers_subscriber_toggle').removeClass().addClass((viewer.is.subscriber ? 'btn-success' : 'btn-danger') + ' btn w-100')
       $('#viewers_regular_toggle').removeClass().addClass((viewer.is.regular ? 'btn-success' : 'btn-danger') + ' btn w-100')
 
-      $('#viewers_last_seen').datetimepicker('destroy')
       $('#viewers_last_seen').datetimepicker(datepickeropts)
+      $('#viewers_last_seen').datetimepicker('date', null)
       if (!_.isNil(viewer.time.message) && viewer.time.message > 0) $('#viewers_last_seen').datetimepicker('defaultDate', viewers.styleFollowTime(viewer.time.message))
-      else $('#viewers_last_seen').datetimepicker('defaultDate', false)
 
-      $('#viewers_followed_at').datetimepicker('destroy')
       $('#viewers_followed_at').datetimepicker(datepickeropts)
+      $('#viewers_followed_at').datetimepicker('date', null)
       if (!_.isNil(viewer.time.follow) && viewer.time.follow > 0) $('#viewers_followed_at').datetimepicker('defaultDate', viewers.styleFollowTime(viewer.time.follow))
-      else $('#viewers_followed_at').datetimepicker('defaultDate', false)
 
-      $('#viewers_subscribed_at').datetimepicker('destroy')
       $('#viewers_subscribed_at').datetimepicker(datepickeropts)
+      $('#viewers_subscribed_at').datetimepicker('date', null)
       if (!_.isNil(viewer.time.subscribed_at) && viewer.time.subscribed_at > 0) $('#viewers_subscribed_at').datetimepicker('defaultDate', viewers.styleFollowTime(viewer.time.subscribed_at))
-      else $('#viewers_subscribed_at').datetimepicker('defaultDate', false)
 
       $('#viewers_watched').val(viewers.styleWatched(viewer.time.watched))
       $('#viewers_points').val(_.get(viewer, 'points', 0))
