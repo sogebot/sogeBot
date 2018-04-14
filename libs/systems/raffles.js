@@ -269,7 +269,7 @@ class Raffles {
   }
 
   async participate (self, sender, text) {
-    if (_.isNil(sender)) return true
+    if (_.isNil(sender) || _.isNil(sender.username)) return true
 
     const [raffle, user] = await Promise.all([global.db.engine.findOne('raffles', { winner: null }), global.users.get(sender.username)])
 
