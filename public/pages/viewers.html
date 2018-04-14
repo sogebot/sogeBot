@@ -333,15 +333,15 @@
       })
     },
     getDateString: function (timestamp) {
-      if (_.isUndefined(timestamp) || timestamp === 0) return '<hr>'
+      if (_.isNil(timestamp) || timestamp === 0) return '<hr>'
       return moment(timestamp).format('HH:mm:ss, YYYY-MM-DD')
     },
     styleFollowTime: function (timestamp) {
-      if (_.isUndefined(timestamp) || parseInt(timestamp, 10) === 0) return '<hr>'
+      if (_.isNil(timestamp) || parseInt(timestamp, 10) === 0) return '<hr>'
       return moment(parseInt(timestamp, 10)).format('HH:mm:ss, YYYY-MM-DD')
     },
     styleWatched: function (timestamp) {
-      if (_.isUndefined(timestamp)) timestamp = 0
+      if (_.isNil(timestamp)) timestamp = 0
       return (timestamp / 1000 / 60 / 60).toFixed(1)
     },
     delete: function (el) {
