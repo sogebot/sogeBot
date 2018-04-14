@@ -70,7 +70,7 @@ class Twitch {
   }
 
   async lastseenUpdate (self, sender, text) {
-    if (!_.isNull(sender)) {
+    if (!_.isNil(sender) && !_.isNil(sender.username)) {
       global.users.set(sender.username, {
         time: { message: new Date().getTime() },
         is: { subscriber: !_.isNil(sender.subscriber) ? sender.subscriber : false }
