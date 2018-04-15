@@ -305,21 +305,21 @@ Points.prototype.updatePoints = async function () {
     var interval = (await global.cache.isOnline() ? await global.configuration.getValue('pointsInterval') * 60 * 1000 : await global.configuration.getValue('pointsIntervalOffline') * 60 * 1000)
     var ptsPerInterval = (await global.cache.isOnline() ? await global.configuration.getValue('pointsPerInterval') : await global.configuration.getValue('pointsPerIntervalOffline'))
 
-    if (parseInt(interval, 10) === 0 || parseInt(ptsPerInterval, 10) === 0) return
-
     for (let user of await global.db.engine.find('users.online')) {
       if (global.commons.isBot(user.username)) continue
 
-      user = await global.db.engine.findOne('users', { username: user.username })
-      _.set(user, 'time.points', _.get(user, 'time.points', new Date().getTime() - interval))
+      if (parseInt(interval, 10) !== 0 && parseInt(ptsPerInterval, 10) !== 0) {
+        user = await global.db.engine.findOne('users', { username: user.username })
+        _.set(user, 'time.points', _.get(user, 'time.points', new Date().getTime() - interval))
 
-      let time = new Date().getTime()
-      let userTimeDiff = time - user.time.points
-      let howManyInc = userTimeDiff / interval
-      for (let i = 1; i <= howManyInc; howManyInc--) { // starting with 1, because 0.2 should not add points
-        await global.db.engine.insert('users.points', { username: user.username, points: parseInt(ptsPerInterval, 10) })
+        let time = new Date().getTime()
+        let userTimeDiff = time - user.time.points
+        let shouldUpdate = userTimeDiff >= interval
+        if (shouldUpdate) {
+          await global.db.engine.insert('users.points', { username: user.username, points: parseInt(ptsPerInterval, 10) })
+        }
       }
-      await global.db.engine.update('users', { username: user.username }, { time: { points: time - (userTimeDiff * howManyInc) } })
+      await global.db.engine.update('users', { username: user.username }, { time: { points: new Date().getTime() } })
     }
   } catch (e) {
     global.db.error(e)
