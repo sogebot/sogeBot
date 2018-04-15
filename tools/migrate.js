@@ -65,6 +65,16 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  points: [{
+    version: '7.3.0',
+    do: async () => {
+      console.info('Migration points to %s', '7.3.0')
+      let users = await global.db.engine.find('users')
+      for (let user of users) {
+        await global.db.engine.insert('users.points', { username: user.username, points: !_.isNil(user.points) ? parseInt(user.points, 10) : 0 })
+      }
+    }
+  }],
   alias: [{
     version: '7.0.0',
     do: async () => {

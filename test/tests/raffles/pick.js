@@ -31,8 +31,8 @@ describe('Raffles - pick()', () => {
     })
 
     it('Create testuser/testuser2 with max points', async () => {
-      await global.db.engine.insert('users', { username: testuser.username, points: max })
-      await global.db.engine.insert('users', { username: testuser2.username, points: max })
+      await global.db.engine.insert('users.points', { username: testuser.username, points: max })
+      await global.db.engine.insert('users.points', { username: testuser2.username, points: max })
     })
 
     it('testuser bets max', async () => {
@@ -40,8 +40,9 @@ describe('Raffles - pick()', () => {
       assert.isTrue(a)
     })
 
-    it('testuser2 bets max', async () => {
-      await global.systems.raffles.participate(global.systems.raffles, testuser2, `!winme ${max / 2}`)
+    it('testuser2 bets half of max', async () => {
+      let a = await global.systems.raffles.participate(global.systems.raffles, testuser2, `!winme ${max / 2}`)
+      assert.isTrue(a)
     })
 
     it('pick a winner', async () => {

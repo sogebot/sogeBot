@@ -144,14 +144,14 @@ class Price {
       return true
     }
 
-    var availablePts = parseInt(user.points, 10)
+    var availablePts = parseInt(await global.systems.points.getPointsOf(user.username), 10)
     var removePts = parseInt(price.price, 10)
     let result = !_.isFinite(availablePts) || !_.isNumber(availablePts) || availablePts < removePts
     if (result) {
       let message = await global.commons.prepare('price.user-have-not-enough-points', { amount: removePts, command: `!${price.command}`, pointsName: await global.systems.points.getPointsName(removePts) })
       debug(message); global.commons.sendMessage(message, sender)
     } else {
-      global.db.engine.increment('users', { username: sender.username }, { points: (removePts * -1) })
+      await global.db.engine.insert('users.points', { username: sender.username, points: (removePts * -1) })
     }
     return !result // need to !result as it's inverted
   }

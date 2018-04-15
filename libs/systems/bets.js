@@ -145,7 +145,7 @@ class Bets {
       if (parsed.length < 2) { throw new Error(ERROR_NOT_ENOUGH_OPTIONS) }
 
       const user = await global.users.get(sender.username)
-      let bet = { option: parsed[1], amount: parsed[2] === 'all' && !_.isNil(user.points) ? user.points : parsed[2] }
+      let bet = { option: parsed[1], amount: parsed[2] === 'all' && !_.isNil(await global.systems.points.getPointsOf(user.username)) ? await global.systems.points.getPointsOf(user.username) : parsed[2] }
 
       if (parseInt(bet.amount, 10) === 0) throw Error(ERROR_ZERO_BET)
       if (_.isEmpty(currentBet)) throw Error(ERROR_NOT_RUNNING)
@@ -155,7 +155,7 @@ class Bets {
 
       var percentGain = (Object.keys(currentBet.bets).length * parseInt(await global.configuration.getValue('betPercentGain'), 10)) / 100
 
-      var availablePts = parseInt(user.points, 10)
+      var availablePts = parseInt(await global.systems.points.getPointsOf(user.username), 10)
       var removePts = parseInt(bet.amount, 10)
       if (!_.isFinite(availablePts) || !_.isNumber(availablePts) || availablePts < removePts) {
         global.commons.sendMessage(global.translate('bets.notEnoughPoints')
@@ -164,7 +164,7 @@ class Bets {
       } else {
         var newBet = _.isUndefined(currentBet.bets[bet.option][sender.username]) ? removePts : parseInt(currentBet.bets[bet.option][sender.username], 10) + removePts
         currentBet.bets[bet.option][sender.username] = newBet
-        global.db.engine.increment('users', { username: sender.username }, { points: parseInt(removePts, 10) * -1 })
+        await global.db.engine.insert('users.points', { username: sender.username, points: parseInt(removePts, 10) * -1 })
 
         global.commons.sendMessage(global.translate('bets.newBet')
           .replace(/\$option/g, bet.option)
@@ -211,7 +211,7 @@ class Bets {
       if (_.isEmpty(currentBet)) throw Error(ERROR_NOT_RUNNING)
       _.each(currentBet.bets, function (users) {
         _.each(users, function (bet, buser) {
-          global.db.engine.increment('users', { username: buser }, { points: parseInt(bet, 10) })
+          global.db.engine.insert('users.points', { username: buser, points: parseInt(bet, 10) })
         })
       })
       global.commons.sendMessage(global.translate('bets.refund'), sender)
@@ -244,7 +244,7 @@ class Bets {
       var percentGain = (Object.keys(currentBet.bets).length * parseInt(await global.configuration.getValue('betPercentGain'), 10)) / 100
       _.each(currentBet.bets[wOption], function (bet, buser) {
         usersToPay.push(buser)
-        global.db.engine.increment('users', { username: buser }, { points: parseInt(bet, 10) + Math.round((parseInt(bet, 10) * percentGain)) })
+        global.db.engine.insert('users.points', { username: buser, points: parseInt(bet, 10) + Math.round((parseInt(bet, 10) * percentGain)) })
       })
 
       global.commons.sendMessage(global.translate('bets.closed')

@@ -324,7 +324,8 @@ class Heist {
 
         if (isSurvivor) {
           // add points to user
-          await global.db.engine.incrementOne('users', { username: user.username }, { points: parseInt(parseFloat(user.points * level.payoutMultiplier).toFixed(), 10) })
+          let points = await global.systems.points.getPointsOf(user.username)
+          await global.db.engine.insert('users.points', { username: user.username, points: parseInt(parseFloat(points * level.payoutMultiplier).toFixed(), 10) })
         }
       } else {
         let winners = []
@@ -333,7 +334,8 @@ class Heist {
 
           if (isSurvivor) {
             // add points to user
-            await global.db.engine.incrementOne('users', { username: user.username }, { points: parseInt(parseFloat(user.points * level.payoutMultiplier).toFixed(), 10) })
+            let points = await global.systems.points.getPointsOf(user.username)
+            await global.db.engine.insert('users.points', { username: user.username, points: parseInt(parseFloat(points * level.payoutMultiplier).toFixed(), 10) })
             winners.push(user.username)
           }
         }
@@ -459,9 +461,8 @@ class Heist {
       return
     }
 
-    const user = await global.users.get(sender.username)
-    points = points === 'all' && !_.isNil(user.points) ? user.points : parseInt(points, 10) // set all points
-    points = points > user.points ? user.points : points // bet only user points
+    points = points === 'all' && !_.isNil(await global.systems.points.getPointsOf(sender.username)) ? await global.systems.points.getPointsOf(sender.username) : parseInt(points, 10) // set all points
+    points = points > await global.systems.points.getPointsOf(sender.username) ? await global.systems.points.getPointsOf(sender.username) : points // bet only user points
     d(`${command} - ${sender.username} betting ${points}`)
 
     if (points === 0 || _.isNil(points) || _.isNaN(points)) {
@@ -471,7 +472,7 @@ class Heist {
     } // send entryInstruction if command is not ok
 
     await Promise.all([
-      global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * -1 }), // remove points from user
+      global.db.engine.insert('users.points', { username: sender.username, points: parseInt(points, 10) * -1 }), // remove points from user
       global.db.engine.update(`${self.collection}.users`, { username: sender.username }, { points: points }) // add user to heist list
     ])
 
