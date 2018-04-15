@@ -95,7 +95,7 @@ Points.prototype.messagePoints = async function (self, sender, text, skip) {
   const points = parseInt(await global.configuration.getValue('pointsPerMessageInterval'), 10)
   const interval = parseInt(await global.configuration.getValue('pointsMessageInterval'), 10)
   const user = await global.users.get(sender.username)
-  if (points === interval === 0) return
+  if (points === 0 || interval === 0) return
   let lastMessageCount = _.isNil(user.custom.lastMessagePoints) ? 0 : user.custom.lastMessagePoints
 
   if (lastMessageCount + interval <= user.stats.messages) {
