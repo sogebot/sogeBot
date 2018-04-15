@@ -313,13 +313,15 @@ Points.prototype.updatePoints = async function () {
         _.set(user, 'time.points', _.get(user, 'time.points', new Date().getTime() - interval))
 
         let time = new Date().getTime()
-        let userTimeDiff = time - user.time.points
-        let shouldUpdate = userTimeDiff >= interval
+        let shouldUpdate = time - user.time.points >= interval
         if (shouldUpdate) {
           await global.db.engine.insert('users.points', { username: user.username, points: parseInt(ptsPerInterval, 10) })
+          await global.db.engine.update('users', { username: user.username }, { time: { points: new Date().getTime() } })
         }
+      } else {
+        // force time update if interval or points are 0
+        await global.db.engine.update('users', { username: user.username }, { time: { points: new Date().getTime() } })
       }
-      await global.db.engine.update('users', { username: user.username }, { time: { points: new Date().getTime() } })
     }
   } catch (e) {
     global.db.error(e)
