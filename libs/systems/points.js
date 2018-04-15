@@ -108,10 +108,13 @@ Points.prototype.messagePoints = async function (self, sender, text, skip) {
 Points.prototype.getPointsOf = async function (user) {
   let points = 0
   for (let item of await global.db.engine.find('users.points', { username: user })) {
-    let itemPoints = !_.isNaN(parseInt(_.get(item, 'points', 0))) ? parseInt(_.get(item, 'points', 0)) : 0
-    points = parseInt(points) + itemPoints
+    let itemPoints = !_.isNaN(parseInt(_.get(item, 'points', 0))) ? _.get(item, 'points', 0) : 0
+    points = points + Number(itemPoints)
   }
-  return points > Number.MAX_SAFE_INTEGER / 1000000 ? points : Number.MAX_SAFE_INTEGER / 1000000
+  return parseInt(
+    Number(points) <= Number.MAX_SAFE_INTEGER / 1000000
+      ? points
+      : Number.MAX_SAFE_INTEGER / 1000000, 10)
 }
 
 Points.prototype.setPoints = async function (self, sender, text) {
