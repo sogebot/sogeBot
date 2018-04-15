@@ -133,7 +133,7 @@ class Gambling {
     debug(m); global.commons.sendMessage(m, { username: username }, { force: true })
 
     // give user his points
-    global.db.engine.incrementOne('users', { username: username }, { points: parseInt(total, 10) })
+    await global.db.engine.insert('users.points', { username: username, points: parseInt(total, 10) })
 
     // reset duel
     this.duelUsers = null
@@ -151,11 +151,11 @@ class Gambling {
       if (_.isNil(parsed)) throw Error(ERROR_NOT_ENOUGH_OPTIONS)
 
       const user = await global.users.get(sender.username)
-      points = parsed[1] === 'all' && !_.isNil(user.points) ? user.points : parsed[1]
+      points = parsed[1] === 'all' && !_.isNil(await global.systems.points.getPointsOf(user.username)) ? await global.systems.points.getPointsOf(user.username) : parsed[1]
 
       if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
-      if (_.isNil(user.points) || user.points < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
-      global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * -1 })
+      if (_.isNil(await global.systems.points.getPointsOf(user.username)) || await global.systems.points.getPointsOf(user.username) < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
+      await global.db.engine.insert('users.points', { username: sender.username, points: parseInt(points, 10) * -1 })
 
       // check if user is already in duel and add points
       let newDuelist = true
@@ -359,23 +359,24 @@ class Gambling {
       if (_.isNil(parsed)) throw Error(ERROR_NOT_ENOUGH_OPTIONS)
 
       const user = await global.users.get(sender.username)
-      points = parsed[1] === 'all' && !_.isNil(user.points) ? user.points : parsed[1]
+      points = parsed[1] === 'all' && !_.isNil(await global.systems.points.getPointsOf(user.username)) ? await global.systems.points.getPointsOf(user.username) : parsed[1]
 
       if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
-      if (_.isNil(user.points) || user.points < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
+      if (_.isNil(await global.systems.points.getPointsOf(user.username)) || await global.systems.points.getPointsOf(user.username) < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
 
-      await global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * -1 })
+      await global.db.engine.insert('users.points', { username: sender.username, points: parseInt(points, 10) * -1 })
       if (_.random(0, 100, false) <= await global.configuration.getValue('gamblingChanceToWin')) {
-        let updatedUser = await global.db.engine.incrementOne('users', { username: sender.username }, { points: parseInt(points, 10) * 2 })
+        await global.db.engine.insert('users.points', { username: sender.username, points: parseInt(points, 10) * 2 })
+        let updatedPoints = await global.systems.points.getPointsOf(sender.username)
         message = await global.commons.prepare('gambling.gamble.win', {
-          pointsName: await global.systems.points.getPointsName(updatedUser.points),
-          points: updatedUser.points
+          pointsName: await global.systems.points.getPointsName(updatedPoints),
+          points: updatedPoints
         })
         debug(message); global.commons.sendMessage(message, sender)
       } else {
         message = await global.commons.prepare('gambling.gamble.lose', {
-          pointsName: await global.systems.points.getPointsName(user.points),
-          points: parseInt(user.points, 10) - parseInt(points, 10)
+          pointsName: await global.systems.points.getPointsName(await global.systems.points.getPointsOf(user.username)),
+          points: parseInt(await global.systems.points.getPointsOf(user.username), 10) - parseInt(points, 10)
         })
         debug(message); global.commons.sendMessage(message, sender)
       }

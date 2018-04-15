@@ -11,11 +11,8 @@ const constants = require('../constants')
 function Points () {
   if (global.commons.isSystemEnabled(this)) {
     if (require('cluster').isMaster) {
-      // add events for join/part
-      setTimeout(() => this.addEvents(this), 1000)
-      // count Points - every 30s check points
-      setInterval(() => this.updatePoints(), 30000)
-
+      this.updatePoints()
+      this.compactPointsDb()
       this.webPanel()
     }
 
@@ -92,30 +89,29 @@ Points.prototype.sendConfiguration = async function (self, socket) {
   })
 }
 
-Points.prototype.addEvents = function (self) {
-  global.client.on('join', function (channel, username, fromSelf) {
-    if (!fromSelf) {
-      self.startCounting(username)
-    }
-  })
-}
-
 Points.prototype.messagePoints = async function (self, sender, text, skip) {
   if (skip || text.startsWith('!')) return true
 
-  const points = parseInt(global.configuration.getValue('pointsPerMessageInterval'), 10)
-  const interval = parseInt(global.configuration.getValue('pointsMessageInterval'), 10)
+  const points = parseInt(await global.configuration.getValue('pointsPerMessageInterval'), 10)
+  const interval = parseInt(await global.configuration.getValue('pointsMessageInterval'), 10)
   const user = await global.users.get(sender.username)
-
+  if (points === interval === 0) return
   let lastMessageCount = _.isNil(user.custom.lastMessagePoints) ? 0 : user.custom.lastMessagePoints
 
   if (lastMessageCount + interval <= user.stats.messages) {
-    await Promise.all([
-      global.db.engine.increment('users', { username: user.username }, { points: parseInt(points, 10) }),
-      global.db.engine.update('users', { username: user.username }, { custom: { lastMessagePoints: user.stats.messages } })
-    ])
+    await global.db.engine.insert('users.points', { username: user.username, points: parseInt(points, 10) })
+    await global.db.engine.update('users', { username: user.username }, { custom: { lastMessagePoints: user.stats.messages } })
   }
   return true
+}
+
+Points.prototype.getPointsOf = async function (user) {
+  let points = 0
+  for (let item of await global.db.engine.find('users.points', { username: user })) {
+    let itemPoints = !_.isNaN(parseInt(_.get(item, 'points', 0))) ? parseInt(_.get(item, 'points', 0)) : 0
+    points = parseInt(points) + itemPoints
+  }
+  return points
 }
 
 Points.prototype.setPoints = async function (self, sender, text) {
@@ -123,7 +119,9 @@ Points.prototype.setPoints = async function (self, sender, text) {
     var parsed = text.match(/^@?([\S]+) ([0-9]+)$/)
     const points = parseInt(parsed[2], 10)
 
-    global.users.set(parsed[1].toLowerCase(), { points: points })
+    let userPoints = await self.getPointsOf(parsed[1].toLowerCase())
+    await global.db.engine.insert('users.points', { username: parsed[1].toLowerCase(), points: points - userPoints })
+
     let message = await global.commons.prepare('points.success.set', {
       amount: points,
       username: parsed[1].toLowerCase(),
@@ -139,11 +137,11 @@ Points.prototype.givePoints = async function (self, sender, text) {
   try {
     var parsed = text.match(/^@?([\S]+) ([\d]+|all)$/)
     const [user, user2] = await Promise.all([global.users.get(sender.username), global.users.get(parsed[1])])
-    var givePts = parsed[2] === 'all' && !_.isNil(user.points) ? user.points : parsed[2]
-    if (parseInt(user.points, 10) >= givePts) {
+    var givePts = parsed[2] === 'all' ? await self.getPointsOf(sender.username) : parsed[2]
+    if (await self.getPointsOf(sender.username) >= givePts) {
       if (user.username !== user2.username) {
-        global.db.engine.increment('users', { username: user.username }, { points: (parseInt(givePts, 10) * -1) })
-        global.db.engine.increment('users', { username: user2.username }, { points: parseInt(givePts, 10) })
+        await global.db.engine.insert('users.points', { username: user.username, points: (parseInt(givePts, 10) * -1) })
+        await global.db.engine.insert('users.points', { username: user2.username, points: parseInt(givePts, 10) })
       }
       let message = await global.commons.prepare('points.success.give', {
         amount: givePts,
@@ -215,13 +213,13 @@ Points.prototype.getPointsName = async function (points) {
 
 Points.prototype.getPointsFromUser = async function (self, sender, text) {
   try {
-    let user = await global.users.get(sender.username)
-    const username = text.match(/^@?([\S]+)$/)[1]
+    const username = text.match(/^@?([\S]+)$/)[1] || sender.username
 
+    let points = await self.getPointsOf(username)
     let message = await global.commons.prepare('points.defaults.pointsResponse', {
-      amount: user.points,
+      amount: points,
       username: username,
-      pointsName: await self.getPointsName(user.points)
+      pointsName: await self.getPointsName(points)
     })
     debug(message); global.commons.sendMessage(message, sender)
   } catch (err) {
@@ -235,9 +233,9 @@ Points.prototype.allPoints = async function (self, sender, text) {
     var givePts = parseInt(parsed[1], 10)
 
     let users = await global.db.engine.find('users.online')
-    _.each(users, function (user) {
-      global.db.engine.increment('users', { username: user.username }, { points: parseInt(givePts, 10) })
-    })
+    for (let user of users) {
+      await global.db.engine.insert('users.points', { username: user.username, points: parseInt(givePts, 10) })
+    }
     let message = await global.commons.prepare('points.success.all', {
       amount: givePts,
       pointsName: await self.getPointsName(givePts)
@@ -254,9 +252,9 @@ Points.prototype.rainPoints = async function (self, sender, text) {
     var givePts = parseInt(parsed[1], 10)
 
     let users = await global.db.engine.find('users.online')
-    _.each(users, function (user) {
-      global.db.engine.increment('users', { username: user.username }, { points: parseInt(Math.floor(Math.random() * givePts), 10) })
-    })
+    for (let user of users) {
+      await global.db.engine.insert('users.points', { username: user.username, points: parseInt(Math.floor(Math.random() * givePts), 10) })
+    }
     let message = await global.commons.prepare('points.success.rain', {
       amount: givePts,
       pointsName: await self.getPointsName(givePts)
@@ -271,7 +269,7 @@ Points.prototype.addPoints = async function (self, sender, text) {
   try {
     var parsed = text.match(/^@?([\S]+) ([0-9]+)$/)
     let givePts = parseInt(parsed[2], 10)
-    global.db.engine.increment('users', { username: parsed[1].toLowerCase() }, { points: givePts })
+    await global.db.engine.insert('users.points', { username: parsed[1].toLowerCase(), points: givePts })
 
     let message = await global.commons.prepare('points.success.add', {
       amount: givePts,
@@ -287,10 +285,8 @@ Points.prototype.addPoints = async function (self, sender, text) {
 Points.prototype.removePoints = async function (self, sender, text) {
   try {
     var parsed = text.match(/^@?([\S]+) ([\d]+|all)$/)
-    const user = await global.users.get(parsed[1])
-    let removePts = parsed[2] === 'all' && !_.isNil(user.points) ? user.points : parsed[2]
-
-    global.db.engine.increment('users', { username: parsed[1].toLowerCase() }, { points: (removePts * -1) })
+    var removePts = parsed[2] === 'all' ? await self.getPointsOf(parsed[1]) : parsed[2]
+    await global.db.engine.insert('users.points', { username: parsed[1].toLowerCase(), points: removePts * -1 })
 
     let message = await global.commons.prepare('points.success.remove', {
       amount: removePts,
@@ -307,25 +303,52 @@ Points.prototype.getPoints = function (self, sender) {
   self.getPointsFromUser(self, sender, sender.username)
 }
 
-Points.prototype.startCounting = function (username) {
-  global.users.set(username, { time: { points: parseInt(new Date().getTime(), 10) } })
+Points.prototype.updatePoints = async function () {
+  try {
+    var interval = (await global.cache.isOnline() ? await global.configuration.getValue('pointsInterval') * 60 * 1000 : await global.configuration.getValue('pointsIntervalOffline') * 60 * 1000)
+    var ptsPerInterval = (await global.cache.isOnline() ? await global.configuration.getValue('pointsPerInterval') : await global.configuration.getValue('pointsPerIntervalOffline'))
+
+    if (parseInt(interval, 10) === 0 || parseInt(ptsPerInterval, 10) === 0) return
+
+    for (let user of await global.db.engine.find('users.online')) {
+      if (global.commons.isBot(user.username)) continue
+
+      user = await global.db.engine.findOne('users', { username: user.username })
+      _.set(user, 'time.points', _.get(user, 'time.points', new Date().getTime() - interval))
+
+      let time = new Date().getTime()
+      let userTimeDiff = time - user.time.points
+      let howManyInc = userTimeDiff / interval
+      for (let i = 1; i <= howManyInc; howManyInc--) { // starting with 1, because 0.2 should not add points
+        await global.db.engine.insert('users.points', { username: user.username, points: parseInt(ptsPerInterval, 10) })
+      }
+      await global.db.engine.update('users', { username: user.username }, { time: { points: time - (userTimeDiff * howManyInc) } })
+    }
+  } catch (e) {
+    global.db.error(e)
+    global.db.error(e.stack)
+  } finally {
+    setTimeout(() => this.updatePoints(), 60000)
+  }
 }
 
-Points.prototype.updatePoints = async function () {
-  var interval = (await global.cache.isOnline() ? await global.configuration.getValue('pointsInterval') * 60 * 1000 : await global.configuration.getValue('pointsIntervalOffline') * 60 * 1000)
-  var ptsPerInterval = (await global.cache.isOnline() ? await global.configuration.getValue('pointsPerInterval') : await global.configuration.getValue('pointsPerIntervalOffline'))
-
-  if (parseInt(interval, 10) === 0 || parseInt(ptsPerInterval, 10) === 0) return
-
-  for (let user of await global.db.engine.find('users.online')) {
-    user = await global.db.engine.findOne('users', { username: user.username })
-    _.set(user, 'time.points', _.get(user, 'time.points', 0))
-    if (new Date().getTime() - user.time.points >= interval) {
-      await Promise.all([
-        global.db.engine.increment('users', { username: user.username }, { points: parseInt(ptsPerInterval, 10) }),
-        global.db.engine.update('users', { username: user.username }, { time: { points: new Date().getTime() } })
-      ])
+Points.prototype.compactPointsDb = async function () {
+  try {
+    let users = {}
+    for (let user of await global.db.engine.find('users.points')) {
+      if (_.isNaN(users[user.username]) || _.isNil(users[user.username])) users[user.username] = 0
+      let points = !_.isNaN(parseInt(_.get(user, 'points', 0))) ? parseInt(_.get(user, 'points', 0)) : 0
+      users[user.username] = parseInt(users[user.username], 10) + points
+      await global.db.engine.remove('users.points', { _id: user._id.toString() })
     }
+    for (let [username, points] of Object.entries(users)) {
+      await global.db.engine.insert('users.points', { username: username, points: parseInt(points, 10) })
+    }
+  } catch (e) {
+    global.db.error(e)
+    global.db.error(e.stack)
+  } finally {
+    setTimeout(() => this.compactPointsDb(), 60000)
   }
 }
 

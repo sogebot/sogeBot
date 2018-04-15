@@ -278,7 +278,7 @@ class Raffles {
     if (!isStartingWithRaffleKeyword || _.isEmpty(raffle)) return true
 
     text = text.toString().replace(raffle.keyword, '')
-    let tickets = text.trim() === 'all' && !_.isNil(user.points) ? user.points : parseInt(text.trim(), 10)
+    let tickets = text.trim() === 'all' && !_.isNil(await global.systems.points.getPointsOf(user.username)) ? await global.systems.points.getPointsOf(user.username) : parseInt(text.trim(), 10)
     debug('User in db: %j', user)
     debug('Text: %s', text)
     debug('Tickets in text: %s', parseInt(text.trim(), 10))
@@ -320,8 +320,8 @@ class Raffles {
     }
     debug('new participant: %j', participantUser)
 
-    debug('not enough points: %o', raffle.type === TYPE_TICKETS && user.points < tickets)
-    if (raffle.type === TYPE_TICKETS && user.points < tickets) return // user doesn't have enough points
+    debug('not enough points: %o', raffle.type === TYPE_TICKETS && await global.systems.points.getPointsOf(user.username) < tickets)
+    if (raffle.type === TYPE_TICKETS && await global.systems.points.getPointsOf(user.username) < tickets) return // user doesn't have enough points
 
     if (raffle.followers && raffle.subscribers) {
       participantUser.eligible = (!_.isNil(user.is.follower) && user.is.follower) || (!_.isNil(user.is.subscriber) && user.is.subscriber)
@@ -332,7 +332,7 @@ class Raffles {
     }
 
     if (participantUser.eligible) {
-      if (raffle.type === TYPE_TICKETS) global.db.engine.increment('users', { username: sender.username }, { points: parseInt(tickets, 10) * -1 })
+      if (raffle.type === TYPE_TICKETS) await global.db.engine.insert('users', { username: sender.username, points: parseInt(tickets, 10) * -1 })
       await global.db.engine.update('raffle_participants', { raffle_id: raffle._id.toString(), username: sender.username }, participantUser)
       self.refresh()
     }

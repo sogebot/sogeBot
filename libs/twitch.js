@@ -263,7 +263,10 @@ class Twitch {
       message.push((watchTime / 1000 / 60 / 60).toFixed(1) + 'h')
 
       // points
-      if (global.commons.isSystemEnabled('points')) message.push(user.points + ' ' + await global.systems.points.getPointsName(user.points))
+      if (global.commons.isSystemEnabled('points')) {
+        let userPoints = await global.systems.points.getPointsOf(sender.username)
+        message.push(userPoints + ' ' + await global.systems.points.getPointsName(userPoints))
+      }
 
       // message count
       var messages = !_.isUndefined(user.stats.messages) ? user.stats.messages : 0
@@ -335,8 +338,10 @@ class Twitch {
       message += (i + 1) + '. ' + (await global.configuration.getValue('atUsername') ? '@' : '') + user.username + ' - '
       if (type === 'time') message += (user.time.watched / 1000 / 60 / 60).toFixed(1) + 'h'
       else if (type === 'tips') message += user.amount.toFixed(2) + global.currency.symbol(await global.configuration.getValue('currency'))
-      else if (type === 'points') message += user.points + ' ' + await global.systems.points.getPointsName(user.points)
-      else message += user.stats.messages
+      else if (type === 'points') {
+        let points = await global.systems.points.getPointsOf(user.username)
+        message += points + ' ' + await global.systems.points.getPointsName(points)
+      } else message += user.stats.messages
       if (i + 1 < 10 && !_.isNil(sorted[i + 1])) message += ', '
       i++
     }
