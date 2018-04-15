@@ -341,7 +341,7 @@ Points.prototype.compactPointsDb = async function () {
       await global.db.engine.remove('users.points', { _id: user._id.toString() })
     }
     for (let [username, points] of Object.entries(users)) {
-      await global.db.engine.insert('users.points', { username: username, points: parseInt(points, 10) })
+      if (points !== 0) await global.db.engine.insert('users.points', { username: username, points: parseInt(points, 10) })
     }
   } catch (e) {
     global.db.error(e)
