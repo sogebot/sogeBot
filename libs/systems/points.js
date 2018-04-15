@@ -111,7 +111,7 @@ Points.prototype.getPointsOf = async function (user) {
     let itemPoints = !_.isNaN(parseInt(_.get(item, 'points', 0))) ? parseInt(_.get(item, 'points', 0)) : 0
     points = parseInt(points) + itemPoints
   }
-  return points
+  return points > Number.MAX_SAFE_INTEGER / 1000000 ? points : Number.MAX_SAFE_INTEGER / 1000000
 }
 
 Points.prototype.setPoints = async function (self, sender, text) {
