@@ -72,6 +72,12 @@ Users.prototype.sockets = function (self) {
     })
 
     socket.on('save', async (data, cb) => {
+      if (!_.isNil(data.points)) {
+        let points = data.points; delete data.points
+        if (global.commons.isSystemEnabled('points')) {
+          global.systems.points.setPoints(global.systems.points, { username: null }, `${data.username} ${points}`)
+        }
+      }
       await global.db.engine.update('users', { username: data.username }, data)
       cb(null, null)
     })
