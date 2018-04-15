@@ -316,7 +316,9 @@ Points.prototype.updatePoints = async function () {
   var ptsPerInterval = (await global.cache.isOnline() ? await global.configuration.getValue('pointsPerInterval') : await global.configuration.getValue('pointsPerIntervalOffline'))
 
   let users = await global.db.engine.find('users.online')
+
   for (let user of users) {
+    user = await global.db.engine.findOne('users', { username: user.username })
     _.set(user, 'time.points', _.get(user, 'time.points', 0))
     if (new Date().getTime() - user.time.points >= interval) {
       await Promise.all([
