@@ -31,8 +31,8 @@ describe('Raffles - pick()', () => {
     })
 
     it('Create testuser/testuser2 with max points', async () => {
-      await global.db.engine.insert('users', { username: testuser.username, points: max })
-      await global.db.engine.insert('users', { username: testuser2.username, points: max })
+      await global.db.engine.insert('users.points', { username: testuser.username, points: max })
+      await global.db.engine.insert('users.points', { username: testuser2.username, points: max })
     })
 
     it('testuser bets max', async () => {
