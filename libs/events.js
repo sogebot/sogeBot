@@ -240,7 +240,7 @@ class Events {
     } else {
       if (!_.isFinite(parseInt(cvFromDb.value, 10))) value = numberToIncrement
       else value = parseInt(cvFromDb.value, 10) + parseInt(numberToIncrement, 10)
-      await global.db.engine.update('customvars', { _id: cvFromDb._id.toString() }, { value: value })
+      await global.db.engine.update('customvars', { _id: cvFromDb._id.toString() }, { value: value.toString() })
     }
 
     // Update widgets and titles
@@ -263,7 +263,7 @@ class Events {
     } else {
       if (!_.isFinite(parseInt(cvFromDb.value, 10))) value = numberToDecrement * -1
       else value = parseInt(cvFromDb.value, 10) - parseInt(numberToDecrement, 10)
-      await global.db.engine.update('customvars', { _id: cvFromDb._id.toString() }, { value: value })
+      await global.db.engine.update('customvars', { _id: cvFromDb._id.toString() }, { value: value.toString() })
     }
 
     // Update widgets and titles
