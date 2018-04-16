@@ -36,7 +36,7 @@ Configuration.prototype.debug = async function (self, sender) {
   global.log.debug(`======= COPY DEBUG MESSAGE FROM HERE =======`)
   global.log.debug(`GENERAL | OS: ${process.env.npm_config_user_agent} | DB: ${config.database.type} | Bot version: ${process.env.npm_package_version} | Bot uptime: ${process.uptime()} | Bot lang: ${lang} | Bot mute: ${mute}`)
   global.log.debug(`SYSTEMS | ${_.keys(_.pickBy(config.systems)).join(', ')}`)
-  global.log.debug(`WIDGETS | ${_.map(widgets, 'widget').join(', ')}`)
+  global.log.debug(`WIDGETS | ${_.map(widgets, 'id').join(', ')}`)
   global.log.debug(`OAUTH | BOT ${!oauth.bot} | BROADCASTER ${!oauth.broadcaster}`)
   global.log.debug('======= END OF DEBUG MESSAGE =======')
 }
