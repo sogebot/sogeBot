@@ -359,10 +359,11 @@ class Gambling {
       if (_.isNil(parsed)) throw Error(ERROR_NOT_ENOUGH_OPTIONS)
 
       const user = await global.users.get(sender.username)
-      points = parsed[1] === 'all' && !_.isNil(await global.systems.points.getPointsOf(user.username)) ? await global.systems.points.getPointsOf(user.username) : parsed[1]
+      const pointsOfUser = await global.systems.points.getPointsOf(user.username)
+      points = parsed[1] === 'all' ? pointsOfUser : parsed[1]
 
       if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
-      if (_.isNil(await global.systems.points.getPointsOf(user.username)) || await global.systems.points.getPointsOf(user.username) < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
+      if (pointsOfUser < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
 
       await global.db.engine.insert('users.points', { username: sender.username, points: parseInt(points, 10) * -1 })
       if (_.random(0, 100, false) <= await global.configuration.getValue('gamblingChanceToWin')) {
