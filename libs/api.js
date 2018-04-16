@@ -83,6 +83,7 @@ class API {
     const sendJoinEvent = async function (bulk) {
       for (let user of bulk) {
         await new Promise((resolve) => setTimeout(() => resolve(), 100))
+        global.api.isFollower(user.username)
         global.events.fire('user-joined-channel', { username: user.username })
       }
     }
@@ -744,18 +745,18 @@ class API {
 
   async isFollower (username) {
     let user = await global.users.get(username)
-    if (new Date().getTime() - user.time.followCheck >= 1000 * 60 * 30) this.rate_limit_follower_check.push(user)
+    if (new Date().getTime() - _.get(user, 'time.followCheck', 0) >= 1000 * 60 * 30) this.rate_limit_follower_check.push(user)
   }
 
   async isFollowerUpdate (user) {
     const cid = await global.cache.channelId()
     const url = `https://api.twitch.tv/helix/users/follows?from_id=${user.id}&to_id=${cid}`
 
-    const userHaveId = _.isNil(user.id)
+    const userHaveId = !_.isNil(user.id)
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
     const isSkipped = user.username === config.settings.broadcaster_username || user.username === config.settings.bot_username.toLowerCase()
-    debug('api:isFollowerUpdate')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}\nskipped: ${isSkipped}`)
+    debug('api:isFollowerUpdate')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}\nskipped: ${isSkipped}\nhave ID: ${userHaveId}`)
     if (needToWait || notEnoughAPICalls || !userHaveId || isSkipped) {
       if (notEnoughAPICalls) debug('api:isFollowerUpdate')('Waiting for rate-limit to refresh')
       if (!userHaveId) return
