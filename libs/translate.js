@@ -29,6 +29,10 @@ class Translate {
           let withoutLocales = f.replace('./locales/', '').replace('.json', '')
           _.set(this.translations, withoutLocales.split('/').join('.'), JSON.parse(fs.readFileSync(f, 'utf8')))
         }
+        if (_.isNil(this.translations[this.lang])) {
+          if (cluster.isMaster) global.log.warning(`Language ${this.lang} not found - fallback to en`)
+          this.lang = 'en'
+        }
         for (let c of this.custom) {
           if (_.isNil(flatten(this.translations[this.lang])[c.key])) {
             // remove if lang doesn't exist anymore
