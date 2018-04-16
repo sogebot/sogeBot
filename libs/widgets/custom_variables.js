@@ -25,11 +25,11 @@ class CustomVariablesWidget {
         callback(null, variables); d('list.variables => %j', variables)
       })
       socket.on('unwatch', async (name, callback) => {
-        await global.db.engine.remove('widgets.customVariables', { name: name })
+        await global.db.engine.remove('widgets.customVariables', { name: String(name) })
         callback(null, name)
       })
       socket.on('save.values', async (data, cb) => {
-        data.value = data.value.split(',').map((o) => o.trim()).filter(String).join(', ')
+        data.value = data.value.split(',').map((o) => o.trim()).filterNamedNodeMap(String).join(', ')
         await global.db.engine.update('widgets.customVariables', { name: data.name }, { value: data.value })
         global.api.setTitleAndGame(global.api, null) // update title
         cb(null, data)
