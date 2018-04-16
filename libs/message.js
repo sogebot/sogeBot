@@ -492,7 +492,6 @@ class Message {
       if (!_.isNull(rMessage)) {
         for (var bkey in rMessage) {
           let newString = await fnc(rMessage[bkey])
-          console.log(newString)
           if ((_.isNil(newString) || newString.length === 0) && removeWhenEmpty) this.message = ''
           this.message = this.message.replace(rMessage[bkey], newString).trim()
         }

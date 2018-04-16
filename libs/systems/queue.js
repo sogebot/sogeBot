@@ -112,7 +112,6 @@ class Queue {
     var amount = (input === '' ? 1 : parseInt(input, 10))
 
     let users = await self.getUsers(amount)
-    console.log(users)
     self.picked = users
 
     for (let index in users) {
