@@ -255,8 +255,8 @@ function loadClientListeners (client) {
 
     const user = await global.db.engine.findOne('users', { username: username })
     if (!fromSelf && !_.get(user, 'is.online', false)) {
-      global.api.isFollower(user.username)
       global.users.set(username, { is: { online: true } })
+      global.api.isFollower(username)
       global.widgets.joinpart.send({ username: username, type: 'join' })
       global.events.fire('user-joined-channel', { username: username })
     }
