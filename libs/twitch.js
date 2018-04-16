@@ -304,8 +304,9 @@ class Twitch {
 
     let users = await global.users.getAll()
     if (type === 'points' && global.commons.isSystemEnabled('points')) {
+      let usersPoints = await global.db.engine.find('users.points')
       message = global.translate('top.listPoints').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.points) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'points', 'desc')
+      sorted = _.orderBy(_.filter(usersPoints, function (o) { return !_.isNil(o.points) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'points', 'desc')
     } else if (type === 'time') {
       message = global.translate('top.listWatched').replace(/\$amount/g, 10)
       sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.time) && !_.isNil(o.time.watched) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'time.watched', 'desc')
