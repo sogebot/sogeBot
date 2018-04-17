@@ -122,10 +122,24 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
       global.log.chatOut(message, {username: sender.username})
       if (await global.configuration.getValue('sendWithMe')) {
         if (cluster.isWorker) process.send({type: 'action', sender: sender.username, message: message})
-        else global.client.action(config.settings.broadcaster_username, message)
+        else {
+          try {
+            global.client.action(config.settings.broadcaster_username, message)
+          } catch (e) {
+            // retry if somehow failed
+            setTimeout(() => this.sendMessage(message, sender, attr), 1000)
+          }
+        }
       } else {
         if (cluster.isWorker) process.send({type: 'say', sender: sender.username, message: message})
-        else global.client.say(config.settings.broadcaster_username, message)
+        else {
+          try {
+            global.client.say(config.settings.broadcaster_username, message)
+          } catch (e) {
+            // retry if somehow failed
+            setTimeout(() => this.sendMessage(message, sender, attr), 1000)
+          }
+        }
       }
     }
   }
