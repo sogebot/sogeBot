@@ -240,6 +240,19 @@
       <div class="w-100"></div>
 
       <div class="col">
+        <strong data-lang="gamblingMinimalBet"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="gamblingMinimalBet" onclick="commons.configEditable(this, '%')" id="configGamblingMinimalBet"></abbr>
+        <div class="input-group" style="display:none;" id="input_gamblingMinimalBet_group">
+          <div class="input-group-prepend">
+          </div>
+          <input id="input_gamblingMinimalBet" class="form-control input-sm" type="text" />
+        </div>
+      </div>
+      <div class="w-100"></div>
+
+      <div class="col">
         <strong data-lang="seppukuTimeout"></strong>
       </div>
       <div class="col">
@@ -373,147 +386,157 @@
 </div>
 
 <script>
-  if (!systems.points) $("#points-tab-link").css('display', 'none')
-  if (!systems.songs) $("#songs-tab-link").css('display', 'none')
-  if (!systems.cooldown) $(".systems-cooldown-only").css('display', 'none')
-  if (!systems.gambling) $("#gambling-tab-link").css('display', 'none')
+  function SystemsPage () {
+    if (_.isNil(systems) || _.isNil(configuration)) {
+      setTimeout(() => SystemsPage(), 1)
+      return
+    }
+
+    if (!systems.points) $("#points-tab-link").css('display', 'none')
+    if (!systems.songs) $("#songs-tab-link").css('display', 'none')
+    if (!systems.cooldown) $(".systems-cooldown-only").css('display', 'none')
+    if (!systems.gambling) $("#gambling-tab-link").css('display', 'none')
+
+    socket.once('configuration', function (data) {
+      $("#configGamblingChanceToWin").text(data.gamblingChanceToWin + '%')
+      $("#configGamblingMinimalBet").text(data.gamblingMinimalBet)
 
 
-  socket.emit('getPointsConfiguration')
-  socket.emit('getNoticeConfiguration')
-  socket.emit('songs.sendConfiguration')
-  socket.emit('getConfiguration')
+      $("#configSeppukuTimeout").text(data.seppukuTimeout + 's')
+      $("#configRouletteTimeout").text(data.rouletteTimeout + 's')
+      $("#configFightmeTimeout").text(data.fightmeTimeout + 's')
 
-  socket.once('configuration', function (data) {
-    $("#configGamblingChanceToWin").text(data.gamblingChanceToWin + '%')
+      $("#configDuelCooldown").text(data.duelCooldown + 's')
+      $("#configFightmeCooldown").text(data.fightmeCooldown + 's')
 
-    $("#configSeppukuTimeout").text(data.seppukuTimeout + 's')
-    $("#configRouletteTimeout").text(data.rouletteTimeout + 's')
-    $("#configFightmeTimeout").text(data.fightmeTimeout + 's')
-
-    $("#configDuelCooldown").text(data.duelCooldown + 's')
-    $("#configFightmeCooldown").text(data.fightmeCooldown + 's')
-
-    $('#gamblingCooldownBypassToggle').off('change')
-    $('#gamblingCooldownBypassToggle').bootstrapToggle(data.gamblingCooldownBypass ? 'on' : 'off')
-    $('#gamblingCooldownBypassToggle').change(function () {
-      if ($('#gamblingCooldownBypassToggle').data('init')) socket.emit('saveConfiguration', {
-        'gamblingCooldownBypass': $(this).prop('checked')
+      $('#gamblingCooldownBypassToggle').off('change')
+      $('#gamblingCooldownBypassToggle').bootstrapToggle(data.gamblingCooldownBypass ? 'on' : 'off')
+      $('#gamblingCooldownBypassToggle').change(function () {
+        if ($('#gamblingCooldownBypassToggle').data('init')) socket.emit('saveConfiguration', {
+          'gamblingCooldownBypass': $(this).prop('checked')
+        })
       })
-    })
-    $('#gamblingCooldownBypassToggle').data('init', true)
+      $('#gamblingCooldownBypassToggle').data('init', true)
 
-    $('#atUsernameToggle').off('change')
-    $('#atUsernameToggle').bootstrapToggle(data.atUsername ? 'on' : 'off')
-    $('#atUsernameToggle').change(function () {
-      if ($('#atUsernameToggle').data('init')) socket.emit('saveConfiguration', {
-        'atUsername': $(this).prop('checked')
+      $('#atUsernameToggle').off('change')
+      $('#atUsernameToggle').bootstrapToggle(data.atUsername ? 'on' : 'off')
+      $('#atUsernameToggle').change(function () {
+        if ($('#atUsernameToggle').data('init')) socket.emit('saveConfiguration', {
+          'atUsername': $(this).prop('checked')
+        })
       })
-    })
-    $('#atUsernameToggle').data('init', true)
+      $('#atUsernameToggle').data('init', true)
 
-    /* whispers */
-    $('#disableWhisperListener').off('change')
-    $('#disableWhisperListener').bootstrapToggle(!data.disableWhisperListener ? 'on' : 'off')
-    $('#disableWhisperListener').change(function () {
-      if ($('#disableWhisperListener').data('init')) socket.emit('saveConfiguration', {
-        'disableWhisperListener': !$(this).prop('checked')
+      /* whispers */
+      $('#disableWhisperListener').off('change')
+      $('#disableWhisperListener').bootstrapToggle(!data.disableWhisperListener ? 'on' : 'off')
+      $('#disableWhisperListener').change(function () {
+        if ($('#disableWhisperListener').data('init')) socket.emit('saveConfiguration', {
+          'disableWhisperListener': !$(this).prop('checked')
+        })
       })
-    })
-    $('#disableWhisperListener').data('init', true)
+      $('#disableWhisperListener').data('init', true)
 
-    $('#disableSettingsWhispers').off('change')
-    $('#disableSettingsWhispers').bootstrapToggle(!data.disableSettingsWhispers ? 'on' : 'off')
-    $('#disableSettingsWhispers').change(function () {
-      if ($('#disableSettingsWhispers').data('init')) socket.emit('saveConfiguration', {
-        'disableSettingsWhispers': !$(this).prop('checked')
+      $('#disableSettingsWhispers').off('change')
+      $('#disableSettingsWhispers').bootstrapToggle(!data.disableSettingsWhispers ? 'on' : 'off')
+      $('#disableSettingsWhispers').change(function () {
+        if ($('#disableSettingsWhispers').data('init')) socket.emit('saveConfiguration', {
+          'disableSettingsWhispers': !$(this).prop('checked')
+        })
       })
-    })
-    $('#disableSettingsWhispers').data('init', true)
+      $('#disableSettingsWhispers').data('init', true)
 
-    $('#disablePermissionWhispers').off('change')
-    $('#disablePermissionWhispers').bootstrapToggle(!data.disablePermissionWhispers ? 'on' : 'off')
-    $('#disablePermissionWhispers').change(function () {
-      if ($('#disablePermissionWhispers').data('init')) socket.emit('saveConfiguration', {
-        'disablePermissionWhispers': !$(this).prop('checked')
+      $('#disablePermissionWhispers').off('change')
+      $('#disablePermissionWhispers').bootstrapToggle(!data.disablePermissionWhispers ? 'on' : 'off')
+      $('#disablePermissionWhispers').change(function () {
+        if ($('#disablePermissionWhispers').data('init')) socket.emit('saveConfiguration', {
+          'disablePermissionWhispers': !$(this).prop('checked')
+        })
       })
-    })
-    $('#disablePermissionWhispers').data('init', true)
+      $('#disablePermissionWhispers').data('init', true)
 
-    $('#disableCooldownWhispers').off('change')
-    $('#disableCooldownWhispers').bootstrapToggle(!data.disableCooldownWhispers ? 'on' : 'off')
-    $('#disableCooldownWhispers').change(function () {
-      if ($('#disableCooldownWhispers').data('init')) socket.emit('saveConfiguration', {
-        'disableCooldownWhispers': !$(this).prop('checked')
+      $('#disableCooldownWhispers').off('change')
+      $('#disableCooldownWhispers').bootstrapToggle(!data.disableCooldownWhispers ? 'on' : 'off')
+      $('#disableCooldownWhispers').change(function () {
+        if ($('#disableCooldownWhispers').data('init')) socket.emit('saveConfiguration', {
+          'disableCooldownWhispers': !$(this).prop('checked')
+        })
       })
+      $('#disableCooldownWhispers').data('init', true)
+
+      $('#default-currency option[value=' + data.currency + ']').prop('selected', true)
     })
-    $('#disableCooldownWhispers').data('init', true)
 
-    $('#default-currency option[value=' + data.currency + ']').prop('selected', true)
-  })
+    socket.off('pointsConfiguration')
+    socket.on('pointsConfiguration', function (data) {
+      $("#configPointsName").text(data.pointsName)
+      $("#configPointsInterval").text(data.pointsInterval + 'min')
+      $("#configPointsPerInterval").text(data.pointsPerInterval)
+      $("#configPointsIntervalOffline").text(data.pointsIntervalOffline + 'min')
+      $("#configPointsPerIntervalOffline").text(data.pointsPerIntervalOffline)
+      $("#configPointsMessageInterval").text(data.pointsMessageInterval)
+      $("#configPointsPerMessageInterval").text(data.pointsPerMessageInterval)
+    })
 
-  socket.off('pointsConfiguration')
-  socket.on('pointsConfiguration', function (data) {
-    $("#configPointsName").text(data.pointsName)
-    $("#configPointsInterval").text(data.pointsInterval + 'min')
-    $("#configPointsPerInterval").text(data.pointsPerInterval)
-    $("#configPointsIntervalOffline").text(data.pointsIntervalOffline + 'min')
-    $("#configPointsPerIntervalOffline").text(data.pointsPerIntervalOffline)
-    $("#configPointsMessageInterval").text(data.pointsMessageInterval)
-    $("#configPointsPerMessageInterval").text(data.pointsPerMessageInterval)
-  })
+    socket.off('noticesConfiguration')
+    socket.on('noticesConfiguration', function (data) {
+      $("#configNoticeInterval").text(data.interval + 'min')
+      $("#configNoticeMsgReq").text(data.msgreq)
+    })
 
-  socket.off('noticesConfiguration')
-  socket.on('noticesConfiguration', function (data) {
-    $("#configNoticeInterval").text(data.interval + 'min')
-    $("#configNoticeMsgReq").text(data.msgreq)
-  })
+    socket.off('songsConfiguration')
+    socket.on('songsConfiguration', function (data) {
+      $("#configVolume").text(data.volume + '%')
+      $("#configDuration").text(data.duration + 'min')
 
-  socket.off('songsConfiguration')
-  socket.on('songsConfiguration', function (data) {
-    $("#configVolume").text(data.volume + '%')
-    $("#configDuration").text(data.duration + 'min')
-
-    $('#shuffleToggle').bootstrapToggle(data.shuffle ? 'on' : 'off')
-    $('#shuffleToggle').off('change')
-    $('#shuffleToggle').change(function () {
-      if ($('#shuffleToggle').data('init')) socket.emit('saveConfiguration', {
-        'songs_shuffle': $(this).prop('checked')
+      $('#shuffleToggle').bootstrapToggle(data.shuffle ? 'on' : 'off')
+      $('#shuffleToggle').off('change')
+      $('#shuffleToggle').change(function () {
+        if ($('#shuffleToggle').data('init')) socket.emit('saveConfiguration', {
+          'songs_shuffle': $(this).prop('checked')
+        })
       })
-    })
-    $('#shuffleToggle').data('init', true)
+      $('#shuffleToggle').data('init', true)
 
-    $('#notifyToggle').bootstrapToggle(data.notify ? 'on' : 'off')
-    $('#notifyToggle').off('change')
-    $('#notifyToggle').change(function () {
-      if ($('#notifyToggle').data('init')) socket.emit('saveConfiguration', {
-        'songs_notify': $(this).prop('checked')
+      $('#notifyToggle').bootstrapToggle(data.notify ? 'on' : 'off')
+      $('#notifyToggle').off('change')
+      $('#notifyToggle').change(function () {
+        if ($('#notifyToggle').data('init')) socket.emit('saveConfiguration', {
+          'songs_notify': $(this).prop('checked')
+        })
       })
-    })
-    $('#notifyToggle').data('init', true)
+      $('#notifyToggle').data('init', true)
 
-    $('#songrequestToggle').bootstrapToggle(data.songrequest ? 'on' : 'off')
-    $('#songrequestToggle').off('change')
-    $('#songrequestToggle').change(function () {
-      if ($('#songrequestToggle').data('init')) socket.emit('saveConfiguration', {
-        'songs_songrequest': $(this).prop('checked')
+      $('#songrequestToggle').bootstrapToggle(data.songrequest ? 'on' : 'off')
+      $('#songrequestToggle').off('change')
+      $('#songrequestToggle').change(function () {
+        if ($('#songrequestToggle').data('init')) socket.emit('saveConfiguration', {
+          'songs_songrequest': $(this).prop('checked')
+        })
       })
-    })
-    $('#songrequestToggle').data('init', true)
+      $('#songrequestToggle').data('init', true)
 
-    $('#playlistToggle').bootstrapToggle(data.playlist ? 'on' : 'off')
-    $('#playlistToggle').off('change')
-    $('#playlistToggle').change(function () {
-      if ($('#playlistToggle').data('init')) socket.emit('saveConfiguration', {
-        'songs_playlist': $(this).prop('checked')
+      $('#playlistToggle').bootstrapToggle(data.playlist ? 'on' : 'off')
+      $('#playlistToggle').off('change')
+      $('#playlistToggle').change(function () {
+        if ($('#playlistToggle').data('init')) socket.emit('saveConfiguration', {
+          'songs_playlist': $(this).prop('checked')
+        })
       })
+      $('#playlistToggle').data('init', true)
     })
-    $('#playlistToggle').data('init', true)
-  })
 
-function saveDefaultCurrency() {
-  socket.emit('saveConfiguration', {
-    'currency': $('#default-currency').val()
-  })
-}
+    socket.emit('getPointsConfiguration')
+    socket.emit('getNoticeConfiguration')
+    socket.emit('songs.sendConfiguration')
+    socket.emit('getConfiguration')
+  }
+
+  function saveDefaultCurrency() {
+    socket.emit('saveConfiguration', {
+      'currency': $('#default-currency').val()
+    })
+  }
+
+  SystemsPage()
 </script>

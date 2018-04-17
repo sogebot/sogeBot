@@ -10,6 +10,7 @@ const debug = require('debug')('systems:gambling')
 const ERROR_NOT_ENOUGH_OPTIONS = '0'
 const ERROR_ZERO_BET = '1'
 const ERROR_NOT_ENOUGH_POINTS = '2'
+const ERROR_MINIMAL_BET = '3'
 
 /*
  * !gamble [amount] - gamble [amount] points with `chanceToWin` chance
@@ -31,6 +32,7 @@ class Gambling {
     global.configuration.register('fightmeCooldown', 'gambling.cooldown.fightme', 'number', 0)
 
     global.configuration.register('gamblingChanceToWin', 'gambling.gamble.chanceToWin', 'number', 50)
+    global.configuration.register('gamblingMinimalBet', 'gambling.gamble.minimalBet', 'number', 0)
 
     if (require('cluster').isMaster) this.pickDuelWinner()
   }
@@ -364,6 +366,7 @@ class Gambling {
 
       if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
       if (pointsOfUser < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
+      if (points < (await global.configuration.getValue('gamblingMinimalBet'))) throw Error(ERROR_MINIMAL_BET)
 
       await global.db.engine.insert('users.points', { username: sender.username, points: parseInt(points, 10) * -1 })
       if (_.random(0, 100, false) <= await global.configuration.getValue('gamblingChanceToWin')) {
@@ -394,6 +397,14 @@ class Gambling {
           break
         case ERROR_NOT_ENOUGH_POINTS:
           message = await global.commons.prepare('gambling.gamble.notEnoughPoints', {
+            pointsName: await global.systems.points.getPointsName(points),
+            points: points
+          })
+          debug(message); global.commons.sendMessage(message, sender)
+          break
+        case ERROR_MINIMAL_BET:
+          points = await global.configuration.getValue('gamblingMinimalBet')
+          message = await global.commons.prepare('gambling.gamble.lowerThanMinimalBet', {
             pointsName: await global.systems.points.getPointsName(points),
             points: points
           })

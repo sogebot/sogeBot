@@ -905,7 +905,8 @@
     "comply": "dodržovat",
     "visible": "viditelné",
     "hidden": "skryté",
-    "gamblingChanceToWin": "Šance na výhru !gamble"
+    "gamblingChanceToWin": "Šance na výhru !gamble",
+    "gamblingMinimalBet": "Minimální sázka pro !gamble"
   },
   "raffles": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych $value minut",
@@ -1250,6 +1251,8 @@
     "gamble": {
       "chanceToWin": "$sender, sance na vyhru v !gamble nastavena na $value%",
       "zeroBet": "$sender, nemuzes hrat o 0 $pointsName",
+      "minimalBet": "$sender, minimalni sazka pro !gamble je nastavena na $value",
+      "lowerThanMinimalBet": "$sender, minimalni sazka pro !gamble je $points $pointsName",
       "notEnoughOptions": "$sender, musis hrat o nejake body",
       "notEnoughPoints": "$sender, nemas $points $pointsName abys o ne hral",
       "win": "$sender, VYHRALS! Aktualne mas $points $pointsName",
