@@ -333,15 +333,18 @@ Points.prototype.updatePoints = async function () {
 
 Points.prototype.compactPointsDb = async function () {
   try {
-    let users = {}
-    for (let user of await global.db.engine.find('users.points')) {
-      if (_.isNaN(users[user.username]) || _.isNil(users[user.username])) users[user.username] = 0
-      let points = !_.isNaN(parseInt(_.get(user, 'points', 0))) ? parseInt(_.get(user, 'points', 0)) : 0
-      users[user.username] = parseInt(users[user.username], 10) + points
-      await global.db.engine.remove('users.points', { _id: user._id.toString() })
-    }
-    for (let [username, points] of Object.entries(users)) {
-      if (points !== 0) await global.db.engine.insert('users.points', { username: username, points: parseInt(points, 10) })
+    const isOnline = await global.cache.isOnline()
+    if (!isOnline) {
+      let users = {}
+      for (let user of await global.db.engine.find('users.points')) {
+        if (_.isNaN(users[user.username]) || _.isNil(users[user.username])) users[user.username] = 0
+        let points = !_.isNaN(parseInt(_.get(user, 'points', 0))) ? parseInt(_.get(user, 'points', 0)) : 0
+        users[user.username] = parseInt(users[user.username], 10) + points
+        await global.db.engine.remove('users.points', { _id: user._id.toString() })
+      }
+      for (let [username, points] of Object.entries(users)) {
+        if (points !== 0) await global.db.engine.insert('users.points', { username: username, points: parseInt(points, 10) })
+      }
     }
   } catch (e) {
     global.db.error(e)
