@@ -348,6 +348,7 @@ Points.prototype.compactPointsDb = async function () {
       const onlineUsers = (await global.db.engine.find('users.online')).map((o) => o.username)
       for (let user of await global.db.engine.find('users.points')) {
         if (_.includes(onlineUsers, user.username)) continue // don't compact online user
+        if (_.isNaN(users[user.username]) || _.isNil(users[user.username])) users[user.username] = 0
         let points = !_.isNaN(parseInt(_.get(user, 'points', 0))) ? parseInt(_.get(user, 'points', 0)) : 0
         users[user.username] = parseInt(users[user.username], 10) + points
         await global.db.engine.remove('users.points', { _id: user._id.toString() })
