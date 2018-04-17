@@ -306,7 +306,10 @@ class Message {
       '(if#)': async function (filter) {
         // (if $days>2|More than 2 days|Less than 2 days)
         try {
-          let toEvaluate = filter.replace('(if ', '').slice(0, -1)
+          let toEvaluate = filter
+            .replace('(if ', '')
+            .slice(0, -1)
+            .replace(/\$param|\$!param/g, attr.param) // replace params
           let [check, ifTrue, ifFalse] = toEvaluate.split('|')
           check = check.startsWith('>') || check.startsWith('<') || check.startsWith('=') ? false : check // force check to false if starts with comparation
 
@@ -329,6 +332,8 @@ class Message {
 
     await this.global()
 
+    await this.parseMessageEach(ifp, false); d('parseMessageEach: %s', this.message)
+    await this.parseMessageEval(evaluate, decode(this.message)); d('parseMessageEval: %s', this.message)
     await this.parseMessageEach(param, true); d('parseMessageEach: %s', this.message)
     // local replaces
     if (!_.isNil(attr)) {
@@ -340,7 +345,6 @@ class Message {
     }
     await this.parseMessageEach(math); d('parseMessageEach: %s', this.message)
     await this.parseMessageVariables(custom); d('parseMessageEach: %s', this.message)
-    await this.parseMessageEval(evaluate, decode(this.message)); d('parseMessageEval: %s', this.message)
     await this.parseMessageOnline(online); d('parseMessageOnline: %s', this.message)
     await this.parseMessageCommand(command); d('parseMessageCommand: %s', this.message)
     await this.parseMessageEach(random); d('parseMessageEach: %s', this.message)
@@ -349,7 +353,6 @@ class Message {
     await this.parseMessageEach(info); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(list); d('parseMessageEach: %s', this.message)
     await this.parseMessageApi(); d('parseMessageApi: %s', this.message)
-    await this.parseMessageEach(ifp, false); d('parseMessageEach: %s', this.message)
 
     return this.message
   }
