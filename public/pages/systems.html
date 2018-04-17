@@ -323,6 +323,19 @@
       <div class="w-100"></div>
 
       <div class="col">
+        <strong data-lang="duelMinimalBet"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="duelMinimalBet" onclick="commons.configEditable(this, '')" id="configDuelMinimalBet"></abbr>
+        <div class="input-group" style="display:none;" id="input_duelMinimalBet_group">
+          <div class="input-group-prepend">
+          </div>
+          <input id="input_duelMinimalBet" class="form-control input-sm" type="text" />
+        </div>
+      </div>
+      <div class="w-100"></div>
+
+      <div class="col">
         <strong data-lang="fightmeCooldown"></strong>
       </div>
       <div class="col">
@@ -416,6 +429,7 @@
       $("#configGamblingMinimalBet").text(data.gamblingMinimalBet)
 
       $("#configDuelDuration").text(data.duelDuration + 'min')
+      $("#configDuelMinimalBet").text(data.duelMinimalBet)
 
       $("#configSeppukuTimeout").text(data.seppukuTimeout + 's')
       $("#configRouletteTimeout").text(data.rouletteTimeout + 's')

@@ -35,6 +35,7 @@ class Gambling {
     global.configuration.register('gamblingMinimalBet', 'gambling.gamble.minimalBet', 'number', 0)
 
     global.configuration.register('duelDuration', 'gambling.duel.duration', 'number', 5)
+    global.configuration.register('duelMinimalBet', 'gambling.duel.minimalBet', 'number', 0)
 
     if (require('cluster').isMaster) this.pickDuelWinner()
   }
@@ -109,7 +110,7 @@ class Gambling {
       global.configuration.getValue('duelDuration')
     ])
 
-    if (timestamp === 0 || new Date().getTime() - timestamp < duelDuration) return setTimeout(() => this.pickDuelWinner(), 30000)
+    if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * duelDuration) return setTimeout(() => this.pickDuelWinner(), 30000)
 
     let total = 0
     for (let user of Object.entries(users)) total += parseInt(user[1], 10)
@@ -161,6 +162,8 @@ class Gambling {
 
       if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
       if (_.isNil(await global.systems.points.getPointsOf(user.username)) || await global.systems.points.getPointsOf(user.username) < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
+      if (points < (await global.configuration.getValue('duelMinimalBet'))) throw Error(ERROR_MINIMAL_BET)
+
       await global.db.engine.insert('users.points', { username: sender.username, points: parseInt(points, 10) * -1 })
 
       // check if user is already in duel and add points
@@ -200,7 +203,7 @@ class Gambling {
         self.duelTimestamp = new Date().getTime()
         message = await global.commons.prepare('gambling.duel.new', {
           minutesName: global.commons.getLocalizedName(5, 'core.minutes'),
-          minutes: 5 })
+          minutes: await global.configuration.getValue('duelDuration') })
         debug(message); global.commons.sendMessage(message, sender)
       }
 
@@ -222,6 +225,14 @@ class Gambling {
           break
         case ERROR_NOT_ENOUGH_POINTS:
           message = await global.commons.prepare('gambling.duel.notEnoughPoints', {
+            pointsName: await global.systems.points.getPointsName(points),
+            points: points
+          })
+          debug(message); global.commons.sendMessage(message, sender)
+          break
+        case ERROR_MINIMAL_BET:
+          points = await global.configuration.getValue('duelMinimalBet')
+          message = await global.commons.prepare('gambling.duel.lowerThanMinimalBet', {
             pointsName: await global.systems.points.getPointsName(points),
             points: points
           })

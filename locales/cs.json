@@ -907,7 +907,8 @@
     "hidden": "skryté",
     "gamblingChanceToWin": "Šance na výhru !gamble",
     "gamblingMinimalBet": "Minimální sázka pro !gamble",
-    "duelDuration": "Trvání !duel"
+    "duelDuration": "Trvání !duel",
+    "duelMinimalBet": "Minimální sázka pro !duel"
   },
   "raffles": {
     "announceInterval": "Otevrene raffle budou oznamovany kazdych $value minut",
@@ -1214,6 +1215,8 @@
       }
     },
     "duel": {
+      "minimalBet": "$sender, minimalni sazka pro !duel je nastavena na $value",
+      "lowerThanMinimalBet": "$sender, minimalni sazka pro !duel je $points $pointsName",
       "duration": "$sender, trvani duelu nastavena na $value minut",
       "cooldown": "$sender, nemuzes pouzit !duel jeste $cooldown $minutesName.",
       "joined": "$sender, hodne stesti behem duelu. Vsadil sis na sebe $points $pointsName!",
