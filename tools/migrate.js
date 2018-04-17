@@ -71,8 +71,11 @@ let migration = {
       console.info('Migration points to %s', '7.3.0')
       let users = await global.db.engine.find('users')
       for (let user of users) {
-        await global.db.engine.update('users', { username: user.username }, { points: 0 })
-        await global.db.engine.insert('users.points', { username: user.username, points: !_.isNil(user.points) ? parseInt(user.points, 10) : 0 })
+        if (_.isNil(user.points)) continue
+        await global.db.engine.remove('users', { _id: user._id.toString() })
+        delete user._id; delete user.points
+        await global.db.engine.insert('users', user)
+        await global.db.engine.insert('users.points', { username: user.username, points: parseInt(user.points, 10) })
       }
     }
   }],
