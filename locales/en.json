@@ -900,7 +900,8 @@
     "visible": "visible",
     "hidden": "hidden",
     "gamblingChanceToWin": "Chance to win !gamble",
-    "gamblingMinimalBet": "Minimal bet for !gamble"
+    "gamblingMinimalBet": "Minimal bet for !gamble",
+    "duelDuration": "Duration of !duel"
   },
   "raffles": {
     "announceInterval": "Opened raffles will be announced every $value minute",
@@ -1207,6 +1208,7 @@
       }
     },
     "duel": {
+      "duration": "$sender, duration of duel set to $value minutes",
       "cooldown": "$sender, you cannot use !duel for $cooldown $minutesName.",
       "joined": "$sender, good luck with your dueling skills. You bet on yourself $points $pointsName!",
       "added": "$sender really thinks he is better than others raising his bet to $points $pointsName!",

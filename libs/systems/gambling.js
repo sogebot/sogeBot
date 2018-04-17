@@ -34,6 +34,8 @@ class Gambling {
     global.configuration.register('gamblingChanceToWin', 'gambling.gamble.chanceToWin', 'number', 50)
     global.configuration.register('gamblingMinimalBet', 'gambling.gamble.minimalBet', 'number', 0)
 
+    global.configuration.register('duelDuration', 'gambling.duel.duration', 'number', 5)
+
     if (require('cluster').isMaster) this.pickDuelWinner()
   }
 
@@ -101,11 +103,13 @@ class Gambling {
   }
 
   async pickDuelWinner () {
-    const [users, timestamp] = await Promise.all([
+    const [users, timestamp, duelDuration] = await Promise.all([
       this.duelUsers,
-      this.duelTimestamp
+      this.duelTimestamp,
+      global.configuration.getValue('duelDuration')
     ])
-    if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * 5) return setTimeout(() => this.pickDuelWinner(), 30000)
+
+    if (timestamp === 0 || new Date().getTime() - timestamp < duelDuration) return setTimeout(() => this.pickDuelWinner(), 30000)
 
     let total = 0
     for (let user of Object.entries(users)) total += parseInt(user[1], 10)

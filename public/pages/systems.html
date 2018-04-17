@@ -243,7 +243,7 @@
         <strong data-lang="gamblingMinimalBet"></strong>
       </div>
       <div class="col">
-        <abbr title="click to edit" data-config-id="gamblingMinimalBet" onclick="commons.configEditable(this, '%')" id="configGamblingMinimalBet"></abbr>
+        <abbr title="click to edit" data-config-id="gamblingMinimalBet" onclick="commons.configEditable(this, '')" id="configGamblingMinimalBet"></abbr>
         <div class="input-group" style="display:none;" id="input_gamblingMinimalBet_group">
           <div class="input-group-prepend">
           </div>
@@ -304,6 +304,20 @@
             <span class="input-group-text" data-lang="seconds"></span>
           </div>
           <input id="input_duelCooldown" class="form-control input-sm" type="text" />
+        </div>
+      </div>
+      <div class="w-100"></div>
+
+      <div class="col">
+        <strong data-lang="duelDuration"></strong>
+      </div>
+      <div class="col">
+        <abbr title="click to edit" data-config-id="duelDuration" onclick="commons.configEditable(this, 'min')" id="configDuelDuration"></abbr>
+        <div class="input-group" style="display:none;" id="input_duelDuration_group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">min</span>
+          </div>
+          <input id="input_duelDuration" class="form-control input-sm" type="text" />
         </div>
       </div>
       <div class="w-100"></div>
@@ -401,6 +415,7 @@
       $("#configGamblingChanceToWin").text(data.gamblingChanceToWin + '%')
       $("#configGamblingMinimalBet").text(data.gamblingMinimalBet)
 
+      $("#configDuelDuration").text(data.duelDuration + 'min')
 
       $("#configSeppukuTimeout").text(data.seppukuTimeout + 's')
       $("#configRouletteTimeout").text(data.rouletteTimeout + 's')
