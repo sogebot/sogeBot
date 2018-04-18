@@ -395,7 +395,7 @@ class Gambling {
       } else {
         message = await global.commons.prepare('gambling.gamble.lose', {
           pointsName: await global.systems.points.getPointsName(await global.systems.points.getPointsOf(user.username)),
-          points: parseInt(await global.systems.points.getPointsOf(user.username), 10) - parseInt(points, 10)
+          points: await global.systems.points.getPointsOf(user.username)
         })
         debug(message); global.commons.sendMessage(message, sender)
       }
