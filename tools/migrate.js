@@ -65,6 +65,18 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  users: [{
+    version: '7.3.0',
+    do: async () => {
+      console.info('Removing users incorrect created_at time %s', '7.3.0')
+      let users = await global.db.engine.find('users')
+      for (let user of users) {
+        if (_.isNil(user.time)) continue
+        delete user._id; delete user.time.created_at
+        await global.db.engine.insert('users', user)
+      }
+    }
+  }],
   points: [{
     version: '7.3.0',
     do: async () => {
