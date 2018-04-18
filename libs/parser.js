@@ -120,7 +120,7 @@ class Parser {
       let onlyParams = message.trim().toLowerCase().replace(item.command, '')
 
       let isStartingWith = message.trim().toLowerCase().startsWith(item.command)
-      d(`Does ${item.command} startsWith ${message}: ${isStartingWith}`)
+      d(`Does ${message} startsWith ${item.command}: ${isStartingWith}`)
       if (isStartingWith && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
         return item
       }

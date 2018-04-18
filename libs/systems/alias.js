@@ -55,6 +55,7 @@ class Alias {
 
   async run (self, sender, msg) {
     const d = debug('alias:run')
+    const parser = new Parser()
     var alias
 
     let cmdArray = msg.toLowerCase().split(' ')
@@ -75,9 +76,12 @@ class Alias {
     for (let i in msg.split(' ')) { // search if it is not trying to bypass permissions
       if (cmdArray.length === alias.command.split(' ').length) break // command is correct (have same number of parameters as command)
       d(`${i} - Searching if ${cmdArray.join(' ')} is registered as command`)
-      d(`Is registered: %s`, new Parser().find(cmdArray.join(' ')))
 
-      if (new Parser().find(cmdArray.join(' '))) {
+      const parsedCmd = await parser.find(cmdArray.join(' '))
+      const isRegistered = !_.isNil(parsedCmd) && parsedCmd.command.split(' ').length === cmdArray.length
+      d(`Is registered: %s`, isRegistered)
+
+      if (isRegistered) {
         tryingToBypass = true
         break
       }

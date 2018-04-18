@@ -80,4 +80,17 @@ describe('Alias - run()', () => {
 
     assert.isEmpty(global.systems.alias.run(global.systems.alias, owner, '!русский'))
   })
+
+  it('!крутить 1000 - will show !gamble 1000', async () => {
+    global.systems.alias.add(global.systems.alias, owner, 'viewer !крутить !gamble')
+    await message.isSent('alias.alias-was-added', owner, { alias: 'крутить', command: 'gamble', sender: owner.username })
+
+    global.systems.alias.run(global.systems.alias, owner, '!крутить 1000')
+    await message.process('!gamble 1000', owner)
+
+    global.systems.alias.remove(global.systems.alias, owner, '!крутить')
+    await message.isSent('alias.alias-was-removed', owner, { alias: 'крутить', sender: owner.username })
+
+    assert.isEmpty(global.systems.alias.run(global.systems.alias, owner, '!крутить'))
+  })
 })
