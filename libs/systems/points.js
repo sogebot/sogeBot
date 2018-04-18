@@ -105,6 +105,8 @@ Points.prototype.getPointsOf = async function (user) {
     let itemPoints = !_.isNaN(parseInt(_.get(item, 'points', 0))) ? _.get(item, 'points', 0) : 0
     points = points + Number(itemPoints)
   }
+  if (Number(points) < 0) points = 0
+
   return parseInt(
     Number(points) <= Number.MAX_SAFE_INTEGER / 1000000
       ? points
@@ -356,6 +358,7 @@ Points.prototype.compactPointsDb = async function () {
     }
 
     for (let [username, points] of Object.entries(users)) {
+      if (Number(points) < 0) points = 0
       if (points !== 0) await global.db.engine.insert('users.points', { username: username, points: parseInt(points, 10) })
     }
   } catch (e) {
