@@ -336,7 +336,8 @@ Users.prototype.merge = async function (self, sender, text) {
   if (!_.isEmpty(toUserFromDb)) {
     await Promise.all([
       global.db.engine.remove('users', { _id: toUserFromDb._id.toString() }),
-      global.db.engine.update('users', { _id: fromUserFromDb._id.toString() }, { username: toUserFromDb.username })
+      global.db.engine.update('users', { _id: fromUserFromDb._id.toString() }, { username: toUserFromDb.username }),
+      global.db.engine.update('users.points', { username: fromUserFromDb.username }, { username: toUserFromDb.username })
     ])
   } else {
     await global.db.engine.update('users', { _id: fromUserFromDb._id.toString() }, { username: toUser })
