@@ -73,9 +73,10 @@ let migration = {
       for (let user of users) {
         if (_.isNil(user.points)) continue
         await global.db.engine.remove('users', { _id: user._id.toString() })
+        await global.db.engine.insert('users.points', { username: user.username, points: parseInt(user.points, 10) })
+
         delete user._id; delete user.points
         await global.db.engine.insert('users', user)
-        await global.db.engine.insert('users.points', { username: user.username, points: parseInt(user.points, 10) })
       }
     }
   }],
