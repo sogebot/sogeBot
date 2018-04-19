@@ -314,40 +314,42 @@ class Twitch {
       message = global.translate('top.listWatched').replace(/\$amount/g, 10)
       sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.time) && !_.isNil(o.time.watched) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'time.watched', 'desc')
     } else if (type === 'tips') {
-      sorted = {}
+      let users = {}
       message = global.translate('top.listTips').replace(/\$amount/g, 10)
       let tips = await global.db.engine.find('users.tips')
       for (let tip of tips) {
-        if (_.isNil(sorted[tip.username])) sorted[tip.username] = { username: tip.username, amount: 0 }
-        sorted[tip.username].amount += global.currency.exchange(tip.amount, tip.currency, await global.configuration.getValue('currency'))
+        if (_.isNil(users[tip.username])) users[tip.username] = { username: tip.username, amount: 0 }
+        users[tip.username].amount += global.currency.exchange(tip.amount, tip.currency, await global.configuration.getValue('currency'))
       }
-      sorted = _.orderBy(sorted, 'amount', 'desc')
+      sorted = _.orderBy(users, 'amount', 'desc')
     } else {
       message = global.translate('top.listMessages').replace(/\$amount/g, 10)
       sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.stats) && !_.isNil(o.stats.messages) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'stats.messages', 'desc')
     }
 
-    // remove ignored users
     if (sorted.length > 0) {
+      // remove ignored users
       let ignored = []
       for (let user of sorted) {
         let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: user.username })
         if (!_.isEmpty(ignoredUser)) ignored.push(user.username)
       }
       _.remove(sorted, (o) => _.includes(ignored, o.username))
-    }
+      sorted = _.chunk(sorted, 10)[0]
 
-    sorted = _.chunk(sorted, 10)[0]
-    for (let user of sorted) {
-      message += (i + 1) + '. ' + (await global.configuration.getValue('atUsername') ? '@' : '') + user.username + ' - '
-      if (type === 'time') message += (user.time.watched / 1000 / 60 / 60).toFixed(1) + 'h'
-      else if (type === 'tips') message += user.amount.toFixed(2) + global.currency.symbol(await global.configuration.getValue('currency'))
-      else if (type === 'points') {
-        let points = await global.systems.points.getPointsOf(user.username)
-        message += points + ' ' + await global.systems.points.getPointsName(points)
-      } else message += user.stats.messages
-      if (i + 1 < 10 && !_.isNil(sorted[i + 1])) message += ', '
-      i++
+      for (let user of sorted) {
+        message += (i + 1) + '. ' + (await global.configuration.getValue('atUsername') ? '@' : '') + user.username + ' - '
+        if (type === 'time') message += (user.time.watched / 1000 / 60 / 60).toFixed(1) + 'h'
+        else if (type === 'tips') message += user.amount.toFixed(2) + global.currency.symbol(await global.configuration.getValue('currency'))
+        else if (type === 'points') {
+          let points = await global.systems.points.getPointsOf(user.username)
+          message += points + ' ' + await global.systems.points.getPointsName(points)
+        } else message += user.stats.messages
+        if (i + 1 < 10 && !_.isNil(sorted[i + 1])) message += ', '
+        i++
+      }
+    } else {
+      message += 'no data available'
     }
     global.commons.sendMessage(message, sender)
   }
