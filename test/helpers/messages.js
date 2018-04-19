@@ -2,6 +2,7 @@ const assert = require('chai').assert
 const until = require('test-until')
 const sinon = require('sinon')
 const _ = require('lodash')
+const util = require('util')
 
 module.exports = {
   prepare: function () {
@@ -78,6 +79,12 @@ module.exports = {
       try {
         let isCorrectlyCalled = false
         for (let e of expected) {
+          /*
+          console.log(util.inspect(global.log.chatOut.args))
+          console.log(e)
+          console.log(user)
+          */
+          delete user['message-type'] // remove unnecessary message-type
           if (global.log.chatOut.calledWith(e, sinon.match(user))) {
             isCorrectlyCalled = true
             break
@@ -88,7 +95,7 @@ module.exports = {
         return true
       } catch (err) {
         return setError(
-          '\nExpected message: "' + JSON.stringify(expected) + '"\nActual message:   "' + (!_.isNil(global.log.chatOut.lastCall) ? global.log.chatOut.lastCall.args[0] : '') + '"' +
+          '\nExpected message: "' + JSON.stringify(expected) + '"\nActual message:   "' + (!_.isNil(global.log.chatOut.args) ? util.inspect(global.log.chatOut.args) : '') + '"' +
           '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.log.chatOut.lastCall) ? JSON.stringify(global.log.chatOut.lastCall.args[1]) : '') + '"')
       }
     }, 10000)

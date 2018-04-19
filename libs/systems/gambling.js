@@ -99,7 +99,7 @@ class Gambling {
   set duelUsers (v) {
     if (_.isNil(v)) global.db.engine.remove(`${this.collection}.duel`, { key: '_users' })
     else {
-      for (let [user, tickets] of Object.entries(v)) global.db.engine.update(`${this.collection}.duel`, { key: '_users' }, { user: user, tickets: tickets })
+      for (let [user, tickets] of Object.entries(v)) global.db.engine.update(`${this.collection}.duel`, { key: '_users', user: user }, { tickets: tickets })
     }
   }
 
@@ -112,6 +112,7 @@ class Gambling {
 
     if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * duelDuration) return setTimeout(() => this.pickDuelWinner(), 30000)
 
+    debug('Duel users: %j', users)
     let total = 0
     for (let user of Object.entries(users)) total += parseInt(user[1], 10)
 
@@ -137,7 +138,7 @@ class Gambling {
       tickets: tickets.toString(),
       winner: username
     })
-    debug(m); global.commons.sendMessage(m, { username: username }, { force: true })
+    debug(m); global.commons.sendMessage(m, { username: global.commons.getOwner() }, { force: true })
 
     // give user his points
     await global.db.engine.insert('users.points', { username: username, points: parseInt(total, 10) })
@@ -158,13 +159,14 @@ class Gambling {
       if (_.isNil(parsed)) throw Error(ERROR_NOT_ENOUGH_OPTIONS)
 
       const user = await global.users.get(sender.username)
-      points = parsed[1] === 'all' && !_.isNil(await global.systems.points.getPointsOf(user.username)) ? await global.systems.points.getPointsOf(user.username) : parsed[1]
+      const points = await global.systems.points.getPointsOf(user.username)
+      const bet = parsed[1] === 'all' ? points : parsed[1]
 
       if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
-      if (_.isNil(await global.systems.points.getPointsOf(user.username)) || await global.systems.points.getPointsOf(user.username) < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
-      if (points < (await global.configuration.getValue('duelMinimalBet'))) throw Error(ERROR_MINIMAL_BET)
+      if (points < bet) throw Error(ERROR_NOT_ENOUGH_POINTS)
+      if (bet < (await global.configuration.getValue('duelMinimalBet'))) throw Error(ERROR_MINIMAL_BET)
 
-      await global.db.engine.insert('users.points', { username: sender.username, points: parseInt(points, 10) * -1 })
+      await global.db.engine.insert('users.points', { username: sender.username, points: parseInt(bet, 10) * -1 })
 
       // check if user is already in duel and add points
       let newDuelist = true
@@ -172,7 +174,7 @@ class Gambling {
       _.each(users, function (value, key) {
         if (key.toLowerCase() === sender.username.toLowerCase()) {
           let userToUpdate = {}
-          userToUpdate[key] = parseInt(users[key], 10) + parseInt(points, 10)
+          userToUpdate[key] = parseInt(users[key], 10) + parseInt(bet, 10)
           self.duelUsers = userToUpdate
           newDuelist = false
           return false
@@ -187,7 +189,7 @@ class Gambling {
           // save new cooldown if not bypassed
           if (!(await global.configuration.getValue('gamblingCooldownBypass') && (isMod || global.commons.isBroadcaster(sender)))) self.duelCooldown = new Date().getTime()
           let newUser = {}
-          newUser[sender.username.toLowerCase()] = parseInt(points, 10)
+          newUser[sender.username.toLowerCase()] = parseInt(bet, 10)
           self.duelUsers = newUser
         } else {
           message = await global.commons.prepare('gambling.fightme.cooldown', {
