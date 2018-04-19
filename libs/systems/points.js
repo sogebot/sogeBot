@@ -307,22 +307,21 @@ Points.prototype.updatePoints = async function () {
     var interval = (await global.cache.isOnline() ? await global.configuration.getValue('pointsInterval') * 60 * 1000 : await global.configuration.getValue('pointsIntervalOffline') * 60 * 1000)
     var ptsPerInterval = (await global.cache.isOnline() ? await global.configuration.getValue('pointsPerInterval') : await global.configuration.getValue('pointsPerIntervalOffline'))
 
-    for (let user of await global.db.engine.find('users.online')) {
-      if (global.commons.isBot(user.username)) continue
+    for (let username of (await global.db.engine.find('users.online')).map((o) => o.username)) {
+      if (global.commons.isBot(username)) continue
 
       if (parseInt(interval, 10) !== 0 && parseInt(ptsPerInterval, 10) !== 0) {
-        user = await global.db.engine.findOne('users', { username: user.username })
+        let user = await global.db.engine.findOne('users', { username: username })
         _.set(user, 'time.points', _.get(user, 'time.points', new Date().getTime() - interval))
-
         let time = new Date().getTime()
         let shouldUpdate = time - user.time.points >= interval
         if (shouldUpdate) {
-          await global.db.engine.insert('users.points', { username: user.username, points: parseInt(ptsPerInterval, 10) })
-          await global.db.engine.update('users', { username: user.username }, { time: { points: new Date().getTime() } })
+          await global.db.engine.insert('users.points', { username: username, points: parseInt(ptsPerInterval, 10) })
+          await global.db.engine.update('users', { username: username }, { time: { points: new Date().getTime() } })
         }
       } else {
         // force time update if interval or points are 0
-        await global.db.engine.update('users', { username: user.username }, { time: { points: new Date().getTime() } })
+        await global.db.engine.update('users', { username: username }, { time: { points: new Date().getTime() } })
       }
     }
   } catch (e) {
