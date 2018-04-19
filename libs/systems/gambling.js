@@ -135,7 +135,7 @@ class Gambling {
       points: total,
       probability: _.round(probability, 2),
       ticketsName: await global.systems.points.getPointsName(tickets),
-      tickets: tickets.toString(),
+      tickets: tickets,
       winner: username
     })
     debug(m); global.commons.sendMessage(m, { username: global.commons.getOwner() }, { force: true })
