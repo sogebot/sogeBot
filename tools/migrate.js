@@ -72,6 +72,7 @@ let migration = {
       let users = await global.db.engine.find('users')
       for (let user of users) {
         if (_.isNil(user.time)) continue
+        await global.db.engine.remove('users', { _id: String(user._id) })
         delete user._id; delete user.time.created_at
         await global.db.engine.insert('users', user)
       }
