@@ -323,6 +323,50 @@ class Message {
         }
       }
     }
+    let stream = {
+      '(stream|#|game)': async function (filter) {
+        const channel = filter.replace('(stream|', '').replace('|game)', '')
+        try {
+          let request = await snekfetch.get(`https://api.twitch.tv/kraken/users?login=${channel}`)
+            .set('Accept', 'application/vnd.twitchtv.v5+json')
+            .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+            .set('Client-ID', config.settings.client_id)
+          const channelId = request.body.users[0]._id
+          request = await snekfetch.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`)
+            .set('Client-ID', config.settings.client_id)
+            .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
+          return global.api.getGameFromId(request.body.data[0].game_id)
+        } catch (e) { return 'n/a' } // return nothing on error
+      },
+      '(stream|#|title)': async function (filter) {
+        const channel = filter.replace('(stream|', '').replace('|title)', '')
+        try {
+          let request = await snekfetch.get(`https://api.twitch.tv/kraken/users?login=${channel}`)
+            .set('Accept', 'application/vnd.twitchtv.v5+json')
+            .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+            .set('Client-ID', config.settings.client_id)
+          const channelId = request.body.users[0]._id
+          request = await snekfetch.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`)
+            .set('Client-ID', config.settings.client_id)
+            .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
+          return request.body.data[0].title
+        } catch (e) { return 'n/a' } // return nothing on error
+      },
+      '(stream|#|viewers)': async function (filter) {
+        const channel = filter.replace('(stream|', '').replace('|viewers)', '')
+        try {
+          let request = await snekfetch.get(`https://api.twitch.tv/kraken/users?login=${channel}`)
+            .set('Accept', 'application/vnd.twitchtv.v5+json')
+            .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+            .set('Client-ID', config.settings.client_id)
+          const channelId = request.body.users[0]._id
+          request = await snekfetch.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`)
+            .set('Client-ID', config.settings.client_id)
+            .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
+          return request.body.data[0].viewer_count
+        } catch (e) { return '0' } // return nothing on error
+      }
+    }
 
     // $currentSong - Spotify -> YTPlayer
     if (!_.isNil(global.integrations) && !_.isEmpty(await global.integrations.spotify.currentSong) && (await global.integrations.spotify.currentSong).is_playing && (await global.integrations.spotify.currentSong).is_enabled) {
@@ -352,6 +396,7 @@ class Message {
     await this.parseMessageEach(qs); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(info); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(list); d('parseMessageEach: %s', this.message)
+    await this.parseMessageEach(stream); d('parseMessageEach: %s', this.message)
     await this.parseMessageApi(); d('parseMessageApi: %s', this.message)
 
     return this.message

@@ -26,6 +26,7 @@ function cluster () {
   global.events = new (require('./libs/events.js'))()
   global.twitch = new (require('./libs/twitch'))()
   global.permissions = new (require('./libs/permissions'))()
+  global.api = new (require('./libs/api'))()
 
   global.lib = {}
   global.lib.translate = new (require('./libs/translate'))()

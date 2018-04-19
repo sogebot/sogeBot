@@ -4,44 +4,47 @@ const config = require('../config.json')
 const snekfetch = require('snekfetch')
 const constants = require('./constants')
 const moment = require('moment')
+const cluster = require('cluster')
 
 class API {
   constructor () {
-    this.remainingAPICalls = 30
-    this.refreshAPICalls = _.now() / 1000
-    this.rate_limit_follower_check = []
+    if (cluster.isMaster) {
+      this.remainingAPICalls = 30
+      this.refreshAPICalls = _.now() / 1000
+      this.rate_limit_follower_check = []
 
-    this.chatMessagesAtStart = global.linesParsed
-    this.maxRetries = 3
-    this.curRetries = 0
-    this.streamType = 'live'
+      this.chatMessagesAtStart = global.linesParsed
+      this.maxRetries = 3
+      this.curRetries = 0
+      this.streamType = 'live'
 
-    this.gameOrTitleChangedManually = false
+      this.gameOrTitleChangedManually = false
 
-    this.retries = {
-      getCurrentStreamData: 0,
-      getChannelDataOldAPI: 0
-    }
-
-    this._loadCachedStatusAndGame()
-    this.getChannelID()
-    this.getCurrentStreamData({ interval: true })
-    this.getLatest100Followers(true)
-    this.updateChannelViews()
-    this.getChannelHosts()
-
-    this.getChannelChattersUnofficialAPI({ saveToWidget: false })
-
-    this.getChannelSubscribersOldAPI() // remove this after twitch add total subscribers
-    this.getChannelDataOldAPI() // remove this after twitch game and status for new API
-
-    setInterval(async () => {
-      // we are in bounds of safe rate limit, wait until limit is refreshed
-      if (this.rate_limit_follower_check.length > 0 && !_.isNil(global.overlays)) {
-        this.rate_limit_follower_check = _.uniq(this.rate_limit_follower_check)
-        this.isFollowerUpdate(this.rate_limit_follower_check.shift())
+      this.retries = {
+        getCurrentStreamData: 0,
+        getChannelDataOldAPI: 0
       }
-    }, 500) // run follower ONE request every .5 second
+
+      this._loadCachedStatusAndGame()
+      this.getChannelID()
+      this.getCurrentStreamData({ interval: true })
+      this.getLatest100Followers(true)
+      this.updateChannelViews()
+      this.getChannelHosts()
+
+      this.getChannelChattersUnofficialAPI({ saveToWidget: false })
+
+      this.getChannelSubscribersOldAPI() // remove this after twitch add total subscribers
+      this.getChannelDataOldAPI() // remove this after twitch game and status for new API
+
+      setInterval(async () => {
+        // we are in bounds of safe rate limit, wait until limit is refreshed
+        if (this.rate_limit_follower_check.length > 0 && !_.isNil(global.overlays)) {
+          this.rate_limit_follower_check = _.uniq(this.rate_limit_follower_check)
+          this.isFollowerUpdate(this.rate_limit_follower_check.shift())
+        }
+      }, 500) // run follower ONE request every .5 second
+    }
   }
 
   async _loadCachedStatusAndGame () {
@@ -452,7 +455,7 @@ class API {
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
-      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+      if (cluster.isMaster) global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
 
       // add id->game to cache
       gids[gid] = request.body.data[0].name
@@ -463,7 +466,7 @@ class API {
       const game = await global.db.engine.findOne('api.current', { key: 'game' })
       global.log.warning(`Couldn't find name of game for gid ${gid} - fallback to ${game.value}`)
       global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
+      if (cluster.isMaster) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
       return game.value
     }
   }
