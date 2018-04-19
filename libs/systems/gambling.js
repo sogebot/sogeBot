@@ -336,13 +336,13 @@ class Gambling {
         debug('vs mod')
         global.commons.sendMessage(global.translate('gambling.fightme.oneModerator')
           .replace(/\$winner/g, isMod.sender ? sender.username : username), sender)
-        global.client.timeout(isMod.sender ? username : sender.username, await global.configuration.getValue('fightmeTimeout'))
+        global.commons.timeout(isMod.sender ? username : sender.username, null, await global.configuration.getValue('fightmeTimeout'))
         global.db.engine.remove(`${self.collection}.fightme`, { _id: challenge._id.toString() })
         return
       }
 
       debug('user vs user')
-      global.client.timeout(winner ? sender.username : username, await global.configuration.getValue('fightmeTimeout'))
+      global.commons.timeout(winner ? sender.username : username, null, await global.configuration.getValue('fightmeTimeout'))
       global.commons.sendMessage(global.translate('gambling.fightme.winner')
         .replace(/\$winner/g, winner ? username : sender.username), sender)
       global.db.engine.remove(`${self.collection}.fightme`, { _id: challenge._id.toString() })
