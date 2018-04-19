@@ -151,7 +151,7 @@ class Gambling {
   }
 
   async duel (self, sender, text) {
-    let points, message
+    let message, bet
 
     sender['message-type'] = 'chat' // force responses to chat
     try {
@@ -160,7 +160,7 @@ class Gambling {
 
       const user = await global.users.get(sender.username)
       const points = await global.systems.points.getPointsOf(user.username)
-      const bet = parsed[1] === 'all' ? points : parsed[1]
+      bet = parsed[1] === 'all' ? points : parsed[1]
 
       if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
       if (points < bet) throw Error(ERROR_NOT_ENOUGH_POINTS)
@@ -227,16 +227,16 @@ class Gambling {
           break
         case ERROR_NOT_ENOUGH_POINTS:
           message = await global.commons.prepare('gambling.duel.notEnoughPoints', {
-            pointsName: await global.systems.points.getPointsName(points),
-            points: points
+            pointsName: await global.systems.points.getPointsName(bet),
+            points: bet
           })
           debug(message); global.commons.sendMessage(message, sender)
           break
         case ERROR_MINIMAL_BET:
-          points = await global.configuration.getValue('duelMinimalBet')
+          bet = await global.configuration.getValue('duelMinimalBet')
           message = await global.commons.prepare('gambling.duel.lowerThanMinimalBet', {
-            pointsName: await global.systems.points.getPointsName(points),
-            points: points
+            pointsName: await global.systems.points.getPointsName(bet),
+            points: bet
           })
           debug(message); global.commons.sendMessage(message, sender)
           break
