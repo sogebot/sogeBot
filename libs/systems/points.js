@@ -335,30 +335,44 @@ Points.prototype.updatePoints = async function () {
 Points.prototype.compactPointsDb = async function () {
   try {
     let users = {}
+    let idsToUpdate = {}
+    let usersPointsFromDb = await global.db.engine.find('users.points')
 
     const isOnline = await global.cache.isOnline()
     if (!isOnline) {
-      for (let user of await global.db.engine.find('users.points')) {
+      for (let user of usersPointsFromDb) {
         if (_.isNaN(users[user.username]) || _.isNil(users[user.username])) users[user.username] = 0
         let points = !_.isNaN(parseInt(_.get(user, 'points', 0))) ? parseInt(_.get(user, 'points', 0)) : 0
         users[user.username] = parseInt(users[user.username], 10) + points
-        await global.db.engine.remove('users.points', { _id: user._id.toString() })
+        if (_.isNil(idsToUpdate[user.username])) {
+          // we don't have id which we will use for compaction
+          idsToUpdate[user.username] = String(user._id)
+        } else {
+          await Promise.all([
+            global.db.engine.update('users.points', { _id: idsToUpdate[user.username] }, { points: Number(users[user.username]) }),
+            global.db.engine.remove('users.points', { _id: user._id.toString() })
+          ])
+        }
       }
     } else {
       // compact only offline users if stream online
       const onlineUsers = (await global.db.engine.find('users.online')).map((o) => o.username)
-      for (let user of await global.db.engine.find('users.points')) {
+      for (let user of usersPointsFromDb) {
         if (_.includes(onlineUsers, user.username)) continue // don't compact online user
         if (_.isNaN(users[user.username]) || _.isNil(users[user.username])) users[user.username] = 0
         let points = !_.isNaN(parseInt(_.get(user, 'points', 0))) ? parseInt(_.get(user, 'points', 0)) : 0
         users[user.username] = parseInt(users[user.username], 10) + points
-        await global.db.engine.remove('users.points', { _id: user._id.toString() })
-      }
-    }
 
-    for (let [username, points] of Object.entries(users)) {
-      if (Number(points) < 0) points = 0
-      if (points !== 0) await global.db.engine.insert('users.points', { username: username, points: parseInt(points, 10) })
+        if (_.isNil(idsToUpdate[user.username])) {
+          // we don't have id which we will use for compaction
+          idsToUpdate[user.username] = String(user._id)
+        } else {
+          await Promise.all([
+            global.db.engine.update('users.points', { _id: idsToUpdate[user.username] }, { points: Number(users[user.username]) }),
+            global.db.engine.remove('users.points', { _id: user._id.toString() })
+          ])
+        }
+      }
     }
   } catch (e) {
     global.db.error(e)
