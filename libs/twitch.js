@@ -302,15 +302,17 @@ class Twitch {
     if (_.isNil(type)) type = 'time'
     else type = type[1]
 
-    let users = await global.users.getAll()
     if (type === 'points' && global.commons.isSystemEnabled('points')) {
       let usersPoints = []
-      for (let user of (_.sortedUniqBy(await global.db.engine.find('users.points'), (o) => o.username)).map((o) => o.username)) {
-        usersPoints.push({ username: user, points: await global.systems.points.getPointsOf(user) })
+      for (let user of (await global.db.engine.find('users.points')).map((o) => o.username)) {
+        if (!_.find(usersPoints, (o) => o.username === user)) {
+          usersPoints.push({ username: user, points: await global.systems.points.getPointsOf(user) })
+        }
       }
       message = global.translate('top.listPoints').replace(/\$amount/g, 10)
       sorted = _.orderBy(_.filter(usersPoints, function (o) { return !_.isNil(o.points) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'points', 'desc')
     } else if (type === 'time') {
+      let users = await global.users.getAll()
       message = global.translate('top.listWatched').replace(/\$amount/g, 10)
       sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.time) && !_.isNil(o.time.watched) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'time.watched', 'desc')
     } else if (type === 'tips') {
@@ -323,6 +325,7 @@ class Twitch {
       }
       sorted = _.orderBy(users, 'amount', 'desc')
     } else {
+      let users = await global.users.getAll()
       message = global.translate('top.listMessages').replace(/\$amount/g, 10)
       sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.stats) && !_.isNil(o.stats.messages) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'stats.messages', 'desc')
     }
