@@ -38,7 +38,7 @@
           .replace('(seconds)', (item.timestamp.seconds < 10) ? '0' + item.timestamp.seconds : item.timestamp.seconds)
           .replace('00h', '').replace('00m', '') // also remove unnecessary hours and minutes if they are 0
         $("#highlights").append('<tr>' +
-          '<td><a href="http://twitch.tv/videos/' + item.video_id + '?t=' + time + '">' + item.video_id +
+          '<td><a href="http://twitch.tv/videos/' + item.video_id.replace('v', '') + '?t=' + time + '">' + item.video_id +
           '</a></td>' +
           '<td>' + item.game + '</td>' +
           '<td>' + item.title + '</td>' +
