@@ -1225,7 +1225,7 @@
       "zeroBet": "$sender, nemuzes na sebe vsadit 0 $pointsName",
       "notEnoughOptions": "$sender, k duelu musis neco vsadit",
       "notEnoughPoints": "$sender, nemas $points $pointsName pro duel!",
-      "noContestant": "Pouze $sender se odvazil zucastnit duelu! Jeho sazka $points $pointsName mu byla vracena.",
+      "noContestant": "Pouze $winner se odvazil zucastnit duelu! Jeho sazka $points $pointsName mu byla vracena.",
       "winner": "Gratulace $winner! Je poslednim prezivsim a ziskal $points $pointsName ($probability% se sazkou $tickets $ticketsName)!!"
     },
     "roulette": {

@@ -138,7 +138,7 @@ class Gambling {
       tickets: tickets,
       winner: username
     })
-    debug(m); global.commons.sendMessage(m, { username: username }, { force: true })
+    debug(m); global.commons.sendMessage(m, { username: global.commons.getOwner() }, { force: true })
 
     // give user his points
     await global.db.engine.insert('users.points', { username: username, points: parseInt(total, 10) })
