@@ -15,6 +15,7 @@
     <style>
       body, html {
         height: 99%;
+        overflow: hidden;
       }
       #emotes {
         margin: auto;
@@ -63,6 +64,25 @@
             .css('left', left)
 
           switch (emote.animation) {
+            case 'facebook':
+              left = _.random(200) + $('body').width() - 250
+              top = $('body').height() + 20
+              img = $('<img></img>')
+                .attr('src', emote_url)
+                .css('top', top)
+                .css('left', left)
+              setTimeout(function() {
+                emotes.append(img)
+                img.velocity({
+                  opacity: 0,
+                  top: top - _.random($('body').height() / 7, $('body').height() / 3),
+                  left: _.random(left-60, left+60)
+                }, "easeOutSine", _.random(emote.animationTime - 500, emote.animationTime + 500),
+                function () {
+                  $(this).remove()
+                })
+              }, _.random(2000))
+              break
             case 'fadeup':
               setTimeout(function() {
                 emotes.append(img)
