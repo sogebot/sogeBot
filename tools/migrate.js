@@ -17,12 +17,13 @@ var runMigration = async function () {
     return
   }
   let info = await global.db.engine.find('info')
+  const version = _.get(process, 'env.npm_package_version', '999.9.9-SNAPSHOT')
 
   let dbVersion = _.isEmpty(info) || _.isNil(_.find(info, (o) => !_.isNil(o.version)).version)
     ? '0.0.0'
     : _.find(info, (o) => !_.isNil(o.version)).version
 
-  if (process.env.npm_package_version === dbVersion && !_.includes(process.env.npm_package_version, 'SNAPSHOT')) {
+  if (version === dbVersion && !_.includes(version, 'SNAPSHOT')) {
     process.exit()
   }
 
@@ -33,17 +34,17 @@ var runMigration = async function () {
   }))
 
   console.info(('-').repeat(56))
-  console.info('Current bot version: %s', process.env.npm_package_version)
+  console.info('Current bot version: %s', version)
   console.info('DB version: %s', dbVersion)
   console.info('DB engine: %s', config.database.type)
   console.info(('-').repeat(56))
 
-  await updates(dbVersion, process.env.npm_package_version)
+  await updates(dbVersion, version)
 
   console.info(('-').repeat(56))
-  console.info('All process DONE! Database is upgraded to %s', process.env.npm_package_version)
-  if (dbVersion !== '0.0.0') await global.db.engine.update('info', { version: dbVersion }, { version: process.env.npm_package_version })
-  else await global.db.engine.insert('info', { version: process.env.npm_package_version })
+  console.info('All process DONE! Database is upgraded to %s', version)
+  if (dbVersion !== '0.0.0') await global.db.engine.update('info', { version: dbVersion }, { version: version })
+  else await global.db.engine.insert('info', { version: version })
   process.exit()
 }
 runMigration()
