@@ -10,9 +10,10 @@ const _ = require('lodash')
 const debug = require('debug')('db:mongodb')
 
 class IMongoDB extends Interface {
-  constructor () {
+  constructor (createIndexes) {
     super('mongodb')
 
+    this.createIndexes = createIndexes || false
     this.connected = false
     this.client = null
     this.dbName = mongodbUri.parse(config.database.mongodb.url).database
@@ -37,14 +38,16 @@ class IMongoDB extends Interface {
     if (_.find(collections, (o) => o.name === 'users')) await db.collection('users').dropIndexes()
     if (_.find(collections, (o) => o.name === 'stats')) await db.collection('stats').dropIndexes()
 
-    await db.collection('users.bits').createIndex('timestamp')
-    await db.collection('users.tips').createIndex('timestamp')
-    await db.collection('users').createIndex('username', { unique: true })
-    await db.collection('users.online').createIndex('username', { unique: true })
-    await db.collection('users.points').createIndex('username')
-    await db.collection('cache').createIndex('key')
-    await db.collection('customTranslations').createIndex('key')
-    await db.collection('stats').createIndex('whenOnline')
+    if (this.createIndexes) {
+      await db.collection('users.bits').createIndex('timestamp')
+      await db.collection('users.tips').createIndex('timestamp')
+      await db.collection('users').createIndex('username', { unique: true })
+      await db.collection('users.online').createIndex('username', { unique: true })
+      await db.collection('users.points').createIndex('username')
+      await db.collection('cache').createIndex('key')
+      await db.collection('customTranslations').createIndex('key')
+      await db.collection('stats').createIndex('whenOnline')
+    }
 
     this.connected = true
   }
