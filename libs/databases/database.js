@@ -13,7 +13,7 @@ class Database {
 
     if (require('cluster').isMaster && this.cluster) this.engine = new IMasterController()
     else if (config.database.type === 'nedb') this.engine = new INeDB()
-    else if (config.database.type === 'mongodb') this.engine = new IMongoDB()
+    else if (config.database.type === 'mongodb') this.engine = new IMongoDB(cluster)
 
     if (_.isNil(this.engine)) {
       global.log.warning('No database was selected - fallback to NeDB')
