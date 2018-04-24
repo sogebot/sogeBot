@@ -11,6 +11,7 @@ class IMasterController extends Interface {
     super('master')
 
     cluster.on('message', (worker, message) => {
+      if (message.type !== 'db') return
       debug('db:master:incoming')(`Got data from Worker#${worker.id}\n${util.inspect(message)}`)
       this.data.push({
         id: message.id,
@@ -32,7 +33,7 @@ class IMasterController extends Interface {
       const size = this.data.length
       _.remove(this.data, (o) => o.finished)
       for (let item of this.data) {
-        if (_.now() - item.timestamp > 5000) _.remove(this.data, (o) => o.finished)
+        if (_.now() - item.timestamp > 5000) _.remove(this.data, (o) => o.id === item.id)
       }
       debug('db:master:cleanup')('Cleaned up ' + (size - this.data.length))
     } catch (e) {
@@ -61,6 +62,7 @@ class IMasterController extends Interface {
       let sendRequest = (resolve, reject, id) => {
         try {
           _.sample(cluster.workers).send(data)
+          debug('db:master:request:id')(id)
           returnData(resolve, reject, id)
         } catch (e) {
           setTimeout(() => sendRequest(resolve, reject, id), 1)
@@ -69,6 +71,7 @@ class IMasterController extends Interface {
       let returnData = (resolve, reject, id) => {
         if ((_.now() - start > 4000 * retries && retries < 5)) {
           _.sample(cluster.workers).send(data) // retry
+          debug('db:master:request:id')(id)
           debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
           retries++
         } else if (_.now() - start > 30000) {
@@ -99,6 +102,7 @@ class IMasterController extends Interface {
       let sendRequest = (resolve, reject, id) => {
         try {
           _.sample(cluster.workers).send(data)
+          debug('db:master:request:id')(id)
           returnData(resolve, reject, id)
         } catch (e) {
           setTimeout(() => sendRequest(resolve, reject, id), 1)
@@ -107,6 +111,7 @@ class IMasterController extends Interface {
       let returnData = (resolve, reject, id) => {
         if ((_.now() - start > 4000 * retries && retries < 5)) {
           _.sample(cluster.workers).send(data) // retry
+          debug('db:master:request:id')(id)
           debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
           retries++
         } else if (_.now() - start > 30000) {
@@ -137,6 +142,7 @@ class IMasterController extends Interface {
       let sendRequest = (resolve, reject, id) => {
         try {
           _.sample(cluster.workers).send(data)
+          debug('db:master:request:id')(id)
           returnData(resolve, reject, id)
         } catch (e) {
           setTimeout(() => sendRequest(resolve, reject, id), 1)
@@ -145,6 +151,7 @@ class IMasterController extends Interface {
       let returnData = (resolve, reject, id) => {
         if ((_.now() - start > 4000 * retries && retries < 5)) {
           _.sample(cluster.workers).send(data) // retry
+          debug('db:master:request:id')(id)
           debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
           retries++
         } else if (_.now() - start > 30000) {
@@ -175,6 +182,7 @@ class IMasterController extends Interface {
       let sendRequest = (resolve, reject, id) => {
         try {
           _.sample(cluster.workers).send(data)
+          debug('db:master:request:id')(id)
           returnData(resolve, reject, id)
         } catch (e) {
           setTimeout(() => sendRequest(resolve, reject, id), 1)
@@ -183,6 +191,7 @@ class IMasterController extends Interface {
       let returnData = (resolve, reject, id) => {
         if ((_.now() - start > 4000 * retries && retries < 5)) {
           _.sample(cluster.workers).send(data) // retry
+          debug('db:master:request:id')(id)
           debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
           retries++
         } else if (_.now() - start > 30000) {
@@ -213,6 +222,7 @@ class IMasterController extends Interface {
       let sendRequest = (resolve, reject, id) => {
         try {
           _.sample(cluster.workers).send(data)
+          debug('db:master:request:id')(id)
           returnData(resolve, reject, id)
         } catch (e) {
           setTimeout(() => sendRequest(resolve, reject, id), 1)
@@ -221,6 +231,7 @@ class IMasterController extends Interface {
       let returnData = (resolve, reject, id) => {
         if ((_.now() - start > 4000 * retries && retries < 5)) {
           _.sample(cluster.workers).send(data) // retry
+          debug('db:master:request:id')(id)
           debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
           retries++
         } else if (_.now() - start > 30000) {
@@ -251,6 +262,7 @@ class IMasterController extends Interface {
       let sendRequest = (resolve, reject, id) => {
         try {
           _.sample(cluster.workers).send(data)
+          debug('db:master:request:id')(id)
           returnData(resolve, reject, id)
         } catch (e) {
           setTimeout(() => sendRequest(resolve, reject, id), 1)
@@ -259,6 +271,7 @@ class IMasterController extends Interface {
       let returnData = (resolve, reject, id) => {
         if ((_.now() - start > 4000 * retries && retries < 5)) {
           _.sample(cluster.workers).send(data) // retry
+          debug('db:master:request:id')(id)
           debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
           retries++
         } else if (_.now() - start > 30000) {
@@ -289,6 +302,7 @@ class IMasterController extends Interface {
       let sendRequest = (resolve, reject, id) => {
         try {
           _.sample(cluster.workers).send(data)
+          debug('db:master:request:id')(id)
           returnData(resolve, reject, id)
         } catch (e) {
           setTimeout(() => sendRequest(resolve, reject, id), 1)
@@ -297,6 +311,7 @@ class IMasterController extends Interface {
       let returnData = (resolve, reject, id) => {
         if ((_.now() - start > 4000 * retries && retries < 5)) {
           _.sample(cluster.workers).send(data) // retry
+          debug('db:master:request:id')(id)
           debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
           retries++
         } else if (_.now() - start > 30000) {
