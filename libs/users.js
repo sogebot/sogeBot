@@ -9,6 +9,9 @@ const config = require('../config.json')
 const debug = require('debug')('users')
 
 function Users () {
+  this.uiSortCache = null
+  this.uiSortCacheViewers = []
+
   if (cluster.isMaster) {
     this.panel()
     this.compactMessagesDb()
@@ -298,6 +301,15 @@ Users.prototype.sockets = function (self) {
         }
         await Promise.all(toAwait)
       } else {
+        // check if this sort is cached
+        const cacheId = `${opts.sortBy}${opts.order}${opts.filter}${JSON.toString(opts.show)}`
+        const isCached = this.uiSortCache === cacheId
+        if (!isCached) this.uiSortCache = cacheId
+        else {
+          // get only needed viewers
+          viewers = _.chunk(_.orderBy(this.uiSortCacheViewers, opts.sortBy, opts.order), itemsPerPage)[opts.page]
+        }
+
         // we need to fetch all viewers and then sort
         let toAwait = []
         let i = 0
@@ -310,7 +322,10 @@ Users.prototype.sockets = function (self) {
           toAwait.push(processUser(viewer))
         }
         await Promise.all(toAwait)
-        viewers = _.chunk(_.orderBy(viewers, opts.sortBy, opts.order), itemsPerPage)[opts.page]
+        if (!isCached) {
+          this.uiSortCacheViewers = viewers // save cache data
+          viewers = _.chunk(_.orderBy(viewers, opts.sortBy, opts.order), itemsPerPage)[opts.page]
+        }
       }
       const response = {
         viewers: viewers,
