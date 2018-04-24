@@ -269,7 +269,7 @@ class Twitch {
       }
 
       // message count
-      var messages = !_.isUndefined(user.stats.messages) ? user.stats.messages : 0
+      var messages = await global.users.getMessagesOf(sender.username)
       message.push(messages + ' ' + global.commons.getLocalizedName(messages, 'core.messages'))
 
       global.commons.sendMessage(message.join(' | '), sender)
@@ -325,9 +325,14 @@ class Twitch {
       }
       sorted = _.orderBy(users, 'amount', 'desc')
     } else {
-      let users = await global.users.getAll()
+      let usersMessages = []
+      for (let user of (await global.db.engine.find('users.messages')).map((o) => o.username)) {
+        if (!_.find(usersMessages, (o) => o.username === user)) {
+          usersMessages.push({ username: user, messages: await global.users.getMessagesOf(user) })
+        }
+      }
       message = global.translate('top.listMessages').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.stats) && !_.isNil(o.stats.messages) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'stats.messages', 'desc')
+      sorted = _.orderBy(_.filter(usersMessages, function (o) { return !_.isNil(o.messages) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'messages', 'desc')
     }
 
     if (sorted.length > 0) {
@@ -345,9 +350,9 @@ class Twitch {
         if (type === 'time') message += (user.time.watched / 1000 / 60 / 60).toFixed(1) + 'h'
         else if (type === 'tips') message += user.amount.toFixed(2) + global.currency.symbol(await global.configuration.getValue('currency'))
         else if (type === 'points') {
-          let points = await global.systems.points.getPointsOf(user.username)
-          message += points + ' ' + await global.systems.points.getPointsName(points)
-        } else message += user.stats.messages
+          let points = user.points
+          message += points + ' ' + await global.systems.points.getPointsName(user.points)
+        } else message += user.messages
         if (i + 1 < 10 && !_.isNil(sorted[i + 1])) message += ', '
         i++
       }

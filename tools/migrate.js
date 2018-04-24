@@ -78,6 +78,22 @@ let migration = {
         await global.db.engine.insert('users', user)
       }
     }
+  }, {
+    version: '7.4.0',
+    do: async () => {
+      console.info('Migration of messages stats')
+      let users = await global.db.engine.find('users')
+      let updated = 0
+      for (let user of users) {
+        if (_.isNil(user.stats) || _.isNil(user.stats.messages)) continue
+        updated++
+        await global.db.engine.remove('users', { _id: String(user._id) })
+        await global.db.engine.insert('users.messages', { username: user.username, messages: parseInt(user.stats.messages, 10) })
+        delete user._id; delete user.stats.messages
+        await global.db.engine.insert('users', user)
+      }
+      console.info(` => ${updated} users`)
+    }
   }],
   points: [{
     version: '7.3.0',

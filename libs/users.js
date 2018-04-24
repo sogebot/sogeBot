@@ -11,6 +11,7 @@ const debug = require('debug')('users')
 function Users () {
   if (cluster.isMaster) {
     this.panel()
+    this.compactMessagesDb()
   }
 
   // set all users offline on start
@@ -251,7 +252,7 @@ Users.prototype.ignoreCheck = async function (self, sender, text) {
 }
 
 Users.prototype.resetMessages = function (self, socket, data) {
-  self.setAll({stats: {messages: 0}})
+  global.db.engine.remove('users.messages', {})
 }
 
 Users.prototype.resetWatchTime = function (self, socket, data) {
@@ -294,6 +295,7 @@ Users.prototype.getViewers = async function (self, socket) {
 
     // POINTS
     _.set(viewer, 'points', await global.systems.points.getPointsOf(viewer.username))
+    _.set(viewer, 'stats.messages', await global.users.getMessagesOf(viewer.username))
   }
   socket.emit('Viewers', Buffer.from(JSON.stringify(viewers), 'utf8').toString('base64'))
 }
@@ -450,6 +452,31 @@ Users.prototype.updateWatchTime = async function () {
   } else {
     debug('Doing nothing, stream offline')
   }
+}
+
+Users.prototype.compactMessagesDb = async function () {
+  try {
+    await global.commons.compactDb({ table: 'users.messages', index: 'username', values: 'messages' })
+  } catch (e) {
+    global.db.error(e)
+    global.db.error(e.stack)
+  } finally {
+    setTimeout(() => this.compactMessagesDb(), 10000)
+  }
+}
+
+Users.prototype.getMessagesOf = async function (user) {
+  let messages = 0
+  for (let item of await global.db.engine.find('users.messages', { username: user })) {
+    let itemPoints = !_.isNaN(parseInt(_.get(item, 'messages', 0))) ? _.get(item, 'messages', 0) : 0
+    messages = messages + Number(itemPoints)
+  }
+  if (Number(messages) < 0) messages = 0
+
+  return parseInt(
+    Number(messages) <= Number.MAX_SAFE_INTEGER / 1000000
+      ? messages
+      : Number.MAX_SAFE_INTEGER / 1000000, 10)
 }
 
 module.exports = Users

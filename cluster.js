@@ -115,7 +115,7 @@ function cluster () {
 
         if (message.startsWith('!')) {
           global.events.fire('command-send-x-times', { username: sender.username, message: message })
-        } else if (!message.startsWith('!') && await global.cache.isOnline()) global.db.engine.increment('users', { username: sender.username }, { stats: { messages: 1 } })
+        } else if (!message.startsWith('!') && await global.cache.isOnline()) global.db.engine.insert('users.messages', { username: sender.username, messages: 1 })
       }
 
       debug(`cluster:worker:onMessage:${id}`)('Process parser')
