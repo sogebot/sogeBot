@@ -200,20 +200,29 @@
         <span class="stats">&nbsp;</span>
       </div>
 
-      <div class="col-sm stream-info">
-        <h2 data-lang="viewers"></h2>
+      <div class="col-sm stream-info" onclick="toggleViewerShow()">
+        <h2>
+          <i data-lang="viewers"></i>
+          <small data-lang="click-to-toggle-display"></small>
+        </h2>
         <span class="data curViewers">-</span>
         <span class="stats">&nbsp;</span>
       </div>
 
-      <div class="col-sm stream-info">
-        <h2 data-lang="max-viewers"></h2>
+      <div class="col-sm stream-info" onclick="toggleViewerShow()">
+        <h2>
+          <i data-lang="max-viewers"></i>
+          <small data-lang="click-to-toggle-display"></small>
+        </h2>
         <span class="data" id="maxViewers">-</span>
         <span class="stats" id="maxViewersChange">&nbsp;</span>
       </div>
 
-      <div class="col-sm stream-info">
-        <h2 data-lang="new-chatters"></h2>
+      <div class="col-sm stream-info" onclick="toggleViewerShow()">
+        <h2>
+          <i data-lang="new-chatters"></i>
+          <small data-lang="click-to-toggle-display"></small>
+        </h2>
         <span class="data" id="newChtr">-</span>
         <span class="stats" id="newChtrChange">&nbsp;</span>
       </div>
@@ -368,6 +377,7 @@
     var configuration
 
     var translations = {}
+    var showViewers = true
 
     console.debug('EMIT [getVersion]')
     socket.emit('getVersion')
@@ -619,16 +629,16 @@
       }
 
       $("#uptime").text(data.uptime !== '' ? data.uptime : '00:00:00')
-      $(".curViewers").text(data.currentViewers)
+      $(".curViewers").html(showViewers ? data.currentViewers : `<small>${translations['hidden']}</small>`)
+      $("#maxViewers").html(showViewers ? data.maxViewers : `<small>${translations['hidden']}</small>`)
+      $("#newChtr").html(showViewers ? data.newChatters : `<small>${translations['hidden']}</small>`)
       $("#curViews").text(data.currentViews)
       $("#curHosts").text(data.currentHosts)
       $("#curSubscribers").text(data.currentSubscribers)
       $("#curBits").text(data.currentBits)
       $("#curTips").text(Number(data.currentTips).toFixed(2))
       $("#curTipsCurrency").text(data.currency)
-      $("#maxViewers").text(data.maxViewers)
       $("#totalChatMsgs").text(data.chatMessages)
-      $("#newChtr").text(data.newChatters)
       $("#curFollowers").text(data.currentFollowers)
 
       let title = await generateTitle(data.status, data.rawStatus)
@@ -1002,6 +1012,10 @@
         })
         $('#game_and_title_dlg').modal('hide')
       }
+    }
+
+    var toggleViewerShow = function () {
+      showViewers = !showViewers
     }
 
     var saveHighlight = function () {

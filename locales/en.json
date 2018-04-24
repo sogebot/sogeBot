@@ -889,6 +889,7 @@
     "fightmeCooldown": "Cooldown for !fightme",
     "gamblingCooldownBypass": "Bypass gambling cooldowns for mods/caster",
     "click-to-highlight": "highlight",
+    "click-to-toggle-display": "toggle display",
     "commercial": "commercial started",
     "start-commercial": "run a commercial",
     "bot-will-join-channel": "bot will join channel",
