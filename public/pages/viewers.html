@@ -193,13 +193,13 @@
               <i class="fa" aria-hidden="true"></i>
             </th>
             <th class="text-center" style="width: 1px; cursor: pointer; user-select: none">
-              <span class="alert alert-secondary" style="padding: 0 1.25rem" onclick="viewers.toggle(this)" data-toggle="subscriber">SUBSCRIBER</span>
+              <span class="alert alert-secondary" style="padding: 0 1.25rem" onclick="viewers.toggle(this)" data-toggle="subscribers">SUBSCRIBER</span>
             </th>
             <th class="text-center" style="width: 1px; cursor: pointer; user-select: none">
-              <span class="alert alert-secondary" style="padding: 0 1.25rem" onclick="viewers.toggle(this)" data-toggle="follower">FOLLOWER</span>
+              <span class="alert alert-secondary" style="padding: 0 1.25rem" onclick="viewers.toggle(this)" data-toggle="followers">FOLLOWER</span>
             </th>
             <th class="text-center" style="width: 1px; cursor: pointer; user-select: none">
-              <span class="alert alert-secondary" style="padding: 0 1.25rem" onclick="viewers.toggle(this)" data-toggle="regular">REGULAR</span>
+              <span class="alert alert-secondary" style="padding: 0 1.25rem" onclick="viewers.toggle(this)" data-toggle="regulars">REGULAR</span>
             </th>
             <th class="text-center" style="width: 1px; cursor: pointer; user-select: none">
               <span class="alert alert-secondary" style="padding: 0 1.25rem" onclick="viewers.toggle(this)" data-toggle="active">ACTIVE</span>
@@ -247,16 +247,25 @@
     sortType: 'up',
     toSearch: '',
     list: {},
+    show: {
+      subscribers: null,
+      followers: null,
+      active: null,
+      regulars: null
+    },
     toggle: function (el) {
       const type = $(el).data('toggle')
       if ($(el).hasClass('alert-secondary')) {
         $(el).removeClass('alert-secondary').addClass('alert-success')
+        viewers.show[type] = true
       } else if ($(el).hasClass('alert-danger')) {
         $(el).removeClass('alert-danger').addClass('alert-secondary')
+        viewers.show[type] = null
       } else {
         $(el).removeClass('alert-success').addClass('alert-danger')
+        viewers.show[type] = false
       }
-      viewers.update(viewers.paging())
+      viewers.refresh()
     },
     save: function (el) {
       let user = {
@@ -285,12 +294,12 @@
         if (err) return console.error(err)
         $(el).toggleClass('btn-primary btn-info').removeAttr('disabled').html(commons.translate('save-changes'))
         $('#viewersDlg').modal('hide')
-        socket.emit('getViewers')
+        viewers.refresh()
       })
     },
-    update: function (list) {
+    update: function () {
       $("#Users").empty()
-      _.each(list, function (item, index) {
+      _.each(viewers.list, function (item, index) {
         item.points = _.isUndefined(item.points) ? 0 : item.points
         item.time = _.isNil(item.time) ? {} : item.time
         let followed_at = viewers.styleFollowTime(_.get(item, 'time.follow', 0))
@@ -347,7 +356,7 @@
     delete: function (el) {
       viewers.socket.emit('delete', $('#viewers_username').text(), () => {
         $('#viewersDlg').modal('hide')
-        socket.emit('getViewers')
+        viewers.refresh()
       })
     },
     sort: function (el) {
@@ -356,72 +365,55 @@
       if (viewers.sortBy === el.dataset.sort) {
         viewers.sortType = viewers.sortType === 'up' ? 'down' : 'up'
       } else {
-        viewers.sortType = 'down'
+        viewers.sortType = 'up'
         if (el.dataset.sort === 'username') viewers.sortType = 'up'
       }
       viewers.sortBy = el.dataset.sort
       $(el).children('i').addClass('fas fa-sort-' + viewers.sortType)
-      viewers.update(viewers.paging(viewers.list))
+      viewers.refresh()
+    },
+    refresh: function () {
+      $("#Users").empty()
+      $("#Users").append(`
+        <tr><td colspan=14><div class="text-info"><strong>Loading</strong> data from server (some sorts may take a while)</div></td></tr>
+      `)
+      viewers.socket.emit('users.get', {
+        page: pagination,
+        sortBy: viewers.sortBy,
+        order: viewers.sortType === 'up' ? 'asc' : 'desc',
+        filter: viewers.toSearch.trim().length === 0 ? null : viewers.toSearch,
+        show: viewers.show
+      }, (users) => {
+        viewers.list = users.viewers
+        viewers._total = users._total
+        viewers.paging()
+        if (viewers._total === 0) $("#Users").empty().append(`<tr><td colspan=14><div class="text-danger"><strong>No</strong> users found on server</div></td></tr>`)
+        else viewers.update()
+      })
     },
     pagination: function (i) {
       pagination = i
-      viewers.update(viewers.paging(viewers.list))
-    },
-    search: function (list) {
-      return _.filter(list, function (o) {
-        if (viewers.search.length === 0) return true
-        return o.username.toLowerCase().indexOf(viewers.toSearch.toLowerCase()) >= 0;
-      })
+      viewers.refresh()
     },
     updateSearch: function () {
       viewers.toSearch = $('#viewersSearch').val()
       pagination = 1
-      viewers.update(viewers.paging())
+      viewers.refresh()
     },
     paging: function () {
-      var list = _.sortBy(_.filter(viewers.search(viewers.list), (o) => {
-        const subscriberFilter = ($('[data-toggle="subscriber"]').hasClass('alert-success') && o.is.subscriber)
-          || ($('[data-toggle="subscriber"]').hasClass('alert-danger') && !o.is.subscriber)
-          || $('[data-toggle="subscriber"]').hasClass('alert-secondary')
-        const followerFilter = ($('[data-toggle="follower"]').hasClass('alert-success') && o.is.follower)
-          || ($('[data-toggle="follower"]').hasClass('alert-danger') && !o.is.follower)
-          || $('[data-toggle="follower"]').hasClass('alert-secondary')
-        const regularFilter = ($('[data-toggle="regular"]').hasClass('alert-success') && o.is.regular)
-          || ($('[data-toggle="regular"]').hasClass('alert-danger') && !o.is.regular)
-          || $('[data-toggle="regular"]').hasClass('alert-secondary')
-        const activeFilter = ($('[data-toggle="active"]').hasClass('alert-success') && o.is.online)
-          || ($('[data-toggle="active"]').hasClass('alert-danger') && !o.is.online)
-          || $('[data-toggle="active"]').hasClass('alert-secondary')
-        return subscriberFilter && followerFilter && regularFilter && activeFilter
-      }), [function (o) {
-        var split = viewers.sortBy.split('.')
-        var sort
-        if (split.length == 2) {
-          sort = (!_.isUndefined(o[split[0]]) && !_.isUndefined(o[split[0]][split[1]])) ? o[split[0]][split[1]] :
-            0
-        } else {
-          sort = !_.isUndefined(o[viewers.sortBy]) ? o[viewers.sortBy] : 0
-        }
-        if (viewers.sortBy !== 'username') {
-          return parseFloat(sort === 'Prime' ? 0.1 : sort) // set Prime value as 0
-        }
-        return sort
-      }])
-      if (viewers.sortType === 'down') list = list.reverse()
-      list = _.chunk(list, 50)
       var paging = $('.paging')
-      var empty = false
       paging.empty()
-      _.each(list, function (v, i) {
-        if (list.length < 10) {
+      const pages = viewers._total / 50
+      for (var i = 0; i < pages; i++) {
+        if (pages < 10) {
           paging.append('<li style="margin:0; padding: 8px 5px;" onclick="viewers.pagination(' + (i + 1) + ')" class="btn ' + (pagination === i + 1 ?
             'btn-primary' : 'btn-default') + '">' + (i + 1) + '</li>')
         } else {
-          if ((i >= pagination - 3 && i < pagination + 2) || (i > list.length - 4) || i % 10 === Math.floor(list.length /
+          if ((i >= pagination - 3 && i < pagination + 2) || (i > pages - 4) || i % 10 === Math.floor(pages /
               10) || i < 3) {
             paging.append('<li style="margin:0; padding: 8px 5px;" onclick="viewers.pagination(' + (i + 1) + ')" class="btn ' + (pagination === i + 1 ?
               'btn-primary' : 'btn-default') + '">' + (i + 1) + '</li>')
-            if (!(i + 1 > pagination - 2 && i + 1 < pagination + 2) || !(i + 1 > list.length - 4)) {
+            if (!(i + 1 > pagination - 2 && i + 1 < pagination + 2) || !(i + 1 > pages - 4)) {
               empty = true
             }
           } else if (empty) {
@@ -429,11 +421,10 @@
             empty = false
           }
         }
-      })
-      if (list.length === 0) {
+      }
+      if (pages === 0) {
         paging.append('<li onclick="viewers.pagination(1)" style="margin:0; padding: 8px 5px;" class="btn btn-primary">1</li>')
       }
-      return list[pagination - 1];
     },
     deleteBitsAndTips: function (button, id) {
       if ($(button).attr('disabled')) return
@@ -452,7 +443,7 @@
             $(`tr[data-viewer-bit-id="${id.replace('tip-','').replace('bit-','')}"]`).popover('hide')
             viewers.updateUserBits($('#viewers_username').text())
             viewers.updateUserTips($('#viewers_username').text())
-            socket.emit('getViewers')
+            viewers.refresh()
           }, 1000)
         }
       })
@@ -497,7 +488,7 @@
             $(`tr[data-viewer-bit-id="${id.replace('tip-','').replace('bit-','')}"]`).popover('hide')
             viewers.updateUserBits(data.username)
             viewers.updateUserTips(data.username)
-            socket.emit('getViewers')
+            viewers.refresh()
           }, 1000)
         }
       })
@@ -535,7 +526,7 @@
         } else {
           viewers.updateUserBits(data.username)
           viewers.updateUserTips(data.username)
-          socket.emit('getViewers')
+          viewers.refresh()
           $(button).toggleClass('btn-info btn-success').text(commons.translate('done'))
           setTimeout(() => {
             $(`#new_${$(button).data('type')}`).popover('hide')
@@ -700,7 +691,7 @@
       ev.preventDefault()
       socket.emit('resetPoints')
       setTimeout(function () {
-        socket.emit('getViewers')
+        viewers.refresh()
       }, 1000)
     })
 
@@ -709,7 +700,7 @@
       ev.preventDefault()
       socket.emit('resetWatchTime')
       setTimeout(function () {
-        socket.emit('getViewers')
+        viewers.refresh()
       }, 1000)
     })
 
@@ -718,7 +709,7 @@
       ev.preventDefault()
       socket.emit('resetMessages')
       setTimeout(function () {
-        socket.emit('getViewers')
+        viewers.refresh()
       }, 1000)
     })
 
@@ -764,15 +755,12 @@
     })
 
 
-    socket.emit('getViewers')
-
-    socket.off('Viewers')
-    socket.on('Viewers', function (list) {
-      viewers.list = JSON.parse(decodeURIComponent(Array.prototype.map.call(atob(list), function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-      }).join('')))
-      viewers.update(viewers.paging())
-    });
+    viewers.socket.emit('users.get', {}, (users) => {
+      viewers.list = users.viewers
+      viewers._total = users._total
+      viewers.paging()
+      viewers.update()
+    })
 
     $('#viewersSearch').attr('placeholder', translations['search-by-username'])
 
