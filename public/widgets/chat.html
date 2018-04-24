@@ -8,8 +8,7 @@
       </li>
       <li role="presentation" class="nav-item">
         <a class="nav-link" href="#chat-viewers-panel" aria-controls="home" role="tab" data-toggle="tab" title="Viewer list">
-          <i class="fas fa-users" aria-hidden="true"> </i>
-          <span id="chat-viewers-count">0</span>
+          <i class="fas fa-users" aria-hidden="true"></i>
         </a>
       </li>
       <li role="presentation" class="nav-item widget-popout">
@@ -55,7 +54,6 @@
 <script>
   socket.on('chatChatters', (data) => {
     $('ul#chat-viewers-data').empty()
-    $('#chat-viewers-count').text(data._total)
 
     let chatters = []
     for (let [type, chatter] of Object.entries(data.chatters)) {
