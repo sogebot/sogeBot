@@ -115,8 +115,6 @@ class API {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
       return
-    } finally {
-      setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
     }
 
     const chatters = _.flatMap(request.body.chatters)
@@ -150,6 +148,8 @@ class API {
         await global.db.engine.insert('users.online', chunk)
       }
     }
+
+    setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
   }
 
   async getChannelSubscribersOldAPI () {
