@@ -92,7 +92,7 @@ class Highlights {
         global.db.engine.update('cache', { 'key': 'highlights.created_at' }, { value: when.online })
         highlight.video_id = video._id
         self.add(self, highlight, timestamp, sender)
-        global.panel.io.emit('api.stats', { data: body, timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: res.status })
+        global.panel.io.emit('api.stats', { data: body, timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: res.status })
       })
     } catch (e) {
       if (e.message !== ERROR_STREAM_NOT_ONLINE) {
