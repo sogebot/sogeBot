@@ -380,8 +380,13 @@ async function cheer (channel, userstate, message) {
   if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
 }
 
+let lastWorker = null
 function sendMessageToWorker (sender, message) {
   let worker = _.sample(cluster.workers)
+
+  if (worker.id === lastWorker && global.cpu > 1) return setTimeout(() => sendMessageToWorker(sender, message), 10) // resend to another worker
+  else lastWorker = worker.id
+
   debug('cluster:master')(`Sending ${message} ${util.inspect(sender)} to worker#${worker.id} - is connected: ${worker.isConnected()}`)
   if (worker.isConnected()) worker.send({ type: 'message', sender: sender, message: message })
   else setTimeout(() => sendMessageToWorker(sender, message), 10) // refresh if worker is disconnected
