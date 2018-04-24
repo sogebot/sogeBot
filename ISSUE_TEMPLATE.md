@@ -1,3 +1,4 @@
+<!-- For feature requests, go to https://ideas.sogehige.tv or https://sogebot.fider.io/ -->
 ### Expected behavior
 
 ### Actual behavior
