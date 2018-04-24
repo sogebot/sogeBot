@@ -9,6 +9,9 @@ const config = require('../config.json')
 const debug = require('debug')('users')
 
 function Users () {
+  this.uiSortCache = null
+  this.uiSortCacheViewers = []
+
   if (cluster.isMaster) {
     this.panel()
     this.compactMessagesDb()
@@ -34,7 +37,6 @@ Users.prototype.panel = function () {
   if (_.isNil(global.panel)) return setTimeout(() => this.panel(), 10)
 
   global.panel.addMenu({category: 'manage', name: 'viewers', id: 'viewers'})
-  global.panel.socketListening(this, 'getViewers', this.getViewers)
   global.panel.socketListening(this, 'deleteViewer', this.deleteViewer)
   global.panel.socketListening(this, 'viewers.toggle', this.toggleIs)
   global.panel.socketListening(this, 'resetMessages', this.resetMessages)
@@ -209,6 +211,128 @@ Users.prototype.sockets = function (self) {
         cb(e.message, null)
       }
     })
+
+    socket.on('users.get', async (opts, cb) => {
+      opts = _.defaults(opts, { page: 1, sortBy: 'username', order: '', filter: null, show: { subscribers: null, followers: null, active: null, regulars: null } })
+      opts.page-- // we are counting index from 0
+
+      const processUser = async (viewer) => {
+        // TIPS
+        let tipsOfViewer = _.filter(tips, (o) => o.username === viewer.username)
+        if (!_.isEmpty(tipsOfViewer)) {
+          let tipsAmount = 0
+          for (let tip of tipsOfViewer) tipsAmount += global.currency.exchange(tip.amount, tip.currency, await global.configuration.getValue('currency'))
+          _.set(viewer, 'stats.tips', tipsAmount)
+        } else {
+          _.set(viewer, 'stats.tips', 0)
+        }
+        _.set(viewer, 'custom.currency', global.currency.symbol(await global.configuration.getValue('currency')))
+
+        // BITS
+        let bitsOfViewer = _.filter(bits, (o) => o.username === viewer.username)
+        if (!_.isEmpty(bitsOfViewer)) {
+          let bitsAmount = 0
+          for (let bit of bitsOfViewer) bitsAmount += parseInt(bit.amount, 10)
+          _.set(viewer, 'stats.bits', bitsAmount)
+        } else {
+          _.set(viewer, 'stats.bits', 0)
+        }
+
+        // ONLINE
+        let isOnline = !_.isEmpty(_.filter(online, (o) => o.username === viewer.username))
+        if (isOnline) _.set(viewer, 'is.online', true)
+        else _.set(viewer, 'is.online', false)
+
+        // POINTS
+        if (!_.isEmpty(_.filter(points, (o) => o.username === viewer.username))) {
+          _.set(viewer, 'points', await global.systems.points.getPointsOf(viewer.username))
+        } else _.set(viewer, 'points', 0)
+
+        // MESSAGES
+        if (!_.isEmpty(_.filter(messages, (o) => o.username === viewer.username))) {
+          _.set(viewer, 'stats.messages', await global.users.getMessagesOf(viewer.username))
+        } else _.set(viewer, 'stats.messages', 0)
+        return viewer
+      }
+
+      const itemsPerPage = 50
+      const batchSize = 10
+
+      let [viewers, tips, bits, online, points, messages] = await Promise.all([
+        global.users.getAll(),
+        global.db.engine.find('users.tips'),
+        global.db.engine.find('users.bits'),
+        global.db.engine.find('users.online'),
+        global.db.engine.find('users.points'),
+        global.db.engine.find('users.messages')
+      ])
+
+      // filter users
+      if (!_.isNil(opts.filter)) viewers = _.filter(viewers, (o) => o.username.toLowerCase().startsWith(opts.filter.toLowerCase().trim()))
+      if (!_.isNil(opts.show.subscribers)) viewers = _.filter(viewers, (o) => _.get(o, 'is.subscriber', false) === opts.show.subscribers)
+      if (!_.isNil(opts.show.followers)) viewers = _.filter(viewers, (o) => _.get(o, 'is.follower', false) === opts.show.followers)
+      if (!_.isNil(opts.show.regulars)) viewers = _.filter(viewers, (o) => _.get(o, 'is.regular', false) === opts.show.regulars)
+      if (!_.isNil(opts.show.active)) viewers = _.filter(viewers, (o) => _.get(o, 'is.online', false) === opts.show.active)
+
+      const _total = _.size(viewers)
+      opts.page = opts.page > viewers.length - 1 ? viewers.length - 1 : opts.page // page should not be out of bounds (if filters etc)
+
+      if (_total === 0) {
+        const response = { viewers: [], _total: _total }
+        cb(response)
+      } else if (['username', 'time.message', 'time.watched', 'time.follow', 'time.subscribed_at', 'stats.tier'].includes(opts.sortBy)) {
+        // we can sort directly in users collection
+        viewers = _.chunk(_.orderBy(viewers, (o) => {
+          // we move null and 0 to last always
+          if (_.get(o, opts.sortBy, 0) === 0) {
+            return opts.order === 'desc' ? Number.MIN_SAFE_INTEGER : Number.MAX_SAFE_INTEGER
+          } else return _.get(o, opts.sortBy, 0)
+        }, opts.order), itemsPerPage)[opts.page]
+
+        let toAwait = []
+        let i = 0
+        for (let viewer of viewers) {
+          if (i > batchSize) {
+            await Promise.all(toAwait)
+            i = 0
+          }
+          i++
+          toAwait.push(processUser(viewer))
+        }
+        await Promise.all(toAwait)
+      } else {
+        // check if this sort is cached
+        const cacheId = `${opts.sortBy}${opts.order}${opts.filter}${JSON.toString(opts.show)}`
+        const isCached = this.uiSortCache === cacheId
+        if (!isCached) this.uiSortCache = cacheId
+        else {
+          // get only needed viewers
+          viewers = _.chunk(_.orderBy(this.uiSortCacheViewers, opts.sortBy, opts.order), itemsPerPage)[opts.page]
+        }
+
+        // we need to fetch all viewers and then sort
+        let toAwait = []
+        let i = 0
+        for (let viewer of viewers) {
+          if (i > batchSize) {
+            await Promise.all(toAwait)
+            i = 0
+          }
+          i++
+          toAwait.push(processUser(viewer))
+        }
+        await Promise.all(toAwait)
+        if (!isCached) {
+          this.uiSortCacheViewers = viewers // save cache data
+          viewers = _.chunk(_.orderBy(viewers, opts.sortBy, opts.order), itemsPerPage)[opts.page]
+        }
+      }
+      const response = {
+        viewers: viewers,
+        _total: _total
+      }
+      cb(response)
+    })
   })
 }
 
@@ -259,50 +383,8 @@ Users.prototype.resetWatchTime = function (self, socket, data) {
   self.setAll({time: {watched: 0}})
 }
 
-Users.prototype.getViewers = async function (self, socket) {
-  let [viewers, tips, bits, online] = await Promise.all([
-    global.users.getAll(),
-    global.db.engine.find('users.tips'),
-    global.db.engine.find('users.bits'),
-    global.db.engine.find('users.online')
-  ])
-  for (let viewer of viewers) {
-    // TIPS
-    let tipsOfViewer = _.filter(tips, (o) => o.username === viewer.username)
-    if (!_.isEmpty(tipsOfViewer)) {
-      let tipsAmount = 0
-      for (let tip of tipsOfViewer) tipsAmount += global.currency.exchange(tip.amount, tip.currency, await global.configuration.getValue('currency'))
-      _.set(viewer, 'stats.tips', tipsAmount)
-    } else {
-      _.set(viewer, 'stats.tips', 0)
-    }
-    _.set(viewer, 'custom.currency', global.currency.symbol(await global.configuration.getValue('currency')))
-
-    // BITS
-    let bitsOfViewer = _.filter(bits, (o) => o.username === viewer.username)
-    if (!_.isEmpty(bitsOfViewer)) {
-      let bitsAmount = 0
-      for (let bit of bitsOfViewer) bitsAmount += parseInt(bit.amount, 10)
-      _.set(viewer, 'stats.bits', bitsAmount)
-    } else {
-      _.set(viewer, 'stats.bits', 0)
-    }
-
-    // ONLINE
-    let isOnline = !_.isEmpty(_.filter(online, (o) => o.username === viewer.username))
-    if (isOnline) _.set(viewer, 'is.online', true)
-    else _.set(viewer, 'is.online', false)
-
-    // POINTS
-    _.set(viewer, 'points', await global.systems.points.getPointsOf(viewer.username))
-    _.set(viewer, 'stats.messages', await global.users.getMessagesOf(viewer.username))
-  }
-  socket.emit('Viewers', Buffer.from(JSON.stringify(viewers), 'utf8').toString('base64'))
-}
-
 Users.prototype.deleteViewer = function (self, socket, username) {
   global.users.delete(username)
-  self.getViewers(self, socket)
 }
 
 /*
