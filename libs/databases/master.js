@@ -83,7 +83,7 @@ class IMasterController extends Interface {
           dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
-        } else setTimeout(() => returnData(resolve, reject, id), 1)
+        } else setTimeout(() => returnData(resolve, reject, id), 100)
       }
       sendRequest(resolve, reject, id)
     })
@@ -121,7 +121,7 @@ class IMasterController extends Interface {
           dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
-        } else setTimeout(() => returnData(resolve, reject, id), 1)
+        } else setTimeout(() => returnData(resolve, reject, id), 100)
       }
       sendRequest(resolve, reject, id)
     })
@@ -159,7 +159,7 @@ class IMasterController extends Interface {
           dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
-        } else setTimeout(() => returnData(resolve, reject, id), 1)
+        } else setTimeout(() => returnData(resolve, reject, id), 100)
       }
       sendRequest(resolve, reject, id)
     })
@@ -197,7 +197,7 @@ class IMasterController extends Interface {
           dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
-        } else setTimeout(() => returnData(resolve, reject, id), 1)
+        } else setTimeout(() => returnData(resolve, reject, id), 100)
       }
       sendRequest(resolve, reject, id)
     })
@@ -235,7 +235,7 @@ class IMasterController extends Interface {
           dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
-        } else setTimeout(() => returnData(resolve, reject, id), 1)
+        } else setTimeout(() => returnData(resolve, reject, id), 100)
       }
       sendRequest(resolve, reject, id)
     })
@@ -273,7 +273,7 @@ class IMasterController extends Interface {
           dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
-        } else setTimeout(() => returnData(resolve, reject, id), 1)
+        } else setTimeout(() => returnData(resolve, reject, id), 100)
       }
       sendRequest(resolve, reject, id)
     })
@@ -311,7 +311,7 @@ class IMasterController extends Interface {
           dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
-        } else setTimeout(() => returnData(resolve, reject, id), 1)
+        } else setTimeout(() => returnData(resolve, reject, id), 100)
       }
       sendRequest(resolve, reject, id)
     })
