@@ -114,7 +114,7 @@ class API {
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
-      return
+      return setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
     }
 
     const chatters = _.flatMap(request.body.chatters)
