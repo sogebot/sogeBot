@@ -133,7 +133,7 @@ class API {
         global.widgets.joinpart.send({ username: user, type: 'part' })
       }
     }
-    if (opts.saveToWidget) sendPartEvent(bulkParted)
+    if (opts.saveToWidget) await sendPartEvent(bulkParted)
 
     for (let chatter of chatters) {
       if (!_.includes(allOnlineUsers, chatter) && !_.includes(ignoredUsers, chatter)) {
@@ -141,7 +141,7 @@ class API {
         global.widgets.joinpart.send({ username: chatter, type: 'join' })
       }
     }
-    if (opts.saveToWidget) sendJoinEvent(bulkInsert)
+    if (opts.saveToWidget) await sendJoinEvent(bulkInsert)
 
     if (bulkInsert.length > 0) {
       for (let chunk of _.chunk(bulkInsert, 100)) {
