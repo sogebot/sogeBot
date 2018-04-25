@@ -99,7 +99,7 @@
     },
     updateBet: function (bet) {
       var $el = $("#bets-running")
-      if (_.isNull(bet)) {
+      if (_.isEmpty(bet)) {
         $el.empty()
         $('a[href="#bets-running"]').css('display', 'none')
         $('a[href="#bets-templates"]').tab('show')
@@ -110,11 +110,11 @@
         bets.end = bet.end
         $el.append('<div class="text-center">')
         var btns = []
-        btns.push('<div class="btn-group btn-group-justified" role="group">')
+        btns.push('<div class="d-flex" role="group">')
         _.each(bet.bets, function (value, index) {
-          btns.push('<div class="btn-group" role="group"><button onclick="bets.close(this)" data-option="' + index + '" type="button" class="btn btn-default">' + index + '</button></div>')
+          btns.push('<button onclick="bets.close(this)" data-option="' + index + '" type="button" class="btn btn-default w-100">' + index + '</button>')
         })
-        btns.push('<div class="btn-group" role="group"><button onclick="bets.close(this)" data-option="refund" type="button" class="btn btn-danger" data-lang="refund"></button></div>')
+        btns.push('<button onclick="bets.close(this)" data-option="refund" type="button" class="btn btn-danger" data-lang="refund"></button>')
         btns.push('</div>')
         $el.append(btns.join(''))
         $el.append('</div>')

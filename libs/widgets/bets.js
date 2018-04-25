@@ -16,11 +16,8 @@ function BetsWidget () {
 
   var self = this
   setInterval(function () {
-    if (global.systems.bets.modifiedTime !== self.cachedTime) {
-      self.getRunningBet(self, global.panel.io)
-      self.getBetsTemplates(self, global.panel.io)
-      self.cachedTime = global.systems.bets.modifiedTime
-    }
+    self.getRunningBet(self, global.panel.io)
+    self.getBetsTemplates(self, global.panel.io)
   }, 1000)
 }
 
