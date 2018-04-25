@@ -933,6 +933,7 @@
       "running": "$sender, sazky jsou jiz otevreny! Pouzij !bet close [$options]",
       "notRunning": "Zadne sazky nejsou otevreny, pozadej moda o otevreni!",
       "opened": "Sazky otevreny! Pouzij !bet [$options] [points] a vyhraj! Zbyva pouze $minutesmin pro vsazeni!",
+      "closeNotEnoughOptions": "$sender, pro zavreni sazky musis vybrat viteznou moznost.",
       "notEnoughOptions": "$sender, nove sazky musi mit alespon dve moznosti!",
       "info": "Sazky otevreny! Pouzij !bet [$options] [points] a vyhraj! $timemin zbyva pro vsazeni!",
       "parseError": "{core.command-parse} !bet a zjisti jak na to",

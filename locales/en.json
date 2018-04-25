@@ -927,6 +927,7 @@
       "running": "$sender, bet is already opened! Use !bet close [$options]",
       "notRunning": "No bet is currently opened, ask mods to open it!",
       "opened": "New bet is opened! Use !bet [$options] [points] to win! You have only $minutesmin to bet!",
+      "closeNotEnoughOptions": "$sender, you need to select winning option for bet close.",
       "notEnoughOptions": "$sender, new bets needs at least 2 options!",
       "info": "Bets are opened! Use !bet [$options] [points] to win! $timemin left to bet!",
       "parseError": "{core.command-parse} !bet to check usage",

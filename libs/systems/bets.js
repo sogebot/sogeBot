@@ -23,7 +23,7 @@ const ERROR_NOT_OPTION = '7'
  * !bet [option] [amount]               - bet [amount] of points on [option]
  * !bet open [option option option ...] - open a new bet with selected options
  * !bet close [option]                  - close a bet and select option as winner
- * !bet close refundall                 - close a bet and refund all participants
+ * !bet refund                          - close a bet and refund all participants
  * !set betPercentGain [0-100]          - sets amount of gain per option
  * !set betCloseTimer [minutes]         - amount of minutes when you can bet
  */
@@ -254,7 +254,7 @@ class Bets {
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
-          global.commons.sendMessage(global.translate('bets.notEnoughOptions'), sender)
+          global.commons.sendMessage(global.translate('bets.closeNotEnoughOptions'), sender)
           break
         case ERROR_NOT_RUNNING:
           global.commons.sendMessage(global.translate('bets.notRunning'), sender)
