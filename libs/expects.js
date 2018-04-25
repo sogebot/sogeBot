@@ -37,16 +37,93 @@ class Expects {
     return this
   }
 
-  points () {
+  points (opts) {
+    _.defaults(opts, { optional: false })
     this.checkText()
 
     const regexp = XRegExp(`(?<points> all|[0-9]* )`, 'ix')
     const match = XRegExp.exec(this.text, regexp)
 
     if (!_.isNil(match)) {
-      this.match.push(match.points)
+      this.match.push(parseInt(match.points, 10))
       this.text = this.text.replace(match.points, '') // remove from text matched pattern
-    } else throw Error(`Points not found`)
+    } else {
+      if (!opts.optional) throw Error(`Points not found`)
+      else this.match.push(null)
+    }
+    return this
+  }
+
+  number (opts) {
+    _.defaults(opts, { optional: false })
+    this.checkText()
+
+    const regexp = XRegExp(`(?<number> [0-9]* )`, 'ix')
+    const match = XRegExp.exec(this.text, regexp)
+
+    if (!_.isNil(match)) {
+      this.match.push(parseInt(match.number, 10))
+      this.text = this.text.replace(match.number, '') // remove from text matched pattern
+    } else {
+      if (!opts.optional) throw Error(`Number not found`)
+      else this.match.push(null)
+    }
+    return this
+  }
+
+  argument (opts) {
+    _.defaults(opts, { optional: false, default: null, multi: false, delimiter: '"' })
+    opts.delimiter = XRegExp.escape(opts.delimiter)
+    if (!opts.multi) opts.delimiter = ''
+
+    if (_.isNil(opts.name)) throw Error(`Argument name must be defined`)
+    this.checkText()
+
+    const regexp = XRegExp(`-${opts.name}\\s${opts.delimiter}(?<${opts.name}> ${opts.multi ? '.*' : '[\\w\\d]*'})${opts.delimiter}`, 'ix')
+    const match = XRegExp.exec(this.text, regexp)
+
+    if (!_.isNil(match)) {
+      this.match.push(match[opts.name])
+      this.text = this.text.replace(`-${opts.name} ${opts.delimiter}${match[opts.name]}${opts.delimiter}`, '') // remove from text matched pattern
+    } else {
+      if (!opts.optional) throw Error(`Argument not found`)
+      else this.match.push(opts.default)
+    }
+    return this
+  }
+
+  string (opts) {
+    _.defaults(opts, { optional: false, delimiter: '\\s' })
+    opts.delimiter = XRegExp.escape(opts.delimiter)
+    this.checkText()
+
+    const regexp = XRegExp(`(?<string> ${opts.delimiter}.*${opts.delimiter} )`, 'ix')
+    const match = XRegExp.exec(this.text, regexp)
+
+    if (!_.isNil(match)) {
+      this.match.push(match.string.substring(1, match.string.length - 1))
+      this.text = this.text.replace(match.string, '') // remove from text matched pattern
+    } else {
+      if (!opts.optional) throw Error(`String not found`)
+      else this.match.push(null)
+    }
+    return this
+  }
+
+  list (opts) {
+    _.defaults(opts, { optional: false, delimiter: ' ' })
+    this.checkText()
+
+    const regexp = XRegExp(`(?<list> .*)`, 'ix')
+    const match = XRegExp.exec(this.text, regexp)
+
+    if (!_.isNil(match)) {
+      this.match.push(match.list.split(opts.delimiter).map((o) => o.trim()))
+      this.text = this.text.replace(match.list, '') // remove from text matched pattern
+    } else {
+      if (!opts.optional) throw Error(`List not found`)
+      else this.match.push([])
+    }
     return this
   }
 }

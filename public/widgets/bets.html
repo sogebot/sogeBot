@@ -2,13 +2,9 @@
   <div class="card-header">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
-        <a class="nav-link active" href="#bets-templates" aria-controls="home" role="tab" data-toggle="tab" title="Betting templates">
-          <i class="fas fa-copy" aria-hidden="true"></i>
-        </a>
-      </li>
-      <li role="presentation" class="nav-item">
-        <a class="nav-link" href="#bets-running" aria-controls="home" role="tab" data-toggle="tab" title="Betting" style="display:none">
-          <i class="fas fa-money" aria-hidden="true"></i>
+        <a class="nav-link active" href="#bets-running" aria-controls="home" role="tab" data-toggle="tab" title="Betting">
+          <span id="betTitle"></span>
+          <i class="far fa-clock"></i>
           <span id="betEndTimer"></span>
         </a>
       </li>
@@ -26,22 +22,11 @@
   <!-- Tab panes -->
   <div class="card-body">
     <div class="tab-content">
-      <div role="tabpanel" class="tab-pane active" id="bets-templates">
-      </div> <!-- /BETS-TEMPLATES -->
-
-      <div role="tabpanel" class="tab-pane" id="bets-running">
+      <div role="tabpanel" class="tab-pane active" id="bets-running">
+        <canvas id="bets-container" class="p-2"></canvas>
       </div> <!-- /BETS -->
 
       <div role="tabpanel" class="tab-pane" id="bets-settings">
-        <div class="input-group">
-          <div class="input-group-prepend">
-              <span class="input-group-text" data-lang="close-bet-after"></span>
-          </div>
-          <input type="text" class="form-control" id="bets-close-after">
-          <div class="input-group-append">
-              <span class="input-group-text" data-lang="minutes"></span>
-          </div>
-        </div>
         <div class="input-group">
           <div class="input-group-prepend">
               <span class="input-group-text" data-lang="gain-every-option"></span>
@@ -59,112 +44,111 @@
 </div>
 
 <script>
+  const betsSocket = io('/widgets/bets', {query: "token="+token})
+  let selected = null
+
+  var customTooltips = function(tooltip) {
+    $(this._chart.canvas).css('cursor', 'pointer');
+
+    if (!_.isNil(tooltip.dataPoints) && tooltip.dataPoints.length > 0) {
+      tooltip.dataPoints.forEach(function(dataPoint) {
+        selected = dataPoint.xLabel.startsWith(translations['refund']) ? 'refund' : dataPoint.index
+      })
+    }
+  }
+
   var bets = {
     end: 0,
     updateTimer: function () {
       // update timer
       var timeLeft = bets.end - new Date().getTime()
       if (timeLeft < 0) {
-        $("#betEndTimer").html('CLOSED')
-        clearInterval(bets.interval)
+        $("#betEndTimer").html('--:--')
       } else {
         var date = new Date(timeLeft)
         var minutes = "0" + date.getMinutes();
         var seconds = "0" + date.getSeconds();
         $("#betEndTimer").text(minutes.substr(-2) + ':' + seconds.substr(-2))
+        setTimeout(() => bets.updateTimer(), 1000)
       }
     },
-    updateTemplates: function (list) {
-      $("#bets-templates").empty()
-      _.each(list, function (template) {
-        var options = template.values
-        var option_labels = ''
-        _.each(options, function (option) {
-          option_labels = option_labels + '<button type="button" class="btn btn-default btn-label" disabled="disabled">' + option + '</button>'
-        })
+    updateBet: function (_current, _bets) {
+      let cIndex = 0
+      let oIndex = 0
 
-        $("#bets-templates").append(
-          '<div class="btn-group" role="group" style="width: 100%">' +
-            '<div class="btn-group" role="group"> ' + option_labels + ' </div>' +
-              '<div class="btn-group" role="group" style="float: right">' +
-                '<button type="button" class="btn btn-default" onclick="bets.reuse(this)" data-options="' + options.join(' | ') + '" data-lang="reuse-bet"></button>' +
-                '<button type="button" onclick="commons.confirm(this)" class="btn btn-danger btn-remove"><span class="fas fa-trash"></span></button>' +
-                '<button type="button" style="display: none" class="btn btn-success btn-confirm" onclick="bets.remove(this)" data-id="' + template._id + '"><span class="fas fa-check"></span></button>' +
-                '<button type="button" style="display: none" class="btn btn-danger btn-confirm" onclick="commons.unconfirm(this)"><span class="fas fa-remove"></span></button>' +
-              '</div>' +
-          '</div>'
-          )
-        commons.translate()
+      const _total = _bets.length
+
+      var ctx = document.getElementById("bets-container").getContext('2d');
+      if (!_.isNil(_current) && !_.isEmpty(_current)) {
+        bets.end = _current.end
+        $('#betTitle').text(_current.title)
+
+        let labels = []
+        let dataset = []
+        for (let option of _current.options) {
+          let percentage = 0
+          if (_total !== 0) percentage = _.filter(_bets, (o) => o.option === oIndex).length / (_total / 100)
+          labels.push(option.name)
+          dataset.push(percentage)
+          oIndex++
+        }
+
+        labels.push('refund')
+        dataset.push(0)
+
+        var myChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: labels,
+              datasets: [{
+                  data: dataset,
+                  borderWidth: 1,
+                  backgroundColor: [
+                    'blue', 'red', 'orange', 'green', 'purple', 'yellow', 'pink', 'cyan'
+                  ]
+              }]
+          },
+          options: {
+              onClick: () => {
+                if (!_.isNil(selected)) betsSocket.emit('close', selected)
+                selected = null
+              },
+              maintainAspectRatio: false,
+              legend: {
+                display: false
+              },
+              tooltips: {
+                enabled: true,
+                mode: 'index',
+                intersect: false,
+                custom: customTooltips
+              },
+              scales: {
+                  yAxes: [{
+                      ticks: {
+                          beginAtZero:true,
+                          min: 0,
+                          max: 100,
+                          stepSize: 25
+                      }
+                  }]
+              }
+          }
       })
-    },
-    updateBet: function (bet) {
-      var $el = $("#bets-running")
-      if (_.isEmpty(bet)) {
-        $el.empty()
-        $('a[href="#bets-running"]').css('display', 'none')
-        $('a[href="#bets-templates"]').tab('show')
-      } else {
-        $el.empty()
-        $('a[href="#bets-running"]').css('display', 'block')
-        $('a[href="#bets-running"]').tab('show')
-        bets.end = bet.end
-        $el.append('<div class="text-center">')
-        var btns = []
-        btns.push('<div class="d-flex" role="group">')
-        _.each(bet.bets, function (value, index) {
-          btns.push('<button onclick="bets.close(this)" data-option="' + index + '" type="button" class="btn btn-default w-100">' + index + '</button>')
-        })
-        btns.push('<button onclick="bets.close(this)" data-option="refund" type="button" class="btn btn-danger" data-lang="refund"></button>')
-        btns.push('</div>')
-        $el.append(btns.join(''))
-        $el.append('</div>')
-
         bets.updateTimer()
-        bets.interval = setInterval(function () { bets.updateTimer() }, 1000)
         commons.translate()
+      } else {
+        bets.end = new Date().getTime()
+        $('#betTitle').text('---')
+        $("#bets-running").empty().append(`<canvas id="bets-container" class="p-2"></canvas>`)
       }
-    },
-    close: function (el) {
-      socket.emit('closeBet', el.dataset.option)
-      $("#betEndTimer").empty()
-      $('a[href="#bets-running"]').css('display', 'none')
-      $('a[href="#bets-templates"]').tab('show')
-      clearInterval(bets.interval)
-    },
-    reuse: function (el) {
-      socket.emit('reuseBet', el.dataset.options.split(' | '))
-      $('a[href="#bets-running"]').css('display', 'block')
-      $('a[href="#bets-running"]').tab('show')
-    },
-    remove: function (el) {
-      socket.emit('removeBetTemplate', el.dataset.id)
-    },
-    interval: null
+    }
   }
 
-  socket.emit('getBetsTemplates');
-  socket.emit('getRunningBet');
+  setInterval(() => betsSocket.emit('data', (_current, _bets) => bets.updateBet(_current, _bets)), 1000)
 
-  socket.off('betsTemplates')
-  socket.on('betsTemplates', function (list) { bets.updateTemplates(list) })
-
-  socket.off('runningBet')
-  socket.on('runningBet', function (bet) { bets.updateBet(bet) })
-
-  socket.emit('getBetsConfiguration')
-  socket.off('betsConfiguration')
-  socket.on('betsConfiguration', function(data) {
-    $("#bets-close-after").val(data.betCloseTimer)
+  betsSocket.emit('config', (data) => {
     $("#bets-percent-gain").val(data.betPercentGain)
-  })
-
-  var $betCloseTimerInput = $('#bets-close-after')
-  $betCloseTimerInput.off()
-  $betCloseTimerInput.on('focusout', function() {
-    var value = $betCloseTimerInput.val()
-    var data = {}
-    data['betCloseTimer'] = value
-    socket.emit('saveConfiguration', data)
   })
 
   var $betPercentGainInput = $('#bets-percent-gain')
@@ -173,6 +157,6 @@
     var value = $betPercentGainInput.val()
     var data = {}
     data['betPercentGain'] = value
-    socket.emit('saveConfiguration', data)
+    betsSocket.emit('saveConfiguration', data)
   })
 </script>
