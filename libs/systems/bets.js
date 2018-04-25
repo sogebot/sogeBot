@@ -97,7 +97,7 @@ class Bets {
     let currentBet = await global.db.engine.findOne('cache', { key: 'bets' })
     try {
       var parsed = text.match(/([\S]+)/g)
-      if (parsed.length < 2) { throw new Error(ERROR_NOT_ENOUGH_OPTIONS) }
+      if (_.isNil(parsed) || parsed.length < 2) { throw new Error(ERROR_NOT_ENOUGH_OPTIONS) }
       if (!_.isEmpty(currentBet)) { throw new Error(ERROR_ALREADY_OPENED) }
 
       let bet = {locked: false, bets: {}}
