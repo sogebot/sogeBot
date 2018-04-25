@@ -923,16 +923,14 @@
     "raffle-winner-is": "Winner of raffle $keyword is $username! Win probability was $probability%!"
   },
   "bets": {
-      "newBet": "$sender, your current bet is $amount $pointsName on $option. You can win $winAmount $winPointsName!",
-      "running": "$sender, bet is already opened! Use !bet close [$options]",
+      "running": "$sender, bet is already opened! Use !bet close 0-$maxIndex",
       "notRunning": "No bet is currently opened, ask mods to open it!",
-      "opened": "New bet is opened! Use !bet [$options] [points] to win! You have only $minutesmin to bet!",
+      "opened": "New bet '$title' is opened! Use !bet 0-$maxIndex [points] to win! You have only $minutesmin to bet!",
       "closeNotEnoughOptions": "$sender, you need to select winning option for bet close.",
       "notEnoughOptions": "$sender, new bets needs at least 2 options!",
-      "info": "Bets are opened! Use !bet [$options] [points] to win! $timemin left to bet!",
+      "info": "Bet '$title' is still opened! Use !bet 0-$maxIndex [points] to win! You have only $minutesmin to bet!",
       "parseError": "{core.command-parse} !bet to check usage",
       "diffBet": "$sender, you already made a bet on $option and you cannot bet to different option!",
-      "notEnoughPoints": "Sorry, $sender, but you dont have $points $pointsName to bet!",
       "undefinedBet": "Sorry, $sender, but this bet option doesn't exist, use !bet to check usage",
       "betPercentGain": "Bet percent gain per option was set to $value%",
       "betCloseTimer": "Bets will be automatically closed after $valuemin",
@@ -942,7 +940,7 @@
       "timeUpBet": "I guess you are too late, $sender, your time for betting is up!",
       "locked": "Betting time is up! No more bets.",
       "zeroBet": "Oh boy, $sender, you cannot bet 0 $pointsName",
-      "lockedInfo": "Bets are opened, but time for betting is up!",
+      "lockedInfo": "Bet '$title' is still opened, but time for betting is up!",
       "removed": "Betting time is up! No bets were sent -> automatically closing"
   },
   "alias": {
