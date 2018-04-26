@@ -65,7 +65,7 @@ class IMasterController extends Interface {
           debug('db:master:request:id')(id)
           returnData(resolve, reject, id)
         } catch (e) {
-          setTimeout(() => sendRequest(resolve, reject, id), 1)
+          setTimeout(() => sendRequest(resolve, reject, id), 10)
         }
       }
       let returnData = (resolve, reject, id) => {
@@ -86,7 +86,7 @@ class IMasterController extends Interface {
           dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
-        } else setTimeout(() => returnData(resolve, reject, id), 100)
+        } else setTimeout(() => returnData(resolve, reject, id), 10)
       }
       sendRequest(resolve, reject, id)
     })
@@ -105,7 +105,7 @@ class IMasterController extends Interface {
           debug('db:master:request:id')(id)
           returnData(resolve, reject, id)
         } catch (e) {
-          setTimeout(() => sendRequest(resolve, reject, id), 1)
+          setTimeout(() => sendRequest(resolve, reject, id), 10)
         }
       }
       let returnData = (resolve, reject, id) => {
@@ -126,7 +126,7 @@ class IMasterController extends Interface {
           dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
-        } else setTimeout(() => returnData(resolve, reject, id), 100)
+        } else setTimeout(() => returnData(resolve, reject, id), 10)
       }
       sendRequest(resolve, reject, id)
     })
@@ -145,7 +145,7 @@ class IMasterController extends Interface {
           debug('db:master:request:id')(id)
           returnData(resolve, reject, id)
         } catch (e) {
-          setTimeout(() => sendRequest(resolve, reject, id), 1)
+          setTimeout(() => sendRequest(resolve, reject, id), 10)
         }
       }
       let returnData = (resolve, reject, id) => {
@@ -166,7 +166,7 @@ class IMasterController extends Interface {
           dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
-        } else setTimeout(() => returnData(resolve, reject, id), 100)
+        } else setTimeout(() => returnData(resolve, reject, id), 10)
       }
       sendRequest(resolve, reject, id)
     })
@@ -185,7 +185,7 @@ class IMasterController extends Interface {
           debug('db:master:request:id')(id)
           returnData(resolve, reject, id)
         } catch (e) {
-          setTimeout(() => sendRequest(resolve, reject, id), 1)
+          setTimeout(() => sendRequest(resolve, reject, id), 10)
         }
       }
       let returnData = (resolve, reject, id) => {
@@ -206,7 +206,7 @@ class IMasterController extends Interface {
           dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
-        } else setTimeout(() => returnData(resolve, reject, id), 100)
+        } else setTimeout(() => returnData(resolve, reject, id), 10)
       }
       sendRequest(resolve, reject, id)
     })
@@ -225,7 +225,7 @@ class IMasterController extends Interface {
           debug('db:master:request:id')(id)
           returnData(resolve, reject, id)
         } catch (e) {
-          setTimeout(() => sendRequest(resolve, reject, id), 1)
+          setTimeout(() => sendRequest(resolve, reject, id), 10)
         }
       }
       let returnData = (resolve, reject, id) => {
@@ -246,7 +246,7 @@ class IMasterController extends Interface {
           dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
-        } else setTimeout(() => returnData(resolve, reject, id), 100)
+        } else setTimeout(() => returnData(resolve, reject, id), 10)
       }
       sendRequest(resolve, reject, id)
     })
@@ -265,7 +265,7 @@ class IMasterController extends Interface {
           debug('db:master:request:id')(id)
           returnData(resolve, reject, id)
         } catch (e) {
-          setTimeout(() => sendRequest(resolve, reject, id), 1)
+          setTimeout(() => sendRequest(resolve, reject, id), 10)
         }
       }
       let returnData = (resolve, reject, id) => {
@@ -286,7 +286,7 @@ class IMasterController extends Interface {
           dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
-        } else setTimeout(() => returnData(resolve, reject, id), 100)
+        } else setTimeout(() => returnData(resolve, reject, id), 10)
       }
       sendRequest(resolve, reject, id)
     })
@@ -305,7 +305,7 @@ class IMasterController extends Interface {
           debug('db:master:request:id')(id)
           returnData(resolve, reject, id)
         } catch (e) {
-          setTimeout(() => sendRequest(resolve, reject, id), 1)
+          setTimeout(() => sendRequest(resolve, reject, id), 10)
         }
       }
       let returnData = (resolve, reject, id) => {
@@ -326,7 +326,7 @@ class IMasterController extends Interface {
           dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
-        } else setTimeout(() => returnData(resolve, reject, id), 100)
+        } else setTimeout(() => returnData(resolve, reject, id), 10)
       }
       sendRequest(resolve, reject, id)
     })
