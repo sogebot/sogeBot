@@ -116,30 +116,13 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
     if ((!_.isNil(attr.quiet) && attr.quiet)) return true
     if (sender['message-type'] === 'whisper') {
       global.log.whisperOut(message, {username: sender.username})
-      if (cluster.isWorker) process.send({type: 'whisper', sender: sender.username, message: message})
-      else global.commons.message('whisper', sender.username, message)
+      global.commons.message('whisper', sender.username, message)
     } else {
       global.log.chatOut(message, {username: sender.username})
       if (await global.configuration.getValue('sendWithMe')) {
-        if (cluster.isWorker) process.send({type: 'action', sender: sender.username, message: message})
-        else {
-          try {
-            global.commons.message('action', config.settings.broadcaster_username, message)
-          } catch (e) {
-            // retry if somehow failed
-            setTimeout(() => this.sendMessage(message, sender, attr), 1000)
-          }
-        }
+        global.commons.message('action', config.settings.broadcaster_username, message)
       } else {
-        if (cluster.isWorker) process.send({type: 'say', sender: sender.username, message: message})
-        else {
-          try {
-            global.commons.message('say', config.settings.broadcaster_username, message)
-          } catch (e) {
-            // retry if somehow failed
-            setTimeout(() => this.sendMessage(message, sender, attr), 1000)
-          }
-        }
+        global.commons.message('say', config.settings.broadcaster_username, message)
       }
     }
   }
@@ -147,10 +130,13 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
 }
 
 Commons.prototype.message = function (type, username, message) {
-  try {
-    global.client[type](username, message)
-  } catch (e) {
-    setTimeout(() => this.message(type, username, message), 10)
+  if (cluster.isWorker) process.send({type: type, sender: username, message: message})
+  else {
+    try {
+      global.client[type](username, message)
+    } catch (e) {
+      setTimeout(() => this.message(type, username, message), 10)
+    }
   }
 }
 
