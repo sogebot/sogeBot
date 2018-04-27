@@ -37,14 +37,24 @@ class API {
       this.getChannelSubscribersOldAPI() // remove this after twitch add total subscribers
       this.getChannelDataOldAPI() // remove this after twitch game and status for new API
 
-      setInterval(async () => {
-        // we are in bounds of safe rate limit, wait until limit is refreshed
-        if (this.rate_limit_follower_check.length > 0 && !_.isNil(global.overlays)) {
-          this.rate_limit_follower_check = _.uniq(this.rate_limit_follower_check)
-          this.isFollowerUpdate(this.rate_limit_follower_check.shift())
-        }
-      }, 500) // run follower ONE request every .5 second
+      this.intervalFollowerUpdate()
     }
+  }
+
+  async intervalFollowerUpdate () {
+    // we are in bounds of safe rate limit, wait until limit is refreshed
+    _.remove(this.rate_limit_follower_check, (o) => {
+      const isSkipped = o.username === config.settings.broadcaster_username || o.username === config.settings.bot_username.toLowerCase()
+      const userHaveId = !_.isNil(o.id)
+      return isSkipped || !userHaveId
+    })
+
+    if (this.rate_limit_follower_check.length > 0 && !_.isNil(global.overlays)) {
+      this.rate_limit_follower_check = _.uniq(this.rate_limit_follower_check)
+      await this.isFollowerUpdate(this.rate_limit_follower_check.shift())
+    }
+
+    setTimeout(() => this.intervalFollowerUpdate(), 500)
   }
 
   async _loadCachedStatusAndGame () {
@@ -756,15 +766,11 @@ class API {
     const cid = await global.cache.channelId()
     const url = `https://api.twitch.tv/helix/users/follows?from_id=${user.id}&to_id=${cid}`
 
-    const userHaveId = !_.isNil(user.id)
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
-    const isSkipped = user.username === config.settings.broadcaster_username || user.username === config.settings.bot_username.toLowerCase()
-    debug('api:isFollowerUpdate')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}\nskipped: ${isSkipped}\nhave ID: ${userHaveId}`)
-    if (needToWait || notEnoughAPICalls || !userHaveId || isSkipped) {
+    debug('api:isFollowerUpdate')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
+    if (needToWait || notEnoughAPICalls) {
       if (notEnoughAPICalls) debug('api:isFollowerUpdate')('Waiting for rate-limit to refresh')
-      if (!userHaveId) return
-      if (isSkipped) return debug('api:isFollowerUpdate')('IsFollowerUpdate SKIP for user %s', user.username)
       setTimeout(() => this.isFollowerUpdate(user), 1000)
       return
     }
