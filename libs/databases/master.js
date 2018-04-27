@@ -16,8 +16,7 @@ class IMasterController extends Interface {
       this.data.push({
         id: message.id,
         items: message.items,
-        timestamp: _.now(),
-        finished: false
+        timestamp: _.now()
       })
     })
 
@@ -25,22 +24,6 @@ class IMasterController extends Interface {
     this.data = []
 
     this.connect()
-    this.cleanup()
-  }
-
-  cleanup () {
-    try {
-      const size = this.data.length
-      _.remove(this.data, (o) => o.finished)
-      for (let item of this.data) {
-        if (_.now() - item.timestamp > 5000) _.remove(this.data, (o) => o.id === item.id)
-      }
-      debug('db:master:cleanup')('Cleaned up ' + (size - this.data.length))
-    } catch (e) {
-      global.log.error(e.stack)
-    } finally {
-      setTimeout(() => this.cleanup(), 1000)
-    }
   }
 
   async connect () {
@@ -57,8 +40,6 @@ class IMasterController extends Interface {
     const data = { type: 'db', fnc: 'find', table: table, where: where, id: id }
 
     return new Promise((resolve, reject) => {
-      const start = _.now()
-      let retries = 1
       let sendRequest = (resolve, reject, id) => {
         try {
           _.sample(cluster.workers).send(data)
@@ -69,21 +50,9 @@ class IMasterController extends Interface {
         }
       }
       let returnData = (resolve, reject, id) => {
-        if ((_.now() - start > 4000 * retries && retries < 5)) {
-          _.sample(cluster.workers).send(data) // retry
-          debug('db:master:request:id')(id)
-          debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
-          retries++
-        } else if (_.now() - start > 30000) {
-          debug('db:master:retry')('DB operation failed - ' + util.inspect(data))
-          resolve([])
-        }
-
         let dataFromWorker = _.find(this.data, (o) => o.id === id)
         if (!_.isNil(dataFromWorker)) {
-          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(dataFromWorker))
           const items = dataFromWorker.items
-          dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 10)
@@ -97,8 +66,6 @@ class IMasterController extends Interface {
     const data = { type: 'db', fnc: 'findOne', table: table, where: where, id: id }
 
     return new Promise((resolve, reject) => {
-      const start = _.now()
-      let retries = 1
       let sendRequest = (resolve, reject, id) => {
         try {
           _.sample(cluster.workers).send(data)
@@ -109,21 +76,9 @@ class IMasterController extends Interface {
         }
       }
       let returnData = (resolve, reject, id) => {
-        if ((_.now() - start > 4000 * retries && retries < 5)) {
-          _.sample(cluster.workers).send(data) // retry
-          debug('db:master:request:id')(id)
-          debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
-          retries++
-        } else if (_.now() - start > 30000) {
-          debug('db:master:retry')('DB operation failed - ' + util.inspect(data))
-          resolve([])
-        }
-
         let dataFromWorker = _.find(this.data, (o) => o.id === id)
         if (!_.isNil(dataFromWorker)) {
-          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(dataFromWorker))
           const items = dataFromWorker.items
-          dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 10)
@@ -137,8 +92,6 @@ class IMasterController extends Interface {
     const data = { type: 'db', fnc: 'insert', table: table, object: object, id: id }
 
     return new Promise((resolve, reject) => {
-      const start = _.now()
-      let retries = 1
       let sendRequest = (resolve, reject, id) => {
         try {
           _.sample(cluster.workers).send(data)
@@ -149,21 +102,9 @@ class IMasterController extends Interface {
         }
       }
       let returnData = (resolve, reject, id) => {
-        if ((_.now() - start > 4000 * retries && retries < 5)) {
-          _.sample(cluster.workers).send(data) // retry
-          debug('db:master:request:id')(id)
-          debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
-          retries++
-        } else if (_.now() - start > 30000) {
-          debug('db:master:retry')('DB operation failed - ' + util.inspect(data))
-          resolve([])
-        }
-
         let dataFromWorker = _.find(this.data, (o) => o.id === id)
         if (!_.isNil(dataFromWorker)) {
-          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(dataFromWorker))
           const items = dataFromWorker.items
-          dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 10)
@@ -177,8 +118,6 @@ class IMasterController extends Interface {
     const data = { type: 'db', fnc: 'remove', table: table, where: where, id: id }
 
     return new Promise((resolve, reject) => {
-      const start = _.now()
-      let retries = 1
       let sendRequest = (resolve, reject, id) => {
         try {
           _.sample(cluster.workers).send(data)
@@ -189,21 +128,9 @@ class IMasterController extends Interface {
         }
       }
       let returnData = (resolve, reject, id) => {
-        if ((_.now() - start > 4000 * retries && retries < 5)) {
-          _.sample(cluster.workers).send(data) // retry
-          debug('db:master:request:id')(id)
-          debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
-          retries++
-        } else if (_.now() - start > 30000) {
-          debug('db:master:retry')('DB operation failed - ' + util.inspect(data))
-          resolve([])
-        }
-
         let dataFromWorker = _.find(this.data, (o) => o.id === id)
         if (!_.isNil(dataFromWorker)) {
-          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(dataFromWorker))
           const items = dataFromWorker.items
-          dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 10)
@@ -217,8 +144,6 @@ class IMasterController extends Interface {
     const data = { type: 'db', fnc: 'update', table: table, where: where, object: object, id: id }
 
     return new Promise((resolve, reject) => {
-      const start = _.now()
-      let retries = 1
       let sendRequest = (resolve, reject, id) => {
         try {
           _.sample(cluster.workers).send(data)
@@ -229,21 +154,9 @@ class IMasterController extends Interface {
         }
       }
       let returnData = (resolve, reject, id) => {
-        if ((_.now() - start > 4000 * retries && retries < 5)) {
-          _.sample(cluster.workers).send(data) // retry
-          debug('db:master:request:id')(id)
-          debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
-          retries++
-        } else if (_.now() - start > 30000) {
-          debug('db:master:retry')('DB operation failed - ' + util.inspect(data))
-          resolve([])
-        }
-
         let dataFromWorker = _.find(this.data, (o) => o.id === id)
         if (!_.isNil(dataFromWorker)) {
-          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(dataFromWorker))
           const items = dataFromWorker.items
-          dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 10)
@@ -257,8 +170,6 @@ class IMasterController extends Interface {
     const data = { type: 'db', fnc: 'incrementOne', table: table, where: where, object: object, id: id }
 
     return new Promise((resolve, reject) => {
-      const start = _.now()
-      let retries = 1
       let sendRequest = (resolve, reject, id) => {
         try {
           _.sample(cluster.workers).send(data)
@@ -269,21 +180,9 @@ class IMasterController extends Interface {
         }
       }
       let returnData = (resolve, reject, id) => {
-        if ((_.now() - start > 4000 * retries && retries < 5)) {
-          _.sample(cluster.workers).send(data) // retry
-          debug('db:master:request:id')(id)
-          debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
-          retries++
-        } else if (_.now() - start > 30000) {
-          debug('db:master:retry')('DB operation failed - ' + util.inspect(data))
-          resolve([])
-        }
-
         let dataFromWorker = _.find(this.data, (o) => o.id === id)
         if (!_.isNil(dataFromWorker)) {
-          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(dataFromWorker))
           const items = dataFromWorker.items
-          dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 10)
@@ -297,8 +196,6 @@ class IMasterController extends Interface {
     const data = { type: 'db', fnc: 'increment', table: table, where: where, object: object, id: id }
 
     return new Promise((resolve, reject) => {
-      const start = _.now()
-      let retries = 1
       let sendRequest = (resolve, reject, id) => {
         try {
           _.sample(cluster.workers).send(data)
@@ -309,21 +206,9 @@ class IMasterController extends Interface {
         }
       }
       let returnData = (resolve, reject, id) => {
-        if ((_.now() - start > 4000 * retries && retries < 5)) {
-          _.sample(cluster.workers).send(data) // retry
-          debug('db:master:request:id')(id)
-          debug('db:master:retry')('Retrying #' + retries + ' ' + util.inspect(data))
-          retries++
-        } else if (_.now() - start > 30000) {
-          debug('db:master:retry')('DB operation failed - ' + util.inspect(data))
-          resolve([])
-        }
-
         let dataFromWorker = _.find(this.data, (o) => o.id === id)
         if (!_.isNil(dataFromWorker)) {
-          if (retries > 1) debug('db:master:retry')('Retry successful' + util.inspect(dataFromWorker))
           const items = dataFromWorker.items
-          dataFromWorker.finished = true
           _.remove(this.data, (o) => o.id === id)
           resolve(items)
         } else setTimeout(() => returnData(resolve, reject, id), 10)
