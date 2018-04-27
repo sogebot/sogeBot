@@ -122,7 +122,7 @@ function cluster () {
       await parse.process()
     }
     debug(`cluster:worker:onMessage:${id}`)('Stats sending')
-    process.send({ type: 'stats', of: 'parser', value: parse.time() })
+    process.send({ type: 'stats', of: 'parser', value: parse.time(), message: message })
   }
 }
 

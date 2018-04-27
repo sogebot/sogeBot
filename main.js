@@ -135,6 +135,7 @@ function fork () {
     } else if (msg.type === 'stats') {
       let avgTime = 0
       global.avgResponse.push(msg.value)
+      if (msg.value > 1000) global.log.warning(`Took ${msg.value}ms to process: ${msg.message}`)
       if (global.avgResponse.length > 100) global.avgResponse.shift()
       for (let time of global.avgResponse) avgTime += parseInt(time, 10)
       global.status['RES'] = (avgTime / global.avgResponse.length).toFixed(0)
