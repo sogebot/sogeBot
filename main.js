@@ -140,11 +140,11 @@ function fork () {
       for (let time of global.avgResponse) avgTime += parseInt(time, 10)
       global.status['RES'] = (avgTime / global.avgResponse.length).toFixed(0)
     } else if (msg.type === 'say') {
-      global.client.say(config.settings.broadcaster_username, msg.message)
+      global.commons.message('say', config.settings.broadcaster_username, msg.message)
     } else if (msg.type === 'action') {
-      global.client.action(config.settings.broadcaster_username, msg.message)
+      global.commons.message('action', config.settings.broadcaster_username, msg.message)
     } else if (msg.type === 'whisper') {
-      global.client.whisper(msg.sender, msg.message)
+      global.commons.message('whisper', msg.sender, msg.message)
     } else if (msg.type === 'parse') {
       _.sample(cluster.workers).send({ type: 'message', sender: msg.sender, message: msg.message, skip: true }) // resend to random worker
     } else if (msg.type === 'db') {

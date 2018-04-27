@@ -117,14 +117,14 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
     if (sender['message-type'] === 'whisper') {
       global.log.whisperOut(message, {username: sender.username})
       if (cluster.isWorker) process.send({type: 'whisper', sender: sender.username, message: message})
-      else global.client.whisper(sender.username, message)
+      else global.commons.message('whisper', sender.username, message)
     } else {
       global.log.chatOut(message, {username: sender.username})
       if (await global.configuration.getValue('sendWithMe')) {
         if (cluster.isWorker) process.send({type: 'action', sender: sender.username, message: message})
         else {
           try {
-            global.client.action(config.settings.broadcaster_username, message)
+            global.commons.message('action', config.settings.broadcaster_username, message)
           } catch (e) {
             // retry if somehow failed
             setTimeout(() => this.sendMessage(message, sender, attr), 1000)
@@ -134,7 +134,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
         if (cluster.isWorker) process.send({type: 'say', sender: sender.username, message: message})
         else {
           try {
-            global.client.say(config.settings.broadcaster_username, message)
+            global.commons.message('say', config.settings.broadcaster_username, message)
           } catch (e) {
             // retry if somehow failed
             setTimeout(() => this.sendMessage(message, sender, attr), 1000)
@@ -144,6 +144,14 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
     }
   }
   return true
+}
+
+Commons.prototype.message = function (type, username, message) {
+  try {
+    global.client[type](username, message)
+  } catch (e) {
+    setTimeout(() => this.message(type, username, message), 10)
+  }
 }
 
 Commons.prototype.timeout = function (username, reason, timeout) {
