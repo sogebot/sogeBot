@@ -47,6 +47,29 @@
         permission: el.dataset.permission
       }
       socket.emit('changePermission', data)
+
+      // set to changed value
+      $(el).parent('td').children('button').removeClass().addClass('btn btn-link')
+
+      let cssClass
+      switch(el.dataset.permission) {
+        case 'disable':
+          cssClass = 'btn-danger'
+          break
+        case 'owner':
+          cssClass = 'btn-success'
+          break
+        case 'viewer':
+          cssClass = 'btn-warning'
+          break
+        case 'mods':
+          cssClass = 'btn-primary'
+          break
+        case 'regular':
+          cssClass = 'btn-info'
+          break
+      }
+      $(el).toggleClass(`btn-link ${cssClass}`)
     }
   }
 

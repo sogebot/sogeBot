@@ -66,7 +66,7 @@ define(
   'PERMISSION_REGEXP',
   XRegExp(`(?<type> viewer|mods|owner|regular|disable  ) # type
            \\s                                           # empty space
-           !?(?<command> [\\pL0-9 ]*                   ) # command`, 'ix')
+           !?(?<command> [\\pL0-9_ ]*                  ) # command`, 'ix')
 )
 
 define('KEYWORD_REGEXP', XRegExp(`(?<keyword> !?[\\pL0-9]*)\\s(?<response> .*)`, 'ix'))
