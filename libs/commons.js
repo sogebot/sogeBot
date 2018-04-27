@@ -129,13 +129,13 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
   return true
 }
 
-Commons.prototype.message = function (type, username, message) {
+Commons.prototype.message = function (type, username, message, retry) {
   if (cluster.isWorker) process.send({type: type, sender: username, message: message})
   else {
     try {
       global.client[type](username, message)
     } catch (e) {
-      setTimeout(() => this.message(type, username, message), 10)
+      if (_.isNil(retry)) setTimeout(() => this.message(type, username, message, false), 5000)
     }
   }
 }
