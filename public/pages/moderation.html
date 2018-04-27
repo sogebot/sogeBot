@@ -554,7 +554,7 @@
     $('#whitelist-textarea').val(!_.isNil(lists.whitelist) ? lists.whitelist.join('\n') : '')
   })
 
-  $('#blacklist, #whitelist').off().on('focusout', function (ev) {
+  $('#blacklist, #whitelist').off().on('focusout keyup', function (ev) {
     socket.emit('moderation.lists.set', {
       blacklist: $('#blacklist-textarea').val().split('\n'),
       whitelist: $('#whitelist-textarea').val().split('\n')

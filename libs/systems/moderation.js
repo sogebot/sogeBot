@@ -96,8 +96,11 @@ class Moderation {
     global.panel.socketListening(this, 'moderation.lists.set', this.setLists)
   }
 
-  emitLists (self, socket) {
-    socket.emit('moderation.lists', self.lists)
+  async emitLists (self, socket) {
+    socket.emit('moderation.lists', {
+      blacklist: _.get(await global.db.engine.findOne('settings', { key: 'blacklist' }), 'value', []),
+      whitelist: _.get(await global.db.engine.findOne('settings', { key: 'whitelist' }), 'value', [])
+    })
   }
 
   setLists (self, socket, data) {
