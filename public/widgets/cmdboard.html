@@ -107,7 +107,10 @@
   socket.emit('cmdboard.widget.fetch')
 
   socket.on('configuration', (data) => {
-    cmdboard.displayAs = data.widgetCmdBoardDisplayAs
+    if (cmdboard.displayAs !== data.widgetCmdBoardDisplayAs) {
+      cmdboard.displayAs = data.widgetCmdBoardDisplayAs
+      cmdboard.updateDisplayAs()
+    }
   })
 
   $('#cmdboard-display-as-list').change(() => {
