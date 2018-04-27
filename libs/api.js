@@ -85,14 +85,14 @@ class API {
   async getChannelChattersUnofficialAPI (opts) {
     const sendJoinEvent = async function (bulk) {
       for (let user of bulk) {
-        await new Promise((resolve) => setTimeout(() => resolve(), 100))
+        await new Promise((resolve) => setTimeout(() => resolve(), 1000))
         global.api.isFollower(user.username)
         global.events.fire('user-joined-channel', { username: user.username })
       }
     }
     const sendPartEvent = async function (bulk) {
       for (let user of bulk) {
-        await new Promise((resolve) => setTimeout(() => resolve(), 100))
+        await new Promise((resolve) => setTimeout(() => resolve(), 1000))
         global.events.fire('user-parted-channel', { username: user.username })
       }
     }
@@ -133,7 +133,6 @@ class API {
         global.widgets.joinpart.send({ username: user, type: 'part' })
       }
     }
-    if (opts.saveToWidget) sendPartEvent(bulkParted)
 
     for (let chatter of chatters) {
       if (!_.includes(allOnlineUsers, chatter) && !_.includes(ignoredUsers, chatter)) {
@@ -141,13 +140,15 @@ class API {
         global.widgets.joinpart.send({ username: chatter, type: 'join' })
       }
     }
-    if (opts.saveToWidget) sendJoinEvent(bulkInsert)
 
     if (bulkInsert.length > 0) {
       for (let chunk of _.chunk(bulkInsert, 100)) {
         await global.db.engine.insert('users.online', chunk)
       }
     }
+
+    if (opts.saveToWidget) sendPartEvent(bulkParted)
+    if (opts.saveToWidget) sendJoinEvent(bulkInsert)
 
     setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
   }
