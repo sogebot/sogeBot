@@ -12,7 +12,7 @@ class Database {
     this.engine = null
 
     if (require('cluster').isMaster && this.cluster && config.database.type === 'nedb') this.engine = new IMasterController()
-    else if (config.database.type === 'nedb') this.engine = new INeDB()
+    else if (config.database.type === 'nedb') this.engine = new INeDB(this.cluster)
     else if (config.database.type === 'mongodb') this.engine = new IMongoDB(this.cluster)
 
     if (_.isNil(this.engine)) {

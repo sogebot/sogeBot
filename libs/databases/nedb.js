@@ -9,9 +9,11 @@ const Datastore = require('nedb')
 const debug = require('debug')('db:nedb')
 
 class INeDB extends Interface {
-  constructor () {
+  constructor (createIndexes) {
     super('nedb')
 
+    this.createIndexes = createIndexes || false
+    console.log(this.createIndexes)
     this.connected = true
 
     if (!fs.existsSync('./db')) fs.mkdirSync('./db')
@@ -28,7 +30,7 @@ class INeDB extends Interface {
       this.table[table].persistence.setAutocompactionInterval(60000)
 
       // create indexes
-      if (this.cluster) {
+      if (this.createIndexes) {
         switch (table) {
           case 'users.bits':
           case 'users.tips':
