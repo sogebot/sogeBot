@@ -30,15 +30,17 @@
           <div class="input-group-prepend">
             <span class="input-group-text" data-lang="name"></span>
           </div>
-          <input type="text" class="form-control" id="cmdboard-name">
+          <input type="text" class="form-control" id="cmdboard-name" onkeyup="cmdboard.checkBtn()">
         </div>
         <div class="input-group">
           <div class="input-group-prepend">
             <span class="input-group-text" data-lang="command"></span>
           </div>
-          <input type="text" class="form-control" id="cmdboard-command">
+          <input type="text" class="form-control" id="cmdboard-command" onkeyup="cmdboard.checkBtn()">
         </div>
-        <div class="input-group">
+        <button type="button" class="btn btn-success btn-block btn-cmdboard" onclick="cmdboard.add()" data-lang="confirm" disabled="disabled"></button>
+
+        <div class="input-group pt-2">
           <div class="input-group-prepend">
             <span class="input-group-text" data-lang="display-as"></span>
           </div>
@@ -52,7 +54,6 @@
           </div>
         </div>
 
-        <button type="button" class="btn btn-success btn-block" onclick="cmdboard.add()" data-lang="confirm"></button>
       </div>
       <!-- /SETTINGS -->
     </div>
@@ -62,11 +63,14 @@
 <script>
   var cmdboard = {
     el: null,
+    displayAs: 'list',
     add: function () {
       var name = $('#cmdboard-name').val();
       $('#cmdboard-name').val('')
       var command = $('#cmdboard-command').val();
       $('#cmdboard-command').val('')
+
+      if (name.length === 0 || command.length === 0) return // do nothing if not all values are set
 
       $('a[href="#cmdboard-main"]').tab('show')
       socket.emit('cmdboard.widget.add', {
@@ -74,27 +78,36 @@
         command: command
       })
     },
+    checkBtn: function () {
+      if ($('#cmdboard-command').val().trim().length > 0
+        && $('#cmdboard-name').val().trim().length > 0) {
+          $('.btn-cmdboard').removeAttr('disabled')
+      } else $('.btn-cmdboard').attr('disabled', 'disabled')
+    },
     emit: function (ev, el) {
       ev.preventDefault()
       socket.emit('cmdboard.widget.run', el.dataset.name)
     },
+    updateDisplayAs: function () {
+      if (cmdboard.displayAs === 'list') {
+        $('#cmdboard-display-as-list').parent().removeClass('active').addClass('active')
+        $('#cmdboard-display-as-grid').parent().removeClass('active')
+        $('.cmdboard-list-group-item').css('width', '100%')
+        $('#cmdboard-list').css('flex-direction', 'column')
+        $('#cmdboard-list').css('display', 'flex')
+      } else {
+        $('.cmdboard-list-group-item').css('width', '50%')
+        $('#cmdboard-list').css('flex-flow', 'wrap')
+        $('#cmdboard-display-as-list').parent().removeClass('active')
+        $('#cmdboard-display-as-grid').parent().removeClass('active').addClass('active')
+      }
+    }
   }
 
   socket.emit('cmdboard.widget.fetch')
 
   socket.on('configuration', (data) => {
-    if (data.widgetCmdBoardDisplayAs === 'list') {
-      $('#cmdboard-display-as-list').parent().removeClass('active').addClass('active')
-      $('#cmdboard-display-as-grid').parent().removeClass('active')
-      $('.cmdboard-list-group-item').css('width', '100%')
-      $('#cmdboard-list').css('flex-direction', 'column')
-      $('#cmdboard-list').css('display', 'flex')
-    } else {
-      $('.cmdboard-list-group-item').css('width', '50%')
-      $('#cmdboard-list').css('flex-flow', 'wrap')
-      $('#cmdboard-display-as-list').parent().removeClass('active')
-      $('#cmdboard-display-as-grid').parent().removeClass('active').addClass('active')
-    }
+    cmdboard.displayAs = data.widgetCmdBoardDisplayAs
   })
 
   $('#cmdboard-display-as-list').change(() => {
@@ -139,5 +152,7 @@
         }
       }]
     })
+
+    cmdboard.updateDisplayAs()
   })
 </script>
