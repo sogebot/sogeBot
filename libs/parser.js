@@ -17,6 +17,7 @@ class Parser {
     this.skip = opts.skip || false
 
     this.isCommand = this.message.startsWith('!')
+    this.list = this.populateList()
   }
 
   time () {
@@ -65,7 +66,7 @@ class Parser {
     if (this.isCommand) this.command(this.sender, this.message.trim(), this.skip)
   }
 
-  get list () {
+  populateList () {
     const list = [
       global.configuration,
       global.currency,
