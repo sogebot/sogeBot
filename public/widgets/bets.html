@@ -58,6 +58,7 @@
   }
 
   var bets = {
+    dataset: [],
     end: 0,
     updateTimer: function () {
       // update timer
@@ -96,45 +97,48 @@
         labels.push('refund')
         dataset.push(0)
 
-        var myChart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-              labels: labels,
-              datasets: [{
-                  data: dataset,
-                  borderWidth: 1,
-                  backgroundColor: [
-                    'blue', 'red', 'orange', 'green', 'purple', 'yellow', 'pink', 'cyan'
-                  ]
-              }]
-          },
-          options: {
-              onClick: () => {
-                if (!_.isNil(selected)) betsSocket.emit('close', selected)
-                selected = null
-              },
-              maintainAspectRatio: false,
-              legend: {
-                display: false
-              },
-              tooltips: {
-                enabled: true,
-                mode: 'index',
-                intersect: false,
-                custom: customTooltips
-              },
-              scales: {
-                  yAxes: [{
-                      ticks: {
-                          beginAtZero:true,
-                          min: 0,
-                          max: 100,
-                          stepSize: 25
-                      }
-                  }]
-              }
-          }
-      })
+        if (!_.isEqual(dataset, bets.dataset)) {
+          var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: dataset,
+                    borderWidth: 1,
+                    backgroundColor: [
+                      'blue', 'red', 'orange', 'green', 'purple', 'yellow', 'pink', 'cyan'
+                    ]
+                }]
+            },
+            options: {
+                onClick: () => {
+                  if (!_.isNil(selected)) betsSocket.emit('close', selected)
+                  selected = null
+                },
+                maintainAspectRatio: false,
+                legend: {
+                  display: false
+                },
+                tooltips: {
+                  enabled: true,
+                  mode: 'index',
+                  intersect: false,
+                  custom: customTooltips
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true,
+                            min: 0,
+                            max: 100,
+                            stepSize: 25
+                        }
+                    }]
+                }
+            }
+        })
+        }
+        bets.dataset = dataset
         bets.updateTimer()
         commons.translate()
       } else {
