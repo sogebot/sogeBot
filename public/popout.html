@@ -92,6 +92,7 @@
     page.base('/popout/')
     page('/', function(p){
       const id = p.hash.length === 0 ? 'dashboard' : p.hash
+      $('title').text(`sogeBot UI - ${id}`)
       // load widget
       $('#widget')
         .load('../widgets/' +
