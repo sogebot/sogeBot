@@ -51,12 +51,15 @@
               <span class="input-group-text">!</span>
           </div>
           <input type="text" class="form-control" placeholder="Enter keyword..." id="rafflesWidgetKeyword">
-          <span class="input-group-btn">
+          <span class="input-group-btn btn-group">
             <button class="btn btn-success" id="openBtn" type="button" title="" onclick="raffles.open()">
                 <i class="fas fa-plus" aria-hidden="true"></i>
             </button>
             <button class="btn btn-danger" style="display: none" id="removeBtn" type="button" title="" onclick="raffles.remove()">
               <i class="fas fa-times"></i>
+            </button>
+            <button type="button" class="btn btn-success" id="raffleWidgetRoll" onclick="raffles.pick()" disabled="disabled">
+              <i class="fas fa-trophy"></i>
             </button>
           </span>
         </div>
@@ -110,9 +113,6 @@
             </div>
           </div>
         </div>
-
-        <button type="button" class="btn btn-disabled btn-block" style="margin-top: 20px;" id="raffleWidgetRoll" onclick="raffles.pick()"
-          data-lang="roll-a-winner"></button>
       </div>
 
       <!-- /GIVEAWAY -->
@@ -421,10 +421,9 @@
           max_show) + ' hidden</li>')
       }
 
-      $("#raffleWidgetRoll").removeClass()
       if (count === 0) {
-        $("#raffleWidgetRoll").addClass('btn btn-disabled btn-block')
-      } else $("#raffleWidgetRoll").addClass('btn btn-success btn-block')
+        $("#raffleWidgetRoll").attr('disabled', 'disabled')
+      } else $("#raffleWidgetRoll").removeAttr('disabled')
     },
     search: function (el) {
       console.debug('raffles search()', $(el).val())
