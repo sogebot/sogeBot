@@ -143,7 +143,7 @@ class Raffles {
 
   async announce () {
     let raffle = await global.db.engine.findOne('raffles', { winner: null })
-    if (_.isEmpty(raffle) || _.now() - this.lastAnnounce < (await global.configuration.getValue('raffleAnnounceInterval') * 60 * 1000)) {
+    if (!await global.cache.isOnline() || _.isEmpty(raffle) || _.now() - this.lastAnnounce < (await global.configuration.getValue('raffleAnnounceInterval') * 60 * 1000)) {
       setTimeout(() => this.announce(), 60000)
       return
     }
