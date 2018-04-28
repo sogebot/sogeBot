@@ -62,8 +62,12 @@ class Parser {
         }
         debug('parser:process')(`Parser ${parser.name} finish`)
       }
-    } // all parsers OK => run command
-    if (this.isCommand) this.command(this.sender, this.message.trim(), this.skip)
+    }
+
+    if (this.isCommand) {
+      debug('parser:process')(`Running command - ${this.message.trim()}`)
+      this.command(this.sender, this.message.trim(), this.skip)
+    }
   }
 
   populateList () {
@@ -150,8 +154,8 @@ class Parser {
     if (!message.startsWith('!')) return // do nothing, this is not a command or user is ignored
 
     let command = await this.find(message)
-    if (_.isNil(command)) return // command not found, do nothing
 
+    if (_.isNil(command)) return // command not found, do nothing
     if (command.permission === constants.DISABLE) return
 
     let [isRegular, isMod, isOwner] = await Promise.all([
