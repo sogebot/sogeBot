@@ -362,20 +362,20 @@ class Twitch {
     global.commons.sendMessage(message, sender)
   }
 
-  setTitle (self, sender, text) {
+  async setTitle (self, sender, text) {
     if (text.trim().length === 0) {
       global.commons.sendMessage(global.translate('title.current')
-        .replace(/\$title/g, self.current.status), sender)
+        .replace(/\$title/g, _.get(await global.db.engine.update('api.current', { key: 'status' }), 'value', 'n/a')), sender)
       return
     }
     if (cluster.isMaster) global.api.setTitleAndGame(self, sender, { title: text })
     else process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: { 0: sender, 1: { title: text } } })
   }
 
-  setGame (self, sender, text) {
+  async setGame (self, sender, text) {
     if (text.trim().length === 0) {
       global.commons.sendMessage(global.translate('game.current')
-        .replace(/\$game/g, self.current.game), sender)
+        .replace(/\$game/g, _.get(await global.db.engine.update('api.current', { key: 'game' }), 'value', 'n/a')), sender)
       return
     }
     if (cluster.isMaster) global.api.setTitleAndGame(self, sender, { game: text })
