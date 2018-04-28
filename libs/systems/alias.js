@@ -100,7 +100,11 @@ class Alias {
       debug('isRegular: %s', isRegular)
       debug('isMod: %s', isMod)
       debug('isOwner: %s', isOwner)
-      if (alias.permission === constants.VIEWERS ||
+
+      // Don't run alias if its same as command e.g. alias !me -> command !me
+      if (alias.command === alias.alias) {
+        global.log.warning(`Cannot run alias !${alias.alias}, because it exec !${alias.command}`)
+      } else if (alias.permission === constants.VIEWERS ||
         (alias.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
         (alias.permission === constants.MODS && (isMod || isOwner)) ||
         (alias.permission === constants.OWNER_ONLY && isOwner)) {
