@@ -540,8 +540,8 @@ Users.prototype.compactMessagesDb = async function () {
   try {
     await global.commons.compactDb({ table: 'users.messages', index: 'username', values: 'messages' })
   } catch (e) {
-    global.db.error(e)
-    global.db.error(e.stack)
+    global.log.error(e)
+    global.log.error(e.stack)
   } finally {
     setTimeout(() => this.compactMessagesDb(), 10000)
   }

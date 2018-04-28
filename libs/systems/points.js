@@ -326,8 +326,8 @@ Points.prototype.updatePoints = async function () {
       }
     }
   } catch (e) {
-    global.db.error(e)
-    global.db.error(e.stack)
+    global.log.error(e)
+    global.log.error(e.stack)
   } finally {
     setTimeout(() => this.updatePoints(), 60000)
   }
@@ -337,8 +337,8 @@ Points.prototype.compactPointsDb = async function () {
   try {
     await global.commons.compactDb({ table: 'users.points', index: 'username', values: 'points' })
   } catch (e) {
-    global.db.error(e)
-    global.db.error(e.stack)
+    global.log.error(e)
+    global.log.error(e.stack)
   } finally {
     setTimeout(() => this.compactPointsDb(), 60000)
   }
