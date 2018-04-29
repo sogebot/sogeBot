@@ -142,6 +142,7 @@
         bets.updateTimer()
         commons.translate()
       } else {
+        bets.dataset = []
         bets.end = new Date().getTime()
         $('#betTitle').text('---')
         $("#bets-running").empty().append(`<canvas id="bets-container" class="p-2"></canvas>`)
