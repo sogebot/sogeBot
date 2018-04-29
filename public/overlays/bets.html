@@ -157,7 +157,7 @@
               if (_total !== 0) percentage = _.filter(bets, (o) => o.option === oIndex).length / (_total / 100)
               $('#options').append(`
                 <div>
-                  <div class="title">${option.name}</div>
+                  <div class="title">${oIndex} ... ${option.name}</div>
                   <div class="percentage">${parseInt(percentage, 10)}%</div>
                   <div class="bar" style="background-color: ${colors[cIndex]}; height: 1.4em; width: ${percentage === 0 ? '5px' : `${percentage}%`};"></div>
                 </div>
