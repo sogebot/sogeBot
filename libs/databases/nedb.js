@@ -13,7 +13,6 @@ class INeDB extends Interface {
     super('nedb')
 
     this.createIndexes = createIndexes || false
-    console.log(this.createIndexes)
     this.connected = true
 
     if (!fs.existsSync('./db')) fs.mkdirSync('./db')

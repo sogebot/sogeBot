@@ -223,7 +223,6 @@ class Bets {
   }
 
   async close (self, sender, text) {
-    console.log(text)
     const expects = new Expects()
     let currentBet = await global.db.engine.findOne('cache', { key: 'bets' })
     try {
