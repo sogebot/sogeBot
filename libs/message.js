@@ -379,6 +379,9 @@ class Message {
 
     await this.global()
 
+    await this.parseMessageEach(price); d('parseMessageEach: %s', this.message)
+    await this.parseMessageEach(info); d('parseMessageEach: %s', this.message)
+    await this.parseMessageEach(random); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(ifp, false); d('parseMessageEach: %s', this.message)
     await this.parseMessageEval(evaluate, decode(this.message)); d('parseMessageEval: %s', this.message)
     await this.parseMessageEach(param, true); d('parseMessageEach: %s', this.message)
@@ -394,10 +397,7 @@ class Message {
     await this.parseMessageVariables(custom); d('parseMessageEach: %s', this.message)
     await this.parseMessageOnline(online); d('parseMessageOnline: %s', this.message)
     await this.parseMessageCommand(command); d('parseMessageCommand: %s', this.message)
-    await this.parseMessageEach(random); d('parseMessageEach: %s', this.message)
-    await this.parseMessageEach(price); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(qs); d('parseMessageEach: %s', this.message)
-    await this.parseMessageEach(info); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(list); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(stream); d('parseMessageEach: %s', this.message)
     await this.parseMessageApi(); d('parseMessageApi: %s', this.message)
