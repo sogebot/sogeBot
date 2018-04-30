@@ -130,6 +130,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
 }
 
 Commons.prototype.message = function (type, username, message, retry) {
+  if (config.debug.console) return
   if (cluster.isWorker) process.send({type: type, sender: username, message: message})
   else {
     try {
