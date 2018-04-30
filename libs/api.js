@@ -525,14 +525,6 @@ class API {
       if (!await global.cache.isOnline() || this.streamType !== stream.type) {
         this.chatMessagesAtStart = global.linesParsed
 
-        await global.db.engine.update('api.max', { key: 'viewers' }, { value: 0 })
-        await global.db.engine.update('api.new', { key: 'chatters' }, { value: 0 })
-        await global.db.engine.update('api.current', { key: 'viewers' }, { value: 0 })
-        await global.db.engine.update('api.current', { key: 'bits' }, { value: 0 })
-        await global.db.engine.update('api.current', { key: 'tips' }, { value: 0 })
-
-        await global.db.engine.remove('cache.hosts', {}) // we dont want to have cached hosts on stream start
-
         if (!global.webhooks.enabled.streams) {
           global.events.fire('stream-started')
           global.events.fire('command-send-x-times', { reset: true })
@@ -590,6 +582,14 @@ class API {
           global.events.fire('stream-is-running-x-minutes', { reset: true })
           global.events.fire('number-of-viewers-is-at-least-x', { reset: true })
         }
+
+        await global.db.engine.update('api.max', { key: 'viewers' }, { value: 0 })
+        await global.db.engine.update('api.new', { key: 'chatters' }, { value: 0 })
+        await global.db.engine.update('api.current', { key: 'viewers' }, { value: 0 })
+        await global.db.engine.update('api.current', { key: 'bits' }, { value: 0 })
+        await global.db.engine.update('api.current', { key: 'tips' }, { value: 0 })
+
+        await global.db.engine.remove('cache.hosts', {}) // we dont want to have cached hosts on stream start
       }
     }
   }
