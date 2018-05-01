@@ -940,10 +940,10 @@
   "bets": {
       "running": "$sender, sazky jsou jiz otevreny! Pouzij !bet close 0-$maxIndex",
       "notRunning": "Zadne sazky nejsou otevreny, pozadej moda o otevreni!",
-      "opened": "Sazka '$title' otevrena! Pouzij !bet 0-$maxIndex [points] a vyhraj! Zbyva pouze $minutesmin pro vsazeni!",
+      "opened": "Sazka '$title' otevrena! Pouzij !bet 0-$maxIndex [body] a vyhraj! Zbyva pouze $minutesmin pro vsazeni!",
       "closeNotEnoughOptions": "$sender, pro zavreni sazky musis vybrat viteznou moznost.",
       "notEnoughOptions": "$sender, nove sazky musi mit alespon dve moznosti!",
-      "info": "Sazka '$title' je stale otevrena! Pouzij !bet 0-$maxIndex [points] a vyhraj! Zbyva pouze $minutesmin pro vsazeni!",
+      "info": "Sazka '$title' je stale otevrena! Pouzij !bet 0-$maxIndex [body] a vyhraj! Zbyva pouze $minutesmin pro vsazeni!",
       "parseError": "{core.command-parse} !bet a zjisti jak na to",
       "diffBet": "$sender, uz sis vsadil na $option a nemuzes vsadit na vice moznosti najednou!",
       "undefinedBet": "Promin, $sender, ale tato moznost neexistuje, pouzij !bet a zjisti jak na to",
