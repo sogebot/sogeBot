@@ -241,7 +241,7 @@ class Bets {
 
       global.commons.sendMessage(global.translate('bets.closed')
         .replace(/\$option/g, currentBet.options[index].name)
-        .replace(/\$amount/g, users.length), sender)
+        .replace(/\$amount/g, _.filter(users, (o) => o.option === index).length), sender)
       await global.db.engine.remove('cache', { _id: currentBet._id.toString() })
     } catch (e) {
       switch (e.message) {
