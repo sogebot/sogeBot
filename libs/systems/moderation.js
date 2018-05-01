@@ -113,10 +113,18 @@ class Moderation {
       global.configuration.getValue('moderationWarnings'),
       global.configuration.getValue('moderationWarningsTimeouts'),
       global.configuration.getValue('moderationAnnounceTimeouts'),
-      global.db.engine.find('moderation.warnings'),
+      global.db.engine.find('moderation.warnings', { username: sender.username }),
       self.isSilent(type)
     ])
     text = text.trim()
+
+    // cleanup warnings
+    let wasCleaned = false
+    for (let warning of _.filter(warnings, (o) => _.now() - o.timestamp > 1000 * 60 * 60)) {
+      await global.db.engine.remove('moderation.warnings', { _id: warning._id.toString() })
+      wasCleaned = true
+    }
+    if (wasCleaned) warnings = await global.db.engine.find('moderation.warnings', { username: sender.username })
 
     if (warningsAllowed === 0) {
       msg = await new Message(msg.replace(/\$count/g, -1)).parse()
@@ -125,7 +133,7 @@ class Moderation {
       return
     }
 
-    const isWarningCountAboveThreshold = _.filter(warnings, (o) => o.username === sender.username).length >= warningsAllowed
+    const isWarningCountAboveThreshold = warnings.length >= parseInt(warningsAllowed, 10)
     if (isWarningCountAboveThreshold) {
       msg = await new Message(warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length)).parse()
       log.timeout(`${sender.username} [${type}] ${time}s timeout | ${text}`)
@@ -134,20 +142,15 @@ class Moderation {
     } else {
       await global.db.engine.insert('moderation.warnings', { username: sender.username, timestamp: _.now() })
       const warningsLeft = parseInt(warningsAllowed, 10) - warnings.length
-      warning = await new Message(warning.replace(/\$count/g, warningsLeft)).parse()
+      warning = await new Message(warning.replace(/\$count/g, warningsLeft < 0 ? 0 : warningsLeft)).parse()
       if (warningsTimeout) {
-        log.timeout(`${sender.username} [${type}] 1s timeout, warnings left ${warningsLeft} | ${text}`)
+        log.timeout(`${sender.username} [${type}] 1s timeout, warnings left ${warningsLeft < 0 ? 0 : warningsLeft} | ${text}`)
         global.commons.timeout(sender.username, warning, 1)
       }
 
       if (announceTimeouts && !silent) {
         global.commons.sendMessage('$sender, ' + warning, sender)
       }
-    }
-
-    // cleanup warnings
-    for (let warning of _.filter(warnings, (o) => _.now() - o.timestamp < 3600)) {
-      await global.db.engine.remove('moderation.warnings', { _id: warning._id.toString() })
     }
   }
 
