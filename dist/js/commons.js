@@ -112,6 +112,15 @@ var commons = {
                 <span class="editable-variable block" data-var="followers" data-lang="responses.variable.followers"></span>
                 <span class="editable-variable block" data-var="subscribers" data-lang="responses.variable.subscribers"></span>
                 <span class="editable-variable block" data-var="currentSong" data-lang="responses.variable.currentSong"></span>
+                <span class="editable-variable block" data-var="latestFollower" data-lang="responses.variable.latestFollower"></span>
+                <span class="editable-variable block" data-var="latestSubscriber" data-lang="responses.variable.latestSubscriber"></span>
+                <span class="editable-variable block" data-var="latestTipAmount" data-lang="responses.variable.latestTipAmount"></span>
+                <span class="editable-variable block" data-var="latestTipCurrency" data-lang="responses.variable.latestTipCurrency"></span>
+                <span class="editable-variable block" data-var="latestTipMessage" data-lang="responses.variable.latestTipMessage"></span>
+                <span class="editable-variable block" data-var="latestTip" data-lang="responses.variable.latestTip"></span>
+                <span class="editable-variable block" data-var="latestCheerAmount" data-lang="responses.variable.latestCheerAmount"></span>
+                <span class="editable-variable block" data-var="latestCheerMessage" data-lang="responses.variable.latestCheerMessage"></span>
+                <span class="editable-variable block" data-var="latestCheer" data-lang="responses.variable.latestCheer"></span>
                 </div>`)
               div.css('display', 'block')
             }

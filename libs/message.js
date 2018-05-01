@@ -25,6 +25,28 @@ class Message {
       value = _.isEmpty(value) ? '' : value.value
       this.message = this.message.replace(regexp, value)
     }
+
+    let events = _.orderBy(await global.db.engine.find('widgetsEventList'), 'timestamp', 'desc')
+    // latestFollower
+    let latestFollower = _.find(events, (o) => o.event === 'follow')
+    this.message = this.message.replace(/\$latestFollower/g, !_.isNil(latestFollower) ? latestFollower.username : 'n/a')
+
+    // latestSubscriber
+    let latestSubscriber = _.find(events, (o) => ['sub', 'resub', 'subgift'].includes(o.event))
+    this.message = this.message.replace(/\$latestSubscriber/g, !_.isNil(latestSubscriber) ? latestSubscriber.username : 'n/a')
+
+    // latestTip, latestTipAmount, latestTipCurrency, latestTipMessage
+    let latestTip = _.find(events, (o) => o.event === 'tip')
+    this.message = this.message.replace(/\$latestTipAmount/g, !_.isNil(latestTip) ? parseFloat(latestTip.amount).toFixed(2) : 'n/a')
+    this.message = this.message.replace(/\$latestTipCurrency/g, !_.isNil(latestTip) ? latestTip.currency : 'n/a')
+    this.message = this.message.replace(/\$latestTipMessage/g, !_.isNil(latestTip) ? latestTip.message : 'n/a')
+    this.message = this.message.replace(/\$latestTip/g, !_.isNil(latestTip) ? latestTip.username : 'n/a')
+
+    // latestCheer, latestCheerAmount, latestCheerCurrency, latestCheerMessage
+    let latestCheer = _.find(events, (o) => o.event === 'cheer')
+    this.message = this.message.replace(/\$latestCheerAmount/g, !_.isNil(latestCheer) ? parseInt(latestCheer.amount, 10) : 'n/a')
+    this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? latestCheer.message : 'n/a')
+    this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? latestCheer.username : 'n/a')
   }
 
   async parse (attr) {

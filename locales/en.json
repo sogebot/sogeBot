@@ -466,7 +466,16 @@
         "userObject": "Full user object",
         "recipientObject": "Full recipient object",
         "recipient": "Recipient",
-        "currentSong": "Current song"
+        "currentSong": "Current song",
+        "latestFollower": "Latest Follower",
+        "latestSubscriber": "Latest Subscriber",
+        "latestTipAmount": "Latest Tip (amount)",
+        "latestTipCurrency": "Latest Tip (currency)",
+        "latestTipMessage": "Latest Tip (message)",
+        "latestTip": "Latest Tip (username)",
+        "latestCheerAmount": "Latest Cheer (amount)",
+        "latestCheerMessage": "Latest Cheer (message)",
+        "latestCheer": "Latest Cheer (username)"
       }
     },
     "page-settings": {

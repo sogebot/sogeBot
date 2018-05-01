@@ -466,7 +466,16 @@
         "userObject": "Úplný uživatelský objekt",
         "recipientObject": "Úplný objekt příjemce",
         "recipient": "Příjemce",
-        "currentSong": "Aktuální píseň"
+        "currentSong": "Aktuální píseň",
+        "latestFollower": "Poslední Follower",
+        "latestSubscriber": "Poslední Subscriber",
+        "latestTipAmount": "Poslední Tip (počet)",
+        "latestTipCurrency": "Poslední Tip (měna)",
+        "latestTipMessage": "Poslední Tip (zpráva)",
+        "latestTip": "Poslední Tip (uživatel)",
+        "latestCheerAmount": "Poslední Cheer (počet)",
+        "latestCheerMessage": "Poslední Cheer (zpráva)",
+        "latestCheer": "Poslední Cheer (uživatel)"
       }
     },
     "page-settings": {
