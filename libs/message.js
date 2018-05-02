@@ -278,42 +278,56 @@ class Message {
     }
     let evaluate = {
       '(eval#)': async function (filter) {
+        const d = debug('message:filter:eval'); d('Start')
         let toEvaluate = filter.replace('(eval ', '').slice(0, -1)
         if (_.isObject(attr.sender)) attr.sender = attr.sender.username
 
-        let awaits = await Promise.all([
-          global.users.getAll(),
-          global.users.get(attr.sender)
-        ])
+        d(toEvaluate)
 
-        let onlineViewers = await global.db.engine.find('users.online')
+        const containUsers = !_.isNil(toEvaluate.match(/users/g))
+        const containRandom = !_.isNil(toEvaluate.match(/random/g))
+        const containOnline = !_.isNil(toEvaluate.match(/online/g))
+        d('contain users: %s', containUsers)
+        d('contain random: %s', containRandom)
+        d('contain online: %s', containOnline)
 
+        let users = []
+        if (containUsers || containRandom) {
+          users = await global.users.getAll()
+        }
+        let user = await global.users.get(attr.sender)
+
+        let onlineViewers = []
         let onlineSubscribers = []
-        for (let viewer of onlineViewers) {
-          let user = await global.db.engine.find('users', { username: viewer.username, is: { ubscriber: true } })
-          if (!_.isEmpty(user)) onlineSubscribers.push(user.username)
-        }
-        onlineSubscribers = _.filter(onlineSubscribers, function (o) { return o !== attr.sender })
-
         let onlineFollowers = []
-        for (let viewer of onlineViewers) {
-          let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } })
-          if (!_.isEmpty(user)) onlineFollowers.push(user.username)
+
+        if (containOnline) {
+          onlineViewers = await global.db.engine.find('users.online')
+
+          for (let viewer of onlineViewers) {
+            let user = await global.db.engine.find('users', { username: viewer.username, is: { subscriber: true } })
+            if (!_.isEmpty(user)) onlineSubscribers.push(user.username)
+          }
+          onlineSubscribers = _.filter(onlineSubscribers, function (o) { return o !== attr.sender })
+
+          for (let viewer of onlineViewers) {
+            let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } })
+            if (!_.isEmpty(user)) onlineFollowers.push(user.username)
+          }
+          onlineFollowers = _.filter(onlineFollowers, function (o) { return o !== attr.sender })
         }
-        onlineFollowers = _.filter(onlineFollowers, function (o) { return o !== attr.sender })
 
         let randomVar = {
           online: {
-            viewer: _.sample(onlineViewers),
-            follower: _.sample(onlineFollowers),
-            subscriber: _.sample(onlineSubscribers)
+            viewer: _.sample(_.map(onlineViewers, 'username')),
+            follower: _.sample(_.map(onlineFollowers, 'username')),
+            subscriber: _.sample(_.map(onlineSubscribers, 'username'))
           },
-          viewer: _.sample(_.map(awaits[0], 'username')),
-          follower: _.sample(_.map(_.filter(awaits[0], (o) => _.get(o, 'is.follower', false)), 'username')),
-          subscriber: _.sample(_.map(_.filter(awaits[0], (o) => _.get(o, 'is.subscriber', false)), 'username'))
+          viewer: _.sample(_.map(users, 'username')),
+          follower: _.sample(_.map(_.filter(users, (o) => _.get(o, 'is.follower', false)), 'username')),
+          subscriber: _.sample(_.map(_.filter(users, (o) => _.get(o, 'is.subscriber', false)), 'username'))
         }
-        let users = awaits[0]
-        let is = awaits[1].is
+        let is = user.is
 
         let toEval = `(function evaluation () {  ${toEvaluate} })()`
         const context = {
