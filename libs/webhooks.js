@@ -185,10 +185,15 @@ class Webhooks {
     }
   */
   async stream (aEvent) {
+    if (_.isEmpty(await global.cache.channelId())) setTimeout(() => this.stream(aEvent), 10) // wait until channelId is set
+
     debug('Stream event received: %j', aEvent)
     // stream is online
     if (aEvent.data.length > 0) {
       let stream = aEvent.data[0]
+
+      if (parseInt(stream.user_id, 10) !== parseInt(await global.cache.channelId(), 10)) return debug(`This events doesn't belong to this channel`)
+
       await global.db.engine.update('api.current', { key: 'status' }, { value: stream.title })
       await global.db.engine.update('api.current', { key: 'game' }, { value: await global.api.getGameFromId(stream.game_id) })
 
