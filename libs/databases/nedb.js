@@ -28,6 +28,28 @@ class INeDB extends Interface {
       this.table[table] = new Datastore({ filename: './db/nedb/' + table + '.db', autoload: true })
       this.table[table].persistence.setAutocompactionInterval(60000)
 
+      switch (table) {
+        case 'users.bits':
+        case 'users.tips':
+          this.table[table].removeIndex('timestamp')
+          break
+        case 'users':
+        case 'users.online':
+          this.table[table].removeIndex('username')
+          break
+        case 'users.points':
+        case 'users.messages':
+          this.table[table].removeIndex('username')
+          break
+        case 'cache':
+        case 'customTranslations':
+          this.table[table].removeIndex('key')
+          break
+        case 'stats':
+          this.table[table].removeIndex('whenOnline')
+          break
+      }
+
       // create indexes
       if (this.createIndexes) {
         switch (table) {
