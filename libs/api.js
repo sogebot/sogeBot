@@ -612,7 +612,13 @@ class API {
       currentViews: _.get(await global.db.engine.findOne('api.current', { key: 'views' }), 'value', 0),
       maxViewers: _.get(await global.db.engine.findOne('api.max', { key: 'viewers' }), 'value', 0),
       newChatters: _.get(await global.db.engine.findOne('api.new', { key: 'chatters' }), 'value', 0),
-      currentHosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0)
+      currentHosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0),
+      game_id: stream.game_id,
+      user_id: stream.user_id,
+      type: stream.type,
+      language: stream.language,
+      title: stream.title,
+      thumbnail_url: stream.thumbnail_url
     })
   }
 
