@@ -100,7 +100,7 @@ class Streamlabs {
             username: event.from.toLowerCase(),
             message: event.message
           })
-          global.events.fire('tip', { username: event.from.toLowerCase(), amount: event.amount, message: event.message, currency: event.currency })
+          global.events.fire('tip', { username: event.from.toLowerCase(), amount: parseFloat(event.amount).toFixed(2), message: event.message, currency: event.currency })
         }
       }
     })
