@@ -285,7 +285,7 @@ class Message {
         d(toEvaluate)
 
         const containUsers = !_.isNil(toEvaluate.match(/users/g))
-        const containRandom = !_.isNil(toEvaluate.match(/random/g))
+        const containRandom = !_.isNil(toEvaluate.replace(/Math\.random|_\.random/g, '').match(/random/g))
         const containOnline = !_.isNil(toEvaluate.match(/online/g))
         d('contain users: %s', containUsers)
         d('contain random: %s', containRandom)
