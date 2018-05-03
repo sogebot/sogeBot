@@ -116,14 +116,17 @@ class Bets {
       global.commons.sendMessage(global.translate('bets.opened', {username: global.commons.getOwner()})
         .replace(/\$title/g, title)
         .replace(/\$maxIndex/g, options.length - 1)
-        .replace(/\$minutes/g, minutes), sender)
+        .replace(/\$minutes/g, minutes)
+        .replace(/\$options/g, options.map((v, i) => `${i}. '${v}'`).join(', ')), sender)
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
           global.commons.sendMessage(global.translate('bets.notEnoughOptions'), sender)
           break
         case ERROR_ALREADY_OPENED:
-          global.commons.sendMessage(global.translate('bets.running').replace(/\$maxIndex/g, currentBet.options.length - 1), sender)
+          global.commons.sendMessage(global.translate('bets.running')
+            .replace(/\$maxIndex/g, currentBet.options.length - 1)
+            .replace(/\$options/g, currentBet.options.map((v, i) => `${i}. '${v}'`).join(', ')), sender)
           break
         default:
           global.log.warning(e.stack)
@@ -141,6 +144,7 @@ class Bets {
       global.commons.sendMessage(global.translate(currentBet.locked ? 'bets.lockedInfo' : 'bets.info')
         .replace(/\$title/g, currentBet.title)
         .replace(/\$maxIndex/g, currentBet.options.length - 1)
+        .replace(/\$options/g, currentBet.options.map((v, i) => `${i}. '${v}'`).join(', '))
         .replace(/\$minutes/g, parseFloat((currentBet.end - new Date().getTime()) / 1000 / 60).toFixed(1)), sender)
     }
   }
