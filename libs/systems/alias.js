@@ -58,6 +58,9 @@ class Alias {
     const parser = new Parser()
     var alias
 
+    // is it an command?
+    if (!msg.trim().startsWith('!')) return true
+
     let cmdArray = msg.toLowerCase().split(' ')
     for (let i in msg.toLowerCase().split(' ')) { // search for correct alias
       d(`${i} - Searching for ${cmdArray.join(' ')} in aliases`)
@@ -89,6 +92,8 @@ class Alias {
     }
     d(`Is trying to bypass command permission: %s`, tryingToBypass)
 
+    d('Alias: %s', replace)
+    d('Command: %s', `!${alias.command}`)
     d('Running: %s', msg.replace(replace, `!${alias.command}`))
     if (!tryingToBypass) {
       debug('Checking if permissions are ok')
