@@ -932,12 +932,12 @@
     "raffle-winner-is": "Winner of raffle $keyword is $username! Win probability was $probability%!"
   },
   "bets": {
-      "running": "$sender, bet is already opened! Use !bet close 0-$maxIndex",
+      "running": "$sender, bet is already opened! Bet options: $options. Use !bet close 0-$maxIndex",
       "notRunning": "No bet is currently opened, ask mods to open it!",
-      "opened": "New bet '$title' is opened! Use !bet 0-$maxIndex [points] to win! You have only $minutesmin to bet!",
+      "opened": "New bet '$title' is opened! Bet options: $options. Use !bet 0-$maxIndex [points] to win! You have only $minutesmin to bet!",
       "closeNotEnoughOptions": "$sender, you need to select winning option for bet close.",
       "notEnoughOptions": "$sender, new bets needs at least 2 options!",
-      "info": "Bet '$title' is still opened! Use !bet 0-$maxIndex [points] to win! You have only $minutesmin to bet!",
+      "info": "Bet '$title' is still opened! Bet options: $options. Use !bet 0-$maxIndex [points] to win! You have only $minutesmin to bet!",
       "parseError": "{core.command-parse} !bet to check usage",
       "diffBet": "$sender, you already made a bet on $option and you cannot bet to different option!",
       "undefinedBet": "Sorry, $sender, but this bet option doesn't exist, use !bet to check usage",
