@@ -54,37 +54,27 @@ class Message {
 
     let random = {
       '(random.online.viewer)': async function () {
-        let onlineUsers = await global.db.engine.find('users.online')
-        let onlineViewers = []
-        for (let user of onlineUsers) {
-          if (user.username !== attr.sender && user.username !== config.settings.bot_username.toLowerCase()) {
-            onlineViewers.push(user.username)
-          }
-        }
+        const onlineViewers = _.filter(
+          (await global.db.engine.find('users.online')).map((o) => o.username),
+          (o) => o.username !== attr.sender && o.username !== config.settings.bot_username.toLowerCase())
         if (onlineViewers.length === 0) return 'unknown'
         return _.sample(onlineViewers)
       },
       '(random.online.follower)': async function () {
-        let onlineViewers = await global.db.engine.find('users.online')
-        let onlineFollowers = []
-        for (let viewer of onlineViewers) {
-          if (viewer.username !== attr.sender && viewer.username !== config.settings.bot_username.toLowerCase()) {
-            let user = await global.db.engine.find('users', { username: viewer.username, is: { follower: true } })
-            if (!_.isEmpty(user)) onlineFollowers.push(user.username)
-          }
-        }
+        const onlineViewers = (await global.db.engine.find('users.online')).map((o) => o.username)
+        const followers = _.filter(
+          (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username),
+          (o) => o.username !== attr.sender && o.username !== config.settings.bot_username.toLowerCase())
+        let onlineFollowers = _.intersection(onlineViewers, followers)
         if (onlineFollowers.length === 0) return 'unknown'
         return _.sample(onlineFollowers)
       },
       '(random.online.subscriber)': async function () {
-        let onlineViewers = await global.db.engine.find('users.online')
-        let onlineSubscribers = []
-        for (let viewer of onlineViewers) {
-          if (viewer.username !== attr.sender && viewer.username !== config.settings.bot_username.toLowerCase()) {
-            let user = await global.db.engine.find('users', { username: viewer.username, is: { subscriber: true } })
-            if (!_.isEmpty(user)) onlineSubscribers.push(user.username)
-          }
-        }
+        const onlineViewers = (await global.db.engine.find('users.online')).map((o) => o.username)
+        const subscribers = _.filter(
+          (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username),
+          (o) => o.username !== attr.sender && o.username !== config.settings.bot_username.toLowerCase())
+        let onlineSubscribers = _.intersection(onlineViewers, subscribers)
         if (onlineSubscribers.length === 0) return 'unknown'
         return _.sample(onlineSubscribers)
       },
