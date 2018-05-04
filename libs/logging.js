@@ -48,7 +48,7 @@ if (cluster.isWorker) {
     levels: levels,
     level: 'debug',
     format: format.combine(
-      format.timestamp(),
+      format.timestamp({format: 'YYYY-MM-DDTHH:mm:ss.SSS'}),
       format.printf(info => {
         let level
         if (info.level === 'error') level = '!!! ERROR !!!'
