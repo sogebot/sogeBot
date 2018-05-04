@@ -122,7 +122,7 @@ class Keywords {
     })
     for (let keyword of keywords) {
       if (!keyword.enabled) continue
-      let message = await new Message(keyword.response).parse({ sender: sender })
+      let message = await new Message(keyword.response).parse({ sender: sender.username })
       global.commons.sendMessage(message, sender)
     }
     return true
