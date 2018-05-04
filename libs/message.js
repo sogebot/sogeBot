@@ -7,6 +7,7 @@ const debug = require('debug')
 const _ = require('lodash')
 const config = require('../config.json')
 const cluster = require('cluster')
+const crypto = require('crypto')
 
 class Message {
   constructor (message) {
@@ -277,9 +278,23 @@ class Message {
         const containUsers = !_.isNil(toEvaluate.match(/users/g))
         const containRandom = !_.isNil(toEvaluate.replace(/Math\.random|_\.random/g, '').match(/random/g))
         const containOnline = !_.isNil(toEvaluate.match(/online/g))
+        const containUrl = !_.isNil(toEvaluate.match(/url\(['"](.*?)['"]\)/g))
         d('contain users: %s', containUsers)
         d('contain random: %s', containRandom)
         d('contain online: %s', containOnline)
+        d('contain url: %s', containUrl)
+
+        let urls = []
+        if (containUrl) {
+          for (let match of toEvaluate.match(/url\(['"](.*?)['"]\)/g)) {
+            const id = 'url' + crypto.randomBytes(64).toString('hex').slice(0, 5)
+            const url = match.replace(/url\(['"]|["']\)/g, '')
+            let response = await snekfetch.get(url)
+            if (_.isBuffer(response.body)) response.body = JSON.parse(response.body.toString())
+            urls.push({ id, response })
+            toEvaluate = toEvaluate.replace(match, id)
+          }
+        }
 
         let users = []
         if (containUsers || containRandom) {
@@ -320,7 +335,7 @@ class Message {
         let is = user.is
 
         let toEval = `(function evaluation () {  ${toEvaluate} })()`
-        const context = {
+        let context = {
           _: _,
           users: users,
           is: is,
@@ -328,6 +343,14 @@ class Message {
           sender: await global.configuration.getValue('atUsername') ? `@${attr.sender}` : `${attr.sender}`,
           param: _.isNil(attr.param) ? null : attr.param
         }
+
+        if (containUrl) {
+          // add urls to context
+          for (let url of urls) {
+            context[url.id] = url.response
+          }
+        }
+
         d(toEval, context); return (safeEval(toEval, context))
       }
     }
