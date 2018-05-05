@@ -7,6 +7,8 @@ const util = require('util')
 const constants = require('./constants')
 const config = require('../config.json')
 
+const DEBUG_PROCESS_PARSE = debug('parser:process')
+
 class Parser {
   constructor (opts) {
     opts = opts || {}
@@ -31,7 +33,7 @@ class Parser {
       if (parser.priority !== constants.MODERATION) continue // skip non-moderation parsers
       const isOk = await parser.fnc(parser.this, this.sender, this.message)
       if (!isOk) {
-        debug('parser:process')(`Parser ${parser.name} failed with message ${this.message}\n${util.inspect(isOk)}\n${util.inspect(this.sender)}`)
+        DEBUG_PROCESS_PARSE(`Parser ${parser.name} failed with message ${this.message}\n${util.inspect(isOk)}\n${util.inspect(this.sender)}`)
         return true
       }
     }
@@ -52,20 +54,20 @@ class Parser {
         (parser.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
         (parser.permission === constants.MODS && (isMod || isOwner)) ||
         (parser.permission === constants.OWNER_ONLY && isOwner)) {
-        debug('parser:process')(`Parser ${parser.name} start`)
+        DEBUG_PROCESS_PARSE(`Parser ${parser.name} start`)
         if (parser.fireAndForget) {
           parser.fnc(parser.this, this.sender, this.message, this.skip)
         } else if (!(await parser.fnc(parser.this, this.sender, this.message, this.skip))) {
           // TODO: call revert on parser with revert (price can have revert)
-          debug('parser:process')(`Parser ${parser.name} failed with message ${this.message}\n${util.inspect(this.sender)}`)
+          DEBUG_PROCESS_PARSE(`Parser ${parser.name} failed with message ${this.message}\n${util.inspect(this.sender)}`)
           return false
         }
-        debug('parser:process')(`Parser ${parser.name} finish`)
+        DEBUG_PROCESS_PARSE(`Parser ${parser.name} finish`)
       }
     }
 
     if (this.isCommand) {
-      debug('parser:process')(`Running command - ${this.message.trim()}`)
+      DEBUG_PROCESS_PARSE(`Running command - ${this.message.trim()}`)
       this.command(this.sender, this.message.trim(), this.skip)
     }
   }
