@@ -5,6 +5,8 @@ const debug = require('debug')('webhooks')
 
 class Webhooks {
   constructor () {
+    this.timeouts = {}
+
     this.enabled = {
       follows: false,
       streams: false
@@ -29,7 +31,8 @@ class Webhooks {
   clearCache () {
     debug('Clearing cache')
     this.cache = _.filter(this.cache, (o) => o.timestamp >= _.now() - 600000)
-    setTimeout(() => this.clearCache(), 600000)
+    if (!_.isNil(this.timeouts.clearCache)) clearTimeout(this.timeouts.clearCache)
+    this.timeouts.clearCache = setTimeout(() => this.clearCache(), 600000)
   }
 
   existsInCache (type, id) {
@@ -82,7 +85,8 @@ class Webhooks {
     }
 
     // resubscribe after while
-    setTimeout(() => this.subscribe(type), leaseSeconds * 1000)
+    if (!_.isNil(this.timeouts.subscribe)) clearTimeout(this.timeouts.subscribe)
+    this.timeouts.subscribe = setTimeout(() => this.subscribe(type), leaseSeconds * 1000)
   }
 
   async event (aEvent, res) {
