@@ -6,6 +6,10 @@ const util = require('util')
 
 const Interface = require('./interface')
 
+const DEBUG_MASTER_REQUEST_ID = debug('db:master:request:id')
+const DEBUG_MASTER_INCOMING = debug('db:master:incoming')
+const DEBUG_MASTER = debug('db:master')
+
 class IMasterController extends Interface {
   constructor () {
     super('master')
@@ -14,7 +18,7 @@ class IMasterController extends Interface {
 
     cluster.on('message', (worker, message) => {
       if (message.type !== 'db') return
-      debug('db:master:incoming')(`Got data from Worker#${worker.id}\n${util.inspect(message)}`)
+      DEBUG_MASTER_INCOMING(`Got data from Worker#${worker.id}\n${util.inspect(message)}`)
       this.data.push({
         id: message.id,
         items: message.items,
@@ -33,14 +37,14 @@ class IMasterController extends Interface {
     for (let worker in cluster.workers) {
       if (cluster.workers[worker].state !== 'online') allOnline = false
     }
-    if (allOnline) setTimeout(() => { this.connected = true; debug('db:master')('Connected') }, 5000) // TODO: send workers db find and if returned then its ok
+    if (allOnline) setTimeout(() => { this.connected = true; DEBUG_MASTER('Connected') }, 5000) // TODO: send workers db find and if returned then its ok
     else setTimeout(() => this.connect(), 10)
   }
 
   async sendRequest (resolve, reject, id, data) {
     try {
       _.sample(cluster.workers).send(data)
-      debug('db:master:request:id')(id)
+      DEBUG_MASTER_REQUEST_ID(id)
       this.returnData(resolve, reject, id)
     } catch (e) {
       if (!_.isNil(this.timeouts.sendRequest)) clearTimeout(this.timeouts.sendRequest)
