@@ -20,6 +20,7 @@ class Spotify {
   constructor () {
     if (require('cluster').isWorker) return
     this.collection = 'integrations.spotify'
+    this.timeouts = {}
     this.scopes = [ 'user-read-currently-playing', 'user-read-private', 'user-read-email' ]
     this.client = null
 
@@ -28,8 +29,8 @@ class Spotify {
     this.status()
     this.sockets()
 
-    setTimeout(() => this.IRefreshToken(), 60000)
-    setTimeout(() => this.ICurrentSong(), 10000)
+    this.timeouts.IRefreshToken = setTimeout(() => this.IRefreshToken(), 60000)
+    this.timeouts.ICurrentSong = setTimeout(() => this.ICurrentSong(), 10000)
   }
 
   get currentSong () {
@@ -70,7 +71,8 @@ class Spotify {
     } catch (e) {
       this.currentSong = {}
     }
-    setTimeout(() => this.ICurrentSong(), 10000)
+    if (!_.isNil(this.timeouts.ICurrentSong)) clearTimeout(this.timeouts.ICurrentSong)
+    this.timeouts.ICurrentSong = setTimeout(() => this.ICurrentSong(), 10000)
   }
 
   async IRefreshToken () {
@@ -84,7 +86,8 @@ class Spotify {
       global.log.error('Spotify refresh token failed')
       global.log.error(e)
     }
-    setTimeout(() => this.IRefreshToken(), 60000)
+    if (!_.isNil(this.timeouts.IRefreshToken)) clearTimeout(this.timeouts.IRefreshToken)
+    this.timeouts.IRefreshToken = setTimeout(() => this.IRefreshToken(), 60000)
   }
 
   get enabled () {
