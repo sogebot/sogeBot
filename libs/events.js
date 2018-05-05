@@ -13,6 +13,8 @@ const Message = require('./message')
 
 class Events {
   constructor () {
+    this.timeouts = {}
+
     if (cluster.isWorker) return // dont do anything on worker
 
     this.supportedEventsList = [
@@ -92,7 +94,8 @@ class Events {
     } catch (e) {
       console.error(e.stack)
     } finally {
-      setTimeout(() => this.fadeOut(), 1000)
+      if (!_.isNil(this.timeouts.fadeOut)) clearTimeout(this.timeouts.fadeOut)
+      this.timeouts.fadeOut = setTimeout(() => this.fadeOut(), 1000)
     }
   }
 
