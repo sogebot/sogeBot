@@ -9,6 +9,8 @@ const cluster = require('cluster')
 class API {
   constructor () {
     if (cluster.isMaster) {
+      this.timeouts = {}
+
       this.remainingAPICalls = 30
       this.refreshAPICalls = _.now() / 1000
       this.rate_limit_follower_check = []
@@ -54,7 +56,8 @@ class API {
       await this.isFollowerUpdate(this.rate_limit_follower_check.shift())
     }
 
-    setTimeout(() => this.intervalFollowerUpdate(), 500)
+    if (!_.isNil(this.timeouts.intervalFollowerUpdate)) clearTimeout(this.timeouts.intervalFollowerUpdate)
+    this.timeouts.intervalFollowerUpdate = setTimeout(() => this.intervalFollowerUpdate(), 500)
   }
 
   async _loadCachedStatusAndGame () {
@@ -79,7 +82,10 @@ class API {
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelID', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
       return
     } finally {
-      if (timeout === 1000) setTimeout(() => this.getChannelID(), timeout)
+      if (timeout === 1000) {
+        if (!_.isNil(this.timeouts.getChannelID)) clearTimeout(this.timeouts.getChannelID)
+        this.timeouts.getChannelID = setTimeout(() => this.getChannelID(), timeout)
+      }
     }
 
     const user = request.body.users[0]
@@ -111,7 +117,8 @@ class API {
     const needToWait = _.isNil(global.widgets)
     debug('api:getChannelChattersUnofficialAPI')(`GET ${url}\nwait: ${needToWait}`)
     if (needToWait) {
-      setTimeout(() => this.getChannelChattersUnofficialAPI(opts), 1000)
+      if (!_.isNil(this.timeouts.getChannelChattersUnofficialAPI)) clearTimeout(this.timeouts.getChannelChattersUnofficialAPI)
+      this.timeouts.getChannelChattersUnofficialAPI = setTimeout(() => this.getChannelChattersUnofficialAPI(opts), 1000)
       return
     }
 
@@ -124,7 +131,9 @@ class API {
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
-      return setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
+      if (!_.isNil(this.timeouts.getChannelChattersUnofficialAPI)) clearTimeout(this.timeouts.getChannelChattersUnofficialAPI)
+      this.timeouts.getChannelChattersUnofficialAPI = setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
+      return
     }
 
     const chatters = _.flatMap(request.body.chatters)
@@ -160,7 +169,8 @@ class API {
     if (opts.saveToWidget) sendPartEvent(bulkParted)
     if (opts.saveToWidget) sendJoinEvent(bulkInsert)
 
-    setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
+    if (!_.isNil(this.timeouts.getChannelChattersUnofficialAPI)) clearTimeout(this.timeouts.getChannelChattersUnofficialAPI)
+    this.timeouts.getChannelChattersUnofficialAPI = setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
   }
 
   async getChannelSubscribersOldAPI () {
@@ -174,7 +184,8 @@ class API {
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
     debug('api:getChannelSubscribersOldAPI')(`GET ${url}\nwait: ${needToWait}`)
     if (needToWait) {
-      setTimeout(() => this.getChannelSubscribersOldAPI(), 1000)
+      if (!_.isNil(this.timeouts.getChannelSubscribersOldAPI)) clearTimeout(this.timeouts.getChannelSubscribersOldAPI)
+      this.timeouts.getChannelSubscribersOldAPI = setTimeout(() => this.getChannelSubscribersOldAPI(), 1000)
       return
     }
 
@@ -203,7 +214,8 @@ class API {
       }
       return
     } finally {
-      if (timeout !== 0) setTimeout(() => this.getChannelSubscribersOldAPI(), timeout)
+      if (!_.isNil(this.timeouts.getChannelSubscribersOldAPI)) clearTimeout(this.timeouts.getChannelSubscribersOldAPI)
+      if (timeout !== 0) this.timeouts.getChannelSubscribersOldAPI = setTimeout(() => this.getChannelSubscribersOldAPI(), timeout)
     }
 
     debug('api:getChannelSubscribersOldAPI')(`Current subscribers count: ${request.body._total}`)
@@ -225,7 +237,8 @@ class API {
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
     debug('api:getChannelDataOldAPI')(`GET ${url}\nwait: ${needToWait}`)
     if (needToWait) {
-      setTimeout(() => this.getChannelDataOldAPI(), 1000)
+      if (!_.isNil(this.timeouts.getChannelDataOldAPI)) clearTimeout(this.timeouts.getChannelDataOldAPI)
+      this.timeouts.getChannelDataOldAPI = setTimeout(() => this.getChannelDataOldAPI(), 1000)
       return
     }
 
@@ -243,7 +256,8 @@ class API {
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
       return
     } finally {
-      setTimeout(() => this.getChannelDataOldAPI(), timeout)
+      if (!_.isNil(this.timeouts.getChannelDataOldAPI)) clearTimeout(this.timeouts.getChannelDataOldAPI)
+      this.timeouts.getChannelDataOldAPI = setTimeout(() => this.getChannelDataOldAPI(), timeout)
     }
 
     if (!this.gameOrTitleChangedManually) {
@@ -280,7 +294,8 @@ class API {
     const cid = await global.cache.channelId()
 
     if (_.isNil(cid)) {
-      setTimeout(() => this.getChannelHosts(), 1000)
+      if (!_.isNil(this.timeouts.getChannelHosts)) clearTimeout(this.timeouts.getChannelHosts)
+      this.timeouts.getChannelHosts = setTimeout(() => this.getChannelHosts(), 1000)
       return
     }
 
@@ -296,7 +311,8 @@ class API {
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
       return
     } finally {
-      setTimeout(() => this.getChannelHosts(), timeout)
+      if (!_.isNil(this.timeouts.getChannelHosts)) clearTimeout(this.timeouts.getChannelHosts)
+      this.timeouts.getChannelHosts = setTimeout(() => this.getChannelHosts(), timeout)
     }
 
     d('Current host count: %s, Hosts: %s', request.body.hosts.length, _.map(request.body.hosts, 'host_login').join(', '))
@@ -317,7 +333,8 @@ class API {
     debug('api:updateChannelViews')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
     if (needToWait || notEnoughAPICalls) {
       if (notEnoughAPICalls) debug('api:updateChannelViews')('Waiting for rate-limit to refresh')
-      setTimeout(() => this.updateChannelViews(), 1000)
+      if (!_.isNil(this.timeouts.updateChannelViews)) clearTimeout(this.timeouts.updateChannelViews)
+      this.timeouts.updateChannelViews = setTimeout(() => this.updateChannelViews(), 1000)
       return
     }
 
@@ -334,7 +351,8 @@ class API {
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
       return
     } finally {
-      setTimeout(() => this.updateChannelViews(), timeout)
+      if (!_.isNil(this.timeouts.updateChannelViews)) clearTimeout(this.timeouts.updateChannelViews)
+      this.timeouts.updateChannelViews = setTimeout(() => this.updateChannelViews(), timeout)
     }
 
     // save remaining api calls
@@ -354,7 +372,8 @@ class API {
     debug('api:getLatest100Followers')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
     if (needToWait || notEnoughAPICalls) {
       if (notEnoughAPICalls) debug('api:getLatest100Followers')('Waiting for rate-limit to refresh')
-      setTimeout(() => this.getLatest100Followers(quiet), 1000)
+      if (!_.isNil(this.timeouts.getLatest100Followers)) clearTimeout(this.timeouts.getLatest100Followers)
+      this.timeouts.getLatest100Followers = setTimeout(() => this.getLatest100Followers(quiet), 1000)
       return
     }
 
@@ -372,7 +391,8 @@ class API {
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
       return
     } finally {
-      setTimeout(() => this.getLatest100Followers(quiet), timeout)
+      if (!_.isNil(this.timeouts.getLatest100Followers)) clearTimeout(this.timeouts.getLatest100Followers)
+      this.timeouts.getLatest100Followers = setTimeout(() => this.getLatest100Followers(quiet), timeout)
     }
 
     // save remaining api calls
@@ -491,7 +511,8 @@ class API {
     debug('api:getCurrentStreamData')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
     if (needToWait || notEnoughAPICalls) {
       if (notEnoughAPICalls) debug('api:getCurrentStreamData')('Waiting for rate-limit to refresh')
-      setTimeout(() => this.getCurrentStreamData(opts), 1000)
+      if (!_.isNil(this.timeouts.getCurrentStreamData)) clearTimeout(this.timeouts.getCurrentStreamData)
+      this.timeouts.getCurrentStreamData = setTimeout(() => this.getCurrentStreamData(opts), 1000)
       return
     }
 
@@ -508,7 +529,8 @@ class API {
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
       return
     } finally {
-      if (opts.interval) setTimeout(() => this.getCurrentStreamData(opts), timeout)
+      if (!_.isNil(this.timeouts.interval)) clearTimeout(this.timeouts.interval)
+      if (opts.interval) this.timeouts.getCurrentStreamData = setTimeout(() => this.getCurrentStreamData(opts), timeout)
     }
 
     // save remaining api calls
@@ -648,7 +670,8 @@ class API {
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
     debug('api:setTitleAndGame')(`PUT ${url}\nwait: ${needToWait}`)
     if (needToWait) {
-      setTimeout(() => this.setTitleAndGame(self, sender, args), 10)
+      if (!_.isNil(this.timeouts.setTitleAndGame)) clearTimeout(this.timeouts.setTitleAndGame)
+      this.timeouts.setTitleAndGame = setTimeout(() => this.setTitleAndGame(self, sender, args), 10)
       return
     }
 
@@ -777,7 +800,8 @@ class API {
     debug('api:isFollowerUpdate')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
     if (needToWait || notEnoughAPICalls) {
       if (notEnoughAPICalls) debug('api:isFollowerUpdate')('Waiting for rate-limit to refresh')
-      setTimeout(() => this.isFollowerUpdate(user), 1000)
+      if (!_.isNil(this.timeouts.isFollowerUpdate)) clearTimeout(this.timeouts.isFollowerUpdate)
+      this.timeouts.isFollowerUpdate = setTimeout(() => this.isFollowerUpdate(user), 1000)
       return
     }
 
