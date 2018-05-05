@@ -8,6 +8,7 @@ const debug = require('debug')('systems:points')
 const constants = require('../constants')
 
 function Points () {
+  this.timestamps = {}
   if (global.commons.isSystemEnabled(this)) {
     if (require('cluster').isMaster) {
       this.updatePoints()
@@ -329,7 +330,8 @@ Points.prototype.updatePoints = async function () {
     global.log.error(e)
     global.log.error(e.stack)
   } finally {
-    setTimeout(() => this.updatePoints(), 60000)
+    if (!_.isNil(this.timeouts.updatePoints)) clearTimeout(this.timeouts.updatePoints)
+    this.timeouts.updatePoints = setTimeout(() => this.updatePoints(), 60000)
   }
 }
 
@@ -340,7 +342,8 @@ Points.prototype.compactPointsDb = async function () {
     global.log.error(e)
     global.log.error(e.stack)
   } finally {
-    setTimeout(() => this.compactPointsDb(), 60000)
+    if (!_.isNil(this.timeouts.compactPointsDb)) clearTimeout(this.timeouts.compactPointsDb)
+    this.timeouts.compactPointsDb = setTimeout(() => this.compactPointsDb(), 60000)
   }
 }
 
