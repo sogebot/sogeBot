@@ -11,6 +11,7 @@ const constants = require('../constants.js')
 class Heist {
   constructor () {
     this.collection = 'games.heist'
+    this.timeouts = {}
 
     this.enabled = true
     this.startedAt = null
@@ -30,7 +31,8 @@ class Heist {
       setTimeout(() => Promise.all([this.levels, this.results]), 5000) // init levels and results
 
       // intervals
-      setTimeout(() => this.iCheckFinished(), 10000) // wait for proper config startup
+      if (!_.isNil(this.timeouts.iCheckFinished)) clearTimeout(this.timeouts.iCheckFinished)
+      this.timeouts.iCheckFinished = setTimeout(() => this.iCheckFinished(), 10000) // wait for proper config startup
     }
   }
 
@@ -305,7 +307,8 @@ class Heist {
         // cleanup
         await global.db.engine.remove(this.collection, { key: 'startedAt' })
         await global.db.engine.remove(`${this.collection}.users`, {})
-        setTimeout(() => this.iCheckFinished(), 10000)
+        if (!_.isNil(this.timeouts.iCheckFinished)) clearTimeout(this.timeouts.iCheckFinished)
+        this.timeouts.iCheckFinished = setTimeout(() => this.iCheckFinished(), 10000)
         return
       }
 
@@ -369,7 +372,8 @@ class Heist {
       await global.db.engine.remove(this.collection, { key: 'lastHeistTimestamp' })
       global.commons.sendMessage((await this.get('copsCooldownMessage')), global.commons.getOwner())
     }
-    setTimeout(() => this.iCheckFinished(), 10000)
+    if (!_.isNil(this.timeouts.iCheckFinished)) clearTimeout(this.timeouts.iCheckFinished)
+    this.timeouts.iCheckFinished = setTimeout(() => this.iCheckFinished(), 10000)
   }
 
   async get (key) {
