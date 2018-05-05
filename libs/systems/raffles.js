@@ -25,6 +25,7 @@ const TYPE_TICKETS = 1
 
 class Raffles {
   constructor () {
+    this.timeouts = {}
     if (global.commons.isSystemEnabled(this)) {
       this.lastAnnounce = _.now()
 
@@ -144,7 +145,8 @@ class Raffles {
   async announce () {
     let raffle = await global.db.engine.findOne('raffles', { winner: null })
     if (!await global.cache.isOnline() || _.isEmpty(raffle) || _.now() - this.lastAnnounce < (await global.configuration.getValue('raffleAnnounceInterval') * 60 * 1000)) {
-      setTimeout(() => this.announce(), 60000)
+      if (!_.isNil(this.timeouts.announce)) clearTimeout(this.timeouts.announce)
+      this.timeouts.announce = setTimeout(() => this.announce(), 60000)
       return
     }
 
@@ -166,7 +168,8 @@ class Raffles {
     })
     debug(message); global.commons.sendMessage(message, global.commons.getOwner())
 
-    setTimeout(() => this.announce(), 60000)
+    if (!_.isNil(this.timeouts.announce)) clearTimeout(this.timeouts.announce)
+    this.timeouts.announce = setTimeout(() => this.announce(), 60000)
   }
 
   async remove (self) {
