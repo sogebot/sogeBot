@@ -22,6 +22,7 @@ const ERROR_MINIMAL_BET = '3'
 class Gambling {
   constructor () {
     this.collection = 'gambling'
+    this.timeouts = {}
 
     global.configuration.register('seppukuTimeout', 'gambling.seppuku.timeout', 'number', 10)
     global.configuration.register('rouletteTimeout', 'gambling.roulette.timeout', 'number', 10)
@@ -110,7 +111,11 @@ class Gambling {
       global.configuration.getValue('duelDuration')
     ])
 
-    if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * duelDuration) return setTimeout(() => this.pickDuelWinner(), 30000)
+    if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * duelDuration) {
+      if (!_.isNil(this.timeouts.pickDuelWinner)) clearTimeout(this.timeouts.pickDuelWinner)
+      this.timeouts.pickDuelWinner = setTimeout(() => this.pickDuelWinner(), 30000)
+      return
+    }
 
     debug('Duel users: %j', users)
     let total = 0
@@ -147,7 +152,8 @@ class Gambling {
     this.duelUsers = null
     this.duelTimestamp = 0
 
-    setTimeout(() => this.pickDuelWinner(), 30000)
+    if (!_.isNil(this.timeouts.pickDuelWinner)) clearTimeout(this.timeouts.pickDuelWinner)
+    this.timeouts.pickDuelWinner = setTimeout(() => this.pickDuelWinner(), 30000)
   }
 
   async duel (self, sender, text) {
