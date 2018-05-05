@@ -6,6 +6,17 @@ const constants = require('./constants')
 const moment = require('moment')
 const cluster = require('cluster')
 
+const DEBUG_API_CHANNELID = debug('api:getChannelID')
+const DEBUG_API_GET_CHANNEL_CHATTERS_UNOFFICIAL_API = debug('api:getChannelChattersUnofficialAPI')
+const DEBUG_API_GET_CHANNEL_SUBSCRIBERS_OLD_API = debug('api:getChannelSubscribersOldAPI')
+const DEBUG_API_GET_CHANNEL_DATA_OLD_API = debug('api:getChannelDataOldAPI')
+const DEBUG_API_UPDATE_CHANNEL_VIEWS = debug('api:updateChannelViews')
+const DEBUG_API_GET_LATEST_100_FOLLOWERS = debug('api:getLatest100Followers')
+const DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS = debug('api:getLatest100Followers:users')
+const DEBUG_API_GET_CURRENT_STREAM_DATA = debug('api:getCurrentStreamData')
+const DEBUG_API_SET_TITLE_AND_GAME = debug('api:setTitleAndGame')
+const DEBUG_API_IS_FOLLOWER_UPDATE = debug('api:isFollowerUpdate')
+
 class API {
   constructor () {
     if (cluster.isMaster) {
@@ -69,7 +80,7 @@ class API {
     const url = `https://api.twitch.tv/kraken/users?login=${config.settings.broadcaster_username}`
     let timeout = 60000
 
-    debug('api:getChannelID')(`GET ${url}`)
+    DEBUG_API_CHANNELID(`GET ${url}`)
     try {
       request = await snekfetch.get(url)
         .set('Accept', 'application/vnd.twitchtv.v5+json')
@@ -89,7 +100,7 @@ class API {
     }
 
     const user = request.body.users[0]
-    debug('api:getChannelID')(user)
+    DEBUG_API_CHANNELID(user)
     if (_.isNil(user)) {
       global.log.error('Channel ' + config.settings.broadcaster_username + ' not found!')
     } else {
@@ -115,7 +126,7 @@ class API {
 
     const url = `https://tmi.twitch.tv/group/user/${config.settings.broadcaster_username.toLowerCase()}/chatters`
     const needToWait = _.isNil(global.widgets)
-    debug('api:getChannelChattersUnofficialAPI')(`GET ${url}\nwait: ${needToWait}`)
+    DEBUG_API_GET_CHANNEL_CHATTERS_UNOFFICIAL_API(`GET ${url}\nwait: ${needToWait}`)
     if (needToWait) {
       if (!_.isNil(this.timeouts.getChannelChattersUnofficialAPI)) clearTimeout(this.timeouts.getChannelChattersUnofficialAPI)
       this.timeouts.getChannelChattersUnofficialAPI = setTimeout(() => this.getChannelChattersUnofficialAPI(opts), 1000)
@@ -137,7 +148,7 @@ class API {
     }
 
     const chatters = _.flatMap(request.body.chatters)
-    debug('api:getChannelChattersUnofficialAPI')(chatters)
+    DEBUG_API_GET_CHANNEL_CHATTERS_UNOFFICIAL_API(chatters)
 
     let bulkInsert = []
     let bulkParted = []
@@ -182,7 +193,7 @@ class API {
     }
 
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
-    debug('api:getChannelSubscribersOldAPI')(`GET ${url}\nwait: ${needToWait}`)
+    DEBUG_API_GET_CHANNEL_SUBSCRIBERS_OLD_API(`GET ${url}\nwait: ${needToWait}`)
     if (needToWait) {
       if (!_.isNil(this.timeouts.getChannelSubscribersOldAPI)) clearTimeout(this.timeouts.getChannelSubscribersOldAPI)
       this.timeouts.getChannelSubscribersOldAPI = setTimeout(() => this.getChannelSubscribersOldAPI(), 1000)
@@ -218,7 +229,7 @@ class API {
       if (timeout !== 0) this.timeouts.getChannelSubscribersOldAPI = setTimeout(() => this.getChannelSubscribersOldAPI(), timeout)
     }
 
-    debug('api:getChannelSubscribersOldAPI')(`Current subscribers count: ${request.body._total}`)
+    DEBUG_API_GET_CHANNEL_SUBSCRIBERS_OLD_API(`Current subscribers count: ${request.body._total}`)
     await global.db.engine.update('api.current', { key: 'subscribers' }, { value: request.body._total - 1 })
 
     const subscribers = _.map(request.body.subscriptions, 'user')
@@ -235,7 +246,7 @@ class API {
     const url = `https://api.twitch.tv/kraken/channels/${cid}`
 
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
-    debug('api:getChannelDataOldAPI')(`GET ${url}\nwait: ${needToWait}`)
+    DEBUG_API_GET_CHANNEL_DATA_OLD_API(`GET ${url}\nwait: ${needToWait}`)
     if (needToWait) {
       if (!_.isNil(this.timeouts.getChannelDataOldAPI)) clearTimeout(this.timeouts.getChannelDataOldAPI)
       this.timeouts.getChannelDataOldAPI = setTimeout(() => this.getChannelDataOldAPI(), 1000)
@@ -262,7 +273,7 @@ class API {
 
     if (!this.gameOrTitleChangedManually) {
       // Just polling update
-      debug('api:getChannelDataOldAPI')(`Current game: ${request.body.game}, Current Status: ${request.body.status}`)
+      DEBUG_API_GET_CHANNEL_DATA_OLD_API(`Current game: ${request.body.game}, Current Status: ${request.body.status}`)
 
       let rawStatus = await global.cache.rawStatus()
       let status = await this.parseTitle()
@@ -330,9 +341,9 @@ class API {
 
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
-    debug('api:updateChannelViews')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
+    DEBUG_API_UPDATE_CHANNEL_VIEWS(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
     if (needToWait || notEnoughAPICalls) {
-      if (notEnoughAPICalls) debug('api:updateChannelViews')('Waiting for rate-limit to refresh')
+      if (notEnoughAPICalls) DEBUG_API_UPDATE_CHANNEL_VIEWS('Waiting for rate-limit to refresh')
       if (!_.isNil(this.timeouts.updateChannelViews)) clearTimeout(this.timeouts.updateChannelViews)
       this.timeouts.updateChannelViews = setTimeout(() => this.updateChannelViews(), 1000)
       return
@@ -359,7 +370,7 @@ class API {
     this.remainingAPICalls = request.headers['ratelimit-remaining']
     this.refreshAPICalls = request.headers['ratelimit-reset']
 
-    debug('api:updateChannelViews')(request.body.data)
+    DEBUG_API_UPDATE_CHANNEL_VIEWS(request.body.data)
     await global.db.engine.update('api.current', { key: 'views' }, { value: request.body.data[0].view_count })
   }
 
@@ -369,9 +380,9 @@ class API {
 
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
-    debug('api:getLatest100Followers')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
+    DEBUG_API_GET_LATEST_100_FOLLOWERS(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
     if (needToWait || notEnoughAPICalls) {
-      if (notEnoughAPICalls) debug('api:getLatest100Followers')('Waiting for rate-limit to refresh')
+      if (notEnoughAPICalls) DEBUG_API_GET_LATEST_100_FOLLOWERS('Waiting for rate-limit to refresh')
       if (!_.isNil(this.timeouts.getLatest100Followers)) clearTimeout(this.timeouts.getLatest100Followers)
       this.timeouts.getLatest100Followers = setTimeout(() => this.getLatest100Followers(quiet), 1000)
       return
@@ -408,12 +419,12 @@ class API {
       for (let u of request.body.data) {
         fTime.push({ id: u.from_id, followed_at: u.followed_at })
         let user = await global.db.engine.findOne('users', { id: u.from_id })
-        debug('api:getLatest100Followers:users')('Searching id %s in users db: %j', u.from_id, user)
+        DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Searching id %s in users db: %j', u.from_id, user)
         if (_.isEmpty(user)) fidsToLoadFromAPI.push(u.from_id)
         else followersUsername.push(user.username)
       }
-      debug('api:getLatest100Followers:users')('Usernames from db: %j', followersUsername)
-      debug('api:getLatest100Followers:users')('IDs to load from API: %j', fidsToLoadFromAPI)
+      DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Usernames from db: %j', followersUsername)
+      DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('IDs to load from API: %j', fidsToLoadFromAPI)
 
       if (fidsToLoadFromAPI.length > 0) {
         let fids = _.map(fidsToLoadFromAPI, (o) => `id=${o}`)
@@ -428,7 +439,7 @@ class API {
         global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.status, remaining: this.remainingAPICalls })
         for (let follower of usersFromApi.body.data) {
           followersUsername.push(follower.login.toLowerCase())
-          debug('api:getLatest100Followers:users')('Saving user %s id %s', follower.login.toLowerCase(), follower.id)
+          DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Saving user %s id %s', follower.login.toLowerCase(), follower.id)
           await global.db.engine.update('users', { username: follower.login.toLowerCase() }, { id: follower.id })
         }
       }
@@ -451,10 +462,10 @@ class API {
         }
         try {
           if (!_.isNil(_.find(fTime, (o) => o.id === user.id))) {
-            debug('api:getLatest100Followers:users')('Saving user %s\n%f', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
+            DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Saving user %s\n%f', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
             global.db.engine.update('users', { username: follower }, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
           } else {
-            debug('api:getLatest100Followers:users')('Saving user %s\n%f', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment().format('x')) } })
+            DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Saving user %s\n%f', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment().format('x')) } })
             global.db.engine.update('users', { username: follower }, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment().format('x')) } })
           }
         } catch (e) {
@@ -464,7 +475,7 @@ class API {
       }
     }
 
-    debug('api:getLatest100Followers')(`Current followers count: ${request.body.total}`)
+    DEBUG_API_GET_LATEST_100_FOLLOWERS(`Current followers count: ${request.body.total}`)
     global.db.engine.update('api.current', { key: 'followers' }, { value: request.body.total })
   }
 
@@ -508,9 +519,9 @@ class API {
 
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
-    debug('api:getCurrentStreamData')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
+    DEBUG_API_GET_CURRENT_STREAM_DATA(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
     if (needToWait || notEnoughAPICalls) {
-      if (notEnoughAPICalls) debug('api:getCurrentStreamData')('Waiting for rate-limit to refresh')
+      if (notEnoughAPICalls) DEBUG_API_GET_CURRENT_STREAM_DATA('Waiting for rate-limit to refresh')
       if (!_.isNil(this.timeouts.getCurrentStreamData)) clearTimeout(this.timeouts.getCurrentStreamData)
       this.timeouts.getCurrentStreamData = setTimeout(() => this.getCurrentStreamData(opts), 1000)
       return
@@ -537,11 +548,11 @@ class API {
     this.remainingAPICalls = request.headers['ratelimit-remaining']
     this.refreshAPICalls = request.headers['ratelimit-reset']
 
-    debug('api:getCurrentStreamData')(request.body)
+    DEBUG_API_GET_CURRENT_STREAM_DATA(request.body)
     global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
     if (request.status === 200 && !_.isNil(request.body.data[0])) {
       // correct status and we've got a data - stream online
-      let stream = request.body.data[0]; debug('api:getCurrentStreamData')(stream)
+      let stream = request.body.data[0]; DEBUG_API_GET_CURRENT_STREAM_DATA(stream)
 
       if (!moment.preciseDiff(moment(stream.started_at), moment((await global.cache.when()).online), true).firstDateWasLater) await global.cache.when({ online: stream.started_at })
       if (!await global.cache.isOnline() || this.streamType !== stream.type) {
@@ -591,7 +602,7 @@ class API {
       if (await global.cache.isOnline() && this.curRetries < this.maxRetries) {
         // retry if it is not just some network / twitch issue
         this.curRetries = this.curRetries + 1
-        debug('api:getCurrentStreamData')('Retry stream offline check, cur: %s, max: %s', this.curRetries, this.maxRetries)
+        DEBUG_API_GET_CURRENT_STREAM_DATA('Retry stream offline check, cur: %s, max: %s', this.curRetries, this.maxRetries)
       } else {
         // stream is really offline
         this.curRetries = 0
@@ -668,7 +679,7 @@ class API {
     const url = `https://api.twitch.tv/kraken/channels/${cid}`
 
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
-    debug('api:setTitleAndGame')(`PUT ${url}\nwait: ${needToWait}`)
+    DEBUG_API_SET_TITLE_AND_GAME(`PUT ${url}\nwait: ${needToWait}`)
     if (needToWait) {
       if (!_.isNil(this.timeouts.setTitleAndGame)) clearTimeout(this.timeouts.setTitleAndGame)
       this.timeouts.setTitleAndGame = setTimeout(() => this.setTitleAndGame(self, sender, args), 10)
@@ -706,7 +717,7 @@ class API {
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
       return
     }
-    debug('api:setTitleAndGame')(request.body)
+    DEBUG_API_SET_TITLE_AND_GAME(request.body)
 
     global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
     if (request.status === 200 && !_.isNil(request.body)) {
@@ -797,22 +808,22 @@ class API {
 
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
-    debug('api:isFollowerUpdate')(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
+    DEBUG_API_IS_FOLLOWER_UPDATE(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
     if (needToWait || notEnoughAPICalls) {
-      if (notEnoughAPICalls) debug('api:isFollowerUpdate')('Waiting for rate-limit to refresh')
+      if (notEnoughAPICalls) DEBUG_API_IS_FOLLOWER_UPDATE('Waiting for rate-limit to refresh')
       if (!_.isNil(this.timeouts.isFollowerUpdate)) clearTimeout(this.timeouts.isFollowerUpdate)
       this.timeouts.isFollowerUpdate = setTimeout(() => this.isFollowerUpdate(user), 1000)
       return
     }
 
     try {
-      debug('api:isFollowerUpdate')('IsFollowerUpdate check for user %s', user.username)
+      DEBUG_API_IS_FOLLOWER_UPDATE('IsFollowerUpdate check for user %s', user.username)
       var request = await snekfetch.get(url)
         .set('Accept', 'application/vnd.twitchtv.v5+json')
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
         .set('Client-ID', config.settings.client_id)
       global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
-      debug('api:isFollowerUpdate')('Request done: %j', request.body)
+      DEBUG_API_IS_FOLLOWER_UPDATE('Request done: %j', request.body)
     } catch (e) {
       global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: global.twitch.remainingAPICalls })
