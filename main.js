@@ -254,9 +254,9 @@ function loadClientListeners (client) {
     let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
     if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
 
-    const user = await global.db.engine.findOne('users', { username: username })
-    if (!fromSelf && !_.get(user, 'is.online', false)) {
-      global.users.set(username, { is: { online: true } })
+    const user = await global.db.engine.findOne('users.online', { username: username })
+    if (!fromSelf && _.isEmpty(user)) {
+      await global.db.engine.insert('users.online', { username: username })
       global.api.isFollower(username)
       global.widgets.joinpart.send({ username: username, type: 'join' })
       global.events.fire('user-joined-channel', { username: username })
@@ -269,9 +269,9 @@ function loadClientListeners (client) {
     let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
     if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
 
-    const user = await global.db.engine.findOne('users', { username: username })
-    if (!fromSelf && !_.get(user, 'is.online', true)) {
-      global.users.set(username, { is: { online: false } })
+    const user = await global.db.engine.findOne('users.online', { username: username })
+    if (!fromSelf && !_.isEmpty(user)) {
+      await global.db.engine.remove('users.online', { username: username })
       global.widgets.joinpart.send({ username: username, type: 'part' })
       global.events.fire('user-parted-channel', { username: username })
     }
