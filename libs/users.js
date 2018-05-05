@@ -9,6 +9,8 @@ const config = require('../config.json')
 const debug = require('debug')('users')
 
 function Users () {
+  this.timeouts = {}
+
   this.uiSortCache = null
   this.uiSortCacheViewers = []
 
@@ -543,7 +545,8 @@ Users.prototype.compactMessagesDb = async function () {
     global.log.error(e)
     global.log.error(e.stack)
   } finally {
-    setTimeout(() => this.compactMessagesDb(), 10000)
+    if (!_.isNil(this.timeouts.compactMessagesDb)) clearTimeout(this.timeouts.compactMessagesDb)
+    this.timeouts.compactMessagesDb = setTimeout(() => this.compactMessagesDb(), 10000)
   }
 }
 
