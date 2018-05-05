@@ -42,9 +42,8 @@ class Credits {
 
   sockets () {
     const d = debug('Credits:sockets')
-    this.io = global.panel.io.of('/overlays/credits')
 
-    this.io.on('connection', (socket) => {
+    global.panel.io.of('/overlays/credits').on('connection', (socket) => {
       d('Socket /overlays/credits connected, registering sockets')
       socket.on('load', async (callback) => {
         let [events, when, hosts, socials] = await Promise.all([

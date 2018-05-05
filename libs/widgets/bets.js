@@ -37,9 +37,8 @@ class BetsWidget {
 
   sockets () {
     const d = debug('BetsWidgets:sockets')
-    this.io = global.panel.io.of('/widgets/bets')
 
-    this.io.on('connection', (socket) => {
+    global.panel.io.of('/widgets/bets').on('connection', (socket) => {
       d('Socket /widgets/bets connected, registering sockets')
 
       socket.on('data', async (callback) => {

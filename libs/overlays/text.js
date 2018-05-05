@@ -9,9 +9,8 @@ class TextOverlay {
 
   sockets () {
     const d = debug('TextOverlay:sockets')
-    this.io = global.panel.io.of('/overlays/text')
 
-    this.io.on('connection', (socket) => {
+    global.panel.io.of('/overlays/text').on('connection', (socket) => {
       d('Socket /overlays/text connected, registering sockets')
       const regexp = new RegExp('\\$_[a-zA-Z0-9_]+', 'g')
       socket.on('parse.data', async (b64string, callback) => {
