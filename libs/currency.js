@@ -5,6 +5,8 @@ const debug = require('debug')
 
 class Currency {
   constructor () {
+    this.timeouts = {}
+
     this.base = 'CZK'
     this.rates = {}
 
@@ -60,7 +62,9 @@ class Currency {
       console.error(e.stack)
       refresh = 1000
     }
-    setTimeout(() => this.updateRates(), refresh) // update rates once per day
+
+    if (!_.isNil(this.timeouts.updateRates)) clearTimeout(this.timeouts.updateRates)
+    this.timeouts.updateRates = setTimeout(() => this.updateRates(), refresh) // update rates once per day
   }
 }
 
