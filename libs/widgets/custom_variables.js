@@ -10,15 +10,14 @@ class CustomVariablesWidget {
 
     require('cluster').on('message', (worker, message) => {
       if (message.type !== 'widget_custom_variables') return
-      this.io.emit(message.emit) // send update to widget
+      global.panel.io.of('/widgets/customVariables').emit(message.emit) // send update to widget
     })
   }
 
   sockets () {
     const d = debug('CustomVariablesWidget:sockets')
-    this.io = global.panel.io.of('/widgets/customVariables')
 
-    this.io.on('connection', (socket) => {
+    global.panel.io.of('/widgets/customVariables').on('connection', (socket) => {
       d('Socket /widgets/customVariables connected, registering sockets')
       socket.on('list.variables', async (callback) => {
         const variables = await global.db.engine.find('widgets.customVariables')

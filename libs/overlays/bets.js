@@ -32,9 +32,8 @@ class BetsOverlay {
 
   sockets () {
     const d = debug('BetsOverlay:sockets')
-    this.io = global.panel.io.of('/overlays/bets')
 
-    this.io.on('connection', (socket) => {
+    global.panel.io.of('/overlays/bets').on('connection', (socket) => {
       d('Socket /overlays/bets connected, registering sockets')
 
       socket.on('data', async (callback) => {
