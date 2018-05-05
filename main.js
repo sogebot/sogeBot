@@ -12,6 +12,10 @@ const moment = require('moment')
 const constants = require('./libs/constants')
 const config = require('./config.json')
 
+const DEBUG_CLUSTER_FORK = debug('cluster:fork')
+const DEBUG_CLUSTER_MASTER = debug('cluster:master')
+const DEBUG_TMIJS = debug('tmijs')
+
 // this is disabled in tests
 global.cluster = _.isNil(global.cluster) ? true : global.cluster
 
@@ -122,7 +126,7 @@ function main () {
 
 function fork () {
   let worker = cluster.fork()
-  debug('cluster:fork')(`New worker ${worker.id} was created.`)
+  DEBUG_CLUSTER_FORK(`New worker ${worker.id} was created.`)
   // processing messages from workers
   worker.on('message', async (msg) => {
     if (msg.type === 'lang') {
@@ -161,26 +165,26 @@ function fork () {
 
 function loadClientListeners (client) {
   global.client.on('connected', function (address, port) {
-    debug('tmijs')('Bot is connected to TMI server - %s:%s', address, port)
+    DEBUG_TMIJS('Bot is connected to TMI server - %s:%s', address, port)
     global.log.info('Bot is connected to TMI server')
     global.client.color(config.settings.bot_color)
     global.status.TMI = constants.CONNECTED
   })
 
   global.client.on('connecting', function (address, port) {
-    debug('tmijs')('Bot is connecting to TMI server - %s:%s', address, port)
+    DEBUG_TMIJS('Bot is connecting to TMI server - %s:%s', address, port)
     global.log.info('Bot is connecting to TMI server')
     global.status.TMI = constants.CONNECTING
   })
 
   global.client.on('reconnect', function (address, port) {
-    debug('tmijs')('Bot is reconnecting to TMI server - %s:%s', address, port)
+    DEBUG_TMIJS('Bot is reconnecting to TMI server - %s:%s', address, port)
     global.log.info('Bot is trying to reconnect to TMI server')
     global.status.TMI = constants.RECONNECTING
   })
 
   global.client.on('message', async function (channel, sender, message, fromSelf) {
-    debug('tmijs')('Message received: %s\n\tuserstate: %s', message, JSON.stringify(sender))
+    DEBUG_TMIJS('Message received: %s\n\tuserstate: %s', message, JSON.stringify(sender))
 
     if (!fromSelf && config.settings.bot_username.toLowerCase() !== sender.username) {
       sendMessageToWorker(sender, message)
@@ -189,7 +193,7 @@ function loadClientListeners (client) {
   })
 
   global.client.on('mod', async function (channel, username) {
-    debug('tmijs')('User mod: %s', username)
+    DEBUG_TMIJS('User mod: %s', username)
     const user = await global.users.get(username)
     if (!user.is.mod) global.events.fire('mod', { username: username })
     global.users.set(username, { is: { mod: true } })
@@ -216,29 +220,29 @@ function loadClientListeners (client) {
   })
 
   global.broadcasterClient.on('connected', function (address, port) {
-    debug('tmijs')('Broadcaster is connected to TMI server - %s:%s', address, port)
+    DEBUG_TMIJS('Broadcaster is connected to TMI server - %s:%s', address, port)
     global.log.info('Broadcaster is connected to TMI server')
   })
 
   global.broadcasterClient.on('connecting', function (address, port) {
-    debug('tmijs')('Broadcaster is connecting to TMI server - %s:%s', address, port)
+    DEBUG_TMIJS('Broadcaster is connecting to TMI server - %s:%s', address, port)
     global.log.info('Broadcaster is connecting to TMI server')
   })
 
   global.client.on('reconnect', function (address, port) {
-    debug('tmijs')('Bot is reconnecting to TMI server - %s:%s', address, port)
+    DEBUG_TMIJS('Bot is reconnecting to TMI server - %s:%s', address, port)
     global.log.info('Bot is trying to reconnect to TMI server')
     global.status.TMI = constants.RECONNECTING
   })
 
   global.client.on('disconnected', function (address, port) {
-    debug('tmijs')('Bot is disconnected to TMI server - %s:%s', address, port)
+    DEBUG_TMIJS('Bot is disconnected to TMI server - %s:%s', address, port)
     global.log.warning('Bot is disconnected from TMI server')
     global.status.TMI = constants.DISCONNECTED
   })
 
   global.client.on('action', async function (channel, userstate, message, self) {
-    debug('tmijs')('User action: %s\n\tuserstate', message, JSON.stringify(userstate))
+    DEBUG_TMIJS('User action: %s\n\tuserstate', message, JSON.stringify(userstate))
 
     let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: userstate.username })
     if (!_.isEmpty(ignoredUser) && userstate.username !== config.settings.broadcaster_username) return
@@ -249,7 +253,7 @@ function loadClientListeners (client) {
   })
 
   global.client.on('join', async function (channel, username, fromSelf) {
-    debug('tmijs')('User joined: %s (isBot: %s)', username, fromSelf)
+    DEBUG_TMIJS('User joined: %s (isBot: %s)', username, fromSelf)
 
     let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
     if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
@@ -264,7 +268,7 @@ function loadClientListeners (client) {
   })
 
   global.client.on('part', async function (channel, username, fromSelf) {
-    debug('tmijs')('User parted: %s (isBot: %s)', username, fromSelf)
+    DEBUG_TMIJS('User parted: %s (isBot: %s)', username, fromSelf)
 
     let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
     if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
@@ -278,23 +282,23 @@ function loadClientListeners (client) {
   })
 
   global.client.on('ban', function (channel, username, reason) {
-    debug('tmijs')('User ban: %s with reason %s', username, reason)
+    DEBUG_TMIJS('User ban: %s with reason %s', username, reason)
     global.log.ban(`${username}, reason: ${reason}`)
     global.events.fire('ban', { username: username.toLowerCase(), reason: reason })
   })
 
   global.client.on('timeout', function (channel, username, reason, duration) {
-    debug('tmijs')('User timeout: %s with reason %s for %ss', username, reason, duration)
+    DEBUG_TMIJS('User timeout: %s with reason %s for %ss', username, reason, duration)
     global.events.fire('timeout', { username: username.toLowerCase(), reason: reason, duration: duration })
   })
 
   global.client.on('hosting', function (channel, target, viewers) {
-    debug('tmijs')('Hosting: %s with %s viewers', target, viewers)
+    DEBUG_TMIJS('Hosting: %s with %s viewers', target, viewers)
     global.events.fire('hosting', { target: target, viewers: viewers })
   })
 
   global.broadcasterClient.on('hosted', async (channel, username, viewers, autohost) => {
-    debug(`Hosted by ${username} with ${viewers} viewers - autohost: ${autohost}`)
+    DEBUG_TMIJS(`Hosted by ${username} with ${viewers} viewers - autohost: ${autohost}`)
     global.log.host(`${username}, viewers: ${viewers}, autohost: ${autohost}`)
 
     global.db.engine.update('cache.hosts', { username: username }, { username: username })
@@ -329,7 +333,7 @@ if (cluster.isMaster) {
 }
 
 async function subscription (channel, username, method) {
-  debug('tmijs')('Subscription: %s from %j', username, method)
+  DEBUG_TMIJS('Subscription: %s from %j', username, method)
 
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
   if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
@@ -341,7 +345,7 @@ async function subscription (channel, username, method) {
 }
 
 async function resub (channel, username, months, message, userstate, method) {
-  debug('tmijs')('Resub: %s (%s months) - %s', username, months, message, userstate, method)
+  DEBUG_TMIJS('Resub: %s (%s months) - %s', username, months, message, userstate, method)
 
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
   if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
@@ -354,7 +358,7 @@ async function resub (channel, username, months, message, userstate, method) {
 
 async function subgift (channel, username, recipient) {
   recipient = recipient.toLowerCase()
-  debug('tmijs')('Subgift: from %s to %s', username, recipient)
+  DEBUG_TMIJS('Subgift: from %s to %s', username, recipient)
 
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
   if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
@@ -366,7 +370,7 @@ async function subgift (channel, username, recipient) {
 }
 
 async function cheer (channel, userstate, message) {
-  debug('tmijs')('Cheer: %s\n\tuserstate: %s', message, JSON.stringify(userstate))
+  DEBUG_TMIJS('Cheer: %s\n\tuserstate: %s', message, JSON.stringify(userstate))
 
   // remove cheerX or channelCheerX from message
   message = message.replace(/(.*?[cC]heer[\d]+)/g, '').trim()
@@ -392,7 +396,7 @@ function sendMessageToWorker (sender, message) {
     return
   } else lastWorker = worker.id
 
-  debug('cluster:master')(`Sending ${message} ${util.inspect(sender)} to worker#${worker.id} - is connected: ${worker.isConnected()}`)
+  DEBUG_CLUSTER_MASTER(`Sending ${message} ${util.inspect(sender)} to worker#${worker.id} - is connected: ${worker.isConnected()}`)
   if (worker.isConnected()) worker.send({ type: 'message', sender: sender, message: message })
   else setTimeout(() => sendMessageToWorker(sender, message), 10) // refresh if worker is disconnected
 }
