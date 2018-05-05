@@ -7,6 +7,8 @@ const crypto = require('crypto')
 
 const Parser = require('./libs/parser')
 
+const DEBUG_CLUSTER_WORKER = debug('cluster:worker')
+
 var workerIsFree = {
   message: true,
   db: true
@@ -38,7 +40,7 @@ function cluster () {
     global.games = require('auto-load')('./libs/games/')
     global.integrations = require('auto-load')('./libs/integrations/')
 
-    debug('cluster:worker')(`Worker ${process.pid} has started.`)
+    DEBUG_CLUSTER_WORKER(`Worker ${process.pid} has started.`)
 
     process.on('message', async (data) => {
       switch (data.type) {
@@ -88,20 +90,21 @@ function cluster () {
 
   async function message (data) {
     const id = crypto.randomBytes(64).toString('hex').slice(0, 5)
-    debug(`cluster:worker:onMessage:${id}`)(data)
+    const DEBUG_CLUSTER_WORKER_ONMESSAGE_ID = debug(`cluster:worker:onMessage:${id}`)
+    DEBUG_CLUSTER_WORKER_ONMESSAGE_ID(data)
     let sender = data.sender
     let message = data.message
     let skip = data.skip
 
-    debug(`cluster:worker:onMessage:${id}`)('Init of parser')
+    DEBUG_CLUSTER_WORKER_ONMESSAGE_ID('Init of parser')
     const parse = new Parser({ sender: sender, message: message, skip: skip })
 
-    debug(`cluster:worker:onMessage:${id}`)('Checking msg type')
+    DEBUG_CLUSTER_WORKER_ONMESSAGE_ID('Checking msg type')
     if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {
       global.log.whisperIn(message, {username: sender.username})
     } else if (!skip && !global.commons.isBot(sender.username)) global.log.chatIn(message, {username: sender.username})
 
-    debug(`cluster:worker:onMessage:${id}`)('IsModerated, isIgnored')
+    DEBUG_CLUSTER_WORKER_ONMESSAGE_ID('IsModerated, isIgnored')
     const isModerated = await parse.isModerated()
     const isIgnored = await global.commons.isIgnored(sender)
 
@@ -118,10 +121,10 @@ function cluster () {
         } else if (!message.startsWith('!') && await global.cache.isOnline()) global.db.engine.insert('users.messages', { username: sender.username, messages: 1 })
       }
 
-      debug(`cluster:worker:onMessage:${id}`)('Process parser')
+      DEBUG_CLUSTER_WORKER_ONMESSAGE_ID('Process parser')
       await parse.process()
     }
-    debug(`cluster:worker:onMessage:${id}`)('Stats sending')
+    DEBUG_CLUSTER_WORKER_ONMESSAGE_ID('Stats sending')
     process.send({ type: 'stats', of: 'parser', value: parse.time(), message: message })
   }
 }
@@ -143,7 +146,7 @@ process.on('uncaughtException', (error) => {
 
 function gracefullyExit () {
   if (_.every(workerIsFree)) {
-    debug('cluster:worker')(`Exiting gracefully worker ${process.pid}`)
+    DEBUG_CLUSTER_WORKER(`Exiting gracefully worker ${process.pid}`)
     process.exit()
   } else setTimeout(() => gracefullyExit(), 10)
 }
