@@ -22,6 +22,7 @@ var constants = require('../constants')
 
 class Timers {
   constructor () {
+    this.timeouts = {}
     if (global.commons.isSystemEnabled(this) && require('cluster').isMaster) {
       this.init()
       global.panel.addMenu({category: 'manage', name: 'timers', id: 'timers'})
@@ -194,7 +195,8 @@ class Timers {
       }
       await global.db.engine.update('timers', { _id: timer._id.toString() }, { trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
     }
-    setTimeout(() => this.check(), 1000) // this will run check 1s after full check is correctly done
+    if (!_.isNil(this.timeouts.check)) clearTimeout(this.timeouts.check)
+    this.timeouts.check = setTimeout(() => this.check(), 1000) // this will run check 1s after full check is correctly done
   }
 
   async editName (self, socket, data) {
