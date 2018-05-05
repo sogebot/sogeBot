@@ -32,6 +32,7 @@ const ERROR_NOT_OPTION = '7'
 
 class Bets {
   constructor () {
+    this.timeouts = {}
     if (global.commons.isSystemEnabled('points') && global.commons.isSystemEnabled(this)) {
       global.configuration.register('betPercentGain', 'bets.betPercentGain', 'number', 20)
 
@@ -79,7 +80,8 @@ class Bets {
           break
       }
     }
-    setTimeout(() => this.checkIfBetExpired(), 10000)
+    if (!_.isNil(this.timeouts.checkIfBetExpired)) clearTimeout(this.timeouts.checkIfBetExpired)
+    this.timeouts.checkIfBetExpired = setTimeout(() => this.checkIfBetExpired(), 10000)
   }
 
   commands () {

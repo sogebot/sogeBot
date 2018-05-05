@@ -5,6 +5,8 @@ const debug = require('debug')
 
 class BetsWidget {
   constructor () {
+    this.timeouts = {}
+
     this.modifiedAt = 0
     this.currentBet = {}
     this.bets = []
@@ -28,7 +30,8 @@ class BetsWidget {
     } catch (e) {
       global.log.error(e.stack)
     } finally {
-      setTimeout(() => this.interval(), 1000)
+      if (!_.isNil(this.timeouts.interval)) clearTimeout(this.timeouts.interval)
+      this.timeouts.interval = setTimeout(() => this.interval(), 1000)
     }
   }
 
