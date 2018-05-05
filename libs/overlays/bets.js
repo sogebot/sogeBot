@@ -1,7 +1,9 @@
 const debug = require('debug')
+const _ = require('lodash')
 
 class BetsOverlay {
   constructor () {
+    this.timeouts = {}
     this.modifiedAt = 0
     this.currentBet = {}
     this.bets = []
@@ -23,7 +25,8 @@ class BetsOverlay {
     } catch (e) {
       global.log.error(e.stack)
     } finally {
-      setTimeout(() => this.interval(), 1000)
+      if (!_.isNil(this.timeouts.interval)) clearTimeout(this.timeouts.interval)
+      this.timeouts.interval = setTimeout(() => this.interval(), 1000)
     }
   }
 
