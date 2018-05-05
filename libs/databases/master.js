@@ -3,6 +3,7 @@ const cluster = require('cluster')
 const crypto = require('crypto')
 const debug = require('debug')
 const util = require('util')
+const Timeout = require('../timeout')
 
 const Interface = require('./interface')
 
@@ -47,8 +48,7 @@ class IMasterController extends Interface {
       DEBUG_MASTER_REQUEST_ID(id)
       this.returnData(resolve, reject, id)
     } catch (e) {
-      if (!_.isNil(this.timeouts.sendRequest)) clearTimeout(this.timeouts.sendRequest)
-      this.timeouts.sendRequest = setTimeout(() => this.sendRequest(resolve, reject, id), 10, data)
+      new Timeout().recursive({ this: this, uid: 'sendRequest', wait: 10, fnc: this.sendRequest, args: [resolve, reject, id, data] })
     }
   }
 
@@ -59,8 +59,7 @@ class IMasterController extends Interface {
       _.remove(this.data, (o) => o.id === id)
       resolve(items)
     } else {
-      if (!_.isNil(this.timeouts.returnData)) clearTimeout(this.timeouts.returnData)
-      this.timeouts.returnData = setTimeout(() => this.returnData(resolve, reject, id), 10)
+      new Timeout().recursive({ this: this, uid: 'returnData', wait: 10, fnc: this.returnData, args: [resolve, reject, id] })
     }
   }
 

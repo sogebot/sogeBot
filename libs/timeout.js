@@ -13,9 +13,10 @@ class Timeout {
     if (_.isNil(opts.wait)) throw new Error('Wait must be defined')
     if (_.isNil(opts.fnc)) throw new Error('Function must be defined')
     if (_.isNil(opts.args)) opts.args = []
-    if (_.isObject(opts.args)) opts.args = [opts.args]
+    if (_.isObject(opts.args) && !_.isArray(opts.args)) opts.args = [opts.args]
 
     DEBUG_RECURSIVE(opts.uid)
+    DEBUG_RECURSIVE(opts.args)
 
     if (!_.isNil(timeouts[opts.uid])) clearTimeout(timeouts[opts.uid])
     timeouts[opts.uid] = setTimeout(() => { opts['fnc'].apply(opts.this, opts.args) }, opts.wait)
