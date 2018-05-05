@@ -5,6 +5,8 @@ const _ = require('lodash')
 const config = require('../config.json')
 const debug = require('debug')
 
+const DEBUG_CONFIGURATION_SETVALUE = debug('configuration:setValue')
+
 function Configuration () {
   this.config = null
   this.cfgL = {}
@@ -54,17 +56,17 @@ Configuration.prototype.register = function (cfgName, success, filter, defaultVa
 Configuration.prototype.setValue = async function (self, sender, text, quiet) {
   try {
     var cmd = text.split(' ')[0]
-    debug('configuration:setValue')('cmd: %s', cmd)
+    DEBUG_CONFIGURATION_SETVALUE('cmd: %s', cmd)
     var value = text.replace(text.split(' ')[0], '').trim()
     var filter = self.cfgL[cmd].filter
     quiet = _.isBoolean(quiet) ? quiet : false
 
     if (value.length === 0) value = self.default[cmd].value
-    debug('configuration:setValue')('filter: %s', filter)
-    debug('configuration:setValue')('key: %s', cmd)
-    debug('configuration:setValue')('value to set: %s', value)
-    debug('configuration:setValue')('text: %s', text)
-    debug('configuration:setValue')('isQuiet: %s', quiet)
+    DEBUG_CONFIGURATION_SETVALUE('filter: %s', filter)
+    DEBUG_CONFIGURATION_SETVALUE('key: %s', cmd)
+    DEBUG_CONFIGURATION_SETVALUE('value to set: %s', value)
+    DEBUG_CONFIGURATION_SETVALUE('text: %s', text)
+    DEBUG_CONFIGURATION_SETVALUE('isQuiet: %s', quiet)
 
     if (_.isString(value)) value = value.trim()
     if (filter === 'number' && Number.isInteger(parseInt(value, 10))) {
