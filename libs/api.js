@@ -498,9 +498,7 @@ class API {
   }
 
   async getCurrentStreamData (opts) {
-    console.log('vvvvvvvvvvvvvvvvvvvvvvv')
     const cid = await global.cache.channelId()
-    console.log('eweeeeeeeeeeeeeeeeeeeeee')
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`
 
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
