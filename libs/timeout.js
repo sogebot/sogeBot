@@ -8,6 +8,10 @@ var timeouts = {}
 const DEBUG_RECURSIVE = debug('timeout:recursive')
 
 class Timeout {
+  clear (uid) {
+    if (!_.isNil(timeouts[uid])) clearTimeout(timeouts[uid])
+  }
+
   recursive (opts) {
     if (_.isNil(opts.uid)) throw new Error('Uid must be defined')
     if (_.isNil(opts.wait)) throw new Error('Wait must be defined')
