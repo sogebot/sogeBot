@@ -217,7 +217,6 @@ class API {
       }
       return
     } finally {
-      console.log(timeout)
       if (timeout !== 0) new Timeout().recursive({ this: this, uid: 'getChannelSubscribersOldAPI', wait: timeout, fnc: this.getChannelSubscribersOldAPI })
     }
 
