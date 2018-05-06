@@ -22,7 +22,7 @@ class Timeout {
     DEBUG_RECURSIVE(opts.uid)
     DEBUG_RECURSIVE(opts.args)
 
-    if (!_.isNil(timeouts[opts.uid])) clearTimeout(timeouts[opts.uid])
+    this.clear(opts.uid)
     timeouts[opts.uid] = setTimeout(() => { opts['fnc'].apply(opts.this, opts.args) }, opts.wait)
   }
 }
