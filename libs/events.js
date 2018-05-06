@@ -10,6 +10,7 @@ const cluster = require('cluster')
 const config = require('../config.json')
 
 const Message = require('./message')
+const Timeout = require('./timeout')
 
 class Events {
   constructor () {
@@ -94,8 +95,7 @@ class Events {
     } catch (e) {
       console.error(e.stack)
     } finally {
-      if (!_.isNil(this.timeouts.fadeOut)) clearTimeout(this.timeouts.fadeOut)
-      this.timeouts.fadeOut = setTimeout(() => this.fadeOut(), 1000)
+      new Timeout().recursive({ uid: `fadeOut`, this: this, fnc: this.fadeOut, wait: 1000 })
     }
   }
 

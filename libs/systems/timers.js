@@ -7,6 +7,7 @@ const crypto = require('crypto')
 
 // bot libraries
 var constants = require('../constants')
+const Timeout = require('../timeout')
 
 /*
  * !timers                                                                                                                      - gets an info about timers usage
@@ -195,8 +196,7 @@ class Timers {
       }
       await global.db.engine.update('timers', { _id: timer._id.toString() }, { trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
     }
-    if (!_.isNil(this.timeouts.check)) clearTimeout(this.timeouts.check)
-    this.timeouts.check = setTimeout(() => this.check(), 1000) // this will run check 1s after full check is correctly done
+    new Timeout().recursive({ uid: `timersCheck`, this: this, fnc: this.check, wait: 1000 }) // this will run check 1s after full check is correctly done
   }
 
   async editName (self, socket, data) {

@@ -6,6 +6,7 @@ const debug = require('debug')('systems:points')
 
 // bot libraries
 const constants = require('../constants')
+const Timeout = require('../timeout')
 
 function Points () {
   this.timestamps = {}
@@ -330,8 +331,7 @@ Points.prototype.updatePoints = async function () {
     global.log.error(e)
     global.log.error(e.stack)
   } finally {
-    if (!_.isNil(this.timeouts.updatePoints)) clearTimeout(this.timeouts.updatePoints)
-    this.timeouts.updatePoints = setTimeout(() => this.updatePoints(), 60000)
+    new Timeout().recursive({ uid: `updatePoints`, this: this, fnc: this.updatePoints, wait: 60000 })
   }
 }
 
@@ -342,8 +342,7 @@ Points.prototype.compactPointsDb = async function () {
     global.log.error(e)
     global.log.error(e.stack)
   } finally {
-    if (!_.isNil(this.timeouts.compactPointsDb)) clearTimeout(this.timeouts.compactPointsDb)
-    this.timeouts.compactPointsDb = setTimeout(() => this.compactPointsDb(), 60000)
+    new Timeout().recursive({ uid: `compactPointsDb`, this: this, fnc: this.compactPointsDb, wait: 60000 })
   }
 }
 
