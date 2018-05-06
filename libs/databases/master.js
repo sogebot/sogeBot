@@ -3,18 +3,16 @@ const cluster = require('cluster')
 const crypto = require('crypto')
 const debug = require('debug')
 const util = require('util')
+const Timeout = require('../timeout')
 
 const Interface = require('./interface')
 
 const DEBUG_MASTER_REQUEST_ID = debug('db:master:request:id')
 const DEBUG_MASTER_INCOMING = debug('db:master:incoming')
 const DEBUG_MASTER = debug('db:master')
-
 class IMasterController extends Interface {
   constructor () {
     super('master')
-
-    this.timeouts = {}
 
     cluster.on('message', (worker, message) => {
       if (message.type !== 'db') return
@@ -41,27 +39,27 @@ class IMasterController extends Interface {
     else setTimeout(() => this.connect(), 10)
   }
 
-  async sendRequest (resolve, reject, id, data) {
+  sendRequest (resolve, reject, id, data) {
+    const timeout = new Timeout()
     try {
       _.sample(cluster.workers).send(data)
       DEBUG_MASTER_REQUEST_ID(id)
       this.returnData(resolve, reject, id)
+      timeout.clear(`sendRequest-${id}`)
     } catch (e) {
-      if (!_.isNil(this.timeouts.sendRequest)) clearTimeout(this.timeouts.sendRequest)
-      this.timeouts.sendRequest = setTimeout(() => this.sendRequest(resolve, reject, id), 10, data)
+      timeout.recursive({ uid: `sendRequest-${id}`, this: this, args: [resolve, reject, id], fnc: this.sendRequest, wait: 10 })
     }
   }
 
-  async returnData (resolve, reject, id) {
+  returnData (resolve, reject, id) {
+    const timeout = new Timeout()
     let dataFromWorker = _.find(this.data, (o) => o.id === id)
     if (!_.isNil(dataFromWorker)) {
       const items = dataFromWorker.items
       _.remove(this.data, (o) => o.id === id)
+      timeout.clear(`returnData-${id}`)
       resolve(items)
-    } else {
-      if (!_.isNil(this.timeouts.returnData)) clearTimeout(this.timeouts.returnData)
-      this.timeouts.returnData = setTimeout(() => this.returnData(resolve, reject, id), 10)
-    }
+    } else timeout.recursive({ uid: `returnData-${id}`, this: this, args: [resolve, reject, id], fnc: this.returnData, wait: 10 })
   }
 
   async find (table, where) {
