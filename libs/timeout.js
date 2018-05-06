@@ -9,7 +9,10 @@ const DEBUG_RECURSIVE = debug('timeout:recursive')
 
 class Timeout {
   clear (uid) {
-    if (!_.isNil(timeouts[uid])) clearTimeout(timeouts[uid])
+    if (!_.isNil(timeouts[uid])) {
+      clearTimeout(timeouts[uid])
+      delete timeouts[uid]
+    }
   }
 
   recursive (opts) {
