@@ -2,6 +2,7 @@ const getSymbolFromCurrency = require('currency-symbol-map')
 const snekfetch = require('snekfetch')
 const _ = require('lodash')
 const debug = require('debug')
+const Timeout = require('./timeout')
 
 class Currency {
   constructor () {
@@ -63,8 +64,7 @@ class Currency {
       refresh = 1000
     }
 
-    if (!_.isNil(this.timeouts.updateRates)) clearTimeout(this.timeouts.updateRates)
-    this.timeouts.updateRates = setTimeout(() => this.updateRates(), refresh) // update rates once per day
+    new Timeout().recursive({ uid: `updateRates`, this: this, fnc: this.updateRates, wait: refresh })
   }
 }
 

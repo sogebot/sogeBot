@@ -5,6 +5,7 @@ const _ = require('lodash')
 const cluster = require('cluster')
 // bot libraries
 var constants = require('../constants')
+const Timeout = require('../timeout')
 // debug
 const debug = require('debug')('systems:raffles')
 
@@ -145,8 +146,7 @@ class Raffles {
   async announce () {
     let raffle = await global.db.engine.findOne('raffles', { winner: null })
     if (!await global.cache.isOnline() || _.isEmpty(raffle) || _.now() - this.lastAnnounce < (await global.configuration.getValue('raffleAnnounceInterval') * 60 * 1000)) {
-      if (!_.isNil(this.timeouts.announce)) clearTimeout(this.timeouts.announce)
-      this.timeouts.announce = setTimeout(() => this.announce(), 60000)
+      new Timeout().recursive({ uid: `rafflesAnnounce`, this: this, fnc: this.announce, wait: 60000 })
       return
     }
 
@@ -168,8 +168,7 @@ class Raffles {
     })
     debug(message); global.commons.sendMessage(message, global.commons.getOwner())
 
-    if (!_.isNil(this.timeouts.announce)) clearTimeout(this.timeouts.announce)
-    this.timeouts.announce = setTimeout(() => this.announce(), 60000)
+    new Timeout().recursive({ uid: `rafflesAnnounce`, this: this, fnc: this.announce, wait: 60000 })
   }
 
   async remove (self) {

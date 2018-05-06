@@ -9,6 +9,7 @@ const cluster = require('cluster')
 var constants = require('../constants')
 var Points = require('./points')
 const Expects = require('../expects.js')
+const Timeout = require('../timeout')
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters'
 const ERROR_ALREADY_OPENED = '1'
@@ -82,8 +83,7 @@ class Bets {
           break
       }
     }
-    if (!_.isNil(this.timeouts.checkIfBetExpired)) clearTimeout(this.timeouts.checkIfBetExpired)
-    this.timeouts.checkIfBetExpired = setTimeout(() => this.checkIfBetExpired(), 10000)
+    new Timeout().recursive({ uid: `betsCheckIfBetExpired`, this: this, fnc: this.checkIfBetExpired, wait: 10000 })
   }
 
   commands () {

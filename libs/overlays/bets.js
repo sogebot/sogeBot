@@ -1,5 +1,6 @@
 const debug = require('debug')
-const _ = require('lodash')
+
+const Timeout = require('../timeout')
 
 class BetsOverlay {
   constructor () {
@@ -25,8 +26,7 @@ class BetsOverlay {
     } catch (e) {
       global.log.error(e.stack)
     } finally {
-      if (!_.isNil(this.timeouts.interval)) clearTimeout(this.timeouts.interval)
-      this.timeouts.interval = setTimeout(() => this.interval(), 1000)
+      new Timeout().recursive({ uid: `betsInterval`, this: this, fnc: this.interval, wait: 1000 })
     }
   }
 

@@ -6,6 +6,7 @@ const chalk = require('chalk')
 const debug = require('debug')
 
 const Expects = require('../expects.js')
+const Timeout = require('../timeout')
 const constants = require('../constants.js')
 
 class Heist {
@@ -31,8 +32,7 @@ class Heist {
       setTimeout(() => Promise.all([this.levels, this.results]), 5000) // init levels and results
 
       // intervals
-      if (!_.isNil(this.timeouts.iCheckFinished)) clearTimeout(this.timeouts.iCheckFinished)
-      this.timeouts.iCheckFinished = setTimeout(() => this.iCheckFinished(), 10000) // wait for proper config startup
+      new Timeout().recursive({ uid: `iCheckFinished`, this: this, fnc: this.iCheckFinished, wait: 10000 }) // wait for proper config startup
     }
   }
 
@@ -307,8 +307,7 @@ class Heist {
         // cleanup
         await global.db.engine.remove(this.collection, { key: 'startedAt' })
         await global.db.engine.remove(`${this.collection}.users`, {})
-        if (!_.isNil(this.timeouts.iCheckFinished)) clearTimeout(this.timeouts.iCheckFinished)
-        this.timeouts.iCheckFinished = setTimeout(() => this.iCheckFinished(), 10000)
+        new Timeout().recursive({ uid: `iCheckFinished`, this: this, fnc: this.iCheckFinished, wait: 10000 })
         return
       }
 
@@ -372,8 +371,7 @@ class Heist {
       await global.db.engine.remove(this.collection, { key: 'lastHeistTimestamp' })
       global.commons.sendMessage((await this.get('copsCooldownMessage')), global.commons.getOwner())
     }
-    if (!_.isNil(this.timeouts.iCheckFinished)) clearTimeout(this.timeouts.iCheckFinished)
-    this.timeouts.iCheckFinished = setTimeout(() => this.iCheckFinished(), 10000)
+    new Timeout().recursive({ uid: `iCheckFinished`, this: this, fnc: this.iCheckFinished, wait: 10000 })
   }
 
   async get (key) {

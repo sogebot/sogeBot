@@ -6,6 +6,7 @@ const _ = require('lodash')
 // bot libraries
 const constants = require('../constants')
 const debug = require('debug')('systems:gambling')
+const Timeout = require('../timeout')
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0'
 const ERROR_ZERO_BET = '1'
@@ -112,8 +113,7 @@ class Gambling {
     ])
 
     if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * duelDuration) {
-      if (!_.isNil(this.timeouts.pickDuelWinner)) clearTimeout(this.timeouts.pickDuelWinner)
-      this.timeouts.pickDuelWinner = setTimeout(() => this.pickDuelWinner(), 30000)
+      new Timeout().recursive({ uid: `gamblingPickDuelWinner`, this: this, fnc: this.pickDuelWinner, wait: 30000 })
       return
     }
 
@@ -152,8 +152,7 @@ class Gambling {
     this.duelUsers = null
     this.duelTimestamp = 0
 
-    if (!_.isNil(this.timeouts.pickDuelWinner)) clearTimeout(this.timeouts.pickDuelWinner)
-    this.timeouts.pickDuelWinner = setTimeout(() => this.pickDuelWinner(), 30000)
+    new Timeout().recursive({ uid: `gamblingPickDuelWinner`, this: this, fnc: this.pickDuelWinner, wait: 30000 })
   }
 
   async duel (self, sender, text) {

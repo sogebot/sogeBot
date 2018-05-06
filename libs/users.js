@@ -7,6 +7,7 @@ const cluster = require('cluster')
 
 const config = require('../config.json')
 const debug = require('debug')('users')
+const Timeout = require('./timeout')
 
 function Users () {
   this.timeouts = {}
@@ -545,8 +546,7 @@ Users.prototype.compactMessagesDb = async function () {
     global.log.error(e)
     global.log.error(e.stack)
   } finally {
-    if (!_.isNil(this.timeouts.compactMessagesDb)) clearTimeout(this.timeouts.compactMessagesDb)
-    this.timeouts.compactMessagesDb = setTimeout(() => this.compactMessagesDb(), 10000)
+    new Timeout().recursive({ uid: `compactMessagesDb`, this: this, fnc: this.compactMessagesDb, wait: 10000 })
   }
 }
 

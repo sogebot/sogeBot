@@ -11,6 +11,7 @@ const moment = require('moment')
 
 const constants = require('./libs/constants')
 const config = require('./config.json')
+const Timeout = require('./libs/timeout')
 
 const DEBUG_CLUSTER_FORK = debug('cluster:fork')
 const DEBUG_CLUSTER_MASTER = debug('cluster:master')
@@ -386,19 +387,17 @@ async function cheer (channel, userstate, message) {
 }
 
 let lastWorker = null
-let timeoutSendMessageToWorker
 function sendMessageToWorker (sender, message) {
   let worker = _.sample(cluster.workers)
 
   if (worker.id === lastWorker && global.cpu > 1) {
-    if (!_.isNil(timeoutSendMessageToWorker)) clearTimeout(timeoutSendMessageToWorker)
-    timeoutSendMessageToWorker = setTimeout(() => sendMessageToWorker(sender, message), 10) // resend to another worker
+    new Timeout().recursive({ uid: 'sendMessageToWorker', this: this, args: [sender, message], fnc: this.sendMessageToWorker, wait: 10 })
     return
   } else lastWorker = worker.id
 
   DEBUG_CLUSTER_MASTER(`Sending ${message} ${util.inspect(sender)} to worker#${worker.id} - is connected: ${worker.isConnected()}`)
   if (worker.isConnected()) worker.send({ type: 'message', sender: sender, message: message })
-  else setTimeout(() => sendMessageToWorker(sender, message), 10) // refresh if worker is disconnected
+  else new Timeout().recursive({ uid: 'sendMessageToWorker', this: this, args: [sender, message], fnc: this.sendMessageToWorker, wait: 10 })
 }
 
 if (cluster.isMaster) {
