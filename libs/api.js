@@ -37,21 +37,19 @@ class API {
         getChannelDataOldAPI: 0
       }
 
-      setTimeout(() => {
-        this._loadCachedStatusAndGame()
-        this.getChannelID()
-        this.getCurrentStreamData({ interval: true })
-        this.getLatest100Followers(true)
-        this.updateChannelViews()
-        this.getChannelHosts()
+      this._loadCachedStatusAndGame()
+      this.getChannelID()
+      this.getCurrentStreamData({ interval: true })
+      this.getLatest100Followers(true)
+      this.updateChannelViews()
+      this.getChannelHosts()
 
-        this.getChannelChattersUnofficialAPI({ saveToWidget: false })
+      this.getChannelChattersUnofficialAPI({ saveToWidget: false })
 
-        this.getChannelSubscribersOldAPI() // remove this after twitch add total subscribers
-        this.getChannelDataOldAPI() // remove this after twitch game and status for new API
+      this.getChannelSubscribersOldAPI() // remove this after twitch add total subscribers
+      this.getChannelDataOldAPI() // remove this after twitch game and status for new API
 
-        this.intervalFollowerUpdate()
-      }, 60000)
+      this.intervalFollowerUpdate()
     }
   }
 
@@ -500,7 +498,9 @@ class API {
   }
 
   async getCurrentStreamData (opts) {
+    console.log('vvvvvvvvvvvvvvvvvvvvvvv')
     const cid = await global.cache.channelId()
+    console.log('eweeeeeeeeeeeeeeeeeeeeee')
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`
 
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
@@ -508,7 +508,7 @@ class API {
     DEBUG_API_GET_CURRENT_STREAM_DATA(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
     if (needToWait || notEnoughAPICalls) {
       if (notEnoughAPICalls) DEBUG_API_GET_CURRENT_STREAM_DATA('Waiting for rate-limit to refresh')
-      new Timeout().recursive({ this: this, uid: 'getCurrentStreamData', wait: 1000, fnc: this.getCurrentStreamData, args: [opts] })
+      new Timeout().recursive({ this: this, uid: 'getCurrentStreamData', wait: 1000, fnc: this.getCurrentStreamData, args: opts })
       return
     }
 
@@ -525,7 +525,7 @@ class API {
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
       return
     } finally {
-      new Timeout().recursive({ this: this, uid: 'getCurrentStreamData', wait: timeout, fnc: this.getCurrentStreamData, args: [opts] })
+      new Timeout().recursive({ this: this, uid: 'getCurrentStreamData', wait: timeout, fnc: this.getCurrentStreamData, args: opts })
     }
 
     // save remaining api calls

@@ -3,19 +3,15 @@ const cluster = require('cluster')
 const crypto = require('crypto')
 const debug = require('debug')
 const util = require('util')
-const Timeout = require('../timeout')
 
 const Interface = require('./interface')
 
 const DEBUG_MASTER_REQUEST_ID = debug('db:master:request:id')
 const DEBUG_MASTER_INCOMING = debug('db:master:incoming')
 const DEBUG_MASTER = debug('db:master')
-
 class IMasterController extends Interface {
   constructor () {
     super('master')
-
-    this.timeouts = {}
 
     cluster.on('message', (worker, message) => {
       if (message.type !== 'db') return
@@ -42,33 +38,29 @@ class IMasterController extends Interface {
     else setTimeout(() => this.connect(), 10)
   }
 
-  async sendRequest (resolve, reject, id, data) {
-    try {
-      _.sample(cluster.workers).send(data)
-      DEBUG_MASTER_REQUEST_ID(id)
-      this.returnData(resolve, reject, id)
-    } catch (e) {
-      new Timeout().recursive({ this: this, uid: 'sendRequest', wait: 10, fnc: this.sendRequest, args: [resolve, reject, id, data] })
-    }
-  }
-
-  async returnData (resolve, reject, id) {
-    let dataFromWorker = _.find(this.data, (o) => o.id === id)
-    if (!_.isNil(dataFromWorker)) {
-      const items = dataFromWorker.items
-      _.remove(this.data, (o) => o.id === id)
-      resolve(items)
-    } else {
-      new Timeout().recursive({ this: this, uid: 'returnData', wait: 10, fnc: this.returnData, args: [resolve, reject, id] })
-    }
-  }
-
   async find (table, where) {
     const id = crypto.randomBytes(64).toString('hex')
     const data = { type: 'db', fnc: 'find', table: table, where: where, id: id }
 
     return new Promise((resolve, reject) => {
-      this.sendRequest(resolve, reject, id, data)
+      let sendRequest = (resolve, reject, id) => {
+        try {
+          _.sample(cluster.workers).send(data)
+          DEBUG_MASTER_REQUEST_ID(id)
+          returnData(resolve, reject, id)
+        } catch (e) {
+          setTimeout(() => sendRequest(resolve, reject, id), 10)
+        }
+      }
+      let returnData = (resolve, reject, id) => {
+        let dataFromWorker = _.find(this.data, (o) => o.id === id)
+        if (!_.isNil(dataFromWorker)) {
+          const items = dataFromWorker.items
+          _.remove(this.data, (o) => o.id === id)
+          resolve(items)
+        } else setTimeout(() => returnData(resolve, reject, id), 10)
+      }
+      sendRequest(resolve, reject, id)
     })
   }
 
@@ -77,7 +69,24 @@ class IMasterController extends Interface {
     const data = { type: 'db', fnc: 'findOne', table: table, where: where, id: id }
 
     return new Promise((resolve, reject) => {
-      this.sendRequest(resolve, reject, id, data)
+      let sendRequest = (resolve, reject, id) => {
+        try {
+          _.sample(cluster.workers).send(data)
+          DEBUG_MASTER_REQUEST_ID(id)
+          returnData(resolve, reject, id)
+        } catch (e) {
+          setTimeout(() => sendRequest(resolve, reject, id), 10)
+        }
+      }
+      let returnData = (resolve, reject, id) => {
+        let dataFromWorker = _.find(this.data, (o) => o.id === id)
+        if (!_.isNil(dataFromWorker)) {
+          const items = dataFromWorker.items
+          _.remove(this.data, (o) => o.id === id)
+          resolve(items)
+        } else setTimeout(() => returnData(resolve, reject, id), 10)
+      }
+      sendRequest(resolve, reject, id)
     })
   }
 
@@ -86,7 +95,24 @@ class IMasterController extends Interface {
     const data = { type: 'db', fnc: 'insert', table: table, object: object, id: id }
 
     return new Promise((resolve, reject) => {
-      this.sendRequest(resolve, reject, id, data)
+      let sendRequest = (resolve, reject, id) => {
+        try {
+          _.sample(cluster.workers).send(data)
+          DEBUG_MASTER_REQUEST_ID(id)
+          returnData(resolve, reject, id)
+        } catch (e) {
+          setTimeout(() => sendRequest(resolve, reject, id), 10)
+        }
+      }
+      let returnData = (resolve, reject, id) => {
+        let dataFromWorker = _.find(this.data, (o) => o.id === id)
+        if (!_.isNil(dataFromWorker)) {
+          const items = dataFromWorker.items
+          _.remove(this.data, (o) => o.id === id)
+          resolve(items)
+        } else setTimeout(() => returnData(resolve, reject, id), 10)
+      }
+      sendRequest(resolve, reject, id)
     })
   }
 
@@ -95,7 +121,24 @@ class IMasterController extends Interface {
     const data = { type: 'db', fnc: 'remove', table: table, where: where, id: id }
 
     return new Promise((resolve, reject) => {
-      this.sendRequest(resolve, reject, id, data)
+      let sendRequest = (resolve, reject, id) => {
+        try {
+          _.sample(cluster.workers).send(data)
+          DEBUG_MASTER_REQUEST_ID(id)
+          returnData(resolve, reject, id)
+        } catch (e) {
+          setTimeout(() => sendRequest(resolve, reject, id), 10)
+        }
+      }
+      let returnData = (resolve, reject, id) => {
+        let dataFromWorker = _.find(this.data, (o) => o.id === id)
+        if (!_.isNil(dataFromWorker)) {
+          const items = dataFromWorker.items
+          _.remove(this.data, (o) => o.id === id)
+          resolve(items)
+        } else setTimeout(() => returnData(resolve, reject, id), 10)
+      }
+      sendRequest(resolve, reject, id)
     })
   }
 
@@ -104,7 +147,24 @@ class IMasterController extends Interface {
     const data = { type: 'db', fnc: 'update', table: table, where: where, object: object, id: id }
 
     return new Promise((resolve, reject) => {
-      this.sendRequest(resolve, reject, id, data)
+      let sendRequest = (resolve, reject, id) => {
+        try {
+          _.sample(cluster.workers).send(data)
+          DEBUG_MASTER_REQUEST_ID(id)
+          returnData(resolve, reject, id)
+        } catch (e) {
+          setTimeout(() => sendRequest(resolve, reject, id), 10)
+        }
+      }
+      let returnData = (resolve, reject, id) => {
+        let dataFromWorker = _.find(this.data, (o) => o.id === id)
+        if (!_.isNil(dataFromWorker)) {
+          const items = dataFromWorker.items
+          _.remove(this.data, (o) => o.id === id)
+          resolve(items)
+        } else setTimeout(() => returnData(resolve, reject, id), 10)
+      }
+      sendRequest(resolve, reject, id)
     })
   }
 
@@ -113,7 +173,24 @@ class IMasterController extends Interface {
     const data = { type: 'db', fnc: 'incrementOne', table: table, where: where, object: object, id: id }
 
     return new Promise((resolve, reject) => {
-      this.sendRequest(resolve, reject, id, data)
+      let sendRequest = (resolve, reject, id) => {
+        try {
+          _.sample(cluster.workers).send(data)
+          DEBUG_MASTER_REQUEST_ID(id)
+          returnData(resolve, reject, id)
+        } catch (e) {
+          setTimeout(() => sendRequest(resolve, reject, id), 10)
+        }
+      }
+      let returnData = (resolve, reject, id) => {
+        let dataFromWorker = _.find(this.data, (o) => o.id === id)
+        if (!_.isNil(dataFromWorker)) {
+          const items = dataFromWorker.items
+          _.remove(this.data, (o) => o.id === id)
+          resolve(items)
+        } else setTimeout(() => returnData(resolve, reject, id), 10)
+      }
+      sendRequest(resolve, reject, id)
     })
   }
 
@@ -122,7 +199,24 @@ class IMasterController extends Interface {
     const data = { type: 'db', fnc: 'increment', table: table, where: where, object: object, id: id }
 
     return new Promise((resolve, reject) => {
-      this.sendRequest(resolve, reject, id, data)
+      let sendRequest = (resolve, reject, id) => {
+        try {
+          _.sample(cluster.workers).send(data)
+          DEBUG_MASTER_REQUEST_ID(id)
+          returnData(resolve, reject, id)
+        } catch (e) {
+          setTimeout(() => sendRequest(resolve, reject, id), 10)
+        }
+      }
+      let returnData = (resolve, reject, id) => {
+        let dataFromWorker = _.find(this.data, (o) => o.id === id)
+        if (!_.isNil(dataFromWorker)) {
+          const items = dataFromWorker.items
+          _.remove(this.data, (o) => o.id === id)
+          resolve(items)
+        } else setTimeout(() => returnData(resolve, reject, id), 10)
+      }
+      sendRequest(resolve, reject, id)
     })
   }
 }
