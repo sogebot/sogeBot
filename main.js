@@ -391,13 +391,13 @@ function sendMessageToWorker (sender, message) {
   let worker = _.sample(cluster.workers)
 
   if (worker.id === lastWorker && global.cpu > 1) {
-    new Timeout().recursive({ uid: 'sendMessageToWorker', this: this, args: [sender, message], fnc: this.sendMessageToWorker, wait: 10 })
+    new Timeout().recursive({ uid: 'sendMessageToWorker', this: this, args: [sender, message], fnc: sendMessageToWorker, wait: 10 })
     return
   } else lastWorker = worker.id
 
   DEBUG_CLUSTER_MASTER(`Sending ${message} ${util.inspect(sender)} to worker#${worker.id} - is connected: ${worker.isConnected()}`)
   if (worker.isConnected()) worker.send({ type: 'message', sender: sender, message: message })
-  else new Timeout().recursive({ uid: 'sendMessageToWorker', this: this, args: [sender, message], fnc: this.sendMessageToWorker, wait: 10 })
+  else new Timeout().recursive({ uid: 'sendMessageToWorker', this: this, args: [sender, message], fnc: sendMessageToWorker, wait: 10 })
 }
 
 if (cluster.isMaster) {
