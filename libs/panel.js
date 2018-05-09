@@ -50,14 +50,14 @@ function Panel () {
   })
   app.get('/auth/token.js', function (req, res) {
     const origin = req.headers.referer ? req.headers.referer.substring(0, req.headers.referer.length - 1) : undefined
-    const domain = config.panel.domain.trim()
+    const domain = config.panel.domain.split(',').map((o) => o.trim()).join('|')
     if (_.isNil(origin)) {
       // file CANNOT be accessed directly
       res.status(401).send('401 Access Denied - This is not a file you are looking for.')
       return
     }
 
-    if (origin.match(new RegExp('^((http|https)\\:\\/\\/|)([\\w|-]+\\.)?' + domain.replace(/,/g, '|')))) {
+    if (origin.match(new RegExp('^((http|https)\\:\\/\\/|)([\\w|-]+\\.)?' + domain))) {
       res.set('Content-Type', 'application/javascript')
       res.send('const token="' + config.panel.token.trim() + '"')
     } else {
