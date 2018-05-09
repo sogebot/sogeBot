@@ -79,6 +79,21 @@ let migration = {
       }
     }
   }, {
+    version: '7.5.0',
+    do: async () => {
+      console.info('Removing users is.online')
+      let users = await global.db.engine.find('users')
+      let updated = 0
+      for (let user of users) {
+        if (_.isNil(user.is) || _.isNil(user.is.online)) continue
+        updated++
+        await global.db.engine.remove('users', { _id: String(user._id) })
+        delete user._id; delete user.is.online
+        await global.db.engine.insert('users', user)
+      }
+      console.info(` => ${updated} users`)
+    }
+  }, {
     version: '7.4.0',
     do: async () => {
       console.info('Migration of messages stats')
