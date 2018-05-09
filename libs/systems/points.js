@@ -315,23 +315,22 @@ Points.prototype.updatePoints = async function () {
 
       if (parseInt(interval, 10) !== 0 && parseInt(ptsPerInterval, 10) !== 0) {
         let user = await global.db.engine.findOne('users', { username: username })
-        _.set(user, 'time.points', _.get(user, 'time.points', new Date().getTime() - interval))
-        let time = new Date().getTime()
-        let shouldUpdate = time - user.time.points >= interval
+        _.set(user, 'time.points', _.get(user, 'time.points', 0))
+        let shouldUpdate = new Date().getTime() - new Date(user.time.points).getTime() >= interval
         if (shouldUpdate) {
           await global.db.engine.insert('users.points', { username: username, points: parseInt(ptsPerInterval, 10) })
-          await global.db.engine.update('users', { username: username }, { time: { points: new Date().getTime() } })
+          await global.db.engine.update('users', { username: username }, { time: { points: new Date() } })
         }
       } else {
         // force time update if interval or points are 0
-        await global.db.engine.update('users', { username: username }, { time: { points: new Date().getTime() } })
+        await global.db.engine.update('users', { username: username }, { time: { points: new Date() } })
       }
     }
   } catch (e) {
     global.log.error(e)
     global.log.error(e.stack)
   } finally {
-    new Timeout().recursive({ uid: `updatePoints`, this: this, fnc: this.updatePoints, wait: 60000 })
+    new Timeout().recursive({ uid: `updatePoints`, this: this, fnc: this.updatePoints, wait: 5000 })
   }
 }
 
