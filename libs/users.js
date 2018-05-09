@@ -243,8 +243,7 @@ Users.prototype.sockets = function (self) {
 
         // ONLINE
         let isOnline = !_.isEmpty(_.filter(online, (o) => o.username === viewer.username))
-        if (isOnline) _.set(viewer, 'is.online', true)
-        else _.set(viewer, 'is.online', false)
+        _.set(viewer, 'is.online', isOnline)
 
         // POINTS
         if (!_.isEmpty(_.filter(points, (o) => o.username === viewer.username))) {
@@ -275,7 +274,7 @@ Users.prototype.sockets = function (self) {
       if (!_.isNil(opts.show.subscribers)) viewers = _.filter(viewers, (o) => _.get(o, 'is.subscriber', false) === opts.show.subscribers)
       if (!_.isNil(opts.show.followers)) viewers = _.filter(viewers, (o) => _.get(o, 'is.follower', false) === opts.show.followers)
       if (!_.isNil(opts.show.regulars)) viewers = _.filter(viewers, (o) => _.get(o, 'is.regular', false) === opts.show.regulars)
-      if (!_.isNil(opts.show.active)) viewers = _.filter(viewers, (o) => _.get(o, 'is.online', false) === opts.show.active)
+      if (!_.isNil(opts.show.active)) viewers = _.filter(viewers, (o) => online.map((v) => v.username).includes(viewers.username) === opts.show.active)
 
       const _total = _.size(viewers)
       opts.page = opts.page > viewers.length - 1 ? viewers.length - 1 : opts.page // page should not be out of bounds (if filters etc)
