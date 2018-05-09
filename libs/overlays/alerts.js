@@ -4,7 +4,9 @@
 const _ = require('lodash')
 const constants = require('../constants.js')
 const cluster = require('cluster')
+const snekfetch = require('snekfetch')
 const Message = require('../message')
+const config = require('../../config.json')
 
 function Alerts () {
   global.configuration.register('replayPosition', 'core.no-response', 'string', 'right')
@@ -65,12 +67,43 @@ Alerts.prototype.overlay = async function (self, sender, text) {
       if (data.key === 'text') {
         data.value = data.value.replace(/\$sender/g, sender.username)
       }
-
       object[data.key] = data.value
     })
     send.push(object)
   })
+
+  // remove clips without url or id
+  send = _.filter(send, (o) => (o.type === 'clip' && (!_.isNil(o.id) || !_.isNil(o.url))) || o.type !== 'clip')
+
+  for (let object of send) {
+    if (object.type === 'clip') {
+      // load clip from api
+      let clip = null
+      if (!_.isNil(object.id)) clip = await self.getClipById(object.id)
+      else if (!_.isNil(object.url)) clip = await self.getClipById(object.url.split('/').pop())
+      clip.cDuration = clip.duration; delete clip.duration
+      if (!_.isNil(clip)) _.merge(object, clip)
+    }
+  }
   global.panel.io.emit('overlay.show', send)
+}
+
+Alerts.prototype.getClipById = async function (id) {
+  const url = `https://api.twitch.tv/kraken/clips/${id}`
+
+  var request
+  try {
+    request = await snekfetch.get(url)
+      .set('Accept', 'application/vnd.twitchtv.v5+json')
+      .set('Client-ID', config.settings.client_id)
+      .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+    global.panel.io.emit('api.stats', { data: request.body, timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+    return request.body
+  } catch (e) {
+    global.log.error(`${url} - ${e.message}`)
+    global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
+    return null
+  }
 }
 
 module.exports = new Alerts()

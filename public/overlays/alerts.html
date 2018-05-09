@@ -24,7 +24,7 @@
         margin: 0;
         padding: 0;
       }
-      #images, #video-pos, #alerts, #html {
+      #images, #video-pos, #clip-pos, #alerts, #html {
         display: table;
         position: absolute;
         height: 100%;
@@ -43,9 +43,9 @@
         background-color: rgba(255, 0, 0, 0.5);
         font-size: 24px;
       }
-      #video-rel-pos { display: table-cell; position: relative; height: 100%; width: 100%; }
-      #video-rel-pos > div { display: inline-block !important; }
-      #video {
+      #video-rel-pos, #clip-rel-pos { display: table-cell; position: relative; height: 100%; width: 100%; }
+      #video-rel-pos > div, #clip-rel-pos > div { display: inline-block !important; }
+      #video, #clip {
         display: inline-block !important; opacity: 0;
       }
       #video_html5_api { width: 100% }
@@ -97,6 +97,15 @@
         </div>
       </div>
     </div>
+    <div id="clip-pos">
+      <div id="clip-rel-pos">
+        <div id="clip"></div>
+        <div id="clip-replay-label" style="vertical-align: top; opacity:0; text-shadow: 0px 0px 2px black; position: absolute; font-family: 'Roboto Condensed', sans; color: red; font-weight: bold; text-transform: uppercase; margin-top: 5px; margin-left: -70px; width: 100%; text-align: left;"><i class="fas fa-circle" style="position:relative; top: -1px;" aria-hidden="true"></i>
+          <span style="font-size:20px">CLIP</span>
+        </div>
+      </div>
+    </div>
+
 
     <script src="/dist/jquery/js/jquery.min.js"></script>
     <script src="/dist/lodash/js/lodash.min.js"></script>
@@ -123,6 +132,7 @@
             if (d.type === 'audio') playAudio(alert_not_running.id, d)
             if (d.type === 'text') showText(alert_not_running.id, d)
             if (d.type === 'video') showVideo(alert_not_running.id, d)
+            if (d.type === 'clip') showClip(alert_not_running.id, d)
             if (d.type === 'html') showHtml(alert_not_running.id, d)
           })
         }
@@ -289,6 +299,103 @@
               alertsQueue[id].finished++
           }})
         })
+      }
+
+      function showClip(id, clip, delay) {
+        if (!delay) {
+          if (clip.delay === 0) {
+            return showClip(id, clip, true)
+          } else {
+            setTimeout(function () {
+              showClip(id, clip, true)
+            }, clip.delay)
+          }
+        }
+
+        if (!_.isNil(clip.url)) clip.id = clip.url.split('/').pop()
+        if (_.isNil(clip.size)) clip.size = 450
+        if (_.isNil(clip.duration)) clip.duration = 1000
+
+        clip.delay = _.isNil(clip.delay) ? 0 : parseInt(clip.delay, 10)
+        clip.class = _.isNil(clip.class) ? 'video' : clip.class
+
+        $('#clip').empty().append(
+          `<iframe
+            src="${clip.embed_url}&autoplay=true&muted=true"
+            height="${clip.size/1.8}"
+            width="${clip.size}"
+            frameborder="0"
+            scrolling="no"
+            allowfullscreen="false">
+          </iframe>`
+        )
+
+        let style = ''
+        switch (clip.position) {
+          case 'top-left':
+            break
+          case 'top-center':
+          case 'top':
+            style = 'display: table-cell; text-align: center'
+            break
+          case 'top-right':
+            style = 'display: table-cell; text-align: right'
+            break
+          case 'left':
+            style = 'display: table-cell; vertical-align: middle'
+            break
+          case 'right':
+            style = 'display: table-cell; vertical-align: middle; text-align: right'
+            break
+          case 'bottom-left':
+            style = 'display: table-cell; vertical-align: bottom; position: relative; top:10px'
+            break
+          case 'bottom-center':
+          case 'bottom':
+            style = 'display: table-cell; vertical-align: bottom; position: relative; top:10px; text-align: center'
+            break
+          case 'bottom-right':
+            style = 'display: table-cell; vertical-align: bottom; position: relative; top:10px; text-align: right'
+            break
+          default:
+            style = 'display: table-cell; vertical-align: middle; text-align: center'
+            break
+        }
+
+        if (!_.isNil(clip['x-offset'])) {
+          style += ';left:' + clip['x-offset'] + 'px'
+        }
+
+        if (!_.isNil(clip['y-offset'])) {
+          style += ';top:' + clip['y-offset'] + 'px'
+        }
+
+        if (!_.isNil(clip.filter)) {
+          $('#clip').addClass(clip.filter)
+        }
+
+        $('#clip').addClass(clip.class)
+
+        $('#clip-replay-label').css('opacity', 0)
+        if (clip.label === 'true') {
+          setTimeout(() => { $('#clip-replay-label').velocity("fadeIn", { loop: true, duration: 1500 }) }, 1000)
+        }
+
+        $('#clip-rel-pos').attr('style', style)
+
+        $('#clip').css('opacity', 1)
+        setTimeout(() => {
+          $("#clip-replay-label").velocity("stop");
+          $('#clip-replay-label').velocity("fadeOut", { duration: clip.duration });
+          $('#clip').velocity("fadeOut", { duration: clip.duration, complete: function(e) {
+            if (!_.isNil(alertsQueue[id])) alertsQueue[id].finished++
+            $('#clip').removeClass(clip.class)
+            if (!_.isNil(clip.filter)) {
+              $('#clip').removeClass(clip.filter)
+            }
+            $("#clip-replay-label").velocity("stop");
+          }})
+        }, clip.cDuration * 1000)
       }
 
       function showVideo(id, video) {
