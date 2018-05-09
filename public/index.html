@@ -1269,10 +1269,14 @@
           $("#" + id).html('<span class="stats-mid"><i class="fas fa-caret-right"></i> ' +
             Math.abs(value) + (btn.data('showPercentage') ? '%' : '') + '</span>')
         } else {
-          $("#" + id).html('<span class="stats-' + (value < 0 ? 'down' : 'up') +
-            ' text-' + (value < 0 ? 'danger' : 'success') +
-            '"><i class="fas fa-caret-' + (value < 0 ? 'down' : 'up') +
-            '"></i> ' + Math.abs(value) + (btn.data('showPercentage') ? '%' : '') + '</span>')
+          if (_.isNaN(value)) {
+            $("#" + id).html('')
+          } else {
+            $("#" + id).html('<span class="stats-' + (value < 0 ? 'down' : 'up') +
+              ' text-' + (value < 0 ? 'danger' : 'success') +
+              '"><i class="fas fa-caret-' + (value < 0 ? 'down' : 'up') +
+              '"></i> ' + Math.abs(value) + (btn.data('showPercentage') ? '%' : '') + '</span>')
+          }
         }
       }
       if ($.isEmptyObject(data)) return
