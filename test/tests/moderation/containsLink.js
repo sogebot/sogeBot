@@ -11,6 +11,7 @@ const tests = {
     'clips.twitch.tv/TolerantExquisiteDuckOneHand'
   ],
   'links': [ // tests will test links, http://links, https://links
+    'google.me',
     'google.com',
     'google.COM',
     'GOOGLE.com',
