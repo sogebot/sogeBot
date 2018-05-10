@@ -940,10 +940,10 @@
   "bets": {
       "running": "$sender, sazky jsou jiz otevreny!  Moznosti sazky: $options. Pouzij !bet close 0-$maxIndex",
       "notRunning": "Zadne sazky nejsou otevreny, pozadej moda o otevreni!",
-      "opened": "Sazka '$title' otevrena! Moznosti sazky: $options. Pouzij !bet 0-$maxIndex [body] a vyhraj! Zbyva pouze $minutesmin pro vsazeni!",
+      "opened": "Sazka '$title' otevrena! Moznosti sazky: $options. Pouzij !bet 0-$maxIndex <pocet bodu> a vyhraj! Zbyva pouze $minutesmin pro vsazeni!",
       "closeNotEnoughOptions": "$sender, pro zavreni sazky musis vybrat viteznou moznost.",
       "notEnoughOptions": "$sender, nove sazky musi mit alespon dve moznosti!",
-      "info": "Sazka '$title' je stale otevrena! Moznosti sazky: $options. Pouzij !bet 0-$maxIndex [body] a vyhraj! Zbyva pouze $minutesmin pro vsazeni!",
+      "info": "Sazka '$title' je stale otevrena! Moznosti sazky: $options. Pouzij !bet 0-$maxIndex <pocet bodu> a vyhraj! Zbyva pouze $minutesmin pro vsazeni!",
       "parseError": "{core.command-parse} !bet a zjisti jak na to",
       "diffBet": "$sender, uz sis vsadil na $option a nemuzes vsadit na vice moznosti najednou!",
       "undefinedBet": "Promin, $sender, ale tato moznost neexistuje, pouzij !bet a zjisti jak na to",
@@ -956,7 +956,8 @@
       "locked": "Vyprsel cas na vsazeni! Dalsi sazky neprijimame",
       "zeroBet": "Ale ale, $sender, nemuzes vsadit 0 $pointsName",
       "lockedInfo": "Sazka '$title' je stale otevrena, ale cas na vsazeni jiz vyprsel!",
-      "removed": "Vyprsel cas na vsazeni! Nikdo si nevsadil -> automaticky uzaviram"
+      "removed": "Vyprsel cas na vsazeni! Nikdo si nevsadil -> automaticky uzaviram",
+      "error": "Promin, $sender, ale prikaz neni v poradku! Pouzij !bet 0-$maxIndex <pocet bodu>. Priklad !bet 0 100 vsadi 100 bodu na polozku 0."
   },
   "alias": {
     "alias-parse-failed": "{core.command-parse} !alias",
