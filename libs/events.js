@@ -151,7 +151,7 @@ class Events {
     for (let event of events) {
       d('Resetting %j', event)
       event.triggered = {}
-      await global.db.engine.find('events', { _id: event._id.toString() }, event)
+      await global.db.engine.update('events', { _id: event._id.toString() }, event)
     }
   }
 
@@ -279,13 +279,16 @@ class Events {
   async everyXMinutesOfStream (event, attributes) {
     const d = debug('events:everyXMinutesOfStream')
 
-    // set to _.now() because 0 will trigger event immediatelly after stream start
+    // set to new Date() because 0 will trigger event immediatelly after stream start
     let shouldSave = _.get(event, 'triggered.runEveryXMinutes', 0) === 0
-    event.triggered.runEveryXMinutes = _.get(event, 'triggered.runEveryXMinutes', _.now())
+    event.triggered.runEveryXMinutes = _.get(event, 'triggered.runEveryXMinutes', new Date())
 
-    let shouldTrigger = _.now() - event.triggered.runEveryXMinutes >= event.definitions.runEveryXMinutes * 60 * 1000
+    let shouldTrigger = _.now() - new Date(event.triggered.runEveryXMinutes).getTime() >= event.definitions.runEveryXMinutes * 60 * 1000
+    d('Should save: %s', shouldSave)
+    d('Should trigger: %s', shouldTrigger)
+    d('Minutes to trigger: %s', -Number((_.now() - new Date(event.triggered.runEveryXMinutes).getTime() - (event.definitions.runEveryXMinutes * 60 * 1000)) / 60000).toFixed(2))
     if (shouldTrigger || shouldSave) {
-      event.triggered.runEveryXMinutes = _.now()
+      event.triggered.runEveryXMinutes = new Date()
       d('Updating event to %j', event)
       await global.db.engine.update('events', { _id: event._id.toString() }, event)
     }
