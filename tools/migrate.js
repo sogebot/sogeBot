@@ -66,6 +66,24 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  cache: [{
+    version: '7.5.0',
+    do: async () => {
+      console.info('Moving gameTitles from cache to cache.titles')
+      let cache = await global.db.engine.findOne('cache', { key: 'gamesTitles' })
+      let processed = 0
+      if (!_.isEmpty(cache)) {
+        for (let [game, titles] of Object.entries(cache['games_and_titles'])) {
+          for (let title of titles) {
+            await global.db.engine.insert('cache.titles', { game, title })
+            processed++
+          }
+        }
+        await global.db.engine.remove('cache', { key: 'gamesTitles' })
+      }
+      console.info(` => ${processed} titles`)
+    }
+  }],
   users: [{
     version: '7.3.0',
     do: async () => {
