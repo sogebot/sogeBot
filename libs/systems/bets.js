@@ -200,7 +200,7 @@ class Bets {
           break
         default:
           global.log.warning(e.stack)
-          global.commons.sendMessage(global.translate('core.error'), sender)
+          global.commons.sendMessage(global.translate('bets.error').replace(/\$maxIndex/g, _.get(currentBet.options.length - 1)), sender)
       }
     } finally {
       global.db.engine.update('cache', { key: 'betsModifiedTime' }, { value: new Date().getTime() })

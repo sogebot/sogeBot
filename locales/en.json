@@ -934,10 +934,10 @@
   "bets": {
       "running": "$sender, bet is already opened! Bet options: $options. Use !bet close 0-$maxIndex",
       "notRunning": "No bet is currently opened, ask mods to open it!",
-      "opened": "New bet '$title' is opened! Bet options: $options. Use !bet 0-$maxIndex [points] to win! You have only $minutesmin to bet!",
+      "opened": "New bet '$title' is opened! Bet options: $options. Use !bet 0-$maxIndex <amount> to win! You have only $minutesmin to bet!",
       "closeNotEnoughOptions": "$sender, you need to select winning option for bet close.",
       "notEnoughOptions": "$sender, new bets needs at least 2 options!",
-      "info": "Bet '$title' is still opened! Bet options: $options. Use !bet 0-$maxIndex [points] to win! You have only $minutesmin to bet!",
+      "info": "Bet '$title' is still opened! Bet options: $options. Use !bet 0-$maxIndex <amount> to win! You have only $minutesmin to bet!",
       "parseError": "{core.command-parse} !bet to check usage",
       "diffBet": "$sender, you already made a bet on $option and you cannot bet to different option!",
       "undefinedBet": "Sorry, $sender, but this bet option doesn't exist, use !bet to check usage",
@@ -950,7 +950,8 @@
       "locked": "Betting time is up! No more bets.",
       "zeroBet": "Oh boy, $sender, you cannot bet 0 $pointsName",
       "lockedInfo": "Bet '$title' is still opened, but time for betting is up!",
-      "removed": "Betting time is up! No bets were sent -> automatically closing"
+      "removed": "Betting time is up! No bets were sent -> automatically closing",
+      "error": "Sorry, $sender, this command is not correct! Use !bet 0-$maxIndex <amount>. E.g. !bet 0 100 will bet 100 points to item 0."
   },
   "alias": {
     "alias-parse-failed": "{core.command-parse} !alias",
