@@ -531,6 +531,8 @@ class API {
 
     DEBUG_API_GET_CURRENT_STREAM_DATA(request.body)
     global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
+
+    let justStarted = false
     if (request.status === 200 && !_.isNil(request.body.data[0])) {
       // correct status and we've got a data - stream online
       let stream = request.body.data[0]; DEBUG_API_GET_CURRENT_STREAM_DATA(stream)
@@ -543,6 +545,7 @@ class API {
           global.events.fire('stream-started')
           global.events.fire('command-send-x-times', { reset: true })
           global.events.fire('every-x-minutes-of-stream', { reset: true })
+          justStarted = true
         }
       }
 
@@ -551,9 +554,12 @@ class API {
       this.streamType = stream.type
       await global.cache.isOnline(true)
 
-      global.events.fire('number-of-viewers-is-at-least-x')
-      global.events.fire('stream-is-running-x-minutes')
-      global.events.fire('every-x-minutes-of-stream')
+      if (!justStarted) {
+        // don't run events on first check
+        global.events.fire('number-of-viewers-is-at-least-x')
+        global.events.fire('stream-is-running-x-minutes')
+        global.events.fire('every-x-minutes-of-stream')
+      }
 
       if (!this.gameOrTitleChangedManually) {
         let rawStatus = await global.cache.rawStatus()
