@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>sogeBot UI</title>
+  <title></title>
   <meta charset="utf-8">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#f4f5f6">
@@ -92,7 +92,7 @@
     page.base('/popout/')
     page('/', function(p){
       const id = p.hash.length === 0 ? 'dashboard' : p.hash
-      $('title').text(`sogeBot UI - ${id}`)
+      $('title').text(`${name.toUpperCase()} POPOUT - ${id}`)
       // load widget
       $('#widget')
         .load('../widgets/' +

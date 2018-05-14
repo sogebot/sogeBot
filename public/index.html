@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>sogeBot UI</title>
+  <title></title>
   <meta charset="utf-8">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#f4f5f6">
@@ -45,7 +45,7 @@
 
 
   <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
-    <a class="navbar-brand" href="#">sogeBot UI <span id="current_version"></span></a>
+    <a class="navbar-brand" href="#"><strong id="bot_name"></strong> <span id="current_version"></span></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault"
       aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -367,6 +367,9 @@
       </pre>
       `)
     }
+
+    $('title').text(`${name.toUpperCase()}`)
+    $('#bot_name').text(`${name.toUpperCase()}`)
 
     var socket = io({
       query: "token=" + token
