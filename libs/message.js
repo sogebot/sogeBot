@@ -131,8 +131,8 @@ class Message {
           (!_.isUndefined(attr.param) && attr.param.length !== 0)) {
           if (attr.param === '+' || attr.param === '-') {
             let cvar = await global.db.engine.findOne('customvars', { key: variable })
-            if (attr.param === '+') attr.param = cvar.value + 1
-            else if (attr.param === '-') attr.param = cvar.value - 1
+            if (attr.param === '+') attr.param = Number(cvar.value) + 1
+            else if (attr.param === '-') attr.param = Number(cvar.value) - 1
             if (_.isNaN(attr.param)) attr.param = 0 // reset if not a number
           }
 

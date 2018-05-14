@@ -34,9 +34,29 @@ const tests = [
     params: { sender: global.commons.getOwner(), param: '+' }
   },
   {
+    test: '$_test',
+    variable: 'test',
+    initialValue: '0',
+    afterValue: 1,
+    command: 'This is $_test',
+    expectedSent: true,
+    expectedWithoutParams: 'This is 1',
+    params: { sender: global.commons.getOwner(), param: '+' }
+  },
+  {
     test: '$!_test',
     variable: 'test',
     initialValue: 0,
+    afterValue: -1,
+    command: 'This is $!_test',
+    expectedSent: false,
+    expectedWithoutParams: 'This is -1',
+    params: { sender: global.commons.getOwner(), param: '-' }
+  },
+  {
+    test: '$!_test',
+    variable: 'test',
+    initialValue: '0',
     afterValue: -1,
     command: 'This is $!_test',
     expectedSent: false,
