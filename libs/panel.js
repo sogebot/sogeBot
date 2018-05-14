@@ -59,7 +59,7 @@ function Panel () {
 
     if (origin.match(new RegExp('^((http|https)\\:\\/\\/|)([\\w|-]+\\.)?' + domain))) {
       res.set('Content-Type', 'application/javascript')
-      res.send('const token="' + config.panel.token.trim() + '"')
+      res.send(`const token="${config.panel.token.trim()}"; const name="${config.settings.bot_username}"`)
     } else {
       // file CANNOT be accessed from different domain
       res.status(403).send('403 Forbidden - You are looking at wrong castle.')
@@ -266,7 +266,7 @@ Panel.prototype.authUser = function (req, res, next) {
       throw new Error(NOT_AUTHORIZED)
     }
   } catch (e) {
-    res.set('WWW-Authenticate', 'Basic realm="Authorize to SogeBot WebPanel"')
+    res.set('WWW-Authenticate', `Basic realm="Authorize to '${config.settings.broadcaster_username.toUpperCase()}' WebPanel`)
     return res.sendStatus(401)
   }
 }
