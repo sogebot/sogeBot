@@ -124,24 +124,46 @@ class Message {
       }
     }
     let custom = {
-      '$_#': async function (filter) {
+      '$_#': async (filter) => {
         let variable = filter.replace('$_', '')
         let isMod = await global.commons.isMod(attr.sender)
         if ((global.commons.isOwner(attr.sender) || isMod) &&
           (!_.isUndefined(attr.param) && attr.param.length !== 0)) {
+          if (attr.param === '+' || attr.param === '-') {
+            let cvar = await global.db.engine.findOne('customvars', { key: variable })
+            if (attr.param === '+') attr.param = cvar.value + 1
+            else if (attr.param === '-') attr.param = cvar.value - 1
+            if (_.isNaN(attr.param)) attr.param = 0 // reset if not a number
+          }
+
           await global.db.engine.update('customvars', { key: variable }, { key: variable, value: attr.param })
           let msg = await global.commons.prepare('filters.setVariable', { value: attr.param, variable: variable })
           global.commons.sendMessage(msg, { username: attr.sender, quiet: _.get(attr, 'quiet', false) })
 
-          if (require('cluster').isWorker) process.send({ type: 'widget_custom_variables', emit: 'refresh' })
-          else global.widgets.custom_variables.io.emit('refresh') // send update to widget
-          const regexp = new RegExp(`\\$_${variable}`, 'ig')
-          let title = await global.cache.rawStatus()
-          if (title.match(regexp)) process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: { 0: null } })
+          this.updateWidgetAndTitle(variable)
           return ''
         }
         let cvar = await global.db.engine.findOne('customvars', { key: variable })
-        return _.isEmpty(cvar.value) ? '' : cvar.value
+        return _.isNil(cvar.value) ? '' : cvar.value
+      },
+      // force quiet variable set
+      '$!_#': async (filter) => {
+        let variable = filter.replace('$!_', '')
+        let isMod = await global.commons.isMod(attr.sender)
+        if ((global.commons.isOwner(attr.sender) || isMod) &&
+          (!_.isUndefined(attr.param) && attr.param.length !== 0)) {
+          if (attr.param === '+' || attr.param === '-') {
+            let cvar = await global.db.engine.findOne('customvars', { key: variable })
+            if (attr.param === '+') attr.param = cvar.value + 1
+            else if (attr.param === '-') attr.param = cvar.value - 1
+            if (_.isNaN(attr.param)) attr.param = 0 // reset if not a number
+          }
+          await global.db.engine.update('customvars', { key: variable }, { key: variable, value: attr.param })
+          this.updateWidgetAndTitle(variable)
+          return ''
+        }
+        let cvar = await global.db.engine.findOne('customvars', { key: variable })
+        return _.isNil(cvar.value) ? '' : cvar.value
       }
     }
     let param = {
@@ -598,6 +620,14 @@ class Message {
         }
       }
     }
+  }
+
+  async updateWidgetAndTitle (variable) {
+    if (require('cluster').isWorker) process.send({ type: 'widget_custom_variables', emit: 'refresh' })
+    else if (!_.isNil(global.widgets.custom_variables.io)) global.widgets.custom_variables.io.emit('refresh') // send update to widget
+    const regexp = new RegExp(`\\$_${variable}`, 'ig')
+    let title = await global.cache.rawStatus()
+    if (title.match(regexp)) process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: { 0: null } })
   }
 }
 
