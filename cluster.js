@@ -95,9 +95,10 @@ function cluster () {
     let sender = data.sender
     let message = data.message
     let skip = data.skip
+    let quiet = data.quiet
 
     DEBUG_CLUSTER_WORKER_ONMESSAGE_ID('Init of parser')
-    const parse = new Parser({ sender: sender, message: message, skip: skip })
+    const parse = new Parser({ sender: sender, message: message, skip: skip, quiet: quiet })
 
     DEBUG_CLUSTER_WORKER_ONMESSAGE_ID('Checking msg type')
     if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {

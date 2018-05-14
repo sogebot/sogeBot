@@ -151,7 +151,7 @@ function fork () {
     } else if (msg.type === 'whisper') {
       global.commons.message('whisper', msg.sender, msg.message)
     } else if (msg.type === 'parse') {
-      _.sample(cluster.workers).send({ type: 'message', sender: msg.sender, message: msg.message, skip: true }) // resend to random worker
+      _.sample(cluster.workers).send({ type: 'message', sender: msg.sender, message: msg.message, skip: true, quiet: msg.quiet }) // resend to random worker
     } else if (msg.type === 'db') {
       // do nothing on db
     } else if (msg.type === 'timeout') {

@@ -52,6 +52,7 @@ class Message {
 
   async parse (attr) {
     const d = debug('parser:parse')
+    d('Attributes: %j', attr)
 
     let random = {
       '(random.online.viewer)': async function () {

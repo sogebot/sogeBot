@@ -18,6 +18,8 @@ class Parser {
     this.sender = opts.sender || null
     this.skip = opts.skip || false
 
+    if (!_.isNil(this.sender) && opts.quiet) this.sender.quiet = opts.quiet
+
     this.isCommand = this.message.startsWith('!')
     this.list = this.populateList()
   }
