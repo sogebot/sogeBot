@@ -432,6 +432,7 @@ class Message {
     await this.parseMessageEach(info); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(random); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(ifp, false); d('parseMessageEach: %s', this.message)
+    await this.parseMessageVariables(custom); d('parseMessageEach: %s', this.message)
     await this.parseMessageEval(evaluate, decode(this.message)); d('parseMessageEval: %s', this.message)
     await this.parseMessageEach(param, true); d('parseMessageEach: %s', this.message)
     // local replaces
@@ -443,7 +444,6 @@ class Message {
       }
     }
     await this.parseMessageEach(math); d('parseMessageEach: %s', this.message)
-    await this.parseMessageVariables(custom); d('parseMessageEach: %s', this.message)
     await this.parseMessageOnline(online); d('parseMessageOnline: %s', this.message)
     await this.parseMessageCommand(command); d('parseMessageCommand: %s', this.message)
     await this.parseMessageEach(qs); d('parseMessageEach: %s', this.message)
