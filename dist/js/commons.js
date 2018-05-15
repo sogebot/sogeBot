@@ -51,6 +51,7 @@ var commons = {
       options.options = !_.isNil(options.options) ? options.options : []
       options.data = !_.isNil(options.data) ? options.data : {}
       options.placeholder = !_.isNil(options.placeholder) ? options.placeholder : '&nbsp;'
+      options.title = !_.isNil(options.title) ? options.title : null
       options.mask = !_.isNil(options.mask) ? options.mask : null
 
       var id = window.crypto.getRandomValues(new Uint32Array(1))
@@ -61,9 +62,18 @@ var commons = {
         else dataArr.push(`${key}="${value}"`)
       }
 
-      var output = '<abbr class="form-control" id="' + id + '" data-id="' + options.id +
+      var output = ''
+      output += !_.isNil(options.title) ? '<small class="form-text text-muted">' + options.title + '</small>' : ''
+      output += '<abbr class="form-control" id="' + id + '" data-id="' + options.id +
       '" data-fnc="' + options.fnc + '" data-filters="' + options.filters.join(',') +
       '" data-errorcontainer="' + options.errorContainer + '" data-value="' + commons.hash(options.text) + '" contenteditable="true" placeholder="' + options.placeholder + '" ' + dataArr.join(' ') + ' data-match="' + options.match + '">' + (!_.isNil(options.mask) ? options.text.replace(/./g, options.mask) : stringAbbr) + '</abbr>'
+
+      if (!_.isNil(options.match) && _.isNil(options.errorContainer)) {
+        output += `
+          <small class="d-none text-danger editable-error" data-key="${options.id}"></small>
+        `
+      }
+
       setTimeout(function () {
         commons.translate()
 
@@ -75,16 +85,23 @@ var commons = {
         $(`#${id}[contenteditable=true]`).off()
         $(`#${id}[contenteditable=true]`)
           .keyup(function () {
-            if (_.isNil($(this).data('match')) || _.isNil($(this).data('errorcontainer'))) return
+            if (_.isNil($(this).data('match'))) return
             let matchRegexp = JSON.parse(window.atob($(this).data('match')))
-            let errorContainer = window.atob($(this).data('errorcontainer'))
 
-            $(errorContainer).css('display', 'none')
+            let errorContainer
+            if (_.isNil($(this).data('errorcontainer'))) errorContainer = `.editable-error[data-key="${options.id}"]`
+            else errorContainer = window.atob($(this).data('errorcontainer'))
+
+            $(errorContainer).addClass('d-none')
+            $(errorContainer).data('isValid', true)
+            $(`#${id}[contenteditable=true]`).removeClass('border-danger')
             for (let [regexp, error] of Object.entries(matchRegexp)) {
               regexp = new RegExp(regexp, 'g')
               if (_.isNil(commons.cleanResponseText($(this).html()).trim().match(regexp))) {
+                $(errorContainer).data('isValid', false)
                 $(errorContainer).text(error)
-                $(errorContainer).css('display', 'inline-block')
+                $(errorContainer).removeClass('d-none').css('display', 'inline-block !important')
+                $(`#${id}[contenteditable=true]`).addClass('border-danger')
               }
             }
           })

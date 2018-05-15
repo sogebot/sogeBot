@@ -15,7 +15,7 @@
     <a class="nav-link" data-toggle="tab" href="#alerts" data-lang="alerts"></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#carousel" data-lang="carousel"></a>
+    <a class="nav-link _load" data-toggle="tab" href="#carousel" data-lang="carousel"></a>
   </li>
   <li class="nav-item">
     <a class="nav-link" data-toggle="tab" href="#eventlist-text" data-lang="text"></a>
@@ -240,31 +240,7 @@
     </div>
   </div>
 
-  <div role="tabpanel" class="tab-pane" id="carousel">
-    <div class="row settings">
-      <div class="col" style="max-width: 50%">
-        <strong>XSplit / OBS link</strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <a class="btn btn-success" href="/overlays/carousel" target="_blank">/overlays/carousel</a>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col" style="max-width: 50%">
-        <strong data-lang="overlay-carousel-upload"></strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <input type="file" id="file-input-carousel" accept="image/*" />
-      </div>
-    </div>
-
-    <div class="col" style="max-width: 50%">
-      <span class="title title-part text-default">Images</span>
-    </div>
-    <div class="row settings settings-part">
-      <div id="carousel-image-list"></div>
-    </div>
-  </div>
+  <div role="tabpanel" class="tab-pane" id="carousel"></div>
 
   <div role="tabpanel" class="tab-pane" id="eventlist-text">
       <div class="row settings">
@@ -575,6 +551,12 @@
 </div>
 
 <script>
+  // load pages
+  for (let page of $('._load')) {
+    let id = $(page).attr('href')
+    $(id).load(`settings/overlays/${id.replace('#', '')}.html`, () => { commons.translate() })
+  }
+
   socket.off('configuration')
 
   new Sortable(document.getElementById('credits-custom-texts'), { handle: ".sortable-handler", onEnd: () => saveCustomTextInputs() })
@@ -661,33 +643,6 @@
     toggle('creditsClips')
     // !CREDITS ///////////////////////////////////////////////////////////////
   })
-
-  socket.emit('overlay.images.get')
-  socket.on('overlay.image.list', function (data) {
-    $('#carousel-image-list').empty()
-    _.each(data, function (image) {
-      $('#carousel-image-list').append('<div>' +
-        '<a target="_blank" href="/dist/carousel/' + image + '">' +
-        '<img src="/dist/carousel/' + image + '">' +
-        '</a>' +
-        '<button data-image="' + image +
-        '" class="btn btn-danger" style="position: absolute; margin-left: -35px;" onclick="deleteCarouselImage(this)">X</button>' +
-        '</div>')
-    })
-    $('#carousel-image-list').append('<br style="clear: both;">')
-  })
-
-  $('#file-input-carousel').on('change', function (ev) {
-    var reader = new FileReader()
-    reader.onload = function (event) {
-      socket.emit('overlay.image.upload', event.target.result)
-    }
-    reader.readAsDataURL(event.target.files[0])
-  })
-
-  function deleteCarouselImage(el) {
-    socket.emit('overlay.image.delete', $(el).data('image'))
-  }
 
   function saveEmotesAnimation() {
     socket.emit('saveConfiguration', {
