@@ -1,61 +1,90 @@
 'use strict'
 
-const fs = require('fs')
-const crypto = require('crypto')
-const glob = require('glob')
-const path = require('path')
+const _ = require('lodash')
+const debug = require('debug')
 
-const carouselDir = './public/dist/carousel/'
+const DEBUG_OVERLAYS_CAROUSEL_SOCKETS = debug('overlays:carousel:sockets')
 
-if (!fs.existsSync(carouselDir)) fs.mkdirSync(carouselDir)
+class ImageCarousel {
+  constructor () {
+    if (require('cluster').isMaster) {
+      global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
 
-function ImageCarousel () {
-  if (require('cluster').isMaster) {
-    global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
-    global.panel.socketListening(this, 'overlay.images.get', this._get)
-    global.panel.socketListening(this, 'overlay.image.delete', this._delete)
-    global.panel.socketListening(this, 'overlay.image.upload', this._upload)
-  }
-}
-
-ImageCarousel.prototype._get = function (self, socket) {
-  glob(carouselDir + '*', function (err, files) {
-    if (err) return
-
-    files = files.map(function (match) {
-      return path.relative(carouselDir, match)
-    })
-    socket.emit('overlay.image.list', files)
-  })
-}
-
-ImageCarousel.prototype._delete = function (self, socket, data) {
-  fs.unlink(carouselDir + data, function (err) {
-    if (err) { return }
-
-    self._get(self, socket)
-  })
-}
-
-ImageCarousel.prototype._upload = function (self, socket, data) {
-  var matches = data.match(/^data:([A-Za-z-+/]+);base64,(.+)$/)
-  if (matches.length !== 3) { return false }
-
-  var type = matches[1]
-  var buffer = Buffer.from(matches[2], 'base64')
-  var ext
-
-  if (type === 'image/jpeg') ext = 'jpg'
-  if (type === 'image/png') ext = 'png'
-
-  fs.writeFile(carouselDir + crypto.randomBytes(20).toString('hex') + '.' + ext, buffer, function (err) {
-    if (err) {
-      socket.emit('overlay.image.upload.failed')
-      return
+      this.sockets()
     }
-    socket.emit('overlay.image.upload.success')
-    self._get(self, socket)
-  })
+  }
+
+  sockets () {
+    global.panel.io.of('/overlays/carousel').on('connection', (socket) => {
+      DEBUG_OVERLAYS_CAROUSEL_SOCKETS('Socket /overlays/carousel connected, registering sockets')
+      socket.on('load', async (cb) => {
+        let images = (await global.db.engine.find('overlay.carousel')).map((o) => { o._id = o._id.toString(); return o })
+        DEBUG_OVERLAYS_CAROUSEL_SOCKETS(images); cb(_.orderBy(images, 'order', 'asc'))
+      })
+
+      socket.on('delete', async (id, cb) => {
+        await global.db.engine.remove('overlay.carousel', { _id: id })
+        // force reorder
+        let images = _.orderBy((await global.db.engine.find('overlay.carousel')).map((o) => { o._id = o._id.toString(); return o }), 'order', 'asc')
+        for (let order = 0; order < images.length; order++) await global.db.engine.update('overlay.carousel', { _id: images[order]._id }, { order })
+        cb(id)
+      })
+
+      socket.on('update', async (_id, data, cb) => {
+        await global.db.engine.update('overlay.carousel', { _id }, data)
+        cb(_id, data)
+      })
+
+      socket.on('move', async (go, id, cb) => {
+        let images = (await global.db.engine.find('overlay.carousel')).map((o) => { o._id = o._id.toString(); return o })
+
+        let image = _.find(images, (o) => o._id === id)
+        let upImage = _.find(images, (o) => Number(o.order) === Number(image.order) - 1)
+        let downImage = _.find(images, (o) => Number(o.order) === Number(image.order) + 1)
+
+        switch (go) {
+          case 'up':
+            if (!_.isNil(upImage)) {
+              await global.db.engine.update('overlay.carousel', { _id: image._id }, { order: Number(upImage.order) })
+              await global.db.engine.update('overlay.carousel', { _id: upImage._id }, { order: Number(image.order) })
+            }
+            break
+          case 'down':
+            if (!_.isNil(downImage)) {
+              await global.db.engine.update('overlay.carousel', { _id: image._id }, { order: Number(downImage.order) })
+              await global.db.engine.update('overlay.carousel', { _id: downImage._id }, { order: Number(image.order) })
+            }
+            break
+        }
+        cb(id)
+      })
+
+      socket.on('upload', async (data, cb) => {
+        var matches = data.match(/^data:([A-Za-z-+/]+);base64,(.+)$/)
+        if (matches.length !== 3) { return false }
+
+        var type = matches[1]
+        var base64 = matches[2]
+
+        let order = (await global.db.engine.find('overlay.carousel')).length
+        let image = await global.db.engine.insert('overlay.carousel',
+          { type,
+            base64,
+            // timers in ms
+            waitBefore: 0,
+            waitAfter: 0,
+            duration: 5000,
+            // animation
+            animationInDuration: 1000,
+            animationIn: 'fadeIn',
+            animationOutDuration: 1000,
+            animationOut: 'fadeOut',
+            // order
+            order })
+        DEBUG_OVERLAYS_CAROUSEL_SOCKETS(image); cb(image)
+      })
+    })
+  }
 }
 
 module.exports = new ImageCarousel()

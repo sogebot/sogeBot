@@ -1,0 +1,22 @@
+{
+  "popover": {
+    "are_you_sure_you_want_to_delete_this_image": "Jste si jistý, že chcete <strong class='text-danger'>smazat</strong> tento obrázek?"
+  },
+  "button": {
+    "update": "Aktualizovat",
+    "fix_your_errors_first": "Nejdřív opravte chyby"
+  },
+  "errors": {
+    "number_greater_or_equal_than_0": "Hodnota musí být >= 0",
+    "value_must_not_be_empty": "Hodnota nesmí být prázdná"
+  },
+  "titles": {
+    "waitBefore": "Doba čekání před zobrazením obrázku (v ms)",
+    "waitAfter": "Doba čekání po zobrazení obrázku (v ms)",
+    "duration": "Jak dlouho obrázek zobrazit (v ms)",
+    "animationIn": "Animace zobrazení",
+    "animationOut": "Animace skrytí",
+    "animationInDuration": "Délka animace zobrazení (v ms)",
+    "animationOutDuration": "Délka animace skrytí (v ms)"
+  }
+}
