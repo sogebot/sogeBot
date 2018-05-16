@@ -36,6 +36,7 @@ var widgetsCustomVariablesSocket = io('/widgets/customVariables', { query: "toke
 
 var customVariablesWidget = {
   save: function (el) {
+    let name
     if (!_.isNil(el.data)) {
       name = el.name
       value = el.value
@@ -49,14 +50,14 @@ var customVariablesWidget = {
     })
   },
   increment: function (el) {
-    const name = $(el).data('name')
+    let name = $(el).data('name')
     let value = $(`input[data-name="${name}"]`).val()
     value = _.isFinite(parseInt(value, 10)) ? ++value : 0
     $(`input[data-name="${name}"]`).val(value)
     customVariablesWidget.save(el)
   },
   decrement: function (el) {
-    const name = $(el).data('name')
+    let name = $(el).data('name')
     let value = $(`input[data-name="${name}"]`).val()
     value = _.isFinite(parseInt(value, 10)) ? --value : 0
     $(`input[data-name="${name}"]`).val(value)
@@ -65,7 +66,7 @@ var customVariablesWidget = {
   saveValues: function (el) {
     $(el).removeClass().addClass('btn btn-info')
 
-    const value = $(el).parents('.input-group').children('input').val()
+    let value = $(el).parents('.input-group').children('input').val()
     widgetsCustomVariablesSocket.emit('save.values', {name: $(el).data('name'), value: value}, (err, cb) => {
       if (err) return console.debug(err)
 
@@ -94,8 +95,8 @@ var customVariablesWidget = {
   watch: function (el) {
     $(el).removeClass().addClass('btn btn-info')
 
-    const name = $('#customVariablesWidgetName input').val()
-    const type = $(el).parents('div.input-group').children('select').val()
+    let name = $('#customVariablesWidgetName input').val()
+    let type = $(el).parents('div.input-group').children('select').val()
 
     $('#customVariablesWidgetName .form-control').removeClass('is-invalid')
     $('#customVariablesWidgetName .invalid-tooltip').text()
