@@ -29,16 +29,16 @@ class CustomVariablesWidget {
       })
       socket.on('save.values', async (data, cb) => {
         data.value = data.value.split(',').map((o) => o.trim()).filterNamedNodeMap(String).join(', ')
-        await global.db.engine.update('widgets.customVariables', { name: data.name }, { value: data.value })
+        await global.db.engine.update('widgets.customVariables', { name: String(data.name) }, { value: data.value })
         global.api.setTitleAndGame(global.api, null) // update title
         cb(null, data)
       })
       socket.on('load.variable', async (variable, callback) => {
-        variable = await global.db.engine.findOne('customvars', { key: variable })
+        variable = await global.db.engine.findOne('customvars', { key: String(variable) })
         callback(null, variable) // { key: 'variable_name', 'value': 'current_value'}
       })
       socket.on('save.variable', async (data, cb) => {
-        await global.db.engine.update('customvars', { key: data.key }, { value: data.value })
+        await global.db.engine.update('customvars', { key: String(data.key) }, { value: data.value })
         global.api.setTitleAndGame(global.api, null) // update title
         cb(null, data)
       })
