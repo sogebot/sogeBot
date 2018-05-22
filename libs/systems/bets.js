@@ -130,7 +130,7 @@ class Bets {
         case ERROR_ALREADY_OPENED:
           global.commons.sendMessage(global.translate('bets.running')
             .replace(/\$maxIndex/g, currentBet.options.length - 1)
-            .replace(/\$options/g, currentBet.options.map((v, i) => `${i}. '${v}'`).join(', ')), sender)
+            .replace(/\$options/g, currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', ')), sender)
           break
         default:
           global.log.warning(e.stack)
@@ -148,7 +148,7 @@ class Bets {
       global.commons.sendMessage(global.translate(currentBet.locked ? 'bets.lockedInfo' : 'bets.info')
         .replace(/\$title/g, currentBet.title)
         .replace(/\$maxIndex/g, currentBet.options.length - 1)
-        .replace(/\$options/g, currentBet.options.map((v, i) => `${i}. '${v}'`).join(', '))
+        .replace(/\$options/g, currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', '))
         .replace(/\$minutes/g, parseFloat((currentBet.end - new Date().getTime()) / 1000 / 60).toFixed(1)), sender)
     }
   }
@@ -200,7 +200,7 @@ class Bets {
           break
         default:
           global.log.warning(e.stack)
-          global.commons.sendMessage(global.translate('bets.error').replace(/\$maxIndex/g, _.get(currentBet.options.length - 1)), sender)
+          global.commons.sendMessage(global.translate('bets.error').replace(/\$maxIndex/g, currentBet.options.length - 1), sender)
       }
     } finally {
       global.db.engine.update('cache', { key: 'betsModifiedTime' }, { value: new Date().getTime() })
