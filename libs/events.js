@@ -54,6 +54,8 @@ class Events {
       { id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] }, fire: this.fireStartCommercial },
       { id: 'bot-will-join-channel', definitions: {}, fire: this.fireBotWillJoinChannel },
       { id: 'bot-will-leave-channel', definitions: {}, fire: this.fireBotWillLeaveChannel },
+      { id: 'create-a-clip', definitions: { announce: false, hasDelay: true }, fire: this.fireCreateAClip },
+      { id: 'create-a-clip-and-play-replay', definitions: { announce: false, hasDelay: true }, fire: this.fireCreateAClipAndPlayReplay },
       { id: 'increment-custom-variable', definitions: { customVariable: '', numberToIncrement: '' }, fire: this.fireIncrementCustomVariable },
       { id: 'decrement-custom-variable', definitions: { customVariable: '', numberToDecrement: '' }, fire: this.fireDecrementCustomVariable }
     ]
@@ -152,6 +154,42 @@ class Events {
       d('Resetting %j', event)
       event.triggered = {}
       await global.db.engine.update('events', { _id: event._id.toString() }, event)
+    }
+  }
+
+  async fireCreateAClip (operation, attributes) {
+    const d = debug('events:fireCreateAClip')
+    d('Clip creation with attrs:', operation, attributes)
+    let cid = await global.api.createClip({ hasDelay: operation.hasDelay })
+    if (cid) { // OK
+      if (Boolean(operation.announce) === true) {
+        let message = await global.commons.prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` })
+        global.commons.sendMessage(message, { username: global.commons.getOwner() })
+      }
+      return cid
+    } else { // NG
+      return null
+    }
+  }
+
+  async fireCreateAClipAndPlayReplay (operation, attributes) {
+    const d = debug('events:fireCreateAClipAndPlayReplay')
+    d('Waiting for clip creation')
+    let cid = await global.events.fireCreateAClip(operation, attributes)
+    if (cid) { // clip created ok
+      const clip = [
+        'type=clip',
+        'id=' + cid,
+        'position=' + await global.configuration.getValue('replayPosition'),
+        'x-offset=' + await global.configuration.getValue('replayOffsetX'),
+        'y-offset=' + await global.configuration.getValue('replayOffsetY'),
+        'size=' + await global.configuration.getValue('replaySize'),
+        'volume=' + await global.configuration.getValue('replayVolume'),
+        'label=' + await global.configuration.getValue('replayLabel'),
+        'filter=' + await global.configuration.getValue('replayFilter'),
+        'class=replay'
+      ]
+      global.overlays.alerts.overlay(global.overlays.alerts, null, clip.join(' '))
     }
   }
 

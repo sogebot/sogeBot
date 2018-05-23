@@ -17,6 +17,8 @@ const DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS = debug('api:getLatest100Follower
 const DEBUG_API_GET_CURRENT_STREAM_DATA = debug('api:getCurrentStreamData')
 const DEBUG_API_SET_TITLE_AND_GAME = debug('api:setTitleAndGame')
 const DEBUG_API_IS_FOLLOWER_UPDATE = debug('api:isFollowerUpdate')
+const DEBUG_API_CREATE_CLIP = debug('api:createClip')
+const DEBUG_API_CHECK_CLIPS = debug('api:checkClips')
 
 class API {
   constructor () {
@@ -50,6 +52,7 @@ class API {
       this.getChannelDataOldAPI() // remove this after twitch game and status for new API
 
       this.intervalFollowerUpdate()
+      this.checkClips()
     }
   }
 
@@ -761,6 +764,93 @@ class API {
     } else {
       socket.emit('sendGameFromTwitch', _.map(request.body.games, 'name'))
     }
+  }
+
+  async checkClips () {
+    let notCheckedClips = (await global.db.engine.find('api.clips', { isChecked: false }))
+
+    // remove clips which failed
+    for (let clip of _.filter(notCheckedClips, (o) => new Date(o.shouldBeCheckedAt).getTime() < new Date().getTime())) {
+      await global.db.engine.remove('api.clips', { _id: String(clip._id) })
+    }
+    notCheckedClips = _.filter(notCheckedClips, (o) => new Date(o.shouldBeCheckedAt).getTime() >= new Date().getTime())
+    const url = `https://api.twitch.tv/helix/clips?id=${notCheckedClips.map((o) => o.clipId).join(',')}`
+
+    if (notCheckedClips.length === 0) { // nothing to do
+      return new Timeout().recursive({ this: this, uid: 'checkClips', wait: 1000, fnc: this.checkClips })
+    }
+
+    const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
+    if (notEnoughAPICalls) {
+      DEBUG_API_CHECK_CLIPS('Waiting for rate-limit to refresh')
+      return new Timeout().recursive({ this: this, uid: 'checkClips', wait: 1000, fnc: this.checkClips })
+    }
+
+    var request
+    try {
+      request = await snekfetch.get(url)
+        .set('Client-ID', config.settings.client_id)
+        .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
+      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
+    } catch (e) {
+      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+      return new Timeout().recursive({ this: this, uid: 'checkClips', wait: 1000, fnc: this.checkClips })
+    }
+
+    for (let clip of request.body.data) {
+      // clip found in twitch api
+      DEBUG_API_CHECK_CLIPS(`Clip ${clip.id} checked and validated`)
+      await global.db.engine.update('api.clips', { clipId: clip.id }, { isChecked: true })
+    }
+    return new Timeout().recursive({ this: this, uid: 'checkClips', wait: 1000, fnc: this.checkClips })
+  }
+
+  async createClip (opts) {
+    if (!(await global.cache.isOnline())) return // do nothing if stream is offline
+
+    const isClipChecked = async function (id) {
+      const check = async (resolve, reject) => {
+        let clip = await global.db.engine.findOne('api.clips', { clipId: id })
+        if (_.isEmpty(clip)) resolve(false)
+        else if (clip.isChecked) resolve(true)
+        else {
+          // not checked yet
+          setTimeout(() => check(resolve, reject), 100)
+        }
+      }
+      return new Promise(async (resolve, reject) => check(resolve, reject))
+    }
+
+    _.defaults(opts, { hasDelay: true })
+
+    const cid = await global.cache.channelId()
+    const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${cid}`
+
+    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
+    DEBUG_API_CREATE_CLIP(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
+    if (needToWait || notEnoughAPICalls) {
+      if (notEnoughAPICalls) DEBUG_API_CREATE_CLIP('Waiting for rate-limit to refresh')
+      new Timeout().recursive({ this: this, uid: 'createClip', wait: 1000, fnc: this.createClip, args: [opts] })
+      return
+    }
+
+    var request
+    try {
+      request = await snekfetch.post(url)
+        .set('Client-ID', config.settings.client_id)
+        .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
+      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
+    } catch (e) {
+      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+      return
+    }
+    const clipId = request.body.data[0].id
+    const timestamp = new Date()
+    await global.db.engine.insert('api.clips', { clipId: clipId, isChecked: false, shouldBeCheckedAt: new Date(timestamp.getTime() + 20 * 1000) })
+    return (await isClipChecked(clipId)) ? clipId : null
   }
 
   async fetchAccountAge (username, id) {
