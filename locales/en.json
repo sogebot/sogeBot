@@ -377,6 +377,16 @@
           "label": "Emotes To Explode",
           "placeholder": "List of emotes to explode, e.g. Kappa PurpleHeart"
         },
+        "announce": {
+          "label": "Announce in chat",
+          "true": "Will be announced",
+          "false": "Will not be announced"
+        },
+        "hasDelay": {
+          "label": "Clip should have slight delay (to be closer what viewer see)",
+          "true": "Will have delay",
+          "false": "Will not have delay"
+        },
         "durationOfCommercial": {
           "label": "Duration Of Commercial",
           "placeholder": "Available durations - 30, 60, 90, 120, 150, 180"
@@ -916,6 +926,8 @@
     "start-commercial": "run a commercial",
     "bot-will-join-channel": "bot will join channel",
     "bot-will-leave-channel": "bot will leave channel",
+    "create-a-clip": "create a clip",
+    "create-a-clip-and-play-replay": "create a clip and play as replay (overlay/alerts)",
     "increment-custom-variable": "increment a custom variable",
     "decrement-custom-variable": "decrement a custom variable",
     "omit": "omit",

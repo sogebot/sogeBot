@@ -377,6 +377,16 @@
           "label": "Emotes k výbuchu",
           "placeholder": "Seznam emotes k výbuchu, např. Kappa PurpleHeart"
         },
+        "announce": {
+          "label": "Oznámit v chatu",
+          "true": "Bude oznámeno",
+          "false": "Nebude oznámeno"
+        },
+        "hasDelay": {
+          "label": "Klip bude mít delay (aby se přiblížil divákovi)",
+          "true": "Bude mít delay",
+          "false": "Nebude mít delay"
+        },
         "durationOfCommercial": {
           "label": "Doba trvání reklamy",
           "placeholder": "Dostupné trvání - 30, 60, 90, 120, 150, 180"
@@ -922,6 +932,8 @@
     "start-commercial": "spustit reklamu",
     "bot-will-join-channel": "bot se připojí k kanálu",
     "bot-will-leave-channel": "bot opustí kanál",
+    "create-a-clip": "vytvořit klip",
+    "create-a-clip-and-play-replay": "vytvořit klip a přehrát (overlay/alerts)",
     "increment-custom-variable": "přičíst do vlastní proměnné",
     "decrement-custom-variable": "odečíst z vlastní proměnné",
     "omit": "vynechat",
