@@ -313,7 +313,12 @@ class Message {
             const id = 'url' + crypto.randomBytes(64).toString('hex').slice(0, 5)
             const url = match.replace(/url\(['"]|["']\)/g, '')
             let response = await snekfetch.get(url)
-            if (_.isBuffer(response.body)) response.body = JSON.parse(response.body.toString())
+            try {
+              response.body = JSON.parse(response.body.toString())
+            } catch (e) {
+              // JSON failed, treat like string
+              response = response.body.toString()
+            }
             urls.push({ id, response })
             toEvaluate = toEvaluate.replace(match, id)
           }
