@@ -7,9 +7,9 @@ Quick Links for Contributing
  - Our bug tracker:
    https://github.com/sogehige/sogeBot/issues
 
- - Development Discord.gg channel: 
+ - Development Discord.gg channel:
    https://discordapp.com/invite/52KpmuH
- 
+
 Coding Guidelines
 -----------------
 
@@ -44,5 +44,9 @@ Commit Guidelines
    Or for donationalerts.ru integration:
 
      `integration/donationalerts: Fix source not displaying`
+
+   If you are updating non project files like CONTRIBUTING.md, travis.yml, use `chore`
+
+      `chore: Update CONTRIBUTING.md`
 
  - If you still need examples, please view the commit history.
