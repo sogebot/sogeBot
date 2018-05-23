@@ -84,6 +84,11 @@ Users.prototype.sockets = function (self) {
           global.systems.points.setPoints(global.systems.points, { username: null }, `${data.username} ${points}`)
         }
       }
+      if (!_.isNil(data.stats.messages)) {
+        let messages = Number(data.stats.messages); delete data.stats.messages
+        messages -= Number(await this.getMessagesOf(data.username))
+        await global.db.engine.insert('users.messages', { username: data.username, messages: messages })
+      }
       await global.db.engine.update('users', { username: data.username }, data)
       cb(null, null)
     })
