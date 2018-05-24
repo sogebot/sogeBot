@@ -104,9 +104,11 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
 
   if (_.isString(sender)) sender = { username: sender }
   if (_.isNil(sender) || _.isNil(sender.username)) sender.username = undefined
+  else attr.sender = sender.username
   if (!_.isNil(sender.quiet)) attr.quiet = sender.quiet
-  attr.sender = sender.username
-  message = await new Message(message).parse(attr)
+  if (!_.isNil(sender.skip)) attr.skip = sender.skip
+
+  if (!attr.skip) message = await new Message(message).parse(attr)
   if (message === '') return false // if message is empty, don't send anything
 
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot

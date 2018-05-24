@@ -17,10 +17,11 @@ class TextOverlay {
         let html = Buffer.from(b64string, 'base64').toString()
         let match = html.match(regexp)
         if (!_.isNil(match)) {
-          for (let variable of html.match(regexp).map((o) => o.replace('$_', ''))) {
-            let variableFromDB = await global.db.engine.findOne('customvars', { key: variable })
-            let value = _.isEmpty(variableFromDB.value) ? `<strong><i class="fas fa-dollar-sign">_${variable}</i></strong>` : variableFromDB.value
-            html = html.replace(new RegExp(`\\$_${variable}`, 'g'), value)
+          for (let variable of html.match(regexp)) {
+            let isVariable = await global.customvariables.isVariableSet(variable)
+            let value = `<strong><i class="fas fa-dollar-sign">_${variable.replace('$_', '')}</i></strong>`
+            if (isVariable) value = await global.customvariables.getValueOf(variable)
+            html = html.replace(new RegExp(`\\${variable}`, 'g'), value)
           }
         }
         html = await new Message(html).parse()

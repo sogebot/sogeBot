@@ -57,6 +57,7 @@ function main () {
   global.logger = new (require('./libs/logging.js'))()
 
   global.events = new (require('./libs/events.js'))()
+  global.customvariables = new (require('./libs/customvariables.js'))()
 
   global.panel = new (require('./libs/panel'))()
   global.webhooks = new (require('./libs/webhooks'))()

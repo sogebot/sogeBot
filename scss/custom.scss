@@ -1,3 +1,5 @@
+div.CodeMirror span.CodeMirror-matchingbracket {color: black !important; font-weight:bold;}
+
 // remove annoying button glow
 .btn:focus,.btn:active:focus,.btn.active:focus,
 .btn.focus,.btn:active.focus,.btn.active.focus {
@@ -66,6 +68,7 @@ a.active {
 /* STREAM DASHBOARD INFORMATIONS */
 .stream-info-container {
   background: $info-bg;
+  overflow: hidden;
   padding: 10px;
   border-bottom: 1px solid $gray-500;
 }
@@ -232,7 +235,7 @@ a.active {
 }
 
 .widget {
-  overflow: hidden;
+  overflow-x: hidden;
   color: $gray-700;
   background: $card-bg;
   padding: 0;
@@ -243,12 +246,14 @@ a.active {
 
 .widget .card-header {
   padding: 0;
+  height: 40px;
 }
 
 .widget .card-body {
   padding: 0;
   height: 100%;
-  padding-bottom: 40px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .widget .card-body .card-title {
@@ -272,7 +277,6 @@ span.title {
   display: inline-block;
   font-size: 26px !important;
   font-weight: bold !important;
-  text-transform: uppercase;
   border: 0 !important;
   padding:0 10px !important;
   margin-bottom: 0;
@@ -357,6 +361,7 @@ span.title.title-part.text-default + div.widget {
 
 .widget .tab-content, .widget .tab-pane.active {
   height: 100%;
+  padding: 0.2rem;
 }
 
 .widget .table tr:first-child > td {
@@ -405,6 +410,10 @@ span.title.title-part.text-default + div.widget {
  .chat-block {
    padding-left: 10px; padding-right: 10px;
  }
+
+#chat-room {
+  padding-bottom: 5px;
+}
 
 #chat-room iframe {
   height: 100%;

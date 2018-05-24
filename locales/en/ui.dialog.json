@@ -1,0 +1,22 @@
+{
+  "title": {
+    "edit": "Edit",
+    "add": "Add"
+  },
+  "buttons": {
+    "cancel": "Cancel",
+    "close": "Close",
+    "saveChanges": {
+      "idle": "Save changes",
+      "progress": "Saving changes",
+      "done": "Changes saved"
+    },
+    "something-went-wrong": "Something went wrong",
+    "disable": "Disable",
+    "enable": "Enable",
+    "edit": "Edit",
+    "delete": "Delete",
+    "yes": "Yes",
+    "no": "No"
+  }
+}

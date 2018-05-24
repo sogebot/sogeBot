@@ -1,0 +1,5 @@
+{
+  "no-custom-variable-found": "Vlastní proměnné nenalezeny, přidejte je v <a href=\"/#registry/customVariables\">registru vlastních proměnných</a>",
+  "add-variable-into-watchlist": "Přidat proměnnou do seznamu sledování",
+  "watchlist": "Seznam sledování"
+}

@@ -250,5 +250,14 @@ var commons = {
   unconfirm: function (el) {
     $(el).parent().children(".btn-confirm").css('display', 'none')
     $(el).parent().children(".btn-remove").css('display', 'inline-block')
+  },
+  urlParam: function (name){
+    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    if (results == null){
+      return null;
+    }
+    else {
+      return decodeURI(results[1]) || 0;
+    }
   }
 }

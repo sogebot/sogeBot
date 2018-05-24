@@ -1,0 +1,63 @@
+{
+  "isReadOnly": "v chatu pouze pro čtení",
+  "isNotReadOnly": "lze měnit prostřednictvím chatu",
+  "no-variables-found": "Nebyly nalezeny žádné proměnné",
+  "additional-info": "Doplňující informace",
+  "run-script": "Spustit skript",
+  "last-run": "Poslední spuštění v",
+  "variable": {
+    "name": "Název proměnné",
+    "help": "Název proměnné musí být jedinečný, například $_wins, $_loses, $_top3",
+    "placeholder": "Zadejte jedinečný název proměnné",
+    "error": {
+      "isNotUnique": "Proměnná musí mít <strong>jedinečný</strong> název.",
+      "isEmpty": "Název proměnné nesmí být prázdný."
+    }
+  },
+  "description": {
+    "name": "Popisek",
+    "help": "Volitelný popis",
+    "placeholder": "Zadejte volitelný popis"
+  },
+  "type": {
+    "name": "Typ",
+    "error": {
+      "isNotSelected": "Zvolte typ proměnné."
+    }
+  },
+  "currentValue": {
+    "name": "Aktuální hodnota",
+    "help": "Pokud je typ nastaven na <strong>skript</strong>, nelze hodnotu změnit ručně"
+  },
+  "usableOptions": {
+    "name": "Použitelné možnosti",
+    "placeholder": "Zadejte, své, možnosti, zde",
+    "help": "Možnosti, které lze použít s touto proměnnou, například <strong>SOLO, DUO, 3-SQ, SQUAD</strong>",
+    "error": {
+      "atLeastOneValue": "Musíte nastavit alespoň jednu hodnotu."
+    }
+  },
+  "scriptToEvaluate": "Skript, který chcete vyhodnotit",
+  "runScript": {
+    "name": "Spustit skript",
+    "error": {
+      "isNotSelected": "Prosím vyberte možnost."
+    }
+  },
+  "testCurrentScript": {
+    "name": "Otestovat aktuální skript",
+    "help": "Kliknutím na tlačítko <strong>Otestovat aktuální skript</strong> zobrazte hodnotu v poli <strong>Aktuální hodnota</strong>"
+  },
+  "warning": "<strong>Upozornění:</strong> Všechna data této proměnné budou smazána!",
+  "choose": "Vybrat...",
+  "types": {
+    "number": "Číslo",
+    "text": "Text",
+    "options": "Možnosti",
+    "eval": "Skript"
+  },
+  "runEvery": {
+    "isUsed": "Při použití proměnné",
+    "everyXMinutes": "Každých $minutes minut"
+  }
+}

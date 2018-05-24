@@ -1,0 +1,350 @@
+<span id="customVariables-edit">
+  <span class="title text-default" style="padding: 0 !important;">
+    <a class="btn btn-outline-info" style="border: 0 !important;" href="/#registry/customVariables"><i class="fas fa-chevron-circle-left"></i></a>
+    <span style="position: relative; top: 2px;">{{ title }} </span>
+    <span style="position: relative; top: 2px;" v-if="isEditation">{{ variableName }}</span>
+  </span>
+
+  <span class="float-right">
+    <button v-if="saveState === 0" type="button" class="btn btn-primary" v-on:click="saveChanges()">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
+    <button v-if="saveState === 1" disabled="disabled" type="button" class="btn btn-info"><i class="fas fa-spinner fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
+    <button v-if="saveState === 2" disabled="disabled" type="button" class="btn btn-success"><i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</span></button>
+    <button v-if="saveState === 3" disabled="disabled" type="button" class="btn btn-danger"><i class="fas fa-exclamation"></i> {{ commons.translate('dialog.buttons.something-went-wrong') }}</span></button>
+  </span>
+
+  <div class="widget pt-3">
+    <!-- Editation stuff here -->
+    <form>
+        <div class="form-group col-md-12">
+          <label for="variable_name_input">{{ commons.translate('registry.customvariables.variable.name') }}</label>
+          <input v-bind:class="{ 'is-invalid': hasError.variableName || hasError.isNotUnique }" v-model="variableName" type="text" class="form-control" id="variable_name_input" v-bind:placeholder="commons.translate('registry.customvariables.variable.placeholder')">
+          <small class="form-text text-muted">{{ commons.translate('registry.customvariables.variable.help') }}</small>
+          <div class="invalid-feedback">
+            <span v-if="hasError.isNotUnique" v-html="commons.translate('registry.customvariables.variable.error.isNotUnique')"></span>
+            <span v-if="!hasError.isNotUnique">{{ commons.translate('registry.customvariables.variable.error.isEmpty') }}</span>
+          </div>
+        </div>
+
+        <div class="form-group col-md-12">
+          <label for="description_input">{{ commons.translate('registry.customvariables.description.name') }}</label>
+          <input v-model="description" type="text" class="form-control" id="description_input" v-bind:placeholder="commons.translate('registry.customvariables.description.placeholder')">
+          <small class="form-text text-muted">{{ commons.translate('registry.customvariables.description.help') }}</small>
+        </div>
+
+        <div class="form-group row pl-3 pr-3">
+          <div class="col-md-4">
+            <label for="type">{{ commons.translate('registry.customvariables.type.name') }}</label>
+            <select id="type" class="form-control" v-bind:class="{ 'is-invalid': hasError.selectedType }" v-model="selectedType">
+              <option value="" selected>{{ commons.translate('registry.customvariables.choose') }}</option>
+              <option v-for="type in types" v-bind:value="type.value">
+                {{ type.text }}
+              </option>
+            </select>
+            <div class="invalid-feedback">{{ commons.translate('registry.customvariables.type.error.isNotSelected') }}</div>
+          </div>
+
+          <div class="col-md-8">
+            <label for="current_value_input">{{ commons.translate('registry.customvariables.currentValue.name') }}</label>
+            <div class="input-group">
+              <input v-if="selectedType !== 'options'" v-model="currentValue" type="text" class="form-control" id="current_value_input" :readonly="(['', 'eval'].includes(selectedType)) ? true : false">
+              <select v-if="selectedType === 'options'" v-model="currentValue" class="form-control">
+                  <option v-for="option in usableOptionsArray">{{ option }}</option>
+              </select>
+
+              <div class="input-group-append" v-if="selectedType !== 'eval'">
+                <button  class="btn form-control" v-bind:class="{ 'btn-danger': readOnly, 'btn-success': !readOnly }" v-on:click="toggleReadOnly">
+                  <template v-if="readOnly">
+                    {{ commons.translate('registry.customvariables.isReadOnly') }}
+                  </template>
+                  <template v-else>
+                    {{ commons.translate('registry.customvariables.isNotReadOnly') }}
+                  </template>
+                </button>
+              </div>
+            </div>
+            <small class="form-text text-muted" v-html="commons.translate('registry.customvariables.currentValue.help')"></small>
+          </div>
+        </div>
+        <div class="form-group col-md-12" v-if="selectedType.toLowerCase() === 'options'">
+          <label for="usable_options_input">{{ commons.translate('registry.customvariables.usableOptions.name') }}</label>
+          <input v-bind:class="{ 'is-invalid': hasError.usableOptions }" v-model="usableOptions" type="text" class="form-control" id="usable_options_input" v-bind:placeholder="commons.translate('registry.customvariables.usableOptions.placeholder')">
+          <small class="form-text text-muted" v-html="commons.translate('registry.customvariables.usableOptions.help')"></small>
+          <div class="invalid-feedback">{{ commons.translate('registry.customvariables.usableOptions.error.atLeastOneValue') }}</div>
+        </div>
+
+        <div class="form-group row pl-3 pr-3" v-if="selectedType === 'eval'">
+          <div class="col-md-8">
+            <label for="variable_name_input">{{ commons.translate('registry.customvariables.scriptToEvaluate') }}</label>
+            <div id="custom_variables-textarea" class="border"></div>
+          </div>
+          <div class="col-md-4">
+            <label for="runEvery">{{ commons.translate('registry.customvariables.runScript.name') }}</label>
+            <select v-bind:class="{ 'is-invalid': hasError.selectedRunEvery }" id="runEvery" class="form-control" v-model="selectedRunEvery">
+              <option value="" selected>{{ commons.translate('registry.customvariables.choose') }}</option>
+              <option v-for="option in runEveryOptions" v-bind:value="option.value">
+                {{ option.text }}
+              </option>
+            </select>
+            <div class="invalid-feedback">{{ commons.translate('registry.customvariables.runScript.error.isNotSelected') }}</div>
+
+            <button type="button" class="btn btn-block btn-info mt-4" v-on:click="testScript()">{{ commons.translate('registry.customvariables.testCurrentScript.name') }}</button>
+            <small class="form-text text-muted" v-html="commons.translate('registry.customvariables.testCurrentScript.help')"></small>
+            <pre v-if="evalError.length > 0" class="alert alert-danger mt-2">{{ evalError }}</pre>
+
+          </div>
+        </div>
+      </form>
+
+      <div class="form-group col-md-12" v-if="isEditation">
+          <button type="button" class="btn btn-danger" key="deleting" data-lang="dialog.buttons.delete" v-if="deleteState === 'waiting'" v-on:click="deleteState='deleting'">{{ commons.translate('dialog.buttons.delete') }}</button>
+          <div class="btn-group" role="group" v-if="deleteState === 'deleting'">
+            <button type="button" class="btn btn-danger" key="deleted" data-lang="dialog.buttons.yes" v-on:click="deleteState='deleted'">{{ commons.translate('dialog.buttons.yes') }}</button>
+            <button type="button" class="btn btn-success" key="waiting" data-lang="dialog.buttons.no" v-on:click="deleteState='waiting'">{{ commons.translate('dialog.buttons.no') }}</button>
+          </div>
+          <small class="form-text text-danger" v-html="commons.translate('registry.customvariables.warning')"></small>
+        </div>
+    <!-- -->
+  </div>
+</span>
+
+<script>
+  Vue.prototype.commons = commons
+
+  function customVariablesEditInit () {
+    if (_.size(translations) === 0) return setTimeout(() => customVariablesEditInit(), 1)
+
+    var customVariablesEdit = new Vue({
+      el: '#customVariables-edit',
+      data: {
+        types: [
+          {
+              value: 'number',
+              text: commons.translate('registry.customvariables.types.number')
+          },
+          {
+            value: 'text',
+            text: commons.translate('registry.customvariables.types.text')
+          },
+          {
+            value: 'options',
+            text: commons.translate('registry.customvariables.types.options')
+          },
+          {
+            value: 'eval',
+            text: commons.translate('registry.customvariables.types.eval')
+          }
+        ],
+        runEveryOptions: [
+          {
+            value: 0,
+            text: commons.translate('registry.customvariables.runEvery.isUsed')
+          },
+          {
+            value: 1000 * 60 * 5,
+            text: commons.translate('registry.customvariables.runEvery.everyXMinutes').replace('$minutes', 5)
+          },
+          {
+            value: 1000 * 60 * 15,
+            text: commons.translate('registry.customvariables.runEvery.everyXMinutes').replace('$minutes', 15)
+          },
+          {
+            value: 1000 * 60 * 30,
+            text: commons.translate('registry.customvariables.runEvery.everyXMinutes').replace('$minutes', 30)
+          },
+          {
+            value: 1000 * 60 * 60,
+            text: commons.translate('registry.customvariables.runEvery.everyXMinutes').replace('$minutes', 60)
+          }
+        ],
+        selectedType: '',
+        selectedRunEvery: '',
+        deleteState: 'waiting',
+
+        variableNameInitial: '',
+        variableName: '',
+        description: '',
+        currentValue: '',
+        usableOptions: '',
+        readOnly: false,
+
+        evalValueInit: '',
+        evalInput: null,
+        evalError: '',
+
+        hasError: {
+          variableName: false,
+          selectedType: false,
+          usableOptions: false,
+          isNotUnique: false
+        },
+
+        socket: io('/registry/customVariables', { query: "token=" + token }),
+
+        saveState: 0
+      },
+      methods: {
+        toggleReadOnly: function (event) {
+          if (event) event.preventDefault()
+          this.readOnly = !this.readOnly
+        },
+        testScript: function () {
+          this.socket.emit('test.script', this.evalValue, (err, response) => {
+            if (err) {
+              this.evalError = err
+              this.evalOk = false
+            } else {
+              this.evalError = ''
+              this.evalOk = true
+            }
+            this.currentValue = response
+          })
+        },
+        validateForm: function () {
+          // reset errors
+          for (let [key, value] of Object.entries(this.hasError)) {
+            if (key !== 'isNotUnique') {
+              this.hasError[key] = false
+            }
+          }
+          if (this.variableName.length === 0 || (this.variableName.length === 2 && this.variableName.startsWith('$_'))) this.hasError.variableName = true
+
+          if (this.selectedType === '') this.hasError.selectedType = true
+          else if (this.selectedType === 'number') {
+            if (_.isNaN(Number(this.currentValue))) this.currentValue = 0
+            else this.currentValue = Number(this.currentValue) // retype
+          } else if (this.selectedType === 'options') {
+            // check options
+            if (this.usableOptionsArray.length === 0) {
+              this.hasError.usableOptions = true
+            }
+            // if current value is not set or is not set as option -> force first item
+            if (String(this.currentValue).trim().length === 0 || !this.usableOptionsArray.includes(String(this.currentValue).trim())) this.currentValue = this.usableOptionsArray[0]
+          } else if (this.selectedType === 'eval') {
+            if (this.selectedRunEvery === '') this.hasError.selectedRunEvery = true
+          }
+
+          return _.filter(this.hasError, (o) => o === true).length === 0
+        },
+        saveChanges: function () {
+          if (this.validateForm()) {
+            this.saveState = 1
+            const data = {
+              _id: commons.urlParam('id') ? commons.urlParam('id') : null,
+              variableName: this.variableName,
+              description: this.description,
+              currentValue: this.currentValue,
+              usableOptions: this.usableOptions,
+              evalValue: this.evalValue,
+              runEvery: this.selectedRunEvery,
+              type: this.selectedType,
+              readOnly: this.readOnly
+            }
+            this.socket.emit('save', data, (err, _id) => {
+              if (err) {
+                console.error(err)
+                return this.saveState = 3
+              }
+              this.saveState = 2
+
+              this.variableNameInitial = this.variableName
+              // if we are creating new -> refresh
+              if (_.isNil(data._id)) setTimeout(() => page(`?id=${_id}#registry/customVariables/edit`), 3000)
+            })
+          }
+        },
+        initializeEvalTextArea: function () {
+          const textarea = document.getElementById('custom_variables-textarea')
+          if (_.isNil(textarea)) return setTimeout(() => this.initializeEvalTextArea(), 1)
+
+          this.evalInput = CodeMirror(textarea, {
+            value: this.evalValueInit ? this.evalValueInit : "/* Available functions\n * url(link) - load data from API\n *\n * Available variables: _, users, random, sender (only in custom commands, keyword), param (only in custom command)\n *\n * IMPORTANT: Must contain return statement!\n */\n\nreturn '';",
+            mode:  "javascript",
+            lineNumbers: true,
+            matchBrackets: true,
+            lint: {
+              esversion: 6
+            },
+            gutters: ["CodeMirror-lint-markers"]
+          })
+        },
+        isUnique: function () {
+          if (this.variableName !== this.variableNameInitial) {
+            this.socket.emit('isUnique', this.variableName, (err, isUnique) => {
+              this.hasError.isNotUnique = !isUnique
+            })
+          }
+        }
+      },
+      created: function () {
+        // _.debounce is a function provided by lodash to limit how
+        // often a particularly expensive operation can be run.
+        // In this case, we want to limit how often we access
+        // yesno.wtf/api, waiting until the user has completely
+        // finished typing before making the ajax request. To learn
+        // more about the _.debounce function (and its cousin
+        // _.throttle), visit: https://lodash.com/docs#debounce
+        this.debouncedIsUnique =_.debounce(this.isUnique, 500)
+      },
+      watch: {
+        deleteState: function (cur, old) {
+          if (cur === 'deleted') {
+            this.socket.emit('delete', commons.urlParam('id'), () => {
+              page('/#registry/customVariables')
+            })
+          }
+        },
+        saveState: function (cur, old) {
+          if (cur === 2 || cur === 3) setTimeout(() => this.saveState = 0, 3000)
+        },
+        variableName: function (cur, old) {
+          if (!cur.startsWith('$_')) this.variableName = '$_' + cur
+          this.variableName = this.variableName.replace(/ /g, '_')
+          this.debouncedIsUnique()
+        },
+        selectedType: function (cur, old) {
+          if (cur === 'eval') {
+            this.initializeEvalTextArea()
+          } else if (cur === 'options') {
+            // check if value or change it
+            if (!this.usableOptionsArray.includes(this.currentValue)) this.currentValue = this.usableOptionsArray[0]
+          } else {
+            this.evalInput = null
+          }
+        },
+        usableOptionsArray: function (cur, old) {
+          this.currentValue = this.usableOptionsArray[0]
+        }
+      },
+      computed: {
+        evalValue: function () {
+          return !_.isNil(this.evalInput) ? this.evalInput.getValue() : ''
+        },
+        usableOptionsArray: function () {
+          return this.usableOptions.split(',').map((o) => o.trim()).filter((o) => o.length > 0)
+        },
+        isEditation: function () {
+          return !_.isNil(commons.urlParam('id'))
+        },
+        title: function () {
+          return commons.translate(this.isEditation ? 'dialog.title.edit' : 'dialog.title.add')
+        }
+      }
+    })
+
+    // load up from db
+    if (commons.urlParam('id')) {
+      customVariablesEdit.socket.emit('load', commons.urlParam('id'), (data) => {
+        customVariablesEdit.variableNameInitial = data.variableName
+        customVariablesEdit.variableName = data.variableName
+        customVariablesEdit.description = data.description
+        customVariablesEdit.currentValue = data.currentValue
+        customVariablesEdit.usableOptions = data.usableOptions
+        customVariablesEdit.evalValueInit = data.evalValue
+        customVariablesEdit.selectedRunEvery = data.runEvery
+        customVariablesEdit.selectedType = data.type
+        customVariablesEdit.readOnly = data.readOnly || false
+      })
+    }
+  }
+  customVariablesEditInit()
+</script>

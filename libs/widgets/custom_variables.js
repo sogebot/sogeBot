@@ -18,39 +18,47 @@ class CustomVariablesWidget {
     const d = debug('CustomVariablesWidget:sockets')
 
     global.panel.io.of('/widgets/customVariables').on('connection', (socket) => {
+      this.socket = socket // expose for custom variables lib refresh
       d('Socket /widgets/customVariables connected, registering sockets')
-      socket.on('list.variables', async (callback) => {
-        const variables = await global.db.engine.find('widgets.customVariables')
-        callback(null, variables); d('list.variables => %j', variables)
+      socket.on('list.variables', async (cb) => {
+        const variables = await global.db.engine.find('custom.variables')
+        cb(null, variables); d('list.variables => %j', variables)
       })
-      socket.on('unwatch', async (name, callback) => {
-        await global.db.engine.remove('widgets.customVariables', { name: String(name) })
-        callback(null, name)
+      socket.on('list.watch', async (cb) => {
+        const variables = await global.db.engine.find('custom.variables.watch')
+        cb(null, _.orderBy(variables, 'order', 'asc')); d('list.watch => %j', variables)
       })
-      socket.on('save.values', async (data, cb) => {
-        data.value = data.value.split(',').map((o) => o.trim()).filterNamedNodeMap(String).join(', ')
-        await global.db.engine.update('widgets.customVariables', { name: String(data.name) }, { value: data.value })
-        global.api.setTitleAndGame(global.api, null) // update title
-        cb(null, data)
+      socket.on('move.up', async (variableId, cb) => {
+        let variableToMoveUp = await global.db.engine.findOne('custom.variables.watch', { variableId })
+        let variableToMoveDown = await global.db.engine.findOne('custom.variables.watch', { order: variableToMoveUp.order - 1 })
+        await global.db.engine.update('custom.variables.watch', { variableId: variableToMoveUp.variableId }, { order: variableToMoveUp.order - 1 })
+        await global.db.engine.update('custom.variables.watch', { variableId: variableToMoveDown.variableId }, { order: variableToMoveDown.order + 1 })
+        cb(null, variableId)
       })
-      socket.on('load.variable', async (variable, callback) => {
-        variable = await global.db.engine.findOne('customvars', { key: String(variable) })
-        callback(null, variable) // { key: 'variable_name', 'value': 'current_value'}
+      socket.on('move.down', async (variableId, cb) => {
+        let variableToMoveDown = await global.db.engine.findOne('custom.variables.watch', { variableId })
+        let variableToMoveUp = await global.db.engine.findOne('custom.variables.watch', { order: variableToMoveDown.order + 1 })
+        await global.db.engine.update('custom.variables.watch', { variableId: variableToMoveUp.variableId }, { order: variableToMoveUp.order - 1 })
+        await global.db.engine.update('custom.variables.watch', { variableId: variableToMoveDown.variableId }, { order: variableToMoveDown.order + 1 })
+        cb(null, variableId)
       })
-      socket.on('save.variable', async (data, cb) => {
-        await global.db.engine.update('customvars', { key: String(data.key) }, { value: data.value })
-        global.api.setTitleAndGame(global.api, null) // update title
-        cb(null, data)
+      socket.on('add.watch', async (variableId, cb) => {
+        const variables = await global.db.engine.find('custom.variables.watch')
+        const order = variables.length
+        await global.db.engine.update('custom.variables.watch', { variableId }, { variableId, order })
+        cb(null, variableId)
       })
-      socket.on('watch', async (data, callback) => {
-        // data = { 'type': 'options|number|text', 'name': 'name-of-variable' }
-        if (_.get(data, 'name', '').length === 0) return callback(new Error(), 'Name cannot be empty')
-        data.name = data.name.replace(/ /g, '_')
-
-        if (!data.name.match(/^[a-zA-Z0-9_]+$/)) return callback(new Error(), 'Name must contain only a-z, A-Z, 0-9 and _ chars')
-
-        await global.db.engine.insert('widgets.customVariables', data)
-        callback(null, data)
+      socket.on('rm.watch', async (variableId, cb) => {
+        await global.db.engine.remove('custom.variables.watch', { variableId })
+        // force reorder
+        let variables = _.orderBy((await global.db.engine.find('custom.variables.watch')).map((o) => { o._id = o._id.toString(); return o }), 'order', 'asc')
+        for (let order = 0; order < variables.length; order++) await global.db.engine.update('custom.variables.watch', { _id: variables[order]._id }, { order })
+        cb(null, variableId)
+      })
+      socket.on('set.value', async (opts, cb) => {
+        let name = await global.customvariables.isVariableSetById(opts._id)
+        if (name) await global.customvariables.setValueOf(name, opts.value, {})
+        cb(null)
       })
     })
   }

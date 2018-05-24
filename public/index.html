@@ -19,6 +19,8 @@
   <link rel="stylesheet" href="./dist/bootstrap-toggle/css/bootstrap-toggle.min.css" />
   <link rel="stylesheet" href="./dist/bootstrap-slider/css/bootstrap-slider.min.css" />
   <link rel="stylesheet" href="./dist/gridstack/css/gridstack.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.38.0/codemirror.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.38.0/addon/lint/lint.min.css" />
   <script src="/socket.io/socket.io.js"></script>
 </head>
 
@@ -69,6 +71,13 @@
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu" id="menu-settings"></ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            <span data-lang="menu.registry"></span>
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" id="menu-registry"></ul>
         </li>
       </ul>
 
@@ -343,6 +352,18 @@
   <script type="text/javascript" src="/auth/token.js"></script>
   <script type="text/javascript" src="./dist/js/commons/commons.js"></script>
   <script src="/dist/velocity-animate/js/velocity.min.js"></script>
+  <!-- CodeMirror textarea editor -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.38.0/codemirror.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.38.0/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.38.0/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.38.0/addon/lint/javascript-lint.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.38.0/addon/lint/lint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jshint/2.9.5/jshint.min.js"></script>
+
+  <!-- development version, includes helpful console warnings -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <!-- production version, optimized for size and speed --
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script-->
 
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/js/tempusdominus-bootstrap-4.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/css/tempusdominus-bootstrap-4.min.css" />
@@ -480,7 +501,6 @@
     })
 
     /* ROUTERS */
-    page.base('/')
     page('/', function(p){
       const id = p.hash.length === 0 ? 'dashboard' : p.hash
 
@@ -518,24 +538,27 @@
       var systems = false // we want only systems settings once
       var integrations = false // we want only systems settings once
       var overlays = false // we want only overlays settings once
+      var registry = false // we want only registry settings once
       _.each(menu, function (obj) {
         if (obj.id !== 'dashboard') {
           if ((obj.id === 'systems') && systems) return
           if ((obj.id === 'overlays') && overlays) return
           if ((obj.id === 'integrations') && integrations) return
+          if ((obj.id === 'registry') && registry) return
           $('#menu-' + obj.category).append('<li class="nav-item"><a class="nav-link" href="#" data-page="' +
-            obj.id + '" data-lang="menu.' + obj.name +
+            obj.id.replace(/\./g, '/') + '" data-lang="menu.' + obj.name +
             '"></a></li>')
         }
         if (obj.id === 'systems') systems = true
         if (obj.id === 'overlays') overlays = true
         if (obj.id === 'integrations') integrations = true
+        if (obj.id === 'registry') registry = true
       })
       loadedMenu = true
 
       $(".page-menu a,#menu-main a").on('click', function (ev) {
         ev.preventDefault()
-        if (!_.isNil(ev.currentTarget.dataset.page)) page('#' + ev.currentTarget.dataset.page)
+        if (!_.isNil(ev.currentTarget.dataset.page)) page('/#' + ev.currentTarget.dataset.page)
         $(".page-menu a,#menu-main a").removeClass('active')
         $(ev.currentTarget).addClass('active')
       })

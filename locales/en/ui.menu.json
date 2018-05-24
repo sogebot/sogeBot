@@ -19,5 +19,7 @@
   "gallery": "Media gallery",
   "games": "Games",
   "spotify": "Spotify",
-  "integrations": "Integrations"
+  "integrations": "Integrations",
+  "custom-variables": "Custom variables",
+  "registry": "Registry"
 }
