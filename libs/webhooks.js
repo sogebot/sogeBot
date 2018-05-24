@@ -207,6 +207,7 @@ class Webhooks {
 
         global.events.fire('stream-started')
         global.events.fire('command-send-x-times', { reset: true })
+        global.events.fire('keyword-send-x-times', { reset: true })
         global.events.fire('every-x-minutes-of-stream', { reset: true })
       }
 

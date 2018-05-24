@@ -311,13 +311,25 @@
           "label": "Odečíst X příkazů",
           "placeholder": "Počet příkazů, odečtených během fade out intervalu"
         },
+        "fadeOutXKeywords": {
+          "label": "Odečíst X klíčových slov",
+          "placeholder": "Počet klíčových slov, odečtených během fade out intervalu"
+        },
         "fadeOutInterval": {
-          "label": "Interval odečítání příkazů (sekundy)",
-          "placeholder": "Fade out interval odečítání příkazů"
+          "label": "Interval odečítání (sekundy)",
+          "placeholder": "Fade out interval odečítání"
         },
         "runEveryXCommands": {
           "label": "Spustit každých X příkazů",
           "placeholder": "Počet příkazů před spuštěním události"
+        },
+        "runEveryXKeywords": {
+          "label": "Spustit každých X klíčových slov",
+          "placeholder": "Počet klíčových slov před spuštěním události"
+        },
+        "keywordToWatch": {
+          "label": "Sledovat toto klíčové slovo",
+          "placeholder": "Nastav klicoveSlovo"
         },
         "commandToWatch": {
           "label": "Sledovat tento příkaz",
@@ -866,6 +878,7 @@
     "subgift": "nový subgift",
     "resub": "uživatel resubscribed",
     "command-send-x-times": "příkaz poslán x-krát",
+    "keyword-send-x-times": "klíčové slovo posláno x-krát",
     "number-of-viewers-is-at-least-x": "počet diváků je alespoň x",
     "stream-started": "stream začal",
     "stream-stopped": "stream skončil",
