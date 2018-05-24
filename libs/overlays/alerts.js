@@ -60,7 +60,7 @@ Alerts.prototype.overlay = async function (self, sender, text) {
   let objectString = text.trim().split(' | ')
   _.each(objectString, function (o) {
     let object = {}
-    let settings = o.match(/(\S+)=([\w-://.%]+|'[\S ]+')/g)
+    let settings = o.match(/([\w-]+)=([\w-://.%?=$]+|'[\S ]+')/g)
     _.each(settings, function (s) {
       let data = { key: s.split('=')[0], value: s.split('=')[1] }
 
