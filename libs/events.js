@@ -28,6 +28,7 @@ class Events {
       { id: 'resub', variables: [ 'username', 'userObject', 'months', 'monthsName', 'message' ] },
       { id: 'tip', variables: [ 'username', 'amount', 'currency', 'message' ] },
       { id: 'command-send-x-times', variables: [ 'username', 'userObject', 'command', 'count' ], definitions: { fadeOutXCommands: 0, fadeOutInterval: 0, runEveryXCommands: 10, commandToWatch: '', runInterval: 0 }, check: this.checkCommandSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
+      { id: 'keyword-send-x-times', variables: [ 'username', 'userObject', 'command', 'count' ], definitions: { fadeOutXKeywords: 0, fadeOutInterval: 0, runEveryXKeywords: 10, keywordToWatch: '', runInterval: 0 }, check: this.checkKeywordSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 }, check: this.checkNumberOfViewersIsAtLeast }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'stream-started' },
       { id: 'stream-stopped' },
@@ -77,17 +78,25 @@ class Events {
     const d = debug('events:fadeout')
 
     try {
-      let events = await global.db.engine.find('events', { key: 'command-send-x-times' }); d(events)
-      for (let event of events) {
+      let commands = await global.db.engine.find('events', { key: 'command-send-x-times' }); d(commands)
+      let keywords = await global.db.engine.find('events', { key: 'keyword-send-x-times' }); d(keywords)
+      for (let event of _.merge(commands, keywords)) {
         if (_.isNil(_.get(event, 'triggered.fadeOutInterval', null))) {
           // fadeOutInterval init
           await global.db.engine.update('events', { _id: event._id.toString() }, { triggered: { fadeOutInterval: _.now() } })
         } else {
           if (_.now() - event.triggered.fadeOutInterval >= event.definitions.fadeOutInterval * 1000) {
             // fade out commands
-            if (!_.isNil(_.get(event, 'triggered.runEveryXCommands', null))) {
-              if (event.triggered.runEveryXCommands <= 0) continue
-              await global.db.engine.update('events', { _id: event._id.toString() }, { triggered: { fadeOutInterval: _.now(), runEveryXCommands: event.triggered.runEveryXCommands - event.definitions.fadeOutXCommands } })
+            if (event.key === 'command-send-x-times') {
+              if (!_.isNil(_.get(event, 'triggered.runEveryXCommands', null))) {
+                if (event.triggered.runEveryXCommands <= 0) continue
+                await global.db.engine.update('events', { _id: event._id.toString() }, { triggered: { fadeOutInterval: _.now(), runEveryXCommands: event.triggered.runEveryXCommands - event.definitions.fadeOutXCommands } })
+              }
+            } else if (event.key === 'keyword-send-x-times') {
+              if (!_.isNil(_.get(event, 'triggered.runEveryXKeywords', null))) {
+                if (event.triggered.runEveryXKeywords <= 0) continue
+                await global.db.engine.update('events', { _id: event._id.toString() }, { triggered: { fadeOutInterval: _.now(), runEveryXKeywords: event.triggered.runEveryXKeywords - event.definitions.fadeOutXKeywords } })
+              }
             }
           }
         }
@@ -378,6 +387,39 @@ class Events {
     return shouldTrigger
   }
 
+  async checkKeywordSendXTimes (event, attributes) {
+    const d = debug('events:checkKeywordSendXTimes')
+    const regexp = new RegExp(`${event.definitions.keywordToWatch}`, 'gi')
+
+    var shouldTrigger = false
+    attributes.message += ' '
+    const match = attributes.message.match(regexp)
+    if (match) {
+      event.triggered.runEveryXKeywords = _.get(event, 'triggered.runEveryXKeywords', 0)
+      event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0)
+
+      event.definitions.runInterval = parseInt(event.definitions.runInterval, 10) // force Integer
+      event.triggered.runInterval = parseInt(event.triggered.runInterval, 10) // force Integer
+
+      // add count from match
+      event.triggered.runEveryXKeywords = Number(event.triggered.runEveryXKeywords) + Number(match.length)
+
+      shouldTrigger =
+        event.triggered.runEveryXKeywords >= event.definitions.runEveryXKeywords &&
+        ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000) ||
+        (event.definitions.runInterval === 0 && event.triggered.runInterval === 0))
+      if (shouldTrigger) {
+        event.triggered.runInterval = _.now()
+        event.triggered.runEveryXKeywords = 0
+      }
+      d('Updating event to %j', event)
+      await global.db.engine.update('events', { _id: event._id.toString() }, event)
+    }
+    d('Attributes for check', attributes)
+    d('Should Trigger?', shouldTrigger)
+    return shouldTrigger
+  }
+
   async checkDefinition (event, attributes) {
     const d = debug('events:checkDefinition')
 
@@ -460,8 +502,8 @@ class Events {
           // check all definitions are correctly set -> no empty values
           for (let [key, value] of Object.entries(event.definitions)) {
             if (value.length === 0) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.value_cannot_be_empty'))
-            else if (key === 'commandToWatch' && !value.startsWith('!')) _.set(errors, 'definitions.commandToWatch', global.translate('webpanel.events.errors.command_must_start_with_!'))
-            else if (key !== 'commandToWatch' && !_.isBoolean(value) && !value.match(/^\d+$/g)) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.this_value_must_be_a_positive_number_or_0'))
+            else if (['commandToWatch'].includes(key) && !value.startsWith('!')) _.set(errors, 'definitions.commandToWatch', global.translate('webpanel.events.errors.command_must_start_with_!'))
+            else if (!['commandToWatch', 'keywordToWatch'].includes(key) && !_.isBoolean(value) && !value.match(/^\d+$/g)) _.set(errors, `definitions.${key}`, global.translate('webpanel.events.errors.this_value_must_be_a_positive_number_or_0'))
           }
 
           // check all operations definitions are correctly set -> no empty values

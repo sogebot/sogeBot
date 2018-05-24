@@ -311,17 +311,29 @@
           "label": "Fade Out X Commands",
           "placeholder": "Number of commands subtracted every fade out interval"
         },
+        "fadeOutXKeywords": {
+          "label": "Fade Out X Keywords",
+          "placeholder": "Number of keywords subtracted every fade out interval"
+        },
         "fadeOutInterval": {
           "label": "Fade Out Interval (seconds)",
-          "placeholder": "Fade out interval of command subtracting"
+          "placeholder": "Fade out interval subtracting"
         },
         "runEveryXCommands": {
           "label": "Run Every X Commands",
           "placeholder": "Number of commands before event is triggered"
         },
+        "runEveryXKeywords": {
+          "label": "Run Every X Keywords",
+          "placeholder": "Number of keywords before event is triggered"
+        },
         "commandToWatch": {
           "label": "Command To Watch",
           "placeholder": "Set your !commandToWatch"
+        },
+        "keywordToWatch": {
+          "label": "Keyword To Watch",
+          "placeholder": "Set your keywordToWatch"
         },
         "viewersAtLeast": {
           "label": "Viewers At Least",
@@ -860,6 +872,7 @@
     "subgift": "new subgift",
     "resub": "user resubscribed",
     "command-send-x-times": "command was send x times",
+    "keyword-send-x-times": "keyword was send x times",
     "number-of-viewers-is-at-least-x": "number of viewers is at least x",
     "stream-started": "stream started",
     "stream-stopped": "stream stopped",
