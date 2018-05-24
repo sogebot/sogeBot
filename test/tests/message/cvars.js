@@ -15,82 +15,82 @@ _.set(global, 'widgets.custom_variables.io.emit', function () {})
 const tests = [
   {
     test: '$_test',
-    variable: 'test',
+    variable: '$_test',
     initialValue: 0,
     afterValue: 5,
+    type: 'number',
     command: 'This is $_test',
     expectedSent: true,
-    expectedWithoutParams: 'This is 5',
     params: { sender: global.commons.getOwner(), param: 5 }
   },
   {
     test: '$_test',
-    variable: 'test',
+    variable: '$_test',
     initialValue: 0,
     afterValue: 1,
+    type: 'number',
     command: 'This is $_test',
     expectedSent: true,
-    expectedWithoutParams: 'This is 1',
     params: { sender: global.commons.getOwner(), param: '+' }
   },
   {
     test: '$_test',
-    variable: 'test',
+    variable: '$_test',
     initialValue: '0',
     afterValue: 1,
+    type: 'number',
     command: 'This is $_test',
     expectedSent: true,
-    expectedWithoutParams: 'This is 1',
     params: { sender: global.commons.getOwner(), param: '+' }
   },
   {
     test: '$!_test',
-    variable: 'test',
+    variable: '$_test',
     initialValue: 0,
     afterValue: -1,
+    type: 'number',
     command: 'This is $!_test',
     expectedSent: false,
-    expectedWithoutParams: 'This is -1',
     params: { sender: global.commons.getOwner(), param: '-' }
   },
   {
     test: '$!_test',
-    variable: 'test',
+    variable: '$_test',
     initialValue: '0',
     afterValue: -1,
+    type: 'number',
     command: 'This is $!_test',
     expectedSent: false,
-    expectedWithoutParams: 'This is -1',
     params: { sender: global.commons.getOwner(), param: '-' }
   },
   {
     test: '$!_test',
-    variable: 'test',
+    variable: '$_test',
     initialValue: 0,
     afterValue: 1,
+    type: 'number',
     command: 'This is $!_test',
     expectedSent: false,
-    expectedWithoutParams: 'This is 1',
     params: { sender: global.commons.getOwner(), param: '+' }
   },
   {
     test: '$_test',
-    variable: 'test',
+    variable: '$_test',
     initialValue: 0,
     afterValue: -1,
+    type: 'number',
     command: 'This is $_test',
     expectedSent: true,
-    expectedWithoutParams: 'This is -1',
     params: { sender: global.commons.getOwner(), param: '-' }
   },
   {
     test: '$!_test',
-    variable: 'test',
+    variable: '$_test',
     initialValue: 0,
     afterValue: 5,
+    type: 'number',
     command: 'This is $!_test',
     expectedSent: false,
-    expectedWithoutParams: 'This is 5',
     params: { sender: global.commons.getOwner(), param: 5 }
   }
 ]
@@ -103,9 +103,9 @@ describe('Message - cvars filter', () => {
 
   for (let test of tests) {
     let message = null
-    describe(`'${test.test}' expect '${test.expectedWithoutParams}' with value after ${test.afterValue}`, async () => {
+    describe(`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.afterValue)}' with value after ${test.afterValue}`, async () => {
       it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-        await global.db.engine.update('customvars', { key: test.variable }, { value: test.initialValue })
+        await global.db.engine.update('custom.variables', { variableName: test.variable }, { readOnly: false, currentValue: test.initialValue, type: test.type })
       })
       it(`parse '${test.command}' with params`, async () => {
         message = await new Message(test.command).parse(test.params)
@@ -117,13 +117,13 @@ describe('Message - cvars filter', () => {
       if (test.params.param) {
         if (test.expectedSent) {
           it(`expecting set message`, async () => {
-            await msg.isSent('filters.setVariable', { username: global.commons.getOwner() }, { sender: global.commons.getOwner(), variable: 'test', value: test.afterValue })
+            await msg.isSent('filters.setVariable', { username: global.commons.getOwner() }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue })
           })
         } else {
           it(`not expecting set message`, async () => {
             let notSent = false
             try {
-              await msg.isSent('filters.setVariable', { username: global.commons.getOwner() }, { sender: global.commons.getOwner(), variable: 'test', value: test.afterValue })
+              await msg.isSent('filters.setVariable', { username: global.commons.getOwner() }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue })
             } catch (e) {
               notSent = true
             }
@@ -133,8 +133,8 @@ describe('Message - cvars filter', () => {
       }
 
       it(`check if after value is ${test.afterValue}`, async () => {
-        let cvar = await global.db.engine.findOne('customvars', { key: test.variable })
-        assert.equal(cvar.value, test.afterValue)
+        let cvar = await global.db.engine.findOne('custom.variables', { variableName: test.variable })
+        assert.equal(cvar.currentValue, test.afterValue)
       })
 
       it(`parse '${test.command}' without params`, async () => {
@@ -142,7 +142,48 @@ describe('Message - cvars filter', () => {
         message = await new Message(test.command).parse(test.params)
       })
       it(`message parsed correctly`, async () => {
-        assert.equal(message, test.expectedWithoutParams)
+        assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.afterValue))
+      })
+    })
+  }
+
+  // read only tests
+  for (let test of tests) {
+    let message = null
+    describe(`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.initialValue)}' with value after ${test.initialValue} because readOnly`, async () => {
+      it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
+        await global.db.engine.update('custom.variables', { variableName: test.variable }, { readOnly: true, currentValue: test.initialValue, type: test.type })
+      })
+      it(`parse '${test.command}' with params`, async () => {
+        message = await new Message(test.command).parse(test.params)
+      })
+      it(`message parsed correctly`, async () => {
+        assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue))
+      })
+
+      if (test.params.param) {
+        it(`not expecting set message`, async () => {
+          let notSent = false
+          try {
+            await msg.isSent('filters.setVariable', { username: global.commons.getOwner() }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue })
+          } catch (e) {
+            notSent = true
+          }
+          assert.isTrue(notSent)
+        })
+      }
+
+      it(`check if after value is ${test.initialValue}`, async () => {
+        let cvar = await global.db.engine.findOne('custom.variables', { variableName: test.variable })
+        assert.equal(cvar.currentValue, test.initialValue)
+      })
+
+      it(`parse '${test.command}' without params`, async () => {
+        delete test.params.param
+        message = await new Message(test.command).parse(test.params)
+      })
+      it(`message parsed correctly`, async () => {
+        assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue))
       })
     })
   }

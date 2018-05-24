@@ -655,10 +655,14 @@ class API {
     const match = title.match(regexp)
 
     if (!_.isNil(match)) {
-      for (let variable of title.match(regexp).map((o) => o.replace('$_', ''))) {
-        let variableFromDb = await global.db.engine.findOne('customvars', { key: variable })
-        if (_.isNil(variableFromDb.key)) variableFromDb = { key: variable, value: global.translate('webpanel.not-available') }
-        title = title.replace(new RegExp(`\\$_${variableFromDb.key}`, 'g'), variableFromDb.value)
+      for (let variable of title.match(regexp)) {
+        let value
+        if (await global.customvariables.isVariableSet(variable)) {
+          value = await global.customvariables.getValueOf(variable)
+        } else {
+          value = global.translate('webpanel.not-available')
+        }
+        title = title.replace(new RegExp(`\\${variable}`, 'g'), value)
       }
     }
     return title

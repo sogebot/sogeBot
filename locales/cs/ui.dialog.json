@@ -1,0 +1,22 @@
+{
+  "title": {
+    "edit": "Upravit",
+    "add": "Přidat"
+  },
+  "buttons": {
+    "cancel": "Zrušit",
+    "close": "Zavřít",
+    "saveChanges": {
+      "idle": "Uložit změny",
+      "progress": "Ukládání změn",
+      "done": "Změny uloženy"
+    },
+    "something-went-wrong": "Něco se pokazilo",
+    "disable": "Vypnout",
+    "enable": "Zapnout",
+    "edit": "Upravit",
+    "delete": "Smazat",
+    "yes": "Ano",
+    "no": "Ne"
+  }
+}

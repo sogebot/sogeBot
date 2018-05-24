@@ -1,4 +1,4 @@
-<div class="card widget">
+<div class="card widget" id="customVariablesWidget">
   <div class="card-header">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
@@ -20,11 +20,79 @@
   <!-- Tab panes -->
   <div class="card-body">
     <div class="tab-content">
-      <div role="tabpanel" class="tab-pane active" id="customvariables-main"></div>
+      <div role="tabpanel" class="tab-pane active" id="customvariables-main">
+        <div v-for="(variable, index) of watchedVariables">
+          <div class="input-group" v-bind:class="{ 'pt-1': index != 0 }">
+            <div class="input-group-prepend">
+              <span class="input-group-text">{{ variable.variableName }}</span>
+            </div>
+            <template v-if="variable.type === 'text'">
+              <number-or-text
+                v-bind:id="String(variable._id)"
+                v-bind:value="variable.currentValue"
+                type="text"
+                v-on:update="onUpdate">
+              </number-or-text>
+            </template>
+            <template v-else-if="variable.type ==='eval'">
+              <input type="text" class="form-control" readonly v-bind:value="variable.currentValue">
+              <span class="input-group-text border-left-0"><i class="fas fa-code"></i></span>
+            </template>
+            <template v-else-if="variable.type ==='number'">
+              <number-or-text
+                v-bind:id="String(variable._id)"
+                v-bind:value="variable.currentValue"
+                type="number"
+                v-on:update="onUpdate">
+              </number-or-text>
+            </template>
+            <template v-else-if="variable.type ==='options'">
+              <div style="display: flex; flex: 1 1 auto;">
+                <div style="flex: 1 auto;" class="btn-group btn-group-toggle" data-toggle="buttons">
+                  <option-selector
+                    v-for="option of variable.usableOptions.split(',').map((o) => o.trim())"
+                    v-bind:value="option"
+                    v-bind:selected="variable.currentValue === option"
+                    v-on:update="onUpdate(String(variable._id), option)">
+                  </option-selector>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
       <!-- /MAIN -->
 
       <div role="tabpanel" class="tab-pane" id="customvariables-settings">
-        <div id="customvariables-watch"></div>
+        <span v-if="_.size(nonWatchedVariables) > 0">
+          <select class="form-control" v-model="selectedVariable">
+            <option v-bind:value="String(variable._id)" v-for="variable of nonWatchedVariables">{{ variable.variableName }}</option>
+          </select>
+          <button class="btn btn-block btn-primary" v-on:click="addToWatch(selectedVariable)">{{ commons.translate('widgets.customvariables.add-variable-into-watchlist') }}</button>
+        </span>
+        <span v-else>
+          <div class="alert alert-warning" v-html="commons.translate('widgets.customvariables.no-custom-variable-found')"></div>
+        </span>
+
+        <span v-if="watched.length > 0">
+          <h6 class="mt-2 mb-0">{{ commons.translate('widgets.customvariables.watchlist') }}</h6>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item" v-for="(watch, index) of watchedVariables">
+              <span class="row">
+                <div class="col-md-2 pt-2" style="line-height: 2rem;">
+                  <button v-if="index !== 0" class="btn btn-block btn-link col-md-2" v-on:click="moveUp(String(watch._id))"><i class="fas fa-angle-up"></i></button>
+                </div>
+                <div class="col-md p-2" style="overflow:hidden; line-height: 2rem;">
+                  {{ watch.variableName }}
+                  <button class="btn float-right btn-outline-danger border-0" v-on:click="unWatch(String(watch._id))"><i class="fas fa-trash-alt"></i></button>
+                </div>
+                <div class="col-md-2 pt-2" style="line-height: 2rem;">
+                  <button v-if="index !== watchedVariables.length - 1" class="btn btn-block btn-link col-md-2" v-on:click="moveDown(String(watch._id))"><i class="fas fa-angle-down"></i></button>
+                </div>
+              </span>
+            </li>
+          </ul>
+        </span>
       </div>
       <!-- /SETTINGS -->
     </div>
@@ -32,282 +100,168 @@
 </div>
 
 <script>
-var widgetsCustomVariablesSocket = io('/widgets/customVariables', { query: "token=" + token })
+Vue.prototype.commons = commons
 
-var customVariablesWidget = {
-  save: function (el) {
-    let name
-    if (!_.isNil(el.data)) {
-      name = el.name
-      value = el.value
-    } else {
-      name = $(el).data('name')
-      value = $(`input[data-name="${name}"]`).val()
+var optionsSelectorComponent = {
+  props: ['value', 'selected'], // data for component
+  methods: {
+    update: function () {
+      this.$emit('update')
     }
-
-    widgetsCustomVariablesSocket.emit('save.variable', { key: name, value: value }, () => {
-      $(`button.btn.btn-secondary[data-name="${name}"]`).css('display', 'none')
-    })
   },
-  increment: function (el) {
-    let name = $(el).data('name')
-    let value = $(`input[data-name="${name}"]`).val()
-    value = _.isFinite(parseInt(value, 10)) ? ++value : 0
-    $(`input[data-name="${name}"]`).val(value)
-    customVariablesWidget.save(el)
-  },
-  decrement: function (el) {
-    let name = $(el).data('name')
-    let value = $(`input[data-name="${name}"]`).val()
-    value = _.isFinite(parseInt(value, 10)) ? --value : 0
-    $(`input[data-name="${name}"]`).val(value)
-    customVariablesWidget.save(el)
-  },
-  saveValues: function (el) {
-    $(el).removeClass().addClass('btn btn-info')
-
-    let value = $(el).parents('.input-group').children('input').val()
-    widgetsCustomVariablesSocket.emit('save.values', {name: $(el).data('name'), value: value}, (err, cb) => {
-      if (err) return console.debug(err)
-
-      $(el).removeClass().addClass('btn btn-success')
-      customVariablesWidget.refresh()
-    })
-  },
-  generateLabels: function (values, current) {
-    current = current || null
-    values = values || _.get(translations, 'custom-variables.no-options-set', '{custom-variables.no-options-set}')
-    let out = ''
-    if (current && values.toLowerCase().indexOf(current.toLowerCase().trim()) === -1) {
-      out += `<label style="flex: 1 auto;" class="btn btn-secondary ${out.length === 0 ? 'active' : ''}">
-        <input type="radio" name="options" id="${current}" autocomplete="off" ${out.length === 0 ? 'checked' : ''}> ${current}
-      </label>`
-    }
-    for (value of values.split(',')) {
-      value = value.trim()
-      let isActive = (out.length === 0 && _.isNil(current)) || (current && value.toLowerCase().indexOf(current.toLowerCase().trim()) !== -1)
-      out += `<label style="flex: 1 auto;" class="btn btn-secondary ${isActive ? 'active' : ''}">
-        <input type="radio" name="options" id="${value}" autocomplete="off" ${isActive ? 'checked' : ''}> ${value}
-      </label>`
-    }
-    return out
-  },
-  watch: function (el) {
-    $(el).removeClass().addClass('btn btn-info')
-
-    let name = $('#customVariablesWidgetName input').val()
-    let type = $(el).parents('div.input-group').children('select').val()
-
-    $('#customVariablesWidgetName .form-control').removeClass('is-invalid')
-    $('#customVariablesWidgetName .invalid-tooltip').text()
-
-    console.debug({name: name, type: type})
-
-    widgetsCustomVariablesSocket.emit('watch', {name: name, type: type}, (err, cb) => {
-      if (err) {
-        $('#customVariablesWidgetName .invalid-tooltip').text(cb)
-        $('#customVariablesWidgetName .form-control').addClass('is-invalid')
-        $(el).removeClass().addClass('btn btn-primary')
-        return console.error(cb)
-      }
-      customVariablesWidget.refresh()
-    })
-  },
-  unwatch: function (el) {
-    $(el).removeClass().addClass('btn btn-info')
-    widgetsCustomVariablesSocket.emit('unwatch', $(el).data('name'), (err, cb) => {
-      if (err) return console.error(err)
-      $(`.input-group[data-variable-group='${cb}']`).velocity('fadeOut')
-      setTimeout(() => customVariablesWidget.refresh(), 500)
-    })
-  },
-  refresh: function () {
-    widgetsCustomVariablesSocket.emit('list.variables', (err, variables) => {
-      if (err) return console.error(err)
-      var i
-
-      // SET customvariables-main /////////////////////////////////////////////////
-      const main = $('#customvariables-main')
-      main.empty()
-
-      i = 0
-      for (let variable of variables) {
-        let variableEl = ''
-        switch(variable.type) {
-          case 'number':
-            variableEl = $(`
-              <div class="input-group" data-variable-group="${variable.name}" ${(i!==0) ? 'style="margin-top: 0.2rem"' : ''}>
-                <div class="input-group-prepend">
-                  <span class="input-group-text">$_${variable.name}</span>
-                </div>
-                <input type="text" class="form-control" data-custom-variable-input data-name="${variable.name}">
-
-                <div class="input-group-append">
-                  <button class="btn btn-secondary d-none" data-name="${variable.name}" onclick="customVariablesWidget.save(this)" type="button"><i class="fas fa-download"></i></button>
-                  <button class="btn btn-danger" data-name="${variable.name}" onclick="customVariablesWidget.decrement(this)" type="button"><i class="fas fa-minus"></i></button>
-                  <button class="btn btn-success" data-name="${variable.name}" onclick="customVariablesWidget.increment(this)" data-button="plus" type="button"><i class="fas fa-plus"></i></button>
-                </div>
-              </div>
-            `)
-            break
-          case 'text':
-            variableEl = $(`
-              <div class="input-group" data-variable-group="${variable.name}" ${(i!==0) ? 'style="margin-top: 0.2rem"' : ''}>
-                <div class="input-group-prepend">
-                  <span class="input-group-text">$_${variable.name}</span>
-                </div>
-                <input type="text" class="form-control" data-custom-variable-input data-name="${variable.name}">
-
-                <div class="input-group-append">
-                  <button class="btn btn-secondary d-none" data-name="${variable.name}" onclick="customVariablesWidget.save(this)" type="button"><i class="fas fa-download"></i></button>
-                </div>
-              </div>
-            `)
-            break
-          case 'options':
-            variableEl = $(`
-              <div class="input-group" data-variable-group="${variable.name}" ${(i!==0) ? 'style="margin-top: 0.2rem"' : ''}>
-                <div class="input-group-prepend">
-                  <span class="input-group-text">$_${variable.name}</span>
-                </div>
-
-                <div style="display: flex; flex: 1 1 auto;">
-                  <div style="flex: 1 auto;" class="btn-group btn-group-toggle" data-toggle="buttons">
-                    ${customVariablesWidget.generateLabels(variable.value)}
-                  </div>
-                </div>
-              </div>
-            `)
-            break
-        }
-        main.append(variableEl)
-        i++
-
-        // load variable custom value
-        widgetsCustomVariablesSocket.emit('load.variable', variable.name, (err, cb) => {
-          if (err) return console.error(err)
-          if (variable.type === 'number' || variable.type === 'text') {
-            $(`input[data-name="${cb.key}"]`).val(cb.value)
-          } else {
-            $(`[data-variable-group="${variable.name}"] div[data-toggle="buttons"]`).html(customVariablesWidget.generateLabels(variable.value, cb.value))
-          }
-        })
-      }
-      // set message if variables are empty
-      if (i === 0) {
-        main.append(`<div style="margin-left: 3.2rem" class="text-primary"><sup class="fas fa-caret-up"></sup> ${_.get(translations, 'custom-variables.set-your-variables-to-watch-here', '{custom-variables.set-your-variables-to-watch-here}')}</div>`)
-      }
-      // /SET customvariables-main ////////////////////////////////////////////////
-
-      // SET customvariables-watch ////////////////////////////////////////////////
-      const watch = $('#customvariables-watch')
-      watch.empty()
-
-      i = 0
-      for (let variable of variables) {
-        let watchEl = ''
-        switch(variable.type) {
-          case 'number':
-          case 'text':
-            watchEl = $(`
-              <div class="input-group" data-variable-group="${variable.name}" style="margin-bottom: 0.2rem">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">$_</span>
-                </div>
-                <input type="text" class="form-control" value="${variable.name}" disabled="disabled"/>
-                <div class="input-group-prepend">
-                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">${_.get(translations, 'custom-variables.type', '{custom-variables.type}')}</span>
-                </div>
-                <select class="form-control" disabled="disabled">
-                  <option>${variable.type}</option>
-                </select>
-                <div class="input-group-append">
-                  <button type="button" data-name="${variable.name}" onclick="customVariablesWidget.unwatch(this)" class="btn btn-danger">${_.get(translations, 'custom-variables.unwatch', '{custom-variables.unwatch}')}</button>
-                </div>
-              </div>
-            `)
-            break
-          case 'options':
-            watchEl = $(`
-            <div class="input-group" data-variable-group="${variable.name}">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">$_</span>
-                </div>
-                <input type="text" class="form-control" value="${variable.name}" disabled="disabled">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">${_.get(translations, 'custom-variables.type', '{custom-variables.type}')}</span>
-                </div>
-                <select class="form-control" disabled="disabled">
-                  <option>${_.get(translations, 'custom-variables.options', '{custom-variables.options}')}</option>
-                </select>
-                <div class="input-group-append">
-                  <button type="button" data-name="${variable.name}" onclick="customVariablesWidget.unwatch(this)" class="btn btn-danger">${_.get(translations, 'custom-variables.unwatch', '{custom-variables.unwatch}')}</button>
-                </div>
-              </div>
-
-              <div class="input-group" data-variable-group="${variable.name}" style="margin-top: -1px; margin-bottom: 0.2rem">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">${_.get(translations, 'custom-variables.options', '{custom-variables.options}')}</span>
-                </div>
-                <input type="text" class="form-control" data-custom-variable-input data-name="${variable.name}" placeholder="${_.get(translations, 'custom-variables.options-placeholder', '{custom-variables.options-placeholder}')}" value="${variable.value ? variable.value : ''}">
-                <div class="input-group-append" style="margin-top:1px;">
-                  <button class="btn btn-secondary d-none" type="button" data-name="${variable.name}" onclick="customVariablesWidget.saveValues(this)"><i class="fas fa-download"></i></button>
-                </div>
-              </div>
-            `)
-            break
-        }
-        watch.append(watchEl)
-      }
-      watch.append(`
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">$_</span>
-          </div>
-          <div id="customVariablesWidgetName" style="flex: 1 1 auto; width: 5%">
-            <input type="text" class="form-control">
-            <div class="invalid-tooltip"></div>
-          </div>
-          <div class="input-group-prepend">
-            <span class="input-group-text" style="border-left: 0; font-weight: bold; font-variant: small-caps">${_.get(translations, 'custom-variables.type', '{custom-variables.type}')}</span>
-          </div>
-          <select class="form-control">
-            <option value="number">${_.get(translations, 'custom-variables.number', '{custom-variables.number}')}</option>
-            <option value="text">${_.get(translations, 'custom-variables.text', '{custom-variables.text}')}</option>
-            <option value="options">${_.get(translations, 'custom-variables.options', '{custom-variables.options}')}</option>
-          </select>
-          <div class="input-group-append">
-            <button type="button" class="btn btn-primary" onclick="customVariablesWidget.watch(this)">${_.get(translations, 'custom-variables.watch', '{custom-variables.watch}')}</button>
-          </div>
-        </div>
-      `)
-      // /SET customvariables-watch ///////////////////////////////////////////////
-    })
-  }
+  template: `
+    <label style="flex: 1 auto;" class="btn btn-secondary" v-bind:class="{ active : selected }" v-on:click="update()">
+      <input type="radio" name="options" v-bind:id="value" autocomplete="off" checked="">{{ value }}
+    </label>`
 }
 
-$(document).on('click', `[data-variable-group] div[data-toggle="buttons"] label`, (event) => {
-  let name = $(event.currentTarget).parents('[data-variable-group]').data('variable-group')
-  let value = $(event.currentTarget).children('input').attr('id')
-  console.debug(name, value)
-  customVariablesWidget.save({ name: name, value: value, data: true })
-})
+var numberOrTextComponent = {
+  props: ['id', 'value', 'type'],
+  watch: {
+    value: function (val) {
+      this.currentValue = this.value
+    },
+    currentValue: function (val, old) {
+      this.showSaveButton = this.initialValue != this.currentValue
+    }
+  },
+  methods: {
+    update: function (val) {
+      if (val) this.currentValue = Number(this.currentValue) + Number(val)
+      else if (this.type === 'number') this.currentValue = Number(this.currentValue)
+      if (_.isNaN(this.currentValue)) this.currentValue = 0
 
-$(document).on('keydown', '[data-custom-variable-input]', (event) => {
-  let name = $(event.currentTarget).data('name')
+      this.initialValue = this.currentValue
+      this.showSaveButton = false
 
-  if (event.which == 13) { // enter to save
-    $(`button.btn.btn-secondary[data-name="${name}"]`).trigger('click')
-    $(event.currentTarget).blur()
-  } else {
-    $(`button.btn.btn-secondary[data-name="${name}"]`).removeClass('d-none')
-    $(`button.btn.btn-secondary[data-name="${name}"]`).css('display', 'inline-block')
-  }
-})
+      this.$emit('update', this.id, this.currentValue)
+    },
+    onKeyUp: function (event) {
+      if (event.key === 'Enter') this.update()
+    }
+  },
+  data: function () {
+    return {
+      showSaveButton: false,
+      currentValue: this.value
+    }
+  },
+  created: function () {
+    this.initialValue = this.value
+  },
+  computed: {
+    typeTemplate: function () {
+      if (this.type === 'number') return '<strong>0-9</strong>'
+      else return '<i class="fas fa-font"></i>'
+    }
+  },
+  template: `
+    <div class="form-control p-0 d-flex border-0">
+      <input type="text" class="form-control" v-model="currentValue" style="z-index:99" v-on:keyup="onKeyUp">
+      <div class="input-group-append">
+        <button class="btn btn-primary" v-bind:class="{'d-none' : type !== 'number'}" type="button" v-on:click="update(1)"><i class="fas fa-plus"></i></button>
+        <button class="btn btn-danger" v-bind:class="{'d-none' : type !== 'number'}" type="button" v-on:click="update(-1)"><i class="fas fa-minus"></i></button>
+        <button class="btn btn-secondary" v-bind:class="{'d-none' : !showSaveButton}" type="button" v-on:click="update()"><i class="fas fa-download"></i></button>
+        <span class="input-group-text" v-html="typeTemplate"></span>
+      </div>
+    </div>
+    `
+}
 
-customVariablesWidget.refresh()
 
-widgetsCustomVariablesSocket.off('refresh').on('refresh', () => {
-  customVariablesWidget.refresh()
-})
+function customVariablesWidgetInit () {
+  if (_.size(translations) === 0) return setTimeout(() => customVariablesWidgetInit(), 1)
+  var customVariablesWidget = new Vue({
+    el: '#customVariablesWidget',
+    components: {
+      'option-selector': optionsSelectorComponent,
+      'number-or-text': numberOrTextComponent
+    },
+    data: {
+      variables: [],
+      watched: [],
+      selectedVariable: null,
+
+      socket: io('/widgets/customVariables', { query: "token=" + token }),
+    },
+    created: function () {
+      this.socket.on('refresh', () => {
+        this.refreshVariablesList()
+        this.refreshWatchList()
+      })
+      this.refreshVariablesList()
+      this.refreshWatchList()
+    },
+    computed: {
+      watchedVariables: function () {
+        let watched = []
+        for (let variable of this.variables) {
+          let filtered = this.watched.filter((o) => o.variableId === String(variable._id))
+          if (filtered.length !== 0) {
+            variable.order = filtered[0].order
+            watched.push(variable)
+          }
+        }
+        return _.orderBy(watched, 'order', 'asc')
+      },
+      nonWatchedVariables: function () {
+        let nonWatched = []
+        for (let variable of this.variables) {
+          let filtered = this.watched.filter((o) => o.variableId === String(variable._id))
+          if (filtered.length === 0) nonWatched.push(variable)
+        }
+        return nonWatched
+      }
+    },
+    watch: {
+      nonWatchedVariables: function () {
+        if (!_.isNil(this.nonWatchedVariables[0])) this.selectedVariable = this.nonWatchedVariables[0]._id
+      }
+    },
+    methods: {
+      onUpdate: function (_id, value) {
+        this.socket.emit('set.value', { _id, value }, (err) => {
+          this.refreshVariablesList()
+          this.refreshWatchList()
+        })
+      },
+      moveUp: function (variableId) {
+        this.socket.emit('move.up', variableId, (err, variableId) => {
+          this.refreshWatchList()
+        })
+      },
+      moveDown: function (variableId) {
+        this.socket.emit('move.down', variableId, (err, variableId) => {
+          this.refreshWatchList()
+        })
+      },
+      addToWatch: function (variableId) {
+        if (!_.isNil(variableId)) {
+          this.socket.emit('add.watch', variableId, (err, variableId) => {
+            this.refreshWatchList()
+          })
+        }
+      },
+      unWatch: function (variableId) {
+        if (!_.isNil(variableId)) {
+          this.socket.emit('rm.watch', variableId, (err, variableId) => {
+            this.refreshWatchList()
+          })
+        }
+      },
+      refreshVariablesList: function () {
+        this.socket.emit('list.variables', (err, data) => {
+          this.variables = data
+
+        })
+      },
+      refreshWatchList: function () {
+        this.socket.emit('list.watch', (err, data) => {
+          this.watched = data
+        })
+      }
+    }
+  })
+}
+customVariablesWidgetInit()
 </script>

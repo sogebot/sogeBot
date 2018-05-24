@@ -77,6 +77,9 @@ function Panel () {
   app.get('/', this.authUser, function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'))
   })
+  app.get('/:type/registry/:subtype/:page', this.authUser, function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', req.params.type, 'registry', req.params.subtype, req.params.page))
+  })
   app.get('/:type/:subtype/:page', this.authUser, function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.subtype, req.params.page))
   })
@@ -169,9 +172,10 @@ function Panel () {
 
     // custom var
     socket.on('custom.variable.value', async (variable, cb) => {
-      let variableFromDb = await global.db.engine.findOne('customvars', { key: variable.replace('$_', '') })
-      if (_.isNil(variableFromDb.key)) cb(null, global.translate('webpanel.not-available'))
-      else cb(null, variableFromDb.value)
+      let value = global.translate('webpanel.not-available')
+      let isVariableSet = await global.customvariables.isVariableSet(variable)
+      if (isVariableSet) value = await global.customvariables.getValueOf(variable)
+      cb(null, value)
     })
 
     socket.on('responses.get', async function (at, callback) {
