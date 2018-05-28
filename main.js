@@ -38,7 +38,7 @@ require('./libs/logging') // logger is on master / worker have own global.log se
 global.db = new (require('./libs/databases/database'))(global.cluster)
 if (cluster.isMaster) {
   // spin up forks first
-  global.cpu = config.cpu === 'auto' ? os.cpus().length : parseInt(config.cpu, 10)
+  global.cpu = config.cpu === 'auto' ? os.cpus().length : parseInt(_.get(config, 'cpu', 1), 10)
   if (config.database.type === 'nedb') global.cpu = 1 // nedb can have only one fork
   for (let i = 0; i < global.cpu; i++) fork()
   cluster.on('disconnect', (worker) => fork())
