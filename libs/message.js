@@ -474,7 +474,7 @@ class Message {
     await this.parseMessageEach(math); d('parseMessageEach: %s', this.message)
     await this.parseMessageOnline(online); d('parseMessageOnline: %s', this.message)
     await this.parseMessageCommand(command); d('parseMessageCommand: %s', this.message)
-    await this.parseMessageEach(qs); d('parseMessageEach: %s', this.message)
+    await this.parseMessageEach(qs, false); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(list); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(stream); d('parseMessageEach: %s', this.message)
     await this.parseMessageApi(); d('parseMessageApi: %s', this.message)
