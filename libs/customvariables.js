@@ -108,8 +108,10 @@ class CustomVariables {
     DEBUG.SCRIPT('contain online: %s', containOnline)
     DEBUG.SCRIPT('contain url: %s', containUrl)
 
-    for (let match of script.match(/(\$_[a-zA-Z_]+)/g)) {
-      script = script.replace(match, await this.getValueOf(match))
+    if (!_.isNil(script.match(/(\$_[a-zA-Z_]+)/g))) {
+      for (let match of script.match(/(\$_[a-zA-Z_]+)/g)) {
+        script = script.replace(match, await this.getValueOf(match))
+      }
     }
 
     let urls = []
