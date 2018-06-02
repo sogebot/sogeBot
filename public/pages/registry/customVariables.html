@@ -21,7 +21,7 @@
           {{ variable.description.length !== 0 ? variable.description : commons.translate('not-available') }}
         </td>
         <td style="font-size: 1.2rem;">{{ commons.translate('registry.customvariables.types.' + variable.type) }}</td>
-        <td v-bind:class="{ 'text-muted': !variable.currentValue }">{{ variable.currentValue ? variable.currentValue : commons.translate('not-available') }}</td>
+        <td v-bind:class="{ 'text-muted': variable.currentValue.length === 0 }">{{ variable.currentValue.length !== 0 ? variable.currentValue : commons.translate('not-available') }}</td>
         <td>
           <span v-if="variable.type === 'eval'">
             <div v-if="variable.runEvery">
