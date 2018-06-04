@@ -365,7 +365,7 @@ class Twitch {
   async setTitle (self, sender, text) {
     if (text.trim().length === 0) {
       global.commons.sendMessage(global.translate('title.current')
-        .replace(/\$title/g, _.get(await global.db.engine.update('api.current', { key: 'status' }), 'value', 'n/a')), sender)
+        .replace(/\$title/g, _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a')), sender)
       return
     }
     if (cluster.isMaster) global.api.setTitleAndGame(self, sender, { title: text })
