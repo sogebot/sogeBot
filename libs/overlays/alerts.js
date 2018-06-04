@@ -96,11 +96,11 @@ Alerts.prototype.getClipById = async function (id) {
       .set('Accept', 'application/vnd.twitchtv.v5+json')
       .set('Client-ID', config.settings.client_id)
       .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
-    global.panel.io.emit('api.stats', { data: request.body, timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+    global.panel.io.emit('api.stats', { data: request.body, timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.statusCode, remaining: this.remainingAPICalls })
     return request.body
   } catch (e) {
     global.log.error(`${url} - ${e.message}`)
-    global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
+    global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
     return null
   }
 }

@@ -71,14 +71,14 @@ class Webhooks {
         request.push(`hub.topic=https://api.twitch.tv/helix/users/follows?to_id=${cid}`)
         res = await snekfetch.post(request.join('&')).set('Client-ID', config.settings.client_id)
         debug('Subscribe response: %o', res)
-        if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: follows waiting for challenge')
+        if (res.statusCode === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: follows waiting for challenge')
         else global.log.error('WEBHOOK: follows NOT subscribed')
         break
       case 'streams':
         request.push(`hub.topic=https://api.twitch.tv/helix/streams?user_id=${cid}`)
         res = await snekfetch.post(request.join('&')).set('Client-ID', config.settings.client_id)
         debug('Subscribe response: %o', res)
-        if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: streams waiting for challenge')
+        if (res.statusCode === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: streams waiting for challenge')
         else global.log.error('WEBHOOK: streams NOT subscribed')
         break
       default:

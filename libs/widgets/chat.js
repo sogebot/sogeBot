@@ -17,7 +17,7 @@ ChatWidget.prototype.refresh = async (self, socket) => {
     let url = `https://tmi.twitch.tv/group/user/${config.settings.broadcaster_username.toLowerCase()}/chatters`
     let response = await fetch.get(url)
 
-    if (response.status === 200) {
+    if (response.statusCode === 200) {
       global.panel.io.emit('chatChatters', { chatters: response.body.chatters, _total: response.body.chatter_count })
     }
   } catch (e) {

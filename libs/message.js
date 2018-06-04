@@ -474,7 +474,7 @@ class Message {
       this.message = this.message.replace(rMessage[0], '').trim() // remove api command from message
       let url = rMessage[1].replace(/&amp;/g, '&')
       let response = await snekfetch.get(url)
-      if (response.status !== 200) {
+      if (response.statusCode !== 200) {
         return global.translate('core.api.error')
       }
 
