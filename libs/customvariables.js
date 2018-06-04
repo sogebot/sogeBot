@@ -217,12 +217,13 @@ class CustomVariables {
     let isEval = false
 
     opts.sender = _.isNil(opts.sender) ? null : opts.sender
+    opts.readOnlyBypass = _.isNil(opts.readOnlyBypass) ? false : opts.readOnlyBypass
 
     // add simple text variable, if not existing
     if (_.isEmpty(item)) {
       item = await global.db.engine.insert('custom.variables', { variableName, currentValue, type: 'text' })
     } else {
-      if (item.readOnly) {
+      if (item.readOnly && !opts.readOnlyBypass) {
         isOk = false
       } else {
         if (item.type === 'number') {

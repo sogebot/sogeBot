@@ -57,7 +57,7 @@ class CustomVariablesWidget {
       })
       socket.on('set.value', async (opts, cb) => {
         let name = await global.customvariables.isVariableSetById(opts._id)
-        if (name) await global.customvariables.setValueOf(name, opts.value, {})
+        if (name) await global.customvariables.setValueOf(name, opts.value, { readOnlyBypass: true })
         cb(null)
       })
     })
