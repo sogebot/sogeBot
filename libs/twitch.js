@@ -1,13 +1,14 @@
 'use strict'
 
 const constants = require('./constants')
-const moment = require('moment')
+const moment = require('moment-timezone')
 const _ = require('lodash')
 const debug = require('debug')
 const cluster = require('cluster')
 require('moment-precise-range-plugin')
 
 const config = require('../config.json')
+config.timezone = config.timezone === 'system' || _.isNil(config.timezone) ? moment.tz.guess() : config.timezone
 
 class Twitch {
   constructor () {
@@ -65,7 +66,7 @@ class Twitch {
   }
 
   async time (self, sender) {
-    let message = await global.commons.prepare('time', { time: moment().format('LTS') })
+    let message = await global.commons.prepare('time', { time: moment().tz(config.timezone).format('LTS') })
     debug(message); global.commons.sendMessage(message, sender)
   }
 
