@@ -7,9 +7,12 @@ const format = winston.format
 var fs = require('fs')
 var _ = require('lodash')
 var logDir = './logs'
-var moment = require('moment')
+var moment = require('moment-timezone')
 const glob = require('glob')
 const cluster = require('cluster')
+const config = require('../config.json')
+
+config.timezone = config.timezone === 'system' || _.isNil(config.timezone) ? moment.tz.guess() : config.timezone
 
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir)
 
@@ -48,7 +51,6 @@ if (cluster.isWorker) {
     levels: levels,
     level: 'debug',
     format: format.combine(
-      format.timestamp({format: 'YYYY-MM-DDTHH:mm:ss.SSS'}),
       format.printf(info => {
         let level
         if (info.level === 'error') level = '!!! ERROR !!!'
@@ -68,7 +70,9 @@ if (cluster.isWorker) {
         if (info.level === 'sub') level = '+sub'
         if (info.level === 'subgift') level = '+subgift'
         if (info.level === 'resub') level = '+resub'
-        return `${info.timestamp} ${level} ${info.message} ${info.username ? `[${info.username}]` : ``}`
+
+        const timestamp = moment().tz(config.timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS')
+        return `${timestamp} ${level} ${info.message} ${info.username ? `[${info.username}]` : ``}`
       })
     ),
     exceptionHandlers: [
@@ -106,7 +110,7 @@ Logger.prototype.send = async function (self, socket, filters) {
 
 Logger.prototype.doFilter = function (self, content) {
   // remove startup, debug and errors
-  var sContent = content.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z? \| .*/g, '')
+  var sContent = content.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}? \| .*/g, '')
     .replace(/.\[39m/g, '', '')
     .split('\n')
   content = []
