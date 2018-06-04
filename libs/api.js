@@ -49,7 +49,7 @@ class API {
       this.getChannelChattersUnofficialAPI({ saveToWidget: false })
 
       this.getChannelSubscribersOldAPI() // remove this after twitch add total subscribers
-      this.getChannelDataOldAPI() // remove this after twitch game and status for new API
+      this.getChannelDataOldAPI({ forceUpdate: true }) // remove this after twitch game and status for new API
 
       this.intervalFollowerUpdate()
       this.checkClips()
@@ -87,11 +87,11 @@ class API {
         .set('Accept', 'application/vnd.twitchtv.v5+json')
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
         .set('Client-ID', config.settings.client_id)
-      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getChannelID', api: 'kraken', endpoint: url, code: request.status })
+      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getChannelID', api: 'kraken', endpoint: url, code: request.statusCode })
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelID', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelID', api: 'kraken', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}` })
       return
     } finally {
       if (timeout === 1000) {
@@ -136,11 +136,11 @@ class API {
     var request
     try {
       request = await snekfetch.get(url)
-      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: request.status })
+      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: request.statusCode })
       opts.saveToWidget = true
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}` })
       new Timeout().recursive({ this: this, uid: 'getChannelChattersUnofficialAPI', wait: timeout, fnc: this.getChannelChattersUnofficialAPI, args: opts })
       return
     }
@@ -202,7 +202,7 @@ class API {
         .set('Accept', 'application/vnd.twitchtv.v5+json')
         .set('Authorization', 'OAuth ' + config.settings.broadcaster_oauth.split(':')[1])
         .set('Client-ID', config.settings.client_id)
-      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: request.status })
+      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: request.statusCode })
     } catch (e) {
       if (e.message === '422 Unprocessable Entity') {
         timeout = 0
@@ -216,7 +216,7 @@ class API {
       } else {
         timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
         global.log.error(`${url} - ${e.message}`)
-        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}` })
       }
       return
     } finally {
@@ -235,14 +235,16 @@ class API {
     }
   }
 
-  async getChannelDataOldAPI () {
+  async getChannelDataOldAPI (opts) {
     const cid = await global.cache.channelId()
     const url = `https://api.twitch.tv/kraken/channels/${cid}`
 
+    opts.forceUpdate = _.isNil(opts.forceUpdate) ? false : opts.forceUpdate
+
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
-    DEBUG_API_GET_CHANNEL_DATA_OLD_API(`GET ${url}\nwait: ${needToWait}`)
+    DEBUG_API_GET_CHANNEL_DATA_OLD_API(`GET ${url}\nwait: ${needToWait}\nforceUpdate: ${opts.forceUpdate}`)
     if (needToWait) {
-      new Timeout().recursive({ this: this, uid: 'getChannelDataOldAPI', wait: 1000, fnc: this.getChannelDataOldAPI })
+      new Timeout().recursive({ this: this, uid: 'getChannelDataOldAPI', wait: 1000, fnc: this.getChannelDataOldAPI, args: opts })
       return
     }
 
@@ -253,14 +255,14 @@ class API {
         .set('Accept', 'application/vnd.twitchtv.v5+json')
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
         .set('Client-ID', config.settings.client_id)
-      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status })
+      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.statusCode })
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}` })
       return
     } finally {
-      new Timeout().recursive({ this: this, uid: 'getChannelDataOldAPI', wait: timeout, fnc: this.getChannelDataOldAPI })
+      new Timeout().recursive({ this: this, uid: 'getChannelDataOldAPI', wait: timeout, fnc: this.getChannelDataOldAPI, args: { forceUpdate: false } })
     }
 
     if (!this.gameOrTitleChangedManually) {
@@ -269,7 +271,8 @@ class API {
 
       let rawStatus = await global.cache.rawStatus()
       let status = await this.parseTitle()
-      if (request.body.status !== status) {
+
+      if (request.body.status !== status && !opts.forceUpdate) {
         // check if status is same as updated status
         if (this.retries.getChannelDataOldAPI >= 15) {
           this.retries.getChannelDataOldAPI = 0
@@ -282,10 +285,9 @@ class API {
         this.retries.getChannelDataOldAPI = 0
       }
 
-      const game = request.body.game
-      await global.db.engine.update('api.current', { key: 'game' }, { value: game })
+      await global.db.engine.update('api.current', { key: 'game' }, { value: request.body.game })
       await global.db.engine.update('api.current', { key: 'status' }, { value: request.body.status })
-      await global.cache.gameCache(game)
+      await global.cache.gameCache(request.body.game)
       await global.cache.rawStatus(rawStatus)
     } else {
       this.gameOrTitleChangedManually = false
@@ -306,11 +308,11 @@ class API {
     let timeout = 30000
     try {
       request = await snekfetch.get(url)
-      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status })
+      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.statusCode })
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}` })
       return
     } finally {
       new Timeout().recursive({ this: this, uid: 'getChannelHosts', wait: timeout, fnc: this.getChannelHosts })
@@ -344,11 +346,11 @@ class API {
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
-      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.statusCode, remaining: this.remainingAPICalls })
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
       return
     } finally {
       new Timeout().recursive({ this: this, uid: 'updateChannelViews', wait: timeout, fnc: this.updateChannelViews })
@@ -381,12 +383,12 @@ class API {
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
-      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.statusCode, remaining: this.remainingAPICalls })
       quiet = false
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
       return
     } finally {
       new Timeout().recursive({ this: this, uid: 'getLatest100Followers', wait: timeout, fnc: this.getLatest100Followers })
@@ -396,8 +398,8 @@ class API {
     this.remainingAPICalls = request.headers['ratelimit-remaining']
     this.refreshAPICalls = request.headers['ratelimit-reset']
 
-    global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
-    if (request.status === 200 && !_.isNil(request.body.data)) {
+    global.status.API = request.statusCode === 200 ? constants.CONNECTED : constants.DISCONNECTED
+    if (request.statusCode === 200 && !_.isNil(request.body.data)) {
       // check if user id is in db, not in db load username from API
       let fTime = []
       let fidsToLoadFromAPI = []
@@ -422,7 +424,7 @@ class API {
         this.remainingAPICalls = usersFromApi.headers['ratelimit-remaining']
         this.refreshAPICalls = usersFromApi.headers['ratelimit-reset']
 
-        global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.status, remaining: this.remainingAPICalls })
+        global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.statusCode, remaining: this.remainingAPICalls })
         for (let follower of usersFromApi.body.data) {
           followersUsername.push(follower.login.toLowerCase())
           DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Saving user %s id %s', follower.login.toLowerCase(), follower.id)
@@ -483,7 +485,7 @@ class API {
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
-      if (cluster.isMaster) global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+      if (cluster.isMaster) global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.statusCode, remaining: this.remainingAPICalls })
 
       // add id->game to cache
       gids[gid] = request.body.data[0].name
@@ -493,8 +495,8 @@ class API {
     } catch (e) {
       const game = await global.db.engine.findOne('api.current', { key: 'game' })
       global.log.warning(`Couldn't find name of game for gid ${gid} - fallback to ${game.value}`)
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
-      if (cluster.isMaster) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
+      global.log.error(`API: ${url} - ${e.statusCode} ${_.get(e, 'body.message', e.message)}`)
+      if (cluster.isMaster) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
       return game.value
     }
   }
@@ -518,11 +520,11 @@ class API {
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
-      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.statusCode, remaining: this.remainingAPICalls })
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
       return
     } finally {
       new Timeout().recursive({ this: this, uid: 'getCurrentStreamData', wait: timeout, fnc: this.getCurrentStreamData, args: opts })
@@ -533,10 +535,10 @@ class API {
     this.refreshAPICalls = request.headers['ratelimit-reset']
 
     DEBUG_API_GET_CURRENT_STREAM_DATA(request.body)
-    global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
+    global.status.API = request.statusCode === 200 ? constants.CONNECTED : constants.DISCONNECTED
 
     let justStarted = false
-    if (request.status === 200 && !_.isNil(request.body.data[0])) {
+    if (request.statusCode === 200 && !_.isNil(request.body.data[0])) {
       // correct status and we've got a data - stream online
       let stream = request.body.data[0]; DEBUG_API_GET_CURRENT_STREAM_DATA(stream)
 
@@ -705,16 +707,16 @@ class API {
         .set('Accept', 'application/vnd.twitchtv.v5+json')
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
-      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: request.status })
+      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: request.statusCode })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+      global.log.error(`API: ${url} - ${e.statusCode} ${_.get(e, 'body.message', e.message)}`)
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}` })
       return
     }
     DEBUG_API_SET_TITLE_AND_GAME(request.body)
 
-    global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
-    if (request.status === 200 && !_.isNil(request.body)) {
+    global.status.API = request.statusCode === 200 ? constants.CONNECTED : constants.DISCONNECTED
+    if (request.statusCode === 200 && !_.isNil(request.body)) {
       const response = request.body
       if (!_.isNil(args.game)) {
         response.game = _.isNil(response.game) ? '' : response.game
@@ -756,10 +758,10 @@ class API {
         .set('Accept', 'application/vnd.twitchtv.v5+json')
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
-      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: request.status })
+      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: request.statusCode })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+      global.log.error(`API: ${url} - ${e.statusCode} ${_.get(e, 'body.message', e.message)}`)
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}` })
       return
     }
     d(request.body.games)
@@ -796,10 +798,10 @@ class API {
       request = await snekfetch.get(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
-      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
+      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.statusCode, remaining: global.twitch.remainingAPICalls })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+      global.log.error(`API: ${url} - ${e.statusCode} ${_.get(e, 'body.message', e.message)}`)
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}` })
       return new Timeout().recursive({ this: this, uid: 'checkClips', wait: 1000, fnc: this.checkClips })
     }
 
@@ -846,10 +848,10 @@ class API {
       request = await snekfetch.post(url)
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
-      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
+      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.statusCode, remaining: global.twitch.remainingAPICalls })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+      global.log.error(`API: ${url} - ${e.statusCode} ${_.get(e, 'body.message', e.message)}`)
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}` })
       return
     }
     const clipId = request.body.data[0].id
@@ -868,10 +870,10 @@ class API {
         .set('Accept', 'application/vnd.twitchtv.v5+json')
         .set('Client-ID', config.settings.client_id)
         .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
-      global.panel.io.emit('api.stats', { data: request.body, timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: request.status })
+      global.panel.io.emit('api.stats', { data: request.body, timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: request.statusCode })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+      global.log.error(`API: ${url} - ${e.statusCode} ${_.get(e, 'body.message', e.message)}`)
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}` })
       return
     }
     d(request.body)
@@ -902,11 +904,11 @@ class API {
         .set('Accept', 'application/vnd.twitchtv.v5+json')
         .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
         .set('Client-ID', config.settings.client_id)
-      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
+      global.panel.io.emit('api.stats', { data: request.body.data, timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.statusCode, remaining: global.twitch.remainingAPICalls })
       DEBUG_API_IS_FOLLOWER_UPDATE('Request done: %j', request.body)
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: global.twitch.remainingAPICalls })
+      global.log.error(`API: ${url} - ${e.statusCode} ${_.get(e, 'body.message', e.message)}`)
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}`, remaining: global.twitch.remainingAPICalls })
       return
     }
 

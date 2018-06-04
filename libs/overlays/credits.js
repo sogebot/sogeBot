@@ -156,10 +156,10 @@ class Credits {
       request = await snekfetch.get(url)
         .set('Accept', 'application/vnd.twitchtv.v5+json')
         .set('Client-ID', config.settings.client_id)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: request.status })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: request.statusCode })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+      global.log.error(`API: ${url} - ${e.statusCode} ${_.get(e, 'body.message', e.message)}`)
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: `${e.statusCode} ${_.get(e, 'body.message', e.message)}` })
     }
     return request.body.clips
   }
