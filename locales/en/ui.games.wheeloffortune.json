@@ -1,0 +1,27 @@
+{
+  "name": "Wheel of Fortune",
+  "command": {
+    "name": "Command",
+    "placeholder": "!setYourCommandHere",
+    "help": "Set your command for wheel of fortune, by default !wof, wheel of fortune doesn't work without <a href='/overlays/wheeloffortune'>overlay</a>"
+  },
+  "title": {
+    "name": "Title",
+    "placeholder": "Title on wheel of fortune"
+  },
+  "responses": {
+    "name": "Responses",
+    "help": "Bot responses for this title, response filters are available",
+    "placeholder": "Set your bot response here"
+  },
+  "options": {
+    "name": "Options"
+  },
+  "remove": {
+    "option": "Remove option",
+    "response": "Remove response"
+  },
+  "addOption": "Add option",
+  "noOptionsFound": "No options were found",
+  "test": "Test"
+}

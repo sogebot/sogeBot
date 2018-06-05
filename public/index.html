@@ -535,6 +535,7 @@
       if (loadedMenu) return
       /* at first, clear all menu */
       $('#menu-*').empty()
+      var games = false // we want only games settings once
       var systems = false // we want only systems settings once
       var integrations = false // we want only systems settings once
       var overlays = false // we want only overlays settings once
@@ -545,6 +546,7 @@
           if ((obj.id === 'overlays') && overlays) return
           if ((obj.id === 'integrations') && integrations) return
           if ((obj.id === 'registry') && registry) return
+          if ((obj.id === 'games') && games) return
           $('#menu-' + obj.category).append('<li class="nav-item"><a class="nav-link" href="#" data-page="' +
             obj.id.replace(/\./g, '/') + '" data-lang="menu.' + obj.name +
             '"></a></li>')
@@ -553,6 +555,7 @@
         if (obj.id === 'overlays') overlays = true
         if (obj.id === 'integrations') integrations = true
         if (obj.id === 'registry') registry = true
+        if (obj.id === 'games') games = true
       })
       loadedMenu = true
 
