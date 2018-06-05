@@ -326,7 +326,7 @@ class Heist {
 
         if (isSurvivor) {
           // add points to user
-          let points = await global.systems.points.getPointsOf(user.username)
+          let points = parseInt((await global.db.engine.findOne(`${this.collection}.users`, { username: user.username })).points, 10)
           await global.db.engine.insert('users.points', { username: user.username, points: parseInt(parseFloat(points * level.payoutMultiplier).toFixed(), 10) })
         }
       } else {
@@ -336,7 +336,7 @@ class Heist {
 
           if (isSurvivor) {
             // add points to user
-            let points = await global.systems.points.getPointsOf(user.username)
+            let points = parseInt((await global.db.engine.findOne(`${this.collection}.users`, { username: user.username })).points, 10)
             await global.db.engine.insert('users.points', { username: user.username, points: parseInt(parseFloat(points * level.payoutMultiplier).toFixed(), 10) })
             winners.push(user.username)
           }
