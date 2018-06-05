@@ -2,7 +2,7 @@
 [![Discord](https://img.shields.io/discord/317348946144002050.svg?style=flat-square)](https://discordapp.com/invite/52KpmuH)
 [![Build Status](https://img.shields.io/travis/sogehige/sogeBot.svg?style=flat-square)](https://travis-ci.org/sogehige/sogeBot)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](http://standardjs.com/)
-[![nodejs](https://img.shields.io/badge/node.js-10.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org/en/)
+[![nodejs](https://img.shields.io/badge/node.js-10.3.0-brightgreen.svg?style=flat-square)](https://nodejs.org/en/)
 [![GitHub release](https://img.shields.io/github/release/sogehige/sogebot.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
 [![Downloads](https://img.shields.io/github/downloads/sogehige/sogebot/total.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](https://www.paypal.me/sogetwitch/5eur)
@@ -38,25 +38,28 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 | Overlay            | Use various overlays in your OBS or XSplit                                                                                               |
 | PhillipsHue        | Blink your lights on follower or any other event                                                                                         |
 | Events             | On numerous events run commands, send messages, do whatever!                                                                             |
-| Chat Games         | bets, heists, duels                                                                                                                      |
+| Chat Games         | bets, heists, duels, wheel of fortune                                                                                                    |
 | Integrations       | **Streamlabs**, DonationAlerts.ru, Twitter                                                                                               |
 
-| Game     | Description                                    |
-|----------|------------------------------------------------|
-| Bets     |                                                |
-| Gambling | !seppuku, !roulette commands                   |
-| Duel     | !duel - bet your points, only one can win      |
-| Heists   | !bankheist                                     |
+| Game             | Description                                    |
+|------------------|------------------------------------------------|
+| Bets             |                                                |
+| Gambling         | !seppuku, !roulette commands                   |
+| Duel             | !duel - bet your points, only one can win      |
+| Heists           | !bankheist                                     |
+| Wheel Of Fortune | !wof                                           |
 
-| Overlay       | Description                                              |
-|---------------|----------------------------------------------------------|
-| Emotes        | Show chat message emotes in your stream!                 |
-| Stats         | Show viewers, follower, uptime                           |
-| ImageCarousel | Simple image fadeIn/fadeOut carousel                     |
-| Alerts        | Show images, play audio/video and **replays** in overlay |
-| Credits       | End credits like in a movie                              |
-| Text          | Show text and variables ($currentSong etc.)              |
-| Eventlist     | Show last events                                         |
+| Overlay          | Description                                                           |
+|------------------|-----------------------------------------------------------------------|
+| Emotes           | Show chat message emotes in your stream!                              |
+| Stats            | Show viewers, follower, uptime                                        |
+| ImageCarousel    | Simple image fadeIn/fadeOut carousel                                  |
+| Alerts           | Show images, play audio/video and **replays** or **clips** in overlay |
+| Credits          | End credits like in a movie                                           |
+| Text             | Show text and variables ($currentSong etc.)                           |
+| Eventlist        | Show last events                                                      |
+| Wheel Of Fortune | Show wheel of fortune spin                                            |
+| Bets             | Show current bet                                                      |
 
 #### Languages
 

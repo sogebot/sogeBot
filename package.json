@@ -58,6 +58,7 @@
     "url-join": "^4.0.0",
     "velocity-animate": "^1.5.1",
     "winston": "^3.0.0-rc3",
+    "winwheel": "^1.0.1",
     "xregexp": "4.1.1",
     "yargs": "^11.0.0",
     "youtube-search": "^1.1.1",

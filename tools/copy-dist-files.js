@@ -10,6 +10,9 @@ var dist = {
 }
 
 var modules = {
+  'winwheel': {
+    'js': 'dist/Winwheel.min.js'
+  },
   'gridstack': {
     'js': 'dist/gridstack.all.js',
     'css': 'dist/gridstack.min.css'
