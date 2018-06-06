@@ -299,6 +299,12 @@ function loadClientListeners (client) {
     global.events.fire('hosting', { target: target, viewers: viewers })
   })
 
+  global.client.on('ritual', function (channel, username, type, userstate) {
+    if (type === 'new_chatter') {
+      global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
+    }
+  })
+
   global.broadcasterClient.on('hosted', async (channel, username, viewers, autohost) => {
     DEBUG_TMIJS(`Hosted by ${username} with ${viewers} viewers - autohost: ${autohost}`)
     global.log.host(`${username}, viewers: ${viewers}, autohost: ${autohost}`)
