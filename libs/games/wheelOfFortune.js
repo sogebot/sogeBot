@@ -5,7 +5,6 @@ const _ = require('lodash')
 const chalk = require('chalk')
 const debug = require('debug')
 
-const Expects = require('../expects.js')
 const constants = require('../constants.js')
 
 class WheelOfFortune {
@@ -81,14 +80,14 @@ class WheelOfFortune {
         cb(null, this.defaults[attr])
       })
       socket.on('test.spin', async () => {
-        global.panel.io.of('/games/wheelOfFortune').emit('spin', {options: await this.options})
+        global.panel.io.of('/games/wheelOfFortune').emit('spin', {options: await this.options, username: global.commons.getOwner()})
       })
-      socket.on('win', async (index) => {
+      socket.on('win', async (index, username) => {
         let options = await this.options
         // compensate for slight delay
         setTimeout(() => {
           for (let response of options[index].responses) {
-            if (response.trim().length > 0) global.commons.sendMessage(response, { username: global.commons.getOwner() })
+            if (response.trim().length > 0) global.commons.sendMessage(response, { username })
           }
         }, 2000)
       })
@@ -115,10 +114,10 @@ class WheelOfFortune {
   }
 
   async run (self, sender, message) {
-    const expects = new Expects()
+    if (!message.trim().toLowerCase().startsWith(await this.command)) return // wof command?
+    if (!(await this.enabled)) return // enabled?
 
-    let data = expects.check(message).command().toArray()
-    console.log(data)
+    global.panel.io.of('/games/wheelOfFortune').emit('spin', {options: await this.options, username: sender.username})
   }
 }
 

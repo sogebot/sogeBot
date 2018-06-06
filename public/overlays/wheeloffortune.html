@@ -51,8 +51,10 @@
         return color;
       }
       var theWheel
+      var username
 
       socket.on('spin', (opts) => {
+        username = opts.username
         let segments = new Array()
         for (let option of opts.options) {
           segments.push({'fillStyle': getRandomColor(), 'text': option.title})
@@ -96,7 +98,7 @@
           theWheel.draw();
 
           setTimeout(() => {
-            socket.emit('win', winningSegmentNumber - 1)
+            socket.emit('win', winningSegmentNumber - 1, username)
             $('#pointer').velocity("fadeOut")
             $('#canvas').velocity("fadeOut")
           }, 1000)
