@@ -616,6 +616,7 @@ class API {
         await global.db.engine.update('api.current', { key: 'tips' }, { value: 0 })
 
         await global.db.engine.remove('cache.hosts', {}) // we dont want to have cached hosts on stream start
+        await global.db.engine.remove('cache.raids', {}) // we dont want to have cached raids on stream start
       }
     }
   }

@@ -408,6 +408,7 @@
     "eventlist-events": {
       "follow": "ti dal <strong>follow</strong>",
       "host": "tě <strong>hostuje</strong> s $viewers diváky",
+      "raid": "tě <strong>raiduje</strong> s $viewers diváky",
       "sub": "ti dal <strong>sub</strong>",
       "subgift": "byl <strong>darován</strong> sub od $username",
       "resub": "ti dal <strong>resub</strong> $months měsíců",
@@ -902,6 +903,7 @@
     "ban": "uživatel byl zabanován",
     "hosting": "tvůj channel začal hostovat",
     "hosted": "tvůj channel je hostován",
+    "raid": "tvůj channel dostal raid",
     "mod": "uživatel se stal novým modem",
     "timeout": "uživatel dostal timeout",
     "create-a-new-event-listener": "Vytvoř nový event listener",

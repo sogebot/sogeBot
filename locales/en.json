@@ -408,6 +408,7 @@
     "eventlist-events": {
       "follow": "<strong>followed</strong> you",
       "host": "<strong>hosted</strong> you with $viewers viewers",
+      "raid": "<strong>raided</strong> you with $viewers viewers",
       "sub": "<strong>subbed</strong> you",
       "subgift": "have <strong>gifted</strong> sub from $username",
       "resub": "<strong>resubbed</strong> you for $months months",
@@ -896,6 +897,7 @@
     "ban": "user was banned",
     "hosting": "your channel started hosting",
     "hosted": "your channel is hosted",
+    "raid": "your channel is raided",
     "mod": "user is a new mod",
     "timeout": "user was timeouted",
     "create-a-new-event-listener": "Create a new event listener",
