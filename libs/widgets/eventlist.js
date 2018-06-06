@@ -9,6 +9,7 @@ function EventList () {
 
   global.configuration.register('widgetEventlistFollows', 'core.no-response-bool', 'bool', true)
   global.configuration.register('widgetEventlistHosts', 'core.no-response-bool', 'bool', true)
+  global.configuration.register('widgetEventlistRaids', 'core.no-response-bool', 'bool', true)
   global.configuration.register('widgetEventlistCheers', 'core.no-response-bool', 'bool', true)
   global.configuration.register('widgetEventlistSubs', 'core.no-response-bool', 'bool', true)
   global.configuration.register('widgetEventlistSubgifts', 'core.no-response-bool', 'bool', true)

@@ -39,6 +39,7 @@ class Events {
       { id: 'ban', variables: [ 'username', 'userObject', 'reason' ] },
       { id: 'hosting', variables: [ 'target', 'viewers' ] },
       { id: 'hosted', variables: [ 'username', 'userObject', 'viewers', 'autohost' ], definitions: { viewersAtLeast: 1, ignoreAutohost: false }, check: this.checkHosted },
+      { id: 'raid', variables: [ 'username', 'userObject', 'viewers' ], definitions: { viewersAtLeast: 1 }, check: this.checkRaid },
       { id: 'mod', variables: [ 'username', 'userObject' ] },
       { id: 'commercial', variables: [ 'duration' ] },
       { id: 'timeout', variables: [ 'username', 'userObject', 'reason', 'duration' ] },
@@ -339,6 +340,18 @@ class Events {
       d('Updating event to %j', event)
       await global.db.engine.update('events', { _id: event._id.toString() }, event)
     }
+    return shouldTrigger
+  }
+
+  async checkRaid (event, attributes) {
+    const d = debug('events:checkRaid')
+
+    event.definitions.viewersAtLeast = parseInt(event.definitions.viewersAtLeast, 10) // force Integer
+    const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast)
+
+    d('Current viewers: %s, expected viewers: %s', attributes.viewers, event.definitions.viewersAtLeast)
+    d('Should trigger: %s', shouldTrigger)
+
     return shouldTrigger
   }
 
