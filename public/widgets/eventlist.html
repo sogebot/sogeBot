@@ -21,6 +21,11 @@
               <i class="fas fa-bullhorn fa-stack-1x"></i>
             </span>
           </button>
+          <button data-id="raid" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
+            <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
+              <i class="fas fa-random fa-stack-1x"></i>
+            </span>
+          </button>
           <button data-id="cheer" class="btn btn-outline-success nav-btn" onclick="eventlist.toggle(this)">
             <span class="fa-stack fa-fw" style="height: 1em; line-height: 0.8em; width: 1em">
               <i class="fas fa-gem fa-stack-1x"></i>
@@ -128,6 +133,7 @@
       socket.emit('saveConfiguration', {
         'widgetEventlistFollows':  window.sessionStorage.getItem(`config.eventlist.follow`),
         'widgetEventlistHosts': window.sessionStorage.getItem(`config.eventlist.host`),
+        'widgetEventlistRaids': window.sessionStorage.getItem(`config.eventlist.raid`),
         'widgetEventlistCheers': window.sessionStorage.getItem(`config.eventlist.cheer`),
         'widgetEventlistSubs': window.sessionStorage.getItem(`config.eventlist.sub`),
         'widgetEventlistSubgifts': window.sessionStorage.getItem(`config.eventlist.subgift`),
@@ -142,6 +148,7 @@
     console.group('Eventlist widgets settings')
     console.debug('widgetEventlistFollows', data.widgetEventlistFollows)
     console.debug('widgetEventlistHosts', data.widgetEventlistHosts)
+    console.debug('widgetEventlistRaids', data.widgetEventlistRaids)
     console.debug('widgetEventlistCheers', data.widgetEventlistCheers)
     console.debug('widgetEventlistSubs', data.widgetEventlistSubs)
     console.debug('widgetEventlistSubgifts', data.widgetEventlistSubgifts)
@@ -157,6 +164,9 @@
     }
     if (data.widgetEventlistHosts.toString().trim().toLowerCase() !== 'true') {
       $('button[data-id="host"]').removeClass().addClass('nav-btn btn btn-outline-danger')
+    }
+    if (data.widgetEventlistRaids.toString().trim().toLowerCase() !== 'true') {
+      $('button[data-id="raid"]').removeClass().addClass('nav-btn btn btn-outline-danger')
     }
     if (data.widgetEventlistCheers.toString().trim().toLowerCase() !== 'true') {
       $('button[data-id="cheer"]').removeClass().addClass('nav-btn btn btn-outline-danger')
@@ -180,6 +190,7 @@
     window.sessionStorage.setItem('config.eventlist.show', data.widgetEventlistShow)
     window.sessionStorage.setItem('config.eventlist.follow', data.widgetEventlistFollows)
     window.sessionStorage.setItem('config.eventlist.host', data.widgetEventlistHosts)
+    window.sessionStorage.setItem('config.eventlist.raid', data.widgetEventlistRaids)
     window.sessionStorage.setItem('config.eventlist.cheer', data.widgetEventlistCheers)
     window.sessionStorage.setItem('config.eventlist.sub', data.widgetEventlistSubs)
     window.sessionStorage.setItem('config.eventlist.subgift', data.widgetEventlistSubgifts)
@@ -205,6 +216,7 @@
     let icons = {
         follow: 'heart',
         host: 'bullhorn',
+        raid: 'random',
         sub: 'star',
         subgift: 'gift',
         resub: 'star-half',
@@ -256,6 +268,14 @@
       }
 
       if (event.event === 'host') {
+        username = `<div class="eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
+          <span title="${event.username}" style="z-index: 9">${event.username}</span>
+          <span style="font-size:0.7rem; font-weight: normal">${t.replace('$viewers', '<strong>' + _.get(event, 'viewers', '0') + '</strong>')}</span>
+          <i class="fas fa-fw fa-${icons[event.event]} icon-${event.event}" aria-hidden="true"></i>
+        </div>`
+      }
+
+      if (event.event === 'raid') {
         username = `<div class="eventlist-username" style="font-size: ${window.sessionStorage.getItem('config.eventlist.size')}px">
           <span title="${event.username}" style="z-index: 9">${event.username}</span>
           <span style="font-size:0.7rem; font-weight: normal">${t.replace('$viewers', '<strong>' + _.get(event, 'viewers', '0') + '</strong>')}</span>

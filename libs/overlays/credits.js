@@ -11,6 +11,7 @@ class Credits {
 
     global.configuration.register('creditsFollowers', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsHosts', 'core.no-response-bool', 'bool', true)
+    global.configuration.register('creditsRaids', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsSubscribers', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsSubgifts', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsResubs', 'core.no-response-bool', 'bool', true)
@@ -27,6 +28,7 @@ class Credits {
     global.configuration.register('creditsStreamBy', 'core.no-response', 'string', 'Stream by')
     global.configuration.register('creditsFollowedBy', 'core.no-response', 'string', 'Followed by')
     global.configuration.register('creditsHostedBy', 'core.no-response', 'string', 'Hosted by')
+    global.configuration.register('creditsRaidedBy', 'core.no-response', 'string', 'Raided by')
     global.configuration.register('creditsCheerBy', 'core.no-response', 'string', 'Cheer <strong>$bits bits</strong> by')
     global.configuration.register('creditsSubscribedBy', 'core.no-response', 'string', 'Subscribed by')
     global.configuration.register('creditsResubscribedBy', 'core.no-response', 'string', 'Resubscribed <strong>$months months</strong> by')
@@ -46,10 +48,11 @@ class Credits {
     global.panel.io.of('/overlays/credits').on('connection', (socket) => {
       d('Socket /overlays/credits connected, registering sockets')
       socket.on('load', async (callback) => {
-        let [events, when, hosts, socials] = await Promise.all([
+        let [events, when, hosts, raids, socials] = await Promise.all([
           global.db.engine.find('widgetsEventList'),
           global.cache.when(),
           global.db.engine.find('cache.hosts'),
+          global.db.engine.find('cache.raids'),
           global.db.engine.find('overlay.credits.socials')
         ])
 
@@ -64,6 +67,7 @@ class Credits {
           'stream-by': await global.configuration.getValue('creditsStreamBy'),
           'followed-by': await global.configuration.getValue('creditsFollowedBy'),
           'hosted-by': await global.configuration.getValue('creditsHostedBy'),
+          'raided-by': await global.configuration.getValue('creditsHRaidedBy'),
           'cheer-by': await global.configuration.getValue('creditsCheerBy'),
           'subscribed-by': await global.configuration.getValue('creditsSubscribedBy'),
           'resubscribed by': await global.configuration.getValue('creditsResubscribedBy'),
@@ -75,6 +79,7 @@ class Credits {
         let show = {
           followers: await global.configuration.getValue('creditsFollowers'),
           hosts: await global.configuration.getValue('creditsHosts'),
+          raids: await global.configuration.getValue('creditsRaids'),
           subscribers: await global.configuration.getValue('creditsSubscribers'),
           subgifts: await global.configuration.getValue('creditsSubgifts'),
           resubs: await global.configuration.getValue('creditsResubs'),
@@ -104,6 +109,7 @@ class Credits {
           _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a'),
           _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a'),
           hosts.map((o) => o.username),
+          raids.map((o) => o.username),
           socials,
           messages,
           custom,

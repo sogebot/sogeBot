@@ -294,6 +294,22 @@ function loadClientListeners (client) {
     global.events.fire('timeout', { username: username.toLowerCase(), reason: reason, duration: duration })
   })
 
+  global.client.on('raid', function (channel, raider, viewers, userstate) {
+    DEBUG_TMIJS('Raided by %s with %s viewers', raider, viewers)
+    global.log.raid(`${raider}, viewers: ${viewers}`)
+
+    global.db.engine.update('cache.raids', { username: raider }, { username: raider })
+
+    const data = {
+      username: raider,
+      viewers: viewers
+    }
+
+    data.type = 'raid'
+    global.overlays.eventlist.add(data)
+    global.events.fire('raided', data)
+  })
+
   global.client.on('hosting', function (channel, target, viewers) {
     DEBUG_TMIJS('Hosting: %s with %s viewers', target, viewers)
     global.events.fire('hosting', { target: target, viewers: viewers })

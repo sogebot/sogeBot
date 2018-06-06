@@ -115,7 +115,7 @@
         padding-bottom: 4rem;
       }
 
-      .hosted-by, .bigHeader, .aggregated-by {
+      .hosted-by, .raided-by, .bigHeader, .aggregated-by {
         font-size: 6rem;
       }
 
@@ -145,7 +145,7 @@
         margin-top: 5px;
       }
 
-      .hosted-column, .aggregated-column {
+      .hosted-column, .raided-column, .aggregated-column {
         column-count: 2;
       }
 
@@ -171,6 +171,9 @@
 
         <div class='hosted-by' id="hosted-by"></div>
         <div class='hosted-column' id="hosts"></div>
+
+        <div class='raided-by' id="raided-by"></div>
+        <div class='raided-column' id="raids"></div>
 
         <div class="clips" id="clips"></div>
 
@@ -230,13 +233,14 @@
           }
         }
 
-        socket.emit('load', (err, events, streamer, game, title, hosts, socials, messages, custom, speed, show, clips, maxFontSize, aggregate) => {
+        socket.emit('load', (err, events, streamer, game, title, hosts, raids, socials, messages, custom, speed, show, clips, maxFontSize, aggregate) => {
           $('#streamer').text(streamer)
           $('#game').text(game)
           $('#title').text(title)
 
           for (let [key, value] of Object.entries(messages)) {
             $('.hosted-by').text(`${_.get(custom, 'hosted-by', 'hosted by')}`)
+            $('.raided-by').text(`${_.get(custom, 'raided-by', 'raided by')}`)
             if (key === 'lastMessage')  $('#last-message').html(value)
             else $('#last-submessage').html(value)
           }
@@ -248,6 +252,7 @@
 
           let $events = $('#events')
           let $hosts = $('#hosts')
+          let $raids = $('#raids')
 
           let followers = []
           let cheers = []
@@ -353,6 +358,12 @@
             }
           }
 
+          if (show.raids) {
+            for (let raid of raids) {
+              $raids.append(`<div class='host-name'>${raid}</div>`)
+            }
+          }
+
           socials = _.orderBy(socials, 'order')
           for (let social of socials) {
             $('#social').append(`
@@ -363,6 +374,11 @@
           if ($hosts.text().length === 0) {
             $('.hosted-by').remove()
             $('.hosted-column').remove()
+          }
+
+          if ($raids.text().length === 0) {
+            $('.raided-by').remove()
+            $('.raided-column').remove()
           }
 
           $('#stream-by').text(`${_.get(custom, 'stream-by', 'stream by')}`)
