@@ -6,7 +6,6 @@
 
 ###### CHECKLIST
 - [ ] Added tests _if applicable_
-- [ ] Test Passing
 - [ ] Docs Updated _if applicable_
 - [ ] Translations added
 - [ ] Commits Squashed
