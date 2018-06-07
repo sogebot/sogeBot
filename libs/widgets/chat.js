@@ -1,7 +1,7 @@
 'use strict'
 
 const config = require('../../config.json')
-const fetch = require('snekfetch')
+const axios = require('axios')
 
 function ChatWidget () {
   global.panel.addWidget('chat', 'widget-title-chat', 'far fa-comments')
@@ -15,10 +15,10 @@ function ChatWidget () {
 ChatWidget.prototype.refresh = async (self, socket) => {
   try {
     let url = `https://tmi.twitch.tv/group/user/${config.settings.broadcaster_username.toLowerCase()}/chatters`
-    let response = await fetch.get(url)
+    let response = await axios.get(url)
 
     if (response.status === 200) {
-      global.panel.io.emit('chatChatters', { chatters: response.body.chatters, _total: response.body.chatter_count })
+      global.panel.io.emit('chatChatters', { chatters: response.data.chatters, _total: response.data.chatter_count })
     }
   } catch (e) {
     // silence this, undocumented throwing 503 often

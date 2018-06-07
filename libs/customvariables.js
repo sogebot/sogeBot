@@ -4,7 +4,7 @@ const _ = require('lodash')
 const debug = require('debug')
 const crypto = require('crypto')
 const safeEval = require('safe-eval')
-const snekfetch = require('snekfetch')
+const axios = require('axios')
 const cluster = require('cluster')
 const mathjs = require('mathjs')
 
@@ -119,12 +119,12 @@ class CustomVariables {
       for (let match of script.match(/url\(['"](.*?)['"]\)/g)) {
         const id = 'url' + crypto.randomBytes(64).toString('hex').slice(0, 5)
         const url = match.replace(/url\(['"]|["']\)/g, '')
-        let response = await snekfetch.get(url)
+        let response = await axios.get(url)
         try {
-          response.body = JSON.parse(response.body.toString())
+          response.data = JSON.parse(response.data.toString())
         } catch (e) {
           // JSON failed, treat like string
-          response = response.body.toString()
+          response = response.data.toString()
         }
         urls.push({ id, response })
         script = script.replace(match, id)

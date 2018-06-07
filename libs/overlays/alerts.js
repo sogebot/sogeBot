@@ -4,7 +4,7 @@
 const _ = require('lodash')
 const constants = require('../constants.js')
 const cluster = require('cluster')
-const snekfetch = require('snekfetch')
+const axios = require('axios')
 const Message = require('../message')
 const config = require('../../config.json')
 
@@ -92,15 +92,18 @@ Alerts.prototype.getClipById = async function (id) {
 
   var request
   try {
-    request = await snekfetch.get(url)
-      .set('Accept', 'application/vnd.twitchtv.v5+json')
-      .set('Client-ID', config.settings.client_id)
-      .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
-    global.panel.io.emit('api.stats', { data: request.body, timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
-    return request.body
+    request = await axios.get(url, {
+      headers: {
+        'Accept': 'application/vnd.twitchtv.v5+json',
+        'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
+        'Client-ID': config.settings.client_id
+      }
+    })
+    global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+    return request.data
   } catch (e) {
     global.log.error(`${url} - ${e.message}`)
-    global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}`, remaining: this.remainingAPICalls })
+    global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: this.remainingAPICalls })
     return null
   }
 }

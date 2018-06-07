@@ -1,5 +1,5 @@
 const _ = require('lodash')
-const snekfetch = require('snekfetch')
+const axios = require('axios')
 const config = require('../config.json')
 const debug = require('debug')('webhooks')
 
@@ -69,14 +69,26 @@ class Webhooks {
     switch (type) {
       case 'follows':
         request.push(`hub.topic=https://api.twitch.tv/helix/users/follows?to_id=${cid}`)
-        res = await snekfetch.post(request.join('&')).set('Client-ID', config.settings.client_id)
+        res = await axios({
+          method: 'post',
+          url: request.join('&'),
+          headers: {
+            'Client-ID': config.settings.client_id
+          }
+        })
         debug('Subscribe response: %o', res)
         if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: follows waiting for challenge')
         else global.log.error('WEBHOOK: follows NOT subscribed')
         break
       case 'streams':
         request.push(`hub.topic=https://api.twitch.tv/helix/streams?user_id=${cid}`)
-        res = await snekfetch.post(request.join('&')).set('Client-ID', config.settings.client_id)
+        res = await axios({
+          method: 'post',
+          url: request.join('&'),
+          headers: {
+            'Client-ID': config.settings.client_id
+          }
+        })
         debug('Subscribe response: %o', res)
         if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: streams waiting for challenge')
         else global.log.error('WEBHOOK: streams NOT subscribed')
@@ -137,19 +149,22 @@ class Webhooks {
     if (_.isEmpty(user)) {
       debug('user not in db')
       // user doesn't exist - get username from api GET https://api.twitch.tv/helix/users?id=<user ID>
-      let userGetFromApi = await snekfetch.get(`https://api.twitch.tv/helix/users?id=${fid}`)
-        .set('Client-ID', config.settings.client_id)
-        .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
-      debug('user API data" %o', userGetFromApi.body)
+      let userGetFromApi = await axios.get(`https://api.twitch.tv/helix/users?id=${fid}`, {
+        headers: {
+          'Client-ID': config.settings.client_id,
+          'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1]
+        }
+      })
+      debug('user API data" %o', userGetFromApi.data)
 
-      if (!global.commons.isBot(userGetFromApi.body.data[0].login)) {
+      if (!global.commons.isBot(userGetFromApi.data.data[0].login)) {
         global.overlays.eventlist.add({
           type: 'follow',
-          username: userGetFromApi.body.data[0].login
+          username: userGetFromApi.data.data[0].login
         })
-        await global.db.engine.update('users', { username: userGetFromApi.body.data[0].login }, { id: fid, username: userGetFromApi.body.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
-        global.log.follow(userGetFromApi.body.data[0].login)
-        debug('Firing follow event'); global.events.fire('follow', { username: userGetFromApi.body.data[0].login }) // we can safely fire event as user doesn't exist in db
+        await global.db.engine.update('users', { username: userGetFromApi.data.data[0].login }, { id: fid, username: userGetFromApi.data.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
+        global.log.follow(userGetFromApi.data.data[0].login)
+        debug('Firing follow event'); global.events.fire('follow', { username: userGetFromApi.data.data[0].login }) // we can safely fire event as user doesn't exist in db
       }
     } else {
       debug('user in db')

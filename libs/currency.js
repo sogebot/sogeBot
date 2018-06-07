@@ -1,5 +1,5 @@
 const getSymbolFromCurrency = require('currency-symbol-map')
-const snekfetch = require('snekfetch')
+const axios = require('axios')
 const _ = require('lodash')
 const debug = require('debug')
 const Timeout = require('./timeout')
@@ -48,9 +48,9 @@ class Currency {
     let refresh = 1000 * 60 * 60 * 24
     try {
       // base is always CZK
-      const result = await snekfetch.get(`http://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt`)
+      const result = await axios.get(`http://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt`)
       let linenum = 0
-      for (let line of result.body.toString().split('\n')) {
+      for (let line of result.data.toString().split('\n')) {
         if (linenum < 2 || line.trim().length === 0) {
           linenum++
           continue

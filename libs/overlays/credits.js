@@ -1,6 +1,6 @@
 const debug = require('debug')
 const _ = require('lodash')
-const snekfetch = require('snekfetch')
+const axios = require('axios')
 const config = require('../../config.json')
 
 class Credits {
@@ -153,15 +153,19 @@ class Credits {
     var request
     const url = `https://api.twitch.tv/kraken/clips/top?channel=${channel}&period=${period}&trending=false&limit=${count}`
     try {
-      request = await snekfetch.get(url)
-        .set('Accept', 'application/vnd.twitchtv.v5+json')
-        .set('Client-ID', config.settings.client_id)
+      request = await axios.get(url, {
+        headers: {
+          'Accept': 'application/vnd.twitchtv.v5+json',
+          'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
+          'Client-ID': config.settings.client_id
+        }
+      })
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`)
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
     }
-    return request.body.clips
+    return request.data.clips
   }
 }
 

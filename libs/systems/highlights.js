@@ -106,7 +106,7 @@ class Highlights {
         })
       } catch (e) {
         if (e.message !== ERROR_STREAM_NOT_ONLINE) {
-          global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+          global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
           global.log.error(e.stack)
         }
         switch (e.message) {

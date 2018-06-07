@@ -1,5 +1,5 @@
 const mathjs = require('mathjs')
-const snekfetch = require('snekfetch')
+const axios = require('axios')
 const safeEval = require('safe-eval')
 const decode = require('decode-html')
 const querystring = require('querystring')
@@ -295,12 +295,12 @@ class Message {
           for (let match of toEvaluate.match(/url\(['"](.*?)['"]\)/g)) {
             const id = 'url' + crypto.randomBytes(64).toString('hex').slice(0, 5)
             const url = match.replace(/url\(['"]|["']\)/g, '')
-            let response = await snekfetch.get(url)
+            let response = await axios.get(url)
             try {
-              response.body = JSON.parse(response.body.toString())
+              response.data = JSON.parse(response.data.toString())
             } catch (e) {
               // JSON failed, treat like string
-              response = response.body.toString()
+              response = response.data.toString()
             }
             urls.push({ id, response })
             toEvaluate = toEvaluate.replace(match, id)
@@ -390,43 +390,61 @@ class Message {
       '(stream|#|game)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|game)', '')
         try {
-          let request = await snekfetch.get(`https://api.twitch.tv/kraken/users?login=${channel}`)
-            .set('Accept', 'application/vnd.twitchtv.v5+json')
-            .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
-            .set('Client-ID', config.settings.client_id)
-          const channelId = request.body.users[0]._id
-          request = await snekfetch.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`)
-            .set('Client-ID', config.settings.client_id)
-            .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
-          return global.api.getGameFromId(request.body.data[0].game_id)
+          let request = await axios.get(`https://api.twitch.tv/kraken/users?login=${channel}`, {
+            headers: {
+              'Accept': 'application/vnd.twitchtv.v5+json',
+              'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
+              'Client-ID': config.settings.client_id
+            }
+          })
+          const channelId = request.data.users[0]._id
+          request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
+            headers: {
+              'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
+              'Client-ID': config.settings.client_id
+            }
+          })
+          return global.api.getGameFromId(request.data.data[0].game_id)
         } catch (e) { return 'n/a' } // return nothing on error
       },
       '(stream|#|title)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|title)', '')
         try {
-          let request = await snekfetch.get(`https://api.twitch.tv/kraken/users?login=${channel}`)
-            .set('Accept', 'application/vnd.twitchtv.v5+json')
-            .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
-            .set('Client-ID', config.settings.client_id)
-          const channelId = request.body.users[0]._id
-          request = await snekfetch.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`)
-            .set('Client-ID', config.settings.client_id)
-            .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
-          return request.body.data[0].title
+          let request = await axios.get(`https://api.twitch.tv/kraken/users?login=${channel}`, {
+            headers: {
+              'Accept': 'application/vnd.twitchtv.v5+json',
+              'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
+              'Client-ID': config.settings.client_id
+            }
+          })
+          const channelId = request.data.users[0]._id
+          request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
+            headers: {
+              'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
+              'Client-ID': config.settings.client_id
+            }
+          })
+          return request.data.data[0].title
         } catch (e) { return 'n/a' } // return nothing on error
       },
       '(stream|#|viewers)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|viewers)', '')
         try {
-          let request = await snekfetch.get(`https://api.twitch.tv/kraken/users?login=${channel}`)
-            .set('Accept', 'application/vnd.twitchtv.v5+json')
-            .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
-            .set('Client-ID', config.settings.client_id)
-          const channelId = request.body.users[0]._id
-          request = await snekfetch.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`)
-            .set('Client-ID', config.settings.client_id)
-            .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
-          return request.body.data[0].viewer_count
+          let request = await axios.get(`https://api.twitch.tv/kraken/users?login=${channel}`, {
+            headers: {
+              'Accept': 'application/vnd.twitchtv.v5+json',
+              'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
+              'Client-ID': config.settings.client_id
+            }
+          })
+          const channelId = request.data.users[0]._id
+          request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
+            headers: {
+              'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
+              'Client-ID': config.settings.client_id
+            }
+          })
+          return request.data.data[0].viewer_count
         } catch (e) { return '0' } // return nothing on error
       }
     }
@@ -473,7 +491,7 @@ class Message {
     if (!_.isNil(rMessage) && !_.isNil(rMessage[1])) {
       this.message = this.message.replace(rMessage[0], '').trim() // remove api command from message
       let url = rMessage[1].replace(/&amp;/g, '&')
-      let response = await snekfetch.get(url)
+      let response = await axios.get(url)
       if (response.status !== 200) {
         return global.translate('core.api.error')
       }
@@ -481,12 +499,12 @@ class Message {
       // search for api datas in this.message
       let rData = this.message.match(/\(api\.(?!_response)(\S*?)\)/gi)
       if (_.isNil(rData)) {
-        this.message = this.message.replace('(api._response)', response.body.toString().replace(/^"(.*)"/, '$1'))
+        this.message = this.message.replace('(api._response)', response.data.toString().replace(/^"(.*)"/, '$1'))
       } else {
-        if (_.isBuffer(response.body)) response.body = JSON.parse(response.body.toString())
-        d('API response %s: %o', url, response.body)
+        if (_.isBuffer(response.data)) response.data = JSON.parse(response.data.toString())
+        d('API response %s: %o', url, response.data)
         for (let tag of rData) {
-          let path = response.body
+          let path = response.data
           let ids = tag.replace('(api.', '').replace(')', '').split('.')
           _.each(ids, function (id) {
             let isArray = id.match(/(\S+)\[(\d+)\]/i)
