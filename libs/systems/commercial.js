@@ -2,7 +2,7 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const snekfetch = require('snekfetch')
+const axios = require('axios')
 
 // bot libraries
 const constants = require('../constants')
@@ -48,18 +48,24 @@ class Commercial {
     if (_.includes([30, 60, 90, 120, 150, 180], commercial.duration)) {
       const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`
       try {
-        await snekfetch.post(url, { data: { length: commercial.duration } })
-          .set('Content-Type', 'application/json')
-          .set('Accept', 'application/vnd.twitchtv.v5+json')
-          .set('Client-ID', config.settings.client_id)
-          .set('Authorization', 'OAuth ' + config.settings.bot_oauth.split(':')[1])
+        await axios({
+          method: 'post',
+          url,
+          data: { length: commercial.duration },
+          headers: {
+            'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
+            'Client-ID': config.settings.client_id,
+            'Accept': 'application/vnd.twitchtv.v5+json',
+            'Content-Type': 'application/json'
+          }
+        })
 
         global.events.fire('commercial', { duration: commercial.duration })
         global.client.commercial(config.settings.broadcaster_username, commercial.duration)
         if (!_.isNil(commercial.message)) global.commons.sendMessage(commercial.message, sender)
       } catch (e) {
-        global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.message)}`)
-        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'commercial', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.message)}` })
+        global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`)
+        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'commercial', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
       }
     } else {
       global.commons.sendMessage('$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', sender)
