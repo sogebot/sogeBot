@@ -8,6 +8,7 @@ hr { border-color: $hr !important }
 .icon-resub { right: 0.5rem }
 .icon-follow { color: map-get($eventlist, follow) !important; }
 .icon-host { color: map-get($eventlist, host) !important; }
+.icon-raid { color: map-get($eventlist, raid) !important; }
 .icon-sub { color: map-get($eventlist, sub) !important; }
 .icon-subgift { color: map-get($eventlist, subgift) !important; }
 .icon-resub { color: map-get($eventlist, resub) !important; }
