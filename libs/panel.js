@@ -71,6 +71,9 @@ function Panel () {
   app.get('/overlays/:overlay', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'overlays', req.params.overlay + '.html'))
   })
+  app.get('/custom/:custom', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'custom', req.params.custom + '.html'))
+  })
   app.get('/favicon.ico', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'favicon.ico'))
   })
