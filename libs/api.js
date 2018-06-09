@@ -429,9 +429,12 @@ class API {
 
       if (fidsToLoadFromAPI.length > 0) {
         let fids = _.map(fidsToLoadFromAPI, (o) => `id=${o}`)
-        let usersFromApi = await axios.get(`https://api.twitch.tv/helix/users?${fids.join('&')}`)
-          .set('Client-ID', config.settings.client_id)
-          .set('Authorization', 'Bearer ' + config.settings.bot_oauth.split(':')[1])
+        let usersFromApi = await axios.get(`https://api.twitch.tv/helix/users?${fids.join('&')}`, {
+          headers: {
+            'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
+            'Client-ID': config.settings.client_id
+          }
+        })
 
         // save remaining api calls
         this.remainingAPICalls = usersFromApi.headers['ratelimit-remaining']
