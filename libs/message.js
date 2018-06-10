@@ -499,7 +499,10 @@ class Message {
       // search for api datas in this.message
       let rData = this.message.match(/\(api\.(?!_response)(\S*?)\)/gi)
       if (_.isNil(rData)) {
-        this.message = this.message.replace('(api._response)', response.data.toString().replace(/^"(.*)"/, '$1'))
+        if (_.isObject(response.data)) {
+          // Stringify object
+          this.message = this.message.replace('(api._response)', JSON.stringify(response.data))
+        } else this.message = this.message.replace('(api._response)', response.data.toString().replace(/^"(.*)"/, '$1'))
       } else {
         if (_.isBuffer(response.data)) response.data = JSON.parse(response.data.toString())
         d('API response %s: %o', url, response.data)
