@@ -6,6 +6,7 @@ var moment = require('moment')
 require('moment-precise-range-plugin')
 const debug = require('debug')
 const cluster = require('cluster')
+const axios = require('axios')
 
 // bot libraries
 const constants = require('../constants')
@@ -82,28 +83,20 @@ class Highlights {
 
         d('Searching in API')
         // we need to load video id
-        let options = {
-          url: url,
+        const request = await axios.get(url, {
           headers: {
-            Accept: 'application/vnd.twitchtv.v5+json',
+            'Accept': 'application/vnd.twitchtv.v5+json',
+            'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
             'Client-ID': config.settings.client_id
           }
-        }
-        global.client.api(options, function (err, res, body) {
-          if (err) {
-            global.log.error(err, { fnc: 'Highlights#1' })
-            global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: err })
-            return
-          }
-          global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: 200 })
-          const video = body.videos[0]
-
-          global.db.engine.update('cache', { 'key': 'highlights.id' }, { value: video._id })
-          global.db.engine.update('cache', { 'key': 'highlights.created_at' }, { value: when.online })
-          highlight.video_id = video._id
-          self.add(self, highlight, timestamp, sender)
-          global.panel.io.emit('api.stats', { data: body, timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: res.status })
         })
+        const video = request.data.videos[0]
+        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: 200 })
+        global.db.engine.update('cache', { 'key': 'highlights.id' }, { value: video._id })
+        global.db.engine.update('cache', { 'key': 'highlights.created_at' }, { value: when.online })
+        highlight.video_id = video._id
+        self.add(self, highlight, timestamp, sender)
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: request.status })
       } catch (e) {
         if (e.message !== ERROR_STREAM_NOT_ONLINE) {
           global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
