@@ -67,7 +67,7 @@ class Credits {
           'stream-by': await global.configuration.getValue('creditsStreamBy'),
           'followed-by': await global.configuration.getValue('creditsFollowedBy'),
           'hosted-by': await global.configuration.getValue('creditsHostedBy'),
-          'raided-by': await global.configuration.getValue('creditsHRaidedBy'),
+          'raided-by': await global.configuration.getValue('creditsRaidedBy'),
           'cheer-by': await global.configuration.getValue('creditsCheerBy'),
           'subscribed-by': await global.configuration.getValue('creditsSubscribedBy'),
           'resubscribed by': await global.configuration.getValue('creditsResubscribedBy'),
