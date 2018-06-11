@@ -120,12 +120,6 @@ class CustomVariables {
         const id = 'url' + crypto.randomBytes(64).toString('hex').slice(0, 5)
         const url = match.replace(/url\(['"]|["']\)/g, '')
         let response = await axios.get(url)
-        try {
-          response.data = JSON.parse(response.data.toString())
-        } catch (e) {
-          // JSON failed, treat like string
-          response = response.data.toString()
-        }
         urls.push({ id, response })
         script = script.replace(match, id)
       }
