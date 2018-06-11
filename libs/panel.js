@@ -74,6 +74,9 @@ function Panel () {
   app.get('/custom/:custom', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'custom', req.params.custom + '.html'))
   })
+  app.get('/public/:public', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'public', 'public', req.params.public + '.html'))
+  })
   app.get('/favicon.ico', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'favicon.ico'))
   })

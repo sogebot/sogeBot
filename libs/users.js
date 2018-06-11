@@ -572,4 +572,13 @@ Users.prototype.getMessagesOf = async function (user) {
       : Number.MAX_SAFE_INTEGER / 1000000, 10)
 }
 
+Users.prototype.getUsernamesFromIds = async function (IdsList) {
+  let IdsToUsername = {}
+  for (let id of IdsList) {
+    if (!_.isNil(IdsToUsername[id])) continue // skip if already had map
+    IdsToUsername[id] = (await global.db.engine.findOne('users', { id })).username
+  }
+  return IdsToUsername
+}
+
 module.exports = Users

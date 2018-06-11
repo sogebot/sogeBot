@@ -61,17 +61,14 @@ class Permissions {
           permission = constants.OWNER_ONLY
       }
 
-      let isFound = true
-      if (!_.isNil(sender)) {
-        // we've got this command from chat, need to recheck
-        // if command exists
-        let parser = new Parser()
-        isFound = !_.isNil(await parser.find('!' + match.command))
-      }
+      let parser = new Parser()
+      let command = await parser.find('!' + match.command)
 
-      if (isFound) {
-        await global.db.engine.update('permissions', { key: match.command }, { key: match.command, permission: permission })
-        global.commons.sendMessage(global.translate('permissions.success.change').replace(/\$command/g, match.command), sender)
+      if (command) {
+        if (!_.isNil(command.id)) await global.db.engine.update('permissions', { key: command.id.replace('!', '') }, { key: command.id.replace('!', ''), permission: permission })
+        // deprecated saving on match.command
+        else await global.db.engine.update('permissions', { key: command.command.replace('!', '') }, { key: command.command.replace('!', ''), permission: permission })
+        global.commons.sendMessage(global.translate('permissions.success.change').replace(/\$command/g, command.command), sender)
       } else {
         global.commons.sendMessage(global.translate('permissions.failed.noCmd'), sender)
       }

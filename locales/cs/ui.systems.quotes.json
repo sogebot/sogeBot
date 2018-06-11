@@ -1,0 +1,24 @@
+{
+  "no-quotes-found": "Je nám líto, ale v databázi nebyly nalezeny žádné citace.",
+  "quote": {
+    "name": "Citát",
+    "placeholder": "Nastavte zde svou citaci"
+  },
+  "by": {
+    "name": "Citát od"
+  },
+  "tags": {
+    "name": "Tagy",
+    "placeholder": "Nastavte zde své tagy",
+    "help": "Tagy oddělené čárkou. Příklad: tag 1, tag 2, tag 3"
+  },
+  "date": {
+    "name": "Datum"
+  },
+  "error": {
+    "isEmpty": "Tato hodnota nesmí být prázdná",
+    "atLeastOneTag": "Musíte nastavit alespoň jeden tag"
+  },
+  "tag-filter": "Filtrování dle tagu",
+  "warning": "Tato akce nemůže být vrácena!"
+}
