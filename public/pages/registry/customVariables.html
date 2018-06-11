@@ -2,8 +2,8 @@
 <a class="btn btn-success float-right" href="/#registry/customVariables/edit" data-lang="dialog.title.add"></a>
 
 <div class="widget" id="customVariables-table">
-  <div class="alert alert-danger mb-0" role="alert" v-if="variables.length === 0">{{ commons.translate('registry.customvariables.no-variables-found') }}</div>
-  <table class="table table-striped" v-if="variables.length > 0">
+  <div class="alert alert-danger mb-0" role="alert" v-if="!variables || variables.length === 0">{{ commons.translate('registry.customvariables.no-variables-found') }}</div>
+  <table class="table table-striped" v-if="variables && variables.length > 0">
     <thead>
       <tr>
         <th scope="col" class="p-3">$_</th>
@@ -17,11 +17,11 @@
     <tbody>
       <tr v-for="variable of variables">
         <td style="font-size: 1.2rem;">{{ variable.variableName }}</td>
-        <td v-bind:class="{ 'text-muted': variable.description.length === 0 }">
-          {{ variable.description.length !== 0 ? variable.description : commons.translate('not-available') }}
+        <td v-bind:class="{ 'text-muted': !variable.description || variable.description.length === 0 }">
+          {{ variable.description && variable.description.length !== 0 ? variable.description : commons.translate('not-available') }}
         </td>
         <td style="font-size: 1.2rem;">{{ commons.translate('registry.customvariables.types.' + variable.type) }}</td>
-        <td v-bind:class="{ 'text-muted': variable.currentValue.length === 0 }">{{ variable.currentValue.length !== 0 ? variable.currentValue : commons.translate('not-available') }}</td>
+        <td v-bind:class="{ 'text-muted': !variable.currentValue || variable.currentValue.length === 0 }">{{ variable.currentValue && variable.currentValue.length !== 0 ? variable.currentValue : commons.translate('not-available') }}</td>
         <td>
           <span v-if="variable.type === 'eval'">
             <div v-if="variable.runEvery">
