@@ -119,10 +119,13 @@ Points.prototype.getPointsOf = async function (user) {
 Points.prototype.setPoints = async function (self, sender, text) {
   try {
     var parsed = text.match(/^@?([\S]+) ([0-9]+)$/)
-    const points = parseInt(parsed[2], 10)
+    const points = parseInt(
+      Number(parsed[2]) <= Number.MAX_SAFE_INTEGER / 1000000
+        ? parsed[2]
+        : Number.MAX_SAFE_INTEGER / 1000000, 10)
 
-    let userPoints = await self.getPointsOf(parsed[1].toLowerCase())
-    await global.db.engine.insert('users.points', { username: parsed[1].toLowerCase(), points: points - userPoints })
+    await global.db.engine.remove('users.points', { username: parsed[1].toLowerCase() })
+    await global.db.engine.insert('users.points', { username: parsed[1].toLowerCase(), points })
 
     let message = await global.commons.prepare('points.success.set', {
       amount: points,
