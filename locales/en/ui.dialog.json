@@ -18,5 +18,6 @@
     "delete": "Delete",
     "yes": "Yes",
     "no": "No"
-  }
+  },
+  "changesPending": "Your changes was not saved."
 }

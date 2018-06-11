@@ -70,11 +70,15 @@ module.exports = {
       if (_.isArray(opts)) {
         for (let o of opts) {
           o.sender = _.isNil(user.username) ? '' : user.username
-          expected.push(await global.commons.prepare(entry, o))
+          if (_.isArray(entry)) {
+            for (let e of entry) expected.push(await global.commons.prepare(e, o))
+          } else expected.push(await global.commons.prepare(entry, o))
         }
       } else {
         opts.sender = _.isNil(user.username) ? '' : user.username
-        expected = [await global.commons.prepare(entry, opts)]
+        if (_.isArray(entry)) {
+          for (let e of entry) expected.push(await global.commons.prepare(e, opts))
+        } else expected.push(await global.commons.prepare(entry, opts))
       }
       try {
         let isCorrectlyCalled = false

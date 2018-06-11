@@ -72,18 +72,18 @@ class Expects {
   }
 
   argument (opts) {
-    _.defaults(opts, { optional: false, default: null, multi: false, delimiter: '"' })
+    _.defaults(opts, { type: String, optional: false, default: null, multi: false, delimiter: '"' })
     opts.delimiter = XRegExp.escape(opts.delimiter)
     if (!opts.multi) opts.delimiter = ''
 
     if (_.isNil(opts.name)) throw Error(`Argument name must be defined`)
-    this.checkText()
+    if (!opts.optional) this.checkText()
 
-    const regexp = XRegExp(`-${opts.name}\\s${opts.delimiter}(?<${opts.name}> ${opts.multi ? '.*' : '[\\w\\d]*'})${opts.delimiter}`, 'ix')
+    const regexp = XRegExp(`-${opts.name}\\s${opts.delimiter}(?<${opts.name}> ${opts.multi ? '.*' : '[\\w\\d, "\'\\/$!@#$%^&*()]*'})${opts.delimiter}`, 'ix')
     const match = XRegExp.exec(this.text, regexp)
 
-    if (!_.isNil(match)) {
-      this.match.push(match[opts.name])
+    if (!_.isNil(match) && match[opts.name].trim().length !== 0) {
+      this.match.push(opts.type(match[opts.name].trim()))
       this.text = this.text.replace(`-${opts.name} ${opts.delimiter}${match[opts.name]}${opts.delimiter}`, '') // remove from text matched pattern
     } else {
       if (!opts.optional) throw Error(`Argument not found`)
@@ -93,6 +93,7 @@ class Expects {
   }
 
   string (opts) {
+    opts = opts || {}
     _.defaults(opts, { optional: false, delimiter: '\\s' })
     opts.delimiter = XRegExp.escape(opts.delimiter)
     this.checkText()

@@ -18,5 +18,6 @@
     "delete": "Smazat",
     "yes": "Ano",
     "no": "Ne"
-  }
+  },
+  "changesPending": "Vaše změny nebyly uloženy."
 }

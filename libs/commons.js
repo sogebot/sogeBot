@@ -68,6 +68,7 @@ Commons.prototype.sendToOwners = function (text) {
 Commons.prototype.prepare = async function (translate, attr) {
   attr = attr || {}
   let msg = global.translate(translate)
+  attr = _(attr).toPairs().sortBy((o) => -o[0].length).fromPairs().value() // reorder attributes by key length
   for (let [key, value] of Object.entries(attr)) {
     if (_.includes(['username', 'who', 'winner', 'sender'], key)) value = await global.configuration.getValue('atUsername') ? `@${value}` : value
     msg = msg.replace(new RegExp('[$]' + key, 'g'), value)

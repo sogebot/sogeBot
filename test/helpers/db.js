@@ -26,6 +26,7 @@ module.exports = {
       await global.db.engine.remove('widgetsEventList', {})
       await global.db.engine.remove('moderation.permit', {})
       await global.db.engine.remove('moderation.warnings', {})
+      await global.db.engine.remove('systems.quotes', {})
       resolve()
     }
     return new Promise((resolve, reject) => {

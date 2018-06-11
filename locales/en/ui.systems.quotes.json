@@ -1,0 +1,24 @@
+{
+  "no-quotes-found": "We're sorry, no quotes were found in database.",
+  "quote": {
+    "name": "Quote",
+    "placeholder": "Set your quote here"
+  },
+  "by": {
+    "name": "Quoted by"
+  },
+  "tags": {
+    "name": "Tags",
+    "placeholder": "Set your tags here",
+    "help": "Comma-separated tags. Example: tag 1, tag 2, tag 3"
+  },
+  "date": {
+    "name": "Date"
+  },
+  "error": {
+    "isEmpty": "This value cannot be empty",
+    "atLeastOneTag": "You need to set at least one tag"
+  },
+  "tag-filter": "Filtering by tag",
+  "warning": "This action cannot be reverted!"
+}

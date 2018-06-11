@@ -142,13 +142,18 @@ class Parser {
     let commands = []
     for (let item of this.list) {
       d(`Checking ${util.inspect(item)}`)
-      if (_.isFunction(item.commands)) commands.push(item.commands())
+      if (_.isFunction(item.commands)) {
+        let items = await item.commands()
+        commands.push(items)
+      }
     }
     // TODO: sort _(this.registeredCmds).toPairs().sortBy((o) => -o[0].length).fromPairs().value() // order by length
     commands = _.flatMap(commands)
 
     for (let command of commands) {
-      let permission = await global.db.engine.findOne('permissions', { key: command.command.replace('!', '') })
+      // TODO: command.command is deprecated
+      let key = (!_.isNil(command.id) ? command.id : command.command).replace('!', '')
+      let permission = await global.db.engine.findOne('permissions', { key })
       if (!_.isEmpty(permission)) command.permission = permission.permission // change to custom permission
     }
     return commands
@@ -174,7 +179,16 @@ class Parser {
       (command.permission === constants.MODS && (isMod || isOwner)) ||
       (command.permission === constants.OWNER_ONLY && isOwner)) {
       var text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim()
-      if (typeof command.fnc === 'function') command.fnc(command.this, _.isNil(sender) ? { username: config.settings.bot_username.toLowerCase() } : sender, text.trim(), message)
+      let opts = {
+        sender: _.isNil(sender) ? { username: config.settings.bot_username.toLowerCase() } : sender,
+        command: {
+          full: message,
+          after: text.trim()
+        }
+      }
+      if (typeof command.fnc === 'function' && !_.isNil(command.id)) command['fnc'].apply(command.this, [opts])
+      // TODO: DEPRECATED: We should use IDs for new systems to be able to have custom permission on id, not command itself
+      else if (typeof command.fnc === 'function') command.fnc(command.this, _.isNil(sender) ? { username: config.settings.bot_username.toLowerCase() } : sender, text.trim(), message)
       else global.log.error(command.command + ' have wrong null function registered!', { fnc: 'Parser.prototype.parseCommands' })
     } else {
       // user doesn't have permissions for command
