@@ -488,7 +488,7 @@
 
       /* SHORTEN NUMBER BUTTON */
       var btn = $('#shortennumber-btn')
-      btn.data('switchShortenNumbers', !data.shortennumber)
+      btn.data('switchShortenNumbers', !data.shortennumbers)
       switchShortenNumbers(false)
 
       /* STICKY BUTTON */
@@ -649,6 +649,7 @@
         b_shortenNumber: true,
         b_percentage: false,
 
+        timestamp: null,
         uptime: '--:--:--',
         currentViewers: 0,
         maxViewers: 0,
@@ -664,7 +665,7 @@
 
       },
       watched: {
-        uptime: function () {
+        timestamp: function () {
           if (this.uptime === '') this.uptime = '00:00:00'
           if (this.uptime === '00:00:00') {
             this.currentViewers = 0
@@ -688,7 +689,7 @@
       },
       methods: {
         difference: function (number, current) {
-          if (_.isNaN(Number(current))) return '' // return nothing if current is not number (hidden, etc)
+          if (_.isNaN(Number(current)) || this.uptime === '00:00:00') return '' // return nothing if current is not number (hidden, etc)
           else if (number === 0) return this.b_percentage ? `${current * 100}%` : current
           else {
             let isPositive = current - number >= 0
@@ -722,11 +723,12 @@
           for (let [key, value] of Object.entries(data)) {
             this[key] = value // populate data
           }
+          this.timestamp = new Date()
         })
       },
       filters: {
         shortenNumber: function (number, shortify) {
-          if (!shortify || Number(number) <= 100000) return number
+          if (!shortify || Number(number) <= 10000) return number
           var SI_PREFIXES = ["", "k", "M", "G", "T", "P", "E"];
           // what tier? (determines SI prefix)
           var tier = Math.log10(number) / 3 | 0;
@@ -1220,7 +1222,6 @@
 
       btn.data('switchShortenNumbers', !btn.data('switchShortenNumbers'))
       quickStatsApp.b_shortenNumber = btn.data('switchShortenNumbers')
-      console.log(quickStatsApp.b_shortenNumber)
 
       if (update) {
         console.debug('EMIT [saveConfiguration]', {
@@ -1401,58 +1402,6 @@
     function leaveBot() {
       socket.emit('leaveBot')
     }
-
-    /*setInterval(() => latestStatsUpdateHTML(latestStats), 1000)
-    function latestStatsUpdateHTML(data) {
-      var getPercentage = function (cur, orig) {
-        if (btn.data('showPercentage')) return Math.round((cur - orig) / orig * 1000) / 10
-        return cur - orig
-      }
-      var setHtml = function (id, value) {
-        var btn = $('#percentage-btn')
-        if (parseInt(value, 10) === 0) {
-          $("#" + id).html('<span class="stats-mid"><i class="fas fa-caret-right"></i> ' +
-            Math.abs(value) + (btn.data('showPercentage') ? '%' : '') + '</span>')
-        } else {
-          if (_.isNaN(value)) {
-            $("#" + id).html('')
-          } else {
-            $("#" + id).html('<span class="stats-' + (value < 0 ? 'down' : 'up') +
-              ' text-' + (value < 0 ? 'danger' : 'success') +
-              '"><i class="fas fa-caret-' + (value < 0 ? 'down' : 'up') +
-              '"></i> ' + Math.abs(value) + (btn.data('showPercentage') ? '%' : '') + '</span>')
-          }
-        }
-      }
-      if ($.isEmptyObject(data)) return
-
-      var uptime = $("#uptime").text()
-      if (uptime !== '00:00:00' && uptime !== '--:--:--') {
-        var maxViewers = getPercentage(parseInt($("#maxViewers").text(), 10), parseInt(data.maxViewers, 10))
-        var totalChatMsgs = getPercentage(parseInt($("#totalChatMsgs").text(), 10), parseInt(data.chatMessages,
-          10))
-        var newChtr = getPercentage(parseInt($("#newChtr").text(), 10), parseInt(data.newChatters, 10))
-        var curFollowers = getPercentage(parseInt($("#curFollowers").text(), 10), parseInt(data.currentFollowers,
-          10))
-        var curSubscribers = getPercentage(parseInt($("#curSubscribers").text(), 10), parseInt(data.currentSubscribers,
-          10))
-        var curBits = getPercentage(parseInt($("#curBits").text(), 10), parseInt(data.currentBits, 10))
-        var curTips = getPercentage(parseFloat($("#curTips").text()), parseFloat(data.currentTips, 10))
-        var curViews = getPercentage(parseInt($("#curViews").text(), 10), parseInt(data.currentViews, 10))
-        var curHosts = getPercentage(parseInt($("#curHosts").text(), 10), parseInt(data.currentHosts, 10))
-
-        setHtml('maxViewersChange', maxViewers)
-        setHtml('totalChatMsgsChange', totalChatMsgs)
-        setHtml('newChtrChange', newChtr)
-        setHtml('curFollowersChange', curFollowers)
-        setHtml('curSubscribersChange', curSubscribers)
-        setHtml('curBitsChange', curBits)
-        setHtml('curTipsChange', curTips)
-        setHtml('curViewsChange', curViews)
-        setHtml('curHostsChange', curHosts)
-      }
-    }
-    */
 
     $(document).on('click', '.widget-popout a', (ev) => {
       ev.preventDefault()
