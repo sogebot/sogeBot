@@ -120,6 +120,10 @@
             <i class="far fa-check-square" aria-hidden="true"></i>
             Percentage in stats
           </button>
+          <button class="dropdown-item" id="showdiff-btn" data-shortennumber="true" onclick="switchShowDiff()">
+            <i class="far fa-check-square" aria-hidden="true"></i>
+            Show average difference
+          </button>
           <button class="dropdown-item" id="shortennumber-btn" data-shortennumber="true" onclick="switchShortenNumbers()">
             <i class="far fa-check-square" aria-hidden="true"></i>
             Shorten long numbers: 10000 => 10k
@@ -491,6 +495,11 @@
       btn.data('switchShortenNumbers', !data.shortennumbers)
       switchShortenNumbers(false)
 
+      /* SHOW DIFF BUTTON */
+      var btn = $('#showdiff-btn')
+      btn.data('switchShowDiff', !data.showdiff)
+      switchShowDiff(false)
+
       /* STICKY BUTTON */
       var btn = $('#sticky-btn')
       btn.data('switchSticky', !data.stickystats)
@@ -647,6 +656,7 @@
 
         hideStats: false,
         b_shortenNumber: true,
+        b_showAvgDiff: false,
         b_percentage: false,
 
         timestamp: null,
@@ -689,7 +699,7 @@
       },
       methods: {
         difference: function (number, current) {
-          if (_.isNaN(Number(current)) || this.uptime === '00:00:00') return '' // return nothing if current is not number (hidden, etc)
+          if (_.isNaN(Number(current)) || this.uptime === '00:00:00' || !this.b_showAvgDiff) return '' // return nothing if current is not number (hidden, etc)
           else if (number === 0) return this.b_percentage ? `${current * 100}%` : current
           else {
             let isPositive = current - number >= 0
@@ -1206,6 +1216,29 @@
         })
         socket.emit('saveConfiguration', {
           'percentage': btn.data('showPercentage')
+        })
+      }
+    }
+
+    var switchShowDiff = function (update = true) {
+      var btn = $('#showdiff-btn')
+      btn.data('switchShowDiff', _.isString(btn.data('switchShowDiff')) ? true : btn.data('switchShowDiff'))
+
+      if (btn.data('switchShowDiff')) {
+        btn.children('i').removeClass().addClass('far fa-square')
+      } else {
+        btn.children('i').removeClass().addClass('far fa-check-square')
+      }
+
+      btn.data('switchShowDiff', !btn.data('switchShowDiff'))
+      quickStatsApp.b_showAvgDiff = btn.data('switchShowDiff')
+
+      if (update) {
+        console.debug('EMIT [saveConfiguration]', {
+          'showdiff': btn.data('switchShowDiff')
+        })
+        socket.emit('saveConfiguration', {
+          'showdiff': btn.data('switchShowDiff')
         })
       }
     }
