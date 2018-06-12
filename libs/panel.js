@@ -98,6 +98,7 @@ function Panel () {
   global.configuration.register('theme', 'core.theme', 'string', 'light')
   global.configuration.register('percentage', 'core.percentage', 'bool', true)
   global.configuration.register('shortennumbers', 'core.no-response-bool', 'bool', true)
+  global.configuration.register('stickystats', 'core.no-response-bool', 'bool', false)
 
   this.addMenu({category: 'settings', name: 'systems', id: 'systems'})
 

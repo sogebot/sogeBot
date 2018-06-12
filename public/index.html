@@ -124,6 +124,10 @@
             <i class="far fa-check-square" aria-hidden="true"></i>
             Shorten long numbers: 10000 => 10k
           </button>
+          <button class="dropdown-item" id="sticky-btn" data-sticky="true" onclick="switchSticky()">
+            <i class="far fa-check-square" aria-hidden="true"></i>
+            Keep stats sticky on scroll
+          </button>
           <button class="dropdown-item" id="stats-btn" data-show-stats="true" onclick="switchStats()">
             <i class="far fa-check-square" aria-hidden="true"></i>
             <span data-lang="stats-panel.show">Quick stats</span>
@@ -486,6 +490,11 @@
       var btn = $('#shortennumber-btn')
       btn.data('switchShortenNumbers', !data.shortennumber)
       switchShortenNumbers(false)
+
+      /* STICKY BUTTON */
+      var btn = $('#sticky-btn')
+      btn.data('switchSticky', !data.stickystats)
+      switchSticky(false)
 
       /* ME BUTTON */
       var btn = $('#me-btn')
@@ -1219,6 +1228,33 @@
         })
         socket.emit('saveConfiguration', {
           'shortennumbers': btn.data('switchShortenNumbers')
+        })
+      }
+    }
+
+    var switchSticky = function (update = true) {
+      var btn = $('#sticky-btn')
+      btn.data('switchSticky', _.isString(btn.data('switchSticky')) ? true : btn.data('switchSticky'))
+
+      if (btn.data('switchSticky')) {
+        btn.children('i').removeClass().addClass('far fa-square')
+      } else {
+        btn.children('i').removeClass().addClass('far fa-check-square')
+      }
+
+      btn.data('switchSticky', !btn.data('switchSticky'))
+
+      if (btn.data('switchSticky')) {
+        $('#quickStatsApp').addClass('sticky-top')
+        $('#quickStatsApp').css('top', '50px')
+      } else $('#quickStatsApp').removeClass('sticky-top')
+
+      if (update) {
+        console.debug('EMIT [saveConfiguration]', {
+          'stickystats': btn.data('switchSticky')
+        })
+        socket.emit('saveConfiguration', {
+          'stickystats': btn.data('switchSticky')
         })
       }
     }
