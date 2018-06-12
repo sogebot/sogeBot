@@ -120,6 +120,10 @@
             <i class="far fa-check-square" aria-hidden="true"></i>
             Percentage in stats
           </button>
+          <button class="dropdown-item" id="shortennumber-btn" data-shortennumber="true" onclick="switchShortenNumbers()">
+            <i class="far fa-check-square" aria-hidden="true"></i>
+            Shorten long numbers: 10000 => 10k
+          </button>
           <button class="dropdown-item" id="stats-btn" data-show-stats="true" onclick="switchStats()">
             <i class="far fa-check-square" aria-hidden="true"></i>
             <span data-lang="stats-panel.show">Quick stats</span>
@@ -198,88 +202,84 @@
   </div>
 
   <!-- SNIPPETS -->
-  <div class="stream-info-container container-fluid">
+  <div class="stream-info-container container-fluid" id="quickStatsApp">
     <div class="row">
       <div class="col-sm stream-info" onclick="saveHighlight()">
         <h2>
           <i data-lang="uptime"></i>
           <small data-lang="click-to-highlight"></small>
         </h2>
-        <span class="data" id="uptime">--:--:--</span>
+        <span class="data" id="uptime">{{ uptime }}</span>
         <span class="stats">&nbsp;</span>
       </div>
 
-      <div class="col-sm stream-info" onclick="toggleViewerShow()">
+      <div class="col-sm stream-info" v-on:click="toggleViewerShow">
         <h2>
           <i data-lang="viewers"></i>
           <small data-lang="click-to-toggle-display"></small>
         </h2>
-        <span class="data curViewers">-</span>
+        <span class="data" v-html="currentViewersComputed"></span>
         <span class="stats">&nbsp;</span>
       </div>
 
-      <div class="col-sm stream-info" onclick="toggleViewerShow()">
+      <div class="col-sm stream-info" v-on:click="toggleViewerShow">
         <h2>
           <i data-lang="max-viewers"></i>
           <small data-lang="click-to-toggle-display"></small>
         </h2>
-        <span class="data" id="maxViewers">-</span>
-        <span class="stats" id="maxViewersChange">&nbsp;</span>
+        <span class="data" v-html="maxViewersComputed"></span>
+        <span class="stats" v-html="difference(averageStats.maxViewers, maxViewersComputed)"></span>
       </div>
 
-      <div class="col-sm stream-info" onclick="toggleViewerShow()">
+      <div class="col-sm stream-info" v-on:click="toggleViewerShow">
         <h2>
           <i data-lang="new-chatters"></i>
           <small data-lang="click-to-toggle-display"></small>
         </h2>
-        <span class="data" id="newChtr">-</span>
-        <span class="stats" id="newChtrChange">&nbsp;</span>
+        <span class="data" v-html="newChattersComputed"></span>
+        <span class="stats" v-html="difference(averageStats.newChatters, newChattersComputed)"></span>
       </div>
 
       <div class="col-sm stream-info">
         <h2 data-lang="chat-messages"></h2>
-        <span class="data" id="totalChatMsgs">-</span>
-        <span class="stats" id="totalChatMsgsChange">&nbsp;</span>
+        <span class="data" v-bind:title="chatMessages">{{ chatMessages | shortenNumber(b_shortenNumber) }}</span>
+        <span class="stats" v-html="difference(averageStats.chatMessages, chatMessages)"></span>
       </div>
 
       <div class="col-sm stream-info">
         <h2 data-lang="views"></h2>
-        <span class="data" id="curViews">-</span>
-        <span class="stats" id="curViewsChange">&nbsp;</span>
+        <span class="data" v-bind:title="currentViews">{{ currentViews | shortenNumber(b_shortenNumber) }}</span>
+        <span class="stats" v-html="difference(averageStats.currentViews, currentViews)"></span>
       </div>
 
       <div class="col-sm stream-info">
         <h2 data-lang="hosts"></h2>
-        <span class="data" id="curHosts">-</span>
+        <span class="data">{{ currentHosts }}</span>
         <span class="stats" id="curHostsChange">&nbsp;</span>
       </div>
 
       <div class="col-sm stream-info">
         <h2 data-lang="followers"></h2>
-        <span class="data">
-          <span id="curFollowers">-</span>
-        </span>
-        <span class="stats" id="curFollowersChange">&nbsp;</span>
+        <span class="data" v-bind:title="currentFollowers">{{ currentFollowers | shortenNumber(b_shortenNumber) }}</span>
+        <span class="stats" v-html="difference(averageStats.currentFollowers, currentFollowers)"></span>
       </div>
 
       <div class="col-sm stream-info">
         <h2 data-lang="subscribers"></h2>
-        <span class="data">
-          <span id="curSubscribers">-</span>
-        </span>
-        <span class="stats" id="curSubscribersChange">&nbsp;</span>
+        <span class="data">{{ currentSubscribers }}</span>
+        <span class="stats" v-html="difference(averageStats.currentSubscribers, currentSubscribers)"></span>
       </div>
 
       <div class="col-sm stream-info">
         <h2 data-lang="bits"></h2>
-        <span class="data" id="curBits">-</span>
-        <span class="stats" id="curBitsChange">&nbsp;</span>
+        <span class="data" v-bind:title="currentBits">{{ currentBits | shortenNumber(b_shortenNumber) }}</span>
+        <span class="stats" v-html="difference(averageStats.currentBits, currentBits)"></span>
       </div>
 
       <div class="col-sm stream-info">
         <h2 data-lang="tips"></h2>
-        <span class="data" id="curTips">-</span><span class="data ml-0 pl-0" id="curTipsCurrency">-</span>
-        <span class="stats" id="curTipsChange">&nbsp;</span>
+        <span class="data">{{ Number(currentTips).toFixed(2) }}</span><span class="data ml-0 pl-0">{{ currency }}</span>
+        <span class="stats" v-html="difference(averageStats.currentTips, currentTips)"></span>
       </div>
     </div>
 
@@ -401,7 +401,6 @@
     var configuration
 
     var translations = {}
-    var showViewers = true
 
     console.debug('EMIT [getVersion]')
     socket.emit('getVersion')
@@ -482,6 +481,11 @@
       var btn = $('#percentage-btn')
       btn.data('showPercentage', !data.percentage)
       switchPercentageShow(false)
+
+      /* SHORTEN NUMBER BUTTON */
+      var btn = $('#shortennumber-btn')
+      btn.data('switchShortenNumbers', !data.shortennumber)
+      switchShortenNumbers(false)
 
       /* ME BUTTON */
       var btn = $('#me-btn')
@@ -624,52 +628,114 @@
       }
     })
 
-    /* STATS */
-    let latestStats
-    console.debug('EMIT [getLatestStats]')
-    socket.emit('getLatestStats')
-    setInterval(function () {
-      console.debug('EMIT [getLatestStats]')
-      socket.emit('getLatestStats')
-    }, 30000)
+    Vue.prototype.commons = commons
+    var quickStatsApp = new Vue({
+      el: '#quickStatsApp',
 
-    console.debug('EMIT [panel.sendStreamData]')
-    socket.emit('panel.sendStreamData')
-    setInterval(function () {
-      console.debug('EMIT [panel.sendStreamData]')
-      socket.emit('panel.sendStreamData')
-    }, 1000)
+      data: {
+        socket: io({ query: "token=" + token }),
+        averageStats: {},
 
+        hideStats: false,
+        b_shortenNumber: true,
+        b_percentage: false,
 
-    socket.on('latestStats', function (data) {
-      latestStats = data
-      latestStatsUpdateHTML(latestStats)
+        uptime: '--:--:--',
+        currentViewers: 0,
+        maxViewers: 0,
+        chatMessages: 0,
+        newChatters: 0,
+        currentHosts: 0,
+        currentViews: 0,
+        currentBits: 0,
+        currentSubscribers: 0,
+        currentFollowers: 0,
+        currentTips: 0,
+        currency: 'n/a'
+
+      },
+      watched: {
+        uptime: function () {
+          if (this.uptime === '') this.uptime = '00:00:00'
+          if (this.uptime === '00:00:00') {
+            this.currentViewers = 0
+            this.maxViewers = 0
+            this.chatMessages = 0
+            this.newChatters = 0
+            this.currentHosts = 0
+          }
+        }
+      },
+      computed: {
+        currentViewersComputed: function () {
+          return !this.hideStats ? this.currentViewers : `<small>${commons.translate('hidden')}</small>`
+        },
+        maxViewersComputed: function () {
+          return !this.hideStats ? this.maxViewers : `<small>${commons.translate('hidden')}</small>`
+        },
+        newChattersComputed: function () {
+          return !this.hideStats ? this.newChatters : `<small>${commons.translate('hidden')}</small>`
+        }
+      },
+      methods: {
+        difference: function (number, current) {
+          if (_.isNaN(Number(current))) return '' // return nothing if current is not number (hidden, etc)
+          else if (number === 0) return this.b_percentage ? `${current * 100}%` : current
+          else {
+            let isPositive = current - number >= 0
+            let f_difference =  Math.abs(this.b_percentage ? (Math.round((current - number) / number * 1000) / 10) : current - number)
+            f_difference = this.b_percentage ? `${f_difference}%` : this.$options.filters.shortenNumber(f_difference, this.b_shortenNumber)
+
+            if (current - number === 0) {
+              return ''
+            } else if (isPositive) {
+              return `<span class="stats-up text-success"><i class="fas fa-caret-up"></i>${f_difference}</span>`
+            } else {
+              return `<span class="stats-down text-danger"><i class="fas fa-caret-down"></i>${f_difference}</span>`
+            }
+          }
+        },
+        toggleViewerShow: function () {
+          this.hideStats = !this.hideStats
+        }
+      },
+      created: function () {
+        this.socket.emit('getLatestStats')
+        this.socket.emit('panel.sendStreamData')
+
+        setInterval(() => {
+          this.socket.emit('getLatestStats')
+          this.socket.emit('panel.sendStreamData')
+        }, 1000)
+
+        this.socket.on('latestStats', (data) => { this.averageStats = data })
+        this.socket.on('stats', (data) => {
+          for (let [key, value] of Object.entries(data)) {
+            this[key] = value // populate data
+          }
+        })
+      },
+      filters: {
+        shortenNumber: function (number, shortify) {
+          if (!shortify || Number(number) <= 100000) return number
+          var SI_PREFIXES = ["", "k", "M", "G", "T", "P", "E"];
+          // what tier? (determines SI prefix)
+          var tier = Math.log10(number) / 3 | 0;
+          // if zero, we don't need a prefix
+          if(tier == 0) return number;
+          // get prefix and determine scale
+          var prefix = SI_PREFIXES[tier];
+          var scale = Math.pow(10, tier * 3);
+          // scale the number
+          var scaled = number / scale;
+          // format number and add prefix as suffix
+          return scaled.toFixed(1) + prefix;
+        }
+      }
     })
 
+    /* STATS */
     socket.on('stats', async function (data) {
-      var $curFollowers = $("#curFollowers")
-
-      if (data.uptime === '' || data.uptime === '00:00:00') {
-        data.currentViewers = 0
-        data.maxViewers = 0
-        data.chatMessages = 0
-        data.newChatters = 0
-        data.currentHosts = 0
-      }
-
-      $("#uptime").text(data.uptime !== '' ? data.uptime : '00:00:00')
-      $(".curViewers").html(showViewers ? data.currentViewers : `<small>${translations['hidden']}</small>`)
-      $("#maxViewers").html(showViewers ? data.maxViewers : `<small>${translations['hidden']}</small>`)
-      $("#newChtr").html(showViewers ? data.newChatters : `<small>${translations['hidden']}</small>`)
-      $("#curViews").text(data.currentViews)
-      $("#curHosts").text(data.currentHosts)
-      $("#curSubscribers").text(data.currentSubscribers)
-      $("#curBits").text(data.currentBits)
-      $("#curTips").text(Number(data.currentTips).toFixed(2))
-      $("#curTipsCurrency").text(data.currency)
-      $("#totalChatMsgs").text(data.chatMessages)
-      $("#curFollowers").text(data.currentFollowers)
-
       let title = await generateTitle(data.status, data.rawStatus)
       $("#title").html(title)
 
@@ -1043,10 +1109,6 @@
       }
     }
 
-    var toggleViewerShow = function () {
-      showViewers = !showViewers
-    }
-
     var saveHighlight = function () {
       console.debug('EMIT [highlights.highlight]')
       socket.emit('highlights.highlight', '')
@@ -1125,6 +1187,7 @@
       }
 
       btn.data('showPercentage', !btn.data('showPercentage'))
+      quickStatsApp.b_percentage = btn.data('showPercentage')
 
       if (update) {
         console.debug('EMIT [saveConfiguration]', {
@@ -1132,6 +1195,30 @@
         })
         socket.emit('saveConfiguration', {
           'percentage': btn.data('showPercentage')
+        })
+      }
+    }
+
+    var switchShortenNumbers = function (update = true) {
+      var btn = $('#shortennumber-btn')
+      btn.data('switchShortenNumbers', _.isString(btn.data('switchShortenNumbers')) ? true : btn.data('switchShortenNumbers'))
+
+      if (btn.data('switchShortenNumbers')) {
+        btn.children('i').removeClass().addClass('far fa-square')
+      } else {
+        btn.children('i').removeClass().addClass('far fa-check-square')
+      }
+
+      btn.data('switchShortenNumbers', !btn.data('switchShortenNumbers'))
+      quickStatsApp.b_shortenNumber = btn.data('switchShortenNumbers')
+      console.log(quickStatsApp.b_shortenNumber)
+
+      if (update) {
+        console.debug('EMIT [saveConfiguration]', {
+          'shortennumbers': btn.data('switchShortenNumbers')
+        })
+        socket.emit('saveConfiguration', {
+          'shortennumbers': btn.data('switchShortenNumbers')
         })
       }
     }
@@ -1279,16 +1366,9 @@
       socket.emit('leaveBot')
     }
 
-    setInterval(() => latestStatsUpdateHTML(latestStats), 1000)
+    /*setInterval(() => latestStatsUpdateHTML(latestStats), 1000)
     function latestStatsUpdateHTML(data) {
       var getPercentage = function (cur, orig) {
-        var btn = $('#percentage-btn')
-        if (_.isNil(orig) || _.isNaN(orig)) orig = 0
-        if (orig === cur) return 0
-        if (orig === 0) {
-          if (!btn.data('showPercentage')) return cur
-          else return cur * 100
-        }
         if (btn.data('showPercentage')) return Math.round((cur - orig) / orig * 1000) / 10
         return cur - orig
       }
@@ -1336,6 +1416,7 @@
         setHtml('curHostsChange', curHosts)
       }
     }
+    */
 
     $(document).on('click', '.widget-popout a', (ev) => {
       ev.preventDefault()
