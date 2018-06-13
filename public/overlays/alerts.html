@@ -514,19 +514,22 @@
       }
 
       function showHtml(id, html) {
+        html.delay = _.isNil(html.delay) ? 0 : parseInt(html.delay, 10)
         html.duration = _.isNil(html.duration) ? 1000 : parseInt(html.duration) // how long to animate
         html.time = _.isNil(html.time) ? 1000 : parseInt(html.time, 10) // how long to show
 
-        $('iframe#html').attr('src', html.url)
-        $('iframe#html').off('load')
-        $('iframe#html').on('load', function () {
-          $('iframe#html').velocity("fadeIn", { duration: html.duration })
+        setTimeout(() => {
+          $('iframe#html').attr('src', html.url)
+          $('iframe#html').off('load')
+          $('iframe#html').on('load', function () {
+            $('iframe#html').velocity("fadeIn", { duration: html.duration })
 
-          setTimeout(() => {
-            $('iframe#html').velocity("fadeOut", { duration: html.duration });
-            setTimeout(() => alertsQueue[id].finished++, html.duration)
-          }, html.duration + html.time)
-        })
+            setTimeout(() => {
+              $('iframe#html').velocity("fadeOut", { duration: html.duration });
+              setTimeout(() => alertsQueue[id].finished++, html.duration)
+            }, html.duration + html.time)
+          })
+        }, html.delay)
       }
 
     </script>
