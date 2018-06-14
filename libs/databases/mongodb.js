@@ -41,7 +41,7 @@ class IMongoDB extends Interface {
       await db.collection('users.bits').createIndex('timestamp')
       await db.collection('users.tips').createIndex('timestamp')
       await db.collection('users').createIndex('username', { unique: true })
-      await db.collection('users.online').createIndex('username', { unique: true })
+      await db.collection('users.online').createIndex('username')
       await db.collection('users.points').createIndex('username')
       await db.collection('users.messages').createIndex('username')
       await db.collection('cache').createIndex('key')
