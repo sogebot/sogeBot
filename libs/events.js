@@ -240,6 +240,7 @@ class Events {
     d('Run command with attrs:', operation, attributes)
 
     let command = operation.commandToRun
+    attributes = _(attributes).toPairs().sortBy((o) => -o[0].length).fromPairs().value() // reorder attributes by key length
     _.each(attributes, function (val, name) {
       if (_.isObject(val) && _.size(val) === 0) return true // skip empty object
       d(`Replacing $${name} with ${val}`)
