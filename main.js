@@ -254,35 +254,6 @@ function loadClientListeners (client) {
     global.events.fire('action', { username: userstate.username.toLowerCase() })
   })
 
-  global.client.on('join', async function (channel, username, fromSelf) {
-    DEBUG_TMIJS('User joined: %s (isBot: %s)', username, fromSelf)
-
-    let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
-    if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
-
-    const user = await global.db.engine.findOne('users.online', { username: username })
-    if (!fromSelf && _.isEmpty(user)) {
-      await global.db.engine.insert('users.online', { username: username })
-      global.api.isFollower(username)
-      global.widgets.joinpart.send({ username: username, type: 'join' })
-      global.events.fire('user-joined-channel', { username: username })
-    }
-  })
-
-  global.client.on('part', async function (channel, username, fromSelf) {
-    DEBUG_TMIJS('User parted: %s (isBot: %s)', username, fromSelf)
-
-    let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
-    if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
-
-    const user = await global.db.engine.findOne('users.online', { username: username })
-    if (!fromSelf && !_.isEmpty(user)) {
-      await global.db.engine.remove('users.online', { username: username })
-      global.widgets.joinpart.send({ username: username, type: 'part' })
-      global.events.fire('user-parted-channel', { username: username })
-    }
-  })
-
   global.client.on('ban', function (channel, username, reason) {
     DEBUG_TMIJS('User ban: %s with reason %s', username, reason)
     global.log.ban(`${username}, reason: ${reason}`)
