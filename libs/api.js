@@ -157,16 +157,21 @@ class API {
     let ignoredUsers = (await global.db.engine.find('users_ignorelist')).map((o) => o.username)
 
     for (let user of allOnlineUsers) {
-      if (!_.includes(chatters, user) && !_.includes(ignoredUsers, user)) {
-        bulkParted.push({ username: user })
+      if (!_.includes(chatters, user)) {
         // user is no longer in channel
         await global.db.engine.remove('users.online', { username: user })
-        global.widgets.joinpart.send({ username: user, type: 'part' })
+        if (!_.includes(ignoredUsers, user)) {
+          bulkParted.push({ username: user })
+          global.widgets.joinpart.send({ username: user, type: 'part' })
+        }
       }
     }
 
     for (let chatter of chatters) {
-      if (!_.includes(allOnlineUsers, chatter) && !_.includes(ignoredUsers, chatter)) {
+      if (_.includes(ignoredUsers, chatter)) {
+        // even if online, remove ignored user from collection
+        await global.db.engine.remove('users.online', { username: chatter })
+      } else if (!_.includes(allOnlineUsers, chatter)) {
         bulkInsert.push({ username: chatter })
         global.widgets.joinpart.send({ username: chatter, type: 'join' })
       }
