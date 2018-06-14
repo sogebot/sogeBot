@@ -334,7 +334,7 @@ class Raffles {
     }
 
     if (participantUser.eligible) {
-      if (raffle.type === TYPE_TICKETS) await global.db.engine.insert('users', { username: sender.username, points: parseInt(tickets, 10) * -1 })
+      if (raffle.type === TYPE_TICKETS) await global.db.engine.insert('users.points', { username: sender.username, points: parseInt(tickets, 10) * -1 })
       await global.db.engine.update('raffle_participants', { raffle_id: raffle._id.toString(), username: sender.username }, participantUser)
       self.refresh()
     }
