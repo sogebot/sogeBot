@@ -2,6 +2,9 @@
 * [Install and upgrade](install-and-upgrade.md)
 * [FAQ](faq.md)
 * Configuration
+  * [Timezone](configuration/timezone.md)
+  * [CPU](configuration/cpu.md)
+  * [Panel](configuration/panel.md)
   * [Database](configuration/database.md)
   * [ClientId](configuration/clientid.md)
 * Commands
