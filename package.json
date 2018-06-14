@@ -74,7 +74,6 @@
     "build:zip": "cross-var bestzip sogeBot-$npm_package_version.zip npm-shrinkwrap.json config.example.json libs/ locales/ main.js cluster.js public/ LICENSE package.json README.md AUTHORS tools/ bin/ bat/ scss/ dist/",
     "compile:css:light": "node-sass --output-style expanded --precision 6 scss/themes/light.scss public/dist/css/light.css",
     "compile:css:dark": "node-sass --output-style expanded --precision 6 scss/themes/dark.scss public/dist/css/dark.css",
-    "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
     "standard": "standard main.js && standard test/* && standard libs/* && standard libs/systems/* && standard libs/overlays/* && standard libs/widgets/*",
     "test": "mocha --recursive --timeout 20000 --exit",
     "test:config:mongodb": "cp config.example.json config.json && sed -i -- 's/nedb/mongodb/g' config.json",
@@ -88,15 +87,10 @@
     "cleanup:shrinkwrap": "rimraf npm-shrinkwrap.json",
     "copy:dist": "node tools/copy-dist-files.js"
   },
-  "pre-commit": [
-    "precommit-msg",
-    "standard"
-  ],
   "devDependencies": {
     "chai": "4.1.2",
     "locate-path": "2.0.0",
     "mocha": "5.2.0",
-    "pre-commit": "1.2.2",
     "sinon": "6.0.0",
     "standard": "11.0.1",
     "test-until": "1.1.1"
