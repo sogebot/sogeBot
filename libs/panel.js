@@ -124,17 +124,20 @@ function Panel () {
 
     // twitch game and title change
     socket.on('getGameFromTwitch', function (game) { global.api.sendGameFromTwitch(global.api, socket, game) })
-    socket.on('getUserTwitchGames', async () => { socket.emit('sendUserTwitchGamesAndTitles', await global.cache.gamesTitles()) })
+    socket.on('getUserTwitchGames', async () => { socket.emit('sendUserTwitchGamesAndTitles', await global.db.engine.find('cache.titles')) })
     socket.on('deleteUserTwitchGame', async (game) => {
-      let gamesTitles = await global.cache.gamesTitles(); delete gamesTitles[game]
-      socket.emit('sendUserTwitchGamesAndTitles', await global.cache.gamesTitles(gamesTitles))
+      let items = await global.db.engine.find('cache.titles', { game })
+      for (let item of items) {
+        await global.db.engine.remove('cache.titles', { _id: String(item._id) })
+      }
+      socket.emit('sendUserTwitchGamesAndTitles', await global.db.engine.find('cache.titles'))
     })
     socket.on('deleteUserTwitchTitle', async (data) => {
-      let gamesTitles = await global.cache.gamesTitles()
-      _.remove(gamesTitles[data.game], function (aTitle) {
-        return aTitle === data.title
-      })
-      socket.emit('sendUserTwitchGamesAndTitles', await global.cache.gamesTitles(gamesTitles))
+      let items = await global.db.engine.find('cache.titles', { game: data.game })
+      for (let item of items) {
+        if (item.title === data.title) await global.db.engine.remove('cache.titles', { _id: String(item._id) })
+      }
+      socket.emit('sendUserTwitchGamesAndTitles', await global.db.engine.find('cache.titles'))
     })
     socket.on('editUserTwitchTitle', async (data) => {
       data.new = data.new.trim()
@@ -144,13 +147,12 @@ function Panel () {
         return
       }
 
-      let gamesTitles = await global.cache.gamesTitles()
-      if (_.isEmpty(_.find(gamesTitles[data.game], (v) => v.trim() === data.title.trim()))) {
-        gamesTitles[data.game].push(data.new) // also, we need to add game and title to cached property
+      let item = await global.db.engine.findOne('cache.titles', { game: data.game, title: data.title.trim() })
+      if (_.isEmpty(item)) {
+        await global.db.engine.insert('cache.titles', { game: data.game, title: data.new })
       } else {
-        gamesTitles[data.game][gamesTitles[data.game].indexOf(data.title)] = data.new
+        await global.db.engine.update('cache.titles', { _id: String(item._id) }, { game: data.game, title: data.new })
       }
-      await global.cache.gamesTitles(gamesTitles)
     })
     socket.on('updateGameAndTitle', async (data) => {
       global.api.setTitleAndGame(global.api, null, data)
@@ -158,16 +160,11 @@ function Panel () {
       data.title = data.title.trim()
       data.game = data.game.trim()
 
-      let gamesTitles = await global.cache.gamesTitles()
-
-      // create game if not in cache
-      if (_.isNil(gamesTitles[data.game])) gamesTitles[data.game] = []
-
-      if (_.isEmpty(_.find(gamesTitles[data.game], (v) => v.trim() === data.title))) {
-        gamesTitles[data.game].push(data.title) // also, we need to add game and title to cached property
+      let item = await global.db.engine.findOne('cache.titles', { game: data.game, title: data.title.trim() })
+      if (_.isEmpty(item)) {
+        await global.db.engine.insert('cache.titles', { game: data.game, title: data.title })
       }
 
-      await global.cache.gamesTitles(gamesTitles)
       self.sendStreamData(self, global.panel.io) // force dashboard update
     })
     socket.on('joinBot', () => { global.client.join('#' + config.settings.broadcaster_username) })
