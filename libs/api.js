@@ -19,6 +19,7 @@ const DEBUG_API_SET_TITLE_AND_GAME = debug('api:setTitleAndGame')
 const DEBUG_API_IS_FOLLOWER_UPDATE = debug('api:isFollowerUpdate')
 const DEBUG_API_CREATE_CLIP = debug('api:createClip')
 const DEBUG_API_CHECK_CLIPS = debug('api:checkClips')
+const DEBUG_API_OAUTH_VALIDATION = debug('api:oauthValidation')
 
 class API {
   constructor () {
@@ -40,6 +41,10 @@ class API {
       }
 
       this._loadCachedStatusAndGame()
+
+      this.oauthValidation('bot')
+      this.oauthValidation('broadcaster')
+
       this.getChannelID()
       this.getCurrentStreamData({ interval: true })
       this.getLatest100Followers(true)
@@ -54,6 +59,28 @@ class API {
       this.intervalFollowerUpdate()
       this.checkClips()
     }
+  }
+
+  async oauthValidation (type) {
+    let request
+    const url = `https://id.twitch.tv/oauth2/validate`
+    let timeout = 1000 * 60 * 30 // every 30 minutes
+
+    DEBUG_API_OAUTH_VALIDATION(`Validating ${type} oauth`)
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'OAuth ' + (type === 'bot' ? config.settings.bot_oauth.split(':')[1] : config.settings.broadcaster_oauth.split(':')[1])
+        }
+      })
+      global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
+      global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: `oauthValidation-${type}`, api: 'kraken', endpoint: url, code: request.status })
+    } catch (e) {
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: `oauthValidation-${type}`, api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
+      global.log.error(`Something went wrong with your ${type} oauth`)
+    }
+
+    new Timeout().recursive({ this: this, uid: `oauthValidation-${type}`, wait: timeout, fnc: this.oauthValidation, args: [type] })
   }
 
   async intervalFollowerUpdate () {
@@ -415,7 +442,6 @@ class API {
     this.remainingAPICalls = request.headers['ratelimit-remaining']
     this.refreshAPICalls = request.headers['ratelimit-reset']
 
-    global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
     if (request.status === 200 && !_.isNil(request.data.data)) {
       // check if user id is in db, not in db load username from API
       let fTime = []
@@ -561,7 +587,6 @@ class API {
     this.refreshAPICalls = request.headers['ratelimit-reset']
 
     DEBUG_API_GET_CURRENT_STREAM_DATA(request.data)
-    global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
 
     let justStarted = false
     if (request.status === 200 && !_.isNil(request.data.data[0])) {
@@ -746,7 +771,6 @@ class API {
     }
     DEBUG_API_SET_TITLE_AND_GAME(request.data)
 
-    global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
     if (request.status === 200 && !_.isNil(request.data)) {
       const response = request.data
       if (!_.isNil(args.game)) {
