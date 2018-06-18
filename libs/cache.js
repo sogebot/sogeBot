@@ -81,26 +81,6 @@ class Cache {
       return _.get(cache, 'value', false)
     }
   }
-
-  async gamesTitles (data) {
-    if (data) {
-      // setter
-      // re-save full object - NeDB issue with $set on object workaround - NeDB is not deleting missing keys
-      await global.db.engine.remove('cache.titles', {})
-      for (let [game, titles] of Object.entries(data)) {
-        for (let title of titles) await global.db.engine.insert('cache.titles', { game, title })
-      }
-      return data
-    } else {
-      // getter
-      let titles = {}
-      for (let object of await global.db.engine.find('cache.titles')) {
-        if (_.isNil(titles[object.game])) titles[object.game] = []
-        titles[object.game].push(object.title)
-      }
-      return titles
-    }
-  }
 }
 
 module.exports = Cache

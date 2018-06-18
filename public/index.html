@@ -881,6 +881,7 @@
       },
 
       update: function (data, curGame = null) {
+        if (_.isArray(data)) data = _.groupBy(data, 'game') // remap array to object if needed
         this.cachedData = data
         curGame = _.isNull(curGame) ? $('#game').text() : curGame
 
@@ -958,7 +959,6 @@
         var row = $('<div>').addClass('row')
 
         if (_.isNil(this.cachedData[this.selectedGame])) this.cachedData[this.selectedGame] = []
-
         if (curTitle !== translations['not-available'] && curTitle !== '') {
           this.selectedTitle = curTitle
           let col = $('<div>').addClass('col-12')
@@ -1003,7 +1003,7 @@
           let inputGroupText = $('<span>').addClass('input-group-text')
           let inputGroupTextRight = $('<span>').addClass('input-group-text')
           let radio = $('<input>').attr('type', 'radio').attr('name', 'title')
-            .data('title', item)
+            .data('title', item.title)
             .data('game', this.selectedGame)
             .on('click', (ev) => {
               // remove checks on all radios
@@ -1015,7 +1015,7 @@
             })
           let inputGroupAppendRight = $('<span>')
             .addClass('input-group-append')
-            .data('title', item)
+            .data('title', item.title)
             .data('game', this.selectedGame)
             .on('click', (ev) => {
               console.group('Title delete event')
@@ -1031,8 +1031,8 @@
           let input = $('<input>')
             .attr('type', 'text')
             .addClass("form-control")
-            .val(item)
-            .data('title', item)
+            .val(item.title)
+            .data('title', item.title)
             .data('game', this.selectedGame)
             .on('click', (ev) => {
               // remove checks on all radios
