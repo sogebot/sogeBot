@@ -21,7 +21,9 @@ Configuration.prototype.commands = function () {
   return [
     { this: this, command: '!set list', fnc: this.listSets, permission: constants.OWNER_ONLY },
     { this: this, command: '!set', fnc: this.setValue, permission: constants.OWNER_ONLY },
-    { this: this, command: '!_debug', fnc: this.debug, permission: constants.OWNER_ONLY }
+    { this: this, command: '!_debug', fnc: this.debug, permission: constants.OWNER_ONLY },
+    { this: this, command: '!enable', fnc: this.enable, permission: constants.OWNER_ONLY },
+    { this: this, command: '!disable', fnc: this.disable, permission: constants.OWNER_ONLY }
   ]
 }
 
@@ -122,6 +124,36 @@ Configuration.prototype.getValue = async function (cfgName) {
     global.log.error(`Error when loading ${cfgName} value`)
     global.log.error(e.stack)
     return null
+  }
+}
+
+Configuration.prototype.enable = async function (self, sender, message) {
+  if (message.trim().length === 0) return
+  try {
+    let [type, name] = message.split(' ')
+
+    if (type === 'system') type = 'systems'
+    else throw new Error('Not supported')
+
+    if (_.isNil(global[type][name])) throw new Error(`Not found - ${type} - ${name}`)
+
+    global[type][name].status(true)
+  } catch (e) {
+    global.log.error(e.message)
+  }
+}
+Configuration.prototype.disable = async function (self, sender, message) {
+  if (message.trim().length === 0) return
+  try {
+    let [type, name] = message.split(' ')
+
+    if (type === 'system') type = 'systems'
+    else throw new Error('Not supported')
+
+    if (_.isNil(global[type][name])) throw new Error(`Not found - ${type} - ${name}`)
+    global[type][name].status(false)
+  } catch (e) {
+    global.log.error(e.message)
   }
 }
 
