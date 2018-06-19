@@ -66,7 +66,6 @@
     socket.emit('getConfiguration')
     socket.on('configuration', function (data) {
       moment.locale(data.lang) // set moment locale
-      console.log(data.theme)
       /* THEME */
       if (data.theme === 'dark') {
         $('head').append('<link rel="stylesheet" href="../dist/css/dark.css">')
