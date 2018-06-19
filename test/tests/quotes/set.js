@@ -11,20 +11,20 @@ const message = require('../../general.js').message
 const owner = { username: 'soge__' }
 
 const tests = [
-  {sender: owner, command: { after: '' }, shouldFail: true},
-  {sender: owner, command: { after: '-id' }, shouldFail: true},
-  {sender: owner, command: { after: '-id a' }, shouldFail: true},
-  {sender: owner, command: { after: '-id 1 -tag' }, shouldFail: true},
+  {sender: owner, parameters: '', shouldFail: true},
+  {sender: owner, parameters: '-id', shouldFail: true},
+  {sender: owner, parameters: '-id a', shouldFail: true},
+  {sender: owner, parameters: '-id 1 -tag', shouldFail: true},
 
-  {sender: owner, command: { after: '-id 1 -tag ipsum, dolor' }, id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true},
-  {sender: owner, command: { after: '-tag ipsum, dolor -id 1' }, id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true},
-  {sender: owner, command: { after: '-id 2 -tag ipsum, dolor' }, id: 2, tags: 'ipsum, dolor', shouldFail: false, exist: false},
-  {sender: owner, command: { after: '-tag ipsum, dolor -id 2' }, id: 2, tags: 'ipsum, dolor', shouldFail: false, exist: false}
+  {sender: owner, parameters: '-id 1 -tag ipsum, dolor', id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true},
+  {sender: owner, parameters: '-tag ipsum, dolor -id 1', id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true},
+  {sender: owner, parameters: '-id 2 -tag ipsum, dolor', id: 2, tags: 'ipsum, dolor', shouldFail: false, exist: false},
+  {sender: owner, parameters: '-tag ipsum, dolor -id 2', id: 2, tags: 'ipsum, dolor', shouldFail: false, exist: false}
 ]
 
 describe('Quotes - set()', () => {
   for (let test of tests) {
-    describe(test.command.after, async () => {
+    describe(test.parameters, async () => {
       before(async () => {
         await db.cleanup()
         await message.prepare()
@@ -32,7 +32,7 @@ describe('Quotes - set()', () => {
       })
 
       it('Run !quote set', async () => {
-        global.systems.quotes.set({sender: test.sender, command: { after: test.command.after }})
+        global.systems.quotes.set({ sender: test.sender, parameters: test.parameters })
       })
       if (test.shouldFail) {
         it('Should throw error', async () => {

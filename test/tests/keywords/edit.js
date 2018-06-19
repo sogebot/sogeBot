@@ -16,33 +16,33 @@ describe('Keywords - edit()', () => {
   })
 
   it('', async () => {
-    global.systems.keywords.edit(global.systems.keywords, owner, '')
+    global.systems.keywords.edit({ sender: owner, parameters: '' })
     await message.isSent('keywords.keyword-parse-failed', owner, { sender: owner.username })
   })
 
   it('!a', async () => {
-    global.systems.keywords.edit(global.systems.keywords, owner, '!a')
+    global.systems.keywords.edit({ sender: owner, parameters: '!a' })
     await message.isSent('keywords.keyword-parse-failed', owner, { sender: owner.username })
   })
 
   it('!unknown Lorem Ipsum', async () => {
-    global.systems.keywords.edit(global.systems.keywords, owner, '!unknown Lorem Ipsum')
+    global.systems.keywords.edit({ sender: owner, parameters: '!unknown Lorem Ipsum' })
     await message.isSent('keywords.keyword-was-not-found', owner, { keyword: '!unknown', sender: owner.username })
   })
 
   it('unknown Lorem Ipsum', async () => {
-    global.systems.keywords.edit(global.systems.keywords, owner, 'unknown Lorem Ipsum')
+    global.systems.keywords.edit({ sender: owner, parameters: 'unknown Lorem Ipsum' })
     await message.isSent('keywords.keyword-was-not-found', owner, { keyword: 'unknown', sender: owner.username })
   })
 
   it('!a Lorem Ipsum -> !a Ipsum Lorem', async () => {
-    global.systems.keywords.add(global.systems.keywords, owner, 'a Lorem Ipsum')
+    global.systems.keywords.add({ sender: owner, parameters: 'a Lorem Ipsum' })
     await message.isSent('keywords.keyword-was-added', owner, { keyword: 'a', response: 'Lorem Ipsum', sender: owner.username })
 
     global.systems.keywords.run(global.systems.keywords, owner, 'a')
     await message.isSentRaw('Lorem Ipsum', owner)
 
-    global.systems.keywords.edit(global.systems.keywords, owner, 'a Ipsum Lorem')
+    global.systems.keywords.edit({ sender: owner, parameters: 'a Ipsum Lorem' })
     await message.isSent('keywords.keyword-was-edited', owner, { keyword: 'a', response: 'Ipsum Lorem', sender: owner.username })
 
     global.systems.keywords.run(global.systems.keywords, owner, 'a')

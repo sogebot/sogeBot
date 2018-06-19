@@ -60,16 +60,16 @@ class Songs {
     return !global.commons.isSystemEnabled('songs')
       ? []
       : [
-        {this: this, command: '!songrequest', fnc: this.addSongToQueue, permission: constants.VIEWERS},
-        {this: this, command: '!wrongsong', fnc: this.removeSongFromQueue, permission: constants.VIEWERS},
-        {this: this, command: '!currentsong', fnc: this.getCurrentSong, permission: constants.VIEWERS},
-        {this: this, command: '!skipsong', fnc: this.sendNextSongID, permission: constants.OWNER_ONLY},
-        {this: this, command: '!bansong', fnc: this.banSong, permission: constants.OWNER_ONLY},
-        {this: this, command: '!unbansong', fnc: this.unbanSong, permission: constants.OWNER_ONLY},
-        {this: this, command: '!playlist add', fnc: this.addSongToPlaylist, permission: constants.OWNER_ONLY},
-        {this: this, command: '!playlist remove', fnc: this.removeSongFromPlaylist, permission: constants.OWNER_ONLY},
-        {this: this, command: '!playlist steal', fnc: this.stealSong, permission: constants.OWNER_ONLY},
-        {this: this, command: '!playlist', fnc: this.help, permission: constants.OWNER_ONLY}
+        {this: this, id: '!songrequest', command: '!songrequest', fnc: this.addSongToQueue, permission: constants.VIEWERS},
+        {this: this, id: '!wrongsong', command: '!wrongsong', fnc: this.removeSongFromQueue, permission: constants.VIEWERS},
+        {this: this, id: '!currentsong', command: '!currentsong', fnc: this.getCurrentSong, permission: constants.VIEWERS},
+        {this: this, id: '!skipsong', command: '!skipsong', fnc: this.sendNextSongID, permission: constants.OWNER_ONLY},
+        {this: this, id: '!bansong', command: '!bansong', fnc: this.banSong, permission: constants.OWNER_ONLY},
+        {this: this, id: '!unbansong', command: '!unbansong', fnc: this.unbanSong, permission: constants.OWNER_ONLY},
+        {this: this, id: '!playlist add', command: '!playlist add', fnc: this.addSongToPlaylist, permission: constants.OWNER_ONLY},
+        {this: this, id: '!playlist remove', command: '!playlist remove', fnc: this.removeSongFromPlaylist, permission: constants.OWNER_ONLY},
+        {this: this, id: '!playlist steal', command: '!playlist steal', fnc: this.stealSong, permission: constants.OWNER_ONLY},
+        {this: this, id: '!playlist', command: '!playlist', fnc: this.help, permission: constants.OWNER_ONLY}
       ]
   }
 
@@ -149,55 +149,54 @@ class Songs {
     socket.emit('bannedSongsList', _.orderBy(bannedSongs, ['title'], ['asc']))
   }
 
-  banSong (self, sender, text) {
-    text.trim().length === 0 ? self.banCurrentSong(self, sender) : self.banSongById(self, sender, text.trim())
+  banSong (opts) {
+    opts.parameters.trim().length === 0 ? this.banCurrentSong(opts) : this.banSongById(opts)
   }
 
-  async banCurrentSong (self, sender) {
-    let currentSong = await self.currentSong
+  async banCurrentSong (opts) {
+    let currentSong = await this.currentSong
     if (_.isNil(currentSong.videoID)) return
 
     let update = await global.db.engine.update('bannedsong', { videoId: currentSong.videoID }, { videoId: currentSong.videoID, title: currentSong.title })
     if (update.length > 0) {
       let message = await global.commons.prepare('songs.song-was-banned', { name: currentSong.title })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
 
       await Promise.all([global.db.engine.remove('playlist', { videoID: currentSong.videoID }), global.db.engine.remove('songrequest', { videoID: currentSong.videoID })])
 
       global.commons.timeout(currentSong.username, global.translate('songs.song-was-banned-timeout-message'), 300)
-      self.getMeanLoudness(self)
+      this.getMeanLoudness(this)
 
-      self.sendNextSongID(self)
-      self.send(self)
+      this.sendNextSongID(this)
+      this.send(this)
     }
   }
 
-  async banSongById (self, sender, text) {
-    text = text.trim()
-    ytdl.getInfo('https://www.youtube.com/watch?v=' + text, async function (err, videoInfo) {
+  async banSongById (opts) {
+    ytdl.getInfo('https://www.youtube.com/watch?v=' + opts.parameters, async function (err, videoInfo) {
       if (err) global.log.error(err, { fnc: 'Songs.prototype.banSongById#1' })
       if (_.isNil(videoInfo.title)) return
 
-      let updated = await global.db.engine.update('bannedsong', { videoId: text }, { videoId: text, title: videoInfo.title })
+      let updated = await global.db.engine.update('bannedsong', { videoId: opts.parameters }, { videoId: opts.parameters, title: videoInfo.title })
       if (updated.length > 0) {
-        global.commons.sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, videoInfo.title), sender)
+        global.commons.sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, videoInfo.title), opts.sender)
 
-        await Promise.all([global.db.engine.remove('playlist', { videoID: text }), global.db.engine.remove('songrequest', { videoID: text })])
+        await Promise.all([global.db.engine.remove('playlist', { videoID: opts.parameters }), global.db.engine.remove('songrequest', { videoID: opts.parameters })])
 
-        const currentSong = await self.currentSong
+        const currentSong = await this.currentSong
         global.commons.timeout(currentSong.username, global.translate('songs.bannedSongTimeout'), 300)
 
-        self.getMeanLoudness(self)
-        self.sendNextSongID(self)
-        self.send(self)
+        this.getMeanLoudness(this)
+        this.sendNextSongID(this)
+        this.send(this)
       }
     })
   }
 
-  async unbanSong (self, sender, text) {
-    let removed = await global.db.engine.remove('bannedsong', { videoId: text.trim() })
-    if (removed > 0) global.commons.sendMessage(global.translate('songs.song-was-unbanned'), sender)
-    else global.commons.sendMessage(global.translate('songs.song-was-not-banned'), sender)
+  async unbanSong (opts) {
+    let removed = await global.db.engine.remove('bannedsong', { videoId: opts.parameters })
+    if (removed > 0) global.commons.sendMessage(global.translate('songs.song-was-unbanned'), opts.sender)
+    else global.commons.sendMessage(global.translate('songs.song-was-not-banned'), opts.sender)
   }
 
   async sendNextSongID (self, socket) {
@@ -298,25 +297,26 @@ class Songs {
     global.commons.sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', {username: config.settings.broadcaster_username})
   }
 
-  async addSongToQueue (self, sender, text) {
-    if (text.length < 1 || !await global.configuration.getValue('songs_songrequest')) {
+  async addSongToQueue (opts) {
+    if (opts.parameters.length < 1 || !await global.configuration.getValue('songs_songrequest')) {
       if (await global.configuration.getValue('songs_songrequest')) {
-        global.commons.sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', sender)
+        global.commons.sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', opts.sender)
       } else {
-        global.commons.sendMessage('$sender, ' + global.translate('core.settings.songs.songrequest.false'), sender)
+        global.commons.sendMessage('$sender, ' + global.translate('core.settings.songs.songrequest.false'), opts.sender)
       }
       return
     }
 
     const urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/
     const idRegex = /^[a-zA-Z0-9-_]{11}$/
-    var match = text.trim().match(urlRegex)
-    var videoID = (match && match[1].length === 11) ? match[1] : text.trim()
+    var match = opts.parameters.match(urlRegex)
+    var videoID = (match && match[1].length === 11) ? match[1] : opts.parameters
 
     if (_.isNil(videoID.match(idRegex))) { // not id or url
-      ytsearch(text.trim(), { maxResults: 1, key: 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0' }, function (err, results) {
+      ytsearch(opts.parameters, { maxResults: 1, key: 'AIzaSyDYevtuLOxbyqBjh17JNZNvSQO854sngK0' }, (err, results) => {
         if (err) return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#3' })
-        self.addSongToQueue(self, sender, results[0].id)
+        opts.parameters = results[0].id
+        this.addSongToQueue(opts)
       })
       return
     }
@@ -324,46 +324,46 @@ class Songs {
     // is song banned?
     let ban = await global.db.engine.findOne('songbanned', { videoID: videoID })
     if (!_.isEmpty(ban)) {
-      global.commons.sendMessage(global.translate('songs.song-is-banned'), sender)
+      global.commons.sendMessage(global.translate('songs.song-is-banned'), opts.sender)
       return
     }
 
     ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async function (err, videoInfo) {
       if (err) return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' })
       if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
-        global.commons.sendMessage(global.translate('songs.song-was-not-found'), sender)
-      } else if (videoInfo.length_seconds / 60 > await global.configuration.getValue('songs_duration')) global.commons.sendMessage(global.translate('songs.tooLong'), sender)
+        global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
+      } else if (videoInfo.length_seconds / 60 > await global.configuration.getValue('songs_duration')) global.commons.sendMessage(global.translate('songs.tooLong'), opts.sender)
       else {
-        global.db.engine.update('songrequests', { addedAt: new Date().getTime() }, { videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: sender.username })
+        global.db.engine.update('songrequests', { addedAt: new Date().getTime() }, { videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: opts.sender.username })
         let message = await global.commons.prepare('songs.song-was-added-to-queue', { name: videoInfo.title })
-        debug(message); global.commons.sendMessage(message, sender)
-        self.getMeanLoudness(self)
+        debug(message); global.commons.sendMessage(message, opts.sender)
+        this.getMeanLoudness(this)
       }
     })
   }
 
-  async removeSongFromQueue (self, sender, text) {
-    let sr = await global.db.engine.find('songrequests', { username: sender.username })
+  async removeSongFromQueue (opts) {
+    let sr = await global.db.engine.find('songrequests', { username: opts.sender.username })
     sr = _.head(_.orderBy(sr, ['addedAt'], ['desc']))
     if (!_.isNil(sr)) {
-      await global.db.engine.remove('songrequests', { username: sender.username, _id: sr._id.toString() })
+      await global.db.engine.remove('songrequests', { username: opts.sender.username, _id: sr._id.toString() })
       let m = await global.commons.prepare('songs.song-was-removed-from-queue', { name: sr.title })
-      debug(m); global.commons.sendMessage(m, sender)
-      self.getMeanLoudness(self)
+      debug(m); global.commons.sendMessage(m, opts.sender)
+      this.getMeanLoudness(this)
     }
   }
 
-  async addSongToPlaylist (self, sender, text) {
-    if (_.isNil(text)) return
+  async addSongToPlaylist (opts) {
+    if (_.isNil(opts.parameters)) return
 
     var urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/
-    var match = text.trim().match(urlRegex)
-    var videoID = (match && match[1].length === 11) ? match[1] : text.trim()
+    var match = opts.parameters.match(urlRegex)
+    var videoID = (match && match[1].length === 11) ? match[1] : opts.parameters
 
     // is song banned?
     let ban = await global.db.engine.findOne('songbanned', { videoID: videoID })
     if (!_.isEmpty(ban)) {
-      global.commons.sendMessage(global.translate('songs.isBanned'), sender)
+      global.commons.sendMessage(global.translate('songs.isBanned'), opts.sender)
       return
     }
 
@@ -371,41 +371,41 @@ class Songs {
     let playlist = await global.db.engine.findOne('playlist', { videoID: videoID })
     if (!_.isEmpty(playlist)) {
       let message = await global.commons.prepare('songs.song-is-already-in-playlist', { name: playlist.title })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return
     }
 
     ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async function (err, videoInfo) {
       if (err) global.log.error(err, { fnc: 'Songs.prototype.addSongToPlaylist#1' })
       if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
-        global.commons.sendMessage(global.translate('songs.song-was-not-found'), sender)
+        global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
         return
       }
       global.db.engine.update('playlist', { videoID: videoID }, {videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1})
       let message = await global.commons.prepare('songs.song-was-added-to-playlist', { name: videoInfo.title })
-      debug(message); global.commons.sendMessage(message, sender)
-      self.send(self, global.panel.io)
-      self.getMeanLoudness(self)
+      debug(message); global.commons.sendMessage(message, opts.sender)
+      this.send(this, global.panel.io)
+      this.getMeanLoudness(this)
     })
   }
 
-  removeSongFromPlaylist (self, sender, text) {
-    if (text.length < 1) return
-    var videoID = text.trim()
+  removeSongFromPlaylist (opts) {
+    if (opts.parameters.length < 1) return
+    var videoID = opts.parameters
 
     ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async function (err, videoInfo) {
       if (err) global.log.error(err, { fnc: 'Songs.prototype.removeSongFromPlaylist#1' })
       if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
-        global.commons.sendMessage(global.translate('songs.song-was-not-found'), sender)
+        global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
         return
       }
 
       let removed = await global.db.engine.remove('playlist', { videoID: videoID })
       if (removed > 0) {
         let message = await global.commons.prepare('songs.song-was-removed-from-playlist', { name: videoInfo.title })
-        debug(message); global.commons.sendMessage(message, sender)
-        self.getMeanLoudness(self)
-        self.send(self, global.panel.io)
+        debug(message); global.commons.sendMessage(message, opts.sender)
+        this.getMeanLoudness(this)
+        this.send(this, global.panel.io)
       }
     })
   }

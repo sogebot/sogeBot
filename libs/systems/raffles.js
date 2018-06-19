@@ -56,11 +56,10 @@ class Raffles {
     return !global.commons.isSystemEnabled('raffles')
       ? []
       : [
-        {this: this, command: '!raffle pick', fnc: this.pick, permission: constants.OWNER_ONLY},
-        {this: this, command: '!raffle close', fnc: this.close, permission: constants.OWNER_ONLY},
-        {this: this, command: '!raffle remove', fnc: this.remove, permission: constants.OWNER_ONLY},
-        {this: this, command: '!raffle open', fnc: this.open, permission: constants.OWNER_ONLY},
-        {this: this, command: '!raffle', fnc: this.info, permission: constants.VIEWERS}
+        {this: this, id: '!raffle pick', command: '!raffle pick', fnc: this.pick, permission: constants.OWNER_ONLY},
+        {this: this, id: '!raffle remove', command: '!raffle remove', fnc: this.remove, permission: constants.OWNER_ONLY},
+        {this: this, id: '!raffle open', command: '!raffle open', fnc: this.open, permission: constants.OWNER_ONLY},
+        {this: this, id: '!raffle', command: '!raffle', fnc: this.info, permission: constants.VIEWERS}
       ]
   }
 
@@ -183,9 +182,9 @@ class Raffles {
     self.refresh()
   }
 
-  async open (self, sender, text, dashboard = false) {
-    let [followers, subscribers] = [text.indexOf('followers') >= 0, text.indexOf('subscribers') >= 0]
-    let type = (text.indexOf('-min') >= 0 || text.indexOf('-max') >= 0) ? TYPE_TICKETS : TYPE_NORMAL
+  async open (opts) {
+    let [followers, subscribers] = [opts.parameters.indexOf('followers') >= 0, opts.parameters.indexOf('subscribers') >= 0]
+    let type = (opts.parameters.indexOf('-min') >= 0 || opts.parameters.indexOf('-max') >= 0) ? TYPE_TICKETS : TYPE_NORMAL
     if (!global.commons.isSystemEnabled('points')) type = TYPE_NORMAL // force normal type if points are disabled
 
     let minTickets = 0
@@ -193,17 +192,17 @@ class Raffles {
 
     if (type === TYPE_TICKETS) {
       let match
-      match = text.match(/-min (\d+)/)
+      match = opts.parameters.match(/-min (\d+)/)
       if (!_.isNil(match)) minTickets = match[1]
 
-      match = text.match(/-max (\d+)/)
+      match = opts.parameters.match(/-max (\d+)/)
       if (!_.isNil(match)) maxTickets = match[1]
     }
 
-    let keyword = text.match(/(![\S]+)/)
+    let keyword = opts.parameters.match(/(![\S]+)/)
     if (_.isNil(keyword)) {
       let message = await global.commons.prepare('raffles.cannot-create-raffle-without-keyword')
-      debug(message); global.commons.sendMessage(message)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return
     }
     keyword = keyword[1]
@@ -212,7 +211,7 @@ class Raffles {
     let raffle = await global.db.engine.findOne('raffles', { winner: null })
     if (!_.isEmpty(raffle)) {
       let message = await global.commons.prepare('raffles.raffle-is-already-running', { keyword: raffle.keyword })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return
     }
 
@@ -240,16 +239,16 @@ class Raffles {
     })
     debug(message); global.commons.sendMessage(message, global.commons.getOwner())
 
-    self.refresh()
-    self.lastAnnounce = _.now()
+    this.refresh()
+    this.lastAnnounce = _.now()
   }
 
-  async info (self, sender) {
+  async info (opts) {
     let raffle = await global.db.engine.findOne('raffles', { winner: null })
 
     if (_.isEmpty(raffle)) {
       let message = await global.commons.prepare('raffles.no-raffle-is-currently-running')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return
     }
 
@@ -341,7 +340,7 @@ class Raffles {
     return true
   }
 
-  async pick (self, sender) {
+  async pick (opts) {
     let raffles = await global.db.engine.find('raffles')
     if (_.size(raffles) === 0) return true // no raffle ever
 
@@ -390,7 +389,7 @@ class Raffles {
     })
     debug(message); global.commons.sendMessage(message, global.commons.getOwner())
 
-    self.refresh()
+    this.refresh()
   }
 
   async eligibility (self, socket, data) {

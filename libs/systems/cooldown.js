@@ -36,10 +36,10 @@ class Cooldown {
     return !global.commons.isSystemEnabled('cooldown')
       ? []
       : [
-        {this: this, command: '!cooldown toggle moderators', fnc: this.toggleModerators, permission: constants.OWNER_ONLY},
-        {this: this, command: '!cooldown toggle owners', fnc: this.toggleOwners, permission: constants.OWNER_ONLY},
-        {this: this, command: '!cooldown toggle enabled', fnc: this.toggleEnabled, permission: constants.OWNER_ONLY},
-        {this: this, command: '!cooldown', fnc: this.set, permission: constants.OWNER_ONLY}
+        {this: this, id: '!cooldown toggle moderators', command: '!cooldown toggle moderators', fnc: this.toggleModerators, permission: constants.OWNER_ONLY},
+        {this: this, id: '!cooldown toggle owners', command: '!cooldown toggle owners', fnc: this.toggleOwners, permission: constants.OWNER_ONLY},
+        {this: this, id: '!cooldown toggle enabled', command: '!cooldown toggle enabled', fnc: this.toggleEnabled, permission: constants.OWNER_ONLY},
+        {this: this, id: '!cooldown', command: '!cooldown', fnc: this.set, permission: constants.OWNER_ONLY}
       ]
   }
 
@@ -56,25 +56,25 @@ class Cooldown {
   }
 
   async editName (self, socket, data) {
-    if (data.value.length === 0) await self.set(self, null, `${data.id} ${data.type} 0`)
+    if (data.value.length === 0) await this.set({ sender: null, command: { after: `${data.id} ${data.type} 0` } })
     else {
       await global.db.engine.update('cooldowns', { key: data.id }, { key: data.value })
     }
   }
 
-  async set (self, sender, text) {
-    const match = XRegExp.exec(text, constants.COOLDOWN_REGEXP_SET)
+  async set (opts) {
+    const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET)
 
     if (_.isNil(match)) {
       let message = await global.commons.prepare('cooldowns.cooldown-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     if (parseInt(match.seconds, 10) === 0) {
       await global.db.engine.remove('cooldowns', { key: match.command, type: match.type })
       let message = await global.commons.prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return
     }
 
@@ -83,7 +83,7 @@ class Cooldown {
     else await global.db.engine.update('cooldowns', { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000 })
 
     let message = await global.commons.prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
   async check (self, sender, text) {
@@ -173,20 +173,19 @@ class Cooldown {
     return result
   }
 
-  async toggle (self, sender, text, type) {
-    debug('toggle(%j, %j, %j, %j', self, sender, text, type)
-    const match = XRegExp.exec(text, constants.COOLDOWN_REGEXP)
+  async toggle (opts, type) {
+    const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP)
 
     if (_.isNil(match)) {
       let message = await global.commons.prepare('cooldowns.cooldown-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     const cooldown = await global.db.engine.findOne('cooldowns', { key: match.command, type: match.type })
     if (_.isEmpty(cooldown)) {
       let message = await global.commons.prepare('cooldowns.cooldown-not-found', { command: match.command })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
@@ -205,14 +204,14 @@ class Cooldown {
     if (type === 'quiet' || type === 'type') return // those two are setable only from dashboard
 
     let message = await global.commons.prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.key })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async toggleEnabled (self, sender, text) { await self.toggle(self, sender, text, 'enabled') }
-  async toggleModerators (self, sender, text) { await self.toggle(self, sender, text, 'moderator') }
-  async toggleOwners (self, sender, text) { await self.toggle(self, sender, text, 'owner') }
-  async toggleNotify (self, sender, text) { await self.toggle(self, sender, text, 'quiet') }
-  async toggleType (self, sender, text) { await self.toggle(self, sender, text, 'type') }
+  async toggleEnabled (opts) { await this.toggle(opts, 'enabled') }
+  async toggleModerators (opts) { await this.toggle(opts, 'moderator') }
+  async toggleOwners (opts) { await this.toggle(opts, 'owner') }
+  async toggleNotify (opts) { await this.toggle(opts, 'quiet') }
+  async toggleType (opts) { await this.toggle(opts, 'type') }
 }
 
 module.exports = new Cooldown()

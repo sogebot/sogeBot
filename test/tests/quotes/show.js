@@ -10,27 +10,27 @@ const message = require('../../general.js').message
 const owner = { username: 'soge__' }
 
 const tests = [
-  {sender: owner, command: { after: '' }, shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
-  {sender: owner, command: { after: '-id' }, shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
-  {sender: owner, command: { after: '-tag' }, shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
-  {sender: owner, command: { after: '-tag      -id     ' }, shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
-  {sender: owner, command: { after: '-tag -id' }, shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
-  {sender: owner, command: { after: '-id -tag' }, shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
+  {sender: owner, parameters: '', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
+  {sender: owner, parameters: '-id', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
+  {sender: owner, parameters: '-tag', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
+  {sender: owner, parameters: '-tag      -id     ', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
+  {sender: owner, parameters: '-tag -id', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
+  {sender: owner, parameters: '-id -tag', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
 
-  {sender: owner, command: { after: '-id a' }, shouldFail: true, error: 'systems.quotes.show.error.id-is-not-a-number'},
+  {sender: owner, parameters: '-id a', shouldFail: true, error: 'systems.quotes.show.error.id-is-not-a-number'},
 
-  {sender: owner, command: { after: '-id 1' }, id: 1, tag: 'general', shouldFail: false, exist: true},
-  {sender: owner, command: { after: '-id 1 -tag' }, id: 1, tag: 'general', shouldFail: false, exist: true},
-  {sender: owner, command: { after: '-id 2' }, id: 2, tag: 'general', shouldFail: false, exist: false},
-  {sender: owner, command: { after: '-id 2 -tag' }, id: 2, tag: 'general', shouldFail: false, exist: false},
+  {sender: owner, parameters: '-id 1', id: 1, tag: 'general', shouldFail: false, exist: true},
+  {sender: owner, parameters: '-id 1 -tag', id: 1, tag: 'general', shouldFail: false, exist: true},
+  {sender: owner, parameters: '-id 2', id: 2, tag: 'general', shouldFail: false, exist: false},
+  {sender: owner, parameters: '-id 2 -tag', id: 2, tag: 'general', shouldFail: false, exist: false},
 
-  {sender: owner, command: { after: '-tag lorem ipsum' }, id: 1, tag: 'lorem ipsum', shouldFail: false, exist: true},
-  {sender: owner, command: { after: '-tag general' }, id: 1, tag: 'general', shouldFail: false, exist: false}
+  {sender: owner, parameters: '-tag lorem ipsum', id: 1, tag: 'lorem ipsum', shouldFail: false, exist: true},
+  {sender: owner, parameters: '-tag general', id: 1, tag: 'general', shouldFail: false, exist: false}
 ]
 
 describe('Quotes - show()', () => {
   for (let test of tests) {
-    describe(test.command.after, async () => {
+    describe(test.parameters, async () => {
       before(async () => {
         await db.cleanup()
         await message.prepare()
@@ -38,7 +38,7 @@ describe('Quotes - show()', () => {
       })
 
       it('Run !quote show', async () => {
-        global.systems.quotes.show({sender: test.sender, command: { after: test.command.after }})
+        global.systems.quotes.show({ sender: test.sender, parameters: test.parameters })
       })
       if (test.shouldFail) {
         it('Should throw error', async () => {

@@ -24,7 +24,7 @@ describe('Gambling - duel', () => {
     })
 
     it('user 1 is challenging', async () => {
-      global.systems.gambling.duel(global.systems.gambling, user1, 'all')
+      global.systems.gambling.duel({ sender: user1, parameters: 'all' })
       await message.isSent('gambling.duel.new', user1, {
         minutesName: global.commons.getLocalizedName(5, 'core.minutes'),
         minutes: await global.configuration.getValue('duelDuration')
@@ -36,7 +36,7 @@ describe('Gambling - duel', () => {
     })
 
     it('user 2 is added to duel', async () => {
-      await global.systems.gambling.duel(global.systems.gambling, user2, 'all')
+      await global.systems.gambling.duel({ sender: user2, parameters: 'all' })
       await message.isSent('gambling.duel.joined', user2, {
         pointsName: await global.systems.points.getPointsName(100),
         points: 100

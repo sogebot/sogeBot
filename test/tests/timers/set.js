@@ -17,12 +17,12 @@ describe('Timers - set()', () => {
   })
 
   it('', async () => {
-    global.systems.timers.set(global.systems.timers, owner, '')
+    global.systems.timers.set({ sender: owner, parameters: '' })
     await message.isSent('timers.name-must-be-defined', owner, { name: 'unknown', sender: owner.username })
   })
 
   it('-name test', async () => {
-    await global.systems.timers.set(global.systems.timers, owner, '-name test')
+    await global.systems.timers.set({ sender: owner, parameters: '-name test' })
     await message.isSent('timers.timer-was-set', owner, { name: 'test', messages: 0, seconds: 60, sender: owner.username })
 
     let item = await global.db.engine.findOne('timers', { name: 'test' })
@@ -32,7 +32,7 @@ describe('Timers - set()', () => {
   })
 
   it('-name test -seconds 20', async () => {
-    await global.systems.timers.set(global.systems.timers, owner, '-name test -seconds 20')
+    await global.systems.timers.set({ sender: owner, parameters: '-name test -seconds 20' })
     await message.isSent('timers.timer-was-set', owner, { name: 'test', messages: 0, seconds: 20, sender: owner.username })
 
     let item = await global.db.engine.findOne('timers', { name: 'test' })
@@ -42,14 +42,14 @@ describe('Timers - set()', () => {
   })
 
   it('-name test -seconds 0', async () => {
-    await global.systems.timers.set(global.systems.timers, owner, '-name test -seconds 0')
+    await global.systems.timers.set({ sender: owner, parameters: '-name test -seconds 0' })
     await message.isSent('timers.cannot-set-messages-and-seconds-0', owner, { sender: owner.username })
     let item = await global.db.engine.findOne('timers', { name: 'test' })
     assert.empty(item)
   })
 
   it('-name test -messages 20', async () => {
-    await global.systems.timers.set(global.systems.timers, owner, '-name test -messages 20')
+    await global.systems.timers.set({ sender: owner, parameters: '-name test -messages 20' })
     await message.isSent('timers.timer-was-set', owner, { name: 'test', messages: 20, seconds: 60, sender: owner.username })
 
     let item = await global.db.engine.findOne('timers', { name: 'test' })
@@ -59,7 +59,7 @@ describe('Timers - set()', () => {
   })
 
   it('-name test -messages 0', async () => {
-    await global.systems.timers.set(global.systems.timers, owner, '-name test -messages 0')
+    await global.systems.timers.set({ sender: owner, parameters: '-name test -messages 0' })
     await message.isSent('timers.timer-was-set', owner, { name: 'test', messages: 0, seconds: 60, sender: owner.username })
 
     let item = await global.db.engine.findOne('timers', { name: 'test' })
@@ -69,7 +69,7 @@ describe('Timers - set()', () => {
   })
 
   it('-name test -seconds 0 -messages 0', async () => {
-    await global.systems.timers.set(global.systems.timers, owner, '-name test -seconds 0 -messages 0')
+    await global.systems.timers.set({ sender: owner, parameters: '-name test -seconds 0 -messages 0' })
     await message.isSent('timers.cannot-set-messages-and-seconds-0', owner, { sender: owner.username })
 
     let item = await global.db.engine.findOne('timers', { name: 'test' })
@@ -77,7 +77,7 @@ describe('Timers - set()', () => {
   })
 
   it('-name test -seconds 5 -messages 6', async () => {
-    await global.systems.timers.set(global.systems.timers, owner, '-name test -seconds 5 -messages 6')
+    await global.systems.timers.set({ sender: owner, parameters: '-name test -seconds 5 -messages 6' })
     await message.isSent('timers.timer-was-set', owner, { name: 'test', messages: 6, seconds: 5, sender: owner.username })
 
     let item = await global.db.engine.findOne('timers', { name: 'test' })

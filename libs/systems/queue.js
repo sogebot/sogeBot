@@ -21,12 +21,12 @@ class Queue {
     return !global.commons.isSystemEnabled('queue')
       ? []
       : [
-        {this: this, command: '!queue pick', fnc: this.pick, permission: constants.OWNER_ONLY},
-        {this: this, command: '!queue join', fnc: this.join, permission: constants.VIEWERS},
-        {this: this, command: '!queue clear', fnc: this.clear, permission: constants.OWNER_ONLY},
-        {this: this, command: '!queue close', fnc: this.close, permission: constants.OWNER_ONLY},
-        {this: this, command: '!queue open', fnc: this.open, permission: constants.OWNER_ONLY},
-        {this: this, command: '!queue', fnc: this.info, permission: constants.VIEWERS}
+        {this: this, id: '!queue pick', command: '!queue pick', fnc: this.pick, permission: constants.OWNER_ONLY},
+        {this: this, id: '!queue join', command: '!queue join', fnc: this.join, permission: constants.VIEWERS},
+        {this: this, id: '!queue clear', command: '!queue clear', fnc: this.clear, permission: constants.OWNER_ONLY},
+        {this: this, id: '!queue close', command: '!queue close', fnc: this.close, permission: constants.OWNER_ONLY},
+        {this: this, id: '!queue open', command: '!queue open', fnc: this.open, permission: constants.OWNER_ONLY},
+        {this: this, id: '!queue', command: '!queue', fnc: this.info, permission: constants.VIEWERS}
       ]
   }
 
@@ -78,41 +78,41 @@ class Queue {
     return toReturn
   }
 
-  info (self, sender) {
-    global.commons.sendMessage(global.translate(self.locked ? 'queue.info.closed' : 'queue.info.opened'), sender)
+  info (opts) {
+    global.commons.sendMessage(global.translate(this.locked ? 'queue.info.closed' : 'queue.info.opened'), opts.sender)
   }
 
-  open (self, sender) {
-    self.locked = false
-    global.commons.sendMessage(global.translate('queue.open'), sender)
+  open (opts) {
+    this.locked = false
+    global.commons.sendMessage(global.translate('queue.open'), opts.sender)
   }
 
-  close (self, sender) {
-    self.locked = true
-    global.commons.sendMessage(global.translate('queue.close'), sender)
+  close (opts) {
+    this.locked = true
+    global.commons.sendMessage(global.translate('queue.close'), opts.sender)
   }
 
-  async join (self, sender) {
-    if (!(await self.locked)) {
-      self.addUser(sender.username)
-      global.commons.sendMessage(global.translate('queue.join.opened'), sender)
+  async join (opts) {
+    if (!(await this.locked)) {
+      this.addUser(opts.sender.username)
+      global.commons.sendMessage(global.translate('queue.join.opened'), opts.sender)
     } else {
-      global.commons.sendMessage(global.translate('queue.join.closed'), sender)
+      global.commons.sendMessage(global.translate('queue.join.closed'), opts.sender)
     }
   }
 
-  clear (self, sender) {
-    self.users = []
-    self.picked = []
-    global.commons.sendMessage(global.translate('queue.clear'), sender)
+  clear (opts) {
+    this.users = []
+    this.picked = []
+    global.commons.sendMessage(global.translate('queue.clear'), opts.sender)
   }
 
-  async pick (self, sender, text) {
-    var input = text.match(/^(\d+)?/)[0]
+  async pick (opts) {
+    var input = opts.parameters.match(/^(\d+)?/)[0]
     var amount = (input === '' ? 1 : parseInt(input, 10))
 
-    let users = await self.getUsers(amount)
-    self.picked = users
+    let users = await this.getUsers(amount)
+    this.picked = users
 
     for (let index in users) {
       users[index] = (await global.configuration.getValue('atUsername') ? '@' : '') + users[index]
@@ -131,7 +131,7 @@ class Queue {
     }
 
     global.commons.sendMessage(msg
-      .replace(/\$users/g, users.join(', ')), sender)
+      .replace(/\$users/g, users.join(', ')), opts.sender)
   }
 }
 

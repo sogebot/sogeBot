@@ -33,7 +33,7 @@ describe('lib/twitch - followers()', () => {
 
   it('!followers should return testuser2', async () => {
     let fromDb = await global.db.engine.findOne('widgetsEventList', {'username': 'testuser2', type: 'follow'})
-    global.twitch.followers(global.twitch, testuser)
+    global.twitch.followers({sender: testuser})
     await message.isSent('followers', testuser, {
       lastFollowAgo: moment(fromDb.timestamp).fromNow(),
       lastFollowUsername: testuser2.username,
@@ -50,7 +50,7 @@ describe('lib/twitch - followers()', () => {
 
   it('!followers should return testuser3', async () => {
     let fromDb = await global.db.engine.findOne('widgetsEventList', {'username': 'testuser3', type: 'follow'})
-    global.twitch.followers(global.twitch, testuser)
+    global.twitch.followers({sender: testuser})
     await message.isSent('followers', testuser, {
       lastFollowAgo: moment(fromDb.timestamp).fromNow(),
       lastFollowUsername: testuser3.username,

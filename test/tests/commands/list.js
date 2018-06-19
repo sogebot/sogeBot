@@ -16,18 +16,18 @@ describe('Custom Commands - list()', () => {
   })
 
   it('empty list', async () => {
-    global.systems.customCommands.list(global.systems.customCommands, owner, '')
+    global.systems.customCommands.list({ sender: owner, parameters: '' })
     await message.isSent('customcmds.list-is-empty', owner, { sender: owner.username })
   })
 
   it('populated list', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !a !me')
+    global.systems.customCommands.add({ sender: owner, parameters: 'viewer !a !me' })
     await message.isSent('customcmds.command-was-added', owner, { command: 'a', sender: owner.username })
 
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !b !me')
+    global.systems.customCommands.add({ sender: owner, parameters: 'viewer !b !me' })
     await message.isSent('customcmds.command-was-added', owner, { command: 'b', sender: owner.username })
 
-    global.systems.customCommands.list(global.systems.customCommands, owner, '')
+    global.systems.customCommands.list({ sender: owner, parameters: '' })
     await message.isSent('customcmds.list-is-not-empty', owner, { list: '!a, !b', sender: owner.username })
   })
 })

@@ -32,14 +32,14 @@ Points.prototype.commands = function () {
   return !global.commons.isSystemEnabled('points')
     ? []
     : [
-      {this: this, command: '!points add', fnc: this.addPoints, permission: constants.OWNER_ONLY},
-      {this: this, command: '!points remove', fnc: this.removePoints, permission: constants.OWNER_ONLY},
-      {this: this, command: '!points all', fnc: this.allPoints, permission: constants.OWNER_ONLY},
-      {this: this, command: '!points set', fnc: this.setPoints, permission: constants.OWNER_ONLY},
-      {this: this, command: '!points get', fnc: this.getPointsFromUser, permission: constants.OWNER_ONLY},
-      {this: this, command: '!points give', fnc: this.givePoints, permission: constants.VIEWERS},
-      {this: this, command: '!makeitrain', fnc: this.rainPoints, permission: constants.OWNER_ONLY},
-      {this: this, command: '!points', fnc: this.getPoints, permission: constants.VIEWERS}
+      {this: this, id: '!points add', command: '!points add', fnc: this.addPoints, permission: constants.OWNER_ONLY},
+      {this: this, id: '!points remove', command: '!points remove', fnc: this.removePoints, permission: constants.OWNER_ONLY},
+      {this: this, id: '!points all', command: '!points all', fnc: this.allPoints, permission: constants.OWNER_ONLY},
+      {this: this, id: '!points set', command: '!points set', fnc: this.setPoints, permission: constants.OWNER_ONLY},
+      {this: this, id: '!points get', command: '!points get', fnc: this.getPointsFromUser, permission: constants.OWNER_ONLY},
+      {this: this, id: '!points give', command: '!points give', fnc: this.givePoints, permission: constants.VIEWERS},
+      {this: this, id: '!makeitrain', command: '!makeitrain', fnc: this.rainPoints, permission: constants.OWNER_ONLY},
+      {this: this, id: '!points', command: '!points', fnc: this.getPoints, permission: constants.VIEWERS}
     ]
 }
 
@@ -116,9 +116,9 @@ Points.prototype.getPointsOf = async function (user) {
       : Number.MAX_SAFE_INTEGER / 1000000, 10)
 }
 
-Points.prototype.setPoints = async function (self, sender, text) {
+Points.prototype.setPoints = async function (opts) {
   try {
-    var parsed = text.match(/^@?([\S]+) ([0-9]+)$/)
+    var parsed = opts.parameters.match(/^@?([\S]+) ([0-9]+)$/)
     const points = parseInt(
       Number(parsed[2]) <= Number.MAX_SAFE_INTEGER / 1000000
         ? parsed[2]
@@ -130,20 +130,20 @@ Points.prototype.setPoints = async function (self, sender, text) {
     let message = await global.commons.prepare('points.success.set', {
       amount: points,
       username: parsed[1].toLowerCase(),
-      pointsName: await self.getPointsName(points)
+      pointsName: await this.getPointsName(points)
     })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   } catch (err) {
-    global.commons.sendMessage(global.translate('points.failed.set'), sender)
+    global.commons.sendMessage(global.translate('points.failed.set'), opts.sender)
   }
 }
 
-Points.prototype.givePoints = async function (self, sender, text) {
+Points.prototype.givePoints = async function (opts) {
   try {
-    var parsed = text.match(/^@?([\S]+) ([\d]+|all)$/)
-    const [user, user2] = await Promise.all([global.users.get(sender.username), global.users.get(parsed[1])])
-    var givePts = parsed[2] === 'all' ? await self.getPointsOf(sender.username) : parsed[2]
-    if (await self.getPointsOf(sender.username) >= givePts) {
+    var parsed = opts.parameters.match(/^@?([\S]+) ([\d]+|all)$/)
+    const [user, user2] = await Promise.all([global.users.get(opts.sender.username), global.users.get(parsed[1])])
+    var givePts = parsed[2] === 'all' ? await this.getPointsOf(opts.sender.username) : parsed[2]
+    if (await this.getPointsOf(opts.sender.username) >= givePts) {
       if (user.username !== user2.username) {
         await global.db.engine.insert('users.points', { username: user.username, points: (parseInt(givePts, 10) * -1) })
         await global.db.engine.insert('users.points', { username: user2.username, points: parseInt(givePts, 10) })
@@ -151,19 +151,19 @@ Points.prototype.givePoints = async function (self, sender, text) {
       let message = await global.commons.prepare('points.success.give', {
         amount: givePts,
         username: user2.username,
-        pointsName: await self.getPointsName(givePts)
+        pointsName: await this.getPointsName(givePts)
       })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
     } else {
       let message = await global.commons.prepare('points.failed.giveNotEnough', {
         amount: givePts,
         username: user2.username,
-        pointsName: await self.getPointsName(givePts)
+        pointsName: await this.getPointsName(givePts)
       })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
     }
   } catch (err) {
-    global.commons.sendMessage(global.translate('points.failed.give'), sender)
+    global.commons.sendMessage(global.translate('points.failed.give'), opts.sender)
   }
 }
 
@@ -216,25 +216,27 @@ Points.prototype.getPointsName = async function (points) {
   return pointsName
 }
 
-Points.prototype.getPointsFromUser = async function (self, sender, text) {
+Points.prototype.getPointsFromUser = async function (opts) {
   try {
-    const username = text.match(/^@?([\S]+)$/)[1] || sender.username
+    const match = opts.parameters.match(/^@?([\S]+)$/)
+    const username = !_.isNil(match) ? match[1] : opts.sender.username
 
-    let points = await self.getPointsOf(username)
+    let points = await this.getPointsOf(username)
     let message = await global.commons.prepare('points.defaults.pointsResponse', {
       amount: points,
       username: username,
-      pointsName: await self.getPointsName(points)
+      pointsName: await this.getPointsName(points)
     })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   } catch (err) {
-    global.commons.sendMessage(global.translate('points.failed.get'), sender)
+    console.log(err)
+    global.commons.sendMessage(global.translate('points.failed.get'), opts.sender)
   }
 }
 
-Points.prototype.allPoints = async function (self, sender, text) {
+Points.prototype.allPoints = async function (opts) {
   try {
-    var parsed = text.match(/^([0-9]+)$/)
+    var parsed = opts.parameters.match(/^([0-9]+)$/)
     var givePts = parseInt(parsed[1], 10)
 
     let users = await global.db.engine.find('users.online')
@@ -243,17 +245,17 @@ Points.prototype.allPoints = async function (self, sender, text) {
     }
     let message = await global.commons.prepare('points.success.all', {
       amount: givePts,
-      pointsName: await self.getPointsName(givePts)
+      pointsName: await this.getPointsName(givePts)
     })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   } catch (err) {
-    global.commons.sendMessage(global.translate('points.failed.all'), sender)
+    global.commons.sendMessage(global.translate('points.failed.all'), opts.sender)
   }
 }
 
-Points.prototype.rainPoints = async function (self, sender, text) {
+Points.prototype.rainPoints = async function (opts) {
   try {
-    var parsed = text.match(/^([0-9]+)$/)
+    var parsed = opts.parameters.match(/^([0-9]+)$/)
     var givePts = parseInt(parsed[1], 10)
 
     let users = await global.db.engine.find('users.online')
@@ -262,50 +264,50 @@ Points.prototype.rainPoints = async function (self, sender, text) {
     }
     let message = await global.commons.prepare('points.success.rain', {
       amount: givePts,
-      pointsName: await self.getPointsName(givePts)
+      pointsName: await this.getPointsName(givePts)
     })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   } catch (err) {
-    global.commons.sendMessage(global.translate('points.failed.rain'), sender)
+    global.commons.sendMessage(global.translate('points.failed.rain'), opts.sender)
   }
 }
 
-Points.prototype.addPoints = async function (self, sender, text) {
+Points.prototype.addPoints = async function (opts) {
   try {
-    var parsed = text.match(/^@?([\S]+) ([0-9]+)$/)
+    var parsed = opts.parameters.match(/^@?([\S]+) ([0-9]+)$/)
     let givePts = parseInt(parsed[2], 10)
     await global.db.engine.insert('users.points', { username: parsed[1].toLowerCase(), points: givePts })
 
     let message = await global.commons.prepare('points.success.add', {
       amount: givePts,
       username: parsed[1].toLowerCase(),
-      pointsName: await self.getPointsName(givePts)
+      pointsName: await this.getPointsName(givePts)
     })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   } catch (err) {
-    global.commons.sendMessage(global.translate('points.failed.add'), sender)
+    global.commons.sendMessage(global.translate('points.failed.add'), opts.sender)
   }
 }
 
-Points.prototype.removePoints = async function (self, sender, text) {
+Points.prototype.removePoints = async function (opts) {
   try {
-    var parsed = text.match(/^@?([\S]+) ([\d]+|all)$/)
-    var removePts = parsed[2] === 'all' ? await self.getPointsOf(parsed[1]) : parsed[2]
+    var parsed = opts.parameters.match(/^@?([\S]+) ([\d]+|all)$/)
+    var removePts = parsed[2] === 'all' ? await this.getPointsOf(parsed[1]) : parsed[2]
     await global.db.engine.insert('users.points', { username: parsed[1].toLowerCase(), points: removePts * -1 })
 
     let message = await global.commons.prepare('points.success.remove', {
       amount: removePts,
       username: parsed[1].toLowerCase(),
-      pointsName: await self.getPointsName(removePts)
+      pointsName: await this.getPointsName(removePts)
     })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   } catch (err) {
-    global.commons.sendMessage(global.translate('points.failed.remove'), sender)
+    global.commons.sendMessage(global.translate('points.failed.remove'), opts.sender)
   }
 }
 
-Points.prototype.getPoints = function (self, sender) {
-  self.getPointsFromUser(self, sender, sender.username)
+Points.prototype.getPoints = function (opts) {
+  this.getPointsFromUser(opts)
 }
 
 Points.prototype.updatePoints = async function () {

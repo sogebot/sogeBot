@@ -16,23 +16,23 @@ describe('Keywords - toggle()', () => {
   })
 
   it('', async () => {
-    global.systems.keywords.toggle(global.systems.keywords, owner, '')
+    global.systems.keywords.toggle({ sender: owner, parameters: '' })
     await message.isSent('keywords.keyword-parse-failed', owner, {sender: owner.username})
   })
 
   it('unknown', async () => {
-    global.systems.keywords.toggle(global.systems.keywords, owner, 'unknown')
+    global.systems.keywords.toggle({ sender: owner, parameters: 'unknown' })
     await message.isSent('keywords.keyword-was-not-found', owner, { keyword: 'unknown', sender: owner.username })
   })
 
   it('a', async () => {
-    global.systems.keywords.add(global.systems.keywords, owner, 'a Lorem Ipsum')
+    global.systems.keywords.add({ sender: owner, parameters: 'a Lorem Ipsum' })
     await message.isSent('keywords.keyword-was-added', owner, { keyword: 'a', sender: owner.username })
 
-    global.systems.keywords.toggle(global.systems.keywords, owner, 'a')
+    global.systems.keywords.toggle({ sender: owner, parameters: 'a' })
     await message.isSent('keywords.keyword-was-disabled', owner, { keyword: 'a', sender: owner.username })
 
-    global.systems.keywords.toggle(global.systems.keywords, owner, 'a')
+    global.systems.keywords.toggle({ sender: owner, parameters: 'a' })
     await message.isSent('keywords.keyword-was-enabled', owner, { keyword: 'a', sender: owner.username })
   })
 })

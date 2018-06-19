@@ -17,13 +17,13 @@ describe('systems/moderation - permitLink()', () => {
   describe('!permit', function () {
     describe('parsing \'!permit\'', function () {
       it('should send parse error', async function () {
-        global.systems.moderation.permitLink(global.systems.moderation, owner, '')
+        global.systems.moderation.permitLink({ sender: owner, parameters: '' })
         await message.isSent('moderation.permit-parse-failed', owner)
       })
     })
     describe('parsing \'!permit [username] 1000\'', function () {
       it('should send success message', async function () {
-        global.systems.moderation.permitLink(global.systems.moderation, owner, 'test 1000')
+        global.systems.moderation.permitLink({ sender: owner, parameters: 'test 1000' })
         await message.isSent('moderation.user-have-link-permit', owner, { username: 'test', count: 1000, link: global.commons.getLocalizedName(1000, 'core.links') })
       })
       it('should not timeout user 1000 messages', async () => {
@@ -37,7 +37,7 @@ describe('systems/moderation - permitLink()', () => {
     })
     describe('parsing \'!permit [username]\'', function () {
       it('should send success message', async function () {
-        global.systems.moderation.permitLink(global.systems.moderation, owner, 'test')
+        global.systems.moderation.permitLink({ sender: owner, parameters: 'test' })
         await message.isSent('moderation.user-have-link-permit', owner, { username: 'test', count: 1, link: 'link' })
       })
       it('should not timeout user on first link message', async () => {
@@ -49,7 +49,7 @@ describe('systems/moderation - permitLink()', () => {
     })
     describe('parsing \'!permit [username]\' - case sensitive test', function () {
       it('should send success message', async function () {
-        global.systems.moderation.permitLink(global.systems.moderation, owner, 'TEST')
+        global.systems.moderation.permitLink({ sender: owner, parameters: 'TEST' })
         await message.isSent('moderation.user-have-link-permit', owner, { username: 'test', count: 1, link: 'link' })
       })
       it('should not timeout user on first link message', async () => {

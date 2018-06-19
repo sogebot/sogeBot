@@ -16,13 +16,13 @@ describe('Keywords - run()', () => {
   })
 
   it('a will show Lorem Ipsum', async () => {
-    global.systems.keywords.add(global.systems.keywords, owner, 'a Lorem Ipsum')
+    global.systems.keywords.add({ sender: owner, parameters: 'a Lorem Ipsum' })
     await message.isSent('keywords.keyword-was-added', owner, { keyword: 'a', response: 'Lorem Ipsum', sender: owner.username })
 
     global.systems.keywords.run(global.systems.keywords, owner, 'a')
     await message.isSentRaw('Lorem Ipsum', owner)
 
-    global.systems.keywords.remove(global.systems.keywords, owner, 'a')
+    global.systems.keywords.remove({ sender: owner, parameters: 'a' })
     await message.isSent('keywords.keyword-was-removed', owner, { keyword: 'a', sender: owner.username })
   })
 })

@@ -20,19 +20,19 @@ describe('Cooldowns - toggleModerators()', () => {
 
   it('incorrect toggle', async () => {
     let [command, type, seconds, quiet] = ['!me', 'user', '60', true]
-    global.systems.cooldown.set(global.systems.cooldown, owner, `${command} ${type} ${seconds} ${quiet}`)
+    global.systems.cooldown.set({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
-    global.systems.cooldown.toggleModerators(global.systems.cooldown, owner, command)
+    global.systems.cooldown.toggleModerators({ sender: owner, parameters: command })
     await message.isSent('cooldowns.cooldown-parse-failed', owner, {sender: owner.username})
   })
 
   it('correct toggle', async () => {
     let [command, type, seconds, quiet] = ['!me', 'user', '60', true]
-    global.systems.cooldown.set(global.systems.cooldown, owner, `${command} ${type} ${seconds} ${quiet}`)
+    global.systems.cooldown.set({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
-    global.systems.cooldown.toggleModerators(global.systems.cooldown, owner, `${command} ${type}`)
+    global.systems.cooldown.toggleModerators({ sender: owner, parameters: `${command} ${type}` })
     await message.isSent('cooldowns.cooldown-was-enabled-for-moderators', owner, { command: command, sender: owner.username })
 
     let isOk = await global.systems.cooldown.check(global.systems.cooldown, mod, '!me')
@@ -40,7 +40,7 @@ describe('Cooldowns - toggleModerators()', () => {
     isOk = await global.systems.cooldown.check(global.systems.cooldown, mod, '!me')
     assert.isFalse(isOk)
 
-    global.systems.cooldown.toggleModerators(global.systems.cooldown, owner, `${command} ${type}`)
+    global.systems.cooldown.toggleModerators({ sender: owner, parameters: `${command} ${type}` })
     await message.isSent('cooldowns.cooldown-was-disabled-for-moderators', owner, { command: command, sender: owner.username })
   })
 })

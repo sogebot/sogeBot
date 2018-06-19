@@ -11,29 +11,29 @@ const message = require('../../general.js').message
 const owner = { username: 'soge__' }
 
 const tests = [
-  {sender: owner, command: { after: '' }, shouldFail: true},
-  {sender: owner, command: { after: '-quote -tags' }, shouldFail: true},
-  {sender: owner, command: { after: '-quote         -tags             ' }, shouldFail: true},
-  {sender: owner, command: { after: '-quote -tags lorem ipsum' }, shouldFail: true},
-  {sender: owner, command: { after: '-tags -quote' }, shouldFail: true},
-  {sender: owner, command: { after: '-tags lorem ipsum -quote' }, shouldFail: true},
-  {sender: owner, command: { after: '-tags Lorem Ipsum Dolor' }, shouldFail: true},
-  {sender: owner, command: { after: '-quote Lorem Ipsum Dolor' }, quote: 'Lorem Ipsum Dolor', tags: 'general', shouldFail: false},
-  {sender: owner, command: { after: '-quote Lorem Ipsum Dolor -tags lorem' }, quote: 'Lorem Ipsum Dolor', tags: 'lorem', shouldFail: false},
-  {sender: owner, command: { after: '-quote Lorem Ipsum Dolor -tags lorem ipsum' }, quote: 'Lorem Ipsum Dolor', tags: 'lorem ipsum', shouldFail: false},
-  {sender: owner, command: { after: ' -tags lorem ipsum, dolor sit -quote Lorem Ipsum Dolor' }, quote: 'Lorem Ipsum Dolor', tags: 'lorem ipsum, dolor sit', shouldFail: false}
+  {sender: owner, parameters: '', shouldFail: true},
+  {sender: owner, parameters: '-quote -tags', shouldFail: true},
+  {sender: owner, parameters: '-quote         -tags             ', shouldFail: true},
+  {sender: owner, parameters: '-quote -tags lorem ipsum', shouldFail: true},
+  {sender: owner, parameters: '-tags -quote', shouldFail: true},
+  {sender: owner, parameters: '-tags lorem ipsum -quote', shouldFail: true},
+  {sender: owner, parameters: '-tags Lorem Ipsum Dolor', shouldFail: true},
+  {sender: owner, parameters: '-quote Lorem Ipsum Dolor', quote: 'Lorem Ipsum Dolor', tags: 'general', shouldFail: false},
+  {sender: owner, parameters: '-quote Lorem Ipsum Dolor -tags lorem', quote: 'Lorem Ipsum Dolor', tags: 'lorem', shouldFail: false},
+  {sender: owner, parameters: '-quote Lorem Ipsum Dolor -tags lorem ipsum', quote: 'Lorem Ipsum Dolor', tags: 'lorem ipsum', shouldFail: false},
+  {sender: owner, parameters: ' -tags lorem ipsum, dolor sit -quote Lorem Ipsum Dolor', quote: 'Lorem Ipsum Dolor', tags: 'lorem ipsum, dolor sit', shouldFail: false}
 ]
 
 describe('Quotes - add()', () => {
   for (let test of tests) {
-    describe(test.command.after, async () => {
+    describe(test.parameters, async () => {
       before(async () => {
         await db.cleanup()
         await message.prepare()
       })
 
       it('Run !quote add', async () => {
-        global.systems.quotes.add({sender: test.sender, command: { after: test.command.after }})
+        global.systems.quotes.add({ sender: test.sender, parameters: test.parameters })
       })
       if (test.shouldFail) {
         it('Should throw error', async () => {

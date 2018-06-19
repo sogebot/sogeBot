@@ -74,7 +74,7 @@ class Moderation {
     return !global.commons.isSystemEnabled('moderation')
       ? []
       : [
-        { command: '!permit', fnc: this.permitLink, permission: constants.OWNER_ONLY, this: this }
+        { this: this, id: '!permit', command: '!permit', fnc: this.permitLink, permission: constants.OWNER_ONLY }
       ]
   }
 
@@ -187,18 +187,18 @@ class Moderation {
     return text
   }
 
-  async permitLink (self, sender, text) {
+  async permitLink (opts) {
     try {
-      var parsed = text.match(/^@?([\S]+) ?(\d+)?$/)
+      var parsed = opts.parameters.match(/^@?([\S]+) ?(\d+)?$/)
       let count = 1
       if (!_.isNil(parsed[2])) count = parseInt(parsed[2], 10)
 
       for (let i = 0; i < count; i++) await global.db.engine.insert('moderation.permit', { username: parsed[1].toLowerCase() })
 
       let m = await global.commons.prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: global.commons.getLocalizedName(count, 'core.links'), count: count })
-      debug(m); global.commons.sendMessage(m, sender)
+      debug(m); global.commons.sendMessage(m, opts.sender)
     } catch (e) {
-      global.commons.sendMessage(global.translate('moderation.permit-parse-failed'), sender)
+      global.commons.sendMessage(global.translate('moderation.permit-parse-failed'), opts.sender)
     }
   }
 
