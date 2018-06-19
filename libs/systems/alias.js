@@ -34,13 +34,13 @@ class Alias {
   commands () {
     if (global.commons.isSystemEnabled('alias')) {
       return [
-        { command: '!alias add', fnc: this.add, permission: constants.OWNER_ONLY, this: this },
-        { command: '!alias edit', fnc: this.edit, permission: constants.OWNER_ONLY, this: this },
-        { command: '!alias list', fnc: this.list, permission: constants.OWNER_ONLY, this: this },
-        { command: '!alias remove', fnc: this.remove, permission: constants.OWNER_ONLY, this: this },
-        { command: '!alias toggle-visibility', fnc: this.visibility, permission: constants.OWNER_ONLY, this: this },
-        { command: '!alias toggle', fnc: this.toggle, permission: constants.OWNER_ONLY, this: this },
-        { command: '!alias', fnc: this.help, permission: constants.OWNER_ONLY, isHelper: true, this: this }
+        { this: this, id: '!alias add', command: '!alias add', fnc: this.add, permission: constants.OWNER_ONLY },
+        { this: this, id: '!alias edit', command: '!alias edit', fnc: this.edit, permission: constants.OWNER_ONLY },
+        { this: this, id: '!alias list', command: '!alias list', fnc: this.list, permission: constants.OWNER_ONLY },
+        { this: this, id: '!alias remove', command: '!alias remove', fnc: this.remove, permission: constants.OWNER_ONLY },
+        { this: this, id: '!alias toggle-visibility', command: '!alias toggle-visibility', fnc: this.visibility, permission: constants.OWNER_ONLY },
+        { this: this, id: '!alias toggle', command: '!alias toggle', fnc: this.toggle, permission: constants.OWNER_ONLY },
+        { this: this, id: '!alias', command: '!alias', fnc: this.help, permission: constants.OWNER_ONLY, isHelper: true }
       ]
     } else return []
   }
@@ -147,20 +147,20 @@ class Alias {
     global.commons.sendMessage(global.translate('core.usage') + ': !alias add owner|mod|regular|viewer <!alias> <!command> | !alias edit owner|mod|regular|viewer <!alias> <!command> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', sender)
   }
 
-  async edit (self, sender, text) {
-    debug('edit(%j, %j, %j)', self, sender, text)
-    const match = XRegExp.exec(text, constants.ALIAS_REGEXP)
+  async edit (opts) {
+    debug('edit(%j)', opts)
+    const match = XRegExp.exec(opts.parameters, constants.ALIAS_REGEXP)
 
     if (_.isNil(match)) {
       let message = await global.commons.prepare('alias.alias-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     let item = await global.db.engine.findOne('alias', { alias: match.alias })
     if (_.isEmpty(item)) {
       let message = await global.commons.prepare('alias.alias-was-not-found', { alias: match.alias })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
@@ -180,16 +180,15 @@ class Alias {
     await global.db.engine.update('alias', { alias: match.alias }, { command: match.command, permission: permission })
 
     let message = await global.commons.prepare('alias.alias-was-edited', { alias: match.alias, command: match.command })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async add (self, sender, text) {
-    debug('add(%j, %j, %j)', self, sender, text)
-    const match = XRegExp.exec(text, constants.ALIAS_REGEXP)
+  async add (opts) {
+    const match = XRegExp.exec(opts.parameters, constants.ALIAS_REGEXP)
 
     if (_.isNil(match)) {
       let message = await global.commons.prepare('alias.alias-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
@@ -216,14 +215,13 @@ class Alias {
 
     await global.db.engine.insert('alias', alias)
     let message = await global.commons.prepare('alias.alias-was-added', alias)
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async list (self, sender) {
-    debug('list(%j, %j)', self, sender)
+  async list (opts) {
     let alias = await global.db.engine.find('alias', { visible: true })
     var output = (alias.length === 0 ? global.translate('alias.list-is-empty') : global.translate('alias.list-is-not-empty').replace(/\$list/g, '!' + (_.map(_.orderBy(alias, 'alias'), 'alias')).join(', !')))
-    debug(output); global.commons.sendMessage(output, sender)
+    debug(output); global.commons.sendMessage(output, opts.sender)
   }
 
   async togglePermission (self, sender, text) {
@@ -234,67 +232,65 @@ class Alias {
     }
   }
 
-  async toggle (self, sender, text) {
-    debug('toggle(%j, %j, %j)', self, sender, text)
-    const match = XRegExp.exec(text, constants.COMMAND_REGEXP_WITH_SPACES)
+  async toggle (opts) {
+    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP_WITH_SPACES)
 
     if (_.isNil(match)) {
       let message = await global.commons.prepare('alias.alias-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
     const alias = await global.db.engine.findOne('alias', { alias: match.command })
     if (_.isEmpty(alias)) {
       let message = await global.commons.prepare('alias.alias-was-not-found', { alias: match.command })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return
     }
 
     await global.db.engine.update('alias', { alias: match.command }, { enabled: !alias.enabled })
     let message = await global.commons.prepare(!alias.enabled ? 'alias.alias-was-enabled' : 'alias.alias-was-disabled', { alias: match.command })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async visible (self, sender, text) {
-    const match = XRegExp.exec(text, constants.COMMAND_REGEXP_WITH_SPACES)
+  async visible (opts) {
+    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP_WITH_SPACES)
 
     if (_.isNil(match)) {
       let message = await global.commons.prepare('alias.alias-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     const alias = await global.db.engine.findOne('alias', { alias: match.command })
     if (_.isEmpty(alias)) {
       let message = await global.commons.prepare('alias.alias-was-not-found', { alias: match.command })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     await global.db.engine.update('alias', { alias: match.command }, { visible: !alias.visible })
 
     let message = await global.commons.prepare(!alias.visible ? 'alias.alias-was-exposed' : 'alias.alias-was-concealed', alias)
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async remove (self, sender, text) {
-    debug('remove(%j, %j, %j)', self, sender, text)
-    const match = XRegExp.exec(text, constants.COMMAND_REGEXP_WITH_SPACES)
+  async remove (opts) {
+    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP_WITH_SPACES)
     if (_.isNil(match)) {
       let message = await global.commons.prepare('alias.alias-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     let removed = await global.db.engine.remove('alias', { alias: match.command })
     if (!removed) {
       let message = await global.commons.prepare('alias.alias-was-not-found', { alias: match.command })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     let message = await global.commons.prepare('alias.alias-was-removed', { alias: match.command })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 }
 

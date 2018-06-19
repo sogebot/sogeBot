@@ -31,7 +31,7 @@ class Highlights {
 
       cluster.on('message', (worker, message) => {
         if (message.type !== 'highlight') return
-        this.highlight(this, message.sender, message.description)
+        this.highlight(message.opts)
       })
     }
   }
@@ -40,17 +40,17 @@ class Highlights {
     return !global.commons.isSystemEnabled('highlights')
       ? []
       : [
-        {this: this, command: '!highlight list', fnc: this.list, permission: constants.OWNER_ONLY},
-        {this: this, command: '!highlight', fnc: this.highlight, permission: constants.OWNER_ONLY}
+        {this: this, id: '!highlight list', command: '!highlight list', fnc: this.list, permission: constants.OWNER_ONLY},
+        {this: this, id: '!highlight', command: '!highlight', fnc: this.highlight, permission: constants.OWNER_ONLY}
       ]
   }
 
-  async highlight (self, sender, description) {
+  async highlight (opts) {
     if (cluster.isWorker) {
       // as we are using API, go through master
-      process.send({ type: 'highlight', sender, description })
+      process.send({ type: 'highlight', opts })
     } else {
-      description = description.trim().length > 0 ? description : null
+      opts.parameters = opts.parameters.trim().length > 0 ? opts.parameters : null
 
       const d = debug('systems:highlight:highlight')
       const cid = await global.cache.channelId()
@@ -59,7 +59,7 @@ class Highlights {
 
       const needToWait = _.isNil(cid)
       if (needToWait) {
-        setTimeout(() => this.highlight(self, sender, description), 1000)
+        setTimeout(() => this.highlight(opts), 1000)
         return
       }
 
@@ -73,7 +73,7 @@ class Highlights {
         highlight.stream_id = moment(when.online).format('X')
         highlight.stream = when.online
         highlight.timestamp = timestamp
-        highlight.description = description
+        highlight.description = opts.parameters
         highlight.title = _.get(await global.db.engine.findOne('api.current', { 'key': 'status' }), 'value', 'n/a')
         highlight.game = _.get(await global.db.engine.findOne('api.current', { 'key': 'status' }), 'value', 'n/a')
         highlight.created_at = _.now()
@@ -95,7 +95,7 @@ class Highlights {
         global.db.engine.update('cache', { 'key': 'highlights.id' }, { value: video._id })
         global.db.engine.update('cache', { 'key': 'highlights.created_at' }, { value: when.online })
         highlight.video_id = video._id
-        self.add(self, highlight, timestamp, sender)
+        this.add(highlight, timestamp, opts.sender)
         global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: request.status })
       } catch (e) {
         if (e.message !== ERROR_STREAM_NOT_ONLINE) {
@@ -104,7 +104,7 @@ class Highlights {
         }
         switch (e.message) {
           case ERROR_STREAM_NOT_ONLINE:
-            global.commons.sendMessage(global.translate('highlights.offline'), sender)
+            global.commons.sendMessage(global.translate('highlights.offline'), opts.sender)
             break
         }
       }
@@ -116,7 +116,7 @@ class Highlights {
     socket.emit('highlights', _.orderBy(highlights, 'created_at', 'desc'))
   }
 
-  add (self, highlight, timestamp, sender) {
+  add (highlight, timestamp, sender) {
     global.commons.sendMessage(global.translate(_.isNil(highlight.description) ? 'highlights.saved.no-description' : 'highlights.saved.description')
       .replace(/\$description/g, highlight.description)
       .replace(/\$hours/g, (timestamp.hours < 10) ? '0' + timestamp.hours : timestamp.hours)
@@ -126,13 +126,13 @@ class Highlights {
     global.db.engine.insert('highlights', highlight)
   }
 
-  async list (self, sender) {
+  async list (opts) {
     let highlights = await global.db.engine.find('highlights')
     const sortedHighlights = _.orderBy(highlights, 'id', 'desc')
     const latestStreamId = sortedHighlights.length > 0 ? sortedHighlights[0].id : null
 
     if (_.isNull(latestStreamId)) {
-      global.commons.sendMessage(global.translate('highlights.list.empty'), sender)
+      global.commons.sendMessage(global.translate('highlights.list.empty'), opts.sender)
       return
     }
     highlights = _.filter(highlights, function (o) { return o.id === latestStreamId })
@@ -144,7 +144,7 @@ class Highlights {
         highlight.timestamp.seconds + 's')
     }
     global.commons.sendMessage(global.translate(list.length > 0 ? 'highlights.list.items' : 'highlights.list.empty')
-      .replace(/\$items/g, list.join(', ')), sender)
+      .replace(/\$items/g, list.join(', ')), opts.sender)
   }
 }
 

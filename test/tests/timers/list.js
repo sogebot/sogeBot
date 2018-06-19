@@ -20,17 +20,17 @@ describe('Timers - list()', () => {
   })
 
   it('', async () => {
-    global.systems.timers.list(global.systems.timers, owner, '')
+    global.systems.timers.list({ sender: owner, parameters: '' })
     await message.isSentRaw(`@${owner.username}, timers list: ⚫ test, ⚪ test2`, owner)
   })
 
   it('-name unknown', async () => {
-    global.systems.timers.list(global.systems.timers, owner, '-name unknown')
+    global.systems.timers.list({ sender: owner, parameters: '-name unknown' })
     await message.isSent('timers.timer-not-found', owner, { name: 'unknown', sender: owner.username })
   })
 
   it('-name test2', async () => {
-    global.systems.timers.list(global.systems.timers, owner, '-name test2')
+    global.systems.timers.list({ sender: owner, parameters: '-name test2' })
 
     let response1 = await global.db.engine.findOne('timers.responses', { response: 'Lorem Ipsum' })
     let response2 = await global.db.engine.findOne('timers.responses', { response: 'Lorem Ipsum 2' })

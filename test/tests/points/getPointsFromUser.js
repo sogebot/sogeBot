@@ -20,7 +20,7 @@ describe('Points - getPointsFromUser()', () => {
     })
 
     it('points should be returned in safe points bounds', async () => {
-      await global.systems.points.getPointsFromUser(global.systems.points, hugePointsUser, hugePointsUser.username)
+      await global.systems.points.getPointsFromUser({ sender: hugePointsUser, parameters: '' })
       await message.isSent('points.defaults.pointsResponse', { username: hugePointsUser.username }, {
         amount: Math.floor(Number.MAX_SAFE_INTEGER / 1000000),
         username: hugePointsUser.username,
@@ -35,7 +35,7 @@ describe('Points - getPointsFromUser()', () => {
     })
 
     it('points should be returned in safe points bounds', async () => {
-      await global.systems.points.getPointsFromUser(global.systems.points, tinyPointsUser, tinyPointsUser.username)
+      await global.systems.points.getPointsFromUser({ sender: tinyPointsUser, parameters: '' })
       await message.isSent('points.defaults.pointsResponse', { username: tinyPointsUser.username }, {
         amount: 100,
         username: tinyPointsUser.username,

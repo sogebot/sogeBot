@@ -16,35 +16,35 @@ describe('Custom Commands - run()', () => {
   })
 
   it('!a will show Lorem Ipsum', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !a Lorem Ipsum')
+    global.systems.customCommands.add({ sender: owner, parameters: 'viewer !a Lorem Ipsum' })
     await message.isSent('customcmds.command-was-added', owner, { command: 'a', response: 'Lorem Ipsum', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!a')
     await message.isSentRaw('Lorem Ipsum', owner)
 
-    global.systems.customCommands.remove(global.systems.customCommands, owner, '!a')
+    global.systems.customCommands.remove({ sender: owner, parameters: '!a' })
     await message.isSent('customcmds.command-was-removed', owner, { command: 'a', sender: owner.username })
   })
 
   it('!한글 will show Lorem Ipsum', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !한글 Lorem Ipsum')
+    global.systems.customCommands.add({ sender: owner, parameters: 'viewer !한글 Lorem Ipsum' })
     await message.isSent('customcmds.command-was-added', owner, { command: '한글', response: 'Lorem Ipsum', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!한글')
     await message.isSentRaw('Lorem Ipsum', owner)
 
-    global.systems.customCommands.remove(global.systems.customCommands, owner, '!한글')
+    global.systems.customCommands.remove({ sender: owner, parameters: '!한글' })
     await message.isSent('customcmds.command-was-removed', owner, { command: '한글', sender: owner.username })
   })
 
   it('!русский will show Lorem Ipsum', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !русский Lorem Ipsum')
+    global.systems.customCommands.add({ sender: owner, parameters: 'viewer !русский Lorem Ipsum' })
     await message.isSent('customcmds.command-was-added', owner, { command: 'русский', response: 'Lorem Ipsum', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!русский')
     await message.isSentRaw('Lorem Ipsum', owner)
 
-    global.systems.customCommands.remove(global.systems.customCommands, owner, '!русский')
+    global.systems.customCommands.remove({ sender: owner, parameters: '!русский' })
     await message.isSent('customcmds.command-was-removed', owner, { command: 'русский', sender: owner.username })
   })
 })

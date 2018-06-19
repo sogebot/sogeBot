@@ -16,22 +16,22 @@ describe('Keywords - add()', () => {
   })
 
   it('', async () => {
-    global.systems.keywords.add(global.systems.keywords, owner, '')
+    global.systems.keywords.add({ sender: owner, parameters: '' })
     await message.isSent('keywords.keyword-parse-failed', owner, {sender: owner.username})
   })
 
   it('!alias', async () => {
-    global.systems.keywords.add(global.systems.keywords, owner, '!alias')
+    global.systems.keywords.add({ sender: owner, parameters: '!alias' })
     await message.isSent('keywords.keyword-parse-failed', owner, {sender: owner.username})
   })
 
   it('alias', async () => {
-    global.systems.keywords.add(global.systems.keywords, owner, 'alias')
+    global.systems.keywords.add({ sender: owner, parameters: 'alias' })
     await message.isSent('keywords.keyword-parse-failed', owner, {sender: owner.username})
   })
 
   it('!new asd', async () => {
-    global.systems.keywords.add(global.systems.keywords, owner, '!new asd')
+    global.systems.keywords.add({ sender: owner, parameters: '!new asd' })
     await message.isSent('keywords.keyword-was-added', owner, { keyword: 'new', sender: owner.username })
 
     global.systems.keywords.run(global.systems.keywords, owner, 'new')
@@ -39,7 +39,7 @@ describe('Keywords - add()', () => {
   })
 
   it('alias asd', async () => {
-    global.systems.keywords.add(global.systems.keywords, owner, 'alias asd')
+    global.systems.keywords.add({ sender: owner, parameters: 'alias asd' })
     await message.isSent('keywords.keyword-was-added', owner, { keyword: 'alias', sender: owner.username })
 
     global.systems.keywords.run(global.systems.keywords, owner, 'asda alias asd')
@@ -47,10 +47,10 @@ describe('Keywords - add()', () => {
   })
 
   it('2x - aaa Lorem Ipsum', async () => {
-    global.systems.keywords.add(global.systems.keywords, owner, 'aaa Lorem Ipsum')
+    global.systems.keywords.add({ sender: owner, parameters: 'aaa Lorem Ipsum' })
     await message.isSent('keywords.keyword-was-added', owner, { response: 'Lorem Ipsum', keyword: 'aaa', sender: owner.username })
 
-    global.systems.keywords.add(global.systems.keywords, owner, 'aaa Lorem Ipsum')
+    global.systems.keywords.add({ sender: owner, parameters: 'aaa Lorem Ipsum' })
     await message.isSent('keywords.keyword-already-exist', owner, { keyword: 'aaa', sender: owner.username })
   })
 })

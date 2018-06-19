@@ -16,35 +16,35 @@ describe('Custom Commands - add()', () => {
   })
 
   it('', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '')
+    global.systems.customCommands.add({ sender: owner, parameters: '' })
     await message.isSent('customcmds.commands-parse-failed', owner, { sender: owner.username })
   })
 
   it('!cmd', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, '!cmd')
+    global.systems.customCommands.add({ sender: owner, parameters: '!cmd' })
     await message.isSent('customcmds.commands-parse-failed', owner, { sender: owner.username })
   })
 
   it('cmd', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'cmd')
+    global.systems.customCommands.add({ sender: owner, parameters: 'cmd' })
     await message.isSent('customcmds.commands-parse-failed', owner, { sender: owner.username })
   })
 
   it('cmd !asd', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'cmd !asd')
+    global.systems.customCommands.add({ sender: owner, parameters: 'cmd !asd' })
     await message.isSent('customcmds.commands-parse-failed', owner, { sender: owner.username })
   })
 
   it('2x - !a Lorem Ipsum', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !a Lorem Ipsum')
+    global.systems.customCommands.add({ sender: owner, parameters: 'viewer !a Lorem Ipsum' })
     await message.isSent('customcmds.command-was-added', owner, { response: 'Lorem Ipsum', command: 'a', sender: owner.username })
 
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !a me')
+    global.systems.customCommands.add({ sender: owner, parameters: 'viewer !a me' })
     await message.isSent('customcmds.command-was-added', owner, { response: 'Lorem Ipsum', command: 'a', sender: owner.username })
   })
 
   it('!cmd this is command response', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !cmd this is command response')
+    global.systems.customCommands.add({ sender: owner, parameters: 'viewer !cmd this is command response' })
     await message.isSent('customcmds.command-was-added', owner, { response: 'this is command response', command: 'cmd', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!cmd')
@@ -52,7 +52,7 @@ describe('Custom Commands - add()', () => {
   })
 
   it('!한국어 this is command response', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !한국어 this is command response')
+    global.systems.customCommands.add({ sender: owner, parameters: 'viewer !한국어 this is command response' })
     await message.isSent('customcmds.command-was-added', owner, { response: 'this is command response', command: '한국어', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!한국어')
@@ -60,7 +60,7 @@ describe('Custom Commands - add()', () => {
   })
 
   it('!русский this is command response', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !русский this is command response')
+    global.systems.customCommands.add({ sender: owner, parameters: 'viewer !русский this is command response' })
     await message.isSent('customcmds.command-was-added', owner, { response: 'this is command response', command: 'русский', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!русский')

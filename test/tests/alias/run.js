@@ -17,78 +17,78 @@ describe('Alias - run()', () => {
   })
 
   it('!a will show !duel', async () => {
-    global.systems.alias.add(global.systems.alias, owner, 'viewer !a !duel')
+    global.systems.alias.add({ sender: owner, parameters: 'viewer !a !duel' })
     await message.isSent('alias.alias-was-added', owner, { alias: 'a', command: 'duel', sender: owner.username })
 
     global.systems.alias.run(global.systems.alias, owner, '!a')
     await message.process('!duel', owner)
 
-    global.systems.alias.remove(global.systems.alias, owner, '!a')
+    global.systems.alias.remove({ sender: owner, parameters: '!a' })
     await message.isSent('alias.alias-was-removed', owner, { alias: 'a', sender: owner.username })
 
     assert.isEmpty(global.systems.alias.run(global.systems.alias, owner, '!a'))
   })
 
   it('#668 - alias is case insensitive', async () => {
-    global.systems.alias.add(global.systems.alias, owner, 'viewer !a !duel')
+    global.systems.alias.add({ sender: owner, parameters: 'viewer !a !duel' })
     await message.isSent('alias.alias-was-added', owner, { alias: 'a', command: 'duel', sender: owner.username })
 
     global.systems.alias.run(global.systems.alias, owner, '!A')
     await message.process('!duel', owner)
 
-    global.systems.alias.remove(global.systems.alias, owner, '!a')
+    global.systems.alias.remove({ sender: owner, parameters: '!a' })
     await message.isSent('alias.alias-was-removed', owner, { alias: 'a', sender: owner.username })
 
     assert.isEmpty(global.systems.alias.run(global.systems.alias, owner, '!a'))
   })
 
   it('!a with spaces - will show !duel', async () => {
-    global.systems.alias.add(global.systems.alias, owner, 'viewer !a with spaces !duel')
+    global.systems.alias.add({ sender: owner, parameters: 'viewer !a with spaces !duel' })
     await message.isSent('alias.alias-was-added', owner, { alias: 'a with spaces', command: 'duel', sender: owner.username })
 
     global.systems.alias.run(global.systems.alias, owner, '!a with spaces')
     await message.process('!duel', owner)
 
-    global.systems.alias.remove(global.systems.alias, owner, '!a with spaces')
+    global.systems.alias.remove({ sender: owner, parameters: '!a with spaces' })
     await message.isSent('alias.alias-was-removed', owner, { alias: 'a with spaces', sender: owner.username })
 
     assert.isEmpty(global.systems.alias.run(global.systems.alias, owner, '!a with spaces'))
   })
 
   it('!한국어 - will show !duel', async () => {
-    global.systems.alias.add(global.systems.alias, owner, 'viewer !한국어 !duel')
+    global.systems.alias.add({ sender: owner, parameters: 'viewer !한국어 !duel' })
     await message.isSent('alias.alias-was-added', owner, { alias: '한국어', command: 'duel', sender: owner.username })
 
     global.systems.alias.run(global.systems.alias, owner, '!한국어')
     await message.process('!duel', owner)
 
-    global.systems.alias.remove(global.systems.alias, owner, '!한국어')
+    global.systems.alias.remove({ sender: owner, parameters: '!한국어' })
     await message.isSent('alias.alias-was-removed', owner, { alias: '한국어', sender: owner.username })
 
     assert.isEmpty(global.systems.alias.run(global.systems.alias, owner, '!한국어'))
   })
 
   it('!русский - will show !duel', async () => {
-    global.systems.alias.add(global.systems.alias, owner, 'viewer !русский !duel')
+    global.systems.alias.add({ sender: owner, parameters: 'viewer !русский !duel' })
     await message.isSent('alias.alias-was-added', owner, { alias: 'русский', command: 'duel', sender: owner.username })
 
     global.systems.alias.run(global.systems.alias, owner, '!русский')
     await message.process('!duel', owner)
 
-    global.systems.alias.remove(global.systems.alias, owner, '!русский')
+    global.systems.alias.remove({ sender: owner, parameters: '!русский' })
     await message.isSent('alias.alias-was-removed', owner, { alias: 'русский', sender: owner.username })
 
     assert.isEmpty(global.systems.alias.run(global.systems.alias, owner, '!русский'))
   })
 
   it('!крутить 1000 - will show !gamble 1000', async () => {
-    global.systems.alias.add(global.systems.alias, owner, 'viewer !крутить !gamble')
+    global.systems.alias.add({ sender: owner, parameters: 'viewer !крутить !gamble' })
     await message.isSent('alias.alias-was-added', owner, { alias: 'крутить', command: 'gamble', sender: owner.username })
 
     global.systems.alias.run(global.systems.alias, owner, '!крутить 1000')
     await message.process('!gamble 1000', owner)
 
-    global.systems.alias.remove(global.systems.alias, owner, '!крутить')
+    global.systems.alias.remove({ sender: owner, parameters: '!крутить' })
     await message.isSent('alias.alias-was-removed', owner, { alias: 'крутить', sender: owner.username })
 
     assert.isEmpty(global.systems.alias.run(global.systems.alias, owner, '!крутить'))

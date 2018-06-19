@@ -11,16 +11,16 @@ const message = require('../../general.js').message
 const owner = { username: 'soge__' }
 
 const tests = [
-  {sender: owner, command: { after: '' }, shouldFail: true},
-  {sender: owner, command: { after: '-id' }, shouldFail: true},
-  {sender: owner, command: { after: '-id a' }, shouldFail: true},
-  {sender: owner, command: { after: '-id 1' }, id: 1, shouldFail: false, exist: true},
-  {sender: owner, command: { after: '-id 2' }, id: 2, shouldFail: false, exist: false}
+  {sender: owner, parameters: '', shouldFail: true},
+  {sender: owner, parameters: '-id', shouldFail: true},
+  {sender: owner, parameters: '-id a', shouldFail: true},
+  {sender: owner, parameters: '-id 1', id: 1, shouldFail: false, exist: true},
+  {sender: owner, parameters: '-id 2', id: 2, shouldFail: false, exist: false}
 ]
 
 describe('Quotes - remove()', () => {
   for (let test of tests) {
-    describe(test.command.after, async () => {
+    describe(test.parameters, async () => {
       before(async () => {
         await db.cleanup()
         await message.prepare()
@@ -28,7 +28,7 @@ describe('Quotes - remove()', () => {
       })
 
       it('Run !quote remove', async () => {
-        global.systems.quotes.remove({sender: test.sender, command: { after: test.command.after }})
+        global.systems.quotes.remove({ sender: test.sender, parameters: test.parameters })
       })
       if (test.shouldFail) {
         it('Should throw error', async () => {

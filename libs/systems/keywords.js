@@ -34,12 +34,12 @@ class Keywords {
     return !global.commons.isSystemEnabled('keywords')
       ? []
       : [
-        {this: this, command: '!keyword add', fnc: this.add, permission: constants.OWNER_ONLY},
-        {this: this, command: '!keyword edit', fnc: this.edit, permission: constants.OWNER_ONLY},
-        {this: this, command: '!keyword list', fnc: this.list, permission: constants.OWNER_ONLY},
-        {this: this, command: '!keyword remove', fnc: this.remove, permission: constants.OWNER_ONLY},
-        {this: this, command: '!keyword toggle', fnc: this.toggle, permission: constants.OWNER_ONLY},
-        {this: this, command: '!keyword', fnc: this.help, permission: constants.OWNER_ONLY}
+        {this: this, id: '!keyword add', command: '!keyword add', fnc: this.add, permission: constants.OWNER_ONLY},
+        {this: this, id: '!keyword edit', command: '!keyword edit', fnc: this.edit, permission: constants.OWNER_ONLY},
+        {this: this, id: '!keyword list', command: '!keyword list', fnc: this.list, permission: constants.OWNER_ONLY},
+        {this: this, id: '!keyword remove', command: '!keyword remove', fnc: this.remove, permission: constants.OWNER_ONLY},
+        {this: this, id: '!keyword toggle', command: '!keyword toggle', fnc: this.toggle, permission: constants.OWNER_ONLY},
+        {this: this, id: '!keyword', command: '!keyword', fnc: this.help, permission: constants.OWNER_ONLY}
       ]
   }
 
@@ -51,26 +51,26 @@ class Keywords {
       ]
   }
 
-  async edit (self, sender, text) {
-    debug('edit(%j, %j, %j)', self, sender, text)
-    const match = XRegExp.exec(text, constants.KEYWORD_REGEXP)
+  async edit (opts) {
+    debug('edit(%j, %j, %j)', opts)
+    const match = XRegExp.exec(opts.parameters, constants.KEYWORD_REGEXP)
 
     if (_.isNil(match)) {
       let message = await global.commons.prepare('keywords.keyword-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     let item = await global.db.engine.findOne('keywords', { keyword: match.keyword })
     if (_.isEmpty(item)) {
       let message = await global.commons.prepare('keywords.keyword-was-not-found', { keyword: match.keyword })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     await global.db.engine.update('keywords', { keyword: match.keyword }, { response: match.response })
     let message = await global.commons.prepare('keywords.keyword-was-edited', { keyword: match.keyword, response: match.response })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
   async send (self, socket) {
@@ -87,17 +87,17 @@ class Keywords {
     else await global.db.engine.update('keywords', { keyword: data.id }, { response: data.value })
   }
 
-  help (self, sender) {
-    global.commons.sendMessage(global.translate('core.usage') + ': !keyword add <keyword> <response> | !keyword edit <keyword> <response> | !keyword remove <keyword> | !keyword list', sender)
+  help (opts) {
+    global.commons.sendMessage(global.translate('core.usage') + ': !keyword add <keyword> <response> | !keyword edit <keyword> <response> | !keyword remove <keyword> | !keyword list', opts.sender)
   }
 
-  async add (self, sender, text) {
-    debug('add(%j,%j,%j)', self, sender, text)
-    const match = XRegExp.exec(text, constants.KEYWORD_REGEXP)
+  async add (opts) {
+    debug('add(%j,%j,%j)', opts)
+    const match = XRegExp.exec(opts.parameters, constants.KEYWORD_REGEXP)
 
     if (_.isNil(match)) {
       let message = await global.commons.prepare('keywords.keyword-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
@@ -106,13 +106,13 @@ class Keywords {
 
     if (!_.isEmpty(await global.db.engine.findOne('keywords', { keyword: match.keyword }))) {
       let message = await global.commons.prepare('keywords.keyword-already-exist', { keyword: match.keyword })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     await global.db.engine.update('keywords', { keyword: match.keyword }, keyword)
     let message = await global.commons.prepare('keywords.keyword-was-added', { keyword: match.keyword })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
   async run (self, sender, text) {
@@ -128,54 +128,54 @@ class Keywords {
     return true
   }
 
-  async list (self, sender) {
-    debug('list(%j,%j)', self, sender)
+  async list (opts) {
+    debug('list(%j,%j)', opts)
     let keywords = await global.db.engine.find('keywords')
     var output = (keywords.length === 0 ? global.translate('keywords.list-is-empty') : global.translate('keywords.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(keywords, 'keyword'), 'keyword').join(', ')))
-    debug(output); global.commons.sendMessage(output, sender)
+    debug(output); global.commons.sendMessage(output, opts.sender)
   }
 
-  async toggle (self, sender, text) {
-    debug('toggle(%j,%j,%j)', self, sender, text)
+  async toggle (opts) {
+    debug('toggle(%j,%j,%j)', opts)
 
-    if (text.trim().length === 0) {
+    if (opts.parameters.trim().length === 0) {
       let message = await global.commons.prepare('keywords.keyword-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
-    let id = text.trim()
+    let id = opts.parameters.trim()
 
     const keyword = await global.db.engine.findOne('keywords', { keyword: id })
     if (_.isEmpty(keyword)) {
       let message = await global.commons.prepare('keywords.keyword-was-not-found', { keyword: id })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return
     }
 
     await global.db.engine.update('keywords', { keyword: id }, { enabled: !keyword.enabled })
 
     let message = await global.commons.prepare(!keyword.enabled ? 'keywords.keyword-was-enabled' : 'keywords.keyword-was-disabled', { keyword: keyword.keyword })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async remove (self, sender, text) {
-    debug('remove(%j,%j,%j)', self, sender, text)
+  async remove (opts) {
+    debug('remove(%j,%j,%j)', opts)
 
-    if (text.trim().length === 0) {
+    if (opts.parameters.trim().length === 0) {
       let message = await global.commons.prepare('keywords.keyword-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
-    let id = text.trim()
+    let id = opts.parameters.trim()
 
     let removed = await global.db.engine.remove('keywords', { keyword: id })
     if (!removed) {
       let message = await global.commons.prepare('keywords.keyword-was-not-found', { keyword: id })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
     let message = await global.commons.prepare('keywords.keyword-was-removed', { keyword: id })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 }
 

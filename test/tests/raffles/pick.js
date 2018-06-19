@@ -21,7 +21,7 @@ describe('Raffles - pick()', () => {
 
   describe('Raffle should return winner', () => {
     it('create ticket raffle', async () => {
-      global.systems.raffles.open(global.systems.raffles, owner, '!winme -min 0 -max ' + max)
+      global.systems.raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max })
       await message.isSent('raffles.announce-ticket-raffle', owner, {
         keyword: '!winme',
         eligibility: await global.commons.prepare('raffles.eligibility-everyone-item'),
@@ -46,7 +46,7 @@ describe('Raffles - pick()', () => {
     })
 
     it('pick a winner', async () => {
-      await global.systems.raffles.pick(global.systems.raffles, owner)
+      await global.systems.raffles.pick({ sender: owner })
 
       await message.isSent('raffles.raffle-winner-is', owner, [{
         username: testuser.username,

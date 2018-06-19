@@ -16,56 +16,56 @@ describe('Alias - toggle()', () => {
   })
 
   it('', async () => {
-    global.systems.alias.toggle(global.systems.alias, owner, '')
+    global.systems.alias.toggle({ sender: owner, parameters: '' })
     await message.isSent('alias.alias-parse-failed', owner, { sender: owner.username })
   })
 
   it('!unknown', async () => {
-    global.systems.alias.toggle(global.systems.alias, owner, '!unknown')
+    global.systems.alias.toggle({ sender: owner, parameters: '!unknown' })
     await message.isSent('alias.alias-was-not-found', owner, { sender: owner.username, alias: 'unknown' })
   })
 
   it('!a', async () => {
-    global.systems.alias.add(global.systems.alias, owner, 'viewer !a !uptime')
+    global.systems.alias.add({ sender: owner, parameters: 'viewer !a !uptime' })
     await message.isSent('alias.alias-was-added', owner, { sender: owner.username, alias: 'a', command: 'uptime' })
 
-    global.systems.alias.toggle(global.systems.alias, owner, '!a')
+    global.systems.alias.toggle({ sender: owner, parameters: '!a' })
     await message.isSent('alias.alias-was-disabled', owner, { sender: owner.username, alias: 'a' })
 
-    global.systems.alias.toggle(global.systems.alias, owner, '!a')
+    global.systems.alias.toggle({ sender: owner, parameters: '!a' })
     await message.isSent('alias.alias-was-enabled', owner, { sender: owner.username, alias: 'a' })
   })
 
   it('!a with spaces', async () => {
-    global.systems.alias.add(global.systems.alias, owner, 'viewer !a with spaces !uptime')
+    global.systems.alias.add({ sender: owner, parameters: 'viewer !a with spaces !uptime' })
     await message.isSent('alias.alias-was-added', owner, { sender: owner.username, alias: 'a with spaces', command: 'uptime' })
 
-    global.systems.alias.toggle(global.systems.alias, owner, '!a with spaces')
+    global.systems.alias.toggle({ sender: owner, parameters: '!a with spaces' })
     await message.isSent('alias.alias-was-disabled', owner, { sender: owner.username, alias: 'a with spaces' })
 
-    global.systems.alias.toggle(global.systems.alias, owner, '!a with spaces')
+    global.systems.alias.toggle({ sender: owner, parameters: '!a with spaces' })
     await message.isSent('alias.alias-was-enabled', owner, { sender: owner.username, alias: 'a with spaces' })
   })
 
   it('!한국어', async () => {
-    global.systems.alias.add(global.systems.alias, owner, 'viewer !한국어 !uptime')
+    global.systems.alias.add({ sender: owner, parameters: 'viewer !한국어 !uptime' })
     await message.isSent('alias.alias-was-added', owner, { sender: owner.username, alias: '한국어', command: 'uptime' })
 
-    global.systems.alias.toggle(global.systems.alias, owner, '!한국어')
+    global.systems.alias.toggle({ sender: owner, parameters: '!한국어' })
     await message.isSent('alias.alias-was-disabled', owner, { sender: owner.username, alias: '한국어' })
 
-    global.systems.alias.toggle(global.systems.alias, owner, '!한국어')
+    global.systems.alias.toggle({ sender: owner, parameters: '!한국어' })
     await message.isSent('alias.alias-was-enabled', owner, { sender: owner.username, alias: '한국어' })
   })
 
   it('!русский', async () => {
-    global.systems.alias.add(global.systems.alias, owner, 'viewer !русский !uptime')
+    global.systems.alias.add({ sender: owner, parameters: 'viewer !русский !uptime' })
     await message.isSent('alias.alias-was-added', owner, { sender: owner.username, alias: 'русский', command: 'uptime' })
 
-    global.systems.alias.toggle(global.systems.alias, owner, '!русский')
+    global.systems.alias.toggle({ sender: owner, parameters: '!русский' })
     await message.isSent('alias.alias-was-disabled', owner, { sender: owner.username, alias: 'русский' })
 
-    global.systems.alias.toggle(global.systems.alias, owner, '!русский')
+    global.systems.alias.toggle({ sender: owner, parameters: '!русский' })
     await message.isSent('alias.alias-was-enabled', owner, { sender: owner.username, alias: 'русский' })
   })
 })

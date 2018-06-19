@@ -91,14 +91,14 @@ class Bets {
     return !isEnabled
       ? []
       : [
-        {this: this, command: '!bet open', fnc: this.open, permission: constants.MODS},
-        {this: this, command: '!bet close', fnc: this.close, permission: constants.MODS},
-        {this: this, command: '!bet refund', fnc: this.refundAll, permission: constants.MODS},
-        {this: this, command: '!bet', fnc: this.save, permission: constants.VIEWERS, isHelper: true}
+        {this: this, id: '!bet open', command: '!bet open', fnc: this.open, permission: constants.MODS},
+        {this: this, id: '!bet close', command: '!bet close', fnc: this.close, permission: constants.MODS},
+        {this: this, id: '!bet refund', command: '!bet refund', fnc: this.refundAll, permission: constants.MODS},
+        {this: this, id: '!bet', command: '!bet', fnc: this.save, permission: constants.VIEWERS, isHelper: true}
       ]
   }
 
-  async open (self, sender, text) {
+  async open (opts) {
     const expects = new Expects()
     const currentBet = await global.db.engine.findOne('cache', { key: 'bets' })
 
@@ -106,7 +106,7 @@ class Bets {
       if (!_.isEmpty(currentBet)) { throw new Error(ERROR_ALREADY_OPENED) }
 
       let [minutes, title, options] = expects
-        .check(text)
+        .check(opts.parameters)
         .argument({ name: 'timeout', optional: true, default: 2 })
         .argument({ name: 'title', optional: false, multi: true })
         .list({ delimiter: '|' })
@@ -121,47 +121,47 @@ class Bets {
         .replace(/\$title/g, title)
         .replace(/\$maxIndex/g, options.length - 1)
         .replace(/\$minutes/g, minutes)
-        .replace(/\$options/g, options.map((v, i) => `${i}. '${v}'`).join(', ')), sender)
+        .replace(/\$options/g, options.map((v, i) => `${i}. '${v}'`).join(', ')), opts.sender)
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
-          global.commons.sendMessage(global.translate('bets.notEnoughOptions'), sender)
+          global.commons.sendMessage(global.translate('bets.notEnoughOptions'), opts.sender)
           break
         case ERROR_ALREADY_OPENED:
           global.commons.sendMessage(global.translate('bets.running')
             .replace(/\$maxIndex/g, currentBet.options.length - 1)
-            .replace(/\$options/g, currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', ')), sender)
+            .replace(/\$options/g, currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', ')), opts.sender)
           break
         default:
           global.log.warning(e.stack)
-          global.commons.sendMessage(global.translate('core.error'), sender)
+          global.commons.sendMessage(global.translate('core.error'), opts.sender)
       }
     } finally {
       global.db.engine.update('cache', { key: 'betsModifiedTime' }, { value: new Date().getTime() })
     }
   }
 
-  async info (self, sender) {
+  async info (opts) {
     let currentBet = await global.db.engine.findOne('cache', { key: 'bets' })
-    if (_.isEmpty(currentBet)) global.commons.sendMessage(global.translate('bets.notRunning'), sender)
+    if (_.isEmpty(currentBet)) global.commons.sendMessage(global.translate('bets.notRunning'), opts.sender)
     else {
       global.commons.sendMessage(global.translate(currentBet.locked ? 'bets.lockedInfo' : 'bets.info')
         .replace(/\$title/g, currentBet.title)
         .replace(/\$maxIndex/g, currentBet.options.length - 1)
         .replace(/\$options/g, currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', '))
-        .replace(/\$minutes/g, parseFloat((currentBet.end - new Date().getTime()) / 1000 / 60).toFixed(1)), sender)
+        .replace(/\$minutes/g, parseFloat((currentBet.end - new Date().getTime()) / 1000 / 60).toFixed(1)), opts.sender)
     }
   }
 
-  async participate (self, sender, text) {
+  async participate (opts) {
     const expects = new Expects()
     const currentBet = await global.db.engine.findOne('cache', { key: 'bets' })
 
     try {
-      let [index, points] = expects.check(text).number({ optional: true }).points({ optional: true }).toArray()
+      let [index, points] = expects.check(opts.parameters).number({ optional: true }).points({ optional: true }).toArray()
       if (!_.isNil(points) && !_.isNil(index)) {
-        const pointsOfUser = await global.systems.points.getPointsOf(sender.username)
-        const _betOfUser = await global.db.engine.findOne('bets.users', { username: sender.username })
+        const pointsOfUser = await global.systems.points.getPointsOf(opts.sender.username)
+        const _betOfUser = await global.db.engine.findOne('bets.users', { username: opts.sender.username })
 
         if (points === 'all' || points > pointsOfUser) points = pointsOfUser
 
@@ -174,55 +174,55 @@ class Bets {
         if (_.isEmpty(_betOfUser)) _betOfUser.points = 0
 
         // All OK
-        await global.db.engine.insert('users.points', { username: sender.username, points: points * -1 })
-        await global.db.engine.update('bets.users', { username: sender.username }, { points: points + _betOfUser.points, option: index })
+        await global.db.engine.insert('users.points', { username: opts.sender.username, points: points * -1 })
+        await global.db.engine.update('bets.users', { username: opts.sender.username }, { points: points + _betOfUser.points, option: index })
       } else {
-        self.info(self, sender)
+        this.info(opts)
       }
     } catch (e) {
       switch (e.message) {
         case ERROR_ZERO_BET:
           global.commons.sendMessage(global.translate('bets.zeroBet')
-            .replace(/\$pointsName/g, await Points.getPointsName(0)), sender)
+            .replace(/\$pointsName/g, await Points.getPointsName(0)), opts.sender)
           break
         case ERROR_NOT_RUNNING:
-          global.commons.sendMessage(global.translate('bets.notRunning'), sender)
+          global.commons.sendMessage(global.translate('bets.notRunning'), opts.sender)
           break
         case ERROR_UNDEFINED_BET:
-          global.commons.sendMessage(global.translate('bets.undefinedBet'), sender)
+          global.commons.sendMessage(global.translate('bets.undefinedBet'), opts.sender)
           break
         case ERROR_IS_LOCKED:
-          global.commons.sendMessage(global.translate('bets.timeUpBet'), sender)
+          global.commons.sendMessage(global.translate('bets.timeUpBet'), opts.sender)
           break
         case ERROR_DIFF_BET:
-          let result = _.pickBy(currentBet.bets, function (v, k) { return _.includes(Object.keys(v), sender.username) })
-          global.commons.sendMessage(global.translate('bets.diffBet').replace(/\$option/g, Object.keys(result)[0]), sender)
+          let result = _.pickBy(currentBet.bets, function (v, k) { return _.includes(Object.keys(v), opts.sender.username) })
+          global.commons.sendMessage(global.translate('bets.diffBet').replace(/\$option/g, Object.keys(result)[0]), opts.sender)
           break
         default:
           global.log.warning(e.stack)
-          global.commons.sendMessage(global.translate('bets.error').replace(/\$maxIndex/g, currentBet.options.length - 1), sender)
+          global.commons.sendMessage(global.translate('bets.error').replace(/\$maxIndex/g, currentBet.options.length - 1), opts.sender)
       }
     } finally {
       global.db.engine.update('cache', { key: 'betsModifiedTime' }, { value: new Date().getTime() })
     }
   }
 
-  async refundAll (self, sender) {
+  async refundAll (opts) {
     try {
       if (_.isEmpty(await global.db.engine.findOne('cache', { key: 'bets' }))) throw Error(ERROR_NOT_RUNNING)
       for (let user of await global.db.engine.find('bets.users')) {
         await global.db.engine.insert('users.points', { username: user.username, points: parseInt(user.points, 10) })
       }
       await global.db.engine.remove('bets.users', {})
-      global.commons.sendMessage(global.translate('bets.refund'), sender)
+      global.commons.sendMessage(global.translate('bets.refund'), opts.sender)
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_RUNNING:
-          global.commons.sendMessage(global.translate('bets.notRunning'), sender)
+          global.commons.sendMessage(global.translate('bets.notRunning'), opts.sender)
           break
         default:
           global.log.warning(e.stack)
-          global.commons.sendMessage(global.translate('core.error'), sender)
+          global.commons.sendMessage(global.translate('core.error'), opts.sender)
       }
     } finally {
       await global.db.engine.remove('cache', { key: 'bets' })
@@ -230,11 +230,11 @@ class Bets {
     }
   }
 
-  async close (self, sender, text) {
+  async close (opts) {
     const expects = new Expects()
     let currentBet = await global.db.engine.findOne('cache', { key: 'bets' })
     try {
-      let index = expects.check(text).number().toArray()[0]
+      let index = expects.check(opts.parameters).number().toArray()[0]
 
       if (_.isEmpty(currentBet)) throw Error(ERROR_NOT_RUNNING)
       if (_.isNil(currentBet.options[index])) throw Error(ERROR_NOT_OPTION)
@@ -249,31 +249,31 @@ class Bets {
 
       global.commons.sendMessage(global.translate('bets.closed')
         .replace(/\$option/g, currentBet.options[index].name)
-        .replace(/\$amount/g, _.filter(users, (o) => o.option === index).length), sender)
+        .replace(/\$amount/g, _.filter(users, (o) => o.option === index).length), opts.sender)
       await global.db.engine.remove('cache', { _id: currentBet._id.toString() })
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
-          global.commons.sendMessage(global.translate('bets.closeNotEnoughOptions'), sender)
+          global.commons.sendMessage(global.translate('bets.closeNotEnoughOptions'), opts.sender)
           break
         case ERROR_NOT_RUNNING:
-          global.commons.sendMessage(global.translate('bets.notRunning'), sender)
+          global.commons.sendMessage(global.translate('bets.notRunning'), opts.sender)
           break
         case ERROR_NOT_OPTION:
-          global.commons.sendMessage(global.translate('bets.notOption'), sender)
+          global.commons.sendMessage(global.translate('bets.notOption'), opts.sender)
           break
         default:
           global.log.warning(e.stack)
-          global.commons.sendMessage(global.translate('core.error'), sender)
+          global.commons.sendMessage(global.translate('core.error'), opts.sender)
       }
     } finally {
       global.db.engine.update('cache', { key: 'betsModifiedTime' }, { value: new Date().getTime() })
     }
   }
 
-  save (self, sender, text) {
-    if (text.length === 0) self.info(self, sender)
-    else self.participate(self, sender, text)
+  save (opts) {
+    if (opts.parameters.length === 0) this.info(opts)
+    else this.participate(opts)
   }
 }
 

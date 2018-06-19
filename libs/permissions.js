@@ -16,7 +16,7 @@ class Permissions {
 
   commands () {
     return [
-      {this: this, command: '!permission', fnc: this.override, permission: constants.OWNER_ONLY}
+      {this: this, id: '!permission', command: '!permission', fnc: this.override, permission: constants.OWNER_ONLY}
     ]
   }
 
@@ -40,9 +40,9 @@ class Permissions {
     global.db.engine.remove('permissions', { key: command.replace('!', '') })
   }
 
-  async override (self, sender, text) {
+  async override (opts) {
     try {
-      const match = XRegExp.exec(text, constants.PERMISSION_REGEXP)
+      const match = XRegExp.exec(opts.parameters, constants.PERMISSION_REGEXP)
       var permission
       switch (match.type) {
         case 'viewer':
@@ -68,12 +68,12 @@ class Permissions {
         if (!_.isNil(command.id)) await global.db.engine.update('permissions', { key: command.id.replace('!', '') }, { key: command.id.replace('!', ''), permission: permission })
         // deprecated saving on match.command
         else await global.db.engine.update('permissions', { key: command.command.replace('!', '') }, { key: command.command.replace('!', ''), permission: permission })
-        global.commons.sendMessage(global.translate('permissions.success.change').replace(/\$command/g, command.command), sender)
+        global.commons.sendMessage(global.translate('permissions.success.change').replace(/\$command/g, command.command), opts.sender)
       } else {
-        global.commons.sendMessage(global.translate('permissions.failed.noCmd'), sender)
+        global.commons.sendMessage(global.translate('permissions.failed.noCmd'), opts.sender)
       }
     } catch (e) {
-      global.commons.sendMessage(global.translate('permissions.failed.parse'), sender)
+      global.commons.sendMessage(global.translate('permissions.failed.parse'), opts.sender)
     }
   }
 }

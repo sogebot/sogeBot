@@ -34,13 +34,13 @@ class CustomCommands {
     return !global.commons.isSystemEnabled('customcommands')
       ? []
       : [
-        { command: '!command add', fnc: this.add, permission: constants.OWNER_ONLY, this: this },
-        { command: '!command edit', fnc: this.edit, permission: constants.OWNER_ONLY, this: this },
-        { command: '!command list', fnc: this.list, permission: constants.OWNER_ONLY, this: this },
-        { command: '!command remove', fnc: this.remove, permission: constants.OWNER_ONLY, this: this },
-        { command: '!command toggle-visibility', fnc: this.visibility, permission: constants.OWNER_ONLY, this: this },
-        { command: '!command toggle', fnc: this.toggle, permission: constants.OWNER_ONLY, this: this },
-        { command: '!command', fnc: this.help, permission: constants.OWNER_ONLY, isHelper: true, this: this }
+        { this: this, id: '!command add', command: '!command add', fnc: this.add, permission: constants.OWNER_ONLY },
+        { this: this, id: '!command edit', command: '!command edit', fnc: this.edit, permission: constants.OWNER_ONLY },
+        { this: this, id: '!command list', command: '!command list', fnc: this.list, permission: constants.OWNER_ONLY },
+        { this: this, id: '!command remove', command: '!command remove', fnc: this.remove, permission: constants.OWNER_ONLY },
+        { this: this, id: '!command toggle-visibility', command: '!command toggle-visibility', fnc: this.visibility, permission: constants.OWNER_ONLY },
+        { this: this, id: '!command toggle', command: '!command toggle', fnc: this.toggle, permission: constants.OWNER_ONLY },
+        { this: this, id: '!command', command: '!command', fnc: this.help, permission: constants.OWNER_ONLY, isHelper: true }
       ]
   }
 
@@ -57,7 +57,7 @@ class CustomCommands {
   }
 
   async editCommand (self, socket, data) {
-    if (data.value.length === 0) await self.remove(self, null, '!' + data.id)
+    if (data.value.length === 0) await self.remove({ sender: null, command: { after: '!' + data.id } })
     else {
       if (data.value.startsWith('!')) data.value = data.value.replace('!', '')
       await global.db.engine.update('commands', { command: data.id }, { command: data.value })
@@ -65,28 +65,27 @@ class CustomCommands {
   }
 
   async editResponse (self, socket, data) {
-    if (data.value.length === 0) await self.remove(self, null, '!' + data.id)
+    if (data.value.length === 0) await self.remove({ sender: null, command: { after: '!' + data.id } })
     else await global.db.engine.update('commands', { command: data.id }, { response: data.value })
   }
 
-  help (self, sender) {
-    global.commons.sendMessage(global.translate('core.usage') + ': !command add owner|mod|regular|viewer <!command> <response> | !command edit owner|mod|regular|viewer <!command> <response> | !command remove <!command> | !command list', sender)
+  help (opts) {
+    global.commons.sendMessage(global.translate('core.usage') + ': !command add owner|mod|regular|viewer <!command> <response> | !command edit owner|mod|regular|viewer <!command> <response> | !command remove <!command> | !command list', opts.sender)
   }
 
-  async edit (self, sender, text) {
-    debug('edit(%j, %j, %j)', self, sender, text)
-    const match = XRegExp.exec(text, constants.COMMAND_REGEXP_WITH_RESPONSE)
+  async edit (opts) {
+    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP_WITH_RESPONSE)
 
     if (_.isNil(match)) {
       let message = await global.commons.prepare('customcmds.commands-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     let item = await global.db.engine.findOne('commands', { command: match.command })
     if (_.isEmpty(item)) {
       let message = await global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
@@ -105,16 +104,15 @@ class CustomCommands {
 
     await global.db.engine.update('commands', { command: match.command }, { response: match.response, permision: permission })
     let message = await global.commons.prepare('customcmds.command-was-edited', { command: match.command, response: match.response })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async add (self, sender, text) {
-    debug('add(%j,%j,%j)', self, sender, text)
-    const match = XRegExp.exec(text, constants.COMMAND_REGEXP_WITH_RESPONSE)
+  async add (opts) {
+    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP_WITH_RESPONSE)
 
     if (_.isNil(match)) {
       let message = await global.commons.prepare('customcmds.commands-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
@@ -135,7 +133,7 @@ class CustomCommands {
 
     await global.db.engine.update('commands', { command: command.command }, command)
     let message = await global.commons.prepare('customcmds.command-was-added', { command: match.command })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
   async run (self, sender, msg) {
@@ -172,78 +170,78 @@ class CustomCommands {
     return true
   }
 
-  async list (self, sender, text) {
+  async list (opts) {
     let commands = await global.db.engine.find('commands', { visible: true })
     var output = (commands.length === 0 ? global.translate('customcmds.list-is-empty') : global.translate('customcmds.list-is-not-empty').replace(/\$list/g, '!' + _.map(_.orderBy(commands, 'command'), 'command').join(', !')))
-    debug(output); global.commons.sendMessage(output, sender)
+    debug(output); global.commons.sendMessage(output, opts.sender)
   }
 
-  async togglePermission (self, sender, text) {
-    debug('togglePermission(%j,%j,%j)', self, sender, text)
-    const command = await global.db.engine.findOne('commands', { command: text.replace('!', '') })
+  async togglePermission (opts) {
+    debug('togglePermission(%j,%j,%j)', opts)
+    const command = await global.db.engine.findOne('commands', { command: opts.parameters.replace('!', '') })
     if (!_.isEmpty(command)) {
       await global.db.engine.update('commands', { _id: command._id.toString() }, { permission: command.permission === 3 ? 0 : ++command.permission })
     }
   }
 
-  async toggle (self, sender, text) {
-    debug('toggle(%j,%j,%j)', self, sender, text)
-    const match = XRegExp.exec(text, constants.COMMAND_REGEXP)
+  async toggle (opts) {
+    debug('toggle(%j,%j,%j)', opts)
+    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP)
     if (_.isNil(match)) {
       let message = await global.commons.prepare('customcmds.commands-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     const command = await global.db.engine.findOne('commands', { command: match.command })
     if (_.isEmpty(command)) {
       let message = await global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     await global.db.engine.update('commands', { command: match.command }, { enabled: !command.enabled })
 
     let message = await global.commons.prepare(!command.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: command.command })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async visible (self, sender, text) {
-    const match = XRegExp.exec(text, constants.COMMAND_REGEXP)
+  async visible (opts) {
+    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP)
     if (_.isNil(match)) {
       let message = await global.commons.prepare('customcmds.commands-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     const command = await global.db.engine.findOne('commands', { command: match.command })
     if (_.isEmpty(command)) {
       let message = await global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     await global.db.engine.update('commands', { command: match.command }, { visible: !command.visible })
     let message = await global.commons.prepare(!command.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: command.command })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async remove (self, sender, text) {
-    const match = XRegExp.exec(text, constants.COMMAND_REGEXP)
+  async remove (opts) {
+    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP)
     if (_.isNil(match)) {
       let message = await global.commons.prepare('customcmds.commands-parse-failed')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     let removed = await global.db.engine.remove('commands', { command: match.command })
     if (!removed) {
       let message = await global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
     let message = await global.commons.prepare('customcmds.command-was-removed', { command: match.command })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 }
 

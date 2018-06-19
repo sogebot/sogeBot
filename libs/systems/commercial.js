@@ -22,15 +22,15 @@ class Commercial {
     return !global.commons.isSystemEnabled('commercial')
       ? []
       : [
-        { command: '!commercial', fnc: this.run, permission: constants.OWNER_ONLY, isHelper: true, this: this }
+        { this: this, id: '!commercial', command: '!commercial', fnc: this.run, permission: constants.OWNER_ONLY, isHelper: true }
       ]
   }
 
-  async run (self, sender, text) {
-    let parsed = text.match(/^([\d]+)? ?(.*)?$/)
+  async run (opts) {
+    let parsed = opts.parameters.match(/^([\d]+)? ?(.*)?$/)
 
     if (_.isNil(parsed)) {
-      global.commons.sendMessage('$sender, something went wrong with !commercial', sender)
+      global.commons.sendMessage('$sender, something went wrong with !commercial', opts.sender)
     }
 
     let commercial = {
@@ -39,7 +39,7 @@ class Commercial {
     }
 
     if (_.isNil(commercial.duration)) {
-      global.commons.sendMessage('Usage: !commercial [duration] [optional-message]', sender)
+      global.commons.sendMessage('Usage: !commercial [duration] [optional-message]', opts.sender)
       return
     }
 
@@ -62,13 +62,13 @@ class Commercial {
 
         global.events.fire('commercial', { duration: commercial.duration })
         global.client.commercial(config.settings.broadcaster_username, commercial.duration)
-        if (!_.isNil(commercial.message)) global.commons.sendMessage(commercial.message, sender)
+        if (!_.isNil(commercial.message)) global.commons.sendMessage(commercial.message, opts.sender)
       } catch (e) {
         global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`)
         global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'commercial', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
       }
     } else {
-      global.commons.sendMessage('$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', sender)
+      global.commons.sendMessage('$sender, available commercial duration are: 30, 60, 90, 120, 150 and 180', opts.sender)
     }
   }
 }

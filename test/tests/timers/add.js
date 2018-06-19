@@ -18,22 +18,22 @@ describe('Timers - add()', () => {
   })
 
   it('', async () => {
-    global.systems.timers.add(global.systems.timers, owner, '')
+    global.systems.timers.add({ sender: owner, parameters: '' })
     await message.isSent('timers.name-must-be-defined', owner, { sender: owner.username })
   })
 
   it('-name test', async () => {
-    global.systems.timers.add(global.systems.timers, owner, '-name test')
+    global.systems.timers.add({ sender: owner, parameters: '-name test' })
     await message.isSent('timers.response-must-be-defined', owner, { sender: owner.username })
   })
 
   it('-name unknown -response "Lorem Ipsum"', async () => {
-    global.systems.timers.add(global.systems.timers, owner, '-name unknown -response "Lorem Ipsum"')
+    global.systems.timers.add({ sender: owner, parameters: '-name unknown -response "Lorem Ipsum"' })
     await message.isSent('timers.timer-not-found', owner, { name: 'unknown', sender: owner.username })
   })
 
   it('-name test -response "Lorem Ipsum"', async () => {
-    await global.systems.timers.add(global.systems.timers, owner, '-name test -response "Lorem Ipsum"')
+    await global.systems.timers.add({ sender: owner, parameters: '-name test -response "Lorem Ipsum"' })
 
     let item = await global.db.engine.findOne('timers.responses', { response: 'Lorem Ipsum' })
     assert.notEmpty(item)

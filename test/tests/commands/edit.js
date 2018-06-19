@@ -16,28 +16,28 @@ describe('Custom Commands - edit()', () => {
   })
 
   it('', async () => {
-    global.systems.customCommands.edit(global.systems.customCommands, owner, '')
+    global.systems.customCommands.edit({ sender: owner, parameters: '' })
     await message.isSent('customcmds.commands-parse-failed', owner, { sender: owner.username })
   })
 
   it('!a', async () => {
-    global.systems.customCommands.edit(global.systems.customCommands, owner, '!a')
+    global.systems.customCommands.edit({ sender: owner, parameters: '!a' })
     await message.isSent('customcmds.commands-parse-failed', owner, { sender: owner.username })
   })
 
   it('!unknown Lorem Ipsum', async () => {
-    global.systems.customCommands.edit(global.systems.customCommands, owner, 'viewer !unknown Lorem Ipsum')
+    global.systems.customCommands.edit({ sender: owner, parameters: 'viewer !unknown Lorem Ipsum' })
     await message.isSent('customcmds.command-was-not-found', owner, { command: 'unknown', sender: owner.username })
   })
 
   it('!a Lorem Ipsum -> !a Ipsum Lorem', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !a Lorem Ipsum')
+    global.systems.customCommands.add({ sender: owner, parameters: 'viewer !a Lorem Ipsum' })
     await message.isSent('customcmds.command-was-added', owner, { command: 'a', response: 'Lorem Ipsum', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!a')
     await message.isSentRaw('Lorem Ipsum', owner)
 
-    global.systems.customCommands.edit(global.systems.customCommands, owner, 'viewer !a Ipsum Lorem')
+    global.systems.customCommands.edit({ sender: owner, parameters: 'viewer !a Ipsum Lorem' })
     await message.isSent('customcmds.command-was-edited', owner, { command: 'a', response: 'Ipsum Lorem', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!a')
@@ -45,13 +45,13 @@ describe('Custom Commands - edit()', () => {
   })
 
   it('!한글 Lorem Ipsum -> !a Ipsum Lorem', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !한글 Lorem Ipsum')
+    global.systems.customCommands.add({ sender: owner, parameters: 'viewer !한글 Lorem Ipsum' })
     await message.isSent('customcmds.command-was-added', owner, { command: '한글', response: 'Lorem Ipsum', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!한글')
     await message.isSentRaw('Lorem Ipsum', owner)
 
-    global.systems.customCommands.edit(global.systems.customCommands, owner, 'viewer !한글 Ipsum Lorem')
+    global.systems.customCommands.edit({ sender: owner, parameters: 'viewer !한글 Ipsum Lorem' })
     await message.isSent('customcmds.command-was-edited', owner, { command: '한글', response: 'Ipsum Lorem', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!한글')
@@ -59,13 +59,13 @@ describe('Custom Commands - edit()', () => {
   })
 
   it('!русский Lorem Ipsum -> !a Ipsum Lorem', async () => {
-    global.systems.customCommands.add(global.systems.customCommands, owner, 'viewer !русский Lorem Ipsum')
+    global.systems.customCommands.add({ sender: owner, parameters: 'viewer !русский Lorem Ipsum' })
     await message.isSent('customcmds.command-was-added', owner, { command: 'русский', response: 'Lorem Ipsum', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!русский')
     await message.isSentRaw('Lorem Ipsum', owner, { sender: owner.username })
 
-    global.systems.customCommands.edit(global.systems.customCommands, owner, 'viewer !русский Ipsum Lorem')
+    global.systems.customCommands.edit({ sender: owner, parameters: 'viewer !русский Ipsum Lorem' })
     await message.isSent('customcmds.command-was-edited', owner, { command: 'русский', response: 'Ipsum Lorem', sender: owner.username })
 
     global.systems.customCommands.run(global.systems.customCommands, owner, '!русский')

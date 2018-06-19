@@ -181,14 +181,13 @@ class Parser {
       var text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim()
       let opts = {
         sender: _.isNil(sender) ? { username: config.settings.bot_username.toLowerCase() } : sender,
-        command: {
-          full: message,
-          after: text.trim()
-        }
+        command: message,
+        parameters: text.trim()
       }
+
+      if (_.isNil(command.id)) throw Error(`command id is missing from ${command['fnc']}`)
+
       if (typeof command.fnc === 'function' && !_.isNil(command.id)) command['fnc'].apply(command.this, [opts])
-      // TODO: DEPRECATED: We should use IDs for new systems to be able to have custom permission on id, not command itself
-      else if (typeof command.fnc === 'function') command.fnc(command.this, _.isNil(sender) ? { username: config.settings.bot_username.toLowerCase() } : sender, text.trim(), message)
       else global.log.error(command.command + ' have wrong null function registered!', { fnc: 'Parser.prototype.parseCommands' })
     } else {
       // user doesn't have permissions for command

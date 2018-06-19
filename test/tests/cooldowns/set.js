@@ -16,97 +16,97 @@ describe('Cooldowns - set()', () => {
   })
 
   it('', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, '')
+    global.systems.cooldown.set({ sender: owner, parameters: '' })
     await message.isSent('cooldowns.cooldown-parse-failed', owner, { sender: owner.username })
   })
 
   it('!alias', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, '!alias')
+    global.systems.cooldown.set({ sender: owner, parameters: '!alias' })
     await message.isSent('cooldowns.cooldown-parse-failed', owner, { sender: owner.username })
   })
 
   it('alias', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, 'alias')
+    global.systems.cooldown.set({ sender: owner, parameters: 'alias' })
     await message.isSent('cooldowns.cooldown-parse-failed', owner, { sender: owner.username })
   })
 
   it('test global 20', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, 'test global 20')
+    global.systems.cooldown.set({ sender: owner, parameters: 'test global 20' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: 'test', type: 'global', seconds: 20, sender: owner.username })
   })
 
   it('test user 20', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, 'test user 20')
+    global.systems.cooldown.set({ sender: owner, parameters: 'test user 20' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: 'test', type: 'user', seconds: 20, sender: owner.username })
   })
 
   it('!test global 20', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, '!test global 20')
+    global.systems.cooldown.set({ sender: owner, parameters: '!test global 20' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!test', type: 'global', seconds: 20, sender: owner.username })
   })
 
   it('!test user 20', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, '!test user 20')
+    global.systems.cooldown.set({ sender: owner, parameters: '!test user 20' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!test', type: 'user', seconds: 20, sender: owner.username })
   })
 
   it('test global 20 true', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, 'test global 20 true')
+    global.systems.cooldown.set({ sender: owner, parameters: 'test global 20 true' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: 'test', type: 'global', seconds: 20, sender: owner.username })
   })
 
   it('test user 20 true', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, 'test user 20 true')
+    global.systems.cooldown.set({ sender: owner, parameters: 'test user 20 true' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: 'test', type: 'user', seconds: 20, sender: owner.username })
   })
 
   it('!test global 20 true', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, '!test global 20 true')
+    global.systems.cooldown.set({ sender: owner, parameters: '!test global 20 true' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!test', type: 'global', seconds: 20, sender: owner.username })
   })
 
   it('!test user 20 true', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, '!test user 20 true')
+    global.systems.cooldown.set({ sender: owner, parameters: '!test user 20 true' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!test', type: 'user', seconds: 20, sender: owner.username })
   })
 
   it('!한국어 global 20 true', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, '!한국어 global 20 true')
+    global.systems.cooldown.set({ sender: owner, parameters: '!한국어 global 20 true' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!한국어', type: 'global', seconds: 20, sender: owner.username })
   })
 
   it('!한국어 user 20 true', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, '!한국어 user 20 true')
+    global.systems.cooldown.set({ sender: owner, parameters: '!한국어 user 20 true' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!한국어', type: 'user', seconds: 20, sender: owner.username })
   })
 
   it('한국어 global 20 true', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, '한국어 global 20 true')
+    global.systems.cooldown.set({ sender: owner, parameters: '한국어 global 20 true' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: '한국어', type: 'global', seconds: 20, sender: owner.username })
   })
 
   it('한국어 user 20 true', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, '한국어 user 20 true')
+    global.systems.cooldown.set({ sender: owner, parameters: '한국어 user 20 true' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: '한국어', type: 'user', seconds: 20, sender: owner.username })
   })
 
   it('!русский global 20 true', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, '!русский global 20 true')
+    global.systems.cooldown.set({ sender: owner, parameters: '!русский global 20 true' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!русский', type: 'global', seconds: 20, sender: owner.username })
   })
 
   it('!русский user 20 true', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, '!русский user 20 true')
+    global.systems.cooldown.set({ sender: owner, parameters: '!русский user 20 true' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: '!русский', type: 'user', seconds: 20, sender: owner.username })
   })
 
   it('русский global 20 true', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, 'русский global 20 true')
+    global.systems.cooldown.set({ sender: owner, parameters: 'русский global 20 true' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: 'русский', type: 'global', seconds: 20, sender: owner.username })
   })
 
   it('русский user 20 true', async () => {
-    global.systems.cooldown.set(global.systems.cooldown, owner, 'русский user 20 true')
+    global.systems.cooldown.set({ sender: owner, parameters: 'русский user 20 true' })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: 'русский', type: 'user', seconds: 20, sender: owner.username })
   })
 })

@@ -16,36 +16,36 @@ describe('Keywords - remove()', () => {
   })
 
   it('', async () => {
-    global.systems.keywords.remove(global.systems.keywords, owner, '')
+    global.systems.keywords.remove({ sender: owner, parameters: '' })
     await message.isSent('keywords.keyword-parse-failed', owner, { sender: owner.username })
   })
 
   it('!alias', async () => {
-    global.systems.keywords.remove(global.systems.keywords, owner, '!alias')
+    global.systems.keywords.remove({ sender: owner, parameters: '!alias' })
     await message.isSent('keywords.keyword-was-not-found', owner, { keyword: '!alias', sender: owner.username })
   })
 
   it('alias', async () => {
-    global.systems.keywords.remove(global.systems.keywords, owner, 'alias')
+    global.systems.keywords.remove({ sender: owner, parameters: 'alias' })
     await message.isSent('keywords.keyword-was-not-found', owner, { keyword: 'alias', sender: owner.username })
   })
 
   it('!a', async () => {
-    global.systems.keywords.add(global.systems.keywords, owner, 'a me')
+    global.systems.keywords.add({ sender: owner, parameters: 'a me' })
     await message.isSent('keywords.keyword-was-added', owner, { keyword: 'a', response: '!me', sender: owner.username })
 
-    global.systems.keywords.remove(global.systems.keywords, owner, 'a')
+    global.systems.keywords.remove({ sender: owner, parameters: 'a' })
     await message.isSent('keywords.keyword-was-removed', owner, { keyword: 'a', sender: owner.username })
   })
 
   it('2x - !a !me', async () => {
-    global.systems.keywords.add(global.systems.keywords, owner, 'a me')
+    global.systems.keywords.add({ sender: owner, parameters: 'a me' })
     await message.isSent('keywords.keyword-was-added', owner, { keyword: 'a', response: '!me', sender: owner.username })
 
-    global.systems.keywords.remove(global.systems.keywords, owner, 'a')
+    global.systems.keywords.remove({ sender: owner, parameters: 'a' })
     await message.isSent('keywords.keyword-was-removed', owner, { keyword: 'a', sender: owner.username })
 
-    global.systems.keywords.remove(global.systems.keywords, owner, 'a')
+    global.systems.keywords.remove({ sender: owner, parameters: 'a' })
     await message.isSent('keywords.keyword-was-not-found', owner, { keyword: 'a', sender: owner.username })
   })
 })

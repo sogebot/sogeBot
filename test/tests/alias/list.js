@@ -16,18 +16,18 @@ describe('Alias - list()', () => {
   })
 
   it('empty list', async () => {
-    global.systems.alias.list(global.systems.alias, owner, '')
+    global.systems.alias.list({ sender: owner, parameters: '' })
     await message.isSent('alias.list-is-empty', owner, { sender: owner.username })
   })
 
   it('populated list', async () => {
-    global.systems.alias.add(global.systems.alias, owner, 'viewer !a !me')
+    global.systems.alias.add({ sender: owner, parameters: 'viewer !a !me' })
     await message.isSent('alias.alias-was-added', owner, { alias: 'a', command: 'me', sender: owner.username })
 
-    global.systems.alias.add(global.systems.alias, owner, 'viewer !b !me')
+    global.systems.alias.add({ sender: owner, parameters: 'viewer !b !me' })
     await message.isSent('alias.alias-was-added', owner, { alias: 'b', command: 'me', sender: owner.username })
 
-    global.systems.alias.list(global.systems.alias, owner, '')
+    global.systems.alias.list({ sender: owner, parameters: '' })
     await message.isSent('alias.list-is-not-empty', owner, { list: '!a, !b', sender: owner.username })
   })
 })

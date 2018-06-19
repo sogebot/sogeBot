@@ -18,18 +18,18 @@ describe('Timers - unset()', () => {
   })
 
   it('', async () => {
-    global.systems.timers.unset(global.systems.timers, owner, '')
+    global.systems.timers.unset({ sender: owner, parameters: '' })
     await message.isSent('timers.name-must-be-defined', owner, { name: 'unknown', sender: owner.username })
   })
   it('-name test', async () => {
-    global.systems.timers.unset(global.systems.timers, owner, '-name test')
+    global.systems.timers.unset({ sender: owner, parameters: '-name test' })
     await message.isSent('timers.timer-deleted', owner, { name: 'test', sender: owner.username })
 
     let item = await global.db.engine.findOne('timers', { name: 'test' })
     assert.empty(item)
   })
   it('-name nonexistent', async () => {
-    global.systems.timers.unset(global.systems.timers, owner, '-name nonexistent')
+    global.systems.timers.unset({ sender: owner, parameters: '-name nonexistent' })
     await message.isSent('timers.timer-not-found', owner, { name: 'nonexistent', sender: owner.username })
 
     let item = await global.db.engine.findOne('timers', { name: 'test' })
