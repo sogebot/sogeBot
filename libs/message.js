@@ -451,7 +451,9 @@ class Message {
 
     // $currentSong - Spotify -> YTPlayer
     if (!_.isNil(global.integrations) && !_.isEmpty(await global.integrations.spotify.currentSong) && (await global.integrations.spotify.currentSong).is_playing && (await global.integrations.spotify.currentSong).is_enabled) {
-      this.message = this.message.replace(/\$currentSong/g, (await global.integrations.spotify.currentSong).song + ' (' + (await global.integrations.spotify.currentSong).artist + ')')
+      // load spotify format
+      const [format, song] = await Promise.all([global.integrations.spotify.format, global.integrations.spotify.currentSong])
+      this.message = this.message.replace(/\$currentSong/g, format.replace(/\$song/g, song.song).replace(/\$artist/g, song.artist))
     } else if (global.commons.isSystemEnabled('songs')) this.message = this.message.replace(/\$currentSong/g, _.get(await global.systems.songs.currentSong, 'title', global.translate('songs.not-playing')))
     else this.message = this.message.replace(/\$currentSong/g, global.translate('songs.not-playing'))
 
