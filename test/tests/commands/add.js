@@ -47,7 +47,7 @@ describe('Custom Commands - add()', () => {
     global.systems.customCommands.add({ sender: owner, parameters: 'viewer !cmd this is command response' })
     await message.isSent('customcmds.command-was-added', owner, { response: 'this is command response', command: 'cmd', sender: owner.username })
 
-    global.systems.customCommands.run(global.systems.customCommands, owner, '!cmd')
+    global.systems.customCommands.run({ sender: owner, message: '!cmd' })
     await message.isSentRaw('this is command response', owner)
   })
 
@@ -55,7 +55,7 @@ describe('Custom Commands - add()', () => {
     global.systems.customCommands.add({ sender: owner, parameters: 'viewer !한국어 this is command response' })
     await message.isSent('customcmds.command-was-added', owner, { response: 'this is command response', command: '한국어', sender: owner.username })
 
-    global.systems.customCommands.run(global.systems.customCommands, owner, '!한국어')
+    global.systems.customCommands.run({ sender: owner, message: '!한국어' })
     await message.isSentRaw('this is command response', owner)
   })
 
@@ -63,7 +63,7 @@ describe('Custom Commands - add()', () => {
     global.systems.customCommands.add({ sender: owner, parameters: 'viewer !русский this is command response' })
     await message.isSent('customcmds.command-was-added', owner, { response: 'this is command response', command: 'русский', sender: owner.username })
 
-    global.systems.customCommands.run(global.systems.customCommands, owner, '!русский')
+    global.systems.customCommands.run({ sender: owner, message: '!русский' })
     await message.isSentRaw('this is command response', owner)
   })
 })

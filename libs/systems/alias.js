@@ -53,16 +53,16 @@ class Alias {
     } else return []
   }
 
-  async run (self, sender, msg) {
+  async run (opts) {
     const d = debug('alias:run')
     const parser = new Parser()
     var alias
 
     // is it an command?
-    if (!msg.trim().startsWith('!')) return true
+    if (!opts.message.startsWith('!')) return true
 
-    let cmdArray = msg.toLowerCase().split(' ')
-    for (let i in msg.toLowerCase().split(' ')) { // search for correct alias
+    let cmdArray = opts.message.toLowerCase().split(' ')
+    for (let i in opts.message.toLowerCase().split(' ')) { // search for correct alias
       d(`${i} - Searching for ${cmdArray.join(' ')} in aliases`)
       alias = await global.db.engine.findOne('alias', { alias: cmdArray.join(' ').replace('!', ''), enabled: true })
       d(alias)
@@ -73,10 +73,10 @@ class Alias {
     d('Alias found: %j', alias)
 
     let replace = new RegExp(`!${alias.alias}`, 'i')
-    cmdArray = msg.replace(replace, `!${alias.command}`).split(' ')
+    cmdArray = opts.message.replace(replace, `!${alias.command}`).split(' ')
     let tryingToBypass = false
 
-    for (let i in msg.split(' ')) { // search if it is not trying to bypass permissions
+    for (let i in opts.message.split(' ')) { // search if it is not trying to bypass permissions
       if (cmdArray.length === alias.command.split(' ').length) break // command is correct (have same number of parameters as command)
       d(`${i} - Searching if ${cmdArray.join(' ')} is registered as command`)
 
@@ -94,13 +94,13 @@ class Alias {
 
     d('Alias: %s', replace)
     d('Command: %s', `!${alias.command}`)
-    d('Running: %s', msg.replace(replace, `!${alias.command}`))
+    d('Running: %s', opts.message.replace(replace, `!${alias.command}`))
     if (!tryingToBypass) {
       debug('Checking if permissions are ok')
       let [isRegular, isMod, isOwner] = await Promise.all([
-        global.commons.isRegular(sender),
-        global.commons.isMod(sender),
-        global.commons.isOwner(sender)
+        global.commons.isRegular(opts.sender),
+        global.commons.isMod(opts.sender),
+        global.commons.isOwner(opts.sender)
       ])
       debug('isRegular: %s', isRegular)
       debug('isMod: %s', isMod)
@@ -113,8 +113,8 @@ class Alias {
         (alias.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
         (alias.permission === constants.MODS && (isMod || isOwner)) ||
         (alias.permission === constants.OWNER_ONLY && isOwner)) {
-        global.log.process({ type: 'parse', sender: sender, message: msg.replace(replace, `!${alias.command}`) })
-        process.send({ type: 'parse', sender: sender, message: msg.replace(replace, `!${alias.command}`) })
+        global.log.process({ type: 'parse', sender: opts.sender, message: opts.message.replace(replace, `!${alias.command}`) })
+        process.send({ type: 'parse', sender: opts.sender, message: opts.message.replace(replace, `!${alias.command}`) })
       }
     }
     return true

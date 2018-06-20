@@ -398,35 +398,35 @@ class Heist {
     return this.status()
   }
 
-  async run (self, sender, message) {
+  async run (opts) {
     const d = debug('heist:run')
     const expects = new Expects()
 
     if (!global.commons.isSystemEnabled('points')) return // is points system enabled?
 
     let [command, enabled, startedAt, entryCooldown, levels, lastHeistTimestamp, copsCooldown] = await Promise.all([
-      self.get('command'),
-      self.get('enabled'),
-      self.get('startedAt'),
-      self.get('entryCooldown'),
-      self.levels,
-      self.get('lastHeistTimestamp'),
-      self.get('copsCooldown')
+      this.get('command'),
+      this.get('enabled'),
+      this.get('startedAt'),
+      this.get('entryCooldown'),
+      this.levels,
+      this.get('lastHeistTimestamp'),
+      this.get('copsCooldown')
     ])
     levels = _.orderBy(levels, 'maxUsers', 'asc')
 
-    if (!message.trim().toLowerCase().startsWith(command)) return // heist command?
+    if (!opts.message.toLowerCase().startsWith(command)) return // heist command?
     if (!enabled) return // enabled?
 
     // is cops patrolling?
     if (_.now() - lastHeistTimestamp < copsCooldown * 60000) {
       d('Minutes left: %s', copsCooldown - (_.now() - lastHeistTimestamp) / 60000)
       let minutesLeft = Number.parseFloat(copsCooldown - (_.now() - lastHeistTimestamp) / 60000).toFixed(1)
-      if (_.now() - (await self._lastAnnouncedCops) >= 60000) {
-        self._lastAnnouncedCops = _.now()
+      if (_.now() - (await this._lastAnnouncedCops) >= 60000) {
+        this._lastAnnouncedCops = _.now()
         global.commons.sendMessage(
-          (await self.get('copsOnPatrol'))
-            .replace('$cooldown', minutesLeft + ' ' + global.commons.getLocalizedName(minutesLeft, 'core.minutes')), sender)
+          (await this.get('copsOnPatrol'))
+            .replace('$cooldown', minutesLeft + ' ' + global.commons.getLocalizedName(minutesLeft, 'core.minutes')), opts.sender)
       }
       return
     }
@@ -435,59 +435,59 @@ class Heist {
     if (_.isNil(startedAt)) { // new heist
       newHeist = true
       startedAt = _.now() // set startedAt
-      await global.db.engine.update(self.collection, { key: 'startedAt' }, { value: startedAt })
-      if (_.now() - (await self._lastAnnouncedStart) >= 60000) {
-        self._lastAnnouncedStart = _.now()
-        global.commons.sendMessage(await self.get('entryMessage'), sender)
+      await global.db.engine.update(this.collection, { key: 'startedAt' }, { value: startedAt })
+      if (_.now() - (await this._lastAnnouncedStart) >= 60000) {
+        this._lastAnnouncedStart = _.now()
+        global.commons.sendMessage(await this.get('entryMessage'), opts.sender)
       }
     }
 
     // is heist in progress?
-    if (_.now() - startedAt > entryCooldown * 1000 && _.now() - (await self._lastAnnouncedHeistInProgress) >= 60000) {
-      self._lastAnnouncedHeistInProgress = _.now()
+    if (_.now() - startedAt > entryCooldown * 1000 && _.now() - (await this._lastAnnouncedHeistInProgress) >= 60000) {
+      this._lastAnnouncedHeistInProgress = _.now()
       global.commons.sendMessage(
-        (await self.get('lateEntryMessage')).replace('$command', command), sender)
+        (await this.get('lateEntryMessage')).replace('$command', command), opts.sender)
       return
     }
 
     let points
     try {
-      points = expects.check(message).command().points().toArray()[1]
+      points = expects.check(opts.message).command().points().toArray()[1]
     } catch (e) {
       if (!newHeist) {
         global.commons.sendMessage(
-          (await self.get('entryInstruction')).replace('$command', command), sender)
+          (await this.get('entryInstruction')).replace('$command', command), opts.sender)
         global.log.warning(`${command} ${e.message}`)
         d(e.stack)
       }
       return
     }
 
-    points = points === 'all' && !_.isNil(await global.systems.points.getPointsOf(sender.username)) ? await global.systems.points.getPointsOf(sender.username) : parseInt(points, 10) // set all points
-    points = points > await global.systems.points.getPointsOf(sender.username) ? await global.systems.points.getPointsOf(sender.username) : points // bet only user points
-    d(`${command} - ${sender.username} betting ${points}`)
+    points = points === 'all' && !_.isNil(await global.systems.points.getPointsOf(opts.sender.username)) ? await global.systems.points.getPointsOf(opts.sender.username) : parseInt(points, 10) // set all points
+    points = points > await global.systems.points.getPointsOf(opts.sender.username) ? await global.systems.points.getPointsOf(opts.sender.username) : points // bet only user points
+    d(`${command} - ${opts.sender.username} betting ${points}`)
 
     if (points === 0 || _.isNil(points) || _.isNaN(points)) {
       global.commons.sendMessage(
-        (await self.get('entryInstruction')).replace('$command', command), sender)
+        (await this.get('entryInstruction')).replace('$command', command), opts.sender)
       return
     } // send entryInstruction if command is not ok
 
     await Promise.all([
-      global.db.engine.insert('users.points', { username: sender.username, points: parseInt(points, 10) * -1 }), // remove points from user
-      global.db.engine.update(`${self.collection}.users`, { username: sender.username }, { points: points }) // add user to heist list
+      global.db.engine.insert('users.points', { username: opts.sender.username, points: parseInt(points, 10) * -1 }), // remove points from user
+      global.db.engine.update(`${this.collection}.users`, { username: opts.sender.username }, { points: points }) // add user to heist list
     ])
 
     // check how many users are in heist
-    let users = await global.db.engine.find(`${self.collection}.users`)
+    let users = await global.db.engine.find(`${this.collection}.users`)
     let level = _.find(levels, (o) => o.maxUsers >= users.length || _.isNil(o.maxUsers))
     let nextLevel = _.find(levels, (o) => o.maxUsers > level.maxUsers)
 
-    if (await self._lastAnnouncedLevel !== level.name) {
-      self._lastAnnouncedLevel = level.name
+    if (await this._lastAnnouncedLevel !== level.name) {
+      this._lastAnnouncedLevel = level.name
       global.commons.sendMessage(level.message
         .replace('$bank', level.name)
-        .replace('$nextBank', _.get(nextLevel, 'name', '')), sender)
+        .replace('$nextBank', _.get(nextLevel, 'name', '')), opts.sender)
     }
   }
 }

@@ -36,12 +36,12 @@ describe('Raffles - pick()', () => {
     })
 
     it('testuser bets max', async () => {
-      let a = await global.systems.raffles.participate(global.systems.raffles, testuser, `!winme ${max}`)
+      let a = await global.systems.raffles.participate({sender: testuser, message: `!winme ${max}`})
       assert.isTrue(a)
     })
 
     it('testuser2 bets half of max', async () => {
-      let a = await global.systems.raffles.participate(global.systems.raffles, testuser2, `!winme ${max / 2}`)
+      let a = await global.systems.raffles.participate({sender: testuser2, message: `!winme ${max / 2}`})
       assert.isTrue(a)
     })
 

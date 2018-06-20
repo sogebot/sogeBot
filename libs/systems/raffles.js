@@ -110,8 +110,8 @@ class Raffles {
     })
   }
 
-  async messages (self, sender, text, skip) {
-    if (skip) return true
+  async messages (opts) {
+    if (opts.skip) return true
 
     debug('[MESSAGE PARSER]')
     let raffles = await global.db.engine.find('raffles')
@@ -123,21 +123,21 @@ class Raffles {
     let raffle = _.orderBy(raffles, 'timestamp', 'desc')[0]
     debug('Selected raffle: %o', raffle)
 
-    let isWinner = !_.isNil(raffle.winner) && raffle.winner === sender.username
+    let isWinner = !_.isNil(raffle.winner) && raffle.winner === opts.sender.username
     let isInTwoMinutesTreshold = _.now() - raffle.timestamp <= 1000 * 60 * 2
 
     debug('current time: %s, raffle pick time: %s, diff: %s', _.now(), raffle.timestamp, _.now() - raffle.timestamp)
     debug('Is raffle in 2 minutes treshold: %s', isInTwoMinutesTreshold)
     debug('Is user a winner: %s', isWinner)
     if (isWinner && isInTwoMinutesTreshold) {
-      let winner = await global.db.engine.findOne('raffle_participants', { username: sender.username, raffle_id: raffle._id.toString() })
+      let winner = await global.db.engine.findOne('raffle_participants', { username: opts.sender.username, raffle_id: raffle._id.toString() })
       winner.messages.push({
         timestamp: _.now(),
-        text: text
+        text: opts.message
       })
-      debug({ username: sender.username, raffle_id: raffle._id.toString() }, { messages: winner.messages })
-      await global.db.engine.update('raffle_participants', { username: sender.username, raffle_id: raffle._id.toString() }, { messages: winner.messages })
-      self.refresh()
+      debug({ username: opts.sender.username, raffle_id: raffle._id.toString() }, { messages: winner.messages })
+      await global.db.engine.update('raffle_participants', { username: opts.sender.username, raffle_id: raffle._id.toString() }, { messages: winner.messages })
+      this.refresh()
     }
     return true
   }
@@ -269,24 +269,24 @@ class Raffles {
     debug(message); global.commons.sendMessage(message, global.commons.getOwner())
   }
 
-  async participate (self, sender, text) {
-    if (_.isNil(sender) || _.isNil(sender.username)) return true
+  async participate (opts) {
+    if (_.isNil(opts.sender) || _.isNil(opts.sender.username)) return true
 
-    const [raffle, user] = await Promise.all([global.db.engine.findOne('raffles', { winner: null }), global.users.get(sender.username)])
+    const [raffle, user] = await Promise.all([global.db.engine.findOne('raffles', { winner: null }), global.users.get(opts.sender.username)])
 
-    const isStartingWithRaffleKeyword = text.startsWith(raffle.keyword)
+    const isStartingWithRaffleKeyword = opts.message.startsWith(raffle.keyword)
     debug('isStartingWithRaffleKeyword: %s', isStartingWithRaffleKeyword)
     if (!isStartingWithRaffleKeyword || _.isEmpty(raffle)) return true
 
-    text = text.toString().replace(raffle.keyword, '')
-    let tickets = text.trim() === 'all' && !_.isNil(await global.systems.points.getPointsOf(user.username)) ? await global.systems.points.getPointsOf(user.username) : parseInt(text.trim(), 10)
+    opts.message = opts.message.toString().replace(raffle.keyword, '')
+    let tickets = opts.message.trim() === 'all' && !_.isNil(await global.systems.points.getPointsOf(user.username)) ? await global.systems.points.getPointsOf(user.username) : parseInt(opts.message.trim(), 10)
     debug('User in db: %j', user)
-    debug('Text: %s', text)
-    debug('Tickets in text: %s', parseInt(text.trim(), 10))
+    debug('Text: %s', opts.message)
+    debug('Tickets in text: %s', parseInt(opts.message.trim(), 10))
 
     if (_.isEmpty(raffle)) { // shouldn't happen, but just to be sure (user can join when closing raffle)
       let message = await global.commons.prepare('no-raffle-is-currently-running')
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
@@ -298,7 +298,7 @@ class Raffles {
     }
     if (!_.isFinite(tickets)) tickets = 0
 
-    let participant = await global.db.engine.findOne('raffle_participants', { raffle_id: raffle._id.toString(), username: sender.username })
+    let participant = await global.db.engine.findOne('raffle_participants', { raffle_id: raffle._id.toString(), username: opts.sender.username })
     let curTickets = 0
     if (!_.isEmpty(participant)) {
       debug(participant)
@@ -315,7 +315,7 @@ class Raffles {
     let participantUser = {
       eligible: !_.isEmpty(participant) ? participant.eligible : true, // get latest eligible to not bypass winner/manual set false
       tickets: raffle.type === TYPE_NORMAL ? 1 : parseInt(newTickets, 10),
-      username: sender.username,
+      username: opts.sender.username,
       messages: [],
       raffle_id: raffle._id.toString()
     }
@@ -333,9 +333,9 @@ class Raffles {
     }
 
     if (participantUser.eligible) {
-      if (raffle.type === TYPE_TICKETS) await global.db.engine.insert('users.points', { username: sender.username, points: parseInt(tickets, 10) * -1 })
-      await global.db.engine.update('raffle_participants', { raffle_id: raffle._id.toString(), username: sender.username }, participantUser)
-      self.refresh()
+      if (raffle.type === TYPE_TICKETS) await global.db.engine.insert('users.points', { username: opts.sender.username, points: parseInt(tickets, 10) * -1 })
+      await global.db.engine.update('raffle_participants', { raffle_id: raffle._id.toString(), username: opts.sender.username }, participantUser)
+      this.refresh()
     }
     return true
   }

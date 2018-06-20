@@ -34,7 +34,7 @@ describe('Keywords - add()', () => {
     global.systems.keywords.add({ sender: owner, parameters: '!new asd' })
     await message.isSent('keywords.keyword-was-added', owner, { keyword: 'new', sender: owner.username })
 
-    global.systems.keywords.run(global.systems.keywords, owner, 'new')
+    global.systems.keywords.run({sender: owner, message: 'new'})
     await message.isSentRaw('asd', owner)
   })
 
@@ -42,7 +42,7 @@ describe('Keywords - add()', () => {
     global.systems.keywords.add({ sender: owner, parameters: 'alias asd' })
     await message.isSent('keywords.keyword-was-added', owner, { keyword: 'alias', sender: owner.username })
 
-    global.systems.keywords.run(global.systems.keywords, owner, 'asda alias asd')
+    global.systems.keywords.run({sender: owner, message: 'asda alias asd'})
     await message.isSentRaw('asd', owner)
   })
 

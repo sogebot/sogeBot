@@ -111,13 +111,13 @@ class Moderation {
     global.db.engine.update('settings', { key: 'whitelist' }, { value: data.whitelist.filter(entry => entry.trim() !== '') })
   }
 
-  async timeoutUser (self, sender, text, warning, msg, time, type) {
+  async timeoutUser (sender, text, warning, msg, time, type) {
     let [warningsAllowed, warningsTimeout, announceTimeouts, warnings, silent] = await Promise.all([
       global.configuration.getValue('moderationWarnings'),
       global.configuration.getValue('moderationWarningsTimeouts'),
       global.configuration.getValue('moderationAnnounceTimeouts'),
       global.db.engine.find('moderation.warnings', { username: sender.username }),
-      self.isSilent(type)
+      this.isSilent(type)
     ])
     text = text.trim()
 
@@ -202,23 +202,21 @@ class Moderation {
     }
   }
 
-  async containsLink (self, sender, text) {
-    DEBUG_MODERATION_CONTAINS_LINK('containLinks(%j, %s', sender, text)
-
+  async containsLink (opts) {
     let [isEnabled, isEnabledForSubs, isEnabledForSpaces, timeout, isMod, whitelisted] = await Promise.all([
       global.configuration.getValue('moderationLinks'),
       global.configuration.getValue('moderationLinksSubs'),
       global.configuration.getValue('moderationLinksWithSpaces'),
       global.configuration.getValue('moderationLinksTimeout'),
-      global.commons.isMod(sender),
-      self.whitelist(text)
+      global.commons.isMod(opts.sender),
+      this.whitelist(opts.message)
     ])
 
     DEBUG_MODERATION_CONTAINS_LINK('should check links - %s', isEnabled)
-    DEBUG_MODERATION_CONTAINS_LINK('isOwner: %s', global.commons.isOwner(sender))
+    DEBUG_MODERATION_CONTAINS_LINK('isOwner: %s', global.commons.isOwner(opts.sender))
     DEBUG_MODERATION_CONTAINS_LINK('isMod: %s', isMod)
     DEBUG_MODERATION_CONTAINS_LINK('moderate with spaces: %s', isEnabledForSpaces)
-    if (global.commons.isOwner(sender) || isMod || !isEnabled || (sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || !isEnabled || (opts.sender.subscriber && !isEnabledForSubs)) {
       DEBUG_MODERATION_CONTAINS_LINK('checking links skipped')
       return true
     }
@@ -229,12 +227,12 @@ class Moderation {
     DEBUG_MODERATION_CONTAINS_LINK('text to check: "%s"', whitelisted)
     DEBUG_MODERATION_CONTAINS_LINK('link is found in a text: %s', whitelisted.search(urlRegex) >= 0)
     if (whitelisted.search(urlRegex) >= 0) {
-      let permit = await global.db.engine.findOne('moderation.permit', { username: sender.username })
+      let permit = await global.db.engine.findOne('moderation.permit', { username: opts.sender.username })
       if (!_.isEmpty(permit)) {
         await global.db.engine.remove('moderation.permit', { _id: permit._id.toString() })
         return true
       } else {
-        self.timeoutUser(self, sender, whitelisted,
+        this.timeoutUser(opts.sender, whitelisted,
           global.translate('moderation.user-is-warned-about-links'),
           global.translate('moderation.user-have-timeout-for-links'),
           timeout, 'links')
@@ -245,12 +243,12 @@ class Moderation {
     }
   }
 
-  async symbols (self, sender, text) {
+  async symbols (opts) {
     let [isEnabled, isEnabledForSubs, whitelisted, isMod, timeout, triggerLength, maxSymbolsConsecutively, maxSymbolsPercent] = await Promise.all([
       global.configuration.getValue('moderationSymbols'),
       global.configuration.getValue('moderationSymbolsSubs'),
-      self.whitelist(text),
-      global.commons.isMod(sender),
+      this.whitelist(opts.message),
+      global.commons.isMod(opts.sender),
       global.configuration.getValue('moderationSymbolsTimeout'),
       global.configuration.getValue('moderationSymbolsTriggerLength'),
       global.configuration.getValue('moderationSymbolsMaxConsecutively'),
@@ -260,7 +258,7 @@ class Moderation {
     var msgLength = whitelisted.trim().length
     var symbolsLength = 0
 
-    if (global.commons.isOwner(sender) || isMod || msgLength < triggerLength || !isEnabled || (sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.subscriber && !isEnabledForSubs)) {
       return true
     }
 
@@ -269,7 +267,7 @@ class Moderation {
       if (out.hasOwnProperty(item)) {
         var symbols = out[item]
         if (symbols.length >= maxSymbolsConsecutively) {
-          self.timeoutUser(self, sender, text,
+          this.timeoutUser(opts.sender, opts.message,
             global.translate('moderation.user-is-warned-about-symbols'),
             global.translate('moderation.user-have-timeout-for-symbols'),
             timeout, 'symbols')
@@ -279,27 +277,27 @@ class Moderation {
       }
     }
     if (Math.ceil(symbolsLength / (msgLength / 100)) >= maxSymbolsPercent) {
-      self.timeoutUser(self, sender, text, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout, 'symbols')
+      this.timeoutUser(opts.sender, opts.message, global.translate('moderation.warnings.symbols'), global.translate('moderation.symbols'), timeout, 'symbols')
       return false
     }
     return true
   }
 
-  async longMessage (self, sender, text) {
+  async longMessage (opts) {
     let [isEnabled, isEnabledForSubs, isMod, whitelisted, timeout, triggerLength] = await Promise.all([
       global.configuration.getValue('moderationLongMessage'),
       global.configuration.getValue('moderationLongMessageSubs'),
-      global.commons.isMod(sender),
-      self.whitelist(text),
+      global.commons.isMod(opts.sender),
+      this.whitelist(opts.message),
       global.configuration.getValue('moderationLongMessageTimeout'),
       global.configuration.getValue('moderationLongMessageTriggerLength')
     ])
 
     var msgLength = whitelisted.trim().length
-    if (global.commons.isOwner(sender) || isMod || msgLength < triggerLength || !isEnabled || (sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.subscriber && !isEnabledForSubs)) {
       return true
     } else {
-      self.timeoutUser(self, sender, text,
+      this.timeoutUser(opts.sender, opts.message,
         global.translate('moderation.user-is-warned-about-long-message'),
         global.translate('moderation.user-have-timeout-for-long-message'),
         timeout, 'longmessage')
@@ -307,19 +305,19 @@ class Moderation {
     }
   }
 
-  async caps (self, sender, text) {
+  async caps (opts) {
     let [isEnabled, isEnabledForSubs, isMod, whitelisted, timeout, triggerLength, maxCapsPercent] = await Promise.all([
       global.configuration.getValue('moderationCaps'),
       global.configuration.getValue('moderationCapsSubs'),
-      global.commons.isMod(sender),
-      self.whitelist(text),
+      global.commons.isMod(opts.sender),
+      this.whitelist(opts.message),
       global.configuration.getValue('moderationCapsTimeout'),
       global.configuration.getValue('moderationCapsTriggerLength'),
       global.configuration.getValue('moderationCapsMaxPercent')
     ])
 
     var emotesCharList = [] // remove emotes from caps checking
-    _.each(sender['emotes'], function (emote) {
+    _.each(opts.sender['emotes'], function (emote) {
       _.each(emote, function (list) {
         _.each(_.range(parseInt(list.split('-')[0], 10), parseInt(list.split('-')[1], 10) + 1), function (val) {
           emotesCharList.push(val)
@@ -330,9 +328,9 @@ class Moderation {
     var msgLength = whitelisted.trim().length
     var capsLength = 0
 
-    DEBUG_MODERATION_CAPS('emotes - %j', sender['emotes'])
+    DEBUG_MODERATION_CAPS('emotes - %j', opts.sender['emotes'])
     DEBUG_MODERATION_CAPS('should check caps - %s', isEnabled)
-    DEBUG_MODERATION_CAPS('isOwner: %s', global.commons.isOwner(sender))
+    DEBUG_MODERATION_CAPS('isOwner: %s', global.commons.isOwner(opts.sender))
     DEBUG_MODERATION_CAPS('isMod: %s', isMod)
 
     const regexp = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-./:;<=>?@[\]^_`{|}~]/gi
@@ -355,11 +353,11 @@ class Moderation {
     DEBUG_MODERATION_CAPS('triggerPercent: %i%', maxCapsPercent)
     DEBUG_MODERATION_CAPS('capped percent: %i%', Math.ceil(capsLength / (msgLength / 100)))
 
-    if (global.commons.isOwner(sender) || isMod || msgLength < triggerLength || !isEnabled || (sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.subscriber && !isEnabledForSubs)) {
       return true
     }
     if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
-      self.timeoutUser(self, sender, text,
+      this.timeoutUser(opts.sender, opts.message,
         global.translate('moderation.user-is-warned-about-caps'),
         global.translate('moderation.user-have-timeout-for-caps'),
         timeout, 'caps')
@@ -368,12 +366,12 @@ class Moderation {
     return true
   }
 
-  async spam (self, sender, text) {
+  async spam (opts) {
     let [isEnabled, isEnabledForSubs, isMod, whitelisted, timeout, triggerLength, maxSpamLength] = await Promise.all([
       global.configuration.getValue('moderationSpam'),
       global.configuration.getValue('moderationSpamSubs'),
-      global.commons.isMod(sender),
-      self.whitelist(text),
+      global.commons.isMod(opts.sender),
+      this.whitelist(opts.message),
       global.configuration.getValue('moderationSpamTimeout'),
       global.configuration.getValue('moderationSpamTriggerLength'),
       global.configuration.getValue('moderationSpamMaxLength')
@@ -381,13 +379,13 @@ class Moderation {
 
     var msgLength = whitelisted.trim().length
 
-    if (global.commons.isOwner(sender) || isMod || msgLength < triggerLength || !isEnabled || (sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.subscriber && !isEnabledForSubs)) {
       return true
     }
     var out = whitelisted.match(/(.+)(\1+)/g)
     for (var item in out) {
       if (out.hasOwnProperty(item) && out[item].length >= maxSpamLength) {
-        self.timeoutUser(self, sender, text,
+        this.timeoutUser(opts.sender, opts.message,
           global.translate('moderation.user-have-timeout-for-spam'),
           global.translate('moderation.user-is-warned-about-spam'),
           timeout, 'spam')
@@ -397,20 +395,20 @@ class Moderation {
     return true
   }
 
-  async color (self, sender, text) {
+  async color (opts) {
     let [isEnabled, isEnabledForSubs, isMod, timeout] = await Promise.all([
       global.configuration.getValue('moderationColor'),
       global.configuration.getValue('moderationColorSubs'),
-      global.commons.isMod(sender),
+      global.commons.isMod(opts.sender),
       global.configuration.getValue('moderationColorTimeout')
     ])
 
-    if (global.commons.isOwner(sender) || isMod || !isEnabled || (sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || !isEnabled || (opts.sender.subscriber && !isEnabledForSubs)) {
       return true
     }
 
-    if (sender['message-type'] === 'action') {
-      self.timeoutUser(self, sender, text,
+    if (opts.sender['message-type'] === 'action') {
+      this.timeoutUser(opts.sender, opts.message,
         global.translate('moderation.user-is-warned-about-color'),
         global.translate('moderation.user-have-timeout-for-color'),
         timeout, 'color')
@@ -418,26 +416,26 @@ class Moderation {
     } else return true
   }
 
-  async emotes (self, sender, text) {
+  async emotes (opts) {
     let [isEnabled, isEnabledForSubs, isMod, timeout, maxCount] = await Promise.all([
       global.configuration.getValue('moderationEmotes'),
       global.configuration.getValue('moderationEmotesSubs'),
-      global.commons.isMod(sender),
+      global.commons.isMod(opts.sender),
       global.configuration.getValue('moderationEmotesTimeout'),
       global.configuration.getValue('moderationEmotesMaxCount')
     ])
 
     var count = 0
-    if (global.commons.isOwner(sender) || isMod || !isEnabled || (sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || !isEnabled || (opts.sender.subscriber && !isEnabledForSubs)) {
       return true
     }
 
-    _.each(sender['emotes'], function (value, index) {
+    _.each(opts.sender['emotes'], function (value, index) {
       count = count + value.length
     })
 
     if (count > maxCount) {
-      self.timeoutUser(self, sender, text,
+      this.timeoutUser(opts.sender, opts.message,
         global.translate('moderation.user-is-warned-about-emotes'),
         global.translate('moderation.user-have-timeout-for-emotes'),
         timeout, 'emotes')
@@ -445,14 +443,14 @@ class Moderation {
     } else return true
   }
 
-  async blacklist (self, sender, text) {
+  async blacklist (opts) {
     let [isEnabledForSubs, isMod, timeout, blacklist] = await Promise.all([
       global.configuration.getValue('moderationBlacklistSubs'),
-      global.commons.isMod(sender),
+      global.commons.isMod(opts.sender),
       global.configuration.getValue('moderationBlacklistTimeout'),
       global.db.engine.findOne('settings', { key: 'blacklist' })
     ])
-    if (global.commons.isOwner(sender) || isMod || (sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || (opts.sender.subscriber && !isEnabledForSubs)) {
       return true
     }
 
@@ -461,9 +459,9 @@ class Moderation {
       value = value.trim().replace(/\*/g, '[\\pL0-9]*').replace(/\+/g, '[\\pL0-9]+')
       const regexp = XRegExp(` [^\\s\\pL0-9\\w]?${value}[^\\s\\pL0-9\\w]? `, 'gi')
       // we need to change 'text' to ' text ' for regexp to correctly work
-      if (XRegExp.exec(` ${text} `, regexp) && value.length > 0) {
+      if (XRegExp.exec(` ${opts.message} `, regexp) && value.length > 0) {
         isOK = false
-        self.timeoutUser(self, sender, text,
+        this.timeoutUser(opts.sender, opts.message,
           global.translate('moderation.user-is-warned-about-blacklist'),
           global.translate('moderation.user-have-timeout-for-blacklist'),
           timeout, 'blacklist')

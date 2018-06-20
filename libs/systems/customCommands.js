@@ -136,12 +136,12 @@ class CustomCommands {
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async run (self, sender, msg) {
-    if (!msg.startsWith('!')) return true // do nothing if it is not a command
+  async run (opts) {
+    if (!opts.message.startsWith('!')) return true // do nothing if it is not a command
 
     var command
-    let cmdArray = msg.toLowerCase().split(' ')
-    for (let i in msg.toLowerCase().split(' ')) { // search for correct command
+    let cmdArray = opts.message.toLowerCase().split(' ')
+    for (let i in opts.message.toLowerCase().split(' ')) { // search for correct command
       debug(`${i} - Searching for ${cmdArray.join(' ')} in commands`)
       command = await global.db.engine.findOne('commands', { command: cmdArray.join(' ').replace('!', ''), enabled: true })
       debug(command)
@@ -153,9 +153,9 @@ class CustomCommands {
 
     debug('Checking if permissions are ok')
     let [isRegular, isMod, isOwner] = await Promise.all([
-      global.commons.isRegular(sender),
-      global.commons.isMod(sender),
-      global.commons.isOwner(sender)
+      global.commons.isRegular(opts.sender),
+      global.commons.isMod(opts.sender),
+      global.commons.isOwner(opts.sender)
     ])
     debug('isRegular: %s', isRegular)
     debug('isMod: %s', isMod)
@@ -164,8 +164,8 @@ class CustomCommands {
       (command.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
       (command.permission === constants.MODS && (isMod || isOwner)) ||
       (command.permission === constants.OWNER_ONLY && isOwner)) {
-      const param = msg.trim().replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim() // remove found command from message to get param
-      global.commons.sendMessage(command.response, sender, {'param': param, 'cmd': command.command})
+      const param = opts.message.replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim() // remove found command from message to get param
+      global.commons.sendMessage(command.response, opts.sender, {'param': param, 'cmd': command.command})
     }
     return true
   }

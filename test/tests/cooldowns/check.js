@@ -27,13 +27,13 @@ describe('Cooldowns - check()', () => {
     let item = await global.db.engine.findOne('cooldowns', { key: '!test' })
     assert.notEmpty(item)
 
-    let isOk = await global.systems.cooldown.check(global.systems.cooldown, testUser, '!test')
+    let isOk = await global.systems.cooldown.check({sender: testUser, message: '!test'})
     assert.isTrue(isOk)
 
-    isOk = await global.systems.cooldown.check(global.systems.cooldown, testUser, '!test')
+    isOk = await global.systems.cooldown.check({sender: testUser, message: '!test'})
     assert.isFalse(isOk) // second should fail
 
-    isOk = await global.systems.cooldown.check(global.systems.cooldown, testUser2, '!test')
+    isOk = await global.systems.cooldown.check({sender: testUser2, message: '!test'})
     assert.isTrue(isOk)
   })
 
@@ -45,13 +45,13 @@ describe('Cooldowns - check()', () => {
     let item = await global.db.engine.findOne('cooldowns', { key: '!test' })
     assert.notEmpty(item)
 
-    let isOk = await global.systems.cooldown.check(global.systems.cooldown, testUser, '!test')
+    let isOk = await global.systems.cooldown.check({sender: testUser, message: '!test'})
     assert.isTrue(isOk)
 
-    isOk = await global.systems.cooldown.check(global.systems.cooldown, testUser, '!test')
+    isOk = await global.systems.cooldown.check({sender: testUser, message: '!test'})
     assert.isFalse(isOk) // second should fail
 
-    isOk = await global.systems.cooldown.check(global.systems.cooldown, testUser2, '!test')
+    isOk = await global.systems.cooldown.check({sender: testUser2, message: '!test'})
     assert.isFalse(isOk) // another user should fail as well
   })
 
@@ -66,13 +66,13 @@ describe('Cooldowns - check()', () => {
     let item = await global.db.engine.findOne('cooldowns', { key: 'me' })
     assert.notEmpty(item)
 
-    let isOk = await global.systems.cooldown.check(global.systems.cooldown, testUser, 'me')
+    let isOk = await global.systems.cooldown.check({sender: testUser, message: 'me'})
     assert.isTrue(isOk)
 
-    isOk = await global.systems.cooldown.check(global.systems.cooldown, testUser, 'me')
+    isOk = await global.systems.cooldown.check({sender: testUser, message: 'me'})
     assert.isFalse(isOk) // second should fail
 
-    isOk = await global.systems.cooldown.check(global.systems.cooldown, testUser2, 'me')
+    isOk = await global.systems.cooldown.check({sender: testUser2, message: 'me'})
     assert.isTrue(isOk)
   })
 
@@ -87,13 +87,13 @@ describe('Cooldowns - check()', () => {
     let item = await global.db.engine.findOne('cooldowns', { key: 'me' })
     assert.notEmpty(item)
 
-    let isOk = await global.systems.cooldown.check(global.systems.cooldown, testUser, 'me')
+    let isOk = await global.systems.cooldown.check({sender: testUser, message: 'me'})
     assert.isTrue(isOk)
 
-    isOk = await global.systems.cooldown.check(global.systems.cooldown, testUser, 'me')
+    isOk = await global.systems.cooldown.check({sender: testUser, message: 'me'})
     assert.isFalse(isOk) // second should fail
 
-    isOk = await global.systems.cooldown.check(global.systems.cooldown, testUser2, 'me')
+    isOk = await global.systems.cooldown.check({sender: testUser2, message: 'me'})
     assert.isFalse(isOk) // another user should fail as well
   })
 })

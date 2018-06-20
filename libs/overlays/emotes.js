@@ -73,13 +73,13 @@ Emotes.prototype.explode = async function (self, socket, data) {
   socket.emit('emote.explode', emotes)
 }
 
-Emotes.prototype.containsEmotes = async function (self, sender, text) {
-  if (_.isNil(sender)) return true
+Emotes.prototype.containsEmotes = async function (opts) {
+  if (_.isNil(opts.sender)) return true
 
   let OEmotesMax = await global.configuration.getValue('OEmotesMax')
   let OEmotesSize = await global.configuration.getValue('OEmotesSize')
 
-  _.each(sender.emotes, function (v, emote) {
+  _.each(opts.sender.emotes, function (v, emote) {
     let limit = 0
     _.each(v, function () {
       if (limit === OEmotesMax) return false
@@ -90,10 +90,10 @@ Emotes.prototype.containsEmotes = async function (self, sender, text) {
 
   // parse BTTV emoticons
   try {
-    for (let emote of await self.fetcher._getRawBTTVEmotes(config.settings.broadcaster_username)) {
-      for (let i in _.range((text.match(new RegExp(emote.code, 'g')) || []).length)) {
+    for (let emote of await this.fetcher._getRawBTTVEmotes(config.settings.broadcaster_username)) {
+      for (let i in _.range((opts.message.match(new RegExp(emote.code, 'g')) || []).length)) {
         if (i === OEmotesMax) break
-        global.panel.io.emit('emote', self.fetcher.emotes.get(emote.code).toLink(OEmotesSize))
+        global.panel.io.emit('emote', this.fetcher.emotes.get(emote.code).toLink(OEmotesSize))
       }
     }
   } catch (e) {

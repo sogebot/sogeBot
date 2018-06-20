@@ -85,15 +85,15 @@ Points.prototype.sendConfiguration = async function (self, socket) {
   })
 }
 
-Points.prototype.messagePoints = async function (self, sender, text, skip) {
-  if (skip || text.startsWith('!')) return true
+Points.prototype.messagePoints = async function (opts) {
+  if (opts.skip || opts.message.startsWith('!')) return true
 
   const points = parseInt(await global.configuration.getValue('pointsPerMessageInterval'), 10)
   const interval = parseInt(await global.configuration.getValue('pointsMessageInterval'), 10)
-  const user = await global.users.get(sender.username)
+  const user = await global.users.get(opts.sender.username)
   if (points === 0 || interval === 0) return
   let lastMessageCount = _.isNil(user.custom.lastMessagePoints) ? 0 : user.custom.lastMessagePoints
-  const userMessages = await global.users.getMessagesOf(sender.username)
+  const userMessages = await global.users.getMessagesOf(opts.sender.username)
 
   if (lastMessageCount + interval <= userMessages) {
     await global.db.engine.insert('users.points', { username: user.username, points: parseInt(points, 10) })
