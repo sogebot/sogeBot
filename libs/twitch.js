@@ -373,8 +373,8 @@ class Twitch {
         .replace(/\$title/g, _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a')), opts.sender)
       return
     }
-    if (cluster.isMaster) global.api.setTitleAndGame(global.api, opts.sender, { title: opts.parameters })
-    else process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: { 0: opts.sender, 1: { title: opts.parameters } } })
+    if (cluster.isMaster) global.api.setTitleAndGame(opts.sender, { title: opts.parameters })
+    else process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [opts.sender, { title: opts.parameters }] })
   }
 
   async setGame (opts) {
@@ -383,8 +383,8 @@ class Twitch {
         .replace(/\$game/g, _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')), opts.sender)
       return
     }
-    if (cluster.isMaster) global.api.setTitleAndGame(global.api, opts.sender, { game: opts.parameters })
-    else process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: { 0: opts.sender, 1: { game: opts.parameters } } })
+    if (cluster.isMaster) global.api.setTitleAndGame(opts.sender, { game: opts.parameters })
+    else process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [opts.sender, { game: opts.parameters }] })
   }
 }
 
