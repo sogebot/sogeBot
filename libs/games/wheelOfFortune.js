@@ -58,7 +58,7 @@ class WheelOfFortune {
 
   async commands () {
     const [command, enabled] = await Promise.all([this.command, this.enabled])
-    if (!enabled) return {}
+    if (!enabled) return []
     else {
       return [
         {this: this, id: '!wof', command, fnc: this.run, permission: constants.VIEWERS}
