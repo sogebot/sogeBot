@@ -30,7 +30,7 @@ function Alerts () {
 
 Alerts.prototype.commands = function () {
   return [
-    {this: this, command: '!alert', fnc: this.overlay, permission: constants.OWNER_ONLY}
+    {this: this, id: '!alert', command: '!alert', fnc: this.overlay, permission: constants.OWNER_ONLY}
   ]
 }
 
@@ -47,24 +47,24 @@ Alerts.prototype.replay = async function (self, socket, data) {
     'filter=' + await global.configuration.getValue('replayFilter'),
     'class=replay'
   ]
-  self.overlay(self, null, replay.join(' '))
+  self.overlay({ sender: null, parameters: replay.join(' ') })
 }
 
-Alerts.prototype.overlay = async function (self, sender, text) {
-  text = await new Message(text).parse()
+Alerts.prototype.overlay = async function (opts) {
+  opts.parameters = await new Message(opts.parameters).parse()
   if (cluster.isWorker) {
-    return process.send({ type: 'alert', fnc: 'overlay', sender: sender, text: text })
+    return process.send({ type: 'alert', fnc: 'overlay', sender: opts.sender, text: opts.parameters })
   }
 
   let send = []
-  let objectString = text.trim().split(' | ')
+  let objectString = opts.parameters.trim().split(' | ')
   _.each(objectString, function (o) {
     let object = {}
     let settings = o.match(/([\w-]+)=([\w-://.%?=$_|@&]+|'[\S ]+')/g)
     _.each(settings, function (s) {
       let data = { key: s.split(/=(.+)/)[0], value: s.split(/=(.+)/)[1] }
       if (data.key === 'text') {
-        data.value = data.value.replace(/\$sender/g, sender.username)
+        data.value = data.value.replace(/\$sender/g, opts.sender.username)
       }
       object[data.key] = data.value
     })
@@ -78,8 +78,8 @@ Alerts.prototype.overlay = async function (self, sender, text) {
     if (object.type === 'clip') {
       // load clip from api
       let clip = null
-      if (!_.isNil(object.id)) clip = await self.getClipById(object.id)
-      else if (!_.isNil(object.url)) clip = await self.getClipById(object.url.split('/').pop())
+      if (!_.isNil(object.id)) clip = await this.getClipById(object.id)
+      else if (!_.isNil(object.url)) clip = await this.getClipById(object.url.split('/').pop())
       clip.cDuration = clip.duration; delete clip.duration
       if (!_.isNil(clip)) _.merge(object, clip)
     }
