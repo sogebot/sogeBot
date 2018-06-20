@@ -27,12 +27,12 @@ function Users () {
 
 Users.prototype.commands = function () {
   return [
-    {this: this, command: '!regular add', fnc: this.addRegular, permission: constants.OWNER_ONLY},
-    {this: this, command: '!regular remove', fnc: this.rmRegular, permission: constants.OWNER_ONLY},
-    {this: this, command: '!merge', fnc: this.merge, permission: constants.MODS},
-    {this: this, command: '!ignore add', fnc: this.ignoreAdd, permission: constants.OWNER_ONLY},
-    {this: this, command: '!ignore rm', fnc: this.ignoreRm, permission: constants.OWNER_ONLY},
-    {this: this, command: '!ignore check', fnc: this.ignoreCheck, permission: constants.OWNER_ONLY}
+    {this: this, id: '!regular add', command: '!regular add', fnc: this.addRegular, permission: constants.OWNER_ONLY},
+    {this: this, id: '!regular remove', command: '!regular remove', fnc: this.rmRegular, permission: constants.OWNER_ONLY},
+    {this: this, id: '!merge', command: '!merge', fnc: this.merge, permission: constants.MODS},
+    {this: this, id: '!ignore add', command: '!ignore add', fnc: this.ignoreAdd, permission: constants.OWNER_ONLY},
+    {this: this, id: '!ignore rm', command: '!ignore rm', fnc: this.ignoreRm, permission: constants.OWNER_ONLY},
+    {this: this, id: '!ignore check', command: '!ignore check', fnc: this.ignoreCheck, permission: constants.OWNER_ONLY}
   ]
 }
 
@@ -347,30 +347,30 @@ Users.prototype.sockets = function (self) {
   })
 }
 
-Users.prototype.ignoreAdd = async function (self, sender, text) {
-  const match = XRegExp.exec(text, constants.USERNAME_REGEXP)
+Users.prototype.ignoreAdd = async function (opts) {
+  const match = XRegExp.exec(opts.parameters, constants.USERNAME_REGEXP)
   if (_.isNil(match)) return
 
   match.username = match.username.toLowerCase()
 
   await global.db.engine.update('users_ignorelist', { username: match.username }, { username: match.username })
   let message = await global.commons.prepare('ignore.user.is.added', { username: match.username })
-  debug(message); global.commons.sendMessage(message, sender)
+  debug(message); global.commons.sendMessage(message, opts.sender)
 }
 
-Users.prototype.ignoreRm = async function (self, sender, text) {
-  const match = XRegExp.exec(text, constants.USERNAME_REGEXP)
+Users.prototype.ignoreRm = async function (opts) {
+  const match = XRegExp.exec(opts.parameters, constants.USERNAME_REGEXP)
   if (_.isNil(match)) return
 
   match.username = match.username.toLowerCase()
 
   await global.db.engine.remove('users_ignorelist', { username: match.username })
   let message = await global.commons.prepare('ignore.user.is.removed', { username: match.username })
-  debug(message); global.commons.sendMessage(message, sender)
+  debug(message); global.commons.sendMessage(message, opts.sender)
 }
 
-Users.prototype.ignoreCheck = async function (self, sender, text) {
-  const match = XRegExp.exec(text, constants.USERNAME_REGEXP)
+Users.prototype.ignoreCheck = async function (opts) {
+  const match = XRegExp.exec(opts.parameters, constants.USERNAME_REGEXP)
   if (_.isNil(match)) return
 
   match.username = match.username.toLowerCase()
@@ -382,7 +382,7 @@ Users.prototype.ignoreCheck = async function (self, sender, text) {
   } else {
     message = await global.commons.prepare('ignore.user.is.not.ignored', { username: match.username })
   }
-  debug(message); global.commons.sendMessage(message, sender)
+  debug(message); global.commons.sendMessage(message, opts.sender)
   return !_.isEmpty(ignoredUser)
 }
 
@@ -402,18 +402,18 @@ Users.prototype.deleteViewer = function (self, socket, username) {
  * Will merge (rename) old user to new user (used in case of user rename) - no merging is done for simplicity
  * Usage: !merge -from oldusername -to newusername
 */
-Users.prototype.merge = async function (self, sender, text) {
-  let [fromUser, toUser] = [text.match(/-from ([a-zA-Z0-9_]+)/), text.match(/-to ([a-zA-Z0-9_]+)/)]
+Users.prototype.merge = async function (opts) {
+  let [fromUser, toUser] = [opts.parameters.match(/-from ([a-zA-Z0-9_]+)/), opts.parameters.match(/-to ([a-zA-Z0-9_]+)/)]
 
   if (_.isNil(fromUser)) {
     let message = await global.commons.prepare('merge.no-from-user-set')
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
     return
   } else { fromUser = fromUser[1] }
 
   if (_.isNil(toUser)) {
     let message = await global.commons.prepare('merge.no-to-user-set')
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
     return
   } else { toUser = toUser[1] }
 
@@ -424,7 +424,7 @@ Users.prototype.merge = async function (self, sender, text) {
 
   if (_.isEmpty(fromUserFromDb)) {
     let message = await global.commons.prepare('merge.from-user-not-found', { fromUsername: fromUser })
-    debug(message); global.commons.sendMessage(message, sender)
+    debug(message); global.commons.sendMessage(message, opts.sender)
     return
   }
 
@@ -439,7 +439,7 @@ Users.prototype.merge = async function (self, sender, text) {
   }
 
   let message = await global.commons.prepare('merge.user-merged', { fromUsername: fromUser, toUsername: toUser })
-  debug(message); global.commons.sendMessage(message, sender)
+  debug(message); global.commons.sendMessage(message, opts.sender)
 }
 
 Users.prototype.get = async function (username) {
@@ -476,36 +476,36 @@ Users.prototype.toggleIs = function (self, socket, data) {
   self.set(data.username, object)
 }
 
-Users.prototype.addRegular = function (self, sender, text) {
-  const username = text.trim()
+Users.prototype.addRegular = function (opts) {
+  const username = opts.parameters.trim()
 
   if (username.length === 0) {
-    global.commons.sendMessage(global.translate('regulars.add.empty'), sender)
+    global.commons.sendMessage(global.translate('regulars.add.empty'), opts.sender)
     return false
   }
 
-  if (!_.isNil(_.find(self.users, function (o) { return o.username === username }))) {
-    self.set(username, { is: { regular: true } })
-    global.commons.sendMessage(global.translate('regulars.add.success').replace(/\$username/g, username), sender)
+  if (!_.isNil(_.find(this.users, function (o) { return o.username === username }))) {
+    this.set(username, { is: { regular: true } })
+    global.commons.sendMessage(global.translate('regulars.add.success').replace(/\$username/g, username), opts.sender)
   } else {
-    global.commons.sendMessage(global.translate('regulars.add.undefined').replace(/\$username/g, username), sender)
+    global.commons.sendMessage(global.translate('regulars.add.undefined').replace(/\$username/g, username), opts.sender)
     return false
   }
 }
 
-Users.prototype.rmRegular = function (self, sender, text) {
-  const username = text.trim()
+Users.prototype.rmRegular = function (opts) {
+  const username = opts.parameters.trim()
 
   if (username.length === 0) {
-    global.commons.sendMessage(global.translate('regulars.rm.empty'), sender)
+    global.commons.sendMessage(global.translate('regulars.rm.empty'), opts.sender)
     return false
   }
 
-  if (!_.isNil(_.find(self.users, function (o) { return o.username === username }))) {
-    self.set(username, { is: { regular: false } })
-    global.commons.sendMessage(global.translate('regulars.rm.success').replace(/\$username/g, username), sender)
+  if (!_.isNil(_.find(this.users, function (o) { return o.username === username }))) {
+    this.set(username, { is: { regular: false } })
+    global.commons.sendMessage(global.translate('regulars.rm.success').replace(/\$username/g, username), opts.sender)
   } else {
-    global.commons.sendMessage(global.translate('regulars.rm.undefined').replace(/\$username/g, username), sender)
+    global.commons.sendMessage(global.translate('regulars.rm.undefined').replace(/\$username/g, username), opts.sender)
     return false
   }
 }
