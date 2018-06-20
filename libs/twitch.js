@@ -41,7 +41,7 @@ class Twitch {
       {this: this, id: '!title', command: '!title', fnc: this.setTitle, permission: constants.OWNER_ONLY},
       {this: this, id: '!game', command: '!game', fnc: this.setGame, permission: constants.OWNER_ONLY}
     ]
-    if (global.commons.isSystemEnabled('points')) commands.push({this: this, command: '!top points', fnc: this.showTopPoints, permission: constants.OWNER_ONLY})
+    if (global.commons.isSystemEnabled('points')) commands.push({this: this, id: '!top points', command: '!top points', fnc: this.showTopPoints, permission: constants.OWNER_ONLY})
     return commands
   }
 
