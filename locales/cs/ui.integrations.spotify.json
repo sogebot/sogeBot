@@ -3,7 +3,9 @@
   "clientId": "clientId",
   "clientSecret": "clientSecret",
   "redirectURI": "redirectURI",
+  "format": "Formát",
   "tooltips": {
+    "format": "Dostupné proměnné: $song, $artist",
     "clientId": "",
     "clientSecret": "",
     "redirectURI": "",

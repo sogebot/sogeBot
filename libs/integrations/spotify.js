@@ -20,6 +20,10 @@ const Timeout = require('../timeout')
 
 class Spotify {
   constructor () {
+    this.defaults = {
+      format: '$song - $artist'
+    }
+
     if (require('cluster').isWorker) return
     this.collection = 'integrations.spotify'
     this.timeouts = {}
@@ -33,6 +37,15 @@ class Spotify {
 
     this.timeouts.IRefreshToken = setTimeout(() => this.IRefreshToken(), 60000)
     this.timeouts.ICurrentSong = setTimeout(() => this.ICurrentSong(), 10000)
+  }
+
+  get format () {
+    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne('cache', { key: 'integration_spotify_format' }), 'value', this.defaults.format)))
+  }
+
+  set format (value) {
+    if (_.isNil(value)) value = this.defaults.format
+    global.db.engine.update('cache', { key: 'integration_spotify_format' }, { value })
   }
 
   get currentSong () {
@@ -195,6 +208,7 @@ class Spotify {
           clientId: await this.clientId,
           clientSecret: await this.clientSecret,
           redirectURI: await this.redirectURI,
+          format: await this.format,
           enabled: await this.status({ log: false })
         })
       })

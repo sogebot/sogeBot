@@ -3,7 +3,9 @@
   "clientId": "clientId",
   "clientSecret": "clientSecret",
   "redirectURI": "redirectURI",
+  "format": "Format",
   "tooltips": {
+    "format": "Available variables: $song, $artist",
     "clientId": "",
     "clientSecret": "",
     "redirectURI": "",
