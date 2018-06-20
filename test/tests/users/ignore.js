@@ -24,40 +24,40 @@ describe('Users - ignore', () => {
     })
 
     it('add testuser to ignore list', async () => {
-      global.users.ignoreAdd(global.users, owner, 'testuser')
+      global.users.ignoreAdd({ sender: owner, parameters: 'testuser' })
       await message.isSent('ignore.user.is.added', owner, testuser)
     })
 
     it('add @testuser2 to ignore list', async () => {
-      global.users.ignoreAdd(global.users, owner, '@testuser2')
+      global.users.ignoreAdd({ sender: owner, parameters: '@testuser2' })
       await message.isSent('ignore.user.is.added', owner, testuser2)
     })
 
     it('testuser should be in ignore list', async () => {
-      global.users.ignoreCheck(global.users, owner, 'testuser')
+      global.users.ignoreCheck({ sender: owner, parameters: 'testuser' })
       await message.isSent('ignore.user.is.ignored', owner, testuser)
       assert.isTrue(await global.commons.isIgnored(testuser))
     })
 
     it('@testuser2 should be in ignore list', async () => {
-      global.users.ignoreCheck(global.users, owner, '@testuser2')
+      global.users.ignoreCheck({ sender: owner, parameters: '@testuser2' })
       await message.isSent('ignore.user.is.ignored', owner, testuser2)
       assert.isTrue(await global.commons.isIgnored(testuser2))
     })
 
     it('testuser3 should not be in ignore list', async () => {
-      global.users.ignoreCheck(global.users, owner, 'testuser3')
+      global.users.ignoreCheck({ sender: owner, parameters: 'testuser3' })
       await message.isSent('ignore.user.is.not.ignored', owner, testuser3)
       assert.isFalse(await global.commons.isIgnored(testuser3))
     })
 
     it('remove testuser from ignore list', async () => {
-      global.users.ignoreRm(global.users, owner, 'testuser')
+      global.users.ignoreRm({ sender: owner, parameters: 'testuser' })
       await message.isSent('ignore.user.is.removed', owner, testuser)
     })
 
     it('testuser should not be in ignore list', async () => {
-      global.users.ignoreCheck(global.users, owner, 'testuser')
+      global.users.ignoreCheck({ sender: owner, parameters: 'testuser' })
       await message.isSent('ignore.user.is.not.ignored', owner, testuser)
       assert.isFalse(await global.commons.isIgnored(testuser))
     })
