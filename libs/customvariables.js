@@ -274,7 +274,7 @@ class CustomVariables {
 
       if (title.match(regexp)) {
         if (cluster.isWorker) process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [null] })
-        else global.api.setTitleAndGame(global.api, null)
+        else global.api.setTitleAndGame(null)
       }
     }
   }
