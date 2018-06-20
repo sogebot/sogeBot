@@ -135,7 +135,8 @@ function fork () {
       for (let worker in cluster.workers) cluster.workers[worker].send({ type: 'lang' })
       await global.lib.translate._load()
     } else if (msg.type === 'call') {
-      global[msg.ns][msg.fnc](global[msg.ns], _.get(msg.args, '0', null), _.get(msg.args, '1', null), _.get(msg.args, '2', null))
+      const namespace = _.get(global, msg.ns, null)
+      namespace[msg.fnc].apply(namespace, msg.args)
     } else if (msg.type === 'log') {
       return global.log[msg.level](msg.message, msg.params)
     } else if (msg.type === 'stats') {
