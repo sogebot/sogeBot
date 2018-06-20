@@ -158,8 +158,7 @@ class Parser {
     commands = _.flatMap(commands)
 
     for (let command of commands) {
-      // TODO: command.command is deprecated
-      let key = (!_.isNil(command.id) ? command.id : command.command).replace('!', '')
+      let key = command.id.replace('!', '')
       let permission = await global.db.engine.findOne('permissions', { key })
       if (!_.isEmpty(permission)) command.permission = permission.permission // change to custom permission
     }
