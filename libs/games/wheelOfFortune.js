@@ -4,6 +4,7 @@
 const _ = require('lodash')
 const chalk = require('chalk')
 const debug = require('debug')
+const cluster = require('cluster')
 
 const constants = require('../constants.js')
 
@@ -17,7 +18,7 @@ class WheelOfFortune {
       options: []
     }
 
-    if (require('cluster').isMaster) {
+    if (cluster.isMaster) {
       global.panel.addMenu({category: 'settings', name: 'games', id: 'games'})
 
       this.status()
@@ -55,10 +56,14 @@ class WheelOfFortune {
     global.db.engine.update(this.collection, { key: 'options' }, { value })
   }
 
-  parsers () {
-    return [
-      {this: this, name: 'wheelOfFortune', fnc: this.run, permission: constants.VIEWERS, priority: constants.LOW, fireAndForget: true}
-    ]
+  async commands () {
+    const [command, enabled] = await Promise.all([this.command, this.enabled])
+    if (!enabled) return {}
+    else {
+      return [
+        {this: this, id: '!wof', command, fnc: this.run, permission: constants.VIEWERS}
+      ]
+    }
   }
 
   sockets () {
@@ -114,10 +119,12 @@ class WheelOfFortune {
   }
 
   async run (opts) {
-    if (!opts.message.toLowerCase().startsWith(await this.command)) return // wof command?
-    if (!(await this.enabled)) return // enabled?
-
-    global.panel.io.of('/games/wheelOfFortune').emit('spin', {options: await this.options, username: opts.sender.username})
+    console.log(opts)
+    if (cluster.isMaster) {
+      global.panel.io.of('/games/wheelOfFortune').emit('spin', {options: await this.options, username: opts.sender.username})
+    } else {
+      process.send({ type: 'call', ns: 'games.wheelOfFortune', fnc: 'run', args: [opts] })
+    }
   }
 }
 
