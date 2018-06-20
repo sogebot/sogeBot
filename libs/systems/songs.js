@@ -250,9 +250,9 @@ class Songs {
     socket.emit('videoID', null)
   }
 
-  async getCurrentSong (self) {
+  async getCurrentSong () {
     let translation = 'songs.no-song-is-currently-playing'
-    const currentSong = await self.currentSong
+    const currentSong = await this.currentSong
     if (!_.isNil(currentSong.title)) {
       if (currentSong.type === 'playlist') translation = 'songs.current-song-from-playlist'
       else translation = 'songs.current-song-from-songrequest'
