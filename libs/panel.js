@@ -158,7 +158,7 @@ function Panel () {
       }
     })
     socket.on('updateGameAndTitle', async (data) => {
-      global.api.setTitleAndGame(global.api, null, data)
+      global.api.setTitleAndGame(null, data)
 
       data.title = data.title.trim()
       data.game = data.game.trim()
