@@ -36,10 +36,15 @@ class Heist {
     }
   }
 
-  parsers () {
-    return [
-      {this: this, name: 'heist', fnc: this.run, permission: constants.VIEWERS, priority: constants.LOW, fireAndForget: true}
-    ]
+  async commands () {
+    const enabled = await this.get('enabled')
+    if (!global.commons.isSystemEnabled('points') || !enabled) return {}
+    else {
+      const command = await this.get('command')
+      return [
+        {this: this, id: '!bankheist', command: command, fnc: this.run, permission: constants.VIEWERS}
+      ]
+    }
   }
 
   get _lastAnnouncedLevel () {
@@ -402,11 +407,7 @@ class Heist {
     const d = debug('heist:run')
     const expects = new Expects()
 
-    if (!global.commons.isSystemEnabled('points')) return // is points system enabled?
-
-    let [command, enabled, startedAt, entryCooldown, levels, lastHeistTimestamp, copsCooldown] = await Promise.all([
-      this.get('command'),
-      this.get('enabled'),
+    let [startedAt, entryCooldown, levels, lastHeistTimestamp, copsCooldown] = await Promise.all([
       this.get('startedAt'),
       this.get('entryCooldown'),
       this.levels,
@@ -414,9 +415,6 @@ class Heist {
       this.get('copsCooldown')
     ])
     levels = _.orderBy(levels, 'maxUsers', 'asc')
-
-    if (!opts.message.toLowerCase().startsWith(command)) return // heist command?
-    if (!enabled) return // enabled?
 
     // is cops patrolling?
     if (_.now() - lastHeistTimestamp < copsCooldown * 60000) {
@@ -446,18 +444,18 @@ class Heist {
     if (_.now() - startedAt > entryCooldown * 1000 && _.now() - (await this._lastAnnouncedHeistInProgress) >= 60000) {
       this._lastAnnouncedHeistInProgress = _.now()
       global.commons.sendMessage(
-        (await this.get('lateEntryMessage')).replace('$command', command), opts.sender)
+        (await this.get('lateEntryMessage')).replace('$command', opts.command), opts.sender)
       return
     }
 
     let points
     try {
-      points = expects.check(opts.message).command().points().toArray()[1]
+      points = expects.check(opts.parameters).points().toArray()[0]
     } catch (e) {
       if (!newHeist) {
         global.commons.sendMessage(
-          (await this.get('entryInstruction')).replace('$command', command), opts.sender)
-        global.log.warning(`${command} ${e.message}`)
+          (await this.get('entryInstruction')).replace('$command', opts.command), opts.sender)
+        global.log.warning(`${opts.command} ${e.message}`)
         d(e.stack)
       }
       return
@@ -465,11 +463,11 @@ class Heist {
 
     points = points === 'all' && !_.isNil(await global.systems.points.getPointsOf(opts.sender.username)) ? await global.systems.points.getPointsOf(opts.sender.username) : parseInt(points, 10) // set all points
     points = points > await global.systems.points.getPointsOf(opts.sender.username) ? await global.systems.points.getPointsOf(opts.sender.username) : points // bet only user points
-    d(`${command} - ${opts.sender.username} betting ${points}`)
+    d(`${opts.command} - ${opts.sender.username} betting ${points}`)
 
     if (points === 0 || _.isNil(points) || _.isNaN(points)) {
       global.commons.sendMessage(
-        (await this.get('entryInstruction')).replace('$command', command), opts.sender)
+        (await this.get('entryInstruction')).replace('$command', opts.command), opts.sender)
       return
     } // send entryInstruction if command is not ok
 
