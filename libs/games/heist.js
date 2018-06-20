@@ -38,7 +38,7 @@ class Heist {
 
   async commands () {
     const enabled = await this.get('enabled')
-    if (!global.commons.isSystemEnabled('points') || !enabled) return {}
+    if (!global.commons.isSystemEnabled('points') || !enabled) return []
     else {
       const command = await this.get('command')
       return [
