@@ -57,9 +57,16 @@ class Parser {
         (parser.permission === constants.MODS && (isMod || isOwner)) ||
         (parser.permission === constants.OWNER_ONLY && isOwner)) {
         DEBUG_PROCESS_PARSE(`Parser ${parser.name} start`)
+
+        const opts = {
+          sender: this.sender,
+          message: this.message.trim(),
+          skip: this.skip
+        }
+
         if (parser.fireAndForget) {
-          parser.fnc(parser.this, this.sender, this.message, this.skip)
-        } else if (!(await parser.fnc(parser.this, this.sender, this.message, this.skip))) {
+          parser['fnc'].apply(parser.this, [opts])
+        } else if (!(await parser['fnc'].apply(parser.this, [opts]))) {
           // TODO: call revert on parser with revert (price can have revert)
           DEBUG_PROCESS_PARSE(`Parser ${parser.name} failed with message ${this.message}\n${util.inspect(this.sender)}`)
           return false

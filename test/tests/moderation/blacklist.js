@@ -92,13 +92,14 @@ describe('systems/moderation - blacklist()', () => {
     for (let text of _.get(test, 'should.return.true', [])) {
       it(`pattern '${pattern}' should ignore '${text}'`, async () => {
         await global.db.engine.update('settings', { key: 'blacklist' }, { value: [pattern] })
-        assert.isTrue(await global.systems.moderation.blacklist(global.systems.moderation, { username: 'testuser' }, text))
+        let result = await global.systems.moderation.blacklist({ sender: { username: 'testuser' }, message: text })
+        assert.isTrue(result)
       })
     }
     for (let text of _.get(test, 'should.return.false', [])) {
       it(`pattern '${pattern}' should timeout on '${text}'`, async () => {
         await global.db.engine.update('settings', { key: 'blacklist' }, { value: [pattern] })
-        let result = await global.systems.moderation.blacklist(global.systems.moderation, { username: 'testuser' }, text)
+        let result = await global.systems.moderation.blacklist({ sender: { username: 'testuser' }, message: text })
         assert.isFalse(result)
       })
     }

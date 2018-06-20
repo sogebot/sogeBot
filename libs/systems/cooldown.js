@@ -86,13 +86,14 @@ class Cooldown {
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async check (self, sender, text) {
+  async check (opts) {
     var data, viewer, timestamp, now
-    const match = XRegExp.exec(text, constants.COMMAND_REGEXP)
+    const match = XRegExp.exec(opts.message, constants.COMMAND_REGEXP)
     if (!_.isNil(match)) { // command
       let cooldown = await global.db.engine.findOne('cooldowns', { key: `!${match.command}` })
       if (_.isEmpty(cooldown)) { // command is not on cooldown -> recheck with text only
-        return self.check(self, sender, text.replace(`!${match.command}`, ''))
+        opts.message = opts.message.replace(`!${match.command}`, '')
+        return this.check(opts)
       }
       data = [{
         key: cooldown.key,
@@ -108,7 +109,7 @@ class Cooldown {
       let [keywords, cooldowns] = await Promise.all([global.db.engine.find('keywords'), global.db.engine.find('cooldowns')])
 
       keywords = _.filter(keywords, function (o) {
-        return text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
+        return opts.message.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
       })
 
       data = []
@@ -134,16 +135,16 @@ class Cooldown {
     }
 
     let result = false
-    let isMod = await global.commons.isMod(sender)
+    let isMod = await global.commons.isMod(opts.sender)
     debug('isMod: %j', isMod)
     for (let cooldown of data) {
       debug('Is for mods: %j', cooldown.moderator)
-      if ((global.commons.isOwner(sender) && !cooldown.owner) || (isMod && !cooldown.moderator)) {
+      if ((global.commons.isOwner(opts.sender) && !cooldown.owner) || (isMod && !cooldown.moderator)) {
         result = true
         continue
       }
 
-      viewer = await global.db.engine.findOne('cooldown.viewers', { username: sender.username, key: cooldown.key })
+      viewer = await global.db.engine.findOne('cooldown.viewers', { username: opts.sender.username, key: cooldown.key })
       if (cooldown.type === 'global') {
         timestamp = cooldown.timestamp
       } else {
@@ -155,15 +156,15 @@ class Cooldown {
         if (cooldown.type === 'global') {
           await global.db.engine.update('cooldowns', { key: cooldown.key, type: 'global' }, { timestamp: now, key: cooldown.key, type: 'global' })
         } else {
-          await global.db.engine.update('cooldown.viewers', { username: sender.username, key: cooldown.key }, { timestamp: now })
+          await global.db.engine.update('cooldown.viewers', { username: opts.sender.username, key: cooldown.key }, { timestamp: now })
         }
         result = true
         continue
       } else {
         if (!cooldown.quiet && !(await global.configuration.getValue('disableCooldownWhispers'))) {
-          sender['message-type'] = 'whisper' // we want to whisp cooldown message
+          opts.sender['message-type'] = 'whisper' // we want to whisp cooldown message
           let message = await global.commons.prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) })
-          debug(message); global.commons.sendMessage(message, sender)
+          debug(message); global.commons.sendMessage(message, opts.sender)
         }
         result = false
         break // disable _.each and updateQueue with false

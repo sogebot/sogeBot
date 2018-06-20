@@ -28,13 +28,13 @@ describe('systems/moderation - Caps()', () => {
 
     for (let test of tests.timeout) {
       it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.caps(global.systems.moderation, { username: 'testuser' }, test))
+        assert.isTrue(await global.systems.moderation.caps({sender: { username: 'testuser' }, message: test}))
       })
     }
 
     for (let test of tests.ok) {
       it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.caps(global.systems.moderation, { username: 'testuser' }, test))
+        assert.isTrue(await global.systems.moderation.caps({sender: { username: 'testuser' }, message: test}))
       })
     }
   })
@@ -46,13 +46,13 @@ describe('systems/moderation - Caps()', () => {
 
     for (let test of tests.timeout) {
       it(`message '${test}' should timeout`, async () => {
-        assert.isFalse(await global.systems.moderation.caps(global.systems.moderation, { username: 'testuser' }, test))
+        assert.isFalse(await global.systems.moderation.caps({sender: { username: 'testuser' }, message: test}))
       })
     }
 
     for (let test of tests.ok) {
       it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.caps(global.systems.moderation, { username: 'testuser' }, test))
+        assert.isTrue(await global.systems.moderation.caps({sender: { username: 'testuser' }, message: test}))
       })
     }
   })
@@ -65,7 +65,7 @@ describe('systems/moderation - Caps()', () => {
     })
 
     it(`message 'BlessRNG BlessRNG' with emotes should not timeout`, async () => {
-      assert.isTrue(await global.systems.moderation.caps(global.systems.moderation, { username: 'testuser', emotes: {'153556': ['0-7', '9-16']} }, 'BlessRNG BlessRNG'))
+      assert.isTrue(await global.systems.moderation.caps({sender: { username: 'testuser', emotes: {'153556': ['0-7', '9-16']} }, message: 'BlessRNG BlessRNG'}))
     })
   })
 })

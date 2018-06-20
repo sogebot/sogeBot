@@ -128,16 +128,16 @@ class Price {
     }
   }
 
-  async check (self, sender, text) {
-    const parsed = text.match(/^!([\S]+)/)
-    if (_.isNil(parsed) || global.commons.isOwner(sender)) return true
+  async check (opts) {
+    const parsed = opts.message.match(/^!([\S]+)/)
+    if (_.isNil(parsed) || global.commons.isOwner(opts.sender)) return true
     /* TODO: Add isHelper checks
     if (global.parser.registeredHelpers.includes(text.trim()) || global.parser.isOwner(sender) || _.isNil(parsed)) {
       return true
     }
     */
 
-    const [user, price] = await Promise.all([global.users.get(sender.username), global.db.engine.findOne('prices', { command: parsed[1], enabled: true })])
+    const [user, price] = await Promise.all([global.users.get(opts.sender.username), global.db.engine.findOne('prices', { command: parsed[1], enabled: true })])
 
     if (_.isEmpty(price)) { // no price set
       return true
@@ -148,9 +148,9 @@ class Price {
     let haveEnoughPoints = availablePts >= removePts
     if (!haveEnoughPoints) {
       let message = await global.commons.prepare('price.user-have-not-enough-points', { amount: removePts, command: `!${price.command}`, pointsName: await global.systems.points.getPointsName(removePts) })
-      debug(message); global.commons.sendMessage(message, sender)
+      debug(message); global.commons.sendMessage(message, opts.sender)
     } else {
-      await global.db.engine.insert('users.points', { username: sender.username, points: (removePts * -1) })
+      await global.db.engine.insert('users.points', { username: opts.sender.username, points: (removePts * -1) })
     }
     return haveEnoughPoints
   }

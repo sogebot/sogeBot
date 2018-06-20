@@ -115,15 +115,15 @@ class Keywords {
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async run (self, sender, text) {
+  async run (opts) {
     let keywords = await global.db.engine.find('keywords')
     keywords = _.filter(keywords, function (o) {
-      return text.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
+      return opts.message.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
     })
     for (let keyword of keywords) {
       if (!keyword.enabled) continue
-      let message = await new Message(keyword.response).parse({ sender: sender.username })
-      global.commons.sendMessage(message, sender)
+      let message = await new Message(keyword.response).parse({ sender: opts.sender.username })
+      global.commons.sendMessage(message, opts.sender)
     }
     return true
   }

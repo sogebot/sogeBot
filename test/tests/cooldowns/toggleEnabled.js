@@ -35,9 +35,9 @@ describe('Cooldowns - toggleEnabled()', () => {
     global.systems.cooldown.toggleEnabled({ sender: owner, parameters: `${command} ${type}` })
     await message.isSent('cooldowns.cooldown-was-disabled', owner, { command: command, sender: owner.username })
 
-    let isOk = await global.systems.cooldown.check(global.systems.cooldown, testUser, '!me')
+    let isOk = await global.systems.cooldown.check({sender: testUser, message: '!me'})
     assert.isTrue(isOk)
-    isOk = await global.systems.cooldown.check(global.systems.cooldown, testUser, '!me')
+    isOk = await global.systems.cooldown.check({sender: testUser, message: '!me'})
     assert.isTrue(isOk)
 
     global.systems.cooldown.toggleEnabled({ sender: owner, parameters: `${command} ${type}` })

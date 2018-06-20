@@ -113,11 +113,11 @@ class WheelOfFortune {
     return this.status(state)
   }
 
-  async run (self, sender, message) {
-    if (!message.trim().toLowerCase().startsWith(await this.command)) return // wof command?
+  async run (opts) {
+    if (!opts.message.toLowerCase().startsWith(await this.command)) return // wof command?
     if (!(await this.enabled)) return // enabled?
 
-    global.panel.io.of('/games/wheelOfFortune').emit('spin', {options: await this.options, username: sender.username})
+    global.panel.io.of('/games/wheelOfFortune').emit('spin', {options: await this.options, username: opts.sender.username})
   }
 }
 
