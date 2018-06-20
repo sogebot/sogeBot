@@ -28,12 +28,17 @@ class Parser {
     return parseInt(new Date().getTime(), 10) - parseInt(this.started_at, 10)
   }
 
-  async isModerated (sender, message) {
+  async isModerated () {
     if (this.skip) return false
 
     for (let parser of this.parsers()) {
       if (parser.priority !== constants.MODERATION) continue // skip non-moderation parsers
-      const isOk = await parser.fnc(parser.this, this.sender, this.message)
+      const opts = {
+        sender: this.sender,
+        message: this.message.trim(),
+        skip: this.skip
+      }
+      const isOk = await parser['fnc'].apply(parser.this, [opts])
       if (!isOk) {
         DEBUG_PROCESS_PARSE(`Parser ${parser.name} failed with message ${this.message}\n${util.inspect(isOk)}\n${util.inspect(this.sender)}`)
         return true
@@ -188,7 +193,7 @@ class Parser {
       var text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim()
       let opts = {
         sender: _.isNil(sender) ? { username: config.settings.bot_username.toLowerCase() } : sender,
-        command: message,
+        command: command.command,
         parameters: text.trim()
       }
 
