@@ -221,7 +221,7 @@ function Panel () {
     socket.on('saveConfiguration', function (data) {
       _.each(data, function (index, value) {
         if (value.startsWith('_')) return true
-        global.configuration.setValue(global.configuration, { username: global.commons.getOwner() }, value + ' ' + index, data._quiet)
+        global.configuration.setValue({ sender: { username: global.commons.getOwner() }, parameters: value + ' ' + index, quiet: data._quiet })
       })
     })
     socket.on('getConfiguration', async function () {

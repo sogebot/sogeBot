@@ -75,12 +75,12 @@ class Songs {
 
   async togglePlaylist () {
     let value = (await global.configuration.getValue('songs_playlist')).toString().toLowerCase() === 'true' ? 'false' : 'true'
-    global.configuration.setValue(global.configuration, { username: global.parser.getOwner() }, `songs_playlist ${value}`, true)
+    global.configuration.setValue({ sender: { username: global.parser.getOwner() }, parameters: `songs_playlist ${value}`, quiet: true })
   }
 
   async toggleSongRequests () {
     let value = (await global.configuration.getValue('songs_songrequest')).toString().toLowerCase() === 'true' ? 'false' : 'true'
-    global.configuration.setValue(global.configuration, { username: global.parser.getOwner() }, `songs_songrequest ${value}`, true)
+    global.configuration.setValue({sender: { username: global.parser.getOwner() }, parameters: `songs_songrequest ${value}`, quiet: true})
   }
 
   async getToggles (self) {
