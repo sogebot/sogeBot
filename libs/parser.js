@@ -156,7 +156,7 @@ class Parser {
       d(`Checking ${util.inspect(item)}`)
       if (_.isFunction(item.commands)) {
         let items = await item.commands()
-        commands.push(items)
+        if (!_.isEmpty(items)) commands.push(items)
       }
     }
     // TODO: sort _(this.registeredCmds).toPairs().sortBy((o) => -o[0].length).fromPairs().value() // order by length
