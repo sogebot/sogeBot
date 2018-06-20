@@ -722,7 +722,7 @@ class API {
     return title
   }
 
-  async setTitleAndGame (self, sender, args) {
+  async setTitleAndGame (sender, args) {
     args = _.defaults(args, { title: null }, { game: null })
     const cid = await global.cache.channelId()
     const url = `https://api.twitch.tv/kraken/channels/${cid}`
@@ -730,7 +730,7 @@ class API {
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
     DEBUG_API_SET_TITLE_AND_GAME(`PUT ${url}\nwait: ${needToWait}`)
     if (needToWait) {
-      new Timeout().recursive({ this: this, uid: 'setTitleAndGame', wait: 10, fnc: this.setTitleAndGame, args: [self, sender, args] })
+      new Timeout().recursive({ this: this, uid: 'setTitleAndGame', wait: 10, fnc: this.setTitleAndGame, args: [sender, args] })
       return
     }
 
