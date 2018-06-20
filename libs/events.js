@@ -299,7 +299,7 @@ class Events {
     global.widgets.custom_variables.io.emit('refresh')
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig')
     let title = await global.cache.rawStatus()
-    if (title.match(regexp)) global.api.setTitleAndGame(global.api, null)
+    if (title.match(regexp)) global.api.setTitleAndGame(null)
   }
 
   async fireDecrementCustomVariable (operation, attributes) {
@@ -322,7 +322,7 @@ class Events {
     global.widgets.custom_variables.io.emit('refresh')
     const regexp = new RegExp(`\\$_${customVariableName}`, 'ig')
     let title = await global.cache.rawStatus()
-    if (title.match(regexp)) global.api.setTitleAndGame(global.api, null)
+    if (title.match(regexp)) global.api.setTitleAndGame(null)
   }
 
   async everyXMinutesOfStream (event, attributes) {
