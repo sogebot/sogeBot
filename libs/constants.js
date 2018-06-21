@@ -43,16 +43,16 @@ define(
 
 define(
   'COMMAND_REGEXP_WITH_SPACES',
-  XRegExp(`!(?<command> [\\pL0-9 ]* ) # command`, 'ix')
+  XRegExp(`(?<command> ![\\pL0-9 ]* ) # command`, 'ix')
 )
 
 define(
   'ALIAS_REGEXP',
   XRegExp(`(?<premission> owner|mod|regular|viewer) # permission
            \\s                                      # empty space
-           !(?<alias> [\\pL0-9 ]*                 ) # alias
+           (?<alias> ![\\pL0-9 ]*                 ) # alias
            \\s                                      # empty space
-           !(?<command> .*                        ) # command`, 'ix')
+           (?<command> !.*                        ) # command`, 'ix')
 )
 
 define(

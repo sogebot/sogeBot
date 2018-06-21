@@ -22,50 +22,50 @@ describe('Alias - visible()', () => {
 
   it('!unknown', async () => {
     global.systems.alias.visible({ sender: owner, parameters: '!unknown' })
-    await message.isSent('alias.alias-was-not-found', owner, { alias: 'unknown', sender: owner.username })
+    await message.isSent('alias.alias-was-not-found', owner, { alias: '!unknown', sender: owner.username })
   })
 
   it('!a', async () => {
     global.systems.alias.add({ sender: owner, parameters: 'viewer !a !uptime' })
-    await message.isSent('alias.alias-was-added', owner, { alias: 'a', command: 'uptime', sender: owner.username })
+    await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!uptime', sender: owner.username })
 
     global.systems.alias.visible({ sender: owner, parameters: '!a' })
-    await message.isSent('alias.alias-was-concealed', owner, { alias: 'a', sender: owner.username })
+    await message.isSent('alias.alias-was-concealed', owner, { alias: '!a', sender: owner.username })
 
     global.systems.alias.visible({ sender: owner, parameters: '!a' })
-    await message.isSent('alias.alias-was-exposed', owner, { alias: 'a', sender: owner.username })
+    await message.isSent('alias.alias-was-exposed', owner, { alias: '!a', sender: owner.username })
   })
 
   it('!a with spaces', async () => {
     global.systems.alias.add({ sender: owner, parameters: 'viewer !a with spaces !uptime' })
-    await message.isSent('alias.alias-was-added', owner, { alias: 'a with spaces', command: 'uptime', sender: owner.username })
+    await message.isSent('alias.alias-was-added', owner, { alias: '!a with spaces', command: '!uptime', sender: owner.username })
 
     global.systems.alias.visible({ sender: owner, parameters: '!a with spaces' })
-    await message.isSent('alias.alias-was-concealed', owner, { alias: 'a with spaces', sender: owner.username })
+    await message.isSent('alias.alias-was-concealed', owner, { alias: '!a with spaces', sender: owner.username })
 
     global.systems.alias.visible({ sender: owner, parameters: '!a with spaces' })
-    await message.isSent('alias.alias-was-exposed', owner, { alias: 'a with spaces', sender: owner.username })
+    await message.isSent('alias.alias-was-exposed', owner, { alias: '!a with spaces', sender: owner.username })
   })
 
   it('!한국어', async () => {
     global.systems.alias.add({ sender: owner, parameters: 'viewer !한국어 !uptime' })
-    await message.isSent('alias.alias-was-added', owner, { alias: '한국어', command: 'uptime', sender: owner.username })
+    await message.isSent('alias.alias-was-added', owner, { alias: '!한국어', command: '!uptime', sender: owner.username })
 
     global.systems.alias.visible({ sender: owner, parameters: '!한국어' })
-    await message.isSent('alias.alias-was-concealed', owner, { alias: '한국어', sender: owner.username })
+    await message.isSent('alias.alias-was-concealed', owner, { alias: '!한국어', sender: owner.username })
 
     global.systems.alias.visible({ sender: owner, parameters: '!한국어' })
-    await message.isSent('alias.alias-was-exposed', owner, { alias: '한국어', sender: owner.username })
+    await message.isSent('alias.alias-was-exposed', owner, { alias: '!한국어', sender: owner.username })
   })
 
   it('!русский', async () => {
     global.systems.alias.add({ sender: owner, parameters: 'viewer !русский !uptime' })
-    await message.isSent('alias.alias-was-added', owner, { alias: 'русский', command: 'uptime', sender: owner.username })
+    await message.isSent('alias.alias-was-added', owner, { alias: '!русский', command: '!uptime', sender: owner.username })
 
     global.systems.alias.visible({ sender: owner, parameters: '!русский' })
-    await message.isSent('alias.alias-was-concealed', owner, { alias: 'русский', sender: owner.username })
+    await message.isSent('alias.alias-was-concealed', owner, { alias: '!русский', sender: owner.username })
 
     global.systems.alias.visible({ sender: owner, parameters: '!русский' })
-    await message.isSent('alias.alias-was-exposed', owner, { alias: 'русский', sender: owner.username })
+    await message.isSent('alias.alias-was-exposed', owner, { alias: '!русский', sender: owner.username })
   })
 })
