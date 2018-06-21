@@ -66,6 +66,34 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  alias: [{
+    version: '7.0.0',
+    do: async () => {
+      console.info('Migration alias to %s', '7.0.0')
+      let alias = await global.db.engine.find('alias')
+      const constants = require('../libs/constants')
+      for (let item of alias) {
+        await global.db.engine.update('alias', { _id: item._id.toString() }, { permission: constants.VIEWERS })
+      }
+    }
+  }, {
+    version: '7.6.0',
+    do: async () => {
+      console.info('Moving alias from alias to system.alias')
+      let items = await global.db.engine.find('alias')
+      let processed = 0
+      for (let item of items) {
+        delete item._id
+        item.alias = `!${item.alias}`
+        item.command = `!${item.command}`
+        await global.db.engine.insert('system.alias', item)
+        processed++
+      }
+      await global.db.engine.remove('alias', {})
+      console.info(` => ${processed} processed`)
+      console.info(` !! alias collection can be deleted`)
+    }
+  }],
   cache: [{
     version: '7.5.0',
     do: async () => {
@@ -140,17 +168,6 @@ let migration = {
 
         delete user._id; delete user.points
         await global.db.engine.insert('users', user)
-      }
-    }
-  }],
-  alias: [{
-    version: '7.0.0',
-    do: async () => {
-      console.info('Migration alias to %s', '7.0.0')
-      let alias = await global.db.engine.find('alias')
-      const constants = require('../libs/constants')
-      for (let item of alias) {
-        await global.db.engine.update('alias', { _id: item._id.toString() }, { permission: constants.VIEWERS })
       }
     }
   }],

@@ -35,7 +35,6 @@
     "points": true,
     "price": true,
     "songs": true,
-    "alias": true,
     "moderation": true,
     "ranks": true,
     "bets": true,
