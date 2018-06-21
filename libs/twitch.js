@@ -253,7 +253,7 @@ class Twitch {
   async showMe (opts) {
     try {
       const user = await global.users.get(opts.sender.username)
-      var message = ['$opts.sender']
+      var message = ['$sender']
 
       // rank
       var rank = await global.systems.ranks.get(user)
