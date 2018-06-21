@@ -1,0 +1,18 @@
+{
+  "alias": {
+    "name": "alias",
+    "placeholder": "Nastavte zde svůj !alias"
+  },
+  "command": {
+    "name": "příkaz",
+    "placeholder": "Nastavte zde svůj !příkaz pro alias"
+  },
+  "forViewers": "pro diváky",
+  "forRegulars": "pro pravidelné diváky",
+  "forOwners": "pro vlastníka",
+  "forMods": "pro mody",
+  "error": {
+    "isEmpty": "Tato hodnota nesmí být prázdná"
+  },
+  "warning": "Tato akce nemůže být vrácena!"
+}
