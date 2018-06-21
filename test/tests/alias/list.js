@@ -22,10 +22,10 @@ describe('Alias - list()', () => {
 
   it('populated list', async () => {
     global.systems.alias.add({ sender: owner, parameters: 'viewer !a !me' })
-    await message.isSent('alias.alias-was-added', owner, { alias: 'a', command: 'me', sender: owner.username })
+    await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!me', sender: owner.username })
 
     global.systems.alias.add({ sender: owner, parameters: 'viewer !b !me' })
-    await message.isSent('alias.alias-was-added', owner, { alias: 'b', command: 'me', sender: owner.username })
+    await message.isSent('alias.alias-was-added', owner, { alias: '!b', command: '!me', sender: owner.username })
 
     global.systems.alias.list({ sender: owner, parameters: '' })
     await message.isSent('alias.list-is-not-empty', owner, { list: '!a, !b', sender: owner.username })

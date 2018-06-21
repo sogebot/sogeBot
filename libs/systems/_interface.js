@@ -5,7 +5,8 @@ const Timeout = require('../timeout')
 
 class System {
   constructor (opts) {
-    this.collection = opts.collection
+    this.collection = opts.collection || {}
+    this.dependsOn = opts.dependsOn || []
     this.socket = null
     this._settings = {}
 
@@ -67,10 +68,23 @@ class System {
     }
   }
 
+  async _dependenciesEnabled () {
+    let status = []
+    for (let dependency of this.dependsOn) {
+      let dependencyPointer = _.get(global, dependency, null)
+      if (!dependencyPointer || !_.isFunction(dependencyPointer.status)) status.push(false)
+      else status.push(await dependencyPointer.status())
+    }
+    return status.length === 0 || _.every(status)
+  }
+
   async status (state) {
+    const areDependenciesEnabled = await this._dependenciesEnabled()
     const isMasterAndStatusOnly = cluster.isMaster && _.isNil(state)
     const isStatusChanged = !_.isNil(state)
-    if (_.isNil(state)) state = await this.settings.enabled
+
+    if (!areDependenciesEnabled) state = false // force disable if dependencies are disabled
+    else if (_.isNil(state)) state = await this.settings.enabled
     else this.settings.enabled = state
 
     if (isMasterAndStatusOnly || isStatusChanged) {
@@ -97,6 +111,10 @@ class System {
       } else throw Error(`Unexpected data type ${typeof values}`)
     }
     return promisedSettings
+  }
+
+  async isEnabled () {
+    return this.settings.enabled
   }
 }
 
