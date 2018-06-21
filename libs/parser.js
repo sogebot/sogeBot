@@ -31,7 +31,7 @@ class Parser {
   async isModerated () {
     if (this.skip) return false
 
-    for (let parser of this.parsers()) {
+    for (let parser of await this.parsers()) {
       if (parser.priority !== constants.MODERATION) continue // skip non-moderation parsers
       const opts = {
         sender: this.sender,
@@ -48,7 +48,7 @@ class Parser {
   }
 
   async process () {
-    for (let parser of this.parsers()) {
+    for (let parser of await this.parsers()) {
       if (parser.priority === constants.MODERATION) continue // skip moderation parsers
       let [isRegular, isMod, isOwner] = await Promise.all([
         global.commons.isRegular(this.sender),
@@ -115,13 +115,16 @@ class Parser {
    * @constructor
    * @returns object or empty list
    */
-  parsers () {
+  async parsers () {
     const d = debug('parser:parsers')
 
     let parsers = []
     for (let item of this.list) {
       d(`Checking ${util.inspect(item)}`)
-      if (_.isFunction(item.parsers)) parsers.push(item.parsers())
+      if (_.isFunction(item.parsers)) {
+        let items = await item.parsers()
+        if (!_.isEmpty(items)) parsers.push(items)
+      }
     }
     parsers = _.orderBy(_.flatMap(parsers), 'priority', 'asc')
     d(`Parsers list: ${util.inspect(parsers)}`)
