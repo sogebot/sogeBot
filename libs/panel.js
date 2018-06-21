@@ -7,6 +7,7 @@ var path = require('path')
 var basicAuth = require('basic-auth')
 const flatten = require('flat')
 var _ = require('lodash')
+const util = require('util')
 
 const Parser = require('./parser')
 
@@ -323,13 +324,13 @@ Panel.prototype.socketListening = function (self, on, fnc) {
   this.socketListeners.push({self: self, on: on, fnc: fnc})
 }
 
-Panel.prototype.registerSockets = function (options) {
+Panel.prototype.registerSockets = util.deprecate(function (options) {
   const name = options.self.constructor.name.toLowerCase()
   for (let fnc of options.expose) {
     if (!_.isFunction(options.self[fnc])) global.log.error(`Function ${fnc} of ${options.self.constructor.name} is undefined`)
     else this.socketListeners.push({self: options.self, on: `${name}.${fnc}`, fnc: options.self[fnc], finally: options.finally})
   }
-}
+}, 'registerSockets() is deprecated. Use socket from system interface directly.')
 
 Panel.prototype.sendStreamData = async function (self, socket) {
   const whenOnline = (await global.cache.when()).online
