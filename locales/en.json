@@ -983,16 +983,16 @@
   },
   "alias": {
     "alias-parse-failed": "{core.command-parse} !alias",
-    "alias-was-not-found": "$sender, alias !$alias was not found in database",
-    "alias-was-edited": "$sender, alias !$alias is changed to !$command",
-    "alias-was-added": "$sender, alias !$alias for !$command was added",
+    "alias-was-not-found": "$sender, alias $alias was not found in database",
+    "alias-was-edited": "$sender, alias $alias is changed to $command",
+    "alias-was-added": "$sender, alias $alias for $command was added",
     "list-is-not-empty": "$sender, list of aliases: $list",
     "list-is-empty": "$sender, list of aliases is empty",
-    "alias-was-enabled": "$sender, alias !$alias was enabled",
-    "alias-was-disabled": "$sender, alias !$alias was disabled",
-    "alias-was-concealed": "$sender, alias !$alias was concealed",
-    "alias-was-exposed": "$sender, alias !$alias was exposed",
-    "alias-was-removed": "$sender, alias !$alias was removed"
+    "alias-was-enabled": "$sender, alias $alias was enabled",
+    "alias-was-disabled": "$sender, alias $alias was disabled",
+    "alias-was-concealed": "$sender, alias $alias was concealed",
+    "alias-was-exposed": "$sender, alias $alias was exposed",
+    "alias-was-removed": "$sender, alias $alias was removed"
   },
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} !commands",

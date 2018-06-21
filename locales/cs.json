@@ -989,16 +989,16 @@
   },
   "alias": {
     "alias-parse-failed": "{core.command-parse} !alias",
-    "alias-was-not-found": "$sender, alias !$alias nebyl nalezen",
-    "alias-was-edited": "$sender, alias !$alias je nyni pro !$command",
-    "alias-was-added": "$sender, alias !$alias pro !$command byl pridan",
+    "alias-was-not-found": "$sender, alias $alias nebyl nalezen",
+    "alias-was-edited": "$sender, alias $alias je nyni pro $command",
+    "alias-was-added": "$sender, alias $alias pro $command byl pridan",
     "list-is-not-empty": "$sender, seznam aliasu: $list",
     "list-is-empty": "$sender, seznam aliasu je prazdny",
-    "alias-was-enabled": "$sender, alias !$alias byl zapnut",
-    "alias-was-disabled": "$sender, alias !$alias byl vypnut",
-    "alias-was-concealed": "$sender, alias !$alias byl skryt",
-    "alias-was-exposed": "$sender, alias !$alias byl odkryt",
-    "alias-was-removed": "$sender, alias !$alias byl smazan"
+    "alias-was-enabled": "$sender, alias $alias byl zapnut",
+    "alias-was-disabled": "$sender, alias $alias byl vypnut",
+    "alias-was-concealed": "$sender, alias $alias byl skryt",
+    "alias-was-exposed": "$sender, alias $alias byl odkryt",
+    "alias-was-removed": "$sender, alias $alias byl smazan"
   },
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} !commands",
