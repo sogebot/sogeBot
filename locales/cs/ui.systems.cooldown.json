@@ -1,0 +1,6 @@
+{
+  "notify-as-whisper": "oznámit šepotem",
+  "error": {
+    "isEmpty": "Tato hodnota nesmí být prázdná"
+  }
+}
