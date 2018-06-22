@@ -119,7 +119,6 @@ class WheelOfFortune {
   }
 
   async run (opts) {
-    console.log(opts)
     if (cluster.isMaster) {
       global.panel.io.of('/games/wheelOfFortune').emit('spin', {options: await this.options, username: opts.sender.username})
     } else {
