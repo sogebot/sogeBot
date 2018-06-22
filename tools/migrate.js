@@ -66,6 +66,22 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  cooldown: [{
+    version: '7.6.0',
+    do: async () => {
+      console.info('Moving cooldowns from cooldowns to system.cooldown')
+      let items = await global.db.engine.find('cooldowns')
+      let processed = 0
+      for (let item of items) {
+        delete item._id
+        await global.db.engine.insert('system.cooldown', item)
+        processed++
+      }
+      await global.db.engine.remove('cooldowns', {})
+      console.info(` => ${processed} processed`)
+      console.info(` !! cooldowns and cooldown.viewers collections can be deleted`)
+    }
+  }],
   alias: [{
     version: '7.0.0',
     do: async () => {

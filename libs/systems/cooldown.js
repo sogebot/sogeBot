@@ -6,6 +6,7 @@ const XRegExp = require('xregexp')
 
 // bot libraries
 var constants = require('../constants')
+const System = require('./_interface')
 
 const debug = require('debug')('systems:cooldown')
 
@@ -16,50 +17,86 @@ const debug = require('debug')('systems:cooldown')
  * !cooldown toggle enabled [keyword|!command] [global|user]         - enable/disable specified keyword or !command cooldown
  */
 
-class Cooldown {
+class Cooldown extends System {
   constructor () {
-    if (global.commons.isSystemEnabled(this)) {
-      global.configuration.register('disableCooldownWhispers', 'whisper.settings.disableCooldownWhispers', 'bool', false)
-
-      if (require('cluster').isMaster) {
-        global.panel.addMenu({category: 'manage', name: 'cooldowns', id: 'cooldown'})
-        global.panel.registerSockets({
-          self: this,
-          expose: ['set', 'toggleModerators', 'toggleOwners', 'toggleEnabled', 'toggleNotify', 'toggleType', 'editName', 'send'],
-          finally: this.send
-        })
-      }
+    const collection = {
+      data: 'systems.cooldown',
+      settings: 'systems.cooldown.settings',
+      viewers: 'systems.cooldown.viewers'
     }
+    const settings = {
+      cooldownNotifyAsWhisper: false,
+      command: [
+        '!cooldown toggle moderators',
+        '!cooldown toggle owners',
+        '!cooldown toggle enabled',
+        '!cooldown'
+      ]
+    }
+    super({ collection, settings })
+
+    this.addMenu({category: 'manage', name: 'cooldowns', id: 'cooldown/list'})
   }
 
-  commands () {
-    return !global.commons.isSystemEnabled('cooldown')
+  async commands () {
+    return !(await this.isEnabled())
       ? []
       : [
-        {this: this, id: '!cooldown toggle moderators', command: '!cooldown toggle moderators', fnc: this.toggleModerators, permission: constants.OWNER_ONLY},
-        {this: this, id: '!cooldown toggle owners', command: '!cooldown toggle owners', fnc: this.toggleOwners, permission: constants.OWNER_ONLY},
-        {this: this, id: '!cooldown toggle enabled', command: '!cooldown toggle enabled', fnc: this.toggleEnabled, permission: constants.OWNER_ONLY},
-        {this: this, id: '!cooldown', command: '!cooldown', fnc: this.set, permission: constants.OWNER_ONLY}
+        {this: this, id: '!cooldown toggle moderators', command: await this.settings.command['!cooldown toggle moderators'], fnc: this.toggleModerators, permission: constants.OWNER_ONLY},
+        {this: this, id: '!cooldown toggle owners', command: await this.settings.command['!cooldown toggle owners'], fnc: this.toggleOwners, permission: constants.OWNER_ONLY},
+        {this: this, id: '!cooldown toggle enabled', command: await this.settings.command['!cooldown toggle enabled'], fnc: this.toggleEnabled, permission: constants.OWNER_ONLY},
+        {this: this, id: '!cooldown', command: await this.settings.command['!cooldown'], fnc: this.set, permission: constants.OWNER_ONLY}
       ]
   }
 
-  parsers () {
-    return !global.commons.isSystemEnabled('cooldown')
+  async parsers () {
+    return !(await this.isEnabled())
       ? []
       : [
         {this: this, name: 'cooldown', fnc: this.check, permission: constants.VIEWERS, priority: constants.HIGH}
       ]
   }
 
-  async send (self, socket) {
-    socket.emit('cooldown', await global.db.engine.find('cooldowns'))
-  }
+  sockets () {
+    this.socket.on('connection', (socket) => {
+      socket.on('list', async (cb) => {
+        cb(null, await global.db.engine.find(this.collection.data))
+      })
+      socket.on('get', async (_id, cb) => {
+        cb(null, await global.db.engine.findOne(this.collection.data, { _id }))
+      })
+      socket.on('delete', async (_id, cb) => {
+        await global.db.engine.remove(this.collection.data, { _id })
+        cb(null)
+      })
+      socket.on('update', async (items, cb) => {
+        for (let item of items) {
+          const _id = item._id; delete item._id
+          let itemFromDb = item
+          if (_.isNil(_id)) itemFromDb = await global.db.engine.insert(this.collection.data, item)
+          else await global.db.engine.update(this.collection.data, { _id }, item)
 
-  async editName (self, socket, data) {
-    if (data.value.length === 0) await this.set({ sender: null, command: { after: `${data.id} ${data.type} 0` } })
-    else {
-      await global.db.engine.update('cooldowns', { key: data.id }, { key: data.value })
-    }
+          if (_.isFunction(cb)) cb(null, itemFromDb)
+        }
+      })
+      socket.on('settings', async (cb) => {
+        cb(null, await this.getAllSettings())
+      })
+      socket.on('settings.update', async (data, cb) => {
+        const enabled = await this.settings.enabled
+        for (let [key, value] of Object.entries(data)) {
+          if (key === 'enabled' && value !== enabled) this.status(value)
+          else if (key === 'commands') {
+            for (let [defaultValue, currentValue] of Object.entries(value)) {
+              this.settings.commands[defaultValue] = currentValue
+            }
+          } else {
+            this.settings[key] = value
+          }
+        }
+        setTimeout(() => cb(null), 1000)
+      })
+    })
   }
 
   async set (opts) {
@@ -72,15 +109,15 @@ class Cooldown {
     }
 
     if (parseInt(match.seconds, 10) === 0) {
-      await global.db.engine.remove('cooldowns', { key: match.command, type: match.type })
+      await global.db.engine.remove(this.collection.data, { key: match.command, type: match.type })
       let message = await global.commons.prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command })
       debug(message); global.commons.sendMessage(message, opts.sender)
       return
     }
 
-    let cooldown = await global.db.engine.findOne('cooldowns', { key: match.command, type: match.type })
-    if (_.isEmpty(cooldown)) await global.db.engine.update('cooldowns', { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000, type: match.type, timestamp: 0, quiet: _.isNil(match.quiet) ? false : match.quiet, enabled: true, owner: false, moderator: false })
-    else await global.db.engine.update('cooldowns', { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000 })
+    let cooldown = await global.db.engine.findOne(this.collection.data, { key: match.command, type: match.type })
+    if (_.isEmpty(cooldown)) await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000, type: match.type, timestamp: 0, quiet: _.isNil(match.quiet) ? false : match.quiet, enabled: true, owner: false, moderator: false })
+    else await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000 })
 
     let message = await global.commons.prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command })
     debug(message); global.commons.sendMessage(message, opts.sender)
@@ -90,9 +127,9 @@ class Cooldown {
     var data, viewer, timestamp, now
     const match = XRegExp.exec(opts.message, constants.COMMAND_REGEXP)
     if (!_.isNil(match)) { // command
-      let cooldown = await global.db.engine.findOne('cooldowns', { key: `!${match.command}` })
+      let cooldown = await global.db.engine.findOne(this.collection.data, { key: `${match.command}` })
       if (_.isEmpty(cooldown)) { // command is not on cooldown -> recheck with text only
-        opts.message = opts.message.replace(`!${match.command}`, '')
+        opts.message = opts.message.replace(`${match.command}`, '')
         return this.check(opts)
       }
       data = [{
@@ -106,7 +143,7 @@ class Cooldown {
         owner: cooldown.owner
       }]
     } else { // text
-      let [keywords, cooldowns] = await Promise.all([global.db.engine.find('keywords'), global.db.engine.find('cooldowns')])
+      let [keywords, cooldowns] = await Promise.all([global.db.engine.find('keywords'), global.db.engine.find(this.collection.data)])
 
       keywords = _.filter(keywords, function (o) {
         return opts.message.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
@@ -144,7 +181,7 @@ class Cooldown {
         continue
       }
 
-      viewer = await global.db.engine.findOne('cooldown.viewers', { username: opts.sender.username, key: cooldown.key })
+      viewer = await global.db.engine.findOne(this.collection.viewers, { username: opts.sender.username, key: cooldown.key })
       if (cooldown.type === 'global') {
         timestamp = cooldown.timestamp
       } else {
@@ -154,14 +191,14 @@ class Cooldown {
 
       if (now - timestamp >= cooldown.miliseconds) {
         if (cooldown.type === 'global') {
-          await global.db.engine.update('cooldowns', { key: cooldown.key, type: 'global' }, { timestamp: now, key: cooldown.key, type: 'global' })
+          await global.db.engine.update(this.collection.data, { key: cooldown.key, type: 'global' }, { timestamp: now, key: cooldown.key, type: 'global' })
         } else {
-          await global.db.engine.update('cooldown.viewers', { username: opts.sender.username, key: cooldown.key }, { timestamp: now })
+          await global.db.engine.update(this.collection.viewers, { username: opts.sender.username, key: cooldown.key }, { timestamp: now })
         }
         result = true
         continue
       } else {
-        if (!cooldown.quiet && !(await global.configuration.getValue('disableCooldownWhispers'))) {
+        if (!cooldown.quiet && !(await this.settings['cooldownNotifyAsWhisper'])) {
           opts.sender['message-type'] = 'whisper' // we want to whisp cooldown message
           let message = await global.commons.prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) })
           debug(message); global.commons.sendMessage(message, opts.sender)
@@ -183,7 +220,7 @@ class Cooldown {
       return false
     }
 
-    const cooldown = await global.db.engine.findOne('cooldowns', { key: match.command, type: match.type })
+    const cooldown = await global.db.engine.findOne(this.collection.data, { key: match.command, type: match.type })
     if (_.isEmpty(cooldown)) {
       let message = await global.commons.prepare('cooldowns.cooldown-not-found', { command: match.command })
       debug(message); global.commons.sendMessage(message, opts.sender)
@@ -195,7 +232,7 @@ class Cooldown {
     } else cooldown[type] = !cooldown[type]
 
     delete cooldown._id
-    await global.db.engine.update('cooldowns', { key: match.command, type: match.type }, cooldown)
+    await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, cooldown)
 
     let path = ''
     let status = cooldown[type] ? 'enabled' : 'disabled'
