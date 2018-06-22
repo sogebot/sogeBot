@@ -79,7 +79,12 @@ class Expects {
     if (_.isNil(opts.name)) throw Error(`Argument name must be defined`)
     if (!opts.optional) this.checkText()
 
-    const regexp = XRegExp(`-${opts.name}\\s${opts.delimiter}(?<${opts.name}> ${opts.multi ? '.*' : '[\\w\\d, "\'\\/$!@#$%^&*()]*'})${opts.delimiter}`, 'ix')
+    let pattern
+    if (opts.multi) pattern = '.*'
+    else if (opts.type.name === 'Number') pattern = '[0-9]*'
+    else pattern = '[\\w\\d, "\'\\/$!@#$%^&*()]*'
+
+    const regexp = XRegExp(`-${opts.name}\\s${opts.delimiter}(?<${opts.name}> ${pattern})${opts.delimiter}`, 'ix')
     const match = XRegExp.exec(this.text, regexp)
 
     if (!_.isNil(match) && match[opts.name].trim().length !== 0) {
