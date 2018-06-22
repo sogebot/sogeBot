@@ -24,7 +24,7 @@ describe('Cooldowns - check()', () => {
     global.systems.cooldown.set({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
-    let item = await global.db.engine.findOne('cooldowns', { key: '!test' })
+    let item = await global.db.engine.findOne('systems.cooldown', { key: '!test' })
     assert.notEmpty(item)
 
     let isOk = await global.systems.cooldown.check({sender: testUser, message: '!test'})
@@ -42,7 +42,7 @@ describe('Cooldowns - check()', () => {
     global.systems.cooldown.set({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
-    let item = await global.db.engine.findOne('cooldowns', { key: '!test' })
+    let item = await global.db.engine.findOne('systems.cooldown', { key: '!test' })
     assert.notEmpty(item)
 
     let isOk = await global.systems.cooldown.check({sender: testUser, message: '!test'})
@@ -63,7 +63,7 @@ describe('Cooldowns - check()', () => {
     global.systems.cooldown.set({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
-    let item = await global.db.engine.findOne('cooldowns', { key: 'me' })
+    let item = await global.db.engine.findOne('systems.cooldown', { key: 'me' })
     assert.notEmpty(item)
 
     let isOk = await global.systems.cooldown.check({sender: testUser, message: 'me'})
@@ -84,7 +84,7 @@ describe('Cooldowns - check()', () => {
     global.systems.cooldown.set({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
-    let item = await global.db.engine.findOne('cooldowns', { key: 'me' })
+    let item = await global.db.engine.findOne('systems.cooldown', { key: 'me' })
     assert.notEmpty(item)
 
     let isOk = await global.systems.cooldown.check({sender: testUser, message: 'me'})

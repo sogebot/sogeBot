@@ -1,0 +1,253 @@
+<div id="systemCooldownApp">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-9 col-md-8 col-sm-6">
+        <span data-lang="menu.cooldowns" class="title text-default"></span>
+
+        <div class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
+          <div class="col-sm-6">
+            <a class="btn btn-primary" href="#cooldown/edit"><i class="fas fa-plus"></i> New Cooldown</a>
+          </div>
+          <div class="col-sm-6 text-right form-inline d-block">
+            <button class="btn border-0" v-on:click="showAs='cards'" v-bind:class="[ showAs === 'cards' ? 'btn-dark' : 'btn-outline-dark' ]"><i class="fas fa-th-large"></i></button>
+            <button class="btn border-0" v-on:click="showAs='table'" v-bind:class="[ showAs === 'table' ? 'btn-dark' : 'btn-outline-dark' ]"><i class="fas fa-th-list"></i></button>
+            <i class="fas fa-search text-muted" style="position: relative; left: 2.2rem;"></i>
+            <input type="search" class="form-control w-auto pl-5" v-model="search" placeholder="Search...">
+          </div>
+        </div>
+
+        <div v-if="showAs === 'cards' && cooldownsFiltered.length > 0" class="card" v-for="(item, index) of cooldownsFiltered" v-bind:class="{ 'mt-3': index !== 0 }">
+          <div class="card-body row">
+            <div class="col-sm-5">
+              <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{ item.key.startsWith('!') ? commons.translate('command') : commons.translate('keyword') }}</div>
+              <div class="font-weight-bold  text-primary" style="font-size: 1.5rem">{{ item.key }}</div>
+            </div>
+
+            <div class="text-muted col-sm-1 text-center" style="margin-top: auto; margin-bottom: auto;font-size: 1.5rem">
+              <span class="fa-stack">
+                <i class="far fa-clock fa-stack-1x"></i>
+                <i v-if="!item.enabled" class="fas fa-ban fa-stack-2x" style="color:Tomato"></i>
+              </span>
+            </div>
+
+            <div style="word-break: break-all; " class="col-sm-6">
+              <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('cooldown')}}</div>
+              <div class="font-weight-bold text-primary" style="font-size: 1.5rem">{{ parseFloat(item.miliseconds / 60000).toFixed(1) }} {{commons.translate('minutes')}}</div>
+            </div>
+          </div>
+
+          <div class="card-body border-top p-0 text-right">
+            <div class="btn-group" role="group">
+              <a v-bind:href="'?id='+ item._id + '#cooldown/edit'" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-pencil-alt mr-1" aria-hidden="true"></i> {{ commons.translate('dialog.buttons.edit') }}</a>
+              <button v-on:click="item.moderator = !item.moderator; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0">
+                  <span v-bind:style="{ 'color': !item.moderator ? 'tomato' : 'inherit', 'text-decoration': !item.moderator ? 'line-through': 'inherit'}" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('cooldown-moderators').toUpperCase()}}</span>
+                </button>
+                <button v-on:click="item.owner = !item.owner; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0">
+                  <span v-bind:style="{ 'color': !item.owner ? 'tomato' : 'inherit', 'text-decoration': !item.owner ? 'line-through': 'inherit'}" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('cooldown-owners').toUpperCase()}}</span>
+                </button>
+              <button v-on:click="item.enabled = !item.enabled; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1"  v-bind:class="[ item.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i> {{ item.enabled ? commons.translate('enabled') : commons.translate('disabled') }}</button>
+              <button type="button" type="button" v-on:click="deleteItem(item._id)" class="btn btn-outline-dark p-3 border-0"><i class="far fa-trash-alt mr-1" aria-hidden="true"></i> {{ commons.translate('delete') }}</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="widget h-auto" v-if="showAs === 'table' && cooldownsFiltered.length > 0">
+          <div class="row p-2 m-0 border-bottom">
+            <div class="col-md-4"><strong>{{ commons.translate('command') }} {{commons.translate('or')}} {{commons.translate('keyword').toLowerCase() }}</strong></div>
+            <div class="col-md-4"><strong>{{ commons.translate('cooldown') }}</strong></div>
+          </div>
+          <div class="row p-2 m-0 border-bottom" v-for="(item, index) of cooldownsFiltered">
+            <div class="col-md-4">{{ item.key }}</div>
+            <div class="col-md-4" style="word-break: break-word">{{ parseFloat(item.miliseconds / 60000).toFixed(1) }} {{commons.translate('minutes')}}</div>
+            <div class="col-md-4">
+              <div class="p-0 text-right">
+                <a v-bind:href="'?id='+ item._id + '#cooldown/edit'" v-bind:title="commons.translate('dialog.buttons.edit')" class="btn btn-outline-dark p-1 border-0"><i class="fas fa-pencil-alt m-1" aria-hidden="true"></i></a>
+                <button v-on:click="item.moderator = !item.moderator; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0">
+                  <span v-bind:style="{ 'color': !item.moderator ? 'tomato' : 'inherit', 'text-decoration': !item.moderator ? 'line-through': 'inherit'}" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('cooldown-moderators').toUpperCase()}}</span>
+                </button>
+                <button v-on:click="item.owner = !item.owner; sendUpdate(item._id)"  class="btn btn-outline-dark p-3 border-0">
+                  <span v-bind:style="{ 'color': !item.owner ? 'tomato' : 'inherit', 'text-decoration': !item.owner ? 'line-through': 'inherit'}" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('cooldown-owners').toUpperCase()}}</span>
+                </button>
+                <button v-bind:title="item.enabled ? commons.translate('enabled') : commons.translate('disabled')" v-on:click="item.enabled = !item.enabled; sendUpdate(item._id)"  class="btn btn-outline-dark p-1 border-0"><i class="fas m-1"  v-bind:class="[ item.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i></button>
+                <button type="button" v-on:click="deleteItem(item._id)" v-bind:title="commons.translate('delete')" class="btn btn-outline-dark p-1 border-0"><i class="far fa-trash-alt m-1" aria-hidden="true"></i></button>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <div class="sticky-top" style="top: 60px">
+          <span class="title text-default">{{ commons.translate('settings') }}</span>
+          <div class="widget pt-1 mt-3" style="height: auto">
+            <div class="pt-1 pl-2 pr-2 pb-1">
+              <toggle
+                v-bind:value="enabled"
+                v-on:update="enabled = !enabled; isDataChanged = true"></toggle>
+            </div>
+
+            <div class="pt-1 pl-2 pr-2 pb-1">
+              <toggle
+                v-bind:title="commons.translate('systems.cooldown.notify-as-whisper')"
+                v-bind:value="cooldownNotifyAsWhisper"
+                v-on:update="cooldownNotifyAsWhisper = !cooldownNotifyAsWhisper; isDataChanged = true"></toggle>
+            </div>
+
+            <div class="p-0 pl-2 pr-2 " v-for="(value, defaultValue) of commands">
+              <command-input
+                class="pt-1 pb-1"
+                v-bind:value="value"
+                v-bind:command="defaultValue"
+                v-on:update="commands[defaultValue] = $event; isDataChanged = true"></command-input>
+            </div>
+            <div class="p-2">
+              <div v-if="isDataChanged" class="alert alert-danger">{{commons.translate('dialog.changesPending')}}</div>
+              <button class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 0">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
+              <button disabled="disabled" class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 1">
+                <i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
+              <button disabled="disabled" class="btn btn-block btn-success" v-on:click="saveSettings" v-if="state.settings === 2">
+                <i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  Vue.prototype.commons = commons
+
+  if (typeof toggle === 'undefined') {
+    var toggle = {
+      props: ['value', 'title'],
+      methods: {
+        update: function () {
+          this.$emit('update', !this.value)
+        }
+      },
+      template: `
+        <div class="input-group">
+          <div v-if="title" class="input-group-prepend">
+            <span class="input-group-text">{{ title }}</span>
+          </div>
+          <button
+            class="btn form-control"
+            v-bind:class="{'btn-success': this.value, 'btn-danger': !this.value}"
+            v-on:click="update()">
+            <template v-if="this.value">{{ commons.translate('enabled') }}</template>
+            <template v-else>{{ commons.translate('disabled') }}</template>
+          </button>
+        </div>`
+    }
+  }
+
+  if (typeof commandInput === 'undefined') {
+    var commandInput = {
+      props: ['value', 'command'],
+      methods: {
+        update: function () {
+          this.$emit('update', this.currentValue)
+        }
+      },
+      data: function () {
+        return {
+          currentValue: this.value
+        }
+      },
+      template: `
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">{{ command }}</span>
+          </div>
+          <input v-on:keyup="update" v-model="currentValue" class="form-control" type="text" />
+        </div>`
+    }
+  }
+
+  function cooldownInit () {
+    if (_.size(translations) === 0) return setTimeout(() => cooldownInit(), 1)
+    var systemCooldownApp = new Vue({
+      el: '#systemCooldownApp',
+      components: {
+        'toggle': toggle,
+        'command-input': commandInput
+      },
+      data: {
+        showAs: 'cards',
+        search: '',
+
+        cooldowns: [],
+
+        commands: {},
+        cooldownNotifyAsWhisper: true,
+        enabled: true,
+
+        changed: [],
+        isDataChanged: false,
+
+        state: {
+          settings: 0
+        },
+        socket: io('/system/Cooldown', { query: "token=" + token }),
+      },
+      computed: {
+        cooldownsFiltered: function () {
+          if (this.search.length === 0) return this.cooldowns
+          return this.cooldowns.filter((o) => {
+            return !_.isNil(o.key.match(new RegExp(this.search, 'ig')))
+          })
+        }
+      },
+      created: function () {
+        this.socket.emit('list', (err, items) => {
+          this.cooldowns = items
+        })
+        this.socket.emit('settings', (err, items) => {
+          this.enabled = items.enabled
+          this.cooldownNotifyAsWhisper = items.cooldownNotifyAsWhisper
+          this.commands = items.commands
+        })
+
+        if (localStorage.getItem('/system/Cooldown/showAs')) this.showAs = JSON.parse(localStorage.getItem('/system/Cooldown/showAs'));
+      },
+      watch: {
+        showAs: function(val) {
+          localStorage.setItem('/system/Cooldown/showAs', JSON.stringify(this.showAs))
+        }
+      },
+      filters: {
+        capitalize: function (value) {
+          if (!value) return ''
+          value = value.toString()
+          return value.charAt(0).toUpperCase() + value.slice(1)
+        }
+      },
+      methods: {
+        deleteItem: function (id) {
+          this.socket.emit('delete', id, () => {
+            this.cooldowns = this.cooldowns.filter((o) => o._id !== id)
+          })
+        },
+        sendUpdate: function (_id) {
+          this.socket.emit('update', this.cooldowns.filter((o) => o._id === _id))
+        },
+        saveSettings: function () {
+          this.state.settings = 1
+          const settings = {
+            commands: this.commands,
+            enabled: this.enabled,
+            cooldownNotifyAsWhisper: this.cooldownNotifyAsWhisper
+          }
+          this.socket.emit('settings.update', settings, (err) => {
+            this.state.settings = 2
+            this.isDataChanged = false
+            setTimeout(() => this.state.settings = 0, 1000)
+          })
+        }
+      }
+    })
+  }
+  cooldownInit()
+</script>
