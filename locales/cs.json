@@ -979,7 +979,7 @@
       "betCloseTimer": "Sazky budou automaticky uzavreny za $valuemin",
       "refund": "Sazky byly uzavreny bez vyhry, vsichni uzivatele byly vyplaceni!",
       "notOption": "$sender, tato moznost neexistuje! Sazka nebyla uzavrena, pouzij !bet",
-      "closed": "Sazky byly uzavreny a vitezna moznost je $option! Vyplaceno bylo $amount uzivatelu!",
+      "closed": "Sazky byly uzavreny a vitezna moznost je $option! Vyplaceno bylo $amount uzivatelu a rozdano $points $pointsName!",
       "timeUpBet": "Prisel si pozde, $sender, cas na sazeni vyprsel!",
       "locked": "Vyprsel cas na vsazeni! Dalsi sazky neprijimame",
       "zeroBet": "Ale ale, $sender, nemuzes vsadit 0 $pointsName",

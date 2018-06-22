@@ -10,6 +10,7 @@ var constants = require('../constants')
 var Points = require('./points')
 const Expects = require('../expects.js')
 const Timeout = require('../timeout')
+const System = require('./_interface')
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters'
 const ERROR_ALREADY_OPENED = '1'
@@ -33,21 +34,38 @@ const DEBUG_BET_CHECK_IF_EXPIRED = debug('bets:checkIfBetExpired')
  * !set betPercentGain [0-100]                                                   - sets amount of gain per option
  */
 
-class Bets {
+class Bets extends System {
   constructor () {
-    this.timeouts = {}
-    if (global.commons.isSystemEnabled('points') && global.commons.isSystemEnabled(this)) {
-      global.configuration.register('betPercentGain', 'bets.betPercentGain', 'number', 20)
+    const collection = {
+      data: 'systems.bets',
+      settings: 'systems.bets.settings',
+      users: 'systems.bets.users'
+    }
+    const dependsOn = [
+      'systems.points'
+    ]
+    const settings = {
+      command: [
+        '!bet open',
+        '!bet close',
+        '!bet refund',
+        '!bet'
+      ]
+    }
 
-      if (cluster.isMaster) {
-        this.checkIfBetExpired()
-      }
+    super({ collection, settings, dependsOn })
+
+    this.timeouts = {}
+
+    global.configuration.register('betPercentGain', 'bets.betPercentGain', 'number', 20)
+    if (cluster.isMaster) {
+      this.checkIfBetExpired()
     }
   }
 
   async checkIfBetExpired () {
     try {
-      let currentBet = await global.db.engine.findOne('cache', { key: 'bets' })
+      let currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' })
       DEBUG_BET_CHECK_IF_EXPIRED('Current bet object: %o', currentBet)
       if (_.isEmpty(currentBet) || currentBet.locked) throw Error(ERROR_NOT_RUNNING)
 
@@ -60,18 +78,18 @@ class Bets {
       if (isExpired) {
         currentBet.locked = true
 
-        const _bets = await global.db.engine.find('bets.users')
+        const _bets = await global.db.engine.find(this.collection.users)
         if (_bets.length > 0) {
           global.commons.sendMessage(global.translate('bets.locked'), {username: global.commons.getOwner()})
           const _id = currentBet._id.toString(); delete currentBet._id
           DEBUG_BET_CHECK_IF_EXPIRED('Doing cache %s update \n %o', _id, currentBet)
-          let update = await global.db.engine.update('cache', { _id: _id }, currentBet)
+          let update = await global.db.engine.update(this.collection.data, { _id: _id }, currentBet)
           DEBUG_BET_CHECK_IF_EXPIRED('Updated Object \n %o', update)
         } else {
           global.commons.sendMessage(global.translate('bets.removed'), global.commons.getOwner())
-          await global.db.engine.remove('cache', { key: 'bets' })
+          await global.db.engine.remove(this.collection.data, { key: 'bets' })
         }
-        await global.db.engine.update('cache', { key: 'betsModifiedTime' }, { value: new Date().getTime() })
+        await global.db.engine.update(this.collection.data, { key: 'betsModifiedTime' }, { value: new Date().getTime() })
       }
     } catch (e) {
       switch (e.message) {
@@ -86,41 +104,41 @@ class Bets {
     new Timeout().recursive({ uid: `betsCheckIfBetExpired`, this: this, fnc: this.checkIfBetExpired, wait: 10000 })
   }
 
-  commands () {
-    const isEnabled = global.commons.isSystemEnabled('points') && global.commons.isSystemEnabled('bets')
+  async commands () {
+    const isEnabled = await this.isEnabled()
     return !isEnabled
       ? []
       : [
-        {this: this, id: '!bet open', command: '!bet open', fnc: this.open, permission: constants.MODS},
-        {this: this, id: '!bet close', command: '!bet close', fnc: this.close, permission: constants.MODS},
-        {this: this, id: '!bet refund', command: '!bet refund', fnc: this.refundAll, permission: constants.MODS},
-        {this: this, id: '!bet', command: '!bet', fnc: this.save, permission: constants.VIEWERS, isHelper: true}
+        {this: this, id: '!bet open', command: await this.settings.command['!bet open'], fnc: this.open, permission: constants.MODS},
+        {this: this, id: '!bet close', command: await this.settings.command['!bet close'], fnc: this.close, permission: constants.MODS},
+        {this: this, id: '!bet refund', command: await this.settings.command['!bet refund'], fnc: this.refundAll, permission: constants.MODS},
+        {this: this, id: '!bet', command: await this.settings.command['!bet'], fnc: this.save, permission: constants.VIEWERS, isHelper: true}
       ]
   }
 
   async open (opts) {
     const expects = new Expects()
-    const currentBet = await global.db.engine.findOne('cache', { key: 'bets' })
+    const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' })
 
     try {
       if (!_.isEmpty(currentBet)) { throw new Error(ERROR_ALREADY_OPENED) }
 
-      let [minutes, title, options] = expects
+      let [timeout, title, options] = expects
         .check(opts.parameters)
-        .argument({ name: 'timeout', optional: true, default: 2 })
+        .argument({ name: 'timeout', optional: true, default: 2, type: Number })
         .argument({ name: 'title', optional: false, multi: true })
         .list({ delimiter: '|' })
         .toArray()
       if (options.length < 2) throw new Error(ERROR_NOT_ENOUGH_OPTIONS)
 
-      let bet = { title, locked: false, options: [], key: 'bets', end: new Date().getTime() + minutes * 1000 * 60 }
+      let bet = { title, locked: false, options: [], key: 'bets', end: new Date().getTime() + timeout * 1000 * 60 }
       for (let i in options) bet.options[i] = { name: options[i] }
 
-      await global.db.engine.insert('cache', bet)
+      await global.db.engine.insert(this.collection.data, bet)
       global.commons.sendMessage(global.translate('bets.opened', {username: global.commons.getOwner()})
         .replace(/\$title/g, title)
         .replace(/\$maxIndex/g, options.length - 1)
-        .replace(/\$minutes/g, minutes)
+        .replace(/\$minutes/g, timeout)
         .replace(/\$options/g, options.map((v, i) => `${i}. '${v}'`).join(', ')), opts.sender)
     } catch (e) {
       switch (e.message) {
@@ -137,12 +155,12 @@ class Bets {
           global.commons.sendMessage(global.translate('core.error'), opts.sender)
       }
     } finally {
-      global.db.engine.update('cache', { key: 'betsModifiedTime' }, { value: new Date().getTime() })
+      global.db.engine.update(this.collection.data, { key: 'betsModifiedTime' }, { value: new Date().getTime() })
     }
   }
 
   async info (opts) {
-    let currentBet = await global.db.engine.findOne('cache', { key: 'bets' })
+    let currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' })
     if (_.isEmpty(currentBet)) global.commons.sendMessage(global.translate('bets.notRunning'), opts.sender)
     else {
       global.commons.sendMessage(global.translate(currentBet.locked ? 'bets.lockedInfo' : 'bets.info')
@@ -155,13 +173,13 @@ class Bets {
 
   async participate (opts) {
     const expects = new Expects()
-    const currentBet = await global.db.engine.findOne('cache', { key: 'bets' })
+    const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' })
 
     try {
       let [index, points] = expects.check(opts.parameters).number({ optional: true }).points({ optional: true }).toArray()
       if (!_.isNil(points) && !_.isNil(index)) {
         const pointsOfUser = await global.systems.points.getPointsOf(opts.sender.username)
-        const _betOfUser = await global.db.engine.findOne('bets.users', { username: opts.sender.username })
+        const _betOfUser = await global.db.engine.findOne(this.collection.users, { username: opts.sender.username })
 
         if (points === 'all' || points > pointsOfUser) points = pointsOfUser
 
@@ -175,7 +193,7 @@ class Bets {
 
         // All OK
         await global.db.engine.insert('users.points', { username: opts.sender.username, points: points * -1 })
-        await global.db.engine.update('bets.users', { username: opts.sender.username }, { points: points + _betOfUser.points, option: index })
+        await global.db.engine.update(this.collection.users, { username: opts.sender.username }, { points: points + _betOfUser.points, option: index })
       } else {
         this.info(opts)
       }
@@ -203,17 +221,17 @@ class Bets {
           global.commons.sendMessage(global.translate('bets.error').replace(/\$maxIndex/g, currentBet.options.length - 1), opts.sender)
       }
     } finally {
-      global.db.engine.update('cache', { key: 'betsModifiedTime' }, { value: new Date().getTime() })
+      global.db.engine.update(this.collection.data, { key: 'betsModifiedTime' }, { value: new Date().getTime() })
     }
   }
 
   async refundAll (opts) {
     try {
-      if (_.isEmpty(await global.db.engine.findOne('cache', { key: 'bets' }))) throw Error(ERROR_NOT_RUNNING)
-      for (let user of await global.db.engine.find('bets.users')) {
+      if (_.isEmpty(await global.db.engine.findOne(this.collection.data, { key: 'bets' }))) throw Error(ERROR_NOT_RUNNING)
+      for (let user of await global.db.engine.find(this.collection.users)) {
         await global.db.engine.insert('users.points', { username: user.username, points: parseInt(user.points, 10) })
       }
-      await global.db.engine.remove('bets.users', {})
+      await global.db.engine.remove(this.collection.users, {})
       global.commons.sendMessage(global.translate('bets.refund'), opts.sender)
     } catch (e) {
       switch (e.message) {
@@ -225,14 +243,14 @@ class Bets {
           global.commons.sendMessage(global.translate('core.error'), opts.sender)
       }
     } finally {
-      await global.db.engine.remove('cache', { key: 'bets' })
-      global.db.engine.update('cache', { key: 'betsModifiedTime' }, { value: new Date().getTime() })
+      await global.db.engine.remove(this.collection.data, { key: 'bets' })
+      global.db.engine.update(this.collection.data, { key: 'betsModifiedTime' }, { value: new Date().getTime() })
     }
   }
 
   async close (opts) {
     const expects = new Expects()
-    let currentBet = await global.db.engine.findOne('cache', { key: 'bets' })
+    let currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' })
     try {
       let index = expects.check(opts.parameters).number().toArray()[0]
 
@@ -241,16 +259,20 @@ class Bets {
 
       var percentGain = (currentBet.options.length * parseInt(await global.configuration.getValue('betPercentGain'), 10)) / 100
 
-      const users = await global.db.engine.find('bets.users')
+      const users = await global.db.engine.find(this.collection.users)
+      let total = 0
       for (let user of users) {
-        await global.db.engine.remove('bets.users', { _id: String(user._id) })
-        if (user.option === index) await global.db.engine.insert('users.points', { username: user.username, points: parseInt(user.points, 10) + Math.round((parseInt(user.points, 10) * percentGain)) })
+        await global.db.engine.remove(this.collection.users, { _id: String(user._id) })
+        total += Math.round((parseInt(user.points, 10) * percentGain))
+        if (user.option === index) await global.db.engine.insert('users.points', { username: user.username, points: Math.round((parseInt(user.points, 10) * percentGain)) })
       }
 
       global.commons.sendMessage(global.translate('bets.closed')
         .replace(/\$option/g, currentBet.options[index].name)
-        .replace(/\$amount/g, _.filter(users, (o) => o.option === index).length), opts.sender)
-      await global.db.engine.remove('cache', { _id: currentBet._id.toString() })
+        .replace(/\$amount/g, _.filter(users, (o) => o.option === index).length)
+        .replace(/\$pointsName/g, await Points.getPointsName(total))
+        .replace(/\$points/g, total), opts.sender)
+      await global.db.engine.remove(this.collection.data, { _id: currentBet._id.toString() })
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
@@ -267,7 +289,7 @@ class Bets {
           global.commons.sendMessage(global.translate('core.error'), opts.sender)
       }
     } finally {
-      global.db.engine.update('cache', { key: 'betsModifiedTime' }, { value: new Date().getTime() })
+      global.db.engine.update(this.collection.data, { key: 'betsModifiedTime' }, { value: new Date().getTime() })
     }
   }
 

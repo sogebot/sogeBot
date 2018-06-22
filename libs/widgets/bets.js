@@ -12,7 +12,7 @@ class BetsWidget {
     this.currentBet = {}
     this.bets = []
 
-    if (!global.commons.isSystemEnabled('bets') || require('cluster').isWorker) return
+    if (require('cluster').isWorker) return
 
     global.panel.addWidget('bets', 'widget-title-bets', 'far fa-money-bill-alt')
 
@@ -22,11 +22,11 @@ class BetsWidget {
 
   async interval () {
     try {
-      let _modifiedAt = await global.db.engine.findOne('cache', { key: 'betsModifiedTime' })
+      let _modifiedAt = await global.db.engine.findOne('systems.bets', { key: 'betsModifiedTime' })
       if (this.modifiedAt !== _modifiedAt) {
         this.modifiedAt = _modifiedAt
-        this.currentBet = await global.db.engine.findOne('cache', { key: 'bets' })
-        this.bets = await global.db.engine.find('bets.users')
+        this.currentBet = await global.db.engine.findOne('systems.bets', { key: 'bets' })
+        this.bets = await global.db.engine.find('systems.bets.users')
       }
     } catch (e) {
       global.log.error(e.stack)
