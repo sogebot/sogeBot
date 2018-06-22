@@ -7,22 +7,32 @@ const axios = require('axios')
 // bot libraries
 const constants = require('../constants')
 const config = require('../../config')
+const System = require('./_interface')
 
 /*
  * !commercial                        - gets an info about alias usage
  * !commercial [duration] [?message]  - run commercial
  */
 
-class Commercial {
+class Commercial extends System {
   constructor () {
-    global.commons.isSystemEnabled(this)
+    const collection = {
+      settings: 'systems.commercial.settings'
+    }
+    const settings = {
+      command: [
+        '!commercial'
+      ]
+    }
+
+    super({ collection, settings })
   }
 
-  commands () {
-    return !global.commons.isSystemEnabled('commercial')
+  async commands () {
+    return !(await this.isEnabled())
       ? []
       : [
-        { this: this, id: '!commercial', command: '!commercial', fnc: this.run, permission: constants.OWNER_ONLY, isHelper: true }
+        { this: this, id: '!commercial', command: await this.settings.command['!commercial'], fnc: this.run, permission: constants.OWNER_ONLY, isHelper: true }
       ]
   }
 
