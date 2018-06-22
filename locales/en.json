@@ -973,7 +973,7 @@
       "betCloseTimer": "Bets will be automatically closed after $valuemin",
       "refund": "Bets were closed without a winning. All users are refunded!",
       "notOption": "$sender, this option doesn't exist! Bet is not closed, check !bet",
-      "closed": "Bets was closed and winning option was $option! $amount users won!",
+      "closed": "Bets was closed and winning option was $option! $amount users won in total $points $pointsName!",
       "timeUpBet": "I guess you are too late, $sender, your time for betting is up!",
       "locked": "Betting time is up! No more bets.",
       "zeroBet": "Oh boy, $sender, you cannot bet 0 $pointsName",
