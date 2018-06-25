@@ -12,7 +12,6 @@
     "ok": "Citace $id od $quotedBy '$quote'",
     "error": {
       "no-parameters": "$sender, $command chybí -id nebo -tag.",
-      "id-is-not-a-number": "$sender, ID citace není číslo.",
       "not-found-by-id": "$sender, citace $id nebyla nalezena.",
       "not-found-by-tag": "$sender, žádné citace s tagem $tag nebyly nalezeny."
     }
@@ -21,7 +20,6 @@
     "ok": "$sender, Tagy citace $id byly nastaveny. (tagy: $tags)",
     "error": {
       "no-parameters": "$sender, $command chybí -id nebo -tag.",
-      "id-is-not-a-number": "$sender, ID citace není číslo.",
       "not-found-by-id": "$sender, citace $id nebyla nalezena."
     }
   },

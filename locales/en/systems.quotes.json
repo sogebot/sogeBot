@@ -12,7 +12,6 @@
     "ok": "Quote $id by $quotedBy '$quote'",
     "error": {
       "no-parameters": "$sender, $command is missing -id or -tag.",
-      "id-is-not-a-number": "$sender, quote ID is not a number.",
       "not-found-by-id": "$sender, quote $id was not found.",
       "not-found-by-tag": "$sender, no quotes with tag $tag was not found."
     }
@@ -21,7 +20,6 @@
     "ok": "$sender, quote $id tags were set. (tags: $tags)",
     "error": {
       "no-parameters": "$sender, $command is missing -id or -tag.",
-      "id-is-not-a-number": "$sender, quote ID is not a number.",
       "not-found-by-id": "$sender, quote $id was not found."
     }
   },

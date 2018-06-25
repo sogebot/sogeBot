@@ -17,7 +17,7 @@ const tests = [
   {sender: owner, parameters: '-tag -id', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
   {sender: owner, parameters: '-id -tag', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
 
-  {sender: owner, parameters: '-id a', shouldFail: true, error: 'systems.quotes.show.error.id-is-not-a-number'},
+  {sender: owner, parameters: '-id a', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
 
   {sender: owner, parameters: '-id 1', id: 1, tag: 'general', shouldFail: false, exist: true},
   {sender: owner, parameters: '-id 1 -tag', id: 1, tag: 'general', shouldFail: false, exist: true},
