@@ -231,20 +231,15 @@ class Quotes {
     try {
       if (opts.parameters.length === 0) throw new Error()
       let [id, tag] = expects.check(opts.parameters).argument({ type: Number, name: 'id' }).argument({ name: 'tag' }).toArray()
-      if (_.isNaN(id)) {
-        const message = await global.commons.prepare('systems.quotes.set.error.id-is-not-a-number')
+      let quote = await global.db.engine.findOne(this.collection, { id })
+      if (!_.isEmpty(quote)) {
+        const tags = tag.split(',').map((o) => o.trim())
+        await global.db.engine.update(this.collection, { id }, { tags })
+        const message = await global.commons.prepare('systems.quotes.set.ok', { id, tags: tags.join(', ') })
         global.commons.sendMessage(message, opts.sender)
       } else {
-        let quote = await global.db.engine.findOne(this.collection, { id })
-        if (!_.isEmpty(quote)) {
-          const tags = tag.split(',').map((o) => o.trim())
-          await global.db.engine.update(this.collection, { id }, { tags })
-          const message = await global.commons.prepare('systems.quotes.set.ok', { id, tags: tags.join(', ') })
-          global.commons.sendMessage(message, opts.sender)
-        } else {
-          const message = await global.commons.prepare('systems.quotes.set.error.not-found-by-id', { id })
-          global.commons.sendMessage(message, opts.sender)
-        }
+        const message = await global.commons.prepare('systems.quotes.set.error.not-found-by-id', { id })
+        global.commons.sendMessage(message, opts.sender)
       }
     } catch (e) {
       const command = await this.commandSet
@@ -265,7 +260,6 @@ class Quotes {
     const expects = new Expects()
 
     let [id, tag] = expects.check(opts.parameters).argument({ type: Number, name: 'id', optional: true }).argument({ name: 'tag', optional: true }).toArray()
-
     if (_.isNil(id) && _.isNil(tag)) {
       const command = await this.command
       const message = await global.commons.prepare('systems.quotes.show.error.no-parameters', { command })
@@ -273,19 +267,14 @@ class Quotes {
     }
 
     if (!_.isNil(id)) {
-      if (_.isNaN(id)) {
-        const message = await global.commons.prepare('systems.quotes.show.error.id-is-not-a-number')
+      let quote = await global.db.engine.findOne(this.collection, { id })
+      if (!_.isEmpty(quote)) {
+        const quotedBy = (await global.users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy]
+        const message = await global.commons.prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy })
         global.commons.sendMessage(message, opts.sender)
       } else {
-        let quote = await global.db.engine.findOne(this.collection, { id })
-        if (!_.isEmpty(quote)) {
-          const quotedBy = (await global.users.getUsernamesFromIds([quote.quotedBy]))[quote.quotedBy]
-          const message = await global.commons.prepare('systems.quotes.show.ok', { quote: quote.quote, id: quote.id, quotedBy })
-          global.commons.sendMessage(message, opts.sender)
-        } else {
-          const message = await global.commons.prepare('systems.quotes.show.error.not-found-by-id', { id })
-          global.commons.sendMessage(message, opts.sender)
-        }
+        const message = await global.commons.prepare('systems.quotes.show.error.not-found-by-id', { id })
+        global.commons.sendMessage(message, opts.sender)
       }
     } else {
       let quotes = await global.db.engine.find(this.collection)
