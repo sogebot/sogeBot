@@ -69,12 +69,12 @@ let migration = {
   cooldown: [{
     version: '7.6.0',
     do: async () => {
-      console.info('Moving cooldowns from cooldowns to system.cooldown')
+      console.info('Moving cooldowns from cooldowns to systems.cooldown')
       let items = await global.db.engine.find('cooldowns')
       let processed = 0
       for (let item of items) {
         delete item._id
-        await global.db.engine.insert('system.cooldown', item)
+        await global.db.engine.insert('systems.cooldown', item)
         processed++
       }
       await global.db.engine.remove('cooldowns', {})
@@ -95,14 +95,14 @@ let migration = {
   }, {
     version: '7.6.0',
     do: async () => {
-      console.info('Moving alias from alias to system.alias')
+      console.info('Moving alias from alias to systems.alias')
       let items = await global.db.engine.find('alias')
       let processed = 0
       for (let item of items) {
         delete item._id
         item.alias = `!${item.alias}`
         item.command = `!${item.command}`
-        await global.db.engine.insert('system.alias', item)
+        await global.db.engine.insert('systems.alias', item)
         processed++
       }
       await global.db.engine.remove('alias', {})
