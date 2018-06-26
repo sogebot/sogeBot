@@ -38,7 +38,7 @@ define(
 
 define(
   'COMMAND_REGEXP',
-  XRegExp(`!(?<command> [\\pL0-9]* ) # command`, 'ix')
+  XRegExp(`(?<command> ![\\pL0-9]* ) # command`, 'ix')
 )
 
 define(
@@ -86,7 +86,7 @@ define(
   'COMMAND_REGEXP_WITH_RESPONSE',
   XRegExp(`(?<premission> owner|mod|regular|viewer) # permission
            \\s                                      # empty space
-          !(?<command> [\\pL0-9]*                 ) # command
+           (?<command> ![\\pL0-9]*                ) # command
            \\s                                      # empty space
            (?<response> .*                        ) # response`, 'ix')
 )
