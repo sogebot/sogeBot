@@ -1,0 +1,18 @@
+{
+  "command": {
+    "name": "vlastní příkaz",
+    "placeholder": ""
+  },
+  "response": {
+    "name": "odpověď",
+    "placeholder": ""
+  },
+  "forViewers": "pro diváky",
+  "forRegulars": "pro pravidelné diváky",
+  "forOwners": "pro vlastníka",
+  "forMods": "pro mody",
+  "error": {
+    "isEmpty": "Tato hodnota nesmí být prázdná"
+  },
+  "warning": "Tato akce nemůže být vrácena!"
+}

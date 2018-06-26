@@ -997,16 +997,16 @@
   },
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} !commands",
-    "command-was-not-found": "$sender, command !$command was not found in database",
-    "command-was-edited": "$sender, command !$command is changed to '$response'",
-    "command-was-added": "$sender, command !$command was added",
+    "command-was-not-found": "$sender, command $command was not found in database",
+    "command-was-edited": "$sender, command $command is changed to '$response'",
+    "command-was-added": "$sender, command $command was added",
     "list-is-not-empty": "$sender, list of commands: $list",
     "list-is-empty": "$sender, list of commands is empty",
-    "command-was-enabled": "$sender, command !$command was enabled",
-    "command-was-disabled": "$sender, command !$command was disabled",
-    "command-was-concealed": "$sender, command !$command was concealed",
-    "command-was-exposed": "$sender, command !$command was exposed",
-    "command-was-removed": "$sender, command !$command was removed"
+    "command-was-enabled": "$sender, command $command was enabled",
+    "command-was-disabled": "$sender, command $command was disabled",
+    "command-was-concealed": "$sender, command $command was concealed",
+    "command-was-exposed": "$sender, command $command was exposed",
+    "command-was-removed": "$sender, command $command was removed"
   },
   "keywords": {
     "keyword-parse-failed": "{core.command-parse} !keyword",

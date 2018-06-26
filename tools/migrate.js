@@ -66,6 +66,23 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  customcommands: [{
+    version: '7.6.0',
+    do: async () => {
+      console.info('Moving custom commands from customcommands to systems.customcommands')
+      let items = await global.db.engine.find('commands')
+      let processed = 0
+      for (let item of items) {
+        delete item._id
+        item.command = `!${item.command}`
+        await global.db.engine.insert('systems.customcommands', item)
+        processed++
+      }
+      await global.db.engine.remove('commands', {})
+      console.info(` => ${processed} processed`)
+      console.info(` !! commands collection can be deleted`)
+    }
+  }],
   cooldown: [{
     version: '7.6.0',
     do: async () => {

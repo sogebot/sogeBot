@@ -7,6 +7,7 @@ const XRegExp = require('xregexp')
 
 // bot libraries
 var constants = require('../constants')
+const System = require('./_interface')
 
 /*
  * !command                                                 - gets an info about command usage
@@ -18,30 +19,26 @@ var constants = require('../constants')
  * !command list                                            - get commands list
  */
 
-class CustomCommands {
+class CustomCommands extends System {
   constructor () {
-    if (global.commons.isSystemEnabled(this) && require('cluster').isMaster) {
-      global.panel.addMenu({category: 'manage', name: 'custom-commands', id: 'customCommands'})
-      global.panel.registerSockets({
-        self: this,
-        expose: ['add', 'remove', 'visible', 'toggle', 'togglePermission', 'editCommand', 'editResponse', 'send'],
-        finally: this.send
-      })
+    const collection = {
+      settings: 'systems.customcommands.settings',
+      data: 'systems.customcommands'
     }
-  }
-
-  commands () {
-    return !global.commons.isSystemEnabled('customcommands')
-      ? []
-      : [
-        { this: this, id: '!command add', command: '!command add', fnc: this.add, permission: constants.OWNER_ONLY },
-        { this: this, id: '!command edit', command: '!command edit', fnc: this.edit, permission: constants.OWNER_ONLY },
-        { this: this, id: '!command list', command: '!command list', fnc: this.list, permission: constants.OWNER_ONLY },
-        { this: this, id: '!command remove', command: '!command remove', fnc: this.remove, permission: constants.OWNER_ONLY },
-        { this: this, id: '!command toggle-visibility', command: '!command toggle-visibility', fnc: this.visibility, permission: constants.OWNER_ONLY },
-        { this: this, id: '!command toggle', command: '!command toggle', fnc: this.toggle, permission: constants.OWNER_ONLY },
-        { this: this, id: '!command', command: '!command', fnc: this.help, permission: constants.OWNER_ONLY, isHelper: true }
+    const settings = {
+      commands: [
+        { name: '!command add', permission: constants.OWNER_ONLY },
+        { name: '!command edit', permission: constants.OWNER_ONLY },
+        { name: '!command list', permission: constants.OWNER_ONLY },
+        { name: '!command remove', permission: constants.OWNER_ONLY },
+        { name: '!command toggle-visibility', permission: constants.OWNER_ONLY },
+        { name: '!command toggle', permission: constants.OWNER_ONLY },
+        { name: '!command', permission: constants.OWNER_ONLY, isHelper: true }
       ]
+    }
+    super({collection, settings})
+
+    this.addMenu({category: 'manage', name: 'custom-commands', id: 'customcommands/list'})
   }
 
   parsers () {
@@ -52,24 +49,51 @@ class CustomCommands {
       ]
   }
 
-  async send (self, socket) {
-    socket.emit('commands', await global.db.engine.find('commands'))
+  sockets () {
+    this.socket.on('connection', (socket) => {
+      socket.on('update', async (items, cb) => {
+        for (let item of items) {
+          const _id = item._id; delete item._id
+          let itemFromDb = item
+          if (_.isNil(_id)) itemFromDb = await global.db.engine.insert(this.collection.data, item)
+          else await global.db.engine.update(this.collection.data, { _id }, item)
+
+          if (_.isFunction(cb)) cb(null, itemFromDb)
+        }
+      })
+      socket.on('delete', async (_id, cb) => {
+        await global.db.engine.remove(this.collection.data, { _id })
+        cb(null)
+      })
+      socket.on('find', async (where, cb) => {
+        where = where || {}
+        cb(null, await global.db.engine.find(this.collection.data, where))
+      })
+      socket.on('findOne', async (where, cb) => {
+        where = where || {}
+        cb(null, await global.db.engine.findOne(this.collection.data, where))
+      })
+      socket.on('settings', async (cb) => {
+        cb(null, await this.getAllSettings())
+      })
+      socket.on('settings.update', async (data, cb) => {
+        const enabled = await this.settings.enabled
+        for (let [key, value] of Object.entries(data)) {
+          if (key === 'enabled' && value !== enabled) this.status(value)
+          else if (key === 'commands') {
+            for (let [defaultValue, currentValue] of Object.entries(value)) {
+              this.settings.commands[defaultValue] = currentValue
+            }
+          } else {
+            this.settings[key] = value
+          }
+        }
+        setTimeout(() => cb(null), 1000)
+      })
+    })
   }
 
-  async editCommand (self, socket, data) {
-    if (data.value.length === 0) await self.remove({ sender: null, command: { after: '!' + data.id } })
-    else {
-      if (data.value.startsWith('!')) data.value = data.value.replace('!', '')
-      await global.db.engine.update('commands', { command: data.id }, { command: data.value })
-    }
-  }
-
-  async editResponse (self, socket, data) {
-    if (data.value.length === 0) await self.remove({ sender: null, command: { after: '!' + data.id } })
-    else await global.db.engine.update('commands', { command: data.id }, { response: data.value })
-  }
-
-  help (opts) {
+  main (opts) {
     global.commons.sendMessage(global.translate('core.usage') + ': !command add owner|mod|regular|viewer <!command> <response> | !command edit owner|mod|regular|viewer <!command> <response> | !command remove <!command> | !command list', opts.sender)
   }
 
@@ -82,7 +106,7 @@ class CustomCommands {
       return false
     }
 
-    let item = await global.db.engine.findOne('commands', { command: match.command })
+    let item = await global.db.engine.findOne(this.collection.data, { command: match.command })
     if (_.isEmpty(item)) {
       let message = await global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
       debug(message); global.commons.sendMessage(message, opts.sender)
@@ -102,7 +126,7 @@ class CustomCommands {
         break
     }
 
-    await global.db.engine.update('commands', { command: match.command }, { response: match.response, permision: permission })
+    await global.db.engine.update(this.collection.data, { command: match.command }, { response: match.response, permision: permission })
     let message = await global.commons.prepare('customcmds.command-was-edited', { command: match.command, response: match.response })
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
@@ -131,7 +155,7 @@ class CustomCommands {
     }
     let command = { command: match.command, response: match.response, enabled: true, visible: true, permission: permission }
 
-    await global.db.engine.update('commands', { command: command.command }, command)
+    await global.db.engine.update(this.collection.data, { command: command.command }, command)
     let message = await global.commons.prepare('customcmds.command-was-added', { command: match.command })
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
@@ -143,7 +167,7 @@ class CustomCommands {
     let cmdArray = opts.message.toLowerCase().split(' ')
     for (let i in opts.message.toLowerCase().split(' ')) { // search for correct command
       debug(`${i} - Searching for ${cmdArray.join(' ')} in commands`)
-      command = await global.db.engine.findOne('commands', { command: cmdArray.join(' ').replace('!', ''), enabled: true })
+      command = await global.db.engine.findOne(this.collection.data, { command: cmdArray.join(' '), enabled: true })
       debug(command)
       if (!_.isEmpty(command)) break
       cmdArray.pop() // remove last array item if not found
@@ -171,16 +195,16 @@ class CustomCommands {
   }
 
   async list (opts) {
-    let commands = await global.db.engine.find('commands', { visible: true })
-    var output = (commands.length === 0 ? global.translate('customcmds.list-is-empty') : global.translate('customcmds.list-is-not-empty').replace(/\$list/g, '!' + _.map(_.orderBy(commands, 'command'), 'command').join(', !')))
+    let commands = await global.db.engine.find(this.collection.data, { visible: true })
+    var output = (commands.length === 0 ? global.translate('customcmds.list-is-empty') : global.translate('customcmds.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(commands, 'command'), 'command').join(', ')))
     debug(output); global.commons.sendMessage(output, opts.sender)
   }
 
   async togglePermission (opts) {
     debug('togglePermission(%j,%j,%j)', opts)
-    const command = await global.db.engine.findOne('commands', { command: opts.parameters.replace('!', '') })
+    const command = await global.db.engine.findOne(this.collection.data, { command: opts.parameters })
     if (!_.isEmpty(command)) {
-      await global.db.engine.update('commands', { _id: command._id.toString() }, { permission: command.permission === 3 ? 0 : ++command.permission })
+      await global.db.engine.update(this.collection.data, { _id: command._id.toString() }, { permission: command.permission === 3 ? 0 : ++command.permission })
     }
   }
 
@@ -193,20 +217,20 @@ class CustomCommands {
       return false
     }
 
-    const command = await global.db.engine.findOne('commands', { command: match.command })
+    const command = await global.db.engine.findOne(this.collection.data, { command: match.command })
     if (_.isEmpty(command)) {
       let message = await global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
       debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
-    await global.db.engine.update('commands', { command: match.command }, { enabled: !command.enabled })
+    await global.db.engine.update(this.collection.data, { command: match.command }, { enabled: !command.enabled })
 
     let message = await global.commons.prepare(!command.enabled ? 'customcmds.command-was-enabled' : 'customcmds.command-was-disabled', { command: command.command })
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async visible (opts) {
+  async toggleVisibility (opts) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP)
     if (_.isNil(match)) {
       let message = await global.commons.prepare('customcmds.commands-parse-failed')
@@ -214,14 +238,14 @@ class CustomCommands {
       return false
     }
 
-    const command = await global.db.engine.findOne('commands', { command: match.command })
+    const command = await global.db.engine.findOne(this.collection.data, { command: match.command })
     if (_.isEmpty(command)) {
       let message = await global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
       debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
-    await global.db.engine.update('commands', { command: match.command }, { visible: !command.visible })
+    await global.db.engine.update(this.collection.data, { command: match.command }, { visible: !command.visible })
     let message = await global.commons.prepare(!command.visible ? 'customcmds.command-was-exposed' : 'customcmds.command-was-concealed', { command: command.command })
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
@@ -234,7 +258,7 @@ class CustomCommands {
       return false
     }
 
-    let removed = await global.db.engine.remove('commands', { command: match.command })
+    let removed = await global.db.engine.remove(this.collection.data, { command: match.command })
     if (!removed) {
       let message = await global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
       debug(message); global.commons.sendMessage(message, opts.sender)
