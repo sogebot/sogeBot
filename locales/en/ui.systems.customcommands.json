@@ -1,0 +1,18 @@
+{
+  "command": {
+    "name": "custom command",
+    "placeholder": ""
+  },
+  "response": {
+    "name": "response",
+    "placeholder": ""
+  },
+  "forViewers": "for viewers",
+  "forRegulars": "for regular viewers",
+  "forOwners": "for owners",
+  "forMods": "for mods",
+  "error": {
+    "isEmpty": "This value cannot be empty"
+  },
+  "warning": "This action cannot be reverted!"
+}

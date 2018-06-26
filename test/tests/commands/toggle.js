@@ -22,39 +22,39 @@ describe('Custom Commands - toggle()', () => {
 
   it('!unknown', async () => {
     global.systems.customCommands.toggle({ sender: owner, parameters: '!unknown' })
-    await message.isSent('customcmds.command-was-not-found', owner, { command: 'unknown', sender: owner.username })
+    await message.isSent('customcmds.command-was-not-found', owner, { command: '!unknown', sender: owner.username })
   })
 
   it('!a', async () => {
     global.systems.customCommands.add({ sender: owner, parameters: 'viewer !a !uptime' })
-    await message.isSent('customcmds.command-was-added', owner, { command: 'a', sender: owner.username })
+    await message.isSent('customcmds.command-was-added', owner, { command: '!a', sender: owner.username })
 
     global.systems.customCommands.toggle({ sender: owner, parameters: '!a' })
-    await message.isSent('customcmds.command-was-disabled', owner, { command: 'a', sender: owner.username })
+    await message.isSent('customcmds.command-was-disabled', owner, { command: '!a', sender: owner.username })
 
     global.systems.customCommands.toggle({ sender: owner, parameters: '!a' })
-    await message.isSent('customcmds.command-was-enabled', owner, { command: 'a', sender: owner.username })
+    await message.isSent('customcmds.command-was-enabled', owner, { command: '!a', sender: owner.username })
   })
 
   it('!한글', async () => {
     global.systems.customCommands.add({ sender: owner, parameters: 'viewer !한글 !uptime' })
-    await message.isSent('customcmds.command-was-added', owner, { command: '한글', sender: owner.username })
+    await message.isSent('customcmds.command-was-added', owner, { command: '!한글', sender: owner.username })
 
     global.systems.customCommands.toggle({ sender: owner, parameters: '!한글' })
-    await message.isSent('customcmds.command-was-disabled', owner, { command: '한글', sender: owner.username })
+    await message.isSent('customcmds.command-was-disabled', owner, { command: '!한글', sender: owner.username })
 
     global.systems.customCommands.toggle({ sender: owner, parameters: '!한글' })
-    await message.isSent('customcmds.command-was-enabled', owner, { command: '한글', sender: owner.username })
+    await message.isSent('customcmds.command-was-enabled', owner, { command: '!한글', sender: owner.username })
   })
 
   it('!русский', async () => {
     global.systems.customCommands.add({ sender: owner, parameters: 'viewer !русский !uptime' })
-    await message.isSent('customcmds.command-was-added', owner, { command: 'русский', sender: owner.username })
+    await message.isSent('customcmds.command-was-added', owner, { command: '!русский', sender: owner.username })
 
     global.systems.customCommands.toggle({ sender: owner, parameters: '!русский' })
-    await message.isSent('customcmds.command-was-disabled', owner, { command: 'русский', sender: owner.username })
+    await message.isSent('customcmds.command-was-disabled', owner, { command: '!русский', sender: owner.username })
 
     global.systems.customCommands.toggle({ sender: owner, parameters: '!русский' })
-    await message.isSent('customcmds.command-was-enabled', owner, { command: 'русский', sender: owner.username })
+    await message.isSent('customcmds.command-was-enabled', owner, { command: '!русский', sender: owner.username })
   })
 })

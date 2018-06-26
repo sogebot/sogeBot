@@ -22,7 +22,7 @@ describe('Custom Commands - remove()', () => {
 
   it('!alias', async () => {
     global.systems.customCommands.remove({ sender: owner, parameters: '!alias' })
-    await message.isSent('customcmds.command-was-not-found', owner, { command: 'alias', sender: owner.username })
+    await message.isSent('customcmds.command-was-not-found', owner, { command: '!alias', sender: owner.username })
   })
 
   it('alias', async () => {
@@ -32,36 +32,36 @@ describe('Custom Commands - remove()', () => {
 
   it('!a', async () => {
     global.systems.customCommands.add({ sender: owner, parameters: 'viewer !a !me' })
-    await message.isSent('customcmds.command-was-added', owner, { command: 'a', response: '!me', sender: owner.username })
+    await message.isSent('customcmds.command-was-added', owner, { command: '!a', response: '!me', sender: owner.username })
 
     global.systems.customCommands.remove({ sender: owner, parameters: '!a' })
-    await message.isSent('customcmds.command-was-removed', owner, { command: 'a', sender: owner.username })
+    await message.isSent('customcmds.command-was-removed', owner, { command: '!a', sender: owner.username })
   })
 
   it('!한글', async () => {
     global.systems.customCommands.add({ sender: owner, parameters: 'viewer !한글 !me' })
-    await message.isSent('customcmds.command-was-added', owner, { command: '한글', response: '!me', sender: owner.username })
+    await message.isSent('customcmds.command-was-added', owner, { command: '!한글', response: '!me', sender: owner.username })
 
     global.systems.customCommands.remove({ sender: owner, parameters: '!한글' })
-    await message.isSent('customcmds.command-was-removed', owner, { command: '한글', sender: owner.username })
+    await message.isSent('customcmds.command-was-removed', owner, { command: '!한글', sender: owner.username })
   })
 
   it('!русский', async () => {
     global.systems.customCommands.add({ sender: owner, parameters: 'viewer !русский !me' })
-    await message.isSent('customcmds.command-was-added', owner, { command: 'русский', response: '!me', sender: owner.username })
+    await message.isSent('customcmds.command-was-added', owner, { command: '!русский', response: '!me', sender: owner.username })
 
     global.systems.customCommands.remove({ sender: owner, parameters: '!русский' })
-    await message.isSent('customcmds.command-was-removed', owner, { command: 'русский', sender: owner.username })
+    await message.isSent('customcmds.command-was-removed', owner, { command: '!русский', sender: owner.username })
   })
 
   it('2x - !a !me', async () => {
     global.systems.customCommands.add({ sender: owner, parameters: 'viewer !a !me' })
-    await message.isSent('customcmds.command-was-added', owner, { command: 'a', response: '!me', sender: owner.username })
+    await message.isSent('customcmds.command-was-added', owner, { command: '!a', response: '!me', sender: owner.username })
 
     global.systems.customCommands.remove({ sender: owner, parameters: '!a' })
-    await message.isSent('customcmds.command-was-removed', owner, { command: 'a', sender: owner.username })
+    await message.isSent('customcmds.command-was-removed', owner, { command: '!a', sender: owner.username })
 
     global.systems.customCommands.remove({ sender: owner, parameters: '!a' })
-    await message.isSent('customcmds.command-was-not-found', owner, { command: 'a', sender: owner.username })
+    await message.isSent('customcmds.command-was-not-found', owner, { command: '!a', sender: owner.username })
   })
 })

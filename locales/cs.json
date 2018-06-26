@@ -1003,16 +1003,16 @@
   },
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} !commands",
-    "command-was-not-found": "$sender, prikaz !$command nebyl nalezen",
-    "command-was-edited": "$sender, prikaz !$command is changed to '$response'",
-    "command-was-added": "$sender, prikaz !$command byl pridan",
+    "command-was-not-found": "$sender, prikaz $command nebyl nalezen",
+    "command-was-edited": "$sender, prikaz $command is changed to '$response'",
+    "command-was-added": "$sender, prikaz $command byl pridan",
     "list-is-not-empty": "$sender, seznam prikazu: $list",
     "list-is-empty": "$sender, seznam prikazu je prazdny",
-    "command-was-enabled": "$sender, prikaz !$command byl zapnut",
-    "command-was-disabled": "$sender, prikaz !$command byl vypnut",
-    "command-was-concealed": "$sender, prikaz !$command byl skryt",
-    "command-was-exposed": "$sender, prikaz !$command byl odkryt",
-    "command-was-removed": "$sender, prikaz !$command byl smazan"
+    "command-was-enabled": "$sender, prikaz $command byl zapnut",
+    "command-was-disabled": "$sender, prikaz $command byl vypnut",
+    "command-was-concealed": "$sender, prikaz $command byl skryt",
+    "command-was-exposed": "$sender, prikaz $command byl odkryt",
+    "command-was-removed": "$sender, prikaz $command byl smazan"
   },
   "keywords": {
     "keywords-parse-failed": "{core.command-parse} !commands",
