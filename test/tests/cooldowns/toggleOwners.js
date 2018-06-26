@@ -19,7 +19,7 @@ describe('Cooldowns - toggleOwners()', () => {
 
   it('incorrect toggle', async () => {
     let [command, type, seconds, quiet] = ['!me', 'user', '60', true]
-    global.systems.cooldown.set({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
+    global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
     global.systems.cooldown.toggleOwners({ sender: owner, parameters: command })
@@ -28,7 +28,7 @@ describe('Cooldowns - toggleOwners()', () => {
 
   it('correct toggle', async () => {
     let [command, type, seconds, quiet] = ['!me', 'user', '60', true]
-    global.systems.cooldown.set({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
+    global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
     global.systems.cooldown.toggleOwners({ sender: owner, parameters: `${command} ${type}` })

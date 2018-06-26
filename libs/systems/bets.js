@@ -45,11 +45,11 @@ class Bets extends System {
       'systems.points'
     ]
     const settings = {
-      command: [
-        '!bet open',
-        '!bet close',
-        '!bet refund',
-        '!bet'
+      commands: [
+        {name: '!bet open', permission: constants.MODS},
+        {name: '!bet close', permission: constants.MODS},
+        {name: '!bet refund', permission: constants.MODS},
+        {name: '!bet', isHelper: true}
       ]
     }
 
@@ -102,18 +102,6 @@ class Bets extends System {
       }
     }
     new Timeout().recursive({ uid: `betsCheckIfBetExpired`, this: this, fnc: this.checkIfBetExpired, wait: 10000 })
-  }
-
-  async commands () {
-    const isEnabled = await this.isEnabled()
-    return !isEnabled
-      ? []
-      : [
-        {this: this, id: '!bet open', command: await this.settings.command['!bet open'], fnc: this.open, permission: constants.MODS},
-        {this: this, id: '!bet close', command: await this.settings.command['!bet close'], fnc: this.close, permission: constants.MODS},
-        {this: this, id: '!bet refund', command: await this.settings.command['!bet refund'], fnc: this.refundAll, permission: constants.MODS},
-        {this: this, id: '!bet', command: await this.settings.command['!bet'], fnc: this.save, permission: constants.VIEWERS, isHelper: true}
-      ]
   }
 
   async open (opts) {
@@ -225,7 +213,7 @@ class Bets extends System {
     }
   }
 
-  async refundAll (opts) {
+  async refund (opts) {
     try {
       if (_.isEmpty(await global.db.engine.findOne(this.collection.data, { key: 'bets' }))) throw Error(ERROR_NOT_RUNNING)
       for (let user of await global.db.engine.find(this.collection.users)) {
@@ -293,7 +281,7 @@ class Bets extends System {
     }
   }
 
-  save (opts) {
+  main (opts) {
     if (opts.parameters.length === 0) this.info(opts)
     else this.participate(opts)
   }

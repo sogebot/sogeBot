@@ -20,23 +20,15 @@ class Commercial extends System {
       settings: 'systems.commercial.settings'
     }
     const settings = {
-      command: [
-        '!commercial'
+      commands: [
+        {name: '!commercial', permission: constants.OWNER_ONLY, isHelper: true}
       ]
     }
 
     super({ collection, settings })
   }
 
-  async commands () {
-    return !(await this.isEnabled())
-      ? []
-      : [
-        { this: this, id: '!commercial', command: await this.settings.command['!commercial'], fnc: this.run, permission: constants.OWNER_ONLY, isHelper: true }
-      ]
-  }
-
-  async run (opts) {
+  async main (opts) {
     let parsed = opts.parameters.match(/^([\d]+)? ?(.*)?$/)
 
     if (_.isNil(parsed)) {

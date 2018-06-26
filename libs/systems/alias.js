@@ -27,33 +27,19 @@ class Alias extends System {
       settings: 'systems.alias.settings'
     }
     const settings = {
-      command: [
-        '!alias add',
-        '!alias edit',
-        '!alias list',
-        '!alias remove',
-        '!alias toggle-visibility',
-        '!alias toggle',
-        '!alias'
+      commands: [
+        {name: '!alias add', permission: constants.OWNER_ONLY},
+        {name: '!alias edit', permission: constants.OWNER_ONLY},
+        {name: '!alias list', permission: constants.OWNER_ONLY},
+        {name: '!alias remove', permission: constants.OWNER_ONLY},
+        {name: '!alias toggle-visibility', permission: constants.OWNER_ONLY},
+        {name: '!alias toggle', permission: constants.OWNER_ONLY},
+        {name: '!alias', permission: constants.OWNER_ONLY}
       ]
     }
     super({ collection, settings })
 
     this.addMenu({category: 'manage', name: 'aliases', id: 'alias/list'})
-  }
-
-  async commands () {
-    if (await this.settings.enabled) {
-      return [
-        { this: this, id: '!alias add', command: await this.settings.command['!alias add'], fnc: this.add, permission: constants.OWNER_ONLY },
-        { this: this, id: '!alias edit', command: await this.settings.command['!alias edit'], fnc: this.edit, permission: constants.OWNER_ONLY },
-        { this: this, id: '!alias list', command: await this.settings.command['!alias list'], fnc: this.list, permission: constants.OWNER_ONLY },
-        { this: this, id: '!alias remove', command: await this.settings.command['!alias remove'], fnc: this.remove, permission: constants.OWNER_ONLY },
-        { this: this, id: '!alias toggle-visibility', command: await this.settings.command['!alias toggle-visibility'], fnc: this.visibility, permission: constants.OWNER_ONLY },
-        { this: this, id: '!alias toggle', command: await this.settings.command['!alias toggle'], fnc: this.toggle, permission: constants.OWNER_ONLY },
-        { this: this, id: '!alias', command: await this.settings.command['!alias'], fnc: this.help, permission: constants.OWNER_ONLY, isHelper: true }
-      ]
-    } else return []
   }
 
   async parsers () {
@@ -171,7 +157,7 @@ class Alias extends System {
     return true
   }
 
-  help (opts) {
+  main (opts) {
     global.commons.sendMessage(global.translate('core.usage') + ': !alias add owner|mod|regular|viewer <!alias> <!command> | !alias edit owner|mod|regular|viewer <!alias> <!command> | !alias remove <!alias> | !alias list | !alias toggle <!alias> | !alias toggle-visibility <!alias>', opts.sender)
   }
 
@@ -271,7 +257,7 @@ class Alias extends System {
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async visible (opts) {
+  async toggleVisibility (opts) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP_WITH_SPACES)
 
     if (_.isNil(match)) {
