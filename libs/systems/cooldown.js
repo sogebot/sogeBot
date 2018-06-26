@@ -26,27 +26,16 @@ class Cooldown extends System {
     }
     const settings = {
       cooldownNotifyAsWhisper: false,
-      command: [
-        '!cooldown toggle moderators',
-        '!cooldown toggle owners',
-        '!cooldown toggle enabled',
-        '!cooldown'
+      commands: [
+        {name: '!cooldown toggle moderators', permission: constants.OWNER_ONLY},
+        {name: '!cooldown toggle owners', permission: constants.OWNER_ONLY},
+        {name: '!cooldown toggle enabled', permission: constants.OWNER_ONLY},
+        {name: '!cooldown', permission: constants.OWNER_ONLY}
       ]
     }
     super({ collection, settings })
 
     this.addMenu({category: 'manage', name: 'cooldowns', id: 'cooldown/list'})
-  }
-
-  async commands () {
-    return !(await this.isEnabled())
-      ? []
-      : [
-        {this: this, id: '!cooldown toggle moderators', command: await this.settings.command['!cooldown toggle moderators'], fnc: this.toggleModerators, permission: constants.OWNER_ONLY},
-        {this: this, id: '!cooldown toggle owners', command: await this.settings.command['!cooldown toggle owners'], fnc: this.toggleOwners, permission: constants.OWNER_ONLY},
-        {this: this, id: '!cooldown toggle enabled', command: await this.settings.command['!cooldown toggle enabled'], fnc: this.toggleEnabled, permission: constants.OWNER_ONLY},
-        {this: this, id: '!cooldown', command: await this.settings.command['!cooldown'], fnc: this.set, permission: constants.OWNER_ONLY}
-      ]
   }
 
   async parsers () {
@@ -99,7 +88,7 @@ class Cooldown extends System {
     })
   }
 
-  async set (opts) {
+  async main (opts) {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET)
 
     if (_.isNil(match)) {

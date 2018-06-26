@@ -21,7 +21,7 @@ describe('Cooldowns - check()', () => {
 
   it('command - user', async () => {
     let [command, type, seconds, quiet] = ['!test', 'user', '60', true]
-    global.systems.cooldown.set({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
+    global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
     let item = await global.db.engine.findOne('systems.cooldown', { key: '!test' })
@@ -39,7 +39,7 @@ describe('Cooldowns - check()', () => {
 
   it('command - global', async () => {
     let [command, type, seconds, quiet] = ['!test', 'global', '60', true]
-    global.systems.cooldown.set({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
+    global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
     let item = await global.db.engine.findOne('systems.cooldown', { key: '!test' })
@@ -60,7 +60,7 @@ describe('Cooldowns - check()', () => {
     await message.isSent('keywords.keyword-was-added', owner, { keyword: 'me', sender: owner.username })
 
     let [command, type, seconds, quiet] = ['me', 'user', '60', true]
-    global.systems.cooldown.set({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
+    global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
     let item = await global.db.engine.findOne('systems.cooldown', { key: 'me' })
@@ -81,7 +81,7 @@ describe('Cooldowns - check()', () => {
     await message.isSent('keywords.keyword-was-added', owner, { keyword: 'me', sender: owner.username })
 
     let [command, type, seconds, quiet] = ['me', 'global', '60', true]
-    global.systems.cooldown.set({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
+    global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
     let item = await global.db.engine.findOne('systems.cooldown', { key: 'me' })
