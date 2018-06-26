@@ -2,13 +2,17 @@ const _ = require('lodash')
 const chalk = require('chalk')
 const cluster = require('cluster')
 const Timeout = require('../timeout')
+const constants = require('../constants')
 
 class System {
   constructor (opts) {
     this.collection = opts.collection || {}
     this.dependsOn = opts.dependsOn || []
     this.socket = null
+
     this._settings = {}
+    this._commands = []
+    this._name = 'systems'
 
     // populate this._settings
     this._prepare(opts.settings)
@@ -27,14 +31,17 @@ class System {
   _prepare (settingsArg) {
     if (_.isNil(this.collection.settings)) throw Error('This system doesn\'t have collection.settings defined')
 
-    // add enabled
-    settingsArg.enabled = true
+    // add enabled if not set
+    if (_.isNil(settingsArg.enabled)) settingsArg.enabled = true
 
     for (let [category, values] of Object.entries(settingsArg)) {
       if (_.isNil(this._settings[category])) this._settings[category] = {} // init if not existing
       if (_.isArray(values)) {
         for (let key of values) {
-          if (_.isObjectLike(key)) throw Error('You can have only one nested item deep')
+          if (category === 'commands') {
+            this._commands.push(key)
+            key = _.isObjectLike(key) ? key.name : key
+          } else if (_.isObjectLike(key)) throw Error('You can have only one nested item deep')
           this._settings[category][key] = () => {
             return new Promise(async (resolve, reject) => {
               const currentValue = await global.db.engine.findOne(this.collection.settings, { category, key })
@@ -88,7 +95,7 @@ class System {
     else this.settings.enabled = state
 
     if (isMasterAndStatusOnly || isStatusChanged) {
-      global.log.info(`${state ? chalk.green('ENABLED') : chalk.red('DISABLED')}: ${this.constructor.name} System`)
+      global.log.info(`${state ? chalk.green('ENABLED') : chalk.red('DISABLED')}: ${this.constructor.name} (${this._name})`)
     }
     return state
   }
@@ -113,8 +120,65 @@ class System {
     return promisedSettings
   }
 
+  async commands () {
+    if (await this.isEnabled()) {
+      let commands = []
+      for (let command of this._commands) {
+        if (typeof command === 'string') {
+          let fnc = 'main'
+          if (command.split(' ').length > 1) {
+            fnc = ''
+            let _fnc = command.split(' ')[1].split('-')
+            for (let part of _fnc) {
+              if (fnc.length === 0) fnc = part
+              else {
+                fnc = fnc + part.charAt(0).toUpperCase() + part.slice(1)
+              }
+            }
+          }
+          commands.push({
+            this: this,
+            id: command,
+            command: await this.settings.commands[command],
+            fnc: this[fnc],
+            permission: constants.VIEWERS,
+            isHelper: false
+          })
+        } else if (typeof command === 'object') {
+          if (_.isNil(command.name)) throw Error('Command name must be defined')
+
+          // if fnc is not set
+          if (_.isNil(command.fnc)) {
+            command.fnc = 'main'
+            if (command.name.split(' ').length > 1) {
+              command.fnc = ''
+              let _fnc = command.name.split(' ')[1].split('-')
+              for (let part of _fnc) {
+                if (command.fnc.length === 0) command.fnc = part
+                else {
+                  command.fnc = command.fnc + part.charAt(0).toUpperCase() + part.slice(1)
+                }
+              }
+            }
+          }
+          command.permission = _.isNil(command.permission) ? constants.VIEWERS : command.permission
+          command.command = _.isNil(command.command) ? await this.settings.commands[command.name] : command.command
+          commands.push({
+            this: this,
+            id: command.name,
+            command: command.command,
+            fnc: this[command.fnc],
+            permission: command.permission,
+            isHelper: command.isHelper ? command.isHelper : false
+          })
+        }
+      }
+      return commands
+    } else return []
+  }
+
   async isEnabled () {
-    return this.settings.enabled
+    return this.status()
   }
 }
 

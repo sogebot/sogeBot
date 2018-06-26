@@ -9,19 +9,19 @@ const message = require('../../general.js').message
 // users
 const owner = { username: 'soge__' }
 
-describe('Alias - visible()', () => {
+describe('Alias - toggleVisibility()', () => {
   beforeEach(async () => {
     await db.cleanup()
     await message.prepare()
   })
 
   it('', async () => {
-    global.systems.alias.visible({ sender: owner, parameters: '' })
+    global.systems.alias.toggleVisibility({ sender: owner, parameters: '' })
     await message.isSent('alias.alias-parse-failed', owner, { sender: owner.username })
   })
 
   it('!unknown', async () => {
-    global.systems.alias.visible({ sender: owner, parameters: '!unknown' })
+    global.systems.alias.toggleVisibility({ sender: owner, parameters: '!unknown' })
     await message.isSent('alias.alias-was-not-found', owner, { alias: '!unknown', sender: owner.username })
   })
 
@@ -29,10 +29,10 @@ describe('Alias - visible()', () => {
     global.systems.alias.add({ sender: owner, parameters: 'viewer !a !uptime' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!a', command: '!uptime', sender: owner.username })
 
-    global.systems.alias.visible({ sender: owner, parameters: '!a' })
+    global.systems.alias.toggleVisibility({ sender: owner, parameters: '!a' })
     await message.isSent('alias.alias-was-concealed', owner, { alias: '!a', sender: owner.username })
 
-    global.systems.alias.visible({ sender: owner, parameters: '!a' })
+    global.systems.alias.toggleVisibility({ sender: owner, parameters: '!a' })
     await message.isSent('alias.alias-was-exposed', owner, { alias: '!a', sender: owner.username })
   })
 
@@ -40,10 +40,10 @@ describe('Alias - visible()', () => {
     global.systems.alias.add({ sender: owner, parameters: 'viewer !a with spaces !uptime' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!a with spaces', command: '!uptime', sender: owner.username })
 
-    global.systems.alias.visible({ sender: owner, parameters: '!a with spaces' })
+    global.systems.alias.toggleVisibility({ sender: owner, parameters: '!a with spaces' })
     await message.isSent('alias.alias-was-concealed', owner, { alias: '!a with spaces', sender: owner.username })
 
-    global.systems.alias.visible({ sender: owner, parameters: '!a with spaces' })
+    global.systems.alias.toggleVisibility({ sender: owner, parameters: '!a with spaces' })
     await message.isSent('alias.alias-was-exposed', owner, { alias: '!a with spaces', sender: owner.username })
   })
 
@@ -51,10 +51,10 @@ describe('Alias - visible()', () => {
     global.systems.alias.add({ sender: owner, parameters: 'viewer !한국어 !uptime' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!한국어', command: '!uptime', sender: owner.username })
 
-    global.systems.alias.visible({ sender: owner, parameters: '!한국어' })
+    global.systems.alias.toggleVisibility({ sender: owner, parameters: '!한국어' })
     await message.isSent('alias.alias-was-concealed', owner, { alias: '!한국어', sender: owner.username })
 
-    global.systems.alias.visible({ sender: owner, parameters: '!한국어' })
+    global.systems.alias.toggleVisibility({ sender: owner, parameters: '!한국어' })
     await message.isSent('alias.alias-was-exposed', owner, { alias: '!한국어', sender: owner.username })
   })
 
@@ -62,10 +62,10 @@ describe('Alias - visible()', () => {
     global.systems.alias.add({ sender: owner, parameters: 'viewer !русский !uptime' })
     await message.isSent('alias.alias-was-added', owner, { alias: '!русский', command: '!uptime', sender: owner.username })
 
-    global.systems.alias.visible({ sender: owner, parameters: '!русский' })
+    global.systems.alias.toggleVisibility({ sender: owner, parameters: '!русский' })
     await message.isSent('alias.alias-was-concealed', owner, { alias: '!русский', sender: owner.username })
 
-    global.systems.alias.visible({ sender: owner, parameters: '!русский' })
+    global.systems.alias.toggleVisibility({ sender: owner, parameters: '!русский' })
     await message.isSent('alias.alias-was-exposed', owner, { alias: '!русский', sender: owner.username })
   })
 })
