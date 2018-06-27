@@ -242,7 +242,10 @@ class API {
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      if (e.message === '422 Unprocessable Entity') {
+      const isChannelPartnerOrAffiliate =
+        !(e.message !== '422 Unprocessable Entity' ||
+         (e.response.data.status === 400 && e.response.data.message === `${config.settings.broadcaster_username} does not have a subscription program`))
+      if (!isChannelPartnerOrAffiliate) {
         timeout = 0
         global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
         global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
