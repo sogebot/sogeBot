@@ -6,10 +6,10 @@ module.exports = {
       if (_.isNil(global.db) || !global.db.engine.connected) {
         return setTimeout(() => waitForIt(resolve, reject), 10)
       }
-      await global.db.engine.remove('system.alias', {})
-      await global.db.engine.remove('commands', {})
-      await global.db.engine.remove('system.cooldown', {})
-      await global.db.engine.remove('system.cooldown.viewers', {})
+      await global.db.engine.remove('systems.alias', {})
+      await global.db.engine.remove('systems.customcommands', {})
+      await global.db.engine.remove('systems.cooldown', {})
+      await global.db.engine.remove('systems.cooldown.viewers', {})
       await global.db.engine.remove('keywords', {})
       await global.db.engine.remove('settings', {})
       await global.db.engine.remove('timers', {})
