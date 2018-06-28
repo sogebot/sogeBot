@@ -20,11 +20,6 @@ function Alerts () {
   if (cluster.isMaster) {
     global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
     global.panel.socketListening(this, 'replay-video', this.replay)
-
-    cluster.on('message', (worker, d) => {
-      if (d.type !== 'alert') return
-      this[d.fnc](this, d.sender, d.text)
-    })
   }
 }
 
@@ -51,10 +46,10 @@ Alerts.prototype.replay = async function (self, socket, data) {
 }
 
 Alerts.prototype.overlay = async function (opts) {
-  opts.parameters = await new Message(opts.parameters).parse()
   if (cluster.isWorker) {
-    return process.send({ type: 'alert', fnc: 'overlay', sender: opts.sender, text: opts.parameters })
+    return process.send({ type: 'call', ns: 'overlays.alerts', fnc: 'overlay', args: [opts] })
   }
+  opts.parameters = await new Message(opts.parameters).parse()
 
   let send = []
   let objectString = opts.parameters.trim().split(' | ')
