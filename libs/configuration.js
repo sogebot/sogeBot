@@ -128,35 +128,31 @@ class Configuration {
     }
   }
 
-  async enable (opts) {
+  async setStatus (opts) {
     if (opts.parameters.trim().length === 0) return
     try {
       let [type, name] = opts.parameters.split(' ')
 
       if (type === 'system') type = 'systems'
+      else if (type === 'game') type = 'games'
       else throw new Error('Not supported')
 
       if (_.isNil(global[type][name])) throw new Error(`Not found - ${type} - ${name}`)
 
-      global[type][name].status(true)
+      global[type][name].status(opts.enable)
     } catch (e) {
       global.log.error(e.message)
     }
   }
 
+  async enable (opts) {
+    opts.enable = true
+    this.setStatus(opts)
+  }
+
   async disable (opts) {
-    if (opts.parameters.trim().length === 0) return
-    try {
-      let [type, name] = opts.parameters.split(' ')
-
-      if (type === 'system') type = 'systems'
-      else throw new Error('Not supported')
-
-      if (_.isNil(global[type][name])) throw new Error(`Not found - ${type} - ${name}`)
-      global[type][name].status(false)
-    } catch (e) {
-      global.log.error(e.message)
-    }
+    opts.enable = false
+    this.setStatus(opts)
   }
 }
 
