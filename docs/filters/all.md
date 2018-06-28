@@ -174,9 +174,7 @@
 
 `(list.!commands)` - will return list of your visible custom !commands
 
-`(list.cooldown)` - will return list of your cooldowns
-
-`(list.!cooldown)` - will return list of your !cooldowns
+`(list.cooldown)` - will return list of your cooldowns (keywords and !commands)
 
 `(list.ranks)` - list of your ranks
 

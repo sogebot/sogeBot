@@ -237,30 +237,24 @@ class Message {
         let system = filter.replace('(list.', '').replace(')', '')
 
         let [alias, commands, cooldowns, ranks] = await Promise.all([
-          global.db.engine.find('alias', { visible: true, enabled: true }),
-          global.db.engine.find('commands', { visible: true, enabled: true }),
-          global.db.engine.find('cooldowns', { enabled: true }),
-          global.db.engine.find('ranks')])
+          global.db.engine.find('systems.alias', { visible: true, enabled: true }),
+          global.db.engine.find('systems.customcommands', { visible: true, enabled: true }),
+          global.db.engine.find('systems.cooldown', { enabled: true }),
+          global.db.engine.find('systems.ranks')])
 
         switch (system) {
           case 'alias':
-            return _.size(alias) === 0 ? ' ' : (_.map(alias, 'alias')).join(', ')
+            return _.size(alias) === 0 ? ' ' : (_.map(alias, (o) => o.alias.replace('!', ''))).join(', ')
           case '!alias':
-            return _.size(alias) === 0 ? ' ' : '!' + (_.map(alias, 'alias')).join(', !')
+            return _.size(alias) === 0 ? ' ' : (_.map(alias, 'alias')).join(', ')
           case 'command':
-            return _.size(commands) === 0 ? ' ' : (_.map(commands, 'command')).join(', ')
+            return _.size(commands) === 0 ? ' ' : (_.map(commands, (o) => o.command.replace('!', ''))).join(', ')
           case '!command':
-            return _.size(commands) === 0 ? ' ' : '!' + (_.map(commands, 'command')).join(', !')
+            return _.size(commands) === 0 ? ' ' : (_.map(commands, 'command')).join(', ')
           case 'cooldown':
             list = _.map(cooldowns, function (o, k) {
               const time = o.miliseconds
               return o.key + ': ' + (parseInt(time, 10) / 1000) + 's'
-            }).join(', ')
-            return list.length > 0 ? list : ' '
-          case '!cooldown':
-            list = _.map(cooldowns, function (o, k) {
-              const time = o.miliseconds
-              return '!' + o.key + ': ' + (parseInt(time, 10) / 1000) + 's'
             }).join(', ')
             return list.length > 0 ? list : ' '
           case 'ranks':
