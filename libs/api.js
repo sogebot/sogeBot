@@ -413,7 +413,7 @@ class API {
     this.refreshAPICalls = request.headers['ratelimit-reset']
 
     DEBUG_API_UPDATE_CHANNEL_VIEWS(request.data.data)
-    await global.db.engine.update('api.current', { key: 'views' }, { value: request.data.data[0].view_count })
+    if (request.data.data.length > 0) await global.db.engine.update('api.current', { key: 'views' }, { value: request.data.data[0].view_count })
   }
 
   async getLatest100Followers (quiet) {
