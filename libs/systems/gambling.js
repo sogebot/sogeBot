@@ -15,7 +15,6 @@ const ERROR_MINIMAL_BET = '3'
 
 /*
  * !gamble [amount] - gamble [amount] points with `chanceToWin` chance
- * !seppuku         - timeout yourself
  * !roulette        - 50/50 chance to timeout yourself
  * !duel [points]   - start or participate in duel
  */
@@ -25,7 +24,6 @@ class Gambling {
     this.collection = 'gambling'
     this.timeouts = {}
 
-    global.configuration.register('seppukuTimeout', 'gambling.seppuku.timeout', 'number', 10)
     global.configuration.register('rouletteTimeout', 'gambling.roulette.timeout', 'number', 10)
     global.configuration.register('fightmeTimeout', 'gambling.fightme.timeout', 'number', 10)
 
@@ -49,7 +47,6 @@ class Gambling {
 
     if (isGamblingEnabled) {
       commands.push(
-        {this: this, id: '!seppuku', command: '!seppuku', fnc: this.seppuku, permission: constants.VIEWERS},
         {this: this, id: '!roulette', command: '!roulette', fnc: this.roulette, permission: constants.VIEWERS},
         {this: this, id: '!fightme', command: '!fightme', fnc: this.fightme, permission: constants.VIEWERS}
       )
@@ -273,22 +270,6 @@ class Gambling {
       if (!isAlive) global.commons.timeout(opts.sender.username, null, await global.configuration.getValue('rouletteTimeout'))
       global.commons.sendMessage(isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead'), opts.sender)
     }, 2000)
-  }
-
-  async seppuku (opts) {
-    if (global.commons.isBroadcaster(opts.sender)) {
-      global.commons.sendMessage(global.translate('gambling.seppuku.broadcaster'), opts.sender)
-      return
-    }
-
-    const isMod = await global.commons.isMod(opts.sender)
-    if (isMod) {
-      global.commons.sendMessage(global.translate('gambling.seppuku.mod'), opts.sender)
-      return
-    }
-
-    global.commons.sendMessage(global.translate('gambling.seppuku.text'), opts.sender)
-    global.commons.timeout(opts.sender.username, null, await global.configuration.getValue('seppukuTimeout'))
   }
 
   async fightme (opts) {
