@@ -119,59 +119,12 @@
 <script>
   Vue.prototype.commons = commons
 
-  if (typeof toggle === 'undefined') {
-    var toggle = {
-      props: ['value', 'title'],
-      methods: {
-        update: function () {
-          this.$emit('update', !this.value)
-        }
-      },
-      template: `
-        <div class="input-group">
-          <div v-if="title" class="input-group-prepend">
-            <span class="input-group-text">{{ title }}</span>
-          </div>
-          <button
-            class="btn form-control"
-            v-bind:class="{'btn-success': this.value, 'btn-danger': !this.value}"
-            v-on:click="update()">
-            <template v-if="this.value">{{ commons.translate('enabled') }}</template>
-            <template v-else>{{ commons.translate('disabled') }}</template>
-          </button>
-        </div>`
-    }
-  }
-
-  if (typeof commandInput === 'undefined') {
-    var commandInput = {
-      props: ['value', 'command'],
-      methods: {
-        update: function () {
-          this.$emit('update', this.currentValue)
-        }
-      },
-      data: function () {
-        return {
-          currentValue: this.value
-        }
-      },
-      template: `
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">{{ command }}</span>
-          </div>
-          <input v-on:keyup="update" v-model="currentValue" class="form-control" type="text" />
-        </div>`
-    }
-  }
-
   function cooldownInit () {
     if (_.size(translations) === 0) return setTimeout(() => cooldownInit(), 1)
     var systemCooldownApp = new Vue({
       el: '#systemCooldownApp',
       components: {
-        'toggle': toggle,
+        'toggle': toggleEnable,
         'command-input': commandInput
       },
       data: {

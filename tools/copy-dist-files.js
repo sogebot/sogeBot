@@ -5,7 +5,8 @@ var _ = require('lodash')
 
 var dist = {
   'js': {
-    'commons': 'commons.js'
+    'commons': 'commons.js',
+    'components': 'components.js'
   }
 }
 
