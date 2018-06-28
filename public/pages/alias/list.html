@@ -117,54 +117,12 @@
 <script>
   Vue.prototype.commons = commons
 
-  if (typeof toggle === 'undefined') {
-    var toggle = {
-      props: ['value'],
-      methods: {
-        update: function () {
-          this.$emit('update', !this.value)
-        }
-      },
-      template: `
-        <button
-          class="btn btn-block"
-          v-bind:class="{'btn-success': this.value, 'btn-danger': !this.value}"
-          v-on:click="update()">
-          <template v-if="this.value">{{ commons.translate('enabled') }}</template>
-          <template v-else>{{ commons.translate('disabled') }}</template>
-        </button>`
-    }
-  }
-
-  if (typeof commandInput === 'undefined') {
-    var commandInput = {
-      props: ['value', 'command'],
-      methods: {
-        update: function () {
-          this.$emit('update', this.currentValue)
-        }
-      },
-      data: function () {
-        return {
-          currentValue: this.value
-        }
-      },
-      template: `
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">{{ command }}</span>
-          </div>
-          <input v-on:keyup="update" v-model="currentValue" class="form-control" type="text" />
-        </div>`
-    }
-  }
-
   function aliasInit () {
     if (_.size(translations) === 0) return setTimeout(() => aliasInit(), 1)
     var systemAliasApp = new Vue({
       el: '#systemAliasApp',
       components: {
-        'toggle': toggle,
+        'toggle': toggleEnable,
         'command-input': commandInput
       },
       data: {
