@@ -21,6 +21,11 @@
         border: 0;
       }
 
+      div#html iframe {
+        width: 100%;
+        height: 100%;
+      }
+
       html, body {
         width: 100%;
         height: 100%;
@@ -88,7 +93,7 @@
     </style>
   </head>
   <body>
-    <iframe id="html"></iframe>
+    <div id="html"></div>
     <div id="alerts"></div>
     <div id="images"></div>
     <div id="video-pos">
@@ -519,14 +524,19 @@
         html.time = _.isNil(html.time) ? 1000 : parseInt(html.time, 10) // how long to show
 
         setTimeout(() => {
-          $('iframe#html').attr('src', html.url)
-          $('iframe#html').off('load')
-          $('iframe#html').on('load', function () {
-            $('iframe#html').velocity("fadeIn", { duration: html.duration })
+          $('div#html').append(`
+            <iframe src="${html.url}"></iframe>
+          `)
+          $('div#html iframe').off('load')
+          $('div#html iframe').on('load', function () {
+            $('div#html').velocity("fadeIn", { duration: html.duration })
 
             setTimeout(() => {
-              $('iframe#html').velocity("fadeOut", { duration: html.duration });
-              setTimeout(() => alertsQueue[id].finished++, html.duration)
+              $('div#html').velocity("fadeOut", { duration: html.duration });
+              setTimeout(() => {
+                $('div#html iframe').remove()
+                alertsQueue[id].finished++
+              }, html.duration)
             }, html.duration + html.time)
           })
         }, html.delay)
