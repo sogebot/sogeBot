@@ -14,7 +14,7 @@ class Message {
     this.message = message
   }
 
-  async global () {
+  async global (opts) {
     let variables = [
       'game', 'viewers', 'views', 'followers',
       'hosts', 'subscribers', 'bits'
@@ -48,6 +48,24 @@ class Message {
     this.message = this.message.replace(/\$latestCheerAmount/g, !_.isNil(latestCheer) ? parseInt(latestCheer.amount, 10) : 'n/a')
     this.message = this.message.replace(/\$latestCheerMessage/g, !_.isNil(latestCheer) ? latestCheer.message : 'n/a')
     this.message = this.message.replace(/\$latestCheer/g, !_.isNil(latestCheer) ? latestCheer.username : 'n/a')
+
+    if (!_.isNil(global.integrations) && !_.isEmpty(await global.integrations.spotify.currentSong) && (await global.integrations.spotify.currentSong).is_playing && (await global.integrations.spotify.currentSong).is_enabled) {
+      // load spotify format
+      const [format, song] = await Promise.all([global.integrations.spotify.format, global.integrations.spotify.currentSong])
+      if (opts.escape) {
+        song.song = song.song.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
+        song.artist = song.artist.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
+      }
+      this.message = this.message.replace(/\$currentSong/g, format.replace(/\$song/g, song.song).replace(/\$artist/g, song.artist))
+    } else if (global.commons.isSystemEnabled('songs')) {
+      let currentSong = _.get(await global.systems.songs.currentSong, 'title', global.translate('songs.not-playing'))
+      if (opts.escape) {
+        currentSong = currentSong.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
+      }
+      this.message = this.message.replace(/\$currentSong/g, currentSong)
+    } else this.message = this.message.replace(/\$currentSong/g, global.translate('songs.not-playing'))
+
+    return this.message
   }
 
   async parse (attr) {
@@ -449,15 +467,7 @@ class Message {
       }
     }
 
-    // $currentSong - Spotify -> YTPlayer
-    if (!_.isNil(global.integrations) && !_.isEmpty(await global.integrations.spotify.currentSong) && (await global.integrations.spotify.currentSong).is_playing && (await global.integrations.spotify.currentSong).is_enabled) {
-      // load spotify format
-      const [format, song] = await Promise.all([global.integrations.spotify.format, global.integrations.spotify.currentSong])
-      this.message = this.message.replace(/\$currentSong/g, format.replace(/\$song/g, song.song).replace(/\$artist/g, song.artist))
-    } else if (global.commons.isSystemEnabled('songs')) this.message = this.message.replace(/\$currentSong/g, _.get(await global.systems.songs.currentSong, 'title', global.translate('songs.not-playing')))
-    else this.message = this.message.replace(/\$currentSong/g, global.translate('songs.not-playing'))
-
-    await this.global()
+    await this.global({})
 
     await this.parseMessageEach(price); d('parseMessageEach: %s', this.message)
     await this.parseMessageEach(info); d('parseMessageEach: %s', this.message)
