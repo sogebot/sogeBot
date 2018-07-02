@@ -7,8 +7,10 @@ const safeEval = require('safe-eval')
 const axios = require('axios')
 const cluster = require('cluster')
 const mathjs = require('mathjs')
+const XRegExp = require('xregexp')
 
 const Timeout = require('./timeout')
+const Message = require('./message')
 
 const DEBUG = {
   SOCKETS: debug('events:sockets'),
@@ -158,6 +160,14 @@ class CustomVariables {
       follower: _.sample(_.map(_.filter(users, (o) => _.get(o, 'is.follower', false)), 'username')),
       subscriber: _.sample(_.map(_.filter(users, (o) => _.get(o, 'is.subscriber', false)), 'username'))
     }
+
+    // get custom variables replace theirs values
+    let match = script.match(new RegExp('\\$!?_([a-zA-Z0-9_]+)', 'g'))
+    for (let variable of match.sort((a, b) => b.length - a.length)) {
+      script = script.replace(new RegExp(XRegExp.escape(variable), 'g'), await this.getValueOf(variable.replace('$!_', ''), opts))
+    }
+    // update globals and replace theirs values
+    script = (await new Message(script).global({ escape: "'" }))
 
     let toEval = `(function evaluation () {  ${script} })()`
     let context = {
