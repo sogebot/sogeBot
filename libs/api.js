@@ -269,6 +269,8 @@ class API {
       if (timeout !== 0) new Timeout().recursive({ this: this, uid: 'getChannelSubscribersOldAPI', wait: timeout, fnc: this.getChannelSubscribersOldAPI })
     }
 
+    this.retries.getChannelSubscribersOldAPI = 0 // reset retry
+
     DEBUG_API_GET_CHANNEL_SUBSCRIBERS_OLD_API(`Current subscribers count: ${request.data._total}`)
     await global.db.engine.update('api.current', { key: 'subscribers' }, { value: request.data._total - 1 })
 
