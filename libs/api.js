@@ -37,7 +37,8 @@ class API {
 
       this.retries = {
         getCurrentStreamData: 0,
-        getChannelDataOldAPI: 0
+        getChannelDataOldAPI: 0,
+        getChannelSubscribersOldAPI: 0
       }
 
       this._loadCachedStatusAndGame()
@@ -246,10 +247,14 @@ class API {
         !(e.message !== '422 Unprocessable Entity' ||
          (e.response.data.status === 400 && e.response.data.message === `${config.settings.broadcaster_username} does not have a subscription program`))
       if (!isChannelPartnerOrAffiliate) {
-        timeout = 0
-        global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
-        global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
-        // caster is not affiliate or partner, don't do calls again
+        if (this.retries.getChannelSubscribersOldAPI >= 15) {
+          timeout = 0
+          global.log.warning('Broadcaster is not affiliate/partner, will not check subs')
+          global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
+          // caster is not affiliate or partner, don't do calls again
+        } else {
+          timeout = 10000
+        }
       } else if (e.message === '403 Forbidden') {
         timeout = 0
         global.log.warning('Broadcaster have not correct oauth, will not check subs')
