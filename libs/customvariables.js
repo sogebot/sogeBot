@@ -163,8 +163,10 @@ class CustomVariables {
 
     // get custom variables replace theirs values
     let match = script.match(new RegExp('\\$!?_([a-zA-Z0-9_]+)', 'g'))
-    for (let variable of match.sort((a, b) => b.length - a.length)) {
-      script = script.replace(new RegExp(XRegExp.escape(variable), 'g'), await this.getValueOf(variable.replace('$!_', ''), opts))
+    if (match) {
+      for (let variable of match.sort((a, b) => b.length - a.length)) {
+        script = script.replace(new RegExp(XRegExp.escape(variable), 'g'), await this.getValueOf(variable.replace('$!_', ''), opts))
+      }
     }
     // update globals and replace theirs values
     script = (await new Message(script).global({ escape: "'" }))
