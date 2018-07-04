@@ -24,7 +24,7 @@ describe('Gambling - duel', () => {
     })
 
     it('user 1 is challenging', async () => {
-      global.systems.gambling.duel({ sender: user1, parameters: 'all' })
+      global.games.duel.main({ sender: user1, parameters: 'all' })
       await message.isSent('gambling.duel.new', user1, {
         minutesName: global.commons.getLocalizedName(5, 'core.minutes'),
         minutes: await global.configuration.getValue('duelDuration')
@@ -36,20 +36,20 @@ describe('Gambling - duel', () => {
     })
 
     it('user 2 is added to duel', async () => {
-      await global.systems.gambling.duel({ sender: user2, parameters: 'all' })
+      await global.games.duel.main({ sender: user2, parameters: 'all' })
       await message.isSent('gambling.duel.joined', user2, {
         pointsName: await global.systems.points.getPointsName(100),
         points: 100
       })
     })
 
-    it('set duel timestamp to force duel to end', async () => {
+    it('set duel timestamp to force duel to end', () => {
       // cannot set as 0 - duel is then ignored
-      await global.db.engine.update(`gambling.duel`, { key: '_timestamp' }, { value: 1 })
+      global.games.duel.settings.timestamp = 1
     })
 
     it('call pickDuelWinner()', () => {
-      global.systems.gambling.pickDuelWinner()
+      global.games.duel.pickDuelWinner()
     })
 
     it('winner should be announced', async () => {
@@ -73,16 +73,16 @@ describe('Gambling - duel', () => {
 
   describe('Pick winner from huge tickets', () => {
     it('create duel', async () => {
-      global.systems.gambling.duelTimestamp = new Date().getTime()
+      global.games.duel.settings.timestamp = new Date()
 
       for (let user of ['testuser', 'testuser2', 'testuser3', 'testuser4', 'testuser5']) {
         let tickets = Math.floor(Number.MAX_SAFE_INTEGER / 10)
-        await global.db.engine.update(`${this.collection}.duel`, { key: '_users' }, { user: user, tickets: tickets })
+        await global.db.engine.update(`${global.games.duel.collection.users}`, { key: '_users' }, { user: user, tickets: tickets })
       }
     })
 
     it('pick winner - bot should not crash', async () => {
-      await global.systems.gambling.pickDuelWinner(global.systems.gambling)
+      await global.games.duel.pickDuelWinner(global.systems.gambling)
     })
   })
 })

@@ -56,7 +56,7 @@ class System {
             set: (value) => global.db.engine.update(this.collection.settings, { category, key }, { value })
           })
         }
-      } else if (_.isString(values) || _.isBoolean(values)) {
+      } else if (_.isString(values) || _.isBoolean(values) || _.isNumber(values)) {
         const key = values
         this._settings[category] = () => {
           return new Promise(async (resolve, reject) => {

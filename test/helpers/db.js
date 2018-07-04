@@ -31,6 +31,9 @@ module.exports = {
       await global.db.engine.remove('games.fightme.settings', {})
       await global.db.engine.remove('games.fightme.users', {})
 
+      // game duel
+      await global.db.engine.remove('games.duel.settings', {})
+      await global.db.engine.remove('games.duel.users', {})
       resolve()
     }
     return new Promise((resolve, reject) => {
