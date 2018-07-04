@@ -108,9 +108,8 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
   else attr.sender = sender.username
   if (!_.isNil(sender.quiet)) attr.quiet = sender.quiet
   if (!_.isNil(sender.skip)) attr.skip = sender.skip
-
   if (!attr.skip) message = await new Message(message).parse(attr)
-  if (message === '') return false // if message is empty, don't send anything
+  if (message.length === 0) return false // if message is empty, don't send anything
 
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
   if (_.get(sender, 'username', config.settings.bot_username.toLowerCase()) === config.settings.bot_username.toLowerCase() && !attr.force) return false // we don't want to reply on bot commands
@@ -157,6 +156,10 @@ Commons.prototype.getOwners = function () {
   return config.settings.bot_owners.split(',')
 }
 
+Commons.prototype.getBroadcaster = function (user) {
+  return config.settings.broadcaster_username.toLowerCase().trim()
+}
+
 Commons.prototype.isBroadcaster = function (user) {
   if (_.isString(user)) user = { username: user }
   return config.settings.broadcaster_username.toLowerCase().trim() === user.username.toLowerCase().trim()
@@ -166,6 +169,7 @@ Commons.prototype.isMod = async function (user) {
   if (_.isNil(user)) return false
 
   if (_.isString(user)) user = await global.users.get(user)
+  else if (_.isNil(user.mod)) user = await global.users.get(user.username)
   else user = { is: { mod: user.mod } }
 
   return new Promise((resolve, reject) => {

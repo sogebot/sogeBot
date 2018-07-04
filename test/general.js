@@ -5,7 +5,7 @@ const config = require('../config.json')
 config.settings.bot_username = 'test__________bot'
 config.settings.bot_oauth = '96wi94nziumq4fk2w3ocj8g97wb5uj'
 config.settings.bot_owners = 'soge__'
-config.settings.broadcaster_username = 'test__________bot'
+config.settings.broadcaster_username = 'test__________broadcaster'
 fs.writeFileSync('../config.json', JSON.stringify(config))
 
 // set process and debug mode to have only one cpu
