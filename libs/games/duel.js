@@ -2,10 +2,11 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
+const debug = require('debug')('game:duel')
+const cluster = require('cluster')
 
 // bot libraries
-const constants = require('../constants')
-const debug = require('debug')('systems:gambling')
+const Game = require('./_interface')
 const Timeout = require('../timeout')
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0'
@@ -17,71 +18,34 @@ const ERROR_MINIMAL_BET = '3'
  * !duel [points]   - start or participate in duel
  */
 
-class Gambling {
+// TODO: duelUsers
+class Duel extends Game {
   constructor () {
-    this.collection = 'gambling'
-    this.timeouts = {}
+    const collection = {
+      settings: 'games.duel.settings',
+      users: 'games.duel.users'
+    }
+    const settings = {
+      timestamp: String(new Date()),
+      cooldown: String(new Date()),
+      commands: [
+        '!duel'
+      ]
+    }
+
+    super({ collection, settings })
 
     global.configuration.register('duelCooldown', 'gambling.cooldown.duel', 'number', 0)
-
     global.configuration.register('duelDuration', 'gambling.duel.duration', 'number', 5)
     global.configuration.register('duelMinimalBet', 'gambling.duel.minimalBet', 'number', 0)
 
-    if (require('cluster').isMaster) this.pickDuelWinner()
-  }
-
-  commands () {
-    const isGamblingEnabled = global.commons.isSystemEnabled('gambling')
-    const isPointsEnabled = global.commons.isSystemEnabled('points')
-    let commands = []
-
-    if (isGamblingEnabled) {
-      if (isPointsEnabled) {
-        commands.push(
-          {this: this, id: '!duel', command: '!duel', fnc: this.duel, permission: constants.VIEWERS}
-        )
-      }
-    }
-    return commands
-  }
-
-  get duelTimestamp () {
-    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne(`${this.collection}.duel`, { key: '_timestamp' }), 'value', 0)))
-  }
-  set duelTimestamp (v) {
-    if (v === 0) global.db.engine.remove(`${this.collection}.duel`, { key: '_timestamp' })
-    else global.db.engine.update(`${this.collection}.duel`, { key: '_timestamp' }, { value: v })
-  }
-
-  get duelCooldown () {
-    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne(`${this.collection}.duel`, { key: '_cooldown' }), 'value', 0)))
-  }
-  set duelCooldown (v) {
-    if (v === 0) global.db.engine.remove(`${this.collection}.duel`, { key: '_cooldown' })
-    else global.db.engine.update(`${this.collection}.duel`, { key: '_cooldown' }, { value: v })
-  }
-
-  get duelUsers () {
-    return new Promise(async (resolve, reject) => {
-      let users = await global.db.engine.find(`${this.collection}.duel`, { key: '_users' })
-      let toResolve = {}
-      for (let user of users) {
-        toResolve[user.user] = user.tickets
-      }
-      resolve(toResolve)
-    })
-  }
-  set duelUsers (v) {
-    if (_.isNil(v)) global.db.engine.remove(`${this.collection}.duel`, { key: '_users' })
-    else {
-      for (let [user, tickets] of Object.entries(v)) global.db.engine.update(`${this.collection}.duel`, { key: '_users', user: user }, { tickets: tickets })
-    }
+    if (cluster.isMaster) this.pickDuelWinner()
   }
 
   async pickDuelWinner () {
     const [users, timestamp, duelDuration] = await Promise.all([
-      this.duelUsers,
-      this.duelTimestamp,
+      global.db.engine.find(this.collection.users),
+      this.settings.timestamp,
       global.configuration.getValue('duelDuration')
     ])
 
@@ -92,14 +56,14 @@ class Gambling {
 
     debug('Duel users: %j', users)
     let total = 0
-    for (let user of Object.entries(users)) total += parseInt(user[1], 10)
+    for (let user of users) total += parseInt(user.ticket, 10)
 
     let winner = _.random(0, total, false)
     let winnerUsername
-    for (let [user, tickets] of Object.entries(users)) {
-      winner = winner - tickets
+    for (let user of users) {
+      winner = winner - user.tickets
       if (winner <= 0) { // winner tickets are <= 0 , we have winner
-        winnerUsername = user
+        winnerUsername = user.username
         break
       }
     }
@@ -122,13 +86,13 @@ class Gambling {
     await global.db.engine.insert('users.points', { username: username, points: parseInt(total, 10) })
 
     // reset duel
-    this.duelUsers = null
-    this.duelTimestamp = 0
+    await global.db.engine.remove(this.collection.users, {})
+    this.settings.timestamp = 0
 
     new Timeout().recursive({ uid: `gamblingPickDuelWinner`, this: this, fnc: this.pickDuelWinner, wait: 30000 })
   }
 
-  async duel (opts) {
+  async main (opts) {
     let message, bet
 
     opts.sender['message-type'] = 'chat' // force responses to chat
@@ -147,49 +111,41 @@ class Gambling {
       await global.db.engine.insert('users.points', { username: opts.sender.username, points: parseInt(bet, 10) * -1 })
 
       // check if user is already in duel and add points
-      let newDuelist = true
-      let users = await this.duelUsers
-      _.each(users, function (value, key) {
-        if (key.toLowerCase() === opts.sender.username.toLowerCase()) {
-          let userToUpdate = {}
-          userToUpdate[key] = parseInt(users[key], 10) + parseInt(bet, 10)
-          this.duelUsers = userToUpdate
-          newDuelist = false
-          return false
-        }
-      })
-      if (newDuelist) {
+      let userFromDB = await global.db.engine.findOne(this.collection.users, { username: opts.sender.username })
+      const isNewDuelist = !_.isEmpty(userFromDB)
+      if (!isNewDuelist) {
+        await global.db.engine.update(this.collection.users, { _id: String(userFromDB._id) }, { tickets: Number(userFromDB.tickets) + Number(bet) })
+      } else {
         // check if under gambling cooldown
         const cooldown = await global.configuration.getValue('duelCooldown')
         const isMod = await global.commons.isMod(opts.sender)
-        if (new Date().getTime() - (await this.duelCooldown) > cooldown * 1000 ||
+        if (new Date().getTime() - new Date(await this.settings.cooldown).getTime() > cooldown * 1000 ||
           (await global.configuration.getValue('gamblingCooldownBypass') && (isMod || global.commons.isBroadcaster(opts.sender)))) {
           // save new cooldown if not bypassed
-          if (!(await global.configuration.getValue('gamblingCooldownBypass') && (isMod || global.commons.isBroadcaster(opts.sender)))) this.duelCooldown = new Date().getTime()
-          let newUser = {}
-          newUser[opts.sender.username.toLowerCase()] = parseInt(bet, 10)
-          this.duelUsers = newUser
+          if (!(await global.configuration.getValue('gamblingCooldownBypass') && (isMod || global.commons.isBroadcaster(opts.sender)))) this.settings.cooldown = new Date()
+          await global.db.engine.insert(this.collection.users, { username: opts.sender.username, tickets: Number(bet) })
         } else {
           message = await global.commons.prepare('gambling.fightme.cooldown', {
-            minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - (await this.duelCooldown))) / 1000 / 60), 'core.minutes'),
-            cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - (await this.duelCooldown))) / 1000 / 60) })
+            minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings.cooldown).getTime())) / 1000 / 60), 'core.minutes'),
+            cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings.cooldown).getTime())) / 1000 / 60) })
           debug(message); global.commons.sendMessage(message, opts.sender)
           return true
         }
       }
 
       // if new duel, we want to save timestamp
-      if ((await this.duelTimestamp) === 0) {
-        this.duelTimestamp = new Date().getTime()
+      if ((await this.settings.timestamp) === 0) {
+        this.settings.timestamp = new Date()
         message = await global.commons.prepare('gambling.duel.new', {
           minutesName: global.commons.getLocalizedName(5, 'core.minutes'),
           minutes: await global.configuration.getValue('duelDuration') })
         debug(message); global.commons.sendMessage(message, opts.sender)
       }
 
-      message = await global.commons.prepare(newDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
-        pointsName: await global.systems.points.getPointsName((await this.duelUsers)[opts.sender.username.toLowerCase()]),
-        points: (await this.duelUsers)[opts.sender.username.toLowerCase()]
+      const tickets = (await global.db.engine.findOne(this.collection.settings, { username: opts.sender.username })).tickets
+      message = await global.commons.prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
+        pointsName: await global.systems.points.getPointsName(tickets),
+        points: tickets
       })
       debug(message); global.commons.sendMessage(message, opts.sender)
     } catch (e) {
@@ -226,4 +182,4 @@ class Gambling {
   }
 }
 
-module.exports = new Gambling()
+module.exports = new Duel()
