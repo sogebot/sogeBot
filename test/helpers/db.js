@@ -26,6 +26,11 @@ module.exports = {
       await global.db.engine.remove('moderation.permit', {})
       await global.db.engine.remove('moderation.warnings', {})
       await global.db.engine.remove('systems.quotes', {})
+
+      // game fightme
+      await global.db.engine.remove('games.fightme.settings', {})
+      await global.db.engine.remove('games.fightme.users', {})
+
       resolve()
     }
     return new Promise((resolve, reject) => {
