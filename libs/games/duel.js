@@ -18,7 +18,6 @@ const ERROR_MINIMAL_BET = '3'
  * !duel [points]   - start or participate in duel
  */
 
-// TODO: duelUsers
 class Duel extends Game {
   constructor () {
     const collection = {
@@ -26,7 +25,7 @@ class Duel extends Game {
       users: 'games.duel.users'
     }
     const settings = {
-      timestamp: String(new Date()),
+      timestamp: 0,
       cooldown: String(new Date()),
       commands: [
         '!duel'
@@ -48,42 +47,40 @@ class Duel extends Game {
       this.settings.timestamp,
       global.configuration.getValue('duelDuration')
     ])
+    debug({users, timestamp, duelDuration})
 
     if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * duelDuration) {
       new Timeout().recursive({ uid: `gamblingPickDuelWinner`, this: this, fnc: this.pickDuelWinner, wait: 30000 })
       return
     }
 
-    debug('Duel users: %j', users)
     let total = 0
-    for (let user of users) total += parseInt(user.ticket, 10)
+    for (let user of users) total += parseInt(user.tickets, 10)
 
     let winner = _.random(0, total, false)
-    let winnerUsername
+    let winnerUser
     for (let user of users) {
       winner = winner - user.tickets
       if (winner <= 0) { // winner tickets are <= 0 , we have winner
-        winnerUsername = user.username
+        winnerUser = user
         break
       }
     }
 
-    const username = winnerUsername
-    const tickets = users[username]
-    const probability = tickets / (total / 100)
+    const probability = winnerUser.tickets / (total / 100)
 
     let m = await global.commons.prepare(_.size(users) === 1 ? 'gambling.duel.noContestant' : 'gambling.duel.winner', {
       pointsName: await global.systems.points.getPointsName(total),
       points: total,
       probability: _.round(probability, 2),
-      ticketsName: await global.systems.points.getPointsName(tickets),
-      tickets: tickets,
-      winner: username
+      ticketsName: await global.systems.points.getPointsName(winnerUser.tickets),
+      tickets: winnerUser.tickets,
+      winner: winnerUser.username
     })
     debug(m); global.commons.sendMessage(m, { username: global.commons.getOwner() }, { force: true })
 
     // give user his points
-    await global.db.engine.insert('users.points', { username: username, points: parseInt(total, 10) })
+    await global.db.engine.insert('users.points', { username: winnerUser.username, points: parseInt(total, 10) })
 
     // reset duel
     await global.db.engine.remove(this.collection.users, {})
@@ -112,7 +109,7 @@ class Duel extends Game {
 
       // check if user is already in duel and add points
       let userFromDB = await global.db.engine.findOne(this.collection.users, { username: opts.sender.username })
-      const isNewDuelist = !_.isEmpty(userFromDB)
+      const isNewDuelist = _.isEmpty(userFromDB)
       if (!isNewDuelist) {
         await global.db.engine.update(this.collection.users, { _id: String(userFromDB._id) }, { tickets: Number(userFromDB.tickets) + Number(bet) })
       } else {
@@ -142,7 +139,7 @@ class Duel extends Game {
         debug(message); global.commons.sendMessage(message, opts.sender)
       }
 
-      const tickets = (await global.db.engine.findOne(this.collection.settings, { username: opts.sender.username })).tickets
+      const tickets = (await global.db.engine.findOne(this.collection.users, { username: opts.sender.username })).tickets
       message = await global.commons.prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
         pointsName: await global.systems.points.getPointsName(tickets),
         points: tickets
