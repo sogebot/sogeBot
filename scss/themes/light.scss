@@ -78,3 +78,8 @@ $status-connecting-border: $yellow !default;
 @import "../../node_modules/bootstrap/scss/bootstrap";
 @import "../custom.scss";
 @import "../colors.scss";
+
+
+.btn-outline-dark:hover {
+  color: white !important;
+}

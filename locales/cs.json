@@ -1322,10 +1322,7 @@
     "user-merged": "$sender, uzivatel $fromUsername byl nakopirovan uzivateli $toUsername"
   },
   "highlights": {
-    "saved": {
-      "description": "$sender, highlight byl ulozen pro $hoursh$minutesm$secondss jako `$description`",
-      "no-description": "$sender, highlight byl ulozen pro $hoursh$minutesm$secondss"
-    },
+    "saved": "$sender, highlight byl ulozen pro $hoursh$minutesm$secondss",
     "list": {
       "items": "$sender, seznam ulozenych highlightu pro posledni stream: $items",
       "empty": "$sender, zande highlighty nebyly ulozeny"
