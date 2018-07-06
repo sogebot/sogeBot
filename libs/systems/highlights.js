@@ -11,6 +11,7 @@ const axios = require('axios')
 // bot libraries
 const constants = require('../constants')
 const config = require('../../config.json')
+const System = require('./_interface')
 
 const ERROR_STREAM_NOT_ONLINE = '1'
 
@@ -19,43 +20,71 @@ const ERROR_STREAM_NOT_ONLINE = '1'
  * !highlight list           - get list of highlights in current running or latest stream
  */
 
-class Highlights {
+class Highlights extends System {
   constructor () {
-    if (global.commons.isSystemEnabled(this) && require('cluster').isMaster) {
-      global.panel.addMenu({category: 'manage', name: 'highlights', id: 'highlights'})
-      global.panel.registerSockets({
-        self: this,
-        expose: ['highlight', 'send'],
-        finally: this.send
-      })
+    const collection = {
+      data: 'systems.highlights',
+      settings: 'systems.highlights.settings'
+    }
+    const settings = {
+      commands: [
+        { name: '!highlight list', permission: constants.OWNER_ONLY },
+        { name: '!highlight', permission: constants.OWNER_ONLY }
+      ]
+    }
+    super({collection, settings})
+
+    if (cluster.isMaster) {
+      global.panel.addMenu({category: 'manage', name: 'highlights', id: 'highlights/list'})
 
       cluster.on('message', (worker, message) => {
         if (message.type !== 'highlight') return
-        this.highlight(message.opts)
+        this.main(message.opts)
       })
     }
   }
 
-  commands () {
-    return !global.commons.isSystemEnabled('highlights')
-      ? []
-      : [
-        {this: this, id: '!highlight list', command: '!highlight list', fnc: this.list, permission: constants.OWNER_ONLY},
-        {this: this, id: '!highlight', command: '!highlight', fnc: this.highlight, permission: constants.OWNER_ONLY}
-      ]
+  sockets () {
+    this.socket.on('connection', (socket) => {
+      socket.on('highlight', () => {
+        this.main({ parameters: '', sender: null })
+      })
+      socket.on('list', async (cb) => {
+        cb(null, await global.db.engine.find(this.collection.data))
+      })
+      socket.on('delete', async (_id, cb) => {
+        await global.db.engine.remove(this.collection.data, { _id })
+        cb(null)
+      })
+      socket.on('settings', async (cb) => {
+        cb(null, await this.getAllSettings())
+      })
+      socket.on('settings.update', async (data, cb) => {
+        const enabled = await this.settings.enabled
+        for (let [key, value] of Object.entries(data)) {
+          if (key === 'enabled' && value !== enabled) this.status(value)
+          else if (key === 'commands') {
+            for (let [defaultValue, currentValue] of Object.entries(value)) {
+              this.settings.commands[defaultValue] = currentValue
+            }
+          } else {
+            this.settings[key] = value
+          }
+        }
+        setTimeout(() => cb(null), 1000)
+      })
+    })
   }
 
-  async highlight (opts) {
+  async main (opts) {
     if (cluster.isWorker) {
       // as we are using API, go through master
-      process.send({ type: 'highlight', opts })
+      return process.send({ type: 'highlight', opts })
     } else {
-      opts.parameters = opts.parameters.trim().length > 0 ? opts.parameters : null
-
       const d = debug('systems:highlight:highlight')
       const cid = await global.cache.channelId()
       const when = await global.cache.when()
-      const url = `https://api.twitch.tv/kraken/channels/${cid}/videos?broadcast_type=archive&limit=1`
+      const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`
 
       const needToWait = _.isNil(cid)
       if (needToWait) {
@@ -63,43 +92,29 @@ class Highlights {
         return
       }
 
-      let highlight = {}
-
       try {
         if (_.isNil(when.online)) throw Error(ERROR_STREAM_NOT_ONLINE)
-
-        let timestamp = moment.preciseDiff(moment().valueOf(), moment(when.online).valueOf(), true)
-        timestamp = { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds }
-        highlight.stream_id = moment(when.online).format('X')
-        highlight.stream = when.online
-        highlight.timestamp = timestamp
-        highlight.description = opts.parameters
-        highlight.title = _.get(await global.db.engine.findOne('api.current', { 'key': 'status' }), 'value', 'n/a')
-        highlight.game = _.get(await global.db.engine.findOne('api.current', { 'key': 'status' }), 'value', 'n/a')
-        highlight.created_at = _.now()
-
-        d('Created at (cached): %s', _.get(await global.db.engine.findOne('cache', { 'key': 'highlights.created_at' }), 'value', 0))
-        d('When online: %s', when.online)
 
         d('Searching in API')
         // we need to load video id
         const request = await axios.get(url, {
           headers: {
-            'Accept': 'application/vnd.twitchtv.v5+json',
-            'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
+            'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
             'Client-ID': config.settings.client_id
           }
         })
-        const video = request.data.videos[0]
-        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: 200 })
-        global.db.engine.update('cache', { 'key': 'highlights.id' }, { value: video._id })
-        global.db.engine.update('cache', { 'key': 'highlights.created_at' }, { value: when.online })
-        highlight.video_id = video._id
+        let highlight = request.data.data[0]
+        d(highlight)
+        let timestamp = moment.preciseDiff(moment().valueOf(), moment(when.online).valueOf(), true)
+        highlight.timestamp = { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds }
+        highlight.game = _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')
+        highlight.title = _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a')
+
         this.add(highlight, timestamp, opts.sender)
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: request.status })
+        global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status, remaining: 'n/a' })
       } catch (e) {
         if (e.message !== ERROR_STREAM_NOT_ONLINE) {
-          global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'highlight', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
+          global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: 'n/a' })
           global.log.error(e.stack)
         }
         switch (e.message) {
@@ -111,23 +126,18 @@ class Highlights {
     }
   }
 
-  async send (self, socket) {
-    let highlights = await global.db.engine.find('highlights')
-    socket.emit('highlights', _.orderBy(highlights, 'created_at', 'desc'))
-  }
-
   add (highlight, timestamp, sender) {
-    global.commons.sendMessage(global.translate(_.isNil(highlight.description) ? 'highlights.saved.no-description' : 'highlights.saved.description')
-      .replace(/\$description/g, highlight.description)
+    global.commons.sendMessage('/marker', { username: global.commons.getOwner() }) // user /marker as well for highlights
+    global.commons.sendMessage(global.translate('highlights.saved')
       .replace(/\$hours/g, (timestamp.hours < 10) ? '0' + timestamp.hours : timestamp.hours)
       .replace(/\$minutes/g, (timestamp.minutes < 10) ? '0' + timestamp.minutes : timestamp.minutes)
       .replace(/\$seconds/g, (timestamp.seconds < 10) ? '0' + timestamp.seconds : timestamp.seconds), sender)
 
-    global.db.engine.insert('highlights', highlight)
+    global.db.engine.insert(this.collection.data, highlight)
   }
 
   async list (opts) {
-    let highlights = await global.db.engine.find('highlights')
+    let highlights = await global.db.engine.find(this.collection.data)
     const sortedHighlights = _.orderBy(highlights, 'id', 'desc')
     const latestStreamId = sortedHighlights.length > 0 ? sortedHighlights[0].id : null
 
