@@ -404,6 +404,8 @@
     var socket = io({
       query: "token=" + token
     });
+
+    var highlightsSocket = io('/system/Highlights', { query: "token=" + token })
     var loadedMenu = false
     var addingWidget = false
     var systems
@@ -1132,8 +1134,8 @@
     }
 
     var saveHighlight = function () {
-      console.debug('EMIT [highlights.highlight]')
-      socket.emit('highlights.highlight', '')
+      console.debug('EMIT [highlight]')
+      highlightsSocket.emit('highlight')
 
     }
     var switchTheme = function () {

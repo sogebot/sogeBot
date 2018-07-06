@@ -1316,10 +1316,7 @@
     "user-merged": "$sender, user $fromUsername was merged to $toUsername"
   },
   "highlights": {
-    "saved": {
-      "description": "$sender, highlight was saved for $hoursh$minutesm$secondss as `$description`",
-      "no-description": "$sender, highlight was saved for $hoursh$minutesm$secondss"
-    },
+    "saved": "$sender, highlight was saved for $hoursh$minutesm$secondss",
     "list": {
       "items": "$sender, list of saved highlights for latest stream: $items",
       "empty": "$sender, no highlights were saved"
