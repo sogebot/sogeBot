@@ -121,7 +121,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
       global.commons.message('whisper', sender.username, message)
     } else {
       global.log.chatOut(message, {username: sender.username})
-      if (await global.configuration.getValue('sendWithMe')) {
+      if ((await global.configuration.getValue('sendWithMe')) && !message.startsWith('/')) {
         global.commons.message('action', config.settings.broadcaster_username, message)
       } else {
         global.commons.message('say', config.settings.broadcaster_username, message)
