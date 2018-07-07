@@ -6,6 +6,10 @@ const term = require('terminal-kit').terminal
 const Database = require('../libs/databases/database')
 const db = new Database(false)
 
+global.log = {
+  error: (msg) => console.error(msg)
+}
+
 function doYouHaveBackup () {
   term('DO YOU HAVE A BACKUP OF YOUR DB? [y|N]\n')
   term.yesOrNo({ yes: ['y'], no: ['n', 'ENTER'] }, (error, result) => {
