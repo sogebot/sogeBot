@@ -26,6 +26,27 @@ class System {
     else if (cluster.isMaster) {
       this.socket = global.panel.io.of('/system/' + this.constructor.name)
       if (!_.isNil(this.sockets)) this.sockets()
+
+      // default socket listeners
+      this.socket.on('connection', (socket) => {
+        socket.on('settings', async (cb) => {
+          cb(null, await this.getAllSettings())
+        })
+        socket.on('settings.update', async (data, cb) => {
+          const enabled = await this.settings.enabled
+          for (let [key, value] of Object.entries(data)) {
+            if (key === 'enabled' && value !== enabled) this.status(value)
+            else if (key === 'commands') {
+              for (let [defaultValue, currentValue] of Object.entries(value)) {
+                this.settings.commands[defaultValue] = currentValue
+              }
+            } else {
+              this.settings[key] = value
+            }
+          }
+          setTimeout(() => cb(null), 1000)
+        })
+      })
     }
   }
 
