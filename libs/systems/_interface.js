@@ -173,6 +173,15 @@ class System {
         parser.permission = _.isNil(parser.permission) ? defaults.permission : parser.permission
         parser.priority = _.isNil(parser.priority) ? defaults.priority : parser.priority
 
+        if (parser.dependsOn) {
+          if (_.isString(parser.dependsOn)) parser.dependsOn = parser.dependsOn.split(',')
+          for (let dependency of parser.dependsOn) {
+            let dependencyPointer = _.get(global, dependency, null)
+            // skip parser if dependency is not enabled
+            if (!dependencyPointer || !_.isFunction(dependencyPointer.status) || !(await dependencyPointer.status())) continue
+          }
+        }
+
         parsers.push({
           this: this,
           name: `${this.constructor.name}.${parser.name}`,
@@ -229,6 +238,16 @@ class System {
               }
             }
           }
+
+          if (command.dependsOn) {
+            if (_.isString(command.dependsOn)) command.dependsOn = command.dependsOn.split(',')
+            for (let dependency of command.dependsOn) {
+              let dependencyPointer = _.get(global, dependency, null)
+              // skip command if dependency is not enabled
+              if (!dependencyPointer || !_.isFunction(dependencyPointer.status) || !(await dependencyPointer.status())) continue
+            }
+          }
+
           command.permission = _.isNil(command.permission) ? constants.VIEWERS : command.permission
           command.command = _.isNil(command.command) ? await this.settings.commands[command.name] : command.command
           commands.push({
