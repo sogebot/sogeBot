@@ -31,19 +31,14 @@ class Cooldown extends System {
         {name: '!cooldown toggle owners', permission: constants.OWNER_ONLY},
         {name: '!cooldown toggle enabled', permission: constants.OWNER_ONLY},
         {name: '!cooldown', permission: constants.OWNER_ONLY}
+      ],
+      parsers: [
+        {name: 'check', priority: constants.HIGH}
       ]
     }
     super({ collection, settings })
 
     this.addMenu({category: 'manage', name: 'cooldowns', id: 'cooldown/list'})
-  }
-
-  async parsers () {
-    return !(await this.isEnabled())
-      ? []
-      : [
-        {this: this, name: 'cooldown', fnc: this.check, permission: constants.VIEWERS, priority: constants.HIGH}
-      ]
   }
 
   sockets () {
