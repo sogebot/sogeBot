@@ -156,7 +156,7 @@ class Parser {
     const d = debug('parser:getCommandsList')
     let commands = []
     for (let item of this.list) {
-      d(`Checking ${util.inspect(item)}`)
+      d(`Checking ${item.constructor.name}`)
       if (_.isFunction(item.commands)) {
         let items = await item.commands()
         if (!_.isEmpty(items)) commands.push(items)
