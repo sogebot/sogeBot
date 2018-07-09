@@ -67,21 +67,6 @@ class Alias extends System {
           if (_.isFunction(cb)) cb(null, aliasFromDb)
         }
       })
-      socket.on('settings', async (cb) => {
-        cb(null, await this.getAllSettings())
-      })
-      socket.on('settings.update', async (data, cb) => {
-        const enabled = await this.settings.enabled
-        for (let [key, value] of Object.entries(data)) {
-          if (key === 'enabled' && value !== enabled) this.status(value)
-          else if (key === 'commands') {
-            for (let [defaultValue, currentValue] of Object.entries(value)) {
-              this.settings.commands[defaultValue] = currentValue
-            }
-          }
-        }
-        setTimeout(() => cb(null), 1000)
-      })
     })
   }
 
