@@ -56,23 +56,6 @@ class Highlights extends System {
         await global.db.engine.remove(this.collection.data, { _id })
         cb(null)
       })
-      socket.on('settings', async (cb) => {
-        cb(null, await this.getAllSettings())
-      })
-      socket.on('settings.update', async (data, cb) => {
-        const enabled = await this.settings.enabled
-        for (let [key, value] of Object.entries(data)) {
-          if (key === 'enabled' && value !== enabled) this.status(value)
-          else if (key === 'commands') {
-            for (let [defaultValue, currentValue] of Object.entries(value)) {
-              this.settings.commands[defaultValue] = currentValue
-            }
-          } else {
-            this.settings[key] = value
-          }
-        }
-        setTimeout(() => cb(null), 1000)
-      })
     })
   }
 
