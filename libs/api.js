@@ -608,6 +608,9 @@ class API {
         this.chatMessagesAtStart = global.linesParsed
 
         if (!global.webhooks.enabled.streams) {
+          global.log.start(
+            `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameFromId(stream.game_id)} | type: ${stream.type}`
+          )
           global.events.fire('stream-started')
           global.events.fire('command-send-x-times', { reset: true })
           global.events.fire('keyword-send-x-times', { reset: true })
@@ -664,6 +667,7 @@ class API {
 
         let when = await global.cache.when()
         if (_.isNil(when.offline)) {
+          global.log.stop()
           global.cache.when({ offline: moment().format() })
           global.events.fire('stream-stopped')
           global.events.fire('stream-is-running-x-minutes', { reset: true })
