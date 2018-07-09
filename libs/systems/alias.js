@@ -35,19 +35,14 @@ class Alias extends System {
         {name: '!alias toggle-visibility', permission: constants.OWNER_ONLY},
         {name: '!alias toggle', permission: constants.OWNER_ONLY},
         {name: '!alias', permission: constants.OWNER_ONLY}
+      ],
+      parsers: [
+        { name: 'run', fireAndForget: true }
       ]
     }
     super({ collection, settings })
 
     this.addMenu({category: 'manage', name: 'aliases', id: 'alias/list'})
-  }
-
-  async parsers () {
-    if (await this.settings.enabled) {
-      return [
-        { name: 'alias', fnc: this.run, priority: constants.LOW, permission: constants.VIEWERS, this: this, fireAndForget: true }
-      ]
-    } else return []
   }
 
   sockets () {

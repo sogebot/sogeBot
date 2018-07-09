@@ -34,19 +34,14 @@ class CustomCommands extends System {
         { name: '!command toggle-visibility', permission: constants.OWNER_ONLY },
         { name: '!command toggle', permission: constants.OWNER_ONLY },
         { name: '!command', permission: constants.OWNER_ONLY, isHelper: true }
+      ],
+      parsers: [
+        { name: 'run', priority: constants.LOW, fireAndForget: true }
       ]
     }
     super({collection, settings})
 
     this.addMenu({category: 'manage', name: 'custom-commands', id: 'customcommands/list'})
-  }
-
-  parsers () {
-    return !global.commons.isSystemEnabled('customcommands')
-      ? []
-      : [
-        { name: 'command', fnc: this.run, priority: constants.LOW, permission: constants.VIEWERS, this: this }
-      ]
   }
 
   sockets () {
