@@ -142,7 +142,6 @@ class Parser {
 
     for (let item of (await this.getCommandsList())) {
       let onlyParams = message.trim().toLowerCase().replace(item.command, '')
-
       let isStartingWith = message.trim().toLowerCase().startsWith(item.command)
       d(`Does ${message} startsWith ${item.command}: ${isStartingWith}`)
       if (isStartingWith && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
@@ -156,16 +155,15 @@ class Parser {
     const d = debug('parser:getCommandsList')
     let commands = []
     for (let item of this.list) {
-      d(`Checking ${item.constructor.name}`)
       if (_.isFunction(item.commands)) {
         let items = await item.commands()
         if (!_.isEmpty(items)) commands.push(items)
       }
     }
-    // TODO: sort _(this.registeredCmds).toPairs().sortBy((o) => -o[0].length).fromPairs().value() // order by length
-    commands = _.flatMap(commands)
 
+    commands = _(commands).flatMap().sortBy(o => -o.command.length).value()
     for (let command of commands) {
+      d(`Checking ${command.command}`)
       let key = command.id.replace('!', '')
       let permission = await global.db.engine.findOne('permissions', { key })
       if (!_.isEmpty(permission)) command.permission = permission.permission // change to custom permission
