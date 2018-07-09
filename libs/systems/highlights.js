@@ -22,17 +22,13 @@ const ERROR_STREAM_NOT_ONLINE = '1'
 
 class Highlights extends System {
   constructor () {
-    const collection = {
-      data: 'systems.highlights',
-      settings: 'systems.highlights.settings'
-    }
     const settings = {
       commands: [
         { name: '!highlight list', permission: constants.OWNER_ONLY },
         { name: '!highlight', permission: constants.OWNER_ONLY }
       ]
     }
-    super({collection, settings})
+    super({settings})
 
     if (cluster.isMaster) {
       global.panel.addMenu({category: 'manage', name: 'highlights', id: 'highlights/list'})

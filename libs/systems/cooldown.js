@@ -19,11 +19,6 @@ const debug = require('debug')('systems:cooldown')
 
 class Cooldown extends System {
   constructor () {
-    const collection = {
-      data: 'systems.cooldown',
-      settings: 'systems.cooldown.settings',
-      viewers: 'systems.cooldown.viewers'
-    }
     const settings = {
       cooldownNotifyAsWhisper: false,
       commands: [
@@ -36,7 +31,7 @@ class Cooldown extends System {
         {name: 'check', priority: constants.HIGH}
       ]
     }
-    super({ collection, settings })
+    super({ settings })
 
     this.addMenu({category: 'manage', name: 'cooldowns', id: 'cooldown/list'})
   }

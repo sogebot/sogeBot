@@ -22,10 +22,6 @@ const System = require('./_interface')
 
 class Alias extends System {
   constructor () {
-    const collection = {
-      data: 'systems.alias',
-      settings: 'systems.alias.settings'
-    }
     const settings = {
       commands: [
         {name: '!alias add', permission: constants.OWNER_ONLY},
@@ -40,7 +36,7 @@ class Alias extends System {
         { name: 'run', fireAndForget: true }
       ]
     }
-    super({ collection, settings })
+    super({ settings })
 
     this.addMenu({category: 'manage', name: 'aliases', id: 'alias/list'})
   }

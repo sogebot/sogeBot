@@ -13,10 +13,6 @@ const Game = require('./_interface')
 
 class FightMe extends Game {
   constructor () {
-    const collection = {
-      settings: 'games.fightme.settings',
-      users: 'games.fightme.users'
-    }
     const settings = {
       cooldown: String(new Date()),
       commands: [
@@ -24,7 +20,7 @@ class FightMe extends Game {
       ]
     }
 
-    super({ collection, settings })
+    super({ settings })
 
     global.configuration.register('fightmeTimeout', 'gambling.fightme.timeout', 'number', 10)
     global.configuration.register('fightmeCooldown', 'gambling.cooldown.fightme', 'number', 0)

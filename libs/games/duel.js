@@ -20,10 +20,6 @@ const ERROR_MINIMAL_BET = '3'
 
 class Duel extends Game {
   constructor () {
-    const collection = {
-      settings: 'games.duel.settings',
-      users: 'games.duel.users'
-    }
     const settings = {
       timestamp: 0,
       cooldown: String(new Date()),
@@ -32,7 +28,7 @@ class Duel extends Game {
       ]
     }
 
-    super({ collection, settings })
+    super({ settings })
 
     global.configuration.register('duelCooldown', 'gambling.cooldown.duel', 'number', 0)
     global.configuration.register('duelDuration', 'gambling.duel.duration', 'number', 5)
