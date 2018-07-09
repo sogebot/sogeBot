@@ -36,11 +36,6 @@ const DEBUG_BET_CHECK_IF_EXPIRED = debug('bets:checkIfBetExpired')
 
 class Bets extends System {
   constructor () {
-    const collection = {
-      data: 'systems.bets',
-      settings: 'systems.bets.settings',
-      users: 'systems.bets.users'
-    }
     const dependsOn = [
       'systems.points'
     ]
@@ -53,7 +48,7 @@ class Bets extends System {
       ]
     }
 
-    super({ collection, settings, dependsOn })
+    super({ settings, dependsOn })
 
     this.timeouts = {}
 

@@ -18,9 +18,6 @@ const ERROR_MINIMAL_BET = '3'
 
 class Gamble extends Game {
   constructor () {
-    const collection = {
-      settings: 'games.gamble.settings'
-    }
     const dependsOn = [
       'systems.points'
     ]
@@ -30,7 +27,7 @@ class Gamble extends Game {
       ]
     }
 
-    super({ collection, settings, dependsOn })
+    super({ settings, dependsOn })
 
     global.configuration.register('gamblingCooldownBypass', 'gambling.cooldown.bypass', 'bool', false)
     global.configuration.register('gamblingChanceToWin', 'gambling.gamble.chanceToWin', 'number', 50)

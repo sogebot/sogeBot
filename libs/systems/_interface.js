@@ -6,7 +6,6 @@ const constants = require('../constants')
 
 class System {
   constructor (opts) {
-    this.collection = opts.collection || {}
     this.dependsOn = opts.dependsOn || []
     this.socket = null
 
@@ -15,12 +14,21 @@ class System {
     this._parsers = []
     this._name = 'systems'
 
+    this.collection = new Proxy({}, {
+      get: (target, name, receiver) => {
+        if (_.isSymbol(name)) return undefined
+        let collection = ''
+        if (name === 'data') collection = `${this._name}.${this.constructor.name.toLowerCase()}`
+        else collection = `${this._name}.${this.constructor.name.toLowerCase()}.${name}`
+        return collection
+      }
+    })
+
     // populate this._settings
     this._prepare(opts.settings)
     this._sockets()
     this.status()
   }
-
   _sockets () {
     if (_.isNil(global.panel)) return new Timeout().recursive({ this: this, uid: `${this.constructor.name}.sockets`, wait: 1000, fnc: this._sockets })
     else if (cluster.isMaster) {

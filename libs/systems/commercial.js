@@ -16,16 +16,13 @@ const System = require('./_interface')
 
 class Commercial extends System {
   constructor () {
-    const collection = {
-      settings: 'systems.commercial.settings'
-    }
     const settings = {
       commands: [
         {name: '!commercial', permission: constants.OWNER_ONLY, isHelper: true}
       ]
     }
 
-    super({ collection, settings })
+    super({ settings })
   }
 
   async main (opts) {
