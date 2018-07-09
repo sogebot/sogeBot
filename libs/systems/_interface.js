@@ -89,13 +89,16 @@ class System {
     const areDependenciesEnabled = await this._dependenciesEnabled()
     const isMasterAndStatusOnly = cluster.isMaster && _.isNil(state)
     const isStatusChanged = !_.isNil(state)
+    const isDisabledByEnv = process.env.DISABLE &&
+      (process.env.DISABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase()) || process.env.DISABLE === '*')
 
-    if (!areDependenciesEnabled) state = false // force disable if dependencies are disabled
+    if (!areDependenciesEnabled || isDisabledByEnv) state = false // force disable if dependencies are disabled or disabled by env
     else if (_.isNil(state)) state = await this.settings.enabled
     else this.settings.enabled = state
 
     if (isMasterAndStatusOnly || isStatusChanged) {
-      global.log.info(`${state ? chalk.green('ENABLED') : chalk.red('DISABLED')}: ${this.constructor.name} (${this._name})`)
+      if (isDisabledByEnv) global.log.info(`${chalk.red('DISABLED BY ENV')}: ${this.constructor.name} (${this._name})`)
+      else global.log.info(`${state ? chalk.green('ENABLED') : chalk.red('DISABLED')}: ${this.constructor.name} (${this._name})`)
     }
     return state
   }
