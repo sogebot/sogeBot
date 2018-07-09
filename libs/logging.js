@@ -33,6 +33,8 @@ const levels = {
   ban: 8,
   warning: 11,
   info: 12,
+  start: 12,
+  stop: 12,
   debug: 13,
   process: 99999
 }
@@ -70,6 +72,8 @@ if (cluster.isWorker) {
         if (info.level === 'sub') level = '+sub'
         if (info.level === 'subgift') level = '+subgift'
         if (info.level === 'resub') level = '+resub'
+        if (info.level === 'start') level = '== STREAM STARTED =>'
+        if (info.level === 'stop') level = '== STREAM STOPPED'
 
         const timestamp = moment().tz(config.timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS')
         return `${timestamp} ${level} ${info.message} ${info.username ? `[${info.username}]` : ``}`
