@@ -6,15 +6,12 @@ const Game = require('./_interface')
 
 class Seppuku extends Game {
   constructor () {
-    const collection = {
-      settings: 'games.seppuku.settings'
-    }
     const settings = {
       commands: [
         '!seppuku'
       ]
     }
-    super({collection, settings})
+    super({settings})
 
     global.configuration.register('seppukuTimeout', 'gambling.seppuku.timeout', 'number', 10)
   }

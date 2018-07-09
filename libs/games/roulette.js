@@ -12,9 +12,6 @@ const Game = require('./_interface')
 
 class Roulette extends Game {
   constructor () {
-    const collection = {
-      settings: 'games.roulette.settings'
-    }
     const dependsOn = [
       'systems.points'
     ]
@@ -24,7 +21,7 @@ class Roulette extends Game {
       ]
     }
 
-    super({ collection, settings, dependsOn })
+    super({ settings, dependsOn })
 
     global.configuration.register('rouletteTimeout', 'gambling.roulette.timeout', 'number', 10)
   }

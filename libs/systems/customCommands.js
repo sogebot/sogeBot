@@ -21,10 +21,6 @@ const System = require('./_interface')
 
 class CustomCommands extends System {
   constructor () {
-    const collection = {
-      settings: 'systems.customcommands.settings',
-      data: 'systems.customcommands'
-    }
     const settings = {
       commands: [
         { name: '!command add', permission: constants.OWNER_ONLY },
@@ -39,7 +35,7 @@ class CustomCommands extends System {
         { name: 'run', priority: constants.LOW, fireAndForget: true }
       ]
     }
-    super({collection, settings})
+    super({settings})
 
     this.addMenu({category: 'manage', name: 'custom-commands', id: 'customcommands/list'})
   }
