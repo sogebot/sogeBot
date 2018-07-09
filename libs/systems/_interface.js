@@ -12,6 +12,7 @@ class System {
 
     this._settings = {}
     this._commands = []
+    this._parsers = []
     this._name = 'systems'
 
     // populate this._settings
@@ -38,10 +39,14 @@ class System {
       if (_.isNil(this._settings[category])) this._settings[category] = {} // init if not existing
       if (_.isArray(values)) {
         for (let key of values) {
-          if (category === 'commands') {
+          if (category === 'parsers') {
+            this._parsers.push(key)
+            continue // nothing else to do with parsers (not updateable)
+          } else if (category === 'commands') {
             this._commands.push(key)
             key = _.isObjectLike(key) ? key.name : key
           } else if (_.isObjectLike(key)) throw Error('You can have only one nested item deep')
+
           this._settings[category][key] = () => {
             return new Promise(async (resolve, reject) => {
               const currentValue = await global.db.engine.findOne(this.collection.settings, { category, key })
@@ -121,6 +126,37 @@ class System {
       } else throw Error(`Unexpected data type ${typeof values}`)
     }
     return promisedSettings
+  }
+
+  async parsers () {
+    if (!(await this.isEnabled())) return []
+
+    let parsers = []
+    for (let parser of this._parsers) {
+      const defaults = {
+        permission: constants.VIEWERS,
+        priority: constants.LOW
+      }
+
+      if (typeof parser === 'object') {
+        if (_.isNil(parser.name)) throw Error('Parsers name must be defined')
+
+        parser.permission = _.isNil(parser.permission) ? defaults.permission : parser.permission
+        parser.priority = _.isNil(parser.priority) ? defaults.priority : parser.priority
+
+        parsers.push({
+          this: this,
+          name: `${this.constructor.name}.${parser.name}`,
+          fnc: this[parser.name],
+          permission: parser.permission,
+          priority: parser.priority,
+          fireAndForget: parser.fireAndForget ? parser.fireAndForget : false
+        })
+      } else {
+        throw new Error('Parsers needs to be type of object')
+      }
+    }
+    return parsers
   }
 
   async commands () {
