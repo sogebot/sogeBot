@@ -66,6 +66,22 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  keywords: [{
+    version: '7.6.0',
+    do: async () => {
+      console.info('Moving custom commands from keywords to systems.keywords')
+      let items = await global.db.engine.find('keywords')
+      let processed = 0
+      for (let item of items) {
+        delete item._id
+        await global.db.engine.insert('systems.keywords', item)
+        processed++
+      }
+      await global.db.engine.remove('keywords', {})
+      console.info(` => ${processed} processed`)
+      console.info(` !! commands collection can be deleted`)
+    }
+  }],
   customcommands: [{
     version: '7.6.0',
     do: async () => {

@@ -8,6 +8,7 @@ const XRegExp = require('xregexp')
 // bot libraries
 var constants = require('../constants')
 const Message = require('../message')
+const System = require('./_interface')
 
 /*
  * !keyword                      - gets an info about keyword usage
@@ -18,37 +19,51 @@ const Message = require('../message')
  * !keyword list                 - get keywords list
  */
 
-class Keywords {
+class Keywords extends System {
   constructor () {
-    if (global.commons.isSystemEnabled(this) && require('cluster').isMaster) {
-      global.panel.addMenu({category: 'manage', name: 'keywords', id: 'keywords'})
-      global.panel.registerSockets({
-        self: this,
-        expose: ['add', 'remove', 'toggle', 'editKeyword', 'editResponse', 'send'],
-        finally: this.send
-      })
+    const settings = {
+      commands: [
+        {name: '!keyword add', permission: constants.OWNER_ONLY},
+        {name: '!keyword edit', permission: constants.OWNER_ONLY},
+        {name: '!keyword list', permission: constants.OWNER_ONLY},
+        {name: '!keyword remove', permission: constants.OWNER_ONLY},
+        {name: '!keyword toggle', permission: constants.OWNER_ONLY},
+        {name: '!keyword', permission: constants.OWNER_ONLY}
+      ],
+      parsers: [
+        { name: 'run' }
+      ]
     }
+    super({settings})
+
+    this.addMenu({category: 'manage', name: 'keywords', id: 'keywords/list'})
   }
 
-  commands () {
-    return !global.commons.isSystemEnabled('keywords')
-      ? []
-      : [
-        {this: this, id: '!keyword add', command: '!keyword add', fnc: this.add, permission: constants.OWNER_ONLY},
-        {this: this, id: '!keyword edit', command: '!keyword edit', fnc: this.edit, permission: constants.OWNER_ONLY},
-        {this: this, id: '!keyword list', command: '!keyword list', fnc: this.list, permission: constants.OWNER_ONLY},
-        {this: this, id: '!keyword remove', command: '!keyword remove', fnc: this.remove, permission: constants.OWNER_ONLY},
-        {this: this, id: '!keyword toggle', command: '!keyword toggle', fnc: this.toggle, permission: constants.OWNER_ONLY},
-        {this: this, id: '!keyword', command: '!keyword', fnc: this.help, permission: constants.OWNER_ONLY}
-      ]
-  }
+  sockets () {
+    this.socket.on('connection', (socket) => {
+      socket.on('update', async (items, cb) => {
+        for (let item of items) {
+          const _id = item._id; delete item._id
+          let itemFromDb = item
+          if (_.isNil(_id)) itemFromDb = await global.db.engine.insert(this.collection.data, item)
+          else await global.db.engine.update(this.collection.data, { _id }, item)
 
-  parsers () {
-    return !global.commons.isSystemEnabled('keywords')
-      ? []
-      : [
-        {this: this, name: 'keywords', fnc: this.run, permission: constants.VIEWERS, priority: constants.LOW}
-      ]
+          if (_.isFunction(cb)) cb(null, itemFromDb)
+        }
+      })
+      socket.on('delete', async (_id, cb) => {
+        await global.db.engine.remove(this.collection.data, { _id })
+        cb(null)
+      })
+      socket.on('find', async (where, cb) => {
+        where = where || {}
+        cb(null, await global.db.engine.find(this.collection.data, where))
+      })
+      socket.on('findOne', async (where, cb) => {
+        where = where || {}
+        cb(null, await global.db.engine.findOne(this.collection.data, where))
+      })
+    })
   }
 
   async edit (opts) {
@@ -61,33 +76,19 @@ class Keywords {
       return false
     }
 
-    let item = await global.db.engine.findOne('keywords', { keyword: match.keyword })
+    let item = await global.db.engine.findOne(this.collection.data, { keyword: match.keyword })
     if (_.isEmpty(item)) {
       let message = await global.commons.prepare('keywords.keyword-was-not-found', { keyword: match.keyword })
       debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
-    await global.db.engine.update('keywords', { keyword: match.keyword }, { response: match.response })
+    await global.db.engine.update(this.collection.data, { keyword: match.keyword }, { response: match.response })
     let message = await global.commons.prepare('keywords.keyword-was-edited', { keyword: match.keyword, response: match.response })
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async send (self, socket) {
-    socket.emit('keywords', await global.db.engine.find('keywords'))
-  }
-
-  async editKeyword (self, socket, data) {
-    if (data.value.length === 0) self.remove(self, null, data.id)
-    else await global.db.engine.update('keywords', { keyword: data.id }, { keyword: data.value })
-  }
-
-  async editResponse (self, socket, data) {
-    if (data.value.length === 0) self.remove(self, null, data.id)
-    else await global.db.engine.update('keywords', { keyword: data.id }, { response: data.value })
-  }
-
-  help (opts) {
+  main (opts) {
     global.commons.sendMessage(global.translate('core.usage') + ': !keyword add <keyword> <response> | !keyword edit <keyword> <response> | !keyword remove <keyword> | !keyword list', opts.sender)
   }
 
@@ -104,19 +105,19 @@ class Keywords {
     if (match.keyword.startsWith('!')) match.keyword = match.keyword.replace('!', '')
     let keyword = { keyword: match.keyword, response: match.response, enabled: true }
 
-    if (!_.isEmpty(await global.db.engine.findOne('keywords', { keyword: match.keyword }))) {
+    if (!_.isEmpty(await global.db.engine.findOne(this.collection.data, { keyword: match.keyword }))) {
       let message = await global.commons.prepare('keywords.keyword-already-exist', { keyword: match.keyword })
       debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
-    await global.db.engine.update('keywords', { keyword: match.keyword }, keyword)
+    await global.db.engine.update(this.collection.data, { keyword: match.keyword }, keyword)
     let message = await global.commons.prepare('keywords.keyword-was-added', { keyword: match.keyword })
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
   async run (opts) {
-    let keywords = await global.db.engine.find('keywords')
+    let keywords = await global.db.engine.find(this.collection.data)
     keywords = _.filter(keywords, function (o) {
       return opts.message.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
     })
@@ -130,7 +131,7 @@ class Keywords {
 
   async list (opts) {
     debug('list(%j,%j)', opts)
-    let keywords = await global.db.engine.find('keywords')
+    let keywords = await global.db.engine.find(this.collection.data)
     var output = (keywords.length === 0 ? global.translate('keywords.list-is-empty') : global.translate('keywords.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(keywords, 'keyword'), 'keyword').join(', ')))
     debug(output); global.commons.sendMessage(output, opts.sender)
   }
@@ -145,14 +146,14 @@ class Keywords {
     }
     let id = opts.parameters.trim()
 
-    const keyword = await global.db.engine.findOne('keywords', { keyword: id })
+    const keyword = await global.db.engine.findOne(this.collection.data, { keyword: id })
     if (_.isEmpty(keyword)) {
       let message = await global.commons.prepare('keywords.keyword-was-not-found', { keyword: id })
       debug(message); global.commons.sendMessage(message, opts.sender)
       return
     }
 
-    await global.db.engine.update('keywords', { keyword: id }, { enabled: !keyword.enabled })
+    await global.db.engine.update(this.collection.data, { keyword: id }, { enabled: !keyword.enabled })
 
     let message = await global.commons.prepare(!keyword.enabled ? 'keywords.keyword-was-enabled' : 'keywords.keyword-was-disabled', { keyword: keyword.keyword })
     debug(message); global.commons.sendMessage(message, opts.sender)
@@ -168,7 +169,7 @@ class Keywords {
     }
     let id = opts.parameters.trim()
 
-    let removed = await global.db.engine.remove('keywords', { keyword: id })
+    let removed = await global.db.engine.remove(this.collection.data, { keyword: id })
     if (!removed) {
       let message = await global.commons.prepare('keywords.keyword-was-not-found', { keyword: id })
       debug(message); global.commons.sendMessage(message, opts.sender)
