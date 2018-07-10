@@ -255,14 +255,16 @@ class Events {
     const d = debug('events:fireSendChatMessageOrWhisper')
     let username = _.isNil(attributes.username) ? global.commons.getOwner() : attributes.username
     let message = operation.messageToSend
+    const atUsername = await global.configuration.getValue('atUsername')
 
     attributes = _(attributes).toPairs().sortBy((o) => -o[0].length).fromPairs().value() // reorder attributes by key length
-    _.each(attributes, function (val, name) {
-      if (_.isObject(val) && _.size(val) === 0) return true // skip empty object
+    for (let [name, val] of Object.entries(attributes)) {
+      if (_.isObject(val) && _.size(val) === 0) continue // skip empty object
+      if (name.includes('username') || name.includes('recipient')) val = atUsername ? `@${val}` : val
       d(`Replacing $${name} with ${val}`)
       let replace = new RegExp(`\\$${name}`, 'g')
       message = message.replace(replace, val)
-    })
+    }
     d('Sending message:', message)
     global.commons.sendMessage(message, { username: username, 'message-type': (whisper ? 'whisper' : 'chat') })
   }
