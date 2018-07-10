@@ -8,6 +8,7 @@ module.exports = {
       }
       await global.db.engine.remove('systems.alias', {})
       await global.db.engine.remove('systems.customcommands', {})
+      await global.db.engine.remove('systems.keywords', {})
       await global.db.engine.remove('systems.cooldown', {})
       await global.db.engine.remove('systems.cooldown.viewers', {})
       await global.db.engine.remove('keywords', {})
