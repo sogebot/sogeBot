@@ -105,7 +105,7 @@ class Cooldown extends System {
         owner: cooldown.owner
       }]
     } else { // text
-      let [keywords, cooldowns] = await Promise.all([global.db.engine.find('keywords'), global.db.engine.find(this.collection.data)])
+      let [keywords, cooldowns] = await Promise.all([global.db.engine.find(global.systems.keywords.collection.data), global.db.engine.find(this.collection.data)])
 
       keywords = _.filter(keywords, function (o) {
         return opts.message.search(new RegExp('^(?!\\!)(?:^|\\s).*(' + _.escapeRegExp(o.keyword) + ')(?=\\s|$|\\?|\\!|\\.|\\,)', 'gi')) >= 0
