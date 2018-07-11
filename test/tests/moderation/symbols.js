@@ -21,7 +21,7 @@ describe('systems/moderation - symbols()', () => {
   describe('moderationSymbols=false', async () => {
     before(async () => {
       await db.cleanup()
-      await global.db.engine.insert('settings', { key: 'moderationSymbols', value: 'false' })
+      await (global.systems.moderation.settings.symbols.enabled = false)
     })
 
     for (let test of tests.timeout) {
@@ -39,7 +39,7 @@ describe('systems/moderation - symbols()', () => {
   describe('moderationSymbols=true', async () => {
     before(async () => {
       await db.cleanup()
-      await global.db.engine.insert('settings', { key: 'moderationSymbols', value: 'true' })
+      await (global.systems.moderation.settings.symbols.enabled = true)
     })
 
     for (let test of tests.timeout) {

@@ -4,6 +4,7 @@ if (require('cluster').isWorker) process.exit()
 require('../../general.js')
 
 const db = require('../../general.js').db
+const variable = require('../../general.js').variable
 const assert = require('chai').assert
 
 const tests = {
@@ -19,7 +20,8 @@ describe('systems/moderation - Spam()', () => {
   describe('moderationSpam=false', async () => {
     before(async () => {
       await db.cleanup()
-      await global.db.engine.insert('settings', { key: 'moderationSpam', value: 'false' })
+      await (global.systems.moderation.settings.spam.enabled = false)
+      await variable.isEqual('systems.moderation.settings.spam.enabled', false)
     })
 
     for (let test of tests.timeout) {
@@ -37,7 +39,8 @@ describe('systems/moderation - Spam()', () => {
   describe('moderationSpam=true', async () => {
     before(async () => {
       await db.cleanup()
-      await global.db.engine.insert('settings', { key: 'moderationSpam', value: 'true' })
+      await (global.systems.moderation.settings.spam.enabled = true)
+      await variable.isEqual('systems.moderation.settings.spam.enabled', true)
     })
 
     for (let test of tests.timeout) {

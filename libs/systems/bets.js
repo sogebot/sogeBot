@@ -40,6 +40,7 @@ class Bets extends System {
       'systems.points'
     ]
     const settings = {
+      betPercentGain: 20,
       commands: [
         {name: '!bet open', permission: constants.MODS},
         {name: '!bet close', permission: constants.MODS},
@@ -52,7 +53,6 @@ class Bets extends System {
 
     this.timeouts = {}
 
-    global.configuration.register('betPercentGain', 'bets.betPercentGain', 'number', 20)
     if (cluster.isMaster) {
       this.checkIfBetExpired()
     }
@@ -240,7 +240,7 @@ class Bets extends System {
       if (_.isEmpty(currentBet)) throw Error(ERROR_NOT_RUNNING)
       if (_.isNil(currentBet.options[index])) throw Error(ERROR_NOT_OPTION)
 
-      var percentGain = (currentBet.options.length * parseInt(await global.configuration.getValue('betPercentGain'), 10)) / 100
+      var percentGain = (currentBet.options.length * parseInt(await this.settings.betPercentGain, 10)) / 100
 
       const users = await global.db.engine.find(this.collection.users)
       let total = 0

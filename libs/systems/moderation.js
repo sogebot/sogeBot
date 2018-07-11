@@ -17,8 +17,61 @@ class Moderation extends System {
   constructor () {
     const settings = {
       lists: {
+        whitelist: [],
         blacklist: [],
-        whitelist: []
+        moderateSubscribers: true,
+        timeout: 120
+      },
+      links: {
+        enabled: true,
+        moderateSubscribers: true,
+        includeSpaces: false,
+        includeClips: true,
+        timeout: 120
+      },
+      symbols: {
+        enabled: true,
+        moderateSubscribers: true,
+        triggerLength: 15,
+        maxSymbolsConsecutively: 10,
+        maxSymbolsPercent: 50,
+        timeout: 120
+      },
+      longMessage: {
+        enabled: true,
+        moderateSubscribers: true,
+        triggerLength: 300,
+        timeout: 120
+      },
+      caps: {
+        enabled: true,
+        moderateSubscribers: true,
+        triggerLength: 15,
+        maxCapsPercent: 50,
+        timeout: 120
+      },
+      spam: {
+        enabled: true,
+        moderateSubscribers: true,
+        triggerLength: 15,
+        maxLength: 15,
+        timeout: 300
+      },
+      color: {
+        enabled: true,
+        moderateSubscribers: true,
+        timeout: 120
+      },
+      emotes: {
+        enabled: true,
+        moderateSubscribers: true,
+        maxCount: 15,
+        timeout: 120
+      },
+      warnings: {
+        warningCount: 3,
+        announce: true,
+        timeout: true
       },
       commands: [
         { name: '!permit', fnc: 'permitLink', permission: constants.OWNER_ONLY }
@@ -36,9 +89,7 @@ class Moderation extends System {
     }
 
     super({settings})
-
-    this.configuration()
-    this.addMenu({category: 'settings', name: 'moderation', id: 'moderation'})
+    this.addMenu({category: 'settings', name: 'systems', id: 'systems'})
   }
 
   sockets () {
@@ -56,60 +107,12 @@ class Moderation extends System {
     })
   }
 
-  configuration () {
-    global.configuration.register('moderationLinks', 'core.settings.moderation.moderationLinks', 'bool', true)
-    global.configuration.register('moderationLinksWithSpaces', 'core.settings.moderation.moderationLinksWithSpaces', 'bool', false)
-    global.configuration.register('moderationLinksSubs', 'core.settings.moderation.moderationLinksSubs', 'bool', true)
-    global.configuration.register('moderationLinksClips', 'core.settings.moderation.moderationLinksClips', 'bool', true)
-    global.configuration.register('moderationLinksTimeout', 'core.settings.moderation.moderationLinksTimeout', 'number', 120)
-
-    global.configuration.register('moderationSymbols', 'core.settings.moderation.moderationSymbols', 'bool', true)
-    global.configuration.register('moderationSymbolsSubs', 'core.settings.moderation.moderationSymbolsSubs', 'bool', true)
-    global.configuration.register('moderationSymbolsTimeout', 'core.settings.moderation.moderationSymbolsTimeout', 'number', 120)
-    global.configuration.register('moderationSymbolsTriggerLength', 'core.settings.moderation.moderationSymbolsTriggerLength', 'number', 15)
-    global.configuration.register('moderationSymbolsMaxConsecutively', 'core.settings.moderation.moderationSymbolsMaxConsecutively', 'number', 10)
-    global.configuration.register('moderationSymbolsMaxPercent', 'core.settings.moderation.moderationSymbolsMaxPercent', 'number', 50)
-
-    global.configuration.register('moderationLongMessage', 'core.settings.moderation.moderationLongMessage', 'bool', true)
-    global.configuration.register('moderationLongMessageSubs', 'core.settings.moderation.moderationLongMessageSubs', 'bool', true)
-    global.configuration.register('moderationLongMessageTimeout', 'core.settings.moderation.moderationLongMessageTimeout', 'number', 120)
-    global.configuration.register('moderationLongMessageTriggerLength', 'core.settings.moderation.moderationLongMessageTriggerLength', 'number', 300)
-
-    global.configuration.register('moderationCaps', 'core.settings.moderation.moderationCaps', 'bool', true)
-    global.configuration.register('moderationCapsSubs', 'core.settings.moderation.moderationCapsSubs', 'bool', true)
-    global.configuration.register('moderationCapsTimeout', 'core.settings.moderation.moderationCapsTimeout', 'number', 120)
-    global.configuration.register('moderationCapsTriggerLength', 'core.settings.moderation.moderationCapsTriggerLength', 'number', 15)
-    global.configuration.register('moderationCapsMaxPercent', 'core.settings.moderation.moderationCapsMaxPercent', 'number', 50)
-
-    global.configuration.register('moderationSpam', 'core.settings.moderation.moderationSpam', 'bool', true)
-    global.configuration.register('moderationSpamSubs', 'core.settings.moderation.moderationSpamSubs', 'bool', true)
-    global.configuration.register('moderationSpamTimeout', 'core.settings.moderation.moderationSpamTimeout', 'number', 300)
-    global.configuration.register('moderationSpamTriggerLength', 'core.settings.moderation.moderationSpamTriggerLength', 'number', 15)
-    global.configuration.register('moderationSpamMaxLength', 'core.settings.moderation.moderationSpamMaxLength', 'number', 15)
-
-    global.configuration.register('moderationColor', 'core.settings.moderation.moderationColor', 'bool', true)
-    global.configuration.register('moderationColorSubs', 'core.settings.moderation.moderationColorSubs', 'bool', true)
-    global.configuration.register('moderationColorTimeout', 'core.settings.moderation.moderationColorTimeout', 'number', 120)
-
-    global.configuration.register('moderationEmotes', 'core.settings.moderation.moderationEmotes', 'bool', true)
-    global.configuration.register('moderationEmotesSubs', 'core.settings.moderation.moderationEmotesSubs', 'bool', true)
-    global.configuration.register('moderationEmotesTimeout', 'core.settings.moderation.moderationEmotesTimeout', 'number', 120)
-    global.configuration.register('moderationEmotesMaxCount', 'core.settings.moderation.moderationEmotesMaxCount', 'number', 15)
-
-    global.configuration.register('moderationBlacklistTimeout', 'core.settings.moderation.moderationBlacklistTimeout', 'number', 120)
-    global.configuration.register('moderationBlacklistSubs', 'core.settings.moderation.moderationBlacklistSubs', 'bool', true)
-
-    global.configuration.register('moderationWarnings', 'core.settings.moderation.moderationWarnings', 'number', 3)
-    global.configuration.register('moderationAnnounceTimeouts', 'core.settings.moderation.moderationAnnounceTimeouts', 'bool', true)
-    global.configuration.register('moderationWarningsTimeouts', 'core.settings.moderation.moderationWarningsTimeouts', 'bool', true)
-  }
-
   async timeoutUser (sender, text, warning, msg, time, type) {
     let [warningsAllowed, warningsTimeout, announceTimeouts, warnings, silent] = await Promise.all([
-      global.configuration.getValue('moderationWarnings'),
-      global.configuration.getValue('moderationWarningsTimeouts'),
-      global.configuration.getValue('moderationAnnounceTimeouts'),
-      global.db.engine.find('moderation.warnings', { username: sender.username }),
+      this.settings.warnings.warningCount,
+      this.settings.warnings.timeout,
+      this.settings.warnings.announce,
+      global.db.engine.find(global.systems.moderation.collection.warnings, { username: sender.username }),
       this.isSilent(type)
     ])
     text = text.trim()
@@ -117,10 +120,10 @@ class Moderation extends System {
     // cleanup warnings
     let wasCleaned = false
     for (let warning of _.filter(warnings, (o) => _.now() - o.timestamp > 1000 * 60 * 60)) {
-      await global.db.engine.remove('moderation.warnings', { _id: warning._id.toString() })
+      await global.db.engine.remove(global.systems.moderation.collection.warnings, { _id: warning._id.toString() })
       wasCleaned = true
     }
-    if (wasCleaned) warnings = await global.db.engine.find('moderation.warnings', { username: sender.username })
+    if (wasCleaned) warnings = await global.db.engine.find(global.systems.moderation.collection.warnings, { username: sender.username })
 
     if (warningsAllowed === 0) {
       msg = await new Message(msg.replace(/\$count/g, -1)).parse()
@@ -134,9 +137,9 @@ class Moderation extends System {
       msg = await new Message(warning.replace(/\$count/g, parseInt(warningsAllowed, 10) - warnings.length)).parse()
       log.timeout(`${sender.username} [${type}] ${time}s timeout | ${text}`)
       global.commons.timeout(sender.username, msg, time)
-      await global.db.engine.remove('moderation.warnings', { username: sender.username })
+      await global.db.engine.remove(global.systems.moderation.collection.warnings, { username: sender.username })
     } else {
-      await global.db.engine.insert('moderation.warnings', { username: sender.username, timestamp: _.now() })
+      await global.db.engine.insert(global.systems.moderation.collection.warnings, { username: sender.username, timestamp: _.now() })
       const warningsLeft = parseInt(warningsAllowed, 10) - warnings.length
       warning = await new Message(warning.replace(/\$count/g, warningsLeft < 0 ? 0 : warningsLeft)).parse()
       if (warningsTimeout) {
@@ -164,7 +167,9 @@ class Moderation extends System {
       text = text.replace(ytRegex, '')
     }
 
-    if (!(await global.configuration.getValue('moderationLinksClips'))) {
+    const includeClips = await this.settings.links.includeClips
+
+    if (!includeClips) {
       clipsRegex = /.*(clips.twitch.tv\/)(\w+)/
       text = text.replace(clipsRegex, '')
     }
@@ -186,7 +191,7 @@ class Moderation extends System {
       let count = 1
       if (!_.isNil(parsed[2])) count = parseInt(parsed[2], 10)
 
-      for (let i = 0; i < count; i++) await global.db.engine.insert('moderation.permit', { username: parsed[1].toLowerCase() })
+      for (let i = 0; i < count; i++) await global.db.engine.insert(this.collection.permits, { username: parsed[1].toLowerCase() })
 
       let m = await global.commons.prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: global.commons.getLocalizedName(count, 'core.links'), count: count })
       debug(m); global.commons.sendMessage(m, opts.sender)
@@ -197,10 +202,10 @@ class Moderation extends System {
 
   async containsLink (opts) {
     let [isEnabled, isEnabledForSubs, isEnabledForSpaces, timeout, isMod, whitelisted] = await Promise.all([
-      global.configuration.getValue('moderationLinks'),
-      global.configuration.getValue('moderationLinksSubs'),
-      global.configuration.getValue('moderationLinksWithSpaces'),
-      global.configuration.getValue('moderationLinksTimeout'),
+      this.settings.links.enabled,
+      this.settings.links.moderateSubscribers,
+      this.settings.links.includeSpaces,
+      this.settings.links.timeout,
       global.commons.isMod(opts.sender),
       this.whitelist(opts.message)
     ])
@@ -220,9 +225,9 @@ class Moderation extends System {
     DEBUG_MODERATION_CONTAINS_LINK('text to check: "%s"', whitelisted)
     DEBUG_MODERATION_CONTAINS_LINK('link is found in a text: %s', whitelisted.search(urlRegex) >= 0)
     if (whitelisted.search(urlRegex) >= 0) {
-      let permit = await global.db.engine.findOne('moderation.permit', { username: opts.sender.username })
+      let permit = await global.db.engine.findOne(this.collection.permits, { username: opts.sender.username })
       if (!_.isEmpty(permit)) {
-        await global.db.engine.remove('moderation.permit', { _id: permit._id.toString() })
+        await global.db.engine.remove(this.collection.permits, { _id: permit._id.toString() })
         return true
       } else {
         this.timeoutUser(opts.sender, whitelisted,
@@ -238,14 +243,14 @@ class Moderation extends System {
 
   async symbols (opts) {
     let [isEnabled, isEnabledForSubs, whitelisted, isMod, timeout, triggerLength, maxSymbolsConsecutively, maxSymbolsPercent] = await Promise.all([
-      global.configuration.getValue('moderationSymbols'),
-      global.configuration.getValue('moderationSymbolsSubs'),
+      this.settings.symbols.enabled,
+      this.settings.symbols.moderateSubscribers,
       this.whitelist(opts.message),
       global.commons.isMod(opts.sender),
-      global.configuration.getValue('moderationSymbolsTimeout'),
-      global.configuration.getValue('moderationSymbolsTriggerLength'),
-      global.configuration.getValue('moderationSymbolsMaxConsecutively'),
-      global.configuration.getValue('moderationSymbolsMaxPercent')
+      this.settings.symbols.timeout,
+      this.settings.symbols.triggerLength,
+      this.settings.symbols.maxSymbolsConsecutively,
+      this.settings.symbols.maxSymbolsPercent
     ])
 
     var msgLength = whitelisted.trim().length
@@ -278,12 +283,12 @@ class Moderation extends System {
 
   async longMessage (opts) {
     let [isEnabled, isEnabledForSubs, isMod, whitelisted, timeout, triggerLength] = await Promise.all([
-      global.configuration.getValue('moderationLongMessage'),
-      global.configuration.getValue('moderationLongMessageSubs'),
+      this.settings.longMessage.enabled,
+      this.settings.longMessage.moderateSubscribers,
       global.commons.isMod(opts.sender),
       this.whitelist(opts.message),
-      global.configuration.getValue('moderationLongMessageTimeout'),
-      global.configuration.getValue('moderationLongMessageTriggerLength')
+      this.settings.longMessage.timeout,
+      this.settings.longMessage.triggerLength
     ])
 
     var msgLength = whitelisted.trim().length
@@ -300,13 +305,13 @@ class Moderation extends System {
 
   async caps (opts) {
     let [isEnabled, isEnabledForSubs, isMod, whitelisted, timeout, triggerLength, maxCapsPercent] = await Promise.all([
-      global.configuration.getValue('moderationCaps'),
-      global.configuration.getValue('moderationCapsSubs'),
+      this.settings.caps.enabled,
+      this.settings.caps.moderateSubscribers,
       global.commons.isMod(opts.sender),
       this.whitelist(opts.message),
-      global.configuration.getValue('moderationCapsTimeout'),
-      global.configuration.getValue('moderationCapsTriggerLength'),
-      global.configuration.getValue('moderationCapsMaxPercent')
+      this.settings.caps.timeout,
+      this.settings.caps.triggerLength,
+      this.settings.caps.maxCapsPercent
     ])
 
     var emotesCharList = [] // remove emotes from caps checking
@@ -360,14 +365,14 @@ class Moderation extends System {
   }
 
   async spam (opts) {
-    let [isEnabled, isEnabledForSubs, isMod, whitelisted, timeout, triggerLength, maxSpamLength] = await Promise.all([
-      global.configuration.getValue('moderationSpam'),
-      global.configuration.getValue('moderationSpamSubs'),
+    let [isEnabled, isEnabledForSubs, isMod, whitelisted, timeout, triggerLength, maxLength] = await Promise.all([
+      this.settings.spam.enabled,
+      this.settings.spam.moderateSubscribers,
       global.commons.isMod(opts.sender),
       this.whitelist(opts.message),
-      global.configuration.getValue('moderationSpamTimeout'),
-      global.configuration.getValue('moderationSpamTriggerLength'),
-      global.configuration.getValue('moderationSpamMaxLength')
+      this.settings.spam.timeout,
+      this.settings.spam.triggerLength,
+      this.settings.spam.maxLength
     ])
 
     var msgLength = whitelisted.trim().length
@@ -377,7 +382,7 @@ class Moderation extends System {
     }
     var out = whitelisted.match(/(.+)(\1+)/g)
     for (var item in out) {
-      if (out.hasOwnProperty(item) && out[item].length >= maxSpamLength) {
+      if (out.hasOwnProperty(item) && out[item].length >= maxLength) {
         this.timeoutUser(opts.sender, opts.message,
           global.translate('moderation.user-have-timeout-for-spam'),
           global.translate('moderation.user-is-warned-about-spam'),
@@ -390,10 +395,10 @@ class Moderation extends System {
 
   async color (opts) {
     let [isEnabled, isEnabledForSubs, isMod, timeout] = await Promise.all([
-      global.configuration.getValue('moderationColor'),
-      global.configuration.getValue('moderationColorSubs'),
+      this.settings.color.enabled,
+      this.settings.color.moderateSubscribers,
       global.commons.isMod(opts.sender),
-      global.configuration.getValue('moderationColorTimeout')
+      this.settings.color.timeout
     ])
 
     if (global.commons.isOwner(opts.sender) || isMod || !isEnabled || (opts.sender.subscriber && !isEnabledForSubs)) {
@@ -411,11 +416,11 @@ class Moderation extends System {
 
   async emotes (opts) {
     let [isEnabled, isEnabledForSubs, isMod, timeout, maxCount] = await Promise.all([
-      global.configuration.getValue('moderationEmotes'),
-      global.configuration.getValue('moderationEmotesSubs'),
+      this.settings.emotes.enabled,
+      this.settings.emotes.moderateSubscribers,
       global.commons.isMod(opts.sender),
-      global.configuration.getValue('moderationEmotesTimeout'),
-      global.configuration.getValue('moderationEmotesMaxCount')
+      this.settings.emotes.timeout,
+      this.settings.emotes.maxCount
     ])
 
     var count = 0
@@ -438,9 +443,9 @@ class Moderation extends System {
 
   async blacklist (opts) {
     let [isEnabledForSubs, isMod, timeout, blacklist] = await Promise.all([
-      global.configuration.getValue('moderationBlacklistSubs'),
+      this.settings.lists.moderateSubscribers,
       global.commons.isMod(opts.sender),
-      global.configuration.getValue('moderationBlacklistTimeout'),
+      this.settings.lists.timeout,
       this.settings.lists.blacklist
     ])
     if (global.commons.isOwner(opts.sender) || isMod || (opts.sender.subscriber && !isEnabledForSubs)) {
