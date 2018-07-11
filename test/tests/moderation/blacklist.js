@@ -4,6 +4,7 @@ if (require('cluster').isWorker) process.exit()
 require('../../general.js')
 
 const db = require('../../general.js').db
+const variable = require('../../general.js').variable
 
 const _ = require('lodash')
 const assert = require('chai').assert
@@ -91,16 +92,16 @@ describe('systems/moderation - blacklist()', () => {
   for (let [pattern, test] of Object.entries(tests)) {
     for (let text of _.get(test, 'should.return.true', [])) {
       it(`pattern '${pattern}' should ignore '${text}'`, async () => {
-        await global.db.engine.remove('systems.moderation.settings', { category: 'lists', key: 'blacklist' })
-        await global.db.engine.insert('systems.moderation.settings', { category: 'lists', key: 'blacklist', value: pattern })
+        await (global.systems.moderation.settings.lists.blacklist = [pattern])
+        await variable.isEqual('systems.moderation.settings.lists.blacklist', [pattern])
         let result = await global.systems.moderation.blacklist({ sender: { username: 'testuser' }, message: text })
         assert.isTrue(result)
       })
     }
     for (let text of _.get(test, 'should.return.false', [])) {
       it(`pattern '${pattern}' should timeout on '${text}'`, async () => {
-        await global.db.engine.remove('systems.moderation.settings', { category: 'lists', key: 'blacklist' })
-        await global.db.engine.insert('systems.moderation.settings', { category: 'lists', key: 'blacklist', value: pattern })
+        await (global.systems.moderation.settings.lists.blacklist = [pattern])
+        await variable.isEqual('systems.moderation.settings.lists.blacklist', [pattern])
         let result = await global.systems.moderation.blacklist({ sender: { username: 'testuser' }, message: text })
         assert.isFalse(result)
       })

@@ -1,571 +1,193 @@
-<ul class="nav nav-tabs">
-  <li class="nav-item">
-    <span data-lang="menu.systems" class="title text-default"></span>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link active" data-toggle="tab" href="#whispers" data-lang="page-settings.systems.whispers.title"></a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#points" data-lang="points" id="points-tab-link"></a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#songs" data-lang="songs" id="songs-tab-link"></a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#gambling" data-lang="gambling" id="gambling-tab-link"></a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#others" data-lang="page-settings.systems.others.title"></a>
-  </li>
-</ul>
+<div id="settingsSystemApp">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-9 col-md-8 col-sm-6">
+        <span class="title text-default mb-2">
+          {{ commons.translate('menu.settings') }}
+          <small><i class="fas fa-angle-right"></i></small>
+          {{ commons.translate('menu.systems') }}
+          <small><i class="fas fa-angle-right"></i></small>
+          {{ commons.translate('menu.' + selectedSystem) }}
+        </span>
 
-<div class="tab-content">
-  <div role="tabpanel" class="tab-pane active" id="whispers">
-    <div class="row settings">
-      <div class="col">
-        <strong data-lang="page-settings.systems.whispers.toggle.listener"></strong>
-      </div>
-      <div class="col">
-        <input id="disableWhisperListener" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-onstyle="success"
-          data-offstyle="danger">
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="page-settings.systems.whispers.toggle.settings"></strong>
-      </div>
-      <div class="col">
-        <input id="disableSettingsWhispers" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-onstyle="success"
-          data-offstyle="danger">
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="page-settings.systems.whispers.toggle.permissions"></strong>
-      </div>
-      <div class="col">
-        <input id="disablePermissionWhispers" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-onstyle="success"
-          data-offstyle="danger">
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col systems-cooldown-only">
-        <strong data-lang="page-settings.systems.whispers.toggle.cooldowns"></strong>
-      </div>
-      <div class="col systems-cooldown-only">
-        <input id="disableCooldownWhispers" type="checkbox" data-toggle="toggle" data-on="Enabled" data-off="Disabled" data-onstyle="success"
-          data-offstyle="danger">
-      </div>
-    </div>
-  </div>
-
-  <div role="tabpanel" class="tab-pane" id="points">
-    <div class="row settings">
-      <div class="col">
-        <strong data-lang="points-name"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="pointsName" onclick="commons.configEditable(this, '')" id="configPointsName"></abbr>
-        <div class="input-group" style="display:none;" id="input_pointsName_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="points-single-multi"></span>
+        <template v-for="(value, category) of settings">
+          <h6>{{ category }}</h6>
+          <div class="card mb-2" >
+            <div class="card-body">
+              <div v-if="typeof value === 'object'" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
+                <toggle
+                  class="pt-1 pb-1"
+                  v-bind:title="commons.translate('settings.' + selectedSystem + '.' + defaultValue)"
+                  v-if="typeof currentValue === 'boolean'"
+                  v-bind:value="currentValue"
+                  v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
+                ></toggle>
+                <textarea-from-array
+                  class="pt-1 pb-1"
+                  v-else-if="currentValue.constructor === Array"
+                  v-bind:value="currentValue"
+                  v-bind:title="commons.translate('settings.' + selectedSystem + '.' + defaultValue)"
+                ></textarea-from-array>
+                <command-input
+                  v-else
+                  class="pt-1 pb-1"
+                  v-bind:type="typeof currentValue"
+                  v-bind:value="currentValue"
+                  v-bind:command="defaultValue"
+                  v-on:update="value[defaultValue] = $event; triggerDataChange()"
+                ></command-input>
+              </div>
+            </div>
           </div>
-          <input id="input_pointsName" class="form-control input-sm" type="text" />
+        </template>
+
+        <div class="text-right mb-2">
+          <div v-if="isDataChanged" class="btn alert-danger" style="cursor: initial">{{commons.translate('dialog.changesPending')}}</div>
+          <button class="btn btn btn-primary" v-on:click="saveSettings" v-if="state.settings === 0">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
+          <button disabled="disabled" class="btn btn btn-primary" v-on:click="saveSettings" v-if="state.settings === 1">
+            <i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
+          <button disabled="disabled" class="btn btn btn-success" v-on:click="saveSettings" v-if="state.settings === 2">
+            <i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</button>
         </div>
       </div>
-      <div class="w-100"></div>
 
-      <div class="col">
-        <strong data-lang="points-interval"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="pointsInterval" onclick="commons.configEditable(this, 'min')" id="configPointsInterval"></abbr>
-        <div class="input-group" style="display:none;" id="input_pointsInterval_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="minutes"></span>
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <div class="sticky-top" style="top: 80px">
+          <div class="widget pt-1 mt-3 border-0 bg-light" style="height: auto">
+            <div class="pl-2 pr-2" v-for="system of listOfSystems">
+              <button
+                class="btn btn-block text-left btn-outline-dark"
+                :style="getBorderStyle(system.name)"
+                v-on:click="setSystem(system.name)"
+              >
+                {{ commons.translate('menu.' + system.name) }}
+
+                <small
+                  :class="[ system.enabled && !system.isDisabledByEnv && system.areDependenciesEnabled ? 'text-success' : 'text-danger' ]"
+                  style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"
+                >
+                  <template v-if="system.isDisabledByEnv">DISABLED BY ENV</template>
+                  <template v-if="!system.enabled">{{ commons.translate('disabled') }}</template>
+                  <template v-else-if="!system.areDependenciesEnabled">DEPENDENCIES DISABLED</template>
+                  <template v-else>{{ commons.translate('enabled') }}</template>
+                </small>
+              </button>
+            </div>
           </div>
-          <input id="input_pointsInterval" class="form-control input-sm" type="text" />
         </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="points-per-interval"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="pointsPerInterval" onclick="commons.configEditable(this, '')" id="configPointsPerInterval"></abbr>
-        <div class="input-group" style="display:none;" id="input_pointsPerInterval_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="points"></span>
-          </div>
-          <input id="input_pointsPerInterval" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="points-interval-offline"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="pointsIntervalOffline" onclick="commons.configEditable(this, 'min')" id="configPointsIntervalOffline"></abbr>
-        <div class="input-group" style="display:none;" id="input_pointsIntervalOffline_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="minutes"></span>
-          </div>
-          <input id="input_pointsIntervalOffline" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="points-per-interval-offline"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="pointsPerIntervalOffline" onclick="commons.configEditable(this, '')" id="configPointsPerIntervalOffline"></abbr>
-        <div class="input-group" style="display:none;" id="input_pointsPerIntervalOffline_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="points"></span>
-          </div>
-          <input id="input_pointsPerIntervalOffline" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="points-per-message-interval"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="pointsMessageInterval" onclick="commons.configEditable(this, '')" id="configPointsMessageInterval"></abbr>
-        <div class="input-group" style="display:none;" id="input_pointsMessageInterval_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="points"></span>
-          </div>
-          <input id="input_pointsMessageInterval" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="points-per-message"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="pointsPerMessageInterval" onclick="commons.configEditable(this, '')" id="configPointsPerMessageInterval"></abbr>
-        <div class="input-group" style="display:none;" id="input_pointsPerMessageInterval_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="points"></span>
-          </div>
-          <input id="input_pointsPerMessageInterval" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div role="tabpanel" class="tab-pane" id="songs">
-    <div class="row settings">
-      <div class="col">
-        <strong data-lang="volume"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="songs_volume" onclick="commons.configEditable(this, '%')" id="configVolume"></abbr>
-        <div class="input-group" style="display:none;" id="input_songs_volume_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">%</span>
-          </div>
-          <input id="input_songs_volume" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="max-duration"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="songs_duration" onclick="commons.configEditable(this, 'min')" id="configDuration"></abbr>
-        <div class="input-group" style="display:none;" id="input_songs_duration_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="minutes"></span>
-          </div>
-          <input id="input_songs_duration" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="shuffle"></strong>
-      </div>
-      <div class="col">
-        <input id="shuffleToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="song-requests"></strong>
-      </div>
-      <div class="col">
-        <input id="songrequestToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="song-notify"></strong>
-      </div>
-      <div class="col">
-        <input id="notifyToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="playlist"></strong>
-      </div>
-      <div class="col">
-        <input id="playlistToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-      </div>
-    </div>
-  </div>
-
-  <div role="tabpanel" class="tab-pane" id="gambling">
-    <div class="row settings">
-      <div class="col">
-        <strong data-lang="gamblingChanceToWin"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="gamblingChanceToWin" onclick="commons.configEditable(this, '%')" id="configGamblingChanceToWin"></abbr>
-        <div class="input-group" style="display:none;" id="input_gamblingChanceToWin_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">%</span>
-          </div>
-          <input id="input_gamblingChanceToWin" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="gamblingMinimalBet"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="gamblingMinimalBet" onclick="commons.configEditable(this, '')" id="configGamblingMinimalBet"></abbr>
-        <div class="input-group" style="display:none;" id="input_gamblingMinimalBet_group">
-          <div class="input-group-prepend">
-          </div>
-          <input id="input_gamblingMinimalBet" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="seppukuTimeout"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="seppukuTimeout" onclick="commons.configEditable(this, 's')" id="configSeppukuTimeout"></abbr>
-        <div class="input-group" style="display:none;" id="input_seppukuTimeout_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="seconds"></span>
-          </div>
-          <input id="input_seppukuTimeout" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="rouletteTimeout"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="rouletteTimeout" onclick="commons.configEditable(this, 's')" id="configRouletteTimeout"></abbr>
-        <div class="input-group" style="display:none;" id="input_rouletteTimeout_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="seconds"></span>
-          </div>
-          <input id="input_rouletteTimeout" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="fightmeTimeout"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="fightmeTimeout" onclick="commons.configEditable(this, 's')" id="configFightmeTimeout"></abbr>
-        <div class="input-group" style="display:none;" id="input_fightmeTimeout_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="seconds"></span>
-          </div>
-          <input id="input_fightmeTimeout" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="duelCooldown"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="duelCooldown" onclick="commons.configEditable(this, 's')" id="configDuelCooldown"></abbr>
-        <div class="input-group" style="display:none;" id="input_duelCooldown_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="seconds"></span>
-          </div>
-          <input id="input_duelCooldown" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="duelDuration"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="duelDuration" onclick="commons.configEditable(this, 'min')" id="configDuelDuration"></abbr>
-        <div class="input-group" style="display:none;" id="input_duelDuration_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">min</span>
-          </div>
-          <input id="input_duelDuration" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="duelMinimalBet"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="duelMinimalBet" onclick="commons.configEditable(this, '')" id="configDuelMinimalBet"></abbr>
-        <div class="input-group" style="display:none;" id="input_duelMinimalBet_group">
-          <div class="input-group-prepend">
-          </div>
-          <input id="input_duelMinimalBet" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="fightmeCooldown"></strong>
-      </div>
-      <div class="col">
-        <abbr title="click to edit" data-config-id="fightmeCooldown" onclick="commons.configEditable(this, 's')" id="configFightmeCooldown"></abbr>
-        <div class="input-group" style="display:none;" id="input_fightmeCooldown_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" data-lang="seconds"></span>
-          </div>
-          <input id="input_fightmeCooldown" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col">
-        <strong data-lang="gamblingCooldownBypass"></strong>
-      </div>
-      <div class="col">
-        <input id="gamblingCooldownBypassToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-      </div>
-    </div>
-  </div>
-
-  <div role="tabpanel" class="tab-pane" id="others">
-    <div class="row settings">
-      <div class="col">
-        <strong data-lang="show-usernames-with-at"></strong>
-      </div>
-      <div class="col">
-        <input id="atUsernameToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-      </div>
-
-      <div class="w-100"></div>
-      <div class="col" style="max-width: 50%">
-        <strong data-lang="page-settings.systems.others.currency"></strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <select id="default-currency" class="form-control" onchange="saveDefaultCurrency()">
-          <option value="USD">USD</option>
-          <option value="AUD">AUD</option>
-          <option value="BGN">BGN</option>
-          <option value="BRL">BRL</option>
-          <option value="CAD">CAD</option>
-          <option value="CHF">CHF</option>
-          <option value="CNY">CNY</option>
-          <option value="CZK">CZK</option>
-          <option value="DKK">DKK</option>
-          <option value="EUR">EUR</option>
-          <option value="GBP">GBP</option>
-          <option value="HKD">HKD</option>
-          <option value="HRK">HRK</option>
-          <option value="HUF">HUF</option>
-          <option value="IDR">IDR</option>
-          <option value="ILS">ILS</option>
-          <option value="INR">INR</option>
-          <option value="ISK">ISK</option>
-          <option value="JPY">JPY</option>
-          <option value="KRW">KRW</option>
-          <option value="MXN">MXN</option>
-          <option value="MYR">MYR</option>
-          <option value="NOK">NOK</option>
-          <option value="NZD">NZD</option>
-          <option value="PHP">PHP</option>
-          <option value="PLN">PLN</option>
-          <option value="RON">RON</option>
-          <option value="RUB">RUB</option>
-          <option value="SEK">SEK</option>
-          <option value="SGD">SGD</option>
-          <option value="THB">THB</option>
-          <option value="TRY">TRY</option>
-          <option value="ZAR">ZAR</option>
-        </select>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-  function SystemsPage () {
-    if (_.isNil(systems) || _.isNil(configuration)) {
-      setTimeout(() => SystemsPage(), 1)
-      return
-    }
+  Vue.prototype.commons = commons
 
-    if (!systems.points) $("#points-tab-link").css('display', 'none')
-    if (!systems.songs) $("#songs-tab-link").css('display', 'none')
-    if (!systems.cooldown) $(".systems-cooldown-only").css('display', 'none')
-    if (!systems.gambling) $("#gambling-tab-link").css('display', 'none')
+  function settingsSystemAppInit () {
+    if (_.size(translations) === 0) return setTimeout(() => settingsSystemAppInit(), 1)
 
-    socket.once('configuration', function (data) {
-      $("#configGamblingChanceToWin").text(data.gamblingChanceToWin + '%')
-      $("#configGamblingMinimalBet").text(data.gamblingMinimalBet)
+    var settingsSystemApp = new Vue({
+      el: '#settingsSystemApp',
+      components: {
+        'toggle': toggleEnable,
+        'command-input': commandInput,
+        'textarea-from-array': textAreaFromArray
+      },
+      data: {
+        socket: { _panel: io({ query: "token=" + token }) },
+        listOfSystems: [],
+        selectedSystem: null,
+        settings: { settings: {} },
+        isDataChanged: false,
 
-      $("#configDuelDuration").text(data.duelDuration + 'min')
-      $("#configDuelMinimalBet").text(data.duelMinimalBet)
-
-      $("#configSeppukuTimeout").text(data.seppukuTimeout + 's')
-      $("#configRouletteTimeout").text(data.rouletteTimeout + 's')
-      $("#configFightmeTimeout").text(data.fightmeTimeout + 's')
-
-      $("#configDuelCooldown").text(data.duelCooldown + 's')
-      $("#configFightmeCooldown").text(data.fightmeCooldown + 's')
-
-      $('#gamblingCooldownBypassToggle').off('change')
-      $('#gamblingCooldownBypassToggle').bootstrapToggle(data.gamblingCooldownBypass ? 'on' : 'off')
-      $('#gamblingCooldownBypassToggle').change(function () {
-        if ($('#gamblingCooldownBypassToggle').data('init')) socket.emit('saveConfiguration', {
-          'gamblingCooldownBypass': $(this).prop('checked')
+        state: {
+          settings: 0
+        }
+      },
+      watch: {
+        selectedSystem: function (valueNew, valueOld) {
+          this.loadSystemSettings(valueNew)
+        }
+      },
+      computed: {
+      },
+      created: function () {
+        this.socket._panel.emit('systems', (err, systems) => {
+          for (let system of systems) {
+            this.socket[system.name] = io(`/system/${system.name}`, { query: "token=" + token })
+          }
+          this.listOfSystems = systems
+          this.selectedSystem = systems[0].name
         })
-      })
-      $('#gamblingCooldownBypassToggle').data('init', true)
+      },
+      filters: {
+      },
+      methods: {
+        loadSystemSettings: function (system) {
+          this.settings = { settings: {} }
+          this.state.settings = 0
+          this.socket[system].emit('settings', (err, settings) => {
+            let _settings = _(settings).toPairs().value()
 
-      $('#atUsernameToggle').off('change')
-      $('#atUsernameToggle').bootstrapToggle(data.atUsername ? 'on' : 'off')
-      $('#atUsernameToggle').change(function () {
-        if ($('#atUsernameToggle').data('init')) socket.emit('saveConfiguration', {
-          'atUsername': $(this).prop('checked')
-        })
-      })
-      $('#atUsernameToggle').data('init', true)
+            // sorting
+            // enabled is first
+            this.settings.settings = {}
+            this.settings.settings.enabled = _(_settings.filter(o => o[0] === 'enabled')).flatten().value()[1]
+            // everything else except commands and enabled and are string|number|bool
+            for (let [name, value] of _(_settings.filter(o => o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
+              this.settings.settings[name] = value
+            }
+            // everything else except commands and enabled and are objects -> own category
+            for (let [name, value] of _(_settings.filter(o => o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')).value()) {
+              this.settings[name] = value
+            }
+            // commands at last
+            for (let [name, value] of _(_settings.filter(o => o[0] === 'commands')).value()) {
+              this.settings[name] = value
+            }
+            this.isDataChanged = false
+          })
+        },
+        getBorderStyle: function (system) {
+          return system === this.selectedSystem ?
+            {
+              'border-width': '0px',
+              'border-left-width': '5px !important'
+            } :
+            {
+              'border-width': '0px',
+              'border-left-width': '5px !important',
+              'border-color': 'transparent'
+            }
+        },
+        triggerDataChange: function () {
+          this.isDataChanged = false; this.isDataChanged = true
+        },
+        setSystem: function (system) {
+          if (this.state.settings === 0) this.selectedSystem = system
+        },
+        saveSettings: function () {
+          this.state.settings = 1
+          let settings = _.cloneDeep(this.settings)
+          for (let [name,value] of Object.entries(settings.settings)) {
+            delete settings.settings[name]
+            settings[name] = value
+          }
+          delete settings.settings
 
-      /* whispers */
-      $('#disableWhisperListener').off('change')
-      $('#disableWhisperListener').bootstrapToggle(!data.disableWhisperListener ? 'on' : 'off')
-      $('#disableWhisperListener').change(function () {
-        if ($('#disableWhisperListener').data('init')) socket.emit('saveConfiguration', {
-          'disableWhisperListener': !$(this).prop('checked')
-        })
-      })
-      $('#disableWhisperListener').data('init', true)
-
-      $('#disableSettingsWhispers').off('change')
-      $('#disableSettingsWhispers').bootstrapToggle(!data.disableSettingsWhispers ? 'on' : 'off')
-      $('#disableSettingsWhispers').change(function () {
-        if ($('#disableSettingsWhispers').data('init')) socket.emit('saveConfiguration', {
-          'disableSettingsWhispers': !$(this).prop('checked')
-        })
-      })
-      $('#disableSettingsWhispers').data('init', true)
-
-      $('#disablePermissionWhispers').off('change')
-      $('#disablePermissionWhispers').bootstrapToggle(!data.disablePermissionWhispers ? 'on' : 'off')
-      $('#disablePermissionWhispers').change(function () {
-        if ($('#disablePermissionWhispers').data('init')) socket.emit('saveConfiguration', {
-          'disablePermissionWhispers': !$(this).prop('checked')
-        })
-      })
-      $('#disablePermissionWhispers').data('init', true)
-
-      $('#disableCooldownWhispers').off('change')
-      $('#disableCooldownWhispers').bootstrapToggle(!data.disableCooldownWhispers ? 'on' : 'off')
-      $('#disableCooldownWhispers').change(function () {
-        if ($('#disableCooldownWhispers').data('init')) socket.emit('saveConfiguration', {
-          'disableCooldownWhispers': !$(this).prop('checked')
-        })
-      })
-      $('#disableCooldownWhispers').data('init', true)
-
-      $('#default-currency option[value=' + data.currency + ']').prop('selected', true)
-    })
-
-    socket.off('pointsConfiguration')
-    socket.on('pointsConfiguration', function (data) {
-      $("#configPointsName").text(data.pointsName)
-      $("#configPointsInterval").text(data.pointsInterval + 'min')
-      $("#configPointsPerInterval").text(data.pointsPerInterval)
-      $("#configPointsIntervalOffline").text(data.pointsIntervalOffline + 'min')
-      $("#configPointsPerIntervalOffline").text(data.pointsPerIntervalOffline)
-      $("#configPointsMessageInterval").text(data.pointsMessageInterval)
-      $("#configPointsPerMessageInterval").text(data.pointsPerMessageInterval)
-    })
-
-    socket.off('noticesConfiguration')
-    socket.on('noticesConfiguration', function (data) {
-      $("#configNoticeInterval").text(data.interval + 'min')
-      $("#configNoticeMsgReq").text(data.msgreq)
-    })
-
-    socket.off('songsConfiguration')
-    socket.on('songsConfiguration', function (data) {
-      $("#configVolume").text(data.volume + '%')
-      $("#configDuration").text(data.duration + 'min')
-
-      $('#shuffleToggle').bootstrapToggle(data.shuffle ? 'on' : 'off')
-      $('#shuffleToggle').off('change')
-      $('#shuffleToggle').change(function () {
-        if ($('#shuffleToggle').data('init')) socket.emit('saveConfiguration', {
-          'songs_shuffle': $(this).prop('checked')
-        })
-      })
-      $('#shuffleToggle').data('init', true)
-
-      $('#notifyToggle').bootstrapToggle(data.notify ? 'on' : 'off')
-      $('#notifyToggle').off('change')
-      $('#notifyToggle').change(function () {
-        if ($('#notifyToggle').data('init')) socket.emit('saveConfiguration', {
-          'songs_notify': $(this).prop('checked')
-        })
-      })
-      $('#notifyToggle').data('init', true)
-
-      $('#songrequestToggle').bootstrapToggle(data.songrequest ? 'on' : 'off')
-      $('#songrequestToggle').off('change')
-      $('#songrequestToggle').change(function () {
-        if ($('#songrequestToggle').data('init')) socket.emit('saveConfiguration', {
-          'songs_songrequest': $(this).prop('checked')
-        })
-      })
-      $('#songrequestToggle').data('init', true)
-
-      $('#playlistToggle').bootstrapToggle(data.playlist ? 'on' : 'off')
-      $('#playlistToggle').off('change')
-      $('#playlistToggle').change(function () {
-        if ($('#playlistToggle').data('init')) socket.emit('saveConfiguration', {
-          'songs_playlist': $(this).prop('checked')
-        })
-      })
-      $('#playlistToggle').data('init', true)
-    })
-
-    socket.emit('getPointsConfiguration')
-    socket.emit('getNoticeConfiguration')
-    socket.emit('songs.sendConfiguration')
-    socket.emit('getConfiguration')
-  }
-
-  function saveDefaultCurrency() {
-    socket.emit('saveConfiguration', {
-      'currency': $('#default-currency').val()
+          this.socket[this.selectedSystem].emit('settings.update', settings, (err) => {
+            this.state.settings = 2
+            this.isDataChanged = false
+            setTimeout(() => this.state.settings = 0, 1000)
+            setTimeout(() => {
+              this.socket._panel.emit('systems', (err, systems) => {
+                this.listOfSystems = systems
+              })
+            })
+          })
+        }
+      }
     })
   }
-
-  SystemsPage()
+  settingsSystemAppInit()
 </script>

@@ -19,7 +19,7 @@ describe('systems/moderation - longMessage()', () => {
   describe('moderationLongMessage=false', async () => {
     before(async () => {
       await db.cleanup()
-      await global.db.engine.insert('settings', { key: 'moderationLongMessage', value: 'false' })
+      await (global.systems.moderation.settings.longMessage.enabled = false)
     })
 
     for (let test of tests.timeout) {
@@ -37,7 +37,7 @@ describe('systems/moderation - longMessage()', () => {
   describe('moderationLongMessage=true', async () => {
     before(async () => {
       await db.cleanup()
-      await global.db.engine.insert('settings', { key: 'moderationLongMessage', value: 'true' })
+      await (global.systems.moderation.settings.longMessage.enabled = true)
     })
 
     for (let test of tests.timeout) {

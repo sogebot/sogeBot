@@ -37,7 +37,7 @@ class CustomCommands extends System {
     }
     super({settings})
 
-    this.addMenu({category: 'manage', name: 'custom-commands', id: 'customcommands/list'})
+    this.addMenu({category: 'manage', name: 'customcommands', id: 'customcommands/list'})
   }
 
   sockets () {

@@ -1,8 +1,8 @@
 <div id="systemAliasApp">
   <div class="container-fluid">
     <div class="row">
-      <div class="col-lg-9 col-md-8 col-sm-6">
-        <span data-lang="menu.aliases" class="title text-default"></span>
+      <div class="col-12">
+        <span data-lang="menu.alias" class="title text-default"></span>
 
         <div class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
           <div class="col-sm-6">
@@ -75,37 +75,7 @@
                 </div>
                 <button v-bind:title="alias.enabled ? commons.translate('enabled') : commons.translate('disabled')" v-on:click="alias.enabled = !alias.enabled; sendUpdate(alias._id)"  class="btn btn-outline-dark p-1 border-0"><i class="fas m-1"  v-bind:class="[ alias.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i></button>
                 <button type="button" v-on:click="deleteAlias(alias._id)" v-bind:title="commons.translate('delete')" class="btn btn-outline-dark p-1 border-0"><i class="far fa-trash-alt m-1" aria-hidden="true"></i></button>
-
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-3 col-md-4 col-sm-6">
-        <div class="sticky-top" style="top: 60px">
-          <span class="title text-default">{{ commons.translate('settings') }}</span>
-          <div class="widget pt-1 mt-3" style="height: auto">
-            <div class="pt-1 pl-2 pr-2 pb-1">
-              <toggle
-                v-bind:value="enabled"
-                v-on:update="enabled = !enabled; isDataChanged = true"></toggle>
-            </div>
-
-            <div class="p-0 pl-2 pr-2 " v-for="(value, defaultValue) of commands">
-              <command-input
-                class="pt-1 pb-1"
-                v-bind:value="value"
-                v-bind:command="defaultValue"
-                v-on:update="commands[defaultValue] = $event; isDataChanged = true"></command-input>
-            </div>
-            <div class="p-2">
-              <div v-if="isDataChanged" class="alert alert-danger">{{commons.translate('dialog.changesPending')}}</div>
-              <button class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 0">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
-              <button disabled="disabled" class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 1">
-                <i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
-              <button disabled="disabled" class="btn btn-block btn-success" v-on:click="saveSettings" v-if="state.settings === 2">
-                <i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</button>
             </div>
           </div>
         </div>
@@ -131,16 +101,13 @@
 
         aliases: [],
 
-        commands: {},
-        enabled: true,
-
         changed: [],
         isDataChanged: false,
 
         state: {
           settings: 0
         },
-        socket: io('/system/Alias', { query: "token=" + token }),
+        socket: io('/system/alias', { query: "token=" + token }),
       },
       computed: {
         aliasesFiltered: function () {
@@ -198,18 +165,6 @@
         },
         sendUpdate: function (_id) {
           this.socket.emit('alias.update', this.aliases.filter((o) => o._id === _id))
-        },
-        saveSettings: function () {
-          this.state.settings = 1
-          const settings = {
-            commands: this.commands,
-            enabled: this.enabled
-          }
-          this.socket.emit('settings.update', settings, (err) => {
-            this.state.settings = 2
-            this.isDataChanged = false
-            setTimeout(() => this.state.settings = 0, 1000)
-          })
         }
       }
     })

@@ -38,7 +38,8 @@ class Alias extends System {
     }
     super({ settings })
 
-    this.addMenu({category: 'manage', name: 'aliases', id: 'alias/list'})
+    this.addMenu({category: 'manage', name: 'alias', id: 'alias/list'})
+    this.addMenu({category: 'settings', name: 'systems', id: 'systems'})
   }
 
   sockets () {

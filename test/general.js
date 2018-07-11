@@ -30,5 +30,6 @@ if (require('cluster').isMaster) {
 module.exports = {
   db: require('./helpers/db'),
   message: require('./helpers/messages'),
-  tmi: require('./helpers/tmi')
+  tmi: require('./helpers/tmi'),
+  variable: require('./helpers/variable')
 }

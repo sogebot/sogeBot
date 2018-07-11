@@ -1,13 +1,13 @@
 {
   "timers": "Timers",
   "keywords": "Keywords",
-  "custom-commands": "Custom commands",
+  "customcommands": "Custom commands",
   "event-listeners": "Event listeners",
   "ranks": "Ranks",
   "songs": "Songs",
   "viewers": "Viewers",
-  "aliases": "Aliases",
-  "cooldowns": "Cooldowns",
+  "alias": "Aliases",
+  "cooldown": "Cooldowns",
   "highlights": "Highlights",
   "price": "Price",
   "logger": "Logs",
@@ -22,5 +22,11 @@
   "integrations": "Integrations",
   "custom-variables": "Custom variables",
   "registry": "Registry",
-  "quotes": "Quotes"
+  "quotes": "Quotes",
+  "settings": "Settings",
+  "commercial": "Commercial",
+  "bets": "Bets",
+  "points": "Points",
+  "raffles": "Raffles",
+  "queue": "Queue"
 }

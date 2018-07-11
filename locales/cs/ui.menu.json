@@ -1,13 +1,13 @@
 {
   "timers": "Časovače",
   "keywords": "Klíčová slova",
-  "custom-commands": "Vlastní příkazy",
+  "customcommands": "Vlastní příkazy",
   "event-listeners": "Události",
   "ranks": "Hodnosti",
   "songs": "Písničky",
   "viewers": "Diváci",
-  "aliases": "Aliasy",
-  "cooldowns": "Cooldowny",
+  "alias": "Aliasy",
+  "cooldown": "Cooldowny",
   "highlights": "Highlighty",
   "price": "Cena",
   "logger": "Logy",
@@ -22,5 +22,11 @@
   "integrations": "Integrace",
   "custom-variables": "Vlastní proměnné",
   "registry": "Registr",
-  "quotes": "Citáty"
+  "quotes": "Citáty",
+  "settings": "Nastavení",
+  "commercial": "Reklamy",
+  "bets": "Sázky",
+  "points": "Body",
+  "raffles": "Tombola",
+  "queue": "Fronta"
 }

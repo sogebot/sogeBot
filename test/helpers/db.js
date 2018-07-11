@@ -3,7 +3,7 @@ const _ = require('lodash')
 module.exports = {
   cleanup: async function () {
     let waitForIt = async (resolve, reject) => {
-      if (_.isNil(global.db) || !global.db.engine.connected) {
+      if (_.isNil(global.db) || !global.db.engine.connected || _.isNil(global.systems)) {
         return setTimeout(() => waitForIt(resolve, reject), 10)
       }
       await global.db.engine.remove('systems.alias', {})
@@ -24,8 +24,6 @@ module.exports = {
       await global.db.engine.remove('cache.users', {})
       await global.db.engine.remove('gambling.duel', {})
       await global.db.engine.remove('widgetsEventList', {})
-      await global.db.engine.remove('moderation.permit', {})
-      await global.db.engine.remove('moderation.warnings', {})
       await global.db.engine.remove('systems.quotes', {})
 
       // game fightme
@@ -35,6 +33,12 @@ module.exports = {
       // game duel
       await global.db.engine.remove('games.duel.settings', {})
       await global.db.engine.remove('games.duel.users', {})
+
+      // remove moderation
+      await global.db.engine.remove(global.systems.moderation.collection.settings, {})
+      await global.db.engine.remove(global.systems.moderation.collection.permits, {})
+      await global.db.engine.remove(global.systems.moderation.collection.warnings, {})
+
       resolve()
     }
     return new Promise((resolve, reject) => {

@@ -32,7 +32,7 @@ class Module {
   _sockets () {
     if (_.isNil(global.panel)) return new Timeout().recursive({ this: this, uid: `${this.constructor.name}.sockets`, wait: 1000, fnc: this._sockets })
     else if (cluster.isMaster) {
-      this.socket = global.panel.io.of('/system/' + this.constructor.name)
+      this.socket = global.panel.io.of('/system/' + this.constructor.name.toLowerCase())
       if (!_.isNil(this.sockets)) this.sockets()
 
       // default socket listeners
@@ -41,10 +41,9 @@ class Module {
           cb(null, await this.getAllSettings())
         })
         socket.on('settings.update', async (data, cb) => {
-          const enabled = await this.settings.enabled
           for (let [key, value] of Object.entries(data)) {
             if (key === 'enabled' && this._name === 'library') continue
-            else if (key === 'enabled' && value !== enabled) this.status(value)
+            else if (key === 'enabled') this.status(value)
             else if (key === 'commands') {
               for (let [defaultValue, currentValue] of Object.entries(value)) {
                 this.settings.commands[defaultValue] = currentValue
@@ -114,15 +113,23 @@ class Module {
           this._settings[category][key] = () => {
             return new Promise(async (resolve, reject) => {
               const currentValue = await global.db.engine.find(this.collection.settings, { category, key })
-              resolve(_.isEmpty(currentValue) ? value : currentValue.map(o => o.value))
+              if (_.isEmpty(currentValue)) {
+                resolve(value)
+              } else {
+                resolve(_.every(currentValue, 'isMultiValue') ? currentValue.map(o => o.value) : currentValue[0].value)
+              }
             })
           }
           Object.defineProperty(this.settings[category], `${key}`, {
             get: () => this._settings[category][key](),
             set: async (values) => {
-              const valuesFromDb = (await global.db.engine.find(this.collection.settings, { category })).map((o) => o.value)
-              for (let toRemoveValue of _.difference(valuesFromDb, values)) await global.db.engine.remove(this.collection.settings, { category, key, value: toRemoveValue })
-              for (let toAddValue of _.difference(values, valuesFromDb)) await global.db.engine.insert(this.collection.settings, { category, key, value: toAddValue })
+              if (_.isArray(values)) {
+                const valuesFromDb = (await global.db.engine.find(this.collection.settings, { category })).map((o) => o.value)
+                for (let toRemoveValue of _.difference(valuesFromDb, values)) await global.db.engine.remove(this.collection.settings, { category, key, value: toRemoveValue })
+                for (let toAddValue of _.difference(values, valuesFromDb)) await global.db.engine.insert(this.collection.settings, { category, key, value: toAddValue, isMultiValue: true })
+              } else {
+                await global.db.engine.update(this.collection.settings, { category, key }, { value: values, isMultiValue: false })
+              }
             }
           })
         }
@@ -131,13 +138,23 @@ class Module {
   }
 
   async _dependenciesEnabled () {
-    let status = []
-    for (let dependency of this.dependsOn) {
-      let dependencyPointer = _.get(global, dependency, null)
-      if (!dependencyPointer || !_.isFunction(dependencyPointer.status)) status.push(false)
-      else status.push(await dependencyPointer.status())
-    }
-    return status.length === 0 || _.every(status)
+    return new Promise((resolve) => {
+      let check = async (retry) => {
+        let status = []
+        for (let dependency of this.dependsOn) {
+          let dependencyPointer = _.get(global, dependency, null)
+          if (!dependencyPointer || !_.isFunction(dependencyPointer.status)) {
+            if (retry > 0) setTimeout(() => check(--retry), 10)
+            else throw new Error('Dependency error - possibly wrong path')
+            return
+          } else {
+            status.push(await dependencyPointer.status({ quiet: true }))
+          }
+        }
+        resolve(status.length === 0 || _.every(status))
+      }
+      check(1000)
+    })
   }
 
   async status (state) {
@@ -146,15 +163,17 @@ class Module {
     const areDependenciesEnabled = await this._dependenciesEnabled()
     const isMasterAndStatusOnly = cluster.isMaster && _.isNil(state)
     const isStatusChanged = !_.isNil(state)
-    const isDisabledByEnv = process.env.DISABLE &&
+    const isDisabledByEnv = !_.isNil(process.env.DISABLE) &&
       (process.env.DISABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase()) || process.env.DISABLE === '*')
 
+    if (isStatusChanged) this.settings.enabled = state
+    else state = await this.settings.enabled
+
     if (!areDependenciesEnabled || isDisabledByEnv) state = false // force disable if dependencies are disabled or disabled by env
-    else if (_.isNil(state)) state = await this.settings.enabled
-    else this.settings.enabled = state
 
     if (isMasterAndStatusOnly || isStatusChanged) {
       if (isDisabledByEnv) global.log.info(`${chalk.red('DISABLED BY ENV')}: ${this.constructor.name} (${this._name})`)
+      else if (!areDependenciesEnabled) global.log.info(`${chalk.red('DISABLED BY DEP')}: ${this.constructor.name} (${this._name})`)
       else global.log.info(`${state ? chalk.green('ENABLED') : chalk.red('DISABLED')}: ${this.constructor.name} (${this._name})`)
     }
     return state
@@ -168,6 +187,7 @@ class Module {
   async getAllSettings () {
     let promisedSettings = {}
     for (let [category, values] of Object.entries(this._settings)) {
+      if (category === 'parsers') continue
       if (_.isObject(values) && !_.isFunction(values)) {
         if (_.isNil(promisedSettings[category])) promisedSettings[category] = {} // init if not existing
         for (let [key, getValue] of Object.entries(values)) {
