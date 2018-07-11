@@ -7,108 +7,101 @@ const XRegExp = require('xregexp')
 // bot libraries
 var constants = require('../constants')
 const Message = require('../message')
+const System = require('./_interface')
 var log = global.log
 
 const DEBUG_MODERATION_CONTAINS_LINK = debug('moderation:containsLink')
 const DEBUG_MODERATION_CAPS = debug('moderation:caps')
 
-class Moderation {
+class Moderation extends System {
   constructor () {
-    if (global.commons.isSystemEnabled(this)) {
-      this.configuration()
-      if (require('cluster').isMaster) this.webPanel()
-    }
-  }
-
-  configuration () {
-    if (global.commons.isSystemEnabled('moderation')) {
-      global.configuration.register('moderationLinks', 'core.settings.moderation.moderationLinks', 'bool', true)
-      global.configuration.register('moderationLinksWithSpaces', 'core.settings.moderation.moderationLinksWithSpaces', 'bool', false)
-      global.configuration.register('moderationLinksSubs', 'core.settings.moderation.moderationLinksSubs', 'bool', true)
-      global.configuration.register('moderationLinksClips', 'core.settings.moderation.moderationLinksClips', 'bool', true)
-      global.configuration.register('moderationLinksTimeout', 'core.settings.moderation.moderationLinksTimeout', 'number', 120)
-
-      global.configuration.register('moderationSymbols', 'core.settings.moderation.moderationSymbols', 'bool', true)
-      global.configuration.register('moderationSymbolsSubs', 'core.settings.moderation.moderationSymbolsSubs', 'bool', true)
-      global.configuration.register('moderationSymbolsTimeout', 'core.settings.moderation.moderationSymbolsTimeout', 'number', 120)
-      global.configuration.register('moderationSymbolsTriggerLength', 'core.settings.moderation.moderationSymbolsTriggerLength', 'number', 15)
-      global.configuration.register('moderationSymbolsMaxConsecutively', 'core.settings.moderation.moderationSymbolsMaxConsecutively', 'number', 10)
-      global.configuration.register('moderationSymbolsMaxPercent', 'core.settings.moderation.moderationSymbolsMaxPercent', 'number', 50)
-
-      global.configuration.register('moderationLongMessage', 'core.settings.moderation.moderationLongMessage', 'bool', true)
-      global.configuration.register('moderationLongMessageSubs', 'core.settings.moderation.moderationLongMessageSubs', 'bool', true)
-      global.configuration.register('moderationLongMessageTimeout', 'core.settings.moderation.moderationLongMessageTimeout', 'number', 120)
-      global.configuration.register('moderationLongMessageTriggerLength', 'core.settings.moderation.moderationLongMessageTriggerLength', 'number', 300)
-
-      global.configuration.register('moderationCaps', 'core.settings.moderation.moderationCaps', 'bool', true)
-      global.configuration.register('moderationCapsSubs', 'core.settings.moderation.moderationCapsSubs', 'bool', true)
-      global.configuration.register('moderationCapsTimeout', 'core.settings.moderation.moderationCapsTimeout', 'number', 120)
-      global.configuration.register('moderationCapsTriggerLength', 'core.settings.moderation.moderationCapsTriggerLength', 'number', 15)
-      global.configuration.register('moderationCapsMaxPercent', 'core.settings.moderation.moderationCapsMaxPercent', 'number', 50)
-
-      global.configuration.register('moderationSpam', 'core.settings.moderation.moderationSpam', 'bool', true)
-      global.configuration.register('moderationSpamSubs', 'core.settings.moderation.moderationSpamSubs', 'bool', true)
-      global.configuration.register('moderationSpamTimeout', 'core.settings.moderation.moderationSpamTimeout', 'number', 300)
-      global.configuration.register('moderationSpamTriggerLength', 'core.settings.moderation.moderationSpamTriggerLength', 'number', 15)
-      global.configuration.register('moderationSpamMaxLength', 'core.settings.moderation.moderationSpamMaxLength', 'number', 15)
-
-      global.configuration.register('moderationColor', 'core.settings.moderation.moderationColor', 'bool', true)
-      global.configuration.register('moderationColorSubs', 'core.settings.moderation.moderationColorSubs', 'bool', true)
-      global.configuration.register('moderationColorTimeout', 'core.settings.moderation.moderationColorTimeout', 'number', 120)
-
-      global.configuration.register('moderationEmotes', 'core.settings.moderation.moderationEmotes', 'bool', true)
-      global.configuration.register('moderationEmotesSubs', 'core.settings.moderation.moderationEmotesSubs', 'bool', true)
-      global.configuration.register('moderationEmotesTimeout', 'core.settings.moderation.moderationEmotesTimeout', 'number', 120)
-      global.configuration.register('moderationEmotesMaxCount', 'core.settings.moderation.moderationEmotesMaxCount', 'number', 15)
-
-      global.configuration.register('moderationBlacklistTimeout', 'core.settings.moderation.moderationBlacklistTimeout', 'number', 120)
-      global.configuration.register('moderationBlacklistSubs', 'core.settings.moderation.moderationBlacklistSubs', 'bool', true)
-
-      global.configuration.register('moderationWarnings', 'core.settings.moderation.moderationWarnings', 'number', 3)
-      global.configuration.register('moderationAnnounceTimeouts', 'core.settings.moderation.moderationAnnounceTimeouts', 'bool', true)
-      global.configuration.register('moderationWarningsTimeouts', 'core.settings.moderation.moderationWarningsTimeouts', 'bool', true)
-    }
-  }
-
-  commands () {
-    return !global.commons.isSystemEnabled('moderation')
-      ? []
-      : [
-        { this: this, id: '!permit', command: '!permit', fnc: this.permitLink, permission: constants.OWNER_ONLY }
+    const settings = {
+      lists: {
+        blacklist: [],
+        whitelist: []
+      },
+      commands: [
+        { name: '!permit', fnc: 'permitLink', permission: constants.OWNER_ONLY }
+      ],
+      parsers: [
+        { name: 'containsLink', priority: constants.MODERATION },
+        { name: 'symbols', priority: constants.MODERATION },
+        { name: 'longMessage', priority: constants.MODERATION },
+        { name: 'caps', priority: constants.MODERATION },
+        { name: 'spam', priority: constants.MODERATION },
+        { name: 'color', priority: constants.MODERATION },
+        { name: 'emotes', priority: constants.MODERATION },
+        { name: 'blacklist', priority: constants.MODERATION }
       ]
+    }
+
+    super({settings})
+
+    this.configuration()
+    this.addMenu({category: 'settings', name: 'moderation', id: 'moderation'})
   }
 
-  parsers () {
-    return !global.commons.isSystemEnabled('moderation')
-      ? []
-      : [
-        { name: 'moderationLinks', fnc: this.containsLink, priority: constants.MODERATION, permission: constants.VIEWERS, this: this },
-        { name: 'moderationSymbols', fnc: this.symbols, priority: constants.MODERATION, permission: constants.VIEWERS, this: this },
-        { name: 'moderationLongMessage', fnc: this.longMessage, priority: constants.MODERATION, permission: constants.VIEWERS, this: this },
-        { name: 'moderationCaps', fnc: this.caps, priority: constants.MODERATION, permission: constants.VIEWERS, this: this },
-        { name: 'moderationSpam', fnc: this.spam, priority: constants.MODERATION, permission: constants.VIEWERS, this: this },
-        { name: 'moderationColor', fnc: this.color, priority: constants.MODERATION, permission: constants.VIEWERS, this: this },
-        { name: 'moderationEmotes', fnc: this.emotes, priority: constants.MODERATION, permission: constants.VIEWERS, this: this },
-        { name: 'moderationBlacklist', fnc: this.blacklist, priority: constants.MODERATION, permission: constants.VIEWERS, this: this }
-      ]
-  }
-
-  webPanel () {
-    global.panel.addMenu({category: 'settings', name: 'moderation', id: 'moderation'})
-    global.panel.socketListening(this, 'moderation.lists.get', this.emitLists)
-    global.panel.socketListening(this, 'moderation.lists.set', this.setLists)
-  }
-
-  async emitLists (self, socket) {
-    socket.emit('moderation.lists', {
-      blacklist: _.get(await global.db.engine.findOne('settings', { key: 'blacklist' }), 'value', []),
-      whitelist: _.get(await global.db.engine.findOne('settings', { key: 'whitelist' }), 'value', [])
+  sockets () {
+    this.socket.on('connection', (socket) => {
+      socket.on('lists.get', async (cb) => {
+        cb(null, {
+          blacklist: await this.settings.lists.blacklist,
+          whitelist: await this.settings.lists.whitelist
+        })
+      })
+      socket.on('lists.set', async (data) => {
+        this.settings.lists.blacklist = data.blacklist.filter(entry => entry.trim() !== '')
+        this.settings.lists.whitelist = data.whitelist.filter(entry => entry.trim() !== '')
+      })
     })
   }
 
-  setLists (self, socket, data) {
-    global.db.engine.update('settings', { key: 'blacklist' }, { value: data.blacklist.filter(entry => entry.trim() !== '') })
-    global.db.engine.update('settings', { key: 'whitelist' }, { value: data.whitelist.filter(entry => entry.trim() !== '') })
+  configuration () {
+    global.configuration.register('moderationLinks', 'core.settings.moderation.moderationLinks', 'bool', true)
+    global.configuration.register('moderationLinksWithSpaces', 'core.settings.moderation.moderationLinksWithSpaces', 'bool', false)
+    global.configuration.register('moderationLinksSubs', 'core.settings.moderation.moderationLinksSubs', 'bool', true)
+    global.configuration.register('moderationLinksClips', 'core.settings.moderation.moderationLinksClips', 'bool', true)
+    global.configuration.register('moderationLinksTimeout', 'core.settings.moderation.moderationLinksTimeout', 'number', 120)
+
+    global.configuration.register('moderationSymbols', 'core.settings.moderation.moderationSymbols', 'bool', true)
+    global.configuration.register('moderationSymbolsSubs', 'core.settings.moderation.moderationSymbolsSubs', 'bool', true)
+    global.configuration.register('moderationSymbolsTimeout', 'core.settings.moderation.moderationSymbolsTimeout', 'number', 120)
+    global.configuration.register('moderationSymbolsTriggerLength', 'core.settings.moderation.moderationSymbolsTriggerLength', 'number', 15)
+    global.configuration.register('moderationSymbolsMaxConsecutively', 'core.settings.moderation.moderationSymbolsMaxConsecutively', 'number', 10)
+    global.configuration.register('moderationSymbolsMaxPercent', 'core.settings.moderation.moderationSymbolsMaxPercent', 'number', 50)
+
+    global.configuration.register('moderationLongMessage', 'core.settings.moderation.moderationLongMessage', 'bool', true)
+    global.configuration.register('moderationLongMessageSubs', 'core.settings.moderation.moderationLongMessageSubs', 'bool', true)
+    global.configuration.register('moderationLongMessageTimeout', 'core.settings.moderation.moderationLongMessageTimeout', 'number', 120)
+    global.configuration.register('moderationLongMessageTriggerLength', 'core.settings.moderation.moderationLongMessageTriggerLength', 'number', 300)
+
+    global.configuration.register('moderationCaps', 'core.settings.moderation.moderationCaps', 'bool', true)
+    global.configuration.register('moderationCapsSubs', 'core.settings.moderation.moderationCapsSubs', 'bool', true)
+    global.configuration.register('moderationCapsTimeout', 'core.settings.moderation.moderationCapsTimeout', 'number', 120)
+    global.configuration.register('moderationCapsTriggerLength', 'core.settings.moderation.moderationCapsTriggerLength', 'number', 15)
+    global.configuration.register('moderationCapsMaxPercent', 'core.settings.moderation.moderationCapsMaxPercent', 'number', 50)
+
+    global.configuration.register('moderationSpam', 'core.settings.moderation.moderationSpam', 'bool', true)
+    global.configuration.register('moderationSpamSubs', 'core.settings.moderation.moderationSpamSubs', 'bool', true)
+    global.configuration.register('moderationSpamTimeout', 'core.settings.moderation.moderationSpamTimeout', 'number', 300)
+    global.configuration.register('moderationSpamTriggerLength', 'core.settings.moderation.moderationSpamTriggerLength', 'number', 15)
+    global.configuration.register('moderationSpamMaxLength', 'core.settings.moderation.moderationSpamMaxLength', 'number', 15)
+
+    global.configuration.register('moderationColor', 'core.settings.moderation.moderationColor', 'bool', true)
+    global.configuration.register('moderationColorSubs', 'core.settings.moderation.moderationColorSubs', 'bool', true)
+    global.configuration.register('moderationColorTimeout', 'core.settings.moderation.moderationColorTimeout', 'number', 120)
+
+    global.configuration.register('moderationEmotes', 'core.settings.moderation.moderationEmotes', 'bool', true)
+    global.configuration.register('moderationEmotesSubs', 'core.settings.moderation.moderationEmotesSubs', 'bool', true)
+    global.configuration.register('moderationEmotesTimeout', 'core.settings.moderation.moderationEmotesTimeout', 'number', 120)
+    global.configuration.register('moderationEmotesMaxCount', 'core.settings.moderation.moderationEmotesMaxCount', 'number', 15)
+
+    global.configuration.register('moderationBlacklistTimeout', 'core.settings.moderation.moderationBlacklistTimeout', 'number', 120)
+    global.configuration.register('moderationBlacklistSubs', 'core.settings.moderation.moderationBlacklistSubs', 'bool', true)
+
+    global.configuration.register('moderationWarnings', 'core.settings.moderation.moderationWarnings', 'number', 3)
+    global.configuration.register('moderationAnnounceTimeouts', 'core.settings.moderation.moderationAnnounceTimeouts', 'bool', true)
+    global.configuration.register('moderationWarningsTimeouts', 'core.settings.moderation.moderationWarningsTimeouts', 'bool', true)
   }
 
   async timeoutUser (sender, text, warning, msg, time, type) {
@@ -177,8 +170,8 @@ class Moderation {
     }
 
     text = ` ${text} `
-    let whitelist = await global.db.engine.findOne('settings', { key: 'whitelist' })
-    for (let value of _.get(whitelist, 'value', [])) {
+    let whitelist = await this.settings.lists.whitelist
+    for (let value of whitelist) {
       value = value.trim().replace(/\*/g, '[\\pL0-9]*').replace(/\+/g, '[\\pL0-9]+')
       const regexp = XRegExp(` [^\\s\\pL0-9\\w]?${value}[^\\s\\pL0-9\\w]? `, 'gi')
       // we need to change 'text' to ' text ' for regexp to correctly work
@@ -448,14 +441,14 @@ class Moderation {
       global.configuration.getValue('moderationBlacklistSubs'),
       global.commons.isMod(opts.sender),
       global.configuration.getValue('moderationBlacklistTimeout'),
-      global.db.engine.findOne('settings', { key: 'blacklist' })
+      this.settings.lists.blacklist
     ])
     if (global.commons.isOwner(opts.sender) || isMod || (opts.sender.subscriber && !isEnabledForSubs)) {
       return true
     }
 
     let isOK = true
-    for (let value of _.get(blacklist, 'value', [])) {
+    for (let value of blacklist) {
       value = value.trim().replace(/\*/g, '[\\pL0-9]*').replace(/\+/g, '[\\pL0-9]+')
       const regexp = XRegExp(` [^\\s\\pL0-9\\w]?${value}[^\\s\\pL0-9\\w]? `, 'gi')
       // we need to change 'text' to ' text ' for regexp to correctly work

@@ -66,6 +66,24 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  moderation: [{
+    version: '7.6.0',
+    do: async () => {
+      console.info('Moving blacklist and whitelist from settings to systems.moderation.settings')
+      let processed = 0
+      for (let list of ['whitelist', 'blacklist']) {
+        let item = await global.db.engine.findOne('settings', { key: list })
+        if (!_.isEmpty(item)) {
+          for (let word of item.value) {
+            await global.db.engine.insert('systems.moderation.settings', { category: 'lists', key: list, value: word })
+            processed++
+          }
+        }
+        await global.db.engine.remove('settings', { key: list })
+      }
+      console.info(` => ${processed} processed`)
+    }
+  }],
   keywords: [{
     version: '7.6.0',
     do: async () => {

@@ -92,14 +92,16 @@ describe('systems/moderation - whitelist()', () => {
   for (let [pattern, test] of Object.entries(tests)) {
     for (let text of _.get(test, 'should.return.changed', [])) {
       it(`pattern '${pattern}' should change '${text}'`, async () => {
-        await global.db.engine.update('settings', { key: 'whitelist' }, { value: [pattern] })
+        await global.db.engine.remove('systems.moderation.settings', { category: 'lists', key: 'whitelist' })
+        await global.db.engine.insert('systems.moderation.settings', { category: 'lists', key: 'whitelist', value: pattern })
         let result = await global.systems.moderation.whitelist(text)
         assert.isTrue(text !== result)
       })
     }
     for (let text of _.get(test, 'should.return.same', [])) {
       it(`pattern '${pattern}' should not change '${text}'`, async () => {
-        await global.db.engine.update('settings', { key: 'whitelist' }, { value: [pattern] })
+        await global.db.engine.remove('systems.moderation.settings', { category: 'lists', key: 'whitelist' })
+        await global.db.engine.insert('systems.moderation.settings', { category: 'lists', key: 'whitelist', value: pattern })
         let result = await global.systems.moderation.whitelist(text)
         assert.isTrue(text === result)
       })
