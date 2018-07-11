@@ -91,11 +91,10 @@ class System {
           })
         }
       } else if (_.isString(values) || _.isBoolean(values) || _.isNumber(values)) {
-        const key = values
         this._settings[category] = () => {
           return new Promise(async (resolve, reject) => {
             const currentValue = await global.db.engine.findOne(this.collection.settings, { category })
-            resolve(_.isNil(currentValue.value) ? key : currentValue.value)
+            resolve(_.isNil(currentValue.value) ? values : currentValue.value)
           })
         }
 
@@ -103,8 +102,29 @@ class System {
         if (_.isNil(this.settings[category])) this.settings[category] = null
         Object.defineProperty(this.settings, `${category}`, {
           get: () => this._settings[category](),
-          set: (value) => global.db.engine.update(this.collection.settings, { category, key }, { value })
+          set: (value) => global.db.engine.update(this.collection.settings, { category }, { value })
         })
+      } else if (_.isObjectLike(values)) {
+        for (let [key, value] of Object.entries(values)) {
+          if (_.isNil(this.settings)) this.settings = {}
+          if (_.isNil(this.settings[category])) this.settings[category] = {}
+          if (_.isNil(this.settings[category][key])) this.settings[category][key] = null
+
+          this._settings[category][key] = () => {
+            return new Promise(async (resolve, reject) => {
+              const currentValue = await global.db.engine.find(this.collection.settings, { category, key })
+              resolve(_.isEmpty(currentValue) ? value : currentValue.map(o => o.value))
+            })
+          }
+          Object.defineProperty(this.settings[category], `${key}`, {
+            get: () => this._settings[category][key](),
+            set: async (values) => {
+              const valuesFromDb = (await global.db.engine.find(this.collection.settings, { category })).map((o) => o.value)
+              for (let toRemoveValue of _.difference(valuesFromDb, values)) await global.db.engine.remove(this.collection.settings, { category, key, value: toRemoveValue })
+              for (let toAddValue of _.difference(values, valuesFromDb)) await global.db.engine.insert(this.collection.settings, { category, key, value: toAddValue })
+            }
+          })
+        }
       } else throw Error(`This variable type cannot be used here ${typeof values}`)
     }
   }

@@ -91,14 +91,16 @@ describe('systems/moderation - blacklist()', () => {
   for (let [pattern, test] of Object.entries(tests)) {
     for (let text of _.get(test, 'should.return.true', [])) {
       it(`pattern '${pattern}' should ignore '${text}'`, async () => {
-        await global.db.engine.update('settings', { key: 'blacklist' }, { value: [pattern] })
+        await global.db.engine.remove('systems.moderation.settings', { category: 'lists', key: 'blacklist' })
+        await global.db.engine.insert('systems.moderation.settings', { category: 'lists', key: 'blacklist', value: pattern })
         let result = await global.systems.moderation.blacklist({ sender: { username: 'testuser' }, message: text })
         assert.isTrue(result)
       })
     }
     for (let text of _.get(test, 'should.return.false', [])) {
       it(`pattern '${pattern}' should timeout on '${text}'`, async () => {
-        await global.db.engine.update('settings', { key: 'blacklist' }, { value: [pattern] })
+        await global.db.engine.remove('systems.moderation.settings', { category: 'lists', key: 'blacklist' })
+        await global.db.engine.insert('systems.moderation.settings', { category: 'lists', key: 'blacklist', value: pattern })
         let result = await global.systems.moderation.blacklist({ sender: { username: 'testuser' }, message: text })
         assert.isFalse(result)
       })

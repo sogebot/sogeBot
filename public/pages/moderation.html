@@ -473,8 +473,9 @@
 </div>
 
 <script>
+  var moderationSocket = io('/system/Moderation', { query: "token=" + token })
+
   socket.emit('getConfiguration')
-  socket.emit('moderation.lists.get')
 
   var createToggle = function (id, value, options) {
     options = options || {
@@ -548,14 +549,13 @@
     })
   })
 
-  socket.off('moderation.lists')
-  socket.on('moderation.lists', function (lists) {
+  moderationSocket.emit('lists.get', function (err, lists) {
     $('#blacklist-textarea').val(!_.isNil(lists.blacklist) ? lists.blacklist.join('\n') : '')
     $('#whitelist-textarea').val(!_.isNil(lists.whitelist) ? lists.whitelist.join('\n') : '')
   })
 
   $('#blacklist, #whitelist').off().on('focusout keyup', function (ev) {
-    socket.emit('moderation.lists.set', {
+    moderationSocket.emit('lists.set', {
       blacklist: $('#blacklist-textarea').val().split('\n'),
       whitelist: $('#whitelist-textarea').val().split('\n')
     })
