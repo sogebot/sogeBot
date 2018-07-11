@@ -75,7 +75,7 @@ let migration = {
         let item = await global.db.engine.findOne('settings', { key: list })
         if (!_.isEmpty(item)) {
           for (let word of item.value) {
-            await global.db.engine.insert('systems.moderation.settings', { category: 'lists', key: list, value: word })
+            await global.db.engine.insert('systems.moderation.settings', { category: 'lists', key: list, value: word, isMultiValue: true })
             processed++
           }
         }

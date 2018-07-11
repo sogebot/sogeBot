@@ -232,7 +232,19 @@ function Panel () {
     })
 
     // send enabled systems
-    socket.on('getSystems', function () { socket.emit('systems', config.systems) })
+    socket.on('systems', async (cb) => {
+      let toEmit = []
+      for (let system of Object.keys(global.systems).filter(o => !o.startsWith('_'))) {
+        if (!global.systems[system].settings) continue
+        toEmit.push({
+          name: system.toLowerCase(),
+          enabled: await global.systems[system].settings.enabled,
+          areDependenciesEnabled: await global.systems[system]._dependenciesEnabled(),
+          isDisabledByEnv: !_.isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*')
+        })
+      }
+      cb(null, toEmit)
+    })
     socket.on('getVersion', function () { socket.emit('version', process.env.npm_package_version) })
 
     socket.on('parser.isRegistered', function (data) {

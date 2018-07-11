@@ -33,7 +33,7 @@ class Cooldown extends System {
     }
     super({ settings })
 
-    this.addMenu({category: 'manage', name: 'cooldowns', id: 'cooldown/list'})
+    this.addMenu({category: 'manage', name: 'cooldown', id: 'cooldown/list'})
   }
 
   sockets () {

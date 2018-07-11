@@ -27,9 +27,13 @@ window.textWithTags = {
 
 /* command input for settings  */
 window.commandInput = {
-  props: ['value', 'command'],
+  props: ['value', 'command', 'type'],
   methods: {
     update: function () {
+      if (this.type === 'number') {
+        if (_.isFinite(Number(this.currentValue))) this.currentValue = Number(this.currentValue)
+        else this.currentValue = this.value
+      }
       this.$emit('update', this.currentValue)
     }
   },
@@ -44,6 +48,33 @@ window.commandInput = {
         <span class="input-group-text">{{ command }}</span>
       </div>
       <input v-on:keyup="update" v-model="currentValue" class="form-control" type="text" />
+    </div>`
+}
+
+/* textarea input for arrays  */
+window.textAreaFromArray = {
+  props: ['value', 'title'],
+  methods: {
+    update: function () {
+      this.$emit('update', this.currentValue.split('\n'))
+    }
+  },
+  data: function () {
+    return {
+      currentValue: this.value.join('\n')
+    }
+  },
+  template: `
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text text-left">
+          <span class="d-block">
+            {{ title }}
+            <small class="d-block">{{ commons.translate('one-record-per-line') }}</small>
+          </span>
+        </span>
+      </div>
+      <textarea v-on:keyup="update" v-model="currentValue" class="form-control" type="text"></textarea>
     </div>`
 }
 

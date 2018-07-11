@@ -58,8 +58,8 @@ describe('systems/moderation - containsLink()', () => {
   describe('moderationLinksClips=true & moderationLinksWithSpaces=true', async () => {
     before(async () => {
       await db.cleanup()
-      await global.db.engine.insert('settings', { key: 'moderationLinksWithSpaces', value: 'true' })
-      await global.db.engine.insert('settings', { key: 'moderationLinksClips', value: 'true' })
+      await (global.systems.moderation.settings.links.includeSpaces = true)
+      await (global.systems.moderation.settings.links.includeClips = true)
     })
 
     for (let [type, listOfTests] of Object.entries(tests)) {
@@ -97,8 +97,8 @@ describe('systems/moderation - containsLink()', () => {
   describe('moderationLinksClips=false & moderationLinksWithSpaces=true', async () => {
     before(async () => {
       await db.cleanup()
-      await global.db.engine.insert('settings', { key: 'moderationLinksWithSpaces', value: 'true' })
-      await global.db.engine.insert('settings', { key: 'moderationLinksClips', value: 'false' })
+      await (global.systems.moderation.settings.links.includeSpaces = true)
+      await (global.systems.moderation.settings.links.includeClips = false)
     })
 
     for (let [type, listOfTests] of Object.entries(tests)) {
@@ -136,8 +136,8 @@ describe('systems/moderation - containsLink()', () => {
   describe('moderationLinksClips=true & moderationLinksWithSpaces=false', async () => {
     before(async () => {
       await db.cleanup()
-      await global.db.engine.insert('settings', { key: 'moderationLinksWithSpaces', value: 'false' })
-      await global.db.engine.insert('settings', { key: 'moderationLinksClips', value: 'true' })
+      await (global.systems.moderation.settings.links.includeSpaces = false)
+      await (global.systems.moderation.settings.links.includeClips = true)
     })
 
     for (let [type, listOfTests] of Object.entries(tests)) {

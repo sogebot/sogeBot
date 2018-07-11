@@ -23,7 +23,7 @@ describe('systems/moderation - Caps()', () => {
   describe('moderationCaps=false', async () => {
     before(async () => {
       await db.cleanup()
-      await global.db.engine.insert('settings', { key: 'moderationCaps', value: 'false' })
+      await (global.systems.moderation.settings.caps.enabled = false)
     })
 
     for (let test of tests.timeout) {
