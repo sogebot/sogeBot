@@ -667,7 +667,7 @@ class API {
 
         let when = await global.cache.when()
         if (_.isNil(when.offline)) {
-          global.log.stop()
+          if (!_.isNil(when.online)) global.log.stop('')
           global.cache.when({ offline: moment().format() })
           global.events.fire('stream-stopped')
           global.events.fire('stream-is-running-x-minutes', { reset: true })
