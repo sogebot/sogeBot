@@ -1,9 +1,9 @@
-const System = require('../systems/_interface')
+const Module = require('../_interface')
 
-class Game extends System {
+class Game extends Module {
   constructor (opts) {
+    opts.name = 'games'
     super(opts)
-    this._name = 'games'
   }
 }
 
