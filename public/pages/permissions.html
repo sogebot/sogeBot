@@ -22,19 +22,19 @@
         $("#Permissions").append('<tr>' +
           '<td>' + command.command + '</td>' +
           '<td>' +
-          '<button onclick="permissions.change(this)" data-command="' + command.command +
+          '<button onclick="permissions.change(this)" data-id="' + command.id +
           '" data-permission="owner" type="button" class="btn ' + (command.permission === 0 ? 'btn-success' :
             'btn-link') + '" title="Owner">OWNER</button>' +
-          '<button onclick="permissions.change(this)" data-command="' + command.command +
+          '<button onclick="permissions.change(this)" data-id="' + command.id +
           '" data-permission="mods" type="button" class="btn ' + (command.permission === 2 ? 'btn-primary' :
             'btn-link') + '" title="Moderator">MOD</button>' +
-          '<button onclick="permissions.change(this)" data-command="' + command.command +
+          '<button onclick="permissions.change(this)" data-id="' + command.id +
           '" data-permission="regular" type="button" class="btn ' + (command.permission === 3 ? 'btn-info' :
             'btn-link') + '" title="Regulars">REGULAR</button>' +
-          '<button onclick="permissions.change(this)" data-command="' + command.command +
+          '<button onclick="permissions.change(this)" data-id="' + command.id +
           '" data-permission="viewer" type="button" class="btn ' + (command.permission === 1 ? 'btn-warning' :
             'btn-link') + '" title="Viewer">VIEWER</i></button>' +
-          '<button onclick="permissions.change(this)" data-command="' + command.command +
+          '<button onclick="permissions.change(this)" data-id="' + command.id +
           '" data-permission="disable" type="button" class="btn ' + (command.permission === -1 ? 'btn-danger' :
             'btn-link') + '" title="Disable">DISABLE</button>' +
           '</td>' +
@@ -43,7 +43,7 @@
     },
     change: function (el) {
       var data = {
-        command: el.dataset.command.split('!')[1],
+        id: el.dataset.id.split('!')[1],
         permission: el.dataset.permission
       }
       socket.emit('changePermission', data)

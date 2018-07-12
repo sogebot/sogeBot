@@ -28,11 +28,37 @@ class Permissions {
 
   async sendSocket (self, socket) {
     let parser = new Parser()
-    socket.emit('Permissions', await parser.getCommandsList())
+    const commands = await parser.getCommandsList()
+
+    let toEmit = []
+    for (let command of commands) {
+      toEmit.push({
+        id: command.id,
+        command: command.command,
+        permission: command.permission
+      })
+    }
+    socket.emit('Permissions', _.orderBy(toEmit, o => o.command))
   }
 
   async changeSocket (self, socket, data) {
-    await self.override(self, null, data.permission + ' ' + data.command)
+    switch (data.permission) {
+      case 'viewer':
+        data.permission = constants.VIEWERS
+        break
+      case 'mods':
+        data.permission = constants.MODS
+        break
+      case 'disable':
+        data.permission = constants.DISABLE
+        break
+      case 'regular':
+        data.permission = constants.REGULAR
+        break
+      default:
+        data.permission = constants.OWNER_ONLY
+    }
+    await global.db.engine.update('permissions', { key: data.id.replace('!', '') }, { key: data.id.replace('!', ''), permission: data.permission })
   }
 
   removePermission (self, command) {
