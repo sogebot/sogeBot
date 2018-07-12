@@ -8,7 +8,7 @@ const message = require('../../general.js').message
 const hugePointsUser = { username: 'hugeuser', points: 99999999999999999999999999999999 }
 const tinyPointsUser = { username: 'tinyuser', points: 100 }
 
-describe('Points - getPointsFromUser()', () => {
+describe('Points - get()', () => {
   before(async () => {
     await db.cleanup()
     await message.prepare()
@@ -20,7 +20,7 @@ describe('Points - getPointsFromUser()', () => {
     })
 
     it('points should be returned in safe points bounds', async () => {
-      await global.systems.points.getPointsFromUser({ sender: hugePointsUser, parameters: '' })
+      await global.systems.points.get({ sender: hugePointsUser, parameters: '' })
       await message.isSent('points.defaults.pointsResponse', { username: hugePointsUser.username }, {
         amount: Math.floor(Number.MAX_SAFE_INTEGER / 1000000),
         username: hugePointsUser.username,
@@ -35,7 +35,7 @@ describe('Points - getPointsFromUser()', () => {
     })
 
     it('points should be returned in safe points bounds', async () => {
-      await global.systems.points.getPointsFromUser({ sender: tinyPointsUser, parameters: '' })
+      await global.systems.points.get({ sender: tinyPointsUser, parameters: '' })
       await message.isSent('points.defaults.pointsResponse', { username: tinyPointsUser.username }, {
         amount: 100,
         username: tinyPointsUser.username,

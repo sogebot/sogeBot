@@ -43,7 +43,7 @@ class Module {
         socket.on('settings.update', async (data, cb) => {
           for (let [key, value] of Object.entries(data)) {
             if (key === 'enabled' && this._name === 'library') continue
-            else if (key === 'enabled') this.status(value)
+            else if (key === 'enabled') this.status({ state: value })
             else if (key === 'commands') {
               for (let [defaultValue, currentValue] of Object.entries(value)) {
                 this.settings.commands[defaultValue] = currentValue
@@ -157,26 +157,27 @@ class Module {
     })
   }
 
-  async status (state) {
+  async status (opts) {
+    opts = opts || {}
     if (this._name === 'library') return true
 
     const areDependenciesEnabled = await this._dependenciesEnabled()
-    const isMasterAndStatusOnly = cluster.isMaster && _.isNil(state)
-    const isStatusChanged = !_.isNil(state)
+    const isMasterAndStatusOnly = cluster.isMaster && _.isNil(opts.state)
+    const isStatusChanged = !_.isNil(opts.state)
     const isDisabledByEnv = !_.isNil(process.env.DISABLE) &&
       (process.env.DISABLE.toLowerCase().split(',').includes(this.constructor.name.toLowerCase()) || process.env.DISABLE === '*')
 
-    if (isStatusChanged) this.settings.enabled = state
-    else state = await this.settings.enabled
+    if (isStatusChanged) this.settings.enabled = opts.state
+    else opts.state = await this.settings.enabled
 
-    if (!areDependenciesEnabled || isDisabledByEnv) state = false // force disable if dependencies are disabled or disabled by env
+    if (!areDependenciesEnabled || isDisabledByEnv) opts.state = false // force disable if dependencies are disabled or disabled by env
 
-    if (isMasterAndStatusOnly || isStatusChanged) {
+    if ((isMasterAndStatusOnly || isStatusChanged) && !opts.quiet) {
       if (isDisabledByEnv) global.log.info(`${chalk.red('DISABLED BY ENV')}: ${this.constructor.name} (${this._name})`)
-      else if (!areDependenciesEnabled) global.log.info(`${chalk.red('DISABLED BY DEP')}: ${this.constructor.name} (${this._name})`)
-      else global.log.info(`${state ? chalk.green('ENABLED') : chalk.red('DISABLED')}: ${this.constructor.name} (${this._name})`)
+      else if (areDependenciesEnabled) global.log.info(`${opts.state ? chalk.green('ENABLED') : chalk.red('DISABLED')}: ${this.constructor.name} (${this._name})`)
+      else global.log.info(`${chalk.red('DISABLED BY DEP')}: ${this.constructor.name} (${this._name})`)
     }
-    return state
+    return opts.state
   }
 
   addMenu (opts) {
@@ -308,7 +309,7 @@ class Module {
   }
 
   async isEnabled () {
-    return this.status()
+    return this.status({ quiet: true })
   }
 }
 
