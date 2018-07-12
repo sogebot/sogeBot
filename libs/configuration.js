@@ -139,7 +139,7 @@ class Configuration {
 
       if (_.isNil(global[type][name])) throw new Error(`Not found - ${type} - ${name}`)
 
-      global[type][name].status(opts.enable)
+      global[type][name].status({state: opts.enable})
     } catch (e) {
       global.log.error(e.message)
     }
