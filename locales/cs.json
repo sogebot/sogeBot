@@ -1181,6 +1181,7 @@
     "user-have-timeout-for-blacklist": "Zadne zakazane slova"
   },
   "queue": {
+    "list": "$sender, v queue jsou prihlaseni: $users",
     "info": {
       "closed": "$sender, {queue.close}",
       "opened": "$sender, {queue.open}"

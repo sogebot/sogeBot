@@ -188,7 +188,7 @@ class Module {
   async getAllSettings () {
     let promisedSettings = {}
     for (let [category, values] of Object.entries(this._settings)) {
-      if (category === 'parsers') continue
+      if (category === 'parsers' || category === '_') continue
       if (_.isObject(values) && !_.isFunction(values)) {
         if (_.isNil(promisedSettings[category])) promisedSettings[category] = {} // init if not existing
         for (let [key, getValue] of Object.entries(values)) {

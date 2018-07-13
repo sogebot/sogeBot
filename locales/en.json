@@ -1175,6 +1175,7 @@
     "user-have-timeout-for-blacklist": "No blacklisted words"
   },
   "queue": {
+    "list": "$sender, current queue pool: $users",
     "info": {
       "closed": "$sender, {queue.close}",
       "opened": "$sender, {queue.open}"
