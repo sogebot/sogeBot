@@ -38,11 +38,28 @@ class Configuration {
 
     const lang = await global.configuration.getValue('lang')
     const mute = await global.configuration.getValue('mute')
+
+    let enabledSystems = {}
+    for (let category of ['systems', 'games']) {
+      if (_.isNil(enabledSystems[category])) enabledSystems[category] = []
+      for (let system of Object.keys(global[category]).filter(o => !o.startsWith('_'))) {
+        if (!global[category][system].settings) continue
+        let [enabled, areDependenciesEnabled, isDisabledByEnv] = await Promise.all([
+          global[category][system].settings.enabled,
+          global[category][system]._dependenciesEnabled(),
+          !_.isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*')
+        ])
+        if (!enabled || !areDependenciesEnabled || isDisabledByEnv) continue
+        enabledSystems[category].push(system)
+      }
+    }
+
     global.log.debug(`======= COPY DEBUG MESSAGE FROM HERE =======`)
     global.log.debug(`GENERAL | OS: ${process.env.npm_config_user_agent} | DB: ${config.database.type} | Bot version: ${process.env.npm_package_version} | Bot uptime: ${process.uptime()} | Bot lang: ${lang} | Bot mute: ${mute}`)
-    global.log.debug(`SYSTEMS | ${_.keys(_.pickBy(config.systems)).join(', ')}`)
+    global.log.debug(`SYSTEMS | ${enabledSystems.systems.join(', ')}`)
+    global.log.debug(`GAMES   | ${enabledSystems.games.join(', ')}`)
     global.log.debug(`WIDGETS | ${_.map(widgets, 'id').join(', ')}`)
-    global.log.debug(`OAUTH | BOT ${!oauth.bot} | BROADCASTER ${!oauth.broadcaster}`)
+    global.log.debug(`OAUTH   | BOT ${!oauth.bot} | BROADCASTER ${!oauth.broadcaster}`)
     global.log.debug('======= END OF DEBUG MESSAGE =======')
   }
 
