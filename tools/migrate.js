@@ -66,6 +66,23 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  prices: [{
+    version: '7.6.0',
+    do: async () => {
+      console.info('Moving prices from prices to systems.price')
+      let items = await global.db.engine.find('prices')
+      let processed = 0
+      for (let item of items) {
+        delete item._id
+        item.command = `!${item.command}`
+        await global.db.engine.insert('systems.price', item)
+        processed++
+      }
+      await global.db.engine.remove('prices', {})
+      console.info(` => ${processed} processed`)
+      console.info(` !! prices collection can be deleted`)
+    }
+  }],
   moderation: [{
     version: '7.6.0',
     do: async () => {
