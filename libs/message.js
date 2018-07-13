@@ -217,9 +217,9 @@ class Message {
     let price = {
       '(price)': async function (filter) {
         let price = 0
-        if (global.commons.isSystemEnabled('price') && global.commons.isSystemEnabled('points')) {
-          price = _.find(global.systems.price.prices, function (o) { return o.command === attr.cmd.command })
-          price = !_.isNil(price) ? price.price : 0
+        if (await global.systems.price.isEnabled()) {
+          let command = await global.db.engine.findOne(global.systems.price.collection.data, { command: attr.cmd })
+          price = _.isEmpty(command) ? 0 : command.price
         }
         return [price, await global.systems.points.getPointsName(price)].join(' ')
       }
@@ -237,10 +237,10 @@ class Message {
         let system = filter.replace('(list.', '').replace(')', '')
 
         let [alias, commands, cooldowns, ranks] = await Promise.all([
-          global.db.engine.find('systems.alias', { visible: true, enabled: true }),
-          global.db.engine.find('systems.customcommands', { visible: true, enabled: true }),
-          global.db.engine.find('systems.cooldown', { enabled: true }),
-          global.db.engine.find('systems.ranks')])
+          global.db.engine.find(global.systems.alias.collection.data, { visible: true, enabled: true }),
+          global.db.engine.find(global.systems.customcommands.collection.data, { visible: true, enabled: true }),
+          global.db.engine.find(global.systems.cooldown.collection.data, { enabled: true }),
+          global.db.engine.find(global.systems.ranks.collection.data)])
 
         switch (system) {
           case 'alias':
