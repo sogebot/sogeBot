@@ -4,6 +4,8 @@
 const _ = require('lodash')
 // bot libraries
 const constants = require('../constants')
+const Parser = require('../parser')
+const System = require('./_interface')
 const debug = require('debug')('systems:price')
 
 /*
@@ -14,49 +16,61 @@ const debug = require('debug')('systems:price')
  * !price toggle [cmd]        - remove notice by id
  */
 
-class Price {
+class Price extends System {
   constructor () {
-    if (global.commons.isSystemEnabled('points') && global.commons.isSystemEnabled(this) && require('cluster').isMaster) {
-      global.panel.addMenu({category: 'manage', name: 'price', id: 'price'})
-      global.panel.registerSockets({
-        self: this,
-        expose: ['set', 'unset', 'toggle', 'editCommand', 'send'],
-        finally: this.send
-      })
+    const dependsOn = [
+      'systems.points'
+    ]
+    const settings = {
+      commands: [
+        {name: '!price set', permission: constants.OWNER_ONLY},
+        {name: '!price list', permission: constants.OWNER_ONLY},
+        {name: '!price unset', permission: constants.OWNER_ONLY},
+        {name: '!price toggle', permission: constants.OWNER_ONLY},
+        {name: '!price', permission: constants.OWNER_ONLY}
+      ],
+      parsers: [
+        {name: 'check', priority: constants.HIGH}
+      ]
     }
+    super({settings, dependsOn})
+
+    this.addMenu({category: 'manage', name: 'price', id: 'price/list'})
   }
 
-  commands () {
-    return !global.commons.isSystemEnabled('price') && !global.commons.isSystemEnabled('points')
-      ? []
-      : [
-        {this: this, id: '!price set', command: '!price set', fnc: this.set, permission: constants.OWNER_ONLY},
-        {this: this, id: '!price list', command: '!price list', fnc: this.list, permission: constants.OWNER_ONLY},
-        {this: this, id: '!price unset', command: '!price unset', fnc: this.unset, permission: constants.OWNER_ONLY},
-        {this: this, id: '!price toggle', command: '!price toggle', fnc: this.toggle, permission: constants.OWNER_ONLY},
-        {this: this, id: '!price', command: '!price', fnc: this.help, permission: constants.OWNER_ONLY}
-      ]
+  sockets () {
+    this.socket.on('connection', (socket) => {
+      socket.on('update', async (items, cb) => {
+        for (let item of items) {
+          const _id = item._id; delete item._id
+          let itemFromDb = item
+          if (_.isNil(_id)) itemFromDb = await global.db.engine.insert(this.collection.data, item)
+          else await global.db.engine.update(this.collection.data, { _id }, item)
+
+          if (_.isFunction(cb)) cb(null, itemFromDb)
+        }
+      })
+      socket.on('delete', async (_id, cb) => {
+        await global.db.engine.remove(this.collection.data, { _id })
+        cb(null)
+      })
+      socket.on('find', async (where, cb) => {
+        where = where || {}
+        cb(null, await global.db.engine.find(this.collection.data, where))
+      })
+      socket.on('findOne', async (where, cb) => {
+        where = where || {}
+        cb(null, await global.db.engine.findOne(this.collection.data, where))
+      })
+    })
   }
 
-  parsers () {
-    return !global.commons.isSystemEnabled('price') && !global.commons.isSystemEnabled('points')
-      ? []
-      : [
-        {this: this, name: 'price', fnc: this.check, permission: constants.VIEWERS, priority: constants.HIGH}
-      ]
-  }
-
-  help (opts) {
+  main (opts) {
     global.commons.sendMessage(global.translate('core.usage') + ': !price set <cmd> <price> | !price unset <cmd> | !price list | !price toggle <cmd>', opts.sender)
   }
 
-  async send (self, socket) {
-    let prices = await global.db.engine.find('prices')
-    socket.emit('price', _.orderBy(prices, 'command', 'asc'))
-  }
-
   async set (opts) {
-    const parsed = opts.parameters.match(/^!?([\S]+) ([0-9]+)$/)
+    const parsed = opts.parameters.match(/^(![\S]+) ([0-9]+)$/)
 
     if (_.isNil(parsed)) {
       let message = await global.commons.prepare('price.price-parse-failed')
@@ -70,13 +84,13 @@ class Price {
       return false
     }
 
-    await global.db.engine.update('prices', { command: command }, { command: command, price: parseInt(price, 10), enabled: true })
-    let message = await global.commons.prepare('price.price-was-set', { command: `!${command}`, amount: parseInt(price, 10), pointsName: await global.systems.points.getPointsName(price) })
+    await global.db.engine.update(this.collection.data, { command: command }, { command: command, price: parseInt(price, 10), enabled: true })
+    let message = await global.commons.prepare('price.price-was-set', { command, amount: parseInt(price, 10), pointsName: await global.systems.points.getPointsName(price) })
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
   async unset (opts) {
-    const parsed = opts.parameters.match(/^!?([\S]+)$/)
+    const parsed = opts.parameters.match(/^(![\S]+)$/)
 
     if (_.isNil(parsed)) {
       let message = await global.commons.prepare('price.price-parse-failed')
@@ -85,14 +99,14 @@ class Price {
     }
 
     const command = parsed[1]
-    await global.db.engine.remove('prices', { command: command })
-    let message = await global.commons.prepare('price.price-was-unset', { command: `!${command}` })
+    await global.db.engine.remove(this.collection.data, { command: command })
+    let message = await global.commons.prepare('price.price-was-unset', { command })
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
   async toggle (opts) {
     debug('toggle(%j,%j,%j)', opts)
-    const parsed = opts.parameters.match(/^!?([\S]+)$/)
+    const parsed = opts.parameters.match(/^(![\S]+)$/)
 
     if (_.isNil(parsed)) {
       let message = await global.commons.prepare('price.price-parse-failed')
@@ -101,43 +115,34 @@ class Price {
     }
 
     const command = parsed[1]
-    const price = await global.db.engine.findOne('prices', { command: command })
+    const price = await global.db.engine.findOne(this.collection.data, { command: command })
     if (_.isEmpty(price)) {
-      let message = await global.commons.prepare('price.price-was-not-found', { command: `!${command}` })
+      let message = await global.commons.prepare('price.price-was-not-found', { command })
       debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
-    await global.db.engine.update('prices', { command: command }, { enabled: !price.enabled })
-    let message = await global.commons.prepare(!price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command: `!${command}` })
+    await global.db.engine.update(this.collection.data, { command: command }, { enabled: !price.enabled })
+    let message = await global.commons.prepare(!price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command })
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
   async list (opts) {
-    let prices = await global.db.engine.find('prices')
-    var output = (prices.length === 0 ? global.translate('price.list-is-empty') : global.translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => { return `!${o.command} - ${o.price}` })).join(', ')))
+    let prices = await global.db.engine.find(this.collection.data)
+    var output = (prices.length === 0 ? global.translate('price.list-is-empty') : global.translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => { return `${o.command} - ${o.price}` })).join(', ')))
     debug(output); global.commons.sendMessage(output, opts.sender)
   }
 
-  async editCommand (self, socket, data) {
-    debug('editCommand(%j, %j, %j)', self, socket, data)
-    if (data.value.length === 0) await self.unset(self, null, '!' + data.id)
-    else {
-      if (data.value.startsWith('!')) data.value = data.value.replace('!', '')
-      await global.db.engine.update('prices', { command: data.id }, { command: data.value })
-    }
-  }
-
   async check (opts) {
-    const parsed = opts.message.match(/^!([\S]+)/)
-    if (_.isNil(parsed) || global.commons.isOwner(opts.sender)) return true
-    /* TODO: Add isHelper checks
-    if (global.parser.registeredHelpers.includes(text.trim()) || global.parser.isOwner(sender) || _.isNil(parsed)) {
-      return true
-    }
-    */
+    const parsed = opts.message.match(/^(![\S]+)/)
+    const helpers = (await (new Parser()).getCommandsList()).filter(o => o.isHelper).map(o => o.command)
+    if (
+      _.isNil(parsed) ||
+      global.commons.isOwner(opts.sender) ||
+      helpers.includes(opts.message)
+    ) return true
 
-    const [user, price] = await Promise.all([global.users.get(opts.sender.username), global.db.engine.findOne('prices', { command: parsed[1], enabled: true })])
+    const [user, price] = await Promise.all([global.users.get(opts.sender.username), global.db.engine.findOne(this.collection.data, { command: parsed[1], enabled: true })])
 
     if (_.isEmpty(price)) { // no price set
       return true
@@ -147,7 +152,7 @@ class Price {
     var removePts = parseInt(price.price, 10)
     let haveEnoughPoints = availablePts >= removePts
     if (!haveEnoughPoints) {
-      let message = await global.commons.prepare('price.user-have-not-enough-points', { amount: removePts, command: `!${price.command}`, pointsName: await global.systems.points.getPointsName(removePts) })
+      let message = await global.commons.prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await global.systems.points.getPointsName(removePts) })
       debug(message); global.commons.sendMessage(message, opts.sender)
     } else {
       await global.db.engine.insert('users.points', { username: opts.sender.username, points: (removePts * -1) })
