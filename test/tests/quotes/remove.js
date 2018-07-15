@@ -28,7 +28,7 @@ describe('Quotes - remove()', () => {
       })
 
       it('Run !quote remove', async () => {
-        global.systems.quotes.remove({ sender: test.sender, parameters: test.parameters })
+        global.systems.quotes.remove({ sender: test.sender, parameters: test.parameters, command: '!quote remove' })
       })
       if (test.shouldFail) {
         it('Should throw error', async () => {

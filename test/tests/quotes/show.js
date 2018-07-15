@@ -28,7 +28,7 @@ const tests = [
   {sender: owner, parameters: '-tag general', id: 1, tag: 'general', shouldFail: false, exist: false}
 ]
 
-describe('Quotes - show()', () => {
+describe('Quotes - main()', () => {
   for (let test of tests) {
     describe(test.parameters, async () => {
       before(async () => {
@@ -37,8 +37,8 @@ describe('Quotes - show()', () => {
         await global.db.engine.insert('systems.quotes', { id: 1, tags: ['lorem ipsum'], quote: 'Lorem Ipsum', quotedBy: '12345' })
       })
 
-      it('Run !quote show', async () => {
-        global.systems.quotes.show({ sender: test.sender, parameters: test.parameters })
+      it('Run !quote', async () => {
+        global.systems.quotes.main({ sender: test.sender, parameters: test.parameters, command: '!quote' })
       })
       if (test.shouldFail) {
         it('Should throw error', async () => {

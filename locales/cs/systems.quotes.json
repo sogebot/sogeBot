@@ -1,6 +1,6 @@
 {
   "add": {
-    "ok": "$sender, citace $id '$quote' byla přidána. (tagy: $tags)`",
+    "ok": "$sender, citace $id '$quote' byla přidána. (tagy: $tags)",
     "error": "$sender, $command není správný nebo chybí -quote parametr"
   },
   "remove": {
