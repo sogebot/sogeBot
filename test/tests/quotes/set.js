@@ -32,7 +32,7 @@ describe('Quotes - set()', () => {
       })
 
       it('Run !quote set', async () => {
-        global.systems.quotes.set({ sender: test.sender, parameters: test.parameters })
+        global.systems.quotes.set({ sender: test.sender, parameters: test.parameters, command: '!quote set' })
       })
       if (test.shouldFail) {
         it('Should throw error', async () => {

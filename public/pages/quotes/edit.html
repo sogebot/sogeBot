@@ -1,6 +1,6 @@
 <span id="quote-edit">
   <span class="title text-default" style="padding: 0 !important;">
-    <a class="btn btn-outline-info" style="border: 0 !important;" href="/#quotes"><i class="fas fa-chevron-circle-left"></i></a>
+    <a class="btn btn-outline-info" style="border: 0 !important;" href="/#quotes/list"><i class="fas fa-chevron-circle-left"></i></a>
     <span style="position: relative; top: 2px;">{{ title }} </span>
     <span style="position: relative; top: 2px;" v-if="isEditation">{{commons.translate('systems.quotes.quote.name')}}#{{ id }}</span>
   </span>
@@ -51,6 +51,7 @@
     var quoteEdit = new Vue({
       el: '#quote-edit',
       data: {
+        _id: null,
         id: null,
         quote: '',
         tags: '',
@@ -79,8 +80,8 @@
           return _.filter(this.hasError, (o) => o === true).length === 0
         },
         deleteQuote: function () {
-          this.socket.emit('quote.delete', this.id, () => {
-            page('/#quotes')
+          this.socket.emit('delete', this._id, () => {
+            page('/#quotes/list')
           })
         },
         saveChanges: function () {
@@ -91,7 +92,7 @@
               quote: this.quote,
               tags: this.tags.split(',').map((o) => o.trim())
             }
-            this.socket.emit('quote.save', data, (err, _id) => {
+            this.socket.emit('update', [data], (err, _id) => {
               if (err) {
                 console.error(err)
                 return this.states.save = 3
@@ -123,7 +124,8 @@
 
     // load up from db
     if (commons.urlParam('id')) {
-      quoteEdit.socket.emit('quote.get', commons.urlParam('id'), (err, data) => {
+      quoteEdit.socket.emit('findOne', { _id: commons.urlParam('id') }, (err, data) => {
+        quoteEdit._id = data._id
         quoteEdit.id = data.id
         quoteEdit.quote = data.quote
         quoteEdit.tags = data.tags.map((o) => o.trim()).join(', ')
