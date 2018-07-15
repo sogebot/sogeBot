@@ -1,6 +1,6 @@
 {
   "add": {
-    "ok": "$sender, quote $id '$quote' was added. (tags: $tags)`",
+    "ok": "$sender, quote $id '$quote' was added. (tags: $tags)",
     "error": "$sender, $command is not correct or missing -quote parameter"
   },
   "remove": {

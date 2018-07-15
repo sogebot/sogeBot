@@ -33,7 +33,7 @@ describe('Quotes - add()', () => {
       })
 
       it('Run !quote add', async () => {
-        global.systems.quotes.add({ sender: test.sender, parameters: test.parameters })
+        global.systems.quotes.add({ sender: test.sender, parameters: test.parameters, command: '!quote add' })
       })
       if (test.shouldFail) {
         it('Should throw error', async () => {
