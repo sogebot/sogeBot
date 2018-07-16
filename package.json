@@ -79,7 +79,7 @@
     "test": "mocha --recursive --timeout 20000 --exit",
     "test:config:mongodb": "cp config.example.json config.json && sed -i -- 's/nedb/mongodb/g' config.json",
     "test:config:nedb": "cp config.example.json config.json",
-    "start": "node ./tools/migrate && npm-run-all --parallel build:css copy:dist && cross-env NODE_ENV=production node ./main || true",
+    "start": "node ./tools/migrate && node ./tools/migrate --delete && npm-run-all --parallel build:css copy:dist && cross-env NODE_ENV=production node ./main || true",
     "start-no-migration": "npm-run-all --parallel build:css copy:dist && cross-env NODE_ENV=production node ./main || true",
     "debug": "npm run copy:dist && node --inspect ./main || true",
     "cleanup": "node ./tools/cleanup.js || true",

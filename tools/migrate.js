@@ -2,10 +2,35 @@ const _ = require('lodash')
 const figlet = require('figlet')
 const config = require('../config.json')
 const compareVersions = require('compare-versions')
+const fs = require('fs')
 
 // logger
 const Logger = require('../libs/logging')
 global.logger = new Logger()
+
+const dropFiles = [
+  'playlist.db', 'songrequest.db', 'ranks.db', 'prices.db',
+  'commands.db', 'keywords.db', 'cooldowns.db', 'alias.db',
+  'cooldowns.viewers.db'
+]
+
+if (process.argv[2] && process.argv[2] === '--delete') {
+  console.info(('-').repeat(56))
+  console.info('Removing nedb files')
+
+  if (fs.existsSync('db/nedb/')) {
+    for (let file of dropFiles) {
+      if (fs.existsSync(`db/nedb/${file}`)) {
+        console.info(`- Removing db/nedb/${file}`)
+        fs.unlinkSync(`db/nedb/${file}`)
+      }
+    }
+  } else {
+    console.info('Nothing to do')
+  }
+  console.info(('-').repeat(56))
+  process.exit()
+}
 
 // db
 const Database = require('../libs/databases/database')
@@ -168,7 +193,7 @@ let migration = {
   keywords: [{
     version: '7.6.0',
     do: async () => {
-      console.info('Moving custom commands from keywords to systems.keywords')
+      console.info('Moving keywords to systems.keywords')
       let items = await global.db.engine.find('keywords')
       let processed = 0
       for (let item of items) {
@@ -178,7 +203,7 @@ let migration = {
       }
       await global.db.engine.remove('keywords', {})
       console.info(` => ${processed} processed`)
-      console.info(` !! commands collection can be deleted`)
+      console.info(` !! keywords collection can be deleted`)
     }
   }],
   customcommands: [{
@@ -211,7 +236,7 @@ let migration = {
       }
       await global.db.engine.remove('cooldowns', {})
       console.info(` => ${processed} processed`)
-      console.info(` !! cooldowns and cooldown.viewers collections can be deleted`)
+      console.info(` !! cooldowns collections can be deleted`)
     }
   }],
   alias: [{
