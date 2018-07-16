@@ -1,0 +1,14 @@
+{
+  "rank": {
+    "name": "hodnost",
+    "placeholder": ""
+  },
+  "value": {
+    "name": "hodiny",
+    "placeholder": ""
+  },
+  "error": {
+    "isEmpty": "Tato hodnota nesmí být prázdná"
+  },
+  "warning": "Tato akce nemůže být vrácena!"
+}
