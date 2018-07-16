@@ -162,7 +162,7 @@ class Songs extends System {
     if (cluster.isWorker) return process.send({ type: 'songs', fnc: 'sendNextSongID' })
     // check if there are any requests
     if (await this.settings.songrequest) {
-      let sr = await global.db.engine.find('songrequests')
+      let sr = await global.db.engine.find(this.collection.request)
       sr = _.head(_.orderBy(sr, ['addedAt'], ['asc']))
       if (!_.isNil(sr)) {
         let currentSong = sr
@@ -172,7 +172,7 @@ class Songs extends System {
 
         if (await this.settings.notify) self.notifySong(self)
         socket.emit('videoID', currentSong)
-        await global.db.engine.remove('songrequests', { videoID: sr.videoID })
+        await global.db.engine.remove(this.collection.request, { videoID: sr.videoID })
         return
       }
     }
@@ -248,7 +248,7 @@ class Songs extends System {
   }
 
   async getSongRequests (self, socket) {
-    let songrequests = await global.db.engine.find('songrequests')
+    let songrequests = await global.db.engine.find(this.collection.request)
     socket.emit('songRequestsList', _.orderBy(songrequests, ['addedAt'], ['asc']))
   }
 
@@ -281,7 +281,7 @@ class Songs extends System {
     }
 
     // is song banned?
-    let ban = await global.db.engine.findOne('songbanned', { videoID: videoID })
+    let ban = await global.db.engine.findOne(this.collection.ban, { videoID: videoID })
     if (!_.isEmpty(ban)) {
       global.commons.sendMessage(global.translate('songs.song-is-banned'), opts.sender)
       return
@@ -293,7 +293,7 @@ class Songs extends System {
         global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
       } else if (videoInfo.length_seconds / 60 > await this.settings.duration) global.commons.sendMessage(global.translate('songs.tooLong'), opts.sender)
       else {
-        global.db.engine.update('songrequests', { addedAt: new Date().getTime() }, { videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: opts.sender.username })
+        global.db.engine.update(this.collection.request, { addedAt: new Date().getTime() }, { videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: opts.sender.username })
         let message = await global.commons.prepare('songs.song-was-added-to-queue', { name: videoInfo.title })
         debug(message); global.commons.sendMessage(message, opts.sender)
         this.getMeanLoudness(this)
@@ -302,10 +302,10 @@ class Songs extends System {
   }
 
   async removeSongFromQueue (opts) {
-    let sr = await global.db.engine.find('songrequests', { username: opts.sender.username })
+    let sr = await global.db.engine.find(this.collection.request, { username: opts.sender.username })
     sr = _.head(_.orderBy(sr, ['addedAt'], ['desc']))
     if (!_.isNil(sr)) {
-      await global.db.engine.remove('songrequests', { username: opts.sender.username, _id: sr._id.toString() })
+      await global.db.engine.remove(this.collection.request, { username: opts.sender.username, _id: sr._id.toString() })
       let m = await global.commons.prepare('songs.song-was-removed-from-queue', { name: sr.title })
       debug(m); global.commons.sendMessage(m, opts.sender)
       this.getMeanLoudness(this)
@@ -320,7 +320,7 @@ class Songs extends System {
     var videoID = (match && match[1].length === 11) ? match[1] : opts.parameters
 
     // is song banned?
-    let ban = await global.db.engine.findOne('songbanned', { videoID: videoID })
+    let ban = await global.db.engine.findOne(this.collection.ban, { videoID: videoID })
     if (!_.isEmpty(ban)) {
       global.commons.sendMessage(global.translate('songs.isBanned'), opts.sender)
       return
@@ -348,25 +348,18 @@ class Songs extends System {
     })
   }
 
-  removeSongFromPlaylist (opts) {
+  async removeSongFromPlaylist (opts) {
     if (opts.parameters.length < 1) return
     var videoID = opts.parameters
 
-    ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async function (err, videoInfo) {
-      if (err) global.log.error(err, { fnc: 'Songs.prototype.removeSongFromPlaylist#1' })
-      if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
-        global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
-        return
-      }
-
-      let removed = await global.db.engine.remove(this.collection.playlist, { videoID: videoID })
-      if (removed > 0) {
-        let message = await global.commons.prepare('songs.song-was-removed-from-playlist', { name: videoInfo.title })
-        debug(message); global.commons.sendMessage(message, opts.sender)
-        this.getMeanLoudness(this)
-        this.send(this, global.panel.io)
-      }
-    })
+    let song = await global.db.engine.findOne(this.collection.playlist, { videoID: videoID })
+    if (!_.isEmpty(song)) {
+      await global.db.engine.remove(this.collection.playlist, { videoID: videoID })
+      let message = await global.commons.prepare('songs.song-was-removed-from-playlist', { name: song.title })
+      debug(message); global.commons.sendMessage(message, opts.sender)
+    } else {
+      global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
+    }
   }
 }
 
