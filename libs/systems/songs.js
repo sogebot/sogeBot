@@ -53,6 +53,15 @@ class Songs extends System {
     }
   }
 
+  sockets () {
+    this.socket.on('connection', (socket) => {
+      socket.on('findPlaylist', async (where, cb) => {
+        where = where || {}
+        cb(null, await global.db.engine.find(this.collection.playlist, where))
+      })
+    })
+  }
+
   async getMeanLoudness (self) {
     let playlist = await global.db.engine.find(this.collection.playlist)
     if (_.isEmpty(playlist)) {
