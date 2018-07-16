@@ -40,33 +40,6 @@ class CustomCommands extends System {
     this.addMenu({category: 'manage', name: 'customcommands', id: 'customcommands/list'})
   }
 
-  sockets () {
-    this.socket.on('connection', (socket) => {
-      socket.on('update', async (items, cb) => {
-        for (let item of items) {
-          const _id = item._id; delete item._id
-          let itemFromDb = item
-          if (_.isNil(_id)) itemFromDb = await global.db.engine.insert(this.collection.data, item)
-          else await global.db.engine.update(this.collection.data, { _id }, item)
-
-          if (_.isFunction(cb)) cb(null, itemFromDb)
-        }
-      })
-      socket.on('delete', async (_id, cb) => {
-        await global.db.engine.remove(this.collection.data, { _id })
-        cb(null)
-      })
-      socket.on('find', async (where, cb) => {
-        where = where || {}
-        cb(null, await global.db.engine.find(this.collection.data, where))
-      })
-      socket.on('findOne', async (where, cb) => {
-        where = where || {}
-        cb(null, await global.db.engine.findOne(this.collection.data, where))
-      })
-    })
-  }
-
   main (opts) {
     global.commons.sendMessage(global.translate('core.usage') + ': !command add owner|mod|regular|viewer <!command> <response> | !command edit owner|mod|regular|viewer <!command> <response> | !command remove <!command> | !command list', opts.sender)
   }
