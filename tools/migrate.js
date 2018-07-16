@@ -66,6 +66,54 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  songs: [{
+    version: '7.6.0',
+    do: async () => {
+      console.info('Moving playlist to systems.songs.playlist')
+      let items = await global.db.engine.find('playlist')
+      let processed = 0
+      for (let item of items) {
+        delete item._id
+        await global.db.engine.insert('systems.songs.playlist', item)
+        processed++
+      }
+      await global.db.engine.remove('playlist', {})
+      console.info(` => ${processed} processed`)
+      console.info(` !! playlist collection can be deleted`)
+    }
+  },
+  {
+    version: '7.6.0',
+    do: async () => {
+      console.info('Moving bannedsong to systems.songs.ban')
+      let items = await global.db.engine.find('bannedsong')
+      let processed = 0
+      for (let item of items) {
+        delete item._id
+        await global.db.engine.insert('systems.songs.ban', item)
+        processed++
+      }
+      await global.db.engine.remove('bannedsong', {})
+      console.info(` => ${processed} processed`)
+      console.info(` !! bannedsong collection can be deleted`)
+    }
+  },
+  {
+    version: '7.6.0',
+    do: async () => {
+      console.info('Moving songrequest to systems.songs.request')
+      let items = await global.db.engine.find('songrequest')
+      let processed = 0
+      for (let item of items) {
+        delete item._id
+        await global.db.engine.insert('systems.songs.request', item)
+        processed++
+      }
+      await global.db.engine.remove('songrequest', {})
+      console.info(` => ${processed} processed`)
+      console.info(` !! songrequest collection can be deleted`)
+    }
+  }],
   ranks: [{
     version: '7.6.0',
     do: async () => {

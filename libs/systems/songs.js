@@ -3,99 +3,106 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const ytdl = require('ytdl-core')
+const ytpl = require('ytpl')
 const ytsearch = require('youtube-search')
 // bot libraries
 const config = require('../../config.json')
 const constants = require('../constants')
 const debug = require('debug')('systems:songs')
 const cluster = require('cluster')
+const System = require('./_interface')
 
-class Songs {
+class Songs extends System {
   constructor () {
-    if (global.commons.isSystemEnabled(this)) {
-      global.configuration.register('songs_volume', 'core.settings.songs.volume', 'number', 25)
-      global.configuration.register('songs_duration', 'core.settings.songs.duration', 'number', 10)
-      global.configuration.register('songs_shuffle', 'core.settings.songs.shuffle', 'bool', false)
-      global.configuration.register('songs_songrequest', 'core.settings.songs.songrequest', 'bool', true)
-      global.configuration.register('songs_playlist', 'core.settings.songs.playlist', 'bool', true)
-      global.configuration.register('songs_notify', 'core.settings.songs.notify', 'bool', false)
+    const settings = {
+      _: {
+        meanLoudness: -15,
+        currentSong: JSON.stringify({videoID: null})
+      },
+      volume: 25,
+      duration: 10,
+      shuffle: true,
+      songrequest: true,
+      playlist: true,
+      notify: false,
+      commands: [
+        {name: '!songrequest', fnc: 'addSongToQueue'},
+        {name: '!wrongsong', fnc: 'removeSongFromQueue'},
+        {name: '!currentsong', fnc: 'getCurrentSong'},
+        {name: '!skipsong', fnc: 'sendNextSongID', permission: constants.OWNER_ONLY},
+        {name: '!bansong', fnc: 'banSong', permission: constants.OWNER_ONLY},
+        {name: '!unbansong', fnc: 'unbanSong', permission: constants.OWNER_ONLY},
+        {name: '!playlist import', fnc: 'importPlaylist', permission: constants.OWNER_ONLY},
+        {name: '!playlist add', fnc: 'addSongToPlaylist', permission: constants.OWNER_ONLY},
+        {name: '!playlist remove', fnc: 'removeSongFromPlaylist', permission: constants.OWNER_ONLY},
+        {name: '!playlist steal', fnc: 'stealSong', permission: constants.OWNER_ONLY},
+        {name: '!playlist', fnc: 'help', permission: constants.OWNER_ONLY}
+      ]
+    }
+    super({settings})
 
-      if (cluster.isMaster) {
-        cluster.on('message', (worker, d) => {
-          if (d.type !== 'songs') return
-          this[d.fnc](this, global.panel.io)
-        })
+    if (cluster.isMaster) {
+      cluster.on('message', (worker, d) => {
+        if (d.type !== 'songs') return
+        this[d.fnc](this, global.panel.io)
+      })
 
-        this.getMeanLoudness(this)
-        this.getToggles(this)
+      this.getMeanLoudness()
 
-        global.panel.addMenu({category: 'manage', name: 'songs', id: 'songs'})
-        global.panel.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones')
-        global.panel.registerSockets({
-          self: this,
-          expose: ['togglePlaylist', 'toggleSongRequests', 'getCurrentVolume', 'send', 'setTrim', 'sendConfiguration', 'banSong', 'getSongRequests', 'stealSong', 'sendNextSongID', 'removeSongFromPlaylist', 'unbanSong']
-        })
-      }
+      this.addMenu({category: 'manage', name: 'playlist', id: 'songs/playlist'})
+      this.addMenu({category: 'manage', name: 'bannedsongs', id: 'songs/bannedsongs'})
+      this.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones')
     }
   }
 
-  get meanLoudness () {
-    return new Promise(async (resolve, reject) => resolve(_.get(await global.db.engine.findOne('cache', { key: 'songs_meanLoudness' }), 'value', -15)))
-  }
-
-  set meanLoudness (v) {
-    global.db.engine.update('cache', { key: 'songs_meanLoudness' }, { value: v })
-  }
-
-  get currentSong () {
-    return new Promise(async (resolve, reject) => resolve(await global.db.engine.findOne('cache', { key: 'songs_currentSong' })))
-  }
-
-  set currentSong (v) {
-    delete v._id
-    global.db.engine.update('cache', { key: 'songs_currentSong' }, v)
-  }
-
-  commands () {
-    return !global.commons.isSystemEnabled('songs')
-      ? []
-      : [
-        {this: this, id: '!songrequest', command: '!songrequest', fnc: this.addSongToQueue, permission: constants.VIEWERS},
-        {this: this, id: '!wrongsong', command: '!wrongsong', fnc: this.removeSongFromQueue, permission: constants.VIEWERS},
-        {this: this, id: '!currentsong', command: '!currentsong', fnc: this.getCurrentSong, permission: constants.VIEWERS},
-        {this: this, id: '!skipsong', command: '!skipsong', fnc: this.sendNextSongID, permission: constants.OWNER_ONLY},
-        {this: this, id: '!bansong', command: '!bansong', fnc: this.banSong, permission: constants.OWNER_ONLY},
-        {this: this, id: '!unbansong', command: '!unbansong', fnc: this.unbanSong, permission: constants.OWNER_ONLY},
-        {this: this, id: '!playlist add', command: '!playlist add', fnc: this.addSongToPlaylist, permission: constants.OWNER_ONLY},
-        {this: this, id: '!playlist remove', command: '!playlist remove', fnc: this.removeSongFromPlaylist, permission: constants.OWNER_ONLY},
-        {this: this, id: '!playlist steal', command: '!playlist steal', fnc: this.stealSong, permission: constants.OWNER_ONLY},
-        {this: this, id: '!playlist', command: '!playlist', fnc: this.help, permission: constants.OWNER_ONLY}
-      ]
-  }
-
-  async togglePlaylist () {
-    let value = (await global.configuration.getValue('songs_playlist')).toString().toLowerCase() === 'true' ? 'false' : 'true'
-    global.configuration.setValue({ sender: { username: global.parser.getOwner() }, parameters: `songs_playlist ${value}`, quiet: true })
-  }
-
-  async toggleSongRequests () {
-    let value = (await global.configuration.getValue('songs_songrequest')).toString().toLowerCase() === 'true' ? 'false' : 'true'
-    global.configuration.setValue({sender: { username: global.parser.getOwner() }, parameters: `songs_songrequest ${value}`, quiet: true})
-  }
-
-  async getToggles (self) {
-    setInterval(async () => {
-      global.panel.io.emit('songs.toggles', {
-        playlist: await global.configuration.getValue('songs_playlist'),
-        songrequest: await global.configuration.getValue('songs_songrequest')
+  sockets () {
+    this.socket.on('connection', (socket) => {
+      socket.on('find.ban', async (where, cb) => {
+        where = where || {}
+        cb(null, await global.db.engine.find(this.collection.ban, where))
       })
-    }, 1000)
+      socket.on('find.playlist', async (where, cb) => {
+        where = where || {}
+        cb(null, await global.db.engine.find(this.collection.playlist, where))
+      })
+      socket.on('find.request', async (where, cb) => {
+        where = where || {}
+        cb(null, _.orderBy(await global.db.engine.find(this.collection.request, where)), ['addedAt'], ['asc'])
+      })
+      socket.on('delete.playlist', async (_id, cb) => {
+        await global.db.engine.remove(this.collection.playlist, { _id })
+        cb()
+      })
+      socket.on('delete.ban', async (_id, cb) => {
+        await global.db.engine.remove(this.collection.ban, { _id })
+        cb()
+      })
+      socket.on('import.ban', async (url, cb) => {
+        cb(null, await this.banSongById({ parameters: this.getIdFromURL(url), sender: null }))
+      })
+      socket.on('import.playlist', async (playlist, cb) => {
+        cb(null, await this.importPlaylist({ parameters: playlist, sender: null }))
+      })
+      socket.on('import.video', async (url, cb) => {
+        cb(null, await this.addSongToPlaylist({ parameters: url, sender: null }))
+      })
+      socket.on('next', async () => {
+        this.sendNextSongID()
+      })
+    })
   }
 
-  async getMeanLoudness (self) {
-    let playlist = await global.db.engine.find('playlist')
+  getIdFromURL (url) {
+    const urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/
+    var match = url.match(urlRegex)
+    var videoID = (match && match[1].length === 11) ? match[1] : url
+    return videoID
+  }
+
+  async getMeanLoudness () {
+    let playlist = await global.db.engine.find(this.collection.playlist)
     if (_.isEmpty(playlist)) {
-      self.meanLoudness = -15
+      this.settings._.meanLoudness = -15
       return -15
     }
 
@@ -107,46 +114,24 @@ class Songs {
         loudness = loudness + parseFloat(item.loudness)
       }
     }
-    self.meanLoudness = loudness / playlist.length
+    this.settings._.meanLoudness = loudness / playlist.length
     return loudness / playlist.length
   }
 
-  async getVolume (self, item) {
+  async getVolume (item) {
     item.loudness = !_.isNil(item.loudness) ? item.loudness : -15
-    const volume = await global.configuration.getValue('songs_volume')
+    const volume = await this.settings.volume
     var correction = Math.ceil((volume / 100) * 3)
-    var loudnessDiff = parseFloat(parseFloat(await self.meanLoudness) - item.loudness)
+    var loudnessDiff = parseFloat(parseFloat(await this.settings._.meanLoudness) - item.loudness)
     return Math.round(volume + (correction * loudnessDiff))
   }
 
-  async getCurrentVolume (self, socket) {
-    socket.emit('newVolume', await self.getVolume(self, await self.currentSong))
+  async getCurrentVolume (socket) {
+    socket.emit('newVolume', await this.getVolume(JSON.parse(await this.settings._.currentSong)))
   }
 
-  setTrim (self, socket, data) {
-    global.db.engine.update('playlist', { videoID: data.id }, { startTime: data.lowValue, endTime: data.highValue })
-  }
-
-  async sendConfiguration (self, socket) {
-    socket.emit('songsConfiguration', {
-      volume: await global.configuration.getValue('songs_volume'),
-      shuffle: await global.configuration.getValue('songs_shuffle'),
-      duration: await global.configuration.getValue('songs_duration'),
-      songrequest: await global.configuration.getValue('songs_songrequest'),
-      playlist: await global.configuration.getValue('songs_playlist'),
-      notify: await global.configuration.getValue('songs_notify')
-    })
-  }
-
-  async send (self, socket) {
-    if (cluster.isWorker) return process.send({ type: 'songs', fnc: 'send' })
-
-    let playlist = await global.db.engine.find('playlist')
-    _.each(playlist, async function (item) { item.volume = await self.getVolume(self, item) })
-    socket.emit('songPlaylistList', _.orderBy(playlist, ['addedAt'], ['asc']))
-
-    let bannedSongs = await global.db.engine.find('bannedsong')
-    socket.emit('bannedSongsList', _.orderBy(bannedSongs, ['title'], ['asc']))
+  setTrim (socket, data) {
+    global.db.engine.update(this.collection.playlist, { videoID: data.id }, { startTime: data.lowValue, endTime: data.highValue })
   }
 
   banSong (opts) {
@@ -154,105 +139,135 @@ class Songs {
   }
 
   async banCurrentSong (opts) {
-    let currentSong = await this.currentSong
+    let currentSong = JSON.parse(await this.settings._.currentSong)
     if (_.isNil(currentSong.videoID)) return
 
-    let update = await global.db.engine.update('bannedsong', { videoId: currentSong.videoID }, { videoId: currentSong.videoID, title: currentSong.title })
+    let update = await global.db.engine.update(this.collection.ban, { videoId: currentSong.videoID }, { videoId: currentSong.videoID, title: currentSong.title })
     if (update.length > 0) {
       let message = await global.commons.prepare('songs.song-was-banned', { name: currentSong.title })
       debug(message); global.commons.sendMessage(message, opts.sender)
 
-      await Promise.all([global.db.engine.remove('playlist', { videoID: currentSong.videoID }), global.db.engine.remove('songrequest', { videoID: currentSong.videoID })])
+      // send timeouts to all users who requested song
+      const request = (await global.db.engine.find(this.collection.request, { videoID: opts.parameters })).map(o => o.username)
+      if (currentSong.videoID === opts.parameters) request.push(currentSong.username)
+      for (let user of request) global.commons.timeout(user, global.translate('songs.song-was-banned-timeout-message'), 300)
 
-      global.commons.timeout(currentSong.username, global.translate('songs.song-was-banned-timeout-message'), 300)
-      this.getMeanLoudness(this)
+      await Promise.all([global.db.engine.remove(this.collection.playlist, { videoID: currentSong.videoID }), global.db.engine.remove(this.collection.request, { videoID: currentSong.videoID })])
 
-      this.sendNextSongID(this)
-      this.send(this)
+      this.getMeanLoudness()
+      this.sendNextSongID()
+      this.refreshPlaylistVolume()
+    }
+  }
+
+  async refreshPlaylistVolume () {
+    let playlist = await global.db.engine.find(this.collection.playlist)
+    for (let item of playlist) {
+      if (_.isNil(item.loudness)) {
+        await global.db.engine.update(this.collection.playlist, { _id: String(item._id) }, { loudness: -15 })
+      }
+      item.volume = await this.getVolume(item)
     }
   }
 
   async banSongById (opts) {
-    ytdl.getInfo('https://www.youtube.com/watch?v=' + opts.parameters, async function (err, videoInfo) {
-      if (err) global.log.error(err, { fnc: 'Songs.prototype.banSongById#1' })
-      if (_.isNil(videoInfo.title)) return
+    let banned = 0
+    const waitForBan = () => {
+      return new Promise((resolve, reject) => {
+        const ban = (resolve) => {
+          ytdl.getInfo('https://www.youtube.com/watch?v=' + opts.parameters, async (err, videoInfo) => {
+            if (err) global.log.error(err, { fnc: 'Songs.prototype.banSongById#1' })
+            else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
+              banned++
+              global.commons.sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, videoInfo.title), opts.sender)
 
-      let updated = await global.db.engine.update('bannedsong', { videoId: opts.parameters }, { videoId: opts.parameters, title: videoInfo.title })
-      if (updated.length > 0) {
-        global.commons.sendMessage(global.translate('songs.bannedSong').replace(/\$title/g, videoInfo.title), opts.sender)
+              // send timeouts to all users who requested song
+              const request = (await global.db.engine.find(this.collection.request, { videoID: opts.parameters })).map(o => o.username)
+              const currentSong = JSON.parse(await this.settings._.currentSong)
+              if (currentSong.videoID === opts.parameters) request.push(currentSong.username)
+              for (let user of request) global.commons.timeout(user, global.translate('songs.bannedSongTimeout'), 300)
 
-        await Promise.all([global.db.engine.remove('playlist', { videoID: opts.parameters }), global.db.engine.remove('songrequest', { videoID: opts.parameters })])
+              await Promise.all([
+                global.db.engine.update(this.collection.ban, { videoId: opts.parameters }, { videoId: opts.parameters, title: videoInfo.title }),
+                global.db.engine.remove(this.collection.playlist, { videoID: opts.parameters }),
+                global.db.engine.remove(this.collection.request, { videoID: opts.parameters })
+              ])
+            }
+            resolve()
+          })
+        }
+        ban(resolve)
+      })
+    }
+    await waitForBan()
+    this.getMeanLoudness()
+    this.refreshPlaylistVolume()
 
-        const currentSong = await this.currentSong
-        global.commons.timeout(currentSong.username, global.translate('songs.bannedSongTimeout'), 300)
-
-        this.getMeanLoudness(this)
-        this.sendNextSongID(this)
-        this.send(this)
-      }
-    })
+    const currentSong = JSON.parse(await this.settings._.currentSong)
+    if (currentSong.videoID === opts.parameters) this.sendNextSongID() // skip song if its currently playing
+    return {banned}
   }
 
   async unbanSong (opts) {
-    let removed = await global.db.engine.remove('bannedsong', { videoId: opts.parameters })
+    let removed = await global.db.engine.remove(this.collection.ban, { videoId: opts.parameters })
     if (removed > 0) global.commons.sendMessage(global.translate('songs.song-was-unbanned'), opts.sender)
     else global.commons.sendMessage(global.translate('songs.song-was-not-banned'), opts.sender)
   }
 
-  async sendNextSongID (self, socket) {
+  async sendNextSongID () {
     if (cluster.isWorker) return process.send({ type: 'songs', fnc: 'sendNextSongID' })
     // check if there are any requests
-    if (await global.configuration.getValue('songs_songrequest')) {
-      let sr = await global.db.engine.find('songrequests')
+    if (await this.settings.songrequest) {
+      let sr = await global.db.engine.find(this.collection.request)
       sr = _.head(_.orderBy(sr, ['addedAt'], ['asc']))
       if (!_.isNil(sr)) {
         let currentSong = sr
-        currentSong.volume = await self.getVolume(self, currentSong)
+        currentSong.volume = await this.getVolume(currentSong)
         currentSong.type = 'songrequests'
-        self.currentSong = currentSong
+        this.currentSong = JSON.stringify(currentSong)
 
-        if (await global.configuration.getValue('songs_notify')) self.notifySong(self)
-        socket.emit('videoID', currentSong)
-        await global.db.engine.remove('songrequests', { videoID: sr.videoID })
+        if (await this.settings.notify) this.notifySong()
+        this.socket.emit('videoID', currentSong)
+        await global.db.engine.remove(this.collection.request, { videoID: sr.videoID })
         return
       }
     }
 
     // get song from playlist
-    if (await global.configuration.getValue('songs_playlist')) {
-      let pl = await global.db.engine.find('playlist')
+    if (await this.settings.playlist) {
+      let pl = await global.db.engine.find(this.collection.playlist)
       if (_.isEmpty(pl)) {
-        socket.emit('videoID', null) // send null and skip to next empty song
+        this.socket.emit('videoID', null) // send null and skip to next empty song
         return // don't do anything if no songs in playlist
       }
-      pl = _.head(_.orderBy(pl, [(await global.configuration.getValue('songs_shuffle') ? 'seed' : 'lastPlayedAt')], ['asc']))
+      pl = _.head(_.orderBy(pl, [(await this.settings.shuffle ? 'seed' : 'lastPlayedAt')], ['asc']))
 
       // shuffled song is played again
-      if (await global.configuration.getValue('songs_shuffle') && pl.seed === 1) {
-        self.createRandomSeeds()
-        self.sendNextSongID(self, socket) // retry with new seeds
+      if (await this.settings.shuffle && pl.seed === 1) {
+        await this.createRandomSeeds()
+        this.sendNextSongID(this.socket) // retry with new seeds
         return
       }
 
-      await global.db.engine.update('playlist', { _id: pl._id.toString() }, { seed: 1, lastPlayedAt: new Date().getTime() })
+      await global.db.engine.update(this.collection.playlist, { _id: pl._id.toString() }, { seed: 1, lastPlayedAt: new Date().getTime() })
       let currentSong = pl
-      currentSong.volume = await self.getVolume(self, currentSong)
+      currentSong.volume = await this.getVolume(currentSong)
       currentSong.type = 'playlist'
-      self.currentSong = currentSong
+      this.currentSong = JSON.stringify(currentSong)
 
-      if (await global.configuration.getValue('songs_notify')) self.notifySong(self)
+      if (await this.settings.notify) this.notifySong()
 
-      socket.emit('videoID', currentSong)
+      this.socket.emit('videoID', currentSong)
       return
     }
 
     // nothing to send
-    socket.emit('videoID', null)
+    this.socket.emit('videoID', null)
   }
 
   async getCurrentSong () {
     let translation = 'songs.no-song-is-currently-playing'
-    const currentSong = await this.currentSong
+    const currentSong = JSON.parse(await this.settings._.currentSong)
     if (!_.isNil(currentSong.title)) {
       if (currentSong.type === 'playlist') translation = 'songs.current-song-from-playlist'
       else translation = 'songs.current-song-from-songrequest'
@@ -261,9 +276,9 @@ class Songs {
     debug(message); global.commons.sendMessage(message, {username: config.settings.broadcaster_username})
   }
 
-  async notifySong (self) {
+  async notifySong () {
     var translation
-    const currentSong = await self.currentSong
+    const currentSong = JSON.parse(await this.settings._.currentSong)
     if (!_.isNil(currentSong.title)) {
       if (currentSong.type === 'playlist') translation = 'songs.current-song-from-playlist'
       else translation = 'songs.current-song-from-songrequest'
@@ -272,25 +287,20 @@ class Songs {
     debug(message); global.commons.sendMessage(message, {username: config.settings.broadcaster_username})
   }
 
-  async stealSong (self) {
+  async stealSong () {
     try {
-      const currentSong = await self.currentSong
-      self.addSongToPlaylist(self, null, currentSong.videoID)
+      const currentSong = JSON.parse(await this.settings._.currentSong)
+      this.addSongToPlaylist({ sender: null, parameters: currentSong.videoID })
     } catch (err) {
       global.commons.sendMessage(global.translate('songs.noCurrentSong'), {username: config.settings.broadcaster_username})
     }
   }
 
   async createRandomSeeds () {
-    let playlist = await global.db.engine.find('playlist')
-    _.each(playlist, function (item) {
-      global.db.engine.update('playlist', { _id: item._id.toString() }, { seed: Math.random() })
-    })
-  }
-
-  async getSongRequests (self, socket) {
-    let songrequests = await global.db.engine.find('songrequests')
-    socket.emit('songRequestsList', _.orderBy(songrequests, ['addedAt'], ['asc']))
+    let playlist = await global.db.engine.find(this.collection.playlist)
+    for (let item of playlist) {
+      global.db.engine.update(this.collection.playlist, { _id: item._id.toString() }, { seed: Math.random() })
+    }
   }
 
   help () {
@@ -298,8 +308,8 @@ class Songs {
   }
 
   async addSongToQueue (opts) {
-    if (opts.parameters.length < 1 || !await global.configuration.getValue('songs_songrequest')) {
-      if (await global.configuration.getValue('songs_songrequest')) {
+    if (opts.parameters.length < 1 || !await this.settings.songrequest) {
+      if (await this.settings.songrequest) {
         global.commons.sendMessage(global.translate('core.usage') + ': !songrequest <video-id|video-url|search-string>', opts.sender)
       } else {
         global.commons.sendMessage('$sender, ' + global.translate('core.settings.songs.songrequest.false'), opts.sender)
@@ -322,34 +332,34 @@ class Songs {
     }
 
     // is song banned?
-    let ban = await global.db.engine.findOne('songbanned', { videoID: videoID })
+    let ban = await global.db.engine.findOne(this.collection.ban, { videoID: videoID })
     if (!_.isEmpty(ban)) {
       global.commons.sendMessage(global.translate('songs.song-is-banned'), opts.sender)
       return
     }
 
-    ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async function (err, videoInfo) {
+    ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async (err, videoInfo) => {
       if (err) return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' })
       if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
         global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
-      } else if (videoInfo.length_seconds / 60 > await global.configuration.getValue('songs_duration')) global.commons.sendMessage(global.translate('songs.tooLong'), opts.sender)
+      } else if (videoInfo.length_seconds / 60 > await this.settings.duration) global.commons.sendMessage(global.translate('songs.tooLong'), opts.sender)
       else {
-        global.db.engine.update('songrequests', { addedAt: new Date().getTime() }, { videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: opts.sender.username })
+        global.db.engine.update(this.collection.request, { addedAt: new Date().getTime() }, { videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: opts.sender.username })
         let message = await global.commons.prepare('songs.song-was-added-to-queue', { name: videoInfo.title })
         debug(message); global.commons.sendMessage(message, opts.sender)
-        this.getMeanLoudness(this)
+        this.getMeanLoudness()
       }
     })
   }
 
   async removeSongFromQueue (opts) {
-    let sr = await global.db.engine.find('songrequests', { username: opts.sender.username })
+    let sr = await global.db.engine.find(this.collection.request, { username: opts.sender.username })
     sr = _.head(_.orderBy(sr, ['addedAt'], ['desc']))
     if (!_.isNil(sr)) {
-      await global.db.engine.remove('songrequests', { username: opts.sender.username, _id: sr._id.toString() })
+      await global.db.engine.remove(this.collection.request, { username: opts.sender.username, _id: sr._id.toString() })
       let m = await global.commons.prepare('songs.song-was-removed-from-queue', { name: sr.title })
       debug(m); global.commons.sendMessage(m, opts.sender)
-      this.getMeanLoudness(this)
+      this.getMeanLoudness()
     }
   }
 
@@ -358,56 +368,127 @@ class Songs {
 
     var urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/
     var match = opts.parameters.match(urlRegex)
-    var videoID = (match && match[1].length === 11) ? match[1] : opts.parameters
+    var id = (match && match[1].length === 11) ? match[1] : opts.parameters
 
-    // is song banned?
-    let ban = await global.db.engine.findOne('songbanned', { videoID: videoID })
-    if (!_.isEmpty(ban)) {
-      global.commons.sendMessage(global.translate('songs.isBanned'), opts.sender)
-      return
+    let imported = 0
+    let done = 0
+
+    let idsFromDB = (await global.db.engine.find(this.collection.playlist)).map(o => o.videoID)
+    let banFromDb = (await global.db.engine.find(this.collection.ban)).map(o => o.videoID)
+
+    if (idsFromDB.includes(id)) {
+      global.log.info(`=> Skipped ${id} - Already in playlist`)
+      done++
+    } else if (banFromDb.includes(id)) {
+      global.log.info(`=> Skipped ${id} - Song is banned`)
+      done++
+    } else {
+      ytdl.getInfo('https://www.youtube.com/watch?v=' + id, async (err, videoInfo) => {
+        done++
+        if (err) return global.log.error(`=> Skipped ${id} - ${err.message}`)
+        else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
+          global.log.info(`=> Imported ${id} - ${videoInfo.title}`)
+          global.db.engine.update(this.collection.playlist, { videoID: id }, {videoID: id, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1})
+          imported++
+        }
+      })
     }
 
-    // is song already in playlist?
-    let playlist = await global.db.engine.findOne('playlist', { videoID: videoID })
-    if (!_.isEmpty(playlist)) {
-      let message = await global.commons.prepare('songs.song-is-already-in-playlist', { name: playlist.title })
-      debug(message); global.commons.sendMessage(message, opts.sender)
-      return
+    const waitForImport = function () {
+      return new Promise((resolve) => {
+        const check = (resolve) => {
+          if (done === 1) resolve()
+          else setTimeout(() => check(resolve), 500)
+        }
+        check(resolve)
+      })
     }
 
-    ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async function (err, videoInfo) {
-      if (err) global.log.error(err, { fnc: 'Songs.prototype.addSongToPlaylist#1' })
-      if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
-        global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
-        return
-      }
-      global.db.engine.update('playlist', { videoID: videoID }, {videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1})
-      let message = await global.commons.prepare('songs.song-was-added-to-playlist', { name: videoInfo.title })
-      debug(message); global.commons.sendMessage(message, opts.sender)
-      this.send(this, global.panel.io)
-      this.getMeanLoudness(this)
-    })
+    await waitForImport()
+
+    this.refreshPlaylistVolume()
+    this.getMeanLoudness()
+    global.commons.sendMessage(global.commons.prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender)
+    return { imported, skipped: done - imported }
   }
 
-  removeSongFromPlaylist (opts) {
+  async removeSongFromPlaylist (opts) {
     if (opts.parameters.length < 1) return
     var videoID = opts.parameters
 
-    ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async function (err, videoInfo) {
-      if (err) global.log.error(err, { fnc: 'Songs.prototype.removeSongFromPlaylist#1' })
-      if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
-        global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
-        return
+    let song = await global.db.engine.findOne(this.collection.playlist, { videoID: videoID })
+    if (!_.isEmpty(song)) {
+      await global.db.engine.remove(this.collection.playlist, { videoID: videoID })
+      let message = await global.commons.prepare('songs.song-was-removed-from-playlist', { name: song.title })
+      debug(message); global.commons.sendMessage(message, opts.sender)
+    } else {
+      global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
+    }
+  }
+
+  async getSongsIdsFromPlaylist (playlist) {
+    const get = function () {
+      return new Promise((resolve, reject) => {
+        ytpl(playlist, { limit: Number.MAX_SAFE_INTEGER }, function (err, playlist) {
+          if (err) reject(err)
+          resolve(playlist)
+        })
+      })
+    }
+    let data = await get()
+    return data.items.map(o => o.id)
+  }
+
+  async importPlaylist (opts) {
+    if (opts.parameters.length < 1) return
+    const ids = await global.systems.songs.getSongsIdsFromPlaylist(opts.parameters)
+
+    if (ids.length === 0) {
+      global.commons.sendMessage(global.commons.prepare('songs.playlist-is-empty'), opts.sender)
+    } else {
+      let imported = 0
+      let done = 0
+
+      let idsFromDB = (await global.db.engine.find(this.collection.playlist)).map(o => o.videoID)
+      let banFromDb = (await global.db.engine.find(this.collection.ban)).map(o => o.videoID)
+
+      for (let id of ids) {
+        if (idsFromDB.includes(id)) {
+          global.log.info(`=> Skipped ${id} - Already in playlist`)
+          done++
+        } else if (banFromDb.includes(id)) {
+          global.log.info(`=> Skipped ${id} - Song is banned`)
+          done++
+        } else {
+          ytdl.getInfo('https://www.youtube.com/watch?v=' + id, async (err, videoInfo) => {
+            done++
+            if (err) return global.log.error(`=> Skipped ${id} - ${err.message}`)
+            else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
+              global.log.info(`=> Imported ${id} - ${videoInfo.title}`)
+              global.db.engine.update(this.collection.playlist, { videoID: id }, {videoID: id, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1})
+              imported++
+            }
+          })
+        }
       }
 
-      let removed = await global.db.engine.remove('playlist', { videoID: videoID })
-      if (removed > 0) {
-        let message = await global.commons.prepare('songs.song-was-removed-from-playlist', { name: videoInfo.title })
-        debug(message); global.commons.sendMessage(message, opts.sender)
-        this.getMeanLoudness(this)
-        this.send(this, global.panel.io)
+      const waitForImport = function () {
+        return new Promise((resolve) => {
+          const check = (resolve) => {
+            if (done === ids.length) resolve()
+            else setTimeout(() => check(resolve), 500)
+          }
+          check(resolve)
+        })
       }
-    })
+
+      await waitForImport()
+
+      await this.refreshPlaylistVolume()
+      await this.getMeanLoudness()
+      global.commons.sendMessage(global.commons.prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender)
+      return { imported, skipped: done - imported }
+    }
   }
 }
 
