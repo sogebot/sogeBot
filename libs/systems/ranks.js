@@ -6,6 +6,7 @@ const debug = require('debug')('systems:ranks')
 
 // bot libraries
 const constants = require('../constants')
+const System = require('./_interface')
 
 /*
  * !rank                       - show user rank
@@ -16,31 +17,23 @@ const constants = require('../constants')
  * !rank unset <username>      - unset custom rank for <username>
  */
 
-class Ranks {
+class Ranks extends System {
   constructor () {
-    if (global.commons.isSystemEnabled(this) && require('cluster').isMaster) {
-      global.panel.addMenu({category: 'manage', name: 'ranks', id: 'ranks'})
-      global.panel.registerSockets({
-        self: this,
-        expose: ['add', 'edit', 'editHours', 'remove', 'send'],
-        finally: this.send
-      })
-    }
-  }
-
-  commands () {
-    return !global.commons.isSystemEnabled('ranks')
-      ? []
-      : [
-        {this: this, id: '!rank add', command: '!rank add', fnc: this.add, permission: constants.OWNER_ONLY},
-        {this: this, id: '!rank edit', command: '!rank edit', fnc: this.edit, permission: constants.OWNER_ONLY},
-        {this: this, id: '!rank set', command: '!rank set', fnc: this.set, permission: constants.OWNER_ONLY},
-        {this: this, id: '!rank unset', command: '!rank unset', fnc: this.unset, permission: constants.OWNER_ONLY},
-        {this: this, id: '!rank list', command: '!rank list', fnc: this.list, permission: constants.OWNER_ONLY},
-        {this: this, id: '!rank remove', command: '!rank remove', fnc: this.remove, permission: constants.OWNER_ONLY},
-        {this: this, id: '!rank help', command: '!rank help', fnc: this.help, permission: constants.OWNER_ONLY},
-        {this: this, id: '!rank', command: '!rank', fnc: this.show, permission: constants.VIEWERS}
+    const settings = {
+      commands: [
+        {name: '!rank add', permission: constants.OWNER_ONLY},
+        {name: '!rank edit', permission: constants.OWNER_ONLY},
+        {name: '!rank set', permission: constants.OWNER_ONLY},
+        {name: '!rank unset', permission: constants.OWNER_ONLY},
+        {name: '!rank list', permission: constants.OWNER_ONLY},
+        {name: '!rank remove', permission: constants.OWNER_ONLY},
+        {name: '!rank help', permission: constants.OWNER_ONLY},
+        '!rank'
       ]
+    }
+    super({settings})
+
+    this.addMenu({category: 'manage', name: 'ranks', id: 'ranks/list'})
   }
 
   async add (opts) {
@@ -58,21 +51,11 @@ class Ranks {
       value: parsed[2]
     }
 
-    var ranks = await global.db.engine.find('ranks', { hours: values.hours })
-    if (ranks.length === 0) { global.db.engine.insert('ranks', values) }
+    var ranks = await global.db.engine.find(this.collection.data, { hours: values.hours })
+    if (ranks.length === 0) { global.db.engine.insert(this.collection.data, values) }
 
     let message = await global.commons.prepare(ranks.length === 0 ? 'ranks.rank-was-added' : 'ranks.ranks-already-exist', { rank: values.value, hours: values.hours })
     debug(message); global.commons.sendMessage(message, opts.sender)
-  }
-
-  async send (self, socket) { socket.emit('ranks', _.orderBy(await global.db.engine.find('ranks'), 'hours', 'asc')) }
-
-  async editHours (self, socket, data) {
-    if (data.value.length === 0) await self.remove(self, null, data.id)
-    else {
-      let item = await global.db.engine.findOne('ranks', { hours: parseInt(parseInt(data.value, 10), 10) })
-      if (_.isEmpty(item)) { await global.db.engine.update('ranks', { hours: parseInt(data.id, 10) }, { hours: parseInt(data.value, 10) }) }
-    }
   }
 
   async edit (opts) {
@@ -88,14 +71,14 @@ class Ranks {
     const hours = parsed[1]
     const rank = parsed[2]
 
-    let item = await global.db.engine.findOne('ranks', { hours: parseInt(hours, 10) })
+    let item = await global.db.engine.findOne(this.collection.data, { hours: parseInt(hours, 10) })
     if (_.isEmpty(item)) {
       let message = await global.commons.prepare('ranks.rank-was-not-found', { hours: hours })
       debug(message); global.commons.sendMessage(message, opts.sender)
       return false
     }
 
-    await global.db.engine.update('ranks', { hours: parseInt(hours, 10) }, { value: rank })
+    await global.db.engine.update(this.collection.data, { hours: parseInt(hours, 10) }, { value: rank })
     let message = await global.commons.prepare('ranks.rank-was-edited', { hours: parseInt(hours, 10), rank: rank })
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
@@ -136,7 +119,7 @@ class Ranks {
   }
 
   async list (opts) {
-    let ranks = await global.db.engine.find('ranks')
+    let ranks = await global.db.engine.find(this.collection.data)
     var output = await global.commons.prepare(ranks.length === 0 ? 'ranks.list-is-empty' : 'ranks.list-is-not-empty', { list: _.map(_.orderBy(ranks, 'hours', 'asc'), function (l) { return l.hours + 'h - ' + l.value }).join(', ') })
     debug(output); global.commons.sendMessage(output, opts.sender)
   }
@@ -152,20 +135,20 @@ class Ranks {
     }
 
     const hours = parseInt(parsed[1], 10)
-    const removed = await global.db.engine.remove('ranks', { hours: hours })
+    const removed = await global.db.engine.remove(this.collection.data, { hours: hours })
 
     let message = await global.commons.prepare(removed ? 'ranks.rank-was-removed' : 'ranks.rank-was-not-found', { hours: hours })
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async show (opts) {
+  async main (opts) {
     debug('show(%j, %j)', opts.sender)
 
     let user = await global.users.get(opts.sender.username)
     let rank = await this.get(user)
     debug('Users rank: %j', rank)
 
-    let [ranks, current] = await Promise.all([global.db.engine.find('ranks'), global.db.engine.findOne('ranks', { value: rank })])
+    let [ranks, current] = await Promise.all([global.db.engine.find(this.collection.data), global.db.engine.findOne(this.collection.data, { value: rank })])
 
     let nextRank = null
     for (let _rank of _.orderBy(ranks, 'hours', 'desc')) {
