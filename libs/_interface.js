@@ -145,7 +145,7 @@ class Module {
           let dependencyPointer = _.get(global, dependency, null)
           if (!dependencyPointer || !_.isFunction(dependencyPointer.status)) {
             if (retry > 0) setTimeout(() => check(--retry), 10)
-            else throw new Error('Dependency error - possibly wrong path')
+            else throw new Error(`[${this.constructor.name}] Dependency error - possibly wrong path`)
             return
           } else {
             status.push(await dependencyPointer.status({ quiet: true }))
@@ -183,6 +183,11 @@ class Module {
   addMenu (opts) {
     if (_.isNil(global.panel)) return new Timeout().recursive({ this: this, uid: `${this.constructor.name}.addMenu`, wait: 1000, fnc: this.addMenu, args: [opts] })
     global.panel.addMenu(opts)
+  }
+
+  addWidget (opts) {
+    if (_.isNil(global.panel)) return new Timeout().recursive({ this: this, uid: `${this.constructor.name}.addWidget`, wait: 1000, fnc: this.addWidget, args: [opts] })
+    global.panel.addWidget(opts)
   }
 
   async getAllSettings () {

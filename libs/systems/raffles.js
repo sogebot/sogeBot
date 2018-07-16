@@ -5,6 +5,7 @@ const _ = require('lodash')
 const cluster = require('cluster')
 // bot libraries
 var constants = require('../constants')
+const System = require('./_interface')
 const Timeout = require('../timeout')
 // debug
 const debug = require('debug')('systems:raffles')
@@ -24,52 +25,36 @@ const TYPE_TICKETS = 1
  * !set raffleAnnounceInterval [minutes] - reannounce raffle interval each x minutes
  */
 
-class Raffles {
+class Raffles extends System {
   constructor () {
-    this.timeouts = {}
-    if (global.commons.isSystemEnabled(this)) {
-      this.lastAnnounce = _.now()
-
-      global.configuration.register('raffleAnnounceInterval', 'raffle.announceInterval', 'number', 10)
-
-      if (cluster.isMaster) {
-        global.panel.registerSockets({
-          self: this,
-          expose: ['refresh', 'remove', 'eligibility', 'open', 'pick'],
-          finally: this.refresh
-        })
-
-        global.panel.addWidget('raffles', 'widget-title-raffles', 'fas fa-gift')
-
-        this.announce()
-        this.refresh()
-
-        cluster.on('message', (worker, message) => {
-          if (message.type !== 'raffles') return
-          this[message.fnc](this)
-        })
-      }
+    const settings = {
+      _: {
+        lastAnnounce: String(new Date())
+      },
+      raffleAnnounceInterval: 10,
+      commands: [
+        {name: '!raffle pick', permission: constants.OWNER_ONLY},
+        {name: '!raffle remove', permission: constants.OWNER_ONLY},
+        {name: '!raffle open', permission: constants.OWNER_ONLY},
+        '!raffle'
+      ],
+      parsers: [
+        {name: 'messages', fireAndForget: true},
+        {name: 'participate'}
+      ]
     }
-  }
+    super({settings})
+    this.addWidget('raffles', 'widget-title-raffles', 'fas fa-gift')
 
-  commands () {
-    return !global.commons.isSystemEnabled('raffles')
-      ? []
-      : [
-        {this: this, id: '!raffle pick', command: '!raffle pick', fnc: this.pick, permission: constants.OWNER_ONLY},
-        {this: this, id: '!raffle remove', command: '!raffle remove', fnc: this.remove, permission: constants.OWNER_ONLY},
-        {this: this, id: '!raffle open', command: '!raffle open', fnc: this.open, permission: constants.OWNER_ONLY},
-        {this: this, id: '!raffle', command: '!raffle', fnc: this.info, permission: constants.VIEWERS}
-      ]
-  }
+    if (cluster.isMaster) {
+      this.announce()
+      this.refresh()
 
-  parsers () {
-    return !global.commons.isSystemEnabled('raffles')
-      ? []
-      : [
-        {this: this, name: 'raffle_winner_messages', fnc: this.messages, permission: constants.VIEWERS, priority: constants.LOW, fireAndForget: true},
-        {this: this, name: 'raffle_participate', fnc: this.participate, permission: constants.VIEWERS, priority: constants.LOW}
-      ]
+      cluster.on('message', (worker, message) => {
+        if (message.type !== 'raffles') return
+        this[message.fnc](this)
+      })
+    }
   }
 
   async refresh (self) {
@@ -144,7 +129,7 @@ class Raffles {
 
   async announce () {
     let raffle = await global.db.engine.findOne('raffles', { winner: null })
-    if (!await global.cache.isOnline() || _.isEmpty(raffle) || _.now() - this.lastAnnounce < (await global.configuration.getValue('raffleAnnounceInterval') * 60 * 1000)) {
+    if (!await global.cache.isOnline() || _.isEmpty(raffle) || new Date().getTime() - new Date(await this.settings._.lastAnnounce).getTime() < ((await this.settings.raffleAnnounceInterval) * 60 * 1000)) {
       new Timeout().recursive({ uid: `rafflesAnnounce`, this: this, fnc: this.announce, wait: 60000 })
       return
     }
@@ -240,10 +225,10 @@ class Raffles {
     debug(message); global.commons.sendMessage(message, global.commons.getOwner())
 
     this.refresh()
-    this.lastAnnounce = _.now()
+    this.settings._.lastAnnounce = String(new Date())
   }
 
-  async info (opts) {
+  async main (opts) {
     let raffle = await global.db.engine.findOne('raffles', { winner: null })
 
     if (_.isEmpty(raffle)) {
