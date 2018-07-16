@@ -207,9 +207,9 @@ class Module {
     global.panel.addMenu(opts)
   }
 
-  addWidget (opts) {
+  addWidget (...opts) {
     if (_.isNil(global.panel)) return new Timeout().recursive({ this: this, uid: `${this.constructor.name}.addWidget`, wait: 1000, fnc: this.addWidget, args: [opts] })
-    global.panel.addWidget(opts)
+    global.panel.addWidget(opts[0], opts[1], opts[2])
   }
 
   async getAllSettings () {

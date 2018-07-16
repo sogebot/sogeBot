@@ -28,5 +28,7 @@
   "bets": "Sázky",
   "points": "Body",
   "raffles": "Tombola",
-  "queue": "Fronta"
+  "queue": "Fronta",
+  "playlist": "Playlist",
+  "bannedsongs": "Zakázané písně"
 }

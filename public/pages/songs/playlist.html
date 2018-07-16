@@ -1,0 +1,161 @@
+<div id="systemSongsPlaylistApp">
+    <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <span data-lang="menu.playlist" class="title text-default"></span>
+
+            <div class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
+              <div class="col-sm-8">
+                <div class="form-inline">
+                  <input type="search" class="form-control w-auto col-6" v-model="toAdd" placeholder="Paste your youtube link, id or playlist link">
+
+                  <button v-if="state.import == 0" class="btn btn-primary mr-2" v-on:click="addSongOrPlaylist()"><i class="fas fa-plus"></i> Add song or import from playlist</button>
+                  <button v-else-if="state.import == 1" class="btn btn-info mr-2" disabled="disabled"><i class="fas fa-circle-notch fa-spin"></i> Importing</button>
+                  <button v-else class="btn btn-success mr-2" disabled="disabled"><i class="fas fa-check"></i> Importing done</button>
+
+                  <span class="text-info">{{ importInfo }}</span>
+                </div>
+              </div>
+              <div class="col-sm-4 text-right form-inline d-block">
+                <button class="btn btn-dark border-0"><i class="fas fa-th-list"></i></button>
+                <i class="fas fa-search text-muted" style="position: relative; left: 2.2rem;"></i>
+                <input type="search" class="form-control w-auto pl-5" v-model="search" placeholder="Search...">
+              </div>
+            </div>
+
+            <div v-if="filtered.length > 0" class="card" v-for="(item, index) of filtered" v-bind:class="{ 'mt-3': index !== 0 }">
+              <div class="card-body row p-0">
+                <div class="col-sm-11 pr-0">
+                  <a class="btn btn-block btn-outline-dark border-0 h-100 text-left p-0" target="_blank" v-bind:href="'https://www.youtube.com/watch?v=' + item.videoID">
+                    <img class="float-left pr-3" v-bind:src="generateThumbnail(item.videoID)">
+                    <div style="padding-top:1.3rem !important">
+                      {{ item.title }}
+                      <small class="d-block">
+                        <i class="far fa-clock"></i> {{ item.length_seconds | formatTime }}
+                        <i class="pl-3 fas fa-volume-up"></i> {{ Number(item.loudness).toFixed(1) }}
+                        <i class="pl-3 fas fa-step-backward"></i>
+                          {{ (item.startTime ? item.startTime : 0) | formatTime }} - {{ (item.endTime ? item.endTime : item.length_seconds) | formatTime }}
+                        <i class="fas fa-step-forward"></i>
+                        <i class="pl-3 fas fa-music"></i> {{ new Date(item.lastPlayedAt).toLocaleString() }}
+                      </small>
+                    </div>
+                  </a>
+                </div>
+
+                <div class="col-sm-1 pl-0">
+                  <button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100"><i class="fas fa-ellipsis-v"></i></button>
+                    <div class="dropdown-menu p-0">
+                      <button class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="editItem(item._id)"><i class="far fa-edit fa-fw"></i> {{ commons.translate('edit') }}</button>
+                      <button class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="deleteItem(item._id)"><i class="fas fa-trash-alt fa-fw"></i> {{ commons.translate('delete') }}</button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+</div>
+
+<script>
+  Vue.prototype.commons = commons
+
+  function songsPlaylistInit () {
+    if (_.size(translations) === 0) return setTimeout(() => songsPlaylistInit(), 1)
+    var systemSongsPlaylistApp = new Vue({
+      el: '#systemSongsPlaylistApp',
+      components: {
+        'toggle': toggleEnable,
+        'command-input': commandInput,
+        'text-with-tags': textWithTags
+      },
+      data: {
+        showAs: 'cards',
+        search: '',
+        toAdd: '',
+        importInfo: '',
+
+        items: [],
+
+        isDataChanged: false,
+
+        state: {
+          import: 0,
+        },
+        socket: io('/system/songs', { query: "token=" + token }),
+      },
+      computed: {
+        filtered: function () {
+          if (this.search.length === 0) return this.items
+          return this.items.filter((o) => {
+            const isSearchInTitle = !_.isNil(o.title.match(new RegExp(this.search, 'ig')))
+            return isSearchInTitle
+          })
+        }
+      },
+      created: function () {
+        this.refreshPlaylist()
+        if (localStorage.getItem('/system/Songs/showAs')) this.showAs = JSON.parse(localStorage.getItem('/system/Songs/showAs'));
+      },
+      watch: {
+        showAs: function(val) {
+          localStorage.setItem('/system/Songs/showAs', JSON.stringify(this.showAs))
+        }
+      },
+      filters: {
+        capitalize: function (value) {
+          if (!value) return ''
+          value = value.toString()
+          return value.charAt(0).toUpperCase() + value.slice(1)
+        },
+        formatTime: function (seconds) {
+          const h = Math.floor(seconds / 3600);
+          const m = Math.floor((seconds % 3600) / 60);
+          const s = seconds % 60;
+          return [
+            h,
+            m > 9 ? m : (h ? '0' + m : m || '0'),
+            s > 9 ? s : '0' + s,
+          ].filter(a => a).join(':');
+        }
+      },
+      methods: {
+        refreshPlaylist: function () {
+          this.socket.emit('find.playlist', {}, (err, items) => {
+            this.items = items
+          })
+        },
+        generateThumbnail: function (videoId) {
+          return `https://img.youtube.com/vi/${videoId}/1.jpg`
+        },
+        addSongOrPlaylist: function () {
+          this.state.import = 1
+          this.socket.emit(this.toAdd.includes('playlist') ? 'import.playlist' : 'import.video', this.toAdd, (err, info) => {
+            this.state.import = 2
+            this.refreshPlaylist()
+            this.toAdd = ''
+            this.showImportInfo(info)
+          })
+        },
+        showImportInfo(info) {
+          this.importInfo = `Imported: ${info.imported}, Skipped: ${info.skipped}`
+          setTimeout(() => {
+            this.importInfo = ''
+            this.state.import = 0
+          }, 5000)
+        },
+        editItem: function (_id) {
+
+        },
+        updateItem: function (_id) {
+          this.socket.emit('update', this.items.filter((o) => o._id === _id))
+        },
+        deleteItem: function (id) {
+          this.socket.emit('delete.playlist', id, () => {
+            this.items = this.items.filter((o) => o._id !== id)
+          })
+        }
+      }
+    })
+  }
+  songsPlaylistInit()
+</script>

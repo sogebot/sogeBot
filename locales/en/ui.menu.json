@@ -28,5 +28,7 @@
   "bets": "Bets",
   "points": "Points",
   "raffles": "Raffles",
-  "queue": "Queue"
+  "queue": "Queue",
+  "playlist": "Playlist",
+  "bannedsongs": "Banned songs"
 }
