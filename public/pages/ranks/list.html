@@ -92,7 +92,6 @@
         filtered: function () {
           if (this.search.length === 0) return this.items
           return this.items.filter((o) => {
-            console.log(o)
             const isSearchInHours = !_.isNil(String(o.hours).match(new RegExp(this.search, 'ig')))
             const isSearchInRank = !_.isNil(o.value.match(new RegExp(this.search, 'ig')))
             return isSearchInHours || isSearchInRank
