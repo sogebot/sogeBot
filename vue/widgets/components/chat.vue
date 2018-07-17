@@ -1,3 +1,4 @@
+<template>
 <div class="card widget">
   <div class="card-header">
     <ul class="nav nav-pills" role="tablist">
@@ -28,57 +29,61 @@
       <div role="tabpanel" class="tab-pane active" id="chat-room-panel">
         <div id="chat-room" style="height: 100%"></div>
 
-        <form style="margin-top: -40px;">
+        <div style="margin-top: -40px;">
           <div class="form-row">
             <div class="col">
-              <input type="text" id="chatInput" class="form-control" />
+              <input type="text" v-model="chatMessage" class="form-control" v-bind:placeholder="commons.translate('send-message-as-a-bot')" />
             </div>
             <div class="col">
-              <button id="chatInputSubmit" class="form-control btn btn-primary" data-lang="chat-as-bot"></button>
+              <button v-on:click="sendChatMessage()" class="form-control btn btn-primary">{{ commons.translate('chat-as-bot') }}</button>
             </div>
           </div>
-        </form>
+        </div>
       </div>
       <!-- /CHAT-ROOM -->
 
       <div role="tabpanel" class="tab-pane" id="chat-viewers-panel">
         <div id="chat-viewers">
-          <ul style="list-style-type: none; -webkit-column-count: 3; -moz-column-count: 3; column-count: 3; margin: 0;" id="chat-viewers-data"></ul>
+          <ul style="list-style-type: none; -webkit-column-count: 3; -moz-column-count: 3; column-count: 3; margin: 0;" id="chat-viewers-data">
+            <li v-for="chatter of chatters" :key="chatter">{{chatter}}</li>
+          </ul>
         </div>
       </div>
       <!-- /VIEWER LIST -->
     </div>
   </div>
 </div>
+</template>
 
 <script>
-  socket.on('chatChatters', (data) => {
-    $('ul#chat-viewers-data').empty()
-
-    let chatters = []
-    for (let [type, chatter] of Object.entries(data.chatters)) {
-      chatters.push(chatter)
+export default {
+  props: ['socket', 'commons'],
+  data: function () {
+    return {
+      chatMessage: '',
+      chatters: []
     }
-    chatters = _.sortedUniq(_.flatten(chatters))
-    for (let chatter of chatters) {
-      $('ul#chat-viewers-data').append($('<li>').text(chatter))
+  },
+  methods: {
+    sendChatMessage: function () {
+      if (this.chatMessage.length > 0) this.socket.emit('chat.message.send', this.chatMessage)
+      this.chatMessage = ''
     }
-  })
+  },
+  created: function () {
+    this.socket.on('chatChatters', (data) => {
+      let chatters = []
+      for (let [type, chatter] of Object.entries(data.chatters)) {
+        chatters.push(chatter)
+      }
+      this.chatters = _.sortedUniq(_.flatten(chatters))
+    })
 
-  socket.emit('getChatRoom');
-  socket.once('chatRoom', function (room) {
-    $("#chat-room").html('<iframe frameborder="0" scrolling="no" id="chat_embed" src="' + window.location.protocol +
-      '//twitch.tv/embed/' + room + '/chat" width="100%"></iframe>')
-  })
-
-  $('#chatInput').attr('placeholder', translations['send-message-as-a-bot'])
-
-  $('#chatInputSubmit').on('click', function (ev) {
-    ev.preventDefault()
-    var message = $('#chatInput').val()
-    $('#chatInput').val('')
-
-    if (message.length > 0) socket.emit('chat.message.send', message)
-  })
-
+    this.socket.emit('getChatRoom');
+    this.socket.once('chatRoom', function (room) {
+      $("#chat-room").html('<iframe frameborder="0" scrolling="no" id="chat_embed" src="' + window.location.protocol +
+        '//twitch.tv/embed/' + room + '/chat" width="100%"></iframe>')
+    })
+  }
+}
 </script>

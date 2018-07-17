@@ -13,7 +13,7 @@ config.timezone = config.timezone === 'system' || _.isNil(config.timezone) ? mom
 class Twitch {
   constructor () {
     if (require('cluster').isMaster) {
-      global.panel.addWidget('twitch', 'widget-title-monitor', 'fab fa-twitch')
+      global.panel.addWidget('chat', 'widget-title-monitor', 'fab fa-twitch')
 
       global.panel.registerSockets({
         self: this,
