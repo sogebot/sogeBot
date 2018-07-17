@@ -1065,6 +1065,8 @@
     }
   },
   "songs": {
+    "playlist-is-empty": "$sender, seznam videi, ktery chcete importovat, je prazdny.",
+    "playlist-imported": "$sender, importovano $imported a preskoceno $skipped ze seznamu videi",
     "not-playing": "Nic nehraje",
     "song-was-banned": "Pisen $name byla zabanovana a nebude uz nikdy hrat!",
     "song-was-banned-timeout-message": "Dostal si timeout za zabanovanou pisen",

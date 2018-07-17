@@ -1059,6 +1059,8 @@
     }
   },
   "songs": {
+    "playlist-is-empty": "$sender, playlist to import is empty",
+    "playlist-imported": "$sender, imported $imported and skipped $skipped from playlist",
     "not-playing": "Not Playing",
     "song-was-banned": "Song $name was banned and will never play again!",
     "song-was-banned-timeout-message": "You've got timeout for posting banned song",

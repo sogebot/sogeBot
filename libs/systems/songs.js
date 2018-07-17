@@ -3,6 +3,7 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const ytdl = require('ytdl-core')
+const ytpl = require('ytpl')
 const ytsearch = require('youtube-search')
 // bot libraries
 const config = require('../../config.json')
@@ -31,6 +32,7 @@ class Songs extends System {
         {name: '!skipsong', fnc: 'sendNextSongID', permission: constants.OWNER_ONLY},
         {name: '!bansong', fnc: 'banSong', permission: constants.OWNER_ONLY},
         {name: '!unbansong', fnc: 'unbanSong', permission: constants.OWNER_ONLY},
+        {name: '!playlist import', fnc: 'importPlaylist', permission: constants.OWNER_ONLY},
         {name: '!playlist add', fnc: 'addSongToPlaylist', permission: constants.OWNER_ONLY},
         {name: '!playlist remove', fnc: 'removeSongFromPlaylist', permission: constants.OWNER_ONLY},
         {name: '!playlist steal', fnc: 'stealSong', permission: constants.OWNER_ONLY},
@@ -55,9 +57,19 @@ class Songs extends System {
 
   sockets () {
     this.socket.on('connection', (socket) => {
-      socket.on('findPlaylist', async (where, cb) => {
+      socket.on('find.playlist', async (where, cb) => {
         where = where || {}
         cb(null, await global.db.engine.find(this.collection.playlist, where))
+      })
+      socket.on('delete.playlist', async (_id, cb) => {
+        await global.db.engine.remove(this.collection.playlist, { _id })
+        cb()
+      })
+      socket.on('import.playlist', async (playlist, cb) => {
+        cb(null, await this.importPlaylist({ parameters: playlist, sender: null }))
+      })
+      socket.on('import.video', async (url, cb) => {
+        cb(null, await this.addSongToPlaylist({ parameters: url, sender: null }))
       })
     })
   }
@@ -122,7 +134,12 @@ class Songs extends System {
 
   async refreshPlaylistVolume () {
     let playlist = await global.db.engine.find(this.collection.playlist)
-    _.each(playlist, async function (item) { item.volume = await this.getVolume(item) })
+    for (let item of playlist) {
+      if (_.isNil(item.loudness)) {
+        await global.db.engine.update(this.collection.playlist, { _id: String(item._id) }, { loudness: -15 })
+      }
+      item.volume = await this.getVolume(item)
+    }
   }
 
   async banSongById (opts) {
@@ -228,7 +245,7 @@ class Songs extends System {
   async stealSong () {
     try {
       const currentSong = JSON.parse(await this.settings._.currentSong)
-      this.addSongToPlaylist(null, currentSong.videoID)
+      this.addSongToPlaylist({ sender: null, parameters: currentSong.videoID })
     } catch (err) {
       global.commons.sendMessage(global.translate('songs.noCurrentSong'), {username: config.settings.broadcaster_username})
     }
@@ -311,35 +328,48 @@ class Songs extends System {
 
     var urlRegex = /^.*(?:youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#&?]*).*/
     var match = opts.parameters.match(urlRegex)
-    var videoID = (match && match[1].length === 11) ? match[1] : opts.parameters
+    var id = (match && match[1].length === 11) ? match[1] : opts.parameters
 
-    // is song banned?
-    let ban = await global.db.engine.findOne(this.collection.ban, { videoID: videoID })
-    if (!_.isEmpty(ban)) {
-      global.commons.sendMessage(global.translate('songs.isBanned'), opts.sender)
-      return
+    let imported = 0
+    let done = 0
+
+    let idsFromDB = (await global.db.engine.find(this.collection.playlist)).map(o => o.videoID)
+    let banFromDb = (await global.db.engine.find(this.collection.ban)).map(o => o.videoID)
+
+    if (idsFromDB.includes(id)) {
+      global.log.info(`=> Skipped ${id} - Already in playlist`)
+      done++
+    } else if (banFromDb.includes(id)) {
+      global.log.info(`=> Skipped ${id} - Song is banned`)
+      done++
+    } else {
+      ytdl.getInfo('https://www.youtube.com/watch?v=' + id, async (err, videoInfo) => {
+        done++
+        if (err) return global.log.error(`=> Skipped ${id} - ${err.message}`)
+        else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title) && !_.isNil(videoInfo.title)) {
+          global.log.info(`=> Imported ${id} - ${videoInfo.title}`)
+          global.db.engine.update(this.collection.playlist, { videoID: id }, {videoID: id, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1})
+          imported++
+        }
+      })
     }
 
-    // is song already in playlist?
-    let playlist = await global.db.engine.findOne(this.collection.playlist, { videoID: videoID })
-    if (!_.isEmpty(playlist)) {
-      let message = await global.commons.prepare('songs.song-is-already-in-playlist', { name: playlist.title })
-      debug(message); global.commons.sendMessage(message, opts.sender)
-      return
+    const waitForImport = function () {
+      return new Promise((resolve) => {
+        const check = (resolve) => {
+          if (done === 1) resolve()
+          else setTimeout(() => check(resolve), 500)
+        }
+        check(resolve)
+      })
     }
 
-    ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async (err, videoInfo) => {
-      if (err) global.log.error(err, { fnc: 'Songs.prototype.addSongToPlaylist#1' })
-      if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
-        global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
-        return
-      }
-      global.db.engine.update(this.collection.playlist, { videoID: videoID }, {videoID: videoID, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1})
-      let message = await global.commons.prepare('songs.song-was-added-to-playlist', { name: videoInfo.title })
-      debug(message); global.commons.sendMessage(message, opts.sender)
-      this.refreshPlaylistVolume()
-      this.getMeanLoudness()
-    })
+    await waitForImport()
+
+    this.refreshPlaylistVolume()
+    this.getMeanLoudness()
+    global.commons.sendMessage(global.commons.prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender)
+    return { imported, skipped: done - imported }
   }
 
   async removeSongFromPlaylist (opts) {
@@ -353,6 +383,71 @@ class Songs extends System {
       debug(message); global.commons.sendMessage(message, opts.sender)
     } else {
       global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
+    }
+  }
+
+  async getSongsIdsFromPlaylist (playlist) {
+    const get = function () {
+      return new Promise((resolve, reject) => {
+        ytpl(playlist, { limit: Number.MAX_SAFE_INTEGER }, function (err, playlist) {
+          if (err) reject(err)
+          resolve(playlist)
+        })
+      })
+    }
+    let data = await get()
+    return data.items.map(o => o.id)
+  }
+
+  async importPlaylist (opts) {
+    if (opts.parameters.length < 1) return
+    const ids = await global.systems.songs.getSongsIdsFromPlaylist(opts.parameters)
+
+    if (ids.length === 0) {
+      global.commons.sendMessage(global.commons.prepare('songs.playlist-is-empty'), opts.sender)
+    } else {
+      let imported = 0
+      let done = 0
+
+      let idsFromDB = (await global.db.engine.find(this.collection.playlist)).map(o => o.videoID)
+      let banFromDb = (await global.db.engine.find(this.collection.ban)).map(o => o.videoID)
+
+      for (let id of ids) {
+        if (idsFromDB.includes(id)) {
+          global.log.info(`=> Skipped ${id} - Already in playlist`)
+          done++
+        } else if (banFromDb.includes(id)) {
+          global.log.info(`=> Skipped ${id} - Song is banned`)
+          done++
+        } else {
+          ytdl.getInfo('https://www.youtube.com/watch?v=' + id, async (err, videoInfo) => {
+            done++
+            if (err) return global.log.error(`=> Skipped ${id} - ${err.message}`)
+            else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title) && !_.isNil(videoInfo.title)) {
+              global.log.info(`=> Imported ${id} - ${videoInfo.title}`)
+              global.db.engine.update(this.collection.playlist, { videoID: id }, {videoID: id, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1})
+              imported++
+            }
+          })
+        }
+      }
+
+      const waitForImport = function () {
+        return new Promise((resolve) => {
+          const check = (resolve) => {
+            if (done === ids.length) resolve()
+            else setTimeout(() => check(resolve), 500)
+          }
+          check(resolve)
+        })
+      }
+
+      await waitForImport()
+
+      await this.refreshPlaylistVolume()
+      await this.getMeanLoudness()
+      global.commons.sendMessage(global.commons.prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender)
+      return { imported, skipped: done - imported }
     }
   }
 }

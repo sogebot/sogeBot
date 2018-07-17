@@ -72,6 +72,8 @@ class Message {
     const d = debug('parser:parse')
     d('Attributes: %j', attr)
 
+    this.message = await this.message // if is promise
+
     let random = {
       '(random.online.viewer)': async function () {
         const onlineViewers = _.filter(

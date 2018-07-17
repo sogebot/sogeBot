@@ -63,7 +63,8 @@
     "xregexp": "4.2.0",
     "yargs": "11.0.0",
     "youtube-search": "1.1.1",
-    "ytdl-core": "0.20.4"
+    "ytdl-core": "0.20.4",
+    "ytpl": "^0.1.12"
   },
   "scripts": {
     "prebuild": "npm install rimraf bestzip npm-run-all cross-var -g",
