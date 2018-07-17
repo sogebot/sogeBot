@@ -73,8 +73,8 @@ export default {
   created: function () {
     this.socket.on('chatChatters', (data) => {
       let chatters = []
-      for (let chatter of Object.entries(data.chatters)) {
-        chatters.push(chatter[1])
+      for (let chatter of Object.entries(data.chatters).map(o => o[1])) {
+        chatters.push(chatter)
       }
       this.chatters = _.sortedUniq(_.flatten(chatters))
     })
