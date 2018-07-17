@@ -313,7 +313,7 @@
 
   <div class="container-fluid" style="overflow-x: hidden;">
     <!-- widgets -->
-    <div class="widgets">
+    <div class="widgets" id="widgets">
       <div class="grid-stack"></div>
     </div>
     <div class="w-100"></div>
@@ -374,6 +374,7 @@
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <!-- production version, optimized for size and speed --
   <script src="https://cdn.jsdelivr.net/npm/vue"></script-->
+  <script src="./dist/js/widgets.js"></script>
 
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/js/tempusdominus-bootstrap-4.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/css/tempusdominus-bootstrap-4.min.css" />
@@ -590,54 +591,6 @@
         if (!_.isNil(ev.currentTarget.dataset.page)) page('/#' + ev.currentTarget.dataset.page)
         $(".page-menu a,#menu-main a").removeClass('active')
         $(ev.currentTarget).addClass('active')
-      })
-    })
-
-    socket.on('widgets', function (widgets) {
-      $('.widgets').empty().append($('<div class="grid-stack"></div>'))
-      for (let widget of widgets) {
-        if (_.isNil(widget.id)) continue
-        $('.grid-stack').append(`
-          <div class="grid-stack-item" id="widget-${widget.id}" data-gs-x="${widget.position.x}" data-gs-y="${widget.position.y}" data-gs-width="${widget.size.width}" data-gs-height="${widget.size.height}">
-            <div class="grid-stack-item-content"></div>
-          </div>
-        `)
-        $(`#widget-${widget.id} .grid-stack-item-content`).load(`widgets/${widget.id}.html`, () => commons.translate()).prepend(`<h6 class="widget-title" data-lang="widget-title-cmdboard"></h6>`)
-      }
-      $('.grid-stack').gridstack({ cellHeight: 42, verticalMargin: 10, removable: true, removeTimeout: 100, handleClass: 'card-header' })
-      $('.grid-stack').off('removed').on('removed', function(event, items) {
-        let widgets = []
-        for (let item of items) {
-          widgets.push({
-            id: item.el[0].id.split('-')[1],
-            position: {
-              x: item.x,
-              y: item.y
-            },
-            size: {
-              height: item.height,
-              width: item.width
-            }
-          })
-        }
-        socket.emit('updateWidgets', widgets)
-      })
-      $('.grid-stack').off('change').on('change', function(event, items) {
-        let widgets = []
-        for (let item of $('.grid-stack-item')) {
-          widgets.push({
-            id: $(item).attr('id').split('-')[1],
-            position: {
-              x: $(item).attr('data-gs-x'),
-              y: $(item).attr('data-gs-y')
-            },
-            size: {
-              height: $(item).attr('data-gs-height'),
-              width: $(item).attr('data-gs-width')
-            }
-          })
-        }
-        socket.emit('updateWidgets', widgets)
       })
     })
 
