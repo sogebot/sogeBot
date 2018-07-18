@@ -1,9 +1,9 @@
-<div class="card widget" id="YTPlayerWidgetApp">
+<div class="card widget">
   <div class="card-header">
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link" href="#yt-song-requests" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
-          <span id="yt-song-requests-count">{{ requests.length }}</span>
+          <span id="yt-song-requests-count">0</span>
           <i class="fas fa-user" aria-hidden="true"></i>
         </a>
       </li>
@@ -22,14 +22,6 @@
   <div class="card-body">
     <div class="tab-content">
       <div role="tabpanel" class="tab-pane active" id="yt-player">
-        {{ currentSong }}
-        <plyr v-if="currentSong" ref="plyr">
-            <div class="plyr__video-embed">
-                <iframe style="border: 0;" v-bind:src="'https://www.youtube.com/embed/' + currentSong.videoID" v-bind:volume="currentSong.volume / 100" allow="autoplay"></iframe>
-            </div>
-        </plyr>
-        <!--
-
         <div id="YTPlayer"></div>
         <div class="row">
           <div class="btn-group" role="group" aria-label="..." style="width: 100%; padding-left:15px; padding-right: 15px; height: 34px;">
@@ -71,7 +63,7 @@
             </div>
           </div>
         </div>
-      -->
+
         <div style="font-size: 0.8rem" class="bg-faded">
           <span id="yt-player-currentsong"></span>
         </div>
@@ -79,14 +71,7 @@
       <!-- /YT-PLAYER -->
 
       <div role="tabpanel" class="tab-pane" id="yt-song-requests">
-        <table class="table table-condensed">
-          <tr v-for="request of requests">
-            <td>{{request.title}}</td>
-            <td>{{request.length_seconds | formatTime}}</td>
-            <td>{{request.username}}</td>
-          </tr>
-          <tr v-if="requests.length === 0"><td colspan=3 class="text-info text-center"><strong>No song requests found</strong></td></tr>
-        </table>
+        <table id="songRequestsWidget" class="table table-condensed"></table>
       </div>
       <!-- /YT-SONG-REQUESTS -->
 
@@ -96,52 +81,6 @@
 </div>
 
 <script>
-  Vue.use(VuePlyr['default'])
-
-  var YTPlayerWidgetAppInit = function () {
-    if (_.size(translations) === 0) return setTimeout(() => YTPlayerWidgetAppInit(), 1)
-    var YTPlayerWidgetApp = new Vue({
-      el: '#YTPlayerWidgetApp',
-      components: {
-      },
-      data: {
-        currentSong: null,
-        requests: [],
-
-        socket: io('/system/songs', { query: "token=" + token }),
-      },
-      created: function () {
-        this.socket.emit('next')
-        this.socket.on('videoID', (item) => {
-          this.currentSong = item
-
-          setTimeout(() => {
-          })
-        })
-
-        setInterval(() => {
-          this.socket.emit('find.request', {}, (err, items) => {
-            this.requests = items
-          })
-        }, 1000)
-      },
-      filters: {
-        formatTime: function (seconds) {
-          const h = Math.floor(seconds / 3600);
-          const m = Math.floor((seconds % 3600) / 60);
-          const s = seconds % 60;
-          return [
-            h,
-            m > 9 ? m : (h ? '0' + m : m || '0'),
-            s > 9 ? s : '0' + s,
-          ].filter(a => a).join(':');
-        }
-      }
-    })
-  }
-  YTPlayerWidgetAppInit()
-
-/*
   socket.on('newVolume', function (vol) {
     player.setVolume(vol)
   })
@@ -292,6 +231,29 @@
     player.seekTo(player.getDuration() / 100 * (Math.floor(e.offsetX * 100 / this.offsetWidth)))
   })
 
+  setInterval(function () {
+    socket.emit('songs.getSongRequests');
+  }, 2000)
+  socket.on('songRequestsList', function (list) {
+    $("#yt-song-requests-count").text(list.length)
+
+    $("table#songRequestsWidget").empty();
+    if (_.isEmpty(list)) {
+      $("table#songRequestsWidget").append(
+        '<tr><td colspan=3 class="text-info text-center"><strong>No song requests found</strong></td></tr>');
+    }
+    for (var index in list) {
+      if (list.hasOwnProperty(index)) {
+        var title = list[index].title,
+          requestedBy = list[index].username,
+          length_seconds = list[index].length_seconds,
+          videoID = list[index].videoID;
+        $("table#songRequestsWidget").append('<tr><td>' + (new Date(length_seconds * 1000)).toUTCString().match(
+          /(\d\d:\d\d:\d\d)/)[0] + '</td><td>' + title + '</td><td>' + requestedBy + '</td></tr>');
+      }
+    }
+  });
+
   function toggleSongsFromSongRequest() {
     socket.emit('songs.toggleSongRequests')
     $icon = $('button#toggle-songrequest-btn i')
@@ -313,5 +275,4 @@
     $icon = $('button#toggle-playlist-btn i')
     $icon.removeClass().addClass(`far ${data.playlist ? `fa-check-square`: `fa-square`}`)
   })
-  */
 </script>

@@ -65,7 +65,7 @@ class Songs extends System {
         where = where || {}
         cb(null, await global.db.engine.find(this.collection.playlist, where))
       })
-      socket.on('find.requests', async (where, cb) => {
+      socket.on('find.request', async (where, cb) => {
         where = where || {}
         cb(null, _.orderBy(await global.db.engine.find(this.collection.request, where)), ['addedAt'], ['asc'])
       })
@@ -85,6 +85,9 @@ class Songs extends System {
       })
       socket.on('import.video', async (url, cb) => {
         cb(null, await this.addSongToPlaylist({ parameters: url, sender: null }))
+      })
+      socket.on('next', async () => {
+        this.sendNextSongID()
       })
     })
   }
@@ -295,9 +298,9 @@ class Songs extends System {
 
   async createRandomSeeds () {
     let playlist = await global.db.engine.find(this.collection.playlist)
-    _.each(playlist, function (item) {
+    for (let item of playlist) {
       global.db.engine.update(this.collection.playlist, { _id: item._id.toString() }, { seed: Math.random() })
-    })
+    }
   }
 
   help () {
@@ -335,7 +338,7 @@ class Songs extends System {
       return
     }
 
-    ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async function (err, videoInfo) {
+    ytdl.getInfo('https://www.youtube.com/watch?v=' + videoID, async (err, videoInfo) => {
       if (err) return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' })
       if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
         global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
