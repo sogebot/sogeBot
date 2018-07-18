@@ -4,7 +4,7 @@
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#twitch-main" aria-controls="home" role="tab" data-toggle="tab" title="Twitch Stream Monitor">
-          <i class="fab fa-twitch" aria-hidden="true"></i>
+          <font-awesome-icon :icon="['fab', 'twitch']" />
         </a>
       </li>
       <li class="nav-item ml-auto">
@@ -25,8 +25,17 @@
 </template>
 
 <script>
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faTwitch } from '@fortawesome/free-brands-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+library.add(faTwitch)
+
 export default {
   props: ['socket', 'commons'],
+  components: {
+    'font-awesome-icon': FontAwesomeIcon
+  },
   created: function () {
     this.socket.emit('twitch.sendTwitchVideo')
     this.socket.once('twitchVideo', function (room) {

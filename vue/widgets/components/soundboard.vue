@@ -4,7 +4,7 @@
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#soundboard-main" aria-controls="home" role="tab" data-toggle="tab" title="SoundBoard">
-          <i class="fas fa-music" aria-hidden="true"></i>
+          <font-awesome-icon icon="music" />
         </a>
       </li>
       <li class="nav-item ml-auto">
@@ -36,8 +36,17 @@
 </template>
 
 <script>
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faMusic } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+library.add(faMusic)
+
 export default {
   props: ['socket', 'commons'],
+  components: {
+    'font-awesome-icon': FontAwesomeIcon
+  },
   data: function () {
     return {
       audio: null,
