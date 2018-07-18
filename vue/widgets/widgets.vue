@@ -23,6 +23,7 @@
 
 <script>
 import chat from './components/chat.vue'
+import soundboard from './components/soundboard.vue'
 import twitch from './components/twitch.vue'
 import twitter from './components/twitter.vue'
 import ytplayer from './components/ytplayer.vue'
@@ -31,6 +32,7 @@ export default {
   props: ['items', 'commons', 'socket'],
   components: {
     chat,
+    soundboard,
     twitch,
     twitter,
     ytplayer
