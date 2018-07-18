@@ -4,17 +4,17 @@
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#chat-room-panel" aria-controls="home" role="tab" data-toggle="tab" title="Chat room">
-          <i class="fas fa-comment-alt" aria-hidden="true"></i>
+          <font-awesome-icon icon="comment-alt" />
         </a>
       </li>
       <li role="presentation" class="nav-item">
         <a class="nav-link" href="#chat-viewers-panel" aria-controls="home" role="tab" data-toggle="tab" title="Viewer list">
-          <i class="fas fa-users" aria-hidden="true"></i>
+          <font-awesome-icon icon="users" />
         </a>
       </li>
       <li role="presentation" class="nav-item widget-popout">
         <a class="nav-link" title="Popout" target="_blank" href="/popout/#chat">
-          <i class="fas fa-external-link-alt"></i>
+          <font-awesome-icon icon="external-link-alt" />
         </a>
       </li>
       <li class="nav-item ml-auto">
@@ -56,8 +56,16 @@
 </template>
 
 <script>
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faCommentAlt, faUsers, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+library.add(faCommentAlt, faUsers, faExternalLinkAlt)
 export default {
   props: ['socket', 'commons'],
+  components: {
+    'font-awesome-icon': FontAwesomeIcon
+  },
   data: function () {
     return {
       chatMessage: '',

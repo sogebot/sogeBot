@@ -1,7 +1,6 @@
 /* globals io token commons _ translations socket */
 
-var Vue = require('vue')
-
+const Vue = require('vue')
 const Widgets = require('./widgets.vue')
 
 function initWidgets () {
