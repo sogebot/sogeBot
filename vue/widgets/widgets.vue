@@ -1,7 +1,5 @@
 <template>
 <div class="widgets">
-  <font-awesome-icon icon="coffee" />
-
   <div class="grid-stack" v-if="show">
     <template v-for="item in items">
       <div :key="item.id"
@@ -25,6 +23,7 @@
 
 <script>
 import chat from './components/chat.vue'
+import cmdboard from './components/cmdboard.vue'
 import commercial from './components/commercial.vue'
 import soundboard from './components/soundboard.vue'
 import twitch from './components/twitch.vue'
@@ -35,6 +34,7 @@ export default {
   props: ['items', 'commons', 'socket'],
   components: {
     chat,
+    cmdboard,
     commercial,
     soundboard,
     twitch,
