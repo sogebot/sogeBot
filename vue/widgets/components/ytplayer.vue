@@ -88,6 +88,9 @@ export default {
     return {
       requests: ['a', 'b']
     }
-  }
+  },
+  mounted: function () {
+    this.$emit('mounted')
+  },
 }
 </script>

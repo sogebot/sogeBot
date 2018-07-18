@@ -1,3 +1,4 @@
+<template>
 <div class="card widget">
   <div class="card-header">
     <ul class="nav nav-pills" role="tablist">
@@ -7,7 +8,7 @@
         </a>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title" data-lang="widget-title-monitor"></h6>
+        <h6 class="widget-title">{{ commons.translate('widget-title-monitor') }}</h6>
       </li>
     </ul>
   </div>
@@ -21,13 +22,22 @@
     </div>
   </div>
 </div>
+</template>
 
 <script>
-  socket.emit('twitch.sendTwitchVideo')
-  socket.once('twitchVideo', function (room) {
-    $("#twitch-main").append(`<iframe style="width: 100%; height: 100%"
-      src="${window.location.protocol}//player.twitch.tv/?channel=${room}&autoplay=true&muted=true"
-      frameborder="0">
-    </iframe>`)
-  })
+export default {
+  props: ['socket', 'commons'],
+  created: function () {
+    this.socket.emit('twitch.sendTwitchVideo')
+    this.socket.once('twitchVideo', function (room) {
+      $("#twitch-main").append(`<iframe style="width: 100%; height: 100%"
+        src="${window.location.protocol}//player.twitch.tv/?channel=${room}&autoplay=true&muted=true"
+        frameborder="0">
+      </iframe>`)
+    })
+  },
+  mounted: function () {
+    this.$emit('mounted')
+  },
+}
 </script>

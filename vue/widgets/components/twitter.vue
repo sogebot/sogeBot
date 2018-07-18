@@ -1,3 +1,4 @@
+<template>
 <div class="card widget">
   <div class="card-header">
     <ul class="nav nav-pills" role="tablist">
@@ -16,29 +17,35 @@
   <div class="card-body">
     <div class="tab-content">
       <div role="tabpanel" class="tab-pane active" id="twitter-main">
-        <form>
-          <div class="form-row">
-            <div class="col">
-              <input type="text" id="twitterInput" class="form-control" />
-            </div>
-            <div class="col-auto">
-              <button id="twitterInputSubmit" class="form-control btn btn-primary">Tweet</button>
-            </div>
+        <div class="form-row">
+          <div class="col">
+            <input type="text" v-model="message" class="form-control" />
           </div>
-        </form>
+          <div class="col-auto">
+            <button on:click="send" class="form-control btn btn-primary">Tweet</button>
+          </div>
+        </div>
       </div>
       <!-- /MAIN -->
     </div>
   </div>
 </div>
+</template>
 
 <script>
-  $('#twitterInputSubmit').on('click', function (ev) {
-    ev.preventDefault()
-    var message = $('#twitterInput').val()
-    $('#twitterInput').val('')
-
-    if (message.length > 0) socket.emit('twitter.send', message)
-  })
-
+export default {
+  props: ['socket', 'commons'],
+  data: function () {
+    return { message: '' }
+  },
+  methods: {
+    send: function () {
+      if (this.message.length > 0) this.socket.emit('twitter.send', this.message)
+      this.message = ''
+    }
+  },
+  mounted: function () {
+    this.$emit('mounted')
+  },
+}
 </script>
