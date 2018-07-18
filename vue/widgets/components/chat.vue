@@ -18,7 +18,7 @@
         </a>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title" data-lang="widget-title-chat"></h6>
+        <h6 class="widget-title">{{ commons.translate('widget-title-chat') }}</h6>
       </li>
     </ul>
   </div>

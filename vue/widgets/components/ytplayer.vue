@@ -1,23 +1,37 @@
 <template>
-  <div class="card widget">
-    <div class="card-header">
-      <ul class="nav nav-pills" role="tablist">
-        <li role="presentation" class="nav-item">
-          <a class="nav-link" href="#yt-song-requests" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
-            {{ requests.length }}
-            <i class="fas fa-user" aria-hidden="true"></i>
-          </a>
-        </li>
-        <li role="presentation" class="nav-item">
-          <a class="nav-link active" href="#yt-player" aria-controls="home" role="tab" data-toggle="tab">
-            <i class="fas fa-music" aria-hidden="true"></i>
-          </a>
-        </li>
-        <li class="nav-item ml-auto">
-          <h6 class="widget-title" data-lang="widget-title-ytplayer"></h6>
-        </li>
-      </ul>
-    </div>
+<div class="card widget">
+  <div class="card-header">
+    <ul class="nav nav-pills" role="tablist">
+      <li role="presentation" class="nav-item">
+        <a class="nav-link" href="#yt-song-requests" aria-controls="home" role="tab" data-toggle="tab" title="Song Requests">
+          {{ requests.length }}
+          <i class="fas fa-user" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li role="presentation" class="nav-item">
+        <a class="nav-link active" href="#yt-player" aria-controls="home" role="tab" data-toggle="tab">
+          <i class="fas fa-music" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li class="nav-item ml-auto">
+        <h6 class="widget-title">{{ commons.translate('widget-title-ytplayer') }}</h6>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Tab panes -->
+  <div class="card-body">
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="yt-player">
+        <div id="YTPlayer"></div>
+        <div class="row">
+          <div class="btn-group" role="group" aria-label="..." style="width: 100%; padding-left:15px; padding-right: 15px; height: 34px;">
+            <button type="button" class="btn btn-success" id="YTControl">
+              <i class="fas fa-play" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="skipSong()">
+              <i class="fas fa-forward" aria-hidden="true"></i>
+            </button>
 
     <!-- Tab panes -->
     <div class="card-body">
