@@ -28,6 +28,7 @@
             style="width: 50%; text-overflow: ellipsis; height: 3.1rem;"
             v-for="item of items"
             v-on:click="emit(item)"
+            :data-name="item.text"
             :key="item"
             :title="item.command">
             <span style="overflow: hidden; display: inline-block; word-break: break-all; height: 30px;">
@@ -42,6 +43,7 @@
             style="width: 100%; text-overflow: ellipsis; height: 3.1rem;"
             v-for="item of items"
             v-on:click="emit(item)"
+            :data-name="item.text"
             :key="item"
             :title="item.command">
             <span style="overflow: hidden; display: inline-block; word-break: break-all; height: 30px;">
@@ -154,77 +156,9 @@ export default {
         name: this.name,
         command: this.command
       })
+      this.name = ''
+      this.command = ''
     }
   }
 }
-/*
-  var cmdboard = {
-    el: null,
-    displayAs: 'list',
-    emit: function (ev, el) {
-      ev.preventDefault()
-      socket.emit('cmdboard.widget.run', el.dataset.name)
-    },
-    updateDisplayAs: function () {
-      if (cmdboard.displayAs === 'list') {
-        $('#cmdboard-display-as-list').parent().removeClass('active').addClass('active')
-        $('#cmdboard-display-as-grid').parent().removeClass('active')
-        $('.cmdboard-list-group-item').css('width', '100%')
-        $('#cmdboard-list').css('flex-direction', 'column')
-        $('#cmdboard-list').css('display', 'flex')
-      } else {
-        $('.cmdboard-list-group-item').css('width', '50%')
-        $('#cmdboard-list').css('flex-flow', 'wrap')
-        $('#cmdboard-display-as-list').parent().removeClass('active')
-        $('#cmdboard-display-as-grid').parent().removeClass('active').addClass('active')
-      }
-    }
-  }
-
-  $('#cmdboard-display-as-list').change(() => {
-    socket.emit('saveConfiguration', {
-      widgetCmdBoardDisplayAs: 'list'
-    })
-    $('.cmdboard-list-group-item').css('width', '100%')
-    $('#cmdboard-list').css('flex-direction', 'column')
-    $('#cmdboard-list').css('display', 'flex')
-  })
-  $('#cmdboard-display-as-grid').change(() => {
-    socket.emit('saveConfiguration', {
-      widgetCmdBoardDisplayAs: 'grid'
-    })
-    $('.cmdboard-list-group-item').css('width', '50%')
-    $('#cmdboard-list').css('flex-flow', 'wrap')
-  })
-
-  socket.off('cmdboard.widget.data')
-  socket.on('cmdboard.widget.data', function (cb) {
-    $("#cmdboard-list").empty()
-    for (let command of cb)
-      $("#cmdboard-list").append(`
-        <button type="button" class="list-group-item list-group-item-action cmdboard-list-group-item" data-name="${command.text}"
-         onclick="cmdboard.emit(event, this)" type="button">
-          ${command.text}
-          <small>${command.command}</small>
-        </button>
-      `)
-
-    // deletion right-click menu
-    var menu = new BootstrapMenu(".cmdboard-list-group-item", {
-      fetchElementData: function ($el) {
-        return $el.data();
-      },
-      actions: [{
-        name: 'Delete',
-        classNames: ['action-danger'],
-        iconClass: 'fa-trash-alt',
-        onClick: function (data) {
-          socket.emit('cmdboard.widget.remove', data)
-        }
-      }]
-    })
-
-    cmdboard.updateDisplayAs()
-  })
-  */
 </script>
