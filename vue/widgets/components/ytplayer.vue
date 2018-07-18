@@ -14,7 +14,7 @@
         </a>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title" data-lang="widget-title-ytplayer"></h6>
+        <h6 class="widget-title">{{ commons.translate('widget-title-ytplayer') }}</h6>
       </li>
     </ul>
   </div>

@@ -8,7 +8,7 @@
         </a>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title" data-lang="widget-title-twitter"></h6>
+        <h6 class="widget-title">{{ commons.translate('widget-title-twitter') }}</h6>
       </li>
     </ul>
   </div>
