@@ -25,6 +25,7 @@
 import chat from './components/chat.vue'
 import cmdboard from './components/cmdboard.vue'
 import commercial from './components/commercial.vue'
+import customvariables from './components/customvariables.vue'
 import soundboard from './components/soundboard.vue'
 import twitch from './components/twitch.vue'
 import twitter from './components/twitter.vue'
@@ -36,10 +37,11 @@ export default {
     chat,
     cmdboard,
     commercial,
+    customvariables,
     soundboard,
     twitch,
     twitter,
-    ytplayer
+    ytplayer,
   },
   data: function () {
     return {
