@@ -301,7 +301,7 @@ Panel.prototype.sendMenu = function (socket) { socket.emit('menu', this.menu) }
 Panel.prototype.addWidget = function (id, name, icon) { this.widgets.push({id: id, name: name, icon: icon}) }
 
 Panel.prototype.sendWidget = async function (socket) {
-  socket.emit('widgets', await global.db.engine.find('widgets'))
+  global.panel.io.emit('widgets', await global.db.engine.find('widgets'))
 }
 
 Panel.prototype.sendWidgetList = async function (self, socket) {
@@ -325,6 +325,7 @@ Panel.prototype.updateWidgetsInDb = async function (self, widgets, socket) {
     toAwait.push(global.db.engine.update('widgets', { id: widget.id }, { id: widget.id, position: {x: widget.position.x, y: widget.position.y}, size: { width: widget.size.width, height: widget.size.height } }))
   }
   await Promise.all(toAwait)
+  self.sendWidget(socket)
 }
 
 Panel.prototype.addWidgetToDb = async function (self, widget, socket) {

@@ -64,6 +64,9 @@ export default {
       chatters: []
     }
   },
+  mounted: function () {
+    this.$emit('mounted')
+  },
   methods: {
     sendChatMessage: function () {
       if (this.chatMessage.length > 0) this.socket.emit('chat.message.send', this.chatMessage)
