@@ -84,7 +84,7 @@
           <font-awesome-icon icon="cog"></font-awesome-icon>
         </a>
       </li>
-      <li role="presentation" class="nav-item widget-popout">
+      <li role="presentation" class="nav-item widget-popout" v-if="!popout">
         <a class="nav-link" title="Popout" target="_blank" href="/popout/#eventlist">
           <font-awesome-icon icon="external-link-alt"></font-awesome-icon>
         </a>
@@ -173,7 +173,7 @@ import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 library.add(faCalendar, faEye, faCog, faExternalLinkAlt, faHeart, faBullhorn, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch)
 
 export default {
-  props: ['commons', 'socket'],
+  props: ['commons', 'socket', 'popout'],
   components: {
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-icon': FontAwesomeIcon

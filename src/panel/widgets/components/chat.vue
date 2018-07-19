@@ -12,7 +12,7 @@
           <font-awesome-icon icon="users" />
         </a>
       </li>
-      <li role="presentation" class="nav-item widget-popout">
+      <li role="presentation" class="nav-item widget-popout" v-if="!popout">
         <a class="nav-link" title="Popout" target="_blank" href="/popout/#chat">
           <font-awesome-icon icon="external-link-alt" />
         </a>
@@ -62,7 +62,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faCommentAlt, faUsers, faExternalLinkAlt)
 export default {
-  props: ['socket', 'commons'],
+  props: ['socket', 'commons', 'popout'],
   components: {
     'font-awesome-icon': FontAwesomeIcon
   },

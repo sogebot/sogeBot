@@ -1,0 +1,51 @@
+<template>
+  <component :is="widget" v-bind:socket="socket" v-bind:commons="commons" :popout="true"></component>
+</template>
+
+<script>
+import chat from './components/chat.vue'
+import cmdboard from './components/cmdboard.vue'
+import commercial from './components/commercial.vue'
+import customvariables from './components/customvariables.vue'
+import eventlist from './components/eventlist.vue'
+import join from './components/join.vue'
+import part from './components/part.vue'
+import soundboard from './components/soundboard.vue'
+import twitch from './components/twitch.vue'
+import twitter from './components/twitter.vue'
+import ytplayer from './components/ytplayer.vue'
+
+export default {
+  props: ['items', 'commons', 'socket', 'page'],
+  components: {
+    chat,
+    cmdboard,
+    commercial,
+    customvariables,
+    eventlist,
+    join,
+    part,
+    soundboard,
+    twitch,
+    twitter,
+    ytplayer,
+  },
+  data: function () {
+    return {
+      widget: null
+    }
+  },
+  created: function () {
+    this.page.base('/popout/')
+    this.page('/', p => {
+      const id = p.hash.length === 0 ? 'dashboard' : p.hash
+      $('title').text(`${name.toUpperCase()} POPOUT - ${id}`)
+
+      this.widget = id
+    })
+    this.page({ popstate:true })
+  },
+  methods: {
+  }
+}
+</script>
