@@ -18,8 +18,7 @@ CmdboardWidget.prototype.fetchCommands = async function (self, socket) {
 }
 
 CmdboardWidget.prototype.runCommand = async function (self, socket, data) {
-  let commands = await global.db.engine.find('widgetsCmdBoard')
-  _.sample(require('cluster').workers).send({ type: 'message', sender: { username: global.commons.getOwner() }, message: _.find(commands, (o) => o.text === data).command, skip: true })
+  _.sample(require('cluster').workers).send({ type: 'message', sender: { username: global.commons.getOwner() }, message: data, skip: true })
 }
 
 CmdboardWidget.prototype.addCommand = async function (self, socket, data) {

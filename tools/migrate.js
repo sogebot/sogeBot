@@ -66,6 +66,16 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  wudgets: [{
+    version: '7.6.0',
+    do: async () => {
+      console.info('Removing joinpart widget')
+      let items = await global.db.engine.find('widgets', { id: 'joinpart' })
+      await global.db.engine.remove('widgets', { id: 'joinpart' })
+      let processed = items.length
+      console.info(` => ${processed} deleted joinpart widgets`)
+    }
+  }],
   cache: [{
     version: '7.5.0',
     do: async () => {
