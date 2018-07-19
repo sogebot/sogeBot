@@ -219,7 +219,6 @@ export default {
   },
   computed: {
     fEvents: function () {
-      let events = this.events
       let toShow = []
       if (this.settings.widgetEventlistFollows) toShow.push('follow')
       if (this.settings.widgetEventlistHosts) toShow.push('host')
