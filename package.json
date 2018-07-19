@@ -74,7 +74,7 @@
   "scripts": {
     "prebuild": "npm install rimraf bestzip npm-run-all cross-var -g",
     "build": "npm-run-all --sequential cleanup:* build:modules build:shrinkwrap build:zip",
-    "build:widgets": "cross-env NODE_ENV=production browserify -p tinyify -t vueify -e -g envify vue/widgets/widgets.js -o public/dist/js/widgets.js",
+    "build:panel": "cross-env NODE_ENV=production browserify -p tinyify -t vueify -e -g envify src/panel/index.js -o public/dist/js/main.js",
     "build:css": "npm-run-all --parallel compile:css:*",
     "build:modules": "npm install",
     "build:shrinkwrap": "npm shrinkwrap",
@@ -85,7 +85,7 @@
     "test": "mocha --recursive --timeout 20000 --exit",
     "test:config:mongodb": "cp config.example.json config.json && sed -i -- 's/nedb/mongodb/g' config.json",
     "test:config:nedb": "cp config.example.json config.json",
-    "start": "node ./tools/migrate && npm-run-all --parallel build:css copy:dist build:widgets && cross-env NODE_ENV=production node ./main || true",
+    "start": "node ./tools/migrate && npm-run-all --parallel build:css copy:dist build:panel && cross-env NODE_ENV=production node ./main || true",
     "start-no-migration": "npm-run-all --parallel build:css copy:dist && cross-env NODE_ENV=production node ./main || true",
     "debug": "npm run copy:dist && node --inspect ./main || true",
     "cleanup": "node ./tools/cleanup.js || true",
