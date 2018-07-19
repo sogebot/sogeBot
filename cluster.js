@@ -1,11 +1,10 @@
 'use strict'
-
 const util = require('util')
 const _ = require('lodash')
 const debug = require('debug')
 const crypto = require('crypto')
 
-const Parser = require('./libs/parser')
+const Parser = require('./src/bot/parser')
 
 const DEBUG_CLUSTER_WORKER = debug('cluster:worker')
 
@@ -22,24 +21,24 @@ function cluster () {
     return
   }
 
-  global.configuration = new (require('./libs/configuration.js'))()
-  global.currency = new (require('./libs/currency.js'))()
-  global.users = new (require('./libs/users.js'))()
-  global.events = new (require('./libs/events.js'))()
-  global.customvariables = new (require('./libs/customvariables.js'))()
-  global.twitch = new (require('./libs/twitch'))()
-  global.permissions = new (require('./libs/permissions'))()
-  global.api = new (require('./libs/api'))()
+  global.configuration = new (require('./src/bot/configuration.js'))()
+  global.currency = new (require('./src/bot/currency.js'))()
+  global.users = new (require('./src/bot/users.js'))()
+  global.events = new (require('./src/bot/events.js'))()
+  global.customvariables = new (require('./src/bot/customvariables.js'))()
+  global.twitch = new (require('./src/bot/twitch'))()
+  global.permissions = new (require('./src/bot/permissions'))()
+  global.api = new (require('./src/bot/api'))()
 
   global.lib = {}
-  global.lib.translate = new (require('./libs/translate'))()
+  global.lib.translate = new (require('./src/bot/translate'))()
   global.translate = global.lib.translate.translate
 
   global.lib.translate._load().then(function () {
-    global.systems = require('auto-load')('./libs/systems/')
-    global.overlays = require('auto-load')('./libs/overlays/')
-    global.games = require('auto-load')('./libs/games/')
-    global.integrations = require('auto-load')('./libs/integrations/')
+    global.systems = require('auto-load')('./src/bot/systems/')
+    global.overlays = require('auto-load')('./src/bot/overlays/')
+    global.games = require('auto-load')('./src/bot/games/')
+    global.integrations = require('auto-load')('./src/bot/integrations/')
 
     DEBUG_CLUSTER_WORKER(`Worker ${process.pid} has started.`)
 

@@ -1,4 +1,5 @@
 'use strict'
+require('module-alias/register')
 
 const figlet = require('figlet')
 const cluster = require('cluster')
@@ -9,9 +10,9 @@ const debug = require('debug')
 const _ = require('lodash')
 const moment = require('moment')
 
-const constants = require('./libs/constants')
-const config = require('./config.json')
-const Timeout = require('./libs/timeout')
+const constants = require('./src/bot/constants')
+const config = require('@config')
+const Timeout = require('./src/bot/timeout')
 
 const DEBUG_CLUSTER_FORK = debug('cluster:fork')
 const DEBUG_CLUSTER_MASTER = debug('cluster:master')
@@ -20,8 +21,8 @@ const DEBUG_TMIJS = debug('tmijs')
 // this is disabled in tests
 global.cluster = _.isNil(global.cluster) ? true : global.cluster
 
-global.commons = new (require('./libs/commons'))()
-global.cache = new (require('./libs/cache'))()
+global.commons = new (require('./src/bot/commons'))()
+global.cache = new (require('./src/bot/cache'))()
 
 global.linesParsed = 0
 global.avgResponse = []
@@ -33,9 +34,9 @@ global.status = { // TODO: move it?
   'RES': 0
 }
 
-require('./libs/logging') // logger is on master / worker have own global.log sending data through process
+require('./src/bot/logging') // logger is on master / worker have own global.log sending data through process
 
-global.db = new (require('./libs/databases/database'))(global.cluster)
+global.db = new (require('./src/bot/databases/database'))(global.cluster)
 if (cluster.isMaster) {
   // spin up forks first
   global.cpu = config.cpu === 'auto' ? os.cpus().length : parseInt(_.get(config, 'cpu', 1), 10)
@@ -50,23 +51,23 @@ if (cluster.isMaster) {
 function main () {
   if (!global.db.engine.connected) return setTimeout(() => main(), 10)
 
-  global.configuration = new (require('./libs/configuration.js'))()
-  global.currency = new (require('./libs/currency.js'))()
-  global.stats = new (require('./libs/stats.js'))()
-  global.users = new (require('./libs/users.js'))()
-  global.logger = new (require('./libs/logging.js'))()
+  global.configuration = new (require('./src/bot/configuration.js'))()
+  global.currency = new (require('./src/bot/currency.js'))()
+  global.stats = new (require('./src/bot/stats.js'))()
+  global.users = new (require('./src/bot/users.js'))()
+  global.logger = new (require('./src/bot/logging.js'))()
 
-  global.events = new (require('./libs/events.js'))()
-  global.customvariables = new (require('./libs/customvariables.js'))()
+  global.events = new (require('./src/bot/events.js'))()
+  global.customvariables = new (require('./src/bot/customvariables.js'))()
 
-  global.panel = new (require('./libs/panel'))()
-  global.webhooks = new (require('./libs/webhooks'))()
-  global.api = new (require('./libs/api'))()
-  global.twitch = new (require('./libs/twitch'))()
-  global.permissions = new (require('./libs/permissions'))()
+  global.panel = new (require('./src/bot/panel'))()
+  global.webhooks = new (require('./src/bot/webhooks'))()
+  global.api = new (require('./src/bot/api'))()
+  global.twitch = new (require('./src/bot/twitch'))()
+  global.permissions = new (require('./src/bot/permissions'))()
 
   global.lib = {}
-  global.lib.translate = new (require('./libs/translate'))()
+  global.lib.translate = new (require('./src/bot/translate'))()
   global.translate = global.lib.translate.translate
 
   // panel
@@ -102,11 +103,11 @@ function main () {
   })
 
   global.lib.translate._load().then(function () {
-    global.systems = require('auto-load')('./libs/systems/')
-    global.widgets = require('auto-load')('./libs/widgets/')
-    global.overlays = require('auto-load')('./libs/overlays/')
-    global.games = require('auto-load')('./libs/games/')
-    global.integrations = require('auto-load')('./libs/integrations/')
+    global.systems = require('auto-load')('./src/bot/systems/')
+    global.widgets = require('auto-load')('./src/bot/widgets/')
+    global.overlays = require('auto-load')('./src/bot/overlays/')
+    global.games = require('auto-load')('./src/bot/games/')
+    global.integrations = require('auto-load')('./src/bot/integrations/')
 
     global.panel.expose()
 

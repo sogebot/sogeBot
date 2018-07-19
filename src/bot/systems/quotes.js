@@ -6,7 +6,7 @@ const System = require('./_interface')
 const Expects = require('../expects')
 
 const constants = require('../constants.js')
-const config = require('../../config.json')
+const config = require('@config')
 
 class Quotes extends System {
   constructor () {

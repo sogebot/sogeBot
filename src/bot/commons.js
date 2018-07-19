@@ -5,7 +5,7 @@ var chalk = require('chalk')
 const debug = require('debug')
 const moment = require('moment')
 
-const config = require('../config.json')
+const config = require('@config')
 
 const cluster = require('cluster')
 const Message = require('./message')

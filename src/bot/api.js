@@ -1,6 +1,6 @@
 const debug = require('debug')
 const _ = require('lodash')
-const config = require('../config.json')
+const config = require('@config')
 const axios = require('axios')
 const constants = require('./constants')
 const moment = require('moment')

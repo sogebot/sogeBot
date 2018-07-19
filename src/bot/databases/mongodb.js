@@ -3,7 +3,7 @@ const ObjectID = require('mongodb').ObjectID
 const mongodbUri = require('mongodb-uri')
 
 const Interface = require('./interface')
-const config = require('../../config.json')
+const config = require('@config')
 const flatten = require('flat')
 
 const _ = require('lodash')

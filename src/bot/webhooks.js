@@ -1,6 +1,6 @@
 const _ = require('lodash')
 const axios = require('axios')
-const config = require('../config.json')
+const config = require('@config')
 const debug = require('debug')('webhooks')
 
 const Timeout = require('./timeout')

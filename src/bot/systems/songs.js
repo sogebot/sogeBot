@@ -6,7 +6,7 @@ const ytdl = require('ytdl-core')
 const ytpl = require('ytpl')
 const ytsearch = require('youtube-search')
 // bot libraries
-const config = require('../../config.json')
+const config = require('@config')
 const constants = require('../constants')
 const debug = require('debug')('systems:songs')
 const cluster = require('cluster')

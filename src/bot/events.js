@@ -7,7 +7,7 @@ const safeEval = require('safe-eval')
 const flatten = require('flat')
 const moment = require('moment')
 const cluster = require('cluster')
-const config = require('../config.json')
+const config = require('@config')
 
 const Message = require('./message')
 const Timeout = require('./timeout')

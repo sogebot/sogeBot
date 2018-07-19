@@ -6,7 +6,7 @@ const axios = require('axios')
 
 // bot libraries
 const constants = require('../constants')
-const config = require('../../config')
+const config = require('@config')
 const System = require('./_interface')
 
 /*

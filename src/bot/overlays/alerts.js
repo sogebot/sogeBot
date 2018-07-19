@@ -6,7 +6,7 @@ const constants = require('../constants.js')
 const cluster = require('cluster')
 const axios = require('axios')
 const Message = require('../message')
-const config = require('../../config.json')
+const config = require('@config')
 
 function Alerts () {
   global.configuration.register('replayPosition', 'core.no-response', 'string', 'right')

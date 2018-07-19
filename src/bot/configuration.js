@@ -2,7 +2,7 @@
 
 const constants = require('./constants')
 const _ = require('lodash')
-const config = require('../config.json')
+const config = require('@config')
 const debug = require('debug')
 
 const DEBUG_CONFIGURATION_SETVALUE = debug('configuration:setValue')

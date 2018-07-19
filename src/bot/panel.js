@@ -11,7 +11,7 @@ const util = require('util')
 
 const Parser = require('./parser')
 
-const config = require('../config.json')
+const config = require('@config')
 
 const NOT_AUTHORIZED = '0'
 
@@ -42,12 +42,12 @@ function Panel () {
   })
 
   // static routing
-  app.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')))
+  app.use('/dist', express.static(path.join(__dirname, '..', '..', 'public', 'dist')))
   app.get('/popout/', this.authUser, function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'))
+    res.sendFile(path.join(__dirname, '..', '..', 'public', 'popout.html'))
   })
   app.get('/oauth/:page', this.authUser, function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'oauth', req.params.page + '.html'))
+    res.sendFile(path.join(__dirname, '..', '..', 'public', 'oauth', req.params.page + '.html'))
   })
   app.get('/auth/token.js', function (req, res) {
     const origin = req.headers.referer ? req.headers.referer.substring(0, req.headers.referer.length - 1) : undefined
@@ -67,31 +67,31 @@ function Panel () {
     }
   })
   app.get('/playlist', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'playlist', 'index.html'))
+    res.sendFile(path.join(__dirname, '..', '..', 'public', 'playlist', 'index.html'))
   })
   app.get('/overlays/:overlay', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'overlays', req.params.overlay + '.html'))
+    res.sendFile(path.join(__dirname, '..', '..', 'public', 'overlays', req.params.overlay + '.html'))
   })
   app.get('/custom/:custom', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'custom', req.params.custom + '.html'))
+    res.sendFile(path.join(__dirname, '..', '..', 'public', 'custom', req.params.custom + '.html'))
   })
   app.get('/public/:public', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'public', req.params.public + '.html'))
+    res.sendFile(path.join(__dirname, '..', '..', 'public', 'public', req.params.public + '.html'))
   })
   app.get('/favicon.ico', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'favicon.ico'))
+    res.sendFile(path.join(__dirname, '..', '..', 'public', 'favicon.ico'))
   })
   app.get('/', this.authUser, function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'))
+    res.sendFile(path.join(__dirname, '..', '..', 'public', 'index.html'))
   })
   app.get('/:type/registry/:subtype/:page', this.authUser, function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', req.params.type, 'registry', req.params.subtype, req.params.page))
+    res.sendFile(path.join(__dirname, '..', '..', 'public', req.params.type, 'registry', req.params.subtype, req.params.page))
   })
   app.get('/:type/:subtype/:page', this.authUser, function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.subtype, req.params.page))
+    res.sendFile(path.join(__dirname, '..', '..', 'public', req.params.type, req.params.subtype, req.params.page))
   })
   app.get('/:type/:page', this.authUser, function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', req.params.type, req.params.page))
+    res.sendFile(path.join(__dirname, '..', '..', 'public', req.params.type, req.params.page))
   })
 
   this.io = require('socket.io')(this.server)
