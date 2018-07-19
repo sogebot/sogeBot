@@ -26,6 +26,8 @@ import chat from './components/chat.vue'
 import cmdboard from './components/cmdboard.vue'
 import commercial from './components/commercial.vue'
 import customvariables from './components/customvariables.vue'
+import join from './components/join.vue'
+import part from './components/part.vue'
 import soundboard from './components/soundboard.vue'
 import twitch from './components/twitch.vue'
 import twitter from './components/twitter.vue'
@@ -38,6 +40,8 @@ export default {
     cmdboard,
     commercial,
     customvariables,
+    join,
+    part,
     soundboard,
     twitch,
     twitter,
