@@ -6,7 +6,7 @@ const axios = require('axios')
 
 // bot libraries
 const constants = require('../constants')
-const config = require('../../config')
+const config = require('@config')
 
 /*
  * !commercial                        - gets an info about alias usage

@@ -10,7 +10,7 @@ var logDir = './logs'
 var moment = require('moment-timezone')
 const glob = require('glob')
 const cluster = require('cluster')
-const config = require('../config.json')
+const config = require('@config')
 
 config.timezone = config.timezone === 'system' || _.isNil(config.timezone) ? moment.tz.guess() : config.timezone
 

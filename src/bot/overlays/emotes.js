@@ -7,7 +7,7 @@ const cluster = require('cluster')
 const { EmoteFetcher } = require('twitch-emoticons')
 
 // bot libraries
-const config = require('../../config')
+const config = require('@config')
 
 function Emotes () {
   this.simpleEmotes = {

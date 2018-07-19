@@ -7,7 +7,7 @@ const debug = require('debug')
 const cluster = require('cluster')
 require('moment-precise-range-plugin')
 
-const config = require('../config.json')
+const config = require('@config')
 config.timezone = config.timezone === 'system' || _.isNil(config.timezone) ? moment.tz.guess() : config.timezone
 
 class Twitch {

@@ -5,7 +5,7 @@ const debug = require('debug')
 const util = require('util')
 
 const constants = require('./constants')
-const config = require('../config.json')
+const config = require('@config')
 
 const DEBUG_PROCESS_PARSE = debug('parser:process')
 

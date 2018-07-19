@@ -5,7 +5,7 @@ var constants = require('./constants')
 const XRegExp = require('xregexp')
 const cluster = require('cluster')
 
-const config = require('../config.json')
+const config = require('@config')
 const debug = require('debug')('users')
 const Timeout = require('./timeout')
 

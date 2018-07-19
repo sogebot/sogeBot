@@ -5,7 +5,7 @@ const decode = require('decode-html')
 const querystring = require('querystring')
 const debug = require('debug')
 const _ = require('lodash')
-const config = require('../config.json')
+const config = require('@config')
 const cluster = require('cluster')
 const crypto = require('crypto')
 

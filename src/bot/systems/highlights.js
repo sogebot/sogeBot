@@ -10,7 +10,7 @@ const axios = require('axios')
 
 // bot libraries
 const constants = require('../constants')
-const config = require('../../config.json')
+const config = require('@config')
 
 const ERROR_STREAM_NOT_ONLINE = '1'
 

@@ -1,6 +1,6 @@
 const _ = require('lodash')
 
-const config = require('../../config.json')
+const config = require('@config')
 
 const INeDB = require('./nedb')
 const IMongoDB = require('./mongodb')

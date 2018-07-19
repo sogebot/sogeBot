@@ -1,14 +1,16 @@
+require('module-alias/register')
+
 const _ = require('lodash')
 const figlet = require('figlet')
 const config = require('../config.json')
 const compareVersions = require('compare-versions')
 
 // logger
-const Logger = require('../libs/logging')
+const Logger = require('../src/bot/logging')
 global.logger = new Logger()
 
 // db
-const Database = require('../libs/databases/database')
+const Database = require('../src/bot/databases/database')
 global.db = new Database(false)
 
 var runMigration = async function () {
@@ -158,7 +160,7 @@ let migration = {
     do: async () => {
       console.info('Migration alias to %s', '7.0.0')
       let alias = await global.db.engine.find('alias')
-      const constants = require('../libs/constants')
+      const constants = require('../src/bot/constants')
       for (let item of alias) {
         await global.db.engine.update('alias', { _id: item._id.toString() }, { permission: constants.VIEWERS })
       }
@@ -169,7 +171,7 @@ let migration = {
     do: async () => {
       console.info('Migration commands to %s', '7.0.0')
       let commands = await global.db.engine.find('commands')
-      const constants = require('../libs/constants')
+      const constants = require('../src/bot/constants')
       for (let command of commands) {
         await global.db.engine.update('commands', { _id: command._id.toString() }, { permission: constants.VIEWERS })
       }

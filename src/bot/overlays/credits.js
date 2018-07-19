@@ -1,7 +1,7 @@
 const debug = require('debug')
 const _ = require('lodash')
 const axios = require('axios')
-const config = require('../../config.json')
+const config = require('@config')
 
 class Credits {
   constructor () {

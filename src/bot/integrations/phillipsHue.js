@@ -7,7 +7,7 @@ const lightState = require('node-hue-api').lightState
 const cluster = require('cluster')
 
 // bot libraries
-const config = require('../../config.json')
+const config = require('@config')
 const constants = require('../constants')
 
 /*

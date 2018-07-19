@@ -39,6 +39,7 @@
     "jquery": "3.3.1",
     "lodash": "4.17.10",
     "mathjs": "5.0.0",
+    "module-alias": "^2.1.0",
     "moment": "2.22.2",
     "moment-precise-range-plugin": "1.3.0",
     "moment-timezone": "0.5.21",
@@ -111,5 +112,9 @@
   },
   "browser": {
     "vue": "vue/dist/vue.common.js"
+  },
+  "_moduleAliases": {
+    "@root": ".",
+    "@config": "./config.json"
   }
 }

@@ -6,7 +6,7 @@ const debug = require('debug')
 const _ = require('lodash')
 
 const Message = require('../message')
-const config = require('../../config.json')
+const config = require('@config')
 
 function Twitter () {
   if (require('cluster').isWorker) return

@@ -5,7 +5,7 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const msg = require('../../general.js').message
-const Message = require('../../../libs/message')
+const Message = require('../../../src/bot/message')
 const assert = require('chai').assert
 
 describe('Message - if filter', () => {
