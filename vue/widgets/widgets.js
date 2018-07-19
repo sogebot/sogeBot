@@ -9,8 +9,6 @@ function initWidgets () {
   new Vue({ // eslint-disable-line no-new
     el: '#widgets',
     data: {
-      _rerender: false,
-      _grid: false,
       items: [],
       socket: io({ query: 'token=' + token })
     },

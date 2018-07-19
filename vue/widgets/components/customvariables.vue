@@ -110,7 +110,6 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload)
 
-
 var optionsSelectorComponent = {
   props: ['value', 'selected'], // data for component
   methods: {

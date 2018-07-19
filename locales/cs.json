@@ -409,9 +409,9 @@
       "follow": "ti dal <strong>follow</strong>",
       "host": "tě <strong>hostuje</strong> s $viewers diváky",
       "raid": "tě <strong>raiduje</strong> s $viewers diváky",
-      "sub": "ti dal <strong>sub</strong>",
+      "sub": "ti dal <strong>sub</strong> | $tier",
       "subgift": "byl <strong>darován</strong> sub od $username",
-      "resub": "ti dal <strong>resub</strong> $months měsíců",
+      "resub": "ti dal <strong>resub</strong> $months měsíců | $tier",
       "cheer": "ti dal <strong>cheer</strong> $bits bitů",
       "tip": "ti dal <strong>tip</strong> $formatted_amount"
     },
