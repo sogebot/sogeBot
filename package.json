@@ -74,7 +74,7 @@
   "scripts": {
     "prebuild": "npm install rimraf bestzip npm-run-all cross-var -g",
     "build": "npm-run-all --sequential cleanup:* build:modules build:shrinkwrap build:zip",
-    "build:widgets": "cross-env NODE_ENV=production browserify -p common-shakeify -t vueify -e -g envify vue/widgets/widgets.js | uglifyjs -c warnings=false -m > public/dist/js/widgets.js",
+    "build:widgets": "cross-env NODE_ENV=production browserify -p tinyify -t vueify -e -g envify vue/widgets/widgets.js -o public/dist/js/widgets.js",
     "build:css": "npm-run-all --parallel compile:css:*",
     "build:modules": "npm install",
     "build:shrinkwrap": "npm shrinkwrap",
@@ -100,13 +100,12 @@
     "babel-preset-es2015": "^6.24.1",
     "babelify": "^8.0.0",
     "chai": "4.1.2",
-    "common-shakeify": "^0.5.0",
     "locate-path": "3.0.0",
     "mocha": "5.2.0",
     "sinon": "6.0.1",
     "standard": "11.0.1",
     "test-until": "1.1.1",
-    "uglify-es": "^3.3.9",
+    "tinyify": "^2.4.3",
     "vue-cli": "^2.9.6",
     "vueify": "^9.4.1"
   },
