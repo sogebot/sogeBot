@@ -35,17 +35,12 @@ export default {
       widget: null
     }
   },
-  created: function () {
-    this.page.base('/popout/')
-    this.page('/', p => {
-      const id = p.hash.length === 0 ? 'dashboard' : p.hash
-      $('title').text(`${name.toUpperCase()} POPOUT - ${id}`)
-
-      this.widget = id
+  mounted: function () {
+    this.page('/popout/', p => {
+      this.widget = p.hash.length === 0 ? 'dashboard' : p.hash
+      $('title').text(`${name.toUpperCase()} POPOUT - ${this.widget}`)
     })
     this.page({ popstate:true })
-  },
-  methods: {
   }
 }
 </script>
