@@ -12,7 +12,7 @@
       >
         <div class="grid-stack-item-content">
           <keep-alive>
-            <component :is="item.id" v-bind:socket="socket" v-bind:commons="commons" v-on:mounted="loaded = loaded + 1"></component>
+            <component :is="item.id" v-bind:socket="socket" v-bind:commons="commons" v-on:mounted="loaded = loaded + 1" :popout="false"></component>
           </keep-alive>
         </div>
       </div>
@@ -72,6 +72,7 @@ export default {
       const options = { cellHeight: 42, verticalMargin: 10, removable: true, removeTimeout: 100, handleClass: 'card-header' }
 
       this.$nextTick(function () {
+        if ($('.grid-stack').length === 0) return
         $('.grid-stack').gridstack(options)
 
         $('.grid-stack').off('change').on('change', () => {
