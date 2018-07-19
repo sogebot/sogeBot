@@ -232,27 +232,27 @@ export default {
     }
   },
   watch: {
-    eventlistSize: function (value, old) {
+    eventlistSize: _.debounce(function (value, old) {
       if (_.isNaN(Number(value))) this.eventlistSize = old
       else {
         this.settings.widgetEventlistSize = value
         this.update = String(new Date())
       }
-    },
-    eventlistShow: function (value, old) {
+    }, 500),
+    eventlistShow: _.debounce(function (value, old) {
       if (_.isNaN(Number(value))) this.eventlistShow = old
       else {
         this.settings.widgetEventlistShow = value
         this.update = String(new Date())
       }
-    },
-    eventlistMessageSize: function (value, old) {
+    }, 500),
+    eventlistMessageSize: _.debounce(function (value, old) {
       if (_.isNaN(Number(value))) this.eventlistMessageSize = old
       else {
         this.settings.widgetEventlistMessageSize = value
         this.update = String(new Date())
       }
-    },
+    }, 500),
     update: function () {
       this.socket.emit('saveConfiguration', this.settings)
     }
