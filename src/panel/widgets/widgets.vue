@@ -1,23 +1,27 @@
 <template>
-<div class="widgets">
-  <div class="grid-stack" v-if="show">
-    <template v-for="item in items">
-      <div :key="item.id"
-        v-bind:id="'widget-' + item.id"
-        v-bind:data-gs-x="item.position.x"
-        v-bind:data-gs-y="item.position.y"
-        v-bind:data-gs-width="item.size.width"
-        v-bind:data-gs-height="item.size.height"
-        class="grid-stack-item"
-      >
-        <div class="grid-stack-item-content">
-          <keep-alive>
-            <component :is="item.id" v-bind:socket="socket" v-bind:commons="commons" v-on:mounted="loaded = loaded + 1" :popout="false"></component>
-          </keep-alive>
+<div>
+  <div class="widgets">
+    <div class="grid-stack" v-if="show">
+      <template v-for="item in items">
+        <div :key="item.id"
+          v-bind:id="'widget-' + item.id"
+          v-bind:data-gs-x="item.position.x"
+          v-bind:data-gs-y="item.position.y"
+          v-bind:data-gs-width="item.size.width"
+          v-bind:data-gs-height="item.size.height"
+          class="grid-stack-item"
+        >
+          <div class="grid-stack-item-content">
+            <keep-alive>
+              <component :is="item.id" v-bind:socket="socket" v-bind:commons="commons" v-on:mounted="loaded = loaded + 1" :popout="false"></component>
+            </keep-alive>
+          </div>
         </div>
-      </div>
-    </template>
+      </template>
+    </div>
   </div>
+  <div class="w-100"></div>
+  <widget-create v-bind:socket="socket" v-bind:commons="commons"></widget-create>
 </div>
 </template>
 
@@ -32,6 +36,7 @@ import part from './components/part.vue'
 import soundboard from './components/soundboard.vue'
 import twitch from './components/twitch.vue'
 import twitter from './components/twitter.vue'
+import widgetCreate from './components/widget_create.vue'
 import ytplayer from './components/ytplayer.vue'
 
 export default {
@@ -47,7 +52,8 @@ export default {
     soundboard,
     twitch,
     twitter,
-    ytplayer,
+    widgetCreate,
+    ytplayer
   },
   data: function () {
     return {

@@ -3,7 +3,7 @@
 class JoinPartWidget {
   constructor () {
     global.panel.addWidget('join', 'widget-title-join', 'fas fa-sign-in-alt')
-    global.panel.addWidget('part', 'widget-title-part', 'fas fa-sign-in-alt')
+    global.panel.addWidget('part', 'widget-title-part', 'fas fa-sign-out-alt')
   }
 
   send (event) {
