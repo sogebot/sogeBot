@@ -10,6 +10,7 @@ import customvariables from './components/customvariables.vue'
 import eventlist from './components/eventlist.vue'
 import join from './components/join.vue'
 import part from './components/part.vue'
+import queue from './components/queue.vue'
 import soundboard from './components/soundboard.vue'
 import twitch from './components/twitch.vue'
 import twitter from './components/twitter.vue'
@@ -25,6 +26,7 @@ export default {
     eventlist,
     join,
     part,
+    queue,
     soundboard,
     twitch,
     twitter,

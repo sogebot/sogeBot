@@ -8,11 +8,7 @@ const constants = require('../constants')
  * !queue                            - gets an info whether queue is opened or closed
  * !queue open                       - open a queue
  * !queue close                      - close a queue
- * !queue pick follower [amount]     - pick [amount] (optional) of followers from queue
- * !queue pick subscriber [amount]   - pick [amount] (optional) of subscribers from queue
  * !queue pick [amount]              - pick [amount] (optional) of users from queue
- * !queue random follower [amount]   - random [amount] (optional) of followers from queue
- * !queue random subscriber [amount] - random [amount] (optional) of subscribers from queue
  * !queue random [amount]            - random [amount] (optional) of users from queue
  * !queue join                       - join a queue
  * !queue clear                      - clear a queue
@@ -25,12 +21,13 @@ class Queue extends System {
         locked: false,
         picked: []
       },
+      eligibility: {
+        all: true,
+        followers: true,
+        subscribers: true
+      },
       commands: [
-        {name: '!queue random follower', permission: constants.OWNER_ONLY},
-        {name: '!queue random subscriber', permission: constants.OWNER_ONLY},
         {name: '!queue random', permission: constants.OWNER_ONLY},
-        {name: '!queue pick follower', permission: constants.OWNER_ONLY},
-        {name: '!queue pick subscriber', permission: constants.OWNER_ONLY},
         {name: '!queue pick', permission: constants.OWNER_ONLY},
         {name: '!queue clear', permission: constants.OWNER_ONLY},
         {name: '!queue close', permission: constants.OWNER_ONLY},
@@ -41,14 +38,14 @@ class Queue extends System {
       ]
     }
     super({settings})
+
+    this.addWidget('queue', 'widget-title-queue', 'fas fa-users')
   }
 
   async getUsers (opts) {
     opts = opts || { amount: 1 }
     let users = await global.db.engine.find(this.collection.data)
-    if (opts.filter) {
-      users = users.filter(o => o.is[opts.filter])
-    }
+
     if (opts.random) {
       users = users.sort(() => Math.random())
     } else {
@@ -84,8 +81,22 @@ class Queue extends System {
   async join (opts) {
     if (!(await this.settings._.locked)) {
       let user = await global.db.engine.findOne('users', { username: opts.sender.username })
-      await global.db.engine.update(this.collection.data, { username: opts.sender.username }, { username: opts.sender.username, is: user.is, created_at: String(new Date()) })
-      global.commons.sendMessage(global.translate('queue.join.opened'), opts.sender)
+
+      const [all, followers, subscribers] = await Promise.all([this.settings.eligibility.all, this.settings.eligibility.followers, this.settings.eligibility.subscribers])
+
+      let eligible = false
+      if (!all) {
+        if ((followers && subscribers) && (user.is.follower || user.is.subscriber)) eligible = true
+        else if (followers && user.is.follower) eligible = true
+        else if (subscribers && user.is.subscriber) eligible = true
+      } else {
+        eligible = true
+      }
+
+      if (eligible) {
+        await global.db.engine.update(this.collection.data, { username: opts.sender.username }, { username: opts.sender.username, is: user.is, created_at: String(new Date()) })
+        global.commons.sendMessage(global.translate('queue.join.opened'), opts.sender)
+      }
     } else {
       global.commons.sendMessage(global.translate('queue.join.closed'), opts.sender)
     }
@@ -98,34 +109,18 @@ class Queue extends System {
   }
 
   async random (opts) {
-    this.pickUsers(opts, null, true)
-  }
-
-  async randomFollower (opts) {
-    this.pickUsers(opts, 'follower', true)
-  }
-
-  async randomSubscriber (opts) {
-    this.pickUsers(opts, 'subscriber', true)
+    this.pickUsers(opts, true)
   }
 
   async pick (opts) {
-    this.pickUsers(opts, null, false)
+    this.pickUsers(opts, false)
   }
 
-  async pickFollower (opts) {
-    this.pickUsers(opts, 'follower', false)
-  }
-
-  async pickSubscriber (opts) {
-    this.pickUsers(opts, 'subscriber', false)
-  }
-
-  async pickUsers (opts, filter, random) {
+  async pickUsers (opts, random) {
     var input = opts.parameters.match(/^(\d+)?/)[0]
     var amount = (input === '' ? 1 : parseInt(input, 10))
 
-    let users = await this.getUsers({amount, filter, random})
+    let users = await this.getUsers({amount, random})
     this.settings._.picked = users
 
     const atUsername = await global.configuration.getValue('atUsername')

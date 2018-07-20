@@ -49,8 +49,11 @@ class Module {
                 this.settings.commands[defaultValue] = currentValue
               }
             } else {
-              console.log('UPDATING', key, value)
-              this.settings[key] = value
+              if (_.isObjectLike(value)) {
+                for (let [defaultValue, currentValue] of Object.entries(value)) {
+                  this.settings[key][defaultValue] = currentValue
+                }
+              } else this.settings[key] = value
             }
           }
           setTimeout(() => cb(null), 1000)
@@ -226,7 +229,7 @@ class Module {
   async getAllSettings () {
     let promisedSettings = {}
     for (let [category, values] of Object.entries(this._settings)) {
-      if (category === 'parsers' || category === '_') continue
+      if (category === 'parsers') continue
       if (_.isObject(values) && !_.isFunction(values)) {
         if (_.isNil(promisedSettings[category])) promisedSettings[category] = {} // init if not existing
         for (let [key, getValue] of Object.entries(values)) {
