@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import bets from './components/bets.vue'
 import chat from './components/chat.vue'
 import cmdboard from './components/cmdboard.vue'
 import commercial from './components/commercial.vue'
@@ -42,6 +43,7 @@ import ytplayer from './components/ytplayer.vue'
 export default {
   props: ['items', 'commons', 'socket'],
   components: {
+    bets,
     chat,
     cmdboard,
     commercial,

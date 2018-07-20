@@ -19,7 +19,7 @@ function initWidgets () {
       })
     },
     render: function (createElement) {
-      return createElement(Widgets, { props: { items: this.items, commons, socket } })
+      return createElement(Widgets, { props: { items: this.items, commons, socket, token } })
     }
   })
 }
