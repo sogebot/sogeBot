@@ -98,14 +98,15 @@
 
 <script>
 export default {
-  el: '#YTPlayerWidgetApp',
   components: {
   },
-  data: {
-    currentSong: null,
-    requests: [],
+  data: function () {
+    return {
+      currentSong: null,
+      requests: [],
 
-    socket: io('/system/songs', { query: "token=" + token }),
+      socket: io('/system/songs', { query: "token=" + token })
+    }
   },
   created: function () {
     this.socket.emit('next')
