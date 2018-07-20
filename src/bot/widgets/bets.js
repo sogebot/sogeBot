@@ -45,9 +45,13 @@ class BetsWidget {
         callback(this.currentBet, this.bets)
       })
 
-      socket.on('config', async (callback) => {
-        const data = { betPercentGain: await global.configuration.getValue('betPercentGain') }
-        callback(data)
+      socket.on('settings.update', async (data, cb) => {
+        global.systems.bets.settings.betPercentGain = data.betPercentGain
+        cb(null)
+      })
+
+      socket.on('settings', async (cb) => {
+        cb(null, {betPercentGain: await global.systems.bets.settings.betPercentGain})
       })
 
       socket.on('close', async (option) => {

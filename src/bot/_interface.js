@@ -49,6 +49,7 @@ class Module {
                 this.settings.commands[defaultValue] = currentValue
               }
             } else {
+              console.log('UPDATING', key, value)
               this.settings[key] = value
             }
           }

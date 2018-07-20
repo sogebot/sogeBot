@@ -13,7 +13,7 @@
         >
           <div class="grid-stack-item-content">
             <keep-alive>
-              <component :is="item.id" v-bind:socket="socket" v-bind:commons="commons" v-on:mounted="loaded = loaded + 1" :popout="false"></component>
+              <component :is="item.id" :token="token" :socket="socket" :commons="commons" @mounted="loaded = loaded + 1" :popout="false"></component>
             </keep-alive>
           </div>
         </div>
@@ -41,7 +41,7 @@ import widgetCreate from './components/widget_create.vue'
 import ytplayer from './components/ytplayer.vue'
 
 export default {
-  props: ['items', 'commons', 'socket'],
+  props: ['items', 'commons', 'socket', 'token'],
   components: {
     bets,
     chat,
