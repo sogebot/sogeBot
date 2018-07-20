@@ -1,6 +1,6 @@
 <template>
-<div>
-  <div class="widgets">
+<div class="widgets">
+  <div>
     <div class="grid-stack" v-if="show">
       <template v-for="item in items">
         <div :key="item.id"
@@ -21,7 +21,7 @@
     </div>
   </div>
   <div class="w-100"></div>
-  <widget-create v-bind:socket="socket" v-bind:commons="commons"></widget-create>
+  <widget-create v-bind:socket="socket" v-bind:commons="commons" class="pt-4"></widget-create>
 </div>
 </template>
 

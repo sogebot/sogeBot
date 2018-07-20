@@ -8,7 +8,7 @@
       <font-awesome-icon icon="spinner" spin /> Loading data from server.
     </span>
   </div>
-  <div v-else class="list-group pb-4">
+  <div v-else class="list-group">
     <a
       v-for="widget of widgets"
       :key="widget.id"

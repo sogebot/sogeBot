@@ -313,7 +313,9 @@
 
   <div class="container-fluid" style="overflow-x: hidden;">
     <!-- widgets -->
-    <div id="widgets" class="widgets"></div>
+    <span class="widgets p-0">
+      <div id="widgets"></div>
+    </span>
   </div>
 
   <div class="pages-wrapper pt-2 pb-5">
@@ -542,7 +544,6 @@
           })
         }))
       $(".widgets").css('display', visibilityBlock)
-      $("#addWidget").css('display', visibility)
     })
     page({ popstate:true })
 
