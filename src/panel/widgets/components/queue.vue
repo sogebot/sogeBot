@@ -4,8 +4,8 @@
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="active nav-link" href="#queue-users" aria-controls="home" role="tab" data-toggle="tab" title="Queue">
-          <font-awesome-icon icon="users"></font-awesome-icon>
-          {{fUsers.length}}
+          <font-awesome-icon icon="users"/>
+          {{ fUsers.length }}
         </a>
       </li>
       <li role="presentation" class="nav-item">
@@ -53,7 +53,7 @@
     <div class="tab-content">
       <div role="tabpanel" class="tab-pane active" id="queue-users">
         <div class="text-center pb-1">
-          <button class="btn btn-sm" :class="[locked ? 'btn-success' : 'btn-danger']" @click="locked = !locked">
+          <button class="btn btn-sm" :class="[locked ? 'btn-danger' : 'btn-success']" @click="locked = !locked">
             <font-awesome-icon v-if="locked" icon="lock" fixed-width></font-awesome-icon>
             <font-awesome-icon v-else icon="lock-open" fixed-width></font-awesome-icon>
           </button>
@@ -122,7 +122,7 @@ library.add(faLock, faUsers, faUser, faEyeSlash, faCheck, faTimes, faHeart, faSt
 export default {
   props: ['token', 'commons'],
   components: {
-    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-icon': FontAwesomeIcon
   },
   mounted: function () {
     this.$emit('mounted')
@@ -172,6 +172,7 @@ export default {
         followers: true,
         subscribers: true
       },
+      selectedUsers: [],
       locked: true,
       multiSelection: false,
       random: false,
