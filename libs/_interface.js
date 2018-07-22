@@ -54,27 +54,37 @@ class Module {
           }
           setTimeout(() => cb(null), 1000)
         })
-        socket.on('update', async (items, cb) => {
-          for (let item of items) {
-            const _id = item._id; delete item._id
-            let itemFromDb = item
-            if (_.isNil(_id)) itemFromDb = await global.db.engine.insert(this.collection.data, item)
-            else await global.db.engine.update(this.collection.data, { _id }, item)
+        socket.on('update', async (opts, cb) => {
+          opts.collection = opts.collection || 'data'
+          if (opts.items) {
+            for (let item of opts.items) {
+              const _id = item._id; delete item._id
+              let itemFromDb = item
+              if (_.isNil(_id)) itemFromDb = await global.db.engine.insert(this.collection[opts.collection], item)
+              else await global.db.engine.update(this.collection[opts.collection], { _id }, item)
 
-            if (_.isFunction(cb)) cb(null, itemFromDb)
+              if (_.isFunction(cb)) cb(null, itemFromDb)
+            }
+          } else {
+            if (_.isFunction(cb)) cb(null, [])
           }
         })
-        socket.on('delete', async (_id, cb) => {
-          await global.db.engine.remove(this.collection.data, { _id })
+        socket.on('delete', async (opts, cb) => {
+          opts.collection = opts.collection || 'data'
+          if (opts._id) {
+            await global.db.engine.remove(this.collection[opts.collection], { _id: opts._id })
+          }
           cb(null)
         })
-        socket.on('find', async (where, cb) => {
-          where = where || {}
-          cb(null, await global.db.engine.find(this.collection.data, where))
+        socket.on('find', async (opts, cb) => {
+          opts.collection = opts.collection || 'data'
+          opts.where = opts.where || {}
+          cb(null, await global.db.engine.find(this.collection[opts.collection], opts.where))
         })
-        socket.on('findOne', async (where, cb) => {
-          where = where || {}
-          cb(null, await global.db.engine.findOne(this.collection.data, where))
+        socket.on('findOne', async (opts, cb) => {
+          opts.collection = opts.collection || 'data'
+          opts.where = opts.where || {}
+          cb(null, await global.db.engine.findOne(this.collection[opts.collection], opts.where))
         })
       })
     }
