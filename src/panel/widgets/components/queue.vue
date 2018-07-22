@@ -63,7 +63,7 @@
                 <input class="form-control" style="width: 60px" v-model="selectCount" />
                 <div class="input-group-append">
                   <div class="btn-group" role="group">
-                    <button class="btn btn-sm btn-primary" title="Pick">
+                    <button class="btn btn-sm btn-primary" title="Pick" @click="pick(null)">
                       <font-awesome-icon icon="hand-pointer"></font-awesome-icon>
                     </button>
                     <button @click="random = !random" :class="[random ? 'btn-success' : 'btn-danger']" class="btn btn-sm" title="Toggle random">
@@ -75,13 +75,13 @@
             </div>
           </template>
 
-          <button v-if="multiSelection" class="btn btn-sm btn-primary">Pick {{ selectedUsers.length }}</button>
+          <button v-if="multiSelection" class="btn btn-sm btn-primary" @click="pick(selectedUsers)">Pick {{ selectedUsers.length }}</button>
           <button @click="multiSelection = !multiSelection; selectedUsers = []" :class="[multiSelection ? 'btn-success' : 'btn-danger']" class="btn btn-sm">Toggle selection</button>
           <span style="position:relative; top: 3px">
             <font-awesome-icon :icon="['far', 'eye-slash']"></font-awesome-icon>
             {{ users.length - fUsers.length }}
           </span>
-          <button class="btn btn-sm btn-danger">Clear</button>
+          <button class="btn btn-sm btn-danger" @click="clear">Clear</button>
         </div>
         <ul class="list-group">
           <li
@@ -94,7 +94,7 @@
               <code v-if="user.is.follower"> FOLLOWER </code>
               <code v-if="user.is.subscriber"> SUBSCRIBER </code>
             </div>
-            <button v-if="!multiSelection" class="btn btn-primary" style="position: absolute; top: 25%; right: 2%;">Pick {{user.username}}</button>
+            <button v-if="!multiSelection" class="btn btn-primary" style="position: absolute; top: 25%; right: 2%;" @click="pick(user.username)">Pick {{user.username}}</button>
             <button v-else @click="select(user.username)" :class="[selectedUsers.includes(user.username) ? 'btn-success' : 'btn-danger']" class="btn" style="position: absolute; top: 25%; right: 2%;">
               <font-awesome-icon icon="check" fixed-width v-if="selectedUsers.includes(user.username)"></font-awesome-icon>
               <font-awesome-icon icon="times" fixed-width v-else></font-awesome-icon>
@@ -103,6 +103,18 @@
         </ul>
       </div>
       <div role="tabpanel" class="tab-pane" id="queue-main">
+        <ul class="list-group">
+          <li
+            v-for="user of picked"
+            :key="user.username"
+            class="list-group-item border-left-0 border-right-0">
+            <strong style="font-size: 1.3rem">{{ user.username }}</strong>
+            <div>
+              <code v-if="user.is.follower"> FOLLOWER </code>
+              <code v-if="user.is.subscriber"> SUBSCRIBER </code>
+            </div>
+          </li>
+        </ul>
       </div> <!-- /MAIN -->
 
       <div class="clearfix"></div>
@@ -128,6 +140,9 @@ export default {
     this.$emit('mounted')
   },
   created: function () {
+    setInterval(() => this.socket.emit('find', { collection: 'picked' }, (err, users) => {
+      this.picked = users
+    }), 1000)
     setInterval(() => this.socket.emit('find', {}, (err, users) => {
       this.users = users
     }), 1000)
@@ -161,7 +176,7 @@ export default {
         if (this.eligibility.followers && this.eligibility.subscribers) users = users.filter(o => o.is.follower || o.is.subscriber)
         else if (this.eligibility.followers) users = users.filter(o => o.is.follower)
         else if (this.eligibility.subscribers) users = users.filter(o => o.is.subscriber)
-        return users
+        return users.sort(o => -(new Date(o.created_at).getTime()))
       }
     }
   },
@@ -178,11 +193,28 @@ export default {
       random: false,
       selectCount: 1,
       users: [],
+      picked: [],
       updated: String(new Date()),
       socket: io('/system/queue', {query: "token=" + this.token})
     }
   },
   methods: {
+    clear: function () {
+      this.socket.emit('remove', {})
+    },
+    pick: function (username) {
+      const data = {
+        random: this.random,
+        count: this.selectCount,
+        username
+      }
+      this.socket.emit('pick', data, users => {
+        $('a[href="#queue-main"]').tab('show')
+        this.picked = users
+        this.multiSelection = false
+        this.selectedUsers = []
+      })
+    },
     toggle: function (pick) {
       Vue.set(this.eligibility, pick, !this.eligibility[pick])
       if (!this.eligibility.all && !this.eligibility.followers && !this.eligibility.subscribers) this.eligibility.all = true

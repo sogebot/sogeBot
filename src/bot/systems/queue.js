@@ -1,5 +1,7 @@
 'use strict'
 
+const _ = require('lodash')
+
 // bot libraries
 const System = require('./_interface')
 const constants = require('../constants')
@@ -18,8 +20,7 @@ class Queue extends System {
   constructor () {
     const settings = {
       _: {
-        locked: false,
-        picked: []
+        locked: false
       },
       eligibility: {
         all: true,
@@ -42,6 +43,23 @@ class Queue extends System {
     this.addWidget('queue', 'widget-title-queue', 'fas fa-users')
   }
 
+  sockets () {
+    this.socket.on('connection', (socket) => {
+      socket.on('pick', async (data, cb) => {
+        if (data.username) {
+          let users = []
+          if (_.isString(data.username)) data.username = [data.username]
+          for (let user of data.username) {
+            user = await global.db.engine.findOne(this.collection.data, { username: user })
+            delete user._id
+            users.push(user)
+          }
+          cb(null, await this.pickUsers({ sender: global.commons.getOwner(), users }))
+        } else cb(null, await this.pickUsers({ sender: global.commons.getOwner(), parameters: String(data.count) }, data.random))
+      })
+    })
+  }
+
   async getUsers (opts) {
     opts = opts || { amount: 1 }
     let users = await global.db.engine.find(this.collection.data)
@@ -49,15 +67,20 @@ class Queue extends System {
     if (opts.random) {
       users = users.sort(() => Math.random())
     } else {
-      users = users.sort(o => new Date(o.created_at).getTime())
+      users = users.sort(o => -(new Date(o.created_at).getTime()))
     }
 
     let toReturn = []
     let i = 0
     for (let user of users) {
+      const isNotFollowerEligible = !user.is.follower && (await this.settings.eligibility.followers)
+      const isNotSubscriberEligible = !user.is.subscriber && (await this.settings.eligibility.subscribers)
+      if (isNotFollowerEligible && isNotSubscriberEligible) continue
+
       if (i < opts.amount) {
-        toReturn.push(user.username)
         await global.db.engine.remove(this.collection.data, { _id: String(user._id) })
+        delete user._id
+        toReturn.push(user)
       } else break
       i++
     }
@@ -104,7 +127,7 @@ class Queue extends System {
 
   clear (opts) {
     global.db.engine.remove(this.collection.data, {})
-    this.settings._.picked = []
+    global.db.engine.remove(this.collection.picked, {})
     global.commons.sendMessage(global.translate('queue.clear'), opts.sender)
   }
 
@@ -117,14 +140,20 @@ class Queue extends System {
   }
 
   async pickUsers (opts, random) {
-    var input = opts.parameters.match(/^(\d+)?/)[0]
-    var amount = (input === '' ? 1 : parseInt(input, 10))
+    let users
+    if (!opts.users) {
+      var input = opts.parameters.match(/^(\d+)?/)[0]
+      var amount = (input === '' ? 1 : parseInt(input, 10))
+      users = await this.getUsers({amount, random})
+    } else {
+      users = opts.users
+      for (let user of users) await global.db.engine.remove(this.collection.data, { username: user.username })
+    }
 
-    let users = await this.getUsers({amount, random})
-    this.settings._.picked = users
+    await global.db.engine.remove(this.collection.picked, {})
+    for (let user of users) await global.db.engine.update(this.collection.picked, { username: user.username }, user)
 
     const atUsername = await global.configuration.getValue('atUsername')
-    users = users.map(o => atUsername ? `@${o}` : o)
 
     var msg
     switch (users.length) {
@@ -138,7 +167,8 @@ class Queue extends System {
         msg = global.translate('queue.picked.multi')
     }
 
-    global.commons.sendMessage(msg.replace(/\$users/g, users.join(', ')), opts.sender)
+    global.commons.sendMessage(msg.replace(/\$users/g, users.map(o => atUsername ? `@${o.username}` : o.username).join(', ')), opts.sender)
+    return users
   }
 
   async list (opts) {

@@ -80,9 +80,7 @@ Users.prototype.sockets = function (self) {
     socket.on('save', async (data, cb) => {
       if (!_.isNil(data.points)) {
         let points = data.points; delete data.points
-        if (global.commons.isSystemEnabled('points')) {
-          global.systems.points.setPoints(global.systems.points, { username: null }, `${data.username} ${points}`)
-        }
+        await global.systems.points.set({ username: null, parameters: `${data.username} ${points}` })
       }
       if (!_.isNil(data.stats.messages)) {
         let messages = Number(data.stats.messages); delete data.stats.messages

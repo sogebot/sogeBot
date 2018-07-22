@@ -458,9 +458,9 @@
       })
     })
 
-    console.debug('EMIT [getSystems]')
-    socket.emit('getSystems')
-    socket.on('systems', function (data) {
+    socket.emit('systems', function (err, data) {
+      console.debug('EMIT [systems]')
+      console.log(data)
       systems = data
     })
 
