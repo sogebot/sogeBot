@@ -170,7 +170,7 @@ class Raffles extends System {
   async open (opts) {
     let [followers, subscribers] = [opts.parameters.indexOf('followers') >= 0, opts.parameters.indexOf('subscribers') >= 0]
     let type = (opts.parameters.indexOf('-min') >= 0 || opts.parameters.indexOf('-max') >= 0) ? TYPE_TICKETS : TYPE_NORMAL
-    if (!global.commons.isSystemEnabled('points')) type = TYPE_NORMAL // force normal type if points are disabled
+    if (!(await global.systems.points.isEnabled())) type = TYPE_NORMAL // force normal type if points are disabled
 
     let minTickets = 0
     let maxTickets = 100

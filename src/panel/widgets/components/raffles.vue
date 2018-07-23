@@ -1,3 +1,4 @@
+<template>
 <div class="card widget">
   <div class="card-header">
     <ul class="nav nav-pills" role="tablist">
@@ -185,6 +186,7 @@
     </div>
   </div>
 </div>
+</template>
 
 <script>
   socket.on('systems', (data) => {
