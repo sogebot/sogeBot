@@ -554,7 +554,7 @@ class API {
     } catch (e) {
       const game = await global.db.engine.findOne('api.current', { key: 'game' })
       global.log.warning(`Couldn't find name of game for gid ${gid} - fallback to ${game.value}`)
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`)
+      global.log.error(`API: ${url} - ${e.stack}`)
       if (cluster.isMaster) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: this.remainingAPICalls })
       return game.value
     }
@@ -779,7 +779,7 @@ class API {
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`)
+      global.log.error(`API: ${url} - ${e.stack}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
       return
     }
@@ -832,7 +832,7 @@ class API {
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`)
+      global.log.error(`API: ${url} - ${e.stack}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
       return
     }
@@ -875,7 +875,7 @@ class API {
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`)
+      global.log.error(`API: ${url} - ${e.stack}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
       return new Timeout().recursive({ this: this, uid: 'checkClips', wait: 1000, fnc: this.checkClips })
     }
@@ -930,7 +930,7 @@ class API {
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`)
+      global.log.error(`API: ${url} - ${e.stack}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
       return
     }
@@ -955,7 +955,8 @@ class API {
       })
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`)
+      console.log(e)
+      global.log.error(`API: ${url} - ${e.stack}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
       return
     }
@@ -994,7 +995,7 @@ class API {
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
       DEBUG_API_IS_FOLLOWER_UPDATE('Request done: %j', request.data)
     } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`)
+      global.log.error(`API: ${url} - ${e.stack}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: global.twitch.remainingAPICalls })
       return
     }
