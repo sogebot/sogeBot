@@ -7,6 +7,19 @@
           <font-awesome-icon icon="music" />
         </a>
       </li>
+      <li role="presentation" class="nav-item">
+        <a class="nav-link nav-dropdown" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer">
+          <font-awesome-icon icon="volume-up" v-if="volume >= 65"></font-awesome-icon>
+          <font-awesome-icon icon="volume-down" v-else-if="volume >= 35"></font-awesome-icon>
+          <font-awesome-icon icon="volume-off" v-else></font-awesome-icon>
+          <small>{{ volume }}%</small>
+        </a>
+        <div class="dropdown-menu" data-allow-focus aria-labelledby="dropdownMenuButton" style="padding:0; margin: 0;">
+          <div class="progress" @click="setVolume">
+            <div class="progress-bar" role="progressbar" :style="{ width: volume + '%'}"></div>
+          </div>
+        </div>
+      </li>
       <li class="nav-item ml-auto">
         <h6 class="widget-title">{{ commons.translate('widget-title-soundboard') }}</h6>
       </li>
@@ -37,10 +50,10 @@
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faMusic } from '@fortawesome/free-solid-svg-icons'
+import { faMusic, faVolumeUp, faVolumeDown, faVolumeOff } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faMusic)
+library.add(faMusic, faVolumeUp, faVolumeDown, faVolumeOff)
 
 export default {
   props: ['socket', 'commons'],
@@ -49,6 +62,7 @@ export default {
   },
   data: function () {
     return {
+      volume: 50,
       audio: null,
       sounds: []
     }
@@ -61,10 +75,15 @@ export default {
     this.socket.off('soundBoardSounds').on('soundBoardSounds', sounds => this.sounds = sounds)
   },
   methods: {
+    setVolume: function (ev) {
+      // steps by 5
+      this.volume = Math.round(Number(ev.offsetX / ev.path[1].clientWidth * 100).toFixed(0) / 5) * 5
+    },
     play: function (sound) {
       if (!_.isNil(this.audio)) this.audio.pause()
       this.audio = new Audio('dist/soundboard/' + sound + '.mp3')
       this.audio.addEventListener('loadedmetadata', () => {
+        this.audio.volume = this.volume / 100
         this.audio.play()
       })
     }

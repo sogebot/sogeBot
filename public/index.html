@@ -1388,6 +1388,12 @@
       let widget = $(ev.currentTarget).attr('href').split('#')[1]
       window.open($(ev.currentTarget).attr('href'),widget,'height=600,width=600');
     })
+
+    // allow focus on dropdowns with data-allow-focus
+    $(document).on("click", "[data-allow-focus]", function(e) {
+      e.preventDefault()
+      e.stopPropagation();
+    });
   </script>
 </body>
 </html>

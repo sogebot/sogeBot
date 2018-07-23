@@ -9,7 +9,7 @@
       </li>
       <li role="presentation" class="nav-item">
         <a class="nav-link nav-dropdown" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <font-awesome-icon icon="eye"></font-awesome-icon>
+          <font-awesome-icon icon="eye"></font-awesome-icon>
         </a>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="padding:0; margin: 0;">
           <button
