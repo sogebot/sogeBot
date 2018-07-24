@@ -409,9 +409,9 @@
       "follow": "ti dal <strong>follow</strong>",
       "host": "tě <strong>hostuje</strong> s $viewers diváky",
       "raid": "tě <strong>raiduje</strong> s $viewers diváky",
-      "sub": "ti dal <strong>sub</strong>",
+      "sub": "ti dal <strong>sub</strong> | $tier",
       "subgift": "byl <strong>darován</strong> sub od $username",
-      "resub": "ti dal <strong>resub</strong> $months měsíců",
+      "resub": "ti dal <strong>resub</strong> $months měsíců | $tier",
       "cheer": "ti dal <strong>cheer</strong> $bits bitů",
       "tip": "ti dal <strong>tip</strong> $formatted_amount"
     },
@@ -755,6 +755,7 @@
     "number-of-users": "Počet diváků",
     "roll-again": "Losuj znovu",
     "follower": "Follower",
+    "subscriber": "Subscriber",
     "minutes": "minuty",
     "seconds": "vteřiny",
     "hours": "hodiny",
@@ -879,7 +880,8 @@
     "widget-title-latest-followers": "NEJNOVĚJŠÍ FOLLOWEŘI",
     "widget-title-latest-subscribers": "NEJNOVĚJŠÍ SUBSCRIBEŘI",
     "widget-title-commercial": "REKLAMY",
-    "widget-title-joinpart": "JOIN/PART LIST",
+    "widget-title-join": "JOIN LIST",
+    "widget-title-part": "PART LIST",
     "event": "událost",
     "operation": "operace",
     "user-joined-channel": "uživatel se připojil do chatu",
@@ -960,7 +962,7 @@
     "announce-ticket-raffle": "Raffle prave bezi. Pro vstup do raffle napis $keyword <$min-$max>. Vstup je mozny pro $eligibility",
 
     "cannot-create-raffle-without-keyword": "Promin, $sender, ale nemuzes vytvorit raffle bez klicoveho slova",
-    "raffle-is-already-running": "Promin, $sender, ale raffle jiz bezi s keywordem !$keyword",
+    "raffle-is-already-running": "Promin, $sender, ale raffle jiz bezi s keywordem $keyword",
     "no-raffle-is-currently-running": "$sender, zadne raffle bez viteze momentalne nebezi",
 
     "no-participants-to-pick-winner": "$sender, nikdo se nezucastnil teto raffle",

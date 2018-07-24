@@ -1,9 +1,11 @@
 'use strict'
 
+require('module-alias/register')
+
 const _ = require('lodash')
 const term = require('terminal-kit').terminal
 
-const Database = require('../libs/databases/database')
+const Database = require('../src/bot/databases/database')
 const db = new Database(false)
 
 global.log = {

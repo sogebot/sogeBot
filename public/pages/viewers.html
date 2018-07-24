@@ -44,7 +44,7 @@
               <span class="input-group-text">h</span>
             </div>
           </div>
-          <div class="input-group mt-1 points-enabled">
+          <div class="input-group mt-1">
             <div class="input-group-prepend">
               <span class="input-group-text" data-lang="points"></span>
             </div>
@@ -281,13 +281,12 @@
           subscribed_at: $('#viewers_subscribed_at').val().trim().length === 0 ? null : parseInt(moment($('#viewers_subscribed_at').val(), "HH:mm:ss YYYY-MM-DD").format('x'), 10),
           watched: $('#viewers_watched').val() * 1000 * 60 * 60
         },
-        points: !systems.points || $('#viewers_points').val().length === 0 ? 0 : $('#viewers_points').val(),
+        points: $('#viewers_points').val().length === 0 ? 0 : $('#viewers_points').val(),
         stats: {
           messages: $('#viewers_messages').val().length === 0 ? 0 : $('#viewers_messages').val(),
           tier: $('#viewers_tier').val().length === 0 ? null : $('#viewers_tier').val()
         }
       }
-      if (!systems.points) delete user.points
       // toggle save button to btn-info and disable\
       $(el).toggleClass('btn-primary btn-info').attr('disabled', 'disabled').html('<i class="fas fa-circle-notch fa-spin"></i> ' + commons.translate('saving'))
       viewers.socket.emit('save', user, (err) => {
@@ -314,7 +313,7 @@
             <td class="text-center" data-value='${_.get(item, 'time.watched', 0)}'>${viewers.styleWatched(item.time.watched)}h</td>
             <td class="text-center" data-value='${!item.is.follower ? 0 : _.get(item, 'time.follow', 0)}'>${followed_at}</td>
             <td class="text-center" data-value='${!item.is.subscriber ? 0 : _.get(item, 'time.subscribed_at', 0)}'>${subscribed_at}</td>
-            ${systems.points ? `<td class="text-center" data-value='${_.get(item, 'points', 0)}'>${_.get(item, 'points', 0)}</td>` : ``}
+            <td class="text-center" data-value='${_.get(item, 'points', 0)}'>${_.get(item, 'points', 0)}</td>
             <td class="text-center" data-value='${_.get(item, 'stats.messages', 0)}'>${_.get(item, 'stats.messages', 0)}</td>
             <td class="text-center" data-value='${_.get(item, 'stats.tips', 0)}'>${_.get(item, 'stats.tips', 0).toFixed(2)}${item.custom.currency}</td>
             <td class="text-center" data-value='${_.get(item, 'stats.bits', 0)}'>${_.get(item, 'stats.bits', 0)}</td>
@@ -334,11 +333,6 @@
             <td>
           </tr>
         `)
-        if (!systems.points) {
-          $(".points-enabled").remove()
-          $("#viewers-points-data").remove()
-          $("#viewers-points").remove()
-        }
       })
     },
     getDateString: function (timestamp) {
@@ -673,7 +667,7 @@
   }
 
   function ViewersPage () {
-    if (_.isNil(systems) || _.isNil(configuration)) {
+    if (_.isNil(configuration)) {
       setTimeout(() => ViewersPage(), 1)
       return
     }
@@ -681,10 +675,6 @@
       query: "token=" + token
     });
     viewers.socket = userSocket
-
-    if (!systems.points) {
-      $("#viewers-points").remove()
-    }
 
     $("#reset-points-of-all-users").off('click')
     $("#reset-points-of-all-users").on('click', function (ev) {

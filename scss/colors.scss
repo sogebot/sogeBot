@@ -4,8 +4,6 @@ hr { border-color: $hr !important }
 
 .stream-info h2, .stream-info h2 i { color: theme-color("primary") !important }
 
-.icon-follow, .icon-host, .icon-sub, .icon-subgift, .icon-resub, .icon-cheer, .icon-tip { position: absolute; right: 1rem; margin-top: -0.8rem; font-size: 1.4rem; }
-.icon-resub { right: 0.5rem }
 .icon-follow { color: map-get($eventlist, follow) !important; }
 .icon-host { color: map-get($eventlist, host) !important; }
 .icon-raid { color: map-get($eventlist, raid) !important; }

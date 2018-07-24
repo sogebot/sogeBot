@@ -409,9 +409,9 @@
       "follow": "<strong>followed</strong> you",
       "host": "<strong>hosted</strong> you with $viewers viewers",
       "raid": "<strong>raided</strong> you with $viewers viewers",
-      "sub": "<strong>subbed</strong> you",
+      "sub": "<strong>subbed</strong> you | $tier",
       "subgift": "have <strong>gifted</strong> sub from $username",
-      "resub": "<strong>resubbed</strong> you for $months months",
+      "resub": "<strong>resubbed</strong> you for $months months | $tier",
       "cheer": "<strong>cheered</strong> you for $bits bits",
       "tip": "<strong>tipped</strong> you for $formatted_amount"
     },
@@ -750,6 +750,7 @@
     "number-of-users": "No. users",
     "roll-again": "Roll again",
     "follower": "Follower",
+    "subscriber": "Subscriber",
     "minutes": "minutes",
     "seconds": "seconds",
     "hours": "hours",
@@ -873,7 +874,8 @@
     "widget-title-latest-followers": "LATEST FOLLOWERS",
     "widget-title-latest-subscribers": "LATEST SUBSCRIBERS",
     "widget-title-commercial": "COMMERCIALS",
-    "widget-title-joinpart": "JOIN/PART LIST",
+    "widget-title-join": "JOIN LIST",
+    "widget-title-part": "PART LIST",
     "event": "event",
     "operation": "operation",
     "user-joined-channel": "user joined a channel",
@@ -954,7 +956,7 @@
     "announce-ticket-raffle": "Raffle is running. To enter type $keyword <$min-$max>. Raffle is opened for $eligibility",
 
     "cannot-create-raffle-without-keyword": "Sorry, $sender, but you cannot create raffle without keyword",
-    "raffle-is-already-running": "Sorry, $sender, raffle is already running with keyword !$keyword",
+    "raffle-is-already-running": "Sorry, $sender, raffle is already running with keyword $keyword",
     "no-raffle-is-currently-running": "$sender, no raffles without winners are currently running",
 
     "no-participants-to-pick-winner": "$sender, nobody joined a raffle",
