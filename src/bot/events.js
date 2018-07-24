@@ -199,7 +199,7 @@ class Events {
         'filter=' + await global.configuration.getValue('replayFilter'),
         'class=replay'
       ]
-      global.overlays.alerts.overlay(global.overlays.alerts, null, clip.join(' '))
+      global.overlays.alerts.overlay({ sender: { username: global.commons.getOwner() }, parameters: clip.join(' ') })
     }
   }
 
