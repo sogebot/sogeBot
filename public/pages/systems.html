@@ -134,11 +134,11 @@
             this.settings.settings = {}
             this.settings.settings.enabled = _(_settings.filter(o => o[0] === 'enabled')).flatten().value()[1]
             // everything else except commands and enabled and are string|number|bool
-            for (let [name, value] of _(_settings.filter(o => o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
+            for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
               this.settings.settings[name] = value
             }
             // everything else except commands and enabled and are objects -> own category
-            for (let [name, value] of _(_settings.filter(o => o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')).value()) {
+            for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')).value()) {
               this.settings[name] = value
             }
             // commands at last

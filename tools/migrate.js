@@ -1,3 +1,5 @@
+require('module-alias/register')
+
 const _ = require('lodash')
 const figlet = require('figlet')
 const config = require('../config.json')
@@ -5,13 +7,13 @@ const compareVersions = require('compare-versions')
 const fs = require('fs')
 
 // logger
-const Logger = require('../libs/logging')
+const Logger = require('../src/bot/logging')
 global.logger = new Logger()
 
 const dropFiles = [
   'playlist.db', 'songrequest.db', 'ranks.db', 'prices.db',
   'commands.db', 'keywords.db', 'cooldowns.db', 'alias.db',
-  'cooldowns.viewers.db'
+  'cooldowns.viewers.db', 'raffles.db', 'raffle_participants.db'
 ]
 
 if (process.argv[2] && process.argv[2] === '--delete') {
@@ -33,7 +35,7 @@ if (process.argv[2] && process.argv[2] === '--delete') {
 }
 
 // db
-const Database = require('../libs/databases/database')
+const Database = require('../src/bot/databases/database')
 global.db = new Database(false)
 
 var runMigration = async function () {
@@ -267,6 +269,16 @@ let migration = {
       console.info(` !! alias collection can be deleted`)
     }
   }],
+  widgets: [{
+    version: '7.6.0',
+    do: async () => {
+      console.info('Removing joinpart widget')
+      let items = await global.db.engine.find('widgets', { id: 'joinpart' })
+      await global.db.engine.remove('widgets', { id: 'joinpart' })
+      let processed = items.length
+      console.info(` => ${processed} deleted joinpart widgets`)
+    }
+  }],
   cache: [{
     version: '7.5.0',
     do: async () => {
@@ -349,7 +361,7 @@ let migration = {
     do: async () => {
       console.info('Migration commands to %s', '7.0.0')
       let commands = await global.db.engine.find('commands')
-      const constants = require('../libs/constants')
+      const constants = require('../src/bot/constants')
       for (let command of commands) {
         await global.db.engine.update('commands', { _id: command._id.toString() }, { permission: constants.VIEWERS })
       }
