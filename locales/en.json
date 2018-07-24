@@ -750,6 +750,7 @@
     "number-of-users": "No. users",
     "roll-again": "Roll again",
     "follower": "Follower",
+    "subscriber": "Subscriber",
     "minutes": "minutes",
     "seconds": "seconds",
     "hours": "hours",
@@ -955,7 +956,7 @@
     "announce-ticket-raffle": "Raffle is running. To enter type $keyword <$min-$max>. Raffle is opened for $eligibility",
 
     "cannot-create-raffle-without-keyword": "Sorry, $sender, but you cannot create raffle without keyword",
-    "raffle-is-already-running": "Sorry, $sender, raffle is already running with keyword !$keyword",
+    "raffle-is-already-running": "Sorry, $sender, raffle is already running with keyword $keyword",
     "no-raffle-is-currently-running": "$sender, no raffles without winners are currently running",
 
     "no-participants-to-pick-winner": "$sender, nobody joined a raffle",

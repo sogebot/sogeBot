@@ -13,7 +13,7 @@ global.logger = new Logger()
 const dropFiles = [
   'playlist.db', 'songrequest.db', 'ranks.db', 'prices.db',
   'commands.db', 'keywords.db', 'cooldowns.db', 'alias.db',
-  'cooldowns.viewers.db'
+  'cooldowns.viewers.db', 'raffles.db', 'raffle_participants.db'
 ]
 
 if (process.argv[2] && process.argv[2] === '--delete') {

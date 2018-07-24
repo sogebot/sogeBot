@@ -4,33 +4,33 @@
     <ul class="nav nav-pills" role="tablist">
       <li role="presentation" class="nav-item">
         <a class="nav-link" href="#raffles-participants" aria-controls="home" role="tab" data-toggle="tab" title="Participants">
-          <span id="raffles-participants-count">0</span>
-          <i class="fas fa-users" aria-hidden="true"></i>
+          <small>{{ participants.length }}</small>
+          <font-awesome-icon icon="users"></font-awesome-icon>
         </a>
       </li>
       <li role="presentation" class="nav-item">
         <a class="nav-link active" href="#raffles-giveaway" aria-controls="home" role="tab" data-toggle="tab" title="Giveaway">
-          <i class="fas fa-gift" aria-hidden="true"></i>
+          <font-awesome-icon icon="gift"></font-awesome-icon>
         </a>
       </li>
       <li role="presentation" class="nav-item">
-        <a class="nav-link" href="#raffles-winner" aria-controls="home" role="tab" data-toggle="tab" title="Last winner" style="display:none">
-          <i class="fas fa-trophy" aria-hidden="true"></i>
-          <span class="raffles-winner-name"></span>
+        <a class="nav-link" href="#raffles-winner" aria-controls="home" role="tab" data-toggle="tab" title="Last winner" v-if="winner">
+          <font-awesome-icon icon="trophy"></font-awesome-icon>
+          {{ winner.username }}
         </a>
       </li>
       <li role="presentation" class="nav-item">
         <a class="nav-link" href="#raffles-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
-          <i class="fas fa-cog" aria-hidden="true"></i>
+          <font-awesome-icon icon="cog"></font-awesome-icon>
         </a>
       </li>
       <li role="presentation" class="nav-item widget-popout">
         <a class="nav-link" title="Popout" target="_blank" href="/popout/#raffles">
-          <i class="fas fa-external-link-alt"></i>
+          <font-awesome-icon icon="external-link-alt"></font-awesome-icon>
         </a>
       </li>
       <li class="nav-item ml-auto">
-        <h6 class="widget-title" data-lang="widget-title-raffles"></h6>
+        <h6 class="widget-title">{{commons.translate('widget-title-raffles')}}</h6>
       </li>
     </ul>
   </div>
@@ -40,82 +40,126 @@
     <div class="tab-content">
       <div role="tabpanel" class="tab-pane" id="raffles-participants">
         <div class="input-group">
-          <input type="text" class="form-control" placeholder="Search..." id="rafflesWidgetSearch" onkeyup="raffles.search(this)">
+          <input type="text" class="form-control" placeholder="Search..." v-model="search">
           <span class="input-group-btn">
-            <button class="btn btn-muted" type="button" title="Cancel search" onclick="raffles.clean()">
-              <i class="fas fa-trash"></i>
+            <button class="btn btn-danger" type="button" title="Cancel search" @click="search = ''">
+              <font-awesome-icon icon="trash"></font-awesome-icon>
             </button>
           </span>
         </div>
-        <ul class="list-unstyled" id="raffles-participants-list"></ul>
+        <ul class="list-unstyled p-2">
+          <li v-for="participant of fParticipants" :key="participant._id" style="cursor: pointer" @click="toggleEligibility(participant)">
+            <font-awesome-icon
+              :class="[participant.eligible ? 'text-success': '']"
+              :icon="['far', participant.eligible ? 'check-circle' : 'circle']"></font-awesome-icon>
+            {{ participant.username }}
+          </li>
+          <li class="text-danger">
+            <font-awesome-icon icon="eye-slash"></font-awesome-icon>
+            {{Math.abs(fParticipants.length - participants.length)}} hidden
+          </li>
+        </ul>
       </div>
       <!-- /PARTICIPANTS -->
 
       <div role="tabpanel" class="tab-pane active" id="raffles-giveaway">
         <div class="input-group">
+          <span class="input-group-btn btn-group">
+            <button class="btn btn-success" type="button"
+              :disabled="keyword.trim().length <= 1 || running"
+              @click="open()">
+                <font-awesome-icon icon="plus" fixed-width></font-awesome-icon>
+            </button>
+            <button class="btn btn-danger" type="button"
+              :disabled="!running"
+              @click="close()">
+                <font-awesome-icon icon="trash" fixed-width></font-awesome-icon>
+            </button>
+          </span>
           <div class="input-group-prepend">
               <span class="input-group-text">!</span>
           </div>
-          <input type="text" class="form-control" placeholder="Enter keyword..." id="rafflesWidgetKeyword">
+          <input type="text" class="form-control" placeholder="Enter keyword..." v-model="keyword" :disabled="running">
           <span class="input-group-btn btn-group">
-            <button class="btn btn-success" id="openBtn" type="button" title="" onclick="raffles.open()">
-                <i class="fas fa-plus" aria-hidden="true"></i>
-            </button>
-            <button class="btn btn-danger" style="display: none" id="removeBtn" type="button" title="" onclick="raffles.remove()">
-              <i class="fas fa-times"></i>
-            </button>
-            <button type="button" class="btn btn-success" id="raffleWidgetRoll" onclick="raffles.pick()" disabled="disabled">
-              <i class="fas fa-trophy"></i>
+            <button type="button" class="btn btn-success" :disabled="!running" @click="socket.emit('pick')">
+              <font-awesome-icon icon="trophy" fixed-width></font-awesome-icon>
             </button>
           </span>
         </div>
 
-        <div class="row">
+        <div class="row pb-1">
           <div class="col">
-            <button type="button" class="btn btn-default btn-label" disabled="disabled" data-lang="eligible-to-enter"></button>
           </div>
           <div class="w-100"></div>
           <div class="col text-center">
-            <div class="btn-group" role="group">
-              <button type="button" class="btn btn-outline-danger" id="followersCheckbox" onclick="raffles.toggleBtn(this)" data-lang="followers"></button>
-              <button type="button" class="btn btn-outline-danger" id="subscribersCheckbox" onclick="raffles.toggleBtn(this)" data-lang="subscribers"></button>
-              <button type="button" class="btn btn-outline-success" id="everyoneCheckbox" onclick="raffles.toggleBtn(this)" data-lang="everyone"></button>
+            <div class="d-flex">
+            <button type="button" class="btn btn-default btn-label" disabled="disabled">{{commons.translate('eligible-to-enter')}}</button>
+            <button
+              class="btn d-block border-0" style="width:100%"
+              :class="[ eligibility.all ? 'btn-outline-success' : 'btn-outline-danger' ]"
+              @click="toggle('all')"
+              :title="commons.translate('everyone')"
+              :disabled="running">
+              <font-awesome-icon icon="users" />
+            </button>
+            <button
+              class="btn d-block border-0" style="width:100%"
+              :class="[ eligibility.followers ? 'btn-outline-success' : 'btn-outline-danger' ]"
+              @click="toggle('followers')"
+              :title="commons.translate('followers')"
+              :disabled="running">
+              <font-awesome-icon icon="heart" />
+            </button>
+            <button
+              class="btn d-block border-0" style="width:100%"
+              :class="[ eligibility.subscribers ? 'btn-outline-success' : 'btn-outline-danger' ]"
+              @click="toggle('subscribers')"
+              :title="commons.translate('subscribers')"
+              :disabled="running">
+              <font-awesome-icon icon="star" />
+            </button>
             </div>
           </div>
         </div>
 
-        <div class="row">
+        <div class="row pb-1">
           <div class="col">
-            <button type="button" class="btn btn-default btn-label" disabled="disabled" data-lang="raffle-type"></button>
-          </div>
-          <div class="w-100"></div>
-          <div class="col text-center">
-            <div class="btn-group" role="group">
-              <button type="button" class="btn btn-outline-primary" id="keywordRadio" onclick="raffles.toggleBtn(this)" data-lang="raffle-type-keywords"></button>
-              <button type="button" class="btn btn-outline-dark" id="ticketsRadio" onclick="raffles.toggleBtn(this)" data-lang="raffle-type-tickets"></button>
+            <div class="d-flex">
+              <button type="button" class="btn btn-default btn-label" disabled="disabled">{{commons.translate('raffle-type')}}</button>
+              <button class="btn d-block" style="width:100%"
+                :class="[isTypeKeywords ? 'btn-primary' : 'btn-outline-primary border-0']"
+                @click="isTypeKeywords = true"
+                :disabled="running">
+                {{commons.translate('raffle-type-keywords')}}
+              </button>
+              <button class="btn d-block" style="width:100%"
+                :class="[isTypeKeywords ? 'btn-outline-primary border-0' : 'btn-primary']"
+                @click="isTypeKeywords = false"
+                :disabled="running">
+                {{commons.translate('raffle-type-tickets')}}
+              </button>
             </div>
           </div>
         </div>
 
-        <div class="row" id="tickets-settings" style="display:none">
+        <div class="row" v-if="!isTypeKeywords">
           <div class="col">
-            <button type="button" class="btn btn-default btn-label" disabled data-lang="raffle-tickets-range"></button>
-          </div>
-          <div class="w-100"></div>
-          <div class="col" style="padding-right:0;">
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text">min</span>
+            <div class="d-flex">
+              <button type="button" class="btn btn-default btn-label" disabled>{{commons.translate('raffle-tickets-range')}}</button>
+              <div class="w-100">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">min</span>
+                  </div>
+                  <input type="number" v-model="ticketsMin" class="form-control" placeholder="0" id="minTickets" min="0" :disabled="running">
+                </div>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                      <span class="input-group-text">max</span>
+                  </div>
+                  <input type="number" v-model="ticketsMax" class="form-control" placeholder="100" id="maxTickets" min="0" :disabled="running">
+                </div>
               </div>
-              <input type="number" class="form-control" placeholder="0" id="minTickets" min="0">
-            </div>
-          </div>
-          <div class="col" style="padding-left:0;">
-            <div class="input-group">
-              <div class="input-group-prepend">
-                  <span class="input-group-text">max</span>
-              </div>
-              <input type="number" class="form-control" placeholder="100" id="maxTickets" min="0">
             </div>
           </div>
         </div>
@@ -123,60 +167,54 @@
 
       <!-- /GIVEAWAY -->
       <div role="tabpanel" class="tab-pane" id="raffles-winner">
-        <div style="text-align: center">
-          <strong style="font-size: 30px">
-            <i class="fab fa-twitch" aria-hidden="true"></i>
-            <span class="raffles-winner-name"></span>
-          </strong>
-        </div>
-
-        <div class="text-center">
-          <div class="btn-group" role="group ">
-            <button type="button" class="btn btn-link" disabled="disabled" id="raffleWinnerFollowing">
-              <span>
-                <i aria-hidden="true"></i>
-                <span data-lang="follower"></span>
-              </span>
-            </button>
-            <button type="button" class="btn btn-link">
-              <a href="" id="raffleWinnerMessage" target="_blank">
-                <i class="fas fa-envelope" aria-hidden="true"></i>
-                <span data-lang="send-message"></span>
-              </a>
-            </button>
-            <button type="button" class="btn btn-link" onclick="raffles.pick()">
-              <span style="color: gray">
-                <i class="fas fa-refresh" aria-hidden="true"></i>
-                <i data-lang="roll-again"></i>
-              </span>
-            </button>
+        <template v-if="winner">
+          <div style="text-align: center">
+            <strong style="font-size: 30px">
+            <font-awesome-icon :icon="['fab', 'twitch']"></font-awesome-icon>
+              {{winner.username}}
+            </strong>
           </div>
-        </div>
 
-        <div class="table-responsive" style="margin-top: 0; padding-left: 10px; padding-right: 10px;">
-          <table class="table table-sm">
-            <thead>
-              <tr>
-                <td colspan="2" style="vertical-align: bottom; font-size: 18px;">
-                  <i class="fas fa-comments-o" aria-hidden="true"></i>
-                  <i data-lang="messages"></i>
-                </td>
-              </tr>
-            </thead>
-            <tbody style="font-size:10px;" id="raffleMessages">
-            </tbody>
-          </table>
-        </div>
+          <div class="text-center">
+            <div class="d-flex">
+              <div class="w-100 btn" style="cursor: initial" :class="[winner.is.follower ? 'text-success' : 'text-danger']">{{commons.translate('follower')}}</div>
+              <div class="w-100 btn" style="cursor: initial" :class="[winner.is.subscriber ? 'text-success' : 'text-danger']">{{commons.translate('subscriber')}}</div>
+              <button type="button" class="btn btn-outline-secondary border-0 btn-block" @click="socket.emit('pick')">
+                <font-awesome-icon icon="sync"></font-awesome-icon>
+                {{commons.translate('roll-again')}}
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive" style="margin-top: 0; padding-left: 10px; padding-right: 10px;">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <td colspan="2" style="vertical-align: bottom; font-size: 18px;">
+                  <font-awesome-icon icon="comments"></font-awesome-icon>
+                  {{commons.translate('messages')}}
+                  </td>
+                </tr>
+              </thead>
+              <tbody style="font-size:10px;">
+                <tr v-for="(message, index) of winnerMessages" :key="index">
+                  <td>{{message.text}}</td>
+                  <td class="text-right"><small class="text-muted">{{ new Date(message.timestamp).toLocaleTimeString()}}</small></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </template>
       </div>
       <!-- /WINNER -->
       <div role="tabpanel" class="tab-pane" id="raffles-settings">
         <div class="input-group">
           <div class="input-group-prepend">
-              <span class="input-group-text" data-lang="announce-every"></span>
+              <span class="input-group-text">{{commons.translate('announce-every')}}</span>
           </div>
-          <input type="text" class="form-control" id="raffleAnnounce">
+          <input type="text" class="form-control" v-model="raffleAnnounceInterval">
           <div class="input-group-append">
-              <span class="input-group-text" data-lang="minutes"></span>
+              <span class="input-group-text">{{commons.translate('minutes')}}</span>
           </div>
         </div>
       </div>
@@ -189,290 +227,160 @@
 </template>
 
 <script>
-  socket.on('systems', (data) => {
-    if (!data.points) {
-      $("#ticketsRadio").hide()
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faTimes, faSync, faComments, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
+import { faTwitch } from '@fortawesome/free-brands-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faCircle, faCheckCircle } from '@fortawesome/free-regular-svg-icons';
+
+library.add(faUsers, faGift, faTrophy, faCog, faExternalLinkAlt, faTrash, faPlus, faTimes, faTwitch, faSync, faComments, faCircle, faCheckCircle, faEyeSlash)
+
+export default {
+  props: ['commons', 'token'],
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+  },
+  mounted: function () {
+    this.$emit('mounted')
+  },
+  data: function () {
+    return {
+      raffleAnnounceInterval: 0,
+
+      search: '',
+
+      eligibility: {
+        all: true,
+        followers: false,
+        subscribers: false
+      },
+
+      isTypeKeywords: true,
+      keyword: '',
+      running: false,
+      ticketsMax: 100,
+      ticketsMin: 0,
+      winner: null,
+      participants: [],
+
+      socket: io('/system/raffles', {query: "token=" + this.token}),
+      updated: String(new Date())
     }
-  })
-
-  socket.emit('getConfiguration')
-  socket.once('configuration', (data) => {
-    $('#raffleAnnounce').val(data.raffleAnnounceInterval)
-  })
-
-  var $raffleAnnounce = $('#raffleAnnounce')
-  $raffleAnnounce.off()
-  $raffleAnnounce.on('focusout', function () {
-    var value = $raffleAnnounce.val()
-    var data = {}
-    data['raffleAnnounceInterval'] = value
-    socket.emit('saveConfiguration', data)
-  })
-
-  socket.emit('raffles.refresh')
-  socket.on('raffles.refresh.data', (data) => {
-    console.group('raffles widget - raffles.refresh.data')
-    console.debug(data)
-
-    const RAFFLE = data.raffle
-    const PARTICIPANTS = data.participants
-    const WINNER = data.winner
-    const MESSAGES = data.messages
-
-    if (!_.isNil(RAFFLE) && _.isNil(RAFFLE.winner)) {
-      // if raffle doesn't have a winner set keyword into input
-      $('#rafflesWidgetKeyword').val(RAFFLE.keyword.replace('!', '')).attr('disabled', 'disabled')
-
-      // disable buttons
-      $('#everyoneCheckbox').attr('disabled', 'disabled')
-      $('#subscribersCheckbox').attr('disabled', 'disabled')
-      $('#followersCheckbox').attr('disabled', 'disabled')
-
-      // set buttons state
-      if (RAFFLE.followers) $('#followersCheckbox').removeClass().addClass('btn btn-outline-success')
-      else $('#followersCheckbox').removeClass().addClass('btn btn-outline-danger')
-
-      if (RAFFLE.subscribers) $('#subscribersCheckbox').removeClass().addClass('btn btn-outline-success')
-      else $('#subscribersCheckbox').removeClass().addClass('btn btn-outline-danger')
-
-      if (!RAFFLE.followers && !RAFFLE.subscribers) {
-        $('#followersCheckbox').removeClass().addClass('btn btn-outline-danger')
-        $('#subscribersCheckbox').removeClass().addClass('btn btn-outline-danger')
-        $('#everyoneCheckbox').removeClass().addClass('btn btn-outline-success')
-      } else $('#everyoneCheckbox').removeClass().addClass('btn btn-outline-danger')
-
-      // set type state
-      if (RAFFLE.type === 0) {
-        // raffle is keyword
-        $('#keywordRadio').removeClass().addClass('btn btn-primary')
-        $('#ticketsRadio').removeClass().addClass('btn btn-outline-primary')
-        $('#keywordRadio').attr('disabled', 'disabled')
-        $('#ticketsRadio').attr('disabled', 'disabled')
-        raffles.hideTickets()
-      } else {
-        $('#ticketsRadio').removeClass().addClass('btn btn-primary')
-        $('#keywordRadio').removeClass().addClass('btn btn-outline-primary')
-        $('#ticketsRadio').attr('disabled', 'disabled')
-        $('#keywordRadio').attr('disabled', 'disabled')
-
-        $('#minTickets').val(RAFFLE.min).attr('disabled', 'disabled')
-        $('#maxTickets').val(RAFFLE.max).attr('disabled', 'disabled')
-        raffles.showTickets()
+  },
+  computed: {
+    fParticipants: function () {
+      if (this.search.trim().length === 0) return this.participants
+      else {
+        return this.participants.filter(o => o.username.includes(this.search.trim()))
       }
-
-      // update participants
-      raffles.participants(PARTICIPANTS)
-
-      // show remove button
-      $('#openBtn').hide()
-      $('#removeBtn').show()
-    } else {
-      $('#rafflesWidgetKeyword').val('')
-      $('#rafflesWidgetKeyword').removeAttr('disabled')
-
-      $('#everyoneCheckbox').removeAttr('disabled')
-      $('#subscribersCheckbox').removeAttr('disabled')
-      $('#followersCheckbox').removeAttr('disabled')
-
-      $('#ticketsRadio').removeAttr('disabled')
-      $('#keywordRadio').removeAttr('disabled')
-
-      $('#keywordRadio').removeClass().addClass('btn btn-primary')
-      $('#ticketsRadio').removeClass().addClass('btn btn-outline-primary')
-      $('#keywordRadio').attr('disabled', 'disabled')
-      $('#ticketsRadio').removeAttr('disabled')
-      raffles.hideTickets()
-
-      $('#minTickets').removeAttr('disabled').val('')
-      $('#maxTickets').removeAttr('disabled').val('')
-
-      // show open button
-      $('#openBtn').show()
-      $('#removeBtn').hide()
-
-      // clear participants
-      raffles.participants([])
+    },
+    winnerMessages: function () {
+      if (this.winner) {
+        return this.participants.filter(o => o.username === this.winner.username)[0].messages
+      } else return []
     }
+  },
+  created: function () {
+    this.socket.emit('settings', (err, data) => {
+      this.raffleAnnounceInterval = data.raffleAnnounceInterval
+    })
 
-    if (!_.isNil(WINNER)) {
-      $('a[href="#raffles-winner"]').css('display', 'block') // show
+    if (localStorage.getItem('/widget/raffles/eligibility/all')) this.eligibility.all = JSON.parse(localStorage.getItem('/widget/raffles/eligibility/all'))
+    if (localStorage.getItem('/widget/raffles/eligibility/followers')) this.eligibility.followers = JSON.parse(localStorage.getItem('/widget/raffles/eligibility/followers'))
+    if (localStorage.getItem('/widget/raffles/eligibility/subscribers')) this.eligibility.subscribers = JSON.parse(localStorage.getItem('/widget/raffles/eligibility/subscribers'))
 
-      if (raffles.switchToWinner) {
-        // go to winners tab
-        $('a[href="#raffles-winner"]').tab('show')
-      }
-
-      var following = $('#raffleWinnerFollowing')
-      following.children('span').css('color', WINNER.is.follower ? 'green' : 'red')
-      following.children('span').children('i').removeClass().addClass('fa ' + (WINNER.is.follower ? 'fa-check' :
-        'fa-close'))
-
-      var message = $('#raffleWinnerMessage')
-      message.attr('href', 'https://www.twitch.tv/message/compose?to=' + WINNER.username)
-
-      $(".raffles-winner-name").text(WINNER.username)
-      $("#raffleMessageOffset").text('0:00')
-      $("#raffleMessageOffset").css('color', 'red')
-      this.timestamp = new Date().getTime()
-
-      // messages
-      $('#raffleMessages').empty()
-      for (let message of MESSAGES.slice(Math.max(MESSAGES.length - 5, 0))) {
-        $('#raffleMessages').append('<tr><td>' + message.text + '</td><td style="text-align: right">' + moment.unix(message.timestamp /
-          1000).format("HH:mm:ss") + '</td></tr>')
-      }
+    this.refresh()
+  },
+  watch: {
+    raffleAnnounceInterval: function (val) {
+      this.socket.emit('settings.update', { raffleAnnounceInterval: val }, () => {})
+    },
+    ticketsMin: function () { this.ticketsMin = Number(this.ticketsMin) },
+    ticketsMax: function () { this.ticketsMax = Number(this.ticketsMax) },
+    keyword: function () {
+      if (!this.keyword.startsWith('!')) this.keyword = '!' + this.keyword
     }
-    raffles.switchToWinner = false // reset variable (only once per click)
-    console.groupEnd()
-  })
+  },
+  methods: {
+    refresh: async function () {
+      await Promise.all([
+        new Promise((resolve) => {
+          this.socket.emit('find', {}, (err, raffles) => {
+            const raffle = _.orderBy(raffles, 'timestamp', 'desc')[0]
+            if (!_.isEmpty(raffle)) {
+              this.running = !raffle.winner
+              if (!raffle.winner) {
+                this.keyword = raffle.keyword
+                this.isTypeKeywords = raffle.type === 0
+                this.ticketsMax = raffle.max
+                this.ticketsMin = raffle.min
+                this.winner = null
 
-  var raffles = {
-    switchToWinner: false,
-    toggleBtn: function (el) {
-      console.group('raffles widget - toggleBtn()')
-      console.debug('element', el)
-      console.debug('button pressed', el.id)
+                // set eligibility
+                if (!raffle.subscribers && !raffle.followers) {
+                  this.eligibility.all = false
+                  this.toggle('all') // enable all
+                } else {
+                  this.eligibility.followers = !raffle.followers
+                  this.eligibility.subscribers = !raffle.subscribers
+                  this.toggle('followers')
+                  this.toggle('subscribers')
+                }
+              } else {
+                if (this.winner === null) {
+                  this.socket.emit('findOne', { collection: '_users', where: {username: raffle.winner}}, (err, user) => this.winner = user)
+                }
+              }
+            }
+            resolve()
+          })
+        }),
+        new Promise((resolve) => {
+          this.socket.emit('find', { collection: 'participants' }, (err, data) => {
+            this.participants = data
+            resolve()
+          })
+        })
+      ])
 
-      if (el.id === 'keywordRadio' || el.id === 'ticketsRadio') {
-        if (el.id === 'keywordRadio') {
-          $('#keywordRadio').removeClass().addClass('btn btn-primary')
-          $('#ticketsRadio').removeClass().addClass('btn btn-outline-primary')
-          $('#keywordRadio').attr('disabled', 'disabled')
-          $('#ticketsRadio').removeAttr('disabled')
-          raffles.hideTickets()
-        } else {
-          $('#ticketsRadio').removeClass().addClass('btn btn-primary')
-          $('#keywordRadio').removeClass().addClass('btn btn-outline-primary')
-          $('#ticketsRadio').attr('disabled', 'disabled')
-          $('#keywordRadio').removeAttr('disabled')
-          raffles.showTickets()
-        }
-        console.groupEnd()
-        return
-      }
-
-      if (el.id === 'everyoneCheckbox') {
-        if ($(el).hasClass('btn-outline-danger')) {
-          console.debug('disabling followers, subscribers')
-          $(el).removeClass().addClass('btn btn-outline-success')
-          $('#followersCheckbox').removeClass().addClass('btn btn-outline-danger')
-          $('#subscribersCheckbox').removeClass().addClass('btn btn-outline-danger')
-        }
-      }
-
-      if ($(el).hasClass('btn-outline-success')) {
-        $(el).removeClass().addClass('btn btn-outline-danger')
-
-        // check if followers and subscribers are disabled -> state success
-        if ($('#subscribersCheckbox').hasClass('btn-outline-danger') && $('#followersCheckbox').hasClass('btn-outline-danger')) $('#everyoneCheckbox').removeClass().addClass('btn btn-outline-success')
-      } else {
-        $(el).removeClass().addClass('btn btn-outline-success')
-
-        // remove success state from everyone checkbox (as only some viewers can be in raffle
-        $('#everyoneCheckbox').removeClass().addClass('btn btn-outline-danger')
-      }
-      console.groupEnd()
+      setTimeout(() => this.refresh(), 1000)
     },
-    showTickets: function () {
-      $('#tickets-settings').show()
+    toggleEligibility: function (participant) {
+      this.socket.emit('update', { collection: 'participants', items: [{_id: String(participant._id), eligible: !participant.eligible}] })
+      participant.eligible = !participant.eligible
     },
-    hideTickets: function () {
-      $('#tickets-settings').hide()
-    },
-    remove: function () {
-      console.debug('raffles.remove')
-      socket.emit('raffles.remove', '')
+    toggle: function (pick) {
+      Vue.set(this.eligibility, pick, !this.eligibility[pick])
+      if (pick === 'all' && this.eligibility[pick]) {
+        this.eligibility.followers = false
+        this.eligibility.subscribers = false
+      }
+      if (!this.eligibility.all && !this.eligibility.followers && !this.eligibility.subscribers) this.eligibility.all = true
+      if (this.eligibility.followers || this.eligibility.subscribers) this.eligibility.all = false
+      this.updated = String(new Date())
+
+      localStorage.setItem('/widget/raffles/eligibility/all', JSON.stringify(this.eligibility.all))
+      localStorage.setItem('/widget/raffles/eligibility/followers', JSON.stringify(this.eligibility.followers))
+      localStorage.setItem('/widget/raffles/eligibility/subscribers', JSON.stringify(this.eligibility.subscribers))
     },
     open: function () {
-      let followers = $('#followersCheckbox').hasClass('btn-outline-success')
-      let subscribers = $('#subscribersCheckbox').hasClass('btn-outline-success')
-      let keyword = $('#rafflesWidgetKeyword').val().length > 0 ? '!' + $('#rafflesWidgetKeyword').val() : null
-      let min = $('#minTickets').val()
-      let max = $('#maxTickets').val()
-
       let out = []
+      out.push(this.keyword)
+      if (this.eligibility.followers || this.eligibility.subscribers) out.push('-for ' + (this.eligibility.followers ? 'followers' : ' ') + (this.eligibility.subscribers ? 'subscribers' : ' '))
 
-      if (!_.isNil(keyword)) out.push(keyword)
-      if (followers || subscribers) out.push('-for ' + (followers ? 'followers' : ' ') + (subscribers ? 'subscribers' : ' '))
-      if (min.length > 0) out.push(`-min ${min}`)
-      if (max.length > 0) out.push(`-max ${max}`)
-
-      // if tickets and min or max not set
-      if ($('#ticketsRadio').hasClass('btn-primary') && !_.isNil(min) && !_.isNil(max)) out.push('-min 0 -max 100')
-
+      if (!this.isTypeKeywords) {
+        out.push(`-min ${this.ticketsMin}`)
+        out.push(`-max ${this.ticketsMax}`)
+      }
       console.group('raffles open()')
-      console.debug('data: ', followers, subscribers, keyword, min, max)
       console.debug('out: ', out.join(' '))
       console.groupEnd()
-      if (!_.isNil(keyword)) socket.emit('raffles.open', out.join(' '))
-
-      $('a[href="#raffles-winner"]').css('display', 'none') // go to winner tab
+      this.socket.emit('open', out.join(' '))
     },
-    participants: function (list) {
-      var max_show = 100
-      var $el = $('#raffles-participants-list')
-      var count = _.size(list)
-
-      $('#raffles-participants-count').text(count)
-      $el.empty()
-      _.each(list, function (item) {
-        max_show--
-        $el.append('<li data-username="' + item.username + '" data-eligible="' + item.eligible +
-        '" onclick="raffles.toggleEligibility(this)" class="' + (max_show < 0 ? 'd-none' : '') + '"><i class="far ' + (item.eligible ?
-        'fa-check-circle text-success' : 'fa-circle') + '" aria-hidden="true"></i> ' + item.username +
-        '</li>')
-      })
-
-      if (max_show < 0) {
-        $el.append('<li><i class="fas fa-eye-slash" aria-hidden="true" style="color: red"></i> ' + Math.abs(
-          max_show) + ' hidden</li>')
-      }
-
-      if (count === 0) {
-        $("#raffleWidgetRoll").attr('disabled', 'disabled')
-      } else $("#raffleWidgetRoll").removeAttr('disabled')
-    },
-    search: function (el) {
-      console.debug('raffles search()', $(el).val())
-      let regexp = new RegExp($(el).val())
-
-      var max_show = 100
-      for (let item of $('#raffles-participants-list li[data-username]')) {
-        if ($(el).val().length === 0) {
-          max_show--
-          if (max_show < 0) $(item).addClass('d-none')
-          else $(item).removeClass()
-          $('#raffles-participants-list li:not([data-username])').removeClass()
-        } else {
-          $('#raffles-participants-list li:not([data-username])').removeClass().addClass('d-none')
-          if (item.dataset.username.match(regexp)) {
-            $(item).removeClass()
-          } else $(item).addClass('d-none')
-        }
-      }
-    },
-    clean: function () {
-      $('#rafflesWidgetSearch').val('')
-      raffles.search($('#rafflesWidgetSearch'))
-    },
-    toggleEligibility: function (el) {
-      $(el).children('i').removeClass()
-      if (el.dataset.eligible === 'true') {
-        $(el).children('i').addClass('fa fa-dot-circle-o')
-      } else {
-        $(el).children('i').addClass('fa fa-check-circle-o text-success')
-      }
-      let eligible = el.dataset.eligible === 'true' ? false : true
-      console.debug('New eligibility:', eligible)
-
-      socket.emit('raffles.eligibility', {
-        username: el.dataset.username,
-        eligible: eligible
-      })
-    },
-    pick: function () {
-      this.switchToWinner = true
-      socket.emit('raffles.pick')
+    close: function () {
+      this.socket.emit('close')
+      this.running = false
     }
   }
+}
 </script>

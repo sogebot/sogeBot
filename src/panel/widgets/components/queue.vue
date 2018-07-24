@@ -184,8 +184,8 @@ export default {
     return {
       eligibility: {
         all: true,
-        followers: true,
-        subscribers: true
+        followers: false,
+        subscribers: false
       },
       selectedUsers: [],
       locked: true,

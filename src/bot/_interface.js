@@ -60,12 +60,16 @@ class Module {
         })
         socket.on('update', async (opts, cb) => {
           opts.collection = opts.collection || 'data'
+          if (opts.collection.startsWith('_')) {
+            opts.collection = opts.collection.replace('_', '')
+          } else opts.collection = this.collection[opts.collection]
+
           if (opts.items) {
             for (let item of opts.items) {
               const _id = item._id; delete item._id
               let itemFromDb = item
-              if (_.isNil(_id)) itemFromDb = await global.db.engine.insert(this.collection[opts.collection], item)
-              else await global.db.engine.update(this.collection[opts.collection], { _id }, item)
+              if (_.isNil(_id)) itemFromDb = await global.db.engine.insert(opts.collection, item)
+              else await global.db.engine.update(opts.collection, { _id }, item)
 
               if (_.isFunction(cb)) cb(null, itemFromDb)
             }
@@ -75,20 +79,33 @@ class Module {
         })
         socket.on('delete', async (opts, cb) => {
           opts.collection = opts.collection || 'data'
+          if (opts.collection.startsWith('_')) {
+            opts.collection = opts.collection.replace('_', '')
+          } else opts.collection = this.collection[opts.collection]
+
           if (opts._id) {
-            await global.db.engine.remove(this.collection[opts.collection], { _id: opts._id })
+            await global.db.engine.remove(opts.collection, { _id: opts._id })
           }
-          cb(null)
+
+          if (_.isFunction(cb)) cb(null)
         })
         socket.on('find', async (opts, cb) => {
           opts.collection = opts.collection || 'data'
+          if (opts.collection.startsWith('_')) {
+            opts.collection = opts.collection.replace('_', '')
+          } else opts.collection = this.collection[opts.collection]
+
           opts.where = opts.where || {}
-          cb(null, await global.db.engine.find(this.collection[opts.collection], opts.where))
+          if (_.isFunction(cb)) cb(null, await global.db.engine.find(opts.collection, opts.where))
         })
         socket.on('findOne', async (opts, cb) => {
           opts.collection = opts.collection || 'data'
+          if (opts.collection.startsWith('_')) {
+            opts.collection = opts.collection.replace('_', '')
+          } else opts.collection = this.collection[opts.collection]
+
           opts.where = opts.where || {}
-          cb(null, await global.db.engine.findOne(this.collection[opts.collection], opts.where))
+          if (_.isFunction(cb)) cb(null, await global.db.engine.findOne(opts.collection, opts.where))
         })
       })
     }

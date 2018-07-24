@@ -755,6 +755,7 @@
     "number-of-users": "Počet diváků",
     "roll-again": "Losuj znovu",
     "follower": "Follower",
+    "subscriber": "Subscriber",
     "minutes": "minuty",
     "seconds": "vteřiny",
     "hours": "hodiny",
@@ -961,7 +962,7 @@
     "announce-ticket-raffle": "Raffle prave bezi. Pro vstup do raffle napis $keyword <$min-$max>. Vstup je mozny pro $eligibility",
 
     "cannot-create-raffle-without-keyword": "Promin, $sender, ale nemuzes vytvorit raffle bez klicoveho slova",
-    "raffle-is-already-running": "Promin, $sender, ale raffle jiz bezi s keywordem !$keyword",
+    "raffle-is-already-running": "Promin, $sender, ale raffle jiz bezi s keywordem $keyword",
     "no-raffle-is-currently-running": "$sender, zadne raffle bez viteze momentalne nebezi",
 
     "no-participants-to-pick-winner": "$sender, nikdo se nezucastnil teto raffle",

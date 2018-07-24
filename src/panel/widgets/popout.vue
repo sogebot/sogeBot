@@ -11,10 +11,10 @@ import eventlist from './components/eventlist.vue'
 import join from './components/join.vue'
 import part from './components/part.vue'
 import queue from './components/queue.vue'
+import raffles from './components/raffles.vue'
 import soundboard from './components/soundboard.vue'
 import twitch from './components/twitch.vue'
 import twitter from './components/twitter.vue'
-import ytplayer from './components/ytplayer.vue'
 
 export default {
   props: ['items', 'commons', 'socket', 'page'],
@@ -27,10 +27,10 @@ export default {
     join,
     part,
     queue,
+    raffles,
     soundboard,
     twitch,
-    twitter,
-    ytplayer,
+    twitter
   },
   data: function () {
     return {

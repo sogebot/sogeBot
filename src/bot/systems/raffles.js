@@ -22,7 +22,6 @@ const TYPE_TICKETS = 1
  * !raffle remove                        - remove raffle without winner
  * !raffle pick                          - pick or repick a winner of raffle
  * ![raffle-keyword]                     - join a raffle
- * !set raffleAnnounceInterval [minutes] - reannounce raffle interval each x minutes
  */
 
 class Raffles extends System {
@@ -48,7 +47,6 @@ class Raffles extends System {
 
     if (cluster.isMaster) {
       this.announce()
-      this.refresh()
 
       cluster.on('message', (worker, message) => {
         if (message.type !== 'raffles') return
@@ -57,41 +55,18 @@ class Raffles extends System {
     }
   }
 
-  async refresh (self) {
-    if (cluster.isWorker) return process.send({type: 'raffles', fnc: 'refresh'})
-
-    debug('[WIDGET REFRESH]')
-    const SOCKET = global.panel.io
-
-    let raffles = await global.db.engine.find('raffles')
-    debug('Raffles: %o', raffles)
-    if (_.isEmpty(raffles)) {
-      SOCKET.emit('raffles.refresh.data', { raffle: null, participants: null })
-      return
-    }
-
-    let raffle = _.orderBy(raffles, 'timestamp', 'desc')[0]
-    debug('Selected raffle: %o', raffle)
-
-    let participants = await global.db.engine.find('raffle_participants', { raffle_id: raffle._id.toString() })
-    debug('Raffle participants: %o', participants)
-
-    let winner = null
-    if (!_.isNil(raffle.winner)) winner = await global.users.get(raffle.winner)
-    debug('Raffle winner: %o', winner)
-
-    let messages = []
-    if (!_.isNil(raffle.winner)) {
-      let participant = await global.db.engine.findOne('raffle_participants', { raffle_id: raffle._id.toString(), username: raffle.winner })
-      messages = participant.messages
-    }
-    debug('winner messages: %O', messages)
-
-    SOCKET.emit('raffles.refresh.data', {
-      raffle: raffle,
-      participants: participants,
-      winner: winner,
-      messages: messages
+  sockets () {
+    this.socket.on('connection', (socket) => {
+      socket.on('pick', async (cb) => {
+        this.pick()
+      })
+      socket.on('open', async (message) => {
+        this.open({ username: global.commons.getOwner(), parameters: message })
+      })
+      socket.on('close', async () => {
+        global.db.engine.remove(this.collection.data, {})
+        global.db.engine.remove(this.collection.participants, {})
+      })
     })
   }
 
@@ -99,7 +74,7 @@ class Raffles extends System {
     if (opts.skip) return true
 
     debug('[MESSAGE PARSER]')
-    let raffles = await global.db.engine.find('raffles')
+    let raffles = await global.db.engine.find(this.collection.data)
     debug('Raffles: %o', raffles)
     if (_.isEmpty(raffles)) {
       return true
@@ -109,26 +84,25 @@ class Raffles extends System {
     debug('Selected raffle: %o', raffle)
 
     let isWinner = !_.isNil(raffle.winner) && raffle.winner === opts.sender.username
-    let isInTwoMinutesTreshold = _.now() - raffle.timestamp <= 1000 * 60 * 2
+    let isInFiveMinutesTreshold = _.now() - raffle.timestamp <= 1000 * 60 * 5
 
     debug('current time: %s, raffle pick time: %s, diff: %s', _.now(), raffle.timestamp, _.now() - raffle.timestamp)
-    debug('Is raffle in 2 minutes treshold: %s', isInTwoMinutesTreshold)
+    debug('Is raffle in 5 minutes treshold: %s', isInFiveMinutesTreshold)
     debug('Is user a winner: %s', isWinner)
-    if (isWinner && isInTwoMinutesTreshold) {
-      let winner = await global.db.engine.findOne('raffle_participants', { username: opts.sender.username, raffle_id: raffle._id.toString() })
+    if (isWinner && isInFiveMinutesTreshold) {
+      let winner = await global.db.engine.findOne(this.collection.participants, { username: opts.sender.username, raffle_id: raffle._id.toString() })
       winner.messages.push({
         timestamp: _.now(),
         text: opts.message
       })
       debug({ username: opts.sender.username, raffle_id: raffle._id.toString() }, { messages: winner.messages })
-      await global.db.engine.update('raffle_participants', { username: opts.sender.username, raffle_id: raffle._id.toString() }, { messages: winner.messages })
-      this.refresh()
+      await global.db.engine.update(this.collection.participants, { username: opts.sender.username, raffle_id: raffle._id.toString() }, { messages: winner.messages })
     }
     return true
   }
 
   async announce () {
-    let raffle = await global.db.engine.findOne('raffles', { winner: null })
+    let raffle = await global.db.engine.findOne(this.collection.data, { winner: null })
     if (!await global.cache.isOnline() || _.isEmpty(raffle) || new Date().getTime() - new Date(await this.settings._.lastAnnounce).getTime() < ((await this.settings.raffleAnnounceInterval) * 60 * 1000)) {
       new Timeout().recursive({ uid: `rafflesAnnounce`, this: this, fnc: this.announce, wait: 60000 })
       return
@@ -156,12 +130,12 @@ class Raffles extends System {
   }
 
   async remove (self) {
-    let raffle = await global.db.engine.findOne('raffles', { winner: null })
+    let raffle = await global.db.engine.findOne(this.collection.data, { winner: null })
     if (_.isEmpty(raffle)) return
 
     await Promise.all([
-      global.db.engine.remove('raffles', { _id: raffle._id.toString() }),
-      global.db.engine.remove('raffle_participants', { raffle_id: raffle._id.toString() })
+      global.db.engine.remove(this.collection.data, { _id: raffle._id.toString() }),
+      global.db.engine.remove(this.collection.participants, { raffle_id: raffle._id.toString() })
     ])
 
     self.refresh()
@@ -193,14 +167,14 @@ class Raffles extends System {
     keyword = keyword[1]
 
     // check if raffle running
-    let raffle = await global.db.engine.findOne('raffles', { winner: null })
+    let raffle = await global.db.engine.findOne(this.collection.data, { winner: null })
     if (!_.isEmpty(raffle)) {
       let message = await global.commons.prepare('raffles.raffle-is-already-running', { keyword: raffle.keyword })
       debug(message); global.commons.sendMessage(message, opts.sender)
       return
     }
 
-    global.db.engine.insert('raffles', {
+    global.db.engine.insert(this.collection.data, {
       keyword: keyword,
       followers: followers,
       subscribers: subscribers,
@@ -224,12 +198,11 @@ class Raffles extends System {
     })
     debug(message); global.commons.sendMessage(message, global.commons.getOwner())
 
-    this.refresh()
     this.settings._.lastAnnounce = String(new Date())
   }
 
   async main (opts) {
-    let raffle = await global.db.engine.findOne('raffles', { winner: null })
+    let raffle = await global.db.engine.findOne(this.collection.data, { winner: null })
 
     if (_.isEmpty(raffle)) {
       let message = await global.commons.prepare('raffles.no-raffle-is-currently-running')
@@ -257,7 +230,7 @@ class Raffles extends System {
   async participate (opts) {
     if (_.isNil(opts.sender) || _.isNil(opts.sender.username)) return true
 
-    const [raffle, user] = await Promise.all([global.db.engine.findOne('raffles', { winner: null }), global.users.get(opts.sender.username)])
+    const [raffle, user] = await Promise.all([global.db.engine.findOne(this.collection.data, { winner: null }), global.users.get(opts.sender.username)])
 
     const isStartingWithRaffleKeyword = opts.message.startsWith(raffle.keyword)
     debug('isStartingWithRaffleKeyword: %s', isStartingWithRaffleKeyword)
@@ -283,7 +256,7 @@ class Raffles extends System {
     }
     if (!_.isFinite(tickets)) tickets = 0
 
-    let participant = await global.db.engine.findOne('raffle_participants', { raffle_id: raffle._id.toString(), username: opts.sender.username })
+    let participant = await global.db.engine.findOne(this.collection.participants, { raffle_id: raffle._id.toString(), username: opts.sender.username })
     let curTickets = 0
     if (!_.isEmpty(participant)) {
       debug(participant)
@@ -319,21 +292,21 @@ class Raffles extends System {
 
     if (participantUser.eligible) {
       if (raffle.type === TYPE_TICKETS) await global.db.engine.insert('users.points', { username: opts.sender.username, points: parseInt(tickets, 10) * -1 })
-      await global.db.engine.update('raffle_participants', { raffle_id: raffle._id.toString(), username: opts.sender.username }, participantUser)
+      await global.db.engine.update(this.collection.participants, { raffle_id: raffle._id.toString(), username: opts.sender.username }, participantUser)
       this.refresh()
     }
     return true
   }
 
-  async pick (opts) {
-    let raffles = await global.db.engine.find('raffles')
+  async pick () {
+    let raffles = await global.db.engine.find(this.collection.data)
     if (_.size(raffles) === 0) return true // no raffle ever
 
     // get only latest raffle
     let raffle = _.orderBy(raffles, 'timestamp', 'desc')[0]
     debug('Picking winner for raffle\n  %j', raffle)
 
-    let participants = await global.db.engine.find('raffle_participants', { raffle_id: raffle._id.toString(), eligible: true })
+    let participants = await global.db.engine.find(this.collection.participants, { raffle_id: raffle._id.toString(), eligible: true })
     if (participants.length === 0) {
       let message = await global.commons.prepare('raffles.no-participants-to-pick-winner')
       debug(message); global.commons.sendMessage(message, global.commons.getOwner())
@@ -363,8 +336,8 @@ class Raffles extends System {
 
     // uneligible winner (don't want to pick second time same user if repick)
     await Promise.all([
-      global.db.engine.update('raffle_participants', { raffle_id: raffle._id.toString(), username: winner.username }, { eligible: false }),
-      global.db.engine.update('raffles', { _id: raffle._id.toString() }, { winner: winner.username, timestamp: new Date().getTime() })
+      global.db.engine.update(this.collection.participants, { raffle_id: raffle._id.toString(), username: winner.username }, { eligible: false }),
+      global.db.engine.update(this.collection.data, { _id: raffle._id.toString() }, { winner: winner.username, timestamp: new Date().getTime() })
     ])
 
     let message = await global.commons.prepare('raffles.raffle-winner-is', {
@@ -373,16 +346,14 @@ class Raffles extends System {
       probability: _.round(probability, 2)
     })
     debug(message); global.commons.sendMessage(message, global.commons.getOwner())
-
-    this.refresh()
   }
 
   async eligibility (self, socket, data) {
-    let raffles = await global.db.engine.find('raffles')
+    let raffles = await global.db.engine.find(this.collection.data)
     if (_.isEmpty(raffles)) return
     let raffle = _.orderBy(raffles, 'timestamp', 'desc')[0]
     debug({ raffle_id: raffle._id.toString(), username: data.username }, { eligible: data.eligible })
-    await global.db.engine.update('raffle_participants', { raffle_id: raffle._id.toString(), username: data.username }, { eligible: data.eligible })
+    await global.db.engine.update(this.collection.participants, { raffle_id: raffle._id.toString(), username: data.username }, { eligible: data.eligible })
   }
 }
 
