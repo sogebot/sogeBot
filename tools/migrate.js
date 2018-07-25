@@ -246,7 +246,7 @@ let migration = {
     do: async () => {
       console.info('Migration alias to %s', '7.0.0')
       let alias = await global.db.engine.find('alias')
-      const constants = require('../libs/constants')
+      const constants = require('../src/bot/constants')
       for (let item of alias) {
         await global.db.engine.update('alias', { _id: item._id.toString() }, { permission: constants.VIEWERS })
       }
