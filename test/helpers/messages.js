@@ -61,7 +61,7 @@ module.exports = {
         return setError(
           '\nExpected message: "' + JSON.stringify(expected) + '"\nActual message:   "' + (!_.isNil(global.log.warning.lastCall) ? global.log.warning.lastCall.args[0] : '') + '"')
       }
-    }, 10000)
+    }, 5000)
   },
   isSent: async function (entry, user, opts) {
     opts = opts || {}
@@ -102,7 +102,7 @@ module.exports = {
           '\nExpected message: "' + JSON.stringify(expected) + '"\nActual message:   "' + (!_.isNil(global.log.chatOut.args) ? util.inspect(global.log.chatOut.args) : '') + '"' +
           '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.log.chatOut.lastCall) ? JSON.stringify(global.log.chatOut.lastCall.args[1]) : '') + '"')
       }
-    }, 10000)
+    }, 5000)
   },
   isSentRaw: async function (expected, user) {
     await until(setError => {
@@ -125,6 +125,6 @@ module.exports = {
           '\nExpected message: "' + expected + '"\nActual message:   "' + (!_.isNil(global.log.chatOut.lastCall) ? global.log.chatOut.lastCall.args[0] : '') + '"' +
           '\n\nExpected user: "' + JSON.stringify(user) + '"\nActual user:   "' + (!_.isNil(global.log.chatOut.lastCall) ? JSON.stringify(global.log.chatOut.lastCall.args[1]) : '') + '"')
       }
-    }, 10000)
+    }, 5000)
   }
 }

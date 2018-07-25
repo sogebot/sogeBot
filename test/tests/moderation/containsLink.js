@@ -4,6 +4,7 @@ if (require('cluster').isWorker) process.exit()
 require('../../general.js')
 
 const db = require('../../general.js').db
+const variable = require('../../general.js').variable
 const assert = require('chai').assert
 
 const tests = {
@@ -58,8 +59,12 @@ describe('systems/moderation - containsLink()', () => {
   describe('moderationLinksClips=true & moderationLinksWithSpaces=true', async () => {
     before(async () => {
       await db.cleanup()
+
       await (global.systems.moderation.settings.links.includeSpaces = true)
+      await variable.isEqual('systems.moderation.settings.links.includeSpaces', true)
       await (global.systems.moderation.settings.links.includeClips = true)
+      await variable.isEqual('systems.moderation.settings.links.includeClips', true)
+
     })
 
     for (let [type, listOfTests] of Object.entries(tests)) {
@@ -97,8 +102,11 @@ describe('systems/moderation - containsLink()', () => {
   describe('moderationLinksClips=false & moderationLinksWithSpaces=true', async () => {
     before(async () => {
       await db.cleanup()
+
       await (global.systems.moderation.settings.links.includeSpaces = true)
+      await variable.isEqual('systems.moderation.settings.links.includeSpaces', true)
       await (global.systems.moderation.settings.links.includeClips = false)
+      await variable.isEqual('systems.moderation.settings.links.includeClips', false)
     })
 
     for (let [type, listOfTests] of Object.entries(tests)) {
@@ -136,8 +144,11 @@ describe('systems/moderation - containsLink()', () => {
   describe('moderationLinksClips=true & moderationLinksWithSpaces=false', async () => {
     before(async () => {
       await db.cleanup()
+
       await (global.systems.moderation.settings.links.includeSpaces = false)
+      await variable.isEqual('systems.moderation.settings.links.includeSpaces', false)
       await (global.systems.moderation.settings.links.includeClips = true)
+      await variable.isEqual('systems.moderation.settings.links.includeClips', true)
     })
 
     for (let [type, listOfTests] of Object.entries(tests)) {
