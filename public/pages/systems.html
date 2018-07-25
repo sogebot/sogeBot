@@ -27,6 +27,7 @@
                   v-else-if="currentValue.constructor === Array"
                   v-bind:value="currentValue"
                   v-bind:title="commons.translate('settings.' + selectedSystem + '.' + defaultValue)"
+                  v-on:update="value[defaultValue] = $event; triggerDataChange()"
                 ></textarea-from-array>
                 <command-input
                   v-else
