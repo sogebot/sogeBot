@@ -140,7 +140,11 @@ class Module {
           if (_.isNil(this.settings[category])) this.settings[category] = {}
           Object.defineProperty(this.settings[category], `${key}`, {
             get: () => this._settings[category][key](),
-            set: (value) => global.db.engine.update(this.collection.settings, { category, key }, { value })
+            set: (value) => {
+              const isDefaultValue = value === key
+              if (isDefaultValue) global.db.engine.remove(this.collection.settings, { category, key })
+              else global.db.engine.update(this.collection.settings, { category, key }, { value })
+            }
           })
         }
       } else if (_.isString(values) || _.isBoolean(values) || _.isNumber(values)) {
@@ -155,7 +159,11 @@ class Module {
         if (_.isNil(this.settings[category])) this.settings[category] = null
         Object.defineProperty(this.settings, `${category}`, {
           get: () => this._settings[category](),
-          set: (value) => global.db.engine.update(this.collection.settings, { category }, { value })
+          set: (value) => {
+            const isDefaultValue = values === value
+            if (isDefaultValue) global.db.engine.remove(this.collection.settings, { category })
+            else global.db.engine.update(this.collection.settings, { category }, { value })
+          }
         })
       } else if (_.isObjectLike(values)) {
         for (let [key, value] of Object.entries(values)) {
@@ -177,11 +185,17 @@ class Module {
             get: () => this._settings[category][key](),
             set: async (values) => {
               if (_.isArray(values)) {
-                const valuesFromDb = (await global.db.engine.find(this.collection.settings, { category })).map((o) => o.value)
-                for (let toRemoveValue of _.difference(valuesFromDb, values)) await global.db.engine.remove(this.collection.settings, { category, key, value: toRemoveValue })
-                for (let toAddValue of _.difference(values, valuesFromDb)) await global.db.engine.insert(this.collection.settings, { category, key, value: toAddValue, isMultiValue: true })
+                if (_.isEqual(_(value).sort().value().filter(String), _(values).sort().value().filter(String))) {
+                  global.db.engine.remove(this.collection.settings, { category, key })
+                } else {
+                  const valuesFromDb = (await global.db.engine.find(this.collection.settings, { category })).map((o) => o.value)
+                  for (let toRemoveValue of _.difference(valuesFromDb, values)) await global.db.engine.remove(this.collection.settings, { category, key, value: toRemoveValue })
+                  for (let toAddValue of _.difference(values, valuesFromDb)) await global.db.engine.insert(this.collection.settings, { category, key, value: toAddValue, isMultiValue: true })
+                }
               } else {
-                await global.db.engine.update(this.collection.settings, { category, key }, { value: values, isMultiValue: false })
+                const isDefaultValue = values === value
+                if (isDefaultValue) global.db.engine.remove(this.collection.settings, { category, isMultiValue: false })
+                else global.db.engine.update(this.collection.settings, { category, key }, { value: values, isMultiValue: false })
               }
             }
           })
