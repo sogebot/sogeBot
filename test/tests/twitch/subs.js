@@ -3,6 +3,7 @@
 require('../../general.js')
 
 const db = require('../../general.js').db
+const time = require('../../general.js').time
 const message = require('../../general.js').message
 
 const moment = require('moment')
@@ -18,6 +19,7 @@ describe('lib/twitch - subs()', () => {
   })
 
   it('add testuser to event', async () => {
+    await time.waitMs(100)
     await global.overlays.eventlist.add({
       type: 'sub',
       username: 'testuser'
@@ -25,6 +27,7 @@ describe('lib/twitch - subs()', () => {
   })
 
   it('add testuser2 to event', async () => {
+    await time.waitMs(100)
     await global.overlays.eventlist.add({
       type: 'sub',
       username: 'testuser2'
@@ -42,6 +45,7 @@ describe('lib/twitch - subs()', () => {
   })
 
   it('add testuser3 to events', async () => {
+    await time.waitMs(100)
     await global.overlays.eventlist.add({
       type: 'sub',
       username: 'testuser3'
