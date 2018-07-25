@@ -250,26 +250,26 @@
       console.debug('Definitions', definitions)
 
       const createProperInput = (k, v) => {
-      if (_.isBoolean(v)) {
-        return `<button data-event-toggle-button data-id="${k}" data-toggle-definition="true" data-value="${v}" style="flex: 1; width: 100%" class="btn ${v === true ? `btn-success` : `btn-danger`}">${translations.events.definitions[k][v]}</button>`
-      } else if (_.isArray(v)) {
-        let buttons = []
-        for (let val of v) {
-          buttons.push(`
-            <label class="form-control btn btn-secondary ${buttons.length === 0 ? `active` : ``}">
-              <input type="radio" name="radio-options-${k}" id="${k}-${val}" autocomplete="off" ${buttons.length === 0 ? `checked` : ``}> ${val}
-            </label>
-          `)
+        if (_.isBoolean(v)) {
+          return `<button data-event-toggle-button data-id="${k}" data-toggle-definition="true" data-value="${v}" style="flex: 1; width: 100%" class="btn ${v === true ? `btn-success` : `btn-danger`}">${translations.events.definitions[k][v]}</button>`
+        } else if (_.isArray(v)) {
+          let buttons = []
+          for (let val of v) {
+            buttons.push(`
+              <label class="form-control btn btn-secondary ${buttons.length === 0 ? `active` : ``}">
+                <input type="radio" name="radio-options-${k}" id="${k}-${val}" autocomplete="off" ${buttons.length === 0 ? `checked` : ``}> ${val}
+              </label>
+            `)
+          }
+          return `
+            <div class="btn-group btn-group-toggle" data-toggle="buttons" style="flex: 1; position: relative; left: 1px">
+              ${buttons.join(' ')}
+            </div>
+          `
+        } else {
+          return `<input id="definition-${k}" class="form-control" placeholder="${translations.events.definitions[k].placeholder}">`
         }
-        return `
-          <div class="btn-group btn-group-toggle" data-toggle="buttons" style="flex: 1; position: relative; left: 1px">
-            ${buttons.join(' ')}
-          </div>
-        `
-      } else {
-        return `<input id="definition-${k}" class="form-control" placeholder="${translations.events.definitions[k].placeholder}">`
       }
-    }
       for (let [key, value] of Object.entries(definitions)) {
         $('[data-event-definitions] .card-body').append(
           `
@@ -305,7 +305,8 @@
 
     const createProperInput = (k, v) => {
       if (_.isBoolean(v)) {
-        return `<button data-event-toggle-button data-id="${k}" data-value="${v}" style="flex: 1" class="btn ${v === true ? `btn-success` : `btn-danger`}">${translations.events.definitions[k][v]}</button>`
+        v = String(v).toLowerCase()
+        return `<button data-event-toggle-button data-id="${k}" data-value="${v}" style="flex: 1" class="btn ${v === 'true' ? `btn-success` : `btn-danger`}">${translations.events.definitions[k][v]}</button>`
       } else if (_.isArray(v)) {
         let buttons = []
         for (let val of v) {
@@ -353,7 +354,7 @@
   $(document).on('click', '[data-event-toggle-button]', ((ev) => {
     ev.preventDefault()
     const target = $(ev.currentTarget)
-    const value = target.data('value') === 'true' ? false : true
+    const value = String(target.data('value')).toLowerCase() === 'true' ? false : true
     target
       .removeClass()
       .addClass('btn')
@@ -454,7 +455,7 @@
         case 'BUTTON':
           if (!_.isNil($(element).data('event-toggle-button'))) {
             if (!_.isNil($(element).data('toggle-definition'))) {
-              eventListener.event.definitions[$(element).data('id')] = $(element).data('value') ===
+              eventListener.event.definitions[$(element).data('id')] = String($(element).data('value').toLowerCase()) ===
                 'true'
             } else {
               let parentId = $(element).parents('.dialog-group').attr('id')
@@ -594,6 +595,7 @@
       for (let [k, v] of Object.entries(eventToEdit.definitions)) {
         if (_.isBoolean(v)) {
           const toggle = modal.find(`button[data-id="${k}"]`)
+
           if (toggle.data('value').toString() !== v.toString()) {
             // trigger "click" if values doesn't match -> button should be toggled
             toggle.trigger('click')
@@ -620,7 +622,7 @@
           console.debug('Operation definition on load:', operationDefinition)
           if (_.isBoolean(operationDefinition)) {
             const toggle = modal.find(`#${elementId} button[data-id="${k}"]`)
-            if (toggle.data('value') !== v.toString()) {
+            if (String(toggle.data('value')) !== String(v)) {
               // trigger "click" if values doesn't match -> button should be toggled
               toggle.trigger('click')
             }
