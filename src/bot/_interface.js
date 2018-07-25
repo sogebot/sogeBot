@@ -188,13 +188,13 @@ class Module {
                 if (_.isEqual(_(value).sort().value().filter(String), _(values).sort().value().filter(String))) {
                   global.db.engine.remove(this.collection.settings, { category, key })
                 } else {
-                  const valuesFromDb = (await global.db.engine.find(this.collection.settings, { category })).map((o) => o.value)
+                  const valuesFromDb = (await global.db.engine.find(this.collection.settings, { category, key })).map((o) => o.value)
                   for (let toRemoveValue of _.difference(valuesFromDb, values)) await global.db.engine.remove(this.collection.settings, { category, key, value: toRemoveValue })
                   for (let toAddValue of _.difference(values, valuesFromDb)) await global.db.engine.insert(this.collection.settings, { category, key, value: toAddValue, isMultiValue: true })
                 }
               } else {
                 const isDefaultValue = values === value
-                if (isDefaultValue) global.db.engine.remove(this.collection.settings, { category, isMultiValue: false })
+                if (isDefaultValue) global.db.engine.remove(this.collection.settings, { category, key, isMultiValue: false })
                 else global.db.engine.update(this.collection.settings, { category, key }, { value: values, isMultiValue: false })
               }
             }
