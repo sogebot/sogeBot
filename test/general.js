@@ -31,5 +31,6 @@ module.exports = {
   db: require('./helpers/db'),
   message: require('./helpers/messages'),
   tmi: require('./helpers/tmi'),
-  variable: require('./helpers/variable')
+  variable: require('./helpers/variable'),
+  time: require('./helpers/time')
 }

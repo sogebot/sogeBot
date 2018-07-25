@@ -4,6 +4,7 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
+const time = require('../../general.js').time
 
 const moment = require('moment')
 
@@ -18,6 +19,7 @@ describe('lib/twitch - followers()', () => {
   })
 
   it('add testuser to event', async () => {
+    await time.waitMs(100)
     await global.overlays.eventlist.add({
       type: 'follow',
       username: 'testuser'
@@ -25,6 +27,7 @@ describe('lib/twitch - followers()', () => {
   })
 
   it('add testuser2 to event', async () => {
+    await time.waitMs(100)
     await global.overlays.eventlist.add({
       type: 'follow',
       username: 'testuser2'
@@ -42,6 +45,7 @@ describe('lib/twitch - followers()', () => {
   })
 
   it('add testuser3 to events', async () => {
+    await time.waitMs(100)
     await global.overlays.eventlist.add({
       type: 'follow',
       username: 'testuser3'
