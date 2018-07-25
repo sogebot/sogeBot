@@ -9,9 +9,11 @@ const config = require('@config')
 const cluster = require('cluster')
 const crypto = require('crypto')
 
+const Entities = require('html-entities').AllHtmlEntities
+
 class Message {
   constructor (message) {
-    this.message = message
+    this.message = Entities.decode(message)
   }
 
   async global (opts) {
@@ -65,7 +67,7 @@ class Message {
       this.message = this.message.replace(/\$currentSong/g, currentSong)
     } else this.message = this.message.replace(/\$currentSong/g, global.translate('songs.not-playing'))
 
-    return this.message
+    return Entities.decode(this.message)
   }
 
   async parse (attr) {
