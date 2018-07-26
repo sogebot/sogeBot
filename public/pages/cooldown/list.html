@@ -103,7 +103,7 @@
         state: {
           settings: 0
         },
-        socket: io('/system/cooldown', { query: "token=" + token }),
+        socket: io('/systems/cooldown', { query: "token=" + token }),
       },
       computed: {
         cooldownsFiltered: function () {
@@ -123,11 +123,11 @@
           this.commands = items.commands
         })
 
-        if (localStorage.getItem('/system/Cooldown/showAs')) this.showAs = JSON.parse(localStorage.getItem('/system/Cooldown/showAs'));
+        if (localStorage.getItem('/systems/Cooldown/showAs')) this.showAs = JSON.parse(localStorage.getItem('/systems/Cooldown/showAs'));
       },
       watch: {
         showAs: function(val) {
-          localStorage.setItem('/system/Cooldown/showAs', JSON.stringify(this.showAs))
+          localStorage.setItem('/systems/Cooldown/showAs', JSON.stringify(this.showAs))
         }
       },
       filters: {

@@ -81,7 +81,7 @@
         state: {
           import: 0,
         },
-        socket: io('/system/songs', { query: "token=" + token }),
+        socket: io('/systems/songs', { query: "token=" + token }),
       },
       computed: {
         filtered: function () {
@@ -94,11 +94,11 @@
       },
       created: function () {
         this.refreshPlaylist()
-        if (localStorage.getItem('/system/Songs/showAs')) this.showAs = JSON.parse(localStorage.getItem('/system/Songs/showAs'));
+        if (localStorage.getItem('/systems/Songs/showAs')) this.showAs = JSON.parse(localStorage.getItem('/systems/Songs/showAs'));
       },
       watch: {
         showAs: function(val) {
-          localStorage.setItem('/system/Songs/showAs', JSON.stringify(this.showAs))
+          localStorage.setItem('/systems/Songs/showAs', JSON.stringify(this.showAs))
         }
       },
       filters: {

@@ -245,6 +245,19 @@ function Panel () {
       }
       cb(null, toEmit)
     })
+    socket.on('games', async (cb) => {
+      let toEmit = []
+      for (let system of Object.keys(global.games).filter(o => !o.startsWith('_'))) {
+        if (!global.games[system].settings) continue
+        toEmit.push({
+          name: system.toLowerCase(),
+          enabled: await global.games[system].settings.enabled,
+          areDependenciesEnabled: await global.games[system]._dependenciesEnabled(),
+          isDisabledByEnv: !_.isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*')
+        })
+      }
+      cb(null, toEmit)
+    })
     socket.on('getVersion', function () { socket.emit('version', process.env.npm_package_version) })
 
     socket.on('parser.isRegistered', function (data) {

@@ -115,7 +115,7 @@
       created: function () {
         this.socket._panel.emit('systems', (err, systems) => {
           for (let system of systems) {
-            this.socket[system.name] = io(`/system/${system.name}`, { query: "token=" + token })
+            this.socket[system.name] = io(`/systems/${system.name}`, { query: "token=" + token })
           }
           this.listOfSystems = systems
           this.selectedSystem = systems[0].name

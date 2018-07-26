@@ -64,7 +64,7 @@
         el: "#quotesApp",
         data: {
           quotes: [],
-          socket: io('/system/quotes', { query: "token=" + token }),
+          socket: io('/systems/quotes', { query: "token=" + token }),
         },
         created: function () {
           this.socket.emit('list', (err, quotes) => {

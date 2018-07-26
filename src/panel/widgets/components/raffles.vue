@@ -263,7 +263,7 @@ export default {
       winner: null,
       participants: [],
 
-      socket: io('/system/raffles', {query: "token=" + this.token}),
+      socket: io('/systems/raffles', {query: "token=" + this.token}),
       updated: String(new Date())
     }
   },

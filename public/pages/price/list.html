@@ -90,7 +90,7 @@
         state: {
           settings: 0
         },
-        socket: io('/system/price', { query: "token=" + token }),
+        socket: io('/systems/price', { query: "token=" + token }),
       },
       computed: {
         filtered: function () {
@@ -110,11 +110,11 @@
           this.s_commands = items.commands
         })
 
-        if (localStorage.getItem('/system/Price/showAs')) this.showAs = JSON.parse(localStorage.getItem('/system/Price/showAs'));
+        if (localStorage.getItem('/systems/Price/showAs')) this.showAs = JSON.parse(localStorage.getItem('/systems/Price/showAs'));
       },
       watch: {
         showAs: function(val) {
-          localStorage.setItem('/system/Price/showAs', JSON.stringify(this.showAs))
+          localStorage.setItem('/systems/Price/showAs', JSON.stringify(this.showAs))
         }
       },
       filters: {

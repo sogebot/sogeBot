@@ -30,5 +30,10 @@
   "raffles": "Tombola",
   "queue": "Fronta",
   "playlist": "Playlist",
-  "bannedsongs": "Zakázané písně"
+  "bannedsongs": "Zakázané písně",
+  "duel": "Duel",
+  "fightme": "FightMe",
+  "seppuku": "Seppuku",
+  "gamble": "Gamble",
+  "roulette": "Roulette"
 }
