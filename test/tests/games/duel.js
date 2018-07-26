@@ -26,8 +26,8 @@ describe('Gambling - duel', () => {
     it('user 1 is challenging', async () => {
       global.games.duel.main({ sender: user1, parameters: 'all' })
       await message.isSent('gambling.duel.new', user1, {
-        minutesName: global.commons.getLocalizedName(5, 'core.minutes'),
-        minutes: await global.configuration.getValue('duelDuration')
+        minutesName: global.commons.getLocalizedName(await global.games.duel.settings.duration, 'core.minutes'),
+        minutes: await global.games.duel.settings.duration
       })
       await message.isSent('gambling.duel.joined', user1, {
         pointsName: await global.systems.points.getPointsName(100),
@@ -45,7 +45,7 @@ describe('Gambling - duel', () => {
 
     it('set duel timestamp to force duel to end', () => {
       // cannot set as 0 - duel is then ignored
-      global.games.duel.settings.timestamp = 1
+      global.games.duel.settings._.timestamp = 1
     })
 
     it('call pickDuelWinner()', () => {

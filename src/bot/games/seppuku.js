@@ -7,13 +7,12 @@ const Game = require('./_interface')
 class Seppuku extends Game {
   constructor () {
     const settings = {
+      timeout: 10,
       commands: [
         '!seppuku'
       ]
     }
     super({settings})
-
-    global.configuration.register('seppukuTimeout', 'gambling.seppuku.timeout', 'number', 10)
   }
 
   async main (opts) {
@@ -29,7 +28,7 @@ class Seppuku extends Game {
     }
 
     global.commons.sendMessage(global.translate('gambling.seppuku.text'), opts.sender)
-    global.commons.timeout(opts.sender.username, null, await global.configuration.getValue('seppukuTimeout'))
+    global.commons.timeout(opts.sender.username, null, await this.settings.timeout)
   }
 }
 
