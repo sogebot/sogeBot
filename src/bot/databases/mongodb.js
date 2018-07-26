@@ -94,8 +94,8 @@ class IMongoDB extends Interface {
   }
 
   async insert (table, object) {
-    if (_.isEmpty(object)) throw Error('Object cannot be empty')
     delete object._id
+    if (_.isEmpty(object)) throw Error('Object cannot be empty')
 
     try {
       let db = this.client.db(this.dbName)
