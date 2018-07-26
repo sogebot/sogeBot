@@ -22,16 +22,13 @@ class Gamble extends Game {
       'systems.points'
     ]
     const settings = {
+      minimalBet: 0,
+      chanceToWin: 50,
       commands: [
         '!gamble'
       ]
     }
-
     super({ settings, dependsOn })
-
-    global.configuration.register('gamblingCooldownBypass', 'gambling.cooldown.bypass', 'bool', false)
-    global.configuration.register('gamblingChanceToWin', 'gambling.gamble.chanceToWin', 'number', 50)
-    global.configuration.register('gamblingMinimalBet', 'gambling.gamble.minimalBet', 'number', 0)
   }
 
   async main (opts) {
@@ -48,10 +45,10 @@ class Gamble extends Game {
 
       if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
       if (pointsOfUser < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
-      if (points < (await global.configuration.getValue('gamblingMinimalBet'))) throw Error(ERROR_MINIMAL_BET)
+      if (points < (await this.settings.minimalBet)) throw Error(ERROR_MINIMAL_BET)
 
       await global.db.engine.insert('users.points', { username: opts.sender.username, points: parseInt(points, 10) * -1 })
-      if (_.random(0, 100, false) <= await global.configuration.getValue('gamblingChanceToWin')) {
+      if (_.random(0, 100, false) <= await this.settings.chanceToWin) {
         await global.db.engine.insert('users.points', { username: opts.sender.username, points: parseInt(points, 10) * 2 })
         let updatedPoints = await global.systems.points.getPointsOf(opts.sender.username)
         message = await global.commons.prepare('gambling.gamble.win', {
@@ -85,7 +82,7 @@ class Gamble extends Game {
           debug(message); global.commons.sendMessage(message, opts.sender)
           break
         case ERROR_MINIMAL_BET:
-          points = await global.configuration.getValue('gamblingMinimalBet')
+          points = await this.settings.minimalBet
           message = await global.commons.prepare('gambling.gamble.lowerThanMinimalBet', {
             pointsName: await global.systems.points.getPointsName(points),
             points: points

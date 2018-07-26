@@ -16,14 +16,13 @@ class Roulette extends Game {
       'systems.points'
     ]
     const settings = {
+      timeout: 10,
       commands: [
         '!roulette'
       ]
     }
 
     super({ settings, dependsOn })
-
-    global.configuration.register('rouletteTimeout', 'gambling.roulette.timeout', 'number', 10)
   }
 
   async main (opts) {
@@ -44,7 +43,7 @@ class Roulette extends Game {
     }
 
     setTimeout(async () => {
-      if (!isAlive) global.commons.timeout(opts.sender.username, null, await global.configuration.getValue('rouletteTimeout'))
+      if (!isAlive) global.commons.timeout(opts.sender.username, null, await this.settings.timeout)
       global.commons.sendMessage(isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead'), opts.sender)
     }, 2000)
   }
