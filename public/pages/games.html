@@ -15,28 +15,36 @@
           <div class="card mb-2" >
             <div class="card-body">
               <div v-if="typeof value === 'object'" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
-                <toggle
-                  class="pt-1 pb-1"
-                  v-bind:title="commons.translate('settings.' + selectedGames + '.' + defaultValue)"
-                  v-if="typeof currentValue === 'boolean'"
-                  v-bind:value="currentValue"
-                  v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
-                ></toggle>
-                <textarea-from-array
-                  class="pt-1 pb-1"
-                  v-else-if="currentValue.constructor === Array"
-                  v-bind:value="currentValue"
-                  v-bind:title="commons.translate('settings.' + selectedGames + '.' + defaultValue)"
-                  v-on:update="value[defaultValue] = $event; triggerDataChange()"
-                ></textarea-from-array>
-                <command-input
-                  v-else
-                  class="pt-1 pb-1"
-                  v-bind:type="typeof currentValue"
-                  v-bind:value="currentValue"
-                  v-bind:command="defaultValue"
-                  v-on:update="value[defaultValue] = $event; triggerDataChange()"
-                ></command-input>
+                <template v-if="selectedGames === 'wheeloffortune' && category === 'options'">
+                  <wheel-of-fortune-responses
+                    :options="JSON.parse(currentValue)"
+                    @update="value[defaultValue] = JSON.stringify($event)"
+                   />
+                </template>
+                <template v-else>
+                  <toggle
+                    class="pt-1 pb-1"
+                    v-bind:title="commons.translate('settings.' + selectedGames + '.' + defaultValue)"
+                    v-if="typeof currentValue === 'boolean'"
+                    v-bind:value="currentValue"
+                    v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
+                  ></toggle>
+                  <textarea-from-array
+                    class="pt-1 pb-1"
+                    v-else-if="currentValue.constructor === Array"
+                    v-bind:value="currentValue"
+                    v-bind:title="commons.translate('settings.' + selectedGames + '.' + defaultValue)"
+                    v-on:update="value[defaultValue] = $event; triggerDataChange()"
+                  ></textarea-from-array>
+                  <command-input
+                    v-else
+                    class="pt-1 pb-1"
+                    v-bind:type="typeof currentValue"
+                    v-bind:value="currentValue"
+                    v-bind:command="defaultValue"
+                    v-on:update="value[defaultValue] = $event; triggerDataChange()"
+                  ></command-input>
+                </template>
               </div>
             </div>
           </div>
@@ -92,7 +100,8 @@
       components: {
         'toggle': toggleEnable,
         'command-input': commandInput,
-        'textarea-from-array': textAreaFromArray
+        'textarea-from-array': textAreaFromArray,
+        'wheel-of-fortune-responses': wofResponses
       },
       data: {
         socket: { _panel: io({ query: "token=" + token }) },
