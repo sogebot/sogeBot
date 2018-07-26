@@ -121,6 +121,7 @@ class INeDB extends Interface {
   async insert (table, object) {
     this.on(table) // init table
 
+    delete object._id
     if (_.isEmpty(object)) throw Error('Object cannot be empty')
 
     var self = this
