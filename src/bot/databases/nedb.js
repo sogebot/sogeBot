@@ -119,6 +119,7 @@ class INeDB extends Interface {
   }
 
   async insert (table, object) {
+    object = _.clone(object)
     this.on(table) // init table
 
     delete object._id

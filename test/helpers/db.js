@@ -39,6 +39,11 @@ module.exports = {
       await global.db.engine.remove(global.systems.moderation.collection.permits, {})
       await global.db.engine.remove(global.systems.moderation.collection.warnings, {})
 
+      // remove timers
+      await global.db.engine.remove(global.systems.timers.collection.settings, {})
+      await global.db.engine.remove(global.systems.timers.collection.data, {})
+      await global.db.engine.remove(global.systems.timers.collection.responses, {})
+
       resolve()
     }
     return new Promise((resolve, reject) => {

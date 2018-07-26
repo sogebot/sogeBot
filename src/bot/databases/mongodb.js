@@ -94,6 +94,7 @@ class IMongoDB extends Interface {
   }
 
   async insert (table, object) {
+    object = _.clone(object)
     delete object._id
     if (_.isEmpty(object)) throw Error('Object cannot be empty')
 

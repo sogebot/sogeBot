@@ -14,7 +14,7 @@ describe('Timers - add()', () => {
   beforeEach(async () => {
     await db.cleanup()
     await message.prepare()
-    await global.db.engine.insert('timers', {name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() }})
+    await global.db.engine.insert(global.systems.timers.collection.data, {name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() }})
   })
 
   it('', async () => {
@@ -35,7 +35,7 @@ describe('Timers - add()', () => {
   it('-name test -response "Lorem Ipsum"', async () => {
     await global.systems.timers.add({ sender: owner, parameters: '-name test -response "Lorem Ipsum"' })
 
-    let item = await global.db.engine.findOne('timers.responses', { response: 'Lorem Ipsum' })
+    let item = await global.db.engine.findOne(global.systems.timers.collection.responses, { response: 'Lorem Ipsum' })
     assert.notEmpty(item)
 
     await message.isSent('timers.response-was-added', owner, { id: item._id, name: 'test', response: 'Lorem Ipsum', sender: owner.username })

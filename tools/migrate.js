@@ -13,7 +13,8 @@ global.logger = new Logger()
 const dropFiles = [
   'playlist.db', 'songrequest.db', 'ranks.db', 'prices.db',
   'commands.db', 'keywords.db', 'cooldowns.db', 'alias.db',
-  'cooldowns.viewers.db', 'raffles.db', 'raffle_participants.db'
+  'cooldowns.viewers.db', 'raffles.db', 'raffle_participants.db',
+  'timers.db', 'timers.responses.db'
 ]
 
 if (process.argv[2] && process.argv[2] === '--delete') {
@@ -93,6 +94,29 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  timers: [{
+    version: '7.6.0',
+    do: async () => {
+      console.info('Moving timers to systems.timers')
+      let items = await global.db.engine.find('timers')
+      let processed = 0
+      for (let item of items) {
+        let newItem = await global.db.engine.insert('systems.timers', item)
+        let responses = await global.db.engine.find('timers.responses', { timerId: String(item._id) })
+        for (let response of responses) {
+          response.timerId = String(newItem._id)
+          await global.db.engine.insert('systems.timers.responses', response)
+          processed++
+        }
+        processed++
+      }
+      await global.db.engine.remove('timers', {})
+      await global.db.engine.remove('timers.responses', {})
+      console.info(` => ${processed} processed`)
+      console.info(` !! timers collection can be deleted`)
+      console.info(` !! timers.responses collection can be deleted`)
+    }
+  }],
   songs: [{
     version: '7.6.0',
     do: async () => {
