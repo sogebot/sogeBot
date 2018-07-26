@@ -14,7 +14,7 @@ describe('Timers - unset()', () => {
   beforeEach(async () => {
     await db.cleanup()
     await message.prepare()
-    await global.db.engine.insert('timers', {name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() }})
+    await global.db.engine.insert(global.systems.timers.collection.data, {name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() }})
   })
 
   it('', async () => {
@@ -25,14 +25,14 @@ describe('Timers - unset()', () => {
     global.systems.timers.unset({ sender: owner, parameters: '-name test' })
     await message.isSent('timers.timer-deleted', owner, { name: 'test', sender: owner.username })
 
-    let item = await global.db.engine.findOne('timers', { name: 'test' })
+    let item = await global.db.engine.findOne(global.systems.timers.collection.data, { name: 'test' })
     assert.empty(item)
   })
   it('-name nonexistent', async () => {
     global.systems.timers.unset({ sender: owner, parameters: '-name nonexistent' })
     await message.isSent('timers.timer-not-found', owner, { name: 'nonexistent', sender: owner.username })
 
-    let item = await global.db.engine.findOne('timers', { name: 'test' })
+    let item = await global.db.engine.findOne(global.systems.timers.collection.data, { name: 'test' })
     assert.notEmpty(item)
     assert.equal(item.seconds, 60)
     assert.equal(item.messages, 0)
