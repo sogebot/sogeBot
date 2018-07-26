@@ -195,7 +195,7 @@ export default {
       users: [],
       picked: [],
       updated: String(new Date()),
-      socket: io('/system/queue', {query: "token=" + this.token})
+      socket: io('/systems/queue', {query: "token=" + this.token})
     }
   },
   methods: {

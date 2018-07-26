@@ -81,7 +81,7 @@ export default {
       currentSong: null,
       requests: [],
 
-      socket: io('/system/songs', { query: "token=" + token })
+      socket: io('/systems/songs', { query: "token=" + token })
     }
   },
   computed: {

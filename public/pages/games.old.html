@@ -1,0 +1,24 @@
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <span data-lang="menu.games" class="title text-default"></span>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active _load" data-toggle="tab" href="#heist"><i id="heist-status" class="fas fa-circle text-danger"></i> <span data-lang="games.heist.name"></span></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link _load" data-toggle="tab" href="#wheeloffortune"><i id="wof-status" class="fas fa-circle text-danger"></i> <span data-lang="games.wheeloffortune.name"></span></a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="heist"></div>
+  <div role="tabpanel" class="tab-pane active" id="wheeloffortune"></div>
+</div>
+
+<script>
+  // load pages
+  for (let page of $('._load')) {
+    let id = $(page).attr('href')
+    $(id).load(`settings/games/${id.replace('#', '')}.html`, () => { commons.translate() })
+  }
+</script>

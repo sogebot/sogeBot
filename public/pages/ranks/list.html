@@ -86,7 +86,7 @@
         state: {
           settings: 0
         },
-        socket: io('/system/ranks', { query: "token=" + token }),
+        socket: io('/systems/ranks', { query: "token=" + token }),
       },
       computed: {
         filtered: function () {
@@ -102,11 +102,11 @@
         this.socket.emit('find', {}, (err, items) => {
           this.items = _.orderBy(items, 'hours', 'asc')
         })
-        if (localStorage.getItem('/system/Ranks/showAs')) this.showAs = JSON.parse(localStorage.getItem('/system/Ranks/showAs'));
+        if (localStorage.getItem('/systems/Ranks/showAs')) this.showAs = JSON.parse(localStorage.getItem('/systems/Ranks/showAs'));
       },
       watch: {
         showAs: function(val) {
-          localStorage.setItem('/system/Ranks/showAs', JSON.stringify(this.showAs))
+          localStorage.setItem('/systems/Ranks/showAs', JSON.stringify(this.showAs))
         }
       },
       filters: {

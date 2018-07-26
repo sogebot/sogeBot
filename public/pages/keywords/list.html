@@ -93,7 +93,7 @@
         state: {
           settings: 0
         },
-        socket: io('/system/keywords', { query: "token=" + token }),
+        socket: io('/systems/keywords', { query: "token=" + token }),
       },
       computed: {
         filtered: function () {
@@ -114,11 +114,11 @@
           this.s_commands = items.commands
         })
 
-        if (localStorage.getItem('/system/Keywords/showAs')) this.showAs = JSON.parse(localStorage.getItem('/system/Keywords/showAs'));
+        if (localStorage.getItem('/systems/Keywords/showAs')) this.showAs = JSON.parse(localStorage.getItem('/systems/Keywords/showAs'));
       },
       watch: {
         showAs: function(val) {
-          localStorage.setItem('/system/Keywords/showAs', JSON.stringify(this.showAs))
+          localStorage.setItem('/systems/Keywords/showAs', JSON.stringify(this.showAs))
         }
       },
       filters: {

@@ -21,8 +21,10 @@ const ERROR_MINIMAL_BET = '3'
 class Duel extends Game {
   constructor () {
     const settings = {
-      timestamp: 0,
-      cooldown: String(new Date()),
+      _: {
+        timestamp: 0,
+        cooldown: String(new Date())
+      },
       commands: [
         '!duel'
       ]
@@ -40,7 +42,7 @@ class Duel extends Game {
   async pickDuelWinner () {
     const [users, timestamp, duelDuration] = await Promise.all([
       global.db.engine.find(this.collection.users),
-      this.settings.timestamp,
+      this.settings._.timestamp,
       global.configuration.getValue('duelDuration')
     ])
     debug({users, timestamp, duelDuration})
@@ -80,7 +82,7 @@ class Duel extends Game {
 
     // reset duel
     await global.db.engine.remove(this.collection.users, {})
-    this.settings.timestamp = 0
+    this.settings._.timestamp = 0
 
     new Timeout().recursive({ uid: `gamblingPickDuelWinner`, this: this, fnc: this.pickDuelWinner, wait: 30000 })
   }
@@ -112,23 +114,23 @@ class Duel extends Game {
         // check if under gambling cooldown
         const cooldown = await global.configuration.getValue('duelCooldown')
         const isMod = await global.commons.isMod(opts.sender)
-        if (new Date().getTime() - new Date(await this.settings.cooldown).getTime() > cooldown * 1000 ||
+        if (new Date().getTime() - new Date(await this.settings._.cooldown).getTime() > cooldown * 1000 ||
           (await global.configuration.getValue('gamblingCooldownBypass') && (isMod || global.commons.isBroadcaster(opts.sender)))) {
           // save new cooldown if not bypassed
-          if (!(await global.configuration.getValue('gamblingCooldownBypass') && (isMod || global.commons.isBroadcaster(opts.sender)))) this.settings.cooldown = new Date()
+          if (!(await global.configuration.getValue('gamblingCooldownBypass') && (isMod || global.commons.isBroadcaster(opts.sender)))) this.settings._.cooldown = new Date()
           await global.db.engine.insert(this.collection.users, { username: opts.sender.username, tickets: Number(bet) })
         } else {
           message = await global.commons.prepare('gambling.fightme.cooldown', {
-            minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings.cooldown).getTime())) / 1000 / 60), 'core.minutes'),
-            cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings.cooldown).getTime())) / 1000 / 60) })
+            minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes'),
+            cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60) })
           debug(message); global.commons.sendMessage(message, opts.sender)
           return true
         }
       }
 
       // if new duel, we want to save timestamp
-      if ((await this.settings.timestamp) === 0) {
-        this.settings.timestamp = new Date()
+      if ((await this.settings._.timestamp) === 0) {
+        this.settings._.timestamp = new Date()
         message = await global.commons.prepare('gambling.duel.new', {
           minutesName: global.commons.getLocalizedName(5, 'core.minutes'),
           minutes: await global.configuration.getValue('duelDuration') })

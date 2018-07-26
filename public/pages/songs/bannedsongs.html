@@ -72,7 +72,7 @@
         state: {
           import: 0,
         },
-        socket: io('/system/songs', { query: "token=" + token }),
+        socket: io('/systems/songs', { query: "token=" + token }),
       },
       computed: {
         filtered: function () {
@@ -85,11 +85,11 @@
       },
       created: function () {
         this.refreshBanlist()
-        if (localStorage.getItem('/system/Songs/bannedsongs/showAs')) this.showAs = JSON.parse(localStorage.getItem('/system/Songs/bannedsongs/showAs'));
+        if (localStorage.getItem('/systems/Songs/bannedsongs/showAs')) this.showAs = JSON.parse(localStorage.getItem('/systems/Songs/bannedsongs/showAs'));
       },
       watch: {
         showAs: function(val) {
-          localStorage.setItem('/system/Songs/bannedsongs/showAs', JSON.stringify(this.showAs))
+          localStorage.setItem('/systems/Songs/bannedsongs/showAs', JSON.stringify(this.showAs))
         }
       },
       filters: {

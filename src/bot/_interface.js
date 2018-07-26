@@ -32,7 +32,7 @@ class Module {
   _sockets () {
     if (_.isNil(global.panel)) return new Timeout().recursive({ this: this, uid: `${this.constructor.name}.sockets`, wait: 1000, fnc: this._sockets })
     else if (cluster.isMaster) {
-      this.socket = global.panel.io.of('/system/' + this.constructor.name.toLowerCase())
+      this.socket = global.panel.io.of('/' + this._name + '/' + this.constructor.name.toLowerCase())
       if (!_.isNil(this.sockets)) this.sockets()
 
       // default socket listeners

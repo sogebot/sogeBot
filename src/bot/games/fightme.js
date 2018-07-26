@@ -14,7 +14,9 @@ const Game = require('./_interface')
 class FightMe extends Game {
   constructor () {
     const settings = {
-      cooldown: String(new Date()),
+      _: {
+        cooldown: String(new Date())
+      },
       commands: [
         '!fightme'
       ]
@@ -97,17 +99,17 @@ class FightMe extends Game {
       // check if under gambling cooldown
       const cooldown = await global.configuration.getValue('fightmeCooldown')
       const isMod = await global.commons.isMod(opts.sender)
-      if (new Date().getTime() - new Date(await this.settings.cooldown).getTime() < cooldown * 1000 &&
+      if (new Date().getTime() - new Date(await this.settings._.cooldown).getTime() < cooldown * 1000 &&
         !(await global.configuration.getValue('gamblingCooldownBypass') && (isMod || global.commons.isBroadcaster(opts.sender)))) {
         debug('cooldown')
         global.commons.sendMessage(global.translate('gambling.fightme.cooldown')
-          .replace(/\$cooldown/g, Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings.cooldown).getTime())) / 1000 / 60))
-          .replace(/\$minutesName/g, global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings.cooldown).getTime())) / 1000 / 60), 'core.minutes')), opts.sender)
+          .replace(/\$cooldown/g, Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60))
+          .replace(/\$minutesName/g, global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes')), opts.sender)
         return
       }
 
       // save new timestamp if not bypassed
-      if (!(await global.configuration.getValue('gamblingCooldownBypass') && (isMod || global.commons.isBroadcaster(opts.sender)))) this.settings.cooldown = new Date()
+      if (!(await global.configuration.getValue('gamblingCooldownBypass') && (isMod || global.commons.isBroadcaster(opts.sender)))) this.settings._.cooldown = new Date()
 
       const isAlreadyChallenged = !_.isEmpty(await global.db.engine.findOne(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username }))
       if (!isAlreadyChallenged) await global.db.engine.insert(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username })

@@ -112,7 +112,7 @@
         state: {
           settings: 0
         },
-        socket: io('/system/customcommands', { query: "token=" + token }),
+        socket: io('/systems/customcommands', { query: "token=" + token }),
       },
       computed: {
         commandsFiltered: function () {
@@ -133,11 +133,11 @@
           this.s_commands = items.commands
         })
 
-        if (localStorage.getItem('/system/CustomCommands/showAs')) this.showAs = JSON.parse(localStorage.getItem('/system/CustomCommands/showAs'));
+        if (localStorage.getItem('/systems/CustomCommands/showAs')) this.showAs = JSON.parse(localStorage.getItem('/systems/CustomCommands/showAs'));
       },
       watch: {
         showAs: function(val) {
-          localStorage.setItem('/system/CustomCommands/showAs', JSON.stringify(this.showAs))
+          localStorage.setItem('/systems/CustomCommands/showAs', JSON.stringify(this.showAs))
         }
       },
       filters: {

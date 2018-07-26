@@ -107,7 +107,7 @@
         state: {
           settings: 0
         },
-        socket: io('/system/alias', { query: "token=" + token }),
+        socket: io('/systems/alias', { query: "token=" + token }),
       },
       computed: {
         aliasesFiltered: function () {
@@ -128,11 +128,11 @@
           this.commands = items.commands
         })
 
-        if (localStorage.getItem('/system/Alias/showAs')) this.showAs = JSON.parse(localStorage.getItem('/system/Alias/showAs'));
+        if (localStorage.getItem('/systems/Alias/showAs')) this.showAs = JSON.parse(localStorage.getItem('/systems/Alias/showAs'));
       },
       watch: {
         showAs: function(val) {
-          localStorage.setItem('/system/Alias/showAs', JSON.stringify(this.showAs))
+          localStorage.setItem('/systems/Alias/showAs', JSON.stringify(this.showAs))
         }
       },
       filters: {

@@ -30,5 +30,10 @@
   "raffles": "Raffles",
   "queue": "Queue",
   "playlist": "Playlist",
-  "bannedsongs": "Banned songs"
+  "bannedsongs": "Banned songs",
+  "duel": "Duel",
+  "fightme": "FightMe",
+  "seppuku": "Seppuku",
+  "gamble": "Gamble",
+  "roulette": "Roulette"
 }
