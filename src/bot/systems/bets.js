@@ -246,8 +246,10 @@ class Bets extends System {
       let total = 0
       for (let user of users) {
         await global.db.engine.remove(this.collection.users, { _id: String(user._id) })
-        total += Math.round((parseInt(user.points, 10) * percentGain))
-        if (user.option === index) await global.db.engine.insert('users.points', { username: user.username, points: Math.round((parseInt(user.points, 10) * percentGain)) })
+        if (user.option === index) {
+          total += Math.round((parseInt(user.points, 10) * percentGain))
+          await global.db.engine.insert('users.points', { username: user.username, points: Math.round((parseInt(user.points, 10) * percentGain)) })
+        }
       }
 
       global.commons.sendMessage(global.translate('bets.closed')
