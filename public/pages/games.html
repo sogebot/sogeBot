@@ -21,6 +21,16 @@
                     @update="value[defaultValue] = JSON.stringify($event)"
                    />
                 </template>
+                <template v-else-if="selectedGames === 'heist' && category === 'levels'">
+                  <heist-levels
+                    :levels="currentValue"
+                    @update="value[defaultValue] = $event" />
+                </template>
+                <template v-else-if="selectedGames === 'heist' && category === 'results' && defaultValue === 'data'">
+                  <heist-results
+                    :results="currentValue"
+                    @update="value[defaultValue] = $event" />
+                </template>
                 <template v-else>
                   <toggle
                     class="pt-1 pb-1"
@@ -101,7 +111,9 @@
         'toggle': toggleEnable,
         'command-input': commandInput,
         'textarea-from-array': textAreaFromArray,
-        'wheel-of-fortune-responses': wofResponses
+        'wheel-of-fortune-responses': wofResponses,
+        'heist-levels': heistLevels,
+        'heist-results': heistResults
       },
       data: {
         socket: { _panel: io({ query: "token=" + token }) },

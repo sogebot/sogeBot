@@ -1,9 +1,9 @@
 {
   "copsOnPatrol": "$sender, poldove porad hledaji minuly tym! Zkus to az za $cooldown.",
   "copsCooldownMessage": "Vypada to, ze poldove maji nohy hore. Muzeme planovat dalsi loupez!",
-  "entryMessage": "$sender zacal planovat prepadeni banky! Hledaji se partaci do akce pro vetsi lup. Pridej se i ty!",
+  "entryMessage": "$sender zacal planovat prepadeni banky! Hledaji se partaci do akce pro vetsi lup. Pridej se i ty! Napis $command <body> aby ses pripojil.",
   "lateEntryMessage": "$sender, loupez prave probiha!",
-  "entryInstruction": "$sender, napis $command [x] aby ses pripojil.",
+  "entryInstruction": "$sender, napis $command <body> aby ses pripojil.",
   "levelMessage": "S touhle partou si troufnem na $bank! Sezeneme vice lidi, abychom vyloupili $nextBank?",
   "maxLevelMessage": "S touhle partou si troufnem na $bank! Lepsi uz to byt nemuze!",
   "started": "Dobra chlapi, posledni kontrola vybaveni, tohle je to, na co jsme se pripravovali. Toto neni zadne cviceni, jde se na to! Jdem vyloupit $bank!",
