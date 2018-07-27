@@ -257,14 +257,14 @@ class Twitch {
 
       // rank
       var rank = await global.systems.ranks.get(user)
-      if (global.commons.isSystemEnabled('ranks') && !_.isNull(rank)) message.push(rank)
+      if (await global.systems.ranks.isEnabled() && !_.isNull(rank)) message.push(rank)
 
       // watchTime
       var watchTime = _.isFinite(parseInt(user.time.watched, 10)) && _.isNumber(parseInt(user.time.watched, 10)) ? user.time.watched : 0
       message.push((watchTime / 1000 / 60 / 60).toFixed(1) + 'h')
 
       // points
-      if (global.commons.isSystemEnabled('points')) {
+      if (await global.systems.points.isEnabled()) {
         let userPoints = await global.systems.points.getPointsOf(opts.sender.username)
         message.push(userPoints + ' ' + await global.systems.points.getPointsName(userPoints))
       }
