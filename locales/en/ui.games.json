@@ -20,7 +20,7 @@
       "entryInstruction": "",
       "andXMore": "Added to $users variable in results if there are more users than max users to show",
       "name": "Name of level",
-      "win%": "Percentage chance of win",
+      "winPercentage": "Percentage chance of win",
       "payoutMultiplier": "Payout multiplier of win",
       "maxUsers": "Maximal number of users for this level",
       "levelsMessage": "Bot announcement when this level is reached",
@@ -39,7 +39,7 @@
     "entryInstruction": "Entry instruction",
     "andXMore": "And X more",
     "message": "Message",
-    "win%": "Win percentage",
+    "winPercentage": "Win percentage",
     "payoutMultiplier": "Payout multiplier",
     "maxUsers": "Max users for level",
     "percentage": "Percentage"

@@ -20,7 +20,7 @@
       "entryInstruction": "",
       "andXMore": "Přidáno k proměnné $users pokud se má zobrazit více uživatelů než je maximální počet",
       "name": "Jméno heistu",
-      "win%": "Procentuální šance výhry",
+      "winPercentage": "Procentuální šance výhry",
       "payoutMultiplier": "Násobitel bodů při vítězství",
       "maxUsers": "Maximální počet uživatelů pro level",
       "levelsMessage": "Oznámení bota, když se přejde na tento level",
@@ -39,7 +39,7 @@
     "entryInstruction": "Jak se zůčastnit",
     "andXMore": "A X dalších",
     "message": "Zpráva",
-    "win%": "Šance výhry",
+    "winPercentage": "Šance výhry",
     "payoutMultiplier": "Násobitel výplaty",
     "maxUsers": "Maximální počet uživatelů pro level",
     "percentage": "Procento výher"

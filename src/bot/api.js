@@ -78,7 +78,7 @@ class API {
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: `oauthValidation-${type}`, api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: `oauthValidation-${type}`, api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
-      global.log.error(`Something went wrong with your ${type} oauth`)
+      global.log.error(`Something went wrong with your ${type} oauth - ${e.response.data.message}`)
     }
 
     new Timeout().recursive({ this: this, uid: `oauthValidation-${type}`, wait: timeout, fnc: this.oauthValidation, args: [type] })
