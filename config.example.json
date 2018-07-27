@@ -28,23 +28,6 @@
       "url": "mongodb://localhost:27017/your-db-name"
     }
   },
-  "systems": {
-    "timers": true,
-    "customcommands": true,
-    "keywords": true,
-    "points": true,
-    "price": true,
-    "songs": true,
-    "moderation": true,
-    "ranks": true,
-    "bets": true,
-    "raffles": true,
-    "queue": true,
-    "cooldown": true,
-    "gambling": true,
-    "highlights": true,
-    "commercial": true
-  },
   "integrations": {
     "twitter": {
       "enabled": false,
