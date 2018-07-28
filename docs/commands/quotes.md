@@ -1,7 +1,7 @@
 ##### Changelog
 | Version | Description                           |
 | --------|:--------------------------------------|
-| 7.6.0   | First implementation of quotes system |
+| 8.0.0   | First implementation of quotes system |
 
 
 ## Add a new quote
