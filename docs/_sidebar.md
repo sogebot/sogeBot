@@ -7,10 +7,10 @@
   * [Panel](configuration/panel.md)
   * [Database](configuration/database.md)
   * [ClientId](configuration/clientid.md)
-* Commands
+* Systems
+  * [Alias](commands/alias.md)
   * [Commercial](commands/commercial.md)
   * [Permissions](commands/permissions.md)
-  * [Alias](commands/alias.md)
   * [Custom Commands](commands/custom-commands.md)
   * [Cooldowns](commands/cooldowns.md)
   * [Keywords](commands/keywords.md)
