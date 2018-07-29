@@ -564,7 +564,7 @@
           if ((obj.id === 'integrations') && integrations) return
           if ((obj.id === 'registry') && registry) return
           if ((obj.id === 'games') && games) return
-          $('#menu-' + obj.category).append('<li class="nav-item"><a class="nav-link" href="#" data-page="' +
+          $('#menu-' + obj.category).append('<li class="nav-item"><a class="nav-link" href="#' + obj.id.replace(/\./g, '/') + '" data-page="' +
             obj.id.replace(/\./g, '/') + '" data-lang="menu.' + obj.name +
             '"></a></li>')
         }
