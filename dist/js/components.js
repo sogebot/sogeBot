@@ -51,6 +51,67 @@ window.commandInput = {
     </div>`
 }
 
+/* command input for settings with permissions  */
+window.commandInputWithPermissions = {
+  props: ['value', 'command', 'type', 'permissions'],
+  watch: {
+    currentPermissions: function () { this.update() }
+  },
+  methods: {
+    update: function () {
+      if (this.type === 'number') {
+        if (_.isFinite(Number(this.currentValue))) this.currentValue = Number(this.currentValue)
+        else this.currentValue = this.value
+      }
+      this.$emit('update', {value: this.currentValue, permissions: this.currentPermissions})
+    }
+  },
+  data: function () {
+    return {
+      currentValue: this.value,
+      currentPermissions: this.permissions
+    }
+  },
+  filters: {
+    toPermission: function (val) {
+      switch (val) {
+        case -1:
+          return 'DISABLED'
+        case 0:
+          return 'OWNER ONLY'
+        case 1:
+          return 'VIEWERS'
+        case 2:
+          return 'MODS'
+        case 3:
+          return 'REGULAR'
+      }
+    }
+  },
+  template: `
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text">{{ command }}</span>
+      </div>
+      <input v-on:keyup="update" v-model="currentValue" class="form-control" type="text" />
+      <div class="input-group-append">
+        <div class="dropdown">
+          <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+            :class='{"btn-primary": currentPermissions === 0, "btn-success": currentPermissions === 1, "btn-info": currentPermissions === 2, "btn-warning": currentPermissions === 3, "btn-dark": currentPermissions === -1}'>
+            {{ currentPermissions | toPermission }}
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <button
+              v-for="n in 5"
+              class="dropdown-item"
+              @click="currentPermissions = (n - 2)"
+            >{{(n - 2)|toPermission}}</button>
+          </div>
+        </div>
+      </div>
+    </div>`
+}
+
 /* textarea input for arrays  */
 window.textAreaFromArray = {
   props: ['value', 'title'],

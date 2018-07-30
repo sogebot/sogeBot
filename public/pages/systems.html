@@ -10,15 +10,24 @@
           {{ commons.translate('menu.' + selectedSystem) }}
         </span>
 
-        <template v-for="(value, category) of settings">
+        <template v-for="(value, category) of settings" v-if="category !== '_permissions'">
           <h6>{{ category }}</h6>
           <div class="card mb-2" >
             <div class="card-body">
               <div v-if="typeof value === 'object'" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
+                <command-input-with-permission
+                  v-if="category === 'commands'"
+                  class="pt-1 pb-1"
+                  v-bind:type="typeof currentValue"
+                  v-bind:value="currentValue"
+                  v-bind:command="defaultValue"
+                  :permissions="settings._permissions[defaultValue]"
+                  v-on:update="value[defaultValue] = $event.value; settings._permissions[defaultValue] = $event.permissions; triggerDataChange()"
+                ></command-input-with-permission>
                 <toggle
                   class="pt-1 pb-1"
                   v-bind:title="commons.translate('settings.' + selectedSystem + '.' + defaultValue)"
-                  v-if="typeof currentValue === 'boolean'"
+                  v-else-if="typeof currentValue === 'boolean'"
                   v-bind:value="currentValue"
                   v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
                 ></toggle>
@@ -35,7 +44,8 @@
                   v-bind:type="typeof currentValue"
                   v-bind:value="currentValue"
                   v-bind:command="defaultValue"
-                  v-on:update="value[defaultValue] = $event; triggerDataChange()"
+                  :permission="settings._permissions[defaultValue]"
+                  v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
                 ></command-input>
               </div>
             </div>
@@ -92,6 +102,7 @@
       components: {
         'toggle': toggleEnable,
         'command-input': commandInput,
+        'command-input-with-permission': commandInputWithPermissions,
         'textarea-from-array': textAreaFromArray
       },
       data: {

@@ -43,7 +43,13 @@ class Module {
         socket.on('settings.update', async (data, cb) => {
           for (let [key, value] of Object.entries(data)) {
             if (key === 'enabled' && this._name === 'library') continue
-            else if (key === 'enabled') this.status({ state: value })
+            else if (key === '_permissions') {
+              for (let [command, currentValue] of Object.entries(value)) {
+                command = this._commands.filter(o => o.name === command)[0]
+                if (currentValue === command.permission) await global.db.engine.remove('permissions', { key: command.name })
+                else await global.db.engine.update('permissions', { key: command.name }, { permission: currentValue })
+              }
+            } else if (key === 'enabled') this.status({ state: value })
             else if (key === 'commands') {
               for (let [defaultValue, currentValue] of Object.entries(value)) {
                 this.settings.commands[defaultValue] = currentValue
@@ -269,6 +275,15 @@ class Module {
       } else if (_.isFunction(values)) {
         promisedSettings[category] = await this._settings[category]()
       } else throw Error(`Unexpected data type ${typeof values}`)
+    }
+
+    // add command permissions
+    promisedSettings._permissions = {}
+    for (let command of this._commands) {
+      const key = _.isNil(command.name) ? command : command.name
+      let permission = await global.db.engine.findOne('permissions', { key })
+      if (!_.isEmpty(permission)) promisedSettings._permissions[key] = permission.permission // change to custom permission
+      else promisedSettings._permissions[key] = _.isNil(command.permission) ? constants.VIEWERS : command.permission
     }
     return promisedSettings
   }
