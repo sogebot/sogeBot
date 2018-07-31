@@ -30,7 +30,7 @@ class IMongoDB extends Interface {
     let db = await this.client.db(this.dbName)
     const collections = await db.listCollections().toArray()
     const dropIndexes = [
-      'users.bits', 'users.tips', 'users.points', 'users.online', 'users.messages',
+      'users.bits', 'users.tips', 'users.points', 'users.online', 'users.messages', 'users.watched',
       'cache', 'customTranslations', 'users', 'stats'
     ]
     for (let table of dropIndexes) {
@@ -44,6 +44,7 @@ class IMongoDB extends Interface {
       await db.collection('users.online').createIndex('username')
       await db.collection('users.points').createIndex('username')
       await db.collection('users.messages').createIndex('username')
+      await db.collection('users.watched').createIndex('username')
       await db.collection('cache').createIndex('key')
       await db.collection('customTranslations').createIndex('key')
       await db.collection('stats').createIndex('whenOnline')

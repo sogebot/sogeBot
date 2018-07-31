@@ -18,11 +18,12 @@ function Users () {
   if (cluster.isMaster) {
     this.panel()
     this.compactMessagesDb()
-  }
+    this.compactWatchedDb()
+    this.updateWatchTime(new Date())
 
-  // set all users offline on start
-  global.db.engine.remove('users.online', {})
-  setInterval(() => this.updateWatchTime(), 60000)
+    // set all users offline on start
+    global.db.engine.remove('users.online', {})
+  }
 }
 
 Users.prototype.commands = function () {
@@ -257,6 +258,11 @@ Users.prototype.sockets = function (self) {
         if (!_.isEmpty(_.filter(messages, (o) => o.username === viewer.username))) {
           _.set(viewer, 'stats.messages', await global.users.getMessagesOf(viewer.username))
         } else _.set(viewer, 'stats.messages', 0)
+
+        // WATCHED
+        if (!_.isEmpty(_.filter(messages, (o) => o.username === viewer.username))) {
+          _.set(viewer, 'time.watched', await global.users.getWatchedOf(viewer.username))
+        } else _.set(viewer, 'time.watched', 0)
         return viewer
       }
 
@@ -273,7 +279,7 @@ Users.prototype.sockets = function (self) {
       ])
 
       // filter users
-      if (!_.isNil(opts.filter)) viewers = _.filter(viewers, (o) => o.username.toLowerCase().startsWith(opts.filter.toLowerCase().trim()))
+      if (!_.isNil(opts.filter)) viewers = _.filter(viewers, (o) => o.username && o.username.toLowerCase().startsWith(opts.filter.toLowerCase().trim()))
       if (!_.isNil(opts.show.subscribers)) viewers = _.filter(viewers, (o) => _.get(o, 'is.subscriber', false) === opts.show.subscribers)
       if (!_.isNil(opts.show.followers)) viewers = _.filter(viewers, (o) => _.get(o, 'is.follower', false) === opts.show.followers)
       if (!_.isNil(opts.show.regulars)) viewers = _.filter(viewers, (o) => _.get(o, 'is.regular', false) === opts.show.regulars)
@@ -289,7 +295,7 @@ Users.prototype.sockets = function (self) {
       if (_total === 0) {
         const response = { viewers: [], _total: _total }
         cb(response)
-      } else if (['username', 'time.message', 'time.watched', 'time.follow', 'time.subscribed_at', 'stats.tier'].includes(opts.sortBy)) {
+      } else if (['username', 'time.message', 'time.follow', 'time.subscribed_at', 'stats.tier'].includes(opts.sortBy)) {
         // we can sort directly in users collection
         viewers = _.chunk(_.orderBy(viewers, (o) => {
           // we move null and 0 to last always
@@ -525,24 +531,48 @@ Users.prototype.delete = function (username) {
   global.db.engine.remove('users', { username: username })
 }
 
-Users.prototype.updateWatchTime = async function () {
-  // count watching time when stream is online
-  debug('init')
-
-  if (await global.cache.isOnline()) {
-    let users = await global.db.engine.find('users.online')
-
-    debug(users)
-    for (let onlineUser of users) {
-      let user = await this.get(onlineUser.username)
-      // add user as a new chatter in a stream
-      if (_.isNil(user.time)) user.time = {}
-      if (_.isNil(user.time.watched) || user.time.watched === 0) await global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
-      global.db.engine.increment('users', { username: user.username }, { time: { watched: 60000 } })
-    }
-  } else {
-    debug('Doing nothing, stream offline')
+Users.prototype.updateWatchTime = async function (lastUpdate) {
+  let timeout = 1000
+  try {
+    // count watching time when stream is online
+    if (await global.cache.isOnline()) {
+      let users = await global.db.engine.find('users.online')
+      for (let onlineUser of users) {
+        let watched = await this.getWatchedOf(onlineUser.username)
+        // add user as a new chatter in a stream
+        if (watched === 0) await global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
+        await global.db.engine.insert('users.watched', { username: onlineUser.username, watched: new Date().getTime() - new Date(lastUpdate).getTime() })
+      }
+    } else throw Error('stream offline')
+  } catch (e) {
+    timeout = 1000
   }
+  return new Timeout().recursive({ this: this, uid: `updateWatchTime`, wait: timeout, fnc: this.updateWatchTime, args: [new Date()] })
+}
+
+Users.prototype.compactWatchedDb = async function () {
+  try {
+    await global.commons.compactDb({ table: 'users.watched', index: 'username', values: 'watched' })
+  } catch (e) {
+    global.log.error(e)
+    global.log.error(e.stack)
+  } finally {
+    new Timeout().recursive({ uid: `compactWatchedDb`, this: this, fnc: this.compactWatchedDb, wait: 10000 })
+  }
+}
+
+Users.prototype.getWatchedOf = async function (user) {
+  let watched = 0
+  for (let item of await global.db.engine.find('users.watched', { username: user })) {
+    let itemPoints = !_.isNaN(parseInt(_.get(item, 'watched', 0))) ? _.get(item, 'watched', 0) : 0
+    watched = watched + Number(itemPoints)
+  }
+  if (Number(watched) < 0) watched = 0
+
+  return parseInt(
+    Number(watched) <= Number.MAX_SAFE_INTEGER / 1000000
+      ? watched
+      : Number.MAX_SAFE_INTEGER / 1000000, 10)
 }
 
 Users.prototype.compactMessagesDb = async function () {

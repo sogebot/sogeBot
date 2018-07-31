@@ -144,15 +144,15 @@ class Ranks extends System {
   async main (opts) {
     debug('show(%j, %j)', opts.sender)
 
-    let user = await global.users.get(opts.sender.username)
-    let rank = await this.get(user)
+    let watched = await global.users.getWatchedOf(opts.sender.username)
+    let rank = await this.get(opts.sender.username)
     debug('Users rank: %j', rank)
 
     let [ranks, current] = await Promise.all([global.db.engine.find(this.collection.data), global.db.engine.findOne(this.collection.data, { value: rank })])
 
     let nextRank = null
     for (let _rank of _.orderBy(ranks, 'hours', 'desc')) {
-      if (_rank.hours > _.get(user, 'time.watched', 0) / 1000 / 60 / 60) {
+      if (_rank.hours > watched / 1000 / 60 / 60) {
         nextRank = _rank
       } else {
         break
@@ -167,7 +167,7 @@ class Ranks extends System {
 
     if (!_.isNil(nextRank)) {
       let toNextRank = nextRank.hours - current.hours
-      let toNextRankWatched = _.get(user, 'time.watched', 0) / 1000 / 60 / 60 - current.hours
+      let toNextRankWatched = watched / 1000 / 60 / 60 - current.hours
       let toWatch = (toNextRank - toNextRankWatched)
       let percentage = 100 - (((toWatch) / toNextRank) * 100)
       let message = await global.commons.prepare('ranks.show-rank-with-next-rank', { rank: rank, nextrank: `${nextRank.value} ${percentage.toFixed(1)}% (${toWatch.toFixed(1)}h)` })
@@ -185,11 +185,14 @@ class Ranks extends System {
     if (!_.isObject(user)) user = await global.users.get(user)
     if (!_.isNil(user.custom.rank)) return user.custom.rank
 
-    let ranks = await global.db.engine.find('ranks')
+    let [watched, ranks] = await Promise.all([
+      global.users.getWatchedOf(user.username),
+      global.db.engine.find(this.collection.data)
+    ])
     let rankToReturn = null
 
     for (let rank of _.orderBy(ranks, 'hours', 'asc')) {
-      if (_.get(user, 'time.watched', 0) / 1000 / 60 / 60 >= rank.hours) {
+      if (watched / 1000 / 60 / 60 >= rank.hours) {
         rankToReturn = rank.value
       } else break
     }

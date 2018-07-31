@@ -260,8 +260,8 @@ class Twitch {
       if (await global.systems.ranks.isEnabled() && !_.isNull(rank)) message.push(rank)
 
       // watchTime
-      var watchTime = _.isFinite(parseInt(user.time.watched, 10)) && _.isNumber(parseInt(user.time.watched, 10)) ? user.time.watched : 0
-      message.push((watchTime / 1000 / 60 / 60).toFixed(1) + 'h')
+      var watched = await global.users.getWatchedOf(opts.sender.username)
+      message.push((watched / 1000 / 60 / 60).toFixed(1) + 'h')
 
       // points
       if (await global.systems.points.isEnabled()) {
@@ -317,9 +317,14 @@ class Twitch {
       message = global.translate('top.listPoints').replace(/\$amount/g, 10)
       sorted = _.orderBy(_.filter(usersPoints, function (o) { return !_.isNil(o.points) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'points', 'desc')
     } else if (type === 'time') {
-      let users = await global.users.getAll()
+      let usersWatched = []
+      for (let user of (await global.db.engine.find('users.watched')).map((o) => o.username)) {
+        if (!_.find(usersWatched, (o) => o.username === user)) {
+          usersWatched.push({ username: user, watched: await global.users.getWatchedOf(user) })
+        }
+      }
       message = global.translate('top.listWatched').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(users, function (o) { return !_.isNil(o.time) && !_.isNil(o.time.watched) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'time.watched', 'desc')
+      sorted = _.orderBy(_.filter(usersWatched, function (o) { return !_.isNil(o.watched) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'watched', 'desc')
     } else if (type === 'tips') {
       let users = {}
       message = global.translate('top.listTips').replace(/\$amount/g, 10)
@@ -352,7 +357,7 @@ class Twitch {
 
       for (let user of sorted) {
         message += (i + 1) + '. ' + (await global.configuration.getValue('atUsername') ? '@' : '') + user.username + ' - '
-        if (type === 'time') message += (user.time.watched / 1000 / 60 / 60).toFixed(1) + 'h'
+        if (type === 'time') message += (user.watched / 1000 / 60 / 60).toFixed(1) + 'h'
         else if (type === 'tips') message += user.amount.toFixed(2) + global.currency.symbol(await global.configuration.getValue('currency'))
         else if (type === 'points') {
           let points = user.points
