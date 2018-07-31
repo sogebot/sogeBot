@@ -35,6 +35,7 @@
 * How To
   * [Phillips Hue](howto/phillipshue.md)
   * [Eval snippets](howto/eval.md)
+  * [Write own system](howto/write-own-system.md)
 * Integrations
   * [Twitter](integrations/twitter.md)
   * [Spotify](integrations/spotify.md)
