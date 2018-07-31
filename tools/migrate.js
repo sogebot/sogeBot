@@ -364,6 +364,22 @@ let migration = {
       }
       console.info(` => ${updated} users`)
     }
+  }, {
+    version: '7.6.0',
+    do: async () => {
+      console.info('Migration of watched stats')
+      let users = await global.db.engine.find('users')
+      let updated = 0
+      for (let user of users) {
+        if (_.isNil(user.time) || _.isNil(user.time.watched)) continue
+        updated++
+        await global.db.engine.remove('users', { _id: String(user._id) })
+        await global.db.engine.insert('users.watched', { username: user.username, watched: parseInt(user.time.watched, 10) })
+        delete user._id; delete user.time.watched
+        await global.db.engine.insert('users', user)
+      }
+      console.info(` => ${updated} users`)
+    }
   }],
   points: [{
     version: '7.3.0',

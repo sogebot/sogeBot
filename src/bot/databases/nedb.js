@@ -35,10 +35,9 @@ class INeDB extends Interface {
           break
         case 'users':
         case 'users.online':
-          this.table[table].removeIndex('username')
-          break
         case 'users.points':
         case 'users.messages':
+        case 'users.watched':
           this.table[table].removeIndex('username')
           break
         case 'cache':
@@ -63,6 +62,7 @@ class INeDB extends Interface {
           case 'users.online':
           case 'users.points':
           case 'users.messages':
+          case 'users.watched':
             this.table[table].ensureIndex({fieldName: 'username'})
             break
           case 'cache':
