@@ -119,25 +119,22 @@ class API {
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getChannelID', api: 'kraken', endpoint: url, code: request.status })
+
+      const user = request.data.users[0]
+      DEBUG_API_CHANNELID(user)
+      if (_.isNil(user)) {
+        global.log.error('Channel ' + config.settings.broadcaster_username + ' not found!')
+      } else {
+        await global.cache.channelId(user._id)
+        global.log.info('Broadcaster channel ID set to ' + user._id)
+      }
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelID', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
-      return
-    } finally {
-      if (timeout === 1000) {
-        new Timeout().recursive({ this: this, uid: 'getChannelID', wait: timeout, fnc: this.getChannelID })
-      }
     }
 
-    const user = request.data.users[0]
-    DEBUG_API_CHANNELID(user)
-    if (_.isNil(user)) {
-      global.log.error('Channel ' + config.settings.broadcaster_username + ' not found!')
-    } else {
-      await global.cache.channelId(user._id)
-      global.log.info('Broadcaster channel ID set to ' + user._id)
-    }
+    new Timeout().recursive({ this: this, uid: 'getChannelID', wait: timeout, fnc: this.getChannelID })
   }
 
   async getChannelChattersUnofficialAPI (opts) {
@@ -242,6 +239,19 @@ class API {
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: request.status })
+
+      this.retries.getChannelSubscribersOldAPI = 0 // reset retry
+
+      DEBUG_API_GET_CHANNEL_SUBSCRIBERS_OLD_API(`Current subscribers count: ${request.data._total}`)
+      await global.db.engine.update('api.current', { key: 'subscribers' }, { value: request.data._total - 1 })
+
+      const subscribers = _.map(request.data.subscriptions, 'user')
+
+      // set subscribers
+      for (let subscriber of subscribers) {
+        if (subscriber.name === config.settings.broadcaster_username || subscriber.name === config.settings.bot_username.toLowerCase()) continue
+        await global.db.engine.update('users', { username: subscriber.name }, { is: { subscriber: true } })
+      }
     } catch (e) {
       const isChannelPartnerOrAffiliate =
         !(e.message !== '422 Unprocessable Entity' ||
@@ -264,23 +274,8 @@ class API {
         global.log.error(`${url} - ${e.message}`)
         global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
       }
-      return
-    } finally {
-      if (timeout !== 0) new Timeout().recursive({ this: this, uid: 'getChannelSubscribersOldAPI', wait: timeout, fnc: this.getChannelSubscribersOldAPI })
     }
-
-    this.retries.getChannelSubscribersOldAPI = 0 // reset retry
-
-    DEBUG_API_GET_CHANNEL_SUBSCRIBERS_OLD_API(`Current subscribers count: ${request.data._total}`)
-    await global.db.engine.update('api.current', { key: 'subscribers' }, { value: request.data._total - 1 })
-
-    const subscribers = _.map(request.data.subscriptions, 'user')
-
-    // set subscribers
-    for (let subscriber of subscribers) {
-      if (subscriber.name === config.settings.broadcaster_username || subscriber.name === config.settings.bot_username.toLowerCase()) continue
-      await global.db.engine.update('users', { username: subscriber.name }, { is: { subscriber: true } })
-    }
+    if (timeout !== 0) new Timeout().recursive({ this: this, uid: 'getChannelSubscribersOldAPI', wait: timeout, fnc: this.getChannelSubscribersOldAPI })
   }
 
   async getChannelDataOldAPI (opts) {
@@ -305,42 +300,40 @@ class API {
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status })
+
+      if (!this.gameOrTitleChangedManually) {
+        // Just polling update
+        DEBUG_API_GET_CHANNEL_DATA_OLD_API(`Current game: ${request.data.game}, Current Status: ${request.data.status}`)
+
+        let rawStatus = await global.cache.rawStatus()
+        let status = await this.parseTitle()
+
+        if (request.data.status !== status && !opts.forceUpdate) {
+          // check if status is same as updated status
+          if (this.retries.getChannelDataOldAPI >= 15) {
+            this.retries.getChannelDataOldAPI = 0
+            await global.cache.rawStatus(request.data.status)
+          } else {
+            this.retries.getChannelDataOldAPI++
+            return
+          }
+        } else {
+          this.retries.getChannelDataOldAPI = 0
+        }
+
+        await global.db.engine.update('api.current', { key: 'game' }, { value: request.data.game })
+        await global.db.engine.update('api.current', { key: 'status' }, { value: request.data.status })
+        await global.cache.gameCache(request.data.game)
+        await global.cache.rawStatus(rawStatus)
+      } else {
+        this.gameOrTitleChangedManually = false
+      }
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
-      return
-    } finally {
-      new Timeout().recursive({ this: this, uid: 'getChannelDataOldAPI', wait: timeout, fnc: this.getChannelDataOldAPI, args: { forceUpdate: false } })
     }
-
-    if (!this.gameOrTitleChangedManually) {
-      // Just polling update
-      DEBUG_API_GET_CHANNEL_DATA_OLD_API(`Current game: ${request.data.game}, Current Status: ${request.data.status}`)
-
-      let rawStatus = await global.cache.rawStatus()
-      let status = await this.parseTitle()
-
-      if (request.data.status !== status && !opts.forceUpdate) {
-        // check if status is same as updated status
-        if (this.retries.getChannelDataOldAPI >= 15) {
-          this.retries.getChannelDataOldAPI = 0
-          await global.cache.rawStatus(request.data.status)
-        } else {
-          this.retries.getChannelDataOldAPI++
-          return
-        }
-      } else {
-        this.retries.getChannelDataOldAPI = 0
-      }
-
-      await global.db.engine.update('api.current', { key: 'game' }, { value: request.data.game })
-      await global.db.engine.update('api.current', { key: 'status' }, { value: request.data.status })
-      await global.cache.gameCache(request.data.game)
-      await global.cache.rawStatus(rawStatus)
-    } else {
-      this.gameOrTitleChangedManually = false
-    }
+    new Timeout().recursive({ this: this, uid: 'getChannelDataOldAPI', wait: timeout, fnc: this.getChannelDataOldAPI, args: { forceUpdate: false } })
   }
 
   async getChannelHosts () {
@@ -358,22 +351,20 @@ class API {
     try {
       request = await axios.get(url)
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status })
+
+      d('Current host count: %s, Hosts: %s', request.data.hosts.length, _.map(request.data.hosts, 'host_login').join(', '))
+      await global.db.engine.update('api.current', { key: 'hosts' }, { value: request.data.hosts.length })
+
+      // save hosts list
+      for (let host of _.map(request.data.hosts, 'host_login')) {
+        await global.db.engine.update('cache.hosts', { username: host }, { username: host })
+      }
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
-      return
-    } finally {
-      new Timeout().recursive({ this: this, uid: 'getChannelHosts', wait: timeout, fnc: this.getChannelHosts })
     }
-
-    d('Current host count: %s, Hosts: %s', request.data.hosts.length, _.map(request.data.hosts, 'host_login').join(', '))
-    await global.db.engine.update('api.current', { key: 'hosts' }, { value: request.data.hosts.length })
-
-    // save hosts list
-    for (let host of _.map(request.data.hosts, 'host_login')) {
-      await global.db.engine.update('cache.hosts', { username: host }, { username: host })
-    }
+    new Timeout().recursive({ this: this, uid: 'getChannelHosts', wait: timeout, fnc: this.getChannelHosts })
   }
 
   async updateChannelViews () {
@@ -399,21 +390,19 @@ class API {
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+
+      // save remaining api calls
+      this.remainingAPICalls = request.headers['ratelimit-remaining']
+      this.refreshAPICalls = request.headers['ratelimit-reset']
+
+      DEBUG_API_UPDATE_CHANNEL_VIEWS(request.data.data)
+      if (request.data.data.length > 0) await global.db.engine.update('api.current', { key: 'views' }, { value: request.data.data[0].view_count })
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: this.remainingAPICalls })
-      return
-    } finally {
-      new Timeout().recursive({ this: this, uid: 'updateChannelViews', wait: timeout, fnc: this.updateChannelViews })
     }
-
-    // save remaining api calls
-    this.remainingAPICalls = request.headers['ratelimit-remaining']
-    this.refreshAPICalls = request.headers['ratelimit-reset']
-
-    DEBUG_API_UPDATE_CHANNEL_VIEWS(request.data.data)
-    if (request.data.data.length > 0) await global.db.engine.update('api.current', { key: 'views' }, { value: request.data.data[0].view_count })
+    new Timeout().recursive({ this: this, uid: 'updateChannelViews', wait: timeout, fnc: this.updateChannelViews })
   }
 
   async getLatest100Followers (quiet) {
@@ -439,88 +428,86 @@ class API {
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+
+      // save remaining api calls
+      this.remainingAPICalls = request.headers['ratelimit-remaining']
+      this.refreshAPICalls = request.headers['ratelimit-reset']
+
+      if (request.status === 200 && !_.isNil(request.data.data)) {
+        // check if user id is in db, not in db load username from API
+        let fTime = []
+        let fidsToLoadFromAPI = []
+        let followersUsername = []
+        for (let u of request.data.data) {
+          fTime.push({ id: u.from_id, followed_at: u.followed_at })
+          let user = await global.db.engine.findOne('users', { id: u.from_id })
+          DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Searching id %s in users db: %j', u.from_id, user)
+          if (_.isEmpty(user)) fidsToLoadFromAPI.push(u.from_id)
+          else followersUsername.push(user.username)
+        }
+        DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Usernames from db: %j', followersUsername)
+        DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('IDs to load from API: %j', fidsToLoadFromAPI)
+
+        if (fidsToLoadFromAPI.length > 0) {
+          let fids = _.map(fidsToLoadFromAPI, (o) => `id=${o}`)
+          let usersFromApi = await axios.get(`https://api.twitch.tv/helix/users?${fids.join('&')}`, {
+            headers: {
+              'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
+              'Client-ID': config.settings.client_id
+            }
+          })
+
+          // save remaining api calls
+          this.remainingAPICalls = usersFromApi.headers['ratelimit-remaining']
+          this.refreshAPICalls = usersFromApi.headers['ratelimit-reset']
+
+          global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.status, remaining: this.remainingAPICalls })
+          for (let follower of usersFromApi.data.data) {
+            followersUsername.push(follower.login.toLowerCase())
+            DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Saving user %s id %s', follower.login.toLowerCase(), follower.id)
+            await global.db.engine.update('users', { username: follower.login.toLowerCase() }, { id: follower.id })
+          }
+        }
+
+        for (let follower of followersUsername) {
+          let user = await global.users.get(follower)
+          if (!_.get(user, 'is.follower', false)) {
+            if (new Date().getTime() - moment(_.get(user, 'time.follow', 0)).format('X') * 1000 < 60000 * 60 && !global.webhooks.existsInCache('follow', user.id)) {
+              global.webhooks.addIdToCache('follow', user.id)
+
+              global.overlays.eventlist.add({
+                type: 'follow',
+                username: user.username
+              })
+              if (!quiet && !global.commons.isBot(user.username)) {
+                global.log.follow(user.username)
+                global.events.fire('follow', { username: user.username })
+              }
+            }
+          }
+          try {
+            if (!_.isNil(_.find(fTime, (o) => o.id === user.id))) {
+              DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Saving user %s\n%f', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
+              global.db.engine.update('users', { username: follower }, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
+            } else {
+              DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Saving user %s\n%f', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment().format('x')) } })
+              global.db.engine.update('users', { username: follower }, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment().format('x')) } })
+            }
+          } catch (e) {
+            global.log.error(e)
+            global.log.error(e.stack)
+          }
+        }
+      }
+
+      DEBUG_API_GET_LATEST_100_FOLLOWERS(`Current followers count: ${request.data.total}`)
+      global.db.engine.update('api.current', { key: 'followers' }, { value: request.data.total })
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: this.remainingAPICalls })
-      return
-    } finally {
-      new Timeout().recursive({ this: this, uid: 'getLatest100Followers', wait: timeout, fnc: this.getLatest100Followers, args: [timeout === 1000] })
     }
-
-    // save remaining api calls
-    this.remainingAPICalls = request.headers['ratelimit-remaining']
-    this.refreshAPICalls = request.headers['ratelimit-reset']
-
-    if (request.status === 200 && !_.isNil(request.data.data)) {
-      // check if user id is in db, not in db load username from API
-      let fTime = []
-      let fidsToLoadFromAPI = []
-      let followersUsername = []
-      for (let u of request.data.data) {
-        fTime.push({ id: u.from_id, followed_at: u.followed_at })
-        let user = await global.db.engine.findOne('users', { id: u.from_id })
-        DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Searching id %s in users db: %j', u.from_id, user)
-        if (_.isEmpty(user)) fidsToLoadFromAPI.push(u.from_id)
-        else followersUsername.push(user.username)
-      }
-      DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Usernames from db: %j', followersUsername)
-      DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('IDs to load from API: %j', fidsToLoadFromAPI)
-
-      if (fidsToLoadFromAPI.length > 0) {
-        let fids = _.map(fidsToLoadFromAPI, (o) => `id=${o}`)
-        let usersFromApi = await axios.get(`https://api.twitch.tv/helix/users?${fids.join('&')}`, {
-          headers: {
-            'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
-            'Client-ID': config.settings.client_id
-          }
-        })
-
-        // save remaining api calls
-        this.remainingAPICalls = usersFromApi.headers['ratelimit-remaining']
-        this.refreshAPICalls = usersFromApi.headers['ratelimit-reset']
-
-        global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.status, remaining: this.remainingAPICalls })
-        for (let follower of usersFromApi.data.data) {
-          followersUsername.push(follower.login.toLowerCase())
-          DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Saving user %s id %s', follower.login.toLowerCase(), follower.id)
-          await global.db.engine.update('users', { username: follower.login.toLowerCase() }, { id: follower.id })
-        }
-      }
-
-      for (let follower of followersUsername) {
-        let user = await global.users.get(follower)
-        if (!_.get(user, 'is.follower', false)) {
-          if (new Date().getTime() - moment(_.get(user, 'time.follow', 0)).format('X') * 1000 < 60000 * 60 && !global.webhooks.existsInCache('follow', user.id)) {
-            global.webhooks.addIdToCache('follow', user.id)
-
-            global.overlays.eventlist.add({
-              type: 'follow',
-              username: user.username
-            })
-            if (!quiet && !global.commons.isBot(user.username)) {
-              global.log.follow(user.username)
-              global.events.fire('follow', { username: user.username })
-            }
-          }
-        }
-        try {
-          if (!_.isNil(_.find(fTime, (o) => o.id === user.id))) {
-            DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Saving user %s\n%f', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
-            global.db.engine.update('users', { username: follower }, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
-          } else {
-            DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Saving user %s\n%f', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment().format('x')) } })
-            global.db.engine.update('users', { username: follower }, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment().format('x')) } })
-          }
-        } catch (e) {
-          global.log.error(e)
-          global.log.error(e.stack)
-        }
-      }
-    }
-
-    DEBUG_API_GET_LATEST_100_FOLLOWERS(`Current followers count: ${request.data.total}`)
-    global.db.engine.update('api.current', { key: 'followers' }, { value: request.data.total })
+    new Timeout().recursive({ this: this, uid: 'getLatest100Followers', wait: timeout, fnc: this.getLatest100Followers, args: [timeout === 1000] })
   }
 
   async getGameFromId (gid) {
@@ -583,107 +570,105 @@ class API {
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+
+      // save remaining api calls
+      this.remainingAPICalls = request.headers['ratelimit-remaining']
+      this.refreshAPICalls = request.headers['ratelimit-reset']
+
+      DEBUG_API_GET_CURRENT_STREAM_DATA(request.data)
+
+      let justStarted = false
+      if (request.status === 200 && !_.isNil(request.data.data[0])) {
+        // correct status and we've got a data - stream online
+        let stream = request.data.data[0]; DEBUG_API_GET_CURRENT_STREAM_DATA(stream)
+
+        if (!moment.preciseDiff(moment(stream.started_at), moment((await global.cache.when()).online), true).firstDateWasLater) await global.cache.when({ online: stream.started_at })
+        if (!await global.cache.isOnline() || this.streamType !== stream.type) {
+          this.chatMessagesAtStart = global.linesParsed
+
+          if (!global.webhooks.enabled.streams) {
+            global.log.start(
+              `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameFromId(stream.game_id)} | type: ${stream.type}`
+            )
+            global.events.fire('stream-started')
+            global.events.fire('command-send-x-times', { reset: true })
+            global.events.fire('keyword-send-x-times', { reset: true })
+            global.events.fire('every-x-minutes-of-stream', { reset: true })
+            justStarted = true
+          }
+        }
+
+        this.curRetries = 0
+        this.saveStreamData(stream)
+        this.streamType = stream.type
+        await global.cache.isOnline(true)
+
+        if (!justStarted) {
+          // don't run events on first check
+          global.events.fire('number-of-viewers-is-at-least-x')
+          global.events.fire('stream-is-running-x-minutes')
+          global.events.fire('every-x-minutes-of-stream')
+        }
+
+        if (!this.gameOrTitleChangedManually) {
+          let rawStatus = await global.cache.rawStatus()
+          let status = await this.parseTitle()
+          const game = await this.getGameFromId(stream.game_id)
+
+          await global.db.engine.update('api.current', { key: 'status' }, { value: stream.title })
+          await global.db.engine.update('api.current', { key: 'game' }, { value: game })
+
+          if (stream.title !== status) {
+            // check if status is same as updated status
+            if (this.retries.getCurrentStreamData >= 15) {
+              this.retries.getCurrentStreamData = 0
+              rawStatus = stream.title
+              await global.cache.rawStatus(rawStatus)
+            } else {
+              this.retries.getCurrentStreamData++
+              return
+            }
+          } else {
+            this.retries.getCurrentStreamData = 0
+          }
+          await global.cache.gameCache(game)
+          await global.cache.rawStatus(rawStatus)
+        }
+      } else {
+        if (await global.cache.isOnline() && this.curRetries < this.maxRetries) {
+          // retry if it is not just some network / twitch issue
+          this.curRetries = this.curRetries + 1
+          DEBUG_API_GET_CURRENT_STREAM_DATA('Retry stream offline check, cur: %s, max: %s', this.curRetries, this.maxRetries)
+        } else {
+          // stream is really offline
+          this.curRetries = 0
+          await global.cache.isOnline(false)
+
+          let when = await global.cache.when()
+          if (_.isNil(when.offline)) {
+            if (!_.isNil(when.online)) global.log.stop('')
+            global.cache.when({ offline: moment().format() })
+            global.events.fire('stream-stopped')
+            global.events.fire('stream-is-running-x-minutes', { reset: true })
+            global.events.fire('number-of-viewers-is-at-least-x', { reset: true })
+          }
+
+          await global.db.engine.update('api.max', { key: 'viewers' }, { value: 0 })
+          await global.db.engine.update('api.new', { key: 'chatters' }, { value: 0 })
+          await global.db.engine.update('api.current', { key: 'viewers' }, { value: 0 })
+          await global.db.engine.update('api.current', { key: 'bits' }, { value: 0 })
+          await global.db.engine.update('api.current', { key: 'tips' }, { value: 0 })
+
+          await global.db.engine.remove('cache.hosts', {}) // we dont want to have cached hosts on stream start
+          await global.db.engine.remove('cache.raids', {}) // we dont want to have cached raids on stream start
+        }
+      }
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: this.remainingAPICalls })
-      return
-    } finally {
-      new Timeout().recursive({ this: this, uid: 'getCurrentStreamData', wait: timeout, fnc: this.getCurrentStreamData, args: opts })
     }
-
-    // save remaining api calls
-    this.remainingAPICalls = request.headers['ratelimit-remaining']
-    this.refreshAPICalls = request.headers['ratelimit-reset']
-
-    DEBUG_API_GET_CURRENT_STREAM_DATA(request.data)
-
-    let justStarted = false
-    if (request.status === 200 && !_.isNil(request.data.data[0])) {
-      // correct status and we've got a data - stream online
-      let stream = request.data.data[0]; DEBUG_API_GET_CURRENT_STREAM_DATA(stream)
-
-      if (!moment.preciseDiff(moment(stream.started_at), moment((await global.cache.when()).online), true).firstDateWasLater) await global.cache.when({ online: stream.started_at })
-      if (!await global.cache.isOnline() || this.streamType !== stream.type) {
-        this.chatMessagesAtStart = global.linesParsed
-
-        if (!global.webhooks.enabled.streams) {
-          global.log.start(
-            `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameFromId(stream.game_id)} | type: ${stream.type}`
-          )
-          global.events.fire('stream-started')
-          global.events.fire('command-send-x-times', { reset: true })
-          global.events.fire('keyword-send-x-times', { reset: true })
-          global.events.fire('every-x-minutes-of-stream', { reset: true })
-          justStarted = true
-        }
-      }
-
-      this.curRetries = 0
-      this.saveStreamData(stream)
-      this.streamType = stream.type
-      await global.cache.isOnline(true)
-
-      if (!justStarted) {
-        // don't run events on first check
-        global.events.fire('number-of-viewers-is-at-least-x')
-        global.events.fire('stream-is-running-x-minutes')
-        global.events.fire('every-x-minutes-of-stream')
-      }
-
-      if (!this.gameOrTitleChangedManually) {
-        let rawStatus = await global.cache.rawStatus()
-        let status = await this.parseTitle()
-        const game = await this.getGameFromId(stream.game_id)
-
-        await global.db.engine.update('api.current', { key: 'status' }, { value: stream.title })
-        await global.db.engine.update('api.current', { key: 'game' }, { value: game })
-
-        if (stream.title !== status) {
-          // check if status is same as updated status
-          if (this.retries.getCurrentStreamData >= 15) {
-            this.retries.getCurrentStreamData = 0
-            rawStatus = stream.title
-            await global.cache.rawStatus(rawStatus)
-          } else {
-            this.retries.getCurrentStreamData++
-            return
-          }
-        } else {
-          this.retries.getCurrentStreamData = 0
-        }
-        await global.cache.gameCache(game)
-        await global.cache.rawStatus(rawStatus)
-      }
-    } else {
-      if (await global.cache.isOnline() && this.curRetries < this.maxRetries) {
-        // retry if it is not just some network / twitch issue
-        this.curRetries = this.curRetries + 1
-        DEBUG_API_GET_CURRENT_STREAM_DATA('Retry stream offline check, cur: %s, max: %s', this.curRetries, this.maxRetries)
-      } else {
-        // stream is really offline
-        this.curRetries = 0
-        await global.cache.isOnline(false)
-
-        let when = await global.cache.when()
-        if (_.isNil(when.offline)) {
-          if (!_.isNil(when.online)) global.log.stop('')
-          global.cache.when({ offline: moment().format() })
-          global.events.fire('stream-stopped')
-          global.events.fire('stream-is-running-x-minutes', { reset: true })
-          global.events.fire('number-of-viewers-is-at-least-x', { reset: true })
-        }
-
-        await global.db.engine.update('api.max', { key: 'viewers' }, { value: 0 })
-        await global.db.engine.update('api.new', { key: 'chatters' }, { value: 0 })
-        await global.db.engine.update('api.current', { key: 'viewers' }, { value: 0 })
-        await global.db.engine.update('api.current', { key: 'bits' }, { value: 0 })
-        await global.db.engine.update('api.current', { key: 'tips' }, { value: 0 })
-
-        await global.db.engine.remove('cache.hosts', {}) // we dont want to have cached hosts on stream start
-        await global.db.engine.remove('cache.raids', {}) // we dont want to have cached raids on stream start
-      }
-    }
+    new Timeout().recursive({ this: this, uid: 'getCurrentStreamData', wait: timeout, fnc: this.getCurrentStreamData, args: opts })
   }
 
   async saveStreamData (stream) {
@@ -874,18 +859,17 @@ class API {
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
+
+      for (let clip of request.data.data) {
+        // clip found in twitch api
+        DEBUG_API_CHECK_CLIPS(`Clip ${clip.id} checked and validated`)
+        await global.db.engine.update('api.clips', { clipId: clip.id }, { isChecked: true })
+      }
     } catch (e) {
       global.log.error(`API: ${url} - ${e.stack}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
-      return new Timeout().recursive({ this: this, uid: 'checkClips', wait: 1000, fnc: this.checkClips })
     }
-
-    for (let clip of request.data.data) {
-      // clip found in twitch api
-      DEBUG_API_CHECK_CLIPS(`Clip ${clip.id} checked and validated`)
-      await global.db.engine.update('api.clips', { clipId: clip.id }, { isChecked: true })
-    }
-    return new Timeout().recursive({ this: this, uid: 'checkClips', wait: 1000, fnc: this.checkClips })
+    new Timeout().recursive({ this: this, uid: 'checkClips', wait: 1000, fnc: this.checkClips })
   }
 
   async createClip (opts) {
@@ -955,7 +939,6 @@ class API {
       })
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      console.log(e)
       global.log.error(`API: ${url} - ${e.stack}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
       return
