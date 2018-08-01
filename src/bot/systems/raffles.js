@@ -231,8 +231,9 @@ class Raffles extends System {
     if (_.isNil(opts.sender) || _.isNil(opts.sender.username)) return true
 
     const [raffle, user] = await Promise.all([global.db.engine.findOne(this.collection.data, { winner: null }), global.users.get(opts.sender.username)])
+    if (_.isEmpty(raffle)) return true
 
-    const isStartingWithRaffleKeyword = opts.message.startsWith(raffle.keyword)
+    const isStartingWithRaffleKeyword = opts.message.toLowerCase().startsWith(raffle.keyword.toLowerCase())
     debug('isStartingWithRaffleKeyword: %s', isStartingWithRaffleKeyword)
     if (!isStartingWithRaffleKeyword || _.isEmpty(raffle)) return true
 
