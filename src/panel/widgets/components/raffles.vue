@@ -217,6 +217,26 @@
               <span class="input-group-text">{{commons.translate('minutes')}}</span>
           </div>
         </div>
+
+        <div class="input-group mt-2">
+          <div class="input-group-prepend">
+              <span class="input-group-text">{{commons.translate('systems.raffles.widget.subscribers-luck')}}</span>
+          </div>
+          <input type="text" class="form-control" v-model="luck.subscribersPercent">
+          <div class="input-group-append">
+              <span class="input-group-text">%</span>
+          </div>
+        </div>
+
+        <div class="input-group mt-2">
+          <div class="input-group-prepend">
+              <span class="input-group-text">{{commons.translate('systems.raffles.widget.followers-luck')}}</span>
+          </div>
+          <input type="text" class="form-control" v-model="luck.followersPercent">
+          <div class="input-group-append">
+              <span class="input-group-text">%</span>
+          </div>
+        </div>
       </div>
       <!-- /SETTINGS -->
 
@@ -246,6 +266,10 @@ export default {
   data: function () {
     return {
       raffleAnnounceInterval: 0,
+      luck: {
+        subscribersPercent: 0,
+        followersPercent: 0
+      },
 
       search: '',
 
@@ -283,6 +307,8 @@ export default {
   created: function () {
     this.socket.emit('settings', (err, data) => {
       this.raffleAnnounceInterval = data.raffleAnnounceInterval
+      this.luck.subscribersPercent = data.luck.subscribersPercent
+      this.luck.followersPercent = data.luck.followersPercent
     })
 
     if (localStorage.getItem('/widget/raffles/eligibility/all')) this.eligibility.all = JSON.parse(localStorage.getItem('/widget/raffles/eligibility/all'))
@@ -294,6 +320,12 @@ export default {
   watch: {
     raffleAnnounceInterval: function (val) {
       this.socket.emit('settings.update', { raffleAnnounceInterval: val }, () => {})
+    },
+    'luck.followersPercent': function () {
+      this.socket.emit('settings.update', { luck: this.luck }, () => {})
+    },
+    'luck.subscribersPercent': function () {
+      this.socket.emit('settings.update', { luck: this.luck }, () => {})
     },
     ticketsMin: function () { this.ticketsMin = Number(this.ticketsMin) },
     ticketsMax: function () { this.ticketsMax = Number(this.ticketsMax) },

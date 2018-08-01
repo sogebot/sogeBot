@@ -30,6 +30,10 @@ class Raffles extends System {
       _: {
         lastAnnounce: String(new Date())
       },
+      luck: {
+        subscribersPercent: 150,
+        followersPercent: 120
+      },
       raffleAnnounceInterval: 10,
       commands: [
         {name: '!raffle pick', permission: constants.OWNER_ONLY},
@@ -276,6 +280,7 @@ class Raffles extends System {
       tickets: raffle.type === TYPE_NORMAL ? 1 : parseInt(newTickets, 10),
       username: opts.sender.username,
       messages: [],
+      is: user.is,
       raffle_id: raffle._id.toString()
     }
     debug('new participant: %j', participantUser)
@@ -314,25 +319,54 @@ class Raffles extends System {
     }
 
     let _total = 0
+    let [fLuck, sLuck] = await Promise.all([this.settings.luck.followersPercent, this.settings.luck.subscribersPercent])
     for (let participant of _.filter(participants, (o) => o.eligible)) {
-      _total = _total + parseInt(participant.tickets, 10)
+      if (!_.isNil(participant.is) && (participant.is.follower || participant.is.subscriber)) {
+        if (participant.is.subscriber) {
+          _total = _total + parseInt(((participant.tickets / 100) * sLuck), 10)
+        } else if (participant.is.follower) {
+          _total = _total + parseInt(((participant.tickets / 100) * fLuck), 10)
+        }
+      } else {
+        _total = _total + parseInt(participant.tickets, 10)
+      }
     }
 
-    let winNumber = _.random(0, parseInt(_total, 10) - 1, false)
+    _total = parseInt(_total, 10)
+    let winNumber = _.random(0, _total - 1, false)
     debug('Total tickets: %s', _total)
     debug('Win number: %s', winNumber)
 
     let winner
     for (let participant of _.filter(participants, (o) => o.eligible)) {
-      winNumber = winNumber - participant.tickets
+      let tickets = participant.tickets
+
+      if (!_.isNil(participant.is) || (participant.is.follower && participant.is.subscriber)) {
+        if (participant.is.subscriber) {
+          tickets = parseInt(((participant.tickets / 100) * sLuck), 10)
+        } else if (participant.is.follower) {
+          tickets = parseInt(((participant.tickets / 100) * fLuck), 10)
+        }
+      }
+
+      winNumber = winNumber - tickets
+      winner = participant
       if (winNumber <= 0) {
-        winner = participant
         break
       }
     }
 
     debug('Raffle winner: %s', winner)
-    let probability = parseInt(winner.tickets, 10) / (parseInt(_total, 10) / 100)
+    let tickets = winner.tickets
+    if (!_.isNil(winner.is) || (winner.is.follower && winner.is.subscriber)) {
+      if (winner.is.subscriber) {
+        tickets = parseInt(((winner.tickets / 100) * sLuck), 10)
+      } else if (winner.is.follower) {
+        tickets = parseInt(((winner.tickets / 100) * fLuck), 10)
+      }
+    }
+
+    let probability = (parseInt(tickets, 10) / (parseInt(_total, 10)) * 100)
 
     // uneligible winner (don't want to pick second time same user if repick)
     await Promise.all([
@@ -346,14 +380,6 @@ class Raffles extends System {
       probability: _.round(probability, 2)
     })
     debug(message); global.commons.sendMessage(message, global.commons.getOwner())
-  }
-
-  async eligibility (self, socket, data) {
-    let raffles = await global.db.engine.find(this.collection.data)
-    if (_.isEmpty(raffles)) return
-    let raffle = _.orderBy(raffles, 'timestamp', 'desc')[0]
-    debug({ raffle_id: raffle._id.toString(), username: data.username }, { eligible: data.eligible })
-    await global.db.engine.update(this.collection.participants, { raffle_id: raffle._id.toString(), username: data.username }, { eligible: data.eligible })
   }
 }
 

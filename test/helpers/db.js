@@ -17,7 +17,6 @@ module.exports = {
       await global.db.engine.remove('timers.responses', {})
       await global.db.engine.remove('users', {})
       await global.db.engine.remove('users.points', {})
-      await global.db.engine.remove('raffles', {})
       await global.db.engine.remove('users_ignorelist', {})
       await global.db.engine.remove('cache', {})
       await global.db.engine.remove('cache.when', {})
@@ -43,6 +42,10 @@ module.exports = {
       await global.db.engine.remove(global.systems.timers.collection.settings, {})
       await global.db.engine.remove(global.systems.timers.collection.data, {})
       await global.db.engine.remove(global.systems.timers.collection.responses, {})
+
+      // remove raffles
+      await global.db.engine.remove(global.systems.raffles.collection.settings, {})
+      await global.db.engine.remove(global.systems.raffles.collection.data, {})
 
       resolve()
     }
