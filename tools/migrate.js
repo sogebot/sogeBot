@@ -4,6 +4,7 @@ const _ = require('lodash')
 const figlet = require('figlet')
 const config = require('../config.json')
 const compareVersions = require('compare-versions')
+const XRegExp = require('xregexp')
 const fs = require('fs')
 
 // logger
@@ -14,7 +15,11 @@ const dropFiles = [
   'playlist.db', 'songrequest.db', 'ranks.db', 'prices.db',
   'commands.db', 'keywords.db', 'cooldowns.db', 'alias.db',
   'cooldowns.viewers.db', 'raffles.db', 'raffle_participants.db',
-  'timers.db', 'timers.responses.db'
+  'timers.db', 'timers.responses.db', 'moderation.message.cooldown.db',
+  'moderation.permit.db', 'moderation.warnings.db', 'songbanned.db',
+  'songrequests.db', 'stats.db', 'system.alias.db', 'system.alias.settings.db',
+  'system.bets.db', 'system.bets.settings.db', 'system.bets.users.db',
+  'system.commercial.settings.db', 'system.cooldown.db', 'system.cooldown.settings.db'
 ]
 
 if (process.argv[2] && process.argv[2] === '--delete') {
@@ -94,8 +99,101 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  settings: [{
+    version: '8.0.0',
+    do: async () => {
+      let processed = 0
+
+      const mappings = {
+        'betPercentGain': 'systems.bets.settings.betPercentGain',
+
+        'disableCooldownWhispers': 'systems.cooldown.settings.cooldownNotifyAsWhisper',
+
+        'moderationLinks': 'systems.moderation.settings.links.enabled',
+        'moderationLinksWithSpaces': 'systems.moderation.settings.links.includeSpaces',
+        'moderationLinksSubs': 'systems.moderation.settings.links.moderateSubscribers',
+        'moderationLinksClips': 'systems.moderation.settings.links.includeClips',
+        'moderationLinksTimeout': 'systems.moderation.settings.links.timeout',
+
+        'moderationSymbols': 'systems.moderation.settings.symbols.enabled',
+        'moderationSymbolsSubs': 'systems.moderation.settings.symbols.moderateSubscribers',
+        'moderationSymbolsTimeout': 'systems.moderation.settings.symbols.timeout',
+        'moderationSymbolsTriggerLength': 'systems.moderation.settings.symbols.triggerLength',
+        'moderationSymbolsMaxConsecutively': 'systems.moderation.settings.symbols.maxSymbolsConsecutively',
+        'moderationSymbolsMaxPercent': 'systems.moderation.settings.symbols.maxSymbolsPercent',
+
+        'moderationLongMessage': 'systems.moderation.settings.longMessage.enabled',
+        'moderationLongMessageSubs': 'systems.moderation.settings.longMessage.moderateSubscribers',
+        'moderationLongMessageTimeout': 'systems.moderation.settings.longMessage.timeout',
+        'moderationLongMessageTriggerLength': 'systems.moderation.settings.longMessage.triggerLength',
+
+        'moderationSpam': 'systems.moderation.settings.caps.enabled',
+        'moderationSpamSubs': 'systems.moderation.settings.caps.moderateSubscribers',
+        'moderationSpamTimeout': 'systems.moderation.settings.caps.timeout',
+        'moderationSpamTriggerLength': 'systems.moderation.settings.caps.triggerLength',
+        'moderationSpamMaxLength': 'systems.moderation.settings.caps.maxLength',
+
+        'moderationColor': 'systems.moderation.settings.color.enabled',
+        'moderationColorSubs': 'systems.moderation.settings.color.moderateSubscribers',
+        'moderationColorTimeout': 'systems.moderation.settings.color.timeout',
+
+        'moderationEmotes': 'systems.moderation.settings.emotes.enabled',
+        'moderationEmotesSubs': 'systems.moderation.settings.emotes.moderateSubscribers',
+        'moderationEmotesTimeout': 'systems.moderation.settings.emotes.timeout',
+        'moderationEmotesMaxCount': 'systems.moderation.settings.emotes.maxCount',
+
+        'moderationWarnings': 'systems.moderation.settings.warnings.warningCount',
+        'moderationAnnounceTimeouts': 'systems.moderation.settings.warnings.announce',
+        'moderationWarningsTimeouts': 'systems.moderation.settings.warnings.timeout',
+
+        'pointsName': 'systems.points.settings.points.name',
+        'pointsInterval': 'systems.points.settings.points.interval',
+        'pointsPerInterval': 'systems.points.settings.points.perInterval',
+        'pointsIntervalOffline': 'systems.points.settings.points.offlineInterval',
+        'pointsPerIntervalOffline': 'systems.points.settings.points.perOfflineInterval',
+        'pointsMessageInterval': 'systems.points.settings.points.messageInterval',
+        'pointsPerMessageInterval': 'systems.points.settings.points.perMessageInterval'
+      }
+
+      console.info('Updating settings')
+      console.info(' -> entries')
+      for (let [o, n] of Object.entries(mappings)) {
+        let item = await global.db.engine.find('settings', { key: o })
+        if (!_.isEmpty(item)) {
+          let regexp = XRegExp(`
+            (?<collection> [a-zA-Z]*.[a-zA-Z]*.settings)
+            .
+            (?<category> [a-zA-Z]*)
+            ?.
+            ?(?<key> [a-zA-Z]*)`, 'ix')
+          const match = XRegExp.exec(n, regexp)
+          if (match.key.trim().length === 0) match.key = undefined
+          await global.db.engine.insert(match.collection, { category: match.category, key: match.key, isMultiValue: false, value: item.value })
+          await global.db.engine.remove('settings', { key: o })
+          processed++
+        }
+      }
+
+      let blacklist = _.get(await global.db.engine.findOne('settings', { key: 'blacklist' }), 'value', [])
+      let whitelist = _.get(await global.db.engine.findOne('settings', { key: 'whitelist' }), 'value', [])
+
+      console.info(' -> blacklist')
+      for (let list of blacklist) {
+        await global.db.engine.insert('systems.moderation.settings', { category: 'list', key: 'blacklist', isMultiValue: true, value: list })
+        processed++
+      }
+
+      console.info(' -> whitelist')
+      for (let list of whitelist) {
+        await global.db.engine.insert('systems.moderation.settings', { category: 'list', key: 'whitelist', isMultiValue: true, value: list })
+        processed++
+      }
+
+      console.info(` => ${processed} processed`)
+    }
+  }],
   timers: [{
-    version: '7.6.0',
+    version: '8.0.0',
     do: async () => {
       console.info('Moving timers to systems.timers')
       let items = await global.db.engine.find('timers')
@@ -118,7 +216,7 @@ let migration = {
     }
   }],
   songs: [{
-    version: '7.6.0',
+    version: '8.0.0',
     do: async () => {
       console.info('Moving playlist to systems.songs.playlist')
       let items = await global.db.engine.find('playlist')
@@ -134,7 +232,7 @@ let migration = {
     }
   },
   {
-    version: '7.6.0',
+    version: '8.0.0',
     do: async () => {
       console.info('Moving bannedsong to systems.songs.ban')
       let items = await global.db.engine.find('bannedsong')
@@ -150,7 +248,7 @@ let migration = {
     }
   },
   {
-    version: '7.6.0',
+    version: '8.0.0',
     do: async () => {
       console.info('Moving songrequest to systems.songs.request')
       let items = await global.db.engine.find('songrequest')
@@ -166,7 +264,7 @@ let migration = {
     }
   }],
   ranks: [{
-    version: '7.6.0',
+    version: '8.0.0',
     do: async () => {
       console.info('Moving ranks from ranks to systems.ranks')
       let items = await global.db.engine.find('ranks')
@@ -182,7 +280,7 @@ let migration = {
     }
   }],
   prices: [{
-    version: '7.6.0',
+    version: '8.0.0',
     do: async () => {
       console.info('Moving prices from prices to systems.price')
       let items = await global.db.engine.find('prices')
@@ -199,7 +297,7 @@ let migration = {
     }
   }],
   moderation: [{
-    version: '7.6.0',
+    version: '8.0.0',
     do: async () => {
       console.info('Moving blacklist and whitelist from settings to systems.moderation.settings')
       let processed = 0
@@ -217,7 +315,7 @@ let migration = {
     }
   }],
   keywords: [{
-    version: '7.6.0',
+    version: '8.0.0',
     do: async () => {
       console.info('Moving keywords to systems.keywords')
       let items = await global.db.engine.find('keywords')
@@ -233,7 +331,7 @@ let migration = {
     }
   }],
   customcommands: [{
-    version: '7.6.0',
+    version: '8.0.0',
     do: async () => {
       console.info('Moving custom commands from customcommands to systems.customcommands')
       let items = await global.db.engine.find('commands')
@@ -250,7 +348,7 @@ let migration = {
     }
   }],
   cooldown: [{
-    version: '7.6.0',
+    version: '8.0.0',
     do: async () => {
       console.info('Moving cooldowns from cooldowns to systems.cooldown')
       let items = await global.db.engine.find('cooldowns')
@@ -266,17 +364,7 @@ let migration = {
     }
   }],
   alias: [{
-    version: '7.0.0',
-    do: async () => {
-      console.info('Migration alias to %s', '7.0.0')
-      let alias = await global.db.engine.find('alias')
-      const constants = require('../src/bot/constants')
-      for (let item of alias) {
-        await global.db.engine.update('alias', { _id: item._id.toString() }, { permission: constants.VIEWERS })
-      }
-    }
-  }, {
-    version: '7.6.0',
+    version: '8.0.0',
     do: async () => {
       console.info('Moving alias from alias to systems.alias')
       let items = await global.db.engine.find('alias')
@@ -294,7 +382,7 @@ let migration = {
     }
   }],
   widgets: [{
-    version: '7.6.0',
+    version: '8.0.0',
     do: async () => {
       console.info('Removing joinpart widget')
       let items = await global.db.engine.find('widgets', { id: 'joinpart' })
@@ -303,69 +391,8 @@ let migration = {
       console.info(` => ${processed} deleted joinpart widgets`)
     }
   }],
-  cache: [{
-    version: '7.5.0',
-    do: async () => {
-      console.info('Moving gameTitles from cache to cache.titles')
-      let cache = await global.db.engine.findOne('cache', { key: 'gamesTitles' })
-      let processed = 0
-      if (!_.isEmpty(cache)) {
-        for (let [game, titles] of Object.entries(cache['games_and_titles'])) {
-          for (let title of titles) {
-            await global.db.engine.insert('cache.titles', { game, title })
-            processed++
-          }
-        }
-        await global.db.engine.remove('cache', { key: 'gamesTitles' })
-      }
-      console.info(` => ${processed} titles`)
-    }
-  }],
   users: [{
-    version: '7.3.0',
-    do: async () => {
-      console.info('Removing users incorrect created_at time %s', '7.3.0')
-      let users = await global.db.engine.find('users')
-      for (let user of users) {
-        if (_.isNil(user.time)) continue
-        await global.db.engine.remove('users', { _id: String(user._id) })
-        delete user._id; delete user.time.created_at
-        await global.db.engine.insert('users', user)
-      }
-    }
-  }, {
-    version: '7.5.0',
-    do: async () => {
-      console.info('Removing users is.online')
-      let users = await global.db.engine.find('users')
-      let updated = 0
-      for (let user of users) {
-        if (_.isNil(user.is) || _.isNil(user.is.online)) continue
-        updated++
-        await global.db.engine.remove('users', { _id: String(user._id) })
-        delete user._id; delete user.is.online
-        await global.db.engine.insert('users', user)
-      }
-      console.info(` => ${updated} users`)
-    }
-  }, {
-    version: '7.4.0',
-    do: async () => {
-      console.info('Migration of messages stats')
-      let users = await global.db.engine.find('users')
-      let updated = 0
-      for (let user of users) {
-        if (_.isNil(user.stats) || _.isNil(user.stats.messages)) continue
-        updated++
-        await global.db.engine.remove('users', { _id: String(user._id) })
-        await global.db.engine.insert('users.messages', { username: user.username, messages: parseInt(user.stats.messages, 10) })
-        delete user._id; delete user.stats.messages
-        await global.db.engine.insert('users', user)
-      }
-      console.info(` => ${updated} users`)
-    }
-  }, {
-    version: '7.6.0',
+    version: '8.0.0',
     do: async () => {
       console.info('Migration of watched stats')
       let users = await global.db.engine.find('users')
@@ -379,47 +406,6 @@ let migration = {
         await global.db.engine.insert('users', user)
       }
       console.info(` => ${updated} users`)
-    }
-  }],
-  points: [{
-    version: '7.3.0',
-    do: async () => {
-      console.info('Migration points to %s', '7.3.0')
-      let users = await global.db.engine.find('users')
-      for (let user of users) {
-        if (_.isNil(user.points)) continue
-        await global.db.engine.remove('users', { _id: user._id.toString() })
-        await global.db.engine.insert('users.points', { username: user.username, points: parseInt(user.points, 10) })
-
-        delete user._id; delete user.points
-        await global.db.engine.insert('users', user)
-      }
-    }
-  }],
-  commands: [{
-    version: '7.0.0',
-    do: async () => {
-      console.info('Migration commands to %s', '7.0.0')
-      let commands = await global.db.engine.find('commands')
-      const constants = require('../src/bot/constants')
-      for (let command of commands) {
-        await global.db.engine.update('commands', { _id: command._id.toString() }, { permission: constants.VIEWERS })
-      }
-    }
-  }],
-  bits: [{
-    version: '7.0.0',
-    do: async () => {
-      console.info('Migration bits to %s', '7.0.0')
-      let users = await global.db.engine.find('users')
-      for (let user of users) {
-        if (!_.has(user, 'stats.bits') || _.isNil(user.stats.bits)) continue // skip if bits are null/undefined
-        await global.db.engine.remove('users', { username: user.username })
-        await global.db.engine.insert('users.bits', { username: user.username, amount: user.stats.bits, message: 'Migrated from 6.x', timestamp: _.now() })
-        delete user.stats.bits
-        delete user._id
-        await global.db.engine.update('users', { username: user.username }, user)
-      }
     }
   }]
 }
