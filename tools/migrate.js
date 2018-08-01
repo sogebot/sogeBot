@@ -17,7 +17,7 @@ const dropFiles = [
   'cooldowns.viewers.db', 'raffles.db', 'raffle_participants.db',
   'timers.db', 'timers.responses.db', 'moderation.message.cooldown.db',
   'moderation.permit.db', 'moderation.warnings.db', 'songbanned.db',
-  'songrequests.db', 'stats.db', 'system.alias.db', 'system.alias.settings.db',
+  'songrequests.db', 'system.alias.db', 'system.alias.settings.db',
   'system.bets.db', 'system.bets.settings.db', 'system.bets.users.db',
   'system.commercial.settings.db', 'system.cooldown.db', 'system.cooldown.settings.db'
 ]
