@@ -470,9 +470,9 @@ class Moderation extends System {
   }
 
   async isSilent (name) {
-    let item = await global.db.engine.findOne('moderation.message.cooldown', { key: name })
+    let item = await global.db.engine.findOne(this.collection.messagecooldown, { key: name })
     if (_.isEmpty(item) || (_.now() - item.value) >= 60000) {
-      await global.db.engine.update('moderation.message.cooldown', { key: name }, { value: _.now() })
+      await global.db.engine.update(this.collection.messagecooldown, { key: name }, { value: _.now() })
       return false
     }
     return true
