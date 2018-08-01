@@ -107,7 +107,6 @@ class API {
   async getChannelID () {
     var request
     const url = `https://api.twitch.tv/kraken/users?login=${config.settings.broadcaster_username}`
-    let timeout = 60000
 
     DEBUG_API_CHANNELID(`GET ${url}`)
     try {
@@ -129,12 +128,11 @@ class API {
         global.log.info('Broadcaster channel ID set to ' + user._id)
       }
     } catch (e) {
-      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+      let timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : 60000
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelID', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
+      new Timeout().recursive({ this: this, uid: 'getChannelID', wait: timeout, fnc: this.getChannelID })
     }
-
-    new Timeout().recursive({ this: this, uid: 'getChannelID', wait: timeout, fnc: this.getChannelID })
   }
 
   async getChannelChattersUnofficialAPI (opts) {
