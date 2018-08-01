@@ -273,6 +273,17 @@ class Twitch {
       var messages = await global.users.getMessagesOf(opts.sender.username)
       message.push(messages + ' ' + global.commons.getLocalizedName(messages, 'core.messages'))
 
+      // tips
+      const [tips, currency] = await Promise.all([
+        global.db.engine.find('users.tips', { username: opts.sender.username }),
+        global.configuration.getValue('currency')
+      ])
+      let tipAmount = 0
+      for (let t of tips) {
+        tipAmount += global.currency.exchange(t.amount, t.currency, currency)
+      }
+      message.push(`${Number(tipAmount).toFixed(2)} ${currency}`)
+
       global.commons.sendMessage(message.join(' | '), opts.sender)
     } catch (e) {
       global.log.error(e.stack)
