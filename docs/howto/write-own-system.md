@@ -133,7 +133,7 @@ function commandFunction(opts) {
 ```
 
 ## Parser function
-Parser function have `opts` object parameter
+Parser function have `opts` object parameter. Must return **true** or **false**. Return **false** will halt all next parser and commands.
 
 ``` javascript
 function parserFunction(opts) {
@@ -144,5 +144,8 @@ function parserFunction(opts) {
       skip: true/false
     }
   */
+
+  return true
+  // return false
 }
 ```
