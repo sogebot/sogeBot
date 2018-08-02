@@ -34,7 +34,7 @@ window.textInput = {
         if (_.isFinite(Number(this.currentValue))) this.currentValue = Number(this.currentValue)
         else this.currentValue = this.value
       }
-      this.$emit('update', this.currentValue)
+      this.$emit('update', {value: this.currentValue})
     }
   },
   data: function () {
