@@ -399,7 +399,6 @@ class Module {
           })
         }
       }
-      console.log(commands)
       return commands
     } else return []
   }
