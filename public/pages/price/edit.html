@@ -104,7 +104,7 @@
                 command: this.command.trim(),
                 enabled: this.enabled
               }
-              this.socket.emit('update', [data], (err, _id) => {
+              this.socket.emit('update', {items: [data]}, (err, _id) => {
                 if (err) {
                   console.error(err)
                   return this.states.save = 3
