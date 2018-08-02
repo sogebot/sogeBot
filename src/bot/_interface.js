@@ -45,7 +45,7 @@ class Module {
             if (key === 'enabled' && this._name === 'library') continue
             else if (key === '_permissions') {
               for (let [command, currentValue] of Object.entries(value)) {
-                command = this._commands.filter(o => o.name === command)[0]
+                command = this._commands.find(o => o.name === command)
                 if (currentValue === command.permission) await global.db.engine.remove('permissions', { key: command.name })
                 else await global.db.engine.update('permissions', { key: command.name }, { permission: currentValue })
               }
@@ -131,8 +131,12 @@ class Module {
             this._parsers.push(key)
             continue // nothing else to do with parsers (not updateable)
           } else if (category === 'commands') {
-            this._commands.push(key)
-            key = _.isObjectLike(key) ? key.name : key
+            let permission = constants.VIEWERS
+            if (_.isObjectLike(key)) {
+              permission = key.permission
+              key = _.isObjectLike(key) ? key.name : key
+            }
+            this._commands.push({ name: key, permission })
           } else if (_.isObjectLike(key)) throw Error('You can have only one nested item deep')
 
           this._settings[category][key] = () => {
