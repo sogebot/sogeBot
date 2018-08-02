@@ -2,5 +2,20 @@
   "widget": {
     "subscribers-luck": "Štěstí Subscribera",
     "followers-luck": "Štěstí Followera"
+  },
+  "settings": {
+    "enabled": "Status",
+    "raffleAnnounceInterval": {
+      "title": "Interval oznámení",
+      "help": "v minutách"
+    },
+    "subscribersPercent": {
+      "title": "Dodatečné štěstí subscribera",
+      "help": "v procentech"
+    },
+    "followersPercent": {
+      "title": "Dodatečné štěstí followera",
+      "help": "v procentech"
+    }
   }
 }

@@ -23,5 +23,8 @@
   },
   "addOption": "Pridat možnost",
   "noOptionsFound": "Nebyly nalezeny žádné možnosti",
-  "test": "Otestovat"
+  "test": "Otestovat",
+  "settings": {
+    "enabled": "Status"
+  }
 }

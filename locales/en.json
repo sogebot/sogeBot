@@ -33,139 +33,6 @@
       "sendWithMe": {
         "true": "Bot will send messages using /me",
         "false": "Bot won't send messages using /me"
-      },
-      "songs": {
-        "notify": {
-          "true": "Notification of current playing song is {core.enabled}",
-          "false": "Notification of current playing song is {core.disabled}"
-        },
-        "songrequest": {
-          "true": "Song requests are {core.enabled}",
-          "false": "Song requests are {core.disabled}"
-        },
-        "playlist": {
-          "true": "Playlist is {core.enabled}",
-          "false": "Playlist is {core.disabled}"
-        },
-        "volume": "Volume succesfully set to $value%",
-        "duration": "Maximum song length set to $value minutes.",
-        "shuffle": {
-          "true": "Songs will play randomly",
-          "false": "Songs will play by time added in playlist"
-        }
-      },
-      "moderation": {
-        "moderationAnnounceTimeouts": {
-          "true": "Bot will send timeout messages to chat",
-          "false": "Bot won't send timeout messages to chat"
-        },
-        "moderationLinks": {
-          "text": "Moderation of links is",
-          "true": "{core.settings.moderation.moderationLinks.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationLinks.text} {core.disabled}"
-        },
-        "moderationLinksWithSpaces": {
-          "text": "Moderation of links with spaces is",
-          "true": "{core.settings.moderation.moderationLinksWithSpaces.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationLinksWithSpaces.text} {core.disabled}"
-        },
-        "moderationLinksSubs": {
-          "text": "Moderation of links for subscribers is",
-          "true": "{core.settings.moderation.moderationLinksSubs.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationLinksSubs.text} {core.disabled}"
-        },
-        "moderationLinksClips": {
-          "text": "Moderation of clips links is",
-          "true": "{core.settings.moderation.moderationLinksClips.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationLinksClips.text} {core.disabled}"
-        },
-        "moderationLinksTimeout": "Timeout because of links set to $values",
-        "moderationSymbols": {
-          "text": "Moderation of symbols is",
-          "true": "{core.settings.moderation.moderationSymbols.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationSymbols.text} {core.disabled}"
-        },
-        "moderationSymbolsSubs": {
-          "text": "Moderation of symbols for subscribers is",
-          "true": "{core.settings.moderation.moderationSymbolsSubs.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationSymbolsSubs.text} {core.disabled}"
-        },
-        "moderationSymbolsTimeout": "Timeout because of symbols set to $values",
-        "moderationSymbolsTriggerLength": "Trigger message length for symbols set to $value",
-        "moderationSymbolsMaxConsecutively": "Maximum of consecutively written symbols set to $value",
-        "moderationSymbolsMaxPercent": "Maximum symbols percentage in message set to $value%",
-        "moderationLongMessage": {
-          "text": "Moderation of long messages is",
-          "true": "{core.settings.moderation.moderationLongMessage.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationLongMessage.text} {core.disabled}"
-        },
-        "moderationLongMessageSubs": {
-          "text": "Moderation of long messages for subscribers is",
-          "true": "{core.settings.moderation.moderationLongMessageSubs.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationLongMessageSubs.text} {core.disabled}"
-        },
-        "moderationLongMessageTimeout": "Timeout because of long message set to $values",
-        "moderationLongMessageTriggerLength": "Trigger message length for long messages set to $value",
-        "moderationCaps": {
-          "text": "Moderation of caps is",
-          "true": "{core.settings.moderation.moderationCaps.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationCaps.text} {core.disabled}"
-        },
-        "moderationCapsSubs": {
-          "text": "Moderation of caps for subscribers is",
-          "true": "{core.settings.moderation.moderationCapsSubs.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationCapsSubs.text} {core.disabled}"
-        },
-        "moderationCapsTimeout": "Timeout because of caps set to $values",
-        "moderationCapsTriggerLength": "Trigger message length for caps set to $value",
-        "moderationCapsMaxPercent": "Maximum caps percentage in message set to $value%",
-        "moderationSpam": {
-          "text": "Moderation of spam is",
-          "true": "{core.settings.moderation.moderationSpam.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationSpam.text} {core.disabled}"
-        },
-        "moderationSpamSubs": {
-          "text": "Moderation of spam for subscribers is",
-          "true": "{core.settings.moderation.moderationSpamSubs.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationSpamSubs.text} {core.disabled}"
-        },
-        "moderationSpamTimeout": "Timeout because of spam set to $values",
-        "moderationSpamTriggerLength": "Trigger message length for spam set to $value",
-        "moderationSpamMaxLength": "Maximum spam length in message set to $value",
-        "moderationColor": {
-          "text": "Moderation of colors (/me) is",
-          "true": "{core.settings.moderation.moderationColor.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationColor.text} {core.disabled}"
-        },
-        "moderationColorSubs": {
-          "text": "Moderation of colors (/me) for subscribers is",
-          "true": "{core.settings.moderation.moderationColorSubs.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationColorSubs.text} {core.disabled}"
-        },
-        "moderationColorTimeout": "Timeout because of colors (/me) usage set to $values",
-        "moderationEmotes": {
-          "text": "Moderation of emotes is",
-          "true": "{core.settings.moderation.moderationEmotes.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationEmotes.text} {core.disabled}"
-        },
-        "moderationEmotesSubs": {
-          "text": "Moderation of emotes for subscribers is",
-          "true": "{core.settings.moderation.moderationEmotesSubs.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationEmotesSubs.text} {core.disabled}"
-        },
-        "moderationEmotesTimeout": "Timeout because of emotes spamming set to $values",
-        "moderationEmotesMaxCount": "Maximum count of emotes in one messages set to $value",
-        "moderationBlacklistTimeout": "Timeout because of blacklisted word set to $values",
-        "moderationBlacklistSubs": {
-          "text": "Moderation of blacklist for subscribers is",
-          "true": "{core.settings.moderation.moderationBlacklistSubs.text} {core.enabled}",
-          "false": "{core.settings.moderation.moderationBlacklistSubs.text} {core.disabled}"
-        },
-        "moderationWarnings": "User will be warned $value times",
-        "moderationWarningsTimeouts": {
-          "true": "Warnings are set to be 1s timeout",
-          "false": "Warnings are set to chat message only"
-        }
       }
     },
     "years": "year|years",
@@ -677,9 +544,6 @@
     "credits": "Credits",
     "fade-out-top": "fade up",
     "fade-out-zoom": "fade zoom",
-    "moderation-subscribers-toggle": "Timeout subscribers",
-    "moderation-clips-toggle": "Timeout clips",
-    "moderation-spaces-toggle": "Timeout links with spaces",
     "global": "Global",
     "user": "User",
     "alerts": "Alerts",
@@ -825,25 +689,9 @@
     "spam": "Spam",
     "colors": "Colors",
     "emotes": "Emotes",
-    "trigger-length-of-message": "Trigger length of message",
-    "max-symbols-consecutively": "Max symbols consecutively",
-    "max-symbols-percentage": "Max symbols percentage",
-    "max-capitals-percentage": "Max capitals percentage",
-    "max-spam-length": "Max spam length",
-    "max-emotes-in-message": "Max emotes in message",
-    "timeout-duration": "Timeout duration",
-    "timeout-settings": "Timeout settings",
-    "timeout-blacklist": "Blacklist",
-    "timeout-whitelist": "Whitelist",
     "one-record-per-line": "one record per line",
-    "warnings-before-user-timeout": "Warnings before user timeout",
-    "warning-should-be-timeout": "Warning is 1s timeout (deletes chat)",
-    "announce-timeouts-in-chat": "Announce timeouts in chat",
     "on": "on",
     "off": "off",
-    "will-timeout": "timeout",
-    "warning": "warning",
-    "announce": "announce",
     "muted": "muted",
     "search-by-username": "Search by username",
     "create-and-use-a-new-game": "Create and use a new game",

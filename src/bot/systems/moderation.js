@@ -71,7 +71,7 @@ class Moderation extends System {
       warnings: {
         warningCount: 3,
         announce: true,
-        timeout: true
+        shouldClearChat: true
       },
       commands: [
         { name: '!permit', fnc: 'permitLink', permission: constants.OWNER_ONLY }
@@ -110,7 +110,7 @@ class Moderation extends System {
   async timeoutUser (sender, text, warning, msg, time, type) {
     let [warningsAllowed, warningsTimeout, announceTimeouts, warnings, silent] = await Promise.all([
       this.settings.warnings.warningCount,
-      this.settings.warnings.timeout,
+      this.settings.warnings.shouldClearChat,
       this.settings.warnings.announce,
       global.db.engine.find(global.systems.moderation.collection.warnings, { username: sender.username }),
       this.isSilent(type)

@@ -1,4 +1,4 @@
-/* globals translations, commons, Vue, _ */
+/* globals translations, commons, Vue, _ $ */
 
 /* div with html filters */
 window.textWithTags = {
@@ -23,6 +23,42 @@ window.textWithTags = {
   template: `
     <div style="flex: 1 1 auto;" v-html="$options.filters.filterize(value)"></div>
     `
+}
+
+/* text input for settings  */
+window.textInput = {
+  props: ['value', 'title', 'type'],
+  methods: {
+    update: function () {
+      if (this.type === 'number') {
+        if (_.isFinite(Number(this.currentValue))) this.currentValue = Number(this.currentValue)
+        else this.currentValue = this.value
+      }
+      this.$emit('update', this.currentValue)
+    }
+  },
+  data: function () {
+    return {
+      currentValue: this.value,
+      translatedTitle: commons.translate(this.title)
+    }
+  },
+  mounted: function () {
+    $('.textInputTooltip').tooltip()
+  },
+  template: `
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
+          <template v-else>
+            {{ translatedTitle.title }}
+            <small class="textInputTooltip text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+          </template>
+        </span>
+      </div>
+      <input v-on:keyup="update" v-model="currentValue" class="form-control" type="text" />
+    </div>`
 }
 
 /* command input for settings  */

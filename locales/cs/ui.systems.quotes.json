@@ -20,5 +20,12 @@
     "atLeastOneTag": "Musíte nastavit alespoň jeden tag"
   },
   "tag-filter": "Filtrování dle tagu",
-  "warning": "Tato akce nemůže být vrácena!"
+  "warning": "Tato akce nemůže být vrácena!",
+  "settings": {
+    "enabled": "Status",
+    "urlBase": {
+      "title": "Adresa URL",
+      "help": "Pro citace byste měli použít veřejný koncový bod, který bude přístupný <strong>všem</strong>"
+    }
+  }
 }

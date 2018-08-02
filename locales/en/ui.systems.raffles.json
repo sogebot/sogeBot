@@ -2,5 +2,20 @@
   "widget": {
     "subscribers-luck": "Subscribers luck",
     "followers-luck": "Followers luck"
+  },
+  "settings": {
+    "enabled": "Status",
+    "raffleAnnounceInterval": {
+      "title": "Announce interval",
+      "help": "in minutes"
+    },
+    "subscribersPercent": {
+      "title": "Additional subscribers luck",
+      "help": "in percents"
+    },
+    "followersPercent": {
+      "title": "Additional followers luck",
+      "help": "in percents"
+    }
   }
 }

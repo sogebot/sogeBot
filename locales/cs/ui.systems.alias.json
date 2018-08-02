@@ -14,5 +14,8 @@
   "error": {
     "isEmpty": "Tato hodnota nesmí být prázdná"
   },
-  "warning": "Tato akce nemůže být vrácena!"
+  "warning": "Tato akce nemůže být vrácena!",
+  "settings": {
+    "enabled": "Status"
+  }
 }

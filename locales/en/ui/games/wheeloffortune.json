@@ -22,6 +22,9 @@
     "response": "Remove response"
   },
   "addOption": "Add option",
-  "noOptionsFound": "No options were found",
-  "test": "Test"
+  "test": "Test",
+  "settings": {
+    "enabled": "Status"
+  },
+  "noOptionsFound": "No options found. Click button bellow to add new option."
 }

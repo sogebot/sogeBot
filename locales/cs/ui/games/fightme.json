@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "cooldown": "Cooldown",
+    "timeout": {
+      "title": "Čas trvání timeoutu",
+      "help": "Sekundy"
+    },
+    "bypassCooldownByOwnerAndMods": "Bypass cooldownu majitelem a moderátory"
+  }
+}

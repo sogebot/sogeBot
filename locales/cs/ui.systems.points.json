@@ -1,0 +1,15 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "name": {
+      "title": "název",
+      "help": "<strong>Možné formáty:</strong><br> point|points <br> bod|4:body|bodu"
+    },
+    "interval": "Minutový interval pro přidání bodů online uživatelům při online streamu",
+    "offlineInterval": "Minutový interval pro přidání bodů online uživatelům při offline streamu",
+    "messageInterval": "Kolik zpráv pro přidání body",
+    "perInterval": "Kolik bodů přidat na online interval",
+    "perOfflineInterval": "Kolik bodů přidat na offline interval",
+    "perMessageInterval": "Kolik bodů přidat na interval zpráv"
+  }
+}

@@ -144,7 +144,7 @@ let migration = {
 
         'moderationWarnings': 'systems.moderation.settings.warnings.warningCount',
         'moderationAnnounceTimeouts': 'systems.moderation.settings.warnings.announce',
-        'moderationWarningsTimeouts': 'systems.moderation.settings.warnings.timeout',
+        'moderationWarningsTimeouts': 'systems.moderation.settings.warnings.shouldClearChat',
 
         'pointsName': 'systems.points.settings.points.name',
         'pointsInterval': 'systems.points.settings.points.interval',
@@ -168,9 +168,13 @@ let migration = {
             ?(?<key> [a-zA-Z]*)`, 'ix')
           const match = XRegExp.exec(n, regexp)
           if (match.key.trim().length === 0) match.key = undefined
-          await global.db.engine.insert(match.collection, { category: match.category, key: match.key, isMultiValue: false, value: item.value })
-          await global.db.engine.remove('settings', { key: o })
-          processed++
+          if (!_.isNil(item.value)) {
+            await global.db.engine.insert(match.collection, { category: match.category, key: match.key, isMultiValue: false, value: item.value })
+            await global.db.engine.remove('settings', { key: o })
+            processed++
+          } else {
+            console.warn(`Settings ${match.category} ${match.key} is missing value`)
+          }
         }
       }
 

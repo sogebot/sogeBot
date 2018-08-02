@@ -1,0 +1,20 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "whitelist": "Whitelist",
+    "blacklist": "Blacklist",
+    "moderateSubscribers": "Moderate subscribers",
+    "timeout": "Timeout duration",
+    "shouldClearChat": "Should clear chat (will timeout for 1s)",
+    "includeSpaces": "Include spaces",
+    "includeClips": "Include clips",
+    "triggerLength": "Trigger length of message",
+    "maxSymbolsConsecutively": "Max symbols consecutively",
+    "maxSymbolsPercent": "Max symbols %",
+    "maxCapsPercent": "Max caps %",
+    "maxLength": "Max length",
+    "maxCount": "Max count",
+    "announce": "Announce timeouts in chat for everyone",
+    "warningCount": "Warning count"
+  }
+}

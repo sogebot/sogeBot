@@ -1,0 +1,14 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "volume": "Volume",
+    "duration": {
+      "title": "Max song duration",
+      "help": "In minutes"
+    },
+    "shuffle": "Shuffle",
+    "songrequest": "Play from song request",
+    "playlist": "Play from playlist",
+    "notify": "Send message on song change"
+  }
+}
