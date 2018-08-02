@@ -2,7 +2,7 @@
   "settings": {
     "enabled": "Status",
     "name": {
-      "title": "název",
+      "title": "Název",
       "help": "<strong>Možné formáty:</strong><br> point|points <br> bod|4:body|bodu"
     },
     "interval": "Minutový interval pro přidání bodů online uživatelům při online streamu",
