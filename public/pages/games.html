@@ -79,7 +79,10 @@
           <div class="widget pt-1 mt-3 border-0 bg-light" style="height: auto">
 
           <div class="pl-2 pr-2 pb-4">
-              <div v-if="isDataChanged" class="btn alert-danger" style="cursor: initial">{{commons.translate('dialog.changesPending')}}</div>
+              <div v-if="isDataChanged" class="btn btn-block alert-warning" style="cursor: initial">
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                {{commons.translate('dialog.changesPending')}}
+              </div>
               <button class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 0">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
               <button disabled="disabled" class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 1">
                 <i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
