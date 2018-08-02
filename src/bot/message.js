@@ -242,7 +242,7 @@ class Message {
 
         let [alias, commands, cooldowns, ranks] = await Promise.all([
           global.db.engine.find(global.systems.alias.collection.data, { visible: true, enabled: true }),
-          global.db.engine.find(global.systems.customcommands.collection.data, { visible: true, enabled: true }),
+          global.db.engine.find(global.systems.customCommands.collection.data, { visible: true, enabled: true }),
           global.db.engine.find(global.systems.cooldown.collection.data, { enabled: true }),
           global.db.engine.find(global.systems.ranks.collection.data)])
 
