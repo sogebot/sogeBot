@@ -10,5 +10,8 @@
   "error": {
     "isEmpty": "This value cannot be empty"
   },
-  "warning": "This action cannot be reverted!"
+  "warning": "This action cannot be reverted!",
+  "settings": {
+    "enabled": "Status"
+  }
 }

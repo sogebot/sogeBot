@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "cooldown": "Cooldown",
+    "timeout": {
+      "title": "Timeout duration",
+      "help": "Seconds"
+    },
+    "bypassCooldownByOwnerAndMods": "Bypass cooldown by owner and mods"
+  }
+}

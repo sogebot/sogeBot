@@ -1,0 +1,8 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "all": "All",
+    "followers": "Followers",
+    "subscribers": "Subscribers"
+  }
+}

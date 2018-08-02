@@ -1,0 +1,14 @@
+{
+  "settings": {
+    "enabled": "Status",
+    "volume": "Hlasitost",
+    "duration": {
+      "title": "Maximální délka skladby",
+      "help": "v minutách"
+    },
+    "shuffle": "Zamíchat",
+    "songrequest": "Přehrávání ze song requestu",
+    "playlist": "Přehrávání z playlistu",
+    "notify": "Odeslat zprávu při změně skladby"
+  }
+}

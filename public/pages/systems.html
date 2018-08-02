@@ -10,7 +10,10 @@
           {{ commons.translate('menu.' + selectedSystem) }}
         </span>
 
-        <template v-for="(value, category) of settings" v-if="category !== '_permissions'">
+        <template v-if="state.loading === 1">
+          <div class="alert alert-info text-center"><i class="fas fa-circle-notch fa-spin"></i> loading settings from server ...</div>
+        </template>
+        <template v-for="(value, category) of settings" v-if="category !== '_permissions' && state.loading === 0">
           <h6>{{ category }}</h6>
           <div class="card mb-2" >
             <div class="card-body">
@@ -26,7 +29,7 @@
                 ></command-input-with-permission>
                 <toggle
                   class="pt-1 pb-1"
-                  v-bind:title="commons.translate('settings.' + selectedSystem + '.' + defaultValue)"
+                  v-bind:title="commons.translate('systems.' + selectedSystem + '.settings.' + defaultValue)"
                   v-else-if="typeof currentValue === 'boolean'"
                   v-bind:value="currentValue"
                   v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
@@ -35,18 +38,18 @@
                   class="pt-1 pb-1"
                   v-else-if="currentValue.constructor === Array"
                   v-bind:value="currentValue"
-                  v-bind:title="commons.translate('settings.' + selectedSystem + '.' + defaultValue)"
+                  v-bind:title="commons.translate('systems.' + selectedSystem + '.settings.' + defaultValue)"
                   v-on:update="value[defaultValue] = $event; triggerDataChange()"
                 ></textarea-from-array>
-                <command-input
+                <text-input
                   v-else
                   class="pt-1 pb-1"
                   v-bind:type="typeof currentValue"
                   v-bind:value="currentValue"
-                  v-bind:command="defaultValue"
+                  v-bind:title="'systems.' + selectedSystem + '.settings.' + defaultValue"
                   :permission="settings._permissions[defaultValue]"
                   v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
-                ></command-input>
+                ></text-input>
               </div>
             </div>
           </div>
@@ -101,7 +104,7 @@
       el: '#settingsSystemApp',
       components: {
         'toggle': toggleEnable,
-        'command-input': commandInput,
+        'text-input': textInput,
         'command-input-with-permission': commandInputWithPermissions,
         'textarea-from-array': textAreaFromArray
       },
@@ -113,6 +116,7 @@
         isDataChanged: false,
 
         state: {
+          loading: 0,
           settings: 0
         }
       },
@@ -138,7 +142,11 @@
         loadSystemSettings: function (system) {
           this.settings = { settings: {} }
           this.state.settings = 0
+          this.state.loading = 1
           this.socket[system].emit('settings', (err, settings) => {
+            if (system !== this.selectedSystem) return // skip if we quickly changed system
+
+            this.state.loading = 0
             let _settings = _(settings).toPairs().value()
 
             // sorting

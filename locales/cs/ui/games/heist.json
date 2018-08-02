@@ -1,0 +1,31 @@
+{
+  "name": "Loupež",
+  "settings": {
+    "enabled": "Status",
+    "showMaxUsers": "Maximální počet uživatelů k zobrazení",
+    "copsCooldownInMinutes": {
+      "title": "Čas mezi heisty",
+      "help": "Minuty"
+    },
+    "entryCooldownInSekundy": {
+      "title": "Čas pro vstup do heistu",
+      "help": "Sekundy"
+    },
+    "started": "Zpráva o startu heistu",
+    "nextLevelMessage": "Zpráva při dosažení další úrovně",
+    "maxLevelMessage": "Zpráva při dosažení maximální úrovně",
+    "copsOnPatrol": "Zpráva, když je heist v cooldownu",
+    "copsCooldown": "Oznámení bota, kdy může být spuštěna loupež",
+    "singleUserSuccess": "Zpráva o úspěchu jednoho uživatele",
+    "singleUserFailed": "Zpráva o neúspěchu jednoho uživatele",
+    "noUser": "Zpráva, když se nikdo nezúčastnil heistu"
+  },
+  "noResultsFound": "Nebyly nalezeny žádné výsledky. Kliknutím na tlačítko níže přidáte nový výsledek.",
+  "noLevelsFound": "Nebyly nalezeny žádné úrovně. Klepnutím na tlačítko níže přidáte novou úroveň.",
+  "andXMore": "A X dalších",
+  "message": "Zpráva",
+  "winPercentage": "Šance výhry",
+  "payoutMultiplier": "Násobitel výplaty",
+  "maxUsers": "Maximální počet uživatelů pro level",
+  "percentage": "Procento výher"
+}
