@@ -23,6 +23,8 @@ class Yoursystem extends System {
     super({settings, dependsOn})
   }
 }
+
+module.exports = new Yoursystem()
 ```
 
 ### Depends on different system
