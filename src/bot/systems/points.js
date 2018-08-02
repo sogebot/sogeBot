@@ -48,10 +48,10 @@ class Points extends System {
       if (!(await this.isEnabled())) return new Timeout().recursive({ uid: `updatePoints`, this: this, fnc: this.updatePoints, wait: 5000 })
 
       let [interval, perInterval, offlineInterval, perOfflineInterval, isOnline] = await Promise.all([
-        this.settings.interval,
-        this.settings.perInterval,
-        this.settings.offlineInterval,
-        this.settings.perOfflineInterval,
+        this.settings.points.interval,
+        this.settings.points.perInterval,
+        this.settings.points.offlineInterval,
+        this.settings.points.perOfflineInterval,
         global.cache.isOnline()
       ])
 
