@@ -132,11 +132,15 @@ class Module {
             continue // nothing else to do with parsers (not updateable)
           } else if (category === 'commands') {
             let permission = constants.VIEWERS
+            let fnc = null
+            let isHelper = false
             if (_.isObjectLike(key)) {
               permission = key.permission
+              fnc = key.fnc || fnc
+              isHelper = key.isHelper || false
               key = _.isObjectLike(key) ? key.name : key
             }
-            this._commands.push({ name: key, permission })
+            this._commands.push({ name: key, permission, fnc, isHelper })
           } else if (_.isObjectLike(key)) throw Error('You can have only one nested item deep')
 
           this._settings[category][key] = () => {
@@ -395,6 +399,7 @@ class Module {
           })
         }
       }
+      console.log(commands)
       return commands
     } else return []
   }
