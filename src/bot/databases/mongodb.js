@@ -10,10 +10,10 @@ const _ = require('lodash')
 const debug = require('debug')('db:mongodb')
 
 class IMongoDB extends Interface {
-  constructor (createIndexes) {
+  constructor (isCluster) {
     super('mongodb')
 
-    this.createIndexes = createIndexes || false
+    this.createIndexes = !(isCluster || false)
     this.connected = false
     this.client = null
     this.dbName = mongodbUri.parse(config.database.mongodb.url).database
@@ -49,7 +49,6 @@ class IMongoDB extends Interface {
       await db.collection('customTranslations').createIndex('key')
       await db.collection('stats').createIndex('whenOnline')
     }
-
     this.connected = true
   }
 
@@ -216,10 +215,15 @@ class IMongoDB extends Interface {
       let items = await db.collection(table).find(where).toArray()
       return items.length === 1 ? items[0] : items
     } catch (e) {
-      global.log.error(e.stack)
-      if (e.message.match(/EPIPE/g)) {
+      if (e.message.startsWith('E11000 duplicate key error collection')) {
+        // this often means that update was too fast...re-do after io
+        setImmediate(() => this.update(table, where, object))
+      } else if (e.message.match(/EPIPE/g)) {
+        global.log.error(e.stack)
         global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
         process.exit()
+      } else {
+        global.log.error(e.stack)
       }
     }
   }
