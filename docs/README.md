@@ -65,11 +65,6 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 * Cestina
 * English
 
-#### Prerequisites
-
-* Node.js 9.x, 10.x
-* Minimum of 512MB RAM
-
 #### Documentation
 http://sogehige.github.io/sogeBot/#/
 
