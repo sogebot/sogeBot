@@ -24,7 +24,7 @@ class IMongoDB extends Interface {
   }
 
   async connect () {
-    this.client = await client.connect(config.database.mongodb.url, { poolSize: _.get(config, 'database.mongodb.poolSize', 5) })
+    this.client = await client.connect(config.database.mongodb.url, { poolSize: _.get(config, 'database.mongodb.poolSize', 5), useNewUrlParser: true })
 
     // create indexes
     let db = await this.client.db(this.dbName)
