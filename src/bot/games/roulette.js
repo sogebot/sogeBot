@@ -19,7 +19,11 @@ class Roulette extends Game {
       timeout: 10,
       commands: [
         '!roulette'
-      ]
+      ],
+      rewards: {
+        winnerWillGet: 0,
+        loserWillLose: 0
+      }
     }
 
     super({ settings, dependsOn })
@@ -29,7 +33,12 @@ class Roulette extends Game {
     opts.sender['message-type'] = 'chat' // force responses to chat
 
     let isAlive = _.random(0, 1, false)
-    const isMod = await global.commons.isMod(opts.sender)
+
+    const [isMod, winnerWillGet, loserWillLose] = await Promise.all([
+      global.commons.isMod(opts.sender),
+      this.settings.winnerWillGet,
+      this.settings.loserWillLose
+    ])
 
     global.commons.sendMessage(global.translate('gambling.roulette.trigger'), opts.sender)
     if (global.commons.isBroadcaster(opts.sender)) {
@@ -45,6 +54,7 @@ class Roulette extends Game {
     setTimeout(async () => {
       if (!isAlive) global.commons.timeout(opts.sender.username, null, await this.settings.timeout)
       global.commons.sendMessage(isAlive ? global.translate('gambling.roulette.alive') : global.translate('gambling.roulette.dead'), opts.sender)
+      global.db.engine.insert('users.points', { username: opts.sender.username, points: isAlive ? Math.abs(Number(winnerWillGet)) : -Math.abs(Number(loserWillLose)) })
     }, 2000)
   }
 }
