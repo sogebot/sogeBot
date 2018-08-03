@@ -67,7 +67,7 @@ class INeDB extends Interface {
             break
           case 'cache':
           case 'customTranslations':
-            this.table[table].ensureIndex({fieldName: 'key'})
+            this.table[table].ensureIndex({fieldName: 'key', unique: true})
             break
           case 'stats':
             this.table[table].ensureIndex({fieldName: 'whenOnline'})
