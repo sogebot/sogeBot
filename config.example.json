@@ -5,11 +5,11 @@
   "settings": {
     "__COMMENT__": "get bot oauth at http://oauth.sogehige.tv",
     "bot_username": "bot_username_here",
-    "bot_oauth": "bot_oauth_here",
+    "bot_oauth": "oauth:bot_oauth_here",
     "bot_color": "OrangeRed",
     "bot_owners": "bot_owners_here_separated_by_comma",
     "broadcaster_username": "broadcaster_username_here",
-    "broadcaster_oauth": "broadcaster_oauth_here",
+    "broadcaster_oauth": "oauth:broadcaster_oauth_here",
     "client_id": "1wjn1i3792t71tl90fmyvd0zl6ri2vg"
   },
   "panel": {
