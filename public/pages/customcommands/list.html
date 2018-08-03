@@ -164,7 +164,7 @@
 
         },
         deleteCommand: function (id) {
-          this.socket.emit('delete', id, () => {
+          this.socket.emit('delete', {_id: id}, () => {
             this.commands = this.commands.filter((o) => o._id !== id)
           })
         },

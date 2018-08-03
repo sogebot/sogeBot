@@ -139,7 +139,7 @@
       },
       methods: {
         deleteItem: function (id) {
-          this.socket.emit('delete', id, () => {
+          this.socket.emit('delete', {_id: id}, () => {
             this.cooldowns = this.cooldowns.filter((o) => o._id !== id)
           })
         },

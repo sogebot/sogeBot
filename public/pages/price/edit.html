@@ -91,7 +91,7 @@
             return _.filter(this.hasError, (o) => o === true).length === 0
           },
           deleteItem: function () {
-            this.socket.emit('delete', this.id, () => {
+            this.socket.emit('delete', {_id: this.id}, () => {
               page('/#price/list')
             })
           },

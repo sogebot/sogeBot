@@ -133,7 +133,7 @@
           this.socket.emit('update', this.items.filter((o) => o._id === _id))
         },
         deleteItem: function (id) {
-          this.socket.emit('delete', id, () => {
+          this.socket.emit('delete', {_id: id}, () => {
             this.items = this.items.filter((o) => o._id !== id)
           })
         }
