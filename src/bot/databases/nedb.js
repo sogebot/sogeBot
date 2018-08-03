@@ -9,10 +9,10 @@ const Datastore = require('nedb')
 const debug = require('debug')('db:nedb')
 
 class INeDB extends Interface {
-  constructor (createIndexes) {
+  constructor () {
     super('nedb')
 
-    this.createIndexes = createIndexes || false
+    this.createIndexes = true
     this.connected = true
 
     if (!fs.existsSync('./db')) fs.mkdirSync('./db')
