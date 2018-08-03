@@ -17,6 +17,10 @@ class FightMe extends Game {
       _: {
         cooldown: String(new Date())
       },
+      rewards: {
+        winnerWillGet: 0,
+        loserWillLose: 0
+      },
       timeout: 10,
       cooldown: 0,
       bypassCooldownByOwnerAndMods: false,
@@ -91,6 +95,10 @@ class FightMe extends Game {
       }
 
       debug('user vs user')
+      const [winnerWillGet, loserWillLose] = await Promise.all([this.settings.winnerWillGet, this.settings.loserWillLose])
+      global.db.engine.insert('users.points', { username: winner ? opts.sender.username : username, points: Math.abs(Number(winnerWillGet)) })
+      global.db.engine.insert('users.points', { username: !winner ? opts.sender.username : username, points: -Math.abs(Number(loserWillLose)) })
+
       global.commons.timeout(winner ? opts.sender.username : username, null, await this.settings.timeout)
       global.commons.sendMessage(await global.commons.prepare('gambling.fightme.winner', { username, winner: winner ? username : opts.sender.username }), opts.sender)
       global.db.engine.remove(this.collection.users, { _id: challenge._id.toString() })

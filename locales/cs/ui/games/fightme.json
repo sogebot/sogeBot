@@ -6,6 +6,8 @@
       "title": "Čas trvání timeoutu",
       "help": "Sekundy"
     },
-    "bypassCooldownByOwnerAndMods": "Bypass cooldownu majitelem a moderátory"
+    "bypassCooldownByOwnerAndMods": "Bypass cooldownu majitelem a moderátory",
+    "winnerWillGet": "Kolik bodů bude přidáno při výhře",
+    "loserWillLose": "Kolik bodů bude ztraceno při prohře"
   }
 }
