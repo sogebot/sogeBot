@@ -115,7 +115,7 @@
       },
       created: function () {
         this.socket.emit('list', (err, items) => {
-          this.cooldowns = items
+          this.cooldowns = _.orderBy(items, 'key', 'asc')
         })
         this.socket.emit('settings', (err, items) => {
           this.enabled = items.enabled

@@ -118,7 +118,7 @@
       },
       created: function () {
         this.socket.emit('find.timers', (err, items) => {
-          this.items.timers = items.timers
+          this.items.timers = _.orderBy(items.timers, 'name', 'asc')
           this.items.responses = items.responses
         })
         if (localStorage.getItem('/systems/Timers/showAs')) this.showAs = JSON.parse(localStorage.getItem('/systems/Timers/showAs'));

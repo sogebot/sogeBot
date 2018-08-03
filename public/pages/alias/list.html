@@ -121,7 +121,7 @@
       },
       created: function () {
         this.socket.emit('alias', (err, items) => {
-          this.aliases = items
+          this.aliases = _.orderBy(items, 'alias', 'asc')
         })
         this.socket.emit('settings', (err, items) => {
           this.enabled = items.enabled
