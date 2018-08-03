@@ -100,7 +100,7 @@
           return url.replace('%{width}', '133').replace('%{height}', '75')
         },
         deleteItem: function (id) {
-          this.socket.emit('delete', id, () => {
+          this.socket.emit('delete', {_id: id}, () => {
             this.items = this.items.filter((o) => o._id !== id)
           })
         }

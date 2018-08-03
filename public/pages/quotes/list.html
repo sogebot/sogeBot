@@ -118,7 +118,7 @@
         },
         deleteQuote: function (id) {
           this.quotesFromDb = this.quotes.filter((o) => o.id !== id)
-          this.socket.emit('delete', id)
+          this.socket.emit('delete', {_id: id})
         },
       },
       filters: {

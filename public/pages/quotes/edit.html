@@ -80,7 +80,7 @@
           return _.filter(this.hasError, (o) => o === true).length === 0
         },
         deleteQuote: function () {
-          this.socket.emit('delete', this._id, () => {
+          this.socket.emit('delete', {_id: this._id}, () => {
             page('/#quotes/list')
           })
         },
