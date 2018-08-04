@@ -124,7 +124,7 @@
 
     // load up from db
     if (commons.urlParam('id')) {
-      quoteEdit.socket.emit('findOne', { _id: commons.urlParam('id') }, (err, data) => {
+      quoteEdit.socket.emit('findOne', { where: { _id: commons.urlParam('id') } }, (err, data) => {
         quoteEdit._id = data._id
         quoteEdit.id = data.id
         quoteEdit.quote = data.quote
