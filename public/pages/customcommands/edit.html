@@ -182,7 +182,7 @@
       // load up from db
       if (commons.urlParam('id')) {
         customCommandsEdit.id = commons.urlParam('id')
-        customCommandsEdit.socket.emit('findOne', { _id: commons.urlParam('id') }, (err, data) => {
+        customCommandsEdit.socket.emit('findOne', { where: { _id: commons.urlParam('id') } }, (err, data) => {
           customCommandsEdit.response = data.response
           customCommandsEdit.command = data.command
           customCommandsEdit.permission = data.permission

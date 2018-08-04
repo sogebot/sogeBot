@@ -150,7 +150,7 @@
       // load up from db
       if (commons.urlParam('id')) {
         priceEdit.id = commons.urlParam('id')
-        priceEdit.socket.emit('findOne', { _id: commons.urlParam('id') }, (err, data) => {
+        priceEdit.socket.emit('findOne', { where: { _id: commons.urlParam('id') } }, (err, data) => {
           priceEdit.command = data.command
           priceEdit.price = data.price
           priceEdit.enabled = data.enabled

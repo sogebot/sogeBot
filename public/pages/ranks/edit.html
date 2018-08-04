@@ -136,7 +136,7 @@
       // load up from db
       if (commons.urlParam('id')) {
         ranksEdit.id = commons.urlParam('id')
-        ranksEdit.socket.emit('findOne', { _id: commons.urlParam('id') }, (err, data) => {
+        ranksEdit.socket.emit('findOne', { where: { _id: commons.urlParam('id') } }, (err, data) => {
           ranksEdit.hours = data.hours
           ranksEdit.value = data.value
           ranksEdit.$nextTick(() => { ranksEdit.pending = false })
