@@ -270,6 +270,7 @@ window.textAreaWithTags = {
   template: `
     <div style="flex: 1 1 auto;"
       class="form-control border-0 p-0 m-0"
+      style="height: fit-content"
       v-bind:class="{ 'is-invalid': error }">
       <textarea v-on:keydown.enter="onEnter" v-on:blur="editation = false" v-show="editation" ref="textarea" v-model="currentValue" v-bind:placeholder="placeholder" class="form-control" v-bind:style="heightStyle"></textarea>
       <div class="form-control" ref="placeholder" style="cursor: text; overflow: auto; resize: vertical;"
