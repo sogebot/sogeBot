@@ -64,7 +64,7 @@ var commons = {
 
       var output = ''
       output += !_.isNil(options.title) ? '<small class="form-text text-muted">' + options.title + '</small>' : ''
-      output += '<abbr class="form-control" id="' + id + '" data-id="' + options.id +
+      output += '<abbr class="form-control" style="height: fit-content" id="' + id + '" data-id="' + options.id +
       '" data-fnc="' + options.fnc + '" data-filters="' + options.filters.join(',') +
       '" data-errorcontainer="' + options.errorContainer + '" data-value="' + commons.hash(options.text) + '" contenteditable="true" placeholder="' + options.placeholder + '" ' + dataArr.join(' ') + ' data-match="' + options.match + '">' + (!_.isNil(options.mask) ? options.text.replace(/./g, options.mask) : stringAbbr) + '</abbr>'
 
