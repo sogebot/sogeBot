@@ -27,8 +27,20 @@ class Module {
     // populate this._settings
     this._prepare(opts.settings)
     this._sockets()
+    this._cleanEmptySettingsValues()
     this.status()
   }
+
+  async _cleanEmptySettingsValues () {
+    let settings = await global.db.engine.find(this.collection.settings)
+    for (let setting of settings) {
+      if (typeof setting.value === 'undefined') {
+        await global.db.engine.remove(this.collection.settings, { _id: String(setting._id) })
+      }
+    }
+    return new Timeout().recursive({ this: this, uid: `${this.constructor.name}._cleanEmptySettingsValues`, wait: 30000, fnc: this._cleanEmptySettingsValues })
+  }
+
   _sockets () {
     if (_.isNil(global.panel)) return new Timeout().recursive({ this: this, uid: `${this.constructor.name}.sockets`, wait: 1000, fnc: this._sockets })
     else if (cluster.isMaster) {
@@ -155,6 +167,10 @@ class Module {
           Object.defineProperty(this.settings[category], `${key}`, {
             get: () => this._settings[category][key](),
             set: (value) => {
+              if (typeof value === 'undefined') {
+                global.log.error(`Trying to set undefined value ${this.constructor.name} - category: ${category}, key: ${key}`)
+                return
+              }
               const isDefaultValue = value === key
               if (isDefaultValue) global.db.engine.remove(this.collection.settings, { category, key })
               else global.db.engine.update(this.collection.settings, { category, key }, { value })
@@ -174,6 +190,10 @@ class Module {
         Object.defineProperty(this.settings, `${category}`, {
           get: () => this._settings[category](),
           set: (value) => {
+            if (typeof value === 'undefined') {
+              global.log.error(`Trying to set undefined value ${this.constructor.name} - category: ${category}`)
+              return
+            }
             const isDefaultValue = values === value
             if (isDefaultValue) global.db.engine.remove(this.collection.settings, { category })
             else global.db.engine.update(this.collection.settings, { category }, { value })
@@ -198,6 +218,11 @@ class Module {
           Object.defineProperty(this.settings[category], `${key}`, {
             get: () => this._settings[category][key](),
             set: async (values) => {
+              if (typeof values === 'undefined') {
+                global.log.error(`Trying to set undefined value ${this.constructor.name} - category: ${category}, key: ${key}`)
+                return
+              }
+
               if (_.isArray(values)) {
                 if (_.isEqual(_(value).sort().value().filter(String), _(values).sort().value().filter(String))) {
                   global.db.engine.remove(this.collection.settings, { category, key })
