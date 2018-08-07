@@ -23,6 +23,7 @@ const levels = {
   whisperIn: 2,
   whisperOut: 2,
   host: 5,
+  raid: 5,
   follow: 5,
   unfollow: 5,
   cheer: 5,
@@ -67,6 +68,7 @@ if (cluster.isWorker) {
         if (info.level === 'ban') level = '+ban'
         if (info.level === 'follow') level = '+follow'
         if (info.level === 'host') level = '+host'
+        if (info.level === 'raid') level = '+raid'
         if (info.level === 'unfollow') level = '-follow'
         if (info.level === 'cheer') level = '+cheer'
         if (info.level === 'sub') level = '+sub'
