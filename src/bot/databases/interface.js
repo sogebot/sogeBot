@@ -75,6 +75,18 @@ class Interface {
   async incrementOne (table, where, object) {
     throw Error('function incrementOne() is not implemented in ' + this.constructor.name)
   }
+
+  /**
+   * Sets up index of table
+   * note: Indexes should be set only at start on master
+   * @param {object} opts options for indexing
+   * @param {string} opts.table table for indexing
+   * @param {string} opts.index index column
+   * @param {boolean} opts.unique index should be unique
+   */
+  async index (opts) {
+    throw Error('function index() is not implemented in ' + this.constructor.name)
+  }
 }
 
 module.exports = Interface
