@@ -6,7 +6,7 @@ class Interface {
   /**
    * Asynchronous find several results on db
    * @param {string} table table to search
-   * @param {object} where object to find in format {'toFind': 'value'} - example {'id': 'soge__'}
+   * @param {object} where object to find in format {'toFind': 'value', _sort, _total, _sum, _group} - example {'id': 'soge__'}
    * @returns {object} results
    */
   async find (table, where) {
