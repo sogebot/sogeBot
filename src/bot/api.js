@@ -191,7 +191,7 @@ class API {
     }
 
     for (let chatter of chatters) {
-      if (_.includes(ignoredUsers, chatter)) {
+      if (_.includes(ignoredUsers, chatter) || config.settings.bot_username.toLowerCase() === chatter) {
         // even if online, remove ignored user from collection
         await global.db.engine.remove('users.online', { username: chatter })
       } else if (!_.includes(allOnlineUsers, chatter)) {
@@ -199,6 +199,8 @@ class API {
         global.widgets.joinpart.send({ username: chatter, type: 'join' })
       }
     }
+    // always remove bot from online users
+    global.db.engine.remove('users.online', { username: config.settings.bot_username.toLowerCase() })
 
     if (bulkInsert.length > 0) {
       for (let chunk of _.chunk(bulkInsert, 100)) {
