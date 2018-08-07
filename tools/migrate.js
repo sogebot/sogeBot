@@ -170,11 +170,11 @@ let migration = {
           if (match.key.trim().length === 0) match.key = undefined
           if (!_.isNil(item.value)) {
             await global.db.engine.insert(match.collection, { category: match.category, key: match.key, isMultiValue: false, value: item.value })
-            await global.db.engine.remove('settings', { key: o })
             processed++
           } else {
             console.warn(`Settings ${match.category} ${match.key} is missing value`)
           }
+          await global.db.engine.remove('settings', { key: o })
         }
       }
 
