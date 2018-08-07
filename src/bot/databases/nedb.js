@@ -83,12 +83,39 @@ class INeDB extends Interface {
 
     where = where || {}
 
-    var self = this
-    return new Promise(function (resolve, reject) {
+    const sortBy = where._sort || '_id'
+    const sumBy = where._sum || undefined
+    const groupBy = where._group || undefined
+    const total = where._total || undefined
+
+    delete where._sort; delete where._sum; delete where._total; delete where._group
+    where = flatten(where)
+
+    return new Promise((resolve, reject) => {
       try {
-        self.on(table).find(flatten(where), function (err, items) {
+        this.on(table).find(flatten(where), (err, items) => {
           if (err) reject(err)
           if (debug.enabled) debug('find() \n\ttable: %s \n\twhere: %j \n\titems: %j', table, where, items)
+
+          // nedb needs to fake sum and group by
+          if (sumBy || groupBy) {
+            let _items = {}
+            for (let item of items) {
+              if (isNaN(_items[item[groupBy]])) _items[item[groupBy]] = 0
+              _items[item[groupBy]] += Number(item[sumBy])
+            }
+            items = []
+            for (let [_id, sum] of Object.entries(_items)) {
+              items.push({_id, [sumBy]: sum})
+            }
+          }
+
+          // nedb needs to fake sort
+          items = _.orderBy(items, sortBy, 'desc')
+
+          // nedb needs to fake total
+          if (total) items = _.chunk(items, total)[0]
+
           resolve(items)
         })
       } catch (e) {
