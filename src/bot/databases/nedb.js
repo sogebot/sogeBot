@@ -23,6 +23,15 @@ class INeDB extends Interface {
     if (debug.enabled) debug('NeDB initialized')
   }
 
+  async index (opts) {
+    opts.unique = opts.unique || false
+    if (!opts.index) throw new Error('Missing index option')
+    if (!opts.table) throw new Error('Missing table option')
+
+    await this.table[opts.table].removeIndex(opts.index)
+    await this.table[opts.table].ensureIndex({fieldName: opts.index, unique: opts.unique})
+  }
+
   on (table) {
     if (_.isNil(this.table[table])) {
       this.table[table] = new Datastore({ filename: './db/nedb/' + table + '.db', autoload: true })

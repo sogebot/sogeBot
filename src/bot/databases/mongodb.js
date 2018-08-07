@@ -23,6 +23,15 @@ class IMongoDB extends Interface {
     if (debug.enabled) debug('MongoDB initialized')
   }
 
+  async index (opts) {
+    opts.unique = opts.unique || false
+    if (!opts.index) throw new Error('Missing index option')
+    if (!opts.table) throw new Error('Missing table option')
+
+    await this.client.db(this.dbName).collection(opts.table).dropIndexes()
+    await this.client.db(this.dbName).collection(opts.table).createIndex(opts.index, { unique: opts.unique })
+  }
+
   async connect () {
     this.client = await client.connect(config.database.mongodb.url, { poolSize: _.get(config, 'database.mongodb.poolSize', 5), useNewUrlParser: true })
 

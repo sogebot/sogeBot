@@ -124,6 +124,15 @@ class IMasterController extends Interface {
       this.sendRequest(resolve, reject, id, data)
     })
   }
+
+  async index (opts) {
+    const id = crypto.randomBytes(64).toString('hex')
+    const data = { type: 'db', fnc: 'index', opts, id }
+
+    return new Promise((resolve, reject) => {
+      this.sendRequest(resolve, reject, id, data)
+    })
+  }
 }
 
 module.exports = IMasterController

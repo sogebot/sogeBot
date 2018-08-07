@@ -79,8 +79,12 @@ function cluster () {
             case 'update':
               data.items = await global.db.engine.update(data.table, data.where, data.object)
               break
+            case 'index':
+              data.items = await global.db.engine.index(data.opts)
+              break
             default:
-              global.log.error('This db call is not correct\n%j', data)
+              global.log.error('This db call is not correct')
+              global.log.error(data)
           }
           process.send(data)
           workerIsFree.db = true
