@@ -8,17 +8,21 @@
         </a>
       </li>
       <li role="presentation" class="nav-item">
-        <a class="nav-link nav-dropdown" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer">
-          <font-awesome-icon icon="volume-up" v-if="volume >= 65"></font-awesome-icon>
-          <font-awesome-icon icon="volume-down" v-else-if="volume >= 35"></font-awesome-icon>
-          <font-awesome-icon icon="volume-off" v-else></font-awesome-icon>
-          <small>{{ volume }}%</small>
-        </a>
-        <div class="dropdown-menu" data-allow-focus aria-labelledby="dropdownMenuButton" style="padding:0; margin: 0;">
-          <div class="progress" @click="setVolume">
-            <div class="progress-bar" role="progressbar" :style="{ width: volume + '%'}"></div>
-          </div>
-        </div>
+        <span class="dropdown">
+          <a class="nav-link nav-dropdown" id="dropdownMenuButton" data-boundary="viewPort" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer; padding: 10px">
+            <font-awesome-icon icon="volume-up" v-if="volume >= 65"></font-awesome-icon>
+            <font-awesome-icon icon="volume-down" v-else-if="volume >= 35"></font-awesome-icon>
+            <font-awesome-icon icon="volume-off" v-else></font-awesome-icon>
+            <small>{{ volume }}%</small>
+          </a>
+          <span class="dropdown-volume-handler">
+            <div class="dropdown-menu dropdown-force-visible" data-allow-focus aria-labelledby="dropdownMenuButton" style="padding:0; margin: 0;">
+              <div class="progress" @click="setVolume" style="height: 1.5rem">
+                <div class="progress-bar" role="progressbar" :style="{ width: volume + '%'}"></div>
+              </div>
+            </div>
+          </span>
+        </span>
       </li>
       <li class="nav-item ml-auto">
         <h6 class="widget-title">{{ commons.translate('widget-title-soundboard') }}</h6>
@@ -69,6 +73,14 @@ export default {
   },
   mounted: function () {
     this.$emit('mounted')
+
+    $('.dropdown').on('show.bs.dropdown', function() {
+      $('body').append($('.dropdown-force-visible').css({
+        position: 'absolute',
+        left: $('.dropdown-volume-handler').offset().left,
+        top: $('.dropdown-volume-handler').offset().top + 5
+      }).detach())
+    })
   },
   watch: {
     volume: function (val) {
