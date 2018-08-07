@@ -29,6 +29,11 @@ class Module {
     this._sockets()
     this._cleanEmptySettingsValues()
     this.status()
+
+    if (cluster.isMaster) {
+      // add indexing to settings
+      global.db.engine.index({ table: this.collection.settings, index: 'category' })
+    }
   }
 
   async _cleanEmptySettingsValues () {
