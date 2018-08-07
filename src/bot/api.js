@@ -618,13 +618,13 @@ class API {
 
           if (stream.title !== status) {
             // check if status is same as updated status
-            if (this.retries.getCurrentStreamData >= 15) {
+            if (this.retries.getCurrentStreamData >= 12) {
               this.retries.getCurrentStreamData = 0
               rawStatus = stream.title
               await global.cache.rawStatus(rawStatus)
             } else {
               this.retries.getCurrentStreamData++
-              return
+              return new Timeout().recursive({ this: this, uid: 'getCurrentStreamData', wait: 10000, fnc: this.getCurrentStreamData, args: opts })
             }
           } else {
             this.retries.getCurrentStreamData = 0
