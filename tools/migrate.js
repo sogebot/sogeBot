@@ -158,7 +158,7 @@ let migration = {
       console.info('Updating settings')
       console.info(' -> entries')
       for (let [o, n] of Object.entries(mappings)) {
-        let item = await global.db.engine.find('settings', { key: o })
+        let item = await global.db.engine.findOne('settings', { key: o })
         if (!_.isEmpty(item)) {
           let regexp = XRegExp(`
             (?<collection> [a-zA-Z]*.[a-zA-Z]*.settings)
