@@ -319,23 +319,17 @@ class Twitch {
     else type = type[1]
 
     if (type === 'points' && global.commons.isSystemEnabled('points')) {
-      let usersPoints = []
-      for (let user of (await global.db.engine.find('users.points')).map((o) => o.username)) {
-        if (!_.find(usersPoints, (o) => o.username === user)) {
-          usersPoints.push({ username: user, points: await global.systems.points.getPointsOf(user) })
-        }
+      sorted = []
+      for (let user of (await global.db.engine.find('users.watched', { _sort: 'points', _sum: 'points', _total: 20, _group: 'username' }))) {
+        sorted.push({ username: user._id, watched: user.points })
       }
       message = global.translate('top.listPoints').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(usersPoints, function (o) { return !_.isNil(o.points) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'points', 'desc')
     } else if (type === 'time') {
-      let usersWatched = []
-      for (let user of (await global.db.engine.find('users.watched')).map((o) => o.username)) {
-        if (!_.find(usersWatched, (o) => o.username === user)) {
-          usersWatched.push({ username: user, watched: await global.users.getWatchedOf(user) })
-        }
+      sorted = []
+      for (let user of (await global.db.engine.find('users.watched', { _sort: 'watched', _sum: 'watched', _total: 20, _group: 'username' }))) {
+        sorted.push({ username: user._id, watched: user.watched })
       }
       message = global.translate('top.listWatched').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(usersWatched, function (o) { return !_.isNil(o.watched) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'watched', 'desc')
     } else if (type === 'tips') {
       let users = {}
       message = global.translate('top.listTips').replace(/\$amount/g, 10)
@@ -346,14 +340,11 @@ class Twitch {
       }
       sorted = _.orderBy(users, 'amount', 'desc')
     } else {
-      let usersMessages = []
-      for (let user of (await global.db.engine.find('users.messages')).map((o) => o.username)) {
-        if (!_.find(usersMessages, (o) => o.username === user)) {
-          usersMessages.push({ username: user, messages: await global.users.getMessagesOf(user) })
-        }
+      sorted = []
+      for (let user of (await global.db.engine.find('users.message', { _sort: 'messages', _sum: 'messages', _total: 20, _group: 'username' }))) {
+        sorted.push({ username: user._id, watched: user.watched })
       }
       message = global.translate('top.listMessages').replace(/\$amount/g, 10)
-      sorted = _.orderBy(_.filter(usersMessages, function (o) { return !_.isNil(o.messages) && !global.commons.isOwner(o.username) && o.username !== config.settings.bot_username.toLowerCase() }), 'messages', 'desc')
     }
 
     if (sorted.length > 0) {
@@ -364,6 +355,10 @@ class Twitch {
         if (!_.isEmpty(ignoredUser)) ignored.push(user.username)
       }
       _.remove(sorted, (o) => _.includes(ignored, o.username))
+
+      // remove broadcaster and bot accounts
+      _.remove(sorted, o => _.includes([config.settings.broadcaster_username.toLowerCase(), config.settings.bot_username.toLowerCase()], o.username))
+
       sorted = _.chunk(sorted, 10)[0]
 
       for (let user of sorted) {
