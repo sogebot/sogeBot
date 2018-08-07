@@ -343,7 +343,7 @@ window.wofTextArea = {
     }
   },
   template: `
-    <div style="flex: 1 1 auto;">
+    <div style="flex: 1 1 auto; height: fit-content">
       <textarea v-on:blur="editation = false" v-show="editation" ref="textarea" v-model="currentValue" v-bind:placeholder="placeholder" class="form-control" v-bind:style="heightStyle"></textarea>
       <div class="form-control" ref="div" style="cursor: text; overflow: auto; resize: vertical;"
         v-show="!editation"
@@ -403,7 +403,7 @@ window.wofResponses = {
         {{ commons.translate('games.wheeloffortune.noOptionsFound') }}
       </div>
       <template v-for="(option, index) of w_options">
-        <div class="input-group" v-bind:class="{ 'pt-4': index > 0 }">
+        <div class="input-group" style="height: fit-content" v-bind:class="{ 'pt-4': index > 0 }">
           <div class="input-group-prepend">
             <span class="input-group-text">{{ commons.translate('games.wheeloffortune.title.name') }}</span>
           </div>
@@ -413,14 +413,14 @@ window.wofResponses = {
             v-on:input="updateOption(index, option.title)">
           <button v-on:click="removeOption(index)" class="btn btn-danger btn-sm"><i class="fas fa-minus"></i> {{ commons.translate('games.wheeloffortune.remove.option') }}</button>
         </div>
-        <div class="input-group">
+        <div class="input-group" style="height: fit-content">
           <div class="input-group-prepend">
             <span class="input-group-text d-block text-left">
               <div>{{ commons.translate('games.wheeloffortune.responses.name') }}</div>
               <small>{{ commons.translate('games.wheeloffortune.responses.help') }}</small>
             </span>
           </div>
-          <div class="form-control p-0 border-0">
+          <div class="form-control p-0 border-0" style="height: fit-content">
             <template v-if="option.responses.length > 1" v-for="(response, index2) of option.responses">
               <div class="d-flex">
                 <textarea-with-tags
