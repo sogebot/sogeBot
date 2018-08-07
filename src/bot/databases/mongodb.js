@@ -58,10 +58,25 @@ class IMongoDB extends Interface {
       let regexp = new RegExp('^[0-9a-fA-F]{24}$')
       if (regexp.test(where._id)) where._id = new ObjectID(where._id)
       else return {}
-    } else where = flatten(where)
+    }
+
+    const sortBy = where._sort || '_id'
+    const sumBy = where._sum || undefined
+    const groupBy = where._group || undefined
+    const total = where._total || undefined
+
+    delete where._sort; delete where._sum; delete where._total; delete where._group
+    where = flatten(where)
     try {
       let db = this.client.db(this.dbName)
-      let items = await db.collection(table).find(where)
+      let items
+
+      if (!sumBy || !groupBy) {
+        items = await db.collection(table).find(where).sort({ [sortBy]: 1 }).limit(Number(total))
+      } else {
+        const group = {_id: `$${groupBy}`, [sumBy]: { $sum: `$${sumBy}` }}
+        items = await db.collection(table).aggregate([{$group: group}]).sort({ [sortBy]: -1 }).limit(Number(total))
+      }
       return items.toArray()
     } catch (e) {
       global.log.error(e.stack)
