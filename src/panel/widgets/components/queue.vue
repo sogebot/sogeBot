@@ -132,7 +132,7 @@ import { faEyeSlash } from '@fortawesome/free-regular-svg-icons';
 library.add(faLock, faUsers, faUser, faEyeSlash, faCheck, faTimes, faHeart, faStar, faLockOpen, faHandPointer, faRandom)
 
 export default {
-  props: ['token', 'commons'],
+  props: ['token', 'commons', 'popout'],
   components: {
     'font-awesome-icon': FontAwesomeIcon
   },
