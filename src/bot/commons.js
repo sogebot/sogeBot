@@ -275,15 +275,24 @@ Commons.prototype.compactDb = async function (opts) {
       if (_.isNaN(items[item[opts.index]]) || _.isNil(items[item[opts.index]])) items[item[opts.index]] = 0
       let value = !_.isNaN(parseInt(_.get(item, opts.values, 0))) ? parseInt(_.get(item, opts.values, 0)) : 0
       items[item[opts.index]] = parseInt(items[item[opts.index]], 10) + value
+      const data = {}; data[opts.values] = Number(items[item[opts.index]])
       if (_.isNil(idsToUpdate[item[opts.index]])) {
         // we don't have id which we will use for compaction
         idsToUpdate[item[opts.index]] = String(item._id)
+        await global.db.engine.update(opts.table, { _id: idsToUpdate[item[opts.index]] }, data)
       } else {
-        const data = {}; data[opts.values] = Number(items[item[opts.index]])
-        await Promise.all([
-          global.db.engine.update(opts.table, { _id: idsToUpdate[item[opts.index]] }, data),
-          global.db.engine.remove(opts.table, { _id: item._id.toString() })
-        ])
+        if (isNaN(data[opts.values])) {
+          // remove if value is not a number
+          await Promise.all([
+            global.db.engine.remove(opts.table, { _id: idsToUpdate[item[opts.index]] }),
+            global.db.engine.remove(opts.table, { _id: item._id.toString() })
+          ])
+        } else {
+          await Promise.all([
+            global.db.engine.update(opts.table, { _id: idsToUpdate[item[opts.index]] }, data),
+            global.db.engine.remove(opts.table, { _id: item._id.toString() })
+          ])
+        }
       }
     }
   } else {
