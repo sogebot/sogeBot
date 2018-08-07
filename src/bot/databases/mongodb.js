@@ -13,7 +13,7 @@ class IMongoDB extends Interface {
   constructor (isCluster) {
     super('mongodb')
 
-    this.createIndexes = !(isCluster || false)
+    this.createIndexes = (isCluster || false)
     this.connected = false
     this.client = null
     this.dbName = mongodbUri.parse(config.database.mongodb.url).database
