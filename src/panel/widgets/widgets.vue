@@ -82,10 +82,10 @@ export default {
   methods: {
     initGridStack: function () {
       const options = { cellHeight: 42, verticalMargin: 10, removable: true, removeTimeout: 100, handleClass: 'card-header' }
-
       this.$nextTick(function () {
         if ($('.grid-stack').length === 0) return
         $('.grid-stack').gridstack(options)
+        $('.grid-stack-item').draggable({cancel: "div.not-draggable" });
 
         $('.grid-stack').off('change').on('change', () => {
           let widgets = []
