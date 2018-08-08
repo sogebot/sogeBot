@@ -157,7 +157,7 @@ class Message {
           }
           return state.isEval ? state.updated.currentValue : ''
         }
-        return global.customvariables.getValueOf(variable, { sender: attr.sender })
+        return global.customvariables.getValueOf(variable, { sender: attr.sender, param: attr.param })
       },
       // force quiet variable set
       '$!_#': async (variable) => {
@@ -168,7 +168,7 @@ class Message {
           let state = await global.customvariables.setValueOf(variable, attr.param, { sender: attr.sender })
           return state.isEval ? state.updated.currentValue : ''
         }
-        return global.customvariables.getValueOf(variable, { sender: attr.sender })
+        return global.customvariables.getValueOf(variable, { sender: attr.sender, param: attr.param })
       }
     }
     let param = {
