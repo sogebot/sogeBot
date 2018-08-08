@@ -47,6 +47,7 @@ class INeDB extends Interface {
         case 'users.points':
         case 'users.messages':
         case 'users.watched':
+        case 'cache.hosts':
           this.table[table].removeIndex('username')
           break
         case 'cache':
@@ -66,6 +67,7 @@ class INeDB extends Interface {
             this.table[table].ensureIndex({fieldName: 'timestamp'})
             break
           case 'users':
+          case 'cache.hosts':
             this.table[table].ensureIndex({fieldName: 'username', unique: true})
             break
           case 'users.online':

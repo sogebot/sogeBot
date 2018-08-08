@@ -532,7 +532,7 @@ Users.prototype.delete = function (username) {
 }
 
 Users.prototype.updateWatchTime = async function (lastUpdate) {
-  let timeout = 1000
+  let timeout = 60000
   try {
     // count watching time when stream is online
     if (await global.cache.isOnline()) {
