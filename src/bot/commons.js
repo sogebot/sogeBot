@@ -269,7 +269,7 @@ Commons.prototype.compactDb = async function (opts) {
   let itemsFromDb = await global.db.engine.find(opts.table)
 
   // compact online/offline only if users are involved
-  const isOnline = (await global.cache.isOnline()) && opts.index === 'username'
+  const isOnline = (await global.cache.isOnline())
   if (!isOnline) {
     for (let item of itemsFromDb) {
       if (_.isNaN(items[item[opts.index]]) || _.isNil(items[item[opts.index]])) items[item[opts.index]] = 0
@@ -293,27 +293,6 @@ Commons.prototype.compactDb = async function (opts) {
             global.db.engine.remove(opts.table, { _id: item._id.toString() })
           ])
         }
-      }
-    }
-  } else {
-    // compact only offline users if stream online
-    // we can expect this part of code only if users are involved
-    const onlineUsers = (await global.db.engine.find('users.online')).map((o) => o.username)
-    for (let item of itemsFromDb) {
-      if (_.includes(onlineUsers, item.username)) continue // don't compact online user
-      if (_.isNaN(items[item[opts.index]]) || _.isNil(items[item[opts.index]])) items[item[opts.index]] = 0
-      let value = !_.isNaN(parseInt(_.get(item, opts.values, 0))) ? parseInt(_.get(item, opts.values, 0)) : 0
-      items[item[opts.index]] = parseInt(items[item[opts.index]], 10) + value
-
-      if (_.isNil(idsToUpdate[item[opts.index]])) {
-        // we don't have id which we will use for compaction
-        idsToUpdate[item[opts.index]] = String(item._id)
-      } else {
-        const data = {}; data[opts.values] = Number(items[item[opts.index]])
-        await Promise.all([
-          global.db.engine.update(opts.table, { _id: idsToUpdate[item[opts.index]] }, data),
-          global.db.engine.remove(opts.table, { _id: item._id.toString() })
-        ])
       }
     }
   }
