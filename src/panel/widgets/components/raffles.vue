@@ -40,7 +40,7 @@
     <div class="tab-content">
       <div role="tabpanel" class="tab-pane" id="raffles-participants">
         <div class="input-group">
-          <input type="text" class="form-control" placeholder="Search..." v-model="search">
+          <input type="text" class="form-control" :placeholder="commons.translate('placeholder-search')" v-model="search">
           <span class="input-group-btn">
             <button class="btn btn-danger" type="button" title="Cancel search" @click="search = ''">
               <font-awesome-icon icon="trash"></font-awesome-icon>
@@ -56,7 +56,7 @@
           </li>
           <li class="text-danger">
             <font-awesome-icon icon="eye-slash"></font-awesome-icon>
-            {{Math.abs(fParticipants.length - participants.length)}} hidden
+            {{Math.abs(fParticipants.length - participants.length)}} {{commons.translate('hidden')}}
           </li>
         </ul>
       </div>
@@ -79,7 +79,7 @@
           <div class="input-group-prepend">
               <span class="input-group-text">!</span>
           </div>
-          <input type="text" class="form-control" placeholder="Enter keyword..." v-model="keyword" :disabled="running">
+          <input type="text" class="form-control" :placeholder="commons.translate('placeholder-enter-keyword')" v-model="keyword" :disabled="running">
           <span class="input-group-btn btn-group">
             <button type="button" class="btn btn-success" :disabled="!running" @click="socket.emit('pick')">
               <font-awesome-icon icon="trophy" fixed-width></font-awesome-icon>
