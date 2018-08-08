@@ -28,8 +28,15 @@ class IMongoDB extends Interface {
     if (!opts.index) throw new Error('Missing index option')
     if (!opts.table) throw new Error('Missing table option')
 
-    await this.client.db(this.dbName).collection(opts.table).dropIndexes()
-    await this.client.db(this.dbName).collection(opts.table).createIndex(opts.index, { unique: opts.unique })
+    try {
+      let db = await this.client.db(this.dbName)
+      await db.collection(opts.table).dropIndexes()
+      await db.collection(opts.table).createIndex(opts.index, { unique: opts.unique })
+      return
+    } catch (e) {
+      // indexes will be created when collection is available
+      setTimeout(() => this.index(opts), 5000)
+    }
   }
 
   async connect () {
@@ -57,6 +64,7 @@ class IMongoDB extends Interface {
       await db.collection('cache').createIndex('key', { unique: true })
       await db.collection('customTranslations').createIndex('key')
       await db.collection('stats').createIndex('whenOnline')
+      await db.collection('cache.hosts').createIndex('username', { unique: true })
     }
     this.connected = true
   }

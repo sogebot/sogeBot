@@ -28,11 +28,18 @@ class Module {
     this._prepare(opts.settings)
     this._sockets()
     this._cleanEmptySettingsValues()
+    this._indexDbs()
     this.status()
+  }
 
+  async _indexDbs () {
     if (cluster.isMaster) {
-      // add indexing to settings
-      global.db.engine.index({ table: this.collection.settings, index: 'category' })
+      if (!global.db.engine.connected) {
+        new Timeout().recursive({ this: this, uid: `${this.constructor.name}._indexDbs`, wait: 1000, fnc: this._indexDbs })
+      } else {
+        // add indexing to settings
+        global.db.engine.index({ table: this.collection.settings, index: 'category' })
+      }
     }
   }
 
