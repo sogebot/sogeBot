@@ -1,5 +1,6 @@
 {
   "settings": {
     "enabled": "Status"
-  }
+  },
+  "warning": "Tato akce nemůže být vrácena!"
 }
