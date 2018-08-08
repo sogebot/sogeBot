@@ -1,5 +1,6 @@
 {
   "settings": {
     "enabled": "Status"
-  }
+  },
+  "warning": "This action cannot be reverted!"
 }
