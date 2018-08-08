@@ -646,8 +646,9 @@
       },
       methods: {
         difference: function (number, current) {
+          number = number || 0
           if (_.isNaN(Number(current)) || this.uptime === '00:00:00' || !this.b_showAvgDiff) return '' // return nothing if current is not number (hidden, etc)
-          else if (number === 0) return this.b_percentage ? `${current * 100}%` : current
+          else if (number === 0) return ''
           else {
             let isPositive = current - number >= 0
             let f_difference =  Math.abs(this.b_percentage ? (Math.round((current - number) / number * 1000) / 10) : current - number)
@@ -656,9 +657,9 @@
             if (current - number === 0) {
               return ''
             } else if (isPositive) {
-              return `<span class="stats-up text-success"><i class="fas fa-caret-up"></i>${f_difference}</span>`
+              return `<small class="stats-up text-success"><i class="fas fa-caret-up"></i>${f_difference}</small>`
             } else {
-              return `<span class="stats-down text-danger"><i class="fas fa-caret-down"></i>${f_difference}</span>`
+              return `<small class="stats-down text-danger"><i class="fas fa-caret-down"></i>${f_difference}</small>`
             }
           }
         },
