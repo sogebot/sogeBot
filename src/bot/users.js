@@ -531,23 +531,30 @@ Users.prototype.delete = function (username) {
   global.db.engine.remove('users', { username: username })
 }
 
-Users.prototype.updateWatchTime = async function (lastUpdate) {
+Users.prototype.updateWatchTime = async function () {
   let timeout = 60000
   try {
     // count watching time when stream is online
     if (await global.cache.isOnline()) {
       let users = await global.db.engine.find('users.online')
+      let updated = []
       for (let onlineUser of users) {
-        let watched = await this.getWatchedOf(onlineUser.username)
-        // add user as a new chatter in a stream
-        if (watched === 0) await global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
-        await global.db.engine.insert('users.watched', { username: onlineUser.username, watched: new Date().getTime() - new Date(lastUpdate).getTime() })
+        updated.push(onlineUser.username)
+        const watched = typeof this.watchedList[onlineUser.username] === 'undefined' ? timeout : new Date().getTime() - new Date(this.watchedList[onlineUser.username]).getTime()
+        await global.db.engine.insert('users.watched', { username: onlineUser.username, watched })
+        this.watchedList[onlineUser.username] = new Date()
+      }
+
+      // remove offline users from watched list
+      for (let u of Object.entries(this.watchedList)) {
+        if (!updated.includes(u[0])) delete this.watchedList[u[0]]
       }
     } else throw Error('stream offline')
   } catch (e) {
+    this.watchedList = {}
     timeout = 1000
   }
-  return new Timeout().recursive({ this: this, uid: `updateWatchTime`, wait: timeout, fnc: this.updateWatchTime, args: [new Date()] })
+  return new Timeout().recursive({ this: this, uid: `updateWatchTime`, wait: timeout, fnc: this.updateWatchTime })
 }
 
 Users.prototype.compactWatchedDb = async function () {
