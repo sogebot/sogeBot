@@ -11,6 +11,7 @@ const cluster = require('cluster')
 const Message = require('./message')
 
 function Commons () {
+  this.compact = {}
   this.registerConfiguration()
 }
 
@@ -270,7 +271,12 @@ Commons.prototype.compactDb = async function (opts) {
 
   // compact online/offline only if users are involved
   const isOnline = (await global.cache.isOnline())
-  if (!isOnline) {
+  const isCompacted = typeof this.compact[opts.table] === 'undefined' ? false : this.compact[opts.table]
+
+  if (isOnline) {
+    this.compact[opts.table] = false
+  } else if (!isOnline && !isCompacted) {
+    this.compact[opts.table] = true
     for (let item of itemsFromDb) {
       if (_.isNaN(items[item[opts.index]]) || _.isNil(items[item[opts.index]])) items[item[opts.index]] = 0
       let value = !_.isNaN(parseInt(_.get(item, opts.values, 0))) ? parseInt(_.get(item, opts.values, 0)) : 0
