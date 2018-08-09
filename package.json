@@ -68,7 +68,6 @@
     "ytpl": "^0.1.12"
   },
   "scripts": {
-    "build:zip": "make && cross-var bestzip sogeBot-$npm_package_version.zip npm-shrinkwrap.json config.example.json src/bot locales/ main.js cluster.js public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ scss/ dist/",
     "standard": "standard main.js && standard test/* && standard libs/* && standard libs/systems/* && standard libs/overlays/* && standard libs/widgets/*",
     "test": "mocha --recursive --timeout 20000 --exit",
     "test:config:mongodb": "cp config.example.json config.json && sed -i -- 's/nedb/mongodb/g' config.json",
