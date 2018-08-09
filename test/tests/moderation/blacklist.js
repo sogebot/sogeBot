@@ -81,6 +81,10 @@ const tests = {
     'should.return.true': [
       'test', 'abc', 'a test', 'test a', 'testa', 'testaa', 'test1', 'test11', 'testрусский', 'test한국어', 'test?', '?test'
     ]
+  },
+  '*саня*': {
+    'should.return.false': ['саня'],
+    'should.return.true': []
   }
 }
 
