@@ -1,6 +1,7 @@
 PATH    := node_modules/.bin:$(PATH)
 SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
+ENV     := production
 
 all : clean dependencies shrinkwrap ui commit
 .PHONY : all
@@ -10,8 +11,10 @@ commit:
 	@git log --oneline -3 | cat
 
 dependencies:
+	@echo -ne "\n\t ----- Installation of production dependencies\n"
+	@npm install -d --production
 	@echo -ne "\n\t ----- Installation of development dependencies\n"
-	@npm install -d --dev
+	@npm install -d --only=dev
 
 shrinkwrap:
 	@echo -ne "\n\t ----- Generating shrinkwrap\n"
@@ -22,7 +25,7 @@ ui:
 	@npx node-sass --output-style expanded --precision 6 scss/themes/light.scss public/dist/css/light.css
 	@npx node-sass --output-style expanded --precision 6 scss/themes/dark.scss public/dist/css/dark.css
 	@echo -ne "\n\t ----- Bundling with webpack\n"
-	@npx webpack
+	@NODE_ENV=$(ENV) npx webpack
 	@echo -ne "\n\t ----- Copying dist files\n"
 	@node tools/copy-dist-files.js
 
