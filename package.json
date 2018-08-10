@@ -74,6 +74,7 @@
     "test:config:nedb": "cp config.example.json config.json",
     "start": "node ./tools/migrate && node ./tools/migrate --delete && cross-env NODE_ENV=production node ./main || true",
     "start-no-migration": "cross-env NODE_ENV=production node ./main || true",
+    "debug": "cross-env NODE_ENV=development node --inspect ./main || true",
     "cleanup": "node ./tools/cleanup.js || true"
   },
   "devDependencies": {
