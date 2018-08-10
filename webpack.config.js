@@ -3,7 +3,7 @@ const path = require('path')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 module.exports = {
-  mode: 'development',
+  mode: process.env.NODE_ENV,
   entry: './src/panel/index.js',
   resolve: {
     alias: {
