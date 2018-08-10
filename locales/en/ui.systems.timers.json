@@ -1,4 +1,6 @@
 {
+  "new": "New Timer",
+  "add_response": "Add Response",
   "settings": {
     "enabled": "Status"
   },

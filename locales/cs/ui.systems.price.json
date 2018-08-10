@@ -1,4 +1,5 @@
 {
+  "new": "Nová Cena",
   "command": {
     "name": "příkaz",
     "placeholder": ""

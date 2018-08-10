@@ -1,4 +1,5 @@
 {
+  "new": "New Custom Command",
   "command": {
     "name": "custom command",
     "placeholder": ""

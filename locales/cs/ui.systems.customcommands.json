@@ -1,4 +1,5 @@
 {
+  "new": "Nový Vlastní Příkaz",
   "command": {
     "name": "vlastní příkaz",
     "placeholder": ""

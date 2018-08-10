@@ -10,5 +10,9 @@
     "songrequest": "Přehrávání ze song requestu",
     "playlist": "Přehrávání z playlistu",
     "notify": "Odeslat zprávu při změně skladby"
-  }
+  },
+  "add_song": "Přidat píseň",
+  "add_or_import": "Přidat skladbu nebo import ze seznamu skladeb",
+  "importing": "Importuji",
+  "importing_done": "Importování Hotovo"
 }
