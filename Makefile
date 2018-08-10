@@ -2,7 +2,7 @@ PATH    := node_modules/.bin:$(PATH)
 SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
 
-all : clean dependencies shrinkwrap ui commit
+all : prepare dependencies shrinkwrap ui commit
 .PHONY : all
 
 commit:
@@ -30,8 +30,10 @@ pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
 	@npx cross-var bestzip sogeBot-$(VERSION).zip npm-shrinkwrap.json config.example.json src/bot locales/ main.js cluster.js public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ scss/ dist/
 
-clean:
+prepare:
 	@echo -ne "\n\t ----- Cleaning up installation\n"
 	@rm -rf node_modules
 	@rm -rf npm-shrinkwrap.json
+
+clean:
 	@rm -rf public/dist/bootstrap* public/dist/carousel/* public/dist/gallery/* public/dist/jquery public/dist/lodash public/dist/velocity-animate public/dist/popper.js public/dist/flv.js public/dist/css/dark.css public/dist/css/light.css
