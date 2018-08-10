@@ -29,6 +29,7 @@ class IMongoDB extends Interface {
     if (!opts.table) throw new Error('Missing table option')
 
     try {
+      if (!this.connected) throw new Error('Not connected yet')
       let db = await this.client.db(this.dbName)
       await db.createCollection(opts.table)
       await db.collection(opts.table).dropIndexes()
@@ -41,7 +42,13 @@ class IMongoDB extends Interface {
   }
 
   async connect () {
-    this.client = await client.connect(config.database.mongodb.url, { poolSize: _.get(config, 'database.mongodb.poolSize', 5), useNewUrlParser: true })
+    this.client = await client.connect(config.database.mongodb.url,
+      {
+        poolSize: _.get(config, 'database.mongodb.poolSize', 5),
+        useNewUrlParser: true,
+        reconnectTries: Number.MAX_VALUE,
+        connectTimeoutMS: 60000
+      })
 
     // create indexes
     let db = await this.client.db(this.dbName)
