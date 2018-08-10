@@ -5,6 +5,11 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 module.exports = {
   mode: 'development',
   entry: './src/panel/index.js',
+  resolve: {
+    alias: {
+      'vue$': 'vue/dist/vue.esm.js'
+    }
+  },
   output: {
     path: path.resolve(__dirname, 'public', 'dist', 'js'),
     filename: 'main.js'

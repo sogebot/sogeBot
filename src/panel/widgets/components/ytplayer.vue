@@ -44,9 +44,9 @@
         </table>
       </div>
       <div role="tabpanel" class="tab-pane active" id="yt-main">
-        <plyr ref="player" :emit="['ready','timeupdate']" @timeupdate="videoTimeUpdated" @ready="ready" :options='{ controls: ["volume"], fullscreen: { enabled: false }, clickToPlay: false }'>
+        <vue-plyr ref="player" :emit="['ready','timeupdate']" @timeupdate="videoTimeUpdated" @ready="ready" :options='{ controls: ["volume"], fullscreen: { enabled: false }, clickToPlay: false }'>
           <div data-plyr-provider="youtube"></div>
-        </plyr>
+        </vue-plyr>
       </div>
 
       <div class="clearfix"></div>
@@ -60,11 +60,9 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faMusic, faList, faPlay, faPause, faForward } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-import Vue from "vue";
-import VuePlyr from 'vue-plyr'
-import "vue-plyr/dist/vue-plyr.css";
 
-Vue.use(VuePlyr)
+import 'vue-plyr'
+import 'vue-plyr/dist/vue-plyr.css'
 
 library.add(faMusic, faList, faPlay, faPause, faForward)
 
