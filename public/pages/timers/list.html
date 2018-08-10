@@ -6,7 +6,7 @@
 
         <div class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
           <div class="col-sm-6">
-            <a class="btn btn-primary" href="#timers/edit"><i class="fas fa-plus"></i> New Timers</a>
+            <a class="btn btn-primary" href="#timers/edit"><i class="fas fa-plus"></i> {{ commons.translate('systems.timers.new') }}</a>
           </div>
           <div class="col-sm-6 text-right form-inline d-block">
             <button class="btn border-0" v-on:click="showAs='cards'" v-bind:class="[ showAs === 'cards' ? 'btn-dark' : 'btn-outline-dark' ]"><i class="fas fa-th-large"></i></button>

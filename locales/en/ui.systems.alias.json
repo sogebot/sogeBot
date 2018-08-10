@@ -1,4 +1,5 @@
 {
+  "new": "New Alias",
   "alias": {
     "name": "alias",
     "placeholder": "Set your !alias here"

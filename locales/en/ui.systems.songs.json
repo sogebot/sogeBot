@@ -10,5 +10,9 @@
     "songrequest": "Play from song request",
     "playlist": "Play from playlist",
     "notify": "Send message on song change"
-  }
+  },
+  "add_song": "Add song",
+  "add_or_import": "Add song or import from playlist",
+  "importing": "Importing",
+  "importing_done": "Importing Done"
 }

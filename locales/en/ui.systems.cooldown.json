@@ -1,4 +1,5 @@
 {
+  "new": "New Cooldown",
   "notify-as-whisper": "Notify as whisper",
   "error": {
     "isEmpty": "This value cannot be empty"

@@ -9,9 +9,9 @@
                 <div class="form-inline">
                   <input type="search" class="form-control w-auto col-6" v-model="toAdd" placeholder="Paste your youtube link, id">
 
-                  <button v-if="state.import == 0" class="btn btn-primary mr-2" v-on:click="addSongOrPlaylist()"><i class="fas fa-plus"></i> Add song</button>
-                  <button v-else-if="state.import == 1" class="btn btn-info mr-2" disabled="disabled"><i class="fas fa-circle-notch fa-spin"></i> Importing</button>
-                  <button v-else class="btn btn-success mr-2" disabled="disabled"><i class="fas fa-check"></i> Importing done</button>
+                  <button v-if="state.import == 0" class="btn btn-primary mr-2" v-on:click="addSongOrPlaylist()"><i class="fas fa-plus"></i> {{ commons.translate('systems.songs.add_song') }}</button>
+                  <button v-else-if="state.import == 1" class="btn btn-info mr-2" disabled="disabled"><i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('systems.songs.importing') }}</button>
+                  <button v-else class="btn btn-success mr-2" disabled="disabled"><i class="fas fa-check"></i> {{ commons.translate('systems.songs.importing_done') }}</button>
 
                   <span class="text-info">{{ importInfo }}</span>
                 </div>

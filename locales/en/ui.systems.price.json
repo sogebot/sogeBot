@@ -1,4 +1,5 @@
 {
+  "new": "New Price",
   "command": {
     "name": "command",
     "placeholder": ""
