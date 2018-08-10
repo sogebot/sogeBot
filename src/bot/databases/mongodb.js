@@ -30,6 +30,7 @@ class IMongoDB extends Interface {
 
     try {
       let db = await this.client.db(this.dbName)
+      await db.createCollection(opts.table)
       await db.collection(opts.table).dropIndexes()
       await db.collection(opts.table).createIndex(opts.index, { unique: opts.unique })
       return
@@ -51,6 +52,7 @@ class IMongoDB extends Interface {
     ]
     for (let table of dropIndexes) {
       if (_.find(collections, (o) => o.name === table)) await db.collection(table).dropIndexes()
+      await db.createCollection(table)
     }
 
     if (this.createIndexes) {
