@@ -7,7 +7,7 @@ all : clean dependencies shrinkwrap ui commit
 
 commit:
 	@echo -ne "\n\t ----- Build commit\n\n"
-	@git log --oneline -3
+	@git log --oneline -3 | cat
 
 dependencies:
 	@echo -ne "\n\t ----- Installation of development dependencies\n"
