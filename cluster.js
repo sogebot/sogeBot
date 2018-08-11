@@ -115,11 +115,11 @@ function cluster () {
 
     if (!isModerated && !isIgnored) {
       if (!skip && !_.isNil(sender.username)) {
-        let data = { id: sender['user-id'], is: { subscriber: _.get(sender, 'subscriber', false), mod: _.get(sender, 'mod', false) }, username: sender.username }
+        let data = { id: sender['userId'], is: { subscriber: _.get(sender, 'isSubscriber', false) || _.get(sender, 'isTurboSubscriber', false), mod: _.get(sender, 'isModerator', false) }, username: sender.username }
         // mark user as online
         await global.db.engine.update('users.online', { username: sender.username }, { username: sender.username })
 
-        if (!_.get(sender, 'subscriber', false)) _.set(data, 'stats.tier', 0) // unset tier if sender is not subscriber
+        if (!_.get(sender, 'isSubscriber', false) || !_.get(sender, 'isTurboSubscriber', false)) _.set(data, 'stats.tier', 0) // unset tier if sender is not subscriber
 
         let user = await global.db.engine.findOne('users', { username: sender.username })
         if (_.isEmpty(user)) await global.db.engine.insert('users', data)

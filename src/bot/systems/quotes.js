@@ -38,7 +38,7 @@ class Quotes extends System {
       if (!_.isEmpty(quotes)) id = _.maxBy(quotes, 'id').id + 1
       else id = 1
 
-      await global.db.engine.insert(this.collection.data, { id, tags, quote, quotedBy: opts.sender['user-id'], createdAt: new Date() })
+      await global.db.engine.insert(this.collection.data, { id, tags, quote, quotedBy: opts.sender['userId'], createdAt: new Date() })
 
       const message = await global.commons.prepare('systems.quotes.add.ok', { id, quote, tags: tags.join(', ') })
       global.commons.sendMessage(message, opts.sender)
