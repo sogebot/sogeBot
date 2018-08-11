@@ -3,7 +3,7 @@ require('module-alias/register')
 
 const figlet = require('figlet')
 const cluster = require('cluster')
-const irc = require('twitch-js')
+const TwitchJs = require('twitch-js').default
 const os = require('os')
 const util = require('util')
 const debug = require('debug')
@@ -48,7 +48,7 @@ if (cluster.isMaster) {
   require('./cluster.js')
 }
 
-function main () {
+async function main () {
   if (!global.db.engine.connected) return setTimeout(() => main(), 10)
 
   global.configuration = new (require('./src/bot/configuration.js'))()
@@ -79,28 +79,60 @@ function main () {
     verticalLayout: 'default'
   }))
 
-  // connect to tmis
-  global.client = global.client || new irc.Client({
-    connection: {
-      reconnect: true
-    },
-    identity: {
-      username: config.settings.bot_username,
-      password: config.settings.bot_oauth
-    },
-    channels: ['#' + config.settings.broadcaster_username]
-  })
+  global.botTMI = new TwitchJs({ token: config.settings.bot_oauth, username: config.settings.bot_username })
+  global.broadcasterTMI = new TwitchJs({ token: config.settings.broadcaster_oauth, username: config.settings.broadcaster_username })
 
-  global.broadcasterClient = new irc.Client({
-    connection: {
-      reconnect: true
-    },
-    identity: {
-      username: config.settings.broadcaster_username,
-      password: config.settings.broadcaster_oauth
-    },
-    channels: ['#' + config.settings.broadcaster_username]
+  global.status.TMI = constants.CONNECTING
+  const connections = new Promise(async (resolve, reject) => {
+    const connect = async (bot, broadcaster, retries) => {
+      try {
+        if (!bot) {
+          global.log.info('Bot is connecting to TMI server')
+          await global.botTMI.chat.connect()
+          await global.botTMI.chat.join(config.settings.broadcaster_username)
+          global.log.info('Bot is connected to TMI server')
+          bot = true
+        }
+      } catch (e) {
+        global.log.info('Bot failed to connect to TMI server')
+        global.log.error(e.stack)
+      }
+
+      try {
+        if (_.get(config, 'settings.broadcaster_oauth', '').match(/oauth:[\w]*/)) {
+          if (!broadcaster) {
+            global.log.info('Broadcaster is connecting to TMI server')
+            await global.broadcasterTMI.chat.connect()
+            await global.broadcasterTMI.chat.join(config.settings.broadcaster_username)
+            global.log.info('Broadcaster is connected to TMI server')
+            broadcaster = true
+          }
+        } else {
+          global.log.error('Broadcaster oauth is not properly set - hosts will not be loaded')
+          global.log.error('Broadcaster oauth is not properly set - subscribers will not be loaded')
+          broadcaster = true
+        }
+      } catch (e) {
+        global.log.info('Broadcaster failed to connect to TMI server')
+        global.log.error(e.stack)
+      }
+
+      retries++
+      if (retries > 15) {
+        reject(new Error('Max retries reached'))
+      } else if (!bot || !broadcaster) {
+        setTimeout(() => {
+          global.status.TMI = constants.RECONNECTING
+          connect(bot, broadcaster, retries)
+        }, 1000 * retries)
+      } else {
+        global.status.TMI = constants.CONNECTED
+        resolve()
+      }
+    }
+    connect(false, false, 0)
   })
+  connections.then(() => {})
 
   global.lib.translate._load().then(function () {
     global.systems = require('auto-load')('./src/bot/systems/')
@@ -110,20 +142,7 @@ function main () {
     global.integrations = require('auto-load')('./src/bot/integrations/')
 
     global.panel.expose()
-
-    global.client.connect()
-    if (_.get(config, 'settings.broadcaster_oauth', '').match(/oauth:[\w]*/)) {
-      global.broadcasterClient.connect()
-    } else {
-      global.log.error('Broadcaster oauth is not properly set - hosts will not be loaded')
-      global.log.error('Broadcaster oauth is not properly set - subscribers will not be loaded')
-    }
-
     loadClientListeners()
-
-    setInterval(function () {
-      global.status.MOD = global.client.isMod('#' + config.settings.broadcaster_username, config.settings.bot_username)
-    }, 60000)
   })
 }
 
@@ -168,147 +187,133 @@ function fork () {
 }
 
 function loadClientListeners (client) {
-  global.client.on('connected', function (address, port) {
-    DEBUG_TMIJS('Bot is connected to TMI server - %s:%s', address, port)
-    global.log.info('Bot is connected to TMI server')
-    global.client.color(config.settings.bot_color)
-    global.status.TMI = constants.CONNECTED
+  global.broadcasterTMI.chat.on('PRIVMSG', async (message) => {
+    if (message.tags.username === 'jtv') {
+      // Someone is hosting the channel and the message contains how many viewers..
+      if (message.message.includes('hosting you')) {
+        const username = message.message.split(' ')[0].replace(':', '')
+        const autohost = message.message.includes('auto')
+        let viewers = '0'
+        if (message.message.includes('hosting you for')) viewers = _.extractNumber(message.message)
+
+        DEBUG_TMIJS(`Hosted by ${username} with ${viewers} viewers - autohost: ${autohost}`)
+        global.log.host(`${username}, viewers: ${viewers}, autohost: ${autohost}`)
+
+        global.db.engine.update('cache.hosts', { username }, { username })
+
+        const data = {
+          username: username,
+          viewers: viewers,
+          autohost: autohost
+        }
+
+        data.type = 'host'
+        global.overlays.eventlist.add(data)
+        global.events.fire('hosted', data)
+      }
+    }
   })
+  global.botTMI.chat.on('PRIVMSG', async (message) => {
+    if (message.tags.username !== 'jtv' && !global.commons.isBot(message.tags.displayName)) {
+      DEBUG_TMIJS('Message received: %s', JSON.stringify(message))
 
-  global.client.on('connecting', function (address, port) {
-    DEBUG_TMIJS('Bot is connecting to TMI server - %s:%s', address, port)
-    global.log.info('Bot is connecting to TMI server')
-    global.status.TMI = constants.CONNECTING
-  })
+      message.tags.username = message.tags.displayName.toLowerCase() // backward compatibility until userID is primary key
+      message.tags['message-type'] = message.message.startsWith('\u0001ACTION') ? 'action' : 'say' // backward compatibility for /me moderation
 
-  global.client.on('reconnect', function (address, port) {
-    DEBUG_TMIJS('Bot is reconnecting to TMI server - %s:%s', address, port)
-    global.log.info('Bot is trying to reconnect to TMI server')
-    global.status.TMI = constants.RECONNECTING
-  })
+      if (message.event === 'CHEER') {
+        cheer(message.tags, message.message)
+      } else {
+        // strip message from ACTION
+        message.message = message.message.replace('\u0001ACTION ', '').replace('\u0001', '')
 
-  global.client.on('message', async function (channel, sender, message, fromSelf) {
-    DEBUG_TMIJS('Message received: %s\n\tuserstate: %s', message, JSON.stringify(sender))
+        sendMessageToWorker(message.tags, message.message)
+        global.linesParsed++
 
-    if (!fromSelf && config.settings.bot_username.toLowerCase() !== sender.username) {
-      sendMessageToWorker(sender, message)
-      global.linesParsed++
+        if (message.tags['message-type'] === 'action') global.events.fire('action', { username: message.tags.username.toLowerCase() })
+      }
     }
   })
 
-  global.client.on('mod', async function (channel, username) {
-    DEBUG_TMIJS('User mod: %s', username)
-    const user = await global.users.get(username)
-    if (!user.is.mod) global.events.fire('mod', { username: username })
-    global.users.set(username, { is: { mod: true } })
-  })
+  global.botTMI.chat.on('CLEARCHAT', message => {
+    console.log(message)
+    if (message.event === 'USER_BANNED') {
+      const duration = message.tags.banDuration
+      const reason = message.tags.banReason
+      const username = message.username.toLowerCase()
 
-  global.client.on('cheer', async function (channel, userstate, message) {
-    cheer(channel, userstate, message)
-  })
-
-  global.client.on('subgift', async function (channel, username, recipient) {
-    subgift(channel, username, recipient)
-  })
-
-  global.client.on('clearchat', function (channel) {
-    global.events.fire('clearchat')
-  })
-
-  global.client.on('subscription', async function (channel, username, method) {
-    subscription(channel, username, method)
-  })
-
-  global.client.on('resub', async function (channel, username, months, message, userstate, method) {
-    resub(channel, username, months, message, userstate, method)
-  })
-
-  global.broadcasterClient.on('connected', function (address, port) {
-    DEBUG_TMIJS('Broadcaster is connected to TMI server - %s:%s', address, port)
-    global.log.info('Broadcaster is connected to TMI server')
-  })
-
-  global.broadcasterClient.on('connecting', function (address, port) {
-    DEBUG_TMIJS('Broadcaster is connecting to TMI server - %s:%s', address, port)
-    global.log.info('Broadcaster is connecting to TMI server')
-  })
-
-  global.client.on('reconnect', function (address, port) {
-    DEBUG_TMIJS('Bot is reconnecting to TMI server - %s:%s', address, port)
-    global.log.info('Bot is trying to reconnect to TMI server')
-    global.status.TMI = constants.RECONNECTING
-  })
-
-  global.client.on('disconnected', function (address, port) {
-    DEBUG_TMIJS('Bot is disconnected to TMI server - %s:%s', address, port)
-    global.log.warning('Bot is disconnected from TMI server')
-    global.status.TMI = constants.DISCONNECTED
-  })
-
-  global.client.on('action', async function (channel, userstate, message, self) {
-    DEBUG_TMIJS('User action: %s\n\tuserstate', message, JSON.stringify(userstate))
-
-    let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: userstate.username })
-    if (!_.isEmpty(ignoredUser) && userstate.username !== config.settings.broadcaster_username) return
-
-    if (self) return
-
-    global.events.fire('action', { username: userstate.username.toLowerCase() })
-  })
-
-  global.client.on('ban', function (channel, username, reason) {
-    DEBUG_TMIJS('User ban: %s with reason %s', username, reason)
-    global.log.ban(`${username}, reason: ${reason}`)
-    global.events.fire('ban', { username: username.toLowerCase(), reason: reason })
-  })
-
-  global.client.on('timeout', function (channel, username, reason, duration) {
-    DEBUG_TMIJS('User timeout: %s with reason %s for %ss', username, reason, duration)
-    global.events.fire('timeout', { username: username.toLowerCase(), reason: reason, duration: duration })
-  })
-
-  global.client.on('raid', function (channel, raider, viewers, userstate) {
-    DEBUG_TMIJS('Raided by %s with %s viewers', raider, viewers)
-    global.log.raid(`${raider}, viewers: ${viewers}`)
-
-    global.db.engine.update('cache.raids', { username: raider }, { username: raider })
-
-    const data = {
-      username: raider,
-      viewers: viewers
-    }
-
-    data.type = 'raid'
-    global.overlays.eventlist.add(data)
-    global.events.fire('raided', data)
-  })
-
-  global.client.on('hosting', function (channel, target, viewers) {
-    DEBUG_TMIJS('Hosting: %s with %s viewers', target, viewers)
-    global.events.fire('hosting', { target: target, viewers: viewers })
-  })
-
-  global.client.on('ritual', function (channel, username, type, userstate) {
-    if (type === 'new_chatter') {
-      global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
+      if (typeof duration === 'undefined') {
+        global.log.ban(`${username}, reason: ${reason}`)
+        global.events.fire('ban', { username: username, reason: reason })
+      } else {
+        global.events.fire('timeout', { username, reason, duration })
+      }
+    } else {
+      global.events.fire('clearchat')
     }
   })
 
-  global.broadcasterClient.on('hosted', async (channel, username, viewers, autohost) => {
-    DEBUG_TMIJS(`Hosted by ${username} with ${viewers} viewers - autohost: ${autohost}`)
-    global.log.host(`${username}, viewers: ${viewers}, autohost: ${autohost}`)
-
-    global.db.engine.update('cache.hosts', { username: username }, { username: username })
-
-    const data = {
-      username: username,
-      viewers: viewers,
-      autohost: autohost
+  global.botTMI.chat.on('HOSTTARGET', message => {
+    if (message.event === 'HOST_ON') {
+      if (typeof message.numberOfViewers !== 'undefined') { // may occur on restart bot when hosting
+        DEBUG_TMIJS('Hosting: %s with %s viewers', message.username, message.numberOfViewers)
+        global.events.fire('hosting', { target: message.username, viewers: message.numberOfViewers })
+      }
     }
+  })
 
-    data.type = 'host'
-    global.overlays.eventlist.add(data)
-    global.events.fire('hosted', data)
+  global.botTMI.chat.on('MODE', async (message) => {
+    DEBUG_TMIJS('User ' + (message.isModerator ? '+mod' : '-mod') + ' ' + message.username)
+    const user = await global.users.get(message.username)
+    if (!user.is.mod && message.isModerator) global.events.fire('mod', { username: message.username })
+    global.users.set(message.username, { is: { mod: message.isModerator } })
+
+    if (message.username === config.settings.bot_username) global.status.MOD = message.isModerator
+  })
+
+  global.botTMI.chat.on('USERNOTICE', message => {
+    if (message.event === 'RAID') {
+      DEBUG_TMIJS('Raided by %s with %s viewers', message.raiderUserName, message.raiderViewerCount)
+      global.log.raid(`${message.raiderUserName}, viewers: ${message.raiderViewerCount}`)
+
+      global.db.engine.update('cache.raids', { username: message.raiderUserName }, { username: message.raiderUserName })
+
+      const data = {
+        username: message.raiderUserName,
+        viewers: message.raiderViewerCount
+      }
+
+      data.type = 'raid'
+      global.overlays.eventlist.add(data)
+      global.events.fire('raided', data)
+    } else if (message.event === 'SUBSCRIPTION') {
+      const method = {
+        plan: message.subPlan === 'Prime' ? 1000 : message.subPlan,
+        prime: message.subPlan === 'Prime' ? 'Prime' : false
+      }
+      subscription(message.tags.displayName.toLowerCase(), method)
+    } else if (message.event === 'RESUBSCRIPTION') {
+      message.tags.username = message.tags.displayName.toLowerCase()
+      const method = {
+        plan: message.subPlan === 'Prime' ? 1000 : message.subPlan,
+        prime: message.subPlan === 'Prime' ? 'Prime' : false
+      }
+      resub(message.tags.username, Number(message.months), message.message, message.tags, method)
+    } else if (message.event === 'SUBSCRIPTION_GIFT') {
+      subgift(message.tags.displayName.toLowerCase(), message.recipientUserName)
+    } else if (message.event === 'RITUAL') {
+      if (message.ritualName === 'new_chatter') {
+        global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
+      } else {
+        global.log.info('Unknown RITUAL')
+      }
+    } else {
+      global.log.info('Unknown USERNOTICE')
+      global.log.info(JSON.stringify(message))
+    }
+  })
+
+  global.botTMI.chat.on('NOTICE', message => {
+    global.log.info(message.message)
   })
 }
 
@@ -329,7 +334,7 @@ if (cluster.isMaster) {
   })
 }
 
-async function subscription (channel, username, method) {
+async function subscription (username, method) {
   DEBUG_TMIJS('Subscription: %s from %j', username, method)
 
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
@@ -341,7 +346,7 @@ async function subscription (channel, username, method) {
   global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
 }
 
-async function resub (channel, username, months, message, userstate, method) {
+async function resub (username, months, message, userstate, method) {
   DEBUG_TMIJS('Resub: %s (%s months) - %s', username, months, message, userstate, method)
 
   let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
@@ -353,7 +358,7 @@ async function resub (channel, username, months, message, userstate, method) {
   global.events.fire('resub', { username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: message })
 }
 
-async function subgift (channel, username, recipient) {
+async function subgift (username, recipient) {
   recipient = recipient.toLowerCase()
   DEBUG_TMIJS('Subgift: from %s to %s', username, recipient)
 
@@ -366,7 +371,7 @@ async function subgift (channel, username, recipient) {
   global.log.subgift(`${recipient}, from: ${username}`)
 }
 
-async function cheer (channel, userstate, message) {
+async function cheer (userstate, message) {
   DEBUG_TMIJS('Cheer: %s\n\tuserstate: %s', message, JSON.stringify(userstate))
 
   // remove cheerX or channelCheerX from message

@@ -317,7 +317,7 @@ class Moderation extends System {
     var emotesCharList = [] // remove emotes from caps checking
     _.each(opts.sender['emotes'], function (emote) {
       _.each(emote, function (list) {
-        _.each(_.range(parseInt(list.split('-')[0], 10), parseInt(list.split('-')[1], 10) + 1), function (val) {
+        _.each(_.range(parseInt(list.start, 10), parseInt(list.end, 10) + 1), function (val) {
           emotesCharList.push(val)
         })
       })
