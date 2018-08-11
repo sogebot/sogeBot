@@ -12,9 +12,9 @@ commit:
 
 dependencies:
 	@echo -ne "\n\t ----- Installation of production dependencies\n"
-	@npm install -d --production
+	@npm install --production
 	@echo -ne "\n\t ----- Installation of development dependencies\n"
-	@npm install -d --only=dev
+	@npm install --only=dev
 
 shrinkwrap:
 	@echo -ne "\n\t ----- Generating shrinkwrap\n"

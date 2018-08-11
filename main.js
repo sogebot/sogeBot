@@ -168,8 +168,8 @@ function fork () {
       global.status['RES'] = (avgTime / global.avgResponse.length).toFixed(0)
     } else if (msg.type === 'say') {
       global.commons.message('say', config.settings.broadcaster_username, msg.message)
-    } else if (msg.type === 'action') {
-      global.commons.message('action', config.settings.broadcaster_username, msg.message)
+    } else if (msg.type === 'me') {
+      global.commons.message('me', config.settings.broadcaster_username, msg.message)
     } else if (msg.type === 'whisper') {
       global.commons.message('whisper', msg.sender, msg.message)
     } else if (msg.type === 'parse') {
@@ -235,7 +235,6 @@ function loadClientListeners (client) {
   })
 
   global.botTMI.chat.on('CLEARCHAT', message => {
-    console.log(message)
     if (message.event === 'USER_BANNED') {
       const duration = message.tags.banDuration
       const reason = message.tags.banReason

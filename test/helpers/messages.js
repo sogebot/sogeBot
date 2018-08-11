@@ -85,8 +85,7 @@ module.exports = {
         for (let e of expected) {
           /*
           console.log(util.inspect(global.log.chatOut.args))
-          console.log(e)
-          console.log(user)
+          console.log({ expected: e, user })
           */
           delete user['message-type'] // remove unnecessary message-type
           if (global.log.chatOut.calledWith(e, sinon.match(user))) {

@@ -99,7 +99,6 @@ Commons.prototype.getTime = function (time, isChat) {
 }
 
 Commons.prototype.sendMessage = async function (message, sender, attr) {
-  if (cluster.isMaster && (_.isNil(global.client) || global.client.readyState() !== 'OPEN')) return setTimeout(() => this.sendMessage(message, sender, attr), 10) // wait for proper connection
   debug('commons:sendMessage')('sendMessage(%s, %j, %j)', message, sender, attr)
   attr = attr || {}
   sender = sender || {}
@@ -123,7 +122,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
     } else {
       global.log.chatOut(message, {username: sender.username})
       if ((await global.configuration.getValue('sendWithMe')) && !message.startsWith('/')) {
-        global.commons.message('action', config.settings.broadcaster_username, message)
+        global.commons.message('me', config.settings.broadcaster_username, message)
       } else {
         global.commons.message('say', config.settings.broadcaster_username, message)
       }
@@ -137,7 +136,7 @@ Commons.prototype.message = function (type, username, message, retry) {
   if (cluster.isWorker) process.send({type: type, sender: username, message: message})
   else {
     try {
-      global.client[type](username, message)
+      global.botTMI.chat[type](username, message)
     } catch (e) {
       if (_.isNil(retry)) setTimeout(() => this.message(type, username, message, false), 5000)
     }
@@ -145,7 +144,7 @@ Commons.prototype.message = function (type, username, message, retry) {
 }
 
 Commons.prototype.timeout = function (username, reason, timeout) {
-  if (cluster.isMaster) global.client.timeout(config.settings.broadcaster_username, username, timeout, reason)
+  if (cluster.isMaster) global.botTMI.chat.timeout(config.settings.broadcaster_username, username, timeout, reason)
   else process.send({type: 'timeout', username: username, timeout: timeout, reason: reason})
 }
 
@@ -170,9 +169,8 @@ Commons.prototype.isMod = async function (user) {
   if (_.isNil(user)) return false
 
   if (_.isString(user)) user = await global.users.get(user)
-  else if (_.isNil(user.mod)) user = await global.users.get(user.username)
-  else user = { is: { mod: user.mod } }
-
+  else if (_.isNil(user.isModerator)) user = await global.users.get(user.username)
+  else user = { is: { mod: user.isModerator } }
   return new Promise((resolve, reject) => {
     resolve(!_.isNil(user.is.mod) ? user.is.mod : false)
   })
