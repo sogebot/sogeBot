@@ -186,15 +186,15 @@ function fork () {
   })
 }
 
-function loadClientListeners (client) {
+function loadClientListeners () {
   global.broadcasterTMI.chat.on('PRIVMSG', async (message) => {
-    if (message.tags.username === 'jtv') {
+    if (message._raw.includes(':jtv!~jtv@jtv.tmi.twitch.tv')) {
       // Someone is hosting the channel and the message contains how many viewers..
-      if (message.message.includes('hosting you')) {
+      if (message._raw.includes('hosting you')) {
         const username = message.message.split(' ')[0].replace(':', '')
         const autohost = message.message.includes('auto')
         let viewers = '0'
-        if (message.message.includes('hosting you for')) viewers = _.extractNumber(message.message)
+        if (message._raw.includes('hosting you for')) viewers = _.extractNumber(message._raw.split(config.broadcaster_username)[1])
 
         DEBUG_TMIJS(`Hosted by ${username} with ${viewers} viewers - autohost: ${autohost}`)
         global.log.host(`${username}, viewers: ${viewers}, autohost: ${autohost}`)
