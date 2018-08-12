@@ -318,15 +318,18 @@ class Twitch {
     if (_.isNil(type)) type = 'time'
     else type = type[1]
 
+    // count ignored users
+    let _total = 10 + (await global.db.engine.find('users_ignorelist')).length + 2 // 2 for bot and broadcaster
+
     if (type === 'points' && global.commons.isSystemEnabled('points')) {
       sorted = []
-      for (let user of (await global.db.engine.find('users.watched', { _sort: 'points', _sum: 'points', _total: 20, _group: 'username' }))) {
+      for (let user of (await global.db.engine.find('users.watched', { _sort: 'points', _sum: 'points', _total, _group: 'username' }))) {
         sorted.push({ username: user._id, watched: user.points })
       }
       message = global.translate('top.listPoints').replace(/\$amount/g, 10)
     } else if (type === 'time') {
       sorted = []
-      for (let user of (await global.db.engine.find('users.watched', { _sort: 'watched', _sum: 'watched', _total: 20, _group: 'username' }))) {
+      for (let user of (await global.db.engine.find('users.watched', { _sort: 'watched', _sum: 'watched', _total, _group: 'username' }))) {
         sorted.push({ username: user._id, watched: user.watched })
       }
       message = global.translate('top.listWatched').replace(/\$amount/g, 10)
@@ -341,8 +344,8 @@ class Twitch {
       sorted = _.orderBy(users, 'amount', 'desc')
     } else {
       sorted = []
-      for (let user of (await global.db.engine.find('users.message', { _sort: 'messages', _sum: 'messages', _total: 20, _group: 'username' }))) {
-        sorted.push({ username: user._id, watched: user.watched })
+      for (let user of (await global.db.engine.find('users.messages', { _sort: 'messages', _sum: 'messages', _total, _group: 'username' }))) {
+        sorted.push({ username: user._id, messages: user.messages })
       }
       message = global.translate('top.listMessages').replace(/\$amount/g, 10)
     }
