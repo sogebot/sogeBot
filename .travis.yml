@@ -1,7 +1,7 @@
 language: node_js
 before_install:
   - npm install -g mocha standard
-install: make ENV=development
+install: travis_wait make ENV=development
 
 jobs:
   include:
