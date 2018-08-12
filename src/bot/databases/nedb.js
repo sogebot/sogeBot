@@ -123,11 +123,10 @@ class INeDB extends Interface {
 
           // nedb needs to fake sort
           items = _.orderBy(items, sortBy, 'desc')
-
           // nedb needs to fake total
           if (total) items = _.chunk(items, total)[0]
 
-          resolve(items)
+          resolve(items || [])
         })
       } catch (e) {
         global.log.error(e.message)
