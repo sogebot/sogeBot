@@ -8,6 +8,7 @@ const flatten = require('flat')
 const moment = require('moment')
 const cluster = require('cluster')
 const config = require('@config')
+const axios = require('axios')
 
 const Message = require('./message')
 const Timeout = require('./timeout')
@@ -215,7 +216,21 @@ class Events {
   async fireStartCommercial (operation, attributes) {
     const d = debug('events:fireStartCommercial')
     d('Start commercials with attrs:', operation, attributes)
-    global.client.commercial(config.settings.broadcaster_username, operation.durationOfCommercial)
+
+    const cid = await global.cache.channelId()
+    const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`
+
+    await axios({
+      method: 'post',
+      url,
+      data: { length: operation.durationOfCommercial },
+      headers: {
+        'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
+        'Client-ID': config.settings.client_id,
+        'Accept': 'application/vnd.twitchtv.v5+json',
+        'Content-Type': 'application/json'
+      }
+    })
   }
 
   async fireEmoteExplosion (operation, attributes) {
