@@ -214,7 +214,7 @@ class Moderation extends System {
     DEBUG_MODERATION_CONTAINS_LINK('isOwner: %s', global.commons.isOwner(opts.sender))
     DEBUG_MODERATION_CONTAINS_LINK('isMod: %s', isMod)
     DEBUG_MODERATION_CONTAINS_LINK('moderate with spaces: %s', isEnabledForSpaces)
-    if (global.commons.isOwner(opts.sender) || isMod || !isEnabled || (opts.sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       DEBUG_MODERATION_CONTAINS_LINK('checking links skipped')
       return true
     }
@@ -256,7 +256,7 @@ class Moderation extends System {
     var msgLength = whitelisted.trim().length
     var symbolsLength = 0
 
-    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     }
 
@@ -292,7 +292,7 @@ class Moderation extends System {
     ])
 
     var msgLength = whitelisted.trim().length
-    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     } else {
       this.timeoutUser(opts.sender, opts.message,
@@ -351,7 +351,7 @@ class Moderation extends System {
     DEBUG_MODERATION_CAPS('triggerPercent: %i%', maxCapsPercent)
     DEBUG_MODERATION_CAPS('capped percent: %i%', Math.ceil(capsLength / (msgLength / 100)))
 
-    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     }
     if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
@@ -377,7 +377,7 @@ class Moderation extends System {
 
     var msgLength = whitelisted.trim().length
 
-    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     }
     var out = whitelisted.match(/(.+)(\1+)/g)
@@ -401,7 +401,7 @@ class Moderation extends System {
       this.settings.color.timeout
     ])
 
-    if (global.commons.isOwner(opts.sender) || isMod || !isEnabled || (opts.sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     }
 
@@ -424,7 +424,7 @@ class Moderation extends System {
     ])
 
     var count = 0
-    if (global.commons.isOwner(opts.sender) || isMod || !isEnabled || (opts.sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     }
 
@@ -448,7 +448,7 @@ class Moderation extends System {
       this.settings.lists.timeout,
       this.settings.lists.blacklist
     ])
-    if (global.commons.isOwner(opts.sender) || isMod || (opts.sender.subscriber && !isEnabledForSubs)) {
+    if (global.commons.isOwner(opts.sender) || isMod || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     }
 

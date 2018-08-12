@@ -74,7 +74,7 @@ class Twitch {
     if (!_.isNil(opts.sender) && !_.isNil(opts.sender.username)) {
       global.users.set(opts.sender.username, {
         time: { message: new Date().getTime() },
-        is: { subscriber: !_.isNil(opts.sender.subscriber) ? opts.sender.subscriber : false }
+        is: { subscriber: opts.sender.isSubscriber || opts.sender.isTurboSubscriber }
       }, true)
       global.db.engine.update('users.online', { username: opts.sender.username }, { username: opts.sender.username })
     }
