@@ -37,11 +37,11 @@ class Twitch {
       {this: this, id: '!me', command: '!me', fnc: this.showMe, permission: constants.VIEWERS},
       {this: this, id: '!top time', command: '!top time', fnc: this.showTopTime, permission: constants.OWNER_ONLY},
       {this: this, id: '!top tips', command: '!top tips', fnc: this.showTopTips, permission: constants.OWNER_ONLY},
+      {this: this, id: '!top points', command: '!top points', fnc: this.showTopPoints, permission: constants.OWNER_ONLY},
       {this: this, id: '!top messages', command: '!top messages', fnc: this.showTopMessages, permission: constants.OWNER_ONLY},
       {this: this, id: '!title', command: '!title', fnc: this.setTitle, permission: constants.OWNER_ONLY},
       {this: this, id: '!game', command: '!game', fnc: this.setGame, permission: constants.OWNER_ONLY}
     ]
-    if (global.commons.isSystemEnabled('points')) commands.push({this: this, id: '!top points', command: '!top points', fnc: this.showTopPoints, permission: constants.OWNER_ONLY})
     return commands
   }
 
@@ -320,11 +320,10 @@ class Twitch {
 
     // count ignored users
     let _total = 10 + (await global.db.engine.find('users_ignorelist')).length + 2 // 2 for bot and broadcaster
-
-    if (type === 'points' && global.commons.isSystemEnabled('points')) {
+    if (type === 'points' && await global.systems.points.isEnabled()) {
       sorted = []
-      for (let user of (await global.db.engine.find('users.watched', { _sort: 'points', _sum: 'points', _total, _group: 'username' }))) {
-        sorted.push({ username: user._id, watched: user.points })
+      for (let user of (await global.db.engine.find('users.points', { _sort: 'points', _sum: 'points', _total, _group: 'username' }))) {
+        sorted.push({ username: user._id, points: user.points })
       }
       message = global.translate('top.listPoints').replace(/\$amount/g, 10)
     } else if (type === 'time') {
