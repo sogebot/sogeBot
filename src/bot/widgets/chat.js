@@ -18,7 +18,9 @@ ChatWidget.prototype.refresh = async (self, socket) => {
     let response = await axios.get(url)
 
     if (response.status === 200) {
-      global.panel.io.emit('chatChatters', { chatters: response.data.chatters, _total: response.data.chatter_count })
+      let chatters = response.data.chatters
+      chatters.viewers = chatters.viewers.filter(o => !global.commons.getIgnoreList().includes(o))
+      global.panel.io.emit('chatChatters', { chatters })
     }
   } catch (e) {
     // silence this, undocumented throwing 503 often
