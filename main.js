@@ -299,6 +299,8 @@ function loadClientListeners () {
       resub(message.tags.username, Number(message.parameters.months), message.message, message.tags, method)
     } else if (message.event === 'SUBSCRIPTION_GIFT') {
       subgift(message.tags.displayName.toLowerCase(), Number(message.parameters.months), message.parameters.recipientName)
+    } else if (message.event === 'SUBSCRIPTION_GIFT_COMMUNITY') {
+      subscriptionGiftCommunity(message.tags.displayName.toLowerCase(), Number(message.parameters.senderCount), Number(message.parameters.subPlan))
     } else if (message.event === 'RITUAL') {
       if (message.parameters.ritualName === 'new_chatter') {
         global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
@@ -355,6 +357,17 @@ async function resub (username, months, message, userstate, method) {
   global.overlays.eventlist.add({ type: 'resub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: message })
   global.log.resub(`${username}, months: ${months}, message: ${message}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
   global.events.fire('resub', { username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: message })
+}
+
+async function subscriptionGiftCommunity (username, count, plan) {
+  DEBUG_TMIJS(`Subscription gifted to ${count} viewers from ${username}`)
+
+  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
+  if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
+
+  global.overlays.eventlist.add({ type: 'subcommunitygift', username, count })
+  global.events.fire('subcommunitygift', { username, count })
+  global.log.subcommunitygift(`${username}, to ${count} viewers`)
 }
 
 async function subgift (username, months, recipient) {

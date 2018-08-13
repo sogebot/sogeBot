@@ -13,6 +13,7 @@ function EventList () {
   global.configuration.register('widgetEventlistCheers', 'core.no-response-bool', 'bool', true)
   global.configuration.register('widgetEventlistSubs', 'core.no-response-bool', 'bool', true)
   global.configuration.register('widgetEventlistSubgifts', 'core.no-response-bool', 'bool', true)
+  global.configuration.register('widgetEventlistSubcommunitygifts', 'core.no-response-bool', 'bool', true)
   global.configuration.register('widgetEventlistResubs', 'core.no-response-bool', 'bool', true)
   global.configuration.register('widgetEventlistTips', 'core.no-response-bool', 'bool', true)
   global.configuration.register('widgetEventlistShow', 'core.no-response', 'number', 5)

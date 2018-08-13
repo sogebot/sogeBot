@@ -291,9 +291,15 @@
             } else if (event.event === 'subgift' && show.subgifts) {
               if (aggregate) subs.push({ username: event.username })
               else $events.append(`
-                <div class='job'>${_.get(custom, 'subgift-by', '<strong>$from</strong> gifted subscribe to').replace('$from', event.from)}</div>
+                <div class='job'>${_.get(custom, 'subgift-by', '<strong>$from</strong> gifted subscribe to').replace('$from', event.username)}</div>
                 <div class='name'>${event.username}</div>
                 <div class="message">${event.message}</div>
+              `)
+            } else if (event.event === 'subcommunitygift' && show.subcommunitygifts) {
+              if (aggregate) subs.push({ username: event.username })
+              else $events.append(`
+                <div class='job'>${_.get(custom, 'subcommunitygift-by', '<strong>$from</strong> gifted subscribe to').replace('$from', event.username)}</div>
+                <div class='name'>${event.count} viewers</div>
               `)
             } else if (event.event === 'tip' && show.tips) {
               if (aggregate) tips.push({ username: event.username, currency: event.currency, amount: event.amount })

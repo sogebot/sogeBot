@@ -8,76 +8,88 @@
         </a>
       </li>
       <li role="presentation" class="nav-item">
-        <a class="nav-link nav-dropdown" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <font-awesome-icon icon="eye"></font-awesome-icon>
-        </a>
-        <div class="dropdown-menu" data-allow-focus aria-labelledby="dropdownMenuButton" style="padding:0; margin: 0;">
-          <button
-            class="btn nav-btn"
-            :class="[ settings.widgetEventlistFollows ? 'btn-outline-success' : 'btn-outline-danger' ]"
-            @click="toggle('widgetEventlistFollows')">
-            <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-              <font-awesome-icon icon="heart"></font-awesome-icon>
-            </font-awesome-layers>
-          </button>
-          <button
-            class="btn nav-btn"
-            :class="[ settings.widgetEventlistHosts ? 'btn-outline-success' : 'btn-outline-danger' ]"
-            @click="toggle('widgetEventlistHosts')">
-            <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-              <font-awesome-icon icon="bullhorn"></font-awesome-icon>
-            </font-awesome-layers>
-          </button>
-          <button
-            class="btn nav-btn"
-            :class="[ settings.widgetEventlistRaids ? 'btn-outline-success' : 'btn-outline-danger' ]"
-            @click="toggle('widgetEventlistRaids')">
-            <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-              <font-awesome-icon icon="random"></font-awesome-icon>
-            </font-awesome-layers>
-          </button>
-          <button
-            class="btn nav-btn"
-            :class="[ settings.widgetEventlistCheers ? 'btn-outline-success' : 'btn-outline-danger' ]"
-            @click="toggle('widgetEventlistCheers')">
-            <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-              <font-awesome-icon icon="gem"></font-awesome-icon>
-            </font-awesome-layers>
-          </button>
-          <button
-            class="btn nav-btn"
-            :class="[ settings.widgetEventlistSubs ? 'btn-outline-success' : 'btn-outline-danger' ]"
-            @click="toggle('widgetEventlistSubs')">
-            <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-              <font-awesome-icon icon="star"></font-awesome-icon>
-            </font-awesome-layers>
-          </button>
-          <button
-            class="btn nav-btn"
-            :class="[ settings.widgetEventlistSubgifts ? 'btn-outline-success' : 'btn-outline-danger' ]"
-            @click="toggle('widgetEventlistSubgifts')">
-            <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-              <font-awesome-icon icon="gift"></font-awesome-icon>
-            </font-awesome-layers>
-          </button>
-          <button
-            class="btn nav-btn"
-            :class="[ settings.widgetEventlistResubs ? 'btn-outline-success' : 'btn-outline-danger' ]"
-            @click="toggle('widgetEventlistResubs')">
-            <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-              <font-awesome-icon icon="star-half"></font-awesome-icon>
-              <font-awesome-icon icon="long-arrow-alt-right"></font-awesome-icon>
-            </font-awesome-layers>
-          </button>
-          <button
-            class="btn nav-btn"
-            :class="[ settings.widgetEventlistTips ? 'btn-outline-success' : 'btn-outline-danger' ]"
-            @click="toggle('widgetEventlistTips')">
-            <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
-              <font-awesome-icon icon="dollar-sign"></font-awesome-icon>
-            </font-awesome-layers>
-          </button>
-        </div>
+        <span class="dropdown" id="eventlistDropdown">
+          <a class="nav-link nav-dropdown" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer; padding: 10px">
+            <font-awesome-icon icon="eye"></font-awesome-icon>
+          </a>
+          <span id="eventlistDropdownData">
+            <div class="dropdown-menu dropdown-force-visible" data-allow-focus aria-labelledby="dropdownMenuButton" style="padding:0; margin: 0;">
+              <button
+                class="btn nav-btn"
+                :class="[ settings.widgetEventlistFollows ? 'btn-outline-success' : 'btn-outline-danger' ]"
+                @click="toggle('widgetEventlistFollows')">
+                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
+                  <font-awesome-icon icon="heart"></font-awesome-icon>
+                </font-awesome-layers>
+              </button>
+              <button
+                class="btn nav-btn"
+                :class="[ settings.widgetEventlistHosts ? 'btn-outline-success' : 'btn-outline-danger' ]"
+                @click="toggle('widgetEventlistHosts')">
+                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
+                  <font-awesome-icon icon="bullhorn"></font-awesome-icon>
+                </font-awesome-layers>
+              </button>
+              <button
+                class="btn nav-btn"
+                :class="[ settings.widgetEventlistRaids ? 'btn-outline-success' : 'btn-outline-danger' ]"
+                @click="toggle('widgetEventlistRaids')">
+                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
+                  <font-awesome-icon icon="random"></font-awesome-icon>
+                </font-awesome-layers>
+              </button>
+              <button
+                class="btn nav-btn"
+                :class="[ settings.widgetEventlistCheers ? 'btn-outline-success' : 'btn-outline-danger' ]"
+                @click="toggle('widgetEventlistCheers')">
+                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
+                  <font-awesome-icon icon="gem"></font-awesome-icon>
+                </font-awesome-layers>
+              </button>
+              <button
+                class="btn nav-btn"
+                :class="[ settings.widgetEventlistSubs ? 'btn-outline-success' : 'btn-outline-danger' ]"
+                @click="toggle('widgetEventlistSubs')">
+                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
+                  <font-awesome-icon icon="star"></font-awesome-icon>
+                </font-awesome-layers>
+              </button>
+              <button
+                class="btn nav-btn"
+                :class="[ settings.widgetEventlistSubgifts ? 'btn-outline-success' : 'btn-outline-danger' ]"
+                @click="toggle('widgetEventlistSubgifts')">
+                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
+                  <font-awesome-icon icon="gift"></font-awesome-icon>
+                </font-awesome-layers>
+              </button>
+              <button
+                class="btn nav-btn"
+                :class="[ settings.widgetEventlistSubcommunitygifts ? 'btn-outline-success' : 'btn-outline-danger' ]"
+                @click="toggle('widgetEventlistSubcommunitygifts')">
+                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
+                  <font-awesome-icon icon="box-open"></font-awesome-icon>
+                </font-awesome-layers>
+              </button>
+              <button
+                class="btn nav-btn"
+                :class="[ settings.widgetEventlistResubs ? 'btn-outline-success' : 'btn-outline-danger' ]"
+                @click="toggle('widgetEventlistResubs')">
+                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
+                  <font-awesome-icon icon="star-half"></font-awesome-icon>
+                  <font-awesome-icon icon="long-arrow-alt-right"></font-awesome-icon>
+                </font-awesome-layers>
+              </button>
+              <button
+                class="btn nav-btn"
+                :class="[ settings.widgetEventlistTips ? 'btn-outline-success' : 'btn-outline-danger' ]"
+                @click="toggle('widgetEventlistTips')">
+                <font-awesome-layers style="height: 1em; line-height: 0.8em; width: 1em">
+                  <font-awesome-icon icon="dollar-sign"></font-awesome-icon>
+                </font-awesome-layers>
+              </button>
+            </div>
+          </span>
+        </span>
       </li>
       <li role="presentation">
         <a class="nav-link" href="#eventlist-settings" aria-controls="home" role="tab" data-toggle="tab" title="Settings">
@@ -113,6 +125,7 @@
               <font-awesome-icon v-if="event.event === 'raid'" icon="random" :class="[`icon-${event.event}`, 'icon']" />
               <font-awesome-icon v-if="event.event === 'sub'" icon="star" :class="[`icon-${event.event}`, 'icon']" />
               <font-awesome-icon v-if="event.event === 'subgift'" icon="gift" :class="[`icon-${event.event}`, 'icon']" />
+              <font-awesome-icon v-if="event.event === 'subcommunitygift'" icon="box-open" :class="[`icon-${event.event}`, 'icon']" />
               <font-awesome-layers v-if="event.event === 'resub'" :class="[`icon-${event.event}`, 'icon']">
                 <font-awesome-icon icon="star-half"></font-awesome-icon>
                 <font-awesome-icon icon="long-arrow-alt-right"></font-awesome-icon>
@@ -166,11 +179,11 @@
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faEye, faCog, faExternalLinkAlt, faHeart, faBullhorn, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch } from '@fortawesome/free-solid-svg-icons'
+import { faBoxOpen, faEye, faCog, faExternalLinkAlt, faHeart, faBullhorn, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 
-library.add(faCalendar, faEye, faCog, faExternalLinkAlt, faHeart, faBullhorn, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch)
+library.add(faBoxOpen, faCalendar, faEye, faCog, faExternalLinkAlt, faHeart, faBullhorn, faRandom, faGem, faStar, faGift, faDollarSign, faStarHalf, faLongArrowAltRight, faCircleNotch)
 
 export default {
   props: ['commons', 'socket', 'popout'],
@@ -190,6 +203,14 @@ export default {
   },
   mounted: function () {
     this.$emit('mounted')
+
+    $('#eventlistDropdown').on('show.bs.dropdown', function() {
+      $('body').append($('#eventlistDropdownData .dropdown-force-visible').css({
+        position: 'absolute',
+        left: $('#eventlistDropdownData').offset().left,
+        top: $('#eventlistDropdownData').offset().top + 5
+      }).detach())
+    })
   },
   created: function () {
     this.socket.once('configuration', data => {
@@ -200,6 +221,7 @@ export default {
         widgetEventlistCheers: data.widgetEventlistCheers,
         widgetEventlistSubs: data.widgetEventlistSubs,
         widgetEventlistSubgifts: data.widgetEventlistSubgifts,
+        widgetEventlistSubcommunitygifts: data.widgetEventlistSubcommunitygifts,
         widgetEventlistResubs: data.widgetEventlistResubs,
         widgetEventlistTips: data.widgetEventlistTips
       }
@@ -226,6 +248,7 @@ export default {
       if (this.settings.widgetEventlistCheers) toShow.push('cheer')
       if (this.settings.widgetEventlistSubs) toShow.push('sub')
       if (this.settings.widgetEventlistSubgifts) toShow.push('subgift')
+      if (this.settings.widgetEventlistSubcommunitygifts) toShow.push('subcommunitygift')
       if (this.settings.widgetEventlistResubs) toShow.push('resub')
       if (this.settings.widgetEventlistTips) toShow.push('tip')
       return _.chunk(this.events.filter(o => toShow.includes(o.event)), this.eventlistShow)[0]

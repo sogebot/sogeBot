@@ -14,6 +14,7 @@ class Credits {
     global.configuration.register('creditsRaids', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsSubscribers', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsSubgifts', 'core.no-response-bool', 'bool', true)
+    global.configuration.register('creditsSubcommunitygifts', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsResubs', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsCheers', 'core.no-response-bool', 'bool', true)
     global.configuration.register('creditsClips', 'core.no-response-bool', 'bool', true)
@@ -33,6 +34,7 @@ class Credits {
     global.configuration.register('creditsSubscribedBy', 'core.no-response', 'string', 'Subscribed by')
     global.configuration.register('creditsResubscribedBy', 'core.no-response', 'string', 'Resubscribed <strong>$months months</strong> by')
     global.configuration.register('creditsSubgiftBy', 'core.no-response', 'string', '<strong>$from</strong> gifted subscribe to')
+    global.configuration.register('creditsSubcommunitygiftBy', 'core.no-response', 'string', '<strong>$from</strong> gifted subscribe to')
     global.configuration.register('creditsClippedBy', 'core.no-response', 'string', 'Clipped by')
     global.configuration.register('creditsTipsBy', 'core.no-response', 'string', 'tip <strong>$currency$amount</strong>')
     global.configuration.register('creditsTopClips', 'core.no-response', 'string', 'Top clips')
@@ -72,6 +74,7 @@ class Credits {
           'subscribed-by': await global.configuration.getValue('creditsSubscribedBy'),
           'resubscribed by': await global.configuration.getValue('creditsResubscribedBy'),
           'subgift-by': await global.configuration.getValue('creditsSubgiftBy'),
+          'subcommunitygift-by': await global.configuration.getValue('creditsSubcommunitygiftBy'),
           'clipped-by': await global.configuration.getValue('creditsClippedBy'),
           'top-clips': await global.configuration.getValue('creditsTopClips'),
           'tip-by': await global.configuration.getValue('creditsTipsBy')
@@ -82,6 +85,7 @@ class Credits {
           raids: await global.configuration.getValue('creditsRaids'),
           subscribers: await global.configuration.getValue('creditsSubscribers'),
           subgifts: await global.configuration.getValue('creditsSubgifts'),
+          subcommunitygifts: await global.configuration.getValue('creditsSubcommunitygifts'),
           resubs: await global.configuration.getValue('creditsResubs'),
           cheers: await global.configuration.getValue('creditsCheers'),
           tips: await global.configuration.getValue('creditsTips')
