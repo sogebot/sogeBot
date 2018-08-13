@@ -319,7 +319,7 @@ class Twitch {
     else type = type[1]
 
     // count ignored users
-    let _total = 10 + (await global.db.engine.find('users_ignorelist')).length + 2 // 2 for bot and broadcaster
+    let _total = 10 + global.commons.getIgnoreList().length + 2 // 2 for bot and broadcaster
     if (type === 'points' && await global.systems.points.isEnabled()) {
       sorted = []
       for (let user of (await global.db.engine.find('users.points', { _sort: 'points', _sum: 'points', _total, _group: 'username' }))) {
@@ -353,8 +353,7 @@ class Twitch {
       // remove ignored users
       let ignored = []
       for (let user of sorted) {
-        let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: user.username })
-        if (!_.isEmpty(ignoredUser)) ignored.push(user.username)
+        if (global.commons.isIgnored(user.username)) ignored.push(user.username)
       }
       _.remove(sorted, (o) => _.includes(ignored, o.username))
 

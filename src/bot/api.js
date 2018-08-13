@@ -177,7 +177,7 @@ class API {
     let bulkInsert = []
     let bulkParted = []
     let allOnlineUsers = (await global.db.engine.find('users.online')).map((o) => o.username)
-    let ignoredUsers = (await global.db.engine.find('users_ignorelist')).map((o) => o.username)
+    let ignoredUsers = global.commons.getIgnoreList()
 
     for (let user of allOnlineUsers) {
       if (!_.includes(chatters, user)) {

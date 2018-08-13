@@ -67,6 +67,8 @@ Users.prototype.sockets = function (self) {
           )
         }
         await Promise.all(promises)
+        // update ignore list
+        global.commons.processAll({type: 'call', ns: 'commons', fnc: 'loadIgnoreList'})
         callback(null, null)
       } catch (e) {
         callback(e, null)
@@ -358,6 +360,10 @@ Users.prototype.ignoreAdd = async function (opts) {
   match.username = match.username.toLowerCase()
 
   await global.db.engine.update('users_ignorelist', { username: match.username }, { username: match.username })
+
+  // update ignore list
+  global.commons.processAll({ns: 'commons', fnc: 'loadIgnoreList'})
+
   let message = await global.commons.prepare('ignore.user.is.added', { username: match.username })
   debug(message); global.commons.sendMessage(message, opts.sender)
 }
@@ -369,6 +375,7 @@ Users.prototype.ignoreRm = async function (opts) {
   match.username = match.username.toLowerCase()
 
   await global.db.engine.remove('users_ignorelist', { username: match.username })
+  global.commons.processAll({type: 'call', ns: 'commons', fnc: 'loadIgnoreList'})
   let message = await global.commons.prepare('ignore.user.is.removed', { username: match.username })
   debug(message); global.commons.sendMessage(message, opts.sender)
 }
