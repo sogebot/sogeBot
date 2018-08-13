@@ -6,11 +6,21 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const variable = require('../../general.js').variable
+const message = require('../../general.js').message
+
+// users
+const owner = { username: 'soge__' }
 
 const _ = require('lodash')
 const assert = require('chai').assert
 
 const tests = {
+  'testForSongRequest': {
+    'should.return.changed': [
+      '!songrequest https://youtu.be/HmZYgqBp1gI',
+      '!sr https://youtu.be/HmZYgqBp1gI'
+    ]
+  },
   'test': {
     'should.return.changed': [
       'test', 'a test', 'test a', 'a test a', '?test', 'test?'
@@ -88,6 +98,10 @@ const tests = {
 describe('systems/moderation - whitelist()', () => {
   before(async () => {
     await db.cleanup()
+    await message.prepare()
+
+    global.systems.alias.add({ sender: owner, parameters: 'viewer !sr !songrequest' })
+    await message.isSent('alias.alias-was-added', owner, { alias: '!sr', command: '!songrequest', sender: owner.username })
   })
 
   for (let [pattern, test] of Object.entries(tests)) {
@@ -96,6 +110,7 @@ describe('systems/moderation - whitelist()', () => {
         await (global.systems.moderation.settings.lists.whitelist = [pattern])
         await variable.isEqual('systems.moderation.settings.lists.whitelist', [pattern])
         let result = await global.systems.moderation.whitelist(text)
+        console.log(result)
         assert.isTrue(text !== result)
       })
     }
