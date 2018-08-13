@@ -10,9 +10,16 @@ const config = require('@config')
 const cluster = require('cluster')
 const Message = require('./message')
 
+const DEBUG = {
+  PROCESSALL: debug('commons:processall')
+}
+
 function Commons () {
   this.compact = {}
+
+  this.cached = {}
   this.registerConfiguration()
+  this.loadIgnoreList()
 }
 
 Commons.prototype.registerConfiguration = function () {
@@ -22,9 +29,37 @@ Commons.prototype.registerConfiguration = function () {
   global.configuration.register('sendWithMe', 'core.settings.sendWithMe', 'bool', false)
 }
 
-Commons.prototype.isIgnored = async function (sender) {
-  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: _.get(sender, 'username', '') })
-  return !_.isEmpty(ignoredUser) && _.get(sender, 'username', '') !== config.settings.broadcaster_username
+Commons.prototype.processAll = function (process) {
+  if (cluster.isMaster) {
+    // run on master
+    const namespace = _.get(global, process.ns, null)
+    namespace[process.fnc].apply(namespace, process.args)
+    // send to all clusters
+    for (let [i, w] of Object.entries(cluster.workers)) {
+      DEBUG.PROCESSALL(`Sending ${JSON.stringify(process)} to worker#${i}`)
+      w.send(process)
+    }
+  } else {
+    // need to be sent to master
+    process.send(process)
+  }
+}
+
+Commons.prototype.loadIgnoreList = async function () {
+  if (typeof global.db === 'undefined' || !global.db.engine.connected) return setTimeout(() => this.loadIgnoreList(), 1000)
+  console.log('loading')
+  this.cached.ignorelist = (await global.db.engine.find('users_ignorelist')).map(o => o.username)
+}
+
+Commons.prototype.getIgnoreList = function () {
+  if (typeof this.cached.ignorelist === 'undefined') this.cached.ignorelist = []
+  return this.cached.ignorelist
+}
+
+Commons.prototype.isIgnored = function (sender) {
+  const isIgnored = this.getIgnoreList().includes(sender.username)
+  const isBroadcaster = this.isBroadcaster(sender)
+  return isIgnored && !isBroadcaster
 }
 
 Commons.prototype.isSystemEnabled = function (fn) {

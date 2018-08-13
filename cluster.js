@@ -44,6 +44,10 @@ function cluster () {
 
     process.on('message', async (data) => {
       switch (data.type) {
+        case 'call':
+          const namespace = _.get(global, data.ns, null)
+          namespace[data.fnc].apply(namespace, data.args)
+          break
         case 'lang':
           await global.lib.translate._load()
           break

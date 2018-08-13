@@ -338,8 +338,7 @@ if (cluster.isMaster) {
 async function subscription (username, method) {
   DEBUG_TMIJS('Subscription: %s from %j', username, method)
 
-  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
-  if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
+  if (global.commons.isIgnored(username)) return
 
   global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: _.now() }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
   global.overlays.eventlist.add({ type: 'sub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
@@ -350,8 +349,7 @@ async function subscription (username, method) {
 async function resub (username, months, message, userstate, method) {
   DEBUG_TMIJS('Resub: %s (%s months) - %s', username, months, message, userstate, method)
 
-  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
-  if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
+  if (global.commons.isIgnored(username)) return
 
   global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: moment().subtract(months, 'months').format('X') * 1000 }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
   global.overlays.eventlist.add({ type: 'resub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: message })
@@ -362,8 +360,7 @@ async function resub (username, months, message, userstate, method) {
 async function subscriptionGiftCommunity (username, count, plan) {
   DEBUG_TMIJS(`Subscription gifted to ${count} viewers from ${username}`)
 
-  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
-  if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
+  if (global.commons.isIgnored(username)) return
 
   global.overlays.eventlist.add({ type: 'subcommunitygift', username, count })
   global.events.fire('subcommunitygift', { username, count })
@@ -374,8 +371,7 @@ async function subgift (username, months, recipient) {
   recipient = recipient.toLowerCase()
   DEBUG_TMIJS('Subgift: from %s to %s', username, recipient)
 
-  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: username })
-  if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
+  if (global.commons.isIgnored(username)) return
 
   global.users.set(recipient, { is: { subscriber: true }, time: { subscribed_at: _.now() } })
   global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months })
@@ -389,8 +385,7 @@ async function cheer (userstate, message) {
   // remove cheerX or channelCheerX from message
   message = message.replace(/(.*?[cC]heer[\d]+)/g, '').trim()
 
-  let ignoredUser = await global.db.engine.findOne('users_ignorelist', { username: userstate.username })
-  if (!_.isEmpty(ignoredUser) && userstate.username !== config.settings.broadcaster_username) return
+  if (global.commons.isIgnored(userstate.username)) return
 
   global.overlays.eventlist.add({ type: 'cheer', username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
   global.log.cheer(`${userstate.username.toLowerCase()}, bits: ${userstate.bits}, message: ${message}`)
