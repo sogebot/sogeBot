@@ -29,6 +29,7 @@ const levels = {
   cheer: 5,
   sub: 5,
   subgift: 5,
+  subcommunitygift: 5,
   resub: 5,
   timeout: 8,
   ban: 8,
@@ -73,6 +74,7 @@ if (cluster.isWorker) {
         if (info.level === 'cheer') level = '+cheer'
         if (info.level === 'sub') level = '+sub'
         if (info.level === 'subgift') level = '+subgift'
+        if (info.level === 'subcommunitygift') level = '+subcommunitygift'
         if (info.level === 'resub') level = '+resub'
         if (info.level === 'start') level = '== STREAM STARTED =>'
         if (info.level === 'stop') level = '== STREAM STOPPED'

@@ -9,6 +9,7 @@ hr { border-color: $hr !important }
 .icon-raid { color: map-get($eventlist, raid) !important; }
 .icon-sub { color: map-get($eventlist, sub) !important; }
 .icon-subgift { color: map-get($eventlist, subgift) !important; }
+.icon-subcommunitygift { color: map-get($eventlist, subcommunitygift) !important; }
 .icon-resub { color: map-get($eventlist, resub) !important; }
 .icon-cheer { color: map-get($eventlist, cheer) !important; }
 .icon-tip { color: map-get($eventlist, tip) !important; }
