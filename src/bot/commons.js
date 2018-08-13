@@ -47,7 +47,6 @@ Commons.prototype.processAll = function (process) {
 
 Commons.prototype.loadIgnoreList = async function () {
   if (typeof global.db === 'undefined' || !global.db.engine.connected) return setTimeout(() => this.loadIgnoreList(), 1000)
-  console.log('loading')
   this.cached.ignorelist = (await global.db.engine.find('users_ignorelist')).map(o => o.username)
 }
 
