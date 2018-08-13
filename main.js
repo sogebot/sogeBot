@@ -214,7 +214,7 @@ function loadClientListeners () {
     }
   })
   global.botTMI.chat.on('PRIVMSG', async (message) => {
-    if (message.tags.username !== 'jtv' && !global.commons.isBot(message.tags.displayName)) {
+    if (!global.commons.isBot(message.tags.displayName) || !message.isSelf) {
       DEBUG_TMIJS('Message received: %s', JSON.stringify(message))
 
       message.tags.username = message.tags.displayName.toLowerCase() // backward compatibility until userID is primary key
@@ -271,14 +271,14 @@ function loadClientListeners () {
 
   global.botTMI.chat.on('USERNOTICE', message => {
     if (message.event === 'RAID') {
-      DEBUG_TMIJS('Raided by %s with %s viewers', message.raiderUserName, message.raiderViewerCount)
-      global.log.raid(`${message.raiderUserName}, viewers: ${message.raiderViewerCount}`)
+      DEBUG_TMIJS('Raided by %s with %s viewers', message.parameters.login, message.parameters.viewerCount)
+      global.log.raid(`${message.parameters.login}, viewers: ${message.parameters.viewerCount}`)
 
-      global.db.engine.update('cache.raids', { username: message.raiderUserName }, { username: message.raiderUserName })
+      global.db.engine.update('cache.raids', { username: message.parameters.login }, { username: message.parameters.login })
 
       const data = {
-        username: message.raiderUserName,
-        viewers: message.raiderViewerCount
+        username: message.parameters.login,
+        viewers: message.parameters.viewerCount
       }
 
       data.type = 'raid'
@@ -286,21 +286,21 @@ function loadClientListeners () {
       global.events.fire('raided', data)
     } else if (message.event === 'SUBSCRIPTION') {
       const method = {
-        plan: message.subPlan === 'Prime' ? 1000 : message.subPlan,
-        prime: message.subPlan === 'Prime' ? 'Prime' : false
+        plan: message.parameters.subPlan === 'Prime' ? 1000 : message.parameters.subPlan,
+        prime: message.parameters.subPlan === 'Prime' ? 'Prime' : false
       }
       subscription(message.tags.displayName.toLowerCase(), method)
     } else if (message.event === 'RESUBSCRIPTION') {
       message.tags.username = message.tags.displayName.toLowerCase()
       const method = {
-        plan: message.subPlan === 'Prime' ? 1000 : message.subPlan,
-        prime: message.subPlan === 'Prime' ? 'Prime' : false
+        plan: message.parameters.subPlan === 'Prime' ? 1000 : message.parameters.subPlan,
+        prime: message.parameters.subPlan === 'Prime' ? 'Prime' : false
       }
-      resub(message.tags.username, Number(message.months), message.message, message.tags, method)
+      resub(message.tags.username, Number(message.parameters.months), message.message, message.tags, method)
     } else if (message.event === 'SUBSCRIPTION_GIFT') {
-      subgift(message.tags.displayName.toLowerCase(), message.recipientUserName)
+      subgift(message.tags.displayName.toLowerCase(), Number(message.parameters.months), message.parameters.recipientName)
     } else if (message.event === 'RITUAL') {
-      if (message.ritualName === 'new_chatter') {
+      if (message.parameters.ritualName === 'new_chatter') {
         global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
       } else {
         global.log.info('Unknown RITUAL')
@@ -357,7 +357,7 @@ async function resub (username, months, message, userstate, method) {
   global.events.fire('resub', { username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: message })
 }
 
-async function subgift (username, recipient) {
+async function subgift (username, months, recipient) {
   recipient = recipient.toLowerCase()
   DEBUG_TMIJS('Subgift: from %s to %s', username, recipient)
 
@@ -365,9 +365,9 @@ async function subgift (username, recipient) {
   if (!_.isEmpty(ignoredUser) && username !== config.settings.broadcaster_username) return
 
   global.users.set(recipient, { is: { subscriber: true }, time: { subscribed_at: _.now() } })
-  global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username })
+  global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months })
   global.events.fire('subgift', { username: username, recipient: recipient })
-  global.log.subgift(`${recipient}, from: ${username}`)
+  global.log.subgift(`${recipient}, from: ${username}, months: ${months}`)
 }
 
 async function cheer (userstate, message) {
