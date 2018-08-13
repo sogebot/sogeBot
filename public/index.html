@@ -1294,7 +1294,6 @@
     }
 
     var setStatus = function (id, status) {
-      if ($("#" + id + "Status").data('status') === status) return // nothing changed, do nothing
       $("#" + id + "Status").data('status', status)
 
       $("#" + id + "Status").removeClass()
