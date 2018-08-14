@@ -56,9 +56,11 @@ Commons.prototype.getIgnoreList = function () {
 }
 
 Commons.prototype.isIgnored = function (sender) {
-  const isIgnored = this.getIgnoreList().includes(sender.username)
-  const isBroadcaster = this.isBroadcaster(sender)
-  return isIgnored && !isBroadcaster
+  if (sender !== null) { // null can be bot from dashboard or event
+    const isIgnored = this.getIgnoreList().includes(sender.username)
+    const isBroadcaster = this.isBroadcaster(sender)
+    return isIgnored && !isBroadcaster
+  } else return false
 }
 
 Commons.prototype.isSystemEnabled = function (fn) {
