@@ -196,6 +196,23 @@ let migration = {
       console.info(` => ${processed} processed`)
     }
   }],
+  events: [{
+    version: '8.0.0',
+    do: async () => {
+      console.info('Updating keyword-send-x-times events with resetCountEachMessage')
+      let items = await global.db.engine.find('events', { key: 'keyword-send-x-times' })
+      let processed = 0
+      for (let i of items) {
+        if (typeof i.definitions.resetCountEachMessage === 'undefined' || i.definitions.resetCountEachMessage === null) {
+          i.definitions.resetCountEachMessage = false
+          const _id = i._id; delete i._id
+          await global.db.engine.update('events', { _id: String(_id) }, i)
+          processed++
+        }
+      }
+      console.info(` => ${processed} processed`)
+    }
+  }],
   timers: [{
     version: '8.0.0',
     do: async () => {

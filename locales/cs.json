@@ -198,6 +198,11 @@
           "label": "Sledovat toto klíčové slovo",
           "placeholder": "Nastav klicoveSlovo"
         },
+        "resetCountEachMessage": {
+          "label": "Resetovat počet každou zprávu",
+          "true": "Resetovat počet",
+          "false": "Ponechat počet"
+        },
         "commandToWatch": {
           "label": "Sledovat tento příkaz",
           "placeholder": "Nastav !prikazKeSledovani"
