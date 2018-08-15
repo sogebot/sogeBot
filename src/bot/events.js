@@ -30,7 +30,7 @@ class Events {
       { id: 'resub', variables: [ 'username', 'userObject', 'months', 'monthsName', 'message' ] },
       { id: 'tip', variables: [ 'username', 'amount', 'currency', 'message' ] },
       { id: 'command-send-x-times', variables: [ 'username', 'userObject', 'command', 'count' ], definitions: { fadeOutXCommands: 0, fadeOutInterval: 0, runEveryXCommands: 10, commandToWatch: '', runInterval: 0 }, check: this.checkCommandSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
-      { id: 'keyword-send-x-times', variables: [ 'username', 'userObject', 'command', 'count' ], definitions: { fadeOutXKeywords: 0, fadeOutInterval: 0, runEveryXKeywords: 10, keywordToWatch: '', runInterval: 0 }, check: this.checkKeywordSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
+      { id: 'keyword-send-x-times', variables: [ 'username', 'userObject', 'command', 'count' ], definitions: { fadeOutXKeywords: 0, fadeOutInterval: 0, runEveryXKeywords: 10, keywordToWatch: '', runInterval: 0, resetCountEachMessage: false }, check: this.checkKeywordSendXTimes }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'number-of-viewers-is-at-least-x', variables: [ 'count' ], definitions: { viewersAtLeast: 100, runInterval: 0 }, check: this.checkNumberOfViewersIsAtLeast }, // runInterval 0 or null - disabled; > 0 every x seconds
       { id: 'stream-started' },
       { id: 'stream-stopped' },
@@ -470,6 +470,10 @@ class Events {
 
       event.definitions.runInterval = parseInt(event.definitions.runInterval, 10) // force Integer
       event.triggered.runInterval = parseInt(event.triggered.runInterval, 10) // force Integer
+
+      if (event.definitions.resetCountEachMessage) {
+        event.triggered.runEveryXKeywords = 0
+      }
 
       // add count from match
       event.triggered.runEveryXKeywords = Number(event.triggered.runEveryXKeywords) + Number(match.length)

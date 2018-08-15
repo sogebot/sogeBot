@@ -202,6 +202,11 @@
           "label": "Keyword To Watch",
           "placeholder": "Set your keywordToWatch"
         },
+        "resetCountEachMessage": {
+          "label": "Reset count each message",
+          "true": "Reset count",
+          "false": "Keep count"
+        },
         "viewersAtLeast": {
           "label": "Viewers At Least",
           "placeholder": "How many viewers at least to trigger event"
