@@ -24,7 +24,7 @@ describe('Gambling - duel', () => {
     })
 
     it('user 1 is challenging', async () => {
-      global.games.duel.main({ sender: user1, parameters: 'all' })
+      await global.games.duel.main({ sender: user1, parameters: 'all' })
       await message.isSent('gambling.duel.new', user1, {
         minutesName: global.commons.getLocalizedName(await global.games.duel.settings.duration, 'core.minutes'),
         minutes: await global.games.duel.settings.duration
