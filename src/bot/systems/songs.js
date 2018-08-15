@@ -63,7 +63,12 @@ class Songs extends System {
       })
       socket.on('find.playlist', async (where, cb) => {
         where = where || {}
-        cb(null, await global.db.engine.find(this.collection.playlist, where))
+        let playlist = await global.db.engine.find(this.collection.playlist, where)
+        for (let i of playlist) {
+          i.volume = await this.getVolume(i)
+          i.forceVolume = i.forceVolume || false
+        }
+        cb(null, playlist)
       })
       socket.on('find.request', async (where, cb) => {
         where = where || {}
@@ -119,11 +124,15 @@ class Songs extends System {
   }
 
   async getVolume (item) {
-    item.loudness = !_.isNil(item.loudness) ? item.loudness : -15
-    const volume = await this.settings.volume
-    var correction = Math.ceil((volume / 100) * 3)
-    var loudnessDiff = parseFloat(parseFloat(await this.settings._.meanLoudness) - item.loudness)
-    return Math.round(volume + (correction * loudnessDiff))
+    if (!item.forceVolume) {
+      item.loudness = !_.isNil(item.loudness) ? item.loudness : -15
+      const volume = await this.settings.volume
+      var correction = Math.ceil((volume / 100) * 3)
+      var loudnessDiff = parseFloat(parseFloat(await this.settings._.meanLoudness) - item.loudness)
+      return Math.round(volume + (correction * loudnessDiff))
+    } else {
+      return item.volume
+    }
   }
 
   async getCurrentVolume (socket) {
