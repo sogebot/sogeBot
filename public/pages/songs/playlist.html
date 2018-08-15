@@ -1,60 +1,110 @@
 <div id="systemSongsPlaylistApp">
-    <div class="container-fluid">
-        <div class="row">
-          <div class="col-12">
-            <span data-lang="menu.playlist" class="title text-default"></span>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <span data-lang="menu.playlist" class="title text-default"></span>
 
-            <div class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
-              <div class="col-sm-8">
-                <div class="form-inline">
-                  <input type="search" class="form-control w-auto col-6" v-model="toAdd" placeholder="Paste your youtube link, id or playlist link">
+        <div class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
+          <div class="col-sm-8">
+            <div class="form-inline">
+              <input type="search" class="form-control w-auto col-6" v-model="toAdd" placeholder="Paste your youtube link, id or playlist link">
+              <button v-if="state.import == 0" class="btn btn-primary mr-2" v-on:click="addSongOrPlaylist()">
+                <i class="fas fa-plus"></i> {{ commons.translate('systems.songs.add_or_import') }}</button>
+              <button v-else-if="state.import == 1" class="btn btn-info mr-2" disabled="disabled">
+                <i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('systems.songs.importing') }}</button>
+              <button v-else class="btn btn-success mr-2" disabled="disabled">
+                <i class="fas fa-check"></i> {{ commons.translate('systems.songs.importing_done') }}</button>
+              <span class="text-info">{{ importInfo }}</span>
+            </div>
+          </div>
+          <div class="col-sm-4 text-right form-inline d-block">
+            <button class="btn btn-dark border-0">
+              <i class="fas fa-th-list"></i>
+            </button>
+            <i class="fas fa-search text-muted" style="position: relative; left: 2.2rem;"></i>
+            <input type="search" class="form-control w-auto pl-5" v-model="search" placeholder="Search...">
+          </div>
+        </div>
 
-                  <button v-if="state.import == 0" class="btn btn-primary mr-2" v-on:click="addSongOrPlaylist()"><i class="fas fa-plus"></i> {{ commons.translate('systems.songs.add_or_import') }}</button>
-                  <button v-else-if="state.import == 1" class="btn btn-info mr-2" disabled="disabled"><i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('systems.songs.importing') }}</button>
-                  <button v-else class="btn btn-success mr-2" disabled="disabled"><i class="fas fa-check"></i> {{ commons.translate('systems.songs.importing_done') }}</button>
-
-                  <span class="text-info">{{ importInfo }}</span>
+        <div v-if="filtered.length > 0" class="card" v-for="(item, index) of filtered" v-bind:class="{ 'mt-1': index !== 0 }">
+          <div class="card-body row p-0">
+            <div class="col-sm-11 pr-0">
+              <a class="btn btn-block btn-outline-dark border-0 h-100 text-left p-0" target="_blank" v-bind:href="'https://www.youtube.com/watch?v=' + item.videoID">
+                <img class="float-left pr-3" v-bind:src="generateThumbnail(item.videoID)">
+                <div style="padding-top:1.3rem !important">
+                  {{ item.title }}
+                  <small class="d-block">
+                    <i class="far fa-clock"></i> {{ item.length_seconds | formatTime }}
+                    <i class="pl-3 fas fa-volume-up"></i> {{ Number(item.volume).toFixed(1) }}%
+                    <i class="pl-3 fas fa-step-backward"></i>
+                    {{ item.startTime | formatTime }} - {{ item.endTime | formatTime }}
+                    <i class="fas fa-step-forward"></i>
+                    <i class="pl-3 fas fa-music"></i> {{ new Date(item.lastPlayedAt).toLocaleString() }}
+                  </small>
                 </div>
-              </div>
-              <div class="col-sm-4 text-right form-inline d-block">
-                <button class="btn btn-dark border-0"><i class="fas fa-th-list"></i></button>
-                <i class="fas fa-search text-muted" style="position: relative; left: 2.2rem;"></i>
-                <input type="search" class="form-control w-auto pl-5" v-model="search" placeholder="Search...">
-              </div>
+              </a>
             </div>
 
-            <div v-if="filtered.length > 0" class="card" v-for="(item, index) of filtered" v-bind:class="{ 'mt-3': index !== 0 }">
-              <div class="card-body row p-0">
-                <div class="col-sm-11 pr-0">
-                  <a class="btn btn-block btn-outline-dark border-0 h-100 text-left p-0" target="_blank" v-bind:href="'https://www.youtube.com/watch?v=' + item.videoID">
-                    <img class="float-left pr-3" v-bind:src="generateThumbnail(item.videoID)">
-                    <div style="padding-top:1.3rem !important">
-                      {{ item.title }}
-                      <small class="d-block">
-                        <i class="far fa-clock"></i> {{ item.length_seconds | formatTime }}
-                        <i class="pl-3 fas fa-volume-up"></i> {{ Number(item.loudness).toFixed(1) }}
-                        <i class="pl-3 fas fa-step-backward"></i>
-                          {{ (item.startTime ? item.startTime : 0) | formatTime }} - {{ (item.endTime ? item.endTime : item.length_seconds) | formatTime }}
-                        <i class="fas fa-step-forward"></i>
-                        <i class="pl-3 fas fa-music"></i> {{ new Date(item.lastPlayedAt).toLocaleString() }}
-                      </small>
-                    </div>
-                  </a>
-                </div>
-
-                <div class="col-sm-1 pl-0">
-                  <button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100"><i class="fas fa-ellipsis-v"></i></button>
-                    <div class="dropdown-menu p-0">
-                      <button class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="deleteItem(item._id)"><i class="fas fa-trash-alt fa-fw"></i> {{ commons.translate('delete') }}</button>
-                    </div>
-                </div>
+            <div class="col-sm-1 pl-0">
+              <button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <div class="dropdown-menu p-0">
+                <button class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="resetForm(); edit = item._id">
+                  <i class="fas fa-pencil-alt fa-fw"></i> {{ commons.translate('dialog.buttons.edit') }}</button>
+                <button class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="deleteItem(item._id)">
+                  <i class="fas fa-trash-alt fa-fw"></i> {{ commons.translate('delete') }}</button>
               </div>
+            </div>
+          </div>
+
+          <div class="card-body row" v-if="edit === item._id">
+            <div class="form-group col-md-12">
+              <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('systems.songs.settings.volume') }}</label>
+              <div class="input-group">
+                <button class="btn" @click="item.forceVolume = false" :class="[!item.forceVolume ? ' btn-success' : 'btn-secondary']">{{commons.translate('systems.songs.calculated')}}</button>
+                <button class="btn" @click="item.forceVolume = true" :class="[item.forceVolume ? ' btn-success' : 'btn-secondary']">{{commons.translate('systems.songs.set_manually')}}</button>
+                <input v-bind:class="{ 'is-invalid': hasError.volume }" v-model="item.volume" type="number" class="form-control" min=1 max=100 :disabled="!item.forceVolume">
+                <div class="input-group-append">
+                  <div class="input-group-text">%</div>
+                </div>
+                <div class="invalid-feedback">{{ commons.translate('systems.songs.error.isEmpty') }}</div>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('systems.songs.startTime') }}</label>
+              <div class="input-group">
+                <input v-bind:class="{ 'is-invalid': hasError.startTime }"v-model="item.startTime" type="number" class="form-control" min=1 :max="Number(item.endTime) - 1">
+                <div class="input-group-append">
+                  <div class="input-group-text">{{commons.translate('systems.songs.seconds')}}</div>
+                </div>
+                <div class="invalid-feedback">{{ commons.translate('systems.songs.error.isEmpty') }}</div>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('systems.songs.endTime') }}</label>
+              <div class="input-group">
+                <input v-bind:class="{ 'is-invalid': hasError.endTime }" v-model="item.endTime" type="number" class="form-control" :min="Number(item.startTime) + 1" :max="item.length_seconds">
+                <div class="input-group-append">
+                  <div class="input-group-text">{{commons.translate('systems.songs.seconds')}}</div>
+                </div>
+                <div class="invalid-feedback">{{ commons.translate('systems.songs.error.isEmpty') }}</div>
+              </div>
+            </div>
+            <div class="form-group text-right col-md-12">
+              <button type="button" class="btn btn-secondary" @click="edit = null">{{commons.translate('events.dialog.close')}}</button>
+
+              <button v-if="state.save === 0" type="button" class="btn btn-primary" v-on:click="updateItem(item._id)">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
+              <button v-if="state.save === 1" disabled="disabled" type="button" class="btn btn-primary"><i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
+              <button v-if="state.save === 2" disabled="disabled" type="button" class="btn btn-success"><i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</span></button>
+              <button v-if="state.save === 3" disabled="disabled" type="button" class="btn btn-danger"><i class="fas fa-exclamation"></i> {{ commons.translate('dialog.buttons.something-went-wrong') }}</span></button>
             </div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
 </div>
-
 <script>
   Vue.prototype.commons = commons
 
@@ -72,6 +122,13 @@
         search: '',
         toAdd: '',
         importInfo: '',
+        edit: null,
+
+        hasError: {
+          volume: false,
+          endTime: false,
+          startTime: false
+        },
 
         items: [],
 
@@ -79,6 +136,7 @@
 
         state: {
           import: 0,
+          save: 0
         },
         socket: io('/systems/songs', { query: "token=" + token }),
       },
@@ -120,6 +178,10 @@
       methods: {
         refreshPlaylist: function () {
           this.socket.emit('find.playlist', {}, (err, items) => {
+            for (let item of items) {
+              item.startTime = item.startTime ? item.startTime : 0
+              item.endTime = item.endTime ? item.endTime : item.length_seconds
+            }
             this.items = items
           })
         },
@@ -142,8 +204,43 @@
             this.state.import = 0
           }, 5000)
         },
+        validateForm: function (_id) {
+          // reset errors
+          this.resetForm()
+
+          let item = this.items.find((o) => o._id === _id)
+          if (item.forceVolume && String(item.volume).trim().length === 0) this.hasError.volume = true
+          if (String(item.startTime).trim().length === 0) this.hasError.startTime = true
+          if (String(item.endTime).trim().length === 0) this.hasError.endTime = true
+
+          return _.filter(this.hasError, (o) => o === true).length === 0
+        },
+        resetForm: function () {
+          for (let [key, value] of Object.entries(this.hasError)) {
+            this.hasError[key] = false
+          }
+          this.state.save = 0
+        },
         updateItem: function (_id) {
-          this.socket.emit('update', this.items.filter((o) => o._id === _id))
+          if (this.validateForm(_id)) {
+            this.state.save = 1
+
+            let item = this.items.find((o) => o._id === _id)
+            item.volume = Number(item.volume)
+            item.startTime = Number(item.startTime)
+            item.endTime = Number(item.endTime)
+            this.socket.emit('update', {collection: 'playlist', items: [item]}, (err) => {
+              if (err) {
+                console.error(err)
+                return this.state.save = 3
+              }
+              this.state.save = 2
+              setTimeout(() => {
+                this.state.save = 0
+                this.edit = null
+              }, 1000)
+            })
+          }
         },
         deleteItem: function (id) {
           this.socket.emit('delete.playlist', id, () => {

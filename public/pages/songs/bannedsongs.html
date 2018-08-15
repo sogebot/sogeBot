@@ -23,7 +23,7 @@
               </div>
             </div>
 
-            <div v-if="filtered.length > 0" class="card" v-for="(item, index) of filtered" v-bind:class="{ 'mt-3': index !== 0 }">
+            <div v-if="filtered.length > 0" class="card" v-for="(item, index) of filtered" v-bind:class="{ 'mt-1': index !== 0 }">
               <div class="card-body row p-0">
                 <div class="col-sm-11 pr-0">
                   <a class="btn btn-block btn-outline-dark border-0 h-100 text-left p-0" target="_blank" v-bind:href="'https://www.youtube.com/watch?v=' + item.videoId">
