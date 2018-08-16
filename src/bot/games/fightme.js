@@ -109,9 +109,11 @@ class FightMe extends Game {
       if (new Date().getTime() - new Date(await this.settings._.cooldown).getTime() < cooldown * 1000 &&
         !(await this.settings.bypassCooldownByOwnerAndMods && (isMod || global.commons.isBroadcaster(opts.sender)))) {
         debug('cooldown')
-        global.commons.sendMessage(global.translate('gambling.fightme.cooldown')
-          .replace(/\$cooldown/g, Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60))
-          .replace(/\$minutesName/g, global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes')), opts.sender)
+        global.commons.sendMessage(global.commons.prepare('gambling.fightme.cooldown', {
+          command: opts.command,
+          cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60),
+          minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes')
+        }), opts.sender)
         return
       }
 
@@ -120,7 +122,7 @@ class FightMe extends Game {
 
       const isAlreadyChallenged = !_.isEmpty(await global.db.engine.findOne(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username }))
       if (!isAlreadyChallenged) await global.db.engine.insert(this.collection.users, { key: '_users', user: opts.sender.username, challenging: username })
-      let message = await global.commons.prepare('gambling.fightme.challenge', { username: username, sender: opts.sender.username }); debug(message)
+      let message = await global.commons.prepare('gambling.fightme.challenge', { username: username, sender: opts.sender.username, command: opts.command }); debug(message)
       global.commons.sendMessage(message, opts.sender)
     }
   }

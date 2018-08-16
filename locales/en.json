@@ -1129,9 +1129,8 @@
     },
     "fightme": {
       "cannotFightWithYourself": "$sender, you cannot fight with yourself!",
-      "cooldown": "$sender, you cannot use !fightme for $cooldown $minutesName.",
-      "timeout": "FightMe! timeout set to $values",
-      "challenge": "(ง'̀-'́)ง $sender wants to fight you $username! If you accept, send !fightme $sender",
+      "cooldown": "$sender, you cannot use $command for $cooldown $minutesName.",
+      "challenge": "(ง'̀-'́)ง $sender wants to fight you $username! If you accept, send $command $sender",
       "winner": "٩(^ᴗ^)۶ $winner is proud winner! Who's next?",
       "notEnoughOptions": "$sender, you need to select user to fight.",
       "broadcaster": "ψ(｀∇´)ψ $winner is a god among you. This fight was decided even before it started.",

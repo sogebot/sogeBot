@@ -1134,9 +1134,8 @@
     },
     "fightme": {
       "cannotFightWithYourself": "$sender, nemuzes se porvat sam se sebou!",
-      "cooldown": "$sender, nemuzes pouzit !fightme jeste $cooldown $minutesName.",
-      "timeout": "FightMe! timeout nastaven na $values",
-      "challenge": "(ง'̀-'́)ง $sender se chce s tebou porvat $username! Pokud souhlasis, posli !fightme $sender",
+      "cooldown": "$sender, nemuzes pouzit $command jeste $cooldown $minutesName.",
+      "challenge": "(ง'̀-'́)ง $sender se chce s tebou porvat $username! Pokud souhlasis, posli $command $sender",
       "winner": "٩(^ᴗ^)۶ $winner je hrdym vitezem! Kdo je dalsim na rade?",
       "notEnoughOptions": "$sender, musis vybrat uzivatele k souboji.",
       "broadcaster": "ψ(｀∇´)ψ $winner je zde bohem. Tento souboj byl rozhodnut jeste nez vubec zacal.",
