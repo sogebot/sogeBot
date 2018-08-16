@@ -43,6 +43,12 @@ export default {
       $('title').text(`${name.toUpperCase()} POPOUT - ${this.widget}`)
     })
     this.page({ popstate:true })
+
+    // allow focus on dropdowns with data-allow-focus
+    $(document).on("click", "[data-allow-focus]", function(e) {
+      e.preventDefault()
+      e.stopPropagation();
+    });
   }
 }
 </script>
