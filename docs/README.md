@@ -8,6 +8,15 @@
 
 Free Twitch Bot built on Node.js
 
+#### Important links
+
+- **DISCORD**: https://discordapp.com/invite/52KpmuH
+- **GITHUB**: https://github.com/sogehige/sogeBot
+- **DOCS**: http://sogehige.github.io/sogeBot/
+- **ISSUES**: https://github.com/sogehige/sogeBot/issues
+- **RELEASES**: https://github.com/sogehige/sogeBot/releases
+- **IDEAS & SUGGESTIONS**: https://ideas.sogehige.tv/ or http://sogebot.fider.io
+
 #### Screenshots
 <img src="https://drive.google.com/uc?id=1yaD6hiHQ8CuZ1konVSK_Iy_7Dbb3-WQC" width="200"> <img src="https://drive.google.com/uc?id=1j0immtX6yutNcNGErHDSwjtqDz2AGfLS" width="200"> <img src="https://drive.google.com/uc?id=1Nshe2MqYpd3fzNyCXmbWDJmR61_RWpVE" width="200"> <img src="https://drive.google.com/uc?id=1mPg3wkFdP_F3jVV5eYenf1CiCenvuU-P" width="200"> <img src="https://drive.google.com/uc?id=1k7vyakPrKid73rGx7qfJcxzBUGcxl8dS" width="200"> <img src="https://drive.google.com/uc?id=1AAZMLew__TkpiQ_QbRZPxV-r9p_So7vG" width="200"> <img src="https://drive.google.com/uc?id=1jcS7GDld7gaMqDYbdGqM8wOqWEpP7Jfo" width="200">
 
