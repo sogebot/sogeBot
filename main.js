@@ -187,32 +187,28 @@ function fork () {
 }
 
 function loadClientListeners () {
-  global.broadcasterTMI.chat.on('PRIVMSG', async (message) => {
-    if (message._raw.includes(':jtv!~jtv@jtv.tmi.twitch.tv')) {
-      // Someone is hosting the channel and the message contains how many viewers..
-      if (message._raw.includes('hosting you')) {
-        const username = message.message.split(' ')[0].replace(':', '')
-        const autohost = message.message.includes('auto')
-        let viewers = '0'
-        if (message._raw.includes('hosting you for')) viewers = _.extractNumber(message._raw.split(config.broadcaster_username)[1])
+  global.broadcasterTMI.chat.on('PRIVMSG/HOSTED', async (message) => {
+    // Someone is hosting the channel and the message contains how many viewers..
+    const username = message.message.split(' ')[0].replace(':', '')
+    const autohost = message.message.includes('auto')
+    let viewers = message.numberOfViewers || '0'
 
-        DEBUG_TMIJS(`Hosted by ${username} with ${viewers} viewers - autohost: ${autohost}`)
-        global.log.host(`${username}, viewers: ${viewers}, autohost: ${autohost}`)
+    DEBUG_TMIJS(`Hosted by ${username} with ${viewers} viewers - autohost: ${autohost}`)
+    global.log.host(`${username}, viewers: ${viewers}, autohost: ${autohost}`)
 
-        global.db.engine.update('cache.hosts', { username }, { username })
+    global.db.engine.update('cache.hosts', { username }, { username })
 
-        const data = {
-          username: username,
-          viewers: viewers,
-          autohost: autohost
-        }
-
-        data.type = 'host'
-        global.overlays.eventlist.add(data)
-        global.events.fire('hosted', data)
-      }
+    const data = {
+      username: username,
+      viewers: viewers,
+      autohost: autohost
     }
+
+    data.type = 'host'
+    global.overlays.eventlist.add(data)
+    global.events.fire('hosted', data)
   })
+
   global.botTMI.chat.on('PRIVMSG', async (message) => {
     if (!global.commons.isBot(message.tags.displayName) || !message.isSelf) {
       DEBUG_TMIJS('Message received: %s', JSON.stringify(message))
