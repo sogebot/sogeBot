@@ -39,6 +39,7 @@ class Twitch {
       {this: this, id: '!top tips', command: '!top tips', fnc: this.showTopTips, permission: constants.OWNER_ONLY},
       {this: this, id: '!top points', command: '!top points', fnc: this.showTopPoints, permission: constants.OWNER_ONLY},
       {this: this, id: '!top messages', command: '!top messages', fnc: this.showTopMessages, permission: constants.OWNER_ONLY},
+      {this: this, id: '!top followage', command: '!top followage', fnc: this.showTopFollowAge, permission: constants.OWNER_ONLY},
       {this: this, id: '!title', command: '!title', fnc: this.setTitle, permission: constants.OWNER_ONLY},
       {this: this, id: '!game', command: '!game', fnc: this.setGame, permission: constants.OWNER_ONLY}
     ]
@@ -290,6 +291,11 @@ class Twitch {
     }
   }
 
+  showTopFollowAge (opts) {
+    opts.parameters = 'followage'
+    this.showTop(opts)
+  }
+
   showTopMessages (opts) {
     opts.parameters = 'messages'
     this.showTop(opts)
@@ -312,7 +318,7 @@ class Twitch {
 
   async showTop (opts) {
     let sorted, message
-    let type = opts.parameters.match(/^(time|points|messages|tips)$/)
+    let type = opts.parameters.match(/^(time|points|messages|tips|followage)$/)
     let i = 0
 
     if (_.isNil(type)) type = 'time'
@@ -341,12 +347,18 @@ class Twitch {
         users[tip.username].amount += global.currency.exchange(tip.amount, tip.currency, await global.configuration.getValue('currency'))
       }
       sorted = _.orderBy(users, 'amount', 'desc')
-    } else {
+    } else if (type === 'messages') {
       sorted = []
       for (let user of (await global.db.engine.find('users.messages', { _sort: 'messages', _sum: 'messages', _total, _group: 'username' }))) {
         sorted.push({ username: user._id, messages: user.messages })
       }
       message = global.translate('top.listMessages').replace(/\$amount/g, 10)
+    } else if (type === 'followage') {
+      sorted = []
+      for (let user of (await global.db.engine.find('users', { _sort: '-time.follow', _total }))) {
+        sorted.push({ username: user.username, followage: user.time.follow })
+      }
+      message = global.translate('top.listFollowage').replace(/\$amount/g, 10)
     }
 
     if (sorted.length > 0) {
@@ -362,6 +374,7 @@ class Twitch {
 
       sorted = _.chunk(sorted, 10)[0]
 
+      moment.locale(global.lib.translate.lang)
       for (let user of sorted) {
         message += (i + 1) + '. ' + (await global.configuration.getValue('atUsername') ? '@' : '') + user.username + ' - '
         if (type === 'time') message += (user.watched / 1000 / 60 / 60).toFixed(1) + 'h'
@@ -369,7 +382,10 @@ class Twitch {
         else if (type === 'points') {
           let points = user.points
           message += points + ' ' + await global.systems.points.getPointsName(user.points)
-        } else message += user.messages
+        } else if (type === 'messages') message += user.messages
+        else if (type === 'followage') {
+          message += `${moment(user.followage).format('L')} (${moment(user.followage).fromNow()})`
+        }
         if (i + 1 < 10 && !_.isNil(sorted[i + 1])) message += ', '
         i++
       }

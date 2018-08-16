@@ -993,7 +993,8 @@
     "listWatched": "Top $amount (watch time): ",
     "listTips": "Top $amount (tips): ",
     "listPoints": "Top $amount (points): ",
-    "listMessages": "Top $amount (messages): "
+    "listMessages": "Top $amount (messages): ",
+    "listFollowage": "Top $amount (followage): "
   },
   "permissions": {
     "success": {
