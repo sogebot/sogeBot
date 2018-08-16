@@ -110,7 +110,6 @@ describe('systems/moderation - whitelist()', () => {
         await (global.systems.moderation.settings.lists.whitelist = [pattern])
         await variable.isEqual('systems.moderation.settings.lists.whitelist', [pattern])
         let result = await global.systems.moderation.whitelist(text)
-        console.log(result)
         assert.isTrue(text !== result)
       })
     }
