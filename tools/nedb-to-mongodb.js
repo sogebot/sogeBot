@@ -22,7 +22,7 @@ var processExpectedCount = 0
 var allStarted = false
 
 async function main () {
-  let mongo = await client.connect(argv.uri, { poolSize: 5 })
+  let mongo = await client.connect(argv.uri, { poolSize: 5, useNewUrlParser: true })
   let db = await mongo.db(mongodbUri.parse(argv.uri).database)
   for (let file of fs.readdirSync('db/nedb/')) {
     processExpectedCount++
