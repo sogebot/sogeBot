@@ -40,3 +40,6 @@
 * Integrations
   * [Twitter](integrations/twitter.md)
   * [Spotify](integrations/spotify.md)
+* Tools
+  * [Users cleanup](tools/users-cleanup.md)
+  * [Migration NeDB->MongoDB](tools/migration-nedb-mongodb.md)
