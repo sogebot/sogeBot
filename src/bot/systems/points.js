@@ -19,7 +19,9 @@ class Points extends System {
         offlineInterval: 30,
         perOfflineInterval: 1,
         messageInterval: 5,
-        perMessageInterval: 1
+        perMessageInterval: 1,
+        messageOfflineInterval: 5,
+        perMessageOfflineInterval: 0
       },
       parsers: [
         { name: 'messagePoints', fireAndForget: true }
@@ -96,18 +98,27 @@ class Points extends System {
   async messagePoints (opts) {
     if (opts.skip || opts.message.startsWith('!')) return true
 
-    let [perMessageInterval, messageInterval] = await Promise.all([
-      this.settings.perMessageInterval,
-      this.settings.messageInterval
+    let [perMessageInterval, messageInterval, perMessageOfflineInterval, messageOfflineInterval, isOnline] = await Promise.all([
+      this.settings.points.perMessageInterval,
+      this.settings.points.messageInterval,
+      this.settings.points.perMessageOfflineInterval,
+      this.settings.points.messageOfflineInterval,
+      global.cache.isOnline()
     ])
 
-    const user = await global.users.get(opts.sender.username)
-    if (perMessageInterval === 0 || messageInterval === 0) return
-    let lastMessageCount = _.isNil(user.custom.lastMessagePoints) ? 0 : user.custom.lastMessagePoints
-    const userMessages = await global.users.getMessagesOf(opts.sender.username)
+    const interval = isOnline ? messageInterval : messageOfflineInterval
+    const ptsPerInterval = isOnline ? perMessageInterval : perMessageOfflineInterval
 
-    if (lastMessageCount + messageInterval <= userMessages) {
-      await global.db.engine.insert('users.points', { username: user.username, points: parseInt(perMessageInterval, 10) })
+    if (interval === 0 || ptsPerInterval === 0) return
+
+    let [user, userMessages] = await Promise.all([
+      global.users.get(opts.sender.username),
+      global.users.getMessagesOf(opts.sender.username)
+    ])
+    let lastMessageCount = _.isNil(user.custom.lastMessagePoints) ? 0 : user.custom.lastMessagePoints
+
+    if (lastMessageCount + interval <= userMessages) {
+      await global.db.engine.insert('users.points', { username: user.username, points: parseInt(ptsPerInterval, 10) })
       await global.db.engine.update('users', { username: user.username }, { custom: { lastMessagePoints: userMessages } })
     }
     return true
