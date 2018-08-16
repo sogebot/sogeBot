@@ -417,7 +417,7 @@ class Songs extends System {
 
     this.refreshPlaylistVolume()
     this.getMeanLoudness()
-    global.commons.sendMessage(global.commons.prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender)
+    global.commons.sendMessage(await global.commons.prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender)
     return { imported, skipped: done - imported }
   }
 
@@ -453,7 +453,7 @@ class Songs extends System {
     const ids = await global.systems.songs.getSongsIdsFromPlaylist(opts.parameters)
 
     if (ids.length === 0) {
-      global.commons.sendMessage(global.commons.prepare('songs.playlist-is-empty'), opts.sender)
+      global.commons.sendMessage(await global.commons.prepare('songs.playlist-is-empty'), opts.sender)
     } else {
       let imported = 0
       let done = 0
@@ -495,7 +495,7 @@ class Songs extends System {
 
       await this.refreshPlaylistVolume()
       await this.getMeanLoudness()
-      global.commons.sendMessage(global.commons.prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender)
+      global.commons.sendMessage(await global.commons.prepare('songs.playlist-imported', { imported, skipped: done - imported }), opts.sender)
       return { imported, skipped: done - imported }
     }
   }

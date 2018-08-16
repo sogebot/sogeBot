@@ -118,7 +118,7 @@ class Bets extends System {
       for (let i in options) bet.options[i] = { name: options[i] }
 
       await global.db.engine.insert(this.collection.data, bet)
-      global.commons.sendMessage(global.commons.prepare('bets.opened', {
+      global.commons.sendMessage(await global.commons.prepare('bets.opened', {
         username: global.commons.getOwner(),
         title: title,
         maxIndex: options.length - 1,
@@ -132,7 +132,7 @@ class Bets extends System {
           global.commons.sendMessage(global.translate('bets.notEnoughOptions'), opts.sender)
           break
         case ERROR_ALREADY_OPENED:
-          global.commons.sendMessage(global.commons.prepare('bets.running', {
+          global.commons.sendMessage(await global.commons.prepare('bets.running', {
             command: opts.command,
             $maxIndex: currentBet.options.length - 1,
             $options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', ')}), opts.sender)
@@ -150,7 +150,7 @@ class Bets extends System {
     let currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' })
     if (_.isEmpty(currentBet)) global.commons.sendMessage(global.translate('bets.notRunning'), opts.sender)
     else {
-      global.commons.sendMessage(global.commons.prepare(currentBet.locked ? 'bets.lockedInfo' : 'bets.info', {
+      global.commons.sendMessage(await global.commons.prepare(currentBet.locked ? 'bets.lockedInfo' : 'bets.info', {
         command: opts.command,
         $title: currentBet.title,
         $maxIndex: currentBet.options.length - 1,
@@ -195,7 +195,7 @@ class Bets extends System {
           global.commons.sendMessage(global.translate('bets.notRunning'), opts.sender)
           break
         case ERROR_UNDEFINED_BET:
-          global.commons.sendMessage(global.commons.prepare('bets.undefinedBet', { command: opts.command }), opts.sender)
+          global.commons.sendMessage(await global.commons.prepare('bets.undefinedBet', { command: opts.command }), opts.sender)
           break
         case ERROR_IS_LOCKED:
           global.commons.sendMessage(global.translate('bets.timeUpBet'), opts.sender)
@@ -206,7 +206,7 @@ class Bets extends System {
           break
         default:
           global.log.warning(e.stack)
-          global.commons.sendMessage(global.commons.prepare('bets.error', { command: opts.command }).replace(/\$maxIndex/g, currentBet.options.length - 1), opts.sender)
+          global.commons.sendMessage(await global.commons.prepare('bets.error', { command: opts.command }).replace(/\$maxIndex/g, currentBet.options.length - 1), opts.sender)
       }
     } finally {
       global.db.engine.update(this.collection.data, { key: 'betsModifiedTime' }, { value: new Date().getTime() })
@@ -272,7 +272,7 @@ class Bets extends System {
           global.commons.sendMessage(global.translate('bets.notRunning'), opts.sender)
           break
         case ERROR_NOT_OPTION:
-          global.commons.sendMessage(global.commons.prepare('bets.notOption', { command: opts.command }), opts.sender)
+          global.commons.sendMessage(await global.commons.prepare('bets.notOption', { command: opts.command }), opts.sender)
           break
         default:
           global.log.warning(e.stack)
