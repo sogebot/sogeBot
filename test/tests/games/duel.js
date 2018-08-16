@@ -10,6 +10,7 @@ const _ = require('lodash')
 const owner = { username: 'soge__' }
 const user1 = { username: 'user1' }
 const user2 = { username: 'user2' }
+const command = '!duel'
 
 describe('Gambling - duel', () => {
   before(async () => {
@@ -24,10 +25,11 @@ describe('Gambling - duel', () => {
     })
 
     it('user 1 is challenging', async () => {
-      await global.games.duel.main({ sender: user1, parameters: 'all' })
+      await global.games.duel.main({ sender: user1, parameters: 'all', command })
       await message.isSent('gambling.duel.new', user1, {
         minutesName: global.commons.getLocalizedName(await global.games.duel.settings.duration, 'core.minutes'),
-        minutes: await global.games.duel.settings.duration
+        minutes: await global.games.duel.settings.duration,
+        command
       })
       await message.isSent('gambling.duel.joined', user1, {
         pointsName: await global.systems.points.getPointsName(100),
@@ -36,10 +38,11 @@ describe('Gambling - duel', () => {
     })
 
     it('user 2 is added to duel', async () => {
-      await global.games.duel.main({ sender: user2, parameters: 'all' })
+      await global.games.duel.main({ sender: user2, parameters: 'all', command })
       await message.isSent('gambling.duel.joined', user2, {
         pointsName: await global.systems.points.getPointsName(100),
-        points: 100
+        points: 100,
+        command
       })
     })
 
