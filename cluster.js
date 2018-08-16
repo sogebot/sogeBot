@@ -134,7 +134,7 @@ function cluster () {
         global.events.fire('keyword-send-x-times', { username: sender.username, message: message })
         if (message.startsWith('!')) {
           global.events.fire('command-send-x-times', { username: sender.username, message: message })
-        } else if (!message.startsWith('!') && await global.cache.isOnline()) global.db.engine.insert('users.messages', { username: sender.username, messages: 1 })
+        } else if (!message.startsWith('!')) global.db.engine.insert('users.messages', { username: sender.username, messages: 1 })
       }
 
       DEBUG_CLUSTER_WORKER_ONMESSAGE_ID('Process parser')

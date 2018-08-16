@@ -903,16 +903,6 @@
       "add": "{core.command-parse} !points add [username] [amount]",
       "remove": "{core.command-parse} !points remove [username] [amount]"
     },
-    "settings": {
-      "pointsName": "Pojmenovani bodu nastaveno na $value format",
-      "pointsResponse": "Odpoved na body nastavena na: $value",
-      "pointsInterval": "Interval ziskavani bodu online je $value minut",
-      "pointsPerInterval": "Pocet bodu ziskano za interval online je $value",
-      "pointsMessageInterval": "Interval zprav pro ziskani bodu je $value",
-      "pointsPerMessageInterval": "Pocet bodu ziskanych za interval zprav je $value",
-      "pointsIntervalOffline": "Interval ziskavani bodu offline je $value minut",
-      "pointsPerIntervalOffline": "Pocet bodu ziskano za interval offline je $value"
-    },
     "defaults": {
       "pointsName": {
         "single": "bod",

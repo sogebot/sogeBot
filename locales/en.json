@@ -898,16 +898,6 @@
       "add": "{core.command-parse} !points add [username] [amount]",
       "remove": "{core.command-parse} !points remove [username] [amount]"
     },
-    "settings": {
-      "pointsName": "Points name was set to $value format",
-      "pointsResponse": "Points response was changed to: $value",
-      "pointsInterval": "Points online interval set to $value minutes",
-      "pointsPerInterval": "Points when online was set to $value per online interval",
-      "pointsMessageInterval": "Points interval message set to $value",
-      "pointsPerMessageInterval": "Points per message interval set to $value",
-      "pointsIntervalOffline": "Points offline interval set to $value minutes",
-      "pointsPerIntervalOffline": "Points when offline was set to $value per offline interval"
-    },
     "defaults": {
       "pointsName": {
         "single": "point",
