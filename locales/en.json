@@ -1102,22 +1102,12 @@
     "response-disabled": "$sender, response (id: $id) was disabled"
   },
   "gambling": {
-    "cooldown": {
-      "duel": "Cooldown for !duel is set to $values",
-      "fightme": "Cooldown for !fightme is set to $values",
-      "bypass": {
-        "true": "Gamble cooldowns will be ignored for mods/caster",
-        "false": "Gamble cooldowns won't be ignored for mods/caster"
-      }
-    },
     "duel": {
-      "minimalBet": "$sender, minimal bet for !duel is set to $value",
-      "lowerThanMinimalBet": "$sender, minimal bet for !duel is $points $pointsName",
-      "duration": "$sender, duration of duel set to $value minutes",
-      "cooldown": "$sender, you cannot use !duel for $cooldown $minutesName.",
+      "lowerThanMinimalBet": "$sender, minimal bet for $command is $points $pointsName",
+      "cooldown": "$sender, you cannot use $command for $cooldown $minutesName.",
       "joined": "$sender, good luck with your dueling skills. You bet on yourself $points $pointsName!",
       "added": "$sender really thinks he is better than others raising his bet to $points $pointsName!",
-      "new": "$sender is your new duel challenger! To participate use !duel [points], you have $minutes $minutesName left to join.",
+      "new": "$sender is your new duel challenger! To participate use $command [points], you have $minutes $minutesName left to join.",
       "zeroBet": "$sender, you cannot duel 0 $pointsName",
       "notEnoughOptions": "$sender, you need to specify points to dueling",
       "notEnoughPoints": "$sender, you don't have $points $pointsName to duel!",

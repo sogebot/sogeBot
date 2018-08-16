@@ -122,7 +122,8 @@ class Duel extends Game {
         } else {
           message = await global.commons.prepare('gambling.fightme.cooldown', {
             minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes'),
-            cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60) })
+            cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60),
+            command: opts.command })
           debug(message); global.commons.sendMessage(message, opts.sender)
           return true
         }
@@ -133,7 +134,8 @@ class Duel extends Game {
         this.settings._.timestamp = new Date()
         message = await global.commons.prepare('gambling.duel.new', {
           minutesName: global.commons.getLocalizedName(5, 'core.minutes'),
-          minutes: await this.settings.duration })
+          minutes: await this.settings.duration,
+          command: opts.command })
         debug(message); global.commons.sendMessage(message, opts.sender)
       }
 
@@ -165,7 +167,8 @@ class Duel extends Game {
           bet = await this.settings.minimalBet
           message = await global.commons.prepare('gambling.duel.lowerThanMinimalBet', {
             pointsName: await global.systems.points.getPointsName(bet),
-            points: bet
+            points: bet,
+            command: opts.command
           })
           debug(message); global.commons.sendMessage(message, opts.sender)
           break

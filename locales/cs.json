@@ -1107,22 +1107,12 @@
     "response-disabled": "$sender, odpoved (id: $id) byla vypnuta."
   },
   "gambling": {
-    "cooldown": {
-      "duel": "Cooldown pro !duel je nastaven na $values",
-      "fightme": "Cooldown pro !fightme je nastaven na $values",
-      "bypass": {
-        "true": "Herni cooldowny budou ignorovany pro mody/castera",
-        "false": "Herni cooldowny nebudou ignorovany mody/castera"
-      }
-    },
     "duel": {
-      "minimalBet": "$sender, minimalni sazka pro !duel je nastavena na $value",
-      "lowerThanMinimalBet": "$sender, minimalni sazka pro !duel je $points $pointsName",
-      "duration": "$sender, trvani duelu nastavena na $value minut",
-      "cooldown": "$sender, nemuzes pouzit !duel jeste $cooldown $minutesName.",
+      "lowerThanMinimalBet": "$sender, minimalni sazka pro $command je $points $pointsName",
+      "cooldown": "$sender, nemuzes pouzit $command jeste $cooldown $minutesName.",
       "joined": "$sender, hodne stesti behem duelu. Vsadil sis na sebe $points $pointsName!",
       "added": "$sender si mysli, ze je lepsi nez ostatni a zvysuje sazku na $points $pointsName!",
-      "new": "$sender je vas novy vyzyvatel pro duel! Zucastni se take pomoci !duel [points], zbyva ti $minutes $minutesName pro ucast.",
+      "new": "$sender je vas novy vyzyvatel pro duel! Zucastni se take pomoci $command [points], zbyva ti $minutes $minutesName pro ucast.",
       "zeroBet": "$sender, nemuzes na sebe vsadit 0 $pointsName",
       "notEnoughOptions": "$sender, k duelu musis neco vsadit",
       "notEnoughPoints": "$sender, nemas $points $pointsName pro duel!",
