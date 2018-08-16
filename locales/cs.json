@@ -998,7 +998,8 @@
     "listWatched": "Top $amount (cas sledovani): ",
     "listTips": "Top $amount (spropitne): ",
     "listPoints": "Top $amount (body): ",
-    "listMessages": "Top $amount (zpravy): "
+    "listMessages": "Top $amount (zpravy): ",
+    "listFollowage": "Top $amount (followage): "
   },
   "permissions": {
     "success": {

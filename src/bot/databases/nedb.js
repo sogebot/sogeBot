@@ -93,8 +93,10 @@ class INeDB extends Interface {
     this.on(table) // init table
 
     where = where || {}
+    where._sort = where._sort || '_id'
 
-    const sortBy = where._sort || '_id'
+    const sortBy = where._sort.startsWith('-') ? where._sort.replace('-', '') : where._sort
+    const order = where._sort.startsWith('-') ? 'asc' : 'desc'
     const sumBy = where._sum || undefined
     const groupBy = where._group || undefined
     const total = where._total || undefined
@@ -122,7 +124,12 @@ class INeDB extends Interface {
           }
 
           // nedb needs to fake sort
-          items = _.orderBy(items, sortBy, 'desc')
+          if (sortBy !== '_id') {
+            // remove undefined values in sortBy
+            items = items.filter(o => _.get(o, sortBy, false))
+          }
+          items = _.orderBy(items, sortBy, order)
+
           // nedb needs to fake total
           if (total) items = _.chunk(items, total)[0]
 
