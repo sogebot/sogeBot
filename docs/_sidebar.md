@@ -7,6 +7,7 @@
   * [Panel](configuration/panel.md)
   * [Database](configuration/database.md)
   * [ClientId](configuration/clientid.md)
+  * [Color](configuration/color.md)
 * Systems
   * [Alias](commands/alias.md)
   * [Commercial](commands/commercial.md)
