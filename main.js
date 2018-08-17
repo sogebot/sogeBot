@@ -151,6 +151,11 @@ async function main () {
 function fork () {
   let worker = cluster.fork()
   DEBUG_CLUSTER_FORK(`New worker ${worker.id} was created.`)
+  forkOn(worker)
+}
+
+function forkOn (worker) {
+  if (!global.db.engine.connected || !(global.lib && global.lib.translate)) return setTimeout(() => forkOn(worker), 1000)
   // processing messages from workers
   worker.on('message', async (msg) => {
     if (msg.type === 'lang') {

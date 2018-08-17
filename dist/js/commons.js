@@ -1,9 +1,12 @@
 /* global translations socket _ $ atob btoa */
 
+var metrics = {
+  translations: []
+}
+
 var commons = {
-  stub: function (id, value) {
-    return // do nothing
-  },
+  mTranslationsSent: [],
+  stub: function (id, value) {},
   setResponse: function (key, value) {
     socket.emit('responses.set', {
       key: key,
@@ -12,6 +15,7 @@ var commons = {
   },
   translate: function (key) {
     if (_.isNil(key)) {
+      console.warn('translate() without key is deprecated')
       // translate everything if key is not given
       _.each($('[data-lang]'), function (el) {
         var key = ($(el).data('lang'))
@@ -25,6 +29,11 @@ var commons = {
         }
       })
     } else {
+      if (!metrics.translations.includes(key)) {
+        // we need only first usage on page load to not unnecessary overload socket
+        metrics.translations.push(key)
+        socket.emit('metrics.translations', key)
+      }
       // return translation of a key
       return _.isNil(_.at(translations, key)[0]) ? `{${key}}` : _.at(translations, key)[0]
     }

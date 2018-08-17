@@ -45,6 +45,9 @@
       "timeout": "30000"
     }
   },
+  "metrics": {
+    "translations": true
+  },
   "debug": {
     "__COMMENT__": "DON'T ENABLE THIS UNTIL YOU KNOW WHAT YOU ARE DOING!",
     "all": false,
