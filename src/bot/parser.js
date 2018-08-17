@@ -164,8 +164,7 @@ class Parser {
     commands = _(commands).flatMap().sortBy(o => -o.command.length).value()
     for (let command of commands) {
       d(`Checking ${command.command}`)
-      let key = command.id.replace('!', '')
-      let permission = await global.db.engine.findOne('permissions', { key })
+      let permission = await global.db.engine.findOne('permissions', { key: command.id })
       if (!_.isEmpty(permission)) command.permission = permission.permission // change to custom permission
     }
     return commands

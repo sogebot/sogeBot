@@ -99,6 +99,22 @@ let updates = async (from, to) => {
 }
 
 let migration = {
+  permission: [{
+    version: '8.0.0',
+    do: async () => {
+      console.log('Updating permissions')
+      let processed = 0
+      const permissions = await global.db.engine.find('permissions')
+      for (let p of permissions) {
+        if (!p.key.startsWith('!')) {
+          await global.global.db.engine.update('permissions', { _id: String(p._id) }, { key: `!${p.key}` })
+          processed++
+        }
+      }
+
+      console.info(` => ${processed} processed`)
+    }
+  }],
   settings: [{
     version: '8.0.0',
     do: async () => {

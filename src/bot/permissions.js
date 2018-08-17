@@ -58,12 +58,11 @@ class Permissions {
       default:
         data.permission = constants.OWNER_ONLY
     }
-    await global.db.engine.update('permissions', { key: data.id.replace('!', '') }, { key: data.id.replace('!', ''), permission: data.permission })
+    await global.db.engine.update('permissions', { key: data.id }, { key: data.id, permission: data.permission })
   }
 
   removePermission (self, command) {
-    // command should be without !
-    global.db.engine.remove('permissions', { key: command.replace('!', '') })
+    global.db.engine.remove('permissions', { key: command })
   }
 
   async override (opts) {
@@ -91,9 +90,9 @@ class Permissions {
       let command = await parser.find('!' + match.command)
 
       if (command) {
-        if (!_.isNil(command.id)) await global.db.engine.update('permissions', { key: command.id.replace('!', '') }, { key: command.id.replace('!', ''), permission: permission })
+        if (!_.isNil(command.id)) await global.db.engine.update('permissions', { key: command.id }, { key: command.id, permission: permission })
         // deprecated saving on match.command
-        else await global.db.engine.update('permissions', { key: command.command.replace('!', '') }, { key: command.command.replace('!', ''), permission: permission })
+        else await global.db.engine.update('permissions', { key: command.command }, { key: command.command, permission: permission })
         global.commons.sendMessage(global.translate('permissions.success.change').replace(/\$command/g, command.command), opts.sender)
       } else {
         global.commons.sendMessage(global.translate('permissions.failed.noCmd'), opts.sender)
