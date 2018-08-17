@@ -509,7 +509,7 @@ class Events {
     const d = debug('events:checkFilter')
     d('Checking filters | %j, %j', eventId, attributes)
     const filter = (await global.db.engine.findOne('events.filters', { eventId: eventId })).filters
-    if (filter.trim().length === 0) return true
+    if (typeof filter === 'undefined' || filter.trim().length === 0) return true
     let toEval = `(function evaluation () { return ${filter} })()`
     const context = {
       _: _,
