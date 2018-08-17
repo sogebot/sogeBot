@@ -1,3 +1,5 @@
+// @flow
+
 'use strict'
 
 var glob = require('glob')
@@ -6,15 +8,23 @@ var _ = require('lodash')
 const flatten = require('flat')
 
 const cluster = require('cluster')
+const config = require('@config')
+const axios = require('axios')
+const chalk = require('chalk')
+
+config.metrics = config.metrics || {}
+config.metrics.translations = config.metrics.translations || true
 
 class Translate {
+  custom: array = [];
+  translations: object = {};
+  initialMetricsSent: boolean = false;
+  mItems: array = [];
+  mTimestamp: Date = new Date();
+  lang: string = 'en';
+
   constructor () {
-    this.custom = []
-    this.translations = {}
-
-    this.lang = 'en'
     global.configuration.register('lang', '', 'string', this.lang)
-
     if (cluster.isMaster) global.panel.addMenu({category: 'settings', name: 'translations', id: 'translations'})
   }
 
@@ -33,12 +43,40 @@ class Translate {
           if (cluster.isMaster) global.log.warning(`Language ${this.lang} not found - fallback to en`)
           this.lang = 'en'
         }
+
         for (let c of this.custom) {
           if (_.isNil(flatten(this.translations[this.lang])[c.key])) {
             // remove if lang doesn't exist anymore
             global.db.engine.remove('customTranslations', { key: c.key })
             this.custom = _.remove(this.custom, (i) => i.key === c.key)
           }
+        }
+
+        if (config.metrics.translations && !this.initialMetricsSent && cluster.isMaster) {
+          const bulk = 1000
+          let data = { version: _.get(process, 'env.npm_package_version', 'n/a'), items: [] }
+          for (let key of [...new Set(Object.keys(flatten(this.translations)).map(o => o.split('.').slice(1).join('.')))]) {
+            data.items.push({key, count: 0})
+            if (data.items.length === bulk) {
+              axios.post('http://stats.sogehige.tv/add', {
+                version: data.version,
+                items: data.items
+              })
+              data.items = []
+            }
+          }
+          // send last data
+          if (data.items.length > 0) {
+            axios.post('http://stats.sogehige.tv/add', {
+              version: data.version,
+              items: data.items
+            })
+          }
+        }
+
+        if (!this.initialMetricsSent && cluster.isMaster) {
+          this.initialMetricsSent = true
+          global.log.info(`${config.metrics.translations ? chalk.green('ENABLED') : chalk.red('DISABLED')}: Translations (metrics)`)
         }
         resolve()
       })
@@ -54,9 +92,34 @@ class Translate {
     }
   }
 
-  translate (text, orig) {
-    orig = orig || false
+  addMetrics (key: string | object) {
+    if (typeof key === 'object') return // skip objects (returning more than one key)
+    if (cluster.isWorker) {
+      // we want to have translations aggregated on master
+      return process.send({ type: 'call', ns: 'lib.translate', fnc: 'addMetrics', args: [key] })
+    }
+
+    this.mItems.push({key, count: 1})
+
+    if (this.mItems.length > 100 || new Date().getTime() - new Date(this.mTimestamp).getTime() > 1000 * 60 * 30) {
+      axios.post('http://stats.sogehige.tv/add', {
+        version: _.get(process, 'env.npm_package_version', 'n/a'),
+        items: _(_.clone(this.mItems)).groupBy('key').map((o, k) => ({
+          key: k,
+          count: _.sumBy(o, 'count')
+        })).value()
+      })
+
+      this.mTimestamp = new Date()
+      this.mItems = []
+    }
+  }
+
+  translate (text: string | object, orig: boolean) {
     const self = global.lib.translate
+
+    self.addMetrics(text)
+    orig = orig || false
     if (_.isUndefined(self.translations[self.lang]) && !_.isUndefined(text)) return '{missing_translation: ' + self.lang + '.' + text + '}'
     else if (typeof text === 'object') {
       let t = self.translations[self.lang][text.root]
@@ -66,7 +129,7 @@ class Translate {
     return null
   }
 
-  get (text, orig) {
+  get (text: string | object, orig: boolean) {
     try {
       const self = global.lib.translate
       var translated

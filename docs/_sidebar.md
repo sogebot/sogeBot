@@ -8,6 +8,7 @@
   * [Database](configuration/database.md)
   * [ClientId](configuration/clientid.md)
   * [Color](configuration/color.md)
+  * [Metrics](configuration/metrics.md)
 * Systems
   * [Alias](commands/alias.md)
   * [Commercial](commands/commercial.md)

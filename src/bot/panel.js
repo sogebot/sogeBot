@@ -126,6 +126,8 @@ function Panel () {
     self.sendMenu(socket)
     self.sendWidget(socket)
 
+    socket.on('metrics.translations', function (key) { global.lib.translate.addMetrics(key) })
+
     // twitch game and title change
     socket.on('getGameFromTwitch', function (game) { global.api.sendGameFromTwitch(global.api, socket, game) })
     socket.on('getUserTwitchGames', async () => { socket.emit('sendUserTwitchGamesAndTitles', await global.db.engine.find('cache.titles')) })
