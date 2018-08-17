@@ -43,7 +43,7 @@
     },
     change: function (el) {
       var data = {
-        id: el.dataset.id.split('!')[1],
+        id: el.dataset.id,
         permission: el.dataset.permission
       }
       socket.emit('changePermission', data)
