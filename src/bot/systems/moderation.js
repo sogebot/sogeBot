@@ -54,7 +54,7 @@ class Moderation extends System {
         enabled: true,
         moderateSubscribers: true,
         triggerLength: 15,
-        maxLength: 15,
+        maxLength: 50,
         timeout: 300
       },
       color: {
