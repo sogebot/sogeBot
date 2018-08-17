@@ -92,16 +92,19 @@ class IMongoDB extends Interface {
     const total = where._total || undefined
 
     delete where._sort; delete where._sum; delete where._total; delete where._group
-    where = flatten(where)
     try {
       let db = this.client.db(this.dbName)
       let items
+      const order = sortBy.startsWith('-') ? 1 : -1
 
       if (!sumBy || !groupBy) {
-        items = await db.collection(table).find(where).sort({ [sortBy]: 1 }).limit(Number(total))
+        if (sortBy !== '_id') {
+          where[sortBy.replace('-', '')] = { $exists: true, $ne: order === 1 ? 0 : null }
+        }
+        items = await db.collection(table).find(where).sort({ [sortBy.replace('-', '')]: order }).limit(Number(total))
       } else {
         const group = {_id: `$${groupBy}`, [sumBy]: { $sum: `$${sumBy}` }}
-        items = await db.collection(table).aggregate([{$group: group}]).sort({ [sortBy]: -1 }).limit(Number(total))
+        items = await db.collection(table).aggregate([{$group: group}]).sort({ [sortBy.replace('-', '')]: order }).limit(Number(total))
       }
       return items.toArray()
     } catch (e) {
