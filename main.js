@@ -1,3 +1,5 @@
+/* @flow */
+
 'use strict'
 require('module-alias/register')
 
@@ -201,10 +203,10 @@ function loadClientListeners () {
     const data = {
       username: username,
       viewers: viewers,
-      autohost: autohost
+      autohost: autohost,
+      type: 'host'
     }
 
-    data.type = 'host'
     global.overlays.eventlist.add(data)
     global.events.fire('hosted', data)
   })
@@ -274,10 +276,10 @@ function loadClientListeners () {
 
       const data = {
         username: message.parameters.login,
-        viewers: message.parameters.viewerCount
+        viewers: message.parameters.viewerCount,
+        type: 'raid'
       }
 
-      data.type = 'raid'
       global.overlays.eventlist.add(data)
       global.events.fire('raided', data)
     } else if (message.event === 'SUBSCRIPTION') {
@@ -347,7 +349,7 @@ async function resub (username, months, message, userstate, method) {
 
   if (global.commons.isIgnored(username)) return
 
-  global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: moment().subtract(months, 'months').format('X') * 1000 }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
+  global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: Number(moment().subtract(months, 'months').format('X')) * 1000 }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
   global.overlays.eventlist.add({ type: 'resub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: message })
   global.log.resub(`${username}, months: ${months}, message: ${message}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
   global.events.fire('resub', { username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: message })
