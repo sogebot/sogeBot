@@ -79,13 +79,11 @@ Emotes.prototype.containsEmotes = async function (opts) {
   let OEmotesMax = await global.configuration.getValue('OEmotesMax')
   let OEmotesSize = await global.configuration.getValue('OEmotesSize')
 
+  let limit = 0
   _.each(opts.sender.emotes, function (v, emote) {
-    let limit = 0
-    _.each(v, function () {
-      if (limit === OEmotesMax) return false
-      process.send({ type: 'emotes', fnc: 'emitEmote', emote: 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote + '/' + (OEmotesSize + 1) + '.0' })
-      limit++
-    })
+    if (limit === OEmotesMax) return false
+    process.send({ type: 'emotes', fnc: 'emitEmote', emote: 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote + '/' + (OEmotesSize + 1) + '.0' })
+    limit++
   })
 
   // parse BTTV emoticons
