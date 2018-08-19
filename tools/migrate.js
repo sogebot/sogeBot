@@ -106,7 +106,7 @@ let migration = {
       let processed = 0
       const permissions = await global.db.engine.find('permissions')
       for (let p of permissions) {
-        if (!p.key.startsWith('!')) {
+        if (!_.isNil(p.key) && !p.key.startsWith('!')) {
           await global.global.db.engine.update('permissions', { _id: String(p._id) }, { key: `!${p.key}` })
           processed++
         }
