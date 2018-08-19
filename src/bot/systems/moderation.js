@@ -423,14 +423,10 @@ class Moderation extends System {
       this.settings.emotes.maxCount
     ])
 
-    var count = 0
+    var count = opts.sender.emotes.length
     if (global.commons.isOwner(opts.sender) || isMod || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     }
-
-    _.each(opts.sender['emotes'], function (value, index) {
-      count = count + value.length
-    })
 
     if (count > maxCount) {
       this.timeoutUser(opts.sender, opts.message,
