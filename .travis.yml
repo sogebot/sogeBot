@@ -7,7 +7,9 @@ jobs:
   include:
     - stage: Test
       node_js: "10"
-      script: npm run standard
+      script:
+        - npm run standard
+        - npx flow check
     - stage: NEDB
       node_js: "9"
       before_script:

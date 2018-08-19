@@ -1,0 +1,16 @@
+[ignore]
+.*/node_modules/*
+[include]
+
+[libs]
+
+[lints]
+
+[options]
+all=false
+emoji=true
+module.system.node.resolve_dirname=node_modules
+
+module.name_mapper='@config' -> './config.example.json'
+module.system=haste
+[strict]

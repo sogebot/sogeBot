@@ -15,6 +15,8 @@ dependencies:
 	@npm install --production
 	@echo -ne "\n\t ----- Installation of development dependencies\n"
 	@npm install --only=dev
+	@echo -ne "\n\t ----- Installation of flow types\n"
+	@npx flow-typed install --ignoreDeps dev bundle peer
 
 shrinkwrap:
 	@echo -ne "\n\t ----- Generating shrinkwrap\n"
