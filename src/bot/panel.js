@@ -42,12 +42,12 @@ function Panel () {
   })
 
   // static routing
-  app.use('/dist', express.static(path.join(__dirname, '..', '..', 'public', 'dist')))
+  app.use('/dist', express.static(path.join(__dirname, '..', 'public', 'dist')))
   app.get('/popout/', this.authUser, function (req, res) {
-    res.sendFile(path.join(__dirname, '..', '..', 'public', 'popout.html'))
+    res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'))
   })
   app.get('/oauth/:page', this.authUser, function (req, res) {
-    res.sendFile(path.join(__dirname, '..', '..', 'public', 'oauth', req.params.page + '.html'))
+    res.sendFile(path.join(__dirname, '..', 'public', 'oauth', req.params.page + '.html'))
   })
   app.get('/auth/token.js', function (req, res) {
     const origin = req.headers.referer ? req.headers.referer.substring(0, req.headers.referer.length - 1) : undefined
