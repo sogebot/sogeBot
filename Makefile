@@ -3,7 +3,7 @@ SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
 ENV     := production
 
-all : prepare dependencies shrinkwrap ui commit
+all : prepare dependencies shrinkwrap ui bot commit
 .PHONY : all
 
 commit:
@@ -31,9 +31,13 @@ ui:
 	@echo -ne "\n\t ----- Copying dist files\n"
 	@node tools/copy-dist-files.js
 
+bot:
+	@echo -ne "\n\t ----- Building bot\n"
+	@npx babel --presets flow src/bot/ -d dest/
+
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
-	@npx cross-var bestzip sogeBot-$(VERSION).zip npm-shrinkwrap.json config.example.json src/bot locales/ main.js cluster.js public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ scss/ dist/
+	@npx cross-var bestzip sogeBot-$(VERSION).zip npm-shrinkwrap.json config.example.json dest/ locales/ main.js cluster.js public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ scss/ dist/
 
 prepare:
 	@echo -ne "\n\t ----- Cleaning up installation\n"
