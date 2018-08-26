@@ -1,6 +1,7 @@
 node_modules
 flow-typed
 logs/*
+dest/*
 package-lock.json*
 npm-shrinkwrap.json*
 *.zip

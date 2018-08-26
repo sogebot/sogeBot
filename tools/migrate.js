@@ -8,7 +8,7 @@ const XRegExp = require('xregexp')
 const fs = require('fs')
 
 // logger
-const Logger = require('../src/bot/logging')
+const Logger = require('../dest/logging')
 global.logger = new Logger()
 
 const dropFiles = [
@@ -41,7 +41,7 @@ if (process.argv[2] && process.argv[2] === '--delete') {
 }
 
 // db
-const Database = require('../src/bot/databases/database')
+const Database = require('../dest/databases/database')
 global.db = new Database(false)
 
 var runMigration = async function () {

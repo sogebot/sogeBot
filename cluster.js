@@ -4,7 +4,7 @@ const _ = require('lodash')
 const debug = require('debug')
 const crypto = require('crypto')
 
-const Parser = require('./src/bot/parser')
+const Parser = require('./dest/parser')
 
 const DEBUG_CLUSTER_WORKER = debug('cluster:worker')
 
@@ -21,24 +21,24 @@ function cluster () {
     return
   }
 
-  global.configuration = new (require('./src/bot/configuration.js'))()
-  global.currency = new (require('./src/bot/currency.js'))()
-  global.users = new (require('./src/bot/users.js'))()
-  global.events = new (require('./src/bot/events.js'))()
-  global.customvariables = new (require('./src/bot/customvariables.js'))()
-  global.twitch = new (require('./src/bot/twitch'))()
-  global.permissions = new (require('./src/bot/permissions'))()
-  global.api = new (require('./src/bot/api'))()
+  global.configuration = new (require('./dest/configuration.js'))()
+  global.currency = new (require('./dest/currency.js'))()
+  global.users = new (require('./dest/users.js'))()
+  global.events = new (require('./dest/events.js'))()
+  global.customvariables = new (require('./dest/customvariables.js'))()
+  global.twitch = new (require('./dest/twitch'))()
+  global.permissions = new (require('./dest/permissions'))()
+  global.api = new (require('./dest/api'))()
 
   global.lib = {}
-  global.lib.translate = new (require('./src/bot/translate'))()
+  global.lib.translate = new (require('./dest/translate'))()
   global.translate = global.lib.translate.translate
 
   global.lib.translate._load().then(function () {
-    global.systems = require('auto-load')('./src/bot/systems/')
-    global.overlays = require('auto-load')('./src/bot/overlays/')
-    global.games = require('auto-load')('./src/bot/games/')
-    global.integrations = require('auto-load')('./src/bot/integrations/')
+    global.systems = require('auto-load')('./dest/systems/')
+    global.overlays = require('auto-load')('./dest/overlays/')
+    global.games = require('auto-load')('./dest/games/')
+    global.integrations = require('auto-load')('./dest/integrations/')
 
     DEBUG_CLUSTER_WORKER(`Worker ${process.pid} has started.`)
 
