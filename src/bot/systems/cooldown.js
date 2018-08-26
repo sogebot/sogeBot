@@ -1,3 +1,5 @@
+/* @flow */
+
 'use strict'
 
 // 3rdparty libraries
@@ -61,7 +63,7 @@ class Cooldown extends System {
     })
   }
 
-  async main (opts) {
+  async main (opts: Object) {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP_SET)
 
     if (_.isNil(match)) {
@@ -85,7 +87,7 @@ class Cooldown extends System {
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async check (opts) {
+  async check (opts: Object) {
     var data, viewer, timestamp, now
     const match = XRegExp.exec(opts.message, constants.COMMAND_REGEXP)
     if (!_.isNil(match)) { // command
@@ -145,7 +147,7 @@ class Cooldown extends System {
 
       viewer = await global.db.engine.findOne(this.collection.viewers, { username: opts.sender.username, key: cooldown.key })
       if (cooldown.type === 'global') {
-        timestamp = cooldown.timestamp
+        timestamp = cooldown.timestamp || 0
       } else {
         timestamp = _.isNil(viewer.timestamp) ? 0 : viewer.timestamp
       }
@@ -173,7 +175,7 @@ class Cooldown extends System {
     return result
   }
 
-  async toggle (opts, type) {
+  async toggle (opts: Object, type: string) {
     const match = XRegExp.exec(opts.parameters, constants.COOLDOWN_REGEXP)
 
     if (_.isNil(match)) {
@@ -207,11 +209,11 @@ class Cooldown extends System {
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async toggleEnabled (opts) { await this.toggle(opts, 'enabled') }
-  async toggleModerators (opts) { await this.toggle(opts, 'moderator') }
-  async toggleOwners (opts) { await this.toggle(opts, 'owner') }
-  async toggleNotify (opts) { await this.toggle(opts, 'quiet') }
-  async toggleType (opts) { await this.toggle(opts, 'type') }
+  async toggleEnabled (opts: Object) { await this.toggle(opts, 'enabled') }
+  async toggleModerators (opts: Object) { await this.toggle(opts, 'moderator') }
+  async toggleOwners (opts: Object) { await this.toggle(opts, 'owner') }
+  async toggleNotify (opts: Object) { await this.toggle(opts, 'quiet') }
+  async toggleType (opts: Object) { await this.toggle(opts, 'type') }
 }
 
 module.exports = new Cooldown()
