@@ -216,6 +216,18 @@ function loadClientListeners () {
     global.events.fire('hosted', data)
   })
 
+  global.botTMI.chat.on('WHISPER', async (message) => {
+    if (!global.commons.isBot(message.tags.displayName) || !message.isSelf) {
+      DEBUG_TMIJS('Whisper received: %s', JSON.stringify(message))
+
+      message.tags.username = message.tags.displayName.toLowerCase() // backward compatibility until userID is primary key
+      message.tags['message-type'] = 'whisper'
+
+      sendMessageToWorker(message.tags, message.message)
+      global.linesParsed++
+    }
+  })
+
   global.botTMI.chat.on('PRIVMSG', async (message) => {
     if (!global.commons.isBot(message.tags.displayName) || !message.isSelf) {
       DEBUG_TMIJS('Message received: %s', JSON.stringify(message))
