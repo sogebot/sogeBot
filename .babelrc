@@ -1,0 +1,9 @@
+{
+  "presets": [
+    ["@babel/preset-env", { "targets": { "node": "current" } }],
+    "@babel/preset-flow",
+    "minify"
+  ],
+  "sourceMaps": "inline",
+  "plugins": ["source-map-support", "@babel/plugin-proposal-class-properties"]
+}

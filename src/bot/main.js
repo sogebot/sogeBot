@@ -12,9 +12,9 @@ const debug = require('debug')
 const _ = require('lodash')
 const moment = require('moment')
 
-const constants = require('./dest/constants')
+const constants = require('./constants')
 const config = require('@config')
-const Timeout = require('./dest/timeout')
+const Timeout = require('./timeout')
 
 const DEBUG_CLUSTER_FORK = debug('cluster:fork')
 const DEBUG_CLUSTER_MASTER = debug('cluster:master')
@@ -23,8 +23,8 @@ const DEBUG_TMIJS = debug('tmijs')
 // this is disabled in tests
 global.cluster = _.isNil(global.cluster) ? true : global.cluster
 
-global.commons = new (require('./dest/commons'))()
-global.cache = new (require('./dest/cache'))()
+global.commons = new (require('./commons'))()
+global.cache = new (require('./cache'))()
 
 global.linesParsed = 0
 global.avgResponse = []
@@ -36,9 +36,9 @@ global.status = { // TODO: move it?
   'RES': 0
 }
 
-require('./dest/logging') // logger is on master / worker have own global.log sending data through process
+require('./logging') // logger is on master / worker have own global.log sending data through process
 
-global.db = new (require('./dest/databases/database'))(global.cluster)
+global.db = new (require('./databases/database'))(global.cluster)
 if (cluster.isMaster) {
   // spin up forks first
   global.cpu = config.cpu === 'auto' ? os.cpus().length : parseInt(_.get(config, 'cpu', 1), 10)
@@ -53,23 +53,23 @@ if (cluster.isMaster) {
 async function main () {
   if (!global.db.engine.connected) return setTimeout(() => main(), 10)
 
-  global.configuration = new (require('./dest/configuration.js'))()
-  global.currency = new (require('./dest/currency.js'))()
-  global.stats = new (require('./dest/stats.js'))()
-  global.users = new (require('./dest/users.js'))()
-  global.logger = new (require('./dest/logging.js'))()
+  global.configuration = new (require('./configuration.js'))()
+  global.currency = new (require('./currency.js'))()
+  global.stats = new (require('./stats.js'))()
+  global.users = new (require('./users.js'))()
+  global.logger = new (require('./logging.js'))()
 
-  global.events = new (require('./dest/events.js'))()
-  global.customvariables = new (require('./dest/customvariables.js'))()
+  global.events = new (require('./events.js'))()
+  global.customvariables = new (require('./customvariables.js'))()
 
-  global.panel = new (require('./dest/panel'))()
-  global.webhooks = new (require('./dest/webhooks'))()
-  global.api = new (require('./dest/api'))()
-  global.twitch = new (require('./dest/twitch'))()
-  global.permissions = new (require('./dest/permissions'))()
+  global.panel = new (require('./panel'))()
+  global.webhooks = new (require('./webhooks'))()
+  global.api = new (require('./api'))()
+  global.twitch = new (require('./twitch'))()
+  global.permissions = new (require('./permissions'))()
 
   global.lib = {}
-  global.lib.translate = new (require('./dest/translate'))()
+  global.lib.translate = new (require('./translate'))()
   global.translate = global.lib.translate.translate
 
   // panel

@@ -96,7 +96,7 @@ class Bets extends System {
           break
       }
     }
-    new Timeout().recursive({ uid: `betsCheckIfBetExpired`, this: this, fnc: this.checkIfBetExpired, wait: 10000 })
+    new Timeout().recursive({ uid: 'betsCheckIfBetExpired', this: this, fnc: this.checkIfBetExpired, wait: 10000 })
   }
 
   async open (opts) {

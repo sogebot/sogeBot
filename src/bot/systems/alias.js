@@ -96,7 +96,7 @@ class Alias extends System {
 
       const parsedCmd = await parser.find(cmdArray.join(' '))
       const isRegistered = !_.isNil(parsedCmd) && parsedCmd.command.split(' ').length === cmdArray.length
-      d(`Is registered: %s`, isRegistered)
+      d('Is registered: %s', isRegistered)
 
       if (isRegistered) {
         tryingToBypass = true
@@ -104,7 +104,7 @@ class Alias extends System {
       }
       cmdArray.pop() // remove last array item if not found
     }
-    d(`Is trying to bypass command permission: %s`, tryingToBypass)
+    d('Is trying to bypass command permission: %s', tryingToBypass)
 
     d('Alias: %s', replace)
     d('Command: %s', `${alias.command}`)

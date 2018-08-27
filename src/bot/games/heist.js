@@ -84,7 +84,7 @@ class Heist extends Game {
     }
     super({settings})
 
-    if (cluster.isMaster) new Timeout().recursive({ uid: `iCheckFinished`, this: this, fnc: this.iCheckFinished, wait: 10000 }) // wait for proper config startup
+    if (cluster.isMaster) new Timeout().recursive({ uid: 'iCheckFinished', this: this, fnc: this.iCheckFinished, wait: 10000 }) // wait for proper config startup
   }
 
   async iCheckFinished () {
@@ -114,7 +114,7 @@ class Heist extends Game {
         // cleanup
         this.settings._.startedAt = null
         await global.db.engine.remove(this.collection.users, {})
-        new Timeout().recursive({ uid: `iCheckFinished`, this: this, fnc: this.iCheckFinished, wait: 10000 })
+        new Timeout().recursive({ uid: 'iCheckFinished', this: this, fnc: this.iCheckFinished, wait: 10000 })
         return
       }
 
@@ -177,7 +177,7 @@ class Heist extends Game {
       this.settings._.lastHeistTimestamp = null
       global.commons.sendMessage((await this.settings.notifications.copsCooldown), global.commons.getOwner())
     }
-    new Timeout().recursive({ uid: `iCheckFinished`, this: this, fnc: this.iCheckFinished, wait: 10000 })
+    new Timeout().recursive({ uid: 'iCheckFinished', this: this, fnc: this.iCheckFinished, wait: 10000 })
   }
 
   async main (opts) {

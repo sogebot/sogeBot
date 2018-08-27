@@ -4,7 +4,7 @@ const _ = require('lodash')
 const debug = require('debug')
 const crypto = require('crypto')
 
-const Parser = require('./dest/parser')
+const Parser = require('./parser')
 
 const DEBUG_CLUSTER_WORKER = debug('cluster:worker')
 
@@ -21,17 +21,17 @@ function cluster () {
     return
   }
 
-  global.configuration = new (require('./dest/configuration.js'))()
-  global.currency = new (require('./dest/currency.js'))()
-  global.users = new (require('./dest/users.js'))()
-  global.events = new (require('./dest/events.js'))()
-  global.customvariables = new (require('./dest/customvariables.js'))()
-  global.twitch = new (require('./dest/twitch'))()
-  global.permissions = new (require('./dest/permissions'))()
-  global.api = new (require('./dest/api'))()
+  global.configuration = new (require('./configuration.js'))()
+  global.currency = new (require('./currency.js'))()
+  global.users = new (require('./users.js'))()
+  global.events = new (require('./events.js'))()
+  global.customvariables = new (require('./customvariables.js'))()
+  global.twitch = new (require('./twitch'))()
+  global.permissions = new (require('./permissions'))()
+  global.api = new (require('./api'))()
 
   global.lib = {}
-  global.lib.translate = new (require('./dest/translate'))()
+  global.lib.translate = new (require('./translate'))()
   global.translate = global.lib.translate.translate
 
   global.lib.translate._load().then(function () {
@@ -146,6 +146,7 @@ function cluster () {
 }
 
 process.on('unhandledRejection', function (reason, p) {
+  if (_.isNil(global.log)) return console.log(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
   global.log.error(`Possibly Unhandled Rejection at: ${util.inspect(p)} reason: ${reason}`)
 })
 

@@ -171,7 +171,7 @@ Users.prototype.sockets = function (self) {
     socket.on('users.tips.add', async (data, cb) => {
       var errors = {}
       try {
-        const cash = XRegExp.exec(data.amount, XRegExp(`(?<amount> [0-9.]*)\\s?(?<currency> .*)`, 'ix'))
+        const cash = XRegExp.exec(data.amount, XRegExp('(?<amount> [0-9.]*)\\s?(?<currency> .*)', 'ix'))
 
         if (_.isNil(cash)) errors.amount = global.translate('ui.errors.something_went_wrong')
         else {
@@ -197,7 +197,7 @@ Users.prototype.sockets = function (self) {
     socket.on('users.tips.update', async (data, cb) => {
       var errors = {}
       try {
-        const cash = XRegExp.exec(data.amount, XRegExp(`(?<amount> [0-9.]*)\\s?(?<currency> .*)`, 'ix'))
+        const cash = XRegExp.exec(data.amount, XRegExp('(?<amount> [0-9.]*)\\s?(?<currency> .*)', 'ix'))
 
         if (_.isNil(cash)) errors.amount = global.translate('ui.errors.something_went_wrong')
         else {
@@ -561,7 +561,7 @@ Users.prototype.updateWatchTime = async function () {
     this.watchedList = {}
     timeout = 1000
   }
-  return new Timeout().recursive({ this: this, uid: `updateWatchTime`, wait: timeout, fnc: this.updateWatchTime })
+  return new Timeout().recursive({ this: this, uid: 'updateWatchTime', wait: timeout, fnc: this.updateWatchTime })
 }
 
 Users.prototype.compactWatchedDb = async function () {
@@ -571,7 +571,7 @@ Users.prototype.compactWatchedDb = async function () {
     global.log.error(e)
     global.log.error(e.stack)
   } finally {
-    new Timeout().recursive({ uid: `compactWatchedDb`, this: this, fnc: this.compactWatchedDb, wait: 10000 })
+    new Timeout().recursive({ uid: 'compactWatchedDb', this: this, fnc: this.compactWatchedDb, wait: 10000 })
   }
 }
 
@@ -596,7 +596,7 @@ Users.prototype.compactMessagesDb = async function () {
     global.log.error(e)
     global.log.error(e.stack)
   } finally {
-    new Timeout().recursive({ uid: `compactMessagesDb`, this: this, fnc: this.compactMessagesDb, wait: 10000 })
+    new Timeout().recursive({ uid: 'compactMessagesDb', this: this, fnc: this.compactMessagesDb, wait: 10000 })
   }
 }
 

@@ -33,17 +33,17 @@ define('CONNECTED', 3)
 // regexp
 define(
   'USERNAME_REGEXP',
-  XRegExp(`@?(?<username> .* )`, 'ix')
+  XRegExp('@?(?<username> .* )', 'ix')
 )
 
 define(
   'COMMAND_REGEXP',
-  XRegExp(`(?<command> ![\\pL0-9]* ) # command`, 'ix')
+  XRegExp('(?<command> ![\\pL0-9]* ) # command', 'ix')
 )
 
 define(
   'COMMAND_REGEXP_WITH_SPACES',
-  XRegExp(`(?<command> ![\\pL0-9 ]* ) # command`, 'ix')
+  XRegExp('(?<command> ![\\pL0-9 ]* ) # command', 'ix')
 )
 
 define(
@@ -69,7 +69,7 @@ define(
            !?(?<command> [\\pL0-9_ ]*                  ) # command`, 'ix')
 )
 
-define('KEYWORD_REGEXP', XRegExp(`(?<keyword> !?[\\pL0-9]*)\\s(?<response> .*)`, 'ix'))
+define('KEYWORD_REGEXP', XRegExp('(?<keyword> !?[\\pL0-9]*)\\s(?<response> .*)', 'ix'))
 
 define(
   'COOLDOWN_REGEXP_SET',

@@ -10,7 +10,7 @@ const message = require('./general.js').message
 const owner = { username: 'soge__' }
 
 // load up a bot
-require('../main.js')
+require('../dest/main.js')
 
 describe('Settings tests', () => {
   before(async () => {

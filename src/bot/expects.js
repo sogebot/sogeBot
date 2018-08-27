@@ -27,13 +27,13 @@ class Expects {
   command () {
     this.checkText()
 
-    const regexp = XRegExp(`(?<command> ![\\pL0-9]* )`, 'ix')
+    const regexp = XRegExp('(?<command> ![\\pL0-9]* )', 'ix')
     const match = XRegExp.exec(this.text, regexp)
 
     if (!_.isNil(match)) {
       this.match.push(match.command)
       this.text = this.text.replace(match.command, '') // remove from text matched pattern
-    } else throw Error(`Command not found`)
+    } else throw Error('Command not found')
     return this
   }
 
@@ -41,14 +41,14 @@ class Expects {
     _.defaults(opts, { optional: false })
     this.checkText()
 
-    const regexp = XRegExp(`(?<points> all|[0-9]* )`, 'ix')
+    const regexp = XRegExp('(?<points> all|[0-9]* )', 'ix')
     const match = XRegExp.exec(this.text, regexp)
 
     if (!_.isNil(match)) {
       this.match.push(parseInt(match.points, 10))
       this.text = this.text.replace(match.points, '') // remove from text matched pattern
     } else {
-      if (!opts.optional) throw Error(`Points not found`)
+      if (!opts.optional) throw Error('Points not found')
       else this.match.push(null)
     }
     return this
@@ -58,14 +58,14 @@ class Expects {
     _.defaults(opts, { optional: false })
     this.checkText()
 
-    const regexp = XRegExp(`(?<number> [0-9]* )`, 'ix')
+    const regexp = XRegExp('(?<number> [0-9]* )', 'ix')
     const match = XRegExp.exec(this.text, regexp)
 
     if (!_.isNil(match)) {
       this.match.push(parseInt(match.number, 10))
       this.text = this.text.replace(match.number, '') // remove from text matched pattern
     } else {
-      if (!opts.optional) throw Error(`Number not found`)
+      if (!opts.optional) throw Error('Number not found')
       else this.match.push(null)
     }
     return this
@@ -76,7 +76,7 @@ class Expects {
     opts.delimiter = XRegExp.escape(opts.delimiter)
     if (!opts.multi) opts.delimiter = ''
 
-    if (_.isNil(opts.name)) throw Error(`Argument name must be defined`)
+    if (_.isNil(opts.name)) throw Error('Argument name must be defined')
     if (!opts.optional) this.checkText()
 
     let pattern
@@ -91,7 +91,7 @@ class Expects {
       this.match.push(opts.type(match[opts.name].trim()))
       this.text = this.text.replace(`-${opts.name} ${opts.delimiter}${match[opts.name]}${opts.delimiter}`, '') // remove from text matched pattern
     } else {
-      if (!opts.optional) throw Error(`Argument not found`)
+      if (!opts.optional) throw Error('Argument not found')
       else this.match.push(opts.default)
     }
     return this
@@ -110,7 +110,7 @@ class Expects {
       this.match.push(match.string.substring(1, match.string.length - 1))
       this.text = this.text.replace(match.string, '') // remove from text matched pattern
     } else {
-      if (!opts.optional) throw Error(`String not found`)
+      if (!opts.optional) throw Error('String not found')
       else this.match.push(null)
     }
     return this
@@ -120,14 +120,14 @@ class Expects {
     _.defaults(opts, { optional: false, delimiter: ' ' })
     this.checkText()
 
-    const regexp = XRegExp(`(?<list> .*)`, 'ix')
+    const regexp = XRegExp('(?<list> .*)', 'ix')
     const match = XRegExp.exec(this.text, regexp)
 
     if (!_.isNil(match)) {
       this.match.push(match.list.split(opts.delimiter).map((o) => o.trim()))
       this.text = this.text.replace(match.list, '') // remove from text matched pattern
     } else {
-      if (!opts.optional) throw Error(`List not found`)
+      if (!opts.optional) throw Error('List not found')
       else this.match.push([])
     }
     return this

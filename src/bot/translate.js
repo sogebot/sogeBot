@@ -16,10 +16,10 @@ config.metrics = config.metrics || {}
 config.metrics.translations = config.metrics.translations || true
 
 class Translate {
-  custom: array = [];
-  translations: object = {};
+  custom: Array<Object> = [];
+  translations: Object = {};
   initialMetricsSent: boolean = false;
-  mItems: array = [];
+  mItems: Array<Object> = [];
   mTimestamp: Date = new Date();
   lang: string = 'en';
 
@@ -92,11 +92,12 @@ class Translate {
     }
   }
 
-  addMetrics (key: string | object) {
+  addMetrics (key: string | Object) {
     if (typeof key === 'object') return // skip objects (returning more than one key)
     if (cluster.isWorker) {
       // we want to have translations aggregated on master
-      return process.send({ type: 'call', ns: 'lib.translate', fnc: 'addMetrics', args: [key] })
+      if (process.send) return process.send({ type: 'call', ns: 'lib.translate', fnc: 'addMetrics', args: [key] })
+      return false
     }
 
     this.mItems.push({key, count: 1})
@@ -115,12 +116,12 @@ class Translate {
     }
   }
 
-  translate (text: string | object, orig: boolean) {
+  translate (text: string | Object, orig: boolean) {
     const self = global.lib.translate
 
     self.addMetrics(text)
     orig = orig || false
-    if (_.isUndefined(self.translations[self.lang]) && !_.isUndefined(text)) return '{missing_translation: ' + self.lang + '.' + text + '}'
+    if (_.isUndefined(self.translations[self.lang]) && !_.isUndefined(text)) return '{missing_translation: ' + self.lang + '.' + String(text) + '}'
     else if (typeof text === 'object') {
       let t = self.translations[self.lang][text.root]
       for (let c of self.custom) { t[c.key.replace(`${text.root}.`, '')] = c.value }
@@ -129,20 +130,20 @@ class Translate {
     return null
   }
 
-  get (text: string | object, orig: boolean) {
+  get (text: string | Object, orig: boolean) {
     try {
       const self = global.lib.translate
       var translated
       var customTranslated = _.find(self.custom, function (o) { return o.key === text })
-      if (!_.isNil(customTranslated) && !orig) {
+      if (customTranslated && customTranslated.value && !orig) {
         translated = customTranslated.value
       } else {
-        translated = text.split('.').reduce((o, i) => o[i], self.translations[self.lang])
+        translated = _.get(self.translations[self.lang], String(text), undefined)
       }
       _.each(translated.match(/(\{[\w-.]+\})/g), function (toTranslate) { translated = translated.replace(toTranslate, self.get(toTranslate.replace('{', '').replace('}', ''), orig)) })
       return translated
     } catch (err) {
-      return '{missing_translation: ' + this.lang + '.' + text + '}'
+      return '{missing_translation: ' + this.lang + '.' + String(text) + '}'
     }
   }
 }

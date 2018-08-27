@@ -26,7 +26,7 @@ class BetsOverlay {
     } catch (e) {
       global.log.error(e.stack)
     } finally {
-      new Timeout().recursive({ uid: `betsInterval`, this: this, fnc: this.interval, wait: 1000 })
+      new Timeout().recursive({ uid: 'betsInterval', this: this, fnc: this.interval, wait: 1000 })
     }
   }
 

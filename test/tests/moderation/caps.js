@@ -64,7 +64,7 @@ describe('systems/moderation - Caps()', () => {
       await global.db.engine.insert('settings', { key: 'moderationCapsTriggerLength', value: 15 })
     })
 
-    it(`message 'BlessRNG BlessRNG' with emotes should not timeout`, async () => {
+    it('message \'BlessRNG BlessRNG\' with emotes should not timeout', async () => {
       assert.isTrue(await global.systems.moderation.caps({sender: { username: 'testuser', emotes: {'153556': ['0-7', '9-16']} }, message: 'BlessRNG BlessRNG'}))
     })
   })

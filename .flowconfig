@@ -11,6 +11,6 @@ all=false
 emoji=true
 module.system.node.resolve_dirname=node_modules
 
-module.name_mapper='@config' -> './config.example.json'
+module.name_mapper='@config' -> 'empty/object'
 module.system=haste
 [strict]

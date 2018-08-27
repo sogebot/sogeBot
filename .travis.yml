@@ -1,6 +1,6 @@
 language: node_js
 before_install:
-  - npm install -g mocha standard
+  - npm install -g mocha
 install: travis_wait make ENV=development
 
 jobs:
@@ -8,7 +8,7 @@ jobs:
     - stage: Test
       node_js: "10"
       script:
-        - npm run standard
+        - npm run eslint
         - npx flow check
     - stage: NEDB
       node_js: "9"

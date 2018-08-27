@@ -64,7 +64,7 @@ class API {
 
   async oauthValidation (type) {
     let request
-    const url = `https://id.twitch.tv/oauth2/validate`
+    const url = 'https://id.twitch.tv/oauth2/validate'
     let timeout = 1000 * 60 * 30 // every 30 minutes
 
     DEBUG_API_OAUTH_VALIDATION(`Validating ${type} oauth`)

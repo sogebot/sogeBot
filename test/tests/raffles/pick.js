@@ -81,12 +81,12 @@ describe('Raffles - pick()', () => {
     })
 
     it('testuser bets 100', async () => {
-      let a = await global.systems.raffles.participate({sender: testuser, message: `!winme 100`})
+      let a = await global.systems.raffles.participate({sender: testuser, message: '!winme 100'})
       assert.isTrue(a)
     })
 
     it('testuser2 bets 100', async () => {
-      let a = await global.systems.raffles.participate({sender: testuser2, message: `!winme 100`})
+      let a = await global.systems.raffles.participate({sender: testuser2, message: '!winme 100'})
       assert.isTrue(a)
     })
 
@@ -126,12 +126,12 @@ describe('Raffles - pick()', () => {
     })
 
     it('testuser bets 100', async () => {
-      let a = await global.systems.raffles.participate({sender: testuser, message: `!winme 100`})
+      let a = await global.systems.raffles.participate({sender: testuser, message: '!winme 100'})
       assert.isTrue(a)
     })
 
     it('testuser2 bets 100', async () => {
-      let a = await global.systems.raffles.participate({sender: testuser2, message: `!winme 100`})
+      let a = await global.systems.raffles.participate({sender: testuser2, message: '!winme 100'})
       assert.isTrue(a)
     })
 
@@ -175,12 +175,12 @@ describe('Raffles - pick()', () => {
     })
 
     it('testuser bets 100', async () => {
-      let a = await global.systems.raffles.participate({sender: testuser, message: `!winme 100`})
+      let a = await global.systems.raffles.participate({sender: testuser, message: '!winme 100'})
       assert.isTrue(a)
     })
 
     it('testuser2 bets 100', async () => {
-      let a = await global.systems.raffles.participate({sender: testuser2, message: `!winme 100`})
+      let a = await global.systems.raffles.participate({sender: testuser2, message: '!winme 100'})
       assert.isTrue(a)
     })
 

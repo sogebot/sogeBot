@@ -157,7 +157,7 @@ class Timers extends System {
       }
       await global.db.engine.update(this.collection.data, { _id: timer._id.toString() }, { trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
     }
-    new Timeout().recursive({ uid: `timersCheck`, this: this, fnc: this.check, wait: 1000 }) // this will run check 1s after full check is correctly done
+    new Timeout().recursive({ uid: 'timersCheck', this: this, fnc: this.check, wait: 1000 }) // this will run check 1s after full check is correctly done
   }
 
   async editName (self, socket, data) {
@@ -300,7 +300,7 @@ class Timers extends System {
 
     if (_.isNil(name)) {
       let timers = await global.db.engine.find(this.collection.data)
-      global.commons.sendMessage(global.translate('timers.timers-list').replace(/\$list/g, _.map(_.orderBy(timers, 'name'), (o) => (o.enabled ? `⚫` : `⚪`) + ' ' + o.name).join(', ')), opts.sender)
+      global.commons.sendMessage(global.translate('timers.timers-list').replace(/\$list/g, _.map(_.orderBy(timers, 'name'), (o) => (o.enabled ? '⚫' : '⚪') + ' ' + o.name).join(', ')), opts.sender)
       return true
     } else { name = name[1] }
 
@@ -314,7 +314,7 @@ class Timers extends System {
     let responses = await global.db.engine.find(this.collection.responses, { timerId: timer._id.toString() })
     d(responses)
     await global.commons.sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), opts.sender)
-    for (let response of responses) await global.commons.sendMessage((response.enabled ? `⚫ ` : `⚪ `) + `${response._id} - ${response.response}`, opts.sender)
+    for (let response of responses) await global.commons.sendMessage((response.enabled ? '⚫ ' : '⚪ ') + `${response._id} - ${response.response}`, opts.sender)
     return true
   }
 

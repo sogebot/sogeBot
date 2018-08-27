@@ -51,7 +51,7 @@ describe('Quotes - main()', () => {
           })
         } else {
           it('Should sent not-found message', async () => {
-            await message.isSent(['systems.quotes.set.error.not-found-by-id', 'systems.quotes.show.error.not-found-by-tag'], owner, { id: test.id, tag: test.tag })
+            await message.isSent(['systems.quotes.show.error.not-found-by-id', 'systems.quotes.show.error.not-found-by-tag'], owner, { id: test.id, tag: test.tag })
           })
         }
       }
