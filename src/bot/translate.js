@@ -13,7 +13,7 @@ const axios = require('axios')
 const chalk = require('chalk')
 
 config.metrics = config.metrics || {}
-config.metrics.translations = config.metrics.translations || true
+config.metrics.translations = typeof config.metrics.translations === 'undefined' ? true : config.metrics.translations
 
 class Translate {
   custom: Array<Object> = [];
@@ -119,7 +119,7 @@ class Translate {
   translate (text: string | Object, orig: boolean) {
     const self = global.lib.translate
 
-    self.addMetrics(text)
+    if (config.metrics.translations) self.addMetrics(text)
     orig = orig || false
     if (_.isUndefined(self.translations[self.lang]) && !_.isUndefined(text)) return '{missing_translation: ' + self.lang + '.' + String(text) + '}'
     else if (typeof text === 'object') {
