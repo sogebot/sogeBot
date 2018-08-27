@@ -314,14 +314,12 @@ class Moderation extends System {
       this.settings.caps.maxCapsPercent
     ])
 
-    var emotesCharList = [] // remove emotes from caps checking
-    _.each(opts.sender['emotes'], function (emote) {
-      _.each(emote, function (list) {
-        _.each(_.range(parseInt(list.start, 10), parseInt(list.end, 10) + 1), function (val) {
-          emotesCharList.push(val)
-        })
-      })
-    })
+    let emotesCharList = []
+    for (let emote of opts.sender.emotes) {
+      for (let i of _.range(parseInt(emote.start, 10), parseInt(emote.end, 10) + 1)) {
+        emotesCharList.push(i)
+      }
+    }
 
     var msgLength = whitelisted.trim().length
     var capsLength = 0

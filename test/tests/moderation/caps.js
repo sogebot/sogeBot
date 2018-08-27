@@ -8,14 +8,15 @@ const assert = require('chai').assert
 
 const tests = {
   'timeout': [
-    'AAAAAAAAAAAAAAAAAAAAAA',
-    'ЙЦУЦЙУЙЦУЙЦУЙЦУЙЦУЙЦ',
-    'AAAAAAAAAAAAAaaaaaaaaaaaa',
-    'SomeMSG SomeMSG'
+    { message: 'AAAAAAAAAAAAAAAAAAAAAA', sender: { username: 'testuser', emotes: [] } },
+    { message: 'ЙЦУЦЙУЙЦУЙЦУЙЦУЙЦУЙЦ', sender: { username: 'testuser', emotes: [] } },
+    { message: 'AAAAAAAAAAAAAaaaaaaaaaaaa', sender: { username: 'testuser', emotes: [] } },
+    { message: 'SomeMSG SomeMSG', sender: { username: 'testuser', emotes: [] } }
   ],
   'ok': [
-    'SomeMSG SomeMSg',
-    '123123123213123123123123213123'
+    { message: 'SomeMSG SomeMSg', sender: { username: 'testuser', emotes: [] } },
+    { message: '123123123213123123123123213123', sender: { username: 'testuser', emotes: [] } },
+    { message: 'zdarec KAPOW KAPOW', sender: { username: 'testuser', emotes: [{ id: '133537', start: 7, end: 11 }, { id: '133537', start: 13, end: 17 }] } }
   ]
 }
 
@@ -27,14 +28,14 @@ describe('systems/moderation - Caps()', () => {
     })
 
     for (let test of tests.timeout) {
-      it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.caps({sender: { username: 'testuser' }, message: test}))
+      it(`message '${test.message}' should not timeout`, async () => {
+        assert.isTrue(await global.systems.moderation.caps({sender: test.sender, message: test.message}))
       })
     }
 
     for (let test of tests.ok) {
-      it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.caps({sender: { username: 'testuser' }, message: test}))
+      it(`message '${test.message}' should not timeout`, async () => {
+        assert.isTrue(await global.systems.moderation.caps({sender: test.sender, message: test.message}))
       })
     }
   })
@@ -45,27 +46,15 @@ describe('systems/moderation - Caps()', () => {
     })
 
     for (let test of tests.timeout) {
-      it(`message '${test}' should timeout`, async () => {
-        assert.isFalse(await global.systems.moderation.caps({sender: { username: 'testuser' }, message: test}))
+      it(`message '${test.message}' should timeout`, async () => {
+        assert.isFalse(await global.systems.moderation.caps({sender: test.sender, message: test.message}))
       })
     }
 
     for (let test of tests.ok) {
-      it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.caps({sender: { username: 'testuser' }, message: test}))
+      it(`message '${test.message}' should not timeout`, async () => {
+        assert.isTrue(await global.systems.moderation.caps({sender: test.sender, message: test.message}))
       })
     }
-  })
-  describe('#884 - message length - 15, max caps 80%, message: BlessRNG BlessRNG with emotes', async () => {
-    before(async () => {
-      await db.cleanup()
-      await global.db.engine.insert('settings', { key: 'moderationCaps', value: 'true' })
-      await global.db.engine.insert('settings', { key: 'moderationCapsMaxPercent', value: 80 })
-      await global.db.engine.insert('settings', { key: 'moderationCapsTriggerLength', value: 15 })
-    })
-
-    it('message \'BlessRNG BlessRNG\' with emotes should not timeout', async () => {
-      assert.isTrue(await global.systems.moderation.caps({sender: { username: 'testuser', emotes: {'153556': ['0-7', '9-16']} }, message: 'BlessRNG BlessRNG'}))
-    })
   })
 })
