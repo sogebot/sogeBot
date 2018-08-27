@@ -33,10 +33,27 @@ class IMasterController extends Interface {
   async connect () {
     let allOnline = true
     for (let worker in cluster.workers) {
-      if (cluster.workers[worker].state !== 'online') allOnline = false
+      if (cluster.workers[worker].state !== 'online') {
+        allOnline = false
+        break
+      }
     }
-    if (allOnline) setTimeout(() => { this.connected = true; DEBUG_MASTER('Connected') }, 5000) // TODO: send workers db find and if returned then its ok
-    else setTimeout(() => this.connect(), 10)
+    if (!(await this.checkConnection()) || !allOnline) return setTimeout(() => this.connect(), 1000) // re-do on first error
+    else this.connected = allOnline
+  }
+
+  async checkConnection () {
+    let timeout = new Promise((resolve, reject) => {
+      let id = setTimeout(() => {
+        clearTimeout(id)
+        DEBUG_MASTER('Connection to db timeouted')
+        resolve(false)
+      }, 5000)
+    })
+    return Promise.race([
+      this.find('info'),
+      timeout
+    ])
   }
 
   sendRequest (resolve, reject, id, data) {
