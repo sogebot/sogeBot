@@ -175,6 +175,7 @@ Commons.prototype.message = function (type, username, message, retry) {
       global.botTMI.chat[type](username, message)
     } catch (e) {
       if (_.isNil(retry)) setTimeout(() => this.message(type, username, message, false), 5000)
+      else global.log.error(e)
     }
   }
 }
