@@ -6,6 +6,7 @@ config.settings.bot_username = '__mocha__test__'
 config.settings.bot_oauth = ''
 config.settings.bot_owners = 'soge__'
 config.settings.broadcaster_username = 'test__________broadcaster'
+config.metrics.translations = false
 fs.writeFileSync('../config.json', JSON.stringify(config))
 
 // set process and debug mode to have only one cpu
