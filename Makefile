@@ -17,6 +17,7 @@ dependencies:
 	@npm install --only=dev
 	@echo -ne "\n\t ----- Installation of flow types\n"
 	@npx flow-typed install --ignoreDeps dev bundle peer
+	@npx flow-typed create-stub empty
 
 shrinkwrap:
 	@echo -ne "\n\t ----- Generating shrinkwrap\n"
@@ -33,16 +34,18 @@ ui:
 
 bot:
 	@echo -ne "\n\t ----- Building bot\n"
-	@npx babel --presets flow src/bot/ -d dest/
+	@npx babel src/bot/ -d dest/
 
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
 	@npx cross-var bestzip sogeBot-$(VERSION).zip npm-shrinkwrap.json config.example.json dest/ locales/ main.js cluster.js public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ scss/ dist/
 
 prepare:
-	@echo -ne "\n\t ----- Cleaning up installation\n"
+	@echo -ne "\n\t ----- Cleaning up node_modules and shrinkwrap\n"
 	@rm -rf node_modules
 	@rm -rf npm-shrinkwrap.json
 
 clean:
+	@echo -ne "\n\t ----- Cleaning up compiled files\n"
 	@rm -rf public/dist/bootstrap* public/dist/carousel/* public/dist/gallery/* public/dist/jquery public/dist/lodash public/dist/velocity-animate public/dist/popper.js public/dist/flv.js public/dist/css/dark.css public/dist/css/light.css
+	@rm -rf dest

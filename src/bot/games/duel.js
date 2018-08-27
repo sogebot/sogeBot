@@ -48,7 +48,7 @@ class Duel extends Game {
     debug({users, timestamp, duelDuration})
 
     if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * duelDuration) {
-      new Timeout().recursive({ uid: `gamblingPickDuelWinner`, this: this, fnc: this.pickDuelWinner, wait: 30000 })
+      new Timeout().recursive({ uid: 'gamblingPickDuelWinner', this: this, fnc: this.pickDuelWinner, wait: 30000 })
       return
     }
 
@@ -84,7 +84,7 @@ class Duel extends Game {
     await global.db.engine.remove(this.collection.users, {})
     this.settings._.timestamp = 0
 
-    new Timeout().recursive({ uid: `gamblingPickDuelWinner`, this: this, fnc: this.pickDuelWinner, wait: 30000 })
+    new Timeout().recursive({ uid: 'gamblingPickDuelWinner', this: this, fnc: this.pickDuelWinner, wait: 30000 })
   }
 
   async main (opts) {

@@ -70,7 +70,7 @@ describe('game/fightme - !fightme', () => {
           await message.isSent(test.expected, test.challenger)
         })
       } else {
-        it(`Expecting gambling.fightme.challenge`, async () => {
+        it('Expecting gambling.fightme.challenge', async () => {
           await message.isSent('gambling.fightme.challenge', test.challenger, { username: test.challenging.username, command })
         })
         it('Challenged user is responding !fightme', async () => {

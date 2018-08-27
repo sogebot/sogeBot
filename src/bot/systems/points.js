@@ -47,7 +47,7 @@ class Points extends System {
 
   async updatePoints () {
     try {
-      if (!(await this.isEnabled())) return new Timeout().recursive({ uid: `updatePoints`, this: this, fnc: this.updatePoints, wait: 5000 })
+      if (!(await this.isEnabled())) return new Timeout().recursive({ uid: 'updatePoints', this: this, fnc: this.updatePoints, wait: 5000 })
 
       let [interval, perInterval, offlineInterval, perOfflineInterval, isOnline] = await Promise.all([
         this.settings.points.interval,
@@ -80,7 +80,7 @@ class Points extends System {
       global.log.error(e)
       global.log.error(e.stack)
     } finally {
-      new Timeout().recursive({ uid: `updatePoints`, this: this, fnc: this.updatePoints, wait: 5000 })
+      new Timeout().recursive({ uid: 'updatePoints', this: this, fnc: this.updatePoints, wait: 5000 })
     }
   }
 
@@ -91,7 +91,7 @@ class Points extends System {
       global.log.error(e)
       global.log.error(e.stack)
     } finally {
-      new Timeout().recursive({ uid: `compactPointsDb`, this: this, fnc: this.compactPointsDb, wait: 60000 })
+      new Timeout().recursive({ uid: 'compactPointsDb', this: this, fnc: this.compactPointsDb, wait: 60000 })
     }
   }
 

@@ -108,7 +108,7 @@ class Raffles extends System {
   async announce () {
     let raffle = await global.db.engine.findOne(this.collection.data, { winner: null })
     if (!await global.cache.isOnline() || _.isEmpty(raffle) || new Date().getTime() - new Date(await this.settings._.lastAnnounce).getTime() < ((await this.settings.raffleAnnounceInterval) * 60 * 1000)) {
-      new Timeout().recursive({ uid: `rafflesAnnounce`, this: this, fnc: this.announce, wait: 60000 })
+      new Timeout().recursive({ uid: 'rafflesAnnounce', this: this, fnc: this.announce, wait: 60000 })
       return
     }
 
@@ -130,7 +130,7 @@ class Raffles extends System {
     })
     debug(message); global.commons.sendMessage(message, global.commons.getOwner())
 
-    new Timeout().recursive({ uid: `rafflesAnnounce`, this: this, fnc: this.announce, wait: 60000 })
+    new Timeout().recursive({ uid: 'rafflesAnnounce', this: this, fnc: this.announce, wait: 60000 })
   }
 
   async remove (self) {

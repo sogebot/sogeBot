@@ -54,7 +54,7 @@ class Configuration {
       }
     }
 
-    global.log.debug(`======= COPY DEBUG MESSAGE FROM HERE =======`)
+    global.log.debug('======= COPY DEBUG MESSAGE FROM HERE =======')
     global.log.debug(`GENERAL | OS: ${process.env.npm_config_user_agent} | DB: ${config.database.type} | Bot version: ${process.env.npm_package_version} | Bot uptime: ${process.uptime()} | Bot lang: ${lang} | Bot mute: ${mute}`)
     global.log.debug(`SYSTEMS | ${enabledSystems.systems.join(', ')}`)
     global.log.debug(`GAMES   | ${enabledSystems.games.join(', ')}`)

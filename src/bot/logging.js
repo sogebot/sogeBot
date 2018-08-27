@@ -80,7 +80,7 @@ if (cluster.isWorker) {
         if (info.level === 'stop') level = '== STREAM STOPPED'
 
         const timestamp = moment().tz(config.timezone).format('YYYY-MM-DD[T]HH:mm:ss.SSS')
-        return `${timestamp} ${level} ${info.message} ${info.username ? `[${info.username}]` : ``}`
+        return `${timestamp} ${level} ${info.message} ${info.username ? `[${info.username}]` : ''}`
       })
     ),
     exceptionHandlers: [

@@ -64,7 +64,6 @@ describe('systems/moderation - containsLink()', () => {
       await variable.isEqual('systems.moderation.settings.links.includeSpaces', true)
       await (global.systems.moderation.settings.links.includeClips = true)
       await variable.isEqual('systems.moderation.settings.links.includeClips', true)
-
     })
 
     for (let [type, listOfTests] of Object.entries(tests)) {

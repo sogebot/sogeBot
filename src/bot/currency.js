@@ -48,7 +48,7 @@ class Currency {
     let refresh = 1000 * 60 * 60 * 24
     try {
       // base is always CZK
-      const result = await axios.get(`http://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt`)
+      const result = await axios.get('http://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt')
       let linenum = 0
       for (let line of result.data.toString().split('\n')) {
         if (linenum < 2 || line.trim().length === 0) {
@@ -64,7 +64,7 @@ class Currency {
       refresh = 1000
     }
 
-    new Timeout().recursive({ uid: `updateRates`, this: this, fnc: this.updateRates, wait: refresh })
+    new Timeout().recursive({ uid: 'updateRates', this: this, fnc: this.updateRates, wait: refresh })
   }
 }
 

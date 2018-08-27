@@ -1,0 +1,7 @@
+{
+  "parser": "babel-eslint",
+  "extends": ["standard"],
+  "rules": {
+    "standard/no-callback-literal": "off"
+  }
+}

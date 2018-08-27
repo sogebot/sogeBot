@@ -14,7 +14,7 @@ process.send = process.send || function () {} // process is not in mocha somehow
 // load up a bot
 if (require('cluster').isMaster) {
   global.cluster = false
-  require('../main.js')
+  require('../dest/main.js')
 }
 
 global.botTMI = {

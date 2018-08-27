@@ -33,7 +33,7 @@ class Webhooks {
   clearCache () {
     debug('Clearing cache')
     this.cache = _.filter(this.cache, (o) => o.timestamp >= _.now() - 600000)
-    new Timeout().recursive({ uid: `clearCache`, this: this, fnc: this.clearCache, wait: 600000 })
+    new Timeout().recursive({ uid: 'clearCache', this: this, fnc: this.clearCache, wait: 600000 })
   }
 
   existsInCache (type, id) {
@@ -44,7 +44,7 @@ class Webhooks {
   async subscribe (type) {
     const cid = await global.cache.channelId()
     if (_.isNil(cid)) {
-      new Timeout().recursive({ uid: `subscribe`, this: this, fnc: this.subscribe, args: [type], wait: 1000 })
+      new Timeout().recursive({ uid: 'subscribe', this: this, fnc: this.subscribe, args: [type], wait: 1000 })
       return
     }
 
@@ -58,7 +58,7 @@ class Webhooks {
     const callback = `http://${domain}/webhooks/hub`
 
     const request = [
-      `https://api.twitch.tv/helix/webhooks/hub?`,
+      'https://api.twitch.tv/helix/webhooks/hub?',
       `hub.mode=${mode}`,
       `hub.callback=${callback}/${type}`,
       `hub.lease_seconds=${leaseSeconds}`
@@ -98,7 +98,7 @@ class Webhooks {
     }
 
     // resubscribe after while
-    new Timeout().recursive({ uid: `subscribe`, this: this, fnc: this.subscribe, args: [type], wait: leaseSeconds * 1000 })
+    new Timeout().recursive({ uid: 'subscribe', this: this, fnc: this.subscribe, args: [type], wait: leaseSeconds * 1000 })
   }
 
   async event (aEvent, res) {
@@ -133,7 +133,7 @@ class Webhooks {
     if (_.isEmpty(await global.cache.channelId())) setTimeout(() => this.follower(aEvent), 10) // wait until channelId is set
 
     debug('Follow event received: %j', aEvent)
-    if (parseInt(aEvent.data.to_id, 10) !== parseInt(await global.cache.channelId(), 10)) return debug(`This events doesn't belong to this channel`)
+    if (parseInt(aEvent.data.to_id, 10) !== parseInt(await global.cache.channelId(), 10)) return debug('This events doesn\'t belong to this channel')
 
     const fid = aEvent.data.from_id
 
@@ -211,7 +211,7 @@ class Webhooks {
     if (aEvent.data.length > 0) {
       let stream = aEvent.data[0]
 
-      if (parseInt(stream.user_id, 10) !== parseInt(await global.cache.channelId(), 10)) return debug(`This events doesn't belong to this channel`)
+      if (parseInt(stream.user_id, 10) !== parseInt(await global.cache.channelId(), 10)) return debug('This events doesn\'t belong to this channel')
 
       await global.db.engine.update('api.current', { key: 'status' }, { value: stream.title })
       await global.db.engine.update('api.current', { key: 'game' }, { value: await global.api.getGameFromId(stream.game_id) })

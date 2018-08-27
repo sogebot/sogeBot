@@ -110,7 +110,7 @@ class IMongoDB extends Interface {
     } catch (e) {
       global.log.error(e.stack)
       if (e.message.match(/EPIPE/g)) {
-        global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
+        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       }
     }
@@ -131,7 +131,7 @@ class IMongoDB extends Interface {
     } catch (e) {
       global.log.error(e.stack)
       if (e.message.match(/EPIPE/g)) {
-        global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
+        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       }
     }
@@ -149,7 +149,7 @@ class IMongoDB extends Interface {
       return item.ops[0]
     } catch (e) {
       if (e.message.match(/EPIPE/g)) {
-        global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
+        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       }
     }
@@ -176,7 +176,7 @@ class IMongoDB extends Interface {
     } catch (e) {
       global.log.error(e.stack)
       if (e.message.match(/EPIPE/g)) {
-        global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
+        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       }
     }
@@ -208,7 +208,7 @@ class IMongoDB extends Interface {
     } catch (e) {
       global.log.error(e.stack)
       if (e.message.match(/EPIPE/g)) {
-        global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
+        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       }
     }
@@ -225,7 +225,7 @@ class IMongoDB extends Interface {
     } catch (e) {
       global.log.error(e.stack)
       if (e.message.match(/EPIPE/g)) {
-        global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
+        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       }
     }
@@ -264,7 +264,7 @@ class IMongoDB extends Interface {
         setImmediate(() => this.update(table, where, object))
       } else if (e.message.match(/EPIPE/g)) {
         global.log.error(e.stack)
-        global.log.error(`Something went wrong with mongodb instance (EPIPE error)`)
+        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
         process.exit()
       } else {
         global.log.error(e.stack)

@@ -109,7 +109,7 @@ class Events {
     } catch (e) {
       console.error(e.stack)
     } finally {
-      new Timeout().recursive({ uid: `fadeOut`, this: this, fnc: this.fadeOut, wait: 1000 })
+      new Timeout().recursive({ uid: 'fadeOut', this: this, fnc: this.fadeOut, wait: 1000 })
     }
   }
 

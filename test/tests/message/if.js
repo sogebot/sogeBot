@@ -14,8 +14,8 @@ describe('Message - if filter', () => {
     await msg.prepare()
   })
 
-  describe(`(if '$!param'=='n/a'| $sender (random.online.viewer) chosed | $sender and $param (random.number-1-to-100)%)`, () => {
-    let toParse = `(if '$!param'=='n/a'| $sender (random.online.viewer) chosed | $sender and $param (random.number-1-to-100)%)`
+  describe('(if \'$!param\'==\'n/a\'| $sender (random.online.viewer) chosed | $sender and $param (random.number-1-to-100)%)', () => {
+    let toParse = '(if \'$!param\'==\'n/a\'| $sender (random.online.viewer) chosed | $sender and $param (random.number-1-to-100)%)'
 
     it('Check true condition', async () => {
       let message = await new Message(toParse).parse({ param: 'n/a' })

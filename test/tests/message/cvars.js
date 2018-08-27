@@ -110,17 +110,17 @@ describe('Message - cvars filter', () => {
       it(`parse '${test.command}' with params`, async () => {
         message = await new Message(test.command).parse(test.params)
       })
-      it(`message parsed correctly`, async () => {
+      it('message parsed correctly', async () => {
         assert.equal(message, '')
       })
 
       if (test.params.param) {
         if (test.expectedSent) {
-          it(`expecting set message`, async () => {
+          it('expecting set message', async () => {
             await msg.isSent('filters.setVariable', { username: global.commons.getOwner() }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue })
           })
         } else {
-          it(`not expecting set message`, async () => {
+          it('not expecting set message', async () => {
             let notSent = false
             try {
               await msg.isSent('filters.setVariable', { username: global.commons.getOwner() }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue })
@@ -141,7 +141,7 @@ describe('Message - cvars filter', () => {
         delete test.params.param
         message = await new Message(test.command).parse(test.params)
       })
-      it(`message parsed correctly`, async () => {
+      it('message parsed correctly', async () => {
         assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.afterValue))
       })
     })
@@ -157,12 +157,12 @@ describe('Message - cvars filter', () => {
       it(`parse '${test.command}' with params`, async () => {
         message = await new Message(test.command).parse(test.params)
       })
-      it(`message parsed correctly`, async () => {
+      it('message parsed correctly', async () => {
         assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue))
       })
 
       if (test.params.param) {
-        it(`not expecting set message`, async () => {
+        it('not expecting set message', async () => {
           let notSent = false
           try {
             await msg.isSent('filters.setVariable', { username: global.commons.getOwner() }, { sender: global.commons.getOwner(), variable: '$_test', value: test.afterValue })
@@ -182,7 +182,7 @@ describe('Message - cvars filter', () => {
         delete test.params.param
         message = await new Message(test.command).parse(test.params)
       })
-      it(`message parsed correctly`, async () => {
+      it('message parsed correctly', async () => {
         assert.equal(message, test.command.replace(/\$_test|\$!_test/g, test.initialValue))
       })
     })

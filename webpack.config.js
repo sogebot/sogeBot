@@ -4,6 +4,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 module.exports = {
   mode: process.env.NODE_ENV,
+  performance: { hints: false },
   entry: './src/panel/index.js',
   resolve: {
     alias: {
