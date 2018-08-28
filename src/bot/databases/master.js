@@ -33,7 +33,7 @@ class IMasterController extends Interface {
   async connect () {
     let allOnline = true
     for (let worker in cluster.workers) {
-      if (cluster.workers[worker].state !== 'online') {
+      if (!cluster.workers[worker].isConnected()) {
         allOnline = false
         break
       }
@@ -59,10 +59,12 @@ class IMasterController extends Interface {
   sendRequest (resolve, reject, id, data) {
     const timeout = new Timeout()
     try {
-      _.sample(cluster.workers).send(data)
+      timeout.clear(`sendRequest-${id}`)
+      const worker = _.sample(cluster.workers)
+      if (!worker.isConnected()) throw new Error('Worker is not connected')
+      worker.send(data)
       DEBUG_MASTER_REQUEST_ID(id)
       this.returnData(resolve, reject, id)
-      timeout.clear(`sendRequest-${id}`)
     } catch (e) {
       timeout.recursive({ uid: `sendRequest-${id}`, this: this, args: [resolve, reject, id], fnc: this.sendRequest, wait: 10 })
     }
