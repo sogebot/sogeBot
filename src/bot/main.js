@@ -29,6 +29,8 @@ global.cache = new (require('./cache'))()
 global.linesParsed = 0
 global.avgResponse = []
 
+let ignoreGiftsFromUser: { [string]: { count: Number, time: Date }} = {}
+
 global.status = { // TODO: move it?
   'TMI': constants.DISCONNECTED,
   'API': constants.DISCONNECTED,
@@ -375,6 +377,8 @@ async function resub (username, months, message, userstate, method) {
 async function subscriptionGiftCommunity (username, count, plan) {
   DEBUG_TMIJS(`Subscription gifted to ${count} viewers from ${username}`)
 
+  ignoreGiftsFromUser[username] = { count, time: new Date() }
+
   if (global.commons.isIgnored(username)) return
 
   global.overlays.eventlist.add({ type: 'subcommunitygift', username, count })
@@ -386,11 +390,22 @@ async function subgift (username, months, recipient) {
   recipient = recipient.toLowerCase()
   DEBUG_TMIJS('Subgift: from %s to %s', username, recipient)
 
+  for (let [u, o] of Object.entries(ignoreGiftsFromUser)) {
+    // $FlowFixMe Incorrect mixed type from value of Object.entries https://github.com/facebook/flow/issues/5838
+    if (o.count === 0 || new Date().getTime() - new Date(o.time).getTime() >= 1000 * 60 * 10) {
+      delete ignoreGiftsFromUser[u]
+    }
+  }
+
+  if (typeof ignoreGiftsFromUser[username] !== 'undefined' && ignoreGiftsFromUser[username].count !== 0) {
+    ignoreGiftsFromUser[username].count--
+  } else {
+    global.events.fire('subgift', { username: username, recipient: recipient })
+  }
   if (global.commons.isIgnored(username)) return
 
   global.users.set(recipient, { is: { subscriber: true }, time: { subscribed_at: _.now() } })
   global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months })
-  global.events.fire('subgift', { username: username, recipient: recipient })
   global.log.subgift(`${recipient}, from: ${username}, months: ${months}`)
 }
 
