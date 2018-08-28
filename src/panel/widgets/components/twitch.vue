@@ -40,7 +40,7 @@ export default {
     this.socket.emit('twitch.sendTwitchVideo')
     this.socket.once('twitchVideo', function (room) {
       $("#twitch-main").append(`<iframe style="width: 100%; height: 100%"
-        src="${window.location.protocol}//player.twitch.tv/?channel=${room}&autoplay=true&muted=true"
+        src="https://player.twitch.tv/?channel=${room}&autoplay=true&muted=true"
         frameborder="0">
       </iframe>`)
     })
