@@ -90,7 +90,11 @@ async function main () {
   const connections = new Promise(async (resolve, reject) => {
     const connect = async (bot, broadcaster, retries) => {
       try {
-        if (!bot) {
+        if (!await global.api.oauthValidation('bot', true)) {
+          global.log.error(`Something went wrong with your bot oauth - please check your config.json`)
+          bot = true // don't reconnect on oauth error
+          global.log.error('Bot WON\'T connect to TMI server')
+        } else if (!bot) {
           global.log.info('Bot is connecting to TMI server')
           await global.botTMI.chat.connect()
           await global.botTMI.chat.join(config.settings.broadcaster_username)
@@ -104,7 +108,11 @@ async function main () {
 
       try {
         if (_.get(config, 'settings.broadcaster_oauth', '').match(/oauth:[\w]*/)) {
-          if (!broadcaster) {
+          if (!await global.api.oauthValidation('broadcaster', true)) {
+            global.log.error(`Something went wrong with your broadcaster oauth - please check your config.json`)
+            broadcaster = true // don't reconnect on oauth error
+            global.log.error('Broadcaster WON\'T connect to TMI server')
+          } else if (!broadcaster) {
             global.log.info('Broadcaster is connecting to TMI server')
             await global.broadcasterTMI.chat.connect()
             await global.broadcasterTMI.chat.join(config.settings.broadcaster_username)

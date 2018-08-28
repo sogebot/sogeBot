@@ -62,8 +62,9 @@ class API {
     }
   }
 
-  async oauthValidation (type) {
+  async oauthValidation (type, quiet = false) {
     let request
+    let status = true
     const url = 'https://id.twitch.tv/oauth2/validate'
     let timeout = 1000 * 60 * 30 // every 30 minutes
 
@@ -77,11 +78,13 @@ class API {
       global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: `oauthValidation-${type}`, api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
+      status = false
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: `oauthValidation-${type}`, api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
-      global.log.error(`Something went wrong with your ${type} oauth - ${e.response.data.message}`)
+      if (!quiet) global.log.error(`Something went wrong with your ${type} oauth - ${e.response.data.message}`)
     }
 
     new Timeout().recursive({ this: this, uid: `oauthValidation-${type}`, wait: timeout, fnc: this.oauthValidation, args: [type] })
+    return status
   }
 
   async intervalFollowerUpdate () {
