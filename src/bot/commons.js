@@ -29,19 +29,19 @@ Commons.prototype.registerConfiguration = function () {
   global.configuration.register('sendWithMe', 'core.settings.sendWithMe', 'bool', false)
 }
 
-Commons.prototype.processAll = function (process) {
+Commons.prototype.processAll = function (proc) {
   if (cluster.isMaster) {
     // run on master
-    const namespace = _.get(global, process.ns, null)
-    namespace[process.fnc].apply(namespace, process.args)
+    const namespace = _.get(global, proc.ns, null)
+    namespace[proc.fnc].apply(namespace, proc.args)
     // send to all clusters
     for (let [i, w] of Object.entries(cluster.workers)) {
-      DEBUG.PROCESSALL(`Sending ${JSON.stringify(process)} to worker#${i}`)
-      w.send(process)
+      DEBUG.PROCESSALL(`Sending ${JSON.stringify(proc)} to worker#${i}`)
+      w.send(proc)
     }
   } else {
     // need to be sent to master
-    process.send(process)
+    process.send(proc)
   }
 }
 
