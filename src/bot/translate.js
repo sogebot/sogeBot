@@ -56,7 +56,7 @@ class Translate {
           const bulk = 1000
           let data = { version, items: [] }
           for (let key of [...new Set(Object.keys(flatten(this.translations)).map(o => o.split('.').slice(1).join('.')))]) {
-            data.items.push({key, count: 0})
+            data.items.push({key, count: 0, missing: false})
             if (data.items.length === bulk) {
               axios.post('http://stats.sogehige.tv/add', {
                 version: data.version,
@@ -92,7 +92,7 @@ class Translate {
     }
   }
 
-  addMetrics (key: String | Object) {
+  addMetrics (key: String | Object, ui: Boolean) {
     const version = _.get(process, 'env.npm_package_version', 'n/a')
     if (typeof key === 'object' || version === 'n/a') return // skip objects (returning more than one key)
     if (cluster.isWorker) {
@@ -101,12 +101,22 @@ class Translate {
       return false
     }
 
+    if (ui) {
+      // we need to search if it is webpanel. or ui.
+      // TODO: remove webpanel
+      if (!this.get('ui.' + key, false).startsWith('{missing_translation: ')) {
+        key = 'ui.' + key
+      } else if (!this.get('webpanel.' + key, false).startsWith('{missing_translation: ')) {
+        key = 'webpanel.' + key
+      }
+    }
+
     if (!this.mSentMetrics.includes(key)) {
       // sent metrics only if its unique
       this.mSentMetrics.push(key)
       axios.post('http://stats.sogehige.tv/add', {
         version: _.get(process, 'env.npm_package_version', 'n/a'),
-        items: [{key, count: 1}]
+        items: [{key, count: 1, missing: this.get(key, false).startsWith('{missing_translation: ')}]
       })
     }
   }
@@ -114,7 +124,7 @@ class Translate {
   translate (text: string | Object, orig: boolean) {
     const self = global.lib.translate
 
-    if (config.metrics.translations) self.addMetrics(text)
+    if (config.metrics.translations) self.addMetrics(text, false)
     orig = orig || false
     if (_.isUndefined(self.translations[self.lang]) && !_.isUndefined(text)) return '{missing_translation: ' + self.lang + '.' + String(text) + '}'
     else if (typeof text === 'object') {
