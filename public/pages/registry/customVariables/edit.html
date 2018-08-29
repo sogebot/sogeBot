@@ -31,6 +31,21 @@
           <small class="form-text text-muted">{{ commons.translate('registry.customvariables.description.help') }}</small>
         </div>
 
+        <div class="form-group col-md-12">
+
+          <div class="row ml-0 mr-0">
+            <label for="description_input">{{ commons.translate('registry.customvariables.response.name') }}</label>
+          </div>
+
+          <button :class="[responseType === 0 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 0; responseText = ''">{{ commons.translate('registry.customvariables.response.default') }}</button>
+          <button :class="[responseType === 1 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 1; responseText = ''">{{ commons.translate('registry.customvariables.response.custom') }}</button>
+          <button :class="[responseType === 2 ? 'btn-primary' : 'btn-outline-primary']" type="button" class="btn" @click="responseType = 2; responseText = ''">{{ commons.translate('registry.customvariables.response.command') }}</button>
+
+          <input v-if="responseType === 1" v-model="responseText" type="text" class="form-control mt-2" v-bind:placeholder="commons.translate('registry.customvariables.response.default-placeholder')">
+          <small class="form-text text-muted">{{ commons.translate('registry.customvariables.response.default-help') }}</small>
+
+        </div>
+
         <div class="form-group row pl-3 pr-3">
           <div class="col-md-4">
             <label for="type">{{ commons.translate('registry.customvariables.type.name') }}</label>
@@ -171,6 +186,9 @@
         evalInput: null,
         evalError: '',
 
+        responseType: 0,
+        responseText: '',
+
         hasError: {
           variableName: false,
           selectedType: false,
@@ -237,7 +255,9 @@
               evalValue: this.evalValue,
               runEvery: this.selectedRunEvery,
               type: this.selectedType,
-              readOnly: this.readOnly
+              readOnly: this.readOnly,
+              responseType: this.responseType,
+              responseText: this.responseText
             }
             this.socket.emit('save', data, (err, _id) => {
               if (err) {
@@ -342,6 +362,8 @@
         customVariablesEdit.evalValueInit = data.evalValue
         customVariablesEdit.selectedRunEvery = data.runEvery
         customVariablesEdit.selectedType = data.type
+        customVariablesEdit.responseType = data.responseType
+        customVariablesEdit.responseText = data.responseText
         customVariablesEdit.readOnly = data.readOnly || false
       })
     }

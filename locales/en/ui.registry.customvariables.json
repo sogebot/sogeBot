@@ -1,4 +1,12 @@
 {
+  "response": {
+    "name": "Response after variable set",
+    "default": "Default",
+    "default-placeholder": "Set your bot response",
+    "default-help": "Use $value to get new variable value",
+    "custom": "Custom",
+    "command": "Command"
+  },
   "isReadOnly": "read-only in chat",
   "isNotReadOnly": "can be changed through chat",
   "no-variables-found": "No variables found",

@@ -1,4 +1,12 @@
 {
+  "response": {
+    "name": "Odpověď po nastavení",
+    "default": "Výchozí",
+    "default-placeholder": "Nastavte svou odpověď",
+    "default-help": "Použijte $value pro získání nové hodnoty proměnné",
+    "custom": "Vlastní",
+    "command": "Příkaz"
+  },
   "isReadOnly": "v chatu pouze pro čtení",
   "isNotReadOnly": "lze měnit prostřednictvím chatu",
   "no-variables-found": "Nebyly nalezeny žádné proměnné",
