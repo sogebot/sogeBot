@@ -94,7 +94,7 @@ class Translate {
 
   addMetrics (key: String | Object) {
     const version = _.get(process, 'env.npm_package_version', 'n/a')
-    if (typeof key === 'object' && version === 'n/a') return // skip objects (returning more than one key)
+    if (typeof key === 'object' || version === 'n/a') return // skip objects (returning more than one key)
     if (cluster.isWorker) {
       // we want to have translations aggregated on master
       if (process.send) return process.send({ type: 'call', ns: 'lib.translate', fnc: 'addMetrics', args: [key] })
