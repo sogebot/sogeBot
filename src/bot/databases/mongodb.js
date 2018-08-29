@@ -5,15 +5,16 @@ const mongodbUri = require('mongodb-uri')
 const Interface = require('./interface')
 const config = require('@config')
 const flatten = require('flat')
+const cluster = require('cluster')
 
 const _ = require('lodash')
 const debug = require('debug')('db:mongodb')
 
 class IMongoDB extends Interface {
-  constructor (isCluster) {
+  constructor (forceIndexes) {
     super('mongodb')
 
-    this.createIndexes = (isCluster || false)
+    this.createIndexes = forceIndexes || cluster.isMaster
     this.connected = false
     this.client = null
     this.dbName = mongodbUri.parse(config.database.mongodb.url).database

@@ -1,8 +1,4 @@
 class Interface {
-  constructor () {
-    this.threads = {}
-  }
-
   /**
    * Asynchronous find several results on db
    * @param {string} table table to search
