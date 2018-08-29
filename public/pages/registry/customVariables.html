@@ -39,7 +39,14 @@
           <div v-if="variable.readOnly">
             <strong>{{ commons.translate('registry.customvariables.isReadOnly') | capitalize }}</strong>
           </div>
-          <span v-else-if="!['eval', 'options'].includes(variable.type)" class="text-muted">{{ commons.translate('not-available') }}</span>
+
+          <div>
+            <strong>{{ commons.translate('registry.customvariables.response.name') }}:</strong>
+            <span v-if="variable.responseType === 0">{{ commons.translate('registry.customvariables.response.default') }}</span>
+            <span v-if="variable.responseType === 1">{{ commons.translate('registry.customvariables.response.custom') }}</span>
+            <span v-if="variable.responseType === 2">{{ commons.translate('registry.customvariables.response.command') }}</span>
+            <i v-if="variable.responseType === 1">{{ variable.responseText }}</i>
+          </div>
         </td>
         <td>
           <a v-bind:href="'?id='+ variable._id + '#registry/customVariables/edit'" class="btn btn-primary btn-block"><i class="far fa-edit"></i> {{ commons.translate('dialog.buttons.edit') }}</a>

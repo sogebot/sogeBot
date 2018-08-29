@@ -374,6 +374,21 @@ let migration = {
       console.info(` !! keywords collection can be deleted`)
     }
   }],
+  customvariables: [{
+    version: '8.0.0',
+    do: async () => {
+      console.info('Add responseType to custom.variables')
+      let items = await global.db.engine.find('custom.variables')
+      let processed = 0
+      for (let item of items) {
+        const _id = item._id; delete item._id
+        if (typeof item.responseType === 'undefined') item.responseType = 0
+        await global.db.engine.update('custom.variables', {_id}, item)
+        processed++
+      }
+      console.info(` => ${processed} processed`)
+    }
+  }],
   customcommands: [{
     version: '8.0.0',
     do: async () => {

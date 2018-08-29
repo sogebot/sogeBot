@@ -151,11 +151,22 @@ class Message {
         if ((global.commons.isOwner(attr.sender) || isMod) &&
           (!_.isNil(attr.param) && attr.param.length !== 0)) {
           let state = await global.customvariables.setValueOf(variable, attr.param, { sender: attr.sender })
-          if (state.isOk && !state.isEval) {
-            let msg = await global.commons.prepare('filters.setVariable', { value: state.updated.currentValue, variable: variable })
-            global.commons.sendMessage(msg, { username: attr.sender, skip: true, quiet: _.get(attr, 'quiet', false) })
+
+          if (state.updated.responseType === 0) {
+            // default
+            if (state.isOk && !state.isEval) {
+              let msg = await global.commons.prepare('filters.setVariable', { value: state.updated.currentValue, variable: variable })
+              global.commons.sendMessage(msg, { username: attr.sender, skip: true, quiet: _.get(attr, 'quiet', false) })
+            }
+            return state.isEval ? state.updated.currentValue : ''
+          } else if (state.updated.responseType === 1) {
+            // custom
+            global.commons.sendMessage(state.updated.responseText.replace('$value', state.updated.currentValue), { username: attr.sender, skip: true, quiet: _.get(attr, 'quiet', false) })
+            return ''
+          } else {
+            // command
+            return state.updated.currentValue
           }
-          return state.isEval ? state.updated.currentValue : ''
         }
         return global.customvariables.getValueOf(variable, { sender: attr.sender, param: attr.param })
       },
@@ -606,7 +617,7 @@ class Message {
       let fnc = filters[key]
       let regexp = _.escapeRegExp(key)
 
-      regexp = regexp.replace(/#/g, '([a-zA-Z_]+)')
+      regexp = regexp.replace(/#/g, '([a-zA-Z0-9_]+)')
       let rMessage = this.message.match((new RegExp('(' + regexp + ')', 'g')))
       if (!_.isNull(rMessage)) {
         for (var bkey in rMessage) {

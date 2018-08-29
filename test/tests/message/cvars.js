@@ -105,7 +105,7 @@ describe('Message - cvars filter', () => {
     let message = null
     describe(`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.afterValue)}' with value after ${test.afterValue}`, async () => {
       it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-        await global.db.engine.update('custom.variables', { variableName: test.variable }, { readOnly: false, currentValue: test.initialValue, type: test.type })
+        await global.db.engine.update('custom.variables', { variableName: test.variable }, { readOnly: false, currentValue: test.initialValue, type: test.type, responseType: 0 })
       })
       it(`parse '${test.command}' with params`, async () => {
         message = await new Message(test.command).parse(test.params)
@@ -152,7 +152,7 @@ describe('Message - cvars filter', () => {
     let message = null
     describe(`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.initialValue)}' with value after ${test.initialValue} because readOnly`, async () => {
       it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
-        await global.db.engine.update('custom.variables', { variableName: test.variable }, { readOnly: true, currentValue: test.initialValue, type: test.type })
+        await global.db.engine.update('custom.variables', { variableName: test.variable }, { readOnly: true, currentValue: test.initialValue, type: test.type, responseType: 0 })
       })
       it(`parse '${test.command}' with params`, async () => {
         message = await new Message(test.command).parse(test.params)
