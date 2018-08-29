@@ -227,7 +227,7 @@ class CustomVariables {
 
     // add simple text variable, if not existing
     if (_.isEmpty(item)) {
-      item = await global.db.engine.insert('custom.variables', { variableName, currentValue, type: 'text' })
+      item = await global.db.engine.insert('custom.variables', { variableName, currentValue, type: 'text', responseType: 0 })
     } else {
       if (item.readOnly && !opts.readOnlyBypass) {
         isOk = false
