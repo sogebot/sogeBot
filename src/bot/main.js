@@ -50,7 +50,6 @@ if (cluster.isMaster) {
 }
 
 async function main () {
-  console.log('waiting')
   if (!global.db.engine.connected) return setTimeout(() => main(), 10)
 
   global.configuration = new (require('./configuration.js'))()
