@@ -143,11 +143,17 @@ let migration = {
         'moderationLongMessageTimeout': 'systems.moderation.settings.longMessage.timeout',
         'moderationLongMessageTriggerLength': 'systems.moderation.settings.longMessage.triggerLength',
 
-        'moderationSpam': 'systems.moderation.settings.caps.enabled',
-        'moderationSpamSubs': 'systems.moderation.settings.caps.moderateSubscribers',
-        'moderationSpamTimeout': 'systems.moderation.settings.caps.timeout',
-        'moderationSpamTriggerLength': 'systems.moderation.settings.caps.triggerLength',
-        'moderationSpamMaxLength': 'systems.moderation.settings.caps.maxLength',
+        'moderationSpam': 'systems.moderation.settings.spam.enabled',
+        'moderationSpamSubs': 'systems.moderation.settings.spam.moderateSubscribers',
+        'moderationSpamTimeout': 'systems.moderation.settings.spam.timeout',
+        'moderationSpamTriggerLength': 'systems.moderation.settings.spam.triggerLength',
+        'moderationSpamMaxLength': 'systems.moderation.settings.spam.maxLength',
+
+        'moderationCaps': 'systems.moderation.settings.caps.enabled',
+        'moderationCapsSubs': 'systems.moderation.settings.caps.moderateSubscribers',
+        'moderationCapsTimeout': 'systems.moderation.settings.caps.timeout',
+        'moderationCapsTriggerLength': 'systems.moderation.settings.caps.triggerLength',
+        'moderationCapsMaxPercent': 'systems.moderation.settings.caps.maxCapsPercent',
 
         'moderationColor': 'systems.moderation.settings.color.enabled',
         'moderationColorSubs': 'systems.moderation.settings.color.moderateSubscribers',
