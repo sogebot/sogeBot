@@ -19,8 +19,7 @@ class Translate {
   custom: Array<Object> = [];
   translations: Object = {};
   initialMetricsSent: boolean = false;
-  mItems: Array<Object> = [];
-  mTimestamp: Date = new Date();
+  mSentMetrics: Array<String> = [];
   lang: string = 'en';
 
   constructor () {
@@ -52,9 +51,10 @@ class Translate {
           }
         }
 
-        if (config.metrics.translations && !this.initialMetricsSent && cluster.isMaster) {
+        const version = _.get(process, 'env.npm_package_version', 'n/a')
+        if (config.metrics.translations && !this.initialMetricsSent && cluster.isMaster && version !== 'n/a') {
           const bulk = 1000
-          let data = { version: _.get(process, 'env.npm_package_version', 'n/a'), items: [] }
+          let data = { version, items: [] }
           for (let key of [...new Set(Object.keys(flatten(this.translations)).map(o => o.split('.').slice(1).join('.')))]) {
             data.items.push({key, count: 0})
             if (data.items.length === bulk) {
@@ -92,27 +92,22 @@ class Translate {
     }
   }
 
-  addMetrics (key: string | Object) {
-    if (typeof key === 'object') return // skip objects (returning more than one key)
+  addMetrics (key: String | Object) {
+    const version = _.get(process, 'env.npm_package_version', 'n/a')
+    if (typeof key === 'object' && version === 'n/a') return // skip objects (returning more than one key)
     if (cluster.isWorker) {
       // we want to have translations aggregated on master
       if (process.send) return process.send({ type: 'call', ns: 'lib.translate', fnc: 'addMetrics', args: [key] })
       return false
     }
 
-    this.mItems.push({key, count: 1})
-
-    if (this.mItems.length > 100 || new Date().getTime() - new Date(this.mTimestamp).getTime() > 1000 * 60 * 30) {
+    if (!this.mSentMetrics.includes(key)) {
+      // sent metrics only if its unique
+      this.mSentMetrics.push(key)
       axios.post('http://stats.sogehige.tv/add', {
         version: _.get(process, 'env.npm_package_version', 'n/a'),
-        items: _(_.clone(this.mItems)).groupBy('key').map((o, k) => ({
-          key: k,
-          count: _.sumBy(o, 'count')
-        })).value()
+        items: [{key, count: 1}]
       })
-
-      this.mTimestamp = new Date()
-      this.mItems = []
     }
   }
 
