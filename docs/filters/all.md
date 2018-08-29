@@ -82,7 +82,7 @@
 ## Custom variables
 **\#** is name of variable, e.g. mmr as `$_mmr`
 
-`($_#)` - will set value for specified variable **if** argument is passed, else will return its value
+`$_#` - will set value for specified variable **if** argument is passed, else will return its value
   - **example:**
     - _command:_ `!mmr`
     - _response:_ `My MMR value is $_mmr`
@@ -95,7 +95,7 @@
     - _chat:_ `!mmr -` < only for owners and mods
     - _bot response_: `@soge__, mmr was set to 1000.`
 
-`($!_#)` - same as variable above, except set message is always silent
+`$!_#` - same as variable above, except set message is always silent
 
 `$param` - is required temporary variable (command without param will not show)
   - **example:**
