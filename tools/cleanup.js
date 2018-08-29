@@ -6,7 +6,7 @@ const _ = require('lodash')
 const term = require('terminal-kit').terminal
 
 const Database = require('../dest/databases/database')
-const db = new Database(false)
+const db = new Database(true)
 
 global.log = {
   error: (msg) => console.error(msg)

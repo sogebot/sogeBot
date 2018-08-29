@@ -20,9 +20,6 @@ const DEBUG_CLUSTER_FORK = debug('cluster:fork')
 const DEBUG_CLUSTER_MASTER = debug('cluster:master')
 const DEBUG_TMIJS = debug('tmijs')
 
-// this is disabled in tests
-global.cluster = _.isNil(global.cluster) ? true : global.cluster
-
 global.commons = new (require('./commons'))()
 global.cache = new (require('./cache'))()
 
@@ -40,7 +37,7 @@ global.status = { // TODO: move it?
 
 require('./logging') // logger is on master / worker have own global.log sending data through process
 
-global.db = new (require('./databases/database'))(global.cluster)
+global.db = new (require('./databases/database'))()
 if (cluster.isMaster) {
   // spin up forks first
   global.cpu = config.cpu === 'auto' ? os.cpus().length : parseInt(_.get(config, 'cpu', 1), 10)
@@ -53,6 +50,7 @@ if (cluster.isMaster) {
 }
 
 async function main () {
+  console.log('waiting')
   if (!global.db.engine.connected) return setTimeout(() => main(), 10)
 
   global.configuration = new (require('./configuration.js'))()

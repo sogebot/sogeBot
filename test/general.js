@@ -17,28 +17,30 @@ process.send = process.send || function () {} // process is not in mocha somehow
 
 // load up a bot
 if (require('cluster').isMaster) {
-  global.cluster = false
+  global.mocha = true
   require('../dest/main.js')
-}
 
-global.botTMI = {
-  chat: {
-    say: function () { },
-    color: function () {},
-    timeout: function () {},
-    on: function () {},
-    connect: function () {},
-    join: function () {}
+  global.commons.timeout = function () {}
+
+  global.botTMI = {
+    chat: {
+      say: function () { },
+      color: function () {},
+      timeout: function () {},
+      on: function () {},
+      connect: function () {},
+      join: function () {}
+    }
   }
-}
-global.broadcasterTMI = {
-  chat: {
-    say: function () { },
-    color: function () {},
-    timeout: function () {},
-    on: function () {},
-    connect: function () {},
-    join: function () {}
+  global.broadcasterTMI = {
+    chat: {
+      say: function () { },
+      color: function () {},
+      timeout: function () {},
+      on: function () {},
+      connect: function () {},
+      join: function () {}
+    }
   }
 }
 

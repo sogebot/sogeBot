@@ -7,13 +7,12 @@ const IMongoDB = require('./mongodb')
 const IMasterController = require('./master')
 
 class Database {
-  constructor (cluster) {
-    this.cluster = _.isNil(cluster) ? true : cluster
+  constructor (forceIndexes) {
     this.engine = null
 
-    if (require('cluster').isMaster && this.cluster && config.database.type === 'nedb') this.engine = new IMasterController()
-    else if (config.database.type === 'nedb') this.engine = new INeDB(this.cluster)
-    else if (config.database.type === 'mongodb') this.engine = new IMongoDB(this.cluster)
+    if (!global.mocha && require('cluster').isMaster && !forceIndexes && config.database.type === 'nedb') this.engine = new IMasterController()
+    else if (config.database.type === 'nedb') this.engine = new INeDB(forceIndexes)
+    else if (config.database.type === 'mongodb') this.engine = new IMongoDB(forceIndexes)
 
     if (_.isNil(this.engine)) {
       global.log.warning('No database was selected - fallback to NeDB')
