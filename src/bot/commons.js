@@ -57,6 +57,7 @@ Commons.prototype.getIgnoreList = function () {
 
 Commons.prototype.isIgnored = function (sender) {
   if (sender !== null) { // null can be bot from dashboard or event
+    if (typeof sender === 'string') sender = { username: sender }
     const isIgnored = this.getIgnoreList().includes(sender.username)
     const isBroadcaster = this.isBroadcaster(sender)
     return isIgnored && !isBroadcaster
