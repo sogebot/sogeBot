@@ -11,7 +11,7 @@ class Donationalerts {
     this.collection = 'integrations.donationalerts'
     this.socket = null
 
-    global.panel.addMenu({category: 'main', name: 'integrations', id: 'integrations'})
+    global.panel.addMenu({ category: 'main', name: 'integrations', id: 'integrations' })
 
     this.status()
     this.sockets()
@@ -51,7 +51,7 @@ class Donationalerts {
         })
     } else this.socket.connect()
 
-    this.socket.emit('add-user', {token: (await this.clientSecret), type: 'minor'})
+    this.socket.emit('add-user', { token: (await this.clientSecret), type: 'minor' })
 
     this.socket.off('connect').on('connect', () => debug('donationalerts:onConnect')('Successfully connected socket to service'))
     this.socket.off('reconnect_attempt').on('reconnect_attempt', () => debug('donationalerts:onReconnectAttempt')('Trying to reconnect to service'))

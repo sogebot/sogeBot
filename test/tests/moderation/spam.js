@@ -28,13 +28,13 @@ describe('systems/moderation - Spam()', () => {
 
     for (let test of tests.timeout) {
       it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.spam({sender: { username: 'testuser' }, message: test}))
+        assert.isTrue(await global.systems.moderation.spam({ sender: { username: 'testuser' }, message: test }))
       })
     }
 
     for (let test of tests.ok) {
       it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.spam({sender: { username: 'testuser' }, message: test}))
+        assert.isTrue(await global.systems.moderation.spam({ sender: { username: 'testuser' }, message: test }))
       })
     }
   })
@@ -47,13 +47,13 @@ describe('systems/moderation - Spam()', () => {
 
     for (let test of tests.timeout) {
       it(`message '${test}' should timeout`, async () => {
-        assert.isFalse(await global.systems.moderation.spam({sender: { username: 'testuser' }, message: test}))
+        assert.isFalse(await global.systems.moderation.spam({ sender: { username: 'testuser' }, message: test }))
       })
     }
 
     for (let test of tests.ok) {
       it(`message '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.spam({sender: { username: 'testuser' }, message: test}))
+        assert.isTrue(await global.systems.moderation.spam({ sender: { username: 'testuser' }, message: test }))
       })
     }
   })

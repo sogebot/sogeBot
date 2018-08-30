@@ -23,19 +23,19 @@ class Price extends System {
     ]
     const settings = {
       commands: [
-        {name: '!price set', permission: constants.OWNER_ONLY},
-        {name: '!price list', permission: constants.OWNER_ONLY},
-        {name: '!price unset', permission: constants.OWNER_ONLY},
-        {name: '!price toggle', permission: constants.OWNER_ONLY},
-        {name: '!price', permission: constants.OWNER_ONLY}
+        { name: '!price set', permission: constants.OWNER_ONLY },
+        { name: '!price list', permission: constants.OWNER_ONLY },
+        { name: '!price unset', permission: constants.OWNER_ONLY },
+        { name: '!price toggle', permission: constants.OWNER_ONLY },
+        { name: '!price', permission: constants.OWNER_ONLY }
       ],
       parsers: [
-        {name: 'check', priority: constants.HIGH}
+        { name: 'check', priority: constants.HIGH }
       ]
     }
-    super({settings, dependsOn})
+    super({ settings, dependsOn })
 
-    this.addMenu({category: 'manage', name: 'price', id: 'price/list'})
+    this.addMenu({ category: 'manage', name: 'price', id: 'price/list' })
   }
 
   main (opts) {

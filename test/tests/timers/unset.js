@@ -14,7 +14,7 @@ describe('Timers - unset()', () => {
   beforeEach(async () => {
     await db.cleanup()
     await message.prepare()
-    await global.db.engine.insert(global.systems.timers.collection.data, {name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() }})
+    await global.db.engine.insert(global.systems.timers.collection.data, { name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
   })
 
   it('', async () => {

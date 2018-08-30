@@ -45,7 +45,7 @@ class Duel extends Game {
       this.settings._.timestamp,
       this.settings.duration
     ])
-    debug({users, timestamp, duelDuration})
+    debug({ users, timestamp, duelDuration })
 
     if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * duelDuration) {
       new Timeout().recursive({ uid: 'gamblingPickDuelWinner', this: this, fnc: this.pickDuelWinner, wait: 30000 })

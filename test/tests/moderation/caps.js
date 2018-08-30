@@ -29,13 +29,13 @@ describe('systems/moderation - Caps()', () => {
 
     for (let test of tests.timeout) {
       it(`message '${test.message}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.caps({sender: test.sender, message: test.message}))
+        assert.isTrue(await global.systems.moderation.caps({ sender: test.sender, message: test.message }))
       })
     }
 
     for (let test of tests.ok) {
       it(`message '${test.message}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.caps({sender: test.sender, message: test.message}))
+        assert.isTrue(await global.systems.moderation.caps({ sender: test.sender, message: test.message }))
       })
     }
   })
@@ -47,13 +47,13 @@ describe('systems/moderation - Caps()', () => {
 
     for (let test of tests.timeout) {
       it(`message '${test.message}' should timeout`, async () => {
-        assert.isFalse(await global.systems.moderation.caps({sender: test.sender, message: test.message}))
+        assert.isFalse(await global.systems.moderation.caps({ sender: test.sender, message: test.message }))
       })
     }
 
     for (let test of tests.ok) {
       it(`message '${test.message}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.caps({sender: test.sender, message: test.message}))
+        assert.isTrue(await global.systems.moderation.caps({ sender: test.sender, message: test.message }))
       })
     }
   })

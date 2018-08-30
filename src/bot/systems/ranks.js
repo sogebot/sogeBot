@@ -21,19 +21,19 @@ class Ranks extends System {
   constructor () {
     const settings = {
       commands: [
-        {name: '!rank add', permission: constants.OWNER_ONLY},
-        {name: '!rank edit', permission: constants.OWNER_ONLY},
-        {name: '!rank set', permission: constants.OWNER_ONLY},
-        {name: '!rank unset', permission: constants.OWNER_ONLY},
-        {name: '!rank list', permission: constants.OWNER_ONLY},
-        {name: '!rank remove', permission: constants.OWNER_ONLY},
-        {name: '!rank help', permission: constants.OWNER_ONLY},
+        { name: '!rank add', permission: constants.OWNER_ONLY },
+        { name: '!rank edit', permission: constants.OWNER_ONLY },
+        { name: '!rank set', permission: constants.OWNER_ONLY },
+        { name: '!rank unset', permission: constants.OWNER_ONLY },
+        { name: '!rank list', permission: constants.OWNER_ONLY },
+        { name: '!rank remove', permission: constants.OWNER_ONLY },
+        { name: '!rank help', permission: constants.OWNER_ONLY },
         '!rank'
       ]
     }
-    super({settings})
+    super({ settings })
 
-    this.addMenu({category: 'manage', name: 'ranks', id: 'ranks/list'})
+    this.addMenu({ category: 'manage', name: 'ranks', id: 'ranks/list' })
   }
 
   async add (opts) {

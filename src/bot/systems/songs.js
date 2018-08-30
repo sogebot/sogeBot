@@ -17,7 +17,7 @@ class Songs extends System {
     const settings = {
       _: {
         meanLoudness: -15,
-        currentSong: JSON.stringify({videoID: null})
+        currentSong: JSON.stringify({ videoID: null })
       },
       volume: 25,
       duration: 10,
@@ -26,20 +26,20 @@ class Songs extends System {
       playlist: true,
       notify: false,
       commands: [
-        {name: '!songrequest', fnc: 'addSongToQueue'},
-        {name: '!wrongsong', fnc: 'removeSongFromQueue'},
-        {name: '!currentsong', fnc: 'getCurrentSong'},
-        {name: '!skipsong', fnc: 'sendNextSongID', permission: constants.OWNER_ONLY},
-        {name: '!bansong', fnc: 'banSong', permission: constants.OWNER_ONLY},
-        {name: '!unbansong', fnc: 'unbanSong', permission: constants.OWNER_ONLY},
-        {name: '!playlist import', fnc: 'importPlaylist', permission: constants.OWNER_ONLY},
-        {name: '!playlist add', fnc: 'addSongToPlaylist', permission: constants.OWNER_ONLY},
-        {name: '!playlist remove', fnc: 'removeSongFromPlaylist', permission: constants.OWNER_ONLY},
-        {name: '!playlist steal', fnc: 'stealSong', permission: constants.OWNER_ONLY},
-        {name: '!playlist', fnc: 'help', permission: constants.OWNER_ONLY}
+        { name: '!songrequest', fnc: 'addSongToQueue' },
+        { name: '!wrongsong', fnc: 'removeSongFromQueue' },
+        { name: '!currentsong', fnc: 'getCurrentSong' },
+        { name: '!skipsong', fnc: 'sendNextSongID', permission: constants.OWNER_ONLY },
+        { name: '!bansong', fnc: 'banSong', permission: constants.OWNER_ONLY },
+        { name: '!unbansong', fnc: 'unbanSong', permission: constants.OWNER_ONLY },
+        { name: '!playlist import', fnc: 'importPlaylist', permission: constants.OWNER_ONLY },
+        { name: '!playlist add', fnc: 'addSongToPlaylist', permission: constants.OWNER_ONLY },
+        { name: '!playlist remove', fnc: 'removeSongFromPlaylist', permission: constants.OWNER_ONLY },
+        { name: '!playlist steal', fnc: 'stealSong', permission: constants.OWNER_ONLY },
+        { name: '!playlist', fnc: 'help', permission: constants.OWNER_ONLY }
       ]
     }
-    super({settings})
+    super({ settings })
 
     if (cluster.isMaster) {
       cluster.on('message', (worker, d) => {
@@ -49,8 +49,8 @@ class Songs extends System {
 
       this.getMeanLoudness()
 
-      this.addMenu({category: 'manage', name: 'playlist', id: 'songs/playlist'})
-      this.addMenu({category: 'manage', name: 'bannedsongs', id: 'songs/bannedsongs'})
+      this.addMenu({ category: 'manage', name: 'playlist', id: 'songs/playlist' })
+      this.addMenu({ category: 'manage', name: 'bannedsongs', id: 'songs/bannedsongs' })
       this.addWidget('ytplayer', 'widget-title-ytplayer', 'fas fa-headphones')
     }
   }
@@ -214,7 +214,7 @@ class Songs extends System {
 
     const currentSong = JSON.parse(await this.settings._.currentSong)
     if (currentSong.videoID === opts.parameters) this.sendNextSongID() // skip song if its currently playing
-    return {banned}
+    return { banned }
   }
 
   async unbanSong (opts) {
@@ -282,7 +282,7 @@ class Songs extends System {
       else translation = 'songs.current-song-from-songrequest'
     }
     let message = await global.commons.prepare(translation, { name: currentSong.title, username: currentSong.username })
-    debug(message); global.commons.sendMessage(message, {username: config.settings.broadcaster_username})
+    debug(message); global.commons.sendMessage(message, { username: config.settings.broadcaster_username })
   }
 
   async notifySong () {
@@ -293,7 +293,7 @@ class Songs extends System {
       else translation = 'songs.current-song-from-songrequest'
     } else return
     let message = await global.commons.prepare(translation, { name: currentSong.title, username: currentSong.username })
-    debug(message); global.commons.sendMessage(message, {username: config.settings.broadcaster_username})
+    debug(message); global.commons.sendMessage(message, { username: config.settings.broadcaster_username })
   }
 
   async stealSong () {
@@ -301,7 +301,7 @@ class Songs extends System {
       const currentSong = JSON.parse(await this.settings._.currentSong)
       this.addSongToPlaylist({ sender: null, parameters: currentSong.videoID })
     } catch (err) {
-      global.commons.sendMessage(global.translate('songs.noCurrentSong'), {username: config.settings.broadcaster_username})
+      global.commons.sendMessage(global.translate('songs.noCurrentSong'), { username: config.settings.broadcaster_username })
     }
   }
 
@@ -313,7 +313,7 @@ class Songs extends System {
   }
 
   help () {
-    global.commons.sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', {username: config.settings.broadcaster_username})
+    global.commons.sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', { username: config.settings.broadcaster_username })
   }
 
   async addSongToQueue (opts) {
@@ -397,7 +397,7 @@ class Songs extends System {
         if (err) return global.log.error(`=> Skipped ${id} - ${err.message}`)
         else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
           global.log.info(`=> Imported ${id} - ${videoInfo.title}`)
-          global.db.engine.update(this.collection.playlist, { videoID: id }, {videoID: id, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1})
+          global.db.engine.update(this.collection.playlist, { videoID: id }, { videoID: id, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1 })
           imported++
         }
       })
@@ -474,7 +474,7 @@ class Songs extends System {
             if (err) return global.log.error(`=> Skipped ${id} - ${err.message}`)
             else if (!_.isNil(videoInfo) && !_.isNil(videoInfo.title)) {
               global.log.info(`=> Imported ${id} - ${videoInfo.title}`)
-              global.db.engine.update(this.collection.playlist, { videoID: id }, {videoID: id, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1})
+              global.db.engine.update(this.collection.playlist, { videoID: id }, { videoID: id, title: videoInfo.title, loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, lastPlayedAt: new Date().getTime(), seed: 1 })
               imported++
             }
           })

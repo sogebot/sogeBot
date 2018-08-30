@@ -15,7 +15,7 @@ describe('Permissions - override()', () => {
   })
 
   it('change permission to viewer to !top messages', async () => {
-    global.permissions.override({sender: owner, parameters: 'viewer !top messages'})
+    global.permissions.override({ sender: owner, parameters: 'viewer !top messages' })
     await message.isSent('permissions.success.change', owner, { command: '!top messages' })
   })
 })

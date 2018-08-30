@@ -12,7 +12,7 @@ class Streamlabs {
     this.collection = 'integrations.streamlabs'
     this.socket = null
 
-    global.panel.addMenu({category: 'main', name: 'integrations', id: 'integrations'})
+    global.panel.addMenu({ category: 'main', name: 'integrations', id: 'integrations' })
 
     this.status({ connect: true })
     this.sockets()

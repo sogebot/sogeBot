@@ -12,7 +12,7 @@ if (!fs.existsSync(galleryDir)) fs.mkdirSync(galleryDir)
 
 function Gallery () {
   if (require('cluster').isMaster) {
-    global.panel.addMenu({category: 'settings', name: 'gallery', id: 'gallery'})
+    global.panel.addMenu({ category: 'settings', name: 'gallery', id: 'gallery' })
     global.panel.socketListening(this, 'overlay.gallery.get', this._get)
     global.panel.socketListening(this, 'overlay.gallery.delete', this._delete)
     global.panel.socketListening(this, 'overlay.gallery.upload', this._upload)

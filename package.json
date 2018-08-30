@@ -67,7 +67,7 @@
     "ytpl": "0.1.12"
   },
   "scripts": {
-    "eslint": "eslint --quiet test/* && eslint --quiet src/bot/* && eslint --quiet src/bot/systems/* && eslint --quiet src/bot/overlays/* && eslint --quiet src/bot/widgets/*",
+    "eslint": "eslint --quiet test src",
     "test": "mocha --recursive --timeout 20000 --exit --require source-map-support/register",
     "test:config:mongodb": "cp config.example.json config.json && sed -i -- 's/nedb/mongodb/g' config.json",
     "test:config:nedb": "cp config.example.json config.json",

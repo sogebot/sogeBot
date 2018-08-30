@@ -34,9 +34,9 @@ describe('Cooldowns - toggleOwners()', () => {
     global.systems.cooldown.toggleOwners({ sender: owner, parameters: `${command} ${type}` })
     await message.isSent('cooldowns.cooldown-was-enabled-for-owners', owner, { command: command, sender: owner.username })
 
-    let isOk = await global.systems.cooldown.check({sender: owner, message: '!me'})
+    let isOk = await global.systems.cooldown.check({ sender: owner, message: '!me' })
     assert.isTrue(isOk)
-    isOk = await global.systems.cooldown.check({sender: owner, message: '!me'})
+    isOk = await global.systems.cooldown.check({ sender: owner, message: '!me' })
     assert.isFalse(isOk)
 
     global.systems.cooldown.toggleOwners({ sender: owner, parameters: `${command} ${type}` })

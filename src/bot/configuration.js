@@ -69,8 +69,8 @@ class Configuration {
 
   register (cfgName, success, filter, defaultValue) {
     debug('configuration:register')(`Registering ${cfgName}:${filter} with default value ${defaultValue}`)
-    this.cfgL[cfgName] = {success: success, value: defaultValue, filter: filter}
-    this.default[cfgName] = {value: defaultValue}
+    this.cfgL[cfgName] = { success: success, value: defaultValue, filter: filter }
+    this.default[cfgName] = { value: defaultValue }
   }
 
   async setValue2 (opts) {
@@ -189,7 +189,7 @@ class Configuration {
 
       if (_.isNil(global[type][name])) throw new Error(`Not found - ${type} - ${name}`)
 
-      global[type][name].status({state: opts.enable})
+      global[type][name].status({ state: opts.enable })
     } catch (e) {
       global.log.error(e.message)
     }

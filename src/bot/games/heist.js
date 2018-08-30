@@ -82,7 +82,7 @@ class Heist extends Game {
         '!bankheist'
       ]
     }
-    super({settings})
+    super({ settings })
 
     if (cluster.isMaster) new Timeout().recursive({ uid: 'iCheckFinished', this: this, fnc: this.iCheckFinished, wait: 10000 }) // wait for proper config startup
   }

@@ -36,17 +36,17 @@ class Raffles extends System {
       },
       raffleAnnounceInterval: 10,
       commands: [
-        {name: '!raffle pick', permission: constants.OWNER_ONLY},
-        {name: '!raffle remove', permission: constants.OWNER_ONLY},
-        {name: '!raffle open', permission: constants.OWNER_ONLY},
+        { name: '!raffle pick', permission: constants.OWNER_ONLY },
+        { name: '!raffle remove', permission: constants.OWNER_ONLY },
+        { name: '!raffle open', permission: constants.OWNER_ONLY },
         '!raffle'
       ],
       parsers: [
-        {name: 'messages', fireAndForget: true},
-        {name: 'participate'}
+        { name: 'messages', fireAndForget: true },
+        { name: 'participate' }
       ]
     }
-    super({settings})
+    super({ settings })
     this.addWidget('raffles', 'widget-title-raffles', 'fas fa-gift')
 
     if (cluster.isMaster) {

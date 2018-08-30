@@ -116,7 +116,7 @@ Commons.prototype.prepare = async function (translate, attr) {
 
 Commons.prototype.getTime = function (time, isChat) {
   var now, days, hours, minutes, seconds
-  now = _.isNull(time) || !time ? {days: 0, hours: 0, minutes: 0, seconds: 0} : moment.preciseDiff(moment().valueOf(), moment(time).valueOf(), true)
+  now = _.isNull(time) || !time ? { days: 0, hours: 0, minutes: 0, seconds: 0 } : moment.preciseDiff(moment().valueOf(), moment(time).valueOf(), true)
   if (isChat) {
     days = now.days > 0 ? now.days : ''
     hours = now.hours > 0 ? now.hours : ''
@@ -154,10 +154,10 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
   if (!(await global.configuration.getValue('mute')) || attr.force) {
     if ((!_.isNil(attr.quiet) && attr.quiet)) return true
     if (sender['message-type'] === 'whisper') {
-      global.log.whisperOut(message, {username: sender.username})
+      global.log.whisperOut(message, { username: sender.username })
       global.commons.message('whisper', sender.username, message)
     } else {
-      global.log.chatOut(message, {username: sender.username})
+      global.log.chatOut(message, { username: sender.username })
       if ((await global.configuration.getValue('sendWithMe')) && !message.startsWith('/')) {
         global.commons.message('me', config.settings.broadcaster_username, message)
       } else {
@@ -170,7 +170,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
 
 Commons.prototype.message = function (type, username, message, retry) {
   if (config.debug.console) return
-  if (cluster.isWorker) process.send({type: type, sender: username, message: message})
+  if (cluster.isWorker) process.send({ type: type, sender: username, message: message })
   else {
     try {
       global.botTMI.chat[type](username, message)
@@ -183,7 +183,7 @@ Commons.prototype.message = function (type, username, message, retry) {
 
 Commons.prototype.timeout = function (username, reason, timeout) {
   if (cluster.isMaster) global.botTMI.chat.timeout(config.settings.broadcaster_username, username, timeout, reason)
-  else process.send({type: 'timeout', username: username, timeout: timeout, reason: reason})
+  else process.send({ type: 'timeout', username: username, timeout: timeout, reason: reason })
 }
 
 Commons.prototype.getOwner = function () {

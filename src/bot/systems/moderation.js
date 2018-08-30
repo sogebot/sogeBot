@@ -88,8 +88,8 @@ class Moderation extends System {
       ]
     }
 
-    super({settings})
-    this.addMenu({category: 'settings', name: 'systems', id: 'systems'})
+    super({ settings })
+    this.addMenu({ category: 'settings', name: 'systems', id: 'systems' })
   }
 
   sockets () {

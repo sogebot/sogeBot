@@ -12,7 +12,7 @@ class Seppuku extends Game {
         '!seppuku'
       ]
     }
-    super({settings})
+    super({ settings })
   }
 
   async main (opts) {

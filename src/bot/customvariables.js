@@ -27,7 +27,7 @@ class CustomVariables {
 
   async addMenuAndListenersToPanel () {
     if (_.isNil(global.panel)) return new Timeout().recursive({ this: this, uid: `${this.constructor.name}.addMenuAndListenersToPanel`, wait: 1000, fnc: this.addMenuAndListenersToPanel })
-    global.panel.addMenu({category: 'registry', name: 'custom-variables', id: 'registry.customVariables'})
+    global.panel.addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables' })
     this.sockets()
   }
 

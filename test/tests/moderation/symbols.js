@@ -26,13 +26,13 @@ describe('systems/moderation - symbols()', () => {
 
     for (let test of tests.timeout) {
       it(`symbols '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.symbols({sender: { username: 'testuser' }, message: test}))
+        assert.isTrue(await global.systems.moderation.symbols({ sender: { username: 'testuser' }, message: test }))
       })
     }
 
     for (let test of tests.ok) {
       it(`symbols '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.symbols({sender: { username: 'testuser' }, message: test}))
+        assert.isTrue(await global.systems.moderation.symbols({ sender: { username: 'testuser' }, message: test }))
       })
     }
   })
@@ -44,13 +44,13 @@ describe('systems/moderation - symbols()', () => {
 
     for (let test of tests.timeout) {
       it(`symbols '${test}' should timeout`, async () => {
-        assert.isFalse(await global.systems.moderation.symbols({sender: { username: 'testuser' }, message: test}))
+        assert.isFalse(await global.systems.moderation.symbols({ sender: { username: 'testuser' }, message: test }))
       })
     }
 
     for (let test of tests.ok) {
       it(`symbols '${test}' should not timeout`, async () => {
-        assert.isTrue(await global.systems.moderation.symbols({sender: { username: 'testuser' }, message: test}))
+        assert.isTrue(await global.systems.moderation.symbols({ sender: { username: 'testuser' }, message: test }))
       })
     }
   })

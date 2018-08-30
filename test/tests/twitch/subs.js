@@ -35,8 +35,8 @@ describe('lib/twitch - subs()', () => {
   })
 
   it('!subs should return testuser2', async () => {
-    let fromDb = await global.db.engine.findOne('widgetsEventList', {'username': 'testuser2', type: 'sub'})
-    global.twitch.subs({sender: testuser})
+    let fromDb = await global.db.engine.findOne('widgetsEventList', { 'username': 'testuser2', type: 'sub' })
+    global.twitch.subs({ sender: testuser })
     await message.isSent('subs', testuser, {
       lastSubAgo: moment(fromDb.timestamp).fromNow(),
       lastSubUsername: testuser2.username,
@@ -53,8 +53,8 @@ describe('lib/twitch - subs()', () => {
   })
 
   it('!subs should return testuser3', async () => {
-    let fromDb = await global.db.engine.findOne('widgetsEventList', {'username': 'testuser3', type: 'sub'})
-    global.twitch.subs({sender: testuser})
+    let fromDb = await global.db.engine.findOne('widgetsEventList', { 'username': 'testuser3', type: 'sub' })
+    global.twitch.subs({ sender: testuser })
     await message.isSent('subs', testuser, {
       lastSubAgo: moment(fromDb.timestamp).fromNow(),
       lastSubUsername: testuser3.username,

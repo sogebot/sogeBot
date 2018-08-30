@@ -180,7 +180,7 @@ class Webhooks {
         }
       }
 
-      if (!_.get(user, 'is.follower', false)) global.users.set(user.username, {id: fid, time: { followCheck: new Date().getTime() }})
+      if (!_.get(user, 'is.follower', false)) global.users.set(user.username, { id: fid, time: { followCheck: new Date().getTime() } })
       else global.users.set(user.username, { id: fid, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
     }
   }

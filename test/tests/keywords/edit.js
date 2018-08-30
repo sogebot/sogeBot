@@ -39,13 +39,13 @@ describe('Keywords - edit()', () => {
     global.systems.keywords.add({ sender: owner, parameters: 'a Lorem Ipsum' })
     await message.isSent('keywords.keyword-was-added', owner, { keyword: 'a', response: 'Lorem Ipsum', sender: owner.username })
 
-    global.systems.keywords.run({sender: owner, message: 'a'})
+    global.systems.keywords.run({ sender: owner, message: 'a' })
     await message.isSentRaw('Lorem Ipsum', owner)
 
     global.systems.keywords.edit({ sender: owner, parameters: 'a Ipsum Lorem' })
     await message.isSent('keywords.keyword-was-edited', owner, { keyword: 'a', response: 'Ipsum Lorem', sender: owner.username })
 
-    global.systems.keywords.run({sender: owner, message: 'a'})
+    global.systems.keywords.run({ sender: owner, message: 'a' })
     await message.isSentRaw('Ipsum Lorem', owner)
   })
 })

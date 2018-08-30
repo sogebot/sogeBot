@@ -51,7 +51,7 @@ class BetsWidget {
       })
 
       socket.on('settings', async (cb) => {
-        cb(null, {betPercentGain: await global.systems.bets.settings.betPercentGain})
+        cb(null, { betPercentGain: await global.systems.bets.settings.betPercentGain })
       })
 
       socket.on('close', async (option) => {

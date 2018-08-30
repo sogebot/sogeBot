@@ -46,7 +46,7 @@ function PhillipsHue () {
           if (state.status.state === 0) {
             state.status.blocked = true
             state.status.state = 1
-            self.api.setLightState(state.light, {'on': true}).done(function () {
+            self.api.setLightState(state.light, { 'on': true }).done(function () {
               self.api.setLightState(state.light, lightState.create().rgb(state.rgb)).done(function () {
                 state.status.blocked = false
                 state.status.loop++
@@ -55,7 +55,7 @@ function PhillipsHue () {
           } else {
             state.status.blocked = true
             state.status.state = 0
-            self.api.setLightState(state.light, {'on': false}).fail(function () { return true }).done(function () {
+            self.api.setLightState(state.light, { 'on': false }).fail(function () { return true }).done(function () {
               state.status.blocked = false
               state.status.loop++
             })
@@ -64,7 +64,7 @@ function PhillipsHue () {
 
         if (state.status.loop === state.loop * 2) {
           setTimeout(function () {
-            self.api.setLightState(state.light, {'on': false}).fail(function () { return true })
+            self.api.setLightState(state.light, { 'on': false }).fail(function () { return true })
           }, state.time + 100)
 
           self.states.splice(index, 1) // remove from list
@@ -78,13 +78,13 @@ PhillipsHue.prototype.commands = function () {
   return !global.commons.isIntegrationEnabled('phillipshue')
     ? []
     : [
-      {this: this, command: '!hue list', fnc: this.getLights, permission: constants.OWNER_ONLY},
-      {this: this, command: '!hue', fnc: this.hue, permission: constants.OWNER_ONLY}
+      { this: this, command: '!hue list', fnc: this.getLights, permission: constants.OWNER_ONLY },
+      { this: this, command: '!hue', fnc: this.hue, permission: constants.OWNER_ONLY }
     ]
 }
 
 PhillipsHue.prototype.getLights = function (self, sender, text) {
-  if (cluster.isWorker) return process.send({type: 'phillipshue', fnc: 'getLights', sender: sender, text: text})
+  if (cluster.isWorker) return process.send({ type: 'phillipshue', fnc: 'getLights', sender: sender, text: text })
   self.api.lights()
     .then(function (lights) {
       var output = []
@@ -97,7 +97,7 @@ PhillipsHue.prototype.getLights = function (self, sender, text) {
 }
 
 PhillipsHue.prototype.hue = function (self, sender, text) {
-  if (cluster.isWorker) return process.send({type: 'phillipshue', fnc: 'hue', sender: sender, text: text})
+  if (cluster.isWorker) return process.send({ type: 'phillipshue', fnc: 'hue', sender: sender, text: text })
   var rgb = self.parseText(text, 'rgb', '255,255,255').split(',')
   if (rgb.length < 3) rgb = [255, 255, 255]
 

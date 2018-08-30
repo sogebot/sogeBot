@@ -33,7 +33,7 @@ function Emotes () {
   global.configuration.register('OEmotesAnimationTime', 'overlay.emotes.settings.OEmotesAnimationTime', 'number', 4000)
 
   if (cluster.isMaster) {
-    global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
+    global.panel.addMenu({ category: 'settings', name: 'overlays', id: 'overlays' })
     global.panel.socketListening(this, 'emote.testExplosion', this._testExplosion)
     global.panel.socketListening(this, 'emote.test', this._test)
 
@@ -55,7 +55,7 @@ function Emotes () {
 
 Emotes.prototype.parsers = function () {
   return [
-    {this: this, name: 'emotes', fnc: this.containsEmotes, permission: constants.VIEWERS, priority: constants.LOW, fireAndForget: true}
+    { this: this, name: 'emotes', fnc: this.containsEmotes, permission: constants.VIEWERS, priority: constants.LOW, fireAndForget: true }
   ]
 }
 

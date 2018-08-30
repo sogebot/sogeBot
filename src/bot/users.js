@@ -28,19 +28,19 @@ function Users () {
 
 Users.prototype.commands = function () {
   return [
-    {this: this, id: '!regular add', command: '!regular add', fnc: this.addRegular, permission: constants.OWNER_ONLY},
-    {this: this, id: '!regular remove', command: '!regular remove', fnc: this.rmRegular, permission: constants.OWNER_ONLY},
-    {this: this, id: '!merge', command: '!merge', fnc: this.merge, permission: constants.MODS},
-    {this: this, id: '!ignore add', command: '!ignore add', fnc: this.ignoreAdd, permission: constants.OWNER_ONLY},
-    {this: this, id: '!ignore rm', command: '!ignore rm', fnc: this.ignoreRm, permission: constants.OWNER_ONLY},
-    {this: this, id: '!ignore check', command: '!ignore check', fnc: this.ignoreCheck, permission: constants.OWNER_ONLY}
+    { this: this, id: '!regular add', command: '!regular add', fnc: this.addRegular, permission: constants.OWNER_ONLY },
+    { this: this, id: '!regular remove', command: '!regular remove', fnc: this.rmRegular, permission: constants.OWNER_ONLY },
+    { this: this, id: '!merge', command: '!merge', fnc: this.merge, permission: constants.MODS },
+    { this: this, id: '!ignore add', command: '!ignore add', fnc: this.ignoreAdd, permission: constants.OWNER_ONLY },
+    { this: this, id: '!ignore rm', command: '!ignore rm', fnc: this.ignoreRm, permission: constants.OWNER_ONLY },
+    { this: this, id: '!ignore check', command: '!ignore check', fnc: this.ignoreCheck, permission: constants.OWNER_ONLY }
   ]
 }
 
 Users.prototype.panel = function () {
   if (_.isNil(global.panel)) return setTimeout(() => this.panel(), 10)
 
-  global.panel.addMenu({category: 'manage', name: 'viewers', id: 'viewers'})
+  global.panel.addMenu({ category: 'manage', name: 'viewers', id: 'viewers' })
   global.panel.socketListening(this, 'deleteViewer', this.deleteViewer)
   global.panel.socketListening(this, 'viewers.toggle', this.toggleIs)
   global.panel.socketListening(this, 'resetMessages', this.resetMessages)
@@ -68,7 +68,7 @@ Users.prototype.sockets = function (self) {
         }
         await Promise.all(promises)
         // update ignore list
-        global.commons.processAll({type: 'call', ns: 'commons', fnc: 'loadIgnoreList'})
+        global.commons.processAll({ type: 'call', ns: 'commons', fnc: 'loadIgnoreList' })
         callback(null, null)
       } catch (e) {
         callback(e, null)
@@ -362,7 +362,7 @@ Users.prototype.ignoreAdd = async function (opts) {
   await global.db.engine.update('users_ignorelist', { username: match.username }, { username: match.username })
 
   // update ignore list
-  global.commons.processAll({ns: 'commons', fnc: 'loadIgnoreList'})
+  global.commons.processAll({ ns: 'commons', fnc: 'loadIgnoreList' })
 
   let message = await global.commons.prepare('ignore.user.is.added', { username: match.username })
   debug(message); global.commons.sendMessage(message, opts.sender)
@@ -375,7 +375,7 @@ Users.prototype.ignoreRm = async function (opts) {
   match.username = match.username.toLowerCase()
 
   await global.db.engine.remove('users_ignorelist', { username: match.username })
-  global.commons.processAll({type: 'call', ns: 'commons', fnc: 'loadIgnoreList'})
+  global.commons.processAll({ type: 'call', ns: 'commons', fnc: 'loadIgnoreList' })
   let message = await global.commons.prepare('ignore.user.is.removed', { username: match.username })
   debug(message); global.commons.sendMessage(message, opts.sender)
 }
@@ -402,7 +402,7 @@ Users.prototype.resetMessages = function (self, socket, data) {
 }
 
 Users.prototype.resetWatchTime = function (self, socket, data) {
-  self.setAll({time: {watched: 0}})
+  self.setAll({ time: { watched: 0 } })
 }
 
 Users.prototype.deleteViewer = function (self, socket, username) {
@@ -468,7 +468,7 @@ Users.prototype.get = async function (username) {
     if (!_.isNil(user._id)) user._id = user._id.toString() // force retype _id
     if (_.isNil(user.time.created_at) && !_.isNil(user.id)) { // this is accessing master (in points) and worker
       if (cluster.isMaster) global.api.fetchAccountAge(username, user.id)
-      else process.send({type: 'api', fnc: 'fetchAccountAge', username: username, id: user.id})
+      else process.send({ type: 'api', fnc: 'fetchAccountAge', username: username, id: user.id })
     }
   } catch (e) {
     global.log.error(e.stack)

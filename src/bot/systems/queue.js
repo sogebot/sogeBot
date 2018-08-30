@@ -28,17 +28,17 @@ class Queue extends System {
         subscribers: true
       },
       commands: [
-        {name: '!queue random', permission: constants.OWNER_ONLY},
-        {name: '!queue pick', permission: constants.OWNER_ONLY},
-        {name: '!queue clear', permission: constants.OWNER_ONLY},
-        {name: '!queue close', permission: constants.OWNER_ONLY},
-        {name: '!queue open', permission: constants.OWNER_ONLY},
-        {name: '!queue list', permission: constants.OWNER_ONLY},
+        { name: '!queue random', permission: constants.OWNER_ONLY },
+        { name: '!queue pick', permission: constants.OWNER_ONLY },
+        { name: '!queue clear', permission: constants.OWNER_ONLY },
+        { name: '!queue close', permission: constants.OWNER_ONLY },
+        { name: '!queue open', permission: constants.OWNER_ONLY },
+        { name: '!queue list', permission: constants.OWNER_ONLY },
         '!queue join',
         '!queue'
       ]
     }
-    super({settings})
+    super({ settings })
 
     this.addWidget('queue', 'widget-title-queue', 'fas fa-users')
   }
@@ -144,7 +144,7 @@ class Queue extends System {
     if (!opts.users) {
       var input = opts.parameters.match(/^(\d+)?/)[0]
       var amount = (input === '' ? 1 : parseInt(input, 10))
-      users = await this.getUsers({amount, random})
+      users = await this.getUsers({ amount, random })
     } else {
       users = opts.users
       for (let user of users) await global.db.engine.remove(this.collection.data, { username: user.username })

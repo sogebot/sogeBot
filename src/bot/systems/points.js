@@ -27,17 +27,17 @@ class Points extends System {
         { name: 'messagePoints', fireAndForget: true }
       ],
       commands: [
-        {name: '!points add', permission: constants.OWNER_ONLY},
-        {name: '!points remove', permission: constants.OWNER_ONLY},
-        {name: '!points all', permission: constants.OWNER_ONLY},
-        {name: '!points set', permission: constants.OWNER_ONLY},
-        {name: '!points get', permission: constants.OWNER_ONLY},
-        {name: '!makeitrain', fnc: 'rain', permission: constants.OWNER_ONLY},
+        { name: '!points add', permission: constants.OWNER_ONLY },
+        { name: '!points remove', permission: constants.OWNER_ONLY },
+        { name: '!points all', permission: constants.OWNER_ONLY },
+        { name: '!points set', permission: constants.OWNER_ONLY },
+        { name: '!points get', permission: constants.OWNER_ONLY },
+        { name: '!makeitrain', fnc: 'rain', permission: constants.OWNER_ONLY },
         '!points give',
         '!points'
       ]
     }
-    super({settings})
+    super({ settings })
 
     if (require('cluster').isMaster) {
       this.updatePoints()

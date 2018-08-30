@@ -14,7 +14,7 @@ class WheelOfFortune extends Game {
         data: JSON.stringify([])
       }
     }
-    super({settings})
+    super({ settings })
   }
   sockets () {
     this.socket.on('connection', (socket) => {
@@ -33,7 +33,7 @@ class WheelOfFortune extends Game {
   async main (opts) {
     if (cluster.isMaster) {
       const options = JSON.parse(await this.settings.options.data)
-      global.panel.io.of('/games/wheeloffortune').emit('spin', {options, username: opts.sender.username})
+      global.panel.io.of('/games/wheeloffortune').emit('spin', { options, username: opts.sender.username })
     } else {
       process.send({ type: 'call', ns: 'games.wheelOfFortune', fnc: 'main', args: [opts] })
     }

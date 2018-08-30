@@ -11,17 +11,17 @@ const message = require('../../general.js').message
 const owner = { username: 'soge__' }
 
 const tests = [
-  {sender: owner, parameters: '', shouldFail: true},
-  {sender: owner, parameters: '-quote -tags', shouldFail: true},
-  {sender: owner, parameters: '-quote         -tags             ', shouldFail: true},
-  {sender: owner, parameters: '-quote -tags lorem ipsum', shouldFail: true},
-  {sender: owner, parameters: '-tags -quote', shouldFail: true},
-  {sender: owner, parameters: '-tags lorem ipsum -quote', shouldFail: true},
-  {sender: owner, parameters: '-tags Lorem Ipsum Dolor', shouldFail: true},
-  {sender: owner, parameters: '-quote Lorem Ipsum Dolor', quote: 'Lorem Ipsum Dolor', tags: 'general', shouldFail: false},
-  {sender: owner, parameters: '-quote Lorem Ipsum Dolor -tags lorem', quote: 'Lorem Ipsum Dolor', tags: 'lorem', shouldFail: false},
-  {sender: owner, parameters: '-quote Lorem Ipsum Dolor -tags lorem ipsum', quote: 'Lorem Ipsum Dolor', tags: 'lorem ipsum', shouldFail: false},
-  {sender: owner, parameters: ' -tags lorem ipsum, dolor sit -quote Lorem Ipsum Dolor', quote: 'Lorem Ipsum Dolor', tags: 'lorem ipsum, dolor sit', shouldFail: false}
+  { sender: owner, parameters: '', shouldFail: true },
+  { sender: owner, parameters: '-quote -tags', shouldFail: true },
+  { sender: owner, parameters: '-quote         -tags             ', shouldFail: true },
+  { sender: owner, parameters: '-quote -tags lorem ipsum', shouldFail: true },
+  { sender: owner, parameters: '-tags -quote', shouldFail: true },
+  { sender: owner, parameters: '-tags lorem ipsum -quote', shouldFail: true },
+  { sender: owner, parameters: '-tags Lorem Ipsum Dolor', shouldFail: true },
+  { sender: owner, parameters: '-quote Lorem Ipsum Dolor', quote: 'Lorem Ipsum Dolor', tags: 'general', shouldFail: false },
+  { sender: owner, parameters: '-quote Lorem Ipsum Dolor -tags lorem', quote: 'Lorem Ipsum Dolor', tags: 'lorem', shouldFail: false },
+  { sender: owner, parameters: '-quote Lorem Ipsum Dolor -tags lorem ipsum', quote: 'Lorem Ipsum Dolor', tags: 'lorem ipsum', shouldFail: false },
+  { sender: owner, parameters: ' -tags lorem ipsum, dolor sit -quote Lorem Ipsum Dolor', quote: 'Lorem Ipsum Dolor', tags: 'lorem ipsum, dolor sit', shouldFail: false }
 ]
 
 describe('Quotes - add()', () => {
