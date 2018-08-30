@@ -38,7 +38,7 @@ bot:
 
 pack:
 	@echo -ne "\n\t ----- Packing into sogeBot-$(VERSION).zip\n"
-	@npx cross-var bestzip sogeBot-$(VERSION).zip npm-shrinkwrap.json config.example.json dest/ locales/ main.js cluster.js public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ scss/ dist/
+	@npx bestzip sogeBot-$(VERSION).zip .npmrc npm-shrinkwrap.json config.example.json dest/ locales/ public/ LICENSE package.json docs/ AUTHORS tools/ bin/ bat/ dist/
 
 prepare:
 	@echo -ne "\n\t ----- Cleaning up node_modules and shrinkwrap\n"
