@@ -35,9 +35,9 @@ class CustomCommands extends System {
         { name: 'run', priority: constants.LOW, fireAndForget: true }
       ]
     }
-    super({settings})
+    super({ settings })
 
-    this.addMenu({category: 'manage', name: 'customcommands', id: 'customcommands/list'})
+    this.addMenu({ category: 'manage', name: 'customcommands', id: 'customcommands/list' })
   }
 
   main (opts) {
@@ -136,7 +136,7 @@ class CustomCommands extends System {
       (command.permission === constants.MODS && (isMod || isOwner)) ||
       (command.permission === constants.OWNER_ONLY && isOwner)) {
       const param = opts.message.replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim() // remove found command from message to get param
-      global.commons.sendMessage(command.response, opts.sender, {'param': param, 'cmd': command.command})
+      global.commons.sendMessage(command.response, opts.sender, { 'param': param, 'cmd': command.command })
     }
     return true
   }

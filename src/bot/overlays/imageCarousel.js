@@ -8,7 +8,7 @@ const DEBUG_OVERLAYS_CAROUSEL_SOCKETS = debug('overlays:carousel:sockets')
 class ImageCarousel {
   constructor () {
     if (require('cluster').isMaster) {
-      global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
+      global.panel.addMenu({ category: 'settings', name: 'overlays', id: 'overlays' })
 
       this.sockets()
     }

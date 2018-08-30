@@ -42,10 +42,10 @@ class Bets extends System {
     const settings = {
       betPercentGain: 20,
       commands: [
-        {name: '!bet open', permission: constants.MODS},
-        {name: '!bet close', permission: constants.MODS},
-        {name: '!bet refund', permission: constants.MODS},
-        {name: '!bet', isHelper: true}
+        { name: '!bet open', permission: constants.MODS },
+        { name: '!bet close', permission: constants.MODS },
+        { name: '!bet refund', permission: constants.MODS },
+        { name: '!bet', isHelper: true }
       ]
     }
 
@@ -75,7 +75,7 @@ class Bets extends System {
 
         const _bets = await global.db.engine.find(this.collection.users)
         if (_bets.length > 0) {
-          global.commons.sendMessage(global.translate('bets.locked'), {username: global.commons.getOwner()})
+          global.commons.sendMessage(global.translate('bets.locked'), { username: global.commons.getOwner() })
           const _id = currentBet._id.toString(); delete currentBet._id
           DEBUG_BET_CHECK_IF_EXPIRED('Doing cache %s update \n %o', _id, currentBet)
           let update = await global.db.engine.update(this.collection.data, { _id: _id }, currentBet)
@@ -135,7 +135,7 @@ class Bets extends System {
           global.commons.sendMessage(await global.commons.prepare('bets.running', {
             command: opts.command,
             $maxIndex: currentBet.options.length - 1,
-            $options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', ')}), opts.sender)
+            $options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', ') }), opts.sender)
           break
         default:
           global.log.warning(e.stack)
@@ -155,7 +155,7 @@ class Bets extends System {
         $title: currentBet.title,
         $maxIndex: currentBet.options.length - 1,
         $options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', '),
-        $minutes: parseFloat((currentBet.end - new Date().getTime()) / 1000 / 60).toFixed(1)}), opts.sender)
+        $minutes: parseFloat((currentBet.end - new Date().getTime()) / 1000 / 60).toFixed(1) }), opts.sender)
     }
   }
 

@@ -16,12 +16,12 @@ class Permissions {
 
   commands () {
     return [
-      {this: this, id: '!permission', command: '!permission', fnc: this.override, permission: constants.OWNER_ONLY}
+      { this: this, id: '!permission', command: '!permission', fnc: this.override, permission: constants.OWNER_ONLY }
     ]
   }
 
   webPanel () {
-    global.panel.addMenu({category: 'settings', name: 'permissions', id: 'permissions'})
+    global.panel.addMenu({ category: 'settings', name: 'permissions', id: 'permissions' })
     global.panel.socketListening(this, 'getPermissions', this.sendSocket)
     global.panel.socketListening(this, 'changePermission', this.changeSocket)
   }

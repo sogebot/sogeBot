@@ -20,9 +20,9 @@ class Quotes extends System {
         '!quote'
       ]
     }
-    super({settings})
+    super({ settings })
 
-    this.addMenu({category: 'manage', name: 'quotes', id: 'quotes/list'})
+    this.addMenu({ category: 'manage', name: 'quotes', id: 'quotes/list' })
   }
 
   async add (opts) {

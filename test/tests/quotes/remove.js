@@ -11,11 +11,11 @@ const message = require('../../general.js').message
 const owner = { username: 'soge__' }
 
 const tests = [
-  {sender: owner, parameters: '', shouldFail: true},
-  {sender: owner, parameters: '-id', shouldFail: true},
-  {sender: owner, parameters: '-id a', shouldFail: true},
-  {sender: owner, parameters: '-id 1', id: 1, shouldFail: false, exist: true},
-  {sender: owner, parameters: '-id 2', id: 2, shouldFail: false, exist: false}
+  { sender: owner, parameters: '', shouldFail: true },
+  { sender: owner, parameters: '-id', shouldFail: true },
+  { sender: owner, parameters: '-id a', shouldFail: true },
+  { sender: owner, parameters: '-id 1', id: 1, shouldFail: false, exist: true },
+  { sender: owner, parameters: '-id 2', id: 2, shouldFail: false, exist: false }
 ]
 
 describe('Quotes - remove()', () => {

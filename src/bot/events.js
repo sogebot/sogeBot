@@ -75,7 +75,7 @@ class Events {
 
   async panel () {
     if (_.isNil(global.panel)) return setTimeout(() => this.panel(), 10)
-    global.panel.addMenu({category: 'manage', name: 'event-listeners', id: 'events'})
+    global.panel.addMenu({ category: 'manage', name: 'event-listeners', id: 'events' })
     this.sockets()
   }
 
@@ -144,12 +144,12 @@ class Events {
         if (!_.isNil(attributes.userObject)) {
           // flatten userObject
           let userObject = attributes.userObject
-          _.merge(attributes, flatten({userObject: userObject}))
+          _.merge(attributes, flatten({ userObject: userObject }))
         }
         if (!_.isNil(attributes.recipientObject)) {
           // flatten recipientObject
           let recipientObject = attributes.recipientObject
-          _.merge(attributes, flatten({recipientObject: recipientObject}))
+          _.merge(attributes, flatten({ recipientObject: recipientObject }))
         }
         const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key))
         if (isOperationSupported) _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation.definitions, attributes)
@@ -686,7 +686,7 @@ class Events {
           if (!_.isNil(attributes.userObject)) {
             // flatten userObject
             let userObject = attributes.userObject
-            _.merge(attributes, flatten({userObject: userObject}))
+            _.merge(attributes, flatten({ userObject: userObject }))
           }
           const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key))
           if (isOperationSupported) _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation.definitions, attributes)

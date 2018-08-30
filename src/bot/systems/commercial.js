@@ -18,7 +18,7 @@ class Commercial extends System {
   constructor () {
     const settings = {
       commands: [
-        {name: '!commercial', permission: constants.OWNER_ONLY, isHelper: true}
+        { name: '!commercial', permission: constants.OWNER_ONLY, isHelper: true }
       ]
     }
 

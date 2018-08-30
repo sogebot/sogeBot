@@ -4,7 +4,7 @@ const _ = require('lodash')
 
 function Stats () {
   if (require('cluster').isMaster) {
-    global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
+    global.panel.addMenu({ category: 'settings', name: 'overlays', id: 'overlays' })
     global.panel.socketListening(this, 'overlay.stats.get', this._get)
   }
 }

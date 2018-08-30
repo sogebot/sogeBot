@@ -23,7 +23,7 @@ describe('Settings tests', () => {
   describe('testBool', () => {
     describe('/bool/', function () {
       before(function () {
-        global.configuration.setValue({sender: owner, parameters: 'testBool false'})
+        global.configuration.setValue({ sender: owner, parameters: 'testBool false' })
       })
       it('success message expected', async function () {
         await message.isWarned('settings.testBool.false', owner, { sender: owner.username })
@@ -36,7 +36,7 @@ describe('Settings tests', () => {
     })
     describe('/string/', function () {
       before(function () {
-        global.configuration.setValue({sender: owner, parameters: 'testBool test'})
+        global.configuration.setValue({ sender: owner, parameters: 'testBool test' })
       })
       it('fail message expected', async function () {
         await message.isSentRaw(`Sorry, @${owner.username}, cannot parse !set command.`, owner, { sender: owner.username })
@@ -48,7 +48,7 @@ describe('Settings tests', () => {
     })
     describe('/number/', function () {
       before(function () {
-        global.configuration.setValue({sender: owner, parameters: 'testBool 10'})
+        global.configuration.setValue({ sender: owner, parameters: 'testBool 10' })
       })
       it('fail message expected', async function () {
         await message.isSentRaw(`Sorry, @${owner.username}, cannot parse !set command.`, owner, { sender: owner.username })
@@ -60,7 +60,7 @@ describe('Settings tests', () => {
     })
     describe('/empty/', function () {
       before(function () {
-        global.configuration.setValue({sender: owner, parameters: 'testBool'})
+        global.configuration.setValue({ sender: owner, parameters: 'testBool' })
       })
       it('success message expected', async function () {
         await message.isWarned('settings.testBool.true', owner, { sender: owner.username })
@@ -74,7 +74,7 @@ describe('Settings tests', () => {
   describe('testNumber', () => {
     describe('/number/', function () {
       before(function () {
-        global.configuration.setValue({sender: owner, parameters: 'testNumber 10'})
+        global.configuration.setValue({ sender: owner, parameters: 'testNumber 10' })
       })
       it('success message expected', async function () {
         await message.isWarned('settings.testNumber', owner, { sender: owner.username })
@@ -87,7 +87,7 @@ describe('Settings tests', () => {
     })
     describe('/string/', function () {
       before(function () {
-        global.configuration.setValue({sender: owner, parameters: 'testNumber test'})
+        global.configuration.setValue({ sender: owner, parameters: 'testNumber test' })
       })
       it('fail message expected', async function () {
         await message.isSentRaw(`Sorry, @${owner.username}, cannot parse !set command.`, owner, { sender: owner.username })
@@ -99,7 +99,7 @@ describe('Settings tests', () => {
     })
     describe('/bool/', function () {
       before(function () {
-        global.configuration.setValue({sender: owner, parameters: 'testNumber true'})
+        global.configuration.setValue({ sender: owner, parameters: 'testNumber true' })
       })
       it('fail message expected', async function () {
         await message.isSentRaw(`Sorry, @${owner.username}, cannot parse !set command.`, owner, { sender: owner.username })
@@ -111,7 +111,7 @@ describe('Settings tests', () => {
     })
     describe('/empty/', function () {
       before(function () {
-        global.configuration.setValue({sender: owner, parameters: 'testNumber'})
+        global.configuration.setValue({ sender: owner, parameters: 'testNumber' })
       })
       it('success message expected', async function () {
         await message.isWarned('settings.testNumber', owner, { sender: owner.username })
@@ -125,7 +125,7 @@ describe('Settings tests', () => {
   describe('testString', () => {
     describe('/string/', function () {
       before(function () {
-        global.configuration.setValue({sender: owner, parameters: 'testString testMe!'})
+        global.configuration.setValue({ sender: owner, parameters: 'testString testMe!' })
       })
       it('success message expected', async function () {
         await message.isWarned('settings.testString', owner, { sender: owner.username })
@@ -138,7 +138,7 @@ describe('Settings tests', () => {
     })
     describe('/number/', function () {
       before(function () {
-        global.configuration.setValue({sender: owner, parameters: 'testString 10'})
+        global.configuration.setValue({ sender: owner, parameters: 'testString 10' })
       })
       it('fail message expected', async function () {
         await message.isSentRaw(`Sorry, @${owner.username}, cannot parse !set command.`, owner, { sender: owner.username })
@@ -150,7 +150,7 @@ describe('Settings tests', () => {
     })
     describe('/bool/', function () {
       before(function () {
-        global.configuration.setValue({sender: owner, parameters: 'testString true'})
+        global.configuration.setValue({ sender: owner, parameters: 'testString true' })
       })
       it('fail message expected', async function () {
         await message.isSentRaw(`Sorry, @${owner.username}, cannot parse !set command.`, owner, { sender: owner.username })
@@ -162,7 +162,7 @@ describe('Settings tests', () => {
     })
     describe('/empty/', function () {
       before(function () {
-        global.configuration.setValue({sender: owner, parameters: 'testString'})
+        global.configuration.setValue({ sender: owner, parameters: 'testString' })
       })
       it('success message expected', async function () {
         await message.isWarned('settings.testString', owner, { sender: owner.username })

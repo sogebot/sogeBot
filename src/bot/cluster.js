@@ -110,8 +110,8 @@ function cluster () {
 
     DEBUG_CLUSTER_WORKER_ONMESSAGE_ID('Checking msg type')
     if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {
-      global.log.whisperIn(message, {username: sender.username})
-    } else if (!skip && !global.commons.isBot(sender.username)) global.log.chatIn(message, {username: sender.username})
+      global.log.whisperIn(message, { username: sender.username })
+    } else if (!skip && !global.commons.isBot(sender.username)) global.log.chatIn(message, { username: sender.username })
 
     DEBUG_CLUSTER_WORKER_ONMESSAGE_ID('IsModerated, isIgnored')
     const isModerated = await parse.isModerated()

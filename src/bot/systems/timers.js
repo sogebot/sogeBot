@@ -27,19 +27,19 @@ class Timers extends System {
   constructor () {
     const settings = {
       commands: [
-        {name: '!timers set', permission: constants.OWNER_ONLY},
-        {name: '!timers unset', permission: constants.OWNER_ONLY},
-        {name: '!timers add', permission: constants.OWNER_ONLY},
-        {name: '!timers rm', permission: constants.OWNER_ONLY},
-        {name: '!timers list', permission: constants.OWNER_ONLY},
-        {name: '!timers toggle', permission: constants.OWNER_ONLY},
-        {name: '!timers', permission: constants.OWNER_ONLY}
+        { name: '!timers set', permission: constants.OWNER_ONLY },
+        { name: '!timers unset', permission: constants.OWNER_ONLY },
+        { name: '!timers add', permission: constants.OWNER_ONLY },
+        { name: '!timers rm', permission: constants.OWNER_ONLY },
+        { name: '!timers list', permission: constants.OWNER_ONLY },
+        { name: '!timers toggle', permission: constants.OWNER_ONLY },
+        { name: '!timers', permission: constants.OWNER_ONLY }
       ]
     }
 
-    super({settings})
+    super({ settings })
 
-    this.addMenu({category: 'manage', name: 'timers', id: 'timers/list'})
+    this.addMenu({ category: 'manage', name: 'timers', id: 'timers/list' })
     if (cluster.isMaster) this.init()
   }
 

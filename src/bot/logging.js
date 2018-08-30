@@ -99,7 +99,7 @@ function Logger () {
 }
 
 Logger.prototype._panel = () => {
-  global.panel.addMenu({category: 'main', name: 'logger', id: 'logger'})
+  global.panel.addMenu({ category: 'main', name: 'logger', id: 'logger' })
   global.panel.socketListening(global.logger, 'log.get', global.logger.send)
 }
 

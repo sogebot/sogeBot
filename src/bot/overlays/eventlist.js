@@ -6,7 +6,7 @@ const crypto = require('crypto')
 
 function EventList () {
   if (require('cluster').isMaster) {
-    global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
+    global.panel.addMenu({ category: 'settings', name: 'overlays', id: 'overlays' })
     global.panel.socketListening(this, 'overlay.eventlist.get', this._get)
   }
 }

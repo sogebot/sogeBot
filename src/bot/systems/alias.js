@@ -24,13 +24,13 @@ class Alias extends System {
   constructor () {
     const settings = {
       commands: [
-        {name: '!alias add', permission: constants.OWNER_ONLY},
-        {name: '!alias edit', permission: constants.OWNER_ONLY},
-        {name: '!alias list', permission: constants.OWNER_ONLY},
-        {name: '!alias remove', permission: constants.OWNER_ONLY},
-        {name: '!alias toggle-visibility', permission: constants.OWNER_ONLY},
-        {name: '!alias toggle', permission: constants.OWNER_ONLY},
-        {name: '!alias', permission: constants.OWNER_ONLY}
+        { name: '!alias add', permission: constants.OWNER_ONLY },
+        { name: '!alias edit', permission: constants.OWNER_ONLY },
+        { name: '!alias list', permission: constants.OWNER_ONLY },
+        { name: '!alias remove', permission: constants.OWNER_ONLY },
+        { name: '!alias toggle-visibility', permission: constants.OWNER_ONLY },
+        { name: '!alias toggle', permission: constants.OWNER_ONLY },
+        { name: '!alias', permission: constants.OWNER_ONLY }
       ],
       parsers: [
         { name: 'run', fireAndForget: true }
@@ -38,8 +38,8 @@ class Alias extends System {
     }
     super({ settings })
 
-    this.addMenu({category: 'manage', name: 'alias', id: 'alias/list'})
-    this.addMenu({category: 'settings', name: 'systems', id: 'systems'})
+    this.addMenu({ category: 'manage', name: 'alias', id: 'alias/list' })
+    this.addMenu({ category: 'settings', name: 'systems', id: 'systems' })
   }
 
   sockets () {

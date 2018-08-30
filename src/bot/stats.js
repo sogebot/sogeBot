@@ -13,13 +13,13 @@ Stats.prototype.sockets = function () {
 
 Stats.prototype.save = async function (data) {
   if (data.timestamp - this.latestTimestamp >= 30000) {
-    let stats = await global.db.engine.findOne('stats', {'whenOnline': data.whenOnline})
+    let stats = await global.db.engine.findOne('stats', { 'whenOnline': data.whenOnline })
 
     // pseudo avg value through stream
     data.currentViewers = Math.round((data.currentViewers + _.get(stats, 'currentViewers', data.currentViewers)) / 2)
     data.currentHosts = Math.round((data.currentHosts + _.get(stats, 'currentHosts', data.currentHosts)) / 2)
 
-    global.db.engine.update('stats', {'whenOnline': data.whenOnline}, data)
+    global.db.engine.update('stats', { 'whenOnline': data.whenOnline }, data)
     this.latestTimestamp = data.timestamp
   }
 }

@@ -18,14 +18,14 @@ function Alerts () {
   global.configuration.register('replayLabel', 'core.no-response-bool', 'bool', true)
 
   if (cluster.isMaster) {
-    global.panel.addMenu({category: 'settings', name: 'overlays', id: 'overlays'})
+    global.panel.addMenu({ category: 'settings', name: 'overlays', id: 'overlays' })
     global.panel.socketListening(this, 'replay-video', this.replay)
   }
 }
 
 Alerts.prototype.commands = function () {
   return [
-    {this: this, id: '!alert', command: '!alert', fnc: this.overlay, permission: constants.OWNER_ONLY}
+    { this: this, id: '!alert', command: '!alert', fnc: this.overlay, permission: constants.OWNER_ONLY }
   ]
 }
 

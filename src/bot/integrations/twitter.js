@@ -45,7 +45,7 @@ Twitter.prototype.fireSendTwitterMessage = async function (operation, attributes
 }
 
 Twitter.prototype.send = function (self, socket, text) {
-  self.client.post('statuses/update', {status: text}, function (error, tweet, response) {
+  self.client.post('statuses/update', { status: text }, function (error, tweet, response) {
     if (error) global.log.error(error, 'Twitch#send')
   })
 }

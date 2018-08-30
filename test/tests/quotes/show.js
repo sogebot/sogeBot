@@ -10,22 +10,22 @@ const message = require('../../general.js').message
 const owner = { username: 'soge__' }
 
 const tests = [
-  {sender: owner, parameters: '', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
-  {sender: owner, parameters: '-id', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
-  {sender: owner, parameters: '-tag', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
-  {sender: owner, parameters: '-tag      -id     ', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
-  {sender: owner, parameters: '-tag -id', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
-  {sender: owner, parameters: '-id -tag', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
+  { sender: owner, parameters: '', shouldFail: true, error: 'systems.quotes.show.error.no-parameters' },
+  { sender: owner, parameters: '-id', shouldFail: true, error: 'systems.quotes.show.error.no-parameters' },
+  { sender: owner, parameters: '-tag', shouldFail: true, error: 'systems.quotes.show.error.no-parameters' },
+  { sender: owner, parameters: '-tag      -id     ', shouldFail: true, error: 'systems.quotes.show.error.no-parameters' },
+  { sender: owner, parameters: '-tag -id', shouldFail: true, error: 'systems.quotes.show.error.no-parameters' },
+  { sender: owner, parameters: '-id -tag', shouldFail: true, error: 'systems.quotes.show.error.no-parameters' },
 
-  {sender: owner, parameters: '-id a', shouldFail: true, error: 'systems.quotes.show.error.no-parameters'},
+  { sender: owner, parameters: '-id a', shouldFail: true, error: 'systems.quotes.show.error.no-parameters' },
 
-  {sender: owner, parameters: '-id 1', id: 1, tag: 'general', shouldFail: false, exist: true},
-  {sender: owner, parameters: '-id 1 -tag', id: 1, tag: 'general', shouldFail: false, exist: true},
-  {sender: owner, parameters: '-id 2', id: 2, tag: 'general', shouldFail: false, exist: false},
-  {sender: owner, parameters: '-id 2 -tag', id: 2, tag: 'general', shouldFail: false, exist: false},
+  { sender: owner, parameters: '-id 1', id: 1, tag: 'general', shouldFail: false, exist: true },
+  { sender: owner, parameters: '-id 1 -tag', id: 1, tag: 'general', shouldFail: false, exist: true },
+  { sender: owner, parameters: '-id 2', id: 2, tag: 'general', shouldFail: false, exist: false },
+  { sender: owner, parameters: '-id 2 -tag', id: 2, tag: 'general', shouldFail: false, exist: false },
 
-  {sender: owner, parameters: '-tag lorem ipsum', id: 1, tag: 'lorem ipsum', shouldFail: false, exist: true},
-  {sender: owner, parameters: '-tag general', id: 1, tag: 'general', shouldFail: false, exist: false}
+  { sender: owner, parameters: '-tag lorem ipsum', id: 1, tag: 'lorem ipsum', shouldFail: false, exist: true },
+  { sender: owner, parameters: '-tag general', id: 1, tag: 'general', shouldFail: false, exist: false }
 ]
 
 describe('Quotes - main()', () => {

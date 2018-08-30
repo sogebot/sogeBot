@@ -24,7 +24,7 @@ describe('Cooldowns - toggleModerators()', () => {
     await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
 
     global.systems.cooldown.toggleModerators({ sender: owner, parameters: command })
-    await message.isSent('cooldowns.cooldown-parse-failed', owner, {sender: owner.username})
+    await message.isSent('cooldowns.cooldown-parse-failed', owner, { sender: owner.username })
   })
 
   it('correct toggle', async () => {
@@ -35,9 +35,9 @@ describe('Cooldowns - toggleModerators()', () => {
     global.systems.cooldown.toggleModerators({ sender: owner, parameters: `${command} ${type}` })
     await message.isSent('cooldowns.cooldown-was-enabled-for-moderators', owner, { command: command, sender: owner.username })
 
-    let isOk = await global.systems.cooldown.check({sender: mod, message: '!me'})
+    let isOk = await global.systems.cooldown.check({ sender: mod, message: '!me' })
     assert.isTrue(isOk)
-    isOk = await global.systems.cooldown.check({sender: mod, message: '!me'})
+    isOk = await global.systems.cooldown.check({ sender: mod, message: '!me' })
     assert.isFalse(isOk)
 
     global.systems.cooldown.toggleModerators({ sender: owner, parameters: `${command} ${type}` })

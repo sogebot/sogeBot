@@ -24,18 +24,18 @@ class Cooldown extends System {
     const settings = {
       cooldownNotifyAsWhisper: false,
       commands: [
-        {name: '!cooldown toggle moderators', permission: constants.OWNER_ONLY},
-        {name: '!cooldown toggle owners', permission: constants.OWNER_ONLY},
-        {name: '!cooldown toggle enabled', permission: constants.OWNER_ONLY},
-        {name: '!cooldown', permission: constants.OWNER_ONLY}
+        { name: '!cooldown toggle moderators', permission: constants.OWNER_ONLY },
+        { name: '!cooldown toggle owners', permission: constants.OWNER_ONLY },
+        { name: '!cooldown toggle enabled', permission: constants.OWNER_ONLY },
+        { name: '!cooldown', permission: constants.OWNER_ONLY }
       ],
       parsers: [
-        {name: 'check', priority: constants.HIGH}
+        { name: 'check', priority: constants.HIGH }
       ]
     }
     super({ settings })
 
-    this.addMenu({category: 'manage', name: 'cooldown', id: 'cooldown/list'})
+    this.addMenu({ category: 'manage', name: 'cooldown', id: 'cooldown/list' })
   }
 
   sockets () {

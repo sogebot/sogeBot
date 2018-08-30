@@ -24,7 +24,7 @@ class Translate {
 
   constructor () {
     global.configuration.register('lang', '', 'string', this.lang)
-    if (cluster.isMaster) global.panel.addMenu({category: 'settings', name: 'translations', id: 'translations'})
+    if (cluster.isMaster) global.panel.addMenu({ category: 'settings', name: 'translations', id: 'translations' })
   }
 
   async _load () {
@@ -56,7 +56,7 @@ class Translate {
           const bulk = 1000
           let data = { version, items: [] }
           for (let key of [...new Set(Object.keys(flatten(this.translations)).map(o => o.split('.').slice(1).join('.')))]) {
-            data.items.push({key, count: 0, missing: false})
+            data.items.push({ key, count: 0, missing: false })
             if (data.items.length === bulk) {
               axios.post('http://stats.sogehige.tv/add', {
                 version: data.version,
@@ -116,7 +116,7 @@ class Translate {
       this.mSentMetrics.push(key)
       axios.post('http://stats.sogehige.tv/add', {
         version: _.get(process, 'env.npm_package_version', 'n/a'),
-        items: [{key, count: 1, missing: this.get(key, false).startsWith('{missing_translation: ')}]
+        items: [{ key, count: 1, missing: this.get(key, false).startsWith('{missing_translation: ') }]
       }).catch() // dont expose any errors if something went wrong to not affect bot and confuse
     }
   }

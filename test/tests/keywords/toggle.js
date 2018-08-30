@@ -17,7 +17,7 @@ describe('Keywords - toggle()', () => {
 
   it('', async () => {
     global.systems.keywords.toggle({ sender: owner, parameters: '' })
-    await message.isSent('keywords.keyword-parse-failed', owner, {sender: owner.username})
+    await message.isSent('keywords.keyword-parse-failed', owner, { sender: owner.username })
   })
 
   it('unknown', async () => {

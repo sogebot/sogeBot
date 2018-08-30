@@ -104,8 +104,8 @@ class IMongoDB extends Interface {
         }
         items = await db.collection(table).find(where).sort({ [sortBy.replace('-', '')]: order }).limit(Number(total))
       } else {
-        const group = {_id: `$${groupBy}`, [sumBy]: { $sum: `$${sumBy}` }}
-        items = await db.collection(table).aggregate([{$group: group}]).sort({ [sortBy.replace('-', '')]: order }).limit(Number(total))
+        const group = { _id: `$${groupBy}`, [sumBy]: { $sum: `$${sumBy}` } }
+        items = await db.collection(table).aggregate([{ $group: group }]).sort({ [sortBy.replace('-', '')]: order }).limit(Number(total))
       }
       return items.toArray()
     } catch (e) {

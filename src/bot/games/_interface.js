@@ -6,7 +6,7 @@ class Game extends Module {
     opts.settings.enabled = typeof opts.settings.enabled !== 'undefined' ? opts.settings.enabled : false
     super(opts)
 
-    this.addMenu({category: 'settings', name: 'games', id: 'games'})
+    this.addMenu({ category: 'settings', name: 'games', id: 'games' })
   }
 }
 

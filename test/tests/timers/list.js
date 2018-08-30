@@ -13,10 +13,10 @@ describe('Timers - list()', () => {
   beforeEach(async () => {
     await db.cleanup()
     await message.prepare()
-    await global.db.engine.insert(global.systems.timers.collection.data, {name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() }})
-    let timer = await global.db.engine.insert(global.systems.timers.collection.data, {name: 'test2', messages: 0, seconds: 60, enabled: false, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() }})
-    await global.db.engine.insert(global.systems.timers.collection.responses, {response: 'Lorem Ipsum', timerId: timer._id.toString(), enabled: true})
-    await global.db.engine.insert(global.systems.timers.collection.responses, {response: 'Lorem Ipsum 2', timerId: timer._id.toString(), enabled: false})
+    await global.db.engine.insert(global.systems.timers.collection.data, { name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
+    let timer = await global.db.engine.insert(global.systems.timers.collection.data, { name: 'test2', messages: 0, seconds: 60, enabled: false, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
+    await global.db.engine.insert(global.systems.timers.collection.responses, { response: 'Lorem Ipsum', timerId: timer._id.toString(), enabled: true })
+    await global.db.engine.insert(global.systems.timers.collection.responses, { response: 'Lorem Ipsum 2', timerId: timer._id.toString(), enabled: false })
   })
 
   it('', async () => {

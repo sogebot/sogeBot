@@ -11,15 +11,15 @@ const message = require('../../general.js').message
 const owner = { username: 'soge__' }
 
 const tests = [
-  {sender: owner, parameters: '', shouldFail: true},
-  {sender: owner, parameters: '-id', shouldFail: true},
-  {sender: owner, parameters: '-id a', shouldFail: true},
-  {sender: owner, parameters: '-id 1 -tag', shouldFail: true},
+  { sender: owner, parameters: '', shouldFail: true },
+  { sender: owner, parameters: '-id', shouldFail: true },
+  { sender: owner, parameters: '-id a', shouldFail: true },
+  { sender: owner, parameters: '-id 1 -tag', shouldFail: true },
 
-  {sender: owner, parameters: '-id 1 -tag ipsum, dolor', id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true},
-  {sender: owner, parameters: '-tag ipsum, dolor -id 1', id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true},
-  {sender: owner, parameters: '-id 2 -tag ipsum, dolor', id: 2, tags: 'ipsum, dolor', shouldFail: false, exist: false},
-  {sender: owner, parameters: '-tag ipsum, dolor -id 2', id: 2, tags: 'ipsum, dolor', shouldFail: false, exist: false}
+  { sender: owner, parameters: '-id 1 -tag ipsum, dolor', id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true },
+  { sender: owner, parameters: '-tag ipsum, dolor -id 1', id: 1, tags: 'ipsum, dolor', shouldFail: false, exist: true },
+  { sender: owner, parameters: '-id 2 -tag ipsum, dolor', id: 2, tags: 'ipsum, dolor', shouldFail: false, exist: false },
+  { sender: owner, parameters: '-tag ipsum, dolor -id 2', id: 2, tags: 'ipsum, dolor', shouldFail: false, exist: false }
 ]
 
 describe('Quotes - set()', () => {

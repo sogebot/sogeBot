@@ -30,7 +30,7 @@ class INeDB extends Interface {
     if (!opts.table) throw new Error('Missing table option')
 
     await this.table[opts.table].removeIndex(opts.index)
-    await this.table[opts.table].ensureIndex({fieldName: opts.index, unique: opts.unique})
+    await this.table[opts.table].ensureIndex({ fieldName: opts.index, unique: opts.unique })
   }
 
   on (table) {
@@ -65,24 +65,24 @@ class INeDB extends Interface {
         switch (table) {
           case 'users.bits':
           case 'users.tips':
-            this.table[table].ensureIndex({fieldName: 'timestamp'})
+            this.table[table].ensureIndex({ fieldName: 'timestamp' })
             break
           case 'users':
           case 'cache.hosts':
-            this.table[table].ensureIndex({fieldName: 'username', unique: true})
+            this.table[table].ensureIndex({ fieldName: 'username', unique: true })
             break
           case 'users.online':
           case 'users.points':
           case 'users.messages':
           case 'users.watched':
-            this.table[table].ensureIndex({fieldName: 'username'})
+            this.table[table].ensureIndex({ fieldName: 'username' })
             break
           case 'cache':
           case 'customTranslations':
-            this.table[table].ensureIndex({fieldName: 'key', unique: true})
+            this.table[table].ensureIndex({ fieldName: 'key', unique: true })
             break
           case 'stats':
-            this.table[table].ensureIndex({fieldName: 'whenOnline'})
+            this.table[table].ensureIndex({ fieldName: 'whenOnline' })
             break
         }
       }
@@ -120,7 +120,7 @@ class INeDB extends Interface {
             }
             items = []
             for (let [_id, sum] of Object.entries(_items)) {
-              items.push({_id, [sumBy]: sum})
+              items.push({ _id, [sumBy]: sum })
             }
           }
 

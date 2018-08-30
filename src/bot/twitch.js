@@ -25,30 +25,30 @@ class Twitch {
 
   commands () {
     const commands = [
-      {this: this, id: '!uptime', command: '!uptime', fnc: this.uptime, permission: constants.VIEWERS},
-      {this: this, id: '!time', command: '!time', fnc: this.time, permission: constants.VIEWERS},
-      {this: this, id: '!lastseen', command: '!lastseen', fnc: this.lastseen, permission: constants.VIEWERS},
-      {this: this, id: '!watched', command: '!watched', fnc: this.watched, permission: constants.VIEWERS},
-      {this: this, id: '!followage', command: '!followage', fnc: this.followage, permission: constants.VIEWERS},
-      {this: this, id: '!subage', command: '!subage', fnc: this.subage, permission: constants.VIEWERS},
-      {this: this, id: '!followers', command: '!followers', fnc: this.followers, permission: constants.VIEWERS},
-      {this: this, id: '!subs', command: '!subs', fnc: this.subs, permission: constants.VIEWERS},
-      {this: this, id: '!age', command: '!age', fnc: this.age, permission: constants.VIEWERS},
-      {this: this, id: '!me', command: '!me', fnc: this.showMe, permission: constants.VIEWERS},
-      {this: this, id: '!top time', command: '!top time', fnc: this.showTopTime, permission: constants.OWNER_ONLY},
-      {this: this, id: '!top tips', command: '!top tips', fnc: this.showTopTips, permission: constants.OWNER_ONLY},
-      {this: this, id: '!top points', command: '!top points', fnc: this.showTopPoints, permission: constants.OWNER_ONLY},
-      {this: this, id: '!top messages', command: '!top messages', fnc: this.showTopMessages, permission: constants.OWNER_ONLY},
-      {this: this, id: '!top followage', command: '!top followage', fnc: this.showTopFollowAge, permission: constants.OWNER_ONLY},
-      {this: this, id: '!title', command: '!title', fnc: this.setTitle, permission: constants.OWNER_ONLY},
-      {this: this, id: '!game', command: '!game', fnc: this.setGame, permission: constants.OWNER_ONLY}
+      { this: this, id: '!uptime', command: '!uptime', fnc: this.uptime, permission: constants.VIEWERS },
+      { this: this, id: '!time', command: '!time', fnc: this.time, permission: constants.VIEWERS },
+      { this: this, id: '!lastseen', command: '!lastseen', fnc: this.lastseen, permission: constants.VIEWERS },
+      { this: this, id: '!watched', command: '!watched', fnc: this.watched, permission: constants.VIEWERS },
+      { this: this, id: '!followage', command: '!followage', fnc: this.followage, permission: constants.VIEWERS },
+      { this: this, id: '!subage', command: '!subage', fnc: this.subage, permission: constants.VIEWERS },
+      { this: this, id: '!followers', command: '!followers', fnc: this.followers, permission: constants.VIEWERS },
+      { this: this, id: '!subs', command: '!subs', fnc: this.subs, permission: constants.VIEWERS },
+      { this: this, id: '!age', command: '!age', fnc: this.age, permission: constants.VIEWERS },
+      { this: this, id: '!me', command: '!me', fnc: this.showMe, permission: constants.VIEWERS },
+      { this: this, id: '!top time', command: '!top time', fnc: this.showTopTime, permission: constants.OWNER_ONLY },
+      { this: this, id: '!top tips', command: '!top tips', fnc: this.showTopTips, permission: constants.OWNER_ONLY },
+      { this: this, id: '!top points', command: '!top points', fnc: this.showTopPoints, permission: constants.OWNER_ONLY },
+      { this: this, id: '!top messages', command: '!top messages', fnc: this.showTopMessages, permission: constants.OWNER_ONLY },
+      { this: this, id: '!top followage', command: '!top followage', fnc: this.showTopFollowAge, permission: constants.OWNER_ONLY },
+      { this: this, id: '!title', command: '!title', fnc: this.setTitle, permission: constants.OWNER_ONLY },
+      { this: this, id: '!game', command: '!game', fnc: this.setGame, permission: constants.OWNER_ONLY }
     ]
     return commands
   }
 
   parsers () {
     return [
-      {this: this, name: 'lastseen', fnc: this.lastseenUpdate, permission: constants.VIEWERS, priority: constants.LOWEST}
+      { this: this, name: 'lastseen', fnc: this.lastseenUpdate, permission: constants.VIEWERS, priority: constants.LOWEST }
     ]
   }
 

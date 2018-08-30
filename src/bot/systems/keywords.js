@@ -23,20 +23,20 @@ class Keywords extends System {
   constructor () {
     const settings = {
       commands: [
-        {name: '!keyword add', permission: constants.OWNER_ONLY},
-        {name: '!keyword edit', permission: constants.OWNER_ONLY},
-        {name: '!keyword list', permission: constants.OWNER_ONLY},
-        {name: '!keyword remove', permission: constants.OWNER_ONLY},
-        {name: '!keyword toggle', permission: constants.OWNER_ONLY},
-        {name: '!keyword', permission: constants.OWNER_ONLY}
+        { name: '!keyword add', permission: constants.OWNER_ONLY },
+        { name: '!keyword edit', permission: constants.OWNER_ONLY },
+        { name: '!keyword list', permission: constants.OWNER_ONLY },
+        { name: '!keyword remove', permission: constants.OWNER_ONLY },
+        { name: '!keyword toggle', permission: constants.OWNER_ONLY },
+        { name: '!keyword', permission: constants.OWNER_ONLY }
       ],
       parsers: [
         { name: 'run' }
       ]
     }
-    super({settings})
+    super({ settings })
 
-    this.addMenu({category: 'manage', name: 'keywords', id: 'keywords/list'})
+    this.addMenu({ category: 'manage', name: 'keywords', id: 'keywords/list' })
   }
 
   async edit (opts) {

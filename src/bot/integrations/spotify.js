@@ -30,7 +30,7 @@ class Spotify {
     this.scopes = [ 'user-read-currently-playing', 'user-read-private', 'user-read-email' ]
     this.client = null
 
-    global.panel.addMenu({category: 'main', name: 'integrations', id: 'integrations'})
+    global.panel.addMenu({ category: 'main', name: 'integrations', id: 'integrations' })
 
     this.status()
     this.sockets()

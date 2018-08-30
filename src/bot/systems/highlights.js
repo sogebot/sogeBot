@@ -28,10 +28,10 @@ class Highlights extends System {
         { name: '!highlight', permission: constants.OWNER_ONLY }
       ]
     }
-    super({settings})
+    super({ settings })
 
     if (cluster.isMaster) {
-      global.panel.addMenu({category: 'manage', name: 'highlights', id: 'highlights/list'})
+      global.panel.addMenu({ category: 'manage', name: 'highlights', id: 'highlights/list' })
 
       cluster.on('message', (worker, message) => {
         if (message.type !== 'highlight') return

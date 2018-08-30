@@ -13,8 +13,8 @@ describe('Timers - toggle()', () => {
   beforeEach(async () => {
     await db.cleanup()
     await message.prepare()
-    let timer = await global.db.engine.insert(global.systems.timers.collection.data, {name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() }})
-    await global.db.engine.insert(global.systems.timers.collection.responses, {response: 'Lorem Ipsum', timerId: timer._id, enabled: true})
+    let timer = await global.db.engine.insert(global.systems.timers.collection.data, { name: 'test', messages: 0, seconds: 60, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
+    await global.db.engine.insert(global.systems.timers.collection.responses, { response: 'Lorem Ipsum', timerId: timer._id, enabled: true })
   })
 
   it('', async () => {

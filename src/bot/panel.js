@@ -95,7 +95,7 @@ function Panel () {
   })
 
   this.io = require('socket.io')(this.server)
-  this.menu = [{category: 'main', name: 'dashboard', id: 'dashboard'}]
+  this.menu = [{ category: 'main', name: 'dashboard', id: 'dashboard' }]
   this.widgets = []
   this.socketListeners = []
 
@@ -105,7 +105,7 @@ function Panel () {
   global.configuration.register('stickystats', 'core.no-response-bool', 'bool', false)
   global.configuration.register('showdiff', 'core.no-response-bool', 'bool', true)
 
-  this.addMenu({category: 'settings', name: 'systems', id: 'systems'})
+  this.addMenu({ category: 'settings', name: 'systems', id: 'systems' })
 
   this.registerSockets({
     self: this,
@@ -205,8 +205,8 @@ function Panel () {
       let lang = {}
       _.merge(
         lang,
-        global.translate({root: 'webpanel'}),
-        global.translate({root: 'ui'}) // add ui root -> slowly refactoring to new name
+        global.translate({ root: 'webpanel' }),
+        global.translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
       )
       socket.emit('lang', lang)
     })
@@ -281,8 +281,8 @@ function Panel () {
     let lang = {}
     _.merge(
       lang,
-      global.translate({root: 'webpanel'}),
-      global.translate({root: 'ui'}) // add ui root -> slowly refactoring to new name
+      global.translate({ root: 'webpanel' }),
+      global.translate({ root: 'ui' }) // add ui root -> slowly refactoring to new name
     )
     socket.emit('lang', lang)
   })
@@ -313,7 +313,7 @@ Panel.prototype.addMenu = function (menu) { this.menu.push(menu) }
 
 Panel.prototype.sendMenu = function (socket) { socket.emit('menu', this.menu) }
 
-Panel.prototype.addWidget = function (id, name, icon) { this.widgets.push({id: id, name: name, icon: icon}) }
+Panel.prototype.addWidget = function (id, name, icon) { this.widgets.push({ id: id, name: name, icon: icon }) }
 
 Panel.prototype.sendWidget = async function (socket) {
   global.panel.io.emit('widgets', await global.db.engine.find('widgets'))
@@ -337,26 +337,26 @@ Panel.prototype.updateWidgetsInDb = async function (self, widgets, socket) {
   await global.db.engine.remove('widgets', {}) // remove widgets
   let toAwait = []
   for (let widget of widgets) {
-    toAwait.push(global.db.engine.update('widgets', { id: widget.id }, { id: widget.id, position: {x: widget.position.x, y: widget.position.y}, size: { width: widget.size.width, height: widget.size.height } }))
+    toAwait.push(global.db.engine.update('widgets', { id: widget.id }, { id: widget.id, position: { x: widget.position.x, y: widget.position.y }, size: { width: widget.size.width, height: widget.size.height } }))
   }
   await Promise.all(toAwait)
   self.sendWidget(socket)
 }
 
 Panel.prototype.addWidgetToDb = async function (self, widget, socket) {
-  await global.db.engine.update('widgets', { id: widget }, { id: widget, position: {x: 0, y: 0}, size: { width: 4, height: 3 } })
+  await global.db.engine.update('widgets', { id: widget }, { id: widget, position: { x: 0, y: 0 }, size: { width: 4, height: 3 } })
   self.sendWidget(socket)
 }
 
 Panel.prototype.socketListening = function (self, on, fnc) {
-  this.socketListeners.push({self: self, on: on, fnc: fnc})
+  this.socketListeners.push({ self: self, on: on, fnc: fnc })
 }
 
 Panel.prototype.registerSockets = util.deprecate(function (options) {
   const name = options.self.constructor.name.toLowerCase()
   for (let fnc of options.expose) {
     if (!_.isFunction(options.self[fnc])) global.log.error(`Function ${fnc} of ${options.self.constructor.name} is undefined`)
-    else this.socketListeners.push({self: options.self, on: `${name}.${fnc}`, fnc: options.self[fnc], finally: options.finally})
+    else this.socketListeners.push({ self: options.self, on: `${name}.${fnc}`, fnc: options.self[fnc], finally: options.finally })
   }
 }, 'registerSockets() is deprecated. Use socket from system interface directly.')
 
