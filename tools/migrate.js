@@ -45,7 +45,6 @@ const Database = require('../dest/databases/database')
 global.db = new Database(true)
 
 var runMigration = async function () {
-  console.log(global.db)
   if (!global.db.engine.connected) {
     setTimeout(() => runMigration(), 1000)
     return
