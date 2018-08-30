@@ -124,5 +124,15 @@
   "_moduleAliases": {
     "@root": ".",
     "@config": "./config.json"
+  },
+  "greenkeeper": {
+    "commitMessages": {
+      "initialBadge": "docs/readme: Add Greenkeeper badge",
+      "initialDependencies": "chore: Update dependencies",
+      "initialBranches": "chore: Whitelist greenkeeper branches",
+      "dependencyUpdate": "chore: Update ${dependency} to version ${version}",
+      "devDependencyUpdate": "chore: Update ${dependency} to version ${version}",
+      "closes": "\n\nCloses #${number}"
+    }
   }
 }
