@@ -90,6 +90,11 @@ Users.prototype.sockets = function (self) {
         messages -= Number(await this.getMessagesOf(data.username))
         await global.db.engine.insert('users.messages', { username: data.username, messages: messages })
       }
+      if (!_.isNil(data.time.watched)) {
+        let watched = Number(data.time.watched); delete data.time.watched
+        watched -= Number(await this.getWatchedOf(data.username))
+        await global.db.engine.insert('users.watched', { username: data.username, watched })
+      }
       await global.db.engine.update('users', { username: data.username }, data)
       cb(null, null)
     })
