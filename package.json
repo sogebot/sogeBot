@@ -7,7 +7,7 @@
   "author": "Michal Orlik <sogehige@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "auto-load": "3.0.0",
+    "auto-load": "3.0.1",
     "axios": "0.18.0",
     "babel-plugin-source-map-support": "2.0.1",
     "basic-auth": "2.0.0",
