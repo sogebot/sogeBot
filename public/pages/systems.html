@@ -6,8 +6,10 @@
           {{ commons.translate('menu.settings') }}
           <small><i class="fas fa-angle-right"></i></small>
           {{ commons.translate('menu.systems') }}
-          <small><i class="fas fa-angle-right"></i></small>
-          {{ commons.translate('menu.' + selectedSystem) }}
+          <template v-if="selectedSystem">
+            <small><i class="fas fa-angle-right"></i></small>
+            {{ commons.translate('menu.' + selectedSystem) }}
+          </template>
         </span>
 
         <template v-if="state.loading === 1">

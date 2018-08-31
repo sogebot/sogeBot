@@ -7,7 +7,10 @@
           <small><i class="fas fa-angle-right"></i></small>
           {{ commons.translate('menu.games') }}
           <small><i class="fas fa-angle-right"></i></small>
-          {{ commons.translate('menu.' + selectedGames) }}
+          <template v-if="selectedGames">
+            <small><i class="fas fa-angle-right"></i></small>
+            {{ commons.translate('menu.' + selectedGames) }}
+          </template>
         </span>
 
         <template v-if="state.loading === 1">
