@@ -26,7 +26,7 @@ class API {
     if (cluster.isMaster) {
       this.remainingAPICalls = 30
       this.refreshAPICalls = _.now() / 1000
-      this.rate_limit_follower_check = []
+      this.rate_limit_follower_check = new Set()
 
       this.chatMessagesAtStart = global.linesParsed
       this.maxRetries = 3
@@ -88,16 +88,18 @@ class API {
   }
 
   async intervalFollowerUpdate () {
-    // we are in bounds of safe rate limit, wait until limit is refreshed
-    _.remove(this.rate_limit_follower_check, (o) => {
-      const isSkipped = o.username === config.settings.broadcaster_username || o.username === config.settings.bot_username.toLowerCase()
-      const userHaveId = !_.isNil(o.id)
-      return isSkipped || !userHaveId
-    })
-
-    if (this.rate_limit_follower_check.length > 0 && !_.isNil(global.overlays)) {
-      this.rate_limit_follower_check = _.uniq(this.rate_limit_follower_check)
-      await this.isFollowerUpdate(this.rate_limit_follower_check.shift())
+    for (let username of this.rate_limit_follower_check) {
+      const user = await global.users.get(username)
+      const isSkipped = user.username === config.settings.broadcaster_username || user.username === config.settings.bot_username.toLowerCase()
+      const userHaveId = !_.isNil(user.id)
+      if (new Date().getTime() - _.get(user, 'time.followCheck', 0) <= 1000 * 60 * 30 || isSkipped || !userHaveId) {
+        this.rate_limit_follower_check.delete(user.username)
+      }
+    }
+    if (this.rate_limit_follower_check.size > 0 && !_.isNil(global.overlays)) {
+      const user = await global.users.get(Array.from(this.rate_limit_follower_check)[0])
+      this.rate_limit_follower_check.delete(user.username)
+      await this.isFollowerUpdate(user)
     }
 
     new Timeout().recursive({ this: this, uid: 'intervalFollowerUpdate', wait: 500, fnc: this.intervalFollowerUpdate })
@@ -951,8 +953,7 @@ class API {
   }
 
   async isFollower (username) {
-    let user = await global.users.get(username)
-    if (new Date().getTime() - _.get(user, 'time.followCheck', 0) >= 1000 * 60 * 30) this.rate_limit_follower_check.push(user)
+    this.rate_limit_follower_check.add(username)
   }
 
   async isFollowerUpdate (user) {
