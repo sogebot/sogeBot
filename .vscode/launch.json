@@ -14,6 +14,10 @@
                 "debug",
                 "start-no-migration"
             ],
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "preLaunchTask": "npm: build",
             "skipFiles": [
                 "${workspaceFolder}/node_modules/**/*.js",
                 "<node_internals>/**/*.js"
