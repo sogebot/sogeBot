@@ -17,7 +17,7 @@
     "bootstrap-toggle": "2.2.2",
     "chalk": "2.4.1",
     "chart.js": "2.7.2",
-    "compare-versions": "3.3.1",
+    "compare-versions": "3.4.0",
     "cross-env": "5.2.0",
     "currency-symbol-map": "4.0.4",
     "debug": "3.1.0",
