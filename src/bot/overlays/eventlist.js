@@ -14,10 +14,9 @@ function EventList () {
 EventList.prototype._get = async function (self) {
   let events = await global.db.engine.find('widgetsEventList')
 
-  events = _.uniqBy(_.orderBy(events, 'timestamp', 'desc'), (o) => {
-    if (o.event === 'cheer') o.event = crypto.randomBytes(64).toString('hex') // force cheer to show
-    return o.username + o.event
-  })
+  events = _.uniqBy(_.orderBy(events, 'timestamp', 'desc'), o =>
+    (o.username + (o.event === 'cheer' ? crypto.randomBytes(64).toString('hex') : o.event))
+  )
   global.panel.io.emit('overlay.eventlist', _.chunk(events, 20)[0])
 }
 
