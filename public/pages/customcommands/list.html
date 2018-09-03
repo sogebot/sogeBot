@@ -36,19 +36,29 @@
             </div>
           </div>
 
-          <div class="card-body border-top p-0 text-right">
-            <div class="btn-group" role="group">
-              <a v-bind:href="'?id='+ command._id + '#customcommands/edit'" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-pencil-alt mr-1" aria-hidden="true"></i> {{ commons.translate('dialog.buttons.edit') }}</a>
-              <button v-on:click="command.visible = !command.visible; sendUpdate(command._id)" class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1" v-bind:class="[ command.visible ? 'fa-eye' : 'fa-eye-slash' ]" aria-hidden="true"></i> {{ (command.visible ? commons.translate('visible') : commons.translate('hidden')) | capitalize }}</button>
-              <button id="permissionsMenuButton" data-toggle="dropdown" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-key mr-1" aria-hidden="true"></i> {{ commons.translate('permission') }}</button>
-              <div class="dropdown-menu" aria-labelledby="permissionsMenuButton">
-                <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 1)">{{ commons.translate('systems.customcommands.forViewers') | capitalize }}</a>
-                <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 2)">{{ commons.translate('systems.customcommands.forRegulars') | capitalize }}</a>
-                <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 3)">{{ commons.translate('systems.customcommands.forMods') | capitalize }}</a>
-                <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 0)">{{ commons.translate('systems.customcommands.forOwners') | capitalize }}</a>
+          <div class="card-body border-top p-0">
+            <div class="row">
+              <div class="col-6">
+                <span class="p-3" style="position: relative; top: 15px; margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                    <i class="fas fa-terminal"></i>
+                    {{ command.count }}
+                </span>
               </div>
-              <button v-on:click="command.enabled = !command.enabled; sendUpdate(command._id)"  class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1"  v-bind:class="[ command.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i> {{ command.enabled ? commons.translate('enabled') : commons.translate('disabled') }}</button>
-              <button type="button" type="button" v-on:click="deleteCommand(command._id)" class="btn btn-outline-dark p-3 border-0"><i class="far fa-trash-alt mr-1" aria-hidden="true"></i> {{ commons.translate('delete') }}</button>
+              <div class="col-6 text-right">
+                <div class="btn-group" role="group">
+                  <a v-bind:href="'?id='+ command._id + '#customcommands/edit'" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-pencil-alt mr-1" aria-hidden="true"></i> {{ commons.translate('dialog.buttons.edit') }}</a>
+                  <button v-on:click="command.visible = !command.visible; sendUpdate(command._id)" class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1" v-bind:class="[ command.visible ? 'fa-eye' : 'fa-eye-slash' ]" aria-hidden="true"></i> {{ (command.visible ? commons.translate('visible') : commons.translate('hidden')) | capitalize }}</button>
+                  <button id="permissionsMenuButton" data-toggle="dropdown" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-key mr-1" aria-hidden="true"></i> {{ commons.translate('permission') }}</button>
+                  <div class="dropdown-menu" aria-labelledby="permissionsMenuButton">
+                    <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 1)">{{ commons.translate('systems.customcommands.forViewers') | capitalize }}</a>
+                    <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 2)">{{ commons.translate('systems.customcommands.forRegulars') | capitalize }}</a>
+                    <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 3)">{{ commons.translate('systems.customcommands.forMods') | capitalize }}</a>
+                    <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 0)">{{ commons.translate('systems.customcommands.forOwners') | capitalize }}</a>
+                  </div>
+                  <button v-on:click="command.enabled = !command.enabled; sendUpdate(command._id)"  class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1"  v-bind:class="[ command.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i> {{ command.enabled ? commons.translate('enabled') : commons.translate('disabled') }}</button>
+                  <button type="button" type="button" v-on:click="deleteCommand(command._id)" class="btn btn-outline-dark p-3 border-0"><i class="far fa-trash-alt mr-1" aria-hidden="true"></i> {{ commons.translate('delete') }}</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -56,13 +66,17 @@
         <div class="widget h-auto" v-if="showAs === 'table' && commandsFiltered.length > 0">
           <div class="row p-2 m-0 border-bottom">
             <div class="col-md-1"><strong>{{ commons.translate('command') }}</strong></div>
-            <div class="col-md-10"><strong>{{ commons.translate('response') }}</strong></div>
+            <div class="col-md-1 text-center"><strong>{{ commons.translate('count') | capitalize }}</strong></div>
+            <div class="col-md-9"><strong>{{ commons.translate('response') }}</strong></div>
           </div>
           <div class="row p-2 m-0 border-bottom" v-for="(command, index) of commandsFiltered">
             <div class="col-md-1" v-bind:style="{ opacity: !command.visible ? 0.6 : 1 }">{{ command.command }}
                 <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{ command.permission | permissionToString }}</div>
             </div>
-            <div class="col-md-9" style="word-break: break-word" v-bind:style="{ opacity: !command.visible ? 0.6 : 1 }">
+            <div class="col-md-1 text-center" style="word-break: break-word" v-bind:style="{ opacity: !command.visible ? 0.6 : 1 }">
+              {{ command.count }}
+            </div>
+            <div class="col-md-8" style="word-break: break-word" v-bind:style="{ opacity: !command.visible ? 0.6 : 1 }">
               <text-with-tags v-bind:value='command.response'></text-with-tags>
             </div>
             <div class="col-md-2">
@@ -125,7 +139,7 @@
         }
       },
       created: function () {
-        this.socket.emit('find', {}, (err, items) => {
+        this.socket.emit('find.commands', {}, (err, items) => {
           this.commands = _.orderBy(items, 'command', 'asc')
         })
         this.socket.emit('settings', (err, items) => {

@@ -35,12 +35,17 @@
 
         <div class="form-group row pl-3 pr-3">
           <div class="col-md-2">
-              <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('permission') }}</label>
+            <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('permission') }}</label>
             <select class="form-control" v-model="permission">
               <option v-for="permission in [0,1,2,3]" v-bind:value="permission">
                 {{ permission | permissionToString }}
               </option>
             </select>
+          </div>
+          <div class="col-md-2">
+            <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('count') }}</label>
+            <input type="number" class="form-control" v-model="count" readonly="true">
+            <button type="button" class="btn btn-block btn-danger" @click="resetCount">{{ commons.translate('commons.reset') | capitalize }}</button>
           </div>
           <div class="col-md-2">
               <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('visible') }}</label>
@@ -83,6 +88,7 @@
           permission: 1,
           visible: true,
           enabled: true,
+          count: 0,
 
           pending: false,
 
@@ -99,6 +105,10 @@
           }
         },
         methods: {
+          resetCount: function () {
+            this.count = 0
+            this.pending = true
+          },
           validateForm: function () {
             // reset errors
             for (let [key, value] of Object.entries(this.hasError)) {
@@ -122,9 +132,10 @@
                 command: this.command.trim(),
                 permission: this.permission,
                 visible: this.visible,
-                enabled: this.enabled
+                enabled: this.enabled,
+                count: this.count
               }
-              this.socket.emit('update', {items: [data]}, (err, _id) => {
+              this.socket.emit('update.command', {items: [data]}, (err, _id) => {
                 if (err) {
                   console.error(err)
                   return this.states.save = 3
@@ -182,12 +193,13 @@
       // load up from db
       if (commons.urlParam('id')) {
         customCommandsEdit.id = commons.urlParam('id')
-        customCommandsEdit.socket.emit('findOne', { where: { _id: commons.urlParam('id') } }, (err, data) => {
+        customCommandsEdit.socket.emit('findOne.command', { where: { _id: commons.urlParam('id') } }, (err, data) => {
           customCommandsEdit.response = data.response
           customCommandsEdit.command = data.command
           customCommandsEdit.permission = data.permission
           customCommandsEdit.visible = data.visible
           customCommandsEdit.enabled = data.enabled
+          customCommandsEdit.count = data.count
           customCommandsEdit.$nextTick(() => { customCommandsEdit.pending = false })
         })
       }
