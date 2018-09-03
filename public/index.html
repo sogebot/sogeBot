@@ -409,6 +409,7 @@
     console.debug('EMIT [getVersion]')
     socket.emit('getVersion')
     socket.once('version', function (version) {
+      $('#current_version').text(version)
       $.get('https://api.github.com/repos/sogehige/sogebot/releases/latest', function (response) {
         var md = new markdownit()
         var commits = new RegExp('(?!added)[0-9a-f]{5,40}', 'gm')
@@ -435,7 +436,6 @@
         console.debug('GITHUB version', response.tag_name)
         console.debug('LOCAL version', version)
         $('#version').text(response.tag_name)
-        $('#current_version').text(version)
         $('title').text($('title').text() + ' ' + version)
 
         let botVersion = version.replace('-SNAPSHOT', '').split('.')
