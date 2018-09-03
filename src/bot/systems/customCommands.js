@@ -1,13 +1,17 @@
+// @flow
+
 'use strict'
 
 // 3rdparty libraries
 const _ = require('lodash')
 const debug = require('debug')('systems:commands')
 const XRegExp = require('xregexp')
+const cluster = require('cluster')
 
 // bot libraries
-var constants = require('../constants')
+const constants = require('../constants')
 const System = require('./_interface')
+const Timeout = require('../timeout')
 
 /*
  * !command                                                 - gets an info about command usage
@@ -18,6 +22,15 @@ const System = require('./_interface')
  * !command toggle-visibility ![cmd]                        - enable/disable specified command
  * !command list                                            - get commands list
  */
+
+type Command = {
+  command: string,
+  enabled: boolean,
+  visible: boolean,
+  response: string,
+  permission: number,
+  count?: number
+}
 
 class CustomCommands extends System {
   constructor () {
@@ -38,13 +51,72 @@ class CustomCommands extends System {
     super({ settings })
 
     this.addMenu({ category: 'manage', name: 'customcommands', id: 'customcommands/list' })
+    if (cluster.isMaster) this.compactCountDb()
   }
 
-  main (opts) {
+  sockets () {
+    this.socket.on('connection', (socket) => {
+      socket.on('find.commands', async (opts, cb) => {
+        opts.collection = opts.collection || 'data'
+        if (opts.collection.startsWith('_')) {
+          opts.collection = opts.collection.replace('_', '')
+        } else opts.collection = this.collection[opts.collection]
+
+        opts.where = opts.where || {}
+
+        let items: Array<Command> = await global.db.engine.find(opts.collection, opts.where)
+        for (let i of items) {
+          i.count = await this.getCountOf(i.command)
+        }
+        if (_.isFunction(cb)) cb(null, items)
+      })
+      socket.on('findOne.command', async (opts, cb) => {
+        opts.collection = opts.collection || 'data'
+        if (opts.collection.startsWith('_')) {
+          opts.collection = opts.collection.replace('_', '')
+        } else opts.collection = this.collection[opts.collection]
+
+        opts.where = opts.where || {}
+
+        let item: Command = await global.db.engine.findOne(opts.collection, opts.where)
+        item.count = await this.getCountOf(item.command)
+        if (_.isFunction(cb)) cb(null, item)
+      })
+      socket.on('update.command', async (opts, cb) => {
+        opts.collection = opts.collection || 'data'
+        if (opts.collection.startsWith('_')) {
+          opts.collection = opts.collection.replace('_', '')
+        } else opts.collection = this.collection[opts.collection]
+
+        if (opts.items) {
+          for (let item of opts.items) {
+            const _id = item._id; delete item._id
+            const count = item.count; delete item.count
+            let itemFromDb = item
+            if (_.isNil(_id)) itemFromDb = await global.db.engine.insert(opts.collection, item)
+            else await global.db.engine.update(opts.collection, { _id }, item)
+
+            // set command count
+            const cCount = await this.getCountOf(itemFromDb.command)
+            if (count !== cCount && count === 0) {
+              // we assume its always reset (set to 0)
+              await global.db.engine.insert(this.collection.count, { command: itemFromDb.command, count: -cCount })
+            }
+
+            if (_.isFunction(cb)) cb(null, itemFromDb)
+          }
+        } else {
+          if (_.isFunction(cb)) cb(null, [])
+        }
+      })
+    })
+  }
+
+  main (opts: Object) {
     global.commons.sendMessage(global.translate('core.usage') + ': !command add owner|mod|regular|viewer <!command> <response> | !command edit owner|mod|regular|viewer <!command> <response> | !command remove <!command> | !command list', opts.sender)
   }
 
-  async edit (opts) {
+  async edit (opts: Object) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP_WITH_RESPONSE)
 
     if (_.isNil(match)) {
@@ -78,7 +150,7 @@ class CustomCommands extends System {
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async add (opts) {
+  async add (opts: Object) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP_WITH_RESPONSE)
 
     if (_.isNil(match)) {
@@ -107,10 +179,10 @@ class CustomCommands extends System {
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async run (opts) {
+  async run (opts: Object) {
     if (!opts.message.startsWith('!')) return true // do nothing if it is not a command
 
-    var command
+    var command: $Shape<Command> = {}
     let cmdArray = opts.message.toLowerCase().split(' ')
     for (let i in opts.message.toLowerCase().split(' ')) { // search for correct command
       debug(`${i} - Searching for ${cmdArray.join(' ')} in commands`)
@@ -119,7 +191,7 @@ class CustomCommands extends System {
       if (!_.isEmpty(command)) break
       cmdArray.pop() // remove last array item if not found
     }
-    if (_.isEmpty(command)) return true // no command was found - return
+    if (Object.keys(command) === 0) return true // no command was found - return
     debug('Command found: %j', command)
 
     debug('Checking if permissions are ok')
@@ -135,19 +207,21 @@ class CustomCommands extends System {
       (command.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
       (command.permission === constants.MODS && (isMod || isOwner)) ||
       (command.permission === constants.OWNER_ONLY && isOwner)) {
-      const param = opts.message.replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim() // remove found command from message to get param
+      // remove found command from message to get param
+      const param = opts.message.replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim()
       global.commons.sendMessage(command.response, opts.sender, { 'param': param, 'cmd': command.command })
+      global.db.engine.insert(this.collection.count, { command: command.command, count: 1 })
     }
     return true
   }
 
-  async list (opts) {
+  async list (opts: Object) {
     let commands = await global.db.engine.find(this.collection.data, { visible: true })
     var output = (commands.length === 0 ? global.translate('customcmds.list-is-empty') : global.translate('customcmds.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(commands, 'command'), 'command').join(', ')))
     debug(output); global.commons.sendMessage(output, opts.sender)
   }
 
-  async togglePermission (opts) {
+  async togglePermission (opts: Object) {
     debug('togglePermission(%j,%j,%j)', opts)
     const command = await global.db.engine.findOne(this.collection.data, { command: opts.parameters })
     if (!_.isEmpty(command)) {
@@ -155,7 +229,7 @@ class CustomCommands extends System {
     }
   }
 
-  async toggle (opts) {
+  async toggle (opts: Object) {
     debug('toggle(%j,%j,%j)', opts)
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP)
     if (_.isNil(match)) {
@@ -177,7 +251,7 @@ class CustomCommands extends System {
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async toggleVisibility (opts) {
+  async toggleVisibility (opts: Object) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP)
     if (_.isNil(match)) {
       let message = await global.commons.prepare('customcmds.commands-parse-failed')
@@ -197,7 +271,7 @@ class CustomCommands extends System {
     debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
-  async remove (opts) {
+  async remove (opts: Object) {
     const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP)
     if (_.isNil(match)) {
       let message = await global.commons.prepare('customcmds.commands-parse-failed')
@@ -213,6 +287,31 @@ class CustomCommands extends System {
     }
     let message = await global.commons.prepare('customcmds.command-was-removed', { command: match.command })
     debug(message); global.commons.sendMessage(message, opts.sender)
+  }
+
+  async compactCountDb () {
+    try {
+      await global.commons.compactDb({ table: this.collection.count, index: 'command', values: 'count' })
+    } catch (e) {
+      global.log.error(e)
+      global.log.error(e.stack)
+    } finally {
+      new Timeout().recursive({ uid: this.collection.count + '.compactCountDb', this: this, fnc: this.compactCountDb, wait: 60000 })
+    }
+  }
+
+  async getCountOf (command: string) {
+    let count = 0
+    for (let item of await global.db.engine.find(this.collection.count, { command })) {
+      let toAdd = !_.isNaN(parseInt(_.get(item, 'count', 0))) ? _.get(item, 'count', 0) : 0
+      count = count + Number(toAdd)
+    }
+    if (Number(count) < 0) count = 0
+
+    return parseInt(
+      Number(count) <= Number.MAX_SAFE_INTEGER / 1000000
+        ? count
+        : Number.MAX_SAFE_INTEGER / 1000000, 10)
   }
 }
 

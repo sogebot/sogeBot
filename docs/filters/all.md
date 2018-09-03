@@ -1,3 +1,8 @@
+##### Changelog
+| Version | Description                  |
+| --------|:-----------------------------|
+| 8.1.0   | Add `(count)` command filter |
+
 !> Response filters are usable in notices, custom commands, keywords and text overlay
 
 ## Global variables
@@ -132,6 +137,8 @@
     - _bot response_: `UserId: 1, id: 5, title: nesciunt quas odio, body: repudiandae veniam quaerat sunt sedalias aut fugiat sit autem sed estvoluptatem omnis possimus esse voluptatibus quisest aut tenetur dolor neque`
 
 ## Command filters
+`(count)` - return how many times command was used
+
 `(!<command> <argument>)` - run `!<command> argument`
 
 `(!points add $sender 1000)` - run `!points add soge__ 1000`

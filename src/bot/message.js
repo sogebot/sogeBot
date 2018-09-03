@@ -199,6 +199,10 @@ class Message {
       }
     }
     let info = {
+      '(count)': async function (filter) {
+        const count = await global.systems.customCommands.getCountOf(attr.cmd)
+        return String(count)
+      },
       '(game)': async function (filter) {
         return _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')
       },
