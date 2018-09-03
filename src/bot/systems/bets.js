@@ -124,7 +124,7 @@ class Bets extends System {
         maxIndex: options.length - 1,
         minutes: timeout,
         options: options.map((v, i) => `${i}. '${v}'`).join(', '),
-        command: opts.command
+        command: this.settings.commands['!bet']
       }), opts.sender)
     } catch (e) {
       switch (e.message) {
@@ -133,7 +133,7 @@ class Bets extends System {
           break
         case ERROR_ALREADY_OPENED:
           global.commons.sendMessage(await global.commons.prepare('bets.running', {
-            command: opts.command,
+            command: this.settings.commands['!bet'],
             $maxIndex: currentBet.options.length - 1,
             $options: currentBet.options.map((v, i) => `${i}. '${v.name}'`).join(', ') }), opts.sender)
           break
