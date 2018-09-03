@@ -1,4 +1,6 @@
 {
   "never": "never",
-  "reset": "resetovat"
+  "reset": "resetovat",
+  "moveUp": "move up",
+  "moveDown": "move down"
 }

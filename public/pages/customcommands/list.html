@@ -31,8 +31,10 @@
             </div>
 
             <div style="word-break: break-all; " class="col-sm-6">
-              <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('response')}}</div>
-              <text-with-tags v-bind:value='command.response'></text-with-tags>
+              <template v-for="(r, i) of _.orderBy(command.responses, 'order', 'asc')">
+                <div :style="{ 'margin-top': i !== 0 ? '15px' : 'inherit' }" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('response')}}#{{i + 1}}</div>
+                <text-with-tags v-bind:value='r.response'></text-with-tags>
+              </template>
             </div>
           </div>
 
@@ -77,7 +79,11 @@
               {{ command.count }}
             </div>
             <div class="col-md-8" style="word-break: break-word" v-bind:style="{ opacity: !command.visible ? 0.6 : 1 }">
-              <text-with-tags v-bind:value='command.response'></text-with-tags>
+              <ol>
+                <li v-for="(r, i) of _.orderBy(command.responses, 'order', 'asc')">
+                    <text-with-tags v-bind:value='r.response'></text-with-tags>
+                </li>
+              </ol>
             </div>
             <div class="col-md-2">
               <div class="p-0 text-right">

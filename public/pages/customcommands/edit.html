@@ -24,12 +24,25 @@
 
         <div class="form-group col-md-12">
           <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('systems.customcommands.response.name') }}</label>
-          <textarea-with-tags
-            v-bind:error="hasError.response"
-            v-bind:value="response"
-            v-bind:placeholder="commons.translate('systems.customcommands.response.placeholder')"
-            v-on:update="response = $event"></textarea-with-tags>
-          <div class="invalid-feedback">{{ commons.translate('systems.customcommands.error.isEmpty') }}</div>
+
+          <template v-for="(response, i) of _.orderBy(responses, 'order', 'asc')">
+            <div style="display: flex; flex: 1 1 auto" :class="[i !== 0 ? 'pt-2' : '']">
+              <textarea-with-tags
+                v-bind:error="hasError.responses && response.response.trim().length === 0"
+                v-bind:value="response.response"
+                v-bind:placeholder="commons.translate('systems.customcommands.response.placeholder')"
+                v-on:update="response.response = $event"></textarea-with-tags>
+
+              <button v-if="responses.length > 1" data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-auto w-auto"><i class="fas fa-ellipsis-v"></i></button>
+              <div class="dropdown-menu p-0" v-if="responses.length > 1">
+                <button v-if="i !== 0" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveUpResponse(response.order)"><i class="fas fa-sort-up fa-fw"></i> {{ commons.translate('commons.moveUp') | capitalize }}</button>
+                <button v-if="i !== responses.length - 1" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveDownResponse(response.order)"><i class="fas fa-sort-down fa-fw"></i> {{ commons.translate('commons.moveDown') | capitalize }}</button>
+                <button class="dropdown-item p-2 pl-4 pr-4 text-danger" style="cursor: pointer" type="button" @click="deleteResponse(response.order)"><i class="fas fa-trash-alt fa-fw"></i> {{ commons.translate('delete') }}</button>
+              </div>
+            </div>
+          </template>
+          <div class="invalid-feedback" :style="{'display': hasError.responses === true ? 'block !important' : 'no'}">{{ commons.translate('systems.customcommands.error.isEmpty') }}</div>
+          <button class="btn btn-primary btn-block mt-2" type="button" @click="responses.push({ order: responses.length, response: '' })">Add response</button>
         </div>
 
 
@@ -83,7 +96,7 @@
         },
         data: {
           id: null,
-          response: '',
+          responses: [],
           command: '',
           permission: 1,
           visible: true,
@@ -93,7 +106,7 @@
           pending: false,
 
           hasError: {
-            response: false,
+            responses: false,
             command: false
           },
 
@@ -105,6 +118,28 @@
           }
         },
         methods: {
+          moveUpResponse: function (order) {
+            this.responses.filter((o) => o.order === order - 1 || o.order === order).map(o => {
+              if (o.order === order - 1) o.order++
+              else o.order--
+              return o
+            })
+          },
+          moveDownResponse: function (order) {
+            this.responses.filter((o) => o.order === order + 1 || o.order === order).map(o => {
+              if (o.order === order + 1) o.order--
+              else o.order++
+              return o
+            })
+          },
+          deleteResponse: function (order) {
+            let i = 0
+            this.responses = this.responses.filter(o => o.order !== order)
+            _.orderBy(this.responses, 'order', 'asc').map((o) => {
+              o.order = i++
+              return o
+            })
+          },
           resetCount: function () {
             this.count = 0
             this.pending = true
@@ -114,7 +149,7 @@
             for (let [key, value] of Object.entries(this.hasError)) {
               this.hasError[key] = false
             }
-            if (this.response.trim().length === 0) this.hasError.response = true
+            for (let r of this.responses) if (r.response.length === 0) this.hasError.responses = true
             if (this.command.trim().length <= 1) this.hasError.command = true
             return _.filter(this.hasError, (o) => o === true).length === 0
           },
@@ -128,7 +163,7 @@
               this.states.save = 1
               const data = {
                 _id: commons.urlParam('id') ? commons.urlParam('id') : null,
-                response: this.response.trim(),
+                responses: this.responses,
                 command: this.command.trim(),
                 permission: this.permission,
                 visible: this.visible,
@@ -194,7 +229,7 @@
       if (commons.urlParam('id')) {
         customCommandsEdit.id = commons.urlParam('id')
         customCommandsEdit.socket.emit('findOne.command', { where: { _id: commons.urlParam('id') } }, (err, data) => {
-          customCommandsEdit.response = data.response
+          customCommandsEdit.responses = data.responses
           customCommandsEdit.command = data.command
           customCommandsEdit.permission = data.permission
           customCommandsEdit.visible = data.visible

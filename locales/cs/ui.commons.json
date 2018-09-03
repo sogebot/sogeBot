@@ -1,4 +1,6 @@
 {
   "never": "nikdy",
-  "reset": "resetovat"
+  "reset": "resetovat",
+  "moveUp": "posunout nahoru",
+  "moveDown": "posunout dolů"
 }

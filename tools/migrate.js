@@ -382,13 +382,36 @@ let migration = {
       for (let item of items) {
         const _id = item._id; delete item._id
         if (typeof item.responseType === 'undefined') item.responseType = 0
-        await global.db.engine.update('custom.variables', {_id}, item)
+        await global.db.engine.update('custom.variables', { _id }, item)
         processed++
       }
       console.info(` => ${processed} processed`)
     }
   }],
   customcommands: [{
+    version: '8.1.0',
+    do: async () => {
+      console.info('Moving responses to systems.customcommands.responses')
+      let processed = 0
+      let responses = {}
+      for (let item of await global.db.engine.find('systems.customcommands')) {
+        if (item.response) {
+          if (typeof responses[item.command] === 'undefined') responses[item.command] = 0
+          else responses[item.command]++
+
+          const order = responses[item.command]
+          const response = item.response
+
+          await global.db.engine.remove('systems.customcommands', { _id: String(item._id) })
+          delete item.response; delete item._id
+          item = await global.db.engine.insert('systems.customcommands', item)
+          await global.db.engine.insert('systems.customcommands.responses', { cid: String(item._id), response, order })
+          processed++
+        }
+      }
+      console.info(` => ${processed} processed`)
+    }
+  }, {
     version: '8.0.0',
     do: async () => {
       console.info('Moving custom commands from customcommands to systems.customcommands')
