@@ -23,11 +23,18 @@ const Timeout = require('../timeout')
  * !command list                                            - get commands list
  */
 
+type Response = {
+  _id?: string,
+  order: number,
+  response: string
+}
+
 type Command = {
+  _id?: string,
   command: string,
   enabled: boolean,
   visible: boolean,
-  response: string,
+  responses?: Array<Response>,
   permission: number,
   count?: number
 }
@@ -67,6 +74,7 @@ class CustomCommands extends System {
         let items: Array<Command> = await global.db.engine.find(opts.collection, opts.where)
         for (let i of items) {
           i.count = await this.getCountOf(i.command)
+          i.responses = await global.db.engine.find(this.collection.responses, { cid: String(i._id) })
         }
         if (_.isFunction(cb)) cb(null, items)
       })
@@ -80,6 +88,7 @@ class CustomCommands extends System {
 
         let item: Command = await global.db.engine.findOne(opts.collection, opts.where)
         item.count = await this.getCountOf(item.command)
+        item.responses = await global.db.engine.find(this.collection.responses, { cid: String(item._id) })
         if (_.isFunction(cb)) cb(null, item)
       })
       socket.on('update.command', async (opts, cb) => {
@@ -92,6 +101,8 @@ class CustomCommands extends System {
           for (let item of opts.items) {
             const _id = item._id; delete item._id
             const count = item.count; delete item.count
+            const responses = item.responses; delete item.responses
+
             let itemFromDb = item
             if (_.isNil(_id)) itemFromDb = await global.db.engine.insert(opts.collection, item)
             else await global.db.engine.update(opts.collection, { _id }, item)
@@ -101,6 +112,17 @@ class CustomCommands extends System {
             if (count !== cCount && count === 0) {
               // we assume its always reset (set to 0)
               await global.db.engine.insert(this.collection.count, { command: itemFromDb.command, count: -cCount })
+            }
+
+            // update responses
+            for (let r of responses) {
+              if (!r.cid) r.cid = _id
+
+              if (!r._id) await global.db.engine.insert(this.collection.responses, r)
+              else {
+                const _id = String(r._id); delete r._id
+                await global.db.engine.update(this.collection.responses, { _id }, r)
+              }
             }
 
             if (_.isFunction(cb)) cb(null, itemFromDb)
@@ -209,8 +231,17 @@ class CustomCommands extends System {
       (command.permission === constants.OWNER_ONLY && isOwner)) {
       // remove found command from message to get param
       const param = opts.message.replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim()
-      global.commons.sendMessage(command.response, opts.sender, { 'param': param, 'cmd': command.command })
       global.db.engine.insert(this.collection.count, { command: command.command, count: 1 })
+
+      const responses: Array<Response> = await global.db.engine.find(this.collection.responses, { cid: String(command._id) })
+      for (let r of _.orderBy(responses, 'order', 'asc')) {
+        if (responses.length > 1) {
+          // slow down command send message to have proper order (every 100ms)
+          setTimeout(() => global.commons.sendMessage(r.response, opts.sender, { 'param': param, 'cmd': command.command }), r.order * 100)
+        } else {
+          global.commons.sendMessage(r.response, opts.sender, { 'param': param, 'cmd': command.command })
+        }
+      }
     }
     return true
   }
