@@ -103,6 +103,7 @@ Users.prototype.sockets = function (self) {
       await global.db.engine.remove('users', { username: username })
       await global.db.engine.remove('users.tips', { username: username })
       await global.db.engine.remove('users.bits', { username: username })
+      await global.db.engine.remove('users.messages', { username: username })
       cb(null, null)
     })
 
