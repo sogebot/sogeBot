@@ -91,7 +91,7 @@ class Points extends System {
       global.log.error(e)
       global.log.error(e.stack)
     } finally {
-      new Timeout().recursive({ uid: 'compactPointsDb', this: this, fnc: this.compactPointsDb, wait: 60000 })
+      new Timeout().recursive({ uid: 'compactPointsDb', this: this, fnc: this.compactPointsDb, wait: 10000 })
     }
   }
 
