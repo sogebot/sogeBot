@@ -86,6 +86,9 @@ function cluster () {
             case 'index':
               data.items = await global.db.engine.index(data.opts)
               break
+            case 'count':
+              data.items = await global.db.engine.count(data.table, data.where, data.object)
+              break
             default:
               global.log.error('This db call is not correct')
               global.log.error(data)
