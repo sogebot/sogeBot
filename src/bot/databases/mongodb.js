@@ -53,17 +53,18 @@ class IMongoDB extends Interface {
 
     // create indexes
     let db = await this.client.db(this.dbName)
-    const collections = await db.listCollections().toArray()
-    const dropIndexes = [
-      'users.bits', 'users.tips', 'users.points', 'users.online', 'users.messages', 'users.watched',
-      'cache', 'customTranslations', 'users', 'stats'
-    ]
-    for (let table of dropIndexes) {
-      if (_.find(collections, (o) => o.name === table)) await db.collection(table).dropIndexes()
-      await db.createCollection(table)
-    }
 
     if (this.createIndexes) {
+      const collections = await db.listCollections().toArray()
+      const dropIndexes = [
+        'users.bits', 'users.tips', 'users.points', 'users.online', 'users.messages', 'users.watched',
+        'cache', 'customTranslations', 'users', 'stats'
+      ]
+      for (let table of dropIndexes) {
+        if (_.find(collections, (o) => o.name === table)) await db.collection(table).dropIndexes()
+        await db.createCollection(table)
+      }
+
       await db.collection('users.bits').createIndex('timestamp')
       await db.collection('users.tips').createIndex('timestamp')
       await db.collection('users').createIndex('username', { unique: true })
