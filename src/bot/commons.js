@@ -301,42 +301,34 @@ Commons.prototype.getLocalizedName = function (number, translation) {
 Commons.prototype.compactDb = async function (opts) {
   opts = opts || {}
   if (_.size(opts) === 0) throw Error('No options specified')
-  let items = {}
-  let idsToUpdate = {}
-  let itemsFromDb = await global.db.engine.find(opts.table)
 
-  // compact online/offline only if users are involved
-  const isOnline = (await global.cache.isOnline())
-  const isCompacted = typeof this.compact[opts.table] === 'undefined' ? false : this.compact[opts.table]
+  // compact if 1000 new items
+  const shouldCompact =
+    typeof this.compact[opts.table] === 'undefined' ? true : this.compact[opts.table] + 1000 < (await global.db.engine.count(opts.table))
 
-  if (isOnline) {
-    this.compact[opts.table] = false
-  } else if (!isOnline && !isCompacted) {
-    this.compact[opts.table] = true
+  if (shouldCompact) {
+    let idsToUpdate = {}
+    let itemsFromDb = await global.db.engine.find(opts.table)
+    this.compact[opts.table] = new Date()
     for (let item of itemsFromDb) {
-      if (_.isNaN(items[item[opts.index]]) || _.isNil(items[item[opts.index]])) items[item[opts.index]] = 0
-      let value = !_.isNaN(parseInt(_.get(item, opts.values, 0))) ? parseInt(_.get(item, opts.values, 0)) : 0
-      items[item[opts.index]] = parseInt(items[item[opts.index]], 10) + value
-      const data = {}; data[opts.values] = Number(items[item[opts.index]])
       if (_.isNil(idsToUpdate[item[opts.index]])) {
-        // we don't have id which we will use for compaction
+        // if first id => we have pointer to that id and do nothing
         idsToUpdate[item[opts.index]] = String(item._id)
-        await global.db.engine.update(opts.table, { _id: idsToUpdate[item[opts.index]] }, data)
       } else {
-        if (isNaN(data[opts.values])) {
-          // remove if value is not a number
+        const value = isNaN(Number(item[opts.values])) ? 0 : Number(item[opts.values])
+
+        if (value > 0) {
           await Promise.all([
-            global.db.engine.remove(opts.table, { _id: idsToUpdate[item[opts.index]] }),
-            global.db.engine.remove(opts.table, { _id: item._id.toString() })
+            global.db.engine.increment(opts.table, { _id: idsToUpdate[item[opts.index]] }, { [opts.values]: value }),
+            global.db.engine.remove(opts.table, { _id: String(item._id) })
           ])
         } else {
-          await Promise.all([
-            global.db.engine.update(opts.table, { _id: idsToUpdate[item[opts.index]] }, data),
-            global.db.engine.remove(opts.table, { _id: item._id.toString() })
-          ])
+          await global.db.engine.remove(opts.table, { _id: String(item._id) })
         }
       }
     }
+    // save new compact count
+    this.compact[opts.table] = await global.db.engine.count(opts.table)
   }
 }
 
