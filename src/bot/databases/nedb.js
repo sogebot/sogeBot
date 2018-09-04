@@ -266,6 +266,24 @@ class INeDB extends Interface {
       }
     })
   }
+
+  async count (table) {
+    this.on(table) // init table
+
+    var self = this
+    return new Promise(function (resolve, reject) {
+      // DON'T EVER DELETE flatten ON OBJECT - with flatten object get updated and not replaced
+      try {
+        self.on(table).count({}, function (err, count) {
+          if (err) reject(err)
+          resolve(count)
+        })
+      } catch (e) {
+        global.log.error(e.message)
+        throw e
+      }
+    })
+  }
 }
 
 module.exports = INeDB

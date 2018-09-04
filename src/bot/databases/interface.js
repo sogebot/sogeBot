@@ -83,6 +83,15 @@ class Interface {
   async index (opts) {
     throw Error('function index() is not implemented in ' + this.constructor.name)
   }
+
+  /**
+   * Count table
+   * note: Indexes should be set only at start on master
+   * @param {string} table table for count
+   */
+  async count (table) {
+    throw Error('function count() is not implemented in ' + this.constructor.name)
+  }
 }
 
 module.exports = Interface
