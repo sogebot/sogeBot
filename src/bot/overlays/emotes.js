@@ -45,11 +45,6 @@ function Emotes () {
     this.fetcher.fetchFFZEmotes(config.settings.broadcaster_username).catch(function (reason) {})
     this.fetcher.fetchBTTVEmotes(config.settings.broadcaster_username).catch(function (reason) {})
     this.fetcher.fetchTwitchEmotes(config.settings.broadcaster_username).catch(function (reason) {})
-
-    cluster.on('message', (worker, data) => {
-      if (data.type !== 'emotes') return
-      if (data.fnc === 'emitEmote') global.panel.io.emit('emote', data.emote)
-    })
   }
 }
 
@@ -75,29 +70,45 @@ Emotes.prototype.explode = async function (self, socket, data) {
 
 Emotes.prototype.containsEmotes = async function (opts) {
   if (_.isNil(opts.sender)) return true
+  if (cluster.isWorker) return process.send({ type: 'call', ns: 'overlays.emotes', fnc: 'containsEmotes', args: [opts] })
 
   let OEmotesMax = await global.configuration.getValue('OEmotesMax')
   let OEmotesSize = await global.configuration.getValue('OEmotesSize')
 
   let limit = 0
-  _.each(opts.sender.emotes, function (v, emote) {
+  for (let e of opts.sender.emotes) {
     if (limit === OEmotesMax) return false
-    process.send({ type: 'emotes', fnc: 'emitEmote', emote: 'https://static-cdn.jtvnw.net/emoticons/v1/' + emote + '/' + (OEmotesSize + 1) + '.0' })
+    global.panel.io.emit('emote', 'https://static-cdn.jtvnw.net/emoticons/v1/' + e.id + '/' + (OEmotesSize + 1) + '.0')
     limit++
-  })
+  }
 
+  let parsed = []
   // parse BTTV emoticons
   try {
     for (let emote of await this.fetcher._getRawBTTVEmotes(config.settings.broadcaster_username)) {
       for (let i in _.range((opts.message.match(new RegExp(emote.code, 'g')) || []).length)) {
         if (i === OEmotesMax) break
         global.panel.io.emit('emote', this.fetcher.emotes.get(emote.code).toLink(OEmotesSize))
+        parsed.push(emote.code)
       }
     }
   } catch (e) {
     // we don't want to output error when BTTV emotes doesn't exist
-    return true
   }
+
+  // parse FFZ emoticons
+  try {
+    for (let emote of await this.fetcher._getRawFFZEmotes(config.settings.broadcaster_username)) {
+      if (parsed.includes(emote.name)) continue
+      for (let i in _.range((opts.message.match(new RegExp(emote.name, 'g')) || []).length)) {
+        if (i === OEmotesMax) break
+        global.panel.io.emit('emote', this.fetcher.emotes.get(emote.name).toLink(OEmotesSize))
+      }
+    }
+  } catch (e) {
+    // we don't want to output error when BTTV emotes doesn't exist
+  }
+
   return true
 }
 
