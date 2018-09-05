@@ -203,7 +203,7 @@ function forkOn (worker) {
 function loadClientListeners () {
   global.broadcasterTMI.chat.on('PRIVMSG/HOSTED', async (message) => {
     // Someone is hosting the channel and the message contains how many viewers..
-    const username = message.message.split(' ')[0].replace(':', '')
+    const username = message.message.split(' ')[0].replace(':', '').toLowerCase()
     const autohost = message.message.includes('auto')
     let viewers = message.numberOfViewers || '0'
 
