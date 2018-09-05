@@ -66,7 +66,7 @@ class IMasterController extends Interface {
       DEBUG_MASTER_REQUEST_ID(id)
       this.returnData(resolve, reject, id)
     } catch (e) {
-      timeout.recursive({ uid: `sendRequest-${id}`, this: this, args: [resolve, reject, id], fnc: this.sendRequest, wait: 10 })
+      timeout.recursive({ uid: `sendRequest-${id}`, this: this, args: [resolve, reject, id, data], fnc: this.sendRequest, wait: 10 })
     }
   }
 
