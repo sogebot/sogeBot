@@ -488,6 +488,7 @@
     "overlays-eventlist-follow": "follow",
     "overlays-eventlist-cheer": "bits",
     "overlays-eventlist-tip": "tip",
+    "overlays-eventlist-raid": "raid",
     "overlay-credits-aggregate": "Spojit eventy",
     "overlay-credits-show-followers": "Zobrazit followery",
     "overlay-credits-show-hosts": "Zobrazit hosty",
