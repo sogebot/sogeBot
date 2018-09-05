@@ -33,28 +33,42 @@
                 v-bind:placeholder="commons.translate('systems.customcommands.response.placeholder')"
                 v-on:update="response.response = $event"></textarea-with-tags>
 
-              <button v-if="responses.length > 1" data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-auto w-auto"><i class="fas fa-ellipsis-v"></i></button>
-              <div class="dropdown-menu p-0" v-if="responses.length > 1">
-                <button v-if="i !== 0" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveUpResponse(response.order)"><i class="fas fa-sort-up fa-fw"></i> {{ commons.translate('commons.moveUp') | capitalize }}</button>
-                <button v-if="i !== responses.length - 1" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveDownResponse(response.order)"><i class="fas fa-sort-down fa-fw"></i> {{ commons.translate('commons.moveDown') | capitalize }}</button>
-                <button class="dropdown-item p-2 pl-4 pr-4 text-danger" style="cursor: pointer" type="button" @click="deleteResponse(response.order)"><i class="fas fa-trash-alt fa-fw"></i> {{ commons.translate('delete') }}</button>
+              <div class="h-auto w-auto">
+                <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i> {{ response.permission | permissionToString }}</button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" style="cursor: pointer" v-on:click="response.permission = 1; pending = true">{{ commons.translate('systems.customcommands.forViewers') | capitalize }}</a>
+                  <a class="dropdown-item" style="cursor: pointer" v-on:click="response.permission = 3; pending = true">{{ commons.translate('systems.customcommands.forRegulars') | capitalize }}</a>
+                  <a class="dropdown-item" style="cursor: pointer" v-on:click="response.permission = 2; pending = true">{{ commons.translate('systems.customcommands.forMods') | capitalize }}</a>
+                  <a class="dropdown-item" style="cursor: pointer" v-on:click="response.permission = 0; pending = true">{{ commons.translate('systems.customcommands.forOwners') | capitalize }}</a>
+                </div>
+              </div>
+
+              <div class="h-auto w-auto">
+                <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">
+                  <i class="fas mr-1" :class="[response.stopIfExecuted ? 'fa-stop' : 'fa-play']" aria-hidden="true"></i>
+                  {{ commons.translate(response.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}</button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" style="cursor: pointer" v-on:click="response.stopIfExecuted = true; pending = true">{{ commons.translate('commons.stop-if-executed') | capitalize }}</a>
+                  <a class="dropdown-item" style="cursor: pointer" v-on:click="response.stopIfExecuted = false; pending = true">{{ commons.translate('commons.continue-if-executed') | capitalize }}</a>
+                </div>
+              </div>
+
+              <div class="h-auto w-auto">
+                <button v-if="responses.length > 1" data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100 w-100"><i class="fas fa-ellipsis-v"></i></button>
+                <div class="dropdown-menu p-0" v-if="responses.length > 1">
+                  <button v-if="i !== 0" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveUpResponse(response.order)"><i class="fas fa-sort-up fa-fw"></i> {{ commons.translate('commons.moveUp') | capitalize }}</button>
+                  <button v-if="i !== responses.length - 1" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" type="button" @click="moveDownResponse(response.order)"><i class="fas fa-sort-down fa-fw"></i> {{ commons.translate('commons.moveDown') | capitalize }}</button>
+                  <button class="dropdown-item p-2 pl-4 pr-4 text-danger" style="cursor: pointer" type="button" @click="deleteResponse(response.order)"><i class="fas fa-trash-alt fa-fw"></i> {{ commons.translate('delete') }}</button>
+                </div>
               </div>
             </div>
           </template>
           <div class="invalid-feedback" :style="{'display': hasError.responses === true ? 'block !important' : 'no'}">{{ commons.translate('systems.customcommands.error.isEmpty') }}</div>
-          <button class="btn btn-primary btn-block mt-2" type="button" @click="responses.push({ order: responses.length, response: '' })">Add response</button>
+          <button class="btn btn-primary btn-block mt-2" type="button" @click="responses.push({ order: responses.length, response: '', permission: 1 })">Add response</button>
         </div>
 
 
         <div class="form-group row pl-3 pr-3">
-          <div class="col-md-2">
-            <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('permission') }}</label>
-            <select class="form-control" v-model="permission">
-              <option v-for="permission in [0,1,2,3]" v-bind:value="permission">
-                {{ permission | permissionToString }}
-              </option>
-            </select>
-          </div>
           <div class="col-md-2">
             <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('count') }}</label>
             <input type="number" class="form-control" v-model="count" readonly="true">
@@ -96,9 +110,8 @@
         },
         data: {
           id: null,
-          responses: [],
+          responses: [{response: '', order: 0, permission: 1, stopIfExecuted: false}],
           command: '',
-          permission: 1,
           visible: true,
           enabled: true,
           count: 0,
@@ -165,7 +178,6 @@
                 _id: commons.urlParam('id') ? commons.urlParam('id') : null,
                 responses: this.responses,
                 command: this.command.trim(),
-                permission: this.permission,
                 visible: this.visible,
                 enabled: this.enabled,
                 count: this.count
@@ -184,9 +196,6 @@
           },
         },
         watch: {
-          permission: function (val, old) {
-            this.pending = true
-          },
           enabled: function (val, old) {
             this.pending = true
           },
@@ -231,7 +240,6 @@
         customCommandsEdit.socket.emit('findOne.command', { where: { _id: commons.urlParam('id') } }, (err, data) => {
           customCommandsEdit.responses = data.responses
           customCommandsEdit.command = data.command
-          customCommandsEdit.permission = data.permission
           customCommandsEdit.visible = data.visible
           customCommandsEdit.enabled = data.enabled
           customCommandsEdit.count = data.count

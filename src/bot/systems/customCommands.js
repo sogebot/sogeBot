@@ -12,21 +12,26 @@ const cluster = require('cluster')
 const constants = require('../constants')
 const System = require('./_interface')
 const Timeout = require('../timeout')
+const Expects = require('../expects')
 
 /*
- * !command                                                 - gets an info about command usage
- * !command add owner|mod|regular|viewer ![cmd] [response]  - add command with specified response
- * !command edit owner|mod|regular|viewer ![cmd] [response] - edit command with specified response
- * !command remove ![cmd]                                   - remove specified command
- * !command toggle ![cmd]                                   - enable/disable specified command
- * !command toggle-visibility ![cmd]                        - enable/disable specified command
- * !command list                                            - get commands list
+ * !command                                                                              - gets an info about command usage
+ * !command add ?-ul=owner|mod|regular|viewer ?-s=true|false ![cmd] [response]           - add command with specified response
+ * !command edit ?-ul=owner|mod|regular|viewer ?-s=true|false ![cmd] [number] [response] - edit command with specified response
+ * !command remove ![cmd]                                                                - remove specified command
+ * !command remove ![cmd] [number]                                                       - remove specified response of command
+ * !command toggle ![cmd]                                                                - enable/disable specified command
+ * !command toggle-visibility ![cmd]                                                     - enable/disable specified command
+ * !command list                                                                         - get commands list
+ * !command list ![cmd]                                                                  - get responses of command
  */
 
 type Response = {
   _id?: string,
   order: number,
-  response: string
+  response: string,
+  stopIfExecuted: boolean,
+  permission: number
 }
 
 type Command = {
@@ -35,7 +40,6 @@ type Command = {
   enabled: boolean,
   visible: boolean,
   responses?: Array<Response>,
-  permission: number,
   count?: number
 }
 
@@ -116,7 +120,7 @@ class CustomCommands extends System {
 
             // update responses
             for (let r of responses) {
-              if (!r.cid) r.cid = _id
+              if (!r.cid) r.cid = _id || itemFromDb._id
 
               if (!r._id) await global.db.engine.insert(this.collection.responses, r)
               else {
@@ -135,76 +139,75 @@ class CustomCommands extends System {
   }
 
   main (opts: Object) {
-    global.commons.sendMessage(global.translate('core.usage') + ': !command add owner|mod|regular|viewer <!command> <response> | !command edit owner|mod|regular|viewer <!command> <response> | !command remove <!command> | !command list', opts.sender)
+    global.commons.sendMessage(global.translate('core.usage') + ': !command add ?-ul=owner|mod|regular|viewer ?-s=true|false <!cmd> <response> | !command edit ?-ul=owner|mod|regular|viewer ?-s=true|false <!cmd> <number> <response> | !command remove <!command> | !command remove <!command> <number> | !command list | !command list <!command>', opts.sender)
   }
 
   async edit (opts: Object) {
-    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP_WITH_RESPONSE)
+    try {
+      const [userlevel, stopIfExecuted, command, rId, response] = new Expects()
+        .check(opts.parameters)
+        .argument({ optional: true, name: 'ul', default: null })
+        .argument({ optional: true, name: 's', default: null, type: Boolean })
+        .command()
+        .number()
+        .string()
+        .toArray()
 
-    if (_.isNil(match)) {
-      let message = await global.commons.prepare('customcmds.commands-parse-failed')
-      debug(message); global.commons.sendMessage(message, opts.sender)
-      return false
+      let cDb = await global.db.engine.findOne(this.collection.data, { command })
+      if (!cDb._id) return global.commons.sendMessage(global.commons.prepare('customcmds.command-was-not-found', { command }), opts.sender)
+
+      let rDb = await global.db.engine.findOne(this.collection.responses, { cid: String(cDb._id), order: rId - 1 })
+      if (!rDb._id) return global.commons.sendMessage(global.commons.prepare('customcmds.response-was-not-found', { command, response: rId }), opts.sender)
+
+      const _id = rDb._id; delete rDb._id
+      rDb.response = response
+      if (userlevel) rDb.permission = userlevel
+      if (stopIfExecuted) rDb.stopIfExecuted = stopIfExecuted
+
+      await global.db.engine.update(this.collection.responses, { _id }, rDb)
+      global.commons.sendMessage(global.commons.prepare('customcmds.command-was-edited', { command, response }), opts.sender)
+    } catch (e) {
+      global.commons.sendMessage(global.commons.prepare('customcmds.commands-parse-failed'), opts.sender)
     }
-
-    let item = await global.db.engine.findOne(this.collection.data, { command: match.command })
-    if (_.isEmpty(item)) {
-      let message = await global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
-      debug(message); global.commons.sendMessage(message, opts.sender)
-      return false
-    }
-
-    let permission = constants.VIEWERS
-    switch (match.permission) {
-      case 'owner':
-        permission = constants.OWNER_ONLY
-        break
-      case 'mod':
-        permission = constants.MODS
-        break
-      case 'regular':
-        permission = constants.REGULAR
-        break
-    }
-
-    await global.db.engine.update(this.collection.data, { command: match.command }, { response: match.response, permision: permission })
-    let message = await global.commons.prepare('customcmds.command-was-edited', { command: match.command, response: match.response })
-    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
   async add (opts: Object) {
-    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP_WITH_RESPONSE)
+    try {
+      const [userlevel, stopIfExecuted, command, response] = new Expects()
+        .check(opts.parameters)
+        .argument({ optional: true, name: 'ul', default: 'viewer' })
+        .argument({ optional: true, name: 's', default: false, type: Boolean })
+        .command()
+        .string()
+        .toArray()
 
-    if (_.isNil(match)) {
-      let message = await global.commons.prepare('customcmds.commands-parse-failed')
-      debug(message); global.commons.sendMessage(message, opts.sender)
-      return false
+      let cDb = await global.db.engine.findOne(this.collection.data, { command })
+      if (!cDb._id) {
+        cDb = await global.db.engine.insert(this.collection.data, {
+          command, enabled: true, visible: true
+        })
+      }
+
+      let rDb = await global.db.engine.find(this.collection.responses, { cid: String(cDb._id) })
+      await global.db.engine.insert(this.collection.responses, {
+        cid: String(cDb._id),
+        order: rDb.length,
+        permission: global.permissions.stringToNumber(userlevel),
+        stopIfExecuted,
+        response
+      })
+      global.commons.sendMessage(global.commons.prepare('customcmds.command-was-added', { command }), opts.sender)
+    } catch (e) {
+      console.log(e)
+      global.commons.sendMessage(global.commons.prepare('customcmds.commands-parse-failed'), opts.sender)
     }
-
-    debug(match)
-    let permission = constants.VIEWERS
-    switch (match.permission) {
-      case 'owner':
-        permission = constants.OWNER_ONLY
-        break
-      case 'mod':
-        permission = constants.MODS
-        break
-      case 'regular':
-        permission = constants.REGULAR
-        break
-    }
-    let command = { command: match.command, response: match.response, enabled: true, visible: true, permission: permission }
-
-    await global.db.engine.update(this.collection.data, { command: command.command }, command)
-    let message = await global.commons.prepare('customcmds.command-was-added', { command: match.command })
-    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
   async run (opts: Object) {
     if (!opts.message.startsWith('!')) return true // do nothing if it is not a command
 
-    var command: $Shape<Command> = {}
+    let _responses = []
+    var command: $Shape<Command> = {} // eslint-disable-line no-undef
     let cmdArray = opts.message.toLowerCase().split(' ')
     for (let i in opts.message.toLowerCase().split(' ')) { // search for correct command
       debug(`${i} - Searching for ${cmdArray.join(' ')} in commands`)
@@ -213,10 +216,9 @@ class CustomCommands extends System {
       if (!_.isEmpty(command)) break
       cmdArray.pop() // remove last array item if not found
     }
-    if (Object.keys(command) === 0) return true // no command was found - return
+    if (Object.keys(command).length === 0) return true // no command was found - return
     debug('Command found: %j', command)
 
-    debug('Checking if permissions are ok')
     let [isRegular, isMod, isOwner] = await Promise.all([
       global.commons.isRegular(opts.sender),
       global.commons.isMod(opts.sender),
@@ -225,31 +227,62 @@ class CustomCommands extends System {
     debug('isRegular: %s', isRegular)
     debug('isMod: %s', isMod)
     debug('isOwner: %s', isOwner)
-    if (command.permission === constants.VIEWERS ||
-      (command.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
-      (command.permission === constants.MODS && (isMod || isOwner)) ||
-      (command.permission === constants.OWNER_ONLY && isOwner)) {
-      // remove found command from message to get param
-      const param = opts.message.replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim()
-      global.db.engine.insert(this.collection.count, { command: command.command, count: 1 })
 
-      const responses: Array<Response> = await global.db.engine.find(this.collection.responses, { cid: String(command._id) })
-      for (let r of _.orderBy(responses, 'order', 'asc')) {
+    // remove found command from message to get param
+    const param = opts.message.replace(new RegExp('^(' + cmdArray.join(' ') + ')', 'i'), '').trim()
+    global.db.engine.insert(this.collection.count, { command: command.command, count: 1 })
+
+    const responses: Array<Response> = await global.db.engine.find(this.collection.responses, { cid: String(command._id) })
+    for (let r of _.orderBy(responses, 'order', 'asc')) {
+      if (r.permission === constants.VIEWERS ||
+        (r.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
+        (r.permission === constants.MODS && (isMod || isOwner)) ||
+        (r.permission === constants.OWNER_ONLY && isOwner)) {
+        _responses.push(r.response)
         if (responses.length > 1) {
           // slow down command send message to have proper order (every 100ms)
           setTimeout(() => global.commons.sendMessage(r.response, opts.sender, { 'param': param, 'cmd': command.command }), r.order * 100)
+          if (r.stopIfExecuted) break
         } else {
           global.commons.sendMessage(r.response, opts.sender, { 'param': param, 'cmd': command.command })
         }
       }
     }
-    return true
+    return _responses
   }
 
   async list (opts: Object) {
-    let commands = await global.db.engine.find(this.collection.data, { visible: true })
-    var output = (commands.length === 0 ? global.translate('customcmds.list-is-empty') : global.translate('customcmds.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(commands, 'command'), 'command').join(', ')))
-    debug(output); global.commons.sendMessage(output, opts.sender)
+    const expects = new Expects()
+    const command = expects.check(opts.parameters).command({ optional: true }).toArray()[0]
+
+    if (!command) {
+      // print commands
+      let commands = await global.db.engine.find(this.collection.data, { visible: true })
+      var output = (commands.length === 0 ? global.translate('customcmds.list-is-empty') : global.translate('customcmds.list-is-not-empty').replace(/\$list/g, _.map(_.orderBy(commands, 'command'), 'command').join(', ')))
+      debug(output); global.commons.sendMessage(output, opts.sender)
+    } else {
+      // print responses
+      const cid = String((await global.db.engine.findOne(this.collection.data, { command }))._id)
+      const responses = _.orderBy((await global.db.engine.find(this.collection.responses, { cid })), 'order', 'asc')
+
+      if (responses.length === 0) global.commons.sendMessage(global.commons.prepare('customcmdustomcmds.list-of-responses-is-empty', { command }), opts.sender)
+      const permission = [
+        { v: constants.VIEWERS, string: await global.commons.prepare('ui.systems.customcommands.forViewers') },
+        { v: constants.REGULAR, string: await global.commons.prepare('ui.systems.customcommands.forRegulars') },
+        { v: constants.MODS, string: await global.commons.prepare('ui.systems.customcommands.forMods') },
+        { v: constants.OWNER_ONLY, string: await global.commons.prepare('ui.systems.customcommands.forOwners') }
+      ]
+      for (let r of responses) {
+        let rPrmsn: any = permission.find(o => o.v === r.permission)
+        const response = await global.commons.prepare('customcmds.response', { command, index: ++r.order, response: r.response, after: r.stopIfExecuted ? '_' : 'v', permission: rPrmsn.string })
+        global.log.chatOut(response, { username: opts.sender.username })
+        if ((await global.configuration.getValue('sendWithMe'))) {
+          global.commons.message('me', global.commons.getOwner(), response)
+        } else {
+          global.commons.message('say', global.commons.getOwner(), response)
+        }
+      }
+    }
   }
 
   async togglePermission (opts: Object) {
@@ -303,21 +336,44 @@ class CustomCommands extends System {
   }
 
   async remove (opts: Object) {
-    const match = XRegExp.exec(opts.parameters, constants.COMMAND_REGEXP)
-    if (_.isNil(match)) {
-      let message = await global.commons.prepare('customcmds.commands-parse-failed')
-      debug(message); global.commons.sendMessage(message, opts.sender)
-      return false
-    }
+    const expects = new Expects()
 
-    let removed = await global.db.engine.remove(this.collection.data, { command: match.command })
-    if (!removed) {
-      let message = await global.commons.prepare('customcmds.command-was-not-found', { command: match.command })
-      debug(message); global.commons.sendMessage(message, opts.sender)
-      return false
+    try {
+      const [command, response] = expects.check(opts.parameters).command().number({ optional: true }).toArray()
+      let cid = (await global.db.engine.findOne(this.collection.data, { command }))._id
+      if (!cid) {
+        global.commons.sendMessage(global.commons.prepare('customcmds.command-was-not-found', { command }), opts.sender)
+      } else {
+        cid = String(cid)
+        if (response) {
+          const order = Number(response) - 1
+          let removed = await global.db.engine.remove(this.collection.responses, { cid, order })
+          if (removed > 0) {
+            global.commons.sendMessage(global.commons.prepare('customcmds.response-was-removed', { command, response }), opts.sender)
+
+            // update order
+            const responses = _.orderBy(await global.db.engine.find(this.collection.responses, { cid }), 'order', 'asc')
+            if (responses.length === 0) {
+              // remove command if 0 responses
+              await global.db.engine.remove(this.collection.data, { command })
+            }
+
+            let order = 0
+            for (let r of responses) {
+              const _id = String(r._id); delete r._id
+              r.order = order
+              await global.db.engine.update(this.collection.responses, { _id }, r)
+              order++
+            }
+          } else global.commons.sendMessage(global.commons.prepare('customcmds.response-was-not-found', { command, response }), opts.sender)
+        } else {
+          await global.db.engine.remove(this.collection.data, { command })
+          global.commons.sendMessage(global.commons.prepare('customcmds.command-was-removed', { command }), opts.sender)
+        }
+      }
+    } catch (e) {
+      return global.commons.sendMessage(global.commons.prepare('customcmds.commands-parse-failed'), opts.sender)
     }
-    let message = await global.commons.prepare('customcmds.command-was-removed', { command: match.command })
-    debug(message); global.commons.sendMessage(message, opts.sender)
   }
 
   async compactCountDb () {

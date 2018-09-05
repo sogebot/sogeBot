@@ -136,6 +136,7 @@ Commons.prototype.getTime = function (time, isChat) {
 }
 
 Commons.prototype.sendMessage = async function (message, sender, attr) {
+  message = await message // await if message is promise (like prepare)
   debug('commons:sendMessage')('sendMessage(%s, %j, %j)', message, sender, attr)
   attr = attr || {}
   sender = sender || {}

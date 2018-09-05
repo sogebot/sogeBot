@@ -863,6 +863,7 @@
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} !commands",
     "command-was-not-found": "$sender, prikaz $command nebyl nalezen",
+    "response-was-not-found": "$sender, odpoved #$response prikazu $command nebyla nalezena",
     "command-was-edited": "$sender, prikaz $command is changed to '$response'",
     "command-was-added": "$sender, prikaz $command byl pridan",
     "list-is-not-empty": "$sender, seznam prikazu: $list",
@@ -871,7 +872,10 @@
     "command-was-disabled": "$sender, prikaz $command byl vypnut",
     "command-was-concealed": "$sender, prikaz $command byl skryt",
     "command-was-exposed": "$sender, prikaz $command byl odkryt",
-    "command-was-removed": "$sender, prikaz $command byl smazan"
+    "command-was-removed": "$sender, prikaz $command byl smazan",
+    "response-was-removed": "$sender, odpoved #$response prikazu $command byla smazana",
+    "list-of-responses-is-empty": "$sender, $command nema zadne odpovedi nebo neexistuje",
+    "response": "$command#$index ($permission) $after| $response"
   },
   "keywords": {
     "keywords-parse-failed": "{core.command-parse} !commands",

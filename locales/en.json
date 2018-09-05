@@ -858,6 +858,7 @@
   "customcmds": {
     "commands-parse-failed": "{core.command-parse} !commands",
     "command-was-not-found": "$sender, command $command was not found in database",
+    "response-was-not-found": "$sender, response #$response of command $command was not found in database",
     "command-was-edited": "$sender, command $command is changed to '$response'",
     "command-was-added": "$sender, command $command was added",
     "list-is-not-empty": "$sender, list of commands: $list",
@@ -866,7 +867,10 @@
     "command-was-disabled": "$sender, command $command was disabled",
     "command-was-concealed": "$sender, command $command was concealed",
     "command-was-exposed": "$sender, command $command was exposed",
-    "command-was-removed": "$sender, command $command was removed"
+    "command-was-removed": "$sender, command $command was removed",
+    "response-was-removed": "$sender, response #$response of $command was removed",
+    "list-of-responses-is-empty": "$sender, $command have no responses or doesn't exists",
+    "response": "$command#$index ($permission) $after| $response"
   },
   "keywords": {
     "keyword-parse-failed": "{core.command-parse} !keyword",

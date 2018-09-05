@@ -401,11 +401,13 @@ let migration = {
 
           const order = responses[item.command]
           const response = item.response
+          const permission = item.permission
+          const stopIfExecuted = false
 
           await global.db.engine.remove('systems.customcommands', { _id: String(item._id) })
-          delete item.response; delete item._id
+          delete item.response; delete item._id; delete item.permission
           item = await global.db.engine.insert('systems.customcommands', item)
-          await global.db.engine.insert('systems.customcommands.responses', { cid: String(item._id), response, order })
+          await global.db.engine.insert('systems.customcommands.responses', { cid: String(item._id), response, order, permission, stopIfExecuted })
           processed++
         }
       }

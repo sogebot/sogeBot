@@ -19,7 +19,7 @@
         <div v-if="showAs === 'cards' && commandsFiltered.length > 0" class="card" v-for="(command, index) of commandsFiltered" v-bind:class="{ 'mt-3': index !== 0 }">
           <div class="card-body row"  v-bind:style="{ opacity: !command.visible ? 0.6 : 1 }">
             <div class="col-sm-5">
-              <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('command')}} {{ command.permission | permissionToString }}</div>
+              <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('command')}}</div>
               <div class="font-weight-bold  text-primary" style="font-size: 1.5rem">{{ command.command }}</div>
             </div>
 
@@ -32,7 +32,31 @@
 
             <div style="word-break: break-all; " class="col-sm-6">
               <template v-for="(r, i) of _.orderBy(command.responses, 'order', 'asc')">
-                <div :style="{ 'margin-top': i !== 0 ? '15px' : 'inherit' }" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('response')}}#{{i + 1}}</div>
+                <div :style="{ 'margin-top': i !== 0 ? '15px' : 'inherit' }" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px">
+                  <span style="display: inline-block">
+                    {{commons.translate('response')}}#{{i + 1}}
+                  </span>
+
+                  <span style="display: inline-block">
+                    <button data-toggle="dropdown" class="btn btn-outline-dark border-0" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i> {{ r.permission | permissionToString }}</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 1)">{{ commons.translate('systems.customcommands.forViewers') | capitalize }}</a>
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 2)">{{ commons.translate('systems.customcommands.forRegulars') | capitalize }}</a>
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 3)">{{ commons.translate('systems.customcommands.forMods') | capitalize }}</a>
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 0)">{{ commons.translate('systems.customcommands.forOwners') | capitalize }}</a>
+                    </div>
+                  </span>
+
+                  <span style="display: inline-block">
+                    <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">
+                      <i class="fas mr-1" :class="[r.stopIfExecuted ? 'fa-stop' : 'fa-play']" aria-hidden="true"></i>
+                      {{ commons.translate(r.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updateStopIfExecuted(command._id, r._id, true)">{{ commons.translate('commons.stop-if-executed') | capitalize }}</a>
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updateStopIfExecuted(command._id, r._id, false)">{{ commons.translate('commons.continue-if-executed') | capitalize }}</a>
+                    </div>
+                  </span>
+                </div>
                 <text-with-tags v-bind:value='r.response'></text-with-tags>
               </template>
             </div>
@@ -50,13 +74,6 @@
                 <div class="btn-group" role="group">
                   <a v-bind:href="'?id='+ command._id + '#customcommands/edit'" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-pencil-alt mr-1" aria-hidden="true"></i> {{ commons.translate('dialog.buttons.edit') }}</a>
                   <button v-on:click="command.visible = !command.visible; sendUpdate(command._id)" class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1" v-bind:class="[ command.visible ? 'fa-eye' : 'fa-eye-slash' ]" aria-hidden="true"></i> {{ (command.visible ? commons.translate('visible') : commons.translate('hidden')) | capitalize }}</button>
-                  <button id="permissionsMenuButton" data-toggle="dropdown" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-key mr-1" aria-hidden="true"></i> {{ commons.translate('permission') }}</button>
-                  <div class="dropdown-menu" aria-labelledby="permissionsMenuButton">
-                    <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 1)">{{ commons.translate('systems.customcommands.forViewers') | capitalize }}</a>
-                    <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 2)">{{ commons.translate('systems.customcommands.forRegulars') | capitalize }}</a>
-                    <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 3)">{{ commons.translate('systems.customcommands.forMods') | capitalize }}</a>
-                    <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 0)">{{ commons.translate('systems.customcommands.forOwners') | capitalize }}</a>
-                  </div>
                   <button v-on:click="command.enabled = !command.enabled; sendUpdate(command._id)"  class="btn btn-outline-dark p-3 border-0"><i class="fas mr-1"  v-bind:class="[ command.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i> {{ command.enabled ? commons.translate('enabled') : commons.translate('disabled') }}</button>
                   <button type="button" type="button" v-on:click="deleteCommand(command._id)" class="btn btn-outline-dark p-3 border-0"><i class="far fa-trash-alt mr-1" aria-hidden="true"></i> {{ commons.translate('delete') }}</button>
                 </div>
@@ -79,23 +96,39 @@
               {{ command.count }}
             </div>
             <div class="col-md-8" style="word-break: break-word" v-bind:style="{ opacity: !command.visible ? 0.6 : 1 }">
-              <ol>
-                <li v-for="(r, i) of _.orderBy(command.responses, 'order', 'asc')">
-                    <text-with-tags v-bind:value='r.response'></text-with-tags>
-                </li>
-              </ol>
+              <template v-for="(r, i) of _.orderBy(command.responses, 'order', 'asc')">
+                <div :style="{ 'margin-top': i !== 0 ? '15px' : 'inherit' }" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: -3px;">
+                  <span style="display: inline-block">
+                    {{commons.translate('response')}}#{{i + 1}}
+                  </span>
+
+                  <span style="display: inline-block">
+                    <button data-toggle="dropdown" class="btn btn-outline-dark border-0" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i> {{ r.permission | permissionToString }}</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 1)">{{ commons.translate('systems.customcommands.forViewers') | capitalize }}</a>
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 2)">{{ commons.translate('systems.customcommands.forRegulars') | capitalize }}</a>
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 3)">{{ commons.translate('systems.customcommands.forMods') | capitalize }}</a>
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, r._id, 0)">{{ commons.translate('systems.customcommands.forOwners') | capitalize }}</a>
+                    </div>
+                  </span>
+
+                  <span style="display: inline-block">
+                    <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">
+                      <i class="fas mr-1" :class="[r.stopIfExecuted ? 'fa-stop' : 'fa-play']" aria-hidden="true"></i>
+                      {{ commons.translate(r.stopIfExecuted ? 'commons.stop-if-executed' : 'commons.continue-if-executed') | capitalize }}</button>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updateStopIfExecuted(command._id, r._id, true)">{{ commons.translate('commons.stop-if-executed') | capitalize }}</a>
+                      <a class="dropdown-item" style="cursor: pointer" v-on:click="updateStopIfExecuted(command._id, r._id, false)">{{ commons.translate('commons.continue-if-executed') | capitalize }}</a>
+                    </div>
+                  </span>
+                </div>
+                <text-with-tags v-bind:value='r.response'></text-with-tags>
+            </template>
             </div>
             <div class="col-md-2">
               <div class="p-0 text-right">
                 <a v-bind:href="'?id='+ command._id + '#customcommands/edit'" v-bind:title="commons.translate('dialog.buttons.edit')" class="btn btn-outline-dark p-1 border-0"><i class="fas fa-pencil-alt m-1" aria-hidden="true"></i></a>
                 <button v-bind:title="(command.visible ? commons.translate('visible') : commons.translate('hidden'))" v-on:click="command.visible = !command.visible; sendUpdate(command._id)" class="btn btn-outline-dark p-1 border-0"><i class="fas m-1" v-bind:class="[ command.visible ? 'fa-eye' : 'fa-eye-slash' ]" aria-hidden="true"></i></button>
-                <button id="permissionsMenuButton" data-toggle="dropdown" v-bind:title="commons.translate('permission')" class="btn btn-outline-dark p-1 border-0"><i class="fas fa-key m-1" aria-hidden="true"></i></button>
-                <div class="dropdown-menu" aria-labelledby="permissionsMenuButton">
-                  <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 1)">{{ commons.translate('systems.customcommands.forViewers') | capitalize }}</a>
-                  <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 2)">{{ commons.translate('systems.customcommands.forRegulars') | capitalize }}</a>
-                  <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 3)">{{ commons.translate('systems.customcommands.forMods') | capitalize }}</a>
-                  <a class="dropdown-item" style="cursor: pointer" v-on:click="updatePermission(command._id, 0)">{{ commons.translate('systems.customcommands.forOwners') | capitalize }}</a>
-                </div>
                 <button v-bind:title="command.enabled ? commons.translate('enabled') : commons.translate('disabled')" v-on:click="command.enabled = !command.enabled; sendUpdate(command._id)"  class="btn btn-outline-dark p-1 border-0"><i class="fas m-1"  v-bind:class="[ command.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i></button>
                 <button type="button" v-on:click="deleteCommand(command._id)" v-bind:title="commons.translate('delete')" class="btn btn-outline-dark p-1 border-0"><i class="far fa-trash-alt m-1" aria-hidden="true"></i></button>
 
@@ -177,11 +210,17 @@
         }
       },
       methods: {
-        updatePermission: function (id, permission) {
-          let command = this.commands.filter((o) => o._id === id)[0]
-          command.permission = permission
-          this.socket.emit('update', [command])
-
+        updatePermission: function (cid, rid, permission) {
+          let command = this.commands.filter((o) => o._id === cid)[0]
+          let response = command.responses.filter((o) => o._id === rid)[0]
+          response.permission = permission
+          this.socket.emit('update.command', {items: [command]})
+        },
+        updateStopIfExecuted: function (cid, rid, stopIfExecuted) {
+          let command = this.commands.filter((o) => o._id === cid)[0]
+          let response = command.responses.filter((o) => o._id === rid)[0]
+          response.stopIfExecuted = stopIfExecuted
+          this.socket.emit('update.command', {items: [command]})
         },
         deleteCommand: function (id) {
           this.socket.emit('delete', {_id: id}, () => {
@@ -189,7 +228,7 @@
           })
         },
         sendUpdate: function (_id) {
-          this.socket.emit('update', this.commands.filter((o) => o._id === _id))
+          this.socket.emit('update.command', {items: this.commands.filter((o) => o._id === _id)})
         }
       }
     })
