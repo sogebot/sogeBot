@@ -27,6 +27,7 @@ EventList.prototype.add = async function (data) {
     event: data.type,
     timestamp: _.now(),
     username: data.username,
+    autohost: _.isNil(data.autohost) ? undefined : data.autohost,
     message: _.isNil(data.message) ? undefined : data.message,
     amount: _.isNil(data.amount) ? undefined : data.amount,
     currency: _.isNil(data.currency) ? undefined : data.currency,
