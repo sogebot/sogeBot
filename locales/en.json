@@ -488,6 +488,7 @@
     "overlays-eventlist-follow": "follow",
     "overlays-eventlist-cheer": "bits",
     "overlays-eventlist-tip": "tip",
+    "overlays-eventlist-raid": "raid",
     "requested-by": "Requested by",
     "description": "Description",
     "raffle-type": "Raffle type",
