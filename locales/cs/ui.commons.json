@@ -2,5 +2,7 @@
   "never": "nikdy",
   "reset": "resetovat",
   "moveUp": "posunout nahoru",
-  "moveDown": "posunout dolů"
+  "moveDown": "posunout dolů",
+  "stop-if-executed": "po provedení nepokračuje",
+  "continue-if-executed": "po provedení pokračuje"
 }

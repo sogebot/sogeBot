@@ -43,8 +43,8 @@ class Permissions {
 
   async changeSocket (self, socket, data) {
     switch (data.permission) {
-      case 'viewer':
-        data.permission = constants.VIEWERS
+      case 'owner':
+        data.permission = constants.OWNER_ONLY
         break
       case 'mods':
         data.permission = constants.MODS
@@ -56,7 +56,7 @@ class Permissions {
         data.permission = constants.REGULAR
         break
       default:
-        data.permission = constants.OWNER_ONLY
+        data.permission = constants.VIEWERS
     }
     await global.db.engine.update('permissions', { key: data.id }, { key: data.id, permission: data.permission })
   }
@@ -99,6 +99,21 @@ class Permissions {
       }
     } catch (e) {
       global.commons.sendMessage(global.translate('permissions.failed.parse'), opts.sender)
+    }
+  }
+
+  stringToNumber (level) {
+    switch (level) {
+      case 'viewer':
+        return constants.VIEWERS
+      case 'mods':
+        return constants.MODS
+      case 'disable':
+        return constants.DISABLE
+      case 'regular':
+        return constants.REGULAR
+      default:
+        return constants.OWNER_ONLY
     }
   }
 }

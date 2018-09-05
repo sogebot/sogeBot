@@ -7,7 +7,6 @@ module.exports = {
         return setTimeout(() => waitForIt(resolve, reject), 10)
       }
       await global.db.engine.remove('systems.alias', {})
-      await global.db.engine.remove('systems.customcommands', {})
       await global.db.engine.remove('systems.keywords', {})
       await global.db.engine.remove('systems.cooldown', {})
       await global.db.engine.remove('systems.cooldown.viewers', {})
@@ -46,6 +45,11 @@ module.exports = {
       // remove raffles
       await global.db.engine.remove(global.systems.raffles.collection.settings, {})
       await global.db.engine.remove(global.systems.raffles.collection.data, {})
+
+      // remove custom commands
+      await global.db.engine.remove(global.systems.customCommands.collection.settings, {})
+      await global.db.engine.remove(global.systems.customCommands.collection.data, {})
+      await global.db.engine.remove(global.systems.customCommands.collection.responses, {})
 
       resolve()
     }
