@@ -11,7 +11,7 @@ class Expects {
   checkText () {
     if (_.isNil(this.text)) throw Error('Text cannot be null')
     if (this.text.trim().length === 0) throw Error('Expected more parameters')
-    this.text = this.text.trim()
+    this.text = this.text.replace(/\s\s+/g, ' ').trim()
   }
 
   check (text) {
@@ -88,12 +88,12 @@ class Expects {
     if (!opts.optional) this.checkText()
 
     let pattern
-    if (opts.multi) pattern = '.*'
-    else if (opts.type.name === 'Number') pattern = '[0-9]*'
-    else if (opts.type.name === 'Boolean') pattern = 'true|false'
-    else pattern = '.*?\\s'
+    if (opts.type.name === 'Number') pattern = '\\s[0-9]*'
+    else if (opts.type.name === 'Boolean') pattern = '\\strue|false'
+    else if (!opts.multi) pattern = '\\s\\w+'
+    else pattern = '(?:(?!\\s-[a-zA-Z]).)*' // capture until -something or [^-]*
 
-    const regexp = XRegExp(`-${opts.name}\\s${opts.delimiter}(?<${opts.name}> ${pattern})${opts.delimiter}`, 'ix')
+    const regexp = XRegExp(`-${opts.name}${opts.delimiter}(?<${opts.name}>${pattern})${opts.delimiter}`, 'ix')
     const match = XRegExp.exec(this.text, regexp)
     if (!_.isNil(match) && match[opts.name].trim().length !== 0) {
       if (opts.type.name === 'Boolean') {
@@ -101,7 +101,7 @@ class Expects {
       } else {
         this.match.push(opts.type(match[opts.name].trim()))
       }
-      this.text = this.text.replace(`-${opts.name} ${opts.delimiter}${match[opts.name]}${opts.delimiter}`, '') // remove from text matched pattern
+      this.text = this.text.replace(match[0], '') // remove from text matched pattern
     } else {
       if (!opts.optional) throw Error('Argument not found')
       else this.match.push(opts.default)
