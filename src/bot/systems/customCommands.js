@@ -16,8 +16,8 @@ const Expects = require('../expects')
 
 /*
  * !command                                                                              - gets an info about command usage
- * !command add ?-ul=owner|mod|regular|viewer ?-s=true|false ![cmd] [response]           - add command with specified response
- * !command edit ?-ul=owner|mod|regular|viewer ?-s=true|false ![cmd] [number] [response] - edit command with specified response
+ * !command add ?-ul owner|mod|regular|viewer ?-s true|false ![cmd] [response]           - add command with specified response
+ * !command edit ?-ul owner|mod|regular|viewer ?-s true|false ![cmd] [number] [response] - edit command with specified response
  * !command remove ![cmd]                                                                - remove specified command
  * !command remove ![cmd] [number]                                                       - remove specified response of command
  * !command toggle ![cmd]                                                                - enable/disable specified command
