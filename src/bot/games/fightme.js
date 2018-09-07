@@ -34,10 +34,12 @@ class FightMe extends Game {
   async main (opts) {
     opts.sender['message-type'] = 'chat' // force responses to chat
     var username
+    var userId
 
     debug(opts)
     try {
       username = opts.parameters.trim().match(/^@?([\S]+)$/)[1].toLowerCase()
+      userId = await global.users.getByName(username).id
       opts.sender.username = opts.sender.username.toLowerCase()
     } catch (e) {
       debug(e)
@@ -58,7 +60,7 @@ class FightMe extends Game {
       let winner = _.random(0, 1, false)
       let isMod = {
         user: await global.commons.isMod(username),
-        sender: await global.commons.isMod(opts.sender)
+        sender: await global.commons.isMod(opts.sender.username)
       }
 
       // vs broadcaster
@@ -96,8 +98,8 @@ class FightMe extends Game {
 
       debug('user vs user')
       const [winnerWillGet, loserWillLose] = await Promise.all([this.settings.winnerWillGet, this.settings.loserWillLose])
-      global.db.engine.insert('users.points', { username: winner ? opts.sender.username : username, points: Math.abs(Number(winnerWillGet)) })
-      global.db.engine.insert('users.points', { username: !winner ? opts.sender.username : username, points: -Math.abs(Number(loserWillLose)) })
+      global.db.engine.insert('users.points', { id: winner ? opts.sender.userId : userId, points: Math.abs(Number(winnerWillGet)) })
+      global.db.engine.insert('users.points', { id: !winner ? opts.sender.userId : userId, points: -Math.abs(Number(loserWillLose)) })
 
       global.commons.timeout(winner ? opts.sender.username : username, null, await this.settings.timeout)
       global.commons.sendMessage(await global.commons.prepare('gambling.fightme.winner', { username, winner: winner ? username : opts.sender.username }), opts.sender)

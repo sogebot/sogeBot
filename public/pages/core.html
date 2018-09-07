@@ -5,7 +5,7 @@
         <span class="title text-default mb-2">
           {{ commons.translate('menu.settings') }}
           <small><i class="fas fa-angle-right"></i></small>
-          {{ commons.translate('menu.systems') }}
+          {{ commons.translate('menu.core') }}
           <template v-if="selectedSystem">
             <small><i class="fas fa-angle-right"></i></small>
             {{ commons.translate('menu.' + selectedSystem) }}
@@ -81,16 +81,6 @@
                 v-on:click="setSystem(system.name)"
               >
                 {{ commons.translate('menu.' + system.name) }}
-
-                <small
-                  :class="[ system.enabled && !system.isDisabledByEnv && system.areDependenciesEnabled ? 'text-success' : 'text-danger' ]"
-                  style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"
-                >
-                  <template v-if="system.isDisabledByEnv">DISABLED BY ENV</template>
-                  <template v-if="!system.enabled">{{ commons.translate('disabled') }}</template>
-                  <template v-else-if="!system.areDependenciesEnabled">DEPENDENCIES DISABLED</template>
-                  <template v-else>{{ commons.translate('enabled') }}</template>
-                </small>
               </button>
             </div>
           </div>
@@ -134,9 +124,9 @@
       computed: {
       },
       created: function () {
-        this.socket._panel.emit('systems', (err, systems) => {
+        this.socket._panel.emit('core', (err, systems) => {
           for (let system of systems) {
-            this.socket[system.name] = io(`/systems/${system.name}`, { query: "token=" + token })
+            this.socket[system.name] = io(`/core/${system.name}`, { query: "token=" + token })
           }
           this.listOfSystems = systems
           this.selectedSystem = systems[0].name
@@ -156,15 +146,13 @@
             let _settings = _(settings).toPairs().value()
 
             // sorting
-            // enabled is first
             this.settings.settings = {}
-            this.settings.settings.enabled = _(_settings.filter(o => o[0] === 'enabled')).flatten().value()[1]
-            // everything else except commands and enabled and are string|number|bool
-            for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
+            // everything else except commands and are string|number|bool
+            for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'commands' && o[0] !== 'enabled' && typeof o[1] !== 'object')).value()) {
               this.settings.settings[name] = value
             }
-            // everything else except commands and enabled and are objects -> own category
-            for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')).value()) {
+            // everything else except commands and are objects -> own category
+            for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'commands' && o[0] !== 'enabled' && typeof o[1] === 'object')).value()) {
               this.settings[name] = value
             }
             // commands at last
@@ -206,7 +194,7 @@
             this.isDataChanged = false
             setTimeout(() => this.state.settings = 0, 1000)
             setTimeout(() => {
-              this.socket._panel.emit('systems', (err, systems) => {
+              this.socket._panel.emit('core', (err, systems) => {
                 this.listOfSystems = systems
               })
             })

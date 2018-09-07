@@ -94,7 +94,7 @@ class API {
     clearTimeout(this.timeouts['intervalFollowerUpdate'])
 
     for (let username of this.rate_limit_follower_check) {
-      const user = await global.users.get(username)
+      const user = await global.users.getByName(username)
       const isSkipped = user.username === config.settings.broadcaster_username || user.username === config.settings.bot_username.toLowerCase()
       const userHaveId = !_.isNil(user.id)
       if (new Date().getTime() - _.get(user, 'time.followCheck', 0) <= 1000 * 60 * 30 || isSkipped || !userHaveId) {
@@ -102,7 +102,7 @@ class API {
       }
     }
     if (this.rate_limit_follower_check.size > 0 && !_.isNil(global.overlays)) {
-      const user = await global.users.get(Array.from(this.rate_limit_follower_check)[0])
+      const user = await global.users.getByName(Array.from(this.rate_limit_follower_check)[0])
       this.rate_limit_follower_check.delete(user.username)
       await this.isFollowerUpdate(user)
     }
@@ -266,7 +266,7 @@ class API {
       // set subscribers
       for (let subscriber of subscribers) {
         if (subscriber.name === config.settings.broadcaster_username || subscriber.name === config.settings.bot_username.toLowerCase()) continue
-        await global.db.engine.update('users', { username: subscriber.name }, { is: { subscriber: true } })
+        await global.db.engine.update('users', { id: subscriber._id }, { username: subscriber.name, is: { subscriber: true } })
       }
     } catch (e) {
       const isChannelPartnerOrAffiliate =
@@ -495,7 +495,7 @@ class API {
         }
 
         for (let follower of followersUsername) {
-          let user = await global.users.get(follower)
+          let user = await global.users.getByName(follower)
           if (!_.get(user, 'is.follower', false)) {
             if (new Date().getTime() - moment(_.get(user, 'time.follow', 0)).format('X') * 1000 < 60000 * 60 && !global.webhooks.existsInCache('follow', user.id)) {
               global.webhooks.addIdToCache('follow', user.id)
@@ -512,11 +512,15 @@ class API {
           }
           try {
             if (!_.isNil(_.find(fTime, (o) => o.id === user.id))) {
-              DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Saving user %s\n%f', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
-              global.db.engine.update('users', { username: follower }, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x')) } })
+              const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x'))
+              const isFollower = user.lock && user.lock.follower ? user.is.follower : true
+              DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Saving user %s\n%f', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: followedAt } })
+              global.db.engine.update('users', { id: user.id }, { is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
             } else {
-              DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Saving user %s\n%f', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment().format('x')) } })
-              global.db.engine.update('users', { username: follower }, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment().format('x')) } })
+              const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment().format('x'))
+              const isFollower = user.lock && user.lock.follower ? user.is.follower : true
+              DEBUG_API_GET_LATEST_100_FOLLOWERS_USERS('Saving user %s\n%f', follower, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: followedAt } })
+              global.db.engine.update('users', { id: user.id }, { is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
             }
           } catch (e) {
             global.log.error(e)
@@ -1032,7 +1036,9 @@ class API {
         global.log.unfollow(user.username)
         global.events.fire('unfollow', { username: user.username })
       }
-      global.users.set(user.username, { is: { follower: false }, time: { followCheck: new Date().getTime(), follow: 0 } }, user.is.follower)
+      const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : 0
+      const isFollower = user.lock && user.lock.follower ? user.is.follower : false
+      global.users.setById(user.id, { username: user.username, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } }, user.is.follower)
     } else {
       // is follower
       if (!user.is.follower && new Date().getTime() - moment(request.data.data[0].followed_at).format('x') < 60000 * 60) {
@@ -1043,7 +1049,9 @@ class API {
         global.log.follow(user.username)
         global.events.fire('follow', { username: user.username })
       }
-      global.users.set(user.username, { is: { follower: true }, time: { followCheck: new Date().getTime(), follow: parseInt(moment(request.data.data[0].followed_at).format('x'), 10) } }, !user.is.follower)
+      const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment(request.data.data[0].followed_at).format('x'), 10)
+      const isFollower = user.lock && user.lock.follower ? user.is.follower : true
+      global.users.set(user.username, { id: user.id, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } }, !user.is.follower)
     }
   }
 }

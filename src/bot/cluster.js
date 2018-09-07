@@ -127,13 +127,15 @@ function cluster () {
 
     if (!isModerated && !isIgnored) {
       if (!skip && !_.isNil(sender.username)) {
-        let data = { id: sender.userId, is: { subscriber: sender.isSubscriber, mod: sender.isModerator }, username: sender.username }
+        let user = await global.db.engine.findOne('users', { id: sender.userId })
+        let data = { id: sender.userId, is: { subscriber: (user.lock && user.lock.subscriber ? undefined : sender.isSubscriber), mod: sender.isModerator }, username: sender.username }
+
         // mark user as online
         await global.db.engine.update('users.online', { username: sender.username }, { username: sender.username })
 
         if (!_.get(sender, 'isSubscriber', false) || !_.get(sender, 'isTurboSubscriber', false)) _.set(data, 'stats.tier', 0) // unset tier if sender is not subscriber
 
-        let user = await global.db.engine.findOne('users', { username: sender.username })
+        // update user based on id not username
         if (_.isEmpty(user)) await global.db.engine.insert('users', data)
         else await global.db.engine.update('users', { _id: String(user._id) }, data)
 
@@ -142,7 +144,7 @@ function cluster () {
         global.events.fire('keyword-send-x-times', { username: sender.username, message: message })
         if (message.startsWith('!')) {
           global.events.fire('command-send-x-times', { username: sender.username, message: message })
-        } else if (!message.startsWith('!')) global.db.engine.insert('users.messages', { username: sender.username, messages: 1 })
+        } else if (!message.startsWith('!')) global.db.engine.insert('users.messages', { id: sender.userId, messages: 1 })
       }
 
       DEBUG_CLUSTER_WORKER_ONMESSAGE_ID('Process parser')

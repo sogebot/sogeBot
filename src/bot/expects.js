@@ -2,9 +2,14 @@ const XRegExp = require('xregexp')
 const _ = require('lodash')
 
 class Expects {
-  constructor () {
-    this.originalText = null
-    this.text = null
+  constructor (text) {
+    if (text) {
+      this.originalText = text
+      this.text = text
+    } else {
+      this.originalText = null
+      this.text = null
+    }
     this.match = []
   }
 
@@ -15,6 +20,8 @@ class Expects {
   }
 
   check (text) {
+    console.warn('Calling deprecated function check(), set in constructor directly')
+    console.warn(new Error().stack)
     this.originalText = text
     this.text = text
     return this
@@ -44,14 +51,19 @@ class Expects {
 
   points (opts) {
     opts = opts || {}
-    _.defaults(opts, { optional: false })
+    _.defaults(opts, { optional: false, all: false })
     if (!opts.optional) this.checkText()
 
-    const regexp = XRegExp('(?<points> all|[0-9]* )', 'ix')
+    let regexp
+    if (opts.all) regexp = XRegExp('(?<points> all|[0-9]* )', 'ix')
+    else regexp = XRegExp('(?<points> [0-9]* )', 'ix')
     const match = XRegExp.exec(this.text, regexp)
 
     if (!_.isNil(match)) {
-      this.match.push(parseInt(match.points, 10))
+      this.match.push(parseInt(
+        Number(match.points) <= Number.MAX_SAFE_INTEGER / 1000000
+          ? match.points
+          : Number.MAX_SAFE_INTEGER / 1000000, 10)) // return only max safe
       this.text = this.text.replace(match.points, '') // remove from text matched pattern
     } else {
       if (!opts.optional) throw Error('Points not found')
@@ -105,6 +117,23 @@ class Expects {
     } else {
       if (!opts.optional) throw Error('Argument not found')
       else this.match.push(opts.default)
+    }
+    return this
+  }
+
+  username (opts) {
+    opts = opts || {}
+    _.defaults(opts, { optional: false })
+    if (!opts.optional) this.checkText()
+
+    const regexp = XRegExp(`@?(?<username>[A-Za-z0-9_]+)`, 'ix')
+    const match = XRegExp.exec(`${this.text}`, regexp)
+    if (!_.isNil(match)) {
+      this.match.push(match.username)
+      this.text = this.text.replace(match.username, '') // remove from text matched pattern
+    } else {
+      if (!opts.optional) throw Error('Username not found')
+      else this.match.push(null)
     }
     return this
   }

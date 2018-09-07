@@ -42,7 +42,7 @@ if (process.argv[2] && process.argv[2] === '--delete') {
 
 // db
 const Database = require('../dest/databases/database')
-global.db = new Database(true)
+global.db = new Database(false, true)
 
 var runMigration = async function () {
   if (!global.db.engine.connected) {
@@ -475,6 +475,163 @@ let migration = {
     }
   }],
   users: [{
+    version: '8.1.0',
+    do: async () => {
+      console.info('Translating points from username to id')
+      let points = await global.db.engine.find('users.points')
+      let updated = 0
+      for (let p of points) {
+        if (p.username) {
+          let user = await global.db.engine.findOne('users', { username: p.username })
+          await global.db.engine.remove('users.points', { username: p.username })
+          delete p.username; delete p._id
+          if (user.id) {
+            p.id = user.id
+            await global.db.engine.insert('users.points', p)
+          }
+          updated++
+        }
+      }
+      console.info(` => ${updated} items moved to ids key`)
+    }
+  }, {
+    version: '8.1.0',
+    do: async () => {
+      console.info('Translating tips from username to id')
+      let points = await global.db.engine.find('users.tips')
+      let updated = 0
+      for (let p of points) {
+        if (p.username) {
+          let user = await global.db.engine.findOne('users', { username: p.username })
+          await global.db.engine.remove('users.tips', { username: p.username })
+          delete p.username; delete p._id
+          if (user.id) {
+            p.id = user.id
+            await global.db.engine.insert('users.tips', p)
+          }
+          updated++
+        }
+      }
+      console.info(` => ${updated} items moved to ids key`)
+    }
+  }, {
+    version: '8.1.0',
+    do: async () => {
+      console.info('Translating bits from username to id')
+      let points = await global.db.engine.find('users.bits')
+      let updated = 0
+      for (let p of points) {
+        if (p.username) {
+          let user = await global.db.engine.findOne('users', { username: p.username })
+          await global.db.engine.remove('users.bits', { username: p.username })
+          delete p.username; delete p._id
+          if (user.id) {
+            p.id = user.id
+            await global.db.engine.insert('users.bits', p)
+          }
+          updated++
+        }
+      }
+      console.info(` => ${updated} items moved to ids key`)
+    }
+  }, {
+    version: '8.1.0',
+    do: async () => {
+      console.info('Translating messages from username to id')
+      let points = await global.db.engine.find('users.messages')
+      let updated = 0
+      for (let p of points) {
+        if (p.username) {
+          let user = await global.db.engine.findOne('users', { username: p.username })
+          await global.db.engine.remove('users.messages', { username: p.username })
+          delete p.username; delete p._id
+          if (user.id) {
+            p.id = user.id
+            await global.db.engine.insert('users.messages', p)
+          }
+          updated++
+        }
+      }
+      console.info(` => ${updated} items moved to ids key`)
+    }
+  }, {
+    version: '8.1.0',
+    do: async () => {
+      console.info('Translating watched from username to id')
+      let points = await global.db.engine.find('users.watched')
+      let updated = 0
+      for (let p of points) {
+        if (p.username) {
+          let user = await global.db.engine.findOne('users', { username: p.username })
+          await global.db.engine.remove('users.watched', { username: p.username })
+          delete p.username; delete p._id
+          if (user.id) {
+            p.id = user.id
+            await global.db.engine.insert('users.watched', p)
+          }
+          updated++
+        }
+      }
+      console.info(` => ${updated} items moved to ids key`)
+    }
+  }, {
+    version: '8.1.0',
+    do: async () => {
+      console.info('Merging users with same id')
+      let users = await global.db.engine.find('users')
+      let updated = 0
+      let removed = 0
+      let alreadyMergedIds = []
+      for (let user of users) {
+        if (!user.id) {
+          await global.db.engine.remove('users', { _id: String(user._id) })
+          removed++
+        } else {
+          let data = {
+            id: user.id,
+            is: {
+              mod: false,
+              regular: false,
+              subscriber: false,
+              follower: false
+            },
+            time: {}
+          }
+          let toMerge = users.filter(o => String(o.id) === String(user.id))
+          if (toMerge.length > 1 && !alreadyMergedIds.includes(user.id)) {
+            updated++
+            alreadyMergedIds.push(user.id)
+            // get possible latest username
+            let followCheck = 0
+            for (let u of toMerge) {
+              if (typeof u.time !== 'undefined' && new Date(followCheck).getTime() < new Date(u.time.followCheck).getTime()) {
+                data.username = u.username
+                followCheck = new Date(u.time.followCheck).getTime()
+              }
+              await global.db.engine.remove('users', { _id: String(u._id) })
+
+              if (typeof u.is !== 'undefined') {
+                if (u.is.mod) data.is.mod = true
+                if (u.is.regular) data.is.regular = true
+                if (u.is.subscriber) data.is.subscriber = true
+                if (u.is.follower) data.is.follower = true
+              }
+
+              if (typeof u.time !== 'undefined') {
+                if (u.time.created_at) data.time.created_at = u.time.created_at
+                if (u.time.subscribed_at) data.time.subscribed_at = u.time.subscribed_at
+                if (u.time.follow) data.time.follow = u.time.follow
+                if (u.time.message && data.time.message < u.time.message) data.time.message = u.time.message
+              }
+            }
+            await global.db.engine.insert('users', data)
+          }
+        }
+      }
+      console.info(` => ${updated} merged users`)
+      console.info(` => ${removed} removed users without id`)
+    }
+  }, {
     version: '8.0.0',
     do: async () => {
       console.info('Migration of watched stats')

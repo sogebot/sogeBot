@@ -247,6 +247,16 @@ function Panel () {
       }
       cb(null, toEmit)
     })
+    socket.on('core', async (cb) => {
+      let toEmit = []
+      for (let system of ['users']) {
+        if (!global[system].settings) continue
+        toEmit.push({
+          name: system.toLowerCase()
+        })
+      }
+      cb(null, toEmit)
+    })
     socket.on('games', async (cb) => {
       let toEmit = []
       for (let system of Object.keys(global.games).filter(o => !o.startsWith('_'))) {

@@ -8,8 +8,8 @@ const message = require('../../general.js').message
 const _ = require('lodash')
 
 const owner = { username: 'soge__' }
-const user1 = { username: 'user1' }
-const user2 = { username: 'user2' }
+const user1 = { username: 'user1', userId: '1' }
+const user2 = { username: 'user2', userId: '2' }
 const command = '!duel'
 
 describe('Gambling - duel', () => {
@@ -20,8 +20,8 @@ describe('Gambling - duel', () => {
 
   describe('#914 - user1 is not correctly added to duel, if he is challenger', () => {
     it('add points for users', async () => {
-      await global.db.engine.insert('users.points', { username: user1.username, points: 100 })
-      await global.db.engine.insert('users.points', { username: user2.username, points: 100 })
+      await global.db.engine.insert('users.points', { id: user1.userId, points: 100 })
+      await global.db.engine.insert('users.points', { id: user2.userId, points: 100 })
     })
 
     it('user 1 is challenging', async () => {

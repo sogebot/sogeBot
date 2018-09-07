@@ -182,11 +182,11 @@ class Ranks extends System {
   async get (user) {
     debug('update()')
 
-    if (!_.isObject(user)) user = await global.users.get(user)
+    if (!_.isObject(user)) user = await global.users.getByName(user)
     if (!_.isNil(user.custom.rank)) return user.custom.rank
 
     let [watched, ranks] = await Promise.all([
-      global.users.getWatchedOf(user.username),
+      global.users.getWatchedOf(user.id),
       global.db.engine.find(this.collection.data)
     ])
     let rankToReturn = null

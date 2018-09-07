@@ -163,7 +163,10 @@ class Webhooks {
           type: 'follow',
           username: userGetFromApi.data.data[0].login
         })
-        await global.db.engine.update('users', { username: userGetFromApi.data.data[0].login }, { id: fid, username: userGetFromApi.data.data[0].login, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
+
+        const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(_.now(), 10)
+        const isFollower = user.lock && user.lock.follower ? user.is.follower : true
+        await global.db.engine.update('users', { username: userGetFromApi.data.data[0].login }, { id: fid, username: userGetFromApi.data.data[0].login, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
         global.log.follow(userGetFromApi.data.data[0].login)
         debug('Firing follow event'); global.events.fire('follow', { username: userGetFromApi.data.data[0].login }) // we can safely fire event as user doesn't exist in db
       }
@@ -182,7 +185,11 @@ class Webhooks {
       }
 
       if (!_.get(user, 'is.follower', false)) global.users.set(user.username, { id: fid, time: { followCheck: new Date().getTime() } })
-      else global.users.set(user.username, { id: fid, is: { follower: true }, time: { followCheck: new Date().getTime(), follow: _.now() } })
+      else {
+        const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(_.now(), 10)
+        const isFollower = user.lock && user.lock.follower ? user.is.follower : true
+        global.users.set(user.username, { id: fid, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
+      }
     }
   }
 

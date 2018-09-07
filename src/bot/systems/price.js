@@ -115,20 +115,20 @@ class Price extends System {
       helpers.includes(opts.message)
     ) return true
 
-    const [user, price] = await Promise.all([global.users.get(opts.sender.username), global.db.engine.findOne(this.collection.data, { command: parsed[1], enabled: true })])
+    const price = await global.db.engine.findOne(this.collection.data, { command: parsed[1], enabled: true })
 
     if (_.isEmpty(price)) { // no price set
       return true
     }
 
-    var availablePts = await global.systems.points.getPointsOf(user.username)
+    var availablePts = await global.systems.points.getPointsOf(opts.sender.userId)
     var removePts = parseInt(price.price, 10)
     let haveEnoughPoints = availablePts >= removePts
     if (!haveEnoughPoints) {
       let message = await global.commons.prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await global.systems.points.getPointsName(removePts) })
       debug(message); global.commons.sendMessage(message, opts.sender)
     } else {
-      await global.db.engine.insert('users.points', { username: opts.sender.username, points: (removePts * -1) })
+      await global.db.engine.insert('users.points', { id: opts.sender.userId, points: (removePts * -1) })
     }
     return haveEnoughPoints
   }

@@ -1,0 +1,362 @@
+<div id="coreViewersApp">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <span data-lang="menu.viewers" class="title text-default"></span>
+        <template v-if="!loaded">
+          <div class="alert alert-info"><i class="fas fa-circle-notch fa-spin"></i> Loading users data, this <strong>may</strong> take a while.</div>
+        </template>
+        <div v-else class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
+          <div class="col-sm-12 text-right form-inline d-block">
+            <div class="d-inline-block float-left">
+              <div class="dropdown d-inline-block">
+                <div class="btn-group" role="group">
+                  <button class="btn border-0 btn-outline-dark " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                      <template v-if="sort === 'username'">{{ commons.translate('username') }}</template>
+                      <template v-if="sort === 'sort.message'">{{ commons.translate('last-seen') }}</template>
+                      <template v-if="sort === 'sort.watched'">{{ commons.translate('watched-time') }}</template>
+                      <template v-if="sort === 'sort.follow'">{{ commons.translate('followed-since') }}</template>
+                      <template v-if="sort === 'sort.subscribed_at'">{{ commons.translate('subscribed-since') }}</template>
+                      <template v-if="sort === 'points'">{{ commons.translate('points') }}</template>
+                      <template v-if="sort === 'stats.messages'">{{ commons.translate('messages') }}</template>
+                      <template v-if="sort === 'stats.tips'">{{ commons.translate('tips') }}</template>
+                      <template v-if="sort === 'stats.bits'">{{ commons.translate('bits') }}</template>
+                    </span>
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" @click="sort = 'username'; sortOrder = 'asc'">{{ commons.translate('username') }}</a>
+                    <a class="dropdown-item" @click="sort = 'sort.message'; sortOrder = 'desc'">{{ commons.translate('last-seen') }}</a>
+                    <a class="dropdown-item" @click="sort = 'sort.watched'; sortOrder = 'desc'">{{ commons.translate('watched-time') }}</a>
+                    <a class="dropdown-item" @click="sort = 'sort.follow'; sortOrder = 'desc'">{{ commons.translate('followed-since') }}</a>
+                    <a class="dropdown-item" @click="sort = 'sort.subscribed_at'; sortOrder = 'desc'">{{ commons.translate('subscribed-since') }}</a>
+                    <a class="dropdown-item" @click="sort = 'points'; sortOrder = 'desc'">{{ commons.translate('points') }}</a>
+                    <a class="dropdown-item" @click="sort = 'stats.messages'; sortOrder = 'desc'">{{ commons.translate('messages') }}</a>
+                    <a class="dropdown-item" @click="sort = 'stats.tips'; sortOrder = 'desc'">{{ commons.translate('tips') }}</a>
+                    <a class="dropdown-item" @click="sort = 'stats.bits'; sortOrder = 'desc'">{{ commons.translate('bits') }}</a>
+                  </div>
+                  <button class="btn border-0 btn-outline-dark" @click="sortOrder = sortOrder === 'asc' ? 'desc': 'asc'">
+                      <i v-if="sortOrder === 'asc'" class="fas fa-sort-alpha-down"></i>
+                      <i v-else class="fas fa-sort-alpha-up"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="dropdown d-inline-block">
+                <div class="btn-group" role="group">
+                  <button class="btn border-0 btn-outline-dark " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                      {{ commons.translate('commons.reset') }}
+                    </span>
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" @click="resetPoints">{{ commons.translate('points') }}</a>
+                    <a class="dropdown-item" @click="resetWatchedTime">{{ commons.translate('watched-time') }}</a>
+                    <a class="dropdown-item" @click="resetMessages">{{ commons.translate('messages') }}</a>
+                    <a class="dropdown-item" @click="resetBits">{{ commons.translate('bits') }}</a>
+                    <a class="dropdown-item" @click="resetTips">{{ commons.translate('tips') }}</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-inline-block">
+              <div class="btn-group" role="group">
+                <button :disabled="page === 1" class="btn border-0 btn-outline-dark" @click="page = 1"><i class="fas fa-step-backward"></i></button>
+                <button :disabled="page === 1" class="btn border-0 btn-outline-dark" @click="page = page - 1"><i class="fas fa-backward"></i></button>
+                <input class="form-control" v-model="page" :style="{ 'width' : (String(totalPages).length + 1.1) +'em'}" style="text-align: center">
+                <button :disabled="page === totalPages" class="btn border-0 btn-outline-dark" @click="page = page + 1"><i class="fas fa-forward"></i></button>
+                <button :disabled="page === totalPages" class="btn border-0 btn-outline-dark" @click="page = totalPages"><i class="fas fa-step-forward"></i></button>
+              </div>
+            </div>
+
+            <div class="btn-group" role="group">
+              <button v-if="filter.regulars === null" class="btn border-0 btn-outline-dark" @click="filter.regulars = true">
+                <i class="fas fa-question fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">regular</strong>
+              </button>
+              <button v-else-if="filter.regulars" class="btn border-0 btn-outline-success" @click="filter.regulars = false">
+                <i class="fas fa-check fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">regular</strong>
+              </button>
+              <button v-else class="btn border-0 btn-outline-danger" @click="filter.regulars = null">
+                <i class="fas fa-exclamation fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">regular</strong>
+              </button>
+
+              <button v-if="filter.active === null" class="btn border-0 btn-outline-dark" @click="filter.active = true">
+                <i class="fas fa-question fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">active</strong>
+              </button>
+              <button v-else-if="filter.active" class="btn border-0 btn-outline-success" @click="filter.active = false">
+                <i class="fas fa-check fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">active</strong>
+              </button>
+              <button v-else class="btn border-0 btn-outline-danger" @click="filter.active = null">
+                <i class="fas fa-exclamation fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">active</strong>
+              </button>
+
+              <button v-if="filter.subscribers === null" class="btn border-0 btn-outline-dark" @click="filter.subscribers = true">
+                <i class="fas fa-question fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">subscribers</strong>
+              </button>
+              <button v-else-if="filter.subscribers" class="btn border-0 btn-outline-success" @click="filter.subscribers = false">
+                <i class="fas fa-check fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">subscribers</strong>
+              </button>
+              <button v-else class="btn border-0 btn-outline-danger" @click="filter.subscribers = null">
+                <i class="fas fa-exclamation fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">subscriber</strong>
+              </button>
+
+              <button v-if="filter.followers === null" class="btn border-0 btn-outline-dark" @click="filter.followers = true">
+                <i class="fas fa-question fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">followers</strong>
+              </button>
+              <button v-else-if="filter.followers" class="btn border-0 btn-outline-success" @click="filter.followers = false">
+                <i class="fas fa-check fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">followers</strong>
+              </button>
+              <button v-else class="btn border-0 btn-outline-danger" @click="filter.followers = null">
+                <i class="fas fa-exclamation fa-fw"></i> <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">follower</strong>
+              </button>
+            </div>
+
+            <button class="btn border-0" v-on:click="showAs='cards'" v-bind:class="[ showAs === 'cards' ? 'btn-dark' : 'btn-outline-dark' ]"><i class="fas fa-th-large"></i></button>
+            <i class="fas fa-search text-muted" style="position: relative; left: 2.2rem;"></i>
+            <input type="search" class="form-control w-auto pl-5" v-model="search" placeholder="Search...">
+          </div>
+        </div>
+
+        <div v-if="showAs === 'cards' && itemsPaged.length > 0" class="card" v-for="(item, index) of itemsPaged" v-bind:class="{ 'mt-3': index !== 0 }">
+          <a v-bind:href="'?id='+ item.id + '#viewers/edit'" class="btn btn-block btn-outline-dark border-0 h-100 text-left p-0">
+            <div class="card-body p-0 row">
+              <div class="col-3 pl-4 pr-4 pt-2 pb-2">
+                <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('username')}}</div>
+                <div class="font-weight-bold  text-primary" style="font-size: 1.5rem">{{ item.username }}</div>
+
+                <strong class="badge" :class="[ item.is.online ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                  active
+                </strong>
+                <strong class="badge" :class="[ item.is.regular ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                  regular
+                </strong>
+                <strong class="badge" :class="[ item.is.follower ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                  <i v-if="item.lock.follower" class="fas fa-lock"></i>
+                  follower
+                </strong>
+                <strong class="badge" :class="[ item.is.subscriber ? 'badge-success' : 'badge-danger' ]" style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                  <i v-if="item.lock.subscriber" class="fas fa-lock"></i>
+                  subscriber
+                </strong>
+              </div>
+              <div class="col-3 pl-4 pr-4 pt-2 pb-2">
+                <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('date')}}</div>
+                <div v-if="item.time.message"><strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('last-seen') }}:</strong> {{ moment(_.get(item, 'time.message', 0)).format('LLL') }}</div>
+                <div v-if="item.time.follow && item.is.follower">
+                  <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                    <i v-if="item.lock.followed_at" class="fas fa-lock"></i>
+                    {{ commons.translate('followed-since') }}:
+                  </strong>
+                  {{ moment(_.get(item, 'time.follow', 0)).format('LLL') }}</div>
+                <div v-if="item.time.subscribed_at && item.is.subscriber">
+                  <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                      <i v-if="item.lock.subscribed_at" class="fas fa-lock"></i>
+                    {{ commons.translate('subscribed-since') }}:
+                  </strong>
+                  {{ moment(_.get(item, 'time.subscribed_at', 0)).format('LLL') }}</div>
+              </div>
+              <div class="col-2 pl-4 pr-4 pt-2 pb-2">
+                <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('stats')}}</div>
+                <div>
+                  <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                    {{ commons.translate('messages') }}:
+                  </strong>
+                  {{ item.stats.messages }}
+                </div>
+                <div>
+                  <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                    {{ commons.translate('points') }}:
+                  </strong>
+                  {{ item.points }}
+                </div>
+              </div>
+              <div class="col-2 pl-4 pr-4 pt-2 pb-2">
+                <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">&nbsp;</div>
+                <div>
+                  <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                    {{ commons.translate('tips') }}:
+                  </strong>
+                  {{ Number(item.stats.tips).toFixed(2) }}{{ item.custom.currency }}
+                </div>
+                <div>
+                  <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                    {{ commons.translate('bits') }}:
+                  </strong>
+                  {{ item.stats.bits }}
+                </div>
+              </div>
+              <div class="col-2 pl-4 pr-4 pt-2 pb-2">
+                <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">&nbsp;</div>
+                <div v-if="item.is.subscriber && item.stats.tier">
+                  <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                    {{ commons.translate('tier') }}:
+                  </strong>
+                  {{ item.stats.tier }}
+                </div>
+                <div>
+                  <strong style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                    {{ commons.translate('watched-time') }}:
+                  </strong>
+                  {{ (item.time.watched / 1000 / 60 / 60).toFixed(1) }}h
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  Vue.prototype.commons = commons
+
+  function viewersInit () {
+    if (_.size(translations) === 0) return setTimeout(() => viewersInit(), 1)
+    var coreViewersApp = new Vue({
+      el: '#coreViewersApp',
+      data: {
+        loaded: false,
+        showAs: 'cards',
+        search: '',
+        page: 1,
+        itemsPerPage: 30,
+
+        sortOrder: 'asc',
+        sort: 'username',
+
+        filter: {
+          followers: null,
+          subscribers: null,
+          regulars: null,
+          active: null
+        },
+
+        items: [],
+
+        state: {
+          settings: 0
+        },
+        socket: io('/core/users', { query: "token=" + token }),
+      },
+      computed: {
+        itemsPaged: function () {
+          if (this.totalPages < this.page) this.page = this.totalPages
+          if (this.page < 1) this.page = 1
+
+          return _.chunk(_.orderBy(this.itemsFiltered.map(o => {
+            o.sort = {}
+            // remap times to timestamps to sort
+            if (o.time.message) o.sort.message = new Date(o.time.message).getTime()
+            else o.sort.message = new Date(0).getTime()
+
+            if (o.time.watched) o.sort.watched = new Date(o.time.watched).getTime()
+            else o.sort.watched = new Date(0).getTime()
+
+            if (o.time.follow) o.sort.follow = new Date(o.time.follow).getTime()
+            else o.sort.follow = new Date(0).getTime()
+
+            if (o.time.subscribed_at) o.sort.subscribed_at = new Date(o.time.subscribed_at).getTime()
+            else o.sort.subscribed_at = new Date(0).getTime()
+
+            return o
+          }), this.sort, this.sortOrder), this.itemsPerPage)[this.page - 1]
+        },
+        itemsFiltered: function () {
+          return this.items.filter((o) => {
+            const isSearchInUsername = this.search.length === 0 ? true : !_.isNil(o.username.match(new RegExp(_.escapeRegExp(this.search), 'ig')))
+
+            let isActive = true
+            if (!_.isNil(this.filter.active)) {
+              if (this.filter.active) {
+                isActive = o.is.online === true
+              } else {
+                isActive = o.is.online === false
+              }
+            }
+
+            let isRegular = true
+            if (!_.isNil(this.filter.regulars)) {
+              if (this.filter.regulars) {
+                isRegular = o.is.regular === true
+              } else {
+                isRegular = o.is.regular === false
+              }
+            }
+
+            let isFollower = true
+            if (!_.isNil(this.filter.followers)) {
+              if (this.filter.followers) {
+                isFollower = o.is.follower === true
+              } else {
+                isFollower = o.is.follower === false
+              }
+            }
+
+            let isSubscriber = true
+            if (!_.isNil(this.filter.subscribers)) {
+              if (this.filter.subscribers) {
+                isSubscriber = o.is.subscriber === true
+              } else {
+                isSubscriber = o.is.subscriber === false
+              }
+            }
+            return isSearchInUsername && isActive && isRegular && isFollower && isSubscriber
+          })
+        },
+        totalPages: function () {
+          return Math.ceil(this.total / this.itemsPerPage)
+        },
+        total: function () {
+          return this.itemsFiltered.length
+        }
+      },
+      created: function () {
+        this.socket.emit('find.viewers', {}, (items) => {
+          this.items = items
+          this.loaded = true
+        })
+        if (localStorage.getItem('/core/users/showAs')) this.showAs = JSON.parse(localStorage.getItem('/core/users/showAs'));
+      },
+      methods: {
+        moment: function (args) {
+          return moment(args) // expose moment function
+        },
+        resetPoints: function () {
+          for (let item of this.items) item.points = 0
+          this.socket.emit('delete', { where: {}, collection: '_users.points' })
+        },
+        resetWatchedTime: function () {
+          for (let item of this.items) item.time.watched = 0
+          this.socket.emit('delete', { where: {}, collection: '_users.watched' })
+        },
+        resetMessages: function () {
+          for (let item of this.items) item.stats.messages = 0
+          this.socket.emit('delete', { where: {}, collection: '_users.messages' })
+        },
+        resetBits: function () {
+          for (let item of this.items) item.stats.bits = 0
+          this.socket.emit('delete', { where: {}, collection: '_users.bits' })
+        },
+        resetTips: function () {
+          for (let item of this.items) item.stats.tips = 0
+          this.socket.emit('delete', { where: {}, collection: '_users.tips' })
+        }
+      },
+      watch: {
+        showAs: function(val) {
+          localStorage.setItem('/core/users/showAs', JSON.stringify(this.showAs))
+        }
+      },
+      filters: {
+        capitalize: function (value) {
+          if (!value) return ''
+          value = value.toString()
+          return value.charAt(0).toUpperCase() + value.slice(1)
+        }
+      },
+    })
+  }
+  viewersInit()
+</script>

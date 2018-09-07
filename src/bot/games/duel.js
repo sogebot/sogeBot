@@ -79,7 +79,7 @@ class Duel extends Game {
     debug(m); global.commons.sendMessage(m, { username: global.commons.getOwner() }, { force: true })
 
     // give user his points
-    await global.db.engine.insert('users.points', { username: winnerUser.username, points: parseInt(total, 10) })
+    await global.db.engine.insert('users.points', { id: winnerUser.id, points: parseInt(total, 10) })
 
     // reset duel
     await global.db.engine.remove(this.collection.users, {})
@@ -96,18 +96,17 @@ class Duel extends Game {
       let parsed = opts.parameters.trim().match(/^([\d]+|all)$/)
       if (_.isNil(parsed)) throw Error(ERROR_NOT_ENOUGH_OPTIONS)
 
-      const user = await global.users.get(opts.sender.username)
-      const points = await global.systems.points.getPointsOf(user.username)
+      const points = await global.systems.points.getPointsOf(opts.sender.userId)
       bet = parsed[1] === 'all' ? points : parsed[1]
 
       if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
       if (points < bet) throw Error(ERROR_NOT_ENOUGH_POINTS)
       if (bet < (await this.settings.minimalBet)) throw Error(ERROR_MINIMAL_BET)
 
-      await global.db.engine.insert('users.points', { username: opts.sender.username, points: parseInt(bet, 10) * -1 })
+      await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(bet, 10) * -1 })
 
       // check if user is already in duel and add points
-      let userFromDB = await global.db.engine.findOne(this.collection.users, { username: opts.sender.username })
+      let userFromDB = await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId })
       const isNewDuelist = _.isEmpty(userFromDB)
       if (!isNewDuelist) {
         await global.db.engine.update(this.collection.users, { _id: String(userFromDB._id) }, { tickets: Number(userFromDB.tickets) + Number(bet) })
@@ -119,7 +118,7 @@ class Duel extends Game {
           (await this.settings.bypassCooldownByOwnerAndMods && (isMod || global.commons.isBroadcaster(opts.sender)))) {
           // save new cooldown if not bypassed
           if (!(await this.settings.bypassCooldownByOwnerAndMods && (isMod || global.commons.isBroadcaster(opts.sender)))) this.settings._.cooldown = new Date()
-          await global.db.engine.insert(this.collection.users, { username: opts.sender.username, tickets: Number(bet) })
+          await global.db.engine.insert(this.collection.users, { id: opts.sender.userId, username: opts.sender.username, tickets: Number(bet) })
         } else {
           message = await global.commons.prepare('gambling.fightme.cooldown', {
             minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes'),
@@ -140,7 +139,7 @@ class Duel extends Game {
         debug(message); global.commons.sendMessage(message, opts.sender)
       }
 
-      const tickets = (await global.db.engine.findOne(this.collection.users, { username: opts.sender.username })).tickets
+      const tickets = (await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId })).tickets
       message = await global.commons.prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
         pointsName: await global.systems.points.getPointsName(tickets),
         points: tickets

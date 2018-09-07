@@ -39,18 +39,17 @@ class Gamble extends Game {
       let parsed = opts.parameters.trim().match(/^([\d]+|all)$/)
       if (_.isNil(parsed)) throw Error(ERROR_NOT_ENOUGH_OPTIONS)
 
-      const user = await global.users.get(opts.sender.username)
-      const pointsOfUser = await global.systems.points.getPointsOf(user.username)
+      const pointsOfUser = await global.systems.points.getPointsOf(opts.sender.userId)
       points = parsed[1] === 'all' ? pointsOfUser : parsed[1]
 
       if (parseInt(points, 10) === 0) throw Error(ERROR_ZERO_BET)
       if (pointsOfUser < points) throw Error(ERROR_NOT_ENOUGH_POINTS)
       if (points < (await this.settings.minimalBet)) throw Error(ERROR_MINIMAL_BET)
 
-      await global.db.engine.insert('users.points', { username: opts.sender.username, points: parseInt(points, 10) * -1 })
+      await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(points, 10) * -1 })
       if (_.random(0, 100, false) <= await this.settings.chanceToWin) {
-        await global.db.engine.insert('users.points', { username: opts.sender.username, points: parseInt(points, 10) * 2 })
-        let updatedPoints = await global.systems.points.getPointsOf(opts.sender.username)
+        await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(points, 10) * 2 })
+        let updatedPoints = await global.systems.points.getPointsOf(opts.sender.userId)
         message = await global.commons.prepare('gambling.gamble.win', {
           pointsName: await global.systems.points.getPointsName(updatedPoints),
           points: updatedPoints
@@ -58,8 +57,8 @@ class Gamble extends Game {
         debug(message); global.commons.sendMessage(message, opts.sender)
       } else {
         message = await global.commons.prepare('gambling.gamble.lose', {
-          pointsName: await global.systems.points.getPointsName(await global.systems.points.getPointsOf(user.username)),
-          points: await global.systems.points.getPointsOf(user.username)
+          pointsName: await global.systems.points.getPointsName(await global.systems.points.getPointsOf(opts.sender.userId)),
+          points: await global.systems.points.getPointsOf(opts.sender.userId)
         })
         debug(message); global.commons.sendMessage(message, opts.sender)
       }
