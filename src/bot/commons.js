@@ -207,12 +207,10 @@ Commons.prototype.isBroadcaster = function (user) {
 Commons.prototype.isMod = async function (user) {
   if (_.isNil(user)) return false
 
-  if (_.isString(user)) user = await global.users.get(user)
-  else if (_.isNil(user.isModerator)) user = await global.users.get(user.username)
+  if (_.isString(user)) user = await global.users.getByName(user)
+  else if (_.isNil(user.isModerator)) user = await global.users.getByName(user.username)
   else user = { is: { mod: user.isModerator } }
-  return new Promise((resolve, reject) => {
-    resolve(!_.isNil(user.is.mod) ? user.is.mod : false)
-  })
+  return !_.isNil(user.is.mod) ? user.is.mod : false
 }
 
 Commons.prototype.isRegular = async function (user) {

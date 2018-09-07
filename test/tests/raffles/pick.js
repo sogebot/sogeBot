@@ -9,9 +9,9 @@ const assert = require('chai').assert
 
 const max = Math.floor(Number.MAX_SAFE_INTEGER / 1000000)
 
-const owner = { username: 'soge__' }
-const testuser = { username: 'testuser' }
-const testuser2 = { username: 'testuser2' }
+const owner = { username: 'soge__', userId: 1 }
+const testuser = { username: 'testuser', userId: 2 }
+const testuser2 = { username: 'testuser2', userId: 3 }
 
 describe('Raffles - pick()', () => {
   before(async () => {
@@ -79,8 +79,8 @@ describe('Raffles - pick()', () => {
     })
 
     it('Create testuser/testuser2 with max points', async () => {
-      await global.db.engine.insert('users.points', { username: testuser.username, points: max })
-      await global.db.engine.insert('users.points', { username: testuser2.username, points: max })
+      await global.db.engine.insert('users.points', { id: testuser.userId, points: max })
+      await global.db.engine.insert('users.points', { id: testuser2.userId, points: max })
     })
 
     it('testuser bets max', async () => {
@@ -120,12 +120,12 @@ describe('Raffles - pick()', () => {
     })
 
     it('Create testuser/testuser2 with max points', async () => {
-      await global.db.engine.insert('users.points', { username: testuser.username, points: max })
-      await global.db.engine.insert('users.points', { username: testuser2.username, points: max })
+      await global.db.engine.insert('users.points', { id: testuser.userId, points: max })
+      await global.db.engine.insert('users.points', { id: testuser2.userId, points: max })
     })
 
     it('Set testuser as follower', async () => {
-      await global.db.engine.update('users', { username: testuser.username }, { is: { follower: true } })
+      await global.db.engine.update('users', { id: testuser.userId }, { username: testuser.username, is: { follower: true } })
     })
 
     it('testuser bets 100', async () => {
@@ -165,12 +165,12 @@ describe('Raffles - pick()', () => {
     })
 
     it('Create testuser/testuser2 with max points', async () => {
-      await global.db.engine.insert('users.points', { username: testuser.username, points: max })
-      await global.db.engine.insert('users.points', { username: testuser2.username, points: max })
+      await global.db.engine.insert('users.points', { id: testuser.userId, points: max })
+      await global.db.engine.insert('users.points', { id: testuser2.userId, points: max })
     })
 
     it('Set testuser as subscriber', async () => {
-      await global.db.engine.update('users', { username: testuser.username }, { is: { subscriber: true } })
+      await global.db.engine.update('users', { id: testuser.userId }, { username: testuser.username, is: { subscriber: true } })
     })
 
     it('testuser bets 100', async () => {

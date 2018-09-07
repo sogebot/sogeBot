@@ -7,6 +7,7 @@ const debug = require('debug')('systems:points')
 // bot libraries
 const constants = require('../constants')
 const System = require('./_interface')
+const Expects = require('../expects')
 
 class Points extends System {
   constructor () {
@@ -66,17 +67,17 @@ class Points extends System {
       for (let username of (await global.db.engine.find('users.online')).map((o) => o.username)) {
         if (global.commons.isBot(username)) continue
 
+        let user = await global.db.engine.findOne('users', { username })
         if (parseInt(interval, 10) !== 0 && parseInt(ptsPerInterval, 10) !== 0) {
-          let user = await global.db.engine.findOne('users', { username: username })
           _.set(user, 'time.points', _.get(user, 'time.points', 0))
           let shouldUpdate = new Date().getTime() - new Date(user.time.points).getTime() >= interval
           if (shouldUpdate) {
-            await global.db.engine.insert('users.points', { username: username, points: parseInt(ptsPerInterval, 10) })
-            await global.db.engine.update('users', { username: username }, { time: { points: new Date() } })
+            await global.db.engine.insert('users.points', { id: user.id, points: parseInt(ptsPerInterval, 10) })
+            await global.db.engine.update('users', { id: user.id }, { time: { points: new Date() } })
           }
         } else {
           // force time update if interval or points are 0
-          await global.db.engine.update('users', { username: username }, { time: { points: new Date() } })
+          await global.db.engine.update('users', { id: user.id }, { time: { points: new Date() } })
         }
       }
     } catch (e) {
@@ -90,7 +91,7 @@ class Points extends System {
   async compactPointsDb () {
     clearTimeout(this.timeouts['compactPointsDb'])
     try {
-      await global.commons.compactDb({ table: 'users.points', index: 'username', values: 'points' })
+      await global.commons.compactDb({ table: 'users.points', index: 'id', values: 'points' })
     } catch (e) {
       global.log.error(e)
       global.log.error(e.stack)
@@ -116,14 +117,14 @@ class Points extends System {
     if (interval === 0 || ptsPerInterval === 0) return
 
     let [user, userMessages] = await Promise.all([
-      global.users.get(opts.sender.username),
-      global.users.getMessagesOf(opts.sender.username)
+      global.users.getById(opts.sender.userId),
+      global.users.getMessagesOf(opts.sender.userId)
     ])
     let lastMessageCount = _.isNil(user.custom.lastMessagePoints) ? 0 : user.custom.lastMessagePoints
 
     if (lastMessageCount + interval <= userMessages) {
-      await global.db.engine.insert('users.points', { username: user.username, points: parseInt(ptsPerInterval, 10) })
-      await global.db.engine.update('users', { username: user.username }, { custom: { lastMessagePoints: userMessages } })
+      await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(ptsPerInterval, 10) })
+      await global.db.engine.update('users', { id: opts.sender.userId }, { custom: { lastMessagePoints: userMessages } })
     }
     return true
   }
@@ -136,9 +137,9 @@ class Points extends System {
     })
   }
 
-  async getPointsOf (user) {
+  async getPointsOf (id) {
     let points = 0
-    for (let item of await global.db.engine.find('users.points', { username: user })) {
+    for (let item of await global.db.engine.find('users.points', { id })) {
       let itemPoints = !_.isNaN(parseInt(_.get(item, 'points', 0))) ? _.get(item, 'points', 0) : 0
       points = points + Number(itemPoints)
     }
@@ -152,21 +153,22 @@ class Points extends System {
 
   async set (opts) {
     try {
-      var parsed = opts.parameters.match(/^@?([\S]+) ([0-9]+)$/)
-      const points = parseInt(
-        Number(parsed[2]) <= Number.MAX_SAFE_INTEGER / 1000000
-          ? parsed[2]
-          : Number.MAX_SAFE_INTEGER / 1000000, 10)
+      const [username, points] = new Expects(opts.parameters).username().points({ all: false })
 
-      await global.db.engine.remove('users.points', { username: parsed[1].toLowerCase() })
-      await global.db.engine.insert('users.points', { username: parsed[1].toLowerCase(), points })
+      const user = global.users.getByName(username)
+      if (user.id) {
+        await global.db.engine.remove('users.points', { id: user.id })
+        await global.db.engine.insert('users.points', { id: user.id, points })
 
-      let message = await global.commons.prepare('points.success.set', {
-        amount: points,
-        username: parsed[1].toLowerCase(),
-        pointsName: await this.getPointsName(points)
-      })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+        let message = await global.commons.prepare('points.success.set', {
+          amount: points,
+          username,
+          pointsName: await this.getPointsName(points)
+        })
+        debug(message); global.commons.sendMessage(message, opts.sender)
+      } else {
+        throw new Error('User doesn\'t have ID')
+      }
     } catch (err) {
       global.commons.sendMessage(global.translate('points.failed.set'), opts.sender)
     }
@@ -174,25 +176,37 @@ class Points extends System {
 
   async give (opts) {
     try {
-      var parsed = opts.parameters.match(/^@?([\S]+) ([\d]+|all)$/)
-      const [user, user2] = await Promise.all([global.users.get(opts.sender.username), global.users.get(parsed[1])])
-      var givePts = parsed[2] === 'all' ? await this.getPointsOf(opts.sender.username) : parsed[2]
-      if (await this.getPointsOf(opts.sender.username) >= givePts) {
-        if (user.username !== user2.username) {
-          await global.db.engine.insert('users.points', { username: user.username, points: (parseInt(givePts, 10) * -1) })
-          await global.db.engine.insert('users.points', { username: user2.username, points: parseInt(givePts, 10) })
-        }
+      const [username, points] = new Expects(opts.parameters).username().points({ all: true })
+      if (opts.sender.username.toLowerCase() === username.toLowerCase()) return
+
+      const availablePoints = await this.getPointsOf(opts.sender.userId)
+      const guser = await this.getByName(username)
+
+      if (!guser.id) throw new Error('User doesn\'t have ID')
+
+      if (points !== 'all' && availablePoints < points) {
+        let message = await global.commons.prepare('points.failed.giveNotEnough', {
+          amount: points,
+          username,
+          pointsName: await this.getPointsName(points)
+        })
+        debug(message); global.commons.sendMessage(message, opts.sender)
+      } else if (points === 'all') {
+        await global.db.engine.insert('users.points', { id: opts.sender.userId, points: (parseInt(availablePoints, 10) * -1) })
+        await global.db.engine.insert('users.points', { id: guser.id, points: parseInt(availablePoints, 10) })
         let message = await global.commons.prepare('points.success.give', {
-          amount: givePts,
-          username: user2.username,
-          pointsName: await this.getPointsName(givePts)
+          amount: availablePoints,
+          username,
+          pointsName: await this.getPointsName(availablePoints)
         })
         debug(message); global.commons.sendMessage(message, opts.sender)
       } else {
-        let message = await global.commons.prepare('points.failed.giveNotEnough', {
-          amount: givePts,
-          username: user2.username,
-          pointsName: await this.getPointsName(givePts)
+        await global.db.engine.insert('users.points', { id: opts.sender.userId, points: (parseInt(points, 10) * -1) })
+        await global.db.engine.insert('users.points', { id: guser.id, points: parseInt(points, 10) })
+        let message = await global.commons.prepare('points.success.give', {
+          amount: points,
+          username,
+          pointsName: await this.getPointsName(points)
         })
         debug(message); global.commons.sendMessage(message, opts.sender)
       }
@@ -252,8 +266,11 @@ class Points extends System {
     try {
       const match = opts.parameters.match(/^@?([\S]+)$/)
       const username = !_.isNil(match) ? match[1] : opts.sender.username
+      const user = await global.users.getByName(username)
 
-      let points = await this.getPointsOf(username)
+      if (!user.id) throw new Error('User doesn\'t have ID')
+
+      let points = await this.getPointsOf(user.id)
       let message = await global.commons.prepare('points.defaults.pointsResponse', {
         amount: points,
         username: username,
@@ -267,16 +284,20 @@ class Points extends System {
 
   async all (opts) {
     try {
-      var parsed = opts.parameters.match(/^([0-9]+)$/)
-      var givePts = parseInt(parsed[1], 10)
+      const points = new Expects(opts.parameters).points({ all: false })
 
-      let users = await global.db.engine.find('users.online')
-      for (let user of users) {
-        await global.db.engine.insert('users.points', { username: user.username, points: parseInt(givePts, 10) })
+      for (let username of (await global.db.engine.find('users.online')).map((o) => o.username)) {
+        if (global.commons.isBot(username)) continue
+
+        let user = await global.db.engine.findOne('users', { username })
+
+        if (user.id) {
+          await global.db.engine.insert('users.points', { id: user.id, points })
+        }
       }
       let message = await global.commons.prepare('points.success.all', {
-        amount: givePts,
-        pointsName: await this.getPointsName(givePts)
+        amount: points,
+        pointsName: await this.getPointsName(points)
       })
       debug(message); global.commons.sendMessage(message, opts.sender)
     } catch (err) {
@@ -286,16 +307,20 @@ class Points extends System {
 
   async rain (opts) {
     try {
-      var parsed = opts.parameters.match(/^([0-9]+)$/)
-      var givePts = parseInt(parsed[1], 10)
+      const points = new Expects(opts.parameters).points({ all: false })
 
-      let users = await global.db.engine.find('users.online')
-      for (let user of users) {
-        await global.db.engine.insert('users.points', { username: user.username, points: parseInt(Math.floor(Math.random() * givePts), 10) })
+      for (let username of (await global.db.engine.find('users.online')).map((o) => o.username)) {
+        if (global.commons.isBot(username)) continue
+
+        let user = await global.db.engine.findOne('users', { username })
+
+        if (user.id) {
+          await global.db.engine.insert('users.points', { id: user.id, points: parseInt(Math.floor(Math.random() * points), 10) })
+        }
       }
       let message = await global.commons.prepare('points.success.rain', {
-        amount: givePts,
-        pointsName: await this.getPointsName(givePts)
+        amount: points,
+        pointsName: await this.getPointsName(points)
       })
       debug(message); global.commons.sendMessage(message, opts.sender)
     } catch (err) {
@@ -305,14 +330,18 @@ class Points extends System {
 
   async add (opts) {
     try {
-      var parsed = opts.parameters.match(/^@?([\S]+) ([0-9]+)$/)
-      let givePts = parseInt(parsed[2], 10)
-      await global.db.engine.insert('users.points', { username: parsed[1].toLowerCase(), points: givePts })
+      const [username, points] = new Expects(opts.parameters).username().points({ all: false })
+      let user = await global.db.engine.findOne('users', { username })
+      if (user.id) {
+        await global.db.engine.insert('users.points', { id: user.id, points: points })
+      } else {
+        throw new Error('User doesn\'t have ID')
+      }
 
       let message = await global.commons.prepare('points.success.add', {
-        amount: givePts,
-        username: parsed[1].toLowerCase(),
-        pointsName: await this.getPointsName(givePts)
+        amount: points,
+        username: username,
+        pointsName: await this.getPointsName(points)
       })
       debug(message); global.commons.sendMessage(message, opts.sender)
     } catch (err) {
@@ -322,16 +351,25 @@ class Points extends System {
 
   async remove (opts) {
     try {
-      var parsed = opts.parameters.match(/^@?([\S]+) ([\d]+|all)$/)
-      var removePts = parsed[2] === 'all' ? await this.getPointsOf(parsed[1]) : parsed[2]
-      await global.db.engine.insert('users.points', { username: parsed[1].toLowerCase(), points: removePts * -1 })
+      const [username, points] = new Expects(opts.parameters).username().points({ all: true })
+      let user = await global.db.engine.findOne('users', { username })
+      if (user.id) {
+        if (points === 'all') {
+          await global.db.engine.remove('users.points', { id: user.id })
+        } else {
+          let availablePoints = await this.getPointsOf(user.id)
+          await global.db.engine.insert('users.points', { id: user.id, points: -Math.min(points, availablePoints) })
+        }
 
-      let message = await global.commons.prepare('points.success.remove', {
-        amount: removePts,
-        username: parsed[1].toLowerCase(),
-        pointsName: await this.getPointsName(removePts)
-      })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+        let message = await global.commons.prepare('points.success.remove', {
+          amount: points,
+          username: username,
+          pointsName: await this.getPointsName(points === 'all' ? 0 : points)
+        })
+        debug(message); global.commons.sendMessage(message, opts.sender)
+      } else {
+        throw new Error('User doesn\'t have ID')
+      }
     } catch (err) {
       global.commons.sendMessage(global.translate('points.failed.remove'), opts.sender)
     }

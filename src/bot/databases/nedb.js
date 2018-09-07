@@ -12,7 +12,6 @@ const debug = require('debug')('db:nedb')
 class INeDB extends Interface {
   constructor (forceIndexes) {
     super('nedb')
-
     this.createIndexes = forceIndexes || cluster.isWorker // create indexes on worker (cpu is always 1)
     this.connected = true
 
@@ -50,6 +49,7 @@ class INeDB extends Interface {
         case 'users.watched':
         case 'cache.hosts':
           this.table[table].removeIndex('username')
+          this.table[table].removeIndex('id')
           break
         case 'cache':
         case 'customTranslations':
@@ -68,6 +68,9 @@ class INeDB extends Interface {
             this.table[table].ensureIndex({ fieldName: 'timestamp' })
             break
           case 'users':
+            this.table[table].ensureIndex({ fieldName: 'username', unique: true })
+            this.table[table].ensureIndex({ fieldName: 'id', unique: true })
+            break
           case 'cache.hosts':
             this.table[table].ensureIndex({ fieldName: 'username', unique: true })
             break

@@ -5,8 +5,8 @@ require('../../general.js')
 const db = require('../../general.js').db
 const message = require('../../general.js').message
 
-const hugePointsUser = { username: 'hugeuser', points: 99999999999999999999999999999999 }
-const tinyPointsUser = { username: 'tinyuser', points: 100 }
+const hugePointsUser = { username: 'hugeuser', points: 99999999999999999999999999999999, userId: '1' }
+const tinyPointsUser = { username: 'tinyuser', points: 100, userId: '2' }
 
 describe('Points - get()', () => {
   before(async () => {
@@ -16,7 +16,8 @@ describe('Points - get()', () => {
 
   describe('User with more than safe points should return safe points', () => {
     it('create user with huge amount of points', async () => {
-      await global.db.engine.insert('users.points', hugePointsUser)
+      await global.db.engine.insert('users', { username: hugePointsUser.username, id: hugePointsUser.userId })
+      await global.db.engine.insert('users.points', { id: hugePointsUser.userId, points: hugePointsUser.points })
     })
 
     it('points should be returned in safe points bounds', async () => {
@@ -31,7 +32,8 @@ describe('Points - get()', () => {
 
   describe('User with less than safe points should return unchanged points', () => {
     it('create user with normal amount of points', async () => {
-      await global.db.engine.insert('users.points', tinyPointsUser)
+      await global.db.engine.insert('users', { username: tinyPointsUser.username, id: tinyPointsUser.userId })
+      await global.db.engine.insert('users.points', { id: tinyPointsUser.userId, points: tinyPointsUser.points })
     })
 
     it('points should be returned in safe points bounds', async () => {

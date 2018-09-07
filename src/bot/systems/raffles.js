@@ -234,7 +234,7 @@ class Raffles extends System {
   async participate (opts) {
     if (_.isNil(opts.sender) || _.isNil(opts.sender.username)) return true
 
-    const [raffle, user] = await Promise.all([global.db.engine.findOne(this.collection.data, { winner: null }), global.users.get(opts.sender.username)])
+    const [raffle, user] = await Promise.all([global.db.engine.findOne(this.collection.data, { winner: null }), global.users.getByName(opts.sender.username)])
     if (_.isEmpty(raffle)) return true
 
     const isStartingWithRaffleKeyword = opts.message.toLowerCase().startsWith(raffle.keyword.toLowerCase())
@@ -242,7 +242,7 @@ class Raffles extends System {
     if (!isStartingWithRaffleKeyword || _.isEmpty(raffle)) return true
 
     opts.message = opts.message.toString().replace(raffle.keyword, '')
-    let tickets = opts.message.trim() === 'all' && !_.isNil(await global.systems.points.getPointsOf(user.username)) ? await global.systems.points.getPointsOf(user.username) : parseInt(opts.message.trim(), 10)
+    let tickets = opts.message.trim() === 'all' && !_.isNil(await global.systems.points.getPointsOf(opts.sender.userId)) ? await global.systems.points.getPointsOf(opts.sender.userId) : parseInt(opts.message.trim(), 10)
     debug('User in db: %j', user)
     debug('Text: %s', opts.message)
     debug('Tickets in text: %s', parseInt(opts.message.trim(), 10))
@@ -285,8 +285,8 @@ class Raffles extends System {
     }
     debug('new participant: %j', participantUser)
 
-    debug('not enough points: %o', raffle.type === TYPE_TICKETS && await global.systems.points.getPointsOf(user.username) < tickets)
-    if (raffle.type === TYPE_TICKETS && await global.systems.points.getPointsOf(user.username) < tickets) return // user doesn't have enough points
+    debug('not enough points: %o', raffle.type === TYPE_TICKETS && await global.systems.points.getPointsOf(opts.sender.userId) < tickets)
+    if (raffle.type === TYPE_TICKETS && await global.systems.points.getPointsOf(opts.sender.userId) < tickets) return // user doesn't have enough points
 
     if (raffle.followers && raffle.subscribers) {
       participantUser.eligible = (!_.isNil(user.is.follower) && user.is.follower) || (!_.isNil(user.is.subscriber) && user.is.subscriber)
@@ -297,7 +297,7 @@ class Raffles extends System {
     }
 
     if (participantUser.eligible) {
-      if (raffle.type === TYPE_TICKETS) await global.db.engine.insert('users.points', { username: opts.sender.username, points: parseInt(tickets, 10) * -1 })
+      if (raffle.type === TYPE_TICKETS) await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(tickets, 10) * -1 })
       await global.db.engine.update(this.collection.participants, { raffle_id: raffle._id.toString(), username: opts.sender.username }, participantUser)
     }
     return true

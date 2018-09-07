@@ -320,9 +320,10 @@ function loadClientListeners () {
     else parsedEvents.push({ _raw: message._raw, ts: Date.now() })
 
     DEBUG_TMIJS_MODE('User ' + (message.isModerator ? '+mod' : '-mod') + ' ' + message.username)
-    const user = await global.users.get(message.username)
+    const user = await global.users.getByName(message.username)
     if (!user.is.mod && message.isModerator) global.events.fire('mod', { username: message.username })
-    global.users.set(message.username, { is: { mod: message.isModerator } })
+    if (!user.id) { user.id = await global.users.getIdFromTwitch(message.username) }
+    global.users.set(message.username, { id: user.id, is: { mod: message.isModerator } })
 
     if (message.username === config.settings.bot_username) global.status.MOD = message.isModerator
   })
@@ -351,7 +352,7 @@ function loadClientListeners () {
         plan: message.parameters.subPlan === 'Prime' ? 1000 : message.parameters.subPlan,
         prime: message.parameters.subPlan === 'Prime' ? 'Prime' : false
       }
-      subscription(message.tags.displayName.toLowerCase(), method)
+      subscription(message.tags.displayName.toLowerCase(), message.tags, method)
     } else if (message.event === 'RESUBSCRIPTION') {
       message.tags.username = message.tags.displayName.toLowerCase()
       const method = {
@@ -401,12 +402,19 @@ if (cluster.isMaster) {
   })
 }
 
-async function subscription (username, method) {
+async function subscription (username, userstate, method) {
   DEBUG_TMIJS('Subscription: %s from %j', username, method)
 
   if (global.commons.isIgnored(username)) return
 
-  global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: _.now() }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
+  const user = await global.db.engine.findOne('users', { id: userstate.userId })
+  let subscribedAt = _.now()
+  let isSubscriber = true
+
+  if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
+  if (user.lock && user.lock.subscriber) isSubscriber = undefined
+
+  global.users.setById(userstate.userId, { username, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
   global.overlays.eventlist.add({ type: 'sub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
   global.log.sub(`${username}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
   global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
@@ -417,7 +425,14 @@ async function resub (username, months, message, userstate, method) {
 
   if (global.commons.isIgnored(username)) return
 
-  global.users.set(username, { is: { subscriber: true }, time: { subscribed_at: Number(moment().subtract(months, 'months').format('X')) * 1000 }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
+  const user = await global.db.engine.findOne('users', { id: userstate.userId })
+  let subscribedAt = Number(moment().subtract(months, 'months').format('X')) * 1000
+  let isSubscriber = true
+
+  if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
+  if (user.lock && user.lock.subscriber) isSubscriber = undefined
+
+  global.users.setById(userstate.userId, { username, id: userstate.userId, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
   global.overlays.eventlist.add({ type: 'resub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: message })
   global.log.resub(`${username}, months: ${months}, message: ${message}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
   global.events.fire('resub', { username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: message })
@@ -453,9 +468,22 @@ async function subgift (username, months, recipient) {
   }
   if (global.commons.isIgnored(username)) return
 
-  global.users.set(recipient, { is: { subscriber: true }, time: { subscribed_at: _.now() } })
-  global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months })
-  global.log.subgift(`${recipient}, from: ${username}, months: ${months}`)
+  let user = await global.db.engine.findOne('users', { username: recipient })
+  if (!user.id) {
+    user.id = await global.users.getIdFromTwitch(recipient)
+  }
+
+  if (user.id !== null) {
+    let subscribedAt = _.now()
+    let isSubscriber = true
+
+    if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
+    if (user.lock && user.lock.subscriber) isSubscriber = undefined
+
+    global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt } })
+    global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months })
+    global.log.subgift(`${recipient}, from: ${username}, months: ${months}`)
+  }
 }
 
 async function cheer (userstate, message) {
@@ -468,7 +496,7 @@ async function cheer (userstate, message) {
 
   global.overlays.eventlist.add({ type: 'cheer', username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
   global.log.cheer(`${userstate.username.toLowerCase()}, bits: ${userstate.bits}, message: ${message}`)
-  global.db.engine.insert('users.bits', { username: userstate.username.toLowerCase(), amount: userstate.bits, message: message, timestamp: _.now() })
+  global.db.engine.insert('users.bits', { id: await global.users.getIdByName(userstate.username.toLowerCase()), amount: userstate.bits, message: message, timestamp: _.now() })
   global.events.fire('cheer', { username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
   if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
 }

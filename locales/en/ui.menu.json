@@ -1,4 +1,6 @@
 {
+  "core": "General",
+  "users": "Users",
   "timers": "Timers",
   "keywords": "Keywords",
   "customcommands": "Custom commands",

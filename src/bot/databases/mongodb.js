@@ -11,10 +11,12 @@ const _ = require('lodash')
 const debug = require('debug')('db:mongodb')
 
 class IMongoDB extends Interface {
-  constructor (forceIndexes) {
+  constructor (forceIndexes, forceRemoveIndexes) {
     super('mongodb')
 
     this.createIndexes = forceIndexes || cluster.isMaster
+    this.forceRemoveIndexes = forceRemoveIndexes || false
+
     this.connected = false
     this.client = null
     this.dbName = mongodbUri.parse(config.database.mongodb.url).database
@@ -54,7 +56,7 @@ class IMongoDB extends Interface {
     // create indexes
     let db = await this.client.db(this.dbName)
 
-    if (this.createIndexes) {
+    if (this.createIndexes || this.forceRemoveIndexes) {
       const collections = await db.listCollections().toArray()
       const dropIndexes = [
         'users.bits', 'users.tips', 'users.points', 'users.online', 'users.messages', 'users.watched',
@@ -65,17 +67,23 @@ class IMongoDB extends Interface {
         await db.createCollection(table)
       }
 
-      await db.collection('users.bits').createIndex('timestamp')
-      await db.collection('users.tips').createIndex('timestamp')
-      await db.collection('users').createIndex('username', { unique: true })
-      await db.collection('users.online').createIndex('username')
-      await db.collection('users.points').createIndex('username')
-      await db.collection('users.messages').createIndex('username')
-      await db.collection('users.watched').createIndex('username')
-      await db.collection('cache').createIndex('key', { unique: true })
-      await db.collection('customTranslations').createIndex('key')
-      await db.collection('stats').createIndex('whenOnline')
-      await db.collection('cache.hosts').createIndex('username', { unique: true })
+      if (this.createIndexes) {
+        await db.collection('users.bits').createIndex('timestamp')
+        await db.collection('users.tips').createIndex('timestamp')
+        await db.collection('users').createIndex('username', { unique: true })
+        await db.collection('users').createIndex(
+          { id: 1 },
+          { partialFilterExpression: { id: { $exists: true } }, unique: true }
+        )
+        await db.collection('users.online').createIndex('username')
+        await db.collection('users.points').createIndex('username')
+        await db.collection('users.messages').createIndex('username')
+        await db.collection('users.watched').createIndex('username')
+        await db.collection('cache').createIndex('key', { unique: true })
+        await db.collection('customTranslations').createIndex('key')
+        await db.collection('stats').createIndex('whenOnline')
+        await db.collection('cache.hosts').createIndex('username', { unique: true })
+      }
     }
     this.connected = true
   }

@@ -122,8 +122,8 @@ class Events {
       return
     }
 
-    if (!_.isNil(_.get(attributes, 'username', null))) attributes.userObject = await global.users.get(attributes.username)
-    if (!_.isNil(_.get(attributes, 'recipient', null))) attributes.recipientObject = await global.users.get(attributes.recipient)
+    if (!_.isNil(_.get(attributes, 'username', null))) attributes.userObject = await global.users.getByName(attributes.username)
+    if (!_.isNil(_.get(attributes, 'recipient', null))) attributes.recipientObject = await global.users.getByName(attributes.recipient)
     d('Firing event %s with attrs: %j', eventId, attributes)
 
     if (_.get(attributes, 'reset', false)) return this.reset(eventId)

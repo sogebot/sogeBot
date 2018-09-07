@@ -1,0 +1,382 @@
+<span id="viewer-edit">
+  <template v-if="!viewer">
+    <div class="alert alert-info"><i class="fas fa-circle-notch fa-spin"></i> Loading user data</div>
+  </template>
+  <template v-else>
+    <span class="title text-default" style="padding: 0 !important;">
+      <a class="btn btn-outline-info" style="border: 0 !important;" href="/#viewers/list"><i class="fas fa-chevron-circle-left"></i></a>
+      <span style="position: relative; top: 2px;">{{ commons.translate('dialog.title.edit') }} </span>
+      <span style="position: relative; top: 2px;">{{ viewer.username }} <small>{{ viewer.id }}</small></span>
+    </span>
+
+    <div class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
+      <div class="col text-danger">
+        <button type="button" class="btn" :class="[states.delete ? 'btn-danger' : 'btn-outline-danger border-light']" @click="states.delete = !states.delete; pending = true">
+          <i v-if="states.delete" class="far fa-check-square pr-1 fa-fw"></i>
+          <i v-else class="far fa-square pr-1 fa-fw"></i>
+          Mark to delete
+        </button>
+        <button type="button" class="btn btn-outline-primary border-light" @click="forceCheckFollowedAt()">
+          <i class="fas fa-sync-alt mr-1 fa-fw" :class="[states.forceCheckFollowedAt ? 'fa-spin' : '']"></i>
+          Force 'followed since' check
+        </button>
+      </div>
+      <div class="col text-right form-inline d-block">
+          <span v-if="pending" style="cursor: auto;" class="alert-danger btn m-0">{{commons.translate('dialog.changesPending')}}</span>
+          <button v-if="states.save === 0" type="button" class="btn btn-primary" v-on:click="saveChanges()">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
+          <button v-if="states.save === 1" disabled="disabled" type="button" class="btn btn-primary"><i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
+          <button v-if="states.save === 2" disabled="disabled" type="button" class="btn btn-success"><i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</span></button>
+          <button v-if="states.save === 3" disabled="disabled" type="button" class="btn btn-danger"><i class="fas fa-exclamation"></i> {{ commons.translate('dialog.buttons.something-went-wrong') }}</span></button>
+      </div>
+    </div>
+
+    <div class="pt-3">
+      <!-- Editation stuff here -->
+      <form>
+        <div class="form-row pl-2 pr-2">
+          <div class="form-group col">
+            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('last-seen') }}</label>
+            <input readonly="true" v-model="lastSeen" type="text" class="form-control">
+          </div>
+          <div class="form-group col">
+            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('followed-since') }}</label>
+            <div class="input-group">
+              <date-picker
+                class="form-control p-0"
+                :disabled="viewer.lock.followed_at"
+                v-model="viewer.time.follow"
+                :first-day-of-week="1"
+                :not-after="new Date().getTime()"
+                format="HH:mm:ss, YYYY-MM-DD"
+                lang="en"
+                type="datetime"
+                input-class="mx-input border-0"></date-picker>
+              <div class="input-group-append">
+                <button type="button" class="border border-left-0 btn" :class="[viewer.lock.followed_at ? 'btn-secondary border-0' : 'btn-light']" @click="viewer.lock.followed_at = !viewer.lock.followed_at">
+                  <i class="fas" :class="[viewer.lock.followed_at ? 'fa-lock' : 'fa-unlock']"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group col">
+            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('subscribed-since') }}</label>
+            <div class="input-group">
+              <date-picker
+                class="form-control p-0"
+                :disabled="viewer.lock.subscribed_at"
+                v-model="viewer.time.subscribed_at"
+                :first-day-of-week="1"
+                :not-after="new Date().getTime()"
+                format="HH:mm:ss, YYYY-MM-DD"
+                lang="en"
+                type="datetime"
+                input-class="mx-input border-0"></date-picker>
+              <div class="input-group-append">
+                <button type="button" class="btn border" :class="[viewer.lock.subscribed_at ? 'btn-secondary border-0' : 'btn-light']" @click="viewer.lock.subscribed_at = !viewer.lock.subscribed_at">
+                  <i class="fas" :class="[viewer.lock.subscribed_at ? 'fa-lock' : 'fa-unlock']"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row pl-2 pr-2">
+          <div class="form-group col">
+            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('message') }}</label>
+            <input v-model="viewer.stats.messages" type="text" class="form-control">
+          </div>
+          <div class="form-group col">
+            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('points') }}</label>
+            <input v-model="viewer.points" type="text" class="form-control">
+          </div>
+          <div class="form-group col">
+            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('watched-time') }} <small>{{ commons.translate('hours') }}</small></label>
+            <input v-model="watchedTime" type="text" class="form-control">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md col-sm-12">
+            <div class="form-row pl-2 pr-2">
+              <div class="col">
+                <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('bits') }}</label>
+              </div>
+            </div>
+
+            <table class="table table-sm ml-2 mr-2" v-if="viewer.stats.bits.length !== 0">
+              <tr v-for="(bits, index) of _.orderBy(viewer.stats.bits, 'timestamp', 'desc')">
+                <td scope="row">{{ moment(bits.timestamp).format('LLL') }}</td>
+                <td>
+                  <input type="number" min="0" v-model="bits.amount" v-if="bits.editation" class="form-control">
+                  <strong v-else>{{ bits.amount }}</strong>
+                </td>
+                <td>
+                  <textarea v-model="bits.message" class="form-control" v-if="bits.editation"></textarea>
+                  <span v-else>{{ bits.message }}</span>
+                </td>
+                <td>
+                  <template v-if="!bits.editation">
+                    <button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100"><i class="fas fa-ellipsis-v"></i></button>
+                    <div class="dropdown-menu p-0">
+                      <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="bits.editation = true; pending = true"><i class="fas fa-edit"></i> {{ commons.translate('dialog.buttons.edit') }}</button>
+                      <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="removeBits(bits._id)"><i class="fas fa-trash-alt"></i> {{ commons.translate('dialog.buttons.delete') }}</button>
+                    </div>
+                  </template>
+                  <span v-else>
+                    <button
+                      type="button"
+                      @click="bits.editation = false"
+                      class="btn btn-block btn-outline-dark border-0 h-100 small-spaced">DONE</button>
+                  </span>
+                </td>
+              </tr>
+            </table>
+            <button type="button" class="btn btn-outline-dark border-0 ml-1 mb-3 small-spaced" @click="pending = true; viewer.stats.bits.push({id: viewer.id, new: true, editation: true, timestamp: Date.now(), amount: 0, message: '', _id: Date.now()})">
+              <i class="fas fa-plus pr-1 fa-fw"></i>
+              Add bits
+            </button>
+          </div>
+          <div class="col-md col-sm-12">
+            <div class="form-row pl-2 pr-2">
+              <div class="col">
+                <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('tips') }}</label>
+              </div>
+            </div>
+
+            <table class="table table-sm ml-2 mr-2" v-if="viewer.stats.tips.length !== 0">
+              <tr v-for="(tips, index) of _.orderBy(viewer.stats.tips, 'timestamp', 'desc')">
+                <td scope="row">{{ moment(tips.timestamp).format('LLL') }}</td>
+                <td class="d-flex">
+                  <template v-if="tips.editation">
+                    <input type="number" min="0" v-model="tips.amount"class="form-control">
+                    <select class="form-control" v-model="tips.currency">
+                      <option value="USD">USD</option>
+                      <option value="AUD">AUD</option>
+                      <option value="BGN">BGN</option>
+                      <option value="BRL">BRL</option>
+                      <option value="CAD">CAD</option>
+                      <option value="CHF">CHF</option>
+                      <option value="CNY">CNY</option>
+                      <option value="CZK">CZK</option>
+                      <option value="DKK">DKK</option>
+                      <option value="EUR">EUR</option>
+                      <option value="GBP">GBP</option>
+                      <option value="HKD">HKD</option>
+                      <option value="HRK">HRK</option>
+                      <option value="HUF">HUF</option>
+                      <option value="IDR">IDR</option>
+                      <option value="ILS">ILS</option>
+                      <option value="INR">INR</option>
+                      <option value="ISK">ISK</option>
+                      <option value="JPY">JPY</option>
+                      <option value="KRW">KRW</option>
+                      <option value="MXN">MXN</option>
+                      <option value="MYR">MYR</option>
+                      <option value="NOK">NOK</option>
+                      <option value="NZD">NZD</option>
+                      <option value="PHP">PHP</option>
+                      <option value="PLN">PLN</option>
+                      <option value="RON">RON</option>
+                      <option value="RUB">RUB</option>
+                      <option value="SEK">SEK</option>
+                      <option value="SGD">SGD</option>
+                      <option value="THB">THB</option>
+                      <option value="TRY">TRY</option>
+                      <option value="ZAR">ZAR</option>
+                    </select>
+                  </template>
+                  <strong v-else>{{ Number(tips.amount).toFixed(2) }}{{ tips.currency }}</strong>
+                <td>
+                  <template v-if="tips.editation">
+                    <textarea v-model="tips.message" class="form-control"></textarea>
+                  </template>
+                  <span v-else>{{ tips.message }}</span>
+                <td>
+                  <template v-if="!tips.editation">
+                      <button data-toggle="dropdown" class="btn btn-block btn-outline-dark border-0 h-100"><i class="fas fa-ellipsis-v"></i></button>
+                      <div class="dropdown-menu p-0">
+                        <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="tips.editation = true; pending = true"><i class="fas fa-edit"></i> {{ commons.translate('dialog.buttons.edit') }}</button>
+                        <button type="button" class="dropdown-item p-2 pl-4 pr-4" style="cursor: pointer" v-on:click="removeTips(tips._id)"><i class="fas fa-trash-alt"></i> {{ commons.translate('dialog.buttons.delete') }}</button>
+                      </div>
+                    </template>
+                    <span v-else>
+                      <button
+                        type="button"
+                        @click="tips.editation = false"
+                        class="btn btn-block btn-outline-dark border-0 h-100 small-spaced">DONE</button>
+                    </span>
+                </td>
+              </tr>
+            </table>
+            <button type="button" class="btn btn-outline-dark border-0 ml-1 mb-3 small-spaced" @click="pending = true; viewer.stats.tips.push({id: viewer.id, new: true, editation: true, timestamp: Date.now(), amount: 0, currency: configuration.currency, message: '', _id: Date.now()})">
+                <i class="fas fa-plus pr-1 fa-fw"></i>
+              Add tip
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row pl-2 pr-2 pb-3">
+          <div class="col">
+            <div class="btn-group d-flex" role="group">
+              <button :disabled="viewer.lock.follower" type="button" class="btn btn-block" v-on:click="viewer.is.follower = !viewer.is.follower" v-bind:class="[ viewer.is.follower ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">Follower</button>
+              <button type="button" class="border border-left-0 btn" :class="[viewer.lock.follower ? 'btn-secondary border-0' : 'btn-light']" @click="viewer.lock.follower = !viewer.lock.follower">
+                <i class="fas" :class="[viewer.lock.follower ? 'fa-lock' : 'fa-unlock']"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col">
+              <div class="btn-group d-flex" role="group">
+                <button :disabled="viewer.lock.subscriber" type="button" class="btn btn-block" v-on:click="viewer.is.subscriber = !viewer.is.subscriber" v-bind:class="[ viewer.is.subscriber ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">Subscriber</button>
+                <button type="button" class="border border-left-0 btn" :class="[viewer.lock.subscriber ? 'btn-secondary border-0' : 'btn-light']" @click="viewer.lock.subscriber = !viewer.lock.subscriber">
+                  <i class="fas" :class="[viewer.lock.subscriber ? 'fa-lock' : 'fa-unlock']"></i>
+                </button>
+              </div>
+          </div>
+          <div class="col">
+              <div class="btn-group d-flex" role="group">
+                <button type="button" class="btn btn-block" v-on:click="viewer.is.regular = !viewer.is.regular" v-bind:class="[ viewer.is.regular ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">Regular</button>
+              </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </span>
+</template>
+  <script>
+    Vue.prototype.commons = commons
+
+    function viewersEditInit () {
+      if (_.size(translations) === 0 || _.isNil(configuration)) return setTimeout(() => viewersEditInit(), 1)
+
+      Vue.prototype.configuration = configuration
+
+      var viewersEdit = new Vue({
+        el: '#viewer-edit',
+        components: {
+          'textarea-with-tags': textAreaWithTags,
+          'date-picker': DatePicker.default
+        },
+        data: {
+          viewer: null,
+          watchedTime: null,
+
+          pending: false,
+
+          socket: io('/core/users', { query: "token=" + token }),
+
+          states: {
+            save: 0,
+            delete: false,
+            forceCheckFollowedAt: false,
+          }
+        },
+        methods: {
+          moment: function (args) {
+            return moment(args) // expose moment function
+          },
+          forceCheckFollowedAt: function () {
+            this.pending = true
+            this.states.forceCheckFollowedAt = true
+            this.socket.emit('followedAt.viewer', this.viewer.id, (err, followed_at) => {
+              if (err) return console.error(err)
+              this.viewer.time.follow = followed_at
+              this.states.forceCheckFollowedAt = false
+            })
+          },
+          removeBits: function (_id) {
+            _.remove(this.viewer.stats.bits, o => o._id === _id);
+            this.viewer.stats.bits = [
+              ...this.viewer.stats.bits
+            ]
+            pending = true
+          },
+          removeTips: function (_id) {
+            _.remove(this.viewer.stats.tips, o => o._id === _id);
+            this.viewer.stats.tips = [
+              ...this.viewer.stats.tips
+            ]
+            pending = true
+          },
+          saveChanges: function () {
+            this.states.save = 1
+            const data = {
+              _id: commons.urlParam('id') ? commons.urlParam('id') : null,
+              viewer: this.viewer
+            }
+            if (!this.states.delete) {
+              this.socket.emit('update.viewer', {items: [data]}, (err, _id) => {
+                if (err) {
+                  console.error(err)
+                  return this.states.save = 3
+                }
+                this.states.save = 2
+                this.pending = false
+                this.id = _id
+                setTimeout(() => this.states.save = 0, 1000)
+              })
+            } else {
+              this.socket.emit('delete.viewer', {_id: this.id}, (err) => {
+                page('/#viewers/list')
+              })
+            }
+          },
+        },
+        watch: {
+          watchedTime: _.debounce(function (val, old) {
+            if (val === old) return
+            this.watchedTime = Number(val).toFixed(1)
+
+            if (!isNaN(this.watchedTime)) this.viewer.time.watched = this.watchedTime * 60 * 60 * 1000
+          }, 1000),
+          'viewer.time.follow': function (val, old) {
+            if (val === null || this.viewer.time.follow === new Date(val).getTime()) return
+            this.pending = true
+            this.viewer.time.follow = new Date(val).getTime()
+            if (this.viewer.time.follow === 0) this.viewer.time.follow = null
+          },
+          'viewer.time.subscribed_at': function (val, old) {
+            if (val === null || this.viewer.time.subscribed_at === new Date(val).getTime()) return
+            this.pending = true
+            this.viewer.time.subscribed_at = new Date(val).getTime()
+            if (this.viewer.time.subscribed_at === 0) this.viewer.time.subscribed_at = null
+          }
+        },
+        computed: {
+          lastSeen: function () {
+            if (this.viewer.time.message) {
+              return moment(this.viewer.time.message).format('HH:mm:ss, YYYY-MM-DD')
+            } else return ''
+          }
+        },
+        created: function () {
+          // load up from db
+          if (commons.urlParam('id')) {
+            this.id = commons.urlParam('id')
+            this.socket.emit('findOne.viewer', { where: { id: commons.urlParam('id') } }, (err, data) => {
+              for (let bits of data.stats.bits) {
+                // Add for vue have control and watchers
+                bits.editation = false
+                bits.new = false
+              }
+              for (let tips of data.stats.tips) {
+                // Add for vue have control and watchers
+                tips.editation = false
+                tips.new = false
+              }
+              this.viewer = data
+              this.watchedTime = !data.time.watched ? '0.0' : Number(data.time.watched / (60 * 60 * 1000)).toFixed(1)
+              this.$nextTick(() => { this.pending = false })
+            })
+          }
+        },
+        filters: {
+          capitalize: function (value) {
+            if (!value) return ''
+            value = value.toString()
+            return value.charAt(0).toUpperCase() + value.slice(1)
+          }
+        }
+      })
+    }
+    viewersEditInit()
+  </script>

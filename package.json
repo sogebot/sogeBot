@@ -72,7 +72,8 @@
     "test": "mocha --recursive --timeout 20000 --exit --require source-map-support/register",
     "test:config:mongodb": "cp config.example.json config.json && sed -i -- 's/nedb/mongodb/g' config.json",
     "test:config:nedb": "cp config.example.json config.json",
-    "start": "node ./tools/migrate && node ./tools/migrate --delete && cross-env NODE_ENV=production node -r source-map-support/register ./dest/main || true",
+    "migrate": "node ./tools/migrate && node ./tools/migrate --delete",
+    "start": "npm run migrate && cross-env NODE_ENV=production node -r source-map-support/register ./dest/main || true",
     "start-no-migration": "cross-env NODE_ENV=production node -r source-map-support/register ./dest/main || true",
     "debug": "cross-env NODE_ENV=development node --inspect  ./dest/main || true",
     "cleanup": "node ./tools/cleanup.js || true"

@@ -16,7 +16,7 @@
         <template v-if="state.loading === 1">
           <div class="alert alert-info text-center"><i class="fas fa-circle-notch fa-spin"></i> loading settings from server ...</div>
         </template>
-        <template v-for="(value, category) of settings" v-if="category !== '_permissions' && state.loading === 0">
+        <template v-for="(value, category) of settings" v-if="category !== '_permissions' && state.loading === 0 && !_.isEmpty(value)">
           <h6>{{ category }}</h6>
           <div class="card mb-2" >
             <div class="card-body">

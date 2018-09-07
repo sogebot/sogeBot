@@ -34,7 +34,6 @@ class Twitch {
       { this: this, id: '!followers', command: '!followers', fnc: this.followers, permission: constants.VIEWERS },
       { this: this, id: '!subs', command: '!subs', fnc: this.subs, permission: constants.VIEWERS },
       { this: this, id: '!age', command: '!age', fnc: this.age, permission: constants.VIEWERS },
-      { this: this, id: '!me', command: '!me', fnc: this.showMe, permission: constants.VIEWERS },
       { this: this, id: '!top time', command: '!top time', fnc: this.showTopTime, permission: constants.OWNER_ONLY },
       { this: this, id: '!top tips', command: '!top tips', fnc: this.showTopTips, permission: constants.OWNER_ONLY },
       { this: this, id: '!top points', command: '!top points', fnc: this.showTopPoints, permission: constants.OWNER_ONLY },
@@ -73,7 +72,8 @@ class Twitch {
 
   async lastseenUpdate (opts) {
     if (!_.isNil(opts.sender) && !_.isNil(opts.sender.username)) {
-      global.users.set(opts.sender.username, {
+      global.users.setById(opts.sender.userId, {
+        username: opts.sender.username,
         time: { message: new Date().getTime() },
         is: { subscriber: opts.sender.isSubscriber || opts.sender.isTurboSubscriber }
       }, true)
@@ -199,7 +199,7 @@ class Twitch {
     if (_.isNil(parsed)) username = opts.sender.username
     else username = parsed[0].toLowerCase()
 
-    const user = await global.users.get(username)
+    const user = await global.users.getByName(username)
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.created_at)) {
       let message = await global.commons.prepare('age.failed', { username: username })
       debug(message); global.commons.sendMessage(message, opts.sender)
@@ -251,46 +251,6 @@ class Twitch {
     }
   }
 
-  async showMe (opts) {
-    try {
-      const user = await global.users.get(opts.sender.username)
-      var message = ['$sender']
-
-      // rank
-      var rank = await global.systems.ranks.get(user)
-      if (await global.systems.ranks.isEnabled() && !_.isNull(rank)) message.push(rank)
-
-      // watchTime
-      var watched = await global.users.getWatchedOf(opts.sender.username)
-      message.push((watched / 1000 / 60 / 60).toFixed(1) + 'h')
-
-      // points
-      if (await global.systems.points.isEnabled()) {
-        let userPoints = await global.systems.points.getPointsOf(opts.sender.username)
-        message.push(userPoints + ' ' + await global.systems.points.getPointsName(userPoints))
-      }
-
-      // message count
-      var messages = await global.users.getMessagesOf(opts.sender.username)
-      message.push(messages + ' ' + global.commons.getLocalizedName(messages, 'core.messages'))
-
-      // tips
-      const [tips, currency] = await Promise.all([
-        global.db.engine.find('users.tips', { username: opts.sender.username }),
-        global.configuration.getValue('currency')
-      ])
-      let tipAmount = 0
-      for (let t of tips) {
-        tipAmount += global.currency.exchange(t.amount, t.currency, currency)
-      }
-      message.push(`${Number(tipAmount).toFixed(2)} ${currency}`)
-
-      global.commons.sendMessage(message.join(' | '), opts.sender)
-    } catch (e) {
-      global.log.error(e.stack)
-    }
-  }
-
   showTopFollowAge (opts) {
     opts.parameters = 'followage'
     this.showTop(opts)
@@ -328,14 +288,14 @@ class Twitch {
     let _total = 10 + global.commons.getIgnoreList().length + 2 // 2 for bot and broadcaster
     if (type === 'points' && await global.systems.points.isEnabled()) {
       sorted = []
-      for (let user of (await global.db.engine.find('users.points', { _sort: 'points', _sum: 'points', _total, _group: 'username' }))) {
-        sorted.push({ username: user._id, points: user.points })
+      for (let user of (await global.db.engine.find('users.points', { _sort: 'points', _sum: 'points', _total, _group: 'id' }))) {
+        sorted.push({ username: await global.users.getNameById(user._id), points: user.points })
       }
       message = global.translate('top.listPoints').replace(/\$amount/g, 10)
     } else if (type === 'time') {
       sorted = []
-      for (let user of (await global.db.engine.find('users.watched', { _sort: 'watched', _sum: 'watched', _total, _group: 'username' }))) {
-        sorted.push({ username: user._id, watched: user.watched })
+      for (let user of (await global.db.engine.find('users.watched', { _sort: 'watched', _sum: 'watched', _total, _group: 'id' }))) {
+        sorted.push({ username: await global.users.getNameById(user._id), watched: user.watched })
       }
       message = global.translate('top.listWatched').replace(/\$amount/g, 10)
     } else if (type === 'tips') {
@@ -343,14 +303,15 @@ class Twitch {
       message = global.translate('top.listTips').replace(/\$amount/g, 10)
       let tips = await global.db.engine.find('users.tips')
       for (let tip of tips) {
-        if (_.isNil(users[tip.username])) users[tip.username] = { username: tip.username, amount: 0 }
-        users[tip.username].amount += global.currency.exchange(tip.amount, tip.currency, await global.configuration.getValue('currency'))
+        const username = await global.users.getNameById(tip.id)
+        if (_.isNil(users[username])) users[username] = { username: username, amount: 0 }
+        users[username].amount += global.currency.exchange(tip.amount, tip.currency, await global.configuration.getValue('currency'))
       }
       sorted = _.orderBy(users, 'amount', 'desc')
     } else if (type === 'messages') {
       sorted = []
-      for (let user of (await global.db.engine.find('users.messages', { _sort: 'messages', _sum: 'messages', _total, _group: 'username' }))) {
-        sorted.push({ username: user._id, messages: user.messages })
+      for (let user of (await global.db.engine.find('users.messages', { _sort: 'messages', _sum: 'messages', _total, _group: 'id' }))) {
+        sorted.push({ username: await global.users.getNameById(user._id), messages: user.messages })
       }
       message = global.translate('top.listMessages').replace(/\$amount/g, 10)
     } else if (type === 'followage') {
