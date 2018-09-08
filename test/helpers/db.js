@@ -51,6 +51,9 @@ module.exports = {
       await global.db.engine.remove(global.systems.customCommands.collection.data, {})
       await global.db.engine.remove(global.systems.customCommands.collection.responses, {})
 
+      // remove bets
+      await global.db.engine.remove(global.systems.bets.collection.data, {})
+
       resolve()
     }
     return new Promise((resolve, reject) => {

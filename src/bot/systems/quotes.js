@@ -26,11 +26,9 @@ class Quotes extends System {
   }
 
   async add (opts) {
-    const expects = new Expects()
-
     try {
       if (opts.parameters.length === 0) throw new Error()
-      let [tags, quote] = expects.check(opts.parameters).argument({ name: 'tags', optional: true, default: 'general', multi: true, delimiter: '' }).argument({ name: 'quote', multi: true, delimiter: '' }).toArray()
+      let [tags, quote] = new Expects(opts.parameters).argument({ name: 'tags', optional: true, default: 'general', multi: true, delimiter: '' }).argument({ name: 'quote', multi: true, delimiter: '' }).toArray()
       tags = tags.split(',').map((o) => o.trim())
 
       let quotes = await global.db.engine.find(this.collection.data, {})
@@ -49,11 +47,9 @@ class Quotes extends System {
   }
 
   async remove (opts) {
-    const expects = new Expects()
-
     try {
       if (opts.parameters.length === 0) throw new Error()
-      let id = expects.check(opts.parameters).argument({ type: Number, name: 'id' }).toArray()[0]
+      let id = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).toArray()[0]
       if (_.isNaN(id)) throw new Error()
 
       let item = await global.db.engine.remove(this.collection.data, { id })
@@ -71,11 +67,9 @@ class Quotes extends System {
   }
 
   async set (opts) {
-    const expects = new Expects()
-
     try {
       if (opts.parameters.length === 0) throw new Error()
-      let [id, tag] = expects.check(opts.parameters).argument({ type: Number, name: 'id' }).argument({ name: 'tag', multi: true, delimiter: '' }).toArray()
+      let [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id' }).argument({ name: 'tag', multi: true, delimiter: '' }).toArray()
       let quote = await global.db.engine.findOne(this.collection.data, { id })
       if (!_.isEmpty(quote)) {
         const tags = tag.split(',').map((o) => o.trim())
@@ -101,9 +95,7 @@ class Quotes extends System {
   }
 
   async main (opts) {
-    const expects = new Expects()
-
-    let [id, tag] = expects.check(opts.parameters).argument({ type: Number, name: 'id', optional: true }).argument({ name: 'tag', optional: true, multi: true, delimiter: '' }).toArray()
+    let [id, tag] = new Expects(opts.parameters).argument({ type: Number, name: 'id', optional: true }).argument({ name: 'tag', optional: true, multi: true, delimiter: '' }).toArray()
     if (_.isNil(id) && _.isNil(tag)) {
       const message = await global.commons.prepare('systems.quotes.show.error.no-parameters', { command: opts.command })
       return global.commons.sendMessage(message, opts.sender)
