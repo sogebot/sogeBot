@@ -100,12 +100,12 @@ class Expects {
     if (!opts.optional) this.checkText()
 
     let pattern
-    if (opts.type.name === 'Number') pattern = '\\s[0-9]*'
-    else if (opts.type.name === 'Boolean') pattern = '\\strue|false'
-    else if (!opts.multi) pattern = '\\s\\w+'
-    else pattern = '(?:(?!\\s-[a-zA-Z]).)*?' // capture until -something or [^-]*
+    if (opts.type.name === 'Number') pattern = '[0-9]*'
+    else if (opts.type.name === 'Boolean') pattern = 'true|false'
+    else if (!opts.multi) pattern = '\\w+'
+    else pattern = `(?:(?!-[a-zA-Z]).)+${opts.delimiter !== '' ? '?' : ''}` // capture until -something or [^-]*
 
-    const regexp = XRegExp(`-${opts.name}${opts.delimiter !== '' ? '\\s' + opts.delimiter : opts.delimiter}(?<${opts.name}>${pattern})${opts.delimiter}`, 'ix')
+    const regexp = XRegExp(`-${opts.name}\\s${opts.delimiter}(?<${opts.name}>${pattern})${opts.delimiter}`, 'ix')
     const match = XRegExp.exec(this.text, regexp)
     if (!_.isNil(match) && match[opts.name].trim().length !== 0) {
       if (opts.type.name === 'Boolean') {
