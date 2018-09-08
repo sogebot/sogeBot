@@ -64,7 +64,7 @@
     "yargs": "12.0.1",
     "youtube-search": "1.1.1",
     "ytdl-core": "0.25.1",
-    "ytpl": "0.1.12"
+    "ytpl": "0.1.13"
   },
   "scripts": {
     "build": "make bot ui",
