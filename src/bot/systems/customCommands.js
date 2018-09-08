@@ -144,8 +144,7 @@ class CustomCommands extends System {
 
   async edit (opts: Object) {
     try {
-      const [userlevel, stopIfExecuted, command, rId, response] = new Expects()
-        .check(opts.parameters)
+      const [userlevel, stopIfExecuted, command, rId, response] = new Expects(opts.parameters)
         .argument({ optional: true, name: 'ul', default: null })
         .argument({ optional: true, name: 's', default: null, type: Boolean })
         .command()
@@ -173,8 +172,7 @@ class CustomCommands extends System {
 
   async add (opts: Object) {
     try {
-      const [userlevel, stopIfExecuted, command, response] = new Expects()
-        .check(opts.parameters)
+      const [userlevel, stopIfExecuted, command, response] = new Expects(opts.parameters)
         .argument({ optional: true, name: 'ul', default: 'viewer' })
         .argument({ optional: true, name: 's', default: false, type: Boolean })
         .command()
@@ -198,7 +196,6 @@ class CustomCommands extends System {
       })
       global.commons.sendMessage(global.commons.prepare('customcmds.command-was-added', { command }), opts.sender)
     } catch (e) {
-      console.log(e)
       global.commons.sendMessage(global.commons.prepare('customcmds.commands-parse-failed'), opts.sender)
     }
   }
@@ -252,8 +249,7 @@ class CustomCommands extends System {
   }
 
   async list (opts: Object) {
-    const expects = new Expects()
-    const command = expects.check(opts.parameters).command({ optional: true }).toArray()[0]
+    const command = new Expects(opts.parameters).command({ optional: true }).toArray()[0]
 
     if (!command) {
       // print commands
@@ -336,10 +332,8 @@ class CustomCommands extends System {
   }
 
   async remove (opts: Object) {
-    const expects = new Expects()
-
     try {
-      const [command, response] = expects.check(opts.parameters).command().number({ optional: true }).toArray()
+      const [command, response] = new Expects(opts.parameters).command().number({ optional: true }).toArray()
       let cid = (await global.db.engine.findOne(this.collection.data, { command }))._id
       if (!cid) {
         global.commons.sendMessage(global.commons.prepare('customcmds.command-was-not-found', { command }), opts.sender)
