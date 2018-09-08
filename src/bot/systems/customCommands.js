@@ -198,7 +198,6 @@ class CustomCommands extends System {
       })
       global.commons.sendMessage(global.commons.prepare('customcmds.command-was-added', { command }), opts.sender)
     } catch (e) {
-      console.log(e)
       global.commons.sendMessage(global.commons.prepare('customcmds.commands-parse-failed'), opts.sender)
     }
   }
