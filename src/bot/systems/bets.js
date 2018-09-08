@@ -101,14 +101,12 @@ class Bets extends System {
   }
 
   async open (opts) {
-    const expects = new Expects()
     const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' })
 
     try {
       if (!_.isEmpty(currentBet)) { throw new Error(ERROR_ALREADY_OPENED) }
 
-      let [timeout, title, options] = expects
-        .check(opts.parameters)
+      let [timeout, title, options] = new Expects(opts.parameters)
         .argument({ name: 'timeout', optional: true, default: 2, type: Number })
         .argument({ name: 'title', optional: false, multi: true })
         .list({ delimiter: '|' })
@@ -161,11 +159,10 @@ class Bets extends System {
   }
 
   async participate (opts) {
-    const expects = new Expects()
     const currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' })
 
     try {
-      let [index, points] = expects.check(opts.parameters).number({ optional: true }).points({ optional: true }).toArray()
+      let [index, points] = new Expects(opts.parameters).number({ optional: true }).points({ optional: true }).toArray()
       if (!_.isNil(points) && !_.isNil(index)) {
         const pointsOfUser = await global.systems.points.getPointsOf(opts.sender.userId)
         const _betOfUser = await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId })
@@ -238,10 +235,9 @@ class Bets extends System {
   }
 
   async close (opts) {
-    const expects = new Expects()
     let currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' })
     try {
-      let index = expects.check(opts.parameters).number().toArray()[0]
+      let index = new Expects(opts.parameters).number().toArray()[0]
 
       if (_.isEmpty(currentBet)) throw Error(ERROR_NOT_RUNNING)
       if (_.isNil(currentBet.options[index])) throw Error(ERROR_NOT_OPTION)
