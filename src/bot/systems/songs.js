@@ -233,7 +233,7 @@ class Songs extends System {
         let currentSong = sr
         currentSong.volume = await this.getVolume(currentSong)
         currentSong.type = 'songrequests'
-        this.currentSong = JSON.stringify(currentSong)
+        this.settings._.currentSong = JSON.stringify(currentSong)
 
         if (await this.settings.notify) this.notifySong()
         this.socket.emit('videoID', currentSong)
@@ -262,7 +262,7 @@ class Songs extends System {
       let currentSong = pl
       currentSong.volume = await this.getVolume(currentSong)
       currentSong.type = 'playlist'
-      this.currentSong = JSON.stringify(currentSong)
+      this.settings._.currentSong = JSON.stringify(currentSong)
 
       if (await this.settings.notify) this.notifySong()
 
