@@ -59,8 +59,8 @@ class Message {
         song.artist = song.artist.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
       }
       this.message = this.message.replace(/\$currentSong/g, format.replace(/\$song/g, song.song).replace(/\$artist/g, song.artist))
-    } else if (global.commons.isSystemEnabled('songs')) {
-      let currentSong = _.get(await global.systems.songs.currentSong, 'title', global.translate('songs.not-playing'))
+    } else if (await global.systems.songs.isEnabled()) {
+      let currentSong = _.get(JSON.parse(await global.systems.songs.settings._.currentSong), 'title', global.translate('songs.not-playing'))
       if (opts.escape) {
         currentSong = currentSong.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
       }
