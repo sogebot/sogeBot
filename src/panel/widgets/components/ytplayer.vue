@@ -44,7 +44,7 @@
         </table>
       </div>
       <div role="tabpanel" class="tab-pane active" id="yt-main">
-        <vue-plyr ref="player" :emit="['ready','timeupdate']" @timeupdate="videoTimeUpdated" @ready="ready" :options='{ controls: ["volume"], fullscreen: { enabled: false }, clickToPlay: false }'>
+        <vue-plyr ref="player" :emit="['ready','timeupdate']" @timeupdate="videoTimeUpdated" @ready="ready" :options='{ controls: ["volume"], fullscreen: { enabled: false }, clickToPlay: false }' :style="{ 'visibility': currentSong ? 'visible' : 'hidden'}">
           <div data-plyr-provider="youtube"></div>
         </vue-plyr>
       </div>
@@ -75,6 +75,7 @@ export default {
     return {
       initialized: false,
       autoplay: false,
+      waitingForNext: false,
 
       currentSong: null,
       requests: [],
@@ -89,7 +90,7 @@ export default {
   },
   methods: {
     videoTimeUpdated: function (event) {
-      if (this.autoplay) {
+      if (this.autoplay && this.currentSong) {
         if (this.currentSong.endTime && event.detail.plyr.currentTime > this.currentSong.endTime) {
           this.next() // go to next if we are at endTime
         }
@@ -98,11 +99,20 @@ export default {
     ready: function () {
       if (!this.initialized) {
         this.initialized = true
-        this.next()
+        setInterval(() => {
+          if (this.autoplay && !this.player.playing && !this.player.loading && !this.waitingForNext) {
+            console.log(this.player)
+            this.next()
+          }
+        }, 1000)
       }
     },
     next: function () {
-      this.socket.emit('next')
+      if (!this.waitingForNext) {
+        this.waitingForNext = true
+        this.player.pause()
+        this.socket.emit('next')
+      }
     },
     pause: function () {
       this.autoplay = false
@@ -115,6 +125,11 @@ export default {
   },
   created: function () {
     this.socket.on('videoID', item => {
+      if (!item) {
+        this.currentSong = null
+        this.waitingForNext = false
+        return
+      }
       this.currentSong = item
       this.player.source = {
         type: 'video',
@@ -132,6 +147,7 @@ export default {
           this.player.play()
         }
         this.player.volume = item.volume / 100
+        this.waitingForNext = false
       })
     })
 
