@@ -307,22 +307,26 @@ class Module {
   }
 
   addMenu (opts) {
-    clearTimeout(this.timeouts[`${this.constructor.name}.addMenu`])
+    if (cluster.isMaster) {
+      clearTimeout(this.timeouts[`${this.constructor.name}.${opts.id}.addMenu`])
 
-    if (_.isNil(global.panel)) {
-      this.timeouts[`${this.constructor.name}.addMenu`] = setTimeout(() => this.addMenu(opts), 1000)
-    } else {
-      global.panel.addMenu(opts)
+      if (_.isNil(global.panel)) {
+        this.timeouts[`${this.constructor.name}.${opts.id}.addMenu`] = setTimeout(() => this.addMenu(opts), 1000)
+      } else {
+        global.panel.addMenu(opts)
+      }
     }
   }
 
   addWidget (...opts) {
-    clearTimeout(this.timeouts[`${this.constructor.name}.addWidget`])
+    if (cluster.isMaster) {
+      clearTimeout(this.timeouts[`${this.constructor.name}.${opts[0]}.addWidget`])
 
-    if (_.isNil(global.panel)) {
-      this.timeouts[`${this.constructor.name}.addWidget`] = setTimeout(() => this.addWidget(opts), 1000)
-    } else {
-      global.panel.addWidget(opts[0], opts[1], opts[2])
+      if (_.isNil(global.panel)) {
+        this.timeouts[`${this.constructor.name}.${opts[0]}.addWidget`] = setTimeout(() => this.addWidget(opts), 1000)
+      } else {
+        global.panel.addWidget(opts[0], opts[1], opts[2])
+      }
     }
   }
 
