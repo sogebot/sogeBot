@@ -5,7 +5,6 @@
 [![GitHub release](https://img.shields.io/github/release/sogehige/sogebot.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
 [![Downloads](https://img.shields.io/github/downloads/sogehige/sogebot/total.svg?style=flat-square)](https://github.com/sogehige/sogeBot/releases)
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](https://www.paypal.me/sogetwitch/5eur)
-[![Greenkeeper badge](https://badges.greenkeeper.io/sogehige/sogeBot.svg)](https://greenkeeper.io/)
 
 Free Twitch Bot built on Node.js
 
