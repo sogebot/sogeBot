@@ -195,12 +195,9 @@ be ignored.
   execution was not stopped! /</em>
 </blockquote>
 
-
-
-
 ## Other settings
 
-### Enable or disable quote system
+### Enable or disable custom commands system
 
 `!enable system customCommands` |
 `!disable system customCommands`
