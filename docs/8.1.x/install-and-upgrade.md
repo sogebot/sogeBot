@@ -50,6 +50,6 @@
 
 ## Oauth generation
 
-For [generation of oauth token](http://oauth.sogehige.tv) is advised to [create your own clientId](https://github.com/sogehige/sogeBot/wiki/custom-clientId-(recommended)).
+For [generation of oauth token](http://oauth.sogebot.xyz) is advised to [create your own clientId](https://github.com/sogehige/sogeBot/wiki/custom-clientId-(recommended)).
 
 !> Make sure you login into correct accounts. Anonymous/Privacy modes can help you with login into correct accounts.

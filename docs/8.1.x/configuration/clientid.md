@@ -6,13 +6,13 @@ Although if more users will use clientId, it may become errorneous.
 - go to https://dev.twitch.tv/dashboard/apps/ and login into your twitch account
 - click on `register your application` button
 - set your name of application - for example your bot name
-- set `OAuth Redirect URI` to http://oauth.sogehige.tv
+- set `OAuth Redirect URI` to http://oauth.sogebot.xyz
 - click `register` button
 - your `clientId` will be visible
 
 ### How to generate oauth
 
-- go to http://oauth.sogehige.tv
+- go to http://oauth.sogebot.xyz
 - copy-paste your clientId from https://dev.twitch.tv/dashboard/apps/ into clientId input field
 - continue as usual - best approach is to create oauth in new incognito windows
 

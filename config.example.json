@@ -3,7 +3,7 @@
   "timezone": "system",
   "cpu": 4,
   "settings": {
-    "__COMMENT__": "get bot oauth at http://oauth.sogehige.tv",
+    "__COMMENT__": "get bot oauth at http://oauth.sogebot.xyz",
     "bot_username": "bot_username_here",
     "bot_oauth": "oauth:bot_oauth_here",
     "bot_color": "OrangeRed",
