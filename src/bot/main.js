@@ -19,6 +19,13 @@ const Timeout = require('./timeout')
 const DEBUG_CLUSTER_FORK = debug('cluster:fork')
 const DEBUG_CLUSTER_MASTER = debug('cluster:master')
 const DEBUG_TMIJS = debug('tmijs')
+const DEBUG_TMIJS_USERNOTICE = debug('tmijs:USERNOTICE')
+const DEBUG_TMIJS_PRIVMSG = debug('tmijs:PRIVMSG')
+const DEBUG_TMIJS_WHISPER = debug('tmijs:WHISPER')
+const DEBUG_TMIJS_CLEARCHAT = debug('tmijs:CLEARCHAT')
+const DEBUG_TMIJS_MODE = debug('tmijs:MODE')
+const DEBUG_TMIJS_NOTICE = debug('tmijs:NOTICE')
+const DEBUG_TMIJS_HOSTTARGET = debug('tmijs:HOSTTARGET')
 
 global.commons = new (require('./commons'))()
 global.cache = new (require('./cache'))()
@@ -202,14 +209,13 @@ function forkOn (worker) {
 
 function loadClientListeners () {
   global.broadcasterTMI.chat.on('PRIVMSG/HOSTED', async (message) => {
+    DEBUG_TMIJS_PRIVMSG(message)
     // Someone is hosting the channel and the message contains how many viewers..
     const username = message.message.split(' ')[0].replace(':', '').toLowerCase()
     const autohost = message.message.includes('auto')
     let viewers = message.numberOfViewers || '0'
 
-    DEBUG_TMIJS(`Hosted by ${username} with ${viewers} viewers - autohost: ${autohost}`)
     global.log.host(`${username}, viewers: ${viewers}, autohost: ${autohost}`)
-
     global.db.engine.update('cache.hosts', { username }, { username })
 
     const data = {
@@ -224,6 +230,7 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('WHISPER', async (message) => {
+    DEBUG_TMIJS_WHISPER(message)
     if (!global.commons.isBot(message.tags.displayName) || !message.isSelf) {
       DEBUG_TMIJS('Whisper received: %s', JSON.stringify(message))
 
@@ -236,6 +243,7 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('PRIVMSG', async (message) => {
+    DEBUG_TMIJS_PRIVMSG(message)
     if (!global.commons.isBot(message.tags.displayName) || !message.isSelf) {
       DEBUG_TMIJS('Message received: %s', JSON.stringify(message))
 
@@ -257,6 +265,7 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('CLEARCHAT', message => {
+    DEBUG_TMIJS_CLEARCHAT(message)
     if (message.event === 'USER_BANNED') {
       const duration = message.tags.banDuration
       const reason = message.tags.banReason
@@ -274,6 +283,7 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('HOSTTARGET', message => {
+    DEBUG_TMIJS_HOSTTARGET(message)
     if (message.event === 'HOST_ON') {
       if (typeof message.numberOfViewers !== 'undefined') { // may occur on restart bot when hosting
         DEBUG_TMIJS('Hosting: %s with %s viewers', message.username, message.numberOfViewers)
@@ -283,7 +293,7 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('MODE', async (message) => {
-    DEBUG_TMIJS('User ' + (message.isModerator ? '+mod' : '-mod') + ' ' + message.username)
+    DEBUG_TMIJS_MODE('User ' + (message.isModerator ? '+mod' : '-mod') + ' ' + message.username)
     const user = await global.users.get(message.username)
     if (!user.is.mod && message.isModerator) global.events.fire('mod', { username: message.username })
     global.users.set(message.username, { is: { mod: message.isModerator } })
@@ -292,6 +302,7 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('USERNOTICE', message => {
+    DEBUG_TMIJS_USERNOTICE(message)
     if (message.event === 'RAID') {
       DEBUG_TMIJS('Raided by %s with %s viewers', message.parameters.login, message.parameters.viewerCount)
       global.log.raid(`${message.parameters.login}, viewers: ${message.parameters.viewerCount}`)
@@ -336,6 +347,7 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('NOTICE', message => {
+    DEBUG_TMIJS_NOTICE(message)
     global.log.info(message.message)
   })
 }
