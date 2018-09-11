@@ -61,7 +61,7 @@ class Translate {
               axios.post('http://stats.sogebot.xyz/add', {
                 version: data.version,
                 items: data.items
-              }).catch() // dont expose any errors if something went wrong to not affect bot and confuse
+              }).catch(function () {}) // dont expose any errors if something went wrong to not affect bot and confuse
               data.items = []
             }
           }
@@ -70,7 +70,7 @@ class Translate {
             axios.post('http://stats.sogebot.xyz/add', {
               version: data.version,
               items: data.items
-            }).catch() // dont expose any errors if something went wrong to not affect bot and confuse
+            }).catch(function () {}) // dont expose any errors if something went wrong to not affect bot and confuse
           }
         }
 
@@ -117,7 +117,7 @@ class Translate {
       axios.post('http://stats.sogebot.xyz/add', {
         version: _.get(process, 'env.npm_package_version', 'n/a'),
         items: [{ key, count: 1, missing: this.get(key, false).startsWith('{missing_translation: ') }]
-      }).catch() // dont expose any errors if something went wrong to not affect bot and confuse
+      }).catch(function () {}) // dont expose any errors if something went wrong to not affect bot and confuse
     }
   }
 
