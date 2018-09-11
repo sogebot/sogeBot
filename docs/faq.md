@@ -12,7 +12,7 @@
 
 **Question:** Why !title and !game commands doesn't work?
 
-**Answer:** Bot need channel editor permissions in http://twitch.tv/yourusername/dashboard/permissions and bot oauth token must be generated through http://oauth.sogehige.tv/
+**Answer:** Bot need channel editor permissions in http://twitch.tv/yourusername/dashboard/permissions and bot oauth token must be generated through http://oauth.sogebot.xyz/
 
 ***
 

@@ -58,7 +58,7 @@ class Translate {
           for (let key of [...new Set(Object.keys(flatten(this.translations)).map(o => o.split('.').slice(1).join('.')))]) {
             data.items.push({ key, count: 0, missing: false })
             if (data.items.length === bulk) {
-              axios.post('http://stats.sogehige.tv/add', {
+              axios.post('http://stats.sogebot.xyz/add', {
                 version: data.version,
                 items: data.items
               }).catch() // dont expose any errors if something went wrong to not affect bot and confuse
@@ -67,7 +67,7 @@ class Translate {
           }
           // send last data
           if (data.items.length > 0) {
-            axios.post('http://stats.sogehige.tv/add', {
+            axios.post('http://stats.sogebot.xyz/add', {
               version: data.version,
               items: data.items
             }).catch() // dont expose any errors if something went wrong to not affect bot and confuse
@@ -114,7 +114,7 @@ class Translate {
     if (!this.mSentMetrics.includes(key)) {
       // sent metrics only if its unique
       this.mSentMetrics.push(key)
-      axios.post('http://stats.sogehige.tv/add', {
+      axios.post('http://stats.sogebot.xyz/add', {
         version: _.get(process, 'env.npm_package_version', 'n/a'),
         items: [{ key, count: 1, missing: this.get(key, false).startsWith('{missing_translation: ') }]
       }).catch() // dont expose any errors if something went wrong to not affect bot and confuse
