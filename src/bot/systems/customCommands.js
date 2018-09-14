@@ -119,7 +119,7 @@ class CustomCommands extends System {
 
             // update responses
             for (let r of responses) {
-              if (!r.cid) r.cid = _id || itemFromDb._id
+              if (!r.cid) r.cid = _id || String(itemFromDb._id)
 
               if (!r._id) await global.db.engine.insert(this.collection.responses, r)
               else {
