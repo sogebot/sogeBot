@@ -19,6 +19,54 @@ describe('Raffles - pick()', () => {
     await message.prepare()
   })
 
+  describe.only('#1318 - 4 subs should have 25% win', () => {
+    it('Set subscribers luck to 150%', async () => {
+      global.systems.raffles.settings.luck.subscribersPercent = 150
+    })
+
+    it('Create subscribers raffle', async () => {
+      global.systems.raffles.open({ sender: owner, parameters: '!winme -for subscribers' })
+      await message.isSent('raffles.announce-raffle', owner, {
+        keyword: '!winme',
+        eligibility: await global.commons.prepare('raffles.eligibility-subscribers-item')
+      })
+    })
+
+    const subs = ['sub1', 'sub2', 'sub3', 'sub4']
+    for (let [id, v] of Object.entries(subs)) {
+      it('Add user ' + v + ' to db', async () => {
+        await global.db.engine.insert('users', { id, is: { subscriber: true }, username: v })
+      })
+
+      it('Add user ' + v + ' to raffle', async () => {
+        let a = await global.systems.raffles.participate({ sender: { username: v }, message: '!winme' })
+        assert.isTrue(a)
+      })
+    }
+
+    it('pick a winner', async () => {
+      await global.systems.raffles.pick({ sender: owner })
+
+      await message.isSent('raffles.raffle-winner-is', owner, [{
+        username: 'sub1',
+        keyword: '!winme',
+        probability: 25
+      }, {
+        username: 'sub2',
+        keyword: '!winme',
+        probability: 25
+      }, {
+        username: 'sub3',
+        keyword: '!winme',
+        probability: 25
+      }, {
+        username: 'sub4',
+        keyword: '!winme',
+        probability: 25
+      }])
+    })
+  })
+
   describe('Raffle should return winner', () => {
     it('create ticket raffle', async () => {
       global.systems.raffles.open({ sender: owner, parameters: '!winme -min 0 -max ' + max })
