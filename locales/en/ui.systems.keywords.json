@@ -1,6 +1,6 @@
 {
   "new": "New Keyword",
-  "keyword": {
+  "command": {
     "name": "keyword",
     "placeholder": ""
   },
