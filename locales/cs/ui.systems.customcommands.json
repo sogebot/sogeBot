@@ -4,6 +4,7 @@
     "name": "vlastní příkaz",
     "placeholder": ""
   },
+  "addResponse": "Nová odpověď",
   "response": {
     "name": "odpověď",
     "placeholder": ""
