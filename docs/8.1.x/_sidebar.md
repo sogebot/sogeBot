@@ -9,6 +9,7 @@
   * [ClientId](8.1.x/configuration/clientid.md)
   * [Color](8.1.x/configuration/color.md)
   * [Metrics](8.1.x/configuration/metrics.md)
+  * [Environment variables](8.1.x/configuration/env.md)
 * Systems
   * [Alias](8.1.x/commands/alias.md)
   * [Commercial](8.1.x/commands/commercial.md)
