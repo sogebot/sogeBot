@@ -6,7 +6,6 @@ const debug = require('debug')('systems:points')
 
 // bot libraries
 const constants = require('../constants')
-const Timeout = require('../timeout')
 const System = require('./_interface')
 
 class Points extends System {
@@ -46,8 +45,12 @@ class Points extends System {
   }
 
   async updatePoints () {
+    clearTimeout(this.timeouts['updatePoints'])
     try {
-      if (!(await this.isEnabled())) return new Timeout().recursive({ uid: 'updatePoints', this: this, fnc: this.updatePoints, wait: 5000 })
+      if (!(await this.isEnabled())) {
+        this.timeouts['updatePoints'] = setTimeout(() => this.updatePoints(), 5000)
+        return
+      }
 
       let [interval, perInterval, offlineInterval, perOfflineInterval, isOnline] = await Promise.all([
         this.settings.points.interval,
@@ -80,18 +83,19 @@ class Points extends System {
       global.log.error(e)
       global.log.error(e.stack)
     } finally {
-      new Timeout().recursive({ uid: 'updatePoints', this: this, fnc: this.updatePoints, wait: 5000 })
+      this.timeouts['updatePoints'] = setTimeout(() => this.updatePoints(), 5000)
     }
   }
 
   async compactPointsDb () {
+    clearTimeout(this.timeouts['compactPointsDb'])
     try {
       await global.commons.compactDb({ table: 'users.points', index: 'username', values: 'points' })
     } catch (e) {
       global.log.error(e)
       global.log.error(e.stack)
     } finally {
-      new Timeout().recursive({ uid: 'compactPointsDb', this: this, fnc: this.compactPointsDb, wait: 10000 })
+      this.timeouts['compactPointsDb'] = setTimeout(() => this.compactPointsDb(), 10000)
     }
   }
 

@@ -7,7 +7,6 @@ const cluster = require('cluster')
 
 // bot libraries
 const Game = require('./_interface')
-const Timeout = require('../timeout')
 
 const ERROR_NOT_ENOUGH_OPTIONS = '0'
 const ERROR_ZERO_BET = '1'
@@ -40,6 +39,8 @@ class Duel extends Game {
   }
 
   async pickDuelWinner () {
+    clearTimeout(this.timeouts['pickDuelWinner'])
+
     const [users, timestamp, duelDuration] = await Promise.all([
       global.db.engine.find(this.collection.users),
       this.settings._.timestamp,
@@ -48,7 +49,7 @@ class Duel extends Game {
     debug({ users, timestamp, duelDuration })
 
     if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * duelDuration) {
-      new Timeout().recursive({ uid: 'gamblingPickDuelWinner', this: this, fnc: this.pickDuelWinner, wait: 30000 })
+      this.timeouts['pickDuelWinner'] = setTimeout(() => this.pickDuelWinner(), 30000)
       return
     }
 
@@ -84,7 +85,7 @@ class Duel extends Game {
     await global.db.engine.remove(this.collection.users, {})
     this.settings._.timestamp = 0
 
-    new Timeout().recursive({ uid: 'gamblingPickDuelWinner', this: this, fnc: this.pickDuelWinner, wait: 30000 })
+    this.timeouts['pickDuelWinner'] = setTimeout(() => this.pickDuelWinner(), 30000)
   }
 
   async main (opts) {

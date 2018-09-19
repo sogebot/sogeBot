@@ -14,7 +14,6 @@ const moment = require('moment')
 
 const constants = require('./constants')
 const config = require('@config')
-const Timeout = require('./timeout')
 
 const DEBUG_CLUSTER_FORK = debug('cluster:fork')
 const DEBUG_CLUSTER_MASTER = debug('cluster:master')
@@ -442,17 +441,19 @@ async function cheer (userstate, message) {
 }
 
 let lastWorker = null
+let timeouts = {}
 function sendMessageToWorker (sender, message) {
+  clearTimeout(timeouts['sendMessageToWorker'])
   let worker = _.sample(cluster.workers)
 
   if (worker.id === lastWorker && global.cpu > 1) {
-    new Timeout().recursive({ uid: 'sendMessageToWorker', this: this, args: [sender, message], fnc: sendMessageToWorker, wait: 10 })
+    timeouts['sendMessageToWorker'] = setTimeout(() => sendMessageToWorker(sender, message), 100)
     return
   } else lastWorker = worker.id
 
   DEBUG_CLUSTER_MASTER(`Sending ${message} ${util.inspect(sender)} to worker#${worker.id} - is connected: ${worker.isConnected()}`)
   if (worker.isConnected()) worker.send({ type: 'message', sender: sender, message: message })
-  else new Timeout().recursive({ uid: 'sendMessageToWorker', this: this, args: [sender, message], fnc: sendMessageToWorker, wait: 10 })
+  else timeouts['sendMessageToWorker'] = setTimeout(() => sendMessageToWorker(sender, message), 100)
 }
 
 if (cluster.isMaster) {

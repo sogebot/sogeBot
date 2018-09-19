@@ -11,7 +11,6 @@ const config = require('@config')
 const axios = require('axios')
 
 const Message = require('./message')
-const Timeout = require('./timeout')
 
 class Events {
   constructor () {
@@ -109,7 +108,8 @@ class Events {
     } catch (e) {
       console.error(e.stack)
     } finally {
-      new Timeout().recursive({ uid: 'fadeOut', this: this, fnc: this.fadeOut, wait: 1000 })
+      clearTimeout(this.timeouts['fadeOut'])
+      this.timeouts['fadeOut'] = setTimeout(() => this.fadeOut(), 1000)
     }
   }
 

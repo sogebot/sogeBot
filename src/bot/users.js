@@ -7,7 +7,6 @@ const cluster = require('cluster')
 
 const config = require('@config')
 const debug = require('debug')('users')
-const Timeout = require('./timeout')
 
 function Users () {
   this.timeouts = {}
@@ -547,6 +546,8 @@ Users.prototype.delete = function (username) {
 }
 
 Users.prototype.updateWatchTime = async function () {
+  clearTimeout(this.timeouts['updateWatchTime'])
+
   let timeout = 60000
   try {
     // count watching time when stream is online
@@ -569,17 +570,18 @@ Users.prototype.updateWatchTime = async function () {
     this.watchedList = {}
     timeout = 1000
   }
-  return new Timeout().recursive({ this: this, uid: 'updateWatchTime', wait: timeout, fnc: this.updateWatchTime })
+  this.timeouts['updateWatchTime'] = setTimeout(() => this.updateWatchTime(), timeout)
 }
 
 Users.prototype.compactWatchedDb = async function () {
+  clearTimeout(this.timeouts['compactWatchedDb'])
   try {
     await global.commons.compactDb({ table: 'users.watched', index: 'username', values: 'watched' })
   } catch (e) {
     global.log.error(e)
     global.log.error(e.stack)
   } finally {
-    new Timeout().recursive({ uid: 'compactWatchedDb', this: this, fnc: this.compactWatchedDb, wait: 10000 })
+    this.timeouts['compactWatchedDb'] = setTimeout(() => this.compactWatchedDb(), 10000)
   }
 }
 
@@ -598,13 +600,15 @@ Users.prototype.getWatchedOf = async function (user) {
 }
 
 Users.prototype.compactMessagesDb = async function () {
+  clearTimeout(this.timeouts['compactMessagesDb'])
+
   try {
     await global.commons.compactDb({ table: 'users.messages', index: 'username', values: 'messages' })
   } catch (e) {
     global.log.error(e)
     global.log.error(e.stack)
   } finally {
-    new Timeout().recursive({ uid: 'compactMessagesDb', this: this, fnc: this.compactMessagesDb, wait: 10000 })
+    this.timeouts['compactMessagesDb'] = setTimeout(() => this.compactMessagesDb(), 10000)
   }
 }
 

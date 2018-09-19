@@ -6,7 +6,6 @@ const cluster = require('cluster')
 // bot libraries
 var constants = require('../constants')
 const System = require('./_interface')
-const Timeout = require('../timeout')
 // debug
 const debug = require('debug')('systems:raffles')
 
@@ -106,9 +105,10 @@ class Raffles extends System {
   }
 
   async announce () {
+    clearTimeout(this.timeouts['raffleAnnounce'])
     let raffle = await global.db.engine.findOne(this.collection.data, { winner: null })
     if (!await global.cache.isOnline() || _.isEmpty(raffle) || new Date().getTime() - new Date(await this.settings._.lastAnnounce).getTime() < ((await this.settings.raffleAnnounceInterval) * 60 * 1000)) {
-      new Timeout().recursive({ uid: 'rafflesAnnounce', this: this, fnc: this.announce, wait: 60000 })
+      this.timeouts['raffleAnnounce'] = setTimeout(() => this.announce(), 60000)
       return
     }
 
@@ -130,7 +130,7 @@ class Raffles extends System {
     })
     debug(message); global.commons.sendMessage(message, global.commons.getOwner())
 
-    new Timeout().recursive({ uid: 'rafflesAnnounce', this: this, fnc: this.announce, wait: 60000 })
+    this.timeouts['raffleAnnounce'] = setTimeout(() => this.announce(), 60000)
   }
 
   async remove (self) {

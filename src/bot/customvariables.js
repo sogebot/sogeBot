@@ -9,7 +9,6 @@ const cluster = require('cluster')
 const mathjs = require('mathjs')
 const XRegExp = require('xregexp')
 
-const Timeout = require('./timeout')
 const Message = require('./message')
 
 const DEBUG = {
@@ -19,6 +18,8 @@ const DEBUG = {
 
 class CustomVariables {
   constructor () {
+    this.timeouts = {}
+
     if (cluster.isMaster) {
       this.addMenuAndListenersToPanel()
       this.checkIfCacheOrRefresh()
@@ -26,9 +27,14 @@ class CustomVariables {
   }
 
   async addMenuAndListenersToPanel () {
-    if (_.isNil(global.panel)) return new Timeout().recursive({ this: this, uid: `${this.constructor.name}.addMenuAndListenersToPanel`, wait: 1000, fnc: this.addMenuAndListenersToPanel })
-    global.panel.addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables' })
-    this.sockets()
+    clearTimeout(this.timeouts[`${this.constructor.name}.addMenuAndListenersToPanel`])
+
+    if (_.isNil(global.panel)) {
+      this.timeouts[`${this.constructor.name}.addMenuAndListenersToPanel`] = setTimeout(() => this.addMenuAndListenersToPanel(), 1000)
+    } else {
+      global.panel.addMenu({ category: 'registry', name: 'custom-variables', id: 'registry.customVariables' })
+      this.sockets()
+    }
   }
 
   sockets () {
@@ -260,6 +266,7 @@ class CustomVariables {
   }
 
   async checkIfCacheOrRefresh () {
+    clearTimeout(this.timeouts[`${this.constructor.name}.checkIfCacheOrRefresh`])
     let items = await global.db.engine.find('custom.variables', { type: 'eval' })
 
     for (let item of items) {
@@ -273,7 +280,7 @@ class CustomVariables {
         }
       } catch (e) {} // silence errors
     }
-    return new Timeout().recursive({ this: this, uid: `${this.constructor.name}.checkIfCacheOrRefresh`, wait: 1000, fnc: this.checkIfCacheOrRefresh })
+    this.timeouts[`${this.constructor.name}.checkIfCacheOrRefresh`] = setTimeout(() => this.checkIfCacheOrRefresh(), 1000)
   }
 
   async updateWidgetAndTitle (variable) {

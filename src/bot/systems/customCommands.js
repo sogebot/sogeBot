@@ -11,7 +11,6 @@ const cluster = require('cluster')
 // bot libraries
 const constants = require('../constants')
 const System = require('./_interface')
-const Timeout = require('../timeout')
 const Expects = require('../expects')
 
 /*
@@ -377,13 +376,15 @@ class CustomCommands extends System {
   }
 
   async compactCountDb () {
+    clearTimeout(this.timeouts[this.collection.count + '.compactCountDb'])
+
     try {
       await global.commons.compactDb({ table: this.collection.count, index: 'command', values: 'count' })
     } catch (e) {
       global.log.error(e)
       global.log.error(e.stack)
     } finally {
-      new Timeout().recursive({ uid: this.collection.count + '.compactCountDb', this: this, fnc: this.compactCountDb, wait: 60000 })
+      this.timeouts[this.collection.count + '.compactCountDb'] = setTimeout(() => this.compactCountDb(), 60000)
     }
   }
 

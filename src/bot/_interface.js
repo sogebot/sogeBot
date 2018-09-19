@@ -1,11 +1,12 @@
 const _ = require('lodash')
 const chalk = require('chalk')
 const cluster = require('cluster')
-const Timeout = require('./timeout')
 const constants = require('./constants')
 
 class Module {
   constructor (opts) {
+    this.timeouts = {}
+
     this.dependsOn = opts.dependsOn || []
     this.socket = null
 
@@ -34,8 +35,9 @@ class Module {
 
   async _indexDbs () {
     if (cluster.isMaster) {
+      clearTimeout(this.timeouts[`${this.constructor.name}._indexDbs`])
       if (!global.db.engine.connected) {
-        new Timeout().recursive({ this: this, uid: `${this.constructor.name}._indexDbs`, wait: 1000, fnc: this._indexDbs })
+        this.timeouts[`${this.constructor.name}._indexDbs`] = setTimeout(() => this._indexDbs(), 1000)
       } else {
         // add indexing to settings
         global.db.engine.index({ table: this.collection.settings, index: 'category' })
@@ -44,18 +46,22 @@ class Module {
   }
 
   async _cleanEmptySettingsValues () {
+    clearTimeout(this.timeouts[`${this.constructor.name}._cleanEmptySettingsValues`])
     let settings = await global.db.engine.find(this.collection.settings)
     for (let setting of settings) {
       if (typeof setting.value === 'undefined') {
         await global.db.engine.remove(this.collection.settings, { _id: String(setting._id) })
       }
     }
-    return new Timeout().recursive({ this: this, uid: `${this.constructor.name}._cleanEmptySettingsValues`, wait: 30000, fnc: this._cleanEmptySettingsValues })
+    this.timeouts[`${this.constructor.name}._cleanEmptySettingsValues`] = setTimeout(() => this._cleanEmptySettingsValues(), 30000)
   }
 
   _sockets () {
-    if (_.isNil(global.panel)) return new Timeout().recursive({ this: this, uid: `${this.constructor.name}.sockets`, wait: 1000, fnc: this._sockets })
-    else if (cluster.isMaster) {
+    clearTimeout(this.timeouts[`${this.constructor.name}.sockets`])
+
+    if (_.isNil(global.panel)) {
+      this.timeouts[`${this.constructor.name}._sockets`] = setTimeout(() => this._sockets(), 1000)
+    } else if (cluster.isMaster) {
       this.socket = global.panel.io.of('/' + this._name + '/' + this.constructor.name.toLowerCase())
       if (!_.isNil(this.sockets)) this.sockets()
 
@@ -299,13 +305,23 @@ class Module {
   }
 
   addMenu (opts) {
-    if (_.isNil(global.panel)) return new Timeout().recursive({ this: this, uid: `${this.constructor.name}.addMenu`, wait: 1000, fnc: this.addMenu, args: [opts] })
-    global.panel.addMenu(opts)
+    clearTimeout(this.timeouts[`${this.constructor.name}.addMenu`])
+
+    if (_.isNil(global.panel)) {
+      this.timeouts[`${this.constructor.name}.addMenu`] = setTimeout(() => this.addMenu(opts), 1000)
+    } else {
+      global.panel.addMenu(opts)
+    }
   }
 
   addWidget (...opts) {
-    if (_.isNil(global.panel)) return new Timeout().recursive({ this: this, uid: `${this.constructor.name}.addWidget`, wait: 1000, fnc: this.addWidget, args: [opts] })
-    global.panel.addWidget(opts[0], opts[1], opts[2])
+    clearTimeout(this.timeouts[`${this.constructor.name}.addWidget`])
+
+    if (_.isNil(global.panel)) {
+      this.timeouts[`${this.constructor.name}.addWidget`] = setTimeout(() => this.addWidget(opts), 1000)
+    } else {
+      global.panel.addWidget(opts[0], opts[1], opts[2])
+    }
   }
 
   async getAllSettings () {

@@ -2,7 +2,6 @@ const getSymbolFromCurrency = require('currency-symbol-map')
 const axios = require('axios')
 const _ = require('lodash')
 const debug = require('debug')
-const Timeout = require('./timeout')
 
 class Currency {
   constructor () {
@@ -45,6 +44,8 @@ class Currency {
   }
 
   async updateRates () {
+    clearTimeout(this.timeouts['updateRates'])
+
     let refresh = 1000 * 60 * 60 * 24
     try {
       // base is always CZK
@@ -64,7 +65,7 @@ class Currency {
       refresh = 1000
     }
 
-    new Timeout().recursive({ uid: 'updateRates', this: this, fnc: this.updateRates, wait: refresh })
+    this.timeouts['updateRates'] = setTimeout(() => this.updateRates(), refresh)
   }
 }
 
