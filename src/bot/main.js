@@ -29,6 +29,9 @@ const DEBUG_TMIJS_HOSTTARGET = debug('tmijs:HOSTTARGET')
 global.commons = new (require('./commons'))()
 global.cache = new (require('./cache'))()
 
+// TODO: delete after https://github.com/twitch-apis/twitch-js/issues/161
+let parsedEvents = []
+
 global.linesParsed = 0
 global.avgResponse = []
 
@@ -208,6 +211,9 @@ function forkOn (worker) {
 
 function loadClientListeners () {
   global.broadcasterTMI.chat.on('PRIVMSG/HOSTED', async (message) => {
+    if (parsedEvents.find(o => o._raw === message._raw)) return
+    else parsedEvents.push({ _raw: message._raw, ts: Date.now() })
+
     DEBUG_TMIJS_PRIVMSG(message)
     // Someone is hosting the channel and the message contains how many viewers..
     const username = message.message.split(' ')[0].replace(':', '').toLowerCase()
@@ -229,6 +235,9 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('WHISPER', async (message) => {
+    if (parsedEvents.find(o => o._raw === message._raw)) return
+    else parsedEvents.push({ _raw: message._raw, ts: Date.now() })
+
     DEBUG_TMIJS_WHISPER(message)
     if (!global.commons.isBot(message.tags.displayName) || !message.isSelf) {
       DEBUG_TMIJS('Whisper received: %s', JSON.stringify(message))
@@ -242,6 +251,9 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('PRIVMSG', async (message) => {
+    if (parsedEvents.find(o => o._raw === message._raw)) return
+    else parsedEvents.push({ _raw: message._raw, ts: Date.now() })
+
     DEBUG_TMIJS_PRIVMSG(message)
     if (!global.commons.isBot(message.tags.displayName) || !message.isSelf) {
       DEBUG_TMIJS('Message received: %s', JSON.stringify(message))
@@ -264,6 +276,9 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('CLEARCHAT', message => {
+    if (parsedEvents.find(o => o._raw === message._raw)) return
+    else parsedEvents.push({ _raw: message._raw, ts: Date.now() })
+
     DEBUG_TMIJS_CLEARCHAT(message)
     if (message.event === 'USER_BANNED') {
       const duration = message.tags.banDuration
@@ -282,6 +297,9 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('HOSTTARGET', message => {
+    if (parsedEvents.find(o => o._raw === message._raw)) return
+    else parsedEvents.push({ _raw: message._raw, ts: Date.now() })
+
     DEBUG_TMIJS_HOSTTARGET(message)
     if (message.event === 'HOST_ON') {
       if (typeof message.numberOfViewers !== 'undefined') { // may occur on restart bot when hosting
@@ -292,6 +310,9 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('MODE', async (message) => {
+    if (parsedEvents.find(o => o._raw === message._raw)) return
+    else parsedEvents.push({ _raw: message._raw, ts: Date.now() })
+
     DEBUG_TMIJS_MODE('User ' + (message.isModerator ? '+mod' : '-mod') + ' ' + message.username)
     const user = await global.users.get(message.username)
     if (!user.is.mod && message.isModerator) global.events.fire('mod', { username: message.username })
@@ -301,6 +322,9 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('USERNOTICE', message => {
+    if (parsedEvents.find(o => o._raw === message._raw)) return
+    else parsedEvents.push({ _raw: message._raw, ts: Date.now() })
+
     DEBUG_TMIJS_USERNOTICE(message)
     if (message.event === 'RAID') {
       DEBUG_TMIJS('Raided by %s with %s viewers', message.parameters.login, message.parameters.viewerCount)
@@ -346,6 +370,9 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('NOTICE', message => {
+    if (parsedEvents.find(o => o._raw === message._raw)) return
+    else parsedEvents.push({ _raw: message._raw, ts: Date.now() })
+
     DEBUG_TMIJS_NOTICE(message)
     global.log.info(message.message)
   })
@@ -456,6 +483,10 @@ function sendMessageToWorker (sender, message) {
   else timeouts['sendMessageToWorker'] = setTimeout(() => sendMessageToWorker(sender, message), 100)
 }
 
+function cleanupParsedEvents () {
+  parsedEvents = parsedEvents.filter(o => Date.now() - o.ts < 1000)
+}
+
 if (cluster.isMaster) {
   setInterval(() => {
     if (global.cpu > 1) { // refresh if there is more than one worker
@@ -464,4 +495,5 @@ if (cluster.isMaster) {
       worker.disconnect()
     }
   }, 1000 * 60 * 60 * 2) // every 2 hour spin up new worker and kill old
+  setInterval(cleanupParsedEvents, 100)
 }
