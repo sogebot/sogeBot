@@ -1,4 +1,5 @@
 'use strict'
+
 const util = require('util')
 const _ = require('lodash')
 const debug = require('debug')
@@ -97,6 +98,10 @@ function cluster () {
           workerIsFree.db = true
       }
     })
+
+    if (process.env.HEAP && process.env.HEAP.toLowerCase() === 'true') {
+      require('./heapdump.js').init('heap/cluster/')
+    }
   })
 
   async function message (data) {

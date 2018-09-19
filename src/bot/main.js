@@ -10,6 +10,7 @@ const os = require('os')
 const util = require('util')
 const debug = require('debug')
 const _ = require('lodash')
+const chalk = require('chalk')
 const moment = require('moment')
 
 const constants = require('./constants')
@@ -161,6 +162,11 @@ async function main () {
 
     global.panel.expose()
     loadClientListeners()
+
+    if (process.env.HEAP && process.env.HEAP.toLowerCase() === 'true') {
+      global.log.warning(chalk.bgRed.bold('HEAP debugging is ENABLED'))
+      require('./heapdump.js').init('heap/main/')
+    }
   })
 }
 
