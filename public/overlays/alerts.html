@@ -249,12 +249,6 @@
           $('#alerts').append($div)
           return
         }
-        if (_.isNil(image.url)) {
-          alertsQueue[id].finished++;
-
-          return
-        }
-
         $('#images').empty()
 
         let style = ''
@@ -298,7 +292,11 @@
         }
 
         $('#images').append('<div style="' + style + '"><img src="' + image.url + '?x=' + Math.random() + '"></img></div>')
-        $('#images div img').on('load', function () {
+        $('#images div img').on('error', function (err) {
+          alertsQueue[id].finished++
+          console.error('Image load failed, check ' + image.url)
+        })
+        $('#images div img').on('load', function (err) {
           image.delay = _.isNil(image.delay) ? 0 : parseInt(image.delay, 10) // delay of animation
           image.time = _.isNil(image.time) ? 1000 : parseInt(image.time, 10) // how long to show
           image.duration = _.isNil(image.duration) ? 1000 : parseInt(image.duration) // how long to animate
