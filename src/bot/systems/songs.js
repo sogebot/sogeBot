@@ -351,7 +351,7 @@ class Songs extends System {
       if (err) return global.log.error(err, { fnc: 'Songs.prototype.addSongToQueue#1' })
       if (_.isUndefined(videoInfo) || _.isUndefined(videoInfo.title) || _.isNull(videoInfo.title)) {
         global.commons.sendMessage(global.translate('songs.song-was-not-found'), opts.sender)
-      } else if (videoInfo.length_seconds / 60 > await this.settings.duration) global.commons.sendMessage(global.translate('songs.tooLong'), opts.sender)
+      } else if (videoInfo.length_seconds / 60 > await this.settings.duration) global.commons.sendMessage(global.translate('songs.song-is-too-long'), opts.sender)
       else {
         global.db.engine.update(this.collection.request, { addedAt: new Date().getTime() }, { videoID: videoID, title: videoInfo.title, addedAt: new Date().getTime(), loudness: videoInfo.loudness, length_seconds: videoInfo.length_seconds, username: opts.sender.username })
         let message = await global.commons.prepare('songs.song-was-added-to-queue', { name: videoInfo.title })
