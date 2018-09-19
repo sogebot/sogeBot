@@ -3,8 +3,6 @@ const axios = require('axios')
 const config = require('@config')
 const debug = require('debug')('webhooks')
 
-const Timeout = require('./timeout')
-
 class Webhooks {
   constructor () {
     this.timeouts = {}
@@ -31,9 +29,10 @@ class Webhooks {
   }
 
   clearCache () {
+    clearTimeout(this.timeouts['clearCache'])
     debug('Clearing cache')
     this.cache = _.filter(this.cache, (o) => o.timestamp >= _.now() - 600000)
-    new Timeout().recursive({ uid: 'clearCache', this: this, fnc: this.clearCache, wait: 600000 })
+    setTimeout(() => this.clearCache, 600000)
   }
 
   existsInCache (type, id) {
@@ -42,9 +41,11 @@ class Webhooks {
   }
 
   async subscribe (type) {
+    clearTimeout(this.timeouts[`subscribe-${type}`])
+
     const cid = await global.cache.channelId()
     if (_.isNil(cid)) {
-      new Timeout().recursive({ uid: 'subscribe', this: this, fnc: this.subscribe, args: [type], wait: 1000 })
+      this.timeouts[`subscribe-${type}`] = setTimeout(() => this.subscribe(type), 1000)
       return
     }
 
@@ -98,7 +99,7 @@ class Webhooks {
     }
 
     // resubscribe after while
-    new Timeout().recursive({ uid: 'subscribe', this: this, fnc: this.subscribe, args: [type], wait: leaseSeconds * 1000 })
+    this.timeouts[`subscribe-${type}`] = setTimeout(() => this.subscriber(type), leaseSeconds * 1000)
   }
 
   async event (aEvent, res) {

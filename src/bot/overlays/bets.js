@@ -1,7 +1,5 @@
 const debug = require('debug')
 
-const Timeout = require('../timeout')
-
 class BetsOverlay {
   constructor () {
     this.timeouts = {}
@@ -16,6 +14,8 @@ class BetsOverlay {
   }
 
   async interval () {
+    clearTimeout(this.timeouts['betsInterval'])
+
     try {
       let _modifiedAt = await global.db.engine.findOne(global.systems.bets.collection.data, { key: 'betsModifiedTime' })
       if (this.modifiedAt !== _modifiedAt) {
@@ -26,7 +26,7 @@ class BetsOverlay {
     } catch (e) {
       global.log.error(e.stack)
     } finally {
-      new Timeout().recursive({ uid: 'betsInterval', this: this, fnc: this.interval, wait: 1000 })
+      this.timeouts['betsInterval'] = setTimeout(() => this.interval(), 1000)
     }
   }
 

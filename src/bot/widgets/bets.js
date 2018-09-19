@@ -2,7 +2,6 @@
 
 const _ = require('lodash')
 const debug = require('debug')
-const Timeout = require('../timeout')
 
 class BetsWidget {
   constructor () {
@@ -21,6 +20,7 @@ class BetsWidget {
   }
 
   async interval () {
+    clearTimeout(this.timeouts['betsWidgetsInterval'])
     try {
       let _modifiedAt = await global.db.engine.findOne('systems.bets', { key: 'betsModifiedTime' })
       if (this.modifiedAt !== _modifiedAt) {
@@ -31,7 +31,7 @@ class BetsWidget {
     } catch (e) {
       global.log.error(e.stack)
     } finally {
-      new Timeout().recursive({ uid: 'betsWidgetsInterval', this: this, fnc: this.interval, wait: 1000 })
+      this.timeouts['betsWidgetsInterval'] = setTimeout(() => this.interval(), 1000)
     }
   }
 

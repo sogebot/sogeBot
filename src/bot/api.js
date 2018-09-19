@@ -5,7 +5,6 @@ const axios = require('axios')
 const constants = require('./constants')
 const moment = require('moment')
 const cluster = require('cluster')
-const Timeout = require('./timeout')
 
 const DEBUG_API_CHANNELID = debug('api:getChannelID')
 const DEBUG_API_GET_CHANNEL_CHATTERS_UNOFFICIAL_API = debug('api:getChannelChattersUnofficialAPI')
@@ -24,6 +23,8 @@ const DEBUG_API_OAUTH_VALIDATION = debug('api:oauthValidation')
 class API {
   constructor () {
     if (cluster.isMaster) {
+      this.timeouts = {}
+
       this.remainingAPICalls = 30
       this.refreshAPICalls = _.now() / 1000
       this.rate_limit_follower_check = new Set()
@@ -63,6 +64,8 @@ class API {
   }
 
   async oauthValidation (type, quiet = false) {
+    clearTimeout(this.timeouts[`oauthValidation-${type}`])
+
     let request
     let status = true
     const url = 'https://id.twitch.tv/oauth2/validate'
@@ -83,11 +86,13 @@ class API {
       if (!quiet) global.log.error(`Something went wrong with your ${type} oauth - ${e.response.data.message}`)
     }
 
-    new Timeout().recursive({ this: this, uid: `oauthValidation-${type}`, wait: timeout, fnc: this.oauthValidation, args: [type] })
+    this.timeouts[`oauthValidation-${type}`] = setTimeout(() => this.oauthValidation(type), timeout)
     return status
   }
 
   async intervalFollowerUpdate () {
+    clearTimeout(this.timeouts['intervalFollowerUpdate'])
+
     for (let username of this.rate_limit_follower_check) {
       const user = await global.users.get(username)
       const isSkipped = user.username === config.settings.broadcaster_username || user.username === config.settings.bot_username.toLowerCase()
@@ -101,8 +106,7 @@ class API {
       this.rate_limit_follower_check.delete(user.username)
       await this.isFollowerUpdate(user)
     }
-
-    new Timeout().recursive({ this: this, uid: 'intervalFollowerUpdate', wait: 500, fnc: this.intervalFollowerUpdate })
+    this.timeouts['intervalFollowerUpdate'] = setTimeout(() => this.intervalFollowerUpdate(), 500)
   }
 
   async _loadCachedStatusAndGame () {
@@ -110,6 +114,8 @@ class API {
   }
 
   async getChannelID () {
+    clearTimeout(this.timeouts['getChannelID'])
+
     var request
     const url = `https://api.twitch.tv/kraken/users?login=${config.settings.broadcaster_username}`
 
@@ -136,11 +142,14 @@ class API {
       let timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : 60000
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelID', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
-      new Timeout().recursive({ this: this, uid: 'getChannelID', wait: timeout, fnc: this.getChannelID })
+
+      this.timeouts['getChannelID'] = setTimeout(() => this.getChannelID(), timeout)
     }
   }
 
   async getChannelChattersUnofficialAPI (opts) {
+    clearTimeout(this.timeouts['getChannelChattersUnofficialAPI'])
+
     const sendJoinEvent = async function (bulk) {
       for (let user of bulk) {
         await new Promise((resolve) => setTimeout(() => resolve(), 1000))
@@ -159,7 +168,7 @@ class API {
     const needToWait = _.isNil(global.widgets)
     DEBUG_API_GET_CHANNEL_CHATTERS_UNOFFICIAL_API(`GET ${url}\nwait: ${needToWait}`)
     if (needToWait) {
-      new Timeout().recursive({ this: this, uid: 'getChannelChattersUnofficialAPI', wait: 1000, fnc: this.getChannelChattersUnofficialAPI, args: opts })
+      this.timeouts['getChannelChattersUnofficialAPI'] = setTimeout(() => this.getChannelChattersUnofficialAPI(opts), 1000)
       return
     }
 
@@ -172,7 +181,7 @@ class API {
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
-      new Timeout().recursive({ this: this, uid: 'getChannelChattersUnofficialAPI', wait: timeout, fnc: this.getChannelChattersUnofficialAPI, args: opts })
+      this.timeouts['getChannelChattersUnofficialAPI'] = setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
       return
     }
 
@@ -216,10 +225,12 @@ class API {
     if (opts.saveToWidget) sendPartEvent(bulkParted)
     if (opts.saveToWidget) sendJoinEvent(bulkInsert)
 
-    new Timeout().recursive({ this: this, uid: 'getChannelChattersUnofficialAPI', wait: timeout, fnc: this.getChannelChattersUnofficialAPI, args: opts })
+    this.timeouts['getChannelChattersUnofficialAPI'] = setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
   }
 
   async getChannelSubscribersOldAPI () {
+    clearTimeout(this.timeouts['getChannelSubscribersOldAPI'])
+
     const cid = await global.cache.channelId()
     const url = `https://api.twitch.tv/kraken/channels/${cid}/subscriptions?limit=100`
     if (_.isNil(_.get(config, 'settings.broadcaster_oauth', '').match(/oauth:[\w]*/))) {
@@ -229,7 +240,7 @@ class API {
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
     DEBUG_API_GET_CHANNEL_SUBSCRIBERS_OLD_API(`GET ${url}\nwait: ${needToWait}`)
     if (needToWait) {
-      new Timeout().recursive({ this: this, uid: 'getChannelSubscribersOldAPI', wait: 1000, fnc: this.getChannelSubscribersOldAPI })
+      this.timeouts['getChannelSubscribersOldAPI'] = setTimeout(() => this.getChannelSubscribersOldAPI(), 1000)
       return
     }
 
@@ -280,17 +291,21 @@ class API {
         global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
       }
     }
-    if (timeout !== 0) new Timeout().recursive({ this: this, uid: 'getChannelSubscribersOldAPI', wait: timeout, fnc: this.getChannelSubscribersOldAPI })
+    if (timeout !== 0) {
+      this.timeouts['getChannelSubscribersOldAPI'] = setTimeout(() => this.getChannelSubscribersOldAPI(), timeout)
+    }
   }
 
   async getChannelDataOldAPI (opts) {
+    clearTimeout(this.timeouts['getChannelDataOldAPI'])
+
     const cid = await global.cache.channelId()
     const url = `https://api.twitch.tv/kraken/channels/${cid}`
 
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
     DEBUG_API_GET_CHANNEL_DATA_OLD_API(`GET ${url}\nwait: ${needToWait}`)
     if (needToWait) {
-      new Timeout().recursive({ this: this, uid: 'getChannelDataOldAPI', wait: 1000, fnc: this.getChannelDataOldAPI, args: opts })
+      this.timeouts['getChannelDataOldAPI'] = setTimeout(() => this.getChannelDataOldAPI(opts), 1000)
       return
     }
 
@@ -338,15 +353,17 @@ class API {
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
     }
-    new Timeout().recursive({ this: this, uid: 'getChannelDataOldAPI', wait: timeout, fnc: this.getChannelDataOldAPI, args: { forceUpdate: false } })
+    this.timeouts['getChannelDataOldAPI'] = setTimeout(() => this.getChannelDataOldAPI({ forceUpdate: false }), timeout)
   }
 
   async getChannelHosts () {
+    clearTimeout(this.timeouts['getChannelHosts'])
+
     const d = debug('api:getChannelHosts')
     const cid = await global.cache.channelId()
 
     if (_.isNil(cid)) {
-      new Timeout().recursive({ this: this, uid: 'getChannelHosts', wait: 1000, fnc: this.getChannelHosts })
+      this.timeouts['getChannelHosts'] = setTimeout(() => this.getChannelHosts(), 1000)
       return
     }
 
@@ -369,10 +386,11 @@ class API {
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
     }
-    new Timeout().recursive({ this: this, uid: 'getChannelHosts', wait: timeout, fnc: this.getChannelHosts })
+    this.timeouts['getChannelHosts'] = setTimeout(() => this.getChannelHosts(), timeout)
   }
 
   async updateChannelViews () {
+    clearTimeout(this.timeouts['updateChannelViews'])
     const cid = await global.cache.channelId()
     const url = `https://api.twitch.tv/helix/users/?id=${cid}`
 
@@ -381,7 +399,7 @@ class API {
     DEBUG_API_UPDATE_CHANNEL_VIEWS(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
     if (needToWait || notEnoughAPICalls) {
       if (notEnoughAPICalls) DEBUG_API_UPDATE_CHANNEL_VIEWS('Waiting for rate-limit to refresh')
-      new Timeout().recursive({ this: this, uid: 'updateChannelViews', wait: 1000, fnc: this.updateChannelViews })
+      this.timeouts['updateChannelViews'] = setTimeout(() => this.updateChannelViews(), 1000)
       return
     }
 
@@ -407,10 +425,12 @@ class API {
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: this.remainingAPICalls })
     }
-    new Timeout().recursive({ this: this, uid: 'updateChannelViews', wait: timeout, fnc: this.updateChannelViews })
+    this.timeouts['updateChannelViews'] = setTimeout(() => this.updateChannelViews(), timeout)
   }
 
   async getLatest100Followers (quiet) {
+    clearTimeout(this.timeouts['getLatest100Followers'])
+
     const cid = await global.cache.channelId()
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`
 
@@ -419,7 +439,7 @@ class API {
     DEBUG_API_GET_LATEST_100_FOLLOWERS(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
     if (needToWait || notEnoughAPICalls) {
       if (notEnoughAPICalls) DEBUG_API_GET_LATEST_100_FOLLOWERS('Waiting for rate-limit to refresh')
-      new Timeout().recursive({ this: this, uid: 'getLatest100Followers', wait: 1000, fnc: this.getLatest100Followers })
+      this.timeouts['getLatest100Followers'] = setTimeout(() => this.getLatest100Followers(), 1000)
       return
     }
 
@@ -512,7 +532,7 @@ class API {
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: this.remainingAPICalls })
     }
-    new Timeout().recursive({ this: this, uid: 'getLatest100Followers', wait: timeout, fnc: this.getLatest100Followers, args: [timeout === 1000] })
+    this.timeouts['getLatest100Followers'] = setTimeout(() => this.getLatest100Followers(timeout === 1000), timeout)
   }
 
   async getGameFromId (gid) {
@@ -553,6 +573,8 @@ class API {
   }
 
   async getCurrentStreamData (opts) {
+    clearTimeout(this.timeouts['getCurrentStreamData'])
+
     const cid = await global.cache.channelId()
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`
 
@@ -561,7 +583,7 @@ class API {
     DEBUG_API_GET_CURRENT_STREAM_DATA(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
     if (needToWait || notEnoughAPICalls) {
       if (notEnoughAPICalls) DEBUG_API_GET_CURRENT_STREAM_DATA('Waiting for rate-limit to refresh')
-      new Timeout().recursive({ this: this, uid: 'getCurrentStreamData', wait: 1000, fnc: this.getCurrentStreamData, args: opts })
+      this.timeouts['getCurrentStreamData'] = setTimeout(() => this.getCurrentStreamData(opts), 1000)
       return
     }
 
@@ -631,7 +653,8 @@ class API {
               await global.cache.rawStatus(rawStatus)
             } else {
               this.retries.getCurrentStreamData++
-              return new Timeout().recursive({ this: this, uid: 'getCurrentStreamData', wait: 10000, fnc: this.getCurrentStreamData, args: opts })
+              this.timeouts['getCurrentStreamData'] = setTimeout(() => this.getCurrentStreamData(opts), 10000)
+              return
             }
           } else {
             this.retries.getCurrentStreamData = 0
@@ -673,7 +696,7 @@ class API {
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: this.remainingAPICalls })
     }
-    new Timeout().recursive({ this: this, uid: 'getCurrentStreamData', wait: timeout, fnc: this.getCurrentStreamData, args: opts })
+    this.timeouts['getCurrentStreamData'] = setTimeout(() => this.getCurrentStreamData(opts), timeout)
   }
 
   async saveStreamData (stream) {
@@ -727,6 +750,8 @@ class API {
   }
 
   async setTitleAndGame (sender, args) {
+    clearTimeout(this.timeouts['setTitleAndGame'])
+
     args = _.defaults(args, { title: null }, { game: null })
     const cid = await global.cache.channelId()
     const url = `https://api.twitch.tv/kraken/channels/${cid}`
@@ -734,7 +759,7 @@ class API {
     const needToWait = _.isNil(cid) || _.isNil(global.overlays)
     DEBUG_API_SET_TITLE_AND_GAME(`PUT ${url}\nwait: ${needToWait}`)
     if (needToWait) {
-      new Timeout().recursive({ this: this, uid: 'setTitleAndGame', wait: 10, fnc: this.setTitleAndGame, args: [sender, args] })
+      this.timeouts['setTitleAndGame'] = setTimeout(() => this.setTitleAndGame(sender, args), 1000)
       return
     }
 
@@ -836,6 +861,8 @@ class API {
   }
 
   async checkClips () {
+    clearTimeout(this.timeouts['checkClips'])
+
     let notCheckedClips = (await global.db.engine.find('api.clips', { isChecked: false }))
 
     // remove clips which failed
@@ -846,13 +873,15 @@ class API {
     const url = `https://api.twitch.tv/helix/clips?id=${notCheckedClips.map((o) => o.clipId).join(',')}`
 
     if (notCheckedClips.length === 0) { // nothing to do
-      return new Timeout().recursive({ this: this, uid: 'checkClips', wait: 1000, fnc: this.checkClips })
+      this.timeouts['checkClips'] = setTimeout(() => this.checkClips(), 1000)
+      return
     }
 
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
     if (notEnoughAPICalls) {
       DEBUG_API_CHECK_CLIPS('Waiting for rate-limit to refresh')
-      return new Timeout().recursive({ this: this, uid: 'checkClips', wait: 1000, fnc: this.checkClips })
+      this.timeouts['checkClips'] = setTimeout(() => this.checkClips(), 1000)
+      return
     }
 
     var request
@@ -874,10 +903,12 @@ class API {
       global.log.error(`API: ${url} - ${e.stack}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
     }
-    new Timeout().recursive({ this: this, uid: 'checkClips', wait: 1000, fnc: this.checkClips })
+    this.timeouts['checkClips'] = setTimeout(() => this.checkClips(), 1000)
   }
 
   async createClip (opts) {
+    clearTimeout(this.timeouts['createClip'])
+
     if (!(await global.cache.isOnline())) return // do nothing if stream is offline
 
     const isClipChecked = async function (id) {
@@ -903,7 +934,7 @@ class API {
     DEBUG_API_CREATE_CLIP(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
     if (needToWait || notEnoughAPICalls) {
       if (notEnoughAPICalls) DEBUG_API_CREATE_CLIP('Waiting for rate-limit to refresh')
-      new Timeout().recursive({ this: this, uid: 'createClip', wait: 1000, fnc: this.createClip, args: [opts] })
+      this.timeouts['createClip'] = setTimeout(() => this.createClip(opts), 1000)
       return
     }
 
@@ -959,6 +990,8 @@ class API {
   }
 
   async isFollowerUpdate (user) {
+    clearTimeout(this.timeouts['isFollowerUpdate'])
+
     const cid = await global.cache.channelId()
     const url = `https://api.twitch.tv/helix/users/follows?from_id=${user.id}&to_id=${cid}`
 
@@ -967,7 +1000,7 @@ class API {
     DEBUG_API_IS_FOLLOWER_UPDATE(`GET ${url}\nwait: ${needToWait}\ncalls: ${this.remainingAPICalls}`)
     if (needToWait || notEnoughAPICalls) {
       if (notEnoughAPICalls) DEBUG_API_IS_FOLLOWER_UPDATE('Waiting for rate-limit to refresh')
-      new Timeout().recursive({ this: this, uid: 'isFollowerUpdate', wait: 1000, fnc: this.isFollowerUpdate, args: [user] })
+      this.timeouts['isFollowerUpdate'] = setTimeout(() => this.isFollowerUpdate(user), 1000)
       return
     }
 

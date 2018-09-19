@@ -6,7 +6,6 @@ const debug = require('debug')
 const cluster = require('cluster')
 
 const Expects = require('../expects.js')
-const Timeout = require('../timeout')
 const Game = require('./_interface')
 
 class Heist extends Game {
@@ -84,10 +83,12 @@ class Heist extends Game {
     }
     super({ settings })
 
-    if (cluster.isMaster) new Timeout().recursive({ uid: 'iCheckFinished', this: this, fnc: this.iCheckFinished, wait: 10000 }) // wait for proper config startup
+    if (cluster.isMaster) this.timeouts['iCheckFinished'] = setTimeout(() => this.iCheckFinished(), 10000) // wait for proper config startup
   }
 
   async iCheckFinished () {
+    clearTimeout(this.timeouts['iCheckFinished'])
+
     const d = debug('heist:iCheckFinished')
     d('Checking if heist is finished')
     let [startedAt, entryCooldown, lastHeistTimestamp, copsCooldown, started] = await Promise.all([
@@ -114,7 +115,7 @@ class Heist extends Game {
         // cleanup
         this.settings._.startedAt = null
         await global.db.engine.remove(this.collection.users, {})
-        new Timeout().recursive({ uid: 'iCheckFinished', this: this, fnc: this.iCheckFinished, wait: 10000 })
+        this.timeouts['iCheckFinished'] = setTimeout(() => this.iCheckFinished(), 10000)
         return
       }
 
@@ -177,7 +178,7 @@ class Heist extends Game {
       this.settings._.lastHeistTimestamp = null
       global.commons.sendMessage((await this.settings.notifications.copsCooldown), global.commons.getOwner())
     }
-    new Timeout().recursive({ uid: 'iCheckFinished', this: this, fnc: this.iCheckFinished, wait: 10000 })
+    this.timeouts['iCheckFinished'] = setTimeout(() => this.iCheckFinished(), 10000)
   }
 
   async main (opts) {

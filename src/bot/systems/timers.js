@@ -8,7 +8,6 @@ const cluster = require('cluster')
 
 // bot libraries
 var constants = require('../constants')
-const Timeout = require('../timeout')
 const System = require('./_interface')
 
 /*
@@ -139,6 +138,8 @@ class Timers extends System {
   }
 
   async check () {
+    clearTimeout(this.timeouts['timersCheck'])
+
     const d = debug('timers:check')
     d('checking timers')
     let timers = await global.db.engine.find(this.collection.data, { enabled: true })
@@ -157,7 +158,7 @@ class Timers extends System {
       }
       await global.db.engine.update(this.collection.data, { _id: timer._id.toString() }, { trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
     }
-    new Timeout().recursive({ uid: 'timersCheck', this: this, fnc: this.check, wait: 1000 }) // this will run check 1s after full check is correctly done
+    this.timeouts['timersCheck'] = setTimeout(() => this.check(), 1000) // this will run check 1s after full check is correctly done
   }
 
   async editName (self, socket, data) {

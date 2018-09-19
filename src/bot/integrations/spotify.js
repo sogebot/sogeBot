@@ -8,8 +8,6 @@ const SpotifyWebApi = require('spotify-web-api-node')
 const crypto = require('crypto')
 const urljoin = require('url-join')
 
-const Timeout = require('../timeout')
-
 /*
  * How to integrate:
  * 1. Create app in https://beta.developer.spotify.com/dashboard/applications
@@ -74,6 +72,8 @@ class Spotify {
   }
 
   async ICurrentSong () {
+    clearTimeout(this.timeouts['ICurrentSong'])
+
     try {
       let data = await this.client.getMyCurrentPlayingTrack()
       let song = {
@@ -86,10 +86,12 @@ class Spotify {
     } catch (e) {
       this.currentSong = {}
     }
-    new Timeout().recursive({ uid: 'ICurrentSong', this: this, fnc: this.ICurrentSong, wait: 10000 })
+    this.timeouts['ICurrentSong'] = setTimeout(() => this.ICurrentSong(), 10000)
   }
 
   async IRefreshToken () {
+    clearTimeout(this.timeouts['IRefreshToken'])
+
     try {
       if (!_.isNil(this.client)) {
         let data = await this.client.refreshAccessToken()
@@ -100,7 +102,7 @@ class Spotify {
       global.log.error('Spotify refresh token failed')
       global.log.error(e)
     }
-    new Timeout().recursive({ uid: 'IRefreshToken', this: this, fnc: this.IRefreshToken, wait: 60000 })
+    this.timeouts['IRefreshToken'] = setTimeout(() => this.IRefreshToken(), 60000)
   }
 
   get enabled () {

@@ -9,7 +9,6 @@ const cluster = require('cluster')
 var constants = require('../constants')
 var Points = require('./points')
 const Expects = require('../expects.js')
-const Timeout = require('../timeout')
 const System = require('./_interface')
 
 const ERROR_NOT_ENOUGH_OPTIONS = 'Expected more parameters'
@@ -59,6 +58,8 @@ class Bets extends System {
   }
 
   async checkIfBetExpired () {
+    clearTimeout(this.timeouts['betsCheckIfBetExpired'])
+
     try {
       let currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' })
       DEBUG_BET_CHECK_IF_EXPIRED('Current bet object: %o', currentBet)
@@ -96,7 +97,7 @@ class Bets extends System {
           break
       }
     }
-    new Timeout().recursive({ uid: 'betsCheckIfBetExpired', this: this, fnc: this.checkIfBetExpired, wait: 10000 })
+    this.timeouts['betsCheckIfBetExpired'] = setTimeout(() => this.checkIfBetExpired(), 10000)
   }
 
   async open (opts) {
