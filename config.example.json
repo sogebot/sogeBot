@@ -1,7 +1,7 @@
 {
   "__README__": "https://github.com/sogehige/SogeBot/wiki/Install-and-Upgrade",
   "timezone": "system",
-  "cpu": 4,
+  "cpu": 1,
   "settings": {
     "__COMMENT__": "get bot oauth at http://oauth.sogebot.xyz",
     "bot_username": "bot_username_here",
