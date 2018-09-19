@@ -4,6 +4,7 @@
     "name": "custom command",
     "placeholder": ""
   },
+  "addResponse": "Add response",
   "response": {
     "name": "response",
     "placeholder": ""

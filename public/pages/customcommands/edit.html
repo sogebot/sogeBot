@@ -64,7 +64,7 @@
             </div>
           </template>
           <div class="invalid-feedback" :style="{'display': hasError.responses === true ? 'block !important' : 'no'}">{{ commons.translate('systems.customcommands.error.isEmpty') }}</div>
-          <button class="btn btn-primary btn-block mt-2" type="button" @click="responses.push({ order: responses.length, response: '', permission: 1 })">Add response</button>
+          <button class="btn btn-primary btn-block mt-2" type="button" @click="responses.push({ order: responses.length, response: '', permission: 1 })">{{ commons.translate('systems.customcommands.addResponse') }}</button>
         </div>
 
 
