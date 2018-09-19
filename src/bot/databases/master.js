@@ -59,6 +59,7 @@ class IMasterController extends Interface {
 
   sendRequest (resolve, reject, id, data) {
     clearTimeout(this.timeouts[`sendRequest-${id}`])
+    delete this.timeouts[`sendRequest-${id}`]
 
     try {
       const worker = _.sample(cluster.workers)
@@ -73,6 +74,7 @@ class IMasterController extends Interface {
 
   returnData (resolve, reject, id) {
     clearTimeout(this.timeouts[`returnData-${id}`])
+    delete this.timeouts[`returnData-${id}`]
 
     let dataFromWorker = _.find(this.data, (o) => o.id === id)
     if (!_.isNil(dataFromWorker)) {
