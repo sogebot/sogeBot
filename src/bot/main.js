@@ -162,7 +162,7 @@ async function main () {
 
     if (process.env.HEAP && process.env.HEAP.toLowerCase() === 'true') {
       global.log.warning(chalk.bgRed.bold('HEAP debugging is ENABLED'))
-      require('./heapdump.js').init('heap/main/')
+      setTimeout(() => require('./heapdump.js').init('heap/main/'), 120000)
     }
   })
 }

@@ -6,10 +6,13 @@
  * @type {exports}
  */
 
+const chalk = require('chalk')
 var fs = require('fs')
 var profiler = require('v8-profiler-node8')
 var _datadir = null
-var nextMBThreshold = 400
+var nextMBThreshold = 200
+var memMBlast = 0
+var heapTaken = 0
 
 /**
  * Init and scheule heap dump runs
@@ -18,7 +21,7 @@ var nextMBThreshold = 400
  */
 module.exports.init = function (datadir) {
   _datadir = datadir
-  setInterval(tickHeapDump, 5000)
+  setInterval(tickHeapDump, 1000)
 }
 
 /**
@@ -34,11 +37,20 @@ function tickHeapDump () {
  * Creates a heap dump if the currently memory threshold is exceeded
  */
 function heapDump () {
-  var memMB = process.memoryUsage().rss / 1048576
-
+  if (heapTaken > 0) {
+    return --heapTaken
+  }
+  var memMB = process.memoryUsage().heapUsed / 1048576
+  console.log(chalk.bgRed((require('cluster').isMaster ? 'Master' : 'Cluster') +
+    ' # Current mem usage: ' + memMB +
+    ', last mem usage: ' + memMBlast +
+    ', change: ' + (memMB - memMBlast) +
+    ', threshold: ' + nextMBThreshold))
+  memMBlast = memMB
   if (memMB > nextMBThreshold) {
-    nextMBThreshold += 50
-    console.log('Taking snapshot - threshold ' + nextMBThreshold)
+    heapTaken = 2 * 60 // wait more before next heap (making heap may cause enxt heap to be too high)
+    nextMBThreshold = memMB + 25
+    console.log('Taking snapshot - ' + (require('cluster').isMaster ? 'Master' : 'Cluster'))
     var snap = profiler.takeSnapshot('profile')
     saveHeapSnapshot(snap, _datadir)
   }
