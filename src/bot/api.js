@@ -975,9 +975,9 @@ class API {
       })
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
-      if (e.response.status !== 422) {
+      if (e.response.data.status !== 422) {
         global.log.error(`API: ${url} - ${e.stack}`)
-        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
+        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: `${e.response.data.status} ${_.get(e, 'body.message', e.statusText)}` })
       }
       return
     }
