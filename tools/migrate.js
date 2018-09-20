@@ -604,6 +604,7 @@ let migration = {
             // get possible latest username
             let followCheck = 0
             for (let u of toMerge) {
+              if (!data.username) data.username = u.username
               if (typeof u.time !== 'undefined' && new Date(followCheck).getTime() < new Date(u.time.followCheck).getTime()) {
                 data.username = u.username
                 followCheck = new Date(u.time.followCheck).getTime()

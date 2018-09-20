@@ -44,7 +44,7 @@ global.status = { // TODO: move it?
 
 require('./logging') // logger is on master / worker have own global.log sending data through process
 
-global.db = new (require('./databases/database'))()
+global.db = new (require('./databases/database'))(true)
 if (cluster.isMaster) {
   // spin up forks first
   global.cpu = config.cpu === 'auto' ? os.cpus().length : parseInt(_.get(config, 'cpu', 1), 10)
