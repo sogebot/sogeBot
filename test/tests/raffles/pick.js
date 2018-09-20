@@ -19,7 +19,7 @@ describe('Raffles - pick()', () => {
     await message.prepare()
   })
 
-  describe.only('#1318 - 4 subs should have 25% win', () => {
+  describe('#1318 - 4 subs should have 25% win', () => {
     it('Set subscribers luck to 150%', async () => {
       global.systems.raffles.settings.luck.subscribersPercent = 150
     })
