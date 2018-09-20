@@ -14,7 +14,7 @@ class IMongoDB extends Interface {
   constructor (forceIndexes, forceRemoveIndexes) {
     super('mongodb')
 
-    this.createIndexes = forceIndexes || cluster.isMaster
+    this.createIndexes = (forceIndexes && cluster.isMaster)
     this.forceRemoveIndexes = forceRemoveIndexes || false
 
     this.connected = false
