@@ -236,14 +236,19 @@ class Twitch {
 
   async watched (opts) {
     try {
-      let watched, parsed
-      parsed = opts.parameters.match(/^([\S]+)$/)
-      const user = await global.users.get(opts.parameters < 1 ? opts.sender.username : parsed[0])
-      watched = parseInt(!_.isNil(user) && !_.isNil(user.time) && !_.isNil(user.time.watched) ? user.time.watched : 0) / 1000 / 60 / 60
+      const parsed = opts.parameters.match(/^([\S]+)$/)
+
+      let id = opts.sender.userId
+      let username = opts.sender.username
+
+      if (parsed) {
+        username = parsed[0].toLowerCase()
+        id = await global.users.getIdByName(username)
+      }
 
       let m = await global.commons.prepare('watched.success.time', {
-        time: watched.toFixed(1),
-        username: user.username
+        time: Number((await global.users.getWatchedOf(id) / (60 * 60 * 1000))).toFixed(1),
+        username
       })
       debug(m); global.commons.sendMessage(m, opts.sender)
     } catch (e) {
