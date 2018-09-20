@@ -68,16 +68,19 @@ class Points extends System {
         if (global.commons.isBot(username)) continue
 
         let user = await global.db.engine.findOne('users', { username })
-        if (parseInt(interval, 10) !== 0 && parseInt(ptsPerInterval, 10) !== 0) {
-          _.set(user, 'time.points', _.get(user, 'time.points', 0))
-          let shouldUpdate = new Date().getTime() - new Date(user.time.points).getTime() >= interval
-          if (shouldUpdate) {
-            await global.db.engine.insert('users.points', { id: user.id, points: parseInt(ptsPerInterval, 10) })
-            await global.db.engine.update('users', { id: user.id }, { time: { points: new Date() } })
+        if (_.isEmpty(user)) user.id = await global.users.getIdFromTwitch(username)
+        if (user.id) {
+          if (parseInt(interval, 10) !== 0 && parseInt(ptsPerInterval, 10) !== 0) {
+            _.set(user, 'time.points', _.get(user, 'time.points', 0))
+            let shouldUpdate = new Date().getTime() - new Date(user.time.points).getTime() >= interval
+            if (shouldUpdate) {
+              await global.db.engine.insert('users.points', { id: user.id, points: parseInt(ptsPerInterval, 10) })
+              await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()) } })
+            }
+          } else {
+            // force time update if interval or points are 0
+            await global.db.engine.update('users', { id: user.id }, { id: user.id, username, time: { points: String(new Date()) } })
           }
-        } else {
-          // force time update if interval or points are 0
-          await global.db.engine.update('users', { id: user.id }, { time: { points: new Date() } })
         }
       }
     } catch (e) {
