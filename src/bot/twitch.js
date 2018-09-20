@@ -71,7 +71,7 @@ class Twitch {
   }
 
   async lastseenUpdate (opts) {
-    if (!_.isNil(opts.sender) && !_.isNil(opts.sender.username)) {
+    if (!_.isNil(opts.sender) && !_.isNil(opts.sender.userId) && !_.isNil(opts.sender.username)) {
       global.users.setById(opts.sender.userId, {
         username: opts.sender.username,
         time: { message: new Date().getTime() },
