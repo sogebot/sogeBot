@@ -100,7 +100,7 @@ function cluster () {
     })
 
     if (process.env.HEAP && process.env.HEAP.toLowerCase() === 'true') {
-      setTimeout(() => require('./heapdump.js').init('heap/cluster/'), 120000)
+      setTimeout(() => require('./heapdump.js').init('heap/'), 120000)
     }
   })
 
