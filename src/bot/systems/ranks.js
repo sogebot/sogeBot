@@ -144,7 +144,7 @@ class Ranks extends System {
   async main (opts) {
     debug('show(%j, %j)', opts.sender)
 
-    let watched = await global.users.getWatchedOf(opts.sender.username)
+    let watched = await global.users.getWatchedOf(opts.sender.userId)
     let rank = await this.get(opts.sender.username)
     debug('Users rank: %j', rank)
 
