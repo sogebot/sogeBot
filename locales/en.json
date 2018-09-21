@@ -371,7 +371,8 @@
         "latestTip": "Latest Tip (username)",
         "latestCheerAmount": "Latest Cheer (amount)",
         "latestCheerMessage": "Latest Cheer (message)",
-        "latestCheer": "Latest Cheer (username)"
+        "latestCheer": "Latest Cheer (username)",
+        "version": "Bot version"
       }
     },
     "page-settings": {
