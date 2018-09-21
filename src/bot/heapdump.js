@@ -11,7 +11,7 @@ const cluster = require('cluster')
 var fs = require('fs')
 var profiler = require('v8-profiler-node8')
 var _datadir = null
-var nextMBThreshold = 200
+var nextMBThreshold = 100
 var memMBlast = 0
 var heapTaken = 0
 
