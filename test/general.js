@@ -12,9 +12,6 @@ config.metrics.translations = false
 
 fs.writeFileSync('../config.json', JSON.stringify(config))
 
-// set process and debug mode to have only one cpu
-process.send = process.send || function () {} // process is not in mocha somehow
-
 // load up a bot
 if (require('cluster').isMaster) {
   global.mocha = true

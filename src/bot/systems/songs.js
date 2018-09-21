@@ -224,7 +224,11 @@ class Songs extends System {
   }
 
   async sendNextSongID () {
-    if (cluster.isWorker) return process.send({ type: 'songs', fnc: 'sendNextSongID' })
+    if (cluster.isWorker) {
+      if (process.send) process.send({ type: 'songs', fnc: 'sendNextSongID' })
+      return
+    }
+
     // check if there are any requests
     if (await this.settings.songrequest) {
       let sr = await global.db.engine.find(this.collection.request)

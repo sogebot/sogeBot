@@ -35,7 +35,7 @@ class WheelOfFortune extends Game {
       const options = JSON.parse(await this.settings.options.data)
       global.panel.io.of('/games/wheeloffortune').emit('spin', { options, username: opts.sender.username })
     } else {
-      process.send({ type: 'call', ns: 'games.wheelOfFortune', fnc: 'main', args: [opts] })
+      if (process.send) process.send({ type: 'call', ns: 'games.wheelOfFortune', fnc: 'main', args: [opts] })
     }
   }
 }

@@ -128,7 +128,7 @@ class Alias extends System {
         (alias.permission === constants.MODS && (isMod || isOwner)) ||
         (alias.permission === constants.OWNER_ONLY && isOwner)) {
         global.log.process({ type: 'parse', sender: opts.sender, message: opts.message.replace(replace, `${alias.command}`) })
-        process.send({ type: 'parse', sender: opts.sender, message: opts.message.replace(replace, `${alias.command}`) })
+        if (process.send) process.send({ type: 'parse', sender: opts.sender, message: opts.message.replace(replace, `${alias.command}`) })
       }
     }
     return true

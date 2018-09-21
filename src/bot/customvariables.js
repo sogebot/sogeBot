@@ -284,7 +284,7 @@ class CustomVariables {
   }
 
   async updateWidgetAndTitle (variable) {
-    if (cluster.isWorker) process.send({ type: 'widget_custom_variables', emit: 'refresh' })
+    if (cluster.isWorker && process.send) process.send({ type: 'widget_custom_variables', emit: 'refresh' })
     else if (!_.isNil(global.widgets.custom_variables.socket)) global.widgets.custom_variables.socket.emit('refresh') // send update to widget
 
     if (!_.isNil(variable)) {
@@ -292,7 +292,7 @@ class CustomVariables {
       let title = await global.cache.rawStatus()
 
       if (title.match(regexp)) {
-        if (cluster.isWorker) process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [null] })
+        if (cluster.isWorker && process.send) process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [null] })
         else global.api.setTitleAndGame(null)
       }
     }

@@ -368,7 +368,7 @@ class Twitch {
       return
     }
     if (cluster.isMaster) global.api.setTitleAndGame(opts.sender, { title: opts.parameters })
-    else process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [opts.sender, { title: opts.parameters }] })
+    else if (process.send) process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [opts.sender, { title: opts.parameters }] })
   }
 
   async setGame (opts) {
@@ -378,7 +378,7 @@ class Twitch {
       return
     }
     if (cluster.isMaster) global.api.setTitleAndGame(opts.sender, { game: opts.parameters })
-    else process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [opts.sender, { game: opts.parameters }] })
+    else if (process.send) process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [opts.sender, { game: opts.parameters }] })
   }
 }
 

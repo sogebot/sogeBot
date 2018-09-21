@@ -94,7 +94,7 @@ function cluster () {
               global.log.error('This db call is not correct')
               global.log.error(data)
           }
-          process.send(data)
+          if (process.send) process.send(data)
           workerIsFree.db = true
       }
     })
@@ -139,7 +139,7 @@ function cluster () {
         if (_.isEmpty(user)) await global.db.engine.insert('users', data)
         else await global.db.engine.update('users', { _id: String(user._id) }, data)
 
-        process.send({ type: 'api', fnc: 'isFollower', username: sender.username })
+        if (process.send) process.send({ type: 'api', fnc: 'isFollower', username: sender.username })
 
         global.events.fire('keyword-send-x-times', { username: sender.username, message: message })
         if (message.startsWith('!')) {
@@ -151,7 +151,7 @@ function cluster () {
       await parse.process()
     }
     DEBUG_CLUSTER_WORKER_ONMESSAGE_ID('Stats sending')
-    process.send({ type: 'stats', of: 'parser', value: parse.time(), message: message })
+    if (process.send) process.send({ type: 'stats', of: 'parser', value: parse.time(), message: message })
   }
 }
 

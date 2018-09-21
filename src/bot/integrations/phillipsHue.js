@@ -84,7 +84,10 @@ PhillipsHue.prototype.commands = function () {
 }
 
 PhillipsHue.prototype.getLights = function (self, sender, text) {
-  if (cluster.isWorker) return process.send({ type: 'phillipshue', fnc: 'getLights', sender: sender, text: text })
+  if (cluster.isWorker) {
+    if (process.send) process.send({ type: 'phillipshue', fnc: 'getLights', sender: sender, text: text })
+    return
+  }
   self.api.lights()
     .then(function (lights) {
       var output = []
@@ -97,7 +100,10 @@ PhillipsHue.prototype.getLights = function (self, sender, text) {
 }
 
 PhillipsHue.prototype.hue = function (self, sender, text) {
-  if (cluster.isWorker) return process.send({ type: 'phillipshue', fnc: 'hue', sender: sender, text: text })
+  if (cluster.isWorker) {
+    if (process.send) process.send({ type: 'phillipshue', fnc: 'hue', sender: sender, text: text })
+    return
+  }
   var rgb = self.parseText(text, 'rgb', '255,255,255').split(',')
   if (rgb.length < 3) rgb = [255, 255, 255]
 
