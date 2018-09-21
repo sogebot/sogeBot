@@ -46,6 +46,8 @@
 
 `$latestCheer` - Latest Cheer (username)
 
+`$version` - return current bot version
+
 ## Eval
 `(eval <yourJScode>)` - will evaluate your javascript code - there **must** be return value
 

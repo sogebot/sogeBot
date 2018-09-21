@@ -29,6 +29,8 @@ class Message {
       this.message = this.message.replace(regexp, value)
     }
 
+    this.message = this.message.replace(/\$version/g, process.env.npm_package_version)
+
     let events = _.orderBy(await global.db.engine.find('widgetsEventList'), 'timestamp', 'desc')
     // latestFollower
     let latestFollower = _.find(events, (o) => o.event === 'follow')
