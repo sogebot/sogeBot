@@ -45,7 +45,7 @@ if (cluster.isWorker) {
   global.log = {}
   for (let level of Object.entries(levels)) {
     global.log[level[0]] = function (message, params) {
-      process.send({ type: 'log', level: level[0], message: message, params: params })
+      if (process.send) process.send({ type: 'log', level: level[0], message: message, params: params })
     }
   }
 } else {

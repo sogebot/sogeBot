@@ -47,7 +47,8 @@ Alerts.prototype.replay = async function (self, socket, data) {
 
 Alerts.prototype.overlay = async function (opts) {
   if (cluster.isWorker) {
-    return process.send({ type: 'call', ns: 'overlays.alerts', fnc: 'overlay', args: [opts] })
+    if (process.send) process.send({ type: 'call', ns: 'overlays.alerts', fnc: 'overlay', args: [opts] })
+    return
   }
   opts.parameters = await new Message(opts.parameters).parse()
 

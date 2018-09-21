@@ -58,7 +58,7 @@ class Highlights extends System {
   async main (opts) {
     if (cluster.isWorker) {
       // as we are using API, go through master
-      return process.send({ type: 'highlight', opts })
+      if (process.send) process.send({ type: 'highlight', opts })
     } else {
       const d = debug('systems:highlight:highlight')
       const cid = await global.cache.channelId()

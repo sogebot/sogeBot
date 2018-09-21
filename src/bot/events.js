@@ -118,7 +118,7 @@ class Events {
     attributes = _.clone(attributes) || {}
 
     if (cluster.isWorker) { // emit process to master
-      process.send({ type: 'event', eventId: eventId, attributes: attributes })
+      if (process.send) process.send({ type: 'event', eventId: eventId, attributes: attributes })
       return
     }
 

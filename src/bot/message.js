@@ -219,7 +219,7 @@ class Message {
           .replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
         if (cluster.isMaster) _.sample(cluster.workers).send({ type: 'message', sender: { username: attr.sender }, message: cmd, skip: true, quiet: true }) // resend to random worker
-        else process.send({ type: 'parse', sender: { username: attr.sender }, message: cmd, skip: true, quiet: true })
+        else if (process.send) process.send({ type: 'parse', sender: { username: attr.sender }, message: cmd, skip: true, quiet: true })
         return ''
       },
       '(!#)': async function (filter) {
@@ -229,7 +229,7 @@ class Message {
           .replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + attr.sender)
           .replace(/\$param/g, attr.param)
         if (cluster.isMaster) _.sample(cluster.workers).send({ type: 'message', sender: { username: attr.sender }, message: cmd, skip: true, quiet: false }) // resend to random worker
-        else process.send({ type: 'parse', sender: { username: attr.sender }, message: cmd, skip: true, quiet: false })
+        else if (process.send) process.send({ type: 'parse', sender: { username: attr.sender }, message: cmd, skip: true, quiet: false })
         return ''
       }
     }

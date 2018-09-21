@@ -41,7 +41,7 @@ Commons.prototype.processAll = function (proc) {
     }
   } else {
     // need to be sent to master
-    process.send(proc)
+    if (process.send) process.send(proc)
   }
 }
 
@@ -184,7 +184,7 @@ Commons.prototype.message = function (type, username, message, retry) {
 
 Commons.prototype.timeout = function (username, reason, timeout) {
   if (cluster.isMaster) global.botTMI.chat.timeout(config.settings.broadcaster_username, username, timeout, reason)
-  else process.send({ type: 'timeout', username: username, timeout: timeout, reason: reason })
+  else if (process.send) process.send({ type: 'timeout', username: username, timeout: timeout, reason: reason })
 }
 
 Commons.prototype.getOwner = function () {

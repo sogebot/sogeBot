@@ -146,7 +146,7 @@ async function main () {
         resolve()
       }
     }
-    connect(false, false, 0)
+    if (!global.mocha) connect(false, false, 0)
   })
   connections.then(() => {})
 
