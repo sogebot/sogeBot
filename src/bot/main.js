@@ -123,6 +123,7 @@ async function main () {
 
       retries++
       if (retries > 15) {
+        global.status.tmi = constants.DISCONNECTED
         reject(new Error('Max retries reached'))
       } else if (!bot || !broadcaster) {
         setTimeout(() => {
@@ -200,6 +201,31 @@ function forkOn (worker) {
 }
 
 function loadClientListeners () {
+  global.broadcasterTMI.chat.on('DISCONNECT', async (message) => {
+    global.log.info('Broadcaster is disconnected from TMI server')
+    global.status.tmi = constants.DISCONNECTED
+  })
+  global.broadcasterTMI.chat.on('RECONNECT', async (message) => {
+    global.log.info('Broadcaster is reconnecting to TMI server')
+    global.status.tmi = constants.RECONNECTING
+  })
+  global.broadcasterTMI.chat.on('CONNECTED ', async (message) => {
+    global.log.info('Broadcaster is connected to TMI server')
+    global.status.tmi = constants.CONNECTED
+  })
+  global.botTMI.chat.on('DISCONNECT', async (message) => {
+    global.log.info('Bot is disconnected from TMI server')
+    global.status.tmi = constants.DISCONNECTED
+  })
+  global.botTMI.chat.on('RECONNECT', async (message) => {
+    global.log.info('Bot is reconnecting to TMI server')
+    global.status.tmi = constants.RECONNECTING
+  })
+  global.botTMI.chat.on('CONNECTED ', async (message) => {
+    global.log.info('Bot is connected to TMI server')
+    global.status.tmi = constants.CONNECTED
+  })
+
   global.broadcasterTMI.chat.on('PRIVMSG/HOSTED', async (message) => {
     // Someone is hosting the channel and the message contains how many viewers..
     const username = message.message.split(' ')[0].replace(':', '').toLowerCase()
