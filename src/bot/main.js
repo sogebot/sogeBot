@@ -209,7 +209,7 @@ function loadClientListeners () {
     global.log.info('Broadcaster is reconnecting to TMI server')
     global.status.tmi = constants.RECONNECTING
   })
-  global.broadcasterTMI.chat.on('CONNECTED ', async (message) => {
+  global.broadcasterTMI.chat.on('CONNECTED', async (message) => {
     global.log.info('Broadcaster is connected to TMI server')
     global.status.tmi = constants.CONNECTED
   })
@@ -221,7 +221,7 @@ function loadClientListeners () {
     global.log.info('Bot is reconnecting to TMI server')
     global.status.tmi = constants.RECONNECTING
   })
-  global.botTMI.chat.on('CONNECTED ', async (message) => {
+  global.botTMI.chat.on('CONNECTED', async (message) => {
     global.log.info('Bot is connected to TMI server')
     global.status.tmi = constants.CONNECTED
   })
