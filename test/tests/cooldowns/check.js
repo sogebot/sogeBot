@@ -19,6 +19,38 @@ describe('Cooldowns - check()', () => {
     await message.prepare()
   })
 
+  it('#1352 - command in a sentence', async () => {
+    let [command, type, seconds, quiet] = ['!test', 'user', '60', true]
+    global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
+    await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
+
+    let item = await global.db.engine.findOne('systems.cooldown', { key: '!test' })
+    assert.notEmpty(item)
+
+    let isOk = await global.systems.cooldown.check({ sender: testUser, message: 'Lorem Ipsum !test' })
+    assert.isTrue(isOk)
+
+    isOk = await global.systems.cooldown.check({ sender: testUser, message: 'Lorem Ipsum !test' })
+    assert.isTrue(isOk) // second should fail
+  })
+
+  it('command with subcommand - user', async () => {
+    let [command, type, seconds, quiet] = ['!test me', 'user', '60', true]
+    global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
+    await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
+
+    let item = await global.db.engine.findOne('systems.cooldown', { key: '!test me' })
+    assert.notEmpty(item)
+
+    assert.isTrue(await global.systems.cooldown.check({ sender: testUser, message: command }), `'${command}' expected to not fail`)
+    assert.isFalse(await global.systems.cooldown.check({ sender: testUser, message: command }), `'${command}' expected to fail`)
+    assert.isTrue(await global.systems.cooldown.check({ sender: testUser2, message: command }), `'${command}' expected to not fail`)
+
+    assert.isTrue(await global.systems.cooldown.check({ sender: testUser, message: '!test' }))
+    assert.isTrue(await global.systems.cooldown.check({ sender: testUser, message: '!test' }))
+    assert.isTrue(await global.systems.cooldown.check({ sender: testUser2, message: '!test' }))
+  })
+
   it('command - user', async () => {
     let [command, type, seconds, quiet] = ['!test', 'user', '60', true]
     global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })

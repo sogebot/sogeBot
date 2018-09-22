@@ -7,8 +7,8 @@ class Expects {
       this.originalText = text
       this.text = text
     } else {
-      this.originalText = null
-      this.text = null
+      this.originalText = ''
+      this.text = ''
     }
     this.match = []
   }
@@ -138,16 +138,32 @@ class Expects {
     return this
   }
 
-  string (opts) {
+  everything (opts) {
     opts = opts || {}
-    _.defaults(opts, { optional: false, delimiter: '\\s' })
-    opts.delimiter = XRegExp.escape(opts.delimiter)
+    _.defaults(opts, { optional: false })
     if (!opts.optional) this.checkText()
 
-    const regexp = XRegExp(`(?<string> .* )`, 'ix')
+    const regexp = XRegExp(`(?<everything> .* )`, 'ix')
     const match = XRegExp.exec(` ${this.text} `, regexp)
     if (!_.isNil(match)) {
-      this.match.push(match.string.substring(1, match.string.length - 1))
+      this.match.push(match.everything.substring(1, match.everything.length - 1).trim())
+      this.everything = this.text.replace(match.everything, '') // remove from text matched pattern
+    } else {
+      if (!opts.optional) throw Error('There is no text found.')
+      else this.match.push(null)
+    }
+    return this
+  }
+
+  string (opts) {
+    opts = opts || {}
+    _.defaults(opts, { optional: false })
+    if (!opts.optional) this.checkText()
+
+    const regexp = XRegExp(`(?<string> \\S* )`, 'igx')
+    const match = XRegExp.exec(`${this.text.trim()}`, regexp)
+    if (!_.isNil(match)) {
+      this.match.push(match.string.trim())
       this.text = this.text.replace(match.string, '') // remove from text matched pattern
     } else {
       if (!opts.optional) throw Error('String not found')

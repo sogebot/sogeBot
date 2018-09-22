@@ -9,6 +9,7 @@ const XRegExp = require('xregexp')
 // bot libraries
 var constants = require('../constants')
 const System = require('./_interface')
+const Expects = require('../expects.js')
 
 /*
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
@@ -87,11 +88,16 @@ class Cooldown extends System {
 
   async check (opts: Object) {
     var data, viewer, timestamp, now
-    const match = XRegExp.exec(opts.message, constants.COMMAND_REGEXP)
-    if (!_.isNil(match)) { // command
-      let cooldown = await global.db.engine.findOne(this.collection.data, { key: `${match.command}` })
+    const [command, subcommand] = new Expects(opts.message)
+      .command({ optional: true })
+      .string({ optional: true })
+      .toArray()
+
+    if (!_.isNil(command)) { // command
+      const key = subcommand ? `${command} ${subcommand}` : command
+      let cooldown = await global.db.engine.findOne(this.collection.data, { key })
       if (_.isEmpty(cooldown)) { // command is not on cooldown -> recheck with text only
-        opts.message = opts.message.replace(`${match.command}`, '')
+        opts.message = opts.message.replace(key, '')
         return this.check(opts)
       }
       data = [{

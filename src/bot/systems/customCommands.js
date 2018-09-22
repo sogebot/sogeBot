@@ -147,7 +147,7 @@ class CustomCommands extends System {
         .argument({ optional: true, name: 's', default: null, type: Boolean })
         .command()
         .number()
-        .string()
+        .everything()
         .toArray()
 
       let cDb = await global.db.engine.findOne(this.collection.data, { command })
@@ -174,7 +174,7 @@ class CustomCommands extends System {
         .argument({ optional: true, name: 'ul', default: 'viewer' })
         .argument({ optional: true, name: 's', default: false, type: Boolean })
         .command()
-        .string()
+        .everything()
         .toArray()
 
       let cDb = await global.db.engine.findOne(this.collection.data, { command })
