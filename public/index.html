@@ -520,17 +520,19 @@
     })
 
     /* ROUTERS */
+    let currentPage = null
     page('/', function(p){
       const id = p.hash.length === 0 ? 'dashboard' : p.hash
+      if (currentPage === id) return
 
       var visibility = id !== 'dashboard' ? 'none' : 'flex'
       var visibilityBlock = id !== 'dashboard' ? 'none' : 'block'
 
       $("#pages").empty()
 
-      if (id !== 'dashboard') $("#pages").append($('<div id="P' + id + '">').load('pages/' + id +
-        '.html',
-        function () {
+      if (id !== 'dashboard') $("#pages").append($('<div id="P' + id + '">').load('pages/' + id + '.html',
+        function (err) {
+          currentPage = id
           commons.translate()
           $('a[data-toggle="tab"]').off()
           $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
