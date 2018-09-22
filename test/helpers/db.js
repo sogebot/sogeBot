@@ -24,6 +24,8 @@ module.exports = {
       await global.db.engine.remove('widgetsEventList', {})
       await global.db.engine.remove('systems.quotes', {})
 
+      await global.db.engine.remove('users', {})
+
       // game fightme
       await global.db.engine.remove('games.fightme.settings', {})
       await global.db.engine.remove('games.fightme.users', {})
