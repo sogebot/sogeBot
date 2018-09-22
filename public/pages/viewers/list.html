@@ -22,6 +22,7 @@
                       <template v-if="sort === 'stats.messages'">{{ commons.translate('messages') }}</template>
                       <template v-if="sort === 'stats.tips'">{{ commons.translate('tips') }}</template>
                       <template v-if="sort === 'stats.bits'">{{ commons.translate('bits') }}</template>
+                      <i class="fas fa-sort-down"></i>
                     </span>
                   </button>
                   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -47,6 +48,7 @@
                   <button class="btn border-0 btn-outline-dark " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
                       {{ commons.translate('commons.reset') }}
+                      <i class="fas fa-sort-down"></i>
                     </span>
                   </button>
                   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
