@@ -1,4 +1,3 @@
-const debug = require('debug')
 const _ = require('lodash')
 const axios = require('axios')
 const config = require('@config')
@@ -45,10 +44,7 @@ class Credits {
   }
 
   sockets () {
-    const d = debug('Credits:sockets')
-
     global.panel.io.of('/overlays/credits').on('connection', (socket) => {
-      d('Socket /overlays/credits connected, registering sockets')
       socket.on('load', async (callback) => {
         let [events, when, hosts, raids, socials] = await Promise.all([
           global.db.engine.find('widgetsEventList'),

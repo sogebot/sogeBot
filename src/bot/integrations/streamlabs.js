@@ -3,7 +3,6 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const io = require('socket.io-client')
-const debug = require('debug')
 const chalk = require('chalk')
 
 class Streamlabs {
@@ -39,11 +38,9 @@ class Streamlabs {
   }
 
   sockets () {
-    const d = debug('streamlabs:sockets')
     const io = global.panel.io.of('/integrations/streamlabs')
 
     io.on('connection', (socket) => {
-      d('Socket /integrations/streamlabs connected, registering sockets')
       socket.on('settings', async (callback) => {
         callback(null, {
           socketToken: await this.socketToken,
@@ -74,19 +71,16 @@ class Streamlabs {
     this.disconnect()
     this.socket = io.connect('https://sockets.streamlabs.com?token=' + (await this.socketToken))
 
-    this.socket.off('reconnect_attempt').on('reconnect_attempt', () => debug('streamlabs:onReconnectAttempt')('Trying to reconnect to service'))
+    this.socket.off('reconnect_attempt').on('reconnect_attempt', () => global.log.info('streamlabs:onReconnectAttempt'))
     this.socket.off('connect').on('connect', () => {
-      debug('streamlabs:onConnect')('Successfully connected socket to service')
       global.log.info('Streamlabs socket connected')
     })
     this.socket.off('disconnect').on('disconnect', () => {
-      debug('streamlabs:onDisconnect')('Socket disconnected from service, trying to reconnect to service')
       global.log.info('Streamlabs socket disconnected')
       this.socket.open()
     })
 
     this.socket.on('event', async (eventData) => {
-      debug('streamlabs:onEvent')(eventData)
       if (eventData.type === 'donation') {
         for (let event of eventData.message) {
           if (!event.isTest) {
@@ -108,9 +102,7 @@ class Streamlabs {
 
   async status (options) {
     options = _.defaults(options, { log: true, connect: false })
-    const d = debug('streamlabs:status')
     let [enabled, socketToken] = await Promise.all([this.enabled, this.socketToken])
-    d(enabled, socketToken)
     enabled = !(_.isNil(socketToken)) && enabled
 
     let color = enabled ? chalk.green : chalk.red

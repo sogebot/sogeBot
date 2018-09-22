@@ -1,5 +1,3 @@
-const debug = require('debug')
-
 class BetsOverlay {
   constructor () {
     this.timeouts = {}
@@ -31,11 +29,7 @@ class BetsOverlay {
   }
 
   sockets () {
-    const d = debug('BetsOverlay:sockets')
-
     global.panel.io.of('/overlays/bets').on('connection', (socket) => {
-      d('Socket /overlays/bets connected, registering sockets')
-
       socket.on('data', async (callback) => {
         callback(this.currentBet, this.bets)
       })

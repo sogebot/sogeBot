@@ -1,9 +1,6 @@
 'use strict'
 
 const _ = require('lodash')
-const debug = require('debug')
-
-const DEBUG_OVERLAYS_CAROUSEL_SOCKETS = debug('overlays:carousel:sockets')
 
 class ImageCarousel {
   constructor () {
@@ -16,10 +13,9 @@ class ImageCarousel {
 
   sockets () {
     global.panel.io.of('/overlays/carousel').on('connection', (socket) => {
-      DEBUG_OVERLAYS_CAROUSEL_SOCKETS('Socket /overlays/carousel connected, registering sockets')
       socket.on('load', async (cb) => {
         let images = (await global.db.engine.find('overlay.carousel')).map((o) => { o._id = o._id.toString(); return o })
-        DEBUG_OVERLAYS_CAROUSEL_SOCKETS(images); cb(_.orderBy(images, 'order', 'asc'))
+        cb(_.orderBy(images, 'order', 'asc'))
       })
 
       socket.on('delete', async (id, cb) => {
@@ -81,7 +77,7 @@ class ImageCarousel {
             animationOut: 'fadeOut',
             // order
             order })
-        DEBUG_OVERLAYS_CAROUSEL_SOCKETS(image); cb(image)
+        cb(image)
       })
     })
   }

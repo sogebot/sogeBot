@@ -2,7 +2,6 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const debug = require('debug')('game:duel')
 const cluster = require('cluster')
 
 // bot libraries
@@ -46,7 +45,6 @@ class Duel extends Game {
       this.settings._.timestamp,
       this.settings.duration
     ])
-    debug({ users, timestamp, duelDuration })
 
     if (timestamp === 0 || new Date().getTime() - timestamp < 1000 * 60 * duelDuration) {
       this.timeouts['pickDuelWinner'] = setTimeout(() => this.pickDuelWinner(), 30000)
@@ -76,7 +74,7 @@ class Duel extends Game {
       tickets: winnerUser.tickets,
       winner: winnerUser.username
     })
-    debug(m); global.commons.sendMessage(m, { username: global.commons.getOwner() }, { force: true })
+    global.commons.sendMessage(m, { username: global.commons.getOwner() }, { force: true })
 
     // give user his points
     await global.db.engine.insert('users.points', { id: winnerUser.id, points: parseInt(total, 10) })
@@ -124,7 +122,7 @@ class Duel extends Game {
             minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes'),
             cooldown: Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60),
             command: opts.command })
-          debug(message); global.commons.sendMessage(message, opts.sender)
+          global.commons.sendMessage(message, opts.sender)
           return true
         }
       }
@@ -136,7 +134,7 @@ class Duel extends Game {
           minutesName: global.commons.getLocalizedName(5, 'core.minutes'),
           minutes: await this.settings.duration,
           command: opts.command })
-        debug(message); global.commons.sendMessage(message, opts.sender)
+        global.commons.sendMessage(message, opts.sender)
       }
 
       const tickets = (await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId })).tickets
@@ -144,7 +142,7 @@ class Duel extends Game {
         pointsName: await global.systems.points.getPointsName(tickets),
         points: tickets
       })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:
@@ -154,14 +152,14 @@ class Duel extends Game {
           message = await global.commons.prepare('gambling.duel.zeroBet', {
             pointsName: await global.systems.points.getPointsName(0)
           })
-          debug(message); global.commons.sendMessage(message, opts.sender)
+          global.commons.sendMessage(message, opts.sender)
           break
         case ERROR_NOT_ENOUGH_POINTS:
           message = await global.commons.prepare('gambling.duel.notEnoughPoints', {
             pointsName: await global.systems.points.getPointsName(bet),
             points: bet
           })
-          debug(message); global.commons.sendMessage(message, opts.sender)
+          global.commons.sendMessage(message, opts.sender)
           break
         case ERROR_MINIMAL_BET:
           bet = await this.settings.minimalBet
@@ -170,7 +168,7 @@ class Duel extends Game {
             points: bet,
             command: opts.command
           })
-          debug(message); global.commons.sendMessage(message, opts.sender)
+          global.commons.sendMessage(message, opts.sender)
           break
         default:
           global.log.error(e.stack)

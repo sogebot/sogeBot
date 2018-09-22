@@ -1,7 +1,6 @@
 'use strict'
 
 const _ = require('lodash')
-const debug = require('debug')
 const crypto = require('crypto')
 const safeEval = require('safe-eval')
 const flatten = require('flat')
@@ -79,11 +78,9 @@ class Events {
   }
 
   async fadeOut () {
-    const d = debug('events:fadeout')
-
     try {
-      let commands = await global.db.engine.find('events', { key: 'command-send-x-times' }); d(commands)
-      let keywords = await global.db.engine.find('events', { key: 'keyword-send-x-times' }); d(keywords)
+      let commands = await global.db.engine.find('events', { key: 'command-send-x-times' })
+      let keywords = await global.db.engine.find('events', { key: 'keyword-send-x-times' })
       for (let event of _.merge(commands, keywords)) {
         if (_.isNil(_.get(event, 'triggered.fadeOutInterval', null))) {
           // fadeOutInterval init
@@ -114,7 +111,6 @@ class Events {
   }
 
   async fire (eventId, attributes) {
-    const d = debug('events:fire')
     attributes = _.clone(attributes) || {}
 
     if (cluster.isWorker) { // emit process to master
@@ -124,8 +120,6 @@ class Events {
 
     if (!_.isNil(_.get(attributes, 'username', null))) attributes.userObject = await global.users.getByName(attributes.username)
     if (!_.isNil(_.get(attributes, 'recipient', null))) attributes.recipientObject = await global.users.getByName(attributes.recipient)
-    d('Firing event %s with attrs: %j', eventId, attributes)
-
     if (_.get(attributes, 'reset', false)) return this.reset(eventId)
 
     let events = await global.db.engine.find('events', { key: eventId, enabled: true })
@@ -135,12 +129,9 @@ class Events {
         this.checkFilter(eventId, attributes),
         this.checkDefinition(_.clone(event), attributes)
       ])
-      d('Should run by filter', shouldRunByFilter)
-      d('Should run by definition', shouldRunByDefinition)
       if ((!shouldRunByFilter || !shouldRunByDefinition)) continue
 
       for (let operation of (await global.db.engine.find('events.operations', { eventId: eventId }))) {
-        d('Firing %j', operation)
         if (!_.isNil(attributes.userObject)) {
           // flatten userObject
           let userObject = attributes.userObject
@@ -153,25 +144,20 @@ class Events {
         }
         const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key))
         if (isOperationSupported) _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation.definitions, attributes)
-        else d(`Operation ${operation.key} is not supported!`)
       }
     }
   }
 
   // set triggered attribute to empty object
   async reset (eventId) {
-    const d = debug('events:reset')
     let events = await global.db.engine.find('events', { key: eventId })
     for (let event of events) {
-      d('Resetting %j', event)
       event.triggered = {}
       await global.db.engine.update('events', { _id: event._id.toString() }, event)
     }
   }
 
   async fireCreateAClip (operation, attributes) {
-    const d = debug('events:fireCreateAClip')
-    d('Clip creation with attrs:', operation, attributes)
     let cid = await global.api.createClip({ hasDelay: operation.hasDelay })
     if (cid) { // OK
       if (Boolean(operation.announce) === true) {
@@ -185,8 +171,6 @@ class Events {
   }
 
   async fireCreateAClipAndPlayReplay (operation, attributes) {
-    const d = debug('events:fireCreateAClipAndPlayReplay')
-    d('Waiting for clip creation')
     let cid = await global.events.fireCreateAClip(operation, attributes)
     if (cid) { // clip created ok
       const clip = [
@@ -215,9 +199,6 @@ class Events {
   }
 
   async fireStartCommercial (operation, attributes) {
-    const d = debug('events:fireStartCommercial')
-    d('Start commercials with attrs:', operation, attributes)
-
     const cid = await global.cache.channelId()
     const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`
 
@@ -235,14 +216,10 @@ class Events {
   }
 
   async fireEmoteExplosion (operation, attributes) {
-    const d = debug('events:fireEmoteExplosion')
-    d('Emote explosion with attrs:', operation, attributes)
     global.overlays.emotes.explode(global.overlays.emotes, global.panel.io, operation.emotesToExplode.split(' '))
   }
 
   async firePlaySound (operation, attributes) {
-    const d = debug('events:firePlaySound')
-    d('Play a sound with attrs:', operation, attributes)
     // attr.sound can be filename or url
     let sound = operation.urlOfSoundFile
     if (!_.includes(sound, 'http')) {
@@ -252,14 +229,10 @@ class Events {
   }
 
   async fireRunCommand (operation, attributes) {
-    const d = debug('events:fireRunCommand')
-    d('Run command with attrs:', operation, attributes)
-
     let command = operation.commandToRun
     attributes = _(attributes).toPairs().sortBy((o) => -o[0].length).fromPairs().value() // reorder attributes by key length
     _.each(attributes, function (val, name) {
       if (_.isObject(val) && _.size(val) === 0) return true // skip empty object
-      d(`Replacing $${name} with ${val}`)
       let replace = new RegExp(`\\$${name}`, 'g')
       command = command.replace(replace, val)
     })
@@ -268,7 +241,6 @@ class Events {
   }
 
   async fireSendChatMessageOrWhisper (operation, attributes, whisper) {
-    const d = debug('events:fireSendChatMessageOrWhisper')
     let username = _.isNil(attributes.username) ? global.commons.getOwner() : attributes.username
     let message = operation.messageToSend
     const atUsername = await global.configuration.getValue('atUsername')
@@ -277,28 +249,21 @@ class Events {
     for (let [name, val] of Object.entries(attributes)) {
       if (_.isObject(val) && _.size(val) === 0) continue // skip empty object
       if (name.includes('username') || name.includes('recipient')) val = atUsername ? `@${val}` : val
-      d(`Replacing $${name} with ${val}`)
       let replace = new RegExp(`\\$${name}`, 'g')
       message = message.replace(replace, val)
     }
-    d('Sending message:', message)
     global.commons.sendMessage(message, { username: username, 'message-type': (whisper ? 'whisper' : 'chat') })
   }
 
   async fireSendWhisper (operation, attributes) {
-    const d = debug('events:fireSendWhisper')
-    d('Sending whisper with attrs:', operation, attributes)
     global.events.fireSendChatMessageOrWhisper(operation, attributes, true)
   }
 
   async fireSendChatMessage (operation, attributes) {
-    const d = debug('events:fireSendChatMessage')
-    d('Sending chat message with attrs:', operation, attributes)
     global.events.fireSendChatMessageOrWhisper(operation, attributes, false)
   }
 
   async fireIncrementCustomVariable (operation, attributes) {
-    debug('events:fireIncrementCustomVariable')('Sending chat message with attrs:', operation, attributes)
     const customVariableName = operation.customVariable
     const numberToIncrement = operation.numberToIncrement
 
@@ -321,7 +286,6 @@ class Events {
   }
 
   async fireDecrementCustomVariable (operation, attributes) {
-    debug('events:fireDecrementCustomVariable')('Sending chat message with attrs:', operation, attributes)
     const customVariableName = operation.customVariable
     const numberToDecrement = operation.numberToDecrement
 
@@ -344,91 +308,62 @@ class Events {
   }
 
   async everyXMinutesOfStream (event, attributes) {
-    const d = debug('events:everyXMinutesOfStream')
-
     // set to new Date() because 0 will trigger event immediatelly after stream start
     let shouldSave = _.get(event, 'triggered.runEveryXMinutes', 0) === 0
     event.triggered.runEveryXMinutes = _.get(event, 'triggered.runEveryXMinutes', new Date())
 
     let shouldTrigger = _.now() - new Date(event.triggered.runEveryXMinutes).getTime() >= event.definitions.runEveryXMinutes * 60 * 1000
-    d('Should save: %s', shouldSave)
-    d('Should trigger: %s', shouldTrigger)
-    d('Minutes to trigger: %s', -Number((_.now() - new Date(event.triggered.runEveryXMinutes).getTime() - (event.definitions.runEveryXMinutes * 60 * 1000)) / 60000).toFixed(2))
     if (shouldTrigger || shouldSave) {
       event.triggered.runEveryXMinutes = new Date()
-      d('Updating event to %j', event)
       await global.db.engine.update('events', { _id: event._id.toString() }, event)
     }
     return shouldTrigger
   }
 
   async checkRaid (event, attributes) {
-    const d = debug('events:checkRaid')
-
     event.definitions.viewersAtLeast = parseInt(event.definitions.viewersAtLeast, 10) // force Integer
     const shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast)
-
-    d('Current viewers: %s, expected viewers: %s', attributes.viewers, event.definitions.viewersAtLeast)
-    d('Should trigger: %s', shouldTrigger)
-
     return shouldTrigger
   }
 
   async checkHosted (event, attributes) {
-    const d = debug('events:checkHosted')
-
     event.definitions.viewersAtLeast = parseInt(event.definitions.viewersAtLeast, 10) // force Integer
-
-    d('Current viewers: %s, expected viewers: %s', attributes.viewers, event.definitions.viewersAtLeast)
-    d('Autohost: %s, ignore Autohost: %s', attributes.autohost, event.definitions.ignoreAutohost)
-
     var shouldTrigger = (attributes.viewers >= event.definitions.viewersAtLeast) &&
                         ((!attributes.autohost && event.definitions.ignoreAutohost) || !event.definitions.ignoreAutohost)
-
-    d('Should trigger: %s', shouldTrigger)
     return shouldTrigger
   }
 
   async checkStreamIsRunningXMinutes (event, attributes) {
-    const d = debug('events:checkStreamIsRunningXMinutes')
     const when = await global.cache.when()
     event.triggered.runAfterXMinutes = _.get(event, 'triggered.runAfterXMinutes', 0)
     let shouldTrigger = event.triggered.runAfterXMinutes === 0 &&
                         moment().format('X') - moment(when.online).format('X') > event.definitions.runAfterXMinutes * 60
     if (shouldTrigger) {
       event.triggered.runAfterXMinutes = event.definitions.runAfterXMinutes
-      d('Updating event to %j', event)
       await global.db.engine.update('events', { _id: event._id.toString() }, event)
     }
     return shouldTrigger
   }
 
   async checkNumberOfViewersIsAtLeast (event, attributes) {
-    const d = debug('events:checkNumberOfViewersIsAtLeast')
     event.triggered.runInterval = _.get(event, 'triggered.runInterval', 0)
 
     event.definitions.runInterval = parseInt(event.definitions.runInterval, 10) // force Integer
     event.definitions.viewersAtLeast = parseInt(event.definitions.viewersAtLeast, 10) // force Integer
 
     const viewers = (await global.db.engine.findOne('api.current', { key: 'viewers' })).value
-    d('Current viewers: %s, expected viewers: %s', viewers, event.definitions.viewersAtLeast)
-    d('Run Interval: %s, triggered: %s', event.definitions.runInterval, event.triggered.runInterval)
 
     var shouldTrigger = viewers >= event.definitions.viewersAtLeast &&
                         ((event.definitions.runInterval > 0 && _.now() - event.triggered.runInterval >= event.definitions.runInterval * 1000) ||
                         (event.definitions.runInterval === 0 && event.triggered.runInterval === 0))
     if (shouldTrigger) {
       event.triggered.runInterval = _.now()
-      d('Updating event to %j', event)
       await global.db.engine.update('events', { _id: event._id.toString() }, event)
     }
-    d('Attributes for check', attributes)
-    d('Should Trigger?', shouldTrigger)
     return shouldTrigger
   }
 
   async checkCommandSendXTimes (event, attributes) {
-    const d = debug('events:checkCommandSendXTimes')
     const regexp = new RegExp(`^${event.definitions.commandToWatch}\\s`, 'i')
 
     var shouldTrigger = false
@@ -449,16 +384,12 @@ class Events {
         event.triggered.runInterval = _.now()
         event.triggered.runEveryXCommands = 0
       }
-      d('Updating event to %j', event)
       await global.db.engine.update('events', { _id: event._id.toString() }, event)
     }
-    d('Attributes for check', attributes)
-    d('Should Trigger?', shouldTrigger)
     return shouldTrigger
   }
 
   async checkKeywordSendXTimes (event, attributes) {
-    const d = debug('events:checkKeywordSendXTimes')
     const regexp = new RegExp(`${event.definitions.keywordToWatch}`, 'gi')
 
     var shouldTrigger = false
@@ -486,28 +417,19 @@ class Events {
         event.triggered.runInterval = _.now()
         event.triggered.runEveryXKeywords = 0
       }
-      d('Updating event to %j', event)
       await global.db.engine.update('events', { _id: event._id.toString() }, event)
     }
-    d('Attributes for check', attributes)
-    d('Should Trigger?', shouldTrigger)
     return shouldTrigger
   }
 
   async checkDefinition (event, attributes) {
-    const d = debug('events:checkDefinition')
-
     const check = (_.find(this.supportedEventsList, (o) => o.id === event.key)).check
-    d('Searching check fnc for %j | %j', event, check)
     if (_.isNil(check)) return true
 
-    d('Running check on %s', check.name)
     return check(event, attributes)
   }
 
   async checkFilter (eventId, attributes) {
-    const d = debug('events:checkFilter')
-    d('Checking filters | %j, %j', eventId, attributes)
     const filter = (await global.db.engine.findOne('events.filters', { eventId: eventId })).filters
     if (typeof filter === 'undefined' || filter.trim().length === 0) return true
     let toEval = `(function evaluation () { return ${filter} })()`
@@ -541,24 +463,21 @@ class Events {
     } catch (e) {
       // do nothing
     }
-    delete context._; d(context, result)
+    delete context._
     return !!result // force boolean
   }
 
   sockets () {
-    const d = debug('events:sockets')
     const io = global.panel.io.of('/events')
 
     io.on('connection', (socket) => {
-      d('Socket /events connected, registering sockets')
       socket.on('list.supported.events', (callback) => {
-        callback(this.supportedEventsList); d('list.supported.events => %s, %j', null, this.supportedEventsList)
+        callback(this.supportedEventsList)
       })
       socket.on('list.supported.operations', (callback) => {
-        callback(this.supportedOperationsList); d('list.supported.operations => %s, %j', null, this.supportedOperationsList)
+        callback(this.supportedOperationsList)
       })
       socket.on('save-changes', async (data, callback) => {
-        d('save-changes - %j', data)
         var eventId = data._id
         var errors = {
           definitions: {},
@@ -682,7 +601,6 @@ class Events {
           currency: _.sample(['CZK', 'USD', 'EUR'])
         }
         for (let operation of (await global.db.engine.find('events.operations', { eventId: eventId }))) {
-          d('Firing %j', operation)
           if (!_.isNil(attributes.userObject)) {
             // flatten userObject
             let userObject = attributes.userObject
@@ -690,7 +608,6 @@ class Events {
           }
           const isOperationSupported = !_.isNil(_.find(this.supportedOperationsList, (o) => o.id === operation.key))
           if (isOperationSupported) _.find(this.supportedOperationsList, (o) => o.id === operation.key).fire(operation.definitions, attributes)
-          else d(`Operation ${operation.key} is not supported!`)
         }
       })
     })

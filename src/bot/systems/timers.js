@@ -2,7 +2,6 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const debug = require('debug')
 const crypto = require('crypto')
 const cluster = require('cluster')
 
@@ -140,19 +139,15 @@ class Timers extends System {
   async check () {
     clearTimeout(this.timeouts['timersCheck'])
 
-    const d = debug('timers:check')
-    d('checking timers')
     let timers = await global.db.engine.find(this.collection.data, { enabled: true })
     for (let timer of timers) {
       if (timer.messages > 0 && timer.trigger.messages - global.linesParsed + timer.messages > 0) continue // not ready to trigger with messages
       if (timer.seconds > 0 && new Date().getTime() - timer.trigger.timestamp < timer.seconds * 1000) continue // not ready to trigger with seconds
 
-      d('ready to fire - %j', timer)
       let responses = await global.db.engine.find(this.collection.responses, { timerId: timer._id.toString(), enabled: true })
       let response = _.orderBy(responses, 'timestamp', 'asc')[0]
 
       if (!_.isNil(response)) {
-        d(response.response, global.commons.getOwner())
         global.commons.sendMessage(response.response, global.commons.getOwner())
         await global.db.engine.update(this.collection.responses, { _id: response._id }, { timestamp: new Date().getTime() })
       }
@@ -177,9 +172,6 @@ class Timers extends System {
 
   async set (opts) {
     // -name [name-of-timer] -messages [num-of-msgs-to-trigger|default:0] -seconds [trigger-every-x-seconds|default:60]
-    const d = debug('timers:set')
-    d('set(%j, %j, %j)', opts)
-
     let name = opts.parameters.match(/-name ([a-zA-Z0-9_]+)/)
     let messages = opts.parameters.match(/-messages ([0-9]+)/)
     let seconds = opts.parameters.match(/-seconds ([0-9]+)/)
@@ -198,8 +190,6 @@ class Timers extends System {
       global.commons.sendMessage(global.translate('timers.cannot-set-messages-and-seconds-0'), opts.sender)
       return false
     }
-    d(name, messages, seconds)
-
     await global.db.engine.update(this.collection.data, { name: name }, { name: name, messages: messages, seconds: seconds, enabled: true, trigger: { messages: global.linesParsed, timestamp: new Date().getTime() } })
     global.commons.sendMessage(global.translate('timers.timer-was-set')
       .replace(/\$name/g, name)
@@ -209,9 +199,6 @@ class Timers extends System {
 
   async unset (opts) {
     // -name [name-of-timer]
-    const d = debug('timers:unset')
-    d('unset(%j, %j, %j)', opts)
-
     let name = opts.parameters.match(/-name ([\S]+)/)
 
     if (_.isNil(name)) {
@@ -223,23 +210,18 @@ class Timers extends System {
 
     let timer = await global.db.engine.findOne(this.collection.data, { name: name })
     if (_.isEmpty(timer)) {
-      d(global.translate('timers.timer-not-found').replace(/\$name/g, name))
       global.commons.sendMessage(global.translate('timers.timer-not-found').replace(/\$name/g, name), opts.sender)
       return false
     }
 
     await global.db.engine.remove(this.collection.data, { name: name })
     await global.db.engine.remove(this.collection.responses, { timerId: timer._id.toString() })
-    d(global.translate('timers.timer-deleted').replace(/\$name/g, name))
     global.commons.sendMessage(global.translate('timers.timer-deleted')
       .replace(/\$name/g, name), opts.sender)
   }
 
   async rm (opts) {
     // -id [id-of-response]
-    const d = debug('timers:rm')
-    d('rm(%j, %j, %j)', opts)
-
     let id = opts.parameters.match(/-id ([a-zA-Z0-9]+)/)
 
     if (_.isNil(id)) {
@@ -256,9 +238,6 @@ class Timers extends System {
 
   async add (opts) {
     // -name [name-of-timer] -response '[response]'
-    const d = debug('timers:add')
-    d('add(%j, %j, %j)', opts)
-
     let name = opts.parameters.match(/-name ([\S]+)/)
     let response = opts.parameters.match(/-response ['"](.+)['"]/)
 
@@ -275,8 +254,6 @@ class Timers extends System {
     } else {
       response = response[1]
     }
-    d(name, response)
-
     let timer = await global.db.engine.findOne(this.collection.data, { name: name })
     if (_.isEmpty(timer)) {
       global.commons.sendMessage(global.translate('timers.timer-not-found')
@@ -285,7 +262,6 @@ class Timers extends System {
     }
 
     let item = await global.db.engine.insert(this.collection.responses, { response: response, timestamp: new Date().getTime(), enabled: true, timerId: timer._id.toString() })
-    d(item)
     global.commons.sendMessage(global.translate('timers.response-was-added')
       .replace(/\$id/g, item._id)
       .replace(/\$name/g, name)
@@ -294,9 +270,6 @@ class Timers extends System {
 
   async list (opts) {
     // !timers list -name [name-of-timer]
-    const d = debug('timers:list')
-    d('list(%j, %j, %j)', opts)
-
     let name = opts.parameters.match(/-name ([\S]+)/)
 
     if (_.isNil(name)) {
@@ -313,7 +286,6 @@ class Timers extends System {
     }
 
     let responses = await global.db.engine.find(this.collection.responses, { timerId: timer._id.toString() })
-    d(responses)
     await global.commons.sendMessage(global.translate('timers.responses-list').replace(/\$name/g, name), opts.sender)
     for (let response of responses) await global.commons.sendMessage((response.enabled ? '⚫ ' : '⚪ ') + `${response._id} - ${response.response}`, opts.sender)
     return true
@@ -321,9 +293,6 @@ class Timers extends System {
 
   async toggle (opts) {
     // -name [name-of-timer] or -id [id-of-response]
-    const d = debug('timers:toggle')
-    d('toggle(%j, %j, %j)', opts)
-
     let id = opts.parameters.match(/-id ([a-zA-Z0-9]+)/)
     let name = opts.parameters.match(/-name ([\S]+)/)
 
@@ -334,16 +303,13 @@ class Timers extends System {
 
     if (!_.isNil(id)) {
       id = id[1]
-      d('toggle response - %s', id)
       let response = await global.db.engine.findOne(this.collection.responses, { _id: id })
       if (_.isEmpty(response)) {
-        d(global.translate('timers.response-not-found').replace(/\$id/g, id))
         global.commons.sendMessage(global.translate('timers.response-not-found').replace(/\$id/g, id), opts.sender)
         return false
       }
 
       await global.db.engine.update(this.collection.responses, { _id: id }, { enabled: !response.enabled })
-      d(global.translate(!response.enabled ? 'timers.response-enabled' : 'timers.response-disabled').replace(/\$id/g, id))
       global.commons.sendMessage(global.translate(!response.enabled ? 'timers.response-enabled' : 'timers.response-disabled')
         .replace(/\$id/g, id), opts.sender)
       return true

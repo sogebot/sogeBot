@@ -2,7 +2,6 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const debug = require('debug')
 const cluster = require('cluster')
 
 // bot libraries
@@ -19,8 +18,6 @@ const ERROR_UNDEFINED_BET = '4'
 const ERROR_IS_LOCKED = '5'
 const ERROR_DIFF_BET = '6'
 const ERROR_NOT_OPTION = '7'
-
-const DEBUG_BET_CHECK_IF_EXPIRED = debug('bets:checkIfBetExpired')
 
 /*
  * !bet                                                                          - gets an info about bet
@@ -62,15 +59,9 @@ class Bets extends System {
 
     try {
       let currentBet = await global.db.engine.findOne(this.collection.data, { key: 'bets' })
-      DEBUG_BET_CHECK_IF_EXPIRED('Current bet object: %o', currentBet)
       if (_.isEmpty(currentBet) || currentBet.locked) throw Error(ERROR_NOT_RUNNING)
 
       const isExpired = currentBet.end <= new Date().getTime()
-      DEBUG_BET_CHECK_IF_EXPIRED(`
-        Current bet end time: %s
-        Current time: %s
-        Is locked: %s
-        Is bet expired: %s`, currentBet.end, new Date().getTime(), currentBet.locked, isExpired)
       if (isExpired) {
         currentBet.locked = true
 
@@ -78,9 +69,7 @@ class Bets extends System {
         if (_bets.length > 0) {
           global.commons.sendMessage(global.translate('bets.locked'), { username: global.commons.getOwner() })
           const _id = currentBet._id.toString(); delete currentBet._id
-          DEBUG_BET_CHECK_IF_EXPIRED('Doing cache %s update \n %o', _id, currentBet)
-          let update = await global.db.engine.update(this.collection.data, { _id: _id }, currentBet)
-          DEBUG_BET_CHECK_IF_EXPIRED('Updated Object \n %o', update)
+          await global.db.engine.update(this.collection.data, { _id: _id }, currentBet)
         } else {
           global.commons.sendMessage(global.translate('bets.removed'), global.commons.getOwner())
           await global.db.engine.remove(this.collection.data, { key: 'bets' })
@@ -90,7 +79,6 @@ class Bets extends System {
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_RUNNING:
-          DEBUG_BET_CHECK_IF_EXPIRED('No bet is currently running')
           break
         default:
           global.log.error(e.stack)

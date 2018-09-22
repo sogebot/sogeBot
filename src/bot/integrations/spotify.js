@@ -3,7 +3,6 @@
 // 3rdparty libraries
 const _ = require('lodash')
 const chalk = require('chalk')
-const debug = require('debug')
 const SpotifyWebApi = require('spotify-web-api-node')
 const crypto = require('crypto')
 const urljoin = require('url-join')
@@ -59,7 +58,6 @@ class Spotify {
       const enabled = await this.status({ log: false })
       if (enabled && !_.isNil(this.client)) {
         let data = await this.client.getMe()
-        debug('spotify:getMe')('Authorized user: %j', data.body)
         return data.body.display_name ? data.body.display_name : data.body.id
       } else return null
     } catch (e) {
@@ -95,7 +93,6 @@ class Spotify {
     try {
       if (!_.isNil(this.client)) {
         let data = await this.client.refreshAccessToken()
-        debug('spotify:IRefreshToken')('New access token: ' + data.body['access_token'])
         this.accessToken = data.body['access_token']
       }
     } catch (e) {
@@ -186,11 +183,9 @@ class Spotify {
   set state (v) { global.db.engine.update(this.collection, { key: 'state' }, { value: _.isNil(v) || v.trim().length === 0 ? null : v }) }
 
   sockets () {
-    const d = debug('spotify:sockets')
     const io = global.panel.io.of('/integrations/spotify')
 
     io.on('connection', (socket) => {
-      d('Socket /integrations/spotify connected, registering sockets')
       socket.on('state', async (callback) => {
         callback(null, await this.state)
       })
@@ -227,7 +222,6 @@ class Spotify {
         cb(null, await this.authorizeURI())
       })
       socket.on('revoke', async (cb) => {
-        debug('spotify:revoke')('User access have been revoked')
         this.accessToken = null
         this.refreshToken = null
         this.currentSong = null
@@ -238,9 +232,7 @@ class Spotify {
 
   async status (options) {
     options = _.defaults(options, { log: true })
-    const d = debug('spotify:status')
     let [enabled, clientSecret, clientId, redirectURI, code, accessToken, refreshToken] = await Promise.all([this.enabled, this.clientSecret, this.clientId, this.redirectURI, this.code, this.accessToken, this.refreshToken])
-    d(enabled, clientSecret, clientId, redirectURI)
     enabled = !(_.isNil(clientSecret) || _.isNil(clientId) || _.isNil(redirectURI)) && enabled
 
     let color = enabled ? chalk.green : chalk.red
@@ -261,17 +253,12 @@ class Spotify {
       if (!_.isNil(code) && !_.isNil(this.client) && enabled) {
         this.client.authorizationCodeGrant(code)
           .then((data) => {
-            debug('spotify:authorizationCodeGrant')('The token expires in ' + data.body['expires_in'])
-            debug('spotify:authorizationCodeGrant')('The access token is ' + data.body['access_token'])
-            debug('spotify:authorizationCodeGrant')('The refresh token is ' + data.body['refresh_token'])
             this.accessToken = data.body['access_token']
             this.refreshToken = data.body['refresh_token']
           })
         this.code = null
       }
       if (!_.isNil(this.client) && enabled && !_.isNil(accessToken)) {
-        debug('spotify:enabled')('The access token is ' + accessToken)
-        debug('spotify:enabled')('The refresh token is ' + refreshToken)
         this.client.setAccessToken(accessToken)
         this.client.setRefreshToken(refreshToken)
       }

@@ -2,17 +2,12 @@
 
 var _ = require('lodash')
 var chalk = require('chalk')
-const debug = require('debug')
 const moment = require('moment')
 
 const config = require('@config')
 
 const cluster = require('cluster')
 const Message = require('./message')
-
-const DEBUG = {
-  PROCESSALL: debug('commons:processall')
-}
 
 function Commons () {
   this.compact = {}
@@ -35,9 +30,9 @@ Commons.prototype.processAll = function (proc) {
     const namespace = _.get(global, proc.ns, null)
     namespace[proc.fnc].apply(namespace, proc.args)
     // send to all clusters
-    for (let [i, w] of Object.entries(cluster.workers)) {
-      DEBUG.PROCESSALL(`Sending ${JSON.stringify(proc)} to worker#${i}`)
-      w.send(proc)
+    // eslint-disable-next-line
+    for (let w of Object.entries(cluster.workers)) {
+      w[1].send(proc)
     }
   } else {
     // need to be sent to master
@@ -71,20 +66,15 @@ Commons.prototype.isSystemEnabled = function (fn) {
   return enabled
 }
 Commons.prototype.isIntegrationEnabled = function (fn) {
-  const d = debug('commons:isIntegrationEnabled')
   const name = (typeof fn === 'object') ? fn.constructor.name : fn
   let enabled = false
 
   let isExists = !_.isNil(config.integrations) && !_.isNil(config.integrations[name.toLowerCase()])
-  d('Checking integration %s is enabled', name)
-  d('Exist in config.json', isExists)
 
   if (isExists) {
     let isBool = _.isBoolean(config.integrations[name.toLowerCase()])
-    d('Is directly a bool', isBool)
     if (!isBool) {
       let isEnabled = config.integrations[name.toLowerCase()].enabled
-      d('integration enabled attribute', isEnabled)
       enabled = isEnabled
     } else enabled = config.integrations[name.toLowerCase()]
   }
@@ -137,7 +127,6 @@ Commons.prototype.getTime = function (time, isChat) {
 
 Commons.prototype.sendMessage = async function (message, sender, attr) {
   message = await message // await if message is promise (like prepare)
-  debug('commons:sendMessage')('sendMessage(%s, %j, %j)', message, sender, attr)
   attr = attr || {}
   sender = sender || {}
 
@@ -221,29 +210,22 @@ Commons.prototype.isRegular = async function (user) {
 }
 
 Commons.prototype.isBot = function (user) {
-  const d = debug('commons:isBot')
-  d('isBot(%j)', user)
   try {
     if (_.isString(user)) user = { username: user }
     return config.settings.bot_username.toLowerCase().trim() === user.username.toLowerCase().trim()
   } catch (e) {
-    d(e)
     return true // we can expect, if user is null -> bot or admin
   }
 }
 
 Commons.prototype.isOwner = function (user) {
-  const d = debug('commons:isOwner')
-  d('isOwner(%j)', user)
   try {
     if (_.isString(user)) user = { username: user }
     let owners = _.map(_.filter(config.settings.bot_owners.split(','), _.isString), function (owner) {
       return _.trim(owner.toLowerCase())
     })
-    d('owners: %j', owners)
     return _.includes(owners, user.username.toLowerCase().trim())
   } catch (e) {
-    d(e)
     return true // we can expect, if user is null -> bot or admin
   }
 }

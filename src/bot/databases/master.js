@@ -1,14 +1,9 @@
 const _ = require('lodash')
 const cluster = require('cluster')
 const crypto = require('crypto')
-const debug = require('debug')
-const util = require('util')
 
 const Interface = require('./interface')
 
-const DEBUG_MASTER_REQUEST_ID = debug('db:master:request:id')
-const DEBUG_MASTER_INCOMING = debug('db:master:incoming')
-const DEBUG_MASTER = debug('db:master')
 class IMasterController extends Interface {
   constructor () {
     super('master')
@@ -17,7 +12,6 @@ class IMasterController extends Interface {
 
     cluster.on('message', (worker, message) => {
       if (message.type !== 'db') return
-      DEBUG_MASTER_INCOMING(`Got data from Worker#${worker.id}\n${util.inspect(message)}`)
       this.data.push({
         id: message.id,
         items: message.items,
@@ -47,7 +41,6 @@ class IMasterController extends Interface {
     let timeout = new Promise((resolve, reject) => {
       let id = setTimeout(() => {
         clearTimeout(id)
-        DEBUG_MASTER('Connection to db timeouted')
         resolve(false)
       }, 5000)
     })
@@ -65,7 +58,6 @@ class IMasterController extends Interface {
       const worker = _.sample(cluster.workers)
       if (!worker.isConnected()) throw new Error('Worker is not connected')
       worker.send(data)
-      DEBUG_MASTER_REQUEST_ID(id)
       this.returnData(resolve, reject, id)
     } catch (e) {
       setTimeout(() => this.sendRequest(resolve, reject, id, data), 100)

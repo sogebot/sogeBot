@@ -1,13 +1,9 @@
 'use strict'
 
 const _ = require('lodash')
-const debug = require('debug')
-const util = require('util')
 
 const constants = require('./constants')
 const config = require('@config')
-
-const DEBUG_PROCESS_PARSE = debug('parser:process')
 
 class Parser {
   constructor (opts) {
@@ -40,7 +36,6 @@ class Parser {
       }
       const isOk = await parser['fnc'].apply(parser.this, [opts])
       if (!isOk) {
-        DEBUG_PROCESS_PARSE(`Parser ${parser.name} failed with message ${this.message}\n${util.inspect(isOk)}\n${util.inspect(this.sender)}`)
         return true
       }
     }
@@ -61,8 +56,6 @@ class Parser {
         (parser.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
         (parser.permission === constants.MODS && (isMod || isOwner)) ||
         (parser.permission === constants.OWNER_ONLY && isOwner)) {
-        DEBUG_PROCESS_PARSE(`Parser ${parser.name} start`)
-
         const opts = {
           sender: this.sender,
           message: this.message.trim(),
@@ -73,15 +66,12 @@ class Parser {
           parser['fnc'].apply(parser.this, [opts])
         } else if (!(await parser['fnc'].apply(parser.this, [opts]))) {
           // TODO: call revert on parser with revert (price can have revert)
-          DEBUG_PROCESS_PARSE(`Parser ${parser.name} failed with message ${this.message}\n${util.inspect(this.sender)}`)
           return false
         }
-        DEBUG_PROCESS_PARSE(`Parser ${parser.name} finish`)
       }
     }
 
     if (this.isCommand) {
-      DEBUG_PROCESS_PARSE(`Running command - ${this.message.trim()}`)
       this.command(this.sender, this.message.trim(), this.skip)
     }
   }
@@ -116,18 +106,14 @@ class Parser {
    * @returns object or empty list
    */
   async parsers () {
-    const d = debug('parser:parsers')
-
     let parsers = []
     for (let item of this.list) {
-      d(`Checking ${util.inspect(item)}`)
       if (_.isFunction(item.parsers)) {
         let items = await item.parsers()
         if (!_.isEmpty(items)) parsers.push(items)
       }
     }
     parsers = _.orderBy(_.flatMap(parsers), 'priority', 'asc')
-    d(`Parsers list: ${util.inspect(parsers)}`)
     return parsers
   }
 
@@ -138,12 +124,9 @@ class Parser {
    * @returns object or null if empty
    */
   async find (message) {
-    const d = debug('parser:find')
-
     for (let item of (await this.getCommandsList())) {
       let onlyParams = message.trim().toLowerCase().replace(item.command, '')
       let isStartingWith = message.trim().toLowerCase().startsWith(item.command)
-      d(`Does ${message} startsWith ${item.command}: ${isStartingWith}`)
       if (isStartingWith && (onlyParams.length === 0 || (onlyParams.length > 0 && onlyParams[0] === ' '))) {
         return item
       }
@@ -152,7 +135,6 @@ class Parser {
   }
 
   async getCommandsList () {
-    const d = debug('parser:getCommandsList')
     let commands = []
     for (let item of this.list) {
       if (_.isFunction(item.commands)) {
@@ -163,7 +145,6 @@ class Parser {
 
     commands = _(commands).flatMap().sortBy(o => -o.command.length).value()
     for (let command of commands) {
-      d(`Checking ${command.command}`)
       let permission = await global.db.engine.findOne('permissions', { key: command.id })
       if (!_.isEmpty(permission)) command.permission = permission.permission // change to custom permission
     }

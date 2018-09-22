@@ -8,24 +8,12 @@ const cluster = require('cluster')
 const TwitchJs = require('twitch-js').default
 const os = require('os')
 const util = require('util')
-const debug = require('debug')
 const _ = require('lodash')
 const chalk = require('chalk')
 const moment = require('moment')
 
 const constants = require('./constants')
 const config = require('@config')
-
-const DEBUG_CLUSTER_FORK = debug('cluster:fork')
-const DEBUG_CLUSTER_MASTER = debug('cluster:master')
-const DEBUG_TMIJS = debug('tmijs')
-const DEBUG_TMIJS_USERNOTICE = debug('tmijs:USERNOTICE')
-const DEBUG_TMIJS_PRIVMSG = debug('tmijs:PRIVMSG')
-const DEBUG_TMIJS_WHISPER = debug('tmijs:WHISPER')
-const DEBUG_TMIJS_CLEARCHAT = debug('tmijs:CLEARCHAT')
-const DEBUG_TMIJS_MODE = debug('tmijs:MODE')
-const DEBUG_TMIJS_NOTICE = debug('tmijs:NOTICE')
-const DEBUG_TMIJS_HOSTTARGET = debug('tmijs:HOSTTARGET')
 
 global.commons = new (require('./commons'))()
 global.cache = new (require('./cache'))()
@@ -169,7 +157,6 @@ async function main () {
 
 function fork () {
   let worker = cluster.fork()
-  DEBUG_CLUSTER_FORK(`New worker ${worker.id} was created.`)
   forkOn(worker)
 }
 
@@ -214,7 +201,6 @@ function forkOn (worker) {
 
 function loadClientListeners () {
   global.broadcasterTMI.chat.on('PRIVMSG/HOSTED', async (message) => {
-    DEBUG_TMIJS_PRIVMSG(message)
     // Someone is hosting the channel and the message contains how many viewers..
     const username = message.message.split(' ')[0].replace(':', '').toLowerCase()
     const autohost = message.message.includes('auto')
@@ -235,23 +221,16 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('WHISPER', async (message) => {
-    DEBUG_TMIJS_WHISPER(message)
     if (!global.commons.isBot(message.tags.displayName) || !message.isSelf) {
-      DEBUG_TMIJS('Whisper received: %s', JSON.stringify(message))
-
       message.tags.username = message.tags.displayName.toLowerCase() // backward compatibility until userID is primary key
       message.tags['message-type'] = 'whisper'
-
       sendMessageToWorker(message.tags, message.message)
       global.linesParsed++
     }
   })
 
   global.botTMI.chat.on('PRIVMSG', async (message) => {
-    DEBUG_TMIJS_PRIVMSG(message)
     if (!global.commons.isBot(message.tags.displayName) || !message.isSelf) {
-      DEBUG_TMIJS('Message received: %s', JSON.stringify(message))
-
       message.tags.username = message.tags.displayName.toLowerCase() // backward compatibility until userID is primary key
       message.tags['message-type'] = message.message.startsWith('\u0001ACTION') ? 'action' : 'say' // backward compatibility for /me moderation
 
@@ -270,7 +249,6 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('CLEARCHAT', message => {
-    DEBUG_TMIJS_CLEARCHAT(message)
     if (message.event === 'USER_BANNED') {
       const duration = message.tags.banDuration
       const reason = message.tags.banReason
@@ -288,17 +266,14 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('HOSTTARGET', message => {
-    DEBUG_TMIJS_HOSTTARGET(message)
     if (message.event === 'HOST_ON') {
       if (typeof message.numberOfViewers !== 'undefined') { // may occur on restart bot when hosting
-        DEBUG_TMIJS('Hosting: %s with %s viewers', message.username, message.numberOfViewers)
         global.events.fire('hosting', { target: message.username, viewers: message.numberOfViewers })
       }
     }
   })
 
   global.botTMI.chat.on('MODE', async (message) => {
-    DEBUG_TMIJS_MODE('User ' + (message.isModerator ? '+mod' : '-mod') + ' ' + message.username)
     const user = await global.users.getByName(message.username)
     if (!user.is.mod && message.isModerator) global.events.fire('mod', { username: message.username })
     if (!user.id) { user.id = await global.users.getIdFromTwitch(message.username) }
@@ -308,11 +283,8 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('USERNOTICE', message => {
-    DEBUG_TMIJS_USERNOTICE(message)
     if (message.event === 'RAID') {
-      DEBUG_TMIJS('Raided by %s with %s viewers', message.parameters.login, message.parameters.viewerCount)
       global.log.raid(`${message.parameters.login}, viewers: ${message.parameters.viewerCount}`)
-
       global.db.engine.update('cache.raids', { username: message.parameters.login }, { username: message.parameters.login })
 
       const data = {
@@ -353,7 +325,6 @@ function loadClientListeners () {
   })
 
   global.botTMI.chat.on('NOTICE', message => {
-    DEBUG_TMIJS_NOTICE(message)
     global.log.info(message.message)
   })
 }
@@ -376,8 +347,6 @@ if (cluster.isMaster) {
 }
 
 async function subscription (username, userstate, method) {
-  DEBUG_TMIJS('Subscription: %s from %j', username, method)
-
   if (global.commons.isIgnored(username)) return
 
   const user = await global.db.engine.findOne('users', { id: userstate.userId })
@@ -394,8 +363,6 @@ async function subscription (username, userstate, method) {
 }
 
 async function resub (username, months, message, userstate, method) {
-  DEBUG_TMIJS('Resub: %s (%s months) - %s', username, months, message, userstate, method)
-
   if (global.commons.isIgnored(username)) return
 
   const user = await global.db.engine.findOne('users', { id: userstate.userId })
@@ -412,8 +379,6 @@ async function resub (username, months, message, userstate, method) {
 }
 
 async function subscriptionGiftCommunity (username, count, plan) {
-  DEBUG_TMIJS(`Subscription gifted to ${count} viewers from ${username}`)
-
   ignoreGiftsFromUser[username] = { count, time: new Date() }
 
   if (global.commons.isIgnored(username)) return
@@ -425,8 +390,6 @@ async function subscriptionGiftCommunity (username, count, plan) {
 
 async function subgift (username, months, recipient) {
   recipient = recipient.toLowerCase()
-  DEBUG_TMIJS('Subgift: from %s to %s', username, recipient)
-
   for (let [u, o] of Object.entries(ignoreGiftsFromUser)) {
     // $FlowFixMe Incorrect mixed type from value of Object.entries https://github.com/facebook/flow/issues/5838
     if (o.count === 0 || new Date().getTime() - new Date(o.time).getTime() >= 1000 * 60 * 10) {
@@ -460,8 +423,6 @@ async function subgift (username, months, recipient) {
 }
 
 async function cheer (userstate, message) {
-  DEBUG_TMIJS('Cheer: %s\n\tuserstate: %s', message, JSON.stringify(userstate))
-
   // remove cheerX or channelCheerX from message
   message = message.replace(/(.*?[cC]heer[\d]+)/g, '').trim()
 
@@ -485,7 +446,6 @@ function sendMessageToWorker (sender, message) {
     return
   } else lastWorker = worker.id
 
-  DEBUG_CLUSTER_MASTER(`Sending ${message} ${util.inspect(sender)} to worker#${worker.id} - is connected: ${worker.isConnected()}`)
   if (worker.isConnected()) worker.send({ type: 'message', sender: sender, message: message })
   else timeouts['sendMessageToWorker'] = setTimeout(() => sendMessageToWorker(sender, message), 100)
 }

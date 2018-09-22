@@ -6,9 +6,6 @@ const cluster = require('cluster')
 const Interface = require('./interface')
 const Datastore = require('nedb')
 
-// debug
-const debug = require('debug')('db:nedb')
-
 class INeDB extends Interface {
   constructor (forceIndexes) {
     super('nedb')
@@ -19,8 +16,6 @@ class INeDB extends Interface {
     if (!fs.existsSync('./db/nedb')) fs.mkdirSync('./db/nedb')
 
     this.table = {}
-
-    if (debug.enabled) debug('NeDB initialized')
   }
 
   async index (opts) {
@@ -112,7 +107,6 @@ class INeDB extends Interface {
       try {
         this.on(table).find(flatten(where), (err, items) => {
           if (err) reject(err)
-          if (debug.enabled) debug('find() \n\ttable: %s \n\twhere: %j \n\titems: %j', table, where, items)
 
           // nedb needs to fake sum and group by
           if (sumBy || groupBy) {
@@ -156,7 +150,6 @@ class INeDB extends Interface {
       try {
         self.on(table).findOne(flatten(where), function (err, item) {
           if (err) reject(err)
-          if (debug.enabled) debug('findOne() \n\ttable: %s \n\twhere: %j \n\titem: %j', table, where, _.isNil(item) ? {} : item)
           resolve(_.isNil(item) ? {} : item)
         })
       } catch (e) {
@@ -178,8 +171,6 @@ class INeDB extends Interface {
       try {
         self.on(table).insert(flatten.unflatten(object), function (err, item) {
           if (err) reject(err)
-          if (debug.enabled) debug('insert() \n\ttable: %s \n\tobject: %j', table, object)
-
           resolve(item)
         })
       } catch (e) {
@@ -197,7 +188,6 @@ class INeDB extends Interface {
       try {
         self.on(table).remove(flatten(where), { multi: true }, function (err, numRemoved) {
           if (err) reject(err)
-          if (debug.enabled) debug('remove() \n\ttable: %s \n\twhere: %j \n\tremoved: %j', table, where, numRemoved)
           resolve(numRemoved)
         })
       } catch (e) {
@@ -218,7 +208,6 @@ class INeDB extends Interface {
       try {
         self.on(table).update(flatten(where), { $set: flatten(object, { safe: true }) }, { upsert: (_.isNil(where._id) && !_.isEmpty(where)), multi: (_.isEmpty(where)), returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
           if (err) reject(err)
-          if (debug.enabled) debug('update() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
           resolve(affectedDocs)
         })
       } catch (e) {
@@ -239,7 +228,6 @@ class INeDB extends Interface {
       try {
         self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: false, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
           if (err) reject(err)
-          if (debug.enabled) debug('increment() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
           resolve(affectedDocs)
         })
       } catch (e) {
@@ -260,7 +248,6 @@ class INeDB extends Interface {
       try {
         self.on(table).update(flatten(where), { $inc: flatten(object) }, { upsert: true, multi: true, returnUpdatedDocs: true }, function (err, numReplaced, affectedDocs) {
           if (err) reject(err)
-          if (debug.enabled) debug('increment() \n\ttable: %s \n\twhere: %j \n\tupdated: %j', table, where, numReplaced)
           resolve(affectedDocs)
         })
       } catch (e) {

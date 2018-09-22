@@ -2,7 +2,6 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const debug = require('debug')('game:gamble')
 
 // bot libraries
 const Game = require('./_interface')
@@ -54,13 +53,13 @@ class Gamble extends Game {
           pointsName: await global.systems.points.getPointsName(updatedPoints),
           points: updatedPoints
         })
-        debug(message); global.commons.sendMessage(message, opts.sender)
+        global.commons.sendMessage(message, opts.sender)
       } else {
         message = await global.commons.prepare('gambling.gamble.lose', {
           pointsName: await global.systems.points.getPointsName(await global.systems.points.getPointsOf(opts.sender.userId)),
           points: await global.systems.points.getPointsOf(opts.sender.userId)
         })
-        debug(message); global.commons.sendMessage(message, opts.sender)
+        global.commons.sendMessage(message, opts.sender)
       }
     } catch (e) {
       switch (e.message) {
@@ -68,7 +67,7 @@ class Gamble extends Game {
           message = await global.commons.prepare('gambling.gamble.zeroBet', {
             pointsName: await global.systems.points.getPointsName(0)
           })
-          debug(message); global.commons.sendMessage(message, opts.sender)
+          global.commons.sendMessage(message, opts.sender)
           break
         case ERROR_NOT_ENOUGH_OPTIONS:
           global.commons.sendMessage(global.translate('gambling.gamble.notEnoughOptions'), opts.sender)
@@ -78,7 +77,7 @@ class Gamble extends Game {
             pointsName: await global.systems.points.getPointsName(points),
             points: points
           })
-          debug(message); global.commons.sendMessage(message, opts.sender)
+          global.commons.sendMessage(message, opts.sender)
           break
         case ERROR_MINIMAL_BET:
           points = await this.settings.minimalBet
@@ -86,7 +85,7 @@ class Gamble extends Game {
             pointsName: await global.systems.points.getPointsName(points),
             points: points
           })
-          debug(message); global.commons.sendMessage(message, opts.sender)
+          global.commons.sendMessage(message, opts.sender)
           break
         default:
           global.log.error(e.stack)

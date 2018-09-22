@@ -10,8 +10,6 @@ const XRegExp = require('xregexp')
 var constants = require('../constants')
 const System = require('./_interface')
 
-const debug = require('debug')('systems:cooldown')
-
 /*
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
  * !cooldown toggle moderators [keyword|!command] [global|user]      - enable/disable specified keyword or !command cooldown for moderators
@@ -68,14 +66,14 @@ class Cooldown extends System {
 
     if (_.isNil(match)) {
       let message = await global.commons.prepare('cooldowns.cooldown-parse-failed')
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     if (parseInt(match.seconds, 10) === 0) {
       await global.db.engine.remove(this.collection.data, { key: match.command, type: match.type })
       let message = await global.commons.prepare('cooldowns.cooldown-was-unset', { type: match.type, command: match.command })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
       return
     }
 
@@ -84,7 +82,7 @@ class Cooldown extends System {
     else await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000 })
 
     let message = await global.commons.prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command })
-    debug(message); global.commons.sendMessage(message, opts.sender)
+    global.commons.sendMessage(message, opts.sender)
   }
 
   async check (opts: Object) {
@@ -131,15 +129,12 @@ class Cooldown extends System {
       })
     }
     if (!_.some(data, { enabled: true })) { // parse ok if all cooldowns are disabled
-      debug('cooldowns disabled')
       return true
     }
 
     let result = false
     let isMod = await global.commons.isMod(opts.sender)
-    debug('isMod: %j', isMod)
     for (let cooldown of data) {
-      debug('Is for mods: %j', cooldown.moderator)
       if ((global.commons.isOwner(opts.sender) && !cooldown.owner) || (isMod && !cooldown.moderator)) {
         result = true
         continue
@@ -165,13 +160,12 @@ class Cooldown extends System {
         if (!cooldown.quiet && !(await this.settings['cooldownNotifyAsWhisper'])) {
           opts.sender['message-type'] = 'whisper' // we want to whisp cooldown message
           let message = await global.commons.prepare('cooldowns.cooldown-triggered', { command: cooldown.key, seconds: Math.ceil((cooldown.miliseconds - now + timestamp) / 1000) })
-          debug(message); global.commons.sendMessage(message, opts.sender)
+          global.commons.sendMessage(message, opts.sender)
         }
         result = false
         break // disable _.each and updateQueue with false
       }
     }
-    debug('cooldowns result %s', result)
     return result
   }
 
@@ -180,14 +174,14 @@ class Cooldown extends System {
 
     if (_.isNil(match)) {
       let message = await global.commons.prepare('cooldowns.cooldown-parse-failed')
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     const cooldown = await global.db.engine.findOne(this.collection.data, { key: match.command, type: match.type })
     if (_.isEmpty(cooldown)) {
       let message = await global.commons.prepare('cooldowns.cooldown-not-found', { command: match.command })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
       return false
     }
 
@@ -206,7 +200,7 @@ class Cooldown extends System {
     if (type === 'quiet' || type === 'type') return // those two are setable only from dashboard
 
     let message = await global.commons.prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.key })
-    debug(message); global.commons.sendMessage(message, opts.sender)
+    global.commons.sendMessage(message, opts.sender)
   }
 
   async toggleEnabled (opts: Object) { await this.toggle(opts, 'enabled') }

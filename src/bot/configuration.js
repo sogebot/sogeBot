@@ -3,9 +3,6 @@
 const constants = require('./constants')
 const _ = require('lodash')
 const config = require('@config')
-const debug = require('debug')
-
-const DEBUG_CONFIGURATION_SETVALUE = debug('configuration:setValue')
 
 class Configuration {
   constructor () {
@@ -68,7 +65,6 @@ class Configuration {
   }
 
   register (cfgName, success, filter, defaultValue) {
-    debug('configuration:register')(`Registering ${cfgName}:${filter} with default value ${defaultValue}`)
     this.cfgL[cfgName] = { success: success, value: defaultValue, filter: filter }
     this.default[cfgName] = { value: defaultValue }
   }
@@ -109,17 +105,11 @@ class Configuration {
       if (opts.parameters.includes('.')) return this.setValue2(opts)
 
       var cmd = opts.parameters.split(' ')[0]
-      DEBUG_CONFIGURATION_SETVALUE('cmd: %s', cmd)
       var value = opts.parameters.replace(opts.parameters.split(' ')[0], '').trim()
       var filter = this.cfgL[cmd].filter
       opts.quiet = _.isBoolean(opts.quiet) ? opts.quiet : false
 
       if (value.length === 0) value = this.default[cmd].value
-      DEBUG_CONFIGURATION_SETVALUE('filter: %s', filter)
-      DEBUG_CONFIGURATION_SETVALUE('key: %s', cmd)
-      DEBUG_CONFIGURATION_SETVALUE('value to set: %s', value)
-      DEBUG_CONFIGURATION_SETVALUE('text: %s', opts.parameters)
-      DEBUG_CONFIGURATION_SETVALUE('isQuiet: %s', opts.quiet)
 
       if (_.isString(value)) value = value.trim()
       if (filter === 'number' && Number.isInteger(parseInt(value, 10))) {

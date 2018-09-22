@@ -2,7 +2,6 @@
 
 // 3rdparty libraries
 const Client = require('twitter')
-const debug = require('debug')
 const _ = require('lodash')
 
 const Message = require('../message')
@@ -29,18 +28,14 @@ function Twitter () {
 }
 
 Twitter.prototype.fireSendTwitterMessage = async function (operation, attributes) {
-  const d = debug('events:fireSendTwitterMessage')
-
   attributes.username = _.get(attributes, 'username', global.commons.getOwner())
   let message = operation.messageToSend
   _.each(attributes, function (val, name) {
     if (_.isObject(val) && _.size(val) === 0) return true // skip empty object
-    d(`Replacing $${name} with ${val}`)
     let replace = new RegExp(`\\$${name}`, 'g')
     message = message.replace(replace, val)
   })
   message = await new Message(message).parse()
-  d('Tweeting message:', message)
   global.integrations.twitter.send(global.integrations.twitter, null, message)
 }
 

@@ -1,6 +1,5 @@
 'use strict'
 
-const debug = require('debug')
 const _ = require('lodash')
 
 class CustomVariablesWidget {
@@ -15,18 +14,15 @@ class CustomVariablesWidget {
   }
 
   sockets () {
-    const d = debug('CustomVariablesWidget:sockets')
-
     global.panel.io.of('/widgets/customVariables').on('connection', (socket) => {
       this.socket = socket // expose for custom variables lib refresh
-      d('Socket /widgets/customVariables connected, registering sockets')
       socket.on('list.variables', async (cb) => {
         const variables = await global.db.engine.find('custom.variables')
-        cb(null, variables); d('list.variables => %j', variables)
+        cb(null, variables)
       })
       socket.on('list.watch', async (cb) => {
         const variables = await global.db.engine.find('custom.variables.watch')
-        cb(null, _.orderBy(variables, 'order', 'asc')); d('list.watch => %j', variables)
+        cb(null, _.orderBy(variables, 'order', 'asc'))
       })
       socket.on('move.up', async (variableId, cb) => {
         let variableToMoveUp = await global.db.engine.findOne('custom.variables.watch', { variableId })

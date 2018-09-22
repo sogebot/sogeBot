@@ -2,7 +2,6 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const debug = require('debug')
 const chalk = require('chalk')
 
 class Donationalerts {
@@ -53,16 +52,14 @@ class Donationalerts {
 
     this.socket.emit('add-user', { token: (await this.clientSecret), type: 'minor' })
 
-    this.socket.off('connect').on('connect', () => debug('donationalerts:onConnect')('Successfully connected socket to service'))
-    this.socket.off('reconnect_attempt').on('reconnect_attempt', () => debug('donationalerts:onReconnectAttempt')('Trying to reconnect to service'))
+    this.socket.off('connect').on('connect', () => { global.log.info('donationalerts.ru: Successfully connected socket to service') })
+    this.socket.off('reconnect_attempt').on('reconnect_attempt', () => global.log.info('donationalerts.ru: Trying to reconnect to service'))
     this.socket.off('disconnect').on('disconnect', () => {
-      debug('donationalerts:onDisconnect')('Socket disconnected from service, trying to reconnect to service')
       this.socket.open()
     })
 
     this.socket.off('donation').on('donation', async (data) => {
       data = JSON.parse(data)
-      debug('donationalerts:onDonation')('Data sent from donationalerts\n%j', data)
       if (parseInt(data.alert_type, 10) !== 1) return
       let additionalData = JSON.parse(data.additional_data)
       global.overlays.eventlist.add({
@@ -80,11 +77,9 @@ class Donationalerts {
     })
   }
   sockets () {
-    const d = debug('donationalerts:sockets')
     const io = global.panel.io.of('/integrations/donationalerts')
 
     io.on('connection', (socket) => {
-      d('Socket /integrations/donationalerts connected, registering sockets')
       socket.on('settings', async (callback) => {
         callback(null, {
           clientSecret: await this.clientSecret,
@@ -109,9 +104,7 @@ class Donationalerts {
 
   async status (options) {
     options = _.defaults(options, { log: true })
-    const d = debug('donationalerts:status')
     let [enabled, clientSecret] = await Promise.all([this.enabled, this.clientSecret, this.clientId, this.redirectURI, this.code, this.accessToken, this.refreshToken])
-    d('Enabled: %s, clientSecret: %s', enabled, clientSecret)
     enabled = !(_.isNil(clientSecret)) && enabled
 
     let color = enabled ? chalk.green : chalk.red

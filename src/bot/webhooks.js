@@ -1,7 +1,6 @@
 const _ = require('lodash')
 const axios = require('axios')
 const config = require('@config')
-const debug = require('debug')('webhooks')
 
 class Webhooks {
   constructor () {
@@ -20,7 +19,6 @@ class Webhooks {
   }
 
   addIdToCache (type, id) {
-    debug(`Adding to ${type} cache - ${id}`)
     this.cache.push({
       id: id,
       type: type,
@@ -30,13 +28,11 @@ class Webhooks {
 
   clearCache () {
     clearTimeout(this.timeouts['clearCache'])
-    debug('Clearing cache')
     this.cache = _.filter(this.cache, (o) => o.timestamp >= _.now() - 600000)
     setTimeout(() => this.clearCache, 600000)
   }
 
   existsInCache (type, id) {
-    debug('Checking if id:%s exists on topic %s - %s', id, type, !_.isEmpty(_.find(this.cache, (o) => o.type === type && o.id === id)))
     return !_.isEmpty(_.find(this.cache, (o) => o.type === type && o.id === id))
   }
 
@@ -64,7 +60,6 @@ class Webhooks {
       `hub.callback=${callback}/${type}`,
       `hub.lease_seconds=${leaseSeconds}`
     ]
-    debug('Subscribe request: %s', request.join('$'))
 
     var res
     switch (type) {
@@ -77,7 +72,6 @@ class Webhooks {
             'Client-ID': config.settings.client_id
           }
         })
-        debug('Subscribe response: %o', res)
         if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: follows waiting for challenge')
         else global.log.error('WEBHOOK: follows NOT subscribed')
         break
@@ -90,7 +84,6 @@ class Webhooks {
             'Client-ID': config.settings.client_id
           }
         })
-        debug('Subscribe response: %o', res)
         if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: streams waiting for challenge')
         else global.log.error('WEBHOOK: streams NOT subscribed')
         break
@@ -103,7 +96,6 @@ class Webhooks {
   }
 
   async event (aEvent, res) {
-    debug('Event received: %j', aEvent)
     const cid = await global.cache.channelId()
 
     // somehow stream doesn't have a topic
@@ -126,15 +118,13 @@ class Webhooks {
         this.enabled.streams = true
         break
     }
-    debug('Sending hub.challenge %s to topic %s', req.query['hub.challenge'], req.query['hub.topic'])
     res.send(req.query['hub.challenge'])
   }
 
   async follower (aEvent) {
-    if (_.isEmpty(await global.cache.channelId())) setTimeout(() => this.follower(aEvent), 10) // wait until channelId is set
-
-    debug('Follow event received: %j', aEvent)
-    if (parseInt(aEvent.data.to_id, 10) !== parseInt(await global.cache.channelId(), 10)) return debug('This events doesn\'t belong to this channel')
+    const cid = await global.cache.channelId()
+    if (_.isEmpty(cid)) setTimeout(() => this.follower(aEvent), 10) // wait until channelId is set
+    if (parseInt(aEvent.data.to_id, 10) !== parseInt(cid, 10)) return
 
     const fid = aEvent.data.from_id
 
@@ -146,9 +136,7 @@ class Webhooks {
 
     // check if user exists in db
     let user = await global.db.engine.findOne('users', { id: fid })
-    debug(user)
     if (_.isEmpty(user)) {
-      debug('user not in db')
       // user doesn't exist - get username from api GET https://api.twitch.tv/helix/users?id=<user ID>
       let userGetFromApi = await axios.get(`https://api.twitch.tv/helix/users?id=${fid}`, {
         headers: {
@@ -156,7 +144,6 @@ class Webhooks {
           'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1]
         }
       })
-      debug('user API data" %o', userGetFromApi.data)
 
       if (!global.commons.isBot(userGetFromApi.data.data[0].login)) {
         global.overlays.eventlist.add({
@@ -168,11 +155,8 @@ class Webhooks {
         const isFollower = user.lock && user.lock.follower ? user.is.follower : true
         await global.db.engine.update('users', { id: fid }, { id: fid, username: userGetFromApi.data.data[0].login, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
         global.log.follow(userGetFromApi.data.data[0].login)
-        debug('Firing follow event'); global.events.fire('follow', { username: userGetFromApi.data.data[0].login }) // we can safely fire event as user doesn't exist in db
       }
     } else {
-      debug('user in db')
-      debug('username: %s, is follower: %s, current time: %s, user time follow: %s', user.username, _.get(user, 'is.follower', false), _.now(), _.get(user, 'time.follow', 0))
       if (!_.get(user, 'is.follower', false) && _.now() - _.get(user, 'time.follow', 0) > 60000 * 60) {
         if (!global.commons.isBot(user.username)) {
           global.overlays.eventlist.add({
@@ -180,7 +164,7 @@ class Webhooks {
             username: user.username
           })
           global.log.follow(user.username)
-          debug('Firing follow event'); global.events.fire('follow', { username: user.username, webhooks: true })
+          global.events.fire('follow', { username: user.username, webhooks: true })
         }
       }
 
@@ -214,12 +198,11 @@ class Webhooks {
   async stream (aEvent) {
     if (_.isEmpty(await global.cache.channelId())) setTimeout(() => this.stream(aEvent), 10) // wait until channelId is set
 
-    debug('Stream event received: %j', aEvent)
     // stream is online
     if (aEvent.data.length > 0) {
       let stream = aEvent.data[0]
 
-      if (parseInt(stream.user_id, 10) !== parseInt(await global.cache.channelId(), 10)) return debug('This events doesn\'t belong to this channel')
+      if (parseInt(stream.user_id, 10) !== parseInt(await global.cache.channelId(), 10)) return
 
       await global.db.engine.update('api.current', { key: 'status' }, { value: stream.title })
       await global.db.engine.update('api.current', { key: 'game' }, { value: await global.api.getGameFromId(stream.game_id) })

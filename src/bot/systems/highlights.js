@@ -4,7 +4,6 @@
 var _ = require('lodash')
 var moment = require('moment')
 require('moment-precise-range-plugin')
-const debug = require('debug')
 const cluster = require('cluster')
 const axios = require('axios')
 
@@ -60,7 +59,6 @@ class Highlights extends System {
       // as we are using API, go through master
       if (process.send) process.send({ type: 'highlight', opts })
     } else {
-      const d = debug('systems:highlight:highlight')
       const cid = await global.cache.channelId()
       const when = await global.cache.when()
       const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`
@@ -74,7 +72,6 @@ class Highlights extends System {
       try {
         if (_.isNil(when.online)) throw Error(ERROR_STREAM_NOT_ONLINE)
 
-        d('Searching in API')
         // we need to load video id
         const request = await axios.get(url, {
           headers: {
@@ -83,7 +80,6 @@ class Highlights extends System {
           }
         })
         let highlight = request.data.data[0]
-        d(highlight)
         let timestamp = moment.preciseDiff(moment().valueOf(), moment(when.online).valueOf(), true)
         highlight.timestamp = { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds }
         highlight.game = _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')
