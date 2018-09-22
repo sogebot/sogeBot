@@ -8,7 +8,6 @@ const flatten = require('flat')
 const cluster = require('cluster')
 
 const _ = require('lodash')
-const debug = require('debug')('db:mongodb')
 
 class IMongoDB extends Interface {
   constructor (forceIndexes, forceRemoveIndexes) {
@@ -22,8 +21,6 @@ class IMongoDB extends Interface {
     this.dbName = mongodbUri.parse(config.database.mongodb.url).database
 
     this.connect()
-
-    if (debug.enabled) debug('MongoDB initialized')
   }
 
   async index (opts) {

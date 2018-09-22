@@ -3,7 +3,6 @@
 const constants = require('./constants')
 const moment = require('moment-timezone')
 const _ = require('lodash')
-const debug = require('debug')
 const cluster = require('cluster')
 require('moment-precise-range-plugin')
 
@@ -67,7 +66,7 @@ class Twitch {
 
   async time (opts) {
     let message = await global.commons.prepare('time', { time: moment().tz(config.timezone).format('LTS') })
-    debug(message); global.commons.sendMessage(message, opts.sender)
+    global.commons.sendMessage(message, opts.sender)
   }
 
   async lastseenUpdate (opts) {
@@ -92,7 +91,7 @@ class Twitch {
     const user = await global.users.get(username)
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.follow) || _.isNil(user.is.follower) || !user.is.follower) {
       let message = await global.commons.prepare('followage.success.never', { username: username })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
     } else {
       let diff = moment.preciseDiff(moment(user.time.follow).valueOf(), moment().valueOf(), true)
       let output = []
@@ -107,12 +106,11 @@ class Twitch {
         username: username,
         diff: output.join(', ')
       })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
     }
   }
 
   async followers (opts) {
-    const d = debug('twitch:followers')
     let events = await global.db.engine.find('widgetsEventList')
     const onlineViewers = (await global.db.engine.find('users.online')).map((o) => o.username)
     const followers = (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username)
@@ -134,11 +132,10 @@ class Twitch {
       lastFollowUsername: lastFollowUsername,
       onlineFollowersCount: onlineFollowersCount
     })
-    d(message); global.commons.sendMessage(message, opts.sender)
+    global.commons.sendMessage(message, opts.sender)
   }
 
   async subs (opts) {
-    const d = debug('twitch:subs')
     let events = await global.db.engine.find('widgetsEventList')
     const onlineViewers = (await global.db.engine.find('users.online')).map((o) => o.username)
     const subscribers = (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username)
@@ -160,7 +157,7 @@ class Twitch {
       lastSubUsername: lastSubUsername,
       onlineSubCount: onlineSubCount
     })
-    d(message); global.commons.sendMessage(message, opts.sender)
+    global.commons.sendMessage(message, opts.sender)
   }
 
   async subage (opts) {
@@ -173,7 +170,7 @@ class Twitch {
     const user = await global.users.get(username)
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.subscribed_at) || _.isNil(user.is.subscriber) || !user.is.subscriber) {
       let message = await global.commons.prepare('subage.success.never', { username: username })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
     } else {
       let diff = moment.preciseDiff(moment(user.time.subscribed_at).valueOf(), moment().valueOf(), true)
       let output = []
@@ -188,7 +185,7 @@ class Twitch {
         username: username,
         diff: output.join(', ')
       })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
     }
   }
 
@@ -202,7 +199,7 @@ class Twitch {
     const user = await global.users.getByName(username)
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.created_at)) {
       let message = await global.commons.prepare('age.failed', { username: username })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
     } else {
       let diff = moment.preciseDiff(moment(user.time.created_at).valueOf(), moment().valueOf(), true)
       let output = []
@@ -214,7 +211,7 @@ class Twitch {
         username: username,
         diff: output.join(', ')
       })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
     }
   }
 
@@ -250,7 +247,7 @@ class Twitch {
         time: Number((await global.users.getWatchedOf(id) / (60 * 60 * 1000))).toFixed(1),
         username
       })
-      debug(m); global.commons.sendMessage(m, opts.sender)
+      global.commons.sendMessage(m, opts.sender)
     } catch (e) {
       global.commons.sendMessage(global.translate('watched.failed.parse'), opts.sender)
     }

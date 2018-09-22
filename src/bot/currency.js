@@ -1,7 +1,6 @@
 const getSymbolFromCurrency = require('currency-symbol-map')
 const axios = require('axios')
 const _ = require('lodash')
-const debug = require('debug')
 
 class Currency {
   constructor () {
@@ -56,8 +55,10 @@ class Currency {
           linenum++
           continue
         }
-        let [country, name, count, code, rate] = line.split('|')
-        debug('currency:updateRates')([country, name, count, code, rate])
+        line = line.split('|')
+        let count = line[2]
+        let code = line[3]
+        let rate = line[3]
         this.rates[code] = parseFloat(rate.replace(',', '.') / count).toFixed(3)
       }
     } catch (e) {

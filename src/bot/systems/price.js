@@ -6,7 +6,6 @@ const _ = require('lodash')
 const constants = require('../constants')
 const Parser = require('../parser')
 const System = require('./_interface')
-const debug = require('debug')('systems:price')
 
 /*
  * !price                     - gets an info about price usage
@@ -47,7 +46,7 @@ class Price extends System {
 
     if (_.isNil(parsed)) {
       let message = await global.commons.prepare('price.price-parse-failed')
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
       return false
     }
 
@@ -59,7 +58,7 @@ class Price extends System {
 
     await global.db.engine.update(this.collection.data, { command: command }, { command: command, price: parseInt(price, 10), enabled: true })
     let message = await global.commons.prepare('price.price-was-set', { command, amount: parseInt(price, 10), pointsName: await global.systems.points.getPointsName(price) })
-    debug(message); global.commons.sendMessage(message, opts.sender)
+    global.commons.sendMessage(message, opts.sender)
   }
 
   async unset (opts) {
@@ -67,23 +66,22 @@ class Price extends System {
 
     if (_.isNil(parsed)) {
       let message = await global.commons.prepare('price.price-parse-failed')
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     const command = parsed[1]
     await global.db.engine.remove(this.collection.data, { command: command })
     let message = await global.commons.prepare('price.price-was-unset', { command })
-    debug(message); global.commons.sendMessage(message, opts.sender)
+    global.commons.sendMessage(message, opts.sender)
   }
 
   async toggle (opts) {
-    debug('toggle(%j,%j,%j)', opts)
     const parsed = opts.parameters.match(/^(![\S]+)$/)
 
     if (_.isNil(parsed)) {
       let message = await global.commons.prepare('price.price-parse-failed')
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
       return false
     }
 
@@ -91,19 +89,19 @@ class Price extends System {
     const price = await global.db.engine.findOne(this.collection.data, { command: command })
     if (_.isEmpty(price)) {
       let message = await global.commons.prepare('price.price-was-not-found', { command })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
       return false
     }
 
     await global.db.engine.update(this.collection.data, { command: command }, { enabled: !price.enabled })
     let message = await global.commons.prepare(!price.enabled ? 'price.price-was-enabled' : 'price.price-was-disabled', { command })
-    debug(message); global.commons.sendMessage(message, opts.sender)
+    global.commons.sendMessage(message, opts.sender)
   }
 
   async list (opts) {
     let prices = await global.db.engine.find(this.collection.data)
     var output = (prices.length === 0 ? global.translate('price.list-is-empty') : global.translate('price.list-is-not-empty').replace(/\$list/g, (_.map(_.orderBy(prices, 'command'), (o) => { return `${o.command} - ${o.price}` })).join(', ')))
-    debug(output); global.commons.sendMessage(output, opts.sender)
+    global.commons.sendMessage(output, opts.sender)
   }
 
   async check (opts) {
@@ -126,7 +124,7 @@ class Price extends System {
     let haveEnoughPoints = availablePts >= removePts
     if (!haveEnoughPoints) {
       let message = await global.commons.prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await global.systems.points.getPointsName(removePts) })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
     } else {
       await global.db.engine.insert('users.points', { id: opts.sender.userId, points: (removePts * -1) })
     }

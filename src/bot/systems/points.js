@@ -2,7 +2,6 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const debug = require('debug')('systems:points')
 
 // bot libraries
 const constants = require('../constants')
@@ -168,7 +167,7 @@ class Points extends System {
           username,
           pointsName: await this.getPointsName(points)
         })
-        debug(message); global.commons.sendMessage(message, opts.sender)
+        global.commons.sendMessage(message, opts.sender)
       } else {
         throw new Error('User doesn\'t have ID')
       }
@@ -193,7 +192,7 @@ class Points extends System {
           username,
           pointsName: await this.getPointsName(points)
         })
-        debug(message); global.commons.sendMessage(message, opts.sender)
+        global.commons.sendMessage(message, opts.sender)
       } else if (points === 'all') {
         await global.db.engine.insert('users.points', { id: opts.sender.userId, points: (parseInt(availablePoints, 10) * -1) })
         await global.db.engine.insert('users.points', { id: guser.id, points: parseInt(availablePoints, 10) })
@@ -202,7 +201,7 @@ class Points extends System {
           username,
           pointsName: await this.getPointsName(availablePoints)
         })
-        debug(message); global.commons.sendMessage(message, opts.sender)
+        global.commons.sendMessage(message, opts.sender)
       } else {
         await global.db.engine.insert('users.points', { id: opts.sender.userId, points: (parseInt(points, 10) * -1) })
         await global.db.engine.insert('users.points', { id: guser.id, points: parseInt(points, 10) })
@@ -211,7 +210,7 @@ class Points extends System {
           username,
           pointsName: await this.getPointsName(points)
         })
-        debug(message); global.commons.sendMessage(message, opts.sender)
+        global.commons.sendMessage(message, opts.sender)
       }
     } catch (err) {
       global.commons.sendMessage(global.translate('points.failed.give'), opts.sender)
@@ -279,7 +278,7 @@ class Points extends System {
         username: username,
         pointsName: await this.getPointsName(points)
       })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
     } catch (err) {
       global.commons.sendMessage(global.translate('points.failed.get'), opts.sender)
     }
@@ -302,7 +301,7 @@ class Points extends System {
         amount: points,
         pointsName: await this.getPointsName(points)
       })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
     } catch (err) {
       global.commons.sendMessage(global.translate('points.failed.all'), opts.sender)
     }
@@ -325,7 +324,7 @@ class Points extends System {
         amount: points,
         pointsName: await this.getPointsName(points)
       })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
     } catch (err) {
       global.commons.sendMessage(global.translate('points.failed.rain'), opts.sender)
     }
@@ -346,7 +345,7 @@ class Points extends System {
         username: username,
         pointsName: await this.getPointsName(points)
       })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
     } catch (err) {
       global.commons.sendMessage(global.translate('points.failed.add'), opts.sender)
     }
@@ -369,7 +368,7 @@ class Points extends System {
           username: username,
           pointsName: await this.getPointsName(points === 'all' ? 0 : points)
         })
-        debug(message); global.commons.sendMessage(message, opts.sender)
+        global.commons.sendMessage(message, opts.sender)
       } else {
         throw new Error('User doesn\'t have ID')
       }

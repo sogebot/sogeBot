@@ -2,16 +2,12 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const debug = require('debug')
 const XRegExp = require('xregexp')
 // bot libraries
 var constants = require('../constants')
 const Message = require('../message')
 const System = require('./_interface')
 var log = global.log
-
-const DEBUG_MODERATION_CONTAINS_LINK = debug('moderation:containsLink')
-const DEBUG_MODERATION_CAPS = debug('moderation:caps')
 
 class Moderation extends System {
   constructor () {
@@ -194,7 +190,7 @@ class Moderation extends System {
       for (let i = 0; i < count; i++) await global.db.engine.insert(this.collection.permits, { username: parsed[1].toLowerCase() })
 
       let m = await global.commons.prepare('moderation.user-have-link-permit', { username: parsed[1].toLowerCase(), link: global.commons.getLocalizedName(count, 'core.links'), count: count })
-      debug(m); global.commons.sendMessage(m, opts.sender)
+      global.commons.sendMessage(m, opts.sender)
     } catch (e) {
       global.commons.sendMessage(global.translate('moderation.permit-parse-failed'), opts.sender)
     }
@@ -210,20 +206,13 @@ class Moderation extends System {
       this.whitelist(opts.message)
     ])
 
-    DEBUG_MODERATION_CONTAINS_LINK('should check links - %s', isEnabled)
-    DEBUG_MODERATION_CONTAINS_LINK('isOwner: %s', global.commons.isOwner(opts.sender))
-    DEBUG_MODERATION_CONTAINS_LINK('isMod: %s', isMod)
-    DEBUG_MODERATION_CONTAINS_LINK('moderate with spaces: %s', isEnabledForSpaces)
     if (global.commons.isOwner(opts.sender) || isMod || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
-      DEBUG_MODERATION_CONTAINS_LINK('checking links skipped')
       return true
     }
 
     const urlRegex = isEnabledForSpaces
       ? /(www)? ??\.? ?[a-zA-Z0-9]+([a-zA-Z0-9-]+) ??\. ?(aero|bet|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|money|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|sl|sm|sn|so|sr|st|su|sv|sy|sz|tc|td|tf|tg|th|tj|tk|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|um|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zr|zw)\b/ig
       : /[a-zA-Z0-9]+([a-zA-Z0-9-]+)?\.(aero|bet|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|money|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|sl|sm|sn|so|sr|st|su|sv|sy|sz|tc|td|tf|tg|th|tj|tk|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|um|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zr|zw)\b/ig
-    DEBUG_MODERATION_CONTAINS_LINK('text to check: "%s"', whitelisted)
-    DEBUG_MODERATION_CONTAINS_LINK('link is found in a text: %s', whitelisted.search(urlRegex) >= 0)
     if (whitelisted.search(urlRegex) >= 0) {
       let permit = await global.db.engine.findOne(this.collection.permits, { username: opts.sender.username })
       if (!_.isEmpty(permit)) {
@@ -324,30 +313,17 @@ class Moderation extends System {
     var msgLength = whitelisted.trim().length
     var capsLength = 0
 
-    DEBUG_MODERATION_CAPS('emotes - %j', opts.sender['emotes'])
-    DEBUG_MODERATION_CAPS('should check caps - %s', isEnabled)
-    DEBUG_MODERATION_CAPS('isOwner: %s', global.commons.isOwner(opts.sender))
-    DEBUG_MODERATION_CAPS('isMod: %s', isMod)
-
     const regexp = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-./:;<=>?@[\]^_`{|}~]/gi
     whitelisted = whitelisted.trim()
     for (let i = 0; i < whitelisted.length; i++) {
       // if is emote or symbol - continue
       if (_.includes(emotesCharList, i) || !_.isNull(whitelisted.charAt(i).match(regexp))) {
-        DEBUG_MODERATION_CAPS(`Emotes char at position ${i}, ${whitelisted.charAt(i)}`)
         msgLength = parseInt(msgLength, 10) - 1
         continue
       } else if (!_.isFinite(parseInt(whitelisted.charAt(i), 10)) && whitelisted.charAt(i).toUpperCase() === whitelisted.charAt(i) && whitelisted.charAt(i) !== ' ') {
-        DEBUG_MODERATION_CAPS(`Capped char at position ${i}, ${whitelisted.charAt(i)}`)
         capsLength += 1
       }
     }
-
-    DEBUG_MODERATION_CAPS('msgLength: %s', msgLength)
-    DEBUG_MODERATION_CAPS('triggerLength: %s', triggerLength)
-    DEBUG_MODERATION_CAPS('capped chars: %i', capsLength)
-    DEBUG_MODERATION_CAPS('triggerPercent: %i%', maxCapsPercent)
-    DEBUG_MODERATION_CAPS('capped percent: %i%', Math.ceil(capsLength / (msgLength / 100)))
 
     if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true

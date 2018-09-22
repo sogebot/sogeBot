@@ -3,7 +3,6 @@ const axios = require('axios')
 const safeEval = require('safe-eval')
 const decode = require('decode-html')
 const querystring = require('querystring')
-const debug = require('debug')
 const _ = require('lodash')
 const config = require('@config')
 const cluster = require('cluster')
@@ -73,9 +72,6 @@ class Message {
   }
 
   async parse (attr) {
-    const d = debug('parser:parse')
-    d('Attributes: %j', attr)
-
     this.message = await this.message // if is promise
 
     let random = {
@@ -308,20 +304,13 @@ class Message {
     }
     let evaluate = {
       '(eval#)': async function (filter) {
-        const d = debug('message:filter:eval'); d('Start')
         let toEvaluate = filter.replace('(eval ', '').slice(0, -1)
         if (_.isObject(attr.sender)) attr.sender = attr.sender.username
-
-        d(toEvaluate)
 
         const containUsers = !_.isNil(toEvaluate.match(/users/g))
         const containRandom = !_.isNil(toEvaluate.replace(/Math\.random|_\.random/g, '').match(/random/g))
         const containOnline = !_.isNil(toEvaluate.match(/online/g))
         const containUrl = !_.isNil(toEvaluate.match(/url\(['"](.*?)['"]\)/g))
-        d('contain users: %s', containUsers)
-        d('contain random: %s', containRandom)
-        d('contain online: %s', containOnline)
-        d('contain url: %s', containUrl)
 
         let urls = []
         if (containUrl) {
@@ -395,7 +384,7 @@ class Message {
           }
         }
 
-        d(toEval, context); return (safeEval(toEval, context))
+        return (safeEval(toEval, context))
       }
     }
     let ifp = {
@@ -408,13 +397,10 @@ class Message {
             .replace(/\$param|\$!param/g, attr.param) // replace params
           let [check, ifTrue, ifFalse] = toEvaluate.split('|')
           check = check.startsWith('>') || check.startsWith('<') || check.startsWith('=') ? false : check // force check to false if starts with comparation
-
-          d(toEvaluate, check, safeEval(check), ifTrue, ifFalse)
           if (_.isNil(ifTrue)) return
           if (safeEval(check)) return ifTrue
           return _.isNil(ifFalse) ? '' : ifFalse
         } catch (e) {
-          d(e)
           return ''
         }
       }
@@ -484,13 +470,13 @@ class Message {
 
     await this.global({})
 
-    await this.parseMessageEach(price); d('parseMessageEach: %s', this.message)
-    await this.parseMessageEach(info); d('parseMessageEach: %s', this.message)
-    await this.parseMessageEach(random); d('parseMessageEach: %s', this.message)
-    await this.parseMessageEach(ifp, false); d('parseMessageEach: %s', this.message)
-    await this.parseMessageVariables(custom); d('parseMessageEach: %s', this.message)
-    await this.parseMessageEval(evaluate, decode(this.message)); d('parseMessageEval: %s', this.message)
-    await this.parseMessageEach(param, true); d('parseMessageEach: %s', this.message)
+    await this.parseMessageEach(price)
+    await this.parseMessageEach(info)
+    await this.parseMessageEach(random)
+    await this.parseMessageEach(ifp, false)
+    await this.parseMessageVariables(custom)
+    await this.parseMessageEval(evaluate, decode(this.message))
+    await this.parseMessageEach(param, true)
     // local replaces
     if (!_.isNil(attr)) {
       const isWithAt = await global.configuration.getValue('atUsername')
@@ -499,19 +485,18 @@ class Message {
         this.message = this.message.replace(new RegExp('[$]' + key, 'g'), value)
       }
     }
-    await this.parseMessageEach(math); d('parseMessageEach: %s', this.message)
-    await this.parseMessageOnline(online); d('parseMessageOnline: %s', this.message)
-    await this.parseMessageCommand(command); d('parseMessageCommand: %s', this.message)
-    await this.parseMessageEach(qs, false); d('parseMessageEach: %s', this.message)
-    await this.parseMessageEach(list); d('parseMessageEach: %s', this.message)
-    await this.parseMessageEach(stream); d('parseMessageEach: %s', this.message)
-    await this.parseMessageApi(); d('parseMessageApi: %s', this.message)
+    await this.parseMessageEach(math)
+    await this.parseMessageOnline(online)
+    await this.parseMessageCommand(command)
+    await this.parseMessageEach(qs, false)
+    await this.parseMessageEach(list)
+    await this.parseMessageEach(stream)
+    await this.parseMessageApi()
 
     return this.message
   }
 
   async parseMessageApi () {
-    const d = debug('parser:parseMessageApi')
     if (this.message.trim().length === 0) return
 
     let rMessage = this.message.match(/\(api\|(http\S+)\)/i)
@@ -532,7 +517,6 @@ class Message {
         } else this.message = this.message.replace('(api._response)', response.data.toString().replace(/^"(.*)"/, '$1'))
       } else {
         if (_.isBuffer(response.data)) response.data = JSON.parse(response.data.toString())
-        d('API response %s: %o', url, response.data)
         for (let tag of rData) {
           let path = response.data
           let ids = tag.replace('(api.', '').replace(')', '').split('.')

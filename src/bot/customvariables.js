@@ -1,7 +1,6 @@
 'use strict'
 
 const _ = require('lodash')
-const debug = require('debug')
 const crypto = require('crypto')
 const safeEval = require('safe-eval')
 const axios = require('axios')
@@ -10,11 +9,6 @@ const mathjs = require('mathjs')
 const XRegExp = require('xregexp')
 
 const Message = require('./message')
-
-const DEBUG = {
-  SOCKETS: debug('events:sockets'),
-  SCRIPT: debug('events:runScript')
-}
 
 class CustomVariables {
   constructor () {
@@ -41,10 +35,9 @@ class CustomVariables {
     const io = global.panel.io.of('/registry/customVariables')
 
     io.on('connection', (socket) => {
-      DEBUG.SOCKETS('Socket /registry/customVariables connected, registering sockets')
       socket.on('list.variables', async (cb) => {
         let variables = await global.db.engine.find('custom.variables')
-        cb(null, variables); DEBUG.SOCKETS('list.variables => %j', variables)
+        cb(null, variables)
       })
       socket.on('run.script', async (_id, cb) => {
         let item
@@ -76,7 +69,7 @@ class CustomVariables {
       })
       socket.on('load', async (id, cb) => {
         let variable = await global.db.engine.findOne('custom.variables', { _id: String(id) })
-        cb(variable); DEBUG.SOCKETS('load => %j', variable)
+        cb(variable)
       })
       socket.on('save', async (data, cb) => {
         var _id
@@ -100,9 +93,6 @@ class CustomVariables {
   }
 
   async runScript (script, opts) {
-    DEBUG.SCRIPT('Start')
-    DEBUG.SCRIPT(script)
-
     let sender = !_.isNil(opts.sender) ? opts.sender : null
     let param = !_.isNil(opts.param) ? opts.param : null
 
@@ -111,10 +101,6 @@ class CustomVariables {
     const containRandom = !_.isNil(script.replace(/Math\.random|_\.random/g, '').match(/random/g)) && script.match(/users/g).length > 1
     const containOnline = !_.isNil(script.match(/online/g))
     const containUrl = !_.isNil(script.match(/url\(['"](.*?)['"]\)/g))
-    DEBUG.SCRIPT('contain users: %s', containUsers)
-    DEBUG.SCRIPT('contain random: %s', containRandom)
-    DEBUG.SCRIPT('contain online: %s', containOnline)
-    DEBUG.SCRIPT('contain url: %s', containUrl)
 
     if (!_.isNil(script.match(/(\$_[a-zA-Z_]+)/g))) {
       for (let match of script.match(/(\$_[a-zA-Z_]+)/g)) {
@@ -192,7 +178,7 @@ class CustomVariables {
         context[url.id] = url.response
       }
     }
-    DEBUG.SCRIPT(toEval); return (safeEval(toEval, context))
+    return (safeEval(toEval, context))
   }
 
   async isVariableSet (variableName) {

@@ -6,8 +6,6 @@ const cluster = require('cluster')
 // bot libraries
 var constants = require('../constants')
 const System = require('./_interface')
-// debug
-const debug = require('debug')('systems:raffles')
 
 const TYPE_NORMAL = 0
 const TYPE_TICKETS = 1
@@ -76,29 +74,22 @@ class Raffles extends System {
   async messages (opts) {
     if (opts.skip) return true
 
-    debug('[MESSAGE PARSER]')
     let raffles = await global.db.engine.find(this.collection.data)
-    debug('Raffles: %o', raffles)
     if (_.isEmpty(raffles)) {
       return true
     }
 
     let raffle = _.orderBy(raffles, 'timestamp', 'desc')[0]
-    debug('Selected raffle: %o', raffle)
 
     let isWinner = !_.isNil(raffle.winner) && raffle.winner === opts.sender.username
     let isInFiveMinutesTreshold = _.now() - raffle.timestamp <= 1000 * 60 * 5
 
-    debug('current time: %s, raffle pick time: %s, diff: %s', _.now(), raffle.timestamp, _.now() - raffle.timestamp)
-    debug('Is raffle in 5 minutes treshold: %s', isInFiveMinutesTreshold)
-    debug('Is user a winner: %s', isWinner)
     if (isWinner && isInFiveMinutesTreshold) {
       let winner = await global.db.engine.findOne(this.collection.participants, { username: opts.sender.username, raffle_id: raffle._id.toString() })
       winner.messages.push({
         timestamp: _.now(),
         text: opts.message
       })
-      debug({ username: opts.sender.username, raffle_id: raffle._id.toString() }, { messages: winner.messages })
       await global.db.engine.update(this.collection.participants, { username: opts.sender.username, raffle_id: raffle._id.toString() }, { messages: winner.messages })
     }
     return true
@@ -128,7 +119,7 @@ class Raffles extends System {
       max: raffle.max,
       eligibility: eligibility.join(', ')
     })
-    debug(message); global.commons.sendMessage(message, global.commons.getOwner())
+    global.commons.sendMessage(message, global.commons.getOwner())
 
     this.timeouts['raffleAnnounce'] = setTimeout(() => this.announce(), 60000)
   }
@@ -165,7 +156,7 @@ class Raffles extends System {
     let keyword = opts.parameters.match(/(![\S]+)/)
     if (_.isNil(keyword)) {
       let message = await global.commons.prepare('raffles.cannot-create-raffle-without-keyword')
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
       return
     }
     keyword = keyword[1]
@@ -174,7 +165,7 @@ class Raffles extends System {
     let raffle = await global.db.engine.findOne(this.collection.data, { winner: null })
     if (!_.isEmpty(raffle)) {
       let message = await global.commons.prepare('raffles.raffle-is-already-running', { keyword: raffle.keyword })
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
       return
     }
 
@@ -200,7 +191,7 @@ class Raffles extends System {
       min: minTickets,
       max: maxTickets
     })
-    debug(message); global.commons.sendMessage(message, global.commons.getOwner())
+    global.commons.sendMessage(message, global.commons.getOwner())
 
     this.settings._.lastAnnounce = String(new Date())
   }
@@ -210,7 +201,7 @@ class Raffles extends System {
 
     if (_.isEmpty(raffle)) {
       let message = await global.commons.prepare('raffles.no-raffle-is-currently-running')
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
       return
     }
 
@@ -228,7 +219,7 @@ class Raffles extends System {
       max: raffle.max,
       eligibility: eligibility.join(', ')
     })
-    debug(message); global.commons.sendMessage(message, global.commons.getOwner())
+    global.commons.sendMessage(message, global.commons.getOwner())
   }
 
   async participate (opts) {
@@ -238,24 +229,17 @@ class Raffles extends System {
     if (_.isEmpty(raffle)) return true
 
     const isStartingWithRaffleKeyword = opts.message.toLowerCase().startsWith(raffle.keyword.toLowerCase())
-    debug('isStartingWithRaffleKeyword: %s', isStartingWithRaffleKeyword)
     if (!isStartingWithRaffleKeyword || _.isEmpty(raffle)) return true
 
     opts.message = opts.message.toString().replace(raffle.keyword, '')
     let tickets = opts.message.trim() === 'all' && !_.isNil(await global.systems.points.getPointsOf(opts.sender.userId)) ? await global.systems.points.getPointsOf(opts.sender.userId) : parseInt(opts.message.trim(), 10)
-    debug('User in db: %j', user)
-    debug('Text: %s', opts.message)
-    debug('Tickets in text: %s', parseInt(opts.message.trim(), 10))
 
     if (_.isEmpty(raffle)) { // shouldn't happen, but just to be sure (user can join when closing raffle)
       let message = await global.commons.prepare('no-raffle-is-currently-running')
-      debug(message); global.commons.sendMessage(message, opts.sender)
+      global.commons.sendMessage(message, opts.sender)
       return false
     }
 
-    debug('Tickets to bet: %s', tickets)
-    debug('Tickets are number: %s', _.isFinite(tickets))
-    debug('Tickets <= 0: %s', tickets <= 0)
     if ((!_.isFinite(tickets) || tickets <= 0 || tickets > parseInt(raffle.max, 10) || tickets < parseInt(raffle.min, 10)) && raffle.type === TYPE_TICKETS) {
       return false
     }
@@ -264,13 +248,9 @@ class Raffles extends System {
     let participant = await global.db.engine.findOne(this.collection.participants, { raffle_id: raffle._id.toString(), username: opts.sender.username })
     let curTickets = 0
     if (!_.isEmpty(participant)) {
-      debug(participant)
       curTickets = parseInt(participant.tickets, 10)
     }
     let newTickets = curTickets + tickets
-    debug('current tickets: %d', curTickets)
-    debug('new tickets: %d', tickets)
-    debug('tickets to set: %d', newTickets)
 
     if (newTickets > raffle.max) { newTickets = raffle.max }
     tickets = newTickets - curTickets
@@ -283,9 +263,6 @@ class Raffles extends System {
       is: user.is,
       raffle_id: raffle._id.toString()
     }
-    debug('new participant: %j', participantUser)
-
-    debug('not enough points: %o', raffle.type === TYPE_TICKETS && await global.systems.points.getPointsOf(opts.sender.userId) < tickets)
     if (raffle.type === TYPE_TICKETS && await global.systems.points.getPointsOf(opts.sender.userId) < tickets) return // user doesn't have enough points
 
     if (raffle.followers && raffle.subscribers) {
@@ -309,12 +286,11 @@ class Raffles extends System {
 
     // get only latest raffle
     let raffle = _.orderBy(raffles, 'timestamp', 'desc')[0]
-    debug('Picking winner for raffle\n  %j', raffle)
 
     let participants = await global.db.engine.find(this.collection.participants, { raffle_id: raffle._id.toString(), eligible: true })
     if (participants.length === 0) {
       let message = await global.commons.prepare('raffles.no-participants-to-pick-winner')
-      debug(message); global.commons.sendMessage(message, global.commons.getOwner())
+      global.commons.sendMessage(message, global.commons.getOwner())
       return true
     }
 
@@ -334,9 +310,6 @@ class Raffles extends System {
 
     _total = parseInt(_total, 10)
     let winNumber = _.random(0, _total - 1, false)
-    debug('Total tickets: %s', _total)
-    debug('Win number: %s', winNumber)
-
     let winner
     for (let participant of _.filter(participants, (o) => o.eligible)) {
       let tickets = participant.tickets
@@ -356,7 +329,6 @@ class Raffles extends System {
       }
     }
 
-    debug('Raffle winner: %s', winner)
     let tickets = winner.tickets
     if (!_.isNil(winner.is) || (winner.is.follower && winner.is.subscriber)) {
       if (winner.is.subscriber) {
@@ -379,7 +351,7 @@ class Raffles extends System {
       keyword: raffle.keyword,
       probability: _.round(probability, 2)
     })
-    debug(message); global.commons.sendMessage(message, global.commons.getOwner())
+    global.commons.sendMessage(message, global.commons.getOwner())
   }
 }
 

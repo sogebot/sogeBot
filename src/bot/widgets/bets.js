@@ -1,7 +1,6 @@
 'use strict'
 
 const _ = require('lodash')
-const debug = require('debug')
 
 class BetsWidget {
   constructor () {
@@ -36,11 +35,7 @@ class BetsWidget {
   }
 
   sockets () {
-    const d = debug('BetsWidgets:sockets')
-
     global.panel.io.of('/widgets/bets').on('connection', (socket) => {
-      d('Socket /widgets/bets connected, registering sockets')
-
       socket.on('data', async (callback) => {
         callback(this.currentBet, this.bets)
       })

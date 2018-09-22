@@ -2,7 +2,6 @@
 
 // 3rdparty libraries
 const _ = require('lodash')
-const debug = require('debug')
 const cluster = require('cluster')
 
 const Expects = require('../expects.js')
@@ -89,8 +88,6 @@ class Heist extends Game {
   async iCheckFinished () {
     clearTimeout(this.timeouts['iCheckFinished'])
 
-    const d = debug('heist:iCheckFinished')
-    d('Checking if heist is finished')
     let [startedAt, entryCooldown, lastHeistTimestamp, copsCooldown, started] = await Promise.all([
       this.settings._.startedAt,
       this.settings.options.entryCooldownInSeconds,
@@ -99,11 +96,6 @@ class Heist extends Game {
       this.settings.notifications.started
     ])
     let levels = _.orderBy(await this.settings.levels.data, 'maxUsers', 'asc')
-
-    d('startedAt: %s', startedAt)
-    d('entryCooldown: %s', entryCooldown)
-    d('How long ago started: %s', _.now() - startedAt)
-    d('Expected heist close: %s', (entryCooldown * 1000) + 10000)
 
     // check if heist is finished
     if (!_.isNil(startedAt) && _.now() - startedAt > (entryCooldown * 1000) + 10000) {
@@ -120,10 +112,6 @@ class Heist extends Game {
       }
 
       global.commons.sendMessage(started.replace('$bank', level.name), global.commons.getOwner())
-
-      d('Closing heist ----------')
-      d('Users: %s', users.length)
-      d('Win probablity:%s%', level['winPercentage'])
 
       if (users.length === 1) {
         // only one user
@@ -182,7 +170,6 @@ class Heist extends Game {
   }
 
   async main (opts) {
-    const d = debug('heist:run')
     const expects = new Expects()
 
     let [startedAt, entryCooldown, lastHeistTimestamp, copsCooldown] = await Promise.all([
@@ -195,7 +182,6 @@ class Heist extends Game {
 
     // is cops patrolling?
     if (_.now() - lastHeistTimestamp < copsCooldown * 60000) {
-      d('Minutes left: %s', copsCooldown - (_.now() - lastHeistTimestamp) / 60000)
       let minutesLeft = Number.parseFloat(copsCooldown - (_.now() - lastHeistTimestamp) / 60000).toFixed(1)
       if (_.now() - (await this.settings._.lastAnnouncedCops) >= 60000) {
         this.settings._.lastAnnouncedCops = _.now()
@@ -233,14 +219,12 @@ class Heist extends Game {
         global.commons.sendMessage(
           (await global.translate('games.heist.entryInstruction')).replace('$command', opts.command), opts.sender)
         global.log.warning(`${opts.command} ${e.message}`)
-        d(e.stack)
       }
       return
     }
 
     points = points === 'all' && !_.isNil(await global.systems.points.getPointsOf(opts.sender.userId)) ? await global.systems.points.getPointsOf(opts.sender.userId) : parseInt(points, 10) // set all points
     points = points > await global.systems.points.getPointsOf(opts.sender.userId) ? await global.systems.points.getPointsOf(opts.sender.userId) : points // bet only user points
-    d(`${opts.command} - ${opts.sender.username} betting ${points}`)
 
     if (points === 0 || _.isNil(points) || _.isNaN(points)) {
       global.commons.sendMessage(
