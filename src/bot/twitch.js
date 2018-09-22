@@ -88,7 +88,7 @@ class Twitch {
     if (_.isNil(parsed)) username = opts.sender.username
     else username = parsed[0].toLowerCase()
 
-    const user = await global.users.get(username)
+    const user = await global.users.getByName(username)
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.follow) || _.isNil(user.is.follower) || !user.is.follower) {
       let message = await global.commons.prepare('followage.success.never', { username: username })
       global.commons.sendMessage(message, opts.sender)
@@ -167,7 +167,7 @@ class Twitch {
     if (_.isNil(parsed)) username = opts.sender.username
     else username = parsed[0].toLowerCase()
 
-    const user = await global.users.get(username)
+    const user = await global.users.getByName(username)
     if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.subscribed_at) || _.isNil(user.is.subscriber) || !user.is.subscriber) {
       let message = await global.commons.prepare('subage.success.never', { username: username })
       global.commons.sendMessage(message, opts.sender)
@@ -218,7 +218,7 @@ class Twitch {
   async lastseen (opts) {
     try {
       var parsed = opts.parameters.match(/^([\S]+)$/)
-      const user = await global.users.get(parsed[0])
+      const user = await global.users.getByName(parsed[0])
       if (_.isNil(user) || _.isNil(user.time) || _.isNil(user.time.message)) {
         global.commons.sendMessage(global.translate('lastseen.success.never').replace(/\$username/g, parsed[0]), opts.sender)
       } else {
