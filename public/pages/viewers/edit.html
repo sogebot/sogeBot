@@ -25,8 +25,8 @@
           <span v-if="pending" style="cursor: auto;" class="alert-danger btn m-0">{{commons.translate('dialog.changesPending')}}</span>
           <button v-if="states.save === 0" type="button" class="btn btn-primary" v-on:click="saveChanges()">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
           <button v-if="states.save === 1" disabled="disabled" type="button" class="btn btn-primary"><i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
-          <button v-if="states.save === 2" disabled="disabled" type="button" class="btn btn-success"><i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</span></button>
-          <button v-if="states.save === 3" disabled="disabled" type="button" class="btn btn-danger"><i class="fas fa-exclamation"></i> {{ commons.translate('dialog.buttons.something-went-wrong') }}</span></button>
+          <button v-if="states.save === 2" disabled="disabled" type="button" class="btn btn-success"><i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }</button>
+          <button v-if="states.save === 3" disabled="disabled" type="button" class="btn btn-danger"><i class="fas fa-exclamation"></i> {{ commons.translate('dialog.buttons.something-went-wrong') }}</button>
       </div>
     </div>
 
@@ -240,143 +240,144 @@
         </div>
       </form>
     </div>
-  </span>
-</template>
-  <script>
-    Vue.prototype.commons = commons
+  </template>
+</span>
 
-    function viewersEditInit () {
-      if (_.size(translations) === 0 || _.isNil(configuration)) return setTimeout(() => viewersEditInit(), 1)
+<script>
+  Vue.prototype.commons = commons
 
-      Vue.prototype.configuration = configuration
+  function viewersEditInit () {
+    if (_.size(translations) === 0 || _.isNil(configuration)) return setTimeout(() => viewersEditInit(), 1)
 
-      var viewersEdit = new Vue({
-        el: '#viewer-edit',
-        components: {
-          'textarea-with-tags': textAreaWithTags,
-          'date-picker': DatePicker.default
-        },
-        data: {
-          viewer: null,
-          watchedTime: null,
+    Vue.prototype.configuration = configuration
 
-          pending: false,
+    var viewersEdit = new Vue({
+      el: '#viewer-edit',
+      components: {
+        'textarea-with-tags': textAreaWithTags,
+        'date-picker': DatePicker.default
+      },
+      data: {
+        viewer: null,
+        watchedTime: null,
 
-          socket: io('/core/users', { query: "token=" + token }),
+        pending: false,
 
-          states: {
-            save: 0,
-            delete: false,
-            forceCheckFollowedAt: false,
-          }
-        },
-        methods: {
-          moment: function (args) {
-            return moment(args) // expose moment function
-          },
-          forceCheckFollowedAt: function () {
-            this.pending = true
-            this.states.forceCheckFollowedAt = true
-            this.socket.emit('followedAt.viewer', this.viewer.id, (err, followed_at) => {
-              if (err) return console.error(err)
-              this.viewer.time.follow = followed_at
-              this.states.forceCheckFollowedAt = false
-            })
-          },
-          removeBits: function (_id) {
-            _.remove(this.viewer.stats.bits, o => o._id === _id);
-            this.viewer.stats.bits = [
-              ...this.viewer.stats.bits
-            ]
-            pending = true
-          },
-          removeTips: function (_id) {
-            _.remove(this.viewer.stats.tips, o => o._id === _id);
-            this.viewer.stats.tips = [
-              ...this.viewer.stats.tips
-            ]
-            pending = true
-          },
-          saveChanges: function () {
-            this.states.save = 1
-            const data = {
-              _id: commons.urlParam('id') ? commons.urlParam('id') : null,
-              viewer: this.viewer
-            }
-            if (!this.states.delete) {
-              this.socket.emit('update.viewer', {items: [data]}, (err, _id) => {
-                if (err) {
-                  console.error(err)
-                  return this.states.save = 3
-                }
-                this.states.save = 2
-                this.pending = false
-                this.id = _id
-                setTimeout(() => this.states.save = 0, 1000)
-              })
-            } else {
-              this.socket.emit('delete.viewer', {_id: this.id}, (err) => {
-                page('/#viewers/list')
-              })
-            }
-          },
-        },
-        watch: {
-          watchedTime: _.debounce(function (val, old) {
-            if (val === old) return
-            this.watchedTime = Number(val).toFixed(1)
+        socket: io('/core/users', { query: "token=" + token }),
 
-            if (!isNaN(this.watchedTime)) this.viewer.time.watched = this.watchedTime * 60 * 60 * 1000
-          }, 1000),
-          'viewer.time.follow': function (val, old) {
-            if (val === null || this.viewer.time.follow === new Date(val).getTime()) return
-            this.pending = true
-            this.viewer.time.follow = new Date(val).getTime()
-            if (this.viewer.time.follow === 0) this.viewer.time.follow = null
-          },
-          'viewer.time.subscribed_at': function (val, old) {
-            if (val === null || this.viewer.time.subscribed_at === new Date(val).getTime()) return
-            this.pending = true
-            this.viewer.time.subscribed_at = new Date(val).getTime()
-            if (this.viewer.time.subscribed_at === 0) this.viewer.time.subscribed_at = null
-          }
-        },
-        computed: {
-          lastSeen: function () {
-            if (this.viewer.time.message) {
-              return moment(this.viewer.time.message).format('HH:mm:ss, YYYY-MM-DD')
-            } else return ''
-          }
-        },
-        created: function () {
-          // load up from db
-          if (commons.urlParam('id')) {
-            this.id = commons.urlParam('id')
-            this.socket.emit('findOne.viewer', { where: { id: commons.urlParam('id') } }, (err, data) => {
-              for (let bits of data.stats.bits) {
-                // Add for vue have control and watchers
-                bits.editation = false
-                bits.new = false
-              }
-              for (let tips of data.stats.tips) {
-                // Add for vue have control and watchers
-                tips.editation = false
-                tips.new = false
-              }
-              this.viewer = data
-              this.watchedTime = !data.time.watched ? '0.0' : Number(data.time.watched / (60 * 60 * 1000)).toFixed(1)
-              this.$nextTick(() => { this.pending = false })
-            })
-          }
-        },
-        filters: {
-          capitalize: function (value) {
-            if (!value) return ''
-            value = value.toString()
-            return value.charAt(0).toUpperCase() + value.slice(1)
-          }
+        states: {
+          save: 0,
+          delete: false,
+          forceCheckFollowedAt: false,
         }
-      })
-    }
-    viewersEditInit()
-  </script>
+      },
+      methods: {
+        moment: function (args) {
+          return moment(args) // expose moment function
+        },
+        forceCheckFollowedAt: function () {
+          this.pending = true
+          this.states.forceCheckFollowedAt = true
+          this.socket.emit('followedAt.viewer', this.viewer.id, (err, followed_at) => {
+            if (err) return console.error(err)
+            this.viewer.time.follow = followed_at
+            this.states.forceCheckFollowedAt = false
+          })
+        },
+        removeBits: function (_id) {
+          _.remove(this.viewer.stats.bits, o => o._id === _id);
+          this.viewer.stats.bits = [
+            ...this.viewer.stats.bits
+          ]
+          pending = true
+        },
+        removeTips: function (_id) {
+          _.remove(this.viewer.stats.tips, o => o._id === _id);
+          this.viewer.stats.tips = [
+            ...this.viewer.stats.tips
+          ]
+          pending = true
+        },
+        saveChanges: function () {
+          this.states.save = 1
+          const data = {
+            _id: commons.urlParam('id') ? commons.urlParam('id') : null,
+            viewer: this.viewer
+          }
+          if (!this.states.delete) {
+            this.socket.emit('update.viewer', {items: [data]}, (err, _id) => {
+              if (err) {
+                console.error(err)
+                return this.states.save = 3
+              }
+              this.states.save = 2
+              this.pending = false
+              this.id = _id
+              setTimeout(() => this.states.save = 0, 1000)
+            })
+          } else {
+            this.socket.emit('delete.viewer', {_id: this.id}, (err) => {
+              page('/#viewers/list')
+            })
+          }
+        },
+      },
+      watch: {
+        watchedTime: _.debounce(function (val, old) {
+          if (val === old) return
+          this.watchedTime = Number(val).toFixed(1)
+
+          if (!isNaN(this.watchedTime)) this.viewer.time.watched = this.watchedTime * 60 * 60 * 1000
+        }, 1000),
+        'viewer.time.follow': function (val, old) {
+          if (val === null || this.viewer.time.follow === new Date(val).getTime()) return
+          this.pending = true
+          this.viewer.time.follow = new Date(val).getTime()
+          if (this.viewer.time.follow === 0) this.viewer.time.follow = null
+        },
+        'viewer.time.subscribed_at': function (val, old) {
+          if (val === null || this.viewer.time.subscribed_at === new Date(val).getTime()) return
+          this.pending = true
+          this.viewer.time.subscribed_at = new Date(val).getTime()
+          if (this.viewer.time.subscribed_at === 0) this.viewer.time.subscribed_at = null
+        }
+      },
+      computed: {
+        lastSeen: function () {
+          if (this.viewer.time.message) {
+            return moment(this.viewer.time.message).format('HH:mm:ss, YYYY-MM-DD')
+          } else return ''
+        }
+      },
+      created: function () {
+        // load up from db
+        if (commons.urlParam('id')) {
+          this.id = commons.urlParam('id')
+          this.socket.emit('findOne.viewer', { where: { id: commons.urlParam('id') } }, (err, data) => {
+            for (let bits of data.stats.bits) {
+              // Add for vue have control and watchers
+              bits.editation = false
+              bits.new = false
+            }
+            for (let tips of data.stats.tips) {
+              // Add for vue have control and watchers
+              tips.editation = false
+              tips.new = false
+            }
+            this.viewer = data
+            this.watchedTime = !data.time.watched ? '0.0' : Number(data.time.watched / (60 * 60 * 1000)).toFixed(1)
+            this.$nextTick(() => { this.pending = false })
+          })
+        }
+      },
+      filters: {
+        capitalize: function (value) {
+          if (!value) return ''
+          value = value.toString()
+          return value.charAt(0).toUpperCase() + value.slice(1)
+        }
+      }
+    })
+  }
+  viewersEditInit()
+</script>
