@@ -193,7 +193,17 @@ export default {
   },
   data: function () {
     return {
-      settings: {},
+      settings: {
+        widgetEventlistFollows: true,
+        widgetEventlistHosts: true,
+        widgetEventlistRaids: true,
+        widgetEventlistCheers: true,
+        widgetEventlistSubs: true,
+        widgetEventlistSubgifts: true,
+        widgetEventlistSubcommunitygifts: true,
+        widgetEventlistResubs: true,
+        widgetEventlistTips: true,
+      },
       update: String(new Date()),
       events: null,
       eventlistShow: 0,
@@ -213,17 +223,17 @@ export default {
     })
   },
   created: function () {
-    this.socket.once('configuration', data => {
+    socket.emit('getConfiguration', data => {
       this.settings = {
-        widgetEventlistFollows: data.widgetEventlistFollows,
-        widgetEventlistHosts: data.widgetEventlistHosts,
-        widgetEventlistRaids: data.widgetEventlistRaids,
-        widgetEventlistCheers: data.widgetEventlistCheers,
-        widgetEventlistSubs: data.widgetEventlistSubs,
-        widgetEventlistSubgifts: data.widgetEventlistSubgifts,
-        widgetEventlistSubcommunitygifts: data.widgetEventlistSubcommunitygifts,
-        widgetEventlistResubs: data.widgetEventlistResubs,
-        widgetEventlistTips: data.widgetEventlistTips
+        widgetEventlistFollows: _.isNil(data.widgetEventlistFollows) ? true : data.widgetEventlistFollows,
+        widgetEventlistHosts: _.isNil(data.widgetEventlistHosts) ? true : data.widgetEventlistHosts,
+        widgetEventlistRaids: _.isNil(data.widgetEventlistRaids) ? true : data.widgetEventlistRaids,
+        widgetEventlistCheers: _.isNil(data.widgetEventlistCheers) ? true : data.widgetEventlistCheers,
+        widgetEventlistSubs: _.isNil(data.widgetEventlistSubs) ? true : data.widgetEventlistSubs,
+        widgetEventlistSubgifts: _.isNil(data.widgetEventlistSubgifts) ? true : data.widgetEventlistSubgifts,
+        widgetEventlistSubcommunitygifts: _.isNil(data.widgetEventlistSubcommunitygifts) ? true : data.widgetEventlistSubcommunitygifts,
+        widgetEventlistResubs: _.isNil(data.widgetEventlistResubs) ? true : data.widgetEventlistResubs,
+        widgetEventlistTips: _.isNil(data.widgetEventlistTips) ? true : data.widgetEventlistTips
       }
 
       this.eventlistShow = data.widgetEventlistShow
@@ -287,7 +297,7 @@ export default {
       t = t.replace('$viewers', '<strong style="font-size: 1rem">' + _.get(event, 'viewers', '0') + '</strong>')
       t = t.replace('$tier', `${commons.translate('tier')} <strong style="font-size: 1rem">${_.get(event, 'tier', 'n/a')}</strong>`)
       t = t.replace('$username', _.get(event, 'from', 'n/a'))
-      t = t.replace('$months', '<strong style="font-size: 1rem">' + _.get(event, 'months', '0') + '</strong>')
+      t = t.replace('$months', '<strong style`="`font-size: 1rem">' + _.get(event, 'months', '0') + '</strong>')
       t = t.replace('$bits', '<strong style="font-size: 1rem">' + _.get(event, 'bits', '0') + '</strong>')
 
       let output = `<span style="font-size:0.7rem; font-weight: normal">${t}</span>`
