@@ -227,10 +227,11 @@ function Panel () {
         global.configuration.setValue({ sender: { username: global.commons.getOwner() }, parameters: value + ' ' + index, quiet: data._quiet })
       })
     })
-    socket.on('getConfiguration', async function () {
+    socket.on('getConfiguration', async function (cb) {
       var data = {}
       for (let key of global.configuration.sets(global.configuration)) data[key] = await global.configuration.getValue(key)
-      socket.emit('configuration', data)
+      if (_.isFunction(cb)) cb(data)
+      else socket.emit('configuration', data)
     })
 
     // send enabled systems
