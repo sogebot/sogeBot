@@ -46,23 +46,23 @@ class Points extends System {
 
   async updatePoints () {
     clearTimeout(this.timeouts['updatePoints'])
+    if (!(await this.isEnabled())) {
+      this.timeouts['updatePoints'] = setTimeout(() => this.updatePoints(), 5000)
+      return
+    }
+
+    let [interval, perInterval, offlineInterval, perOfflineInterval, isOnline] = await Promise.all([
+      this.settings.points.interval,
+      this.settings.points.perInterval,
+      this.settings.points.offlineInterval,
+      this.settings.points.perOfflineInterval,
+      global.cache.isOnline()
+    ])
+
+    interval = isOnline ? interval * 60 * 1000 : offlineInterval * 60 * 1000
+    var ptsPerInterval = isOnline ? perInterval : perOfflineInterval
+
     try {
-      if (!(await this.isEnabled())) {
-        this.timeouts['updatePoints'] = setTimeout(() => this.updatePoints(), 5000)
-        return
-      }
-
-      let [interval, perInterval, offlineInterval, perOfflineInterval, isOnline] = await Promise.all([
-        this.settings.points.interval,
-        this.settings.points.perInterval,
-        this.settings.points.offlineInterval,
-        this.settings.points.perOfflineInterval,
-        global.cache.isOnline()
-      ])
-
-      interval = isOnline ? interval * 60 * 1000 : offlineInterval * 60 * 1000
-      var ptsPerInterval = isOnline ? perInterval : perOfflineInterval
-
       for (let username of (await global.db.engine.find('users.online')).map((o) => o.username)) {
         if (global.commons.isBot(username)) continue
 
@@ -86,7 +86,7 @@ class Points extends System {
       global.log.error(e)
       global.log.error(e.stack)
     } finally {
-      this.timeouts['updatePoints'] = setTimeout(() => this.updatePoints(), 5000)
+      this.timeouts['updatePoints'] = setTimeout(() => this.updatePoints(), interval === 0 ? 60000 : interval)
     }
   }
 
