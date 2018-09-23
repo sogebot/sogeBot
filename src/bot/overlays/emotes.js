@@ -69,7 +69,7 @@ Emotes.prototype.explode = async function (self, socket, data) {
 }
 
 Emotes.prototype.containsEmotes = async function (opts) {
-  if (_.isNil(opts.sender) || _.isNil(opts.sender.emotes)) return true
+  if (_.isNil(opts.sender) || _.isNil(opts.sender.emotes) || !(Symbol.iterator in Object(opts.sender.emotes))) return true
   if (cluster.isWorker) {
     if (process.send) process.send({ type: 'call', ns: 'overlays.emotes', fnc: 'containsEmotes', args: [opts] })
     return
