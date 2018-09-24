@@ -1,6 +1,7 @@
 node_modules
 flow-typed
 heap
+heap-*.csv
 logs/*
 dest/*
 package-lock.json*
