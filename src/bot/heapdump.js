@@ -8,12 +8,13 @@
 
 const chalk = require('chalk')
 const cluster = require('cluster')
-var fs = require('fs')
+const fs = require('fs')
 var profiler = require('v8-profiler-node8')
 var _datadir = null
 var nextMBThreshold = 100
 var memMBlast = 0
 var heapTaken = 0
+var csvfilePath = null
 
 /**
  * Init and scheule heap dump runs
@@ -22,6 +23,8 @@ var heapTaken = 0
  */
 module.exports.init = function (datadir) {
   _datadir = datadir
+  csvfilePath = datadir + '/heap-' + (cluster.isMaster ? 'master' : 'cluster') + '.csv'
+  fs.writeFileSync(csvfilePath, 'memory, timestamp\n')
   setInterval(tickHeapDump, 1000)
 }
 
@@ -42,6 +45,9 @@ function heapDump () {
     return --heapTaken
   }
   var memMB = process.memoryUsage().heapUsed / 1048576
+
+  fs.appendFileSync(csvfilePath, `${memMB}, ${Date.now()}\n`)
+
   console.log(chalk.bgRed((cluster.isMaster ? 'Master' : 'Cluster') +
     ' # Current mem usage: ' + memMB +
     ', last mem usage: ' + memMBlast +
