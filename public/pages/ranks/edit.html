@@ -90,18 +90,19 @@
             if (this.validateForm()) {
               this.states.save = 1
               const data = {
-                _id: commons.urlParam('id') ? commons.urlParam('id') : null,
+                _id: this.id,
                 hours: parseInt(this.hours),
                 value: this.value.trim(),
               }
-              this.socket.emit('update', {items: [data]}, (err, _id) => {
+              this.socket.emit('update', {items: [data]}, (err, data) => {
                 if (err) {
                   console.error(err)
                   return this.states.save = 3
                 }
                 this.states.save = 2
                 this.pending = false
-                this.id = _id
+                this.id = String(data._id)
+                page('?id=' + this.id + '/#ranks/edit')
                 setTimeout(() => this.states.save = 0, 1000)
               })
             }

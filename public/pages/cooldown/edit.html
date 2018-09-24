@@ -121,7 +121,7 @@
             if (this.validateForm()) {
               this.states.save = 1
               const data = {
-                _id: commons.urlParam('id') ? commons.urlParam('id') : null,
+                _id: this.id,
                 key: this.key.trim(),
                 miliseconds: Number(this.miliseconds) * 1000,
                 moderator: this.moderator,
@@ -130,14 +130,15 @@
                 quiet: this.quiet,
                 enabled: this.enabled
               }
-              this.socket.emit('update', [data], (err, _id) => {
+              this.socket.emit('update', [data], (err, data) => {
                 if (err) {
                   console.error(err)
                   return this.states.save = 3
                 }
                 this.states.save = 2
                 this.pending = false
-                this.id = _id
+                this.id = String(data._id)
+                page('?id=' + this.id + '/#cooldown/edit', )
                 setTimeout(() => this.states.save = 0, 1000)
               })
             }

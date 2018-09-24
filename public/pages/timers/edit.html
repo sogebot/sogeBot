@@ -139,7 +139,7 @@
             this.states.save = 1
             const data = {
               timer: {
-                _id: commons.urlParam('id') ? commons.urlParam('id') : null,
+                _id: this.id,
                 seconds: parseInt(this.timer.seconds),
                 messages: parseInt(this.timer.messages),
                 name: this.timer.name,
@@ -152,10 +152,12 @@
                 console.error(err)
                 return this.states.save = 3
               }
+              this.id = String(data.timer._id)
               this.states.save = 2
               this.pending = false
               this.timer = data.timer
               this.responses = data.responses
+              page('?id=' + this.id + '/#timers/edit')
               setTimeout(() => this.states.save = 0, 1000)
             })
           }

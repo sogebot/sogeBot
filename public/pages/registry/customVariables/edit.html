@@ -247,7 +247,7 @@
           if (this.validateForm()) {
             this.saveState = 1
             const data = {
-              _id: commons.urlParam('id') ? commons.urlParam('id') : null,
+              _id: this.id,
               variableName: this.variableName,
               description: this.description,
               currentValue: this.currentValue,
