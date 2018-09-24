@@ -155,6 +155,7 @@ class Webhooks {
         const isFollower = user.lock && user.lock.follower ? user.is.follower : true
         await global.db.engine.update('users', { id: fid }, { id: fid, username: userGetFromApi.data.data[0].login, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
         global.log.follow(userGetFromApi.data.data[0].login)
+        global.events.fire('follow', { username: userGetFromApi.data.data[0].login, webhooks: true })
       }
     } else {
       if (!_.get(user, 'is.follower', false) && _.now() - _.get(user, 'time.follow', 0) > 60000 * 60) {
