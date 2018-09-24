@@ -4,6 +4,7 @@ if (require('cluster').isWorker) process.exit()
 require('../../general.js')
 
 const db = require('../../general.js').db
+const variable = require('../../general.js').variable
 const assert = require('chai').assert
 
 const tests = {
@@ -21,7 +22,8 @@ describe('systems/moderation - symbols()', () => {
   describe('moderationSymbols=false', async () => {
     before(async () => {
       await db.cleanup()
-      await (global.systems.moderation.settings.symbols.enabled = false)
+      global.systems.moderation.settings.symbols.enabled = false
+      await variable.isEqual('systems.moderation.settings.symbols.enabled', false)
     })
 
     for (let test of tests.timeout) {
@@ -39,7 +41,8 @@ describe('systems/moderation - symbols()', () => {
   describe('moderationSymbols=true', async () => {
     before(async () => {
       await db.cleanup()
-      await (global.systems.moderation.settings.symbols.enabled = true)
+      global.systems.moderation.settings.symbols.enabled = true
+      await variable.isEqual('systems.moderation.settings.symbols.enabled', true)
     })
 
     for (let test of tests.timeout) {

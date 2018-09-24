@@ -4,6 +4,7 @@ if (require('cluster').isWorker) process.exit()
 require('../../general.js')
 
 const db = require('../../general.js').db
+const variable = require('../../general.js').variable
 const assert = require('chai').assert
 
 const tests = {
@@ -19,7 +20,8 @@ describe('systems/moderation - longMessage()', () => {
   describe('moderationLongMessage=false', async () => {
     before(async () => {
       await db.cleanup()
-      await (global.systems.moderation.settings.longMessage.enabled = false)
+      global.systems.moderation.settings.longMessage.enabled = false
+      await variable.isEqual('global.systems.moderation.settings.longMessage.enabled', false)
     })
 
     for (let test of tests.timeout) {
@@ -37,7 +39,8 @@ describe('systems/moderation - longMessage()', () => {
   describe('moderationLongMessage=true', async () => {
     before(async () => {
       await db.cleanup()
-      await (global.systems.moderation.settings.longMessage.enabled = true)
+      global.systems.moderation.settings.longMessage.enabled = true
+      await variable.isEqual('global.systems.moderation.settings.longMessage.enabled', true)
     })
 
     for (let test of tests.timeout) {

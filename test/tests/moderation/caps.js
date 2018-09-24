@@ -4,6 +4,7 @@ if (require('cluster').isWorker) process.exit()
 require('../../general.js')
 
 const db = require('../../general.js').db
+const variable = require('../../general.js').variable
 const assert = require('chai').assert
 
 const tests = {
@@ -24,7 +25,8 @@ describe('systems/moderation - Caps()', () => {
   describe('moderationCaps=false', async () => {
     before(async () => {
       await db.cleanup()
-      await (global.systems.moderation.settings.caps.enabled = false)
+      global.systems.moderation.settings.caps.enabled = false
+      await variable.isEqual('global.systems.moderation.settings.caps.enabled', false)
     })
 
     for (let test of tests.timeout) {
@@ -42,7 +44,8 @@ describe('systems/moderation - Caps()', () => {
   describe('moderationCaps=true', async () => {
     before(async () => {
       await db.cleanup()
-      await global.db.engine.insert('settings', { key: 'moderationCaps', value: 'true' })
+      global.systems.moderation.settings.caps.enabled = true
+      await variable.isEqual('global.systems.moderation.settings.caps.enabled', true)
     })
 
     for (let test of tests.timeout) {

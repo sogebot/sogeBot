@@ -6,7 +6,6 @@ const safeEval = require('safe-eval')
 const flatten = require('flat')
 const moment = require('moment')
 const cluster = require('cluster')
-const config = require('@config')
 const axios = require('axios')
 
 const Message = require('./message')
@@ -190,25 +189,27 @@ class Events {
   }
 
   async fireBotWillJoinChannel (operation, attributes) {
-    global.client.join('#' + config.settings.broadcaster_username)
+    global.client.join('#' + await global.oauth.settings.broadcaster.username)
   }
 
   async fireBotWillLeaveChannel (operation, attributes) {
-    global.client.part('#' + config.settings.broadcaster_username)
+    global.client.part('#' + await global.oauth.settings.broadcaster.username)
     global.db.engine.remove('users.online', {}) // force all users offline
   }
 
   async fireStartCommercial (operation, attributes) {
-    const cid = await global.cache.channelId()
+    const cid = await global.oauth.settings._.channelId
     const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`
+
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return
 
     await axios({
       method: 'post',
       url,
       data: { length: operation.durationOfCommercial },
       headers: {
-        'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
-        'Client-ID': config.settings.client_id,
+        'Authorization': 'OAuth ' + token,
         'Accept': 'application/vnd.twitchtv.v5+json',
         'Content-Type': 'application/json'
       }

@@ -6,9 +6,6 @@ const constants = require('../constants')
 const cluster = require('cluster')
 const { EmoteFetcher } = require('twitch-emoticons')
 
-// bot libraries
-const config = require('@config')
-
 function Emotes () {
   this.simpleEmotes = {
     ':)': 'https://static-cdn.jtvnw.net/emoticons/v1/1/',
@@ -38,14 +35,18 @@ function Emotes () {
     global.panel.socketListening(this, 'emote.test', this._test)
 
     // major bottleneck on worker
-    this.fetcher = new EmoteFetcher()
-    this.fetcher.fetchTwitchEmotes().catch(function (reason) {})
-    this.fetcher.fetchBTTVEmotes().catch(function (reason) {})
-    this.fetcher.fetchFFZEmotes().catch(function (reason) {})
-    this.fetcher.fetchFFZEmotes(config.settings.broadcaster_username).catch(function (reason) {})
-    this.fetcher.fetchBTTVEmotes(config.settings.broadcaster_username).catch(function (reason) {})
-    this.fetcher.fetchTwitchEmotes(config.settings.broadcaster_username).catch(function (reason) {})
+    this.fetchEmotes()
   }
+}
+
+Emotes.prototype.fetchEmotes = async function () {
+  this.fetcher = new EmoteFetcher()
+  this.fetcher.fetchTwitchEmotes().catch(function (reason) {})
+  this.fetcher.fetchBTTVEmotes().catch(function (reason) {})
+  this.fetcher.fetchFFZEmotes().catch(function (reason) {})
+  this.fetcher.fetchFFZEmotes(await global.oauth.settings.broadcaster.username).catch(function (reason) {})
+  this.fetcher.fetchBTTVEmotes(await global.oauth.settings.broadcaster.username).catch(function (reason) {})
+  this.fetcher.fetchTwitchEmotes(await global.oauth.settings.broadcaster.username).catch(function (reason) {})
 }
 
 Emotes.prototype.parsers = function () {
@@ -88,7 +89,7 @@ Emotes.prototype.containsEmotes = async function (opts) {
   let parsed = []
   // parse BTTV emoticons
   try {
-    for (let emote of await this.fetcher._getRawBTTVEmotes(config.settings.broadcaster_username)) {
+    for (let emote of await this.fetcher._getRawBTTVEmotes(await global.oauth.settings.broadcaster.username)) {
       for (let i in _.range((opts.message.match(new RegExp(emote.code, 'g')) || []).length)) {
         if (i === OEmotesMax) break
         global.panel.io.emit('emote', this.fetcher.emotes.get(emote.code).toLink(OEmotesSize))
@@ -101,7 +102,7 @@ Emotes.prototype.containsEmotes = async function (opts) {
 
   // parse FFZ emoticons
   try {
-    for (let emote of await this.fetcher._getRawFFZEmotes(config.settings.broadcaster_username)) {
+    for (let emote of await this.fetcher._getRawFFZEmotes(await global.oauth.settings.broadcaster.username)) {
       if (parsed.includes(emote.name)) continue
       for (let i in _.range((opts.message.match(new RegExp(emote.name, 'g')) || []).length)) {
         if (i === OEmotesMax) break

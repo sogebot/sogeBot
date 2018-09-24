@@ -560,6 +560,7 @@
       var integrations = false // we want only systems settings once
       var overlays = false // we want only overlays settings once
       var registry = false // we want only registry settings once
+      var core = false // we want only core settings once
       _.each(menu, function (obj) {
         if (obj.id !== 'dashboard') {
           if ((obj.id === 'systems') && systems) return
@@ -567,6 +568,7 @@
           if ((obj.id === 'integrations') && integrations) return
           if ((obj.id === 'registry') && registry) return
           if ((obj.id === 'games') && games) return
+          if ((obj.id === 'core') && core) return
           $('#menu-' + obj.category).append('<li class="nav-item"><a class="nav-link" href="#' + obj.id.replace(/\./g, '/') + '" data-page="' +
             obj.id.replace(/\./g, '/') + '" data-lang="menu.' + obj.name +
             '"></a></li>')
@@ -575,6 +577,7 @@
         if (obj.id === 'overlays') overlays = true
         if (obj.id === 'integrations') integrations = true
         if (obj.id === 'registry') registry = true
+        if (obj.id === 'core') core = true
         if (obj.id === 'games') games = true
       })
       loadedMenu = true

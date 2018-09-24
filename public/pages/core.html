@@ -19,39 +19,59 @@
           <h6>{{ category }}</h6>
           <div class="card mb-2" >
             <div class="card-body">
-              <div v-if="typeof value === 'object'" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
-                <command-input-with-permission
-                  v-if="category === 'commands'"
-                  class="pt-1 pb-1"
-                  v-bind:type="typeof currentValue"
-                  v-bind:value="currentValue"
-                  v-bind:command="defaultValue"
-                  :permissions="settings._permissions[defaultValue]"
-                  v-on:update="value[defaultValue] = $event.value; settings._permissions[defaultValue] = $event.permissions; triggerDataChange()"
-                ></command-input-with-permission>
-                <toggle
-                  class="pt-1 pb-1"
-                  v-bind:title="commons.translate('systems.' + selectedSystem + '.settings.' + defaultValue)"
-                  v-else-if="typeof currentValue === 'boolean'"
-                  v-bind:value="currentValue"
-                  v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
-                ></toggle>
-                <textarea-from-array
-                  class="pt-1 pb-1"
-                  v-else-if="currentValue.constructor === Array"
-                  v-bind:value="currentValue"
-                  v-bind:title="commons.translate('systems.' + selectedSystem + '.settings.' + defaultValue)"
-                  v-on:update="value[defaultValue] = $event; triggerDataChange()"
-                ></textarea-from-array>
-                <text-input
-                  v-else
-                  class="pt-1 pb-1"
-                  v-bind:type="typeof currentValue"
-                  v-bind:value="currentValue"
-                  v-bind:title="'systems.' + selectedSystem + '.settings.' + defaultValue"
-                  :permission="settings._permissions[defaultValue]"
-                  v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
-                ></text-input>
+              <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
+                <template v-if="typeof ui[category] !== 'undefined' && ui[category][defaultValue]">
+                  <component
+                    :is="ui[category][defaultValue].type"
+                    :readonly="ui[category][defaultValue].readOnly"
+                    :secret="ui[category][defaultValue].secret"
+                    :value="currentValue"
+                    @update="value[defaultValue] = $event.value; triggerDataChange()"
+                    :title="defaultValue"
+                    :current="value[ui[category][defaultValue].current]"
+                    class="pt-1 pb-1"></component>
+                </template>
+                <template v-else>
+                  <command-input-with-permission
+                    v-if="category === 'commands'"
+                    class="pt-1 pb-1"
+                    v-bind:type="typeof currentValue"
+                    v-bind:value="currentValue"
+                    v-bind:command="defaultValue"
+                    :permissions="settings._permissions[defaultValue]"
+                    v-on:update="value[defaultValue] = $event.value; settings._permissions[defaultValue] = $event.permissions; triggerDataChange()"
+                  ></command-input-with-permission>
+                  <toggle
+                    class="pt-1 pb-1"
+                    v-bind:title="commons.translate('systems.' + selectedSystem + '.settings.' + defaultValue)"
+                    v-else-if="typeof currentValue === 'boolean'"
+                    v-bind:value="currentValue"
+                    v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
+                  ></toggle>
+                  <textarea-from-array
+                    class="pt-1 pb-1"
+                    v-else-if="currentValue.constructor === Array"
+                    v-bind:value="currentValue"
+                    v-bind:title="commons.translate('systems.' + selectedSystem + '.settings.' + defaultValue)"
+                    v-on:update="value[defaultValue] = $event; triggerDataChange()"
+                  ></textarea-from-array>
+                  <text-input
+                    v-else
+                    class="pt-1 pb-1"
+                    v-bind:type="typeof currentValue"
+                    v-bind:value="currentValue"
+                    v-bind:title="'systems.' + selectedSystem + '.settings.' + defaultValue"
+                    :permission="settings._permissions[defaultValue]"
+                    v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
+                  ></text-input>
+                </template>
+              </div>
+              <div v-if="typeof value === 'object'" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of ui[category]">
+                <template v-if="typeof value[defaultValue] === 'undefined'">
+                  <template v-if="ui[category][defaultValue].type === 'link'">
+                    <a :href="currentValue.href" class="mt-1 mb-1" :class="currentValue.class" :target="currentValue.target">{{ commons.translate(currentValue.text) }}</a>
+                  </template>
+                </template>
               </div>
             </div>
           </div>
@@ -102,13 +122,15 @@
         'toggle': toggleEnable,
         'text-input': textInput,
         'command-input-with-permission': commandInputWithPermissions,
-        'textarea-from-array': textAreaFromArray
+        'textarea-from-array': textAreaFromArray,
+        'check-list': checkList
       },
       data: {
         socket: { _panel: io({ query: "token=" + token }) },
         listOfSystems: [],
         selectedSystem: null,
         settings: { settings: {} },
+        ui: {},
         isDataChanged: false,
 
         state: {
@@ -139,8 +161,10 @@
           this.settings = { settings: {} }
           this.state.settings = 0
           this.state.loading = 1
-          this.socket[system].emit('settings', (err, settings) => {
+          this.socket[system].emit('settings', (err, settings, ui) => {
             if (system !== this.selectedSystem) return // skip if we quickly changed system
+
+            this.ui = ui
 
             this.state.loading = 0
             let _settings = _(settings).toPairs().value()

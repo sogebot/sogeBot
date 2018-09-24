@@ -112,13 +112,11 @@ class Price extends System {
       global.commons.isOwner(opts.sender) ||
       helpers.includes(opts.message)
     ) return true
-
     const price = await global.db.engine.findOne(this.collection.data, { command: parsed[1], enabled: true })
 
     if (_.isEmpty(price)) { // no price set
       return true
     }
-
     var availablePts = await global.systems.points.getPointsOf(opts.sender.userId)
     var removePts = parseInt(price.price, 10)
     let haveEnoughPoints = availablePts >= removePts

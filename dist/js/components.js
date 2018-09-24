@@ -27,18 +27,19 @@ window.textWithTags = {
 
 /* text input for settings  */
 window.textInput = {
-  props: ['value', 'title', 'type'],
+  props: ['value', 'title', 'type', 'readonly', 'secret'],
   methods: {
     update: function () {
       if (this.type === 'number') {
         if (_.isFinite(Number(this.currentValue))) this.currentValue = Number(this.currentValue)
         else this.currentValue = this.value
       }
-      this.$emit('update', {value: this.currentValue})
+      this.$emit('update', { value: this.currentValue })
     }
   },
   data: function () {
     return {
+      show: false,
       currentValue: this.value,
       translatedTitle: commons.translate(this.title)
     }
@@ -57,7 +58,7 @@ window.textInput = {
           </template>
         </span>
       </div>
-      <input v-on:keyup="update" v-model="currentValue" class="form-control" type="text" />
+      <input v-on:keyup="update" @focus="show = true" @blur="show = false" v-model="currentValue" class="form-control" :type="secret && !show ? 'password' : 'text'" :readonly="readonly" />
     </div>`
 }
 
@@ -573,6 +574,34 @@ window.heistResults = {
         </div>
       </template>
       <button class="btn btn-success btn-block mt-2" @click="addResult"><i class="fas fa-plus"></i></button>
+    </div>
+  `
+}
+
+/* checklist */
+window.checkList = {
+  props: ['current', 'value', 'title'],
+  data: function () {
+    return {
+      show: false,
+      currentValue: this.value,
+      translatedTitle: commons.translate(this.title)
+    }
+  },
+  template: `
+    <div class="d-flex">
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <template v-if="typeof translatedTitle === 'string'">{{ translatedTitle }}</template>
+          <template v-else>
+            {{ translatedTitle.title }}
+            <small class="textInputTooltip text-info" data-toggle="tooltip" data-html="true" :title="translatedTitle.help">[?]</small>
+          </template>
+        </span>
+      </div>
+      <ul class="list-group list-group-flush w-100 border border-input">
+        <li class="list-group-item border-0" v-for='v of value' :class="[current.includes(v) ? 'list-group-item-success' : 'list-group-item-danger']">{{ v }}</li>
+      </ul>
     </div>
   `
 }

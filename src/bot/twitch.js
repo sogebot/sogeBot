@@ -50,8 +50,8 @@ class Twitch {
     ]
   }
 
-  sendTwitchVideo (self, socket) {
-    socket.emit('twitchVideo', config.settings.broadcaster_username.toLowerCase())
+  async sendTwitchVideo (self, socket) {
+    socket.emit('twitchVideo', (await global.oauth.settings.broadcaster.username).toLowerCase())
   }
 
   async uptime (opts) {
@@ -121,7 +121,7 @@ class Twitch {
 
     let lastFollowAgo = ''
     let lastFollowUsername = 'n/a'
-    let onlineFollowersCount = _.size(_.filter(onlineFollowers, (o) => o !== config.settings.broadcaster_username && o !== config.settings.bot_username.toLowerCase())) // except bot and user
+    let onlineFollowersCount = _.size(_.filter(onlineFollowers, (o) => o !== global.commons.cached.bot.toLowerCase() && o !== global.commons.getBroadcaster().toLowerCase())) // except bot and user
     if (events.length > 0) {
       lastFollowUsername = events[0].username
       lastFollowAgo = moment(events[0].timestamp).fromNow()
@@ -146,7 +146,7 @@ class Twitch {
 
     let lastSubAgo = ''
     let lastSubUsername = 'n/a'
-    let onlineSubCount = _.size(_.filter(onlineSubscribers, (o) => o !== config.settings.broadcaster_username && o !== config.settings.bot_username.toLowerCase())) // except bot and user
+    let onlineSubCount = _.size(_.filter(onlineSubscribers, (o) => o !== global.commons.getBroadcaster().toLowerCase() && o !== global.commons.cached.bot.toLowerCase())) // except bot and user
     if (events.length > 0) {
       lastSubUsername = events[0].username
       lastSubAgo = moment(events[0].timestamp).fromNow()
@@ -328,12 +328,12 @@ class Twitch {
       // remove ignored users
       let ignored = []
       for (let user of sorted) {
-        if (global.commons.isIgnored(user.username)) ignored.push(user.username)
+        if (await global.commons.isIgnored(user.username)) ignored.push(user.username)
       }
       _.remove(sorted, (o) => _.includes(ignored, o.username))
 
       // remove broadcaster and bot accounts
-      _.remove(sorted, o => _.includes([config.settings.broadcaster_username.toLowerCase(), config.settings.bot_username.toLowerCase()], o.username))
+      _.remove(sorted, o => _.includes([global.commons.getBroadcaster().toLowerCase(), global.commons.cached.bot.toLowerCase()], o.username))
 
       sorted = _.chunk(sorted, 10)[0]
 

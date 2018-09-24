@@ -67,7 +67,7 @@ class IMongoDB extends Interface {
       if (this.createIndexes) {
         await db.collection('users.bits').createIndex('timestamp')
         await db.collection('users.tips').createIndex('timestamp')
-        await db.collection('users').createIndex('username', { unique: true })
+        await db.collection('users').createIndex('username')
         await db.collection('users').createIndex(
           { id: 1 },
           { partialFilterExpression: { id: { $exists: true } }, unique: true }

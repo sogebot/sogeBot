@@ -9,7 +9,6 @@ const axios = require('axios')
 
 // bot libraries
 const constants = require('../constants')
-const config = require('@config')
 const System = require('./_interface')
 
 const ERROR_STREAM_NOT_ONLINE = '1'
@@ -59,11 +58,11 @@ class Highlights extends System {
       // as we are using API, go through master
       if (process.send) process.send({ type: 'highlight', opts })
     } else {
-      const cid = await global.cache.channelId()
+      const cid = await global.oauth.settings._.channelId
       const when = await global.cache.when()
       const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`
 
-      const needToWait = _.isNil(cid)
+      const needToWait = _.isNil(cid) || cid === ''
       if (needToWait) {
         setTimeout(() => this.highlight(opts), 1000)
         return
@@ -72,11 +71,13 @@ class Highlights extends System {
       try {
         if (_.isNil(when.online)) throw Error(ERROR_STREAM_NOT_ONLINE)
 
+        const token = await global.oauth.settings.bot.accessToken
+        if (token === '') return
+
         // we need to load video id
         const request = await axios.get(url, {
           headers: {
-            'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
-            'Client-ID': config.settings.client_id
+            'Authorization': 'Bearer ' + token
           }
         })
         let highlight = request.data.data[0]
@@ -101,7 +102,7 @@ class Highlights extends System {
     }
   }
 
-  add (highlight, timestamp, sender) {
+  async add (highlight, timestamp, sender) {
     global.commons.sendMessage('/marker', { username: global.commons.getOwner() }) // user /marker as well for highlights
     global.commons.sendMessage(global.translate('highlights.saved')
       .replace(/\$hours/g, (timestamp.hours < 10) ? '0' + timestamp.hours : timestamp.hours)

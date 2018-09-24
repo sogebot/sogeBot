@@ -6,7 +6,6 @@
   * [CPU](8.1.x/configuration/cpu.md)
   * [Panel](8.1.x/configuration/panel.md)
   * [Database](8.1.x/configuration/database.md)
-  * [ClientId](8.1.x/configuration/clientid.md)
   * [Color](8.1.x/configuration/color.md)
   * [Metrics](8.1.x/configuration/metrics.md)
   * [Environment variables](8.1.x/configuration/env.md)

@@ -9,7 +9,7 @@ function CommercialWidget () {
   }
 }
 
-CommercialWidget.prototype.runCommercial = function (self, socket, data) {
+CommercialWidget.prototype.runCommercial = async function (self, socket, data) {
   _.sample(require('cluster').workers).send({ type: 'message', sender: { username: global.commons.getOwner() }, message: '!commercial ' + data.seconds, skip: true })
 }
 

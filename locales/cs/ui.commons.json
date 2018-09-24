@@ -4,5 +4,6 @@
   "moveUp": "posunout nahoru",
   "moveDown": "posunout dolů",
   "stop-if-executed": "po provedení nepokračuje",
-  "continue-if-executed": "po provedení pokračuje"
+  "continue-if-executed": "po provedení pokračuje",
+  "generate": "Vygenerovat"
 }

@@ -4,6 +4,7 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
+const variable = require('../../general.js').variable
 
 const _ = require('lodash')
 
@@ -19,6 +20,11 @@ describe('Gambling - duel', () => {
   })
 
   describe('#914 - user1 is not correctly added to duel, if he is challenger', () => {
+    it('set duel timestamp to 0 to force new duel', async () => {
+      global.games.duel.settings._.timestamp = 0
+      await variable.isEqual('global.games.duel.settings._.timestamp', 0)
+    })
+
     it('add points for users', async () => {
       await global.db.engine.insert('users.points', { id: user1.userId, points: 100 })
       await global.db.engine.insert('users.points', { id: user2.userId, points: 100 })
@@ -46,9 +52,10 @@ describe('Gambling - duel', () => {
       })
     })
 
-    it('set duel timestamp to force duel to end', () => {
+    it('set duel timestamp to force duel to end', async () => {
       // cannot set as 0 - duel is then ignored
       global.games.duel.settings._.timestamp = 1
+      await variable.isEqual('global.games.duel.settings._.timestamp', 1)
     })
 
     it('call pickDuelWinner()', () => {

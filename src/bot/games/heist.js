@@ -118,7 +118,7 @@ class Heist extends Game {
         let isSurvivor = _.random(0, 100, false) <= level['winPercentage']
         let user = users[0]
         let outcome = isSurvivor ? await this.settings.results.singleUserSuccess : await this.settings.results.singleUserFailed
-        setTimeout(() => { global.commons.sendMessage(outcome.replace('$user', (global.configuration.getValue('atUsername') ? '@' : '') + user.username), global.commons.getOwner()) }, 5000)
+        setTimeout(async () => { global.commons.sendMessage(outcome.replace('$user', (global.configuration.getValue('atUsername') ? '@' : '') + user.username), global.commons.getOwner()) }, 5000)
 
         if (isSurvivor) {
           // add points to user
@@ -140,7 +140,7 @@ class Heist extends Game {
         let percentage = (100 / users.length) * winners.length
         let ordered = _.orderBy(await this.settings.results.data, [(o) => parseInt(o.percentage)], 'asc')
         let result = _.find(ordered, (o) => o.percentage >= percentage)
-        setTimeout(() => { global.commons.sendMessage(_.isNil(result) ? '' : result.message, global.commons.getOwner()) }, 5000)
+        setTimeout(async () => { global.commons.sendMessage(_.isNil(result) ? '' : result.message, global.commons.getOwner()) }, 5000)
         if (winners.length > 0) {
           setTimeout(async () => {
             winners = _.chunk(winners, await this.settings.options.showMaxUsers)
