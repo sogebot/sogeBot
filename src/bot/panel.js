@@ -149,7 +149,11 @@ function Panel () {
       data.new = data.new.trim()
 
       if (data.new.length === 0) {
-        await self.deleteUserTwitchTitle(self, socket, data)
+        let items = await global.db.engine.find('cache.titles', { game: data.game })
+        for (let item of items) {
+          if (item.title === data.title) await global.db.engine.remove('cache.titles', { _id: String(item._id) })
+        }
+        socket.emit('sendUserTwitchGamesAndTitles', await global.db.engine.find('cache.titles'))
         return
       }
 
