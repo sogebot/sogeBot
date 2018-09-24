@@ -3,7 +3,6 @@
 const _ = require('lodash')
 
 const constants = require('./constants')
-const config = require('@config')
 
 class Parser {
   constructor (opts) {
@@ -27,7 +26,8 @@ class Parser {
   async isModerated () {
     if (this.skip) return false
 
-    for (let parser of await this.parsers()) {
+    const parsers = await this.parsers()
+    for (let parser of parsers) {
       if (parser.priority !== constants.MODERATION) continue // skip non-moderation parsers
       const opts = {
         sender: this.sender,
@@ -43,7 +43,8 @@ class Parser {
   }
 
   async process () {
-    for (let parser of await this.parsers()) {
+    const parsers = await this.parsers()
+    for (let parser of parsers) {
       if (parser.priority === constants.MODERATION) continue // skip moderation parsers
       let [isRegular, isMod, isOwner] = await Promise.all([
         global.commons.isRegular(this.sender),
@@ -64,9 +65,12 @@ class Parser {
 
         if (parser.fireAndForget) {
           parser['fnc'].apply(parser.this, [opts])
-        } else if (!(await parser['fnc'].apply(parser.this, [opts]))) {
-          // TODO: call revert on parser with revert (price can have revert)
-          return false
+        } else {
+          const status = await parser['fnc'].apply(parser.this, [opts])
+          if (!status) {
+            // TODO: call revert on parser with revert (price can have revert)
+            return false
+          }
         }
       }
     }
@@ -107,13 +111,12 @@ class Parser {
    */
   async parsers () {
     let parsers = []
-    for (let item of this.list) {
-      if (_.isFunction(item.parsers)) {
-        let items = await item.parsers()
-        if (!_.isEmpty(items)) parsers.push(items)
+    for (let i = 0, length = this.list.length; i < length; i++) {
+      if (_.isFunction(this.list[i].parsers)) {
+        parsers.push(this.list[i].parsers())
       }
     }
-    parsers = _.orderBy(_.flatMap(parsers), 'priority', 'asc')
+    parsers = _.orderBy(_.flatMap(await Promise.all(parsers)), 'priority', 'asc')
     return parsers
   }
 
@@ -136,14 +139,12 @@ class Parser {
 
   async getCommandsList () {
     let commands = []
-    for (let item of this.list) {
-      if (_.isFunction(item.commands)) {
-        let items = await item.commands()
-        if (!_.isEmpty(items)) commands.push(items)
+    for (let i = 0, length = this.list.length; i < length; i++) {
+      if (_.isFunction(this.list[i].commands)) {
+        commands.push(this.list[i].commands())
       }
     }
-
-    commands = _(commands).flatMap().sortBy(o => -o.command.length).value()
+    commands = _(await Promise.all(commands)).flatMap().sortBy(o => -o.command.length).value()
     for (let command of commands) {
       let permission = await global.db.engine.findOne('permissions', { key: command.id })
       if (!_.isEmpty(permission)) command.permission = permission.permission // change to custom permission
@@ -155,7 +156,6 @@ class Parser {
     if (!message.startsWith('!')) return // do nothing, this is not a command or user is ignored
 
     let command = await this.find(message)
-
     if (_.isNil(command)) return // command not found, do nothing
     if (command.permission === constants.DISABLE) return
 
@@ -172,15 +172,16 @@ class Parser {
       (command.permission === constants.OWNER_ONLY && isOwner)) {
       var text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim()
       let opts = {
-        sender: _.isNil(sender) ? { username: config.settings.bot_username.toLowerCase() } : sender,
+        sender: _.isNil(sender) ? { username: global.commons.cached.bot.toLowerCase() } : sender,
         command: command.command,
         parameters: text.trim()
       }
 
       if (_.isNil(command.id)) throw Error(`command id is missing from ${command['fnc']}`)
 
-      if (typeof command.fnc === 'function' && !_.isNil(command.id)) command['fnc'].apply(command.this, [opts])
-      else global.log.error(command.command + ' have wrong null function registered!', { fnc: 'Parser.prototype.parseCommands' })
+      if (typeof command.fnc === 'function' && !_.isNil(command.id)) {
+        command['fnc'].apply(command.this, [opts])
+      } else global.log.error(command.command + ' have wrong null function registered!', { fnc: 'Parser.prototype.parseCommands' })
     } else {
       // user doesn't have permissions for command
       sender['message-type'] = 'whisper'

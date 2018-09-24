@@ -4,7 +4,9 @@ const cluster = require('cluster')
 const constants = require('./constants')
 
 class Module {
-  constructor (opts) {
+  constructor (opts = {}) {
+    opts.settings = opts.settings || {}
+
     this.timeouts = {}
 
     this.dependsOn = opts.dependsOn || []
@@ -14,6 +16,7 @@ class Module {
     this._commands = []
     this._parsers = []
     this._name = opts.name || 'core'
+    this._ui = opts.ui || {}
 
     this.collection = new Proxy({}, {
       get: (target, name, receiver) => {
@@ -68,7 +71,7 @@ class Module {
       // default socket listeners
       this.socket.on('connection', (socket) => {
         socket.on('settings', async (cb) => {
-          cb(null, await this.getAllSettings())
+          cb(null, await this.getAllSettings(), this._ui)
         })
         socket.on('settings.update', async (data, cb) => {
           for (let [key, value] of Object.entries(data)) {
@@ -186,14 +189,17 @@ class Module {
           if (_.isNil(this.settings[category])) this.settings[category] = {}
           Object.defineProperty(this.settings[category], `${key}`, {
             get: () => this._settings[category][key](),
-            set: (value) => {
+            set: async (value) => {
               if (typeof value === 'undefined') {
                 global.log.error(`Trying to set undefined value ${this.constructor.name} - category: ${category}, key: ${key}`)
                 return
               }
               const isDefaultValue = value === key
               if (isDefaultValue) global.db.engine.remove(this.collection.settings, { category, key })
-              else global.db.engine.update(this.collection.settings, { category, key }, { value })
+              else {
+                await global.db.engine.remove(this.collection.settings, { category, key })
+                await global.db.engine.insert(this.collection.settings, { category, key, value })
+              }
             }
           })
         }
@@ -209,14 +215,17 @@ class Module {
         if (_.isNil(this.settings[category])) this.settings[category] = null
         Object.defineProperty(this.settings, `${category}`, {
           get: () => this._settings[category](),
-          set: (value) => {
+          set: async (value) => {
             if (typeof value === 'undefined') {
               global.log.error(`Trying to set undefined value ${this.constructor.name} - category: ${category}`)
               return
             }
             const isDefaultValue = values === value
             if (isDefaultValue) global.db.engine.remove(this.collection.settings, { category })
-            else global.db.engine.update(this.collection.settings, { category }, { value })
+            else {
+              await global.db.engine.remove(this.collection.settings, { category })
+              await global.db.engine.insert(this.collection.settings, { category, value })
+            }
           }
         })
       } else if (_.isObjectLike(values)) {
@@ -242,7 +251,6 @@ class Module {
                 global.log.error(`Trying to set undefined value ${this.constructor.name} - category: ${category}, key: ${key}`)
                 return
               }
-
               if (_.isArray(values)) {
                 if (_.isEqual(_(value).sort().value().filter(String), _(values).sort().value().filter(String))) {
                   global.db.engine.remove(this.collection.settings, { category, key })
@@ -254,7 +262,10 @@ class Module {
               } else {
                 const isDefaultValue = values === value
                 if (isDefaultValue) global.db.engine.remove(this.collection.settings, { category, key, isMultiValue: false })
-                else global.db.engine.update(this.collection.settings, { category, key }, { value: values, isMultiValue: false })
+                else {
+                  await global.db.engine.remove(this.collection.settings, { category, key, isMultiValue: false })
+                  await global.db.engine.insert(this.collection.settings, { category, key, value: values, isMultiValue: false })
+                }
               }
             }
           })

@@ -12,7 +12,11 @@ const Message = require('./message')
 function Commons () {
   this.compact = {}
 
-  this.cached = {}
+  this.cached = {
+    bot: '',
+    broadcaster: '',
+    owners: []
+  }
   this.registerConfiguration()
   this.loadIgnoreList()
 }
@@ -40,21 +44,25 @@ Commons.prototype.processAll = function (proc) {
   }
 }
 
+Commons.prototype.load = async function (type, data) {
+  global.commons.cached[type] = data
+}
+
 Commons.prototype.loadIgnoreList = async function () {
   if (typeof global.db === 'undefined' || !global.db.engine.connected) return setTimeout(() => this.loadIgnoreList(), 1000)
-  this.cached.ignorelist = (await global.db.engine.find('users_ignorelist')).map(o => o.username)
+  global.commons.cached.ignorelist = (await global.db.engine.find('users_ignorelist')).map(o => o.username)
 }
 
 Commons.prototype.getIgnoreList = function () {
-  if (typeof this.cached.ignorelist === 'undefined') this.cached.ignorelist = []
-  return this.cached.ignorelist
+  if (typeof global.commons.cached.ignorelist === 'undefined') global.commons.cached.ignorelist = []
+  return global.commons.cached.ignorelist
 }
 
-Commons.prototype.isIgnored = function (sender) {
+Commons.prototype.isIgnored = async function (sender) {
   if (sender !== null) { // null can be bot from dashboard or event
     if (typeof sender === 'string') sender = { username: sender }
     const isIgnored = this.getIgnoreList().includes(sender.username)
-    const isBroadcaster = this.isBroadcaster(sender)
+    const isBroadcaster = await this.isBroadcaster(sender)
     return isIgnored && !isBroadcaster
   } else return false
 }
@@ -82,9 +90,9 @@ Commons.prototype.isIntegrationEnabled = function (fn) {
   return enabled
 }
 
-Commons.prototype.sendToOwners = function (text) {
+Commons.prototype.sendToOwners = async function (text) {
   if (global.configuration.getValue('disableSettingsWhispers')) return text.length > 0 ? global.log.warning(text) : ''
-  for (let owner of global.commons.getOwners()) {
+  for (let owner of global.commons.cached.owners) {
     owner = {
       username: owner,
       'message-type': 'whisper'
@@ -139,7 +147,7 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
   if (message.length === 0) return false // if message is empty, don't send anything
 
   // if sender is null/undefined, we can assume, that username is from dashboard -> bot
-  if (_.get(sender, 'username', config.settings.bot_username.toLowerCase()) === config.settings.bot_username.toLowerCase() && !attr.force) return false // we don't want to reply on bot commands
+  if ((typeof sender.username === 'undefined' || sender.username === null) && !attr.force) return false // we don't want to reply on bot commands
   message = !_.isNil(sender.username) ? message.replace(/\$sender/g, (global.configuration.getValue('atUsername') ? '@' : '') + sender.username) : message
   if (!(await global.configuration.getValue('mute')) || attr.force) {
     if ((!_.isNil(attr.quiet) && attr.quiet)) return true
@@ -149,9 +157,9 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
     } else {
       global.log.chatOut(message, { username: sender.username })
       if ((await global.configuration.getValue('sendWithMe')) && !message.startsWith('/')) {
-        global.commons.message('me', config.settings.broadcaster_username, message)
+        global.commons.message('me', global.commons.getBroadcaster(), message)
       } else {
-        global.commons.message('say', config.settings.broadcaster_username, message)
+        global.commons.message('say', global.commons.getBroadcaster(), message)
       }
     }
   }
@@ -163,7 +171,7 @@ Commons.prototype.message = function (type, username, message, retry) {
   if (cluster.isWorker && process.send) process.send({ type: type, sender: username, message: message })
   else if (cluster.isMaster) {
     try {
-      global.botTMI.chat[type](username, message)
+      global.tmi.client.bot.chat[type](username, message)
     } catch (e) {
       if (_.isNil(retry)) setTimeout(() => this.message(type, username, message, false), 5000)
       else global.log.error(e)
@@ -171,26 +179,37 @@ Commons.prototype.message = function (type, username, message, retry) {
   }
 }
 
-Commons.prototype.timeout = function (username, reason, timeout) {
-  if (cluster.isMaster) global.botTMI.chat.timeout(config.settings.broadcaster_username, username, timeout, reason)
+Commons.prototype.timeout = async function (username, reason, timeout) {
+  if (cluster.isMaster) global.tmi.client.bot.chat.timeout(global.commons.getBroadcaster(), username, timeout, reason)
   else if (process.send) process.send({ type: 'timeout', username: username, timeout: timeout, reason: reason })
 }
 
 Commons.prototype.getOwner = function () {
-  return config.settings.bot_owners.split(',')[0].trim()
+  try {
+    return global.commons.cached.owners[0].trim()
+  } catch (e) {
+    return ''
+  }
 }
-
 Commons.prototype.getOwners = function () {
-  return config.settings.bot_owners.split(',')
+  return global.commons.cached.owners
 }
 
-Commons.prototype.getBroadcaster = function (user) {
-  return config.settings.broadcaster_username.toLowerCase().trim()
+Commons.prototype.getBroadcaster = function () {
+  try {
+    return global.commons.cached.broadcaster.toLowerCase().trim()
+  } catch (e) {
+    return ''
+  }
 }
 
 Commons.prototype.isBroadcaster = function (user) {
-  if (_.isString(user)) user = { username: user }
-  return config.settings.broadcaster_username.toLowerCase().trim() === user.username.toLowerCase().trim()
+  try {
+    if (_.isString(user)) user = { username: user }
+    return global.commons.cached.broadcaster.toLowerCase().trim() === user.username.toLowerCase().trim()
+  } catch (e) {
+    return false
+  }
 }
 
 Commons.prototype.isMod = async function (user) {
@@ -212,7 +231,9 @@ Commons.prototype.isRegular = async function (user) {
 Commons.prototype.isBot = function (user) {
   try {
     if (_.isString(user)) user = { username: user }
-    return config.settings.bot_username.toLowerCase().trim() === user.username.toLowerCase().trim()
+    if (global.commons.cached.bot) {
+      return global.commons.cached.bot.toLowerCase().trim() === user.username.toLowerCase().trim()
+    } else return false
   } catch (e) {
     return true // we can expect, if user is null -> bot or admin
   }
@@ -221,10 +242,12 @@ Commons.prototype.isBot = function (user) {
 Commons.prototype.isOwner = function (user) {
   try {
     if (_.isString(user)) user = { username: user }
-    let owners = _.map(_.filter(config.settings.bot_owners.split(','), _.isString), function (owner) {
-      return _.trim(owner.toLowerCase())
-    })
-    return _.includes(owners, user.username.toLowerCase().trim())
+    if (global.commons.cached.owners) {
+      const owners = _.map(_.filter(global.commons.cached.owners, _.isString), function (owner) {
+        return _.trim(owner.toLowerCase())
+      })
+      return _.includes(owners, user.username.toLowerCase().trim())
+    } else return false
   } catch (e) {
     return true // we can expect, if user is null -> bot or admin
   }

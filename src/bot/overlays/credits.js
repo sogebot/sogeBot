@@ -1,6 +1,5 @@
 const _ = require('lodash')
 const axios = require('axios')
-const config = require('@config')
 
 class Credits {
   constructor () {
@@ -105,7 +104,7 @@ class Credits {
 
         callback(null,
           events.filter((o) => o.timestamp >= timestamp),
-          config.settings.broadcaster_username,
+          await global.oauth.settings.broadcaster.username,
           _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a'),
           _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a'),
           hosts.map((o) => o.username),
@@ -154,7 +153,10 @@ class Credits {
   async getTopClips () {
     const period = _.includes(['day', 'week', 'month', 'all'], await await global.configuration.getValue('creditsTopClipsPeriod')) ? await global.configuration.getValue('creditsTopClipsPeriod') : 'day'
     const count = await await global.configuration.getValue('creditsTopClipsCount')
-    const channel = config.settings.broadcaster_username
+    const channel = await global.oauth.settings.broadcaster.username
+
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return
 
     var request
     const url = `https://api.twitch.tv/kraken/clips/top?channel=${channel}&period=${period}&trending=false&limit=${count}`
@@ -162,8 +164,7 @@ class Credits {
       request = await axios.get(url, {
         headers: {
           'Accept': 'application/vnd.twitchtv.v5+json',
-          'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
-          'Client-ID': config.settings.client_id
+          'Authorization': 'OAuth ' + token
         }
       })
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: request.status })

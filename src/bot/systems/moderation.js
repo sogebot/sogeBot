@@ -197,16 +197,17 @@ class Moderation extends System {
   }
 
   async containsLink (opts) {
-    let [isEnabled, isEnabledForSubs, isEnabledForSpaces, timeout, isMod, whitelisted] = await Promise.all([
+    let [isEnabled, isEnabledForSubs, isEnabledForSpaces, timeout, isOwner, isMod, whitelisted] = await Promise.all([
       this.settings.links.enabled,
       this.settings.links.moderateSubscribers,
       this.settings.links.includeSpaces,
       this.settings.links.timeout,
+      global.commons.isOwner(opts.sender),
       global.commons.isMod(opts.sender),
       this.whitelist(opts.message)
     ])
 
-    if (global.commons.isOwner(opts.sender) || isMod || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     }
 
@@ -231,10 +232,11 @@ class Moderation extends System {
   }
 
   async symbols (opts) {
-    let [isEnabled, isEnabledForSubs, whitelisted, isMod, timeout, triggerLength, maxSymbolsConsecutively, maxSymbolsPercent] = await Promise.all([
+    let [isEnabled, isEnabledForSubs, whitelisted, isOwner, isMod, timeout, triggerLength, maxSymbolsConsecutively, maxSymbolsPercent] = await Promise.all([
       this.settings.symbols.enabled,
       this.settings.symbols.moderateSubscribers,
       this.whitelist(opts.message),
+      global.commons.isOwner(opts.sender),
       global.commons.isMod(opts.sender),
       this.settings.symbols.timeout,
       this.settings.symbols.triggerLength,
@@ -245,7 +247,7 @@ class Moderation extends System {
     var msgLength = whitelisted.trim().length
     var symbolsLength = 0
 
-    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     }
 
@@ -271,9 +273,10 @@ class Moderation extends System {
   }
 
   async longMessage (opts) {
-    let [isEnabled, isEnabledForSubs, isMod, whitelisted, timeout, triggerLength] = await Promise.all([
+    let [isEnabled, isEnabledForSubs, isOwner, isMod, whitelisted, timeout, triggerLength] = await Promise.all([
       this.settings.longMessage.enabled,
       this.settings.longMessage.moderateSubscribers,
+      global.commons.isOwner(opts.sender),
       global.commons.isMod(opts.sender),
       this.whitelist(opts.message),
       this.settings.longMessage.timeout,
@@ -281,7 +284,7 @@ class Moderation extends System {
     ])
 
     var msgLength = whitelisted.trim().length
-    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     } else {
       this.timeoutUser(opts.sender, opts.message,
@@ -293,9 +296,10 @@ class Moderation extends System {
   }
 
   async caps (opts) {
-    let [isEnabled, isEnabledForSubs, isMod, whitelisted, timeout, triggerLength, maxCapsPercent] = await Promise.all([
+    let [isEnabled, isEnabledForSubs, isOwner, isMod, whitelisted, timeout, triggerLength, maxCapsPercent] = await Promise.all([
       this.settings.caps.enabled,
       this.settings.caps.moderateSubscribers,
+      global.commons.isOwner(opts.sender),
       global.commons.isMod(opts.sender),
       this.whitelist(opts.message),
       this.settings.caps.timeout,
@@ -325,7 +329,7 @@ class Moderation extends System {
       }
     }
 
-    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     }
     if (Math.ceil(capsLength / (msgLength / 100)) >= maxCapsPercent) {
@@ -339,9 +343,10 @@ class Moderation extends System {
   }
 
   async spam (opts) {
-    let [isEnabled, isEnabledForSubs, isMod, whitelisted, timeout, triggerLength, maxLength] = await Promise.all([
+    let [isEnabled, isEnabledForSubs, isOwner, isMod, whitelisted, timeout, triggerLength, maxLength] = await Promise.all([
       this.settings.spam.enabled,
       this.settings.spam.moderateSubscribers,
+      global.commons.isOwner(opts.sender),
       global.commons.isMod(opts.sender),
       this.whitelist(opts.message),
       this.settings.spam.timeout,
@@ -351,7 +356,7 @@ class Moderation extends System {
 
     var msgLength = whitelisted.trim().length
 
-    if (global.commons.isOwner(opts.sender) || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || msgLength < triggerLength || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     }
     var out = whitelisted.match(/(.+)(\1+)/g)
@@ -368,14 +373,15 @@ class Moderation extends System {
   }
 
   async color (opts) {
-    let [isEnabled, isEnabledForSubs, isMod, timeout] = await Promise.all([
+    let [isEnabled, isEnabledForSubs, isOwner, isMod, timeout] = await Promise.all([
       this.settings.color.enabled,
       this.settings.color.moderateSubscribers,
+      global.commons.isOwner(opts.sender),
       global.commons.isMod(opts.sender),
       this.settings.color.timeout
     ])
 
-    if (global.commons.isOwner(opts.sender) || isMod || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     }
 
@@ -389,16 +395,17 @@ class Moderation extends System {
   }
 
   async emotes (opts) {
-    let [isEnabled, isEnabledForSubs, isMod, timeout, maxCount] = await Promise.all([
+    let [isEnabled, isEnabledForSubs, isOwner, isMod, timeout, maxCount] = await Promise.all([
       this.settings.emotes.enabled,
       this.settings.emotes.moderateSubscribers,
+      global.commons.isOwner(opts.sender),
       global.commons.isMod(opts.sender),
       this.settings.emotes.timeout,
       this.settings.emotes.maxCount
     ])
 
     var count = opts.sender.emotes.length
-    if (global.commons.isOwner(opts.sender) || isMod || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || !isEnabled || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     }
 
@@ -412,13 +419,14 @@ class Moderation extends System {
   }
 
   async blacklist (opts) {
-    let [isEnabledForSubs, isMod, timeout, blacklist] = await Promise.all([
+    let [isEnabledForSubs, isOwner, isMod, timeout, blacklist] = await Promise.all([
       this.settings.lists.moderateSubscribers,
+      global.commons.isOwner(opts.sender),
       global.commons.isMod(opts.sender),
       this.settings.lists.timeout,
       this.settings.lists.blacklist
     ])
-    if (global.commons.isOwner(opts.sender) || isMod || (opts.sender.isSubscriber && !isEnabledForSubs)) {
+    if (isOwner || isMod || (opts.sender.isSubscriber && !isEnabledForSubs)) {
       return true
     }
 

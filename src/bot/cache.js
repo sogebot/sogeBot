@@ -53,22 +53,6 @@ class Cache {
   }
 
   // attribute
-  async channelId (value) {
-    if (value) {
-      // setter
-      await global.db.engine.update('cache', { key: 'channelId' }, {
-        value: value
-      })
-      return value
-    } else {
-      if (global.mocha) return '1'
-      // getter
-      let cache = await global.db.engine.findOne('cache', { key: 'channelId' })
-      return _.get(cache, 'value', null)
-    }
-  }
-
-  // attribute
   async isOnline (value) {
     if (!_.isNil(value)) {
       // setter

@@ -25,13 +25,13 @@ const tests = [
     expected: 'gambling.fightme.winner'
   },
   {
-    challenger: { username: global.commons.getBroadcaster() },
+    challenger: { username: 'broadcaster' },
     challenging: { username: 'user1' },
     expected: 'gambling.fightme.broadcaster'
   },
   {
     challenger: { username: 'user1' },
-    challenging: { username: global.commons.getBroadcaster() },
+    challenging: { username: 'broadcaster' },
     expected: 'gambling.fightme.broadcaster'
   },
   {

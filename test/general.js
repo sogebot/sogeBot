@@ -16,29 +16,7 @@ fs.writeFileSync('../config.json', JSON.stringify(config))
 if (require('cluster').isMaster) {
   global.mocha = true
   require('../dest/main.js')
-
-  global.commons.timeout = function () {}
-
-  global.botTMI = {
-    chat: {
-      say: function () { },
-      color: function () {},
-      timeout: function () {},
-      on: function () {},
-      connect: function () {},
-      join: function () {}
-    }
-  }
-  global.broadcasterTMI = {
-    chat: {
-      say: function () { },
-      color: function () {},
-      timeout: function () {},
-      on: function () {},
-      connect: function () {},
-      join: function () {}
-    }
-  }
+  global.commons.cached.owners = ['soge__']
 }
 
 module.exports = {

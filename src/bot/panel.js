@@ -49,7 +49,7 @@ function Panel () {
   app.get('/oauth/:page', this.authUser, function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'oauth', req.params.page + '.html'))
   })
-  app.get('/auth/token.js', function (req, res) {
+  app.get('/auth/token.js', async function (req, res) {
     const origin = req.headers.referer ? req.headers.referer.substring(0, req.headers.referer.length - 1) : undefined
     const domain = config.panel.domain.split(',').map((o) => o.trim()).join('|')
     if (_.isNil(origin)) {
@@ -60,7 +60,7 @@ function Panel () {
 
     if (origin.match(new RegExp('^((http|https)\\:\\/\\/|)([\\w|-]+\\.)?' + domain))) {
       res.set('Content-Type', 'application/javascript')
-      res.send(`const token="${config.panel.token.trim()}"; const name="${config.settings.bot_username}"`)
+      res.send(`const token="${config.panel.token.trim()}"; const name="${global.commons.cached.bot}"`)
     } else {
       // file CANNOT be accessed from different domain
       res.status(403).send('403 Forbidden - You are looking at wrong castle.')
@@ -177,9 +177,9 @@ function Panel () {
 
       self.sendStreamData(self, global.panel.io) // force dashboard update
     })
-    socket.on('joinBot', () => { global.client.join('#' + config.settings.broadcaster_username) })
-    socket.on('leaveBot', () => {
-      global.client.part('#' + config.settings.broadcaster_username)
+    socket.on('joinBot', async () => { global.tmi.client.bot.chat.join(await global.oauth.settings.broadcaster.username) })
+    socket.on('leaveBot', async () => {
+      global.tmi.client.bot.chat.part(await global.oauth.settings.broadcaster.username)
       global.db.engine.remove('users.online', {}) // force all users offline
     })
 
@@ -226,7 +226,7 @@ function Panel () {
     socket.on('updateWidgets', function (widgets) { self.updateWidgetsInDb(self, widgets, socket) })
     socket.on('getConnectionStatus', function () { socket.emit('connectionStatus', global.status) })
     socket.on('saveConfiguration', function (data) {
-      _.each(data, function (index, value) {
+      _.each(data, async function (index, value) {
         if (value.startsWith('_')) return true
         global.configuration.setValue({ sender: { username: global.commons.getOwner() }, parameters: value + ' ' + index, quiet: data._quiet })
       })
@@ -254,7 +254,7 @@ function Panel () {
     })
     socket.on('core', async (cb) => {
       let toEmit = []
-      for (let system of ['users']) {
+      for (let system of ['oauth', 'users']) {
         if (!global[system].settings) continue
         toEmit.push({
           name: system.toLowerCase()
@@ -309,7 +309,7 @@ Panel.prototype.expose = function () {
   })
 }
 
-Panel.prototype.authUser = function (req, res, next) {
+Panel.prototype.authUser = async function (req, res, next) {
   var user = basicAuth(req)
   try {
     if (user.name === config.panel.username &&
@@ -319,7 +319,7 @@ Panel.prototype.authUser = function (req, res, next) {
       throw new Error(NOT_AUTHORIZED)
     }
   } catch (e) {
-    res.set('WWW-Authenticate', `Basic realm="Authorize to '${config.settings.broadcaster_username.toUpperCase()}' WebPanel`)
+    res.set('WWW-Authenticate', `Basic realm="Authorize to '${(await global.oauth.settings.broadcaster.username).toUpperCase()}' WebPanel`)
     return res.sendStatus(401)
   }
 }

@@ -24,11 +24,13 @@ function cluster () {
   global.customvariables = new (require('./customvariables.js'))()
   global.twitch = new (require('./twitch'))()
   global.permissions = new (require('./permissions'))()
-  global.api = new (require('./api'))()
 
   global.lib = {}
   global.lib.translate = new (require('./translate'))()
   global.translate = global.lib.translate.translate
+
+  global.oauth = new (require('./oauth.js'))()
+  global.api = new (require('./api'))()
 
   global.lib.translate._load().then(function () {
     global.systems = require('auto-load')('./dest/systems/')
@@ -107,7 +109,7 @@ function cluster () {
 
     if (!skip && sender['message-type'] === 'whisper' && (!(await global.configuration.getValue('disableWhisperListener')) || global.commons.isOwner(sender))) {
       global.log.whisperIn(message, { username: sender.username })
-    } else if (!skip && !global.commons.isBot(sender.username)) global.log.chatIn(message, { username: sender.username })
+    } else if (!skip && !await global.commons.isBot(sender.username)) global.log.chatIn(message, { username: sender.username })
 
     const isModerated = await parse.isModerated()
     const isIgnored = await global.commons.isIgnored(sender)
@@ -133,7 +135,6 @@ function cluster () {
           global.events.fire('command-send-x-times', { username: sender.username, message: message })
         } else if (!message.startsWith('!')) global.db.engine.insert('users.messages', { id: sender.userId, messages: 1 })
       }
-
       await parse.process()
     }
     if (process.send) process.send({ type: 'stats', of: 'parser', value: parse.time(), message: message })

@@ -84,3 +84,7 @@ $status-connecting-border: $yellow !default;
 .btn-outline-dark:hover {
   color: white !important;
 }
+
+.border-gray, .border-input {
+  border-color: $gray-600 !important
+}

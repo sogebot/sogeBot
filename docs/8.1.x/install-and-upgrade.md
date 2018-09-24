@@ -53,6 +53,9 @@
 
 ## Oauth generation
 
-For [generation of oauth token](http://oauth.sogebot.xyz) is advised to [create your own clientId](https://github.com/sogehige/sogeBot/wiki/custom-clientId-(recommended)).
+Generate your oauth tokens in `ui->settings->general->oauth` and paste your
+`accessToken` and `refreshToken` from https://twitchtokengenerator.com to your bot.
 
-!> Make sure you login into correct accounts. Anonymous/Privacy modes can help you with login into correct accounts.
+!> Make sure you login into correct accounts. Anonymous/Privacy modes can help
+   you with login into correct accounts (Right click on generate button -> Open
+  link in incognito window)

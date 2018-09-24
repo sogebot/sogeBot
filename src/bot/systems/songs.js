@@ -6,7 +6,6 @@ const ytdl = require('ytdl-core')
 const ytpl = require('ytpl')
 const ytsearch = require('youtube-search')
 // bot libraries
-const config = require('@config')
 const constants = require('../constants')
 const cluster = require('cluster')
 const System = require('./_interface')
@@ -285,7 +284,7 @@ class Songs extends System {
       else translation = 'songs.current-song-from-songrequest'
     }
     let message = await global.commons.prepare(translation, { name: currentSong.title, username: currentSong.username })
-    global.commons.sendMessage(message, { username: config.settings.broadcaster_username })
+    global.commons.sendMessage(message, { username: await global.oauth.settings.broadcaster.username })
   }
 
   async notifySong () {
@@ -296,7 +295,7 @@ class Songs extends System {
       else translation = 'songs.current-song-from-songrequest'
     } else return
     let message = await global.commons.prepare(translation, { name: currentSong.title, username: currentSong.username })
-    global.commons.sendMessage(message, { username: config.settings.broadcaster_username })
+    global.commons.sendMessage(message, { username: await global.oauth.settings.broadcaster.username })
   }
 
   async stealSong () {
@@ -304,7 +303,7 @@ class Songs extends System {
       const currentSong = JSON.parse(await this.settings._.currentSong)
       this.addSongToPlaylist({ sender: null, parameters: currentSong.videoID })
     } catch (err) {
-      global.commons.sendMessage(global.translate('songs.noCurrentSong'), { username: config.settings.broadcaster_username })
+      global.commons.sendMessage(global.translate('songs.noCurrentSong'), { username: await global.oauth.settings.broadcaster.username })
     }
   }
 
@@ -315,8 +314,8 @@ class Songs extends System {
     }
   }
 
-  help () {
-    global.commons.sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', { username: config.settings.broadcaster_username })
+  async help () {
+    global.commons.sendMessage(global.translate('core.usage') + ': !playlist add <youtubeid> | !playlist remove <youtubeid> | !playlist ban <youtubeid> | !playlist random on/off | !playlist steal', { username: await global.oauth.settings.broadcaster.username })
   }
 
   async addSongToQueue (opts) {

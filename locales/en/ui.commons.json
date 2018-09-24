@@ -4,5 +4,6 @@
   "moveUp": "move up",
   "moveDown": "move down",
   "stop-if-executed": "stop, if executed",
-  "continue-if-executed": "continue, if executed"
+  "continue-if-executed": "continue, if executed",
+  "generate": "Generate"
 }

@@ -101,13 +101,12 @@ class Duel extends Game {
       if (points < bet) throw Error(ERROR_NOT_ENOUGH_POINTS)
       if (bet < (await this.settings.minimalBet)) throw Error(ERROR_MINIMAL_BET)
 
-      await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(bet, 10) * -1 })
-
       // check if user is already in duel and add points
       let userFromDB = await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId })
       const isNewDuelist = _.isEmpty(userFromDB)
       if (!isNewDuelist) {
         await global.db.engine.update(this.collection.users, { _id: String(userFromDB._id) }, { tickets: Number(userFromDB.tickets) + Number(bet) })
+        await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(bet, 10) * -1 })
       } else {
         // check if under gambling cooldown
         const cooldown = await this.settings.cooldown
@@ -117,6 +116,7 @@ class Duel extends Game {
           // save new cooldown if not bypassed
           if (!(await this.settings.bypassCooldownByOwnerAndMods && (isMod || global.commons.isBroadcaster(opts.sender)))) this.settings._.cooldown = new Date()
           await global.db.engine.insert(this.collection.users, { id: opts.sender.userId, username: opts.sender.username, tickets: Number(bet) })
+          await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(bet, 10) * -1 })
         } else {
           message = await global.commons.prepare('gambling.fightme.cooldown', {
             minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes'),
@@ -128,7 +128,8 @@ class Duel extends Game {
       }
 
       // if new duel, we want to save timestamp
-      if ((await this.settings._.timestamp) === 0) {
+      const isNewDuel = (await this.settings._.timestamp) === 0
+      if (isNewDuel) {
         this.settings._.timestamp = new Date()
         message = await global.commons.prepare('gambling.duel.new', {
           minutesName: global.commons.getLocalizedName(5, 'core.minutes'),
@@ -138,12 +139,13 @@ class Duel extends Game {
       }
 
       const tickets = (await global.db.engine.findOne(this.collection.users, { id: opts.sender.userId })).tickets
-      message = await global.commons.prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
-        pointsName: await global.systems.points.getPointsName(tickets),
-        points: tickets
-      })
-      console.log(message)
-      global.commons.sendMessage(message, opts.sender)
+      setTimeout(async () => {
+        message = await global.commons.prepare(isNewDuelist ? 'gambling.duel.joined' : 'gambling.duel.added', {
+          pointsName: await global.systems.points.getPointsName(tickets),
+          points: tickets
+        })
+        global.commons.sendMessage(message, opts.sender)
+      }, isNewDuel ? 500 : 0)
       return true
     } catch (e) {
       switch (e.message) {

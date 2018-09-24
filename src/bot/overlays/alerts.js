@@ -6,7 +6,6 @@ const constants = require('../constants.js')
 const cluster = require('cluster')
 const axios = require('axios')
 const Message = require('../message')
-const config = require('@config')
 
 function Alerts () {
   global.configuration.register('replayPosition', 'core.no-response', 'string', 'right')
@@ -86,13 +85,15 @@ Alerts.prototype.overlay = async function (opts) {
 Alerts.prototype.getClipById = async function (id) {
   const url = `https://api.twitch.tv/kraken/clips/${id}`
 
+  const token = await global.oauth.settings.bot.accessToken
+  if (token === '') return null
+
   var request
   try {
     request = await axios.get(url, {
       headers: {
         'Accept': 'application/vnd.twitchtv.v5+json',
-        'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
-        'Client-ID': config.settings.client_id
+        'Authorization': 'OAuth ' + token
       }
     })
     global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.remainingAPICalls })

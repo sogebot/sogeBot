@@ -1,7 +1,5 @@
 const _ = require('lodash')
-const config = require('@config')
 const axios = require('axios')
-const constants = require('./constants')
 const moment = require('moment')
 const cluster = require('cluster')
 
@@ -29,10 +27,6 @@ class API {
 
       this._loadCachedStatusAndGame()
 
-      this.oauthValidation('bot')
-      this.oauthValidation('broadcaster')
-
-      this.getChannelID()
       this.getCurrentStreamData({ interval: true })
       this.getLatest100Followers(true)
       this.updateChannelViews()
@@ -48,38 +42,12 @@ class API {
     }
   }
 
-  async oauthValidation (type, quiet = false) {
-    clearTimeout(this.timeouts[`oauthValidation-${type}`])
-
-    let request
-    let status = true
-    const url = 'https://id.twitch.tv/oauth2/validate'
-    let timeout = 1000 * 60 * 30 // every 30 minutes
-
-    try {
-      request = await axios.get(url, {
-        headers: {
-          'Authorization': 'OAuth ' + (type === 'bot' ? config.settings.bot_oauth.split(':')[1] : config.settings.broadcaster_oauth.split(':')[1])
-        }
-      })
-      global.status.API = request.status === 200 ? constants.CONNECTED : constants.DISCONNECTED
-      global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: `oauthValidation-${type}`, api: 'kraken', endpoint: url, code: request.status })
-    } catch (e) {
-      status = false
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: `oauthValidation-${type}`, api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
-      if (!quiet) global.log.error(`Something went wrong with your ${type} oauth - ${e.response.data.message}`)
-    }
-
-    this.timeouts[`oauthValidation-${type}`] = setTimeout(() => this.oauthValidation(type), timeout)
-    return status
-  }
-
   async intervalFollowerUpdate () {
     clearTimeout(this.timeouts['intervalFollowerUpdate'])
 
     for (let username of this.rate_limit_follower_check) {
       const user = await global.users.getByName(username)
-      const isSkipped = user.username === config.settings.broadcaster_username || user.username === config.settings.bot_username.toLowerCase()
+      const isSkipped = user.username === global.commons.getBroadcaster || user.username === global.commons.cached.bot
       const userHaveId = !_.isNil(user.id)
       if (new Date().getTime() - _.get(user, 'time.followCheck', 0) <= 1000 * 60 * 30 || isSkipped || !userHaveId) {
         this.rate_limit_follower_check.delete(user.username)
@@ -95,38 +63,6 @@ class API {
 
   async _loadCachedStatusAndGame () {
     global.db.engine.update('api.current', { key: 'game' }, { value: await global.cache.gameCache() })
-  }
-
-  async getChannelID () {
-    clearTimeout(this.timeouts['getChannelID'])
-
-    var request
-    const url = `https://api.twitch.tv/kraken/users?login=${config.settings.broadcaster_username}`
-
-    try {
-      request = await axios.get(url, {
-        headers: {
-          'Accept': 'application/vnd.twitchtv.v5+json',
-          'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
-          'Client-ID': config.settings.client_id
-        }
-      })
-      global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getChannelID', api: 'kraken', endpoint: url, code: request.status })
-
-      const user = request.data.users[0]
-      if (_.isNil(user)) {
-        global.log.error('Channel ' + config.settings.broadcaster_username + ' not found!')
-      } else {
-        await global.cache.channelId(user._id)
-        global.log.info('Broadcaster channel ID set to ' + user._id)
-      }
-    } catch (e) {
-      let timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : 60000
-      global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelID', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
-
-      this.timeouts['getChannelID'] = setTimeout(() => this.getChannelID(), timeout)
-    }
   }
 
   async getChannelChattersUnofficialAPI (opts) {
@@ -146,7 +82,7 @@ class API {
       }
     }
 
-    const url = `https://tmi.twitch.tv/group/user/${config.settings.broadcaster_username.toLowerCase()}/chatters`
+    const url = `https://tmi.twitch.tv/group/user/${global.commons.getBroadcaster().toLowerCase()}/chatters`
     const needToWait = _.isNil(global.widgets)
     if (needToWait) {
       this.timeouts['getChannelChattersUnofficialAPI'] = setTimeout(() => this.getChannelChattersUnofficialAPI(opts), 1000)
@@ -185,7 +121,7 @@ class API {
     }
 
     for (let chatter of chatters) {
-      if (_.includes(ignoredUsers, chatter) || config.settings.bot_username.toLowerCase() === chatter) {
+      if (_.includes(ignoredUsers, chatter) || global.commons.cached.bot === chatter) {
         // even if online, remove ignored user from collection
         await global.db.engine.remove('users.online', { username: chatter })
       } else if (!_.includes(allOnlineUsers, chatter)) {
@@ -194,7 +130,7 @@ class API {
       }
     }
     // always remove bot from online users
-    global.db.engine.remove('users.online', { username: config.settings.bot_username.toLowerCase() })
+    global.db.engine.remove('users.online', { username: global.commons.cached.bot })
 
     if (bulkInsert.length > 0) {
       for (let chunk of _.chunk(bulkInsert, 100)) {
@@ -211,13 +147,13 @@ class API {
   async getChannelSubscribersOldAPI () {
     clearTimeout(this.timeouts['getChannelSubscribersOldAPI'])
 
-    const cid = await global.cache.channelId()
+    const cid = await global.oauth.settings._.channelId
     const url = `https://api.twitch.tv/kraken/channels/${cid}/subscriptions?limit=100`
-    if (_.isNil(_.get(config, 'settings.broadcaster_oauth', '').match(/oauth:[\w]*/))) {
-      return
-    }
 
-    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    const token = await global.oauth.settings.broadcaster.accessToken
+    if (token === '') return
+
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays)
     if (needToWait) {
       this.timeouts['getChannelSubscribersOldAPI'] = setTimeout(() => this.getChannelSubscribersOldAPI(), 1000)
       return
@@ -229,8 +165,7 @@ class API {
       request = await axios.get(url, {
         headers: {
           'Accept': 'application/vnd.twitchtv.v5+json',
-          'Authorization': 'OAuth ' + config.settings.broadcaster_oauth.split(':')[1],
-          'Client-ID': config.settings.client_id
+          'Authorization': 'OAuth ' + token
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: request.status })
@@ -243,13 +178,13 @@ class API {
 
       // set subscribers
       for (let subscriber of subscribers) {
-        if (subscriber.name === config.settings.broadcaster_username || subscriber.name === config.settings.bot_username.toLowerCase()) continue
+        if (subscriber.name === global.commons.getBroadcaster || subscriber.name === global.commons.cached.bot) continue
         await global.db.engine.update('users', { id: subscriber._id }, { username: subscriber.name, is: { subscriber: true } })
       }
     } catch (e) {
       const isChannelPartnerOrAffiliate =
         !(e.message !== '422 Unprocessable Entity' ||
-         (e.response.data.status === 400 && e.response.data.message === `${config.settings.broadcaster_username} does not have a subscription program`))
+         (e.response.data.status === 400 && e.response.data.message === `${global.commons.getBroadcaster} does not have a subscription program`))
       if (!isChannelPartnerOrAffiliate) {
         if (this.retries.getChannelSubscribersOldAPI >= 15) {
           timeout = 0
@@ -277,10 +212,13 @@ class API {
   async getChannelDataOldAPI (opts) {
     clearTimeout(this.timeouts['getChannelDataOldAPI'])
 
-    const cid = await global.cache.channelId()
+    const cid = await global.oauth.settings._.channelId
     const url = `https://api.twitch.tv/kraken/channels/${cid}`
 
-    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return
+
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays)
     if (needToWait) {
       this.timeouts['getChannelDataOldAPI'] = setTimeout(() => this.getChannelDataOldAPI(opts), 1000)
       return
@@ -292,8 +230,7 @@ class API {
       request = await axios.get(url, {
         headers: {
           'Accept': 'application/vnd.twitchtv.v5+json',
-          'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
-          'Client-ID': config.settings.client_id
+          'Authorization': 'OAuth ' + token
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status })
@@ -334,9 +271,9 @@ class API {
   async getChannelHosts () {
     clearTimeout(this.timeouts['getChannelHosts'])
 
-    const cid = await global.cache.channelId()
+    const cid = await global.oauth.settings._.channelId
 
-    if (_.isNil(cid)) {
+    if (_.isNil(cid) || cid === '') {
       this.timeouts['getChannelHosts'] = setTimeout(() => this.getChannelHosts(), 1000)
       return
     }
@@ -364,10 +301,13 @@ class API {
 
   async updateChannelViews () {
     clearTimeout(this.timeouts['updateChannelViews'])
-    const cid = await global.cache.channelId()
+    const cid = await global.oauth.settings._.channelId
     const url = `https://api.twitch.tv/helix/users/?id=${cid}`
 
-    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return
+
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays)
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
       this.timeouts['updateChannelViews'] = setTimeout(() => this.updateChannelViews(), 1000)
@@ -379,8 +319,7 @@ class API {
     try {
       request = await axios.get(url, {
         headers: {
-          'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
-          'Client-ID': config.settings.client_id
+          'Authorization': 'Bearer ' + token
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
@@ -401,10 +340,13 @@ class API {
   async getLatest100Followers (quiet) {
     clearTimeout(this.timeouts['getLatest100Followers'])
 
-    const cid = await global.cache.channelId()
+    const cid = await global.oauth.settings._.channelId
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`
 
-    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return
+
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays)
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
       this.timeouts['getLatest100Followers'] = setTimeout(() => this.getLatest100Followers(), 1000)
@@ -416,8 +358,7 @@ class API {
     try {
       request = await axios.get(url, {
         headers: {
-          'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
-          'Client-ID': config.settings.client_id
+          'Authorization': 'Bearer ' + token
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
@@ -442,8 +383,7 @@ class API {
           let fids = _.map(fidsToLoadFromAPI, (o) => `id=${o}`)
           let usersFromApi = await axios.get(`https://api.twitch.tv/helix/users?${fids.join('&')}`, {
             headers: {
-              'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
-              'Client-ID': config.settings.client_id
+              'Authorization': 'Bearer ' + token
             }
           })
 
@@ -468,21 +408,23 @@ class API {
                 type: 'follow',
                 username: user.username
               })
-              if (!quiet && !global.commons.isBot(user.username)) {
+              if (!quiet && !await global.commons.isBot(user.username)) {
                 global.log.follow(user.username)
                 global.events.fire('follow', { username: user.username })
               }
             }
           }
           try {
-            if (!_.isNil(_.find(fTime, (o) => o.id === user.id))) {
-              const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x'))
-              const isFollower = user.lock && user.lock.follower ? user.is.follower : true
-              global.db.engine.update('users', { id: user.id }, { is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
-            } else {
-              const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment().format('x'))
-              const isFollower = user.lock && user.lock.follower ? user.is.follower : true
-              global.db.engine.update('users', { id: user.id }, { is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
+            if (user.id) {
+              if (!_.isNil(_.find(fTime, (o) => o.id === user.id))) {
+                const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x'))
+                const isFollower = user.lock && user.lock.follower ? user.is.follower : true
+                global.db.engine.update('users', { id: user.id }, { is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
+              } else {
+                const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment().format('x'))
+                const isFollower = user.lock && user.lock.follower ? user.is.follower : true
+                global.db.engine.update('users', { id: user.id }, { is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
+              }
             }
           } catch (e) {
             global.log.error(e)
@@ -504,6 +446,9 @@ class API {
     var request
     const url = `https://api.twitch.tv/helix/games?id=${gid}`
 
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return ''
+
     if (gid.toString().trim().length === 0 || parseInt(gid, 10) === 0) return '' // return empty game if gid is empty
 
     let cache = await global.db.engine.findOne('cache', { upsert: true })
@@ -515,8 +460,7 @@ class API {
     try {
       request = await axios.get(url, {
         headers: {
-          'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
-          'Client-ID': config.settings.client_id
+          'Authorization': 'Bearer ' + token
         }
       })
       if (cluster.isMaster) global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
@@ -537,10 +481,13 @@ class API {
   async getCurrentStreamData (opts) {
     clearTimeout(this.timeouts['getCurrentStreamData'])
 
-    const cid = await global.cache.channelId()
+    const cid = await global.oauth.settings._.channelId
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`
 
-    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return
+
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays)
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
       this.timeouts['getCurrentStreamData'] = setTimeout(() => this.getCurrentStreamData(opts), 1000)
@@ -552,8 +499,7 @@ class API {
     try {
       request = await axios.get(url, {
         headers: {
-          'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
-          'Client-ID': config.settings.client_id
+          'Authorization': 'Bearer ' + token
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
@@ -710,10 +656,13 @@ class API {
     clearTimeout(this.timeouts['setTitleAndGame'])
 
     args = _.defaults(args, { title: null }, { game: null })
-    const cid = await global.cache.channelId()
+    const cid = await global.oauth.settings._.channelId
     const url = `https://api.twitch.tv/kraken/channels/${cid}`
 
-    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return
+
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays)
     if (needToWait) {
       this.timeouts['setTitleAndGame'] = setTimeout(() => this.setTitleAndGame(sender, args), 1000)
       return
@@ -744,8 +693,7 @@ class API {
         },
         headers: {
           'Accept': 'application/vnd.twitchtv.v5+json',
-          'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
-          'Client-ID': config.settings.client_id
+          'Authorization': 'OAuth ' + token
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: request.status })
@@ -790,13 +738,15 @@ class API {
   async sendGameFromTwitch (self, socket, game) {
     const url = `https://api.twitch.tv/kraken/search/games?query=${encodeURIComponent(game)}&type=suggest`
 
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return
+
     var request
     try {
       request = await axios.get(url, {
         headers: {
           'Accept': 'application/vnd.twitchtv.v5+json',
-          'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
-          'Client-ID': config.settings.client_id
+          'Authorization': 'OAuth ' + token
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: request.status })
@@ -815,6 +765,9 @@ class API {
 
   async checkClips () {
     clearTimeout(this.timeouts['checkClips'])
+
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return
 
     let notCheckedClips = (await global.db.engine.find('api.clips', { isChecked: false }))
 
@@ -840,8 +793,7 @@ class API {
     try {
       request = await axios.get(url, {
         headers: {
-          'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
-          'Client-ID': config.settings.client_id
+          'Authorization': 'Bearer ' + token
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
@@ -877,10 +829,13 @@ class API {
 
     _.defaults(opts, { hasDelay: true })
 
-    const cid = await global.cache.channelId()
+    const cid = await global.oauth.settings._.channelId
     const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${cid}`
 
-    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return
+
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays)
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
       this.timeouts['createClip'] = setTimeout(() => this.createClip(opts), 1000)
@@ -893,8 +848,7 @@ class API {
         method: 'post',
         url,
         headers: {
-          'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
-          'Client-ID': config.settings.client_id
+          'Authorization': 'Bearer ' + token
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
@@ -912,21 +866,31 @@ class API {
   async fetchAccountAge (username, id) {
     const url = `https://api.twitch.tv/kraken/users/${id}`
 
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return
+
     var request
     try {
       request = await axios.get(url, {
         headers: {
           'Accept': 'application/vnd.twitchtv.v5+json',
-          'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
-          'Client-ID': config.settings.client_id
+          'Authorization': 'OAuth ' + token
         }
       })
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') return // ignore ECONNRESET errors
-      if (e.response.data.status !== 422) {
+
+      let logError
+      try {
+        logError = e.response.data.status !== 422
+      } catch (e) {
+        logError = true
+      }
+
+      if (logError) {
         global.log.error(`API: ${url} - ${e.stack}`)
-        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: `${e.response.data.status} ${_.get(e, 'body.message', e.statusText)}` })
+        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: e.stack })
       }
       return
     }
@@ -938,15 +902,20 @@ class API {
   }
 
   async isFollowerUpdate (user) {
-    clearTimeout(this.timeouts['isFollowerUpdate'])
+    if (!user.id) return
+    clearTimeout(this.timeouts['isFollowerUpdate-' + user.id])
 
-    const cid = await global.cache.channelId()
+    const cid = await global.oauth.settings._.channelId
+    const clientId = await global.oauth.settings._.clientId
     const url = `https://api.twitch.tv/helix/users/follows?from_id=${user.id}&to_id=${cid}`
 
-    const needToWait = _.isNil(cid) || _.isNil(global.overlays)
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return
+
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || clientId === ''
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
-      this.timeouts['isFollowerUpdate'] = setTimeout(() => this.isFollowerUpdate(user), 1000)
+      this.timeouts['isFollowerUpdate-' + user.id] = setTimeout(() => this.isFollowerUpdate(user), 1000)
       return
     }
 
@@ -955,8 +924,8 @@ class API {
       request = await axios.get(url, {
         headers: {
           'Accept': 'application/vnd.twitchtv.v5+json',
-          'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
-          'Client-ID': config.settings.client_id
+          'Authorization': 'OAuth ' + token,
+          'Client-ID': clientId
         }
       })
       global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })

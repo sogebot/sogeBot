@@ -11,6 +11,33 @@ module.exports = {
     if (!eventSpy) eventSpy = sinon.spy(global.events, 'fire')
     else eventSpy.resetHistory()
 
+    global.commons.timeout = function () {}
+
+    global.tmi = {
+      client: {
+        bot: {
+          chat: {
+            say: function () { },
+            color: function () {},
+            timeout: function () {},
+            on: function () {},
+            connect: function () {},
+            join: function () {}
+          }
+        },
+        broadcaster: {
+          chat: {
+            say: function () { },
+            color: function () {},
+            timeout: function () {},
+            on: function () {},
+            connect: function () {},
+            join: function () {}
+          }
+        }
+      }
+    }
+
     try {
       sinon.stub(global.log, 'chatOut')
       sinon.stub(global.log, 'warning')

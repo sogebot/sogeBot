@@ -21,7 +21,7 @@ EventList.prototype._get = async function (self) {
 }
 
 EventList.prototype.add = async function (data) {
-  if (global.commons.isBot(data.username)) return // don't save event from a bot
+  if (await global.commons.isBot(data.username)) return // don't save event from a bot
 
   const newEvent = {
     event: data.type,

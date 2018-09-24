@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const variable = require('./variable')
 
 module.exports = {
   cleanup: async function () {
@@ -59,6 +60,14 @@ module.exports = {
       await global.db.engine.remove('events', {})
       await global.db.engine.remove('events.filters', {})
       await global.db.engine.remove('events.operations', {})
+
+      global.oauth.settings.general.owners = ['soge__']
+      global.commons.cached.owners = ['soge__']
+      await variable.isEqual('global.oauth.settings.general.owners', ['soge__'])
+
+      global.oauth.settings.broadcaster.username = 'broadcaster'
+      global.commons.cached.broadcaster = 'broadcaster'
+      await variable.isEqual('global.oauth.settings.broadcaster.username', 'broadcaster')
 
       resolve()
     }

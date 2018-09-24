@@ -60,7 +60,7 @@ class IMasterController extends Interface {
       worker.send(data)
       this.returnData(resolve, reject, id)
     } catch (e) {
-      setTimeout(() => this.sendRequest(resolve, reject, id, data), 100)
+      setTimeout(() => this.sendRequest(resolve, reject, id, data), 10)
     }
   }
 
@@ -73,7 +73,7 @@ class IMasterController extends Interface {
       const items = dataFromWorker.items
       _.remove(this.data, (o) => o.id === id)
       resolve(items)
-    } else setTimeout(() => this.returnData(resolve, reject, id), 100)
+    } else setTimeout(() => this.returnData(resolve, reject, id), 10)
   }
 
   async find (table, where) {

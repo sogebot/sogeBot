@@ -4,7 +4,6 @@ const safeEval = require('safe-eval')
 const decode = require('decode-html')
 const querystring = require('querystring')
 const _ = require('lodash')
-const config = require('@config')
 const cluster = require('cluster')
 const crypto = require('crypto')
 
@@ -60,7 +59,7 @@ class Message {
         song.artist = song.artist.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
       }
       this.message = this.message.replace(/\$currentSong/g, format.replace(/\$song/g, song.song).replace(/\$artist/g, song.artist))
-    } else if (await global.systems.songs.isEnabled()) {
+    } else if (await global.systems.songs.isEnabled() && this.message.includes('$currentSong')) {
       let currentSong = _.get(JSON.parse(await global.systems.songs.settings._.currentSong), 'title', global.translate('songs.not-playing'))
       if (opts.escape) {
         currentSong = currentSong.replace(new RegExp(opts.escape, 'g'), `\\${opts.escape}`)
@@ -78,7 +77,7 @@ class Message {
       '(random.online.viewer)': async function () {
         const onlineViewers = _.filter(
           (await global.db.engine.find('users.online')).map((o) => o.username),
-          (o) => o.username !== attr.sender && o.username !== config.settings.bot_username.toLowerCase())
+          (o) => o.username !== attr.sender && o.username !== global.commons.cached.bot.toLowerCase())
         if (onlineViewers.length === 0) return 'unknown'
         return _.sample(onlineViewers)
       },
@@ -86,7 +85,7 @@ class Message {
         const onlineViewers = (await global.db.engine.find('users.online')).map((o) => o.username)
         const followers = _.filter(
           (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username),
-          (o) => o.username !== attr.sender && o.username !== config.settings.bot_username.toLowerCase())
+          (o) => o.username !== attr.sender && o.username !== global.commons.cached.bot.toLowerCase())
         let onlineFollowers = _.intersection(onlineViewers, followers)
         if (onlineFollowers.length === 0) return 'unknown'
         return _.sample(onlineFollowers)
@@ -95,26 +94,26 @@ class Message {
         const onlineViewers = (await global.db.engine.find('users.online')).map((o) => o.username)
         const subscribers = _.filter(
           (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username),
-          (o) => o.username !== attr.sender && o.username !== config.settings.bot_username.toLowerCase())
+          (o) => o.username !== attr.sender && o.username !== global.commons.cached.bot.toLowerCase())
         let onlineSubscribers = _.intersection(onlineViewers, subscribers)
         if (onlineSubscribers.length === 0) return 'unknown'
         return _.sample(onlineSubscribers)
       },
       '(random.viewer)': async function () {
         let viewer = await global.users.getAll()
-        viewer = _.filter(viewer, function (o) { return o.username !== attr.sender && o.username !== config.settings.bot_username.toLowerCase() })
+        viewer = _.filter(viewer, function (o) { return o.username !== attr.sender && o.username !== global.commons.cached.bot.toLowerCase() })
         if (viewer.length === 0) return 'unknown'
         return _.sample(viewer).username
       },
       '(random.follower)': async function () {
         let follower = await global.users.getAll({ is: { follower: true } })
-        follower = _.filter(follower, function (o) { return o.username !== attr.sender && o.username !== config.settings.bot_username.toLowerCase() })
+        follower = _.filter(follower, function (o) { return o.username !== attr.sender && o.username !== global.commons.cached.bot.toLowerCase() })
         if (follower.length === 0) return 'unknown'
         return _.sample(follower).username
       },
       '(random.subscriber)': async function () {
         let subscriber = await global.users.getAll({ is: { subscriber: true } })
-        subscriber = _.filter(subscriber, function (o) { return o.username !== attr.sender && o.username !== config.settings.bot_username.toLowerCase() })
+        subscriber = _.filter(subscriber, function (o) { return o.username !== attr.sender && o.username !== global.commons.cached.bot.toLowerCase() })
         if (subscriber.length === 0) return 'unknown'
         return _.sample(subscriber).username
       },
@@ -408,19 +407,21 @@ class Message {
     let stream = {
       '(stream|#|game)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|game)', '')
+
+        const token = await global.oauth.settings.bot.accessToken
+        if (token === '') return 'n/a'
+
         try {
           let request = await axios.get(`https://api.twitch.tv/kraken/users?login=${channel}`, {
             headers: {
               'Accept': 'application/vnd.twitchtv.v5+json',
-              'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
-              'Client-ID': config.settings.client_id
+              'Authorization': 'OAuth ' + token
             }
           })
           const channelId = request.data.users[0]._id
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
-              'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
-              'Client-ID': config.settings.client_id
+              'Authorization': 'Bearer ' + token
             }
           })
           return global.api.getGameFromId(request.data.data[0].game_id)
@@ -428,19 +429,21 @@ class Message {
       },
       '(stream|#|title)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|title)', '')
+
+        const token = await global.oauth.settings.bot.accessToken
+        if (token === '') return 'n/a'
+
         try {
           let request = await axios.get(`https://api.twitch.tv/kraken/users?login=${channel}`, {
             headers: {
               'Accept': 'application/vnd.twitchtv.v5+json',
-              'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
-              'Client-ID': config.settings.client_id
+              'Authorization': 'OAuth ' + token
             }
           })
           const channelId = request.data.users[0]._id
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
-              'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
-              'Client-ID': config.settings.client_id
+              'Authorization': 'Bearer ' + token
             }
           })
           return request.data.data[0].title
@@ -448,19 +451,21 @@ class Message {
       },
       '(stream|#|viewers)': async function (filter) {
         const channel = filter.replace('(stream|', '').replace('|viewers)', '')
+
+        const token = await global.oauth.settings.bot.accessToken
+        if (token === '') return '0'
+
         try {
           let request = await axios.get(`https://api.twitch.tv/kraken/users?login=${channel}`, {
             headers: {
               'Accept': 'application/vnd.twitchtv.v5+json',
-              'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
-              'Client-ID': config.settings.client_id
+              'Authorization': 'OAuth ' + token
             }
           })
           const channelId = request.data.users[0]._id
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
-              'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
-              'Client-ID': config.settings.client_id
+              'Authorization': 'Bearer ' + token
             }
           })
           return request.data.data[0].viewer_count

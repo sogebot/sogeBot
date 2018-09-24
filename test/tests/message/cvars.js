@@ -12,90 +12,90 @@ const _ = require('lodash')
 // stub
 _.set(global, 'widgets.custom_variables.io.emit', function () {})
 
-const tests = [
-  {
-    test: '$_test',
-    variable: '$_test',
-    initialValue: 0,
-    afterValue: 5,
-    type: 'number',
-    command: 'This is $_test',
-    expectedSent: true,
-    params: { sender: global.commons.getOwner(), param: 5 }
-  },
-  {
-    test: '$_test',
-    variable: '$_test',
-    initialValue: 0,
-    afterValue: 1,
-    type: 'number',
-    command: 'This is $_test',
-    expectedSent: true,
-    params: { sender: global.commons.getOwner(), param: '+' }
-  },
-  {
-    test: '$_test',
-    variable: '$_test',
-    initialValue: '0',
-    afterValue: 1,
-    type: 'number',
-    command: 'This is $_test',
-    expectedSent: true,
-    params: { sender: global.commons.getOwner(), param: '+' }
-  },
-  {
-    test: '$!_test',
-    variable: '$_test',
-    initialValue: 0,
-    afterValue: -1,
-    type: 'number',
-    command: 'This is $!_test',
-    expectedSent: false,
-    params: { sender: global.commons.getOwner(), param: '-' }
-  },
-  {
-    test: '$!_test',
-    variable: '$_test',
-    initialValue: '0',
-    afterValue: -1,
-    type: 'number',
-    command: 'This is $!_test',
-    expectedSent: false,
-    params: { sender: global.commons.getOwner(), param: '-' }
-  },
-  {
-    test: '$!_test',
-    variable: '$_test',
-    initialValue: 0,
-    afterValue: 1,
-    type: 'number',
-    command: 'This is $!_test',
-    expectedSent: false,
-    params: { sender: global.commons.getOwner(), param: '+' }
-  },
-  {
-    test: '$_test',
-    variable: '$_test',
-    initialValue: 0,
-    afterValue: -1,
-    type: 'number',
-    command: 'This is $_test',
-    expectedSent: true,
-    params: { sender: global.commons.getOwner(), param: '-' }
-  },
-  {
-    test: '$!_test',
-    variable: '$_test',
-    initialValue: 0,
-    afterValue: 5,
-    type: 'number',
-    command: 'This is $!_test',
-    expectedSent: false,
-    params: { sender: global.commons.getOwner(), param: 5 }
-  }
-]
+describe('Message - cvars filter', async () => {
+  const tests = [
+    {
+      test: '$_test',
+      variable: '$_test',
+      initialValue: 0,
+      afterValue: 5,
+      type: 'number',
+      command: 'This is $_test',
+      expectedSent: true,
+      params: { sender: global.commons.getOwner(), param: 5 }
+    },
+    {
+      test: '$_test',
+      variable: '$_test',
+      initialValue: 0,
+      afterValue: 1,
+      type: 'number',
+      command: 'This is $_test',
+      expectedSent: true,
+      params: { sender: global.commons.getOwner(), param: '+' }
+    },
+    {
+      test: '$_test',
+      variable: '$_test',
+      initialValue: '0',
+      afterValue: 1,
+      type: 'number',
+      command: 'This is $_test',
+      expectedSent: true,
+      params: { sender: global.commons.getOwner(), param: '+' }
+    },
+    {
+      test: '$!_test',
+      variable: '$_test',
+      initialValue: 0,
+      afterValue: -1,
+      type: 'number',
+      command: 'This is $!_test',
+      expectedSent: false,
+      params: { sender: global.commons.getOwner(), param: '-' }
+    },
+    {
+      test: '$!_test',
+      variable: '$_test',
+      initialValue: '0',
+      afterValue: -1,
+      type: 'number',
+      command: 'This is $!_test',
+      expectedSent: false,
+      params: { sender: global.commons.getOwner(), param: '-' }
+    },
+    {
+      test: '$!_test',
+      variable: '$_test',
+      initialValue: 0,
+      afterValue: 1,
+      type: 'number',
+      command: 'This is $!_test',
+      expectedSent: false,
+      params: { sender: global.commons.getOwner(), param: '+' }
+    },
+    {
+      test: '$_test',
+      variable: '$_test',
+      initialValue: 0,
+      afterValue: -1,
+      type: 'number',
+      command: 'This is $_test',
+      expectedSent: true,
+      params: { sender: global.commons.getOwner(), param: '-' }
+    },
+    {
+      test: '$!_test',
+      variable: '$_test',
+      initialValue: 0,
+      afterValue: 5,
+      type: 'number',
+      command: 'This is $!_test',
+      expectedSent: false,
+      params: { sender: global.commons.getOwner(), param: 5 }
+    }
+  ]
 
-describe('Message - cvars filter', () => {
   before(async () => {
     await db.cleanup()
     await msg.prepare()

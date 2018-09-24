@@ -39,8 +39,9 @@ class Webhooks {
   async subscribe (type) {
     clearTimeout(this.timeouts[`subscribe-${type}`])
 
-    const cid = await global.cache.channelId()
-    if (_.isNil(cid)) {
+    const cid = await global.oauth.settings._.channelId
+    const clientId = await global.oauth.settings._.clientId
+    if (cid === '' || clientId === '') {
       this.timeouts[`subscribe-${type}`] = setTimeout(() => this.subscribe(type), 1000)
       return
     }
@@ -69,7 +70,7 @@ class Webhooks {
           method: 'post',
           url: request.join('&'),
           headers: {
-            'Client-ID': config.settings.client_id
+            'Client-ID': clientId
           }
         })
         if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: follows waiting for challenge')
@@ -81,7 +82,7 @@ class Webhooks {
           method: 'post',
           url: request.join('&'),
           headers: {
-            'Client-ID': config.settings.client_id
+            'Client-ID': clientId
           }
         })
         if (res.status === 202 && res.statusText === 'Accepted') global.log.info('WEBHOOK: streams waiting for challenge')
@@ -96,7 +97,7 @@ class Webhooks {
   }
 
   async event (aEvent, res) {
-    const cid = await global.cache.channelId()
+    const cid = await global.oauth.settings._.channelId
 
     // somehow stream doesn't have a topic
     if (_.get(aEvent, 'topic', null) === `https://api.twitch.tv/helix/users/follows?to_id=${cid}`) this.follower(aEvent) // follow
@@ -106,7 +107,7 @@ class Webhooks {
   }
 
   async challenge (req, res) {
-    const cid = await global.cache.channelId()
+    const cid = await global.oauth.settings._.channelId
     // set webhooks enabled
     switch (req.query['hub.topic']) {
       case `https://api.twitch.tv/helix/users/follows?to_id=${cid}`:
@@ -122,7 +123,7 @@ class Webhooks {
   }
 
   async follower (aEvent) {
-    const cid = await global.cache.channelId()
+    const cid = await global.oauth.settings._.channelId
     if (_.isEmpty(cid)) setTimeout(() => this.follower(aEvent), 10) // wait until channelId is set
     if (parseInt(aEvent.data.to_id, 10) !== parseInt(cid, 10)) return
     const fid = aEvent.data.from_id
@@ -136,15 +137,17 @@ class Webhooks {
     // check if user exists in db
     let user = await global.db.engine.findOne('users', { id: fid })
     if (_.isEmpty(user)) {
+      const token = await global.oauth.settings.bot.accessToken
+      if (token === '') return
+
       // user doesn't exist - get username from api GET https://api.twitch.tv/helix/users?id=<user ID>
       let userGetFromApi = await axios.get(`https://api.twitch.tv/helix/users?id=${fid}`, {
         headers: {
-          'Client-ID': config.settings.client_id,
-          'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1]
+          'Authorization': 'OAuth ' + token
         }
       })
 
-      if (!global.commons.isBot(userGetFromApi.data.data[0].login)) {
+      if (!await global.commons.isBot(userGetFromApi.data.data[0].login)) {
         global.overlays.eventlist.add({
           type: 'follow',
           username: userGetFromApi.data.data[0].login
@@ -158,7 +161,7 @@ class Webhooks {
       }
     } else {
       if (!_.get(user, 'is.follower', false) && _.now() - _.get(user, 'time.follow', 0) > 60000 * 60) {
-        if (!global.commons.isBot(user.username)) {
+        if (!await global.commons.isBot(user.username)) {
           global.overlays.eventlist.add({
             type: 'follow',
             username: user.username

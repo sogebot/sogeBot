@@ -7,7 +7,6 @@ var constants = require('./constants')
 const cluster = require('cluster')
 const axios = require('axios')
 
-const config = require('@config')
 const Expects = require('./expects')
 const Core = require('./_interface')
 
@@ -65,7 +64,7 @@ class Users extends Core {
   async ignoreCheck (opts: Object) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
-      const isIgnored = global.commons.isIgnored(username)
+      const isIgnored = await global.commons.isIgnored(username)
       global.commons.sendMessage(global.commons.prepare(isIgnored ? 'ignore.user.is.ignored' : 'ignore.user.is.not.ignored', { username }), opts.sender)
       return isIgnored
     } catch (e) {}
@@ -159,7 +158,7 @@ class Users extends Core {
     if (_.isNil(username)) return global.log.error('username is NULL!\n' + new Error().stack)
 
     username = username.toLowerCase()
-    if (username === config.settings.bot_username.toLowerCase() || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
+    if (username === global.commons.cached.bot.toLowerCase() || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
 
     const user = await global.db.engine.findOne('users', { username })
     object.username = username
@@ -273,11 +272,13 @@ class Users extends Core {
       }
     */
 
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return null
+
     try {
       request = await axios.get(url, {
         headers: {
-          'Authorization': 'Bearer ' + config.settings.bot_oauth.split(':')[1],
-          'Client-ID': config.settings.client_id
+          'Authorization': 'Bearer ' + token
         }
       })
       return request.data.data[0].id
@@ -433,21 +434,22 @@ class Users extends Core {
       })
       socket.on('followedAt.viewer', async (id, cb) => {
         try {
-          const cid = await global.cache.channelId()
+          const cid = await global.oauth.settings._.channelId
           const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`
+
+          const token = await global.oauth.settings.bot.accessToken
+          if (token === '') cb(new Error('no token available'), null)
 
           const request = await axios.get(url, {
             headers: {
               'Accept': 'application/vnd.twitchtv.v5+json',
-              'Authorization': 'OAuth ' + config.settings.bot_oauth.split(':')[1],
-              'Client-ID': config.settings.client_id
+              'Authorization': 'OAuth ' + token
             }
           })
 
           if (request.data.total === 0) throw new Error('Not a follower')
           else cb(null, new Date(request.data.data[0].followed_at).getTime())
         } catch (e) {
-          console.log(e)
           cb(e, null)
         }
       })

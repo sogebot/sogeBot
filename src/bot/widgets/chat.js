@@ -1,6 +1,5 @@
 'use strict'
 
-const config = require('@config')
 const axios = require('axios')
 
 function ChatWidget () {
@@ -14,7 +13,7 @@ function ChatWidget () {
 
 ChatWidget.prototype.refresh = async (self, socket) => {
   try {
-    let url = `https://tmi.twitch.tv/group/user/${config.settings.broadcaster_username.toLowerCase()}/chatters`
+    let url = `https://tmi.twitch.tv/group/user/${(await global.oauth.settings.general.channel).toLowerCase()}/chatters`
     let response = await axios.get(url)
 
     if (response.status === 200) {
@@ -27,12 +26,12 @@ ChatWidget.prototype.refresh = async (self, socket) => {
   }
 }
 
-ChatWidget.prototype.sendChatRoom = function (self, socket) {
-  socket.emit('chatRoom', config.settings.broadcaster_username.toLowerCase())
+ChatWidget.prototype.sendChatRoom = async function (self, socket) {
+  socket.emit('chatRoom', (await global.oauth.settings.general.channel).toLowerCase())
 }
 
-ChatWidget.prototype.chatMessageSend = function (self, socket, message) {
-  global.commons.sendMessage(message, { username: config.settings.bot_username }, { force: true })
+ChatWidget.prototype.chatMessageSend = async function (self, socket, message) {
+  global.commons.sendMessage(message, { username: global.commons.cached.bot }, { force: true })
 }
 
 module.exports = new ChatWidget()
