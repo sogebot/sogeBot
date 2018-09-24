@@ -175,21 +175,22 @@
             if (this.validateForm()) {
               this.states.save = 1
               const data = {
-                _id: commons.urlParam('id') ? commons.urlParam('id') : null,
+                _id: this.id,
                 responses: this.responses,
                 command: this.command.trim(),
                 visible: this.visible,
                 enabled: this.enabled,
                 count: this.count
               }
-              this.socket.emit('update.command', {items: [data]}, (err, _id) => {
+              this.socket.emit('update.command', {items: [data]}, (err, data) => {
                 if (err) {
                   console.error(err)
                   return this.states.save = 3
                 }
                 this.states.save = 2
                 this.pending = false
-                this.id = _id
+                this.id = String(data._id)
+                page('?id=' + this.id + '/#customcommands/edit')
                 setTimeout(() => this.states.save = 0, 1000)
               })
             }

@@ -88,7 +88,7 @@
           if (this.validateForm()) {
             this.states.save = 1
             const data = {
-              _id: commons.urlParam('id') ? commons.urlParam('id') : null,
+              _id: this.id,
               quote: this.quote,
               tags: this.tags.split(',').map((o) => o.trim())
             }

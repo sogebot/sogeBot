@@ -69,6 +69,7 @@ class Timers extends System {
         _.remove(data.responses, (o) => o.response.trim().length === 0)
 
         const timer = {
+          _id: data.timer._id,
           name: name,
           messages: _.toNumber(data.timer.messages),
           seconds: _.toNumber(data.timer.seconds),
@@ -78,13 +79,14 @@ class Timers extends System {
             timestamp: new Date().getTime()
           }
         }
-        if (_.isNil(data.timer._id)) data.timer._id = (await global.db.engine.insert(this.collection.data, timer))._id.toString()
+        if (_.isNil(data.timer._id)) data.timer._id = String((await global.db.engine.insert(this.collection.data, timer))._id)
         else {
           await Promise.all([
             global.db.engine.update(this.collection.data, { _id: data.timer._id }, timer),
             global.db.engine.remove(this.collection.responses, { timerId: data.timer._id })
           ])
         }
+
         var insertArray = []
         for (let response of data.responses) {
           insertArray.push(global.db.engine.insert(this.collection.responses, {
@@ -95,7 +97,6 @@ class Timers extends System {
           }))
         }
         await Promise.all(insertArray)
-
         callback(null, {
           timer: await global.db.engine.findOne(this.collection.data, { _id: data.timer._id }),
           responses: await global.db.engine.find(this.collection.responses, { timerId: data.timer._id })
