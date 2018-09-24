@@ -79,65 +79,6 @@ async function main () {
   global.broadcasterTMI = new TwitchJs({ token: config.settings.broadcaster_oauth, username: config.settings.broadcaster_username })
 
   global.status.TMI = constants.CONNECTING
-  const connections = new Promise(async (resolve, reject) => {
-    const connect = async (bot, broadcaster, retries) => {
-      try {
-        if (!await global.api.oauthValidation('bot', true)) {
-          global.log.error(`Something went wrong with your bot oauth - please check your config.json`)
-          bot = true // don't reconnect on oauth error
-          global.log.error('Bot WON\'T connect to TMI server')
-        } else if (!bot) {
-          global.log.info('Bot is connecting to TMI server')
-          await global.botTMI.chat.connect()
-          await global.botTMI.chat.join(config.settings.broadcaster_username)
-          global.log.info('Bot is connected to TMI server')
-          bot = true
-        }
-      } catch (e) {
-        global.log.info('Bot failed to connect to TMI server')
-        global.log.error(e.stack)
-      }
-
-      try {
-        if (_.get(config, 'settings.broadcaster_oauth', '').match(/oauth:[\w]*/)) {
-          if (!await global.api.oauthValidation('broadcaster', true)) {
-            global.log.error(`Something went wrong with your broadcaster oauth - please check your config.json`)
-            broadcaster = true // don't reconnect on oauth error
-            global.log.error('Broadcaster WON\'T connect to TMI server')
-          } else if (!broadcaster) {
-            global.log.info('Broadcaster is connecting to TMI server')
-            await global.broadcasterTMI.chat.connect()
-            await global.broadcasterTMI.chat.join(config.settings.broadcaster_username)
-            global.log.info('Broadcaster is connected to TMI server')
-            broadcaster = true
-          }
-        } else {
-          global.log.error('Broadcaster oauth is not properly set - hosts will not be loaded')
-          global.log.error('Broadcaster oauth is not properly set - subscribers will not be loaded')
-          broadcaster = true
-        }
-      } catch (e) {
-        global.log.info('Broadcaster failed to connect to TMI server')
-        global.log.error(e.stack)
-      }
-
-      retries++
-      if (retries > 15) {
-        global.status.tmi = constants.DISCONNECTED
-        reject(new Error('Max retries reached'))
-      } else if (!bot || !broadcaster) {
-        setTimeout(() => {
-          global.status.TMI = constants.RECONNECTING
-          connect(bot, broadcaster, retries)
-        }, 1000 * retries)
-      } else {
-        global.status.TMI = constants.CONNECTED
-        resolve()
-      }
-    }
-    if (!global.mocha) connect(false, false, 0)
-  })
-  connections.then(() => {})
 
   global.lib.translate._load().then(function () {
     global.systems = require('auto-load')('./dest/systems/')
@@ -153,6 +94,64 @@ async function main () {
       global.log.warning(chalk.bgRed.bold('HEAP debugging is ENABLED'))
       setTimeout(() => require('./heapdump.js').init('heap/'), 120000)
     }
+
+    const connections = new Promise(async (resolve, reject) => {
+      const connect = async (bot, broadcaster, retries) => {
+        try {
+          if (!await global.api.oauthValidation('bot', true)) {
+            global.log.error(`Something went wrong with your bot oauth - please check your config.json`)
+            bot = true // don't reconnect on oauth error
+            global.log.error('Bot WON\'T connect to TMI server')
+          } else if (!bot) {
+            global.log.info('Bot is connecting to TMI server')
+            await global.botTMI.chat.connect()
+            await global.botTMI.chat.join(config.settings.broadcaster_username)
+            bot = true
+          }
+        } catch (e) {
+          global.log.info('Bot failed to connect to TMI server')
+          global.log.error(e.stack)
+        }
+
+        try {
+          if (_.get(config, 'settings.broadcaster_oauth', '').match(/oauth:[\w]*/)) {
+            if (!await global.api.oauthValidation('broadcaster', true)) {
+              global.log.error(`Something went wrong with your broadcaster oauth - please check your config.json`)
+              broadcaster = true // don't reconnect on oauth error
+              global.log.error('Broadcaster WON\'T connect to TMI server')
+            } else if (!broadcaster) {
+              global.log.info('Broadcaster is connecting to TMI server')
+              await global.broadcasterTMI.chat.connect()
+              await global.broadcasterTMI.chat.join(config.settings.broadcaster_username)
+              broadcaster = true
+            }
+          } else {
+            global.log.error('Broadcaster oauth is not properly set - hosts will not be loaded')
+            global.log.error('Broadcaster oauth is not properly set - subscribers will not be loaded')
+            broadcaster = true
+          }
+        } catch (e) {
+          global.log.info('Broadcaster failed to connect to TMI server')
+          global.log.error(e.stack)
+        }
+
+        retries++
+        if (retries > 15) {
+          global.status.tmi = constants.DISCONNECTED
+          reject(new Error('Max retries reached'))
+        } else if (!bot || !broadcaster) {
+          setTimeout(() => {
+            global.status.TMI = constants.RECONNECTING
+            connect(bot, broadcaster, retries)
+          }, 1000 * retries)
+        } else {
+          global.status.TMI = constants.CONNECTED
+          resolve()
+        }
+      }
+      if (!global.mocha) connect(false, false, 0)
+    })
+    connections.then(() => {})
   })
 }
 
