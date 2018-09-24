@@ -583,9 +583,9 @@ class Events {
         const months = _.random(0, 99, false)
         let attributes = {
           username: username,
-          userObject: await global.users.get(username),
+          userObject: await global.users.getByName(username),
           recipient: recipient,
-          recipientObject: await global.users.get(recipient),
+          recipientObject: await global.users.getByName(recipient),
           months: months,
           monthsName: global.commons.getLocalizedName(months, 'core.months'),
           message: _.sample(['', 'Lorem Ipsum Dolor Sit Amet']),

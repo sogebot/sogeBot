@@ -10,12 +10,11 @@ module.exports = {
       sinon.stub(global.log, 'chatOut')
       sinon.stub(global.log, 'warning')
       sinon.stub(global.log, 'process')
-      sinon.stub(global.events, 'fire')
+      sinon.spy(global.events, 'fire')
     } catch (e) {
       global.log.chatOut.reset()
       global.log.warning.reset()
       global.log.process.reset()
-      global.events.fire.reset()
     }
   },
   process: async function (expected, user) {
