@@ -4,14 +4,15 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
+const _ = require('lodash')
 
 const assert = require('chai').assert
 
 const max = Math.floor(Number.MAX_SAFE_INTEGER / 1000000)
 
-const owner = { username: 'soge__', userId: 1 }
-const testuser = { username: 'testuser', userId: 2 }
-const testuser2 = { username: 'testuser2', userId: 3 }
+const owner = { username: 'soge__', userId: String(_.random(999999, false)) }
+const testuser = { username: 'testuser', userId: String(_.random(999999, false)) }
+const testuser2 = { username: 'testuser2', userId: String(_.random(999999, false)) }
 
 describe('Raffles - pick()', () => {
   before(async () => {

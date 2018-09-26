@@ -125,7 +125,6 @@ class Webhooks {
     const cid = await global.cache.channelId()
     if (_.isEmpty(cid)) setTimeout(() => this.follower(aEvent), 10) // wait until channelId is set
     if (parseInt(aEvent.data.to_id, 10) !== parseInt(cid, 10)) return
-
     const fid = aEvent.data.from_id
 
     // is in webhooks cache

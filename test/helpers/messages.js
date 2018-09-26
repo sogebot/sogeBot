@@ -4,13 +4,17 @@ const sinon = require('sinon')
 const _ = require('lodash')
 const util = require('util')
 
+var eventSpy
+
 module.exports = {
   prepare: function () {
+    if (!eventSpy) eventSpy = sinon.spy(global.events, 'fire')
+    else eventSpy.resetHistory()
+
     try {
       sinon.stub(global.log, 'chatOut')
       sinon.stub(global.log, 'warning')
       sinon.stub(global.log, 'process')
-      sinon.spy(global.events, 'fire')
     } catch (e) {
       global.log.chatOut.reset()
       global.log.warning.reset()
