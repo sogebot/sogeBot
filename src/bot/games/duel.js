@@ -142,7 +142,9 @@ class Duel extends Game {
         pointsName: await global.systems.points.getPointsName(tickets),
         points: tickets
       })
+      console.log(message)
       global.commons.sendMessage(message, opts.sender)
+      return true
     } catch (e) {
       switch (e.message) {
         case ERROR_NOT_ENOUGH_OPTIONS:

@@ -8,8 +8,8 @@ const message = require('../../general.js').message
 const _ = require('lodash')
 
 const owner = { username: 'soge__' }
-const user1 = { username: 'user1', userId: '1' }
-const user2 = { username: 'user2', userId: '2' }
+const user1 = { username: 'user1', userId: String(_.random(999999, false)) }
+const user2 = { username: 'user2', userId: String(_.random(999999, false)) }
 const command = '!duel'
 
 describe('Gambling - duel', () => {

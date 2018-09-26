@@ -61,6 +61,7 @@ class Cache {
       })
       return value
     } else {
+      if (global.mocha) return '1'
       // getter
       let cache = await global.db.engine.findOne('cache', { key: 'channelId' })
       return _.get(cache, 'value', null)

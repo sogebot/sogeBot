@@ -2,6 +2,7 @@
 if (require('cluster').isWorker) process.exit()
 
 const assert = require('chai').assert
+const _ = require('lodash')
 require('../../general.js')
 
 const db = require('../../general.js').db
@@ -14,7 +15,7 @@ const user = { username: 'testuser' }
 const tests = [
   {
     user: owner.username,
-    userId: '1',
+    userId: String(_.random(999999, false)),
     points: 10,
     command: '!me',
     price: 15,
@@ -23,7 +24,7 @@ const tests = [
   },
   {
     user: user.username,
-    userId: '2',
+    userId: String(_.random(999999, false)),
     points: 15,
     command: '!me',
     price: 15,
@@ -32,7 +33,7 @@ const tests = [
   },
   {
     user: user.username,
-    userId: '2',
+    userId: String(_.random(999999, false)),
     points: 10,
     command: '!me',
     price: 15,
@@ -41,7 +42,7 @@ const tests = [
   },
   {
     user: user.username,
-    userId: '2',
+    userId: String(_.random(999999, false)),
     points: 20,
     command: '!me',
     price: 15,
