@@ -5,7 +5,8 @@ const _ = require('lodash')
 const Parser = require('./parser')
 
 var workerIsFree = {
-  message: true
+  message: true,
+  db: true
 }
 
 cluster()
@@ -52,8 +53,43 @@ function cluster () {
           await message(data)
           workerIsFree.message = true
           break
+        case 'db':
+          workerIsFree.db = false
+          switch (data.fnc) {
+            case 'find':
+              data.items = await global.db.engine.find(data.table, data.where)
+              break
+            case 'findOne':
+              data.items = await global.db.engine.findOne(data.table, data.where)
+              break
+            case 'increment':
+              data.items = await global.db.engine.increment(data.table, data.where, data.object)
+              break
+            case 'incrementOne':
+              data.items = await global.db.engine.incrementOne(data.table, data.where, data.object)
+              break
+            case 'insert':
+              data.items = await global.db.engine.insert(data.table, data.object)
+              break
+            case 'remove':
+              data.items = await global.db.engine.remove(data.table, data.where)
+              break
+            case 'update':
+              data.items = await global.db.engine.update(data.table, data.where, data.object)
+              break
+            case 'index':
+              data.items = await global.db.engine.index(data.opts)
+              break
+            case 'count':
+              data.items = await global.db.engine.count(data.table, data.where, data.object)
+              break
+            default:
+              global.log.error('This db call is not correct')
+              global.log.error(data)
+          }
+          if (process.send) process.send(data)
+          workerIsFree.db = true
       }
-      if (process.send) process.send(data)
     })
 
     if (process.env.HEAP && process.env.HEAP.toLowerCase() === 'true') {

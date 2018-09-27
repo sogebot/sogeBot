@@ -1,16 +1,16 @@
 const _ = require('lodash')
-const crypto = require('crypto')
 const cluster = require('cluster')
+const crypto = require('crypto')
 
 const Interface = require('./interface')
 
-class IWorkerController extends Interface {
+class IMasterController extends Interface {
   constructor () {
-    super('worker')
+    super('master')
 
     this.timeouts = {}
 
-    process.on('message', (message) => {
+    cluster.on('message', (worker, message) => {
       if (message.type !== 'db') return
       this.data.push({
         id: message.id,
@@ -26,8 +26,15 @@ class IWorkerController extends Interface {
   }
 
   async connect () {
-    this.connected = !_.isEmpty(await this.checkConnection())
-    if (!this.connected) return setTimeout(() => this.connect(), 1000) // re-do on first error
+    let allOnline = true
+    for (let worker in cluster.workers) {
+      if (!cluster.workers[worker].isConnected()) {
+        allOnline = false
+        break
+      }
+    }
+    if (!(await this.checkConnection()) || !allOnline) return setTimeout(() => this.connect(), 1000) // re-do on first error
+    else this.connected = allOnline
   }
 
   async checkConnection () {
@@ -48,8 +55,9 @@ class IWorkerController extends Interface {
     delete this.timeouts[`sendRequest-${id}`]
 
     try {
-      data.clusterId = cluster.worker.id
-      process.send(data)
+      const worker = _.sample(cluster.workers)
+      if (!worker.isConnected()) throw new Error('Worker is not connected')
+      worker.send(data)
       this.returnData(resolve, reject, id)
     } catch (e) {
       setTimeout(() => this.sendRequest(resolve, reject, id, data), 100)
@@ -150,4 +158,4 @@ class IWorkerController extends Interface {
   }
 }
 
-module.exports = IWorkerController
+module.exports = IMasterController
