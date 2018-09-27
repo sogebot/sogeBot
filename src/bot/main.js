@@ -32,11 +32,12 @@ global.status = { // TODO: move it?
 
 require('./logging') // logger is on master / worker have own global.log sending data through process
 
+const isNeDB = config.database.type === 'nedb'
 if (cluster.isWorker) {
-  global.db = new (require('./databases/database'))(false, false)
+  global.db = new (require('./databases/database'))(isNeDB, isNeDB)
   require('./cluster.js')
 } else if (cluster.isMaster) {
-  global.db = new (require('./databases/database'))(true, true)
+  global.db = new (require('./databases/database'))(!isNeDB, !isNeDB)
   // spin up forks first
   global.cpu = config.cpu === 'auto' ? os.cpus().length : parseInt(_.get(config, 'cpu', 1), 10)
   if (config.database.type === 'nedb') global.cpu = 1 // nedb can have only one fork
@@ -165,41 +166,7 @@ function forkOn (worker) {
   if (!global.db.engine.connected || !(global.lib && global.lib.translate)) return setTimeout(() => forkOn(worker), 1000)
   // processing messages from workers
   worker.on('message', async (msg) => {
-    if (msg.type === 'db') {
-      switch (msg.fnc) {
-        case 'find':
-          msg.items = await global.db.engine.find(msg.table, msg.where)
-          break
-        case 'findOne':
-          msg.items = await global.db.engine.findOne(msg.table, msg.where)
-          break
-        case 'increment':
-          msg.items = await global.db.engine.increment(msg.table, msg.where, msg.object)
-          break
-        case 'incrementOne':
-          msg.items = await global.db.engine.incrementOne(msg.table, msg.where, msg.object)
-          break
-        case 'insert':
-          msg.items = await global.db.engine.insert(msg.table, msg.object)
-          break
-        case 'remove':
-          msg.items = await global.db.engine.remove(msg.table, msg.where)
-          break
-        case 'update':
-          msg.items = await global.db.engine.update(msg.table, msg.where, msg.object)
-          break
-        case 'index':
-          msg.items = await global.db.engine.index(msg.opts)
-          break
-        case 'count':
-          msg.items = await global.db.engine.count(msg.table, msg.where, msg.object)
-          break
-        default:
-          global.log.error('This db call is not correct')
-          global.log.error(msg)
-      }
-      if (cluster.workers[msg.clusterId]) cluster.workers[msg.clusterId].send(msg)
-    } else if (msg.type === 'lang') {
+    if (msg.type === 'lang') {
       for (let worker in cluster.workers) cluster.workers[worker].send({ type: 'lang' })
       await global.lib.translate._load()
     } else if (msg.type === 'call') {
