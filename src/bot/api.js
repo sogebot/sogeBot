@@ -151,9 +151,7 @@ class API {
     const url = `https://api.twitch.tv/kraken/channels/${cid}/subscriptions?limit=100`
 
     const token = await global.oauth.settings.broadcaster.accessToken
-    if (token === '') return
-
-    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays)
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     if (needToWait) {
       this.timeouts['getChannelSubscribersOldAPI'] = setTimeout(() => this.getChannelSubscribersOldAPI(), 1000)
       return
@@ -216,9 +214,7 @@ class API {
     const url = `https://api.twitch.tv/kraken/channels/${cid}`
 
     const token = await global.oauth.settings.bot.accessToken
-    if (token === '') return
-
-    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays)
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     if (needToWait) {
       this.timeouts['getChannelDataOldAPI'] = setTimeout(() => this.getChannelDataOldAPI(opts), 1000)
       return
@@ -305,9 +301,7 @@ class API {
     const url = `https://api.twitch.tv/helix/users/?id=${cid}`
 
     const token = await global.oauth.settings.bot.accessToken
-    if (token === '') return
-
-    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays)
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
       this.timeouts['updateChannelViews'] = setTimeout(() => this.updateChannelViews(), 1000)
@@ -344,9 +338,7 @@ class API {
     const url = `https://api.twitch.tv/helix/users/follows?to_id=${cid}&first=100`
 
     const token = await global.oauth.settings.bot.accessToken
-    if (token === '') return
-
-    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays)
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
       this.timeouts['getLatest100Followers'] = setTimeout(() => this.getLatest100Followers(), 1000)
@@ -446,9 +438,6 @@ class API {
     var request
     const url = `https://api.twitch.tv/helix/games?id=${gid}`
 
-    const token = await global.oauth.settings.bot.accessToken
-    if (token === '') return ''
-
     if (gid.toString().trim().length === 0 || parseInt(gid, 10) === 0) return '' // return empty game if gid is empty
 
     let cache = await global.db.engine.findOne('cache', { upsert: true })
@@ -458,6 +447,8 @@ class API {
     if (!_.isNil(gids[gid])) return gids[gid]
 
     try {
+      const token = await global.oauth.settings.bot.accessToken
+      if (token === '') throw new Error('token not available')
       request = await axios.get(url, {
         headers: {
           'Authorization': 'Bearer ' + token
@@ -485,9 +476,7 @@ class API {
     const url = `https://api.twitch.tv/helix/streams?user_id=${cid}`
 
     const token = await global.oauth.settings.bot.accessToken
-    if (token === '') return
-
-    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays)
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
       this.timeouts['getCurrentStreamData'] = setTimeout(() => this.getCurrentStreamData(opts), 1000)
@@ -660,9 +649,7 @@ class API {
     const url = `https://api.twitch.tv/kraken/channels/${cid}`
 
     const token = await global.oauth.settings.bot.accessToken
-    if (token === '') return
-
-    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays)
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     if (needToWait) {
       this.timeouts['setTitleAndGame'] = setTimeout(() => this.setTitleAndGame(sender, args), 1000)
       return
@@ -833,9 +820,7 @@ class API {
     const url = `https://api.twitch.tv/helix/clips?broadcaster_id=${cid}`
 
     const token = await global.oauth.settings.bot.accessToken
-    if (token === '') return
-
-    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays)
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
       this.timeouts['createClip'] = setTimeout(() => this.createClip(opts), 1000)
@@ -910,9 +895,7 @@ class API {
     const url = `https://api.twitch.tv/helix/users/follows?from_id=${user.id}&to_id=${cid}`
 
     const token = await global.oauth.settings.bot.accessToken
-    if (token === '') return
-
-    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || clientId === ''
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === '' || clientId === ''
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
       this.timeouts['isFollowerUpdate-' + user.id] = setTimeout(() => this.isFollowerUpdate(user), 1000)
