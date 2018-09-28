@@ -308,9 +308,11 @@ class Moderation extends System {
     ])
 
     let emotesCharList = []
-    for (let emote of opts.sender.emotes) {
-      for (let i of _.range(parseInt(emote.start, 10), parseInt(emote.end, 10) + 1)) {
-        emotesCharList.push(i)
+    if (Symbol.iterator in Object(opts.sender.emotes)) {
+      for (let emote of opts.sender.emotes) {
+        for (let i of _.range(parseInt(emote.start, 10), parseInt(emote.end, 10) + 1)) {
+          emotesCharList.push(i)
+        }
       }
     }
 
@@ -395,6 +397,7 @@ class Moderation extends System {
   }
 
   async emotes (opts) {
+    if (!(Symbol.iterator in Object(opts.sender.emotes))) return
     let [isEnabled, isEnabledForSubs, isOwner, isMod, timeout, maxCount] = await Promise.all([
       this.settings.emotes.enabled,
       this.settings.emotes.moderateSubscribers,
