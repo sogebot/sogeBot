@@ -143,7 +143,7 @@ class Webhooks {
       // user doesn't exist - get username from api GET https://api.twitch.tv/helix/users?id=<user ID>
       let userGetFromApi = await axios.get(`https://api.twitch.tv/helix/users?id=${fid}`, {
         headers: {
-          'Authorization': 'OAuth ' + token
+          'Authorization': 'Bearer ' + token
         }
       })
 
