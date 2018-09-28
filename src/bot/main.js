@@ -118,9 +118,9 @@ function forkOn (worker) {
       for (let time of global.avgResponse) avgTime += parseInt(time, 10)
       global.status['RES'] = (avgTime / global.avgResponse.length).toFixed(0)
     } else if (msg.type === 'say') {
-      global.commons.message('say', await global.oauth.settings.broadcaster.username, msg.message)
+      global.commons.message('say', await global.oauth.settings.general.channel, msg.message)
     } else if (msg.type === 'me') {
-      global.commons.message('me', await global.oauth.settings.broadcaster.username, msg.message)
+      global.commons.message('me', await global.oauth.settings.general.channel, msg.message)
     } else if (msg.type === 'whisper') {
       global.commons.message('whisper', msg.sender, msg.message)
     } else if (msg.type === 'parse') {

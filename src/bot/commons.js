@@ -171,7 +171,11 @@ Commons.prototype.message = function (type, username, message, retry) {
   if (cluster.isWorker && process.send) process.send({ type: type, sender: username, message: message })
   else if (cluster.isMaster) {
     try {
-      global.tmi.client.bot.chat[type](username, message)
+      if (username === '') {
+        global.log.error('TMI: channel is not defined, message cannot be sent')
+      } else {
+        global.tmi.client.bot.chat[type](username, message)
+      }
     } catch (e) {
       if (_.isNil(retry)) setTimeout(() => this.message(type, username, message, false), 5000)
       else global.log.error(e)
