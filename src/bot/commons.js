@@ -157,20 +157,21 @@ Commons.prototype.sendMessage = async function (message, sender, attr) {
     } else {
       global.log.chatOut(message, { username: sender.username })
       if ((await global.configuration.getValue('sendWithMe')) && !message.startsWith('/')) {
-        global.commons.message('me', global.commons.getBroadcaster(), message)
+        global.commons.message('me', null, message)
       } else {
-        global.commons.message('say', global.commons.getBroadcaster(), message)
+        global.commons.message('say', null, message)
       }
     }
   }
   return true
 }
 
-Commons.prototype.message = function (type, username, message, retry) {
+Commons.prototype.message = async function (type, username, message, retry) {
   if (config.debug.console) return
   if (cluster.isWorker && process.send) process.send({ type: type, sender: username, message: message })
   else if (cluster.isMaster) {
     try {
+      if (username === null) username = await global.oauth.settings.general.channel
       if (username === '') {
         global.log.error('TMI: channel is not defined, message cannot be sent')
       } else {

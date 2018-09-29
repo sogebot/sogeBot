@@ -10,6 +10,7 @@ const constants = require('./constants')
 
 class OAuth extends Core {
   timeouts: Object = {}
+  currentChannel: string = ''
 
   constructor () {
     const settings = {
@@ -18,6 +19,7 @@ class OAuth extends Core {
         bot: '',
         clientId: '',
         botId: '',
+        broadcasterId: '',
         channelId: ''
       },
       general: {
@@ -111,7 +113,22 @@ class OAuth extends Core {
     this.addMenu({ category: 'settings', name: 'core', id: 'core' })
     this.validateOAuth('bot')
     this.validateOAuth('broadcaster')
+    this.getChannelId()
     this.sendDataToClusters()
+  }
+
+  async getChannelId () {
+    clearTimeout(this.timeouts['getChannelId'])
+
+    const channel = await this.settings.general.channel
+    if (this.currentChannel !== channel && channel !== '') {
+      this.currentChannel = channel
+      const cid = await global.users.getIdFromTwitch(channel)
+      this.settings._.channelId = cid
+      global.log.info('Channel ID set to ' + cid)
+    }
+
+    this.timeouts['getChannelId'] = setTimeout(() => this.getChannelId(), 10000)
   }
 
   async sendDataToClusters () {
@@ -162,11 +179,7 @@ class OAuth extends Core {
       this.settings._.clientId = request.data.client_id
 
       if (type === 'bot') this.settings._.botId = request.data.user_id
-      else {
-        const currentChannelId = await this.settings._.channelId
-        if (currentChannelId !== request.data.user_id) global.log.info('Broadcaster channel ID set to ' + request.data.user_id)
-        this.settings._.channelId = request.data.user_id
-      }
+      else this.settings._.broadcasterId = request.data.user_id
 
       this.settings[type]._authenticatedScopes = request.data.scopes
       this.settings[type].username = request.data.login
