@@ -440,12 +440,16 @@ class Message {
               'Authorization': 'OAuth ' + token
             }
           })
+
           const channelId = request.data.users[0]._id
           request = await axios.get(`https://api.twitch.tv/helix/streams?user_id=${channelId}`, {
             headers: {
               'Authorization': 'Bearer ' + token
             }
           })
+          // save remaining api calls
+          global.api.remainingAPICalls = request.headers['ratelimit-remaining']
+          global.api.refreshAPICalls = request.headers['ratelimit-reset']
           return request.data.data[0].title
         } catch (e) { return 'n/a' } // return nothing on error
       },
@@ -468,6 +472,9 @@ class Message {
               'Authorization': 'Bearer ' + token
             }
           })
+          // save remaining api calls
+          global.api.remainingAPICalls = request.headers['ratelimit-remaining']
+          global.api.refreshAPICalls = request.headers['ratelimit-reset']
           return request.data.data[0].viewer_count
         } catch (e) { return '0' } // return nothing on error
       }

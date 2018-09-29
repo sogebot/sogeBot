@@ -288,7 +288,12 @@ class Users extends Core {
     */
 
     const token = await global.oauth.settings.bot.accessToken
-    if (token === '') return null
+    const needToWait = token === ''
+    const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
+    if (needToWait || notEnoughAPICalls) {
+      setTimeout(() => this.getIdFromTwitch(username), 1000)
+      return
+    }
 
     try {
       request = await axios.get(url, {
@@ -296,9 +301,18 @@ class Users extends Core {
           'Authorization': 'Bearer ' + token
         }
       })
+
+      // save remaining api calls
+      // $FlowFixMe error with flow on request.headers
+      global.api.remainingAPICalls = request.headers['ratelimit-remaining']
+      // $FlowFixMe error with flow on request.headers
+      global.api.refreshAPICalls = request.headers['ratelimit-reset']
+
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: global.api.remainingAPICalls })
+
       return request.data.data[0].id
     } catch (e) {
-      return null
+      global.panel.io.emit('api.stats', { data: {}, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.stack, remaining: global.api.remainingAPICalls })
     }
   }
 
