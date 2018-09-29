@@ -13,6 +13,7 @@ const Core = require('./_interface')
 class Users extends Core {
   uiSortCache: String | null = null
   uiSortCacheViewers: Array<Object> = []
+  newChattersList: Array<string> = []
 
   constructor () {
     const settings = {
@@ -170,6 +171,15 @@ class Users extends Core {
     } else return global.db.engine.update('users', { id: user.id }, object)
   }
 
+  async checkNewChatter (id: string, username: string) {
+    let watched = await this.getWatchedOf(id)
+    // add user as a new chatter in a stream
+    if (watched === 0 && !this.newChattersList.includes(username)) {
+      await global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
+      this.newChattersList.push(username.toLowerCase())
+    }
+  }
+
   async updateWatchTime () {
     clearTimeout(this.timeouts['updateWatchTime'])
 
@@ -180,9 +190,11 @@ class Users extends Core {
         let users = await global.db.engine.find('users.online')
         let updated = []
         for (let onlineUser of users) {
+          const isNewUser = typeof this.watchedList[onlineUser.username] === 'undefined'
           updated.push(onlineUser.username)
-          const watched = typeof this.watchedList[onlineUser.username] === 'undefined' ? timeout : new Date().getTime() - new Date(this.watchedList[onlineUser.username]).getTime()
+          const watched = isNewUser ? timeout : new Date().getTime() - new Date(this.watchedList[onlineUser.username]).getTime()
           const id = await global.users.getIdByName(onlineUser.username)
+          if (isNewUser) this.checkNewChatter(id, onlineUser.username)
           await global.db.engine.insert('users.watched', { id, watched })
           this.watchedList[onlineUser.username] = new Date()
         }
@@ -191,7 +203,10 @@ class Users extends Core {
         for (let u of Object.entries(this.watchedList)) {
           if (!updated.includes(u[0])) delete this.watchedList[u[0]]
         }
-      } else throw Error('stream offline')
+      } else {
+        global.users.newChattersList = []
+        throw Error('stream offline')
+      }
     } catch (e) {
       this.watchedList = {}
       timeout = 1000
