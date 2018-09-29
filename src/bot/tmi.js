@@ -60,6 +60,7 @@ class TMI extends Core {
     if (typeof this.client[type] !== 'undefined') {
       global.log.info(`TMI: ${type} is reconnecting caused by scope or oauth change`)
       this.client[type].chat.disconnect()
+      this.client[type] = null
     }
     this.initClient(type)
   }
@@ -95,7 +96,7 @@ class TMI extends Core {
           message.tags['message-type'] = message.message.startsWith('\u0001ACTION') ? 'action' : 'say' // backward compatibility for /me moderation
 
           if (message.event === 'CHEER') {
-            this.cheer(message.tags, message.message)
+            this.cheer(message)
           } else {
             // strip message from ACTION
             message.message = message.message.replace('\u0001ACTION ', '').replace('\u0001', '')
@@ -156,22 +157,13 @@ class TMI extends Core {
           global.overlays.eventlist.add(data)
           global.events.fire('raided', data)
         } else if (message.event === 'SUBSCRIPTION') {
-          const method = {
-            plan: message.parameters.subPlan === 'Prime' ? 1000 : message.parameters.subPlan,
-            prime: message.parameters.subPlan === 'Prime' ? 'Prime' : false
-          }
-          this.subscription(message.tags.displayName.toLowerCase(), message.tags, method)
+          this.subscription(message)
         } else if (message.event === 'RESUBSCRIPTION') {
-          message.tags.username = message.tags.displayName.toLowerCase()
-          const method = {
-            plan: message.parameters.subPlan === 'Prime' ? 1000 : message.parameters.subPlan,
-            prime: message.parameters.subPlan === 'Prime' ? 'Prime' : false
-          }
-          this.resub(message.tags.username, Number(message.parameters.months), message.message, message.tags, method)
+          this.resub(message)
         } else if (message.event === 'SUBSCRIPTION_GIFT') {
-          this.subgift(message.tags.displayName.toLowerCase(), Number(message.parameters.months), message.parameters.recipientName)
+          this.subgift(message)
         } else if (message.event === 'SUBSCRIPTION_GIFT_COMMUNITY') {
-          this.subscriptionGiftCommunity(message.tags.displayName.toLowerCase(), Number(message.parameters.senderCount), Number(message.parameters.subPlan))
+          this.subscriptionGiftCommunity(message)
         } else if (message.event === 'RITUAL') {
           if (message.parameters.ritualName === 'new_chatter') {
             if (!global.users.newChattersList.includes(message.tags.displayName.toLowerCase())) {
@@ -228,93 +220,143 @@ class TMI extends Core {
     else this.timeouts['sendMessageToWorker'] = setTimeout(() => this.sendMessageToWorker(sender, message), 100)
   }
 
-  async subscription (username: string, userstate: Object, method: Object) {
-    if (await global.commons.isIgnored(username)) return
+  async subscription (message: Object) {
+    try {
+      const username = message.tags.username || message.tags.displayName.toLowerCase()
+      const method = this.getMethod(message)
+      const userstate = message.tags
 
-    const user = await global.db.engine.findOne('users', { id: userstate.userId })
-    let subscribedAt = _.now()
-    let isSubscriber = true
+      if (await global.commons.isIgnored(username)) return
 
-    if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
-    if (user.lock && user.lock.subscriber) isSubscriber = undefined
-
-    global.users.setById(userstate.userId, { username, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
-    global.overlays.eventlist.add({ type: 'sub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
-    global.log.sub(`${username}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
-    global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
-  }
-
-  async resub (username: string, months: number, message: string, userstate: Object, method: Object) {
-    if (await global.commons.isIgnored(username)) return
-
-    const user = await global.db.engine.findOne('users', { id: userstate.userId })
-    let subscribedAt = Number(moment().subtract(months, 'months').format('X')) * 1000
-    let isSubscriber = true
-
-    if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
-    if (user.lock && user.lock.subscriber) isSubscriber = undefined
-
-    global.users.setById(userstate.userId, { username, id: userstate.userId, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
-    global.overlays.eventlist.add({ type: 'resub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: message })
-    global.log.resub(`${username}, months: ${months}, message: ${message}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
-    global.events.fire('resub', { username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: message })
-  }
-
-  async subscriptionGiftCommunity (username: string, count: number, plan: string | number) {
-    this.ignoreGiftsFromUser[username] = { count, time: new Date() }
-
-    if (await global.commons.isIgnored(username)) return
-
-    global.overlays.eventlist.add({ type: 'subcommunitygift', username, count })
-    global.events.fire('subcommunitygift', { username, count })
-    global.log.subcommunitygift(`${username}, to ${count} viewers`)
-  }
-
-  async subgift (username: string, months: number, recipient: string) {
-    recipient = recipient.toLowerCase()
-    for (let [u, o] of Object.entries(this.ignoreGiftsFromUser)) {
-      // $FlowFixMe Incorrect mixed type from value of Object.entries https://github.com/facebook/flow/issues/5838
-      if (o.count === 0 || new Date().getTime() - new Date(o.time).getTime() >= 1000 * 60 * 10) {
-        delete this.ignoreGiftsFromUser[u]
-      }
-    }
-
-    if (typeof this.ignoreGiftsFromUser[username] !== 'undefined' && this.ignoreGiftsFromUser[username].count !== 0) {
-      this.ignoreGiftsFromUser[username].count--
-    } else {
-      global.events.fire('subgift', { username: username, recipient: recipient })
-    }
-    if (await global.commons.isIgnored(username)) return
-
-    let user = await global.db.engine.findOne('users', { username: recipient })
-    if (!user.id) {
-      user.id = await global.users.getIdFromTwitch(recipient)
-    }
-
-    if (user.id !== null) {
+      const user = await global.db.engine.findOne('users', { id: userstate.userId })
       let subscribedAt = _.now()
       let isSubscriber = true
 
       if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
       if (user.lock && user.lock.subscriber) isSubscriber = undefined
 
-      global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt } })
-      global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months })
-      global.log.subgift(`${recipient}, from: ${username}, months: ${months}`)
+      global.users.setById(userstate.userId, { username, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
+      global.overlays.eventlist.add({ type: 'sub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
+      global.log.sub(`${username}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
+      global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
+    } catch (e) {
+      global.log.error('Error parsing subscription event')
+      global.log.errro(JSON.stringify(message))
     }
   }
 
-  async cheer (userstate: Object, message: string) {
-    // remove cheerX or channelCheerX from message
-    message = message.replace(/(.*?[cC]heer[\d]+)/g, '').trim()
+  async resub (message: Object) {
+    try {
+      const username = message.tags.username || message.tags.displayName.toLowerCase()
+      const method = this.getMethod(message)
+      const months = Number(message.parameters.months)
+      const userstate = message.tags
+      const messageFromUser = message.message
 
-    if (await global.commons.isIgnored(userstate.username)) return
+      if (await global.commons.isIgnored(username)) return
 
-    global.overlays.eventlist.add({ type: 'cheer', username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
-    global.log.cheer(`${userstate.username.toLowerCase()}, bits: ${userstate.bits}, message: ${message}`)
-    global.db.engine.insert('users.bits', { id: await global.users.getIdByName(userstate.username.toLowerCase()), amount: userstate.bits, message: message, timestamp: _.now() })
-    global.events.fire('cheer', { username: userstate.username.toLowerCase(), bits: userstate.bits, message: message })
-    if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
+      const user = await global.db.engine.findOne('users', { id: userstate.userId })
+      let subscribedAt = Number(moment().subtract(months, 'months').format('X')) * 1000
+      let isSubscriber = true
+
+      if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
+      if (user.lock && user.lock.subscriber) isSubscriber = undefined
+
+      global.users.setById(userstate.userId, { username, id: userstate.userId, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
+      global.overlays.eventlist.add({ type: 'resub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: messageFromUser })
+      global.log.resub(`${username}, months: ${months}, message: ${messageFromUser}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
+      global.events.fire('resub', { username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: messageFromUser })
+    } catch (e) {
+      global.log.error('Error parsing resub event')
+      global.log.errro(JSON.stringify(message))
+    }
+  }
+
+  async subscriptionGiftCommunity (message: Object) {
+    try {
+      const username = message.tags.username || message.tags.displayName.toLowerCase()
+      const count = Number(message.parameters.senderCount)
+      // const plan = message.parameters.subPlan
+
+      this.ignoreGiftsFromUser[username] = { count, time: new Date() }
+
+      if (await global.commons.isIgnored(username)) return
+
+      global.overlays.eventlist.add({ type: 'subcommunitygift', username, count })
+      global.events.fire('subcommunitygift', { username, count })
+      global.log.subcommunitygift(`${username}, to ${count} viewers`)
+    } catch (e) {
+      global.log.error('Error parsing subscriptionGiftCommunity event')
+      global.log.errro(JSON.stringify(message))
+    }
+  }
+
+  async subgift (message: Object) {
+    try {
+      const username = message.tags.username || message.tags.displayName.toLowerCase()
+      const months = Number(message.parameters.months)
+      const recipient = message.parameters.recipientName.toLowerCase()
+
+      for (let [u, o] of Object.entries(this.ignoreGiftsFromUser)) {
+        // $FlowFixMe Incorrect mixed type from value of Object.entries https://github.com/facebook/flow/issues/5838
+        if (o.count === 0 || new Date().getTime() - new Date(o.time).getTime() >= 1000 * 60 * 10) {
+          delete this.ignoreGiftsFromUser[u]
+        }
+      }
+
+      if (typeof this.ignoreGiftsFromUser[username] !== 'undefined' && this.ignoreGiftsFromUser[username].count !== 0) {
+        this.ignoreGiftsFromUser[username].count--
+      } else {
+        global.events.fire('subgift', { username: username, recipient: recipient })
+      }
+      if (await global.commons.isIgnored(username)) return
+
+      let user = await global.db.engine.findOne('users', { username: recipient })
+      if (!user.id) {
+        user.id = await global.users.getIdFromTwitch(recipient)
+      }
+
+      if (user.id !== null) {
+        let subscribedAt = _.now()
+        let isSubscriber = true
+
+        if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
+        if (user.lock && user.lock.subscriber) isSubscriber = undefined
+
+        global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt } })
+        global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months })
+        global.log.subgift(`${recipient}, from: ${username}, months: ${months}`)
+      }
+    } catch (e) {
+      global.log.error('Error parsing subgift event')
+      global.log.errro(JSON.stringify(message))
+    }
+  }
+
+  async cheer (message: Object) {
+    try {
+      const userstate = message.tags
+      // remove cheerX or channelCheerX from message
+      const messageFromUser = message.message.replace(/(.*?[cC]heer[\d]+)/g, '').trim()
+
+      if (await global.commons.isIgnored(userstate.username)) return
+
+      global.overlays.eventlist.add({ type: 'cheer', username: userstate.username.toLowerCase(), bits: userstate.bits, message: messageFromUser })
+      global.log.cheer(`${userstate.username.toLowerCase()}, bits: ${userstate.bits}, message: ${messageFromUser}`)
+      global.db.engine.insert('users.bits', { id: await global.users.getIdByName(userstate.username.toLowerCase()), amount: userstate.bits, message: messageFromUser, timestamp: _.now() })
+      global.events.fire('cheer', { username: userstate.username.toLowerCase(), bits: userstate.bits, message: messageFromUser })
+      if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
+    } catch (e) {
+      global.log.error('Error parsing cheer event')
+      global.log.errro(JSON.stringify(message))
+    }
+  }
+
+  getMethod (message: Object) {
+    return {
+      plan: message.parameters.subPlan === 'Prime' ? 1000 : message.parameters.subPlan,
+      prime: message.parameters.subPlan === 'Prime' ? 'Prime' : false
+    }
   }
 }
 
