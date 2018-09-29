@@ -153,7 +153,7 @@ class Credits {
   async getTopClips () {
     const period = _.includes(['day', 'week', 'month', 'all'], await await global.configuration.getValue('creditsTopClipsPeriod')) ? await global.configuration.getValue('creditsTopClipsPeriod') : 'day'
     const count = await await global.configuration.getValue('creditsTopClipsCount')
-    const channel = await global.oauth.settings.broadcaster.username
+    const channel = await global.oauth.settings.general.channel
 
     const token = await global.oauth.settings.bot.accessToken
     if (token === '') return
