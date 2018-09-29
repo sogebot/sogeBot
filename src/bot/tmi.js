@@ -174,7 +174,10 @@ class TMI extends Core {
           this.subscriptionGiftCommunity(message.tags.displayName.toLowerCase(), Number(message.parameters.senderCount), Number(message.parameters.subPlan))
         } else if (message.event === 'RITUAL') {
           if (message.parameters.ritualName === 'new_chatter') {
-            global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
+            if (!global.users.newChattersList.includes(message.tags.displayName.toLowerCase())) {
+              global.users.newChattersList.push(message.tags.displayName.toLowerCase())
+              global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
+            }
           } else {
             global.log.info('Unknown RITUAL')
           }
