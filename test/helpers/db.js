@@ -61,6 +61,9 @@ module.exports = {
       await global.db.engine.remove('events.filters', {})
       await global.db.engine.remove('events.operations', {})
 
+      global.oauth.settings.general.channel = 'soge__'
+      await variable.isEqual('global.oauth.settings.general.channel', 'soge__')
+
       global.oauth.settings.general.owners = ['soge__']
       global.commons.cached.owners = ['soge__']
       await variable.isEqual('global.oauth.settings.general.owners', ['soge__'])

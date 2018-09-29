@@ -36,7 +36,7 @@ Commons.prototype.processAll = function (proc) {
     // send to all clusters
     // eslint-disable-next-line
     for (let w of Object.entries(cluster.workers)) {
-      w[1].send(proc)
+      if (w[1].isConnected()) w[1].send(proc)
     }
   } else {
     // need to be sent to master
