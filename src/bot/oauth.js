@@ -118,6 +118,7 @@ class OAuth extends Core {
   }
 
   async getChannelId () {
+    if (cluster.isWorker || global.mocha) return
     clearTimeout(this.timeouts['getChannelId'])
 
     const channel = await this.settings.general.channel
@@ -126,6 +127,8 @@ class OAuth extends Core {
       const cid = await global.users.getIdFromTwitch(channel)
       this.settings._.channelId = cid
       global.log.info('Channel ID set to ' + cid)
+      global.tmi.reconnect('bot')
+      global.tmi.reconnect('broadcaster')
     }
 
     this.timeouts['getChannelId'] = setTimeout(() => this.getChannelId(), 10000)
