@@ -8,8 +8,8 @@ class API {
     if (cluster.isMaster) {
       this.timeouts = {}
 
-      this.remainingAPICalls = 30
-      this.refreshAPICalls = _.now() / 1000
+      this.remainingAPICalls = 0
+      this.refreshAPICalls = (_.now() / 1000) + 90
       this.rate_limit_follower_check = new Set()
 
       this.chatMessagesAtStart = global.linesParsed
@@ -93,11 +93,11 @@ class API {
     var request
     try {
       request = await axios.get(url)
-      global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: request.status })
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: request.status })
       opts.saveToWidget = true
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: e.stack })
       this.timeouts['getChannelChattersUnofficialAPI'] = setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
       return
     }
@@ -166,7 +166,7 @@ class API {
           'Authorization': 'OAuth ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: request.status })
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: request.status })
 
       this.retries.getChannelSubscribersOldAPI = 0 // reset retry
 
@@ -199,7 +199,7 @@ class API {
       } else {
         timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
         global.log.error(`${url} - ${e.message}`)
-        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
+        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: e.stack })
       }
     }
     if (timeout !== 0) {
@@ -229,7 +229,7 @@ class API {
           'Authorization': 'OAuth ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status })
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status })
 
       if (!this.gameOrTitleChangedManually) {
         // Just polling update
@@ -259,7 +259,7 @@ class API {
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: e.stack })
     }
     this.timeouts['getChannelDataOldAPI'] = setTimeout(() => this.getChannelDataOldAPI({ forceUpdate: false }), timeout)
   }
@@ -279,7 +279,7 @@ class API {
     let timeout = 30000
     try {
       request = await axios.get(url)
-      global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status })
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status })
 
       await global.db.engine.update('api.current', { key: 'hosts' }, { value: request.data.hosts.length })
 
@@ -290,7 +290,7 @@ class API {
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: e.stack })
     }
     this.timeouts['getChannelHosts'] = setTimeout(() => this.getChannelHosts(), timeout)
   }
@@ -316,7 +316,7 @@ class API {
           'Authorization': 'Bearer ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
 
       // save remaining api calls
       this.remainingAPICalls = request.headers['ratelimit-remaining']
@@ -326,7 +326,7 @@ class API {
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: this.remainingAPICalls })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: e.stack, remaining: this.remainingAPICalls })
     }
     this.timeouts['updateChannelViews'] = setTimeout(() => this.updateChannelViews(), timeout)
   }
@@ -353,7 +353,7 @@ class API {
           'Authorization': 'Bearer ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
 
       // save remaining api calls
       this.remainingAPICalls = request.headers['ratelimit-remaining']
@@ -383,7 +383,7 @@ class API {
           this.remainingAPICalls = usersFromApi.headers['ratelimit-remaining']
           this.refreshAPICalls = usersFromApi.headers['ratelimit-reset']
 
-          global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.status, remaining: this.remainingAPICalls })
+          global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.status, remaining: this.remainingAPICalls })
           for (let follower of usersFromApi.data.data) {
             followersUsername.push(follower.login.toLowerCase())
             await global.db.engine.update('users', { username: follower.login.toLowerCase() }, { id: follower.id })
@@ -429,22 +429,21 @@ class API {
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: this.remainingAPICalls })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.stack, remaining: this.remainingAPICalls })
     }
     this.timeouts['getLatest100Followers'] = setTimeout(() => this.getLatest100Followers(timeout === 1000), timeout)
   }
 
-  async getGameFromId (gid) {
+  async getGameFromId (id) {
     var request
-    const url = `https://api.twitch.tv/helix/games?id=${gid}`
+    const url = `https://api.twitch.tv/helix/games?id=${id}`
 
-    if (gid.toString().trim().length === 0 || parseInt(gid, 10) === 0) return '' // return empty game if gid is empty
+    if (id.toString().trim().length === 0 || parseInt(id, 10) === 0) return '' // return empty game if gid is empty
 
-    let cache = await global.db.engine.findOne('cache', { upsert: true })
-    let gids = _.get(cache, 'gidToGame', {})
+    let gameFromDb = await global.db.engine.findOne('core.api.games', { id })
 
     // check if id is cached
-    if (!_.isNil(gids[gid])) return gids[gid]
+    if (!_.isEmpty(gameFromDb)) return gameFromDb.name
 
     try {
       const token = await global.oauth.settings.bot.accessToken
@@ -454,17 +453,17 @@ class API {
           'Authorization': 'Bearer ' + token
         }
       })
-      if (cluster.isMaster) global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+      if (cluster.isMaster) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
 
       // add id->game to cache
-      gids[gid] = request.data.data[0].name
-      await global.db.engine.update('cache', { key: 'gidToGame' }, { gidToGame: gids })
-      return request.data.data[0].name
+      const name = request.data.data[0].name
+      await global.db.engine.insert('core.api.games', { id, name })
+      return name
     } catch (e) {
       const game = await global.db.engine.findOne('api.current', { key: 'game' })
-      global.log.warning(`Couldn't find name of game for gid ${gid} - fallback to ${game.value}`)
+      global.log.warning(`Couldn't find name of game for gid ${id} - fallback to ${game.value}`)
       global.log.error(`API: ${url} - ${e.stack}`)
-      if (cluster.isMaster) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: this.remainingAPICalls })
+      if (cluster.isMaster) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.stack, remaining: this.remainingAPICalls })
       return game.value
     }
   }
@@ -491,7 +490,7 @@ class API {
           'Authorization': 'Bearer ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
 
       // save remaining api calls
       this.remainingAPICalls = request.headers['ratelimit-remaining']
@@ -586,7 +585,7 @@ class API {
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: this.remainingAPICalls })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.stack, remaining: this.remainingAPICalls })
     }
     this.timeouts['getCurrentStreamData'] = setTimeout(() => this.getCurrentStreamData(opts), timeout)
   }
@@ -683,10 +682,10 @@ class API {
           'Authorization': 'OAuth ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: request.status })
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.stack}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: e.stack })
       return
     }
 
@@ -736,10 +735,10 @@ class API {
           'Authorization': 'OAuth ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: request.status })
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.stack}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: e.stack })
       return
     }
 
@@ -783,7 +782,12 @@ class API {
           'Authorization': 'Bearer ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
+
+      // save remaining api calls
+      this.remainingAPICalls = request.headers['ratelimit-remaining']
+      this.refreshAPICalls = request.headers['ratelimit-reset']
+
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
 
       for (let clip of request.data.data) {
         // clip found in twitch api
@@ -791,7 +795,7 @@ class API {
       }
     } catch (e) {
       global.log.error(`API: ${url} - ${e.stack}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.stack })
     }
     this.timeouts['checkClips'] = setTimeout(() => this.checkClips(), 1000)
   }
@@ -836,10 +840,15 @@ class API {
           'Authorization': 'Bearer ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
+
+      // save remaining api calls
+      this.remainingAPICalls = request.headers['ratelimit-remaining']
+      this.refreshAPICalls = request.headers['ratelimit-reset']
+
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.stack}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: e.stack })
       return
     }
     const clipId = request.data.data[0].id
@@ -891,12 +900,11 @@ class API {
     clearTimeout(this.timeouts['isFollowerUpdate-' + user.id])
 
     const cid = await global.oauth.settings._.channelId
-    const clientId = await global.oauth.settings._.clientId
     const url = `https://api.twitch.tv/helix/users/follows?from_id=${user.id}&to_id=${cid}`
 
     const token = await global.oauth.settings.bot.accessToken
-    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === '' || clientId === ''
-    const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
+    const needToWait = _.isNil(cid) || cid === '' || _.isNil(global.overlays) || token === ''
+    const notEnoughAPICalls = this.remainingAPICalls <= 40 && this.refreshAPICalls > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
       this.timeouts['isFollowerUpdate-' + user.id] = setTimeout(() => this.isFollowerUpdate(user), 1000)
       return
@@ -906,15 +914,18 @@ class API {
     try {
       request = await axios.get(url, {
         headers: {
-          'Accept': 'application/vnd.twitchtv.v5+json',
-          'Authorization': 'OAuth ' + token,
-          'Client-ID': clientId
+          'Authorization': 'Bearer ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: global.twitch.remainingAPICalls })
+
+      // save remaining api calls
+      this.remainingAPICalls = request.headers['ratelimit-remaining']
+      this.refreshAPICalls = request.headers['ratelimit-reset']
+
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.stack}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: global.twitch.remainingAPICalls })
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.stack, remaining: this.remainingAPICalls })
       return
     }
 

@@ -63,7 +63,8 @@ class Highlights extends System {
       const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`
 
       const needToWait = _.isNil(cid) || cid === ''
-      if (needToWait) {
+      const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
+      if (needToWait || notEnoughAPICalls) {
         setTimeout(() => this.highlight(opts), 1000)
         return
       }
@@ -80,6 +81,11 @@ class Highlights extends System {
             'Authorization': 'Bearer ' + token
           }
         })
+
+        // save remaining api calls
+        global.api.remainingAPICalls = request.headers['ratelimit-remaining']
+        global.api.refreshAPICalls = request.headers['ratelimit-reset']
+
         let highlight = request.data.data[0]
         let timestamp = moment.preciseDiff(moment().valueOf(), moment(when.online).valueOf(), true)
         highlight.timestamp = { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds }
@@ -87,10 +93,10 @@ class Highlights extends System {
         highlight.title = _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a')
 
         this.add(highlight, timestamp, opts.sender)
-        global.panel.io.emit('api.stats', { data: request.data.data, timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status, remaining: 'n/a' })
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: global.api.remainingAPICalls })
       } catch (e) {
         if (e.message !== ERROR_STREAM_NOT_ONLINE) {
-          global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: 'n/a' })
+          global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'highlights', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: global.api.remainingAPICalls })
           global.log.error(e.stack)
         }
         switch (e.message) {
