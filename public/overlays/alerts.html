@@ -160,6 +160,10 @@
       })
 
       function showText (id, text) {
+        if (typeof text.text === 'undefined') {
+          alertsQueue[id].finished++
+          return console.error('Text alert is missing text property')
+        }
         text.delay = _.isNil(text.delay) ? 0 : parseInt(text.delay, 10)
         text.time = _.isNil(text.time) ? 1000 : parseInt(text.time, 10) // how long to show
         text.duration = _.isNil(text.duration) ? 1000 : parseInt(text.duration) // how long to animate
