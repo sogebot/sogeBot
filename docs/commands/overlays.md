@@ -1,4 +1,3 @@
-## Overlays
 `!alert type=<image|audio|video|text|clip|html> duration=<default:1000> time=<default:1000> delay=<default:0> position=<default:center> volume=<default:100> x-offset=<default:0> y-offset=<default:0> size=<default:not-set> filters=<default:not-set> class=<default:not-set> text=<default:not-set> id=<default:not-set> url=<default:not-set>`
   - type - image, audio, video, text, html
   - duration - how long should be fadeIn animation in ms (default: 1000)

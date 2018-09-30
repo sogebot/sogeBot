@@ -21,6 +21,7 @@
   * [Points](commands/points.md)
   * [Price](commands/price.md)
   * [Songs](commands/songs.md)
+  * [Overlays](commands/overlays.md)
   * [Ranks](commands/ranks.md)
   * [Raffles](commands/raffles.md)
   * [Queue](commands/queue.md)

@@ -21,6 +21,7 @@
   * [Points](8.1.x/commands/points.md)
   * [Price](8.1.x/commands/price.md)
   * [Songs](8.1.x/commands/songs.md)
+  * [Overlays](8.1.x/commands/overlays.md)
   * [Ranks](8.1.x/commands/ranks.md)
   * [Raffles](8.1.x/commands/raffles.md)
   * [Queue](8.1.x/commands/queue.md)
