@@ -37,7 +37,6 @@ class TMI extends Core {
 
     try {
       if (token === '' || username === '' || channel === '') throw Error(`${type} - token, username or channel expected`)
-      console.log(channel)
       this.client[type] = new TwitchJs({
         token,
         username,
