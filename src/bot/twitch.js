@@ -38,8 +38,10 @@ class Twitch {
       { this: this, id: '!top points', command: '!top points', fnc: this.showTopPoints, permission: constants.OWNER_ONLY },
       { this: this, id: '!top messages', command: '!top messages', fnc: this.showTopMessages, permission: constants.OWNER_ONLY },
       { this: this, id: '!top followage', command: '!top followage', fnc: this.showTopFollowAge, permission: constants.OWNER_ONLY },
-      { this: this, id: '!title', command: '!title', fnc: this.setTitle, permission: constants.OWNER_ONLY },
-      { this: this, id: '!game', command: '!game', fnc: this.setGame, permission: constants.OWNER_ONLY }
+      { this: this, id: '!title', command: '!title', fnc: this.getTitle, permission: constants.VIEWERS },
+      { this: this, id: '!title set', command: '!title set', fnc: this.setTitle, permission: constants.OWNER_ONLY },
+      { this: this, id: '!game', command: '!game', fnc: this.getGame, permission: constants.VIEWERS },
+      { this: this, id: '!game set', command: '!game set', fnc: this.setGame, permission: constants.OWNER_ONLY }
     ]
     return commands
   }
@@ -358,6 +360,11 @@ class Twitch {
     global.commons.sendMessage(message, opts.sender)
   }
 
+  async getTitle (opts) {
+    global.commons.sendMessage(global.translate('title.current')
+      .replace(/\$title/g, _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a')), opts.sender)
+  }
+
   async setTitle (opts) {
     if (opts.parameters.length === 0) {
       global.commons.sendMessage(global.translate('title.current')
@@ -366,6 +373,11 @@ class Twitch {
     }
     if (cluster.isMaster) global.api.setTitleAndGame(opts.sender, { title: opts.parameters })
     else if (process.send) process.send({ type: 'call', ns: 'api', fnc: 'setTitleAndGame', args: [opts.sender, { title: opts.parameters }] })
+  }
+
+  async getGame (opts) {
+    global.commons.sendMessage(global.translate('game.current')
+      .replace(/\$game/g, _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')), opts.sender)
   }
 
   async setGame (opts) {
