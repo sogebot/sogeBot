@@ -904,14 +904,14 @@
       "remove": "A jeje, $amount $pointsName bylo odebrano uzivateli $username!"
     },
     "failed": {
-      "set": "{core.command-parse} !points set [username] [amount]",
-      "give": "{core.command-parse} !points give [username] [amount]",
+      "set": "{core.command-parse} $command [username] [amount]",
+      "give": "{core.command-parse} $command [username] [amount]",
       "giveNotEnough": "Promin, $sender, ale nemas $amount $pointsName abys je daroval uzivateli $username",
-      "get": "{core.command-parse} !points get [username]",
-      "all": "{core.command-parse} !points all [amount]",
-      "rain": "{core.command-parse} !makeitrain [amount]",
-      "add": "{core.command-parse} !points add [username] [amount]",
-      "remove": "{core.command-parse} !points remove [username] [amount]"
+      "get": "{core.command-parse} $command [username]",
+      "all": "{core.command-parse} $command [amount]",
+      "rain": "{core.command-parse} $command [amount]",
+      "add": "{core.command-parse} $command [username] [amount]",
+      "remove": "{core.command-parse} $command [username] [amount]"
     },
     "defaults": {
       "pointsName": {
