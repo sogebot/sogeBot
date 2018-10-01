@@ -354,6 +354,7 @@
     // load up from db
     if (commons.urlParam('id')) {
       customVariablesEdit.socket.emit('load', commons.urlParam('id'), (data) => {
+        customVariablesEdit.id = commons.urlParam('id')
         customVariablesEdit.variableNameInitial = data.variableName
         customVariablesEdit.variableName = data.variableName
         customVariablesEdit.description = data.description
