@@ -291,8 +291,7 @@ class Users extends Core {
     const needToWait = token === ''
     const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
     if (needToWait || notEnoughAPICalls) {
-      setTimeout(() => this.getIdFromTwitch(username), 1000)
-      return
+      return null
     }
 
     try {
