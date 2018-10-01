@@ -39,7 +39,7 @@ class Webhooks {
   async subscribe (type) {
     clearTimeout(this.timeouts[`subscribe-${type}`])
 
-    const cid = await global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     const clientId = await global.oauth.settings._.clientId
     if (cid === '' || clientId === '') {
       this.timeouts[`subscribe-${type}`] = setTimeout(() => this.subscribe(type), 1000)
@@ -97,7 +97,7 @@ class Webhooks {
   }
 
   async event (aEvent, res) {
-    const cid = await global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
 
     // somehow stream doesn't have a topic
     if (_.get(aEvent, 'topic', null) === `https://api.twitch.tv/helix/users/follows?to_id=${cid}`) this.follower(aEvent) // follow
@@ -107,7 +107,7 @@ class Webhooks {
   }
 
   async challenge (req, res) {
-    const cid = await global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     // set webhooks enabled
     switch (req.query['hub.topic']) {
       case `https://api.twitch.tv/helix/users/follows?to_id=${cid}`:
@@ -123,7 +123,7 @@ class Webhooks {
   }
 
   async follower (aEvent) {
-    const cid = await global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     if (_.isEmpty(cid)) setTimeout(() => this.follower(aEvent), 10) // wait until channelId is set
     if (parseInt(aEvent.data.to_id, 10) !== parseInt(cid, 10)) return
     const fid = aEvent.data.from_id
@@ -151,10 +151,10 @@ class Webhooks {
         })
 
         // save remaining api calls
-        global.api.remainingAPICalls = request.headers['ratelimit-remaining']
-        global.api.refreshAPICalls = request.headers['ratelimit-reset']
+        global.api.calls.bot.remaining = request.headers['ratelimit-remaining']
+        global.api.calls.bot.refresh = request.headers['ratelimit-reset']
 
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'webhooks.follower', api: 'helix', endpoint: url, code: request.status, remaining: global.api.remainingAPICalls })
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'webhooks.follower', api: 'helix', endpoint: url, code: request.status, remaining: global.api.calls.bot.remaining })
 
         if (!await global.commons.isBot(request.data.data[0].login)) {
           global.overlays.eventlist.add({
@@ -169,7 +169,7 @@ class Webhooks {
           global.events.fire('follow', { username: request.data.data[0].login, webhooks: true })
         }
       } catch (e) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'webhooks.follower', api: 'helix', endpoint: url, code: e.stack, remaining: global.api.remainingAPICalls })
+        global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'webhooks.follower', api: 'helix', endpoint: url, code: e.stack, remaining: global.api.calls.bot.remaining })
       }
     } else {
       if (!_.get(user, 'is.follower', false) && _.now() - _.get(user, 'time.follow', 0) > 60000 * 60) {
@@ -211,7 +211,7 @@ class Webhooks {
     }
   */
   async stream (aEvent) {
-    const cid = await global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     if (cid === '') setTimeout(() => this.stream(aEvent), 1000) // wait until channelId is set
 
     // stream is online

@@ -448,8 +448,8 @@ class Message {
             }
           })
           // save remaining api calls
-          global.api.remainingAPICalls = request.headers['ratelimit-remaining']
-          global.api.refreshAPICalls = request.headers['ratelimit-reset']
+          global.api.calls.bot.remaining = request.headers['ratelimit-remaining']
+          global.api.calls.bot.refresh = request.headers['ratelimit-reset']
           return request.data.data[0].title
         } catch (e) { return 'n/a' } // return nothing on error
       },
@@ -473,8 +473,8 @@ class Message {
             }
           })
           // save remaining api calls
-          global.api.remainingAPICalls = request.headers['ratelimit-remaining']
-          global.api.refreshAPICalls = request.headers['ratelimit-reset']
+          global.api.calls.bot.remaining = request.headers['ratelimit-remaining']
+          global.api.calls.bot.refresh = request.headers['ratelimit-reset']
           return request.data.data[0].viewer_count
         } catch (e) { return '0' } // return nothing on error
       }

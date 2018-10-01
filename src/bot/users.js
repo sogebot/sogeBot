@@ -304,19 +304,19 @@ class Users extends Core {
 
       // save remaining api calls
       // $FlowFixMe error with flow on request.headers
-      global.api.remainingAPICalls = request.headers['ratelimit-remaining']
+      global.api.calls.bot.remaining = request.headers['ratelimit-remaining']
       // $FlowFixMe error with flow on request.headers
-      global.api.refreshAPICalls = request.headers['ratelimit-reset']
+      global.api.calls.bot.refresh = request.headers['ratelimit-reset']
 
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: global.api.remainingAPICalls })
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: global.api.calls.bot.remaining })
 
       return request.data.data[0].id
     } catch (e) {
-      if (e.response.status === 429) {
-        global.api.remainingAPICalls = 0
-        global.api.refreshAPICalls = e.response.headers['ratelimit-reset']
+      if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.api.calls.bot.remaining = 0
+        global.api.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
-      global.panel.io.emit('api.stats', { data: {}, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.stack, remaining: global.api.remainingAPICalls })
+      global.panel.io.emit('api.stats', { data: {}, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.stack, remaining: global.api.calls.bot.remaining })
     }
   }
 
@@ -467,7 +467,7 @@ class Users extends Core {
       })
       socket.on('followedAt.viewer', async (id, cb) => {
         try {
-          const cid = await global.oauth.settings._.channelId
+          const cid = global.oauth.channelId
           const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`
 
           const token = await global.oauth.settings.bot.accessToken
