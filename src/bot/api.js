@@ -3,6 +3,7 @@ const axios = require('axios')
 const moment = require('moment')
 const cluster = require('cluster')
 const stacktrace = require('stacktrace-parser')
+const fs = require('fs')
 
 class API {
   constructor () {
@@ -18,6 +19,13 @@ class API {
           set: function (obj, prop, value) {
             if (Number(value) === Number(obj[prop])) return true
             global.log.debug(`API: ${prop} changed to ${value} at ${stacktrace.parse((new Error()).stack)[1].methodName}`)
+
+            if (prop === 'remaining' && (process.env.DEBUG && process.env.DEBUG.includes('api'))) {
+              const remaining = obj.remaining || 'n/a'
+              const refresh = obj.refresh || 'n/a'
+              fs.appendFileSync('api.bot.csv', `${stacktrace.parse((new Error()).stack)[1].methodName}, ${remaining}, ${refresh}, ${new Date()}\n`)
+            }
+
             value = Number(value)
             obj[prop] = value
             return true
@@ -33,6 +41,13 @@ class API {
           set: function (obj, prop, value) {
             if (Number(value) === Number(obj[prop])) return true
             global.log.debug(`API: ${prop} changed to ${value} at ${stacktrace.parse((new Error()).stack)[1].methodName}`)
+
+            if (prop === 'remaining' && (process.env.DEBUG && process.env.DEBUG.includes('api'))) {
+              const remaining = obj.remaining || 'n/a'
+              const refresh = obj.refresh || 'n/a'
+              fs.appendFileSync('api.broadcaster.csv', `${stacktrace.parse((new Error()).stack)[1].methodName}, ${remaining}, ${refresh}, ${new Date()}\n`)
+            }
+
             value = Number(value)
             obj[prop] = value
             return true
