@@ -177,9 +177,11 @@ function Panel () {
 
       self.sendStreamData(self, global.panel.io) // force dashboard update
     })
-    socket.on('joinBot', async () => { global.tmi.client.bot.chat.join(await global.oauth.settings.broadcaster.username) })
+    socket.on('joinBot', async () => {
+      global.tmi.join('bot', global.tmi.channel)
+    })
     socket.on('leaveBot', async () => {
-      global.tmi.client.bot.chat.part(await global.oauth.settings.broadcaster.username)
+      global.tmi.part('bot')
       global.db.engine.remove('users.online', {}) // force all users offline
     })
 
