@@ -193,7 +193,7 @@ class Events {
   }
 
   async fireBotWillLeaveChannel (operation, attributes) {
-    global.client.part('#' + await global.oauth.settings.broadcaster.username)
+    global.tmi.part('bot', global.tmi.channel)
     global.db.engine.remove('users.online', {}) // force all users offline
   }
 

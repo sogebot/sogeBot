@@ -11,6 +11,7 @@ const Core = require('./_interface')
 const constants = require('./constants')
 
 class TMI extends Core {
+  channel: string = ''
   timeouts: Object = {}
   client: Object = {}
   lastWorker: string = ''
@@ -23,8 +24,6 @@ class TMI extends Core {
 
     if (cluster.isMaster) {
       global.status.TMI = constants.DISCONNECTED
-      this.initClient('broadcaster')
-      this.initClient('bot')
     }
   }
 
@@ -38,6 +37,7 @@ class TMI extends Core {
 
     try {
       if (token === '' || username === '' || channel === '') throw Error(`${type} - token, username or channel expected`)
+      console.log(channel)
       this.client[type] = new TwitchJs({
         token,
         username,
@@ -45,7 +45,7 @@ class TMI extends Core {
       })
       this.loadListeners(type)
       await this.client[type].chat.connect()
-      await this.client[type].chat.join(channel)
+      await this.join(type, channel)
     } catch (e) {
       if (type === 'broadcaster' && !this.broadcasterWarning) {
         global.log.error('Broadcaster oauth is not properly set - hosts will not be loaded')
@@ -56,13 +56,40 @@ class TMI extends Core {
     }
   }
 
+  /* will connect/reconnect bot and broadcaster
+   * this is called from oauth when channel is changed or initialized
+   */
   async reconnect (type: string) {
-    if (typeof this.client[type] !== 'undefined') {
-      global.log.info(`TMI: ${type} is reconnecting caused by scope or oauth change`)
-      this.client[type].chat.disconnect()
-      this.client[type] = null
+    try {
+      if (typeof this.client[type] === 'undefined') throw Error('TMI: cannot reconnect, connection is not established')
+      const [token, username, channel] = await Promise.all([
+        global.oauth.settings[type].accessToken,
+        global.oauth.settings[type].username,
+        global.oauth.settings.general.channel
+      ])
+
+      if (this.channel !== channel) {
+        global.log.info(`TMI: ${type} is reconnecting`)
+
+        await this.client[type].chat.part(this.channel)
+        await this.client[type].chat.reconnect({ token, username, onAuthenticationFailure: () => global.oauth.refreshAccessToken(type).then(token => token) })
+
+        await this.join(type, channel)
+      }
+    } catch (e) {
+      this.initClient(type) // connect properly
     }
-    this.initClient(type)
+  }
+
+  async join (type: string, channel: string) {
+    await this.client[type].chat.join(channel)
+    global.log.info(`TMI: ${type} joined channel ${channel}`)
+    this.channel = channel
+  }
+
+  async part (type: string) {
+    await this.client[type].chat.part(this.channel)
+    global.log.info(`TMI: ${type} parted channel ${this.channel}`)
   }
 
   loadListeners (type: string) {
