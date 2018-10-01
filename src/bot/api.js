@@ -147,7 +147,7 @@ class API {
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: request.status })
       opts.saveToWidget = true
     } catch (e) {
-      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: e.stack })
       this.timeouts['getChannelChattersUnofficialAPI'] = setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
       return
@@ -249,7 +249,7 @@ class API {
         global.log.warning('Broadcaster have not correct oauth, will not check subs')
         global.db.engine.update('api.current', { key: 'subscribers' }, { value: 0 })
       } else {
-        timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+        timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
         global.log.error(`${url} - ${e.message}`)
         global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: e.stack })
       }
@@ -310,7 +310,7 @@ class API {
         this.gameOrTitleChangedManually = false
       }
     } catch (e) {
-      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: e.stack })
     }
@@ -342,7 +342,7 @@ class API {
         await global.db.engine.update('cache.hosts', { username: host }, { username: host })
       }
     } catch (e) {
-      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: e.stack })
     }
@@ -384,7 +384,7 @@ class API {
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
 
-      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
     }
@@ -493,7 +493,7 @@ class API {
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
 
-      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
     }
@@ -668,7 +668,7 @@ class API {
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
 
-      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
+      timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
     }
