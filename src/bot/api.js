@@ -557,7 +557,7 @@ class API {
     }
 
     var request
-    let timeout = 15000
+    let timeout = 60000
     try {
       request = await axios.get(url, {
         headers: {
