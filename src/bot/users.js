@@ -312,6 +312,10 @@ class Users extends Core {
 
       return request.data.data[0].id
     } catch (e) {
+      if (e.response.status === 429) {
+        global.api.remainingAPICalls = 0
+        global.api.refreshAPICalls = e.response.headers['ratelimit-reset']
+      }
       global.panel.io.emit('api.stats', { data: {}, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.stack, remaining: global.api.remainingAPICalls })
     }
   }

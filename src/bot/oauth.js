@@ -122,9 +122,11 @@ class OAuth extends Core {
   }
 
   async getChannelId () {
+    if (typeof global.api === 'undefined') return setTimeout(() => this.getChannelId(), 1000)
     if (cluster.isWorker || global.mocha) return
     clearTimeout(this.timeouts['getChannelId'])
 
+    let timeout = 1000
     const channel = await this.settings.general.channel
     if (this.currentChannel !== channel && channel !== '') {
       this.currentChannel = channel
@@ -134,10 +136,13 @@ class OAuth extends Core {
         global.log.info('Channel ID set to ' + cid)
         global.tmi.reconnect('bot')
         global.tmi.reconnect('broadcaster')
+      } else {
+        global.log.error(`Cannot get channel ID of ${channel} - waiting ${Number(global.api.refreshAPICalls - (Date.now() / 1000)).toFixed(2)}s`)
+        timeout = (global.api.refreshAPICalls - (Date.now() / 1000)) * 1000
       }
     }
 
-    this.timeouts['getChannelId'] = setTimeout(() => this.getChannelId(), 10000)
+    this.timeouts['getChannelId'] = setTimeout(() => this.getChannelId(), timeout)
   }
 
   async sendDataToClusters () {
@@ -156,7 +161,7 @@ class OAuth extends Core {
   /*
    * Validates OAuth access tokens
    * and sets this.settings.<bot|broadcaster>.username
-   * and sets this.settings.<bot|broadcaster>._scopes\
+   * and sets this.settings.<bot|broadcaster>._scopes
    * if invalid refreshAccessToken()
    * @param {string} type - bot or broadcaster
    *

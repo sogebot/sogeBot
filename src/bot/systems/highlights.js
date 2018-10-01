@@ -57,15 +57,7 @@ class Highlights extends System {
       // as we are using API, go through master
       if (process.send) process.send({ type: 'highlight', opts })
     } else {
-      const cid = await global.oauth.settings._.channelId
       const when = await global.cache.when()
-
-      const needToWait = _.isNil(cid) || cid === ''
-      const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
-      if (needToWait || notEnoughAPICalls) {
-        setTimeout(() => this.highlight(opts), 1000)
-        return
-      }
 
       try {
         if (_.isNil(when.online)) throw Error(ERROR_STREAM_NOT_ONLINE)
@@ -83,9 +75,6 @@ class Highlights extends System {
 
         this.add(highlight, timestamp, opts.sender)
       } catch (e) {
-        if (e.message !== ERROR_STREAM_NOT_ONLINE) {
-          global.log.error(e.stack)
-        }
         switch (e.message) {
           case ERROR_STREAM_NOT_ONLINE:
             global.commons.sendMessage(global.translate('highlights.offline'), opts.sender)
