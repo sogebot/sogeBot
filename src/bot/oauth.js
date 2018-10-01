@@ -42,7 +42,11 @@ class OAuth extends Core {
         refreshToken: '',
         username: '',
         scopes: [
-          'chat_login',
+          'channel:moderate',
+          'chat:edit',
+          'chat:read',
+          'whispers:read',
+          'whispers:edit',
           'channel_editor',
           'channel_commercial',
           'clips:edit',
@@ -100,7 +104,7 @@ class OAuth extends Core {
         },
         generate: {
           type: 'link',
-          href: 'https://twitchtokengenerator.com/quick/6CEB7gfCHA',
+          href: 'https://twitchtokengenerator.com/quick/UQ6SHl81nt',
           class: 'btn btn-primary btn-block',
           text: 'commons.generate',
           target: '_blank'
