@@ -5,7 +5,6 @@ var _ = require('lodash')
 var moment = require('moment')
 require('moment-precise-range-plugin')
 const cluster = require('cluster')
-const axios = require('axios')
 
 // bot libraries
 const constants = require('../constants')
@@ -60,7 +59,6 @@ class Highlights extends System {
     } else {
       const cid = await global.oauth.settings._.channelId
       const when = await global.cache.when()
-      const url = `https://api.twitch.tv/helix/videos?user_id=${cid}&type=archive&first=1`
 
       const needToWait = _.isNil(cid) || cid === ''
       const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
@@ -75,28 +73,17 @@ class Highlights extends System {
         const token = await global.oauth.settings.bot.accessToken
         if (token === '') return
 
-        // we need to load video id
-        const request = await axios.get(url, {
-          headers: {
-            'Authorization': 'Bearer ' + token
-          }
-        })
-
-        // save remaining api calls
-        global.api.remainingAPICalls = request.headers['ratelimit-remaining']
-        global.api.refreshAPICalls = request.headers['ratelimit-reset']
-
-        let highlight = request.data.data[0]
-        let timestamp = moment.preciseDiff(moment().valueOf(), moment(when.online).valueOf(), true)
-        highlight.timestamp = { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds }
-        highlight.game = _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')
-        highlight.title = _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a')
+        let timestamp = moment.preciseDiff(moment().valueOf(), moment(global.api.streamStartedAt).valueOf(), true)
+        let highlight = {
+          id: global.api.streamId,
+          timestamp: { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds },
+          game: _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a'),
+          title: _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a')
+        }
 
         this.add(highlight, timestamp, opts.sender)
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'highlights', api: 'helix', endpoint: url, code: request.status, remaining: global.api.remainingAPICalls })
       } catch (e) {
         if (e.message !== ERROR_STREAM_NOT_ONLINE) {
-          global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'highlights', api: 'helix', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: global.api.remainingAPICalls })
           global.log.error(e.stack)
         }
         switch (e.message) {
