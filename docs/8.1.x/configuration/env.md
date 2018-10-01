@@ -26,3 +26,9 @@ Changes log level of a bot
 
 - `LOGLEVEL=debug`
 - `LOGLEVEL=info` *default*
+
+## DEBUG
+
+Enables extended debugging, by default its disabled
+
+- `DEBUG=api` - will save `api.bot.csv` and `api.broadcaster.csv` files
