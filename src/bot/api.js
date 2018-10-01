@@ -1010,12 +1010,15 @@ class API {
       if (token === '') throw Error('missing bot accessToken')
       if (cid === '') throw Error('channel is not set')
 
-      const request = await axios.get(url, {
+      const request = await axios({
+        method: 'post',
+        url,
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + token
         },
         data: {
-          user_id: cid,
+          user_id: String(cid),
           description: 'Marked from sogeBot'
         }
       })
@@ -1026,6 +1029,7 @@ class API {
 
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
+      if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') return this.createMarker()
       global.log.error(`API: Marker was not created - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.stack, remaining: this.remainingAPICalls })
     }
