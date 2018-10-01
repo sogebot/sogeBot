@@ -414,11 +414,12 @@ class API {
           'Authorization': 'Bearer ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
+
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       if (request.status === 200 && !_.isNil(request.data.data)) {
         // check if user id is in db, not in db load username from API
@@ -521,6 +522,10 @@ class API {
         }
       })
 
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining']
+      this.calls.bot.refresh = request.headers['ratelimit-reset']
+
       if (cluster.isMaster) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       // add id->game to cache
@@ -564,11 +569,12 @@ class API {
           'Authorization': 'Bearer ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
+
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       let justStarted = false
       if (request.status === 200 && !_.isNil(request.data.data[0])) {
