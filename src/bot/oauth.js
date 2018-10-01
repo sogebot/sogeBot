@@ -129,10 +129,12 @@ class OAuth extends Core {
     if (this.currentChannel !== channel && channel !== '') {
       this.currentChannel = channel
       const cid = await global.users.getIdFromTwitch(channel)
-      this.settings._.channelId = cid
-      global.log.info('Channel ID set to ' + cid)
-      global.tmi.reconnect('bot')
-      global.tmi.reconnect('broadcaster')
+      if (typeof cid !== 'undefined') {
+        this.settings._.channelId = cid
+        global.log.info('Channel ID set to ' + cid)
+        global.tmi.reconnect('bot')
+        global.tmi.reconnect('broadcaster')
+      }
     }
 
     this.timeouts['getChannelId'] = setTimeout(() => this.getChannelId(), 10000)
