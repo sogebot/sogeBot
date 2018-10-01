@@ -6,7 +6,6 @@ require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
-const variable = require('../../general.js').variable
 
 // users
 const id = _.random(99999, false)
@@ -17,8 +16,7 @@ describe('libs/webhooks - follower()', () => {
   before(async () => {
     await db.cleanup()
     await message.prepare()
-    global.oauth.settings._.channelId = channelId
-    await variable.isEqual('global.oauth.settings._.channelId', channelId)
+    global.oauth.channelId = channelId
   })
 
   it('testuser should not be in webhooks cache', async () => {
@@ -38,7 +36,7 @@ describe('libs/webhooks - follower()', () => {
       await global.webhooks.follower({
         data: {
           from_id: id,
-          to_id: await global.oauth.settings._.channelId
+          to_id: global.oauth.channelId
         }
       })
     }
