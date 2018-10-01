@@ -16,6 +16,8 @@ class API {
       this.maxRetries = 3
       this.curRetries = 0
       this.streamType = 'live'
+      this.streamId = null
+      this.streamStartedAt = Date.now()
 
       this.gameOrTitleChangedManually = false
 
@@ -501,6 +503,11 @@ class API {
         // correct status and we've got a data - stream online
         let stream = request.data.data[0]
 
+        // Always keep this updated
+        this.streamStartedAt = stream.started_at
+        this.streamId = stream.id
+        this.streamType = stream.type
+
         if (!moment.preciseDiff(moment(stream.started_at), moment((await global.cache.when()).online), true).firstDateWasLater) await global.cache.when({ online: stream.started_at })
         if (!await global.cache.isOnline() || this.streamType !== stream.type) {
           this.chatMessagesAtStart = global.linesParsed
@@ -519,7 +526,6 @@ class API {
 
         this.curRetries = 0
         this.saveStreamData(stream)
-        this.streamType = stream.type
         await global.cache.isOnline(true)
 
         if (!justStarted) {
@@ -580,6 +586,8 @@ class API {
 
           await global.db.engine.remove('cache.hosts', {}) // we dont want to have cached hosts on stream start
           await global.db.engine.remove('cache.raids', {}) // we dont want to have cached raids on stream start
+
+          this.streamId = null
         }
       }
     } catch (e) {

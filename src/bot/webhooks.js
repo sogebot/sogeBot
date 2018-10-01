@@ -220,10 +220,18 @@ class Webhooks {
 
       if (parseInt(stream.user_id, 10) !== parseInt(cid, 10)) return
 
+      // Always keep this updated
+      this.streamStartedAt = stream.started_at
+      this.streamId = stream.id
+      this.streamType = stream.type
+
       await global.db.engine.update('api.current', { key: 'status' }, { value: stream.title })
       await global.db.engine.update('api.current', { key: 'game' }, { value: await global.api.getGameFromId(stream.game_id) })
 
       if (!await global.cache.isOnline() || global.twitch.streamType !== stream.type) {
+        global.log.start(
+          `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameFromId(stream.game_id)} | type: ${stream.type}`
+        )
         global.cache.when({ online: stream.started_at })
         global.api.chatMessagesAtStart = global.linesParsed
 
