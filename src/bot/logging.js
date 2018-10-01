@@ -16,6 +16,8 @@ config.timezone = config.timezone === 'system' || _.isNil(config.timezone) ? mom
 
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir)
 
+const logLevel = !_.isNil(process.env.LOGLEVEL) ? process.env.LOGLEVEL.toLowerCase().trim() : 'info'
+
 const levels = {
   error: 1,
   chatIn: 2,
@@ -53,7 +55,7 @@ if (cluster.isWorker) {
     exitOnError: true,
     json: false,
     levels: levels,
-    level: 'debug',
+    level: logLevel,
     format: format.combine(
       format.printf(info => {
         let level
