@@ -169,16 +169,19 @@ class Raffles extends System {
       return
     }
 
-    global.db.engine.insert(this.collection.data, {
-      keyword: keyword,
-      followers: followers,
-      subscribers: subscribers,
-      min: minTickets,
-      max: maxTickets,
-      type: type,
-      winner: null,
-      timestamp: _.now()
-    })
+    await Promise.all([
+      global.db.engine.insert(this.collection.data, {
+        keyword: keyword,
+        followers: followers,
+        subscribers: subscribers,
+        min: minTickets,
+        max: maxTickets,
+        type: type,
+        winner: null,
+        timestamp: _.now()
+      }),
+      global.db.engine.remove(this.collection.participants, {})
+    ])
 
     let eligibility = []
     if (followers) eligibility.push(await global.commons.prepare('raffles.eligibility-followers-item'))
