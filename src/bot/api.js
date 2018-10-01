@@ -957,6 +957,38 @@ class API {
       global.users.set(user.username, { id: user.id, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } }, !user.is.follower)
     }
   }
+
+  async createMarker () {
+    const [ token, cid ] = await Promise.all([
+      global.oauth.settings.bot.accessToken,
+      global.oauth.settings._.channelId
+    ])
+
+    const url = 'https://api.twitch.tv/helix/streams/markers'
+    try {
+      if (token === '') throw Error('missing bot accessToken')
+      if (cid === '') throw Error('channel is not set')
+
+      const request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token
+        },
+        data: {
+          user_id: cid,
+          description: 'Marked from sogeBot'
+        }
+      })
+
+      // save remaining api calls
+      this.remainingAPICalls = request.headers['ratelimit-remaining']
+      this.refreshAPICalls = request.headers['ratelimit-reset']
+
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+    } catch (e) {
+      global.log.error(`API: Marker was not created - ${e.message}`)
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.stack, remaining: this.remainingAPICalls })
+    }
+  }
 }
 
 module.exports = API

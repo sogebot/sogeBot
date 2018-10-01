@@ -109,7 +109,7 @@ class Highlights extends System {
   }
 
   async add (highlight, timestamp, sender) {
-    global.commons.sendMessage('/marker', { username: global.commons.getOwner() }) // user /marker as well for highlights
+    global.api.createMarker()
     global.commons.sendMessage(global.translate('highlights.saved')
       .replace(/\$hours/g, (timestamp.hours < 10) ? '0' + timestamp.hours : timestamp.hours)
       .replace(/\$minutes/g, (timestamp.minutes < 10) ? '0' + timestamp.minutes : timestamp.minutes)
