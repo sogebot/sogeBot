@@ -99,7 +99,7 @@ class API {
       const user = await global.users.getByName(username)
       const isSkipped = user.username === global.commons.getBroadcaster || user.username === global.commons.cached.bot
       const userHaveId = !_.isNil(user.id)
-      if (new Date().getTime() - _.get(user, 'time.followCheck', 0) <= 1000 * 60 * 30 || isSkipped || !userHaveId) {
+      if (new Date().getTime() - _.get(user, 'time.followCheck', 0) <= 1000 * 60 * 60 * 12 || isSkipped || !userHaveId) {
         this.rate_limit_follower_check.delete(user.username)
       }
     }
