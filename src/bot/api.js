@@ -23,7 +23,7 @@ class API {
             if (prop === 'remaining' && (process.env.DEBUG && process.env.DEBUG.includes('api'))) {
               const remaining = obj.remaining || 'n/a'
               const refresh = obj.refresh || 'n/a'
-              fs.appendFileSync('api.bot.csv', `${stacktrace.parse((new Error()).stack)[1].methodName}, ${remaining}, ${refresh}, ${new Date()}\n`)
+              fs.appendFileSync('api.bot.csv', `${cluster.isMaster}, ${stacktrace.parse((new Error()).stack)[1].methodName}, ${remaining}, ${refresh}, ${new Date()}\n`)
             }
 
             value = Number(value)
@@ -45,7 +45,7 @@ class API {
             if (prop === 'remaining' && (process.env.DEBUG && process.env.DEBUG.includes('api'))) {
               const remaining = obj.remaining || 'n/a'
               const refresh = obj.refresh || 'n/a'
-              fs.appendFileSync('api.broadcaster.csv', `${stacktrace.parse((new Error()).stack)[1].methodName}, ${remaining}, ${refresh}, ${new Date()}\n`)
+              fs.appendFileSync('api.broadcaster.csv', `${cluster.isMaster}, ${stacktrace.parse((new Error()).stack)[1].methodName}, ${remaining}, ${refresh}, ${new Date()}\n`)
             }
 
             value = Number(value)
