@@ -172,7 +172,7 @@ class Points extends System {
         throw new Error('User doesn\'t have ID')
       }
     } catch (err) {
-      global.commons.sendMessage(global.translate('points.failed.set'), opts.sender)
+      global.commons.sendMessage(global.translate('points.failed.set').replace('$command', opts.command), opts.sender)
     }
   }
 
@@ -187,7 +187,7 @@ class Points extends System {
       if (!guser.id) throw new Error('User doesn\'t have ID')
 
       if (points !== 'all' && availablePoints < points) {
-        let message = await global.commons.prepare('points.failed.giveNotEnough', {
+        let message = await global.commons.prepare('points.failed.giveNotEnough'.replace('$command', opts.command), {
           amount: points,
           username,
           pointsName: await this.getPointsName(points)
@@ -213,7 +213,7 @@ class Points extends System {
         global.commons.sendMessage(message, opts.sender)
       }
     } catch (err) {
-      global.commons.sendMessage(global.translate('points.failed.give'), opts.sender)
+      global.commons.sendMessage(global.translate('points.failed.give').replace('$command', opts.command), opts.sender)
     }
   }
 
@@ -280,7 +280,7 @@ class Points extends System {
       })
       global.commons.sendMessage(message, opts.sender)
     } catch (err) {
-      global.commons.sendMessage(global.translate('points.failed.get'), opts.sender)
+      global.commons.sendMessage(global.translate('points.failed.get').replace('$command', opts.command), opts.sender)
     }
   }
 
@@ -303,7 +303,7 @@ class Points extends System {
       })
       global.commons.sendMessage(message, opts.sender)
     } catch (err) {
-      global.commons.sendMessage(global.translate('points.failed.all'), opts.sender)
+      global.commons.sendMessage(global.translate('points.failed.all').replace('$command', opts.command), opts.sender)
     }
   }
 
@@ -326,7 +326,7 @@ class Points extends System {
       })
       global.commons.sendMessage(message, opts.sender)
     } catch (err) {
-      global.commons.sendMessage(global.translate('points.failed.rain'), opts.sender)
+      global.commons.sendMessage(global.translate('points.failed.rain').replace('$command', opts.command), opts.sender)
     }
   }
 
@@ -347,7 +347,7 @@ class Points extends System {
       })
       global.commons.sendMessage(message, opts.sender)
     } catch (err) {
-      global.commons.sendMessage(global.translate('points.failed.add'), opts.sender)
+      global.commons.sendMessage(global.translate('points.failed.add').replace('$command', opts.command), opts.sender)
     }
   }
 
@@ -373,7 +373,7 @@ class Points extends System {
         throw new Error('User doesn\'t have ID')
       }
     } catch (err) {
-      global.commons.sendMessage(global.translate('points.failed.remove'), opts.sender)
+      global.commons.sendMessage(global.translate('points.failed.remove').replace('$command', opts.command), opts.sender)
     }
   }
 
