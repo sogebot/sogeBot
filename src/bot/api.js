@@ -326,6 +326,11 @@ class API {
 
       if (request.data.data.length > 0) await global.db.engine.update('api.current', { key: 'views' }, { value: request.data.data[0].view_count })
     } catch (e) {
+      if (e.response.status === 429) {
+        this.remainingAPICalls = 0
+        this.refreshAPICalls = e.response.headers['ratelimit-reset']
+      }
+
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: e.stack, remaining: this.remainingAPICalls })
@@ -429,6 +434,11 @@ class API {
 
       global.db.engine.update('api.current', { key: 'followers' }, { value: request.data.total })
     } catch (e) {
+      if (e.response.status === 429) {
+        this.remainingAPICalls = 0
+        this.refreshAPICalls = e.response.headers['ratelimit-reset']
+      }
+
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.stack, remaining: this.remainingAPICalls })
@@ -455,6 +465,7 @@ class API {
           'Authorization': 'Bearer ' + token
         }
       })
+
       if (cluster.isMaster) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
 
       // add id->game to cache
@@ -462,6 +473,11 @@ class API {
       await global.db.engine.insert('core.api.games', { id, name })
       return name
     } catch (e) {
+      if (e.response.status === 429) {
+        this.remainingAPICalls = 0
+        this.refreshAPICalls = e.response.headers['ratelimit-reset']
+      }
+
       const game = await global.db.engine.findOne('api.current', { key: 'game' })
       global.log.warning(`Couldn't find name of game for gid ${id} - fallback to ${game.value}`)
       global.log.error(`API: ${url} - ${e.stack}`)
@@ -591,6 +607,11 @@ class API {
         }
       }
     } catch (e) {
+      if (e.response.status === 429) {
+        this.remainingAPICalls = 0
+        this.refreshAPICalls = e.response.headers['ratelimit-reset']
+      }
+
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 1000 : timeout
       global.log.error(`${url} - ${e.message}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.stack, remaining: this.remainingAPICalls })
@@ -802,6 +823,11 @@ class API {
         await global.db.engine.update('api.clips', { clipId: clip.id }, { isChecked: true })
       }
     } catch (e) {
+      if (e.response.status === 429) {
+        this.remainingAPICalls = 0
+        this.refreshAPICalls = e.response.headers['ratelimit-reset']
+      }
+
       global.log.error(`API: ${url} - ${e.stack}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.stack })
     }
@@ -855,6 +881,11 @@ class API {
 
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
+      if (e.response.status === 429) {
+        this.remainingAPICalls = 0
+        this.refreshAPICalls = e.response.headers['ratelimit-reset']
+      }
+
       global.log.error(`API: ${url} - ${e.stack}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: e.stack })
       return
@@ -932,13 +963,15 @@ class API {
 
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
     } catch (e) {
+      if (e.response.status === 429) {
+        this.remainingAPICalls = 0
+        this.refreshAPICalls = e.response.headers['ratelimit-reset']
+      }
+
       global.log.error(`API: ${url} - ${e.stack}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.stack, remaining: this.remainingAPICalls })
       return
     }
-
-    global.api.remainingAPICalls = request.headers['ratelimit-remaining']
-    global.api.refreshAPICalls = request.headers['ratelimit-reset']
 
     if (request.data.total === 0) {
       // not a follower
