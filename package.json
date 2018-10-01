@@ -50,6 +50,7 @@
     "sortablejs": "1.7.0",
     "source-map-support": "0.5.9",
     "spotify-web-api-node": "4.0.0",
+    "stacktrace-parser": "0.1.4",
     "terminal-kit": "1.26.2",
     "twitch-emoticons": "http://deps.sogebot.xyz/twitch-emoticons-2.1.0.tgz",
     "twitch-js": "2.0.0-beta.19",

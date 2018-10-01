@@ -11,6 +11,7 @@ const constants = require('./constants')
 class OAuth extends Core {
   timeouts: Object = {}
   currentChannel: string = ''
+  channelId: string = ''
 
   constructor () {
     const settings = {
@@ -19,8 +20,7 @@ class OAuth extends Core {
         bot: '',
         clientId: '',
         botId: '',
-        broadcasterId: '',
-        channelId: ''
+        broadcasterId: ''
       },
       general: {
         channel: '',
@@ -132,13 +132,13 @@ class OAuth extends Core {
       this.currentChannel = channel
       const cid = await global.users.getIdFromTwitch(channel)
       if (typeof cid !== 'undefined') {
-        this.settings._.channelId = cid
+        this.channelId = cid
         global.log.info('Channel ID set to ' + cid)
         global.tmi.reconnect('bot')
         global.tmi.reconnect('broadcaster')
       } else {
-        global.log.error(`Cannot get channel ID of ${channel} - waiting ${Number(global.api.refreshAPICalls - (Date.now() / 1000)).toFixed(2)}s`)
-        timeout = (global.api.refreshAPICalls - (Date.now() / 1000)) * 1000
+        global.log.error(`Cannot get channel ID of ${channel} - waiting ${Number(global.api.calls.bot.refresh - (Date.now() / 1000)).toFixed(2)}s`)
+        timeout = (global.api.calls.bot.refresh - (Date.now() / 1000)) * 1000
       }
     }
 

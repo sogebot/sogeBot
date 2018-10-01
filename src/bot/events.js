@@ -198,7 +198,7 @@ class Events {
   }
 
   async fireStartCommercial (operation, attributes) {
-    const cid = await global.oauth.settings._.channelId
+    const cid = global.oauth.channelId
     const url = `https://api.twitch.tv/kraken/channels/${cid}/commercial`
 
     const token = await global.oauth.settings.bot.accessToken
