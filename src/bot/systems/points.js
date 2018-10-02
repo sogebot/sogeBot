@@ -155,7 +155,7 @@ class Points extends System {
 
   async set (opts) {
     try {
-      const [username, points] = new Expects(opts.parameters).username().points({ all: false })
+      const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray()
 
       const user = global.users.getByName(username)
       if (user.id) {
@@ -178,7 +178,7 @@ class Points extends System {
 
   async give (opts) {
     try {
-      const [username, points] = new Expects(opts.parameters).username().points({ all: true })
+      const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray()
       if (opts.sender.username.toLowerCase() === username.toLowerCase()) return
 
       const availablePoints = await this.getPointsOf(opts.sender.userId)
@@ -286,7 +286,7 @@ class Points extends System {
 
   async all (opts) {
     try {
-      const points = new Expects(opts.parameters).points({ all: false })
+      const points = new Expects(opts.parameters).points({ all: false }).toArray()
 
       for (let username of (await global.db.engine.find('users.online')).map((o) => o.username)) {
         if (await global.commons.isBot(username)) continue
@@ -309,7 +309,7 @@ class Points extends System {
 
   async rain (opts) {
     try {
-      const points = new Expects(opts.parameters).points({ all: false })
+      const points = new Expects(opts.parameters).points({ all: false }).toArray()
 
       for (let username of (await global.db.engine.find('users.online')).map((o) => o.username)) {
         if (await global.commons.isBot(username)) continue
@@ -332,7 +332,7 @@ class Points extends System {
 
   async add (opts) {
     try {
-      const [username, points] = new Expects(opts.parameters).username().points({ all: false })
+      const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray()
       let user = await global.db.engine.findOne('users', { username })
       if (user.id) {
         await global.db.engine.insert('users.points', { id: user.id, points: points })
@@ -353,7 +353,7 @@ class Points extends System {
 
   async remove (opts) {
     try {
-      const [username, points] = new Expects(opts.parameters).username().points({ all: true })
+      const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray()
       let user = await global.db.engine.findOne('users', { username })
       if (user.id) {
         if (points === 'all') {
