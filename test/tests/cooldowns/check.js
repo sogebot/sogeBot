@@ -19,6 +19,27 @@ describe('Cooldowns - check()', () => {
     await message.prepare()
   })
 
+  it('#1406 - cooldown not working on gamble', async () => {
+    let [command, type, seconds, quiet] = ['!gamble', 'user', '300', true]
+    global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })
+    await message.isSent('cooldowns.cooldown-was-set', owner, { command: command, type: type, seconds: seconds, sender: owner.username })
+
+    let item = await global.db.engine.findOne('systems.cooldown', { key: '!gamble' })
+    assert.notEmpty(item)
+
+    let isOk = await global.systems.cooldown.check({ sender: testUser, message: '!gamble 10' })
+    assert.isTrue(isOk)
+
+    isOk = await global.systems.cooldown.check({ sender: testUser, message: '!gamble 15' })
+    assert.isFalse(isOk) // second should fail
+
+    isOk = await global.systems.cooldown.check({ sender: testUser2, message: '!gamble 20' })
+    assert.isTrue(isOk)
+
+    isOk = await global.systems.cooldown.check({ sender: testUser2, message: '!gamble 25' })
+    assert.isFalse(isOk) // second should fail
+  })
+
   it('#1352 - command in a sentence', async () => {
     let [command, type, seconds, quiet] = ['!test', 'user', '60', true]
     global.systems.cooldown.main({ sender: owner, parameters: `${command} ${type} ${seconds} ${quiet}` })

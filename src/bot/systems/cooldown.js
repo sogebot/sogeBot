@@ -10,6 +10,7 @@ const XRegExp = require('xregexp')
 var constants = require('../constants')
 const System = require('./_interface')
 const Expects = require('../expects.js')
+const Parser = require('../parser')
 
 /*
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
@@ -94,7 +95,12 @@ class Cooldown extends System {
       .toArray()
 
     if (!_.isNil(command)) { // command
-      const key = subcommand ? `${command} ${subcommand}` : command
+      let key
+      const parsed = await (new Parser().find(subcommand ? `${command} ${subcommand}` : command))
+      if (!parsed) {
+        key = subcommand ? `${command} ${subcommand}` : command
+      } else key = parsed.command
+
       let cooldown = await global.db.engine.findOne(this.collection.data, { key })
       if (_.isEmpty(cooldown)) { // command is not on cooldown -> recheck with text only
         opts.message = opts.message.replace(key, '')
