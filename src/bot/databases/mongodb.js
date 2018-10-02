@@ -291,6 +291,19 @@ class IMongoDB extends Interface {
       }
     }
   }
+
+  async collections () {
+    try {
+      let db = this.client.db(this.dbName)
+      return (await db.listCollections().toArray()).map(o => o.name)
+    } catch (e) {
+      global.log.error(e.stack)
+      if (e.message.match(/EPIPE/g)) {
+        global.log.error('Something went wrong with mongodb instance (EPIPE error)')
+        process.exit()
+      }
+    }
+  }
 }
 
 module.exports = IMongoDB

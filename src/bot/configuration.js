@@ -29,8 +29,8 @@ class Configuration {
     let widgets = await global.db.engine.find('widgets')
 
     let oauth = {
-      broadcaster: global.commons.cached.broadcaster !== '',
-      bot: global.commons.cached.bot !== ''
+      broadcaster: global.oauth.settings.broadcaster.username !== '',
+      bot: global.oauth.settings.bot.username !== ''
     }
 
     const lang = await global.configuration.getValue('lang')

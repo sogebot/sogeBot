@@ -8,16 +8,16 @@ module.exports = {
     let isOk = false
     await until(setError => {
       if (isOk) return true
-      _.get(global, variablePath.replace('global.', '')).then(current => {
-        try {
-          assert.isTrue(_.isEqual(current, expected))
-          isOk = true
-        } catch (err) {
-          return setError(
-            '\nExpected value: "' + util.inspect(expected) + '"\nActual value: "' + util.inspect(current) + '"' +
-            '\n\nVariable: "global.' + variablePath)
-        }
-      })
+
+      const current = _.get(global, variablePath.replace('global.', ''))
+      try {
+        assert.isTrue(_.isEqual(current, expected))
+        isOk = true
+      } catch (err) {
+        return setError(
+          '\nExpected value: "' + util.inspect(expected) + '"\nActual value: "' + util.inspect(current) + '"' +
+          '\n\nVariable: "global.' + variablePath)
+      }
     }, 1000)
   }
 }

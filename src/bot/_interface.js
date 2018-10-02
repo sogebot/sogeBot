@@ -3,16 +3,21 @@ const chalk = require('chalk')
 const cluster = require('cluster')
 const constants = require('./constants')
 
+let listeners = 0
+
 class Module {
-  constructor (opts = {}) {
-    opts.settings = opts.settings || {}
+  timeouts: Object = {}
+  constructor (opts: Object = {}) {
+    /* Prepare default settings configuration
+     * set enabled by default to true
+     */
+    this._settings = opts.settings || {}
+    this._settings.enabled = typeof this._settings.enabled !== 'undefined' ? this._settings.enabled : true
 
-    this.timeouts = {}
-
+    this.onChange = opts.onChange || {}
     this.dependsOn = opts.dependsOn || []
     this.socket = null
 
-    this._settings = {}
     this._commands = []
     this._parsers = []
     this._name = opts.name || 'core'
@@ -28,12 +33,143 @@ class Module {
       }
     })
 
-    // populate this._settings
-    this._prepare(opts.settings)
+    // prepare proxies for variables
+    this.threadListener()
+    this.prepareCommandProxies()
+    this.prepareVariableProxies()
+    this.prepareParsers()
+    this.loadVariableValues()
     this._sockets()
     this._cleanEmptySettingsValues()
     this._indexDbs()
     this.status()
+  }
+
+  prepareParsers () {
+    this.settings = this.settings || {}
+    if (this._settings.parsers) {
+      this._parsers = this._settings.parsers
+    }
+  }
+
+  async loadVariableValues () {
+    const variables = await global.db.engine.find(this.collection.settings)
+    for (let i = 0, length = variables.length; i < length; i++) {
+      _.set(this._settings, variables[i].key, variables[i].value)
+    }
+  }
+
+  threadListener () {
+    if (cluster.isWorker) {
+      process.setMaxListeners(++listeners + 10)
+      process.on('message', async (data) => {
+        if (data.type === '/' + this._name + '/' + this.constructor.name.toLowerCase()) {
+          _.set(this.settings, data.path, data.value)
+        }
+      })
+    } else {
+      cluster.setMaxListeners(++listeners + 10)
+      cluster.on('message', (worker, data) => {
+        if (data.type === '/' + this._name + '/' + this.constructor.name.toLowerCase()) {
+          _.set(this.settings, data.path, data.value)
+        }
+      })
+    }
+  }
+
+  updateSettings (key, value) {
+    const proc = { type: '/' + this._name + '/' + this.constructor.name.toLowerCase(), path: key, value }
+
+    if (cluster.isMaster) {
+      global.db.engine.update(this.collection.settings, { key }, { value })
+      // send to all cluster
+      // eslint-disable-next-line
+      for (let w of Object.entries(cluster.workers)) {
+        if (w[1].isConnected()) w[1].send(proc)
+      }
+    } else {
+      // send to master to update
+      if (process.send) process.send(proc)
+    }
+  }
+
+  prepareVariableProxies () {
+    // add main level proxy
+    this.settings = new Proxy(this._settings, {
+      get: (target, key, receiver) => {
+        if (key === 'then' || key === 'toJSON') return Reflect.get(target, key, receiver) // promisify
+        if (_.isSymbol(key)) return undefined // handle iterator
+
+        if (typeof target[key] === 'object' && target[key] !== null) {
+          const path = key
+          return new Proxy(target[key], {
+            get: (target, key, receiver) => {
+              if (key === 'then' || key === 'toJSON') return Reflect.get(target, key, receiver) // promisify
+              if (_.isSymbol(key)) return undefined // handle iterator
+              return target[key]
+            },
+            set: (target, key, value) => {
+              if (_.isEqual(target[key], value)) return true
+              // check if types match
+              if (typeof target[key] !== typeof value) throw new Error(path + '.' + key + ' set failed\n\texpected:\t' + typeof target[key] + '\n\tset:     \t' + typeof value)
+
+              target[key] = value
+              this.updateSettings(`${path}.${key}`, value)
+
+              if (this.onChange[`${path}.${key}`] && cluster.isMaster) {
+                // run onChange functions only on master
+                for (let fnc of this.onChange[`${path}.${key}`]) {
+                  this[fnc](`${path}.${key}`, value)
+                }
+              }
+              return true
+            }
+          })
+        }
+
+        return target[key]
+      },
+      set: (target, key, value) => {
+        if (_.isEqual(target[key], value)) return true
+        // check if types match
+        if (typeof target[key] !== typeof value) throw new Error(key + ' set failed\n\texpected:\t' + typeof target[key] + '\n\tset:     \t' + typeof value)
+
+        target[key] = value
+        this.updateSettings(key, value)
+
+        if (this.onChange[key]) {
+          for (let fnc of this.onChange[key]) {
+            global[fnc](key, value)
+          }
+        }
+        return true
+      }
+    })
+  }
+
+  prepareCommandProxies () {
+    let commands = {}
+    if (this._settings.commands) {
+      for (let i = 0, length = this._settings.commands.length; i < length; i++) {
+        let key = this._settings.commands[i]
+        let permission = constants.VIEWERS
+        let fnc = null
+        let isHelper = false
+
+        if (_.isObjectLike(key)) {
+          permission = key.permission
+          fnc = key.fnc || fnc
+          isHelper = key.isHelper || false
+          key = _.isObjectLike(key) ? key.name : key
+        }
+
+        // basic loadup of commands
+        this._commands.push({ name: key, permission, fnc, isHelper })
+
+        commands[key] = key // remap to default value
+      }
+    }
+    this._settings.commands = commands
   }
 
   async _indexDbs () {
@@ -43,7 +179,7 @@ class Module {
         this.timeouts[`${this.constructor.name}._indexDbs`] = setTimeout(() => this._indexDbs(), 1000)
       } else {
         // add indexing to settings
-        global.db.engine.index({ table: this.collection.settings, index: 'category' })
+        global.db.engine.index({ table: this.collection.settings, index: 'key' })
       }
     }
   }
@@ -152,128 +288,6 @@ class Module {
     }
   }
 
-  _prepare (settingsArg) {
-    if (_.isNil(this.collection.settings)) throw Error('This system doesn\'t have collection.settings defined')
-
-    // add enabled if not set
-    if (_.isNil(settingsArg.enabled)) settingsArg.enabled = true
-
-    for (let [category, values] of Object.entries(settingsArg)) {
-      if (_.isNil(this._settings[category])) this._settings[category] = {} // init if not existing
-      if (_.isArray(values)) {
-        for (let key of values) {
-          if (category === 'parsers') {
-            this._parsers.push(key)
-            continue // nothing else to do with parsers (not updateable)
-          } else if (category === 'commands') {
-            let permission = constants.VIEWERS
-            let fnc = null
-            let isHelper = false
-            if (_.isObjectLike(key)) {
-              permission = key.permission
-              fnc = key.fnc || fnc
-              isHelper = key.isHelper || false
-              key = _.isObjectLike(key) ? key.name : key
-            }
-            this._commands.push({ name: key, permission, fnc, isHelper })
-          } else if (_.isObjectLike(key)) throw Error('You can have only one nested item deep')
-
-          this._settings[category][key] = () => {
-            return new Promise(async (resolve, reject) => {
-              const currentValue = await global.db.engine.findOne(this.collection.settings, { category, key })
-              resolve(_.isNil(currentValue.value) ? key : currentValue.value)
-            })
-          }
-
-          if (_.isNil(this.settings)) this.settings = {}
-          if (_.isNil(this.settings[category])) this.settings[category] = {}
-          Object.defineProperty(this.settings[category], `${key}`, {
-            get: () => this._settings[category][key](),
-            set: async (value) => {
-              if (typeof value === 'undefined') {
-                global.log.error(`Trying to set undefined value ${this.constructor.name} - category: ${category}, key: ${key}`)
-                return
-              }
-              const isDefaultValue = value === key
-              if (isDefaultValue) global.db.engine.remove(this.collection.settings, { category, key })
-              else {
-                await global.db.engine.remove(this.collection.settings, { category, key })
-                await global.db.engine.insert(this.collection.settings, { category, key, value })
-              }
-            }
-          })
-        }
-      } else if (_.isString(values) || _.isBoolean(values) || _.isNumber(values)) {
-        this._settings[category] = () => {
-          return new Promise(async (resolve, reject) => {
-            const currentValue = await global.db.engine.findOne(this.collection.settings, { category })
-            resolve(_.isNil(currentValue.value) ? values : currentValue.value)
-          })
-        }
-
-        if (_.isNil(this.settings)) this.settings = {}
-        if (_.isNil(this.settings[category])) this.settings[category] = null
-        Object.defineProperty(this.settings, `${category}`, {
-          get: () => this._settings[category](),
-          set: async (value) => {
-            if (typeof value === 'undefined') {
-              global.log.error(`Trying to set undefined value ${this.constructor.name} - category: ${category}`)
-              return
-            }
-            const isDefaultValue = values === value
-            if (isDefaultValue) global.db.engine.remove(this.collection.settings, { category })
-            else {
-              await global.db.engine.remove(this.collection.settings, { category })
-              await global.db.engine.insert(this.collection.settings, { category, value })
-            }
-          }
-        })
-      } else if (_.isObjectLike(values)) {
-        for (let [key, value] of Object.entries(values)) {
-          if (_.isNil(this.settings)) this.settings = {}
-          if (_.isNil(this.settings[category])) this.settings[category] = {}
-          if (_.isNil(this.settings[category][key])) this.settings[category][key] = null
-
-          this._settings[category][key] = () => {
-            return new Promise(async (resolve, reject) => {
-              const currentValue = await global.db.engine.find(this.collection.settings, { category, key })
-              if (_.isEmpty(currentValue)) {
-                resolve(value)
-              } else {
-                resolve(_.every(currentValue, 'isMultiValue') ? currentValue.map(o => o.value) : currentValue[0].value)
-              }
-            })
-          }
-          Object.defineProperty(this.settings[category], `${key}`, {
-            get: () => this._settings[category][key](),
-            set: async (values) => {
-              if (typeof values === 'undefined') {
-                global.log.error(`Trying to set undefined value ${this.constructor.name} - category: ${category}, key: ${key}`)
-                return
-              }
-              if (_.isArray(values)) {
-                if (_.isEqual(_(value).sort().value().filter(String), _(values).sort().value().filter(String))) {
-                  global.db.engine.remove(this.collection.settings, { category, key })
-                } else {
-                  const valuesFromDb = (await global.db.engine.find(this.collection.settings, { category, key })).map((o) => o.value)
-                  for (let toRemoveValue of _.difference(valuesFromDb, values)) await global.db.engine.remove(this.collection.settings, { category, key, value: toRemoveValue })
-                  for (let toAddValue of _.difference(values, valuesFromDb)) await global.db.engine.insert(this.collection.settings, { category, key, value: toAddValue, isMultiValue: true })
-                }
-              } else {
-                const isDefaultValue = values === value
-                if (isDefaultValue) global.db.engine.remove(this.collection.settings, { category, key, isMultiValue: false })
-                else {
-                  await global.db.engine.remove(this.collection.settings, { category, key, isMultiValue: false })
-                  await global.db.engine.insert(this.collection.settings, { category, key, value: values, isMultiValue: false })
-                }
-              }
-            }
-          })
-        }
-      } else throw Error(`This variable type cannot be used here ${typeof values}`)
-    }
-  }
-
   async _dependenciesEnabled () {
     return new Promise((resolve) => {
       let check = async (retry) => {
@@ -343,16 +357,21 @@ class Module {
 
   async getAllSettings () {
     let promisedSettings = {}
+
+    // go through expected settings
     for (let [category, values] of Object.entries(this._settings)) {
       if (category === 'parsers') continue
-      if (_.isObject(values) && !_.isFunction(values)) {
-        if (_.isNil(promisedSettings[category])) promisedSettings[category] = {} // init if not existing
-        for (let [key, getValue] of Object.entries(values)) {
-          promisedSettings[category][key] = await getValue()
+      promisedSettings[category] = {}
+
+      if (!_.isObject(values)) {
+        // we are expecting bool, string, number
+        promisedSettings[category] = await this.settings[category]
+      } else {
+        // we are expecting one more layer
+        for (let o of Object.entries(values)) {
+          promisedSettings[category][o[0]] = await this.settings[category][o[0]]
         }
-      } else if (_.isFunction(values)) {
-        promisedSettings[category] = await this._settings[category]()
-      } else throw Error(`Unexpected data type ${typeof values}`)
+      }
     }
 
     // add command permissions

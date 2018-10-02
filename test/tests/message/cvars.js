@@ -22,7 +22,7 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $_test',
       expectedSent: true,
-      params: { sender: global.commons.getOwner(), param: 5 }
+      params: { sender: '__owner__', param: 5 }
     },
     {
       test: '$_test',
@@ -32,7 +32,7 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $_test',
       expectedSent: true,
-      params: { sender: global.commons.getOwner(), param: '+' }
+      params: { sender: '__owner__', param: '+' }
     },
     {
       test: '$_test',
@@ -42,7 +42,7 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $_test',
       expectedSent: true,
-      params: { sender: global.commons.getOwner(), param: '+' }
+      params: { sender: '__owner__', param: '+' }
     },
     {
       test: '$!_test',
@@ -52,7 +52,7 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $!_test',
       expectedSent: false,
-      params: { sender: global.commons.getOwner(), param: '-' }
+      params: { sender: '__owner__', param: '-' }
     },
     {
       test: '$!_test',
@@ -62,7 +62,7 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $!_test',
       expectedSent: false,
-      params: { sender: global.commons.getOwner(), param: '-' }
+      params: { sender: '__owner__', param: '-' }
     },
     {
       test: '$!_test',
@@ -72,7 +72,7 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $!_test',
       expectedSent: false,
-      params: { sender: global.commons.getOwner(), param: '+' }
+      params: { sender: '__owner__', param: '+' }
     },
     {
       test: '$_test',
@@ -82,7 +82,7 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $_test',
       expectedSent: true,
-      params: { sender: global.commons.getOwner(), param: '-' }
+      params: { sender: '__owner__', param: '-' }
     },
     {
       test: '$!_test',
@@ -92,7 +92,7 @@ describe('Message - cvars filter', async () => {
       type: 'number',
       command: 'This is $!_test',
       expectedSent: false,
-      params: { sender: global.commons.getOwner(), param: 5 }
+      params: { sender: '__owner__', param: 5 }
     }
   ]
 
@@ -106,6 +106,9 @@ describe('Message - cvars filter', async () => {
     describe(`'${test.test}' expect '${test.command.replace(/\$_test|\$!_test/g, test.afterValue)}' with value after ${test.afterValue}`, async () => {
       it(`create initial value '${test.initialValue}' of ${test.variable}`, async () => {
         await global.db.engine.update('custom.variables', { variableName: test.variable }, { readOnly: false, currentValue: test.initialValue, type: test.type, responseType: 0 })
+      })
+      it(`add proper user to params => ${test.params.sender}`, () => {
+        if (test.params.sender === '__owner__') test.params.sender = global.commons.getOwner()
       })
       it(`parse '${test.command}' with params`, async () => {
         message = await new Message(test.command).parse(test.params)

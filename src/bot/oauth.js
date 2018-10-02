@@ -112,13 +112,17 @@ class OAuth extends Core {
       }
     }
 
-    super({ settings, ui })
+    const onChange = {
+      'broadcaster.accessToken': [ 'onChangeAccessToken' ],
+      'bot.accessToken': [ 'onChangeAccessToken' ]
+    }
+
+    super({ settings, ui, onChange })
 
     this.addMenu({ category: 'settings', name: 'core', id: 'core' })
     this.validateOAuth('bot')
     this.validateOAuth('broadcaster')
     this.getChannelId()
-    this.sendDataToClusters()
   }
 
   async getChannelId () {
@@ -145,17 +149,15 @@ class OAuth extends Core {
     this.timeouts['getChannelId'] = setTimeout(() => this.getChannelId(), timeout)
   }
 
-  async sendDataToClusters () {
-    clearTimeout(this.timeouts['sendDataToClusters'])
-    global.commons.cached.owners = await this.settings.general.owners
-    global.commons.processAll({ ns: 'commons', fnc: 'load', args: ['owners', global.commons.cached.owners] })
-
-    global.commons.cached.broadcaster = await this.settings.broadcaster.username
-    global.commons.processAll({ ns: 'commons', fnc: 'load', args: ['broadcaster', global.commons.cached.broadcaster] })
-
-    global.commons.cached.bot = await this.settings.bot.username
-    global.commons.processAll({ ns: 'commons', fnc: 'load', args: ['bot', global.commons.cached.bot] })
-    this.timeouts['sendDataToClusters'] = setTimeout(() => this.sendDataToClusters(), 10000)
+  async onChangeAccessToken (key: string, value: any) {
+    switch (key) {
+      case 'broadcaster.accessToken':
+        this.validateOAuth('broadcaster')
+        break
+      case 'bot.accessToken':
+        this.validateOAuth('bot')
+        break
+    }
   }
 
   /*

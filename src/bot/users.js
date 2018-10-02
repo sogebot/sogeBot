@@ -159,7 +159,7 @@ class Users extends Core {
     if (_.isNil(username)) return global.log.error('username is NULL!\n' + new Error().stack)
 
     username = username.toLowerCase()
-    if (username === global.commons.cached.bot.toLowerCase() || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
+    if (username === global.oauth.settings.bot.username.toLowerCase() || _.isNil(username)) return // it shouldn't happen, but there can be more than one instance of a bot
 
     const user = await global.db.engine.findOne('users', { username })
     object.username = username

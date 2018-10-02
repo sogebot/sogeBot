@@ -174,7 +174,7 @@ class TMI extends Core {
         if (!user.id) { user.id = await global.api.getIdFromTwitch(message.username) }
         global.users.set(message.username, { id: user.id, is: { mod: message.isModerator } })
 
-        if (message.username === global.commons.cached.bot) global.status.MOD = message.isModerator
+        if (message.username === global.oauth.settings.bot.username) global.status.MOD = message.isModerator
       })
 
       this.client[type].chat.on('USERNOTICE', message => {

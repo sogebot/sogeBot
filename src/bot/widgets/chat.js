@@ -31,7 +31,7 @@ ChatWidget.prototype.sendChatRoom = async function (self, socket) {
 }
 
 ChatWidget.prototype.chatMessageSend = async function (self, socket, message) {
-  global.commons.sendMessage(message, { username: global.commons.cached.bot }, { force: true })
+  global.commons.sendMessage(message, { username: global.oauth.settings.bot.username }, { force: true })
 }
 
 module.exports = new ChatWidget()

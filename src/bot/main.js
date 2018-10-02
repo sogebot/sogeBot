@@ -16,6 +16,7 @@ const config = require('@config')
 global.commons = new (require('./commons'))()
 global.cache = new (require('./cache'))()
 
+global.startedClusters = 0
 global.linesParsed = 0
 global.avgResponse = []
 
@@ -39,7 +40,10 @@ if (cluster.isWorker) {
   if (config.database.type === 'nedb') global.cpu = 1 // nedb can have only one fork
   for (let i = 0; i < global.cpu; i++) fork()
   cluster.on('disconnect', (worker) => fork())
-  main()
+  cluster.on('listening', (worker, address) => {
+    console.log(
+      `A worker is now connected to ${address.address}:${address.port}`)
+  })
 }
 
 async function main () {
@@ -94,7 +98,10 @@ async function main () {
 }
 
 function fork () {
-  let worker = cluster.fork()
+  const worker = cluster.fork()
+  worker.on('online', () => {
+    if (++global.startedClusters === global.cpu) main()
+  })
   forkOn(worker)
 }
 

@@ -20,7 +20,7 @@ class Duel extends Game {
   constructor () {
     const settings = {
       _: {
-        timestamp: 0,
+        timestamp: Number(new Date(0)),
         cooldown: String(new Date())
       },
       cooldown: 0,
@@ -114,7 +114,7 @@ class Duel extends Game {
         if (new Date().getTime() - new Date(await this.settings._.cooldown).getTime() > cooldown * 1000 ||
           (await this.settings.bypassCooldownByOwnerAndMods && (isMod || global.commons.isBroadcaster(opts.sender)))) {
           // save new cooldown if not bypassed
-          if (!(await this.settings.bypassCooldownByOwnerAndMods && (isMod || global.commons.isBroadcaster(opts.sender)))) this.settings._.cooldown = new Date()
+          if (!(await this.settings.bypassCooldownByOwnerAndMods && (isMod || global.commons.isBroadcaster(opts.sender)))) this.settings._.cooldown = String(new Date())
           await global.db.engine.insert(this.collection.users, { id: opts.sender.userId, username: opts.sender.username, tickets: Number(bet) })
           await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(bet, 10) * -1 })
         } else {
@@ -130,7 +130,7 @@ class Duel extends Game {
       // if new duel, we want to save timestamp
       const isNewDuel = (await this.settings._.timestamp) === 0
       if (isNewDuel) {
-        this.settings._.timestamp = new Date()
+        this.settings._.timestamp = Number(new Date())
         message = await global.commons.prepare('gambling.duel.new', {
           minutesName: global.commons.getLocalizedName(5, 'core.minutes'),
           minutes: await this.settings.duration,
