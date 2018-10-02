@@ -91,6 +91,12 @@ class TMI extends Core {
     global.log.info(`TMI: ${type} parted channel ${this.channel}`)
   }
 
+  getUsernameFromRaw (raw: string) {
+    const match = raw.match(/@([a-z_0-9]*).tmi.twitch.tv/)
+    if (match) return match[1]
+    else return null
+  }
+
   loadListeners (type: string) {
     // common for bot and broadcaster
     this.client[type].chat.on('DISCONNECT', async (message) => {
@@ -108,8 +114,9 @@ class TMI extends Core {
 
     if (type === 'bot') {
       this.client[type].chat.on('WHISPER', async (message) => {
-        if (!await global.commons.isBot(message.tags.displayName) || !message.isSelf) {
-          message.tags.username = message.tags.displayName.toLowerCase() // backward compatibility until userID is primary key
+        message.tags.username = this.getUsernameFromRaw(message._raw)
+
+        if (!await global.commons.isBot(message.tags.username) || !message.isSelf) {
           message.tags['message-type'] = 'whisper'
           this.sendMessageToWorker(message.tags, message.message)
           global.linesParsed++
@@ -117,8 +124,9 @@ class TMI extends Core {
       })
 
       this.client[type].chat.on('PRIVMSG', async (message) => {
-        if (!await global.commons.isBot(message.tags.displayName) || !message.isSelf) {
-          message.tags.username = message.tags.displayName.toLowerCase() // backward compatibility until userID is primary key
+        message.tags.username = this.getUsernameFromRaw(message._raw)
+
+        if (!await global.commons.isBot(message.tags.username) || !message.isSelf) {
           message.tags['message-type'] = message.message.startsWith('\u0001ACTION') ? 'action' : 'say' // backward compatibility for /me moderation
 
           if (message.event === 'CHEER') {
@@ -127,6 +135,7 @@ class TMI extends Core {
             // strip message from ACTION
             message.message = message.message.replace('\u0001ACTION ', '').replace('\u0001', '')
 
+            console.log({ tags: message.tags, msg: message.message })
             this.sendMessageToWorker(message.tags, message.message)
             global.linesParsed++
 
@@ -192,8 +201,8 @@ class TMI extends Core {
           this.subscriptionGiftCommunity(message)
         } else if (message.event === 'RITUAL') {
           if (message.parameters.ritualName === 'new_chatter') {
-            if (!global.users.newChattersList.includes(message.tags.displayName.toLowerCase())) {
-              global.users.newChattersList.push(message.tags.displayName.toLowerCase())
+            if (!global.users.newChattersList.includes(message.tags.username.toLowerCase())) {
+              global.users.newChattersList.push(message.tags.username.toLowerCase())
               global.db.engine.increment('api.new', { key: 'chatters' }, { value: 1 })
             }
           } else {
@@ -248,7 +257,7 @@ class TMI extends Core {
 
   async subscription (message: Object) {
     try {
-      const username = message.tags.username || message.tags.displayName.toLowerCase()
+      const username = message.tags.username
       const method = this.getMethod(message)
       const userstate = message.tags
 
@@ -262,7 +271,7 @@ class TMI extends Core {
       if (user.lock && user.lock.subscriber) isSubscriber = undefined
 
       global.users.setById(userstate.userId, { username, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt }, stats: { tier: method.prime ? 'Prime' : method.plan / 1000 } })
-      global.overlays.eventlist.add({ type: 'sub', tier: (method.prime ? 'Prime' : method.plan / 1000), username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
+      global.overlays.eventlist.add({ type: 'sub', tier: (method.prime ? 'Prime' : method.plan / 1000), username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
       global.log.sub(`${username}, tier: ${method.prime ? 'Prime' : method.plan / 1000}`)
       global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
     } catch (e) {
@@ -273,7 +282,7 @@ class TMI extends Core {
 
   async resub (message: Object) {
     try {
-      const username = message.tags.username || message.tags.displayName.toLowerCase()
+      const username = message.tags.username
       const method = this.getMethod(message)
       const months = Number(message.parameters.months)
       const userstate = message.tags
@@ -300,7 +309,7 @@ class TMI extends Core {
 
   async subscriptionGiftCommunity (message: Object) {
     try {
-      const username = message.tags.username || message.tags.displayName.toLowerCase()
+      const username = message.tags.username
       const count = Number(message.parameters.senderCount)
       // const plan = message.parameters.subPlan
 
@@ -319,7 +328,7 @@ class TMI extends Core {
 
   async subgift (message: Object) {
     try {
-      const username = message.tags.username || message.tags.displayName.toLowerCase()
+      const username = message.tags.username
       const months = Number(message.parameters.months)
       const recipient = message.parameters.recipientName.toLowerCase()
 
