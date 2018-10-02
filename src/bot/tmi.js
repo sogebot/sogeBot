@@ -92,7 +92,9 @@ class TMI extends Core {
   }
 
   getUsernameFromRaw (raw: string) {
-    return raw.match(/@([a-z_0-9]*).tmi.twitch.tv/)[1]
+    const match = raw.match(/@([a-z_0-9]*).tmi.twitch.tv/)
+    if (match) return match[1]
+    else return null
   }
 
   loadListeners (type: string) {
