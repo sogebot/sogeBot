@@ -163,7 +163,7 @@ class TMI extends Core {
       this.client[type].chat.on('MODE', async (message) => {
         const user = await global.users.getByName(message.username)
         if (!user.is.mod && message.isModerator) global.events.fire('mod', { username: message.username })
-        if (!user.id) { user.id = await global.users.getIdFromTwitch(message.username) }
+        if (!user.id) { user.id = await global.api.getIdFromTwitch(message.username) }
         global.users.set(message.username, { id: user.id, is: { mod: message.isModerator } })
 
         if (message.username === global.commons.cached.bot) global.status.MOD = message.isModerator
@@ -339,7 +339,7 @@ class TMI extends Core {
 
       let user = await global.db.engine.findOne('users', { username: recipient })
       if (!user.id) {
-        user.id = await global.users.getIdFromTwitch(recipient)
+        user.id = await global.api.getIdFromTwitch(recipient)
       }
 
       if (user.id !== null) {

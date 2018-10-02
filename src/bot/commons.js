@@ -33,6 +33,7 @@ Commons.prototype.processAll = function (proc) {
     // run on master
     const namespace = _.get(global, proc.ns, null)
     namespace[proc.fnc].apply(namespace, proc.args)
+    proc.type = 'call'
     // send to all clusters
     // eslint-disable-next-line
     for (let w of Object.entries(cluster.workers)) {
