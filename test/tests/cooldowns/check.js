@@ -7,6 +7,7 @@ const assert = require('chai').assert
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
+const variable = require('../../general.js').variable
 
 // users
 const owner = { username: 'soge__' }
@@ -17,6 +18,9 @@ describe('Cooldowns - check()', () => {
   beforeEach(async () => {
     await db.cleanup()
     await message.prepare()
+
+    global.games.gamble.settings.enabled = true
+    await variable.isEqual('global.games.gamble.settings.enabled', true)
   })
 
   it('#1406 - cooldown not working on gamble', async () => {
