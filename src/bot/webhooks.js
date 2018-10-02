@@ -151,6 +151,7 @@ class Webhooks {
         })
 
         // save remaining api calls
+        global.api.calls.bot.limit = request.headers['ratelimit-limit']
         global.api.calls.bot.remaining = request.headers['ratelimit-remaining']
         global.api.calls.bot.refresh = request.headers['ratelimit-reset']
 

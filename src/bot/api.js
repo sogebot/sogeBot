@@ -12,6 +12,7 @@ class API {
         bot: new Proxy({}, {
           get: function (obj, prop) {
             if (typeof obj[prop] === 'undefined') {
+              if (prop === 'limit') return 120
               if (prop === 'remaining') return 0
               if (prop === 'refresh') return (_.now() / 1000) + 90
             } else return obj[prop]
@@ -23,7 +24,8 @@ class API {
             if (prop === 'remaining' && (process.env.DEBUG && process.env.DEBUG.includes('api'))) {
               const remaining = obj.remaining || 'n/a'
               const refresh = obj.refresh || 'n/a'
-              fs.appendFileSync('api.bot.csv', `${cluster.isMaster}, ${stacktrace.parse((new Error()).stack)[1].methodName}, ${remaining}, ${refresh}, ${new Date()}\n`)
+              const limit = obj.limit || 'n/a'
+              fs.appendFileSync('api.bot.csv', `${stacktrace.parse((new Error()).stack)[1].methodName}, ${new Date()}, ${limit}, ${remaining}, ${refresh}\n`)
             }
 
             value = Number(value)
@@ -45,7 +47,8 @@ class API {
             if (prop === 'remaining' && (process.env.DEBUG && process.env.DEBUG.includes('api'))) {
               const remaining = obj.remaining || 'n/a'
               const refresh = obj.refresh || 'n/a'
-              fs.appendFileSync('api.broadcaster.csv', `${cluster.isMaster}, ${stacktrace.parse((new Error()).stack)[1].methodName}, ${remaining}, ${refresh}, ${new Date()}\n`)
+              const limit = obj.limit || 'n/a'
+              fs.appendFileSync('api.bot.csv', `${stacktrace.parse((new Error()).stack)[1].methodName}, ${new Date()}, ${limit}, ${remaining}, ${refresh}\n`)
             }
 
             value = Number(value)
@@ -88,7 +91,26 @@ class API {
 
       this.intervalFollowerUpdate()
       this.checkClips()
+    } else {
+      this.calls = {
+        bot: {
+          limit: 0,
+          remaining: 0,
+          refresh: 0
+        },
+        broadcaster: {
+          limit: 0,
+          remaining: 0,
+          refresh: 0
+        }
+      }
     }
+  }
+
+  async setRateLimit (type, limit, remaining, reset) {
+    this.calls[type].limit = limit
+    this.calls[type].remaining = remaining
+    this.calls[type].reset = reset
   }
 
   async intervalFollowerUpdate () {
@@ -113,6 +135,63 @@ class API {
 
   async _loadCachedStatusAndGame () {
     global.db.engine.update('api.current', { key: 'game' }, { value: await global.cache.gameCache() })
+  }
+
+  async getIdFromTwitch (username: string, isChannelId: bool = false) {
+    const url = `https://api.twitch.tv/helix/users?login=${username}`
+    var request
+    /*
+      {
+        "data": [{
+          "id": "44322889",
+          "login": "dallas",
+          "display_name": "dallas",
+          "type": "staff",
+          "broadcaster_type": "",
+          "description": "Just a gamer playing games and chatting. :)",
+          "profile_image_url": "https://static-cdn.jtvnw.net/jtv_user_pictures/dallas-profile_image-1a2c906ee2c35f12-300x300.png",
+          "offline_image_url": "https://static-cdn.jtvnw.net/jtv_user_pictures/dallas-channel_offline_image-1a2c906ee2c35f12-1920x1080.png",
+          "view_count": 191836881,
+          "email": "login@provider.com"
+        }]
+      }
+    */
+
+    const token = await global.oauth.settings.bot.accessToken
+    const needToWait = token === ''
+    const notEnoughAPICalls = global.api.calls.bot.remaining <= 30 && global.api.calls.bot.refresh > _.now() / 1000
+    if ((needToWait || notEnoughAPICalls) && !isChannelId) {
+      return null
+    }
+
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      })
+
+      // save remaining api calls
+      // $FlowFixMe error with flow on request.headers
+      this.calls.bot.limit = request.headers['ratelimit-limit']
+      // $FlowFixMe error with flow on request.headers
+      this.calls.bot.remaining = request.headers['ratelimit-remaining']
+      // $FlowFixMe error with flow on request.headers
+      this.calls.bot.refresh = request.headers['ratelimit-reset']
+      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+
+      return request.data.data[0].id
+    } catch (e) {
+      if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+        this.calls.bot.remaining = 0
+        this.calls.bot.refresh = e.response.headers['ratelimit-reset']
+      }
+      global.panel.io.emit('api.stats', { data: {}, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
+    }
+    return null
   }
 
   async getChannelChattersUnofficialAPI (opts) {
@@ -376,10 +455,13 @@ class API {
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
+      this.calls.bot.limit = request.headers['ratelimit-limit']
+      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       if (request.data.data.length > 0) await global.db.engine.update('api.current', { key: 'views' }, { value: request.data.data[0].view_count })
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -418,6 +500,8 @@ class API {
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
+      this.calls.bot.limit = request.headers['ratelimit-limit']
+      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
@@ -490,6 +574,7 @@ class API {
       global.db.engine.update('api.current', { key: 'followers' }, { value: request.data.total })
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -525,6 +610,8 @@ class API {
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
+      this.calls.bot.limit = request.headers['ratelimit-limit']
+      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       if (cluster.isMaster) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
@@ -534,6 +621,7 @@ class API {
       return name
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -573,6 +661,8 @@ class API {
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
+      this.calls.bot.limit = request.headers['ratelimit-limit']
+      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
@@ -670,6 +760,7 @@ class API {
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -881,6 +972,8 @@ class API {
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
+      this.calls.bot.limit = request.headers['ratelimit-limit']
+      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
@@ -890,6 +983,7 @@ class API {
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -945,10 +1039,13 @@ class API {
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
+      this.calls.bot.limit = request.headers['ratelimit-limit']
+      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -1029,10 +1126,13 @@ class API {
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
+      this.calls.bot.limit = request.headers['ratelimit-limit']
+      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -1094,6 +1194,8 @@ class API {
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
       this.calls.bot.refresh = request.headers['ratelimit-reset']
+      this.calls.bot.limit = request.headers['ratelimit-limit']
+      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
     } catch (e) {

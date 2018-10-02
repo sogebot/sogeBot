@@ -67,7 +67,7 @@ class Points extends System {
         if (await global.commons.isBot(username)) continue
 
         let user = await global.db.engine.findOne('users', { username })
-        if (_.isEmpty(user)) user.id = await global.users.getIdFromTwitch(username)
+        if (_.isEmpty(user)) user.id = await global.api.getIdFromTwitch(username)
         if (user.id) {
           if (parseInt(interval, 10) !== 0 && parseInt(ptsPerInterval, 10) !== 0) {
             _.set(user, 'time.points', _.get(user, 'time.points', 0))

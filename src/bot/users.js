@@ -164,7 +164,7 @@ class Users extends Core {
     const user = await global.db.engine.findOne('users', { username })
     object.username = username
     if (_.isEmpty(user)) {
-      const id = await this.getIdFromTwitch(username)
+      const id = await global.api.getIdFromTwitch(username)
       if (id !== null) {
         return global.db.engine.update('users', { id }, object)
       } else return null
@@ -267,58 +267,6 @@ class Users extends Core {
         : Number.MAX_SAFE_INTEGER / 1000000, 10)
   }
 
-  async getIdFromTwitch (username: string) {
-    const url = `https://api.twitch.tv/helix/users?login=${username}`
-    var request
-    /*
-      {
-        "data": [{
-          "id": "44322889",
-          "login": "dallas",
-          "display_name": "dallas",
-          "type": "staff",
-          "broadcaster_type": "",
-          "description": "Just a gamer playing games and chatting. :)",
-          "profile_image_url": "https://static-cdn.jtvnw.net/jtv_user_pictures/dallas-profile_image-1a2c906ee2c35f12-300x300.png",
-          "offline_image_url": "https://static-cdn.jtvnw.net/jtv_user_pictures/dallas-channel_offline_image-1a2c906ee2c35f12-1920x1080.png",
-          "view_count": 191836881,
-          "email": "login@provider.com"
-        }]
-      }
-    */
-
-    const token = await global.oauth.settings.bot.accessToken
-    const needToWait = token === ''
-    const notEnoughAPICalls = this.remainingAPICalls <= 10 && this.refreshAPICalls > _.now() / 1000
-    if (needToWait || notEnoughAPICalls) {
-      return null
-    }
-
-    try {
-      request = await axios.get(url, {
-        headers: {
-          'Authorization': 'Bearer ' + token
-        }
-      })
-
-      // save remaining api calls
-      // $FlowFixMe error with flow on request.headers
-      global.api.calls.bot.remaining = request.headers['ratelimit-remaining']
-      // $FlowFixMe error with flow on request.headers
-      global.api.calls.bot.refresh = request.headers['ratelimit-reset']
-
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: global.api.calls.bot.remaining })
-
-      return request.data.data[0].id
-    } catch (e) {
-      if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.api.calls.bot.remaining = 0
-        global.api.calls.bot.refresh = e.response.headers['ratelimit-reset']
-      }
-      global.panel.io.emit('api.stats', { data: {}, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.stack, remaining: global.api.calls.bot.remaining })
-    }
-  }
-
   async getUsernamesFromIds (IdsList: Array<string>) {
     let IdsToUsername = {}
     for (let id of IdsList) {
@@ -335,7 +283,7 @@ class Users extends Core {
   async getIdByName (username: string) {
     let id = (await global.db.engine.findOne('users', { username })).id
     if (typeof id === 'undefined' || id === 'null') {
-      id = await this.getIdFromTwitch(username)
+      id = await global.api.getIdFromTwitch(username)
       await global.db.engine.update('users', { id }, { username })
     }
     return id

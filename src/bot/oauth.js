@@ -130,8 +130,8 @@ class OAuth extends Core {
     const channel = await this.settings.general.channel
     if (this.currentChannel !== channel && channel !== '') {
       this.currentChannel = channel
-      const cid = await global.users.getIdFromTwitch(channel)
-      if (typeof cid !== 'undefined') {
+      const cid = await global.api.getIdFromTwitch(channel, true)
+      if (typeof cid !== 'undefined' && cid !== null) {
         this.channelId = cid
         global.log.info('Channel ID set to ' + cid)
         global.tmi.reconnect('bot')
