@@ -671,16 +671,11 @@ class API {
         // correct status and we've got a data - stream online
         let stream = request.data.data[0]
 
-        // Always keep this updated
-        this.streamStartedAt = stream.started_at
-        this.streamId = stream.id
-        this.streamType = stream.type
-
         if (!moment.preciseDiff(moment(stream.started_at), moment((await global.cache.when()).online), true).firstDateWasLater) await global.cache.when({ online: stream.started_at })
         if (!await global.cache.isOnline() || this.streamType !== stream.type) {
           this.chatMessagesAtStart = global.linesParsed
 
-          if (!global.webhooks.enabled.streams) {
+          if (!global.webhooks.enabled.streams && Number(this.streamId) !== Number(stream.id)) {
             global.log.start(
               `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameFromId(stream.game_id)} | type: ${stream.type}`
             )
@@ -691,6 +686,11 @@ class API {
             justStarted = true
           }
         }
+
+        // Always keep this updated
+        this.streamStartedAt = stream.started_at
+        this.streamId = stream.id
+        this.streamType = stream.type
 
         this.curRetries = 0
         this.saveStreamData(stream)
