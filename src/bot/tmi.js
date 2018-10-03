@@ -135,7 +135,6 @@ class TMI extends Core {
             // strip message from ACTION
             message.message = message.message.replace('\u0001ACTION ', '').replace('\u0001', '')
 
-            console.log({ tags: message.tags, msg: message.message })
             this.sendMessageToWorker(message.tags, message.message)
             global.linesParsed++
 
