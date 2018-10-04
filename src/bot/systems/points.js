@@ -182,7 +182,7 @@ class Points extends System {
       if (opts.sender.username.toLowerCase() === username.toLowerCase()) return
 
       const availablePoints = await this.getPointsOf(opts.sender.userId)
-      const guser = await this.getByName(username)
+      const guser = await global.users.getByName(username)
 
       if (!guser.id) throw new Error('User doesn\'t have ID')
 
