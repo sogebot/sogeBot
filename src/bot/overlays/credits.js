@@ -172,6 +172,11 @@ class Credits {
       global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`)
       global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
     }
+
+    // get mp4 from thumbnail
+    for (let c of request.data.clips) {
+      c.mp4 = c.thumbnails.medium.replace('-preview-480x272.jpg', '.mp4')
+    }
     return request.data.clips
   }
 }
