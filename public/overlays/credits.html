@@ -14,6 +14,7 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="/auth/token.js"></script>
+    <script src="https://cdn.plyr.io/3.4.4/plyr.js"></script>
 
     <style>
       @import url(https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300);
@@ -74,7 +75,7 @@
         padding-bottom: 15px; margin-bottom: -15px;
       }
 
-      iframe, img {
+      iframe, img, video {
         width: 75%;
         height: 75%;
       }
@@ -409,7 +410,7 @@
                 <div class='name' style="padding-${i % 2 === 0 ? 'left' : 'right'}: 22%"><strong>${clip.game}</strong></div>
                 <div class="name" style="padding-${i % 2 === 0 ? 'left' : 'right'}: 22%">${_.get(custom, 'clipped-by', 'clipped by')} ${clip.curator.display_name}</div>
               </div>
-              <div class="clip" style="height: ${wHeight}px" data-duration="${clip.duration}" data-embed="${clip.embed_html}" data-thumbnail="${clip.thumbnails.medium}">
+              <div class="clip" style="height: ${wHeight}px" data-duration="${clip.duration}" data-mp4="${clip.mp4}" data-thumbnail="${clip.thumbnails.medium}">
                 <img src="${clip.thumbnails.medium}" data-id="${clip.tracking_id}"></img>
               </div>`)
           }
@@ -441,6 +442,7 @@
             let clips = $('.clip')
             let clipsBackup = _.clone(clips)
             let triggerHeight = wHeight / 4.5
+
             setInterval(() => {
               for (let i in clips) {
                 try {
@@ -448,7 +450,12 @@
                   if ($(clips[i]).offset().top <= triggerHeight) {
                     $('#wrapper').velocity("pause")
                     $(clips[i]).empty()
-                    $(clips[i]).append($(clips[i]).data('embed'))
+
+                    $(clips[i]).append(`
+                    <video id="player" playsinline autoplay>
+                      <source src="${$(clips[i]).data('mp4')}" type="video/mp4">
+                    </video>
+                    `)
                     setTimeout(() => {
                       $(clipsBackup[i]).empty()
                       $(clipsBackup[i]).append(`<img src="${$(clipsBackup[i]).data('thumbnail')}"></img>`)
