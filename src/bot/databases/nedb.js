@@ -274,6 +274,15 @@ class INeDB extends Interface {
       }
     })
   }
+
+  async collections () {
+    try {
+      return fs.readdir('db/nedb')
+    } catch (e) {
+      global.log.error(e.message)
+      throw e
+    }
+  }
 }
 
 module.exports = INeDB

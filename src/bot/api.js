@@ -119,7 +119,7 @@ class API {
 
     for (let username of this.rate_limit_follower_check) {
       const user = await global.users.getByName(username)
-      const isSkipped = user.username === global.commons.getBroadcaster || user.username === global.commons.cached.bot
+      const isSkipped = user.username === global.commons.getBroadcaster || user.username === global.oauth.settings.bot.username
       const userHaveId = !_.isNil(user.id)
       if (new Date().getTime() - _.get(user, 'time.followCheck', 0) <= 1000 * 60 * 60 * 24 || isSkipped || !userHaveId) {
         this.rate_limit_follower_check.delete(user.username)
@@ -251,7 +251,7 @@ class API {
     }
 
     for (let chatter of chatters) {
-      if (_.includes(ignoredUsers, chatter) || global.commons.cached.bot === chatter) {
+      if (_.includes(ignoredUsers, chatter) || global.oauth.settings.bot.username === chatter) {
         // even if online, remove ignored user from collection
         await global.db.engine.remove('users.online', { username: chatter })
       } else if (!_.includes(allOnlineUsers, chatter)) {
@@ -260,7 +260,7 @@ class API {
       }
     }
     // always remove bot from online users
-    global.db.engine.remove('users.online', { username: global.commons.cached.bot })
+    global.db.engine.remove('users.online', { username: global.oauth.settings.bot.username })
 
     if (bulkInsert.length > 0) {
       for (let chunk of _.chunk(bulkInsert, 100)) {
@@ -307,7 +307,7 @@ class API {
 
       // set subscribers
       for (let subscriber of subscribers) {
-        if (subscriber.name === global.commons.getBroadcaster || subscriber.name === global.commons.cached.bot) continue
+        if (subscriber.name === global.commons.getBroadcaster || subscriber.name === global.oauth.settings.bot.username) continue
         await global.db.engine.update('users', { id: subscriber._id }, { username: subscriber.name, is: { subscriber: true } })
       }
     } catch (e) {

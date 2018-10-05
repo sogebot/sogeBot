@@ -83,7 +83,7 @@ describe('Gambling - duel', () => {
 
   describe('Pick winner from huge tickets', () => {
     it('create duel', async () => {
-      global.games.duel.settings.timestamp = new Date()
+      global.games.duel.settings._.timestamp = Number(new Date())
 
       for (let user of ['testuser', 'testuser2', 'testuser3', 'testuser4', 'testuser5']) {
         let tickets = Math.floor(Number.MAX_SAFE_INTEGER / 10)

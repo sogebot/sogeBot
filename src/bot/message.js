@@ -77,7 +77,7 @@ class Message {
       '(random.online.viewer)': async function () {
         const onlineViewers = _.filter(
           (await global.db.engine.find('users.online')).map((o) => o.username),
-          (o) => o.username !== attr.sender && o.username !== global.commons.cached.bot.toLowerCase())
+          (o) => o.username !== attr.sender && o.username !== global.oauth.settings.bot.username.toLowerCase())
         if (onlineViewers.length === 0) return 'unknown'
         return _.sample(onlineViewers)
       },
@@ -85,7 +85,7 @@ class Message {
         const onlineViewers = (await global.db.engine.find('users.online')).map((o) => o.username)
         const followers = _.filter(
           (await global.db.engine.find('users', { is: { follower: true } })).map((o) => o.username),
-          (o) => o.username !== attr.sender && o.username !== global.commons.cached.bot.toLowerCase())
+          (o) => o.username !== attr.sender && o.username !== global.oauth.settings.bot.username.toLowerCase())
         let onlineFollowers = _.intersection(onlineViewers, followers)
         if (onlineFollowers.length === 0) return 'unknown'
         return _.sample(onlineFollowers)
@@ -94,26 +94,26 @@ class Message {
         const onlineViewers = (await global.db.engine.find('users.online')).map((o) => o.username)
         const subscribers = _.filter(
           (await global.db.engine.find('users', { is: { subscriber: true } })).map((o) => o.username),
-          (o) => o.username !== attr.sender && o.username !== global.commons.cached.bot.toLowerCase())
+          (o) => o.username !== attr.sender && o.username !== global.oauth.settings.bot.username.toLowerCase())
         let onlineSubscribers = _.intersection(onlineViewers, subscribers)
         if (onlineSubscribers.length === 0) return 'unknown'
         return _.sample(onlineSubscribers)
       },
       '(random.viewer)': async function () {
         let viewer = await global.users.getAll()
-        viewer = _.filter(viewer, function (o) { return o.username !== attr.sender && o.username !== global.commons.cached.bot.toLowerCase() })
+        viewer = _.filter(viewer, function (o) { return o.username !== attr.sender && o.username !== global.oauth.settings.bot.username.toLowerCase() })
         if (viewer.length === 0) return 'unknown'
         return _.sample(viewer).username
       },
       '(random.follower)': async function () {
         let follower = await global.users.getAll({ is: { follower: true } })
-        follower = _.filter(follower, function (o) { return o.username !== attr.sender && o.username !== global.commons.cached.bot.toLowerCase() })
+        follower = _.filter(follower, function (o) { return o.username !== attr.sender && o.username !== global.oauth.settings.bot.username.toLowerCase() })
         if (follower.length === 0) return 'unknown'
         return _.sample(follower).username
       },
       '(random.subscriber)': async function () {
         let subscriber = await global.users.getAll({ is: { subscriber: true } })
-        subscriber = _.filter(subscriber, function (o) { return o.username !== attr.sender && o.username !== global.commons.cached.bot.toLowerCase() })
+        subscriber = _.filter(subscriber, function (o) { return o.username !== attr.sender && o.username !== global.oauth.settings.bot.username.toLowerCase() })
         if (subscriber.length === 0) return 'unknown'
         return _.sample(subscriber).username
       },

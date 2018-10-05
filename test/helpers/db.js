@@ -1,12 +1,15 @@
 const _ = require('lodash')
 const variable = require('./variable')
 
+const startup = _.now()
+
 module.exports = {
   cleanup: async function () {
     let waitForIt = async (resolve, reject) => {
-      if (_.isNil(global.db) || !global.db.engine.connected || _.isNil(global.systems)) {
+      if (_.isNil(global.db) || !global.db.engine.connected || _.isNil(global.systems) || _.now() - startup < 10000) {
         return setTimeout(() => waitForIt(resolve, reject), 10)
       }
+
       await global.db.engine.remove('systems.alias', {})
       await global.db.engine.remove('systems.keywords', {})
       await global.db.engine.remove('systems.cooldown', {})
@@ -61,15 +64,15 @@ module.exports = {
       await global.db.engine.remove('events.filters', {})
       await global.db.engine.remove('events.operations', {})
 
+      await global.db.engine.remove('core.oauth.settings', {})
+
       global.oauth.settings.general.channel = 'soge__'
       await variable.isEqual('global.oauth.settings.general.channel', 'soge__')
 
       global.oauth.settings.general.owners = ['soge__']
-      global.commons.cached.owners = ['soge__']
       await variable.isEqual('global.oauth.settings.general.owners', ['soge__'])
 
       global.oauth.settings.broadcaster.username = 'broadcaster'
-      global.commons.cached.broadcaster = 'broadcaster'
       await variable.isEqual('global.oauth.settings.broadcaster.username', 'broadcaster')
 
       resolve()

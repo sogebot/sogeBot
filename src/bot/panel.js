@@ -60,7 +60,7 @@ function Panel () {
 
     if (origin.match(new RegExp('^((http|https)\\:\\/\\/|)([\\w|-]+\\.)?' + domain))) {
       res.set('Content-Type', 'application/javascript')
-      res.send(`const token="${config.panel.token.trim()}"; const name="${global.commons.cached.bot}"`)
+      res.send(`const token="${config.panel.token.trim()}"; const name="${global.oauth.settings.bot.username}"`)
     } else {
       // file CANNOT be accessed from different domain
       res.status(403).send('403 Forbidden - You are looking at wrong castle.')

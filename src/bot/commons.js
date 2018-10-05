@@ -13,10 +13,9 @@ function Commons () {
   this.compact = {}
 
   this.cached = {
-    bot: '',
-    broadcaster: '',
-    owners: []
+    ignorelist: []
   }
+
   this.registerConfiguration()
   this.loadIgnoreList()
 }
@@ -43,10 +42,6 @@ Commons.prototype.processAll = function (proc) {
     // need to be sent to master
     if (process.send) process.send(proc)
   }
-}
-
-Commons.prototype.load = async function (type, data) {
-  global.commons.cached[type] = data
 }
 
 Commons.prototype.loadIgnoreList = async function () {
@@ -93,7 +88,7 @@ Commons.prototype.isIntegrationEnabled = function (fn) {
 
 Commons.prototype.sendToOwners = async function (text) {
   if (global.configuration.getValue('disableSettingsWhispers')) return text.length > 0 ? global.log.warning(text) : ''
-  for (let owner of global.commons.cached.owners) {
+  for (let owner of global.oauth.settings.general.owners) {
     owner = {
       username: owner,
       'message-type': 'whisper'
@@ -192,18 +187,18 @@ Commons.prototype.timeout = async function (username, reason, timeout) {
 
 Commons.prototype.getOwner = function () {
   try {
-    return global.commons.cached.owners[0].trim()
+    return global.oauth.settings.general.owners[0].trim()
   } catch (e) {
     return ''
   }
 }
 Commons.prototype.getOwners = function () {
-  return global.commons.cached.owners
+  return global.oauth.settings.general.owners
 }
 
 Commons.prototype.getBroadcaster = function () {
   try {
-    return global.commons.cached.broadcaster.toLowerCase().trim()
+    return global.oauth.settings.broadcaster.username.toLowerCase().trim()
   } catch (e) {
     return ''
   }
@@ -212,7 +207,7 @@ Commons.prototype.getBroadcaster = function () {
 Commons.prototype.isBroadcaster = function (user) {
   try {
     if (_.isString(user)) user = { username: user }
-    return global.commons.cached.broadcaster.toLowerCase().trim() === user.username.toLowerCase().trim()
+    return global.oauth.settings.broadcaster.username.toLowerCase().trim() === user.username.toLowerCase().trim()
   } catch (e) {
     return false
   }
@@ -237,8 +232,8 @@ Commons.prototype.isRegular = async function (user) {
 Commons.prototype.isBot = function (user) {
   try {
     if (_.isString(user)) user = { username: user }
-    if (global.commons.cached.bot) {
-      return global.commons.cached.bot.toLowerCase().trim() === user.username.toLowerCase().trim()
+    if (global.oauth.settings.bot.username) {
+      return global.oauth.settings.bot.username.toLowerCase().trim() === user.username.toLowerCase().trim()
     } else return false
   } catch (e) {
     return true // we can expect, if user is null -> bot or admin
@@ -248,8 +243,8 @@ Commons.prototype.isBot = function (user) {
 Commons.prototype.isOwner = function (user) {
   try {
     if (_.isString(user)) user = { username: user }
-    if (global.commons.cached.owners) {
-      const owners = _.map(_.filter(global.commons.cached.owners, _.isString), function (owner) {
+    if (global.oauth.settings.general.owners) {
+      const owners = _.map(_.filter(global.oauth.settings.general.owners, _.isString), function (owner) {
         return _.trim(owner.toLowerCase())
       })
       return _.includes(owners, user.username.toLowerCase().trim())

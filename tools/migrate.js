@@ -116,6 +116,76 @@ let migration = {
     }
   }],
   settings: [{
+    version: '8.1.0',
+    do: async () => {
+      let processed = 0
+      console.info('Updating settings db format')
+      if (config.database.type === 'nedb') {
+        for (let f of fs.readdirSync('db/nedb')) {
+          if (f.includes('.settings.db')) {
+            const collection = f.slice(0, -3)
+            const items = await global.db.engine.find(collection)
+
+            let arrays = {}
+            for (let i = 0, length = items.length; i < length; i++) {
+              const _id = String(items[i]._id)
+              const value = items[i].value
+              const isArray = items[i].isMultiValue || false
+              const key = [items[i].category, items[i].key].filter(o => typeof o === 'string').join('.')
+
+              if (!isArray) {
+                // simple remove -> insert
+                processed++
+                await global.db.engine.remove(collection, { _id })
+                await global.db.engine.insert(collection, { key, value })
+              } else {
+                if (!arrays[key]) arrays[key] = []
+                arrays[key].push(value)
+                await global.db.engine.remove(collection, { _id })
+              }
+            }
+
+            for (let [key, value] of Object.entries(arrays)) {
+              processed++
+              await global.db.engine.insert(collection, { key, value })
+            }
+          }
+        }
+      } else if (config.database.type === 'mongodb') {
+        for (let collection of (await global.db.engine.collections())) {
+          if (collection.includes('.settings')) {
+            const items = await global.db.engine.find(collection)
+
+            let arrays = {}
+            for (let i = 0, length = items.length; i < length; i++) {
+              const _id = String(items[i]._id)
+              const value = items[i].value
+              const isArray = items[i].isMultiValue || false
+              const key = [items[i].category, items[i].key].filter(o => typeof o === 'string').join('.')
+
+              if (!isArray) {
+                // simple remove -> insert
+                processed++
+                await global.db.engine.remove(collection, { _id })
+                await global.db.engine.insert(collection, { key, value })
+              } else {
+                if (!arrays[key]) arrays[key] = []
+                arrays[key].push(value)
+                await global.db.engine.remove(collection, { _id })
+              }
+            }
+
+            for (let [key, value] of Object.entries(arrays)) {
+              processed++
+              await global.db.engine.insert(collection, { key, value })
+            }
+          }
+        }
+      }
+      console.info(` => ${processed} processed`)
+    }
+  },
+  {
     version: '8.0.0',
     do: async () => {
       let processed = 0

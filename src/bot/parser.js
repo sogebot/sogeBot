@@ -172,7 +172,7 @@ class Parser {
       (command.permission === constants.OWNER_ONLY && isOwner)) {
       var text = message.trim().replace(new RegExp('^(' + command.command + ')', 'i'), '').trim()
       let opts = {
-        sender: _.isNil(sender) ? { username: global.commons.cached.bot.toLowerCase() } : sender,
+        sender: _.isNil(sender) ? { username: global.oauth.settings.bot.username.toLowerCase() } : sender,
         command: command.command,
         parameters: text.trim()
       }
