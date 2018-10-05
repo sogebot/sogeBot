@@ -321,6 +321,9 @@ Commons.prototype.compactDb = async function (opts) {
     let itemsFromDb = await global.db.engine.find(opts.table)
     this.compact[opts.table] = new Date()
     for (let item of itemsFromDb) {
+      if (!item[opts.index] || item[opts.index] === 'undefined') {
+        await global.db.engine.remove(opts.table, { _id: String(item._id) })
+      }
       if (_.isNil(idsToUpdate[item[opts.index]])) {
         // if first id => we have pointer to that id and do nothing
         idsToUpdate[item[opts.index]] = String(item._id)
