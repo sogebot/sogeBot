@@ -126,7 +126,7 @@ class OAuth extends Core {
   }
 
   async getChannelId () {
-    if (typeof global.api === 'undefined') return setTimeout(() => this.getChannelId(), 1000)
+    if (typeof global.api === 'undefined' || typeof global.tmi === 'undefined') return setTimeout(() => this.getChannelId(), 1000)
     if (cluster.isWorker || global.mocha) return
     clearTimeout(this.timeouts['getChannelId'])
 
