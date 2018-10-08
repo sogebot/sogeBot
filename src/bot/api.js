@@ -185,7 +185,7 @@ class API {
       return request.data.data[0].id
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -461,7 +461,7 @@ class API {
       if (request.data.data.length > 0) await global.db.engine.update('api.current', { key: 'views' }, { value: request.data.data[0].view_count })
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -574,7 +574,7 @@ class API {
       global.db.engine.update('api.current', { key: 'followers' }, { value: request.data.total })
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -621,7 +621,7 @@ class API {
       return name
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -760,7 +760,7 @@ class API {
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -983,7 +983,7 @@ class API {
       }
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -1045,7 +1045,7 @@ class API {
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
@@ -1132,7 +1132,7 @@ class API {
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
-        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
