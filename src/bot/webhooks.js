@@ -271,7 +271,7 @@ class Webhooks {
     if (aEvent.data.length > 0) {
       let stream = aEvent.data[0]
 
-      if (parseInt(stream.user_id, 10) !== parseInt(cid, 10) && Number(stream.id) === Number(global.api.streamId)) return
+      if (parseInt(stream.user_id, 10) !== parseInt(cid, 10) || Number(stream.id) === Number(global.api.streamId)) return
 
       // Always keep this updated
       global.api.streamStartedAt = stream.started_at
