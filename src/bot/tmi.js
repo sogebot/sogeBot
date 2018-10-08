@@ -275,7 +275,8 @@ class TMI extends Core {
       global.events.fire('subscription', { username: username, method: (!_.isNil(method.prime) && method.prime) ? 'Twitch Prime' : '' })
     } catch (e) {
       global.log.error('Error parsing subscription event')
-      global.log.errro(JSON.stringify(message))
+      global.log.error(JSON.stringify(message))
+      global.log.error(e.stack)
     }
   }
 
@@ -302,7 +303,8 @@ class TMI extends Core {
       global.events.fire('resub', { username: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months: months, message: messageFromUser })
     } catch (e) {
       global.log.error('Error parsing resub event')
-      global.log.errro(JSON.stringify(message))
+      global.log.error(JSON.stringify(message))
+      global.log.error(e.stack)
     }
   }
 
@@ -321,7 +323,8 @@ class TMI extends Core {
       global.log.subcommunitygift(`${username}, to ${count} viewers`)
     } catch (e) {
       global.log.error('Error parsing subscriptionGiftCommunity event')
-      global.log.errro(JSON.stringify(message))
+      global.log.error(JSON.stringify(message))
+      global.log.error(e.stack)
     }
   }
 
@@ -363,7 +366,8 @@ class TMI extends Core {
       }
     } catch (e) {
       global.log.error('Error parsing subgift event')
-      global.log.errro(JSON.stringify(message))
+      global.log.error(JSON.stringify(message))
+      global.log.error(e.stack)
     }
   }
 
@@ -382,7 +386,8 @@ class TMI extends Core {
       if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
     } catch (e) {
       global.log.error('Error parsing cheer event')
-      global.log.errro(JSON.stringify(message))
+      global.log.error(JSON.stringify(message))
+      global.log.error(e.stack)
     }
   }
 
