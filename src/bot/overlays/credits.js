@@ -106,7 +106,7 @@ class Credits {
           events.filter((o) => o.timestamp >= timestamp),
           await global.oauth.settings.broadcaster.username,
           _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a'),
-          _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a'),
+          _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a'),
           hosts.map((o) => o.username),
           raids.map((o) => o.username),
           socials,

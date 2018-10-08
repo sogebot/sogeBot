@@ -70,7 +70,7 @@ class Highlights extends System {
           id: global.api.streamId,
           timestamp: { hours: timestamp.hours, minutes: timestamp.minutes, seconds: timestamp.seconds },
           game: _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a'),
-          title: _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a')
+          title: _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a')
         }
 
         this.add(highlight, timestamp, opts.sender)

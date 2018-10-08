@@ -41,13 +41,13 @@ class Cache {
   async rawStatus (value) {
     if (value) {
       // setter
-      await global.db.engine.update('cache', { key: 'status' }, {
+      await global.db.engine.update('cache', { key: 'title' }, {
         value: value
       })
       return value
     } else {
       // getter
-      let cache = await global.db.engine.findOne('cache', { key: 'status' })
+      let cache = await global.db.engine.findOne('cache', { key: 'title' })
       return _.get(cache, 'value', '')
     }
   }

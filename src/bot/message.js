@@ -17,7 +17,7 @@ class Message {
   async global (opts) {
     let variables = [
       'game', 'viewers', 'views', 'followers',
-      'hosts', 'subscribers', 'bits'
+      'hosts', 'subscribers', 'bits', 'title'
     ]
     let items = await global.db.engine.find('api.current')
     for (let variable of variables) {
@@ -204,7 +204,7 @@ class Message {
         return _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a')
       },
       '(status)': async function (filter) {
-        return _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a')
+        return _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a')
       }
     }
     let command = {
