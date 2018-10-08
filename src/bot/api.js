@@ -24,9 +24,9 @@ class API {
           },
           set: function (obj, prop, value) {
             if (Number(value) === Number(obj[prop])) return true
-            global.log.debug(`API: ${prop} changed to ${value} at ${stacktrace.parse((new Error()).stack)[1].methodName}`)
 
             if (prop === 'remaining' && __DEBUG__.CALLS) {
+              global.log.debug(`API: ${prop} changed to ${value} at ${stacktrace.parse((new Error()).stack)[1].methodName}`)
               const remaining = obj.remaining || 'n/a'
               const refresh = obj.refresh || 'n/a'
               const limit = obj.limit || 'n/a'
@@ -47,9 +47,9 @@ class API {
           },
           set: function (obj, prop, value) {
             if (Number(value) === Number(obj[prop])) return true
-            global.log.debug(`API: ${prop} changed to ${value} at ${stacktrace.parse((new Error()).stack)[1].methodName}`)
 
-            if (prop === 'remaining' && (process.env.DEBUG && process.env.DEBUG.includes('api'))) {
+            if (prop === 'remaining' && __DEBUG__.CALLS) {
+              global.log.debug(`API: ${prop} changed to ${value} at ${stacktrace.parse((new Error()).stack)[1].methodName}`)
               const remaining = obj.remaining || 'n/a'
               const refresh = obj.refresh || 'n/a'
               const limit = obj.limit || 'n/a'
@@ -672,6 +672,7 @@ class API {
       global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       let justStarted = false
+      global.log.debug('API: ' + JSON.stringify(request.data))
       if (request.status === 200 && !_.isNil(request.data.data[0])) {
         // correct status and we've got a data - stream online
         let stream = request.data.data[0]
