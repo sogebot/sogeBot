@@ -5,6 +5,11 @@ const cluster = require('cluster')
 const stacktrace = require('stacktrace-parser')
 const fs = require('fs')
 
+const __DEBUG__ = {
+  STREAM: (process.env.DEBUG && process.env.DEBUG.includes('api.stream')),
+  CALLS: (process.env.DEBUG && process.env.DEBUG.includes('api.calls'))
+}
+
 class API {
   constructor () {
     if (cluster.isMaster) {
@@ -21,7 +26,7 @@ class API {
             if (Number(value) === Number(obj[prop])) return true
             global.log.debug(`API: ${prop} changed to ${value} at ${stacktrace.parse((new Error()).stack)[1].methodName}`)
 
-            if (prop === 'remaining' && (process.env.DEBUG && process.env.DEBUG.includes('api'))) {
+            if (prop === 'remaining' && __DEBUG__.CALLS) {
               const remaining = obj.remaining || 'n/a'
               const refresh = obj.refresh || 'n/a'
               const limit = obj.limit || 'n/a'
@@ -676,8 +681,11 @@ class API {
           this.chatMessagesAtStart = global.linesParsed
 
           if (!global.webhooks.enabled.streams && Number(this.streamId) !== Number(stream.id)) {
+            if (__DEBUG__.STREAM) {
+              global.log.debug('API: ' + JSON.stringify(stream))
+            }
             global.log.start(
-              `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameFromId(stream.game_id)} | type: ${stream.type}`
+              `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await this.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
             )
             global.events.fire('stream-started')
             global.events.fire('command-send-x-times', { reset: true })
