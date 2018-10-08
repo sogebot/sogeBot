@@ -16,8 +16,8 @@ class Webhooks {
     }
     this.cache = []
 
-    this.subscribe('follows')
-    this.subscribe('streams')
+    this.unsubscribe('follows').then(() => this.subscribe('follows'))
+    this.unsubscribe('streams').then(() => this.subscribe('streams'))
 
     this.clearCache()
   }
@@ -40,7 +40,55 @@ class Webhooks {
     return !_.isEmpty(_.find(this.cache, (o) => o.type === type && o.id === id))
   }
 
-  async subscribe (type) {
+  async unsubscribe (type) {
+    clearTimeout(this.timeouts[`unsubscribe-${type}`])
+
+    const cid = global.oauth.channelId
+    const clientId = await global.oauth.settings._.clientId
+    if (cid === '' || clientId === '') {
+      this.timeouts[`unsubscribe-${type}`] = setTimeout(() => this.subscribe(type), 1000)
+      return
+    }
+
+    // get proper domain
+    let domains = config.panel.domain.split(',').map((o) => o.trim()).filter((o) => o !== 'localhost')
+    if (domains.length === 0) return
+    let domain = domains[0]
+
+    const mode = 'unsubscribe'
+    const callback = `http://${domain}/webhooks/hub`
+
+    const request = [
+      'https://api.twitch.tv/helix/webhooks/hub?',
+      `hub.mode=${mode}`,
+      `hub.callback=${callback}/${type}`
+    ]
+
+    switch (type) {
+      case 'follows':
+        request.push(`hub.topic=https://api.twitch.tv/helix/users/follows?to_id=${cid}`)
+        await axios({
+          method: 'post',
+          url: request.join('&'),
+          headers: {
+            'Client-ID': clientId
+          }
+        })
+        break
+      case 'streams':
+        request.push(`hub.topic=https://api.twitch.tv/helix/streams?user_id=${cid}`)
+        await axios({
+          method: 'post',
+          url: request.join('&'),
+          headers: {
+            'Client-ID': clientId
+          }
+        })
+        break
+    }
+  }
+
+  async subscribe (type, quiet) {
     clearTimeout(this.timeouts[`subscribe-${type}`])
 
     const cid = global.oauth.channelId
