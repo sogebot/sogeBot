@@ -2,6 +2,10 @@ const _ = require('lodash')
 const axios = require('axios')
 const config = require('@config')
 
+const __DEBUG__ = {
+  STREAM: (process.env.DEBUG && process.env.DEBUG.includes('webhooks.stream'))
+}
+
 class Webhooks {
   constructor () {
     this.timeouts = {}
@@ -230,8 +234,11 @@ class Webhooks {
       await global.db.engine.update('api.current', { key: 'game' }, { value: await global.api.getGameFromId(stream.game_id) })
 
       if (!await global.cache.isOnline() || global.twitch.streamType !== stream.type) {
+        if (__DEBUG__.STREAM) {
+          global.log.debug('WEBHOOKS: ' + JSON.stringify(aEvent))
+        }
         global.log.start(
-          `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await global.api.getGameFromId(stream.game_id)} | type: ${stream.type}`
+          `id: ${stream.id} | startedAt: ${stream.started_at} | title: ${stream.title} | game: ${await global.api.getGameFromId(stream.game_id)} | type: ${stream.type} | channel ID: ${cid}`
         )
         global.cache.when({ online: stream.started_at })
         global.api.chatMessagesAtStart = global.linesParsed
