@@ -31,4 +31,5 @@ Changes log level of a bot
 
 Enables extended debugging, by default its disabled
 
-- `DEBUG=api` - will save `api.bot.csv` and `api.broadcaster.csv` files
+- `DEBUG=api.call` - will save `api.bot.csv` and `api.broadcaster.csv` files
+- `DEBUG=webhooks.stream`, `DEBUG=api.stream`
