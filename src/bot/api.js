@@ -382,7 +382,7 @@ class API {
         }
 
         await global.db.engine.update('api.current', { key: 'game' }, { value: request.data.game })
-        await global.db.engine.update('api.current', { key: 'status' }, { value: request.data.status })
+        await global.db.engine.update('api.current', { key: 'title' }, { value: request.data.status })
         await global.cache.gameCache(request.data.game)
         await global.cache.rawStatus(rawStatus)
       } else {
@@ -708,7 +708,7 @@ class API {
           let status = await this.parseTitle()
           const game = await this.getGameFromId(stream.game_id)
 
-          await global.db.engine.update('api.current', { key: 'status' }, { value: stream.title })
+          await global.db.engine.update('api.current', { key: 'title' }, { value: stream.title })
           await global.db.engine.update('api.current', { key: 'game' }, { value: game })
 
           if (stream.title !== status) {
@@ -895,10 +895,10 @@ class API {
 
           // we changed title outside of bot
           if (response.status !== status) await global.cache.rawStatus(response.status)
-          await global.db.engine.update('api.current', { key: 'status' }, { value: response.status })
+          await global.db.engine.update('api.current', { key: 'title' }, { value: response.status })
         } else {
           global.commons.sendMessage(global.translate('title.change.failed')
-            .replace(/\$title/g, (await global.db.engine.findOne('api.current', { key: 'status' })).value), sender)
+            .replace(/\$title/g, (await global.db.engine.findOne('api.current', { key: 'title' })).value), sender)
         }
       }
       this.gameOrTitleChangedManually = true

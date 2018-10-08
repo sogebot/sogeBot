@@ -362,13 +362,13 @@ class Twitch {
 
   async getTitle (opts) {
     global.commons.sendMessage(global.translate('title.current')
-      .replace(/\$title/g, _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a')), opts.sender)
+      .replace(/\$title/g, _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a')), opts.sender)
   }
 
   async setTitle (opts) {
     if (opts.parameters.length === 0) {
       global.commons.sendMessage(global.translate('title.current')
-        .replace(/\$title/g, _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a')), opts.sender)
+        .replace(/\$title/g, _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a')), opts.sender)
       return
     }
     if (cluster.isMaster) global.api.setTitleAndGame(opts.sender, { title: opts.parameters })

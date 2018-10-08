@@ -452,7 +452,7 @@ class Events {
       $duration: _.get(attributes, 'duration', null),
       // add global variables
       $game: _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a'),
-      $title: _.get(await global.db.engine.findOne('api.current', { key: 'status' }), 'value', 'n/a'),
+      $title: _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a'),
       $views: _.get(await global.db.engine.findOne('api.current', { key: 'views' }), 'value', 0),
       $followers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
       $hosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0),
