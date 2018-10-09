@@ -245,10 +245,9 @@ class Twitch {
         id = await global.users.getIdByName(username)
       }
 
-      let m = await global.commons.prepare('watched.success.time', {
-        time: Number((await global.users.getWatchedOf(id) / (60 * 60 * 1000))).toFixed(1),
-        username
-      })
+      const time = id ? Number((await global.users.getWatchedOf(id) / (60 * 60 * 1000))).toFixed(1) : 0
+
+      let m = await global.commons.prepare('watched.success.time', { time, username })
       global.commons.sendMessage(m, opts.sender)
     } catch (e) {
       global.commons.sendMessage(global.translate('watched.failed.parse'), opts.sender)
