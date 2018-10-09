@@ -158,6 +158,8 @@ class Points extends System {
       const [username, points] = new Expects(opts.parameters).username().points({ all: false }).toArray()
 
       const user = global.users.getByName(username)
+      if (!user.id) user.id = await global.api.getIdFromTwitch(username)
+
       if (user.id) {
         await global.db.engine.remove('users.points', { id: user.id })
         await global.db.engine.insert('users.points', { id: user.id, points })
@@ -184,7 +186,7 @@ class Points extends System {
       const availablePoints = await this.getPointsOf(opts.sender.userId)
       const guser = await global.users.getByName(username)
 
-      if (!guser.id) throw new Error('User doesn\'t have ID')
+      if (!guser.id) guser.id = await global.api.getIdFromTwitch(username)
 
       if (points !== 'all' && availablePoints < points) {
         let message = await global.commons.prepare('points.failed.giveNotEnough'.replace('$command', opts.command), {
@@ -213,6 +215,7 @@ class Points extends System {
         global.commons.sendMessage(message, opts.sender)
       }
     } catch (err) {
+      console.log(err)
       global.commons.sendMessage(global.translate('points.failed.give').replace('$command', opts.command), opts.sender)
     }
   }
@@ -270,7 +273,7 @@ class Points extends System {
       const username = !_.isNil(match) ? match[1] : opts.sender.username
       const user = await global.users.getByName(username)
 
-      if (!user.id) throw new Error('User doesn\'t have ID')
+      if (!user.id) user.id = await global.api.getIdFromTwitch(username)
 
       let points = await this.getPointsOf(user.id)
       let message = await global.commons.prepare('points.defaults.pointsResponse', {
@@ -355,6 +358,9 @@ class Points extends System {
     try {
       const [username, points] = new Expects(opts.parameters).username().points({ all: true }).toArray()
       let user = await global.db.engine.findOne('users', { username })
+
+      if (!user.id) user.id = await global.api.getIdFromTwitch(username)
+
       if (user.id) {
         if (points === 'all') {
           await global.db.engine.remove('users.points', { id: user.id })

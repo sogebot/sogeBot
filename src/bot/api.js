@@ -185,7 +185,7 @@ class API {
       this.calls.bot.refresh = request.headers['ratelimit-reset']
       global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       return request.data.data[0].id
     } catch (e) {
@@ -194,7 +194,7 @@ class API {
         this.calls.bot.remaining = 0
         this.calls.bot.refresh = e.response.headers['ratelimit-reset']
       }
-      global.panel.io.emit('api.stats', { data: {}, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: {}, timestamp: _.now(), call: 'getIdFromTwitch', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
     }
     return null
   }
@@ -228,11 +228,11 @@ class API {
     var request
     try {
       request = await axios.get(url)
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: request.status })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: request.status })
       opts.saveToWidget = true
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: e.stack })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelChattersUnofficialAPI', api: 'unofficial', endpoint: url, code: e.stack })
       this.timeouts['getChannelChattersUnofficialAPI'] = setTimeout(() => this.getChannelChattersUnofficialAPI(opts), timeout)
       return
     }
@@ -302,7 +302,7 @@ class API {
           'Authorization': 'OAuth ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: request.status })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: request.status })
 
       this.retries.getChannelSubscribersOldAPI = 0 // reset retry
 
@@ -335,7 +335,7 @@ class API {
       } else {
         timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
         global.log.error(`${url} - ${e.message}`)
-        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: e.stack })
+        if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelSubscribersOldAPI', api: 'kraken', endpoint: url, code: e.stack })
       }
     }
     if (timeout !== 0) {
@@ -366,7 +366,7 @@ class API {
           'Authorization': 'OAuth ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: request.status })
 
       if (!this.gameOrTitleChangedManually) {
         // Just polling update
@@ -396,7 +396,7 @@ class API {
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: e.stack })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelDataOldAPI', api: 'kraken', endpoint: url, code: e.stack })
     }
     this.timeouts['getChannelDataOldAPI'] = setTimeout(() => this.getChannelDataOldAPI({ forceUpdate: false }), timeout)
   }
@@ -417,7 +417,7 @@ class API {
     let timeout = 30000
     try {
       request = await axios.get(url)
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: request.status })
 
       await global.db.engine.update('api.current', { key: 'hosts' }, { value: request.data.hosts.length })
 
@@ -428,7 +428,7 @@ class API {
     } catch (e) {
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: e.stack })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getChannelHosts', api: 'tmi', endpoint: url, code: e.stack })
     }
     this.timeouts['getChannelHosts'] = setTimeout(() => this.getChannelHosts(), timeout)
   }
@@ -455,7 +455,7 @@ class API {
           'Authorization': 'Bearer ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       // save remaining api calls
       this.calls.bot.remaining = request.headers['ratelimit-remaining']
@@ -473,7 +473,7 @@ class API {
 
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'updateChannelViews', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
     }
     this.timeouts['updateChannelViews'] = setTimeout(() => this.updateChannelViews(), timeout)
   }
@@ -508,7 +508,7 @@ class API {
       this.calls.bot.limit = request.headers['ratelimit-limit']
       global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       if (request.status === 200 && !_.isNil(request.data.data)) {
         // check if user id is in db, not in db load username from API
@@ -534,7 +534,7 @@ class API {
           this.calls.bot.remaining = usersFromApi.headers['ratelimit-remaining']
           this.calls.bot.refresh = usersFromApi.headers['ratelimit-reset']
 
-          global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.status, remaining: this.calls.bot.remaining })
+          if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.status, remaining: this.calls.bot.remaining })
           for (let follower of usersFromApi.data.data) {
             followersUsername.push(follower.login.toLowerCase())
             await global.db.engine.update('users', { username: follower.login.toLowerCase() }, { id: follower.id })
@@ -586,7 +586,7 @@ class API {
 
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
     }
     this.timeouts['getLatest100Followers'] = setTimeout(() => this.getLatest100Followers(timeout === 1000), timeout)
   }
@@ -618,7 +618,7 @@ class API {
       this.calls.bot.limit = request.headers['ratelimit-limit']
       global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
-      if (cluster.isMaster) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+      if (cluster.isMaster) if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       // add id->game to cache
       const name = request.data.data[0].name
@@ -634,7 +634,7 @@ class API {
       const game = await global.db.engine.findOne('api.current', { key: 'game' })
       global.log.warning(`Couldn't find name of game for gid ${id} - fallback to ${game.value}`)
       global.log.error(`API: ${url} - ${e.stack}`)
-      if (cluster.isMaster) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
+      if (cluster.isMaster) if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getGameFromId', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
       return game.value
     }
   }
@@ -669,7 +669,7 @@ class API {
       this.calls.bot.limit = request.headers['ratelimit-limit']
       global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       let justStarted = false
       global.log.debug('API: ' + JSON.stringify(request.data))
@@ -776,7 +776,7 @@ class API {
 
       timeout = e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT' ? 10000 : timeout
       global.log.error(`${url} - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getCurrentStreamData', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
     }
     this.timeouts['getCurrentStreamData'] = setTimeout(() => this.getCurrentStreamData(opts), timeout)
   }
@@ -875,10 +875,10 @@ class API {
           'Authorization': 'OAuth ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: request.status })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.stack}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: e.stack })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'setTitleAndGame', api: 'kraken', endpoint: url, code: e.stack })
       return
     }
 
@@ -929,10 +929,10 @@ class API {
           'Authorization': 'OAuth ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: request.status })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
       global.log.error(`API: ${url} - ${e.stack}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: e.stack })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'sendGameFromTwitch', api: 'kraken', endpoint: url, code: e.stack })
       return
     }
 
@@ -984,7 +984,7 @@ class API {
       this.calls.bot.limit = request.headers['ratelimit-limit']
       global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
 
       for (let clip of request.data.data) {
         // clip found in twitch api
@@ -998,7 +998,7 @@ class API {
       }
 
       global.log.error(`API: ${url} - ${e.stack}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.stack })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'checkClips', api: 'helix', endpoint: url, code: e.stack })
     }
     this.timeouts['checkClips'] = setTimeout(() => this.checkClips(), 1000)
   }
@@ -1051,7 +1051,7 @@ class API {
       this.calls.bot.limit = request.headers['ratelimit-limit']
       global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
@@ -1060,7 +1060,7 @@ class API {
       }
 
       global.log.error(`API: ${url} - ${e.stack}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: e.stack })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createClip', api: 'helix', endpoint: url, code: e.stack })
       return
     }
     const clipId = request.data.data[0].id
@@ -1084,7 +1084,7 @@ class API {
           'Authorization': 'OAuth ' + token
         }
       })
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: request.status })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: request.status })
     } catch (e) {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') return // ignore ECONNRESET errors
 
@@ -1097,7 +1097,7 @@ class API {
 
       if (logError) {
         global.log.error(`API: ${url} - ${e.stack}`)
-        global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: e.stack })
+        if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'fetchAccountAge', api: 'kraken', endpoint: url, code: e.stack })
       }
       return
     }
@@ -1138,7 +1138,7 @@ class API {
       this.calls.bot.limit = request.headers['ratelimit-limit']
       global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
-      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
     } catch (e) {
       if (typeof e.response !== 'undefined' && e.response.status === 429) {
         global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
@@ -1147,7 +1147,7 @@ class API {
       }
 
       global.log.error(`API: ${url} - ${e.stack}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'isFollowerUpdate', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
       return
     }
 
@@ -1206,11 +1206,11 @@ class API {
       this.calls.bot.limit = request.headers['ratelimit-limit']
       global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
 
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
     } catch (e) {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') return this.createMarker()
       global.log.error(`API: Marker was not created - ${e.message}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
     }
   }
 }
