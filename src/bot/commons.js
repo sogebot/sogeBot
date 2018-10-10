@@ -325,7 +325,7 @@ Commons.prototype.compactDb = async function (opts) {
       } else {
         const value = isNaN(Number(item[opts.values])) ? 0 : Number(item[opts.values])
 
-        if (value > 0) {
+        if (value !== 0) {
           await Promise.all([
             global.db.engine.increment(opts.table, { _id: idsToUpdate[item[opts.index]] }, { [opts.values]: value }),
             global.db.engine.remove(opts.table, { _id: String(item._id) })
