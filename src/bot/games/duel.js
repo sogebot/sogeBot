@@ -77,7 +77,7 @@ class Duel extends Game {
     global.commons.sendMessage(m, { username: global.commons.getOwner() }, { force: true })
 
     // give user his points
-    await global.db.engine.insert('users.points', { id: winnerUser.id, points: parseInt(total, 10) })
+    await global.db.engine.insert('users.points', { id: winnerUser.id, points: parseInt(total, 10), __COMMENT__: (new Error()).stack })
 
     // reset duel
     await global.db.engine.remove(this.collection.users, {})
@@ -106,7 +106,7 @@ class Duel extends Game {
       const isNewDuelist = _.isEmpty(userFromDB)
       if (!isNewDuelist) {
         await global.db.engine.update(this.collection.users, { _id: String(userFromDB._id) }, { tickets: Number(userFromDB.tickets) + Number(bet) })
-        await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(bet, 10) * -1 })
+        await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(bet, 10) * -1, __COMMENT__: (new Error()).stack })
       } else {
         // check if under gambling cooldown
         const cooldown = await this.settings.cooldown
@@ -116,7 +116,7 @@ class Duel extends Game {
           // save new cooldown if not bypassed
           if (!(await this.settings.bypassCooldownByOwnerAndMods && (isMod || global.commons.isBroadcaster(opts.sender)))) this.settings._.cooldown = String(new Date())
           await global.db.engine.insert(this.collection.users, { id: opts.sender.userId, username: opts.sender.username, tickets: Number(bet) })
-          await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(bet, 10) * -1 })
+          await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(bet, 10) * -1, __COMMENT__: (new Error()).stack })
         } else {
           message = await global.commons.prepare('gambling.fightme.cooldown', {
             minutesName: global.commons.getLocalizedName(Math.round(((cooldown * 1000) - (new Date().getTime() - new Date(await this.settings._.cooldown).getTime())) / 1000 / 60), 'core.minutes'),

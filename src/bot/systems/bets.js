@@ -166,7 +166,7 @@ class Bets extends System {
         if (_.isEmpty(_betOfUser)) _betOfUser.points = 0
 
         // All OK
-        await global.db.engine.insert('users.points', { id: opts.sender.userId, points: points * -1 })
+        await global.db.engine.insert('users.points', { id: opts.sender.userId, points: points * -1, __COMMENT__: (new Error()).stack })
         await global.db.engine.update(this.collection.users, { id: opts.sender.userId }, { username: opts.sender.username, points: points + _betOfUser.points, option: index })
       } else {
         this.info(opts)
@@ -203,7 +203,7 @@ class Bets extends System {
     try {
       if (_.isEmpty(await global.db.engine.findOne(this.collection.data, { key: 'bets' }))) throw Error(ERROR_NOT_RUNNING)
       for (let user of await global.db.engine.find(this.collection.users)) {
-        await global.db.engine.insert('users.points', { id: user.id, points: parseInt(user.points, 10) })
+        await global.db.engine.insert('users.points', { id: user.id, points: parseInt(user.points, 10), __COMMENT__: (new Error()).stack })
       }
       await global.db.engine.remove(this.collection.users, {})
       global.commons.sendMessage(global.translate('bets.refund'), opts.sender)
@@ -238,7 +238,7 @@ class Bets extends System {
         await global.db.engine.remove(this.collection.users, { _id: String(user._id) })
         if (user.option === index) {
           total += Math.round((parseInt(user.points, 10) * percentGain))
-          await global.db.engine.insert('users.points', { user: user.id, points: Math.round((parseInt(user.points, 10) * percentGain)) })
+          await global.db.engine.insert('users.points', { user: user.id, points: Math.round((parseInt(user.points, 10) * percentGain)), __COMMENT__: (new Error()).stack })
         }
       }
 
