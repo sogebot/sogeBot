@@ -134,7 +134,10 @@ let migration = {
               const isArray = items[i].isMultiValue || false
               const key = [items[i].category, items[i].key].filter(o => typeof o === 'string').join('.')
 
-              if (!isArray) {
+              if (key.startsWith('_')) {
+                // remove underscore keys / this may cause some compatibility issues between versions
+                await global.db.engine.remove(collection, { _id })
+              } else if (!isArray) {
                 // simple remove -> insert
                 processed++
                 await global.db.engine.remove(collection, { _id })
@@ -164,7 +167,10 @@ let migration = {
               const isArray = items[i].isMultiValue || false
               const key = [items[i].category, items[i].key].filter(o => typeof o === 'string').join('.')
 
-              if (!isArray) {
+              if (key.startsWith('_')) {
+                // remove underscore keys / this may cause some compatibility issues between versions
+                await global.db.engine.remove(collection, { _id })
+              } else if (!isArray) {
                 // simple remove -> insert
                 processed++
                 await global.db.engine.remove(collection, { _id })
