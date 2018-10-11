@@ -11,13 +11,7 @@ const Message = require('./message')
 
 function Commons () {
   this.compact = {}
-
-  this.cached = {
-    ignorelist: []
-  }
-
   this.registerConfiguration()
-  this.loadIgnoreList()
 }
 
 Commons.prototype.registerConfiguration = function () {
@@ -44,14 +38,8 @@ Commons.prototype.processAll = function (proc) {
   }
 }
 
-Commons.prototype.loadIgnoreList = async function () {
-  if (typeof global.db === 'undefined' || !global.db.engine.connected) return setTimeout(() => this.loadIgnoreList(), 1000)
-  global.commons.cached.ignorelist = (await global.db.engine.find('users_ignorelist')).map(o => o.username)
-}
-
 Commons.prototype.getIgnoreList = function () {
-  if (typeof global.commons.cached.ignorelist === 'undefined') global.commons.cached.ignorelist = []
-  return global.commons.cached.ignorelist
+  return global.users.settings.users.ignorelist
 }
 
 Commons.prototype.isIgnored = async function (sender) {

@@ -78,6 +78,9 @@ module.exports = {
       // remove compact db - compactDb tests
       await global.db.engine.remove('compact', {})
 
+      // remove user settings
+      await global.db.engine.remove(global.users.collection.settings, {})
+
       resolve()
     }
     return new Promise((resolve, reject) => {
