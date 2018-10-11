@@ -124,7 +124,7 @@ class Price extends System {
       let message = await global.commons.prepare('price.user-have-not-enough-points', { amount: removePts, command: `${price.command}`, pointsName: await global.systems.points.getPointsName(removePts) })
       global.commons.sendMessage(message, opts.sender)
     } else {
-      await global.db.engine.insert('users.points', { id: opts.sender.userId, points: (removePts * -1) })
+      await global.db.engine.insert('users.points', { id: opts.sender.userId, points: (removePts * -1), __COMMENT__: (new Error()).stack })
     }
     return haveEnoughPoints
   }

@@ -277,7 +277,7 @@ class Raffles extends System {
     }
 
     if (participantUser.eligible) {
-      if (raffle.type === TYPE_TICKETS) await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(tickets, 10) * -1 })
+      if (raffle.type === TYPE_TICKETS) await global.db.engine.insert('users.points', { id: opts.sender.userId, points: parseInt(tickets, 10) * -1, __COMMENT__: (new Error()).stack })
       await global.db.engine.update(this.collection.participants, { raffle_id: raffle._id.toString(), username: opts.sender.username }, participantUser)
     }
     return true

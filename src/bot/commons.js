@@ -325,6 +325,10 @@ Commons.prototype.compactDb = async function (opts) {
       } else {
         const value = isNaN(Number(item[opts.values])) ? 0 : Number(item[opts.values])
 
+        if (isNaN(Number(item[opts.values]))) {
+          global.log.warning(`compactDb - ${opts.table} | NaN value found | ${item.__COMMENT__}`)
+        }
+
         if (value !== 0) {
           await Promise.all([
             global.db.engine.increment(opts.table, { _id: idsToUpdate[item[opts.index]] }, { [opts.values]: value }),

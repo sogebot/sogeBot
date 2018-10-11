@@ -498,7 +498,7 @@ class Users extends Core {
 
         // update user points
         await global.db.engine.remove('users.points', { id })
-        await global.db.engine.insert('users.points', { id, points: isNaN(Number(viewer.points)) ? 0 : Number(viewer.points) })
+        await global.db.engine.insert('users.points', { id, points: isNaN(Number(viewer.points)) ? 0 : Number(viewer.points), __COMMENT__: (new Error()).stack })
         delete viewer.points
 
         // update messages
