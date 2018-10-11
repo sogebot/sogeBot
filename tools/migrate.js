@@ -19,7 +19,8 @@ const dropFiles = [
   'moderation.permit.db', 'moderation.warnings.db', 'songbanned.db',
   'songrequests.db', 'system.alias.db', 'system.alias.settings.db',
   'system.bets.db', 'system.bets.settings.db', 'system.bets.users.db',
-  'system.commercial.settings.db', 'system.cooldown.db', 'system.cooldown.settings.db'
+  'system.commercial.settings.db', 'system.cooldown.db', 'system.cooldown.settings.db',
+  'users_ignorelist.db'
 ]
 
 if (process.argv[2] && process.argv[2] === '--delete') {
@@ -545,6 +546,19 @@ let migration = {
     }
   }],
   users: [{
+    version: '8.1.0',
+    do: async () => {
+      let processed = 0
+      console.info('Moving ignorelist to user settings')
+      let users = await global.db.engine.find('users_ignorelist')
+      if (!_.isEmpty(users)) {
+        users = users.map(o => o.username)
+        processed = users.length
+        await global.db.engine.update('core.users.settings', { key: 'users.ignorelist' }, { key: 'users.ignorelist', value: users })
+      }
+      console.info(` => ${processed} items moved to settings`)
+    }
+  }, {
     version: '8.1.0',
     do: async () => {
       console.info('Translating points from username to id')

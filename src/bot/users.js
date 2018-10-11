@@ -17,6 +17,9 @@ class Users extends Core {
 
   constructor () {
     const settings = {
+      users: {
+        ignorelist: []
+      },
       commands: [
         { name: '!regular add', fnc: 'addRegular', permission: constants.OWNER_ONLY },
         { name: '!regular remove', fnc: 'rmRegular', permission: constants.OWNER_ONLY },
@@ -45,9 +48,8 @@ class Users extends Core {
   async ignoreAdd (opts: Object) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
-      await global.db.engine.update('users_ignorelist', { username }, { username })
+      global.users.settings.users.ignorelist.push(username)
       // update ignore list
-      global.commons.processAll({ ns: 'commons', fnc: 'loadIgnoreList' })
       global.commons.sendMessage(global.commons.prepare('ignore.user.is.added', { username }), opts.sender)
     } catch (e) {}
   }
@@ -55,9 +57,8 @@ class Users extends Core {
   async ignoreRm (opts: Object) {
     try {
       const username = new Expects(opts.parameters).username().toArray()[0].toLowerCase()
-      await global.db.engine.remove('users_ignorelist', { username })
+      global.users.settings.users.ignorelist = global.users.settings.users.ignorelist.filter(o => o !== username)
       // update ignore list
-      global.commons.processAll({ ns: 'commons', fnc: 'loadIgnoreList' })
       global.commons.sendMessage(global.commons.prepare('ignore.user.is.removed', { username }), opts.sender)
     } catch (e) {}
   }
