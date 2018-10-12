@@ -9,12 +9,6 @@ notifications:
 node_js:
   - "9"
   - "10"
-os:
-  - windows
-  - linux
-env:
-  - DB=nedb
-  - DB=mongodb
 services: mongodb
 before_script:
   - npm run test:config:$DB
@@ -23,3 +17,18 @@ script:
   - npm run eslint
   - npx flow check
   - travis_retry npm run test
+
+matrix:
+  include:
+    - os: linux
+      env: DB=nedb
+    - os: linux
+      env: DB=mongodb
+      services: mongodb
+    - os: windows
+      env: DB=nedb
+    - os: windows
+      env: DB=mongodb
+      services: mongodb
+    - os: osx
+      env: DB=nedb
