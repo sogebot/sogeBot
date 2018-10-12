@@ -6,6 +6,7 @@
 const _ = require('lodash')
 const XRegExp = require('xregexp')
 const cluster = require('cluster')
+const safeEval = require('safe-eval')
 
 // bot libraries
 const constants = require('../constants')
@@ -29,7 +30,8 @@ type Response = {
   order: number,
   response: string,
   stopIfExecuted: boolean,
-  permission: number
+  permission: number,
+  filter: string
 }
 
 type Command = {
@@ -223,10 +225,11 @@ class CustomCommands extends System {
 
     const responses: Array<Response> = await global.db.engine.find(this.collection.responses, { cid: String(command._id) })
     for (let r of _.orderBy(responses, 'order', 'asc')) {
-      if (r.permission === constants.VIEWERS ||
+      if ((r.permission === constants.VIEWERS ||
         (r.permission === constants.REGULAR && (isRegular || isMod || isOwner)) ||
         (r.permission === constants.MODS && (isMod || isOwner)) ||
-        (r.permission === constants.OWNER_ONLY && isOwner)) {
+        (r.permission === constants.OWNER_ONLY && isOwner)) &&
+        await this.checkFilter(opts, r.filter)) {
         _responses.push(r.response)
         if (responses.length > 1) {
           // slow down command send message to have proper order (every 100ms)
@@ -385,6 +388,31 @@ class CustomCommands extends System {
       Number(count) <= Number.MAX_SAFE_INTEGER / 1000000
         ? count
         : Number.MAX_SAFE_INTEGER / 1000000, 10)
+  }
+
+  async checkFilter (opts: Object, filter: string) {
+    if (typeof filter === 'undefined' || filter.trim().length === 0) return true
+    let toEval = `(function evaluation () { return ${filter} })()`
+    const context = {
+      _: _,
+      $sender: opts.sender.username,
+      $userObject: await global.users.getByName(opts.sender.username),
+      // add global variables
+      $game: _.get(await global.db.engine.findOne('api.current', { key: 'game' }), 'value', 'n/a'),
+      $title: _.get(await global.db.engine.findOne('api.current', { key: 'title' }), 'value', 'n/a'),
+      $views: _.get(await global.db.engine.findOne('api.current', { key: 'views' }), 'value', 0),
+      $followers: _.get(await global.db.engine.findOne('api.current', { key: 'followers' }), 'value', 0),
+      $hosts: _.get(await global.db.engine.findOne('api.current', { key: 'hosts' }), 'value', 0),
+      $subscribers: _.get(await global.db.engine.findOne('api.current', { key: 'subscribers' }), 'value', 0)
+    }
+    var result = false
+    try {
+      result = safeEval(toEval, context)
+    } catch (e) {
+      // do nothing
+    }
+    delete context._
+    return !!result // force boolean
   }
 }
 

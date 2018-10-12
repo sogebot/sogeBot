@@ -57,7 +57,8 @@
                     </div>
                   </span>
                 </div>
-                <text-with-tags v-bind:value='r.response'></text-with-tags>
+                <text-with-tags v-if='r.filter' v-bind:value='r.filter' style="font-size: .8rem;border: 1px dashed #eee; display: inline-block;padding: 0.1rem; padding-left: 0.3rem; padding-right: 0.3rem;"></text-with-tags>
+                <text-with-tags v-bind:value='r.response' style="display: inline-block"></text-with-tags>
               </template>
             </div>
           </div>
@@ -122,7 +123,8 @@
                     </div>
                   </span>
                 </div>
-                <text-with-tags v-bind:value='r.response'></text-with-tags>
+                <text-with-tags v-if='r.filter' v-bind:value='r.filter' style="font-size: .8rem;border: 1px dashed #eee; display: inline-block;padding: 0.1rem; padding-left: 0.3rem; padding-right: 0.3rem;"></text-with-tags>
+                <text-with-tags v-bind:value='r.response' style="display: inline-block"></text-with-tags>
             </template>
             </div>
             <div class="col-md-2">
@@ -131,7 +133,6 @@
                 <button v-bind:title="(command.visible ? commons.translate('visible') : commons.translate('hidden'))" v-on:click="command.visible = !command.visible; sendUpdate(command._id)" class="btn btn-outline-dark p-1 border-0"><i class="fas m-1" v-bind:class="[ command.visible ? 'fa-eye' : 'fa-eye-slash' ]" aria-hidden="true"></i></button>
                 <button v-bind:title="command.enabled ? commons.translate('enabled') : commons.translate('disabled')" v-on:click="command.enabled = !command.enabled; sendUpdate(command._id)"  class="btn btn-outline-dark p-1 border-0"><i class="fas m-1"  v-bind:class="[ command.enabled ? 'fa-toggle-on' : 'fa-toggle-off' ]" aria-hidden="true"></i></button>
                 <button type="button" v-on:click="deleteCommand(command._id)" v-bind:title="commons.translate('delete')" class="btn btn-outline-dark p-1 border-0"><i class="far fa-trash-alt m-1" aria-hidden="true"></i></button>
-
               </div>
             </div>
           </div>

@@ -1,18 +1,43 @@
-/* global describe it beforeEach */
+/* global describe it before */
 if (require('cluster').isWorker) process.exit()
 
 require('../../general.js')
 
 const db = require('../../general.js').db
 const message = require('../../general.js').message
+const assert = require('assert')
 
 // users
 const owner = { username: 'soge__' }
+const user1 = { username: 'user1' }
 
 describe('Custom Commands - run()', () => {
-  beforeEach(async () => {
+  before(async () => {
     await db.cleanup()
     await message.prepare()
+  })
+
+  describe('!cmd with username filter', () => {
+    it('create command and response with filter', async () => {
+      let cmd = await global.db.engine.insert('systems.customcommands', { command: '!cmd', enabled: true, visible: true })
+      await global.db.engine.insert('systems.customcommands.responses', { cid: String(cmd._id), filter: '$sender == "user1"', response: 'Lorem Ipsum', permission: 1 })
+    })
+
+    it('run command as user not defined in filter', async () => {
+      global.systems.customCommands.run({ sender: owner, message: '!cmd' })
+      let notSent = false
+      try {
+        await message.isSentRaw('Lorem Ipsum', owner)
+      } catch (e) {
+        notSent = true
+      }
+      assert.ok(!!notSent)
+    })
+
+    it('run command as user defined in filter', async () => {
+      global.systems.customCommands.run({ sender: user1, message: '!cmd' })
+      await message.isSentRaw('Lorem Ipsum', user1)
+    })
   })
 
   it('!a will show Lorem Ipsum', async () => {
