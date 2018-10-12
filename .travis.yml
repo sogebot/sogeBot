@@ -1,40 +1,29 @@
 language: node_js
 before_install:
   - npm install -g mocha
-install: travis_wait make ENV=development
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install make; fi
+install:
+  - travis_wait make ENV=development
 notifications:
   email: false
+node_js:
+  - "10"
+os:
+  - linux
+  - osx
+env:
+  - DB=nedb
+  - DB=mongodb
+services: mongodb
+before_script:
+  - npm run test:config:$DB
+  - cat config.json
+script:
+  - npm run eslint
+  - npx flow check
+  - travis_retry npm run test
 
-jobs:
-  include:
-    - stage: Test
-      node_js: "10"
-      script:
-        - npm run eslint
-        - npx flow check
-    - stage: NEDB
-      node_js: "9"
-      before_script:
-        - npm run test:config:nedb
-        - cat config.json
-      script: travis_retry npm run test
-    - stage: NEDB
-      node_js: "10"
-      before_script:
-        - npm run test:config:nedb
-        - cat config.json
-      script: travis_retry npm run test
-    - stage: MONGODB
-      node_js: "9"
-      services: mongodb
-      before_script:
-        - npm run test:config:mongodb
-        - cat config.json
-      script: travis_retry npm run test
-    - stage: MONGODB
-      node_js: "10"
-      services: mongodb
-      before_script:
-        - npm run test:config:mongodb
-        - cat config.json
-      script: travis_retry npm run test
+matrix:
+  exclude:
+    - os: osx
+      env: DB=mongodb
