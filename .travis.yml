@@ -1,7 +1,9 @@
 language: node_js
 before_install:
   - npm install -g mocha
-install: travis_wait make ENV=development
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install make; fi
+install:
+  - travis_wait make ENV=development
 notifications:
   email: false
 node_js:
