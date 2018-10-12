@@ -4,14 +4,16 @@ before_install:
 install: travis_wait make ENV=development
 notifications:
   email: false
+node_js:
+  - "9"
+  - "10"
+os:
+  - windows
+  - linux
 
 jobs:
   include:
     - stage: NEDB
-    - node_js: "10"
-    - os:
-        - windows
-        - linux
       before_script:
         - npm run test:config:nedb
         - cat config.json
@@ -20,10 +22,6 @@ jobs:
         - npx flow check
         - travis_retry npm run test
     - stage: MONGODB
-    - node_js: "10"
-    - os:
-        - windows
-        - linux
       services: mongodb
       before_script:
         - npm run test:config:mongodb
