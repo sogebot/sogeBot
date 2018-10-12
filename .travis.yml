@@ -8,9 +8,7 @@ notifications:
 jobs:
   include:
     - stage: NEDB
-    - node_js:
-        - "9"
-        - "10"
+    - node_js: "10"
     - os:
         - windows
         - linux
@@ -22,9 +20,7 @@ jobs:
         - npx flow check
         - travis_retry npm run test
     - stage: MONGODB
-    - node_js:
-        - "9"
-        - "10"
+    - node_js: "10"
     - os:
         - windows
         - linux
