@@ -25,7 +25,7 @@ script:
   - npx flow check
   - travis_retry npm run test
 
-  matrix:
-    exclude:
-      - os: osx
-        env: DB=mongodb
+matrix:
+  exclude:
+    - os: osx
+      env: DB=mongodb
