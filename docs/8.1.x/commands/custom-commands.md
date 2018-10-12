@@ -195,6 +195,39 @@ be ignored.
   execution was not stopped! /</em>
 </blockquote>
 
+## Command filters
+
+You can add filter for commands through UI
+
+### Available filters
+
+| Filter variable | Description                        |
+| ----------------|:-----------------------------------|
+| `$sender`       | username of user triggered command |
+| `$userObject`   | full database row of sender        |
+| `$game`         | current game                       |
+| `$title`        | current title                      |
+| `$views`        | current views count                |
+| `$followers`    | current followers count            |
+| `$hosts`        | current hosts count                |
+| `$subscribers`  | current subscribers count          |
+
+#### Examples
+
+`$sender == 'soge__'` - run command only for soge__
+
+`$game == 'PLAYERUNKNOWN'S BATTLEGROUNDS'` - run command only when PUBG is set
+as game
+
+`$sender == 'soge__' && $game == 'PLAYERUNKNOWN'S BATTLEGROUNDS'` - run command
+only for soge__ **and** when game is set to PUBG
+
+`$sender == 'soge__' || $game == 'PLAYERUNKNOWN'S BATTLEGROUNDS'` - run command
+only for soge__ **or** when game is set to PUBG
+
+`$subscribers >= 10` - run command when current subscribers count is equal or
+greater than 10
+
 ## Other settings
 
 ### Enable or disable custom commands system

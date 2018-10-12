@@ -9,6 +9,10 @@
     "name": "response",
     "placeholder": ""
   },
+  "filter": {
+    "name": "filter",
+    "placeholder": "Add filter for this response"
+  },
   "forViewers": "for viewers",
   "forRegulars": "for regular viewers",
   "forOwners": "for owners",

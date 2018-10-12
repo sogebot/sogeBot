@@ -32,6 +32,10 @@
                 v-bind:value="response.response"
                 v-bind:placeholder="commons.translate('systems.customcommands.response.placeholder')"
                 v-on:update="response.response = $event"></textarea-with-tags>
+              <textarea-with-tags
+                v-bind:value="response.filter"
+                v-bind:placeholder="commons.translate('systems.customcommands.filter.placeholder')"
+                v-on:update="response.filter = $event"></textarea-with-tags>
 
               <div class="h-auto w-auto">
                 <button data-toggle="dropdown" class="btn btn-outline-dark border-0 h-100 w-100" style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-key mr-1" aria-hidden="true"></i> {{ response.permission | permissionToString }}</button>
@@ -64,7 +68,7 @@
             </div>
           </template>
           <div class="invalid-feedback" :style="{'display': hasError.responses === true ? 'block !important' : 'no'}">{{ commons.translate('systems.customcommands.error.isEmpty') }}</div>
-          <button class="btn btn-primary btn-block mt-2" type="button" @click="responses.push({ order: responses.length, response: '', permission: 1 })">{{ commons.translate('systems.customcommands.addResponse') }}</button>
+          <button class="btn btn-primary btn-block mt-2" type="button" @click="responses.push({ filter: '', order: responses.length, response: '', permission: 1 })">{{ commons.translate('systems.customcommands.addResponse') }}</button>
         </div>
 
 
@@ -110,7 +114,7 @@
         },
         data: {
           id: null,
-          responses: [{response: '', order: 0, permission: 1, stopIfExecuted: false}],
+          responses: [{filter: '', response: '', order: 0, permission: 1, stopIfExecuted: false}],
           command: '',
           visible: true,
           enabled: true,
@@ -239,7 +243,12 @@
       if (commons.urlParam('id')) {
         customCommandsEdit.id = commons.urlParam('id')
         customCommandsEdit.socket.emit('findOne.command', { where: { _id: commons.urlParam('id') } }, (err, data) => {
+          // add empty filter if undefined
+          for (let i = 0, length = data.responses.length; i < length; i++) {
+            if (!data.responses[i].filter) data.responses[i].filter = ''
+          }
           customCommandsEdit.responses = data.responses
+
           customCommandsEdit.command = data.command
           customCommandsEdit.visible = data.visible
           customCommandsEdit.enabled = data.enabled

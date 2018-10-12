@@ -9,6 +9,10 @@
     "name": "odpověď",
     "placeholder": ""
   },
+  "filter": {
+    "name": "filter",
+    "placeholder": "Přidat filtr k této odpovědi"
+  },
   "forViewers": "pro diváky",
   "forRegulars": "pro pravidelné diváky",
   "forOwners": "pro vlastníka",
