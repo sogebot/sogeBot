@@ -4,6 +4,10 @@ before_install:
 install: travis_wait make ENV=development
 notifications:
   email: false
+os:
+  - windows
+  - linux
+  - osx
 
 jobs:
   include:
