@@ -7,52 +7,32 @@ notifications:
 
 jobs:
   include:
-    - stage: Test
-      node_js: "10"
+    - stage: NEDB
+    - node_js:
+        - "9"
+        - "10"
     - os:
+        - windows
         - linux
+      before_script:
+        - npm run test:config:nedb
+        - cat config.json
       script:
         - npm run eslint
         - npx flow check
-    - stage: NEDB
-      node_js: "9"
-    - os:
-        - windows
-        - linux
-        - osx
-      before_script:
-        - npm run test:config:nedb
-        - cat config.json
-      script: travis_retry npm run test
-    - stage: NEDB
-      node_js: "10"
-    - os:
-        - windows
-        - linux
-        - osx
-      before_script:
-        - npm run test:config:nedb
-        - cat config.json
-      script: travis_retry npm run test
+        - travis_retry npm run test
     - stage: MONGODB
-      node_js: "9"
+    - node_js:
+        - "9"
+        - "10"
     - os:
         - windows
         - linux
-        - osx
       services: mongodb
       before_script:
         - npm run test:config:mongodb
         - cat config.json
-      script: travis_retry npm run test
-    - stage: MONGODB
-      node_js: "10"
-    - os:
-        - windows
-        - linux
-        - osx
-      services: mongodb
-      before_script:
-        - npm run test:config:mongodb
-        - cat config.json
-      script: travis_retry npm run test
+      script:
+        - npm run eslint
+        - npx flow check
+        - travis_retry npm run test
