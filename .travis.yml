@@ -6,6 +6,15 @@ install:
   - travis_wait make ENV=development
 notifications:
   email: false
+node_js:
+  - "9"
+  - "10"
+os:
+  - windows
+  - linux
+env:
+  - DB=nedb
+  - DB=mongodb
 services: mongodb
 before_script:
   - npm run test:config:$DB
@@ -15,26 +24,7 @@ script:
   - npx flow check
   - travis_retry npm run test
 
-matrix:
-  include:
-    - os: linux
-      node_js:
-        - "9"
-        - "10"
-      env:
-        - DB=nedb
-        - DB=mongodb
-
-    - os: windows
-      node_js:
-        - "9"
-        - "10"
-      env:
-        - DB=nedb
-        - DB=mongodb
-
-    - os: osx
-      env: DB=nedb
-      node_js:
-        - "9"
-        - "10"
+  matrix:
+    include:
+      - os: osx
+        env: DB=nedb
