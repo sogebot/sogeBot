@@ -12,6 +12,7 @@ node_js:
 os:
   - windows
   - linux
+  - osx
 env:
   - DB=nedb
   - DB=mongodb
@@ -25,6 +26,6 @@ script:
   - travis_retry npm run test
 
   matrix:
-    include:
+    exclude:
       - os: osx
-        env: DB=nedb
+        env: DB=mongodb
