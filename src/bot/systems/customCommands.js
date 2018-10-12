@@ -30,7 +30,8 @@ type Response = {
   order: number,
   response: string,
   stopIfExecuted: boolean,
-  permission: number
+  permission: number,
+  filter: string
 }
 
 type Command = {
@@ -389,7 +390,7 @@ class CustomCommands extends System {
         : Number.MAX_SAFE_INTEGER / 1000000, 10)
   }
 
-  async checkFilter (opts, filter) {
+  async checkFilter (opts: Object, filter: string) {
     if (typeof filter === 'undefined' || filter.trim().length === 0) return true
     let toEval = `(function evaluation () { return ${filter} })()`
     const context = {
