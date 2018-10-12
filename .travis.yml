@@ -10,21 +10,17 @@ node_js:
 os:
   - windows
   - linux
+  - osx
+env:
+  - DB=nedb
+  - DB=mongodb
 
 jobs:
   include:
-    - stage: NEDB
-      before_script:
-        - npm run test:config:nedb
-        - cat config.json
-      script:
-        - npm run eslint
-        - npx flow check
-        - travis_retry npm run test
-    - stage: MONGODB
+    - stage: Test
       services: mongodb
       before_script:
-        - npm run test:config:mongodb
+        - npm run test:config:$DB
         - cat config.json
       script:
         - npm run eslint
