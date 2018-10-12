@@ -4,32 +4,42 @@ before_install:
 install: travis_wait make ENV=development
 notifications:
   email: false
-os:
-  - windows
-  - linux
-  - osx
 
 jobs:
   include:
     - stage: Test
       node_js: "10"
+    - os:
+        - linux
       script:
         - npm run eslint
         - npx flow check
     - stage: NEDB
       node_js: "9"
+    - os:
+        - windows
+        - linux
+        - osx
       before_script:
         - npm run test:config:nedb
         - cat config.json
       script: travis_retry npm run test
     - stage: NEDB
       node_js: "10"
+    - os:
+        - windows
+        - linux
+        - osx
       before_script:
         - npm run test:config:nedb
         - cat config.json
       script: travis_retry npm run test
     - stage: MONGODB
       node_js: "9"
+    - os:
+        - windows
+        - linux
+        - osx
       services: mongodb
       before_script:
         - npm run test:config:mongodb
@@ -37,6 +47,10 @@ jobs:
       script: travis_retry npm run test
     - stage: MONGODB
       node_js: "10"
+    - os:
+        - windows
+        - linux
+        - osx
       services: mongodb
       before_script:
         - npm run test:config:mongodb
