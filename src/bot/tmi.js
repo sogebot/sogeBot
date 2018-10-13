@@ -282,7 +282,7 @@ class TMI extends Core {
 
   async resub (message: Object) {
     try {
-      const username = message.tags.username
+      const username = message.tags.login
       const method = this.getMethod(message)
       const months = Number(message.parameters.months)
       const userstate = message.tags
@@ -310,7 +310,7 @@ class TMI extends Core {
 
   async subscriptionGiftCommunity (message: Object) {
     try {
-      const username = message.tags.username
+      const username = message.tags.login
       const count = Number(message.parameters.senderCount)
       // const plan = message.parameters.subPlan
 
@@ -330,7 +330,7 @@ class TMI extends Core {
 
   async subgift (message: Object) {
     try {
-      const username = message.tags.username
+      const username = message.tags.login
       const months = Number(message.parameters.months)
       const recipient = message.parameters.recipientName.toLowerCase()
 
@@ -373,16 +373,17 @@ class TMI extends Core {
 
   async cheer (message: Object) {
     try {
+      const username = message.tags.login
       const userstate = message.tags
       // remove cheerX or channelCheerX from message
       const messageFromUser = message.message.replace(/(.*?[cC]heer[\d]+)/g, '').trim()
 
       if (await global.commons.isIgnored(userstate.username)) return
 
-      global.overlays.eventlist.add({ type: 'cheer', username: userstate.username.toLowerCase(), bits: userstate.bits, message: messageFromUser })
-      global.log.cheer(`${userstate.username.toLowerCase()}, bits: ${userstate.bits}, message: ${messageFromUser}`)
-      global.db.engine.insert('users.bits', { id: await global.users.getIdByName(userstate.username.toLowerCase()), amount: userstate.bits, message: messageFromUser, timestamp: _.now() })
-      global.events.fire('cheer', { username: userstate.username.toLowerCase(), bits: userstate.bits, message: messageFromUser })
+      global.overlays.eventlist.add({ type: 'cheer', username, bits: userstate.bits, message: messageFromUser })
+      global.log.cheer(`${username}, bits: ${userstate.bits}, message: ${messageFromUser}`)
+      global.db.engine.insert('users.bits', { id: await global.users.getIdByName(username), amount: userstate.bits, message: messageFromUser, timestamp: _.now() })
+      global.events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser })
       if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
     } catch (e) {
       global.log.error('Error parsing cheer event')
