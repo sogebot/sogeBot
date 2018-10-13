@@ -256,7 +256,7 @@ class TMI extends Core {
 
   async subscription (message: Object) {
     try {
-      const username = message.tags.username
+      const username = message.tags.login
       const method = this.getMethod(message)
       const userstate = message.tags
 
