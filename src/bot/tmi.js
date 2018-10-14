@@ -332,7 +332,9 @@ class TMI extends Core {
     try {
       const username = message.tags.login
       const months = Number(message.parameters.months)
-      const recipient = message.parameters.recipientName.toLowerCase()
+      const recipient = message.parameters.recipientUserName.toLowerCase()
+      const recipientId = message.parameters.recipientId
+      const senderCount = message.parameters.senderCount
 
       for (let [u, o] of Object.entries(this.ignoreGiftsFromUser)) {
         // $FlowFixMe Incorrect mixed type from value of Object.entries https://github.com/facebook/flow/issues/5838
@@ -348,22 +350,21 @@ class TMI extends Core {
       }
       if (await global.commons.isIgnored(username)) return
 
-      let user = await global.db.engine.findOne('users', { username: recipient })
-      if (!user.id) {
-        user.id = await global.api.getIdFromTwitch(recipient)
-      }
+      let user = await global.db.engine.findOne('users', { id: recipientId })
+      if (!user.id) user.id = recipientId
 
-      if (user.id !== null) {
-        let subscribedAt = _.now()
-        let isSubscriber = true
+      let subscribedAt = _.now()
+      let isSubscriber = true
 
-        if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
-        if (user.lock && user.lock.subscriber) isSubscriber = undefined
+      if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
+      if (user.lock && user.lock.subscriber) isSubscriber = undefined
 
-        global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt } })
-        global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months })
-        global.log.subgift(`${recipient}, from: ${username}, months: ${months}`)
-      }
+      global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt } })
+      global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months })
+      global.log.subgift(`${recipient}, from: ${username}, months: ${months}`)
+
+      // also set subgift count to gifter
+      if (!global.commons.isIgnored(username)) global.users.setById(message.tags.userId, { custom: { subgiftCount: senderCount } })
     } catch (e) {
       global.log.error('Error parsing subgift event')
       global.log.error(JSON.stringify(message))
