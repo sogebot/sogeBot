@@ -350,7 +350,7 @@ class TMI extends Core {
       }
       if (await global.commons.isIgnored(username)) return
 
-      let user = await global.db.engine.findOne('users', { username: recipient })
+      let user = await global.db.engine.findOne('users', { id: recipientId })
       if (!user.id) user.id = recipientId
 
       let subscribedAt = _.now()
@@ -359,7 +359,7 @@ class TMI extends Core {
       if (user.lock && user.lock.subcribed_at) subscribedAt = undefined
       if (user.lock && user.lock.subscriber) isSubscriber = undefined
 
-      global.users.setById(user.id, { id: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt } })
+      global.users.setById(user.id, { username: recipient, is: { subscriber: isSubscriber }, time: { subscribed_at: subscribedAt } })
       global.overlays.eventlist.add({ type: 'subgift', username: recipient, from: username, monthsName: global.commons.getLocalizedName(months, 'core.months'), months })
       global.log.subgift(`${recipient}, from: ${username}, months: ${months}`)
 
