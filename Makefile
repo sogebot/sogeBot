@@ -1,12 +1,13 @@
 PATH    := node_modules/.bin:$(PATH)
 SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
-ENV     := production
+ENV     ?= production
 
-all : prepare dependencies shrinkwrap ui bot commit
+all : prepare dependencies shrinkwrap ui bot info
 .PHONY : all
 
-commit:
+info:
+	@echo -ne "\n\t ----- Build ENV: $(ENV)"
 	@echo -ne "\n\t ----- Build commit\n\n"
 	@git log --oneline -3 | cat
 
