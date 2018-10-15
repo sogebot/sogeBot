@@ -48,17 +48,13 @@
               </number-or-text>
             </template>
             <template v-else-if="variable.type ==='options'">
-              <div style="display: flex; flex: 1 1 auto;">
-                <div style="flex: 1 auto;" class="btn-group btn-group-toggle" data-toggle="buttons">
-                  <option-selector
-                    v-bind:key="option"
-                    v-for="option of variable.usableOptions.split(',').map((o) => o.trim())"
-                    v-bind:value="option"
-                    v-bind:selected="variable.currentValue === option"
-                    v-on:update="onUpdate(String(variable._id), option)">
-                  </option-selector>
-                </div>
-              </div>
+              <select class="form-control" v-model="variable.currentValue" v-on:change="onUpdate(String(variable._id), variable.currentValue)">
+                <option
+                  v-for="option of variable.usableOptions.split(',').map((o) => o.trim())"
+                  v-bind:key="option"
+                  v-bind:value="String(option)">
+                  {{ option }}</option>
+              </select>
             </template>
           </div>
         </div>
@@ -109,19 +105,6 @@ import { faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faDollarSign, faCog, faCode, faAngleUp, faTrashAlt, faAngleDown, faFont, faPlus, faMinus, faDownload)
-
-var optionsSelectorComponent = {
-  props: ['value', 'selected'], // data for component
-  methods: {
-    update: function () {
-      this.$emit('update')
-    }
-  },
-  template: `
-    <label style="flex: 1 auto;" class="btn btn-secondary" v-bind:class="{ active : selected }" v-on:click="update()">
-      <input type="radio" name="options" v-bind:id="value" autocomplete="off" checked="">{{ value }}
-    </label>`
-}
 
 var numberOrTextComponent = {
   props: ['id', 'value', 'type'],
@@ -179,7 +162,6 @@ export default {
   props: ['commons'],
   components: {
     'font-awesome-icon': FontAwesomeIcon,
-    'option-selector': optionsSelectorComponent,
     'number-or-text': numberOrTextComponent
   },
   data: function () {
