@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#f4f5f6">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#f4f5f6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Poppins|PT+Sans|PT+Sans+Narrow|PT+Mono" rel="stylesheet">
+  <!-- LoDash goodness -->
+  <script src="../dist/lodash/js/lodash.min.js"></script>
+  <script type="text/javascript" src="/dist/js/commons/commons.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+
+  <style>
+    html {
+      height: 100%;
+    }
+
+    #widget {
+      height:100%
+    }
+  </style>
+</head>
+<body style="padding-top: 0; height: 100%; width: 100%">
+  <div id="overlays"></div>
+
+  <script type="text/javascript" src="/auth/token.js"></script>
+  <script src="/dist/js/overlay.js"></script>
+
+  <script>
+    var socket = io({
+      query: "token=" + token
+    });
+
+    var translations = {}
+    socket.on('lang', (data) => translations = data)
+  </script>
+</body>
+</html>

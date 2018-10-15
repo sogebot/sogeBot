@@ -70,7 +70,7 @@ function Panel () {
     res.sendFile(path.join(__dirname, '..', 'public', 'playlist', 'index.html'))
   })
   app.get('/overlays/:overlay', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'overlays', req.params.overlay + '.html'))
+    res.sendFile(path.join(__dirname, '..', 'public', 'overlays.html'))
   })
   app.get('/custom/:custom', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'custom', req.params.custom + '.html'))
