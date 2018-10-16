@@ -142,6 +142,62 @@ class API {
     global.db.engine.update('api.current', { key: 'game' }, { value: await global.cache.gameCache() })
   }
 
+  async getUsernameFromTwitch (id: string) {
+    const url = `https://api.twitch.tv/helix/users?id=${id}`
+    var request
+    /*
+      {
+        "data": [{
+          "id": "44322889",
+          "login": "dallas",
+          "display_name": "dallas",
+          "type": "staff",
+          "broadcaster_type": "",
+          "description": "Just a gamer playing games and chatting. :)",
+          "profile_image_url": "https://static-cdn.jtvnw.net/jtv_user_pictures/dallas-profile_image-1a2c906ee2c35f12-300x300.png",
+          "offline_image_url": "https://static-cdn.jtvnw.net/jtv_user_pictures/dallas-channel_offline_image-1a2c906ee2c35f12-1920x1080.png",
+          "view_count": 191836881,
+          "email": "login@provider.com"
+        }]
+      }
+    */
+
+    const token = await global.oauth.settings.bot.accessToken
+    const needToWait = token === ''
+    const notEnoughAPICalls = global.api.calls.bot.remaining <= 30 && global.api.calls.bot.refresh > _.now() / 1000
+    if ((needToWait || notEnoughAPICalls)) {
+      return null
+    }
+
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      })
+
+      // save remaining api calls
+      // $FlowFixMe error with flow on request.headers
+      this.calls.bot.limit = request.headers['ratelimit-limit']
+      // $FlowFixMe error with flow on request.headers
+      this.calls.bot.remaining = request.headers['ratelimit-remaining']
+      // $FlowFixMe error with flow on request.headers
+      this.calls.bot.refresh = request.headers['ratelimit-reset']
+      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: request.status, remaining: this.calls.bot.remaining })
+      return request.data.data[0].login
+    } catch (e) {
+      if (typeof e.response !== 'undefined' && e.response.status === 429) {
+        global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', 120, 0, e.response.headers['ratelimit-reset'] ] })
+        this.calls.bot.remaining = 0
+        this.calls.bot.refresh = e.response.headers['ratelimit-reset']
+      }
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: {}, timestamp: _.now(), call: 'getUsernameFromTwitch', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
+    }
+    return null
+  }
+
   async getIdFromTwitch (username: string, isChannelId: bool = false) {
     const url = `https://api.twitch.tv/helix/users?login=${username}`
     var request
