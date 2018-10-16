@@ -7,7 +7,7 @@
     "cancel": "Zrušit",
     "close": "Zavřít",
     "saveChanges": {
-      "idle": "Uložit změnya",
+      "idle": "Uložit změny",
       "progress": "Ukládání změn",
       "done": "Změny uloženy"
     },
