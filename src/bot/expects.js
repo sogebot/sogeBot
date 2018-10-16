@@ -55,15 +55,19 @@ class Expects {
     if (!opts.optional) this.checkText()
 
     let regexp
-    if (opts.all) regexp = XRegExp('(?<points> all|[0-9]* )', 'ix')
-    else regexp = XRegExp('(?<points> [0-9]* )', 'ix')
+    if (opts.all) regexp = XRegExp('(?<points> all|[0-9]+ )', 'ix')
+    else regexp = XRegExp('(?<points> [0-9]+ )', 'ix')
     const match = XRegExp.exec(this.text, regexp)
 
     if (!_.isNil(match)) {
-      this.match.push(parseInt(
-        Number(match.points) <= Number.MAX_SAFE_INTEGER / 1000000
-          ? match.points
-          : Number.MAX_SAFE_INTEGER / 1000000, 10)) // return only max safe
+      if (match.points === 'all') {
+        this.match.push(match.points)
+      } else {
+        this.match.push(parseInt(
+          Number(match.points) <= Number.MAX_SAFE_INTEGER / 1000000
+            ? match.points
+            : Number.MAX_SAFE_INTEGER / 1000000, 10)) // return only max safe
+      }
       this.text = this.text.replace(match.points, '') // remove from text matched pattern
     } else {
       if (!opts.optional) throw Error('Points not found')
