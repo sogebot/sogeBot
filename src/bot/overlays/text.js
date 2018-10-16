@@ -20,6 +20,7 @@ class Text extends Overlay {
 
     super({ ui })
     if (require('cluster').isMaster) this.sockets()
+    this.addMenu({ category: 'registry', name: 'text-overlay', id: 'registry.textOverlay/list' })
   }
 
   sockets () {
