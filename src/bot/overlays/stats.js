@@ -2,8 +2,24 @@
 
 const _ = require('lodash')
 
-class StatsOverlay {
+const Overlay = require('./_interface')
+
+class Stats extends Overlay {
   constructor () {
+    // define special property name as readonly
+    const ui = {
+      links: {
+        overlay: {
+          type: 'link',
+          href: '/overlays/stats',
+          class: 'btn btn-primary btn-block',
+          rawText: '/overlays/stats (500x55)',
+          target: '_blank'
+        }
+      }
+    }
+
+    super({ ui })
     if (require('cluster').isMaster) this.sockets()
   }
 
@@ -24,4 +40,4 @@ class StatsOverlay {
   }
 }
 
-module.exports = new StatsOverlay()
+module.exports = new Stats()

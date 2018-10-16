@@ -1,920 +1,243 @@
-<ul class="nav nav-tabs">
-  <li class="nav-item">
-    <span data-lang="menu.overlays" class="title text-default"></span>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link active" data-toggle="tab" href="#emotes" data-lang="emotes"></a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#stats" data-lang="stats"></a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#eventlist-overlay" data-lang="eventlist"></a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#alerts" data-lang="alerts"></a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link _load" data-toggle="tab" href="#carousel" data-lang="carousel"></a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#eventlist-text" data-lang="text"></a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#eventlist-credits" data-lang="credits"></a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#games" data-lang="menu.games"></a>
-  </li>
-</ul>
-
-<div class="tab-content">
-  <div role="tabpanel" class="tab-pane active" id="emotes">
-    <div class="row settings">
-      <div class="col" style="max-width: 50%">
-        <strong>XSplit / OBS link</strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <a class="btn btn-success" href="/overlays/emotes" target="_blank">/overlays/emotes (1920x1080 or 1280x720)</a>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col" style="max-width: 50%">
-        <strong>Overlay testing</strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <button class="btn btn-default" onclick="emotesTest('explosion')">Test explosion</button>
-        <button class="btn btn-default" onclick="emotesTest('emote')">Test emote</button>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col" style="max-width: 50%">
-        <strong data-lang="overlay-emotes-size"></strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <abbr title="click to edit" data-config-id="OEmotesSize" onclick="commons.configEditable(this, '')" id="configOEmotesSize"></abbr>
-        <div class="input-group" style="display:none;" id="input_OEmotesSize_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">0-2</span>
+<div id="settingsOverlaysApp">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-9 col-md-8 col-sm-6">
+        <span class="title text-default mb-2">
+          {{ commons.translate('menu.settings') }}
+          <small><i class="fas fa-angle-right"></i></small>
+          {{ commons.translate('menu.overlays') }}
+          <template v-if="selected">
+            <small><i class="fas fa-angle-right"></i></small>
+            {{ commons.translate('menu.' + selected) }}
+          </template>
+        </span>
+        <template v-if="state.loading === 1">
+          <div class="alert alert-info text-center"><i class="fas fa-circle-notch fa-spin"></i> loading settings from server ...</div>
+        </template>
+        <template v-for="(value, category) of settings" v-if="category !== '_permissions' && state.loading === 0 && !_.isEmpty(value)">
+          <h6>{{ category }}</h6>
+          <div class="card mb-2" >
+            <div class="card-body">
+              <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
+                <template v-if="typeof ui[category] !== 'undefined' && ui[category][defaultValue]">
+                  <component
+                    :is="ui[category][defaultValue].type"
+                    :readonly="ui[category][defaultValue].readOnly"
+                    :secret="ui[category][defaultValue].secret"
+                    :value="currentValue"
+                    @update="value[defaultValue] = $event.value; triggerDataChange()"
+                    :title="defaultValue"
+                    :current="value[ui[category][defaultValue].current]"
+                    class="pt-1 pb-1"></component>
+                </template>
+                <template v-else>
+                  <command-input-with-permission
+                    v-if="category === 'commands'"
+                    class="pt-1 pb-1"
+                    v-bind:type="typeof currentValue"
+                    v-bind:value="currentValue"
+                    v-bind:command="defaultValue"
+                    :permissions="settings._permissions[defaultValue]"
+                    v-on:update="value[defaultValue] = $event.value; settings._permissions[defaultValue] = $event.permissions; triggerDataChange()"
+                  ></command-input-with-permission>
+                  <toggle
+                    class="pt-1 pb-1"
+                    v-bind:title="commons.translate('systems.' + selected + '.settings.' + defaultValue)"
+                    v-else-if="typeof currentValue === 'boolean'"
+                    v-bind:value="currentValue"
+                    v-on:update="value[defaultValue] = !value[defaultValue]; triggerDataChange()"
+                  ></toggle>
+                  <textarea-from-array
+                    class="pt-1 pb-1"
+                    v-else-if="currentValue.constructor === Array"
+                    v-bind:value="currentValue"
+                    v-bind:title="commons.translate('systems.' + selected + '.settings.' + defaultValue)"
+                    v-on:update="value[defaultValue] = $event; triggerDataChange()"
+                  ></textarea-from-array>
+                  <text-input
+                    v-else
+                    class="pt-1 pb-1"
+                    v-bind:type="typeof currentValue"
+                    v-bind:value="currentValue"
+                    v-bind:title="'systems.' + selected + '.settings.' + defaultValue"
+                    :permission="settings._permissions[defaultValue]"
+                    v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
+                  ></text-input>
+                </template>
+              </div>
+              <div v-if="typeof value === 'object'" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of ui[category]">
+                <template v-if="typeof value[defaultValue] === 'undefined' || value[defaultValue] === null">
+                  <template v-if="ui[category][defaultValue].type === 'link'">
+                    <a :href="currentValue.href" class="mt-1 mb-1" :class="currentValue.class" :target="currentValue.target">
+                      <template v-if="currentValue.rawText">{{ currentValue.rawText }}</template>
+                      <template v-else>{{ commons.translate(currentValue.text) }}</template>
+                    </a>
+                  </template>
+                </template>
+              </div>
+            </div>
           </div>
-          <input id="input_OEmotesSize" class="form-control input-sm" type="text" />
-        </div>
+        </template>
       </div>
-      <div class="w-100"></div>
 
-      <div class="col" style="max-width: 50%">
-        <strong data-lang="overlay-emotes-max"></strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <abbr title="click to edit" data-config-id="OEmotesMax" onclick="commons.configEditable(this, '')" id="configOEmotesMax"></abbr>
-        <div class="input-group" style="display:none;" id="input_OEmotesMax_group">
-          <input id="input_OEmotesMax" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <div class="sticky-top" style="top: 80px">
+          <div class="widget pt-1 mt-3 border-0 bg-light" style="height: auto">
 
-      <div class="col" style="max-width: 50%">
-        <strong data-lang="overlay-emotes-animation"></strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <select id="overlay-emotes-animation-select" class="form-control" onchange="saveEmotesAnimation()">
-          <option value="fadeup" data-lang="fade-out-top"></option>
-          <option value="fadezoom" data-lang="fade-out-zoom"></option>
-          <option value="facebook">facebook</option>
-        </select>
-      </div>
-      <div class="w-100"></div>
+          <div class="pl-2 pr-2 pb-4">
+              <div v-if="isDataChanged" class="btn btn-block alert-warning" style="cursor: initial">
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                {{commons.translate('dialog.changesPending')}}
+              </div>
+              <button class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 0">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
+              <button disabled="disabled" class="btn btn-block btn-primary" v-on:click="saveSettings" v-if="state.settings === 1">
+                <i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
+              <button disabled="disabled" class="btn btn-block btn-success" v-on:click="saveSettings" v-if="state.settings === 2">
+                <i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</button>
+            </div>
 
-      <div class="col" style="max-width: 50%">
-        <strong data-lang="overlay-emotes-animation-time"></strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <abbr title="click to edit" data-config-id="OEmotesAnimationTime" onclick="commons.configEditable(this, 'ms')" id="configOEmotesAnimationTime"></abbr>
-        <div class="input-group" style="display:none;" id="input_OEmotesAnimationTime_group">
-          <input id="input_OEmotesAnimationTime" class="form-control input-sm" type="text" />
-          <div class="input-group-prepend">
-            <span class="input-group-text">ms</span>
+            <div class="pl-2 pr-2" v-for="system of list">
+              <button
+                class="btn btn-block text-left btn-outline-dark"
+                :style="getBorderStyle(system.name)"
+                v-on:click="setSelected(system.name)"
+              >
+                {{ commons.translate('menu.' + system.name) }}
+
+                <small
+                  :class="[ system.enabled && !system.isDisabledByEnv && system.areDependenciesEnabled ? 'text-success' : 'text-danger' ]"
+                  style="margin: 0px 0px 3px; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;"
+                ></small>
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <div role="tabpanel" class="tab-pane" id="stats">
-    <div class="row settings">
-      <div class="col" style="max-width: 50%">
-        <strong>XSplit / OBS link</strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <a class="btn btn-success" href="/overlays/stats" target="_blank">/overlays/stats (500x55)</a>
-      </div>
-    </div>
-  </div>
-
-  <div role="tabpanel" class="tab-pane" id="eventlist-overlay">
-    <div class="row settings">
-      <div class="col" style="max-width: 50%">
-        <strong>XSplit / OBS link</strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <a class="btn btn-success" href="/overlays/eventlist" target="_blank">/overlays/eventlist (350x220)</a>
-      </div>
-    </div>
-  </div>
-
-  <div role="tabpanel" class="tab-pane" id="alerts">
-    <div class="row settings">
-      <div class="col" style="max-width: 50%">
-        <strong>XSplit / OBS link</strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <a class="btn btn-success" href="/overlays/alerts" target="_blank">/overlays/alerts (1920x1080 or 1280x720)</a>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col" style="max-width: 50%">
-        <strong>Overlay testing</strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <button class="btn btn-default" onclick="replayTest()">Test replay</button>
-      </div>
-    </div>
-
-    <div class="col" style="max-width: 50%">
-      <span class="title title-part text-default">Replay settings
-        <a href="https://github.com/sogehige/sogeBot/wiki/OBS-replays-through-alert-systems">
-          <small>How to setup</small>
-        </a>
-      </span>
-    </div>
-    <div class="w-100"></div>
-
-    <div class="row settings settings-part">
-      <div class="col" style="max-width: 50%">
-        <strong data-lang="page-settings.overlays.replay.position"></strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <select id="overlay-replay-position-select" class="form-control" onchange="saveReplayPos()">
-          <option value="left" data-lang="page-settings.overlays.replay.posleft"></option>
-          <option value="right" data-lang="page-settings.overlays.replay.posright"></option>
-        </select>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col" style="max-width: 50%">
-        <strong data-lang="page-settings.overlays.replay.filter.title"></strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <select id="overlay-replay-filter-select" class="form-control" onchange="saveReplayFil()">
-          <option value="none" data-lang="page-settings.overlays.replay.filter.none"></option>
-          <option value="grayscale" data-lang="page-settings.overlays.replay.filter.grayscale"></option>
-          <option value="sepia" data-lang="page-settings.overlays.replay.filter.sepia"></option>
-          <option value="tint" data-lang="page-settings.overlays.replay.filter.tint"></option>
-          <option value="washed" data-lang="page-settings.overlays.replay.filter.washed"></option>
-        </select>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col" style="max-width: 50%">
-        <strong data-lang="page-settings.overlays.replay.offsetX"></strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <abbr title="click to edit" data-config-id="replayOffsetX" onclick="commons.configEditable(this, '')" id="configReplayOffsetX"></abbr>
-        <div class="input-group" style="display:none;" id="input_replayOffsetX_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">px</span>
-          </div>
-          <input id="input_replayOffsetX" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col" style="max-width: 50%">
-        <strong data-lang="page-settings.overlays.replay.offsetY"></strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <abbr title="click to edit" data-config-id="replayOffsetY" onclick="commons.configEditable(this, '')" id="configReplayOffsetY"></abbr>
-        <div class="input-group" style="display:none;" id="input_replayOffsetY_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">px</span>
-          </div>
-          <input id="input_replayOffsetY" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col" style="max-width: 50%">
-        <strong data-lang="page-settings.overlays.replay.size"></strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <abbr title="click to edit" data-config-id="replaySize" onclick="commons.configEditable(this, '')" id="configReplaySize"></abbr>
-        <div class="input-group" style="display:none;" id="input_replaySize_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">px</span>
-          </div>
-          <input id="input_replaySize" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col" style="max-width: 50%">
-        <strong data-lang="page-settings.overlays.replay.volume"></strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <abbr title="click to edit" data-config-id="replayVolume" onclick="commons.configEditable(this, '')" id="configReplayVolume"></abbr>
-        <div class="input-group" style="display:none;" id="input_replayVolume_group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">0-100</span>
-          </div>
-          <input id="input_replayVolume" class="form-control input-sm" type="text" />
-        </div>
-      </div>
-      <div class="w-100"></div>
-
-      <div class="col" style="max-width: 50%">
-        <strong data-lang="page-settings.overlays.replay.label"></strong>
-      </div>
-      <div class="col" style="max-width: 50%">
-        <input id="replayLabelToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-      </div>
-    </div>
-  </div>
-
-  <div role="tabpanel" class="tab-pane" id="carousel"></div>
-
-  <div role="tabpanel" class="tab-pane" id="eventlist-text">
-      <div class="row settings">
-        <div class="col" style="max-width: 50%">
-          <strong>XSplit / OBS link</strong>
-        </div>
-        <div class="col" style="max-width: 50%">
-          <a class="btn btn-success" style="max-width: 100%; word-wrap: break-word; text-align: left; margin-bottom: .1rem; display: inline-block; white-space: normal;" id="text-url" href="/overlays/text" target="_blank">/overlays/text</a>
-        </div>
-        <div class="w-100"></div>
-
-        <div class="col" style="max-width: 50%">
-          <strong data-lang="overlay-text-link-generator"></strong>
-        </div>
-        <div class="col" style="max-width: 50%">
-          <textarea id="text-url-generator" class="form-control"></textarea>
-        </div>
-        <div class="w-100"></div>
-
-        <div class="col" style="max-width: 50%">
-          <strong data-lang="overlay-text-decode-base64"></strong>
-        </div>
-        <div class="col" style="max-width: 50%">
-          <textarea id="text-decode-base64" class="form-control"></textarea>
-        </div>
-      </div>
-    </div>
-
-    <div role="tabpanel" class="tab-pane" id="eventlist-credits">
-        <div class="row settings">
-          <div class="col" style="max-width: 50%">
-            <strong>XSplit / OBS link</strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <a class="btn btn-success" style="max-width: 100%; word-wrap: break-word; text-align: left; margin-bottom: .1rem; display: inline-block; white-space: normal;" href="/overlays/credits" target="_blank">/overlays/credits (1920x1080 or 1280x720)</a>
-          </div>
-        </div>
-
-        <div class="col" style="max-width: 50%">
-          <span class="title title-part text-default">Show</span>
-        </div>
-        <div class="row settings settings-part">
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-aggregate"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="creditsAggregateToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-          <div class="w-100"></div>
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-show-followers"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="creditsFollowersToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-show-tips"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="creditsTipsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-show-hosts"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="creditsHostsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-show-subscribers"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="creditsSubscribersToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-show-subgifts"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="creditsSubgiftsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-show-subcommunitygifts"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="creditsSubcommunitygiftsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-show-resubs"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="creditsResubsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-show-cheers"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="creditsCheersToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-show-clips"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="creditsClipsToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-        </div>
-
-        <div class="col" style="max-width: 50%">
-          <span class="title title-part text-default">Configuration</span>
-        </div>
-        <div class="row settings settings-part">
-            <div class="col" style="max-width: 50%">
-              <strong data-lang="overlay-credits-speed"></strong>
-            </div>
-            <div class="col" style="max-width: 50%">
-              <input id="input_creditsSpeed" class="form-control input-sm" type="text" />
-            </div>
-            <div class="w-100"></div>
-
-            <div class="col" style="max-width: 50%">
-              <strong data-lang="overlay-credits-max-font-size"></strong>
-            </div>
-            <div class="col" style="max-width: 50%">
-              <input id="input_creditsMaxFontSize" class="form-control input-sm" type="text" />
-            </div>
-        </div>
-
-        <div class="col">
-          <span class="title title-part text-default">Custom texts <small>(html supported)</small></span>
-          <button class="btn btn-sm btn-success" style="margin-top: -3px; line-height: 1.25; position: relative; left: -4px;" type="button" onclick="addCustomTextInputs()"><i class="fas fa-plus"></i></button>
-
-          <div class="alert alert-primary float-right" data-custom-text-alert style="opacity: 0; padding: 0.2rem 1rem; margin: 0; position: relative; top: 0.8rem;" role="alert">
-            <strong>... saving ...</strong>
-          </div>
-        </div>
-        <div class="row settings settings-part">
-          <div id="credits-custom-texts" style="width: 100%"></div>
-        </div>
-
-        <div class="col" style="max-width: 50%">
-          <span class="title title-part text-default">Text</span>
-        </div>
-        <div class="row settings settings-part">
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-last-message"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="input_creditsLastMessage" class="form-control input-sm" type="text" />
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-last-submessage"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="input_creditsLastSubMessage" class="form-control input-sm" type="text" />
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-stream-by"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="input_creditsStreamBy" class="form-control input-sm" type="text" />
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-followed-by"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="input_creditsFollowedBy" class="form-control input-sm" type="text" />
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-hosted-by"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="input_creditsHostedBy" class="form-control input-sm" type="text" />
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-cheer-by"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="input_creditsCheerBy" class="form-control input-sm" type="text" />
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-subscribed-by"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="input_creditsSubscribedBy" class="form-control input-sm" type="text" />
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-resubscribed-by"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="input_creditsResubscribedBy" class="form-control input-sm" type="text" />
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-subgift-by"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="input_creditsSubgiftBy" class="form-control input-sm" type="text" />
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-subcommunitygift-by"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="input_creditsSubcommunitygiftBy" class="form-control input-sm" type="text" />
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-clipped-by"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="input_creditsClippedBy" class="form-control input-sm" type="text" />
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-tip-by"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="input_creditsTipsBy" class="form-control input-sm" type="text" />
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-top-clips"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="input_creditsTopClips" class="form-control input-sm" type="text" />
-          </div>
-        </div>
-
-        <div class="col" style="max-width: 50%">
-          <span class="title title-part text-default">Clips</span>
-        </div>
-        <div class="row settings settings-part">
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-clips-period"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <select id="overlay-credits-clips-period" class="form-control" onchange="saveClipsPeriod()">
-                <option value="day" data-lang="page-settings.overlays.credits.period.day"></option>
-                <option value="week" data-lang="page-settings.overlays.credits.period.week"></option>
-                <option value="month" data-lang="page-settings.overlays.credits.period.month"></option>
-                <option value="all" data-lang="page-settings.overlays.credits.period.all"></option>
-              </select>
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-clips-count"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="input_creditsTopClipsCount" class="form-control input-sm" type="text" />
-          </div>
-          <div class="w-100"></div>
-
-          <div class="col" style="max-width: 50%">
-            <strong data-lang="overlay-credits-clips-play"></strong>
-          </div>
-          <div class="col" style="max-width: 50%">
-            <input id="creditsTopClipsPlayToggle" type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-          </div>
-        </div>
-
-        <div class="col">
-          <span class="title title-part text-default">Social</span>
-          <button class="btn btn-sm btn-success" style="margin-top: -3px; line-height: 1.25; position: relative; left: -4px;" type="button" onclick="addSocialInputs()"><i class="fas fa-plus"></i></button>
-
-          <div class="alert alert-primary float-right" data-social-alert style="opacity: 0; padding: 0.2rem 1rem; margin: 0; position: relative; top: 0.8rem;" role="alert">
-            <strong>... saving ...</strong>
-          </div>
-        </div>
-        <div class="row settings settings-part">
-          <div id="credits-socials" style="width: 100%"></div>
-        </div>
-        <div class="w-100"></div>
-    </div>
-
-    <div role="tabpanel" class="tab-pane" id="games">
-      <div class="row settings">
-        <div class="col" style="max-width: 50%">
-          <strong>XSplit / OBS link</strong>
-        </div>
-        <div class="col" style="max-width: 50%">
-          <a class="btn btn-success" style="max-width: 100%; word-wrap: break-word; text-align: left; margin-bottom: .1rem; display: inline-block; white-space: normal;" id="text-url" href="/overlays/bets" target="_blank">/overlays/bets</a>
-          <br>
-          <a class="btn btn-success" style="max-width: 100%; word-wrap: break-word; text-align: left; margin-bottom: .1rem; display: inline-block; white-space: normal;" id="text-url" href="/overlays/wheeloffortune" target="_blank">/overlays/wheeloffortune</a>
-        </div>
-        <div class="w-100"></div>
-      </div>
-    </div>
-
-
-      <br/>
-      <br/>
 </div>
 
 <script>
-  // load pages
-  for (let page of $('._load')) {
-    let id = $(page).attr('href')
-    $(id).load(`settings/overlays/${id.replace('#', '')}.html`, () => { commons.translate() })
-  }
+  Vue.prototype.commons = commons
 
-  socket.off('configuration')
+  function settingsOverlaysAppInit () {
+    if (_.size(translations) === 0) return setTimeout(() => settingsOverlaysAppInit(), 1)
 
-  new Sortable(document.getElementById('credits-custom-texts'), { handle: ".sortable-handler", onEnd: () => saveCustomTextInputs() })
-  new Sortable(document.getElementById('credits-socials'), { handle: ".sortable-handler", onEnd: () => saveSocialInputs() })
+    var settingsOverlaysApp = new Vue({
+      el: '#settingsOverlaysApp',
+      components: {
+        'toggle': toggleEnable,
+        'text-input': textInput,
+        'command-input-with-permission': commandInputWithPermissions,
+        'textarea-from-array': textAreaFromArray
+      },
+      data: {
+        socket: { _panel: io({ query: "token=" + token }) },
+        list: [],
+        selected: null,
+        settings: { settings: {} },
+        ui: {},
+        isDataChanged: false,
 
-  var creditsSocket = io('/overlays/credits', {query: "token="+token})
+        state: {
+          loading: 0,
+          settings: 0
+        }
+      },
+      watch: {
+        selected: function (valueNew, valueOld) {
+          this.loadSettings(valueNew)
+        }
+      },
+      computed: {
+      },
+      created: function () {
+        this.socket._panel.emit('overlays', (err, overlays) => {
+          for (let system of overlays) {
+            this.socket[system.name] = io(`/overlays/${system.name}`, { query: "token=" + token })
+          }
+          this.list = overlays
+          this.selected = overlays[0].name
+        })
+      },
+      filters: {
+      },
+      methods: {
+        loadSettings: function (system) {
+          this.settings = { settings: {} }
+          this.state.settings = 0
+          this.state.loading = 1
+          this.socket[system].emit('settings', (err, settings, ui) => {
+            if (system !== this.selected) return // skip if we quickly changed system
 
-  creditsSocket.emit('custom.text.load', (err, cb) => {
-    if (err) return console.error(err)
-    cb = _.sortBy(cb, 'order')
-    for (let input of cb) addCustomTextInputs(input)
-    saveCustomTextInputs()
-  })
+            this.ui = ui
 
-  creditsSocket.emit('socials.load', (err, cb) => {
-    if (err) return console.error(err)
-    cb = _.sortBy(cb, 'order')
-    for (let input of cb) addSocialInputs(input)
-    saveSocialInputs()
-  })
+            this.state.loading = 0
+            let _settings = _(settings).toPairs().value()
 
-  socket.emit('getConfiguration')
-  socket.once('configuration', function (data) {
-    $("#configOEmotesSize").text(data.OEmotesSize)
-    $("#configOEmotesMax").text(data.OEmotesMax)
-    $("#configOEmotesAnimationTime").text(data.OEmotesAnimationTime + 'ms')
+            // sorting
+            this.settings.settings = {}
+            // everything else except commands and enabled and are string|number|bool
+            for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] !== 'object')).value()) {
+              this.settings.settings[name] = value
+            }
+            // everything else except commands and enabled and are objects -> own category
+            for (let [name, value] of _(_settings.filter(o => o[0] !== '_' && o[0] !== 'enabled' && o[0] !== 'commands' && typeof o[1] === 'object')).value()) {
+              this.settings[name] = value
+            }
+            // commands at last
+            for (let [name, value] of _(_settings.filter(o => o[0] === 'commands')).value()) {
+              this.settings[name] = value
+            }
 
-    $('#overlay-emotes-animation-select option[value=' + data.OEmotesAnimation + ']').prop('selected', true)
+            // check if all ui is in settings to be shown
+            for (let key of Object.keys(this.ui)) {
+              if (!this.settings[key]) this.settings[key] = {}
+              for (let k of Object.keys(this.ui[key])) this.settings[key][k] = null
+            }
+            this.isDataChanged = false
+          })
+        },
+        getBorderStyle: function (system) {
+          return system === this.selected ?
+            {
+              'border-width': '0px',
+              'border-left-width': '5px !important'
+            } :
+            {
+              'border-width': '0px',
+              'border-left-width': '5px !important',
+              'border-color': 'transparent'
+            }
+        },
+        triggerDataChange: function () {
+          this.isDataChanged = false; this.isDataChanged = true
+        },
+        setSelected: function (system) {
+          if (this.state.settings === 0) this.selected = system
+        },
+        saveSettings: function () {
+          this.state.settings = 1
+          let settings = _.cloneDeep(this.settings)
+          for (let [name,value] of Object.entries(settings.settings)) {
+            delete settings.settings[name]
+            settings[name] = value
+          }
+          delete settings.settings
 
-    // replay settings
-    $("#configReplayOffsetX").text(data.replayOffsetX)
-    $("#configReplayOffsetY").text(data.replayOffsetY)
-    $("#configReplaySize").text(data.replaySize)
-    $("#configReplayVolume").text(data.replayVolume)
-
-    var options = {
-      on: translations['on'],
-      off: translations['off']
-    }
-    $('#replayLabelToggle').bootstrapToggle(options)
-    $('#replayLabelToggle').bootstrapToggle(data.replayLabel ? 'on' : 'off')
-    $('#replayLabelToggle').off('change')
-    $('#replayLabelToggle').on('change', function () {
-      var data = {}
-      data['replayLabel'] = $(this).prop('checked')
-      if ($('#replayLabelToggle').data('init')) socket.emit('saveConfiguration', data)
-    })
-    $('#replayLabelToggle').data('init', true)
-
-    $('#overlay-replay-position-select option[value=' + data.replayPosition + ']').prop('selected', true)
-    $('#overlay-replay-filter-select option[value=' + data.replayFilter + ']').prop('selected', true)
-
-    // CREDITS ////////////////////////////////////////////////////////////////
-    $('#input_creditsSpeed').attr('placeholder', _.get(translations, 'placeholders.creditsSpeed', '{placeholders.creditsSpeed}'))
-
-    for (let input of $('input[id^="input_credits"]')) {
-      let key = $(input).attr('id').split('_')[1]
-      $(input).val(data[key])
-    }
-
-    $('#overlay-credits-clips-period option[value=' + data.creditsTopClipsPeriod + ']').prop('selected', true)
-
-    const toggle = (id) => {
-      $(`#${id}Toggle`).bootstrapToggle(options)
-      $(`#${id}Toggle`).bootstrapToggle(data[id] ? 'on' : 'off')
-      $(`#${id}Toggle`).off('change')
-      $(`#${id}Toggle`).on('change', function () {
-        var data = {}
-        data[id] = $(this).prop('checked')
-        if ($(`#${id}Toggle`).data('init')) socket.emit('saveConfiguration', data)
-      })
-      $(`#${id}Toggle`).data('init', true)
-    }
-
-    toggle('creditsTopClipsPlay')
-    toggle('creditsAggregate')
-    toggle('creditsFollowers')
-    toggle('creditsTips')
-    toggle('creditsHosts')
-    toggle('creditsSubscribers')
-    toggle('creditsSubgifts')
-    toggle('creditsSubcommunitygifts')
-    toggle('creditsResubs')
-    toggle('creditsCheers')
-    toggle('creditsClips')
-    // !CREDITS ///////////////////////////////////////////////////////////////
-  })
-
-  function saveEmotesAnimation() {
-    socket.emit('saveConfiguration', {
-      'OEmotesAnimation': $('#overlay-emotes-animation-select').val()
-    })
-  }
-
-  function emotesTest(type) {
-    if (type === 'explosion') socket.emit('emote.testExplosion')
-    if (type === 'emote') socket.emit('emote.test')
-  }
-
-  function replayTest() {
-    socket.emit('replay-video', '/dist/video/instant_replay.mp4')
-  }
-
-  function saveReplayPos() {
-    socket.emit('saveConfiguration', {
-      'replayPosition': $('#overlay-replay-position-select').val()
-    })
-  }
-
-  function saveReplayFil() {
-    socket.emit('saveConfiguration', {
-      'replayFilter': $('#overlay-replay-filter-select').val()
-    })
-  }
-
-  function saveClipsPeriod() {
-    socket.emit('saveConfiguration', {
-      'creditsTopClipsPeriod': $('#overlay-credits-clips-period').val()
-    })
-  }
-
-  // #text-url | #text-url-generator | #text-decode-b64
-  $('#text-url-generator').on('keyup', (event) => {
-    let value = $(event.currentTarget).val()
-    if (value.trim().length === 0) {
-      $('#text-url').attr('href', `/overlays/text`).text(`/overlays/text`)
-      $('#text-decode-base64').val('')
-      return
-    }
-    let b64string = btoa(encodeURIComponent(value).replace(/%([0-9A-F]{2})/g, function(match, p1) {
-        return String.fromCharCode(parseInt(p1, 16))
-    }))
-    $('#text-url').attr('href', `/overlays/text?${b64string}`).text(`/overlays/text?${b64string}`)
-
-    $('#text-decode-base64').val(b64string)
-  })
-
-  $('#text-decode-base64').on('keyup', (event) => {
-    let value = $(event.currentTarget).val()
-    if (value.trim().length === 0) {
-      $('#text-url').attr('href', `/overlays/text`).text(`/overlays/text`)
-      $('#text-url-generator').val('')
-      return
-    }
-
-    let decoded = ''
-    try {
-      decoded = decodeURIComponent(Array.prototype.map.call(atob(value), function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-    }).join(''))
-    } catch (e) {
-      // pass
-    }
-
-    $('#text-url-generator').val(decoded)
-    $('#text-url').attr('href', `/overlays/text?${value}`).text(`/overlays/text?${value}`)
-  })
-
-  $('#text-url-generator').attr('placeholder', _.get(translations, 'placeholders.text-url-generator', '{placeholders.text-url-generator}'))
-  $('#text-decode-base64').attr('placeholder', _.get(translations, 'placeholders.text-decode-base64', '{placeholders.text-decode-base64}'))
-
-  $('input[id^="input_credits"]').off('keyup').on('keyup', (event) => {
-    let value = $(event.currentTarget).val()
-    let id = $(event.currentTarget).attr('id').split('_')[1]
-    let data = {}; data[id] = value
-    socket.emit('saveConfiguration', data)
-  })
-
-  function addSocialInputs(input) {
-    const id = _.get(input, 'order', _.now())
-    $('#credits-socials').append(`
-      <div class="input-group" data-social-id="${id}">
-        <div class="input-group-prepend">
-          <button class="btn sortable-handler disabled" type="button">
-            <i class="fas fa-ellipsis-v"></i>
-          </button>
-        </div>
-
-        <select class="form-control" data-social-option data-social-id="${id}" style="height: auto !important;">
-          <option value="deviantart">DeviantArt</option>
-          <option value="discord">Discord</option>
-          <option value="facebook">Facebook</option>
-          <option value="github">GitHub</option>
-          <option value="google-plus-g">Google+</option>
-          <option value="instagram">Instagram</option>
-          <option value="linkedin">LinkedIn</option>
-          <option value="paypal">PayPal</option>
-          <option value="pinterest">Pinterest</option>
-          <option value="playstation">Playstation</option>
-          <option value="reddit">Reddit</option>
-          <option value="skype">Skype</option>
-          <option value="snapchat">Snapchat</option>
-          <option value="spotify">Spotify</option>
-          <option value="steam">Steam</option>
-          <option value="strava">Strava</option>
-          <option value="telegram">Telegram</option>
-          <option value="twitter">Twitter</option>
-          <option value="vk">VK</option>
-          <option value="windows">Windows</option>
-          <option value="xbox">XBox</option>
-          <option value="youtube">YouTube</option>
-        </select>
-        <input data-social-input class="form-control" value="${_.get(input, 'text', '')}">
-        <div class="input-group-append">
-          <button class="btn btn-danger" type="button" onclick="removeSocialInputs('${id}')">
-            <i class="far fa-trash-alt"></i>
-          </button>
-        </div>
-      </div>
-    `)
-
-    if (!_.isNil(input)) {
-      $(`select[data-social-id="${id}"]`).val(input.type)
-      $(`select[data-social-id="${id}"]`).trigger('change')
-      $($(`.input-group[data-social-id="${id}"]`).children('textarea')[0]).text(input.text)
-    }
-
-    if (_.isNil(input)) saveSocialInputs()
-  }
-
-  function removeSocialInputs(id) {
-    $(`[data-social-id="${id}"]`).remove()
-    saveSocialInputs()
-  }
-
-  function saveSocialInputs() {
-    $(`[data-social-alert]`).css('opacity', '1')
-
-    let data = {}
-    let order = 0;
-    for (let group of $('.input-group[data-social-id]')) {
-      data[order] = {
-        type: ($(group).children('select')[0].value),
-        text: $($(group).children('input')[0]).val() }
-      order++
-    }
-    console.debug(data)
-
-    creditsSocket.emit('socials.save', data, (err, cb) => {
-      $(`[data-social-alert]`).css('opacity', '0')
-      if (!_.isNil(err)) return console.debug(err)
-    })
-  }
-
-  function addCustomTextInputs(input) {
-    const id = _.get(input, 'order', _.now())
-    $('#credits-custom-texts').append(`
-      <div class="input-group" data-custom-text-id="${id}">
-        <div class="input-group-prepend">
-          <button class="btn sortable-handler disabled" type="button">
-            <i class="fas fa-ellipsis-v"></i>
-          </button>
-        </div>
-
-        <select class="form-control" data-custom-text-option data-custom-text-id="${id}" style="height: auto !important;">
-          <option value="bigHeader">Big Header</option>
-          <option value="header">Header</option>
-          <option value="text">Text</option>
-          <option value="smallText">Small Text</option>
-          <option value="separator">Separator</option>
-        </select>
-        <textarea data-custom-text-textarea class="form-control" style="resize: none;" readonly></textarea>
-        <textarea data-custom-text-textarea class="form-control" style="resize: none;"></textarea>
-        <textarea data-custom-text-textarea class="form-control" style="resize: none;" readonly></textarea>
-        <div class="input-group-append">
-          <button class="btn btn-danger" type="button" onclick="removeCustomTextInputs('${id}')">
-            <i class="far fa-trash-alt"></i>
-          </button>
-        </div>
-      </div>
-    `)
-
-    if (!_.isNil(input)) {
-      $(`select[data-custom-text-id="${id}"]`).val(input.type)
-      $(`select[data-custom-text-id="${id}"]`).trigger('change')
-      if (input.type !== 'separator') {
-        $($(`.input-group[data-custom-text-id="${id}"]`).children('textarea')[0]).text(input.text.left)
-        $($(`.input-group[data-custom-text-id="${id}"]`).children('textarea')[1]).text(input.text.middle)
-        $($(`.input-group[data-custom-text-id="${id}"]`).children('textarea')[2]).text(input.text.right)
+          this.socket[this.selected].emit('settings.update', settings, (err) => {
+            this.state.settings = 2
+            this.isDataChanged = false
+            setTimeout(() => this.state.settings = 0, 1000)
+            setTimeout(() => {
+              this.socket._panel.emit('overlays', (err, data) => {
+                this.list = data
+              })
+            })
+          })
+        }
       }
-    }
-
-    if (_.isNil(input)) saveCustomTextInputs()
-  }
-
-  function removeCustomTextInputs(id) {
-    $(`[data-custom-text-id="${id}"]`).remove()
-    saveCustomTextInputs()
-  }
-
-  function saveCustomTextInputs() {
-    $(`[data-custom-text-alert]`).css('opacity', '1')
-
-    let data = {}
-    let order = 0;
-    for (let group of $('.input-group[data-custom-text-id]')) {
-      const type = ($(group).children('select')[0].value)
-
-      data[order] = { type: type, text: {} }
-      if (type !== 'separator') {
-        data[order].text.left = $($(group).children('textarea')[0]).val()
-        data[order].text.middle = $($(group).children('textarea')[1]).val()
-        data[order].text.right = $($(group).children('textarea')[2]).val()
-      }
-      order++
-    }
-    console.debug(data)
-
-    creditsSocket.emit('custom.text.save', data, (err, cb) => {
-      $(`[data-custom-text-alert]`).css('opacity', '0')
-      if (!_.isNil(err)) return console.debug(err)
     })
   }
-
-  $(document).on('change', '[data-custom-text-option]', (ev) => {
-    const id = $(ev.currentTarget).data('custom-text-id')
-    const value = $(ev.currentTarget).val()
-
-    $(`.input-group[data-custom-text-id="${id}"] textarea`).remove()
-    console.debug(id, value)
-
-    if (value === 'bigHeader') {
-      $(`.input-group[data-custom-text-id="${id}"] select`).after(`
-        <textarea data-custom-text-textarea class="form-control" style="resize: none;" readonly></textarea>
-        <textarea data-custom-text-textarea class="form-control" style="resize: none;"></textarea>
-        <textarea data-custom-text-textarea class="form-control" style="resize: none;" readonly></textarea>
-      `)
-    } else if (value !== 'separator') {
-      $(`.input-group[data-custom-text-id="${id}"] select`).after(`
-        <textarea data-custom-text-textarea class="form-control" style="resize: none;"></textarea>
-        <textarea data-custom-text-textarea class="form-control" style="resize: none;"></textarea>
-        <textarea data-custom-text-textarea class="form-control" style="resize: none;"></textarea>
-      `)
-    }
-
-    saveCustomTextInputs()
-  })
-
-  $(document).on('keyup', '[data-custom-text-textarea]', (event) => saveCustomTextInputs())
-  $(document).on('keyup', '[data-social-input]', (event) => saveSocialInputs())
-
-
+  settingsOverlaysAppInit()
 </script>

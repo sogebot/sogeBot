@@ -4,12 +4,27 @@
 const _ = require('lodash')
 const crypto = require('crypto')
 
-class EventListOverlay {
+const Overlay = require('./_interface')
+
+class EventList extends Overlay {
   socket = null
 
   constructor () {
+    // define special property name as readonly
+    const ui = {
+      links: {
+        overlay: {
+          type: 'link',
+          href: '/overlays/eventlist',
+          class: 'btn btn-primary btn-block',
+          rawText: '/overlays/eventlist (350x220)',
+          target: '_blank'
+        }
+      }
+    }
+
+    super({ ui })
     if (require('cluster').isMaster) {
-      global.panel.addMenu({ category: 'settings', name: 'overlays', id: 'overlays' })
       this.sockets()
     }
   }
@@ -56,4 +71,4 @@ class EventListOverlay {
   }
 }
 
-module.exports = new EventListOverlay()
+module.exports = new EventList()

@@ -264,6 +264,19 @@ function Panel () {
       }
       cb(null, toEmit)
     })
+    socket.on('overlays', async (cb) => {
+      let toEmit = []
+      for (let system of Object.keys(global.overlays).filter(o => !o.startsWith('_'))) {
+        if (!global.overlays[system].settings) continue
+        toEmit.push({
+          name: system.toLowerCase(),
+          enabled: await global.overlays[system].settings.enabled,
+          areDependenciesEnabled: await global.overlays[system]._dependenciesEnabled(),
+          isDisabledByEnv: !_.isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*')
+        })
+      }
+      cb(null, toEmit)
+    })
     socket.on('games', async (cb) => {
       let toEmit = []
       for (let system of Object.keys(global.games).filter(o => !o.startsWith('_'))) {

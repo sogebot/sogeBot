@@ -1,8 +1,24 @@
 const _ = require('lodash')
 const Message = require('../message')
 
-class TextOverlay {
+const Overlay = require('./_interface')
+
+class Text extends Overlay {
   constructor () {
+    // define special property name as readonly
+    const ui = {
+      links: {
+        overlay: {
+          type: 'link',
+          href: '/overlays/text',
+          class: 'btn btn-primary btn-block',
+          rawText: '/overlays/text',
+          target: '_blank'
+        }
+      }
+    }
+
+    super({ ui })
     if (require('cluster').isMaster) this.sockets()
   }
 
@@ -27,4 +43,4 @@ class TextOverlay {
   }
 }
 
-module.exports = new TextOverlay()
+module.exports = new Text()
