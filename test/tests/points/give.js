@@ -48,7 +48,7 @@ describe('Points - get()', () => {
     it('we are not expecting NaN in users.points', async () => {
       let points = await global.db.engine.find('users.points')
       for (let i = 0, length = points.length; i < length; i++) {
-        assert.strict.equal(typeof points[i].points, 'number')
+        assert.strict.equal(isNaN(points[i].points), false)
       }
     })
 
@@ -97,7 +97,7 @@ describe('Points - get()', () => {
     it('we are not expecting NaN in users.points', async () => {
       let points = await global.db.engine.find('users.points')
       for (let i = 0, length = points.length; i < length; i++) {
-        assert.strict.equal(typeof points[i].points, 'number')
+        assert.strict.equal(isNaN(points[i].points), false)
       }
     })
 
@@ -146,7 +146,7 @@ describe('Points - get()', () => {
     it('we are not expecting NaN in users.points', async () => {
       let points = await global.db.engine.find('users.points')
       for (let i = 0, length = points.length; i < length; i++) {
-        assert.strict.equal(typeof points[i].points, 'number')
+        assert.strict.equal(isNaN(points[i].points), false)
       }
     })
 
@@ -193,7 +193,7 @@ describe('Points - get()', () => {
     it('we are not expecting NaN in users.points', async () => {
       let points = await global.db.engine.find('users.points')
       for (let i = 0, length = points.length; i < length; i++) {
-        assert.strict.equal(typeof points[i].points, 'number')
+        assert.strict.equal(isNaN(points[i].points), false)
       }
     })
 
@@ -240,7 +240,7 @@ describe('Points - get()', () => {
     it('we are not expecting NaN in users.points', async () => {
       let points = await global.db.engine.find('users.points')
       for (let i = 0, length = points.length; i < length; i++) {
-        assert.strict.equal(typeof points[i].points, 'number')
+        assert.strict.equal(isNaN(points[i].points), false)
       }
     })
 
