@@ -1,0 +1,10 @@
+{
+  "new": "Vytvořte nový textový overlay",
+  "title": "textový overlay",
+  "name": {
+    "error": {
+      "isEmpty": "Název nesmí být prázdný."
+    },
+    "placeholder": "Nastavte název textového overlaye"
+  }
+}

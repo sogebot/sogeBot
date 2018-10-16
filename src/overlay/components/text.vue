@@ -8,7 +8,6 @@
     data: function () {
       return {
         socket: io('/overlays/text', {query: "token="+token}),
-        base64string: window.location.search.replace('?', ''),
         text: ''
       }
     },
@@ -17,13 +16,21 @@
       setInterval(() => this.refresh(), 5000)
     },
     methods: {
+      urlParam: function (name) {
+        var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+        if (results == null) {
+          return null
+        } else {
+          return decodeURI(results[1]) || 0;
+        }
+      },
       refresh: function () {
-        if (this.base64string.length !== 0) {
-          this.socket.emit('parse.data', this.base64string, (cb) => {
+        if (this.urlParam('id')) {
+          this.socket.emit('get', this.urlParam('id'), (cb) => {
             this.text = cb
           })
         } else {
-          console.error('Missing base64 string in url')
+          console.error('Missing id param in url')
         }
       }
     }

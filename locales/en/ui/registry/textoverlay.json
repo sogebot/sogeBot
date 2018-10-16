@@ -1,0 +1,10 @@
+{
+  "new": "Create new text overlay",
+  "title": "text overlay",
+  "name": {
+    "error": {
+      "isEmpty": "Name cannot be empty."
+    },
+    "placeholder": "Set your text overlay name"
+  }
+}

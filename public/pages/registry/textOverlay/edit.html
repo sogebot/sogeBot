@@ -25,7 +25,7 @@
           <span v-if="pending" style="cursor: auto;" class="alert-danger btn m-0">{{commons.translate('dialog.changesPending')}}</span>
           <button v-if="states.save === 0" type="button" class="btn btn-primary" v-on:click="save()">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
           <button v-if="states.save === 1" disabled="disabled" type="button" class="btn btn-primary"><i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
-          <button v-if="states.save === 2" disabled="disabled" type="button" class="btn btn-success"><i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }</button>
+          <button v-if="states.save === 2" disabled="disabled" type="button" class="btn btn-success"><i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</button>
           <button v-if="states.save === 3" disabled="disabled" type="button" class="btn btn-danger"><i class="fas fa-exclamation"></i> {{ commons.translate('dialog.buttons.something-went-wrong') }}</button>
       </div>
     </div>
@@ -36,8 +36,8 @@
         <div class="form-row pl-2 pr-2">
           <div class="form-group col">
             <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('name') }}</label>
-            <input v-bind:class="{ 'is-invalid': hasError.name }" v-model="name" type="text" class="form-control" v-bind:placeholder="commons.translate('overlays.textoverlay.name.placeholder')">
-            <div class="invalid-feedback">{{ commons.translate('overlays.textoverlay.name.error.isEmpty') }}</div>
+            <input v-bind:class="{ 'is-invalid': hasError.name }" v-model="name" type="text" class="form-control" v-bind:placeholder="commons.translate('registry.textoverlay.name.placeholder')">
+            <div class="invalid-feedback">{{ commons.translate('registry.textoverlay.name.error.isEmpty') }}</div>
           </div>
         </div>
         <div class="form-row pl-2 pr-2">
