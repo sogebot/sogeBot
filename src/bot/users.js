@@ -278,7 +278,15 @@ class Users extends Core {
   }
 
   async getNameById (id: string) {
-    return (await global.db.engine.findOne('users', { id })).username
+    let username = (await global.db.engine.findOne('users', { id })).username
+
+    if (typeof username === 'undefined' || username === null) {
+      username = await global.api.getUsernameFromTwitch(id)
+      if (username) {
+        global.db.engine.update('users', { id }, { username })
+      }
+    }
+    return username || null
   }
 
   async getIdByName (username: string) {

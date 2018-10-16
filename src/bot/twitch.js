@@ -340,7 +340,7 @@ class Twitch {
 
       moment.locale(global.lib.translate.lang)
       for (let user of sorted) {
-        message += (i + 1) + '. ' + (await global.configuration.getValue('atUsername') ? '@' : '') + user.username + ' - '
+        message += (i + 1) + '. ' + (await global.configuration.getValue('atUsername') ? '@' : '') + (user.username || 'unknown') + ' - '
         if (type === 'time') message += (user.watched / 1000 / 60 / 60).toFixed(1) + 'h'
         else if (type === 'tips') message += user.amount.toFixed(2) + global.currency.symbol(await global.configuration.getValue('currency'))
         else if (type === 'points') {
@@ -356,6 +356,7 @@ class Twitch {
     } else {
       message += 'no data available'
     }
+    console.log(message)
     global.commons.sendMessage(message, opts.sender)
   }
 
