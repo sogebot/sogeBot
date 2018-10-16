@@ -241,8 +241,8 @@ class Module {
 
           if (opts.items) {
             for (let item of opts.items) {
+              let itemFromDb = Object.assign({}, item)
               const _id = item._id; delete item._id
-              let itemFromDb = item
               if (_.isNil(_id)) itemFromDb = await global.db.engine.insert(opts.collection, item)
               else await global.db.engine.update(opts.collection, { _id }, item)
 

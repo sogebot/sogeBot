@@ -29,7 +29,7 @@
 
             <div style="word-break: break-all; " class="col-sm-6">
               <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('code')}}</div>
-              <div>{{ item.code }}</div>
+              <pre v-show="item.text.length > 0"><code class="language-markup">{{ item.text }}</code></pre>
             </div>
           </div>
 
@@ -76,6 +76,9 @@
       created: function () {
         this.socket.emit('find', { collection: 'data' }, (err, items) => {
           this.items = _.orderBy(items, 'name', 'asc')
+          this.$nextTick(function () {
+            Prism.highlightAll()
+          })
         })
         if (localStorage.getItem('/overlays/text/showAs')) this.showAs = JSON.parse(localStorage.getItem('/overlays/text/showAs'));
       },

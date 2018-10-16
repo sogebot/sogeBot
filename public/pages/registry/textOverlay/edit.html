@@ -36,7 +36,8 @@
         <div class="form-row pl-2 pr-2">
           <div class="form-group col">
             <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('name') }}</label>
-            <input v-model="name" type="text" class="form-control">
+            <input v-bind:class="{ 'is-invalid': hasError.name }" v-model="name" type="text" class="form-control" v-bind:placeholder="commons.translate('overlays.textoverlay.name.placeholder')">
+            <div class="invalid-feedback">{{ commons.translate('overlays.textoverlay.name.error.isEmpty') }}</div>
           </div>
         </div>
         <div class="form-row pl-2 pr-2">
@@ -68,6 +69,8 @@
         name: '',
         text: '',
 
+        textInput: null,
+
         pending: false,
 
         socket: io('/overlays/text', { query: "token=" + token }),
@@ -76,6 +79,9 @@
           load: false,
           save: 0,
           delete: false,
+        },
+        hasError: {
+          name: false
         }
       },
       methods: {
@@ -83,8 +89,8 @@
           const textarea = document.getElementById('text_overlay-textarea')
           if (_.isNil(textarea)) return setTimeout(() => this.initializeTextArea(), 1)
 
-          this.evalInput = CodeMirror(textarea, {
-            value: this.text ? this.text : "<!-- you can also use html here, global filters are also available -->",
+          this.textInput = CodeMirror(textarea, {
+            value: this.text ? this.text : "<!-- you can also use html here, global filters and custom variables are also available -->",
             mode:  "htmlmixed",
             lineNumbers: true,
             matchBrackets: true,
@@ -95,41 +101,50 @@
           })
         },
         save: function () {
-          this.states.save = 1
-          const data = {
-            _id: this.id,
-            name: this.name,
-            text: this.text
-          }
-          if (!this.states.delete) {
-            this.socket.emit('update', {collection: 'data', items: [data]}, (err, data) => {
-              if (err) {
-                console.error(err)
-                return this.states.save = 3
-              }
-              this.states.save = 2
-              this.pending = false
-              this.id = String(data._id)
-              page('?id=' + this.id + '/#registry/textOverlay/edit')
-              setTimeout(() => this.states.save = 0, 1000)
-            })
-          } else {
-            this.socket.emit('delete', {collection: 'data', _id: this.id}, (err) => {
-              page('/#registry/textOverlay/list')
-            })
+          if (this.validate()) {
+            this.states.save = 1
+            const data = {
+              _id: this.id,
+              name: this.name,
+              text: this.textInput.getValue()
+            }
+            if (!this.states.delete) {
+              this.socket.emit('update', {collection: 'data', items: [data]}, (err, data) => {
+                if (err) {
+                  console.error(err)
+                  return this.states.save = 3
+                }
+                this.states.save = 2
+                this.pending = false
+                if (this.id === null) {
+                  this.id = String(data._id)
+                  page('?id=' + String(data._id) + '/#registry/textOverlay/edit')
+                }
+                setTimeout(() => this.states.save = 0, 1000)
+              })
+            } else {
+              this.socket.emit('delete', {collection: 'data', _id: this.id}, (err) => {
+                page('/#registry/textOverlay/list')
+              })
+            }
           }
         },
-      },
-      watch: {
-      },
-      computed: {
+        validate: function () {
+          // reset errors
+          for (let [key, value] of Object.entries(this.hasError)) {
+            this.hasError[key] = false
+          }
+          if (this.name.trim().length === 0) this.hasError.name = true
+          return _.filter(this.hasError, (o) => o === true).length === 0
+        }
       },
       created: function () {
         // load up from db
         if (commons.urlParam('id')) {
           this.id = commons.urlParam('id')
-          this.socket.emit('findOne', { collection: 'data', where: { id: commons.urlParam('id') } }, (err, data) => {
-            this.item = data
+          this.socket.emit('findOne', { collection: 'data', where: { _id: commons.urlParam('id') } }, (err, data) => {
+            this.name = data.name
+            this.text = data.text
             this.$nextTick(() => { this.pending = false })
             this.states.load = true
           })
