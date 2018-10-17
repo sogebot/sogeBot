@@ -18,13 +18,28 @@
           <h6>{{ category }}</h6>
           <div class="card mb-2" >
             <div class="card-body">
-              <div v-if="typeof value === 'object' && !defaultValue.startsWith('_')" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
+              <div v-if="typeof value === 'object' && (typeof value[defaultValue] === 'undefined' || value[defaultValue] === null)" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of ui[category]">
+                <template v-if="ui[category][defaultValue].type === 'link'">
+                  <a :href="currentValue.href" class="mt-1 mb-1" :class="currentValue.class" :target="currentValue.target">
+                    <template v-if="currentValue.rawText">{{ currentValue.rawText }}</template>
+                    <template v-else>{{ commons.translate(currentValue.text) }}</template>
+                  </a>
+                </template>
+                <template v-if="ui[category][defaultValue].type === 'test'">
+                  <button @click="emoteTest(currentValue.explosion)" class="mt-1 mb-1" :class="currentValue.class" :target="currentValue.target">
+                    <template v-if="currentValue.rawText">{{ currentValue.rawText }}</template>
+                    <template v-else>{{ commons.translate(currentValue.text) }}</template>
+                  </button>
+                </template>
+              </div>
+              <div v-if="typeof value === 'object' && !defaultValue.startsWith('_') && currentValue !== null" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
                 <template v-if="typeof ui[category] !== 'undefined' && ui[category][defaultValue]">
                   <component
                     :is="ui[category][defaultValue].type"
                     :readonly="ui[category][defaultValue].readOnly"
                     :secret="ui[category][defaultValue].secret"
                     :value="currentValue"
+                    :values="ui[category][defaultValue].values"
                     @update="value[defaultValue] = $event.value; triggerDataChange()"
                     :title="defaultValue"
                     :current="value[ui[category][defaultValue].current]"
@@ -63,16 +78,6 @@
                     :permission="settings._permissions[defaultValue]"
                     v-on:update="value[defaultValue] = $event.value; triggerDataChange()"
                   ></text-input>
-                </template>
-              </div>
-              <div v-if="typeof value === 'object'" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of ui[category]">
-                <template v-if="typeof value[defaultValue] === 'undefined' || value[defaultValue] === null">
-                  <template v-if="ui[category][defaultValue].type === 'link'">
-                    <a :href="currentValue.href" class="mt-1 mb-1" :class="currentValue.class" :target="currentValue.target">
-                      <template v-if="currentValue.rawText">{{ currentValue.rawText }}</template>
-                      <template v-else>{{ commons.translate(currentValue.text) }}</template>
-                    </a>
-                  </template>
                 </template>
               </div>
             </div>
@@ -129,10 +134,14 @@
         'toggle': toggleEnable,
         'text-input': textInput,
         'command-input-with-permission': commandInputWithPermissions,
-        'textarea-from-array': textAreaFromArray
+        'textarea-from-array': textAreaFromArray,
+        'selector': selector
       },
       data: {
-        socket: { _panel: io({ query: "token=" + token }) },
+        socket: {
+          _panel: io({ query: "token=" + token }),
+          emotes: io('/overlays/emotes', {query: "token="+token})
+        },
         list: [],
         selected: null,
         settings: { settings: {} },
@@ -163,6 +172,9 @@
       filters: {
       },
       methods: {
+        emoteTest: function (explosion) {
+          this.socket.emotes.emit('emote.test', explosion)
+        },
         loadSettings: function (system) {
           this.settings = { settings: {} }
           this.state.settings = 0
@@ -193,8 +205,9 @@
             // check if all ui is in settings to be shown
             for (let key of Object.keys(this.ui)) {
               if (!this.settings[key]) this.settings[key] = {}
-              for (let k of Object.keys(this.ui[key])) this.settings[key][k] = null
+              for (let k of Object.keys(this.ui[key])) this.settings[key][k] = this.settings[key][k] || null
             }
+
             this.isDataChanged = false
           })
         },
@@ -216,9 +229,18 @@
         setSelected: function (system) {
           if (this.state.settings === 0) this.selected = system
         },
+        removeNulls: function (obj){
+          var isArray = obj instanceof Array;
+          for (var k in obj){
+            if (obj[k]===null) isArray ? obj.splice(k,1) : delete obj[k];
+            else if (typeof obj[k]=="object") this.removeNulls(obj[k]);
+          }
+        },
         saveSettings: function () {
           this.state.settings = 1
           let settings = _.cloneDeep(this.settings)
+          this.removeNulls(settings)
+
           for (let [name,value] of Object.entries(settings.settings)) {
             delete settings.settings[name]
             settings[name] = value

@@ -39,29 +39,29 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faStar, faGem, faUsers, faClock, faEye)
 
-  export default {
-    props: ['token'],
-    components: {
-      'font-awesome-icon': FontAwesomeIcon
-    },
-    data: function () {
-      return {
-        socket: io('/overlays/stats', {query: "token="+token}),
-        stats: {}
-      }
-    },
-    created: function () {
-      this.refresh()
-      setInterval(() => this.refresh(), 5000)
-    },
-    methods: {
-      refresh: function () {
-        this.socket.emit('get', (cb) => {
-          this.stats = cb
-        })
-      }
+export default {
+  props: ['token'],
+  components: {
+    'font-awesome-icon': FontAwesomeIcon
+  },
+  data: function () {
+    return {
+      socket: io('/overlays/stats', {query: "token="+token}),
+      stats: {}
+    }
+  },
+  created: function () {
+    this.refresh()
+    setInterval(() => this.refresh(), 5000)
+  },
+  methods: {
+    refresh: function () {
+      this.socket.emit('get', (cb) => {
+        this.stats = cb
+      })
     }
   }
+}
 </script>
 
 <style>
