@@ -4,7 +4,8 @@
 const _ = require('lodash')
 const constants = require('../constants')
 const cluster = require('cluster')
-const { EmoteFetcher } = require('twitch-emoticons')
+const axios = require('axios')
+const XRegExp = require('XRegExp')
 
 const Overlay = require('./_interface')
 
@@ -29,14 +30,21 @@ class Emotes extends Overlay {
 
   constructor () {
     const settings = {
+      _: {
+        lastGlobalEmoteChk: 0,
+        lastSubscriberEmoteChk: 0,
+        lastChannelChk: '',
+        lastFFZEmoteChk: 0,
+        lastBTTVEmoteChk: 0
+      },
       emotes: {
-        size: 0,
+        size: 1,
         maxEmotesPerMessage: 5,
         animation: 'fadeup',
         animationTime: 4000
       },
       parsers: [
-        { name: 'containsEmotes', priority: constants.LOW, fireAndForget: true },
+        { name: 'containsEmotes', priority: constants.LOW, fireAndForget: true }
       ]
     }
 
@@ -70,14 +78,20 @@ class Emotes extends Overlay {
           title: 'animation.select',
           type: 'selector',
           values: ['fadeup', 'fadezoom', 'facebook']
+        },
+        size: {
+          title: 'animation.size',
+          type: 'selector',
+          values: ['1', '2', '3']
         }
       }
     }
     super({ settings, ui })
-    if (cluster.isMaster) this.sockets()
-
-    // major bottleneck on worker
-    this.fetchEmotes()
+    if (cluster.isMaster) {
+      this.sockets()
+      global.db.engine.index({ table: this.collection.cache, index: 'code' })
+      setInterval(() => this.fetchEmotes(), 10000)
+    }
   }
 
   sockets () {
@@ -96,13 +110,119 @@ class Emotes extends Overlay {
   }
 
   async fetchEmotes () {
-    this.fetcher = new EmoteFetcher()
-    /*this.fetcher.fetchTwitchEmotes().catch(function (reason) {})
-    this.fetcher.fetchBTTVEmotes().catch(function (reason) {})
-    this.fetcher.fetchFFZEmotes().catch(function (reason) {})
-    this.fetcher.fetchFFZEmotes(await global.oauth.settings.broadcaster.username).catch(function (reason) {})
-    this.fetcher.fetchBTTVEmotes(await global.oauth.settings.broadcaster.username).catch(function (reason) {})
-    this.fetcher.fetchTwitchEmotes(await global.oauth.settings.broadcaster.username).catch(function (reason) {})*/
+    const cid = global.oauth.channelId
+    const channel = global.oauth.currentChannel
+    if (!cid) return
+
+    // we want to update once every week
+    if (Date.now() - this.settings._.lastGlobalEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+      this.settings._.lastGlobalEmoteChk = Date.now()
+      try {
+        const request = await axios.get('https://twitchemotes.com/api_cache/v3/global.json')
+        const codes = Object.keys(request.data)
+        for (let i = 0, length = codes.length; i < length; i++) {
+          await global.db.engine.update(this.collection.cache,
+            {
+              code: codes[i],
+              type: 'twitch'
+            },
+            {
+              urls: {
+                1: 'https://static-cdn.jtvnw.net/emoticons/v1/' + request.data[codes[i]].id + '/1.0',
+                2: 'https://static-cdn.jtvnw.net/emoticons/v1/' + request.data[codes[i]].id + '/2.0',
+                3: 'https://static-cdn.jtvnw.net/emoticons/v1/' + request.data[codes[i]].id + '/3.0'
+              }
+            })
+        }
+      } catch (e) {
+        global.log.error(e)
+      }
+    }
+
+    if (Date.now() - this.settings._.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.settings._.lastChannelChk !== cid) {
+      this.settings._.lastSubscriberEmoteChk = Date.now()
+      this.settings._.lastChannelChk = cid
+      try {
+        const request = await axios.get('https://twitchemotes.com/api_cache/v3/subscriber.json')
+        const emoteId = Object.keys(request.data)
+        for (let i = 0, length = emoteId.length; i < length; i++) {
+          if (request.data[emoteId[i]].channel_id === cid) {
+            const emotes = request.data[emoteId[i]].emotes
+            for (let j = 0, length2 = emotes.length; j < length2; j++) {
+              await global.db.engine.update(this.collection.cache,
+                {
+                  code: emotes[j].code,
+                  type: 'twitch'
+                },
+                {
+                  urls: {
+                    1: 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
+                    2: 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
+                    3: 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0'
+                  }
+                })
+            }
+          }
+        }
+      } catch (e) {
+        global.log.error(e)
+      }
+    }
+
+    // fetch FFZ emotes
+    if (Date.now() - this.settings._.lastFFZEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+      this.settings._.lastFFZEmoteChk = Date.now()
+      try {
+        const request = await axios.get('https://api.frankerfacez.com/v1/room/id/' + cid)
+
+        const emoteSet = request.data.room.set
+        const emotes = request.data.sets[emoteSet].emoticons
+
+        for (let i = 0, length = emotes.length; i < length; i++) {
+          // change 4x to 3x, to be same as Twitch and BTTV
+          emotes[i].urls['3'] = emotes[i].urls['4']; delete emotes[i].urls['4']
+          await global.db.engine.update(this.collection.cache,
+            {
+              code: emotes[i].name,
+              type: 'ffz'
+            },
+            {
+              urls: emotes[i].urls
+            })
+        }
+      } catch (e) {
+        global.log.error(e)
+      }
+    }
+
+    // fetch BTTV emotes
+    if (Date.now() - this.settings._.lastBTTVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+      this.settings._.lastBTTVEmoteChk = Date.now()
+      try {
+        const request = await axios.get('https://api.betterttv.net/2/channels/' + channel)
+
+        const urlTemplate = request.data.urlTemplate
+        const emotes = request.data.emotes
+
+        for (let i = 0, length = emotes.length; i < length; i++) {
+          await global.db.engine.update(this.collection.cache,
+            {
+              code: emotes[i].code,
+              type: 'bttv'
+            },
+            {
+              urls: {
+                1: urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '1x'),
+                2: urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '2x'),
+                3: urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '3x')
+              }
+
+            })
+        }
+      } catch (e) {
+        global.log.error(e)
+      }
+    }
   }
 
   async _testExplosion () {
@@ -119,62 +239,59 @@ class Emotes extends Overlay {
   }
 
   async containsEmotes (opts) {
-    /*
-    if (_.isNil(opts.sender) || _.isNil(opts.sender.emotes) || !(Symbol.iterator in Object(opts.sender.emotes))) return true
+    if (_.isNil(opts.sender)) return true
     if (cluster.isWorker) {
       if (process.send) process.send({ type: 'call', ns: 'overlays.emotes', fnc: 'containsEmotes', args: [opts] })
       return
     }
 
-    let OEmotesMax = await global.configuration.getValue('OEmotesMax')
-    let OEmotesSize = await global.configuration.getValue('OEmotesSize')
-
-    let limit = 0
-    for (let e of opts.sender.emotes) {
-      if (limit === OEmotesMax) return false
-      global.panel.io.emit('emote', 'https://static-cdn.jtvnw.net/emoticons/v1/' + e.id + '/' + (OEmotesSize + 1) + '.0')
-      limit++
-    }
-
     let parsed = []
-    // parse BTTV emoticons
-    try {
-      for (let emote of await this.fetcher._getRawBTTVEmotes(await global.oauth.settings.broadcaster.username)) {
-        for (let i in _.range((opts.message.match(new RegExp(emote.code, 'g')) || []).length)) {
-          if (i === OEmotesMax) break
-          global.panel.io.emit('emote', this.fetcher.emotes.get(emote.code).toLink(OEmotesSize))
-          parsed.push(emote.code)
+    let usedEmotes = {}
+
+    let cache = await global.db.engine.find(this.collection.cache)
+
+    // add simple emotes
+    for (const code of Object.keys(this.simpleEmotes)) {
+      cache.push({
+        type: 'twitch',
+        code,
+        urls: {
+          1: this.simpleEmotes[code] + '1.0',
+          2: this.simpleEmotes[code] + '2.0',
+          3: this.simpleEmotes[code] + '3.0'
         }
-      }
-    } catch (e) {
-      // we don't want to output error when BTTV emotes doesn't exist
+      })
     }
 
-    // parse FFZ emoticons
-    try {
-      for (let emote of await this.fetcher._getRawFFZEmotes(await global.oauth.settings.broadcaster.username)) {
-        if (parsed.includes(emote.name)) continue
-        for (let i in _.range((opts.message.match(new RegExp(emote.name, 'g')) || []).length)) {
-          if (i === OEmotesMax) break
-          global.panel.io.emit('emote', this.fetcher.emotes.get(emote.name).toLink(OEmotesSize))
-        }
+    for (let j = 0, jl = cache.length; j < jl; j++) {
+      const emote = cache[j]
+      if (parsed.includes(emote.code)) continue // this emote was already parsed
+      for (let i = 0, length = (opts.message.match(new RegExp(XRegExp.escape(emote.code), 'g')) || []).length; i < length; i++) {
+        usedEmotes[emote.code] = emote
+        parsed.push(emote.code)
       }
-    } catch (e) {
-      // we don't want to output error when BTTV emotes doesn't exist
     }
-*/
+
+    const emotes = _.shuffle(parsed)
+    for (let i = 0; i < this.settings.emotes.maxEmotesPerMessage && i < emotes.length; i++) {
+      global.panel.io.emit('emote', usedEmotes[emotes[i]].urls[this.settings.emotes.size])
+    }
+
     return true
   }
 
   async parseEmotes (emotes) {
     let emotesArray = []
 
-    for (var i = 0; i < emotes.length; i++) {
+    for (var i = 0, length = emotes.length; i < length; i++) {
       if (_.includes(Object.keys(this.simpleEmotes), emotes[i])) {
-        emotesArray.push(this.simpleEmotes[emotes[i]] + (this.settings.emotes.size + 1) + '.0')
+        emotesArray.push(this.simpleEmotes[emotes[i]] + this.settings.emotes.size + '.0')
       } else {
         try {
-          emotesArray.push(this.fetcher.emotes.get(emotes[i]).toLink(this.settings.emotes.size))
+          const items = await global.db.engine.find(this.collection.cache, { code: emotes[i] })
+          if (!_.isEmpty(items)) {
+            emotesArray.push(items[0].urls[this.settings.emotes.size])
+          }
         } catch (e) {
           continue
         }
