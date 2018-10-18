@@ -31,6 +31,12 @@
                     <template v-else>{{ commons.translate(currentValue.text) }}</template>
                   </button>
                 </template>
+                <template v-if="ui[category][defaultValue].type === 'removecache'">
+                  <button @click="removeCache()" class="mt-1 mb-1" :class="currentValue.class" :target="currentValue.target">
+                    <template v-if="currentValue.rawText">{{ currentValue.rawText }}</template>
+                    <template v-else>{{ commons.translate(currentValue.text) }}</template>
+                  </button>
+                </template>
               </div>
               <div v-if="typeof value === 'object' && !defaultValue.startsWith('_') && currentValue !== null" class="p-0 pl-2 pr-2 " v-for="(currentValue, defaultValue) of value">
                 <template v-if="typeof ui[category] !== 'undefined' && ui[category][defaultValue]">
@@ -175,6 +181,13 @@
         emoteTest: function (explosion) {
           this.socket.emotes.emit('emote.test', explosion)
         },
+        removeCache: _.debounce(function (explosion) {
+          this.socket.emotes.emit('remove.cache')
+        }, 10000, {
+          // fire first and omit other
+          leading: true,
+          trailing: false
+        }),
         loadSettings: function (system) {
           this.settings = { settings: {} }
           this.state.settings = 0

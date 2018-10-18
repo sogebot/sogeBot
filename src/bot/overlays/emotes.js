@@ -74,6 +74,12 @@ class Emotes extends Overlay {
         }
       },
       emotes: {
+        cache: {
+          type: 'removecache',
+          explosion: false,
+          text: 'remove.cache',
+          class: 'btn btn-danger btn-block'
+        },
         animation: {
           title: 'animation.select',
           type: 'selector',
@@ -99,6 +105,7 @@ class Emotes extends Overlay {
       // somehow socket connection is sent twice
       if (!this.connSckList.has(socket.id)) {
         this.connSckList.set(socket.id, socket.id)
+        socket.on('remove.cache', () => this.removeCache())
         socket.on('emote.test', (explosion) => {
           explosion ? this._testExplosion() : this._test()
         })
@@ -107,6 +114,15 @@ class Emotes extends Overlay {
         })
       }
     })
+  }
+
+  async removeCache () {
+    this.settings._.lastGlobalEmoteChk = 0
+    this.settings._.lastSubscriberEmoteChk = 0
+    this.settings._.lastFFZEmoteChk = 0
+    this.settings._.lastBTTVEmoteChk = 0
+    await global.db.engine.remove(this.collection.cache, {})
+    this.fetchEmotes()
   }
 
   async fetchEmotes () {
