@@ -20,9 +20,6 @@ export default {
     this.socket.on('emote', (emote_url) => this.show(emote_url))
   },
   methods: {
-    explode: function (emotes) {
-      console.log(emotes)
-    },
     show: function (emote_url) {
       console.log(emote_url)
       var left = _.random($('body').width() - 200) + 100
@@ -82,6 +79,7 @@ export default {
       }
     },
     explode: function (emotes_array) {
+      console.log(emotes_array)
       var emotes = $('#emotes')
       for (var i = 0; i < 50; i++) {
         setTimeout(function () {
