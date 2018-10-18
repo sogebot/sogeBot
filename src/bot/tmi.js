@@ -373,8 +373,10 @@ class TMI extends Core {
   }
 
   async cheer (message: Object) {
+    console.log(message)
     try {
-      const username = message.tags.login
+      const username = message.tags.username
+      const userId = message.tags.userId
       const userstate = message.tags
       // remove cheerX or channelCheerX from message
       const messageFromUser = message.message.replace(/(.*?[cC]heer[\d]+)/g, '').trim()
@@ -383,7 +385,7 @@ class TMI extends Core {
 
       global.overlays.eventlist.add({ type: 'cheer', username, bits: userstate.bits, message: messageFromUser })
       global.log.cheer(`${username}, bits: ${userstate.bits}, message: ${messageFromUser}`)
-      global.db.engine.insert('users.bits', { id: await global.users.getIdByName(username), amount: userstate.bits, message: messageFromUser, timestamp: _.now() })
+      global.db.engine.insert('users.bits', { id: userId, amount: userstate.bits, message: messageFromUser, timestamp: _.now() })
       global.events.fire('cheer', { username, bits: userstate.bits, message: messageFromUser })
       if (await global.cache.isOnline()) await global.db.engine.increment('api.current', { key: 'bits' }, { value: parseInt(userstate.bits, 10) })
     } catch (e) {
