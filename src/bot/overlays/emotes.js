@@ -5,7 +5,7 @@ const _ = require('lodash')
 const constants = require('../constants')
 const cluster = require('cluster')
 const axios = require('axios')
-const XRegExp = require('XRegExp')
+const XRegExp = require('xregexp')
 
 const Overlay = require('./_interface')
 
