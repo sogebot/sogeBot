@@ -259,6 +259,7 @@
             settings[name] = value
           }
           delete settings.settings
+          console.log(settings)
 
           this.socket[this.selected].emit('settings.update', settings, (err) => {
             this.state.settings = 2

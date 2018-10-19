@@ -617,7 +617,7 @@ window.selector = {
   },
   methods: {
     onChange: function () {
-      this.$emit('update', this.currentValue)
+      this.$emit('update', { value: this.currentValue })
     }
   },
   template: `

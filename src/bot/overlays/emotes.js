@@ -41,7 +41,7 @@ class Emotes extends Overlay {
         size: 1,
         maxEmotesPerMessage: 5,
         animation: 'fadeup',
-        animationTime: 4000
+        animationTime: 1000
       },
       parsers: [
         { name: 'containsEmotes', priority: constants.LOW, fireAndForget: true }
@@ -246,12 +246,27 @@ class Emotes extends Overlay {
   }
 
   async _test () {
-    global.panel.io.of('/overlays/emotes').emit('emote', 'https://static-cdn.jtvnw.net/emoticons/v1/9/' + (this.settings.emotes.size + 1) + '.0')
+    global.panel.io.of('/overlays/emotes').emit('emote', {
+      url: 'https://static-cdn.jtvnw.net/emoticons/v1/9/' + this.settings.emotes.size + '.0',
+      settings: {
+        emotes: {
+          animation: this.settings.emotes.animation,
+          animationTime: this.settings.emotes.animationTime
+        }
+      }
+    })
   }
 
   async explode (data) {
     const emotes = await this.parseEmotes(data)
-    global.panel.io.of('/overlays/emotes').emit('emote.explode', emotes)
+    global.panel.io.of('/overlays/emotes').emit('emote.explode', {
+      emotes,
+      settings: {
+        emotes: {
+          animationTime: this.settings.emotes.animationTime
+        }
+      }
+    })
   }
 
   async containsEmotes (opts) {
@@ -290,7 +305,15 @@ class Emotes extends Overlay {
 
     const emotes = _.shuffle(parsed)
     for (let i = 0; i < this.settings.emotes.maxEmotesPerMessage && i < emotes.length; i++) {
-      global.panel.io.emit('emote', usedEmotes[emotes[i]].urls[this.settings.emotes.size])
+      global.panel.io.emit('emote', {
+        url: usedEmotes[emotes[i]].urls[this.settings.emotes.size],
+        settings: {
+          emotes: {
+            animation: this.settings.emotes.animation,
+            animationTime: this.settings.emotes.animationTime
+          }
+        }
+      })
     }
 
     return true

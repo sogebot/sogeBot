@@ -1,5 +1,24 @@
 <template>
-  <div id="emotes"></div>
+  <div id="emotes">
+    <transition
+      v-for="e of emotes"
+      :key="e.id"
+      :name="e.animation.type"
+      :duration="e.animation.time"
+      @leave="doAnimation"
+      :css="false"
+      v-on:before-leave="setTransition"
+      >
+      <img
+        v-if="!e.animation.finished"
+        v-show="e.show && !e.animation.running"
+        :id="e.id"
+        :src="e.url"
+        style="position: absolute"
+        :style="{ 'left': e.position.left + 'px', 'top': e.position.top + 'px' }"
+      >
+    </transition>
+  </div>
 </template>
 
 <script>
@@ -7,96 +26,121 @@ export default {
   props: ['token'],
   data: function () {
     return {
+      show: true,
       socket: io('/overlays/emotes', {
         query: "token=" + token
       }),
-      settings: {}
+      emotes: []
     }
   },
   created: function () {
-    this.socket.emit('settings', (e, s) => this.settings = s)
+    this.socket.on('emote.explode', (opts) => this.explode(opts))
+    this.socket.on('emote', (opts) => this.addEmote(opts))
 
-    this.socket.on('emote.explode', (emotes) => this.explode(emotes))
-    this.socket.on('emote', (emote_url) => this.show(emote_url))
+    setInterval(() => {
+      this.triggerAnimation()
+      this.cleanEmotes()
+    }, 100)
   },
   methods: {
-    show: function (emote_url) {
-      console.log(emote_url)
-      var left = _.random($('body').width() - 200) + 100
-      var top = _.random($('body').height() - 200) + 100
+    cleanEmotes: function () {
+      if (_.every(this.emotes, o => o.animation.finished)) this.emotes = []
+    },
+    doAnimation: function (el, done) {
+      const id = el.id
+      const emote = this.emotes.find(o => o.id === id)
 
-      var emotes = $('#emotes')
-      var img = $('<img></img>')
-        .attr('src', emote_url)
-        .css('top', top)
-        .css('left', left)
+      let animation = {
+        opacity: 0
+      }
 
-      switch (this.settings.animation) {
-        case 'facebook':
-          left = _.random(200) + $('body').width() - 250
-          top = $('body').height() + 20
-          img = $('<img></img>')
-            .attr('src', emote_url)
-            .css('top', top)
-            .css('left', left)
-          setTimeout(function () {
-            emotes.append(img)
-            img.velocity({
-                opacity: 0,
-                top: top - _.random($('body').height() / 7, $('body').height() / 3),
-                left: _.random(left - 60, left + 60)
-              }, "easeOutSine", _.random(this.settings.animationTime - 500, this.settings.animationTime + 500),
-              function () {
-                $(this).remove()
-              })
-          }, _.random(2000))
-          break
-        case 'fadeup':
-          setTimeout(function () {
-            emotes.append(img)
-            img.velocity({
-                opacity: 0,
-                top: top - 100
-              }, this.settings.animationTime,
-              function () {
-                $(this).remove()
-              })
-          }, _.random(2000))
-          break
-        case 'fadezoom':
-          setTimeout(function () {
-            emotes.append(img)
-            img.velocity({
-                opacity: 0,
-                scaleX: 0,
-                scaleY: 0
-              }, this.settings.animationTime,
-              function () {
-                $(this).remove()
-              })
-          }, _.random(2000))
-          break
+      if (emote.animation.type === 'fadeup') {
+        animation = {
+          top: emote.position.top - 150,
+          opacity: 0
+        }
+      } else if (emote.animation.type === 'facebook') {
+        animation = {
+          top: emote.position.top - _.random($('body').height() / 4, $('body').height() / 1.2),
+          left: _.random(emote.position.left - 60, emote.position.left + 60),
+          opacity: 0
+        }
+      } else if (emote.animation.type === 'fadezoom') {
+        animation = {
+          scale: 2,
+          opacity: 0
+        }
+      } else if (emote.animation.type === 'explosion') {
+        animation = {
+          top: _.random(0, $('body').height() - 100),
+          left: _.random(0, $('body').width() - 100),
+          opacity: 0
+        }
+      }
+
+      TweenLite.to(el, this.emotes.find(o => o.id === id).animation.time / 1000, {
+        ...animation,
+        onComplete: () => {
+          this.emotes.find(o => o.id === id).animation.finished = true
+          done()
+        }
+      })
+    },
+    triggerAnimation: function () {
+      for (let i = 0, length = this.emotes.length; i < length; i++) {
+        if (!this.emotes[i].animation.running && Date.now() - this.emotes[i].trigger > 0) {
+          // show and after next tick hide -> trigger animation
+          this.emotes[i].show = true
+          this.$nextTick(function () { this.emotes[i].animation.running = true })
+        }
       }
     },
-    explode: function (emotes_array) {
-      console.log(emotes_array)
-      var emotes = $('#emotes')
+    setLeft: function (type) {
+      if (type === 'fadeup' || type === 'fadezoom') return _.random($('body').width() - 200) + 100
+      else if (type === 'facebook') return _.random(200) + $('body').width() - 250
+      else return $('body').width() / 2
+    },
+    setTop: function (type) {
+      if (type === 'fadeup' || type === 'fadezoom') return _.random($('body').height() - 200) + 100
+      else if (type === 'facebook') return $('body').height() - 20
+      else return $('body').height() / 2
+    },
+    addEmote: function (opts) {
+      this.emotes.push({
+        id: Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9),
+        trigger: Date.now() + _.random(500),
+        show: false,
+        animation: {
+          type: opts.settings.emotes.animation,
+          time: opts.settings.emotes.animationTime,
+          running: false,
+          finished: false
+        },
+        position: {
+          left: this.setLeft(opts.settings.emotes.animation),
+          top: this.setTop(opts.settings.emotes.animation)
+        },
+        url: opts.url
+      })
+    },
+    explode: function (opts) {
       for (var i = 0; i < 50; i++) {
-        setTimeout(function () {
-          var img = $('<img></img>')
-            .attr('src', _.sample(emotes_array))
-            .css('top', _.random(-300, 300) + $('#emotes').height() / 2)
-            .css('left', _.random(-300, 300) + $('#emotes').width() / 2)
-          emotes.append(img)
-          img.velocity({
-              opacity: 0,
-              top: _.random(0, $('#emotes').height() - 100),
-              left: _.random(0, $('#emotes').width() - 100)
-            }, this.settings.animationTime,
-            function () {
-              $(this).remove()
-            })
-        }, _.random(3000))
+        this.emotes.push({
+          id: Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9),
+          trigger: Date.now() + _.random(3000),
+          show: false,
+          animation: {
+            type: 'explosion',
+            time: opts.settings.emotes.animationTime,
+            running: false,
+            finished: false
+          },
+          position: {
+            left: _.random(-300, 300) + $('body').width() / 2,
+            top: _.random(-300, 300) + $('body').height() / 2
+          },
+          url: _.sample(opts.emotes)
+        })
       }
     }
   }
