@@ -75,7 +75,7 @@ class Emotes extends Overlay {
           test: 'fireworks',
           text: 'test.emoteFirework',
           class: 'btn btn-secondary btn-block'
-        },
+        }
       },
       links: {
         overlay: {
