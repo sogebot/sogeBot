@@ -52,6 +52,7 @@ class Events {
       { id: 'run-command', definitions: { commandToRun: '', isCommandQuiet: false }, fire: this.fireRunCommand },
       { id: 'play-sound', definitions: { urlOfSoundFile: '' }, fire: this.firePlaySound },
       { id: 'emote-explosion', definitions: { emotesToExplode: '' }, fire: this.fireEmoteExplosion },
+      { id: 'emote-firework', definitions: { emotesToFirework: '' }, fire: this.fireEmoteFirework },
       { id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] }, fire: this.fireStartCommercial },
       { id: 'bot-will-join-channel', definitions: {}, fire: this.fireBotWillJoinChannel },
       { id: 'bot-will-leave-channel', definitions: {}, fire: this.fireBotWillLeaveChannel },
@@ -217,7 +218,11 @@ class Events {
   }
 
   async fireEmoteExplosion (operation, attributes) {
-    global.overlays.emotes.explode(global.overlays.emotes, global.panel.io, operation.emotesToExplode.split(' '))
+    global.overlays.emotes.explode(operation.emotesToExplode.split(' '))
+  }
+
+  async fireEmoteFirework (operation, attributes) {
+    global.overlays.emotes.firework(operation.emotesToFirework.split(' '))
   }
 
   async firePlaySound (operation, attributes) {

@@ -26,7 +26,7 @@
                   </a>
                 </template>
                 <template v-if="ui[category][defaultValue].type === 'test'">
-                  <button @click="emoteTest(currentValue.explosion)" class="mt-1 mb-1" :class="currentValue.class" :target="currentValue.target">
+                  <button @click="emoteTest(currentValue.test)" class="mt-1 mb-1" :class="currentValue.class" :target="currentValue.target">
                     <template v-if="currentValue.rawText">{{ currentValue.rawText }}</template>
                     <template v-else>{{ commons.translate(currentValue.text) }}</template>
                   </button>
@@ -178,8 +178,8 @@
       filters: {
       },
       methods: {
-        emoteTest: function (explosion) {
-          this.socket.emotes.emit('emote.test', explosion)
+        emoteTest: function (test) {
+          this.socket.emotes.emit('emote.test', test)
         },
         removeCache: _.debounce(function (explosion) {
           this.socket.emotes.emit('remove.cache')

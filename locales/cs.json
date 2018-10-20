@@ -249,6 +249,10 @@
           "label": "Emotes k výbuchu",
           "placeholder": "Seznam emotes k výbuchu, např. Kappa PurpleHeart"
         },
+        "emotesToFirework": {
+          "label": "Emotes k fireworku",
+          "placeholder": "Seznam emotes k fireworku, např. Kappa PurpleHeart"
+        },
         "announce": {
           "label": "Oznámit v chatu",
           "true": "Bude oznámeno",
@@ -783,6 +787,7 @@
     "message": "zpráva",
     "sound": "zvuk",
     "emote-explosion": "exploze smajlíků",
+    "emote-firework": "firework smajlíků",
     "quiet": "tichý",
     "true": "ano",
     "false": "ne",

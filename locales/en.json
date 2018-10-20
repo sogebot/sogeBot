@@ -249,6 +249,10 @@
           "label": "Emotes To Explode",
           "placeholder": "List of emotes to explode, e.g. Kappa PurpleHeart"
         },
+        "emotesToFirework": {
+          "label": "Emotes To Firework",
+          "placeholder": "List of emotes to firework, e.g. Kappa PurpleHeart"
+        },
         "announce": {
           "label": "Announce in chat",
           "true": "Will be announced",
@@ -778,6 +782,7 @@
     "message": "message",
     "sound": "sound",
     "emote-explosion": "emote explosion",
+    "emote-firework": "emote firework",
     "quiet": "quiet",
     "true": "true",
     "false": "false",

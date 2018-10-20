@@ -43,6 +43,13 @@ class Emotes extends Overlay {
         animation: 'fadeup',
         animationTime: 1000
       },
+      explosion: {
+        numOfEmotes: 20
+      },
+      fireworks: {
+        numOfEmotesPerExplosion: 10,
+        numOfExplosions: 5
+      },
       parsers: [
         { name: 'containsEmotes', priority: constants.LOW, fireAndForget: true }
       ]
@@ -50,19 +57,25 @@ class Emotes extends Overlay {
 
     const ui = {
       test: {
-        /* explosion type test are only for overlays */
+        /* type test are only for overlays */
         explosion: {
           type: 'test',
-          explosion: true,
+          test: 'explosion',
           text: 'test.emoteExplosion',
           class: 'btn btn-secondary btn-block'
         },
         emote: {
           type: 'test',
-          explosion: false,
+          test: 'emote',
           text: 'test.emote',
           class: 'btn btn-secondary btn-block'
-        }
+        },
+        firework: {
+          type: 'test',
+          test: 'fireworks',
+          text: 'test.emoteFirework',
+          class: 'btn btn-secondary btn-block'
+        },
       },
       links: {
         overlay: {
@@ -106,8 +119,10 @@ class Emotes extends Overlay {
       if (!this.connSckList.has(socket.id)) {
         this.connSckList.set(socket.id, socket.id)
         socket.on('remove.cache', () => this.removeCache())
-        socket.on('emote.test', (explosion) => {
-          explosion ? this._testExplosion() : this._test()
+        socket.on('emote.test', (test) => {
+          if (test === 'explosion') this._testExplosion()
+          else if (test === 'fireworks') this._testFireworks()
+          else this._test()
         })
         socket.on('disconnect', () => {
           this.connSckList.delete(socket.id)
@@ -241,6 +256,10 @@ class Emotes extends Overlay {
     }
   }
 
+  async _testFireworks () {
+    this.firework(['Kappa', 'GivePLZ', 'PogChamp'])
+  }
+
   async _testExplosion () {
     this.explode(['Kappa', 'GivePLZ', 'PogChamp'])
   }
@@ -257,6 +276,22 @@ class Emotes extends Overlay {
     })
   }
 
+  async firework (data) {
+    const emotes = await this.parseEmotes(data)
+    global.panel.io.of('/overlays/emotes').emit('emote.firework', {
+      emotes,
+      settings: {
+        emotes: {
+          animationTime: this.settings.emotes.animationTime
+        },
+        fireworks: {
+          numOfEmotesPerExplosion: this.settings.fireworks.numOfEmotesPerExplosion,
+          numOfExplosions: this.settings.fireworks.numOfExplosions
+        }
+      }
+    })
+  }
+
   async explode (data) {
     const emotes = await this.parseEmotes(data)
     global.panel.io.of('/overlays/emotes').emit('emote.explode', {
@@ -264,6 +299,9 @@ class Emotes extends Overlay {
       settings: {
         emotes: {
           animationTime: this.settings.emotes.animationTime
+        },
+        explosion: {
+          numOfEmotes: this.settings.explosion.numOfEmotes
         }
       }
     })

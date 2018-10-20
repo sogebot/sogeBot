@@ -35,6 +35,7 @@ export default {
   },
   created: function () {
     this.socket.on('emote.explode', (opts) => this.explode(opts))
+    this.socket.on('emote.firework', (opts) => this.firework(opts))
     this.socket.on('emote', (opts) => this.addEmote(opts))
 
     setInterval(() => {
@@ -74,6 +75,12 @@ export default {
         animation = {
           top: _.random(0, $('body').height() - 100),
           left: _.random(0, $('body').width() - 100),
+          opacity: 0
+        }
+      } else if (emote.animation.type === 'firework') {
+        animation = {
+          top: _.random(emote.position.top - 100, emote.position.top + 100),
+          left: _.random(emote.position.left - 100, emote.position.left + 100),
           opacity: 0
         }
       }
@@ -124,7 +131,7 @@ export default {
       })
     },
     explode: function (opts) {
-      for (var i = 0; i < 50; i++) {
+      for (var i = 0; i < opts.settings.explosion.numOfEmotes; i++) {
         this.emotes.push({
           id: Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9),
           trigger: Date.now() + _.random(3000),
@@ -141,6 +148,33 @@ export default {
           },
           url: _.sample(opts.emotes)
         })
+      }
+    },
+    firework: function (opts) {
+      for (let i = 0; i < opts.settings.fireworks.numOfExplosions; i++) {
+        const commonTop = _.random(200, $('body').height() - 200)
+        const commonLeft = _.random(200, $('body').width() - 200)
+        const commonTrigger = Date.now() + _.random(3000)
+        const commonUrl = _.sample(opts.emotes)
+
+        for (let j = 0; j < opts.settings.fireworks.numOfEmotesPerExplosion; j++) {
+          this.emotes.push({
+            id: Math.random().toString(36).substr(2, 9) + '-' + Math.random().toString(36).substr(2, 9),
+            trigger: commonTrigger,
+            show: false,
+            animation: {
+              type: 'firework',
+              time: opts.settings.emotes.animationTime,
+              running: false,
+              finished: false
+            },
+            position: {
+              left: commonLeft,
+              top: commonTop
+            },
+            url: commonUrl
+          })
+        }
       }
     }
   }
