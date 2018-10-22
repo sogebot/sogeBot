@@ -6,6 +6,7 @@ const _ = require('lodash')
 const Overlay = require('./_interface')
 
 class ImageCarousel extends Overlay {
+  connSckList = new Map()
   constructor () {
     // define special property name as readonly
     const ui = {
@@ -29,72 +30,90 @@ class ImageCarousel extends Overlay {
 
   sockets () {
     global.panel.io.of('/overlays/carousel').on('connection', (socket) => {
-      socket.on('load', async (cb) => {
-        let images = (await global.db.engine.find('overlay.carousel')).map((o) => { o._id = o._id.toString(); return o })
-        cb(_.orderBy(images, 'order', 'asc'))
-      })
+      // somehow socket connection is sent twice
+      if (!this.connSckList.has(socket.id)) {
+        this.connSckList.set(socket.id, socket.id)
+        socket.on('disconnect', () => {
+          this.connSckList.delete(socket.id)
+        })
 
-      socket.on('delete', async (id, cb) => {
-        await global.db.engine.remove('overlay.carousel', { _id: id })
-        // force reorder
-        let images = _.orderBy((await global.db.engine.find('overlay.carousel')).map((o) => { o._id = o._id.toString(); return o }), 'order', 'asc')
-        for (let order = 0; order < images.length; order++) await global.db.engine.update('overlay.carousel', { _id: images[order]._id }, { order })
-        cb(id)
-      })
+        socket.on('load', async (cb) => {
+          let images = (await global.db.engine.find('overlay.carousel')).map((o) => { o._id = o._id.toString(); return o })
+          cb(_.orderBy(images, 'order', 'asc'))
+        })
 
-      socket.on('update', async (_id, data, cb) => {
-        await global.db.engine.update('overlay.carousel', { _id }, data)
-        cb(_id, data)
-      })
+        socket.on('delete', async (id, cb) => {
+          await global.db.engine.remove('overlay.carousel', { _id: id })
+          // force reorder
+          let images = _.orderBy((await global.db.engine.find('overlay.carousel')).map((o) => { o._id = o._id.toString(); return o }), 'order', 'asc')
+          for (let order = 0; order < images.length; order++) await global.db.engine.update('overlay.carousel', { _id: images[order]._id }, { order })
+          cb(id)
+        })
 
-      socket.on('move', async (go, id, cb) => {
-        let images = (await global.db.engine.find('overlay.carousel')).map((o) => { o._id = o._id.toString(); return o })
+        socket.on('update', async (_id, data, cb) => {
+          await global.db.engine.update('overlay.carousel', { _id }, data)
+          cb(_id, data)
+        })
 
-        let image = _.find(images, (o) => o._id === id)
-        let upImage = _.find(images, (o) => Number(o.order) === Number(image.order) - 1)
-        let downImage = _.find(images, (o) => Number(o.order) === Number(image.order) + 1)
+        socket.on('move', async (go, id, cb) => {
+          let images = (await global.db.engine.find('overlay.carousel')).map((o) => { o._id = o._id.toString(); return o })
 
-        switch (go) {
-          case 'up':
-            if (!_.isNil(upImage)) {
-              await global.db.engine.update('overlay.carousel', { _id: image._id }, { order: Number(upImage.order) })
-              await global.db.engine.update('overlay.carousel', { _id: upImage._id }, { order: Number(image.order) })
-            }
-            break
-          case 'down':
-            if (!_.isNil(downImage)) {
-              await global.db.engine.update('overlay.carousel', { _id: image._id }, { order: Number(downImage.order) })
-              await global.db.engine.update('overlay.carousel', { _id: downImage._id }, { order: Number(image.order) })
-            }
-            break
-        }
-        cb(id)
-      })
+          let image = _.find(images, (o) => o._id === id)
+          let upImage = _.find(images, (o) => Number(o.order) === Number(image.order) - 1)
+          let downImage = _.find(images, (o) => Number(o.order) === Number(image.order) + 1)
 
-      socket.on('upload', async (data, cb) => {
-        var matches = data.match(/^data:([A-Za-z-+/]+);base64,(.+)$/)
-        if (matches.length !== 3) { return false }
+          switch (go) {
+            case 'up':
+              if (!_.isNil(upImage)) {
+                await global.db.engine.update('overlay.carousel', { _id: image._id }, { order: Number(upImage.order) })
+                await global.db.engine.update('overlay.carousel', { _id: upImage._id }, { order: Number(image.order) })
+              }
+              cb([
+                { imageId: id, order: Number(upImage.order) },
+                { imageId: String(upImage._id), order: Number(image.order) }
+              ])
+              break
+            case 'down':
+              if (!_.isNil(downImage)) {
+                await global.db.engine.update('overlay.carousel', { _id: image._id }, { order: Number(downImage.order) })
+                await global.db.engine.update('overlay.carousel', { _id: downImage._id }, { order: Number(image.order) })
+              }
+              cb([
+                { imageId: id, order: Number(downImage.order) },
+                { imageId: String(downImage._id), order: Number(image.order) }
+              ])
+              break
+          }
+        })
 
-        var type = matches[1]
-        var base64 = matches[2]
+        socket.on('upload', async (data, cb) => {
+          var matches = data.match(/^data:([A-Za-z-+/]+);base64,(.+)$/)
+          if (matches.length !== 3) { return false }
 
-        let order = (await global.db.engine.find('overlay.carousel')).length
-        let image = await global.db.engine.insert('overlay.carousel',
-          { type,
-            base64,
-            // timers in ms
-            waitBefore: 0,
-            waitAfter: 0,
-            duration: 5000,
-            // animation
-            animationInDuration: 1000,
-            animationIn: 'fadeIn',
-            animationOutDuration: 1000,
-            animationOut: 'fadeOut',
-            // order
-            order })
-        cb(image)
-      })
+          var type = matches[1]
+          var base64 = matches[2]
+
+          let order = (await global.db.engine.find('overlay.carousel')).length
+          let image = await global.db.engine.insert('overlay.carousel',
+            { type,
+              base64,
+              // timers in ms
+              waitBefore: 0,
+              waitAfter: 0,
+              duration: 5000,
+              // animation
+              animationInDuration: 1000,
+              animationIn: 'fadeIn',
+              animationOutDuration: 1000,
+              animationOut: 'fadeOut',
+              // order
+              order,
+              // showOnlyOncePerStream
+              showOnlyOncePerStream: false
+            })
+          cb(image)
+        })
+      }
     })
   }
 }
