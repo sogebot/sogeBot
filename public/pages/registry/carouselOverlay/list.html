@@ -23,7 +23,7 @@
                   multiple
                   ref="uploadFileInput"
                   :disabled="isUploading"
-                  @change="filesChange($event.target.name, $event.target.files)"
+                  @change="filesChange($event.target.files)"
                   accept="image/*" class="input-file"/>
 
             </form>
@@ -107,7 +107,7 @@
         }
       },
       methods: {
-        filesChange: function (name, files) {
+        filesChange: function (files) {
           this.isUploading = true
           console.log({name, files})
         }
