@@ -1,0 +1,118 @@
+<div id="registryCarouselOverlayApp">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <span data-lang="menu.carouseloverlay" class="title text-default"></span>
+
+        <div class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
+          <div class="col-sm-6">
+            <form enctype="multipart/form-data" novalidate>
+              <label class="custom-file-upload" for="uploadImageInput">
+                <button type="button" class="btn btn-primary" :disabled="isUploading" @click="$refs.uploadFileInput.click()">
+                  <template v-if="isUploading">
+                      <i class="fas fa-circle-notch fa-spin fa-fw"></i>
+                      {{ commons.translate('registry.carouseloverlay.uploading') }}</template>
+                    <template v-else>
+                      <i class="fas fa-upload fa-fw"></i>
+                      {{ commons.translate('registry.carouseloverlay.upload') }}</template>
+                </button>
+              </label>
+                <input
+                  class="d-none"
+                  type="file"
+                  multiple
+                  ref="uploadFileInput"
+                  :disabled="isUploading"
+                  @change="filesChange($event.target.name, $event.target.files)"
+                  accept="image/*" class="input-file"/>
+
+            </form>
+          </div>
+          <div class="col-sm-6 text-right form-inline d-block">
+            <button class="btn border-0" v-on:click="showAs='cards'" v-bind:class="[ showAs === 'cards' ? 'btn-dark' : 'btn-outline-dark' ]"><i class="fas fa-th-large"></i></button>
+          </div>
+        </div>
+
+        <div v-if="showAs === 'cards' && filtered.length > 0" class="card" v-for="(item, index) of filtered" v-bind:class="{ 'mt-3': index !== 0 }">
+          <div class="card-body row">
+            <div class="col-sm-5">
+              <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('name')}}</div>
+              <div class="font-weight-bold  text-primary" style="font-size: 1.5rem">{{ item.name }}</div>
+
+            </div>
+
+            <div class="text-muted col-sm-1 text-center" style="margin-top: auto; margin-bottom: auto;font-size: 1.5rem">
+              <i class="ml-3 mr-3 fab fa-html5"></i>
+            </div>
+
+            <div style="word-break: break-all; " class="col-sm-6">
+              <div style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px;">{{commons.translate('text')}}</div>
+              <pre v-show="item.text.length > 0"><code class="language-markup">{{ item.text }}</code></pre>
+            </div>
+          </div>
+
+          <div class="card-body border-top p-0 text-right">
+            <div class="btn-group" role="group">
+              <a v-bind:href="'/overlays/text?id='+ item._id" class="btn btn-outline-dark p-3 border-0" target="_blank"><i class="fas fa-link"></i> /overlays/text?id={{ item._id }}</a>
+              <a v-bind:href="'?id='+ item._id + '#registry/textoverlay/edit'" class="btn btn-outline-dark p-3 border-0"><i class="fas fa-pencil-alt mr-1" aria-hidden="true"></i> {{ commons.translate('dialog.buttons.edit') }}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  Vue.prototype.commons = commons
+
+  function carouselOverlayInit () {
+    if (_.size(translations) === 0) return setTimeout(() => carouselOverlayInit(), 1)
+    var registryCarouselOverlayApp = new Vue({
+      el: '#registryCarouselOverlayApp',
+      components: {
+        'toggle': toggleEnable,
+        'command-input': commandInput
+      },
+      data: {
+        isUploading: false,
+        showAs: 'cards',
+        search: '',
+
+        items: [],
+
+        socket: io('/overlays/carousel', { query: "token=" + token }),
+      },
+      computed: {
+        filtered: function () {
+          if (this.search.length === 0) return this.items
+        }
+      },
+      created: function () {
+        this.socket.emit('find', { collection: 'data' }, (err, items) => {
+          this.items = _.orderBy(items, 'name', 'asc')
+        })
+        if (localStorage.getItem('/overlays/carousel/showAs')) this.showAs = JSON.parse(localStorage.getItem('/overlays/carousel/showAs'));
+      },
+      watch: {
+        showAs: function(val) {
+          localStorage.setItem('/overlays/carousel/showAs', JSON.stringify(this.showAs))
+        }
+      },
+      filters: {
+        capitalize: function (value) {
+          if (!value) return ''
+          value = value.toString()
+          return value.charAt(0).toUpperCase() + value.slice(1)
+        }
+      },
+      methods: {
+        filesChange: function (name, files) {
+          this.isUploading = true
+          console.log({name, files})
+        }
+      }
+    })
+  }
+  carouselOverlayInit()
+</script>

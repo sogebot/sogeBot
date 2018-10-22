@@ -1,14 +1,30 @@
+// @flow
 'use strict'
 
 const _ = require('lodash')
 
-class ImageCarousel {
-  constructor () {
-    if (require('cluster').isMaster) {
-      global.panel.addMenu({ category: 'settings', name: 'overlays', id: 'overlays' })
+const Overlay = require('./_interface')
 
+class ImageCarousel extends Overlay {
+  constructor () {
+    // define special property name as readonly
+    const ui = {
+      links: {
+        overlay: {
+          type: 'link',
+          href: '/overlays/carousel',
+          class: 'btn btn-primary btn-block',
+          rawText: '/overlays/carousel',
+          target: '_blank'
+        }
+      }
+    }
+
+    super({ ui })
+    if (require('cluster').isMaster) {
       this.sockets()
     }
+    this.addMenu({ category: 'registry', name: 'carouseloverlay', id: 'registry.carouselOverlay/list' })
   }
 
   sockets () {

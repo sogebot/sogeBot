@@ -1,3 +1,10 @@
+<template>
+<div>
+</div>
+</template>
+
+<script>
+</script>
 <!doctype html>
 <html lang="en">
   <head>
