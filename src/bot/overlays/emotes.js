@@ -11,7 +11,6 @@ const XRegExp = require('xregexp')
 const Overlay = require('./_interface')
 
 class Emotes extends Overlay {
-  connSckList = new Map()
   simpleEmotes = {
     ':)': 'https://static-cdn.jtvnw.net/emoticons/v1/1/',
     ':(': 'https://static-cdn.jtvnw.net/emoticons/v1/2/',
@@ -108,7 +107,6 @@ class Emotes extends Overlay {
     }
     super({ settings, ui })
     if (cluster.isMaster) {
-      this.sockets()
       global.db.engine.index({ table: this.collection.cache, index: 'code' })
       setInterval(() => this.fetchEmotes(), 10000)
     }
@@ -116,19 +114,12 @@ class Emotes extends Overlay {
 
   sockets () {
     global.panel.io.of('/overlays/emotes').on('connection', (socket) => {
-      // somehow socket connection is sent twice
-      if (!this.connSckList.has(socket.id)) {
-        this.connSckList.set(socket.id, socket.id)
-        socket.on('remove.cache', () => this.removeCache())
-        socket.on('emote.test', (test) => {
-          if (test === 'explosion') this._testExplosion()
-          else if (test === 'fireworks') this._testFireworks()
-          else this._test()
-        })
-        socket.on('disconnect', () => {
-          this.connSckList.delete(socket.id)
-        })
-      }
+      socket.on('remove.cache', () => this.removeCache())
+      socket.on('emote.test', (test) => {
+        if (test === 'explosion') this._testExplosion()
+        else if (test === 'fireworks') this._testFireworks()
+        else this._test()
+      })
     })
   }
 

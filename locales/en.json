@@ -523,6 +523,7 @@
     "overlay-emotes-animation": "Emoticon animation",
     "overlay-emotes-animation-time": "Animation Duration",
     "overlay-carousel-upload": "Upload image",
+    "overlay-carousel-reorder": "Reorder images",
     "overlay-text-link-generator": "URL generator",
     "overlay-text-decode-base64": "Decode base64",
     "overlay-credits-aggregate": "Aggregate events",

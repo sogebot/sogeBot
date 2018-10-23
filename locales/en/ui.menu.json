@@ -41,5 +41,6 @@
   "wheeloffortune": "Wheel of Fortune",
   "heist": "Heist",
   "oauth": "OAuth",
-  "textoverlay": "Text overlay"
+  "textoverlay": "Text overlay",
+  "carouseloverlay": "Carousel overlay"
 }

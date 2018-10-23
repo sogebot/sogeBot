@@ -11,10 +11,10 @@
                 <button type="button" class="btn btn-primary" :disabled="isUploading" @click="$refs.uploadFileInput.click()">
                   <template v-if="isUploading">
                       <i class="fas fa-circle-notch fa-spin fa-fw"></i>
-                      {{ commons.translate('registry.carouseloverlay.uploading') }}</template>
+                      {{ commons.translate('overlay-carousel-upload') }}</template>
                     <template v-else>
                       <i class="fas fa-upload fa-fw"></i>
-                      {{ commons.translate('registry.carouseloverlay.upload') }}</template>
+                      {{ commons.translate('overlay-carousel-upload') }}</template>
                 </button>
               </label>
                 <input
@@ -29,7 +29,7 @@
           </div>
           <div class="col-sm-6 text-right form-inline d-block">
             <button class="btn border-0" v-on:click="showAs='cards'" v-bind:class="[ showAs === 'cards' ? 'btn-dark' : 'btn-outline-dark' ]"><i class="fas fa-th-large"></i></button>
-            <button class="btn btn-secondary border-0" @click="items = _.orderBy(items, 'order', 'asc')"><i class="fas fa-sort-numeric-down fa-fw"></i> {{ commons.translate('reorder') }}</button>
+            <button class="btn btn-secondary border-0" @click="items = _.orderBy(items, 'order', 'asc')"><i class="fas fa-sort-numeric-down fa-fw"></i> {{ commons.translate('overlay-carousel-reorder') }}</button>
           </div>
         </div>
 
@@ -49,7 +49,7 @@
             <div class="card-body">
               <dl class="row card-text">
                 <template v-for="key of Object.keys(item)" v-if="!['_id', 'order', 'base64', 'type'].includes(key)">
-                  <dt class="col-6">{{key}}</dt>
+                  <dt class="col-6">{{commons.translate('page.settings.overlays.carousel.titles.' + key)}}</dt>
                   <dd class="col-6">{{item[key]}}</dd>
                 </template>
               </dl>

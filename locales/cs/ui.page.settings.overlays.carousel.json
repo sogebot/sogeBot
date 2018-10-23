@@ -17,6 +17,7 @@
     "animationIn": "Animace zobrazení",
     "animationOut": "Animace skrytí",
     "animationInDuration": "Délka animace zobrazení (v ms)",
-    "animationOutDuration": "Délka animace skrytí (v ms)"
+    "animationOutDuration": "Délka animace skrytí (v ms)",
+    "showOnlyOncePerStream": "Zobrazit pouze jednou během streamu"
   }
 }

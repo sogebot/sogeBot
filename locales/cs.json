@@ -554,6 +554,7 @@
     "overlay-emotes-animation": "Animace emotikonu",
     "overlay-emotes-animation-time": "Trvání animace",
     "overlay-carousel-upload": "Nahrát obrázek",
+    "overlay-carousel-reorder": "Přeskupit obrázky",
     "overlay-text-link-generator": "URL generátor",
     "overlay-text-decode-base64": "Dekódovat base64",
     "fade-out-top": "slábnout směrem nahoru",

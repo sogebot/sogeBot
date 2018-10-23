@@ -209,7 +209,12 @@ class Module {
       this.timeouts[`${this.constructor.name}._sockets`] = setTimeout(() => this._sockets(), 1000)
     } else if (cluster.isMaster) {
       this.socket = global.panel.io.of('/' + this._name + '/' + this.constructor.name.toLowerCase())
-      if (!_.isNil(this.sockets)) this.sockets()
+      if (!_.isNil(this.sockets)) {
+        this.sockets()
+        this.sockets = function () {
+          global.log.error('/' + this._name + '/' + this.constructor.name.toLowerCase() + ': Cannot initialize sockets second time')
+        }
+      }
 
       // default socket listeners
       this.socket.on('connection', (socket) => {
