@@ -1,5 +1,5 @@
-<div id="registryCarouselOverlayApp">
-  <div class="container-fluid">
+<div id="registryCarouselOverlayApp" ref="window">
+  <div class="container-fluid" v-if="isMounted">
     <div class="row">
       <div class="col-12">
         <span data-lang="menu.carouseloverlay" class="title text-default"></span>
@@ -33,7 +33,7 @@
           </div>
         </div>
 
-        <div class="card-deck mb-3" v-if="items.length > 0" v-for="(chunk, index) of _.chunk(items, 3)">
+        <div class="card-deck mb-3" v-if="items.length > 0" v-for="(chunk, index) of _.chunk(items, itemCountPerRow)">
           <div class="card" v-for="item of chunk">
             <div class="card-body border-top p-0 text-right" style="flex: 0 1 auto;">
               <div class="btn-group" role="group">
@@ -57,7 +57,7 @@
           </div>
 
           <!-- add empty invisible cards if chunk is < 3-->
-          <div class="card" v-for="index in (3 - chunk.length)" style="visibility: hidden"></div>
+          <div class="card" v-for="index in (itemCountPerRow - chunk.length)" style="visibility: hidden"></div>
         </div>
       </div>
     </div>
@@ -76,6 +76,8 @@
         'command-input': commandInput
       },
       data: {
+        domWidth: 0,
+        isMounted: false,
         isMoving: false,
         isUploading: false,
         uploadedFiles: 0,
@@ -86,6 +88,23 @@
         items: [],
 
         socket: io('/overlays/carousel', { query: "token=" + token }),
+      },
+      mounted: function () {
+        this.isMounted = true
+
+        setInterval(() => {
+          this.domWidth = this.$refs['window'].clientWidth
+        }, 1000)
+      },
+      computed: {
+        itemCountPerRow: function () {
+          if(!this.isMounted) return 3
+          else {
+            if (this.domWidth > 1200) return 3
+            else if (this.domWidth > 1000) return 2
+            else return 1
+          }
+        }
       },
       created: function () {
         this.socket.emit('load', (items) => {

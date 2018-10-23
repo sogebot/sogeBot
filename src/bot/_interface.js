@@ -11,6 +11,7 @@ class Module {
     /* Prepare default settings configuration
      * set enabled by default to true
      */
+    opts = opts || {}
     this._settings = opts.settings || {}
     this._settings.enabled = typeof this._settings.enabled !== 'undefined' ? this._settings.enabled : true
 
