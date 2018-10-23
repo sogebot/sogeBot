@@ -8,7 +8,7 @@ const crypto = require('crypto')
 const Overlay = require('./_interface')
 
 class EventList extends Overlay {
-  socket = null
+  socket: any = null
 
   constructor () {
     // define special property name as readonly
@@ -47,7 +47,7 @@ class EventList extends Overlay {
     this.socket.emit('events', _.chunk(events, 20)[0])
   }
 
-  async add (data) {
+  async add (data: Object) {
     if (await global.commons.isBot(data.username)) return // don't save event from a bot
 
     const newEvent = {

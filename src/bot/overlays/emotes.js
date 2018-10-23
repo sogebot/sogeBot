@@ -151,9 +151,9 @@ class Emotes extends Overlay {
             },
             {
               urls: {
-                1: 'https://static-cdn.jtvnw.net/emoticons/v1/' + request.data[codes[i]].id + '/1.0',
-                2: 'https://static-cdn.jtvnw.net/emoticons/v1/' + request.data[codes[i]].id + '/2.0',
-                3: 'https://static-cdn.jtvnw.net/emoticons/v1/' + request.data[codes[i]].id + '/3.0'
+                '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + request.data[codes[i]].id + '/1.0',
+                '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + request.data[codes[i]].id + '/2.0',
+                '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + request.data[codes[i]].id + '/3.0'
               }
             })
         }
@@ -179,9 +179,9 @@ class Emotes extends Overlay {
                 },
                 {
                   urls: {
-                    1: 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
-                    2: 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
-                    3: 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0'
+                    '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
+                    '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
+                    '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0'
                   }
                 })
             }
@@ -235,9 +235,9 @@ class Emotes extends Overlay {
             },
             {
               urls: {
-                1: urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '1x'),
-                2: urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '2x'),
-                3: urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '3x')
+                '1': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '1x'),
+                '2': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '2x'),
+                '3': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '3x')
               }
 
             })
@@ -268,7 +268,7 @@ class Emotes extends Overlay {
     })
   }
 
-  async firework (data) {
+  async firework (data: Array<string>) {
     const emotes = await this.parseEmotes(data)
     global.panel.io.of('/overlays/emotes').emit('emote.firework', {
       emotes,
@@ -284,7 +284,7 @@ class Emotes extends Overlay {
     })
   }
 
-  async explode (data) {
+  async explode (data: Array<string>) {
     const emotes = await this.parseEmotes(data)
     global.panel.io.of('/overlays/emotes').emit('emote.explode', {
       emotes,
@@ -299,7 +299,7 @@ class Emotes extends Overlay {
     })
   }
 
-  async containsEmotes (opts) {
+  async containsEmotes (opts: ParserOptions) {
     if (_.isNil(opts.sender)) return true
     if (cluster.isWorker) {
       if (process.send) process.send({ type: 'call', ns: 'overlays.emotes', fnc: 'containsEmotes', args: [opts] })
@@ -317,9 +317,9 @@ class Emotes extends Overlay {
         type: 'twitch',
         code,
         urls: {
-          1: this.simpleEmotes[code] + '1.0',
-          2: this.simpleEmotes[code] + '2.0',
-          3: this.simpleEmotes[code] + '3.0'
+          '1': this.simpleEmotes[code] + '1.0',
+          '2': this.simpleEmotes[code] + '2.0',
+          '3': this.simpleEmotes[code] + '3.0'
         }
       })
     }
@@ -349,7 +349,7 @@ class Emotes extends Overlay {
     return true
   }
 
-  async parseEmotes (emotes) {
+  async parseEmotes (emotes: Array<string>) {
     let emotesArray = []
 
     for (var i = 0, length = emotes.length; i < length; i++) {
