@@ -21,7 +21,6 @@ class Stats extends Overlay {
     }
 
     super({ ui })
-    if (require('cluster').isMaster) this.sockets()
   }
 
   sockets () {

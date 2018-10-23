@@ -25,9 +25,6 @@ class EventList extends Overlay {
     }
 
     super({ ui })
-    if (require('cluster').isMaster) {
-      this.sockets()
-    }
   }
 
   sockets () {
