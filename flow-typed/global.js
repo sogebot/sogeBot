@@ -9,3 +9,24 @@ declare type CommandOptions = {
   command: string,
   parameters: string
 }
+
+declare type TimeoutsObject = {
+  [string]: function
+}
+
+declare type EventType = {
+  type: string,
+  timestamp: string,
+  username: string,
+  autohost?: boolean,
+  message?: string,
+  amount?: number,
+  currency?: string,
+  months?: number,
+  bits?: number,
+  viewers?: number,
+  from?: number,
+  tier?: string,
+  song_title?: string,
+  song_url?: string
+}

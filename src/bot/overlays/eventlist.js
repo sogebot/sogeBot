@@ -47,7 +47,7 @@ class EventList extends Overlay {
     this.socket.emit('events', _.chunk(events, 20)[0])
   }
 
-  async add (data: Object) {
+  async add (data: EventType) {
     if (await global.commons.isBot(data.username)) return // don't save event from a bot
 
     const newEvent = {

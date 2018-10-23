@@ -15,7 +15,7 @@ class TMI extends Core {
   timeouts: Object = {}
   client: Object = {}
   lastWorker: string = ''
-  broadcasterWarning: bool = false
+  broadcasterWarning: boolean = false
 
   ignoreGiftsFromUser: { [string]: { count: number, time: Date }} = {}
 

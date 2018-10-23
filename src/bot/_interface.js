@@ -6,8 +6,8 @@ const constants = require('./constants')
 let listeners = 0
 
 class Module {
-  timeouts: Object = {}
-  constructor (opts: Object = {}) {
+  timeouts = {}
+  constructor (opts) {
     /* Prepare default settings configuration
      * set enabled by default to true
      */

@@ -142,7 +142,7 @@ class API {
     global.db.engine.update('api.current', { key: 'game' }, { value: await global.cache.gameCache() })
   }
 
-  async getUsernameFromTwitch (id: string) {
+  async getUsernameFromTwitch (id) {
     const url = `https://api.twitch.tv/helix/users?id=${id}`
     var request
     /*
@@ -198,7 +198,7 @@ class API {
     return null
   }
 
-  async getIdFromTwitch (username: string, isChannelId: bool = false) {
+  async getIdFromTwitch (username, isChannelId = false) {
     const url = `https://api.twitch.tv/helix/users?login=${username}`
     var request
     /*
