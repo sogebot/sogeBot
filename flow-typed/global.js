@@ -11,7 +11,7 @@ declare type CommandOptions = {
 }
 
 declare type TimeoutsObject = {
-  [string]: function
+  [string]: TimeoutID
 }
 
 declare type EventType = {
