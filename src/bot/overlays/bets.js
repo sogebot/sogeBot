@@ -1,12 +1,31 @@
-class BetsOverlay {
+// @flow
+'use strict'
+
+const Overlay = require('./_interface')
+
+class Bets extends Overlay {
+  timeouts: TimeoutsObject = {}
+  modifiedAt: number = 0
+  currentBet: Object = {}
+  bets: Array<Object> = []
+
   constructor () {
-    this.timeouts = {}
-    this.modifiedAt = 0
-    this.currentBet = {}
-    this.bets = []
+    // define special property name as readonly
+    const ui = {
+      links: {
+        overlay: {
+          type: 'link',
+          href: '/overlays/bets',
+          class: 'btn btn-primary btn-block',
+          rawText: '/overlays/bets',
+          target: '_blank'
+        }
+      }
+    }
+
+    super({ ui })
 
     if (require('cluster').isMaster) {
-      this.sockets()
       this.interval()
     }
   }
@@ -37,4 +56,4 @@ class BetsOverlay {
   }
 }
 
-module.exports = new BetsOverlay()
+module.exports = new Bets()
