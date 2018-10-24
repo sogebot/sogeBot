@@ -62,7 +62,8 @@ You can also contact me on my email sogehige@gmail.com or get support on our [di
 | Emotes           | Show chat message emotes in your stream!                              |
 | Stats            | Show viewers, follower, uptime                                        |
 | ImageCarousel    | Simple image fadeIn/fadeOut carousel                                  |
-| Alerts           | Show images, play audio/video and **replays** or **clips** in overlay |
+| Alerts           | Show images, play audio/video |
+| Clips            | Show clips created through events as replays |
 | Credits          | End credits like in a movie                                           |
 | Text             | Show text and variables ($currentSong etc.)                           |
 | Eventlist        | Show last events                                                      |

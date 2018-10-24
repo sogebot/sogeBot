@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import { TweenLite } from 'gsap/TweenMax'
+
 export default {
   props: ['token'],
   data: function () {
@@ -39,7 +41,7 @@ export default {
     },
     doEnterAnimation: function (el, done) {
       let animation = { opacity: 1 }
-      
+
       // force refresh of styles
       this.$refs[this.images[this.currentImage]._id][0].style.filter = 'blur(0px)'
       this.$refs[this.images[this.currentImage]._id][0].style.top = 0
@@ -84,7 +86,7 @@ export default {
     },
     doLeaveAnimation: function (el, done) {
       let animation = { opacity: 0 }
-      
+
       switch (this.images[this.currentImage].animationOut) {
         case 'blurOut':
           animation = { filter: 'blur(50px)', opacity: 0 }

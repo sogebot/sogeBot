@@ -22,6 +22,9 @@
 </template>
 
 <script>
+import { TweenLite } from 'gsap/TweenMax'
+import _ from 'lodash'
+
 export default {
   props: ['token'],
   data: function () {

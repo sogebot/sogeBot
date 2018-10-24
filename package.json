@@ -107,6 +107,7 @@
     "flow": "0.2.3",
     "flow-bin": "0.84.0",
     "flow-typed": "2.5.1",
+    "gsap": "2.0.2",
     "locate-path": "3.0.0",
     "minimist": "1.2.0",
     "mocha": "5.2.0",

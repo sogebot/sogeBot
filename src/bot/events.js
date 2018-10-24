@@ -166,6 +166,7 @@ class Events {
       }
       return cid
     } else { // NG
+      global.log.warning('Clip was not created successfully')
       return null
     }
   }
@@ -173,19 +174,9 @@ class Events {
   async fireCreateAClipAndPlayReplay (operation, attributes) {
     let cid = await global.events.fireCreateAClip(operation, attributes)
     if (cid) { // clip created ok
-      const clip = [
-        'type=clip',
-        'id=' + cid,
-        'position=' + await global.configuration.getValue('replayPosition'),
-        'x-offset=' + await global.configuration.getValue('replayOffsetX'),
-        'y-offset=' + await global.configuration.getValue('replayOffsetY'),
-        'size=' + await global.configuration.getValue('replaySize'),
-        'volume=' + await global.configuration.getValue('replayVolume'),
-        'label=' + await global.configuration.getValue('replayLabel'),
-        'filter=' + await global.configuration.getValue('replayFilter'),
-        'class=replay'
-      ]
-      global.overlays.alerts.overlay({ sender: { username: global.commons.getOwner() }, parameters: clip.join(' ') })
+      global.overlays.clips.showClip(cid)
+    } else {
+      global.log.warning('Clip was not created successfully')
     }
   }
 

@@ -1269,6 +1269,29 @@ class API {
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
     }
   }
+
+  async getClipById (id) {
+    const url = `https://api.twitch.tv/helix/clips/?id=${id}`
+
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return null
+
+    var request
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        }
+      })
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+      return request.data
+    } catch (e) {
+      global.log.error(`${url} - ${e.message}`)
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: this.remainingAPICalls })
+      return null
+    }
+  }
 }
 
 module.exports = API
