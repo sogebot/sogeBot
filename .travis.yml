@@ -7,7 +7,7 @@ install:
 notifications:
   email: false
 node_js:
-  - "10"
+  - "11"
 os:
   - linux
   - osx
