@@ -13,6 +13,7 @@ const tests = {
   ],
   'links': [ // tests will test links, http://links, https://links
     'google.me',
+    'google.shop',
     'google.com',
     'google.COM',
     'GOOGLE.com',
