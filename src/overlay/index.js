@@ -1,4 +1,4 @@
-/* globals io token commons _ translations socket */
+/* globals io token commons translations socket */
 import Vue from 'vue'
 import Overlays from './index.vue'
 import _ from 'lodash'
