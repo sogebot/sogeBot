@@ -1,12 +1,6 @@
 // @flow
 'use strict'
 
-const fs = require('fs')
-const crypto = require('crypto')
-const glob = require('glob')
-const path = require('path')
-const _ = require('lodash')
-
 const Overlay = require('./_interface')
 
 class Gallery extends Overlay {
