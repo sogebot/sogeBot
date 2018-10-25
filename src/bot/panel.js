@@ -46,6 +46,17 @@ function Panel () {
   app.get('/popout/', this.authUser, function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'))
   })
+  app.get('/gallery/:id', async function (req, res) {
+    const file = await global.db.engine.findOne(global.overlays.gallery.collection.data, { _id: req.params.id })
+    if (!_.isEmpty(file)) {
+      const data = Buffer.from(file.data.split(',')[1], 'base64')
+      res.writeHead(200, {
+        'Content-Type': file.type,
+        'Content-Length': data.length
+      })
+      res.end(data)
+    } else res.sendStatus(404)
+  })
   app.get('/oauth/:page', this.authUser, function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'oauth', req.params.page + '.html'))
   })
@@ -267,7 +278,7 @@ function Panel () {
     socket.on('overlays', async (cb) => {
       let toEmit = []
       for (let system of Object.keys(global.overlays).filter(o => !o.startsWith('_'))) {
-        if (!global.overlays[system].settings) continue
+        if (!global.overlays[system].settings || global.overlays[system]._ui._hidden) continue
         toEmit.push({
           name: system.toLowerCase(),
           enabled: await global.overlays[system].settings.enabled,

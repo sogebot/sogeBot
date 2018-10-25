@@ -4,6 +4,11 @@
     "add": "Add"
   },
   "buttons": {
+    "upload": {
+      "idle": "Upload",
+      "progress": "Uploading",
+      "done": "Uploaded"
+    },
     "cancel": "Cancel",
     "close": "Close",
     "saveChanges": {

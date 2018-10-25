@@ -4,6 +4,11 @@
     "add": "Přidat"
   },
   "buttons": {
+    "upload": {
+      "idle": "Nahrát",
+      "progress": "Nahrávání",
+      "done": "Nahráno"
+    },
     "cancel": "Zrušit",
     "close": "Zavřít",
     "saveChanges": {
