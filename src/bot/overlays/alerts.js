@@ -34,7 +34,7 @@ class Alerts extends Overlay {
     this.addMenu({ category: 'settings', name: 'overlays', id: 'overlays' })
   }
 
-  async overlay (opts: ParserOptions) {
+  async overlay (opts: CommandOptions) {
     if (cluster.isWorker) {
       if (process.send) process.send({ type: 'call', ns: 'overlays.alerts', fnc: 'overlay', args: [opts] })
       return
