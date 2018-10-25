@@ -7,8 +7,9 @@ current: {{ getCurrentAlertList() }}
 finishedCount: {{ finishedCount }}
 finished: {{ (getCurrentAlertList() || []).filter(o => o.finished) }}
       </pre>
-      <div class="absolute" v-if="isPlaying && !isFinished" v-for="(alert, index) of getCurrentAlertList()" :key="index">
+      <div class="absolute" v-if="isPlaying && !isFinished">
         <transition
+          v-for="(alert, index) of getCurrentAlertList()" :key="index"
           @enter="doEnterAnimation"
           @leave="doLeaveAnimation"
           :css="false"
