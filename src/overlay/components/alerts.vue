@@ -13,44 +13,45 @@ finished: {{ (getCurrentAlertList() || []).filter(o => o.finished) }}
           @leave="doLeaveAnimation"
           :css="false"
         >
-        <iframe
-          :data-index="index"
-          v-if="alert.type === 'html' && alert.run"
-          v-show="alert.run && !alert.finished && !alert.leaveAnimation"
-          :class="[ alert.class ? alert.class : '']"
-          :src="alert.url"></iframe>
+          <iframe
+            :data-index="index"
+            v-if="alert.type === 'html' && alert.run"
+            v-show="alert.run && !alert.finished && !alert.leaveAnimation"
+            :class="[ alert.class ? alert.class : '']"
+            :src="alert.url"></iframe>
 
-        <audio
-          ref="audio"
-          v-if="alert.type === 'audio'"
-          :src="alert.url"></audio>
+          <audio
+            ref="audio"
+            v-if="alert.type === 'audio'"
+            :src="alert.url"></audio>
 
-        <video
-          playsinline
-          ref="video"
-          :data-index="index"
-          :data-src="alert.url"
-          :class="[ alert.class ? alert.class : '']"
-          v-show="alert.run && !alert.finished && !alert.leaveAnimation"
-          v-if="alert.type === 'video' || alert.type === 'clip'">
-          <source :src="alert.url" type="video/mp4">
-        </video>
+          <video
+            playsinline
+            ref="video"
+            :data-index="index"
+            :data-src="alert.url"
+            :class="[ alert.class ? alert.class : '']"
+            v-show="alert.run && !alert.finished && !alert.leaveAnimation"
+            v-if="alert.type === 'video' || alert.type === 'clip'">
+            <source :src="alert.url" type="video/mp4">
+          </video>
 
-        <div
-          class='text'
-          :data-index="index"
-          :class="[ alert.class ? alert.class : '']"
-          v-show="alert.run && !alert.finished && !alert.leaveAnimation"
-          v-if="alert.type === 'text'">{{alert.text}}</div>
+          <div
+            class='text'
+            :data-index="index"
+            :class="[ alert.class ? alert.class : '']"
+            v-show="alert.run && !alert.finished && !alert.leaveAnimation"
+            v-if="alert.type === 'text'">{{alert.text}}</div>
 
-        <img
+          <img
           class="image"
           :data-index="index"
           :class="[ alert.class ? alert.class : '']"
           v-show="alert.run && !alert.finished && !alert.leaveAnimation"
           v-if="alert.type === 'image'"
           :src="alert.url">
-      </div>
+        </transition>
+    </div>
   </div>
 </template>
 
