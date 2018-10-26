@@ -172,11 +172,13 @@ class Moderation extends System {
 
     text = ` ${text} `
     let whitelist = await this.settings.lists.whitelist
-    for (let value of whitelist) {
-      value = value.trim().replace(/\*/g, '[\\pL0-9]*').replace(/\+/g, '[\\pL0-9]+')
-      const regexp = XRegExp(` [^\\s\\pL0-9\\w]?${value}[^\\s\\pL0-9\\w]? `, 'gi')
-      // we need to change 'text' to ' text ' for regexp to correctly work
-      text = XRegExp.replace(` ${text} `, regexp, '').trim()
+
+    for (let value of whitelist.map(o => o.trim().replace(/\*/g, '[\\pL0-9]*').replace(/\+/g, '[\\pL0-9]+'))) {
+      if (value.length > 0) {
+        const regexp = XRegExp(` [^\\s\\pL0-9\\w]?${value}[^\\s\\pL0-9\\w]? `, 'gi')
+        // we need to change 'text' to ' text ' for regexp to correctly work
+        text = XRegExp.replace(` ${text} `, regexp, '').trim()
+      }
     }
     return text
   }
@@ -434,17 +436,18 @@ class Moderation extends System {
     }
 
     let isOK = true
-    for (let value of blacklist) {
-      value = value.trim().replace(/\*/g, '[\\pL0-9]*').replace(/\+/g, '[\\pL0-9]+')
-      const regexp = XRegExp(` [^\\s\\pL0-9\\w]?${value}[^\\s\\pL0-9\\w]? `, 'gi')
-      // we need to change 'text' to ' text ' for regexp to correctly work
-      if (XRegExp.exec(` ${opts.message} `, regexp) && value.length > 0) {
-        isOK = false
-        this.timeoutUser(opts.sender, opts.message,
-          global.translate('moderation.user-is-warned-about-blacklist'),
-          global.translate('moderation.user-have-timeout-for-blacklist'),
-          timeout, 'blacklist')
-        break
+    for (let value of blacklist.map(o => o.trim().replace(/\*/g, '[\\pL0-9]*').replace(/\+/g, '[\\pL0-9]+'))) {
+      if (value.length > 0) {
+        const regexp = XRegExp(` [^\\s\\pL0-9\\w]?${value}[^\\s\\pL0-9\\w]? `, 'gi')
+        // we need to change 'text' to ' text ' for regexp to correctly work
+        if (XRegExp.exec(` ${opts.message} `, regexp) && value.length > 0) {
+          isOK = false
+          this.timeoutUser(opts.sender, opts.message,
+            global.translate('moderation.user-is-warned-about-blacklist'),
+            global.translate('moderation.user-have-timeout-for-blacklist'),
+            timeout, 'blacklist')
+          break
+        }
       }
     }
     return isOK
