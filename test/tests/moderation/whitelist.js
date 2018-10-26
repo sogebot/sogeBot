@@ -15,6 +15,27 @@ const _ = require('lodash')
 const assert = require('chai').assert
 
 const tests = {
+  'osu.ppy.sh': {
+    'should.return.changed': [
+      'Lorem Ipsum osu.ppy.sh dolor sit amet'
+    ],
+    'should.return.same': [
+      'Lorem Ipsum http://osu.ppy.sh dolor sit amet',
+      'Lorem Ipsum https://osu.ppy.sh dolor sit amet'
+    ]
+  },
+  '(https?:\\/\\/)?osu.ppy.sh([\\/A-z0-9_]+)?': {
+    'should.return.changed': [
+      'Lorem Ipsum osu.ppy.sh dolor sit amet',
+      'Lorem Ipsum http://osu.ppy.sh dolor sit amet',
+      'Lorem Ipsum https://osu.ppy.sh dolor sit amet',
+      'Lorem Ipsum osu.ppy.sh/asd dolor sit amet',
+      'Lorem Ipsum http://osu.ppy.sh/asd dolor sit amet',
+      'Lorem Ipsum https://osu.ppy.sh/asd dolor sit amet'
+    ],
+    'should.return.same': [
+    ]
+  },
   'testForSongRequest': {
     'should.return.changed': [
       '!songrequest https://youtu.be/HmZYgqBp1gI',
