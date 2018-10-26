@@ -85,6 +85,10 @@ const tests = {
   '*саня*': {
     'should.return.false': ['саня'],
     'should.return.true': []
+  },
+  ' ': {
+    'should.return.false': [],
+    'should.return.true': ['have a good night brotha']
   }
 }
 
