@@ -40,10 +40,6 @@ if (cluster.isWorker) {
   if (config.database.type === 'nedb') global.cpu = 1 // nedb can have only one fork
   for (let i = 0; i < global.cpu; i++) fork()
   cluster.on('disconnect', (worker) => fork())
-  cluster.on('listening', (worker, address) => {
-    console.log(
-      `A worker is now connected to ${address.address}:${address.port}`)
-  })
 }
 
 async function main () {
