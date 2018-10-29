@@ -24,14 +24,15 @@ const tests = {
       'Lorem Ipsum https://osu.ppy.sh dolor sit amet'
     ]
   },
-  '(https?:\\/\\/)?osu.ppy.sh([\\/A-z0-9_]+)?': {
+  '(https?:\\/\\/)?osu.ppy.sh(*)?': {
     'should.return.changed': [
       'Lorem Ipsum osu.ppy.sh dolor sit amet',
       'Lorem Ipsum http://osu.ppy.sh dolor sit amet',
       'Lorem Ipsum https://osu.ppy.sh dolor sit amet',
       'Lorem Ipsum osu.ppy.sh/asd dolor sit amet',
       'Lorem Ipsum http://osu.ppy.sh/asd dolor sit amet',
-      'Lorem Ipsum https://osu.ppy.sh/asd dolor sit amet'
+      'Lorem Ipsum https://osu.ppy.sh/asd dolor sit amet',
+      'Lorem Ipsum osu.ppy.sh/p/2131231231 dolor sit amet'
     ],
     'should.return.same': [
     ]

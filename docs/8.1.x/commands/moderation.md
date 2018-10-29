@@ -101,4 +101,4 @@
 
 Use this pattern to whitelist your desired url. Change `example.com` to what you want.
 
-`(https?:\/\/)?(www\.)?example.com([\/A-z0-9_]+)?`
+`(https?:\/\/)?(www\.)?example.com(*)?`
