@@ -32,7 +32,8 @@ const tests = {
       'Lorem Ipsum osu.ppy.sh/asd dolor sit amet',
       'Lorem Ipsum http://osu.ppy.sh/asd dolor sit amet',
       'Lorem Ipsum https://osu.ppy.sh/asd dolor sit amet',
-      'Lorem Ipsum osu.ppy.sh/p/2131231231 dolor sit amet'
+      'Lorem Ipsum osu.ppy.sh/p/2131231231 dolor sit amet',
+      'Lorem Ipsum osu.ppy.sh/beatmapsets/59670/#osu/1263997 dolor sit amet'
     ],
     'should.return.same': [
     ]
