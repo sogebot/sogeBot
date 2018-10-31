@@ -119,17 +119,33 @@ class CustomCommands extends System {
             }
 
             // update responses
+            let rIds = []
             for (let r of responses) {
               if (!r.cid) r.cid = _id || String(itemFromDb._id)
 
-              if (!r._id) await global.db.engine.insert(this.collection.responses, r)
-              else {
+              if (!r._id) {
+                rIds.push(
+                  String((await global.db.engine.insert(this.collection.responses, r))._id))
+              } else {
                 const _id = String(r._id); delete r._id
+                rIds.push(_id)
                 await global.db.engine.update(this.collection.responses, { _id }, r)
               }
             }
 
-            if (_.isFunction(cb)) cb(null, itemFromDb)
+            itemFromDb._id = _id || String(itemFromDb._id)
+
+            // remove responses
+            for (let r of await global.db.engine.find(this.collection.responses, { cid: itemFromDb._id })) {
+              if (!rIds.includes(String(r._id))) await global.db.engine.remove(this.collection.responses, { _id: String(r._id) })
+            }
+
+            if (_.isFunction(cb)) {
+              cb(null, {
+                command: itemFromDb,
+                responses: await global.db.engine.find(this.collection.responses, { cid: itemFromDb._id })
+              })
+            }
           }
         } else {
           if (_.isFunction(cb)) cb(null, [])

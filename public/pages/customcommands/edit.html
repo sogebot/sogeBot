@@ -193,8 +193,9 @@
                 }
                 this.states.save = 2
                 this.pending = false
-                this.id = String(data._id)
-                page('?id=' + this.id + '/#customcommands/edit')
+                this.id = String(data.command._id)
+                this.responses = data.responses
+                page('?id=' + this.id + '#customcommands/edit')
                 setTimeout(() => this.states.save = 0, 1000)
               })
             }
