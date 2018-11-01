@@ -1,8 +1,121 @@
-const _ = require('lodash')
-const axios = require('axios')
+// @flow
+'use strict'
 
-class Credits {
+const Overlay = require('./_interface')
+
+class Credits extends Overlay {
   constructor () {
+    const settings = {
+      credits: {
+        speed: 25
+      },
+      clips: {
+        enabled: true,
+        period: 'month',
+        numOfClips: 3,
+        shouldPlay: true,
+        volume: 20
+      }
+    }
+
+    const ui = {
+      clips: {
+        period: {
+          type: 'selector',
+          values: ['stream', 'day', 'week', 'month', 'all'],
+          title: 'filter.select'
+        }
+      },
+      links: {
+        overlay: {
+          type: 'link',
+          href: '/overlays/credits',
+          class: 'btn btn-primary btn-block',
+          rawText: '/overlays/credits (1920x1080)',
+          target: '_blank'
+        }
+      }
+    }
+    super({ settings, ui })
+  }
+
+  sockets () {
+    global.panel.io.of('/overlays/credits').on('connection', (socket) => {
+      socket.on('load', async (cb) => {
+        cb(null, {
+          settings: {
+            clips: {
+              shouldPlay: this.settings.clips.shouldPlay,
+              volume: this.settings.clips.volume
+            },
+            speed: this.settings.credits.sped,
+          },
+          streamer: global.oauth.settings.broadcaster.username,
+          game: await global.db.engine.findOne('api.current', { key: 'game' }),
+          title: await global.db.engine.findOne('api.current', { key: 'title' }),
+          //clips: this.settings.clips.enabled ? global.api.getTopClips({ period: this.settings.clips.period, first: this.settings.clips.numOfClips }) : []
+          clips: [ { id: 'InventiveGoodTriangleBleedPurple',
+    url: 'https://clips.twitch.tv/InventiveGoodTriangleBleedPurple',
+    embed_url:
+     'https://clips.twitch.tv/embed?clip=InventiveGoodTriangleBleedPurple',
+    broadcaster_id: '96965261',
+    broadcaster_name: 'soge__',
+    creator_id: '96965261',
+    creator_name: 'soge__',
+    video_id: '',
+    game_id: '115977',
+    language: 'en',
+    title: 'How to bow like a gentleman 101',
+    view_count: 132,
+    created_at: '2017-08-14T10:49:26Z',
+    thumbnail_url:
+     'https://clips-media-assets2.twitch.tv/vod-166727819-offset-151.99999999999997-18.00000000000003-preview-480x272.jpg',
+    mp4:
+     'https://clips-media-assets2.twitch.tv/vod-166727819-offset-151.99999999999997-18.00000000000003.mp4',
+    game: 'The Witcher 3: Wild Hunt' },
+  { id: 'EnjoyableSecretiveChinchillaEleGiggle',
+    url:
+     'https://clips.twitch.tv/EnjoyableSecretiveChinchillaEleGiggle',
+    embed_url:
+     'https://clips.twitch.tv/embed?clip=EnjoyableSecretiveChinchillaEleGiggle',
+    broadcaster_id: '96965261',
+    broadcaster_name: 'soge__',
+    creator_id: '96965261',
+    creator_name: 'soge__',
+    video_id: '',
+    game_id: '32399',
+    language: 'cs',
+    title: '4K Overpass 2v4',
+    view_count: 72,
+    created_at: '2017-04-12T23:48:21Z',
+    thumbnail_url:
+     'https://clips-media-assets2.twitch.tv/vod-135173516-offset-12740-42-preview-480x272.jpg',
+    mp4:
+     'https://clips-media-assets2.twitch.tv/vod-135173516-offset-12740-42.mp4',
+    game: 'Counter-Strike: Global Offensive' },
+  { id: 'ModernHelplessEndiveDatBoi',
+    url: 'https://clips.twitch.tv/ModernHelplessEndiveDatBoi',
+    embed_url:
+     'https://clips.twitch.tv/embed?clip=ModernHelplessEndiveDatBoi',
+    broadcaster_id: '96965261',
+    broadcaster_name: 'soge__',
+    creator_id: '60473430',
+    creator_name: 'Jackuobo',
+    video_id: '',
+    game_id: '493057',
+    language: 'en',
+    title: 'SCHLUPY šný šná šnupy',
+    view_count: 70,
+    created_at: '2018-04-02T21:22:43Z',
+    thumbnail_url:
+     'https://clips-media-assets2.twitch.tv/218475622-preview-480x272.jpg',
+    mp4: 'https://clips-media-assets2.twitch.tv/218475622.mp4',
+    game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS' } ]
+        })
+      })
+    })
+  }
+  /*
     if (require('cluster').isMaster) this.sockets()
 
     global.configuration.register('creditsAggregate', 'core.no-response-bool', 'bool', false)
@@ -149,36 +262,7 @@ class Credits {
       })
     })
   }
-
-  async getTopClips () {
-    const period = _.includes(['day', 'week', 'month', 'all'], await await global.configuration.getValue('creditsTopClipsPeriod')) ? await global.configuration.getValue('creditsTopClipsPeriod') : 'day'
-    const count = await await global.configuration.getValue('creditsTopClipsCount')
-    const channel = await global.oauth.settings.general.channel
-
-    const token = await global.oauth.settings.bot.accessToken
-    if (token === '') return
-
-    var request
-    const url = `https://api.twitch.tv/kraken/clips/top?channel=${channel}&period=${period}&trending=false&limit=${count}`
-    try {
-      request = await axios.get(url, {
-        headers: {
-          'Accept': 'application/vnd.twitchtv.v5+json',
-          'Authorization': 'OAuth ' + token
-        }
-      })
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: request.status })
-    } catch (e) {
-      global.log.error(`API: ${url} - ${e.status} ${_.get(e, 'body.message', e.statusText)}`)
-      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getTopClips', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}` })
-    }
-
-    // get mp4 from thumbnail
-    for (let c of request.data.clips) {
-      c.mp4 = c.thumbnails.medium.replace('-preview-480x272.jpg', '.mp4')
-    }
-    return request.data.clips
-  }
+  */
 }
 
 module.exports = new Credits()

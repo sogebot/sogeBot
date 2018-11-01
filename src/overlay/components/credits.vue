@@ -1,3 +1,234 @@
+<template>
+<div>
+  <pre class="debug" :class="[!urlParam('debug') ? 'hide' : '']">
+settings: {{ settings }}
+currentPage: {{ currentPage }}
+isLoaded: {{ isLoaded }}
+isPlaying: {{ isPlaying }}
+isEnded: {{ isEnded }}
+current: {{ current }}
+  </pre>
+  <div ref="page" class="page">
+    <template v-for="(el, index) of current">
+      <div :class="el.class" :key="index">{{ el.text }}</div>
+    </template>
+  </div>
+</div>
+</template>
+
+<script>
+import { TweenLite, Power0 } from 'gsap/TweenMax'
+
+export default {
+  props: ['token'],
+  data: function () {
+    return {
+      socket: io('/overlays/credits', {
+        query: "token=" + token
+      }),
+      settings: {},
+      pages: [],
+      clipPages: [],
+      currentPage: 0,
+      isLoaded: false,
+      isPlaying: false,
+      isEnded: false
+    }
+  },
+  mounted: function () {
+    this.socket.emit('load', (err, opts) => {
+      this.settings = opts.settings
+      this.settings.speed = 2
+
+      // set page 1 -> title, game, text
+      this.pages.push([
+        {
+          text: opts.game.value,
+          class: "game"
+        },
+        {
+          text: opts.title.value,
+          class: "title"
+        },
+        {
+          text: 'Stream by',
+          class: "header3"
+        },
+        {
+          text: opts.streamer,
+          class: "streamer"
+        }
+      ])
+
+      // TBD events
+
+      // last pages are clips
+      for (let i = 0, length = opts.clips.length; i < length; i++) {
+        this.clipPages.push(this.pages.length+1)
+
+        const clip = opts.clips[i]
+        this.pages.push([
+          {
+            text: clip.game,
+            class: "clip_game"
+          },
+          {
+            text: clip.title,
+            class: "clip_title"
+          },
+          {
+            text: clip.creator_name,
+            class: "clip_createdBy"
+          },
+          {
+            text: i + 1,
+            class: "clip_index"
+          },
+          {
+            clip: clip.mp4,
+            class: "clip_video"
+          }
+        ])
+      }
+
+      this.isLoaded = true
+    })
+  },
+  computed: {
+    current: function () {
+      return this.pages[this.currentPage]
+    }
+  },
+  watch: {
+    isEnded: function (val) {
+      if (val) {
+        if (this.current) {
+          this.isEnded = false
+          this.isPlaying = false
+        }
+      }
+    },
+    isLoaded: function () {
+      setInterval(() => {
+        if (!this.isPlaying) {
+          if (this.$refs.page.clientHeight === 0) return
+
+          this.isPlaying = true
+          this.$refs.page.style.top = window.innerHeight + 'px'
+
+          const duration = (window.innerHeight + this.$refs.page.clientHeight) * this.settings.speed
+
+          // normal linear if non clips
+          if (!clipsPages.includes(currentPage)) {
+            TweenLite.to(this.$refs.page, duration / 1000, {
+              top: -this.$refs.page.clientHeight,
+              ease: Power0.easeNone,
+              onComplete: () => {
+                this.isEnded = true
+                this.currentPage++
+              }
+            })
+          } else {
+            // clip page
+            TweenLite.to(this.$refs.page, duration / 1000, {
+              top: 0,
+              ease: Power0.easeNone,
+              onComplete: () => {
+                //this.isEnded = true
+                //this.currentPage++
+              }
+            })
+          }
+        }
+      }, 100)
+    }
+  },
+  methods: {
+    urlParam: function (name) {
+      var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+      if (results == null) {
+        return null
+      } else {
+        return decodeURI(results[1]) || 0;
+      }
+    }
+  }
+}
+</script>
+
+<style scoped>
+  @import url('https://fonts.googleapis.com/css?family=Cabin+Condensed');
+
+  .debug {
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    color: white;
+    padding: 1rem;
+  }
+
+  div.page {
+    font-family: 'Cabin Condensed', sans-serif;
+    text-align: center;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 0 1rem #000;
+    width: 100%;
+    position: absolute;
+    top: -9999px;
+    padding: 1vh;
+  }
+
+  .streamer {
+    font-size: 2vw
+  }
+
+  .game {
+    font-size: 4vw
+  }
+
+  .title {
+    font-size: 2.5vw
+  }
+
+  .header3 {
+    padding-top: 2vw;
+    font-size: 2.5vw;
+    font-weight: bold;
+  }
+
+  .header2 {
+    padding-top: 2vw;
+    font-size: 3vw;
+    font-weight: bold;
+  }
+
+  .header1 {
+    padding-top: 2vw;
+    font-size: 3.5vw;
+    font-weight: bold;
+  }
+
+  .clip_title, .clip_game, .clip_createdBy {
+    text-align: left;
+    font-size: 3vw;
+  }
+  .clip_createdBy {
+    font-size: 2.5vw
+  }
+  .clip_game {
+    font-weight: bold;
+  }
+  .clip_index {
+    font-size: 10vw;
+    position: absolute;
+    right: 5vh;
+    top: 0;
+  }
+</style>
+
+<!--
+/*
 <!doctype html>
 <html lang="en">
   <head>
@@ -180,7 +411,7 @@
 
         <div class="custom" id="custom"></div>
 
-        <div class="half-end"><!-- empty page --></div>
+        <div class="half-end"></div>
         <div class="end">
           <div class="center">
             <div class="last-message"><span id="last-message"></span></div>
@@ -476,3 +707,6 @@
     </script>
     </body>
   </html>
+*/
+</script>
+-->

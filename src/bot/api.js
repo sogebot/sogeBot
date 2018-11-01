@@ -1292,6 +1292,52 @@ class API {
       return null
     }
   }
+
+  async getTopClips (opts) {
+    let url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + global.oauth.channelId
+    const token = global.oauth.settings.bot.accessToken
+    // TODO
+    let period = {}
+    try {
+      if (token === '') throw Error('No broadcaster access token')
+      if (typeof opts === 'undefined' || !opts) throw Error('Missing opts')
+      if (!['stream', 'day', 'week', 'month', 'all'].includes(opts.period)) throw Error('Invalid period defined')
+      else {
+        if (opts.period === 'stream') {
+          period = {
+            started_at: (new Date()).toISOString(),
+            ended_at: (await global.cache.when()).online
+          }
+        }
+      }
+      if (opts.first) url += '&first=' + opts.first
+
+      const request = await axios.get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        }
+      })
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining']
+      this.calls.bot.refresh = request.headers['ratelimit-reset']
+      this.calls.bot.limit = request.headers['ratelimit-limit']
+      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+      // get mp4 from thumbnail
+      for (let c of request.data.data) {
+        c.mp4 = c.thumbnail_url.replace('-preview-480x272.jpg', '.mp4')
+        c.game = await this.getGameFromId(c.game_id)
+      }
+
+      return request.data.data
+    } catch (e) {
+      global.log.error(`API: ${url} - ${e.stack}`)
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getTopClips', api: 'helix', endpoint: url, code: e.stack })
+    }
+  }
 }
 
 module.exports = API
