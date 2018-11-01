@@ -7,11 +7,12 @@ class Credits extends Overlay {
   constructor () {
     const settings = {
       credits: {
-        speed: 25
+        speed: 'medium'
       },
       clips: {
         enabled: true,
-        period: 'month',
+        period: 'custom',
+        customPeriodInDays: 31,
         numOfClips: 3,
         shouldPlay: true,
         volume: 20
@@ -19,10 +20,17 @@ class Credits extends Overlay {
     }
 
     const ui = {
+      credits: {
+        speed: {
+          type: 'selector',
+          values: ['very slow', 'slow', 'medium', 'fast', 'very fast'],
+          title: 'filter.select'
+        }
+      },
       clips: {
         period: {
           type: 'selector',
-          values: ['stream', 'day', 'week', 'month', 'all'],
+          values: ['stream', 'custom'],
           title: 'filter.select'
         }
       },
@@ -48,69 +56,12 @@ class Credits extends Overlay {
               shouldPlay: this.settings.clips.shouldPlay,
               volume: this.settings.clips.volume
             },
-            speed: this.settings.credits.sped,
+            speed: this.settings.credits.speed
           },
           streamer: global.oauth.settings.broadcaster.username,
           game: await global.db.engine.findOne('api.current', { key: 'game' }),
           title: await global.db.engine.findOne('api.current', { key: 'title' }),
-          //clips: this.settings.clips.enabled ? global.api.getTopClips({ period: this.settings.clips.period, first: this.settings.clips.numOfClips }) : []
-          clips: [ { id: 'InventiveGoodTriangleBleedPurple',
-    url: 'https://clips.twitch.tv/InventiveGoodTriangleBleedPurple',
-    embed_url:
-     'https://clips.twitch.tv/embed?clip=InventiveGoodTriangleBleedPurple',
-    broadcaster_id: '96965261',
-    broadcaster_name: 'soge__',
-    creator_id: '96965261',
-    creator_name: 'soge__',
-    video_id: '',
-    game_id: '115977',
-    language: 'en',
-    title: 'How to bow like a gentleman 101',
-    view_count: 132,
-    created_at: '2017-08-14T10:49:26Z',
-    thumbnail_url:
-     'https://clips-media-assets2.twitch.tv/vod-166727819-offset-151.99999999999997-18.00000000000003-preview-480x272.jpg',
-    mp4:
-     'https://clips-media-assets2.twitch.tv/vod-166727819-offset-151.99999999999997-18.00000000000003.mp4',
-    game: 'The Witcher 3: Wild Hunt' },
-  { id: 'EnjoyableSecretiveChinchillaEleGiggle',
-    url:
-     'https://clips.twitch.tv/EnjoyableSecretiveChinchillaEleGiggle',
-    embed_url:
-     'https://clips.twitch.tv/embed?clip=EnjoyableSecretiveChinchillaEleGiggle',
-    broadcaster_id: '96965261',
-    broadcaster_name: 'soge__',
-    creator_id: '96965261',
-    creator_name: 'soge__',
-    video_id: '',
-    game_id: '32399',
-    language: 'cs',
-    title: '4K Overpass 2v4',
-    view_count: 72,
-    created_at: '2017-04-12T23:48:21Z',
-    thumbnail_url:
-     'https://clips-media-assets2.twitch.tv/vod-135173516-offset-12740-42-preview-480x272.jpg',
-    mp4:
-     'https://clips-media-assets2.twitch.tv/vod-135173516-offset-12740-42.mp4',
-    game: 'Counter-Strike: Global Offensive' },
-  { id: 'ModernHelplessEndiveDatBoi',
-    url: 'https://clips.twitch.tv/ModernHelplessEndiveDatBoi',
-    embed_url:
-     'https://clips.twitch.tv/embed?clip=ModernHelplessEndiveDatBoi',
-    broadcaster_id: '96965261',
-    broadcaster_name: 'soge__',
-    creator_id: '60473430',
-    creator_name: 'Jackuobo',
-    video_id: '',
-    game_id: '493057',
-    language: 'en',
-    title: 'SCHLUPY šný šná šnupy',
-    view_count: 70,
-    created_at: '2018-04-02T21:22:43Z',
-    thumbnail_url:
-     'https://clips-media-assets2.twitch.tv/218475622-preview-480x272.jpg',
-    mp4: 'https://clips-media-assets2.twitch.tv/218475622.mp4',
-    game: 'PLAYERUNKNOWN\'S BATTLEGROUNDS' } ]
+          clips: this.settings.clips.enabled ? await global.api.getTopClips({ period: this.settings.clips.period, days: this.settings.clips.customPeriodInDays, first: this.settings.clips.numOfClips }) : []
         })
       })
     })

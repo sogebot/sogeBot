@@ -1,16 +1,20 @@
 <template>
 <div>
-  <pre class="debug" :class="[!urlParam('debug') ? 'hide' : '']">
+  <pre class="debug" v-if="urlParam('debug')">
 settings: {{ settings }}
 currentPage: {{ currentPage }}
+clipsPages: {{ clipsPages }}
 isLoaded: {{ isLoaded }}
 isPlaying: {{ isPlaying }}
 isEnded: {{ isEnded }}
 current: {{ current }}
   </pre>
   <div ref="page" class="page">
-    <template v-for="(el, index) of current">
-      <div :class="el.class" :key="index">{{ el.text }}</div>
+    <template v-for="(el, index) of current" v-show="!isEnded && !isPlaying">
+      <video class="video" v-if="el.type === 'video'" playsinline ref="video" :key="el.clip">
+        <source :src="el.clip" type="video/mp4">
+      </video>
+      <div v-else :class="el.class" :key="index">{{ el.text }}</div>
     </template>
   </div>
 </div>
@@ -28,7 +32,7 @@ export default {
       }),
       settings: {},
       pages: [],
-      clipPages: [],
+      clipsPages: [],
       currentPage: 0,
       isLoaded: false,
       isPlaying: false,
@@ -38,7 +42,13 @@ export default {
   mounted: function () {
     this.socket.emit('load', (err, opts) => {
       this.settings = opts.settings
-      this.settings.speed = 2
+
+      // set speed
+      if (opts.settings.speed === 'very slow') this.settings.speed = 50
+      if (opts.settings.speed === 'slow') this.settings.speed = 25
+      if (opts.settings.speed === 'medium') this.settings.speed = 15
+      if (opts.settings.speed === 'fast') this.settings.speed = 5
+      if (opts.settings.speed === 'very fast') this.settings.speed = 2
 
       // set page 1 -> title, game, text
       this.pages.push([
@@ -64,7 +74,7 @@ export default {
 
       // last pages are clips
       for (let i = 0, length = opts.clips.length; i < length; i++) {
-        this.clipPages.push(this.pages.length+1)
+        this.clipsPages.push(this.pages.length)
 
         const clip = opts.clips[i]
         this.pages.push([
@@ -86,7 +96,8 @@ export default {
           },
           {
             clip: clip.mp4,
-            class: "clip_video"
+            class: "clip_video",
+            type: "video"
           }
         ])
       }
@@ -116,12 +127,12 @@ export default {
           this.isPlaying = true
           this.$refs.page.style.top = window.innerHeight + 'px'
 
-          const duration = (window.innerHeight + this.$refs.page.clientHeight) * this.settings.speed
 
           // normal linear if non clips
-          if (!clipsPages.includes(currentPage)) {
+          if (!this.clipsPages.includes(this.currentPage)) {
+            const duration = (window.innerHeight + this.$refs.page.clientHeight + 100) * this.settings.speed
             TweenLite.to(this.$refs.page, duration / 1000, {
-              top: -this.$refs.page.clientHeight,
+              top: -(this.$refs.page.clientHeight + 100),
               ease: Power0.easeNone,
               onComplete: () => {
                 this.isEnded = true
@@ -130,17 +141,43 @@ export default {
             })
           } else {
             // clip page
-            TweenLite.to(this.$refs.page, duration / 1000, {
+            const duration1 = window.innerHeight * this.settings.speed
+            const duration2 = (this.$refs.page.clientHeight + 100) * this.settings.speed
+            TweenLite.to(this.$refs.page, duration1 / 1000, {
               top: 0,
               ease: Power0.easeNone,
               onComplete: () => {
-                //this.isEnded = true
-                //this.currentPage++
+                // play clip
+                const video = this.$refs.video[0]
+                video.volume = this.settings.clips.volume / 100
+
+                if (this.settings.clips.shouldPlay) {
+                  video.play()
+                  video.onended = () => {
+                    TweenLite.to(this.$refs.page, duration2 / 1000, {
+                      top: -(this.$refs.page.clientHeight + 100),
+                      ease: Power0.easeNone,
+                      onComplete: () => {
+                        this.isEnded = true
+                        this.currentPage++
+                      }
+                    })
+                  }
+                } else {
+                  TweenLite.to(this.$refs.page, duration2 / 1000, {
+                    top: -(this.$refs.page.clientHeight + 100),
+                    ease: Power0.easeNone,
+                    onComplete: () => {
+                      this.isEnded = true
+                      this.currentPage++
+                    }
+                  })
+                }
               }
             })
           }
         }
-      }, 100)
+      }, 10)
     }
   },
   methods: {
@@ -173,10 +210,10 @@ export default {
     text-transform: uppercase;
     color: #fff;
     text-shadow: 0 0 1rem #000;
-    width: 100%;
-    position: absolute;
+    position: relative;
     top: -9999px;
-    padding: 1vh;
+    margin: 5vh;
+    text-align: center;
   }
 
   .streamer {
@@ -222,173 +259,17 @@ export default {
   .clip_index {
     font-size: 10vw;
     position: absolute;
-    right: 5vh;
+    right: 2.5vw;
     top: 0;
+  }
+  .video {
+    width: 100%;
+    padding-top: 8vh;
+    max-height: 65vh;
   }
 </style>
 
 <!--
-/*
-<!doctype html>
-<html lang="en">
-  <head>
-    <title>Credits</title>
-    <meta charset="utf-8">
-    <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#f4f5f6">
-    <meta name="apple-mobile-web-app-status-bar-style" content="#f4f5f6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300" rel="stylesheet">
-
-    <script src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript" src="/auth/token.js"></script>
-    <script src="https://cdn.plyr.io/3.4.4/plyr.js"></script>
-
-    <style>
-      @import url(https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300);
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      .center {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 100%;
-      }
-
-      .end {
-        position: relative;
-        text-align: center;
-      }
-
-      html, body {
-        height: 100vh;
-        overflow: hidden;
-      }
-
-      #wrapper {
-        position: absolute;
-        left: -500%;
-        width: 100%;
-        font: 300 3rem/1 'Open Sans Condensed', sans-serif;
-        text-align: center;
-        text-transform: uppercase;
-        color: #fff;
-        text-shadow: 0px 0px 1rem #000;
-      }
-
-      .clip {
-        vertical-align: middle;
-        text-align: center;
-      }
-
-      .clip-title {
-        text-align: left;
-        padding-bottom: 1rem;
-      }
-
-      .clip-title .name {
-        font-size: 3rem;
-        width: 100%;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        padding-left: 14%; padding-right: 14%;
-        padding-top: 15px; margin-top: -15px;
-        padding-bottom: 15px; margin-bottom: -15px;
-      }
-
-      iframe, img, video {
-        width: 75%;
-        height: 75%;
-      }
-
-      .title {
-        font-weight: bold;
-        margin-left: 5%;
-        margin-right: 5%;
-      }
-      .subtitle {
-        margin-left: 5%;
-        margin-right: 5%;
-        margin-bottom: 50px;
-      }
-
-      .last-message {
-        margin-bottom: 10px;
-        font-weight: bold
-      }
-
-      .last-submessage {
-        margin-bottom: 10px;
-        margin-bottom: 200px;
-      }
-
-      .social {
-        margin-bottom: 10px;
-        margin-left: 10%;
-        font-size: 3rem;
-        text-align: left;
-      }
-
-      .job, .header {
-        font-size: 3rem;
-      }
-
-      .separator {
-        padding-bottom: 4rem;
-      }
-
-      .hosted-by, .raided-by, .bigHeader, .aggregated-by {
-        font-size: 6rem;
-      }
-
-      .top-clips {
-        font-size: 6rem;
-        margin-bottom: 150px;
-      }
-
-      .message, .smallText {
-        font-size: 2.5rem;
-        margin-bottom: 50px;
-      }
-
-      .last-message, .last-submessage {
-        margin-right: 5%;
-        margin-left: 5%;
-      }
-
-      .name, .host-name, .text {
-        font-size: 4rem;
-        width: 100%;
-        display: inline-block;
-      }
-
-      .host-name {
-        margin-bottom: 5px;
-        margin-top: 5px;
-      }
-
-      .hosted-column, .raided-column, .aggregated-column {
-        column-count: 2;
-      }
-
-      .aggregated-column, .aggregated-by {
-        padding-top: 50px;
-      }
-
-      .aggregated-column {
-        padding-bottom: 100px;
-      }
-    </style>
     </head>
     <body>
       <div id='wrapper'>
@@ -618,92 +499,6 @@ export default {
             $('.raided-by').remove()
             $('.raided-column').remove()
           }
-
-          $('#stream-by').text(`${_.get(custom, 'stream-by', 'stream by')}`)
-
-          // window height
-          let wHeight = $(document).height()
-
-          if (clips.list.length > 0) {
-            $('#clips').append(`
-              <div class="half-end"></div>
-              <div class='top-clips'>${_.get(custom, 'top-clips', 'top clips')}</div>
-            `)
-          }
-
-          let i = 0
-          for (let clip of clips.list) {
-            i++
-            $('#clips').append(`
-              <div class="clip-title" style="text-align:${i % 2 === 0 ? 'right' : 'left'}" data-id="${clip.tracking_id}">
-                <div style="position:absolute; opacity: 0.5; font-weight: bold; margin-top: -5px; font-size: 10rem; ${i % 2 === 0 ? 'left: 15%;' : 'right: 15%;'}">${i}</div>
-                <div class='name' style="padding-${i % 2 === 0 ? 'left' : 'right'}: 22%">${clip.title}</div>
-                <div class='name' style="padding-${i % 2 === 0 ? 'left' : 'right'}: 22%"><strong>${clip.game}</strong></div>
-                <div class="name" style="padding-${i % 2 === 0 ? 'left' : 'right'}: 22%">${_.get(custom, 'clipped-by', 'clipped by')} ${clip.curator.display_name}</div>
-              </div>
-              <div class="clip" style="height: ${wHeight}px" data-duration="${clip.duration}" data-mp4="${clip.mp4}" data-thumbnail="${clip.thumbnails.medium}">
-                <img src="${clip.thumbnails.medium}" data-id="${clip.tracking_id}"></img>
-              </div>`)
-          }
-
-
-          // set windows height for end (to be on "separate" page)
-          $('.end').css('height', `${wHeight}px`)
-          $('.half-end').css('height', `${wHeight/2}px`)
-
-          // get height of wrapper
-          let height = $('#wrapper').innerHeight()
-          let delay = 0 //10 * 1000 // 10s delay
-
-          // set css of wrapper
-          $('#wrapper')
-            .css('left', 0)
-            .css('top', `${wHeight}px`)
-
-          // roll after delay
-          setTimeout(() => {
-            $('#wrapper').velocity({ top: (wHeight - height) + 'px' }, "linear", (wHeight + height) * speed)
-          }, delay)
-
-          let elements = $('#wrapper *')
-          //remove end from elements
-
-          if (clips.list.length > 0 && clips.play) {
-            // check for clips
-            let clips = $('.clip')
-            let clipsBackup = _.clone(clips)
-            let triggerHeight = wHeight / 4.5
-
-            setInterval(() => {
-              for (let i in clips) {
-                try {
-                  if (!clips.hasOwnProperty(i) || i === 'length' || i === 'prevObject') continue
-                  if ($(clips[i]).offset().top <= triggerHeight) {
-                    $('#wrapper').velocity("pause")
-                    $(clips[i]).empty()
-
-                    $(clips[i]).append(`
-                    <video id="player" playsinline autoplay>
-                      <source src="${$(clips[i]).data('mp4')}" type="video/mp4">
-                    </video>
-                    `)
-                    setTimeout(() => {
-                      $(clipsBackup[i]).empty()
-                      $(clipsBackup[i]).append(`<img src="${$(clipsBackup[i]).data('thumbnail')}"></img>`)
-                      $('#wrapper').velocity("resume")
-                    }, ($(clipsBackup[i]).data('duration') + 1) * 1000)
-                    delete clips[i]
-                  }
-                } catch (e) {
-                  console.debug(e)
-                  console.debug(clips[i])
-                  continue
-                }
-              }
-            }, 100)
-          }
-        })
-      })
     </script>
     </body>
   </html>

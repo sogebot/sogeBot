@@ -1,5 +1,6 @@
 const _ = require('lodash')
 const axios = require('axios')
+const querystring = require('querystring')
 const moment = require('moment')
 const cluster = require('cluster')
 const stacktrace = require('stacktrace-parser')
@@ -1296,18 +1297,23 @@ class API {
   async getTopClips (opts) {
     let url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + global.oauth.channelId
     const token = global.oauth.settings.bot.accessToken
-    // TODO
     let period = {}
     try {
       if (token === '') throw Error('No broadcaster access token')
       if (typeof opts === 'undefined' || !opts) throw Error('Missing opts')
-      if (!['stream', 'day', 'week', 'month', 'all'].includes(opts.period)) throw Error('Invalid period defined')
-      else {
+
+      if (opts.period) {
         if (opts.period === 'stream') {
-          period = {
-            started_at: (new Date()).toISOString(),
-            ended_at: (await global.cache.when()).online
-          }
+          url += '&' + querystring.stringify({
+            started_at: (new Date(this.streamStartedAt)).toISOString(),
+            ended_at: (new Date()).toISOString()
+          })
+        } else {
+          if (!opts.days || opts.days < 0) throw Error('Days cannot be < 0')
+          url += '&' + querystring.stringify({
+            started_at: (new Date((new Date()).setDate(-opts.days))).toISOString(),
+            ended_at: (new Date()).toISOString()
+          })
         }
       }
       if (opts.first) url += '&first=' + opts.first
@@ -1331,7 +1337,6 @@ class API {
         c.mp4 = c.thumbnail_url.replace('-preview-480x272.jpg', '.mp4')
         c.game = await this.getGameFromId(c.game_id)
       }
-
       return request.data.data
     } catch (e) {
       global.log.error(`API: ${url} - ${e.stack}`)
