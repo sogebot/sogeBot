@@ -14,7 +14,7 @@ current: {{ current }}
       <video class="video" v-if="el.type === 'video'" playsinline ref="video" :key="el.clip">
         <source :src="el.clip" type="video/mp4">
       </video>
-      <div v-else :class="el.class" :key="index">{{ el.text }}</div>
+      <div v-else :class="el.class" :key="index" v-html="el.text"></div>
     </template>
   </div>
 </div>
@@ -71,6 +71,33 @@ export default {
       ])
 
       // TBD events
+      for (let [key, object] of Object.entries(_.groupBy(opts.events, 'event'))) {
+        let page = [{
+          text: key,
+          class: "header1"
+        }]
+
+        console.log(object)
+
+        for (let o of object) {
+          let html = o.username
+          if (key === 'cheer') {
+            html = `<strong></strong> <br> ${o.username}`
+          }
+          page.push({
+            html,
+            class: "text4 column"
+          })
+        }
+        for (let i = 0; i < object.length % 3; i++) {
+          page.push({
+            html: '',
+            class: "text4 column"
+          })
+        }
+
+        this.pages.push(page)
+      }
 
       // last pages are clips
       for (let i = 0, length = opts.clips.length; i < length; i++) {
@@ -226,6 +253,31 @@ export default {
 
   .title {
     font-size: 2.5vw
+  }
+
+  .column {
+    display: inline-block;
+    width: 33%;
+  }
+
+  .text4 {
+    padding-top: 2vw;
+    font-size: 2vw;
+  }
+
+  .text3 {
+    padding-top: 2vw;
+    font-size: 2.5vw;
+  }
+
+  .text2 {
+    padding-top: 2vw;
+    font-size: 3vw;
+  }
+
+  .text1 {
+    padding-top: 2vw;
+    font-size: 3.5vw;
   }
 
   .header3 {

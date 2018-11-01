@@ -1,6 +1,8 @@
 // @flow
 'use strict'
 
+const _ = require('lodash')
+
 const Overlay = require('./_interface')
 
 class Credits extends Overlay {
@@ -9,8 +11,19 @@ class Credits extends Overlay {
       credits: {
         speed: 'medium'
       },
+      show: {
+        followers: true,
+        hosts: true,
+        raids: true,
+        subscribers: true,
+        subgifts: true,
+        subcommunitygifts: true,
+        resubs: true,
+        cheers: true,
+        clips: true,
+        tips: true
+      },
       clips: {
-        enabled: true,
         period: 'custom',
         customPeriodInDays: 31,
         numOfClips: 3,
@@ -50,6 +63,24 @@ class Credits extends Overlay {
   sockets () {
     global.panel.io.of('/overlays/credits').on('connection', (socket) => {
       socket.on('load', async (cb) => {
+        const when = await global.cache.when()
+
+        if (typeof when.online === 'undefined' || when.online === null) when.online = _.now() - 5000000000 // 5000000
+        console.log(when.online)
+        let timestamp = new Date(when.online).getTime()
+        let events = await global.db.engine.find('widgetsEventList')
+
+        // change tips if neccessary for aggregated events (need same currency)
+        events = events.filter((o) => o.timestamp >= timestamp)
+        for (let event of events) {
+          if (!_.isNil(event.amount) && !_.isNil(event.currency)) {
+            event.amount = await global.configuration.getValue('creditsAggregate')
+              ? global.currency.exchange(event.amount, event.currency, await global.configuration.getValue('currency'))
+              : event.amount
+            event.currency = global.currency.symbol(await global.configuration.getValue('creditsAggregate') ? await global.configuration.getValue('currency') : event.currency)
+          }
+        }
+
         cb(null, {
           settings: {
             clips: {
@@ -61,7 +92,8 @@ class Credits extends Overlay {
           streamer: global.oauth.settings.broadcaster.username,
           game: await global.db.engine.findOne('api.current', { key: 'game' }),
           title: await global.db.engine.findOne('api.current', { key: 'title' }),
-          clips: this.settings.clips.enabled ? await global.api.getTopClips({ period: this.settings.clips.period, days: this.settings.clips.customPeriodInDays, first: this.settings.clips.numOfClips }) : []
+          clips: this.settings.show.clips ? await global.api.getTopClips({ period: this.settings.clips.period, days: this.settings.clips.customPeriodInDays, first: this.settings.clips.numOfClips }) : [],
+          events: events.filter((o) => o.timestamp >= timestamp)
         })
       })
     })
