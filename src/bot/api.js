@@ -1297,7 +1297,6 @@ class API {
   async getTopClips (opts) {
     let url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + global.oauth.channelId
     const token = global.oauth.settings.bot.accessToken
-    let period = {}
     try {
       if (token === '') throw Error('No broadcaster access token')
       if (typeof opts === 'undefined' || !opts) throw Error('Missing opts')
