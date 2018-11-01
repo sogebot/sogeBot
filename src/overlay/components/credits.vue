@@ -1,6 +1,7 @@
 <template>
 <div>
   <pre class="debug" v-if="urlParam('debug')">
+<button @click="stopAnimation">Stop Animation</button>
 settings: {{ settings }}
 currentPage: {{ currentPage }}
 clipsPages: {{ clipsPages }}
@@ -71,33 +72,39 @@ export default {
       ])
 
       // TBD events
+      let currentKey = ''
+      let page = []
       for (let [key, object] of Object.entries(_.groupBy(opts.events, 'event'))) {
-        let page = [{
-          text: key,
-          class: "header1"
-        }]
-
-        console.log(object)
+        if (key !== currentKey) {
+          currentKey = key
+          page.push({
+            text: key,
+            class: "header1"
+          })
+        }
 
         for (let o of object) {
           let html = o.username
           if (key === 'cheer') {
-            html = `<strong></strong> <br> ${o.username}`
+            html = `<strong style="font-size:65%">${o.bits} bits</strong> <br> ${o.username}`
+          } else if (['raid', 'host'].includes(key)) {
+            html = `<strong style="font-size:65%">${o.viewers} viewers</strong> <br> ${o.username}`
+          } else if (['resub'].includes(key)) {
+            html = `<strong style="font-size:65%">${o.months} months</strong> <br> ${o.username}`
           }
           page.push({
-            html,
+            text: html,
             class: "text4 column"
           })
         }
-        for (let i = 0; i < object.length % 3; i++) {
+        for (let i = 0; i < 3 - (object.length % 3); i++) {
           page.push({
-            html: '',
+            text: '',
             class: "text4 column"
           })
         }
-
-        this.pages.push(page)
       }
+      this.pages.push(page)
 
       // last pages are clips
       for (let i = 0, length = opts.clips.length; i < length; i++) {
@@ -140,9 +147,11 @@ export default {
   watch: {
     isEnded: function (val) {
       if (val) {
-        if (this.current) {
+        if (this.pages[this.currentPage + 1]) {
+          this.$refs.page.style.top = window.innerHeight + 'px'
           this.isEnded = false
           this.isPlaying = false
+          this.currentPage++
         }
       }
     },
@@ -150,37 +159,49 @@ export default {
       setInterval(() => {
         if (!this.isPlaying) {
           if (this.$refs.page.clientHeight === 0) return
-
-          this.isPlaying = true
           this.$refs.page.style.top = window.innerHeight + 'px'
 
+          this.$nextTick(() => { // force next tick
+            this.isPlaying = true
+            // normal linear if non clips
+            if (!this.clipsPages.includes(this.currentPage)) {
+              const duration = (window.innerHeight + this.$refs.page.clientHeight + 100) * this.settings.speed
+              TweenLite.to(this.$refs.page, duration / 1000, {
+                top: -(this.$refs.page.clientHeight + 100),
+                ease: Power0.easeNone,
+                onComplete: () => {
+                  this.$refs.page.style.top != window.innerHeight + 'px'
 
-          // normal linear if non clips
-          if (!this.clipsPages.includes(this.currentPage)) {
-            const duration = (window.innerHeight + this.$refs.page.clientHeight + 100) * this.settings.speed
-            TweenLite.to(this.$refs.page, duration / 1000, {
-              top: -(this.$refs.page.clientHeight + 100),
-              ease: Power0.easeNone,
-              onComplete: () => {
-                this.isEnded = true
-                this.currentPage++
-              }
-            })
-          } else {
-            // clip page
-            const duration1 = window.innerHeight * this.settings.speed
-            const duration2 = (this.$refs.page.clientHeight + 100) * this.settings.speed
-            TweenLite.to(this.$refs.page, duration1 / 1000, {
-              top: 0,
-              ease: Power0.easeNone,
-              onComplete: () => {
-                // play clip
-                const video = this.$refs.video[0]
-                video.volume = this.settings.clips.volume / 100
+                  this.$nextTick(() => {
+                    this.isEnded = true
+                  })
+                }
+              })
+            } else {
+              // clip page
+              const duration1 = window.innerHeight * this.settings.speed
+              const duration2 = (this.$refs.page.clientHeight + 100) * this.settings.speed
+              TweenLite.to(this.$refs.page, duration1 / 1000, {
+                top: 0,
+                ease: Power0.easeNone,
+                onComplete: () => {
+                  // play clip
+                  const video = this.$refs.video[0]
+                  video.volume = this.settings.clips.volume / 100
 
-                if (this.settings.clips.shouldPlay) {
-                  video.play()
-                  video.onended = () => {
+                  if (this.settings.clips.shouldPlay) {
+                    video.play()
+                    video.onended = () => {
+                      TweenLite.to(this.$refs.page, duration2 / 1000, {
+                        top: -(this.$refs.page.clientHeight + 100),
+                        ease: Power0.easeNone,
+                        onComplete: () => {
+                          this.isEnded = true
+                          this.currentPage++
+                        }
+                      })
+                    }
+                  } else {
                     TweenLite.to(this.$refs.page, duration2 / 1000, {
                       top: -(this.$refs.page.clientHeight + 100),
                       ease: Power0.easeNone,
@@ -190,24 +211,18 @@ export default {
                       }
                     })
                   }
-                } else {
-                  TweenLite.to(this.$refs.page, duration2 / 1000, {
-                    top: -(this.$refs.page.clientHeight + 100),
-                    ease: Power0.easeNone,
-                    onComplete: () => {
-                      this.isEnded = true
-                      this.currentPage++
-                    }
-                  })
                 }
-              }
-            })
-          }
+              })
+            }
+          })
         }
       }, 10)
     }
   },
   methods: {
+    stopAnimation: function () {
+      TweenMax.killAll()
+    },
     urlParam: function (name) {
       var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
       if (results == null) {
