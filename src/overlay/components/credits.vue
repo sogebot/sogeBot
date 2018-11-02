@@ -22,7 +22,7 @@ current: {{ current }}
 </template>
 
 <script>
-import { TweenLite, Power0 } from 'gsap/TweenMax'
+import { TweenLite, Power0, Sine } from 'gsap/TweenMax'
 
 export default {
   props: ['token'],
@@ -104,7 +104,7 @@ export default {
           })
         }
       }
-      this.pages.push(page)
+      if (page.length > 0) this.pages.push(page)
 
       // clips
       for (let i = 0, length = opts.clips.length; i < length; i++) {
@@ -164,7 +164,7 @@ export default {
             class: cl + ' column'
           })
         }
-        this.pages.push(page)
+        if (page.length > 0) this.pages.push(page)
       }
 
       // last page is lastMessage and lastSubMessage
@@ -212,7 +212,7 @@ export default {
               const duration = (window.innerHeight + (-endPos)) * this.settings.speed
               TweenLite.to(this.$refs.page, duration / 1000, {
                 top: endPos,
-                ease: Power0.easeNone,
+                ease: endPos === 0 ? Sine.easeOut : Power0.easeNone,
                 onComplete: () => {
                   this.isEnded = true
                 }
@@ -223,7 +223,7 @@ export default {
               const duration2 = (this.$refs.page.clientHeight + 100) * this.settings.speed
               TweenLite.to(this.$refs.page, duration1 / 1000, {
                 top: 0,
-                ease: Power0.easeNone,
+                ease: Sine.easeOut,
                 onComplete: () => {
                   // play clip
                   const video = this.$refs.video[0]
@@ -234,10 +234,9 @@ export default {
                     video.onended = () => {
                       TweenLite.to(this.$refs.page, duration2 / 1000, {
                         top: -(this.$refs.page.clientHeight + 100),
-                        ease: Power0.easeNone,
+                        ease: Sine.easeIn,
                         onComplete: () => {
                           this.isEnded = true
-                          this.currentPage++
                         }
                       })
                     }
@@ -247,7 +246,6 @@ export default {
                       ease: Power0.easeNone,
                       onComplete: () => {
                         this.isEnded = true
-                        this.currentPage++
                       }
                     })
                   }
