@@ -136,6 +136,37 @@ export default {
         ])
       }
 
+      // custom texts
+      if (opts.customTexts.length > 0) {
+        page = []
+        for (let ct of opts.customTexts) {
+          var cl = "header1"
+          if (ct.type === 'header') cl = "header2"
+          if (ct.type === 'text') cl = "text1"
+          if (ct.type === 'smallText') cl = "text2"
+          if (ct.type === 'separator') {
+            cl = "separator"
+            ct.left = ''
+            ct.right = ''
+            ct.middle = ''
+          }
+
+          page.push({
+            text: ct.left,
+            class: cl + ' column'
+          })
+          page.push({
+            text: ct.middle,
+            class: cl + ' column'
+          })
+          page.push({
+            text: ct.right,
+            class: cl + ' column'
+          })
+        }
+        this.pages.push(page)
+      }
+
       // last page is lastMessage and lastSubMessage
       this.pages.push([
         {
@@ -318,6 +349,10 @@ export default {
 
   .header1:first {
     padding-top: 0;
+  }
+
+  .separator {
+    padding-top: 10vw;
   }
 
   .header1 {

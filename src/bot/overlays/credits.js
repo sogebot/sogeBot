@@ -37,6 +37,9 @@ class Credits extends Overlay {
         subcommunitygift: 'Sub community gifts by',
         tips: 'Tips by'
       },
+      customTexts: {
+        values: []
+      },
       clips: {
         period: 'custom',
         customPeriodInDays: 31,
@@ -47,6 +50,11 @@ class Credits extends Overlay {
     }
 
     const ui = {
+      customTexts: {
+        values: {
+          type: 'custom-texts'
+        }
+      },
       credits: {
         speed: {
           type: 'selector',
@@ -133,7 +141,8 @@ class Credits extends Overlay {
           game: await global.db.engine.findOne('api.current', { key: 'game' }),
           title: await global.db.engine.findOne('api.current', { key: 'title' }),
           clips: this.settings.show.clips ? await global.api.getTopClips({ period: this.settings.clips.period, days: this.settings.clips.customPeriodInDays, first: this.settings.clips.numOfClips }) : [],
-          events: events.filter((o) => o.timestamp >= timestamp)
+          events: events.filter((o) => o.timestamp >= timestamp),
+          customTexts: this.settings.customTexts.values
         })
       })
     })
