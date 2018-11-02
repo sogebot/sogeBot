@@ -140,10 +140,10 @@ export default {
       if (opts.customTexts.length > 0) {
         page = []
         for (let ct of opts.customTexts) {
-          var cl = "header1"
-          if (ct.type === 'header') cl = "header2"
-          if (ct.type === 'text') cl = "text1"
-          if (ct.type === 'smallText') cl = "text2"
+          var cl = "header2"
+          if (ct.type === 'header') cl = "header3"
+          if (ct.type === 'text') cl = "text3"
+          if (ct.type === 'smallText') cl = "text4"
           if (ct.type === 'separator') {
             cl = "separator"
             ct.left = ''
