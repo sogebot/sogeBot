@@ -313,13 +313,17 @@ export default {
     padding: 1rem;
   }
 
+  svg {
+    filter: drop-shadow( -0px -0px .2rem #000 );
+  }
+
   div.page {
     font-family: 'Cabin Condensed', sans-serif;
     text-align: center;
     text-transform: uppercase;
     color: #fff;
-    filter: drop-shadow( -0px -0px .2rem #000 );
     position: relative;
+    text-shadow: 0 0 1rem #000;
     top: -9999px;
     margin: 5vh;
     text-align: center;
