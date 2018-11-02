@@ -15,6 +15,10 @@ current: {{ current }}
       <video class="video" v-if="el.type === 'video'" playsinline ref="video" :key="el.clip">
         <source :src="el.clip" type="video/mp4">
       </video>
+      <div v-if="el.type ==='with-icon'" :key="index" class="text4" style="text-align: left; padding-left:5vw; padding-top: 0;">
+        <font-awesome-icon :icon="['fab', el.class]" fixed-width />
+        {{el.text}}
+      </div>
       <div v-else :class="el.class" :key="index" v-html="el.text"></div>
     </template>
   </div>
@@ -24,8 +28,17 @@ current: {{ current }}
 <script>
 import { TweenLite, Power0, Sine } from 'gsap/TweenMax'
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faDeviantart, faDiscord, faFacebook, faGithub, faGoogle, faInstagram, faLinkedin, faPaypal, faPinterest, faPlaystation, faReddit, faSkype, faSnapchat, faSpotify, faSteam, faStrava, faTelegram, faTwitter, faVk, faWindows, faXbox, faYoutube } from '@fortawesome/free-brands-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+library.add(faDeviantart, faDiscord, faFacebook, faGithub, faGoogle, faInstagram, faLinkedin, faPaypal, faPinterest, faPlaystation, faReddit, faSkype, faSnapchat, faSpotify, faSteam, faStrava, faTelegram, faTwitter, faVk, faWindows, faXbox, faYoutube)
+
 export default {
   props: ['token'],
+  components: {
+    'font-awesome-icon': FontAwesomeIcon
+  },
   data: function () {
     return {
       socket: io('/overlays/credits', {
@@ -91,6 +104,8 @@ export default {
             html = `<strong style="font-size:65%">${o.viewers} viewers</strong> <br> ${o.username}`
           } else if (['resub'].includes(key)) {
             html = `<strong style="font-size:65%">${o.months} months</strong> <br> ${o.username}`
+          } else if (['tip'].includes(key)) {
+            html = `<strong style="font-size:65%">${Number(o.amount).toFixed(2)} ${o.currency}</strong> <br> ${o.username}`
           }
           page.push({
             text: html,
@@ -168,6 +183,15 @@ export default {
       }
 
       // last page is lastMessage and lastSubMessage
+      let social = []
+      for (let s of opts.social) {
+        social.push({
+          text: s.text,
+          type: 'with-icon',
+          class: s.type
+        })
+      }
+
       this.pages.push([
         {
           text: opts.settings.text.lastMessage,
@@ -175,7 +199,12 @@ export default {
         }, {
           text: opts.settings.text.lastSubMessage,
           class: "text2"
-        }
+        },
+        {
+          text: '',
+          class: "separator"
+        },
+        ...social
       ])
 
       this.isLoaded = true
@@ -289,7 +318,7 @@ export default {
     text-align: center;
     text-transform: uppercase;
     color: #fff;
-    text-shadow: 0 0 1rem #000;
+    filter: drop-shadow( -0px -0px .2rem #000 );
     position: relative;
     top: -9999px;
     margin: 5vh;
