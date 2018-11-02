@@ -23,6 +23,20 @@ class Credits extends Overlay {
         clips: true,
         tips: true
       },
+      text: {
+        lastMessage: 'Thanks for watching',
+        lastSubMessage: '~ see you on the next stream ~',
+        streamBy: 'Stream by',
+        follow: 'Followed by',
+        host: 'Hosted by',
+        raid: 'Raided by',
+        cheer: 'Cheered by',
+        sub: 'Subscribed by',
+        resub: 'Resubscribed by',
+        subgift: 'Subgitfs by',
+        subcommunitygift: 'Sub community gifts by',
+        tips: 'Tips by'
+      },
       clips: {
         period: 'custom',
         customPeriodInDays: 31,
@@ -66,7 +80,7 @@ class Credits extends Overlay {
         const when = await global.cache.when()
 
         if (typeof when.online === 'undefined' || when.online === null) when.online = _.now() - 5000000000 // 5000000
-        console.log(when.online)
+
         let timestamp = new Date(when.online).getTime()
         let events = await global.db.engine.find('widgetsEventList')
 
@@ -87,7 +101,33 @@ class Credits extends Overlay {
               shouldPlay: this.settings.clips.shouldPlay,
               volume: this.settings.clips.volume
             },
-            speed: this.settings.credits.speed
+            speed: this.settings.credits.speed,
+            text: {
+              lastMessage: this.settings.text.lastMessage,
+              lastSubMessage: this.settings.text.lastSubMessage,
+              streamBy: this.settings.text.streamBy,
+              follow: this.settings.text.follow,
+              host: this.settings.text.host,
+              raid: this.settings.text.raid,
+              cheer: this.settings.text.cheer,
+              sub: this.settings.text.sub,
+              resub: this.settings.text.resub,
+              subgift: this.settings.text.subgift,
+              subcommunitygift: this.settings.text.subcommunitygift,
+              tips: this.settings.text.tips
+            },
+            show: {
+              follow: this.settings.show.followers,
+              host: this.settings.show.hosts,
+              raid: this.settings.show.raids,
+              sub: this.settings.show.subscribers,
+              subgift: this.settings.show.subgifts,
+              subcommunitygift: this.settings.show.subcommunitygifts,
+              resub: this.settings.show.resubs,
+              cheer: this.settings.show.cheers,
+              clips: this.settings.show.clips,
+              tip: this.settings.show.tips
+            }
           },
           streamer: global.oauth.settings.broadcaster.username,
           game: await global.db.engine.findOne('api.current', { key: 'game' }),
