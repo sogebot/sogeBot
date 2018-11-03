@@ -139,7 +139,7 @@ class Module {
 
         if (this.onChange[key]) {
           for (let fnc of this.onChange[key]) {
-            global[fnc](key, value)
+            this[fnc](key, value)
           }
         }
         return true
