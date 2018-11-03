@@ -267,6 +267,7 @@
         },
         itemsFiltered: function () {
           return this.items.filter((o) => {
+            if (!o.username) o.username = ''
             const isSearchInUsername = this.search.length === 0 ? true : !_.isNil(o.username.match(new RegExp(_.escapeRegExp(this.search), 'ig')))
 
             let isActive = true
