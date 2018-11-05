@@ -120,6 +120,32 @@ let migration = {
     version: '8.1.0',
     do: async () => {
       let processed = 0
+      console.info('Moving gallery files to db')
+      for (let fname of fs.readdirSync('public/dist/gallery')) {
+        let data = Buffer.from(fs.readFileSync('public/dist/gallery/' + fname)).toString('base64')
+        let type = null
+
+        if (fname.endsWith('ogg')) type = 'audio/ogg'
+        if (fname.endsWith('mp3')) type = 'audio/mp3'
+        if (fname.endsWith('mp4')) type = 'video/mp4'
+        if (fname.endsWith('jpg')) type = 'image/jpg'
+        if (fname.endsWith('png')) type = 'image/png'
+        if (fname.endsWith('gif')) type = 'image/gif'
+
+        if (type) {
+          data = 'data:' + type + ';base64,' + data
+          await global.db.engine.insert('overlays.gallery', { type, data })
+        }
+
+        fs.unlinkSync('public/dist/gallery/' + fname)
+        processed++
+      }
+      console.info(` => ${processed} processed`)
+    }
+  }, {
+    version: '8.1.0',
+    do: async () => {
+      let processed = 0
       console.info('Updating settings db format')
       if (config.database.type === 'nedb') {
         for (let f of fs.readdirSync('db/nedb')) {
