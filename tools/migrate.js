@@ -120,6 +120,73 @@ let migration = {
     version: '8.1.0',
     do: async () => {
       let processed = 0
+
+      const mappings = {
+        'creditsAggregate': null,
+        'creditsHosts': 'overlays.credits.settings.show.hosts',
+        'creditsRaids': 'overlays.credits.settings.show.raids',
+        'creditsSubscribers': 'overlays.credits.settings.show.subscribers',
+        'creditsSubgifts': 'overlays.credits.settings.show.subgifts',
+        'creditsSubcommunitygifts': 'overlays.credits.settings.show.subcommunitygifts',
+        'creditsResubs': 'overlays.credits.settings.show.resubs',
+        'creditsCheers': 'overlays.credits.settings.show.cheers',
+        'creditsClips': 'overlays.credits.settings.show.clips',
+        'creditsTips': 'overlays.credits.settings.show.tips',
+        'creditsSpeed': null,
+        'creditsMaxFontSize': null,
+        'creditsLastMessage': 'overlays.credits.settings.text.lastMessage',
+        'creditsLastSubMessage': 'overlays.credits.settings.text.lastSubMessage',
+        'creditsStreamBy': 'overlays.credits.settings.text.streamBy',
+        'creditsFollowedBy': 'overlays.credits.settings.text.follow',
+        'creditsHostedBy': 'overlays.credits.settings.text.host',
+        'creditsRaidedBy': 'overlays.credits.settings.text.raid',
+        'creditsCheerBy': 'overlays.credits.settings.text.cheer',
+        'creditsSubscribedBy': 'overlays.credits.settings.text.sub',
+        'creditsResubscribedBy': 'overlays.credits.settings.text.resub',
+        'creditsSubgiftBy': 'overlays.credits.settings.text.subgift',
+        'creditsSubcommunitygiftBy': 'overlays.credits.settings.text.subcommunitygift',
+        'creditsClippedBy': null,
+        'creditsTipsBy': 'overlays.credits.settings.text.tip',
+        'creditsTopClipsPeriod': null,
+        'creditsTopClipsPlay': 'overlays.credits.settings.clips.shouldPlay',
+        'creditsTopClipsCount': 'overlays.credits.settings.clips.numOfClips',
+
+        'OEmotesSize': 'overlays.emotes.settings.emotes.size',
+        'OEmotesMax': 'overlays.emotes.settings.emotes.maxEmotesPerMessage',
+        'OEmotesAnimation': 'overlays.emotes.settings.emotes.animation',
+        'OEmotesAnimationTime': 'overlays.emotes.settings.emotes.animationTime'
+      }
+
+      console.info('Updating overlays settings')
+      console.info(' -> entries')
+      for (let [o, n] of Object.entries(mappings)) {
+        if (n !== null) {
+          let item = await global.db.engine.findOne('settings', { key: o })
+          if (!_.isEmpty(item)) {
+            let regexp = XRegExp(`
+              (?<collection> [a-zA-Z]*.[a-zA-Z]*.settings)
+              .
+              (?<category> [a-zA-Z]*)
+              ?.
+              ?(?<key> [a-zA-Z]*)`, 'ix')
+            const match = XRegExp.exec(n, regexp)
+            if (match.key.trim().length === 0) match.key = undefined
+            if (!_.isNil(item.value)) {
+              await global.db.engine.insert(match.collection, { category: match.category, key: match.key, isMultiValue: false, value: item.value })
+              processed++
+            } else {
+              console.warn(`Settings ${match.category} ${match.key} is missing value`)
+            }
+          }
+          await global.db.engine.remove('settings', { key: o })
+        }
+      }
+      console.info(` => ${processed} processed`)
+    }
+  }, {
+    version: '8.1.0',
+    do: async () => {
+      let processed = 0
       console.info('Moving gallery files to db')
       for (let fname of fs.readdirSync('public/dist/gallery')) {
         let data = Buffer.from(fs.readFileSync('public/dist/gallery/' + fname)).toString('base64')
