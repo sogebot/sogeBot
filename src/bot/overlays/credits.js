@@ -66,15 +66,13 @@ class Credits extends Overlay {
       credits: {
         speed: {
           type: 'selector',
-          values: ['very slow', 'slow', 'medium', 'fast', 'very fast'],
-          title: 'filter.select'
+          values: ['very slow', 'slow', 'medium', 'fast', 'very fast']
         }
       },
       clips: {
         period: {
           type: 'selector',
-          values: ['stream', 'custom'],
-          title: 'filter.select'
+          values: ['stream', 'custom']
         }
       },
       links: {

@@ -47,7 +47,7 @@
                     :value="currentValue"
                     :values="ui[category][defaultValue].values"
                     @update="value[defaultValue] = $event.value; triggerDataChange()"
-                    :title="defaultValue"
+                    :title="'systems.' + selected + '.settings.' + defaultValue"
                     :current="value[ui[category][defaultValue].current]"
                     class="pt-1 pb-1"></component>
                 </template>

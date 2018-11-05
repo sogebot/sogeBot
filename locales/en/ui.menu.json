@@ -42,5 +42,13 @@
   "heist": "Heist",
   "oauth": "OAuth",
   "textoverlay": "Text overlay",
-  "carouseloverlay": "Carousel overlay"
+  "carouseloverlay": "Carousel overlay",
+  "alerts": "Alerts",
+  "carousel": "Image carousel",
+  "clips": "Clips",
+  "credits": "Credits",
+  "emotes": "Emotes",
+  "eventlist": "Eventlist",
+  "stats": "Stats",
+  "text": "Text"
 }

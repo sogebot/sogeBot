@@ -61,19 +61,19 @@ class Emotes extends Overlay {
         explosion: {
           type: 'test',
           test: 'explosion',
-          text: 'test.emoteExplosion',
+          text: 'systems.emotes.settings.test.emoteExplosion',
           class: 'btn btn-secondary btn-block'
         },
         emote: {
           type: 'test',
           test: 'emote',
-          text: 'test.emote',
+          text: 'systems.emotes.settings.test.emote',
           class: 'btn btn-secondary btn-block'
         },
         firework: {
           type: 'test',
           test: 'fireworks',
-          text: 'test.emoteFirework',
+          text: 'systems.emotes.settings.test.emoteFirework',
           class: 'btn btn-secondary btn-block'
         }
       },
@@ -90,16 +90,14 @@ class Emotes extends Overlay {
         cache: {
           type: 'removecache',
           explosion: false,
-          text: 'remove.cache',
+          text: 'systems.emotes.settings.removecache',
           class: 'btn btn-danger btn-block'
         },
         animation: {
-          title: 'animation.select',
           type: 'selector',
           values: ['fadeup', 'fadezoom', 'facebook']
         },
         size: {
-          title: 'animation.size',
           type: 'selector',
           values: ['1', '2', '3']
         }

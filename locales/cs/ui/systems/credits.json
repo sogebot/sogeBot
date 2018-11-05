@@ -1,0 +1,32 @@
+{
+  "settings": {
+    "speed": "Rychlost titulek",
+    "followers": "Zobrazit followery",
+    "hosts": "Zobrazit hosty",
+    "raids": "Zobrazit raidy",
+    "subscribers": "Zobrazit subscribery",
+    "subgifts": "Zobrazit darované suby",
+    "subcommunitygifts": "Zobrazit suby darované komunitě",
+    "resubs": "Zobrazit resuby",
+    "cheers": "Zobrazit cheery",
+    "clips": "Zobrazit klipy",
+    "tips": "Zobrazit tipy",
+    "lastMessage": "Poslední zpráva",
+    "lastSubMessage": "Poslední podzpráva",
+    "streamBy": "Streamoval",
+    "follow": "Follow od",
+    "host": "Hostování",
+    "raid": "Raidování",
+    "cheer": "Cheer od",
+    "sub": "Subscribe od",
+    "resub": "Resub od",
+    "subgift": "Darovaný sub",
+    "subcommunitygift": "Sub darovaný komunitě",
+    "tip": "Tip od",
+    "period": "Časové období",
+    "customPeriodInDays": "Vlastní časové období (dny)",
+    "numOfClips": "Počet klipů",
+    "shouldPlay": "Bude klipy přehrávány",
+    "volume": "Hlasitost"
+  }
+}

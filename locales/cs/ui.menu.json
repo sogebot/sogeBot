@@ -42,5 +42,13 @@
   "heist": "Heist",
   "oauth": "OAuth",
   "textoverlay": "Text overlay",
-  "carouseloverlay": "Carousel overlay"
+  "carouseloverlay": "Carousel overlay",
+  "alerts": "Alerty",
+  "carousel": "Promítačka obrázků",
+  "clips": "Klipy",
+  "credits": "Závěrečné titulky",
+  "emotes": "Emotikony",
+  "eventlist": "Eventlist",
+  "stats": "Statistiky",
+  "text": "Text"
 }

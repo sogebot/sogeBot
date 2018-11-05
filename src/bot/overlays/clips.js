@@ -17,8 +17,7 @@ class Clips extends Overlay {
       clips: {
         filter: {
           type: 'selector',
-          values: ['none', 'grayscale', 'sepia', 'tint', 'washed'],
-          title: 'filter.select'
+          values: ['none', 'grayscale', 'sepia', 'tint', 'washed']
         }
       },
       links: {
