@@ -47,7 +47,7 @@ export default {
   },
   computed: {
     parted: function () {
-      const list = _(this.list.filter(o => o.type === 'part').sort(o => new Date(o.createdAt).getTime())).chunk(30).value()[0]
+      let list = _(this.list.filter(o => o.type === 'part').sort(o => -(new Date(o.createdAt).getTime()))).chunk(30).value()[0]
       return list ? list.map(o => o.username).join(', ') : ''
     }
   },
