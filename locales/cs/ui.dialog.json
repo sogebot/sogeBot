@@ -4,6 +4,7 @@
     "add": "Přidat"
   },
   "buttons": {
+    "reorder": "Uspořádat",
     "upload": {
       "idle": "Nahrát",
       "progress": "Nahrávání",

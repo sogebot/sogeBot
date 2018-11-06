@@ -5,5 +5,8 @@
   "moveDown": "move down",
   "stop-if-executed": "stop, if executed",
   "continue-if-executed": "continue, if executed",
-  "generate": "Generate"
+  "generate": "Generate",
+  "thumbnail": "Thumbnail",
+  "yes": "Yes",
+  "no": "No"
 }
