@@ -20,7 +20,8 @@ const dropFiles = [
   'songrequests.db', 'system.alias.db', 'system.alias.settings.db',
   'system.bets.db', 'system.bets.settings.db', 'system.bets.users.db',
   'system.commercial.settings.db', 'system.cooldown.db', 'system.cooldown.settings.db',
-  'users_ignorelist.db'
+  'users_ignorelist.db', 'overlay.credits.socials.db', 'overlay.credits.customTexts.db',
+  'overlay.carousel.db'
 ]
 
 if (process.argv[2] && process.argv[2] === '--delete') {
@@ -117,6 +118,32 @@ let migration = {
     }
   }],
   settings: [{
+    version: '8.1.0',
+    do: async () => {
+      console.info('Updating overlays credits settings')
+
+      console.info(' => customTexts')
+      let customTexts =
+        (await global.db.engine.find('overlay.credits.customTexts'))
+          .map(o => {
+            o.left = o.text.left
+            o.middle = o.text.middle
+            o.right = o.text.right
+            delete o._id;
+            return o
+          })
+      await global.db.engine.update('overlays.credits.settings', { key: 'customTexts.values' }, { key: 'customTexts.values', value: customTexts })
+
+      console.info(' => socials')
+      let socials =
+        (await global.db.engine.find('overlay.credits.socials'))
+          .map(o => {
+            delete o._id; return o
+          })
+      await global.db.engine.update('overlays.credits.settings', { key: 'social.values' }, { key: 'social.values', value: socials })
+      console.info(' => DONE')
+    }
+  }, {
     version: '8.1.0',
     do: async () => {
       let processed = 0
