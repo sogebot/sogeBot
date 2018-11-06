@@ -21,7 +21,7 @@ const dropFiles = [
   'system.bets', 'system.bets.settings', 'system.bets.users',
   'system.commercial.settings', 'system.cooldown', 'system.cooldown.settings',
   'users_ignorelist', 'overlay.credits.socials', 'overlay.credits.customTexts',
-  'overlay.carousel'
+  'overlay.carousel', 'bannedsong', 'highlights', 'notices'
 ]
 
 // db
