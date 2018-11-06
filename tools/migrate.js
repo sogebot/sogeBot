@@ -197,7 +197,7 @@ let migration = {
         'creditsTopClipsPlay': 'overlays.credits.settings.clips.shouldPlay',
         'creditsTopClipsCount': 'overlays.credits.settings.clips.numOfClips',
 
-        'OEmotesSize': 'overlays.emotes.settings.emotes.size',
+        'OEmotesSize': null,
         'OEmotesMax': 'overlays.emotes.settings.emotes.maxEmotesPerMessage',
         'OEmotesAnimation': 'overlays.emotes.settings.emotes.animation',
         'OEmotesAnimationTime': 'overlays.emotes.settings.emotes.animationTime'
