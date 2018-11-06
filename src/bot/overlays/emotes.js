@@ -133,7 +133,6 @@ class Emotes extends Overlay {
   async fetchEmotes () {
     const cid = global.oauth.channelId
     const channel = global.oauth.currentChannel
-    if (!cid) return
 
     // we want to update once every week
     if (Date.now() - this.settings._.lastGlobalEmoteChk > 1000 * 60 * 60 * 24 * 7) {
@@ -160,7 +159,7 @@ class Emotes extends Overlay {
       }
     }
 
-    if (Date.now() - this.settings._.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.settings._.lastChannelChk !== cid) {
+    if (cid && (Date.now() - this.settings._.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.settings._.lastChannelChk !== cid)) {
       this.settings._.lastSubscriberEmoteChk = Date.now()
       this.settings._.lastChannelChk = cid
       try {
@@ -191,7 +190,7 @@ class Emotes extends Overlay {
     }
 
     // fetch FFZ emotes
-    if (Date.now() - this.settings._.lastFFZEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+    if (cid && Date.now() - this.settings._.lastFFZEmoteChk > 1000 * 60 * 60 * 24 * 7) {
       this.settings._.lastFFZEmoteChk = Date.now()
       try {
         const request = await axios.get('https://api.frankerfacez.com/v1/room/id/' + cid)
@@ -217,7 +216,7 @@ class Emotes extends Overlay {
     }
 
     // fetch BTTV emotes
-    if (Date.now() - this.settings._.lastBTTVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+    if (channel && Date.now() - this.settings._.lastBTTVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
       this.settings._.lastBTTVEmoteChk = Date.now()
       try {
         const request = await axios.get('https://api.betterttv.net/2/channels/' + channel)
