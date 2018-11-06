@@ -1,0 +1,164 @@
+<span id="text-overlay-edit">
+  <template v-if="!states.load">
+    <div class="alert alert-info" style="text-transform: uppercase; font-size: 0.8rem;"><i class="fas fa-circle-notch fa-spin"></i> Loading data from server</div>
+  </template>
+  <template v-else>
+    <span class="title text-default" style="padding: 0 !important;">
+      <a class="btn btn-outline-info" style="border: 0 !important;" href="/#registry/textOverlay/list"><i class="fas fa-chevron-circle-left"></i></a>
+      <span style="position: relative; top: 2px;">
+        <template v-if="id">{{ commons.translate('dialog.title.edit') }}</template>
+        <template v-else>{{ commons.translate('dialog.title.add') }}</template>
+        {{ commons.translate('registry.textoverlay.title') }}
+      </span>
+      <span style="position: relative; top: 2px;">{{ name }}</span>
+    </span>
+
+    <div class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
+      <div class="col text-danger" v-if="id">
+        <button type="button" class="btn" :class="[states.delete ? 'btn-danger' : 'btn-outline-danger border-light']" @click="states.delete = !states.delete; pending = true">
+          <i v-if="states.delete" class="far fa-check-square pr-1 fa-fw"></i>
+          <i v-else class="far fa-square pr-1 fa-fw"></i>
+          Mark to delete
+        </button>
+      </div>
+      <div class="col text-right form-inline d-block">
+          <span v-if="pending" style="cursor: auto;" class="alert-danger btn m-0">{{commons.translate('dialog.changesPending')}}</span>
+          <button v-if="states.save === 0" type="button" class="btn btn-primary" v-on:click="save()">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
+          <button v-if="states.save === 1" disabled="disabled" type="button" class="btn btn-primary"><i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
+          <button v-if="states.save === 2" disabled="disabled" type="button" class="btn btn-success"><i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</button>
+          <button v-if="states.save === 3" disabled="disabled" type="button" class="btn btn-danger"><i class="fas fa-exclamation"></i> {{ commons.translate('dialog.buttons.something-went-wrong') }}</button>
+      </div>
+    </div>
+
+    <div class="pt-3">
+      <!-- Editation stuff here -->
+      <form>
+        <div class="form-row pl-2 pr-2">
+          <div class="form-group col">
+            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('name') }}</label>
+            <input v-bind:class="{ 'is-invalid': hasError.name }" v-model="name" type="text" class="form-control" v-bind:placeholder="commons.translate('registry.textoverlay.name.placeholder')">
+            <div class="invalid-feedback">{{ commons.translate('registry.textoverlay.name.error.isEmpty') }}</div>
+          </div>
+        </div>
+        <div class="form-row pl-2 pr-2">
+          <div class="form-group col">
+            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('text') }}</label>
+            <div id="text_overlay-textarea" class="border"></div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </template>
+</span>
+
+<script>
+  Vue.prototype.commons = commons
+
+  function textOverlayInit () {
+    if (_.size(translations) === 0 || _.isNil(configuration)) return setTimeout(() => textOverlayInit(), 1)
+
+    Vue.prototype.configuration = configuration
+
+    var textOverlay = new Vue({
+      el: '#text-overlay-edit',
+      components: {
+        'textarea-with-tags': textAreaWithTags,
+      },
+      data: {
+        id: null,
+        name: '',
+        text: '',
+
+        textInput: null,
+
+        pending: false,
+
+        socket: io('/overlays/text', { query: "token=" + token }),
+
+        states: {
+          load: false,
+          save: 0,
+          delete: false,
+        },
+        hasError: {
+          name: false
+        }
+      },
+      methods: {
+        initializeTextArea: function () {
+          const textarea = document.getElementById('text_overlay-textarea')
+          if (_.isNil(textarea)) return setTimeout(() => this.initializeTextArea(), 1)
+
+          this.textInput = CodeMirror(textarea, {
+            value: this.text ? this.text : "<!-- you can also use html here, global filters and custom variables are also available -->",
+            mode:  "htmlmixed",
+            lineNumbers: true,
+            matchBrackets: true,
+            lint: {
+              esversion: 6
+            },
+            gutters: ["CodeMirror-lint-markers"]
+          })
+        },
+        save: function () {
+          if (this.validate()) {
+            this.states.save = 1
+            const data = {
+              _id: this.id,
+              name: this.name,
+              text: this.textInput.getValue()
+            }
+            if (!this.states.delete) {
+              this.socket.emit('update', {collection: 'data', items: [data]}, (err, data) => {
+                if (err) {
+                  console.error(err)
+                  return this.states.save = 3
+                }
+                this.states.save = 2
+                this.pending = false
+                if (this.id === null) {
+                  this.id = String(data._id)
+                  page('?id=' + String(data._id) + '/#registry/textOverlay/edit')
+                }
+                setTimeout(() => this.states.save = 0, 1000)
+              })
+            } else {
+              this.socket.emit('delete', {collection: 'data', _id: this.id}, (err) => {
+                page('/#registry/textOverlay/list')
+              })
+            }
+          }
+        },
+        validate: function () {
+          // reset errors
+          for (let [key, value] of Object.entries(this.hasError)) {
+            this.hasError[key] = false
+          }
+          if (this.name.trim().length === 0) this.hasError.name = true
+          return _.filter(this.hasError, (o) => o === true).length === 0
+        }
+      },
+      created: function () {
+        // load up from db
+        if (commons.urlParam('id')) {
+          this.id = commons.urlParam('id')
+          this.socket.emit('findOne', { collection: 'data', where: { _id: commons.urlParam('id') } }, (err, data) => {
+            this.name = data.name
+            this.text = data.text
+            this.$nextTick(() => { this.pending = false })
+            this.states.load = true
+          })
+        } else this.states.load = true
+        this.initializeTextArea()
+      },
+      filters: {
+        capitalize: function (value) {
+          if (!value) return ''
+          value = value.toString()
+          return value.charAt(0).toUpperCase() + value.slice(1)
+        }
+      }
+    })
+  }
+  textOverlayInit()
+</script>

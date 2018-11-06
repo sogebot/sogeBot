@@ -6,11 +6,12 @@ const constants = require('./constants')
 let listeners = 0
 
 class Module {
-  timeouts: Object = {}
-  constructor (opts: Object = {}) {
+  timeouts = {}
+  constructor (opts) {
     /* Prepare default settings configuration
      * set enabled by default to true
      */
+    opts = opts || {}
     this._settings = opts.settings || {}
     this._settings.enabled = typeof this._settings.enabled !== 'undefined' ? this._settings.enabled : true
 
@@ -111,7 +112,14 @@ class Module {
             set: (target, key, value) => {
               if (_.isEqual(target[key], value)) return true
               // check if types match
-              if (typeof target[key] !== typeof value) throw new Error(path + '.' + key + ' set failed\n\texpected:\t' + typeof target[key] + '\n\tset:     \t' + typeof value)
+              if (typeof target[key] !== typeof value) {
+                const error = path + '.' + key + ' set failed\n\texpected:\t' + typeof target[key] + '\n\tset:     \t' + typeof value
+                // try retype if expected is number and we got string (from ui settings e.g.)
+                if (typeof target[key] === 'number') {
+                  value = Number(value)
+                  if (isNaN(value)) throw new Error(error)
+                } else throw new Error(error)
+              }
 
               target[key] = value
               this.updateSettings(`${path}.${key}`, value)
@@ -202,7 +210,12 @@ class Module {
       this.timeouts[`${this.constructor.name}._sockets`] = setTimeout(() => this._sockets(), 1000)
     } else if (cluster.isMaster) {
       this.socket = global.panel.io.of('/' + this._name + '/' + this.constructor.name.toLowerCase())
-      if (!_.isNil(this.sockets)) this.sockets()
+      if (!_.isNil(this.sockets)) {
+        this.sockets()
+        this.sockets = function () {
+          global.log.error('/' + this._name + '/' + this.constructor.name.toLowerCase() + ': Cannot initialize sockets second time')
+        }
+      }
 
       // default socket listeners
       this.socket.on('connection', (socket) => {
@@ -241,8 +254,8 @@ class Module {
 
           if (opts.items) {
             for (let item of opts.items) {
+              let itemFromDb = Object.assign({}, item)
               const _id = item._id; delete item._id
-              let itemFromDb = item
               if (_.isNil(_id)) itemFromDb = await global.db.engine.insert(opts.collection, item)
               else await global.db.engine.update(opts.collection, { _id }, item)
 

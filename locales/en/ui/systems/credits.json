@@ -1,0 +1,32 @@
+{
+  "settings": {
+    "speed": "Speed",
+    "followers": "Show followers",
+    "hosts": "Show hosts",
+    "raids": "Show raids",
+    "subscribers": "Show subscribers",
+    "subgifts": "Show gifted subs",
+    "subcommunitygifts": "Show subs gifted to community",
+    "resubs": "Show resubs",
+    "cheers": "Show cheers",
+    "clips": "Show clips",
+    "tips": "Show tips",
+    "lastMessage": "Last message",
+    "lastSubMessage": "Last submessge",
+    "streamBy": "Streamed by",
+    "follow": "Follow by",
+    "host": "Hosted by",
+    "raid": "Raided by",
+    "cheer": "Cheer by",
+    "sub": "Subscribe by",
+    "resub": "Resub by",
+    "subgift": "Gifted subs",
+    "subcommunitygift": "Subs gifted to community",
+    "tip": "Tips by",
+    "period": "Time interval",
+    "customPeriodInDays": "Custom time interval (days)",
+    "numOfClips": "Number of clips",
+    "shouldPlay": "Clips should be played",
+    "volume": "Volume"
+  }
+}

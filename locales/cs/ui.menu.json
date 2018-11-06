@@ -40,5 +40,15 @@
   "roulette": "Roulette",
   "wheeloffortune": "Kolo štěstí",
   "heist": "Heist",
-  "oauth": "OAuth"
+  "oauth": "OAuth",
+  "textoverlay": "Text overlay",
+  "carouseloverlay": "Carousel overlay",
+  "alerts": "Alerty",
+  "carousel": "Promítačka obrázků",
+  "clips": "Klipy",
+  "credits": "Závěrečné titulky",
+  "emotes": "Emotikony",
+  "eventlist": "Eventlist",
+  "stats": "Statistiky",
+  "text": "Text"
 }

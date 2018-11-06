@@ -23,8 +23,8 @@ class INeDB extends Interface {
     if (!opts.index) throw new Error('Missing index option')
     if (!opts.table) throw new Error('Missing table option')
 
-    await this.table[opts.table].removeIndex(opts.index)
-    await this.table[opts.table].ensureIndex({ fieldName: opts.index, unique: opts.unique })
+    await this.on(opts.table).removeIndex(opts.index)
+    await this.on(opts.table).ensureIndex({ fieldName: opts.index, unique: opts.unique })
   }
 
   on (table) {

@@ -20,7 +20,8 @@ const dropFiles = [
   'songrequests.db', 'system.alias.db', 'system.alias.settings.db',
   'system.bets.db', 'system.bets.settings.db', 'system.bets.users.db',
   'system.commercial.settings.db', 'system.cooldown.db', 'system.cooldown.settings.db',
-  'users_ignorelist.db'
+  'users_ignorelist.db', 'overlay.credits.socials.db', 'overlay.credits.customTexts.db',
+  'overlay.carousel.db'
 ]
 
 if (process.argv[2] && process.argv[2] === '--delete') {
@@ -117,6 +118,125 @@ let migration = {
     }
   }],
   settings: [{
+    version: '8.1.0',
+    do: async () => {
+      console.info('Updating overlays credits settings')
+
+      console.info(' => customTexts')
+      let customTexts =
+        (await global.db.engine.find('overlay.credits.customTexts'))
+          .map(o => {
+            o.left = o.text.left
+            o.middle = o.text.middle
+            o.right = o.text.right
+            delete o._id;
+            return o
+          })
+      await global.db.engine.update('overlays.credits.settings', { key: 'customTexts.values' }, { key: 'customTexts.values', value: customTexts })
+
+      console.info(' => socials')
+      let socials =
+        (await global.db.engine.find('overlay.credits.socials'))
+          .map(o => {
+            delete o._id; return o
+          })
+      await global.db.engine.update('overlays.credits.settings', { key: 'social.values' }, { key: 'social.values', value: socials })
+      console.info(' => DONE')
+    }
+  }, {
+    version: '8.1.0',
+    do: async () => {
+      let processed = 0
+
+      const mappings = {
+        'creditsAggregate': null,
+        'creditsHosts': 'overlays.credits.settings.show.hosts',
+        'creditsRaids': 'overlays.credits.settings.show.raids',
+        'creditsSubscribers': 'overlays.credits.settings.show.subscribers',
+        'creditsSubgifts': 'overlays.credits.settings.show.subgifts',
+        'creditsSubcommunitygifts': 'overlays.credits.settings.show.subcommunitygifts',
+        'creditsResubs': 'overlays.credits.settings.show.resubs',
+        'creditsCheers': 'overlays.credits.settings.show.cheers',
+        'creditsClips': 'overlays.credits.settings.show.clips',
+        'creditsTips': 'overlays.credits.settings.show.tips',
+        'creditsSpeed': null,
+        'creditsMaxFontSize': null,
+        'creditsLastMessage': 'overlays.credits.settings.text.lastMessage',
+        'creditsLastSubMessage': 'overlays.credits.settings.text.lastSubMessage',
+        'creditsStreamBy': 'overlays.credits.settings.text.streamBy',
+        'creditsFollowedBy': 'overlays.credits.settings.text.follow',
+        'creditsHostedBy': 'overlays.credits.settings.text.host',
+        'creditsRaidedBy': 'overlays.credits.settings.text.raid',
+        'creditsCheerBy': 'overlays.credits.settings.text.cheer',
+        'creditsSubscribedBy': 'overlays.credits.settings.text.sub',
+        'creditsResubscribedBy': 'overlays.credits.settings.text.resub',
+        'creditsSubgiftBy': 'overlays.credits.settings.text.subgift',
+        'creditsSubcommunitygiftBy': 'overlays.credits.settings.text.subcommunitygift',
+        'creditsClippedBy': null,
+        'creditsTipsBy': 'overlays.credits.settings.text.tip',
+        'creditsTopClipsPeriod': null,
+        'creditsTopClipsPlay': 'overlays.credits.settings.clips.shouldPlay',
+        'creditsTopClipsCount': 'overlays.credits.settings.clips.numOfClips',
+
+        'OEmotesSize': 'overlays.emotes.settings.emotes.size',
+        'OEmotesMax': 'overlays.emotes.settings.emotes.maxEmotesPerMessage',
+        'OEmotesAnimation': 'overlays.emotes.settings.emotes.animation',
+        'OEmotesAnimationTime': 'overlays.emotes.settings.emotes.animationTime'
+      }
+
+      console.info('Updating overlays settings')
+      console.info(' -> entries')
+      for (let [o, n] of Object.entries(mappings)) {
+        if (n !== null) {
+          let item = await global.db.engine.findOne('settings', { key: o })
+          if (!_.isEmpty(item)) {
+            let regexp = XRegExp(`
+              (?<collection> [a-zA-Z]*.[a-zA-Z]*.settings)
+              .
+              (?<category> [a-zA-Z]*)
+              ?.
+              ?(?<key> [a-zA-Z]*)`, 'ix')
+            const match = XRegExp.exec(n, regexp)
+            if (match.key.trim().length === 0) match.key = undefined
+            if (!_.isNil(item.value)) {
+              await global.db.engine.insert(match.collection, { category: match.category, key: match.key, isMultiValue: false, value: item.value })
+              processed++
+            } else {
+              console.warn(`Settings ${match.category} ${match.key} is missing value`)
+            }
+          }
+          await global.db.engine.remove('settings', { key: o })
+        }
+      }
+      console.info(` => ${processed} processed`)
+    }
+  }, {
+    version: '8.1.0',
+    do: async () => {
+      let processed = 0
+      console.info('Moving gallery files to db')
+      for (let fname of fs.readdirSync('public/dist/gallery')) {
+        let data = Buffer.from(fs.readFileSync('public/dist/gallery/' + fname)).toString('base64')
+        let type = null
+
+        if (fname.endsWith('ogg')) type = 'audio/ogg'
+        if (fname.endsWith('mp3')) type = 'audio/mp3'
+        if (fname.endsWith('mp4')) type = 'video/mp4'
+        if (fname.endsWith('jpg')) type = 'image/jpg'
+        if (fname.endsWith('png')) type = 'image/png'
+        if (fname.endsWith('gif')) type = 'image/gif'
+
+        if (type) {
+          data = 'data:' + type + ';base64,' + data
+          await global.db.engine.insert('overlays.gallery', { type, data })
+        }
+
+        fs.unlinkSync('public/dist/gallery/' + fname)
+        processed++
+      }
+      console.info(` => ${processed} processed`)
+    }
+  }, {
     version: '8.1.0',
     do: async () => {
       let processed = 0

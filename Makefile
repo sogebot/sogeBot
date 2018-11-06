@@ -3,7 +3,7 @@ SHELL   := /bin/bash
 VERSION := `node -pe "require('./package.json').version"`
 ENV     ?= production
 
-all : prepare dependencies shrinkwrap ui bot info
+all : clean prepare dependencies shrinkwrap ui bot info
 .PHONY : all
 
 info:

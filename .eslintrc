@@ -1,7 +1,13 @@
 {
   "parser": "babel-eslint",
-  "extends": ["standard"],
+  "extends": ["standard", "plugin:flowtype/recommended"],
+  "plugins": ["flowtype"],
   "rules": {
     "standard/no-callback-literal": "off"
+  },
+  "settings": {
+    "flowtype": {
+      "onlyFilesWithFlowAnnotation": true
+    }
   }
 }

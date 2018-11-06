@@ -18,6 +18,7 @@
     "animationIn": "Animation In",
     "animationOut": "Animation Out",
     "animationInDuration": "Animation In duration (in ms)",
-    "animationOutDuration": "Animation Out duration (in ms)"
+    "animationOutDuration": "Animation Out duration (in ms)",
+    "showOnlyOncePerStream": "Show only once per stream"
   }
 }

@@ -1,0 +1,178 @@
+<div id="registryGalleryApp" ref="window">
+  <div class="container-fluid" v-if="isMounted">
+    <div class="row">
+      <div class="col-12">
+        <span data-lang="menu.gallery" class="title text-default"></span>
+
+        <div class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
+          <div class="col-sm-6">
+            <form enctype="multipart/form-data" novalidate>
+              <label class="custom-file-upload" for="uploadImageInput">
+                <button type="button" class="btn btn-primary" :disabled="isUploading" @click="$refs.uploadFileInput.click()">
+                  <template v-if="isUploading">
+                      <i class="fas fa-circle-notch fa-spin fa-fw"></i>
+                      {{ commons.translate('dialog.buttons.upload.progress') }}</template>
+                    <template v-else>
+                      <i class="fas fa-upload fa-fw"></i>
+                      {{ commons.translate('dialog.buttons.upload.idle') }}</template>
+                </button>
+              </label>
+                <input
+                  class="d-none"
+                  type="file"
+                  ref="uploadFileInput"
+                  :disabled="isUploading"
+                  @change="filesChange($event.target.files)"
+                  accept="image/*, video/mp4, audio/*" class="input-file"/>
+
+            </form>
+          </div>
+          <div class="col-sm-6 text-right form-inline d-block">
+            <button class="btn btn-primary border-0" :class="[this.exclude.includes('audio') ? 'btn-outline-primary' : 'btn-primary']" v-on:click="toggle('audio')"><i class="far fa-fw" :class="[this.exclude.includes('audio') ? 'fa-square' : 'fa-check-square']"></i> Audio</button>
+            <button class="btn btn-primary border-0" :class="[this.exclude.includes('video') ? 'btn-outline-primary' : 'btn-primary']" v-on:click="toggle('video')"><i class="far fa-fw" :class="[this.exclude.includes('video') ? 'fa-square' : 'fa-check-square']"></i> Video</button>
+            <button class="btn btn-primary border-0" :class="[this.exclude.includes('images') ? 'btn-outline-primary' : 'btn-primary']" v-on:click="toggle('images')"><i class="far fa-fw" :class="[this.exclude.includes('images') ? 'fa-square' : 'fa-check-square']"></i> Images</button>
+            <button class="btn border-0" v-on:click="showAs='cards'" v-bind:class="[ showAs === 'cards' ? 'btn-dark' : 'btn-outline-dark' ]"><i class="fas fa-th-large"></i></button>
+          </div>
+        </div>
+
+        <div class="alert alert-primary" v-if="isLoading" role="alert">
+          <i class="fas fa-circle-notch fa-spin"></i>
+          <strong>loading data from server...</strong>
+        </div>
+        <div class="card-deck mb-3" v-else-if="filtered.length > 0" v-for="(chunk, index) of _.chunk(filtered, itemCountPerRow)">
+          <div class="card" v-for="item of chunk">
+            <div class="card-body border-top p-0 text-right" style="flex: 0 1 auto;">
+              <a v-bind:href="'/gallery/'+ item._id" class="btn btn-outline-dark p-3 border-0 w-100" target="_blank"><i class="fas fa-link"></i> /gallery/{{ item._id }}</a>
+            </div>
+            <div class="card-body border-top p-0 text-right" style="flex: 1 1 auto;">
+              <img class="w-100" :src="'/gallery/'+ item._id" v-if="item.type.includes('png')">
+              <video class="w-100" v-if="item.type.includes('mp4')" controls>
+                <source :type="item.type" :src="'/gallery/'+ item._id">
+              </video>
+              <audio class="w-100" v-if="item.type.includes('audio')" controls>
+                <source :type="item.type" :src="'/gallery/'+ item._id">
+              </audio>
+            </div>
+
+            <div class="card-footer p-0">
+              <button class="btn btn-danger p-3 w-100" @click="remove(item._id)"><i class="fas fa-trash mr-1" aria-hidden="true"></i> {{ commons.translate('dialog.buttons.delete') }}</a>
+            </div>
+          </div>
+
+          <!-- add empty invisible cards if chunk is < 3-->
+          <div class="card" v-for="index in (itemCountPerRow - chunk.length)" style="visibility: hidden"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  Vue.prototype.commons = commons
+
+  function galleryInit () {
+    if (_.size(translations) === 0) return setTimeout(() => galleryInit(), 1)
+    var registryGalleryApp = new Vue({
+      el: '#registryGalleryApp',
+      components: {
+        'toggle': toggleEnable,
+        'command-input': commandInput
+      },
+      data: {
+        domWidth: 0,
+        isLoading: true,
+        isMounted: false,
+        isUploading: false,
+        uploadedFiles: 0,
+        isUploadingNum: 0,
+
+        showAs: 'cards',
+
+        items: [],
+        exclude: [],
+
+        socket: io('/overlays/gallery', { query: "token=" + token }),
+      },
+      mounted: function () {
+        this.isMounted = true
+
+        setInterval(() => {
+          this.domWidth = this.$refs['window'].clientWidth
+        }, 1000)
+      },
+      computed: {
+        filtered: function () {
+          return this.items.filter(o => {
+            const isVideoIncluded = !(this.exclude.includes('video') && o.type.includes('video'))
+            const isImageIncluded = !(this.exclude.includes('images') && o.type.includes('image'))
+            const isAudioIncluded = !(this.exclude.includes('audio') && o.type.includes('audio'))
+            return isVideoIncluded && isImageIncluded && isAudioIncluded
+          })
+        },
+        itemCountPerRow: function () {
+          if(!this.isMounted) return 6
+          else {
+            if (this.domWidth > 1400) return 6
+            if (this.domWidth > 1300) return 5
+            if (this.domWidth > 1100) return 4
+            else if (this.domWidth > 800) return 3
+            else if (this.domWidth > 600) return 2
+            else return 1
+          }
+        }
+      },
+      created: function () {
+        this.socket.emit('find', {}, (err, items) => {
+          this.items = items
+          this.isLoading = false
+        })
+        if (localStorage.getItem('/overlays/gallery/showAs')) this.showAs = JSON.parse(localStorage.getItem('/overlays/gallery/showAs'));
+      },
+      watch: {
+        showAs: function(val) {
+          localStorage.setItem('/overlays/gallery/showAs', JSON.stringify(this.showAs))
+        },
+        uploadedFiles: function (val) {
+          if (this.isUploadingNum === val) this.isUploading = false
+        }
+      },
+      filters: {
+        capitalize: function (value) {
+          if (!value) return ''
+          value = value.toString()
+          return value.charAt(0).toUpperCase() + value.slice(1)
+        }
+      },
+      methods: {
+        toggle: function (type) {
+          if (this.exclude.includes(type)) {
+            this.exclude = this.exclude.filter(o => o !== type)
+          } else this.exclude.push(type)
+        },
+        remove: function (_id) {
+          console.log(_id)
+          this.socket.emit('delete', { _id }, () => {
+            this.items = this.items.filter(o => o._id != _id)
+          })
+        },
+        filesChange: function (files) {
+          this.isUploading = true
+          this.isUploadingNum = files.length
+          this.uploadedFiles = 0
+
+          for (let i = 0, l = files.length; i < l; i++) {
+            const reader = new FileReader()
+            reader.onload = (e => {
+              this.socket.emit('upload', e.target.result, (item) => {
+                this.uploadedFiles++
+                this.items.push(item)
+              })
+            })
+            reader.readAsDataURL(files[i])
+          }
+        }
+      }
+    })
+  }
+  galleryInit()
+</script>

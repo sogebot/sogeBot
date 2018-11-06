@@ -123,11 +123,11 @@ export default {
     getBetsPercentage: function (index) {
       if (this.bets.length === 0) return 0
 
-      let percentage = (100 / this.bets.length) * this.bets.filter(o => o.option === index).length + '%'
+      let percentage = (100 / this.bets.length) * this.bets.filter(o => Number(o.option) === Number(index)).length + '%'
       return percentage === '0%' ? '0' : percentage
     },
     getBets: function (index) {
-      return this.bets.filter(o => o.option === index).length
+      return this.bets.filter(o => Number(o.option) === Number(index)).length
     }
   },
   filters: {

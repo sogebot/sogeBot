@@ -40,5 +40,15 @@
   "roulette": "Roulette",
   "wheeloffortune": "Wheel of Fortune",
   "heist": "Heist",
-  "oauth": "OAuth"
+  "oauth": "OAuth",
+  "textoverlay": "Text overlay",
+  "carouseloverlay": "Carousel overlay",
+  "alerts": "Alerts",
+  "carousel": "Image carousel",
+  "clips": "Clips",
+  "credits": "Credits",
+  "emotes": "Emotes",
+  "eventlist": "Eventlist",
+  "stats": "Stats",
+  "text": "Text"
 }

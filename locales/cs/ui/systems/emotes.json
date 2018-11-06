@@ -1,0 +1,17 @@
+{
+  "settings": {
+    "removecache": "Smazat cache",
+    "size": "Velikost emotikonů",
+    "maxEmotesPerMessage": "Maximální počet emotikonů",
+    "animation": "Animace",
+    "animationTime": "Doba trvání animace",
+    "numOfEmotes": "Počet emotikonů",
+    "numOfEmotesPerExplosion": "Počet emotikonů za explozi",
+    "numOfExplosions": "Počet explozí",
+    "test": {
+      "emoteExplosion": "Exploze emotikonů",
+      "emote": "Emotikon",
+      "emoteFirework": "Ohňostroj emotikonů"
+    }
+  }
+}

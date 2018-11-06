@@ -52,6 +52,7 @@ class Events {
       { id: 'run-command', definitions: { commandToRun: '', isCommandQuiet: false }, fire: this.fireRunCommand },
       { id: 'play-sound', definitions: { urlOfSoundFile: '' }, fire: this.firePlaySound },
       { id: 'emote-explosion', definitions: { emotesToExplode: '' }, fire: this.fireEmoteExplosion },
+      { id: 'emote-firework', definitions: { emotesToFirework: '' }, fire: this.fireEmoteFirework },
       { id: 'start-commercial', definitions: { durationOfCommercial: [30, 60, 90, 120, 150, 180] }, fire: this.fireStartCommercial },
       { id: 'bot-will-join-channel', definitions: {}, fire: this.fireBotWillJoinChannel },
       { id: 'bot-will-leave-channel', definitions: {}, fire: this.fireBotWillLeaveChannel },
@@ -165,6 +166,7 @@ class Events {
       }
       return cid
     } else { // NG
+      global.log.warning('Clip was not created successfully')
       return null
     }
   }
@@ -172,19 +174,9 @@ class Events {
   async fireCreateAClipAndPlayReplay (operation, attributes) {
     let cid = await global.events.fireCreateAClip(operation, attributes)
     if (cid) { // clip created ok
-      const clip = [
-        'type=clip',
-        'id=' + cid,
-        'position=' + await global.configuration.getValue('replayPosition'),
-        'x-offset=' + await global.configuration.getValue('replayOffsetX'),
-        'y-offset=' + await global.configuration.getValue('replayOffsetY'),
-        'size=' + await global.configuration.getValue('replaySize'),
-        'volume=' + await global.configuration.getValue('replayVolume'),
-        'label=' + await global.configuration.getValue('replayLabel'),
-        'filter=' + await global.configuration.getValue('replayFilter'),
-        'class=replay'
-      ]
-      global.overlays.alerts.overlay({ sender: { username: global.commons.getOwner() }, parameters: clip.join(' ') })
+      global.overlays.clips.showClip(cid)
+    } else {
+      global.log.warning('Clip was not created successfully')
     }
   }
 
@@ -217,7 +209,11 @@ class Events {
   }
 
   async fireEmoteExplosion (operation, attributes) {
-    global.overlays.emotes.explode(global.overlays.emotes, global.panel.io, operation.emotesToExplode.split(' '))
+    global.overlays.emotes.explode(operation.emotesToExplode.split(' '))
+  }
+
+  async fireEmoteFirework (operation, attributes) {
+    global.overlays.emotes.firework(operation.emotesToFirework.split(' '))
   }
 
   async firePlaySound (operation, attributes) {

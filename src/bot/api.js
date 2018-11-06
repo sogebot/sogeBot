@@ -1,5 +1,6 @@
 const _ = require('lodash')
 const axios = require('axios')
+const querystring = require('querystring')
 const moment = require('moment')
 const cluster = require('cluster')
 const stacktrace = require('stacktrace-parser')
@@ -142,7 +143,7 @@ class API {
     global.db.engine.update('api.current', { key: 'game' }, { value: await global.cache.gameCache() })
   }
 
-  async getUsernameFromTwitch (id: string) {
+  async getUsernameFromTwitch (id) {
     const url = `https://api.twitch.tv/helix/users?id=${id}`
     var request
     /*
@@ -198,7 +199,7 @@ class API {
     return null
   }
 
-  async getIdFromTwitch (username: string, isChannelId: bool = false) {
+  async getIdFromTwitch (username, isChannelId = false) {
     const url = `https://api.twitch.tv/helix/users?login=${username}`
     var request
     /*
@@ -1267,6 +1268,78 @@ class API {
       if (e.errno === 'ECONNRESET' || e.errno === 'ECONNREFUSED' || e.errno === 'ETIMEDOUT') return this.createMarker()
       global.log.error(`API: Marker was not created - ${e.message}`)
       if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'createMarker', api: 'helix', endpoint: url, code: e.stack, remaining: this.calls.bot.remaining })
+    }
+  }
+
+  async getClipById (id) {
+    const url = `https://api.twitch.tv/helix/clips/?id=${id}`
+
+    const token = await global.oauth.settings.bot.accessToken
+    if (token === '') return null
+
+    var request
+    try {
+      request = await axios.get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        }
+      })
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+      return request.data
+    } catch (e) {
+      global.log.error(`${url} - ${e.message}`)
+      global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: `${e.status} ${_.get(e, 'body.message', e.statusText)}`, remaining: this.remainingAPICalls })
+      return null
+    }
+  }
+
+  async getTopClips (opts) {
+    let url = 'https://api.twitch.tv/helix/clips?broadcaster_id=' + global.oauth.channelId
+    const token = global.oauth.settings.bot.accessToken
+    try {
+      if (token === '') throw Error('No broadcaster access token')
+      if (typeof opts === 'undefined' || !opts) throw Error('Missing opts')
+
+      if (opts.period) {
+        if (opts.period === 'stream') {
+          url += '&' + querystring.stringify({
+            started_at: (new Date(this.streamStartedAt)).toISOString(),
+            ended_at: (new Date()).toISOString()
+          })
+        } else {
+          if (!opts.days || opts.days < 0) throw Error('Days cannot be < 0')
+          url += '&' + querystring.stringify({
+            started_at: (new Date((new Date()).setDate(-opts.days))).toISOString(),
+            ended_at: (new Date()).toISOString()
+          })
+        }
+      }
+      if (opts.first) url += '&first=' + opts.first
+
+      const request = await axios.get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        }
+      })
+
+      // save remaining api calls
+      this.calls.bot.remaining = request.headers['ratelimit-remaining']
+      this.calls.bot.refresh = request.headers['ratelimit-reset']
+      this.calls.bot.limit = request.headers['ratelimit-limit']
+      global.commons.processAll({ ns: 'api', fnc: 'setRateLimit', args: [ 'bot', request.headers['ratelimit-limit'], request.headers['ratelimit-remaining'], request.headers['ratelimit-reset'] ] })
+
+      global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getClipById', api: 'kraken', endpoint: url, code: request.status, remaining: this.remainingAPICalls })
+      // get mp4 from thumbnail
+      for (let c of request.data.data) {
+        c.mp4 = c.thumbnail_url.replace('-preview-480x272.jpg', '.mp4')
+        c.game = await this.getGameFromId(c.game_id)
+      }
+      return request.data.data
+    } catch (e) {
+      global.log.error(`API: ${url} - ${e.stack}`)
+      if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { timestamp: _.now(), call: 'getTopClips', api: 'helix', endpoint: url, code: e.stack })
     }
   }
 }

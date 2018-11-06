@@ -1,0 +1,250 @@
+<span id="carousel-overlay-edit">
+  <template v-if="!states.load">
+    <div class="alert alert-info" style="text-transform: uppercase; font-size: 0.8rem;"><i class="fas fa-circle-notch fa-spin"></i> Loading data from server</div>
+  </template>
+  <template v-else>
+    <span class="title text-default" style="padding: 0 !important;">
+      <a class="btn btn-outline-info" style="border: 0 !important;" href="/#registry/carouselOverlay/list"><i class="fas fa-chevron-circle-left"></i></a>
+      <span style="position: relative; top: 2px;">
+        {{ commons.translate('dialog.title.edit') }}
+      </span>
+    </span>
+
+    <div class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
+      <div class="col text-danger" v-if="id">
+        <button type="button" class="btn" :class="[states.delete ? 'btn-danger' : 'btn-outline-danger border-light']" @click="states.delete = !states.delete; pending = true">
+          <i v-if="states.delete" class="far fa-check-square pr-1 fa-fw"></i>
+          <i v-else class="far fa-square pr-1 fa-fw"></i>
+          Mark to delete
+        </button>
+      </div>
+      <div class="col text-right form-inline d-block">
+          <span v-if="pending" style="cursor: auto;" class="alert-danger btn m-0">{{commons.translate('dialog.changesPending')}}</span>
+          <button v-if="states.save === 0" type="button" class="btn btn-primary" v-on:click="save()">{{ commons.translate('dialog.buttons.saveChanges.idle') }}</button>
+          <button v-if="states.save === 1" disabled="disabled" type="button" class="btn btn-primary"><i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
+          <button v-if="states.save === 2" disabled="disabled" type="button" class="btn btn-success"><i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</button>
+          <button v-if="states.save === 3" disabled="disabled" type="button" class="btn btn-danger"><i class="fas fa-exclamation"></i> {{ commons.translate('dialog.buttons.something-went-wrong') }}</button>
+      </div>
+    </div>
+
+    <div class="pt-3">
+
+      <!-- Editation stuff here -->
+      <form>
+        <div class="form-row pl-2 pr-2">
+          <div class="form-group col-auto">
+            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('thumbnail') }}</label>
+            <img class="d-block p-0" style="max-height: 275px" :src="'data:' + type + ';base64,'  + base64">
+          </div>
+          <div class="form-group col">
+            <div class="form-row pl-2 pr-2">
+              <div class="form-group col-4">
+                <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('page.settings.overlays.carousel.titles.waitBefore')}}</label>
+                <input v-bind:class="{ 'is-invalid': hasError.waitBefore }" v-model="waitBefore" type="number" min="0" class="form-control" v-bind:placeholder="commons.translate('registry.carouseloverlay.waitBefore.placeholder')">
+              </div>
+              <div class="form-group col-4">
+                <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('page.settings.overlays.carousel.titles.duration')}}</label>
+                <input v-bind:class="{ 'is-invalid': hasError.duration }" v-model="duration" type="number" min="1" class="form-control" v-bind:placeholder="commons.translate('registry.carouseloverlay.duration.placeholder')">
+              </div>
+              <div class="form-group col-4">
+                <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('page.settings.overlays.carousel.titles.waitAfter')}}</label>
+                <input v-bind:class="{ 'is-invalid': hasError.waitAfter }" v-model="waitAfter" type="number" min="0" class="form-control" v-bind:placeholder="commons.translate('registry.carouseloverlay.waitAfter.placeholder')">
+              </div>
+            </div>
+            <div class="form-row pl-2 pr-2">
+              <div class="form-group col-6">
+                <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('page.settings.overlays.carousel.titles.animationIn')}}</label>
+                <select id="type" class="form-control" v-model="animationIn">
+                  <option value="fadeIn">fadeIn</option>
+                  <option value="blurIn">blurIn</option>
+                  <option value="slideUp">slideUp</option>
+                  <option value="slideDown">slideDown</option>
+                  <option value="slideLeft">slideLeft</option>
+                  <option value="slideRight">slideRight</option>
+                </select>
+              </div>
+              <div class="form-group col-6">
+                <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('page.settings.overlays.carousel.titles.animationInDuration')}}</label>
+                <input v-bind:class="{ 'is-invalid': hasError.animationInDuration }" v-model="animationInDuration" type="text" class="form-control" v-bind:placeholder="commons.translate('registry.carouseloverlay.animationInDuration.placeholder')">
+                <div class="invalid-feedback">{{ commons.translate('registry.carouseloverlay.animationInDuration.error.isEmpty') }}</div>
+              </div>
+            </div>
+            <div class="form-row pl-2 pr-2">
+              <div class="form-group col-6">
+                <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('page.settings.overlays.carousel.titles.animationOut')}}</label>
+                <select id="type" class="form-control" v-model="animationOut">
+                  <option value="fadeOut">fadeOut</option>
+                  <option value="blurOut">blurOut</option>
+                  <option value="slideUp">slideUp</option>
+                  <option value="slideDown">slideDown</option>
+                  <option value="slideLeft">slideLeft</option>
+                  <option value="slideRight">slideRight</option>
+                </select>
+              </div>
+              <div class="form-group col-6">
+                <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('page.settings.overlays.carousel.titles.animationOutDuration')}}</label>
+                <input v-bind:class="{ 'is-invalid': hasError.animationOutDuration }" v-model="animationOutDuration" type="number" min="1" class="form-control" v-bind:placeholder="commons.translate('registry.carouseloverlay.animationOutDuration.placeholder')">
+              </div>
+            </div>
+            <div class="form-row pl-2 pr-2">
+              <div class="col-md-4">
+                <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('page.settings.overlays.carousel.titles.showOnlyOncePerStream')}}</label>
+                <button type="button" class="btn btn-block" v-on:click="showOnlyOncePerStream = !showOnlyOncePerStream" v-bind:class="[ showOnlyOncePerStream ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">{{ (showOnlyOncePerStream ? commons.translate('showOnlyOncePerStream.true') : commons.translate('showOnlyOncePerStream.false')) | capitalize }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </template>
+</span>
+
+<script>
+  Vue.prototype.commons = commons
+
+  function carouselOverlayInit () {
+    if (_.size(translations) === 0 || _.isNil(configuration)) return setTimeout(() => carouselOverlayInit(), 1)
+
+    Vue.prototype.configuration = configuration
+
+    var carouselOverlay = new Vue({
+      el: '#carousel-overlay-edit',
+      components: {
+        'textarea-with-tags': textAreaWithTags,
+      },
+      data: {
+        id: null,
+        waitBefore: 0,
+        waitAfter: 0,
+        duration: 5000,
+        animationIn: 'fadeIn',
+        animationOut: 'fadeOut',
+        animationInDuration: 1500,
+        animationOutDuration: 15,
+        showOnlyOncePerStream: false,
+        type: null,
+        base64: null,
+
+        pending: false,
+
+        socket: io('/overlays/carousel', { query: "token=" + token }),
+
+        states: {
+          load: false,
+          save: 0,
+          delete: false,
+        },
+        hasError: {
+          name: false
+        }
+      },
+      methods: {
+        save: function () {
+          this.states.save = 1
+          const data = {
+            _id: this.id,
+            waitBefore: this.waitBefore,
+            waitAfter: this.waitAfter,
+            duration: this.duration,
+            animationIn: this.animationIn,
+            animationOut: this.animationOut,
+            animationInDuration: this.animationInDuration,
+            animationOutDuration: this.animationOutDuration,
+            showOnlyOncePerStream: this.showOnlyOncePerStream
+          }
+
+          if (!this.states.delete) {
+            this.socket.emit('update', {collection: 'data', items: [data]}, (err, data) => {
+              if (err) {
+                console.error(err)
+                return this.states.save = 3
+              }
+              this.states.save = 2
+              this.pending = false
+              if (this.id === null) {
+                this.id = String(data._id)
+                page('?id=' + String(data._id) + '/#registry/carouselOverlay/edit')
+              }
+              setTimeout(() => this.states.save = 0, 1000)
+            })
+          } else {
+            this.socket.emit('delete.image', this.id, () => {
+              page('/#registry/carouselOverlay/list')
+            })
+          }
+        },
+        validate: function () {
+          // reset errors
+          for (let [key, value] of Object.entries(this.hasError)) {
+            this.hasError[key] = false
+          }
+          if (this.name.trim().length === 0) this.hasError.name = true
+          return _.filter(this.hasError, (o) => o === true).length === 0
+        }
+      },
+      watch: {
+        waitBefore: function (val, old) {
+          if (val === old) return
+          if (val === '' || val < 0 || isNaN(Number(this.waitBefore))) this.waitBefore = 0
+          else this.waitBefore = Math.round(val)
+          this.pending = true
+        },
+        waitAfter: function (val, old) {
+          if (val === old) return
+          if (val === '' || val < 0 || isNaN(Number(this.waitAfter))) this.waitAfter = 0
+          else this.waitAfter = Math.round(val)
+          this.pending = true
+        },
+        duration: function (val, old) {
+          if (val === old) return
+          if (val === '' || val < 1 || isNaN(Number(this.duration))) this.duration = 1
+          else this.duration = Math.round(val)
+          this.pending = true
+        },
+        animationIn: function () { this.pending = true },
+        animationOut: function () { this.pending = true },
+        animationInDuration: function (val, old) {
+          if (val === old) return
+          if (val === '' || val < 1 || isNaN(Number(this.animationInDuration))) this.animationInDuration = 1
+          else this.animationInDuration = Math.round(val)
+          this.pending = true
+        },
+        animationOutDuration: function (val, old) {
+          if (val === old) return
+          if (val === '' || val < 1 || isNaN(Number(this.animationOutDuration))) this.animationOutDuration = 1
+          else this.animationOutDuration = Math.round(val)
+          this.pending = true
+        },
+        showOnlyOncePerStream: function () { this.pending = true }
+      },
+      created: function () {
+        // load up from db
+        if (commons.urlParam('id')) {
+          this.id = commons.urlParam('id')
+          this.socket.emit('findOne', { collection: 'data', where: { _id: commons.urlParam('id') } }, (err, data) => {
+            this.waitBefore = data.waitBefore
+            this.waitAfter = data.waitAfter
+            this.duration = data.duration
+            this.animationIn = data.animationIn
+            this.animationOut = data.animationOut
+            this.animationInDuration = data.animationInDuration
+            this.animationOutDuration = data.animationOutDuration
+            this.showOnlyOncePerStream = data.showOnlyOncePerStream
+            this.type = data.type
+            this.base64 = data.base64
+            this.$nextTick(() => { this.pending = false })
+            this.states.load = true
+          })
+        } else this.states.load = true
+      },
+      filters: {
+        capitalize: function (value) {
+          if (!value) return ''
+          value = value.toString()
+          return value.charAt(0).toUpperCase() + value.slice(1)
+        }
+      }
+    })
+  }
+  carouselOverlayInit()
+</script>

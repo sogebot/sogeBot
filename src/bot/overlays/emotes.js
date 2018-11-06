@@ -1,13 +1,17 @@
+// @flow
 'use strict'
 
 // 3rdparty libraries
 const _ = require('lodash')
 const constants = require('../constants')
 const cluster = require('cluster')
-const { EmoteFetcher } = require('twitch-emoticons')
+const axios = require('axios')
+const XRegExp = require('xregexp')
 
-function Emotes () {
-  this.simpleEmotes = {
+const Overlay = require('./_interface')
+
+class Emotes extends Overlay {
+  simpleEmotes = {
     ':)': 'https://static-cdn.jtvnw.net/emoticons/v1/1/',
     ':(': 'https://static-cdn.jtvnw.net/emoticons/v1/2/',
     ':o': 'https://static-cdn.jtvnw.net/emoticons/v1/8/',
@@ -24,114 +28,344 @@ function Emotes () {
     '<3': 'https://static-cdn.jtvnw.net/emoticons/v1/9/'
   }
 
-  global.configuration.register('OEmotesSize', 'overlay.emotes.settings.OEmotesSize', 'number', 0)
-  global.configuration.register('OEmotesMax', 'overlay.emotes.settings.OEmotesMax', 'number', 5)
-  global.configuration.register('OEmotesAnimation', 'overlay.emotes.settings.OEmotesAnimation', 'string', 'fadeup')
-  global.configuration.register('OEmotesAnimationTime', 'overlay.emotes.settings.OEmotesAnimationTime', 'number', 4000)
+  constructor () {
+    const settings = {
+      _: {
+        lastGlobalEmoteChk: 0,
+        lastSubscriberEmoteChk: 0,
+        lastChannelChk: '',
+        lastFFZEmoteChk: 0,
+        lastBTTVEmoteChk: 0
+      },
+      emotes: {
+        size: 1,
+        maxEmotesPerMessage: 5,
+        animation: 'fadeup',
+        animationTime: 1000
+      },
+      explosion: {
+        numOfEmotes: 20
+      },
+      fireworks: {
+        numOfEmotesPerExplosion: 10,
+        numOfExplosions: 5
+      },
+      parsers: [
+        { name: 'containsEmotes', priority: constants.LOW, fireAndForget: true }
+      ]
+    }
 
-  if (cluster.isMaster) {
-    global.panel.addMenu({ category: 'settings', name: 'overlays', id: 'overlays' })
-    global.panel.socketListening(this, 'emote.testExplosion', this._testExplosion)
-    global.panel.socketListening(this, 'emote.test', this._test)
+    const ui = {
+      test: {
+        /* type test are only for overlays */
+        explosion: {
+          type: 'test',
+          test: 'explosion',
+          text: 'systems.emotes.settings.test.emoteExplosion',
+          class: 'btn btn-secondary btn-block'
+        },
+        emote: {
+          type: 'test',
+          test: 'emote',
+          text: 'systems.emotes.settings.test.emote',
+          class: 'btn btn-secondary btn-block'
+        },
+        firework: {
+          type: 'test',
+          test: 'fireworks',
+          text: 'systems.emotes.settings.test.emoteFirework',
+          class: 'btn btn-secondary btn-block'
+        }
+      },
+      links: {
+        overlay: {
+          type: 'link',
+          href: '/overlays/emotes',
+          class: 'btn btn-primary btn-block',
+          rawText: '/overlays/emotes (1920x1080)',
+          target: '_blank'
+        }
+      },
+      emotes: {
+        cache: {
+          type: 'removecache',
+          explosion: false,
+          text: 'systems.emotes.settings.removecache',
+          class: 'btn btn-danger btn-block'
+        },
+        animation: {
+          type: 'selector',
+          values: ['fadeup', 'fadezoom', 'facebook']
+        },
+        size: {
+          type: 'selector',
+          values: ['1', '2', '3']
+        }
+      }
+    }
+    super({ settings, ui })
+    if (cluster.isMaster) {
+      global.db.engine.index({ table: this.collection.cache, index: 'code' })
+      setInterval(() => this.fetchEmotes(), 10000)
+    }
+  }
 
-    // major bottleneck on worker
+  sockets () {
+    global.panel.io.of('/overlays/emotes').on('connection', (socket) => {
+      socket.on('remove.cache', () => this.removeCache())
+      socket.on('emote.test', (test) => {
+        if (test === 'explosion') this._testExplosion()
+        else if (test === 'fireworks') this._testFireworks()
+        else this._test()
+      })
+    })
+  }
+
+  async removeCache () {
+    this.settings._.lastGlobalEmoteChk = 0
+    this.settings._.lastSubscriberEmoteChk = 0
+    this.settings._.lastFFZEmoteChk = 0
+    this.settings._.lastBTTVEmoteChk = 0
+    await global.db.engine.remove(this.collection.cache, {})
     this.fetchEmotes()
   }
-}
 
-Emotes.prototype.fetchEmotes = async function () {
-  this.fetcher = new EmoteFetcher()
-  this.fetcher.fetchTwitchEmotes().catch(function (reason) {})
-  this.fetcher.fetchBTTVEmotes().catch(function (reason) {})
-  this.fetcher.fetchFFZEmotes().catch(function (reason) {})
-  this.fetcher.fetchFFZEmotes(await global.oauth.settings.broadcaster.username).catch(function (reason) {})
-  this.fetcher.fetchBTTVEmotes(await global.oauth.settings.broadcaster.username).catch(function (reason) {})
-  this.fetcher.fetchTwitchEmotes(await global.oauth.settings.broadcaster.username).catch(function (reason) {})
-}
+  async fetchEmotes () {
+    const cid = global.oauth.channelId
+    const channel = global.oauth.currentChannel
+    if (!cid) return
 
-Emotes.prototype.parsers = function () {
-  return [
-    { this: this, name: 'emotes', fnc: this.containsEmotes, permission: constants.VIEWERS, priority: constants.LOW, fireAndForget: true }
-  ]
-}
+    // we want to update once every week
+    if (Date.now() - this.settings._.lastGlobalEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+      this.settings._.lastGlobalEmoteChk = Date.now()
+      try {
+        const request = await axios.get('https://twitchemotes.com/api_cache/v3/global.json')
+        const codes = Object.keys(request.data)
+        for (let i = 0, length = codes.length; i < length; i++) {
+          await global.db.engine.update(this.collection.cache,
+            {
+              code: codes[i],
+              type: 'twitch'
+            },
+            {
+              urls: {
+                '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + request.data[codes[i]].id + '/1.0',
+                '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + request.data[codes[i]].id + '/2.0',
+                '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + request.data[codes[i]].id + '/3.0'
+              }
+            })
+        }
+      } catch (e) {
+        global.log.error(e)
+      }
+    }
 
-Emotes.prototype._testExplosion = async function (self, socket) {
-  self.explode(self, socket, ['Kappa', 'GivePLZ', 'PogChamp'])
-}
+    if (Date.now() - this.settings._.lastSubscriberEmoteChk > 1000 * 60 * 60 * 24 * 7 || this.settings._.lastChannelChk !== cid) {
+      this.settings._.lastSubscriberEmoteChk = Date.now()
+      this.settings._.lastChannelChk = cid
+      try {
+        const request = await axios.get('https://twitchemotes.com/api_cache/v3/subscriber.json')
+        const emoteId = Object.keys(request.data)
+        for (let i = 0, length = emoteId.length; i < length; i++) {
+          if (request.data[emoteId[i]].channel_id === cid) {
+            const emotes = request.data[emoteId[i]].emotes
+            for (let j = 0, length2 = emotes.length; j < length2; j++) {
+              await global.db.engine.update(this.collection.cache,
+                {
+                  code: emotes[j].code,
+                  type: 'twitch'
+                },
+                {
+                  urls: {
+                    '1': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/1.0',
+                    '2': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/2.0',
+                    '3': 'https://static-cdn.jtvnw.net/emoticons/v1/' + emotes[j].id + '/3.0'
+                  }
+                })
+            }
+          }
+        }
+      } catch (e) {
+        global.log.error(e)
+      }
+    }
 
-Emotes.prototype._test = async function (self, socket) {
-  let OEmotesSize = await global.configuration.getValue('OEmotesSize')
-  socket.emit('emote', 'https://static-cdn.jtvnw.net/emoticons/v1/9/' + (OEmotesSize + 1) + '.0')
-}
+    // fetch FFZ emotes
+    if (Date.now() - this.settings._.lastFFZEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+      this.settings._.lastFFZEmoteChk = Date.now()
+      try {
+        const request = await axios.get('https://api.frankerfacez.com/v1/room/id/' + cid)
 
-Emotes.prototype.explode = async function (self, socket, data) {
-  const emotes = await self.parseEmotes(self, data)
-  socket.emit('emote.explode', emotes)
-}
+        const emoteSet = request.data.room.set
+        const emotes = request.data.sets[emoteSet].emoticons
 
-Emotes.prototype.containsEmotes = async function (opts) {
-  if (_.isNil(opts.sender) || _.isNil(opts.sender.emotes) || !(Symbol.iterator in Object(opts.sender.emotes))) return true
-  if (cluster.isWorker) {
-    if (process.send) process.send({ type: 'call', ns: 'overlays.emotes', fnc: 'containsEmotes', args: [opts] })
-    return
+        for (let i = 0, length = emotes.length; i < length; i++) {
+          // change 4x to 3x, to be same as Twitch and BTTV
+          emotes[i].urls['3'] = emotes[i].urls['4']; delete emotes[i].urls['4']
+          await global.db.engine.update(this.collection.cache,
+            {
+              code: emotes[i].name,
+              type: 'ffz'
+            },
+            {
+              urls: emotes[i].urls
+            })
+        }
+      } catch (e) {
+        global.log.error(e)
+      }
+    }
+
+    // fetch BTTV emotes
+    if (Date.now() - this.settings._.lastBTTVEmoteChk > 1000 * 60 * 60 * 24 * 7) {
+      this.settings._.lastBTTVEmoteChk = Date.now()
+      try {
+        const request = await axios.get('https://api.betterttv.net/2/channels/' + channel)
+
+        const urlTemplate = request.data.urlTemplate
+        const emotes = request.data.emotes
+
+        for (let i = 0, length = emotes.length; i < length; i++) {
+          await global.db.engine.update(this.collection.cache,
+            {
+              code: emotes[i].code,
+              type: 'bttv'
+            },
+            {
+              urls: {
+                '1': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '1x'),
+                '2': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '2x'),
+                '3': urlTemplate.replace('{{id}}', emotes[i].id).replace('{{image}}', '3x')
+              }
+
+            })
+        }
+      } catch (e) {
+        global.log.error(e)
+      }
+    }
   }
 
-  let OEmotesMax = await global.configuration.getValue('OEmotesMax')
-  let OEmotesSize = await global.configuration.getValue('OEmotesSize')
-
-  let limit = 0
-  for (let e of opts.sender.emotes) {
-    if (limit === OEmotesMax) return false
-    global.panel.io.emit('emote', 'https://static-cdn.jtvnw.net/emoticons/v1/' + e.id + '/' + (OEmotesSize + 1) + '.0')
-    limit++
+  async _testFireworks () {
+    this.firework(['Kappa', 'GivePLZ', 'PogChamp'])
   }
 
-  let parsed = []
-  // parse BTTV emoticons
-  try {
-    for (let emote of await this.fetcher._getRawBTTVEmotes(await global.oauth.settings.broadcaster.username)) {
-      for (let i in _.range((opts.message.match(new RegExp(emote.code, 'g')) || []).length)) {
-        if (i === OEmotesMax) break
-        global.panel.io.emit('emote', this.fetcher.emotes.get(emote.code).toLink(OEmotesSize))
+  async _testExplosion () {
+    this.explode(['Kappa', 'GivePLZ', 'PogChamp'])
+  }
+
+  async _test () {
+    global.panel.io.of('/overlays/emotes').emit('emote', {
+      url: 'https://static-cdn.jtvnw.net/emoticons/v1/9/' + this.settings.emotes.size + '.0',
+      settings: {
+        emotes: {
+          animation: this.settings.emotes.animation,
+          animationTime: this.settings.emotes.animationTime
+        }
+      }
+    })
+  }
+
+  async firework (data: Array<string>) {
+    const emotes = await this.parseEmotes(data)
+    global.panel.io.of('/overlays/emotes').emit('emote.firework', {
+      emotes,
+      settings: {
+        emotes: {
+          animationTime: this.settings.emotes.animationTime
+        },
+        fireworks: {
+          numOfEmotesPerExplosion: this.settings.fireworks.numOfEmotesPerExplosion,
+          numOfExplosions: this.settings.fireworks.numOfExplosions
+        }
+      }
+    })
+  }
+
+  async explode (data: Array<string>) {
+    const emotes = await this.parseEmotes(data)
+    global.panel.io.of('/overlays/emotes').emit('emote.explode', {
+      emotes,
+      settings: {
+        emotes: {
+          animationTime: this.settings.emotes.animationTime
+        },
+        explosion: {
+          numOfEmotes: this.settings.explosion.numOfEmotes
+        }
+      }
+    })
+  }
+
+  async containsEmotes (opts: ParserOptions) {
+    if (_.isNil(opts.sender)) return true
+    if (cluster.isWorker) {
+      if (process.send) process.send({ type: 'call', ns: 'overlays.emotes', fnc: 'containsEmotes', args: [opts] })
+      return
+    }
+
+    let parsed = []
+    let usedEmotes = {}
+
+    let cache = await global.db.engine.find(this.collection.cache)
+
+    // add simple emotes
+    for (const code of Object.keys(this.simpleEmotes)) {
+      cache.push({
+        type: 'twitch',
+        code,
+        urls: {
+          '1': this.simpleEmotes[code] + '1.0',
+          '2': this.simpleEmotes[code] + '2.0',
+          '3': this.simpleEmotes[code] + '3.0'
+        }
+      })
+    }
+
+    for (let j = 0, jl = cache.length; j < jl; j++) {
+      const emote = cache[j]
+      if (parsed.includes(emote.code)) continue // this emote was already parsed
+      for (let i = 0, length = (opts.message.match(new RegExp(XRegExp.escape(emote.code), 'g')) || []).length; i < length; i++) {
+        usedEmotes[emote.code] = emote
         parsed.push(emote.code)
       }
     }
-  } catch (e) {
-    // we don't want to output error when BTTV emotes doesn't exist
+
+    const emotes = _.shuffle(parsed)
+    for (let i = 0; i < this.settings.emotes.maxEmotesPerMessage && i < emotes.length; i++) {
+      global.panel.io.emit('emote', {
+        url: usedEmotes[emotes[i]].urls[this.settings.emotes.size],
+        settings: {
+          emotes: {
+            animation: this.settings.emotes.animation,
+            animationTime: this.settings.emotes.animationTime
+          }
+        }
+      })
+    }
+
+    return true
   }
 
-  // parse FFZ emoticons
-  try {
-    for (let emote of await this.fetcher._getRawFFZEmotes(await global.oauth.settings.broadcaster.username)) {
-      if (parsed.includes(emote.name)) continue
-      for (let i in _.range((opts.message.match(new RegExp(emote.name, 'g')) || []).length)) {
-        if (i === OEmotesMax) break
-        global.panel.io.emit('emote', this.fetcher.emotes.get(emote.name).toLink(OEmotesSize))
+  async parseEmotes (emotes: Array<string>) {
+    let emotesArray = []
+
+    for (var i = 0, length = emotes.length; i < length; i++) {
+      if (_.includes(Object.keys(this.simpleEmotes), emotes[i])) {
+        emotesArray.push(this.simpleEmotes[emotes[i]] + this.settings.emotes.size + '.0')
+      } else {
+        try {
+          const items = await global.db.engine.find(this.collection.cache, { code: emotes[i] })
+          if (!_.isEmpty(items)) {
+            emotesArray.push(items[0].urls[this.settings.emotes.size])
+          }
+        } catch (e) {
+          continue
+        }
       }
     }
-  } catch (e) {
-    // we don't want to output error when BTTV emotes doesn't exist
+    return emotesArray
   }
-
-  return true
-}
-
-Emotes.prototype.parseEmotes = async function (self, emotes) {
-  let OEmotesSize = await global.configuration.getValue('OEmotesSize')
-  let emotesArray = []
-
-  for (var i = 0; i < emotes.length; i++) {
-    if (_.includes(Object.keys(self.simpleEmotes), emotes[i])) {
-      emotesArray.push(self.simpleEmotes[emotes[i]] + (OEmotesSize + 1) + '.0')
-    } else {
-      try {
-        emotesArray.push(self.fetcher.emotes.get(emotes[i]).toLink(OEmotesSize))
-      } catch (e) {
-        continue
-      }
-    }
-  }
-  return emotesArray
 }
 
 module.exports = new Emotes()

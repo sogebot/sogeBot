@@ -46,6 +46,17 @@ function Panel () {
   app.get('/popout/', this.authUser, function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'popout.html'))
   })
+  app.get('/gallery/:id', async function (req, res) {
+    const file = await global.db.engine.findOne(global.overlays.gallery.collection.data, { _id: req.params.id })
+    if (!_.isEmpty(file)) {
+      const data = Buffer.from(file.data.split(',')[1], 'base64')
+      res.writeHead(200, {
+        'Content-Type': file.type,
+        'Content-Length': data.length
+      })
+      res.end(data)
+    } else res.sendStatus(404)
+  })
   app.get('/oauth/:page', this.authUser, function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'oauth', req.params.page + '.html'))
   })
@@ -70,7 +81,7 @@ function Panel () {
     res.sendFile(path.join(__dirname, '..', 'public', 'playlist', 'index.html'))
   })
   app.get('/overlays/:overlay', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'overlays', req.params.overlay + '.html'))
+    res.sendFile(path.join(__dirname, '..', 'public', 'overlays.html'))
   })
   app.get('/custom/:custom', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'public', 'custom', req.params.custom + '.html'))
@@ -260,6 +271,19 @@ function Panel () {
         if (!global[system].settings) continue
         toEmit.push({
           name: system.toLowerCase()
+        })
+      }
+      cb(null, toEmit)
+    })
+    socket.on('overlays', async (cb) => {
+      let toEmit = []
+      for (let system of Object.keys(global.overlays).filter(o => !o.startsWith('_'))) {
+        if (!global.overlays[system].settings || global.overlays[system]._ui._hidden) continue
+        toEmit.push({
+          name: system.toLowerCase(),
+          enabled: await global.overlays[system].settings.enabled,
+          areDependenciesEnabled: await global.overlays[system]._dependenciesEnabled(),
+          isDisabledByEnv: !_.isNil(process.env.DISABLE) && (process.env.DISABLE.toLowerCase().split(',').includes(system.toLowerCase()) || process.env.DISABLE === '*')
         })
       }
       cb(null, toEmit)

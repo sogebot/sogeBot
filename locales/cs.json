@@ -249,6 +249,10 @@
           "label": "Emotes k výbuchu",
           "placeholder": "Seznam emotes k výbuchu, např. Kappa PurpleHeart"
         },
+        "emotesToFirework": {
+          "label": "Emotes k fireworku",
+          "placeholder": "Seznam emotes k fireworku, např. Kappa PurpleHeart"
+        },
         "announce": {
           "label": "Oznámit v chatu",
           "true": "Bude oznámeno",
@@ -391,35 +395,6 @@
             "cooldowns": "Šeptat při cooldownu (pokud nastaven jako oznámit)"
           }
         }
-      },
-      "overlays": {
-        "credits": {
-          "period": {
-            "day": "den",
-            "week": "týden",
-            "month": "měsíc",
-            "all": "bez omezení"
-          }
-        },
-        "replay": {
-          "title": "Nastavení replaye",
-          "position": "Pozice",
-          "posleft": "Vlevo",
-          "posright": "Vpravo",
-          "offsetX": "Horizontální posun",
-          "offsetY": "Vertikální posun",
-          "size": "Velikost videa",
-          "volume": "Hlasitost",
-          "label": "Ukazát 'replay' popisek",
-          "filter": {
-            "title": "Filter replaye",
-            "none": "- žádný -",
-            "grayscale": "grayscale",
-            "sepia": "sepia",
-            "tint": "tint",
-            "washed": "vybledlé barvy"
-          }
-        }
       }
     },
     "page-logger": {
@@ -490,37 +465,6 @@
     "overlays-eventlist-cheer": "bits",
     "overlays-eventlist-tip": "tip",
     "overlays-eventlist-raid": "raid",
-    "overlay-credits-aggregate": "Spojit eventy",
-    "overlay-credits-show-followers": "Zobrazit followery",
-    "overlay-credits-show-hosts": "Zobrazit hosty",
-    "overlay-credits-show-subscribers": "Zobrazit subscribery",
-    "overlay-credits-show-subgifts": "Zobrazit subgifty",
-    "overlay-credits-show-subcommunitygifts": "Zobrazit suby darované komunitě",
-    "overlay-credits-show-resubs": "Zobrazit resuby",
-    "overlay-credits-show-cheers": "Zobrazit cheery",
-    "overlay-credits-show-clips": "Zobrazit klipy",
-    "overlay-credits-show-tips": "Zobrazit tipy",
-    "overlay-credits-speed": "Rychlost titulek",
-    "overlay-credits-max-font-size": "Max velikost fontu titulku",
-    "overlay-credits-last-message": "Poslední zpráva",
-    "overlay-credits-last-submessage": "Poslední podzpráva",
-    "overlay-credits-stream-by": "Streamoval",
-    "overlay-credits-followed-by": "Follow od",
-    "overlay-credits-hosted-by": "Hostování",
-    "overlay-credits-cheer-by": "Cheer od",
-    "overlay-credits-subscribed-by": "Subscribe od",
-    "overlay-credits-resubscribed-by": "Resubscribe od",
-    "overlay-credits-subgift-by": "Subgift od",
-    "overlay-credits-subcommunitygift-by": "Suby darované komunitě od",
-    "overlay-credits-clipped-by": "Klip od",
-    "overlay-credits-tip-by": "Tip od",
-    "overlay-credits-social-facebook": "Facebook",
-    "overlay-credits-social-twitter": "Twitter",
-    "overlay-credits-social-twitch": "Twitch",
-    "overlay-credits-clips-period": "Klipy za období",
-    "overlay-credits-clips-count": "Počet klipů",
-    "overlay-credits-clips-play": "Bude klipy přehrávány",
-    "overlay-credits-top-clips": "Top klipy",
     "credits": "Titulky",
     "requested-by": "Požadoval",
     "description": "Popisek",
@@ -545,13 +489,6 @@
     "placeholder-search": "Hledat",
     "placeholder-enter-product": "Vložte produkt",
     "placeholder-enter-keyword": "Vložte klíčové slovo",
-    "overlay-emotes-size": "Velikost emotikonu",
-    "overlay-emotes-max": "Max stejných emotikonů na zprávu",
-    "overlay-emotes-animation": "Animace emotikonu",
-    "overlay-emotes-animation-time": "Trvání animace",
-    "overlay-carousel-upload": "Nahrát obrázek",
-    "overlay-text-link-generator": "URL generátor",
-    "overlay-text-decode-base64": "Dekódovat base64",
     "fade-out-top": "slábnout směrem nahoru",
     "fade-out-zoom": "slábnout přiblížením",
     "global": "Globální",
@@ -783,6 +720,7 @@
     "message": "zpráva",
     "sound": "zvuk",
     "emote-explosion": "exploze smajlíků",
+    "emote-firework": "firework smajlíků",
     "quiet": "tichý",
     "true": "ano",
     "false": "ne",

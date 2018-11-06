@@ -48,16 +48,6 @@
     "online": "Stream is online for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)",
     "offline": "Stream is currently offline for (if $days>0|$daysd )(if $hours>0|$hoursh )(if $minutes>0|$minutesm )(if $seconds>0|$secondss)"
   },
-  "overlay": {
-    "emotes": {
-      "settings": {
-        "OEmotesSize": "Emoticon size is set to $value",
-        "OEmotesMax": "Max count of same emoticon to show is $value",
-        "OEmotesAnimation": "Emoticon show animation is $value",
-        "OEmotesAnimationTime": "Emoticon animation duration is $valuems"
-      }
-    }
-  },
   "webpanel": {
     "display-as": "Display as",
     "set-default": "Set default",
@@ -249,6 +239,10 @@
           "label": "Emotes To Explode",
           "placeholder": "List of emotes to explode, e.g. Kappa PurpleHeart"
         },
+        "emotesToFirework": {
+          "label": "Emotes To Firework",
+          "placeholder": "List of emotes to firework, e.g. Kappa PurpleHeart"
+        },
         "announce": {
           "label": "Announce in chat",
           "true": "Will be announced",
@@ -391,35 +385,6 @@
             "cooldowns": "Whispers on cooldown (if set as notify)"
           }
         }
-      },
-      "overlays": {
-        "credits": {
-          "period": {
-            "day": "a day",
-            "week": "a week",
-            "month": "a month",
-            "all": "all"
-          }
-        },
-        "replay": {
-          "title": "Replay settings",
-          "position": "Position",
-          "posleft": "Left",
-          "posright": "Right",
-          "offsetX": "Horizontal offset",
-          "offsetY": "Vertical offset",
-          "size": "Video size",
-          "volume": "Volume",
-          "label": "Show 'replay' label",
-          "filter": {
-            "title": "Replay filter",
-            "none": "- none -",
-            "grayscale": "grayscale",
-            "sepia": "sepia",
-            "tint": "tint",
-            "washed": "washed out colors"
-          }
-        }
       }
     },
     "page-logger": {
@@ -514,44 +479,6 @@
     "placeholder-search": "Search",
     "placeholder-enter-product": "Enter product",
     "placeholder-enter-keyword": "Enter keyword",
-    "overlay-emotes-size": "Emoticon size",
-    "overlay-emotes-max": "Max same emoticons to show",
-    "overlay-emotes-animation": "Emoticon animation",
-    "overlay-emotes-animation-time": "Animation Duration",
-    "overlay-carousel-upload": "Upload image",
-    "overlay-text-link-generator": "URL generator",
-    "overlay-text-decode-base64": "Decode base64",
-    "overlay-credits-aggregate": "Aggregate events",
-    "overlay-credits-show-followers": "Show followers",
-    "overlay-credits-show-hosts": "Show hosts",
-    "overlay-credits-show-subscribers": "Show subscribers",
-    "overlay-credits-show-subgifts": "Show subgifts",
-    "overlay-credits-show-subcommunitygifts": "Show subs given to community",
-    "overlay-credits-show-resubs": "Show resubs",
-    "overlay-credits-show-cheers": "Show cheers",
-    "overlay-credits-show-clips": "Show clips",
-    "overlay-credits-show-tips": "Show tips",
-    "overlay-credits-speed": "Credits speed",
-    "overlay-credits-max-font-size": "Max title font size",
-    "overlay-credits-last-message": "Last message",
-    "overlay-credits-last-submessage": "Last submessage",
-    "overlay-credits-stream-by": "Stream by",
-    "overlay-credits-followed-by": "Followed by",
-    "overlay-credits-hosted-by": "Hosted by",
-    "overlay-credits-cheer-by": "Cheer by",
-    "overlay-credits-subscribed-by": "Subscribed by",
-    "overlay-credits-resubscribed-by": "Resubscribed by",
-    "overlay-credits-subgift-by": "Subgift by",
-    "overlay-credits-subcommunitygift-by": "Sub given to community by",
-    "overlay-credits-clipped-by": "Clipped by",
-    "overlay-credits-tip-by": "Tip by",
-    "overlay-credits-social-facebook": "Facebook",
-    "overlay-credits-social-twitter": "Twitter",
-    "overlay-credits-social-twitch": "Twitch",
-    "overlay-credits-clips-period": "Clips period",
-    "overlay-credits-clips-count": "Clips count",
-    "overlay-credits-clips-play": "Will clips play",
-    "overlay-credits-top-clips": "Top clips",
     "credits": "Credits",
     "fade-out-top": "fade up",
     "fade-out-zoom": "fade zoom",
@@ -778,6 +705,7 @@
     "message": "message",
     "sound": "sound",
     "emote-explosion": "emote explosion",
+    "emote-firework": "emote firework",
     "quiet": "quiet",
     "true": "true",
     "false": "false",
