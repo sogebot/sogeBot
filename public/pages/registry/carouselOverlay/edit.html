@@ -33,7 +33,7 @@
       <form>
         <div class="form-row pl-2 pr-2">
           <div class="form-group col-auto">
-            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('thumbnail') }}</label>
+            <label style="font-weight: bold; margin: 0px 0px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">{{ commons.translate('commons.thumbnail') }}</label>
             <img class="d-block p-0" style="max-height: 275px" :src="'data:' + type + ';base64,'  + base64">
           </div>
           <div class="form-group col">
@@ -89,7 +89,7 @@
             <div class="form-row pl-2 pr-2">
               <div class="col-md-4">
                 <label style="margin: 0px 0px 3px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">{{commons.translate('page.settings.overlays.carousel.titles.showOnlyOncePerStream')}}</label>
-                <button type="button" class="btn btn-block" v-on:click="showOnlyOncePerStream = !showOnlyOncePerStream" v-bind:class="[ showOnlyOncePerStream ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">{{ (showOnlyOncePerStream ? commons.translate('showOnlyOncePerStream.true') : commons.translate('showOnlyOncePerStream.false')) | capitalize }}</button>
+                <button type="button" class="btn btn-block" v-on:click="showOnlyOncePerStream = !showOnlyOncePerStream" v-bind:class="[ showOnlyOncePerStream ? 'btn-success' : 'btn-danger' ]" aria-hidden="true">{{ (showOnlyOncePerStream ? commons.translate('commons.yes') : commons.translate('commons.no')) | capitalize }}</button>
               </div>
             </div>
           </div>

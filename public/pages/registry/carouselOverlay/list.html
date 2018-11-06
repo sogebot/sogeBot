@@ -2,7 +2,7 @@
   <div class="container-fluid" v-if="isMounted">
     <div class="row">
       <div class="col-12">
-        <span data-lang="menu.carouseloverlay" class="title text-default"></span>
+        <span class="title text-default">{{ commons.translate('menu.carouseloverlay') }}</span>
 
         <div class="pt-3 pb-3 mt-3 mb-3 m-0 border-top border-bottom row">
           <div class="col-sm-6">
@@ -11,10 +11,10 @@
                 <button type="button" class="btn btn-primary" :disabled="isUploading" @click="$refs.uploadFileInput.click()">
                   <template v-if="isUploading">
                       <i class="fas fa-circle-notch fa-spin fa-fw"></i>
-                      {{ commons.translate('overlay-carousel-upload') }}</template>
+                      {{ commons.translate('dialog.buttons.upload.progress') }}</template>
                     <template v-else>
                       <i class="fas fa-upload fa-fw"></i>
-                      {{ commons.translate('overlay-carousel-upload') }}</template>
+                      {{ commons.translate('dialog.buttons.upload.idle') }}</template>
                 </button>
               </label>
                 <input
@@ -29,7 +29,7 @@
           </div>
           <div class="col-sm-6 text-right form-inline d-block">
             <button class="btn border-0" v-on:click="showAs='cards'" v-bind:class="[ showAs === 'cards' ? 'btn-dark' : 'btn-outline-dark' ]"><i class="fas fa-th-large"></i></button>
-            <button class="btn btn-secondary border-0" @click="items = _.orderBy(items, 'order', 'asc')"><i class="fas fa-sort-numeric-down fa-fw"></i> {{ commons.translate('overlay-carousel-reorder') }}</button>
+            <button class="btn btn-secondary border-0" @click="items = _.orderBy(items, 'order', 'asc')"><i class="fas fa-sort-numeric-down fa-fw"></i> {{ commons.translate('dialog.buttons.reorder') }}</button>
           </div>
         </div>
 

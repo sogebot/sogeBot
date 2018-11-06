@@ -5,5 +5,8 @@
   "moveDown": "posunout dolů",
   "stop-if-executed": "po provedení nepokračuje",
   "continue-if-executed": "po provedení pokračuje",
-  "generate": "Vygenerovat"
+  "generate": "Vygenerovat",
+  "thumbnail": "Miniatura",
+  "yes": "Ano",
+  "no": "Ne"
 }

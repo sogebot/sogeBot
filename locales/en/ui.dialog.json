@@ -4,6 +4,7 @@
     "add": "Add"
   },
   "buttons": {
+    "reorder": "Reorder",
     "upload": {
       "idle": "Upload",
       "progress": "Uploading",
