@@ -6,6 +6,19 @@ const Game = require('./_interface')
 
 class WheelOfFortune extends Game {
   constructor () {
+    // define special property name as readonly
+    const ui = {
+      links: {
+        overlay: {
+          type: 'link',
+          href: '/overlays/wheeloffortune',
+          class: 'btn btn-primary btn-block',
+          rawText: '/overlays/wheeloffortune (500x55)',
+          target: '_blank'
+        }
+      }
+    }
+
     const settings = {
       commands: [
         '!wof'
@@ -14,7 +27,7 @@ class WheelOfFortune extends Game {
         data: JSON.stringify([])
       }
     }
-    super({ settings })
+    super({ settings, ui })
   }
   sockets () {
     this.socket.on('connection', (socket) => {
