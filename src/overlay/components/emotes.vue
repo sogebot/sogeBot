@@ -65,7 +65,7 @@ export default {
         }
       } else if (emote.animation.type === 'facebook') {
         animation = {
-          top: emote.position.top - _.random($('body').height() / 4, $('body').height() / 1.2),
+          top: emote.position.top - _.random(window.innerHeight / 4, window.innerHeight / 1.2),
           left: _.random(emote.position.left - 60, emote.position.left + 60),
           opacity: 0
         }
@@ -76,8 +76,8 @@ export default {
         }
       } else if (emote.animation.type === 'explosion') {
         animation = {
-          top: _.random(0, $('body').height() - 100),
-          left: _.random(0, $('body').width() - 100),
+          top: _.random(0, window.innerHeight - 100),
+          left: _.random(0, window.innerWidth - 100),
           opacity: 0
         }
       } else if (emote.animation.type === 'firework') {
@@ -106,14 +106,14 @@ export default {
       }
     },
     setLeft: function (type) {
-      if (type === 'fadeup' || type === 'fadezoom') return _.random($('body').width() - 200) + 100
-      else if (type === 'facebook') return _.random(200) + $('body').width() - 250
-      else return $('body').width() / 2
+      if (type === 'fadeup' || type === 'fadezoom') return _.random(window.innerWidth - 200) + 100
+      else if (type === 'facebook') return _.random(200) + window.innerWidth - 250
+      else return window.innerWidth / 2
     },
     setTop: function (type) {
-      if (type === 'fadeup' || type === 'fadezoom') return _.random($('body').height() - 200) + 100
-      else if (type === 'facebook') return $('body').height() - 20
-      else return $('body').height() / 2
+      if (type === 'fadeup' || type === 'fadezoom') return _.random(window.innerHeight - 200) + 100
+      else if (type === 'facebook') return window.innerHeight - 20
+      else return window.innerHeight / 2
     },
     addEmote: function (opts) {
       this.emotes.push({
@@ -146,8 +146,8 @@ export default {
             finished: false
           },
           position: {
-            left: _.random(-300, 300) + $('body').width() / 2,
-            top: _.random(-300, 300) + $('body').height() / 2
+            left: _.random(-300, 300) + window.innerWidth / 2,
+            top: _.random(-300, 300) + window.innerHeight / 2
           },
           url: _.sample(opts.emotes)
         })
@@ -155,8 +155,8 @@ export default {
     },
     firework: function (opts) {
       for (let i = 0; i < opts.settings.fireworks.numOfExplosions; i++) {
-        const commonTop = _.random(200, $('body').height() - 200)
-        const commonLeft = _.random(200, $('body').width() - 200)
+        const commonTop = _.random(200, window.innerHeight - 200)
+        const commonLeft = _.random(200, window.innerWidth - 200)
         const commonTrigger = Date.now() + _.random(3000)
         const commonUrl = _.sample(opts.emotes)
 
