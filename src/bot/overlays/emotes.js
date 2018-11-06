@@ -332,8 +332,8 @@ class Emotes extends Overlay {
 
     const emotes = _.shuffle(parsed)
     for (let i = 0; i < this.settings.emotes.maxEmotesPerMessage && i < emotes.length; i++) {
-      global.panel.io.emit('emote', {
-        url: usedEmotes[emotes[i]].urls[this.settings.emotes.size],
+      global.panel.io.of('/overlays/emotes').emit('emote', {
+        url: usedEmotes[emotes[i]].urls[String(this.settings.emotes.size)],
         settings: {
           emotes: {
             animation: this.settings.emotes.animation,
