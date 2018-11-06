@@ -12,39 +12,55 @@ const Logger = require('../dest/logging')
 global.logger = new Logger()
 
 const dropFiles = [
-  'playlist.db', 'songrequest.db', 'ranks.db', 'prices.db',
-  'commands.db', 'keywords.db', 'cooldowns.db', 'alias.db',
-  'cooldowns.viewers.db', 'raffles.db', 'raffle_participants.db',
-  'timers.db', 'timers.responses.db', 'moderation.message.cooldown.db',
-  'moderation.permit.db', 'moderation.warnings.db', 'songbanned.db',
-  'songrequests.db', 'system.alias.db', 'system.alias.settings.db',
-  'system.bets.db', 'system.bets.settings.db', 'system.bets.users.db',
-  'system.commercial.settings.db', 'system.cooldown.db', 'system.cooldown.settings.db',
-  'users_ignorelist.db', 'overlay.credits.socials.db', 'overlay.credits.customTexts.db',
-  'overlay.carousel.db'
+  'playlist', 'songrequest', 'ranks', 'prices',
+  'commands', 'keywords', 'cooldowns', 'alias',
+  'cooldowns.viewers', 'raffles', 'raffle_participants',
+  'timers', 'timers.responses', 'moderation.message.cooldown',
+  'moderation.permit', 'moderation.warnings', 'songbanned',
+  'songrequests', 'system.alias', 'system.alias.settings',
+  'system.bets', 'system.bets.settings', 'system.bets.users',
+  'system.commercial.settings', 'system.cooldown', 'system.cooldown.settings',
+  'users_ignorelist', 'overlay.credits.socials', 'overlay.credits.customTexts',
+  'overlay.carousel', 'bannedsong', 'highlights', 'notices'
 ]
-
-if (process.argv[2] && process.argv[2] === '--delete') {
-  console.info(('-').repeat(56))
-  console.info('Removing nedb files')
-
-  if (fs.existsSync('db/nedb/')) {
-    for (let file of dropFiles) {
-      if (fs.existsSync(`db/nedb/${file}`)) {
-        console.info(`- Removing db/nedb/${file}`)
-        fs.unlinkSync(`db/nedb/${file}`)
-      }
-    }
-  } else {
-    console.info('Nothing to do')
-  }
-  console.info(('-').repeat(56))
-  process.exit()
-}
 
 // db
 const Database = require('../dest/databases/database')
 global.db = new Database(false, true)
+
+const runDeletion = async function () {
+  if (!global.db.engine.connected) {
+    setTimeout(() => runDeletion(), 1000)
+    return
+  }
+
+  console.info(('-').repeat(56))
+  if (config.database.type === 'nedb') {
+    console.info('Removing nedb files')
+
+    if (fs.existsSync('db/nedb/')) {
+      for (let file of dropFiles) {
+        if (fs.existsSync(`db/nedb/${file}.db`)) {
+          console.info(`- Removing db/nedb/${file}.db`)
+          fs.unlinkSync(`db/nedb/${file}.db`)
+        }
+      }
+    } else {
+      console.info('Nothing to do')
+    }
+    console.info(('-').repeat(56))
+  } else if (config.database.type === 'mongodb') {
+    console.info('Removing mongodb collections')
+    const collections = await global.db.engine.collections()
+    for (let file of dropFiles) {
+      if (collections.includes(file)) {
+        console.info(`- Removing ${file}`)
+        await global.db.engine.drop(file)
+      }
+    }
+  }
+  process.exit()
+}
 
 var runMigration = async function () {
   if (!global.db.engine.connected) {
@@ -82,7 +98,10 @@ var runMigration = async function () {
   else await global.db.engine.insert('info', { version: version })
   process.exit()
 }
-runMigration()
+
+if (process.argv[2] && process.argv[2] === '--delete') {
+  runDeletion()
+} else runMigration()
 
 let updates = async (from, to) => {
   console.info('Performing update from %s to %s', from, to)
@@ -129,7 +148,7 @@ let migration = {
             o.left = o.text.left
             o.middle = o.text.middle
             o.right = o.text.right
-            delete o._id;
+            delete o._id
             return o
           })
       await global.db.engine.update('overlays.credits.settings', { key: 'customTexts.values' }, { key: 'customTexts.values', value: customTexts })
