@@ -96,9 +96,3 @@
   - `test1` - X
   - `testa` - X
   - `atest` - X
-
-## URL whitelisting
-
-Use this pattern to whitelist your desired url. Change `example.com` to what you want.
-
-`(https?:\/\/)?(www\.)?example.com(*)?`
