@@ -98,6 +98,13 @@ class Interface {
   async collections () {
     throw Error('function collections() is not implemented in ' + this.constructor.name)
   }
+
+  /**
+   * Drop collection
+   */
+  async drop (table) {
+    throw Error('function drop() is not implemented in ' + this.constructor.name)
+  }
 }
 
 module.exports = Interface
