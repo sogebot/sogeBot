@@ -89,6 +89,7 @@ export default {
           a.delay = Number(a.delay)
           if (isNaN(a.delay)) a.delay = 0
           if (a.receivedAt + a.delay < Date.now()) a.run = true
+          else continue
 
           if (a.type === 'audio') {
             if (!a.url) {
@@ -100,8 +101,13 @@ export default {
               for (let el of audio) {
                 if (el.src === a.url) {
                   if (a.volume) el.volume = Number(a.volume) / 100
-                  el.play()
-                  el.onended = () => a.finished = true
+                  if (!el.error) {
+                    el.onended = () => a.finished = true
+                    el.play()
+                  } else {
+                    a.finished = true
+                    console.error('Something went wrong with your audio file')
+                  }
                 }
               }
             } else {
@@ -119,10 +125,16 @@ export default {
               for (let el of video) {
                 if (el.dataset.src === a.url) {
                   if (a.volume) el.volume = Number(a.volume) / 100
-                  el.play()
-                  el.onended = () => {
+                  if (!el.error) {
+                    el.onended = () => {
+                      a.leaveAnimation = true // trigger leave animation
+                      setTimeout(() => a.finished = true, Number(a.duration || 1000)) // trigger finished
+                    }
+                    el.play()
+                  } else {
                     a.leaveAnimation = true // trigger leave animation
-                    setTimeout(() => a.finished = true, Number(a.duration || 1000)) // trigger finished
+                    a.finished = true
+                    console.error('Something went wrong with your video file')
                   }
                 }
               }
@@ -158,6 +170,9 @@ export default {
       if (val) {
         this.isPlaying = false,
         this.alerts.shift()
+        for (let a of this.alerts[0]) {
+          a.receivedAt = Date.now()
+        }
       }
     }
   },
