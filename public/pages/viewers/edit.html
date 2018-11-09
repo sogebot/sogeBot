@@ -279,9 +279,9 @@
           this.pending = true
           this.states.forceCheckFollowedAt = true
           this.socket.emit('followedAt.viewer', this.viewer.id, (err, followed_at) => {
-            if (err) return console.error(err)
-            this.viewer.time.follow = followed_at
             this.states.forceCheckFollowedAt = false
+            if (err) return console.error(err)
+            else this.viewer.time.follow = followed_at
           })
         },
         removeBits: function (_id) {
@@ -365,6 +365,8 @@
               tips.editation = false
               tips.new = false
             }
+
+            data.time.follow = data.time.follow === 0 ? null : data.time.follow
             this.viewer = data
             this.watchedTime = !data.time.watched ? '0.0' : Number(data.time.watched / (60 * 60 * 1000)).toFixed(1)
             this.$nextTick(() => { this.pending = false })
