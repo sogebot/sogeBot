@@ -426,20 +426,19 @@ class Users extends Core {
           const cid = global.oauth.channelId
           const url = `https://api.twitch.tv/helix/users/follows?from_id=${id}&to_id=${cid}`
 
-          const token = await global.oauth.settings.bot.accessToken
+          const token = global.oauth.settings.bot.accessToken
           if (token === '') cb(new Error('no token available'), null)
 
           const request = await axios.get(url, {
             headers: {
               'Accept': 'application/vnd.twitchtv.v5+json',
-              'Authorization': 'OAuth ' + token
+              'Authorization': 'Bearer ' + token
             }
           })
-
           if (request.data.total === 0) throw new Error('Not a follower')
           else cb(null, new Date(request.data.data[0].followed_at).getTime())
         } catch (e) {
-          cb(e, null)
+          cb(e.stack, null)
         }
       })
       socket.on('findOne.viewer', async (opts, cb) => {
