@@ -72,6 +72,8 @@
                 <i class="fas fa-circle-notch fa-spin"></i> {{ commons.translate('dialog.buttons.saveChanges.progress') }}</button>
               <button disabled="disabled" class="btn btn-block btn-success" v-on:click="saveSettings" v-if="state.settings === 2">
                 <i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.saveChanges.done') }}</button>
+              <button disabled="disabled" class="btn btn-block btn-danger" v-on:click="saveSettings" v-if="state.settings === 3">
+                <i class="fas fa-check"></i> {{ commons.translate('dialog.buttons.something-went-wrong') }}</button>
             </div>
 
             <div class="pl-2 pr-2" v-for="system of listOfSystems">
@@ -202,9 +204,14 @@
           delete settings.settings
 
           this.socket[this.selectedSystem].emit('settings.update', settings, (err) => {
-            this.state.settings = 2
-            this.isDataChanged = false
             setTimeout(() => this.state.settings = 0, 1000)
+            if (err) {
+              this.state.settings = 3
+              console.error(err)
+            } else {
+              this.state.settings = 2
+              this.isDataChanged = false
+            }
             setTimeout(() => {
               this.socket._panel.emit('systems', (err, systems) => {
                 this.listOfSystems = systems
