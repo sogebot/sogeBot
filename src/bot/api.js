@@ -586,7 +586,7 @@ class API {
             }
           }
           try {
-            const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(f.followed_at).format('x')
+            const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : new Date(f.followed_at).getTime()
             const isFollower = user.lock && user.lock.follower ? user.is.follower : true
             global.db.engine.update('users', { id: f.from_id }, { username: f.from_name, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
           } catch (e) {
