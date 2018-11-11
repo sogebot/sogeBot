@@ -14,7 +14,7 @@
         <button type="button" class="btn" :class="[states.delete ? 'btn-danger' : 'btn-outline-danger border-light']" @click="states.delete = !states.delete; pending = true">
           <i v-if="states.delete" class="far fa-check-square pr-1 fa-fw"></i>
           <i v-else class="far fa-square pr-1 fa-fw"></i>
-          Mark to delete
+          {{ commons.translate('dialog.buttons.mark-to-delete') }}
         </button>
         <button type="button" class="btn btn-outline-primary border-light" @click="forceCheckFollowedAt()">
           <i class="fas fa-sync-alt mr-1 fa-fw" :class="[states.forceCheckFollowedAt ? 'fa-spin' : '']"></i>

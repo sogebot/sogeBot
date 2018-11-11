@@ -18,7 +18,7 @@
         <button type="button" class="btn" :class="[states.delete ? 'btn-danger' : 'btn-outline-danger border-light']" @click="states.delete = !states.delete; pending = true">
           <i v-if="states.delete" class="far fa-check-square pr-1 fa-fw"></i>
           <i v-else class="far fa-square pr-1 fa-fw"></i>
-          Mark to delete
+          {{ commons.translate('dialog.buttons.mark-to-delete') }}
         </button>
       </div>
       <div class="col text-right form-inline d-block">
