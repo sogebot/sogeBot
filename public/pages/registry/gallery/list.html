@@ -45,7 +45,7 @@
               <a v-bind:href="'/gallery/'+ item._id" class="btn btn-outline-dark p-3 border-0 w-100" target="_blank"><i class="fas fa-link"></i> /gallery/{{ item._id }}</a>
             </div>
             <div class="card-body border-top p-0 text-right" style="flex: 1 1 auto;">
-              <img class="w-100" :src="'/gallery/'+ item._id" v-if="item.type.includes('png')">
+              <img class="w-100" :src="'/gallery/'+ item._id" v-if="item.type.includes('png') || item.type.includes('jpg') || item.type.includes('jpeg') || item.type.includes('gif')">
               <video class="w-100" v-if="item.type.includes('mp4')" controls>
                 <source :type="item.type" :src="'/gallery/'+ item._id">
               </video>
