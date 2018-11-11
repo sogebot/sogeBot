@@ -223,26 +223,31 @@ class Module {
           cb(null, await this.getAllSettings(), this._ui)
         })
         socket.on('settings.update', async (data, cb) => {
-          for (let [key, value] of Object.entries(data)) {
-            if (key === 'enabled' && this._name === 'core') continue
-            else if (key === '_permissions') {
-              for (let [command, currentValue] of Object.entries(value)) {
-                command = this._commands.find(o => o.name === command)
-                if (currentValue === command.permission) await global.db.engine.remove('permissions', { key: command.name })
-                else await global.db.engine.update('permissions', { key: command.name }, { permission: currentValue })
-              }
-            } else if (key === 'enabled') this.status({ state: value })
-            else if (key === 'commands') {
-              for (let [defaultValue, currentValue] of Object.entries(value)) {
-                this.settings.commands[defaultValue] = currentValue
-              }
-            } else {
-              if (_.isObjectLike(value)) {
-                for (let [defaultValue, currentValue] of Object.entries(value)) {
-                  this.settings[key][defaultValue] = currentValue
+          try {
+            for (let [key, value] of Object.entries(data)) {
+              if (key === 'enabled' && this._name === 'core') continue
+              else if (key === '_permissions') {
+                for (let [command, currentValue] of Object.entries(value)) {
+                  command = this._commands.find(o => o.name === command)
+                  if (currentValue === command.permission) await global.db.engine.remove('permissions', { key: command.name })
+                  else await global.db.engine.update('permissions', { key: command.name }, { permission: currentValue })
                 }
-              } else this.settings[key] = value
+              } else if (key === 'enabled') this.status({ state: value })
+              else if (key === 'commands') {
+                for (let [defaultValue, currentValue] of Object.entries(value)) {
+                  this.settings.commands[defaultValue] = currentValue
+                }
+              } else {
+                if (_.isObjectLike(value)) {
+                  for (let [defaultValue, currentValue] of Object.entries(value)) {
+                    this.settings[key][defaultValue] = currentValue
+                  }
+                } else this.settings[key] = value
+              }
             }
+          } catch (e) {
+            global.log.error(e.stack)
+            setTimeout(() => cb(e.stack), 1000)
           }
           setTimeout(() => cb(null), 1000)
         })
