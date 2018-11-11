@@ -16,6 +16,7 @@ const Parser = require('../parser')
  * !cooldown [keyword|!command] [global|user] [seconds] [true/false] - set cooldown for keyword or !command - 0 for disable, true/false set quiet mode
  * !cooldown toggle moderators [keyword|!command] [global|user]      - enable/disable specified keyword or !command cooldown for moderators
  * !cooldown toggle owners [keyword|!command] [global|user]          - enable/disable specified keyword or !command cooldown for owners
+ * !cooldown toggle subscribers [keyword|!command] [global|user]    - enable/disable specified keyword or !command cooldown for owners
  * !cooldown toggle enabled [keyword|!command] [global|user]         - enable/disable specified keyword or !command cooldown
  */
 
@@ -26,6 +27,7 @@ class Cooldown extends System {
       commands: [
         { name: '!cooldown toggle moderators', permission: constants.OWNER_ONLY },
         { name: '!cooldown toggle owners', permission: constants.OWNER_ONLY },
+        { name: '!cooldown toggle subscribers', permission: constants.OWNER_ONLY },
         { name: '!cooldown toggle enabled', permission: constants.OWNER_ONLY },
         { name: '!cooldown', permission: constants.OWNER_ONLY }
       ],
@@ -80,7 +82,7 @@ class Cooldown extends System {
     }
 
     let cooldown = await global.db.engine.findOne(this.collection.data, { key: match.command, type: match.type })
-    if (_.isEmpty(cooldown)) await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000, type: match.type, timestamp: 0, quiet: _.isNil(match.quiet) ? false : match.quiet, enabled: true, owner: false, moderator: false })
+    if (_.isEmpty(cooldown)) await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000, type: match.type, timestamp: 0, quiet: _.isNil(match.quiet) ? false : match.quiet, enabled: true, owner: false, moderator: false, subscriber: true })
     else await global.db.engine.update(this.collection.data, { key: match.command, type: match.type }, { miliseconds: parseInt(match.seconds, 10) * 1000 })
 
     let message = await global.commons.prepare('cooldowns.cooldown-was-set', { seconds: match.seconds, type: match.type, command: match.command })
@@ -114,6 +116,7 @@ class Cooldown extends System {
         quiet: cooldown.quiet,
         enabled: cooldown.enabled,
         moderator: cooldown.moderator,
+        subscriber: cooldown.subscriber,
         owner: cooldown.owner
       }]
     } else { // text
@@ -135,6 +138,7 @@ class Cooldown extends System {
             quiet: cooldown.quiet,
             enabled: cooldown.enabled,
             moderator: cooldown.moderator,
+            subscriber: cooldown.subscriber,
             owner: cooldown.owner
           })
         }
@@ -145,9 +149,11 @@ class Cooldown extends System {
     }
 
     let result = false
-    let isMod = await global.commons.isMod(opts.sender)
+    let isMod = opts.sender.isModerator
+    let isSubscriber = opts.sender.isSubscriber
+
     for (let cooldown of data) {
-      if ((global.commons.isOwner(opts.sender) && !cooldown.owner) || (isMod && !cooldown.moderator)) {
+      if ((global.commons.isOwner(opts.sender) && !cooldown.owner) || (isMod && !cooldown.moderator) || (isSubscriber && !cooldown.subscriber)) {
         result = true
         continue
       }
@@ -209,6 +215,7 @@ class Cooldown extends System {
 
     if (type === 'moderator') path = '-for-moderators'
     if (type === 'owner') path = '-for-owners'
+    if (type === 'subscriber') path = '-for-subscribers'
     if (type === 'quiet' || type === 'type') return // those two are setable only from dashboard
 
     let message = await global.commons.prepare(`cooldowns.cooldown-was-${status}${path}`, { command: cooldown.key })
@@ -218,6 +225,7 @@ class Cooldown extends System {
   async toggleEnabled (opts: Object) { await this.toggle(opts, 'enabled') }
   async toggleModerators (opts: Object) { await this.toggle(opts, 'moderator') }
   async toggleOwners (opts: Object) { await this.toggle(opts, 'owner') }
+  async toggleSubscribers (opts: Object) { await this.toggle(opts, 'subscriber') }
   async toggleNotify (opts: Object) { await this.toggle(opts, 'quiet') }
   async toggleType (opts: Object) { await this.toggle(opts, 'type') }
 }
