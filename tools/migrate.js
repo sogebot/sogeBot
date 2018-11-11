@@ -664,7 +664,7 @@ let migration = {
       console.info(` !! cooldowns collections can be deleted`)
     }
   }, {
-    version: '8.2.0',
+    version: '8.1.2',
     do: async () => {
       console.log('Updating cooldowns for subscribers')
       let processed = 0
