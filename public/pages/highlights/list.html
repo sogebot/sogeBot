@@ -15,8 +15,8 @@
         <div v-if="filtered.length > 0" class="card" v-for="(item, index) of filtered" v-bind:class="{ 'mt-3': index !== 0 }">
           <div class="card-body row p-0">
             <div class="col-sm-11 pr-0">
-              <a class="btn btn-block btn-outline-dark border-0 h-100 text-left p-0" target="_blank" v-bind:href="item.url + '?t=' + timestampToString(item.timestamp)">
-                <img class="float-left pr-3" v-bind:src="generateThumbnail(item.thumbnail_url)">
+              <a class="btn btn-block btn-outline-dark border-0 h-100 text-left p-0" target="_blank" v-bind:href="'https://www.twitch.tv/videos/' + item.id + '?t=' + timestampToString(item.timestamp)">
+                <img class="float-left pr-3" v-bind:src="generateThumbnail(item.game)">
                 <div style="padding-top:0.8rem !important">
                   {{ item.title }}
                   <small class="d-block">
@@ -96,8 +96,9 @@
             (value.seconds ? `${value.seconds}s` : '')
           return string
         },
-        generateThumbnail: function (url) {
-          return url.replace('%{width}', '133').replace('%{height}', '75')
+        generateThumbnail: function (game) {
+          const template = 'https://static-cdn.jtvnw.net/ttv-boxart/./%{game}-60x80.jpg'
+          return template.replace('%{game}', encodeURI(game))
         },
         deleteItem: function (id) {
           this.socket.emit('delete', {_id: id}, () => {
