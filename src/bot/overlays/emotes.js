@@ -148,7 +148,6 @@ class Emotes extends Overlay {
 
   async fetchEmotesGlobal () {
     this.fetch.global = true
-    this.lastFetch.global = Date.now()
 
     // we want to update once every week
     if (Date.now() - this.settings._.lastGlobalEmoteChk > 1000 * 60 * 60 * 24 * 7) {
