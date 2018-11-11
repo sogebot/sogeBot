@@ -164,6 +164,7 @@ class Events {
         let message = await global.commons.prepare('api.clips.created', { link: `https://clips.twitch.tv/${cid}` })
         global.commons.sendMessage(message, { username: global.commons.getOwner() })
       }
+      global.log.info('Clip was created successfully')
       return cid
     } else { // NG
       global.log.warning('Clip was not created successfully')
@@ -175,8 +176,6 @@ class Events {
     let cid = await global.events.fireCreateAClip(operation, attributes)
     if (cid) { // clip created ok
       global.overlays.clips.showClip(cid)
-    } else {
-      global.log.warning('Clip was not created successfully')
     }
   }
 

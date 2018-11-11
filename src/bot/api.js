@@ -966,8 +966,11 @@ class API {
     if (cluster.isWorker) throw new Error('API can run only on master')
     clearTimeout(this.timeouts['checkClips'])
 
-    const token = await global.oauth.settings.bot.accessToken
-    if (token === '') return
+    const token = global.oauth.settings.bot.accessToken
+    if (token === '') {
+      this.timeouts['checkClips'] = setTimeout(() => this.checkClips(), 1000)
+      return
+    }
 
     let notCheckedClips = (await global.db.engine.find('api.clips', { isChecked: false }))
 
@@ -1084,7 +1087,7 @@ class API {
     }
     const clipId = request.data.data[0].id
     const timestamp = new Date()
-    await global.db.engine.insert('api.clips', { clipId: clipId, isChecked: false, shouldBeCheckedAt: new Date(timestamp.getTime() + 20 * 1000) })
+    await global.db.engine.insert('api.clips', { clipId: clipId, isChecked: false, shouldBeCheckedAt: new Date(timestamp.getTime() + 120 * 1000) })
     return (await isClipChecked(clipId)) ? clipId : null
   }
 
