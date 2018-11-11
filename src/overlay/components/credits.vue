@@ -19,6 +19,7 @@ current: {{ current }}
         <font-awesome-icon :icon="['fab', el.class]" fixed-width />
         {{el.text}}
       </div>
+      <img v-if="el.type === 'image'" :src="el.image" :class="el.class" :key="index" />
       <div v-else :class="el.class" :key="index" v-html="el.text"></div>
     </template>
   </div>
@@ -81,19 +82,30 @@ export default {
         {
           text: opts.streamer,
           class: "streamer"
+        },
+        {
+          text: '',
+          class: "separator"
+        },
+        {
+          image: 'https://static-cdn.jtvnw.net/ttv-boxart/' + encodeURIComponent(opts.game.value) + '-600x840.jpg',
+          type: 'image',
+          class: 'image'
         }
       ])
 
       let currentKey = ''
       let page = []
+      let withoutPadding = true
       for (let [key, object] of Object.entries(_.groupBy(opts.events, 'event'))) {
         if (!opts.settings.show[key]) continue
         if (key !== currentKey) {
           currentKey = key
           page.push({
             text: opts.settings.text[key],
-            class: "header1"
+            class: withoutPadding ? "header1 withoutPadding" : "header1"
           })
+          withoutPadding = false
         }
 
         for (let o of object) {
@@ -366,6 +378,10 @@ export default {
     font-size: 3.5vw;
   }
 
+  .image {
+    width: 30vw;
+  }
+
   .header3 {
     padding-top: 2vw;
     font-size: 2.5vw;
@@ -378,8 +394,8 @@ export default {
     font-weight: bold;
   }
 
-  .header1:first {
-    padding-top: 0;
+  .withoutPadding {
+    padding-top: 0 !important;
   }
 
   .separator {
