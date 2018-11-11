@@ -30,6 +30,12 @@ define('CONNECTING', 1)
 define('RECONNECTING', 2)
 define('CONNECTED', 3)
 
+// Time
+define('SECOND', 1000)
+define('MINUTE', 1000 * 60)
+define('HOUR', 1000 * 60 * 60)
+define('DAY', 1000 * 60 * 60 * 24)
+
 // regexp
 define(
   'USERNAME_REGEXP',
