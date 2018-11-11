@@ -178,70 +178,32 @@ class Webhooks {
     const cid = global.oauth.channelId
     if (_.isEmpty(cid)) setTimeout(() => this.follower(aEvent), 10) // wait until channelId is set
     if (parseInt(aEvent.data.to_id, 10) !== parseInt(cid, 10)) return
-    const fid = aEvent.data.from_id
+    const data = aEvent.data
 
     // is in webhooks cache
-    if (this.existsInCache('follow', aEvent.data.from_id)) return
+    if (this.existsInCache('follow', data.from_id)) return
 
     // add to cache
-    this.addIdToCache('follow', aEvent.data.from_id)
+    this.addIdToCache('follow', data.from_id)
 
-    // check if user exists in db
-    let user = await global.db.engine.findOne('users', { id: fid })
-    if (_.isEmpty(user)) {
-      const token = await global.oauth.settings.bot.accessToken
-      if (token === '') return
-
-      // user doesn't exist - get username from api GET https://api.twitch.tv/helix/users?id=<user ID>
-      const url = `https://api.twitch.tv/helix/users?id=${fid}`
-      let request
-      try {
-        request = await axios.get(url, {
-          headers: {
-            'Authorization': 'Bearer ' + token
-          }
+    const user = await global.users.getById(data.from_id)
+    if (!_.get(user, 'is.follower', false) && _.now() - _.get(user, 'time.follow', 0) > 60000 * 60) {
+      if (!await global.commons.isBot(data.from_name)) {
+        global.overlays.eventlist.add({
+          type: 'follow',
+          username: data.from_name
         })
-
-        // save remaining api calls
-        global.api.calls.bot.limit = request.headers['ratelimit-limit']
-        global.api.calls.bot.remaining = request.headers['ratelimit-remaining']
-        global.api.calls.bot.refresh = request.headers['ratelimit-reset']
-
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'webhooks.follower', api: 'helix', endpoint: url, code: request.status, remaining: global.api.calls.bot.remaining })
-
-        if (!await global.commons.isBot(request.data.data[0].login)) {
-          global.overlays.eventlist.add({
-            type: 'follow',
-            username: request.data.data[0].login
-          })
-
-          const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(_.now(), 10)
-          const isFollower = user.lock && user.lock.follower ? user.is.follower : true
-          await global.db.engine.update('users', { id: fid }, { id: fid, username: request.data.data[0].login, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
-          global.log.follow(request.data.data[0].login)
-          global.events.fire('follow', { username: request.data.data[0].login, webhooks: true })
-        }
-      } catch (e) {
-        global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'webhooks.follower', api: 'helix', endpoint: url, code: e.stack, remaining: global.api.calls.bot.remaining })
+        global.log.follow(data.from_name)
+        global.events.fire('follow', { username: data.from_name, webhooks: true })
       }
+    }
+
+    if (!_.get(user, 'is.follower', false)) {
+      global.db.engine.update('users', { id: data.from_id }, { username: data.from_name, time: { followCheck: new Date().getTime() } })
     } else {
-      if (!_.get(user, 'is.follower', false) && _.now() - _.get(user, 'time.follow', 0) > 60000 * 60) {
-        if (!await global.commons.isBot(user.username)) {
-          global.overlays.eventlist.add({
-            type: 'follow',
-            username: user.username
-          })
-          global.log.follow(user.username)
-          global.events.fire('follow', { username: user.username, webhooks: true })
-        }
-      }
-
-      if (!_.get(user, 'is.follower', false)) global.users.set(user.username, { id: fid, time: { followCheck: new Date().getTime() } })
-      else {
-        const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(_.now(), 10)
-        const isFollower = user.lock && user.lock.follower ? user.is.follower : true
-        global.users.set(user.username, { id: fid, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
-      }
+      const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(_.now(), 10)
+      const isFollower = user.lock && user.lock.follower ? user.is.follower : true
+      global.db.engine.update('users', { id: data.from_id }, { username: data.from_name, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
     }
   }
 

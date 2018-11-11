@@ -569,37 +569,8 @@ class API {
 
       if (request.status === 200 && !_.isNil(request.data.data)) {
         // check if user id is in db, not in db load username from API
-        let fTime = []
-        let fidsToLoadFromAPI = []
-        let followersUsername = []
-        for (let u of request.data.data) {
-          fTime.push({ id: u.from_id, followed_at: u.followed_at })
-          let user = await global.db.engine.findOne('users', { id: u.from_id })
-          if (_.isEmpty(user)) fidsToLoadFromAPI.push(u.from_id)
-          else followersUsername.push(user.username)
-        }
-
-        if (fidsToLoadFromAPI.length > 0) {
-          let fids = _.map(fidsToLoadFromAPI, (o) => `id=${o}`)
-          let usersFromApi = await axios.get(`https://api.twitch.tv/helix/users?${fids.join('&')}`, {
-            headers: {
-              'Authorization': 'Bearer ' + token
-            }
-          })
-
-          // save remaining api calls
-          this.calls.bot.remaining = usersFromApi.headers['ratelimit-remaining']
-          this.calls.bot.refresh = usersFromApi.headers['ratelimit-reset']
-
-          if (global.panel && global.panel.io) global.panel.io.emit('api.stats', { data: request.data, timestamp: _.now(), call: 'getLatest100Followers', api: 'helix', endpoint: `https://api.twitch.tv/helix/users?${fids.join('&')}`, code: request.status, remaining: this.calls.bot.remaining })
-          for (let follower of usersFromApi.data.data) {
-            followersUsername.push(follower.login.toLowerCase())
-            await global.db.engine.update('users', { username: follower.login.toLowerCase() }, { id: follower.id })
-          }
-        }
-
-        for (let follower of followersUsername) {
-          let user = await global.users.getByName(follower)
+        for (let f of request.data.data) {
+          let user = await global.users.getById(f.from_id)
           if (!_.get(user, 'is.follower', false)) {
             if (new Date().getTime() - moment(_.get(user, 'time.follow', 0)).format('X') * 1000 < 60000 * 60 && !global.webhooks.existsInCache('follow', user.id)) {
               global.webhooks.addIdToCache('follow', user.id)
@@ -615,19 +586,10 @@ class API {
             }
           }
           try {
-            if (user.id) {
-              if (!_.isNil(_.find(fTime, (o) => o.id === user.id))) {
-                const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment(_.find(fTime, (o) => o.id === user.id).followed_at).format('x'))
-                const isFollower = user.lock && user.lock.follower ? user.is.follower : true
-                global.db.engine.update('users', { id: user.id }, { is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
-              } else {
-                const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(moment().format('x'))
-                const isFollower = user.lock && user.lock.follower ? user.is.follower : true
-                global.db.engine.update('users', { id: user.id }, { is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
-              }
-            }
+            const followedAt = user.lock && user.lock.followed_at ? Number(user.time.follow) : parseInt(f.followed_at).format('x')
+            const isFollower = user.lock && user.lock.follower ? user.is.follower : true
+            global.db.engine.update('users', { id: f.from_id }, { username: f.from_name, is: { follower: isFollower }, time: { followCheck: new Date().getTime(), follow: followedAt } })
           } catch (e) {
-            global.log.error(e)
             global.log.error(e.stack)
           }
         }
